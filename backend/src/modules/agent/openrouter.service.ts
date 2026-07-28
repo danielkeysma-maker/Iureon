@@ -207,7 +207,8 @@ export class OpenRouterMultiEngineService {
         body: JSON.stringify({
           model: validApiModel,
           messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
-          temperature: 0.2
+          temperature: 0.2,
+          max_tokens: 2048
         })
       });
       const json = await response.json();
