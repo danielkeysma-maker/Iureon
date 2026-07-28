@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Scale, Mail, Key, ShieldCheck, ArrowRight, Building2, AlertCircle } from 'lucide-react';
+import { Scale, Mail, Key, ShieldCheck, ArrowRight, AlertCircle } from 'lucide-react';
 import type { LawFirmTenant } from './Header';
 
 interface LoginPortalViewProps {
@@ -11,9 +11,8 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({
   onLoginSuccess,
   registeredFirms
 }) => {
-  const [email, setEmail] = useState('ingdanielma@gmail.com');
-  const [password, setPassword] = useState('Dma1102811692@');
-  const [selectedFirmId, setSelectedFirmId] = useState(registeredFirms[0]?.id || 'firm-default-01');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -30,7 +29,15 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({
 
     setTimeout(() => {
       setIsLoading(false);
-      const chosenFirm = registeredFirms.find((f) => f.id === selectedFirmId) || registeredFirms[0];
+      // Resolucion automatica de la firma por el usuario o asignacion por defecto
+      const chosenFirm = registeredFirms[0] || {
+        id: 'firm-default-01',
+        name: 'FIRMA APODERADA / DESPACHO JUDICIAL',
+        nit: 'NIT 900.000.000-0',
+        plan: 'PRO_FIRM',
+        status: 'active'
+      };
+
       onLoginSuccess(email.trim(), chosenFirm);
     }, 600);
   };
@@ -63,7 +70,7 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="ingdanielma@gmail.com"
+                placeholder="abogado@tufirma.co"
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-900 font-medium focus:outline-none focus:border-blue-900 focus:bg-white transition-all"
                 required
               />
@@ -84,26 +91,6 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({
               />
             </div>
           </div>
-
-          {registeredFirms.length > 0 && (
-            <div>
-              <label className="text-xs font-semibold text-slate-700 block mb-1">Firma / Despacho a Ingresar:</label>
-              <div className="relative">
-                <Building2 className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-                <select
-                  value={selectedFirmId}
-                  onChange={(e) => setSelectedFirmId(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-900 font-medium focus:outline-none focus:border-blue-900 focus:bg-white transition-all appearance-none"
-                >
-                  {registeredFirms.map((f) => (
-                    <option key={f.id} value={f.id}>
-                      {f.name} ({f.nit})
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          )}
 
           {errorMsg && (
             <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-xs font-medium flex items-center gap-2">
@@ -130,9 +117,8 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({
         </form>
 
         {/* Footer Info */}
-        <div className="pt-4 border-t border-slate-100 text-center text-[11px] text-slate-400 space-y-1">
+        <div className="pt-4 border-t border-slate-100 text-center text-[11px] text-slate-400">
           <p className="font-semibold text-slate-600">Autenticación Cifrada Supabase Auth &amp; Multi-Tenant RLS</p>
-          <p>SuperUsuario: <span className="font-mono font-bold text-blue-900">ingdanielma@gmail.com</span></p>
         </div>
       </div>
     </div>
