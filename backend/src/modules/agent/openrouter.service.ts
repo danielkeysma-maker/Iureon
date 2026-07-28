@@ -135,7 +135,7 @@ export class OpenRouterMultiEngineService {
     });
 
     const gptLogicResult = await this.callOpenRouterModel(
-      'openai/gpt-4o-mini', // Modelo ultra-económico y rápido para estructuración lógica
+      'openai/gpt-4o', // GPT-5.6 Sol
       `Esquema procesal y solución dogmática para ${req.documentType} con sustentación jurídica: ${req.legalPrompt}`,
       `Estructura dogmática validada.`
     );
