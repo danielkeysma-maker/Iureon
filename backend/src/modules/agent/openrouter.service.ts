@@ -126,7 +126,7 @@ export class OpenRouterMultiEngineService {
           ];
     }
 
-    // Stage 2: GPT-5.6 Sol Router
+    // Stage 2: GPT-5.6 Sol / GPT Logic Router
     onStepLog({
       stage: 'STAGE_2_LOGIC',
       engine: 'GPT',
@@ -135,7 +135,7 @@ export class OpenRouterMultiEngineService {
     });
 
     const gptLogicResult = await this.callOpenRouterModel(
-      'openai/gpt-4o', // Model ID principal GPT-5.6 Sol / GPT-4o
+      'openai/gpt-4o-mini', // Modelo ultra-económico y rápido para estructuración lógica
       `Esquema procesal y solución dogmática para ${req.documentType} con sustentación jurídica: ${req.legalPrompt}`,
       `Estructura dogmática validada.`
     );
