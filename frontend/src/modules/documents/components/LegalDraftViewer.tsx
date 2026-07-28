@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { API_BASE_URL } from '../../../config/api.config';
-import { FileText, Scale, ShieldAlert, Sparkles, CheckCircle2, BrainCircuit, Maximize2, Minimize2 } from 'lucide-react';
+import { FileText, Scale, ShieldAlert, Sparkles, CheckCircle2, BrainCircuit, Maximize2, Minimize2, Save, FolderOpen } from 'lucide-react';
 import { JargonSuggestionModal } from './JargonSuggestionModal';
 
 export interface GeneratedDraft {
@@ -18,12 +18,16 @@ interface LegalDraftViewerProps {
   onExportWord?: () => void;
   isFocusMode?: boolean;
   onToggleFocusMode?: () => void;
+  onSaveDraft?: (updatedText: string) => void;
+  onOpenSavedDraftsModal?: () => void;
 }
 
 export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
   draft,
   isFocusMode,
-  onToggleFocusMode
+  onToggleFocusMode,
+  onSaveDraft,
+  onOpenSavedDraftsModal
 }) => {
   const [editableText, setEditableText] = useState(draft.legalText);
   const [selectedText, setSelectedText] = useState('');
@@ -107,6 +111,28 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
                 <><BrainCircuit className="w-3 h-3" /><span>Enseñar estilo</span></>
               )}
             </button>
+
+            {onSaveDraft && (
+              <button
+                onClick={() => onSaveDraft(editableText)}
+                className="px-2.5 py-1.5 bg-blue-950 hover:bg-blue-900 text-white rounded-lg text-[11px] font-medium flex items-center gap-1.5 transition-colors shadow-sm"
+                title="Guardar borrador en el historial de la firma"
+              >
+                <Save className="w-3 h-3" />
+                <span>Guardar Borrador</span>
+              </button>
+            )}
+
+            {onOpenSavedDraftsModal && (
+              <button
+                onClick={onOpenSavedDraftsModal}
+                className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 rounded-lg text-[11px] font-medium flex items-center gap-1.5 transition-colors"
+                title="Ver lista de borradores guardados"
+              >
+                <FolderOpen className="w-3 h-3 text-slate-600" />
+                <span>Mis Borradores</span>
+              </button>
+            )}
 
             {onToggleFocusMode && (
               <button

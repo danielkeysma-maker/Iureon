@@ -14,6 +14,9 @@ import { DEFAULT_FIRM_BRANDING, DocumentExportService } from './modules/document
 import type { FirmBrandingConfig } from './modules/documents/services/documentExport.service';
 import { useLegalAgentWorkflow } from './modules/workspace/hooks/useLegalAgentWorkflow';
 
+import { SavedDraftsModal } from './modules/documents/components/SavedDraftsModal';
+import type { SavedDraftEntry } from './modules/documents/components/SavedDraftsModal';
+
 const SAMPLE_FIRMS: LawFirmTenant[] = [
   { id: '8f9b2c34-torres-asociados', name: 'Torres & Asociados S.A.S.', nit: '900.892.102-4', plan: 'PRO_FIRM', status: 'active' },
   { id: '1a2b3c4d-gomez-consultores', name: 'Gómez & Abogados Consultores', nit: '800.112.443-1', plan: 'ENTERPRISE', status: 'active' },
@@ -27,8 +30,63 @@ export function App() {
   const [isBrandingModalOpen, setIsBrandingModalOpen] = useState(false);
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
 
+  const [isSavedDraftsModalOpen, setIsSavedDraftsModalOpen] = useState(false);
+  const [savedDrafts, setSavedDrafts] = useState<SavedDraftEntry[]>(() => {
+    try {
+      const stored = localStorage.getItem('iureon_saved_drafts');
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
+
   const [firmBranding, setFirmBranding] = useState<FirmBrandingConfig>(DEFAULT_FIRM_BRANDING);
   const workflow = useLegalAgentWorkflow();
+
+  const handleSaveDraft = (updatedText: string) => {
+    if (!workflow.generatedDraft) return;
+
+    const newEntry: SavedDraftEntry = {
+      id: `draft-${Date.now()}`,
+      savedAt: new Date().toLocaleDateString('es-CO', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }),
+      draft: {
+        ...workflow.generatedDraft,
+        legalText: updatedText
+      }
+    };
+
+    const updatedList = [newEntry, ...savedDrafts];
+    setSavedDrafts(updatedList);
+    try {
+      localStorage.setItem('iureon_saved_drafts', JSON.stringify(updatedList));
+    } catch (e) {
+      console.warn('LocalStorage error saving draft:', e);
+    }
+
+    alert('✅ Borrador guardado exitosamente en la Bóveda de la Firma. Podrás abrirlo y editarlo en cualquier momento.');
+  };
+
+  const handleDeleteDraft = (id: string) => {
+    const updatedList = savedDrafts.filter((d) => d.id !== id);
+    setSavedDrafts(updatedList);
+    try {
+      localStorage.setItem('iureon_saved_drafts', JSON.stringify(updatedList));
+    } catch (e) {
+      console.warn('LocalStorage error deleting draft:', e);
+    }
+  };
+
+  const handleLoadDraft = (entry: SavedDraftEntry) => {
+    workflow.setGeneratedDraft(entry.draft);
+    workflow.setRightView('draft');
+    alert(`📂 Borrador "${entry.draft.title}" cargado en el editor.`);
+  };
 
   const handleExportWord = () => {
     if (workflow.generatedDraft) {
@@ -68,6 +126,13 @@ export function App() {
         isOpen={isSubscriptionModalOpen}
         onClose={() => setIsSubscriptionModalOpen(false)}
         info={sampleSubscriptionInfo}
+      />
+      <SavedDraftsModal
+        isOpen={isSavedDraftsModalOpen}
+        onClose={() => setIsSavedDraftsModalOpen(false)}
+        savedDrafts={savedDrafts}
+        onLoadDraft={handleLoadDraft}
+        onDeleteDraft={handleDeleteDraft}
       />
 
       {/* ENTERPRISE LEFT SIDEBAR */}
@@ -124,6 +189,8 @@ export function App() {
                 onExportPdf={handleExportPdf}
                 isFocusMode={workflow.isFocusMode}
                 onToggleFocusMode={() => workflow.setIsFocusMode(!workflow.isFocusMode)}
+                onSaveDraft={handleSaveDraft}
+                onOpenSavedDraftsModal={() => setIsSavedDraftsModalOpen(true)}
               />
             </>
           )}

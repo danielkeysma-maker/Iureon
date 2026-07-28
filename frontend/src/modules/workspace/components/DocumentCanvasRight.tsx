@@ -17,6 +17,8 @@ interface DocumentCanvasRightProps {
   onExportPdf: () => void;
   isFocusMode?: boolean;
   onToggleFocusMode?: () => void;
+  onSaveDraft?: (updatedText: string) => void;
+  onOpenSavedDraftsModal?: () => void;
 }
 
 export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
@@ -26,7 +28,9 @@ export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
   onExportWord,
   onExportPdf,
   isFocusMode,
-  onToggleFocusMode
+  onToggleFocusMode,
+  onSaveDraft,
+  onOpenSavedDraftsModal
 }) => {
   return (
     <section className="flex-1 bg-slate-100 flex flex-col h-full overflow-hidden font-sans">
@@ -41,6 +45,8 @@ export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
             onExportWord={onExportWord}
             isFocusMode={isFocusMode}
             onToggleFocusMode={onToggleFocusMode}
+            onSaveDraft={onSaveDraft}
+            onOpenSavedDraftsModal={onOpenSavedDraftsModal}
           />
         ) : (
           <PdfViewerCanvas />

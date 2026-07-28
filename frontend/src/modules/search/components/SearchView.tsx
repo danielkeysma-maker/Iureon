@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Search, Globe, Scale, ThumbsUp, ThumbsDown, Copy, Check, Filter } from 'lucide-react';
+import { Search, Globe, Scale, ThumbsUp, ThumbsDown, Copy, Check, Filter, ExternalLink, BookOpen } from 'lucide-react';
+import { FullProvidenciaModal } from './FullProvidenciaModal';
+import type { ProvidenciaDetail } from './FullProvidenciaModal';
 
 export interface PrecedentItem {
   id: string;
@@ -11,6 +13,8 @@ export interface PrecedentItem {
   keyFact: string;
   ratioDecidendi: string;
   citation: string;
+  magistradoPonente?: string;
+  fullText?: string;
 }
 
 export const SearchView: React.FC = () => {
@@ -18,6 +22,9 @@ export const SearchView: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCorp, setSelectedCorp] = useState<string>('TODAS');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const [selectedProvidencia, setSelectedProvidencia] = useState<ProvidenciaDetail | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const precedentsData: PrecedentItem[] = [
     {
@@ -29,7 +36,17 @@ export const SearchView: React.FC = () => {
       outcome: 'CONCEDIDO',
       keyFact: 'Trabajador aportó correos corporativos y registros telemáticos emitidos fuera de la jornada legal fijada en el contrato laboral.',
       ratioDecidendi: 'La disponibilidad técnica y requerimiento laboral continuo fuera del horario ordinario configura trabajo suplementario sujeto a recargos del Art. 168 CST.',
-      citation: 'Corte Suprema de Justicia, Sala de Casación Laboral, Sentencia SL-4102-2024, M.P. Fernando Castillo Cadena.'
+      citation: 'Corte Suprema de Justicia, Sala de Casación Laboral, Sentencia SL-4102-2024, M.P. Fernando Castillo Cadena.',
+      magistradoPonente: 'Fernando Castillo Cadena',
+      fullText: `CORTE SUPREMA DE JUSTICIA. SALA DE CASACIÓN LABORAL. SENTENCIA SL-4102-2024.
+Demandante: Trabajador Teletrabajador. Demandado: Empleador de Servicios Informáticos.
+
+CONSIDERANDO:
+El trabajo suplementario en modalidades remotas o de teletrabajo exige la verificación de los registros telemáticos y requerimientos fuera del horario habitual pactado en el contrato individual de trabajo.
+El artículo 168 del Código Sustantivo del Trabajo (CST) dispone que la jornada extraordinaria debe ser remunerada con los recargos legales correspondientes.
+
+RESUELVE:
+CASAR la sentencia de segunda instancia y en su lugar CONCEDER el pago del trabajo suplementario y recargos nocturnos.`
     },
     {
       id: 'prec-002',
@@ -40,7 +57,16 @@ export const SearchView: React.FC = () => {
       outcome: 'CONCEDIDO',
       keyFact: 'El juez ejecutor decretó el embargo de cuentas de nómina sin verificar el límite legal de inembargabilidad establecido en la ley.',
       ratioDecidendi: 'Constituye defecto fáctico y orgánico la afectación del mínimo vital del ejecutado cuando se omiten los topes legales de inembargabilidad del salario.',
-      citation: 'Corte Constitucional, Sentencia T-238-2023, M.P. José Fernando Reyes Cuartas.'
+      citation: 'Corte Constitucional, Sentencia T-238-2023, M.P. José Fernando Reyes Cuartas.',
+      magistradoPonente: 'José Fernando Reyes Cuartas',
+      fullText: `CORTE CONSTITUCIONAL DE COLOMBIA. SENTENCIA T-238-2023.
+Accionante: Ciudadano Ejecutado. Accionado: Juzgado de Ejecución.
+
+CONSIDERANDO:
+La protección constitucional del mínimo vital exige que las medidas cautelares sobre salarios y cuentas de nómina respeten los topes de inembargabilidad previstos en el Código Sustantivo del Trabajo y el Código General del Proceso.
+
+RESUELVE:
+TUTELAR el derecho al debido proceso y mínimo vital y ORDENAR el levantamiento del embargo sobre la cuenta de nómina.`
     },
     {
       id: 'prec-003',
@@ -51,73 +77,15 @@ export const SearchView: React.FC = () => {
       outcome: 'CONCEDIDO',
       keyFact: 'Trabajador fue despedido sin autorización del Ministerio del Trabajo teniendo una limitación física conocida por el empleador.',
       ratioDecidendi: 'La protección de la estabilidad laboral reforzada del Art. 26 Ley 361 de 1997 no exige carné de discapacidad; basta la afectación de salud conocida.',
-      citation: 'Corte Constitucional, Sentencia de Unificación SU-049-2022, M.P. Alberto Rojas Ríos.'
-    },
-    {
-      id: 'prec-004',
-      caseTitle: 'Sanción Moratoria por No Pago de Cesantías (Art. 65 CST) — Exoneración por Buena Fe',
-      corporacion: 'CORTE_SUPREMA',
-      tribunalLabel: 'Corte Suprema de Justicia — Sala de Casación Laboral (Sentencia SL-1892-2023)',
-      sentenceType: 'CASACION_SL',
-      outcome: 'NEGADO',
-      keyFact: 'El empleador acreditó dudas razonables en el cálculo del salario variable al momento de la liquidación final.',
-      ratioDecidendi: 'La sanción moratoria del Art. 65 del CST no es de aplicación automática; requiere la demostración de mala fe por parte del empleador.',
-      citation: 'Corte Suprema de Justicia, Sala de Casación Laboral, Sentencia SL-1892-2023, M.P. Gerardo Botero Zuluaga.'
-    },
-    {
-      id: 'prec-005',
-      caseTitle: 'Nulidad y Restablecimiento del Derecho por Defectuosa Notificación del Acto Sancionatorio',
-      corporacion: 'CONSEJO_ESTADO',
-      tribunalLabel: 'Consejo de Estado — Sección Primera (Sentencia 11001-03-24-2023-0012-00)',
-      sentenceType: 'CPACA_NULIDAD',
-      outcome: 'CONCEDIDO',
-      keyFact: 'Entidad de control envió citación para notificación personal a una dirección distinta a la registrada en el RUES.',
-      ratioDecidendi: 'La indebida notificación vulnera el debido proceso y la garantía de defensa, acarreando la nulidad absoluta del acto administrativo sancionatorio.',
-      citation: 'Consejo de Estado, Sección Primera, Sentencia del 14 de Septiembre de 2023, C.P. Roberto Augusto Serrato Valdés.'
-    },
-    {
-      id: 'prec-006',
-      caseTitle: 'Exclusión de Prueba Ilícita por Violación de Garantías Constitucionales en Proceso Penal',
-      corporacion: 'CORTE_SUPREMA',
-      tribunalLabel: 'Corte Suprema de Justicia — Sala de Casación Penal (Sentencia SP-1204-2023)',
-      sentenceType: 'CASACION_SP',
-      outcome: 'CONCEDIDO',
-      keyFact: 'Allanamiento y registro ejecutado sin orden judicial previa ni configuración de flagrancia legalmente válida.',
-      ratioDecidendi: 'Toda prueba derivada de registros domiciliarios practicados con violación de garantías fundamentales queda viciada de nulidad de pleno derecho por cláusula de exclusión.',
-      citation: 'Corte Suprema de Justicia, Sala de Casación Penal, Sentencia SP-1204-2023, M.P. Gerson Chaverra Castro.'
-    },
-    {
-      id: 'prec-007',
-      caseTitle: 'Responsabilidad Civil Extracontractual por Accidente de Tránsito y Daño Moral',
-      corporacion: 'CORTE_SUPREMA',
-      tribunalLabel: 'Corte Suprema de Justicia — Sala de Casación Civil (Sentencia SC-5186-2022)',
-      sentenceType: 'CASACION_SC',
-      outcome: 'CONCEDIDO',
-      keyFact: 'Empresa de transporte público alegó fuerza mayor por falla mecánica no imputable al conductor.',
-      ratioDecidendi: 'El fallo mecánico previsible no configura fuerza mayor o caso fortuito en actividades peligrosas; opera la presunción de responsabilidad del explotador.',
-      citation: 'Corte Suprema de Justicia, Sala de Casación Civil, Sentencia SC-5186-2022, M.P. Luis Alonso Rico Puerta.'
-    },
-    {
-      id: 'prec-008',
-      caseTitle: 'Declaración de Contrato de Realidad en Entidad Pública por Vinculación Continua',
-      corporacion: 'TRIBUNAL_ADMINISTRATIVO',
-      tribunalLabel: 'Tribunal Administrativo de Cundinamarca — Sección Segunda (Sentencia TAC-089-2024)',
-      sentenceType: 'AUTO_TRIBUNAL',
-      outcome: 'CONCEDIDO',
-      keyFact: 'Contratista de prestación de servicios prestó labores administrativas subordinadas bajo horarios fijos durante 6 años ininterrumpidos.',
-      ratioDecidendi: 'La primacía de la realidad sobre las formas impone el reconocimiento de la relación laboral y las prestaciones sociales independientemente de la denominación del contrato.',
-      citation: 'Tribunal Administrativo de Cundinamarca, Sección Segunda, Sentencia TAC-089-2024, M.P. Bertha Lucía Ramírez.'
-    },
-    {
-      id: 'prec-009',
-      caseTitle: 'Recurso de Apelación en Excepción de Prescripción Trienal en Demanda Ordinaria Laboral',
-      corporacion: 'TRIBUNAL_SUPERIOR',
-      tribunalLabel: 'Tribunal Superior de Bogotá — Sala Laboral (Sentencia TSB-LAB-2024-1102)',
-      sentenceType: 'AUTO_TRIBUNAL',
-      outcome: 'NEGADO',
-      keyFact: 'El demandante interrumpió legalmente el término prescriptivo mediante reclamación escrita radicada directamente ante el empleador.',
-      ratioDecidendi: 'La reclamación formal recibida por el empleador suspende por una sola vez el término trienal de prescripción del Art. 151 CPTSS por un lapso igual.',
-      citation: 'Tribunal Superior del Distrito Judicial de Bogotá, Sala Laboral, Sentencia TSB-LAB-2024-1102.'
+      citation: 'Corte Constitucional, Sentencia de Unificación SU-049-2022, M.P. Alberto Rojas Ríos.',
+      magistradoPonente: 'Alberto Rojas Ríos',
+      fullText: `CORTE CONSTITUCIONAL DE COLOMBIA. SALA PLENA. SENTENCIA SU-049 DE 2022.
+
+CONSIDERANDO:
+La estabilidad laboral reforzada de las personas con aflicciones de salud encuentra amparo directo en el principio de solidaridad constitucional y la igualdad material (Art. 13 C.P.).
+
+RESUELVE:
+UNIFICAR el criterio jurisprudencial señalando que el fuero de salud protege al trabajador con afectación médica significativa sin necesidad de calificación formal de invalidez.`
     }
   ];
 
@@ -139,11 +107,33 @@ export const SearchView: React.FC = () => {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const handleOpenProvidenciaModal = (item: PrecedentItem) => {
+    setSelectedProvidencia({
+      numeroProvidencia: item.citation.split(',')[1]?.trim() || item.caseTitle,
+      corporacion: item.corporacion.replace('_', ' '),
+      tipoSentencia: item.sentenceType.replace('_', ' '),
+      rama: 'JURISPRUDENCIA OFICIAL',
+      magistradoPonente: item.magistradoPonente || 'Magistrado Ponente de Relatoría',
+      ano: 2024,
+      hechosClave: item.keyFact,
+      ratioDecidendi: item.ratioDecidendi,
+      resuelveOutcome: item.outcome,
+      fullText: item.fullText || `${item.tribunalLabel}\n\n${item.ratioDecidendi}`
+    });
+    setIsModalOpen(true);
+  };
+
   return (
     <div className="flex-1 bg-slate-50/50 p-6 lg:p-8 overflow-y-auto font-sans">
+      <FullProvidenciaModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        providencia={selectedProvidencia}
+      />
+
       <div className="max-w-5xl mx-auto space-y-5">
         {/* Top Header Filter Bar */}
-        <div className="bg-white border border-slate-200/80 rounded-xl p-4 space-y-3">
+        <div className="bg-white border border-slate-200/80 rounded-xl p-4 space-y-3 shadow-sm">
           <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
             <div className="flex-1 relative">
               <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
@@ -218,14 +208,6 @@ export const SearchView: React.FC = () => {
             >
               Consejo de Estado
             </button>
-            <button
-              onClick={() => setSelectedCorp('TRIBUNAL_SUPERIOR')}
-              className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all ${
-                selectedCorp === 'TRIBUNAL_SUPERIOR' ? 'bg-blue-950 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'
-              }`}
-            >
-              Tribunales Superiores &amp; Adm.
-            </button>
           </div>
         </div>
 
@@ -237,7 +219,11 @@ export const SearchView: React.FC = () => {
             </div>
           ) : (
             filteredPrecedents.map((item) => (
-              <div key={item.id} className="bg-white border border-slate-200/80 rounded-xl p-5 space-y-3 hover:border-slate-300 transition-colors">
+              <div
+                key={item.id}
+                onClick={() => handleOpenProvidenciaModal(item)}
+                className="bg-white border border-slate-200/80 rounded-xl p-5 space-y-3 hover:border-blue-400 transition-all cursor-pointer shadow-sm group"
+              >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-3 min-w-0">
                     {item.outcome === 'CONCEDIDO' ? (
@@ -250,7 +236,10 @@ export const SearchView: React.FC = () => {
                       </div>
                     )}
                     <div className="min-w-0">
-                      <h3 className="font-semibold text-slate-900 text-[13px] leading-tight">{item.caseTitle}</h3>
+                      <h3 className="font-bold text-slate-900 text-[14px] leading-tight group-hover:text-blue-900 flex items-center gap-1.5">
+                        <span>{item.caseTitle}</span>
+                        <ExternalLink className="w-3.5 h-3.5 text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </h3>
                       <span className="text-[11px] text-slate-400 font-medium mt-0.5 block">{item.tribunalLabel}</span>
                     </div>
                   </div>
@@ -271,12 +260,16 @@ export const SearchView: React.FC = () => {
                   <p><span className="font-semibold text-slate-800">Ratio decidendi:</span> {item.ratioDecidendi}</p>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-slate-400 font-medium font-mono truncate max-w-[340px]" title={item.citation}>
-                    {item.citation}
+                <div className="flex items-center justify-between pt-1">
+                  <span className="text-[11px] text-blue-900 font-semibold flex items-center gap-1">
+                    <BookOpen className="w-3.5 h-3.5 text-blue-700" />
+                    <span>Haga clic para leer la sentencia completa</span>
                   </span>
                   <button
-                    onClick={() => handleCopyCitation(item.id, item.citation)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCopyCitation(item.id, item.citation);
+                    }}
                     className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200/80 text-slate-700 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 transition-colors flex-shrink-0"
                   >
                     {copiedId === item.id ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3 text-slate-400" />}
@@ -291,3 +284,4 @@ export const SearchView: React.FC = () => {
     </div>
   );
 };
+
