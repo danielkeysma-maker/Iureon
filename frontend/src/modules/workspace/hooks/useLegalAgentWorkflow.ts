@@ -230,12 +230,12 @@ Por favor espere unos segundos mientras se finaliza la redacción solemne.`,
 
 REFERENCIA: ACCIÓN DE TUTELA PARA LA PROTECCIÓN DE DERECHOS FUNDAMENTALES
 ACCIONANTE: APODERADO JUDICIAL / CIUDADANO AFECTADO
-ACCIONADO: SECRETARÍA DE TRÁNSITO Y TRANSPORTE / INSPECCIÓN DE POLICÍA / ENTIDAD PÚBLICA
+ACCIONADO: AUTORIDAD PÚBLICA / ENTIDAD DE CONTROL / INSPECCIÓN JUDICIAL
 
-JULIÁN DELGADO, abogado en ejercicio identificado con T.P. No. 245.890 del C.S.J., actuando en representación del ciudadano afectado, acudo ante su Despacho para interponer formalmente ACCIÓN DE TUTELA conforme al Artículo 86 de la Constitución Política y el Decreto 2591 de 1991, con fundamento en los siguientes hechos:
+El apoderado judicial en ejercicio, actuando en representación del ciudadano afectado, acudo ante su Despacho para interponer formalmente ACCIÓN DE TUTELA conforme al Artículo 86 de la Constitución Política y el Decreto 2591 de 1991, con fundamento en los siguientes hechos:
 
 I. HECHOS QUE MOTIVAN LA ACCIÓN
-1. Mi representado fue afectado por actuaciones derivadas de la situación denunciada: ${legalPrompt || 'Falsedad e indebida asignación en registros vehiculares y fotomultas por suplantación de placas de motocicleta'}.
+1. Mi representado fue afectado por actuaciones derivadas de la situación denunciada: ${legalPrompt || 'Falsedad e indebida asignación en registros vehiculares y fotomultas por suplantación de placas'}.
 2. La entidad accionada ha omitido verificar la veracidad fáctica de los registros, vulnerando de manera flagrante los derechos fundamentales al debido proceso e intimidad de mi representado.
 3. Se han agotado las peticiones directas ante la autoridad competente sin obtener una respuesta de fondo o rectificación inmediata.
 
@@ -249,14 +249,13 @@ De conformidad con la jurisprudencia pacífica de la Corte Constitucional (Sente
 
 IV. PRETENSIONES
 1. TUTELAR de manera inmediata los derechos fundamentales al Debido Proceso y Habeas Data de mi representado.
-2. ORDENAR a la entidad accionada la suspensión inmediata de los cobros o registros derivados de la alteración o falsedad fáctica denunciada sobre el vehículo / motocicleta.
+2. ORDENAR a la entidad accionada la suspensión inmediata de los cobros o registros derivados de la alteración o falsedad fáctica denunciada.
 3. ORDENAR la rectificación del expediente administrativo y la exoneración de los valores indebidamente atribuidos.
 
 Atentamente,
 
-JULIÁN DELGADO
-T.P. No. 245.890 del C.S. de la J.
-Abogado Apoderado`,
+APODERADO JUDICIAL
+T.P. Abogado Apoderado`,
           tokensConsumed: 4820
         });
       } else {
@@ -273,7 +272,7 @@ Abogado Apoderado`,
 REFERENCIA: ${documentType.toUpperCase()}
 EXPEDIENTE: EXP-2026-904
 
-JULIÁN DELGADO, apoderado judicial en ejercicio, presento ante su Despacho la siguiente solicitud en el marco de la actuación de la referencia:
+El apoderado judicial en ejercicio presento ante su Despacho la siguiente solicitud en el marco de la actuación de la referencia:
 
 I. SUSTENTO FÁCTICO
 ${legalPrompt || 'Hechos expuestos en la solicitud procesal del expediente digital.'}
@@ -286,8 +285,8 @@ III. PETICIONES
 
 Atentamente,
 
-JULIÁN DELGADO
-T.P. No. 245.890 del C.S. de la J.`,
+APODERADO JUDICIAL
+T.P. Abogado Apoderado`,
           tokensConsumed: 4820
         });
       }
