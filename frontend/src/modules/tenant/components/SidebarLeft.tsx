@@ -26,6 +26,7 @@ interface SidebarLeftProps {
   setIsFirmDropdownOpen: (open: boolean) => void;
   onOpenBrandingModal: () => void;
   onOpenSubscriptionModal: () => void;
+  onOpenUserManagementModal?: () => void;
 }
 
 export const SidebarLeft: React.FC<SidebarLeftProps> = ({
@@ -37,7 +38,8 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
   isFirmDropdownOpen,
   setIsFirmDropdownOpen,
   onOpenBrandingModal,
-  onOpenSubscriptionModal
+  onOpenSubscriptionModal,
+  onOpenUserManagementModal
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -107,6 +109,19 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
                     {firm.id === activeFirm.id && <Check className="w-4 h-4 text-blue-700 flex-shrink-0" />}
                   </button>
                 ))}
+
+                <div className="border-t border-slate-100 mt-1 pt-1">
+                  <button
+                    onClick={() => {
+                      setIsFirmDropdownOpen(false);
+                      onOpenUserManagementModal?.();
+                    }}
+                    className="w-full px-3 py-2 text-left text-xs font-bold text-blue-900 hover:bg-blue-50 flex items-center gap-1.5"
+                  >
+                    <Building2 className="w-3.5 h-3.5" />
+                    <span>👥 Gestión de Usuarios &amp; Firmas</span>
+                  </button>
+                </div>
               </div>
             )}
           </div>

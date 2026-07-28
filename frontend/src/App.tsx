@@ -17,18 +17,29 @@ import { useLegalAgentWorkflow } from './modules/workspace/hooks/useLegalAgentWo
 import { SavedDraftsModal } from './modules/documents/components/SavedDraftsModal';
 import type { SavedDraftEntry } from './modules/documents/components/SavedDraftsModal';
 
-const SAMPLE_FIRMS: LawFirmTenant[] = [
-  { id: '8f9b2c34-torres-asociados', name: 'Torres & Asociados S.A.S.', nit: '900.892.102-4', plan: 'PRO_FIRM', status: 'active' },
-  { id: '1a2b3c4d-gomez-consultores', name: 'Gómez & Abogados Consultores', nit: '800.112.443-1', plan: 'ENTERPRISE', status: 'active' },
-  { id: '9z8y7x6w-valencia-legal', name: 'Valencia & Cárdenas LegalTech', nit: '901.554.981-9', plan: 'STARTER', status: 'active' }
+import { TenantUserManagementModal } from './modules/tenant/components/TenantUserManagementModal';
+
+const INITIAL_REGISTERED_FIRMS: LawFirmTenant[] = [
+  { id: 'firm-default-01', name: 'FIRMA APODERADA / DESPACHO JUDICIAL', nit: 'NIT 900.000.000-0', plan: 'PRO_FIRM', status: 'active' }
 ];
 
 export function App() {
   const [mainView, setMainView] = useState<'workspace' | 'search' | 'tools' | 'audit'>('workspace');
-  const [activeFirm, setActiveFirm] = useState<LawFirmTenant>(SAMPLE_FIRMS[0]);
+
+  const [registeredFirms, setRegisteredFirms] = useState<LawFirmTenant[]>(() => {
+    try {
+      const stored = localStorage.getItem('iureon_registered_firms');
+      return stored ? JSON.parse(stored) : INITIAL_REGISTERED_FIRMS;
+    } catch {
+      return INITIAL_REGISTERED_FIRMS;
+    }
+  });
+
+  const [activeFirm, setActiveFirm] = useState<LawFirmTenant>(registeredFirms[0] || INITIAL_REGISTERED_FIRMS[0]);
   const [isFirmDropdownOpen, setIsFirmDropdownOpen] = useState(false);
   const [isBrandingModalOpen, setIsBrandingModalOpen] = useState(false);
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
+  const [isUserManagementModalOpen, setIsUserManagementModalOpen] = useState(false);
 
   const [isSavedDraftsModalOpen, setIsSavedDraftsModalOpen] = useState(false);
   const [savedDrafts, setSavedDrafts] = useState<SavedDraftEntry[]>(() => {
@@ -42,6 +53,39 @@ export function App() {
 
   const [firmBranding, setFirmBranding] = useState<FirmBrandingConfig>(DEFAULT_FIRM_BRANDING);
   const workflow = useLegalAgentWorkflow();
+
+  const handleCreateFirm = (newFirm: LawFirmTenant) => {
+    const updated = [newFirm, ...registeredFirms];
+    setRegisteredFirms(updated);
+    setActiveFirm(newFirm);
+    try {
+      localStorage.setItem('iureon_registered_firms', JSON.stringify(updated));
+    } catch (err) {
+      console.warn('LocalStorage save firm fail:', err);
+    }
+  };
+
+  const handleUpdateFirm = (updatedFirm: LawFirmTenant) => {
+    const updated = registeredFirms.map((f) => (f.id === updatedFirm.id ? updatedFirm : f));
+    setRegisteredFirms(updated);
+    if (activeFirm.id === updatedFirm.id) setActiveFirm(updatedFirm);
+    try {
+      localStorage.setItem('iureon_registered_firms', JSON.stringify(updated));
+    } catch (err) {
+      console.warn('LocalStorage update firm fail:', err);
+    }
+  };
+
+  const handleDeleteFirm = (firmId: string) => {
+    const updated = registeredFirms.filter((f) => f.id !== firmId);
+    setRegisteredFirms(updated);
+    if (updated.length > 0) setActiveFirm(updated[0]);
+    try {
+      localStorage.setItem('iureon_registered_firms', JSON.stringify(updated));
+    } catch (err) {
+      console.warn('LocalStorage delete firm fail:', err);
+    }
+  };
 
   const handleSaveDraft = (updatedText: string) => {
     if (!workflow.generatedDraft) return;
@@ -106,11 +150,11 @@ export function App() {
     subscriptionStatus: 'active',
     monthlyTokensUsed: 1420500,
     monthlyTokensLimit: 5000000,
-    activeUsersCount: 4,
+    activeUsersCount: 1,
     maxUsersAllowed: 10,
     renewalDate: '2026-08-20',
     usersList: [
-      { id: 'usr-001', name: 'Dr. Julián Delgado', email: 'jdelgado@torresasociados.co', role: 'SOCIO_ADMIN', status: 'active' }
+      { id: 'usr-001', name: 'Administrador de Firma', email: 'admin@firma.co', role: 'SOCIO_ADMIN', status: 'active' }
     ]
   };
 
@@ -134,6 +178,16 @@ export function App() {
         onLoadDraft={handleLoadDraft}
         onDeleteDraft={handleDeleteDraft}
       />
+      <TenantUserManagementModal
+        isOpen={isUserManagementModalOpen}
+        onClose={() => setIsUserManagementModalOpen(false)}
+        firms={registeredFirms}
+        activeFirm={activeFirm}
+        onSelectFirm={(f) => setActiveFirm(f)}
+        onCreateFirm={handleCreateFirm}
+        onUpdateFirm={handleUpdateFirm}
+        onDeleteFirm={handleDeleteFirm}
+      />
 
       {/* ENTERPRISE LEFT SIDEBAR */}
       <SidebarLeft
@@ -141,11 +195,12 @@ export function App() {
         setMainView={setMainView}
         activeFirm={activeFirm}
         setActiveFirm={setActiveFirm}
-        sampleFirms={SAMPLE_FIRMS}
+        sampleFirms={registeredFirms}
         isFirmDropdownOpen={isFirmDropdownOpen}
         setIsFirmDropdownOpen={setIsFirmDropdownOpen}
         onOpenBrandingModal={() => setIsBrandingModalOpen(true)}
         onOpenSubscriptionModal={() => setIsSubscriptionModalOpen(true)}
+        onOpenUserManagementModal={() => setIsUserManagementModalOpen(true)}
       />
 
       {/* RIGHT MAIN WORKSPACE AREA */}
