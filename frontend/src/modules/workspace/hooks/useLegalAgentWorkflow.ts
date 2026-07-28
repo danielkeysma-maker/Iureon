@@ -12,6 +12,7 @@ export function useLegalAgentWorkflow() {
   const [documentType, setDocumentType] = useState('Contestación de Demanda');
   const [copied, setCopied] = useState(false);
   const [generatedDraft, setGeneratedDraft] = useState<GeneratedDraft | null>(null);
+  const [isFocusMode, setIsFocusMode] = useState(false);
 
   const [analyticsData] = useState<CaseProvidenciaEvaluationData>({
     expedienteId: 'EXP-2026-904',
@@ -303,6 +304,8 @@ T.P. No. 245.890 del C.S. de la J.`,
     generatedDraft,
     analyticsData,
     logs,
+    isFocusMode,
+    setIsFocusMode,
     handleSendPrompt,
     handleCopyText
   };

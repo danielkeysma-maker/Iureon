@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronRight, Sparkles, BookOpen, Wrench, Shield, CheckCircle2, Copy, Download, FileType } from 'lucide-react';
+import { ChevronRight, Sparkles, BookOpen, Wrench, Shield, CheckCircle2, Copy, Download, FileType, Maximize2, Minimize2 } from 'lucide-react';
 
 interface HeaderTopProps {
   mainView: 'workspace' | 'search' | 'tools' | 'audit';
@@ -9,6 +9,8 @@ interface HeaderTopProps {
   onCopyText: () => void;
   onExportWord: () => void;
   onExportPdf: () => void;
+  isFocusMode?: boolean;
+  onToggleFocusMode?: () => void;
 }
 
 export const HeaderTop: React.FC<HeaderTopProps> = ({
@@ -18,7 +20,9 @@ export const HeaderTop: React.FC<HeaderTopProps> = ({
   copied,
   onCopyText,
   onExportWord,
-  onExportPdf
+  onExportPdf,
+  isFocusMode,
+  onToggleFocusMode
 }) => {
   const viewMeta: Record<string, { label: string; icon: React.ReactNode }> = {
     workspace: { label: 'Redacción & Providencias', icon: <Sparkles className="w-4 h-4 text-blue-800" /> },
@@ -92,6 +96,21 @@ export const HeaderTop: React.FC<HeaderTopProps> = ({
                 <FileType className="w-3.5 h-3.5" />
                 <span>PDF</span>
               </button>
+
+              {onToggleFocusMode && (
+                <button
+                  onClick={onToggleFocusMode}
+                  className={`px-3 py-1.5 rounded-lg text-[12px] font-medium flex items-center gap-1.5 transition-all ml-1 ${
+                    isFocusMode
+                      ? 'bg-amber-500 hover:bg-amber-600 text-white font-semibold shadow-sm'
+                      : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border border-indigo-200'
+                  }`}
+                  title={isFocusMode ? 'Restaurar panel lateral de la plataforma' : 'Expandir editor a Pantalla Central'}
+                >
+                  {isFocusMode ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+                  <span>{isFocusMode ? 'Vista Dividida' : 'Pantalla Central'}</span>
+                </button>
+              )}
             </div>
           )}
         </div>

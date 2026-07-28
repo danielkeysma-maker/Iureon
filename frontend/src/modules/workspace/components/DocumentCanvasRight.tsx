@@ -15,6 +15,8 @@ interface DocumentCanvasRightProps {
   onCopyText: () => void;
   onExportWord: () => void;
   onExportPdf: () => void;
+  isFocusMode?: boolean;
+  onToggleFocusMode?: () => void;
 }
 
 export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
@@ -22,16 +24,24 @@ export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
   generatedDraft,
   analyticsData,
   onExportWord,
-  onExportPdf
+  onExportPdf,
+  isFocusMode,
+  onToggleFocusMode
 }) => {
   return (
     <section className="flex-1 bg-slate-100 flex flex-col h-full overflow-hidden font-sans">
       {/* Main Canvas View Area */}
-      <div className="flex-1 p-6 md:p-8 overflow-y-auto bg-slate-100/70">
+      <div className="flex-1 p-4 md:p-8 overflow-y-auto bg-slate-100/70">
         {rightView === 'analytics' ? (
           <PrecedentsAnalyticsCard data={analyticsData} />
         ) : rightView === 'draft' && generatedDraft ? (
-          <LegalDraftViewer draft={generatedDraft} onExportPdf={onExportPdf} onExportWord={onExportWord} />
+          <LegalDraftViewer
+            draft={generatedDraft}
+            onExportPdf={onExportPdf}
+            onExportWord={onExportWord}
+            isFocusMode={isFocusMode}
+            onToggleFocusMode={onToggleFocusMode}
+          />
         ) : (
           <PdfViewerCanvas />
         )}

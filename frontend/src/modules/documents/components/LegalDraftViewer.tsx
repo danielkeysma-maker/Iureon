@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { API_BASE_URL } from '../../../config/api.config';
-import { FileText, Scale, ShieldAlert, Sparkles, CheckCircle2, BrainCircuit, FileType, Download } from 'lucide-react';
+import { FileText, Scale, ShieldAlert, Sparkles, CheckCircle2, BrainCircuit, Maximize2, Minimize2 } from 'lucide-react';
 import { JargonSuggestionModal } from './JargonSuggestionModal';
 
 export interface GeneratedDraft {
@@ -16,12 +16,14 @@ interface LegalDraftViewerProps {
   draft: GeneratedDraft;
   onExportPdf?: () => void;
   onExportWord?: () => void;
+  isFocusMode?: boolean;
+  onToggleFocusMode?: () => void;
 }
 
 export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
   draft,
-  onExportPdf,
-  onExportWord
+  isFocusMode,
+  onToggleFocusMode
 }) => {
   const [editableText, setEditableText] = useState(draft.legalText);
   const [selectedText, setSelectedText] = useState('');
@@ -67,7 +69,7 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
   const wordCount = editableText.split(/\s+/).filter(Boolean).length;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-5 font-sans">
+    <div className={`${isFocusMode ? 'max-w-6xl' : 'max-w-4xl'} mx-auto space-y-5 font-sans transition-all duration-300`}>
       <JargonSuggestionModal
         isOpen={isJargonModalOpen}
         onClose={() => setIsJargonModalOpen(false)}
@@ -76,17 +78,17 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
       />
 
       {/* Metadata + Actions bar */}
-      <div className="bg-white border border-slate-200/80 rounded-xl px-5 py-4">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2.5">
-            <FileText className="w-4 h-4 text-blue-900" />
-            <div>
-              <h3 className="text-[13px] font-semibold text-slate-900">{draft.title}</h3>
+      <div className="bg-white border border-slate-200/80 rounded-xl px-5 py-4 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <FileText className="w-4 h-4 text-blue-900 shrink-0" />
+            <div className="min-w-0">
+              <h3 className="text-[13px] font-semibold text-slate-900 truncate">{draft.title}</h3>
               <p className="text-[11px] text-slate-400 font-medium">{wordCount} palabras • Edición en vivo</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => setIsJargonModalOpen(true)}
               className="px-2.5 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-slate-700 rounded-lg text-[11px] font-medium flex items-center gap-1.5 transition-colors"
@@ -106,20 +108,18 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
               )}
             </button>
 
-            {onExportWord && (
+            {onToggleFocusMode && (
               <button
-                onClick={onExportWord}
-                className="px-2.5 py-1.5 bg-blue-950 hover:bg-blue-900 text-white rounded-lg text-[11px] font-medium flex items-center gap-1.5 transition-colors"
+                onClick={onToggleFocusMode}
+                className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 transition-all shadow-sm ${
+                  isFocusMode
+                    ? 'bg-amber-500 hover:bg-amber-600 text-white'
+                    : 'bg-indigo-900 hover:bg-indigo-950 text-white'
+                }`}
+                title={isFocusMode ? 'Restaurar vista dividida' : 'Expandir editor a Pantalla Central'}
               >
-                <Download className="w-3 h-3" /><span>Word</span>
-              </button>
-            )}
-            {onExportPdf && (
-              <button
-                onClick={onExportPdf}
-                className="px-2.5 py-1.5 bg-rose-700 hover:bg-rose-800 text-white rounded-lg text-[11px] font-medium flex items-center gap-1.5 transition-colors"
-              >
-                <FileType className="w-3 h-3" /><span>PDF</span>
+                {isFocusMode ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+                <span>{isFocusMode ? 'Vista Dividida' : 'Pantalla Central'}</span>
               </button>
             )}
           </div>
@@ -159,9 +159,9 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
         </div>
       </div>
 
-      {/* Editable Folio */}
-      <div className="bg-white border border-slate-200/80 rounded-xl p-8 sm:p-12 shadow-sm relative border-t-2 border-t-blue-900">
-        <div className="border-b border-slate-200 pb-3 mb-6 flex justify-between items-center">
+      {/* Editable Folio Paper Canvas */}
+      <div className="bg-white border border-slate-200/80 rounded-xl p-6 sm:p-12 shadow-sm relative border-t-4 border-t-blue-900 max-w-full overflow-hidden">
+        <div className="border-b border-slate-200 pb-3 mb-6 flex justify-between items-center flex-wrap gap-2">
           <span className="uppercase font-semibold tracking-wide text-slate-800 text-[11px]">República de Colombia — Rama Judicial</span>
           <span className="font-mono text-[10px] text-slate-400">Edición interactiva</span>
         </div>
@@ -171,8 +171,8 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
           onChange={(e) => setEditableText(e.target.value)}
           onMouseUp={handleSelection}
           onKeyUp={handleSelection}
-          rows={22}
-          className="w-full bg-transparent border-0 focus:outline-none font-legal text-sm md:text-base leading-relaxed text-slate-900 resize-none selection:bg-blue-100"
+          rows={24}
+          className="w-full bg-transparent border-0 focus:outline-none font-legal text-sm sm:text-base leading-relaxed text-slate-900 resize-y selection:bg-blue-100 whitespace-pre-wrap break-words max-w-full overflow-x-hidden min-h-[550px]"
         />
       </div>
     </div>

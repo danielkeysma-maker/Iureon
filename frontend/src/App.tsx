@@ -93,20 +93,24 @@ export function App() {
           onCopyText={workflow.handleCopyText}
           onExportWord={handleExportWord}
           onExportPdf={handleExportPdf}
+          isFocusMode={workflow.isFocusMode}
+          onToggleFocusMode={() => workflow.setIsFocusMode(!workflow.isFocusMode)}
         />
 
         <main className="flex-1 flex overflow-hidden">
           {mainView === 'workspace' && (
             <>
-              <AgentPanelLeft
-                documentType={workflow.documentType}
-                setDocumentType={workflow.setDocumentType}
-                legalPrompt={workflow.legalPrompt}
-                setLegalPrompt={workflow.setLegalPrompt}
-                isProcessing={workflow.isProcessing}
-                handleSendPrompt={workflow.handleSendPrompt}
-                logs={workflow.logs}
-              />
+              {!workflow.isFocusMode && (
+                <AgentPanelLeft
+                  documentType={workflow.documentType}
+                  setDocumentType={workflow.setDocumentType}
+                  legalPrompt={workflow.legalPrompt}
+                  setLegalPrompt={workflow.setLegalPrompt}
+                  isProcessing={workflow.isProcessing}
+                  handleSendPrompt={workflow.handleSendPrompt}
+                  logs={workflow.logs}
+                />
+              )}
 
               <DocumentCanvasRight
                 rightView={workflow.rightView}
@@ -118,6 +122,8 @@ export function App() {
                 onCopyText={workflow.handleCopyText}
                 onExportWord={handleExportWord}
                 onExportPdf={handleExportPdf}
+                isFocusMode={workflow.isFocusMode}
+                onToggleFocusMode={() => workflow.setIsFocusMode(!workflow.isFocusMode)}
               />
             </>
           )}
