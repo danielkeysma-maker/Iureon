@@ -171,7 +171,7 @@ export class OpenRouterService {
 
     // Mapeo directo: 3 motores exactos sin fallbacks (julio 2026)
     const modelSlugMap: Record<string, string> = {
-      'google/gemini-3.6-flash': 'google/gemini-3.5-flash',
+      'google/gemini-3.6-flash': 'google/gemini-3.6-flash',
       'openai/gpt-5.6-sol': 'openai/gpt-5.6-sol',
       'anthropic/claude-opus-5': 'anthropic/claude-opus-5'
     };

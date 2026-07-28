@@ -38,7 +38,7 @@
    - Autenticación limpia con resolución automática del rol y la firma según las credenciales del usuario.
 
 9. **🤖 Pipeline de Inteligencia Artificial de 3 Motores (OpenRouter API)**:
-   - ⚡ **Fase 1**: `google/gemini-3.5-flash` → Ingesta masiva y estructuración de hechos del expediente.
+   - ⚡ **Fase 1**: `google/gemini-3.6-flash` → Ingesta masiva y estructuración de hechos del expediente.
    - 🧠 **Fase 2**: `openai/gpt-5.6-sol` → Formulación dogmática, problemas jurídicos y excepciones.
    - ✍️ **Fase 3**: `anthropic/claude-opus-5` → Redacción solemne e íntegra de la providencia (60s timeout, 4096 tokens).
 
