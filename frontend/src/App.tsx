@@ -196,6 +196,15 @@ export function App() {
     );
   }
 
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    try {
+      localStorage.removeItem('iureon_is_authenticated');
+    } catch (err) {
+      console.warn('LocalStorage logout fail:', err);
+    }
+  };
+
   return (
     <div className="flex h-screen bg-slate-100 font-sans overflow-hidden">
       <FirmBrandingModal
@@ -254,6 +263,7 @@ export function App() {
           isFocusMode={workflow.isFocusMode}
           onToggleFocusMode={() => workflow.setIsFocusMode(!workflow.isFocusMode)}
           onOpenUserManagementModal={() => setIsUserManagementModalOpen(true)}
+          onLogout={handleLogout}
         />
 
         <main className="flex-1 flex overflow-hidden">
