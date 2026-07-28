@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  iureon-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: iureon-backend-api
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+      - NODE_ENV=production
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - B2_APPLICATION_KEY_ID=${B2_APPLICATION_KEY_ID}
+      - B2_APPLICATION_KEY=${B2_APPLICATION_KEY}
+      - B2_BUCKET_ID=${B2_BUCKET_ID}
+    restart: always
+
+  iureon-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: iureon-frontend-web
+    ports:
+      - "80:80"
+    depends_on:
+      - iureon-backend
+    restart: always
