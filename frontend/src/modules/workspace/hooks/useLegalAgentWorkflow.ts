@@ -99,7 +99,7 @@ export function useLegalAgentWorkflow() {
         id: Date.now().toString(),
         timestamp: requestTimestamp,
         engine: 'GEMINI',
-        message: `[STAGE-1: INGESTION] Gemini 3.6 Flash leyendo expediente de 142 folios...`,
+        message: `[STAGE-1: INGESTION] Gemini 3.6 Flash procesando indicación procesal e insumos fácticos del caso...`,
         type: 'info'
       }
     ]);
