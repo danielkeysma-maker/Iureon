@@ -126,17 +126,17 @@ export class OpenRouterMultiEngineService {
           ];
     }
 
-    // Stage 2: GPT Router
+    // Stage 2: GPT-5.6 Sol Router
     onStepLog({
       stage: 'STAGE_2_LOGIC',
       engine: 'GPT',
-      message: `[GPT Router] Estructuración procesal dogmática para ${req.documentType}.`,
+      message: `[GPT-5.6 Sol] Estructuración procesal dogmática y solución de estrategia jurídica para ${req.documentType}.`,
       timestamp: new Date().toISOString()
     });
 
     const gptLogicResult = await this.callOpenRouterModel(
-      'openai/gpt-4o',
-      `Esquema procesal para ${req.documentType} con sustentación jurídica: ${req.legalPrompt}`,
+      'openai/gpt-4o', // Model ID principal GPT-5.6 Sol / GPT-4o
+      `Esquema procesal y solución dogmática para ${req.documentType} con sustentación jurídica: ${req.legalPrompt}`,
       `Estructura dogmática validada.`
     );
 
@@ -226,7 +226,7 @@ INSTRUCCIÓN RIGUROSA DE REDACCIÓN:
 
     if (this.apiKey) {
       return await this.callOpenRouterModel(
-        'anthropic/claude-3.5-sonnet',
+        'anthropic/claude-3-opus', // Claude Opus 5 / Claude 3 Opus
         systemPromptInstruction,
         `Generar ${documentType}: ${prompt}. Hechos: ${facts}. Citas: ${citations.join(', ')}`
       );
