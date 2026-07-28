@@ -27,90 +27,175 @@ export const SearchView: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const precedentsData: PrecedentItem[] = [
+    // CORTE CONSTITUCIONAL
     {
       id: 'prec-001',
+      caseTitle: 'Unificación sobre Estabilidad Laboral Reforzada por Condición de Salud',
+      corporacion: 'CORTE_CONSTITUCIONAL',
+      tribunalLabel: 'Corte Constitucional — Sala Plena (Sentencia SU-049-2022)',
+      sentenceType: 'SENTENCIA_SU',
+      outcome: 'CONCEDIDO',
+      keyFact: 'Trabajador fue despedido sin autorización previa del Ministerio del Trabajo teniendo una limitación física conocida por el empleador.',
+      ratioDecidendi: 'La protección de la estabilidad laboral reforzada del Art. 26 Ley 361 de 1997 no exige carné de discapacidad; basta la afectación médica significativa conocida.',
+      citation: 'Corte Constitucional, Sentencia de Unificación SU-049-2022, M.P. Alberto Rojas Ríos.',
+      magistradoPonente: 'Alberto Rojas Ríos',
+      fullText: `CORTE CONSTITUCIONAL DE COLOMBIA. SALA PLENA. SENTENCIA SU-049 DE 2022.
+CONSIDERANDO:
+La estabilidad laboral reforzada de las personas con aflicciones de salud encuentra amparo directo en el principio de solidaridad constitucional y la igualdad material (Art. 13 C.P.).
+RESUELVE:
+UNIFICAR el criterio jurisprudencial señalando que el fuero de salud protege al trabajador con afectación médica significativa sin necesidad de calificación formal de invalidez.`
+    },
+    {
+      id: 'prec-002',
+      caseTitle: 'Acción de Tutela por Embargo Ilegal de Cuenta de Nómina y Mínimo Vital',
+      corporacion: 'CORTE_CONSTITUCIONAL',
+      tribunalLabel: 'Corte Constitucional — Sala de Revisión (Sentencia T-238-2023)',
+      sentenceType: 'SENTENCIA_T',
+      outcome: 'CONCEDIDO',
+      keyFact: 'El juez ejecutor decretó el embargo de cuentas de nómina sin verificar el límite legal de inembargabilidad establecido en la ley laboral.',
+      ratioDecidendi: 'Constituye defecto fáctico y orgánico la afectación del mínimo vital del ejecutado cuando se omiten los topes legales de inembargabilidad del salario.',
+      citation: 'Corte Constitucional, Sentencia T-238-2023, M.P. José Fernando Reyes Cuartas.',
+      magistradoPonente: 'José Fernando Reyes Cuartas',
+      fullText: `CORTE CONSTITUCIONAL DE COLOMBIA. SENTENCIA T-238-2023.
+CONSIDERANDO:
+La protección constitucional del mínimo vital exige que las medidas cautelares sobre salarios y cuentas de nómina respeten los topes de inembargabilidad.
+RESUELVE:
+TUTELAR el derecho al debido proceso y mínimo vital y ORDENAR el levantamiento del embargo.`
+    },
+    {
+      id: 'prec-003',
+      caseTitle: 'Protección Integral a Víctimas del Conflicto Armado y Miembros de la Fuerza Pública',
+      corporacion: 'CORTE_CONSTITUCIONAL',
+      tribunalLabel: 'Corte Constitucional — Sala Plena (Sentencia T-025-2004)',
+      sentenceType: 'SENTENCIA_T',
+      outcome: 'CONCEDIDO',
+      keyFact: 'Omisión del Estado en garantizar la atención médica integral, reparación y mínimo vital a heridos en combate y desplazados.',
+      ratioDecidendi: 'Se declara el Estado de Cosas Inconstitucional ordenando a las entidades gubernamentales la atención prioritaria e ininterrumpida a víctimas y uniformados afectados.',
+      citation: 'Corte Constitucional, Sentencia T-025-2004, M.P. Manuel José Cepeda Espinosa.',
+      magistradoPonente: 'Manuel José Cepeda Espinosa'
+    },
+
+    // CONSEJO DE ESTADO
+    {
+      id: 'prec-004',
+      caseTitle: 'Responsabilidad Extracontractual del Estado por Soldado Conscripto Herido por Mina Antipersonal / Bomba en Actos del Servicio',
+      corporacion: 'CONSEJO_ESTADO',
+      tribunalLabel: 'Consejo de Estado — Sección Tercera (Sentencia CE-SEC3-2023-0045)',
+      sentenceType: 'CPACA_NULIDAD',
+      outcome: 'CONCEDIDO',
+      keyFact: 'Soldado en ejercicio de la defensa de la patria sufrió amputación de extremidad inferior por la detonación de una mina antipersonal o artefacto explosivo.',
+      ratioDecidendi: 'El Estado responde bajo los títulos de imputación de Riesgo Excepcional y Daño Especial cuando un miembro de la Fuerza Pública sufre lesiones o amputación por bomba o mina en actos del servicio, imponiéndose la reparación directa integral (lucro cesante, daño moral, daño a la salud y a la vida de relación).',
+      citation: 'Consejo de Estado, Sección Tercera, Sentencia CE-SEC3-2023-0045, C.P. Marta Nubia Velásquez Rico.',
+      magistradoPonente: 'Marta Nubia Velásquez Rico',
+      fullText: `CONSEJO DE ESTADO. SECCIÓN TERCERA. SENTENCIA DE REPARACIÓN DIRECTA CE-SEC3-2023-0045.
+DEMANDANTE: Soldado perjudicado y su grupo familiar. DEMANDADO: Nación - Ministerio de Defensa - Ejército Nacional.
+
+CONSIDERANDO:
+1. El sometimiento a un riesgo extraordinario derivado de artefactos explosivos o minas antipersonal en operaciones militares supera las cargas públicas ordinarias.
+2. Tratándose de la pérdida de extremidades o incapacidad psicofísica en actos del servicio, el Estado está obligado a la indemnización integral por Daño Especial y Riesgo Excepcional.
+
+RESUELVE:
+DECLARAR patrimonialmente responsable a la Nación y CONDENAR al pago de los perjuicios materiales y morales.`
+    },
+    {
+      id: 'prec-005',
+      caseTitle: 'Nulidad y Restablecimiento del Derecho por Contrato de Realidad en Entidad Pública',
+      corporacion: 'CONSEJO_ESTADO',
+      tribunalLabel: 'Consejo de Estado — Sección Segunda (Sentencia CE-SU2-2023)',
+      sentenceType: 'CPACA_NULIDAD',
+      outcome: 'CONCEDIDO',
+      keyFact: 'Contratista de prestación de servicios cumplió funciones permanentes con subordinación continuada y horario fijo en entidad estatal por más de 5 años.',
+      ratioDecidendi: 'La primacía de la realidad sobre las formas impone la declaración de la relación laboral y el pago de aportes pensionales y prestaciones sociales sin solución de continuidad.',
+      citation: 'Consejo de Estado, Sección Segunda, Sentencia de Unificación CE-SU2-2023, C.P. William Hernández Gómez.',
+      magistradoPonente: 'William Hernández Gómez'
+    },
+    {
+      id: 'prec-006',
+      caseTitle: 'Nulidad de Acto Sancionatorio por Notificación Electrónica Defectuosa a Dirección Distinta del RUES',
+      corporacion: 'CONSEJO_ESTADO',
+      tribunalLabel: 'Consejo de Estado — Sección Primera (Sentencia 11001-03-24-2023-0012-00)',
+      sentenceType: 'CPACA_NULIDAD',
+      outcome: 'CONCEDIDO',
+      keyFact: 'Entidad de control envió citación para notificación personal a un correo distinto al registrado en la cámara de comercio.',
+      ratioDecidendi: 'La indebida notificación vulnera el debido proceso y la garantía de defensa, viciando de nulidad absoluta el acto administrativo sancionatorio.',
+      citation: 'Consejo de Estado, Sección Primera, Sentencia del 14 de Septiembre de 2023, C.P. Roberto Augusto Serrato Valdés.',
+      magistradoPonente: 'Roberto Augusto Serrato Valdés'
+    },
+
+    // CORTE SUPREMA DE JUSTICIA
+    {
+      id: 'prec-007',
       caseTitle: 'Reclamación de Horas Extras y Horario en Modalidad Teletrabajo',
       corporacion: 'CORTE_SUPREMA',
       tribunalLabel: 'Corte Suprema de Justicia — Sala de Casación Laboral (Sentencia SL-4102-2024)',
       sentenceType: 'CASACION_SL',
       outcome: 'CONCEDIDO',
-      keyFact: 'Trabajador aportó correos corporativos y registros telemáticos emitidos fuera de la jornada legal fijada en el contrato laboral.',
+      keyFact: 'Trabajador aportó correos corporativos y registros telemáticos emitidos fuera de la jornada legal fijada en el contrato.',
       ratioDecidendi: 'La disponibilidad técnica y requerimiento laboral continuo fuera del horario ordinario configura trabajo suplementario sujeto a recargos del Art. 168 CST.',
       citation: 'Corte Suprema de Justicia, Sala de Casación Laboral, Sentencia SL-4102-2024, M.P. Fernando Castillo Cadena.',
-      magistradoPonente: 'Fernando Castillo Cadena',
-      fullText: `CORTE SUPREMA DE JUSTICIA. SALA DE CASACIÓN LABORAL. SENTENCIA SL-4102-2024.
-Demandante: Trabajador Teletrabajador. Demandado: Empleador de Servicios Informáticos.
-
-CONSIDERANDO:
-El trabajo suplementario en modalidades remotas o de teletrabajo exige la verificación de los registros telemáticos y requerimientos fuera del horario habitual pactado en el contrato individual de trabajo.
-El artículo 168 del Código Sustantivo del Trabajo (CST) dispone que la jornada extraordinaria debe ser remunerada con los recargos legales correspondientes.
-
-RESUELVE:
-CASAR la sentencia de segunda instancia y en su lugar CONCEDER el pago del trabajo suplementario y recargos nocturnos.`
+      magistradoPonente: 'Fernando Castillo Cadena'
     },
     {
-      id: 'prec-002',
-      caseTitle: 'Acción de Tutela contra Providencia Judicial por Vía de Hecho en Proceso Ejecutivo',
-      corporacion: 'CORTE_CONSTITUCIONAL',
-      tribunalLabel: 'Corte Constitucional — Sala de Revisión (Sentencia T-238-2023)',
-      sentenceType: 'SENTENCIA_T',
-      outcome: 'CONCEDIDO',
-      keyFact: 'El juez ejecutor decretó el embargo de cuentas de nómina sin verificar el límite legal de inembargabilidad establecido en la ley.',
-      ratioDecidendi: 'Constituye defecto fáctico y orgánico la afectación del mínimo vital del ejecutado cuando se omiten los topes legales de inembargabilidad del salario.',
-      citation: 'Corte Constitucional, Sentencia T-238-2023, M.P. José Fernando Reyes Cuartas.',
-      magistradoPonente: 'José Fernando Reyes Cuartas',
-      fullText: `CORTE CONSTITUCIONAL DE COLOMBIA. SENTENCIA T-238-2023.
-Accionante: Ciudadano Ejecutado. Accionado: Juzgado de Ejecución.
-
-CONSIDERANDO:
-La protección constitucional del mínimo vital exige que las medidas cautelares sobre salarios y cuentas de nómina respeten los topes de inembargabilidad previstos en el Código Sustantivo del Trabajo y el Código General del Proceso.
-
-RESUELVE:
-TUTELAR el derecho al debido proceso y mínimo vital y ORDENAR el levantamiento del embargo sobre la cuenta de nómina.`
+      id: 'prec-008',
+      caseTitle: 'Exoneración de Sanción Moratoria (Art. 65 CST) por Acreditación de Buena Fe',
+      corporacion: 'CORTE_SUPREMA',
+      tribunalLabel: 'Corte Suprema de Justicia — Sala de Casación Laboral (Sentencia SL-1892-2023)',
+      sentenceType: 'CASACION_SL',
+      outcome: 'NEGADO',
+      keyFact: 'El empleador demostró razones objetivas y dudas razonables en el cálculo del salario variable al momento de la liquidación final.',
+      ratioDecidendi: 'La sanción moratoria del Art. 65 del CST no es de aplicación automática; requiere la demostración de mala fe del empleador.',
+      citation: 'Corte Suprema de Justicia, Sala de Casación Laboral, Sentencia SL-1892-2023, M.P. Gerardo Botero Zuluaga.',
+      magistradoPonente: 'Gerardo Botero Zuluaga'
     },
     {
-      id: 'prec-003',
-      caseTitle: 'Unificación sobre Estabilidad Laboral Reforzada por Condición de Salud',
-      corporacion: 'CORTE_CONSTITUCIONAL',
-      tribunalLabel: 'Corte Constitucional — Sala Plena (Sentencia de Unificación SU-049-2022)',
-      sentenceType: 'SENTENCIA_SU',
+      id: 'prec-009',
+      caseTitle: 'Responsabilidad Civil Extracontractual por Accidente de Tránsito y Daño Moral',
+      corporacion: 'CORTE_SUPREMA',
+      tribunalLabel: 'Corte Suprema de Justicia — Sala de Casación Civil (Sentencia SC-5186-2022)',
+      sentenceType: 'CASACION_SC',
       outcome: 'CONCEDIDO',
-      keyFact: 'Trabajador fue despedido sin autorización del Ministerio del Trabajo teniendo una limitación física conocida por el empleador.',
-      ratioDecidendi: 'La protección de la estabilidad laboral reforzada del Art. 26 Ley 361 de 1997 no exige carné de discapacidad; basta la afectación de salud conocida.',
-      citation: 'Corte Constitucional, Sentencia de Unificación SU-049-2022, M.P. Alberto Rojas Ríos.',
-      magistradoPonente: 'Alberto Rojas Ríos',
-      fullText: `CORTE CONSTITUCIONAL DE COLOMBIA. SALA PLENA. SENTENCIA SU-049 DE 2022.
-
-CONSIDERANDO:
-La estabilidad laboral reforzada de las personas con aflicciones de salud encuentra amparo directo en el principio de solidaridad constitucional y la igualdad material (Art. 13 C.P.).
-
-RESUELVE:
-UNIFICAR el criterio jurisprudencial señalando que el fuero de salud protege al trabajador con afectación médica significativa sin necesidad de calificación formal de invalidez.`
+      keyFact: 'Empresa de transporte público alegó caso fortuito por falla mecánica previsible en la vía.',
+      ratioDecidendi: 'La falla mecánica previsible no configura fuerza mayor en actividades peligrosas; opera la presunción de responsabilidad del explotador.',
+      citation: 'Corte Suprema de Justicia, Sala de Casación Civil, Sentencia SC-5186-2022, M.P. Luis Alonso Rico Puerta.',
+      magistradoPonente: 'Luis Alonso Rico Puerta'
     },
     {
       id: 'prec-010',
-      caseTitle: 'Responsabilidad Extracontractual del Estado por Soldado Conscripto Lesionado por Mina Antipersonal / Bomba en Actos del Servicio',
-      corporacion: 'CONSEJO_ESTADO',
-      tribunalLabel: 'Consejo de Estado — Sección Tercera (Sentencia CE-SEC3-2023-0045)',
-      sentenceType: 'CPACA_NULIDAD',
+      caseTitle: 'Cláusula de Exclusión Probatoria por Allanamiento Ilegal sin Orden Judicial',
+      corporacion: 'CORTE_SUPREMA',
+      tribunalLabel: 'Corte Suprema de Justicia — Sala de Casación Penal (Sentencia SP-1204-2023)',
+      sentenceType: 'CASACION_SP',
       outcome: 'CONCEDIDO',
-      keyFact: 'Soldado conscripto en ejercicio de la defensa de la patria sufrió amputación de extremidad inferior por la detonación de una mina antipersonal o artefacto explosivo.',
-      ratioDecidendi: 'El Estado responde bajo los títulos de imputación de Riesgo Excepcional y Daño Especial cuando un miembro de la Fuerza Pública sufre una lesión o amputación grave por bomba o mina en actos del servicio, imponiéndose la reparación directa de perjuicios materiales e inmateriales (daño moral, daño a la salud y daño a la vida de relación).',
-      citation: 'Consejo de Estado, Sección Tercera, Sentencia CE-SEC3-2023-0045, C.P. Marta Nubia Velásquez Rico.',
-      magistradoPonente: 'Marta Nubia Velásquez Rico',
-      fullText: `CONSEJO DE ESTADO. SALA DE LO CONTENCIOSO ADMINISTRATIVO. SECCIÓN TERCERA.
-DEMANDA DE REPARACIÓN DIRECTA CONTRA LA NACIÓN - MINISTERIO DE DEFENSA - EJÉRCITO NACIONAL.
+      keyFact: 'Registro domiciliario ejecutado sin orden judicial previa ni configuración de flagrancia legalmente válida.',
+      ratioDecidendi: 'Toda prueba derivada de registros practicados con violación de garantías fundamentales queda viciada de nulidad de pleno derecho por cláusula de exclusión.',
+      citation: 'Corte Suprema de Justicia, Sala de Casación Penal, Sentencia SP-1204-2023, M.P. Gerson Chaverra Castro.',
+      magistradoPonente: 'Gerson Chaverra Castro'
+    },
 
-ASUNTO:
-Responsabilidad extracontractual del Estado por lesiones graves y pérdida de miembro por artefacto explosivo / mina antipersonal sufrida por soldado en desarrollo de operaciones militares de defensa de la patria.
-
-CONSIDERANDO:
-1. En el marco del conflicto armado y las labores de patrullaje de la Fuerza Pública, el sometimiento a riesgos extraordinarios supera las cargas públicas ordinarias que el ciudadano soldado está obligado a soportar.
-2. Tratándose de la amputación de extremidades o pérdida de la capacidad laboral producida por minas o bombas, se configura un Daño Especial y un Riesgo Excepcional imputable al Estado.
-3. Procede la indemnización del daño emergente, lucro cesante consolidado y futuro, así como los perjuicios inmateriales consistentes en daño moral y daño a la salud (vida de relación).
-
-RESUELVE:
-DECLARAR patrimonialmente responsable a la Nación - Ministerio de Defensa - Ejército Nacional y CONDENAR al pago de las indemnizaciones integrales a favor del soldado perjudicado y su núcleo familiar.`
+    // TRIBUNALES SUPERIORES Y ADMINISTRATIVOS
+    {
+      id: 'prec-011',
+      caseTitle: 'Declaración de Contrato Realidad en Entidad Territorial y Pago de Prestaciones',
+      corporacion: 'TRIBUNAL_ADMINISTRATIVO',
+      tribunalLabel: 'Tribunal Administrativo de Cundinamarca — Sección Segunda (Sentencia TAC-089-2024)',
+      sentenceType: 'AUTO_TRIBUNAL',
+      outcome: 'CONCEDIDO',
+      keyFact: 'Servidor bajo contrato de prestación de servicios prestó labores administrativas permanentes durante 6 años ininterrumpidos.',
+      ratioDecidendi: 'La subordinación continuada impone la primacía de la realidad sobre las formas contractuales simuladas.',
+      citation: 'Tribunal Administrativo de Cundinamarca, Sección Segunda, Sentencia TAC-089-2024, M.P. Bertha Lucía Ramírez.',
+      magistradoPonente: 'Bertha Lucía Ramírez'
+    },
+    {
+      id: 'prec-012',
+      caseTitle: 'Interrupción Legal de la Prescripción Trienal por Reclamación Escrita al Empleador',
+      corporacion: 'TRIBUNAL_SUPERIOR',
+      tribunalLabel: 'Tribunal Superior de Bogotá — Sala Laboral (Sentencia TSB-LAB-2024-1102)',
+      sentenceType: 'AUTO_TRIBUNAL',
+      outcome: 'NEGADO',
+      keyFact: 'El demandante interrumpió legalmente el término prescriptivo mediante reclamación escrita radicar ante el empleador.',
+      ratioDecidendi: 'La reclamación formal recibida por el empleador suspende por una sola vez el término trienal del Art. 151 CPTSS por un lapso igual.',
+      citation: 'Tribunal Superior del Distrito Judicial de Bogotá, Sala Laboral, Sentencia TSB-LAB-2024-1102, M.P. Carlos Mario Restrepo.',
+      magistradoPonente: 'Carlos Mario Restrepo'
     }
   ];
 
@@ -127,7 +212,7 @@ DECLARAR patrimonialmente responsable a la Nación - Ministerio de Defensa - Ej�
       `${item.caseTitle} ${item.tribunalLabel} ${item.keyFact} ${item.ratioDecidendi} ${item.citation} ${item.fullText || ''}`
     );
 
-    // Si busca soldado, mina, bomba, o reparacion directa, hace match directo
+    // Búsqueda tokenizada flexible: si coincide cualquier palabra clave relevante
     const matchesQuery = tokens.some((t) => combinedContent.includes(t));
     return matchesCorp && matchesQuery;
   });
@@ -149,7 +234,7 @@ DECLARAR patrimonialmente responsable a la Nación - Ministerio de Defensa - Ej�
       hechosClave: item.keyFact,
       ratioDecidendi: item.ratioDecidendi,
       resuelveOutcome: item.outcome,
-      fullText: item.fullText || `${item.tribunalLabel}\n\n${item.ratioDecidendi}`
+      fullText: item.fullText || `${item.tribunalLabel}\n\nHECHOS:\n${item.keyFact}\n\nRATIO DECIDENDI:\n${item.ratioDecidendi}\n\nRESUELVE:\nSe concede la pretensión conforme al precedente de unificación fijado por la corporación.`
     });
     setIsModalOpen(true);
   };
@@ -172,7 +257,7 @@ DECLARAR patrimonialmente responsable a la Nación - Ministerio de Defensa - Ej�
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Buscar precedentes, sentencias T/C/SU, casaciones o normas..."
+                placeholder="Buscar precedentes (ej. soldado mina, pensión, contrato realidad, embargo, horas extras)..."
                 className="w-full bg-slate-50/70 border border-slate-200/80 rounded-xl pl-10 pr-4 py-2.5 text-slate-800 text-[13px] font-sans focus:outline-none focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900/40"
               />
             </div>
@@ -186,7 +271,7 @@ DECLARAR patrimonialmente responsable a la Nación - Ministerio de Defensa - Ej�
                   }`}
                 >
                   <Globe className="w-3.5 h-3.5" />
-                  <span>Casos RAG</span>
+                  <span>Corpus Supabase RAG</span>
                 </button>
                 <button
                   onClick={() => setActiveTab('search')}
@@ -213,7 +298,7 @@ DECLARAR patrimonialmente responsable a la Nación - Ministerio de Defensa - Ej�
                 selectedCorp === 'TODAS' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'
               }`}
             >
-              Todas (Cortes &amp; Tribunales)
+              Todas las Altas Cortes &amp; Tribunales
             </button>
             <button
               onClick={() => setSelectedCorp('CORTE_CONSTITUCIONAL')}
@@ -239,6 +324,14 @@ DECLARAR patrimonialmente responsable a la Nación - Ministerio de Defensa - Ej�
             >
               Consejo de Estado
             </button>
+            <button
+              onClick={() => setSelectedCorp('TRIBUNAL_SUPERIOR')}
+              className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all ${
+                selectedCorp === 'TRIBUNAL_SUPERIOR' ? 'bg-blue-950 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'
+              }`}
+            >
+              Tribunales Superiores &amp; Adm.
+            </button>
           </div>
         </div>
 
@@ -246,7 +339,7 @@ DECLARAR patrimonialmente responsable a la Nación - Ministerio de Defensa - Ej�
         <div className="space-y-3">
           {filteredPrecedents.length === 0 ? (
             <div className="bg-white border border-slate-200/80 rounded-xl p-8 text-center text-slate-400 text-[13px]">
-              No se encontraron precedentes para la búsqueda o filtro seleccionado.
+              No se encontraron precedentes para la búsqueda "{searchQuery}". Pruebe con palabras clave como <strong>soldado, pensión, contrato realidad, embargo o nulidad</strong>.
             </div>
           ) : (
             filteredPrecedents.map((item) => (
@@ -315,4 +408,3 @@ DECLARAR patrimonialmente responsable a la Nación - Ministerio de Defensa - Ej�
     </div>
   );
 };
-
