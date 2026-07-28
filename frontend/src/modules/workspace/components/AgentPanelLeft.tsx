@@ -72,6 +72,8 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
         'Demanda Ejecutiva & Liquidación de Crédito'
       ],
       despacho: [
+        'Proyección de Auto Admisorio de Demanda Civil',
+        'Proyección de Auto Inadmisorio de Demanda Civil (Art. 90 CGP)',
         'Proyección de Sentencia Civil Ordinaria / Verbal',
         'Proyección de Auto Resolutorio de Recurso de Reposición',
         'Proyección de Auto Mandamiento de Pago'
