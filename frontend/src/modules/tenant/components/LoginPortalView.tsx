@@ -29,11 +29,11 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({
 
     setTimeout(() => {
       setIsLoading(false);
-      // Resolucion automatica de la firma por el usuario o asignacion por defecto
+      // Resolucion automatica de la firma por el usuario o asignacion limpia
       const chosenFirm = registeredFirms[0] || {
-        id: 'firm-default-01',
-        name: 'FIRMA / DESPACHO ACTIVO',
-        nit: 'PENDIENTE REGISTRO',
+        id: '',
+        name: 'Sin Firma Registrada',
+        nit: 'REGISTRA TU FIRMA',
         creditsBalance: 0,
         status: 'active'
       };

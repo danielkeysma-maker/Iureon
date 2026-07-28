@@ -20,9 +20,9 @@ export interface LawFirmTenant {
 
 export const Header: React.FC = () => {
   const [activeFirm, setActiveFirm] = useState<LawFirmTenant>({
-    id: 'firm-default-01',
-    name: 'FIRMA / DESPACHO ACTIVO',
-    nit: 'PENDIENTE REGISTRO',
+    id: '',
+    name: 'Sin Firma Registrada',
+    nit: 'REGISTRA TU FIRMA',
     creditsBalance: 0,
     status: 'active'
   });

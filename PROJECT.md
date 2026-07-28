@@ -5,8 +5,9 @@ Iureon es la plataforma B2B SaaS de Inteligencia Artificial y Ecosistema Judicia
 
 ## 🏗️ Arquitectura del Software
 
-### 1. Autenticación & Multi-Tenancy
+### 1. Autenticación, Multi-Tenancy & Producción Limpia
 - **Portal de Login**: `LoginPortalView.tsx`
+- **Entorno Cero Datos Ficticios (Zero Mock Data)**: La plataforma inicia con 0 firmas ficticias. Toda firma o usuario nace únicamente cuando se registra de forma explícita.
 - **Aprovisionamiento Flexible de Usuarios**:
   - **Abogados de Firma**: Requieren la creación previa de una Firma Cliente (`FIRM_ADMIN` / `LAWYER`).
   - **Abogados Particulares**: Pueden registrarse de forma independiente sin estar vinculados a ninguna firma (`INDEPENDENT_LAWYER` / `firmId: 'INDEPENDENT'`).
@@ -18,6 +19,7 @@ Iureon es la plataforma B2B SaaS de Inteligencia Artificial y Ecosistema Judicia
   - `🏢 Firma Cliente (NIT ...)`
 - **Protección por Modales de Confirmación**: Todas las operaciones destructivas o de edición (crear/editar/eliminar firmas y usuarios, así como el Cierre de Sesión) están protegidas por `ActionConfirmationModal.tsx`.
 - **Modelo Económico**: Recarga de Créditos Procesales (COP $) sin cuotas de suscripción fijas ficticias (`FirmCreditsRechargeModal.tsx`).
+- **Despliegue Obligatorio vía Git**: Todo cambio realizado en la plataforma debe empaquetarse y desplegarse inmediatamente a producción usando Git (`git add .`, `git commit`, `git push origin main`).
 
 ### 2. Pipeline de Inteligencia Artificial (OpenRouter API)
 - `google/gemini-3.6-flash`: Análisis de expedientes PDF y extracción de hechos.

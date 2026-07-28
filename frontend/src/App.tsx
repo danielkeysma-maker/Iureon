@@ -21,9 +21,15 @@ import { TenantUserManagementModal } from './modules/tenant/components/TenantUse
 import { LoginPortalView } from './modules/tenant/components/LoginPortalView';
 import { FirmCreditsRechargeModal } from './modules/tenant/components/FirmCreditsRechargeModal';
 
-const INITIAL_REGISTERED_FIRMS: LawFirmTenant[] = [
-  { id: 'firm-default-01', name: 'FIRMA / DESPACHO ACTIVO', nit: 'PENDIENTE REGISTRO', creditsBalance: 0, status: 'active' }
-];
+const INITIAL_REGISTERED_FIRMS: LawFirmTenant[] = [];
+
+const EMPTY_FIRM_PLACEHOLDER: LawFirmTenant = {
+  id: '',
+  name: 'Sin Firma Registrada',
+  nit: 'REGISTRA TU FIRMA',
+  creditsBalance: 0,
+  status: 'active'
+};
 
 export function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
@@ -47,13 +53,17 @@ export function App() {
   const [registeredFirms, setRegisteredFirms] = useState<LawFirmTenant[]>(() => {
     try {
       const stored = localStorage.getItem('iureon_registered_firms');
-      return stored ? JSON.parse(stored) : INITIAL_REGISTERED_FIRMS;
+      if (!stored) return INITIAL_REGISTERED_FIRMS;
+      const parsed: LawFirmTenant[] = JSON.parse(stored);
+      // Clean out any legacy mock firm data from localStorage
+      const clean = parsed.filter(f => f.id !== 'firm-default-01' && f.name !== 'FIRMA / DESPACHO ACTIVO' && !f.name.includes('FIRMA APODERADA'));
+      return clean;
     } catch {
       return INITIAL_REGISTERED_FIRMS;
     }
   });
 
-  const [activeFirm, setActiveFirm] = useState<LawFirmTenant>(registeredFirms[0] || INITIAL_REGISTERED_FIRMS[0]);
+  const [activeFirm, setActiveFirm] = useState<LawFirmTenant>(registeredFirms[0] || EMPTY_FIRM_PLACEHOLDER);
   const [isFirmDropdownOpen, setIsFirmDropdownOpen] = useState(false);
   const [isBrandingModalOpen, setIsBrandingModalOpen] = useState(false);
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);

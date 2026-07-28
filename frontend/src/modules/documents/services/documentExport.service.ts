@@ -16,8 +16,8 @@ export interface FirmBrandingConfig {
 }
 
 export const DEFAULT_FIRM_BRANDING: FirmBrandingConfig = {
-  firmName: 'FIRMA / DESPACHO ACTIVO',
-  firmNit: 'PENDIENTE REGISTRO',
+  firmName: 'REPÚBLICA DE COLOMBIA - RAMA JUDICIAL',
+  firmNit: 'SIN NIT FISCAL REGISTRADO',
   firmAddress: 'Dirección Corporativa',
   firmPhone: 'Teléfono Notificaciones',
   firmEmail: 'notificaciones@tufirma.co',
