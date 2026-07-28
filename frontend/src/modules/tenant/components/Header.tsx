@@ -14,18 +14,18 @@ export interface LawFirmTenant {
   id: string;
   name: string;
   nit: string;
-  plan: 'STARTER' | 'PRO_FIRM' | 'ENTERPRISE';
+  creditsBalance: number; // Saldo disponible de recargas en COP ($)
   status: 'active' | 'trial';
 }
 
-const SAMPLE_FIRMS: LawFirmTenant[] = [
-  { id: '8f9b2c34-torres-asociados', name: 'Torres & Asociados S.A.S.', nit: '900.892.102-4', plan: 'PRO_FIRM', status: 'active' },
-  { id: '1a2b3c4d-gomez-consultores', name: 'Gómez & Abogados Consultores', nit: '800.112.443-1', plan: 'ENTERPRISE', status: 'active' },
-  { id: '9z8y7x6w-valencia-legal', name: 'Valencia & Cárdenas LegalTech', nit: '901.554.981-9', plan: 'STARTER', status: 'active' }
-];
-
 export const Header: React.FC = () => {
-  const [activeFirm, setActiveFirm] = useState<LawFirmTenant>(SAMPLE_FIRMS[0]);
+  const [activeFirm, setActiveFirm] = useState<LawFirmTenant>({
+    id: 'firm-default-01',
+    name: 'FIRMA APODERADA / DESPACHO JUDICIAL',
+    nit: 'NIT 900.000.000-0',
+    creditsBalance: 500000,
+    status: 'active'
+  });
   const [isFirmDropdownOpen, setIsFirmDropdownOpen] = useState(false);
   const [isToolsDropdownOpen, setIsToolsDropdownOpen] = useState(false);
 
@@ -103,8 +103,8 @@ export const Header: React.FC = () => {
             >
               <Building2 className="w-3.5 h-3.5 text-blue-900" />
               <span className="font-bold text-slate-900">{activeFirm.name}</span>
-              <span className="text-[10px] font-mono bg-slate-900 text-white px-2 py-0.5 rounded font-semibold">
-                {activeFirm.plan}
+              <span className="text-[10px] font-mono bg-emerald-800 text-white px-2 py-0.5 rounded font-semibold">
+                ${(activeFirm.creditsBalance || 500000).toLocaleString('es-CO')} COP
               </span>
               <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
             </button>
@@ -112,9 +112,9 @@ export const Header: React.FC = () => {
             {isFirmDropdownOpen && (
               <div className="absolute top-full left-0 mt-1.5 w-64 bg-white border border-slate-200 rounded-xl shadow-xl z-50 py-1">
                 <div className="px-3 py-1.5 text-[10px] font-mono uppercase text-slate-400 border-b border-slate-100 font-bold">
-                  Firmas Cliente en Sesión RLS
+                  Firma Cliente Activa
                 </div>
-                {SAMPLE_FIRMS.map((firm) => (
+                {[activeFirm].map((firm) => (
                   <button
                     key={firm.id}
                     onClick={() => {

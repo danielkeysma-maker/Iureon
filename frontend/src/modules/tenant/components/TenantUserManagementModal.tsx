@@ -40,13 +40,13 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
   const [isCreatingFirm, setIsCreatingFirm] = useState(false);
   const [newFirmName, setNewFirmName] = useState('');
   const [newFirmNit, setNewFirmNit] = useState('');
-  const [newFirmPlan, setNewFirmPlan] = useState<'STARTER' | 'PRO_FIRM' | 'ENTERPRISE'>('PRO_FIRM');
+  const [newFirmBalance, setNewFirmBalance] = useState<number>(500000);
 
   // Edit Firm Form State
   const [editingFirm, setEditingFirm] = useState<LawFirmTenant | null>(null);
   const [editFirmName, setEditFirmName] = useState('');
   const [editFirmNit, setEditFirmNit] = useState('');
-  const [editFirmPlan, setEditFirmPlan] = useState<'STARTER' | 'PRO_FIRM' | 'ENTERPRISE'>('PRO_FIRM');
+  const [editFirmBalance, setEditFirmBalance] = useState<number>(500000);
 
   // Confirmation Warning Modal State
   const [confirmModalData, setConfirmModalData] = useState<{
@@ -106,7 +106,7 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
     setConfirmModalData({
       isOpen: true,
       title: '⚠️ ¿Registrar Nueva Firma Cliente?',
-      message: `Se creará la firma "${newFirmName.trim()}" con NIT ${newFirmNit.trim()} en la plataforma Multi-Tenant.`,
+      message: `Se creará la firma "${newFirmName.trim()}" con NIT ${newFirmNit.trim()} y un Saldo Inicial de $${newFirmBalance.toLocaleString('es-CO')} COP.`,
       confirmText: 'Registrar Firma',
       variant: 'primary',
       onConfirmAction: () => {
@@ -114,7 +114,7 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
           id: `firm-${Date.now()}`,
           name: newFirmName.trim(),
           nit: newFirmNit.trim(),
-          plan: newFirmPlan,
+          creditsBalance: newFirmBalance,
           status: 'active'
         };
         onCreateFirm(created);
@@ -130,7 +130,7 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
     setEditingFirm(f);
     setEditFirmName(f.name);
     setEditFirmNit(f.nit);
-    setEditFirmPlan(f.plan);
+    setEditFirmBalance(f.creditsBalance || 500000);
   };
 
   const requestEditFirmSubmit = (e: React.FormEvent) => {
@@ -140,7 +140,7 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
     setConfirmModalData({
       isOpen: true,
       title: '⚠️ ¿Guardar Cambios en la Firma?',
-      message: `Se actualizarán los datos de la firma "${editFirmName.trim()}" (NIT: ${editFirmNit.trim()}).`,
+      message: `Se actualizarán los datos de la firma "${editFirmName.trim()}" (NIT: ${editFirmNit.trim()}) y Saldo de $${editFirmBalance.toLocaleString('es-CO')} COP.`,
       confirmText: 'Guardar Cambios',
       variant: 'primary',
       onConfirmAction: () => {
@@ -148,7 +148,7 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
           ...editingFirm,
           name: editFirmName.trim(),
           nit: editFirmNit.trim(),
-          plan: editFirmPlan
+          creditsBalance: editFirmBalance
         });
         setEditingFirm(null);
         setConfirmModalData((prev) => ({ ...prev, isOpen: false }));
@@ -232,7 +232,7 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
             </div>
             <div>
               <h3 className="text-sm font-bold text-white">Gestión de Usuarios, Autenticación y Firmas Cliente</h3>
-              <p className="text-[11px] text-slate-300">Administra tus firmas jurídicas, invita usuarios abogados y conmuta accesos Multi-Tenant</p>
+              <p className="text-[11px] text-slate-300">Administra tus firmas jurídicas, recarga saldos e invita usuarios abogados</p>
             </div>
           </div>
           <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors">
@@ -322,16 +322,14 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
                     </div>
 
                     <div>
-                      <label className="text-[11px] font-semibold text-slate-700 block mb-1">Plan de Suscripción:</label>
-                      <select
-                        value={newFirmPlan}
-                        onChange={(e) => setNewFirmPlan(e.target.value as any)}
-                        className="w-full bg-white border border-slate-300 rounded-lg p-2 text-slate-900 focus:outline-none focus:border-blue-900"
-                      >
-                        <option value="PRO_FIRM">PRO_FIRM (Firma Estándar)</option>
-                        <option value="ENTERPRISE">ENTERPRISE (Ilimitado Corporativo)</option>
-                        <option value="STARTER">STARTER (Plan Inicial)</option>
-                      </select>
+                      <label className="text-[11px] font-semibold text-slate-700 block mb-1">Saldo Inicial (COP $):</label>
+                      <input
+                        type="number"
+                        value={newFirmBalance}
+                        onChange={(e) => setNewFirmBalance(parseFloat(e.target.value) || 0)}
+                        className="w-full bg-white border border-slate-300 rounded-lg p-2 text-slate-900 font-mono focus:outline-none focus:border-blue-900"
+                        required
+                      />
                     </div>
                   </div>
 
@@ -387,16 +385,14 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
                     </div>
 
                     <div>
-                      <label className="text-[11px] font-semibold text-slate-700 block mb-1">Plan de Suscripción:</label>
-                      <select
-                        value={editFirmPlan}
-                        onChange={(e) => setEditFirmPlan(e.target.value as any)}
-                        className="w-full bg-white border border-amber-300 rounded-lg p-2 text-slate-900 focus:outline-none focus:border-amber-700"
-                      >
-                        <option value="PRO_FIRM">PRO_FIRM (Firma Estándar)</option>
-                        <option value="ENTERPRISE">ENTERPRISE (Ilimitado Corporativo)</option>
-                        <option value="STARTER">STARTER (Plan Inicial)</option>
-                      </select>
+                      <label className="text-[11px] font-semibold text-slate-700 block mb-1">Saldo en Cuenta (COP $):</label>
+                      <input
+                        type="number"
+                        value={editFirmBalance}
+                        onChange={(e) => setEditFirmBalance(parseFloat(e.target.value) || 0)}
+                        className="w-full bg-white border border-amber-300 rounded-lg p-2 text-slate-900 font-mono focus:outline-none focus:border-amber-700"
+                        required
+                      />
                     </div>
                   </div>
 
@@ -418,7 +414,7 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
                     <tr>
                       <th className="p-3">Firma Cliente</th>
                       <th className="p-3">NIT Fiscal</th>
-                      <th className="p-3">Plan</th>
+                      <th className="p-3">Saldo de Recargas</th>
                       <th className="p-3">Estado</th>
                       <th className="p-3 text-right">Acción</th>
                     </tr>
@@ -438,10 +434,8 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
                             )}
                           </td>
                           <td className="p-3 font-mono text-slate-600">{f.nit}</td>
-                          <td className="p-3">
-                            <span className="px-2 py-0.5 bg-slate-100 text-slate-800 font-bold text-[10px] rounded uppercase">
-                              {f.plan}
-                            </span>
+                          <td className="p-3 font-mono font-bold text-slate-900">
+                            ${(f.creditsBalance || 500000).toLocaleString('es-CO')} COP
                           </td>
                           <td className="p-3">
                             <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 font-bold text-[10px] rounded">
@@ -461,7 +455,7 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
                               <button
                                 onClick={() => startEditFirm(f)}
                                 className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg text-[11px] font-medium flex items-center gap-1"
-                                title="Editar Nombre, NIT y Plan"
+                                title="Editar Datos y Saldo"
                               >
                                 <Edit className="w-3 h-3 text-slate-500" />
                                 <span>Editar</span>

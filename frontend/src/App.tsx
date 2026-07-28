@@ -19,9 +19,10 @@ import type { SavedDraftEntry } from './modules/documents/components/SavedDrafts
 
 import { TenantUserManagementModal } from './modules/tenant/components/TenantUserManagementModal';
 import { LoginPortalView } from './modules/tenant/components/LoginPortalView';
+import { FirmCreditsRechargeModal } from './modules/tenant/components/FirmCreditsRechargeModal';
 
 const INITIAL_REGISTERED_FIRMS: LawFirmTenant[] = [
-  { id: 'firm-default-01', name: 'FIRMA APODERADA / DESPACHO JUDICIAL', nit: 'NIT 900.000.000-0', plan: 'PRO_FIRM', status: 'active' }
+  { id: 'firm-default-01', name: 'FIRMA APODERADA / DESPACHO JUDICIAL', nit: 'NIT 900.000.000-0', creditsBalance: 500000, status: 'active' }
 ];
 
 export function App() {
@@ -57,6 +58,7 @@ export function App() {
   const [isBrandingModalOpen, setIsBrandingModalOpen] = useState(false);
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
   const [isUserManagementModalOpen, setIsUserManagementModalOpen] = useState(false);
+  const [isRechargeModalOpen, setIsRechargeModalOpen] = useState(false);
 
   const [isSavedDraftsModalOpen, setIsSavedDraftsModalOpen] = useState(false);
   const [savedDrafts, setSavedDrafts] = useState<SavedDraftEntry[]>(() => {
@@ -163,7 +165,7 @@ export function App() {
 
   const sampleSubscriptionInfo: FirmSubscriptionInfo = {
     firmName: activeFirm.name,
-    planTier: activeFirm.plan,
+    planTier: 'SALDO_RECARGA' as any,
     subscriptionStatus: 'active',
     monthlyTokensUsed: 1420500,
     monthlyTokensLimit: 5000000,
@@ -205,6 +207,12 @@ export function App() {
     }
   };
 
+  const handleRechargeSuccess = (addedAmount: number) => {
+    const updatedFirm = { ...activeFirm, creditsBalance: (activeFirm.creditsBalance || 0) + addedAmount };
+    setActiveFirm(updatedFirm);
+    handleUpdateFirm(updatedFirm);
+  };
+
   return (
     <div className="flex h-screen bg-slate-100 font-sans overflow-hidden">
       <FirmBrandingModal
@@ -235,6 +243,12 @@ export function App() {
         onUpdateFirm={handleUpdateFirm}
         onDeleteFirm={handleDeleteFirm}
       />
+      <FirmCreditsRechargeModal
+        isOpen={isRechargeModalOpen}
+        onClose={() => setIsRechargeModalOpen(false)}
+        firm={activeFirm}
+        onRechargeSuccess={handleRechargeSuccess}
+      />
 
       {/* ENTERPRISE LEFT SIDEBAR */}
       <SidebarLeft
@@ -248,6 +262,7 @@ export function App() {
         onOpenBrandingModal={() => setIsBrandingModalOpen(true)}
         onOpenSubscriptionModal={() => setIsSubscriptionModalOpen(true)}
         onOpenUserManagementModal={() => setIsUserManagementModalOpen(true)}
+        onOpenRechargeModal={() => setIsRechargeModalOpen(true)}
       />
 
       {/* RIGHT MAIN WORKSPACE AREA */}

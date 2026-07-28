@@ -27,6 +27,7 @@ interface SidebarLeftProps {
   onOpenBrandingModal: () => void;
   onOpenSubscriptionModal: () => void;
   onOpenUserManagementModal?: () => void;
+  onOpenRechargeModal?: () => void;
 }
 
 export const SidebarLeft: React.FC<SidebarLeftProps> = ({
@@ -39,7 +40,8 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
   setIsFirmDropdownOpen,
   onOpenBrandingModal,
   onOpenSubscriptionModal,
-  onOpenUserManagementModal
+  onOpenUserManagementModal,
+  onOpenRechargeModal
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -52,100 +54,90 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
 
   return (
     <aside
-      className={`${
-        isCollapsed ? 'w-[68px]' : 'w-[260px]'
-      } bg-white border-r border-slate-200/80 flex flex-col h-full select-none font-sans transition-all duration-300 ease-in-out z-30 relative`}
+      className={`bg-white border-r border-slate-200/80 flex flex-col h-full transition-all duration-300 relative select-none font-sans ${
+        isCollapsed ? 'w-[72px]' : 'w-64'
+      }`}
     >
-      {/* BRAND */}
-      <div className={`${isCollapsed ? 'px-3 py-5' : 'px-5 py-5'} flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-950 to-blue-800 flex items-center justify-center text-white shadow-sm flex-shrink-0">
-          <Scale className="w-4.5 h-4.5 text-blue-200" />
-        </div>
-        {!isCollapsed && (
-          <div>
-            <h1 className="text-[15px] font-extrabold tracking-tight text-slate-900 leading-none">IUREON</h1>
-            <p className="text-[11px] text-slate-400 font-medium mt-0.5">Plataforma Judicial</p>
+      {/* BRAND HEADER */}
+      <div className="p-4 border-b border-slate-200/80 flex items-center justify-between">
+        {!isCollapsed ? (
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-blue-950 text-white flex items-center justify-center font-black text-sm shadow-xs border border-blue-900">
+              <Scale className="w-5 h-5 text-blue-200" />
+            </div>
+            <div>
+              <div className="font-black text-slate-900 tracking-tight text-base leading-none">IUREON</div>
+              <div className="text-[10px] font-semibold text-slate-400 mt-0.5">LegalTech Colombia</div>
+            </div>
+          </div>
+        ) : (
+          <div className="w-9 h-9 rounded-xl bg-blue-950 text-white flex items-center justify-center font-black text-sm mx-auto shadow-xs border border-blue-900">
+            <Scale className="w-5 h-5 text-blue-200" />
           </div>
         )}
       </div>
 
-      {/* FIRM TENANT SELECTOR */}
-      {!isCollapsed && (
-        <div className="px-4 pb-4">
+      {/* FIRM SWITCHER DROPDOWN */}
+      <div className="p-3 border-b border-slate-200/80 bg-slate-50/50">
+        {!isCollapsed ? (
           <div className="relative">
             <button
               onClick={() => setIsFirmDropdownOpen(!isFirmDropdownOpen)}
-              className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 transition-all text-xs text-left group"
+              className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-left hover:border-slate-300 transition-all shadow-2xs flex items-center justify-between"
             >
-              <div className="flex items-center gap-2.5 overflow-hidden">
-                <div className="w-7 h-7 rounded-lg bg-blue-950/5 border border-blue-900/10 flex items-center justify-center flex-shrink-0">
-                  <Building2 className="w-3.5 h-3.5 text-blue-900" />
-                </div>
+              <div className="flex items-center gap-2.5 min-w-0">
+                <Building2 className="w-4 h-4 text-blue-900 flex-shrink-0" />
                 <div className="truncate">
-                  <div className="font-bold text-slate-900 truncate text-[12px] leading-tight">{activeFirm.name}</div>
-                  <div className="text-[10px] text-slate-400 font-mono mt-0.5">{activeFirm.nit}</div>
+                  <div className="font-bold text-slate-900 text-xs truncate">{activeFirm.name}</div>
+                  <div className="text-[10px] font-mono text-slate-400 truncate">{activeFirm.nit}</div>
                 </div>
               </div>
-              <ChevronDown className={`w-3.5 h-3.5 text-slate-400 flex-shrink-0 transition-transform duration-200 ${isFirmDropdownOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0" />
             </button>
 
             {isFirmDropdownOpen && (
-              <div className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-slate-200 rounded-xl shadow-lg z-50 py-1 animate-in fade-in slide-in-from-top-1">
-                <div className="px-3 py-2 text-[10px] uppercase text-slate-400 font-bold tracking-wider">
-                  Firmas disponibles
-                </div>
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-30 overflow-hidden py-1">
                 {sampleFirms.map((firm) => (
                   <button
                     key={firm.id}
-                    onClick={() => { setActiveFirm(firm); setIsFirmDropdownOpen(false); }}
-                    className={`w-full px-3 py-2 text-left flex items-center justify-between text-xs transition-colors ${
-                      firm.id === activeFirm.id ? 'bg-blue-50/60' : 'hover:bg-slate-50'
+                    onClick={() => {
+                      setActiveFirm(firm);
+                      setIsFirmDropdownOpen(false);
+                    }}
+                    className={`w-full px-3 py-2 text-left hover:bg-slate-50 transition-colors flex items-center justify-between text-xs ${
+                      firm.id === activeFirm.id ? 'bg-blue-50/50 text-blue-900 font-semibold' : 'text-slate-700'
                     }`}
                   >
-                    <div className="truncate">
-                      <div className="font-bold text-slate-900 truncate text-[12px]">{firm.name}</div>
-                      <div className="text-[10px] text-slate-400 font-mono">{firm.nit}</div>
-                    </div>
-                    {firm.id === activeFirm.id && <Check className="w-4 h-4 text-blue-700 flex-shrink-0" />}
+                    <span className="truncate">{firm.name}</span>
+                    {firm.id === activeFirm.id && <Check className="w-3.5 h-3.5 text-blue-900 flex-shrink-0 ml-2" />}
                   </button>
                 ))}
-
-                <div className="border-t border-slate-100 mt-1 pt-1">
-                  <button
-                    onClick={() => {
-                      setIsFirmDropdownOpen(false);
-                      onOpenUserManagementModal?.();
-                    }}
-                    className="w-full px-3 py-2 text-left text-xs font-bold text-blue-900 hover:bg-blue-50 flex items-center gap-1.5"
-                  >
-                    <Building2 className="w-3.5 h-3.5" />
-                    <span>👥 Gestión de Usuarios &amp; Firmas</span>
-                  </button>
-                </div>
+                {onOpenUserManagementModal && (
+                  <div className="p-1 border-t border-slate-100 mt-1">
+                    <button
+                      onClick={() => {
+                        setIsFirmDropdownOpen(false);
+                        onOpenUserManagementModal();
+                      }}
+                      className="w-full px-2.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-lg text-[11px] flex items-center justify-center gap-1.5 transition-colors"
+                    >
+                      <Shield className="w-3.5 h-3.5 text-blue-300" />
+                      <span>Gestionar Firmas &amp; Usuarios</span>
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
-        </div>
-      )}
-
-      {/* Collapsed firm icon */}
-      {isCollapsed && (
-        <div className="px-3 pb-3 flex justify-center">
-          <button
-            onClick={() => setIsFirmDropdownOpen(!isFirmDropdownOpen)}
-            className="w-10 h-10 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 flex items-center justify-center transition-colors"
-            title={activeFirm.name}
-          >
+        ) : (
+          <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center mx-auto" title={activeFirm.name}>
             <Building2 className="w-4 h-4 text-blue-900" />
-          </button>
-        </div>
-      )}
+          </div>
+        )}
+      </div>
 
-      {/* SEPARATOR */}
-      <div className="mx-4 border-t border-slate-100" />
-
-      {/* NAVIGATION */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      {/* NAVIGATION ITEMS */}
+      <nav className="flex-1 p-3 space-y-1.5 overflow-y-auto">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = mainView === item.id;
@@ -153,20 +145,20 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
             <button
               key={item.id}
               onClick={() => setMainView(item.id)}
-              title={isCollapsed ? item.label : undefined}
-              className={`w-full flex items-center ${
-                isCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5'
-              } rounded-xl text-[13px] transition-all duration-150 ${
+              className={`w-full flex items-center gap-3 p-2.5 rounded-xl transition-all duration-150 text-left ${
                 isActive
-                  ? 'bg-blue-950 text-white shadow-sm'
-                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                  ? 'bg-blue-950 text-white font-semibold shadow-xs'
+                  : 'text-slate-600 hover:bg-slate-100/70 hover:text-slate-900'
               }`}
+              title={isCollapsed ? item.label : undefined}
             >
-              <Icon className={`w-[18px] h-[18px] flex-shrink-0 ${isActive ? 'text-blue-200' : 'text-slate-400'}`} />
+              <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-blue-300' : 'text-slate-500'}`} />
               {!isCollapsed && (
-                <div className="text-left">
-                  <span className={`font-semibold block leading-tight ${isActive ? 'text-white' : 'text-slate-800'}`}>{item.label}</span>
-                  <span className={`text-[10px] font-normal block mt-0.5 leading-tight ${isActive ? 'text-blue-300' : 'text-slate-400'}`}>{item.description}</span>
+                <div className="min-w-0">
+                  <div className="text-xs font-semibold leading-tight">{item.label}</div>
+                  <div className={`text-[10px] leading-tight truncate ${isActive ? 'text-blue-200/80' : 'text-slate-400'}`}>
+                    {item.description}
+                  </div>
                 </div>
               )}
             </button>
@@ -174,21 +166,22 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
         })}
       </nav>
 
-      {/* BOTTOM SECTION */}
-      <div className="px-3 pb-3 space-y-2">
-        {/* Subscription card */}
+      {/* FOOTER ACCENTS */}
+      <div className="p-3 border-t border-slate-200/80 space-y-2">
         {!isCollapsed ? (
           <>
             <button
-              onClick={onOpenSubscriptionModal}
-              className="w-full p-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200/80 rounded-xl text-left transition-colors flex items-center gap-3"
+              onClick={onOpenRechargeModal || onOpenSubscriptionModal}
+              className="w-full p-3 bg-emerald-50/70 hover:bg-emerald-100/80 border border-emerald-200/80 rounded-xl text-left transition-colors flex items-center gap-3"
             >
-              <div className="w-8 h-8 rounded-lg bg-blue-950/5 border border-blue-900/10 flex items-center justify-center flex-shrink-0">
-                <CreditCard className="w-4 h-4 text-blue-900" />
+              <div className="w-8 h-8 rounded-lg bg-emerald-700 text-white flex items-center justify-center flex-shrink-0">
+                <CreditCard className="w-4 h-4" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="font-bold text-slate-900 text-[12px]">Plan Firma</div>
-                <div className="text-[10px] text-slate-400 font-mono">1.4M / 5M créditos</div>
+                <div className="font-bold text-slate-900 text-[12px]">Saldo de Recargas</div>
+                <div className="text-[10px] text-emerald-800 font-mono font-bold">
+                  ${(activeFirm.creditsBalance || 500000).toLocaleString('es-CO')} COP
+                </div>
               </div>
             </button>
 
@@ -210,11 +203,11 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
         ) : (
           <div className="flex flex-col items-center gap-2">
             <button
-              onClick={onOpenSubscriptionModal}
-              className="w-10 h-10 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 rounded-xl flex items-center justify-center transition-colors"
-              title="Plan Firma"
+              onClick={onOpenRechargeModal || onOpenSubscriptionModal}
+              className="w-10 h-10 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl flex items-center justify-center transition-colors text-emerald-800"
+              title="Recargar Saldo"
             >
-              <CreditCard className="w-4 h-4 text-blue-900" />
+              <CreditCard className="w-4 h-4 text-emerald-700" />
             </button>
             <button
               onClick={onOpenBrandingModal}
