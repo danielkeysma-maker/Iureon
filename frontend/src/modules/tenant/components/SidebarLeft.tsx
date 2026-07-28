@@ -12,7 +12,8 @@ import {
   ShieldCheck,
   CreditCard,
   ChevronsLeft,
-  ChevronsRight
+  ChevronsRight,
+  User
 } from 'lucide-react';
 import type { LawFirmTenant } from './Header';
 
@@ -28,6 +29,8 @@ interface SidebarLeftProps {
   onOpenSubscriptionModal: () => void;
   onOpenUserManagementModal?: () => void;
   onOpenRechargeModal?: () => void;
+  isSuperUser?: boolean;
+  isParticularUser?: boolean;
 }
 
 export const SidebarLeft: React.FC<SidebarLeftProps> = ({
@@ -41,7 +44,9 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
   onOpenBrandingModal,
   onOpenSubscriptionModal,
   onOpenUserManagementModal,
-  onOpenRechargeModal
+  onOpenRechargeModal,
+  isSuperUser = false,
+  isParticularUser = false
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -77,26 +82,71 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
         )}
       </div>
 
-      {/* FIRM SWITCHER DROPDOWN */}
+      {/* FIRM SWITCHER DROPDOWN / USER CONTEXT */}
       <div className="p-3 border-b border-slate-200/80 bg-slate-50/50">
         {!isCollapsed ? (
           <div className="relative">
-            <button
-              onClick={() => setIsFirmDropdownOpen(!isFirmDropdownOpen)}
-              className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-left hover:border-slate-300 transition-all shadow-2xs flex items-center justify-between"
-            >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <Building2 className="w-4 h-4 text-blue-900 flex-shrink-0" />
-                <div className="truncate">
-                  <div className="font-bold text-slate-900 text-xs truncate">{activeFirm.name}</div>
-                  <div className="text-[10px] font-mono text-slate-400 truncate">{activeFirm.nit}</div>
+            {isSuperUser ? (
+              <button
+                onClick={() => setIsFirmDropdownOpen(!isFirmDropdownOpen)}
+                className="w-full p-2.5 bg-gradient-to-r from-slate-950 to-blue-950 text-white border border-blue-900/80 rounded-xl text-left hover:border-blue-700 transition-all shadow-xs flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <Shield className="w-4 h-4 text-blue-300 flex-shrink-0" />
+                  <div className="truncate">
+                    <div className="font-bold text-white text-xs truncate flex items-center gap-1">
+                      <span>SuperUsuario Global</span>
+                    </div>
+                    <div className="text-[10px] text-blue-300/90 truncate font-semibold">Acceso Total (Sin Firma)</div>
+                  </div>
                 </div>
-              </div>
-              <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0" />
-            </button>
+                <ChevronDown className="w-4 h-4 text-blue-300 flex-shrink-0" />
+              </button>
+            ) : isParticularUser ? (
+              <button
+                onClick={() => setIsFirmDropdownOpen(!isFirmDropdownOpen)}
+                className="w-full p-2.5 bg-gradient-to-r from-teal-950 to-slate-900 text-white border border-teal-800/80 rounded-xl text-left hover:border-teal-600 transition-all shadow-xs flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <User className="w-4 h-4 text-teal-300 flex-shrink-0" />
+                  <div className="truncate">
+                    <div className="font-bold text-white text-xs truncate flex items-center gap-1">
+                      <span>Abogado Particular</span>
+                    </div>
+                    <div className="text-[10px] text-teal-300/90 truncate font-semibold">Sin Firma (Uso Personal)</div>
+                  </div>
+                </div>
+                <ChevronDown className="w-4 h-4 text-teal-300 flex-shrink-0" />
+              </button>
+            ) : (
+              <button
+                onClick={() => setIsFirmDropdownOpen(!isFirmDropdownOpen)}
+                className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-left hover:border-slate-300 transition-all shadow-2xs flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <Building2 className="w-4 h-4 text-blue-900 flex-shrink-0" />
+                  <div className="truncate">
+                    <div className="font-bold text-slate-900 text-xs truncate">{activeFirm.name}</div>
+                    <div className="text-[10px] font-mono text-slate-400 truncate">{activeFirm.nit}</div>
+                  </div>
+                </div>
+                <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0" />
+              </button>
+            )}
 
             {isFirmDropdownOpen && (
               <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-30 overflow-hidden py-1">
+                {isSuperUser ? (
+                  <div className="px-3 py-2 bg-slate-900 text-white text-[11px] font-bold border-b border-slate-800 flex items-center justify-between">
+                    <span>Contexto: SuperUsuario Global</span>
+                    <span className="text-[9px] bg-blue-500/30 text-blue-200 px-1.5 py-0.5 rounded uppercase">ROOT</span>
+                  </div>
+                ) : isParticularUser ? (
+                  <div className="px-3 py-2 bg-teal-950 text-white text-[11px] font-bold border-b border-teal-900 flex items-center justify-between">
+                    <span>Contexto: Abogado Particular</span>
+                    <span className="text-[9px] bg-teal-500/30 text-teal-200 px-1.5 py-0.5 rounded uppercase">SIN FIRMA</span>
+                  </div>
+                ) : null}
                 {sampleFirms.map((firm) => (
                   <button
                     key={firm.id}
@@ -130,8 +180,29 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
             )}
           </div>
         ) : (
-          <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center mx-auto" title={activeFirm.name}>
-            <Building2 className="w-4 h-4 text-blue-900" />
+          <div
+            className={`w-10 h-10 rounded-xl border flex items-center justify-center mx-auto ${
+              isSuperUser
+                ? 'bg-slate-950 text-blue-300 border-blue-900'
+                : isParticularUser
+                ? 'bg-teal-950 text-teal-300 border-teal-800'
+                : 'bg-white text-blue-900 border-slate-200'
+            }`}
+            title={
+              isSuperUser
+                ? 'SuperUsuario Global (Sin Firma)'
+                : isParticularUser
+                ? 'Abogado Particular (Sin Firma)'
+                : activeFirm.name
+            }
+          >
+            {isSuperUser ? (
+              <Shield className="w-4 h-4 text-blue-300" />
+            ) : isParticularUser ? (
+              <User className="w-4 h-4 text-teal-300" />
+            ) : (
+              <Building2 className="w-4 h-4 text-blue-900" />
+            )}
           </div>
         )}
       </div>

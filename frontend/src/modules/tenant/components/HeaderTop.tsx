@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ChevronRight, Sparkles, BookOpen, Wrench, Shield, CheckCircle2, Copy, Download, FileType, Maximize2, Minimize2, LogOut } from 'lucide-react';
+import { ActionConfirmationModal } from './ActionConfirmationModal';
 
 interface HeaderTopProps {
   mainView: 'workspace' | 'search' | 'tools' | 'audit';
@@ -28,6 +29,8 @@ export const HeaderTop: React.FC<HeaderTopProps> = ({
   onOpenUserManagementModal,
   onLogout
 }) => {
+  const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
+
   const viewMeta: Record<string, { label: string; icon: React.ReactNode }> = {
     workspace: { label: 'Redacción & Providencias', icon: <Sparkles className="w-4 h-4 text-blue-800" /> },
     search: { label: 'Buscador & Sentencias', icon: <BookOpen className="w-4 h-4 text-blue-800" /> },
@@ -135,7 +138,7 @@ export const HeaderTop: React.FC<HeaderTopProps> = ({
 
         {onLogout && (
           <button
-            onClick={onLogout}
+            onClick={() => setIsLogoutConfirmOpen(true)}
             className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-[11.5px] font-bold flex items-center gap-1.5 transition-all shadow-xs"
             title="Cerrar Sesión e Ir al Portal de Login"
           >
@@ -144,6 +147,20 @@ export const HeaderTop: React.FC<HeaderTopProps> = ({
           </button>
         )}
       </div>
+
+      {/* ActionConfirmationModal for Logout */}
+      <ActionConfirmationModal
+        isOpen={isLogoutConfirmOpen}
+        title="🚨 ¿Cerrar Sesión de la Plataforma?"
+        message="¿Está seguro de que desea salir del Ecosistema E-Judicial de Iureon? Sus datos y configuraciones activas permanecerán seguros."
+        confirmText="Sí, Cerrar Sesión"
+        confirmVariant="danger"
+        onConfirm={() => {
+          setIsLogoutConfirmOpen(false);
+          if (onLogout) onLogout();
+        }}
+        onCancel={() => setIsLogoutConfirmOpen(false)}
+      />
     </header>
   );
 };

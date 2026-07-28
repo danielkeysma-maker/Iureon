@@ -263,6 +263,7 @@ export function App() {
         onOpenSubscriptionModal={() => setIsSubscriptionModalOpen(true)}
         onOpenUserManagementModal={() => setIsUserManagementModalOpen(true)}
         onOpenRechargeModal={() => setIsRechargeModalOpen(true)}
+        isSuperUser={currentUserEmail === 'ingdanielma@gmail.com'}
       />
 
       {/* RIGHT MAIN WORKSPACE AREA */}

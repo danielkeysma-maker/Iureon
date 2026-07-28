@@ -7,9 +7,16 @@ Iureon es la plataforma B2B SaaS de Inteligencia Artificial y Ecosistema Judicia
 
 ### 1. Autenticación & Multi-Tenancy
 - **Portal de Login**: `LoginPortalView.tsx`
-- **Gestión de Firmas & Usuarios**: `TenantUserManagementModal.tsx`
-- **Aviso de Seguridad & Advertencias**: `ActionConfirmationModal.tsx`
-- **SuperUsuario Global**: `ingdanielma@gmail.com`
+- **Aprovisionamiento Flexible de Usuarios**:
+  - **Abogados de Firma**: Requieren la creación previa de una Firma Cliente (`FIRM_ADMIN` / `LAWYER`).
+  - **Abogados Particulares**: Pueden registrarse de forma independiente sin estar vinculados a ninguna firma (`INDEPENDENT_LAWYER` / `firmId: 'INDEPENDENT'`).
+  - **SuperUsuario Global**: Acceso global de administración desvinculado de firmas (`SUPER_ADMIN` / `firmId: 'N/A'`).
+- **Gestión de Firmas & Usuarios**: `TenantUserManagementModal.tsx` con capacidades completas de creación, edición y eliminación de firmas y cuentas de usuario.
+- **Visualización Contextual en Barra Lateral (`SidebarLeft.tsx`)**:
+  - `👑 SuperUsuario Global (Acceso Total - Sin Firma)`
+  - `👤 Abogado Particular (Sin Firma - Uso Personal)`
+  - `🏢 Firma Cliente (NIT ...)`
+- **Protección por Modales de Confirmación**: Todas las operaciones destructivas o de edición (crear/editar/eliminar firmas y usuarios, así como el Cierre de Sesión) están protegidas por `ActionConfirmationModal.tsx`.
 - **Modelo Económico**: Recarga de Créditos Procesales (COP $) sin cuotas de suscripción fijas ficticias (`FirmCreditsRechargeModal.tsx`).
 
 ### 2. Pipeline de Inteligencia Artificial (OpenRouter API)
