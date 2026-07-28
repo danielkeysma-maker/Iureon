@@ -93,13 +93,20 @@ export class OpenRouterMultiEngineService {
       const isLaboral = req.documentType.toLowerCase().includes('laboral') || req.legalPrompt.toLowerCase().includes('laboral');
       const isPenal = req.documentType.toLowerCase().includes('penal') || req.legalPrompt.toLowerCase().includes('penal');
       const isCivil = req.documentType.toLowerCase().includes('civil') || req.legalPrompt.toLowerCase().includes('civil');
-      const isAdmin = req.documentType.toLowerCase().includes('nulidad') || req.legalPrompt.toLowerCase().includes('cpaca');
+      const isMilitaresOEstado = req.legalPrompt.toLowerCase().includes('soldado') || req.legalPrompt.toLowerCase().includes('bomba') || req.legalPrompt.toLowerCase().includes('mina') || req.legalPrompt.toLowerCase().includes('reparación directa');
+      const isAdmin = req.documentType.toLowerCase().includes('nulidad') || req.legalPrompt.toLowerCase().includes('cpaca') || isMilitaresOEstado;
 
       jurisprudenciaEncontrada = isTutela
         ? [
-            'Sentencia T-025-2004 (Corte Constitucional - Protección de Derechos Fundamentales)',
+            'Sentencia T-025-2004 (Corte Constitucional - Protección a Víctimas del Conflicto Armado y Fuerza Pública)',
             'Sentencia T-238-2018 (Corte Constitucional - Debido Proceso Administrativo)',
             'Sentencia SU-049-2022 (Corte Constitucional - Unificación en Estabilidad Laboral Reforzada)'
+          ]
+        : isMilitaresOEstado
+        ? [
+            'Sentencia CE-SEC3-2023-0045 (Consejo de Estado - Sección Tercera, Responsabilidad Extracontractual del Estado por Riesgo Excepcional y Daño Especial a Soldado por Artefacto Explosivo)',
+            'Sentencia CE-SU3-2022 (Consejo de Estado - Unificación en Indemnización por Daño a la Vida de Relación y Lesiones de Guerra)',
+            'Sentencia T-025-2004 (Corte Constitucional - Amparo a Miembros de la Fuerza Pública Heridos en Actos del Servicio)'
           ]
         : isLaboral
         ? [
