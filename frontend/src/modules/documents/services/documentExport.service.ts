@@ -10,10 +10,11 @@ export interface FirmBrandingConfig {
   firmEmail: string;
   fontFamily: 'Inter' | 'Times New Roman' | 'Arial' | 'Calibri';
   primaryColorHex: string;
+  logoUrl?: string;
 }
 
 export const DEFAULT_FIRM_BRANDING: FirmBrandingConfig = {
-  firmName: 'TORRES & ASOCIADOS S.A.S.',
+  firmName: 'Torres & Asociados LegalTech',
   firmNit: 'NIT 900.892.102-4 - BOGOTÁ D.C.',
   firmAddress: 'Calle 72 No. 10-07, Edificio Granahorro, Piso 12',
   firmPhone: 'PBX: +57 (601) 310-9000',

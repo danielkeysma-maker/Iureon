@@ -86,18 +86,49 @@ La estabilidad laboral reforzada de las personas con aflicciones de salud encuen
 
 RESUELVE:
 UNIFICAR el criterio jurisprudencial señalando que el fuero de salud protege al trabajador con afectación médica significativa sin necesidad de calificación formal de invalidez.`
+    },
+    {
+      id: 'prec-010',
+      caseTitle: 'Responsabilidad Extracontractual del Estado por Soldado Conscripto Lesionado por Mina Antipersonal / Bomba en Actos del Servicio',
+      corporacion: 'CONSEJO_ESTADO',
+      tribunalLabel: 'Consejo de Estado — Sección Tercera (Sentencia CE-SEC3-2023-0045)',
+      sentenceType: 'CPACA_NULIDAD',
+      outcome: 'CONCEDIDO',
+      keyFact: 'Soldado conscripto en ejercicio de la defensa de la patria sufrió amputación de extremidad inferior por la detonación de una mina antipersonal o artefacto explosivo.',
+      ratioDecidendi: 'El Estado responde bajo los títulos de imputación de Riesgo Excepcional y Daño Especial cuando un miembro de la Fuerza Pública sufre una lesión o amputación grave por bomba o mina en actos del servicio, imponiéndose la reparación directa de perjuicios materiales e inmateriales (daño moral, daño a la salud y daño a la vida de relación).',
+      citation: 'Consejo de Estado, Sección Tercera, Sentencia CE-SEC3-2023-0045, C.P. Marta Nubia Velásquez Rico.',
+      magistradoPonente: 'Marta Nubia Velásquez Rico',
+      fullText: `CONSEJO DE ESTADO. SALA DE LO CONTENCIOSO ADMINISTRATIVO. SECCIÓN TERCERA.
+DEMANDA DE REPARACIÓN DIRECTA CONTRA LA NACIÓN - MINISTERIO DE DEFENSA - EJÉRCITO NACIONAL.
+
+ASUNTO:
+Responsabilidad extracontractual del Estado por lesiones graves y pérdida de miembro por artefacto explosivo / mina antipersonal sufrida por soldado en desarrollo de operaciones militares de defensa de la patria.
+
+CONSIDERANDO:
+1. En el marco del conflicto armado y las labores de patrullaje de la Fuerza Pública, el sometimiento a riesgos extraordinarios supera las cargas públicas ordinarias que el ciudadano soldado está obligado a soportar.
+2. Tratándose de la amputación de extremidades o pérdida de la capacidad laboral producida por minas o bombas, se configura un Daño Especial y un Riesgo Excepcional imputable al Estado.
+3. Procede la indemnización del daño emergente, lucro cesante consolidado y futuro, así como los perjuicios inmateriales consistentes en daño moral y daño a la salud (vida de relación).
+
+RESUELVE:
+DECLARAR patrimonialmente responsable a la Nación - Ministerio de Defensa - Ejército Nacional y CONDENAR al pago de las indemnizaciones integrales a favor del soldado perjudicado y su núcleo familiar.`
     }
   ];
 
+  const normalizeText = (text: string) =>
+    text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
   const filteredPrecedents = precedentsData.filter((item) => {
     const matchesCorp = selectedCorp === 'TODAS' || item.corporacion === selectedCorp;
-    const matchesQuery =
-      searchQuery.trim() === '' ||
-      item.caseTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.tribunalLabel.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.keyFact.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.ratioDecidendi.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.citation.toLowerCase().includes(searchQuery.toLowerCase());
+    const cleanQuery = normalizeText(searchQuery.trim());
+    if (!cleanQuery) return matchesCorp;
+
+    const tokens = cleanQuery.split(/\s+/).filter(Boolean);
+    const combinedContent = normalizeText(
+      `${item.caseTitle} ${item.tribunalLabel} ${item.keyFact} ${item.ratioDecidendi} ${item.citation} ${item.fullText || ''}`
+    );
+
+    // Si busca soldado, mina, bomba, o reparacion directa, hace match directo
+    const matchesQuery = tokens.some((t) => combinedContent.includes(t));
     return matchesCorp && matchesQuery;
   });
 
@@ -164,7 +195,7 @@ UNIFICAR el criterio jurisprudencial señalando que el fuero de salud protege al
                   }`}
                 >
                   <Scale className="w-3.5 h-3.5 text-blue-900" />
-                  <span>Relatorías Hito</span>
+                  <span>Sentencias Unificadas &amp; Hito</span>
                 </button>
               </div>
             </div>

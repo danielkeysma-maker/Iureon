@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Check, Settings } from 'lucide-react';
+import { X, Check, Settings, Upload, Image as ImageIcon } from 'lucide-react';
 import type { FirmBrandingConfig } from '../../documents/services/documentExport.service';
 
 interface FirmBrandingModalProps {
@@ -19,6 +19,18 @@ export const FirmBrandingModal: React.FC<FirmBrandingModalProps> = ({
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   if (!isOpen) return null;
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (uploadEvent) => {
+        const result = uploadEvent.target?.result as string;
+        setFormState((prev) => ({ ...prev, logoUrl: result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,6 +67,42 @@ export const FirmBrandingModal: React.FC<FirmBrandingModalProps> = ({
 
         {/* Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs font-body">
+          {/* Logo Upload Section */}
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2">
+            <label className="text-[11px] font-bold text-slate-800 block flex items-center justify-between">
+              <span>Logo Oficial de la Firma (.PNG, .JPG, .SVG):</span>
+              {formState.logoUrl && <span className="text-emerald-700 text-[10px]">✓ Logo Cargado</span>}
+            </label>
+
+            <div className="flex items-center gap-3">
+              {formState.logoUrl ? (
+                <img
+                  src={formState.logoUrl}
+                  alt="Logo Firma"
+                  className="w-12 h-12 object-contain bg-white border border-slate-200 rounded-lg p-1"
+                />
+              ) : (
+                <div className="w-12 h-12 rounded-lg bg-slate-200/70 border border-dashed border-slate-300 flex items-center justify-center text-slate-400">
+                  <ImageIcon className="w-5 h-5" />
+                </div>
+              )}
+
+              <div className="flex-1">
+                <label className="cursor-pointer px-3 py-1.5 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 transition-colors">
+                  <Upload className="w-3.5 h-3.5 text-blue-900" />
+                  <span>{formState.logoUrl ? 'Cambiar Logo' : 'Subir Imagen del Logo'}</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleLogoUpload}
+                    className="hidden"
+                  />
+                </label>
+                <p className="text-[10px] text-slate-400 mt-1">Se incluirá automáticamente en el encabezado de los PDF/Word exportados.</p>
+              </div>
+            </div>
+          </div>
+
           <div>
             <label className="text-[11px] font-semibold text-slate-700 block mb-1">Nombre Oficial de la Firma:</label>
             <input
