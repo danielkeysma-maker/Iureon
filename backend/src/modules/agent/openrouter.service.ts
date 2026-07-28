@@ -161,7 +161,7 @@ export class OpenRouterService {
     };
   }
 
-  private async callOpenRouterModel(models: string[], systemPrompt: string, userPrompt: string): Promise<string> {
+  private async callOpenRouterModel(requestedModels: string[], systemPrompt: string, userPrompt: string): Promise<string> {
     const apiKey = process.env.OPENROUTER_API_KEY || config.openRouter.apiKey;
 
     if (!apiKey) {
@@ -169,10 +169,30 @@ export class OpenRouterService {
       return '';
     }
 
-    for (const model of models) {
+    // Mapeo inteligente de slugs hacia OpenRouter con fallbacks de API
+    const modelSlugMap: Record<string, string[]> = {
+      'google/gemini-3.6-flash': ['google/gemini-3.6-flash', 'google/gemini-2.0-flash-001', 'google/gemini-flash-1.5'],
+      'openai/gpt-5.6-sol': ['openai/gpt-5.6-sol', 'openai/gpt-4o', 'openai/gpt-4-turbo'],
+      'anthropic/claude-opus-5': ['anthropic/claude-opus-5', 'anthropic/claude-3-opus', 'anthropic/claude-3.5-sonnet']
+    };
+
+    let targetSlugs: string[] = [];
+    for (const m of requestedModels) {
+      if (modelSlugMap[m]) {
+        targetSlugs.push(...modelSlugMap[m]);
+      } else {
+        targetSlugs.push(m);
+      }
+    }
+
+    for (const model of targetSlugs) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000); // 12s max por llamada
+
       try {
         const response = await fetch(`${this.baseUrl}/chat/completions`, {
           method: 'POST',
+          signal: controller.signal,
           headers: {
             'Authorization': `Bearer ${apiKey}`,
             'Content-Type': 'application/json',
@@ -186,13 +206,16 @@ export class OpenRouterService {
           })
         });
 
+        clearTimeout(timeoutId);
         const json: any = await response.json();
+
         if (!json.error && json.choices?.[0]?.message?.content) {
           const text = json.choices[0].message.content.trim();
           if (text.length > 50) return text;
         }
       } catch (err: any) {
-        console.warn(`[OPENROUTER MODEL FAIL] Error en ${model}:`, err.message);
+        clearTimeout(timeoutId);
+        console.warn(`[OPENROUTER MODEL RETRY] Fallo en ${model}:`, err.message);
       }
     }
 

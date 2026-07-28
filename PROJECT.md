@@ -43,4 +43,5 @@ El sistema utiliza una arquitectura de orquestación en cascada a través de Ope
 
 ## 🚨 Reglas de Arquitectura e Invariantes
 - **Umbral de 500 Líneas**: Ningún archivo del proyecto puede superar las 500 líneas de código.
-- **Sin Datos Ficticios Genéricos**: Nombres como "Mario Alberto Pérez" o "Julián Delgado" no se hardcodean a menos que provengan de los hechos reales aportados por el abogado.
+- **Sin Datos Ficticios Genéricos**: Nombres como "Mario Alberto Pérez" o "Julián Delgado" están prohibidos. Toda la plataforma utiliza marcadores solemnes de la Rama Judicial (`APODERADO JUDICIAL`, `DEMANDANTE`, `DEMANDADO`) o la información real ingresada por el usuario.
+- **Motores Invariables Fijos**: El pipeline utiliza exclusivamente los slugs oficiales `google/gemini-3.6-flash`, `openai/gpt-5.6-sol` y `anthropic/claude-opus-5`.
