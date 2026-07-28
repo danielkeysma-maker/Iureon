@@ -189,6 +189,12 @@ export class OpenRouterMultiEngineService {
       return `[PROCESADO por ${model}]: ${userPrompt.substring(0, 80)}`;
     }
 
+    // Mapeo transparente hacia las APIs oficiales en OpenRouter para evitar error 404
+    let validApiModel = model;
+    if (model.includes('gemini')) validApiModel = 'google/gemini-2.0-flash-001';
+    if (model.includes('gpt')) validApiModel = 'openai/gpt-4o';
+    if (model.includes('claude') || model.includes('opus')) validApiModel = 'anthropic/claude-3-opus';
+
     try {
       const response = await fetch(`${this.baseUrl}/chat/completions`, {
         method: 'POST',
@@ -199,15 +205,21 @@ export class OpenRouterMultiEngineService {
           'X-Title': 'Iureon LegalTech B2B'
         },
         body: JSON.stringify({
-          model: model, // Envia directamente el modelo exacto (google/gemini-3.6-flash, openai/gpt-5.6-sol, anthropic/claude-opus-5)
+          model: validApiModel,
           messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
           temperature: 0.2
         })
       });
       const json = await response.json();
-      return json.choices?.[0]?.message?.content || `[PROCESADO por ${model}]`;
+      const content = json.choices?.[0]?.message?.content;
+      if (!content) {
+        console.error('[OPENROUTER API ERROR RESPONSE]', json);
+        throw new Error(json.error?.message || `No content returned from ${validApiModel}`);
+      }
+      return content;
     } catch (err: any) {
-      return `[FALLBACK-PROCESSED] Modelo ${model} ejecutado correctamente.`;
+      console.error(`[OPENROUTER MODEL FAIL] Error en ${validApiModel}:`, err.message);
+      throw err;
     }
   }
 
