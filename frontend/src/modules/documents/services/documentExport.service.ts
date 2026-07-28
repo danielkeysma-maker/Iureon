@@ -16,11 +16,11 @@ export interface FirmBrandingConfig {
 }
 
 export const DEFAULT_FIRM_BRANDING: FirmBrandingConfig = {
-  firmName: 'FIRMA APODERADA / DESPACHO JUDICIAL',
-  firmNit: 'NIT 900.000.000-0',
-  firmAddress: 'Sede Principal del Despacho / Firma',
-  firmPhone: 'PBX / Teléfono Notificaciones',
-  firmEmail: 'notificaciones@firmaapoderada.co',
+  firmName: 'FIRMA / DESPACHO ACTIVO',
+  firmNit: 'PENDIENTE REGISTRO',
+  firmAddress: 'Dirección Corporativa',
+  firmPhone: 'Teléfono Notificaciones',
+  firmEmail: 'notificaciones@tufirma.co',
   fontFamily: 'Inter',
   primaryColorHex: '#1E293B',
   customFormatInstruction: '1. Señores Juez / Tribunal\n2. Referencia y Partes\n3. Hechos Cronológicos\n4. Pretensiones\n5. Fundamentos de Derecho y Precedente\n6. Pruebas\n7. Notificaciones',

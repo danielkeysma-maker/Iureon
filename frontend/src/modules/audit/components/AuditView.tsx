@@ -8,7 +8,7 @@ export const AuditView: React.FC = () => {
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
 
   const sampleSubscriptionInfo = {
-    firmName: 'FIRMA APODERADA / DESPACHO JUDICIAL',
+    firmName: 'FIRMA / DESPACHO ACTIVO',
     planTier: 'SALDO_RECARGA' as any,
     subscriptionStatus: 'active' as const,
     monthlyTokensUsed: 0,

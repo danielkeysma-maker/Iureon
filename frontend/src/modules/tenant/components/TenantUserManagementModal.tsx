@@ -315,7 +315,7 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
                         type="text"
                         value={newFirmNit}
                         onChange={(e) => setNewFirmNit(e.target.value)}
-                        placeholder="NIT 900.000.000-0"
+                        placeholder="Ej. NIT 900.123.456-7"
                         className="w-full bg-white border border-slate-300 rounded-lg p-2 text-slate-900 font-mono focus:outline-none focus:border-blue-900"
                         required
                       />

@@ -22,7 +22,7 @@ import { LoginPortalView } from './modules/tenant/components/LoginPortalView';
 import { FirmCreditsRechargeModal } from './modules/tenant/components/FirmCreditsRechargeModal';
 
 const INITIAL_REGISTERED_FIRMS: LawFirmTenant[] = [
-  { id: 'firm-default-01', name: 'FIRMA APODERADA / DESPACHO JUDICIAL', nit: 'NIT 900.000.000-0', creditsBalance: 500000, status: 'active' }
+  { id: 'firm-default-01', name: 'FIRMA / DESPACHO ACTIVO', nit: 'PENDIENTE REGISTRO', creditsBalance: 0, status: 'active' }
 ];
 
 export function App() {
