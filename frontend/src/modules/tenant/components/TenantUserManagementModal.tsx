@@ -47,10 +47,10 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
       const stored = localStorage.getItem('iureon_firm_users');
       return stored ? JSON.parse(stored) : [
         {
-          id: 'user-001',
+          id: 'super-user-001',
           firmId: activeFirm.id,
-          fullName: 'Administrador Principal',
-          email: 'admin@iureon.co',
+          fullName: 'Ing. Daniel Ma. (SuperUsuario Global)',
+          email: 'ingdanielma@gmail.com',
           role: 'SUPER_ADMIN',
           status: 'active',
           createdAt: new Date().toLocaleDateString('es-CO')
@@ -69,8 +69,8 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
   const [newUserFirmId, setNewUserFirmId] = useState(activeFirm.id);
 
   // Login Form State
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
+  const [loginEmail, setLoginEmail] = useState('ingdanielma@gmail.com');
+  const [loginPassword, setLoginPassword] = useState('Dma1102811692@');
   const [loginSuccessMsg, setLoginSuccessMsg] = useState('');
 
   if (!isOpen) return null;
@@ -126,7 +126,12 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
     e.preventDefault();
     if (!loginEmail.trim()) return;
 
-    setLoginSuccessMsg(`✅ Sesión iniciada correctamente para: ${loginEmail}`);
+    if (loginEmail.trim() === 'ingdanielma@gmail.com' && loginPassword === 'Dma1102811692@') {
+      setLoginSuccessMsg('👑 Sesión de SuperUsuario Global autenticada exitosamente para Ing. Daniel Ma.');
+    } else {
+      setLoginSuccessMsg(`✅ Sesión iniciada correctamente para: ${loginEmail}`);
+    }
+
     setTimeout(() => {
       setLoginSuccessMsg('');
       onClose();
