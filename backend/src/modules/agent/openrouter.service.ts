@@ -188,12 +188,6 @@ export class OpenRouterMultiEngineService {
     if (!this.apiKey) {
       return `[PROCESADO por ${model}]: ${userPrompt.substring(0, 80)}`;
     }
-    
-    // Mapeo dinámico de identificadores de modelos
-    let openRouterModelId = model;
-    if (model === 'google/gemini-3.6-flash') openRouterModelId = 'google/gemini-2.0-flash-001';
-    if (model === 'openai/gpt-5.6-sol') openRouterModelId = 'openai/gpt-4o';
-    if (model === 'anthropic/claude-opus-5') openRouterModelId = 'anthropic/claude-3-opus';
 
     try {
       const response = await fetch(`${this.baseUrl}/chat/completions`, {
@@ -205,8 +199,7 @@ export class OpenRouterMultiEngineService {
           'X-Title': 'Iureon LegalTech B2B'
         },
         body: JSON.stringify({
-          model: openRouterModelId,
-          models: [openRouterModelId, 'google/gemini-2.0-flash-001', 'openai/gpt-4o', 'anthropic/claude-3-opus'],
+          model: model, // Envia directamente el modelo exacto (google/gemini-3.6-flash, openai/gpt-5.6-sol, anthropic/claude-opus-5)
           messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
           temperature: 0.2
         })
