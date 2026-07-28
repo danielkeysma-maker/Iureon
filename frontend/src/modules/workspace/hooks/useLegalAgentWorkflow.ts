@@ -128,13 +128,14 @@ export function useLegalAgentWorkflow() {
           if (done) break;
 
           buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split('\n\n');
-          buffer = lines.pop() || '';
+          const blocks = buffer.split('\n\n');
+          buffer = blocks.pop() || '';
 
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
+          for (const block of blocks) {
+            const match = block.match(/data:\s*(\{.*\})/s);
+            if (match && match[1]) {
               try {
-                const payload = JSON.parse(line.replace('data: ', ''));
+                const payload = JSON.parse(match[1]);
                 if (payload.stage) {
                   setLogs((prev) => [
                     ...prev,
