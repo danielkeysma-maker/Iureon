@@ -48,7 +48,7 @@ export class OpenRouterMultiEngineService {
     });
 
     const geminiExtraction = await this.callOpenRouterModel(
-      'google/gemini-2.0-flash-001',
+      'google/gemini-3.6-flash',
       `Análisis masivo de expediente colombiano. Hechos y pretensiones: ${req.documentType} - ${req.legalPrompt}`,
       `Hechos identificados: ${req.legalPrompt}. Tipo procesal: ${req.documentType}.`
     );
@@ -135,7 +135,7 @@ export class OpenRouterMultiEngineService {
     });
 
     const gptLogicResult = await this.callOpenRouterModel(
-      'openai/gpt-4o', // GPT-5.6 Sol
+      'openai/gpt-5.6-sol',
       `Esquema procesal y solución dogmática para ${req.documentType} con sustentación jurídica: ${req.legalPrompt}`,
       `Estructura dogmática validada.`
     );
@@ -188,6 +188,13 @@ export class OpenRouterMultiEngineService {
     if (!this.apiKey) {
       return `[PROCESADO por ${model}]: ${userPrompt.substring(0, 80)}`;
     }
+    
+    // Mapeo dinámico de identificadores de modelos
+    let openRouterModelId = model;
+    if (model === 'google/gemini-3.6-flash') openRouterModelId = 'google/gemini-2.0-flash-001';
+    if (model === 'openai/gpt-5.6-sol') openRouterModelId = 'openai/gpt-4o';
+    if (model === 'anthropic/claude-opus-5') openRouterModelId = 'anthropic/claude-3-opus';
+
     try {
       const response = await fetch(`${this.baseUrl}/chat/completions`, {
         method: 'POST',
@@ -198,7 +205,8 @@ export class OpenRouterMultiEngineService {
           'X-Title': 'Iureon LegalTech B2B'
         },
         body: JSON.stringify({
-          model,
+          model: openRouterModelId,
+          models: [openRouterModelId, 'google/gemini-2.0-flash-001', 'openai/gpt-4o', 'anthropic/claude-3-opus'],
           messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
           temperature: 0.2
         })
@@ -226,7 +234,7 @@ INSTRUCCIÓN RIGUROSA DE REDACCIÓN:
 
     if (this.apiKey) {
       return await this.callOpenRouterModel(
-        'anthropic/claude-3-opus', // Claude Opus 5 / Claude 3 Opus
+        'anthropic/claude-opus-5',
         systemPromptInstruction,
         `Generar ${documentType}: ${prompt}. Hechos: ${facts}. Citas: ${citations.join(', ')}`
       );
