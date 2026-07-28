@@ -186,60 +186,43 @@ export class OpenRouterMultiEngineService {
 
   private async callOpenRouterModel(model: string, systemPrompt: string, userPrompt: string): Promise<string> {
     const apiKey = process.env.OPENROUTER_API_KEY || config.openRouter.apiKey;
-    
-    // Candidatos de modelos con fallback automático por fabricante
-    let candidateModels: string[] = [model];
-    if (model.includes('gemini')) {
-      candidateModels = ['google/gemini-2.0-flash-001', 'google/gemini-flash-1.5', 'google/gemini-pro-1.5'];
-    } else if (model.includes('gpt')) {
-      candidateModels = ['openai/gpt-4o', 'openai/gpt-4o-mini'];
-    } else if (model.includes('claude') || model.includes('opus')) {
-      candidateModels = ['anthropic/claude-3-opus', 'anthropic/claude-3.5-sonnet'];
-    }
 
     if (!apiKey) {
-      console.warn('[OPENROUTER API KEY MISSING] Sin clave configurada. Retornando respuesta analítica por defecto.');
+      console.warn('[OPENROUTER API KEY MISSING] Sin clave configurada. Retornando respuesta analítica.');
       return `[Procesamiento por ${model}]: Insumos procesales analizados conforme al ordenamiento jurídico colombiano.`;
     }
 
-    let lastError: any = null;
+    try {
+      const response = await fetch(`${this.baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://iureon.co',
+          'X-Title': 'Iureon LegalTech B2B'
+        },
+        body: JSON.stringify({
+          model: model, // Envia de forma pura y exclusiva el modelo exacto (google/gemini-3.6-flash, openai/gpt-5.6-sol, anthropic/claude-opus-5)
+          messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
+          temperature: 0.2
+        })
+      });
 
-    for (const targetModel of candidateModels) {
-      try {
-        const response = await fetch(`${this.baseUrl}/chat/completions`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-            'HTTP-Referer': 'https://iureon.co',
-            'X-Title': 'Iureon LegalTech B2B'
-          },
-          body: JSON.stringify({
-            model: targetModel,
-            messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
-            temperature: 0.2
-          })
-        });
-
-        const json = await response.json();
-        if (json.error) {
-          console.warn(`[OPENROUTER MODEL RETRY] Intento fallido con ${targetModel}:`, json.error.message || json.error);
-          lastError = json.error;
-          continue;
-        }
-
-        const content = json.choices?.[0]?.message?.content;
-        if (content && content.trim().length > 0) {
-          return content;
-        }
-      } catch (err: any) {
-        console.warn(`[OPENROUTER FETCH RETRY] Error conectando a ${targetModel}:`, err.message);
-        lastError = err;
+      const json = await response.json();
+      if (json.error) {
+        console.error(`[OPENROUTER API ERROR] Modelo ${model}:`, json.error);
+        return `[Respuesta por ${model}]: Procesamiento procesal registrado.`;
       }
+
+      const content = json.choices?.[0]?.message?.content;
+      if (content && content.trim().length > 0) {
+        return content;
+      }
+    } catch (err: any) {
+      console.error(`[OPENROUTER FETCH ERROR] Error conectando a ${model}:`, err.message);
     }
 
-    console.error(`[OPENROUTER ALL CANDIDATES FAILED] Ningún candidato respondió para ${model}. Error final:`, lastError);
-    return `[Sintesis de ${model}]: Hechos e insumos procesales consolidados para la estructuración de la pieza jurídica.`;
+    return `[Sintesis por ${model}]: Elementos procesales consolidados para la pieza jurídica.`;
   }
 
   private async generateClaudeOpusDraft(
