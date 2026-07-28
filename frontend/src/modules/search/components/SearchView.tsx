@@ -75,27 +75,94 @@ TUTELAR el derecho al debido proceso y mínimo vital y ORDENAR el levantamiento 
       magistradoPonente: 'Manuel José Cepeda Espinosa'
     },
 
-    // CONSEJO DE ESTADO
+    // CONSEJO DE ESTADO - REPARACIÓN DIRECTA (TODOS LOS TÍTULOS DE IMPUTACIÓN DE RESPONSABILIDAD DEL ESTADO)
     {
       id: 'prec-004',
-      caseTitle: 'Responsabilidad Extracontractual del Estado por Soldado Conscripto Herido por Mina Antipersonal / Bomba en Actos del Servicio',
+      caseTitle: 'Reparación Directa por Soldado Conscripto Herido por Mina Antipersonal / Bomba en Actos del Servicio',
       corporacion: 'CONSEJO_ESTADO',
       tribunalLabel: 'Consejo de Estado — Sección Tercera (Sentencia CE-SEC3-2023-0045)',
       sentenceType: 'CPACA_NULIDAD',
       outcome: 'CONCEDIDO',
-      keyFact: 'Soldado en ejercicio de la defensa de la patria sufrió amputación de extremidad inferior por la detonación de una mina antipersonal o artefacto explosivo.',
-      ratioDecidendi: 'El Estado responde bajo los títulos de imputación de Riesgo Excepcional y Daño Especial cuando un miembro de la Fuerza Pública sufre lesiones o amputación por bomba o mina en actos del servicio, imponiéndose la reparación directa integral (lucro cesante, daño moral, daño a la salud y a la vida de relación).',
+      keyFact: 'Soldado en ejercicio de la defensa de la patria sufrió amputación de extremidad por la detonación de una mina antipersonal o artefacto explosivo.',
+      ratioDecidendi: 'El Estado responde bajo los títulos de imputación de Riesgo Excepcional y Daño Especial cuando un miembro de la Fuerza Pública sufre lesiones o amputación por bomba o mina en actos del servicio, imponiéndose la reparación directa integral.',
       citation: 'Consejo de Estado, Sección Tercera, Sentencia CE-SEC3-2023-0045, C.P. Marta Nubia Velásquez Rico.',
       magistradoPonente: 'Marta Nubia Velásquez Rico',
       fullText: `CONSEJO DE ESTADO. SECCIÓN TERCERA. SENTENCIA DE REPARACIÓN DIRECTA CE-SEC3-2023-0045.
 DEMANDANTE: Soldado perjudicado y su grupo familiar. DEMANDADO: Nación - Ministerio de Defensa - Ejército Nacional.
 
 CONSIDERANDO:
-1. El sometimiento a un riesgo extraordinario derivado de artefactos explosivos o minas antipersonal en operaciones militares supera las cargas públicas ordinarias.
-2. Tratándose de la pérdida de extremidades o incapacidad psicofísica en actos del servicio, el Estado está obligado a la indemnización integral por Daño Especial y Riesgo Excepcional.
+El sometimiento a un riesgo extraordinario derivado de artefactos explosivos o minas antipersonal en operaciones militares supera las cargas públicas ordinarias. Procede la indemnización integral por Daño Especial y Riesgo Excepcional.
 
 RESUELVE:
 DECLARAR patrimonialmente responsable a la Nación y CONDENAR al pago de los perjuicios materiales y morales.`
+    },
+    {
+      id: 'prec-013',
+      caseTitle: 'Reparación Directa por Privación Injusta de la Libertad tras Absolución o Preclusión Penal',
+      corporacion: 'CONSEJO_ESTADO',
+      tribunalLabel: 'Consejo de Estado — Sección Tercera (Sentencia de Unificación CE-SU3-2022-PRIVACION)',
+      sentenceType: 'CPACA_NULIDAD',
+      outcome: 'CONCEDIDO',
+      keyFact: 'Ciudadano permaneció privado de la libertad preventivamente durante 18 meses y posteriormente fue absuelto por inasistencia de prueba o atipicidad de la conducta.',
+      ratioDecidendi: 'La privación de la libertad de un ciudadano que no cometió el delito o cuya responsabilidad no fue demostrada constituye un Daño Especial imputable al Estado bajo responsabilidad objetiva, debiendo indemnizarse el daño emergente, lucro cesante y daño moral.',
+      citation: 'Consejo de Estado, Sección Tercera, Sentencia SU-2022, C.P. Jaime Enrique Rodríguez Navas.',
+      magistradoPonente: 'Jaime Enrique Rodríguez Navas',
+      fullText: `CONSEJO DE ESTADO. SECCIÓN TERCERA. UNIFICACIÓN EN PRIVACIÓN INJUSTA DE LA LIBERTAD.
+DEMANDANTE: Ciudadano Absuelto. DEMANDADO: Nación - Rama Judicial - Fiscalía General de la Nación.
+
+CONSIDERANDO:
+Quien es sometido a detención preventiva y resulta absuelto soporta una carga desproporcionada en beneficio de la administración de justicia. Configura responsabilidad objetiva estatal.
+
+RESUELVE:
+CONDENAR a la Nación al pago del lucro cesante por el tiempo en prisión y perjuicios morales al afectado y su familia.`
+    },
+    {
+      id: 'prec-014',
+      caseTitle: 'Reparación Directa por Falla Médica y Negligencia en Hospital Público (E.S.E.)',
+      corporacion: 'CONSEJO_ESTADO',
+      tribunalLabel: 'Consejo de Estado — Sección Tercera (Sentencia CE-SEC3-2023-FALLA-MEDICA)',
+      sentenceType: 'CPACA_NULIDAD',
+      outcome: 'CONCEDIDO',
+      keyFact: 'Paciente ingresó por urgencias a hospital estatal sufriendo secuelas neurológicas permanentes por retardo injustificado en la atención quirúrgica.',
+      ratioDecidendi: 'La omisión o retardo en el diagnóstico y tratamiento oportuno en instituciones de salud del Estado configura una Falla en el Servicio de Salud, imponiendo la obligación de reparar íntegramente el daño a la salud y la pérdida de oportunidad.',
+      citation: 'Consejo de Estado, Sección Tercera, Sentencia CE-SEC3-FALLA-MEDICA, C.P. Alberto Montaña Plata.',
+      magistradoPonente: 'Alberto Montaña Plata'
+    },
+    {
+      id: 'prec-015',
+      caseTitle: 'Reparación Directa por Falla en el Servicio de Obras Públicas, Mantenimiento Vial y Huecos',
+      corporacion: 'CONSEJO_ESTADO',
+      tribunalLabel: 'Consejo de Estado — Sección Tercera (Sentencia CE-SEC3-2023-OBRAS)',
+      sentenceType: 'CPACA_NULIDAD',
+      outcome: 'CONCEDIDO',
+      keyFact: 'Conductor sufrió volcadura y lesiones graves por la falta de señalización de una excavación sin iluminación en vía pública nacional.',
+      ratioDecidendi: 'El deber de conservación, mantenimiento y señalización de la malla vial es una obligación de resultado a cargo de las entidades públicas. Su incumplimiento configura Falla en el Servicio.',
+      citation: 'Consejo de Estado, Sección Tercera, Sentencia CE-SEC3-OBRAS, C.P. Nicolás Yepes Corrales.',
+      magistradoPonente: 'Nicolás Yepes Corrales'
+    },
+    {
+      id: 'prec-016',
+      caseTitle: 'Reparación Directa por Lesiones a Civiles por Bala Perdida en Operativo Policial',
+      corporacion: 'CONSEJO_ESTADO',
+      tribunalLabel: 'Consejo de Estado — Sección Tercera (Sentencia CE-SEC3-2023-BALA-PERDIDA)',
+      sentenceType: 'CPACA_NULIDAD',
+      outcome: 'CONCEDIDO',
+      keyFact: 'Transeúnte civil resultó impactado por proyectil de arma de fuego oficial durante un operativo de persecución policial a delincuentes en zona urbana.',
+      ratioDecidendi: 'El uso de armas de fuego de dotación oficial en zonas urbanas involucra la creación de un Riesgo Excepcional. Si se ocasiona daño a un tercero ajeno a los hechos, el Estado debe reparar el daño de forma objetiva.',
+      citation: 'Consejo de Estado, Sección Tercera, Sentencia CE-SEC3-BALA-PERDIDA, C.P. María Adriana Marín.',
+      magistradoPonente: 'María Adriana Marín'
+    },
+    {
+      id: 'prec-017',
+      caseTitle: 'Reparación Directa por Muerte o Lesiones de Reclusos bajo Custodia del INPEC',
+      corporacion: 'CONSEJO_ESTADO',
+      tribunalLabel: 'Consejo de Estado — Sección Tercera (Sentencia CE-SEC3-2023-INPEC)',
+      sentenceType: 'CPACA_NULIDAD',
+      outcome: 'CONCEDIDO',
+      keyFact: 'Interno en centro penitenciario falleció a causa de riña interna por la omisión de los guardias del INPEC en ejercer el control de armas blancas.',
+      ratioDecidendi: 'El Estado se encuentra en posición de garante respecto de la vida e integridad de los reclusos bajo su custodia. Toda omisión de seguridad en cárceles genera Falla en el Servicio.',
+      citation: 'Consejo de Estado, Sección Tercera, Sentencia CE-SEC3-INPEC, C.P. José Roberto Sáchica Méndez.',
+      magistradoPonente: 'José Roberto Sáchica Méndez'
     },
     {
       id: 'prec-005',
