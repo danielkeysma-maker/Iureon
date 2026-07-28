@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../../../config/api.config';
 import { FileText, Scale, ShieldAlert, Sparkles, CheckCircle2, BrainCircuit, Maximize2, Minimize2, Save, FolderOpen } from 'lucide-react';
 import { JargonSuggestionModal } from './JargonSuggestionModal';
@@ -33,6 +33,10 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
   const [selectedText, setSelectedText] = useState('');
   const [isJargonModalOpen, setIsJargonModalOpen] = useState(false);
   const [isStyleSaved, setIsStyleSaved] = useState(false);
+
+  useEffect(() => {
+    setEditableText(draft.legalText);
+  }, [draft.legalText]);
 
   const handleSelection = () => {
     const selection = window.getSelection();
