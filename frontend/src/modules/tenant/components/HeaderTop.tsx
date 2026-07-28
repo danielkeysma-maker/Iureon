@@ -11,6 +11,7 @@ interface HeaderTopProps {
   onExportPdf: () => void;
   isFocusMode?: boolean;
   onToggleFocusMode?: () => void;
+  onOpenUserManagementModal?: () => void;
 }
 
 export const HeaderTop: React.FC<HeaderTopProps> = ({
@@ -22,7 +23,8 @@ export const HeaderTop: React.FC<HeaderTopProps> = ({
   onExportWord,
   onExportPdf,
   isFocusMode,
-  onToggleFocusMode
+  onToggleFocusMode,
+  onOpenUserManagementModal
 }) => {
   const viewMeta: Record<string, { label: string; icon: React.ReactNode }> = {
     workspace: { label: 'Redacción & Providencias', icon: <Sparkles className="w-4 h-4 text-blue-800" /> },
@@ -114,6 +116,18 @@ export const HeaderTop: React.FC<HeaderTopProps> = ({
             </div>
           )}
         </div>
+      )}
+
+      {/* SUPERUSER & TENANT MANAGEMENT QUICK LINK */}
+      {onOpenUserManagementModal && (
+        <button
+          onClick={onOpenUserManagementModal}
+          className="ml-auto px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-[11.5px] font-bold flex items-center gap-1.5 transition-all shadow-xs border border-slate-700"
+          title="Gestión de SuperUsuario, Autenticación y Cuentas de Firmas"
+        >
+          <Shield className="w-3.5 h-3.5 text-blue-300" />
+          <span>SuperUsuario &amp; Firmas</span>
+        </button>
       )}
     </header>
   );

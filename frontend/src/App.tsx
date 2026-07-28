@@ -215,6 +215,7 @@ export function App() {
           onExportPdf={handleExportPdf}
           isFocusMode={workflow.isFocusMode}
           onToggleFocusMode={() => workflow.setIsFocusMode(!workflow.isFocusMode)}
+          onOpenUserManagementModal={() => setIsUserManagementModalOpen(true)}
         />
 
         <main className="flex-1 flex overflow-hidden">
