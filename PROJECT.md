@@ -22,9 +22,10 @@ Iureon es la plataforma B2B SaaS de Inteligencia Artificial y Ecosistema Judicia
 - **Despliegue Obligatorio vía Git**: Todo cambio realizado en la plataforma debe empaquetarse y desplegarse inmediatamente a producción usando Git (`git add .`, `git commit`, `git push origin main`).
 
 ### 2. Pipeline de Inteligencia Artificial (OpenRouter API)
-- `google/gemini-3.6-flash`: Análisis de expedientes PDF y extracción de hechos.
-- `openai/gpt-5.6-sol`: Razonamiento y estructuración dogmática.
-- `anthropic/claude-opus-5`: Redacción solemne y formal de providencias.
+- **Fase 1 – Ingesta Fáctica**: `google/gemini-3.5-flash` (fallback: `google/gemini-2.5-flash`) — Análisis de expedientes PDF y extracción de hechos.
+- **Fase 2 – Estructura Dogmática**: `openai/gpt-4o` (fallback: `openai/gpt-4-turbo`) — Razonamiento y estructuración procesal.
+- **Fase 3 – Redacción Solemne**: `anthropic/claude-opus-5` (fallback: `anthropic/claude-opus-5-fast`) — Redacción íntegra de la providencia con 60s de timeout y 4096 max tokens.
+- **Fallback Local**: Si OpenRouter no responde, se genera una plantilla solemne estática en `buildSolemnColombianDraft()`.
 
 ### 3. Redacción & Workspace
 - **Panel de Agentes**: `AgentPanelLeft.tsx`

@@ -37,10 +37,11 @@
 8. **🔑 Portal de Inicio de Sesión Multi-Tenant (`LoginPortalView.tsx`)**:
    - Autenticación limpia con resolución automática del rol y la firma según las credenciales del usuario.
 
-9. **🤖 Pipeline de Inteligencia Artificial de 3 Motores**:
-   - ⚡ **Fase 1: Gemini 3.6 Flash**: Ingesta masiva y estructuración de hechos del expediente.
-   - 🧠 **Fase 2: GPT-5.6 Sol**: Formulación dogmática, problemas jurídicos y excepciones.
-   - ✍️ **Fase 3: Claude Opus 5**: Redacción solemne y formal del escrito procesal.
+9. **🤖 Pipeline de Inteligencia Artificial de 3 Motores (OpenRouter API)**:
+   - ⚡ **Fase 1**: `google/gemini-3.5-flash` → Ingesta masiva y estructuración de hechos del expediente.
+   - 🧠 **Fase 2**: `openai/gpt-4o` → Formulación dogmática, problemas jurídicos y excepciones.
+   - ✍️ **Fase 3**: `anthropic/claude-opus-5` → Redacción solemne e íntegra de la providencia (timeout 60s, 4096 tokens).
+   - 🔄 **Fallback local**: Plantilla solemne colombiana estática si la API no responde.
 
 10. **🗖 Modo Pantalla Central (Editor Ampliado)**:
     - Expansión del lienzo al 100% de la pantalla para redacción libre de distracciones.

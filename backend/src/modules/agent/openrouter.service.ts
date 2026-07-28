@@ -169,11 +169,11 @@ export class OpenRouterService {
       return '';
     }
 
-    // Mapeo inteligente de slugs hacia OpenRouter con fallbacks de API
+    // Mapeo de slugs internos del proyecto hacia modelos reales disponibles en OpenRouter (julio 2026)
     const modelSlugMap: Record<string, string[]> = {
-      'google/gemini-3.6-flash': ['google/gemini-3.6-flash', 'google/gemini-2.0-flash-001', 'google/gemini-flash-1.5'],
-      'openai/gpt-5.6-sol': ['openai/gpt-5.6-sol', 'openai/gpt-4o', 'openai/gpt-4-turbo'],
-      'anthropic/claude-opus-5': ['anthropic/claude-opus-5', 'anthropic/claude-3-opus', 'anthropic/claude-3.5-sonnet']
+      'google/gemini-3.6-flash': ['google/gemini-3.5-flash', 'google/gemini-2.5-flash'],
+      'openai/gpt-5.6-sol': ['openai/gpt-4o', 'openai/gpt-4-turbo'],
+      'anthropic/claude-opus-5': ['anthropic/claude-opus-5', 'anthropic/claude-opus-5-fast']
     };
 
     let targetSlugs: string[] = [];
@@ -187,9 +187,13 @@ export class OpenRouterService {
 
     for (const model of targetSlugs) {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 12000); // 12s max por llamada
+      // 60s para Opus (redacción completa de providencias), 20s para los demás
+      const isOpus = model.includes('claude-opus');
+      const timeoutMs = isOpus ? 60000 : 20000;
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
       try {
+        console.log(`[OPENROUTER] Intentando modelo: ${model} (timeout: ${timeoutMs / 1000}s)`);
         const response = await fetch(`${this.baseUrl}/chat/completions`, {
           method: 'POST',
           signal: controller.signal,
@@ -202,15 +206,22 @@ export class OpenRouterService {
           body: JSON.stringify({
             model: model,
             messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
-            temperature: 0.2
+            temperature: 0.2,
+            max_tokens: isOpus ? 4096 : 2048
           })
         });
 
         clearTimeout(timeoutId);
         const json: any = await response.json();
 
-        if (!json.error && json.choices?.[0]?.message?.content) {
+        if (json.error) {
+          console.warn(`[OPENROUTER MODEL ERROR] ${model}:`, json.error.message || json.error);
+          continue;
+        }
+
+        if (json.choices?.[0]?.message?.content) {
           const text = json.choices[0].message.content.trim();
+          console.log(`[OPENROUTER OK] ${model} respondió con ${text.length} caracteres.`);
           if (text.length > 50) return text;
         }
       } catch (err: any) {
