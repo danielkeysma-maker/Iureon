@@ -3,7 +3,7 @@ import { X, CreditCard, Users, UserPlus, Zap, CheckCircle2 } from 'lucide-react'
 
 export interface FirmSubscriptionInfo {
   firmName: string;
-  planTier: 'STARTER' | 'PRO_FIRM' | 'ENTERPRISE';
+  planTier: string;
   subscriptionStatus: 'active' | 'past_due' | 'canceled';
   monthlyTokensUsed: number;
   monthlyTokensLimit: number;

@@ -34,7 +34,7 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({
         id: 'firm-default-01',
         name: 'FIRMA APODERADA / DESPACHO JUDICIAL',
         nit: 'NIT 900.000.000-0',
-        plan: 'PRO_FIRM',
+        creditsBalance: 500000,
         status: 'active'
       };
 

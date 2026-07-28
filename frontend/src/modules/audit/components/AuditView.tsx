@@ -8,19 +8,16 @@ export const AuditView: React.FC = () => {
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
 
   const sampleSubscriptionInfo = {
-    firmName: 'Torres & Asociados S.A.S.',
-    planTier: 'PRO_FIRM' as const,
+    firmName: 'FIRMA APODERADA / DESPACHO JUDICIAL',
+    planTier: 'SALDO_RECARGA' as any,
     subscriptionStatus: 'active' as const,
-    monthlyTokensUsed: 1420500,
+    monthlyTokensUsed: 0,
     monthlyTokensLimit: 5000000,
-    activeUsersCount: 4,
+    activeUsersCount: 1,
     maxUsersAllowed: 10,
-    renewalDate: '2026-08-20',
+    renewalDate: '2026-12-31',
     usersList: [
-      { id: 'usr-001', name: 'Dr. Julián Delgado', email: 'jdelgado@torresasociados.co', role: 'SOCIO_ADMIN', status: 'active' as const },
-      { id: 'usr-002', name: 'Dra. María Camila Osorio', email: 'mcosorio@torresasociados.co', role: 'ASOCIADO', status: 'active' as const },
-      { id: 'usr-003', name: 'Dr. Andrés Restrepo', email: 'arestrepo@torresasociados.co', role: 'ASOCIADO', status: 'active' as const },
-      { id: 'usr-004', name: 'Laura Gómez', email: 'lgomez@torresasociados.co', role: 'PARALEGAL', status: 'active' as const }
+      { id: 'usr-001', name: 'Ing. Daniel Ma. (SuperUsuario Global)', email: 'ingdanielma@gmail.com', role: 'SOCIO_ADMIN', status: 'active' as const }
     ]
   };
 
