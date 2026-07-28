@@ -16,11 +16,11 @@ export interface FirmBrandingConfig {
 }
 
 export const DEFAULT_FIRM_BRANDING: FirmBrandingConfig = {
-  firmName: 'Torres & Asociados LegalTech',
-  firmNit: 'NIT 900.892.102-4 - BOGOTÁ D.C.',
-  firmAddress: 'Calle 72 No. 10-07, Edificio Granahorro, Piso 12',
-  firmPhone: 'PBX: +57 (601) 310-9000',
-  firmEmail: 'notificaciones@torresasociados.co',
+  firmName: 'FIRMA APODERADA / DESPACHO JUDICIAL',
+  firmNit: 'NIT 900.000.000-0',
+  firmAddress: 'Sede Principal del Despacho / Firma',
+  firmPhone: 'PBX / Teléfono Notificaciones',
+  firmEmail: 'notificaciones@firmaapoderada.co',
   fontFamily: 'Inter',
   primaryColorHex: '#1E293B',
   customFormatInstruction: '1. Señores Juez / Tribunal\n2. Referencia y Partes\n3. Hechos Cronológicos\n4. Pretensiones\n5. Fundamentos de Derecho y Precedente\n6. Pruebas\n7. Notificaciones',
