@@ -11,6 +11,8 @@ export interface FirmBrandingConfig {
   fontFamily: 'Inter' | 'Times New Roman' | 'Arial' | 'Calibri';
   primaryColorHex: string;
   logoUrl?: string;
+  customFormatInstruction?: string; // Ej: Orden exacto de secciones (Hechos primero, Pretensiones al final)
+  customSampleTemplate?: string;   // Modelo o minuta de referencia de la firma
 }
 
 export const DEFAULT_FIRM_BRANDING: FirmBrandingConfig = {
@@ -20,7 +22,9 @@ export const DEFAULT_FIRM_BRANDING: FirmBrandingConfig = {
   firmPhone: 'PBX: +57 (601) 310-9000',
   firmEmail: 'notificaciones@torresasociados.co',
   fontFamily: 'Inter',
-  primaryColorHex: '#1E293B'
+  primaryColorHex: '#1E293B',
+  customFormatInstruction: '1. Señores Juez / Tribunal\n2. Referencia y Partes\n3. Hechos Cronológicos\n4. Pretensiones\n5. Fundamentos de Derecho y Precedente\n6. Pruebas\n7. Notificaciones',
+  customSampleTemplate: ''
 };
 
 export class DocumentExportService {

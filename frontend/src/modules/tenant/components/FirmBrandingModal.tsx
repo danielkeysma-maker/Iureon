@@ -163,6 +163,23 @@ export const FirmBrandingModal: React.FC<FirmBrandingModalProps> = ({
             />
           </div>
 
+          {/* Firm Writing Style & Section Ordering */}
+          <div className="bg-blue-50/60 border border-blue-200/80 rounded-xl p-3.5 space-y-2">
+            <label className="text-[11px] font-bold text-blue-950 block">
+              ✍️ Orden Preferido de Secciones y Estilo de Redacción de la Firma:
+            </label>
+            <p className="text-[10px] text-blue-800">
+              Indica qué escribe tu despacho primero y qué después (ej. Encabezado ➔ Hechos ➔ Pretensiones ➔ Precedente ➔ Pruebas ➔ Notificaciones). La IA imitará este orden exacto al redactar.
+            </p>
+            <textarea
+              rows={3}
+              value={formState.customFormatInstruction || ''}
+              onChange={(e) => setFormState({ ...formState, customFormatInstruction: e.target.value })}
+              placeholder="Ej: 1° Señor Juez / Tribunal. 2° Referencia del Proceso. 3° Hechos Cronológicos. 4° Pretensiones. 5° Precedente Judicial. 6° Notificaciones."
+              className="w-full bg-white border border-blue-200 rounded-lg p-2.5 text-slate-900 text-xs font-sans focus:outline-none focus:border-blue-900"
+            />
+          </div>
+
           <div className="flex items-center justify-between pt-3 border-t border-slate-200">
             {savedSuccess ? (
               <span className="text-emerald-700 text-xs font-semibold flex items-center gap-1">

@@ -291,13 +291,16 @@ CONDENAR a la Nación al pago del lucro cesante por el tiempo en prisión y perj
   };
 
   const handleOpenProvidenciaModal = (item: PrecedentItem) => {
+    const yearMatch = item.citation.match(/\b(19\d\d|20\d\d)\b/) || item.tribunalLabel.match(/\b(19\d\d|20\d\d)\b/);
+    const parsedYear = yearMatch ? parseInt(yearMatch[1]) : 2023;
+
     setSelectedProvidencia({
       numeroProvidencia: item.citation.split(',')[1]?.trim() || item.caseTitle,
       corporacion: item.corporacion.replace('_', ' '),
       tipoSentencia: item.sentenceType.replace('_', ' '),
       rama: 'JURISPRUDENCIA OFICIAL',
       magistradoPonente: item.magistradoPonente || 'Magistrado Ponente de Relatoría',
-      ano: 2024,
+      ano: parsedYear,
       hechosClave: item.keyFact,
       ratioDecidendi: item.ratioDecidendi,
       resuelveOutcome: item.outcome,
