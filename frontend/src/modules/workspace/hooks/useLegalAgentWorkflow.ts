@@ -92,6 +92,20 @@ export function useLegalAgentWorkflow() {
     if (!legalPrompt.trim() || isProcessing) return;
 
     setIsProcessing(true);
+    setRightView('draft');
+    setGeneratedDraft({
+      title: `${documentType.replace(/\s+/g, '_')}_EXP-2026-904`,
+      documentType: documentType,
+      jurisprudenciaCitada: ['Corte Constitucional / CSJ / Consejo de Estado'],
+      excepcionesFormuladas: ['Revisión Procesal en Curso'],
+      legalText: `⏳ REDACTANDO PIEZA PROCESAL EN TIEMPO REAL...
+
+El Pipeline de 3 Motores (Gemini 3.6 Flash ➔ GPT-5.6 Sol ➔ Claude Opus 5) se encuentra procesando su indicación procesal, vectorizando precedentes en Supabase y estructurando la providencia.
+
+Por favor espere unos segundos mientras se finaliza la redacción solemne.`,
+      tokensConsumed: 4820
+    });
+
     const requestTimestamp = new Date().toLocaleTimeString();
 
     setLogs((prev) => [

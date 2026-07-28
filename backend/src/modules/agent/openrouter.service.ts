@@ -47,7 +47,7 @@ export class OpenRouterService {
     });
 
     const geminiExtraction = await this.callOpenRouterModel(
-      ['google/gemini-2.0-flash-001', 'google/gemini-flash-1.5', 'google/gemini-pro-1.5'],
+      ['google/gemini-3.6-flash'],
       `Procesador fáctico de la Rama Judicial. Extrae los hechos relevantes, pretensiones y partes para: ${req.documentType}`,
       req.legalPrompt
     );
@@ -112,7 +112,7 @@ export class OpenRouterService {
     });
 
     await this.callOpenRouterModel(
-      ['openai/gpt-4o', 'openai/gpt-4-turbo'],
+      ['openai/gpt-5.6-sol'],
       `Esquema procesal y solución dogmática para ${req.documentType} con sustentación jurídica: ${req.legalPrompt}`,
       `Estructura dogmática validada conforme al ordenamiento procesal colombiano.`
     );
@@ -217,7 +217,7 @@ ${customFormat ? `5. SIGUE ESTE ORDEN Y ESTRUCTURA DE SECCIONES EXIGIDO POR LA F
     `;
 
     const apiResult = await this.callOpenRouterModel(
-      ['anthropic/claude-3-opus', 'anthropic/claude-3.5-sonnet', 'openai/gpt-4o', 'google/gemini-2.0-flash-001'],
+      ['anthropic/claude-opus-5'],
       systemPromptInstruction,
       `Generar pieza procesal íntegra para ${documentType}. Hechos: "${prompt}". Insumos fácticos: ${facts}. Citas: ${citations.join(', ')}`
     );
