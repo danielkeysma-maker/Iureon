@@ -39,9 +39,8 @@
 
 9. **🤖 Pipeline de Inteligencia Artificial de 3 Motores (OpenRouter API)**:
    - ⚡ **Fase 1**: `google/gemini-3.5-flash` → Ingesta masiva y estructuración de hechos del expediente.
-   - 🧠 **Fase 2**: `openai/gpt-4o` → Formulación dogmática, problemas jurídicos y excepciones.
-   - ✍️ **Fase 3**: `anthropic/claude-opus-5` → Redacción solemne e íntegra de la providencia (timeout 60s, 4096 tokens).
-   - 🔄 **Fallback local**: Plantilla solemne colombiana estática si la API no responde.
+   - 🧠 **Fase 2**: `openai/gpt-5.6-sol` → Formulación dogmática, problemas jurídicos y excepciones.
+   - ✍️ **Fase 3**: `anthropic/claude-opus-5` → Redacción solemne e íntegra de la providencia (60s timeout, 4096 tokens).
 
 10. **🗖 Modo Pantalla Central (Editor Ampliado)**:
     - Expansión del lienzo al 100% de la pantalla para redacción libre de distracciones.

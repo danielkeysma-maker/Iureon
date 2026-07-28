@@ -169,65 +169,55 @@ export class OpenRouterService {
       return '';
     }
 
-    // Mapeo de slugs internos del proyecto hacia modelos reales disponibles en OpenRouter (julio 2026)
-    const modelSlugMap: Record<string, string[]> = {
-      'google/gemini-3.6-flash': ['google/gemini-3.5-flash', 'google/gemini-2.5-flash'],
-      'openai/gpt-5.6-sol': ['openai/gpt-4o', 'openai/gpt-4-turbo'],
-      'anthropic/claude-opus-5': ['anthropic/claude-opus-5', 'anthropic/claude-opus-5-fast']
+    // Mapeo directo: 3 motores exactos sin fallbacks (julio 2026)
+    const modelSlugMap: Record<string, string> = {
+      'google/gemini-3.6-flash': 'google/gemini-3.5-flash',
+      'openai/gpt-5.6-sol': 'openai/gpt-5.6-sol',
+      'anthropic/claude-opus-5': 'anthropic/claude-opus-5'
     };
 
-    let targetSlugs: string[] = [];
-    for (const m of requestedModels) {
-      if (modelSlugMap[m]) {
-        targetSlugs.push(...modelSlugMap[m]);
-      } else {
-        targetSlugs.push(m);
+    const model = modelSlugMap[requestedModels[0]] || requestedModels[0];
+    const isOpus = model.includes('claude-opus');
+    const timeoutMs = isOpus ? 60000 : 20000;
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+      console.log(`[OPENROUTER] Llamando a ${model} (timeout: ${timeoutMs / 1000}s)`);
+      const response = await fetch(`${this.baseUrl}/chat/completions`, {
+        method: 'POST',
+        signal: controller.signal,
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://iureon.co',
+          'X-Title': 'Iureon LegalTech B2B'
+        },
+        body: JSON.stringify({
+          model: model,
+          messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
+          temperature: 0.2,
+          max_tokens: isOpus ? 4096 : 2048
+        })
+      });
+
+      clearTimeout(timeoutId);
+      const json: any = await response.json();
+
+      if (json.error) {
+        console.warn(`[OPENROUTER ERROR] ${model}:`, json.error.message || json.error);
+        return '';
       }
-    }
 
-    for (const model of targetSlugs) {
-      const controller = new AbortController();
-      // 60s para Opus (redacción completa de providencias), 20s para los demás
-      const isOpus = model.includes('claude-opus');
-      const timeoutMs = isOpus ? 60000 : 20000;
-      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-
-      try {
-        console.log(`[OPENROUTER] Intentando modelo: ${model} (timeout: ${timeoutMs / 1000}s)`);
-        const response = await fetch(`${this.baseUrl}/chat/completions`, {
-          method: 'POST',
-          signal: controller.signal,
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-            'HTTP-Referer': 'https://iureon.co',
-            'X-Title': 'Iureon LegalTech B2B'
-          },
-          body: JSON.stringify({
-            model: model,
-            messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
-            temperature: 0.2,
-            max_tokens: isOpus ? 4096 : 2048
-          })
-        });
-
-        clearTimeout(timeoutId);
-        const json: any = await response.json();
-
-        if (json.error) {
-          console.warn(`[OPENROUTER MODEL ERROR] ${model}:`, json.error.message || json.error);
-          continue;
-        }
-
-        if (json.choices?.[0]?.message?.content) {
-          const text = json.choices[0].message.content.trim();
-          console.log(`[OPENROUTER OK] ${model} respondió con ${text.length} caracteres.`);
-          if (text.length > 50) return text;
-        }
-      } catch (err: any) {
-        clearTimeout(timeoutId);
-        console.warn(`[OPENROUTER MODEL RETRY] Fallo en ${model}:`, err.message);
+      if (json.choices?.[0]?.message?.content) {
+        const text = json.choices[0].message.content.trim();
+        console.log(`[OPENROUTER OK] ${model} respondió con ${text.length} caracteres.`);
+        if (text.length > 50) return text;
       }
+    } catch (err: any) {
+      clearTimeout(timeoutId);
+      console.warn(`[OPENROUTER FALLO] ${model}:`, err.message);
     }
 
     return '';
