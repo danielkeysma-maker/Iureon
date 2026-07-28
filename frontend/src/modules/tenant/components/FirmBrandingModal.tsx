@@ -175,7 +175,7 @@ export const FirmBrandingModal: React.FC<FirmBrandingModalProps> = ({
               rows={3}
               value={formState.customFormatInstruction || ''}
               onChange={(e) => setFormState({ ...formState, customFormatInstruction: e.target.value })}
-              placeholder="Ej: 1° Señor Juez / Tribunal. 2° Referencia del Proceso. 3° Hechos Cronológicos. 4° Pretensiones. 5° Precedente Judicial. 6° Notificaciones."
+              placeholder="Ingrese el orden de secciones e instrucciones de estilo de la firma..."
               className="w-full bg-white border border-blue-200 rounded-lg p-2.5 text-slate-900 text-xs font-sans focus:outline-none focus:border-blue-900"
             />
           </div>

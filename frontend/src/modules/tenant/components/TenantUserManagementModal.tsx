@@ -303,7 +303,7 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
                         type="text"
                         value={newFirmName}
                         onChange={(e) => setNewFirmName(e.target.value)}
-                        placeholder="Ej. Abogados &amp; Consultores S.A.S."
+                        placeholder="Nombre oficial de la firma..."
                         className="w-full bg-white border border-slate-300 rounded-lg p-2 text-slate-900 focus:outline-none focus:border-blue-900"
                         required
                       />
@@ -315,7 +315,7 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
                         type="text"
                         value={newFirmNit}
                         onChange={(e) => setNewFirmNit(e.target.value)}
-                        placeholder="Ej. NIT 900.123.456-7"
+                        placeholder="Ingrese NIT o identificación fiscal..."
                         className="w-full bg-white border border-slate-300 rounded-lg p-2 text-slate-900 font-mono focus:outline-none focus:border-blue-900"
                         required
                       />
@@ -509,7 +509,7 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
                             type="text"
                             value={newUserName}
                             onChange={(e) => setNewUserName(e.target.value)}
-                            placeholder="Ej. Dr. Andrés Felipe Osorio"
+                            placeholder="Nombre completo del usuario..."
                             className="w-full bg-white border border-slate-300 rounded-lg p-2 text-slate-900 focus:outline-none focus:border-blue-900"
                             required
                           />
@@ -521,7 +521,7 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
                             type="email"
                             value={newUserEmail}
                             onChange={(e) => setNewUserEmail(e.target.value)}
-                            placeholder="abogado@firma.co"
+                            placeholder="correo@tufirma.co"
                             className="w-full bg-white border border-slate-300 rounded-lg p-2 text-slate-900 font-mono focus:outline-none focus:border-blue-900"
                             required
                           />

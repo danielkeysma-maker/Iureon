@@ -120,7 +120,7 @@ export const FirmCreditsRechargeModal: React.FC<FirmCreditsRechargeModalProps> =
                 type="number"
                 value={customAmount}
                 onChange={(e) => setCustomAmount(e.target.value)}
-                placeholder="Ej. 150000"
+                placeholder="Ingrese valor a abonar..."
                 className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-8 pr-3 py-2 text-xs text-slate-900 font-mono focus:outline-none focus:border-blue-900"
               />
             </div>

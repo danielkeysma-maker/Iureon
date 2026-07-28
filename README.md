@@ -1,47 +1,58 @@
-# Iureon - Plataforma LegalTech B2B SaaS Multi-Tenant (Colombia)
+# Iureon - Plataforma LegalTech & Ecosistema Judicial Colombia
 
-> ⚖️ **Motor de Búsqueda Web de Precedentes en Vivo (Casos Concedidos vs. Negados), Hermenéutica Profesional & Redacción de Providencias**.
-> 🚨 **Regla de Escalabilidad**: Todos los archivos del código se mantienen estrictamente por debajo del umbral de **500 líneas de código**.
-> ⏱️ **Regla de Navegación Directa por el Usuario**: El asistente de IA no ejecutará herramientas de navegador automático sobre el entorno local ni páginas web. Únicamente el usuario realizará la navegación y pruebas en vivo para ahorrar tiempo y maximizar la agilidad del desarrollo.
+> ⚖️ **Plataforma B2B Multi-Tenant de Inteligencia Artificial para Firmas de Abogados y Despachos Judiciales en Colombia**.
 
 ---
 
-## 🌟 Módulos y Capacidades Principales del Sistema:
+## 🌟 Arquitectura y Características Principales
 
-1. **Pipeline de IA de 3 Motores Insignia**:
-   - ⚡ **Fase 1: Gemini 3.6 Flash** (`google/gemini-3.6-flash`): Ingesta masiva y análisis de hechos del expediente.
-   - 🧠 **Fase 2: GPT-5.6 Sol** (`openai/gpt-5.6-sol`): Estructuración dogmática y formulación de excepciones.
-   - ✍️ **Fase 3: Claude Opus 5** (`anthropic/claude-opus-5`): Redacción solemne y formal de la providencia final.
+1. **🔒 Entorno de Producción 100% Limpio (Sin Datos Ficticios / Zero Mock Data)**:
+   - Toda firma cliente, usuario abogado o despacho judicial nacerá únicamente cuando se registre en el sistema.
+   - Seguridad **Supabase Auth & Multi-Tenant RLS** (*Row Level Security*).
 
-2. **🗖 Modo Pantalla Central (Editor Ampliado)**:
-   - Permite expandir el lienzo de trabajo al 100% del ancho del sistema para leer, escribir y editar sin distracciones.
+2. **💳 Modelo Económico de Recargas de Créditos Procesales (Pay-As-You-Go)**:
+   - Sin planes de suscripción mensuales ni cuotas ficticias.
+   - Manejo de **Saldo en Cuenta (COP $)** con módulo interactivo `FirmCreditsRechargeModal.tsx` para recargas inmediatas vía Wompi / PSE / Nequi / Tarjeta.
 
-3. **📁 Bóveda de Borradores Guardados (`SavedDraftsModal.tsx`)**:
-   - Guarda providencias y escritos procesales editados de la firma para ser reabiertos y corregidos días o semanas después.
+3. **👑 SuperUsuario Global & Acceso Total al Workspace**:
+   - Cuenta de administración global (`ingdanielma@gmail.com`) con permisos completos.
+   - Acceso total a la Redacción de Providencias y Demandas, Buscador RAG de Sentencias, Herramientas de Cálculo y Auditoría.
 
-4. **📖 Glosario Jurídico Procesal de Colombia**:
-   - Diccionario interactivo en tiempo real con más de 30 términos dogmáticos (*Ratio Decidendi, Obiter Dictum, Excepción de Mérito, Habeas Data, Prescripción Trienal, etc.*) y sus bases legales.
+4. **⚠️ Modales de Advertencia y Confirmación Previa (`ActionConfirmationModal.tsx`)**:
+   - Modal de seguridad que exige confirmación explícita antes de editar, eliminar o registrar datos sensibles de firmas o usuarios.
 
-5. **📜 Visor de Sentencias Completas (`FullProvidenciaModal.tsx`)**:
-   - Permite cliquear cualquier cita jurisprudencial para abrir el texto completo de la sentencia, Magistrado Ponente, Hechos y Resuelve.
+5. **🔑 Portal de Inicio de Sesión Multi-Tenant (`LoginPortalView.tsx`)**:
+   - Autenticación limpia con resolución automática del rol y la firma según las credenciales del usuario.
 
-6. **📄 Visor PDF Dinámico e Interactivo (`PdfViewerCanvas.tsx`)**:
-   - Controles de zoom (75%-150%), navegación por número de folio e inspección de texto extraído por OCR.
+6. **🤖 Pipeline de Inteligencia Artificial de 3 Motores**:
+   - ⚡ **Fase 1: Gemini 3.6 Flash**: Ingesta masiva y estructuración de hechos del expediente.
+   - 🧠 **Fase 2: GPT-5.6 Sol**: Formulación dogmática, problemas jurídicos y excepciones.
+   - ✍️ **Fase 3: Claude Opus 5**: Redacción solemne y formal del escrito procesal.
 
-7. **🚜 Ingestión Masiva de Jurisprudencia Colombiana**:
-   - Pipeline automatizado en `backend/src/modules/ingestion/mass_ingest_jurisprudence.ts` y scrapers en segundo plano para alimentar la base de conocimiento vectorial de la Corte Constitucional (T, C, SU), Corte Suprema (SL, SC, SP), Consejo de Estado y Tribunales.
+7. **🗖 Modo Pantalla Central (Editor Ampliado)**:
+   - Expansión del lienzo al 100% de la pantalla para redacción libre de distracciones.
 
-8. **Motor de Hermenéutica Profesional**: Sustentación dogmática basada en *Analogía Legis* y *Principios Generales del Derecho*, **cero invención**.
+8. **📁 Bóveda de Borradores Guardados (`SavedDraftsModal.tsx`)**:
+   - Persistencia local y en nube de borradores con fechas y metadatos.
 
-9. **Buscador en Vivo de Precedentes Web**: Clasificación entre 🟢 **Concedidos** y 🔴 **Negados**.
+9. **📖 Glosario Jurídico Procesal de Colombia**:
+   - Diccionario dogmático interactivo en tiempo real.
 
-10. **Calculadora de Términos Procesales Judiciales** (CGP & CPTSS Días Hábiles).
+10. **🧮 Herramientas de Cálculo Procesal**:
+    - Liquidación de intereses moratorios, prestaciones laborales, actualización de cánones e indemnizaciones.
 
-11. **Calculadora de Liquidaciones Laborales & Agencias en Derecho** (Art. 64 CST & CSJ).
-
-12. **Exportador Multi-Tenant Word (.docx) & PDF (.pdf)** con membrete dinámico.
+11. **📄 Exportador Multi-Tenant Word (.docx) & PDF (.pdf)** con membrete dinámico de la firma.
 
 ---
 
-Consulta la arquitectura detallada en:
-👉 **[PROJECT_GUIDE.md](file:///c:/Iureon/PROJECT_GUIDE.md)** y **[PROJECT.md](file:///c:/Iureon/PROJECT.md)**
+## 🚀 Inicio Rápido en Desarrollo
+
+```bash
+# Servidor Backend
+cd backend
+npm run dev
+
+# Servidor Frontend
+cd frontend
+npm run dev
+```
