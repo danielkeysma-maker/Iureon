@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { X, Building2, UserPlus, Users, Key, Plus, CheckCircle2, Shield } from 'lucide-react';
+import { X, Building2, UserPlus, Users, Key, Plus, CheckCircle2, Shield, Edit, Trash2 } from 'lucide-react';
 import type { LawFirmTenant } from './Header';
+import { ActionConfirmationModal } from './ActionConfirmationModal';
 
 export interface FirmUser {
   id: string;
@@ -41,6 +42,29 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
   const [newFirmNit, setNewFirmNit] = useState('');
   const [newFirmPlan, setNewFirmPlan] = useState<'STARTER' | 'PRO_FIRM' | 'ENTERPRISE'>('PRO_FIRM');
 
+  // Edit Firm Form State
+  const [editingFirm, setEditingFirm] = useState<LawFirmTenant | null>(null);
+  const [editFirmName, setEditFirmName] = useState('');
+  const [editFirmNit, setEditFirmNit] = useState('');
+  const [editFirmPlan, setEditFirmPlan] = useState<'STARTER' | 'PRO_FIRM' | 'ENTERPRISE'>('PRO_FIRM');
+
+  // Confirmation Warning Modal State
+  const [confirmModalData, setConfirmModalData] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    confirmText: string;
+    variant: 'danger' | 'primary' | 'success';
+    onConfirmAction: () => void;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    confirmText: 'Confirmar',
+    variant: 'danger',
+    onConfirmAction: () => {}
+  });
+
   // Users State
   const [usersList, setUsersList] = useState<FirmUser[]>(() => {
     try {
@@ -75,51 +99,110 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
 
   if (!isOpen) return null;
 
-  const handleCreateFirmSubmit = (e: React.FormEvent) => {
+  const requestCreateFirm = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newFirmName.trim() || !newFirmNit.trim()) return;
 
-    const created: LawFirmTenant = {
-      id: `firm-${Date.now()}`,
-      name: newFirmName.trim(),
-      nit: newFirmNit.trim(),
-      plan: newFirmPlan,
-      status: 'active'
-    };
-
-    onCreateFirm(created);
-    setIsCreatingFirm(false);
-    setNewFirmName('');
-    setNewFirmNit('');
-    alert(`✅ Firma "${created.name}" registrada exitosamente.`);
+    setConfirmModalData({
+      isOpen: true,
+      title: '⚠️ ¿Registrar Nueva Firma Cliente?',
+      message: `Se creará la firma "${newFirmName.trim()}" con NIT ${newFirmNit.trim()} en la plataforma Multi-Tenant.`,
+      confirmText: 'Registrar Firma',
+      variant: 'primary',
+      onConfirmAction: () => {
+        const created: LawFirmTenant = {
+          id: `firm-${Date.now()}`,
+          name: newFirmName.trim(),
+          nit: newFirmNit.trim(),
+          plan: newFirmPlan,
+          status: 'active'
+        };
+        onCreateFirm(created);
+        setIsCreatingFirm(false);
+        setNewFirmName('');
+        setNewFirmNit('');
+        setConfirmModalData((prev) => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
-  const handleCreateUserSubmit = (e: React.FormEvent) => {
+  const startEditFirm = (f: LawFirmTenant) => {
+    setEditingFirm(f);
+    setEditFirmName(f.name);
+    setEditFirmNit(f.nit);
+    setEditFirmPlan(f.plan);
+  };
+
+  const requestEditFirmSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingFirm || !editFirmName.trim()) return;
+
+    setConfirmModalData({
+      isOpen: true,
+      title: '⚠️ ¿Guardar Cambios en la Firma?',
+      message: `Se actualizarán los datos de la firma "${editFirmName.trim()}" (NIT: ${editFirmNit.trim()}).`,
+      confirmText: 'Guardar Cambios',
+      variant: 'primary',
+      onConfirmAction: () => {
+        onUpdateFirm({
+          ...editingFirm,
+          name: editFirmName.trim(),
+          nit: editFirmNit.trim(),
+          plan: editFirmPlan
+        });
+        setEditingFirm(null);
+        setConfirmModalData((prev) => ({ ...prev, isOpen: false }));
+      }
+    });
+  };
+
+  const requestDeleteFirm = (f: LawFirmTenant) => {
+    setConfirmModalData({
+      isOpen: true,
+      title: '🚨 ¿Eliminar Firma Cliente?',
+      message: `¿Está seguro de que desea eliminar la firma "${f.name}"? Se revocarán los accesos de todos los usuarios vinculados. Esta acción es irreversible.`,
+      confirmText: 'Sí, Eliminar Firma',
+      variant: 'danger',
+      onConfirmAction: () => {
+        onDeleteFirm(f.id);
+        setConfirmModalData((prev) => ({ ...prev, isOpen: false }));
+      }
+    });
+  };
+
+  const requestCreateUserSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newUserName.trim() || !newUserEmail.trim()) return;
 
-    const newUser: FirmUser = {
-      id: `user-${Date.now()}`,
-      firmId: newUserFirmId,
-      fullName: newUserName.trim(),
-      email: newUserEmail.trim(),
-      role: newUserRole,
-      status: 'active',
-      createdAt: new Date().toLocaleDateString('es-CO')
-    };
-
-    const updated = [newUser, ...usersList];
-    setUsersList(updated);
-    try {
-      localStorage.setItem('iureon_firm_users', JSON.stringify(updated));
-    } catch (err) {
-      console.warn('LocalStorage save user fail:', err);
-    }
-
-    setIsCreatingUser(false);
-    setNewUserName('');
-    setNewUserEmail('');
-    alert(`👤 Usuario abogado "${newUser.fullName}" creado e invitado a la firma.`);
+    setConfirmModalData({
+      isOpen: true,
+      title: '⚠️ ¿Crear Cuenta de Usuario Abogado?',
+      message: `Se otorgarán credenciales de acceso para "${newUserName.trim()}" (${newUserEmail.trim()}).`,
+      confirmText: 'Crear Usuario',
+      variant: 'success',
+      onConfirmAction: () => {
+        const newUser: FirmUser = {
+          id: `user-${Date.now()}`,
+          firmId: newUserFirmId,
+          fullName: newUserName.trim(),
+          email: newUserEmail.trim(),
+          role: newUserRole,
+          status: 'active',
+          createdAt: new Date().toLocaleDateString('es-CO')
+        };
+        const updated = [newUser, ...usersList];
+        setUsersList(updated);
+        try {
+          localStorage.setItem('iureon_firm_users', JSON.stringify(updated));
+        } catch (err) {
+          console.warn('LocalStorage save user fail:', err);
+        }
+        setIsCreatingUser(false);
+        setNewUserName('');
+        setNewUserEmail('');
+        setConfirmModalData((prev) => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   const handleLoginSubmit = (e: React.FormEvent) => {
@@ -211,7 +294,7 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
 
               {/* Form to Create New Firm */}
               {isCreatingFirm && (
-                <form onSubmit={handleCreateFirmSubmit} className="bg-blue-50/50 border border-blue-200 rounded-xl p-4 space-y-3">
+                <form onSubmit={requestCreateFirm} className="bg-blue-50/50 border border-blue-200 rounded-xl p-4 space-y-3">
                   <h5 className="font-bold text-blue-950 text-xs">Registrar Firma Cliente</h5>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div>
@@ -263,6 +346,71 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
                 </form>
               )}
 
+              {/* Form to Edit Firm */}
+              {editingFirm && (
+                <form onSubmit={requestEditFirmSubmit} className="bg-amber-50/70 border border-amber-200 rounded-xl p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h5 className="font-bold text-amber-950 text-xs flex items-center gap-1.5">
+                      <Edit className="w-3.5 h-3.5 text-amber-800" />
+                      <span>Editar Firma Cliente: {editingFirm.name}</span>
+                    </h5>
+                    <button
+                      type="button"
+                      onClick={() => setEditingFirm(null)}
+                      className="text-amber-800 hover:text-amber-950 text-[11px] font-semibold"
+                    >
+                      Cancelar Edición
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div>
+                      <label className="text-[11px] font-semibold text-slate-700 block mb-1">Nombre Oficial:</label>
+                      <input
+                        type="text"
+                        value={editFirmName}
+                        onChange={(e) => setEditFirmName(e.target.value)}
+                        className="w-full bg-white border border-amber-300 rounded-lg p-2 text-slate-900 focus:outline-none focus:border-amber-700"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[11px] font-semibold text-slate-700 block mb-1">NIT Fiscal:</label>
+                      <input
+                        type="text"
+                        value={editFirmNit}
+                        onChange={(e) => setEditFirmNit(e.target.value)}
+                        className="w-full bg-white border border-amber-300 rounded-lg p-2 text-slate-900 font-mono focus:outline-none focus:border-amber-700"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[11px] font-semibold text-slate-700 block mb-1">Plan de Suscripción:</label>
+                      <select
+                        value={editFirmPlan}
+                        onChange={(e) => setEditFirmPlan(e.target.value as any)}
+                        className="w-full bg-white border border-amber-300 rounded-lg p-2 text-slate-900 focus:outline-none focus:border-amber-700"
+                      >
+                        <option value="PRO_FIRM">PRO_FIRM (Firma Estándar)</option>
+                        <option value="ENTERPRISE">ENTERPRISE (Ilimitado Corporativo)</option>
+                        <option value="STARTER">STARTER (Plan Inicial)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-2 pt-1">
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-amber-800 hover:bg-amber-900 text-white font-semibold rounded-lg text-xs"
+                    >
+                      Actualizar Datos de Firma
+                    </button>
+                  </div>
+                </form>
+              )}
+
               {/* Firms List Table */}
               <div className="border border-slate-200 rounded-xl overflow-hidden shadow-xs">
                 <table className="w-full text-left border-collapse text-xs">
@@ -301,36 +449,31 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
                             </span>
                           </td>
                           <td className="p-3 text-right">
-                            <div className="flex items-center justify-end gap-2">
+                            <div className="flex items-center justify-end gap-1.5">
                               {!isActive && (
                                 <button
                                   onClick={() => onSelectFirm(f)}
-                                  className="px-3 py-1 bg-blue-950 hover:bg-blue-900 text-white rounded-lg font-semibold text-[11px] transition-colors"
+                                  className="px-2.5 py-1 bg-blue-950 hover:bg-blue-900 text-white rounded-lg font-semibold text-[11px] transition-colors"
                                 >
                                   Conmutar
                                 </button>
                               )}
                               <button
-                                onClick={() => {
-                                  const updatedPlan = f.plan === 'PRO_FIRM' ? 'ENTERPRISE' : 'PRO_FIRM';
-                                  onUpdateFirm({ ...f, plan: updatedPlan });
-                                }}
-                                className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[10px] font-semibold"
-                                title="Cambiar Plan de Suscripción"
+                                onClick={() => startEditFirm(f)}
+                                className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg text-[11px] font-medium flex items-center gap-1"
+                                title="Editar Nombre, NIT y Plan"
                               >
-                                Editar Plan
+                                <Edit className="w-3 h-3 text-slate-500" />
+                                <span>Editar</span>
                               </button>
                               {firms.length > 1 && (
                                 <button
-                                  onClick={() => {
-                                    if (confirm(`¿Eliminar la firma "${f.name}"?`)) {
-                                      onDeleteFirm(f.id);
-                                    }
-                                  }}
-                                  className="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg text-[10px] font-semibold"
-                                  title="Eliminar Firma"
+                                  onClick={() => requestDeleteFirm(f)}
+                                  className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-[11px] font-medium flex items-center gap-1"
+                                  title="Eliminar Firma Cliente"
                                 >
-                                  Eliminar
+                                  <Trash2 className="w-3 h-3 text-rose-600" />
+                                  <span>Eliminar</span>
                                 </button>
                               )}
                             </div>
@@ -363,7 +506,7 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
 
                   {/* Form to Create New User */}
                   {isCreatingUser && (
-                    <form onSubmit={handleCreateUserSubmit} className="bg-blue-50/50 border border-blue-200 rounded-xl p-4 space-y-3">
+                    <form onSubmit={requestCreateUserSubmit} className="bg-blue-50/50 border border-blue-200 rounded-xl p-4 space-y-3">
                       <h5 className="font-bold text-blue-950 text-xs">Crear Cuenta de Usuario Abogado</h5>
                       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                         <div>
@@ -514,6 +657,17 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
           )}
         </div>
       </div>
+
+      {/* Confirmation Warning Modal */}
+      <ActionConfirmationModal
+        isOpen={confirmModalData.isOpen}
+        title={confirmModalData.title}
+        message={confirmModalData.message}
+        confirmText={confirmModalData.confirmText}
+        confirmVariant={confirmModalData.variant}
+        onConfirm={confirmModalData.onConfirmAction}
+        onCancel={() => setConfirmModalData((prev) => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 };

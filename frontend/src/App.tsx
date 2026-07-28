@@ -18,12 +18,29 @@ import { SavedDraftsModal } from './modules/documents/components/SavedDraftsModa
 import type { SavedDraftEntry } from './modules/documents/components/SavedDraftsModal';
 
 import { TenantUserManagementModal } from './modules/tenant/components/TenantUserManagementModal';
+import { LoginPortalView } from './modules/tenant/components/LoginPortalView';
 
 const INITIAL_REGISTERED_FIRMS: LawFirmTenant[] = [
   { id: 'firm-default-01', name: 'FIRMA APODERADA / DESPACHO JUDICIAL', nit: 'NIT 900.000.000-0', plan: 'PRO_FIRM', status: 'active' }
 ];
 
 export function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('iureon_is_authenticated') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const [currentUserEmail, setCurrentUserEmail] = useState<string>(() => {
+    try {
+      return localStorage.getItem('iureon_current_user_email') || 'ingdanielma@gmail.com';
+    } catch {
+      return 'ingdanielma@gmail.com';
+    }
+  });
+
   const [mainView, setMainView] = useState<'workspace' | 'search' | 'tools' | 'audit'>('workspace');
 
   const [registeredFirms, setRegisteredFirms] = useState<LawFirmTenant[]>(() => {
@@ -154,9 +171,30 @@ export function App() {
     maxUsersAllowed: 10,
     renewalDate: '2026-08-20',
     usersList: [
-      { id: 'usr-001', name: 'Administrador de Firma', email: 'admin@firma.co', role: 'SOCIO_ADMIN', status: 'active' }
+      { id: 'usr-001', name: 'Administrador de Firma', email: currentUserEmail, role: 'SOCIO_ADMIN', status: 'active' }
     ]
   };
+
+  const handleLoginSuccess = (userEmail: string, firm: LawFirmTenant) => {
+    setIsAuthenticated(true);
+    setCurrentUserEmail(userEmail);
+    setActiveFirm(firm);
+    try {
+      localStorage.setItem('iureon_is_authenticated', 'true');
+      localStorage.setItem('iureon_current_user_email', userEmail);
+    } catch (err) {
+      console.warn('LocalStorage save auth fail:', err);
+    }
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <LoginPortalView
+        onLoginSuccess={handleLoginSuccess}
+        registeredFirms={registeredFirms}
+      />
+    );
+  }
 
   return (
     <div className="flex h-screen bg-slate-100 font-sans overflow-hidden">
