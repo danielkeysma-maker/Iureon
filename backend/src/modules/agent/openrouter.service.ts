@@ -298,158 +298,402 @@ export class OpenRouterService {
     citations: string[],
     customFormat?: string
   ): Promise<string> {
-    // Detectar tipo de documento para ajustar la estructura obligatoria
-    const docLower = documentType.toLowerCase();
-    const esTutela = docLower.includes('tutela');
-    const esContestacion = docLower.includes('contestación') || docLower.includes('contestacion');
-    const esDemanda = docLower.includes('demanda') || docLower.includes('ejecutiva');
-    const esDerechoPeticion = docLower.includes('petición') || docLower.includes('peticion');
-    const esRecurso = docLower.includes('recurso') || docLower.includes('apelación') || docLower.includes('casación') || docLower.includes('impugnación');
-    const esProyeccionSentencia = docLower.includes('proyección de sentencia') || docLower.includes('sentencia');
-    const esAuto = docLower.includes('auto ');
-    const esHabeasCorpus = docLower.includes('hábeas corpus') || docLower.includes('habeas corpus');
+    // ═══════════════════════════════════════════════════════════════════════
+    // MAPA DE ESTRUCTURA EXACTA POR TIPO DE DOCUMENTO
+    // Cada actuación del dropdown tiene su formato preciso.
+    // Si la firma ha personalizado el formato (customFormat via "Enseñar estilo"),
+    // ese formato prevalece sobre el default.
+    // ═══════════════════════════════════════════════════════════════════════
 
-    let estructuraObligatoria = '';
+    const estructurasPorTipo: Record<string, string> = {
+      // ─── CONSTITUCIONAL: LITIGANTE ───
+      'redacción de acción de tutela': `ACCIÓN DE TUTELA (Art. 86 C.P., Decreto 2591/1991):
+1. Encabezado: ciudad, fecha
+2. Señor Juez (competencia por factor territorial)
+3. ACCIONANTE: nombre completo, cédula, domicilio
+4. ACCIONADO: entidad/persona contra quien se dirige
+5. DERECHOS FUNDAMENTALES VULNERADOS O AMENAZADOS
+6. HECHOS (numerados, detallados, cronológicos)
+7. FUNDAMENTOS DE DERECHO (Art. 86 C.P., Decreto 2591/1991, jurisprudencia de la Corte Constitucional)
+8. PRETENSIONES (numeradas — lo que se pide al juez: ORDENAR, TUTELAR, PROTEGER — OBLIGATORIO)
+9. MEDIDA PROVISIONAL (si aplica, Art. 7 Decreto 2591/1991)
+10. PRUEBAS que se aportan y solicitan
+11. JURAMENTO Art. 37 Decreto 2591/1991 (no se ha interpuesto otra tutela por los mismos hechos)
+12. NOTIFICACIONES (dirección, correo, teléfono)
+13. Firma del accionante o apoderado`,
 
-    if (esTutela && !esContestacion && !esProyeccionSentencia) {
-      estructuraObligatoria = `
-ESTRUCTURA OBLIGATORIA PARA ACCIÓN DE TUTELA:
-1. Encabezado (ciudad, fecha, juez competente)
-2. Accionante (nombre, identificación, domicilio)
-3. Accionado (entidad o persona contra quien se dirige)
-4. Derechos fundamentales vulnerados o amenazados
-5. HECHOS (numerados, detallados)
-6. FUNDAMENTOS DE DERECHO (Art. 86 C.P., Decreto 2591/1991, jurisprudencia)
-7. PRETENSIONES (lo que se pide al juez — SECCIÓN OBLIGATORIA, NO OMITIR)
-8. Pruebas que se aportan y que se solicitan
-9. Juramento de no haber interpuesto otra tutela por los mismos hechos (Art. 37 Decreto 2591/1991)
-10. Notificaciones
-11. Firma`;
-    } else if (esContestacion) {
-      estructuraObligatoria = `
-ESTRUCTURA OBLIGATORIA PARA CONTESTACIÓN:
-1. Encabezado (ciudad, fecha, despacho judicial)
-2. Referencia (radicado, proceso, demandante vs demandado)
-3. Pronunciamiento sobre cada hecho de la demanda (acepta, niega, no le consta)
-4. EXCEPCIONES DE MÉRITO (nominadas y de fondo — SECCIÓN OBLIGATORIA)
-5. FUNDAMENTOS DE DERECHO con artículos y jurisprudencia
-6. OPOSICIÓN A LAS PRETENSIONES (punto por punto — SECCIÓN OBLIGATORIA, NO OMITIR)
-7. Pruebas que se solicitan y que se aportan
-8. Notificaciones
-9. Firma del apoderado`;
-    } else if (esDerechoPeticion) {
-      estructuraObligatoria = `
-ESTRUCTURA OBLIGATORIA PARA DERECHO DE PETICIÓN (Ley 1755 de 2015):
-1. Encabezado (ciudad, fecha)
-2. Destinatario (entidad/autoridad a quien se dirige)
-3. Referencia: DERECHO DE PETICIÓN — Art. 23 Constitución Política / Ley 1755 de 2015
-4. Identificación del peticionario (nombre, cédula, domicilio)
-5. HECHOS (numerados y detallados)
-6. FUNDAMENTOS DE DERECHO (artículos de la Ley 1755, normas sectoriales aplicables, jurisprudencia)
-7. PETICIÓN CONCRETA (lo que se solicita específicamente — ESTA ES LA SECCIÓN MÁS IMPORTANTE, NO OMITIR JAMÁS)
-8. Pruebas y documentos que se anexan
-9. Notificaciones (dirección física y correo electrónico)
-10. Firma del peticionario`;
-    } else if (esDemanda) {
-      estructuraObligatoria = `
-ESTRUCTURA OBLIGATORIA PARA DEMANDA:
-1. Encabezado (ciudad, fecha, juez competente)
-2. Demandante (nombre, identificación, domicilio, apoderado)
-3. Demandado (nombre/razón social, domicilio)
-4. Clase de proceso y cuantía
-5. PRETENSIONES (numeradas — SECCIÓN OBLIGATORIA, NO OMITIR)
-6. HECHOS (numerados y probados)
-7. FUNDAMENTOS DE DERECHO con artículos y jurisprudencia
-8. Pruebas documentales, testimoniales, periciales
-9. Estimación razonada de la cuantía (si aplica)
-10. Anexos (poder, pruebas)
-11. Notificaciones
-12. Firma del apoderado`;
-    } else if (esRecurso) {
-      estructuraObligatoria = `
-ESTRUCTURA OBLIGATORIA PARA RECURSO/IMPUGNACIÓN:
-1. Encabezado (ciudad, fecha, despacho judicial)
-2. Referencia (radicado, providencia impugnada, fecha)
-3. Legitimación del recurrente
-4. PROVIDENCIA QUE SE IMPUGNA (identificación precisa)
-5. CARGOS O AGRAVIOS (numerados — SECCIÓN OBLIGATORIA, por qué la providencia es errónea)
-6. FUNDAMENTOS DE DERECHO con artículos y jurisprudencia
-7. PETICIÓN AL SUPERIOR (lo que se pide que revoque, modifique o adicione — NO OMITIR)
-8. Pruebas (si aplica)
-9. Notificaciones
-10. Firma del apoderado`;
-    } else if (esProyeccionSentencia) {
-      estructuraObligatoria = `
-ESTRUCTURA OBLIGATORIA PARA PROYECCIÓN DE SENTENCIA:
+      'acción de tutela por vía de hecho judicial': `ACCIÓN DE TUTELA CONTRA PROVIDENCIA JUDICIAL (Sentencia C-590/2005):
+1. Encabezado: ciudad, fecha
+2. Señor Juez de superior jerarquía funcional
+3. ACCIONANTE y ACCIONADO (despacho judicial que profirió la providencia)
+4. PROVIDENCIA CUESTIONADA (fecha, radicado, despacho)
+5. CAUSALES ESPECÍFICAS DE PROCEDIBILIDAD (defecto orgánico, fáctico, material, procedimental, decisión sin motivación, desconocimiento del precedente, violación directa de la Constitución)
+6. HECHOS (numerados)
+7. FUNDAMENTOS (Sentencia C-590/2005, SU-813/2007, SU-556/2014)
+8. PRETENSIONES (que se deje sin efectos la providencia — OBLIGATORIO)
+9. PRUEBAS
+10. JURAMENTO Art. 37 Decreto 2591/1991
+11. NOTIFICACIONES
+12. Firma`,
+
+      'impugnación de sentencia de tutela': `IMPUGNACIÓN DE SENTENCIA DE TUTELA (Art. 31 Decreto 2591/1991):
+1. Encabezado: ciudad, fecha, juez de primera instancia (para envío al superior)
+2. Referencia: radicado, sentencia impugnada, fecha del fallo
+3. LEGITIMACIÓN del impugnante
+4. SENTENCIA QUE SE IMPUGNA (transcripción de la parte resolutiva)
+5. RAZONES DE LA IMPUGNACIÓN (por qué el fallo es equivocado — OBLIGATORIO)
+6. FUNDAMENTOS DE DERECHO y jurisprudencia
+7. PETICIÓN AL AD QUEM (revocar / modificar / adicionar — OBLIGATORIO)
+8. PRUEBAS adicionales (si aplica)
+9. NOTIFICACIONES
+10. Firma`,
+
+      'acción popular / acción de grupo': `ACCIÓN POPULAR (Art. 88 C.P., Ley 472/1998):
+1. Encabezado: ciudad, fecha, juez administrativo o civil de circuito
+2. ACTOR POPULAR: identificación
+3. DEMANDADO: entidad o persona que vulnera el derecho colectivo
+4. DERECHO O INTERÉS COLECTIVO VULNERADO (Art. 4 Ley 472/1998)
+5. HECHOS (numerados)
+6. FUNDAMENTOS (Ley 472/1998, Art. 88 C.P.)
+7. PRETENSIONES (que se ordene cesar la vulneración, indemnizar, restituir — OBLIGATORIO)
+8. PACTO DE CUMPLIMIENTO (indicar disponibilidad, Art. 27 Ley 472/1998)
+9. PRUEBAS
+10. NOTIFICACIONES
+11. Firma`,
+
+      'acción de cumplimiento': `ACCIÓN DE CUMPLIMIENTO (Art. 87 C.P., Ley 393/1997):
+1. Encabezado: ciudad, fecha, juez administrativo
+2. ACCIONANTE: identificación
+3. AUTORIDAD RENUENTE: la que incumple la ley o acto administrativo
+4. NORMA O ACTO ADMINISTRATIVO INCUMPLIDO (identificación precisa)
+5. RENUENCIA PREVIA (Art. 8 Ley 393/1997 — prueba de que se constituyó en renuencia)
+6. HECHOS (numerados)
+7. FUNDAMENTOS (Art. 87 C.P., Ley 393/1997)
+8. PRETENSIONES (que se ordene cumplir — OBLIGATORIO)
+9. PRUEBAS
+10. NOTIFICACIONES
+11. Firma`,
+
+      // ─── CONSTITUCIONAL: DESPACHO ───
+      'contestación / informe de respuesta a tutela (juzgado/entidad)': `INFORME DE RESPUESTA A TUTELA (Despacho/Entidad accionada):
+1. REPÚBLICA DE COLOMBIA — encabezado institucional
+2. Referencia: radicado, accionante, juzgado de conocimiento
+3. PRONUNCIAMIENTO SOBRE CADA HECHO (acepta, niega, aclara)
+4. RAZONES POR LAS CUALES NO HAY VULNERACIÓN (o las acciones tomadas para subsanar)
+5. FUNDAMENTOS NORMATIVOS de la actuación de la entidad
+6. PRUEBAS que se aportan
+7. PETICIÓN AL JUEZ (negar la tutela / declarar improcedente — OBLIGATORIO)
+8. NOTIFICACIONES
+9. Firma del representante legal o jefe jurídico`,
+
+      'proyección de sentencia de tutela (concede / niega)': `SENTENCIA DE TUTELA (Despacho judicial):
 1. REPÚBLICA DE COLOMBIA — RAMA JUDICIAL
-2. Despacho judicial (Juzgado/Tribunal/Sala)
-3. Radicado, partes procesales
-4. VISTOS (resumen del trámite procesal)
-5. ANTECEDENTES Y HECHOS PROBADOS
-6. PROBLEMA JURÍDICO
-7. CONSIDERACIONES DEL DESPACHO (análisis jurídico con normativa y jurisprudencia)
-8. PARTE RESOLUTIVA — RESUELVE (PRIMERO, SEGUNDO, TERCERO... — SECCIÓN OBLIGATORIA, NO OMITIR)
-9. Cúmplase y notifíquese
-10. Firma del juez/magistrado`;
-    } else if (esAuto) {
-      estructuraObligatoria = `
-ESTRUCTURA OBLIGATORIA PARA AUTO:
+2. JUZGADO ___ [competente] DE ___ [ciudad]
+3. Radicado, accionante vs. accionado
+4. ASUNTO: Acción de Tutela
+5. I. ANTECEDENTES (pretensiones del accionante, respuesta del accionado)
+6. II. HECHOS PROBADOS
+7. III. PROBLEMA JURÍDICO
+8. IV. CONSIDERACIONES (análisis de procedibilidad: legitimación, inmediatez, subsidiariedad; análisis de fondo con normativa y jurisprudencia de la Corte Constitucional)
+9. V. DECISIÓN — RESUELVE:
+   PRIMERO: CONCEDER/NEGAR la protección del derecho fundamental a ___
+   SEGUNDO: ORDENAR a ___ que en el término de 48 horas... (si concede)
+   TERCERO: NOTIFÍQUESE esta decisión...
+   CUARTO: Si no se impugna, REMÍTASE a la Corte Constitucional para eventual revisión
+(PARTE RESOLUTIVA — OBLIGATORIO, NO OMITIR)
+10. Cúmplase y notifíquese
+11. Firma del Juez`,
+
+      'proyección de auto admisorio & medida cautelar': `AUTO ADMISORIO DE TUTELA CON MEDIDA CAUTELAR (Art. 7 Decreto 2591/1991):
+1. REPÚBLICA DE COLOMBIA — RAMA JUDICIAL
+2. JUZGADO ___ DE ___
+3. Radicado, accionante vs. accionado
+4. AUTO INTERLOCUTORIO
+5. CONSIDERACIONES: verificación de requisitos de procedibilidad, urgencia
+6. RESUELVE:
+   PRIMERO: ADMITIR la acción de tutela interpuesta por ___
+   SEGUNDO: ORDENAR notificar al accionado para que rinda informe en 2 días (Art. 16 Decreto 2591/1991)
+   TERCERO: DECRETAR MEDIDA PROVISIONAL consistente en ___ (Art. 7 Decreto 2591/1991)
+   CUARTO: VINCULAR como terceros interesados a ___
+(PARTE RESOLUTIVA — OBLIGATORIO)
+7. Cúmplase, notifíquese y cúmplase
+8. Firma del Juez`,
+
+      'proyección de auto resolutorio de impugnación': `AUTO QUE CONCEDE/NIEGA IMPUGNACIÓN DE TUTELA:
 1. REPÚBLICA DE COLOMBIA — RAMA JUDICIAL
 2. Despacho judicial
-3. Radicado y partes
-4. CONSIDERACIONES (fundamento fáctico y jurídico)
-5. PARTE RESOLUTIVA — RESUELVE (PRIMERO, SEGUNDO... — SECCIÓN OBLIGATORIA, NO OMITIR)
-6. Cúmplase y notifíquese
-7. Firma del juez`;
-    } else if (esHabeasCorpus) {
-      estructuraObligatoria = `
-ESTRUCTURA OBLIGATORIA PARA HÁBEAS CORPUS:
-1. Encabezado (ciudad, fecha, juez competente — cualquier juez penal)
-2. Accionante (quien interpone a favor del privado de libertad)
-3. Persona privada de la libertad (nombre, lugar de reclusión)
-4. Autoridad responsable de la privación
-5. HECHOS (numerados)
-6. FUNDAMENTOS (Art. 30 C.P., Ley 1095/2006)
-7. PETICIÓN (que se ordene la libertad inmediata — NO OMITIR)
-8. Pruebas
-9. Firma`;
+3. Radicado
+4. AUTO INTERLOCUTORIO
+5. CONSIDERACIONES: oportunidad de la impugnación, legitimación
+6. RESUELVE:
+   PRIMERO: CONCEDER/NEGAR la impugnación presentada por ___
+   SEGUNDO: REMITIR el expediente al superior jerárquico funcional para que resuelva
+(PARTE RESOLUTIVA — OBLIGATORIO)
+7. Cúmplase y notifíquese
+8. Firma del Juez`,
+
+      // ─── LABORAL: DESPACHO ───
+      'proyección de sentencia laboral de primera instancia': `SENTENCIA LABORAL DE PRIMERA INSTANCIA:
+1. REPÚBLICA DE COLOMBIA — RAMA JUDICIAL
+2. JUZGADO ___ LABORAL DEL CIRCUITO DE ___
+3. Radicado, demandante vs. demandado
+4. ASUNTO: Proceso Ordinario Laboral de Primera Instancia
+5. I. ANTECEDENTES (pretensiones, contestación, excepciones)
+6. II. HECHOS PROBADOS (valoración probatoria conforme al Art. 61 CPTSS — libre formación del convencimiento)
+7. III. PROBLEMA JURÍDICO
+8. IV. CONSIDERACIONES (análisis normativo: CST, CPTSS, Ley 100/1993; jurisprudencia de la Sala Laboral de la CSJ)
+9. V. CONDENA EN COSTAS (Art. 65 CPTSS)
+10. VI. RESUELVE:
+   PRIMERO: DECLARAR probada/no probada la excepción de ___
+   SEGUNDO: CONDENAR/ABSOLVER al demandado a pagar ___
+   TERCERO: CONDENAR/EXONERAR en costas
+(PARTE RESOLUTIVA — OBLIGATORIO, NO OMITIR)
+11. Cúmplase, notifíquese y cúmplase
+12. Firma del Juez Laboral`,
+
+      'proyección de auto interlocutorio / resuelve excepciones': `AUTO INTERLOCUTORIO QUE RESUELVE EXCEPCIONES (Laboral):
+1. REPÚBLICA DE COLOMBIA — RAMA JUDICIAL
+2. JUZGADO ___ LABORAL DEL CIRCUITO DE ___
+3. Radicado, partes
+4. AUTO INTERLOCUTORIO
+5. CONSIDERACIONES: análisis de cada excepción propuesta (prescripción, inexistencia de la obligación, cobro de lo no debido, compensación, etc.)
+6. RESUELVE:
+   PRIMERO: DECLARAR probada/no probada la excepción de ___
+   SEGUNDO: CONTINUAR con el trámite del proceso / DECLARAR terminado el proceso
+(PARTE RESOLUTIVA — OBLIGATORIO)
+7. Notifíquese, cúmplase
+8. Firma del Juez`,
+
+      'proyección de auto admisorio de demanda laboral': `AUTO ADMISORIO DE DEMANDA LABORAL (Art. 25A CPTSS, Art. 90 CGP):
+1. REPÚBLICA DE COLOMBIA — RAMA JUDICIAL
+2. JUZGADO ___ LABORAL DEL CIRCUITO DE ___
+3. Radicado
+4. AUTO ADMISORIO DE DEMANDA
+5. CONSIDERACIONES: verificación de requisitos formales (Art. 25 CPTSS), competencia, cuantía
+6. RESUELVE:
+   PRIMERO: ADMITIR la demanda laboral ordinaria presentada por ___ contra ___
+   SEGUNDO: CORRER TRASLADO al demandado por el término de 10 días (Art. 29 CPTSS)
+   TERCERO: NOTIFICAR personalmente al demandado
+   CUARTO: FIJAR fecha para audiencia obligatoria de conciliación, decisión de excepciones previas, saneamiento y fijación del litigio (Art. 77 CPTSS)
+(PARTE RESOLUTIVA — OBLIGATORIO)
+7. Notifíquese y cúmplase
+8. Firma del Juez`,
+
+      // ─── CIVIL: DESPACHO ───
+      'proyección de auto admisorio de demanda civil': `AUTO ADMISORIO DE DEMANDA CIVIL (Art. 90 CGP):
+1. REPÚBLICA DE COLOMBIA — RAMA JUDICIAL
+2. JUZGADO ___ CIVIL [Municipal/del Circuito] DE ___
+3. Radicado
+4. AUTO ADMISORIO DE DEMANDA
+5. CONSIDERACIONES: requisitos de la demanda (Art. 82-84 CGP), competencia, cuantía
+6. RESUELVE:
+   PRIMERO: ADMITIR la demanda presentada por ___ contra ___
+   SEGUNDO: CORRER TRASLADO al demandado por el término de ___ días (Art. 369/372 CGP según el proceso)
+   TERCERO: NOTIFICAR personalmente al demandado (Art. 291 CGP)
+   CUARTO: RECONOCER personería jurídica al Dr. ___ como apoderado
+(PARTE RESOLUTIVA — OBLIGATORIO)
+7. Notifíquese y cúmplase
+8. Firma del Juez`,
+
+      'proyección de auto inadmisorio de demanda civil (art. 90 cgp)': `AUTO INADMISORIO DE DEMANDA (Art. 90 CGP):
+1. REPÚBLICA DE COLOMBIA — RAMA JUDICIAL
+2. JUZGADO ___ CIVIL DE ___
+3. Radicado
+4. AUTO INADMISORIO
+5. CONSIDERACIONES: defectos formales encontrados (falta de requisitos Art. 82 CGP, indebida acumulación, falta de competencia, etc.)
+6. RESUELVE:
+   PRIMERO: INADMITIR la demanda presentada por ___ contra ___
+   SEGUNDO: CONCEDER al demandante el término de 5 días para SUBSANAR los defectos señalados (Art. 90 CGP)
+   TERCERO: Advertir que de no subsanarse, se RECHAZARÁ la demanda
+(PARTE RESOLUTIVA — OBLIGATORIO)
+7. Notifíquese
+8. Firma del Juez`,
+
+      'proyección de sentencia civil ordinaria / verbal': `SENTENCIA CIVIL (Proceso Ordinario/Verbal):
+1. REPÚBLICA DE COLOMBIA — RAMA JUDICIAL
+2. JUZGADO ___ CIVIL [Municipal/del Circuito] DE ___
+3. Radicado, demandante vs. demandado
+4. ASUNTO: Proceso [Verbal/Verbal Sumario/Declarativo]
+5. I. ANTECEDENTES (pretensiones, contestación, excepciones previas y de mérito)
+6. II. HECHOS PROBADOS (valoración probatoria: sana crítica, Art. 176 CGP)
+7. III. PROBLEMA JURÍDICO
+8. IV. CONSIDERACIONES (análisis normativo: Código Civil, CGP, Código de Comercio si aplica; jurisprudencia de la Sala Civil de la CSJ)
+9. V. COSTAS (Art. 365 CGP — condena al vencido)
+10. VI. RESUELVE:
+   PRIMERO: DECLARAR probada/no probada la pretensión de ___
+   SEGUNDO: CONDENAR/ABSOLVER al demandado
+   TERCERO: CONDENAR en costas a ___
+(PARTE RESOLUTIVA — OBLIGATORIO, NO OMITIR)
+11. Notifíquese, cúmplase
+12. Firma del Juez Civil`,
+
+      'proyección de auto resolutorio de recurso de reposición': `AUTO QUE RESUELVE RECURSO DE REPOSICIÓN (Art. 318 CGP):
+1. REPÚBLICA DE COLOMBIA — RAMA JUDICIAL
+2. Despacho judicial
+3. Radicado, partes
+4. AUTO INTERLOCUTORIO — Resuelve recurso de reposición
+5. CONSIDERACIONES: providencia recurrida, argumentos del recurrente, análisis jurídico
+6. RESUELVE:
+   PRIMERO: REPONER/NO REPONER la providencia de fecha ___
+   SEGUNDO: [Si tiene subsidiario de apelación] CONCEDER/NEGAR el recurso de apelación en el efecto ___
+(PARTE RESOLUTIVA — OBLIGATORIO)
+7. Notifíquese
+8. Firma del Juez`,
+
+      'proyección de auto mandamiento de pago': `AUTO DE MANDAMIENTO DE PAGO (Art. 430 CGP):
+1. REPÚBLICA DE COLOMBIA — RAMA JUDICIAL
+2. JUZGADO ___ CIVIL DE ___
+3. Radicado
+4. AUTO DE MANDAMIENTO DE PAGO — Proceso Ejecutivo
+5. CONSIDERACIONES: título ejecutivo, requisitos (Art. 422 CGP: obligación clara, expresa, exigible), liquidación del crédito
+6. RESUELVE:
+   PRIMERO: LIBRAR mandamiento de pago a favor de ___ y en contra de ___ por las siguientes sumas:
+   a) Capital: $___
+   b) Intereses moratorios desde ___ hasta ___
+   c) Costas del proceso
+   SEGUNDO: NOTIFICAR personalmente al ejecutado (Art. 291 CGP)
+   TERCERO: Informar que el ejecutado dispone de 10 días para proponer excepciones (Art. 442 CGP)
+(PARTE RESOLUTIVA — OBLIGATORIO)
+7. Cúmplase, notifíquese
+8. Firma del Juez`,
+
+      // ─── ADMINISTRATIVO: DESPACHO ───
+      'proyección de sentencia contencioso administrativa': `SENTENCIA CONTENCIOSO ADMINISTRATIVA:
+1. REPÚBLICA DE COLOMBIA — RAMA JUDICIAL — JURISDICCIÓN CONTENCIOSO ADMINISTRATIVA
+2. TRIBUNAL ADMINISTRATIVO DE ___ / JUZGADO ___ ADMINISTRATIVO DE ___
+3. Radicado, demandante vs. demandado (entidad)
+4. MEDIO DE CONTROL: Nulidad y Restablecimiento / Reparación Directa / Nulidad Simple
+5. I. ANTECEDENTES (pretensiones, contestación, concepto del Ministerio Público si aplica)
+6. II. HECHOS PROBADOS
+7. III. PROBLEMA JURÍDICO
+8. IV. CONSIDERACIONES (CPACA, jurisprudencia del Consejo de Estado por sección)
+9. V. COSTAS
+10. VI. FALLO — RESUELVE:
+   PRIMERO: DECLARAR la nulidad del acto ___ / DECLARAR responsable a ___
+   SEGUNDO: A título de restablecimiento del derecho / reparación, CONDENAR a ___ a pagar ___
+   TERCERO: COSTAS
+(PARTE RESOLUTIVA — OBLIGATORIO)
+11. Cúmplase, notifíquese, publíquese
+12. Firma del Juez/Magistrado`,
+
+      'proyección de auto de medida cautelar': `AUTO DE MEDIDA CAUTELAR (Art. 229-241 CPACA):
+1. REPÚBLICA DE COLOMBIA — JURISDICCIÓN CONTENCIOSO ADMINISTRATIVA
+2. Despacho judicial, radicado
+3. AUTO INTERLOCUTORIO — Decide solicitud de medida cautelar
+4. CONSIDERACIONES: apariencia de buen derecho (fumus boni iuris), peligro en la demora (periculum in mora), ponderación de intereses, caución
+5. RESUELVE:
+   PRIMERO: DECRETAR/NEGAR la medida cautelar de suspensión provisional del acto ___
+   SEGUNDO: Fijar caución de $___
+(PARTE RESOLUTIVA — OBLIGATORIO)
+6. Notifíquese
+7. Firma del Juez/Magistrado`,
+
+      // ─── PENAL: DESPACHO ───
+      'proyección de auto de preclusión / control de garantías': `AUTO DE PRECLUSIÓN / CONTROL DE GARANTÍAS (Ley 906/2004):
+1. REPÚBLICA DE COLOMBIA — RAMA JUDICIAL
+2. JUZGADO ___ PENAL [Municipal/del Circuito] CON FUNCIÓN DE CONTROL DE GARANTÍAS
+3. Radicado, intervinientes
+4. AUTO INTERLOCUTORIO
+5. CONSIDERACIONES: causal de preclusión invocada (Art. 332 Ley 906), análisis probatorio, derechos de la víctima
+6. RESUELVE:
+   PRIMERO: DECRETAR/NEGAR la preclusión de la investigación adelantada contra ___
+   SEGUNDO: ORDENAR la cesación de toda acción penal (si se decreta)
+(PARTE RESOLUTIVA — OBLIGATORIO)
+7. Notifíquese, cúmplase
+8. Firma del Juez Penal`,
+
+      'proyección de sentencia penal de primera instancia': `SENTENCIA PENAL DE PRIMERA INSTANCIA (Ley 906/2004):
+1. REPÚBLICA DE COLOMBIA — RAMA JUDICIAL
+2. JUZGADO ___ PENAL DEL CIRCUITO DE ___
+3. Radicado, procesado, delito(s)
+4. ASUNTO: Sentencia de primera instancia — Sistema Penal Acusatorio
+5. I. ANTECEDENTES (imputación, acusación, juicio oral)
+6. II. HECHOS PROBADOS (valoración probatoria bajo la regla de exclusión y cadena de custodia)
+7. III. ANÁLISIS JURÍDICO (tipicidad, antijuridicidad, culpabilidad; Ley 599/2000, Ley 906/2004)
+8. IV. DOSIFICACIÓN PUNITIVA (si condena: cuartos, circunstancias de atenuación/agravación)
+9. V. RESUELVE:
+   PRIMERO: DECLARAR penalmente responsable/ABSOLVER a ___ del delito de ___
+   SEGUNDO: IMPONER pena de ___ meses/años de prisión (si condena)
+   TERCERO: CONCEDER/NEGAR sustituto de prisión domiciliaria
+   CUARTO: CONDENAR al pago de perjuicios a favor de la víctima por $___
+(PARTE RESOLUTIVA — OBLIGATORIO)
+10. Notifíquese, cúmplase
+11. Firma del Juez Penal`,
+
+      'proyección de auto de medida de aseguramiento': `AUTO DE MEDIDA DE ASEGURAMIENTO (Art. 306-316 Ley 906/2004):
+1. REPÚBLICA DE COLOMBIA — RAMA JUDICIAL
+2. JUZGADO ___ PENAL CON FUNCIÓN DE CONTROL DE GARANTÍAS
+3. Radicado, indiciado/imputado
+4. AUTO INTERLOCUTORIO — Decide solicitud de medida de aseguramiento
+5. CONSIDERACIONES: inferencia razonable de autoría, requisitos (Art. 308: obstrucción de justicia, peligro para la víctima/comunidad, riesgo de no comparecencia), proporcionalidad y necesidad
+6. RESUELVE:
+   PRIMERO: IMPONER/NEGAR medida de aseguramiento de [detención preventiva/domiciliaria/caución] contra ___
+   SEGUNDO: ORDENAR la reclusión en ___
+(PARTE RESOLUTIVA — OBLIGATORIO)
+7. Notifíquese, cúmplase
+8. Firma del Juez Penal`,
+    };
+
+    // Buscar estructura exacta por coincidencia del nombre del documento
+    const docLower = documentType.toLowerCase().trim();
+    let estructuraObligatoria = '';
+
+    // Primero: buscar coincidencia exacta en el mapa
+    if (estructurasPorTipo[docLower]) {
+      estructuraObligatoria = estructurasPorTipo[docLower];
     } else {
-      estructuraObligatoria = `
-ESTRUCTURA OBLIGATORIA GENERAL:
-1. Encabezado (ciudad, fecha, destinatario/juez)
-2. Referencia del tipo de escrito
-3. Identificación de las partes
-4. HECHOS (numerados)
-5. FUNDAMENTOS DE DERECHO (artículos y jurisprudencia)
-6. PETICIÓN / PRETENSIONES / SOLICITUD CONCRETA (SECCIÓN OBLIGATORIA — NO OMITIR JAMÁS)
-7. Pruebas y anexos
-8. Notificaciones
-9. Firma`;
+      // Segundo: buscar por coincidencia parcial (substring)
+      for (const [key, value] of Object.entries(estructurasPorTipo)) {
+        if (docLower.includes(key) || key.includes(docLower)) {
+          estructuraObligatoria = value;
+          break;
+        }
+      }
+    }
+
+    // Tercero: si no se encontró coincidencia, inferir por palabras clave
+    if (!estructuraObligatoria) {
+      if (docLower.includes('tutela') && !docLower.includes('contestación') && !docLower.includes('sentencia')) {
+        estructuraObligatoria = estructurasPorTipo['redacción de acción de tutela'];
+      } else if (docLower.includes('contestación') || docLower.includes('contestacion')) {
+        estructuraObligatoria = `CONTESTACIÓN DE DEMANDA:\n1. Encabezado (ciudad, fecha, despacho)\n2. Referencia (radicado, partes)\n3. Pronunciamiento sobre CADA HECHO (acepta, niega, no le consta)\n4. EXCEPCIONES DE MÉRITO (OBLIGATORIO)\n5. FUNDAMENTOS DE DERECHO\n6. OPOSICIÓN A LAS PRETENSIONES punto por punto (OBLIGATORIO)\n7. PRUEBAS\n8. NOTIFICACIONES\n9. Firma del apoderado`;
+      } else if (docLower.includes('petición') || docLower.includes('peticion')) {
+        estructuraObligatoria = estructurasPorTipo['acción de cumplimiento']?.replace('ACCIÓN DE CUMPLIMIENTO', 'DERECHO DE PETICIÓN') || `DERECHO DE PETICIÓN (Ley 1755/2015):\n1. Encabezado\n2. Destinatario\n3. Ref: DERECHO DE PETICIÓN\n4. Peticionario\n5. HECHOS numerados\n6. FUNDAMENTOS DE DERECHO\n7. PETICIÓN CONCRETA (OBLIGATORIO — NO OMITIR)\n8. Pruebas\n9. Notificaciones\n10. Firma`;
+      } else if (docLower.includes('demanda') || docLower.includes('ejecutiva')) {
+        estructuraObligatoria = `DEMANDA:\n1. Encabezado\n2. Juez competente\n3. Demandante y demandado\n4. Clase de proceso y cuantía\n5. PRETENSIONES numeradas (OBLIGATORIO)\n6. HECHOS numerados\n7. FUNDAMENTOS DE DERECHO\n8. PRUEBAS\n9. CUANTÍA\n10. ANEXOS\n11. NOTIFICACIONES\n12. Firma`;
+      } else if (docLower.includes('recurso') || docLower.includes('apelación') || docLower.includes('casación') || docLower.includes('impugnación')) {
+        estructuraObligatoria = `RECURSO/IMPUGNACIÓN:\n1. Encabezado\n2. Referencia (providencia impugnada)\n3. Legitimación\n4. CARGOS/AGRAVIOS numerados (OBLIGATORIO)\n5. FUNDAMENTOS DE DERECHO\n6. PETICIÓN AL SUPERIOR (OBLIGATORIO)\n7. NOTIFICACIONES\n8. Firma`;
+      } else if (docLower.includes('sentencia')) {
+        estructuraObligatoria = `SENTENCIA:\n1. REPÚBLICA DE COLOMBIA — RAMA JUDICIAL\n2. Despacho, radicado, partes\n3. ANTECEDENTES\n4. HECHOS PROBADOS\n5. PROBLEMA JURÍDICO\n6. CONSIDERACIONES\n7. RESUELVE: PRIMERO, SEGUNDO, TERCERO... (OBLIGATORIO)\n8. Cúmplase y notifíquese\n9. Firma del Juez`;
+      } else if (docLower.includes('auto')) {
+        estructuraObligatoria = `AUTO INTERLOCUTORIO:\n1. REPÚBLICA DE COLOMBIA — RAMA JUDICIAL\n2. Despacho, radicado, partes\n3. CONSIDERACIONES (fundamento fáctico y jurídico)\n4. RESUELVE: PRIMERO, SEGUNDO... (OBLIGATORIO)\n5. Cúmplase y notifíquese\n6. Firma del Juez`;
+      } else {
+        estructuraObligatoria = `ESTRUCTURA PROCESAL GENERAL:\n1. Encabezado (ciudad, fecha, destinatario/juez)\n2. Referencia\n3. Partes\n4. HECHOS numerados\n5. FUNDAMENTOS DE DERECHO\n6. PETICIÓN / PRETENSIONES / RESUELVE (OBLIGATORIO — NO OMITIR)\n7. PRUEBAS\n8. NOTIFICACIONES\n9. Firma`;
+      }
     }
 
     const systemPromptInstruction = `
-REGLA ABSOLUTA: Tu respuesta debe contener EXCLUSIVAMENTE el texto del documento jurídico solicitado. NO incluyas comentarios, advertencias, explicaciones, notas, aclaraciones ni meta-texto. Comienza directamente con el encabezado.
+REGLA ABSOLUTA: Responde EXCLUSIVAMENTE con el texto del documento jurídico. Sin comentarios, advertencias, explicaciones ni meta-texto. Comienza directamente con el encabezado del escrito.
 
-REGLA CRÍTICA DE COMPLETITUD: El documento DEBE estar COMPLETO de principio a fin. NUNCA lo dejes incompleto. La sección de PETICIÓN/PRETENSIONES/RESUELVE es la MÁS IMPORTANTE del documento — si la omites, el documento no sirve para nada. Debes llegar SIEMPRE hasta la firma.
+REGLA DE COMPLETITUD: El documento DEBE estar COMPLETO de principio a fin hasta la firma. La sección de PETICIÓN/PRETENSIONES/RESUELVE es la MÁS IMPORTANTE — si la omites, el documento es inservible. NUNCA lo dejes incompleto.
 
-PERFIL: Eres un abogado litigante senior y redactor judicial de élite en Colombia con 25 años de experiencia ante las Altas Cortes.
+PERFIL: Abogado litigante senior y redactor judicial de élite en Colombia, 25 años de experiencia ante Corte Constitucional, CSJ, Consejo de Estado y Tribunales.
 
-TAREA: Redactar de forma ÍNTEGRA, COMPLETA y lista para firmar: "${documentType}".
+TAREA: Redactar ÍNTEGRAMENTE, COMPLETO y listo para firmar: "${documentType}".
 
 INDICACIÓN DEL USUARIO: "${prompt}".
 
-NORMATIVIDAD: Cita los artículos pertinentes del CGP, CST, CPACA, CP, Ley 1755/2015, Decreto 2591/1991 o la normativa que corresponda.
+NORMATIVIDAD: Cita artículos pertinentes de CGP, CST, CPACA, CP, C. Civil, C. Penal, Ley 1755/2015, Decreto 2591/1991, Ley 906/2004, Ley 472/1998 o la que corresponda.
 
 JURISPRUDENCIA: ${citations.join('; ')}.
 
-${customFormat ? `FORMATO PERSONALIZADO DE LA FIRMA:\n${customFormat}` : ''}
-${estructuraObligatoria}
+${customFormat ? `⚠️ LA FIRMA HA PERSONALIZADO EL FORMATO — USA ESTE FORMATO POR ENCIMA DEL DEFAULT:\n${customFormat}` : `ESTRUCTURA OBLIGATORIA PARA ESTE TIPO DE DOCUMENTO:\n${estructuraObligatoria}`}
     `;
 
     const apiResult = await this.callOpenRouterModel(
       ['anthropic/claude-opus-5'],
       systemPromptInstruction,
-      `Genera el documento jurídico COMPLETO tipo "${documentType}". Hechos del usuario: "${prompt}". Insumos fácticos: ${facts}. Jurisprudencia aplicable: ${citations.join('; ')}. RECUERDA: el documento debe estar COMPLETO hasta la firma, incluyendo obligatoriamente la sección de PETICIÓN/PRETENSIONES/RESUELVE.`
+      `Genera el documento jurídico "${documentType}" COMPLETO hasta la firma. Hechos: "${prompt}". Insumos fácticos: ${facts}. Jurisprudencia: ${citations.join('; ')}. INCLUYE OBLIGATORIAMENTE la sección de PETICIÓN/PRETENSIONES/RESUELVE según corresponda al tipo de actuación.`
     );
 
     if (apiResult && apiResult.length > 200) {
