@@ -66,7 +66,10 @@ export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
             </div>
           )
         ) : (
-          <PdfViewerCanvas />
+          <PdfViewerCanvas
+            draftText={generatedDraft?.legalText}
+            draftTitle={generatedDraft?.title}
+          />
         )}
       </div>
     </section>

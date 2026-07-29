@@ -246,7 +246,7 @@ export class OpenRouterService {
 
     const model = modelSlugMap[requestedModels[0]] || requestedModels[0];
     const isOpus = model.includes('claude-opus');
-    const timeoutMs = isOpus ? 90000 : 20000;
+    const timeoutMs = isOpus ? 120000 : 20000;
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
@@ -266,7 +266,7 @@ export class OpenRouterService {
           model: model,
           messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
           temperature: 0.2,
-          max_tokens: isOpus ? 8192 : 2048
+          max_tokens: isOpus ? undefined : 2048
         })
       });
 
@@ -997,13 +997,13 @@ NORMATIVIDAD: Cita artículos pertinentes de CGP, CST, CPACA, CP, C. Civil, C. P
 
 JURISPRUDENCIA: ${citations.join('; ')}.
 
-${customFormat ? `⚠️ LA FIRMA HA PERSONALIZADO EL FORMATO — USA ESTE FORMATO POR ENCIMA DEL DEFAULT:\n${customFormat}` : `ESTRUCTURA OBLIGATORIA PARA ESTE TIPO DE DOCUMENTO:\n${estructuraObligatoria}`}
+${customFormat ? `⚠️ LA FIRMA HA PERSONALIZADO EL FORMATO — USA ESTE FORMATO POR ENCIMA DEL DEFAULT:\n${customFormat}` : `GUÍA DE REFERENCIA para "${documentType}" (usa tu criterio jurídico para estructurar el documento como mejor corresponda según la práctica procesal colombiana, pero asegúrate de NO OMITIR la sección de petición/pretensiones/resuelve):\n${estructuraObligatoria}`}
     `;
 
     const apiResult = await this.callOpenRouterModel(
       ['anthropic/claude-opus-5'],
       systemPromptInstruction,
-      `Genera el documento jurídico "${documentType}" COMPLETO hasta la firma. Hechos: "${prompt}". Insumos fácticos: ${facts}. Jurisprudencia: ${citations.join('; ')}. INCLUYE OBLIGATORIAMENTE la sección de PETICIÓN/PRETENSIONES/RESUELVE según corresponda al tipo de actuación.`
+      `Genera el documento jurídico "${documentType}" COMPLETO hasta la firma. Hechos: "${prompt}". Insumos fácticos: ${facts}. Jurisprudencia: ${citations.join('; ')}. El documento debe estar COMPLETO incluyendo la sección de PETICIÓN/PRETENSIONES/RESUELVE.`
     );
 
     if (apiResult && apiResult.length > 200) {
