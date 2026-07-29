@@ -41,7 +41,8 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
         'Impugnación de Sentencia de Tutela',
         'Acción de Tutela por Vía de Hecho Judicial',
         'Acción Popular / Acción de Grupo',
-        'Acción de Cumplimiento'
+        'Acción de Cumplimiento',
+        'Derecho de Petición (Art. 23 C.P. / Ley 1755 de 2015)'
       ],
       despacho: [
         'Contestación / Informe de Respuesta a Tutela (Juzgado/Entidad)',
@@ -56,7 +57,8 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
         'Sustentación de Recurso de Apelación',
         'Contestación a Recurso de Apelación de la Contraparte',
         'Recurso de Casación Laboral',
-        'Formulación de Excepción de Prescripción Trienal'
+        'Formulación de Excepción de Prescripción Trienal',
+        'Derecho de Petición Laboral (Ley 1755 de 2015)'
       ],
       despacho: [
         'Proyección de Sentencia Laboral de Primera Instancia',
@@ -69,7 +71,8 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
         'Contestación de Demanda Civil',
         'Recurso de Reposición y en Subsidio Apelación',
         'Contestación a Recurso de Apelación Civil',
-        'Demanda Ejecutiva & Liquidación de Crédito'
+        'Demanda Ejecutiva & Liquidación de Crédito',
+        'Derecho de Petición Civil (Ley 1755 de 2015)'
       ],
       despacho: [
         'Proyección de Auto Admisorio de Demanda Civil',
@@ -82,9 +85,11 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
     'ADMINISTRATIVO': {
       litigante: [
         'Demanda de Nulidad y Restablecimiento del Derecho',
+        'Demanda de Reparación Directa (Art. 140 CPACA)',
         'Contestación de Demanda Contencioso Administrativa',
         'Respuesta / Contestación a Medida Cautelar',
-        'Recurso de Apelación CPACA'
+        'Recurso de Apelación CPACA',
+        'Derecho de Petición Administrativo (Ley 1755 de 2015)'
       ],
       despacho: [
         'Proyección de Sentencia Contencioso Administrativa',
@@ -97,7 +102,8 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
         'Sustentación de Apelación Penal (Ley 906)',
         'Contestación / Memorial de Inhabilidad o Libertad',
         'Petición de HÁBEAS CORPUS',
-        'Solicitud de Preclusión de la Defensa'
+        'Solicitud de Preclusión de la Defensa',
+        'Derecho de Petición Penal (Ley 1755 de 2015)'
       ],
       despacho: [
         'Proyección de Auto de Preclusión / Control de Garantías',
@@ -110,7 +116,8 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
         'Demanda de Fijación / Exoneración de Alimentos',
         'Contestación de Demanda de Alimentos o Custodia',
         'Divorcio por Mutuo Acuerdo / Demanda de Divorcio',
-        'Impugnación / Reconocimiento de Paternidad'
+        'Impugnación / Reconocimiento de Paternidad',
+        'Derecho de Petición de Familia (Ley 1755 de 2015)'
       ],
       despacho: [
         'Proyección de Sentencia de Familia (Alimentos/Divorcio)',
@@ -121,7 +128,8 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
       litigante: [
         'Demanda Verbal Sumaria de Mínima Cuantía',
         'Contestación a Demanda de Pequeñas Causas',
-        'Restitución de Inmueble Arrendado'
+        'Restitución de Inmueble Arrendado',
+        'Derecho de Petición (Ley 1755 de 2015)'
       ],
       despacho: [
         'Proyección de Sentencia de Única Instancia (Pequeñas Causas)',
@@ -132,7 +140,8 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
       litigante: [
         'Recurso de Reconsideración ante la DIAN',
         'Contestación a Liquidación Oficial DIAN',
-        'Demanda de Nulidad y Restablecimiento Tributario'
+        'Demanda de Nulidad y Restablecimiento Tributario',
+        'Derecho de Petición Tributario (Ley 1755 de 2015)'
       ],
       despacho: [
         'Proyección de Sentencia Nulidad Tributaria',
@@ -143,7 +152,8 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
       litigante: [
         'Demanda por Competencia Desleal (SIC)',
         'Impugnación de Actas Asamblearias (SuperSociedades)',
-        'Contestación a Demanda Societaria'
+        'Contestación a Demanda Societaria',
+        'Derecho de Petición Societario (Ley 1755 de 2015)'
       ],
       despacho: [
         'Proyección de Sentencia Societaria (SuperSociedades / SIC)',
@@ -154,7 +164,8 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
       litigante: [
         'Petición / Demanda ante la Corte IDH (OEA)',
         'Solicitud de Exequátur ante la CSJ',
-        'Arbitraje Comercial Internacional (CIADI)'
+        'Arbitraje Comercial Internacional (CIADI)',
+        'Derecho de Petición Internacional (Ley 1755 de 2015)'
       ],
       despacho: [
         'Informe del Estado / Despacho ante la Corte IDH',
