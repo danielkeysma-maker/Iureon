@@ -1,0 +1,15 @@
+# REGLAS DE AHORRO DE TOKENS PARA CLAUDE OPUS
+
+1. LECTURA QUIRÚRGICA:
+   - NUNCA leas archivos completos si superan las 100 líneas. Usa herramientas de búsqueda (search_files / grep) para leer solo las líneas relevantes.
+   - NUNCA escanees carpetas pesadas como `node_modules`, `dist`, `.git`, `build` o carpetas de caché.
+
+2. RESPUESTAS CONCISAS:
+   - No des explicaciones teóricas largas ni introducciones corteses a menos que te lo pida.
+   - Ve directo al código y a la solución.
+
+3. PLANIFICACIÓN ANTES DE EJECUTAR:
+   - Antes de modificar múltiples archivos, dame un resumen de 2 líneas de los cambios planificados y espera mi confirmación.
+
+4. USO EFICIENTE DEL CONTEXTO:
+   - Si no necesitas leer un archivo para responder mi pregunta, NO lo leas.

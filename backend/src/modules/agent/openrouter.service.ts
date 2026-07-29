@@ -6,6 +6,7 @@ export interface WorkflowRequest {
   legalPrompt: string;
   expedienteId?: string;
   customFormatInstruction?: string;
+  existingDraft?: string;
 }
 
 export interface AgentExecutionStep {
@@ -20,9 +21,9 @@ export class OpenRouterService {
   private baseUrl = 'https://openrouter.ai/api/v1';
 
   public async executeMultiEnginePipeline(
-    req: any,
-    onStepLog: (stepData: AgentExecutionStep) => void
-  ) {
+    req: { firmId: string; documentType: string; legalPrompt: string; expedienteId?: string; existingDraft?: string },
+    onStepLog: (step: AgentExecutionStep) => void
+  ): Promise<any> {
     return this.processWorkflowPipeline(req, onStepLog);
   }
 
@@ -46,10 +47,14 @@ export class OpenRouterService {
       timestamp: new Date().toISOString()
     });
 
+    const geminiPrompt = req.existingDraft
+      ? `${req.legalPrompt}\n\n--- BORRADOR EXISTENTE PARA CONTINUAR/CORREGIR ---\n${req.existingDraft.substring(0, 4000)}`
+      : req.legalPrompt;
+
     const geminiExtraction = await this.callOpenRouterModel(
       ['google/gemini-3.6-flash'],
       `Procesador fáctico de la Rama Judicial. Extrae los hechos relevantes, pretensiones y partes para: ${req.documentType}`,
-      req.legalPrompt
+      geminiPrompt
     );
 
     // Stage 1.5: RAG Vector Search — Jurisprudencia de TODAS las Cortes (CC, CSJ, CE, Tribunales)
@@ -196,7 +201,9 @@ export class OpenRouterService {
     onStepLog({
       stage: 'STAGE_3_REDACCION',
       engine: 'CLAUDE',
-      message: `[Claude Opus 5] Redacción de pieza procesal con lenguaje jurídico formal y sustentación legal...`,
+      message: req.existingDraft
+        ? `[Claude Opus 5] Continuación/corrección sobre borrador existente con sustentación legal...`
+        : `[Claude Opus 5] Redacción de pieza procesal con lenguaje jurídico formal y sustentación legal...`,
       timestamp: new Date().toISOString()
     });
 
@@ -205,7 +212,8 @@ export class OpenRouterService {
       req.legalPrompt,
       geminiExtraction,
       jurisprudenciaEncontrada,
-      req.customFormatInstruction
+      req.customFormatInstruction,
+      req.existingDraft
     );
 
     onStepLog({
@@ -296,7 +304,8 @@ export class OpenRouterService {
     prompt: string,
     facts: string,
     citations: string[],
-    customFormat?: string
+    customFormat?: string,
+    existingDraft?: string
   ): Promise<string> {
     // ═══════════════════════════════════════════════════════════════════════
     // MAPA DE ESTRUCTURA EXACTA POR TIPO DE DOCUMENTO
@@ -982,14 +991,18 @@ export class OpenRouterService {
       }
     }
 
+    const continuationBlock = existingDraft
+      ? `\nMODO CONTINUACIÓN/CORRECCIÓN: El usuario tiene un borrador previo que quiere que continúes, corrijas o proyectes. Tu tarea es tomar ese borrador como base y aplicar las instrucciones del usuario. Entrega el documento COMPLETO resultante (no solo la parte modificada).\n\nBORRADOR EXISTENTE:\n"""\n${existingDraft}\n"""\n`
+      : '';
+
     const systemPromptInstruction = `
 REGLA ABSOLUTA: Responde EXCLUSIVAMENTE con el texto del documento jurídico. Sin comentarios, advertencias, explicaciones ni meta-texto. Comienza directamente con el encabezado del escrito.
 
 REGLA DE COMPLETITUD: El documento DEBE estar COMPLETO de principio a fin hasta la firma. La sección de PETICIÓN/PRETENSIONES/RESUELVE es la MÁS IMPORTANTE — si la omites, el documento es inservible. NUNCA lo dejes incompleto.
 
 PERFIL: Abogado litigante senior y redactor judicial de élite en Colombia, 25 años de experiencia ante Corte Constitucional, CSJ, Consejo de Estado y Tribunales.
-
-TAREA: Redactar ÍNTEGRAMENTE, COMPLETO y listo para firmar: "${documentType}".
+${continuationBlock}
+TAREA: ${existingDraft ? 'Continuar, corregir o proyectar a partir del borrador existente según la indicación del usuario' : 'Redactar ÍNTEGRAMENTE, COMPLETO y listo para firmar'}: "${documentType}".
 
 INDICACIÓN DEL USUARIO: "${prompt}".
 
@@ -1000,10 +1013,14 @@ JURISPRUDENCIA: ${citations.join('; ')}.
 ${customFormat ? `⚠️ LA FIRMA HA PERSONALIZADO EL FORMATO — USA ESTE FORMATO POR ENCIMA DEL DEFAULT:\n${customFormat}` : `GUÍA DE REFERENCIA para "${documentType}" (usa tu criterio jurídico para estructurar el documento como mejor corresponda según la práctica procesal colombiana, pero asegúrate de NO OMITIR la sección de petición/pretensiones/resuelve):\n${estructuraObligatoria}`}
     `;
 
+    const userMessage = existingDraft
+      ? `Instrucción del usuario: "${prompt}". Insumos fácticos: ${facts}. Jurisprudencia: ${citations.join('; ')}. Toma el borrador existente como base y aplica las correcciones o continuaciones que el usuario indica. Entrega el documento COMPLETO resultante.`
+      : `Genera el documento jurídico "${documentType}" COMPLETO hasta la firma. Hechos: "${prompt}". Insumos fácticos: ${facts}. Jurisprudencia: ${citations.join('; ')}. El documento debe estar COMPLETO incluyendo la sección de PETICIÓN/PRETENSIONES/RESUELVE.`;
+
     const apiResult = await this.callOpenRouterModel(
       ['anthropic/claude-opus-5'],
       systemPromptInstruction,
-      `Genera el documento jurídico "${documentType}" COMPLETO hasta la firma. Hechos: "${prompt}". Insumos fácticos: ${facts}. Jurisprudencia: ${citations.join('; ')}. El documento debe estar COMPLETO incluyendo la sección de PETICIÓN/PRETENSIONES/RESUELVE.`
+      userMessage
     );
 
     if (apiResult && apiResult.length > 200) {

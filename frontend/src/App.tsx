@@ -157,8 +157,10 @@ export function App() {
 
   const handleLoadDraft = (entry: SavedDraftEntry) => {
     workflow.setGeneratedDraft(entry.draft);
+    workflow.setActiveDraftText(entry.draft.legalText);
+    workflow.setDocumentType(entry.draft.documentType);
     workflow.setRightView('draft');
-    alert(`📂 Borrador "${entry.draft.title}" cargado en el editor.`);
+    setIsSavedDraftsModalOpen(false);
   };
 
   const handleExportWord = () => {
@@ -304,6 +306,8 @@ export function App() {
                   isProcessing={workflow.isProcessing}
                   handleSendPrompt={workflow.handleSendPrompt}
                   logs={workflow.logs}
+                  activeDraftText={workflow.activeDraftText}
+                  onClearActiveDraft={() => workflow.setActiveDraftText(null)}
                 />
               )}
 

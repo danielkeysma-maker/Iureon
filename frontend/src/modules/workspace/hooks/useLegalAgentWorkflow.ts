@@ -13,6 +13,7 @@ export function useLegalAgentWorkflow() {
   const [copied, setCopied] = useState(false);
   const [generatedDraft, setGeneratedDraft] = useState<GeneratedDraft | null>(null);
   const [isFocusMode, setIsFocusMode] = useState(false);
+  const [activeDraftText, setActiveDraftText] = useState<string | null>(null);
 
   const [analyticsData] = useState<CaseProvidenciaEvaluationData>({
     expedienteId: 'EXP-2026-904',
@@ -129,7 +130,8 @@ Por favor espere unos segundos mientras se finaliza la redacción solemne.`,
         body: JSON.stringify({
           documentType,
           legalPrompt,
-          expedienteId: 'EXP-2026-904'
+          expedienteId: 'EXP-2026-904',
+          existingDraft: activeDraftText || undefined
         })
       });
 
@@ -295,6 +297,7 @@ T.P. Abogado Apoderado`,
     } finally {
       setIsProcessing(false);
       setLegalPrompt('');
+      setActiveDraftText(null);
     }
   };
 
@@ -320,6 +323,8 @@ T.P. Abogado Apoderado`,
     logs,
     isFocusMode,
     setIsFocusMode,
+    activeDraftText,
+    setActiveDraftText,
     handleSendPrompt,
     handleCopyText
   };

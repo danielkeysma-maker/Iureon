@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, Database, Cpu, Send, Scale, Building, Paperclip, FileText, X, UploadCloud } from 'lucide-react';
+import { Sparkles, Database, Cpu, Send, Scale, Building, Paperclip, FileText, X, UploadCloud, RefreshCw } from 'lucide-react';
 import { AgentConsoleStream } from '../../agent/components/AgentConsoleStream';
 import type { AgentLog } from '../../agent/components/AgentConsoleStream';
 
@@ -18,6 +18,8 @@ interface AgentPanelLeftProps {
   isProcessing: boolean;
   handleSendPrompt: (e: React.FormEvent) => void;
   logs: AgentLog[];
+  activeDraftText?: string | null;
+  onClearActiveDraft?: () => void;
 }
 
 export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
@@ -27,7 +29,9 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
   setLegalPrompt,
   isProcessing,
   handleSendPrompt,
-  logs
+  logs,
+  activeDraftText,
+  onClearActiveDraft
 }) => {
   const [legalBranch, setLegalBranch] = useState<string>('CONSTITUCIONAL');
   const [userRole, setUserRole] = useState<'FIRMA_LITIGANTE' | 'JUZGADO_DESPACHO'>('FIRMA_LITIGANTE');
@@ -380,11 +384,32 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
       {/* Prompt Area */}
       <div className="px-4 py-3 flex-1 flex flex-col min-h-0">
         <form onSubmit={handleSendPrompt} className="flex flex-col gap-3 flex-1">
+          {/* Active Draft Indicator */}
+          {activeDraftText && (
+            <div className="flex items-center justify-between px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center gap-2 text-[11px] text-blue-900 font-semibold">
+                <RefreshCw className="w-3.5 h-3.5" />
+                <span>Modo Continuación — Borrador cargado ({(activeDraftText.length / 1000).toFixed(1)}k caracteres)</span>
+              </div>
+              <button
+                type="button"
+                onClick={onClearActiveDraft}
+                className="text-blue-400 hover:text-blue-700 transition-colors"
+                title="Descartar borrador base"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+
           <div className="relative flex-1">
             <textarea
               value={legalPrompt}
               onChange={(e) => setLegalPrompt(e.target.value)}
-              placeholder={`Describa los hechos y la pretensión para ${documentType.toLowerCase()}...`}
+              placeholder={activeDraftText
+                ? 'Instrucciones sobre el borrador cargado: continuar, corregir, ampliar pretensiones, agregar jurisprudencia...'
+                : `Describa los hechos y la pretensión para ${documentType.toLowerCase()}...`
+              }
               rows={4}
               className="w-full h-full bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 text-[13px] text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900/40 resize-none leading-relaxed"
             />
@@ -407,8 +432,8 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
                 </>
               ) : (
                 <>
-                  <Send className="w-3.5 h-3.5" />
-                  <span>Generar {userRole === 'JUZGADO_DESPACHO' ? 'Providencia' : 'Borrador'}</span>
+                  {activeDraftText ? <RefreshCw className="w-3.5 h-3.5" /> : <Send className="w-3.5 h-3.5" />}
+                  <span>{activeDraftText ? 'Continuar / Corregir' : (userRole === 'JUZGADO_DESPACHO' ? 'Generar Providencia' : 'Generar Borrador')}</span>
                 </>
               )}
             </button>

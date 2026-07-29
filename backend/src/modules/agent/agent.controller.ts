@@ -5,7 +5,7 @@ const aiService = new OpenRouterMultiEngineService();
 
 export const streamAgentDraftController = async (req: Request, res: Response): Promise<void> => {
   const firmId = req.firmId;
-  const { documentType, legalPrompt, expedienteId } = req.body;
+  const { documentType, legalPrompt, expedienteId, existingDraft } = req.body;
 
   if (!legalPrompt) {
     res.status(400).json({ error: 'MISSING_PROMPT', message: 'Se requiere la instrucción jurídica en legalPrompt' });
@@ -29,7 +29,8 @@ export const streamAgentDraftController = async (req: Request, res: Response): P
         firmId: firmId || 'unknown-firm',
         documentType: documentType || 'Contestación de Demanda',
         legalPrompt,
-        expedienteId
+        expedienteId,
+        existingDraft
       },
       (step: AgentExecutionStep) => {
         sendEvent('AGENT_LOG', step);
