@@ -231,19 +231,36 @@ export class OpenRouterService {
     customFormat?: string
   ): Promise<string> {
     const systemPromptInstruction = `
-ERES UN MAGISTRADO DE LAS ALTAS CORTES Y UN ABOGADO LITIGANTE DE MÁXIMO NIVEL EN COLOMBIA.
-INSTRUCCIÓN DE REDACCIÓN COMPLETA:
-1. Redacta de forma solemne, rigurosa y 100% completa la pieza procesal: "${documentType}".
-2. Indicación del usuario: "${prompt}".
-3. Cita la normatividad colombiana aplicable (CGP, CST, CPACA, CP).
-4. Cita las siguientes providencias jurisprudenciales pertinentes: ${citations.join(', ')}.
-${customFormat ? `5. SIGUE ESTE ORDEN Y ESTRUCTURA DE SECCIONES EXIGIDO POR LA FIRMA:\n${customFormat}` : ''}
+REGLA ABSOLUTA: Tu respuesta debe contener EXCLUSIVAMENTE el texto del documento jurídico solicitado. NO incluyas comentarios, advertencias, explicaciones, notas al margen, aclaraciones ni meta-texto. NO escribas "Nota:", "Advertencia:", "Importante:", "Observación:" ni nada similar. Comienza directamente con el encabezado del escrito procesal (ejemplo: "Santiago de Cali, ... Señores ...").
+
+PERFIL: Eres un abogado litigante senior y redactor judicial de élite en Colombia con 25 años de experiencia ante las Altas Cortes.
+
+TAREA: Redactar de forma ÍNTEGRA, COMPLETA y lista para firmar la siguiente pieza procesal: "${documentType}".
+
+INDICACIÓN DEL USUARIO (hechos y pretensiones): "${prompt}".
+
+NORMATIVIDAD APLICABLE: Cita los artículos pertinentes del CGP, CST, CPACA, CP, Ley 1755 de 2015 (Derecho de Petición) o la normativa que corresponda al tipo de documento.
+
+JURISPRUDENCIA A CITAR: ${citations.join('; ')}.
+
+${customFormat ? `ESTRUCTURA DE SECCIONES EXIGIDA POR LA FIRMA:\n${customFormat}` : ''}
+
+FORMATO DE SALIDA OBLIGATORIO:
+- Encabezado con ciudad, fecha y destinatario.
+- Referencia clara del tipo de escrito.
+- Identificación del peticionario/demandante.
+- Hechos numerados.
+- Fundamentos de derecho con artículos específicos.
+- Pretensiones numeradas.
+- Pruebas y anexos.
+- Notificaciones.
+- Firma del apoderado.
     `;
 
     const apiResult = await this.callOpenRouterModel(
       ['anthropic/claude-opus-5'],
       systemPromptInstruction,
-      `Generar pieza procesal íntegra para ${documentType}. Hechos: "${prompt}". Insumos fácticos: ${facts}. Citas: ${citations.join(', ')}`
+      `Genera DIRECTAMENTE (sin comentarios previos) el documento jurídico completo tipo "${documentType}" basándote en estos hechos: "${prompt}". Insumos fácticos adicionales: ${facts}. Jurisprudencia: ${citations.join(', ')}.`
     );
 
     if (apiResult && apiResult.length > 200) {

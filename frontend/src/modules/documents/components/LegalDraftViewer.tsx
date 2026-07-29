@@ -85,8 +85,8 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
         onApplyReplacement={handleApplyReplacement}
       />
 
-      {/* Metadata + Actions bar */}
-      <div className="bg-white border border-slate-200/80 rounded-xl px-5 py-4 shadow-sm">
+      {/* Metadata + Actions bar — STICKY para que siempre sea visible */}
+      <div className="bg-white border border-slate-200/80 rounded-xl px-5 py-4 shadow-sm sticky top-0 z-20">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
           <div className="flex items-center gap-2.5 min-w-0">
             <FileText className="w-4 h-4 text-blue-900 shrink-0" />
