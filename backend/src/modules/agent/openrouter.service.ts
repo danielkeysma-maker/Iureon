@@ -246,7 +246,7 @@ export class OpenRouterService {
 
     const model = modelSlugMap[requestedModels[0]] || requestedModels[0];
     const isOpus = model.includes('claude-opus');
-    const timeoutMs = isOpus ? 60000 : 20000;
+    const timeoutMs = isOpus ? 90000 : 20000;
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
@@ -266,7 +266,7 @@ export class OpenRouterService {
           model: model,
           messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
           temperature: 0.2,
-          max_tokens: isOpus ? 4096 : 2048
+          max_tokens: isOpus ? 8192 : 2048
         })
       });
 
@@ -298,37 +298,158 @@ export class OpenRouterService {
     citations: string[],
     customFormat?: string
   ): Promise<string> {
+    // Detectar tipo de documento para ajustar la estructura obligatoria
+    const docLower = documentType.toLowerCase();
+    const esTutela = docLower.includes('tutela');
+    const esContestacion = docLower.includes('contestación') || docLower.includes('contestacion');
+    const esDemanda = docLower.includes('demanda') || docLower.includes('ejecutiva');
+    const esDerechoPeticion = docLower.includes('petición') || docLower.includes('peticion');
+    const esRecurso = docLower.includes('recurso') || docLower.includes('apelación') || docLower.includes('casación') || docLower.includes('impugnación');
+    const esProyeccionSentencia = docLower.includes('proyección de sentencia') || docLower.includes('sentencia');
+    const esAuto = docLower.includes('auto ');
+    const esHabeasCorpus = docLower.includes('hábeas corpus') || docLower.includes('habeas corpus');
+
+    let estructuraObligatoria = '';
+
+    if (esTutela && !esContestacion && !esProyeccionSentencia) {
+      estructuraObligatoria = `
+ESTRUCTURA OBLIGATORIA PARA ACCIÓN DE TUTELA:
+1. Encabezado (ciudad, fecha, juez competente)
+2. Accionante (nombre, identificación, domicilio)
+3. Accionado (entidad o persona contra quien se dirige)
+4. Derechos fundamentales vulnerados o amenazados
+5. HECHOS (numerados, detallados)
+6. FUNDAMENTOS DE DERECHO (Art. 86 C.P., Decreto 2591/1991, jurisprudencia)
+7. PRETENSIONES (lo que se pide al juez — SECCIÓN OBLIGATORIA, NO OMITIR)
+8. Pruebas que se aportan y que se solicitan
+9. Juramento de no haber interpuesto otra tutela por los mismos hechos (Art. 37 Decreto 2591/1991)
+10. Notificaciones
+11. Firma`;
+    } else if (esContestacion) {
+      estructuraObligatoria = `
+ESTRUCTURA OBLIGATORIA PARA CONTESTACIÓN:
+1. Encabezado (ciudad, fecha, despacho judicial)
+2. Referencia (radicado, proceso, demandante vs demandado)
+3. Pronunciamiento sobre cada hecho de la demanda (acepta, niega, no le consta)
+4. EXCEPCIONES DE MÉRITO (nominadas y de fondo — SECCIÓN OBLIGATORIA)
+5. FUNDAMENTOS DE DERECHO con artículos y jurisprudencia
+6. OPOSICIÓN A LAS PRETENSIONES (punto por punto — SECCIÓN OBLIGATORIA, NO OMITIR)
+7. Pruebas que se solicitan y que se aportan
+8. Notificaciones
+9. Firma del apoderado`;
+    } else if (esDerechoPeticion) {
+      estructuraObligatoria = `
+ESTRUCTURA OBLIGATORIA PARA DERECHO DE PETICIÓN (Ley 1755 de 2015):
+1. Encabezado (ciudad, fecha)
+2. Destinatario (entidad/autoridad a quien se dirige)
+3. Referencia: DERECHO DE PETICIÓN — Art. 23 Constitución Política / Ley 1755 de 2015
+4. Identificación del peticionario (nombre, cédula, domicilio)
+5. HECHOS (numerados y detallados)
+6. FUNDAMENTOS DE DERECHO (artículos de la Ley 1755, normas sectoriales aplicables, jurisprudencia)
+7. PETICIÓN CONCRETA (lo que se solicita específicamente — ESTA ES LA SECCIÓN MÁS IMPORTANTE, NO OMITIR JAMÁS)
+8. Pruebas y documentos que se anexan
+9. Notificaciones (dirección física y correo electrónico)
+10. Firma del peticionario`;
+    } else if (esDemanda) {
+      estructuraObligatoria = `
+ESTRUCTURA OBLIGATORIA PARA DEMANDA:
+1. Encabezado (ciudad, fecha, juez competente)
+2. Demandante (nombre, identificación, domicilio, apoderado)
+3. Demandado (nombre/razón social, domicilio)
+4. Clase de proceso y cuantía
+5. PRETENSIONES (numeradas — SECCIÓN OBLIGATORIA, NO OMITIR)
+6. HECHOS (numerados y probados)
+7. FUNDAMENTOS DE DERECHO con artículos y jurisprudencia
+8. Pruebas documentales, testimoniales, periciales
+9. Estimación razonada de la cuantía (si aplica)
+10. Anexos (poder, pruebas)
+11. Notificaciones
+12. Firma del apoderado`;
+    } else if (esRecurso) {
+      estructuraObligatoria = `
+ESTRUCTURA OBLIGATORIA PARA RECURSO/IMPUGNACIÓN:
+1. Encabezado (ciudad, fecha, despacho judicial)
+2. Referencia (radicado, providencia impugnada, fecha)
+3. Legitimación del recurrente
+4. PROVIDENCIA QUE SE IMPUGNA (identificación precisa)
+5. CARGOS O AGRAVIOS (numerados — SECCIÓN OBLIGATORIA, por qué la providencia es errónea)
+6. FUNDAMENTOS DE DERECHO con artículos y jurisprudencia
+7. PETICIÓN AL SUPERIOR (lo que se pide que revoque, modifique o adicione — NO OMITIR)
+8. Pruebas (si aplica)
+9. Notificaciones
+10. Firma del apoderado`;
+    } else if (esProyeccionSentencia) {
+      estructuraObligatoria = `
+ESTRUCTURA OBLIGATORIA PARA PROYECCIÓN DE SENTENCIA:
+1. REPÚBLICA DE COLOMBIA — RAMA JUDICIAL
+2. Despacho judicial (Juzgado/Tribunal/Sala)
+3. Radicado, partes procesales
+4. VISTOS (resumen del trámite procesal)
+5. ANTECEDENTES Y HECHOS PROBADOS
+6. PROBLEMA JURÍDICO
+7. CONSIDERACIONES DEL DESPACHO (análisis jurídico con normativa y jurisprudencia)
+8. PARTE RESOLUTIVA — RESUELVE (PRIMERO, SEGUNDO, TERCERO... — SECCIÓN OBLIGATORIA, NO OMITIR)
+9. Cúmplase y notifíquese
+10. Firma del juez/magistrado`;
+    } else if (esAuto) {
+      estructuraObligatoria = `
+ESTRUCTURA OBLIGATORIA PARA AUTO:
+1. REPÚBLICA DE COLOMBIA — RAMA JUDICIAL
+2. Despacho judicial
+3. Radicado y partes
+4. CONSIDERACIONES (fundamento fáctico y jurídico)
+5. PARTE RESOLUTIVA — RESUELVE (PRIMERO, SEGUNDO... — SECCIÓN OBLIGATORIA, NO OMITIR)
+6. Cúmplase y notifíquese
+7. Firma del juez`;
+    } else if (esHabeasCorpus) {
+      estructuraObligatoria = `
+ESTRUCTURA OBLIGATORIA PARA HÁBEAS CORPUS:
+1. Encabezado (ciudad, fecha, juez competente — cualquier juez penal)
+2. Accionante (quien interpone a favor del privado de libertad)
+3. Persona privada de la libertad (nombre, lugar de reclusión)
+4. Autoridad responsable de la privación
+5. HECHOS (numerados)
+6. FUNDAMENTOS (Art. 30 C.P., Ley 1095/2006)
+7. PETICIÓN (que se ordene la libertad inmediata — NO OMITIR)
+8. Pruebas
+9. Firma`;
+    } else {
+      estructuraObligatoria = `
+ESTRUCTURA OBLIGATORIA GENERAL:
+1. Encabezado (ciudad, fecha, destinatario/juez)
+2. Referencia del tipo de escrito
+3. Identificación de las partes
+4. HECHOS (numerados)
+5. FUNDAMENTOS DE DERECHO (artículos y jurisprudencia)
+6. PETICIÓN / PRETENSIONES / SOLICITUD CONCRETA (SECCIÓN OBLIGATORIA — NO OMITIR JAMÁS)
+7. Pruebas y anexos
+8. Notificaciones
+9. Firma`;
+    }
+
     const systemPromptInstruction = `
-REGLA ABSOLUTA: Tu respuesta debe contener EXCLUSIVAMENTE el texto del documento jurídico solicitado. NO incluyas comentarios, advertencias, explicaciones, notas al margen, aclaraciones ni meta-texto. NO escribas "Nota:", "Advertencia:", "Importante:", "Observación:" ni nada similar. Comienza directamente con el encabezado del escrito procesal (ejemplo: "Santiago de Cali, ... Señores ...").
+REGLA ABSOLUTA: Tu respuesta debe contener EXCLUSIVAMENTE el texto del documento jurídico solicitado. NO incluyas comentarios, advertencias, explicaciones, notas, aclaraciones ni meta-texto. Comienza directamente con el encabezado.
+
+REGLA CRÍTICA DE COMPLETITUD: El documento DEBE estar COMPLETO de principio a fin. NUNCA lo dejes incompleto. La sección de PETICIÓN/PRETENSIONES/RESUELVE es la MÁS IMPORTANTE del documento — si la omites, el documento no sirve para nada. Debes llegar SIEMPRE hasta la firma.
 
 PERFIL: Eres un abogado litigante senior y redactor judicial de élite en Colombia con 25 años de experiencia ante las Altas Cortes.
 
-TAREA: Redactar de forma ÍNTEGRA, COMPLETA y lista para firmar la siguiente pieza procesal: "${documentType}".
+TAREA: Redactar de forma ÍNTEGRA, COMPLETA y lista para firmar: "${documentType}".
 
-INDICACIÓN DEL USUARIO (hechos y pretensiones): "${prompt}".
+INDICACIÓN DEL USUARIO: "${prompt}".
 
-NORMATIVIDAD APLICABLE: Cita los artículos pertinentes del CGP, CST, CPACA, CP, Ley 1755 de 2015 (Derecho de Petición) o la normativa que corresponda al tipo de documento.
+NORMATIVIDAD: Cita los artículos pertinentes del CGP, CST, CPACA, CP, Ley 1755/2015, Decreto 2591/1991 o la normativa que corresponda.
 
-JURISPRUDENCIA A CITAR: ${citations.join('; ')}.
+JURISPRUDENCIA: ${citations.join('; ')}.
 
-${customFormat ? `ESTRUCTURA DE SECCIONES EXIGIDA POR LA FIRMA:\n${customFormat}` : ''}
-
-FORMATO DE SALIDA OBLIGATORIO:
-- Encabezado con ciudad, fecha y destinatario.
-- Referencia clara del tipo de escrito.
-- Identificación del peticionario/demandante.
-- Hechos numerados.
-- Fundamentos de derecho con artículos específicos.
-- Pretensiones numeradas.
-- Pruebas y anexos.
-- Notificaciones.
-- Firma del apoderado.
+${customFormat ? `FORMATO PERSONALIZADO DE LA FIRMA:\n${customFormat}` : ''}
+${estructuraObligatoria}
     `;
 
     const apiResult = await this.callOpenRouterModel(
       ['anthropic/claude-opus-5'],
       systemPromptInstruction,
-      `Genera DIRECTAMENTE (sin comentarios previos) el documento jurídico completo tipo "${documentType}" basándote en estos hechos: "${prompt}". Insumos fácticos adicionales: ${facts}. Jurisprudencia: ${citations.join(', ')}.`
+      `Genera el documento jurídico COMPLETO tipo "${documentType}". Hechos del usuario: "${prompt}". Insumos fácticos: ${facts}. Jurisprudencia aplicable: ${citations.join('; ')}. RECUERDA: el documento debe estar COMPLETO hasta la firma, incluyendo obligatoriamente la sección de PETICIÓN/PRETENSIONES/RESUELVE.`
     );
 
     if (apiResult && apiResult.length > 200) {
