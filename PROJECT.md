@@ -24,7 +24,8 @@ Iureon es la plataforma B2B SaaS de Inteligencia Artificial y Ecosistema Judicia
 ### 2. Pipeline de Inteligencia Artificial (OpenRouter API) — 3 Motores Exactos
 - **Fase 1 – Ingesta Fáctica**: `google/gemini-3.6-flash` — Análisis de expedientes PDF y extracción de hechos.
 - **Fase 2 – Estructura Dogmática**: `openai/gpt-5.6-sol` — Razonamiento y estructuración procesal.
-- **Fase 3 – Redacción Solemne**: `anthropic/claude-opus-5` — Redacción íntegra del documento según la actuación, rama y tipo seleccionado (60s timeout, 4096 max tokens).
+- **Fase 3 – Redacción Solemne**: `anthropic/claude-opus-5` — Redacción íntegra del documento según la actuación, rama y tipo seleccionado (120s timeout, sin límite de tokens).
+- **Estructura como Guía (no camisa de fuerza)**: Las estructuras por tipo son una guía de referencia; Opus 5 decide la mejor estructura según su criterio jurídico. Solo se exige no omitir la sección de petición/pretensiones/resuelve.
 - **Regla de redacción**: Opus genera EXCLUSIVAMENTE el documento jurídico solicitado, sin meta-comentarios ni advertencias.
 - **Fallback Local**: Si OpenRouter no responde, se genera una plantilla solemne estática colombiana.
 
@@ -37,10 +38,21 @@ Iureon es la plataforma B2B SaaS de Inteligencia Artificial y Ecosistema Judicia
 ### 4. Redacción & Workspace
 - **Panel de Agentes**: `AgentPanelLeft.tsx` — Selección de rama, rol, tipo de documento y prompt.
 - **Lienzo de Documento & PDF**: `DocumentCanvasRight.tsx` / `PdfViewerCanvas.tsx`
+- **Visor de Documento (PdfViewerCanvas)**: Muestra el borrador generado en formato de vista previa de impresión con:
+  - Fuente Times New Roman (estilo judicial)
+  - Zoom (60% – 150%)
+  - Paginación por páginas simuladas
+  - Botón de impresión directa
+  - Toggle entre vista documento y texto plano
 - **Barra de acciones sticky**: "Guardar Borrador", "Mis Borradores", "Pantalla Central" siempre visibles.
 - **Borradores Guardados**: `SavedDraftsModal.tsx`
 
-### 5. Búsqueda & RAG de Jurisprudencia
+### 5. Continuación y Corrección desde Borradores Guardados
+- **Flujo**: El usuario carga un borrador guardado → el panel izquierdo muestra un banner azul "Modo Continuación" → el usuario escribe instrucciones (ej: "ampliar pretensiones", "corregir hechos", "agregar jurisprudencia") → los 3 motores procesan usando el borrador como base → Opus entrega el documento completo corregido/ampliado.
+- **Backend**: `existingDraft` se pasa por el pipeline hasta Opus, que lo recibe como "BORRADOR EXISTENTE" en el system prompt.
+- **UI**: El botón cambia de "Generar Borrador" a "Continuar / Corregir" cuando hay un borrador activo. El placeholder del textarea cambia a instrucciones de continuación.
+
+### 6. Búsqueda & RAG de Jurisprudencia
 - Jurisprudencia de TODAS las Cortes de Colombia:
   - **Corte Constitucional**: Sentencias de tutela (T-), constitucionalidad (C-), unificación (SU-).
   - **Corte Suprema de Justicia**: Salas Civil (SC-), Laboral (SL-), Penal (SP-).
@@ -49,7 +61,11 @@ Iureon es la plataforma B2B SaaS de Inteligencia Artificial y Ecosistema Judicia
 - Clasificación: Sentencias **concedidas**, **negadas**, de **sala**, de **revisión** y de **unificación**.
 - Detección inteligente de temas especiales: tránsito/movilidad, comparendos, fotomultas, reparación directa, etc.
 
-### 6. Herramientas de Cálculo
+### 7. Enseñar Estilo (Aprendizaje de Formato)
+- **"Enseñar estilo"**: Si la firma edita un documento y pulsa el botón, ese formato personalizado (`customFormat`) se guarda y prevalece sobre la guía de referencia en futuras generaciones.
+- **Backend**: `customFormatInstruction` se inyecta en el system prompt con prioridad sobre la estructura por defecto.
+
+### 8. Herramientas de Cálculo
 - Liquidaciones laborales (CST).
 - Intereses de mora y cánones.
 - Términos procesales en días hábiles (CGP / CPTSS).
