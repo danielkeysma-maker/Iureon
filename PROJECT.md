@@ -59,15 +59,18 @@ Cada motor gasta SOLO los tokens de su tarea. No hay redundancia.
 ### 5. Redacción & Workspace
 - **Panel de Agentes**: `AgentPanelLeft.tsx` — Selección de rama, rol, tipo de documento y prompt.
 - **Lienzo de Documento & PDF**: `DocumentCanvasRight.tsx` / `PdfViewerCanvas.tsx`
+- **Título limpio en todos los visores**: Se eliminan automáticamente `(Art. 23 C.P. / Ley 1755...)`, `_EXP-2026-904`, `Redacción_de_`. Ejemplo: `Derecho De Petición`.
 - **Visor de Documento (PdfViewerCanvas)**:
-  - Renderiza `**negritas**` como negritas reales HTML (sin asteriscos visibles).
-  - Limpia automáticamente `##` headings y `---` separadores markdown.
+  - Título limpio (sin artículos de ley ni códigos de expediente).
+  - Renderiza `**negritas**` como negritas reales HTML.
+  - Limpia `##` headings y `---` separadores markdown.
   - Fuente Times New Roman (estilo judicial).
   - Zoom (60% – 150%), paginación, impresión directa, toggle texto plano.
 - **Editor de Borrador (LegalDraftViewer)**:
+  - Título limpio en la barra superior.
   - **Modo Vista** (por defecto): Renderiza negritas reales con `dangerouslySetInnerHTML` + DOMPurify.
   - **Modo Edición**: Toggle a textarea para editar el raw markdown.
-  - Toggle visual en esquina superior derecha del folio: 👁️ Vista Documento / ✏️ Editar Texto.
+  - **Jurisprudencia colapsable**: Panel debajo del documento (cerrado por defecto). Click para expandir sentencias + excepciones. No ocupa espacio de pantalla.
 - **Barra de acciones sticky**: "Guardar Borrador", "Mis Borradores", "Pantalla Central" siempre visibles.
 
 ### 6. Persistencia de Borradores (Multi-Tenant)
@@ -84,7 +87,10 @@ Cada motor gasta SOLO los tokens de su tarea. No hay redundancia.
 - **Los 3 motores adaptan sus prompts**: Gemini identifica cambios (no re-extrae todo), GPT genera esquema de correcciones (no esquema completo), Claude aplica correcciones al borrador existente.
 - **UI**: El botón cambia de "Generar Borrador" a "Continuar / Corregir" cuando hay un borrador activo.
 
-### 8. Exportación con Negritas Reales
+### 8. Exportación con Nomenclatura Limpia y Negritas Reales
+- **Nombre de archivo**: `TipoActuacion_NombreParte_Fecha` (ej: `Derecho_De_Peticion_Juan_Perez_31-Jul-2026.pdf`).
+- **Extracción automática del nombre**: Se extrae el demandante/accionante del output de Gemini (Fase 1).
+- **Limpieza del tipo de documento**: Se eliminan artículos de ley `(Art. 23 C.P.)`, prefijos `Redacción de`, artículos iniciales `La`/`El`.
 - **Word (.docx)**: `**texto**` → `TextRun({ bold: true })`. Cada línea se parsea en segmentos bold/normal.
 - **PDF (.pdf)**: `**texto**` → `doc.setFont('helvetica', 'bold')`. Renderizado segmento a segmento.
 - **Impresión**: `**texto**` → `<strong>` HTML en la ventana de impresión.

@@ -62,14 +62,17 @@
     - Actualizar borrador existente en vez de crear duplicados.
     - Botón "Mis Borradores Guardados" accesible desde la vista vacía del canvas.
 
-13. **📄 Visor de Documento con Negritas Reales**:
+13. **📄 Visor de Documento con Negritas Reales y Título Limpio**:
+    - **Título limpio**: Se eliminan automáticamente artículos de ley `(Art. 23 C.P.)`, prefijos `Redacción de`, y códigos `EXP-2026-904`. Ejemplo: `Derecho De Petición`.
     - **Vista Documento**: Renderiza `**texto**` como negritas reales HTML (sin asteriscos visibles).
     - **Modo Edición**: Toggle para editar el texto raw con asteriscos markdown.
-    - **Visor PDF**: Renderiza negritas reales en la vista previa de impresión.
-    - **Impresión**: Negritas reales en el documento impreso.
+    - **Visor PDF**: Título limpio + negritas reales en la vista previa de impresión.
     - Zoom (60%–150%), paginación, toggle texto plano.
+    - **Jurisprudencia colapsable**: Panel debajo del documento (cerrado por defecto). Click para expandir y ver sentencias + excepciones.
 
-14. **📄 Exportación Word (.docx) & PDF (.pdf) con Negritas Reales**:
+14. **📄 Exportación Word (.docx) & PDF (.pdf) con Nomenclatura Limpia**:
+    - **Nombre de archivo**: `TipoActuacion_NombreParte_Fecha` (ej: `Derecho_De_Peticion_Juan_Perez_31-Jul-2026.pdf`).
+    - Extrae automáticamente el nombre del demandante/accionante del análisis de Gemini.
     - Parseo inteligente de `**texto**` → negritas reales en Word (TextRun bold) y PDF (font bold).
     - Limpieza automática de `##` headings y `---` separadores markdown.
     - Membrete dinámico de la firma cliente.

@@ -27,6 +27,18 @@ export const PdfViewerCanvas: React.FC<PdfViewerCanvasProps> = ({
   const hasFile = !!pdfUrl || !!fileName;
   const isEmpty = !hasDraft && !hasFile;
 
+  // Título limpio: quitar artículos, leyes entre paréntesis, EXP-xxxx
+  const cleanTitle = useMemo(() => {
+    const raw = draftTitle || fileName || 'Documento';
+    return raw
+      .replace(/\s*\(.*?\)\s*/g, '')
+      .replace(/_(Art\..*?)(?=_|$)/g, '')
+      .replace(/_EXP-[\w-]+/g, '')
+      .replace(/^(Redacción_de_|Proyección_de_|Elaboración_de_|Formulación_de_)/i, '')
+      .replace(/_/g, ' ')
+      .trim();
+  }, [draftTitle, fileName]);
+
   // Dividir el texto en "páginas" simuladas de ~3000 caracteres para paginación
   const pages = useMemo(() => {
     if (!draftText) return [''];
@@ -105,7 +117,7 @@ export const PdfViewerCanvas: React.FC<PdfViewerCanvasProps> = ({
           </div>
           <div>
             <h3 className="text-[13px] font-semibold text-slate-900">
-              {hasDraft ? (draftTitle || 'Borrador Jurídico') : (fileName || 'Expediente_Adjunto.pdf')}
+              {hasDraft ? (cleanTitle || 'Borrador Jurídico') : (fileName || 'Expediente_Adjunto.pdf')}
             </h3>
             <p className="text-[11px] text-slate-400 font-medium mt-0.5">
               {hasDraft ? 'Vista Previa de Impresión • Generado por IA' : 'Bóveda Cifrada • Rama Judicial'}
