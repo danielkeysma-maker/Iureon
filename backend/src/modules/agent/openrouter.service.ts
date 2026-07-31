@@ -1045,6 +1045,8 @@ REGLA ABSOLUTA: Responde EXCLUSIVAMENTE con el texto del documento jurídico. Si
 
 REGLA DE COMPLETITUD: El documento DEBE estar COMPLETO de principio a fin hasta la firma. La sección de PETICIÓN/PRETENSIONES/RESUELVE es la MÁS IMPORTANTE — si la omites, el documento es inservible. NUNCA lo dejes incompleto.
 
+REGLA DE FORMATO: NO uses encabezados markdown (##, ###). NO uses separadores (---). USA **negritas** ÚNICAMENTE para: títulos de secciones (I. HECHOS, II. PRETENSIONES, RESUELVE), numerales resolutivos (PRIMERO:, SEGUNDO:), nombres propios de partes y entidades, y términos jurídicos clave como CONCEDER, NEGAR, TUTELAR, ORDENAR. NO pongas **negritas** en párrafos completos ni en texto normal de argumentación.
+
 PERFIL: Abogado litigante senior y redactor judicial de élite en Colombia, 25 años de experiencia ante Corte Constitucional, CSJ, Consejo de Estado y Tribunales.
 ${continuationBlock}
 TAREA: ${existingDraft ? 'Continuar, corregir o proyectar a partir del borrador existente según la indicación del usuario' : 'Redactar ÍNTEGRAMENTE, COMPLETO y listo para firmar'}: "${documentType}".

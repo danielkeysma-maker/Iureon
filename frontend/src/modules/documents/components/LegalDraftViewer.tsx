@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { API_BASE_URL } from '../../../config/api.config';
-import { FileText, Scale, ShieldAlert, Sparkles, CheckCircle2, BrainCircuit, Maximize2, Minimize2, Save, FolderOpen } from 'lucide-react';
+import { FileText, Scale, ShieldAlert, Sparkles, CheckCircle2, BrainCircuit, Maximize2, Minimize2, Save, FolderOpen, Eye, Pencil } from 'lucide-react';
 import { JargonSuggestionModal } from './JargonSuggestionModal';
+import { markdownBoldToHtml } from '../services/documentExport.service';
+import DOMPurify from 'dompurify';
 
 export interface GeneratedDraft {
   title: string;
@@ -33,6 +35,16 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
   const [selectedText, setSelectedText] = useState('');
   const [isJargonModalOpen, setIsJargonModalOpen] = useState(false);
   const [isStyleSaved, setIsStyleSaved] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+
+  // Generar HTML sanitizado con negritas reales para el modo vista
+  const renderedHtml = useMemo(() => {
+    const raw = markdownBoldToHtml(editableText);
+    // Convertir saltos de línea a <br> y preservar párrafos
+    const withBreaks = raw
+      .split('\n\n').map(p => `<p style="margin-bottom:12px;text-align:justify;">${p.replace(/\n/g, '<br/>')}</p>`).join('');
+    return DOMPurify.sanitize(withBreaks);
+  }, [editableText]);
 
   useEffect(() => {
     setEditableText(draft.legalText);
@@ -196,14 +208,38 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
           <span className="font-mono text-[10px] text-slate-400">Edición interactiva</span>
         </div>
 
-        <textarea
-          value={editableText}
-          onChange={(e) => setEditableText(e.target.value)}
-          onMouseUp={handleSelection}
-          onKeyUp={handleSelection}
-          rows={24}
-          className="w-full bg-transparent border-0 focus:outline-none font-legal text-sm sm:text-base leading-relaxed text-slate-900 resize-y selection:bg-blue-100 whitespace-pre-wrap break-words max-w-full overflow-x-hidden min-h-[550px]"
-        />
+        {isEditMode ? (
+          <textarea
+            value={editableText}
+            onChange={(e) => setEditableText(e.target.value)}
+            onMouseUp={handleSelection}
+            onKeyUp={handleSelection}
+            rows={24}
+            className="w-full bg-transparent border-0 focus:outline-none font-legal text-sm sm:text-base leading-relaxed text-slate-900 resize-y selection:bg-blue-100 whitespace-pre-wrap break-words max-w-full overflow-x-hidden min-h-[550px]"
+          />
+        ) : (
+          <div
+            className="font-legal text-sm sm:text-base leading-relaxed text-slate-900 whitespace-pre-wrap break-words max-w-full min-h-[550px] prose prose-slate max-w-none"
+            onMouseUp={handleSelection}
+            dangerouslySetInnerHTML={{ __html: renderedHtml }}
+          />
+        )}
+
+        {/* Toggle Edición / Vista */}
+        <div className="absolute top-3 right-3">
+          <button
+            onClick={() => setIsEditMode(!isEditMode)}
+            className={`px-2.5 py-1.5 rounded-lg text-[10px] font-semibold flex items-center gap-1 transition-all shadow-sm ${
+              isEditMode
+                ? 'bg-amber-100 text-amber-800 border border-amber-300 hover:bg-amber-200'
+                : 'bg-blue-50 text-blue-800 border border-blue-200 hover:bg-blue-100'
+            }`}
+            title={isEditMode ? 'Cambiar a vista formateada' : 'Cambiar a modo edición'}
+          >
+            {isEditMode ? <Eye className="w-3 h-3" /> : <Pencil className="w-3 h-3" />}
+            <span>{isEditMode ? 'Vista Documento' : 'Editar Texto'}</span>
+          </button>
+        </div>
       </div>
     </div>
   );
