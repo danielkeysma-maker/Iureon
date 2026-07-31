@@ -261,10 +261,15 @@ export class OpenRouterService {
       timestamp: new Date().toISOString()
     });
 
-    const titleSanitized = req.documentType.replace(/\s+/g, '_');
+    // ═══════════════════════════════════════════════════════════════════════
+    // GENERAR NOMBRE LIMPIO DEL ARCHIVO
+    // Formato: TipoActuacion_NombreParte_Fecha
+    // Ejemplo: Derecho_de_Peticion_Juan_Perez_31-Jul-2026
+    // ═══════════════════════════════════════════════════════════════════════
+    const cleanDocTitle = this.generateCleanDocumentTitle(req.documentType, geminiExtraction);
 
     return {
-      title: `${titleSanitized}_${req.expedienteId || 'EXP-2026-904'}`,
+      title: cleanDocTitle,
       documentType: req.documentType,
       jurisprudenciaCitada: jurisprudenciaEncontrada,
       excepcionesFormuladas: isTutela
@@ -273,6 +278,61 @@ export class OpenRouterService {
       legalText: finalDraftText,
       tokensConsumed: 4820
     };
+  }
+
+  /**
+   * Genera un nombre limpio para el archivo del documento.
+   * Formato: TipoActuacion_NombreParte_Fecha
+   * Ejemplo: Derecho_de_Peticion_Juan_Perez_31-Jul-2026
+   */
+  private generateCleanDocumentTitle(documentType: string, geminiExtraction: string): string {
+    // 1. Limpiar el tipo de documento
+    let cleanType = documentType
+      // Quitar artículos y leyes entre paréntesis: (Art. 23 C.P. / Ley 1755...)
+      .replace(/\s*\(.*?\)\s*/g, '')
+      // Quitar "Redacción de", "Proyección de", "Elaboración de"
+      .replace(/^(redacción de|proyección de|elaboración de|formulación de)\s*/i, '')
+      // Quitar artículos iniciales
+      .replace(/^(la|el|los|las|un|una|del)\s+/i, '')
+      .trim();
+
+    // Capitalizar cada palabra
+    cleanType = cleanType
+      .split(/\s+/)
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+      .join('_');
+
+    // 2. Extraer nombre del demandante/accionante de la extracción de Gemini
+    let partyName = '';
+    if (geminiExtraction) {
+      // Buscar patrones comunes: "Demandante: Juan Pérez", "Accionante: María López"
+      const partyPatterns = [
+        /(?:demandante|accionante|peticionario|solicitante|actor|recurrente|apelante|querellante)\s*[:—\-–]\s*([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+){0,3})/i,
+        /(?:señor(?:a)?|el ciudadano|la ciudadana)\s+([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+){0,3})/i
+      ];
+
+      for (const pattern of partyPatterns) {
+        const match = geminiExtraction.match(pattern);
+        if (match && match[1]) {
+          // Tomar máximo 2 palabras del nombre para no hacer el archivo muy largo
+          const nameParts = match[1].trim().split(/\s+/).slice(0, 2);
+          partyName = nameParts.join('_');
+          break;
+        }
+      }
+    }
+
+    // 3. Fecha en formato legible
+    const now = new Date();
+    const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const dateStr = `${now.getDate()}-${months[now.getMonth()]}-${now.getFullYear()}`;
+
+    // 4. Combinar: TipoActuacion_NombreParte_Fecha
+    const parts = [cleanType];
+    if (partyName) parts.push(partyName);
+    parts.push(dateStr);
+
+    return parts.join('_');
   }
 
   private async callOpenRouterModel(requestedModels: string[], systemPrompt: string, userPrompt: string, maxTokensOverride?: number): Promise<string> {

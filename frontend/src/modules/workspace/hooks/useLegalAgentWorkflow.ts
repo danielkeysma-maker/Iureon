@@ -77,10 +77,22 @@ export function useLegalAgentWorkflow(firmId?: string) {
     e.preventDefault();
     if (!legalPrompt.trim() || isProcessing) return;
 
-    setIsProcessing(true);
-    setRightView('draft');
+    // Generar título limpio temporal: TipoActuacion_Fecha
+    const cleanType = documentType
+      .replace(/\s*\(.*?\)\s*/g, '')
+      .replace(/^(redacción de|proyección de|elaboración de|formulación de)\s*/i, '')
+      .replace(/^(la|el|los|las|un|una|del)\s+/i, '')
+      .trim()
+      .split(/\s+/)
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+      .join('_');
+    const months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    const now = new Date();
+    const dateStr = `${now.getDate()}-${months[now.getMonth()]}-${now.getFullYear()}`;
+    const tempTitle = `${cleanType}_${dateStr}`;
+
     setGeneratedDraft({
-      title: `${documentType.replace(/\s+/g, '_')}_EXP-2026-904`,
+      title: tempTitle,
       documentType: documentType,
       jurisprudenciaCitada: ['Corte Constitucional / CSJ / Consejo de Estado'],
       excepcionesFormuladas: ['Revisión Procesal en Curso'],
