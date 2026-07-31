@@ -1,5 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { FileText, ZoomIn, ZoomOut, ChevronLeft, ChevronRight, Eye, UploadCloud, Printer } from 'lucide-react';
+import { markdownBoldToHtml } from '../services/documentExport.service';
+import DOMPurify from 'dompurify';
 
 interface PdfViewerCanvasProps {
   fileName?: string;
@@ -29,9 +31,13 @@ export const PdfViewerCanvas: React.FC<PdfViewerCanvasProps> = ({
   const pages = useMemo(() => {
     if (!draftText) return [''];
     const pageSize = 3000;
+    // Limpiar markdown: ## headings → texto plano, --- → eliminar
+    const cleaned = draftText
+      .replace(/^#{1,6}\s+/gm, '')
+      .replace(/^-{3,}$/gm, '');
     return Array.from(
-      { length: Math.ceil(draftText.length / pageSize) },
-      (_, i) => draftText.slice(i * pageSize, (i + 1) * pageSize)
+      { length: Math.ceil(cleaned.length / pageSize) },
+      (_, i) => cleaned.slice(i * pageSize, (i + 1) * pageSize)
     );
   }, [draftText]);
 
@@ -41,16 +47,21 @@ export const PdfViewerCanvas: React.FC<PdfViewerCanvasProps> = ({
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
     const content = draftText || '';
+    // Convertir **negritas** a <strong> para impresión y limpiar ## y ---
+    const htmlContent = markdownBoldToHtml(content)
+      .split('\n\n').map(p => `<p style="margin-bottom:10px;text-align:justify;">${p.replace(/\n/g, '<br/>')}</p>`).join('');
     printWindow.document.write(`
       <html>
         <head>
           <title>${draftTitle || 'Documento Jurídico'}</title>
           <style>
             @page { margin: 2.54cm; }
-            body { font-family: 'Times New Roman', Times, serif; font-size: 12pt; line-height: 1.8; color: #000; white-space: pre-wrap; }
+            body { font-family: 'Times New Roman', Times, serif; font-size: 12pt; line-height: 1.8; color: #000; }
+            strong { font-weight: bold; }
+            p { margin: 0; }
           </style>
         </head>
-        <body>${content.replace(/\n/g, '<br/>')}</body>
+        <body>${htmlContent}</body>
       </html>
     `);
     printWindow.document.close();
@@ -156,16 +167,20 @@ export const PdfViewerCanvas: React.FC<PdfViewerCanvasProps> = ({
         {viewMode === 'document' ? (
           hasDraft ? (
             <div
-              className="text-slate-900 leading-[1.8] whitespace-pre-wrap transition-all duration-200"
+              className="text-slate-900 leading-[1.8] transition-all duration-200"
               style={{
                 fontFamily: "'Times New Roman', Times, serif",
                 fontSize: `${Math.round(12 * zoomLevel / 100)}px`,
                 padding: `${Math.round(48 * zoomLevel / 100)}px ${Math.round(64 * zoomLevel / 100)}px`,
                 transformOrigin: 'top center'
               }}
-            >
-              {pages[currentPage - 1]}
-            </div>
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(
+                  markdownBoldToHtml(pages[currentPage - 1])
+                    .split('\n\n').map(p => `<p style="margin-bottom:10px;text-align:justify;">${p.replace(/\n/g, '<br/>')}</p>`).join('')
+                )
+              }}
+            />
           ) : pdfUrl ? (
             <iframe src={pdfUrl} title="Visor PDF Integrado" className="w-full h-[600px] border-0 rounded-lg" />
           ) : (

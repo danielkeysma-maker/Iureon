@@ -18,41 +18,80 @@ Iureon es la plataforma B2B SaaS de Inteligencia Artificial y Ecosistema Judicia
   - `👤 Abogado Particular (Sin Firma - Uso Personal)`
   - `🏢 Firma Cliente (NIT ...)`
 - **Protección por Modales de Confirmación**: Todas las operaciones destructivas o de edición (crear/editar/eliminar firmas y usuarios, así como el Cierre de Sesión) están protegidas por `ActionConfirmationModal.tsx`.
-- **Modelo Económico**: Recarga de Créditos Procesales (COP $) sin cuotas de suscripción fijas ficticias (`FirmCreditsRechargeModal.tsx`).
 - **Despliegue Obligatorio vía Git**: Todo cambio realizado en la plataforma debe empaquetarse y desplegarse inmediatamente a producción usando Git (`git add .`, `git commit`, `git push origin main`).
 
-### 2. Pipeline de Inteligencia Artificial (OpenRouter API) — 3 Motores Exactos
-- **Fase 1 – Ingesta Fáctica**: `google/gemini-3.6-flash` — Análisis de expedientes PDF y extracción de hechos.
-- **Fase 2 – Estructura Dogmática**: `openai/gpt-5.6-sol` — Razonamiento y estructuración procesal.
-- **Fase 3 – Redacción Solemne**: `anthropic/claude-opus-5` — Redacción íntegra del documento según la actuación, rama y tipo seleccionado (120s timeout, sin límite de tokens).
-- **Estructura como Guía (no camisa de fuerza)**: Las estructuras por tipo son una guía de referencia; Opus 5 decide la mejor estructura según su criterio jurídico. Solo se exige no omitir la sección de petición/pretensiones/resuelve.
-- **Regla de redacción**: Opus genera EXCLUSIVAMENTE el documento jurídico solicitado, sin meta-comentarios ni advertencias.
+### 2. Modelo Económico de Créditos
+- **Sin suscripciones**: Modelo pay-as-you-go con recarga de créditos en COP $.
+- **Costo por borrador**: $2.000 COP por cada generación de documento con IA. Se descuenta automáticamente del saldo.
+- **Saldo en tiempo real**: `SidebarLeft.tsx` muestra el saldo actual de la firma sin fallbacks ficticios (`?? 0` en vez de `|| 500000`).
+- **Recarga**: `FirmCreditsRechargeModal.tsx` (integración futura con Wompi / PSE / Nequi / Tarjeta).
+- **Persistencia**: El saldo se actualiza en React state y localStorage por firma.
+
+### 3. Pipeline de Inteligencia Artificial (OpenRouter API) — 3 Motores
+
+Cada motor gasta SOLO los tokens de su tarea. No hay redundancia.
+
+#### Modo Nuevo (sin borrador):
+| Motor | Tarea | max_tokens |
+|---|---|---|
+| **Gemini 3.6 Flash** | Extraer hechos, partes y pretensiones en lista concisa | 1024 |
+| **GPT-5.6 Sol** | Esquema dogmático: problema jurídico, excepciones, normas, estrategia | 1536 |
+| **Claude Opus 5** | Redactar documento jurídico COMPLETO y solemne | Sin límite |
+
+#### Modo Continuación (con borrador cargado):
+| Motor | Tarea | max_tokens |
+|---|---|---|
+| **Gemini 3.6 Flash** | Identificar SOLO qué cambiar (máx. 5 puntos) | 768 |
+| **GPT-5.6 Sol** | Esquema de CORRECCIONES (no completo) | 1024 |
+| **Claude Opus 5** | Aplicar correcciones al borrador existente | Sin límite |
+
+- **Regla de formato para Claude**: NO usar `##` headings markdown ni `---` separadores. Usar `**negritas**` ÚNICAMENTE para: títulos de secciones, numerales resolutivos (PRIMERO:, SEGUNDO:), nombres propios y verbos clave (CONCEDER, NEGAR, TUTELAR, ORDENAR).
+- **Estructura como Guía**: Las estructuras por tipo son una guía de referencia; Opus 5 decide la mejor estructura según su criterio jurídico.
+- **Cadena de datos**: Gemini → GPT recibe output de Gemini → Claude recibe output de Gemini + esquema de GPT.
 - **Fallback Local**: Si OpenRouter no responde, se genera una plantilla solemne estática colombiana.
 
-### 3. Tipos de Actuaciones por Rama del Derecho
+### 4. Tipos de Actuaciones por Rama del Derecho
 - **10 Ramas**: Constitucional, Laboral, Civil, Administrativo, Penal, Familia, Pequeñas Causas, Tributario, Societario, Internacional.
 - **2 Roles de actuación**: Firma Litigante (demandas, recursos, contestaciones) y Juzgado/Despacho (proyecciones de sentencia, autos).
 - **Derecho de Petición (Ley 1755/2015)**: Disponible en TODAS las ramas del derecho como actuación del litigante.
 - **El documento generado se adapta al tipo de actuación, la rama y el tipo seleccionado.**
 
-### 4. Redacción & Workspace
+### 5. Redacción & Workspace
 - **Panel de Agentes**: `AgentPanelLeft.tsx` — Selección de rama, rol, tipo de documento y prompt.
 - **Lienzo de Documento & PDF**: `DocumentCanvasRight.tsx` / `PdfViewerCanvas.tsx`
-- **Visor de Documento (PdfViewerCanvas)**: Muestra el borrador generado en formato de vista previa de impresión con:
-  - Fuente Times New Roman (estilo judicial)
-  - Zoom (60% – 150%)
-  - Paginación por páginas simuladas
-  - Botón de impresión directa
-  - Toggle entre vista documento y texto plano
+- **Visor de Documento (PdfViewerCanvas)**:
+  - Renderiza `**negritas**` como negritas reales HTML (sin asteriscos visibles).
+  - Limpia automáticamente `##` headings y `---` separadores markdown.
+  - Fuente Times New Roman (estilo judicial).
+  - Zoom (60% – 150%), paginación, impresión directa, toggle texto plano.
+- **Editor de Borrador (LegalDraftViewer)**:
+  - **Modo Vista** (por defecto): Renderiza negritas reales con `dangerouslySetInnerHTML` + DOMPurify.
+  - **Modo Edición**: Toggle a textarea para editar el raw markdown.
+  - Toggle visual en esquina superior derecha del folio: 👁️ Vista Documento / ✏️ Editar Texto.
 - **Barra de acciones sticky**: "Guardar Borrador", "Mis Borradores", "Pantalla Central" siempre visibles.
-- **Borradores Guardados**: `SavedDraftsModal.tsx`
 
-### 5. Continuación y Corrección desde Borradores Guardados
-- **Flujo**: El usuario carga un borrador guardado → el panel izquierdo muestra un banner azul "Modo Continuación" → el usuario escribe instrucciones (ej: "ampliar pretensiones", "corregir hechos", "agregar jurisprudencia") → los 3 motores procesan usando el borrador como base → Opus entrega el documento completo corregido/ampliado.
-- **Backend**: `existingDraft` se pasa por el pipeline hasta Opus, que lo recibe como "BORRADOR EXISTENTE" en el system prompt.
-- **UI**: El botón cambia de "Generar Borrador" a "Continuar / Corregir" cuando hay un borrador activo. El placeholder del textarea cambia a instrucciones de continuación.
+### 6. Persistencia de Borradores (Multi-Tenant)
+- **API Backend**: Tabla `saved_drafts` en Supabase con RLS por `firm_id`.
+  - Endpoints: `GET/POST/PUT/DELETE /api/drafts`
+  - Middleware: `x-firm-id` header para aislamiento multi-tenant.
+- **localStorage fallback**: Clave scoped `iureon_saved_drafts_{firmId}_{email}`.
+- **Migración automática**: Borradores de la clave global antigua (`iureon_saved_drafts`) se migran al nuevo scope al primer login.
+- **Actualizar vs. Duplicar**: Si abres un borrador guardado y lo editas, "Guardar" actualiza el mismo (PUT) en vez de crear nuevo (POST).
+- **Botón "Mis Borradores Guardados"**: Accesible desde la vista vacía del canvas sin necesidad de tener borrador activo.
 
-### 6. Búsqueda & RAG de Jurisprudencia
+### 7. Continuación y Corrección desde Borradores Guardados
+- **Flujo**: El usuario carga un borrador guardado → el panel izquierdo muestra un banner azul "Modo Continuación" → el usuario escribe instrucciones (ej: "ampliar pretensiones", "corregir hechos", "agregar jurisprudencia") → los 3 motores procesan con prompts adaptativos al modo continuación → Opus entrega el documento completo corregido/ampliado.
+- **Los 3 motores adaptan sus prompts**: Gemini identifica cambios (no re-extrae todo), GPT genera esquema de correcciones (no esquema completo), Claude aplica correcciones al borrador existente.
+- **UI**: El botón cambia de "Generar Borrador" a "Continuar / Corregir" cuando hay un borrador activo.
+
+### 8. Exportación con Negritas Reales
+- **Word (.docx)**: `**texto**` → `TextRun({ bold: true })`. Cada línea se parsea en segmentos bold/normal.
+- **PDF (.pdf)**: `**texto**` → `doc.setFont('helvetica', 'bold')`. Renderizado segmento a segmento.
+- **Impresión**: `**texto**` → `<strong>` HTML en la ventana de impresión.
+- **Limpieza automática**: `##` headings → texto plano, `---` → eliminados.
+- Membrete dinámico de la firma cliente en header/footer.
+
+### 9. Búsqueda & RAG de Jurisprudencia
 - Jurisprudencia de TODAS las Cortes de Colombia:
   - **Corte Constitucional**: Sentencias de tutela (T-), constitucionalidad (C-), unificación (SU-).
   - **Corte Suprema de Justicia**: Salas Civil (SC-), Laboral (SL-), Penal (SP-).
@@ -61,11 +100,11 @@ Iureon es la plataforma B2B SaaS de Inteligencia Artificial y Ecosistema Judicia
 - Clasificación: Sentencias **concedidas**, **negadas**, de **sala**, de **revisión** y de **unificación**.
 - Detección inteligente de temas especiales: tránsito/movilidad, comparendos, fotomultas, reparación directa, etc.
 
-### 7. Enseñar Estilo (Aprendizaje de Formato)
+### 10. Enseñar Estilo (Aprendizaje de Formato)
 - **"Enseñar estilo"**: Si la firma edita un documento y pulsa el botón, ese formato personalizado (`customFormat`) se guarda y prevalece sobre la guía de referencia en futuras generaciones.
 - **Backend**: `customFormatInstruction` se inyecta en el system prompt con prioridad sobre la estructura por defecto.
 
-### 8. Herramientas de Cálculo
+### 11. Herramientas de Cálculo
 - Liquidaciones laborales (CST).
 - Intereses de mora y cánones.
 - Términos procesales en días hábiles (CGP / CPTSS).
