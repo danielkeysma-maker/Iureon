@@ -114,43 +114,73 @@ export function App() {
   };
 
   // ═══ Clave de localStorage scoped por firma+usuario ═══
-  const draftsStorageKey = `iureon_saved_drafts_${activeFirm.id}_${currentUserEmail}`;
+  const draftsStorageKey = `iureon_saved_drafts_${activeFirm.id || 'superuser'}_${currentUserEmail}`;
 
   // ═══ Cargar borradores desde API (Supabase) o localStorage fallback ═══
   const loadDraftsFromSource = useCallback(async () => {
-    if (!activeFirm.id || !currentUserEmail) {
+    if (!currentUserEmail) {
       setSavedDrafts([]);
       return;
     }
 
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/drafts?userEmail=${encodeURIComponent(currentUserEmail)}`, {
-        headers: { 'x-firm-id': activeFirm.id }
-      });
-      const json = await res.json();
-      if (json.success && json.drafts?.length > 0) {
-        const mapped: SavedDraftEntry[] = json.drafts.map((d: any) => ({
-          id: d.id,
-          savedAt: new Date(d.updated_at || d.saved_at).toLocaleDateString('es-CO', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
-          draft: {
-            title: d.title,
-            documentType: d.document_type,
-            legalText: d.legal_text,
-            jurisprudenciaCitada: d.jurisprudencia_citada || [],
-            excepcionesFormuladas: d.excepciones_formuladas || [],
-            tokensConsumed: d.tokens_consumed || 0
-          }
-        }));
-        setSavedDrafts(mapped);
-        return;
+    // Intentar API si hay firmId
+    if (activeFirm.id) {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/drafts?userEmail=${encodeURIComponent(currentUserEmail)}`, {
+          headers: { 'x-firm-id': activeFirm.id }
+        });
+        const json = await res.json();
+        if (json.success && json.drafts?.length > 0) {
+          const mapped: SavedDraftEntry[] = json.drafts.map((d: any) => ({
+            id: d.id,
+            savedAt: new Date(d.updated_at || d.saved_at).toLocaleDateString('es-CO', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+            draft: {
+              title: d.title,
+              documentType: d.document_type,
+              legalText: d.legal_text,
+              jurisprudenciaCitada: d.jurisprudencia_citada || [],
+              excepcionesFormuladas: d.excepciones_formuladas || [],
+              tokensConsumed: d.tokens_consumed || 0
+            }
+          }));
+          setSavedDrafts(mapped);
+          return;
+        }
+      } catch {
+        // API no disponible — usar localStorage
       }
-    } catch {
-      // API no disponible — usar localStorage
     }
 
+    // Fallback: localStorage con clave scoped
     try {
+      let drafts: SavedDraftEntry[] = [];
       const stored = localStorage.getItem(draftsStorageKey);
-      setSavedDrafts(stored ? JSON.parse(stored) : []);
+      if (stored) {
+        drafts = JSON.parse(stored);
+      }
+
+      // Migrar borradores antiguos de la clave global (solo una vez)
+      const oldGlobalKey = 'iureon_saved_drafts';
+      const oldStored = localStorage.getItem(oldGlobalKey);
+      if (oldStored) {
+        try {
+          const oldDrafts: SavedDraftEntry[] = JSON.parse(oldStored);
+          if (oldDrafts.length > 0) {
+            // Merge sin duplicados (por id)
+            const existingIds = new Set(drafts.map(d => d.id));
+            const newDrafts = oldDrafts.filter(d => !existingIds.has(d.id));
+            drafts = [...newDrafts, ...drafts];
+            // Guardar en nueva clave y limpiar la antigua
+            localStorage.setItem(draftsStorageKey, JSON.stringify(drafts));
+            localStorage.removeItem(oldGlobalKey);
+            console.log(`[DRAFTS] Migrados ${newDrafts.length} borradores de clave global a ${draftsStorageKey}`);
+          }
+        } catch {
+          // Error en migración, no bloquear
+        }
+      }
+
+      setSavedDrafts(drafts);
     } catch {
       setSavedDrafts([]);
     }

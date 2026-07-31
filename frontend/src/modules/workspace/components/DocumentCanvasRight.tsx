@@ -4,7 +4,7 @@ import { LegalDraftViewer } from '../../documents/components/LegalDraftViewer';
 import type { GeneratedDraft } from '../../documents/components/LegalDraftViewer';
 import { PrecedentsAnalyticsCard } from '../../precedents/components/PrecedentsAnalyticsCard';
 import type { CaseProvidenciaEvaluationData } from '../../precedents/components/PrecedentsAnalyticsCard';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, FolderOpen } from 'lucide-react';
 
 interface DocumentCanvasRightProps {
   rightView: 'pdf' | 'draft' | 'analytics';
@@ -62,6 +62,16 @@ export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
                     Escriba su indicación o hechos en el orquestador de la izquierda y haga clic en <strong>Generar Borrador</strong> para redactar la providencia.
                   </p>
                 </div>
+
+                {onOpenSavedDraftsModal && (
+                  <button
+                    onClick={onOpenSavedDraftsModal}
+                    className="mt-3 px-5 py-2.5 bg-blue-950 hover:bg-blue-900 text-white rounded-xl text-xs font-bold flex items-center gap-2 mx-auto transition-colors shadow-sm"
+                  >
+                    <FolderOpen className="w-4 h-4" />
+                    <span>Mis Borradores Guardados</span>
+                  </button>
+                )}
               </div>
             </div>
           )
