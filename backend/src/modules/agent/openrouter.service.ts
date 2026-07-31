@@ -39,23 +39,31 @@ export class OpenRouterService {
   ) {
     const startTime = Date.now();
 
-    // Stage 1: Gemini 3.6 Flash
+    // ═══════════════════════════════════════════════════════════════════════
+    // FASE 1: GEMINI 3.6 FLASH — Solo extracción de hechos (tokens mínimos)
+    // Tarea: Leer la indicación del usuario y extraer hechos, partes y pretensiones
+    // en formato conciso. NO redacta ni estructura — solo extrae.
+    // max_tokens: 1024 (respuesta corta y estructurada)
+    // ═══════════════════════════════════════════════════════════════════════
     onStepLog({
       stage: 'STAGE_1_INGESTION',
       engine: 'GEMINI',
-      message: `[Gemini 3.6 Flash] Ingestando expediente, indicación e insumos procesales para ${req.documentType}...`,
+      message: `[Gemini 3.6 Flash] Extracción de hechos fácticos, partes procesales y pretensiones del caso...`,
       timestamp: new Date().toISOString()
     });
 
     const geminiPrompt = req.existingDraft
-      ? `${req.legalPrompt}\n\n--- BORRADOR EXISTENTE PARA CONTINUAR/CORREGIR ---\n${req.existingDraft.substring(0, 4000)}`
+      ? `${req.legalPrompt}\n\n--- BORRADOR EXISTENTE ---\n${req.existingDraft.substring(0, 3000)}`
       : req.legalPrompt;
 
     const geminiExtraction = await this.callOpenRouterModel(
       ['google/gemini-3.6-flash'],
-      `Procesador fáctico de la Rama Judicial. Extrae los hechos relevantes, pretensiones y partes para: ${req.documentType}`,
-      geminiPrompt
+      `Eres un procesador fáctico judicial. Tu ÚNICA tarea es extraer en formato de lista concisa:\n1. HECHOS RELEVANTES (máximo 8 puntos)\n2. PARTES PROCESALES (demandante/accionante, demandado/accionado)\n3. PRETENSIONES (lo que se pide)\n4. TIPO DE PROCESO: ${req.documentType}\n\nResponde SOLO con la extracción. Sin comentarios, sin redacción, sin encabezados solemnes. Máximo 500 palabras.`,
+      geminiPrompt,
+      1024
     );
+
+    console.log(`[PIPELINE] Gemini 3.6 Flash: ${geminiExtraction.length} caracteres extraídos.`);
 
     // Stage 1.5: RAG Vector Search — Jurisprudencia de TODAS las Cortes (CC, CSJ, CE, Tribunales)
     // Incluye sentencias de sala, sentencias de revisión, fallos concedidos y negados (no solo unificación)
@@ -176,26 +184,35 @@ export class OpenRouterService {
       data: { jurisprudencia: jurisprudenciaEncontrada }
     });
 
-    // Stage 2: GPT-5.6 Sol — recibe los hechos extraídos por Gemini como input
+    // ═══════════════════════════════════════════════════════════════════════
+    // FASE 2: GPT-5.6 SOL — Solo esquema dogmático (tokens moderados)
+    // Tarea: Recibir hechos de Gemini + jurisprudencia RAG y producir:
+    //   - Problema jurídico
+    //   - Excepciones aplicables
+    //   - Esquema procesal (estructura del documento)
+    // NO redacta el documento — solo estructura.
+    // max_tokens: 1536 (esquema conciso, no prosa larga)
+    // ═══════════════════════════════════════════════════════════════════════
     onStepLog({
       stage: 'STAGE_2_LOGIC',
       engine: 'GPT',
-      message: `[GPT-5.6 Sol] Estructuración procesal dogmática y formulación de estrategia jurídica para ${req.documentType}. Hechos de Gemini: ${geminiExtraction.length} caracteres.`,
+      message: `[GPT-5.6 Sol] Formulación del problema jurídico y esquema dogmático para ${req.documentType}...`,
       timestamp: new Date().toISOString()
     });
 
     const gptStructure = await this.callOpenRouterModel(
       ['openai/gpt-5.6-sol'],
-      `Eres un abogado estructurador procesal senior de Colombia. Tu tarea es tomar los hechos fácticos extraídos por el motor de ingesta y crear el esquema dogmático procesal para: ${req.documentType}. Debes formular el problema jurídico, las excepciones aplicables y la estrategia de sustentación conforme al ordenamiento jurídico colombiano.`,
-      `HECHOS FÁCTICOS EXTRAÍDOS POR MOTOR DE INGESTA:\n${geminiExtraction || req.legalPrompt}\n\nJURISPRUDENCIA ENCONTRADA EN RAG:\n${jurisprudenciaEncontrada.join('\n')}\n\nINDICACIÓN ORIGINAL DEL USUARIO: ${req.legalPrompt}\n\nGenera el esquema dogmático, problema jurídico y estrategia procesal.`
+      `Eres un estructurador procesal senior de Colombia. Tu ÚNICA tarea es producir un ESQUEMA CONCISO con:\n1. PROBLEMA JURÍDICO (1-2 oraciones)\n2. EXCEPCIONES O DEFENSAS APLICABLES (lista)\n3. NORMAS CLAVE (artículos específicos)\n4. ESTRATEGIA DE SUSTENTACIÓN (enfoque argumentativo)\n\nNO redactes el documento final. Solo entrega el esquema estructurado. Máximo 600 palabras.`,
+      `HECHOS EXTRAÍDOS POR GEMINI:\n${geminiExtraction || req.legalPrompt}\n\nJURISPRUDENCIA RAG:\n${jurisprudenciaEncontrada.join('\n')}\n\nTIPO DE DOCUMENTO: ${req.documentType}`,
+      1536
     );
 
-    console.log(`[OPENROUTER] GPT-5.6 Sol respondió con ${gptStructure.length} caracteres.`);
+    console.log(`[PIPELINE] GPT-5.6 Sol: ${gptStructure.length} caracteres de esquema.`);
 
     onStepLog({
       stage: 'STAGE_2_LOGIC',
       engine: 'GPT',
-      message: `[GPT Router] Esquema dogmático y pretensiones consolidadas (${gptStructure.length} caracteres).`,
+      message: `[GPT Router] Esquema dogmático consolidado (${gptStructure.length} caracteres).`,
       timestamp: new Date().toISOString()
     });
 
@@ -209,13 +226,20 @@ export class OpenRouterService {
       timestamp: new Date().toISOString()
     });
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // FASE 3: CLAUDE OPUS 5 — Redacción solemne final (tokens libres)
+    // Tarea: Recibir esquema de GPT + hechos de Gemini y redactar el
+    // documento jurídico COMPLETO con lenguaje procesal colombiano.
+    // max_tokens: sin límite (necesita espacio para documento completo)
+    // ═══════════════════════════════════════════════════════════════════════
     const finalDraftText = await this.generateClaudeOpusDraft(
       req.documentType,
       req.legalPrompt,
       geminiExtraction,
       jurisprudenciaEncontrada,
       req.customFormatInstruction,
-      req.existingDraft
+      req.existingDraft,
+      gptStructure
     );
 
     onStepLog({
@@ -239,7 +263,7 @@ export class OpenRouterService {
     };
   }
 
-  private async callOpenRouterModel(requestedModels: string[], systemPrompt: string, userPrompt: string): Promise<string> {
+  private async callOpenRouterModel(requestedModels: string[], systemPrompt: string, userPrompt: string, maxTokensOverride?: number): Promise<string> {
     const apiKey = process.env.OPENROUTER_API_KEY || config.openRouter.apiKey;
 
     if (!apiKey) {
@@ -258,11 +282,17 @@ export class OpenRouterService {
     const isOpus = model.includes('claude-opus');
     const timeoutMs = isOpus ? 120000 : 20000;
 
+    // Token budget por motor:
+    // Gemini Flash: 1024 (solo extracción de hechos)
+    // GPT Sol: 1536 (solo esquema dogmático)
+    // Claude Opus: sin límite (redacción completa del documento)
+    const resolvedMaxTokens = maxTokensOverride ?? (isOpus ? undefined : 2048);
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
-      console.log(`[OPENROUTER] Llamando a ${model} (timeout: ${timeoutMs / 1000}s)`);
+      console.log(`[OPENROUTER] Llamando a ${model} (timeout: ${timeoutMs / 1000}s, max_tokens: ${resolvedMaxTokens ?? 'unlimited'})`);
       const response = await fetch(`${this.baseUrl}/chat/completions`, {
         method: 'POST',
         signal: controller.signal,
@@ -276,7 +306,7 @@ export class OpenRouterService {
           model: model,
           messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
           temperature: 0.2,
-          max_tokens: isOpus ? undefined : 2048
+          max_tokens: resolvedMaxTokens
         })
       });
 
@@ -307,7 +337,8 @@ export class OpenRouterService {
     facts: string,
     citations: string[],
     customFormat?: string,
-    existingDraft?: string
+    existingDraft?: string,
+    gptSchemaOutput?: string
   ): Promise<string> {
     // ═══════════════════════════════════════════════════════════════════════
     // MAPA DE ESTRUCTURA EXACTA POR TIPO DE DOCUMENTO
@@ -1015,9 +1046,14 @@ JURISPRUDENCIA: ${citations.join('; ')}.
 ${customFormat ? `⚠️ LA FIRMA HA PERSONALIZADO EL FORMATO — USA ESTE FORMATO POR ENCIMA DEL DEFAULT:\n${customFormat}` : `GUÍA DE REFERENCIA para "${documentType}" (usa tu criterio jurídico para estructurar el documento como mejor corresponda según la práctica procesal colombiana, pero asegúrate de NO OMITIR la sección de petición/pretensiones/resuelve):\n${estructuraObligatoria}`}
     `;
 
+    // Claude recibe el esquema de GPT como contexto principal para no reprocesar
+    const schemaBlock = gptSchemaOutput
+      ? `\nESQUEMA DOGMÁTICO (generado por GPT-5.6 Sol — úsalo como guía de estructura):\n${gptSchemaOutput}\n`
+      : '';
+
     const userMessage = existingDraft
-      ? `Instrucción del usuario: "${prompt}". Insumos fácticos: ${facts}. Jurisprudencia: ${citations.join('; ')}. Toma el borrador existente como base y aplica las correcciones o continuaciones que el usuario indica. Entrega el documento COMPLETO resultante.`
-      : `Genera el documento jurídico "${documentType}" COMPLETO hasta la firma. Hechos: "${prompt}". Insumos fácticos: ${facts}. Jurisprudencia: ${citations.join('; ')}. El documento debe estar COMPLETO incluyendo la sección de PETICIÓN/PRETENSIONES/RESUELVE.`;
+      ? `Instrucción del usuario: "${prompt}".${schemaBlock}Insumos fácticos de Gemini: ${facts}. Jurisprudencia: ${citations.join('; ')}. Toma el borrador existente como base y aplica las correcciones. Entrega el documento COMPLETO resultante.`
+      : `Genera el documento jurídico "${documentType}" COMPLETO hasta la firma.${schemaBlock}Hechos extraídos por Gemini: ${facts}. Jurisprudencia: ${citations.join('; ')}. El documento debe estar COMPLETO incluyendo PETICIÓN/PRETENSIONES/RESUELVE.`;
 
     const apiResult = await this.callOpenRouterModel(
       ['anthropic/claude-opus-5'],
