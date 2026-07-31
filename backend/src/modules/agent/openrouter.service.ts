@@ -53,14 +53,18 @@ export class OpenRouterService {
     });
 
     const geminiPrompt = req.existingDraft
-      ? `${req.legalPrompt}\n\n--- BORRADOR EXISTENTE ---\n${req.existingDraft.substring(0, 3000)}`
+      ? `${req.legalPrompt}\n\n--- BORRADOR EXISTENTE (primeros 3000 caracteres) ---\n${req.existingDraft.substring(0, 3000)}`
       : req.legalPrompt;
+
+    const geminiSystemPrompt = req.existingDraft
+      ? `Eres un analista judicial. Ya existe un borrador de "${req.documentType}". El usuario quiere CONTINUARLO o CORREGIRLO. Tu tarea es identificar SOLO:\n1. QUÉ PIDE EL USUARIO que se cambie/agregue/corrija (máximo 5 puntos)\n2. SECCIONES AFECTADAS del borrador existente\n3. DATOS FÁCTICOS NUEVOS si los hay\n\nNO repitas los hechos que ya están en el borrador. Solo identifica los cambios solicitados. Máximo 300 palabras.`
+      : `Eres un procesador fáctico judicial. Tu ÚNICA tarea es extraer en formato de lista concisa:\n1. HECHOS RELEVANTES (máximo 8 puntos)\n2. PARTES PROCESALES (demandante/accionante, demandado/accionado)\n3. PRETENSIONES (lo que se pide)\n4. TIPO DE PROCESO: ${req.documentType}\n\nResponde SOLO con la extracción. Sin comentarios, sin redacción, sin encabezados solemnes. Máximo 500 palabras.`;
 
     const geminiExtraction = await this.callOpenRouterModel(
       ['google/gemini-3.6-flash'],
-      `Eres un procesador fáctico judicial. Tu ÚNICA tarea es extraer en formato de lista concisa:\n1. HECHOS RELEVANTES (máximo 8 puntos)\n2. PARTES PROCESALES (demandante/accionante, demandado/accionado)\n3. PRETENSIONES (lo que se pide)\n4. TIPO DE PROCESO: ${req.documentType}\n\nResponde SOLO con la extracción. Sin comentarios, sin redacción, sin encabezados solemnes. Máximo 500 palabras.`,
+      geminiSystemPrompt,
       geminiPrompt,
-      1024
+      req.existingDraft ? 768 : 1024
     );
 
     console.log(`[PIPELINE] Gemini 3.6 Flash: ${geminiExtraction.length} caracteres extraídos.`);
@@ -200,11 +204,19 @@ export class OpenRouterService {
       timestamp: new Date().toISOString()
     });
 
+    const gptSystemPrompt = req.existingDraft
+      ? `Eres un revisor procesal senior de Colombia. Ya existe un borrador de "${req.documentType}" que el usuario quiere CORREGIR o CONTINUAR. Tu tarea es producir un ESQUEMA DE CORRECCIONES conciso con:\n1. CAMBIOS IDENTIFICADOS por Gemini que deben aplicarse\n2. NORMAS QUE APLICAN a las correcciones\n3. SECCIONES DEL BORRADOR QUE DEBEN MODIFICARSE\n\nNO generes un esquema completo desde cero. Solo lo necesario para las correcciones. Máximo 400 palabras.`
+      : `Eres un estructurador procesal senior de Colombia. Tu ÚNICA tarea es producir un ESQUEMA CONCISO con:\n1. PROBLEMA JURÍDICO (1-2 oraciones)\n2. EXCEPCIONES O DEFENSAS APLICABLES (lista)\n3. NORMAS CLAVE (artículos específicos)\n4. ESTRATEGIA DE SUSTENTACIÓN (enfoque argumentativo)\n\nNO redactes el documento final. Solo entrega el esquema estructurado. Máximo 600 palabras.`;
+
+    const gptUserPrompt = req.existingDraft
+      ? `CAMBIOS IDENTIFICADOS POR GEMINI:\n${geminiExtraction || req.legalPrompt}\n\nJURISPRUDENCIA RAG:\n${jurisprudenciaEncontrada.join('\n')}\n\nINSTRUCCIÓN DEL USUARIO: ${req.legalPrompt}\n\nTIPO DE DOCUMENTO: ${req.documentType}`
+      : `HECHOS EXTRAÍDOS POR GEMINI:\n${geminiExtraction || req.legalPrompt}\n\nJURISPRUDENCIA RAG:\n${jurisprudenciaEncontrada.join('\n')}\n\nTIPO DE DOCUMENTO: ${req.documentType}`;
+
     const gptStructure = await this.callOpenRouterModel(
       ['openai/gpt-5.6-sol'],
-      `Eres un estructurador procesal senior de Colombia. Tu ÚNICA tarea es producir un ESQUEMA CONCISO con:\n1. PROBLEMA JURÍDICO (1-2 oraciones)\n2. EXCEPCIONES O DEFENSAS APLICABLES (lista)\n3. NORMAS CLAVE (artículos específicos)\n4. ESTRATEGIA DE SUSTENTACIÓN (enfoque argumentativo)\n\nNO redactes el documento final. Solo entrega el esquema estructurado. Máximo 600 palabras.`,
-      `HECHOS EXTRAÍDOS POR GEMINI:\n${geminiExtraction || req.legalPrompt}\n\nJURISPRUDENCIA RAG:\n${jurisprudenciaEncontrada.join('\n')}\n\nTIPO DE DOCUMENTO: ${req.documentType}`,
-      1536
+      gptSystemPrompt,
+      gptUserPrompt,
+      req.existingDraft ? 1024 : 1536
     );
 
     console.log(`[PIPELINE] GPT-5.6 Sol: ${gptStructure.length} caracteres de esquema.`);
