@@ -4,7 +4,7 @@ import type { AgentLog } from '../../agent/components/AgentConsoleStream';
 import type { GeneratedDraft } from '../../documents/components/LegalDraftViewer';
 import type { CaseProvidenciaEvaluationData } from '../../precedents/components/PrecedentsAnalyticsCard';
 
-export function useLegalAgentWorkflow() {
+export function useLegalAgentWorkflow(firmId?: string) {
 
   const [rightView, setRightView] = useState<'pdf' | 'draft' | 'analytics'>('pdf');
   const [legalPrompt, setLegalPrompt] = useState('');
@@ -71,22 +71,7 @@ export function useLegalAgentWorkflow() {
     ]
   });
 
-  const [logs, setLogs] = useState<AgentLog[]>([
-    {
-      id: '1',
-      timestamp: '15:48:02.102',
-      engine: 'SUPABASE',
-      message: '[RLS-OK] Session authenticated. firm_id: 8f9b2c34-torres-asociados',
-      type: 'info'
-    },
-    {
-      id: '2',
-      timestamp: '15:48:02.340',
-      engine: 'B2',
-      message: '[B2-VAULT] Presigned URL active for b2://iureon-vault/8f9b2c34-torres-asociados/EXP-2026-904.pdf',
-      type: 'info'
-    }
-  ]);
+  const [logs, setLogs] = useState<AgentLog[]>([]);
 
   const handleSendPrompt = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,7 +110,7 @@ Por favor espere unos segundos mientras se finaliza la redacción solemne.`,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-firm-id': '8f9b2c34-torres-asociados'
+          'x-firm-id': firmId || 'unknown-firm'
         },
         body: JSON.stringify({
           documentType,

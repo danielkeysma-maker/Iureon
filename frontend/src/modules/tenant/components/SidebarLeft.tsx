@@ -251,7 +251,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
               <div className="flex-1 min-w-0">
                 <div className="font-bold text-slate-900 text-[12px]">Saldo de Recargas</div>
                 <div className="text-[10px] text-emerald-800 font-mono font-bold">
-                  ${(activeFirm.creditsBalance || 500000).toLocaleString('es-CO')} COP
+                  ${(activeFirm.creditsBalance ?? 0).toLocaleString('es-CO')} COP
                 </div>
               </div>
             </button>

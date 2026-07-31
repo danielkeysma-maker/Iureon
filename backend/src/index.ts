@@ -12,6 +12,7 @@ import { proceduralTermsRoutes } from './modules/procedural-terms/terms.routes';
 import { settlementRoutes } from './modules/settlements/settlement.routes';
 import { auditRoutes } from './modules/audit/audit.routes';
 import { searchRoutes } from './modules/search/search.routes';
+import { draftsRoutes } from './modules/drafts/drafts.routes';
 
 const app: Express = express();
 
@@ -42,6 +43,7 @@ app.use('/api', proceduralTermsRoutes);
 app.use('/api', settlementRoutes);
 app.use('/api', auditRoutes);
 app.use('/api', searchRoutes);
+app.use('/api', draftsRoutes);
 
 // Servidor Express
 app.listen(config.port, () => {

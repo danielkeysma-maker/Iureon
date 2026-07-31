@@ -176,24 +176,26 @@ export class OpenRouterService {
       data: { jurisprudencia: jurisprudenciaEncontrada }
     });
 
-    // Stage 2: GPT-5.6 Sol
+    // Stage 2: GPT-5.6 Sol — recibe los hechos extraídos por Gemini como input
     onStepLog({
       stage: 'STAGE_2_LOGIC',
       engine: 'GPT',
-      message: `[GPT-5.6 Sol] Estructuración procesal dogmática y formulación de estrategia jurídica para ${req.documentType}.`,
+      message: `[GPT-5.6 Sol] Estructuración procesal dogmática y formulación de estrategia jurídica para ${req.documentType}. Hechos de Gemini: ${geminiExtraction.length} caracteres.`,
       timestamp: new Date().toISOString()
     });
 
-    await this.callOpenRouterModel(
+    const gptStructure = await this.callOpenRouterModel(
       ['openai/gpt-5.6-sol'],
-      `Esquema procesal y solución dogmática para ${req.documentType} con sustentación jurídica: ${req.legalPrompt}`,
-      `Estructura dogmática validada conforme al ordenamiento procesal colombiano.`
+      `Eres un abogado estructurador procesal senior de Colombia. Tu tarea es tomar los hechos fácticos extraídos por el motor de ingesta y crear el esquema dogmático procesal para: ${req.documentType}. Debes formular el problema jurídico, las excepciones aplicables y la estrategia de sustentación conforme al ordenamiento jurídico colombiano.`,
+      `HECHOS FÁCTICOS EXTRAÍDOS POR MOTOR DE INGESTA:\n${geminiExtraction || req.legalPrompt}\n\nJURISPRUDENCIA ENCONTRADA EN RAG:\n${jurisprudenciaEncontrada.join('\n')}\n\nINDICACIÓN ORIGINAL DEL USUARIO: ${req.legalPrompt}\n\nGenera el esquema dogmático, problema jurídico y estrategia procesal.`
     );
+
+    console.log(`[OPENROUTER] GPT-5.6 Sol respondió con ${gptStructure.length} caracteres.`);
 
     onStepLog({
       stage: 'STAGE_2_LOGIC',
       engine: 'GPT',
-      message: `[GPT Router] Esquema dogmático y pretensiones consolidadas.`,
+      message: `[GPT Router] Esquema dogmático y pretensiones consolidadas (${gptStructure.length} caracteres).`,
       timestamp: new Date().toISOString()
     });
 
