@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { API_BASE_URL } from '../../../config/api.config';
-import { FileText, Scale, ShieldAlert, Sparkles, CheckCircle2, BrainCircuit, Maximize2, Minimize2, Save, FolderOpen, Eye, Pencil } from 'lucide-react';
+import { FileText, Scale, Sparkles, CheckCircle2, BrainCircuit, Maximize2, Minimize2, Save, FolderOpen, Eye, Pencil, ChevronDown, ChevronUp } from 'lucide-react';
 import { JargonSuggestionModal } from './JargonSuggestionModal';
 import { markdownBoldToHtml } from '../services/documentExport.service';
 import DOMPurify from 'dompurify';
@@ -36,6 +36,18 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
   const [isJargonModalOpen, setIsJargonModalOpen] = useState(false);
   const [isStyleSaved, setIsStyleSaved] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [isMetadataOpen, setIsMetadataOpen] = useState(false);
+
+  // Título limpio: quitar artículos, leyes entre paréntesis, EXP-xxxx
+  const cleanTitle = useMemo(() => {
+    return draft.title
+      .replace(/\s*\(.*?\)\s*/g, '')
+      .replace(/_(Art\..*?)(?=_|$)/g, '')
+      .replace(/_EXP-[\w-]+/g, '')
+      .replace(/^(Redacción_de_|Proyección_de_|Elaboración_de_|Formulación_de_)/i, '')
+      .replace(/_/g, ' ')
+      .trim();
+  }, [draft.title]);
 
   // Generar HTML sanitizado con negritas reales para el modo vista
   const renderedHtml = useMemo(() => {
@@ -98,12 +110,12 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
       />
 
       {/* Metadata + Actions bar — STICKY para que siempre sea visible */}
-      <div className="bg-white border border-slate-200/80 rounded-xl px-5 py-4 shadow-sm sticky top-0 z-20">
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+      <div className="bg-white border border-slate-200/80 rounded-xl px-5 py-3 shadow-sm sticky top-0 z-20">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2.5 min-w-0">
             <FileText className="w-4 h-4 text-blue-900 shrink-0" />
             <div className="min-w-0">
-              <h3 className="text-[13px] font-semibold text-slate-900 truncate">{draft.title}</h3>
+              <h3 className="text-[13px] font-semibold text-slate-900 truncate">{cleanTitle}</h3>
               <p className="text-[11px] text-slate-400 font-medium">{wordCount} palabras • Edición en vivo</p>
             </div>
           </div>
@@ -166,39 +178,6 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
             )}
           </div>
         </div>
-
-        {/* Citations & Exceptions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div className="bg-slate-50 p-3 rounded-lg">
-            <span className="text-[11px] font-medium text-slate-500 flex items-center gap-1.5 mb-1.5">
-              <Scale className="w-3 h-3 text-slate-400" />
-              Jurisprudencia aplicada
-            </span>
-            <ul className="space-y-0.5 text-[11px] text-slate-700">
-              {draft.jurisprudenciaCitada.map((item, idx) => (
-                <li key={idx} className="flex items-start gap-1.5">
-                  <span className="text-blue-700 mt-0.5">•</span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="bg-slate-50 p-3 rounded-lg">
-            <span className="text-[11px] font-medium text-slate-500 flex items-center gap-1.5 mb-1.5">
-              <ShieldAlert className="w-3 h-3 text-slate-400" />
-              Excepciones procesales
-            </span>
-            <ul className="space-y-0.5 text-[11px] text-slate-700">
-              {draft.excepcionesFormuladas.map((ex, idx) => (
-                <li key={idx} className="flex items-start gap-1.5">
-                  <span className="text-emerald-600 mt-0.5">•</span>
-                  <span>{ex}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
       </div>
 
       {/* Editable Folio Paper Canvas */}
@@ -240,6 +219,49 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
             <span>{isEditMode ? 'Vista Documento' : 'Editar Texto'}</span>
           </button>
         </div>
+      </div>
+
+      {/* Jurisprudencia & Excepciones — Panel colapsable debajo del documento */}
+      <div className="bg-white border border-slate-200/80 rounded-xl shadow-sm overflow-hidden">
+        <button
+          onClick={() => setIsMetadataOpen(!isMetadataOpen)}
+          className="w-full px-4 py-2.5 flex items-center justify-between hover:bg-slate-50 transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <Scale className="w-3.5 h-3.5 text-blue-800" />
+            <span className="text-[11px] font-semibold text-slate-700">
+              Jurisprudencia aplicada ({draft.jurisprudenciaCitada.length}) &amp; Excepciones ({draft.excepcionesFormuladas.length})
+            </span>
+          </div>
+          {isMetadataOpen ? <ChevronUp className="w-3.5 h-3.5 text-slate-400" /> : <ChevronDown className="w-3.5 h-3.5 text-slate-400" />}
+        </button>
+
+        {isMetadataOpen && (
+          <div className="px-4 pb-3 grid grid-cols-1 md:grid-cols-2 gap-3 border-t border-slate-100 pt-3">
+            <div>
+              <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-1 block">Jurisprudencia</span>
+              <ul className="space-y-0.5 text-[11px] text-slate-700">
+                {draft.jurisprudenciaCitada.map((item, idx) => (
+                  <li key={idx} className="flex items-start gap-1.5">
+                    <span className="text-blue-700 mt-0.5">•</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-1 block">Excepciones procesales</span>
+              <ul className="space-y-0.5 text-[11px] text-slate-700">
+                {draft.excepcionesFormuladas.map((ex, idx) => (
+                  <li key={idx} className="flex items-start gap-1.5">
+                    <span className="text-emerald-600 mt-0.5">•</span>
+                    <span>{ex}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
