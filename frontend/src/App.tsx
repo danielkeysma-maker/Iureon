@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { SidebarLeft } from './modules/tenant/components/SidebarLeft';
 import { HeaderTop } from './modules/tenant/components/HeaderTop';
-import type { LawFirmTenant } from './modules/tenant/components/Header';
+import type { LawFirmTenant } from './modules/tenant/types';
 import { AgentPanelLeft } from './modules/workspace/components/AgentPanelLeft';
 import { DocumentCanvasRight } from './modules/workspace/components/DocumentCanvasRight';
 import { SearchView } from './modules/search/components/SearchView';
@@ -9,13 +9,13 @@ import { ToolsView } from './modules/tools/components/ToolsView';
 import { AuditView } from './modules/audit/components/AuditView';
 import { FirmBrandingModal } from './modules/tenant/components/FirmBrandingModal';
 import { FirmSubscriptionModal } from './modules/subscriptions/components/FirmSubscriptionModal';
-import type { FirmSubscriptionInfo } from './modules/subscriptions/components/FirmSubscriptionModal';
+import type { FirmSubscriptionInfo } from './modules/subscriptions/types';
 import { DEFAULT_FIRM_BRANDING, DocumentExportService } from './modules/documents/services/documentExport.service';
 import type { FirmBrandingConfig } from './modules/documents/services/documentExport.service';
 import { useLegalAgentWorkflow } from './modules/workspace/hooks/useLegalAgentWorkflow';
 
 import { SavedDraftsModal } from './modules/documents/components/SavedDraftsModal';
-import type { SavedDraftEntry } from './modules/documents/components/SavedDraftsModal';
+import type { SavedDraftEntry } from './modules/documents/types';
 
 import { TenantUserManagementModal } from './modules/tenant/components/TenantUserManagementModal';
 import { LoginPortalView } from './modules/tenant/components/LoginPortalView';

@@ -6,17 +6,13 @@ import { AuditLogsModal } from '../../audit/components/AuditLogsModal';
 import { LegalSearchGlossaryModal } from '../../search/components/LegalSearchGlossaryModal';
 import { FirmBrandingModal } from './FirmBrandingModal';
 import { FirmSubscriptionModal } from '../../subscriptions/components/FirmSubscriptionModal';
-import type { FirmSubscriptionInfo } from '../../subscriptions/components/FirmSubscriptionModal';
+import type { FirmSubscriptionInfo } from '../../subscriptions/types';
 import { DEFAULT_FIRM_BRANDING } from '../../documents/services/documentExport.service';
 import type { FirmBrandingConfig } from '../../documents/services/documentExport.service';
 
-export interface LawFirmTenant {
-  id: string;
-  name: string;
-  nit: string;
-  creditsBalance: number; // Saldo disponible de recargas en COP ($)
-  status: 'active' | 'trial';
-}
+export type { LawFirmTenant } from '../types';
+import type { LawFirmTenant } from '../types';
+
 
 export const Header: React.FC = () => {
   const [activeFirm, setActiveFirm] = useState<LawFirmTenant>({

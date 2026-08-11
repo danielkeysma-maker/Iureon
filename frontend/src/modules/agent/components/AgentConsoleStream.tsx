@@ -1,13 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import { Terminal, Cpu } from 'lucide-react';
 
-export interface AgentLog {
-  id: string;
-  timestamp: string;
-  engine: 'GEMINI' | 'GPT' | 'CLAUDE' | 'SUPABASE' | 'B2';
-  message: string;
-  type: 'info' | 'success' | 'warning' | 'error';
-}
+export type { AgentLog } from '../types';
+import type { AgentLog } from '../types';
+
 
 interface AgentConsoleStreamProps {
   logs: AgentLog[];

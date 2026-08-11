@@ -1,9 +1,9 @@
 import React from 'react';
 import { PdfViewerCanvas } from '../../documents/components/PdfViewerCanvas';
 import { LegalDraftViewer } from '../../documents/components/LegalDraftViewer';
-import type { GeneratedDraft } from '../../documents/components/LegalDraftViewer';
+import type { GeneratedDraft } from '../../documents/types';
 import { PrecedentsAnalyticsCard } from '../../precedents/components/PrecedentsAnalyticsCard';
-import type { CaseProvidenciaEvaluationData } from '../../precedents/components/PrecedentsAnalyticsCard';
+import type { CaseProvidenciaEvaluationData } from '../../precedents/types';
 import { Sparkles, FolderOpen } from 'lucide-react';
 
 interface DocumentCanvasRightProps {

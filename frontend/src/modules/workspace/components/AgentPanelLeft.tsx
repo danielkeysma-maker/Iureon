@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Sparkles, Database, Cpu, Send, Scale, Building, Paperclip, FileText, X, UploadCloud, RefreshCw } from 'lucide-react';
 import { AgentConsoleStream } from '../../agent/components/AgentConsoleStream';
-import type { AgentLog } from '../../agent/components/AgentConsoleStream';
+import type { AgentLog } from '../../agent/types';
 
 export interface CaseStudyFile {
   id: string;

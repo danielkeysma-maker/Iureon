@@ -1,3 +1,12 @@
+/** A client law firm: the tenant every request and record is scoped to. */
+export interface LawFirmTenant {
+  id: string;
+  name: string;
+  nit: string;
+  creditsBalance: number; // Saldo disponible de recargas en COP ($)
+  status: 'active' | 'trial';
+}
+
 export type FirmUserRole = 'SUPER_ADMIN' | 'FIRM_ADMIN' | 'LAWYER' | 'INDEPENDENT_LAWYER';
 
 export interface FirmUser {

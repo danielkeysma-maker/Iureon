@@ -5,14 +5,9 @@ import { JargonSuggestionModal } from './JargonSuggestionModal';
 import { markdownBoldToHtml } from '../services/documentExport.service';
 import DOMPurify from 'dompurify';
 
-export interface GeneratedDraft {
-  title: string;
-  documentType: string;
-  jurisprudenciaCitada: string[];
-  excepcionesFormuladas: string[];
-  legalText: string;
-  tokensConsumed: number;
-}
+export type { GeneratedDraft } from '../types';
+import type { GeneratedDraft } from '../types';
+
 
 interface LegalDraftViewerProps {
   draft: GeneratedDraft;

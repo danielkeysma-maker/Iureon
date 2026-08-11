@@ -1,12 +1,9 @@
 import React from 'react';
 import { X, FolderOpen, Clock, Trash2, ArrowUpRight, Scale } from 'lucide-react';
-import type { GeneratedDraft } from './LegalDraftViewer';
 
-export interface SavedDraftEntry {
-  id: string;
-  savedAt: string;
-  draft: GeneratedDraft;
-}
+export type { SavedDraftEntry } from '../types';
+import type { SavedDraftEntry } from '../types';
+
 
 interface SavedDraftsModalProps {
   isOpen: boolean;

@@ -1,39 +1,12 @@
 import React from 'react';
 import { Scale, AlertTriangle, CheckCircle2, XCircle, BookOpen, ShieldCheck } from 'lucide-react';
 
-export interface FactoresRiesgo {
-  riesgo: string;
-  explicacion: string;
-  impacto: 'ALTO' | 'MEDIO' | 'BAJO';
-}
+export type { FactoresRiesgo, RequisitosConcesion, PrecedenteJudicial, CaseProvidenciaEvaluationData } from '../types';
+import type { CaseProvidenciaEvaluationData } from '../types';
 
-export interface RequisitosConcesion {
-  requisito: string;
-  cumplidoEnExpediente: boolean;
-  recomendacion: string;
-}
 
-export interface PrecedenteJudicial {
-  sentencia: string;
-  ponente: string;
-  ano: number;
-  fundamentoClave?: string;
-  causalDenegacion?: string;
-}
 
-export interface CaseProvidenciaEvaluationData {
-  expedienteId: string;
-  documentType: string;
-  circunstanciaEstudio: string;
-  pronosticoFallo: 'ALTA_PROBABILIDAD_CONCESION' | 'RIESGO_MEDIO_DENEGACION' | 'ALTO_RIESGO_DENEGACION';
-  tasaConcedidosPct: number;
-  tasaNegadosPct: number;
-  corporacionPrincipal: string;
-  factoresRiesgoDenegacion: FactoresRiesgo[];
-  requisitosClaveParaConcesion: RequisitosConcesion[];
-  topPrecedentesConcedidos: PrecedenteJudicial[];
-  topPrecedentesNegados: PrecedenteJudicial[];
-}
+
 
 interface PrecedentsAnalyticsCardProps {
   data: CaseProvidenciaEvaluationData;

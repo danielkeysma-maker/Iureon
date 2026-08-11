@@ -1,23 +1,9 @@
 import React, { useState } from 'react';
 import { X, CreditCard, Users, UserPlus, Zap, CheckCircle2 } from 'lucide-react';
 
-export interface FirmSubscriptionInfo {
-  firmName: string;
-  planTier: string;
-  subscriptionStatus: 'active' | 'past_due' | 'canceled';
-  monthlyTokensUsed: number;
-  monthlyTokensLimit: number;
-  activeUsersCount: number;
-  maxUsersAllowed: number;
-  renewalDate: string;
-  usersList: {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-    status: string;
-  }[];
-}
+export type { FirmSubscriptionInfo } from '../types';
+import type { FirmSubscriptionInfo } from '../types';
+
 
 interface FirmSubscriptionModalProps {
   isOpen: boolean;

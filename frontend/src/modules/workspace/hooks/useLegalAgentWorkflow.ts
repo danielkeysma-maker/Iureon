@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { API_BASE_URL } from '../../../config/api.config';
-import type { AgentLog } from '../../agent/components/AgentConsoleStream';
-import type { GeneratedDraft } from '../../documents/components/LegalDraftViewer';
-import type { CaseProvidenciaEvaluationData } from '../../precedents/components/PrecedentsAnalyticsCard';
+import type { AgentLog } from '../../agent/types';
+import type { GeneratedDraft } from '../../documents/types';
+import type { CaseProvidenciaEvaluationData } from '../../precedents/types';
 
 export function useLegalAgentWorkflow(firmId?: string) {
 
