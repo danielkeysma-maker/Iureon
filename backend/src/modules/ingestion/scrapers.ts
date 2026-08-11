@@ -1,4 +1,3 @@
-import fetch from 'node-fetch';
 import { JurisprudenceIngestionPipeline, IngestionRulingMetadata } from './jurisprudenceIngestion.service';
 
 /**
