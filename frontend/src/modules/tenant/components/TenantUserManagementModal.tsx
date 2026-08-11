@@ -100,8 +100,8 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
   const [editUserFirmId, setEditUserFirmId] = useState('');
 
   // Login Form State
-  const [loginEmail, setLoginEmail] = useState('ingdanielma@gmail.com');
-  const [loginPassword, setLoginPassword] = useState('Dma1102811692@');
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
   const [loginSuccessMsg, setLoginSuccessMsg] = useState('');
 
   if (!isOpen) return null;
@@ -296,11 +296,10 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
     e.preventDefault();
     if (!loginEmail.trim()) return;
 
-    if (loginEmail.trim() === 'ingdanielma@gmail.com' && loginPassword === 'Dma1102811692@') {
-      setLoginSuccessMsg('👑 Sesión de SuperUsuario Global autenticada exitosamente para Ing. Daniel Ma.');
-    } else {
-      setLoginSuccessMsg(`✅ Sesión iniciada correctamente para: ${loginEmail}`);
-    }
+    // Credentials are never verified in the browser: this form only collects
+    // them. Roles and session state must come from Supabase Auth on the server,
+    // otherwise anyone can grant themselves SUPER_ADMIN by editing the bundle.
+    setLoginSuccessMsg(`✅ Sesión iniciada correctamente para: ${loginEmail}`);
 
     setTimeout(() => {
       setLoginSuccessMsg('');
