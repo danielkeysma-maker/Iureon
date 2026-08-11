@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { API_BASE_URL } from '../../../config/api.config';
 import { X, DollarSign, Calculator, Scale } from 'lucide-react';
 import { useTenant } from '../../tenant/TenantContext';
+import { settlementsApi } from '../services/settlements.api';
 
 interface LaborSettlementModalProps {
   isOpen: boolean;
@@ -27,24 +27,12 @@ export const LaborSettlementModal: React.FC<LaborSettlementModalProps> = ({
     setIsCalculating(true);
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/settlement/calculate`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-firm-id': firmId
-        },
-        body: JSON.stringify({
-          monthlySalary,
-          startDate,
-          endDate,
-          terminationType
-        })
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        setResult(data.result);
+      const calculated = await settlementsApi.calculate(firmId, { monthlySalary, startDate, endDate, terminationType });
+      if (calculated) {
+        setResult(calculated);
+        return;
       }
+      throw new Error('settlement API unavailable');
     } catch (err) {
       console.warn('Fallback settlement calculation:', err);
       setResult({

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { API_BASE_URL } from '../../../config/api.config';
 import { X, ShieldCheck, User, Cpu } from 'lucide-react';
 import { useTenant } from '../../tenant/TenantContext';
+import { auditApi } from '../services/audit.api';
 
 interface AuditLogsModalProps {
   isOpen: boolean;
@@ -25,15 +25,12 @@ export const AuditLogsModal: React.FC<AuditLogsModalProps> = ({
   const fetchAuditLogs = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/audit/logs`, {
-        headers: {
-          'x-firm-id': firmId
-        }
-      });
-      const data = await res.json();
-      if (data.success) {
-        setLogs(data.logs);
+      const logs = await auditApi.listLogs(firmId);
+      if (logs) {
+        setLogs(logs);
+        return;
       }
+      throw new Error('audit API unavailable');
     } catch (err) {
       console.warn('Fallback audit logs:', err);
       setLogs([

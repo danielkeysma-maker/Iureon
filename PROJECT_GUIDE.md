@@ -35,9 +35,38 @@
 
 ---
 
-## 📏 REGLA ARQUITECTÓNICA OBLIGATORIA: UMBRAL DE 500 LÍNEAS DE CÓDIGO
+## 📏 CONTRATO DE MÓDULOS (reemplaza la antigua regla de 500 líneas)
 
-> 🚨 **REGLA DE ORO DE ESCALABILIDAD**: Ningún archivo fuente (.ts, .tsx, .js, .css) en `backend/` o `frontend/` puede superar el **límite de 500 líneas de código**.
+> 🚨 **REGLA DE ORO DE MANTENIBILIDAD**: la métrica no es el tamaño del archivo, sino el acoplamiento. Un archivo de 400 líneas aislado se mantiene solo; uno de 200 que alcanza el interior de otro módulo, no. `scripts/check-module-boundaries.sh` valida estas cuatro reglas en CI:
+
+**1. Los tipos de dominio viven en `<módulo>/types.ts`, nunca dentro de un componente.**
+Ningún módulo debe importar un tipo desde el archivo de un componente ajeno. Componer un componente de otro módulo sí está permitido: eso es React normal.
+
+**2. Solo la capa de API llama a `fetch`.**
+Los componentes usan `<módulo>/services/*.api.ts`, que a su vez usa `config/httpClient.ts`. Ningún componente conoce una URL ni el header `x-firm-id`.
+
+**3. El cliente de Supabase se crea una sola vez**, en `backend/src/config/supabase.config.ts`.
+
+**4. Los controladores no hablan con Supabase.**
+El acceso a datos vive en el servicio del módulo. Rutas → controlador → servicio.
+
+### Anatomía de un módulo
+
+```
+frontend/src/modules/<dominio>/
+├── types.ts             # contrato del dominio — lo único que otros módulos importan
+├── components/          # UI
+├── hooks/               # estado y orquestación
+└── services/*.api.ts    # acceso al backend
+
+backend/src/modules/<dominio>/
+├── types.ts             # contrato del dominio
+├── <x>.routes.ts        # cableado de rutas
+├── <x>.controller.ts    # HTTP: valida entrada, formatea salida
+└── <x>.service.ts       # lógica de negocio y acceso a datos
+```
+
+El tenant activo llega por `TenantContext`; ningún componente lo recibe por props ni lo hardcodea.
 
 ---
 

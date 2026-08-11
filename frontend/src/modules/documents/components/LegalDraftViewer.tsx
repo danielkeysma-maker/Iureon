@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { API_BASE_URL } from '../../../config/api.config';
 import { FileText, Scale, Sparkles, CheckCircle2, BrainCircuit, Maximize2, Minimize2, Save, FolderOpen, Eye, Pencil, ChevronDown, ChevronUp } from 'lucide-react';
 import { JargonSuggestionModal } from './JargonSuggestionModal';
 import { markdownBoldToHtml } from '../services/documentExport.service';
@@ -8,6 +7,7 @@ import DOMPurify from 'dompurify';
 export type { GeneratedDraft } from '../types';
 import type { GeneratedDraft } from '../types';
 import { useTenant } from '../../tenant/TenantContext';
+import { learningApi } from '../../agent/services/learning.api';
 
 
 interface LegalDraftViewerProps {
@@ -77,19 +77,7 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
   const handleSaveAndTeachStyle = async () => {
     setIsStyleSaved(true);
     try {
-      await fetch(`${API_BASE_URL}/api/agent/learn-edits`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-firm-id': firmId
-        },
-        body: JSON.stringify({
-          originalText: draft.legalText,
-          editedText: editableText
-        })
-      });
-    } catch (err) {
-      console.warn('Fallback learn edits simulation:', err);
+      await learningApi.teachStyle(firmId, draft.legalText, editableText);
     } finally {
       setTimeout(() => setIsStyleSaved(false), 3000);
     }

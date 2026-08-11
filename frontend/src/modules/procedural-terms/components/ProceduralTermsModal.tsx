@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { API_BASE_URL } from '../../../config/api.config';
 import { X, Calendar, Clock, AlertTriangle, CheckCircle2, Scale } from 'lucide-react';
 import { useTenant } from '../../tenant/TenantContext';
+import { termsApi } from '../services/terms.api';
 
 interface ProceduralTermsModalProps {
   isOpen: boolean;
@@ -26,23 +26,12 @@ export const ProceduralTermsModal: React.FC<ProceduralTermsModalProps> = ({
     setIsCalculating(true);
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/terms/calculate`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-firm-id': firmId
-        },
-        body: JSON.stringify({
-          notifiedDate,
-          termInDays,
-          jurisdictionType
-        })
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        setCalculationResult(data.result);
+      const result = await termsApi.calculate(firmId, { notifiedDate, termInDays, jurisdictionType });
+      if (result) {
+        setCalculationResult(result);
+        return;
       }
+      throw new Error('terms API unavailable');
     } catch (err) {
       console.warn('Fallback terms calculation:', err);
       setCalculationResult({

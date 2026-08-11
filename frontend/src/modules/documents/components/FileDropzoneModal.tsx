@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
-import { API_BASE_URL } from '../../../config/api.config';
 import { Upload, X, FileText, CheckCircle2, Cpu, Database } from 'lucide-react';
 import { useTenant } from '../../tenant/TenantContext';
+import { documentsApi } from '../services/documents.api';
+
+/** Placeholder case the upload flow is wired to until case selection exists. */
+const CASE_ID = 'EXP-2026-904';
+
+/** Shown when the backend does not report a real folio count. */
+const DEFAULT_FOLIO_COUNT = 142;
 
 interface FileDropzoneModalProps {
   isOpen: boolean;
@@ -35,37 +41,17 @@ export const FileDropzoneModal: React.FC<FileDropzoneModalProps> = ({
     setUploadStep('Solicitando URL pre-firmada a Backblaze B2 Vault...');
 
     try {
-      const b2Res = await fetch(`${API_BASE_URL}/api/documents/upload-url`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-firm-id': firmId
-        },
-        body: JSON.stringify({
-          caseId: 'EXP-2026-904',
-          fileName: selectedFile.name
-        })
-      });
-
-      const b2Data = await b2Res.json();
-      const b2Url = b2Data.uploadInfo?.fileKey || `${firmId}/EXP-2026-904/${selectedFile.name}`;
+      const fileKey = await documentsApi.requestUploadUrl(firmId, CASE_ID, selectedFile.name);
+      const b2Url = fileKey || `${firmId}/${CASE_ID}/${selectedFile.name}`;
 
       setUploadStep('Iniciando ingestión y vectorización en Supabase pgvector (1536d)...');
 
-      const ingestRes = await fetch(`${API_BASE_URL}/api/documents/ingest`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-firm-id': firmId
-        },
-        body: JSON.stringify({
-          title: selectedFile.name,
-          b2FileUrl: `b2://iureon-vault/${b2Url}`
-        })
+      const ingested = await documentsApi.ingest(firmId, {
+        title: selectedFile.name,
+        b2FileUrl: `b2://iureon-vault/${b2Url}`
       });
 
-      const ingestData = await ingestRes.json();
-      const folios = ingestData.result?.totalFoliosIndexed || 142;
+      const folios = ingested?.totalFoliosIndexed || DEFAULT_FOLIO_COUNT;
 
       onUploadSuccess({
         title: selectedFile.name,
@@ -78,8 +64,8 @@ export const FileDropzoneModal: React.FC<FileDropzoneModalProps> = ({
       console.warn('Fallback ingest simulation:', err);
       onUploadSuccess({
         title: selectedFile.name,
-        b2Url: `b2://iureon-vault/${firmId}/EXP-2026-904/${selectedFile.name}`,
-        totalFolios: 142
+        b2Url: `b2://iureon-vault/${firmId}/${CASE_ID}/${selectedFile.name}`,
+        totalFolios: DEFAULT_FOLIO_COUNT
       });
       onClose();
     } finally {

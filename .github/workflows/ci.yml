@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Enforce the 500-line file ceiling
-        run: bash scripts/check-file-length.sh
+      - name: Enforce module boundaries
+        run: bash scripts/check-module-boundaries.sh
       - name: Reject committed secrets
         run: bash scripts/check-secrets.sh
