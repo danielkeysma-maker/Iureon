@@ -86,7 +86,7 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
   const wordCount = editableText.split(/\s+/).filter(Boolean).length;
 
   return (
-    <div className={`${isFocusMode ? 'max-w-6xl' : 'max-w-4xl'} mx-auto space-y-5 font-sans transition-all duration-300`}>
+    <div className={`${isFocusMode ? 'max-w-none px-8' : 'max-w-4xl'} mx-auto space-y-5 font-sans transition-all duration-300`}>
       <JargonSuggestionModal
         isOpen={isJargonModalOpen}
         onClose={() => setIsJargonModalOpen(false)}

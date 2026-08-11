@@ -243,7 +243,8 @@ export function App() {
         onRechargeSuccess={handleRechargeSuccess}
       />
 
-      {/* ENTERPRISE LEFT SIDEBAR */}
+      {/* ENTERPRISE LEFT SIDEBAR — hidden in focus mode so the editor owns the screen */}
+      {!workflow.isFocusMode && (
       <SidebarLeft
         mainView={mainView}
         setMainView={setMainView}
@@ -258,6 +259,7 @@ export function App() {
         onOpenRechargeModal={() => setIsRechargeModalOpen(true)}
         isSuperUser={currentUserEmail === 'ingdanielma@gmail.com'}
       />
+      )}
 
       {/* RIGHT MAIN WORKSPACE AREA */}
       <div className="flex-1 flex flex-col h-full overflow-hidden">
