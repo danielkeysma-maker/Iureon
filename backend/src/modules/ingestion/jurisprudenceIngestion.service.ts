@@ -1,19 +1,8 @@
 import { config } from '../../config/env.config';
 import { supabase } from '../../config/supabase.config';
 
-export interface IngestionRulingMetadata {
-  corporacion: 'CORTE_CONSTITUCIONAL' | 'CORTE_SUPREMA' | 'CONSEJO_ESTADO' | 'TRIBUNAL_SUPERIOR' | 'TRIBUNAL_ADMINISTRATIVO';
-  numeroProvidencia: string; // ej: Sentencia T-025 de 2004, SL-4102-2023, CE-SU2-2022
-  tipoSentencia: 'T' | 'C' | 'SU' | 'SL' | 'SC' | 'SP' | 'NULIDAD' | 'AUTO';
-  rama: 'CONSTITUCIONAL' | 'LABORAL' | 'CIVIL' | 'ADMINISTRATIVO' | 'PENAL' | 'FAMILIA';
-  magistradoPonente: string;
-  ano: number;
-  hechosClave: string;
-  ratioDecidendi: string;
-  resuelveOutcome: 'CONCEDIDO' | 'NEGADO';
-  pdfUrl?: string;
-  fullText: string;
-}
+export type { IngestionRulingMetadata } from './types';
+import type { IngestionRulingMetadata } from './types';
 
 export class JurisprudenceIngestionPipeline {
   /**

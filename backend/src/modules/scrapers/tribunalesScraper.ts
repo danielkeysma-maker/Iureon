@@ -1,4 +1,4 @@
-import { IngestionRulingMetadata } from '../ingestion/jurisprudenceIngestion.service';
+import type { IngestionRulingMetadata } from '../ingestion/types';
 
 export class TribunalesScraper {
   private baseUrl = 'https://www.ramajudicial.gov.co/';

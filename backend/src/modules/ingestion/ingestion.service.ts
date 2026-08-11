@@ -1,33 +1,11 @@
-import { createClient } from '@supabase/supabase-js';
-import { config } from '../../config/env.config';
+import { supabase } from '../../config/supabase.config';
 
-export interface IngestionRequest {
-  firmId: string;
-  title: string;
-  b2FileUrl: string;
-  rawText?: string;
-  metadata?: Record<string, any>;
-}
-
-export interface IngestionResult {
-  documentId: string;
-  firmId: string;
-  title: string;
-  b2FileUrl: string;
-  totalChunksCreated: number;
-  totalFoliosIndexed: number;
-  status: 'COMPLETED' | 'FAILED';
-  ingestedAt: string;
-}
+export type { IngestionRequest, IngestionResult } from './types';
+import type { IngestionRequest, IngestionResult } from './types';
 
 export class IngestionService {
-  private supabaseClient: any;
-
-  constructor() {
-    if (config.supabase.url && config.supabase.serviceKey) {
-      this.supabaseClient = createClient(config.supabase.url, config.supabase.serviceKey);
-    }
-  }
+  /** Null when Supabase is not configured; ingestion then runs as a dry run. */
+  private readonly supabaseClient = supabase;
 
   /**
    * Ingesta un expediente PDF de Backblaze B2, fragmenta el texto y genera embeddings de 1536 dimensiones en Supabase

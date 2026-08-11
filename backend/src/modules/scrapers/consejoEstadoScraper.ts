@@ -1,4 +1,4 @@
-import { IngestionRulingMetadata } from '../ingestion/jurisprudenceIngestion.service';
+import type { IngestionRulingMetadata } from '../ingestion/types';
 
 export class ConsejoEstadoScraper {
   private baseUrl = 'https://consejodeestado.gov.co/relatoria/';

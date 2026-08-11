@@ -1,4 +1,4 @@
-import { IngestionRulingMetadata } from '../ingestion/jurisprudenceIngestion.service';
+import type { IngestionRulingMetadata } from '../ingestion/types';
 
 export class CorteSupremaScraper {
   private baseUrl = 'https://cortesuprema.gov.co/corte/index.php/relatorias/';

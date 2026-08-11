@@ -1,4 +1,4 @@
-import { JurisprudenceIngestionPipeline, IngestionRulingMetadata } from './jurisprudenceIngestion.service';
+import { JurisprudenceIngestionPipeline, IngestionRulingMetadata } from '../modules/ingestion/jurisprudenceIngestion.service';
 
 /**
  * Script de Ingestión Masiva de Jurisprudencia Colombiana para el Corpus RAG de IUREON
