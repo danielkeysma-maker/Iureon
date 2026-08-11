@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../../../config/api.config';
 import { X, ShieldCheck, User, Cpu } from 'lucide-react';
+import { useTenant } from '../../tenant/TenantContext';
 
 interface AuditLogsModalProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ export const AuditLogsModal: React.FC<AuditLogsModalProps> = ({
   isOpen,
   onClose
 }) => {
+  const { firmId } = useTenant();
   const [logs, setLogs] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -25,7 +27,7 @@ export const AuditLogsModal: React.FC<AuditLogsModalProps> = ({
     try {
       const res = await fetch(`${API_BASE_URL}/api/audit/logs`, {
         headers: {
-          'x-firm-id': '8f9b2c34-torres-asociados'
+          'x-firm-id': firmId
         }
       });
       const data = await res.json();

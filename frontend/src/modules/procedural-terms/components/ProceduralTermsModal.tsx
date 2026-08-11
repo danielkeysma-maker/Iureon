@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { API_BASE_URL } from '../../../config/api.config';
 import { X, Calendar, Clock, AlertTriangle, CheckCircle2, Scale } from 'lucide-react';
+import { useTenant } from '../../tenant/TenantContext';
 
 interface ProceduralTermsModalProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ export const ProceduralTermsModal: React.FC<ProceduralTermsModalProps> = ({
   isOpen,
   onClose
 }) => {
+  const { firmId } = useTenant();
   const [notifiedDate, setNotifiedDate] = useState<string>('2026-07-28');
   const [termInDays, setTermInDays] = useState<number>(10);
   const [jurisdictionType, setJurisdictionType] = useState<'LABORAL' | 'CIVIL' | 'CONSTITUCIONAL'>('LABORAL');
@@ -28,7 +30,7 @@ export const ProceduralTermsModal: React.FC<ProceduralTermsModalProps> = ({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-firm-id': '8f9b2c34-torres-asociados'
+          'x-firm-id': firmId
         },
         body: JSON.stringify({
           notifiedDate,

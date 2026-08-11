@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { API_BASE_URL } from '../../../config/api.config';
 import { X, DollarSign, Calculator, Scale } from 'lucide-react';
+import { useTenant } from '../../tenant/TenantContext';
 
 interface LaborSettlementModalProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ export const LaborSettlementModal: React.FC<LaborSettlementModalProps> = ({
   isOpen,
   onClose
 }) => {
+  const { firmId } = useTenant();
   const [monthlySalary, setMonthlySalary] = useState<number>(3500000);
   const [startDate, setStartDate] = useState<string>('2023-01-15');
   const [endDate, setEndDate] = useState<string>('2026-03-15');
@@ -29,7 +31,7 @@ export const LaborSettlementModal: React.FC<LaborSettlementModalProps> = ({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-firm-id': '8f9b2c34-torres-asociados'
+          'x-firm-id': firmId
         },
         body: JSON.stringify({
           monthlySalary,

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { API_BASE_URL } from '../../../config/api.config';
 import { Upload, X, FileText, CheckCircle2, Cpu, Database } from 'lucide-react';
+import { useTenant } from '../../tenant/TenantContext';
 
 interface FileDropzoneModalProps {
   isOpen: boolean;
@@ -13,6 +14,7 @@ export const FileDropzoneModal: React.FC<FileDropzoneModalProps> = ({
   onClose,
   onUploadSuccess
 }) => {
+  const { firmId } = useTenant();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStep, setUploadStep] = useState<string>('');
@@ -37,7 +39,7 @@ export const FileDropzoneModal: React.FC<FileDropzoneModalProps> = ({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-firm-id': '8f9b2c34-torres-asociados'
+          'x-firm-id': firmId
         },
         body: JSON.stringify({
           caseId: 'EXP-2026-904',
@@ -46,7 +48,7 @@ export const FileDropzoneModal: React.FC<FileDropzoneModalProps> = ({
       });
 
       const b2Data = await b2Res.json();
-      const b2Url = b2Data.uploadInfo?.fileKey || `8f9b2c34-torres-asociados/EXP-2026-904/${selectedFile.name}`;
+      const b2Url = b2Data.uploadInfo?.fileKey || `${firmId}/EXP-2026-904/${selectedFile.name}`;
 
       setUploadStep('Iniciando ingestión y vectorización en Supabase pgvector (1536d)...');
 
@@ -54,7 +56,7 @@ export const FileDropzoneModal: React.FC<FileDropzoneModalProps> = ({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-firm-id': '8f9b2c34-torres-asociados'
+          'x-firm-id': firmId
         },
         body: JSON.stringify({
           title: selectedFile.name,
@@ -76,7 +78,7 @@ export const FileDropzoneModal: React.FC<FileDropzoneModalProps> = ({
       console.warn('Fallback ingest simulation:', err);
       onUploadSuccess({
         title: selectedFile.name,
-        b2Url: `b2://iureon-vault/8f9b2c34-torres-asociados/EXP-2026-904/${selectedFile.name}`,
+        b2Url: `b2://iureon-vault/${firmId}/EXP-2026-904/${selectedFile.name}`,
         totalFolios: 142
       });
       onClose();
@@ -144,7 +146,7 @@ export const FileDropzoneModal: React.FC<FileDropzoneModalProps> = ({
               </div>
               <div className="flex items-center gap-1 text-[10px] text-slate-600">
                 <Database className="w-3 h-3 text-blue-900" />
-                <span>Generando embeddings 1536d con RLS (firm_id: 8f9b2c34)...</span>
+                <span>Generando embeddings 1536d con RLS (firm_id: {firmId})...</span>
               </div>
             </div>
           )}

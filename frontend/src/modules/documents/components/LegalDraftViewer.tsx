@@ -7,6 +7,7 @@ import DOMPurify from 'dompurify';
 
 export type { GeneratedDraft } from '../types';
 import type { GeneratedDraft } from '../types';
+import { useTenant } from '../../tenant/TenantContext';
 
 
 interface LegalDraftViewerProps {
@@ -26,6 +27,7 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
   onSaveDraft,
   onOpenSavedDraftsModal
 }) => {
+  const { firmId } = useTenant();
   const [editableText, setEditableText] = useState(draft.legalText);
   const [selectedText, setSelectedText] = useState('');
   const [isJargonModalOpen, setIsJargonModalOpen] = useState(false);
@@ -79,7 +81,7 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-firm-id': '8f9b2c34-torres-asociados'
+          'x-firm-id': firmId
         },
         body: JSON.stringify({
           originalText: draft.legalText,
