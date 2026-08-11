@@ -6,6 +6,7 @@ import { TenantProvider } from './modules/tenant/TenantContext';
 import { AgentPanelLeft } from './modules/workspace/components/AgentPanelLeft';
 import { DocumentCanvasRight } from './modules/workspace/components/DocumentCanvasRight';
 import { SearchView } from './modules/search/components/SearchView';
+import { TranscriptionView } from './modules/transcription/components/TranscriptionView';
 import { ToolsView } from './modules/tools/components/ToolsView';
 import { AuditView } from './modules/audit/components/AuditView';
 import { FirmBrandingModal } from './modules/tenant/components/FirmBrandingModal';
@@ -22,6 +23,7 @@ import { useSavedDrafts } from './modules/documents/hooks/useSavedDrafts';
 import { TenantUserManagementModal } from './modules/tenant/components/TenantUserManagementModal';
 import { LoginPortalView } from './modules/tenant/components/LoginPortalView';
 import { FirmCreditsRechargeModal } from './modules/tenant/components/FirmCreditsRechargeModal';
+import type { MainView } from './modules/tenant/types';
 
 const COST_PER_DRAFT_COP = 2000;
 
@@ -52,7 +54,7 @@ export function App() {
     }
   });
 
-  const [mainView, setMainView] = useState<'workspace' | 'search' | 'tools' | 'audit'>('workspace');
+  const [mainView, setMainView] = useState<MainView>('workspace');
 
   const [registeredFirms, setRegisteredFirms] = useState<LawFirmTenant[]>(() => {
     try {
@@ -316,6 +318,7 @@ export function App() {
             </>
           )}
 
+          {mainView === 'audiencias' && <TranscriptionView kind="AUDIENCIA" />}
           {mainView === 'search' && <SearchView />}
           {mainView === 'tools' && <ToolsView />}
           {mainView === 'audit' && <AuditView />}

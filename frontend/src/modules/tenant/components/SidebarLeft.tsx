@@ -13,13 +13,13 @@ import {
   CreditCard,
   ChevronsLeft,
   ChevronsRight,
-  User
-} from 'lucide-react';
+  User, Mic } from 'lucide-react';
 import type { LawFirmTenant } from './Header';
+import type { MainView } from '../types';
 
 interface SidebarLeftProps {
-  mainView: 'workspace' | 'search' | 'tools' | 'audit';
-  setMainView: (view: 'workspace' | 'search' | 'tools' | 'audit') => void;
+  mainView: MainView;
+  setMainView: (view: MainView) => void;
   activeFirm: LawFirmTenant;
   setActiveFirm: (firm: LawFirmTenant) => void;
   sampleFirms: LawFirmTenant[];
@@ -52,6 +52,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
 
   const navItems = [
     { id: 'workspace' as const, label: 'Redacción', icon: Sparkles, description: 'Providencias judiciales' },
+    { id: 'audiencias' as const, label: 'Audiencias', icon: Mic, description: 'Transcripción de grabaciones' },
     { id: 'search' as const, label: 'Buscador', icon: BookOpen, description: 'Sentencias & precedentes' },
     { id: 'tools' as const, label: 'Herramientas', icon: Wrench, description: 'Cálculos & utilidades' },
     { id: 'audit' as const, label: 'Seguridad', icon: Shield, description: 'Auditoría & gestión' }

@@ -1,10 +1,11 @@
 import React from 'react';
 import { Scale, Building2, ShieldCheck, Check, ChevronDown, Sparkles, BookOpen, Wrench, Shield } from 'lucide-react';
 import type { LawFirmTenant } from './Header';
+import type { MainView } from '../types';
 
 interface TopNavBarProps {
-  mainView: 'workspace' | 'search' | 'tools' | 'audit';
-  setMainView: (view: 'workspace' | 'search' | 'tools' | 'audit') => void;
+  mainView: MainView;
+  setMainView: (view: MainView) => void;
   activeFirm: LawFirmTenant;
   setActiveFirm: (firm: LawFirmTenant) => void;
   sampleFirms: LawFirmTenant[];

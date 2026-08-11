@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { ChevronRight, Sparkles, BookOpen, Wrench, Shield, CheckCircle2, Copy, Download, FileType, Maximize2, Minimize2, LogOut } from 'lucide-react';
 import { ActionConfirmationModal } from './ActionConfirmationModal';
+import type { MainView } from '../types';
 
 interface HeaderTopProps {
-  mainView: 'workspace' | 'search' | 'tools' | 'audit';
+  mainView: MainView;
   rightView: 'pdf' | 'draft' | 'analytics';
   setRightView: (view: 'pdf' | 'draft' | 'analytics') => void;
   copied: boolean;
