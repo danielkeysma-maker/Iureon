@@ -48,6 +48,7 @@ const requireGroup = (name: string, keys: string[]): boolean => {
   return true;
 };
 
+const openAIEnabled = requireGroup('OpenAI (transcripción)', ['OPENAI_API_KEY']);
 const supabaseEnabled = requireGroup('Supabase', ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY']);
 const backblazeEnabled = requireGroup('Backblaze B2', [
   'B2_APPLICATION_KEY_ID',
@@ -78,6 +79,10 @@ export const config = {
   },
   openRouter: {
     apiKey: openRouterApiKey
+  },
+  openAI: {
+    enabled: openAIEnabled,
+    apiKey: read('OPENAI_API_KEY')
   },
   backblaze: {
     enabled: backblazeEnabled,
