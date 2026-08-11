@@ -8,7 +8,8 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "ingest:jurisprudence": "npx ts-node src/scripts/runIngestion.ts",
-    "ingest:mass": "npx ts-node src/scripts/massIngestJurisprudence.ts"
+    "ingest:mass": "npx ts-node src/scripts/massIngestJurisprudence.ts",
+    "check:catalog": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/catalog/__checks__/catalog.check.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

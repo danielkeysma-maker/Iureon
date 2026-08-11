@@ -14,6 +14,7 @@ import { auditRoutes } from './modules/audit/audit.routes';
 import { searchRoutes } from './modules/search/search.routes';
 import { draftsRoutes } from './modules/drafts/drafts.routes';
 import { transcriptionRoutes } from './modules/transcription/transcription.routes';
+import { catalogRoutes } from './modules/catalog/catalog.routes';
 
 const app: Express = express();
 
@@ -46,6 +47,7 @@ app.use('/api', auditRoutes);
 app.use('/api', searchRoutes);
 app.use('/api', draftsRoutes);
 app.use('/api', transcriptionRoutes);
+app.use('/api', catalogRoutes);
 
 // Servidor Express
 app.listen(config.port, () => {
@@ -61,6 +63,7 @@ app.listen(config.port, () => {
   console.log(`🛡️ Módulo Audit: Trazabilidad de Seguridad B2B`);
   console.log(`💳 Módulo Subscriptions: Perfiles de Firma y Planes SaaS`);
   console.log(`🎙️ Módulo Transcription: Audiencias y entrevistas con diarización`);
+  console.log(`📚 Módulo Catalog: Actuaciones verificadas con norma y caducidad`);
   console.log(`=======================================================`);
 });
 

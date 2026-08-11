@@ -1,4 +1,5 @@
 import { resolveDocumentStructure } from './documentStructures';
+import { buildCatalogGuidance } from './catalogGuidance';
 
 interface ClaudePromptInput {
   documentType: string;
@@ -34,7 +35,11 @@ export const buildClaudeDraftPrompt = ({
   customFormat,
   existingDraft
 }: ClaudePromptInput): string => {
-  const estructuraObligatoria = resolveDocumentStructure(documentType);
+  // A catalogued actuación supplies the article, the deadline and the
+  // norm-mandated sections. Only when the actuación is not catalogued yet does
+  // the older free-text reference structure apply.
+  const catalogGuidance = buildCatalogGuidance(documentType);
+  const estructuraObligatoria = catalogGuidance ?? resolveDocumentStructure(documentType);
   const continuationBlock = existingDraft
     ? `\nMODO CONTINUACIÓN/CORRECCIÓN: El usuario tiene un borrador previo que quiere que continúes, corrijas o proyectes. Tu tarea es tomar ese borrador como base y aplicar las instrucciones del usuario. Entrega el documento COMPLETO resultante (no solo la parte modificada).\n\nBORRADOR EXISTENTE:\n"""\n${existingDraft}\n"""\n`
     : '';
