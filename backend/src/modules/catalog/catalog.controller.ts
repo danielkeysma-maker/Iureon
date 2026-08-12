@@ -51,12 +51,15 @@ export const listActuacionesController = async (req: Request, res: Response): Pr
   const branch = req.query.branch as LegalBranch | undefined;
   const role = req.query.role as ActuacionRole | undefined;
 
-  const { actuaciones, curation } = await catalogService.listForFirm(firmId, branch, role);
+  const { actuaciones, meta, curation } = await catalogService.listForFirm(firmId, branch, role);
 
   res.json({
     success: true,
     branches: catalogService.listBranches(),
     curation,
+    // Declared coverage gaps travel with the list so the screen can show what
+    // the catalogue does NOT cover, instead of leaving it in a research file.
+    meta,
     actuaciones
   });
 };

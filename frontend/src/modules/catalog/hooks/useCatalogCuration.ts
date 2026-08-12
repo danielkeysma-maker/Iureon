@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTenant } from '../../tenant/TenantContext';
 import { catalogApi } from '../services/catalog.api';
-import type { Actuacion, CurationStatus, LegalBranch, VerificationInput } from '../types';
+import type { Actuacion, CatalogMeta, CurationStatus, LegalBranch, VerificationInput } from '../types';
 
 /**
  * State for the curation screen.
@@ -15,6 +15,7 @@ export const useCatalogCuration = () => {
 
   const [actuaciones, setActuaciones] = useState<Actuacion[]>([]);
   const [branches, setBranches] = useState<LegalBranch[]>([]);
+  const [meta, setMeta] = useState<CatalogMeta[]>([]);
   const [curation, setCuration] = useState<CurationStatus>('OK');
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -33,6 +34,7 @@ export const useCatalogCuration = () => {
       const result = await catalogApi.list(firmId);
       setActuaciones(result.actuaciones);
       setBranches(result.branches);
+      setMeta(result.meta);
       setCuration(result.curation);
     } catch (error) {
       setLoadError(error instanceof Error ? error.message : 'No se pudo cargar el catálogo.');
@@ -116,6 +118,7 @@ export const useCatalogCuration = () => {
     total: actuaciones.length,
     pending,
     branches,
+    meta,
     curation,
     isLoading,
     loadError,

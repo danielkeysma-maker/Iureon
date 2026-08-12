@@ -2,6 +2,7 @@ import { httpClient } from '../../../config/httpClient';
 import type {
   Actuacion,
   ActuacionRole,
+  CatalogMeta,
   CurationStatus,
   LegalBranch,
   VerificationInput
@@ -17,6 +18,7 @@ interface ListResponse {
   success: boolean;
   curation: CurationStatus;
   branches: LegalBranch[];
+  meta: CatalogMeta[];
   actuaciones: Actuacion[];
 }
 
@@ -55,7 +57,12 @@ export const catalogApi = {
   async list(
     firmId: string,
     filters: { branch?: LegalBranch; role?: ActuacionRole } = {}
-  ): Promise<{ actuaciones: Actuacion[]; branches: LegalBranch[]; curation: CurationStatus }> {
+  ): Promise<{
+    actuaciones: Actuacion[];
+    branches: LegalBranch[];
+    meta: CatalogMeta[];
+    curation: CurationStatus;
+  }> {
     const params = new URLSearchParams();
     if (filters.branch) params.set('branch', filters.branch);
     if (filters.role) params.set('role', filters.role);
@@ -66,7 +73,12 @@ export const catalogApi = {
       { firmId }
     );
 
-    return { actuaciones: data.actuaciones, branches: data.branches, curation: data.curation };
+    return {
+      actuaciones: data.actuaciones,
+      branches: data.branches,
+      meta: data.meta ?? [],
+      curation: data.curation
+    };
   },
 
   /** Records the firm's verification. Throws with the API's message on rejection. */

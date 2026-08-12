@@ -43,6 +43,12 @@ export const CatalogCurationView: React.FC = () => {
   const curation = useCatalogCuration();
   const [selected, setSelected] = useState<Actuacion | null>(null);
 
+  // Follows the branch filter: reading eleven branches' caveats at once is the
+  // same as reading none.
+  const visibleGaps = curation.meta
+    .filter((m) => curation.branchFilter === 'TODAS' || m.branch === curation.branchFilter)
+    .flatMap((m) => m.gaps.map((text) => ({ branch: m.branch, text })));
+
   // The list is reloaded after each write, so the open actuación is re-read
   // from the fresh data rather than kept as a stale snapshot.
   const openActuacion = selected
@@ -85,6 +91,29 @@ export const CatalogCurationView: React.FC = () => {
                 todavía. Puedes consultar el catálogo base.
               </p>
             </div>
+          )}
+
+          {/* Declared coverage gaps. These are the things the catalogue knows
+              it does not cover — including, for labour, that a whole transition
+              regime runs alongside the code it was verified against. Leaving
+              them in a research file would make the catalogue look complete. */}
+          {visibleGaps.length > 0 && (
+            <details className="mt-3 rounded-lg border border-slate-200 bg-white">
+              <summary className="cursor-pointer px-3 py-2 text-[11px] font-semibold text-slate-700 select-none">
+                Lo que este catálogo NO cubre
+                <span className="ml-1.5 font-normal text-slate-500">
+                  ({visibleGaps.length} advertencia{visibleGaps.length === 1 ? '' : 's'})
+                </span>
+              </summary>
+              <ul className="px-3 pb-3 pt-1 space-y-1.5">
+                {visibleGaps.map((gap) => (
+                  <li key={gap.branch + gap.text} className="text-[11px] text-slate-700 leading-snug flex gap-1.5">
+                    <span className="shrink-0 font-bold text-slate-400">{gap.branch}</span>
+                    <span>{gap.text}</span>
+                  </li>
+                ))}
+              </ul>
+            </details>
           )}
 
           <div className="mt-3 flex flex-wrap items-center gap-2">

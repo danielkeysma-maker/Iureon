@@ -76,6 +76,20 @@ export interface Actuacion {
  */
 export type CurationStatus = 'OK' | 'NOT_CONFIGURED' | 'UNAVAILABLE';
 
+/**
+ * Provenance for one branch's catalogue.
+ *
+ * `gaps` is the honest part: what the catalogue does NOT cover, declared rather
+ * than left to be discovered. The labour branch's first gap is that a whole
+ * transition regime runs alongside the code it was verified against.
+ */
+export interface CatalogMeta {
+  branch: LegalBranch;
+  verifiedAt: string;
+  sourceOfTruth: string;
+  gaps: string[];
+}
+
 /** What the firm submits when it verifies an actuación against the norm. */
 export interface VerificationInput {
   actuacionId: string;

@@ -5,6 +5,7 @@ import type {
   Actuacion,
   ActuacionRole,
   BranchCatalog,
+  CatalogMeta,
   LegalBranch
 } from './types';
 
@@ -181,15 +182,21 @@ export class CatalogService {
   // applies to every later draft without a developer touching source.
   // ---------------------------------------------------------------------------
 
+  /** Provenance for the branches in scope, so the declared gaps stay visible. */
+  listMeta(branch?: LegalBranch): CatalogMeta[] {
+    return CATALOGS.filter((c) => !branch || c.meta.branch === branch).map((c) => c.meta);
+  }
+
   async listForFirm(
     firmId: string,
     branch?: LegalBranch,
     role?: ActuacionRole
-  ): Promise<{ actuaciones: Actuacion[]; curation: CurationStatus }> {
+  ): Promise<{ actuaciones: Actuacion[]; meta: CatalogMeta[]; curation: CurationStatus }> {
     const load = await verificationStore.listForFirm(firmId);
 
     return {
       actuaciones: applyVerifications(this.list(branch, role), load.verifications),
+      meta: this.listMeta(branch),
       curation: load.status
     };
   }
