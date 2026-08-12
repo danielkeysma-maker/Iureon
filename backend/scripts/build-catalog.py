@@ -88,6 +88,13 @@ BRANCHES = [
         'NOTARIAL',
         'notarial',
     ),
+    (
+        'actuaciones-contratacion.json',
+        'contratacion.ts',
+        'CONTRATACION_CATALOG',
+        'CONTRATACION',
+        'contratacion',
+    ),
 ]
 
 

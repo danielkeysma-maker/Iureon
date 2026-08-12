@@ -14,6 +14,7 @@ export type LegalBranch =
   | 'TRIBUTARIO'
   | 'TRANSITO'
   | 'NOTARIAL'
+  | 'CONTRATACION'
   | 'INTERNACIONAL';
 
 export type ActuacionRole = 'LITIGANTE' | 'DESPACHO';

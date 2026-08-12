@@ -1,0 +1,390 @@
+import type { BranchCatalog } from '../types';
+
+/**
+ * CONTRATACION catalogue.
+ *
+ * Generated from research/actuaciones-contratacion.json, whose entries were verified against the
+ * official text of the governing norms. Do not hand-edit: regenerate with
+ * `python backend/scripts/build-catalog.py` so data and provenance never drift.
+ *
+ * Coverage is partial by design and the gaps are declared below rather than
+ * hidden, because a silent gap in procedural deadlines is the dangerous kind.
+ */
+export const CONTRATACION_CATALOG: BranchCatalog = {
+  meta: {
+    branch: 'CONTRATACION',
+    verifiedAt: '2026-08-12',
+    sourceOfTruth: 'Ley 80 de 1993 (Estatuto General de Contratación de la Administración Pública); Ley 1150 de 2007; Ley 1474 de 2011 (Estatuto Anticorrupción); Decreto 1082 de 2015. Los términos marcados como verificados fueron leídos artículo por artículo en el texto de la norma. Esta rama cubre la etapa precontractual y contractual ante la entidad; las acciones judiciales contractuales están en la rama ADMINISTRATIVO.',
+    gaps: [
+    'LEY 80 DE 1993 SIGUE VIGENTE. El Proyecto de Ley 554 de 2025 propone reformarla integralmente —poder preferente del Estado para ejecutar directamente, incidente de objeciones ciudadanas, audiencias públicas obligatorias— pero NO ha sido aprobado. Es un proyecto, no derecho vigente. Este catálogo refleja la ley en vigor.',
+    'EL ACTO DE ADJUDICACIÓN ES IRREVOCABLE. El art. 9 de la Ley 1150 de 2007 dispone que la adjudicación se hace obligatoriamente en audiencia pública, mediante resolución motivada, y que el acto de adjudicación es IRREVOCABLE y obliga a la entidad y al adjudicatario. No se ataca por revocatoria directa: la vía es judicial, ante la jurisdicción contencioso administrativa. Confundir esto pierde la oportunidad de impugnar.',
+    'Términos para interponer los recursos contra los actos de caducidad, multa y declaratoria de incumplimiento: se rigen por el CPACA y no los fija la Ley 80 ni la Ley 1474. Están en la rama ADMINISTRATIVO y por eso figuran sin verificar en estas entradas.',
+    'El art. 86 de la Ley 1474 de 2011 fija las etapas del procedimiento sancionatorio contractual —citación, audiencia, cargos, descargos, pruebas— pero no plazos en días para cada una. Quedan sin verificar.',
+    'Los regímenes exceptuados del Estatuto General —empresas de servicios públicos domiciliarios, entidades financieras estatales, salud, ciencia y tecnología, entre otros— se rigen por el derecho privado y sus propias normas. No están cubiertos.',
+    'Los plazos específicos de cada modalidad de selección —selección abreviada, concurso de méritos, mínima cuantía— están reglamentados en el Decreto 1082 de 2015 y no se verificaron aquí; sólo se catalogó la licitación pública de la Ley 80.'
+    ]
+  },
+  actuaciones: [
+  {
+    id: 'contratacion/observaciones-al-proyecto-de-pliego-de-condiciones',
+    exactName: 'Observaciones al proyecto de pliego de condiciones',
+    branch: 'CONTRATACION',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 80 de 1993, art. 30; Decreto 1082 de 2015',
+    competentAuthority: 'Entidad estatal contratante',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Identificación del proceso de selección y del proyecto de pliego observado', mandatory: true, basis: 'Art. 30' },
+      { n: 2, name: 'Identificación del observante y de su interés en el proceso', mandatory: true, basis: null },
+      { n: 3, name: 'Observación concreta por cada numeral del pliego', mandatory: true, basis: 'Art. 30' },
+      { n: 4, name: 'Fundamento legal o técnico de cada observación', mandatory: true, basis: null },
+      { n: 5, name: 'Petición concreta de modificación', mandatory: true, basis: null }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=304'
+  },
+  {
+    id: 'contratacion/solicitud-de-aclaracion-de-pliegos-en-audiencia-de-precision',
+    exactName: 'Solicitud de aclaración de pliegos en audiencia de precisión',
+    branch: 'CONTRATACION',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 80 de 1993, art. 30 num. 4',
+    competentAuthority: 'Entidad estatal contratante',
+    term: { status: 'VERIFICADO', description: 'Dentro de los tres (3) días hábiles siguientes al inicio del plazo para la presentación de propuestas pueden solicitarse aclaraciones o precisiones sobre el contenido y alcance de los pliegos (art. 30 num. 4).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del proceso y del numeral del pliego que se aclara', mandatory: true, basis: 'Art. 30 num. 4' },
+      { n: 2, name: 'Punto concreto que ofrece duda sobre el contenido o alcance', mandatory: true, basis: 'Art. 30 num. 4' },
+      { n: 3, name: 'Incidencia de la duda en la formulación de la propuesta', mandatory: true, basis: null },
+      { n: 4, name: 'Solicitud de que la respuesta se consigne en acta y adenda', mandatory: true, basis: 'Art. 30 num. 4' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=304'
+  },
+  {
+    id: 'contratacion/presentacion-de-propuesta-en-licitacion-publica',
+    exactName: 'Presentación de propuesta en licitación pública',
+    branch: 'CONTRATACION',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 80 de 1993, arts. 24 y 30; Ley 1150 de 2007, art. 5',
+    competentAuthority: 'Entidad estatal contratante',
+    term: { status: 'VERIFICADO', description: 'El plazo de la licitación se señala en los pliegos según la naturaleza, objeto y cuantía del contrato, y puede prorrogarse hasta por seis (6) días hábiles (art. 30).' },
+    requiredSections: [
+      { n: 1, name: 'Carta de presentación de la propuesta suscrita por el representante legal', mandatory: true, basis: 'Art. 30' },
+      { n: 2, name: 'Documentos de existencia y representación legal del proponente', mandatory: true, basis: 'Art. 30' },
+      { n: 3, name: 'Acreditación de los requisitos habilitantes: capacidad jurídica, financiera y experiencia', mandatory: true, basis: 'Ley 1150 de 2007, art. 5' },
+      { n: 4, name: 'Registro Único de Proponentes vigente y en firme', mandatory: true, basis: 'Ley 1150 de 2007, art. 6' },
+      { n: 5, name: 'Oferta económica conforme al formato del pliego', mandatory: true, basis: 'Art. 30' },
+      { n: 6, name: 'Garantía de seriedad de la oferta', mandatory: true, basis: 'Art. 30' },
+      { n: 7, name: 'Declaración de ausencia de inhabilidades e incompatibilidades', mandatory: true, basis: 'Art. 8' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=304'
+  },
+  {
+    id: 'contratacion/observaciones-al-informe-de-evaluacion-de-propuestas',
+    exactName: 'Observaciones al informe de evaluación de propuestas',
+    branch: 'CONTRATACION',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 80 de 1993, art. 30 num. 8',
+    competentAuthority: 'Entidad estatal contratante',
+    term: { status: 'VERIFICADO', description: 'Los informes de evaluación permanecen a disposición de los oferentes por un término de cinco (5) días hábiles para que presenten observaciones, sin que puedan modificar ni mejorar sus propuestas (art. 30 num. 8).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del informe de evaluación observado', mandatory: true, basis: 'Art. 30 num. 8' },
+      { n: 2, name: 'Observación concreta sobre la calificación propia o de otros proponentes', mandatory: true, basis: 'Art. 30 num. 8' },
+      { n: 3, name: 'Fundamento en el pliego y en la propuesta ya presentada', mandatory: true, basis: 'Art. 30 num. 8' },
+      { n: 4, name: 'Constancia de que no se modifica ni mejora la propuesta', mandatory: true, basis: 'Art. 30 num. 8' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=304'
+  },
+  {
+    id: 'contratacion/subsanacion-de-requisitos-habilitantes',
+    exactName: 'Subsanación de requisitos habilitantes',
+    branch: 'CONTRATACION',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1150 de 2007, art. 5 par. 1',
+    competentAuthority: 'Entidad estatal contratante',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Identificación del requerimiento de subsanación de la entidad', mandatory: true, basis: 'Ley 1150 de 2007, art. 5' },
+      { n: 2, name: 'Documento que acredita el requisito habilitante echado de menos', mandatory: true, basis: 'Ley 1150 de 2007, art. 5' },
+      { n: 3, name: 'Constancia de que el requisito no otorga puntaje', mandatory: true, basis: 'Ley 1150 de 2007, art. 5' },
+      { n: 4, name: 'Manifestación de que no se modifica la oferta económica', mandatory: true, basis: 'Ley 1150 de 2007, art. 5' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=184686'
+  },
+  {
+    id: 'contratacion/descargos-en-audiencia-de-incumplimiento-contractual',
+    exactName: 'Descargos en audiencia de incumplimiento contractual',
+    branch: 'CONTRATACION',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1474 de 2011, art. 86',
+    competentAuthority: 'Entidad estatal contratante',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Identificación de la citación, de los hechos imputados y del contrato', mandatory: true, basis: 'Art. 86' },
+      { n: 2, name: 'Pronunciamiento sobre cada cargo formulado por la entidad', mandatory: true, basis: 'Art. 86' },
+      { n: 3, name: 'Controversia del informe de interventoría o supervisión que soporta los hechos', mandatory: true, basis: 'Art. 86' },
+      { n: 4, name: 'Pruebas que se aportan o cuya práctica se solicita', mandatory: true, basis: 'Art. 86' },
+      { n: 5, name: 'Alegación de causa extraña, fuerza mayor o hecho de la entidad, cuando proceda', mandatory: false, basis: null }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=43292'
+  },
+  {
+    id: 'contratacion/solicitud-de-liquidacion-bilateral-del-contrato-estatal',
+    exactName: 'Solicitud de liquidación bilateral del contrato estatal',
+    branch: 'CONTRATACION',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1150 de 2007, art. 11',
+    competentAuthority: 'Entidad estatal contratante',
+    term: { status: 'VERIFICADO', description: 'De mutuo acuerdo dentro del término fijado en los pliegos o el que acuerden las partes. A falta de ese término, dentro de los cuatro (4) meses siguientes a la expiración del plazo previsto para la ejecución del contrato o a la expedición del acto que ordene su terminación. Vencido, la entidad puede liquidar unilateralmente dentro de los dos (2) meses siguientes; y si tampoco se hizo, puede liquidarse en cualquier tiempo dentro de los dos (2) años siguientes (art. 11).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del contrato y de la fecha de expiración de su plazo de ejecución', mandatory: true, basis: 'Art. 11' },
+      { n: 2, name: 'Balance de las prestaciones ejecutadas y de los pagos realizados', mandatory: true, basis: 'Art. 11' },
+      { n: 3, name: 'Determinación del saldo a favor o en contra de cada parte', mandatory: true, basis: 'Art. 11' },
+      { n: 4, name: 'Salvedades y reclamaciones que se dejan constando', mandatory: true, basis: 'Art. 11' },
+      { n: 5, name: 'Constancia de paz y salvo, cuando no haya salvedades', mandatory: false, basis: 'Art. 11' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=184686'
+  },
+  {
+    id: 'contratacion/solicitud-de-restablecimiento-del-equilibrio-economico-del-contrato',
+    exactName: 'Solicitud de restablecimiento del equilibrio económico del contrato',
+    branch: 'CONTRATACION',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 80 de 1993, arts. 4 num. 8, 5 num. 1 y 27',
+    competentAuthority: 'Entidad estatal contratante',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Identificación del contrato y de su ecuación contractual inicial', mandatory: true, basis: 'Art. 27' },
+      { n: 2, name: 'Hecho que rompió el equilibrio: hecho del príncipe, imprevisión o incumplimiento de la entidad', mandatory: true, basis: 'Art. 27' },
+      { n: 3, name: 'Demostración de que el hecho fue imprevisible y no imputable al contratista', mandatory: true, basis: 'Art. 27' },
+      { n: 4, name: 'Cuantificación del mayor valor o del perjuicio sufrido', mandatory: true, basis: 'Art. 27' },
+      { n: 5, name: 'Constancia de haber dejado la salvedad oportunamente', mandatory: true, basis: 'Ley 1150 de 2007, art. 11' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=304'
+  },
+  {
+    id: 'contratacion/solicitud-de-adicion-o-prorroga-del-contrato-estatal',
+    exactName: 'Solicitud de adición o prórroga del contrato estatal',
+    branch: 'CONTRATACION',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 80 de 1993, art. 40 par.',
+    competentAuthority: 'Entidad estatal contratante',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Identificación del contrato, de su valor y de su plazo vigente', mandatory: true, basis: 'Art. 40' },
+      { n: 2, name: 'Justificación técnica de la adición o prórroga', mandatory: true, basis: 'Art. 40' },
+      { n: 3, name: 'Verificación del límite: la adición no puede superar el cincuenta por ciento (50%) del valor inicial expresado en salarios mínimos legales mensuales', mandatory: true, basis: 'Art. 40 par.' },
+      { n: 4, name: 'Solicitud presentada antes del vencimiento del plazo de ejecución', mandatory: true, basis: null },
+      { n: 5, name: 'Ajuste de las garantías', mandatory: true, basis: null }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=304'
+  },
+  {
+    id: 'contratacion/recurso-de-reposicion-contra-la-declaratoria-de-caducidad',
+    exactName: 'Recurso de reposición contra la declaratoria de caducidad',
+    branch: 'CONTRATACION',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 80 de 1993, arts. 18 y 77; Ley 1437 de 2011, art. 76',
+    competentAuthority: 'La misma entidad que profirió el acto',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Identificación del acto de caducidad y de su fecha de notificación', mandatory: true, basis: 'Art. 18' },
+      { n: 2, name: 'Controversia del hecho constitutivo de incumplimiento grave invocado', mandatory: true, basis: 'Art. 18' },
+      { n: 3, name: 'Demostración de que el incumplimiento no afecta de manera grave y directa la ejecución', mandatory: true, basis: 'Art. 18' },
+      { n: 4, name: 'Pronunciamiento sobre las inhabilidades que la caducidad genera', mandatory: true, basis: 'Art. 18' },
+      { n: 5, name: 'Petición de revocatoria del acto', mandatory: true, basis: 'Art. 77' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=304'
+  },
+  {
+    id: 'contratacion/recurso-de-reposicion-contra-la-resolucion-que-impone-multa',
+    exactName: 'Recurso de reposición contra la resolución que impone multa',
+    branch: 'CONTRATACION',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1474 de 2011, art. 86; Ley 1437 de 2011, art. 76',
+    competentAuthority: 'La misma entidad que impuso la multa',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Identificación de la resolución sancionatoria y de su notificación', mandatory: true, basis: 'Art. 86' },
+      { n: 2, name: 'Controversia de los cargos y de las pruebas valoradas en la audiencia', mandatory: true, basis: 'Art. 86' },
+      { n: 3, name: 'Cuestionamiento de la cuantificación de la multa o de los perjuicios', mandatory: true, basis: 'Art. 86' },
+      { n: 4, name: 'Petición de revocatoria o de reducción', mandatory: true, basis: 'Art. 86' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=43292'
+  },
+  {
+    id: 'contratacion/aviso-de-convocatoria-publica',
+    exactName: 'Aviso de convocatoria pública',
+    branch: 'CONTRATACION',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 80 de 1993, art. 30 num. 3',
+    competentAuthority: 'Entidad estatal contratante',
+    term: { status: 'VERIFICADO', description: 'Dentro de los diez (10) a veinte (20) días calendario anteriores a la apertura de la licitación se publican hasta tres (3) avisos, en la página web de la entidad y en el SECOP (art. 30 num. 3).' },
+    requiredSections: [
+      { n: 1, name: 'Objeto del contrato y modalidad de selección', mandatory: true, basis: 'Art. 30 num. 3' },
+      { n: 2, name: 'Presupuesto oficial estimado', mandatory: true, basis: 'Art. 30 num. 3' },
+      { n: 3, name: 'Fecha de apertura de la licitación y cronograma', mandatory: true, basis: 'Art. 30 num. 3' },
+      { n: 4, name: 'Lugar de consulta del pliego de condiciones', mandatory: true, basis: 'Art. 30 num. 3' },
+      { n: 5, name: 'Constancia de publicación en la página web y en el SECOP', mandatory: true, basis: 'Art. 30 num. 3' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=304'
+  },
+  {
+    id: 'contratacion/estudios-previos-y-analisis-del-sector',
+    exactName: 'Estudios previos y análisis del sector',
+    branch: 'CONTRATACION',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 80 de 1993, art. 25 nums. 7 y 12; Decreto 1082 de 2015',
+    competentAuthority: 'Entidad estatal contratante',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Descripción de la necesidad que se pretende satisfacer', mandatory: true, basis: 'Art. 25 num. 12' },
+      { n: 2, name: 'Objeto a contratar y sus especificaciones técnicas', mandatory: true, basis: 'Art. 25 num. 12' },
+      { n: 3, name: 'Modalidad de selección y su justificación jurídica', mandatory: true, basis: 'Ley 1150 de 2007, art. 2' },
+      { n: 4, name: 'Valor estimado del contrato y su fundamento', mandatory: true, basis: 'Art. 25 num. 12' },
+      { n: 5, name: 'Criterios de selección y requisitos habilitantes', mandatory: true, basis: 'Ley 1150 de 2007, art. 5' },
+      { n: 6, name: 'Análisis de riesgos y su asignación', mandatory: true, basis: 'Ley 1150 de 2007, art. 4' },
+      { n: 7, name: 'Garantías exigidas', mandatory: true, basis: 'Art. 25 num. 19' },
+      { n: 8, name: 'Certificado de disponibilidad presupuestal', mandatory: true, basis: 'Art. 25 num. 6' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=304'
+  },
+  {
+    id: 'contratacion/pliego-de-condiciones-definitivo',
+    exactName: 'Pliego de condiciones definitivo',
+    branch: 'CONTRATACION',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 80 de 1993, art. 24 num. 5 y art. 30',
+    competentAuthority: 'Entidad estatal contratante',
+    term: { status: 'VERIFICADO', description: 'El plazo de la licitación se señala en el pliego y puede prorrogarse hasta por seis (6) días hábiles (art. 30).' },
+    requiredSections: [
+      { n: 1, name: 'Objeto, alcance y especificaciones técnicas', mandatory: true, basis: 'Art. 24 num. 5' },
+      { n: 2, name: 'Requisitos habilitantes objetivos, sin puntaje', mandatory: true, basis: 'Ley 1150 de 2007, art. 5' },
+      { n: 3, name: 'Reglas de evaluación y factores de escogencia con su ponderación', mandatory: true, basis: 'Ley 1150 de 2007, art. 5' },
+      { n: 4, name: 'Cronograma completo del proceso', mandatory: true, basis: 'Art. 30' },
+      { n: 5, name: 'Minuta del contrato a celebrar', mandatory: true, basis: 'Art. 24 num. 5' },
+      { n: 6, name: 'Reglas que no induzcan a error ni permitan la formulación de ofrecimientos de extensión ilimitada', mandatory: true, basis: 'Art. 24 num. 5' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=304'
+  },
+  {
+    id: 'contratacion/informe-de-evaluacion-de-propuestas',
+    exactName: 'Informe de evaluación de propuestas',
+    branch: 'CONTRATACION',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 80 de 1993, art. 30 num. 8',
+    competentAuthority: 'Entidad estatal contratante',
+    term: { status: 'VERIFICADO', description: 'Permanece a disposición de los oferentes por cinco (5) días hábiles para que presenten observaciones, sin que puedan modificar ni mejorar sus propuestas (art. 30 num. 8).' },
+    requiredSections: [
+      { n: 1, name: 'Verificación de los requisitos habilitantes de cada proponente', mandatory: true, basis: 'Ley 1150 de 2007, art. 5' },
+      { n: 2, name: 'Calificación de los factores de escogencia según la ponderación del pliego', mandatory: true, basis: 'Ley 1150 de 2007, art. 5' },
+      { n: 3, name: 'Orden de elegibilidad resultante', mandatory: true, basis: 'Art. 30 num. 8' },
+      { n: 4, name: 'Motivación de los rechazos', mandatory: true, basis: 'Art. 30 num. 8' },
+      { n: 5, name: 'Constancia de traslado por cinco (5) días hábiles', mandatory: true, basis: 'Art. 30 num. 8' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=304'
+  },
+  {
+    id: 'contratacion/resolucion-de-adjudicacion',
+    exactName: 'Resolución de adjudicación',
+    branch: 'CONTRATACION',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 80 de 1993, art. 30 nums. 10 y 11; Ley 1150 de 2007, art. 9',
+    competentAuthority: 'Entidad estatal contratante',
+    term: { status: 'VERIFICADO', description: 'Se hace obligatoriamente en audiencia pública, mediante resolución motivada. El acto de adjudicación es IRREVOCABLE y obliga a la entidad y al adjudicatario (Ley 1150 de 2007, art. 9). El plazo para adjudicar se fija en el pliego y el jefe de la entidad puede prorrogarlo por un período máximo igual a la mitad del inicialmente fijado (Ley 80, art. 30).' },
+    requiredSections: [
+      { n: 1, name: 'Constancia de celebración de la audiencia pública de adjudicación', mandatory: true, basis: 'Ley 1150 de 2007, art. 9' },
+      { n: 2, name: 'Motivación: análisis de las propuestas y del orden de elegibilidad', mandatory: true, basis: 'Ley 1150 de 2007, art. 9' },
+      { n: 3, name: 'Respuesta a las observaciones presentadas al informe de evaluación', mandatory: true, basis: 'Art. 30 num. 8' },
+      { n: 4, name: 'Identificación del adjudicatario y del valor adjudicado', mandatory: true, basis: 'Art. 30 num. 11' },
+      { n: 5, name: 'Advertencia de irrevocabilidad del acto', mandatory: true, basis: 'Ley 1150 de 2007, art. 9' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=184686'
+  },
+  {
+    id: 'contratacion/resolucion-de-declaratoria-de-desierta',
+    exactName: 'Resolución de declaratoria de desierta',
+    branch: 'CONTRATACION',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 80 de 1993, art. 25 num. 18; Ley 1150 de 2007',
+    competentAuthority: 'Entidad estatal contratante',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Motivos precisos y detallados que impiden la selección objetiva', mandatory: true, basis: 'Art. 25 num. 18' },
+      { n: 2, name: 'Constancia de que no obedece a motivos o causas inconvenientes', mandatory: true, basis: 'Art. 25 num. 18' },
+      { n: 3, name: 'Análisis de cada propuesta y de por qué ninguna resulta admisible', mandatory: true, basis: 'Art. 25 num. 18' },
+      { n: 4, name: 'Indicación del recurso de reposición que procede', mandatory: true, basis: 'Art. 77' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=304'
+  },
+  {
+    id: 'contratacion/acto-de-declaratoria-de-caducidad-del-contrato',
+    exactName: 'Acto de declaratoria de caducidad del contrato',
+    branch: 'CONTRATACION',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 80 de 1993, art. 18',
+    competentAuthority: 'Entidad estatal contratante',
+    term: { status: 'VERIFICADO', description: 'Procede si se presenta alguno de los hechos constitutivos de incumplimiento que afecte de manera grave y directa la ejecución del contrato y evidencie que puede conducir a su paralización (art. 18).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del hecho constitutivo de incumplimiento', mandatory: true, basis: 'Art. 18' },
+      { n: 2, name: 'Demostración de que afecta de manera grave y directa la ejecución', mandatory: true, basis: 'Art. 18' },
+      { n: 3, name: 'Constancia del procedimiento previo con audiencia del contratista', mandatory: true, basis: 'Ley 1474 de 2011, art. 86' },
+      { n: 4, name: 'Declaratoria de terminación y orden de liquidación en el estado en que se encuentre', mandatory: true, basis: 'Art. 18' },
+      { n: 5, name: 'Constancia de que no habrá lugar a indemnización para el contratista', mandatory: true, basis: 'Art. 18' },
+      { n: 6, name: 'Advertencia sobre las inhabilidades que genera la caducidad', mandatory: true, basis: 'Arts. 8 y 18' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=304'
+  },
+  {
+    id: 'contratacion/resolucion-que-impone-multa-o-hace-efectiva-la-clausula-penal',
+    exactName: 'Resolución que impone multa o hace efectiva la cláusula penal',
+    branch: 'CONTRATACION',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 1474 de 2011, art. 86',
+    competentAuthority: 'Entidad estatal contratante',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Constancia de la citación previa con los hechos y el informe de interventoría o supervisión', mandatory: true, basis: 'Art. 86' },
+      { n: 2, name: 'Constancia de la audiencia y de la formulación sustentada de cargos', mandatory: true, basis: 'Art. 86' },
+      { n: 3, name: 'Valoración de los descargos y de las pruebas practicadas', mandatory: true, basis: 'Art. 86' },
+      { n: 4, name: 'Declaratoria de incumplimiento y cuantificación de los perjuicios', mandatory: true, basis: 'Art. 86' },
+      { n: 5, name: 'Liquidación de la multa o efectividad de la cláusula penal', mandatory: true, basis: 'Art. 86' },
+      { n: 6, name: 'Indicación de los recursos que proceden', mandatory: true, basis: 'Art. 86' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=43292'
+  },
+  {
+    id: 'contratacion/acta-de-liquidacion-bilateral-del-contrato',
+    exactName: 'Acta de liquidación bilateral del contrato',
+    branch: 'CONTRATACION',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 1150 de 2007, art. 11',
+    competentAuthority: 'Entidad estatal contratante y contratista',
+    term: { status: 'VERIFICADO', description: 'Dentro del término del pliego o el acordado; a falta de él, dentro de los cuatro (4) meses siguientes a la expiración del plazo de ejecución o al acto que ordene la terminación (art. 11).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del contrato y de sus modificaciones', mandatory: true, basis: 'Art. 11' },
+      { n: 2, name: 'Balance de prestaciones ejecutadas y pagos efectuados', mandatory: true, basis: 'Art. 11' },
+      { n: 3, name: 'Saldo a favor o en contra de cada parte', mandatory: true, basis: 'Art. 11' },
+      { n: 4, name: 'Salvedades del contratista, cuando las formule', mandatory: true, basis: 'Art. 11' },
+      { n: 5, name: 'Firma de ambas partes', mandatory: true, basis: 'Art. 11' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=184686'
+  },
+  {
+    id: 'contratacion/acto-de-liquidacion-unilateral-del-contrato',
+    exactName: 'Acto de liquidación unilateral del contrato',
+    branch: 'CONTRATACION',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 1150 de 2007, art. 11',
+    competentAuthority: 'Entidad estatal contratante',
+    term: { status: 'VERIFICADO', description: 'Procede cuando el contratista no comparece a la liquidación previa notificación o convocatoria, o cuando las partes no llegan a acuerdo sobre su contenido. Debe expedirse dentro de los dos (2) meses siguientes al vencimiento del término de la liquidación bilateral; vencido, aún puede liquidarse en cualquier tiempo dentro de los dos (2) años siguientes (art. 11).' },
+    requiredSections: [
+      { n: 1, name: 'Constancia de la notificación o convocatoria al contratista para liquidar', mandatory: true, basis: 'Art. 11' },
+      { n: 2, name: 'Constancia de su inasistencia o de la falta de acuerdo', mandatory: true, basis: 'Art. 11' },
+      { n: 3, name: 'Balance final de la ejecución y de los pagos', mandatory: true, basis: 'Art. 11' },
+      { n: 4, name: 'Determinación del saldo y orden de pago o de reintegro', mandatory: true, basis: 'Art. 11' },
+      { n: 5, name: 'Verificación del cómputo de los dos (2) meses y, en su caso, de los dos (2) años', mandatory: true, basis: 'Art. 11' },
+      { n: 6, name: 'Indicación de los recursos que proceden', mandatory: true, basis: 'Art. 77' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=184686'
+  }
+  ]
+};

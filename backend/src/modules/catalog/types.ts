@@ -18,6 +18,7 @@ export type LegalBranch =
   | 'TRIBUTARIO'
   | 'TRANSITO'
   | 'NOTARIAL'
+  | 'CONTRATACION'
   | 'INTERNACIONAL';
 
 /** Who authors the document. */

@@ -425,6 +425,46 @@ const CASES: Case[] = [
     mustContain: 'NO afirmes'
   },
 
+  // Contratación estatal. The liquidación cascade is the one people miss: a
+  // 4-month bilateral window, then 2 months to do it unilaterally, then two
+  // years in which it can still be done.
+  {
+    label: 'Solicitud de liquidación bilateral del contrato estatal',
+    expect: 'MATCH',
+    branch: 'CONTRATACION',
+    exactMatch: 'Solicitud de liquidación bilateral del contrato estatal',
+    mustContain: 'cuatro (4) meses'
+  },
+  {
+    label: 'Acto de liquidación unilateral del contrato',
+    expect: 'MATCH',
+    branch: 'CONTRATACION',
+    exactMatch: 'Acto de liquidación unilateral del contrato',
+    mustContain: 'dos (2) meses'
+  },
+  // Irrevocability is the fact that decides how an award is attacked at all.
+  {
+    label: 'Resolución de adjudicación',
+    expect: 'MATCH',
+    branch: 'CONTRATACION',
+    exactMatch: 'Resolución de adjudicación',
+    mustContain: 'IRREVOCABLE'
+  },
+  {
+    label: 'Observaciones al informe de evaluación de propuestas',
+    expect: 'MATCH',
+    branch: 'CONTRATACION',
+    exactMatch: 'Observaciones al informe de evaluación de propuestas',
+    mustContain: 'cinco (5) días hábiles'
+  },
+  {
+    label: 'Aviso de convocatoria pública',
+    expect: 'MATCH',
+    branch: 'CONTRATACION',
+    exactMatch: 'Aviso de convocatoria pública',
+    mustContain: 'veinte (20) días calendario'
+  },
+
   // Still not catalogued: must fall back rather than guess.
   { label: 'zzz documento inexistente', expect: 'NO_MATCH' },
   { label: 'de la', expect: 'NO_MATCH' }
