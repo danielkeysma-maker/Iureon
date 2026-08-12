@@ -13,6 +13,22 @@ import type { ActuacionRole, LegalBranch } from './types';
  * developer editing source — the point of the module.
  */
 
+/**
+ * Answers a store failure without echoing the database's own error text, which
+ * would leak schema details to the client. The detail goes to the server log,
+ * where it is actually useful.
+ */
+const respondStoreError = (res: Response, error: VerificationStoreError): void => {
+  console.error(`[CATALOG] ${error.code}: ${error.message}`);
+
+  const message =
+    error.code === 'STORE_NOT_CONFIGURED'
+      ? error.message
+      : 'La verificación no pudo guardarse. Revisa la conexión con la base de datos e inténtalo de nuevo.';
+
+  res.status(503).json({ error: error.code, message });
+};
+
 const requireFirmId = (req: Request, res: Response): string | null => {
   const firmId = req.firmId;
 
@@ -123,7 +139,7 @@ export const saveVerificationController = async (req: Request, res: Response): P
     res.json({ success: true, verification: saved, actuacion });
   } catch (error) {
     if (error instanceof VerificationStoreError) {
-      res.status(503).json({ error: error.code, message: error.message });
+      respondStoreError(res, error);
       return;
     }
     throw error;
@@ -153,7 +169,7 @@ export const deleteVerificationController = async (req: Request, res: Response):
     res.json({ success: true, actuacionId });
   } catch (error) {
     if (error instanceof VerificationStoreError) {
-      res.status(503).json({ error: error.code, message: error.message });
+      respondStoreError(res, error);
       return;
     }
     throw error;

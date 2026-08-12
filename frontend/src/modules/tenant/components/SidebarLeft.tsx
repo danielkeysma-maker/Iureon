@@ -13,7 +13,7 @@ import {
   CreditCard,
   ChevronsLeft,
   ChevronsRight,
-  User, Mic } from 'lucide-react';
+  User, Mic, Library } from 'lucide-react';
 import type { LawFirmTenant } from './Header';
 import type { MainView } from '../types';
 
@@ -54,6 +54,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
     { id: 'workspace' as const, label: 'Redacción', icon: Sparkles, description: 'Providencias judiciales' },
     { id: 'audiencias' as const, label: 'Audiencias', icon: Mic, description: 'Transcripción de grabaciones' },
     { id: 'search' as const, label: 'Buscador', icon: BookOpen, description: 'Sentencias & precedentes' },
+    { id: 'catalogo' as const, label: 'Catálogo', icon: Library, description: 'Actuaciones y términos verificados' },
     { id: 'tools' as const, label: 'Herramientas', icon: Wrench, description: 'Cálculos & utilidades' },
     { id: 'audit' as const, label: 'Seguridad', icon: Shield, description: 'Auditoría & gestión' }
   ];

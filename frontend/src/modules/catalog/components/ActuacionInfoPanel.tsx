@@ -84,6 +84,15 @@ export const ActuacionInfoPanel: React.FC<ActuacionInfoPanelProps> = ({ actuacio
             ? 'El catálogo no tiene este término confirmado contra la norma. Verifícalo antes de radicar: no asumas que no hay plazo.'
             : actuacion.term.description}
         </p>
+
+        {/* Who supplied the fact matters as much as the fact. A term the firm
+            curated must never read as one that shipped verified. */}
+        {actuacion.verification && (
+          <p className="text-[10px] mt-1.5 pt-1.5 border-t border-current/15 opacity-80 leading-snug">
+            Verificado por tu firma ({actuacion.verification.verifiedBy}) el{' '}
+            {new Date(actuacion.verification.verifiedAt).toLocaleDateString('es-CO')}.
+          </p>
+        )}
       </div>
 
       {actuacion.competentAuthority && (

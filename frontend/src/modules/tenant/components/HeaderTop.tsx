@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronRight, Sparkles, BookOpen, Wrench, Shield, CheckCircle2, Copy, Download, FileType, Maximize2, Minimize2, LogOut } from 'lucide-react';
+import { ChevronRight, Sparkles, BookOpen, Wrench, Shield, CheckCircle2, Copy, Download, FileType, Maximize2, Minimize2, LogOut, Mic, Library } from 'lucide-react';
 import { ActionConfirmationModal } from './ActionConfirmationModal';
 import type { MainView } from '../types';
 
@@ -34,12 +34,20 @@ export const HeaderTop: React.FC<HeaderTopProps> = ({
 
   const viewMeta: Record<string, { label: string; icon: React.ReactNode }> = {
     workspace: { label: 'Redacción & Providencias', icon: <Sparkles className="w-4 h-4 text-blue-800" /> },
+    audiencias: { label: 'Audiencias & Transcripción', icon: <Mic className="w-4 h-4 text-blue-800" /> },
     search: { label: 'Buscador & Sentencias', icon: <BookOpen className="w-4 h-4 text-blue-800" /> },
+    catalogo: { label: 'Catálogo Procesal', icon: <Library className="w-4 h-4 text-blue-800" /> },
     tools: { label: 'Herramientas & Cálculos', icon: <Wrench className="w-4 h-4 text-blue-800" /> },
     audit: { label: 'Seguridad & Auditoría', icon: <Shield className="w-4 h-4 text-blue-800" /> }
   };
 
-  const current = viewMeta[mainView];
+  // Falls back rather than crashing: this map silently lost its 'audiencias'
+  // entry when that view shipped, and reading `.icon` off undefined took the
+  // whole header down with it.
+  const current = viewMeta[mainView] ?? {
+    label: 'Módulo',
+    icon: <Sparkles className="w-4 h-4 text-blue-800" />
+  };
 
   return (
     <header className="h-[52px] bg-white border-b border-slate-200/80 px-6 flex items-center justify-between select-none font-sans z-20">

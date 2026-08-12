@@ -46,7 +46,14 @@ const request = async <T>(
   });
 
   if (!response.ok) {
-    throw new ApiError(`${method} ${path} failed with ${response.status}`, response.status, url);
+    // The API explains rejections in Spanish for the lawyer — a curation form
+    // needs to say "falta la fuente normativa", not "failed with 400".
+    const payload = await response.json().catch(() => null);
+    throw new ApiError(
+      payload?.message || `${method} ${path} failed with ${response.status}`,
+      response.status,
+      url
+    );
   }
 
   if (response.status === 204) {

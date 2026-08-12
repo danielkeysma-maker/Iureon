@@ -7,6 +7,7 @@ import { AgentPanelLeft } from './modules/workspace/components/AgentPanelLeft';
 import { DocumentCanvasRight } from './modules/workspace/components/DocumentCanvasRight';
 import { SearchView } from './modules/search/components/SearchView';
 import { TranscriptionView } from './modules/transcription/components/TranscriptionView';
+import { CatalogCurationView } from './modules/catalog/components/CatalogCurationView';
 import { ToolsView } from './modules/tools/components/ToolsView';
 import { AuditView } from './modules/audit/components/AuditView';
 import { FirmBrandingModal } from './modules/tenant/components/FirmBrandingModal';
@@ -320,6 +321,7 @@ export function App() {
 
           {mainView === 'audiencias' && <TranscriptionView kind="AUDIENCIA" />}
           {mainView === 'search' && <SearchView />}
+          {mainView === 'catalogo' && <CatalogCurationView />}
           {mainView === 'tools' && <ToolsView />}
           {mainView === 'audit' && <AuditView />}
         </main>

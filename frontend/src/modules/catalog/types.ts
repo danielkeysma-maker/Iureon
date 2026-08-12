@@ -40,6 +40,20 @@ export interface ActuacionTerm {
   description: string | null;
 }
 
+/**
+ * Stamped on an actuación the firm curated itself.
+ *
+ * Always surfaced. A lawyer reading a deadline is entitled to know whether it
+ * came with the product or from a colleague, and `replaced` keeps the previous
+ * value visible so an override can be reviewed rather than taken on faith.
+ */
+export interface ActuacionVerification {
+  verifiedBy: string;
+  verifiedAt: string;
+  note: string | null;
+  replaced: ActuacionTerm;
+}
+
 export interface Actuacion {
   id: string;
   exactName: string;
@@ -50,4 +64,25 @@ export interface Actuacion {
   term: ActuacionTerm;
   requiredSections: RequiredSection[];
   sourceUrl: string | null;
+  verification?: ActuacionVerification;
+}
+
+/**
+ * Whether the firm's own curation could be read for this response.
+ *
+ * UNAVAILABLE is not the same as "nothing curated": it means the catalogue on
+ * screen may be missing corrections the firm already made, so the UI warns
+ * instead of presenting shipped data as current.
+ */
+export type CurationStatus = 'OK' | 'NOT_CONFIGURED' | 'UNAVAILABLE';
+
+/** What the firm submits when it verifies an actuación against the norm. */
+export interface VerificationInput {
+  actuacionId: string;
+  termStatus: TermStatus;
+  termDescription: string | null;
+  legalBasis: string | null;
+  sourceUrl: string | null;
+  note: string | null;
+  verifiedBy: string;
 }
