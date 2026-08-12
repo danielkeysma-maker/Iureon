@@ -345,6 +345,46 @@ const CASES: Case[] = [
     mustContain: 'cincuenta (50) días'
   },
 
+  // Tránsito. Caducidad and prescripción are the pair to keep apart: the
+  // ACTION lapses at 1 year from the facts (art. 161), the imposed SANCTION
+  // prescribes at 3 (art. 159). Pleading the wrong one loses a good defence.
+  {
+    label: 'Solicitud de caducidad de la acción contravencional de tránsito',
+    expect: 'MATCH',
+    branch: 'TRANSITO',
+    exactMatch: 'Solicitud de caducidad de la acción contravencional de tránsito',
+    mustContain: 'caduca al año'
+  },
+  {
+    label: 'Solicitud de prescripción de la sanción de tránsito',
+    expect: 'MATCH',
+    branch: 'TRANSITO',
+    exactMatch: 'Solicitud de prescripción de la sanción de tránsito',
+    mustContain: 'Tres (3) años'
+  },
+  {
+    label: 'Solicitud de reducción de la multa de tránsito',
+    expect: 'MATCH',
+    branch: 'TRANSITO',
+    exactMatch: 'Solicitud de reducción de la multa de tránsito',
+    mustContain: 'cinco (5) días'
+  },
+  {
+    label: 'Comparecencia y descargos ante orden de comparendo',
+    expect: 'MATCH',
+    branch: 'TRANSITO',
+    exactMatch: 'Comparecencia y descargos ante orden de comparendo',
+    mustContain: 'treinta (30) días calendario'
+  },
+  // A defence that is lost by not pleading it deserves its own check.
+  {
+    label: 'Solicitud de silencio administrativo positivo por recurso no resuelto',
+    expect: 'MATCH',
+    branch: 'TRANSITO',
+    exactMatch: 'Solicitud de silencio administrativo positivo por recurso no resuelto',
+    mustContain: 'a favor del recurrente'
+  },
+
   // Still not catalogued: must fall back rather than guess.
   { label: 'zzz documento inexistente', expect: 'NO_MATCH' },
   { label: 'de la', expect: 'NO_MATCH' }

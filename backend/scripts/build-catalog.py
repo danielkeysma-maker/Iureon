@@ -74,6 +74,13 @@ BRANCHES = [
         'TRIBUTARIO',
         'tributario',
     ),
+    (
+        'actuaciones-transito.json',
+        'transito.ts',
+        'TRANSITO_CATALOG',
+        'TRANSITO',
+        'transito',
+    ),
 ]
 
 
