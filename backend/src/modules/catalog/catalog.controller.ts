@@ -83,7 +83,15 @@ export const resolveActuacionController = async (req: Request, res: Response): P
     return;
   }
 
-  const { actuacion, curation } = await catalogService.resolveForFirm(firmId, documentType);
+  // Optional, but supplying it is what lets a name shared by two branches
+  // resolve at all: without it the service refuses rather than guesses.
+  const branch = (req.query.branch as LegalBranch | undefined) || undefined;
+
+  const { actuacion, curation } = await catalogService.resolveForFirm(
+    firmId,
+    documentType,
+    branch
+  );
 
   res.json({ success: true, curation, actuacion });
 };

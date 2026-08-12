@@ -1,5 +1,4 @@
-import { ADMINISTRATIVO_CATALOG } from './data/administrativo';
-import { CONSTITUCIONAL_CATALOG } from './data/constitucional';
+import { ALL_CATALOGS } from './data';
 import { applyVerification, applyVerifications } from './verification.merge';
 import { verificationStore, type VerificationLoad } from './verification.store';
 import type {
@@ -19,11 +18,14 @@ import type {
 export type CurationStatus = VerificationLoad['status'];
 
 /**
- * Branch catalogues currently loaded. Branches absent here are simply not
- * catalogued yet; callers must degrade rather than assume an empty result
- * means "no such actuación exists".
+ * Branch catalogues currently loaded, from the generated `data/index.ts`.
+ * Branches absent there are simply not catalogued yet; callers must degrade
+ * rather than assume an empty result means "no such actuación exists".
+ *
+ * The service deliberately does not name the branches: adding one is a change
+ * to the generator's BRANCHES list and nothing else.
  */
-const CATALOGS: BranchCatalog[] = [ADMINISTRATIVO_CATALOG, CONSTITUCIONAL_CATALOG];
+const CATALOGS: BranchCatalog[] = ALL_CATALOGS;
 
 const normalize = (text: string): string =>
   text
@@ -97,14 +99,23 @@ export class CatalogService {
   /**
    * Resolves a UI document-type label to a catalogued actuación.
    * Returns null when nothing matches confidently.
+   *
+   * `branch` narrows the search when the caller knows it. Without it, a label
+   * that fits more than one branch is AMBIGUOUS and resolves to null: "recurso
+   * de reposición" is 3 days before a civil judge (CGP art. 318) and 10 before
+   * the administration (CPACA art. 76), and answering with either one at random
+   * would hand a lawyer the wrong deadline with full confidence.
    */
-  findByDocumentType(documentType: string): Actuacion | null {
+  findByDocumentType(documentType: string, branch?: LegalBranch): Actuacion | null {
     const target = normalize(documentType);
 
     if (!target) return null;
 
-    const exact = this.actuaciones.find((a) => normalize(a.exactName) === target);
-    if (exact) return exact;
+    const pool = branch ? this.actuaciones.filter((a) => a.branch === branch) : this.actuaciones;
+
+    const exact = pool.filter((a) => normalize(a.exactName) === target);
+    if (exact.length === 1) return exact[0];
+    if (exact.length > 1) return CatalogService.ambiguous(documentType, exact);
 
     const targetWords = new Set(significantWords(documentType));
     if (targetWords.size === 0) return null;
@@ -112,8 +123,9 @@ export class CatalogService {
     let best: Actuacion | null = null;
     let bestOverlap = 0;
     let bestScore = -Infinity;
+    let tied: Actuacion[] = [];
 
-    for (const actuacion of this.actuaciones) {
+    for (const actuacion of pool) {
       // Deduplicated: a name that repeats a word must not outrank a name that
       // matches the request more precisely. "Demanda de nulidad o de nulidad y
       // restablecimiento ... contra actos precontractuales" would otherwise
@@ -134,10 +146,33 @@ export class CatalogService {
         bestScore = score;
         bestOverlap = overlap;
         best = actuacion;
+        tied = [actuacion];
+      } else if (score === bestScore) {
+        tied.push(actuacion);
       }
     }
 
-    return bestOverlap >= CatalogService.MIN_MATCH_SCORE ? best : null;
+    if (bestOverlap < CatalogService.MIN_MATCH_SCORE) return null;
+    if (tied.length > 1) return CatalogService.ambiguous(documentType, tied);
+
+    return best;
+  }
+
+  /**
+   * Refuses to choose between equally good candidates.
+   *
+   * Returning null makes the drafting pipeline fall back to its generic
+   * structure and the panel show nothing — which is the correct outcome. The
+   * whole module exists because a confident wrong deadline is worse than an
+   * acknowledged absence of one.
+   */
+  private static ambiguous(documentType: string, candidates: Actuacion[]): null {
+    console.warn(
+      `[CATALOG] "${documentType}" es ambiguo entre ${candidates.length} actuaciones (${candidates
+        .map((a) => `${a.branch}:${a.exactName}`)
+        .join(' | ')}). No se resuelve sin rama.`
+    );
+    return null;
   }
 
   // ---------------------------------------------------------------------------
@@ -167,9 +202,10 @@ export class CatalogService {
    */
   async resolveForFirm(
     firmId: string,
-    documentType: string
+    documentType: string,
+    branch?: LegalBranch
   ): Promise<{ actuacion: Actuacion | null; curation: CurationStatus }> {
-    const base = this.findByDocumentType(documentType);
+    const base = this.findByDocumentType(documentType, branch);
     const load = await verificationStore.listForFirm(firmId);
 
     if (!base) return { actuacion: null, curation: load.status };

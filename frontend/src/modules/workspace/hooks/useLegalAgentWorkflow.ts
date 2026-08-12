@@ -10,6 +10,11 @@ export function useLegalAgentWorkflow(firmId?: string) {
   const [legalPrompt, setLegalPrompt] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [documentType, setDocumentType] = useState('Contestación de Demanda');
+  // The branch belongs to the workflow, not to the panel that renders its
+  // selector: the catalogue cannot resolve a filing name without it. "Recurso
+  // de reposición" exists in civil and administrativo with different deadlines,
+  // and without the branch the backend correctly refuses to guess.
+  const [legalBranch, setLegalBranch] = useState('CONSTITUCIONAL');
   const [copied, setCopied] = useState(false);
   const [generatedDraft, setGeneratedDraft] = useState<GeneratedDraft | null>(null);
   const [isFocusMode, setIsFocusMode] = useState(false);
@@ -126,6 +131,7 @@ Por favor espere unos segundos mientras se finaliza la redacción solemne.`,
         },
         body: JSON.stringify({
           documentType,
+          legalBranch,
           legalPrompt,
           expedienteId: 'EXP-2026-904',
           existingDraft: activeDraftText || undefined
@@ -313,6 +319,8 @@ T.P. Abogado Apoderado`,
     isProcessing,
     documentType,
     setDocumentType,
+    legalBranch,
+    setLegalBranch,
     copied,
     generatedDraft,
     setGeneratedDraft,

@@ -8,8 +8,12 @@ import type { Actuacion } from '../types';
  *
  * Returns null while loading and when nothing matches, so the caller renders
  * nothing rather than a placeholder claiming an absence of requirements.
+ *
+ * The branch is not optional in practice: several filing names exist in more
+ * than one branch with different deadlines, and the backend refuses to resolve
+ * them without it rather than pick one.
  */
-export const useActuacion = (documentType: string): Actuacion | null => {
+export const useActuacion = (documentType: string, branch?: string): Actuacion | null => {
   const { firmId } = useTenant();
   const [actuacion, setActuacion] = useState<Actuacion | null>(null);
 
@@ -20,14 +24,14 @@ export const useActuacion = (documentType: string): Actuacion | null => {
     // chosen document type would be actively misleading.
     setActuacion(null);
 
-    catalogApi.resolve(firmId, documentType).then((found) => {
+    catalogApi.resolve(firmId, documentType, branch).then((found) => {
       if (!cancelled) setActuacion(found);
     });
 
     return () => {
       cancelled = true;
     };
-  }, [firmId, documentType]);
+  }, [firmId, documentType, branch]);
 
   return actuacion;
 };

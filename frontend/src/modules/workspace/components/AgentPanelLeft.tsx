@@ -15,6 +15,9 @@ export interface CaseStudyFile {
 interface AgentPanelLeftProps {
   documentType: string;
   setDocumentType: (type: string) => void;
+  /** Owned by the workflow: the catalogue needs it to resolve a filing name. */
+  legalBranch: string;
+  setLegalBranch: (branch: string) => void;
   legalPrompt: string;
   setLegalPrompt: (prompt: string) => void;
   isProcessing: boolean;
@@ -27,6 +30,8 @@ interface AgentPanelLeftProps {
 export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
   documentType,
   setDocumentType,
+  legalBranch,
+  setLegalBranch,
   legalPrompt,
   setLegalPrompt,
   isProcessing,
@@ -35,8 +40,7 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
   activeDraftText,
   onClearActiveDraft
 }) => {
-  const actuacion = useActuacion(documentType);
-  const [legalBranch, setLegalBranch] = useState<string>('CONSTITUCIONAL');
+  const actuacion = useActuacion(documentType, legalBranch);
   const [userRole, setUserRole] = useState<'FIRMA_LITIGANTE' | 'JUZGADO_DESPACHO'>('FIRMA_LITIGANTE');
   const [importedFiles, setImportedFiles] = useState<CaseStudyFile[]>([]);
   const [isUploadingFile, setIsUploadingFile] = useState(false);

@@ -4,10 +4,18 @@ import { detectLegalTopic } from './topicDetector';
 import { generateCleanDocumentTitle } from './documentTitle';
 import { buildClaudeDraftPrompt, buildClaudeUserMessage } from './claudeDraft.prompt';
 import { buildCatalogGuidanceForFirm } from './catalogGuidance';
+import type { LegalBranch } from '../catalog/types';
 import { buildSolemnColombianDraft } from './solemnDraft.fallback';
 
 export interface WorkflowRequest {
   documentType: string;
+  /**
+   * Branch the filing belongs to. Optional because older callers omit it, but
+   * without it the catalogue cannot resolve a name shared by two branches —
+   * "recurso de reposición" is 3 days in civil and 10 in administrativo — and
+   * correctly declines to answer rather than pick one.
+   */
+  legalBranch?: string;
   legalPrompt: string;
   expedienteId?: string;
   customFormatInstruction?: string;
@@ -208,7 +216,11 @@ export class OpenRouterService {
     // Resolved per firm so a term the firm verified in the curation screen is
     // the one Claude drafts against, not the shipped default it replaced.
     const catalogGuidance = req.firmId
-      ? await buildCatalogGuidanceForFirm(req.firmId, req.documentType)
+      ? await buildCatalogGuidanceForFirm(
+          req.firmId,
+          req.documentType,
+          req.legalBranch as LegalBranch | undefined
+        )
       : undefined;
 
     const systemPrompt = buildClaudeDraftPrompt({

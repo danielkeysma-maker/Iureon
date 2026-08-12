@@ -34,12 +34,15 @@ interface SaveResponse {
  * learn that the verification was not recorded, so it throws.
  */
 export const catalogApi = {
-  async resolve(firmId: string, documentType: string): Promise<Actuacion | null> {
+  async resolve(firmId: string, documentType: string, branch?: string): Promise<Actuacion | null> {
     if (!documentType.trim()) return null;
+
+    const params = new URLSearchParams({ documentType });
+    if (branch) params.set('branch', branch);
 
     try {
       const data = await httpClient.get<ResolveResponse>(
-        `/api/catalog/actuaciones/resolve?documentType=${encodeURIComponent(documentType)}`,
+        `/api/catalog/actuaciones/resolve?${params.toString()}`,
         { firmId }
       );
 

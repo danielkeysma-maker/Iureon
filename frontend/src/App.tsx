@@ -287,6 +287,8 @@ export function App() {
                 <AgentPanelLeft
                   documentType={workflow.documentType}
                   setDocumentType={workflow.setDocumentType}
+                  legalBranch={workflow.legalBranch}
+                  setLegalBranch={workflow.setLegalBranch}
                   legalPrompt={workflow.legalPrompt}
                   setLegalPrompt={workflow.setLegalPrompt}
                   isProcessing={workflow.isProcessing}

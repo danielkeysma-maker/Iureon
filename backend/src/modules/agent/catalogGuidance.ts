@@ -1,5 +1,5 @@
 import { catalogService } from '../catalog/catalog.service';
-import type { Actuacion } from '../catalog/types';
+import type { Actuacion, LegalBranch } from '../catalog/types';
 
 /**
  * Turns a catalogued actuación into the block Claude drafts against.
@@ -65,8 +65,10 @@ REGLA DE CITACIÓN: cita únicamente los artículos indicados arriba y aquellos 
 };
 
 /** Shipped-catalogue guidance, with no firm curation applied. */
-export const buildCatalogGuidance = (documentType: string): string | null =>
-  renderCatalogGuidance(catalogService.findByDocumentType(documentType));
+export const buildCatalogGuidance = (
+  documentType: string,
+  branch?: LegalBranch
+): string | null => renderCatalogGuidance(catalogService.findByDocumentType(documentType, branch));
 
 /**
  * Guidance for one firm: the shipped catalogue with that firm's own verified
@@ -75,9 +77,10 @@ export const buildCatalogGuidance = (documentType: string): string | null =>
  */
 export const buildCatalogGuidanceForFirm = async (
   firmId: string,
-  documentType: string
+  documentType: string,
+  branch?: LegalBranch
 ): Promise<string | null> => {
-  const { actuacion } = await catalogService.resolveForFirm(firmId, documentType);
+  const { actuacion } = await catalogService.resolveForFirm(firmId, documentType, branch);
   return renderCatalogGuidance(actuacion);
 };
 

@@ -14,13 +14,15 @@ import { catalogService } from '../catalog.service';
 import { buildCatalogGuidance, renderCatalogGuidance } from '../../agent/catalogGuidance';
 import { validateVerificationInput } from '../verification.validate';
 import { applyVerification } from '../verification.merge';
-import type { CatalogVerification } from '../types';
+import type { CatalogVerification, LegalBranch } from '../types';
 
 interface Case {
   label: string;
   expect: 'MATCH' | 'NO_MATCH';
   mustContain?: string;
   exactMatch?: string;
+  /** Narrows the search, as a caller who knows the branch would. */
+  branch?: LegalBranch;
 }
 
 // The dangerous failure is a confident wrong match: attaching the 4-month
@@ -40,6 +42,90 @@ const CASES: Case[] = [
   { label: 'Incidente de desacato', expect: 'MATCH', exactMatch: 'Solicitud de apertura de incidente de desacato' },
   { label: 'Impugnación del fallo de tutela', expect: 'MATCH' },
 
+  // Civil (CGP). The verbal / verbal sumario pair is the dangerous one: the
+  // traslado is 20 days in one and 10 in the other, so a wrong match halves or
+  // doubles the window a defendant actually has to answer.
+  {
+    label: 'Contestación de la demanda en proceso verbal',
+    expect: 'MATCH',
+    exactMatch: 'Contestación de la demanda en proceso verbal',
+    mustContain: 'Veinte (20) días'
+  },
+  {
+    label: 'Contestación de demanda verbal sumario',
+    expect: 'MATCH',
+    exactMatch: 'Contestación de la demanda en proceso verbal sumario',
+    mustContain: 'Diez (10) días'
+  },
+  {
+    label: 'Demanda de proceso verbal sumario',
+    expect: 'MATCH',
+    exactMatch: 'Demanda de proceso verbal sumario'
+  },
+  // Casación splits into two filings with very different windows: 5 days to
+  // lodge the recurso, 30 to file the demanda. Collapsing them loses the case.
+  {
+    label: 'Interposición del recurso de casación',
+    expect: 'MATCH',
+    exactMatch: 'Interposición del recurso extraordinario de casación',
+    mustContain: 'Cinco (5) días'
+  },
+  {
+    label: 'Demanda de casación',
+    expect: 'MATCH',
+    exactMatch: 'Demanda de casación',
+    mustContain: 'Treinta (30) días'
+  },
+  // Three ordinary recursos, all with a 3-day window but different addressees.
+  // The first two share a name with a CPACA filing, so they need their branch.
+  { label: 'Recurso de reposición', expect: 'MATCH', branch: 'CIVIL', exactMatch: 'Recurso de reposición' },
+  { label: 'Recurso de apelación', expect: 'MATCH', branch: 'CIVIL', exactMatch: 'Recurso de apelación' },
+  { label: 'Recurso de súplica', expect: 'MATCH', branch: 'CIVIL', exactMatch: 'Recurso de súplica' },
+
+  // THE COLLISION. "Recurso de reposición" is 3 days before a civil judge
+  // (CGP art. 318) and 10 before the administration (CPACA art. 76). Asked
+  // without a branch, the catalogue must refuse: answering with either one at
+  // random would hand a lawyer a wrong deadline with full confidence, which is
+  // the single failure mode this module exists to prevent.
+  { label: 'Recurso de reposición', expect: 'NO_MATCH' },
+  { label: 'Recurso de apelación', expect: 'NO_MATCH' },
+  { label: 'Recurso de queja', expect: 'NO_MATCH' },
+  { label: 'Recurso de súplica', expect: 'NO_MATCH' },
+  {
+    label: 'Recurso de reposición',
+    expect: 'MATCH',
+    branch: 'ADMINISTRATIVO',
+    exactMatch: 'Recurso de reposición (vía gubernativa)',
+    mustContain: 'diez (10) días'
+  },
+  // Executive proceedings: the plain and the secured demand are different filings.
+  { label: 'Demanda ejecutiva singular', expect: 'MATCH', exactMatch: 'Demanda ejecutiva singular' },
+  {
+    label: 'Demanda ejecutiva con garantía real',
+    expect: 'MATCH',
+    exactMatch: 'Demanda ejecutiva con garantía real'
+  },
+  {
+    label: 'Excepciones de mérito en proceso ejecutivo',
+    expect: 'MATCH',
+    exactMatch: 'Excepciones de mérito en proceso ejecutivo',
+    mustContain: 'Diez (10) días'
+  },
+  // Queja is catalogued but its term was not verifiable in the source; the
+  // guidance must refuse to state one rather than borrow a neighbouring term.
+  {
+    label: 'Recurso de queja',
+    expect: 'MATCH',
+    branch: 'CIVIL',
+    exactMatch: 'Recurso de queja',
+    mustContain: 'NO afirmes'
+  },
+  {
+    label: 'Demanda de pertenencia',
+    expect: 'MATCH',
+    exactMatch: 'Demanda de declaración de pertenencia'
+  },
+
   // Still not catalogued: must fall back rather than guess.
   { label: 'Demanda laboral ordinaria', expect: 'NO_MATCH' },
   { label: 'zzz documento inexistente', expect: 'NO_MATCH' },
@@ -49,7 +135,7 @@ const CASES: Case[] = [
 let failures = 0;
 
 for (const testCase of CASES) {
-  const found = catalogService.findByDocumentType(testCase.label);
+  const found = catalogService.findByDocumentType(testCase.label, testCase.branch);
   const got = found ? 'MATCH' : 'NO_MATCH';
 
   if (got !== testCase.expect) {
@@ -67,7 +153,7 @@ for (const testCase of CASES) {
   }
 
   if (found && testCase.mustContain) {
-    const guidance = buildCatalogGuidance(testCase.label) ?? '';
+    const guidance = buildCatalogGuidance(testCase.label, testCase.branch) ?? '';
     if (!guidance.includes(testCase.mustContain)) {
       console.error(`FAIL "${testCase.label}": guidance missing "${testCase.mustContain}" (matched ${found.exactName})`);
       failures++;
