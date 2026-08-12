@@ -24,6 +24,10 @@ jobs:
         run: npx tsc --noEmit
       - name: Catalogue correctness checks
         run: npm run check:catalog
+
+      - name: Embeddings guard (no fabricated vectors)
+        working-directory: backend
+        run: npm run check:embeddings
       - name: Build
         run: npm run build
 

@@ -1,5 +1,6 @@
 import { config } from '../../config/env.config';
 import { supabase } from '../../config/supabase.config';
+import { embeddingsService } from '../embeddings/embeddings.service';
 
 export type { IngestionRulingMetadata } from './types';
 import type { IngestionRulingMetadata } from './types';
@@ -15,9 +16,20 @@ export class JurisprudenceIngestionPipeline {
       const chunks = this.chunkText(ruling.fullText, 1000);
       let count = 0;
 
-      for (const chunk of chunks) {
-        // En producción: llamada a OpenAI/Gemini/Cohere Embeddings (1536 dimensiones)
-        const mockEmbedding = new Array(1536).fill(0).map(() => (Math.random() - 0.5) * 0.1);
+      // The shared SYSTEM_CORPUS is read by every tenant, so a fabricated
+      // vector here would corrupt search for all of them at once. This used to
+      // write Math.random() values, which is worse than sine noise: the same
+      // ruling produced a different vector on every run.
+      if (!embeddingsService.isAvailable()) {
+        console.warn(
+          '[JURISPRUDENCE] Sin proveedor de embeddings: no se ingesta. Configura OPENAI_API_KEY.'
+        );
+        return { success: false, chunksIngested: 0 };
+      }
+
+      const vectors = await embeddingsService.embedAll(chunks);
+
+      for (const [index, chunk] of chunks.entries()) {
 
         const contentWithMetadata = `[CORPORACIÓN: ${ruling.corporacion}] [TIPO: ${ruling.tipoSentencia}] [PROVIDENCIA: ${ruling.numeroProvidencia}] [PONENTE: ${ruling.magistradoPonente}] [RESULTADO: ${ruling.resuelveOutcome}]\nHECHOS: ${ruling.hechosClave}\nRATIO: ${ruling.ratioDecidendi}\n\n${chunk}`;
 
@@ -28,7 +40,7 @@ export class JurisprudenceIngestionPipeline {
             branch: ruling.rama,
             file_name: `${ruling.numeroProvidencia}.pdf`,
             content_chunk: contentWithMetadata,
-            embedding: mockEmbedding
+            embedding: vectors[index]
           });
         }
         count++;

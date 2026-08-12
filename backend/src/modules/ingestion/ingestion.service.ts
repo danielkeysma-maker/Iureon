@@ -1,4 +1,5 @@
 import { supabase } from '../../config/supabase.config';
+import { embeddingsService } from '../embeddings/embeddings.service';
 
 export type { IngestionRequest, IngestionResult } from './types';
 import type { IngestionRequest, IngestionResult } from './types';
@@ -20,7 +21,26 @@ export class IngestionService {
 
     console.log(`[INGESTION] Procesando "${req.title}" para firm_id: ${req.firmId}. Total chunks: ${chunks.length}`);
 
-    // 2. Generar embeddings e insertar en Supabase si las credenciales están activas
+    // 2. Real vectors or none. Writing fabricated ones would poison the index
+    // permanently: at rest they are indistinguishable from real embeddings, so
+    // no later query could tell that its neighbours are noise.
+    if (!embeddingsService.isAvailable()) {
+      console.warn(
+        '[INGESTION] Sin proveedor de embeddings: no se indexa. Configura OPENAI_API_KEY.'
+      );
+
+      return {
+        documentId,
+        firmId: req.firmId,
+        title: req.title,
+        b2FileUrl: req.b2FileUrl,
+        totalChunksCreated: chunks.length,
+        totalFoliosIndexed: 0,
+        status: 'NOT_INDEXED',
+        ingestedAt: new Date().toISOString()
+      };
+    }
+
     if (this.supabaseClient) {
       try {
         // Insertar documento base en legal_documents con RLS firm_id
@@ -40,21 +60,38 @@ export class IngestionService {
           console.warn('[SUPABASE-DOC-ERROR]', docError.message);
         }
 
-        // Generar y almacenar embeddings vectoriales
-        for (let i = 0; i < chunks.length; i++) {
-          const chunkText = chunks[i];
-          const mockVector = this.generateMockVector(1536, chunkText);
+        // Embedded first, inserted after: a provider failure must leave the
+        // index untouched rather than half-filled.
+        const vectors = await embeddingsService.embedAll(chunks);
 
+        for (let i = 0; i < chunks.length; i++) {
           await this.supabaseClient.from('document_embeddings').insert({
             document_id: documentId,
             firm_id: req.firmId,
-            content_chunk: chunkText,
-            embedding: mockVector,
+            content_chunk: chunks[i],
+            embedding: vectors[i],
             chunk_index: i
           });
         }
+
+        console.log(
+          `[INGESTION] ${chunks.length} fragmentos indexados con ${embeddingsService.providerName}.`
+        );
       } catch (err: any) {
-        console.warn('[SUPABASE-INGESTION-FALLBACK]', err.message);
+        // Never swallowed into a COMPLETED result: the caller must know the
+        // document is not searchable.
+        console.error('[INGESTION] Falló la indexación:', err.message);
+
+        return {
+          documentId,
+          firmId: req.firmId,
+          title: req.title,
+          b2FileUrl: req.b2FileUrl,
+          totalChunksCreated: chunks.length,
+          totalFoliosIndexed: 0,
+          status: 'NOT_INDEXED',
+          ingestedAt: new Date().toISOString()
+        };
       }
     }
 
@@ -82,18 +119,6 @@ export class IngestionService {
     }
 
     return chunks.length > 0 ? chunks : [text];
-  }
-
-  private generateMockVector(dimensions: number, textSeed: string): number[] {
-    const hash = textSeed.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const vector: number[] = [];
-
-    for (let i = 0; i < dimensions; i++) {
-      const val = Math.sin(hash + i) * 0.1;
-      vector.push(parseFloat(val.toFixed(6)));
-    }
-
-    return vector;
   }
 
   private getSampleExpedienteText(title: string): string {

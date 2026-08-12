@@ -55,6 +55,12 @@ export interface IngestionResult {
   b2FileUrl: string;
   totalChunksCreated: number;
   totalFoliosIndexed: number;
-  status: 'COMPLETED' | 'FAILED';
+  /**
+   * NOT_INDEXED is distinct from FAILED on purpose: the document was stored but
+   * is NOT searchable, either because no embeddings provider is configured or
+   * because indexing failed. Reporting it as COMPLETED would promise a search
+   * that cannot find it.
+   */
+  status: 'COMPLETED' | 'NOT_INDEXED' | 'FAILED';
   ingestedAt: string;
 }
