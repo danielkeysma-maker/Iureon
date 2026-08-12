@@ -187,6 +187,25 @@ if (missingBasis.length) {
   console.log(`ok   all ${catalogService.list().length} actuaciones carry a legal basis`);
 }
 
+// The workspace now offers catalogued names as its document-type options, so
+// every one of them must resolve back to itself when its branch is supplied.
+// A name that does not is an option the lawyer can pick and get no norm for —
+// which is exactly the gap that made the catalogue invisible in the UI. It also
+// catches two entries inside one branch that normalise identically.
+const unresolvable = catalogService
+  .list()
+  .filter((a) => catalogService.findByDocumentType(a.exactName, a.branch)?.id !== a.id);
+
+if (unresolvable.length) {
+  console.error(`FAIL ${unresolvable.length} actuaciones no resuelven desde su propio nombre:`);
+  for (const a of unresolvable.slice(0, 5)) {
+    console.error(`     ${a.branch}: ${a.exactName}`);
+  }
+  failures++;
+} else {
+  console.log(`ok   every catalogued name resolves within its branch (${catalogService.list().length})`);
+}
+
 // Ids must be unique or lookups silently return the wrong filing.
 const ids = catalogService.list().map((a) => a.id);
 if (new Set(ids).size !== ids.length) {
