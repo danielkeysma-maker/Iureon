@@ -118,7 +118,40 @@ CREATE TABLE IF NOT EXISTS public.audit_logs (
 CREATE INDEX IF NOT EXISTS idx_audit_logs_firm ON public.audit_logs(firm_id);
 
 -- ==============================================================================
--- 7. ROW LEVEL SECURITY — strict tenant isolation
+-- 7. CATALOG_VERIFICATIONS — procedural knowledge curated inside the product
+-- ==============================================================================
+-- The shipped catalogue (backend/src/modules/catalog/data/*.ts) is the base
+-- knowledge. This table is how a firm corrects or confirms an entry WITHOUT a
+-- developer editing source: a lawyer verifies an actuación's deadline against
+-- the norm once, and every future draft for that firm uses it.
+--
+-- Scope is deliberately per-firm. One tenant's verification must never silently
+-- change the legal advice another tenant receives; confirmed entries are
+-- promoted into the shipped catalogue by review, not by cross-tenant write.
+--
+-- verified_by is NOT NULL because this is legal knowledge: every claim about a
+-- caducidad has to be attributable to the person who checked it.
+CREATE TABLE IF NOT EXISTS public.catalog_verifications (
+    firm_id TEXT NOT NULL,
+    actuacion_id TEXT NOT NULL,   -- e.g. 'administrativo/demanda-de-nulidad-simple'
+    term_status TEXT NOT NULL CHECK (term_status IN ('VERIFICADO', 'NO_CADUCA', 'NO_VERIFICADO')),
+    term_description TEXT,        -- NULL exactly when term_status = 'NO_VERIFICADO'
+    legal_basis TEXT,             -- overrides the shipped article when the firm corrects it
+    source_url TEXT,              -- where it was verified; required to claim a term
+    note TEXT,
+    verified_by TEXT NOT NULL,
+    verified_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (firm_id, actuacion_id),
+    CONSTRAINT chk_unverified_has_no_term CHECK (
+        (term_status = 'NO_VERIFICADO' AND term_description IS NULL)
+        OR (term_status <> 'NO_VERIFICADO' AND term_description IS NOT NULL AND source_url IS NOT NULL)
+    )
+);
+
+CREATE INDEX IF NOT EXISTS idx_catalog_verifications_firm ON public.catalog_verifications(firm_id);
+
+-- ==============================================================================
+-- 8. ROW LEVEL SECURITY — strict tenant isolation
 -- ==============================================================================
 -- The backend connects with the service role key, which bypasses RLS by design;
 -- isolation there is enforced by the x-firm-id middleware. These policies are
@@ -132,6 +165,7 @@ ALTER TABLE public.document_embeddings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.saved_drafts        ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.firm_style_profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.audit_logs          ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.catalog_verifications ENABLE ROW LEVEL SECURITY;
 
 CREATE OR REPLACE FUNCTION public.current_firm_id()
 RETURNS TEXT
@@ -191,8 +225,14 @@ CREATE POLICY "tenant_append_audit_logs"
     ON public.audit_logs FOR INSERT
     WITH CHECK (firm_id = public.current_firm_id());
 
+DROP POLICY IF EXISTS "tenant_isolation_catalog_verifications" ON public.catalog_verifications;
+CREATE POLICY "tenant_isolation_catalog_verifications"
+    ON public.catalog_verifications FOR ALL
+    USING (firm_id = public.current_firm_id())
+    WITH CHECK (firm_id = public.current_firm_id());
+
 -- ==============================================================================
--- 8. RPC — tenant-scoped vector similarity search
+-- 9. RPC — tenant-scoped vector similarity search
 -- ==============================================================================
 CREATE OR REPLACE FUNCTION public.match_document_chunks_multi_tenant(
     query_embedding vector(1536),

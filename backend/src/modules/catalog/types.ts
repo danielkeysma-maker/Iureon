@@ -49,6 +49,21 @@ export interface ActuacionTerm {
   description: string | null;
 }
 
+/**
+ * Provenance stamped on an actuación whose term or basis was curated by the
+ * firm itself rather than shipped with the product.
+ *
+ * It is surfaced, never hidden: a lawyer reading a deadline is entitled to know
+ * whether it came from the verified catalogue or from a colleague last Tuesday.
+ */
+export interface ActuacionVerification {
+  verifiedBy: string;
+  verifiedAt: string;
+  note: string | null;
+  /** What the shipped catalogue said before the firm overrode it. */
+  replaced: ActuacionTerm;
+}
+
 export interface Actuacion {
   /** Stable lookup key, e.g. "administrativo/demanda-de-nulidad-simple". */
   id: string;
@@ -62,6 +77,36 @@ export interface Actuacion {
   requiredSections: RequiredSection[];
   /** Where the basis was verified. */
   sourceUrl: string | null;
+  /** Present only when this firm curated the entry in-product. */
+  verification?: ActuacionVerification;
+}
+
+/**
+ * A firm's curation of one catalogued actuación.
+ *
+ * Only the term, the article and the source may be corrected. Section
+ * requirements are not editable yet, and that limit is declared rather than
+ * silently enforced.
+ */
+export interface CatalogVerification {
+  actuacionId: string;
+  term: ActuacionTerm;
+  legalBasis: string | null;
+  sourceUrl: string | null;
+  note: string | null;
+  verifiedBy: string;
+  verifiedAt: string;
+}
+
+/** What a curation request may carry. Validated before it is persisted. */
+export interface CatalogVerificationInput {
+  actuacionId: string;
+  termStatus: TermStatus;
+  termDescription?: string | null;
+  legalBasis?: string | null;
+  sourceUrl?: string | null;
+  note?: string | null;
+  verifiedBy: string;
 }
 
 /** Provenance for a branch's catalogue, so gaps stay visible rather than implied. */

@@ -3,6 +3,7 @@ import { JURISPRUDENCE_BY_TOPIC } from './data/jurisprudence';
 import { detectLegalTopic } from './topicDetector';
 import { generateCleanDocumentTitle } from './documentTitle';
 import { buildClaudeDraftPrompt, buildClaudeUserMessage } from './claudeDraft.prompt';
+import { buildCatalogGuidanceForFirm } from './catalogGuidance';
 import { buildSolemnColombianDraft } from './solemnDraft.fallback';
 
 export interface WorkflowRequest {
@@ -56,7 +57,10 @@ export class OpenRouterService {
     return this.processWorkflowPipeline(req, onStepLog);
   }
 
-  public async processWorkflowPipeline(req: WorkflowRequest, onStepLog: (stepData: any) => void) {
+  public async processWorkflowPipeline(
+    req: WorkflowRequest & { firmId?: string },
+    onStepLog: (stepData: any) => void
+  ) {
     const startTime = Date.now();
     const isContinuation = Boolean(req.existingDraft);
 
@@ -186,7 +190,7 @@ export class OpenRouterService {
    * fails, so the lawyer never faces an empty canvas.
    */
   private async runDrafting(
-    req: WorkflowRequest,
+    req: WorkflowRequest & { firmId?: string },
     geminiExtraction: string,
     jurisprudencia: string[],
     gptStructure: string,
@@ -201,12 +205,19 @@ export class OpenRouterService {
       timestamp: new Date().toISOString()
     });
 
+    // Resolved per firm so a term the firm verified in the curation screen is
+    // the one Claude drafts against, not the shipped default it replaced.
+    const catalogGuidance = req.firmId
+      ? await buildCatalogGuidanceForFirm(req.firmId, req.documentType)
+      : undefined;
+
     const systemPrompt = buildClaudeDraftPrompt({
       documentType: req.documentType,
       prompt: req.legalPrompt,
       citations: jurisprudencia,
       customFormat: req.customFormatInstruction,
-      existingDraft: req.existingDraft
+      existingDraft: req.existingDraft,
+      catalogGuidance
     });
 
     const userMessage = buildClaudeUserMessage({

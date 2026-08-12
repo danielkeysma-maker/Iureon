@@ -7,6 +7,12 @@ interface ClaudePromptInput {
   citations: string[];
   customFormat?: string;
   existingDraft?: string;
+  /**
+   * Guidance already resolved for the firm, including its own curated terms.
+   * Omitted only by callers with no tenant in hand, which then fall back to the
+   * shipped catalogue.
+   */
+  catalogGuidance?: string | null;
 }
 
 interface ClaudeUserMessageInput {
@@ -33,13 +39,15 @@ export const buildClaudeDraftPrompt = ({
   prompt,
   citations,
   customFormat,
-  existingDraft
+  existingDraft,
+  catalogGuidance
 }: ClaudePromptInput): string => {
   // A catalogued actuación supplies the article, the deadline and the
   // norm-mandated sections. Only when the actuación is not catalogued yet does
   // the older free-text reference structure apply.
-  const catalogGuidance = buildCatalogGuidance(documentType);
-  const estructuraObligatoria = catalogGuidance ?? resolveDocumentStructure(documentType);
+  const guidance =
+    catalogGuidance === undefined ? buildCatalogGuidance(documentType) : catalogGuidance;
+  const estructuraObligatoria = guidance ?? resolveDocumentStructure(documentType);
   const continuationBlock = existingDraft
     ? `\nMODO CONTINUACIÓN/CORRECCIÓN: El usuario tiene un borrador previo que quiere que continúes, corrijas o proyectes. Tu tarea es tomar ese borrador como base y aplicar las instrucciones del usuario. Entrega el documento COMPLETO resultante (no solo la parte modificada).\n\nBORRADOR EXISTENTE:\n"""\n${existingDraft}\n"""\n`
     : '';

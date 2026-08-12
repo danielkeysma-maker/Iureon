@@ -1,11 +1,22 @@
 import { ADMINISTRATIVO_CATALOG } from './data/administrativo';
 import { CONSTITUCIONAL_CATALOG } from './data/constitucional';
+import { applyVerification, applyVerifications } from './verification.merge';
+import { verificationStore, type VerificationLoad } from './verification.store';
 import type {
   Actuacion,
   ActuacionRole,
   BranchCatalog,
   LegalBranch
 } from './types';
+
+/**
+ * Whether the firm's own curation was consulted for this answer.
+ *
+ * Carried on every firm-scoped response so the UI can say "no pude leer tus
+ * verificaciones" instead of quietly showing the shipped catalogue as if it
+ * were current.
+ */
+export type CurationStatus = VerificationLoad['status'];
 
 /**
  * Branch catalogues currently loaded. Branches absent here are simply not
@@ -127,6 +138,65 @@ export class CatalogService {
     }
 
     return bestOverlap >= CatalogService.MIN_MATCH_SCORE ? best : null;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Firm-scoped reads. The shipped catalogue is the base knowledge; a firm's
+  // own verifications are overlaid on top so a term confirmed once in-product
+  // applies to every later draft without a developer touching source.
+  // ---------------------------------------------------------------------------
+
+  async listForFirm(
+    firmId: string,
+    branch?: LegalBranch,
+    role?: ActuacionRole
+  ): Promise<{ actuaciones: Actuacion[]; curation: CurationStatus }> {
+    const load = await verificationStore.listForFirm(firmId);
+
+    return {
+      actuaciones: applyVerifications(this.list(branch, role), load.verifications),
+      curation: load.status
+    };
+  }
+
+  /**
+   * Resolves a document-type label for one firm.
+   *
+   * Matching runs against the shipped names, which curation never changes, so
+   * the override is applied after the match rather than widening it.
+   */
+  async resolveForFirm(
+    firmId: string,
+    documentType: string
+  ): Promise<{ actuacion: Actuacion | null; curation: CurationStatus }> {
+    const base = this.findByDocumentType(documentType);
+    const load = await verificationStore.listForFirm(firmId);
+
+    if (!base) return { actuacion: null, curation: load.status };
+
+    const found = load.verifications.find((v) => v.actuacionId === base.id);
+
+    return {
+      actuacion: found ? applyVerification(base, found) : base,
+      curation: load.status
+    };
+  }
+
+  async getByIdForFirm(
+    firmId: string,
+    id: string
+  ): Promise<{ actuacion: Actuacion | null; curation: CurationStatus }> {
+    const base = this.getById(id);
+    const load = await verificationStore.listForFirm(firmId);
+
+    if (!base) return { actuacion: null, curation: load.status };
+
+    const found = load.verifications.find((v) => v.actuacionId === base.id);
+
+    return {
+      actuacion: found ? applyVerification(base, found) : base,
+      curation: load.status
+    };
   }
 }
 
