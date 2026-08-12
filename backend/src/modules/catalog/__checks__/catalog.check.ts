@@ -296,6 +296,55 @@ const CASES: Case[] = [
     mustContain: 'veinte por ciento'
   },
 
+  // Tributario. The reconsideración/per saltum pair is the trap: 2 months to
+  // one forum, 4 to the other, and the second is only open when the
+  // requerimiento especial was answered properly.
+  {
+    label: 'Recurso de reconsideración',
+    expect: 'MATCH',
+    branch: 'TRIBUTARIO',
+    exactMatch: 'Recurso de reconsideración',
+    mustContain: 'Dos (2) meses'
+  },
+  {
+    label: 'Demanda per saltum contra liquidación oficial tributaria',
+    expect: 'MATCH',
+    branch: 'TRIBUTARIO',
+    exactMatch: 'Demanda per saltum contra liquidación oficial tributaria',
+    mustContain: 'Cuatro (4) meses'
+  },
+  {
+    label: 'Respuesta al requerimiento especial',
+    expect: 'MATCH',
+    branch: 'TRIBUTARIO',
+    exactMatch: 'Respuesta al requerimiento especial',
+    mustContain: 'Tres (3) meses'
+  },
+  // Firmeza and the requerimiento window are both 3 years and count from the
+  // same date; a draft that confuses them tells the taxpayer the assessment
+  // closed when the DIAN can still open it.
+  {
+    label: 'Constancia de firmeza de la declaración privada',
+    expect: 'MATCH',
+    branch: 'TRIBUTARIO',
+    exactMatch: 'Constancia de firmeza de la declaración privada',
+    mustContain: 'seis (6) años'
+  },
+  {
+    label: 'Liquidación oficial de revisión',
+    expect: 'MATCH',
+    branch: 'TRIBUTARIO',
+    exactMatch: 'Liquidación oficial de revisión',
+    mustContain: 'seis (6) meses'
+  },
+  {
+    label: 'Solicitud de devolución de saldo a favor',
+    expect: 'MATCH',
+    branch: 'TRIBUTARIO',
+    exactMatch: 'Solicitud de devolución de saldo a favor',
+    mustContain: 'cincuenta (50) días'
+  },
+
   // Still not catalogued: must fall back rather than guess.
   { label: 'zzz documento inexistente', expect: 'NO_MATCH' },
   { label: 'de la', expect: 'NO_MATCH' }

@@ -67,6 +67,13 @@ BRANCHES = [
         'SOCIETARIO',
         'societario',
     ),
+    (
+        'actuaciones-tributario.json',
+        'tributario.ts',
+        'TRIBUTARIO_CATALOG',
+        'TRIBUTARIO',
+        'tributario',
+    ),
 ]
 
 
