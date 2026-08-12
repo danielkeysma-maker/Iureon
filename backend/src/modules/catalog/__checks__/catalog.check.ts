@@ -385,6 +385,46 @@ const CASES: Case[] = [
     mustContain: 'a favor del recurrente'
   },
 
+  // Notarial. The notarial route only works by unanimous agreement, and it
+  // dies quietly: two months of inaction is treated as withdrawal.
+  {
+    label: 'Solicitud de divorcio ante notario por mutuo acuerdo',
+    expect: 'MATCH',
+    branch: 'NOTARIAL',
+    exactMatch: 'Solicitud de divorcio ante notario por mutuo acuerdo',
+    mustContain: 'quince (15) días'
+  },
+  {
+    label: 'Solicitud de liquidación de herencia ante notario',
+    expect: 'MATCH',
+    branch: 'NOTARIAL',
+    exactMatch: 'Solicitud de liquidación de herencia ante notario',
+    mustContain: 'dos (2) meses'
+  },
+  {
+    label: 'Solicitud de registro de instrumento público',
+    expect: 'MATCH',
+    branch: 'NOTARIAL',
+    exactMatch: 'Solicitud de registro de instrumento público',
+    mustContain: 'cinco (5) días hábiles'
+  },
+  {
+    label: 'Edicto emplazatorio en sucesión notarial',
+    expect: 'MATCH',
+    branch: 'NOTARIAL',
+    exactMatch: 'Edicto emplazatorio en sucesión notarial',
+    mustContain: 'diez (10) días'
+  },
+  // Its term comes from the CPACA, not from Ley 1579, so the guidance must
+  // refuse one rather than borrow the registration window.
+  {
+    label: 'Recurso de reposición contra acto de registro',
+    expect: 'MATCH',
+    branch: 'NOTARIAL',
+    exactMatch: 'Recurso de reposición contra acto de registro',
+    mustContain: 'NO afirmes'
+  },
+
   // Still not catalogued: must fall back rather than guess.
   { label: 'zzz documento inexistente', expect: 'NO_MATCH' },
   { label: 'de la', expect: 'NO_MATCH' }

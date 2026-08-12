@@ -81,6 +81,13 @@ BRANCHES = [
         'TRANSITO',
         'transito',
     ),
+    (
+        'actuaciones-notarial.json',
+        'notarial.ts',
+        'NOTARIAL_CATALOG',
+        'NOTARIAL',
+        'notarial',
+    ),
 ]
 
 
