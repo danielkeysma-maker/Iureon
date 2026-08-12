@@ -53,6 +53,13 @@ BRANCHES = [
         'FAMILIA',
         'familia',
     ),
+    (
+        'actuaciones-penal.json',
+        'penal.ts',
+        'PENAL_CATALOG',
+        'PENAL',
+        'penal',
+    ),
 ]
 
 

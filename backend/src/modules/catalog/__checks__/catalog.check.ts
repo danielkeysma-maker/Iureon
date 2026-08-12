@@ -211,6 +211,53 @@ const CASES: Case[] = [
     mustContain: 'alimentos provisionales'
   },
 
+  // Penal (Ley 906 de 2004). These terms decide whether someone stays in
+  // custody, so they are asserted digit by digit.
+  {
+    label: 'Solicitud de libertad por vencimiento de términos',
+    expect: 'MATCH',
+    branch: 'PENAL',
+    exactMatch: 'Solicitud de libertad por vencimiento de términos',
+    mustContain: 'sesenta (60) días'
+  },
+  {
+    label: 'Solicitud de control de legalidad de la captura',
+    expect: 'MATCH',
+    branch: 'PENAL',
+    exactMatch: 'Solicitud de control de legalidad de la captura',
+    mustContain: 'treinta y seis (36) horas'
+  },
+  {
+    label: 'Escrito de acusación',
+    expect: 'MATCH',
+    branch: 'PENAL',
+    exactMatch: 'Escrito de acusación',
+    mustContain: 'noventa (90) días'
+  },
+  {
+    label: 'Querella',
+    expect: 'MATCH',
+    branch: 'PENAL',
+    exactMatch: 'Querella',
+    mustContain: 'seis (6) meses'
+  },
+  {
+    label: 'Demanda de casación penal',
+    expect: 'MATCH',
+    branch: 'PENAL',
+    exactMatch: 'Demanda de casación penal',
+    mustContain: 'Treinta (30) días'
+  },
+  // The apelación term is not in art. 176 and was not verified elsewhere, so
+  // the guidance must refuse one rather than borrow the civil or labour figure.
+  {
+    label: 'Recurso de apelación penal',
+    expect: 'MATCH',
+    branch: 'PENAL',
+    exactMatch: 'Recurso de apelación penal',
+    mustContain: 'NO afirmes'
+  },
+
   // Still not catalogued: must fall back rather than guess.
   { label: 'zzz documento inexistente', expect: 'NO_MATCH' },
   { label: 'de la', expect: 'NO_MATCH' }

@@ -4,6 +4,7 @@ import { CONSTITUCIONAL_CATALOG } from './constitucional';
 import { CIVIL_CATALOG } from './civil';
 import { LABORAL_CATALOG } from './laboral';
 import { FAMILIA_CATALOG } from './familia';
+import { PENAL_CATALOG } from './penal';
 
 /**
  * Every branch catalogue the product ships with.
@@ -17,5 +18,6 @@ export const ALL_CATALOGS: BranchCatalog[] = [
   CONSTITUCIONAL_CATALOG,
   CIVIL_CATALOG,
   LABORAL_CATALOG,
-  FAMILIA_CATALOG
+  FAMILIA_CATALOG,
+  PENAL_CATALOG
 ];
