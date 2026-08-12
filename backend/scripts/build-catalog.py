@@ -102,6 +102,13 @@ BRANCHES = [
         'INTERNACIONAL',
         'internacional',
     ),
+    (
+        'actuaciones-superintendencias.json',
+        'superintendencias.ts',
+        'SUPERINTENDENCIAS_CATALOG',
+        'SUPERINTENDENCIAS',
+        'superintendencias',
+    ),
 ]
 
 

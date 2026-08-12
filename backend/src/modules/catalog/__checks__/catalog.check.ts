@@ -511,6 +511,54 @@ const CASES: Case[] = [
     mustContain: 'diez (10) días'
   },
 
+  // Superintendencias. Here the one-year window is PRESCRIPCIÓN, not
+  // caducidad — the opposite of tránsito. It must be pleaded, it can be
+  // interrupted, and no judge may declare it on their own motion. Treating it
+  // as caducidad abandons claims that are still alive.
+  {
+    label: 'Demanda de protección al consumidor',
+    expect: 'MATCH',
+    branch: 'SUPERINTENDENCIAS',
+    exactMatch: 'Demanda de protección al consumidor',
+    mustContain: 'prescripción y no caducidad'
+  },
+  {
+    label: 'Reclamación directa al productor o proveedor',
+    expect: 'MATCH',
+    branch: 'SUPERINTENDENCIAS',
+    exactMatch: 'Reclamación directa al productor o proveedor',
+    mustContain: 'quince (15) días hábiles'
+  },
+  {
+    label: 'Consulta sobre datos personales',
+    expect: 'MATCH',
+    branch: 'SUPERINTENDENCIAS',
+    exactMatch: 'Consulta sobre datos personales',
+    mustContain: 'diez (10) días hábiles'
+  },
+  // Filing without exhausting the prior step gets the complaint rejected.
+  {
+    label: 'Queja ante la SIC por protección de datos personales',
+    expect: 'MATCH',
+    branch: 'SUPERINTENDENCIAS',
+    exactMatch: 'Queja ante la SIC por protección de datos personales',
+    mustContain: 'UNA VEZ AGOTADO'
+  },
+  {
+    label: 'Recurso de reposición ante empresa de servicios públicos',
+    expect: 'MATCH',
+    branch: 'SUPERINTENDENCIAS',
+    exactMatch: 'Recurso de reposición ante empresa de servicios públicos',
+    mustContain: 'cinco (5) días'
+  },
+  {
+    label: 'Solicitud de silencio administrativo positivo en servicios públicos',
+    expect: 'MATCH',
+    branch: 'SUPERINTENDENCIAS',
+    exactMatch: 'Solicitud de silencio administrativo positivo en servicios públicos',
+    mustContain: 'quince (15) días hábiles'
+  },
+
   // Still not catalogued: must fall back rather than guess.
   { label: 'zzz documento inexistente', expect: 'NO_MATCH' },
   { label: 'de la', expect: 'NO_MATCH' }
