@@ -19,6 +19,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     'Recurso de queja: los artículos 352 y 353 fijan el trámite pero el término de interposición no se pudo leer en la fuente consultada. Queda sin verificar.',
     'Restitución de inmueble arrendado (art. 384): el traslado sigue las reglas del proceso verbal o verbal sumario según la cuantía, de modo que el término depende del trámite y no se afirma aquí.',
     'Procesos de sucesión, liquidación de sociedad conyugal e insolvencia de persona natural: catalogados en su estructura, con términos sin verificar.',
+    'ACTUACIONES DE SECRETARIA. Las entradas con rol SECRETARIA provienen del CGP y aplican, por remision, a las ramas que siguen ese codigo. Estan catalogadas aqui y no duplicadas en cada rama. EL SUSTANCIADOR NO TIENE ROL PROPIO: proyecta la providencia que el juez firma, de modo que es un solo documento con dos manos, no dos documentos. El PROFESIONAL UNIVERSITARIO cumple funciones de sustanciacion y por la misma razon tampoco constituye un rol aparte. El CITADOR apoya la entrega de citaciones y avisos y no proyecta providencias; su producto documental, la planilla de entrega, figura bajo SECRETARIA porque la expide la secretaria.',
     'Los términos de la jurisdicción agraria y de los procesos de familia tramitados por el CGP no están incluidos; corresponden a las ramas FAMILIA y AGRARIA aún no catalogadas.',
     'Todos los términos del CGP se cuentan en días hábiles salvo disposición en contrario (art. 118). El catálogo transcribe el plazo de la norma, no su cómputo en un caso concreto.'
     ]
@@ -815,6 +816,242 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Orden de rehacer la actuación anulada', mandatory: true, basis: 'Art. 138' }
     ],
     sourceUrl: 'https://leyes.co/codigo_general_del_proceso/137.htm'
+  },
+  {
+    id: 'civil/constancia-de-ejecutoria',
+    exactName: 'Constancia de ejecutoria',
+    branch: 'CIVIL',
+    role: 'SECRETARIA',
+    legalBasis: 'Ley 1564 de 2012, art. 302',
+    competentAuthority: 'Secretaria del juzgado',
+    term: { status: 'VERIFICADO', description: 'Las providencias proferidas en audiencia quedan ejecutoriadas una vez notificadas cuando no se impugnan o no admiten recursos; las dictadas fuera de audiencia, tres (3) dias despues de notificadas (art. 302).' },
+    requiredSections: [
+      { n: 1, name: 'Identificacion del proceso y de la providencia', mandatory: true, basis: 'Art. 302' },
+      { n: 2, name: 'Fecha y forma de su notificacion', mandatory: true, basis: 'Art. 302' },
+      { n: 3, name: 'Constancia de que no se interpusieron recursos, o de que los interpuestos quedaron resueltos', mandatory: true, basis: 'Art. 302' },
+      { n: 4, name: 'Fecha exacta en que quedo ejecutoriada', mandatory: true, basis: 'Art. 302' },
+      { n: 5, name: 'Firma del secretario', mandatory: true, basis: 'Art. 302' }
+    ],
+    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/302.htm'
+  },
+  {
+    id: 'civil/estado-para-notificacion-de-providencias',
+    exactName: 'Estado para notificacion de providencias',
+    branch: 'CIVIL',
+    role: 'SECRETARIA',
+    legalBasis: 'Ley 1564 de 2012, art. 295',
+    competentAuthority: 'Secretaria del juzgado',
+    term: { status: 'VERIFICADO', description: 'El estado se fija en lugar visible de la secretaria al comenzar la primera hora habil del respectivo dia y se desfija al finalizar la ultima hora habil del mismo dia (art. 295).' },
+    requiredSections: [
+      { n: 1, name: 'Clase de proceso', mandatory: true, basis: 'Art. 295' },
+      { n: 2, name: 'Nombres de las partes interesadas', mandatory: true, basis: 'Art. 295' },
+      { n: 3, name: 'Fecha de la providencia que se notifica', mandatory: true, basis: 'Art. 295' },
+      { n: 4, name: 'Fecha del estado y firma del secretario', mandatory: true, basis: 'Art. 295' },
+      { n: 5, name: 'Publicacion por mensaje de datos cuando se disponga de los recursos tecnicos, sin impresion ni firma fisica', mandatory: false, basis: 'Art. 295' }
+    ],
+    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/295.htm'
+  },
+  {
+    id: 'civil/citacion-para-notificacion-personal',
+    exactName: 'Citacion para notificacion personal',
+    branch: 'CIVIL',
+    role: 'SECRETARIA',
+    legalBasis: 'Ley 1564 de 2012, art. 291',
+    competentAuthority: 'Secretaria del juzgado; su entrega la apoya el citador',
+    term: { status: 'VERIFICADO', description: 'El citado debe comparecer dentro de los cinco (5) dias siguientes a la entrega de la comunicacion en el lugar de destino si es en el mismo municipio del juzgado; diez (10) dias si es en municipio distinto; y treinta (30) dias si es en el exterior. Si no comparece, procede la notificacion por aviso (art. 291).' },
+    requiredSections: [
+      { n: 1, name: 'Identificacion del destinatario y de su direccion', mandatory: true, basis: 'Art. 291' },
+      { n: 2, name: 'Informacion sobre la existencia del proceso, su naturaleza y la fecha de la providencia', mandatory: true, basis: 'Art. 291' },
+      { n: 3, name: 'Termino para comparecer segun la ubicacion del destinatario', mandatory: true, basis: 'Art. 291' },
+      { n: 4, name: 'Envio por servicio postal autorizado', mandatory: true, basis: 'Art. 291' },
+      { n: 5, name: 'Constancia de entrega expedida por la empresa postal, para el expediente', mandatory: true, basis: 'Art. 291' }
+    ],
+    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/291.htm'
+  },
+  {
+    id: 'civil/aviso-de-notificacion',
+    exactName: 'Aviso de notificacion',
+    branch: 'CIVIL',
+    role: 'SECRETARIA',
+    legalBasis: 'Ley 1564 de 2012, art. 292',
+    competentAuthority: 'Secretaria del juzgado',
+    term: { status: 'VERIFICADO', description: 'La notificacion por aviso se considera surtida al finalizar el dia siguiente al de la entrega del aviso en el lugar de destino (art. 292).' },
+    requiredSections: [
+      { n: 1, name: 'Fecha del aviso y fecha de la providencia que se notifica', mandatory: true, basis: 'Art. 292' },
+      { n: 2, name: 'Juzgado, naturaleza del proceso y nombres de las partes', mandatory: true, basis: 'Art. 292' },
+      { n: 3, name: 'Advertencia sobre los efectos de la notificacion', mandatory: true, basis: 'Art. 292' },
+      { n: 4, name: 'Copia informal de la providencia, cuando se trate del auto admisorio o del mandamiento ejecutivo', mandatory: true, basis: 'Art. 292' },
+      { n: 5, name: 'Comprobante de entrega de la empresa postal y copia sellada del aviso, incorporados al expediente', mandatory: true, basis: 'Art. 292' }
+    ],
+    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/292.htm'
+  },
+  {
+    id: 'civil/emplazamiento-y-remision-al-registro-nacional-de-personas-emplazadas',
+    exactName: 'Emplazamiento y remision al Registro Nacional de Personas Emplazadas',
+    branch: 'CIVIL',
+    role: 'SECRETARIA',
+    legalBasis: 'Ley 1564 de 2012, art. 108',
+    competentAuthority: 'Secretaria del juzgado; el Registro lo administra el Consejo Superior de la Judicatura',
+    term: { status: 'VERIFICADO', description: 'El emplazamiento se entiende surtido quince (15) dias despues de publicada la informacion en el Registro Nacional de Personas Emplazadas. La publicacion en el medio se hace por una sola vez y su contenido debe permanecer en la pagina web del medio durante todo el termino del emplazamiento (art. 108).' },
+    requiredSections: [
+      { n: 1, name: 'Nombre del sujeto emplazado', mandatory: true, basis: 'Art. 108' },
+      { n: 2, name: 'Nombres de las partes, clase de proceso y juzgado que lo requiere', mandatory: true, basis: 'Art. 108' },
+      { n: 3, name: 'Constancia de publicacion por una sola vez en medio escrito o de comunicacion masiva', mandatory: true, basis: 'Art. 108' },
+      { n: 4, name: 'Remision de la informacion al Registro Nacional de Personas Emplazadas', mandatory: true, basis: 'Art. 108' },
+      { n: 5, name: 'Computo de los quince (15) dias desde la publicacion en el Registro', mandatory: true, basis: 'Art. 108' }
+    ],
+    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/108.htm'
+  },
+  {
+    id: 'civil/constancia-de-traslado-en-secretaria',
+    exactName: 'Constancia de traslado en secretaria',
+    branch: 'CIVIL',
+    role: 'SECRETARIA',
+    legalBasis: 'Ley 1564 de 2012, art. 110',
+    competentAuthority: 'Secretaria del juzgado',
+    term: { status: 'VERIFICADO', description: 'El traslado que deba surtirse fuera de audiencia se cumple en secretaria por tres (3) dias, sin necesidad de auto ni constancia en el expediente; se incluye en una lista que permanece a disposicion en la secretaria por un (1) dia, y el termino corre desde el dia siguiente (art. 110).' },
+    requiredSections: [
+      { n: 1, name: 'Identificacion del proceso y del escrito o memorial que se traslada', mandatory: true, basis: 'Art. 110' },
+      { n: 2, name: 'Inclusion en la lista de traslados de la secretaria', mandatory: true, basis: 'Art. 110' },
+      { n: 3, name: 'Fecha de inclusion y fecha de inicio del termino', mandatory: true, basis: 'Art. 110' },
+      { n: 4, name: 'Advertencia: no requiere auto que lo ordene ni constancia en el expediente', mandatory: true, basis: 'Art. 110' }
+    ],
+    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/110.htm'
+  },
+  {
+    id: 'civil/constancia-secretarial-de-recibo-de-memorial',
+    exactName: 'Constancia secretarial de recibo de memorial',
+    branch: 'CIVIL',
+    role: 'SECRETARIA',
+    legalBasis: 'Ley 1564 de 2012, art. 109',
+    competentAuthority: 'Secretaria del juzgado',
+    term: { status: 'VERIFICADO', description: 'El memorial es oportuno si se recibe antes del cierre del despacho del dia en que vence el termino. Cuando se ejercen recursos o facultades con terminos comunes, el secretario debe esperar a que el termino transcurra respecto de todas las partes (art. 109).' },
+    requiredSections: [
+      { n: 1, name: 'Fecha y hora exactas de presentacion del memorial o comunicacion', mandatory: true, basis: 'Art. 109' },
+      { n: 2, name: 'Identificacion de quien lo presenta y del proceso', mandatory: true, basis: 'Art. 109' },
+      { n: 3, name: 'Constancia de agregacion al expediente respectivo', mandatory: true, basis: 'Art. 109' },
+      { n: 4, name: 'Pronunciamiento sobre la oportunidad frente al vencimiento del termino', mandatory: true, basis: 'Art. 109' },
+      { n: 5, name: 'Constancia del medio de presentacion, incluido el mensaje de datos', mandatory: true, basis: 'Art. 109' }
+    ],
+    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/109.htm'
+  },
+  {
+    id: 'civil/informe-secretarial',
+    exactName: 'Informe secretarial',
+    branch: 'CIVIL',
+    role: 'SECRETARIA',
+    legalBasis: 'Ley 1564 de 2012, arts. 109 y 110',
+    competentAuthority: 'Secretaria del juzgado',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Identificacion del proceso y de la actuacion sobre la que se informa', mandatory: true, basis: null },
+      { n: 2, name: 'Relacion cronologica de lo ocurrido en secretaria', mandatory: true, basis: null },
+      { n: 3, name: 'Computo de los terminos transcurridos', mandatory: true, basis: 'Art. 118' },
+      { n: 4, name: 'Constancia de lo que procede, para que el despacho resuelva', mandatory: true, basis: null },
+      { n: 5, name: 'Firma del secretario', mandatory: true, basis: null }
+    ],
+    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/109.htm'
+  },
+  {
+    id: 'civil/certificacion-de-terminos-procesales',
+    exactName: 'Certificacion de terminos procesales',
+    branch: 'CIVIL',
+    role: 'SECRETARIA',
+    legalBasis: 'Ley 1564 de 2012, arts. 117 y 118',
+    competentAuthority: 'Secretaria del juzgado',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Identificacion del termino que se certifica y de la norma que lo fija', mandatory: true, basis: 'Art. 117' },
+      { n: 2, name: 'Fecha desde la cual empezo a correr', mandatory: true, basis: 'Art. 118' },
+      { n: 3, name: 'Dias habiles transcurridos y dias no habiles descontados', mandatory: true, basis: 'Art. 118' },
+      { n: 4, name: 'Fecha exacta de vencimiento', mandatory: true, basis: 'Art. 118' },
+      { n: 5, name: 'Firma del secretario', mandatory: true, basis: null }
+    ],
+    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/110.htm'
+  },
+  {
+    id: 'civil/oficio-de-comunicacion-judicial',
+    exactName: 'Oficio de comunicacion judicial',
+    branch: 'CIVIL',
+    role: 'SECRETARIA',
+    legalBasis: 'Ley 1564 de 2012, arts. 111 y 112',
+    competentAuthority: 'Secretaria del juzgado',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Autoridad o entidad destinataria', mandatory: true, basis: null },
+      { n: 2, name: 'Identificacion del proceso, de las partes y del radicado', mandatory: true, basis: null },
+      { n: 3, name: 'Providencia que ordena librar el oficio', mandatory: true, basis: null },
+      { n: 4, name: 'Orden o solicitud concreta que se comunica', mandatory: true, basis: null },
+      { n: 5, name: 'Termino concedido para su cumplimiento y firma del secretario', mandatory: true, basis: null }
+    ],
+    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/110.htm'
+  },
+  {
+    id: 'civil/despacho-comisorio',
+    exactName: 'Despacho comisorio',
+    branch: 'CIVIL',
+    role: 'SECRETARIA',
+    legalBasis: 'Ley 1564 de 2012, arts. 38 y 39',
+    competentAuthority: 'Secretaria del juzgado comitente; lo cumple el juez comisionado',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Identificacion del juez comitente y del comisionado', mandatory: true, basis: 'Art. 38' },
+      { n: 2, name: 'Providencia que ordena la comision', mandatory: true, basis: 'Art. 38' },
+      { n: 3, name: 'Diligencia concreta que se comisiona y sus limites', mandatory: true, basis: 'Art. 39' },
+      { n: 4, name: 'Anexos y copias necesarios para la practica', mandatory: true, basis: 'Art. 39' },
+      { n: 5, name: 'Termino para su cumplimiento y devolucion', mandatory: true, basis: 'Art. 39' }
+    ],
+    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/110.htm'
+  },
+  {
+    id: 'civil/constancia-de-desglose-de-documentos',
+    exactName: 'Constancia de desglose de documentos',
+    branch: 'CIVIL',
+    role: 'SECRETARIA',
+    legalBasis: 'Ley 1564 de 2012, art. 116',
+    competentAuthority: 'Secretaria del juzgado',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Identificacion de los documentos que se desglosan y de sus folios', mandatory: true, basis: 'Art. 116' },
+      { n: 2, name: 'Providencia que autoriza el desglose', mandatory: true, basis: 'Art. 116' },
+      { n: 3, name: 'Constancia que reemplaza los documentos retirados en el expediente', mandatory: true, basis: 'Art. 116' },
+      { n: 4, name: 'Identificacion de quien los recibe y fecha de entrega', mandatory: true, basis: 'Art. 116' }
+    ],
+    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/110.htm'
+  },
+  {
+    id: 'civil/constancia-de-remision-del-expediente-al-superior',
+    exactName: 'Constancia de remision del expediente al superior',
+    branch: 'CIVIL',
+    role: 'SECRETARIA',
+    legalBasis: 'Ley 1564 de 2012, arts. 324 y 325',
+    competentAuthority: 'Secretaria del juzgado de primera instancia',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Identificacion del proceso y del recurso concedido', mandatory: true, basis: 'Art. 324' },
+      { n: 2, name: 'Providencia que concede el recurso y el efecto en que se concede', mandatory: true, basis: 'Art. 323' },
+      { n: 3, name: 'Constancia de ejecutoria de esa providencia', mandatory: true, basis: 'Art. 302' },
+      { n: 4, name: 'Relacion de las piezas remitidas al superior', mandatory: true, basis: 'Art. 324' },
+      { n: 5, name: 'Fecha de remision y firma del secretario', mandatory: true, basis: 'Art. 324' }
+    ],
+    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/302.htm'
+  },
+  {
+    id: 'civil/planilla-de-entrega-de-comunicaciones-judiciales',
+    exactName: 'Planilla de entrega de comunicaciones judiciales',
+    branch: 'CIVIL',
+    role: 'SECRETARIA',
+    legalBasis: 'Ley 1564 de 2012, arts. 291 y 292; manual de funciones del citador, Consejo Superior de la Judicatura',
+    competentAuthority: 'Citador de la secretaria del juzgado',
+    term: { status: 'VERIFICADO', description: 'De la fecha de entrega registrada en la planilla dependen los terminos de comparecencia del art. 291 y la fecha en que se entiende surtida la notificacion por aviso del art. 292.' },
+    requiredSections: [
+      { n: 1, name: 'Relacion de las comunicaciones, citaciones y avisos entregados', mandatory: true, basis: 'Art. 291' },
+      { n: 2, name: 'Destinatario y direccion de cada entrega', mandatory: true, basis: 'Art. 291' },
+      { n: 3, name: 'Fecha y hora de entrega o de devolucion', mandatory: true, basis: 'Art. 292' },
+      { n: 4, name: 'Constancia de recibido o causal de no entrega', mandatory: true, basis: 'Art. 291' },
+      { n: 5, name: 'Incorporacion de la constancia al expediente', mandatory: true, basis: 'Art. 292' }
+    ],
+    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/291.htm'
   },
   {
     id: 'civil/sentencia-de-declaracion-de-pertenencia',

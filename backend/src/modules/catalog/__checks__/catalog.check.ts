@@ -559,6 +559,37 @@ const CASES: Case[] = [
     mustContain: 'quince (15) días hábiles'
   },
 
+  // Secretaría. These are the acts the secretary signs in their own name, and
+  // the terms they certify are what the parties' deadlines hang from.
+  {
+    label: 'Citación para notificación personal',
+    expect: 'MATCH',
+    branch: 'CIVIL',
+    exactMatch: 'Citacion para notificacion personal',
+    mustContain: 'treinta (30) dias'
+  },
+  {
+    label: 'Emplazamiento y remisión al Registro Nacional de Personas Emplazadas',
+    expect: 'MATCH',
+    branch: 'CIVIL',
+    exactMatch: 'Emplazamiento y remision al Registro Nacional de Personas Emplazadas',
+    mustContain: 'quince (15) dias'
+  },
+  {
+    label: 'Constancia de traslado en secretaría',
+    expect: 'MATCH',
+    branch: 'CIVIL',
+    exactMatch: 'Constancia de traslado en secretaria',
+    mustContain: 'tres (3) dias'
+  },
+  {
+    label: 'Aviso de notificación',
+    expect: 'MATCH',
+    branch: 'CIVIL',
+    exactMatch: 'Aviso de notificacion',
+    mustContain: 'dia siguiente'
+  },
+
   // Still not catalogued: must fall back rather than guess.
   { label: 'zzz documento inexistente', expect: 'NO_MATCH' },
   { label: 'de la', expect: 'NO_MATCH' }
@@ -664,6 +695,16 @@ if (unresolvable.length) {
   failures++;
 } else {
   console.log(`ok   every catalogued name resolves within its branch (${catalogService.list().length})`);
+}
+
+// Secretarial work is a third of a court's output and had no role until now;
+// this guards against the role silently disappearing from the catalogue.
+const secretaria = catalogService.list(undefined, 'SECRETARIA');
+if (secretaria.length === 0) {
+  console.error('FAIL no hay actuaciones con rol SECRETARIA');
+  failures++;
+} else {
+  console.log(`ok   secretarial role catalogued (${secretaria.length})`);
 }
 
 // Ids must be unique or lookups silently return the wrong filing.

@@ -23,7 +23,17 @@ export type LegalBranch =
   | 'INTERNACIONAL';
 
 /** Who authors the document. */
-export type ActuacionRole = 'LITIGANTE' | 'DESPACHO';
+/**
+ * Who signs the document.
+ *
+ * The sustanciador is deliberately NOT a role: he projects the providencia the
+ * judge signs, so it is one document with two hands, not two documents.
+ * SECRETARIA is a role because its acts — estados, constancias, traslados,
+ * emplazamientos — are signed by the secretary in their own name. The citador's
+ * work (delivering citations, keeping delivery sheets) is issued by the
+ * secretariat and lives under SECRETARIA too.
+ */
+export type ActuacionRole = 'LITIGANTE' | 'DESPACHO' | 'SECRETARIA';
 
 export interface RequiredSection {
   /** Display order within the document. */

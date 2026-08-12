@@ -10,6 +10,35 @@ import { LEGACY_DOCUMENT_OPTIONS } from '../data/legacyDocumentOptions';
 import type { AgentLog } from '../../agent/types';
 import type { ActuacionRole } from '../../catalog/types';
 
+/**
+ * Who signs the document being drafted.
+ *
+ * There is no separate tab for the sustanciador or the profesional
+ * universitario: both project the providencia the judge signs, so it is one
+ * document, not two. Secretaría gets its own tab because its acts — estados,
+ * constancias, traslados, emplazamientos — are signed by the secretary.
+ */
+const ROLE_TABS: { role: ActuacionRole; label: string; hint: string }[] = [
+  { role: 'LITIGANTE', label: 'Firma / Litigante', hint: 'Escritos de parte' },
+  {
+    role: 'DESPACHO',
+    label: 'Juez / Despacho',
+    hint: 'Providencias: autos y sentencias. Las proyecta el sustanciador y las firma el juez.'
+  },
+  {
+    role: 'SECRETARIA',
+    label: 'Secretaría',
+    hint: 'Actos que firma el secretario: estados, constancias, traslados, emplazamientos, oficios.'
+  }
+];
+
+/** What the button promises to produce, per role. */
+const SUBMIT_LABEL: Record<ActuacionRole, string> = {
+  LITIGANTE: 'Generar Borrador',
+  DESPACHO: 'Generar Providencia',
+  SECRETARIA: 'Generar Constancia'
+};
+
 export interface CaseStudyFile {
   id: string;
   name: string;
@@ -46,13 +75,12 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
   onClearActiveDraft
 }) => {
   const actuacion = useActuacion(documentType, legalBranch);
-  const [userRole, setUserRole] = useState<'FIRMA_LITIGANTE' | 'JUZGADO_DESPACHO'>('FIRMA_LITIGANTE');
+  const [userRole, setUserRole] = useState<ActuacionRole>('LITIGANTE');
   const [importedFiles, setImportedFiles] = useState<CaseStudyFile[]>([]);
   const [isUploadingFile, setIsUploadingFile] = useState(false);
 
 
-  const catalogRole: ActuacionRole = userRole === 'FIRMA_LITIGANTE' ? 'LITIGANTE' : 'DESPACHO';
-  const catalogued = useBranchActuaciones(legalBranch, catalogRole);
+  const catalogued = useBranchActuaciones(legalBranch, userRole);
   const catalogBranches = useCatalogBranches();
 
   // Catalogued branches first, then any legacy-only branch that still has
@@ -63,9 +91,12 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
     ...Object.keys(LEGACY_DOCUMENT_OPTIONS).filter((b) => !catalogBranches.includes(b as never))
   ];
 
-  const legacyFor = (branch: string, role: 'FIRMA_LITIGANTE' | 'JUZGADO_DESPACHO'): string[] => {
+  // The legacy lists only ever had two roles, so secretarial work has no
+  // fallback: it exists in the catalogue or it does not exist at all.
+  const legacyFor = (branch: string, role: ActuacionRole): string[] => {
+    if (role === 'SECRETARIA') return [];
     const entry = LEGACY_DOCUMENT_OPTIONS[branch] || LEGACY_DOCUMENT_OPTIONS['CONSTITUCIONAL'];
-    return role === 'FIRMA_LITIGANTE' ? entry.litigante : entry.despacho;
+    return role === 'LITIGANTE' ? entry.litigante : entry.despacho;
   };
 
   // The catalogue wins wherever it has entries. Its names are the ones the
@@ -88,7 +119,7 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
     setLegalBranch(branch);
   };
 
-  const handleRoleChange = (role: 'FIRMA_LITIGANTE' | 'JUZGADO_DESPACHO') => {
+  const handleRoleChange = (role: ActuacionRole) => {
     setUserRole(role);
   };
 
@@ -133,22 +164,20 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
             Actuación
           </label>
           <div className="flex bg-slate-100/80 p-0.5 rounded-lg">
-            <button
-              onClick={() => handleRoleChange('FIRMA_LITIGANTE')}
-              className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all ${
-                userRole === 'FIRMA_LITIGANTE' ? 'bg-blue-950 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700'
-              }`}
-            >
-              Firma / Litigante
-            </button>
-            <button
-              onClick={() => handleRoleChange('JUZGADO_DESPACHO')}
-              className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all ${
-                userRole === 'JUZGADO_DESPACHO' ? 'bg-blue-950 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700'
-              }`}
-            >
-              Juzgado / Despacho
-            </button>
+            {ROLE_TABS.map((tab) => (
+              <button
+                key={tab.role}
+                onClick={() => handleRoleChange(tab.role)}
+                title={tab.hint}
+                className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all ${
+                  userRole === tab.role
+                    ? 'bg-blue-950 text-white shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -300,7 +329,7 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
               ) : (
                 <>
                   {activeDraftText ? <RefreshCw className="w-3.5 h-3.5" /> : <Send className="w-3.5 h-3.5" />}
-                  <span>{activeDraftText ? 'Continuar / Corregir' : (userRole === 'JUZGADO_DESPACHO' ? 'Generar Providencia' : 'Generar Borrador')}</span>
+                  <span>{activeDraftText ? 'Continuar / Corregir' : SUBMIT_LABEL[userRole]}</span>
                 </>
               )}
             </button>

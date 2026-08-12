@@ -14,10 +14,17 @@ report() {
 
 # Literal assignments to credential-shaped identifiers. Anything sourced from
 # process.env or import.meta.env is configuration, not a committed secret.
+#
+# "secretari" is excluded because Spanish "secretaría/secretarial" begins with
+# the letters of "secret" and the pattern reads SECRETARIA as SECRET + ARIA,
+# exactly as it reads SECRET_KEY as SECRET + _KEY. The exclusion is narrow: it
+# only drops that word stem, so secretKey, secret_value and the rest still trip
+# the gate. Verified in both directions after the change.
 matches=$(grep -rnIEi \
   "(password|passwd|secret|api[_-]?key|access[_-]?token|service[_-]?role)[[:alnum:]_]*[[:space:]]*[:=][[:space:]]*['\"][^'\"]{8,}['\"]" \
   backend/src frontend/src 2>/dev/null \
   | grep -viE "process\.env|import\.meta\.env|placeholder=|type=|className=|aria-|// |\* " \
+  | grep -viE "secretari" \
   || true)
 
 if [ -n "$matches" ]; then
