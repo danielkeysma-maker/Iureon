@@ -262,3 +262,37 @@ AS $$
     ORDER BY de.embedding <=> query_embedding
     LIMIT match_count;
 $$;
+
+-- ==============================================================================
+-- 10. GRANTS — sin esto la API responde "permission denied for table ..."
+-- ==============================================================================
+-- Crear una tabla no concede acceso a los roles que usa la API de Supabase.
+-- Sin estas líneas el backend recibe "permission denied" aunque la tabla exista
+-- y las políticas RLS estén correctas: son dos capas distintas y ambas deben
+-- estar presentes. Esta sección faltaba y era la causa del fallo.
+--
+-- Reparto:
+--   service_role  -> el backend. Omite RLS por diseño; necesita todo.
+--   authenticated -> un usuario con sesión. Puede operar, pero SIEMPRE filtrado
+--                    por las políticas RLS de la sección 8.
+--   anon          -> sin sesión. No recibe nada sobre datos de inquilinos.
+
+GRANT USAGE ON SCHEMA public TO service_role, authenticated;
+
+GRANT ALL PRIVILEGES ON ALL TABLES    IN SCHEMA public TO service_role;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO service_role;
+GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO service_role;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO authenticated;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO authenticated;
+GRANT EXECUTE ON FUNCTION public.match_document_chunks_multi_tenant(vector, INT, TEXT) TO authenticated, service_role;
+
+-- Y para las tablas que se creen después de correr este archivo.
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+    GRANT ALL PRIVILEGES ON TABLES TO service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+    GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO authenticated;
+
+-- El rol anónimo no recibe acceso a datos de inquilinos. Se revoca de forma
+-- explícita para que quede constancia de que es una decisión, no un olvido.
+REVOKE ALL ON ALL TABLES IN SCHEMA public FROM anon;
