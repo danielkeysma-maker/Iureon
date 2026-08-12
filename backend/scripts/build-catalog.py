@@ -1,24 +1,41 @@
-"""Converts a verified research JSON into a typed TypeScript catalogue module.
+"""Converts verified research JSON files into typed TypeScript catalogue modules.
 
-Kept as a script rather than a runtime JSON import so the data is plain
+Kept as a generator rather than a runtime JSON import so the data is plain
 TypeScript: no build-time file copying, no path differences between src and
 dist, and the compiler checks the shape.
+
+Run with: python backend/scripts/build-catalog.py
 """
 import json
+import os
 import re
-import sys
 import unicodedata
 
-import os
-
-# Paths are resolved from this file so the script runs from any working
-# directory and on any machine.
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-SRC = os.path.join(REPO_ROOT, 'research', 'actuaciones-administrativo-tributario-transito.json')
-OUT = os.path.join(REPO_ROOT, 'backend', 'src', 'modules', 'catalog', 'data', 'administrativo.ts')
+RESEARCH_DIR = os.path.join(REPO_ROOT, 'research')
+DATA_DIR = os.path.join(REPO_ROOT, 'backend', 'src', 'modules', 'catalog', 'data')
+
+# One entry per researched branch:
+# (research file, generated module, export name, branch constant, id prefix)
+BRANCHES = [
+    (
+        'actuaciones-administrativo-tributario-transito.json',
+        'administrativo.ts',
+        'ADMINISTRATIVO_CATALOG',
+        'ADMINISTRATIVO',
+        'administrativo',
+    ),
+    (
+        'actuaciones-constitucional.json',
+        'constitucional.ts',
+        'CONSTITUCIONAL_CATALOG',
+        'CONSTITUCIONAL',
+        'constitucional',
+    ),
+]
 
 
-def slugify(text: str) -> str:
+def slugify(text):
     text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode()
     text = re.sub(r'[^a-zA-Z0-9]+', '-', text).strip('-').lower()
     return re.sub(r'-+', '-', text)
@@ -47,33 +64,25 @@ def ts(value):
         return 'true' if value else 'false'
     if isinstance(value, (int, float)):
         return str(value)
-    escaped = str(value).replace('\\', '\\\\').replace("'", "\\'").replace('\n', ' ').strip()
-    escaped = re.sub(r'\s+', ' ', escaped)
-    return f"'{escaped}'"
+
+    escaped = str(value).replace('\\', '\\\\').replace("'", "\\'")
+    escaped = re.sub(r'\s+', ' ', escaped).strip()
+    return "'" + escaped + "'"
 
 
-data = json.load(open(SRC, encoding='utf-8'))
-meta = data['_meta']
-raw_items = data['actuaciones']
-
-seen = set()
-entries = []
-counts = {'VERIFICADO': 0, 'NO_CADUCA': 0, 'NO_VERIFICADO': 0}
-
-for item in raw_items:
+def build_entry(item, branch, prefix, seen):
     name = item['exact_name']
     slug = slugify(name)
-    key = f'administrativo/{slug}'
+    key = prefix + '/' + slug
 
     # Guarantee unique ids even if two names slugify identically.
     suffix = 2
     while key in seen:
-        key = f'administrativo/{slug}-{suffix}'
+        key = prefix + '/' + slug + '-' + str(suffix)
         suffix += 1
     seen.add(key)
 
     status, description = classify_term(item.get('term'))
-    counts[status] += 1
 
     sections = []
     for section in item.get('required_sections') or []:
@@ -87,51 +96,88 @@ for item in raw_items:
             )
         )
 
-    entries.append(
-        "  {\n"
-        f"    id: {ts(key)},\n"
-        f"    exactName: {ts(name)},\n"
-        "    branch: 'ADMINISTRATIVO',\n"
-        f"    role: {ts(item.get('role') or 'LITIGANTE')},\n"
-        f"    legalBasis: {ts(item.get('legal_basis'))},\n"
-        f"    competentAuthority: {ts(item.get('competent_authority'))},\n"
-        f"    term: {{ status: '{status}', description: {ts(description)} }},\n"
-        "    requiredSections: [\n" + ',\n'.join(sections) + "\n    ],\n"
-        f"    sourceUrl: {ts(item.get('source_url'))}\n"
-        "  }"
-    )
+    lines = [
+        '  {',
+        '    id: %s,' % ts(key),
+        '    exactName: %s,' % ts(name),
+        "    branch: '%s'," % branch,
+        '    role: %s,' % ts(item.get('role') or 'LITIGANTE'),
+        '    legalBasis: %s,' % ts(item.get('legal_basis')),
+        '    competentAuthority: %s,' % ts(item.get('competent_authority')),
+        "    term: { status: '%s', description: %s }," % (status, ts(description)),
+        '    requiredSections: [',
+        ',\n'.join(sections),
+        '    ],',
+        '    sourceUrl: %s' % ts(item.get('source_url')),
+        '  }',
+    ]
 
-gaps = ',\n'.join(f'    {ts(g)}' for g in meta.get('gaps', []))
+    return '\n'.join(lines), status
 
-output = f"""import type {{ BranchCatalog }} from '../types';
+
+HEADER = """import type {{ BranchCatalog }} from '../types';
 
 /**
- * Contencioso administrativo catalogue (Ley 1437 de 2011, CPACA).
+ * {branch} catalogue.
  *
- * Generated from research/actuaciones-administrativo-tributario-transito.json,
- * whose entries were verified article by article against the Función Pública
- * text. Do not hand-edit: regenerate from the research file so provenance and
- * data never drift apart.
+ * Generated from research/{src_name}, whose entries were verified against the
+ * official text of the governing norms. Do not hand-edit: regenerate with
+ * `python backend/scripts/build-catalog.py` so data and provenance never drift.
  *
  * Coverage is partial by design and the gaps are declared below rather than
  * hidden, because a silent gap in procedural deadlines is the dangerous kind.
  */
-export const ADMINISTRATIVO_CATALOG: BranchCatalog = {{
+export const {export_name}: BranchCatalog = {{
   meta: {{
-    branch: 'ADMINISTRATIVO',
-    verifiedAt: {ts(meta.get('verified_at'))},
-    sourceOfTruth: {ts(meta.get('source_of_truth'))},
+    branch: '{branch}',
+    verifiedAt: {verified_at},
+    sourceOfTruth: {source_of_truth},
     gaps: [
 {gaps}
     ]
   }},
   actuaciones: [
-{',\n'.join(entries)}
+{entries}
   ]
 }};
 """
 
-open(OUT, 'w', encoding='utf-8', newline='\n').write(output)
 
-print(f'wrote {len(entries)} actuaciones -> {OUT}')
-print(f'terms: VERIFICADO={counts["VERIFICADO"]} NO_CADUCA={counts["NO_CADUCA"]} NO_VERIFICADO={counts["NO_VERIFICADO"]}')
+def build(src_name, out_name, export_name, branch, prefix):
+    src = os.path.join(RESEARCH_DIR, src_name)
+    out = os.path.join(DATA_DIR, out_name)
+
+    data = json.load(open(src, encoding='utf-8'))
+    meta = data['_meta']
+
+    seen = set()
+    entries = []
+    counts = {'VERIFICADO': 0, 'NO_CADUCA': 0, 'NO_VERIFICADO': 0}
+
+    for item in data['actuaciones']:
+        entry, status = build_entry(item, branch, prefix, seen)
+        entries.append(entry)
+        counts[status] += 1
+
+    output = HEADER.format(
+        branch=branch,
+        src_name=src_name,
+        export_name=export_name,
+        verified_at=ts(meta.get('verified_at')),
+        source_of_truth=ts(meta.get('source_of_truth')),
+        gaps=',\n'.join('    ' + ts(g) for g in meta.get('gaps', [])),
+        entries=',\n'.join(entries),
+    )
+
+    open(out, 'w', encoding='utf-8', newline='\n').write(output)
+
+    print('%s: %d actuaciones -> %s' % (branch, len(entries), out_name))
+    print(
+        '  terms: VERIFICADO=%d NO_CADUCA=%d NO_VERIFICADO=%d'
+        % (counts['VERIFICADO'], counts['NO_CADUCA'], counts['NO_VERIFICADO'])
+    )
+
+
+if __name__ == '__main__':
+    for args in BRANCHES:
+        build(*args)

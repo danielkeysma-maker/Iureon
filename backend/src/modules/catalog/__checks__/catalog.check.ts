@@ -29,8 +29,15 @@ const CASES: Case[] = [
   { label: 'Nulidad y restablecimiento del derecho (Art. 138 CPACA)', expect: 'MATCH', exactMatch: 'Demanda de nulidad y restablecimiento del derecho' },
   { label: 'Redacción de la Demanda de Reparación Directa', expect: 'MATCH', exactMatch: 'Demanda de reparación directa' },
   { label: 'Solicitud de pérdida de investidura', expect: 'MATCH', exactMatch: 'Solicitud de pérdida de investidura' },
-  // Not catalogued: must fall back rather than guess.
-  { label: 'Redacción de Acción de Tutela', expect: 'NO_MATCH' },
+  // Constitucional. These three are distinct actions and the codebase has
+  // already confused two of them once: a derecho de petición template was
+  // derived from an acción de cumplimiento template with a string replace.
+  { label: 'Redacción de Acción de Tutela', expect: 'MATCH', exactMatch: 'Acción de tutela' },
+  { label: 'Acción de cumplimiento', expect: 'MATCH', exactMatch: 'Acción de cumplimiento' },
+  { label: 'Incidente de desacato', expect: 'MATCH', exactMatch: 'Solicitud de apertura de incidente de desacato' },
+  { label: 'Impugnación del fallo de tutela', expect: 'MATCH' },
+
+  // Still not catalogued: must fall back rather than guess.
   { label: 'Demanda laboral ordinaria', expect: 'NO_MATCH' },
   { label: 'zzz documento inexistente', expect: 'NO_MATCH' },
   { label: 'de la', expect: 'NO_MATCH' }

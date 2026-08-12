@@ -1,12 +1,11 @@
 import type { BranchCatalog } from '../types';
 
 /**
- * Contencioso administrativo catalogue (Ley 1437 de 2011, CPACA).
+ * ADMINISTRATIVO catalogue.
  *
- * Generated from research/actuaciones-administrativo-tributario-transito.json,
- * whose entries were verified article by article against the Función Pública
- * text. Do not hand-edit: regenerate from the research file so provenance and
- * data never drift apart.
+ * Generated from research/actuaciones-administrativo-tributario-transito.json, whose entries were verified against the
+ * official text of the governing norms. Do not hand-edit: regenerate with
+ * `python backend/scripts/build-catalog.py` so data and provenance never drift.
  *
  * Coverage is partial by design and the gaps are declared below rather than
  * hidden, because a silent gap in procedural deadlines is the dangerous kind.

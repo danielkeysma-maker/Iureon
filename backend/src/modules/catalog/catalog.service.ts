@@ -1,4 +1,5 @@
 import { ADMINISTRATIVO_CATALOG } from './data/administrativo';
+import { CONSTITUCIONAL_CATALOG } from './data/constitucional';
 import type {
   Actuacion,
   ActuacionRole,
@@ -11,7 +12,7 @@ import type {
  * catalogued yet; callers must degrade rather than assume an empty result
  * means "no such actuación exists".
  */
-const CATALOGS: BranchCatalog[] = [ADMINISTRATIVO_CATALOG];
+const CATALOGS: BranchCatalog[] = [ADMINISTRATIVO_CATALOG, CONSTITUCIONAL_CATALOG];
 
 const normalize = (text: string): string =>
   text

@@ -1,0 +1,694 @@
+import type { BranchCatalog } from '../types';
+
+/**
+ * CONSTITUCIONAL catalogue.
+ *
+ * Generated from research/actuaciones-constitucional.json, whose entries were verified against the
+ * official text of the governing norms. Do not hand-edit: regenerate with
+ * `python backend/scripts/build-catalog.py` so data and provenance never drift.
+ *
+ * Coverage is partial by design and the gaps are declared below rather than
+ * hidden, because a silent gap in procedural deadlines is the dangerous kind.
+ */
+export const CONSTITUCIONAL_CATALOG: BranchCatalog = {
+  meta: {
+    branch: 'CONSTITUCIONAL',
+    verifiedAt: '2026-08-11',
+    sourceOfTruth: 'Textos leídos en fuentes oficiales durante esta sesión: (1) Decreto 2591 de 1991 completo, Gestor Normativo de la Función Pública, https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=5304 (arts. 1, 5, 6, 7, 8, 10, 11, 13, 14, 15, 16, 18, 19, 20, 22, 23, 24, 26, 27, 29, 30, 31, 32, 33, 34, 36, 37, 38, 39, 42, 45, 49, 52, 53); (2) Ley 393 de 1997 completa, Gestor Normativo, https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=338 (arts. 1, 3-28, 30); (3) Ley 472 de 1998, Gestor Normativo, https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=188 (arts. 2, 3, 9, 12, 13, 15, 16, 17, 18, 20, 21, 22, 23, 26, 27, 30, 33, 34, 36, 37, 46, 47, 48, 49, 51, 52, 53, 55, 56, 61, 65, 66); (4) Ley 1095 de 2006, Gestor Normativo, https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=22087 (arts. 1-9); (5) Decreto 2067 de 1991, Gestor Normativo, https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=30150 (arts. 1, 2, 6, 7, 8); (6) Sentencia C-590 de 2005, Relatoría de la Corte Constitucional, https://www.corteconstitucional.gov.co/relatoria/2005/c-590-05.htm (requisitos generales y causales especiales de procedibilidad); (7) Ley 1581 de 2012, Gestor Normativo, https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=49981 (arts. 8, 14, 15, 16); (8) Ley 1266 de 2008, Gestor Normativo, https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=34488 (arts. 6, 15, 16); (9) Constitución Política, art. 23 y art. 30, Gestor Normativo, https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=4125.',
+    gaps: [
+    'CONSTITUCIÓN POLÍTICA — arts. 86, 87, 88 y 241 NO se leyeron verbatim. La página del Gestor Normativo (norma.php?i=4125) sólo entregó hasta el art. 42, y secretariasenado.gov.co y suin-juriscol.gov.co rechazaron la conexión (ECONNREFUSED). Sólo se leyeron verbatim el art. 23 (derecho de petición) y el art. 30 (hábeas corpus, \'treinta y seis horas\'). Por eso el término constitucional de diez días del art. 86 NO se registra como verificado: el término de diez (10) días que aparece en este archivo proviene del art. 29 del Decreto 2591 de 1991, que sí se leyó. La atribución de los arts. 86, 87, 88 y 241 como fundamento constitucional se conserva porque las propias normas leídas (Decreto 2591, Ley 393, Ley 472, Decreto 2067) declaran en su encabezado que reglamentan o desarrollan esos artículos, pero el texto constitucional literal no fue leído.',
+    'DECRETO 2591 DE 1991, ART. 7 (medida provisional) — el art. 7 NO fija término alguno que se haya podido leer con certeza. La fuente consultada mencionó de forma ambigua un estándar de \'48 horas\' en el art. 7, lo que no se pudo confirmar contra el texto literal. Por eso el campo \'term\' de la solicitud de medida provisional y del auto que la decreta queda en null. NO se debe afirmar en una plantilla que el juez tiene 48 horas para resolver la medida provisional.',
+    'DECRETO 2591 DE 1991, ART. 52 (consulta del desacato) — la fuente dice que la sanción \'será consultada al superior dentro de los tres (3) días, quien decidirá si debe revocarse\'. NO quedó claro si el término de tres (3) días corresponde a la remisión del expediente al superior o al plazo del superior para decidir. El campo \'term\' registra la ambigüedad tal como se leyó y NO debe redactarse en plantilla como si fuera un plazo cierto de decisión.',
+    'INCIDENTE DE DESACATO — no existe artículo que fije un término propio de trámite del incidente. La afirmación jurisprudencial de que el desacato debe resolverse en diez (10) días apareció sólo en un resumen de búsqueda y NO se leyó en una sentencia fetched; por eso no se registra como término.',
+    'DECRETO 1983 DE 2017 (reglas de reparto de tutela) — NO se hizo fetch de su texto. Las reglas de reparto (juez municipal, del circuito, tribunal, altas cortes) NO están verificadas y por eso el campo \'competent_authority\' de la tutela se limita a lo que dice el art. 37 del Decreto 2591 (competencia a prevención en el lugar de la violación o amenaza, y jueces del circuito para medios de comunicación). Advertencia: reparto NO es competencia (jurisprudencia constitucional reiterada), y esa distinción tampoco fue verificada verbatim aquí.',
+    'DECRETO 306 DE 1992 (reglamentario del Decreto 2591) — no consultado. Cualquier requisito formal que provenga de él no está en este archivo.',
+    'LEY 1755 DE 2015 (derecho de petición, arts. 13-33) — NO consultada en esta sesión. Sólo se leyó el art. 23 de la Constitución. Ninguna sección ni término del derecho de petición está verificado aquí y el derecho de petición NO se incluye como actuación en este archivo.',
+    'DISTINCIÓN CRÍTICA — acción de tutela, acción de cumplimiento y derecho de petición son TRES figuras distintas y no intercambiables: (a) la acción de tutela (art. 86 C.P.; Decreto 2591 de 1991) protege derechos fundamentales y se dirige a un juez; (b) la acción de cumplimiento (art. 87 C.P.; Ley 393 de 1997) hace efectivo el cumplimiento de una norma con fuerza material de ley o de un acto administrativo, se dirige a un juez administrativo, NO tiene fines indemnizatorios (art. 24 Ley 393) y NO procede para derechos protegibles por tutela (art. 9 Ley 393); (c) el derecho de petición (art. 23 C.P.; Ley 1755 de 2015) es una solicitud dirigida a la AUTORIDAD, no a un juez, y no es una acción judicial. El repositorio ya contiene un defecto conocido en el que una plantilla de derecho de petición se derivó de una plantilla de acción de cumplimiento: esa derivación es incorrecta porque la constitución en renuencia del art. 8 de la Ley 393 (reclamo previo y ratificación del incumplimiento o silencio de diez (10) días) es un requisito de procedibilidad de la acción judicial, NO el contenido de un derecho de petición. Ninguna plantilla de derecho de petición debe reutilizar secciones ni términos de las entradas de acción de cumplimiento de este archivo.',
+    'HÁBEAS DATA — no existe una \'acción de hábeas data\' con procedimiento judicial propio en la Ley 1266 de 2008 ni en la Ley 1581 de 2012: lo que esas leyes regulan son consultas y reclamos ante el responsable/operador, y la protección judicial se canaliza por acción de tutela (art. 42 num. 6 del Decreto 2591, leído). Las entradas de hábeas data de este archivo son actuaciones ante el particular o la autoridad administrativa, no demandas judiciales.',
+    'REQUIRED_SECTIONS — sólo tienen \'basis\' con artículo aquellas secciones leídas verbatim en el artículo citado (Decreto 2591 art. 14 y art. 29; Ley 393 arts. 10 y 21; Ley 472 arts. 18 y 52; Ley 1095 art. 4; Decreto 2067 art. 2). Todas las demás secciones llevan basis null: son estructura de práctica forense, no exigencia legal verificada.',
+    'No se verificaron: el trámite de la acción de tutela ante la Corte Suprema y el Consejo de Estado; el recurso de insistencia en su regulación reglamentaria interna de la Corte Constitucional (Acuerdo 02 de 2015); los términos de la acción de grupo posteriores al art. 66 de la Ley 472; la Ley 1425 de 2010 (derogatoria del incentivo económico en acciones populares); ni el art. 242 de la Constitución.'
+    ]
+  },
+  actuaciones: [
+  {
+    id: 'constitucional/accion-de-tutela',
+    exactName: 'Acción de tutela',
+    branch: 'CONSTITUCIONAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Art. 86 C.P.; Decreto 2591 de 1991, arts. 1, 5, 6, 10, 14, 15 y 37',
+    competentAuthority: 'Los jueces o tribunales con jurisdicción en el lugar donde ocurriere la violación o la amenaza que motivaren la presentación de la solicitud (Decreto 2591 de 1991, art. 37). Los jueces del circuito del lugar conocen de las acciones dirigidas contra los medios de comunicación (art. 37, inciso final).',
+    term: { status: 'VERIFICADO', description: '"Dentro de los diez (10) días siguientes a la presentación de la solicitud" el juez proferirá el fallo (Decreto 2591 de 1991, art. 29). Los términos son perentorios e improrrogables (art. 15). La acción puede interponerse en todo momento y lugar (art. 1).' },
+    requiredSections: [
+      { n: 1, name: 'Designación del juez o tribunal al que se dirige', mandatory: false, basis: null },
+      { n: 2, name: 'Identificación y residencia del solicitante', mandatory: true, basis: 'Decreto 2591 de 1991, art. 14' },
+      { n: 3, name: 'Identificación de la autoridad o particular accionado', mandatory: true, basis: 'Decreto 2591 de 1991, arts. 13 y 14' },
+      { n: 4, name: 'Hechos: acción u omisión que motiva la solicitud y demás circunstancias relevantes', mandatory: true, basis: 'Decreto 2591 de 1991, art. 14' },
+      { n: 5, name: 'Derechos fundamentales vulnerados o amenazados', mandatory: true, basis: 'Decreto 2591 de 1991, art. 14' },
+      { n: 6, name: 'Fundamentos de derecho', mandatory: false, basis: 'Decreto 2591 de 1991, art. 14 (no es indispensable citar la norma constitucional infringida si se determina claramente el derecho violado o amenazado)' },
+      { n: 7, name: 'Pretensiones', mandatory: false, basis: null },
+      { n: 8, name: 'Solicitud de medida provisional', mandatory: false, basis: 'Decreto 2591 de 1991, art. 7' },
+      { n: 9, name: 'Pruebas y anexos', mandatory: false, basis: null },
+      { n: 10, name: 'Juramento de no haber presentado otra acción de tutela por los mismos hechos y derechos', mandatory: true, basis: 'Decreto 2591 de 1991, art. 37' },
+      { n: 11, name: 'Notificaciones', mandatory: false, basis: null }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=5304'
+  },
+  {
+    id: 'constitucional/accion-de-tutela-como-mecanismo-transitorio-para-evitar-un-perjuicio-irremediable',
+    exactName: 'Acción de tutela como mecanismo transitorio para evitar un perjuicio irremediable',
+    branch: 'CONSTITUCIONAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Art. 86 C.P.; Decreto 2591 de 1991, arts. 6 num. 1 y 8',
+    competentAuthority: 'Los jueces o tribunales con jurisdicción en el lugar donde ocurriere la violación o la amenaza (Decreto 2591 de 1991, art. 37).',
+    term: { status: 'VERIFICADO', description: 'Fallo dentro de los diez (10) días siguientes a la presentación (Decreto 2591 de 1991, art. 29). El accionante deberá ejercer la acción principal en un término máximo de cuatro (4) meses a partir del fallo de tutela, so pena de que cesen los efectos de éste (art. 8).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación y residencia del solicitante', mandatory: true, basis: 'Decreto 2591 de 1991, art. 14' },
+      { n: 2, name: 'Identificación de la autoridad o particular accionado', mandatory: true, basis: 'Decreto 2591 de 1991, arts. 13 y 14' },
+      { n: 3, name: 'Hechos', mandatory: true, basis: 'Decreto 2591 de 1991, art. 14' },
+      { n: 4, name: 'Derechos fundamentales vulnerados o amenazados', mandatory: true, basis: 'Decreto 2591 de 1991, art. 14' },
+      { n: 5, name: 'Sustentación del perjuicio irremediable y de la existencia de otro medio de defensa judicial', mandatory: true, basis: 'Decreto 2591 de 1991, arts. 6 num. 1 y 8' },
+      { n: 6, name: 'Pretensión de amparo transitorio', mandatory: true, basis: 'Decreto 2591 de 1991, art. 8' },
+      { n: 7, name: 'Pruebas y anexos', mandatory: false, basis: null },
+      { n: 8, name: 'Juramento de no haber presentado otra acción de tutela por los mismos hechos y derechos', mandatory: true, basis: 'Decreto 2591 de 1991, art. 37' },
+      { n: 9, name: 'Notificaciones', mandatory: false, basis: null }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=5304'
+  },
+  {
+    id: 'constitucional/accion-de-tutela-contra-providencia-judicial',
+    exactName: 'Acción de tutela contra providencia judicial',
+    branch: 'CONSTITUCIONAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Art. 86 C.P.; Decreto 2591 de 1991, arts. 14 y 37; Sentencia C-590 de 2005 de la Corte Constitucional (requisitos generales y causales especiales de procedibilidad)',
+    competentAuthority: 'El superior funcional del juez o tribunal que profirió la providencia atacada. ADVERTENCIA: esta regla proviene del reparto (Decreto 1983 de 2017), norma que NO se leyó en esta verificación; lo único verificado es la competencia a prevención del art. 37 del Decreto 2591 de 1991.',
+    term: { status: 'VERIFICADO', description: 'Fallo dentro de los diez (10) días siguientes a la presentación (Decreto 2591 de 1991, art. 29). No hay término de caducidad legal: el art. 11 del Decreto 2591, que fijaba dos (2) meses contra providencias judiciales ejecutoriadas, fue declarado INEXEQUIBLE. Rige el requisito jurisprudencial de inmediatez, es decir, la interposición "en un término razonable y proporcionado" (C-590 de 2005).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación y residencia del solicitante', mandatory: true, basis: 'Decreto 2591 de 1991, art. 14' },
+      { n: 2, name: 'Identificación de la autoridad judicial accionada y de la providencia atacada', mandatory: true, basis: 'Decreto 2591 de 1991, arts. 13 y 14' },
+      { n: 3, name: 'Hechos y actuación procesal surtida en el proceso ordinario', mandatory: true, basis: 'Decreto 2591 de 1991, art. 14' },
+      { n: 4, name: 'Requisitos generales de procedibilidad: relevancia constitucional; agotamiento de todos los medios ordinarios y extraordinarios de defensa judicial; inmediatez; efecto decisivo de la irregularidad procesal alegada; identificación razonable de los hechos y derechos vulnerados y su alegación en el proceso ordinario; que no se trate de sentencias de tutela', mandatory: true, basis: 'Sentencia C-590 de 2005' },
+      { n: 5, name: 'Causales especiales de procedibilidad invocadas: defecto orgánico; defecto procedimental absoluto; defecto fáctico; defecto material o sustantivo; error inducido; decisión sin motivación; desconocimiento del precedente; violación directa de la Constitución', mandatory: true, basis: 'Sentencia C-590 de 2005' },
+      { n: 6, name: 'Derechos fundamentales vulnerados (en particular debido proceso y acceso a la administración de justicia)', mandatory: true, basis: 'Decreto 2591 de 1991, art. 14' },
+      { n: 7, name: 'Pretensiones (dejar sin efectos la providencia y órdenes de reemplazo)', mandatory: false, basis: null },
+      { n: 8, name: 'Pruebas y anexos (copia de la providencia y de las piezas procesales relevantes)', mandatory: false, basis: null },
+      { n: 9, name: 'Juramento de no haber presentado otra acción de tutela por los mismos hechos y derechos', mandatory: true, basis: 'Decreto 2591 de 1991, art. 37' },
+      { n: 10, name: 'Notificaciones', mandatory: false, basis: null }
+    ],
+    sourceUrl: 'https://www.corteconstitucional.gov.co/relatoria/2005/c-590-05.htm'
+  },
+  {
+    id: 'constitucional/solicitud-de-medida-provisional-en-accion-de-tutela',
+    exactName: 'Solicitud de medida provisional en acción de tutela',
+    branch: 'CONSTITUCIONAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Decreto 2591 de 1991, art. 7',
+    competentAuthority: 'El juez de tutela que conoce de la solicitud (Decreto 2591 de 1991, art. 7).',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Identificación del proceso de tutela y de las partes', mandatory: false, basis: null },
+      { n: 2, name: 'Acto concreto cuya suspensión se solicita o medida de conservación o seguridad pedida', mandatory: true, basis: 'Decreto 2591 de 1991, art. 7' },
+      { n: 3, name: 'Sustentación de la necesidad y urgencia de la medida para proteger el derecho', mandatory: true, basis: 'Decreto 2591 de 1991, art. 7' },
+      { n: 4, name: 'Pruebas sumarias que soportan la urgencia', mandatory: false, basis: null },
+      { n: 5, name: 'Petición concreta', mandatory: false, basis: null }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=5304'
+  },
+  {
+    id: 'constitucional/impugnacion-del-fallo-de-tutela',
+    exactName: 'Impugnación del fallo de tutela',
+    branch: 'CONSTITUCIONAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Decreto 2591 de 1991, arts. 31 y 32',
+    competentAuthority: 'Se presenta ante el juez que profirió el fallo de primera instancia, quien remite el expediente al superior jerárquico correspondiente (Decreto 2591 de 1991, art. 32).',
+    term: { status: 'VERIFICADO', description: '"Dentro de los tres (3) días siguientes a la notificación del fallo" pueden impugnarlo el Defensor del Pueblo, el solicitante, la autoridad pública o el representante del órgano correspondiente, sin perjuicio de su cumplimiento inmediato (Decreto 2591 de 1991, art. 31). Recibido el expediente, el juez remitirá dentro de los dos (2) días siguientes al superior, quien decidirá dentro de los veinte (20) días siguientes a la recepción del expediente (art. 32).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del proceso, del fallo impugnado y de la fecha de notificación (oportunidad)', mandatory: true, basis: 'Decreto 2591 de 1991, art. 31' },
+      { n: 2, name: 'Legitimación del impugnante', mandatory: true, basis: 'Decreto 2591 de 1991, art. 31' },
+      { n: 3, name: 'Reparos concretos contra el fallo', mandatory: false, basis: null },
+      { n: 4, name: 'Argumentos de hecho y de derecho', mandatory: false, basis: null },
+      { n: 5, name: 'Pruebas que se solicitan en segunda instancia', mandatory: false, basis: 'Decreto 2591 de 1991, art. 32 (el superior podrá solicitar informes y ordenar la práctica de pruebas)' },
+      { n: 6, name: 'Pretensión (revocatoria o modificación del fallo)', mandatory: false, basis: null }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=5304'
+  },
+  {
+    id: 'constitucional/solicitud-de-cumplimiento-del-fallo-de-tutela',
+    exactName: 'Solicitud de cumplimiento del fallo de tutela',
+    branch: 'CONSTITUCIONAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Decreto 2591 de 1991, arts. 23, 27 y 29 num. 5',
+    competentAuthority: 'El juez de primera instancia que profirió el fallo, quien mantiene la competencia hasta que esté completamente restablecido el derecho o eliminadas las causas de la amenaza (Decreto 2591 de 1991, art. 27).',
+    term: { status: 'VERIFICADO', description: 'El fallo fija un plazo perentorio para el cumplimiento de la orden, que no podrá exceder de cuarenta y ocho (48) horas (Decreto 2591 de 1991, art. 29 num. 5). Si la autoridad no cumple dentro de las cuarenta y ocho (48) horas siguientes, el juez se dirigirá al superior del responsable y le requerirá para que lo haga cumplir y abra el correspondiente procedimiento disciplinario; pasadas otras cuarenta y ocho (48) horas, el juez ordenará abrir proceso contra el superior que no hubiere procedido conforme a lo ordenado y adoptará directamente todas las medidas para el cabal cumplimiento del fallo (art. 27).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del proceso, del fallo y de la orden incumplida', mandatory: true, basis: 'Decreto 2591 de 1991, art. 27' },
+      { n: 2, name: 'Fecha de notificación del fallo y vencimiento del plazo perentorio', mandatory: true, basis: 'Decreto 2591 de 1991, arts. 29 num. 5 y 27' },
+      { n: 3, name: 'Descripción del incumplimiento', mandatory: true, basis: 'Decreto 2591 de 1991, art. 27' },
+      { n: 4, name: 'Identificación del obligado y de su superior jerárquico', mandatory: false, basis: 'Decreto 2591 de 1991, art. 27' },
+      { n: 5, name: 'Pruebas del incumplimiento', mandatory: false, basis: null },
+      { n: 6, name: 'Petición de requerimiento al superior y de adopción directa de medidas para el cabal cumplimiento', mandatory: false, basis: 'Decreto 2591 de 1991, art. 27' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=5304'
+  },
+  {
+    id: 'constitucional/solicitud-de-apertura-de-incidente-de-desacato',
+    exactName: 'Solicitud de apertura de incidente de desacato',
+    branch: 'CONSTITUCIONAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Decreto 2591 de 1991, arts. 52 y 27',
+    competentAuthority: 'El mismo juez que profirió la orden de tutela impone la sanción mediante trámite incidental; la sanción se consulta ante el superior jerárquico (Decreto 2591 de 1991, art. 52).',
+    term: { status: 'VERIFICADO', description: 'El Decreto 2591 de 1991 no fija término para el trámite del incidente. Términos verificados asociados: plazo perentorio de cumplimiento no mayor de cuarenta y ocho (48) horas (art. 29 num. 5) y los dos plazos sucesivos de cuarenta y ocho (48) horas del art. 27. Sanción: arresto hasta de seis (6) meses y multa hasta de veinte (20) salarios mínimos mensuales, salvo que en este decreto ya se hubiere señalado una sanción (art. 52). La sanción "será consultada al superior jerárquico" dentro de los tres (3) días, quien decidirá si debe revocarse (art. 52); no se pudo determinar con certeza si los tres (3) días corresponden a la remisión o a la decisión.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del proceso de tutela, del fallo y de la orden desacatada', mandatory: true, basis: 'Decreto 2591 de 1991, art. 52' },
+      { n: 2, name: 'Identificación del incumplido y de su superior jerárquico (responsable por acción u omisión)', mandatory: true, basis: 'Decreto 2591 de 1991, arts. 27 y 52' },
+      { n: 3, name: 'Relato del incumplimiento y del agotamiento del requerimiento previo', mandatory: true, basis: 'Decreto 2591 de 1991, art. 27' },
+      { n: 4, name: 'Pruebas del desacato', mandatory: false, basis: null },
+      { n: 5, name: 'Petición de apertura del trámite incidental y de imposición de arresto y multa', mandatory: true, basis: 'Decreto 2591 de 1991, art. 52' },
+      { n: 6, name: 'Notificaciones', mandatory: false, basis: null }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=5304'
+  },
+  {
+    id: 'constitucional/solicitud-de-insistencia-para-revision-eventual-ante-la-corte-constitucional',
+    exactName: 'Solicitud de insistencia para revisión eventual ante la Corte Constitucional',
+    branch: 'CONSTITUCIONAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Decreto 2591 de 1991, arts. 33 y 34',
+    competentAuthority: 'La Corte Constitucional. La insistencia sólo puede ser formulada por cualquier magistrado de la Corte o por el Defensor del Pueblo (Decreto 2591 de 1991, art. 33); el interesado eleva una petición dirigida a ellos para que insistan.',
+    term: { status: 'VERIFICADO', description: 'La Sala de Selección, integrada por dos magistrados designados por sorteo, selecciona sin motivación expresa. Cualquier magistrado de la Corte o el Defensor del Pueblo puede solicitar que se revise algún fallo excluido cuando considere que la revisión puede aclarar el alcance de un derecho o evitar un perjuicio grave. Los casos no excluidos de revisión dentro de los treinta (30) días siguientes a su recepción deberán ser decididos en el término de tres (3) meses (Decreto 2591 de 1991, art. 33).' },
+    requiredSections: [
+      { n: 1, name: 'Destinatario (magistrado de la Corte Constitucional o Defensor del Pueblo)', mandatory: true, basis: 'Decreto 2591 de 1991, art. 33' },
+      { n: 2, name: 'Identificación del expediente de tutela y de los fallos de instancia', mandatory: true, basis: null },
+      { n: 3, name: 'Hechos y decisiones de instancia', mandatory: false, basis: null },
+      { n: 4, name: 'Justificación de la insistencia: aclaración del alcance de un derecho fundamental o necesidad de evitar un perjuicio grave', mandatory: true, basis: 'Decreto 2591 de 1991, art. 33' },
+      { n: 5, name: 'Petición concreta de insistir en la selección para revisión', mandatory: true, basis: 'Decreto 2591 de 1991, art. 33' },
+      { n: 6, name: 'Anexos', mandatory: false, basis: null }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=5304'
+  },
+  {
+    id: 'constitucional/constitucion-en-renuencia-requisito-de-procedibilidad-de-la-accion-de-cumplimiento',
+    exactName: 'Constitución en renuencia (requisito de procedibilidad de la acción de cumplimiento)',
+    branch: 'CONSTITUCIONAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 393 de 1997, art. 8',
+    competentAuthority: 'La autoridad administrativa obligada al cumplimiento de la norma con fuerza material de ley o del acto administrativo (Ley 393 de 1997, arts. 5 y 8). NO se dirige a un juez.',
+    term: { status: 'VERIFICADO', description: '"Con el propósito de constituir la renuencia, la procedencia de la acción requerirá que el accionante previamente haya reclamado el cumplimiento del deber legal o administrativo y la autoridad se haya ratificado en su incumplimiento o no contestado dentro de los diez (10) días siguientes a la presentación de la solicitud" (Ley 393 de 1997, art. 8). No será necesario el requisito cuando el cumplirlo genere el inminente peligro de sufrir un perjuicio irremediable (art. 8).' },
+    requiredSections: [
+      { n: 1, name: 'Autoridad destinataria obligada al cumplimiento', mandatory: true, basis: 'Ley 393 de 1997, arts. 5 y 8' },
+      { n: 2, name: 'Identificación del solicitante', mandatory: false, basis: null },
+      { n: 3, name: 'Determinación de la norma con fuerza material de ley o acto administrativo incumplido', mandatory: true, basis: 'Ley 393 de 1997, arts. 1 y 8' },
+      { n: 4, name: 'Hechos del incumplimiento', mandatory: false, basis: null },
+      { n: 5, name: 'Reclamación expresa del cumplimiento del deber legal o administrativo', mandatory: true, basis: 'Ley 393 de 1997, art. 8' },
+      { n: 6, name: 'Advertencia de que el silencio de diez (10) días o la ratificación del incumplimiento constituyen la renuencia', mandatory: false, basis: 'Ley 393 de 1997, art. 8' },
+      { n: 7, name: 'Notificaciones', mandatory: false, basis: null }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=338'
+  },
+  {
+    id: 'constitucional/accion-de-cumplimiento',
+    exactName: 'Acción de cumplimiento',
+    branch: 'CONSTITUCIONAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Art. 87 C.P.; Ley 393 de 1997, arts. 1, 3, 4, 5, 8, 9, 10 y 21',
+    competentAuthority: 'En primera instancia los Jueces Administrativos con competencia en el domicilio del accionante; en segunda instancia el Tribunal Contencioso Administrativo del Departamento al cual pertenezca el Juzgado Administrativo (Ley 393 de 1997, art. 3).',
+    term: { status: 'VERIFICADO', description: 'El juez decide sobre la admisión dentro de los tres (3) días siguientes (arts. 12 y 13). El fallo se proferirá dentro de los veinte (20) días siguientes a la admisión (art. 13). La acción puede ejercerse en cualquier tiempo (art. 7). Requisito previo: renuencia constituida por reclamación previa y ratificación del incumplimiento o silencio de diez (10) días (art. 8).' },
+    requiredSections: [
+      { n: 1, name: 'Nombre, identificación y lugar de residencia del solicitante', mandatory: true, basis: 'Ley 393 de 1997, art. 10' },
+      { n: 2, name: 'Determinación de la norma con fuerza material de ley o acto administrativo incumplido', mandatory: true, basis: 'Ley 393 de 1997, art. 10' },
+      { n: 3, name: 'Narración de los hechos constitutivos del incumplimiento', mandatory: true, basis: 'Ley 393 de 1997, art. 10' },
+      { n: 4, name: 'Determinación de la autoridad o particular incumplido', mandatory: true, basis: 'Ley 393 de 1997, art. 10' },
+      { n: 5, name: 'Prueba de la renuencia', mandatory: true, basis: 'Ley 393 de 1997, arts. 8 y 10' },
+      { n: 6, name: 'Solicitud de pruebas y enunciación de las que se pretenden hacer valer', mandatory: false, basis: 'Ley 393 de 1997, art. 10' },
+      { n: 7, name: 'Manifestación bajo la gravedad del juramento de no haber presentado otra solicitud respecto a los mismos hechos o derechos ante ninguna otra autoridad', mandatory: true, basis: 'Ley 393 de 1997, art. 10' },
+      { n: 8, name: 'Pretensiones (orden de cumplimiento)', mandatory: false, basis: null },
+      { n: 9, name: 'Anexos y notificaciones', mandatory: false, basis: null }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=338'
+  },
+  {
+    id: 'constitucional/impugnacion-del-fallo-de-accion-de-cumplimiento',
+    exactName: 'Impugnación del fallo de acción de cumplimiento',
+    branch: 'CONSTITUCIONAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 393 de 1997, arts. 26 y 27',
+    competentAuthority: 'Se presenta ante el juez de primera instancia, quien remite al superior; decide el Tribunal Contencioso Administrativo respectivo (Ley 393 de 1997, arts. 3 y 27).',
+    term: { status: 'VERIFICADO', description: '"Dentro de los tres (3) días siguientes a la notificación del fallo" pueden impugnarlo el solicitante, la autoridad renuente, el representante de la entidad o el Defensor del Pueblo; se concede en el efecto suspensivo salvo que se comprometa la efectividad de un derecho y se genere un perjuicio irremediable (art. 26). El juez remite al superior a más tardar al día siguiente y el superior profiere fallo dentro de los diez (10) días siguientes al recibo del expediente (art. 27).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del proceso, del fallo impugnado y de la fecha de notificación', mandatory: true, basis: 'Ley 393 de 1997, art. 26' },
+      { n: 2, name: 'Legitimación del impugnante', mandatory: true, basis: 'Ley 393 de 1997, art. 26' },
+      { n: 3, name: 'Reparos contra el fallo', mandatory: false, basis: null },
+      { n: 4, name: 'Argumentos de hecho y de derecho', mandatory: false, basis: null },
+      { n: 5, name: 'Pretensión', mandatory: false, basis: null }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=338'
+  },
+  {
+    id: 'constitucional/accion-popular',
+    exactName: 'Acción popular',
+    branch: 'CONSTITUCIONAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Art. 88 C.P.; Ley 472 de 1998, arts. 2, 9, 12, 13, 15, 16 y 18',
+    competentAuthority: 'La jurisdicción de lo Contencioso Administrativo cuando se originan en actos, acciones u omisiones de entidades públicas; en los demás casos, la jurisdicción ordinaria civil (Ley 472 de 1998, art. 15). En primera instancia conocen los jueces administrativos y los jueces civiles del circuito (art. 16).',
+    term: { status: 'VERIFICADO', description: 'El juez se pronuncia sobre la admisión dentro de los tres (3) días hábiles siguientes a la presentación de la demanda o petición inicial (Ley 472 de 1998, art. 20). Traslado para contestar: diez (10) días (art. 22). Alegatos: término común de cinco (5) días (art. 33). Sentencia: veinte (20) días (art. 34). La acción popular puede promoverse mientras subsista la amenaza o vulneración del derecho o interés colectivo (no se verificó artículo específico de caducidad).' },
+    requiredSections: [
+      { n: 1, name: 'Indicación del derecho o interés colectivo amenazado o vulnerado', mandatory: true, basis: 'Ley 472 de 1998, art. 18 lit. a)' },
+      { n: 2, name: 'Indicación de los hechos, actos, acciones u omisiones que motivan la petición', mandatory: true, basis: 'Ley 472 de 1998, art. 18 lit. b)' },
+      { n: 3, name: 'Enunciación de las pretensiones', mandatory: true, basis: 'Ley 472 de 1998, art. 18 lit. c)' },
+      { n: 4, name: 'Indicación de la persona natural o jurídica, o de la autoridad pública presuntamente responsable', mandatory: true, basis: 'Ley 472 de 1998, art. 18 lit. d)' },
+      { n: 5, name: 'Pruebas que se pretende hacer valer', mandatory: true, basis: 'Ley 472 de 1998, art. 18 lit. e)' },
+      { n: 6, name: 'Direcciones para notificaciones', mandatory: true, basis: 'Ley 472 de 1998, art. 18 lit. f)' },
+      { n: 7, name: 'Nombre e identificación de quien ejerce la acción', mandatory: true, basis: 'Ley 472 de 1998, art. 18 lit. g)' },
+      { n: 8, name: 'Solicitud de medidas cautelares', mandatory: false, basis: 'Ley 472 de 1998, art. 26' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=188'
+  },
+  {
+    id: 'constitucional/accion-de-grupo',
+    exactName: 'Acción de grupo',
+    branch: 'CONSTITUCIONAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Art. 88 C.P.; Ley 472 de 1998, arts. 3, 46, 47, 48, 49, 51 y 52',
+    competentAuthority: 'En primera instancia los jueces administrativos y los jueces civiles del circuito (Ley 472 de 1998, art. 51). Debe ejercerse por conducto de abogado (art. 49).',
+    term: { status: 'VERIFICADO', description: '"La acción de grupo deberá promoverse dentro de los dos (2) años siguientes a la fecha en que se causó el daño" (Ley 472 de 1998, art. 47). El juez se pronuncia sobre la admisión dentro de los diez (10) días hábiles siguientes a la presentación de la demanda (art. 53). Exclusión del grupo: dentro de los cinco (5) días siguientes al vencimiento del término de traslado de la demanda (art. 56). Conciliación: dentro de los cinco (5) días siguientes al vencimiento del término de exclusión (art. 61). Integración al grupo tras la sentencia: dentro de los veinte (20) días siguientes a su publicación (art. 55).' },
+    requiredSections: [
+      { n: 1, name: 'Nombre del apoderado o apoderados, anexando el poder legalmente conferido', mandatory: true, basis: 'Ley 472 de 1998, art. 52 num. 1' },
+      { n: 2, name: 'Identificación de los poderdantes: nombres, documentos de identidad y domicilio', mandatory: true, basis: 'Ley 472 de 1998, art. 52 num. 2' },
+      { n: 3, name: 'Estimativo del valor de los perjuicios ocasionados', mandatory: true, basis: 'Ley 472 de 1998, art. 52 num. 3' },
+      { n: 4, name: 'Criterios para identificar a los integrantes del grupo y definirlo, cuando no sea posible dar el nombre de todos', mandatory: true, basis: 'Ley 472 de 1998, art. 52 num. 4' },
+      { n: 5, name: 'Identificación del demandado', mandatory: true, basis: 'Ley 472 de 1998, art. 52 num. 5' },
+      { n: 6, name: 'Justificación sobre la procedencia de la acción de grupo', mandatory: true, basis: 'Ley 472 de 1998, art. 52 num. 6' },
+      { n: 7, name: 'Hechos de la demanda y pruebas que se pretenden hacer valer', mandatory: true, basis: 'Ley 472 de 1998, art. 52 num. 7' },
+      { n: 8, name: 'Pretensiones indemnizatorias', mandatory: false, basis: null }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=188'
+  },
+  {
+    id: 'constitucional/solicitud-de-habeas-corpus',
+    exactName: 'Solicitud de hábeas corpus',
+    branch: 'CONSTITUCIONAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Art. 30 C.P.; Ley 1095 de 2006, arts. 1, 2, 3 y 4',
+    competentAuthority: '"Son competentes para resolver la solicitud de Hábeas Corpus todos los jueces y tribunales de la Rama Judicial del Poder Público" (Ley 1095 de 2006, art. 2). En los órganos plurales cada integrante actúa como juez individual (art. 2).',
+    term: { status: 'VERIFICADO', description: 'El hábeas corpus "debe resolverse en el término de treinta y seis horas" (Art. 30 C.P.); la Ley 1095 de 2006, art. 3, reitera el término de treinta y seis (36) horas. Puede invocarse en cualquier tiempo mientras la violación persista, y las actividades no se suspenden por días festivos (art. 3). Sólo podrá invocarse o incoarse por una sola vez (art. 1).' },
+    requiredSections: [
+      { n: 1, name: 'Nombre de la persona en cuyo favor se instaura la acción', mandatory: true, basis: 'Ley 1095 de 2006, art. 4 num. 1' },
+      { n: 2, name: 'Razones por las cuales se considera que la privación de la libertad es ilegal o arbitraria', mandatory: true, basis: 'Ley 1095 de 2006, art. 4 num. 2' },
+      { n: 3, name: 'Fecha de reclusión y lugar donde se encuentra el capturado', mandatory: true, basis: 'Ley 1095 de 2006, art. 4 num. 3' },
+      { n: 4, name: 'Autoridad o persona que ordenó la privación de la libertad, si se conoce', mandatory: true, basis: 'Ley 1095 de 2006, art. 4 num. 4' },
+      { n: 5, name: 'Nombre, documento de identidad y lugar de residencia del solicitante', mandatory: true, basis: 'Ley 1095 de 2006, art. 4 num. 5' },
+      { n: 6, name: 'Afirmación bajo la gravedad del juramento de que ningún otro juez ha asumido conocimiento de la solicitud o decidido sobre la misma', mandatory: true, basis: 'Ley 1095 de 2006, art. 4 num. 6' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=22087'
+  },
+  {
+    id: 'constitucional/impugnacion-de-la-decision-que-niega-el-habeas-corpus',
+    exactName: 'Impugnación de la decisión que niega el hábeas corpus',
+    branch: 'CONSTITUCIONAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1095 de 2006, art. 7',
+    competentAuthority: 'El superior jerárquico correspondiente (Ley 1095 de 2006, art. 7).',
+    term: { status: 'VERIFICADO', description: 'La decisión denegatoria podrá ser impugnada "dentro de los tres (3) días calendario" siguientes a la notificación. El superior debe recibir el expediente dentro de las veinticuatro (24) horas siguientes y decidir dentro de los tres (3) días hábiles siguientes (Ley 1095 de 2006, art. 7).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación de la actuación y de la decisión impugnada', mandatory: false, basis: null },
+      { n: 2, name: 'Oportunidad de la impugnación', mandatory: true, basis: 'Ley 1095 de 2006, art. 7' },
+      { n: 3, name: 'Razones de la impugnación', mandatory: false, basis: null },
+      { n: 4, name: 'Petición de revocatoria y de orden de libertad', mandatory: false, basis: 'Ley 1095 de 2006, art. 6' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=22087'
+  },
+  {
+    id: 'constitucional/reclamo-de-habeas-data-ante-el-responsable-o-encargado-del-tratamiento-datos-personales',
+    exactName: 'Reclamo de hábeas data ante el Responsable o Encargado del Tratamiento (datos personales)',
+    branch: 'CONSTITUCIONAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1581 de 2012, arts. 8, 14, 15 y 16',
+    competentAuthority: 'El Responsable del Tratamiento o el Encargado del Tratamiento de la base de datos. Sólo agotado el trámite de consulta o reclamo el Titular o causahabiente podrá elevar queja ante la Superintendencia de Industria y Comercio (Ley 1581 de 2012, art. 16).',
+    term: { status: 'VERIFICADO', description: 'Consultas: término máximo de diez (10) días hábiles contados a partir de la fecha de recibo; si no fuere posible, se informa al interesado y se atiende dentro de los cinco (5) días hábiles siguientes (Ley 1581 de 2012, art. 14). Reclamos: si el reclamo está incompleto se requiere al interesado dentro de los cinco (5) días siguientes para subsanar; el término máximo para atender el reclamo es de quince (15) días hábiles contados a partir del día siguiente a la fecha de su recibo, prorrogable con información al interesado por máximo ocho (8) días hábiles siguientes (art. 15).' },
+    requiredSections: [
+      { n: 1, name: 'Destinatario: Responsable o Encargado del Tratamiento', mandatory: true, basis: 'Ley 1581 de 2012, art. 15' },
+      { n: 2, name: 'Identificación del Titular', mandatory: true, basis: 'Ley 1581 de 2012, art. 15' },
+      { n: 3, name: 'Descripción de los hechos que dan lugar al reclamo', mandatory: true, basis: 'Ley 1581 de 2012, art. 15' },
+      { n: 4, name: 'Dirección del Titular para notificaciones', mandatory: true, basis: 'Ley 1581 de 2012, art. 15' },
+      { n: 5, name: 'Petición concreta: conocer, actualizar, rectificar o suprimir los datos, o revocar la autorización', mandatory: true, basis: 'Ley 1581 de 2012, art. 8' },
+      { n: 6, name: 'Documentos que se quieran hacer valer', mandatory: false, basis: 'Ley 1581 de 2012, art. 15' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=49981'
+  },
+  {
+    id: 'constitucional/reclamo-de-habeas-data-ante-operador-de-informacion-financiera-y-crediticia',
+    exactName: 'Reclamo de hábeas data ante operador de información financiera y crediticia',
+    branch: 'CONSTITUCIONAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1266 de 2008, arts. 6 y 16',
+    competentAuthority: 'El operador, la fuente o el usuario de la información, según corresponda (Ley 1266 de 2008, arts. 6 y 16).',
+    term: { status: 'VERIFICADO', description: 'Consultas o peticiones de información: término máximo de diez (10) días hábiles contados desde el recibo, prorrogable hasta por cinco (5) días hábiles adicionales previa información al interesado. Reclamos: término máximo de quince (15) días hábiles contados desde su presentación, prorrogable hasta por ocho (8) días hábiles más (Ley 1266 de 2008, art. 16).' },
+    requiredSections: [
+      { n: 1, name: 'Destinatario: operador, fuente o usuario de la información', mandatory: true, basis: 'Ley 1266 de 2008, art. 16' },
+      { n: 2, name: 'Identificación del titular de la información', mandatory: true, basis: null },
+      { n: 3, name: 'Descripción del dato que se estima incorrecto, inexacto o desactualizado', mandatory: true, basis: 'Ley 1266 de 2008, art. 6' },
+      { n: 4, name: 'Petición de actualización, rectificación o retiro del dato', mandatory: true, basis: 'Ley 1266 de 2008, art. 6' },
+      { n: 5, name: 'Solicitud de prueba de la autorización otorgada a la fuente o al usuario', mandatory: false, basis: 'Ley 1266 de 2008, art. 6' },
+      { n: 6, name: 'Anexos y dirección para respuesta', mandatory: false, basis: null }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=34488'
+  },
+  {
+    id: 'constitucional/demanda-de-accion-publica-de-inconstitucionalidad',
+    exactName: 'Demanda de acción pública de inconstitucionalidad',
+    branch: 'CONSTITUCIONAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Art. 241 C.P.; Decreto 2067 de 1991, arts. 1, 2 y 6',
+    competentAuthority: 'La Corte Constitucional (Decreto 2067 de 1991, arts. 1 y 2).',
+    term: { status: 'VERIFICADO', description: 'El magistrado sustanciador decide sobre la admisión dentro de los diez (10) días siguientes al reparto. Si la demanda no cumple alguno de los requisitos del art. 2, se conceden tres (3) días al demandante para corregirla señalándole con precisión los requisitos incumplidos; si no lo hiciere, se rechaza (Decreto 2067 de 1991, art. 6). Fijación en lista por diez (10) días para intervención ciudadana y traslado al Procurador General por treinta (30) días (art. 7). El magistrado presenta el proyecto de fallo dentro de los treinta (30) días siguientes y la Corte decide dentro de los sesenta (60) días siguientes (art. 8). La acción no tiene término de caducidad, salvo el previsto para vicios de forma (no verificado en esta sesión).' },
+    requiredSections: [
+      { n: 1, name: 'Señalamiento de las normas acusadas como inconstitucionales, su transcripción literal por cualquier medio o un ejemplar de la publicación oficial de las mismas', mandatory: true, basis: 'Decreto 2067 de 1991, art. 2 num. 1' },
+      { n: 2, name: 'Señalamiento de las normas constitucionales que se consideren infringidas', mandatory: true, basis: 'Decreto 2067 de 1991, art. 2 num. 2' },
+      { n: 3, name: 'Razones por las cuales dichos textos se estiman violados (concepto de la violación)', mandatory: true, basis: 'Decreto 2067 de 1991, art. 2 num. 3' },
+      { n: 4, name: 'Cuando fuere el caso, señalamiento del trámite impuesto por la Constitución para la expedición del acto demandado y la forma en que fue quebrantado', mandatory: false, basis: 'Decreto 2067 de 1991, art. 2 num. 4' },
+      { n: 5, name: 'Razón por la cual la Corte es competente para conocer de la demanda', mandatory: true, basis: 'Decreto 2067 de 1991, art. 2 num. 5' },
+      { n: 6, name: 'Presentación por escrito y en duplicado', mandatory: true, basis: 'Decreto 2067 de 1991, art. 2' },
+      { n: 7, name: 'Identificación del ciudadano demandante y notificaciones', mandatory: false, basis: null }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=30150'
+  },
+  {
+    id: 'constitucional/recurso-de-suplica-contra-el-auto-de-rechazo-de-la-demanda-de-inconstitucionalidad',
+    exactName: 'Recurso de súplica contra el auto de rechazo de la demanda de inconstitucionalidad',
+    branch: 'CONSTITUCIONAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Decreto 2067 de 1991, art. 6',
+    competentAuthority: 'La Sala Plena de la Corte Constitucional (Decreto 2067 de 1991, art. 6: "Contra el auto de rechazo, procederá el recurso de súplica ante la Corte").',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Identificación del expediente y del auto de rechazo recurrido', mandatory: false, basis: null },
+      { n: 2, name: 'Argumentos contra las razones del rechazo', mandatory: true, basis: 'Decreto 2067 de 1991, art. 6' },
+      { n: 3, name: 'Petición de revocatoria del auto de rechazo y de admisión de la demanda', mandatory: false, basis: null }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=30150'
+  },
+  {
+    id: 'constitucional/intervencion-ciudadana-en-proceso-de-constitucionalidad',
+    exactName: 'Intervención ciudadana en proceso de constitucionalidad',
+    branch: 'CONSTITUCIONAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Decreto 2067 de 1991, art. 7',
+    competentAuthority: 'La Corte Constitucional (Decreto 2067 de 1991, art. 7).',
+    term: { status: 'VERIFICADO', description: 'El término de fijación en lista es de diez (10) días, durante los cuales cualquier ciudadano podrá impugnar o defender la norma sometida a control (Decreto 2067 de 1991, art. 7).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del expediente y de la norma sometida a control', mandatory: false, basis: null },
+      { n: 2, name: 'Calidad de ciudadano del interviniente', mandatory: true, basis: 'Decreto 2067 de 1991, art. 7' },
+      { n: 3, name: 'Posición: impugnación o defensa de la norma', mandatory: true, basis: 'Decreto 2067 de 1991, art. 7' },
+      { n: 4, name: 'Argumentación constitucional', mandatory: false, basis: null },
+      { n: 5, name: 'Solicitud (exequibilidad o inexequibilidad)', mandatory: false, basis: null }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=30150'
+  },
+  {
+    id: 'constitucional/auto-admisorio-de-la-accion-de-tutela',
+    exactName: 'Auto admisorio de la acción de tutela',
+    branch: 'CONSTITUCIONAL',
+    role: 'DESPACHO',
+    legalBasis: 'Decreto 2591 de 1991, arts. 15, 16, 19 y 37',
+    competentAuthority: 'El juez o tribunal con jurisdicción en el lugar donde ocurriere la violación o la amenaza (Decreto 2591 de 1991, art. 37).',
+    term: { status: 'VERIFICADO', description: 'El juez puede requerir informes al órgano o autoridad contra quien se hubiere hecho la solicitud y pedir el expediente administrativo; "el plazo para informar será de uno a tres días" y se fijará según sea la índole del asunto, la distancia y la rapidez de los medios de comunicación (Decreto 2591 de 1991, art. 19). Si el informe no se rinde dentro del plazo se tendrán por ciertos los hechos (art. 20). El fallo debe proferirse dentro de los diez (10) días siguientes a la presentación de la solicitud (art. 29).' },
+    requiredSections: [
+      { n: 1, name: 'Encabezado: juzgado, radicado, accionante y accionado', mandatory: false, basis: null },
+      { n: 2, name: 'Verificación de competencia', mandatory: false, basis: 'Decreto 2591 de 1991, art. 37' },
+      { n: 3, name: 'Admisión y avocamiento del conocimiento', mandatory: false, basis: null },
+      { n: 4, name: 'Orden de requerir informe al accionado, fijando el plazo de uno a tres días', mandatory: true, basis: 'Decreto 2591 de 1991, art. 19' },
+      { n: 5, name: 'Advertencia sobre la presunción de veracidad por falta de informe', mandatory: false, basis: 'Decreto 2591 de 1991, art. 20' },
+      { n: 6, name: 'Vinculación de terceros con interés', mandatory: false, basis: 'Decreto 2591 de 1991, art. 13' },
+      { n: 7, name: 'Pronunciamiento sobre la medida provisional solicitada', mandatory: false, basis: 'Decreto 2591 de 1991, art. 7' },
+      { n: 8, name: 'Orden de notificación por el medio que el juez considere más expedito y eficaz', mandatory: true, basis: 'Decreto 2591 de 1991, art. 16' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=5304'
+  },
+  {
+    id: 'constitucional/auto-que-decreta-medida-provisional-en-tutela',
+    exactName: 'Auto que decreta medida provisional en tutela',
+    branch: 'CONSTITUCIONAL',
+    role: 'DESPACHO',
+    legalBasis: 'Decreto 2591 de 1991, art. 7',
+    competentAuthority: 'El juez de tutela que conoce de la solicitud (Decreto 2591 de 1991, art. 7).',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Encabezado y antecedentes de la solicitud', mandatory: false, basis: null },
+      { n: 2, name: 'Consideraciones sobre la necesidad y urgencia de proteger el derecho', mandatory: true, basis: 'Decreto 2591 de 1991, art. 7' },
+      { n: 3, name: 'Ponderación del perjuicio o afectación grave al interés público que podría causar la suspensión', mandatory: false, basis: 'Decreto 2591 de 1991, art. 7' },
+      { n: 4, name: 'Decisión: suspensión de la aplicación del acto concreto o medida de conservación o seguridad', mandatory: true, basis: 'Decreto 2591 de 1991, art. 7' },
+      { n: 5, name: 'Órdenes concretas y destinatarios', mandatory: false, basis: null },
+      { n: 6, name: 'Orden de notificación', mandatory: false, basis: 'Decreto 2591 de 1991, art. 16' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=5304'
+  },
+  {
+    id: 'constitucional/sentencia-de-tutela-que-concede-el-amparo',
+    exactName: 'Sentencia de tutela que concede el amparo',
+    branch: 'CONSTITUCIONAL',
+    role: 'DESPACHO',
+    legalBasis: 'Decreto 2591 de 1991, arts. 23, 24, 29 y 30',
+    competentAuthority: 'El juez de tutela de primera instancia (Decreto 2591 de 1991, art. 37).',
+    term: { status: 'VERIFICADO', description: '"Dentro de los diez (10) días siguientes a la presentación de la solicitud" el juez proferirá el fallo (Decreto 2591 de 1991, art. 29). El plazo perentorio que se fije para el cumplimiento no podrá exceder de cuarenta y ocho (48) horas (art. 29 num. 5). El fallo se notificará a más tardar al día siguiente de haber sido proferido (art. 30).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del solicitante', mandatory: true, basis: 'Decreto 2591 de 1991, art. 29 num. 1' },
+      { n: 2, name: 'Identificación del sujeto o sujetos de quien provenga la amenaza o vulneración', mandatory: true, basis: 'Decreto 2591 de 1991, art. 29 num. 2' },
+      { n: 3, name: 'Antecedentes y actuación procesal', mandatory: false, basis: null },
+      { n: 4, name: 'Consideraciones y determinación del derecho tutelado', mandatory: true, basis: 'Decreto 2591 de 1991, art. 29 num. 3' },
+      { n: 5, name: 'Orden y definición precisa de la conducta a cumplir con el fin de hacer efectiva la tutela', mandatory: true, basis: 'Decreto 2591 de 1991, art. 29 num. 4' },
+      { n: 6, name: 'Plazo perentorio para el cumplimiento, no mayor de cuarenta y ocho (48) horas', mandatory: true, basis: 'Decreto 2591 de 1991, art. 29 num. 5' },
+      { n: 7, name: 'Cuando la violación o amenaza derive de la aplicación de una norma incompatible con los derechos fundamentales, orden de inaplicarla en el caso concreto', mandatory: false, basis: 'Decreto 2591 de 1991, art. 29 num. 6' },
+      { n: 8, name: 'Prevención a la autoridad para que en ningún caso vuelva a incurrir en las acciones u omisiones que dieron mérito a la tutela', mandatory: false, basis: 'Decreto 2591 de 1991, art. 24' },
+      { n: 9, name: 'Orden de notificación a más tardar al día siguiente y advertencia sobre la impugnación', mandatory: true, basis: 'Decreto 2591 de 1991, arts. 30 y 31' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=5304'
+  },
+  {
+    id: 'constitucional/sentencia-de-tutela-que-niega-el-amparo',
+    exactName: 'Sentencia de tutela que niega el amparo',
+    branch: 'CONSTITUCIONAL',
+    role: 'DESPACHO',
+    legalBasis: 'Decreto 2591 de 1991, arts. 6, 29, 30 y 31',
+    competentAuthority: 'El juez de tutela de primera instancia (Decreto 2591 de 1991, art. 37).',
+    term: { status: 'VERIFICADO', description: '"Dentro de los diez (10) días siguientes a la presentación de la solicitud" el juez proferirá el fallo (Decreto 2591 de 1991, art. 29). El fallo se notificará a más tardar al día siguiente de haber sido proferido (art. 30). "En ningún caso podrá ser inhibitorio" (art. 29).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del solicitante', mandatory: true, basis: 'Decreto 2591 de 1991, art. 29 num. 1' },
+      { n: 2, name: 'Identificación del accionado', mandatory: true, basis: 'Decreto 2591 de 1991, art. 29 num. 2' },
+      { n: 3, name: 'Antecedentes y actuación procesal', mandatory: false, basis: null },
+      { n: 4, name: 'Consideraciones: causales de improcedencia (existencia de otros recursos o medios de defensa judicial; hábeas corpus; derechos colectivos; daño consumado; actos de carácter general, impersonal y abstracto)', mandatory: true, basis: 'Decreto 2591 de 1991, art. 6' },
+      { n: 5, name: 'Decisión de negar o declarar improcedente el amparo, sin que pueda ser inhibitoria', mandatory: true, basis: 'Decreto 2591 de 1991, art. 29' },
+      { n: 6, name: 'Orden de notificación a más tardar al día siguiente y advertencia sobre la impugnación dentro de los tres (3) días siguientes', mandatory: true, basis: 'Decreto 2591 de 1991, arts. 30 y 31' },
+      { n: 7, name: 'Orden de remisión a la Corte Constitucional para eventual revisión si el fallo no fuere impugnado', mandatory: true, basis: 'Decreto 2591 de 1991, art. 31' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=5304'
+  },
+  {
+    id: 'constitucional/auto-que-concede-la-impugnacion-y-remite-el-expediente-al-superior',
+    exactName: 'Auto que concede la impugnación y remite el expediente al superior',
+    branch: 'CONSTITUCIONAL',
+    role: 'DESPACHO',
+    legalBasis: 'Decreto 2591 de 1991, arts. 31 y 32',
+    competentAuthority: 'El juez de primera instancia que profirió el fallo, que remite al superior jerárquico correspondiente (Decreto 2591 de 1991, art. 32).',
+    term: { status: 'VERIFICADO', description: '"Presentada debidamente la impugnación el juez remitirá el expediente dentro de los dos (2) días siguientes al superior jerárquico correspondiente" (Decreto 2591 de 1991, art. 32). La impugnación no suspende el cumplimiento inmediato del fallo (art. 31).' },
+    requiredSections: [
+      { n: 1, name: 'Encabezado y radicado', mandatory: false, basis: null },
+      { n: 2, name: 'Verificación de la oportunidad de la impugnación (tres días desde la notificación) y de la legitimación del impugnante', mandatory: true, basis: 'Decreto 2591 de 1991, art. 31' },
+      { n: 3, name: 'Concesión de la impugnación', mandatory: true, basis: 'Decreto 2591 de 1991, art. 32' },
+      { n: 4, name: 'Orden de remisión del expediente al superior jerárquico dentro de los dos (2) días siguientes', mandatory: true, basis: 'Decreto 2591 de 1991, art. 32' },
+      { n: 5, name: 'Constancia de que el fallo es de cumplimiento inmediato pese a la impugnación', mandatory: false, basis: 'Decreto 2591 de 1991, art. 31' },
+      { n: 6, name: 'Orden de notificación', mandatory: false, basis: 'Decreto 2591 de 1991, art. 16' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=5304'
+  },
+  {
+    id: 'constitucional/fallo-de-segunda-instancia-que-resuelve-la-impugnacion-de-tutela',
+    exactName: 'Fallo de segunda instancia que resuelve la impugnación de tutela',
+    branch: 'CONSTITUCIONAL',
+    role: 'DESPACHO',
+    legalBasis: 'Decreto 2591 de 1991, art. 32',
+    competentAuthority: 'El superior jerárquico del juez de primera instancia (Decreto 2591 de 1991, art. 32).',
+    term: { status: 'VERIFICADO', description: 'El juez que conozca de la impugnación "estudiará el contenido de la misma, cotejándola con el acervo probatorio y con el fallo"; podrá solicitar informes y ordenar la práctica de pruebas de oficio, y "deberá decidir dentro de los veinte (20) días siguientes a la recepción del expediente" (Decreto 2591 de 1991, art. 32). Dentro de los diez (10) días siguientes a la ejecutoria del fallo de segunda instancia el juez remitirá el expediente a la Corte Constitucional para su eventual revisión (art. 32).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación de las partes y del fallo impugnado', mandatory: false, basis: null },
+      { n: 2, name: 'Antecedentes y síntesis de la impugnación', mandatory: false, basis: null },
+      { n: 3, name: 'Pruebas decretadas en segunda instancia, si las hubiere', mandatory: false, basis: 'Decreto 2591 de 1991, art. 32' },
+      { n: 4, name: 'Consideraciones: cotejo de la impugnación con el acervo probatorio y con el fallo', mandatory: true, basis: 'Decreto 2591 de 1991, art. 32' },
+      { n: 5, name: 'Decisión de confirmar cuando el fallo carece de fundamento, o de revocar; si el fallo carece de fundamento el superior lo revocará, y si lo encuentra ajustado a derecho lo confirmará', mandatory: true, basis: 'Decreto 2591 de 1991, art. 32' },
+      { n: 6, name: 'Orden de remitir el expediente a la Corte Constitucional dentro de los diez (10) días siguientes a la ejecutoria', mandatory: true, basis: 'Decreto 2591 de 1991, art. 32' },
+      { n: 7, name: 'Orden de notificación', mandatory: false, basis: 'Decreto 2591 de 1991, art. 16' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=5304'
+  },
+  {
+    id: 'constitucional/auto-que-abre-el-incidente-de-desacato',
+    exactName: 'Auto que abre el incidente de desacato',
+    branch: 'CONSTITUCIONAL',
+    role: 'DESPACHO',
+    legalBasis: 'Decreto 2591 de 1991, arts. 27 y 52',
+    competentAuthority: 'El juez que profirió la orden de tutela, quien mantiene la competencia hasta que esté completamente restablecido el derecho (Decreto 2591 de 1991, art. 27).',
+    term: { status: 'VERIFICADO', description: 'El Decreto 2591 de 1991 no fija término para el trámite del incidente. Términos verificados asociados: cumplimiento inmediato del fallo y, ante incumplimiento, requerimiento al superior pasadas cuarenta y ocho (48) horas y apertura de proceso contra el superior pasadas otras cuarenta y ocho (48) horas (art. 27).' },
+    requiredSections: [
+      { n: 1, name: 'Encabezado, radicado y referencia al fallo de tutela', mandatory: false, basis: null },
+      { n: 2, name: 'Identificación de la orden incumplida y del plazo perentorio vencido', mandatory: true, basis: 'Decreto 2591 de 1991, arts. 27 y 29 num. 5' },
+      { n: 3, name: 'Identificación del responsable del cumplimiento y de su superior jerárquico', mandatory: true, basis: 'Decreto 2591 de 1991, art. 27' },
+      { n: 4, name: 'Apertura del trámite incidental', mandatory: true, basis: 'Decreto 2591 de 1991, art. 52' },
+      { n: 5, name: 'Requerimiento al obligado para que informe y ejerza su derecho de defensa', mandatory: false, basis: null },
+      { n: 6, name: 'Requerimiento al superior para que haga cumplir la orden y abra el correspondiente procedimiento disciplinario', mandatory: false, basis: 'Decreto 2591 de 1991, art. 27' },
+      { n: 7, name: 'Decreto de pruebas', mandatory: false, basis: null },
+      { n: 8, name: 'Orden de notificación', mandatory: false, basis: 'Decreto 2591 de 1991, art. 16' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=5304'
+  },
+  {
+    id: 'constitucional/auto-que-resuelve-el-incidente-de-desacato-e-impone-sancion',
+    exactName: 'Auto que resuelve el incidente de desacato e impone sanción',
+    branch: 'CONSTITUCIONAL',
+    role: 'DESPACHO',
+    legalBasis: 'Decreto 2591 de 1991, arts. 27, 52 y 53',
+    competentAuthority: 'El mismo juez que profirió la orden de tutela impone la sanción mediante trámite incidental; la sanción será consultada al superior jerárquico (Decreto 2591 de 1991, art. 52).',
+    term: { status: 'VERIFICADO', description: 'Sanción: arresto hasta de seis (6) meses y multa hasta de veinte (20) salarios mínimos mensuales, salvo que en el Decreto 2591 ya se hubiere señalado una consecuencia jurídica distinta, y sin perjuicio de las sanciones penales a que hubiere lugar (art. 52). "La sanción será impuesta por el mismo juez mediante trámite incidental y será consultada al superior jerárquico" dentro de los tres (3) días, quien decidirá si debe revocarse la sanción (art. 52). NO se pudo precisar si los tres (3) días corresponden a la remisión al superior o al término de decisión de éste.' },
+    requiredSections: [
+      { n: 1, name: 'Encabezado, radicado y antecedentes del incidente', mandatory: false, basis: null },
+      { n: 2, name: 'Identificación de la orden de tutela desacatada', mandatory: true, basis: 'Decreto 2591 de 1991, art. 52' },
+      { n: 3, name: 'Pruebas practicadas y descargos del incidentado', mandatory: false, basis: null },
+      { n: 4, name: 'Consideraciones sobre la responsabilidad subjetiva del obligado y de su superior', mandatory: false, basis: 'Decreto 2591 de 1991, art. 27' },
+      { n: 5, name: 'Decisión: declarar o no el desacato', mandatory: true, basis: 'Decreto 2591 de 1991, art. 52' },
+      { n: 6, name: 'Sanción: arresto hasta de seis (6) meses y multa hasta de veinte (20) salarios mínimos mensuales', mandatory: true, basis: 'Decreto 2591 de 1991, art. 52' },
+      { n: 7, name: 'Orden de compulsar copias para las sanciones penales o disciplinarias a que hubiere lugar', mandatory: false, basis: 'Decreto 2591 de 1991, arts. 27 y 53' },
+      { n: 8, name: 'Orden de remitir la sanción en consulta al superior jerárquico', mandatory: true, basis: 'Decreto 2591 de 1991, art. 52' },
+      { n: 9, name: 'Orden de notificación', mandatory: false, basis: 'Decreto 2591 de 1991, art. 16' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=5304'
+  },
+  {
+    id: 'constitucional/providencia-del-superior-que-resuelve-la-consulta-de-la-sancion-por-desacato',
+    exactName: 'Providencia del superior que resuelve la consulta de la sanción por desacato',
+    branch: 'CONSTITUCIONAL',
+    role: 'DESPACHO',
+    legalBasis: 'Decreto 2591 de 1991, art. 52',
+    competentAuthority: 'El superior jerárquico del juez que impuso la sanción (Decreto 2591 de 1991, art. 52).',
+    term: { status: 'VERIFICADO', description: 'La consulta se surte dentro de los tres (3) días, y el superior "decidirá si debe revocarse la sanción" (Decreto 2591 de 1991, art. 52). NO se pudo precisar si los tres (3) días corresponden a la remisión o a la decisión.' },
+    requiredSections: [
+      { n: 1, name: 'Encabezado y antecedentes de la sanción consultada', mandatory: false, basis: null },
+      { n: 2, name: 'Verificación del cumplimiento o incumplimiento de la orden de tutela', mandatory: false, basis: 'Decreto 2591 de 1991, art. 27' },
+      { n: 3, name: 'Consideraciones sobre la legalidad y proporcionalidad de la sanción', mandatory: false, basis: null },
+      { n: 4, name: 'Decisión: confirmar o revocar la sanción', mandatory: true, basis: 'Decreto 2591 de 1991, art. 52' },
+      { n: 5, name: 'Orden de devolución del expediente al juez de origen', mandatory: false, basis: null }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=5304'
+  },
+  {
+    id: 'constitucional/auto-admisorio-de-la-accion-de-cumplimiento',
+    exactName: 'Auto admisorio de la acción de cumplimiento',
+    branch: 'CONSTITUCIONAL',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 393 de 1997, arts. 12, 13 y 17',
+    competentAuthority: 'El Juez Administrativo con competencia en el domicilio del accionante (Ley 393 de 1997, art. 3).',
+    term: { status: 'VERIFICADO', description: '"Dentro de los tres (3) días" siguientes el juez decide sobre la admisión o el rechazo; si la solicitud carece de alguno de los requisitos, se previene al solicitante para que la corrija dentro de los dos (2) días siguientes, so pena de rechazo (arts. 12 y 13). Notificación al demandado mediante entrega de copia dentro de los tres (3) días siguientes (art. 13). El fallo se proferirá dentro de los veinte (20) días siguientes a la admisión (art. 13). Informes: plazo de uno (1) a cinco (5) días según la índole del asunto (art. 17).' },
+    requiredSections: [
+      { n: 1, name: 'Encabezado y radicado', mandatory: false, basis: null },
+      { n: 2, name: 'Verificación de los requisitos del art. 10, incluida la prueba de la renuencia', mandatory: true, basis: 'Ley 393 de 1997, arts. 8, 10 y 12' },
+      { n: 3, name: 'Admisión de la solicitud', mandatory: true, basis: 'Ley 393 de 1997, art. 13' },
+      { n: 4, name: 'Orden de notificación al demandado mediante entrega de copia dentro de los tres (3) días siguientes', mandatory: true, basis: 'Ley 393 de 1997, art. 13' },
+      { n: 5, name: 'Requerimiento de informes con plazo de uno (1) a cinco (5) días', mandatory: false, basis: 'Ley 393 de 1997, art. 17' },
+      { n: 6, name: 'Decreto de pruebas', mandatory: false, basis: null }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=338'
+  },
+  {
+    id: 'constitucional/sentencia-de-accion-de-cumplimiento',
+    exactName: 'Sentencia de acción de cumplimiento',
+    branch: 'CONSTITUCIONAL',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 393 de 1997, arts. 21, 24 y 25',
+    competentAuthority: 'El Juez Administrativo de primera instancia (Ley 393 de 1997, art. 3).',
+    term: { status: 'VERIFICADO', description: 'El fallo se profiere dentro de los veinte (20) días siguientes a la admisión (Ley 393 de 1997, art. 13). El plazo perentorio para el cumplimiento no puede ser mayor de diez (10) días hábiles (art. 21). En firme el fallo, si la autoridad incumple, pasados cinco (5) días el juez ordena proceder contra el superior (art. 25).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del solicitante', mandatory: true, basis: 'Ley 393 de 1997, art. 21' },
+      { n: 2, name: 'Determinación de la obligación incumplida', mandatory: true, basis: 'Ley 393 de 1997, art. 21' },
+      { n: 3, name: 'Identificación de la autoridad de quien proviene el incumplimiento', mandatory: true, basis: 'Ley 393 de 1997, art. 21' },
+      { n: 4, name: 'Orden de cumplimiento de la obligación incumplida', mandatory: true, basis: 'Ley 393 de 1997, art. 21' },
+      { n: 5, name: 'Plazo perentorio para el cumplimiento, no mayor de diez (10) días hábiles', mandatory: true, basis: 'Ley 393 de 1997, art. 21' },
+      { n: 6, name: 'Orden a la autoridad competente de iniciar la investigación disciplinaria, cuando proceda', mandatory: false, basis: 'Ley 393 de 1997, art. 21' },
+      { n: 7, name: 'Condena en costas', mandatory: false, basis: 'Ley 393 de 1997, art. 21' },
+      { n: 8, name: 'Constancia de que la acción de cumplimiento no tiene fines indemnizatorios', mandatory: false, basis: 'Ley 393 de 1997, art. 24' },
+      { n: 9, name: 'Orden de notificación y advertencia sobre la impugnación dentro de los tres (3) días siguientes', mandatory: true, basis: 'Ley 393 de 1997, arts. 22 y 26' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=338'
+  },
+  {
+    id: 'constitucional/auto-admisorio-de-la-accion-popular',
+    exactName: 'Auto admisorio de la acción popular',
+    branch: 'CONSTITUCIONAL',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 472 de 1998, arts. 20, 21, 22, 26 y 27',
+    competentAuthority: 'El juez administrativo o el juez civil del circuito, según la jurisdicción (Ley 472 de 1998, arts. 15 y 16).',
+    term: { status: 'VERIFICADO', description: '"Dentro de los tres (3) días hábiles siguientes a la presentación de la demanda o petición inicial, el juez competente se pronunciará sobre su admisión" (Ley 472 de 1998, art. 20). En el auto admisorio el juez ordenará el traslado por el término de diez (10) días para contestarla (art. 22). El pacto de cumplimiento se cita dentro de los tres (3) días siguientes al vencimiento del término de traslado (art. 27).' },
+    requiredSections: [
+      { n: 1, name: 'Encabezado y radicado', mandatory: false, basis: null },
+      { n: 2, name: 'Verificación de los requisitos del art. 18', mandatory: true, basis: 'Ley 472 de 1998, arts. 18 y 20' },
+      { n: 3, name: 'Admisión de la demanda', mandatory: true, basis: 'Ley 472 de 1998, art. 20' },
+      { n: 4, name: 'Orden de notificación personal al demandado', mandatory: true, basis: 'Ley 472 de 1998, art. 21' },
+      { n: 5, name: 'Orden de traslado por el término de diez (10) días para contestar', mandatory: true, basis: 'Ley 472 de 1998, art. 22' },
+      { n: 6, name: 'Pronunciamiento sobre medidas cautelares solicitadas', mandatory: false, basis: 'Ley 472 de 1998, art. 26' },
+      { n: 7, name: 'Citación al pacto de cumplimiento y al Ministerio Público', mandatory: false, basis: 'Ley 472 de 1998, art. 27' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=188'
+  },
+  {
+    id: 'constitucional/sentencia-de-accion-popular',
+    exactName: 'Sentencia de acción popular',
+    branch: 'CONSTITUCIONAL',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 472 de 1998, arts. 33, 34, 36 y 37',
+    competentAuthority: 'El juez administrativo o el juez civil del circuito en primera instancia (Ley 472 de 1998, art. 16); la apelación se resuelve por el superior (art. 37).',
+    term: { status: 'VERIFICADO', description: 'Vencido el término para practicar pruebas, el juez da traslado a las partes para alegar por el término común de cinco (5) días (art. 33). "Vencido el término para alegar, el juez dispondrá de veinte (20) días para proferir sentencia" (art. 34). El recurso de apelación contra la sentencia deberá ser resuelto dentro de los veinte (20) días siguientes contados a partir de la radicación del expediente (art. 37).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación de las partes', mandatory: false, basis: null },
+      { n: 2, name: 'Antecedentes y actuación procesal', mandatory: false, basis: null },
+      { n: 3, name: 'Pruebas practicadas y consideraciones sobre la carga de la prueba', mandatory: false, basis: 'Ley 472 de 1998, art. 30' },
+      { n: 4, name: 'Consideraciones sobre la vulneración o amenaza del derecho o interés colectivo', mandatory: true, basis: 'Ley 472 de 1998, art. 9' },
+      { n: 5, name: 'Órdenes de hacer o de no hacer para la protección del derecho colectivo', mandatory: true, basis: null },
+      { n: 6, name: 'Condena en costas', mandatory: false, basis: null },
+      { n: 7, name: 'Advertencia sobre los recursos de reposición y apelación', mandatory: false, basis: 'Ley 472 de 1998, arts. 36 y 37' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=188'
+  },
+  {
+    id: 'constitucional/providencia-que-resuelve-el-habeas-corpus-y-ordena-la-libertad',
+    exactName: 'Providencia que resuelve el hábeas corpus y ordena la libertad',
+    branch: 'CONSTITUCIONAL',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 1095 de 2006, arts. 5, 6 y 9; Art. 30 C.P.',
+    competentAuthority: 'Cualquier juez o tribunal de la Rama Judicial del Poder Público (Ley 1095 de 2006, art. 2). El juez no podrá ser recusado en ningún caso (art. 5).',
+    term: { status: 'VERIFICADO', description: 'Debe resolverse dentro de las treinta y seis (36) horas (Art. 30 C.P.; Ley 1095 de 2006, art. 3). "Demostrada la violación de las garantías constitucionales o legales, la autoridad judicial competente inmediatamente ordenará la liberación de la persona privada de la libertad" mediante auto interlocutorio contra el cual no procede recurso alguno (art. 6). La decisión denegatoria es impugnable dentro de los tres (3) días calendario (art. 7).' },
+    requiredSections: [
+      { n: 1, name: 'Encabezado, identificación del solicitante y del capturado', mandatory: false, basis: null },
+      { n: 2, name: 'Actuación surtida: revisión de la actuación, solicitud de informes urgentes al centro de reclusión y entrevista con la persona privada de la libertad o visita al lugar', mandatory: false, basis: 'Ley 1095 de 2006, art. 5' },
+      { n: 3, name: 'Razones por las que se prescindió de la entrevista, cuando el juez la considere innecesaria', mandatory: false, basis: 'Ley 1095 de 2006, art. 5' },
+      { n: 4, name: 'Consideraciones sobre la legalidad de la privación de la libertad y sobre su eventual prolongación ilícita', mandatory: true, basis: 'Ley 1095 de 2006, art. 1' },
+      { n: 5, name: 'Decisión: orden inmediata de liberación mediante auto interlocutorio contra el cual no procede recurso', mandatory: true, basis: 'Ley 1095 de 2006, art. 6' },
+      { n: 6, name: 'Orden de compulsar copias para que la autoridad competente adelante la investigación penal correspondiente', mandatory: false, basis: 'Ley 1095 de 2006, art. 9' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=22087'
+  },
+  {
+    id: 'constitucional/auto-admisorio-de-la-demanda-de-inconstitucionalidad',
+    exactName: 'Auto admisorio de la demanda de inconstitucionalidad',
+    branch: 'CONSTITUCIONAL',
+    role: 'DESPACHO',
+    legalBasis: 'Decreto 2067 de 1991, arts. 6 y 7',
+    competentAuthority: 'El magistrado sustanciador de la Corte Constitucional (Decreto 2067 de 1991, art. 6).',
+    term: { status: 'VERIFICADO', description: 'El magistrado sustanciador decide sobre la admisibilidad dentro de los diez (10) días siguientes. Si la demanda no cumple alguno de los requisitos del art. 2, se conceden tres (3) días para corregirla; si no lo hiciere, se rechaza y contra el auto de rechazo procede el recurso de súplica (art. 6). Admitida la demanda, se fija en lista por diez (10) días para la intervención ciudadana y se corre traslado al Procurador General por treinta (30) días (art. 7).' },
+    requiredSections: [
+      { n: 1, name: 'Encabezado y radicado del expediente', mandatory: false, basis: null },
+      { n: 2, name: 'Verificación de los requisitos del art. 2 del Decreto 2067 de 1991', mandatory: true, basis: 'Decreto 2067 de 1991, arts. 2 y 6' },
+      { n: 3, name: 'Verificación de la competencia de la Corte', mandatory: true, basis: 'Decreto 2067 de 1991, art. 2 num. 5' },
+      { n: 4, name: 'Admisión, inadmisión con concesión de tres (3) días para corregir, o rechazo', mandatory: true, basis: 'Decreto 2067 de 1991, art. 6' },
+      { n: 5, name: 'Orden de fijación en lista por diez (10) días', mandatory: true, basis: 'Decreto 2067 de 1991, art. 7' },
+      { n: 6, name: 'Orden de traslado al Procurador General de la Nación por treinta (30) días', mandatory: true, basis: 'Decreto 2067 de 1991, art. 7' },
+      { n: 7, name: 'Comunicaciones a las autoridades e invitaciones a intervenir', mandatory: false, basis: null }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=30150'
+  }
+  ]
+};
