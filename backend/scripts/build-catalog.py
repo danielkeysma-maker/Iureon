@@ -39,6 +39,13 @@ BRANCHES = [
         'CIVIL',
         'civil',
     ),
+    (
+        'actuaciones-laboral.json',
+        'laboral.ts',
+        'LABORAL_CATALOG',
+        'LABORAL',
+        'laboral',
+    ),
 ]
 
 

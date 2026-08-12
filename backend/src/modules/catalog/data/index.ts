@@ -2,6 +2,7 @@ import type { BranchCatalog } from '../types';
 import { ADMINISTRATIVO_CATALOG } from './administrativo';
 import { CONSTITUCIONAL_CATALOG } from './constitucional';
 import { CIVIL_CATALOG } from './civil';
+import { LABORAL_CATALOG } from './laboral';
 
 /**
  * Every branch catalogue the product ships with.
@@ -13,5 +14,6 @@ import { CIVIL_CATALOG } from './civil';
 export const ALL_CATALOGS: BranchCatalog[] = [
   ADMINISTRATIVO_CATALOG,
   CONSTITUCIONAL_CATALOG,
-  CIVIL_CATALOG
+  CIVIL_CATALOG,
+  LABORAL_CATALOG
 ];

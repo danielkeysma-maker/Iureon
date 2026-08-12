@@ -67,6 +67,7 @@ const CASES: Case[] = [
   {
     label: 'Interposición del recurso de casación',
     expect: 'MATCH',
+    branch: 'CIVIL',
     exactMatch: 'Interposición del recurso extraordinario de casación',
     mustContain: 'Cinco (5) días'
   },
@@ -126,8 +127,62 @@ const CASES: Case[] = [
     exactMatch: 'Demanda de declaración de pertenencia'
   },
 
+  // Laboral (Ley 2452 de 2025, the code in force since 2 April 2026). The
+  // pairs below are the ones a lawyer would most easily carry across branches.
+  {
+    label: 'Contestación de la demanda laboral',
+    expect: 'MATCH',
+    branch: 'LABORAL',
+    exactMatch: 'Contestación de la demanda laboral',
+    mustContain: 'Diez (10) días'
+  },
+  {
+    label: 'Demanda laboral ordinaria',
+    expect: 'MATCH',
+    branch: 'LABORAL',
+    exactMatch: 'Demanda laboral ordinaria'
+  },
+  // Revisión is 2 years in civil (CGP art. 356) and 5 in labour (art. 236).
+  // Same recurso, same name shape, two and a half times the window.
+  {
+    label: 'Recurso extraordinario de revisión laboral',
+    expect: 'MATCH',
+    branch: 'LABORAL',
+    exactMatch: 'Recurso extraordinario de revisión laboral',
+    mustContain: 'Cinco (5) años'
+  },
+  {
+    label: 'Recurso extraordinario de revisión',
+    expect: 'MATCH',
+    branch: 'CIVIL',
+    exactMatch: 'Recurso extraordinario de revisión',
+    mustContain: 'Dos (2) años'
+  },
+  {
+    label: 'Excepción de prescripción trienal',
+    expect: 'MATCH',
+    branch: 'LABORAL',
+    exactMatch: 'Formulación de la excepción de prescripción trienal',
+    mustContain: 'tres (3) años'
+  },
+  {
+    label: 'Recurso de apelación laboral',
+    expect: 'MATCH',
+    branch: 'LABORAL',
+    exactMatch: 'Recurso de apelación laboral',
+    mustContain: 'tres (3) días'
+  },
+  // Its term could not be read in the source, so the guidance must refuse to
+  // borrow the civil one rather than state a plazo nobody verified.
+  {
+    label: 'Demanda de casación laboral',
+    expect: 'MATCH',
+    branch: 'LABORAL',
+    exactMatch: 'Demanda de casación laboral',
+    mustContain: 'NO afirmes'
+  },
+
   // Still not catalogued: must fall back rather than guess.
-  { label: 'Demanda laboral ordinaria', expect: 'NO_MATCH' },
   { label: 'zzz documento inexistente', expect: 'NO_MATCH' },
   { label: 'de la', expect: 'NO_MATCH' }
 ];
