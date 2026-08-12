@@ -465,6 +465,52 @@ const CASES: Case[] = [
     mustContain: 'veinte (20) días calendario'
   },
 
+  // Internacional. The seat of the arbitration decides whether recognition is
+  // needed at all — asking for it when it is not costs months, skipping it
+  // when it is makes the award unenforceable.
+  {
+    label: 'Solicitud de ejecución de laudo internacional con sede en Colombia',
+    expect: 'MATCH',
+    branch: 'INTERNACIONAL',
+    exactMatch: 'Solicitud de ejecución de laudo internacional con sede en Colombia',
+    mustContain: 'sin necesidad de reconocimiento previo'
+  },
+  {
+    label: 'Solicitud de reconocimiento de laudo arbitral extranjero',
+    expect: 'MATCH',
+    branch: 'INTERNACIONAL',
+    exactMatch: 'Solicitud de reconocimiento de laudo arbitral extranjero',
+    mustContain: 'veinte (20) días'
+  },
+  {
+    label: 'Recurso de anulación de laudo arbitral internacional',
+    expect: 'MATCH',
+    branch: 'INTERNACIONAL',
+    exactMatch: 'Recurso de anulación de laudo arbitral internacional',
+    mustContain: 'mes siguiente'
+  },
+  {
+    label: 'Demanda de exequátur de sentencia extranjera',
+    expect: 'MATCH',
+    branch: 'INTERNACIONAL',
+    exactMatch: 'Demanda de exequátur de sentencia extranjera',
+    mustContain: 'cinco (5) días'
+  },
+  {
+    label: 'Petición individual ante la Comisión Interamericana de Derechos Humanos',
+    expect: 'MATCH',
+    branch: 'INTERNACIONAL',
+    exactMatch: 'Petición individual ante la Comisión Interamericana de Derechos Humanos',
+    mustContain: 'seis (6) meses'
+  },
+  {
+    label: 'Memorial de defensa en trámite de extradición',
+    expect: 'MATCH',
+    branch: 'INTERNACIONAL',
+    exactMatch: 'Memorial de defensa en trámite de extradición',
+    mustContain: 'diez (10) días'
+  },
+
   // Still not catalogued: must fall back rather than guess.
   { label: 'zzz documento inexistente', expect: 'NO_MATCH' },
   { label: 'de la', expect: 'NO_MATCH' }

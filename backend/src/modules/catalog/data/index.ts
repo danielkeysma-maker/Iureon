@@ -10,6 +10,7 @@ import { TRIBUTARIO_CATALOG } from './tributario';
 import { TRANSITO_CATALOG } from './transito';
 import { NOTARIAL_CATALOG } from './notarial';
 import { CONTRATACION_CATALOG } from './contratacion';
+import { INTERNACIONAL_CATALOG } from './internacional';
 
 /**
  * Every branch catalogue the product ships with.
@@ -29,5 +30,6 @@ export const ALL_CATALOGS: BranchCatalog[] = [
   TRIBUTARIO_CATALOG,
   TRANSITO_CATALOG,
   NOTARIAL_CATALOG,
-  CONTRATACION_CATALOG
+  CONTRATACION_CATALOG,
+  INTERNACIONAL_CATALOG
 ];

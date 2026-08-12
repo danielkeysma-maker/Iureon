@@ -95,6 +95,13 @@ BRANCHES = [
         'CONTRATACION',
         'contratacion',
     ),
+    (
+        'actuaciones-internacional.json',
+        'internacional.ts',
+        'INTERNACIONAL_CATALOG',
+        'INTERNACIONAL',
+        'internacional',
+    ),
 ]
 
 
