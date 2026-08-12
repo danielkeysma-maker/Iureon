@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Sparkles, Database, Cpu, Send, Scale, Building, Paperclip, FileText, X, UploadCloud, RefreshCw } from 'lucide-react';
 import { AgentConsoleStream } from '../../agent/components/AgentConsoleStream';
+import { ActuacionInfoPanel } from '../../catalog/components/ActuacionInfoPanel';
+import { useActuacion } from '../../catalog/hooks/useActuacion';
 import type { AgentLog } from '../../agent/types';
 
 export interface CaseStudyFile {
@@ -33,6 +35,7 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
   activeDraftText,
   onClearActiveDraft
 }) => {
+  const actuacion = useActuacion(documentType);
   const [legalBranch, setLegalBranch] = useState<string>('CONSTITUCIONAL');
   const [userRole, setUserRole] = useState<'FIRMA_LITIGANTE' | 'JUZGADO_DESPACHO'>('FIRMA_LITIGANTE');
   const [importedFiles, setImportedFiles] = useState<CaseStudyFile[]>([]);
@@ -333,6 +336,8 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
           </select>
         </div>
       </div>
+
+      {actuacion && <ActuacionInfoPanel actuacion={actuacion} />}
 
       {/* File Importer */}
       <div className="px-4 py-3 border-b border-slate-100">
