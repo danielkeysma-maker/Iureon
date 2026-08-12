@@ -182,6 +182,35 @@ const CASES: Case[] = [
     mustContain: 'NO afirmes'
   },
 
+  // Familia. The catalogue's job here is partly to NOT offer something.
+  {
+    label: 'Solicitud de adjudicación judicial de apoyos',
+    expect: 'MATCH',
+    branch: 'FAMILIA',
+    exactMatch: 'Solicitud de adjudicación judicial de apoyos',
+    mustContain: 'cinco (5) días'
+  },
+  {
+    label: 'Demanda de divorcio contencioso',
+    expect: 'MATCH',
+    branch: 'FAMILIA',
+    exactMatch: 'Demanda de divorcio contencioso',
+    mustContain: 'veinte (20) días'
+  },
+  {
+    label: 'Demanda de investigación de la paternidad',
+    expect: 'MATCH',
+    branch: 'FAMILIA',
+    exactMatch: 'Demanda de investigación de la paternidad o la maternidad'
+  },
+  {
+    label: 'Demanda de alimentos a favor de mayor de edad',
+    expect: 'MATCH',
+    branch: 'FAMILIA',
+    exactMatch: 'Demanda de alimentos a favor de mayor de edad',
+    mustContain: 'alimentos provisionales'
+  },
+
   // Still not catalogued: must fall back rather than guess.
   { label: 'zzz documento inexistente', expect: 'NO_MATCH' },
   { label: 'de la', expect: 'NO_MATCH' }
@@ -240,6 +269,34 @@ if (missingBasis.length) {
   failures++;
 } else {
   console.log(`ok   all ${catalogService.list().length} actuaciones carry a legal basis`);
+}
+
+// An abolished figure must never resolve, with or without a branch.
+//
+// Ley 1996 de 2019 art. 53 forbids initiating interdicción or inhabilitación
+// proceedings, and its art. 61 repealed the matching numerals of CGP art. 22.
+// The published text of CGP art. 577 still lists them among the jurisdicción
+// voluntaria matters, so a model reading the code would happily draft one and
+// no judge could admit it. The replacement is the adjudicación de apoyos.
+const ABOLISHED = [
+  'Proceso de interdicción',
+  'Demanda de interdicción por discapacidad mental',
+  'Solicitud de interdicción',
+  'Proceso de inhabilitación'
+];
+
+for (const label of ABOLISHED) {
+  const hit =
+    catalogService.findByDocumentType(label) ?? catalogService.findByDocumentType(label, 'FAMILIA');
+
+  if (hit) {
+    console.error(
+      `FAIL "${label}": la interdicción está prohibida (Ley 1996 de 2019, art. 53) y resolvió a "${hit.exactName}"`
+    );
+    failures++;
+  } else {
+    console.log(`ok   abolished figure not offered ("${label}")`);
+  }
 }
 
 // The workspace now offers catalogued names as its document-type options, so

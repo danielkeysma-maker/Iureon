@@ -46,6 +46,13 @@ BRANCHES = [
         'LABORAL',
         'laboral',
     ),
+    (
+        'actuaciones-familia.json',
+        'familia.ts',
+        'FAMILIA_CATALOG',
+        'FAMILIA',
+        'familia',
+    ),
 ]
 
 
