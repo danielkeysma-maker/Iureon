@@ -258,6 +258,44 @@ const CASES: Case[] = [
     mustContain: 'NO afirmes'
   },
 
+  // Societario. The insolvency thresholds are the trap here: Ley 2437 de 2024
+  // does not offer the abbreviated route, it imposes it below 5.000 SMMLV.
+  {
+    label: 'Demanda de impugnación de decisiones de asamblea o junta de socios',
+    expect: 'MATCH',
+    branch: 'SOCIETARIO',
+    exactMatch: 'Demanda de impugnación de decisiones de asamblea o junta de socios',
+    mustContain: 'Dos (2) meses'
+  },
+  {
+    label: 'Solicitud de admisión al proceso de reorganización abreviado',
+    expect: 'MATCH',
+    branch: 'SOCIETARIO',
+    exactMatch: 'Solicitud de admisión al proceso de reorganización abreviado',
+    mustContain: 'tres (3) meses'
+  },
+  {
+    label: 'Solicitud de admisión al proceso de reorganización',
+    expect: 'MATCH',
+    branch: 'SOCIETARIO',
+    exactMatch: 'Solicitud de admisión al proceso de reorganización',
+    mustContain: 'cuatro (4) meses'
+  },
+  {
+    label: 'Presentación de créditos en proceso de insolvencia',
+    expect: 'MATCH',
+    branch: 'SOCIETARIO',
+    exactMatch: 'Presentación de créditos en proceso de insolvencia',
+    mustContain: 'Veinte (20) días'
+  },
+  {
+    label: 'Ejercicio de la acción social de responsabilidad contra administradores',
+    expect: 'MATCH',
+    branch: 'SOCIETARIO',
+    exactMatch: 'Ejercicio de la acción social de responsabilidad contra administradores',
+    mustContain: 'veinte por ciento'
+  },
+
   // Still not catalogued: must fall back rather than guess.
   { label: 'zzz documento inexistente', expect: 'NO_MATCH' },
   { label: 'de la', expect: 'NO_MATCH' }

@@ -60,6 +60,13 @@ BRANCHES = [
         'PENAL',
         'penal',
     ),
+    (
+        'actuaciones-societario.json',
+        'societario.ts',
+        'SOCIETARIO_CATALOG',
+        'SOCIETARIO',
+        'societario',
+    ),
 ]
 
 

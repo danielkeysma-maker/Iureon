@@ -1,0 +1,412 @@
+import type { BranchCatalog } from '../types';
+
+/**
+ * SOCIETARIO catalogue.
+ *
+ * Generated from research/actuaciones-societario.json, whose entries were verified against the
+ * official text of the governing norms. Do not hand-edit: regenerate with
+ * `python backend/scripts/build-catalog.py` so data and provenance never drift.
+ *
+ * Coverage is partial by design and the gaps are declared below rather than
+ * hidden, because a silent gap in procedural deadlines is the dangerous kind.
+ */
+export const SOCIETARIO_CATALOG: BranchCatalog = {
+  meta: {
+    branch: 'SOCIETARIO',
+    verifiedAt: '2026-08-12',
+    sourceOfTruth: 'Código de Comercio (Decreto 410 de 1971); Ley 222 de 1995; Ley 1258 de 2008 (SAS); Ley 1116 de 2006 (insolvencia empresarial); Ley 2437 de 2024, que hizo permanente el régimen de los Decretos 560 y 772 de 2020; Ley 1564 de 2012, art. 24. Los términos marcados como verificados fueron leídos artículo por artículo en el texto de la norma.',
+    gaps: [
+    'LEY 2437 DE 2024 — RÉGIMEN OBLIGATORIO, NO OPCIONAL. Los deudores del régimen de la Ley 1116 de 2006 cuyos activos sean inferiores o iguales a 5.000 SMMLV SÓLO podrán ser admitidos al proceso de reorganización ABREVIADO. No es una alternativa que el deudor escoja: define a qué proceso puede entrar. Verifique el monto de los activos antes de escoger la vía.',
+    'COMPETENCIA A PREVENCIÓN. La Superintendencia de Sociedades ejerce funciones jurisdiccionales sobre conflictos societarios, impugnación de actos de asambleas y juntas, desestimación de la personalidad jurídica y abuso del derecho (art. 24 CGP). Esa competencia opera A PREVENCIÓN y no excluye la de los jueces civiles. La elección de foro cambia el trámite y los recursos disponibles.',
+    'Término de prescripción de la acción social de responsabilidad contra administradores: no se verificó en el texto de la norma. Queda sin verificar.',
+    'Términos del proceso de validación judicial de acuerdos extrajudiciales de reorganización: no verificados.',
+    'El régimen de insolvencia de la persona natural no comerciante (arts. 531 y siguientes del CGP) no está aquí; corresponde a la rama CIVIL.',
+    'Las sociedades sometidas a regímenes especiales — financieras, aseguradoras, cooperativas de ahorro y crédito, servicios públicos — están excluidas de la Ley 1116 y se rigen por sus propias normas. No están cubiertas.'
+    ]
+  },
+  actuaciones: [
+  {
+    id: 'societario/demanda-de-impugnacion-de-decisiones-de-asamblea-o-junta-de-socios',
+    exactName: 'Demanda de impugnación de decisiones de asamblea o junta de socios',
+    branch: 'SOCIETARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Código de Comercio, arts. 190 y 191; Ley 1564 de 2012, arts. 24 y 382',
+    competentAuthority: 'Superintendencia de Sociedades en ejercicio de funciones jurisdiccionales, o juez civil del circuito; la competencia opera a prevención (art. 24 CGP)',
+    term: { status: 'VERIFICADO', description: 'Dos (2) meses siguientes a la fecha de la reunión en que se adoptaron las decisiones. Si se trata de acuerdos o actos que deban inscribirse en el registro mercantil, los dos meses se cuentan desde la fecha de la inscripción (art. 191 C.Co).' },
+    requiredSections: [
+      { n: 1, name: 'Acreditación de la legitimación: administrador, revisor fiscal o socio ausente o disidente', mandatory: true, basis: 'Art. 191 C.Co' },
+      { n: 2, name: 'Identificación de la reunión y de la decisión impugnada', mandatory: true, basis: 'Art. 191 C.Co' },
+      { n: 3, name: 'Fecha de la reunión o de la inscripción en el registro mercantil, para el cómputo del término', mandatory: true, basis: 'Art. 191 C.Co' },
+      { n: 4, name: 'Demostración de que la decisión no se ajusta a la ley o a los estatutos', mandatory: true, basis: 'Art. 191 C.Co' },
+      { n: 5, name: 'Copia del acta y de los estatutos vigentes', mandatory: true, basis: 'Art. 382 CGP' },
+      { n: 6, name: 'Solicitud de suspensión del acto impugnado', mandatory: false, basis: 'Art. 382 CGP' }
+    ],
+    sourceUrl: 'https://leyes.co/codigo_de_comercio/191.htm'
+  },
+  {
+    id: 'societario/demanda-de-resolucion-de-conflictos-societarios',
+    exactName: 'Demanda de resolución de conflictos societarios',
+    branch: 'SOCIETARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1258 de 2008, art. 40; Ley 1564 de 2012, art. 24',
+    competentAuthority: 'Superintendencia de Sociedades, por proceso verbal sumario, salvo que los estatutos pacten arbitramento o amigable composición (art. 40)',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Identificación de las partes: accionistas entre sí, o con la sociedad o sus administradores', mandatory: true, basis: 'Art. 40' },
+      { n: 2, name: 'Verificación de que los estatutos no pactan arbitramento ni amigable composición', mandatory: true, basis: 'Art. 40' },
+      { n: 3, name: 'Hechos que configuran la diferencia', mandatory: true, basis: 'Art. 40' },
+      { n: 4, name: 'Estatutos sociales y certificado de existencia y representación', mandatory: true, basis: null },
+      { n: 5, name: 'Petición de pruebas', mandatory: true, basis: null }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=34130'
+  },
+  {
+    id: 'societario/demanda-de-desestimacion-de-la-personalidad-juridica',
+    exactName: 'Demanda de desestimación de la personalidad jurídica',
+    branch: 'SOCIETARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1258 de 2008, art. 42; Ley 1564 de 2012, art. 24',
+    competentAuthority: 'Superintendencia de Sociedades, por proceso verbal sumario (art. 42)',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Identificación de la sociedad, de los accionistas y de los administradores demandados', mandatory: true, basis: 'Art. 42' },
+      { n: 2, name: 'Demostración del uso de la sociedad en fraude a la ley o en perjuicio de terceros', mandatory: true, basis: 'Art. 42' },
+      { n: 3, name: 'Pretensión de declaratoria de nulidad de los actos defraudatorios', mandatory: true, basis: 'Art. 42' },
+      { n: 4, name: 'Pretensión de responsabilidad solidaria de accionistas y administradores', mandatory: true, basis: 'Art. 42' },
+      { n: 5, name: 'Cuantificación de los perjuicios', mandatory: true, basis: 'Art. 42' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=34130'
+  },
+  {
+    id: 'societario/demanda-de-nulidad-por-abuso-del-derecho-de-voto',
+    exactName: 'Demanda de nulidad por abuso del derecho de voto',
+    branch: 'SOCIETARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1258 de 2008, art. 43; Ley 1564 de 2012, art. 24',
+    competentAuthority: 'Superintendencia de Sociedades, por proceso verbal sumario (art. 43)',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Identificación de la decisión y del accionista cuyo voto se cuestiona', mandatory: true, basis: 'Art. 43' },
+      { n: 2, name: 'Demostración de que el voto no se ejerció en el interés de la compañía', mandatory: true, basis: 'Art. 43' },
+      { n: 3, name: 'Acreditación del propósito de causar daño o de obtener ventaja injustificada', mandatory: true, basis: 'Art. 43' },
+      { n: 4, name: 'Pretensión de nulidad de la decisión y de indemnización de perjuicios', mandatory: true, basis: 'Art. 43' },
+      { n: 5, name: 'Copia del acta de la reunión', mandatory: true, basis: null }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=34130'
+  },
+  {
+    id: 'societario/ejercicio-de-la-accion-social-de-responsabilidad-contra-administradores',
+    exactName: 'Ejercicio de la acción social de responsabilidad contra administradores',
+    branch: 'SOCIETARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 222 de 1995, arts. 23, 24 y 25',
+    competentAuthority: 'Superintendencia de Sociedades o juez competente',
+    term: { status: 'VERIFICADO', description: 'Requiere decisión previa de la asamblea general o junta de socios, que puede adoptarse aunque no conste en el orden del día. La convocatoria puede hacerla un número de socios que represente al menos el veinte por ciento (20%) del capital, y la decisión se toma por la mitad más una de las acciones, cuotas o partes de interés representadas en la reunión, e implica la remoción del administrador (art. 25).' },
+    requiredSections: [
+      { n: 1, name: 'Acta de la asamblea o junta que decidió ejercer la acción', mandatory: true, basis: 'Art. 25' },
+      { n: 2, name: 'Acreditación del quórum decisorio de la mitad más una', mandatory: true, basis: 'Art. 25' },
+      { n: 3, name: 'Identificación de los administradores demandados', mandatory: true, basis: 'Art. 24' },
+      { n: 4, name: 'Deberes incumplidos: buena fe, lealtad y diligencia de un buen hombre de negocios', mandatory: true, basis: 'Art. 23' },
+      { n: 5, name: 'Daño causado a la sociedad y su cuantificación', mandatory: true, basis: 'Art. 24' },
+      { n: 6, name: 'Constancia de la remoción del administrador como efecto de la decisión', mandatory: true, basis: 'Art. 25' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=6739'
+  },
+  {
+    id: 'societario/demanda-de-cumplimiento-de-acuerdo-de-accionistas',
+    exactName: 'Demanda de cumplimiento de acuerdo de accionistas',
+    branch: 'SOCIETARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1258 de 2008, art. 24; Ley 1564 de 2012, art. 24',
+    competentAuthority: 'Superintendencia de Sociedades en ejercicio de funciones jurisdiccionales (art. 24 CGP)',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Copia del acuerdo de accionistas y prueba de su depósito en la sociedad', mandatory: true, basis: 'Ley 1258 de 2008, art. 24' },
+      { n: 2, name: 'Identificación de las obligaciones incumplidas', mandatory: true, basis: null },
+      { n: 3, name: 'Hechos del incumplimiento', mandatory: true, basis: null },
+      { n: 4, name: 'Pretensión de cumplimiento y, en su caso, de indemnización', mandatory: true, basis: null }
+    ],
+    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/24.htm'
+  },
+  {
+    id: 'societario/solicitud-de-admision-al-proceso-de-reorganizacion',
+    exactName: 'Solicitud de admisión al proceso de reorganización',
+    branch: 'SOCIETARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1116 de 2006, arts. 9, 10, 13 y 31',
+    competentAuthority: 'Superintendencia de Sociedades como juez del concurso; juez civil del circuito en los casos que la ley señala',
+    term: { status: 'VERIFICADO', description: 'Confirmados los créditos, el plazo para celebrar el acuerdo de reorganización no será superior a cuatro (4) meses, prorrogable por un término que en ningún caso podrá exceder de dos (2) meses (art. 31).' },
+    requiredSections: [
+      { n: 1, name: 'Acreditación de los supuestos de admisión: cesación de pagos o incapacidad de pago inminente', mandatory: true, basis: 'Art. 9' },
+      { n: 2, name: 'Estados financieros de los últimos tres ejercicios, certificados y dictaminados', mandatory: true, basis: 'Art. 13' },
+      { n: 3, name: 'Estado de inventario de activos y pasivos', mandatory: true, basis: 'Art. 13' },
+      { n: 4, name: 'Memoria explicativa de las causas de la crisis', mandatory: true, basis: 'Art. 13' },
+      { n: 5, name: 'Relación completa y actualizada de acreedores, con montos y garantías', mandatory: true, basis: 'Art. 13' },
+      { n: 6, name: 'Verificación de que los activos superan 5.000 SMMLV; de lo contrario procede el proceso abreviado', mandatory: true, basis: 'Ley 2437 de 2024' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=22657'
+  },
+  {
+    id: 'societario/solicitud-de-admision-al-proceso-de-reorganizacion-abreviado',
+    exactName: 'Solicitud de admisión al proceso de reorganización abreviado',
+    branch: 'SOCIETARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 2437 de 2024, art. 18; Ley 1116 de 2006, aplicable en lo no dispuesto',
+    competentAuthority: 'El juez del concurso',
+    term: { status: 'VERIFICADO', description: 'Se fija una fecha que tenga lugar dentro de los tres (3) meses siguientes para realizar la reunión de conciliación en la que se celebre el acuerdo (art. 18).' },
+    requiredSections: [
+      { n: 1, name: 'Acreditación de que los activos del deudor son inferiores o iguales a 5.000 SMMLV', mandatory: true, basis: 'Ley 2437 de 2024' },
+      { n: 2, name: 'Acreditación de los supuestos de insolvencia', mandatory: true, basis: 'Ley 1116 de 2006, art. 9' },
+      { n: 3, name: 'Estados financieros e inventario de activos y pasivos', mandatory: true, basis: 'Ley 1116 de 2006, art. 13' },
+      { n: 4, name: 'Relación de acreedores con montos y garantías', mandatory: true, basis: 'Ley 1116 de 2006, art. 13' },
+      { n: 5, name: 'Propuesta de acuerdo para la reunión de conciliación', mandatory: true, basis: 'Ley 2437 de 2024, art. 18' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=256656'
+  },
+  {
+    id: 'societario/solicitud-de-liquidacion-judicial',
+    exactName: 'Solicitud de liquidación judicial',
+    branch: 'SOCIETARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1116 de 2006, arts. 47 y 48',
+    competentAuthority: 'El juez del concurso',
+    term: { status: 'VERIFICADO', description: 'Abierto el proceso, el aviso permanece publicado por diez (10) días y los acreedores disponen de veinte (20) días desde la desfijación para presentar sus créditos (art. 48).' },
+    requiredSections: [
+      { n: 1, name: 'Causal de liquidación judicial invocada', mandatory: true, basis: 'Art. 47' },
+      { n: 2, name: 'Estados financieros e inventario de activos', mandatory: true, basis: 'Art. 48' },
+      { n: 3, name: 'Relación de acreedores', mandatory: true, basis: 'Art. 48' },
+      { n: 4, name: 'Relación de procesos judiciales en curso contra el deudor', mandatory: true, basis: 'Art. 48' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=22657'
+  },
+  {
+    id: 'societario/solicitud-de-liquidacion-judicial-simplificada',
+    exactName: 'Solicitud de liquidación judicial simplificada',
+    branch: 'SOCIETARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 2437 de 2024, art. 19',
+    competentAuthority: 'El juez del concurso',
+    term: { status: 'VERIFICADO', description: 'El liquidador presenta la estimación de gastos dentro de quince (15) días; los acreedores presentan sus créditos en diez (10) días; se corre traslado de la calificación por cinco (5) días; hay dos (2) meses para vender los bienes y la adjudicación se hace dentro de los diez (10) días siguientes (art. 19).' },
+    requiredSections: [
+      { n: 1, name: 'Acreditación de que los activos son inferiores o iguales a 5.000 SMMLV', mandatory: true, basis: 'Ley 2437 de 2024' },
+      { n: 2, name: 'Causal de liquidación invocada', mandatory: true, basis: 'Ley 1116 de 2006, art. 47' },
+      { n: 3, name: 'Inventario de activos y su avalúo', mandatory: true, basis: 'Ley 2437 de 2024, art. 19' },
+      { n: 4, name: 'Relación de acreedores', mandatory: true, basis: 'Ley 2437 de 2024, art. 19' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=256656'
+  },
+  {
+    id: 'societario/presentacion-de-creditos-en-proceso-de-insolvencia',
+    exactName: 'Presentación de créditos en proceso de insolvencia',
+    branch: 'SOCIETARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1116 de 2006, art. 48',
+    competentAuthority: 'El juez del concurso, por conducto del liquidador o promotor',
+    term: { status: 'VERIFICADO', description: 'Veinte (20) días contados a partir de la fecha de desfijación del aviso que informa la apertura del proceso de liquidación judicial (art. 48).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del acreedor y del deudor concursado', mandatory: true, basis: 'Art. 48' },
+      { n: 2, name: 'Monto del crédito, discriminando capital e intereses', mandatory: true, basis: 'Art. 48' },
+      { n: 3, name: 'Clase y prelación legal que se reclama', mandatory: true, basis: 'Art. 48' },
+      { n: 4, name: 'Documentos que soportan la existencia y cuantía del crédito', mandatory: true, basis: 'Art. 48' },
+      { n: 5, name: 'Garantías constituidas a favor del acreedor', mandatory: false, basis: 'Art. 48' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=22657'
+  },
+  {
+    id: 'societario/objecion-a-la-calificacion-y-graduacion-de-creditos',
+    exactName: 'Objeción a la calificación y graduación de créditos',
+    branch: 'SOCIETARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1116 de 2006, arts. 29 y 48',
+    competentAuthority: 'El juez del concurso',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Identificación del crédito objetado y del proyecto de graduación', mandatory: true, basis: 'Art. 29' },
+      { n: 2, name: 'Razones de la objeción: existencia, cuantía o prelación', mandatory: true, basis: 'Art. 29' },
+      { n: 3, name: 'Pruebas que la sustentan', mandatory: true, basis: 'Art. 29' },
+      { n: 4, name: 'Petición concreta de modificación de la calificación', mandatory: true, basis: 'Art. 29' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=22657'
+  },
+  {
+    id: 'societario/solicitud-de-convocatoria-a-asamblea-o-junta-de-socios',
+    exactName: 'Solicitud de convocatoria a asamblea o junta de socios',
+    branch: 'SOCIETARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Código de Comercio, arts. 181, 182 y 423; Ley 222 de 1995, art. 25',
+    competentAuthority: 'Superintendencia de Sociedades, o el órgano estatutario competente',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Acreditación de la participación en el capital que legitima la solicitud', mandatory: true, basis: 'Art. 25 Ley 222 de 1995' },
+      { n: 2, name: 'Orden del día propuesto', mandatory: true, basis: 'Art. 182 C.Co' },
+      { n: 3, name: 'Constancia de la negativa o inacción del administrador', mandatory: true, basis: null },
+      { n: 4, name: 'Estatutos vigentes y certificado de existencia y representación', mandatory: true, basis: null }
+    ],
+    sourceUrl: 'https://leyes.co/codigo_de_comercio/181.htm'
+  },
+  {
+    id: 'societario/solicitud-de-ejercicio-del-derecho-de-inspeccion',
+    exactName: 'Solicitud de ejercicio del derecho de inspección',
+    branch: 'SOCIETARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Código de Comercio, arts. 48, 328 y 447; Ley 222 de 1995, art. 48',
+    competentAuthority: 'La sociedad; la Superintendencia de Sociedades ante su negativa',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Acreditación de la calidad de socio o accionista', mandatory: true, basis: null },
+      { n: 2, name: 'Documentos y libros cuya inspección se solicita', mandatory: true, basis: 'Art. 48 Ley 222 de 1995' },
+      { n: 3, name: 'Constancia de la negativa de la sociedad', mandatory: true, basis: null },
+      { n: 4, name: 'Petición de orden para permitir la inspección', mandatory: true, basis: null }
+    ],
+    sourceUrl: 'https://leyes.co/codigo_de_comercio/48.htm'
+  },
+  {
+    id: 'societario/demanda-de-disolucion-y-liquidacion-de-sociedad',
+    exactName: 'Demanda de disolución y liquidación de sociedad',
+    branch: 'SOCIETARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Código de Comercio, arts. 218 y siguientes; Ley 1258 de 2008, art. 34',
+    competentAuthority: 'Superintendencia de Sociedades o juez civil del circuito',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Causal de disolución invocada', mandatory: true, basis: 'Art. 218 C.Co' },
+      { n: 2, name: 'Hechos que la configuran', mandatory: true, basis: null },
+      { n: 3, name: 'Certificado de existencia y representación y estatutos', mandatory: true, basis: null },
+      { n: 4, name: 'Pretensión de declaratoria de disolución y orden de liquidación', mandatory: true, basis: 'Art. 218 C.Co' }
+    ],
+    sourceUrl: 'https://leyes.co/codigo_de_comercio/218.htm'
+  },
+  {
+    id: 'societario/demanda-de-nulidad-de-reforma-estatutaria',
+    exactName: 'Demanda de nulidad de reforma estatutaria',
+    branch: 'SOCIETARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Código de Comercio, arts. 190 y 191; Ley 1564 de 2012, art. 382',
+    competentAuthority: 'Superintendencia de Sociedades o juez civil del circuito',
+    term: { status: 'VERIFICADO', description: 'Cuando la reforma deba inscribirse en el registro mercantil, los dos (2) meses para impugnarla se cuentan desde la fecha de la inscripción (art. 191 C.Co).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación de la reforma y de la reunión que la aprobó', mandatory: true, basis: 'Art. 191 C.Co' },
+      { n: 2, name: 'Fecha de inscripción en el registro mercantil', mandatory: true, basis: 'Art. 191 C.Co' },
+      { n: 3, name: 'Causal de nulidad: violación de la ley o de los estatutos', mandatory: true, basis: 'Art. 190 C.Co' },
+      { n: 4, name: 'Copia de la escritura o del documento de reforma', mandatory: true, basis: null }
+    ],
+    sourceUrl: 'https://leyes.co/codigo_de_comercio/191.htm'
+  },
+  {
+    id: 'societario/solicitud-de-nombramiento-de-perito-para-avaluo-de-acciones-o-cuotas',
+    exactName: 'Solicitud de nombramiento de perito para avalúo de acciones o cuotas',
+    branch: 'SOCIETARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Código de Comercio, arts. 136 y 363; Ley 222 de 1995, art. 14',
+    competentAuthority: 'Superintendencia de Sociedades',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Acreditación de la calidad de socio o accionista', mandatory: true, basis: null },
+      { n: 2, name: 'Hecho que genera la necesidad del avalúo: retiro, ejercicio del derecho de preferencia o exclusión', mandatory: true, basis: 'Art. 14 Ley 222 de 1995' },
+      { n: 3, name: 'Constancia de la falta de acuerdo sobre el precio', mandatory: true, basis: null },
+      { n: 4, name: 'Estados financieros de la sociedad', mandatory: true, basis: null }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=6739'
+  },
+  {
+    id: 'societario/auto-de-admision-al-proceso-de-reorganizacion',
+    exactName: 'Auto de admisión al proceso de reorganización',
+    branch: 'SOCIETARIO',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 1116 de 2006, arts. 19 y 31',
+    competentAuthority: 'El juez del concurso',
+    term: { status: 'VERIFICADO', description: 'Confirmados los créditos, el plazo para celebrar el acuerdo no será superior a cuatro (4) meses, prorrogable por máximo dos (2) meses adicionales (art. 31).' },
+    requiredSections: [
+      { n: 1, name: 'Verificación de los supuestos de admisión', mandatory: true, basis: 'Art. 9' },
+      { n: 2, name: 'Designación del promotor', mandatory: true, basis: 'Art. 19' },
+      { n: 3, name: 'Orden de inscripción del auto en el registro mercantil', mandatory: true, basis: 'Art. 19' },
+      { n: 4, name: 'Orden de suspensión de procesos ejecutivos contra el deudor', mandatory: true, basis: 'Art. 20' },
+      { n: 5, name: 'Fijación del plazo para celebrar el acuerdo', mandatory: true, basis: 'Art. 31' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=22657'
+  },
+  {
+    id: 'societario/auto-de-apertura-de-liquidacion-judicial',
+    exactName: 'Auto de apertura de liquidación judicial',
+    branch: 'SOCIETARIO',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 1116 de 2006, art. 48',
+    competentAuthority: 'El juez del concurso',
+    term: { status: 'VERIFICADO', description: 'El aviso se publica por diez (10) días; los acreedores presentan créditos dentro de los veinte (20) días siguientes a la desfijación; el liquidador elabora el inventario en máximo treinta (30) días y presenta el proyecto de graduación en un plazo no inferior a un (1) mes ni superior a tres (3) meses; el juez decide dentro de los quince (15) días siguientes (art. 48).' },
+    requiredSections: [
+      { n: 1, name: 'Declaración de apertura y designación del liquidador', mandatory: true, basis: 'Art. 48' },
+      { n: 2, name: 'Orden de publicación del aviso por diez (10) días', mandatory: true, basis: 'Art. 48' },
+      { n: 3, name: 'Fijación del término para presentar créditos', mandatory: true, basis: 'Art. 48' },
+      { n: 4, name: 'Orden de elaborar el inventario de activos en máximo treinta (30) días', mandatory: true, basis: 'Art. 48 num. 9' },
+      { n: 5, name: 'Orden de inscripción en el registro mercantil', mandatory: true, basis: 'Art. 48' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=22657'
+  },
+  {
+    id: 'societario/providencia-de-confirmacion-del-acuerdo-de-reorganizacion',
+    exactName: 'Providencia de confirmación del acuerdo de reorganización',
+    branch: 'SOCIETARIO',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 1116 de 2006, arts. 31 y 35 a 37',
+    competentAuthority: 'El juez del concurso',
+    term: { status: 'VERIFICADO', description: 'El acuerdo debe celebrarse dentro de los cuatro (4) meses siguientes a la confirmación de los créditos, prorrogables por máximo dos (2) meses (art. 31).' },
+    requiredSections: [
+      { n: 1, name: 'Verificación del cumplimiento del plazo del artículo 31', mandatory: true, basis: 'Art. 31' },
+      { n: 2, name: 'Verificación de las mayorías exigidas por clase de acreedor', mandatory: true, basis: 'Art. 31' },
+      { n: 3, name: 'Control de legalidad del contenido del acuerdo', mandatory: true, basis: 'Art. 35' },
+      { n: 4, name: 'Pronunciamiento sobre las objeciones presentadas', mandatory: true, basis: 'Art. 35' },
+      { n: 5, name: 'Efectos de la confirmación frente a todos los acreedores', mandatory: true, basis: 'Art. 36' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=22657'
+  },
+  {
+    id: 'societario/auto-de-calificacion-y-graduacion-de-creditos',
+    exactName: 'Auto de calificación y graduación de créditos',
+    branch: 'SOCIETARIO',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 1116 de 2006, arts. 29 y 48',
+    competentAuthority: 'El juez del concurso',
+    term: { status: 'VERIFICADO', description: 'El liquidador presenta el proyecto de graduación en un plazo fijado por el juez, no inferior a un (1) mes ni superior a tres (3) meses; el juez decide dentro de los quince (15) días siguientes (art. 48).' },
+    requiredSections: [
+      { n: 1, name: 'Relación de los créditos presentados y de los reconocidos', mandatory: true, basis: 'Art. 48' },
+      { n: 2, name: 'Aplicación de la prelación legal de créditos', mandatory: true, basis: 'Art. 29' },
+      { n: 3, name: 'Resolución de cada objeción presentada', mandatory: true, basis: 'Art. 29' },
+      { n: 4, name: 'Determinación de los créditos excluidos y su motivo', mandatory: true, basis: 'Art. 48' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=22657'
+  },
+  {
+    id: 'societario/sentencia-de-impugnacion-de-decisiones-sociales',
+    exactName: 'Sentencia de impugnación de decisiones sociales',
+    branch: 'SOCIETARIO',
+    role: 'DESPACHO',
+    legalBasis: 'Código de Comercio, arts. 190 y 191; Ley 1564 de 2012, arts. 24 y 382',
+    competentAuthority: 'Superintendencia de Sociedades o juez civil del circuito',
+    term: { status: 'VERIFICADO', description: 'Debe verificarse que la demanda se presentó dentro de los dos (2) meses siguientes a la reunión o a la inscripción en el registro mercantil (art. 191 C.Co).' },
+    requiredSections: [
+      { n: 1, name: 'Verificación de la legitimación del impugnante', mandatory: true, basis: 'Art. 191 C.Co' },
+      { n: 2, name: 'Verificación del término de dos (2) meses', mandatory: true, basis: 'Art. 191 C.Co' },
+      { n: 3, name: 'Análisis de la conformidad de la decisión con la ley y los estatutos', mandatory: true, basis: 'Art. 190 C.Co' },
+      { n: 4, name: 'Decisión sobre la nulidad o ineficacia de la decisión impugnada', mandatory: true, basis: 'Art. 190 C.Co' },
+      { n: 5, name: 'Orden de inscripción de la decisión en el registro mercantil', mandatory: false, basis: null }
+    ],
+    sourceUrl: 'https://leyes.co/codigo_de_comercio/191.htm'
+  },
+  {
+    id: 'societario/sentencia-de-desestimacion-de-la-personalidad-juridica',
+    exactName: 'Sentencia de desestimación de la personalidad jurídica',
+    branch: 'SOCIETARIO',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 1258 de 2008, art. 42; Ley 1564 de 2012, art. 24',
+    competentAuthority: 'Superintendencia de Sociedades',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Análisis del uso de la sociedad en fraude a la ley o en perjuicio de terceros', mandatory: true, basis: 'Art. 42' },
+      { n: 2, name: 'Declaratoria de nulidad de los actos defraudatorios', mandatory: true, basis: 'Art. 42' },
+      { n: 3, name: 'Declaración de responsabilidad solidaria de accionistas y administradores', mandatory: true, basis: 'Art. 42' },
+      { n: 4, name: 'Liquidación de los perjuicios causados', mandatory: true, basis: 'Art. 42' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=34130'
+  }
+  ]
+};
