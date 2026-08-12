@@ -187,12 +187,26 @@ export class CatalogService {
     return CATALOGS.filter((c) => !branch || c.meta.branch === branch).map((c) => c.meta);
   }
 
+  /**
+   * Loads the firm's curation, or nothing when there is no firm yet.
+   *
+   * The shipped catalogue is product knowledge and must be readable before a
+   * firm is registered: requiring a tenant to see it made the whole feature
+   * invisible in exactly the state a new user starts in.
+   */
+  private async loadCuration(firmId?: string | null): Promise<VerificationLoad> {
+    const tenant = firmId?.trim();
+    return tenant
+      ? verificationStore.listForFirm(tenant)
+      : { status: 'NO_TENANT', verifications: [] };
+  }
+
   async listForFirm(
-    firmId: string,
+    firmId?: string | null,
     branch?: LegalBranch,
     role?: ActuacionRole
   ): Promise<{ actuaciones: Actuacion[]; meta: CatalogMeta[]; curation: CurationStatus }> {
-    const load = await verificationStore.listForFirm(firmId);
+    const load = await this.loadCuration(firmId);
 
     return {
       actuaciones: applyVerifications(this.list(branch, role), load.verifications),
@@ -208,12 +222,12 @@ export class CatalogService {
    * the override is applied after the match rather than widening it.
    */
   async resolveForFirm(
-    firmId: string,
+    firmId: string | null | undefined,
     documentType: string,
     branch?: LegalBranch
   ): Promise<{ actuacion: Actuacion | null; curation: CurationStatus }> {
     const base = this.findByDocumentType(documentType, branch);
-    const load = await verificationStore.listForFirm(firmId);
+    const load = await this.loadCuration(firmId);
 
     if (!base) return { actuacion: null, curation: load.status };
 

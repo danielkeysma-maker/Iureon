@@ -76,7 +76,7 @@ export interface Actuacion {
  * screen may be missing corrections the firm already made, so the UI warns
  * instead of presenting shipped data as current.
  */
-export type CurationStatus = 'OK' | 'NOT_CONFIGURED' | 'UNAVAILABLE';
+export type CurationStatus = 'OK' | 'NOT_CONFIGURED' | 'UNAVAILABLE' | 'NO_TENANT';
 
 /**
  * Provenance for one branch's catalogue.

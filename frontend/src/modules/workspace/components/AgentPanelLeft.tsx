@@ -4,6 +4,8 @@ import { AgentConsoleStream } from '../../agent/components/AgentConsoleStream';
 import { ActuacionInfoPanel } from '../../catalog/components/ActuacionInfoPanel';
 import { useActuacion } from '../../catalog/hooks/useActuacion';
 import { useBranchActuaciones } from '../../catalog/hooks/useBranchActuaciones';
+import { useCatalogBranches } from '../../catalog/hooks/useCatalogBranches';
+import { branchLabel } from '../../catalog/branchLabels';
 import { LEGACY_DOCUMENT_OPTIONS } from '../data/legacyDocumentOptions';
 import type { AgentLog } from '../../agent/types';
 import type { ActuacionRole } from '../../catalog/types';
@@ -51,6 +53,15 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
 
   const catalogRole: ActuacionRole = userRole === 'FIRMA_LITIGANTE' ? 'LITIGANTE' : 'DESPACHO';
   const catalogued = useBranchActuaciones(legalBranch, catalogRole);
+  const catalogBranches = useCatalogBranches();
+
+  // Catalogued branches first, then any legacy-only branch that still has
+  // hand-written document types. Built from the API so the selector can never
+  // again fall behind the catalogue.
+  const branchOptions = [
+    ...catalogBranches,
+    ...Object.keys(LEGACY_DOCUMENT_OPTIONS).filter((b) => !catalogBranches.includes(b as never))
+  ];
 
   const legacyFor = (branch: string, role: 'FIRMA_LITIGANTE' | 'JUZGADO_DESPACHO'): string[] => {
     const entry = LEGACY_DOCUMENT_OPTIONS[branch] || LEGACY_DOCUMENT_OPTIONS['CONSTITUCIONAL'];
@@ -152,16 +163,11 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
             onChange={(e) => handleBranchChange(e.target.value)}
             className="bg-white border border-slate-200/80 text-slate-800 font-medium text-[12px] rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900/40"
           >
-            <option value="CONSTITUCIONAL">Constitucional &amp; Tutelas</option>
-            <option value="LABORAL">Laboral &amp; Seguridad Social</option>
-            <option value="CIVIL">Civil &amp; Comercial (CGP)</option>
-            <option value="ADMINISTRATIVO">Contencioso Administrativo (CPACA)</option>
-            <option value="PENAL">Penal &amp; Acusatorio (Ley 906)</option>
-            <option value="FAMILIA">Familia &amp; Sucesiones</option>
-            <option value="INTERNACIONAL">Derecho Internacional &amp; Andino</option>
-            <option value="PEQUEÑAS_CAUSAS">Pequeñas Causas (Mínima Cuantía)</option>
-            <option value="TRIBUTARIO">Tributario &amp; DIAN</option>
-            <option value="SOCIETARIO">Societario &amp; Competencia (SIC)</option>
+            {branchOptions.map((branch) => (
+              <option key={branch} value={branch}>
+                {branchLabel(branch)}
+              </option>
+            ))}
           </select>
         </div>
 

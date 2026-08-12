@@ -14,7 +14,7 @@ import { auditRoutes } from './modules/audit/audit.routes';
 import { searchRoutes } from './modules/search/search.routes';
 import { draftsRoutes } from './modules/drafts/drafts.routes';
 import { transcriptionRoutes } from './modules/transcription/transcription.routes';
-import { catalogRoutes } from './modules/catalog/catalog.routes';
+import { catalogPublicRoutes, catalogRoutes } from './modules/catalog/catalog.routes';
 
 const app: Express = express();
 
@@ -30,6 +30,10 @@ app.get('/ping', (_req: Request, res: Response) => {
     system: 'SaaS B2B LegalTech Modular Architecture'
   });
 });
+
+// Reading the actuación catalogue is product knowledge, not tenant data, so it
+// is mounted BEFORE the tenant middleware. Curation writes stay behind it.
+app.use('/api', catalogPublicRoutes);
 
 // Middleware Global Multi-Tenant (Requisito x-firm-id)
 app.use('/api', tenantMiddleware);

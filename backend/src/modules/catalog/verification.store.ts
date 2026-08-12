@@ -27,7 +27,12 @@ export type VerificationLoad =
   /** Supabase is not wired up (local development). There is nothing to load. */
   | { status: 'NOT_CONFIGURED'; verifications: CatalogVerification[] }
   /** Configured but unreachable. The catalogue shown may be stale. */
-  | { status: 'UNAVAILABLE'; verifications: CatalogVerification[]; reason: string };
+  | { status: 'UNAVAILABLE'; verifications: CatalogVerification[]; reason: string }
+  /**
+   * No firm selected yet. The shipped catalogue still applies — it is product
+   * knowledge, identical for everyone — but no firm curation is overlaid.
+   */
+  | { status: 'NO_TENANT'; verifications: CatalogVerification[] };
 
 /** Raised when a write cannot be persisted. Never swallowed: losing a
  *  verification silently would leave the lawyer believing it was recorded. */

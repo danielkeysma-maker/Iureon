@@ -29,6 +29,19 @@ const respondStoreError = (res: Response, error: VerificationStoreError): void =
   res.status(503).json({ error: error.code, message });
 };
 
+/**
+ * Tenant for a READ of the catalogue.
+ *
+ * Optional on purpose: the shipped catalogue is product knowledge, the same for
+ * everyone, and only the curation overlay is per firm. These routes are mounted
+ * before the tenant middleware, so the header is read directly here.
+ */
+const optionalFirmId = (req: Request): string | null => {
+  const header = req.headers['x-firm-id'];
+  const value = req.firmId ?? (typeof header === 'string' ? header : undefined);
+  return value?.trim() ? value.trim() : null;
+};
+
 const requireFirmId = (req: Request, res: Response): string | null => {
   const firmId = req.firmId;
 
@@ -45,8 +58,7 @@ const requireFirmId = (req: Request, res: Response): string | null => {
  * Lists catalogued filings for this firm, optionally filtered.
  */
 export const listActuacionesController = async (req: Request, res: Response): Promise<void> => {
-  const firmId = requireFirmId(req, res);
-  if (!firmId) return;
+  const firmId = optionalFirmId(req);
 
   const branch = req.query.branch as LegalBranch | undefined;
   const role = req.query.role as ActuacionRole | undefined;
@@ -73,8 +85,7 @@ export const listActuacionesController = async (req: Request, res: Response): Pr
  * normal state, not an error.
  */
 export const resolveActuacionController = async (req: Request, res: Response): Promise<void> => {
-  const firmId = requireFirmId(req, res);
-  if (!firmId) return;
+  const firmId = optionalFirmId(req);
 
   const documentType = (req.query.documentType as string) || '';
 
@@ -192,8 +203,7 @@ export const deleteVerificationController = async (req: Request, res: Response):
  * coverage gaps so the UI can be honest about what is not verified.
  */
 export const getBranchCatalogController = async (req: Request, res: Response): Promise<void> => {
-  const firmId = requireFirmId(req, res);
-  if (!firmId) return;
+  const firmId = optionalFirmId(req);
 
   const rawBranch = String(req.params.branch ?? '');
   const branch = rawBranch.toUpperCase() as LegalBranch;
