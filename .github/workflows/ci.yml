@@ -12,6 +12,12 @@ jobs:
     defaults:
       run:
         working-directory: backend
+    # The checks import catalog.service, which reaches config/env.config through
+    # the verification store. That module fails fast when OPENROUTER_API_KEY is
+    # absent — correct for the server, fatal for a check that never calls the
+    # API. A placeholder satisfies the boot contract without granting anything.
+    env:
+      OPENROUTER_API_KEY: ci-placeholder-no-request-is-made
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -24,9 +30,7 @@ jobs:
         run: npx tsc --noEmit
       - name: Catalogue correctness checks
         run: npm run check:catalog
-
       - name: Embeddings guard (no fabricated vectors)
-        working-directory: backend
         run: npm run check:embeddings
       - name: Build
         run: npm run build
