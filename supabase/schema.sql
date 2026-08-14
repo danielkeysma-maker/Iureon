@@ -160,6 +160,7 @@ CREATE INDEX IF NOT EXISTS idx_catalog_verifications_firm ON public.catalog_veri
 --
 -- app.current_firm_id is the session GUC a tenant-scoped connection must set.
 
+ALTER TABLE public.firms               ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.legal_documents     ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.document_embeddings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.saved_drafts        ENABLE ROW LEVEL SECURITY;
@@ -177,6 +178,16 @@ AS $$
         NULLIF(current_setting('app.current_firm_id', true), '')
     );
 $$;
+
+-- A firm may only ever see its own registry row. The backend uses the service
+-- role and bypasses this; the policy exists for the day a session-bearing
+-- client reaches the table directly. Without it, `firms` was the one table
+-- where an authenticated user could read and edit every tenant's billing row.
+DROP POLICY IF EXISTS "tenant_isolation_firms" ON public.firms;
+CREATE POLICY "tenant_isolation_firms"
+    ON public.firms FOR ALL
+    USING (firm_id = public.current_firm_id())
+    WITH CHECK (firm_id = public.current_firm_id());
 
 DROP POLICY IF EXISTS "tenant_isolation_legal_documents" ON public.legal_documents;
 CREATE POLICY "tenant_isolation_legal_documents"
@@ -283,11 +294,24 @@ GRANT ALL PRIVILEGES ON ALL TABLES    IN SCHEMA public TO service_role;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO service_role;
 GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO service_role;
 
+-- Revoke first, then grant. Supabase ships default privileges owned by
+-- supabase_admin that hand `anon` and `authenticated` the FULL set (arwdDxtm)
+-- on every new table in `public`. Granting the four DML on top of that changes
+-- nothing: the surplus TRUNCATE / REFERENCES / TRIGGER / MAINTAIN survive
+-- unless they are explicitly taken away. Verified against pg_default_acl.
+REVOKE ALL ON ALL TABLES IN SCHEMA public FROM authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO authenticated;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO authenticated;
 GRANT EXECUTE ON FUNCTION public.match_document_chunks_multi_tenant(vector, INT, TEXT) TO authenticated, service_role;
 
 -- Y para las tablas que se creen después de correr este archivo.
+-- El REVOKE va primero por la misma razón de arriba: sin él, una tabla futura
+-- nace otra vez con el juego completo para anon y authenticated.
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+    REVOKE ALL ON TABLES FROM anon;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+    REVOKE ALL ON TABLES FROM authenticated;
+
 ALTER DEFAULT PRIVILEGES IN SCHEMA public
     GRANT ALL PRIVILEGES ON TABLES TO service_role;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public
@@ -295,4 +319,12 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public
 
 -- El rol anónimo no recibe acceso a datos de inquilinos. Se revoca de forma
 -- explícita para que quede constancia de que es una decisión, no un olvido.
+--
+-- ESTA LÍNEA ES UNA FOTO, NO UNA REGLA: alcanza únicamente las tablas que
+-- existen cuando se corre. Junto con el ALTER DEFAULT PRIVILEGES de arriba
+-- cubre también las futuras, PERO solo las que se creen por este archivo o por
+-- el mismo rol. Los defaults de supabase_admin no se pueden revocar desde aquí.
+-- Consecuencia operativa: toda tabla nueva de `public` debe nacer en este
+-- archivo. Una tabla creada a mano en el SQL Editor le queda a anon con el
+-- juego completo, incluido TRUNCATE.
 REVOKE ALL ON ALL TABLES IN SCHEMA public FROM anon;
