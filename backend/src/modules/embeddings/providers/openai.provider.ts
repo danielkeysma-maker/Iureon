@@ -8,11 +8,15 @@ import {
 } from '../types';
 
 /**
- * OpenAI embeddings adapter.
+ * OpenAI embeddings adapter. Optional: the default provider is local and free.
  *
- * `text-embedding-3-small` is chosen because it returns exactly 1536
- * dimensions, which is the width of the pgvector column already in the schema.
- * The larger model returns 3072 and would silently fail to insert.
+ * `text-embedding-3-small` returns 1536 dimensions natively, but the family
+ * accepts a `dimensions` parameter and returns a correctly renormalised vector
+ * at the requested width. That is what lets a paid and a local provider share
+ * one pgvector column instead of forcing a schema per vendor.
+ *
+ * Vectors from the two providers are still NOT interchangeable: same width does
+ * not mean same vector space. Switching provider means reindexing the corpus.
  */
 const MODEL = 'text-embedding-3-small';
 const ENDPOINT = 'https://api.openai.com/v1/embeddings';
@@ -29,6 +33,7 @@ interface EmbeddingResponse {
 
 export class OpenAIEmbeddingsProvider implements EmbeddingsProvider {
   readonly name = `openai:${MODEL}`;
+  readonly maxBatch = MAX_BATCH;
 
   isAvailable(): boolean {
     return Boolean(config.openAI.enabled && config.openAI.apiKey);
@@ -64,7 +69,7 @@ export class OpenAIEmbeddingsProvider implements EmbeddingsProvider {
           Authorization: `Bearer ${config.openAI.apiKey}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ model: MODEL, input }),
+        body: JSON.stringify({ model: MODEL, input, dimensions: EMBEDDING_DIMENSIONS }),
         signal: controller.signal
       });
 

@@ -8,8 +8,19 @@
  * confident nearest neighbours that are unrelated to the query.
  */
 
-/** Dimension of the pgvector column in supabase/schema.sql. Not negotiable. */
-export const EMBEDDING_DIMENSIONS = 1536;
+/**
+ * Dimension of the pgvector column in supabase/schema.sql. Not negotiable.
+ *
+ * 1024, the native width of bge-m3, so the default provider can run locally at
+ * no cost. OpenAI stays usable because text-embedding-3-* accepts a
+ * `dimensions` parameter and returns a correctly normalised 1024-wide vector.
+ *
+ * Changing this number invalidates every stored vector: two vectors of
+ * different width are not comparable, and a column change silently drops the
+ * old index. It was moved from 1536 while the table held zero rows, which is
+ * the only cheap moment such a change ever has.
+ */
+export const EMBEDDING_DIMENSIONS = 1024;
 
 /** Longest input a single chunk may carry before the provider truncates it. */
 export const MAX_CHUNK_CHARS = 8000;
@@ -37,6 +48,12 @@ export class EmbeddingsProviderError extends Error {
 export interface EmbeddingsProvider {
   /** Human-readable identity, for logs and provenance. */
   readonly name: string;
+  /**
+   * Largest batch this provider accepts in one call. It belongs to the adapter
+   * because the limit is a property of the vendor, not of the caller: a hosted
+   * API caps it by request size, a local model caps it by available RAM.
+   */
+  readonly maxBatch: number;
   /** False when the integration is not configured; callers must not proceed. */
   isAvailable(): boolean;
   /** Returns one vector per input, in the same order. */

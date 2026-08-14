@@ -1,5 +1,23 @@
-import { OpenAIEmbeddingsProvider, MAX_BATCH } from './providers/openai.provider';
+import { config } from '../../config/env.config';
+import { LocalEmbeddingsProvider } from './providers/local.provider';
+import { OpenAIEmbeddingsProvider } from './providers/openai.provider';
 import type { EmbeddingsProvider } from './types';
+
+/**
+ * Which adapter backs the index.
+ *
+ * Local by default, deliberately: it costs nothing and needs no account, so a
+ * fresh clone can build the corpus without a billing decision standing in the
+ * way. `EMBEDDINGS_PROVIDER=openai` opts into the hosted one.
+ *
+ * This is a one-way door per corpus. The two providers produce vectors of the
+ * same width in different spaces, so changing it without reindexing leaves the
+ * old rows sitting there, comparable in arithmetic and meaningless in fact.
+ */
+const resolveProvider = (): EmbeddingsProvider =>
+  config.embeddings.provider === 'openai'
+    ? new OpenAIEmbeddingsProvider()
+    : new LocalEmbeddingsProvider();
 
 /**
  * The single way anything in this codebase turns text into a vector.
@@ -15,7 +33,7 @@ import type { EmbeddingsProvider } from './types';
  * honest; an index full of noise is not.
  */
 export class EmbeddingsService {
-  constructor(private readonly provider: EmbeddingsProvider = new OpenAIEmbeddingsProvider()) {}
+  constructor(private readonly provider: EmbeddingsProvider = resolveProvider()) {}
 
   get providerName(): string {
     return this.provider.name;
@@ -35,8 +53,13 @@ export class EmbeddingsService {
   async embedAll(texts: string[]): Promise<number[][]> {
     const vectors: number[][] = [];
 
-    for (let i = 0; i < texts.length; i += MAX_BATCH) {
-      const batch = texts.slice(i, i + MAX_BATCH);
+    // The limit comes from the adapter: a hosted API caps a batch by request
+    // size, a local model caps it by RAM. Hardcoding one vendor's number here
+    // would either waste requests or exhaust memory on the other.
+    const size = this.provider.maxBatch;
+
+    for (let i = 0; i < texts.length; i += size) {
+      const batch = texts.slice(i, i + size);
       vectors.push(...(await this.provider.embed(batch)));
     }
 

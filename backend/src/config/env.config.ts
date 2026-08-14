@@ -49,6 +49,18 @@ const requireGroup = (name: string, keys: string[]): boolean => {
 };
 
 const openAIEnabled = requireGroup('OpenAI (transcripción)', ['OPENAI_API_KEY']);
+
+/**
+ * Embeddings provider. Local by default so indexing costs nothing and needs no
+ * account; `openai` opts into the hosted model and then requires its key.
+ */
+const embeddingsProvider = (read('EMBEDDINGS_PROVIDER') || 'local').toLowerCase();
+if (!['local', 'openai'].includes(embeddingsProvider)) {
+  errors.push(`EMBEDDINGS_PROVIDER must be "local" or "openai", received "${embeddingsProvider}".`);
+}
+if (embeddingsProvider === 'openai' && !openAIEnabled) {
+  errors.push('EMBEDDINGS_PROVIDER=openai requires OPENAI_API_KEY.');
+}
 const supabaseEnabled = requireGroup('Supabase', ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY']);
 const backblazeEnabled = requireGroup('Backblaze B2', [
   'B2_APPLICATION_KEY_ID',
@@ -83,6 +95,13 @@ export const config = {
   openAI: {
     enabled: openAIEnabled,
     apiKey: read('OPENAI_API_KEY')
+  },
+  embeddings: {
+    provider: embeddingsProvider,
+    // Overridable so a machine with more RAM can point at heavier weights
+    // without a code change. Any replacement MUST output EMBEDDING_DIMENSIONS
+    // values or the adapter rejects every vector.
+    model: read('EMBEDDINGS_MODEL') || 'Xenova/bge-m3'
   },
   backblaze: {
     enabled: backblazeEnabled,

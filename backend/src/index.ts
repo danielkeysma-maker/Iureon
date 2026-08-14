@@ -15,6 +15,8 @@ import { searchRoutes } from './modules/search/search.routes';
 import { draftsRoutes } from './modules/drafts/drafts.routes';
 import { transcriptionRoutes } from './modules/transcription/transcription.routes';
 import { catalogPublicRoutes, catalogRoutes } from './modules/catalog/catalog.routes';
+import { embeddingsService } from './modules/embeddings/embeddings.service';
+import { EMBEDDING_DIMENSIONS } from './modules/embeddings/types';
 
 const app: Express = express();
 
@@ -61,7 +63,9 @@ app.listen(config.port, () => {
   console.log(`🤖 Módulo Agent: Gemini 3.6 Flash -> GPT -> Claude Opus 5`);
   console.log(`🔍 Módulo Search: Glosario & Buscador de Leyes/Sentencias`);
   console.log(`📦 Módulo Documents: Backblaze B2 Vault Storage`);
-  console.log(`⚡ Módulo Ingestion: Vectorización pgvector (1536d)`);
+  console.log(
+    `⚡ Módulo Ingestion: Vectorización pgvector (${EMBEDDING_DIMENSIONS}d) vía ${embeddingsService.providerName}`
+  );
   console.log(`📅 Módulo Terms: Calculadora de Términos Procesales CGP/CPTSS`);
   console.log(`💰 Módulo Settlement: Liquidaciones Laborales Art 64 CST`);
   console.log(`🛡️ Módulo Audit: Trazabilidad de Seguridad B2B`);

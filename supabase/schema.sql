@@ -60,11 +60,36 @@ CREATE TABLE IF NOT EXISTS public.document_embeddings (
     branch TEXT,           -- LABORAL | CIVIL | ADMINISTRATIVO | PENAL | CONSTITUCIONAL | ...
     file_name TEXT,
     content_chunk TEXT NOT NULL,
-    embedding vector(1536),
+    embedding vector(1024),
     chunk_index INT NOT NULL DEFAULT 0,
     metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- El CREATE de arriba NO corrige una tabla que ya existe: si venía con
+-- vector(1536), `IF NOT EXISTS` la deja intacta y el script pasa en verde
+-- mientras cada INSERT falla por ancho. Este bloque hace explícito el cambio.
+--
+-- Solo es seguro con la tabla vacía. Dos vectores de distinto ancho no son
+-- comparables, así que un corpus ya indexado no se migra: se reindexa.
+DO $$
+DECLARE dims INT;
+BEGIN
+    SELECT atttypmod INTO dims
+    FROM pg_attribute
+    WHERE attrelid = 'public.document_embeddings'::regclass AND attname = 'embedding';
+
+    IF dims IS NOT NULL AND dims <> 1024 THEN
+        IF EXISTS (SELECT 1 FROM public.document_embeddings LIMIT 1) THEN
+            RAISE EXCEPTION
+                'document_embeddings tiene vector(%) y filas guardadas. Vacía la tabla antes de cambiar el ancho: los vectores viejos no son convertibles.', dims;
+        END IF;
+
+        DROP INDEX IF EXISTS public.idx_document_embeddings_hnsw;
+        ALTER TABLE public.document_embeddings ALTER COLUMN embedding TYPE vector(1024);
+        RAISE NOTICE 'document_embeddings.embedding migrado de vector(%) a vector(1024).', dims;
+    END IF;
+END $$;
 
 CREATE INDEX IF NOT EXISTS idx_document_embeddings_firm ON public.document_embeddings(firm_id);
 CREATE INDEX IF NOT EXISTS idx_document_embeddings_hnsw
@@ -246,7 +271,7 @@ CREATE POLICY "tenant_isolation_catalog_verifications"
 -- 9. RPC — tenant-scoped vector similarity search
 -- ==============================================================================
 CREATE OR REPLACE FUNCTION public.match_document_chunks_multi_tenant(
-    query_embedding vector(1536),
+    query_embedding vector(1024),
     match_count INT DEFAULT 5,
     filter_firm_id TEXT DEFAULT NULL
 )

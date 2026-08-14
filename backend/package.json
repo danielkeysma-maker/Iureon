@@ -10,10 +10,12 @@
     "ingest:jurisprudence": "npx ts-node src/scripts/runIngestion.ts",
     "ingest:mass": "npx ts-node src/scripts/massIngestJurisprudence.ts",
     "check:catalog": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/catalog/__checks__/catalog.check.ts",
-    "check:embeddings": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/embeddings/__checks__/embeddings.check.ts"
+    "check:embeddings": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/embeddings/__checks__/embeddings.check.ts",
+    "smoke:embeddings": "npx ts-node --transpile-only src/scripts/smokeLocalEmbeddings.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
+    "@huggingface/transformers": "^4.2.0",
     "@supabase/supabase-js": "^2.49.1",
     "backblaze-b2": "^1.7.0",
     "cors": "^2.8.5",

@@ -9,7 +9,8 @@ export class IngestionService {
   private readonly supabaseClient = supabase;
 
   /**
-   * Ingesta un expediente PDF de Backblaze B2, fragmenta el texto y genera embeddings de 1536 dimensiones en Supabase
+   * Ingesta un expediente PDF de Backblaze B2, fragmenta el texto y genera sus
+   * embeddings en Supabase. El ancho lo fija EMBEDDING_DIMENSIONS, no este comentario.
    */
   public async ingestLegalDocument(req: IngestionRequest): Promise<IngestionResult> {
     const documentId = `doc-${Date.now().toString().slice(-6)}`;

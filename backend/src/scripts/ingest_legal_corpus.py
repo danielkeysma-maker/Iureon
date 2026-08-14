@@ -35,7 +35,7 @@ def main():
                 total_chunks += chunks_count
 
                 print(f"[{branch_name.upper()}] Procesando: {file}")
-                print(f"   - Tamaño: {size_mb:.2f} MB | Chunks generados: {chunks_count} | Vector: 1536d pgvector")
+                print(f"   - Tamaño: {size_mb:.2f} MB | Chunks generados: {chunks_count} | Vector: 1024d pgvector")
 
     print("\n=================================================================")
     print(f"VECTORIZACION COMPLETADA CON EXITO")

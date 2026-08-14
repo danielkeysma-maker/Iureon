@@ -42,7 +42,11 @@ const walk = (dir: string): string[] =>
 // of all — `new Array(1536).fill(0).map((_, i) => Math.sin(i))` — where the
 // arithmetic comes last. A guard that only fires one way is not a guard.
 const ARITHMETIC = /Math\.(random|sin|cos|tan)\s*\(/i;
-const VECTOR_SHAPED = /\b(embed\w*|vector\w*|1536)\b/i;
+
+// Built from the constant instead of a literal. A hardcoded 1536 kept passing
+// after the column moved to 1024: the guard would have gone half-blind exactly
+// when the vectors changed shape, which is when it is needed most.
+const VECTOR_SHAPED = new RegExp(`\\b(embed\\w*|vector\\w*|${EMBEDDING_DIMENSIONS})\\b`, 'i');
 
 /**
  * Comments are prose, not code. Several files explain WHY fabricated vectors
@@ -77,6 +81,7 @@ if (offenders.length) {
 // ---------------------------------------------------------------------------
 const unavailable: EmbeddingsProvider = {
   name: 'test:unavailable',
+  maxBatch: 8,
   isAvailable: () => false,
   embed: async () => {
     throw new EmbeddingsUnavailableError('sin proveedor');
@@ -108,6 +113,7 @@ void (async () => {
   // -------------------------------------------------------------------------
   const wrongWidth: EmbeddingsProvider = {
     name: 'test:wrong-width',
+    maxBatch: 8,
     isAvailable: () => true,
     embed: async (texts) => texts.map(() => new Array(768).fill(0.1))
   };
@@ -120,6 +126,42 @@ void (async () => {
     console.log(
       '     (la validación de ancho vive en el adaptador; este caso documenta que el puerto no la duplica)'
     );
+  }
+
+  // -------------------------------------------------------------------------
+  // 4. Batching obeys the ADAPTER's limit, and order survives the split.
+  // -------------------------------------------------------------------------
+  // The batch size used to be a constant imported from the OpenAI adapter, so
+  // the local model — which is bound by RAM, not by request size — would have
+  // been handed batches twelve times larger than it can hold. Splitting is also
+  // where order is easiest to lose: chunk N must keep vector N, or every stored
+  // vector is attached to the wrong text and nothing downstream can tell.
+  const seen: number[] = [];
+
+  const counting: EmbeddingsProvider = {
+    name: 'test:counting',
+    maxBatch: 2,
+    isAvailable: () => true,
+    embed: async (texts) => {
+      seen.push(texts.length);
+      return texts.map((t) => new Array(EMBEDDING_DIMENSIONS).fill(Number(t)));
+    }
+  };
+
+  const batched = await new EmbeddingsService(counting).embedAll(['0', '1', '2', '3', '4']);
+
+  if (seen.join(',') === '2,2,1') {
+    pass('embedAll splits by the provider maxBatch (2,2,1 for five inputs)');
+  } else {
+    fail(`embedAll produced batches [${seen.join(',')}]; expected [2,2,1] from maxBatch=2`);
+  }
+
+  const ordered = batched.every((vector, i) => vector[0] === i);
+
+  if (ordered && batched.length === 5) {
+    pass('vectors come back in input order across batch boundaries');
+  } else {
+    fail('embedAll reordered or dropped vectors when splitting into batches');
   }
 
   console.log(failures === 0 ? '\nALL CHECKS PASSED' : `\n${failures} CHECK(S) FAILED`);
