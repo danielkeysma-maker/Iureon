@@ -275,10 +275,23 @@ CREATE OR REPLACE FUNCTION public.match_document_chunks_multi_tenant(
     match_count INT DEFAULT 5,
     filter_firm_id TEXT DEFAULT NULL
 )
+-- CREATE OR REPLACE cannot change a function's return type — it fails with
+-- "cannot change return type of existing function". The signature widened on
+-- 2026-08-14, so the old definition has to go first. Dropping is safe: the
+-- function holds no state and is recreated immediately below.
+DROP FUNCTION IF EXISTS public.match_document_chunks_multi_tenant(vector, INT, TEXT);
+
+-- `metadata` and `branch` travel with the match on purpose. Without them a
+-- corpus hit is an anonymous paragraph: the caller cannot say which providencia
+-- it came from, who the ponente was, or where to read it. A quote a lawyer
+-- cannot trace back to its source is not usable as precedent.
 RETURNS TABLE (
     id UUID,
     document_id TEXT,
     firm_id TEXT,
+    branch TEXT,
+    file_name TEXT,
+    metadata JSONB,
     content_chunk TEXT,
     similarity FLOAT
 )
@@ -290,6 +303,9 @@ AS $$
         de.id,
         de.document_id,
         de.firm_id,
+        de.branch,
+        de.file_name,
+        de.metadata,
         de.content_chunk,
         1 - (de.embedding <=> query_embedding) AS similarity
     FROM public.document_embeddings de

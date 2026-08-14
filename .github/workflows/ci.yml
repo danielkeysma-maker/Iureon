@@ -32,6 +32,9 @@ jobs:
         run: npm run check:catalog
       - name: Embeddings guard (no fabricated vectors)
         run: npm run check:embeddings
+      - name: Legal search guard (no fabricated law)
+        run: npm run check:search
+
       - name: Build
         run: npm run build
 

@@ -21,8 +21,17 @@ export class JurisprudenceIngestionPipeline {
       // write Math.random() values, which is worse than sine noise: the same
       // ruling produced a different vector on every run.
       if (!embeddingsService.isAvailable()) {
+        console.warn('[JURISPRUDENCE] Sin proveedor de embeddings: no se ingesta.');
+        return { success: false, chunksIngested: 0 };
+      }
+
+      // Same rule the catalogue lives by: a legal statement with no source is
+      // not knowledge. A ruling indexed without the URL it was read at cannot
+      // be checked by the lawyer who ends up citing it, and the corpus is
+      // shared by every tenant — one unverifiable entry misleads all of them.
+      if (!ruling.pdfUrl || !/^https?:\/\//.test(ruling.pdfUrl)) {
         console.warn(
-          '[JURISPRUDENCE] Sin proveedor de embeddings: no se ingesta. Configura OPENAI_API_KEY.'
+          `[JURISPRUDENCE] ${ruling.numeroProvidencia} no trae pdfUrl http(s): no se ingesta.`
         );
         return { success: false, chunksIngested: 0 };
       }
@@ -34,14 +43,34 @@ export class JurisprudenceIngestionPipeline {
         const contentWithMetadata = `[CORPORACIÓN: ${ruling.corporacion}] [TIPO: ${ruling.tipoSentencia}] [PROVIDENCIA: ${ruling.numeroProvidencia}] [PONENTE: ${ruling.magistradoPonente}] [RESULTADO: ${ruling.resuelveOutcome}]\nHECHOS: ${ruling.hechosClave}\nRATIO: ${ruling.ratioDecidendi}\n\n${chunk}`;
 
         if (supabase) {
-          await supabase.from('document_embeddings').insert({
+          // `expediente_id` was written here for months and that column has
+          // never existed, so every corpus insert failed and the pipeline
+          // reported success anyway — the try/catch swallowed it into a
+          // console.error. The providencia number goes in `metadata`, NOT in
+          // `document_id`: that column carries a foreign key to
+          // legal_documents, and a ruling is not a tenant's case file.
+          const { error } = await supabase.from('document_embeddings').insert({
             firm_id: 'SYSTEM_CORPUS', // Corpus legal público accesible para todas las firmas
-            expediente_id: ruling.numeroProvidencia,
             branch: ruling.rama,
             file_name: `${ruling.numeroProvidencia}.pdf`,
             content_chunk: contentWithMetadata,
-            embedding: vectors[index]
+            embedding: vectors[index],
+            chunk_index: index,
+            metadata: {
+              providencia: ruling.numeroProvidencia,
+              corporacion: ruling.corporacion,
+              tipoSentencia: ruling.tipoSentencia,
+              magistradoPonente: ruling.magistradoPonente,
+              resuelveOutcome: ruling.resuelveOutcome,
+              sourceUrl: ruling.pdfUrl
+            }
           });
+
+          // Surfaced, not swallowed. A corpus that silently fails to grow is
+          // indistinguishable from one nobody has fed.
+          if (error) {
+            throw new Error(`Insert falló para ${ruling.numeroProvidencia}: ${error.message}`);
+          }
         }
         count++;
       }

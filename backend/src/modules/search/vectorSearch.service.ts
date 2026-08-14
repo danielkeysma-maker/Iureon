@@ -17,6 +17,14 @@ export interface VectorMatch {
   contentChunk: string;
   /** 1 - cosine distance. Higher is closer. */
   similarity: number;
+  branch: string | null;
+  fileName: string | null;
+  /**
+   * Provenance carried by the row: providencia, corporación, ponente, sourceUrl.
+   * A match without it is an untraceable paragraph, which is not usable as
+   * precedent no matter how relevant it looks.
+   */
+  metadata: Record<string, unknown> | null;
 }
 
 export type VectorSearchStatus =
@@ -51,7 +59,7 @@ export class VectorSearchService {
         status: 'NO_PROVIDER',
         matches: [],
         reason:
-          'La búsqueda semántica requiere un proveedor de embeddings configurado (OPENAI_API_KEY). Sin él no se puede convertir la consulta en vector.'
+          'La búsqueda semántica requiere un proveedor de embeddings. Sin él no se puede convertir la consulta en vector.'
       };
     }
 
@@ -81,7 +89,10 @@ export class VectorSearchService {
         documentId: row.document_id,
         firmId: row.firm_id,
         contentChunk: row.content_chunk,
-        similarity: row.similarity
+        similarity: row.similarity,
+        branch: row.branch ?? null,
+        fileName: row.file_name ?? null,
+        metadata: row.metadata ?? null
       }));
 
       return { status: 'OK', matches };

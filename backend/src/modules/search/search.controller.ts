@@ -7,8 +7,10 @@ const searchService = new LegalSearchService();
 export const getGlossaryController = async (req: Request, res: Response): Promise<void> => {
   try {
     const { query, category } = req.query;
-    const terms = searchService.getGlossaryTerms(query as string, category as string);
-    res.json({ success: true, terms });
+    const result = searchService.getGlossaryTerms(query as string, category as string);
+    // `terms` kept alongside `items` so an older client does not break on the
+    // rename; both point at the same array.
+    res.json({ success: true, ...result, terms: result.items });
   } catch (error: any) {
     res.status(500).json({ error: 'GLOSSARY_ERROR', message: error.message });
   }
@@ -16,22 +18,41 @@ export const getGlossaryController = async (req: Request, res: Response): Promis
 
 export const searchLegalDatabaseController = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { query, filterType } = req.query;
-    const results = searchService.searchLegalDatabase((query as string) || '', filterType as any);
-    res.json({ success: true, results });
+    const { query, branch } = req.query;
+    const result = searchService.searchLegalDatabase((query as string) || '', branch as string);
+    res.json({ success: true, ...result, results: result.items });
   } catch (error: any) {
     res.status(500).json({ error: 'LEGAL_SEARCH_ERROR', message: error.message });
   }
 };
 
-export const searchWebPrecedentsController = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { query, branch } = req.query;
-    const precedents = searchService.searchWebPrecedents((query as string) || '', (branch as string) || 'GENERAL');
-    res.json({ success: true, precedents });
-  } catch (error: any) {
-    res.status(500).json({ error: 'WEB_PRECEDENTS_ERROR', message: error.message });
+/**
+ * GET /api/legal/precedents?query=&limit=
+ *
+ * Searches the ingested corpus, not the live web. The endpoint it replaced was
+ * called `web-precedents` and returned three hand-written rulings with invented
+ * URLs; the name promised something the code never did.
+ */
+export const searchPrecedentsController = async (req: Request, res: Response): Promise<void> => {
+  const firmId = req.firmId;
+
+  if (!firmId) {
+    res.status(401).json({ error: 'UNAUTHORIZED', message: 'Se requiere req.firmId autenticado' });
+    return;
   }
+
+  const query = String(req.query.query ?? '').trim();
+
+  if (!query) {
+    res.status(400).json({ error: 'MISSING_QUERY', message: 'Se requiere el parámetro query.' });
+    return;
+  }
+
+  const parsedLimit = Number(req.query.limit);
+  const limit = Number.isFinite(parsedLimit) ? Math.min(Math.max(parsedLimit, 1), 25) : undefined;
+
+  const result = await searchService.searchPrecedents(firmId, query, limit);
+  res.json({ success: true, ...result, precedents: result.items });
 };
 
 /**
