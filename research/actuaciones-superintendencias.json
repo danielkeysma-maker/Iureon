@@ -1,9 +1,10 @@
 {
   "_meta": {
     "branch": "SUPERINTENDENCIAS",
-    "verified_at": "2026-08-12",
+    "verified_at": "2026-08-14",
     "source_of_truth": "Ley 1480 de 2011 (Estatuto del Consumidor); Ley 1581 de 2012 (protección de datos personales); Ley 142 de 1994 (servicios públicos domiciliarios); Ley 1122 de 2007, art. 41, modificado por el art. 6 de la Ley 1949 de 2019 (función jurisdiccional de la Supersalud); Ley 1328 de 2009 (consumidor financiero); Ley 1564 de 2012, art. 24. Los términos marcados como verificados fueron leídos artículo por artículo en el texto de la norma.",
     "gaps": [
+      "NOTA (2026-08-14): la lista siguiente es anterior a la verificacion masiva de esta fecha. Varios de esos huecos quedaron cerrados; los vigentes estan en _meta.unverified con su razon. Ver research/VERIFICATION-2026-08-14.md.",
       "EN CONSUMIDOR ES PRESCRIPCIÓN, NO CADUCIDAD. El plazo de un año del art. 58 num. 3 de la Ley 1480 de 2011 es de PRESCRIPCIÓN, según lo ha sostenido la propia SIC. La diferencia decide casos: la prescripción debe ser ALEGADA por quien quiere beneficiarse, es renunciable, se INTERRUMPE con comunicación escrita del acreedor al deudor, y el juez NO puede declararla de oficio. Tratarla como caducidad hace abandonar reclamaciones que siguen vivas.",
       "AGOTAMIENTO PREVIO OBLIGATORIO. Ante la SIC en consumidor debe anexarse la reclamación directa hecha al productor o proveedor; en protección de datos, el titular sólo puede quejarse ante la SIC una vez agotado el trámite de consulta o reclamo ante el responsable o encargado. Presentar sin agotar ese paso conduce al rechazo.",
       "COMPETENCIA A PREVENCIÓN. Las funciones jurisdiccionales de las superintendencias (art. 24 del CGP) no excluyen la de los jueces ordinarios: operan a prevención. La elección de foro cambia el trámite, los recursos y la segunda instancia.",
@@ -11,6 +12,16 @@
       "Términos del trámite ante el Defensor del Consumidor Financiero y ante la Superintendencia Financiera en funciones jurisdiccionales: no verificados.",
       "La Superintendencia de Sociedades está catalogada en la rama SOCIETARIO; el cobro coactivo de las superintendencias sigue el procedimiento del Estatuto Tributario, en la rama TRIBUTARIO.",
       "Los procedimientos administrativos sancionatorios de cada superintendencia se rigen por el CPACA y por sus normas especiales; sólo se catalogó su estructura."
+    ],
+    "unverified": [
+      {
+        "actuacion": "Queja ante el Defensor del Consumidor Financiero",
+        "reason": "El legal_basis citado no contiene término alguno. Se leyó el art. 13 de la Ley 1328 de 2009 en dos fuentes oficiales (Gestor Normativo de Función Pública y compilación normativa gov.co): el literal b) remite las quejas a los términos y al procedimiento 'que se establezca para tal fin', y el art. 20 delega expresamente en el Gobierno Nacional señalar por normas de carácter general el procedimiento de presentación y resolución de quejas. Los plazos reales están en el Decreto 2555 de 2010 (arts. 2.34.2.1.1 y ss.), cuyo texto oficial no pudo leerse: el Gestor Normativo solo publica la Parte 1 y el Libro 1 de la Parte 2, SUIN-Juriscol y secretariasenado.gov.co estuvieron inaccesibles, y las únicas versiones disponibles eran reglamentos internos de bancos y aseguradoras, que no son fuente de derecho. No se cataloga un plazo leído en un resumen privado."
+      },
+      {
+        "actuacion": "Demanda ante la Superintendencia Financiera",
+        "reason": "El art. 24 num. 2 de la Ley 1564 de 2012, leído en su texto, solo atribuye competencia jurisdiccional a la Superintendencia Financiera sobre las controversias entre consumidores financieros y entidades vigiladas relativas a la ejecución y cumplimiento de obligaciones contractuales, y en el parágrafo 1 aclara que la competencia es a prevención. No fija término de caducidad ni de prescripción, y tampoco lo hace la Ley 1328 de 2009. El plazo aplicable es el de prescripción de la acción sustancial de que se trate (contractual civil o comercial, o el especial del contrato de seguro), que depende del caso concreto y no puede leerse en la norma citada. Registrar aquí un plazo único sería inferirlo por analogía."
+      }
     ]
   },
   "actuaciones": [
@@ -21,11 +32,36 @@
       "competent_authority": "El productor o proveedor; es requisito previo para acudir a la SIC",
       "term": "El productor o proveedor debe dar respuesta dentro de los quince (15) días hábiles siguientes a la recepción de la reclamación (art. 58).",
       "required_sections": [
-        { "n": 1, "name": "Identificación del consumidor y del productor o proveedor", "mandatory": true, "basis": "Art. 58" },
-        { "n": 2, "name": "Descripción del bien o servicio y de la falla o incumplimiento", "mandatory": true, "basis": "Art. 58" },
-        { "n": 3, "name": "Petición concreta: reparación, cambio, devolución del dinero o cumplimiento", "mandatory": true, "basis": "Art. 11" },
-        { "n": 4, "name": "Constancia de la reclamación, que puede presentarse por escrito, por teléfono o verbalmente", "mandatory": true, "basis": "Art. 58" },
-        { "n": 5, "name": "Advertencia: esta reclamación debe anexarse a la demanda ante la SIC", "mandatory": true, "basis": "Art. 58" }
+        {
+          "n": 1,
+          "name": "Identificación del consumidor y del productor o proveedor",
+          "mandatory": true,
+          "basis": "Art. 58"
+        },
+        {
+          "n": 2,
+          "name": "Descripción del bien o servicio y de la falla o incumplimiento",
+          "mandatory": true,
+          "basis": "Art. 58"
+        },
+        {
+          "n": 3,
+          "name": "Petición concreta: reparación, cambio, devolución del dinero o cumplimiento",
+          "mandatory": true,
+          "basis": "Art. 11"
+        },
+        {
+          "n": 4,
+          "name": "Constancia de la reclamación, que puede presentarse por escrito, por teléfono o verbalmente",
+          "mandatory": true,
+          "basis": "Art. 58"
+        },
+        {
+          "n": 5,
+          "name": "Advertencia: esta reclamación debe anexarse a la demanda ante la SIC",
+          "mandatory": true,
+          "basis": "Art. 58"
+        }
       ],
       "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=44306"
     },
@@ -36,12 +72,42 @@
       "competent_authority": "Superintendencia de Industria y Comercio en funciones jurisdiccionales, o juez civil; la competencia opera a prevención",
       "term": "Prescripción de un (1) año: las demandas para efectividad de la garantía deben presentarse dentro del año siguiente a la expiración de la garantía; las controversias contractuales dentro del año siguiente a la terminación del contrato; en los demás casos, dentro del año siguiente a que el consumidor tenga conocimiento de los hechos (art. 58 num. 3). Es prescripción y no caducidad: debe alegarse, es renunciable y se interrumpe.",
       "required_sections": [
-        { "n": 1, "name": "Identificación del consumidor demandante y del productor o proveedor demandado", "mandatory": true, "basis": "Art. 58" },
-        { "n": 2, "name": "Reclamación directa previa anexada a la demanda", "mandatory": true, "basis": "Art. 58 num. 5" },
-        { "n": 3, "name": "Hechos: descripción del bien o servicio y de la vulneración", "mandatory": true, "basis": "Art. 58" },
-        { "n": 4, "name": "Fecha que determina el inicio del año de prescripción según el supuesto aplicable", "mandatory": true, "basis": "Art. 58 num. 3" },
-        { "n": 5, "name": "Pretensiones y su cuantificación", "mandatory": true, "basis": "Art. 58" },
-        { "n": 6, "name": "Petición de pruebas", "mandatory": true, "basis": "Art. 58" }
+        {
+          "n": 1,
+          "name": "Identificación del consumidor demandante y del productor o proveedor demandado",
+          "mandatory": true,
+          "basis": "Art. 58"
+        },
+        {
+          "n": 2,
+          "name": "Reclamación directa previa anexada a la demanda",
+          "mandatory": true,
+          "basis": "Art. 58 num. 5"
+        },
+        {
+          "n": 3,
+          "name": "Hechos: descripción del bien o servicio y de la vulneración",
+          "mandatory": true,
+          "basis": "Art. 58"
+        },
+        {
+          "n": 4,
+          "name": "Fecha que determina el inicio del año de prescripción según el supuesto aplicable",
+          "mandatory": true,
+          "basis": "Art. 58 num. 3"
+        },
+        {
+          "n": 5,
+          "name": "Pretensiones y su cuantificación",
+          "mandatory": true,
+          "basis": "Art. 58"
+        },
+        {
+          "n": 6,
+          "name": "Petición de pruebas",
+          "mandatory": true,
+          "basis": "Art. 58"
+        }
       ],
       "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=44306"
     },
@@ -52,10 +118,30 @@
       "competent_authority": "Superintendencia de Industria y Comercio",
       "term": "La suspensión de la producción o comercialización puede ordenarse por sesenta (60) días, prorrogables por otro período igual (art. 58).",
       "required_sections": [
-        { "n": 1, "name": "Identificación del bien o servicio cuya comercialización se pretende suspender", "mandatory": true, "basis": "Art. 58" },
-        { "n": 2, "name": "Riesgo para la salud, la vida o la seguridad de los consumidores", "mandatory": true, "basis": "Art. 58" },
-        { "n": 3, "name": "Pruebas sumarias del riesgo", "mandatory": true, "basis": "Art. 58" },
-        { "n": 4, "name": "Medida concreta solicitada y su duración", "mandatory": true, "basis": "Art. 58" }
+        {
+          "n": 1,
+          "name": "Identificación del bien o servicio cuya comercialización se pretende suspender",
+          "mandatory": true,
+          "basis": "Art. 58"
+        },
+        {
+          "n": 2,
+          "name": "Riesgo para la salud, la vida o la seguridad de los consumidores",
+          "mandatory": true,
+          "basis": "Art. 58"
+        },
+        {
+          "n": 3,
+          "name": "Pruebas sumarias del riesgo",
+          "mandatory": true,
+          "basis": "Art. 58"
+        },
+        {
+          "n": 4,
+          "name": "Medida concreta solicitada y su duración",
+          "mandatory": true,
+          "basis": "Art. 58"
+        }
       ],
       "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=44306"
     },
@@ -64,15 +150,40 @@
       "role": "LITIGANTE",
       "legal_basis": "Ley 256 de 1996; Ley 1564 de 2012, art. 24",
       "competent_authority": "Superintendencia de Industria y Comercio en funciones jurisdiccionales, o juez civil; competencia a prevención",
-      "term": null,
+      "term": "Prescripción de la acción: dos (2) años a partir del momento en que el legitimado tuvo conocimiento de la persona que realizó el acto de competencia desleal y, en todo caso, tres (3) años contados a partir del momento de la realización del acto (Ley 256 de 1996, art. 23). Es doble plazo prescriptivo —subjetivo de dos (2) años y objetivo de tres (3) años— y no caducidad: es prescripción, debe alegarse y no puede declararse de oficio.",
       "required_sections": [
-        { "n": 1, "name": "Identificación del demandante y de su participación en el mercado", "mandatory": true, "basis": "Ley 256 de 1996, art. 21" },
-        { "n": 2, "name": "Acto de competencia desleal invocado entre los tipificados", "mandatory": true, "basis": "Ley 256 de 1996, arts. 8 a 19" },
-        { "n": 3, "name": "Hechos que lo configuran y su realización en el mercado", "mandatory": true, "basis": "Ley 256 de 1996, art. 2" },
-        { "n": 4, "name": "Pretensión declarativa y de indemnización de perjuicios", "mandatory": true, "basis": "Ley 256 de 1996, art. 20" },
-        { "n": 5, "name": "Solicitud de medidas cautelares", "mandatory": false, "basis": "Ley 256 de 1996, art. 31" }
+        {
+          "n": 1,
+          "name": "Identificación del demandante y de su participación en el mercado",
+          "mandatory": true,
+          "basis": "Ley 256 de 1996, art. 21"
+        },
+        {
+          "n": 2,
+          "name": "Acto de competencia desleal invocado entre los tipificados",
+          "mandatory": true,
+          "basis": "Ley 256 de 1996, arts. 8 a 19"
+        },
+        {
+          "n": 3,
+          "name": "Hechos que lo configuran y su realización en el mercado",
+          "mandatory": true,
+          "basis": "Ley 256 de 1996, art. 2"
+        },
+        {
+          "n": 4,
+          "name": "Pretensión declarativa y de indemnización de perjuicios",
+          "mandatory": true,
+          "basis": "Ley 256 de 1996, art. 20"
+        },
+        {
+          "n": 5,
+          "name": "Solicitud de medidas cautelares",
+          "mandatory": false,
+          "basis": "Ley 256 de 1996, art. 31"
+        }
       ],
-      "source_url": "https://leyes.co/codigo_general_del_proceso/24.htm"
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=38871"
     },
     {
       "exact_name": "Consulta sobre datos personales",
@@ -81,10 +192,30 @@
       "competent_authority": "Responsable o encargado del tratamiento de los datos",
       "term": "Debe atenderse en un término máximo de diez (10) días hábiles contados desde su recibo. Si no fuere posible, se informa al interesado y se señala la fecha, que en ningún caso podrá superar los cinco (5) días hábiles siguientes al vencimiento del primer término (art. 14).",
       "required_sections": [
-        { "n": 1, "name": "Identificación del titular del dato o de su causahabiente", "mandatory": true, "basis": "Art. 14" },
-        { "n": 2, "name": "Información o dato personal cuya consulta se solicita", "mandatory": true, "basis": "Art. 14" },
-        { "n": 3, "name": "Canal por el que se solicita la respuesta", "mandatory": true, "basis": "Art. 14" },
-        { "n": 4, "name": "Constancia de la fecha de radicación, para el cómputo de los diez (10) días hábiles", "mandatory": true, "basis": "Art. 14" }
+        {
+          "n": 1,
+          "name": "Identificación del titular del dato o de su causahabiente",
+          "mandatory": true,
+          "basis": "Art. 14"
+        },
+        {
+          "n": 2,
+          "name": "Información o dato personal cuya consulta se solicita",
+          "mandatory": true,
+          "basis": "Art. 14"
+        },
+        {
+          "n": 3,
+          "name": "Canal por el que se solicita la respuesta",
+          "mandatory": true,
+          "basis": "Art. 14"
+        },
+        {
+          "n": 4,
+          "name": "Constancia de la fecha de radicación, para el cómputo de los diez (10) días hábiles",
+          "mandatory": true,
+          "basis": "Art. 14"
+        }
       ],
       "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=49981"
     },
@@ -95,11 +226,36 @@
       "competent_authority": "Responsable o encargado del tratamiento de los datos",
       "term": "El término máximo para atender el reclamo es de quince (15) días hábiles contados desde el día siguiente a su recibo. Si no fuere posible, se informan los motivos y la fecha de respuesta, que en ningún caso podrá superar los ocho (8) días hábiles siguientes al vencimiento del primer término (art. 15).",
       "required_sections": [
-        { "n": 1, "name": "Identificación del titular o causahabiente", "mandatory": true, "basis": "Art. 15" },
-        { "n": 2, "name": "Descripción de los hechos que dan lugar al reclamo", "mandatory": true, "basis": "Art. 15" },
-        { "n": 3, "name": "Petición concreta: corregir, actualizar o suprimir la información", "mandatory": true, "basis": "Art. 15" },
-        { "n": 4, "name": "Documentos que se quieran hacer valer", "mandatory": true, "basis": "Art. 15" },
-        { "n": 5, "name": "Dirección para notificaciones", "mandatory": true, "basis": "Art. 15" }
+        {
+          "n": 1,
+          "name": "Identificación del titular o causahabiente",
+          "mandatory": true,
+          "basis": "Art. 15"
+        },
+        {
+          "n": 2,
+          "name": "Descripción de los hechos que dan lugar al reclamo",
+          "mandatory": true,
+          "basis": "Art. 15"
+        },
+        {
+          "n": 3,
+          "name": "Petición concreta: corregir, actualizar o suprimir la información",
+          "mandatory": true,
+          "basis": "Art. 15"
+        },
+        {
+          "n": 4,
+          "name": "Documentos que se quieran hacer valer",
+          "mandatory": true,
+          "basis": "Art. 15"
+        },
+        {
+          "n": 5,
+          "name": "Dirección para notificaciones",
+          "mandatory": true,
+          "basis": "Art. 15"
+        }
       ],
       "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=49981"
     },
@@ -110,11 +266,36 @@
       "competent_authority": "Superintendencia de Industria y Comercio, Delegatura para la Protección de Datos Personales",
       "term": "El titular o causahabiente sólo puede elevar queja ante la SIC UNA VEZ AGOTADO el trámite de consulta o reclamo ante el responsable o encargado del tratamiento (art. 16).",
       "required_sections": [
-        { "n": 1, "name": "Constancia del agotamiento previo de la consulta o del reclamo", "mandatory": true, "basis": "Art. 16" },
-        { "n": 2, "name": "Identificación del titular y del responsable o encargado", "mandatory": true, "basis": "Art. 15" },
-        { "n": 3, "name": "Hechos que configuran la infracción al régimen de datos", "mandatory": true, "basis": "Art. 19" },
-        { "n": 4, "name": "Prueba de la respuesta recibida o de su ausencia", "mandatory": true, "basis": "Art. 16" },
-        { "n": 5, "name": "Petición de investigación y de imposición de sanciones", "mandatory": true, "basis": "Art. 23" }
+        {
+          "n": 1,
+          "name": "Constancia del agotamiento previo de la consulta o del reclamo",
+          "mandatory": true,
+          "basis": "Art. 16"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del titular y del responsable o encargado",
+          "mandatory": true,
+          "basis": "Art. 15"
+        },
+        {
+          "n": 3,
+          "name": "Hechos que configuran la infracción al régimen de datos",
+          "mandatory": true,
+          "basis": "Art. 19"
+        },
+        {
+          "n": 4,
+          "name": "Prueba de la respuesta recibida o de su ausencia",
+          "mandatory": true,
+          "basis": "Art. 16"
+        },
+        {
+          "n": 5,
+          "name": "Petición de investigación y de imposición de sanciones",
+          "mandatory": true,
+          "basis": "Art. 23"
+        }
       ],
       "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=49981"
     },
@@ -125,11 +306,36 @@
       "competent_authority": "La empresa prestadora del servicio público domiciliario",
       "term": "Debe interponerse dentro de los cinco (5) días siguientes a la fecha de conocimiento de la decisión, tanto contra los actos que resuelven reclamaciones por facturación como contra los demás actos de la empresa (art. 154). La empresa debe resolverlo dentro de los quince (15) días hábiles siguientes a su presentación.",
       "required_sections": [
-        { "n": 1, "name": "Identificación del suscriptor o usuario y del contrato de servicios públicos", "mandatory": true, "basis": "Art. 154" },
-        { "n": 2, "name": "Identificación del acto recurrido: negativa del contrato, suspensión, terminación, corte o facturación", "mandatory": true, "basis": "Art. 154" },
-        { "n": 3, "name": "Fecha en que la empresa puso el acto en conocimiento del usuario", "mandatory": true, "basis": "Art. 154" },
-        { "n": 4, "name": "Razones de inconformidad", "mandatory": true, "basis": "Art. 154" },
-        { "n": 5, "name": "Apelación subsidiaria ante la Superintendencia, en los casos en que la ley la consagra", "mandatory": false, "basis": "Art. 154" }
+        {
+          "n": 1,
+          "name": "Identificación del suscriptor o usuario y del contrato de servicios públicos",
+          "mandatory": true,
+          "basis": "Art. 154"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del acto recurrido: negativa del contrato, suspensión, terminación, corte o facturación",
+          "mandatory": true,
+          "basis": "Art. 154"
+        },
+        {
+          "n": 3,
+          "name": "Fecha en que la empresa puso el acto en conocimiento del usuario",
+          "mandatory": true,
+          "basis": "Art. 154"
+        },
+        {
+          "n": 4,
+          "name": "Razones de inconformidad",
+          "mandatory": true,
+          "basis": "Art. 154"
+        },
+        {
+          "n": 5,
+          "name": "Apelación subsidiaria ante la Superintendencia, en los casos en que la ley la consagra",
+          "mandatory": false,
+          "basis": "Art. 154"
+        }
       ],
       "source_url": "https://leyes.co/codigo_general_del_proceso/24.htm"
     },
@@ -140,10 +346,30 @@
       "competent_authority": "Superintendencia de Servicios Públicos Domiciliarios",
       "term": "Se interpone dentro de los cinco (5) días siguientes a aquel en que la empresa ponga el acto en conocimiento del suscriptor o usuario, y sólo procede en los casos en que la ley expresamente lo consagra; debe presentarse como subsidiario de la reposición (art. 154).",
       "required_sections": [
-        { "n": 1, "name": "Constancia de haber interpuesto la reposición ante la empresa", "mandatory": true, "basis": "Art. 154" },
-        { "n": 2, "name": "Acreditación de que la ley consagra expresamente la apelación para ese acto", "mandatory": true, "basis": "Art. 154" },
-        { "n": 3, "name": "Reparos concretos contra la decisión de la empresa", "mandatory": true, "basis": "Art. 154" },
-        { "n": 4, "name": "Petición de revocatoria", "mandatory": true, "basis": "Art. 159" }
+        {
+          "n": 1,
+          "name": "Constancia de haber interpuesto la reposición ante la empresa",
+          "mandatory": true,
+          "basis": "Art. 154"
+        },
+        {
+          "n": 2,
+          "name": "Acreditación de que la ley consagra expresamente la apelación para ese acto",
+          "mandatory": true,
+          "basis": "Art. 154"
+        },
+        {
+          "n": 3,
+          "name": "Reparos concretos contra la decisión de la empresa",
+          "mandatory": true,
+          "basis": "Art. 154"
+        },
+        {
+          "n": 4,
+          "name": "Petición de revocatoria",
+          "mandatory": true,
+          "basis": "Art. 159"
+        }
       ],
       "source_url": "https://leyes.co/codigo_general_del_proceso/24.htm"
     },
@@ -154,10 +380,30 @@
       "competent_authority": "La empresa prestadora; su reconocimiento puede pedirse ante la Superintendencia",
       "term": "Toda entidad o persona vigilada por la Superintendencia de Servicios Públicos debe resolver las peticiones, quejas y recursos dentro del término de quince (15) días hábiles contados desde su presentación (art. 154). Vencido sin respuesta, opera el silencio administrativo positivo del art. 158.",
       "required_sections": [
-        { "n": 1, "name": "Identificación de la petición, queja o recurso y de su fecha de radicación", "mandatory": true, "basis": "Art. 154" },
-        { "n": 2, "name": "Cómputo de los quince (15) días hábiles sin respuesta", "mandatory": true, "basis": "Art. 154" },
-        { "n": 3, "name": "Constancia de que no se notificó decisión alguna", "mandatory": true, "basis": "Art. 158" },
-        { "n": 4, "name": "Petición de reconocimiento de los efectos del silencio positivo", "mandatory": true, "basis": "Art. 158" }
+        {
+          "n": 1,
+          "name": "Identificación de la petición, queja o recurso y de su fecha de radicación",
+          "mandatory": true,
+          "basis": "Art. 154"
+        },
+        {
+          "n": 2,
+          "name": "Cómputo de los quince (15) días hábiles sin respuesta",
+          "mandatory": true,
+          "basis": "Art. 154"
+        },
+        {
+          "n": 3,
+          "name": "Constancia de que no se notificó decisión alguna",
+          "mandatory": true,
+          "basis": "Art. 158"
+        },
+        {
+          "n": 4,
+          "name": "Petición de reconocimiento de los efectos del silencio positivo",
+          "mandatory": true,
+          "basis": "Art. 158"
+        }
       ],
       "source_url": "https://leyes.co/codigo_general_del_proceso/24.htm"
     },
@@ -166,29 +412,74 @@
       "role": "LITIGANTE",
       "legal_basis": "Ley 1122 de 2007, art. 41, modificado por el art. 6 de la Ley 1949 de 2019",
       "competent_authority": "Superintendencia Nacional de Salud en funciones jurisdiccionales",
-      "term": null,
+      "term": "El art. 41 de la Ley 1122 de 2007, modificado por el art. 6 de la Ley 1949 de 2019, no fija término para presentar la demanda; fija los términos para fallar: la Superintendencia debe dictar sentencia dentro de los veinte (20) días siguientes a la radicación en los asuntos de los literales a), c), d) y e) (cobertura del Plan de Beneficios, multiafiliación, libre elección y movilidad, y servicios no incluidos); dentro de los sesenta (60) días en el literal b) (reconocimientos económicos); y dentro de los ciento veinte (120) días en el literal f) (glosas y devoluciones de facturas). El trámite es sumario, sin formalidades y sin necesidad de apoderado.",
       "required_sections": [
-        { "n": 1, "name": "Identificación del afiliado y de la entidad demandada", "mandatory": true, "basis": "Art. 41" },
-        { "n": 2, "name": "Materia sobre la que versa, entre las de competencia jurisdiccional de la Supersalud", "mandatory": true, "basis": "Art. 41" },
-        { "n": 3, "name": "Hechos de la negación o del incumplimiento", "mandatory": true, "basis": "Art. 41" },
-        { "n": 4, "name": "Pretensión concreta y su fundamento en el plan de beneficios", "mandatory": true, "basis": "Art. 41" },
-        { "n": 5, "name": "Pruebas: historia clínica, órdenes médicas y respuestas de la entidad", "mandatory": true, "basis": "Art. 41" }
+        {
+          "n": 1,
+          "name": "Identificación del afiliado y de la entidad demandada",
+          "mandatory": true,
+          "basis": "Art. 41"
+        },
+        {
+          "n": 2,
+          "name": "Materia sobre la que versa, entre las de competencia jurisdiccional de la Supersalud",
+          "mandatory": true,
+          "basis": "Art. 41"
+        },
+        {
+          "n": 3,
+          "name": "Hechos de la negación o del incumplimiento",
+          "mandatory": true,
+          "basis": "Art. 41"
+        },
+        {
+          "n": 4,
+          "name": "Pretensión concreta y su fundamento en el plan de beneficios",
+          "mandatory": true,
+          "basis": "Art. 41"
+        },
+        {
+          "n": 5,
+          "name": "Pruebas: historia clínica, órdenes médicas y respuestas de la entidad",
+          "mandatory": true,
+          "basis": "Art. 41"
+        }
       ],
-      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=90185"
+      "source_url": "https://normograma.supersalud.gov.co/compilacion/docs/ley_1122_2007.htm"
     },
     {
       "exact_name": "Recurso de apelación contra sentencia de la Superintendencia Nacional de Salud",
       "role": "LITIGANTE",
       "legal_basis": "Ley 1122 de 2007, art. 41, modificado por el art. 6 de la Ley 1949 de 2019",
       "competent_authority": "Sala Laboral del Tribunal Superior del Distrito Judicial del domicilio del apelante",
-      "term": null,
+      "term": "La sentencia podrá ser apelada dentro de los tres (3) días siguientes a su notificación; concedido el recurso, el expediente se remite al Tribunal Superior del Distrito Judicial - Sala Laboral del domicilio del apelante (art. 41 de la Ley 1122 de 2007, modificado por el art. 6 de la Ley 1949 de 2019).",
       "required_sections": [
-        { "n": 1, "name": "Identificación de la sentencia apelada y de su notificación", "mandatory": true, "basis": "Art. 41" },
-        { "n": 2, "name": "Determinación del domicilio del apelante, que fija el tribunal competente", "mandatory": true, "basis": "Art. 41" },
-        { "n": 3, "name": "Reparos concretos contra la sentencia", "mandatory": true, "basis": "Art. 41" },
-        { "n": 4, "name": "Petición de revocatoria o modificación", "mandatory": true, "basis": "Art. 41" }
+        {
+          "n": 1,
+          "name": "Identificación de la sentencia apelada y de su notificación",
+          "mandatory": true,
+          "basis": "Art. 41"
+        },
+        {
+          "n": 2,
+          "name": "Determinación del domicilio del apelante, que fija el tribunal competente",
+          "mandatory": true,
+          "basis": "Art. 41"
+        },
+        {
+          "n": 3,
+          "name": "Reparos concretos contra la sentencia",
+          "mandatory": true,
+          "basis": "Art. 41"
+        },
+        {
+          "n": 4,
+          "name": "Petición de revocatoria o modificación",
+          "mandatory": true,
+          "basis": "Art. 41"
+        }
       ],
-      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=90185"
+      "source_url": "https://normograma.supersalud.gov.co/compilacion/docs/ley_1122_2007.htm"
     },
     {
       "exact_name": "Queja ante el Defensor del Consumidor Financiero",
@@ -197,11 +488,36 @@
       "competent_authority": "Defensor del Consumidor Financiero de la entidad vigilada",
       "term": null,
       "required_sections": [
-        { "n": 1, "name": "Identificación del consumidor financiero y de la entidad vigilada", "mandatory": true, "basis": "Ley 1328 de 2009, art. 13" },
-        { "n": 2, "name": "Descripción del producto o servicio financiero", "mandatory": true, "basis": null },
-        { "n": 3, "name": "Hechos de la queja y su fecha", "mandatory": true, "basis": null },
-        { "n": 4, "name": "Pretensión concreta", "mandatory": true, "basis": null },
-        { "n": 5, "name": "Documentos que soportan la reclamación", "mandatory": true, "basis": null }
+        {
+          "n": 1,
+          "name": "Identificación del consumidor financiero y de la entidad vigilada",
+          "mandatory": true,
+          "basis": "Ley 1328 de 2009, art. 13"
+        },
+        {
+          "n": 2,
+          "name": "Descripción del producto o servicio financiero",
+          "mandatory": true,
+          "basis": null
+        },
+        {
+          "n": 3,
+          "name": "Hechos de la queja y su fecha",
+          "mandatory": true,
+          "basis": null
+        },
+        {
+          "n": 4,
+          "name": "Pretensión concreta",
+          "mandatory": true,
+          "basis": null
+        },
+        {
+          "n": 5,
+          "name": "Documentos que soportan la reclamación",
+          "mandatory": true,
+          "basis": null
+        }
       ],
       "source_url": "https://leyes.co/codigo_general_del_proceso/24.htm"
     },
@@ -212,11 +528,36 @@
       "competent_authority": "Superintendencia Financiera de Colombia en funciones jurisdiccionales; competencia a prevención con los jueces",
       "term": null,
       "required_sections": [
-        { "n": 1, "name": "Identificación del consumidor financiero y de la entidad vigilada", "mandatory": true, "basis": "Art. 24 num. 2" },
-        { "n": 2, "name": "Acreditación de que la controversia versa sobre la relación de consumo financiero", "mandatory": true, "basis": "Art. 24 num. 2" },
-        { "n": 3, "name": "Hechos y pretensiones", "mandatory": true, "basis": null },
-        { "n": 4, "name": "Constancia del trámite previo ante el Defensor del Consumidor Financiero, cuando aplique", "mandatory": false, "basis": "Ley 1328 de 2009" },
-        { "n": 5, "name": "Petición de pruebas", "mandatory": true, "basis": null }
+        {
+          "n": 1,
+          "name": "Identificación del consumidor financiero y de la entidad vigilada",
+          "mandatory": true,
+          "basis": "Art. 24 num. 2"
+        },
+        {
+          "n": 2,
+          "name": "Acreditación de que la controversia versa sobre la relación de consumo financiero",
+          "mandatory": true,
+          "basis": "Art. 24 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "Hechos y pretensiones",
+          "mandatory": true,
+          "basis": null
+        },
+        {
+          "n": 4,
+          "name": "Constancia del trámite previo ante el Defensor del Consumidor Financiero, cuando aplique",
+          "mandatory": false,
+          "basis": "Ley 1328 de 2009"
+        },
+        {
+          "n": 5,
+          "name": "Petición de pruebas",
+          "mandatory": true,
+          "basis": null
+        }
       ],
       "source_url": "https://leyes.co/codigo_general_del_proceso/24.htm"
     },
@@ -225,14 +566,34 @@
       "role": "LITIGANTE",
       "legal_basis": "Ley 1480 de 2011, arts. 59 a 61",
       "competent_authority": "Superintendencia de Industria y Comercio en funciones administrativas",
-      "term": null,
+      "term": "La Ley 1480 de 2011 no fija plazo para presentar la denuncia; su art. 60 remite el procedimiento sancionatorio al Código Contencioso Administrativo, hoy Ley 1437 de 2011. Rige por tanto el art. 52 del CPACA: salvo lo dispuesto en leyes especiales, la facultad de imponer sanciones caduca a los tres (3) años de ocurrido el hecho, la conducta u omisión, término dentro del cual el acto que impone la sanción debe haber sido expedido y notificado; si la conducta es continuada, los tres (3) años se cuentan desde el día siguiente a aquel en que cesó la infracción. Denunciar después de ese término es inútil: la SIC ya no puede sancionar.",
       "required_sections": [
-        { "n": 1, "name": "Identificación del denunciante y del investigado", "mandatory": true, "basis": "Art. 59" },
-        { "n": 2, "name": "Conducta que infringe las normas de protección al consumidor", "mandatory": true, "basis": "Art. 59" },
-        { "n": 3, "name": "Pruebas de la conducta", "mandatory": true, "basis": "Art. 59" },
-        { "n": 4, "name": "Advertencia: la vía administrativa sanciona pero no indemniza; para eso está la acción jurisdiccional", "mandatory": true, "basis": "Arts. 56 y 61" }
+        {
+          "n": 1,
+          "name": "Identificación del denunciante y del investigado",
+          "mandatory": true,
+          "basis": "Art. 59"
+        },
+        {
+          "n": 2,
+          "name": "Conducta que infringe las normas de protección al consumidor",
+          "mandatory": true,
+          "basis": "Art. 59"
+        },
+        {
+          "n": 3,
+          "name": "Pruebas de la conducta",
+          "mandatory": true,
+          "basis": "Art. 59"
+        },
+        {
+          "n": 4,
+          "name": "Advertencia: la vía administrativa sanciona pero no indemniza; para eso está la acción jurisdiccional",
+          "mandatory": true,
+          "basis": "Arts. 56 y 61"
+        }
       ],
-      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=44306"
+      "source_url": "https://normograma.supersalud.gov.co/compilacion/docs/ley_1437_2011.htm"
     },
     {
       "exact_name": "Sentencia de protección al consumidor",
@@ -241,11 +602,36 @@
       "competent_authority": "Superintendencia de Industria y Comercio en funciones jurisdiccionales",
       "term": "Debe verificarse la prescripción anual del num. 3, teniendo presente que es prescripción y no caducidad: no puede declararse de oficio (art. 58 num. 3).",
       "required_sections": [
-        { "n": 1, "name": "Verificación del agotamiento de la reclamación directa previa", "mandatory": true, "basis": "Art. 58 num. 5" },
-        { "n": 2, "name": "Pronunciamiento sobre la prescripción sólo si fue alegada", "mandatory": true, "basis": "Art. 58 num. 3" },
-        { "n": 3, "name": "Análisis de la garantía legal y de su alcance", "mandatory": true, "basis": "Arts. 7 a 11" },
-        { "n": 4, "name": "Decisión sobre cada pretensión", "mandatory": true, "basis": "Art. 58" },
-        { "n": 5, "name": "Orden de reparación, cambio, devolución del dinero o cumplimiento", "mandatory": true, "basis": "Art. 11" }
+        {
+          "n": 1,
+          "name": "Verificación del agotamiento de la reclamación directa previa",
+          "mandatory": true,
+          "basis": "Art. 58 num. 5"
+        },
+        {
+          "n": 2,
+          "name": "Pronunciamiento sobre la prescripción sólo si fue alegada",
+          "mandatory": true,
+          "basis": "Art. 58 num. 3"
+        },
+        {
+          "n": 3,
+          "name": "Análisis de la garantía legal y de su alcance",
+          "mandatory": true,
+          "basis": "Arts. 7 a 11"
+        },
+        {
+          "n": 4,
+          "name": "Decisión sobre cada pretensión",
+          "mandatory": true,
+          "basis": "Art. 58"
+        },
+        {
+          "n": 5,
+          "name": "Orden de reparación, cambio, devolución del dinero o cumplimiento",
+          "mandatory": true,
+          "basis": "Art. 11"
+        }
       ],
       "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=44306"
     },
@@ -256,10 +642,30 @@
       "competent_authority": "Superintendencia de Industria y Comercio",
       "term": "La suspensión de la producción o comercialización se ordena por sesenta (60) días, prorrogables por otro período igual (art. 58).",
       "required_sections": [
-        { "n": 1, "name": "Identificación del bien o servicio y del investigado", "mandatory": true, "basis": "Art. 58" },
-        { "n": 2, "name": "Motivación del riesgo para la salud, la vida o la seguridad", "mandatory": true, "basis": "Art. 58" },
-        { "n": 3, "name": "Determinación de la medida y de su duración de sesenta (60) días", "mandatory": true, "basis": "Art. 58" },
-        { "n": 4, "name": "Constancia de la prórroga, cuando se decrete", "mandatory": false, "basis": "Art. 58" }
+        {
+          "n": 1,
+          "name": "Identificación del bien o servicio y del investigado",
+          "mandatory": true,
+          "basis": "Art. 58"
+        },
+        {
+          "n": 2,
+          "name": "Motivación del riesgo para la salud, la vida o la seguridad",
+          "mandatory": true,
+          "basis": "Art. 58"
+        },
+        {
+          "n": 3,
+          "name": "Determinación de la medida y de su duración de sesenta (60) días",
+          "mandatory": true,
+          "basis": "Art. 58"
+        },
+        {
+          "n": 4,
+          "name": "Constancia de la prórroga, cuando se decrete",
+          "mandatory": false,
+          "basis": "Art. 58"
+        }
       ],
       "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=44306"
     },
@@ -270,11 +676,36 @@
       "competent_authority": "La empresa prestadora en reposición; la Superintendencia de Servicios Públicos en apelación",
       "term": "Debe resolverse dentro de los quince (15) días hábiles siguientes a la presentación; vencido ese término sin decisión, opera el silencio administrativo positivo (arts. 154 y 158).",
       "required_sections": [
-        { "n": 1, "name": "Verificación del cumplimiento del término de quince (15) días hábiles", "mandatory": true, "basis": "Art. 154" },
-        { "n": 2, "name": "Pronunciamiento sobre cada razón de inconformidad", "mandatory": true, "basis": "Art. 154" },
-        { "n": 3, "name": "Análisis del contrato de servicios públicos y de la facturación cuestionada", "mandatory": true, "basis": "Art. 154" },
-        { "n": 4, "name": "Decisión: confirma, modifica o revoca", "mandatory": true, "basis": "Art. 159" },
-        { "n": 5, "name": "Advertencia sobre los efectos del silencio positivo si se excedió el término", "mandatory": true, "basis": "Art. 158" }
+        {
+          "n": 1,
+          "name": "Verificación del cumplimiento del término de quince (15) días hábiles",
+          "mandatory": true,
+          "basis": "Art. 154"
+        },
+        {
+          "n": 2,
+          "name": "Pronunciamiento sobre cada razón de inconformidad",
+          "mandatory": true,
+          "basis": "Art. 154"
+        },
+        {
+          "n": 3,
+          "name": "Análisis del contrato de servicios públicos y de la facturación cuestionada",
+          "mandatory": true,
+          "basis": "Art. 154"
+        },
+        {
+          "n": 4,
+          "name": "Decisión: confirma, modifica o revoca",
+          "mandatory": true,
+          "basis": "Art. 159"
+        },
+        {
+          "n": 5,
+          "name": "Advertencia sobre los efectos del silencio positivo si se excedió el término",
+          "mandatory": true,
+          "basis": "Art. 158"
+        }
       ],
       "source_url": "https://leyes.co/codigo_general_del_proceso/24.htm"
     },
@@ -283,15 +714,40 @@
       "role": "DESPACHO",
       "legal_basis": "Ley 1581 de 2012, arts. 22 a 24",
       "competent_authority": "Superintendencia de Industria y Comercio, Delegatura para la Protección de Datos Personales",
-      "term": null,
+      "term": "La Ley 1581 de 2012 no fija términos procesales: su art. 22 dispone que en lo no reglado se siguen las normas del Código Contencioso Administrativo, hoy Ley 1437 de 2011. Rigen entonces el art. 47 del CPACA —quince (15) días siguientes a la notificación de la formulación de cargos para presentar descargos y pedir pruebas— y el art. 52 —la facultad sancionatoria caduca a los tres (3) años de ocurrido el hecho, la conducta u omisión, dentro de los cuales la resolución sancionatoria debe haber sido expedida y notificada; los recursos deben resolverse dentro de un (1) año desde su interposición oportuna, so pena de que se entiendan fallados a favor del recurrente, y la sanción impuesta prescribe a los cinco (5) años contados desde la ejecutoria.",
       "required_sections": [
-        { "n": 1, "name": "Identificación del responsable o encargado investigado", "mandatory": true, "basis": "Art. 22" },
-        { "n": 2, "name": "Conducta infractora y norma vulnerada", "mandatory": true, "basis": "Art. 23" },
-        { "n": 3, "name": "Valoración de los descargos y de las pruebas", "mandatory": true, "basis": "Art. 22" },
-        { "n": 4, "name": "Aplicación de los criterios de graduación de la sanción", "mandatory": true, "basis": "Art. 24" },
-        { "n": 5, "name": "Sanción impuesta: multa, suspensión, cierre temporal o definitivo", "mandatory": true, "basis": "Art. 23" }
+        {
+          "n": 1,
+          "name": "Identificación del responsable o encargado investigado",
+          "mandatory": true,
+          "basis": "Art. 22"
+        },
+        {
+          "n": 2,
+          "name": "Conducta infractora y norma vulnerada",
+          "mandatory": true,
+          "basis": "Art. 23"
+        },
+        {
+          "n": 3,
+          "name": "Valoración de los descargos y de las pruebas",
+          "mandatory": true,
+          "basis": "Art. 22"
+        },
+        {
+          "n": 4,
+          "name": "Aplicación de los criterios de graduación de la sanción",
+          "mandatory": true,
+          "basis": "Art. 24"
+        },
+        {
+          "n": 5,
+          "name": "Sanción impuesta: multa, suspensión, cierre temporal o definitivo",
+          "mandatory": true,
+          "basis": "Art. 23"
+        }
       ],
-      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=49981"
+      "source_url": "https://normograma.supersalud.gov.co/compilacion/docs/ley_1437_2011.htm"
     },
     {
       "exact_name": "Sentencia de la Superintendencia Nacional de Salud",
@@ -300,11 +756,36 @@
       "competent_authority": "Superintendencia Nacional de Salud en funciones jurisdiccionales",
       "term": "Contra la sentencia procede apelación, cuya segunda instancia corresponde a la Sala Laboral del Tribunal Superior del Distrito Judicial del domicilio del apelante (art. 41).",
       "required_sections": [
-        { "n": 1, "name": "Verificación de la competencia jurisdiccional sobre la materia", "mandatory": true, "basis": "Art. 41" },
-        { "n": 2, "name": "Análisis de las pruebas: historia clínica, órdenes médicas y respuestas de la entidad", "mandatory": true, "basis": "Art. 41" },
-        { "n": 3, "name": "Decisión sobre cada pretensión del afiliado", "mandatory": true, "basis": "Art. 41" },
-        { "n": 4, "name": "Órdenes concretas a la entidad y plazos de cumplimiento", "mandatory": true, "basis": "Art. 41" },
-        { "n": 5, "name": "Indicación del recurso de apelación y del tribunal competente", "mandatory": true, "basis": "Art. 41" }
+        {
+          "n": 1,
+          "name": "Verificación de la competencia jurisdiccional sobre la materia",
+          "mandatory": true,
+          "basis": "Art. 41"
+        },
+        {
+          "n": 2,
+          "name": "Análisis de las pruebas: historia clínica, órdenes médicas y respuestas de la entidad",
+          "mandatory": true,
+          "basis": "Art. 41"
+        },
+        {
+          "n": 3,
+          "name": "Decisión sobre cada pretensión del afiliado",
+          "mandatory": true,
+          "basis": "Art. 41"
+        },
+        {
+          "n": 4,
+          "name": "Órdenes concretas a la entidad y plazos de cumplimiento",
+          "mandatory": true,
+          "basis": "Art. 41"
+        },
+        {
+          "n": 5,
+          "name": "Indicación del recurso de apelación y del tribunal competente",
+          "mandatory": true,
+          "basis": "Art. 41"
+        }
       ],
       "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=90185"
     }

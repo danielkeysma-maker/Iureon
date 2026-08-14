@@ -112,14 +112,17 @@ const CASES: Case[] = [
     exactMatch: 'Excepciones de mérito en proceso ejecutivo',
     mustContain: 'Diez (10) días'
   },
-  // Queja is catalogued but its term was not verifiable in the source; the
-  // guidance must refuse to state one rather than borrow a neighbouring term.
+  // Queja was unverifiable when this case was written, so it asserted the
+  // refusal wording. The term has since been read in the norm: it has no term
+  // of its own because it travels in subsidio of the reposición (art. 353).
+  // The case now asserts that derivation, which is the fact most easily lost
+  // if someone later "simplifies" the entry into a bare number of days.
   {
     label: 'Recurso de queja',
     expect: 'MATCH',
     branch: 'CIVIL',
     exactMatch: 'Recurso de queja',
-    mustContain: 'NO afirmes'
+    mustContain: 'subsidio'
   },
   {
     label: 'Demanda de pertenencia',
@@ -172,14 +175,15 @@ const CASES: Case[] = [
     exactMatch: 'Recurso de apelación laboral',
     mustContain: 'tres (3) días'
   },
-  // Its term could not be read in the source, so the guidance must refuse to
-  // borrow the civil one rather than state a plazo nobody verified.
+  // Once unverifiable, now read in Ley 2452 de 2025 art. 243: twenty days of
+  // traslado to sustain. The article number is asserted because this branch was
+  // renumbered wholesale — a carried-over CPTSS citation is the failure mode.
   {
     label: 'Demanda de casación laboral',
     expect: 'MATCH',
     branch: 'LABORAL',
     exactMatch: 'Demanda de casación laboral',
-    mustContain: 'NO afirmes'
+    mustContain: 'art. 243'
   },
 
   // Familia. The catalogue's job here is partly to NOT offer something.
@@ -248,14 +252,15 @@ const CASES: Case[] = [
     exactMatch: 'Demanda de casación penal',
     mustContain: 'Treinta (30) días'
   },
-  // The apelación term is not in art. 176 and was not verified elsewhere, so
-  // the guidance must refuse one rather than borrow the civil or labour figure.
+  // The term is not in art. 176; it lives in arts. 178 and 179. Autos and
+  // sentencias run on different clocks, and the guidance must keep them apart —
+  // flattening them into one figure is how an appeal gets filed out of time.
   {
     label: 'Recurso de apelación penal',
     expect: 'MATCH',
     branch: 'PENAL',
     exactMatch: 'Recurso de apelación penal',
-    mustContain: 'NO afirmes'
+    mustContain: 'art. 178'
   },
 
   // Societario. The insolvency thresholds are the trap here: Ley 2437 de 2024
@@ -415,14 +420,17 @@ const CASES: Case[] = [
     exactMatch: 'Edicto emplazatorio en sucesión notarial',
     mustContain: 'diez (10) días'
   },
-  // Its term comes from the CPACA, not from Ley 1579, so the guidance must
-  // refuse one rather than borrow the registration window.
+  // The term is real but BORROWED: art. 60 of Ley 1579 grants the recourse and
+  // fixes no deadline; the ten days come from CPACA art. 76, reachable only
+  // through the express remission in art. 22. The case asserts the remission is
+  // still spelled out, because a term whose source lives in another statute is
+  // the first thing an editor "tidies up" into a bare figure.
   {
     label: 'Recurso de reposición contra acto de registro',
     expect: 'MATCH',
     branch: 'NOTARIAL',
     exactMatch: 'Recurso de reposición contra acto de registro',
-    mustContain: 'NO afirmes'
+    mustContain: 'Contencioso Administrativo'
   },
 
   // Contratación estatal. The liquidación cascade is the one people miss: a

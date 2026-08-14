@@ -103,7 +103,7 @@ export const CONSTITUCIONAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Decreto 2591 de 1991, art. 7',
     competentAuthority: 'El juez de tutela que conoce de la solicitud (Decreto 2591 de 1991, art. 7).',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'El artículo 7 del Decreto 2591 de 1991 —vigente, leído verbatim— NO fija término alguno para pedir ni para decidir la medida provisional. Procede "[d]esde la presentación de la solicitud, cuando el juez expresamente lo considere necesario y urgente para proteger el derecho", puede dictarse de oficio o a petición de parte durante todo el trámite, y el juez puede "hacer cesar en cualquier momento" la medida por resolución debidamente fundada; por tanto no opera caducidad para solicitarla mientras la tutela esté pendiente. El único plazo del artículo es la notificación "inmediata" de la suspensión a aquél contra quien se hizo la solicitud. NO existe término de cuarenta y ocho (48) horas para resolverla: ni el artículo 7 del Decreto 2591 de 1991 ni el Decreto 306 de 1992 (reglamentario, arts. 1 a 10) fijan tal plazo. El fallo de fondo sigue sujeto a los diez (10) días del artículo 29 del Decreto 2591 de 1991.' },
     requiredSections: [
       { n: 1, name: 'Identificación del proceso de tutela y de las partes', mandatory: false, basis: null },
       { n: 2, name: 'Acto concreto cuya suspensión se solicita o medida de conservación o seguridad pedida', mandatory: true, basis: 'Decreto 2591 de 1991, art. 7' },
@@ -378,13 +378,13 @@ export const CONSTITUCIONAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Decreto 2067 de 1991, art. 6',
     competentAuthority: 'La Sala Plena de la Corte Constitucional (Decreto 2067 de 1991, art. 6: "Contra el auto de rechazo, procederá el recurso de súplica ante la Corte").',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'El artículo 6 del Decreto 2067 de 1991 (vigente) prevé el recurso —"Contra el auto de rechazo, procederá el recurso de súplica ante la Corte"— pero NO fija término para interponerlo; ese artículo sólo fija los diez (10) días del magistrado sustanciador para proveer sobre la admisibilidad y los tres (3) días concedidos al demandante para corregir la demanda. El plazo para suplicar NO es legal sino reglamentario y jurisprudencial: proviene del artículo 50.1 del Reglamento Interno de la Corte Constitucional (Acuerdo 02 de 2015) y así lo aplica la Corte: "este recurso debe interponerse dentro de los tres días siguientes a la notificación de la providencia que rechaza la demanda" (Corte Constitucional, Auto 371 de 2021), esto es, dentro del término de ejecutoria del auto de rechazo.' },
     requiredSections: [
       { n: 1, name: 'Identificación del expediente y del auto de rechazo recurrido', mandatory: false, basis: null },
       { n: 2, name: 'Argumentos contra las razones del rechazo', mandatory: true, basis: 'Decreto 2067 de 1991, art. 6' },
       { n: 3, name: 'Petición de revocatoria del auto de rechazo y de admisión de la demanda', mandatory: false, basis: null }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=30150'
+    sourceUrl: 'https://www.corteconstitucional.gov.co/relatoria/autos/2021/a371-21.htm'
   },
   {
     id: 'constitucional/intervencion-ciudadana-en-proceso-de-constitucionalidad',
@@ -430,7 +430,7 @@ export const CONSTITUCIONAL_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Decreto 2591 de 1991, art. 7',
     competentAuthority: 'El juez de tutela que conoce de la solicitud (Decreto 2591 de 1991, art. 7).',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'El artículo 7 del Decreto 2591 de 1991 —vigente, leído verbatim— NO fija término para que el juez profiera el auto que decreta la medida provisional. La medida procede "[d]esde la presentación de la solicitud, cuando el juez expresamente lo considere necesario y urgente para proteger el derecho", de oficio o a petición de parte, y el juez puede "hacer cesar en cualquier momento" la medida por resolución debidamente fundada; no opera caducidad para decretarla mientras el trámite de tutela esté en curso. El artículo sólo impone que la suspensión de la aplicación "se notificará inmediatamente" a aquél contra quien se hubiere hecho la solicitud, por el medio más expedito posible. NO existe término de cuarenta y ocho (48) horas: no aparece en el artículo 7 del Decreto 2591 de 1991 ni en el Decreto 306 de 1992.' },
     requiredSections: [
       { n: 1, name: 'Encabezado y antecedentes de la solicitud', mandatory: false, basis: null },
       { n: 2, name: 'Consideraciones sobre la necesidad y urgencia de proteger el derecho', mandatory: true, basis: 'Decreto 2591 de 1991, art. 7' },

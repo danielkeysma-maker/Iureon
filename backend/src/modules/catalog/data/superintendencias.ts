@@ -13,9 +13,10 @@ import type { BranchCatalog } from '../types';
 export const SUPERINTENDENCIAS_CATALOG: BranchCatalog = {
   meta: {
     branch: 'SUPERINTENDENCIAS',
-    verifiedAt: '2026-08-12',
+    verifiedAt: '2026-08-14',
     sourceOfTruth: 'Ley 1480 de 2011 (Estatuto del Consumidor); Ley 1581 de 2012 (protección de datos personales); Ley 142 de 1994 (servicios públicos domiciliarios); Ley 1122 de 2007, art. 41, modificado por el art. 6 de la Ley 1949 de 2019 (función jurisdiccional de la Supersalud); Ley 1328 de 2009 (consumidor financiero); Ley 1564 de 2012, art. 24. Los términos marcados como verificados fueron leídos artículo por artículo en el texto de la norma.',
     gaps: [
+    'NOTA (2026-08-14): la lista siguiente es anterior a la verificacion masiva de esta fecha. Varios de esos huecos quedaron cerrados; los vigentes estan en _meta.unverified con su razon. Ver research/VERIFICATION-2026-08-14.md.',
     'EN CONSUMIDOR ES PRESCRIPCIÓN, NO CADUCIDAD. El plazo de un año del art. 58 num. 3 de la Ley 1480 de 2011 es de PRESCRIPCIÓN, según lo ha sostenido la propia SIC. La diferencia decide casos: la prescripción debe ser ALEGADA por quien quiere beneficiarse, es renunciable, se INTERRUMPE con comunicación escrita del acreedor al deudor, y el juez NO puede declararla de oficio. Tratarla como caducidad hace abandonar reclamaciones que siguen vivas.',
     'AGOTAMIENTO PREVIO OBLIGATORIO. Ante la SIC en consumidor debe anexarse la reclamación directa hecha al productor o proveedor; en protección de datos, el titular sólo puede quejarse ante la SIC una vez agotado el trámite de consulta o reclamo ante el responsable o encargado. Presentar sin agotar ese paso conduce al rechazo.',
     'COMPETENCIA A PREVENCIÓN. Las funciones jurisdiccionales de las superintendencias (art. 24 del CGP) no excluyen la de los jueces ordinarios: operan a prevención. La elección de foro cambia el trámite, los recursos y la segunda instancia.',
@@ -84,7 +85,7 @@ export const SUPERINTENDENCIAS_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 256 de 1996; Ley 1564 de 2012, art. 24',
     competentAuthority: 'Superintendencia de Industria y Comercio en funciones jurisdiccionales, o juez civil; competencia a prevención',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'Prescripción de la acción: dos (2) años a partir del momento en que el legitimado tuvo conocimiento de la persona que realizó el acto de competencia desleal y, en todo caso, tres (3) años contados a partir del momento de la realización del acto (Ley 256 de 1996, art. 23). Es doble plazo prescriptivo —subjetivo de dos (2) años y objetivo de tres (3) años— y no caducidad: es prescripción, debe alegarse y no puede declararse de oficio.' },
     requiredSections: [
       { n: 1, name: 'Identificación del demandante y de su participación en el mercado', mandatory: true, basis: 'Ley 256 de 1996, art. 21' },
       { n: 2, name: 'Acto de competencia desleal invocado entre los tipificados', mandatory: true, basis: 'Ley 256 de 1996, arts. 8 a 19' },
@@ -92,7 +93,7 @@ export const SUPERINTENDENCIAS_CATALOG: BranchCatalog = {
       { n: 4, name: 'Pretensión declarativa y de indemnización de perjuicios', mandatory: true, basis: 'Ley 256 de 1996, art. 20' },
       { n: 5, name: 'Solicitud de medidas cautelares', mandatory: false, basis: 'Ley 256 de 1996, art. 31' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/24.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=38871'
   },
   {
     id: 'superintendencias/consulta-sobre-datos-personales',
@@ -200,7 +201,7 @@ export const SUPERINTENDENCIAS_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1122 de 2007, art. 41, modificado por el art. 6 de la Ley 1949 de 2019',
     competentAuthority: 'Superintendencia Nacional de Salud en funciones jurisdiccionales',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'El art. 41 de la Ley 1122 de 2007, modificado por el art. 6 de la Ley 1949 de 2019, no fija término para presentar la demanda; fija los términos para fallar: la Superintendencia debe dictar sentencia dentro de los veinte (20) días siguientes a la radicación en los asuntos de los literales a), c), d) y e) (cobertura del Plan de Beneficios, multiafiliación, libre elección y movilidad, y servicios no incluidos); dentro de los sesenta (60) días en el literal b) (reconocimientos económicos); y dentro de los ciento veinte (120) días en el literal f) (glosas y devoluciones de facturas). El trámite es sumario, sin formalidades y sin necesidad de apoderado.' },
     requiredSections: [
       { n: 1, name: 'Identificación del afiliado y de la entidad demandada', mandatory: true, basis: 'Art. 41' },
       { n: 2, name: 'Materia sobre la que versa, entre las de competencia jurisdiccional de la Supersalud', mandatory: true, basis: 'Art. 41' },
@@ -208,7 +209,7 @@ export const SUPERINTENDENCIAS_CATALOG: BranchCatalog = {
       { n: 4, name: 'Pretensión concreta y su fundamento en el plan de beneficios', mandatory: true, basis: 'Art. 41' },
       { n: 5, name: 'Pruebas: historia clínica, órdenes médicas y respuestas de la entidad', mandatory: true, basis: 'Art. 41' }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=90185'
+    sourceUrl: 'https://normograma.supersalud.gov.co/compilacion/docs/ley_1122_2007.htm'
   },
   {
     id: 'superintendencias/recurso-de-apelacion-contra-sentencia-de-la-superintendencia-nacional-de-salud',
@@ -217,14 +218,14 @@ export const SUPERINTENDENCIAS_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1122 de 2007, art. 41, modificado por el art. 6 de la Ley 1949 de 2019',
     competentAuthority: 'Sala Laboral del Tribunal Superior del Distrito Judicial del domicilio del apelante',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'La sentencia podrá ser apelada dentro de los tres (3) días siguientes a su notificación; concedido el recurso, el expediente se remite al Tribunal Superior del Distrito Judicial - Sala Laboral del domicilio del apelante (art. 41 de la Ley 1122 de 2007, modificado por el art. 6 de la Ley 1949 de 2019).' },
     requiredSections: [
       { n: 1, name: 'Identificación de la sentencia apelada y de su notificación', mandatory: true, basis: 'Art. 41' },
       { n: 2, name: 'Determinación del domicilio del apelante, que fija el tribunal competente', mandatory: true, basis: 'Art. 41' },
       { n: 3, name: 'Reparos concretos contra la sentencia', mandatory: true, basis: 'Art. 41' },
       { n: 4, name: 'Petición de revocatoria o modificación', mandatory: true, basis: 'Art. 41' }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=90185'
+    sourceUrl: 'https://normograma.supersalud.gov.co/compilacion/docs/ley_1122_2007.htm'
   },
   {
     id: 'superintendencias/queja-ante-el-defensor-del-consumidor-financiero',
@@ -267,14 +268,14 @@ export const SUPERINTENDENCIAS_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1480 de 2011, arts. 59 a 61',
     competentAuthority: 'Superintendencia de Industria y Comercio en funciones administrativas',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'La Ley 1480 de 2011 no fija plazo para presentar la denuncia; su art. 60 remite el procedimiento sancionatorio al Código Contencioso Administrativo, hoy Ley 1437 de 2011. Rige por tanto el art. 52 del CPACA: salvo lo dispuesto en leyes especiales, la facultad de imponer sanciones caduca a los tres (3) años de ocurrido el hecho, la conducta u omisión, término dentro del cual el acto que impone la sanción debe haber sido expedido y notificado; si la conducta es continuada, los tres (3) años se cuentan desde el día siguiente a aquel en que cesó la infracción. Denunciar después de ese término es inútil: la SIC ya no puede sancionar.' },
     requiredSections: [
       { n: 1, name: 'Identificación del denunciante y del investigado', mandatory: true, basis: 'Art. 59' },
       { n: 2, name: 'Conducta que infringe las normas de protección al consumidor', mandatory: true, basis: 'Art. 59' },
       { n: 3, name: 'Pruebas de la conducta', mandatory: true, basis: 'Art. 59' },
       { n: 4, name: 'Advertencia: la vía administrativa sanciona pero no indemniza; para eso está la acción jurisdiccional', mandatory: true, basis: 'Arts. 56 y 61' }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=44306'
+    sourceUrl: 'https://normograma.supersalud.gov.co/compilacion/docs/ley_1437_2011.htm'
   },
   {
     id: 'superintendencias/sentencia-de-proteccion-al-consumidor',
@@ -333,7 +334,7 @@ export const SUPERINTENDENCIAS_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 1581 de 2012, arts. 22 a 24',
     competentAuthority: 'Superintendencia de Industria y Comercio, Delegatura para la Protección de Datos Personales',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'La Ley 1581 de 2012 no fija términos procesales: su art. 22 dispone que en lo no reglado se siguen las normas del Código Contencioso Administrativo, hoy Ley 1437 de 2011. Rigen entonces el art. 47 del CPACA —quince (15) días siguientes a la notificación de la formulación de cargos para presentar descargos y pedir pruebas— y el art. 52 —la facultad sancionatoria caduca a los tres (3) años de ocurrido el hecho, la conducta u omisión, dentro de los cuales la resolución sancionatoria debe haber sido expedida y notificada; los recursos deben resolverse dentro de un (1) año desde su interposición oportuna, so pena de que se entiendan fallados a favor del recurrente, y la sanción impuesta prescribe a los cinco (5) años contados desde la ejecutoria.' },
     requiredSections: [
       { n: 1, name: 'Identificación del responsable o encargado investigado', mandatory: true, basis: 'Art. 22' },
       { n: 2, name: 'Conducta infractora y norma vulnerada', mandatory: true, basis: 'Art. 23' },
@@ -341,7 +342,7 @@ export const SUPERINTENDENCIAS_CATALOG: BranchCatalog = {
       { n: 4, name: 'Aplicación de los criterios de graduación de la sanción', mandatory: true, basis: 'Art. 24' },
       { n: 5, name: 'Sanción impuesta: multa, suspensión, cierre temporal o definitivo', mandatory: true, basis: 'Art. 23' }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=49981'
+    sourceUrl: 'https://normograma.supersalud.gov.co/compilacion/docs/ley_1437_2011.htm'
   },
   {
     id: 'superintendencias/sentencia-de-la-superintendencia-nacional-de-salud',

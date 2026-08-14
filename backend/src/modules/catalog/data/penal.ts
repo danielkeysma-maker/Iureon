@@ -13,9 +13,10 @@ import type { BranchCatalog } from '../types';
 export const PENAL_CATALOG: BranchCatalog = {
   meta: {
     branch: 'PENAL',
-    verifiedAt: '2026-08-12',
+    verifiedAt: '2026-08-14',
     sourceOfTruth: 'Ley 906 de 2004 (Código de Procedimiento Penal, sistema acusatorio), vigente con sus modificaciones; texto consultado el 12 de agosto de 2026. Los términos marcados como verificados fueron leídos artículo por artículo en el texto de la norma.',
     gaps: [
+    'NOTA (2026-08-14): la lista siguiente es anterior a la verificacion masiva de esta fecha. Varios de esos huecos quedaron cerrados; los vigentes estan en _meta.unverified con su razon. Ver research/VERIFICATION-2026-08-14.md.',
     'NO CONFUNDIR PROYECTOS CON LEY VIGENTE. En julio de 2026 circularon publicaciones que anunciaban la supresión de la audiencia de imputación, la audiencia unificada de acusación y preparatoria, y el fallo escrito. Esas descripciones corresponden a PROYECTOS de reforma entregados el 30 de julio de 2026, no a derecho vigente. Se verificó lo contrario en el texto en vigor: los arts. 175 y 317 siguen contando sus términos desde la formulación de la imputación, de modo que esa audiencia existe. Este catálogo refleja el código vigente, no las reformas propuestas.',
     'COEXISTEN DOS SISTEMAS PROCESALES PENALES. La Ley 906 de 2004 rige las conductas cometidas a partir de su entrada en vigencia gradual; las anteriores siguen bajo la Ley 600 de 2000, con instituciones y términos distintos. Antes de aplicar cualquier término, confirme la fecha de la conducta. Este catálogo cubre únicamente la Ley 906.',
     'El procedimiento abreviado y la figura del acusador privado (Ley 1826 de 2017) tienen términos propios que no se verificaron; solo se cataloga su estructura.',
@@ -32,7 +33,7 @@ export const PENAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 906 de 2004, arts. 67 y 69',
     competentAuthority: 'Fiscalía General de la Nación; también policía judicial y autoridades habilitadas para recibirla',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'La denuncia no caduca: el Código solo fija caducidad para la querella —seis (6) meses siguientes a la comisión de la conducta punible (art. 73)—, mientras que respecto de los delitos investigables de oficio el art. 66 impone a la Fiscalía el deber ineludible de ejercer la acción penal y el art. 67 el deber de denunciar, sin señalar plazo alguno. Su único límite temporal es la prescripción de la acción penal. En consecuencia, no opera caducidad de la denuncia.' },
     requiredSections: [
       { n: 1, name: 'Identificación del denunciante y su declaración bajo juramento', mandatory: true, basis: 'Art. 69' },
       { n: 2, name: 'Relato detallado de los hechos, con fecha, hora y lugar', mandatory: true, basis: 'Art. 69' },
@@ -40,7 +41,7 @@ export const PENAL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Elementos materiales probatorios que se aportan', mandatory: false, basis: 'Art. 69' },
       { n: 5, name: 'Dirección para notificaciones', mandatory: true, basis: null }
     ],
-    sourceUrl: 'https://leyes.co/codigo_de_procedimiento_penal/69.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr001.html'
   },
   {
     id: 'penal/querella',
@@ -133,14 +134,14 @@ export const PENAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 906 de 2004, arts. 176 a 179',
     competentAuthority: 'El superior del juez que profirió la decisión',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'Contra autos: se interpone, se sustenta y se corre traslado a los no impugnantes en la respectiva audiencia; concedido, el juez lo resuelve en el término de cinco (5) días y cita a audiencia de lectura de auto dentro de los cinco (5) días siguientes (art. 178, modificado por el art. 90 de la Ley 1395 de 2010). Contra sentencias: se interpone en la audiencia de lectura de fallo y se sustenta oralmente en ella o por escrito dentro de los cinco (5) días siguientes, precluido lo cual corre traslado común a los no recurrentes por cinco (5) días; el juez de segunda instancia resuelve en quince (15) días y cita a lectura de fallo dentro de los diez (10) días siguientes (art. 179, modificado por el art. 91 de la Ley 1395 de 2010). Si no se sustenta, el recurso se declara desierto (art. 179A).' },
     requiredSections: [
       { n: 1, name: 'Identificación de la decisión apelada: auto adoptado en audiencia o sentencia', mandatory: true, basis: 'Art. 176' },
       { n: 2, name: 'Manifestación expresa de interponer la apelación', mandatory: true, basis: 'Art. 176' },
       { n: 3, name: 'Sustentación: reparos concretos contra la decisión', mandatory: true, basis: 'Art. 179' },
       { n: 4, name: 'Petición de revocatoria o modificación', mandatory: true, basis: 'Art. 179' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_de_procedimiento_penal/176.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr004.html'
   },
   {
     id: 'penal/interposicion-del-recurso-de-casacion-penal',
@@ -181,14 +182,14 @@ export const PENAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 906 de 2004, arts. 192 a 198',
     competentAuthority: 'La Sala de Casación Penal de la Corte Suprema de Justicia o el tribunal, según quién profirió la sentencia',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'La acción de revisión no caduca: los arts. 192 a 198 no fijan término para promoverla, pues procede contra sentencias ejecutoriadas por las causales taxativas del art. 192 sin sujeción a plazo. Los términos que sí corren son los del trámite (art. 195): admisión de la demanda dentro de los cinco (5) días siguientes al reparto, apertura a prueba por quince (15) días, práctica de pruebas en audiencia dentro de los treinta (30) días siguientes, registro de proyecto en diez (10) días y decisión dentro de los veinte (20) días siguientes.' },
     requiredSections: [
       { n: 1, name: 'Identificación de la sentencia ejecutoriada que se revisa', mandatory: true, basis: 'Art. 192' },
       { n: 2, name: 'Causal de revisión invocada', mandatory: true, basis: 'Art. 192' },
       { n: 3, name: 'Hechos y pruebas nuevas que la configuran', mandatory: true, basis: 'Art. 194' },
       { n: 4, name: 'Petición de pruebas', mandatory: true, basis: 'Art. 194' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_de_procedimiento_penal/192.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr004.html'
   },
   {
     id: 'penal/solicitud-de-nulidad-procesal-penal',
@@ -197,14 +198,14 @@ export const PENAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 906 de 2004, arts. 455 a 458',
     competentAuthority: 'El juez que conoce de la actuación',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'La ley no fija plazo de caducidad para invocar la nulidad: los arts. 455 a 458 regulan las causales (prueba ilícita, incompetencia del juez y violación de garantías fundamentales) y el principio de taxatividad, sin señalar término alguno, de modo que no opera caducidad. La oportunidad procesal expresamente prevista para alegarlas oralmente es la audiencia de formulación de acusación, al abrirse el traslado del escrito de acusación (art. 339). Los recursos de apelación pendientes de definición al iniciarse el juicio oral, salvo los relativos a la negativa o admisión de pruebas, no invalidan el procedimiento (art. 457, inc. 2).' },
     requiredSections: [
       { n: 1, name: 'Causal de nulidad invocada', mandatory: true, basis: 'Art. 457' },
       { n: 2, name: 'Identificación del acto procesal afectado', mandatory: true, basis: 'Art. 457' },
       { n: 3, name: 'Demostración de la afectación sustancial al debido proceso o al derecho de defensa', mandatory: true, basis: 'Art. 457' },
       { n: 4, name: 'Petición de invalidez y de rehacer la actuación', mandatory: true, basis: 'Art. 457' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_de_procedimiento_penal/457.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr011.html'
   },
   {
     id: 'penal/solicitud-de-sustitucion-de-la-detencion-preventiva',
@@ -213,14 +214,14 @@ export const PENAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 906 de 2004, art. 314',
     competentAuthority: 'Juez de control de garantías',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'El art. 314 no fija término ni caducidad para pedir la sustitución de la detención preventiva por la del lugar de residencia: procede mientras la medida esté vigente, al configurarse alguna de sus causales (numerales 3 y 5 modificados por el art. 17 de la Ley 2292 de 2023), de manera que no opera caducidad. Sí existe un límite de oportunidad: la revocatoria o sustitución de la medida solo puede solicitarse por una sola vez ante el juez de control de garantías (art. 318). Además, vencido el término máximo de un (1) año de la medida privativa de la libertad —prorrogable hasta por el mismo término inicial en los casos allí previstos—, el juez podrá sustituirla a petición de la Fiscalía, la defensa o el apoderado de la víctima (art. 307, parágrafo 1, modificado por el art. 1 de la Ley 1786 de 2016).' },
     requiredSections: [
       { n: 1, name: 'Identificación de la medida de aseguramiento vigente', mandatory: true, basis: 'Art. 314' },
       { n: 2, name: 'Causal de sustitución invocada', mandatory: true, basis: 'Art. 314' },
       { n: 3, name: 'Prueba de la circunstancia alegada: enfermedad grave, edad, maternidad o cabeza de familia', mandatory: true, basis: 'Art. 314' },
       { n: 4, name: 'Ofrecimiento de caución y compromiso de comparecencia', mandatory: false, basis: 'Art. 314' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_de_procedimiento_penal/314.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr007.html'
   },
   {
     id: 'penal/solicitud-de-preacuerdo-o-negociacion-con-la-fiscalia',
@@ -229,7 +230,7 @@ export const PENAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 906 de 2004, arts. 348 a 354',
     competentAuthority: 'Se acuerda con la Fiscalía y lo aprueba el juez de conocimiento',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'Desde la audiencia de formulación de imputación y hasta antes de ser presentado el escrito de acusación, con rebaja de hasta la mitad de la pena imponible (arts. 350 y 351). Presentada la acusación y hasta el momento en que el acusado sea interrogado al inicio del juicio oral sobre la aceptación de su responsabilidad, el preacuerdo sigue siendo procedente y la pena imponible se reduce en una tercera parte (art. 352).' },
     requiredSections: [
       { n: 1, name: 'Identificación del imputado o acusado y de los cargos', mandatory: true, basis: 'Art. 350' },
       { n: 2, name: 'Términos del preacuerdo: cargos aceptados y rebaja convenida', mandatory: true, basis: 'Arts. 350 y 351' },
@@ -237,7 +238,7 @@ export const PENAL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Pronunciamiento sobre la reparación a las víctimas', mandatory: true, basis: 'Art. 351' },
       { n: 5, name: 'Solicitud de aprobación al juez de conocimiento', mandatory: true, basis: 'Art. 351' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_de_procedimiento_penal/350.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr008.html'
   },
   {
     id: 'penal/solicitud-de-aplicacion-del-principio-de-oportunidad',
@@ -246,7 +247,7 @@ export const PENAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 906 de 2004, arts. 321 a 330',
     competentAuthority: 'La Fiscalía lo aplica; el juez de control de garantías ejerce el control de legalidad',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'La Fiscalía puede suspender, interrumpir o renunciar a la persecución penal en la indagación, en la investigación o en el juicio hasta antes de la audiencia de juzgamiento, y el plazo para que el procesado cumpla los compromisos adquiridos es máximo de un (1) año, prorrogable por el mismo tiempo (art. 323, modificado por el art. 7 de la Ley 2477 de 2025). El juez de control de garantías debe efectuar el control de legalidad, obligatorio y automático, dentro de los cinco (5) días siguientes a la determinación de la Fiscalía de dar aplicación al principio de oportunidad (art. 327). La suspensión del procedimiento a prueba puede solicitarse hasta antes de la audiencia de juzgamiento y el período de prueba no puede ser superior a tres (3) años (arts. 325 y 326).' },
     requiredSections: [
       { n: 1, name: 'Identificación del proceso y del imputado', mandatory: true, basis: 'Art. 324' },
       { n: 2, name: 'Causal de aplicación invocada entre las taxativas', mandatory: true, basis: 'Art. 324' },
@@ -254,7 +255,7 @@ export const PENAL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Pronunciamiento sobre los derechos de las víctimas', mandatory: true, basis: 'Art. 328' },
       { n: 5, name: 'Modalidad solicitada: suspensión, interrupción o renuncia de la acción penal', mandatory: true, basis: 'Art. 323' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_de_procedimiento_penal/324.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr007.html'
   },
   {
     id: 'penal/solicitud-de-habeas-corpus',
@@ -263,14 +264,14 @@ export const PENAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Constitución Política, art. 30; Ley 1095 de 2006',
     competentAuthority: 'Cualquier juez o tribunal del lugar donde se encuentre la persona privada de la libertad',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'El habeas corpus no caduca: puede invocarse en cualquier tiempo mientras la violación persista, y debe ser resuelto en un término de treinta y seis (36) horas (Ley 1095 de 2006, art. 3, numerales 1 y 3). La acción únicamente puede invocarse por una sola vez y no se suspende ni en los estados de excepción (art. 1). La providencia que la niegue puede impugnarse dentro de los tres (3) días calendario siguientes a la notificación; el juez remite las diligencias dentro de las veinticuatro (24) horas siguientes y el superior falla dentro de los tres (3) días hábiles siguientes (art. 7).' },
     requiredSections: [
       { n: 1, name: 'Identificación de la persona privada de la libertad', mandatory: true, basis: 'Ley 1095 de 2006' },
       { n: 2, name: 'Lugar de reclusión y autoridad que ordenó o mantiene la privación', mandatory: true, basis: 'Ley 1095 de 2006' },
       { n: 3, name: 'Hechos que configuran la privación ilegal o su prolongación indebida', mandatory: true, basis: 'Ley 1095 de 2006' },
       { n: 4, name: 'Petición de libertad inmediata', mandatory: true, basis: 'C.P. art. 30' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_de_procedimiento_penal/297.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1095_2006.html'
   },
   {
     id: 'penal/descubrimiento-probatorio-de-la-defensa',
@@ -279,14 +280,14 @@ export const PENAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 906 de 2004, arts. 344 a 347',
     competentAuthority: 'Ante el juez de conocimiento, en audiencia preparatoria',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'El descubrimiento se cumple dentro de la audiencia de formulación de acusación; cuando el juez ordena descubrir, exhibir o entregar copia de un elemento material probatorio específico, el plazo máximo para cumplirlo es de tres (3) días (art. 344). Lo que debiendo descubrirse no se descubra no podrá aducirse al proceso ni practicarse en el juicio, y el juez está obligado a rechazarlo, salvo que la omisión obedezca a causas no imputables a la parte afectada (art. 346).' },
     requiredSections: [
       { n: 1, name: 'Relación de los elementos materiales probatorios y evidencia física', mandatory: true, basis: 'Art. 344' },
       { n: 2, name: 'Relación de los testigos y peritos que se pretende hacer comparecer', mandatory: true, basis: 'Art. 344' },
       { n: 3, name: 'Puesta a disposición de la contraparte para su examen', mandatory: true, basis: 'Art. 344' },
       { n: 4, name: 'Advertencia de que lo no descubierto no podrá aducirse en el juicio', mandatory: true, basis: 'Art. 346' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_de_procedimiento_penal/344.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr008.html'
   },
   {
     id: 'penal/alegatos-de-conclusion-en-juicio-oral',
@@ -295,14 +296,14 @@ export const PENAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 906 de 2004, art. 443',
     competentAuthority: 'Juez de conocimiento, en el juicio oral',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'La ley no fija plazo ni caducidad para los alegatos de conclusión: se exponen oralmente en el juicio, en el orden del art. 443 (Fiscalía, representante de las víctimas, Ministerio Público y, finalmente, la defensa, que conserva en todo caso el último turno de intervención argumentativa), de modo que no opera caducidad. Lo único sujeto a límite es su extensión, que el juez delimita en cada caso según el volumen de la prueba practicada y la complejidad de los cargos (art. 444). Cerrado el debate, el juez puede decretar un receso de hasta dos (2) horas para anunciar el sentido del fallo (art. 445).' },
     requiredSections: [
       { n: 1, name: 'Síntesis de la teoría del caso sostenida', mandatory: true, basis: 'Art. 443' },
       { n: 2, name: 'Análisis de la prueba efectivamente practicada en el juicio', mandatory: true, basis: 'Art. 443' },
       { n: 3, name: 'Confrontación con la teoría del caso de la contraparte', mandatory: true, basis: 'Art. 443' },
       { n: 4, name: 'Petición concreta de condena o absolución', mandatory: true, basis: 'Art. 443' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_de_procedimiento_penal/443.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr010.html'
   },
   {
     id: 'penal/solicitud-de-incidente-de-reparacion-integral',
@@ -311,14 +312,14 @@ export const PENAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 906 de 2004, arts. 102 a 108',
     competentAuthority: 'Juez de conocimiento que profirió el fallo',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'La solicitud caduca treinta (30) días después de haber quedado en firme el fallo condenatorio (art. 106, modificado por el art. 89 de la Ley 1395 de 2010). Presentada en tiempo, el juez fallador convoca dentro de los ocho (8) días siguientes la audiencia pública con la que da inicio al incidente (art. 102, modificado por el art. 86 de la Ley 1395 de 2010); si no prospera la conciliación, fija nueva audiencia dentro de los ocho (8) días siguientes (art. 103).' },
     requiredSections: [
       { n: 1, name: 'Acreditación de la calidad de víctima', mandatory: true, basis: 'Art. 102' },
       { n: 2, name: 'Identificación de la sentencia condenatoria en firme', mandatory: true, basis: 'Art. 102' },
       { n: 3, name: 'Pretensiones de reparación: daño emergente, lucro cesante y perjuicios morales', mandatory: true, basis: 'Art. 103' },
       { n: 4, name: 'Pruebas del daño y de su cuantía', mandatory: true, basis: 'Art. 103' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_de_procedimiento_penal/102.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr002.html'
   },
   {
     id: 'penal/escrito-de-acusacion-del-acusador-privado',
@@ -327,7 +328,7 @@ export const PENAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1826 de 2017; Ley 906 de 2004, arts. 336 y 337',
     competentAuthority: 'Juez de conocimiento, en el procedimiento especial abreviado',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'La conversión de la acción penal pública en privada debe solicitarse ante el fiscal del caso hasta antes del traslado del escrito de acusación, y el fiscal dispone de un (1) mes desde la fecha de recibo para resolverla de fondo (arts. 552 y 553). Autorizada la conversión, el acusador privado hace las veces de fiscal y se rigen su actuación por las reglas del procedimiento especial abreviado (art. 551): surtido el traslado de la acusación al indiciado, debe presentar el escrito de acusación ante el juez competente dentro de los cinco (5) días siguientes (art. 540), anexando la orden que autoriza la conversión (arts. 538 num. 4 y 561). A partir del traslado del escrito de acusación el indiciado tiene sesenta (60) días para preparar su defensa y la audiencia concentrada se realiza dentro de los diez (10) días siguientes al vencimiento de ese término (art. 541).' },
     requiredSections: [
       { n: 1, name: 'Acreditación de la conversión de la acción penal y de la calidad de acusador privado', mandatory: true, basis: 'Ley 1826 de 2017' },
       { n: 2, name: 'Individualización del acusado', mandatory: true, basis: 'Art. 337 num. 1' },
@@ -335,7 +336,7 @@ export const PENAL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Relación de los bienes afectados con fines de comiso', mandatory: false, basis: 'Art. 337 num. 3' },
       { n: 5, name: 'Descubrimiento de los elementos materiales probatorios', mandatory: true, basis: 'Art. 337 num. 5' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_de_procedimiento_penal/337.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr013.html'
   },
   {
     id: 'penal/escrito-de-acusacion',
@@ -378,14 +379,14 @@ export const PENAL_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 906 de 2004, arts. 306 a 313',
     competentAuthority: 'Fiscalía o Ministerio Público ante el juez de control de garantías',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'Los arts. 306 y 308 no fijan término ni caducidad para solicitar la medida de aseguramiento: la Fiscalía —y también la víctima o su apoderado en los términos del art. 306— puede pedirla ante el juez de control de garantías mientras dure la actuación, de modo que no opera caducidad. Lo que sí tiene término es su duración: la medida privativa de la libertad no puede exceder de un (1) año, prorrogable hasta por el mismo término inicial cuando el proceso se surta ante la justicia penal especializada, haya tres (3) o más acusados con detención vigente o se trate de actos de corrupción de la Ley 1474 de 2011 (art. 307, parágrafo 1, modificado por el art. 1 de la Ley 1786 de 2016); tres (3) años para miembros de Grupos Delictivos Organizados y cuatro (4) años para Grupos Armados Organizados (art. 307A); y ciento ochenta (180) días en el procedimiento especial abreviado (art. 548).' },
     requiredSections: [
       { n: 1, name: 'Inferencia razonable de autoría o participación, con los elementos que la sustentan', mandatory: true, basis: 'Art. 308' },
       { n: 2, name: 'Demostración del fin constitucional: obstrucción, peligro para la comunidad o para la víctima, o no comparecencia', mandatory: true, basis: 'Art. 308' },
       { n: 3, name: 'Juicio de necesidad, adecuación, proporcionalidad y razonabilidad', mandatory: true, basis: 'Art. 308' },
       { n: 4, name: 'Medida concreta solicitada: privativa o no privativa de la libertad', mandatory: true, basis: 'Arts. 307 y 308' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_de_procedimiento_penal/308.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr007.html'
   },
   {
     id: 'penal/auto-de-control-de-legalidad-de-la-captura',
@@ -411,7 +412,7 @@ export const PENAL_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 906 de 2004, arts. 331 a 335',
     competentAuthority: 'Juez de conocimiento',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'El fiscal solicitará la preclusión en cualquier momento, una vez sobrevenga alguna de las causales del art. 332 (art. 331, modificado por el art. 9 de la Ley 2477 de 2025). Previa solicitud, el juez de conocimiento cita a audiencia dentro de los cinco (5) días siguientes; en ella no hay lugar a solicitud ni práctica de pruebas y, agotado el debate, el juez puede decretar un receso de hasta una (1) hora para preparar la decisión, que motivará oralmente (art. 333).' },
     requiredSections: [
       { n: 1, name: 'Identificación de la causal de preclusión acreditada', mandatory: true, basis: 'Art. 332' },
       { n: 2, name: 'Análisis de los elementos materiales probatorios', mandatory: true, basis: 'Art. 333' },
@@ -419,7 +420,7 @@ export const PENAL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Cesación de la medida de aseguramiento y de las cautelares', mandatory: true, basis: 'Art. 334' },
       { n: 5, name: 'Efecto de cosa juzgada de la decisión', mandatory: true, basis: 'Art. 334' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_de_procedimiento_penal/334.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr008.html'
   },
   {
     id: 'penal/sentencia-penal-condenatoria',
@@ -446,14 +447,14 @@ export const PENAL_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 906 de 2004, arts. 446 y 448',
     competentAuthority: 'Juez de conocimiento',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'El sentido del fallo se da a conocer oral y públicamente inmediatamente después del receso de hasta dos (2) horas que sigue al cierre del debate (arts. 445 y 446). La audiencia para proferir sentencia debe señalarse en un término que no podrá exceder de quince (15) días contados a partir de la terminación del juicio oral, plazo que el parágrafo del art. 447 extiende expresamente a la sentencia absolutoria (art. 447, modificado por el art. 100 de la Ley 1395 de 2010). En el procedimiento especial abreviado el juez cuenta con diez (10) días para proferir la sentencia y correr traslado escrito de la misma (art. 545). De ser absuelto de la totalidad de los cargos, el juez dispone la libertad inmediata y levanta todas las medidas cautelares (art. 449).' },
     requiredSections: [
       { n: 1, name: 'Identificación del acusado y de los cargos', mandatory: true, basis: 'Art. 446' },
       { n: 2, name: 'Análisis de la prueba practicada y de la duda razonable', mandatory: true, basis: 'Art. 448' },
       { n: 3, name: 'Declaración de absolución', mandatory: true, basis: 'Art. 446' },
       { n: 4, name: 'Orden de libertad inmediata y de cesación de las medidas cautelares', mandatory: true, basis: 'Art. 449' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_de_procedimiento_penal/448.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr010.html'
   },
   {
     id: 'penal/auto-que-decreta-pruebas-en-audiencia-preparatoria',

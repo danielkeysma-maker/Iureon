@@ -13,9 +13,10 @@ import type { BranchCatalog } from '../types';
 export const CIVIL_CATALOG: BranchCatalog = {
   meta: {
     branch: 'CIVIL',
-    verifiedAt: '2026-08-12',
+    verifiedAt: '2026-08-14',
     sourceOfTruth: 'Ley 1564 de 2012 (Código General del Proceso), texto vigente. Los términos marcados como verificados fueron leídos artículo por artículo en el texto de la norma; los no verificados quedan declarados como tales y la aplicación se abstiene de afirmarlos.',
     gaps: [
+    'NOTA (2026-08-14): la lista siguiente es anterior a la verificacion masiva de esta fecha. Varios de esos huecos quedaron cerrados; los vigentes estan en _meta.unverified con su razon. Ver research/VERIFICATION-2026-08-14.md.',
     'Recurso de queja: los artículos 352 y 353 fijan el trámite pero el término de interposición no se pudo leer en la fuente consultada. Queda sin verificar.',
     'Restitución de inmueble arrendado (art. 384): el traslado sigue las reglas del proceso verbal o verbal sumario según la cuantía, de modo que el término depende del trámite y no se afirma aquí.',
     'Procesos de sucesión, liquidación de sociedad conyugal e insolvencia de persona natural: catalogados en su estructura, con términos sin verificar.',
@@ -73,7 +74,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, arts. 82, 422 y 430',
     competentAuthority: 'Juez civil del circuito o municipal, según la cuantía',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'Ni el art. 82 (requisitos de la demanda), ni el art. 422 (título ejecutivo), ni el art. 430 (mandamiento ejecutivo) fijan plazo para presentar la demanda ejecutiva singular: no opera caducidad para su presentación, pues la oportunidad depende de la exigibilidad y de la prescripción de la obligación sustancial (art. 422 exige obligación expresa, clara y exigible). El único término que la norma sí fija es incidental: revocado el mandamiento de pago por ausencia de los requisitos del título, el demandante puede presentar demanda declarativa dentro de los cinco (5) días siguientes a la ejecutoria de ese auto, dentro del mismo expediente (art. 430, inc. 3).' },
     requiredSections: [
       { n: 1, name: 'Designación del juez a quien se dirige', mandatory: true, basis: 'Art. 82 num. 1' },
       { n: 2, name: 'Identificación de ejecutante y ejecutado', mandatory: true, basis: 'Art. 82 num. 2' },
@@ -84,7 +85,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 7, name: 'Solicitud de medidas cautelares', mandatory: false, basis: 'Art. 599' },
       { n: 8, name: 'Lugar y dirección para notificaciones', mandatory: true, basis: 'Art. 82 num. 10' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/430.htm'
+    sourceUrl: 'https://www.alcaldiabogota.gov.co/sisjur/normas/Norma1.jsp?i=48425'
   },
   {
     id: 'civil/demanda-ejecutiva-con-garantia-real',
@@ -93,7 +94,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, arts. 422, 430 y 468',
     competentAuthority: 'Juez civil del circuito o municipal, según la cuantía',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'El certificado del registrador que se anexa a la demanda no puede haber sido expedido con antelación superior a un (1) mes (art. 468 num. 1). Los acreedores hipotecarios o prendarios citados disponen de diez (10) días contados desde su respectiva notificación para hacer valer sus créditos, y el curador ad litem que se designe dispone de diez (10) días desde su notificación para presentar la demanda (art. 468 num. 4). El proceso ejecutivo de los acreedores que no concurrieron debe iniciarse dentro de los treinta (30) días siguientes al pago, vencidos los cuales el saldo se entrega al ejecutado (art. 468 num. 4). El término del ejecutado para proponer excepciones de mérito no lo fija el artículo 468 sino el artículo 442 num. 1: diez (10) días siguientes a la notificación del mandamiento ejecutivo.' },
     requiredSections: [
       { n: 1, name: 'Designación del juez', mandatory: true, basis: 'Art. 82 num. 1' },
       { n: 2, name: 'Identificación de las partes', mandatory: true, basis: 'Art. 82 num. 2' },
@@ -103,7 +104,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 6, name: 'Solicitud de embargo y secuestro del bien gravado', mandatory: false, basis: 'Art. 468' },
       { n: 7, name: 'Lugar y dirección para notificaciones', mandatory: true, basis: 'Art. 82 num. 10' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/468.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=48425'
   },
   {
     id: 'civil/subsanacion-de-demanda-inadmitida',
@@ -128,13 +129,13 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, art. 93',
     competentAuthority: 'El juez que conoce del proceso',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'El demandante puede corregir, aclarar o reformar la demanda en cualquier momento, desde su presentación y hasta antes del señalamiento de la audiencia inicial, y la reforma procede por una sola vez (art. 93, incs. 1 y 2). Si la reforma es posterior a la notificación del demandado, el auto que la admite se notifica por estado y se corre traslado al demandado o su apoderado por la mitad del término inicial, que corre pasados tres (3) días desde la notificación; a los nuevos demandados se les notifica personalmente y se les corre traslado en la forma y por el término de la demanda inicial (art. 93, num. 4).' },
     requiredSections: [
       { n: 1, name: 'Identificación del proceso y de la demanda que se reforma', mandatory: true, basis: 'Art. 93' },
       { n: 2, name: 'Escrito integrado de la demanda con las modificaciones', mandatory: true, basis: 'Art. 93' },
       { n: 3, name: 'Indicación de las partes, hechos o pretensiones modificadas', mandatory: true, basis: 'Art. 93' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/93.htm'
+    sourceUrl: 'https://www.alcaldiabogota.gov.co/sisjur/normas/Norma1.jsp?i=48425'
   },
   {
     id: 'civil/contestacion-de-la-demanda-en-proceso-verbal',
@@ -178,14 +179,14 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, arts. 100 y 101',
     competentAuthority: 'El juez que conoce del proceso',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'Las excepciones previas deben proponerse dentro del término de traslado de la demanda, en escrito separado que exprese las razones y hechos en que se fundamentan y al que deben acompañarse todas las pruebas en poder del demandado (arts. 100, inc. 1, y 101, inc. 1). Del escrito se corre traslado al demandante por tres (3) días conforme al art. 110 (art. 101, num. 1). Dentro del traslado de la reforma de la demanda el demandado puede proponer nuevas excepciones previas siempre que se originen en dicha reforma (art. 101, num. 3).' },
     requiredSections: [
       { n: 1, name: 'Enunciación de la causal invocada entre las taxativas del art. 100', mandatory: true, basis: 'Art. 100' },
       { n: 2, name: 'Hechos en que se funda cada excepción', mandatory: true, basis: 'Art. 101' },
       { n: 3, name: 'Pruebas que se pretende hacer valer', mandatory: true, basis: 'Art. 101' },
       { n: 4, name: 'Petición de que se declare probada la excepción', mandatory: true, basis: 'Art. 101' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/100.htm'
+    sourceUrl: 'https://www.alcaldiabogota.gov.co/sisjur/normas/Norma1.jsp?i=48425'
   },
   {
     id: 'civil/excepciones-de-merito-en-proceso-ejecutivo',
@@ -210,14 +211,14 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, arts. 82 y 371',
     competentAuthority: 'El juez que conoce de la demanda principal',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'La reconvención debe proponerse durante el término del traslado de la demanda (art. 371), que en el proceso verbal es de veinte (20) días (art. 369). Vencido el término del traslado de la demanda inicial a todos los demandados, se corre traslado de la reconvención al demandante por el mismo término de la inicial (art. 371).' },
     requiredSections: [
       { n: 1, name: 'Requisitos generales de la demanda', mandatory: true, basis: 'Art. 82' },
       { n: 2, name: 'Demostración de que el juez es competente para conocer de la reconvención', mandatory: true, basis: 'Art. 371' },
       { n: 3, name: 'Pretensiones propias del demandado contra el demandante', mandatory: true, basis: 'Art. 371' },
       { n: 4, name: 'Petición de pruebas', mandatory: true, basis: 'Art. 82 num. 6' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/371.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=48425'
   },
   {
     id: 'civil/llamamiento-en-garantia',
@@ -226,14 +227,14 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, arts. 64 a 66',
     competentAuthority: 'El juez que conoce del proceso',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'El llamamiento en garantía debe pedirse en la demanda o dentro del término para contestarla (art. 64). Admitido, se ordena notificar personalmente al convocado y correrle traslado del escrito por el término de la demanda inicial; si la notificación no se logra dentro de los seis (6) meses siguientes, el llamamiento será ineficaz (art. 66, inc. 1).' },
     requiredSections: [
       { n: 1, name: 'Nombre y domicilio del llamado y de su representante', mandatory: true, basis: 'Art. 66' },
       { n: 2, name: 'Hechos en que se basa el llamamiento y fundamentos de derecho', mandatory: true, basis: 'Art. 66' },
       { n: 3, name: 'Dirección para notificar al llamado', mandatory: true, basis: 'Art. 66' },
       { n: 4, name: 'Prueba siquiera sumaria del derecho legal o contractual invocado', mandatory: true, basis: 'Art. 64' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/64.htm'
+    sourceUrl: 'https://www.alcaldiabogota.gov.co/sisjur/normas/Norma1.jsp?i=48425'
   },
   {
     id: 'civil/solicitud-de-medidas-cautelares',
@@ -242,7 +243,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, art. 590',
     competentAuthority: 'El juez que conoce del proceso',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'En los procesos declarativos las medidas cautelares pueden pedirse por el demandante desde la presentación de la demanda (art. 590, num. 1); la norma no señala fecha límite para solicitarlas: no opera caducidad de la solicitud. El demandante debe prestar caución equivalente al veinte por ciento (20%) del valor de las pretensiones estimadas, salvo para embargos y secuestros posteriores a sentencia favorable de primera instancia (art. 590, num. 2). Por remisión expresa del parágrafo segundo del art. 590, las medidas de los literales b) y c) se levantarán si el demandante no promueve la ejecución dentro del término del art. 306, esto es, dentro de los treinta (30) días siguientes a la ejecutoria de la sentencia o a la notificación del auto de obedecimiento a lo resuelto por el superior.' },
     requiredSections: [
       { n: 1, name: 'Identificación de la medida solicitada', mandatory: true, basis: 'Art. 590' },
       { n: 2, name: 'Apariencia de buen derecho e interés para obrar', mandatory: true, basis: 'Art. 590 lit. c' },
@@ -250,7 +251,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Identificación de los bienes sobre los que recae', mandatory: true, basis: 'Art. 590' },
       { n: 5, name: 'Ofrecimiento de caución', mandatory: false, basis: 'Art. 590 par.' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/590.htm'
+    sourceUrl: 'https://www.alcaldiabogota.gov.co/sisjur/normas/Norma1.jsp?i=48425'
   },
   {
     id: 'civil/recurso-de-reposicion',
@@ -306,14 +307,14 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, arts. 352 y 353',
     competentAuthority: 'El superior del juez que denegó la apelación o la casación',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'El recurso de queja debe interponerse en subsidio del de reposición contra el auto que denegó la apelación o la casación (art. 353, inc. 1); el término es por tanto el de la reposición: verbalmente e inmediatamente si el auto se profiere en audiencia, o por escrito dentro de los tres (3) días siguientes al de la notificación cuando se profiere fuera de audiencia (art. 318, inc. 3). Cuando la denegación sea consecuencia de la reposición interpuesta por la parte contraria, la queja se interpone directamente dentro de la ejecutoria de ese auto (art. 353, inc. 1; la ejecutoria de las providencias dictadas fuera de audiencia se produce tres (3) días después de notificadas, art. 302, inc. 3). Remitidas las copias al superior, el escrito se mantiene tres (3) días en secretaría a disposición de la otra parte y surtido el traslado se decide (art. 353, inc. 3).' },
     requiredSections: [
       { n: 1, name: 'Reposición previa contra el auto que denegó el recurso', mandatory: true, basis: 'Art. 353' },
       { n: 2, name: 'Interposición subsidiaria de la queja', mandatory: true, basis: 'Art. 353' },
       { n: 3, name: 'Razones por las cuales el recurso denegado era procedente', mandatory: true, basis: 'Art. 352' },
       { n: 4, name: 'Copias necesarias para el trámite ante el superior', mandatory: true, basis: 'Art. 353' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/352.htm'
+    sourceUrl: 'https://www.alcaldiabogota.gov.co/sisjur/normas/Norma1.jsp?i=48425'
   },
   {
     id: 'civil/interposicion-del-recurso-extraordinario-de-casacion',
@@ -402,13 +403,13 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, art. 286',
     competentAuthority: 'El mismo juez que profirió la providencia',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'Toda providencia en que se haya incurrido en error puramente aritmético puede ser corregida por el juez que la dictó en cualquier tiempo, de oficio o a solicitud de parte, mediante auto (art. 286, inc. 1): la solicitud no caduca. Si la corrección se hace luego de terminado el proceso, el auto se notifica por aviso (art. 286, inc. 2). La misma regla se aplica al error por omisión, cambio o alteración de palabras contenidas en la parte resolutiva o que influyan en ella (art. 286, inc. 3).' },
     requiredSections: [
       { n: 1, name: 'Identificación de la providencia', mandatory: true, basis: 'Art. 286' },
       { n: 2, name: 'Señalamiento del error puramente aritmético, de nombre o de cita', mandatory: true, basis: 'Art. 286' },
       { n: 3, name: 'Indicación del texto correcto', mandatory: true, basis: 'Art. 286' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/286.htm'
+    sourceUrl: 'https://www.alcaldiabogota.gov.co/sisjur/normas/Norma1.jsp?i=48425'
   },
   {
     id: 'civil/solicitud-de-nulidad-procesal',
@@ -417,7 +418,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, arts. 133 a 138',
     competentAuthority: 'El juez que conoce del proceso',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'Las nulidades pueden alegarse en cualquiera de las instancias antes de que se dicte sentencia, o con posterioridad a esta si ocurrieren en ella (art. 134, inc. 1); las de indebida representación, falta de notificación o emplazamiento en legal forma, o la originada en la sentencia contra la que no procede recurso, pueden alegarse además en la diligencia de entrega, como excepción en la ejecución de la sentencia o mediante recurso de revisión, y en el proceso ejecutivo incluso después de la orden de seguir adelante la ejecución mientras no haya terminado (art. 134, incs. 2 y 3). Puesta la nulidad en conocimiento de la parte afectada, si dentro de los tres (3) días siguientes al de la notificación no la alega, queda saneada (art. 137, texto corregido por el art. 4 del Decreto 1736 de 2012). La nulidad originada en la interrupción o suspensión del proceso se sanea si no se alega dentro de los cinco (5) días siguientes a la fecha en que cese la causa (art. 136, num. 3).' },
     requiredSections: [
       { n: 1, name: 'Causal de nulidad invocada entre las taxativas del art. 133', mandatory: true, basis: 'Art. 133' },
       { n: 2, name: 'Hechos en que se fundamenta', mandatory: true, basis: 'Art. 135' },
@@ -425,7 +426,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Pruebas que se pretende hacer valer', mandatory: true, basis: 'Art. 135' },
       { n: 5, name: 'Petición de invalidez de lo actuado y de rehacer la actuación', mandatory: true, basis: 'Art. 138' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/133.htm'
+    sourceUrl: 'https://www.alcaldiabogota.gov.co/sisjur/normas/Norma1.jsp?i=48425'
   },
   {
     id: 'civil/demanda-de-declaracion-de-pertenencia',
@@ -469,14 +470,14 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, art. 379',
     competentAuthority: 'Juez civil municipal o del circuito, según la cuantía',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'El artículo 379 no fija por sí mismo el término de traslado de la demanda: remite al “término del traslado de la demanda”, dentro del cual el demandado debe oponerse a rendir las cuentas u objetar la estimación (art. 379 num. 2). De las cuentas rendidas se da traslado al demandante por el término de diez (10) días (art. 379 num. 5); si en la sentencia se ordena la rendición, el juez señala un término prudencial para presentarlas y, si el demandado no las presenta, se ordena pagar lo estimado en la demanda (art. 379 nums. 4 y 6).' },
     requiredSections: [
       { n: 1, name: 'Requisitos generales de la demanda', mandatory: true, basis: 'Art. 82' },
       { n: 2, name: 'Indicación de la obligación de rendir cuentas y su fuente', mandatory: true, basis: 'Art. 379' },
       { n: 3, name: 'Período respecto del cual se piden las cuentas', mandatory: true, basis: 'Art. 379' },
       { n: 4, name: 'Estimación razonada de lo que se considere debido', mandatory: false, basis: 'Art. 379' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/379.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=48425'
   },
   {
     id: 'civil/demanda-de-pago-por-consignacion',
@@ -485,14 +486,14 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, art. 381',
     competentAuthority: 'Juez civil municipal o del circuito, según la cuantía',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'Si el demandado no se opone, el demandante debe depositar a órdenes del juzgado lo ofrecido dentro de los cinco (5) días siguientes al vencimiento del término del traslado (art. 381 num. 2). Si al contestar la demanda el demandado se opone a recibir el pago, el juez ordena por auto que no admite recurso que la consignación se haga en el término de cinco (5) días (art. 381 num. 3). Vencido el plazo sin efectuarse la consignación, el juez niega las pretensiones mediante sentencia que no admite apelación (art. 381 num. 2).' },
     requiredSections: [
       { n: 1, name: 'Requisitos generales de la demanda', mandatory: true, basis: 'Art. 82' },
       { n: 2, name: 'Identificación de la obligación cuyo pago se ofrece', mandatory: true, basis: 'Art. 381' },
       { n: 3, name: 'Prueba de la oferta de pago o de la negativa del acreedor a recibirlo', mandatory: true, basis: 'Art. 381' },
       { n: 4, name: 'Constancia de consignación a órdenes del juzgado', mandatory: true, basis: 'Art. 381' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/381.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=48425'
   },
   {
     id: 'civil/demanda-de-impugnacion-de-actos-de-asambleas-juntas-directivas-o-de-socios',
@@ -501,7 +502,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, art. 382',
     competentAuthority: 'Juez civil del circuito del domicilio de la persona jurídica',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'La demanda solo puede proponerse, so pena de caducidad, dentro de los dos (2) meses siguientes a la fecha del acto respectivo; si se trata de acuerdos o actos sujetos a registro, el término se cuenta desde la fecha de la inscripción (art. 382).' },
     requiredSections: [
       { n: 1, name: 'Requisitos generales de la demanda', mandatory: true, basis: 'Art. 82' },
       { n: 2, name: 'Identificación del acto impugnado y de la reunión en que se adoptó', mandatory: true, basis: 'Art. 382' },
@@ -509,7 +510,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Copia del acta correspondiente', mandatory: true, basis: 'Art. 382' },
       { n: 5, name: 'Solicitud de suspensión del acto impugnado', mandatory: false, basis: 'Art. 382' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/382.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=48425'
   },
   {
     id: 'civil/demanda-divisoria',
@@ -518,7 +519,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, arts. 406 a 411',
     competentAuthority: 'Juez civil municipal o del circuito del lugar del bien',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'En el auto admisorio de la demanda se ordena correr traslado al demandado por diez (10) días (art. 409). Los motivos que configuren excepciones previas deben alegarse mediante recurso de reposición contra el auto admisorio (art. 409).' },
     requiredSections: [
       { n: 1, name: 'Requisitos generales de la demanda', mandatory: true, basis: 'Art. 82' },
       { n: 2, name: 'Prueba de la titularidad de la cuota sobre el bien común', mandatory: true, basis: 'Art. 406' },
@@ -526,7 +527,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Petición de división material o de venta', mandatory: true, basis: 'Art. 406' },
       { n: 5, name: 'Certificado de tradición del inmueble', mandatory: true, basis: 'Art. 406' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/406.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=48425'
   },
   {
     id: 'civil/demanda-de-deslinde-y-amojonamiento',
@@ -535,14 +536,14 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, arts. 400 a 405',
     competentAuthority: 'Juez civil municipal del lugar de ubicación del inmueble',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'De la demanda de deslinde y amojonamiento se corre traslado al demandado por tres (3) días (art. 402). Los hechos que constituyen excepciones previas, la cosa juzgada y la transacción solo pueden alegarse como fundamento del recurso de reposición contra el auto admisorio de la demanda (art. 402).' },
     requiredSections: [
       { n: 1, name: 'Requisitos generales de la demanda', mandatory: true, basis: 'Art. 82' },
       { n: 2, name: 'Identificación de los predios y de la línea divisoria discutida', mandatory: true, basis: 'Art. 400' },
       { n: 3, name: 'Títulos de propiedad de los predios', mandatory: true, basis: 'Art. 400' },
       { n: 4, name: 'Certificados de tradición', mandatory: true, basis: 'Art. 400' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/400.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=48425'
   },
   {
     id: 'civil/demanda-de-expropiacion',
@@ -551,7 +552,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, art. 399',
     competentAuthority: 'Juez civil del circuito del lugar del bien',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'La demanda de expropiación debe presentarse dentro de los tres (3) meses siguientes a la fecha en la cual quede en firme la resolución que ordena la expropiación, so pena de que dicha resolución y sus inscripciones pierdan fuerza ejecutoria sin necesidad de pronunciamiento judicial o administrativo alguno (art. 399 num. 2). De la demanda se corre traslado al demandado por el término de tres (3) días, sin que pueda proponer excepciones de ninguna clase (art. 399 num. 5).' },
     requiredSections: [
       { n: 1, name: 'Requisitos generales de la demanda', mandatory: true, basis: 'Art. 82' },
       { n: 2, name: 'Copia del acto administrativo que decretó la expropiación', mandatory: true, basis: 'Art. 399' },
@@ -559,7 +560,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Avalúo del bien', mandatory: true, basis: 'Art. 399' },
       { n: 5, name: 'Solicitud de entrega anticipada, cuando proceda', mandatory: false, basis: 'Art. 399' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/399.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=48425'
   },
   {
     id: 'civil/demanda-de-proceso-de-sucesion',
@@ -568,7 +569,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, arts. 488 y siguientes',
     competentAuthority: 'Juez de familia o civil del último domicilio del causante',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'La apertura del proceso de sucesión puede pedirse desde el fallecimiento del causante y el artículo 488 no fija término alguno para presentar la demanda: no caduca. Los acreedores pueden hacer valer sus créditos dentro del proceso hasta que termine la diligencia de inventario (art. 491 num. 2), y el reconocimiento de herederos, legatarios, cesionarios, cónyuge o compañero permanente puede pedirse desde que se declare abierto el proceso y hasta antes de la ejecutoria de la sentencia aprobatoria de la última partición o adjudicación (art. 491 num. 3).' },
     requiredSections: [
       { n: 1, name: 'Requisitos generales de la demanda', mandatory: true, basis: 'Art. 82' },
       { n: 2, name: 'Registro civil de defunción del causante', mandatory: true, basis: 'Art. 489' },
@@ -576,7 +577,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Inventario de los bienes relictos', mandatory: true, basis: 'Art. 501' },
       { n: 5, name: 'Testamento, cuando la sucesión sea testada', mandatory: false, basis: 'Art. 489' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/488.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=48425'
   },
   {
     id: 'civil/solicitud-de-amparo-de-pobreza',
@@ -585,13 +586,13 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, arts. 151 a 158',
     competentAuthority: 'El juez que conoce o conocerá del proceso',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'El amparo de pobreza puede solicitarse por el presunto demandante antes de la presentación de la demanda, o por cualquiera de las partes durante el curso del proceso (art. 152, inc. 1): la norma no fija un plazo perentorio de solicitud. Los términos que sí establece son: tres (3) días siguientes a la comunicación de la designación para que el apoderado designado acepte o presente prueba del motivo de rechazo, y tres (3) días para manifestar impedimento (art. 154, incs. 3 y 5); treinta (30) días siguientes a la aceptación del apoderado designado para presentar la demanda, si se quiere conservar el efecto interruptivo de la prescripción e impeditivo de la caducidad que produce la solicitud presentada antes de la demanda, cumpliendo el art. 94 (art. 154, inc. 6); y traslado de tres (3) días a la parte contraria para resolver la solicitud de terminación del amparo (art. 158).' },
     requiredSections: [
       { n: 1, name: 'Afirmación bajo juramento de que no se está en capacidad de atender los gastos del proceso', mandatory: true, basis: 'Art. 152' },
       { n: 2, name: 'Indicación del proceso en que se solicita', mandatory: true, basis: 'Art. 152' },
       { n: 3, name: 'Petición de designación de apoderado, cuando se requiera', mandatory: false, basis: 'Art. 154' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/151.htm'
+    sourceUrl: 'https://www.alcaldiabogota.gov.co/sisjur/normas/Norma1.jsp?i=48425'
   },
   {
     id: 'civil/solicitud-de-prueba-extraprocesal',
@@ -600,13 +601,13 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, arts. 183 a 190',
     competentAuthority: 'Juez civil municipal, o notario en los casos permitidos',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'Las pruebas extraprocesales se practican con observancia de las reglas de citación y práctica del código; cuando se soliciten con citación de la contraparte, la notificación personal a esta debe hacerse, conforme a los arts. 291 y 292, con no menos de cinco (5) días de antelación a la fecha de la respectiva diligencia (art. 183, inc. 2). El art. 183 no fija plazo para presentar la solicitud. En la declaración sobre documentos, el citado que no concurra dispone de los tres (3) días siguientes a la fecha señalada para probar siquiera sumariamente que su inasistencia obedeció a causa justificada, caso en el cual el juez señala nueva fecha por una sola vez (art. 185, inc. 6).' },
     requiredSections: [
       { n: 1, name: 'Identificación de quien solicita y de la persona contra quien se pretende hacer valer', mandatory: true, basis: 'Art. 184' },
       { n: 2, name: 'Indicación de la prueba que se pide practicar', mandatory: true, basis: 'Art. 183' },
       { n: 3, name: 'Objeto o finalidad de la prueba', mandatory: true, basis: 'Art. 183' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/183.htm'
+    sourceUrl: 'https://www.alcaldiabogota.gov.co/sisjur/normas/Norma1.jsp?i=48425'
   },
   {
     id: 'civil/desistimiento-de-las-pretensiones',
@@ -615,13 +616,13 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, art. 314',
     competentAuthority: 'El juez que conoce del proceso',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'El demandante puede desistir de las pretensiones mientras no se haya pronunciado sentencia que ponga fin al proceso (art. 314, inc. 1). Presentado ante el superior por haber interpuesto el demandante apelación de la sentencia o casación, se entiende que comprende el desistimiento del recurso. El artículo no fija plazo en días: el límite temporal es la sentencia que pone fin al proceso.' },
     requiredSections: [
       { n: 1, name: 'Manifestación expresa e incondicional de desistir', mandatory: true, basis: 'Art. 314' },
       { n: 2, name: 'Identificación de las pretensiones de las que se desiste', mandatory: true, basis: 'Art. 314' },
       { n: 3, name: 'Facultad expresa del apoderado para desistir', mandatory: true, basis: 'Art. 77' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/314.htm'
+    sourceUrl: 'https://www.alcaldiabogota.gov.co/sisjur/normas/Norma1.jsp?i=48425'
   },
   {
     id: 'civil/solicitud-de-acumulacion-de-procesos',
@@ -630,13 +631,13 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, arts. 148 y 149',
     competentAuthority: 'El juez que conoce del proceso más antiguo',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'En los procesos declarativos las acumulaciones de procesos y de demandas proceden hasta antes de señalarse fecha y hora para la audiencia inicial (art. 148, num. 3, inc. 1). Decretada la acumulación, cuando el demandado ya esté notificado, este puede solicitar en la secretaría que se le suministre la reproducción de la demanda y sus anexos dentro de los tres (3) días siguientes, vencidos los cuales comienza a correr el término de ejecutoria y el de traslado de la demanda que estaba pendiente de notificación (art. 148, num. 3). La acumulación de demandas y de procesos ejecutivos se rige por los arts. 463 y 464 por remisión expresa del art. 148, num. 3, inc. final.' },
     requiredSections: [
       { n: 1, name: 'Identificación de los procesos cuya acumulación se pide', mandatory: true, basis: 'Art. 148' },
       { n: 2, name: 'Causal de acumulación invocada', mandatory: true, basis: 'Art. 148' },
       { n: 3, name: 'Prueba de la existencia y estado de los procesos', mandatory: true, basis: 'Art. 149' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/148.htm'
+    sourceUrl: 'https://www.alcaldiabogota.gov.co/sisjur/normas/Norma1.jsp?i=48425'
   },
   {
     id: 'civil/auto-admisorio-de-la-demanda',
@@ -677,13 +678,13 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 1564 de 2012, art. 90',
     competentAuthority: 'El juez que conoce del proceso',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'Dentro de los treinta (30) días siguientes a la fecha de presentación de la demanda debe notificarse al demandante el auto admisorio, el mandamiento de pago o el auto que la rechace; vencido ese plazo sin notificación, el término del artículo 121 se computa desde el día siguiente a la presentación (art. 90). El rechazo procede por falta de jurisdicción o de competencia, por estar vencido el término de caducidad para instaurar la demanda, o por no haberse subsanado dentro de los cinco (5) días concedidos en el auto inadmisorio (art. 90).' },
     requiredSections: [
       { n: 1, name: 'Motivo del rechazo: falta de jurisdicción, competencia, caducidad o no subsanación', mandatory: true, basis: 'Art. 90' },
       { n: 2, name: 'Orden de devolución de los anexos sin necesidad de desglose', mandatory: true, basis: 'Art. 90' },
       { n: 3, name: 'Orden de remisión al juez competente, cuando el rechazo obedezca a falta de jurisdicción o competencia', mandatory: false, basis: 'Art. 90' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/90.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=48425'
   },
   {
     id: 'civil/mandamiento-de-pago',
@@ -708,14 +709,14 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 1564 de 2012, art. 101',
     competentAuthority: 'El juez que conoce del proceso',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'Del escrito que contiene las excepciones previas se corre traslado al demandante por el término de tres (3) días conforme al artículo 110 (art. 101 num. 1). El juez decide las excepciones previas que no requieran práctica de pruebas antes de la audiencia inicial; cuando se requiera practicar pruebas, cita a la audiencia inicial y en ella las practica y resuelve las excepciones (art. 101 num. 2).' },
     requiredSections: [
       { n: 1, name: 'Identificación de cada excepción propuesta', mandatory: true, basis: 'Art. 101' },
       { n: 2, name: 'Análisis probatorio de los hechos que las fundan', mandatory: true, basis: 'Art. 101' },
       { n: 3, name: 'Decisión sobre cada excepción y sus efectos', mandatory: true, basis: 'Art. 101' },
       { n: 4, name: 'Concesión de término para subsanar, cuando el defecto sea subsanable', mandatory: false, basis: 'Art. 101' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/101.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=48425'
   },
   {
     id: 'civil/auto-que-decreta-medidas-cautelares',
@@ -724,14 +725,14 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 1564 de 2012, art. 590',
     competentAuthority: 'El juez que conoce del proceso',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'El artículo 590 no fija plazo para proferir el auto que decreta la medida. La caución previa equivale al veinte por ciento (20%) del valor de las pretensiones estimadas en la demanda, salvo los embargos y secuestros posteriores a sentencia favorable de primera instancia (art. 590 num. 2). Las medidas de los literales b) y c) del numeral 1 se levantan si el demandante no promueve la ejecución dentro del término a que se refiere el artículo 306 (art. 590 par. 2), esto es, dentro de los treinta (30) días siguientes a la ejecutoria de la sentencia o a la notificación del auto de obedecimiento a lo resuelto por el superior (art. 306).' },
     requiredSections: [
       { n: 1, name: 'Apreciación de la apariencia de buen derecho y del interés para obrar', mandatory: true, basis: 'Art. 590 lit. c' },
       { n: 2, name: 'Juicio de necesidad, efectividad y proporcionalidad de la medida', mandatory: true, basis: 'Art. 590 lit. c' },
       { n: 3, name: 'Determinación de la medida y de los bienes sobre los que recae', mandatory: true, basis: 'Art. 590' },
       { n: 4, name: 'Fijación de la caución, cuando proceda', mandatory: false, basis: 'Art. 590 par.' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/590.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=48425'
   },
   {
     id: 'civil/sentencia-de-primera-instancia-en-proceso-declarativo',
@@ -775,7 +776,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 1564 de 2012, art. 440',
     competentAuthority: 'El juez de la ejecución',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'El artículo 440 no señala plazo al juez para proferir este auto: no opera caducidad. Se dicta cuando el ejecutado no propone excepciones oportunamente, esto es, vencidos los diez (10) días siguientes a la notificación del mandamiento ejecutivo (art. 442 num. 1, al que remite la expresión “oportunamente” del art. 440). Cumplida la obligación dentro del término señalado en el mandamiento, el ejecutado puede pedir la exoneración de costas dentro de los tres (3) días siguientes a la notificación del auto que las impone (art. 440).' },
     requiredSections: [
       { n: 1, name: 'Constatación de que no se propusieron excepciones o de que fueron desestimadas', mandatory: true, basis: 'Art. 440' },
       { n: 2, name: 'Orden de seguir adelante la ejecución en la forma pedida', mandatory: true, basis: 'Art. 440' },
@@ -783,7 +784,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Orden de avalúo y remate de los bienes embargados', mandatory: true, basis: 'Art. 440' },
       { n: 5, name: 'Condena en costas', mandatory: true, basis: 'Art. 365' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/440.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=48425'
   },
   {
     id: 'civil/liquidacion-del-credito',
@@ -792,14 +793,14 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 1564 de 2012, art. 446',
     competentAuthority: 'El juez de la ejecución',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'Ejecutoriado el auto que ordena seguir adelante la ejecución, o notificada la sentencia que resuelve las excepciones cuando no sea totalmente favorable al ejecutado, cualquiera de las partes puede presentar la liquidación del crédito (art. 446, num. 1). De la liquidación presentada se corre traslado a la otra parte, en la forma prevista en el art. 110, por el término de tres (3) días, dentro del cual solo pueden formularse objeciones relativas al estado de cuenta, acompañando so pena de rechazo una liquidación alternativa (art. 446, num. 2). Vencido el traslado el juez decide por auto (art. 446, num. 3).' },
     requiredSections: [
       { n: 1, name: 'Especificación del capital y de los intereses causados', mandatory: true, basis: 'Art. 446' },
       { n: 2, name: 'Indicación de la tasa aplicada y del período liquidado', mandatory: true, basis: 'Art. 446' },
       { n: 3, name: 'Traslado a la parte contraria para objeciones', mandatory: true, basis: 'Art. 446' },
       { n: 4, name: 'Aprobación o modificación de la liquidación', mandatory: true, basis: 'Art. 446' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/446.htm'
+    sourceUrl: 'https://www.alcaldiabogota.gov.co/sisjur/normas/Norma1.jsp?i=48425'
   },
   {
     id: 'civil/auto-que-declara-la-nulidad-procesal',
@@ -808,14 +809,14 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 1564 de 2012, arts. 137 y 138',
     competentAuthority: 'El juez que conoce del proceso',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'Puesta en conocimiento la nulidad no saneada, la parte afectada dispone de tres (3) días siguientes al de la notificación para alegarla; si no lo hace la nulidad queda saneada y el proceso continúa su curso, y solo si la alega el juez la declara (art. 137). Los artículos 137 y 138 no fijan plazo al juez para proferir el auto que declara la nulidad.' },
     requiredSections: [
       { n: 1, name: 'Identificación de la causal de nulidad configurada', mandatory: true, basis: 'Art. 133' },
       { n: 2, name: 'Verificación de que la nulidad no fue saneada', mandatory: true, basis: 'Art. 136' },
       { n: 3, name: 'Determinación de la actuación afectada y de la que conserva validez', mandatory: true, basis: 'Art. 138' },
       { n: 4, name: 'Orden de rehacer la actuación anulada', mandatory: true, basis: 'Art. 138' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/137.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=48425'
   },
   {
     id: 'civil/constancia-de-ejecutoria',
@@ -942,7 +943,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'SECRETARIA',
     legalBasis: 'Ley 1564 de 2012, arts. 109 y 110',
     competentAuthority: 'Secretaria del juzgado',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'El art. 109 no fija un plazo en días sino un deber de inmediatez: el secretario hace constar la fecha y hora de presentación de los memoriales y comunicaciones que reciba, los agrega al expediente y los ingresa inmediatamente al despacho solo cuando el juez deba pronunciarse sobre ellos fuera de audiencia; cuando se trate del ejercicio de un recurso o de una facultad con término común, el secretario debe esperar a que este transcurra respecto de todas las partes antes de ingresar el expediente al despacho. Los memoriales se entienden presentados oportunamente si son recibidos antes del cierre del despacho del día en que vence el término (art. 109, incs. 1 y 4).' },
     requiredSections: [
       { n: 1, name: 'Identificacion del proceso y de la actuacion sobre la que se informa', mandatory: true, basis: null },
       { n: 2, name: 'Relacion cronologica de lo ocurrido en secretaria', mandatory: true, basis: null },
@@ -950,7 +951,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Constancia de lo que procede, para que el despacho resuelva', mandatory: true, basis: null },
       { n: 5, name: 'Firma del secretario', mandatory: true, basis: null }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/109.htm'
+    sourceUrl: 'https://www.alcaldiabogota.gov.co/sisjur/normas/Norma1.jsp?i=48425'
   },
   {
     id: 'civil/certificacion-de-terminos-procesales',
@@ -959,7 +960,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'SECRETARIA',
     legalBasis: 'Ley 1564 de 2012, arts. 117 y 118',
     competentAuthority: 'Secretaria del juzgado',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'Los artículos 117 y 118 no fijan término para expedir la certificación secretarial de términos: no opera caducidad. A falta de término legal para un acto, el juez señala el que estime necesario y puede prorrogarlo por una sola vez si la solicitud se formula antes del vencimiento (art. 117). En los términos de días no se cuentan los de vacancia judicial ni aquellos en que el juzgado permanezca cerrado (art. 118).' },
     requiredSections: [
       { n: 1, name: 'Identificacion del termino que se certifica y de la norma que lo fija', mandatory: true, basis: 'Art. 117' },
       { n: 2, name: 'Fecha desde la cual empezo a correr', mandatory: true, basis: 'Art. 118' },
@@ -967,7 +968,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Fecha exacta de vencimiento', mandatory: true, basis: 'Art. 118' },
       { n: 5, name: 'Firma del secretario', mandatory: true, basis: null }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/110.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=48425'
   },
   {
     id: 'civil/oficio-de-comunicacion-judicial',
@@ -976,7 +977,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'SECRETARIA',
     legalBasis: 'Ley 1564 de 2012, arts. 111 y 112',
     competentAuthority: 'Secretaria del juzgado',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'El art. 111 no fija plazo para librar ni para remitir los oficios y despachos: no opera caducidad. La norma impone un estándar de celeridad —los tribunales y jueces se entienden con las autoridades y los particulares por medio de despachos y oficios que se envían «por el medio más rápido y con las debidas seguridades», pueden remitirse a través de mensajes de datos y son firmados únicamente por el secretario (art. 111, inc. 1).' },
     requiredSections: [
       { n: 1, name: 'Autoridad o entidad destinataria', mandatory: true, basis: null },
       { n: 2, name: 'Identificacion del proceso, de las partes y del radicado', mandatory: true, basis: null },
@@ -984,7 +985,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Orden o solicitud concreta que se comunica', mandatory: true, basis: null },
       { n: 5, name: 'Termino concedido para su cumplimiento y firma del secretario', mandatory: true, basis: null }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/110.htm'
+    sourceUrl: 'https://www.alcaldiabogota.gov.co/sisjur/normas/Norma1.jsp?i=48425'
   },
   {
     id: 'civil/despacho-comisorio',
@@ -993,7 +994,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'SECRETARIA',
     legalBasis: 'Ley 1564 de 2012, arts. 38 y 39',
     competentAuthority: 'Secretaria del juzgado comitente; lo cumple el juez comisionado',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'El art. 39 no fija un plazo legal único: cuando la comisión tenga por objeto la práctica de pruebas, el comitente señala en la providencia el término para su realización, teniendo en cuenta lo dispuesto en el art. 121 (un (1) año para la primera o única instancia y seis (6) meses para la segunda); en los demás casos el comisionado fija el día más próximo posible y la hora de iniciación, en auto que se notifica por estado. Concluida la comisión el despacho se devuelve de inmediato al comitente. El comisionado que incumpla el término señalado o retarde injustificadamente la comisión es sancionado con multa de cinco (5) a diez (10) smlmv impuesta por el comitente (art. 39, incs. 3 a 5).' },
     requiredSections: [
       { n: 1, name: 'Identificacion del juez comitente y del comisionado', mandatory: true, basis: 'Art. 38' },
       { n: 2, name: 'Providencia que ordena la comision', mandatory: true, basis: 'Art. 38' },
@@ -1001,7 +1002,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Anexos y copias necesarios para la practica', mandatory: true, basis: 'Art. 39' },
       { n: 5, name: 'Termino para su cumplimiento y devolucion', mandatory: true, basis: 'Art. 39' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/110.htm'
+    sourceUrl: 'https://www.alcaldiabogota.gov.co/sisjur/normas/Norma1.jsp?i=48425'
   },
   {
     id: 'civil/constancia-de-desglose-de-documentos',
@@ -1010,14 +1011,14 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'SECRETARIA',
     legalBasis: 'Ley 1564 de 2012, art. 116',
     competentAuthority: 'Secretaria del juzgado',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'El artículo 116 no fija término para el desglose ni para su constancia: no opera caducidad. El desglose procede por orden del juez una vez precluida la oportunidad para tachar los documentos de falsos o desestimada la tacha, y en el expediente se deja una reproducción del documento desglosado (art. 116 num. 4).' },
     requiredSections: [
       { n: 1, name: 'Identificacion de los documentos que se desglosan y de sus folios', mandatory: true, basis: 'Art. 116' },
       { n: 2, name: 'Providencia que autoriza el desglose', mandatory: true, basis: 'Art. 116' },
       { n: 3, name: 'Constancia que reemplaza los documentos retirados en el expediente', mandatory: true, basis: 'Art. 116' },
       { n: 4, name: 'Identificacion de quien los recibe y fecha de entrega', mandatory: true, basis: 'Art. 116' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/110.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=48425'
   },
   {
     id: 'civil/constancia-de-remision-del-expediente-al-superior',
@@ -1026,7 +1027,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'SECRETARIA',
     legalBasis: 'Ley 1564 de 2012, arts. 324 y 325',
     competentAuthority: 'Secretaria del juzgado de primera instancia',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'El secretario debe remitir el expediente o su reproducción al superior dentro del término máximo de cinco (5) días, contados a partir del momento previsto en el inciso primero del artículo 324 o del día siguiente a aquel en que el recurrente pague el valor de la reproducción; el incumplimiento de este deber se considera falta gravísima (art. 324). El recurrente debe suministrar las expensas de las copias en el término de cinco (5) días, so pena de que el recurso se declare desierto, y el secretario debe expedirlas dentro de los tres (3) días siguientes (art. 324).' },
     requiredSections: [
       { n: 1, name: 'Identificacion del proceso y del recurso concedido', mandatory: true, basis: 'Art. 324' },
       { n: 2, name: 'Providencia que concede el recurso y el efecto en que se concede', mandatory: true, basis: 'Art. 323' },
@@ -1034,7 +1035,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Relacion de las piezas remitidas al superior', mandatory: true, basis: 'Art. 324' },
       { n: 5, name: 'Fecha de remision y firma del secretario', mandatory: true, basis: 'Art. 324' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/302.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=48425'
   },
   {
     id: 'civil/planilla-de-entrega-de-comunicaciones-judiciales',
@@ -1060,14 +1061,14 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 1564 de 2012, art. 375',
     competentAuthority: 'El juez que conoce del proceso',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'El art. 375 no fija plazo para proferir la sentencia de pertenencia. Los términos que la norma sí establece son: quince (15) días para que el registrador de instrumentos públicos expida el certificado de titulares de derechos reales (num. 5, inc. 2); inscripción del contenido de la valla o del aviso en el Registro Nacional de Procesos de Pertenencia por el término de un (1) mes, dentro del cual pueden contestar la demanda las personas emplazadas, tomando quienes concurran después el proceso en el estado en que se encuentre (num. 7, inc. final); y, cuando la prescripción adquisitiva se alegue por vía de excepción, treinta (30) días desde el vencimiento del traslado de la demanda para cumplir los numerales 6 y 7, so pena de que en la sentencia no pueda declararse la pertenencia (parágrafo 1°). La valla o el aviso deben permanecer instalados hasta la audiencia de instrucción y juzgamiento (num. 7).' },
     requiredSections: [
       { n: 1, name: 'Verificación del cumplimiento de la publicidad: valla, emplazamiento y registro del proceso', mandatory: true, basis: 'Art. 375' },
       { n: 2, name: 'Análisis de los elementos de la posesión: aprehensión, ánimo de señor y dueño y tiempo', mandatory: true, basis: 'Art. 375' },
       { n: 3, name: 'Identificación del bien con sus linderos y cabida', mandatory: true, basis: 'Art. 375' },
       { n: 4, name: 'Orden de inscripción en el registro de instrumentos públicos', mandatory: true, basis: 'Art. 375' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/375.htm'
+    sourceUrl: 'https://www.alcaldiabogota.gov.co/sisjur/normas/Norma1.jsp?i=48425'
   }
   ]
 };

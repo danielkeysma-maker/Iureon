@@ -13,9 +13,10 @@ import type { BranchCatalog } from '../types';
 export const INTERNACIONAL_CATALOG: BranchCatalog = {
   meta: {
     branch: 'INTERNACIONAL',
-    verifiedAt: '2026-08-12',
+    verifiedAt: '2026-08-14',
     sourceOfTruth: 'Ley 1564 de 2012 (CGP), arts. 605 a 607, sobre exequátur; Ley 1563 de 2012 (Estatuto de Arbitraje Nacional e Internacional); Ley 906 de 2004, arts. 490 a 514, sobre extradición; Convención Americana sobre Derechos Humanos y Reglamento de la CIDH; Convenio de La Haya de 1961 sobre apostilla. Los términos marcados como verificados fueron leídos artículo por artículo en el texto de la norma.',
     gaps: [
+    'NOTA (2026-08-14): la lista siguiente es anterior a la verificacion masiva de esta fecha. Varios de esos huecos quedaron cerrados; los vigentes estan en _meta.unverified con su razon. Ver research/VERIFICATION-2026-08-14.md.',
     'UN LAUDO INTERNACIONAL CON SEDE EN COLOMBIA NO NECESITA RECONOCIMIENTO. El art. 111 de la Ley 1563 de 2012 dispone que los arbitrajes internacionales cuya sede sea Colombia se consideran NACIONALES y sus laudos pueden ejecutarse directamente, sin reconocimiento previo. Sólo los laudos EXTRANJEROS requieren reconocimiento judicial previo. Pedir reconocimiento de un laudo que no lo necesita cuesta meses de trámite innecesario; omitirlo cuando sí se requiere hace inejecutable el laudo. La sede del arbitraje es el dato que decide.',
     'EXEQUÁTUR Y RECONOCIMIENTO DE LAUDO SON TRÁMITES DISTINTOS. El exequátur de sentencias extranjeras se surte ante la Sala de Casación Civil de la Corte Suprema de Justicia (art. 607 CGP); el reconocimiento de laudos extranjeros sigue el trámite propio del art. 115 de la Ley 1563 de 2012, con términos diferentes. No son intercambiables.',
     'El plazo de seis (6) meses para acudir a la CIDH se cuenta desde la notificación de la decisión final que agota los recursos internos, y existen excepciones al agotamiento. Determinar cuál es esa decisión final en un caso concreto es una cuestión de fondo que este catálogo no resuelve.',
@@ -103,7 +104,7 @@ export const INTERNACIONAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1563 de 2012, arts. 62 y siguientes',
     competentAuthority: 'Tribunal arbitral constituido conforme al acuerdo de arbitraje',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'La ley no fija un término legal para presentar la demanda: conforme al artículo 96 de la Ley 1563 de 2012 (Demanda y contestación), esta debe presentarse "dentro del plazo convenido por las partes o determinado por el tribunal arbitral", indicando los hechos en que se funda, los puntos controvertidos y el objeto de ella. La actuación arbitral se entiende iniciada, salvo pacto en contrario, en la fecha en que el demandado recibe la solicitud de someter la controversia a arbitraje (art. 94). Salvo acuerdo en contrario, en el curso de las actuaciones cualquiera de las partes puede modificar o ampliar su demanda o contestación, a menos que el tribunal considere improcedente esa alteración por la tardanza con que se hizo (art. 96, inciso final). La no presentación de la demanda en ese plazo, sin causa suficiente, obliga al tribunal a dar por terminada la actuación (art. 98 num. 1).' },
     requiredSections: [
       { n: 1, name: 'Acuerdo de arbitraje y demostración del carácter internacional del arbitraje', mandatory: true, basis: 'Art. 62' },
       { n: 2, name: 'Identificación de las partes y de su domicilio', mandatory: true, basis: null },
@@ -112,7 +113,7 @@ export const INTERNACIONAL_CATALOG: BranchCatalog = {
       { n: 5, name: 'Pruebas que se aportan y se solicitan', mandatory: true, basis: null },
       { n: 6, name: 'Designación de árbitro conforme al acuerdo', mandatory: true, basis: null }
     ],
-    sourceUrl: 'https://leyes.co/estatuto_de_arbitraje_nacional_e_internacional/64.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=48366'
   },
   {
     id: 'internacional/solicitud-de-medidas-cautelares-en-arbitraje-internacional',
@@ -121,14 +122,14 @@ export const INTERNACIONAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1563 de 2012, arts. 80 y siguientes',
     competentAuthority: 'Tribunal arbitral o autoridad judicial de apoyo',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'No opera caducidad: la Ley 1563 de 2012 no sujeta la solicitud a término alguno. Ante el tribunal arbitral, "salvo acuerdo en contrario de las partes, el tribunal arbitral podrá, a instancia de cualquiera de ellas, decretar medidas cautelares", entendidas como toda medida temporal adoptada "en cualquier momento previo a la emisión del laudo" que dirima definitivamente la controversia (art. 80). Ante la autoridad judicial, la medida puede pedirse "con anterioridad a las actuaciones arbitrales o durante el transcurso de las mismas" (art. 71) y, tratándose de arbitraje internacional, "con anterioridad a la iniciación del trámite arbitral o en el curso del mismo, e independientemente de que el proceso se adelante en Colombia o en el exterior" (art. 90). Las condiciones para el decreto de la medida están en el art. 81, no en el art. 80.' },
     requiredSections: [
       { n: 1, name: 'Identificación de la medida solicitada', mandatory: true, basis: 'Art. 80' },
       { n: 2, name: 'Demostración del daño no resarcible adecuadamente mediante indemnización', mandatory: true, basis: 'Art. 80' },
       { n: 3, name: 'Probabilidad razonable de prosperidad de la pretensión', mandatory: true, basis: 'Art. 80' },
       { n: 4, name: 'Ofrecimiento de garantía', mandatory: false, basis: 'Art. 80' }
     ],
-    sourceUrl: 'https://leyes.co/estatuto_de_arbitraje_nacional_e_internacional/64.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=48366'
   },
   {
     id: 'internacional/memorial-de-defensa-en-tramite-de-extradicion',
@@ -190,7 +191,7 @@ export const INTERNACIONAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Reglamento de la CIDH, art. 25',
     competentAuthority: 'Comisión Interamericana de Derechos Humanos',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'No opera caducidad: el artículo 25 del Reglamento de la CIDH no fija plazo alguno para presentar la solicitud. La Comisión puede actuar "a iniciativa propia o a solicitud de parte", y las medidas, "ya sea que guarden o no conexidad con una petición o caso, se relacionarán con situaciones de gravedad y urgencia que presenten un riesgo de daño irreparable" (art. 25.1). El plazo de seis (6) meses del art. 46 CADH rige la petición individual, no la solicitud de medidas cautelares. Los requisitos de contenido están en el art. 25.4 y el plazo de vigencia, cuando aplique, lo fija la propia resolución de otorgamiento (art. 25.7 lit. d).' },
     requiredSections: [
       { n: 1, name: 'Identificación de los beneficiarios propuestos', mandatory: true, basis: 'Reglamento CIDH, art. 25' },
       { n: 2, name: 'Demostración de la gravedad de la situación', mandatory: true, basis: 'Reglamento CIDH, art. 25' },
@@ -198,7 +199,7 @@ export const INTERNACIONAL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Riesgo de daño irreparable', mandatory: true, basis: 'Reglamento CIDH, art. 25' },
       { n: 5, name: 'Medidas concretas que se solicitan al Estado', mandatory: true, basis: 'Reglamento CIDH, art. 25' }
     ],
-    sourceUrl: 'https://www.oas.org/es/CIDH/jsForm/?File=%2Fes%2Fcidh%2Fmandato%2Fbasicos%2Freglamentocidh.asp'
+    sourceUrl: 'https://www.oas.org/es/cidh/jsForm/?File=%2Fes%2Fcidh%2Fmandato%2Fbasicos%2Freglamentocidh.asp'
   },
   {
     id: 'internacional/solicitud-de-interpretacion-prejudicial-al-tribunal-de-justicia-de-la-comunidad-andina',
@@ -207,14 +208,14 @@ export const INTERNACIONAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Tratado de Creación del Tribunal de Justicia de la Comunidad Andina; Decisión 500',
     competentAuthority: 'Tribunal de Justicia de la Comunidad Andina, a solicitud del juez nacional',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'No opera caducidad para formular la consulta: el Estatuto del Tribunal (Decisión 500 de 2001) no señala término para elevarla. En la consulta facultativa, el juez nacional puede solicitarla mientras la sentencia sea susceptible de recursos en derecho interno, y si llega la oportunidad de fallar sin haber recibido la interpretación "el juez deberá decidir el proceso" (art. 122). En la consulta obligatoria (sentencia de única o última instancia no susceptible de recursos), el juez "deberá suspender el procedimiento y solicitar directamente y mediante simple oficio, la interpretación del Tribunal" (art. 123), y el proceso interno queda suspendido hasta que se reciba la interpretación (art. 124). El término propiamente dicho es el del Tribunal: "Dentro del término de treinta días siguientes al de la admisión de la solicitud por el Tribunal, éste dictará sentencia" (art. 126).' },
     requiredSections: [
       { n: 1, name: 'Identificación del proceso nacional en curso', mandatory: true, basis: null },
       { n: 2, name: 'Normas del ordenamiento jurídico andino cuya interpretación se solicita', mandatory: true, basis: null },
       { n: 3, name: 'Explicación de por qué son aplicables al caso', mandatory: true, basis: null },
       { n: 4, name: 'Informe sucinto de los hechos que el juez considere relevantes', mandatory: true, basis: null }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/607.htm'
+    sourceUrl: 'https://www.tribunalandino.org.ec/transparencia/normatividad/EstatutoTJCA_ant.pdf'
   },
   {
     id: 'internacional/carta-rogatoria-para-cooperacion-judicial-internacional',
@@ -240,14 +241,14 @@ export const INTERNACIONAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Convenio de La Haya de 1961, aprobado por Ley 455 de 1998; Ley 1564 de 2012, art. 251',
     competentAuthority: 'Ministerio de Relaciones Exteriores',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'No opera caducidad: el Convenio de La Haya de 5 de octubre de 1961, en vigor para Colombia desde el 30 de enero de 2001 (aprobado por Ley 455 de 1998), no fija plazo para pedir la apostilla ni término de vencimiento de esta. Su artículo 5 dispone que "la Apostilla se expedirá a petición del signatario o de cualquier portador del documento", y el artículo 3 la señala como única formalidad exigible para certificar la autenticidad de la firma. Tampoco el artículo 251 del CGP fija término: se limita a exigir que los documentos públicos otorgados en el extranjero se aporten apostillados conforme a los tratados ratificados por Colombia y, si el país de origen no es parte, autenticados por el cónsul o agente diplomático colombiano. La apostilla es requisito de valor probatorio del documento, no acto sujeto a plazo procesal.' },
     requiredSections: [
       { n: 1, name: 'Documento público original o copia auténtica', mandatory: true, basis: 'Ley 455 de 1998' },
       { n: 2, name: 'Verificación de que el país de destino es parte del Convenio de La Haya; si no lo es, procede legalización consular', mandatory: true, basis: 'Ley 455 de 1998' },
       { n: 3, name: 'Identificación del solicitante y del país de destino', mandatory: true, basis: null },
       { n: 4, name: 'Traducción oficial cuando el documento vaya a surtir efectos en otro idioma', mandatory: false, basis: 'Art. 251 CGP' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/607.htm'
+    sourceUrl: 'https://www.hcch.net/es/instruments/conventions/full-text/?cid=41'
   },
   {
     id: 'internacional/sentencia-de-exequatur',

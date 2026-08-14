@@ -13,9 +13,10 @@ import type { BranchCatalog } from '../types';
 export const TRANSITO_CATALOG: BranchCatalog = {
   meta: {
     branch: 'TRANSITO',
-    verifiedAt: '2026-08-12',
+    verifiedAt: '2026-08-14',
     sourceOfTruth: 'Ley 769 de 2002 (Código Nacional de Tránsito Terrestre) con sus modificaciones, entre ellas la Ley 1383 de 2010, el Decreto Ley 019 de 2012 y la Ley 2251 de 2022 (Ley Julián Esteban). Los términos marcados como verificados fueron leídos artículo por artículo en el texto de la norma.',
     gaps: [
+    'NOTA (2026-08-14): la lista siguiente es anterior a la verificacion masiva de esta fecha. Varios de esos huecos quedaron cerrados; los vigentes estan en _meta.unverified con su razon. Ver research/VERIFICATION-2026-08-14.md.',
     'NO CONFUNDIR CADUCIDAD CON PRESCRIPCIÓN. Son dos términos distintos que operan en momentos distintos. La ACCIÓN por contravención CADUCA AL AÑO contado desde la ocurrencia de los hechos (art. 161): pasado ese año la autoridad ya no puede imponer la sanción. La SANCIÓN ya impuesta PRESCRIBE EN TRES AÑOS desde la ocurrencia del hecho (art. 159), término que se interrumpe con la notificación del mandamiento de pago. Alegar la figura equivocada pierde una defensa válida.',
     'SILENCIO POSITIVO EN LOS RECURSOS. El art. 161 dispone que los recursos deben decidirse dentro del año siguiente a su interposición y que, de no resolverse, se entienden fallados A FAVOR DEL RECURRENTE. Es una defensa que se pierde por no alegarla.',
     'Términos del cobro coactivo de multas de tránsito: se rigen por el procedimiento del Estatuto Tributario por remisión, y no se verificaron aquí. La rama TRIBUTARIO cubre ese procedimiento.',
@@ -181,14 +182,14 @@ export const TRANSITO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1437 de 2011, arts. 93 a 97; Ley 769 de 2002',
     competentAuthority: 'Organismo de tránsito que profirió el acto o su superior',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'La solicitud NO CADUCA: la Ley 1437 de 2011 no fija término para presentarla y su art. 95 permite que la revocación directa se cumpla aun cuando ya se haya acudido a la Jurisdicción de lo Contencioso Administrativo, siempre que no se haya notificado el auto admisorio de la demanda. Lo que sí está limitado es su procedencia: conforme al art. 94 no procede por la causal del num. 1 del art. 93 (manifiesta oposición a la Constitución o a la ley) cuando el peticionario interpuso los recursos de que el acto era susceptible, ni respecto de actos frente a los cuales ya operó la caducidad del medio de control judicial. La autoridad debe resolverla dentro de los dos (2) meses siguientes a su presentación (art. 95, inc. 2), contra esa decisión no procede recurso (art. 95, inc. 3), y ni la petición ni la decisión revive los términos para demandar ni da lugar a silencio administrativo (art. 96). En materia de tránsito, además, la revocación directa solo procede en forma supletiva al proceso contravencional y, de resolverse a favor del presunto infractor, sus efectos son a futuro, iniciando el cómputo de la caducidad desde la notificación de la aceptación (Ley 769 de 2002, art. 161, inc. 3, adicionado por el art. 11 de la Ley 1843 de 2017).' },
     requiredSections: [
       { n: 1, name: 'Identificación del acto cuya revocatoria se solicita', mandatory: true, basis: 'Ley 1437 de 2011, art. 93' },
       { n: 2, name: 'Causal invocada: oposición a la Constitución o la ley, afectación del interés público o agravio injustificado', mandatory: true, basis: 'Ley 1437 de 2011, art. 93' },
       { n: 3, name: 'Acreditación de que no se interpusieron los recursos de la vía gubernativa', mandatory: true, basis: 'Ley 1437 de 2011, art. 94' },
       { n: 4, name: 'Hechos y pruebas que sustentan la solicitud', mandatory: true, basis: null }
     ],
-    sourceUrl: 'https://leyes.co/codigo_nacional_de_transito_terrestre/142.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=41249'
   },
   {
     id: 'transito/solicitud-de-acuerdo-de-pago-de-multas-de-transito',
@@ -231,14 +232,14 @@ export const TRANSITO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 769 de 2002, arts. 125 y 127',
     competentAuthority: 'Organismo de tránsito que ordenó la inmovilización',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'La solicitud de entrega NO CADUCA: el art. 125, parágrafo 2, de la Ley 769 de 2002 no fija plazo alguno y condiciona la orden de entrega únicamente a la comprobación directa, por la autoridad de tránsito competente, de haberse subsanado la causa que motivó la inmovilización, ejecutándose a favor del propietario o del infractor que acredite tal calidad con prueba documental. Existen dos plazos asociados que sí corren: (i) en vehículos de servicio público, cuando la falta no pueda subsanarse por estar el vehículo inmovilizado, la autoridad puede ordenar la entrega previa acta de compromiso de subsanar en plazo no mayor a cinco (5) días, cuyo incumplimiento acarrea multa de veinte (20) SMLMV a cargo del propietario (art. 125, parágrafo 3); y (ii) transcurrido un (1) año sin que el propietario o poseedor retire el vehículo, subsane la causa y esté a paz y salvo por parqueadero y/o grúa, la autoridad publica el listado y el interesado cuenta con quince (15) días hábiles siguientes a la publicación para subsanar y pagar y obtener la entrega; vencido ese término se declara administrativamente el abandono y el organismo de tránsito queda facultado para enajenar el vehículo (art. 128 de la Ley 769 de 2002, sustituido por el art. 1 de la Ley 1730 de 2014). El retiro de patios puede hacerlo el propietario o un apoderado que no requiere ser abogado (Decreto Ley 019 de 2012, art. 209).' },
     requiredSections: [
       { n: 1, name: 'Identificación del vehículo y del acta de inmovilización', mandatory: true, basis: 'Art. 125' },
       { n: 2, name: 'Acreditación de la subsanación de la causa que la originó', mandatory: true, basis: 'Art. 125' },
       { n: 3, name: 'Prueba de la propiedad o de la tenencia legítima', mandatory: true, basis: null },
       { n: 4, name: 'Constancia de pago de los costos de grúa y parqueadero', mandatory: true, basis: 'Art. 127' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_nacional_de_transito_terrestre/125.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=58773'
   },
   {
     id: 'transito/orden-de-comparendo',

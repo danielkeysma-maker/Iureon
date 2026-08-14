@@ -13,9 +13,10 @@ import type { BranchCatalog } from '../types';
 export const SOCIETARIO_CATALOG: BranchCatalog = {
   meta: {
     branch: 'SOCIETARIO',
-    verifiedAt: '2026-08-12',
+    verifiedAt: '2026-08-14',
     sourceOfTruth: 'Código de Comercio (Decreto 410 de 1971); Ley 222 de 1995; Ley 1258 de 2008 (SAS); Ley 1116 de 2006 (insolvencia empresarial); Ley 2437 de 2024, que hizo permanente el régimen de los Decretos 560 y 772 de 2020; Ley 1564 de 2012, art. 24. Los términos marcados como verificados fueron leídos artículo por artículo en el texto de la norma.',
     gaps: [
+    'NOTA (2026-08-14): la lista siguiente es anterior a la verificacion masiva de esta fecha. Varios de esos huecos quedaron cerrados; los vigentes estan en _meta.unverified con su razon. Ver research/VERIFICATION-2026-08-14.md.',
     'LEY 2437 DE 2024 — RÉGIMEN OBLIGATORIO, NO OPCIONAL. Los deudores del régimen de la Ley 1116 de 2006 cuyos activos sean inferiores o iguales a 5.000 SMMLV SÓLO podrán ser admitidos al proceso de reorganización ABREVIADO. No es una alternativa que el deudor escoja: define a qué proceso puede entrar. Verifique el monto de los activos antes de escoger la vía.',
     'COMPETENCIA A PREVENCIÓN. La Superintendencia de Sociedades ejerce funciones jurisdiccionales sobre conflictos societarios, impugnación de actos de asambleas y juntas, desestimación de la personalidad jurídica y abuso del derecho (art. 24 CGP). Esa competencia opera A PREVENCIÓN y no excluye la de los jueces civiles. La elección de foro cambia el trámite y los recursos disponibles.',
     'Término de prescripción de la acción social de responsabilidad contra administradores: no se verificó en el texto de la norma. Queda sin verificar.',
@@ -67,7 +68,7 @@ export const SOCIETARIO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1258 de 2008, art. 42; Ley 1564 de 2012, art. 24',
     competentAuthority: 'Superintendencia de Sociedades, por proceso verbal sumario (art. 42)',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'El artículo 42 no fija término de caducidad para la acción: no opera caducidad. La norma sólo asigna competencia y trámite — la declaratoria de nulidad de los actos defraudatorios se adelanta ante la Superintendencia de Sociedades por proceso verbal sumario, y la acción indemnizatoria corresponde a prevención a la Superintendencia o a los jueces civiles del circuito especializados, también por proceso verbal sumario (Ley 1258 de 2008, art. 42).' },
     requiredSections: [
       { n: 1, name: 'Identificación de la sociedad, de los accionistas y de los administradores demandados', mandatory: true, basis: 'Art. 42' },
       { n: 2, name: 'Demostración del uso de la sociedad en fraude a la ley o en perjuicio de terceros', mandatory: true, basis: 'Art. 42' },
@@ -119,14 +120,14 @@ export const SOCIETARIO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1258 de 2008, art. 24; Ley 1564 de 2012, art. 24',
     competentAuthority: 'Superintendencia de Sociedades en ejercicio de funciones jurisdiccionales (art. 24 CGP)',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'El artículo 24 no fija término de caducidad para la acción de ejecución específica: no opera caducidad; los accionistas pueden promoverla ante la Superintendencia de Sociedades por el trámite del proceso verbal sumario. Los plazos que sí fija el artículo son sustanciales: el acuerdo sólo debe ser acatado por la compañía si fue depositado en las oficinas de la administración y su término no es superior a diez (10) años, prorrogables por voluntad unánime de los suscriptores por períodos que no superen los diez (10) años; y el representante de los suscriptores debe responder por escrito las aclaraciones solicitadas por la sociedad dentro de los cinco (5) días comunes siguientes al recibo de la solicitud (Ley 1258 de 2008, art. 24).' },
     requiredSections: [
       { n: 1, name: 'Copia del acuerdo de accionistas y prueba de su depósito en la sociedad', mandatory: true, basis: 'Ley 1258 de 2008, art. 24' },
       { n: 2, name: 'Identificación de las obligaciones incumplidas', mandatory: true, basis: null },
       { n: 3, name: 'Hechos del incumplimiento', mandatory: true, basis: null },
       { n: 4, name: 'Pretensión de cumplimiento y, en su caso, de indemnización', mandatory: true, basis: null }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/24.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=34130'
   },
   {
     id: 'societario/solicitud-de-admision-al-proceso-de-reorganizacion',
@@ -219,7 +220,7 @@ export const SOCIETARIO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1116 de 2006, arts. 29 y 48',
     competentAuthority: 'El juez del concurso',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'Del proyecto de reconocimiento y graduación de créditos y derechos de voto presentado por el promotor se corre traslado en las oficinas del juez del concurso por el término de cinco (5) días, y es dentro de ese traslado que deben presentarse las objeciones. Vencido, el juez corre traslado de las objeciones por tres (3) días para que los acreedores afectados se pronuncien, y luego corre un término de diez (10) días para provocar la conciliación de las objeciones; las no conciliadas las decide el juez del concurso en audiencia. La única prueba admisible es la documental y debe aportarse con el escrito de objeciones o con el de respuesta (Ley 1116 de 2006, art. 29).' },
     requiredSections: [
       { n: 1, name: 'Identificación del crédito objetado y del proyecto de graduación', mandatory: true, basis: 'Art. 29' },
       { n: 2, name: 'Razones de la objeción: existencia, cuantía o prelación', mandatory: true, basis: 'Art. 29' },
@@ -235,14 +236,14 @@ export const SOCIETARIO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Código de Comercio, arts. 181, 182 y 423; Ley 222 de 1995, art. 25',
     competentAuthority: 'Superintendencia de Sociedades, o el órgano estatutario competente',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'La ley no fija plazo para presentar la solicitud de convocatoria; el término perentorio es el de la antelación con que debe hacerse la convocatoria una vez ordenada: cuando menos quince (15) días hábiles de anticipación para las reuniones en que hayan de aprobarse los balances de fin de ejercicio, y cinco (5) días comunes en los demás casos, siempre en la forma prevista en los estatutos y, a falta de estipulación, mediante aviso publicado en un diario de circulación en el domicilio principal; tratándose de asamblea extraordinaria, en el aviso debe insertarse el orden del día (art. 424 C.Co).' },
     requiredSections: [
       { n: 1, name: 'Acreditación de la participación en el capital que legitima la solicitud', mandatory: true, basis: 'Art. 25 Ley 222 de 1995' },
       { n: 2, name: 'Orden del día propuesto', mandatory: true, basis: 'Art. 182 C.Co' },
       { n: 3, name: 'Constancia de la negativa o inacción del administrador', mandatory: true, basis: null },
       { n: 4, name: 'Estatutos vigentes y certificado de existencia y representación', mandatory: true, basis: null }
     ],
-    sourceUrl: 'https://leyes.co/codigo_de_comercio/181.htm'
+    sourceUrl: 'https://leyes.co/codigo_de_comercio/424.htm'
   },
   {
     id: 'societario/solicitud-de-ejercicio-del-derecho-de-inspeccion',
@@ -251,14 +252,14 @@ export const SOCIETARIO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Código de Comercio, arts. 48, 328 y 447; Ley 222 de 1995, art. 48',
     competentAuthority: 'La sociedad; la Superintendencia de Sociedades ante su negativa',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'Los documentos del artículo 446, junto con los libros y demás comprobantes exigidos por la ley, deben ponerse a disposición de los accionistas en las oficinas de la administración durante los quince (15) días hábiles que preceden a la reunión de la asamblea; es dentro de esa ventana que se ejerce el derecho de inspección respecto de los balances de fin de ejercicio (art. 447 C.Co).' },
     requiredSections: [
       { n: 1, name: 'Acreditación de la calidad de socio o accionista', mandatory: true, basis: null },
       { n: 2, name: 'Documentos y libros cuya inspección se solicita', mandatory: true, basis: 'Art. 48 Ley 222 de 1995' },
       { n: 3, name: 'Constancia de la negativa de la sociedad', mandatory: true, basis: null },
       { n: 4, name: 'Petición de orden para permitir la inspección', mandatory: true, basis: null }
     ],
-    sourceUrl: 'https://leyes.co/codigo_de_comercio/48.htm'
+    sourceUrl: 'https://leyes.co/codigo_de_comercio/447.htm'
   },
   {
     id: 'societario/demanda-de-disolucion-y-liquidacion-de-sociedad',
@@ -267,14 +268,14 @@ export const SOCIETARIO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Código de Comercio, arts. 218 y siguientes; Ley 1258 de 2008, art. 34',
     competentAuthority: 'Superintendencia de Sociedades o juez civil del circuito',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'Cuando la disolución provenga de causales distintas de las del artículo 219, los asociados pueden evitarla adoptando las modificaciones del caso y observando las reglas de las reformas del contrato, siempre que el acuerdo se formalice dentro de los seis (6) meses siguientes a la ocurrencia de la causal (art. 220 C.Co). El artículo 218 no fija término de caducidad para demandar la declaratoria de la causal.' },
     requiredSections: [
       { n: 1, name: 'Causal de disolución invocada', mandatory: true, basis: 'Art. 218 C.Co' },
       { n: 2, name: 'Hechos que la configuran', mandatory: true, basis: null },
       { n: 3, name: 'Certificado de existencia y representación y estatutos', mandatory: true, basis: null },
       { n: 4, name: 'Pretensión de declaratoria de disolución y orden de liquidación', mandatory: true, basis: 'Art. 218 C.Co' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_de_comercio/218.htm'
+    sourceUrl: 'https://leyes.co/codigo_de_comercio/220.htm'
   },
   {
     id: 'societario/demanda-de-nulidad-de-reforma-estatutaria',
@@ -399,7 +400,7 @@ export const SOCIETARIO_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 1258 de 2008, art. 42; Ley 1564 de 2012, art. 24',
     competentAuthority: 'Superintendencia de Sociedades',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'El artículo 42 no fija término de caducidad de la acción ni plazo legal para proferir la sentencia: no opera caducidad. El asunto se tramita por proceso verbal sumario ante la Superintendencia de Sociedades (Ley 1258 de 2008, art. 42), en el que, en firme el auto admisorio y vencido el traslado de la demanda, el juez practica en una sola audiencia las actuaciones de los artículos 372 y 373 del CGP (Ley 1564 de 2012, art. 392).' },
     requiredSections: [
       { n: 1, name: 'Análisis del uso de la sociedad en fraude a la ley o en perjuicio de terceros', mandatory: true, basis: 'Art. 42' },
       { n: 2, name: 'Declaratoria de nulidad de los actos defraudatorios', mandatory: true, basis: 'Art. 42' },

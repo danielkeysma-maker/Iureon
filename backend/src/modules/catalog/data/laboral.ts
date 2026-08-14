@@ -13,9 +13,10 @@ import type { BranchCatalog } from '../types';
 export const LABORAL_CATALOG: BranchCatalog = {
   meta: {
     branch: 'LABORAL',
-    verifiedAt: '2026-08-12',
+    verifiedAt: '2026-08-14',
     sourceOfTruth: 'Ley 2452 de 2025, nuevo Código Procesal del Trabajo y de la Seguridad Social. Publicada en el Diario Oficial el 2 de abril de 2025 y VIGENTE DESDE EL 2 DE ABRIL DE 2026, en reemplazo del Decreto Ley 2158 de 1948. Los términos marcados como verificados fueron leídos artículo por artículo en el texto del código nuevo.',
     gaps: [
+    'NOTA (2026-08-14): la lista siguiente es anterior a la verificacion masiva de esta fecha. Varios de esos huecos quedaron cerrados; los vigentes estan en _meta.unverified con su razon. Ver research/VERIFICATION-2026-08-14.md.',
     'RÉGIMEN DE TRANSICIÓN — ADVERTENCIA CENTRAL DE ESTA RAMA. La Ley 2452 de 2025 rige desde el 2 de abril de 2026, pero los procesos iniciados antes de esa fecha continúan tramitándose por el Decreto Ley 2158 de 1948 y sus reformas. Los términos de este catálogo son los del código NUEVO. Antes de aplicar cualquiera, confirme la fecha de inicio del proceso: si es anterior al 2 de abril de 2026, rige el código anterior y la numeración de artículos es distinta.',
     'La numeración del código cambió por completo frente al Decreto 2158 de 1948. Las citas de artículos que circulan en formatos, minutas y jurisprudencia anterior a abril de 2026 corresponden al código derogado y no coinciden con este catálogo.',
     'Término para presentar la demanda de casación: el art. 244 fija sus requisitos pero no el plazo. Queda sin verificar.',
@@ -32,7 +33,7 @@ export const LABORAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 2452 de 2025, arts. 65 y 66',
     competentAuthority: 'Juez laboral del circuito o juez municipal de pequeñas causas laborales, según la cuantía',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'No opera caducidad para presentar la demanda ordinaria laboral: la Ley 2452 de 2025 no fija plazo de caducidad para acudir a la jurisdicción. El art. 61 (Forma y requisitos de la demanda) regula únicamente su contenido, y el art. 66 num. 7 contempla la caducidad como causal de inadmisión solo "cuando se haya cumplido el término de caducidad para iniciar la acción", es decir, cuando una ley especial la establezca. El límite temporal ordinario es la prescripción trienal del art. 317: las acciones que emanen de las leyes sociales prescriben en tres (3) años contados desde que la respectiva obligación se hizo exigible, salvo prescripciones especiales del código.' },
     requiredSections: [
       { n: 1, name: 'Designación del juez a quien se dirige', mandatory: true, basis: null },
       { n: 2, name: 'Identificación de las partes: nombre, domicilio, dirección física, correo electrónico y canal digital', mandatory: true, basis: null },
@@ -43,7 +44,7 @@ export const LABORAL_CATALOG: BranchCatalog = {
       { n: 7, name: 'Cuantía, cuando sea necesaria para determinar la competencia', mandatory: false, basis: null },
       { n: 8, name: 'Anexos: poder, prueba de existencia y representación, y documentos probatorios', mandatory: true, basis: 'Art. 66' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/66.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=259639'
   },
   {
     id: 'laboral/subsanacion-de-demanda-laboral-inadmitida',
@@ -103,14 +104,14 @@ export const LABORAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 2452 de 2025, arts. 256 y 257',
     competentAuthority: 'El juez que conoce de la demanda principal',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'Se propone al contestar la demanda, esto es, dentro del término común de diez (10) días de traslado del auto admisorio (arts. 256 y 255). Se formula en escrito separado del de la contestación y, admitida, de ella se corre traslado común al reconvenido, al agente del Ministerio Público y a los integrados a la litis por el mismo término de la demanda inicial —diez (10) días— sustanciándose en adelante bajo un mismo trámite y decidiéndose en una misma sentencia (art. 257).' },
     requiredSections: [
       { n: 1, name: 'Requisitos generales de la demanda', mandatory: true, basis: 'Art. 257' },
       { n: 2, name: 'Acreditación de que el juez es competente para conocer de la reconvención', mandatory: true, basis: 'Art. 256' },
       { n: 3, name: 'Pretensiones propias del demandado contra el demandante', mandatory: true, basis: 'Art. 257' },
       { n: 4, name: 'Petición de pruebas', mandatory: true, basis: 'Art. 257' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/256.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=259639'
   },
   {
     id: 'laboral/recurso-de-reposicion-laboral',
@@ -181,7 +182,7 @@ export const LABORAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 2452 de 2025, art. 244',
     competentAuthority: 'Sala de Casación Laboral de la Corte Suprema de Justicia',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'Veinte (20) días de traslado para sustentar el recurso, contados desde que el tribunal lo concede en el efecto devolutivo (art. 243, inc. 2). Presentada la demanda de casación en término, el tribunal remite la actuación a la Sala de Casación Laboral; si no se sustenta oportunamente, el recurso se declara desierto y la actuación vuelve al juzgado de origen (art. 243, inc. 3). Admitido y calificada la demanda, la Sala corre traslado al opositor por quince (15) días (art. 247). El art. 244 fija únicamente los requisitos de contenido de la demanda de casación, no su plazo.' },
     requiredSections: [
       { n: 1, name: 'Designación de las partes', mandatory: true, basis: 'Art. 244 num. 1' },
       { n: 2, name: 'Síntesis de los hechos del caso', mandatory: true, basis: 'Art. 244' },
@@ -190,7 +191,7 @@ export const LABORAL_CATALOG: BranchCatalog = {
       { n: 5, name: 'Causal de casación invocada y normas de derecho sustancial violadas', mandatory: true, basis: 'Art. 244' },
       { n: 6, name: 'Cargos concretos con las razones que los sustentan', mandatory: true, basis: 'Art. 244' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/244.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=259639'
   },
   {
     id: 'laboral/solicitud-de-seleccion-de-sentencia-ante-la-sala-de-casacion-laboral',
@@ -264,7 +265,7 @@ export const LABORAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 2452 de 2025, arts. 265 y siguientes',
     competentAuthority: 'Juez laboral del circuito, o el que conoció del proceso cuando se ejecuta su propia sentencia',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'El plazo para solicitar la ejecución es igual al fijado en las leyes sustantivas para el ejercicio de la acción tendiente al reconocimiento del derecho cuya ejecución se pretende, y dicho plazo es de prescripción para todos los efectos (art. 274). Tratándose de acciones que emanan de las leyes sociales, ese plazo es de tres (3) años contados desde que la obligación se hizo exigible (art. 317). Las medidas cautelares pueden solicitarse desde la presentación de la demanda ejecutiva (art. 271).' },
     requiredSections: [
       { n: 1, name: 'Identificación del ejecutante y del ejecutado', mandatory: true, basis: null },
       { n: 2, name: 'Título ejecutivo laboral: obligación clara, expresa y exigible', mandatory: true, basis: 'Art. 265' },
@@ -272,7 +273,7 @@ export const LABORAL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Solicitud de librar mandamiento de pago', mandatory: true, basis: null },
       { n: 5, name: 'Solicitud de medidas cautelares', mandatory: false, basis: 'Art. 315' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/265.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=259639'
   },
   {
     id: 'laboral/formulacion-de-la-excepcion-de-prescripcion-trienal',
@@ -297,13 +298,13 @@ export const LABORAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 2452 de 2025, arts. 291 y 315',
     competentAuthority: 'El juez que conoce del proceso',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'En los procesos declarativos —ordinarios y especiales de fuero— pueden solicitarse desde la presentación de la demanda, por escrito motivado y con las pruebas respectivas (arts. 315 y 316). La medida se decreta mediante auto dentro de los cinco (5) días siguientes a la radicación de la solicitud, previa caución de hasta el diez por ciento (10%) del valor de las pretensiones estimadas (art. 316). Proferida sentencia de primera instancia favorable al demandante, a petición de este el juez ordena el embargo y secuestro de los bienes dentro de los treinta (30) días siguientes a la petición (art. 315 num. 1). Contra la providencia que resuelva sobre medidas cautelares procede apelación en el efecto devolutivo (arts. 316 y 228 num. 9).' },
     requiredSections: [
       { n: 1, name: 'Identificación de la medida solicitada', mandatory: true, basis: 'Art. 315' },
       { n: 2, name: 'Justificación de su necesidad', mandatory: true, basis: 'Art. 315' },
       { n: 3, name: 'Identificación de los bienes sobre los que recae', mandatory: true, basis: 'Art. 315' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/315.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=259639'
   },
   {
     id: 'laboral/solicitud-de-nulidad-procesal-laboral',
@@ -328,13 +329,13 @@ export const LABORAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 2452 de 2025, art. 62',
     competentAuthority: 'El juez que conoce del proceso',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'No opera caducidad: el art. 62 no fija plazo autónomo. La acumulación se formula en la misma demanda ("El demandante podrá acumular en una misma demanda varias pretensiones contra el demandado, aunque no sean conexas"), siempre que el juez sea competente para todas sin atender la cuantía, que no se excluyan entre sí salvo que se propongan como principales y subsidiarias, y que todas puedan tramitarse por el mismo procedimiento. Cuando la acumulación no cumpla los demás requisitos pero sí los tres numerales del inciso primero, el defecto se considera subsanado si no se propone oportunamente la respectiva excepción previa (art. 62, inc. final), oportunidad que es la del traslado de la demanda (art. 74).' },
     requiredSections: [
       { n: 1, name: 'Enunciación de las pretensiones que se acumulan', mandatory: true, basis: 'Art. 62' },
       { n: 2, name: 'Acreditación de competencia del juez para todas ellas', mandatory: true, basis: 'Art. 62' },
       { n: 3, name: 'Acreditación de compatibilidad y de identidad de procedimiento', mandatory: true, basis: 'Art. 62' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/62.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=259639'
   },
   {
     id: 'laboral/demanda-de-reconocimiento-de-pension-ante-la-jurisdiccion-laboral',
@@ -343,7 +344,7 @@ export const LABORAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 2452 de 2025, arts. 65 y 66; Ley 100 de 1993',
     competentAuthority: 'Juez laboral del circuito',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'No opera caducidad: la Ley 2452 de 2025 no fija plazo de caducidad para demandar el reconocimiento de una prestación pensional ante la jurisdicción laboral; el art. 66 num. 7 solo contempla la caducidad como causal de inadmisión cuando una ley especial la haya establecido. El límite temporal es la prescripción trienal del art. 317: las acciones que emanan de las leyes sociales prescriben en tres (3) años desde que la respectiva obligación se hizo exigible, salvo las prescripciones especiales del código. La presentación de la demanda interrumpe el término de prescripción (art. 318), y también lo interrumpe el simple reclamo escrito del acreedor (art. 319).' },
     requiredSections: [
       { n: 1, name: 'Identificación del afiliado y de la administradora demandada', mandatory: true, basis: null },
       { n: 2, name: 'Historia laboral y semanas cotizadas', mandatory: true, basis: null },
@@ -352,7 +353,7 @@ export const LABORAL_CATALOG: BranchCatalog = {
       { n: 5, name: 'Pretensiones: reconocimiento, retroactivo e intereses moratorios', mandatory: true, basis: null },
       { n: 6, name: 'Petición de pruebas', mandatory: true, basis: null }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/66.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=259639'
   },
   {
     id: 'laboral/auto-admisorio-de-la-demanda-laboral',
@@ -392,12 +393,12 @@ export const LABORAL_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 2452 de 2025, art. 66',
     competentAuthority: 'El juez que conoce del proceso',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'El art. 66 no fija término al juez para proferirlo: dispone que "el juez rechazará in limine o de plano la demanda, cuando carezca de jurisdicción o de competencia; en el mismo auto dispondrá la remisión al que considere competente". El término relevante es el de impugnación: el auto que rechaza la demanda es apelable (art. 228 num. 1) y el recurso se interpone y sustenta por escrito dentro de los tres (3) días siguientes cuando la providencia se notifica fuera de audiencia, u oralmente en la audiencia en que se profiera (art. 230). El rechazo por no subsanación opera vencidos los cinco (5) días concedidos en el auto inadmisorio (art. 66, inc. 2).' },
     requiredSections: [
       { n: 1, name: 'Motivo del rechazo: falta de jurisdicción o de competencia', mandatory: true, basis: 'Art. 66' },
       { n: 2, name: 'Orden de remisión al juez competente cuando proceda', mandatory: true, basis: 'Art. 66' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/66.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=259639'
   },
   {
     id: 'laboral/auto-que-resuelve-excepciones-previas-laborales',
@@ -436,7 +437,7 @@ export const LABORAL_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 2452 de 2025, arts. 65 y siguientes',
     competentAuthority: 'Juez laboral del circuito o juez municipal de pequeñas causas laborales',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'Se profiere oralmente en la audiencia de trámite y juzgamiento, cerrado el debate probatorio y oídas las alegaciones, aunque las partes o sus apoderados no hayan asistido o se hubieren retirado; el juez puede decretar un receso de hasta una (1) hora para proferir la decisión oral (art. 259). Excepcionalmente, cuando no disponga de medios electrónicos de registro o la complejidad del caso lo amerite, el juez puede abstenerse de dictarla oralmente: anuncia el sentido del fallo con una breve exposición de sus fundamentos y emite la decisión escrita dentro de los diez (10) días siguientes (art. 259, inc. 5). En procesos ordinarios las audiencias son dos y en ningún caso pueden celebrarse más de dos (arts. 124 y 125). El juez debe dictar sentencia anticipada, total o parcial, en los casos del art. 260.' },
     requiredSections: [
       { n: 1, name: 'Síntesis de la demanda y de su contestación', mandatory: true, basis: null },
       { n: 2, name: 'Motivación: examen crítico de las pruebas', mandatory: true, basis: null },
@@ -444,7 +445,7 @@ export const LABORAL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Resolución sobre las excepciones propuestas, incluida la prescripción', mandatory: true, basis: 'Art. 317' },
       { n: 5, name: 'Condena en costas', mandatory: true, basis: null }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/66.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=259639'
   },
   {
     id: 'laboral/sentencia-laboral-de-segunda-instancia',
@@ -453,7 +454,7 @@ export const LABORAL_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 2452 de 2025, arts. 228 a 231',
     competentAuthority: 'Sala laboral del tribunal superior del distrito judicial',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'Recibido el proceso, si no se requiere decreto y práctica de pruebas se corre traslado de cinco (5) días a las partes para alegar de conclusión, vencido el cual se dicta sentencia por escrito; si hay pruebas que practicar, se fija fecha, se reciben en la misma audiencia los alegatos de conclusión y luego se dicta por escrito la sentencia (art. 261 nums. 1 y 2). Cuando se trate de la apelación de un auto, el recurso se resuelve por escrito dentro de los cinco (5) días siguientes (art. 261 num. 3). El art. 261 no fija término al tribunal para proferir la sentencia de segunda instancia; el único plazo que allí se establece es el traslado de cinco (5) días para alegar. La decisión se limita a los puntos concretos planteados por el recurrente, salvo derechos mínimos irrenunciables (art. 228).' },
     requiredSections: [
       { n: 1, name: 'Delimitación a los reparos formulados por el apelante', mandatory: true, basis: 'Art. 230' },
       { n: 2, name: 'Síntesis del proceso y de la sentencia apelada', mandatory: true, basis: null },
@@ -461,7 +462,7 @@ export const LABORAL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Decisión: confirma, revoca o modifica', mandatory: true, basis: null },
       { n: 5, name: 'Condena en costas de la instancia', mandatory: true, basis: null }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/230.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=259639'
   },
   {
     id: 'laboral/sentencia-de-fuero-sindical',
@@ -486,14 +487,14 @@ export const LABORAL_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 2452 de 2025, arts. 265 y siguientes',
     competentAuthority: 'El juez de la ejecución',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'El juez ordena el pago de cantidades líquidas de dinero con sus intereses comerciales en el término de cinco (5) días contados a partir de la ejecutoria de la decisión, plazo dentro del cual el demandado debe cumplir la obligación o formular las excepciones que considere pertinentes (art. 273, inc. 1). El ejecutado puede proponer excepciones dentro de los cinco (5) días siguientes a la notificación del mandamiento ejecutivo, y vencido ese término se señala audiencia para resolverlas dentro de los cinco (5) días siguientes (art. 275 num. 1). Las cuestiones sobre requisitos formales del título, las excepciones previas y el beneficio de excusión solo pueden alegarse por reposición; de prosperar, el ejecutante tiene cinco (5) días para subsanar o aportar los documentos omitidos, so pena de revocatoria de la orden de pago (art. 273, inc. 4). El auto que niegue total o parcialmente el mandamiento de pago es apelable (art. 228 num. 7).' },
     requiredSections: [
       { n: 1, name: 'Verificación de que el título presta mérito ejecutivo', mandatory: true, basis: 'Art. 265' },
       { n: 2, name: 'Orden de pago con determinación de capital e intereses', mandatory: true, basis: null },
       { n: 3, name: 'Advertencia del término para proponer excepciones', mandatory: true, basis: null },
       { n: 4, name: 'Pronunciamiento sobre las medidas cautelares solicitadas', mandatory: false, basis: 'Art. 315' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/265.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=259639'
   },
   {
     id: 'laboral/auto-que-declara-la-nulidad-procesal-laboral',
@@ -502,13 +503,13 @@ export const LABORAL_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 2452 de 2025, art. 93',
     competentAuthority: 'El juez que conoce del proceso',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'El art. 93 no fija término al juez para proferirlo: dispone que "el juez resolverá la solicitud de nulidad previo traslado, decreto y práctica de las pruebas que fueren necesarias". La oportunidad para alegar la nulidad es en cualquiera de las instancias antes de que se dicte sentencia, o con posterioridad a esta si ocurriere en ella; la nulidad por indebida representación, falta de notificación o emplazamiento en legal forma, o la originada en sentencia contra la cual no proceda recurso, puede además alegarse como excepción en la ejecución de la sentencia, en la diligencia de entrega o incluso con posterioridad a la orden de seguir adelante con la ejecución, mientras el proceso no haya terminado por pago total o por otra causa legal (art. 93). El auto que decida o rechace una nulidad procesal es apelable (art. 228 num. 5), dentro de los tres (3) días siguientes si se notifica fuera de audiencia (art. 230).' },
     requiredSections: [
       { n: 1, name: 'Identificación de la causal configurada', mandatory: true, basis: 'Art. 93' },
       { n: 2, name: 'Determinación de la actuación afectada y de la que conserva validez', mandatory: true, basis: 'Art. 93' },
       { n: 3, name: 'Orden de rehacer la actuación anulada', mandatory: true, basis: 'Art. 93' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/93.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=259639'
   }
   ]
 };

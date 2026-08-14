@@ -13,9 +13,10 @@ import type { BranchCatalog } from '../types';
 export const NOTARIAL_CATALOG: BranchCatalog = {
   meta: {
     branch: 'NOTARIAL',
-    verifiedAt: '2026-08-12',
+    verifiedAt: '2026-08-14',
     sourceOfTruth: 'Decreto Ley 960 de 1970 (Estatuto del Notariado); Ley 1579 de 2012 (Estatuto de Registro de Instrumentos Públicos); Decreto 902 de 1988 (liquidación de herencias ante notario); Decreto 4436 de 2005 y Ley 962 de 2005 (divorcio ante notario); Ley 1183 de 2008; Ley 1996 de 2019. Los términos marcados como verificados fueron leídos artículo por artículo en el texto de la norma.',
     gaps: [
+    'NOTA (2026-08-14): la lista siguiente es anterior a la verificacion masiva de esta fecha. Varios de esos huecos quedaron cerrados; los vigentes estan en _meta.unverified con su razon. Ver research/VERIFICATION-2026-08-14.md.',
     'LA VÍA NOTARIAL SÓLO OPERA POR MUTUO ACUERDO. El divorcio, la liquidación de herencias y la de sociedad conyugal ante notario exigen acuerdo total de todos los interesados. Basta la oposición de uno para que el trámite deba adelantarse ante juez, por la vía de la rama FAMILIA o CIVIL. Verifique el acuerdo antes de escoger la vía: el trámite notarial iniciado sin él se pierde.',
     'DESISTIMIENTO TÁCITO A LOS DOS MESES. Tanto en el divorcio notarial (Decreto 4436 de 2005) como en la liquidación de herencia (Decreto 902 de 1988), si transcurren dos (2) meses desde que la escritura quedó a disposición de los interesados sin que concurran a otorgarla, se entiende que desistieron y el notario termina la actuación. Es un plazo que se vence por inacción, sin notificación previa.',
     'Términos para interponer los recursos de reposición y apelación contra los actos de registro: el art. 60 de la Ley 1579 de 2012 los establece pero remite al CPACA para los plazos. Esos términos están en la rama ADMINISTRATIVO, no aquí, y por eso figuran sin verificar en estas entradas.',
@@ -106,7 +107,7 @@ export const NOTARIAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1579 de 2012, art. 60; Ley 1437 de 2011, art. 76',
     competentAuthority: 'Registrador de Instrumentos Públicos que profirió el acto',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'Diez (10) días. El art. 60 de la Ley 1579 de 2012 concede el recurso pero no fija plazo; el art. 22 de la misma ley ordena que la nota devolutiva informe "los recursos que proceden conforme al Código de Procedimiento Administrativo y de lo Contencioso Administrativo", y el art. 76 de la Ley 1437 de 2011 —declarado EXEQUIBLE por la Sentencia C-007 de 2017— dispone que los recursos de reposición y apelación "deberán interponerse por escrito en la diligencia de notificación personal, o dentro de los diez (10) días siguientes a ella, o a la notificación por aviso, o al vencimiento del término de publicación, según el caso". Contra los actos presuntos el recurso puede interponerse en cualquier tiempo, salvo que se haya acudido ante el juez (Ley 1437 de 2011, art. 76). El recurso de reposición no es obligatorio (inciso final del art. 76).' },
     requiredSections: [
       { n: 1, name: 'Identificación del acto de registro o de la nota devolutiva recurrida', mandatory: true, basis: 'Art. 60' },
       { n: 2, name: 'Fecha de notificación del acto', mandatory: true, basis: 'Ley 1437 de 2011, art. 76' },
@@ -114,7 +115,7 @@ export const NOTARIAL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Documentos que subsanan la causal de devolución', mandatory: false, basis: null },
       { n: 5, name: 'Apelación subsidiaria ante el Director del Registro', mandatory: false, basis: 'Art. 60' }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=49731'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=41249'
   },
   {
     id: 'notarial/recurso-de-apelacion-contra-acto-de-registro',
@@ -123,14 +124,14 @@ export const NOTARIAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1579 de 2012, art. 60; Ley 1437 de 2011, art. 76',
     competentAuthority: 'Director del Registro de la Superintendencia de Notariado y Registro, o el funcionario que haga sus veces',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'Diez (10) días, contados en la diligencia de notificación personal o dentro de los diez (10) días siguientes a ella, a la notificación por aviso o al vencimiento del término de publicación (Ley 1437 de 2011, art. 76, declarado EXEQUIBLE por la Sentencia C-007 de 2017), término aplicable por la remisión expresa que el art. 22 de la Ley 1579 de 2012 hace al CPACA; el art. 60 de la Ley 1579 de 2012 concede la apelación ante el Director del Registro pero no señala plazo. La apelación "podrá interponerse directamente, o como subsidiario del de reposición y cuando proceda será obligatorio para acceder a la jurisdicción" (art. 76, inciso 3).' },
     requiredSections: [
       { n: 1, name: 'Identificación del acto recurrido y de la decisión de reposición, si la hubo', mandatory: true, basis: 'Art. 60' },
       { n: 2, name: 'Reparos concretos contra la calificación registral', mandatory: true, basis: 'Art. 60' },
       { n: 3, name: 'Fundamento legal de la inscripción pretendida', mandatory: true, basis: 'Art. 60' },
       { n: 4, name: 'Petición de revocatoria de la nota devolutiva y de orden de inscripción', mandatory: true, basis: 'Art. 60' }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=49731'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=41249'
   },
   {
     id: 'notarial/solicitud-de-correccion-de-error-en-el-registro',
@@ -139,14 +140,14 @@ export const NOTARIAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1579 de 2012, arts. 59 y siguientes',
     competentAuthority: 'Registrador de Instrumentos Públicos',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'No opera caducidad para pedir la corrección: el art. 59 de la Ley 1579 de 2012 dispone que los errores aritméticos, ortográficos, de digitación o mecanográficos que se deduzcan de los antecedentes y que no afecten la naturaleza jurídica del acto "podrán corregirse en cualquier tiempo", y la misma regla se aplica a los errores de calificación detectados antes de notificarse el acto registral. Los errores que modifiquen la situación jurídica del inmueble y que ya hayan sido publicitados o surtido efectos sólo pueden corregirse mediante actuación administrativa, con los requisitos y procedimientos del CPACA (Ley 1437 de 2011), de modo que los términos de esa actuación —y no un plazo de la Ley 1579— son los aplicables. De toda corrección debe dejarse salvedad en el folio (art. 59).' },
     requiredSections: [
       { n: 1, name: 'Identificación de la matrícula inmobiliaria y de la anotación errada', mandatory: true, basis: 'Art. 59' },
       { n: 2, name: 'Descripción precisa del error: aritmético, de nombre o de transcripción', mandatory: true, basis: 'Art. 59' },
       { n: 3, name: 'Documento que acredita el dato correcto', mandatory: true, basis: 'Art. 59' },
       { n: 4, name: 'Petición de corrección y de expedición del folio corregido', mandatory: true, basis: 'Art. 59' }
     ],
-    sourceUrl: 'https://actualicese.com/archivo/ley-1579-de-01-10-2012-parte-ii/'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=49731'
   },
   {
     id: 'notarial/solicitud-de-certificado-de-tradicion-y-libertad',
@@ -221,14 +222,14 @@ export const NOTARIAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 70 de 1931; Ley 495 de 1999',
     competentAuthority: 'Notario del círculo; se perfecciona con la inscripción en el registro',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'Quince (15) días de edicto. Presentada la petición con los requisitos legales, el notario dispone el emplazamiento "por medio de un edicto que debe fijarse por el término de quince (15) días, en lugar visible, para el público, de la Notaría", de quienes quieran oponerse por ser lesivo de sus derechos como acreedores del constituyente, y ordena además la publicación "por una (1) vez, dentro del anterior período de quince (15) días, en un periódico de amplia circulación del lugar" (Decreto 1069 de 2015, art. 2.2.6.9.5, que compila el art. 5 del Decreto 2817 de 2006, reglamentario del art. 37 de la Ley 962 de 2005). Desfijado el edicto, si hay oposición de acreedores y no se obtiene su consentimiento, el notario deja constancia en acta y da por terminada la actuación; si no hay oposición o se supera, se otorga la escritura (art. 2.2.6.9.6).' },
     requiredSections: [
       { n: 1, name: 'Identificación de los constituyentes y de los beneficiarios', mandatory: true, basis: 'Ley 70 de 1931' },
       { n: 2, name: 'Determinación del inmueble y su matrícula', mandatory: true, basis: 'Ley 70 de 1931' },
       { n: 3, name: 'Avalúo del inmueble dentro del límite legal', mandatory: true, basis: 'Ley 495 de 1999' },
       { n: 4, name: 'Certificado de tradición que acredite ausencia de gravámenes', mandatory: true, basis: null }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=49731'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=74174'
   },
   {
     id: 'notarial/escritura-publica-de-afectacion-a-vivienda-familiar',
@@ -237,14 +238,14 @@ export const NOTARIAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 258 de 1996; Ley 854 de 2003',
     competentAuthority: 'Notario del círculo; se perfecciona con la inscripción en el registro',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'La Ley 258 de 1996 no fija plazo alguno para constituir la afectación ni caducidad para pedirla: respecto de las viviendas adquiridas con posterioridad a su vigencia la afectación "opera por ministerio de la ley", y los inmuebles adquiridos antes "podrán afectarse a vivienda familiar mediante escritura pública otorgada por ambos cónyuges, o conforme al procedimiento notarial o judicial establecido en la presente ley" (art. 2), sin término. El procedimiento notarial del art. 9 tampoco señala plazos. No opera caducidad: en sentido inverso, el art. 4 permite que ambos cónyuges levanten la afectación "en cualquier momento, de común acuerdo y mediante escritura pública sometida a registro". El único efecto temporal relevante es la oponibilidad, que sólo surge a partir de la anotación en el folio de matrícula inmobiliaria (art. 5).' },
     requiredSections: [
       { n: 1, name: 'Identificación de los cónyuges o compañeros permanentes', mandatory: true, basis: 'Ley 258 de 1996' },
       { n: 2, name: 'Determinación del inmueble destinado a vivienda de la familia', mandatory: true, basis: 'Ley 258 de 1996' },
       { n: 3, name: 'Manifestación de que es el único inmueble destinado a ese fin', mandatory: true, basis: 'Ley 258 de 1996' },
       { n: 4, name: 'Efecto: los actos de disposición requerirán el consentimiento de ambos', mandatory: true, basis: 'Ley 258 de 1996' }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=49731'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=10794'
   },
   {
     id: 'notarial/solicitud-de-declaracion-de-posesion-regular-ante-notario',
@@ -253,7 +254,7 @@ export const NOTARIAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1183 de 2008',
     competentAuthority: 'Notario del círculo donde se ubique el inmueble',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'No hay plazo de caducidad para presentar la solicitud, pero sí términos propios del trámite. Requisito temporal sustancial: estar en posesión regular del inmueble, en nombre propio, en forma continua y exclusiva, sin violencia ni clandestinidad, "durante un año continuo o más" (Ley 1183 de 2008, art. 2, num. 1), acreditado con recibos de impuestos "con una antigüedad de por lo menos un año" (art. 6, num. 2). Efectuado el reparto o presentada la solicitud, el notario dispone de ocho (8) días hábiles para revisar que su contenido se ajuste a la Ley 1183 de 2008 y archivarla si opera alguna excepción del art. 9 (Decreto 1069 de 2015, art. 2.2.6.6.1, que compila el art. 1 del Decreto 2742 de 2008). La autoridad de planeación debe pronunciarse sobre la condición técnica y urbanística del inmueble "en un término no superior a veinte (20) días hábiles" contados desde la radicación; si guarda silencio el notario deja constancia y sigue el trámite, pero se abstiene de autorizar la escritura hasta que aquélla se pronuncie (art. 2.2.6.6.2). Si se presenta oposición en cualquier etapa, se ordena el archivo de las diligencias (Ley 1183 de 2008, art. 1, inciso 2). Inscrita la escritura, comienza a contarse el término de prescripción ordinaria conforme a la Ley 791 de 2002 (art. 2.2.6.6.4). Catastro y el IGAC deben entregar planos y certificaciones dentro de los diez (10) días hábiles siguientes a la solicitud (Ley 1183 de 2008, art. 21).' },
     requiredSections: [
       { n: 1, name: 'Identificación del poseedor y del inmueble', mandatory: true, basis: 'Ley 1183 de 2008' },
       { n: 2, name: 'Acreditación de la posesión material, pública y pacífica', mandatory: true, basis: 'Ley 1183 de 2008' },
@@ -261,7 +262,7 @@ export const NOTARIAL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Declaraciones extraprocesales de testigos', mandatory: true, basis: 'Ley 1183 de 2008' },
       { n: 5, name: 'Certificado de tradición del inmueble', mandatory: true, basis: null }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=49731'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=74174'
   },
   {
     id: 'notarial/acuerdo-de-apoyo-formalizado-ante-notario',
@@ -270,7 +271,7 @@ export const NOTARIAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1996 de 2019, arts. 15 y siguientes',
     competentAuthority: 'Notario o conciliador extrajudicial en derecho',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'Duración máxima de cinco (5) años: "Ningún acuerdo de apoyo puede extenderse por un período superior a cinco (5) años, pasados los cuales se deberá agotar de nuevo alguno de los procedimientos previstos en la presente ley" (Ley 1996 de 2019, art. 18). El titular del acto puede terminarlo unilateralmente "en cualquier momento" por escritura pública o ante conciliador extrajudicial en derecho, y puede modificarse por mutuo acuerdo también en cualquier momento (art. 20); la muerte del titular termina el acuerdo (art. 20, par. 1).' },
     requiredSections: [
       { n: 1, name: 'Identificación de la persona titular del acto jurídico y de las personas de apoyo', mandatory: true, basis: 'Ley 1996 de 2019, art. 15' },
       { n: 2, name: 'Constancia de la voluntad y preferencias del titular', mandatory: true, basis: 'Ley 1996 de 2019, art. 15' },
@@ -278,7 +279,7 @@ export const NOTARIAL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Duración del acuerdo y salvaguardias', mandatory: true, basis: 'Ley 1996 de 2019, art. 17' },
       { n: 5, name: 'Advertencia: la interdicción está prohibida y este acuerdo la reemplaza', mandatory: true, basis: 'Ley 1996 de 2019, art. 53' }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=99712'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=99712'
   },
   {
     id: 'notarial/solicitud-de-correccion-del-registro-civil-ante-notario',
@@ -287,14 +288,14 @@ export const NOTARIAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Decreto 1260 de 1970, arts. 89 a 95',
     competentAuthority: 'Notario encargado del registro civil',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'No opera caducidad. El estado civil "es indivisible, indisponible e imprescriptible" (Decreto 1260 de 1970, art. 1), y los arts. 89, 90, 91, 93 y 94 —en el texto vigente, modificado por los arts. 2 a 6 del Decreto 999 de 1988— no señalan plazo alguno para pedir la corrección: realizada la inscripción, el funcionario del registro, "a solicitud escrita del interesado", corrige los errores mecanográficos, ortográficos y los que se establezcan con la comparación del documento antecedente o con la sola lectura del folio, abriendo un folio nuevo; los demás errores se corrigen por escritura pública en la que el otorgante exprese las razones y protocolice los documentos que la fundamenten (art. 91). El único límite temporal-cuantitativo es el del art. 94: el propio inscrito puede disponer la modificación de su nombre por escritura pública "por una sola vez". Toda modificación que envuelva cambio de estado civil exige escritura pública o decisión judicial en firme (art. 95).' },
     requiredSections: [
       { n: 1, name: 'Identificación del registro civil y del inscrito', mandatory: true, basis: 'Decreto 1260 de 1970' },
       { n: 2, name: 'Error que se pretende corregir', mandatory: true, basis: 'Decreto 1260 de 1970' },
       { n: 3, name: 'Documentos auténticos que acreditan el dato correcto', mandatory: true, basis: 'Decreto 1260 de 1970' },
       { n: 4, name: 'Advertencia: la corrección se hace por escritura pública cuando altera el estado civil', mandatory: true, basis: 'Decreto 1260 de 1970' }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=49731'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=8256'
   },
   {
     id: 'notarial/solicitud-de-matrimonio-civil-ante-notario',
@@ -303,14 +304,14 @@ export const NOTARIAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Decreto 2668 de 1988',
     competentAuthority: 'Notario del círculo del domicilio de la mujer o el que escojan los contrayentes',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'Edicto de cinco (5) días hábiles: "Presentada la solicitud con el lleno de todos los requisitos legales, el notario hará fijar un edicto por el término de cinco (5) días hábiles, en la secretaría de su despacho" (Decreto 2668 de 1988, art. 4, modificado por el art. 1 del Decreto 1556 de 1989). Si el otro contrayente es vecino de municipio de distinto círculo, o si alguno no tiene seis (6) meses de residencia en el círculo, el notario primero del círculo fijará un nuevo edicto por cinco (5) días (art. 4, inciso 2, en concordancia con el art. 131 del Código Civil). Los registros civiles de nacimiento deben haberse expedido "con antelación no mayor de un (1) mes a la solicitud del matrimonio" (art. 3); el extranjero no domiciliado debe aportar registro civil de nacimiento y certificado de soltería con vigencia inferior a tres (3) meses (art. 4, inciso 3). Vencido y desfijado el edicto se otorga la escritura con la que queda perfeccionado el matrimonio (art. 5). Plazo de caducidad del trámite: "Transcurridos seis (6) meses de la presentación de la solicitud, sin que se hubiere celebrado el matrimonio, se dará por terminado el trámite notarial, sin perjuicio de que los interesados puedan presentarla nuevamente" (art. 9). Si se presenta oposición antes de la celebración, el trámite notarial termina (art. 8).' },
     requiredSections: [
       { n: 1, name: 'Identificación de ambos contrayentes con sus registros civiles de nacimiento', mandatory: true, basis: 'Decreto 2668 de 1988' },
       { n: 2, name: 'Manifestación libre de contraer matrimonio', mandatory: true, basis: 'Decreto 2668 de 1988' },
       { n: 3, name: 'Información sobre hijos comunes extramatrimoniales, si los hay', mandatory: true, basis: 'Decreto 2668 de 1988' },
       { n: 4, name: 'Prueba de la disolución y liquidación de vínculos anteriores, cuando existan', mandatory: true, basis: 'Decreto 2668 de 1988' }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=49731'
+    sourceUrl: 'https://normativa.colpensiones.gov.co/colpens/docs/decreto_2668_1988.htm'
   },
   {
     id: 'notarial/edicto-emplazatorio-en-sucesion-notarial',

@@ -192,7 +192,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1437 de 2011, art. 143',
     competentAuthority: 'Consejo de Estado (congresistas) y Tribunal Administrativo (diputados, concejales y ediles), conforme a las reglas de competencia del Código. Legitimación: la Mesa Directiva de la Cámara, Asamblea, Concejo o junta administradora local correspondiente, o cualquier ciudadano.',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'La solicitud debe presentarse dentro de los cinco (5) años contados a partir del día siguiente al de la ocurrencia del hecho generador de la causal de pérdida de investidura, so pena de que opere la caducidad (Ley 1881 de 2018, art. 6). El art. 143 del CPACA no fija término alguno. Términos internos del trámite: la Sala Especial de Decisión dispone de veinte (20) días hábiles desde la presentación de la solicitud para dictar sentencia de primera instancia y la Sala Plena de igual plazo para decidir la apelación (art. 3); el recurso de apelación debe interponerse y sustentarse dentro de los diez (10) días siguientes a la notificación de la sentencia (art. 14 num. 1); el recurso extraordinario especial de revisión procede dentro de los dos (2) años siguientes a la ejecutoria (art. 19). La Ley 1881 de 2018 derogó la Ley 144 de 1994 (art. 24) y se aplica, en lo que sea compatible, a los procesos de pérdida de investidura de concejales y diputados (art. 22).' },
     requiredSections: [
       { n: 1, name: 'Designación de la corporación judicial competente', mandatory: false, basis: 'art. 162 por remisión' },
       { n: 2, name: 'Identificación del solicitante y del congresista, diputado, concejal o edil demandado', mandatory: false, basis: 'art. 162 num. 1' },
@@ -203,7 +203,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
       { n: 7, name: 'Notificaciones y canal digital', mandatory: false, basis: 'art. 162 num. 7' },
       { n: 8, name: 'Anexos', mandatory: false, basis: 'art. 166' }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=41249'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1881_2018.html'
   },
   {
     id: 'administrativo/demanda-de-proteccion-de-los-derechos-e-intereses-colectivos',
@@ -212,7 +212,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1437 de 2011, art. 144 (medio de control); art. 161 num. 4 (requisito de procedibilidad: reclamación previa prevista en el art. 144)',
     competentAuthority: 'Jurisdicción de lo Contencioso Administrativo',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'No opera caducidad: la acción popular podrá promoverse durante el tiempo que subsista la amenaza o peligro al derecho e interés colectivo (Ley 472 de 1998, art. 11, aplicable por remisión del art. 164 num. 1 lit. f) del CPACA a los demás casos expresamente establecidos en la ley). En el texto oficial vigente aparece tachado como INEXEQUIBLE el aparte que fijaba un término de cinco (5) años, contados desde la acción u omisión que produjo la alteración, cuando la acción se dirigiera a volver las cosas a su estado anterior; ese plazo NO puede oponerse hoy. Requisito previo: reclamación ante la autoridad conforme al art. 144 del CPACA.' },
     requiredSections: [
       { n: 1, name: 'Designación del juez competente', mandatory: false, basis: 'art. 162' },
       { n: 2, name: 'Partes y representantes', mandatory: false, basis: 'art. 162 num. 1' },
@@ -224,7 +224,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
       { n: 8, name: 'Notificaciones y canal digital', mandatory: false, basis: 'art. 162 num. 7' },
       { n: 9, name: 'Anexos', mandatory: false, basis: 'art. 166' }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=41249'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0472_1998.html'
   },
   {
     id: 'administrativo/demanda-de-reparacion-de-los-perjuicios-causados-a-un-grupo-accion-de-grupo',
@@ -495,7 +495,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1437 de 2011, art. 74 num. 3; art. 77 (requisitos)',
     competentAuthority: 'El superior del funcionario que dictó la decisión, ante quien puede interponerse directamente (art. 74 num. 3)',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'De este recurso se podrá hacer uso dentro de los cinco (5) días siguientes a la notificación de la decisión (art. 74 num. 3, inciso 3). Procede cuando se rechace el recurso de apelación, es facultativo y puede interponerse directamente ante el superior del funcionario que dictó la decisión, mediante escrito al que deberá acompañarse copia de la providencia que haya negado el recurso (art. 74 num. 3, incisos 1 a 3). Recibido el escrito, el superior ordenará inmediatamente la remisión del expediente y decidirá lo que sea del caso.' },
     requiredSections: [
       { n: 1, name: 'Designación del superior del funcionario que dictó la decisión', mandatory: true, basis: 'art. 74 num. 3 — se interpone directamente ante el superior' },
       { n: 2, name: 'Identificación del recurrente', mandatory: false, basis: 'art. 77 num. 1' },
@@ -504,7 +504,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
       { n: 5, name: 'Copia de la providencia que negó el recurso de apelación', mandatory: true, basis: 'art. 74 num. 3, inciso final — debe acompañarse al escrito' },
       { n: 6, name: 'Nombre y dirección del recurrente y dirección electrónica', mandatory: true, basis: 'art. 77 num. 4' }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=41249'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1437_2011_pr001.html'
   },
   {
     id: 'administrativo/solicitud-de-revocacion-directa-de-actos-administrativos',
@@ -550,7 +550,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1437 de 2011, art. 269, en concordancia con el art. 102',
     competentAuthority: 'Consejo de Estado. Procede si se negó la extensión de los efectos de una sentencia de unificación o si la autoridad guardó silencio en los términos del art. 102.',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'Treinta (30) días siguientes a la negativa total o parcial de la petición de extensión, o al silencio de la autoridad sobre ella, para acudir ante el Consejo de Estado en los términos del art. 269 (art. 102, modificado por el art. 17 de la Ley 2080 de 2021). La solicitud de extensión ante la autoridad suspende los términos para presentar la demanda, que se reanudan al vencimiento de ese plazo de treinta (30) días cuando el interesado decide no acudir al Consejo de Estado (art. 102, incisos finales). Si el escrito no cumple los requisitos se inadmite para corregirlo dentro de los diez (10) días siguientes, so pena de rechazo (art. 269, inciso 3); la presentación extemporánea es causal de rechazo de plano (art. 269, causal 2).' },
     requiredSections: [
       { n: 1, name: 'Designación del Consejo de Estado', mandatory: false, basis: 'art. 269' },
       { n: 2, name: 'Actuación a través de apoderado', mandatory: true, basis: 'art. 269, inciso 1 («el interesado, a través de apoderado»)' },
@@ -560,7 +560,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
       { n: 6, name: 'Manifestación bajo la gravedad del juramento —que se entiende prestado con la sola presentación de la solicitud— de que no se ha acudido a la jurisdicción de lo contencioso administrativo para obtener el reconocimiento del derecho pretendido', mandatory: true, basis: 'art. 269, inciso 2' },
       { n: 7, name: 'Notificaciones', mandatory: false, basis: null }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=41249'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1437_2011_pr002.html'
   },
   {
     id: 'administrativo/solicitud-de-medidas-cautelares',
@@ -626,7 +626,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1437 de 2011, art. 161 num. 1 (modificado por el art. 34 de la Ley 2080 de 2021)',
     competentAuthority: 'Ministerio Público — Procuraduría General de la Nación (agentes del Ministerio Público ante la Jurisdicción de lo Contencioso Administrativo)',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'El trámite se rige hoy por la Ley 2220 de 2022 (Estatuto de Conciliación), que derogó íntegramente la Ley 640 de 2001 (art. 146). El agente del Ministerio Público admite la solicitud dentro de los diez (10) días siguientes a su recibo o a su subsanación y fija la audiencia, que deberá realizarse dentro de los treinta (30) días siguientes a la notificación del auto admisorio (art. 106 num. 1). El requisito de procedibilidad se entiende surtido, entre otros eventos, cuando vencido el término de tres (3) meses contados desde la presentación de la solicitud —o su prórroga— la audiencia no se hubiere celebrado por cualquier causa, caso en el cual se puede acudir directamente a la Jurisdicción de lo Contencioso Administrativo con la sola presentación de la solicitud (art. 94 num. 3). La presentación de la petición de convocatoria suspende el término de caducidad del medio de control hasta la ejecutoria de la providencia que imprueba el acuerdo, la expedición de las constancias o el vencimiento de los tres (3) meses, lo primero que ocurra; durante la prórroga pactada por las partes NO opera la suspensión (art. 96 y su parágrafo).' },
     requiredSections: [
       { n: 1, name: 'Designación del agente del Ministerio Público (Procurador Judicial Delegado ante la Jurisdicción de lo Contencioso Administrativo)', mandatory: false, basis: null },
       { n: 2, name: 'Identificación del convocante y del convocado (entidad pública)', mandatory: false, basis: null },
@@ -636,7 +636,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
       { n: 6, name: 'Pruebas y anexos', mandatory: false, basis: null },
       { n: 7, name: 'Notificaciones', mandatory: false, basis: null }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=41249'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_2220_2022_pr002.html'
   },
   {
     id: 'administrativo/escrito-de-constitucion-en-renuencia-requisito-de-procedibilidad-de-la-accion-de-cumplimiento',
@@ -645,7 +645,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1437 de 2011, art. 161 num. 3, que remite al art. 8 de la Ley 393 de 1997',
     competentAuthority: 'La autoridad obligada al cumplimiento de la norma con fuerza material de ley o del acto administrativo',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'La renuencia se constituye cuando el accionante ha reclamado previamente el cumplimiento del deber legal o administrativo y la autoridad se ha ratificado en su incumplimiento o no ha contestado dentro de los diez (10) días siguientes a la presentación de la solicitud (Ley 393 de 1997, art. 8, inciso 2, al que remite expresamente el art. 161 num. 3 del CPACA). Excepcionalmente puede prescindirse del requisito cuando cumplirlo a cabalidad genere el inminente peligro de sufrir un perjuicio irremediable, lo que deberá sustentarse en la demanda (la expresión «para el accionante» figura tachada como INEXEQUIBLE en el texto oficial).' },
     requiredSections: [
       { n: 1, name: 'Designación de la autoridad obligada', mandatory: false, basis: null },
       { n: 2, name: 'Identificación del solicitante', mandatory: false, basis: null },
@@ -653,7 +653,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
       { n: 4, name: 'Requerimiento expreso de cumplimiento', mandatory: true, basis: 'art. 161 num. 3' },
       { n: 5, name: 'Notificaciones', mandatory: false, basis: null }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=41249'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0393_1997.html'
   },
   {
     id: 'administrativo/reclamacion-previa-para-la-proteccion-de-derechos-e-intereses-colectivos-requisito-de-procedibilidad',
@@ -662,7 +662,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1437 de 2011, art. 161 num. 4, que remite al art. 144 del mismo Código',
     competentAuthority: 'La autoridad presuntamente responsable de la amenaza o vulneración del derecho o interés colectivo',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'Antes de presentar la demanda el interesado debe solicitar a la autoridad o al particular en ejercicio de funciones administrativas que adopte las medidas necesarias de protección; si la autoridad no atiende dicha reclamación dentro de los quince (15) días siguientes a la presentación de la solicitud o se niega a ello, podrá acudirse ante el juez (art. 144, inciso 3, al que remite el art. 161 num. 4). Excepcionalmente se podrá prescindir de este requisito cuando exista inminente peligro de ocurrir un perjuicio irremediable en contra de los derechos e intereses colectivos, situación que deberá sustentarse en la demanda.' },
     requiredSections: [
       { n: 1, name: 'Designación de la autoridad', mandatory: false, basis: null },
       { n: 2, name: 'Identificación del reclamante', mandatory: false, basis: null },
@@ -671,7 +671,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
       { n: 5, name: 'Petición de adopción de las medidas necesarias', mandatory: true, basis: 'art. 144' },
       { n: 6, name: 'Notificaciones', mandatory: false, basis: null }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=41249'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1437_2011_pr003.html'
   },
   {
     id: 'administrativo/escritura-publica-para-invocar-el-silencio-administrativo-positivo',
@@ -680,14 +680,14 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1437 de 2011, art. 85 (procedimiento para invocar el silencio administrativo positivo), en concordancia con el art. 84',
     competentAuthority: 'Notaría (protocolización) y la autoridad ante la cual se hace valer el acto ficto positivo',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'El art. 85 no fija plazo alguno para otorgar la escritura: no opera caducidad para protocolizar una vez configurado el silencio positivo. El interesado protocoliza la constancia o copia de que trata el art. 15 junto con una declaración jurada de no haberle sido notificada la decisión dentro del término previsto; la escritura y sus copias auténticas producen todos los efectos legales de la decisión favorable que se pidió y es deber de todas las personas y autoridades reconocerla así; para efectos de la protocolización se entiende que los documentos carecen de valor económico (art. 85). El plazo tras el cual se entiende producida la decisión positiva presunta lo fija cada disposición legal especial y se cuenta a partir del día en que se presentó la petición o recurso (art. 84); el acto positivo presunto puede ser objeto de revocación directa (art. 84, inciso 3).' },
     requiredSections: [
       { n: 1, name: 'Identificación del interesado', mandatory: false, basis: null },
       { n: 2, name: 'Copia de la petición presentada y prueba de su radicación', mandatory: true, basis: 'art. 85' },
       { n: 3, name: 'Declaración jurada de no haberse notificado la decisión dentro del término previsto', mandatory: true, basis: 'art. 85' },
       { n: 4, name: 'Invocación de la disposición legal especial que consagra el silencio positivo para el caso', mandatory: true, basis: 'art. 84 — el silencio positivo sólo opera en los casos expresamente previstos en disposiciones legales especiales' }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=41249'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1437_2011_pr002.html'
   },
   {
     id: 'administrativo/recurso-de-apelacion-contra-sentencias-y-autos-judicial',
@@ -696,14 +696,14 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1437 de 2011, art. 243',
     competentAuthority: 'El superior funcional del juez de primera instancia (Tribunal Administrativo o Consejo de Estado)',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'Contra sentencias de primera instancia: el recurso deberá interponerse y sustentarse ante la autoridad que profirió la providencia dentro de los diez (10) días siguientes a su notificación, término que también aplica a las sentencias dictadas en audiencia (art. 247 num. 1, modificado por el art. 67 de la Ley 2080 de 2021). Contra autos (los enumerados en el art. 243): si el auto se profiere en audiencia, la apelación deberá interponerse y sustentarse oralmente a continuación de su notificación en estrados o de la del auto que niega total o parcialmente la reposición; si el auto se notifica por estado, deberá interponerse y sustentarse por escrito dentro de los tres (3) días siguientes a su notificación, término que en el medio de control electoral es de dos (2) días (art. 244 nums. 2 y 3, modificado por el art. 64 de la Ley 2080 de 2021).' },
     requiredSections: [
       { n: 1, name: 'Designación del juez de primera instancia y del superior', mandatory: false, basis: null },
       { n: 2, name: 'Identificación de la providencia apelada', mandatory: true, basis: 'art. 243' },
       { n: 3, name: 'Sustentación y reparos concretos contra la providencia', mandatory: true, basis: null },
       { n: 4, name: 'Petición', mandatory: false, basis: null }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=41249'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1437_2011_pr005.html'
   },
   {
     id: 'administrativo/recurso-de-suplica',
@@ -712,14 +712,14 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1437 de 2011, art. 246',
     competentAuthority: 'Los demás magistrados de la Sala o Sección, distintos del ponente que dictó el auto',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'Si el auto del magistrado ponente se profiere en audiencia, el recurso deberá interponerse y sustentarse oralmente a continuación de su notificación en estrados o de la del auto que niega total o parcialmente la reposición; si el auto se notifica por estado, deberá interponerse y sustentarse por escrito dentro de los tres (3) días siguientes a su notificación, término que en el medio de control electoral es de dos (2) días (art. 246, literales b) y c), modificado por el art. 66 de la Ley 2080 de 2021). El escrito se mantiene dos (2) días en secretaría a disposición de los demás sujetos procesales. Si el recurrente no sustenta el recurso, el magistrado ponente se abstendrá de plano de darle trámite (art. 246, literal e).' },
     requiredSections: [
       { n: 1, name: 'Designación de la Sala o Sección', mandatory: false, basis: null },
       { n: 2, name: 'Identificación del auto del magistrado ponente que se suplica', mandatory: true, basis: 'art. 246' },
       { n: 3, name: 'Sustentación', mandatory: true, basis: null },
       { n: 4, name: 'Petición', mandatory: false, basis: null }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=41249'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1437_2011_pr005.html'
   },
   {
     id: 'administrativo/recurso-extraordinario-de-revision',
@@ -728,7 +728,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1437 de 2011, art. 248 (procedencia)',
     competentAuthority: 'Consejo de Estado o Tribunal Administrativo, según la corporación que dictó la sentencia ejecutoriada',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'El recurso podrá interponerse dentro del año siguiente a la ejecutoria de la respectiva sentencia (art. 251, inciso 1). En las causales de los numerales 3 y 4 del art. 250, dentro del año siguiente a la ejecutoria de la sentencia penal que así lo declare; en la causal del numeral 7, dentro del año siguiente a la ocurrencia de los motivos que dan lugar al recurso; y en los casos previstos en el art. 20 de la Ley 797 de 2003, dentro de los cinco (5) años siguientes a la ejecutoria de la providencia judicial o, cuando ella no se requiera, dentro del mismo término contado a partir del perfeccionamiento del acuerdo transaccional o conciliatorio (art. 251).' },
     requiredSections: [
       { n: 1, name: 'Designación de la corporación competente', mandatory: false, basis: null },
       { n: 2, name: 'Identificación de la sentencia ejecutoriada objeto del recurso', mandatory: true, basis: 'art. 248 — procede contra sentencias ejecutoriadas dictadas por las secciones y subsecciones' },
@@ -736,7 +736,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
       { n: 4, name: 'Pruebas', mandatory: false, basis: null },
       { n: 5, name: 'Petición', mandatory: false, basis: null }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=41249'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1437_2011_pr005.html'
   },
   {
     id: 'administrativo/recurso-extraordinario-de-unificacion-de-jurisprudencia',
@@ -745,7 +745,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1437 de 2011, arts. 256 (fines) y 257 (procedencia)',
     competentAuthority: 'Consejo de Estado',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'El recurso deberá interponerse y sustentarse por escrito ante quien expidió la providencia, a más tardar dentro de los diez (10) días siguientes a su ejecutoria (art. 261, modificado por el art. 72 de la Ley 2080 de 2021). Si se interpuso y sustentó en término, el ponente lo concederá dentro de los cinco (5) días siguientes; de lo contrario lo rechazará o lo declarará desierto.' },
     requiredSections: [
       { n: 1, name: 'Designación del Consejo de Estado', mandatory: false, basis: null },
       { n: 2, name: 'Identificación de la sentencia dictada en única o en segunda instancia objeto del recurso', mandatory: true, basis: 'art. 257' },
@@ -753,7 +753,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
       { n: 4, name: 'Sustentación', mandatory: true, basis: null },
       { n: 5, name: 'Petición', mandatory: false, basis: null }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=41249'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1437_2011_pr006.html'
   },
   {
     id: 'administrativo/acto-administrativo-que-resuelve-el-recurso-de-reposicion-o-de-apelacion-en-via-gubernativa',
@@ -865,7 +865,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 1437 de 2011, art. 136',
     competentAuthority: 'Jurisdicción de lo Contencioso Administrativo en el lugar donde se expidan las medidas, si se trata de entidades territoriales, o el Consejo de Estado si emanan de autoridades nacionales, de acuerdo con las reglas de competencia establecidas en el Código (art. 136)',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'No opera caducidad: el control es oficioso y no se ejerce mediante demanda sujeta a plazo. Las autoridades competentes que expidan las medidas deben enviar los actos administrativos a la autoridad judicial indicada dentro de las cuarenta y ocho (48) horas siguientes a su expedición; si no se efectuare el envío, la autoridad judicial competente aprehenderá de oficio su conocimiento (art. 136, inciso 2). Trámite (art. 185): aviso en secretaría por diez (10) días para la intervención ciudadana; las pruebas que se decreten se practican en el término de diez (10) días; el Ministerio Público rinde concepto dentro de los diez (10) días siguientes; el ponente registra el proyecto de fallo dentro de los quince (15) días siguientes a la entrada al despacho y la Sala Plena adopta el fallo dentro de los veinte (20) días siguientes.' },
     requiredSections: [
       { n: 1, name: 'Identificación de la medida de carácter general objeto de control', mandatory: true, basis: 'art. 136' },
       { n: 2, name: 'Verificación de que fue dictada en ejercicio de la función administrativa y como desarrollo de los decretos legislativos durante los Estados de Excepción', mandatory: true, basis: 'art. 136 — es el presupuesto del control' },
@@ -873,7 +873,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
       { n: 4, name: 'Consideraciones y confrontación con el decreto legislativo y el ordenamiento superior', mandatory: true, basis: null },
       { n: 5, name: 'Decisión', mandatory: true, basis: null }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=41249'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1437_2011_pr003.html'
   },
   {
     id: 'administrativo/auto-que-fija-fecha-para-la-audiencia-inicial-y-audiencia-inicial',
@@ -915,13 +915,13 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 1437 de 2011, art. 182',
     competentAuthority: 'Juez o Magistrado Ponente / Sala',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'En la fecha y hora señaladas se oyen los alegatos hasta por veinte (20) minutos a cada interviniente, en el orden previsto en el art. 182 num. 1. Inmediatamente el juzgador dictará sentencia oral; de no ser posible, informará el sentido de la sentencia en forma oral y la consignará por escrito dentro de los diez (10) días siguientes (art. 182 num. 2, modificado por el art. 41 de la Ley 2080 de 2021). Cuando no fuere posible indicar el sentido de la sentencia, se proferirá por escrito dentro de los treinta (30) días siguientes, dejando constancia en la audiencia del motivo (art. 182 num. 3).' },
     requiredSections: [
       { n: 1, name: 'Alegatos de conclusión de las partes', mandatory: true, basis: 'art. 182' },
       { n: 2, name: 'Concepto del Ministerio Público', mandatory: false, basis: null },
       { n: 3, name: 'Sentencia', mandatory: true, basis: 'art. 182' }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=41249'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1437_2011_pr004.html'
   },
   {
     id: 'administrativo/auto-inadmisorio-de-la-solicitud-de-extension-de-jurisprudencia',
@@ -945,13 +945,13 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 1437 de 2011, art. 269',
     competentAuthority: 'Consejo de Estado — Magistrado Ponente',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'El art. 269 no sujeta a plazo la expedición del auto de rechazo de plano: no opera caducidad ni término legal para proferirlo. El único término expreso del trámite previo es el de la inadmisión: diez (10) días para corregir el escrito, so pena de rechazo de la solicitud (art. 269, inciso 3). Las causales de rechazo de plano son SEIS en el texto vigente (modificado por el art. 77 de la Ley 2080 de 2021): (1) haber acudido ya a la Jurisdicción de lo Contencioso Administrativo para obtener el mismo reconocimiento; (2) presentación extemporánea; (3) pedir la extensión de una sentencia que no sea de unificación; (4) que la sentencia de unificación invocada no sea de aquellas que reconocen un derecho; (5) haber operado la caducidad del medio de control procedente o la prescripción total del derecho reclamado; (6) que no proceda la extensión por no existir o no estar acreditada la similitud entre la situación del peticionario y la sentencia de unificación invocada.' },
     requiredSections: [
       { n: 1, name: 'Identificación de la solicitud de extensión', mandatory: false, basis: 'art. 269' },
       { n: 2, name: 'Causal de rechazo de plano invocada', mandatory: true, basis: 'art. 269: (1) el peticionario ya acudió a la Jurisdicción de lo Contencioso Administrativo para obtener el reconocimiento del derecho pretendido; (2) se presentó extemporáneamente; (3) se pide extender una sentencia que no es de unificación; (4) la sentencia de unificación invocada no es de aquellas que reconocen un derecho' },
       { n: 3, name: 'Decisión de rechazo', mandatory: true, basis: 'art. 269' }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=41249'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1437_2011_pr006.html'
   },
   {
     id: 'administrativo/auto-que-decreta-levanta-modifica-o-revoca-la-medida-cautelar',
@@ -960,7 +960,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 1437 de 2011, arts. 229, 230, 231, 234 y 235',
     competentAuthority: 'Juez o Magistrado Ponente',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'El auto que decida las medidas cautelares deberá proferirse dentro de los diez (10) días siguientes al vencimiento del término de cinco (5) días de que dispone el demandado para pronunciarse sobre la solicitud, y en ese mismo auto el Juez o Magistrado Ponente deberá fijar la caución; la medida sólo podrá hacerse efectiva a partir de la ejecutoria del auto que acepte la caución prestada (art. 233, incisos 2 y 4). Si la medida se solicita en audiencia, se corre traslado en ella y puede ser decretada en la misma audiencia (art. 233, inciso 5). El levantamiento, la modificación o la revocatoria pueden decidirse en cualquier estado del proceso, de oficio o a petición de parte, sin término preclusivo (art. 235, incisos 1 y 2); la parte a favor de quien se otorgó la medida debe informar todo cambio sustancial dentro de los tres (3) días siguientes a su conocimiento (art. 235, inciso 3).' },
     requiredSections: [
       { n: 1, name: 'Identificación de la solicitud y del proceso', mandatory: false, basis: null },
       { n: 2, name: 'Verificación de los requisitos del art. 231', mandatory: true, basis: 'art. 231' },
@@ -970,7 +970,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
       { n: 6, name: 'Señalamiento de la caución', mandatory: true, basis: 'art. 234, inciso 2' },
       { n: 7, name: 'Recursos que proceden', mandatory: false, basis: 'art. 234, inciso 1' }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=41249'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1437_2011_pr005.html'
   },
   {
     id: 'administrativo/sentencia-de-unificacion-jurisprudencial',
@@ -979,14 +979,14 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 1437 de 2011, art. 270',
     competentAuthority: 'Consejo de Estado',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'NO_CADUCA', description: 'El art. 270 (modificado por el art. 78 de la Ley 2080 de 2021) se limita a definir qué providencias se tienen como sentencias de unificación jurisprudencial y no fija término alguno para proferirlas: no opera caducidad ni plazo propio. Rigen los términos generales de la audiencia de alegaciones y juzgamiento: sentencia oral inmediata o, de no ser posible, informe oral del sentido del fallo y consignación por escrito dentro de los diez (10) días siguientes; y, cuando no sea posible indicar el sentido del fallo, sentencia escrita dentro de los treinta (30) días siguientes (art. 182 nums. 2 y 3).' },
     requiredSections: [
       { n: 1, name: 'Identificación del proceso y de las partes', mandatory: false, basis: null },
       { n: 2, name: 'Antecedentes', mandatory: false, basis: null },
       { n: 3, name: 'Consideraciones y regla de unificación', mandatory: true, basis: 'art. 270' },
       { n: 4, name: 'Decisión', mandatory: true, basis: null }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=41249'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1437_2011_pr006.html'
   }
   ]
 };
