@@ -270,17 +270,17 @@ CREATE POLICY "tenant_isolation_catalog_verifications"
 -- ==============================================================================
 -- 9. RPC — tenant-scoped vector similarity search
 -- ==============================================================================
-CREATE OR REPLACE FUNCTION public.match_document_chunks_multi_tenant(
-    query_embedding vector(1024),
-    match_count INT DEFAULT 5,
-    filter_firm_id TEXT DEFAULT NULL
-)
 -- CREATE OR REPLACE cannot change a function's return type — it fails with
 -- "cannot change return type of existing function". The signature widened on
 -- 2026-08-14, so the old definition has to go first. Dropping is safe: the
 -- function holds no state and is recreated immediately below.
 DROP FUNCTION IF EXISTS public.match_document_chunks_multi_tenant(vector, INT, TEXT);
 
+CREATE OR REPLACE FUNCTION public.match_document_chunks_multi_tenant(
+    query_embedding vector(1024),
+    match_count INT DEFAULT 5,
+    filter_firm_id TEXT DEFAULT NULL
+)
 -- `metadata` and `branch` travel with the match on purpose. Without them a
 -- corpus hit is an anonymous paragraph: the caller cannot say which providencia
 -- it came from, who the ponente was, or where to read it. A quote a lawyer
