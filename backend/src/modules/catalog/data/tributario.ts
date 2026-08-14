@@ -33,7 +33,7 @@ export const TRIBUTARIO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Estatuto Tributario, art. 707',
     competentAuthority: 'Dirección de Impuestos y Aduanas Nacionales (DIAN)',
-    term: { status: 'VERIFICADO', description: 'Tres (3) meses contados a partir de la fecha de notificación del requerimiento especial (art. 707).' },
+    term: { status: 'VERIFICADO', description: 'Tres (3) meses siguientes, contados a partir de la fecha de notificación del requerimiento especial, para formular por escrito las objeciones, solicitar pruebas, subsanar las omisiones que permita la ley, pedir que se alleguen documentos que reposen en los archivos de la Administración y solicitar la práctica de inspecciones tributarias conducentes (E.T. art. 707, texto original, sin modificación posterior).' },
     requiredSections: [
       { n: 1, name: 'Identificación del contribuyente, del período y del requerimiento respondido', mandatory: true, basis: 'Art. 707' },
       { n: 2, name: 'Objeciones escritas a cada glosa propuesta', mandatory: true, basis: 'Art. 707' },
@@ -42,7 +42,7 @@ export const TRIBUTARIO_CATALOG: BranchCatalog = {
       { n: 5, name: 'Solicitud de práctica de inspecciones tributarias, cuando sean conducentes', mandatory: false, basis: 'Art. 707' },
       { n: 6, name: 'Advertencia sobre el efecto de atender en debida forma el requerimiento: habilita el per saltum del art. 720', mandatory: false, basis: 'Art. 720 par.' }
     ],
-    sourceUrl: 'https://actualicese.com/estatutotributario/707-2/'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/estatuto_tributario_pr029.html'
   },
   {
     id: 'tributario/recurso-de-reconsideracion',
@@ -51,7 +51,7 @@ export const TRIBUTARIO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Estatuto Tributario, arts. 720 a 722',
     competentAuthority: 'Oficina competente de la Administración de Impuestos que profirió el acto',
-    term: { status: 'VERIFICADO', description: 'Dos (2) meses siguientes a la notificación del acto (art. 720). La Administración tiene un (1) año para resolverlo, contado desde su interposición en debida forma (art. 732).' },
+    term: { status: 'VERIFICADO', description: 'Dos (2) meses siguientes a la notificación del acto para interponerlo ante la oficina competente de la Administración que lo profirió (E.T. art. 720 inc. 2, modificado por la Ley 6 de 1992 art. 67). La Administración tiene un (1) año para resolverlo, contado a partir de su interposición en debida forma (E.T. art. 732); ese término se suspende mientras dure la inspección tributaria pedida por el contribuyente y hasta por tres (3) meses si se practica de oficio (art. 733), y vencido sin fallo opera el silencio administrativo positivo a favor del recurrente (art. 734).' },
     requiredSections: [
       { n: 1, name: 'Identificación del acto recurrido: liquidación oficial, resolución sancionatoria o de reintegro', mandatory: true, basis: 'Art. 720' },
       { n: 2, name: 'Fecha de notificación del acto, para acreditar la oportunidad', mandatory: true, basis: 'Art. 720' },
@@ -60,7 +60,7 @@ export const TRIBUTARIO_CATALOG: BranchCatalog = {
       { n: 5, name: 'Acreditación de la representación y del derecho de postulación', mandatory: true, basis: 'Art. 722' },
       { n: 6, name: 'Petición de revocatoria o modificación del acto', mandatory: true, basis: 'Art. 720' }
     ],
-    sourceUrl: 'https://actualicese.com/estatutotributario/720-2/'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/estatuto_tributario_pr029.html'
   },
   {
     id: 'tributario/demanda-per-saltum-contra-liquidacion-oficial-tributaria',
@@ -69,7 +69,7 @@ export const TRIBUTARIO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Estatuto Tributario, art. 720 par.; Ley 1437 de 2011, art. 138',
     competentAuthority: 'Jurisdicción de lo contencioso administrativo',
-    term: { status: 'VERIFICADO', description: 'Cuatro (4) meses siguientes a la notificación de la liquidación oficial, cuando el requerimiento especial se atendió en debida forma y se prescinde del recurso de reconsideración (art. 720 par.).' },
+    term: { status: 'VERIFICADO', description: 'Cuatro (4) meses siguientes a la notificación de la liquidación oficial, cuando se atendió en debida forma el requerimiento especial y el contribuyente prescinde del recurso de reconsideración para acudir directamente ante la jurisdicción contencioso administrativa (E.T. art. 720 parágrafo, adicionado por la Ley 223 de 1995 art. 283).' },
     requiredSections: [
       { n: 1, name: 'Acreditación de que el requerimiento especial se atendió en debida forma', mandatory: true, basis: 'Art. 720 par.' },
       { n: 2, name: 'Manifestación expresa de prescindir del recurso de reconsideración', mandatory: true, basis: 'Art. 720 par.' },
@@ -78,7 +78,7 @@ export const TRIBUTARIO_CATALOG: BranchCatalog = {
       { n: 5, name: 'Pretensiones de nulidad y de restablecimiento del derecho', mandatory: true, basis: 'Ley 1437 de 2011, art. 138' },
       { n: 6, name: 'Petición de pruebas', mandatory: true, basis: 'Ley 1437 de 2011, art. 162' }
     ],
-    sourceUrl: 'https://actualicese.com/estatutotributario/720-2/'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/estatuto_tributario_pr029.html'
   },
   {
     id: 'tributario/solicitud-de-devolucion-de-saldo-a-favor',
@@ -87,7 +87,7 @@ export const TRIBUTARIO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Estatuto Tributario, arts. 850, 854 y 855',
     competentAuthority: 'Dirección de Impuestos y Aduanas Nacionales (DIAN)',
-    term: { status: 'VERIFICADO', description: 'La DIAN debe devolver dentro de los cincuenta (50) días siguientes a la solicitud presentada oportunamente y en debida forma; treinta (30) días para operadores económicos autorizados. Si la solicitud se formula dentro de los dos meses siguientes a la presentación de la declaración, el término se amplía en un (1) mes (art. 855).' },
+    term: { status: 'VERIFICADO', description: 'La solicitud debe presentarse a más tardar dos (2) años después de la fecha de vencimiento del término para declarar (E.T. art. 854). Presentada oportunamente y en debida forma, la DIAN debe devolver, previas las compensaciones a que haya lugar, dentro de los cincuenta (50) días siguientes (art. 855 inc. 1, modificado por la Ley 1430 de 2010 art. 19), o dentro de los treinta (30) días cuando el solicitante ostenta la calidad de operador económico autorizado (art. 855 par. 4). Si la solicitud se formula dentro de los dos (2) meses siguientes a la presentación de la declaración o de su corrección, la Administración dispone de un (1) mes adicional para devolver (art. 855 par. 3).' },
     requiredSections: [
       { n: 1, name: 'Identificación del solicitante, del impuesto y del período', mandatory: true, basis: 'Art. 850' },
       { n: 2, name: 'Determinación del saldo a favor y su origen', mandatory: true, basis: 'Art. 850' },
@@ -95,7 +95,7 @@ export const TRIBUTARIO_CATALOG: BranchCatalog = {
       { n: 4, name: 'Garantía, cuando se solicite el trámite con garantía', mandatory: false, basis: 'Art. 860' },
       { n: 5, name: 'Advertencia: presentada la solicitud, el término de firmeza del art. 714 se cuenta desde ella', mandatory: true, basis: 'Art. 714' }
     ],
-    sourceUrl: 'https://actualicese.com/estatutotributario/855-2/'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/estatuto_tributario_pr035.html'
   },
   {
     id: 'tributario/correccion-voluntaria-de-la-declaracion-tributaria',
@@ -233,7 +233,7 @@ export const TRIBUTARIO_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Estatuto Tributario, arts. 703, 704 y 705',
     competentAuthority: 'Dirección de Impuestos y Aduanas Nacionales (DIAN)',
-    term: { status: 'VERIFICADO', description: 'Debe notificarse a más tardar dentro de los tres (3) años siguientes a la fecha de vencimiento del plazo para declarar. Si la declaración se presentó extemporáneamente, los tres años se cuentan desde su presentación; si hay saldo a favor, desde la solicitud de devolución o compensación (art. 705).' },
+    term: { status: 'VERIFICADO', description: 'Debe notificarse a más tardar dentro de los tres (3) años siguientes a la fecha de vencimiento del plazo para declarar; si la declaración inicial se presentó extemporáneamente, los tres (3) años se cuentan a partir de su presentación; si la declaración presenta saldo a favor, a más tardar tres (3) años después de la fecha de presentación de la solicitud de devolución o compensación (E.T. art. 705, modificado por la Ley 1819 de 2016 art. 276). El término se suspende por tres (3) meses con inspección tributaria de oficio, mientras dure la practicada a solicitud del contribuyente, y durante el mes siguiente a la notificación del emplazamiento para corregir (art. 706).' },
     requiredSections: [
       { n: 1, name: 'Identificación del contribuyente, del impuesto y del período', mandatory: true, basis: 'Art. 704' },
       { n: 2, name: 'Cuantificación de los impuestos, anticipos, retenciones y sanciones que se pretende adicionar', mandatory: true, basis: 'Art. 703' },
@@ -241,7 +241,7 @@ export const TRIBUTARIO_CATALOG: BranchCatalog = {
       { n: 4, name: 'Indicación del término de tres (3) meses para responder', mandatory: true, basis: 'Art. 707' },
       { n: 5, name: 'Constancia de notificación dentro del término del art. 705', mandatory: true, basis: 'Art. 705' }
     ],
-    sourceUrl: 'https://actualicese.com/estatutotributario/705-2/'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/estatuto_tributario_pr029.html'
   },
   {
     id: 'tributario/liquidacion-oficial-de-revision',
@@ -250,7 +250,7 @@ export const TRIBUTARIO_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Estatuto Tributario, arts. 702, 710 y 711',
     competentAuthority: 'Dirección de Impuestos y Aduanas Nacionales (DIAN)',
-    term: { status: 'VERIFICADO', description: 'Debe notificarse dentro de los seis (6) meses siguientes al vencimiento del término para responder el requerimiento especial. El plazo se suspende tres (3) meses cuando se decreta inspección tributaria de oficio, mientras dure la inspección contable solicitada por el contribuyente, y dos (2) meses cuando la prueba solicitada no reposa en el expediente (art. 710).' },
+    term: { status: 'VERIFICADO', description: 'Debe notificarse dentro de los seis (6) meses siguientes a la fecha de vencimiento del término para dar respuesta al requerimiento especial o a su ampliación, según el caso (E.T. art. 710, modificado por la Ley 223 de 1995 art. 135). El término se suspende por tres (3) meses cuando se practica inspección tributaria de oficio, mientras dure la inspección contable solicitada por el contribuyente, y durante dos (2) meses cuando la prueba solicitada se refiere a documentos que no reposan en el respectivo expediente.' },
     requiredSections: [
       { n: 1, name: 'Identificación del contribuyente, del impuesto y del período', mandatory: true, basis: 'Art. 712' },
       { n: 2, name: 'Correspondencia con el requerimiento especial: no puede exceder sus glosas', mandatory: true, basis: 'Art. 711' },
@@ -259,7 +259,7 @@ export const TRIBUTARIO_CATALOG: BranchCatalog = {
       { n: 5, name: 'Verificación del cómputo del término del art. 710 y de sus suspensiones', mandatory: true, basis: 'Art. 710' },
       { n: 6, name: 'Indicación de los recursos que proceden y del término de dos (2) meses', mandatory: true, basis: 'Art. 720' }
     ],
-    sourceUrl: 'https://actualicese.com/estatutotributario/710-2/'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/estatuto_tributario_pr029.html'
   },
   {
     id: 'tributario/liquidacion-oficial-de-aforo',
@@ -284,7 +284,7 @@ export const TRIBUTARIO_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Estatuto Tributario, arts. 732, 733 y 734',
     competentAuthority: 'Dirección de Impuestos y Aduanas Nacionales (DIAN)',
-    term: { status: 'VERIFICADO', description: 'La Administración tiene un (1) año para resolver el recurso de reconsideración, contado a partir de su interposición en debida forma (art. 732).' },
+    term: { status: 'VERIFICADO', description: 'La Administración tiene un (1) año para resolver el recurso de reconsideración, contado a partir de su interposición en debida forma (E.T. art. 732). El término se suspende mientras dure la inspección tributaria practicada a solicitud del contribuyente y hasta por tres (3) meses cuando se practica de oficio (art. 733). Transcurrido el término sin que el recurso se resuelva, se entiende fallado a favor del recurrente y así debe declararlo la Administración, de oficio o a petición de parte (silencio administrativo positivo, art. 734).' },
     requiredSections: [
       { n: 1, name: 'Verificación de la oportunidad y de los requisitos del recurso', mandatory: true, basis: 'Art. 722' },
       { n: 2, name: 'Pronunciamiento sobre cada razón de inconformidad', mandatory: true, basis: 'Art. 732' },
@@ -292,7 +292,7 @@ export const TRIBUTARIO_CATALOG: BranchCatalog = {
       { n: 4, name: 'Verificación del cumplimiento del término de un (1) año', mandatory: true, basis: 'Art. 732' },
       { n: 5, name: 'Decisión: confirma, modifica o revoca el acto recurrido', mandatory: true, basis: 'Art. 732' }
     ],
-    sourceUrl: 'https://actualicese.com/estatutotributario/732-2/'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/estatuto_tributario_pr030.html'
   },
   {
     id: 'tributario/emplazamiento-para-corregir',
@@ -351,14 +351,14 @@ export const TRIBUTARIO_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Estatuto Tributario, art. 714',
     competentAuthority: 'Dirección de Impuestos y Aduanas Nacionales (DIAN)',
-    term: { status: 'VERIFICADO', description: 'La declaración queda en firme si dentro de los tres (3) años siguientes al vencimiento del plazo para declarar no se notificó requerimiento especial. Si se presentó extemporáneamente, los tres años corren desde su presentación; con saldo a favor, desde la solicitud de devolución o compensación. En el régimen de precios de transferencia el término es de seis (6) años (art. 714).' },
+    term: { status: 'VERIFICADO', description: 'La declaración queda en firme si dentro de los tres (3) años siguientes al vencimiento del plazo para declarar no se notificó requerimiento especial; si la declaración inicial se presentó extemporáneamente, los tres (3) años se cuentan desde su presentación; la declaración con saldo a favor queda en firme tres (3) años después de la fecha de presentación de la solicitud de devolución o compensación (E.T. art. 714, modificado por la Ley 1819 de 2016 art. 277). También queda en firme si, vencido el término para practicar la liquidación de revisión, esta no se notificó. La declaración en que se liquide pérdida fiscal queda en firme en el mismo término que el contribuyente tiene para compensarla. Para los contribuyentes sujetos al Régimen de Precios de Transferencia el término es de seis (6) años contados desde el vencimiento del plazo para declarar, o desde la presentación si fue extemporánea.' },
     requiredSections: [
       { n: 1, name: 'Identificación de la declaración, del impuesto y del período', mandatory: true, basis: 'Art. 714' },
       { n: 2, name: 'Fecha de vencimiento del plazo para declarar o de presentación extemporánea', mandatory: true, basis: 'Art. 714' },
       { n: 3, name: 'Constancia de que no se notificó requerimiento especial ni liquidación de revisión', mandatory: true, basis: 'Art. 714' },
       { n: 4, name: 'Verificación de si aplica el término especial de seis (6) años', mandatory: true, basis: 'Art. 714' }
     ],
-    sourceUrl: 'https://actualicese.com/estatutotributario/714-2/'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/estatuto_tributario_pr029.html'
   }
   ]
 };

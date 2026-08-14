@@ -152,7 +152,7 @@ export const SUPERINTENDENCIAS_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 142 de 1994, arts. 154 y 155',
     competentAuthority: 'La empresa prestadora del servicio público domiciliario',
-    term: { status: 'VERIFICADO', description: 'Debe interponerse dentro de los cinco (5) días siguientes a la fecha de conocimiento de la decisión, tanto contra los actos que resuelven reclamaciones por facturación como contra los demás actos de la empresa (art. 154). La empresa debe resolverlo dentro de los quince (15) días hábiles siguientes a su presentación.' },
+    term: { status: 'VERIFICADO', description: 'El recurso de reposición contra los actos que resuelven reclamaciones por facturación debe interponerse dentro de los cinco (5) días siguientes a la fecha de conocimiento de la decisión; contra los demás actos que enumera el inciso primero (negativa del contrato, suspensión, terminación y corte) debe hacerse uso de los recursos dentro de los cinco (5) días siguientes a aquel en que la empresa ponga el acto en conocimiento del suscriptor o usuario, en la forma prevista en las condiciones uniformes del contrato (Ley 142 de 1994, art. 154). En ningún caso proceden reclamaciones contra facturas que tuviesen más de cinco (5) meses de haber sido expedidas (art. 154, inc. 3). El término de quince (15) días hábiles para resolver NO está en el art. 154: está en el art. 158 de la Ley 142 de 1994, subrogado por el art. 123 del Decreto 2150 de 1995 (Sentencia C-451 de 1999), conforme al cual toda entidad o persona vigilada por la Superintendencia de Servicios Públicos y prestadora del servicio debe resolver las peticiones, quejas y recursos dentro de quince (15) días hábiles contados desde la fecha de su presentación.' },
     requiredSections: [
       { n: 1, name: 'Identificación del suscriptor o usuario y del contrato de servicios públicos', mandatory: true, basis: 'Art. 154' },
       { n: 2, name: 'Identificación del acto recurrido: negativa del contrato, suspensión, terminación, corte o facturación', mandatory: true, basis: 'Art. 154' },
@@ -160,7 +160,7 @@ export const SUPERINTENDENCIAS_CATALOG: BranchCatalog = {
       { n: 4, name: 'Razones de inconformidad', mandatory: true, basis: 'Art. 154' },
       { n: 5, name: 'Apelación subsidiaria ante la Superintendencia, en los casos en que la ley la consagra', mandatory: false, basis: 'Art. 154' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/24.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0142_1994_pr003.html'
   },
   {
     id: 'superintendencias/recurso-de-apelacion-ante-la-superintendencia-de-servicios-publicos',
@@ -169,14 +169,14 @@ export const SUPERINTENDENCIAS_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 142 de 1994, arts. 154 y 159',
     competentAuthority: 'Superintendencia de Servicios Públicos Domiciliarios',
-    term: { status: 'VERIFICADO', description: 'Se interpone dentro de los cinco (5) días siguientes a aquel en que la empresa ponga el acto en conocimiento del suscriptor o usuario, y sólo procede en los casos en que la ley expresamente lo consagra; debe presentarse como subsidiario de la reposición (art. 154).' },
+    term: { status: 'VERIFICADO', description: 'Procede sólo en los casos en que expresamente lo consagre la ley y debe hacerse uso de él dentro de los cinco (5) días siguientes a aquel en que la empresa ponga el acto en conocimiento del suscriptor o usuario (Ley 142 de 1994, art. 154). Sólo se puede interponer como subsidiario del de reposición ante el gerente o representante legal de la empresa, quien debe remitir el expediente a la Superintendencia de Servicios Públicos Domiciliarios, y se le da el trámite del Código Contencioso Administrativo (art. 159, modificado por el art. 20 de la Ley 689 de 2001). Si en el trámite de la apelación la Superintendencia estima necesario practicar pruebas, el término probatorio no puede ser superior a treinta (30) días hábiles, prorrogables hasta por otro tanto (art. 159).' },
     requiredSections: [
       { n: 1, name: 'Constancia de haber interpuesto la reposición ante la empresa', mandatory: true, basis: 'Art. 154' },
       { n: 2, name: 'Acreditación de que la ley consagra expresamente la apelación para ese acto', mandatory: true, basis: 'Art. 154' },
       { n: 3, name: 'Reparos concretos contra la decisión de la empresa', mandatory: true, basis: 'Art. 154' },
       { n: 4, name: 'Petición de revocatoria', mandatory: true, basis: 'Art. 159' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/24.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0142_1994_pr004.html'
   },
   {
     id: 'superintendencias/solicitud-de-silencio-administrativo-positivo-en-servicios-publicos',
@@ -185,14 +185,14 @@ export const SUPERINTENDENCIAS_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 142 de 1994, arts. 123, 154 y 158',
     competentAuthority: 'La empresa prestadora; su reconocimiento puede pedirse ante la Superintendencia',
-    term: { status: 'VERIFICADO', description: 'Toda entidad o persona vigilada por la Superintendencia de Servicios Públicos debe resolver las peticiones, quejas y recursos dentro del término de quince (15) días hábiles contados desde su presentación (art. 154). Vencido sin respuesta, opera el silencio administrativo positivo del art. 158.' },
+    term: { status: 'VERIFICADO', description: 'Conforme al art. 158 de la Ley 142 de 1994, subrogado por el art. 123 del Decreto 2150 de 1995, toda entidad o persona vigilada por la Superintendencia de Servicios Públicos y prestadora de servicios públicos domiciliarios debe resolver las peticiones, quejas y recursos de los suscriptores o usuarios dentro de quince (15) días hábiles contados a partir de la fecha de su presentación. Vencido ese término -salvo que se demuestre que el suscriptor o usuario auspició la demora o que se requirió la práctica de pruebas- se entiende que la petición, queja o recurso fue resuelto en forma favorable. Dentro de las setenta y dos (72) horas siguientes al vencimiento de los quince (15) días hábiles, el prestador debe reconocer al usuario los efectos del silencio administrativo positivo; si no lo hace, el peticionario puede pedir a la Superintendencia la imposición de sanciones y las decisiones necesarias para hacer efectiva la ejecutoriedad del acto presunto.' },
     requiredSections: [
       { n: 1, name: 'Identificación de la petición, queja o recurso y de su fecha de radicación', mandatory: true, basis: 'Art. 154' },
       { n: 2, name: 'Cómputo de los quince (15) días hábiles sin respuesta', mandatory: true, basis: 'Art. 154' },
       { n: 3, name: 'Constancia de que no se notificó decisión alguna', mandatory: true, basis: 'Art. 158' },
       { n: 4, name: 'Petición de reconocimiento de los efectos del silencio positivo', mandatory: true, basis: 'Art. 158' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/24.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/decreto_2150_1995_pr002.html'
   },
   {
     id: 'superintendencias/demanda-ante-la-superintendencia-nacional-de-salud',
@@ -234,7 +234,7 @@ export const SUPERINTENDENCIAS_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1328 de 2009, arts. 13 y siguientes',
     competentAuthority: 'Defensor del Consumidor Financiero de la entidad vigilada',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'La Ley 1328 de 2009 no fija términos: su art. 13, lit. b) remite al procedimiento que se establezca para el efecto. Los términos están en el art. 5 del Decreto 2281 de 2010 (compilado en el Decreto 2555 de 2010, Libro 34): si la queja se presenta en agencias o sucursales de la entidad, esta debe trasladarla al Defensor dentro de los tres (3) días hábiles siguientes a su recepción (num. 1); el Defensor decide si el asunto es de su competencia y comunica la admisión o inadmisión dentro de los tres (3) días hábiles contados desde el día siguiente al recibo de la solicitud (num. 3); si pide información adicional, la entidad o el consumidor deben responder en el término que fije el Defensor, sin exceder ocho (8) días hábiles desde el día siguiente a la solicitud, y recibida la información el Defensor decide sobre la admisión dentro de máximo tres (3) días hábiles (num. 4), entendiéndose desistida la queja si el consumidor no responde (num. 5); admitida la queja, la entidad debe responder el traslado dentro de ocho (8) días hábiles contados desde el día siguiente al traslado, prorrogables a petición de la entidad y a juicio del Defensor (num. 6); y el Defensor debe resolver en un término que en ningún caso puede exceder ocho (8) días hábiles contados desde el día siguiente al vencimiento del traslado a la entidad, comunicando la decisión el día hábil siguiente a su expedición (num. 8). No conoce hechos sucedidos con tres (3) años o más de anterioridad a la presentación de la solicitud, ni asuntos cuya cuantía supere cien (100) SMLMV (Ley 1328 de 2009, art. 14, lits. g e i).' },
     requiredSections: [
       { n: 1, name: 'Identificación del consumidor financiero y de la entidad vigilada', mandatory: true, basis: 'Ley 1328 de 2009, art. 13' },
       { n: 2, name: 'Descripción del producto o servicio financiero', mandatory: true, basis: null },
@@ -242,7 +242,7 @@ export const SUPERINTENDENCIAS_CATALOG: BranchCatalog = {
       { n: 4, name: 'Pretensión concreta', mandatory: true, basis: null },
       { n: 5, name: 'Documentos que soportan la reclamación', mandatory: true, basis: null }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/24.htm'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=39943'
   },
   {
     id: 'superintendencias/demanda-ante-la-superintendencia-financiera',
@@ -317,7 +317,7 @@ export const SUPERINTENDENCIAS_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 142 de 1994, arts. 154, 158 y 159',
     competentAuthority: 'La empresa prestadora en reposición; la Superintendencia de Servicios Públicos en apelación',
-    term: { status: 'VERIFICADO', description: 'Debe resolverse dentro de los quince (15) días hábiles siguientes a la presentación; vencido ese término sin decisión, opera el silencio administrativo positivo (arts. 154 y 158).' },
+    term: { status: 'VERIFICADO', description: 'La empresa prestadora debe resolver la petición, queja o recurso dentro de quince (15) días hábiles contados desde la fecha de su presentación; vencido ese término, salvo demora auspiciada por el usuario o práctica de pruebas, se entiende resuelto en forma favorable al usuario, y dentro de las setenta y dos (72) horas siguientes al vencimiento el prestador debe reconocerle los efectos del silencio administrativo positivo (Ley 142 de 1994, art. 158, subrogado por el art. 123 del Decreto 2150 de 1995). Ese término de quince (15) días hábiles y el silencio positivo están referidos por el texto a la entidad o persona vigilada PRESTADORA del servicio; la decisión de la apelación por la Superintendencia de Servicios Públicos se rige por el trámite del Código Contencioso Administrativo al que remite el art. 159 (modificado por el art. 20 de la Ley 689 de 2001), con término probatorio no superior a treinta (30) días hábiles prorrogables hasta por otro tanto.' },
     requiredSections: [
       { n: 1, name: 'Verificación del cumplimiento del término de quince (15) días hábiles', mandatory: true, basis: 'Art. 154' },
       { n: 2, name: 'Pronunciamiento sobre cada razón de inconformidad', mandatory: true, basis: 'Art. 154' },
@@ -325,7 +325,7 @@ export const SUPERINTENDENCIAS_CATALOG: BranchCatalog = {
       { n: 4, name: 'Decisión: confirma, modifica o revoca', mandatory: true, basis: 'Art. 159' },
       { n: 5, name: 'Advertencia sobre los efectos del silencio positivo si se excedió el término', mandatory: true, basis: 'Art. 158' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/24.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/decreto_2150_1995_pr002.html'
   },
   {
     id: 'superintendencias/resolucion-sancionatoria-por-infraccion-al-regimen-de-datos-personales',

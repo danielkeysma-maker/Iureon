@@ -224,7 +224,7 @@ export const INTERNACIONAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, art. 40; convenios bilaterales y multilaterales aplicables',
     competentAuthority: 'Se tramita por conducto del Ministerio de Relaciones Exteriores',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'El Código General del Proceso no fija término legal para la carta rogatoria. El art. 41 del CGP (Comisión en el exterior) autoriza al juez, con arreglo a los tratados y convenios internacionales de cooperación judicial, a enviar carta rogatoria por conducto del Ministerio de Relaciones Exteriores a una autoridad judicial del país donde ha de practicarse la diligencia, para que la practique y la devuelva por conducto del agente diplomático o consular de Colombia o el de un país amigo, o a comisionar directamente al cónsul o agente diplomático de Colombia. El plazo lo señala el comitente en la providencia que confiere la comisión: cuando la comisión tiene por objeto la práctica de pruebas el comitente señala el término para su realización teniendo en cuenta el art. 121 (duración del proceso), y el comisionado que incumple ese término o retarda injustificadamente la comisión es sancionado con multa de cinco (5) a diez (10) SMLMV (art. 39).' },
     requiredSections: [
       { n: 1, name: 'Identificación del proceso y de la autoridad judicial requirente', mandatory: true, basis: 'Art. 40' },
       { n: 2, name: 'Diligencia concreta cuya práctica se solicita', mandatory: true, basis: 'Art. 40' },
@@ -232,7 +232,7 @@ export const INTERNACIONAL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Traducción oficial al idioma del Estado requerido', mandatory: true, basis: null },
       { n: 5, name: 'Indicación del convenio o del principio de reciprocidad invocado', mandatory: true, basis: null }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/607.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr001.html'
   },
   {
     id: 'internacional/solicitud-de-apostilla-o-legalizacion-de-documento',
@@ -308,7 +308,7 @@ export const INTERNACIONAL_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 1563 de 2012, arts. 104 a 107',
     competentAuthority: 'Tribunal arbitral internacional',
-    term: { status: 'VERIFICADO', description: 'Notificado el laudo, corre el mes del artículo 109 para interponer el recurso de anulación.' },
+    term: { status: 'VERIFICADO', description: 'Notificado el laudo, el recurso de anulación -único recurso judicial procedente (art. 107)- debe proponerse y sustentarse, con indicación de las causales invocadas, dentro del mes siguiente a la notificación del laudo o, en su caso, a la notificación del laudo adicional o de la providencia que resuelva la corrección o aclaración o que rechace la solicitud de laudo adicional (Ley 1563 de 2012, art. 109, num. 1). En el mismo mes siguiente a la notificación del laudo, salvo pacto en contrario, cualquiera de las partes puede pedir corrección, aclaración o laudo adicional (art. 106).' },
     requiredSections: [
       { n: 1, name: 'Identificación de las partes, del acuerdo de arbitraje y de la sede', mandatory: true, basis: 'Art. 104' },
       { n: 2, name: 'Motivación en que se funda la decisión', mandatory: true, basis: 'Art. 104' },
@@ -317,7 +317,7 @@ export const INTERNACIONAL_CATALOG: BranchCatalog = {
       { n: 5, name: 'Fecha y firma de los árbitros', mandatory: true, basis: 'Art. 104' },
       { n: 6, name: 'Advertencia: si la sede fue Colombia, el laudo es nacional y se ejecuta sin reconocimiento previo', mandatory: true, basis: 'Art. 111' }
     ],
-    sourceUrl: 'https://leyes.co/estatuto_de_arbitraje_nacional_e_internacional/111.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1563_2012_pr002.html'
   }
   ]
 };

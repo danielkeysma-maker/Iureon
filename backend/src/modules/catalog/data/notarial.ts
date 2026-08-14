@@ -156,13 +156,13 @@ export const NOTARIAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1579 de 2012, art. 68',
     competentAuthority: 'Oficina de Registro de Instrumentos Públicos',
-    term: { status: 'VERIFICADO', description: 'Se expide de manera inmediata en las oficinas sistematizadas; en las demás, dentro de un plazo máximo de un (1) día (art. 68).' },
+    term: { status: 'VERIFICADO', description: 'Los certificados se expiden siguiendo el orden de radicación: de forma inmediata en las oficinas sistematizadas y, en las demás, en un plazo máximo de un (1) día (Ley 1579 de 2012, art. 68).' },
     requiredSections: [
       { n: 1, name: 'Número de matrícula inmobiliaria del predio', mandatory: true, basis: 'Art. 68' },
       { n: 2, name: 'Identificación del solicitante', mandatory: true, basis: 'Art. 68' },
       { n: 3, name: 'Constancia de pago de los derechos', mandatory: true, basis: 'Art. 68' }
     ],
-    sourceUrl: 'https://actualicese.com/archivo/ley-1579-de-01-10-2012-parte-ii/'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1579_2012_pr001.html'
   },
   {
     id: 'notarial/solicitud-de-certificado-especial-de-registro',
@@ -171,13 +171,13 @@ export const NOTARIAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1579 de 2012, art. 69',
     competentAuthority: 'Oficina de Registro de Instrumentos Públicos',
-    term: { status: 'VERIFICADO', description: 'Se expide en un plazo máximo de cinco (5) días, una vez esté plenamente operativa la base de datos registral (art. 69).' },
+    term: { status: 'VERIFICADO', description: 'Las Oficinas de Registro de Instrumentos Públicos cuentan con un término máximo de cinco (5) días para expedir los certificados especiales —los destinados a procesos de prescripción adquisitiva del dominio, clarificación de títulos u otros similares, y los de ampliación de la historia registral por un período superior a veinte (20) años—, una vez esté en pleno funcionamiento la base de datos registral (Ley 1579 de 2012, art. 69).' },
     requiredSections: [
       { n: 1, name: 'Objeto y alcance del certificado especial solicitado', mandatory: true, basis: 'Art. 69' },
       { n: 2, name: 'Identificación del inmueble o de la persona sobre la que versa', mandatory: true, basis: 'Art. 69' },
       { n: 3, name: 'Constancia de pago de los derechos', mandatory: true, basis: 'Art. 69' }
     ],
-    sourceUrl: 'https://actualicese.com/archivo/ley-1579-de-01-10-2012-parte-ii/'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1579_2012_pr001.html'
   },
   {
     id: 'notarial/escritura-publica-de-compraventa-de-inmueble',

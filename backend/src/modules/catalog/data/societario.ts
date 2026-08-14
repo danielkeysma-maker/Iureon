@@ -236,14 +236,14 @@ export const SOCIETARIO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Código de Comercio, arts. 181, 182 y 423; Ley 222 de 1995, art. 25',
     competentAuthority: 'Superintendencia de Sociedades, o el órgano estatutario competente',
-    term: { status: 'VERIFICADO', description: 'La ley no fija plazo para presentar la solicitud de convocatoria; el término perentorio es el de la antelación con que debe hacerse la convocatoria una vez ordenada: cuando menos quince (15) días hábiles de anticipación para las reuniones en que hayan de aprobarse los balances de fin de ejercicio, y cinco (5) días comunes en los demás casos, siempre en la forma prevista en los estatutos y, a falta de estipulación, mediante aviso publicado en un diario de circulación en el domicilio principal; tratándose de asamblea extraordinaria, en el aviso debe insertarse el orden del día (art. 424 C.Co).' },
+    term: { status: 'VERIFICADO', description: 'La ley no fija plazo para presentar la solicitud de convocatoria. El término perentorio es el de la antelación de la convocatoria una vez ordenada: para las reuniones en que hayan de aprobarse los balances de fin de ejercicio, cuando menos quince (15) días hábiles de anticipación; en los demás casos basta una antelación de cinco (5) días comunes; toda convocatoria se hace en la forma prevista en los estatutos y, a falta de estipulación, mediante aviso publicado en un diario de circulación en el domicilio principal de la sociedad, y tratándose de asamblea extraordinaria en el aviso se inserta el orden del día (Código de Comercio, art. 424).' },
     requiredSections: [
       { n: 1, name: 'Acreditación de la participación en el capital que legitima la solicitud', mandatory: true, basis: 'Art. 25 Ley 222 de 1995' },
       { n: 2, name: 'Orden del día propuesto', mandatory: true, basis: 'Art. 182 C.Co' },
       { n: 3, name: 'Constancia de la negativa o inacción del administrador', mandatory: true, basis: null },
       { n: 4, name: 'Estatutos vigentes y certificado de existencia y representación', mandatory: true, basis: null }
     ],
-    sourceUrl: 'https://leyes.co/codigo_de_comercio/424.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/codigo_comercio_pr013.html'
   },
   {
     id: 'societario/solicitud-de-ejercicio-del-derecho-de-inspeccion',
@@ -268,14 +268,14 @@ export const SOCIETARIO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Código de Comercio, arts. 218 y siguientes; Ley 1258 de 2008, art. 34',
     competentAuthority: 'Superintendencia de Sociedades o juez civil del circuito',
-    term: { status: 'VERIFICADO', description: 'Cuando la disolución provenga de causales distintas de las del artículo 219, los asociados pueden evitarla adoptando las modificaciones del caso y observando las reglas de las reformas del contrato, siempre que el acuerdo se formalice dentro de los seis (6) meses siguientes a la ocurrencia de la causal (art. 220 C.Co). El artículo 218 no fija término de caducidad para demandar la declaratoria de la causal.' },
+    term: { status: 'VERIFICADO', description: 'El art. 218 del Código de Comercio enumera las causales de disolución y no fija término de caducidad para demandar su declaratoria. Cuando la disolución provenga de causales distintas de las indicadas en el art. 219, los asociados pueden evitarla adoptando las modificaciones del caso y observando las reglas de las reformas del contrato, siempre que el acuerdo se formalice dentro de los seis (6) meses siguientes a la ocurrencia de la causal (art. 220 C.Co). En la sociedad por acciones simplificada el enervamiento se rige por el art. 35 de la Ley 1258 de 2008: seis (6) meses siguientes a la fecha en que la asamblea reconozca el acaecimiento de la causal, y dieciocho (18) meses en el caso de la causal del ordinal 7 del art. 34 -hoy causal de disolución por no cumplimiento de la hipótesis de negocio en marcha del art. 4 de la Ley 2069 de 2020-. El numeral 7 del art. 34 de la Ley 1258 de 2008 (disolución por pérdidas) fue DEROGADO por el parágrafo 2 del art. 4 de la Ley 2069 de 2020.' },
     requiredSections: [
       { n: 1, name: 'Causal de disolución invocada', mandatory: true, basis: 'Art. 218 C.Co' },
       { n: 2, name: 'Hechos que la configuran', mandatory: true, basis: null },
       { n: 3, name: 'Certificado de existencia y representación y estatutos', mandatory: true, basis: null },
       { n: 4, name: 'Pretensión de declaratoria de disolución y orden de liquidación', mandatory: true, basis: 'Art. 218 C.Co' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_de_comercio/220.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/codigo_comercio_pr006.html'
   },
   {
     id: 'societario/demanda-de-nulidad-de-reforma-estatutaria',

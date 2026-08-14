@@ -507,7 +507,7 @@
       "role": "LITIGANTE",
       "legal_basis": "Código de Comercio, arts. 181, 182 y 423; Ley 222 de 1995, art. 25",
       "competent_authority": "Superintendencia de Sociedades, o el órgano estatutario competente",
-      "term": "La ley no fija plazo para presentar la solicitud de convocatoria; el término perentorio es el de la antelación con que debe hacerse la convocatoria una vez ordenada: cuando menos quince (15) días hábiles de anticipación para las reuniones en que hayan de aprobarse los balances de fin de ejercicio, y cinco (5) días comunes en los demás casos, siempre en la forma prevista en los estatutos y, a falta de estipulación, mediante aviso publicado en un diario de circulación en el domicilio principal; tratándose de asamblea extraordinaria, en el aviso debe insertarse el orden del día (art. 424 C.Co).",
+      "term": "La ley no fija plazo para presentar la solicitud de convocatoria. El término perentorio es el de la antelación de la convocatoria una vez ordenada: para las reuniones en que hayan de aprobarse los balances de fin de ejercicio, cuando menos quince (15) días hábiles de anticipación; en los demás casos basta una antelación de cinco (5) días comunes; toda convocatoria se hace en la forma prevista en los estatutos y, a falta de estipulación, mediante aviso publicado en un diario de circulación en el domicilio principal de la sociedad, y tratándose de asamblea extraordinaria en el aviso se inserta el orden del día (Código de Comercio, art. 424).",
       "required_sections": [
         {
           "n": 1,
@@ -534,7 +534,7 @@
           "basis": null
         }
       ],
-      "source_url": "https://leyes.co/codigo_de_comercio/424.htm"
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/codigo_comercio_pr013.html"
     },
     {
       "exact_name": "Solicitud de ejercicio del derecho de inspección",
@@ -575,7 +575,7 @@
       "role": "LITIGANTE",
       "legal_basis": "Código de Comercio, arts. 218 y siguientes; Ley 1258 de 2008, art. 34",
       "competent_authority": "Superintendencia de Sociedades o juez civil del circuito",
-      "term": "Cuando la disolución provenga de causales distintas de las del artículo 219, los asociados pueden evitarla adoptando las modificaciones del caso y observando las reglas de las reformas del contrato, siempre que el acuerdo se formalice dentro de los seis (6) meses siguientes a la ocurrencia de la causal (art. 220 C.Co). El artículo 218 no fija término de caducidad para demandar la declaratoria de la causal.",
+      "term": "El art. 218 del Código de Comercio enumera las causales de disolución y no fija término de caducidad para demandar su declaratoria. Cuando la disolución provenga de causales distintas de las indicadas en el art. 219, los asociados pueden evitarla adoptando las modificaciones del caso y observando las reglas de las reformas del contrato, siempre que el acuerdo se formalice dentro de los seis (6) meses siguientes a la ocurrencia de la causal (art. 220 C.Co). En la sociedad por acciones simplificada el enervamiento se rige por el art. 35 de la Ley 1258 de 2008: seis (6) meses siguientes a la fecha en que la asamblea reconozca el acaecimiento de la causal, y dieciocho (18) meses en el caso de la causal del ordinal 7 del art. 34 -hoy causal de disolución por no cumplimiento de la hipótesis de negocio en marcha del art. 4 de la Ley 2069 de 2020-. El numeral 7 del art. 34 de la Ley 1258 de 2008 (disolución por pérdidas) fue DEROGADO por el parágrafo 2 del art. 4 de la Ley 2069 de 2020.",
       "required_sections": [
         {
           "n": 1,
@@ -602,7 +602,7 @@
           "basis": "Art. 218 C.Co"
         }
       ],
-      "source_url": "https://leyes.co/codigo_de_comercio/220.htm"
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/codigo_comercio_pr006.html"
     },
     {
       "exact_name": "Demanda de nulidad de reforma estatutaria",

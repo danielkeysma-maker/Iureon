@@ -324,7 +324,7 @@
       "role": "LITIGANTE",
       "legal_basis": "Ley 1579 de 2012, art. 68",
       "competent_authority": "Oficina de Registro de Instrumentos Públicos",
-      "term": "Se expide de manera inmediata en las oficinas sistematizadas; en las demás, dentro de un plazo máximo de un (1) día (art. 68).",
+      "term": "Los certificados se expiden siguiendo el orden de radicación: de forma inmediata en las oficinas sistematizadas y, en las demás, en un plazo máximo de un (1) día (Ley 1579 de 2012, art. 68).",
       "required_sections": [
         {
           "n": 1,
@@ -345,14 +345,14 @@
           "basis": "Art. 68"
         }
       ],
-      "source_url": "https://actualicese.com/archivo/ley-1579-de-01-10-2012-parte-ii/"
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1579_2012_pr001.html"
     },
     {
       "exact_name": "Solicitud de certificado especial de registro",
       "role": "LITIGANTE",
       "legal_basis": "Ley 1579 de 2012, art. 69",
       "competent_authority": "Oficina de Registro de Instrumentos Públicos",
-      "term": "Se expide en un plazo máximo de cinco (5) días, una vez esté plenamente operativa la base de datos registral (art. 69).",
+      "term": "Las Oficinas de Registro de Instrumentos Públicos cuentan con un término máximo de cinco (5) días para expedir los certificados especiales —los destinados a procesos de prescripción adquisitiva del dominio, clarificación de títulos u otros similares, y los de ampliación de la historia registral por un período superior a veinte (20) años—, una vez esté en pleno funcionamiento la base de datos registral (Ley 1579 de 2012, art. 69).",
       "required_sections": [
         {
           "n": 1,
@@ -373,7 +373,7 @@
           "basis": "Art. 69"
         }
       ],
-      "source_url": "https://actualicese.com/archivo/ley-1579-de-01-10-2012-parte-ii/"
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1579_2012_pr001.html"
     },
     {
       "exact_name": "Escritura pública de compraventa de inmueble",
