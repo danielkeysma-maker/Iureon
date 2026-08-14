@@ -1,0 +1,16 @@
+{
+  "_meta": {
+    "purpose": "Semilla curada del corpus compartido SYSTEM_CORPUS. Cada entrada apunta a una providencia REAL en su relatoria oficial; el texto NO se guarda aqui, se descarga en el momento de la ingesta desde `url`.",
+    "why_curated": "Los cuatro scrapers que alimentaban este corpus extraian numeros de sentencia con una expresion regular y les adjuntaban hechos, ratio decidendi y un resultado inventados, con el outcome fijado siempre en CONCEDIDO. Su lista de respaldo, llamada getOfficialIndexedDatabase, incluia la Sentencia SU-049 de 2022, que no existe: la unificacion real sobre estabilidad laboral reforzada es la SU-049 de 2017. SYSTEM_CORPUS lo leen todas las firmas, asi que una sola entrada inventada las engana a todas a la vez.",
+    "rules": [
+      "La URL es obligatoria y debe ser la relatoria oficial. Sin URL no se ingesta.",
+      "`ratioDecidendi` y `hechosClave` describen; no reemplazan al texto. El texto indexado siempre es el que se descarga de la URL.",
+      "Verificar que la providencia EXISTE con ese numero y ese ano antes de agregarla. Un numero que se lee correcto es lo que nadie vuelve a revisar.",
+      "`resuelveOutcome` se lee en el resuelve, no se asume. Un corpus donde todo salio CONCEDIDO no informa nada.",
+      "Confirmar que la sentencia no fue superada por una unificacion posterior."
+    ],
+    "seeded_at": null,
+    "count": 0
+  },
+  "rulings": []
+}
