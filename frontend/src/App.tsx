@@ -307,8 +307,7 @@ export function App() {
                 rightView={workflow.rightView}
                 setRightView={workflow.setRightView}
                 generatedDraft={workflow.generatedDraft}
-                analyticsData={workflow.analyticsData}
-                copied={workflow.copied}
+                                copied={workflow.copied}
                 onOpenBrandingModal={() => setIsBrandingModalOpen(true)}
                 onCopyText={workflow.handleCopyText}
                 onExportWord={handleExportWord}

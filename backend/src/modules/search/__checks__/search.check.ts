@@ -47,7 +47,11 @@ const walk = (dir: string): string[] => {
 // T-238-2023, SL-4102-2023 — which is how these were written. The catalogue's
 // own data is excluded: its entries cite rulings that WERE read in the source,
 // and they are generated from research/, not typed into a component.
-const RULING = /\b(SU|T|C|SL|SC|SP|CE)-\s?\d{2,4}\s?-\s?\d{2,4}\b/;
+// Both separators, because only the hyphen was matched before and the two
+// citations that survived longest were written with a slash: `SU-049/22` in the
+// Herramientas glossary and `SU-049/2022` in the drafting data. A pattern that
+// catches one spelling of a defect declares the other one clean.
+const RULING = /\b(SU|T|C|SL|SC|SP|CE)-\s?\d{2,4}\s?[-/]\s?\d{2,4}\b/;
 
 /**
  * Comments are prose. The first version only skipped lines that BEGIN with a
@@ -68,18 +72,60 @@ const withoutComments = (line: string): string =>
     .replace(/\/\/.*$/, '');
 const isComment = (line: string): boolean => /^\s*(\/\/|\*|\/\*)/.test(line);
 
-const scanned = [
-  join(REPO, 'backend', 'src', 'modules', 'search'),
-  join(REPO, 'backend', 'src', 'modules', 'ingestion'),
-  join(REPO, 'frontend', 'src', 'modules', 'search'),
-  join(REPO, 'frontend', 'src', 'modules', 'precedents')
-].flatMap(walk);
+/**
+ * Every module, not just the one the defect was found in.
+ *
+ * This list used to name four directories — search and ingestion — and that is
+ * precisely how "SU-049 de 2022" survived being deleted. It was cleaned out of
+ * the search module and went on living in two places nobody scanned: the
+ * Herramientas glossary, which showed it as an "ejemplo en escrito procesal"
+ * ready to paste into a brief, and agent/data/jurisprudence.ts, which fed it to
+ * the drafting model as authority. Scoping a gate to the crime scene declares
+ * the rest of the city safe.
+ *
+ * The catalogue's generated data is the one exclusion, and it is earned: its
+ * entries cite rulings that were read at the source, and they are built from
+ * research/ by a script rather than typed into a component.
+ */
+const scanned = [join(REPO, 'backend', 'src', 'modules'), join(REPO, 'frontend', 'src', 'modules')]
+  .flatMap(walk)
+  .filter((file) => !file.includes(join('catalog', 'data')));
+
+/**
+ * Citations allowed to appear in source, each one opened at the relatoría.
+ *
+ * The rule this check enforces is "no UNVERIFIED ruling in the source", and the
+ * honest way to keep it strict is to record the exceptions rather than stop
+ * looking at whole directories — the scoping that let SU-049 de 2022 survive in
+ * two modules after being deleted from a third.
+ *
+ * These four are doctrinal references inside document templates and the
+ * glossary, not fabricated data, and each was confirmed on 2026-08-15 by
+ * fetching its page and checking the document carries its own docket. That test
+ * matters: the relatoría answers 200 for a providencia that does not exist,
+ * returning the site shell — 5,513 characters of fonts and navigation — so a
+ * length threshold would have called the fake one real. SU-049 de 2022 was used
+ * as the control and correctly failed.
+ *
+ *   C-590 de 2005   /relatoria/2005/C-590-05.htm   (also in the verified corpus)
+ *   SU-813 de 2007  /relatoria/2007/SU813-07.htm
+ *   SU-556 de 2014  /relatoria/2014/SU556-14.htm
+ *   C-327 de 2016   /relatoria/2016/C-327-16.htm
+ *
+ * Adding a line here means opening the ruling first. It is not a place to put
+ * something the gate found inconvenient.
+ */
+const VERIFIED = /\b(C-590\/2005|SU-813\/2007|SU-556\/2014|C-327\/16)\b/g;
 
 const offenders = scanned.flatMap((file) =>
   readFileSync(file, 'utf8')
     .split('\n')
     .map((text, i) => ({ file, line: i + 1, text }))
-    .filter((row) => !isComment(row.text) && RULING.test(withoutComments(row.text)))
+    .filter(
+      (row) =>
+        !isComment(row.text) &&
+        RULING.test(withoutComments(row.text).replace(VERIFIED, ''))
+    )
 );
 
 if (offenders.length) {

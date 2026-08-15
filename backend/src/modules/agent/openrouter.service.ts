@@ -1,11 +1,17 @@
 import { ENGINE, callOpenRouterModel } from './openrouter.client';
-import { JURISPRUDENCE_BY_TOPIC } from './data/jurisprudence';
+import { vectorSearchService } from '../search/vectorSearch.service';
 import { detectLegalTopic } from './topicDetector';
 import { generateCleanDocumentTitle } from './documentTitle';
 import { buildClaudeDraftPrompt, buildClaudeUserMessage } from './claudeDraft.prompt';
 import { buildCatalogGuidanceForFirm } from './catalogGuidance';
 import type { LegalBranch } from '../catalog/types';
 import { buildSolemnColombianDraft } from './solemnDraft.fallback';
+
+/**
+ * Precedents come from the shared corpus, never from a firm's own files: a
+ * draft must cite published jurisprudence, not another client's document.
+ */
+const SHARED_CORPUS = 'SYSTEM_CORPUS';
 
 export interface WorkflowRequest {
   documentType: string;
@@ -73,7 +79,7 @@ export class OpenRouterService {
     const isContinuation = Boolean(req.existingDraft);
 
     const geminiExtraction = await this.runFactExtraction(req, onStepLog);
-    const jurisprudencia = this.runPrecedentSearch(req, onStepLog);
+    const jurisprudencia = await this.runPrecedentSearch(req, onStepLog);
     const gptStructure = await this.runDogmaticOutline(req, geminiExtraction, jurisprudencia, onStepLog);
     const legalText = await this.runDrafting(req, geminiExtraction, jurisprudencia, gptStructure, onStepLog);
 
@@ -131,15 +137,68 @@ export class OpenRouterService {
     return extraction;
   }
 
-  /** Phase 1.5 — precedent lookup across every Colombian high court. */
-  private runPrecedentSearch(req: WorkflowRequest, onStepLog: (step: any) => void): string[] {
-    const topic = detectLegalTopic(req.documentType, req.legalPrompt);
-    const jurisprudencia = JURISPRUDENCE_BY_TOPIC[topic];
+  /**
+   * Phase 1.5 — precedent lookup in SYSTEM_CORPUS.
+   *
+   * This step used to read a hardcoded array and then TELL the user it had run
+   * a vector search: the log said "[pgvector RAG] Encontradas N providencias
+   * aplicables en SYSTEM_CORPUS", naming Supabase, pgvector and the corpus, none
+   * of which were touched. Twenty of the fifty-seven citations in that array
+   * used dockets no Colombian court issues — TSB-LAB-2024-1102, CE-SEC3-2020-0756,
+   * TAC-089/2024 — templates of an acronym, a branch, a year and a sequence. One
+   * more, SU-049 de 2022, named a providencia that does not exist at all.
+   *
+   * The corpus is real now, so the step does what its log always claimed. When
+   * the search finds nothing it returns nothing: the drafting phases receive an
+   * empty list and say so, because inventing a precedent is the one failure this
+   * pipeline cannot be allowed to have.
+   */
+  private async runPrecedentSearch(
+    req: WorkflowRequest,
+    onStepLog: (step: any) => void
+  ): Promise<string[]> {
+    const query = [req.documentType, req.legalPrompt].filter(Boolean).join('. ').trim();
+    const result = await vectorSearchService.search(SHARED_CORPUS, query, 12);
+
+    if (result.status !== 'OK') {
+      onStepLog({
+        stage: 'STAGE_1_RAG',
+        engine: 'SUPABASE',
+        message: `[RAG] Sin precedentes: ${result.reason ?? result.status}. La redacción continúa sin jurisprudencia.`,
+        timestamp: new Date().toISOString(),
+        data: { jurisprudencia: [] }
+      });
+      return [];
+    }
+
+    // Chunks, not rulings: one providencia usually matches several times. The
+    // model needs each ruling once, and the URL travels with it so the lawyer
+    // can open what was cited.
+    const byProvidencia = new Map<string, string>();
+
+    for (const match of result.matches) {
+      const meta = (match.metadata ?? {}) as Record<string, unknown>;
+      const providencia = typeof meta.providencia === 'string' ? meta.providencia : match.fileName;
+      if (!providencia || byProvidencia.has(providencia)) continue;
+
+      const parts = [
+        typeof meta.corporacion === 'string' ? meta.corporacion.replace(/_/g, ' ') : null,
+        typeof meta.magistradoPonente === 'string' ? `M.P. ${meta.magistradoPonente}` : null,
+        typeof meta.resuelveOutcome === 'string' ? meta.resuelveOutcome : null,
+        typeof meta.sourceUrl === 'string' ? meta.sourceUrl : null
+      ].filter(Boolean);
+
+      byProvidencia.set(providencia, `${providencia} (${parts.join(' — ')})`);
+    }
+
+    const jurisprudencia = [...byProvidencia.values()];
 
     onStepLog({
       stage: 'STAGE_1_RAG',
       engine: 'SUPABASE',
-      message: `[pgvector RAG] Encontradas ${jurisprudencia.length} providencias aplicables en SYSTEM_CORPUS.`,
+      message: jurisprudencia.length
+        ? `[pgvector RAG] ${jurisprudencia.length} providencia(s) recuperadas de SYSTEM_CORPUS.`
+        : '[pgvector RAG] El corpus no devolvió providencias para esta consulta.',
       timestamp: new Date().toISOString(),
       data: { jurisprudencia }
     });

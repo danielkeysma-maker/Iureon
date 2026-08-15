@@ -147,7 +147,13 @@ const EXTENSIVE_LEGAL_GLOSSARY: GlossaryTerm[] = [
     term: 'Sanción Moratoria (Art. 65 CST)',
     category: 'LABORAL_CST',
     definition: 'Indemnización equivalente a un día de salario por cada día de retardo en el pago de salarios y prestaciones a la terminación del contrato, sujeta a buena/mala fe.',
-    legalBasis: 'Artículo 65 del Código Sustantivo del Trabajo & Casación CSJ SL-1892-2023',
+    // The citation "Casación CSJ SL-1892-2023" was dropped rather than kept:
+    // it is not in the verified corpus, the CSJ publishes into date-based
+    // folders so its page cannot be resolved to confirm it, and a near-twin
+    // — SL-1892-2022 — was part of the fabricated precedents module deleted the
+    // same day. Article 65 CST is the substantive basis and is verifiable; an
+    // unconfirmed ruling number adds authority the entry has not earned.
+    legalBasis: 'Artículo 65 del Código Sustantivo del Trabajo',
     exampleUsage: 'Se solicita la condena a la Sanción Moratoria del Art. 65 por omisión injustificada del empleador.'
   },
   {

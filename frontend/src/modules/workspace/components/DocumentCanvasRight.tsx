@@ -2,15 +2,12 @@ import React from 'react';
 import { PdfViewerCanvas } from '../../documents/components/PdfViewerCanvas';
 import { LegalDraftViewer } from '../../documents/components/LegalDraftViewer';
 import type { GeneratedDraft } from '../../documents/types';
-import { PrecedentsAnalyticsCard } from '../../precedents/components/PrecedentsAnalyticsCard';
-import type { CaseProvidenciaEvaluationData } from '../../precedents/types';
 import { Sparkles, FolderOpen } from 'lucide-react';
 
 interface DocumentCanvasRightProps {
-  rightView: 'pdf' | 'draft' | 'analytics';
-  setRightView: (view: 'pdf' | 'draft' | 'analytics') => void;
+  rightView: 'pdf' | 'draft';
+  setRightView: (view: 'pdf' | 'draft') => void;
   generatedDraft: GeneratedDraft | null;
-  analyticsData: CaseProvidenciaEvaluationData;
   copied: boolean;
   onOpenBrandingModal: () => void;
   onCopyText: () => void;
@@ -25,7 +22,6 @@ interface DocumentCanvasRightProps {
 export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
   rightView,
   generatedDraft,
-  analyticsData,
   onExportWord,
   onExportPdf,
   isFocusMode,
@@ -37,9 +33,7 @@ export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
     <section className="flex-1 bg-slate-100 flex flex-col h-full overflow-hidden font-sans">
       {/* Main Canvas View Area */}
       <div className="flex-1 p-4 md:p-8 overflow-y-auto bg-slate-100/70">
-        {rightView === 'analytics' ? (
-          <PrecedentsAnalyticsCard data={analyticsData} />
-        ) : rightView === 'draft' ? (
+        {rightView === 'draft' ? (
           generatedDraft ? (
             <LegalDraftViewer
               draft={generatedDraft}

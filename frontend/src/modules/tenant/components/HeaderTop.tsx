@@ -6,8 +6,8 @@ import { navModule } from '../navigation';
 
 interface HeaderTopProps {
   mainView: MainView;
-  rightView: 'pdf' | 'draft' | 'analytics';
-  setRightView: (view: 'pdf' | 'draft' | 'analytics') => void;
+  rightView: 'pdf' | 'draft';
+  setRightView: (view: 'pdf' | 'draft') => void;
   copied: boolean;
   onCopyText: () => void;
   onExportWord: () => void;
