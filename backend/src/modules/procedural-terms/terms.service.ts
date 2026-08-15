@@ -23,11 +23,29 @@ export class ProceduralTermsService {
    * Calcula el término procesal en días hábiles conforme al Art. 118 del CGP y Art. 151 CPTSS
    */
   public calculateJudicialTerm(req: TermCalculationRequest): TermCalculationResult {
+    /*
+     * TODO EN UTC, Y NO ES UN DETALLE DE ESTILO.
+     *
+     * `new Date('2026-08-14')` se interpreta como medianoche UTC. Este bucle
+     * derivaba la fecha con `toISOString()` (UTC) y el día de la semana con
+     * `getDay()` (local). En Colombia, UTC−5, la medianoche UTC del 16 de agosto
+     * es el 15 a las 19:00 local: la cadena decía "2026-08-16" mientras
+     * `getDay()` respondía sábado. Las dos mitades del cálculo hablaban de días
+     * distintos.
+     *
+     * El efecto medido: notificado el viernes 14 de agosto de 2026 con un
+     * término de 5 días, devolvía el 21. El lunes 17 quedaba marcado como
+     * domingo, así que nunca alcanzaba la rama de festivos pese a estar en la
+     * lista — es la Asunción trasladada — y el vencimiento real, el 24, se
+     * adelantaba tres días. Un término procesal equivocado por defecto es el
+     * error que le hace perder el caso a un abogado, y llegaba con la cara de
+     * un cálculo hecho.
+     */
     const startDate = new Date(req.notifiedDate);
     let currentDate = new Date(startDate);
 
     // En Colombia el término empieza a correr al día siguiente de la notificación (Art. 118 CGP)
-    currentDate.setDate(currentDate.getDate() + 1);
+    currentDate.setUTCDate(currentDate.getUTCDate() + 1);
     const calculatedStartDate = currentDate.toISOString().split('T')[0];
 
     let businessDaysCounted = 0;
@@ -43,7 +61,7 @@ export class ProceduralTermsService {
 
     while (businessDaysCounted < req.termInDays) {
       const dateStr = currentDate.toISOString().split('T')[0];
-      const dayOfWeek = currentDate.getDay(); // 0: Dom, 6: Sáb
+      const dayOfWeek = currentDate.getUTCDay(); // 0: Dom, 6: Sáb — UTC, igual que dateStr
 
       if (dayOfWeek === 0) {
         excludedDays.push({ date: dateStr, reason: 'Domingo (Día no hábil)' });
@@ -56,7 +74,7 @@ export class ProceduralTermsService {
       }
 
       if (businessDaysCounted < req.termInDays) {
-        currentDate.setDate(currentDate.getDate() + 1);
+        currentDate.setUTCDate(currentDate.getUTCDate() + 1);
       }
     }
 

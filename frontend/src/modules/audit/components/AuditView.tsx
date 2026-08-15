@@ -39,7 +39,12 @@ export const AuditView: React.FC = () => {
       iconBg: 'bg-blue-50',
       iconColor: 'text-blue-800',
       title: 'Plan de Firma & Licencias',
-      description: 'Supervisión de créditos mensuales (1.4M / 5M), licencias activas (4 de 10) y renovación del servicio.',
+      // The figures "1.4M / 5M" and "4 de 10" were hardcoded into this sentence
+      // and read as the firm's own consumption. Nothing computed them: there is
+      // no subscription service returning credits or seats, and at the time of
+      // writing no firm was even registered. A card describes what a section
+      // does; the numbers belong to the panel that can actually fetch them.
+      description: 'Créditos del plan, licencias activas y renovación del servicio.',
       action: () => setIsSubscriptionModalOpen(true),
       buttonLabel: 'Administrar plan',
       buttonClass: 'bg-blue-950 hover:bg-blue-900'
