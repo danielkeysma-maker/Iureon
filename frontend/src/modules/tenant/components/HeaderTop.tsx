@@ -132,15 +132,28 @@ export const HeaderTop: React.FC<HeaderTopProps> = ({
         </div>
       )}
 
-      {/* SUPERUSER & LOGOUT QUICK LINKS */}
-      <div className="ml-auto flex items-center gap-2">
+      {/*
+        SUPERUSER & LOGOUT.
+
+        These two used to carry the heaviest treatment in the product: solid
+        slate-900, font-bold, rounded-xl, against tabs that were rounded-lg,
+        font-semibold and half a pixel larger. The result was that the loudest
+        element on the whole screen was an admin panel, and the second loudest
+        was a red "Cerrar Sesión" — while the actual work, drafting a document,
+        sat in plain grey underneath.
+
+        Both are secondary now: same radius, same size and a lighter weight than
+        the primary actions, so attention follows importance. Red is kept for
+        things that destroy something; leaving a session destroys nothing.
+      */}
+      <div className="flex items-center gap-2">
         {onOpenUserManagementModal && (
           <button
             onClick={onOpenUserManagementModal}
-            className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-[11.5px] font-bold flex items-center gap-1.5 transition-all shadow-xs border border-slate-700"
+            className="px-2.5 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/80 rounded-lg text-[12px] font-medium flex items-center gap-1.5 transition-colors"
             title="Gestión de SuperUsuario, Autenticación y Cuentas de Firmas"
           >
-            <Shield className="w-3.5 h-3.5 text-blue-300" />
+            <Shield className="w-3.5 h-3.5 text-slate-400" />
             <span>SuperUsuario &amp; Firmas</span>
           </button>
         )}
@@ -148,10 +161,10 @@ export const HeaderTop: React.FC<HeaderTopProps> = ({
         {onLogout && (
           <button
             onClick={() => setIsLogoutConfirmOpen(true)}
-            className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-[11.5px] font-bold flex items-center gap-1.5 transition-all shadow-xs"
+            className="px-2.5 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/80 rounded-lg text-[12px] font-medium flex items-center gap-1.5 transition-colors"
             title="Cerrar Sesión e Ir al Portal de Login"
           >
-            <LogOut className="w-3.5 h-3.5 text-rose-600" />
+            <LogOut className="w-3.5 h-3.5 text-slate-400" />
             <span>Cerrar Sesión</span>
           </button>
         )}
@@ -160,9 +173,9 @@ export const HeaderTop: React.FC<HeaderTopProps> = ({
       {/* ActionConfirmationModal for Logout */}
       <ActionConfirmationModal
         isOpen={isLogoutConfirmOpen}
-        title="🚨 ¿Cerrar Sesión de la Plataforma?"
-        message="¿Está seguro de que desea salir del Ecosistema E-Judicial de Iureon? Sus datos y configuraciones activas permanecerán seguros."
-        confirmText="Sí, Cerrar Sesión"
+        title="¿Cerrar sesión?"
+        message="Sus borradores y configuraciones quedan guardados. Puede volver a entrar cuando quiera."
+        confirmText="Cerrar sesión"
         confirmVariant="danger"
         onConfirm={() => {
           setIsLogoutConfirmOpen(false);

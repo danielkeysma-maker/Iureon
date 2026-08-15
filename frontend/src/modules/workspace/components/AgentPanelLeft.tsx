@@ -39,6 +39,18 @@ const SUBMIT_LABEL: Record<ActuacionRole, string> = {
   SECRETARIA: 'Generar Constancia'
 };
 
+/**
+ * Shared width for the three controls of the setup rows (Actuación, Rama, Tipo).
+ *
+ * Each one used to size itself: the role toggle to its labels, the branch select
+ * to its longest option, the type select to a max-width. Measured in the browser
+ * they landed at 291, 322 and 300 px — right edges aligned, left edges ragged by
+ * 31 px. That reads as untidy without a reader being able to name why, and it
+ * comes back the moment someone adds a longer branch label. One constant decides
+ * it now, so the column stays straight by construction rather than by luck.
+ */
+const CONTROL_WIDTH = 'w-[300px]';
+
 export interface CaseStudyFile {
   id: string;
   name: string;
@@ -163,13 +175,13 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
             <Building className="w-3.5 h-3.5 text-slate-400" />
             Actuación
           </label>
-          <div className="flex bg-slate-100/80 p-0.5 rounded-lg">
+          <div className={`${CONTROL_WIDTH} flex bg-slate-100/80 p-0.5 rounded-lg`}>
             {ROLE_TABS.map((tab) => (
               <button
                 key={tab.role}
                 onClick={() => handleRoleChange(tab.role)}
                 title={tab.hint}
-                className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all ${
+                className={`flex-1 px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all ${
                   userRole === tab.role
                     ? 'bg-blue-950 text-white shadow-sm'
                     : 'text-slate-500 hover:text-slate-700'
@@ -190,7 +202,7 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
           <select
             value={legalBranch}
             onChange={(e) => handleBranchChange(e.target.value)}
-            className="bg-white border border-slate-200/80 text-slate-800 font-medium text-[12px] rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900/40"
+            className={`${CONTROL_WIDTH} bg-white border border-slate-200/80 text-slate-800 font-medium text-[12px] rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900/40 truncate`}
           >
             {branchOptions.map((branch) => (
               <option key={branch} value={branch}>
@@ -202,11 +214,14 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
 
         {/* Document type selector */}
         <div className="flex items-center justify-between">
-          <label className="text-[12px] text-slate-500 font-medium">Tipo</label>
+          <label className="text-[12px] text-slate-500 font-medium flex items-center gap-1.5">
+            <FileText className="w-3.5 h-3.5 text-slate-400" />
+            Tipo
+          </label>
           <select
             value={documentType}
             onChange={(e) => setDocumentType(e.target.value)}
-            className="bg-white border border-slate-200/80 text-slate-800 font-medium text-[12px] rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900/40 max-w-[300px] truncate"
+            className={`${CONTROL_WIDTH} bg-white border border-slate-200/80 text-slate-800 font-medium text-[12px] rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900/40 truncate`}
           >
             {currentOptions.map((opt, idx) => (
               <option key={idx} value={opt}>{opt}</option>
