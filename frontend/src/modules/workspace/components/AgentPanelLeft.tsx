@@ -89,7 +89,6 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
   const actuacion = useActuacion(documentType, legalBranch);
   const [userRole, setUserRole] = useState<ActuacionRole>('LITIGANTE');
   const [importedFiles, setImportedFiles] = useState<CaseStudyFile[]>([]);
-  const [isUploadingFile, setIsUploadingFile] = useState(false);
 
 
   const catalogued = useBranchActuaciones(legalBranch, userRole);
@@ -135,24 +134,32 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
     setUserRole(role);
   };
 
-  const handleFileUploadMock = (e: React.ChangeEvent<HTMLInputElement>) => {
+  /**
+   * Lists the files the lawyer selected. It does not read or send them.
+   *
+   * That limit is stated in the UI now, because the previous version hid it
+   * behind an appearance of work: a 600ms pause, and then a badge on every file
+   * classifying the ruling as **Concedido** or **Negado** — green or red — based
+   * on whether its FILENAME contained "conced" or "nega". Naming a file
+   * `borrador_concedido.pdf` made the product assert how a court had ruled.
+   *
+   * The contents never reached the model either: importedFiles is local state,
+   * and the draft request body carries documentType, legalBranch and the prompt.
+   * A lawyer attaching the rulings their brief should rest on saw them listed
+   * and none of it arrived.
+   */
+  const handleFileSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
-    setIsUploadingFile(true);
-    setTimeout(() => {
-      const newFiles: CaseStudyFile[] = Array.from(files).map((f, idx) => ({
-        id: `file-${Date.now()}-${idx}`,
-        name: f.name,
-        size: `${(f.size / (1024 * 1024)).toFixed(1)} MB`,
-        type: f.name.toLowerCase().includes('conced')
-          ? 'PRECEDENTE_CONCEDIDO'
-          : f.name.toLowerCase().includes('nega')
-          ? 'PRECEDENTE_NEGADO'
-          : 'DOCUMENTO_ESTUDIO'
-      }));
-      setImportedFiles((prev) => [...prev, ...newFiles]);
-      setIsUploadingFile(false);
-    }, 600);
+
+    const newFiles: CaseStudyFile[] = Array.from(files).map((f, idx) => ({
+      id: `file-${Date.now()}-${idx}`,
+      name: f.name,
+      size: `${(f.size / (1024 * 1024)).toFixed(1)} MB`,
+      type: 'DOCUMENTO_ESTUDIO'
+    }));
+
+    setImportedFiles((prev) => [...prev, ...newFiles]);
   };
 
   const removeFile = (id: string) => {
@@ -258,12 +265,16 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
         </div>
 
         <label className="w-full flex items-center justify-center gap-2 py-2.5 bg-slate-50 hover:bg-slate-100/80 border border-dashed border-slate-300 rounded-xl cursor-pointer transition-colors">
-          <input type="file" multiple accept=".pdf,.docx,.doc,.txt" onChange={handleFileUploadMock} className="hidden" />
+          <input type="file" multiple accept=".pdf,.docx,.doc,.txt" onChange={handleFileSelection} className="hidden" />
           <UploadCloud className="w-4 h-4 text-slate-400" />
-          <span className="text-[12px] font-medium text-slate-500">
-            {isUploadingFile ? 'Cargando...' : 'Adjuntar sentencias o pruebas'}
-          </span>
+          <span className="text-[12px] font-medium text-slate-500">Adjuntar sentencias o pruebas</span>
         </label>
+
+        {/* Says what the feature does. It listed files while implying the draft
+            would use them, which is the quietest way to be wrong. */}
+        <p className="mt-1.5 text-[10.5px] text-amber-700 leading-snug">
+          Por ahora solo se listan: su contenido todavía no se envía al redactor.
+        </p>
 
         {importedFiles.length > 0 && (
           <div className="space-y-1.5 mt-2 max-h-28 overflow-y-auto">
@@ -275,13 +286,8 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
                   <span className="text-[9px] text-slate-400 font-mono">({file.size})</span>
                 </div>
                 <div className="flex items-center gap-1.5 flex-shrink-0">
-                  {file.type === 'PRECEDENTE_CONCEDIDO' ? (
-                    <span className="text-[9px] font-mono bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded font-semibold">Concedido</span>
-                  ) : file.type === 'PRECEDENTE_NEGADO' ? (
-                    <span className="text-[9px] font-mono bg-rose-50 text-rose-600 px-1.5 py-0.5 rounded font-semibold">Negado</span>
-                  ) : (
-                    <span className="text-[9px] font-mono bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded font-semibold">Estudio</span>
-                  )}
+                  {/* The Concedido/Negado badges are gone. Nothing here has read
+                      the ruling, so nothing here can say how it was decided. */}
                   <button type="button" onClick={() => removeFile(file.id)} className="text-slate-400 hover:text-rose-500 transition-colors">
                     <X className="w-3 h-3" />
                   </button>
