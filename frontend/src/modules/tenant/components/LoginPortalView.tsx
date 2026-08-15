@@ -116,9 +116,21 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({
           </button>
         </form>
 
-        {/* Footer Info */}
-        <div className="pt-4 border-t border-slate-100 text-center text-[11px] text-slate-400">
-          <p className="font-semibold text-slate-600">Autenticación Cifrada Supabase Auth &amp; Multi-Tenant RLS</p>
+        {/*
+          This said "Autenticación Cifrada Supabase Auth & Multi-Tenant RLS".
+          None of it was true: handleLoginSubmit checks that the two fields are
+          non-empty, waits on a setTimeout that exists only to look busy, and
+          lets anyone in. There is no Supabase call and no credential check.
+
+          A product whose whole thesis is that it never states what it has not
+          verified cannot promise security it does not have — a false claim here
+          is the same defect as a fabricated ruling, and more dangerous, because
+          a firm would decide to trust it with client data. Says what is true
+          until real authentication lands.
+        */}
+        <div className="pt-4 border-t border-slate-100 text-center text-[11px] text-slate-500">
+          <p className="font-semibold text-amber-700">Entorno de desarrollo</p>
+          <p className="mt-0.5">El acceso todavía no se verifica. No cargue información real de clientes.</p>
         </div>
       </div>
     </div>

@@ -9,7 +9,6 @@ import {
   Wrench,
   Shield,
   Settings,
-  ShieldCheck,
   CreditCard,
   ChevronsLeft,
   ChevronsRight,
@@ -267,10 +266,15 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
                 <span>Membrete</span>
               </button>
 
-              <div className="py-2 px-2.5 bg-emerald-50 border border-emerald-200/80 rounded-xl text-emerald-800 text-[11px] font-semibold flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Cifrado</span>
-              </div>
+              {/*
+                A green "Cifrado" pill sat here. It was static markup: no state
+                behind it, nothing measured, nothing to turn it off if encryption
+                were ever absent — and today the login verifies nothing at all,
+                so it asserted the opposite of the truth. A reassurance nobody
+                can revoke is not a status indicator, it is decoration that
+                happens to lie. It also made this corner the busiest part of the
+                rail, mixing a balance, a settings button and a security claim.
+              */}
             </div>
           </>
         ) : (
