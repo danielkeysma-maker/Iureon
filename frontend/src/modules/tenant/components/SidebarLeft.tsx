@@ -4,17 +4,15 @@ import {
   Building2,
   ChevronDown,
   Check,
-  Sparkles,
-  BookOpen,
-  Wrench,
   Shield,
   Settings,
   CreditCard,
   ChevronsLeft,
   ChevronsRight,
-  User, Mic, Library } from 'lucide-react';
+  User } from 'lucide-react';
 import type { LawFirmTenant } from './Header';
 import type { MainView } from '../types';
+import { NAV_MODULES } from '../navigation';
 
 interface SidebarLeftProps {
   mainView: MainView;
@@ -49,14 +47,9 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const navItems = [
-    { id: 'workspace' as const, label: 'Redacción', icon: Sparkles, description: 'Providencias judiciales' },
-    { id: 'audiencias' as const, label: 'Audiencias', icon: Mic, description: 'Transcripción de grabaciones' },
-    { id: 'search' as const, label: 'Buscador', icon: BookOpen, description: 'Sentencias & precedentes' },
-    { id: 'catalogo' as const, label: 'Catálogo', icon: Library, description: 'Actuaciones y términos verificados' },
-    { id: 'tools' as const, label: 'Herramientas', icon: Wrench, description: 'Cálculos & utilidades' },
-    { id: 'audit' as const, label: 'Seguridad', icon: Shield, description: 'Auditoría & gestión' }
-  ];
+  // Shared with HeaderTop. See navigation.ts: these were two lists that had
+  // drifted into six different names for the same six modules.
+  const navItems = NAV_MODULES;
 
   return (
     <aside

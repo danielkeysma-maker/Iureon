@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { ChevronRight, Sparkles, BookOpen, Wrench, Shield, CheckCircle2, Copy, Download, FileType, Maximize2, Minimize2, LogOut, Mic, Library } from 'lucide-react';
+import { ChevronRight, Shield, CheckCircle2, Copy, Download, FileType, Maximize2, Minimize2, LogOut } from 'lucide-react';
 import { ActionConfirmationModal } from './ActionConfirmationModal';
 import type { MainView } from '../types';
+import { navModule } from '../navigation';
 
 interface HeaderTopProps {
   mainView: MainView;
@@ -32,22 +33,14 @@ export const HeaderTop: React.FC<HeaderTopProps> = ({
 }) => {
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
 
-  const viewMeta: Record<string, { label: string; icon: React.ReactNode }> = {
-    workspace: { label: 'Redacción & Providencias', icon: <Sparkles className="w-4 h-4 text-blue-800" /> },
-    audiencias: { label: 'Audiencias & Transcripción', icon: <Mic className="w-4 h-4 text-blue-800" /> },
-    search: { label: 'Buscador & Sentencias', icon: <BookOpen className="w-4 h-4 text-blue-800" /> },
-    catalogo: { label: 'Catálogo Procesal', icon: <Library className="w-4 h-4 text-blue-800" /> },
-    tools: { label: 'Herramientas & Cálculos', icon: <Wrench className="w-4 h-4 text-blue-800" /> },
-    audit: { label: 'Seguridad & Auditoría', icon: <Shield className="w-4 h-4 text-blue-800" /> }
-  };
-
-  // Falls back rather than crashing: this map silently lost its 'audiencias'
-  // entry when that view shipped, and reading `.icon` off undefined took the
-  // whole header down with it.
-  const current = viewMeta[mainView] ?? {
-    label: 'Módulo',
-    icon: <Sparkles className="w-4 h-4 text-blue-800" />
-  };
+  // This used to be a second copy of the module list, and the two had drifted
+  // into six different names for the same six modules — the rail said
+  // "Buscador", the bar said "Buscador & Sentencias". navigation.ts is the one
+  // list now, and it still falls back rather than crashing: this map silently
+  // lost its 'audiencias' entry when that view shipped, and reading `.icon` off
+  // undefined took the whole header down with it.
+  const current = navModule(mainView);
+  const CurrentIcon = current.icon;
 
   return (
     <header className="h-[52px] bg-white border-b border-slate-200/80 px-6 flex items-center justify-between select-none font-sans z-20">
@@ -56,7 +49,7 @@ export const HeaderTop: React.FC<HeaderTopProps> = ({
         <span className="text-slate-400 font-medium">Módulos</span>
         <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
         <div className="flex items-center gap-2 text-slate-900 font-semibold">
-          {current.icon}
+          <CurrentIcon className="w-4 h-4 text-blue-800" />
           <span>{current.label}</span>
         </div>
       </div>
