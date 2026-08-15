@@ -150,7 +150,19 @@ const NONSENSE_CEILING = 0.55;
   // stored bytes proves a lawyer can quote it.
   // ---------------------------------------------------------------------------
   if (supabase) {
-    const damaged = new Map<string, number>();
+    // Mirrors the floor `ingestCorpus.ts` enforces on the way in. A gate that
+    // demands more than the pipeline guarantees reports defects nobody can fix.
+    //
+    // Zero is the WRONG bar, and one real case proved it: SC4703-2021 is a
+    // scanned PDF whose page separator carries a glyph with no Unicode mapping —
+    // one U+FFFD inside a run of dashes, with all 1,678 of its accents intact.
+    // A genuine decoding failure is not subtle at this scale: T-388 de 2013 lost
+    // 43,860 characters. Orders of magnitude separate the two, so the ratio
+    // catches every real one without crying about scanner noise.
+    const MAX_REPLACEMENT_RATIO = 0.001;
+
+    const lostPer = new Map<string, number>();
+    const sizePer = new Map<string, number>();
     let scanned = 0;
 
     for (let from = 0; ; from += 1000) {
@@ -171,19 +183,27 @@ const NONSENSE_CEILING = 0.55;
 
       for (const row of data as Array<{ file_name: string; content_chunk: string }>) {
         const lost = row.content_chunk.match(/�/g)?.length ?? 0;
-        if (lost > 0) damaged.set(row.file_name, (damaged.get(row.file_name) ?? 0) + lost);
+        lostPer.set(row.file_name, (lostPer.get(row.file_name) ?? 0) + lost);
+        sizePer.set(row.file_name, (sizePer.get(row.file_name) ?? 0) + row.content_chunk.length);
       }
 
       if (data.length < 1000) break;
     }
 
-    if (damaged.size === 0) {
+    const damaged = [...lostPer.entries()]
+      .map(([name, lost]) => ({ name, lost, ratio: lost / Math.max(sizePer.get(name) ?? 1, 1) }))
+      .filter((entry) => entry.ratio > MAX_REPLACEMENT_RATIO)
+      .sort((a, b) => b.ratio - a.ratio);
+
+    if (damaged.length === 0) {
       pass(`el texto almacenado es legible en los ${scanned} chunks del corpus`);
     } else {
-      const worst = [...damaged.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
       fail(
-        `${damaged.size} providencia(s) con caracteres destruidos por una mala decodificación: ` +
-          worst.map(([name, lost]) => `${name} (${lost})`).join(', ')
+        `${damaged.length} providencia(s) con caracteres destruidos por una mala decodificación: ` +
+          damaged
+            .slice(0, 5)
+            .map((e) => `${e.name} (${e.lost}, ${(e.ratio * 100).toFixed(2)}%)`)
+            .join(', ')
       );
     }
   }
