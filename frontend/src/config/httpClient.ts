@@ -3,10 +3,15 @@ import { API_BASE_URL } from './api.config';
 /**
  * Single entry point for backend calls.
  *
- * Every `/api` route is behind the x-firm-id middleware, so the tenant is a
- * required argument rather than an optional header a caller might forget. That
- * is deliberate: five components previously sent a hardcoded firm id, which
+ * Nearly every `/api` route is behind the x-firm-id middleware, so the tenant is
+ * an explicit argument rather than a header a caller might forget. That is
+ * deliberate: five components previously sent a hardcoded firm id, which
  * silently routed their reads and writes to the wrong tenant.
+ *
+ * The exceptions are reads of shared product knowledge — the actuación
+ * catalogue and the jurisprudence corpus — which are mounted BEFORE that
+ * middleware because they hold the same data for every firm. Those calls omit
+ * the tenant entirely instead of passing a placeholder.
  */
 
 export class ApiError extends Error {
@@ -22,8 +27,16 @@ export class ApiError extends Error {
 }
 
 interface RequestOptions {
-  /** Tenant the request is scoped to. Sent as the x-firm-id header. */
-  firmId: string;
+  /**
+   * Tenant the request is scoped to. Sent as the x-firm-id header.
+   *
+   * Optional because a few endpoints read shared product knowledge — the
+   * actuación catalogue and the jurisprudence corpus — and are mounted before
+   * the tenant middleware. Omit it there rather than inventing a value: the
+   * server does not verify this header, so a made-up firm id is not a harmless
+   * placeholder, it is the shape of naming someone else's tenant.
+   */
+  firmId?: string;
   body?: unknown;
   signal?: AbortSignal;
 }
@@ -35,7 +48,8 @@ const request = async <T>(
 ): Promise<T> => {
   const url = `${API_BASE_URL}${path}`;
 
-  const headers: Record<string, string> = { 'x-firm-id': firmId };
+  const headers: Record<string, string> = {};
+  if (firmId) headers['x-firm-id'] = firmId;
   if (body !== undefined) headers['Content-Type'] = 'application/json';
 
   const response = await fetch(url, {
@@ -70,7 +84,9 @@ const request = async <T>(
 const postForm = async <T>(
   path: string,
   form: FormData,
-  { firmId, signal }: Omit<RequestOptions, 'body'>
+  // Required here even though RequestOptions makes it optional: uploads write
+  // into a tenant's own storage, so there is no shared-knowledge case for them.
+  { firmId, signal }: Omit<RequestOptions, 'body' | 'firmId'> & { firmId: string }
 ): Promise<T> => {
   const url = `${API_BASE_URL}${path}`;
 

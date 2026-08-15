@@ -47,15 +47,23 @@ export interface SearchResponse<T> {
   reason?: string;
 }
 
+/**
+ * Searches the shared jurisprudence corpus. Takes no firm on purpose.
+ *
+ * SYSTEM_CORPUS holds the same providencias for every tenant, so the route is
+ * mounted before the tenant middleware and pins the corpus server-side. Passing
+ * a firm from here would be worse than useless: the header is not verified, so
+ * it would only invite naming someone else's firm. Searching a firm's own
+ * documents lives on /api/legal/semantic, which does require the header.
+ */
 export const searchPrecedents = (
-  firmId: string,
   query: string,
   limit = 8,
   signal?: AbortSignal
 ): Promise<SearchResponse<CorpusPrecedent>> =>
   httpClient.get<SearchResponse<CorpusPrecedent>>(
     `/api/legal/precedents?query=${encodeURIComponent(query)}&limit=${limit}`,
-    { firmId, signal }
+    { signal }
   );
 
 export const searchGlossary = (

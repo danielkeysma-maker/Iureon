@@ -56,7 +56,16 @@ const RULING = /\b(SU|T|C|SL|SC|SP|CE)-\s?\d{2,4}\s?-\s?\d{2,4}\b/;
  * Strip the comment tail and test what is left.
  */
 const withoutComments = (line: string): string =>
-  line.replace(/\/\*.*?\*\//g, '').replace(/\/\/.*$/, '');
+  // The trailing \r goes first, and that is not cosmetic. On a CRLF checkout —
+  // every Windows clone of this repo — `//.*$` matched nothing at all: `.` never
+  // matches a carriage return and `$` will not sit before one, so the comment
+  // survived and this check failed on a line that merely DOCUMENTS the format it
+  // guards. A gate that fires for a reason unrelated to the defect is worse than
+  // no gate: it teaches everyone that red means "line endings again".
+  line
+    .replace(/\r$/, '')
+    .replace(/\/\*.*?\*\//g, '')
+    .replace(/\/\/.*$/, '');
 const isComment = (line: string): boolean => /^\s*(\/\/|\*|\/\*)/.test(line);
 
 const scanned = [

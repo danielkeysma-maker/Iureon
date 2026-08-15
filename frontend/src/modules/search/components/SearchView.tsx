@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Search, Scale, ThumbsUp, ThumbsDown, Copy, Check, Filter, ExternalLink, AlertTriangle, Loader2 } from 'lucide-react';
-import { useTenant } from '../../tenant/TenantContext';
 import { searchPrecedents } from '../services/legalSearch.api';
 import type { CorpusPrecedent, CorpusStatus } from '../services/legalSearch.api';
 
@@ -32,6 +31,24 @@ const CORPORACIONES = [
   { id: 'CONSEJO_ESTADO', label: 'Consejo de Estado' }
 ];
 
+/**
+ * Strips the header the ingestion pipeline prepends to every stored chunk.
+ *
+ * Each chunk is saved as `[CORPORACIÓN: …] [TIPO: …] [PROVIDENCIA: …] [PONENTE:
+ * …] [RESULTADO: …]` followed by HECHOS and RATIO lines, because the embedding
+ * is computed over that whole string and the metadata helps it match. Useful to
+ * the model, noise to a reader: the card already shows the providencia, the
+ * corporación and the ponente in their own fields, so the block repeated them in
+ * shouting brackets before the actual text of the ruling began.
+ *
+ * Falls back to the raw chunk if the shape is not what we expect. Showing a
+ * little plumbing beats showing nothing.
+ */
+const readableChunk = (chunk: string): string => {
+  const body = chunk.split(/\n\s*\n/).slice(1).join('\n\n').trim();
+  return body || chunk;
+};
+
 /** What to tell the lawyer when there is nothing to show, per status. */
 const emptyMessage = (status: CorpusStatus, reason: string | undefined, query: string): string => {
   switch (status) {
@@ -49,8 +66,6 @@ const emptyMessage = (status: CorpusStatus, reason: string | undefined, query: s
 };
 
 export const SearchView: React.FC = () => {
-  const { firmId } = useTenant();
-
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCorp, setSelectedCorp] = useState('TODAS');
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -63,13 +78,19 @@ export const SearchView: React.FC = () => {
 
   const runSearch = async () => {
     const query = searchQuery.trim();
-    if (!query || !firmId) return;
+
+    // This used to also require a firm, and returned SILENTLY without one: the
+    // user typed, pressed Buscar, and nothing happened — no results, no error,
+    // no reason — while the screen still read "Escriba una consulta", blaming
+    // them for it. The corpus is shared product knowledge, so no firm is needed
+    // to read it.
+    if (!query) return;
 
     setIsLoading(true);
     setLastQuery(query);
 
     try {
-      const response = await searchPrecedents(firmId, query);
+      const response = await searchPrecedents(query);
       setResults(response.items ?? []);
       setStatus(response.status);
       setReason(response.reason);
@@ -203,7 +224,7 @@ export const SearchView: React.FC = () => {
               </div>
 
               <div className="text-[12px] text-slate-600 leading-relaxed bg-slate-50 p-3.5 rounded-lg whitespace-pre-wrap">
-                {item.contentChunk}
+                {readableChunk(item.contentChunk)}
               </div>
 
               <div className="flex items-center justify-between pt-1">

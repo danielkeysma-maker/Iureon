@@ -11,7 +11,7 @@ import { ingestionRoutes } from './modules/ingestion/ingestion.routes';
 import { proceduralTermsRoutes } from './modules/procedural-terms/terms.routes';
 import { settlementRoutes } from './modules/settlements/settlement.routes';
 import { auditRoutes } from './modules/audit/audit.routes';
-import { searchRoutes } from './modules/search/search.routes';
+import { searchPublicRoutes, searchRoutes } from './modules/search/search.routes';
 import { draftsRoutes } from './modules/drafts/drafts.routes';
 import { transcriptionRoutes } from './modules/transcription/transcription.routes';
 import { catalogPublicRoutes, catalogRoutes } from './modules/catalog/catalog.routes';
@@ -36,6 +36,12 @@ app.get('/ping', (_req: Request, res: Response) => {
 // Reading the actuación catalogue is product knowledge, not tenant data, so it
 // is mounted BEFORE the tenant middleware. Curation writes stay behind it.
 app.use('/api', catalogPublicRoutes);
+
+// The jurisprudence corpus is the same case: SYSTEM_CORPUS holds the identical
+// providencias for every firm. Behind the middleware the Buscador answered
+// nothing at all to a user with no firm yet. Its handler pins SYSTEM_CORPUS
+// server-side and never reads a firm id from the request.
+app.use('/api', searchPublicRoutes);
 
 // Middleware Global Multi-Tenant (Requisito x-firm-id)
 app.use('/api', tenantMiddleware);
