@@ -88,6 +88,49 @@ const looksBinary = (raw: string): boolean => {
 };
 
 /**
+ * Decodes a page with the charset it declares instead of assuming UTF-8.
+ *
+ * This is not a nicety. The Colombian relatorías serve **windows-1252**, and
+ * `buffer.toString('utf8')` turns every á, é, í, ó, ú and ñ in them into U+FFFD
+ * — a replacement character, which is a permanent loss, not a display glitch.
+ * It destroyed 193,742 characters across 23 providencias before anyone read the
+ * stored text: byte `e1` is "á" in windows-1252 and simply is not valid UTF-8.
+ *
+ * What made it survive review is worth remembering: the SEARCH still worked.
+ * bge-m3 ranked the mangled rulings first anyway, so every retrieval test
+ * passed. Only a lawyer pasting `c�rceles` into a brief would have found it.
+ *
+ * The header usually omits the charset, so the document's own meta tag decides.
+ * That tag is read as latin1 because ASCII survives every candidate encoding —
+ * we only need the tag legible, not the document.
+ */
+const decodeBody = (buffer: Buffer, contentType: string): string => {
+  const fromHeader = /charset=["']?([\w-]+)/i.exec(contentType)?.[1];
+  const fromMeta = /charset=["']?([\w-]+)/i.exec(buffer.subarray(0, 4096).toString('latin1'))?.[1];
+  const charset = (fromHeader ?? fromMeta ?? 'utf-8').toLowerCase();
+
+  try {
+    return new TextDecoder(charset).decode(buffer);
+  } catch {
+    // An unknown label is not a reason to lose the document; UTF-8 is still the
+    // best guess, and the mojibake guard below catches it if that guess is bad.
+    return buffer.toString('utf8');
+  }
+};
+
+/**
+ * Share of characters lost to decoding, as a fraction.
+ *
+ * A correctly decoded ruling has zero. Spanish legal prose is roughly 3% accented
+ * characters, so anything past a thousandth means the decoder picked wrong — and
+ * refusing beats storing text a lawyer cannot quote.
+ */
+const MAX_REPLACEMENT_RATIO = 0.001;
+
+const replacementRatio = (text: string): number =>
+  (text.match(/�/g)?.length ?? 0) / Math.max(text.length, 1);
+
+/**
  * Pulls readable text out of a relatoría page. Deliberately conservative: if
  * the result is too short the caller refuses the ruling rather than indexing a
  * navigation menu as if it were a holding.
@@ -263,7 +306,7 @@ async function main(): Promise<void> {
           continue;
         }
 
-        fullText = extractText(raw);
+        fullText = extractText(decodeBody(buffer, contentType));
       }
     } catch (error) {
       skipped.push(`${ruling.numeroProvidencia}: ${(error as Error).message}`);
@@ -276,6 +319,20 @@ async function main(): Promise<void> {
     if (fullText.length < MIN_TEXT) {
       skipped.push(
         `${ruling.numeroProvidencia}: la página rindió ${fullText.length} caracteres (mínimo ${MIN_TEXT})`
+      );
+      continue;
+    }
+
+    // Length says the text arrived; this says it arrived READABLE. Both are
+    // needed, and only the second would have caught the windows-1252 defect:
+    // the mangled rulings were long, ranked first in every search, and passed
+    // every test — the loss only shows when a human reads a quote.
+    const ratio = replacementRatio(fullText);
+
+    if (ratio > MAX_REPLACEMENT_RATIO) {
+      skipped.push(
+        `${ruling.numeroProvidencia}: ${(ratio * 100).toFixed(1)}% del texto son caracteres de reemplazo; ` +
+          'la codificación declarada no corresponde y las tildes se perderían de forma irrecuperable'
       );
       continue;
     }
