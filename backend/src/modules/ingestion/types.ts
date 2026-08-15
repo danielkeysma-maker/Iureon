@@ -1,9 +1,13 @@
 /**
  * Ingestion domain types.
  *
- * These live apart from the pipeline so the court scrapers can describe what
- * they produce without importing the service that consumes it. A scraper
- * depends on this contract, never on the pipeline implementation.
+ * These live apart from the pipeline so a corpus source can describe what it
+ * produces without importing the service that consumes it. The four "court
+ * scrapers" that used to depend on this contract were deleted on 2026-08-14:
+ * they regex-scraped ruling numbers out of relatoría HTML and attached
+ * invented hechos, an invented ratio and an outcome hardcoded to CONCEDIDO.
+ * The corpus is now seeded from `research/jurisprudencia.json`, whose entries
+ * were each opened and read before being written down.
  */
 
 export type Corporacion =
@@ -13,7 +17,17 @@ export type Corporacion =
   | 'TRIBUNAL_SUPERIOR'
   | 'TRIBUNAL_ADMINISTRATIVO';
 
-export type TipoSentencia = 'T' | 'C' | 'SU' | 'SL' | 'SC' | 'SP' | 'NULIDAD' | 'AUTO';
+export type TipoSentencia =
+  // Corte Constitucional
+  | 'T' | 'C' | 'SU'
+  // Corte Suprema — casación por sala
+  | 'SL' | 'SC' | 'SP'
+  // Consejo de Estado — the medio de control decides the rules that apply, so
+  // it is not one type. Calling a reparación directa "NULIDAD" would misfile
+  // the caducidad that governs it.
+  | 'NULIDAD' | 'REPARACION_DIRECTA' | 'CONTRACTUAL' | 'NULIDAD_ELECTORAL'
+  | 'PERDIDA_INVESTIDURA' | 'UNIFICACION'
+  | 'AUTO';
 
 export type RamaDerecho =
   | 'CONSTITUCIONAL'
@@ -21,10 +35,20 @@ export type RamaDerecho =
   | 'CIVIL'
   | 'ADMINISTRATIVO'
   | 'PENAL'
-  | 'FAMILIA';
+  | 'FAMILIA'
+  | 'TRIBUTARIO'
+  | 'SOCIETARIO';
 
-/** Whether the court granted or denied the claim. */
-export type ResuelveOutcome = 'CONCEDIDO' | 'NEGADO';
+/**
+ * What the court actually did.
+ *
+ * `PARCIAL` is not a convenience: "casa parcialmente" is the most common
+ * outcome in casación, and forcing it into CONCEDIDO or NEGADO would tell the
+ * lawyer the opposite of what happened in roughly a third of the corpus. The
+ * type carried only two values until 2026-08-14, which is why the deleted
+ * scrapers could hardcode CONCEDIDO and still typecheck.
+ */
+export type ResuelveOutcome = 'CONCEDIDO' | 'NEGADO' | 'PARCIAL';
 
 export interface IngestionRulingMetadata {
   corporacion: Corporacion;
