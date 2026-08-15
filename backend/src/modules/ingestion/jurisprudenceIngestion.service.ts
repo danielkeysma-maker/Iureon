@@ -13,7 +13,7 @@ export class JurisprudenceIngestionPipeline {
   public async ingestRuling(ruling: IngestionRulingMetadata): Promise<{ success: boolean; chunksIngested: number }> {
     try {
       // 1. Fragmentación del texto procesal en bloques semánticos (Chunks de ~1000 caracteres)
-      const chunks = this.chunkText(ruling.fullText, 1000);
+      const chunks = this.chunkText(ruling.fullText, 2500);
       let count = 0;
 
       // The shared SYSTEM_CORPUS is read by every tenant, so a fabricated
@@ -84,15 +84,27 @@ export class JurisprudenceIngestionPipeline {
   }
 
   /**
-   * Helper para dividir textos largos de providencias en chunks homogéneos
+   * Divide una providencia en fragmentos con traslape.
+   *
+   * Two things changed here on 2026-08-14, both for retrieval quality:
+   *
+   *  - 1000 characters was about one paragraph. bge-m3 accepts ~8000 tokens, so
+   *    that size threw away the context the model was chosen for; a ratio
+   *    decidendi rarely fits in a paragraph.
+   *  - there was NO overlap. A holding that straddled a boundary was cut in
+   *    half and lost from both chunks — the retrieval failure nobody notices,
+   *    because the search still returns something.
    */
-  private chunkText(text: string, chunkSize: number): string[] {
+  private chunkText(text: string, chunkSize: number, overlap = 200): string[] {
     const chunks: string[] = [];
-    let i = 0;
-    while (i < text.length) {
-      chunks.push(text.slice(i, i + chunkSize));
-      i += chunkSize;
+    const step = Math.max(chunkSize - overlap, 1);
+
+    for (let i = 0; i < text.length; i += step) {
+      const chunk = text.slice(i, i + chunkSize).trim();
+      if (chunk) chunks.push(chunk);
+      if (i + chunkSize >= text.length) break;
     }
+
     return chunks;
   }
 }
