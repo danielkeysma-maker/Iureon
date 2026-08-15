@@ -36,7 +36,26 @@ export class JurisprudenceIngestionPipeline {
         return { success: false, chunksIngested: 0 };
       }
 
-      const vectors = await embeddingsService.embedAll(chunks);
+      // Only long rulings report progress, and only every so often. A short one
+      // finishes before anyone wonders; the noise would just bury the per-ruling
+      // line that actually matters.
+      const REPORT_EVERY = 50;
+      const NOISY_ENOUGH = 150;
+
+      // Counted against the last report, not with a modulo: `done` advances by
+      // the provider's batch size, so `done % 50` would simply never be 0 for a
+      // batch of 8 and the progress line would never appear.
+      let lastReported = 0;
+
+      const vectors = await embeddingsService.embedAll(chunks, (done, total) => {
+        if (total < NOISY_ENOUGH) return;
+        if (done !== total && done - lastReported < REPORT_EVERY) return;
+
+        lastReported = done;
+
+        const pct = Math.round((done / total) * 100);
+        console.log(`    ${ruling.numeroProvidencia}: ${done}/${total} chunks vectorizados (${pct}%)`);
+      });
 
       for (const [index, chunk] of chunks.entries()) {
 

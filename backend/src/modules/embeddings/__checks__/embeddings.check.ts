@@ -164,6 +164,30 @@ void (async () => {
     fail('embedAll reordered or dropped vectors when splitting into batches');
   }
 
+  // ---------------------------------------------------------------------------
+  // 6. Progress is reported per batch, with a running total.
+  //
+  // Embedding a 2M-character ruling on a local CPU takes close to an hour and
+  // used to print nothing until it finished, which reads exactly like a hung
+  // process. The counts must be cumulative — a callback reporting the batch size
+  // each time (2, 2, 1) instead of progress (2, 4, 5) would be worse than
+  // silence: it would look like the work never advances.
+  // ---------------------------------------------------------------------------
+  const progress: Array<[number, number]> = [];
+
+  await new EmbeddingsService(counting).embedAll(['0', '1', '2', '3', '4'], (done, total) =>
+    progress.push([done, total])
+  );
+
+  const reported = progress.map(([done]) => done).join(',');
+  const totalsStable = progress.every(([, total]) => total === 5);
+
+  if (reported === '2,4,5' && totalsStable) {
+    pass('embedAll reports cumulative progress after each batch (2,4,5 of 5)');
+  } else {
+    fail(`embedAll reported [${reported}] against totals [${progress.map(([, t]) => t).join(',')}]`);
+  }
+
   console.log(failures === 0 ? '\nALL CHECKS PASSED' : `\n${failures} CHECK(S) FAILED`);
   process.exit(failures === 0 ? 0 : 1);
 })();

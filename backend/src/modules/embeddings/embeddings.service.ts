@@ -49,8 +49,19 @@ export class EmbeddingsService {
     return vector;
   }
 
-  /** Vectors for a whole document, batched to the provider's request limit. */
-  async embedAll(texts: string[]): Promise<number[][]> {
+  /**
+   * Vectors for a whole document, batched to the provider's request limit.
+   *
+   * `onProgress` fires after each batch. It exists because a long document is
+   * otherwise completely silent: embedding a 2M-character ruling on a local CPU
+   * takes close to an hour, and with no output that is indistinguishable from a
+   * hung process. Callers reached for the task manager to find out whether work
+   * was still happening.
+   */
+  async embedAll(
+    texts: string[],
+    onProgress?: (done: number, total: number) => void
+  ): Promise<number[][]> {
     const vectors: number[][] = [];
 
     // The limit comes from the adapter: a hosted API caps a batch by request
@@ -61,6 +72,7 @@ export class EmbeddingsService {
     for (let i = 0; i < texts.length; i += size) {
       const batch = texts.slice(i, i + size);
       vectors.push(...(await this.provider.embed(batch)));
+      onProgress?.(vectors.length, texts.length);
     }
 
     return vectors;
