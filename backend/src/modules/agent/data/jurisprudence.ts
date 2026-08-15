@@ -13,7 +13,7 @@ export const JURISPRUDENCE_BY_TOPIC: Record<LegalTopic, string[]> = {
     'Sentencia T-025/2004 (Corte Constitucional, Sala Tercera de Revisión — CONCEDIDA — Protección de derechos fundamentales de víctimas del conflicto armado)',
     'Sentencia T-760/2008 (Corte Constitucional, Sala Segunda de Revisión — CONCEDIDA — Derecho a la salud como derecho fundamental autónomo)',
     'Sentencia T-238/2018 (Corte Constitucional, Sala Séptima de Revisión — CONCEDIDA — Debido proceso administrativo y habeas data)',
-    'Sentencia SU-049/2022 (Corte Constitucional, Sala Plena — UNIFICACIÓN — Estabilidad laboral reforzada)',
+    'Sentencia SU-049/2017 (Corte Constitucional, Sala Plena — UNIFICACIÓN — Estabilidad ocupacional reforzada)',
     'Sentencia T-406/1992 (Corte Constitucional, Sala Primera de Revisión — CONCEDIDA — Derechos fundamentales innominados y conexidad)',
     'Sentencia T-152/2019 (Corte Constitucional — NEGADA — Improcedencia de tutela por existencia de otro mecanismo judicial)'
   ],
@@ -48,7 +48,7 @@ export const JURISPRUDENCE_BY_TOPIC: Record<LegalTopic, string[]> = {
     'Sentencia SL-4102/2024 (Corte Suprema de Justicia, Sala Laboral — CONCEDIDA — Prescripción trienal Art. 151 CPTSS)',
     'Sentencia SL-1892/2023 (CSJ, Sala Laboral — CONCEDIDA — Exoneración de sanción moratoria por buena fe del empleador)',
     'Sentencia SL-3462/2022 (CSJ, Sala Laboral — NEGADA — Rechazo de excepción de prescripción por existencia de reclamo escrito previo)',
-    'Sentencia SU-049/2022 (Corte Constitucional — UNIFICACIÓN — Estabilidad laboral reforzada por fuero de salud)',
+    'Sentencia SU-049/2017 (Corte Constitucional — UNIFICACIÓN — Estabilidad ocupacional reforzada sin calificación de PCL)',
     'Sentencia TSB-LAB-2024-1102 (Tribunal Superior de Bogotá, Sala Laboral — CONCEDIDA — Reintegro por despido sin justa causa)',
     'Sentencia C-593/2014 (Corte Constitucional — Constitucionalidad del contrato realidad sobre el contrato de prestación de servicios)'
   ],

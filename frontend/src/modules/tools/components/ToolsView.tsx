@@ -17,8 +17,8 @@ const EXTENSIVE_LEGAL_GLOSSARY: GlossaryTerm[] = [
     term: 'Ratio Decidendi',
     category: 'CONSTITUCIONAL',
     definition: 'Fundamento jurídico directo y esencial en que se apoya la parte resolutiva de una sentencia. Constituye el precedente judicial obligatorio para jueces e inspectores.',
-    legalBasis: 'Precedente obligatorio de la Corte Constitucional (Sentencia C-037 de 1996 & SU-049/22)',
-    exampleUsage: 'La Ratio Decidendi de la Sentencia SU-049-2022 ampara la estabilidad laboral reforzada por fuero de salud.'
+    legalBasis: 'Precedente obligatorio de la Corte Constitucional (Sentencia C-037 de 1996 & SU-049 de 2017)',
+    exampleUsage: 'La Ratio Decidendi de la Sentencia SU-049 de 2017 extiende la estabilidad ocupacional reforzada a quienes no tienen calificación de pérdida de capacidad laboral.'
   },
   {
     term: 'Obiter Dictum',
@@ -140,7 +140,7 @@ const EXTENSIVE_LEGAL_GLOSSARY: GlossaryTerm[] = [
     term: 'Fuero de Salud (Estabilidad Laboral Reforzada)',
     category: 'LABORAL_CST',
     definition: 'Protección legal que prohíbe el despido sin autorización previa del Ministerio del Trabajo a trabajadores con afectaciones de salud significativas.',
-    legalBasis: 'Artículo 26 de la Ley 361 de 1997 & Sentencia SU-049/22',
+    legalBasis: 'Artículo 26 de la Ley 361 de 1997 & Sentencia SU-049 de 2017',
     exampleUsage: 'El trabajador se encontraba amparado por Fuero de Salud al momento de la carta de despido.'
   },
   {
