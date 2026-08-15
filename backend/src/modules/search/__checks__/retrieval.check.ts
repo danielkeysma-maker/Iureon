@@ -21,6 +21,7 @@
  * purpose: a gate that fails on every machine without credentials is a gate
  * everyone learns to ignore, and an ignored gate protects nothing.
  */
+import { supabase } from '../../../config/supabase.config';
 import { embeddingsService } from '../../embeddings/embeddings.service';
 import { vectorSearchService } from '../vectorSearch.service';
 
@@ -135,6 +136,55 @@ const NONSENSE_CEILING = 0.55;
       );
     } else {
       pass(`"${testCase.query}" -> puesto ${rank + 1}`);
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // The corpus must be READABLE, not merely findable.
+  //
+  // This is the case that was missing, and its absence cost a full re-ingestion.
+  // The relatorías serve windows-1252; decoding them as UTF-8 turned every á, é,
+  // í, ó, ú and ñ into U+FFFD across 23 providencias — 193,742 characters gone.
+  // Every retrieval case above still PASSED: bge-m3 ranked the mangled rulings
+  // first anyway. Ranking proves the corpus can be found; only reading the
+  // stored bytes proves a lawyer can quote it.
+  // ---------------------------------------------------------------------------
+  if (supabase) {
+    const damaged = new Map<string, number>();
+    let scanned = 0;
+
+    for (let from = 0; ; from += 1000) {
+      const { data, error } = await supabase
+        .from('document_embeddings')
+        .select('file_name, content_chunk')
+        .eq('firm_id', 'SYSTEM_CORPUS')
+        .range(from, from + 999);
+
+      if (error) {
+        fail(`no se pudo leer el texto almacenado: ${error.message}`);
+        break;
+      }
+
+      if (!data || data.length === 0) break;
+
+      scanned += data.length;
+
+      for (const row of data as Array<{ file_name: string; content_chunk: string }>) {
+        const lost = row.content_chunk.match(/�/g)?.length ?? 0;
+        if (lost > 0) damaged.set(row.file_name, (damaged.get(row.file_name) ?? 0) + lost);
+      }
+
+      if (data.length < 1000) break;
+    }
+
+    if (damaged.size === 0) {
+      pass(`el texto almacenado es legible en los ${scanned} chunks del corpus`);
+    } else {
+      const worst = [...damaged.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
+      fail(
+        `${damaged.size} providencia(s) con caracteres destruidos por una mala decodificación: ` +
+          worst.map(([name, lost]) => `${name} (${lost})`).join(', ')
+      );
     }
   }
 
