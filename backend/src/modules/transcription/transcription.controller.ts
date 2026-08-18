@@ -4,6 +4,7 @@ import {
   TranscriptionService,
   TranscriptionUnavailableError
 } from './transcription.service';
+import { proposeRoles } from './roleProposer';
 import { transcriptionStore } from './transcriptionStore.service';
 import type { SpeakerRole, TranscriptionKind } from './types';
 
@@ -84,7 +85,21 @@ export const transcribeAudioController = async (req: Request, res: Response): Pr
       result
     );
 
-    res.json({ success: true, result, id: stored?.id ?? null, persisted: Boolean(stored) });
+    /*
+     * Proposals, not assignments. The roles are NOT written into the stored
+     * segments: diarization knows two voices differ, never that one is the
+     * judge, and these come from procedural formulas in the text — which a
+     * quotation or counsel reading an order aloud will also trip. Each carries
+     * the phrase and second that produced it so the lawyer confirms from
+     * evidence rather than from our confidence.
+     */
+    res.json({
+      success: true,
+      result,
+      id: stored?.id ?? null,
+      persisted: Boolean(stored),
+      roleProposals: proposeRoles(result.segments)
+    });
   } catch (err) {
     if (err instanceof InvalidAudioError) {
       res.status(400).json({ error: 'INVALID_AUDIO', message: err.message });
