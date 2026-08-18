@@ -148,18 +148,25 @@ export class TranscriptionStore {
   async remove(firmId: string, id: string): Promise<boolean> {
     if (!supabase) return false;
 
-    const { error } = await supabase
+    // `.select()` so the deleted rows come back and the count can be checked.
+    // Without it, deleting another firm's transcript reported success: the
+    // firm_id filter matched nothing, Postgres raised no error, and the API
+    // answered "borrado" for a record that is still there. The isolation held —
+    // the row survived — but the response lied about what had happened, and a
+    // caller cannot tell "deleted" from "was never yours" .
+    const { data, error } = await supabase
       .from('transcriptions')
       .delete()
       .eq('firm_id', firmId)
-      .eq('id', id);
+      .eq('id', id)
+      .select('id');
 
     if (error) {
       console.error('[TRANSCRIPTION] No se pudo borrar el transcrito:', error.message);
       return false;
     }
 
-    return true;
+    return (data?.length ?? 0) > 0;
   }
 }
 
