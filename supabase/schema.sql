@@ -116,6 +116,46 @@ CREATE INDEX IF NOT EXISTS idx_saved_drafts_firm ON public.saved_drafts(firm_id)
 CREATE INDEX IF NOT EXISTS idx_saved_drafts_firm_user ON public.saved_drafts(firm_id, user_email);
 
 -- ==============================================================================
+-- 4b. TRANSCRIPTIONS — hearings and client interviews, TEXT ONLY
+-- ==============================================================================
+-- El transcrito se guarda; la grabación no, y esa asimetría es deliberada.
+--
+-- Sin esta tabla, cerrar la pestaña por accidente perdía dos horas de audiencia
+-- y obligaba a subir el audio otra vez y a pagar la transcripción de nuevo. Se
+-- escribe apenas el proveedor responde, del lado del servidor, así que el
+-- navegador puede desaparecer sin que se pierda nada.
+--
+-- POR QUÉ NO HAY COLUMNA DE AUDIO. Una audiencia de dos horas pesa unos 50 MB;
+-- su transcrito, unos 300 KB. Guardar el audio cuesta poco dinero pero acumula
+-- material privilegiado sin fecha de caducidad, y no resuelve nada que el texto
+-- no resuelva ya. El módulo mantiene la grabación en memoria y la descarta:
+-- `multer.memoryStorage()` está ahí por la misma razón.
+--
+-- `segments` guarda también el rol procesal que el abogado asignó a cada voz,
+-- porque ese mapeo es trabajo suyo y perderlo sería perder la parte que la
+-- diarización no puede hacer sola.
+CREATE TABLE IF NOT EXISTS public.transcriptions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    firm_id TEXT NOT NULL,
+    user_email TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    title TEXT NOT NULL,
+    source_file_name TEXT NOT NULL,
+    full_text TEXT NOT NULL,
+    segments JSONB NOT NULL DEFAULT '[]'::jsonb,
+    speaker_labels JSONB NOT NULL DEFAULT '[]'::jsonb,
+    language TEXT,
+    duration_seconds NUMERIC,
+    model TEXT NOT NULL,
+    transcribed_at TIMESTAMPTZ NOT NULL,
+    saved_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_transcriptions_firm ON public.transcriptions(firm_id);
+CREATE INDEX IF NOT EXISTS idx_transcriptions_firm_user ON public.transcriptions(firm_id, user_email);
+
+-- ==============================================================================
 -- 5. FIRM_STYLE_PROFILES — "Enseñar Estilo" learned formatting per firm
 -- ==============================================================================
 CREATE TABLE IF NOT EXISTS public.firm_style_profiles (
@@ -189,6 +229,7 @@ ALTER TABLE public.firms               ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.legal_documents     ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.document_embeddings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.saved_drafts        ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.transcriptions      ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.firm_style_profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.audit_logs          ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.catalog_verifications ENABLE ROW LEVEL SECURITY;
@@ -236,6 +277,12 @@ DROP POLICY IF EXISTS "tenant_delete_document_embeddings" ON public.document_emb
 CREATE POLICY "tenant_delete_document_embeddings"
     ON public.document_embeddings FOR DELETE
     USING (firm_id = public.current_firm_id());
+
+DROP POLICY IF EXISTS "tenant_isolation_transcriptions" ON public.transcriptions;
+CREATE POLICY "tenant_isolation_transcriptions"
+    ON public.transcriptions FOR ALL
+    USING (firm_id = public.current_firm_id())
+    WITH CHECK (firm_id = public.current_firm_id());
 
 DROP POLICY IF EXISTS "tenant_isolation_saved_drafts" ON public.saved_drafts;
 CREATE POLICY "tenant_isolation_saved_drafts"

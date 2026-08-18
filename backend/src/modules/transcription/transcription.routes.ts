@@ -1,6 +1,9 @@
 import { NextFunction, Request, Response, Router } from 'express';
 import multer, { MulterError } from 'multer';
 import {
+  assignTranscriptionRolesController,
+  deleteTranscriptionController,
+  listTranscriptionsController,
   transcribeAudioController,
   transcriptionStatusController
 } from './transcription.controller';
@@ -46,6 +49,9 @@ const handleUploadErrors = (
 const router = Router();
 
 router.get('/transcription/status', transcriptionStatusController as any);
+router.get('/transcription', listTranscriptionsController as any);
+router.patch('/transcription/:id/roles', assignTranscriptionRolesController as any);
+router.delete('/transcription/:id', deleteTranscriptionController as any);
 router.post(
   '/transcription',
   upload.single('audio'),

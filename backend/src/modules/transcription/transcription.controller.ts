@@ -4,7 +4,8 @@ import {
   TranscriptionService,
   TranscriptionUnavailableError
 } from './transcription.service';
-import type { TranscriptionKind } from './types';
+import { transcriptionStore } from './transcriptionStore.service';
+import type { SpeakerRole, TranscriptionKind } from './types';
 
 const transcriptionService = new TranscriptionService();
 
@@ -62,7 +63,28 @@ export const transcribeAudioController = async (req: Request, res: Response): Pr
         `${result.segments.length} intervenciones, ${result.speakerLabels.length} interlocutores.`
     );
 
-    res.json({ success: true, result });
+    /*
+     * Saved HERE, before responding, and that ordering is the whole point.
+     *
+     * The transcript used to exist only in the browser, so closing the tab lost
+     * a two-hour hearing and recovering it meant uploading the audio again and
+     * paying for the transcription twice. Writing at this line means the work
+     * survives even if the browser is gone by the time we answer.
+     *
+     * A failed save does not fail the request: the lawyer already paid for this
+     * transcription and losing it over a database hiccup would be the worse
+     * outcome. It is reported instead, so the UI can warn that this one has to
+     * be copied out now.
+     */
+    const stored = await transcriptionStore.save(
+      req.firmId as string,
+      (req.body.userEmail as string) || 'desconocido',
+      (req.body.title as string) || file.originalname,
+      file.originalname,
+      result
+    );
+
+    res.json({ success: true, result, id: stored?.id ?? null, persisted: Boolean(stored) });
   } catch (err) {
     if (err instanceof InvalidAudioError) {
       res.status(400).json({ error: 'INVALID_AUDIO', message: err.message });
@@ -82,4 +104,64 @@ export const transcribeAudioController = async (req: Request, res: Response): Pr
       message: 'El motor de transcripción no pudo procesar el audio. Intenta de nuevo.'
     });
   }
+};
+
+/**
+ * GET /api/transcription — Transcripts already saved for this firm and user.
+ *
+ * Exists so a closed tab costs nothing: the work is recovered from here instead
+ * of by uploading the recording again.
+ */
+export const listTranscriptionsController = async (req: Request, res: Response): Promise<void> => {
+  const items = await transcriptionStore.list(
+    req.firmId as string,
+    (req.query.userEmail as string) || 'desconocido'
+  );
+
+  res.json({ success: true, items });
+};
+
+/**
+ * PATCH /api/transcription/:id/roles — Maps anonymous voices to procedural roles.
+ *
+ * The half diarization cannot do. `speaker_0` is a cluster, not a person; only
+ * someone who was in the room knows which one is the judge. Persisting the
+ * mapping keeps that work from being redone on every visit.
+ */
+export const assignTranscriptionRolesController = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const roles = req.body.roles as Record<string, SpeakerRole> | undefined;
+
+  if (!roles || typeof roles !== 'object') {
+    res.status(400).json({
+      error: 'MISSING_ROLES',
+      message: 'Se requiere un objeto "roles" que asocie cada interlocutor con su rol procesal.'
+    });
+    return;
+  }
+
+  const updated = await transcriptionStore.assignRoles(req.firmId as string, String(req.params.id), roles);
+
+  if (!updated) {
+    res.status(404).json({ error: 'NOT_FOUND', message: 'No se encontró el transcrito.' });
+    return;
+  }
+
+  res.json({ success: true, item: updated });
+};
+
+/**
+ * DELETE /api/transcription/:id — The firm disposes of its own privileged material.
+ */
+export const deleteTranscriptionController = async (req: Request, res: Response): Promise<void> => {
+  const removed = await transcriptionStore.remove(req.firmId as string, String(req.params.id));
+
+  if (!removed) {
+    res.status(404).json({ error: 'NOT_FOUND', message: 'No se encontró el transcrito.' });
+    return;
+  }
+
+  res.json({ success: true });
 };
