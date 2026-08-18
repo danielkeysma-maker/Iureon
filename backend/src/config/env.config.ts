@@ -61,6 +61,14 @@ if (!['local', 'openai'].includes(embeddingsProvider)) {
 if (embeddingsProvider === 'openai' && !openAIEnabled) {
   errors.push('EMBEDDINGS_PROVIDER=openai requires OPENAI_API_KEY.');
 }
+/**
+ * Transcription provider. Deepgram is the default because it is the only option
+ * evaluated that separates speakers, which is what makes a hearing transcript
+ * citable; OpenAI's diarizing model remains available for an account that
+ * already pays for it.
+ */
+const deepgramEnabled = requireGroup('Deepgram (transcripción)', ['DEEPGRAM_API_KEY']);
+
 const supabaseEnabled = requireGroup('Supabase', ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY']);
 const backblazeEnabled = requireGroup('Backblaze B2', [
   'B2_APPLICATION_KEY_ID',
@@ -102,6 +110,10 @@ export const config = {
     // without a code change. Any replacement MUST output EMBEDDING_DIMENSIONS
     // values or the adapter rejects every vector.
     model: read('EMBEDDINGS_MODEL') || 'Xenova/bge-m3'
+  },
+  deepgram: {
+    enabled: deepgramEnabled,
+    apiKey: read('DEEPGRAM_API_KEY')
   },
   backblaze: {
     enabled: backblazeEnabled,

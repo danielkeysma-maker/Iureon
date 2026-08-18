@@ -1,3 +1,5 @@
+import { config } from '../../config/env.config';
+import { DeepgramTranscriptionProvider } from './providers/deepgram.provider';
 import { OpenAITranscriptionProvider } from './providers/openai.provider';
 import {
   MAX_AUDIO_BYTES,
@@ -6,6 +8,21 @@ import {
   type TranscriptionRequest,
   type TranscriptionResult
 } from './types';
+
+/**
+ * Picks the transcription backend, Deepgram first.
+ *
+ * Both diarize, and that is the whole selection criterion: a hearing transcript
+ * without speaker separation cannot be cited. Deepgram leads because its free
+ * credit covers roughly a year at the volumes we expect and it needs no account
+ * a firm already pays for; OpenAI stays available for one that has a key.
+ *
+ * There is deliberately no third option here. Whisper — local, on Groq, or on
+ * Cloudflare Workers AI — is cheaper still and does not diarize, so wiring it in
+ * would mean returning a transcript that looks complete and silently is not.
+ */
+const resolveProvider = (): TranscriptionProvider =>
+  config.deepgram.enabled ? new DeepgramTranscriptionProvider() : new OpenAITranscriptionProvider();
 
 export class TranscriptionUnavailableError extends Error {
   constructor(message: string) {
@@ -35,7 +52,7 @@ const megabytes = (bytes: number): string => (bytes / (1024 * 1024)).toFixed(1);
  * different adapter.
  */
 export class TranscriptionService {
-  constructor(private readonly provider: TranscriptionProvider = new OpenAITranscriptionProvider()) {}
+  constructor(private readonly provider: TranscriptionProvider = resolveProvider()) {}
 
   isAvailable(): boolean {
     return this.provider.isConfigured();
