@@ -66,4 +66,33 @@ export const ROLE_LABELS: Record<SpeakerRole, string> = {
 
 export const SUPPORTED_AUDIO_EXTENSIONS = ['mp3', 'mp4', 'mpeg', 'mpga', 'm4a', 'wav', 'webm'];
 
-export const MAX_AUDIO_BYTES = 25 * 1024 * 1024;
+/**
+ * Used only until the server reports the real ceiling, which belongs to the
+ * configured provider — 25 MB on OpenAI, 200 on Deepgram. This was THE limit
+ * once, hardcoded in the browser, and after switching provider it would have
+ * refused a two-hour hearing the backend was willing to take.
+ */
+export const FALLBACK_MAX_AUDIO_BYTES = 25 * 1024 * 1024;
+
+/**
+ * A role the app proposes for an anonymous voice, and the phrase behind it.
+ *
+ * Kept apart from `TranscriptSegment.role` on purpose: that field is what a
+ * human decided, this one is what the app inferred from procedural formulas in
+ * the transcript. Merging them would make a guess indistinguishable from a
+ * confirmation, which is the whole failure this design avoids.
+ */
+export interface RoleEvidence {
+  /** The transcribed phrase that triggered the proposal. */
+  phrase: string;
+  /** Second in the recording where it was said, when known. */
+  atSeconds: number | null;
+}
+
+export interface RoleProposal {
+  speakerLabel: string;
+  proposedRole: SpeakerRole;
+  /** Markers found. Zero means nothing was proposed, not that nothing matched. */
+  matches: number;
+  evidence: RoleEvidence[];
+}

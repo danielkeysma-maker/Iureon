@@ -2,8 +2,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTenant } from '../../tenant/TenantContext';
 import { transcriptionApi } from '../services/transcription.api';
 import {
-  MAX_AUDIO_BYTES,
+  FALLBACK_MAX_AUDIO_BYTES,
   SUPPORTED_AUDIO_EXTENSIONS,
+  type RoleProposal,
   type SpeakerRole,
   type TranscriptionKind,
   type TranscriptionResult
@@ -18,7 +19,7 @@ const megabytes = (bytes: number): string => (bytes / (1024 * 1024)).toFixed(1);
  * upload only to be rejected, so the user is told immediately. The server
  * remains the authority — this is a courtesy, not the guard.
  */
-const validate = (file: File): string | null => {
+const validate = (file: File, limit: number): string | null => {
   const extension = (file.name.split('.').pop() ?? '').toLowerCase();
 
   if (!SUPPORTED_AUDIO_EXTENSIONS.includes(extension)) {
@@ -29,8 +30,8 @@ const validate = (file: File): string | null => {
     return 'El archivo de audio está vacío.';
   }
 
-  if (file.size > MAX_AUDIO_BYTES) {
-    return `El audio pesa ${megabytes(file.size)} MB y el límite es ${megabytes(MAX_AUDIO_BYTES)} MB. Divide la grabación en partes y súbelas por separado.`;
+  if (file.size > limit) {
+    return `El audio pesa ${megabytes(file.size)} MB y el límite es ${megabytes(limit)} MB. Divide la grabación en partes y súbelas por separado.`;
   }
 
   return null;
@@ -51,12 +52,26 @@ export const useTranscription = (kind: TranscriptionKind) => {
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [result, setResult] = useState<TranscriptionResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [roleProposals, setRoleProposals] = useState<RoleProposal[]>([]);
+  /**
+   * False after a transcription that could not be stored. The lawyer is about
+   * to close a tab holding the only copy, so the screen has to say so.
+   */
+  const [persisted, setPersisted] = useState(true);
+  /**
+   * Comes from the server, because the ceiling is the provider's: 25 MB on
+   * OpenAI, 200 on Deepgram. Hardcoding it here refused two-hour hearings the
+   * backend was willing to accept.
+   */
+  const [maxAudioBytes, setMaxAudioBytes] = useState<number>(FALLBACK_MAX_AUDIO_BYTES);
 
   useEffect(() => {
     let cancelled = false;
 
-    transcriptionApi.isAvailable(firmId).then((available) => {
-      if (!cancelled) setIsAvailable(available);
+    transcriptionApi.status(firmId).then((status) => {
+      if (cancelled) return;
+      setIsAvailable(status.available);
+      if (status.maxAudioBytes) setMaxAudioBytes(status.maxAudioBytes);
     });
 
     return () => {
@@ -66,7 +81,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
 
   const transcribe = useCallback(
     async (file: File, contextPrompt?: string) => {
-      const validationError = validate(file);
+      const validationError = validate(file, maxAudioBytes);
 
       if (validationError) {
         setError(validationError);
@@ -77,14 +92,17 @@ export const useTranscription = (kind: TranscriptionKind) => {
       setIsTranscribing(true);
 
       try {
-        setResult(await transcriptionApi.transcribe(firmId, { file, kind, contextPrompt }));
+        const outcome = await transcriptionApi.transcribe(firmId, { file, kind, contextPrompt });
+        setResult(outcome.result);
+        setRoleProposals(outcome.roleProposals);
+        setPersisted(outcome.persisted);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'No se pudo transcribir el audio.');
       } finally {
         setIsTranscribing(false);
       }
     },
-    [firmId, kind]
+    [firmId, kind, maxAudioBytes]
   );
 
   /** Applies a procedural role to every segment of one diarized speaker. */
@@ -104,7 +122,20 @@ export const useTranscription = (kind: TranscriptionKind) => {
   const reset = useCallback(() => {
     setResult(null);
     setError(null);
+    setRoleProposals([]);
+    setPersisted(true);
   }, []);
 
-  return { isAvailable, isTranscribing, result, error, transcribe, assignRole, reset };
+  return {
+    isAvailable,
+    isTranscribing,
+    result,
+    error,
+    roleProposals,
+    persisted,
+    maxAudioBytes,
+    transcribe,
+    assignRole,
+    reset
+  };
 };

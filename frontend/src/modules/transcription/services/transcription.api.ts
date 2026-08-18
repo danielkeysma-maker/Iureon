@@ -1,14 +1,36 @@
 import { ApiError, httpClient } from '../../../config/httpClient';
-import type { TranscriptionKind, TranscriptionResult } from '../types';
+import type { RoleProposal, TranscriptionKind, TranscriptionResult } from '../types';
 
 interface StatusResponse {
   success: boolean;
   available: boolean;
+  /** Belongs to the configured provider, not to the product. */
+  maxAudioBytes?: number;
+}
+
+export interface TranscriptionStatus {
+  available: boolean;
+  maxAudioBytes: number | null;
 }
 
 interface TranscribeResponse {
   success: boolean;
   result: TranscriptionResult;
+  /** Null when the transcript could not be stored; see `persisted`. */
+  id: string | null;
+  /**
+   * False means the transcription succeeded but was NOT saved. The lawyer has
+   * to be told, because they are about to close a tab holding the only copy.
+   */
+  persisted: boolean;
+  roleProposals: RoleProposal[];
+}
+
+export interface TranscriptionOutcome {
+  result: TranscriptionResult;
+  id: string | null;
+  persisted: boolean;
+  roleProposals: RoleProposal[];
 }
 
 export interface TranscribeInput {
@@ -28,16 +50,16 @@ export interface TranscribeInput {
  * of those in Spanish, so the message is surfaced as-is.
  */
 export const transcriptionApi = {
-  async isAvailable(firmId: string): Promise<boolean> {
+  async status(firmId: string): Promise<TranscriptionStatus> {
     try {
       const data = await httpClient.get<StatusResponse>('/api/transcription/status', { firmId });
-      return data.available;
+      return { available: data.available, maxAudioBytes: data.maxAudioBytes ?? null };
     } catch {
-      return false;
+      return { available: false, maxAudioBytes: null };
     }
   },
 
-  async transcribe(firmId: string, input: TranscribeInput): Promise<TranscriptionResult> {
+  async transcribe(firmId: string, input: TranscribeInput): Promise<TranscriptionOutcome> {
     const form = new FormData();
     form.append('audio', input.file);
     form.append('kind', input.kind);
@@ -50,7 +72,12 @@ export const transcriptionApi = {
       firmId
     });
 
-    return data.result;
+    return {
+      result: data.result,
+      id: data.id ?? null,
+      persisted: Boolean(data.persisted),
+      roleProposals: data.roleProposals ?? []
+    };
   }
 };
 

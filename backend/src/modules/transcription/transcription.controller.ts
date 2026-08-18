@@ -19,7 +19,15 @@ const VALID_KINDS: TranscriptionKind[] = ['AUDIENCIA', 'ENTREVISTA'];
  * credentials sees a clear explanation instead of a failing upload.
  */
 export const transcriptionStatusController = (_req: Request, res: Response): void => {
-  res.json({ success: true, available: transcriptionService.isAvailable() });
+  // The size ceiling travels with the status because it belongs to whichever
+  // provider is configured — 25 MB on OpenAI, 200 on Deepgram. The browser used
+  // to hardcode 25, so after switching provider it would have refused a
+  // two-hour hearing before uploading it, with the server perfectly willing.
+  res.json({
+    success: true,
+    available: transcriptionService.isAvailable(),
+    maxAudioBytes: transcriptionService.maxAudioBytes
+  });
 };
 
 /**

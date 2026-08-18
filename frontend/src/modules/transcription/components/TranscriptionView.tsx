@@ -2,7 +2,8 @@ import React, { useRef, useState } from 'react';
 import { Mic, Upload, FileAudio, AlertTriangle, Cpu, Copy, CheckCircle2, RotateCcw } from 'lucide-react';
 import { useTranscription } from '../hooks/useTranscription';
 import { TranscriptSegments } from './TranscriptSegments';
-import { ROLE_LABELS, SUPPORTED_AUDIO_EXTENSIONS, type TranscriptionKind } from '../types';
+import { NotPersistedWarning, RoleProposals } from './RoleProposals';
+import { ROLE_LABELS, SUPPORTED_AUDIO_EXTENSIONS, type SpeakerRole, type TranscriptionKind } from '../types';
 
 interface TranscriptionViewProps {
   kind?: TranscriptionKind;
@@ -25,10 +26,15 @@ const toPlainText = (
  * mis-transcribed without it.
  */
 export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AUDIENCIA' }) => {
-  const { isAvailable, isTranscribing, result, error, transcribe, assignRole, reset } =
+  const { isAvailable, isTranscribing, result, error, roleProposals, persisted, transcribe, assignRole, reset } =
     useTranscription(kind);
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  /**
+   * Which voices the lawyer has confirmed. A suggestion disappears once
+   * accepted so the panel shows only what still needs a decision.
+   */
+  const [confirmed, setConfirmed] = useState<Record<string, SpeakerRole>>({});
   const [contextPrompt, setContextPrompt] = useState('');
   const [copied, setCopied] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -44,6 +50,9 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AU
   const handleStartOver = () => {
     reset();
     setSelectedFile(null);
+    // Cleared too, or the next recording opens with the previous hearing's
+    // confirmations already applied and its suggestions hidden.
+    setConfirmed({});
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -69,7 +78,7 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AU
             <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
             <span>
               El motor de transcripción no está configurado en el servidor. Falta la variable
-              <b className="font-mono"> OPENAI_API_KEY</b>. Puedes preparar el envío, pero la
+              <b className="font-mono"> DEEPGRAM_API_KEY</b>. Puedes preparar el envío, pero la
               transcripción fallará hasta que se configure.
             </span>
           </div>
@@ -183,6 +192,17 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AU
                 </button>
               </div>
             </div>
+
+            {!persisted && <NotPersistedWarning />}
+
+            <RoleProposals
+              proposals={roleProposals}
+              assigned={confirmed}
+              onAccept={(speakerLabel, role) => {
+                assignRole(speakerLabel, role);
+                setConfirmed((current) => ({ ...current, [speakerLabel]: role }));
+              }}
+            />
 
             <TranscriptSegments result={result} kind={kind} onAssignRole={assignRole} />
           </>

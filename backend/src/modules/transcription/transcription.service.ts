@@ -70,7 +70,11 @@ export class TranscriptionService {
 
     if (!this.provider.isConfigured()) {
       throw new TranscriptionUnavailableError(
-        'El motor de transcripción no está configurado. Falta OPENAI_API_KEY en el servidor.'
+        // Names the provider that is actually preferred. This said OPENAI_API_KEY
+        // after Deepgram became the default, so a firm following the message
+        // would have configured the wrong service and still had nothing work.
+        'El motor de transcripción no está configurado. Falta DEEPGRAM_API_KEY en el servidor ' +
+          '(o OPENAI_API_KEY si prefieres ese proveedor).'
       );
     }
 
