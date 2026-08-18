@@ -54,9 +54,27 @@ const openAIEnabled = requireGroup('OpenAI (transcripción)', ['OPENAI_API_KEY']
  * Embeddings provider. Local by default so indexing costs nothing and needs no
  * account; `openai` opts into the hosted model and then requires its key.
  */
+/**
+ * Cloudflare Workers AI, which serves the SAME bge-m3 that indexed the corpus.
+ *
+ * It exists because the local model cannot run where this deploys: a 600 MB
+ * ONNX model does not load in a Vercel serverless function, and no free tier
+ * evaluated — Render or Koyeb, both 512 MB of RAM — has the memory either. The
+ * search answered FAILED in production while working perfectly on a laptop.
+ */
+const cloudflareEnabled = requireGroup('Cloudflare Workers AI', [
+  'CLOUDFLARE_ACCOUNT_ID',
+  'CLOUDFLARE_API_TOKEN'
+]);
+
 const embeddingsProvider = (read('EMBEDDINGS_PROVIDER') || 'local').toLowerCase();
-if (!['local', 'openai'].includes(embeddingsProvider)) {
-  errors.push(`EMBEDDINGS_PROVIDER must be "local" or "openai", received "${embeddingsProvider}".`);
+if (!['local', 'openai', 'cloudflare'].includes(embeddingsProvider)) {
+  errors.push(
+    `EMBEDDINGS_PROVIDER must be "local", "cloudflare" or "openai", received "${embeddingsProvider}".`
+  );
+}
+if (embeddingsProvider === 'cloudflare' && !cloudflareEnabled) {
+  errors.push('EMBEDDINGS_PROVIDER=cloudflare requires CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN.');
 }
 if (embeddingsProvider === 'openai' && !openAIEnabled) {
   errors.push('EMBEDDINGS_PROVIDER=openai requires OPENAI_API_KEY.');
@@ -68,6 +86,7 @@ if (embeddingsProvider === 'openai' && !openAIEnabled) {
  * already pays for it.
  */
 const deepgramEnabled = requireGroup('Deepgram (transcripción)', ['DEEPGRAM_API_KEY']);
+
 
 const supabaseEnabled = requireGroup('Supabase', ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY']);
 const backblazeEnabled = requireGroup('Backblaze B2', [
@@ -110,6 +129,11 @@ export const config = {
     // without a code change. Any replacement MUST output EMBEDDING_DIMENSIONS
     // values or the adapter rejects every vector.
     model: read('EMBEDDINGS_MODEL') || 'Xenova/bge-m3'
+  },
+  cloudflare: {
+    enabled: cloudflareEnabled,
+    accountId: read('CLOUDFLARE_ACCOUNT_ID'),
+    apiToken: read('CLOUDFLARE_API_TOKEN')
   },
   deepgram: {
     enabled: deepgramEnabled,

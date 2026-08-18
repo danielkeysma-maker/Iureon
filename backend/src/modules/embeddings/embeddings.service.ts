@@ -1,4 +1,5 @@
 import { config } from '../../config/env.config';
+import { CloudflareEmbeddingsProvider } from './providers/cloudflare.provider';
 import { LocalEmbeddingsProvider } from './providers/local.provider';
 import { OpenAIEmbeddingsProvider } from './providers/openai.provider';
 import type { EmbeddingsProvider } from './types';
@@ -14,10 +15,17 @@ import type { EmbeddingsProvider } from './types';
  * same width in different spaces, so changing it without reindexing leaves the
  * old rows sitting there, comparable in arithmetic and meaningless in fact.
  */
-const resolveProvider = (): EmbeddingsProvider =>
-  config.embeddings.provider === 'openai'
-    ? new OpenAIEmbeddingsProvider()
-    : new LocalEmbeddingsProvider();
+/**
+ * `cloudflare` serves the same bge-m3 as `local`, which is why it is the option
+ * that works where this deploys: the local build loads 600 MB of ONNX weights
+ * into the process, and neither a Vercel function nor any 512 MB free tier can
+ * hold that. The search answered FAILED in production for precisely that.
+ */
+const resolveProvider = (): EmbeddingsProvider => {
+  if (config.embeddings.provider === 'openai') return new OpenAIEmbeddingsProvider();
+  if (config.embeddings.provider === 'cloudflare') return new CloudflareEmbeddingsProvider();
+  return new LocalEmbeddingsProvider();
+};
 
 /**
  * The single way anything in this codebase turns text into a vector.
