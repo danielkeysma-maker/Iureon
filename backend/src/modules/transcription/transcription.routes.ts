@@ -49,9 +49,25 @@ const handleUploadErrors = (
   next(err);
 };
 
-const router = Router();
+/**
+ * Whether the server has a transcription engine, mounted BEFORE the tenant
+ * middleware.
+ *
+ * It answers about the SERVER, not about a firm: the same engine and the same
+ * size ceiling for everyone, revealing nothing about any tenant. Behind the
+ * middleware it returned 401 to a user with no firm registered, the browser's
+ * catch turned that into "unavailable", and the screen reported a missing
+ * DEEPGRAM_API_KEY — blaming a key that was correctly configured for a problem
+ * that was a missing firm. Same shape as the Buscador defect: the feature was
+ * fine, the explanation was not.
+ */
+const publicRouter = Router();
 
-router.get('/transcription/status', transcriptionStatusController as any);
+publicRouter.get('/transcription/status', transcriptionStatusController as any);
+
+export const transcriptionPublicRoutes = publicRouter;
+
+const router = Router();
 router.get('/transcription', listTranscriptionsController as any);
 router.patch('/transcription/:id/roles', assignTranscriptionRolesController as any);
 router.delete('/transcription/:id', deleteTranscriptionController as any);

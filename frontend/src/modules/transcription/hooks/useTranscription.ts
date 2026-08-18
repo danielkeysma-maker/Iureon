@@ -68,7 +68,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
   useEffect(() => {
     let cancelled = false;
 
-    transcriptionApi.status(firmId).then((status) => {
+    transcriptionApi.status().then((status) => {
       if (cancelled) return;
       setIsAvailable(status.available);
       if (status.maxAudioBytes) setMaxAudioBytes(status.maxAudioBytes);
@@ -127,6 +127,8 @@ export const useTranscription = (kind: TranscriptionKind) => {
   }, []);
 
   return {
+    /** False while no firm is registered: the transcript could not be saved. */
+    hasFirm: Boolean(firmId),
     isAvailable,
     isTranscribing,
     result,

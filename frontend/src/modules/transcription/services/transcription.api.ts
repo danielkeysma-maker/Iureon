@@ -50,9 +50,15 @@ export interface TranscribeInput {
  * of those in Spanish, so the message is surfaced as-is.
  */
 export const transcriptionApi = {
-  async status(firmId: string): Promise<TranscriptionStatus> {
+  /**
+   * Takes no firm: this asks whether the SERVER has an engine, which is the same
+   * answer for everyone. It used to send one, so a user with no firm registered
+   * got a 401, the catch below turned it into "unavailable", and the screen
+   * blamed a missing DEEPGRAM_API_KEY that was correctly configured.
+   */
+  async status(): Promise<TranscriptionStatus> {
     try {
-      const data = await httpClient.get<StatusResponse>('/api/transcription/status', { firmId });
+      const data = await httpClient.get<StatusResponse>('/api/transcription/status', {});
       return { available: data.available, maxAudioBytes: data.maxAudioBytes ?? null };
     } catch {
       return { available: false, maxAudioBytes: null };

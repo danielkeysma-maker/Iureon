@@ -26,7 +26,7 @@ const toPlainText = (
  * mis-transcribed without it.
  */
 export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AUDIENCIA' }) => {
-  const { isAvailable, isTranscribing, result, error, roleProposals, persisted, transcribe, assignRole, reset } =
+  const { hasFirm, isAvailable, isTranscribing, result, error, roleProposals, persisted, maxAudioBytes, transcribe, assignRole, reset } =
     useTranscription(kind);
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -73,6 +73,14 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AU
           </div>
         </div>
 
+        {/*
+          Two different problems, two different messages. One banner used to
+          cover both, and it named the wrong one: with no firm registered the
+          status request came back 401, the client read that as "unavailable",
+          and the screen told the user to configure an API key that was already
+          correct. Telling someone to fix the wrong thing costs more than saying
+          nothing.
+        */}
         {isAvailable === false && (
           <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs flex items-start gap-2">
             <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
@@ -80,6 +88,16 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AU
               El motor de transcripción no está configurado en el servidor. Falta la variable
               <b className="font-mono"> DEEPGRAM_API_KEY</b>. Puedes preparar el envío, pero la
               transcripción fallará hasta que se configure.
+            </span>
+          </div>
+        )}
+
+        {isAvailable && !hasFirm && (
+          <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs flex items-start gap-2">
+            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+            <span>
+              El motor de transcripción está listo, pero todavía no hay una firma registrada.
+              La transcripción necesita una firma para guardarse: regístrala desde el menú lateral.
             </span>
           </div>
         )}
@@ -113,7 +131,12 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AU
                     Arrastra la grabación aquí
                   </span>
                   <span className="text-[11px] text-slate-500">
-                    {SUPPORTED_AUDIO_EXTENSIONS.join(', ')} · máximo 25 MB
+                    {/* From the server, because the ceiling is the configured
+                        provider's. Typed as a literal "25 MB" here, it kept
+                        announcing OpenAI's limit after the switch to Deepgram
+                        raised it eightfold — telling lawyers to split hearings
+                        the product could already accept whole. */}
+                    {SUPPORTED_AUDIO_EXTENSIONS.join(', ')} · máximo {megabytes(maxAudioBytes)} MB
                   </span>
                 </div>
               )}

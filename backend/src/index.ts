@@ -12,7 +12,7 @@ import { settlementRoutes } from './modules/settlements/settlement.routes';
 import { auditRoutes } from './modules/audit/audit.routes';
 import { searchPublicRoutes, searchRoutes } from './modules/search/search.routes';
 import { draftsRoutes } from './modules/drafts/drafts.routes';
-import { transcriptionRoutes } from './modules/transcription/transcription.routes';
+import { transcriptionPublicRoutes, transcriptionRoutes } from './modules/transcription/transcription.routes';
 import { catalogPublicRoutes, catalogRoutes } from './modules/catalog/catalog.routes';
 import { embeddingsService } from './modules/embeddings/embeddings.service';
 import { EMBEDDING_DIMENSIONS } from './modules/embeddings/types';
@@ -41,6 +41,11 @@ app.use('/api', catalogPublicRoutes);
 // nothing at all to a user with no firm yet. Its handler pins SYSTEM_CORPUS
 // server-side and never reads a firm id from the request.
 app.use('/api', searchPublicRoutes);
+
+// Whether a transcription engine exists is a fact about the server, identical
+// for every firm. Gating it made the screen report a missing API key to a user
+// whose only problem was having no firm registered yet.
+app.use('/api', transcriptionPublicRoutes);
 
 // Middleware Global Multi-Tenant (Requisito x-firm-id)
 app.use('/api', tenantMiddleware);
