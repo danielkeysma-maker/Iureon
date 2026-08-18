@@ -7,7 +7,7 @@ import {
 import { transcriptionStore } from './transcriptionStore.service';
 import type { SpeakerRole, TranscriptionKind } from './types';
 
-const transcriptionService = new TranscriptionService();
+export const transcriptionService = new TranscriptionService();
 
 const VALID_KINDS: TranscriptionKind[] = ['AUDIENCIA', 'ENTREVISTA'];
 

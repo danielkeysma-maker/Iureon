@@ -53,6 +53,9 @@ const toSegments = (raw: DiarizedSegment[]): TranscriptSegment[] =>
 export class OpenAITranscriptionProvider implements TranscriptionProvider {
   readonly name = 'openai';
 
+  /** OpenAI rejects anything larger; a two-hour hearing does not fit. */
+  readonly maxAudioBytes = 25 * 1024 * 1024;
+
   private client: OpenAI | null = null;
 
   isConfigured(): boolean {

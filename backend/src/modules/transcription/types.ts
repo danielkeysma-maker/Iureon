@@ -66,6 +66,15 @@ export interface TranscriptionRequest {
  */
 export interface TranscriptionProvider {
   readonly name: string;
+  /**
+   * Largest upload this backend accepts, in bytes.
+   *
+   * It belongs to the adapter because it is a vendor fact, and treating it as a
+   * domain constant cost real capability: a flat 25 MB ceiling — OpenAI's limit
+   * — was rejecting two-hour hearings even after moving to a provider that
+   * accepts 2 GB.
+   */
+  readonly maxAudioBytes: number;
   /** True when the provider has credentials and can actually be called. */
   isConfigured(): boolean;
   transcribe(request: TranscriptionRequest): Promise<TranscriptionResult>;
@@ -83,8 +92,12 @@ export const SUPPORTED_AUDIO_FORMATS = [
 ] as const;
 
 /**
- * Hard limit imposed by the provider. A two-hour hearing exceeds this easily,
- * so long recordings must be split before upload; see the service for how that
- * is currently surfaced to the caller.
+ * Ceiling used when no provider is configured, so an upload can still be
+ * rejected with a size message instead of a missing-credentials one.
+ *
+ * The real limit comes from the provider — see `maxAudioBytes` on the port.
+ * This used to be THE limit, fixed at OpenAI's 25 MB, and it turned a vendor
+ * constraint into a product one: a two-hour hearing is around 50 MB, so the
+ * headline feature was unusable for the thing it was built for.
  */
-export const MAX_AUDIO_BYTES = 25 * 1024 * 1024;
+export const FALLBACK_MAX_AUDIO_BYTES = 25 * 1024 * 1024;

@@ -7,7 +7,7 @@ import {
   transcribeAudioController,
   transcriptionStatusController
 } from './transcription.controller';
-import { MAX_AUDIO_BYTES } from './types';
+import { transcriptionService } from './transcription.controller';
 
 /**
  * Audio is held in memory and forwarded straight to the provider: hearing
@@ -16,7 +16,10 @@ import { MAX_AUDIO_BYTES } from './types';
  */
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: MAX_AUDIO_BYTES, files: 1 }
+  // Read from the configured provider so multer and the service agree. They
+  // must: a mismatch means either an upload rejected twice with two different
+  // numbers, or one accepted here and refused a layer deeper.
+  limits: { fileSize: transcriptionService.maxAudioBytes, files: 1 }
 });
 
 const megabytes = (bytes: number): string => (bytes / (1024 * 1024)).toFixed(1);
@@ -35,8 +38,8 @@ const handleUploadErrors = (
   if (err instanceof MulterError) {
     const message =
       err.code === 'LIMIT_FILE_SIZE'
-        ? `El audio supera el límite de ${megabytes(MAX_AUDIO_BYTES)} MB por archivo. ` +
-          'Divide la grabación en partes (por ejemplo, por bloques de la audiencia) y súbelas por separado.'
+        ? `El audio supera el límite de ${megabytes(transcriptionService.maxAudioBytes)} MB por archivo. ` +
+          'Divide la grabación en partes y súbelas por separado.'
         : 'No se pudo procesar el archivo enviado.';
 
     res.status(400).json({ error: 'INVALID_AUDIO', message });

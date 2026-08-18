@@ -2,7 +2,6 @@ import { config } from '../../config/env.config';
 import { DeepgramTranscriptionProvider } from './providers/deepgram.provider';
 import { OpenAITranscriptionProvider } from './providers/openai.provider';
 import {
-  MAX_AUDIO_BYTES,
   SUPPORTED_AUDIO_FORMATS,
   type TranscriptionProvider,
   type TranscriptionRequest,
@@ -54,6 +53,11 @@ const megabytes = (bytes: number): string => (bytes / (1024 * 1024)).toFixed(1);
 export class TranscriptionService {
   constructor(private readonly provider: TranscriptionProvider = resolveProvider()) {}
 
+  /** The configured backend's ceiling, so callers do not guess it. */
+  get maxAudioBytes(): number {
+    return this.provider.maxAudioBytes;
+  }
+
   isAvailable(): boolean {
     return this.provider.isConfigured();
   }
@@ -89,9 +93,14 @@ export class TranscriptionService {
     // The provider rejects anything above this, and a full hearing recording
     // routinely exceeds it. Splitting is not automatic yet, so the message has
     // to tell the user exactly what to do rather than fail opaquely.
-    if (request.audio.length > MAX_AUDIO_BYTES) {
+    // Asked of the provider, not of a constant: the ceiling is a vendor fact,
+    // and hardcoding OpenAI's 25 MB kept rejecting two-hour hearings long after
+    // we moved to a backend that accepts them.
+    const limit = this.provider.maxAudioBytes;
+
+    if (request.audio.length > limit) {
       throw new InvalidAudioError(
-        `El audio pesa ${megabytes(request.audio.length)} MB y el límite por archivo es ${megabytes(MAX_AUDIO_BYTES)} MB. ` +
+        `El audio pesa ${megabytes(request.audio.length)} MB y el límite por archivo es ${megabytes(limit)} MB. ` +
           'Divide la grabación en partes (por ejemplo, por bloques de la audiencia) y súbelas por separado.'
       );
     }

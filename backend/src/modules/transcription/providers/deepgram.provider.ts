@@ -88,6 +88,17 @@ const toKeyTerms = (contextPrompt?: string): string[] => {
 export class DeepgramTranscriptionProvider implements TranscriptionProvider {
   readonly name = 'deepgram';
 
+  /**
+   * Deepgram accepts up to 2 GB. This caps well below that on purpose.
+   *
+   * The upload is held in RAM — `multer.memoryStorage()`, chosen so privileged
+   * recordings never touch the server's disk — and a 2 GB buffer would trade
+   * that guarantee for an out-of-memory crash. 200 MB clears a two-hour hearing
+   * at ordinary speech bitrates with room to spare, which is the case this
+   * feature exists for.
+   */
+  readonly maxAudioBytes = 200 * 1024 * 1024;
+
   isConfigured(): boolean {
     return Boolean(config.deepgram?.apiKey);
   }
