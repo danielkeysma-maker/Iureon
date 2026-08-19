@@ -3,7 +3,8 @@ import { Mic, Upload, FileAudio, AlertTriangle, Cpu, Copy, CheckCircle2, RotateC
 import { useTranscription } from '../hooks/useTranscription';
 import { TranscriptSegments } from './TranscriptSegments';
 import { NotPersistedWarning, RoleProposals } from './RoleProposals';
-import { ROLE_LABELS, SUPPORTED_AUDIO_EXTENSIONS, type SpeakerRole, type TranscriptionKind } from '../types';
+import { buildSpeakerNames } from '../speakerNames';
+import { ROLE_LABELS, SUPPORTED_AUDIO_EXTENSIONS, type SpeakerRole, type TranscriptSegment, type TranscriptionKind } from '../types';
 
 interface TranscriptionViewProps {
   kind?: TranscriptionKind;
@@ -11,11 +12,19 @@ interface TranscriptionViewProps {
 
 const megabytes = (bytes: number): string => (bytes / (1024 * 1024)).toFixed(1);
 
-/** Plain text of the transcript, prefixed by role, ready to paste into a filing. */
+/**
+ * Plain text of the transcript, ready to paste into a filing.
+ *
+ * Prefixed by the disambiguated speaker name rather than the bare role. With
+ * two apoderados or three witnesses the old form wrote "Testigo:" over and
+ * over and the reader could not tell which one spoke — in a document that gets
+ * quoted, that is not untidy, it is unusable.
+ */
 const toPlainText = (
-  segments: { role: string; text: string }[],
-  labels: Record<string, string>
-): string => segments.map((s) => `${labels[s.role] ?? s.role}: ${s.text}`).join('\n\n');
+  segments: TranscriptSegment[],
+  names: Record<string, string>
+): string =>
+  segments.map((s) => `${names[s.speakerLabel] ?? s.speakerLabel}: ${s.text}`).join('\n\n');
 
 /**
  * Hearing and interview transcription.
@@ -42,7 +51,9 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AU
   const handleCopy = async () => {
     if (!result) return;
 
-    await navigator.clipboard.writeText(toPlainText(result.segments, ROLE_LABELS));
+    await navigator.clipboard.writeText(
+      toPlainText(result.segments, buildSpeakerNames(result.segments, ROLE_LABELS))
+    );
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

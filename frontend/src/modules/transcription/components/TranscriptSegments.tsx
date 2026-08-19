@@ -1,5 +1,6 @@
 import React from 'react';
 import { User } from 'lucide-react';
+import { buildSpeakerNames } from '../speakerNames';
 import {
   ROLE_LABELS,
   ROLE_OPTIONS,
@@ -52,6 +53,10 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
   const roleOf = (speakerLabel: string): SpeakerRole =>
     result.segments.find((s) => s.speakerLabel === speakerLabel)?.role ?? 'DESCONOCIDO';
 
+  // Shared with the copied text so the screen and the clipboard never disagree
+  // about who said what.
+  const speakerNames = buildSpeakerNames(result.segments, ROLE_LABELS);
+
   return (
     <div className="space-y-4">
       {/* Speaker role assignment */}
@@ -70,7 +75,9 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
               >
                 <User className="w-3.5 h-3.5 text-slate-600" />
               </div>
-              <span className="text-[11px] font-mono text-slate-500 w-20 shrink-0">{label}</span>
+              <span className="text-[11px] font-mono text-slate-500 w-20 shrink-0" title={speakerNames[label]}>
+                {label}
+              </span>
               <select
                 value={roleOf(label)}
                 onChange={(e) => onAssignRole(label, e.target.value as SpeakerRole)}
@@ -95,8 +102,10 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
             className={`border-l-4 ${styleFor(segment.speakerLabel)} p-3`}
           >
             <div className="flex items-center gap-2 mb-1">
+              {/* The disambiguated name, not the bare role: with three
+                  witnesses "Testigo" three times tells the reader nothing. */}
               <span className="text-[11px] font-bold text-slate-800">
-                {ROLE_LABELS[segment.role]}
+                {speakerNames[segment.speakerLabel] ?? ROLE_LABELS[segment.role]}
               </span>
               {segment.role === 'DESCONOCIDO' && (
                 <span className="text-[10px] font-mono text-slate-400">{segment.speakerLabel}</span>
