@@ -68,6 +68,34 @@ const toSegments = (utterances: DeepgramUtterance[]): TranscriptSegment[] =>
   }));
 
 /**
+ * Joins consecutive utterances by the same voice into one intervention.
+ *
+ * Deepgram ends an utterance at every pause, so a single continuous answer came
+ * back as seven rows — "de", "posterior a", "a la terminación por captura" —
+ * each stamped and labelled as though the speaker had taken the floor again.
+ * That is a segmentation by breath, and a transcript that gets quoted in a
+ * filing needs one by turn: an intervention is what someone said before
+ * somebody else spoke.
+ *
+ * Only ADJACENT utterances merge, so a genuine exchange is never collapsed —
+ * anything the other party says sits between them and breaks the run. The merged
+ * segment keeps the first start and the last end, which is exactly the span of
+ * the turn, and the role proposer still sees the same words.
+ */
+export const mergeConsecutive = (segments: TranscriptSegment[]): TranscriptSegment[] =>
+  segments.reduce<TranscriptSegment[]>((merged, segment) => {
+    const previous = merged[merged.length - 1];
+
+    if (previous && previous.speakerLabel === segment.speakerLabel) {
+      previous.text = `${previous.text} ${segment.text}`.trim();
+      previous.endSeconds = segment.endSeconds ?? previous.endSeconds;
+      return merged;
+    }
+
+    return [...merged, { ...segment }];
+  }, []);
+
+/**
  * Domain vocabulary goes in as key terms, which is what the parameter exists
  * for. Colombian legal wording — "caducidad", "sustanciador", a radicado read
  * aloud — is mis-transcribed often enough that this is not a nicety, and party
@@ -174,7 +202,7 @@ export class DeepgramTranscriptionProvider implements TranscriptionProvider {
 
   private toResult(payload: DeepgramResponse, kind: TranscriptionRequest['kind']): TranscriptionResult {
     const utterances = payload.results?.utterances ?? [];
-    const segments = toSegments(utterances);
+    const segments = mergeConsecutive(toSegments(utterances));
 
     const channelTranscript = payload.results?.channels?.[0]?.alternatives?.[0]?.transcript;
 

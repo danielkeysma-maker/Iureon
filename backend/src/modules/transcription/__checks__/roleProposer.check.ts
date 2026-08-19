@@ -9,6 +9,7 @@
  * that gets quoted in a filing, and "JUEZ" printed beside the wrong voice reads
  * exactly like a verified fact.
  */
+import { mergeConsecutive } from '../providers/deepgram.provider';
 import { proposeRoles } from '../roleProposer';
 import type { TranscriptSegment } from '../types';
 
@@ -119,6 +120,49 @@ if (roleOf(tratamiento, 'speaker_0') === 'JUEZ') {
 } else {
   fail(`dirigirse a un apoderado etiquetó al hablante como ${roleOf(tratamiento, 'speaker_0')}`);
 }
+
+// ---------------------------------------------------------------------------
+// 6. One turn is one intervention, not one per pause.
+//
+// Deepgram ends an utterance at every silence, so a continuous answer arrived as
+// seven rows — "de", "posterior a", "a la terminación por captura" — each
+// labelled as a fresh turn. A transcript quoted in a filing has to read as
+// somebody speaking, and the merge must never swallow a real exchange.
+// ---------------------------------------------------------------------------
+const fusionadas = mergeConsecutive([
+  say('speaker_0', 'Incluso yo acá estoy validando', 326),
+  say('speaker_0', 'de', 329),
+  say('speaker_0', 'posterior a la terminación por captura', 331),
+  say('speaker_1', 'Ok,', 337),
+  say('speaker_0', 'y el cliente asume los gastos', 340)
+]);
+
+if (fusionadas.length === 3) {
+  pass('tres intervenciones seguidas de una voz se unen en una sola');
+} else {
+  fail(`se esperaban 3 intervenciones y quedaron ${fusionadas.length}`);
+}
+
+if (fusionadas[0]?.text === 'Incluso yo acá estoy validando de posterior a la terminación por captura') {
+  pass('el texto se une en orden y con un espacio entre partes');
+} else {
+  fail(`el texto unido quedó: "${fusionadas[0]?.text}"`);
+}
+
+if (fusionadas[0]?.startSeconds === 326 && fusionadas[0]?.endSeconds === 336) {
+  pass('la intervención conserva el inicio de la primera y el final de la última');
+} else {
+  fail(`el lapso quedó ${fusionadas[0]?.startSeconds}-${fusionadas[0]?.endSeconds}, se esperaba 326-336`);
+}
+
+// The point of "adjacent only": the other party speaking must break the run, or
+// a dialogue would collapse into one person's monologue.
+if (fusionadas[1]?.speakerLabel === 'speaker_1' && fusionadas[2]?.speakerLabel === 'speaker_0') {
+  pass('la intervención de la otra parte corta la unión, el diálogo se conserva');
+} else {
+  fail('la unión atravesó la intervención de otra voz');
+}
+
 
 console.log(failures === 0 ? '\nALL CHECKS PASSED' : `\n${failures} CHECK(S) FAILED`);
 process.exit(failures === 0 ? 0 : 1);
