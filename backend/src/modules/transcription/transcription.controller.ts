@@ -365,3 +365,53 @@ export const editTranscriptionSegmentController = async (
 
   res.json({ success: true, item: updated });
 };
+
+/**
+ * PATCH /api/transcription/:id/split — Cuts one intervention in two.
+ *
+ * Exists because diarization cannot separate people who talk over each other,
+ * and a hearing is full of that. When two real voices share one label, no role
+ * assignment can fix it — the block has to be cut first.
+ */
+export const splitTranscriptionSegmentController = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const index = Number(req.body.segmentIndex);
+  const offset = Number(req.body.charOffset);
+  const speakerLabel = String(req.body.speakerLabel ?? '').trim();
+
+  if (!Number.isInteger(index) || index < 0 || !Number.isInteger(offset) || offset <= 0) {
+    res.status(400).json({
+      error: 'INVALID_SPLIT',
+      message: 'Se requieren "segmentIndex" y "charOffset" como enteros válidos.'
+    });
+    return;
+  }
+
+  if (!speakerLabel) {
+    res.status(400).json({
+      error: 'MISSING_SPEAKER',
+      message: 'Se requiere "speakerLabel" para la segunda mitad.'
+    });
+    return;
+  }
+
+  const updated = await transcriptionStore.splitSegment(
+    req.firmId as string,
+    String(req.params.id),
+    index,
+    offset,
+    speakerLabel
+  );
+
+  if (!updated) {
+    res.status(400).json({
+      error: 'SPLIT_FAILED',
+      message: 'No se pudo dividir la intervención. Revisa que el punto de corte deje texto a ambos lados.'
+    });
+    return;
+  }
+
+  res.json({ success: true, item: updated });
+};

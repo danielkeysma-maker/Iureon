@@ -205,6 +205,113 @@ export class TranscriptionStore {
   }
 
   /**
+   * Cuts one intervention in two at a character offset, so the second half can
+   * belong to somebody else.
+   *
+   * WHY THIS IS NECESSARY. Diarization cannot separate people who talk over each
+   * other, and a hearing is full of that: the judge greets counsel and counsel
+   * answers mid-sentence, so both land in one block labelled with one voice.
+   * Deepgram's own documentation treats overlapping speech as a phenomenon to
+   * detect rather than a defect to configure away, and `diarize_model=latest` is
+   * already v2, the best available.
+   *
+   * Role assignment alone cannot fix it: roles attach to a diarization label, so
+   * when two real people share `speaker_0` there is nothing to reassign. The cut
+   * has to come first.
+   *
+   * Merging turns made this worse, not the misattribution itself: three short
+   * mislabelled rows became one long paragraph, and half a paragraph cannot be
+   * reassigned. This is the other half of that decision.
+   */
+  async splitSegment(
+    firmId: string,
+    id: string,
+    segmentIndex: number,
+    charOffset: number,
+    newSpeakerLabel: string
+  ): Promise<StoredTranscription | null> {
+    if (!supabase) return null;
+
+    const { data: existing, error: readError } = await supabase
+      .from('transcriptions')
+      .select('*')
+      .eq('firm_id', firmId)
+      .eq('id', id)
+      .single();
+
+    if (readError || !existing) {
+      console.error('[TRANSCRIPTION] Transcrito no encontrado para dividir.');
+      return null;
+    }
+
+    const segments = [...(((existing as StoredTranscription).segments ?? []) as TranscriptSegment[])];
+    const target = segments[segmentIndex];
+
+    if (!target) {
+      console.error(`[TRANSCRIPTION] Intervención ${segmentIndex} fuera de rango.`);
+      return null;
+    }
+
+    const antes = target.text.slice(0, charOffset).trim();
+    const despues = target.text.slice(charOffset).trim();
+
+    if (!antes || !despues) {
+      // A cut at either end produces an empty intervention, which reads as a
+      // voice that said nothing.
+      console.error('[TRANSCRIPTION] La división dejaría una intervención vacía.');
+      return null;
+    }
+
+    /*
+     * Timestamps are split proportionally to the text, and that is an estimate
+     * rather than a measurement — the words carry their own times but the stored
+     * segment does not keep them. It is honest enough for navigation, which is
+     * what a timestamp is for here, and better than giving the second half the
+     * first one's start and implying they were said at once.
+     */
+    const inicio = target.startSeconds;
+    const fin = target.endSeconds;
+    const corte =
+      inicio !== null && fin !== null
+        ? inicio + (fin - inicio) * (antes.length / target.text.length)
+        : null;
+
+    segments.splice(
+      segmentIndex,
+      1,
+      { ...target, text: antes, endSeconds: corte },
+      {
+        speakerLabel: newSpeakerLabel,
+        // The new half starts unassigned on purpose: it was cut off precisely
+        // because we do not know whose it is.
+        role: 'DESCONOCIDO',
+        text: despues,
+        startSeconds: corte,
+        endSeconds: fin
+      }
+    );
+
+    const { data, error } = await supabase
+      .from('transcriptions')
+      .update({
+        segments,
+        speaker_labels: [...new Set(segments.map((segment) => segment.speakerLabel))],
+        updated_at: new Date().toISOString()
+      })
+      .eq('firm_id', firmId)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('[TRANSCRIPTION] No se pudo dividir la intervención:', error.message);
+      return null;
+    }
+
+    return data as StoredTranscription;
+  }
+
+  /**
    * Deletion is the firm's, by design. Privileged material must not outlive the
    * decision of whoever owns it.
    */

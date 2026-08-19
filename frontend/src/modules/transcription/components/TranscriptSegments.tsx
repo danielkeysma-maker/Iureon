@@ -1,5 +1,5 @@
 import React from 'react';
-import { User } from 'lucide-react';
+import { Scissors, User } from 'lucide-react';
 import { buildSpeakerNames } from '../speakerNames';
 import {
   ROLE_LABELS,
@@ -15,6 +15,8 @@ interface TranscriptSegmentsProps {
   onAssignRole: (speakerLabel: string, role: SpeakerRole) => void;
   /** Absent when the transcript could not be stored: there is nothing to save into. */
   onEditSegment?: (segmentIndex: number, text: string) => void;
+  /** Cuts an intervention that holds two voices. Same storage requirement. */
+  onSplitSegment?: (segmentIndex: number, charOffset: number) => void;
 }
 
 /** Colour per speaker so a long hearing stays readable at a glance. */
@@ -48,7 +50,8 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
   result,
   kind,
   onAssignRole,
-  onEditSegment
+  onEditSegment,
+  onSplitSegment
 }) => {
   const styleFor = (speakerLabel: string): string =>
     SPEAKER_STYLES[result.speakerLabels.indexOf(speakerLabel) % SPEAKER_STYLES.length];
@@ -113,6 +116,37 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
               {segment.role === 'DESCONOCIDO' && (
                 <span className="text-[10px] font-mono text-slate-400">{segment.speakerLabel}</span>
               )}
+              {/*
+                Cuts where the caret sits. Diarization cannot separate people
+                who talk over each other — the judge greets counsel and counsel
+                answers mid-sentence — so one block ends up holding two voices
+                under one label, and no role assignment can fix that. Only a cut
+                can.
+              */}
+              {onSplitSegment && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const seleccion = window.getSelection();
+                    const offset = seleccion?.anchorOffset ?? 0;
+
+                    if (offset <= 0 || offset >= segment.text.length) {
+                      window.alert(
+                        'Haz clic dentro del texto, justo donde empieza a hablar la otra persona, y vuelve a pulsar Dividir.'
+                      );
+                      return;
+                    }
+
+                    onSplitSegment(index, offset);
+                  }}
+                  className="text-[10px] font-semibold text-slate-500 hover:text-blue-900 flex items-center gap-1"
+                  title="Separa esta intervención en dos, desde donde tengas el cursor"
+                >
+                  <Scissors className="w-3 h-3" />
+                  Dividir
+                </button>
+              )}
+
               {segment.startSeconds !== null && (
                 <span className="text-[10px] font-mono text-slate-400 ml-auto">
                   {formatTimestamp(segment.startSeconds)}

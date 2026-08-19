@@ -188,6 +188,48 @@ export const useTranscription = (kind: TranscriptionKind) => {
     [firmId, transcriptionId]
   );
 
+  /**
+   * Cuts an intervention in two because two people are inside it.
+   *
+   * Diarization cannot separate speech that overlaps, and a hearing is full of
+   * it — the judge greets counsel and counsel answers mid-sentence, so both land
+   * in one block under one voice. No role assignment fixes that, because roles
+   * attach to the diarization label: the block has to be cut first.
+   *
+   * The new voice gets a label that does not collide with the existing ones. It
+   * starts as DESCONOCIDO on purpose — it was cut off precisely because nobody
+   * knows yet whose it is.
+   */
+  const splitSegment = useCallback(
+    async (segmentIndex: number, charOffset: number) => {
+      if (!transcriptionId || !result) return;
+
+      const nuevo = `speaker_${result.speakerLabels.length}`;
+
+      try {
+        const { item } = await transcriptionApi.splitSegment(
+          firmId,
+          transcriptionId,
+          segmentIndex,
+          charOffset,
+          nuevo
+        );
+
+        // Taken from the server rather than patched here: a split shifts every
+        // index after it, and recomputing that on the client is how two views of
+        // one transcript drift apart.
+        setResult((current) =>
+          current
+            ? { ...current, segments: item.segments, speakerLabels: item.speaker_labels }
+            : current
+        );
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'No se pudo dividir la intervención.');
+      }
+    },
+    [firmId, transcriptionId, result]
+  );
+
   const reset = useCallback(() => {
     setResult(null);
     setTranscriptionId(null);
@@ -210,6 +252,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
     transcribe,
     assignRole,
     editSegment,
+    splitSegment,
     canEdit: Boolean(transcriptionId),
     reset
   };

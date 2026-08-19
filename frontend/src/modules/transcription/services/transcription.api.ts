@@ -1,5 +1,5 @@
 import { ApiError, httpClient } from '../../../config/httpClient';
-import type { RoleProposal, TranscriptionKind, TranscriptionResult } from '../types';
+import type { RoleProposal, TranscriptSegment, TranscriptionKind, TranscriptionResult } from '../types';
 
 interface StatusResponse {
   success: boolean;
@@ -208,6 +208,26 @@ export const transcriptionApi = {
     await httpClient.patch(`/api/transcription/${id}/segment`, {
       firmId,
       body: { segmentIndex, text }
+    });
+  },
+
+  /**
+   * Cuts one intervention in two, giving the second half a different voice.
+   *
+   * The transcript is refetched by the caller rather than patched locally: a
+   * split changes indices for every intervention after it, and guessing at that
+   * on the client is how two views of the same transcript drift apart.
+   */
+  async splitSegment(
+    firmId: string,
+    id: string,
+    segmentIndex: number,
+    charOffset: number,
+    speakerLabel: string
+  ): Promise<{ item: { segments: TranscriptSegment[]; speaker_labels: string[] } }> {
+    return httpClient.patch(`/api/transcription/${id}/split`, {
+      firmId,
+      body: { segmentIndex, charOffset, speakerLabel }
     });
   }
 };
