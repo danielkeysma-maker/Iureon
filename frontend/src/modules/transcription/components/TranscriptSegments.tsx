@@ -1,5 +1,5 @@
 import React from 'react';
-import { Scissors, User } from 'lucide-react';
+import { Scissors, User, UserCog } from 'lucide-react';
 import { buildSpeakerNames } from '../speakerNames';
 import {
   ROLE_LABELS,
@@ -17,6 +17,13 @@ interface TranscriptSegmentsProps {
   onEditSegment?: (segmentIndex: number, text: string) => void;
   /** Cuts an intervention that holds two voices. Same storage requirement. */
   onSplitSegment?: (segmentIndex: number, charOffset: number, speakerLabel: string) => void;
+  /**
+   * Hands a whole intervention to another voice.
+   *
+   * Distinct from the cut on purpose: the cut solves two people inside one
+   * intervention, this solves two people the engine filed under one label.
+   */
+  onReassignSpeaker?: (segmentIndex: number, speakerLabel: string) => void;
 }
 
 /** Colour per speaker so a long hearing stays readable at a glance. */
@@ -51,7 +58,8 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
   kind,
   onAssignRole,
   onEditSegment,
-  onSplitSegment
+  onSplitSegment,
+  onReassignSpeaker
 }) => {
   const styleFor = (speakerLabel: string): string =>
     SPEAKER_STYLES[result.speakerLabels.indexOf(speakerLabel) % SPEAKER_STYLES.length];
@@ -80,6 +88,9 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
 
   /** The cut in progress: which intervention, and where it is being cut. */
   const [cutting, setCutting] = React.useState<{ index: number; offset: number } | null>(null);
+
+  /** The intervention whose voice is being changed. */
+  const [moving, setMoving] = React.useState<number | null>(null);
 
   /**
    * The caret's offset within a paragraph, or null when the caret is elsewhere.
@@ -208,6 +219,34 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                   );
                 })()}
 
+              {/*
+                Cambia la voz de TODA la intervención.
+
+                Hace falta porque la diarización también junta a dos personas
+                bajo una misma etiqueta en intervenciones distintas: en una
+                audiencia real `speaker_1` se presentó como Tomás Wilches a los
+                64 segundos y como José Omar Gaitán, apoderado de la otra parte,
+                a los 195. Ni el rol ni el corte podían arreglarlo — el rol
+                nombra la etiqueta, así que nombraba a los dos, y el corte se
+                niega a dejar una mitad vacía, que es justo lo que pide mover
+                una intervención entera.
+              */}
+              {onReassignSpeaker && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMoving(moving === index ? null : index);
+                    setCutting(null);
+                    setAviso(null);
+                  }}
+                  className="text-[10px] font-semibold text-slate-400 hover:text-blue-900 flex items-center gap-1"
+                  title="Esta intervención es de otra persona"
+                >
+                  <UserCog className="w-3 h-3" />
+                  Otra voz
+                </button>
+              )}
+
               {segment.startSeconds !== null && (
                 <span className="text-[10px] font-mono text-slate-400 ml-auto">
                   {formatTimestamp(segment.startSeconds)}
@@ -248,6 +287,43 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
               person. Handing the tail back to somebody already in the room is the
               common case — most often whoever was interrupted.
             */}
+            {moving === index && (
+              <div className="mt-2 flex flex-wrap items-center gap-2 bg-blue-50/70 border border-blue-200 rounded-lg p-2">
+                <span className="text-[11px] text-slate-700">Esta intervención la dice:</span>
+
+                <select
+                  defaultValue=""
+                  onChange={(e) => {
+                    onReassignSpeaker?.(index, e.target.value);
+                    setMoving(null);
+                  }}
+                  className="bg-white border border-slate-200 rounded-lg p-1.5 text-[11px] text-slate-900 focus:outline-none focus:border-blue-900"
+                >
+                  <option value="" disabled>
+                    Elige quién…
+                  </option>
+                  {result.speakerLabels
+                    // La suya no se ofrece: elegirla no cambia nada y sugiere
+                    // que sí.
+                    .filter((label) => label !== segment.speakerLabel)
+                    .map((label) => (
+                      <option key={label} value={label}>
+                        {speakerNames[label] ?? label}
+                      </option>
+                    ))}
+                  <option value="__nueva__">Otra persona (voz nueva)</option>
+                </select>
+
+                <button
+                  type="button"
+                  onClick={() => setMoving(null)}
+                  className="text-[11px] text-slate-500 hover:text-slate-700"
+                >
+                  Cancelar
+                </button>
+              </div>
+            )}
+
             {cutting?.index === index && (
               <div className="mt-2 flex flex-wrap items-center gap-2 bg-amber-50/70 border border-amber-200 rounded-lg p-2">
                 <span className="text-[11px] text-slate-700">Lo que sigue lo dice:</span>

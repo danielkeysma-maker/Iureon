@@ -36,7 +36,7 @@ const toPlainText = (
  * mis-transcribed without it.
  */
 export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AUDIENCIA' }) => {
-  const { hasFirm, isAvailable, isUploading, isTranscribing, result, error, roleProposals, persisted, maxAudioBytes, transcribe, assignRole, editSegment, splitSegment, canEdit, reset } =
+  const { hasFirm, isAvailable, isUploading, isTranscribing, result, error, roleProposals, persisted, maxAudioBytes, transcribe, assignRole, editSegment, splitSegment, reassignSpeaker, canEdit, reset } =
     useTranscription(kind);
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -258,6 +258,7 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AU
               onAssignRole={assignRole}
               onEditSegment={canEdit ? editSegment : undefined}
               onSplitSegment={canEdit ? splitSegment : undefined}
+              onReassignSpeaker={canEdit ? reassignSpeaker : undefined}
             />
           </>
         )}

@@ -322,6 +322,87 @@ export class TranscriptionStore {
   }
 
   /**
+   * Moves one whole intervention to a different voice.
+   *
+   * WHY CUTTING IS NOT ENOUGH. `splitSegment` solves two people inside ONE
+   * intervention. This is the other half of the same failure: diarization also
+   * puts two people under one LABEL across separate interventions. A real
+   * hearing showed it plainly — `speaker_1` said "mi nombre es Tomas Enrique
+   * Wilches" at 01:04 and "Jose Omar Gaitan Guevara, abogado apoderado" at
+   * 03:15. Two names, two people, one voice.
+   *
+   * Nothing could fix that before. Roles attach to the label, so naming
+   * `speaker_1` named both; and the cut refuses a split that would leave an
+   * empty half, which is exactly what moving a whole intervention asks for.
+   *
+   * The role travels with the destination, not with the text: an intervention
+   * handed to a voice already in the hearing takes that voice's role, and one
+   * handed to a new voice starts DESCONOCIDO because nobody has said yet who it
+   * is.
+   */
+  async reassignSpeaker(
+    firmId: string,
+    id: string,
+    segmentIndex: number,
+    speakerLabel: string
+  ): Promise<StoredTranscription | null> {
+    if (!supabase) return null;
+
+    const { data: existing, error: readError } = await supabase
+      .from('transcriptions')
+      .select('*')
+      .eq('firm_id', firmId)
+      .eq('id', id)
+      .single();
+
+    if (readError || !existing) {
+      console.error('[TRANSCRIPTION] Transcrito no encontrado para reasignar la voz.');
+      return null;
+    }
+
+    const segments = [...(((existing as StoredTranscription).segments ?? []) as TranscriptSegment[])];
+    const target = segments[segmentIndex];
+
+    if (!target) {
+      console.error(`[TRANSCRIPTION] Intervención ${segmentIndex} fuera de rango.`);
+      return null;
+    }
+
+    if (target.speakerLabel === speakerLabel) {
+      // Already there. Reported as done rather than as an error: the caller
+      // asked for a state, and the state holds.
+      return existing as StoredTranscription;
+    }
+
+    const role = segments.find((s) => s.speakerLabel === speakerLabel)?.role ?? 'DESCONOCIDO';
+    segments[segmentIndex] = { ...target, speakerLabel, role };
+
+    /*
+     * Recomputed from the segments rather than appended to, because moving the
+     * last intervention of a voice retires that voice. Leaving a label with no
+     * text behind would keep offering a speaker who never speaks — in the role
+     * panel, in the cut selector, and in the numbering that turns three
+     * witnesses into "Testigo 1, 2, 3".
+     */
+    const speakerLabels = [...new Set(segments.map((segment) => segment.speakerLabel))];
+
+    const { data, error } = await supabase
+      .from('transcriptions')
+      .update({ segments, speaker_labels: speakerLabels, updated_at: new Date().toISOString() })
+      .eq('firm_id', firmId)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('[TRANSCRIPTION] No se pudo reasignar la voz:', error.message);
+      return null;
+    }
+
+    return data as StoredTranscription;
+  }
+
+  /**
    * Deletion is the firm's, by design. Privileged material must not outlive the
    * decision of whoever owns it.
    */

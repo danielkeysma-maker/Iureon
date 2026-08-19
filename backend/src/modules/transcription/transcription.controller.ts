@@ -367,6 +367,52 @@ export const editTranscriptionSegmentController = async (
 };
 
 /**
+ * PATCH /api/transcription/:id/speaker — Moves one intervention to another voice.
+ *
+ * The companion of /split, for the other way diarization fails: two people under
+ * one label across SEPARATE interventions. Cutting cannot express that, because
+ * a cut that leaves an empty half is refused, and assigning roles cannot either,
+ * because a role attaches to the label and would name both people at once.
+ */
+export const reassignTranscriptionSpeakerController = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const index = Number(req.body.segmentIndex);
+  const speakerLabel = String(req.body.speakerLabel ?? '').trim();
+
+  if (!Number.isInteger(index) || index < 0) {
+    res.status(400).json({
+      error: 'INVALID_REASSIGN',
+      message: 'Se requiere "segmentIndex" como entero válido.'
+    });
+    return;
+  }
+
+  if (!speakerLabel) {
+    res.status(400).json({
+      error: 'MISSING_SPEAKER',
+      message: 'Se requiere "speakerLabel" para la intervención.'
+    });
+    return;
+  }
+
+  const updated = await transcriptionStore.reassignSpeaker(
+    req.firmId as string,
+    String(req.params.id),
+    index,
+    speakerLabel
+  );
+
+  if (!updated) {
+    res.status(404).json({ error: 'NOT_FOUND', message: 'No se encontró la intervención.' });
+    return;
+  }
+
+  res.json({ success: true, item: updated });
+};
+
+/**
  * PATCH /api/transcription/:id/split — Cuts one intervention in two.
  *
  * Exists because diarization cannot separate people who talk over each other,

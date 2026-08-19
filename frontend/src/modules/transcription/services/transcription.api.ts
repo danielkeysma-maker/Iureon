@@ -218,6 +218,25 @@ export const transcriptionApi = {
    * split changes indices for every intervention after it, and guessing at that
    * on the client is how two views of the same transcript drift apart.
    */
+  /**
+   * Moves one whole intervention to another voice.
+   *
+   * Separate from splitSegment because the failures are different: a cut solves
+   * two people inside one intervention, this solves two people sharing one
+   * label across several.
+   */
+  async reassignSpeaker(
+    firmId: string,
+    id: string,
+    segmentIndex: number,
+    speakerLabel: string
+  ): Promise<{ item: { segments: TranscriptSegment[]; speaker_labels: string[] } }> {
+    return httpClient.patch(`/api/transcription/${id}/speaker`, {
+      firmId,
+      body: { segmentIndex, speakerLabel }
+    });
+  },
+
   async splitSegment(
     firmId: string,
     id: string,

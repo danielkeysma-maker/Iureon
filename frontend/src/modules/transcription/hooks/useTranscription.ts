@@ -235,6 +235,43 @@ export const useTranscription = (kind: TranscriptionKind) => {
     [firmId, transcriptionId, result]
   );
 
+  /**
+   * Hands one whole intervention to another voice.
+   *
+   * The other half of the cut. Diarization merges two people under one label as
+   * readily as it merges two people into one block, and a real hearing showed
+   * both: `speaker_1` introduced himself twice, under two different names,
+   * hours apart. Roles could not fix it — a role names the label, so it named
+   * both — and the cut could not either, because it refuses to leave an empty
+   * half.
+   */
+  const reassignSpeaker = useCallback(
+    async (segmentIndex: number, speakerLabel: string) => {
+      if (!transcriptionId || !result) return;
+
+      const destino =
+        speakerLabel === '__nueva__' ? `speaker_${result.speakerLabels.length}` : speakerLabel;
+
+      try {
+        const { item } = await transcriptionApi.reassignSpeaker(
+          firmId,
+          transcriptionId,
+          segmentIndex,
+          destino
+        );
+
+        setResult((current) =>
+          current
+            ? { ...current, segments: item.segments, speakerLabels: item.speaker_labels }
+            : current
+        );
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'No se pudo cambiar la voz de la intervención.');
+      }
+    },
+    [firmId, transcriptionId, result]
+  );
+
   const reset = useCallback(() => {
     setResult(null);
     setTranscriptionId(null);
@@ -258,6 +295,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
     assignRole,
     editSegment,
     splitSegment,
+    reassignSpeaker,
     canEdit: Boolean(transcriptionId),
     reset
   };
