@@ -8,13 +8,31 @@
 
 /** Who is speaking. Diarization gives us labels; a human maps them to roles. */
 export type SpeakerRole =
+  // El estrado
   | 'JUEZ'
-  | 'APODERADO_DEMANDANTE'
-  | 'APODERADO_DEMANDADO'
-  | 'TESTIGO'
-  | 'PERITO'
+  | 'SECRETARIO'
+  // Parte acusadora y control estatal
   | 'FISCAL'
   | 'MINISTERIO_PUBLICO'
+  | 'DEFENSOR_PUEBLO'
+  // Defensa penal y la persona procesada
+  | 'DEFENSOR'
+  | 'PROCESADO'
+  // Víctimas
+  | 'VICTIMA'
+  | 'REPRESENTANTE_VICTIMAS'
+  // Proceso civil, laboral y administrativo: el apoderado y la parte NO son la
+  // misma voz. En un interrogatorio de parte declara el demandante, no su
+  // abogado, y el transcrito tiene que poder distinguirlos.
+  | 'APODERADO_DEMANDANTE'
+  | 'APODERADO_DEMANDADO'
+  | 'DEMANDANTE'
+  | 'DEMANDADO'
+  // Prueba
+  | 'TESTIGO'
+  | 'PERITO'
+  | 'INTERPRETE'
+  // Entrevista de cliente
   | 'CLIENTE'
   | 'ABOGADO'
   | 'DESCONOCIDO';

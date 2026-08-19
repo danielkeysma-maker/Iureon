@@ -86,6 +86,20 @@ const MARKERS: Marker[] = [
     weight: 6
   },
   { role: 'FISCAL', pattern: /\bfiscal[ía]?\s+(\w+\s+)?delegad[oa]\b/i, weight: 5 },
+
+  // Roles added after a lawyer pointed out the list held only half a hearing.
+  // Each still needs a formula somebody says about THEMSELVES; a role with no
+  // marker simply never gets proposed, which is the correct outcome.
+  { role: 'DEFENSOR', pattern: /\b(soy|como)\s+(el\s+|la\s+)?defensor[a]?\b/i, weight: 6 },
+  { role: 'DEFENSOR', pattern: /\bla\s+defensa\s+(solicita|se\s+opone|manifiesta)\b/i, weight: 4 },
+  { role: 'DEFENSOR_PUEBLO', pattern: /\bdefensor[íi]a\s+del\s+pueblo\b/i, weight: 5 },
+  {
+    role: 'REPRESENTANTE_VICTIMAS',
+    pattern: /\brepresent(o|ante)\s+(a\s+)?(las?\s+)?v[íi]ctimas?\b/i,
+    weight: 6
+  },
+  { role: 'SECRETARIO', pattern: /\bsecretar[íi]a?\s+del\s+(juzgado|despacho)\b/i, weight: 5 },
+  { role: 'INTERPRETE', pattern: /\b(soy|como)\s+(el\s+|la\s+)?int[ée]rprete\b/i, weight: 6 },
   { role: 'MINISTERIO_PUBLICO', pattern: /\b(agente\s+del\s+)?ministerio\s+p[úu]blico\b/i, weight: 5 },
   { role: 'PERITO', pattern: /\b(rindo|como)\s+(mi\s+)?(dictamen|peritaje)\b/i, weight: 5 },
 

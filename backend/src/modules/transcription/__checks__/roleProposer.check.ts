@@ -164,5 +164,36 @@ if (fusionadas[1]?.speakerLabel === 'speaker_1' && fusionadas[2]?.speakerLabel =
 }
 
 
+// ---------------------------------------------------------------------------
+// 7. The roles a hearing actually has.
+//
+// The list held only half of one until a lawyer said so: no defensor, no
+// Defensoría del Pueblo, no secretary, no interpreter, and no way to mark the
+// person being prosecuted or a party who is not their own lawyer. These check
+// the ones with a formula somebody says about themselves.
+// ---------------------------------------------------------------------------
+const penal = proposeRoles([
+  say('speaker_0', 'Con venia del despacho, soy el defensor del señor procesado.', 20),
+  say('speaker_1', 'Represento a las víctimas en esta actuación.', 55),
+  say('speaker_2', 'Soy la intérprete designada para esta diligencia.', 80),
+  say('speaker_3', 'Buenos días, actúo por la Defensoría del Pueblo.', 95)
+]);
+
+const esperado: Record<string, string> = {
+  speaker_0: 'DEFENSOR',
+  speaker_1: 'REPRESENTANTE_VICTIMAS',
+  speaker_2: 'INTERPRETE',
+  speaker_3: 'DEFENSOR_PUEBLO'
+};
+
+for (const [label, rol] of Object.entries(esperado)) {
+  if (roleOf(penal, label) === rol) {
+    pass(`quien se identifica como ${rol} queda propuesto como tal`);
+  } else {
+    fail(`${label} se propuso como ${roleOf(penal, label)}, se esperaba ${rol}`);
+  }
+}
+
+
 console.log(failures === 0 ? '\nALL CHECKS PASSED' : `\n${failures} CHECK(S) FAILED`);
 process.exit(failures === 0 ? 0 : 1);

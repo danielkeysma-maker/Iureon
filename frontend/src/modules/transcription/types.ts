@@ -5,12 +5,21 @@
 
 export type SpeakerRole =
   | 'JUEZ'
-  | 'APODERADO_DEMANDANTE'
-  | 'APODERADO_DEMANDADO'
-  | 'TESTIGO'
-  | 'PERITO'
+  | 'SECRETARIO'
   | 'FISCAL'
   | 'MINISTERIO_PUBLICO'
+  | 'DEFENSOR_PUEBLO'
+  | 'DEFENSOR'
+  | 'PROCESADO'
+  | 'VICTIMA'
+  | 'REPRESENTANTE_VICTIMAS'
+  | 'APODERADO_DEMANDANTE'
+  | 'APODERADO_DEMANDADO'
+  | 'DEMANDANTE'
+  | 'DEMANDADO'
+  | 'TESTIGO'
+  | 'PERITO'
+  | 'INTERPRETE'
   | 'CLIENTE'
   | 'ABOGADO'
   | 'DESCONOCIDO';
@@ -37,28 +46,59 @@ export interface TranscriptionResult {
 }
 
 /** Labels a lawyer can assign to a diarized speaker, per kind of recording. */
+/**
+ * What the lawyer can pick, per kind of recording.
+ *
+ * A hearing is not two lawyers and a judge. The bench has a secretary; the
+ * State appears as Fiscalía, Ministerio Público or Defensoría del Pueblo; a
+ * criminal matter has a defensor and the person being prosecuted; victims speak
+ * and so do their representatives; and in civil, labour or administrative
+ * matters the PARTY is a different voice from their apoderado — an interrogatorio
+ * de parte is the demandante speaking, not their lawyer.
+ *
+ * Ordered as a hearing is populated rather than alphabetically, so the eye
+ * finds the bench first and the evidence last.
+ */
 export const ROLE_OPTIONS: Record<TranscriptionKind, SpeakerRole[]> = {
   AUDIENCIA: [
     'JUEZ',
-    'APODERADO_DEMANDANTE',
-    'APODERADO_DEMANDADO',
-    'TESTIGO',
-    'PERITO',
+    'SECRETARIO',
     'FISCAL',
     'MINISTERIO_PUBLICO',
+    'DEFENSOR_PUEBLO',
+    'DEFENSOR',
+    'PROCESADO',
+    'VICTIMA',
+    'REPRESENTANTE_VICTIMAS',
+    'APODERADO_DEMANDANTE',
+    'APODERADO_DEMANDADO',
+    'DEMANDANTE',
+    'DEMANDADO',
+    'TESTIGO',
+    'PERITO',
+    'INTERPRETE',
     'DESCONOCIDO'
   ],
-  ENTREVISTA: ['ABOGADO', 'CLIENTE', 'TESTIGO', 'DESCONOCIDO']
+  ENTREVISTA: ['ABOGADO', 'CLIENTE', 'TESTIGO', 'INTERPRETE', 'DESCONOCIDO']
 };
 
 export const ROLE_LABELS: Record<SpeakerRole, string> = {
   JUEZ: 'Juez',
-  APODERADO_DEMANDANTE: 'Apoderado demandante',
-  APODERADO_DEMANDADO: 'Apoderado demandado',
-  TESTIGO: 'Testigo',
-  PERITO: 'Perito',
+  SECRETARIO: 'Secretario',
   FISCAL: 'Fiscal',
   MINISTERIO_PUBLICO: 'Ministerio Público',
+  DEFENSOR_PUEBLO: 'Defensor del Pueblo',
+  DEFENSOR: 'Defensor',
+  PROCESADO: 'Procesado',
+  VICTIMA: 'Víctima',
+  REPRESENTANTE_VICTIMAS: 'Representante de víctimas',
+  APODERADO_DEMANDANTE: 'Apoderado demandante',
+  APODERADO_DEMANDADO: 'Apoderado demandado',
+  DEMANDANTE: 'Demandante',
+  DEMANDADO: 'Demandado',
+  TESTIGO: 'Testigo',
+  PERITO: 'Perito',
+  INTERPRETE: 'Intérprete',
   CLIENTE: 'Cliente',
   ABOGADO: 'Abogado',
   DESCONOCIDO: 'Sin identificar'
