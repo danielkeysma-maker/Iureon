@@ -64,6 +64,14 @@ export const useTranscription = (kind: TranscriptionKind) => {
    * backend was willing to accept.
    */
   const [maxAudioBytes, setMaxAudioBytes] = useState<number>(FALLBACK_MAX_AUDIO_BYTES);
+  /**
+   * Whether the recording can go straight to storage instead of through the
+   * API. It is what makes a two-hour hearing possible: the deployment rejects
+   * request bodies over 4.5 MB, and 50 MB of audio has no other way in.
+   */
+  const [viaStorage, setViaStorage] = useState(false);
+  /** Shown while the recording travels to storage, which is the slow part. */
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -71,7 +79,13 @@ export const useTranscription = (kind: TranscriptionKind) => {
     transcriptionApi.status().then((status) => {
       if (cancelled) return;
       setIsAvailable(status.available);
-      if (status.maxAudioBytes) setMaxAudioBytes(status.maxAudioBytes);
+      setViaStorage(status.supportsRemoteAudio);
+      // The storage path is not bound by the API's ceiling, so the limit shown
+      // and enforced is the provider's whenever that path is available.
+      const limit = status.supportsRemoteAudio
+        ? status.maxAudioBytesViaStorage ?? status.maxAudioBytes
+        : status.maxAudioBytes;
+      if (limit) setMaxAudioBytes(limit);
     });
 
     return () => {
@@ -92,7 +106,26 @@ export const useTranscription = (kind: TranscriptionKind) => {
       setIsTranscribing(true);
 
       try {
-        const outcome = await transcriptionApi.transcribe(firmId, { file, kind, contextPrompt });
+        /*
+         * Two routes, and the choice is not an optimisation. Through the API the
+         * recording dies at 4.5 MB on this deployment; through storage it never
+         * touches the function at all. The direct route stays for providers that
+         * cannot fetch remote audio.
+         */
+        let outcome;
+
+        if (viaStorage) {
+          setIsUploading(true);
+          try {
+            const fileKey = await transcriptionApi.uploadAudioToStorage(firmId, file);
+            outcome = await transcriptionApi.transcribeFromStorage(firmId, fileKey, { kind, contextPrompt });
+          } finally {
+            setIsUploading(false);
+          }
+        } else {
+          outcome = await transcriptionApi.transcribe(firmId, { file, kind, contextPrompt });
+        }
+
         setResult(outcome.result);
         setRoleProposals(outcome.roleProposals);
         setPersisted(outcome.persisted);
@@ -102,7 +135,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
         setIsTranscribing(false);
       }
     },
-    [firmId, kind, maxAudioBytes]
+    [firmId, kind, maxAudioBytes, viaStorage]
   );
 
   /** Applies a procedural role to every segment of one diarized speaker. */
@@ -130,6 +163,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
     /** False while no firm is registered: the transcript could not be saved. */
     hasFirm: Boolean(firmId),
     isAvailable,
+    isUploading,
     isTranscribing,
     result,
     error,

@@ -26,7 +26,7 @@ const toPlainText = (
  * mis-transcribed without it.
  */
 export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AUDIENCIA' }) => {
-  const { hasFirm, isAvailable, isTranscribing, result, error, roleProposals, persisted, maxAudioBytes, transcribe, assignRole, reset } =
+  const { hasFirm, isAvailable, isUploading, isTranscribing, result, error, roleProposals, persisted, maxAudioBytes, transcribe, assignRole, reset } =
     useTranscription(kind);
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -172,7 +172,15 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AU
               disabled={!selectedFile || isTranscribing}
               className="w-full py-2.5 bg-blue-950 hover:bg-blue-900 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition-colors shadow-xs"
             >
-              {isTranscribing ? (
+              {/* Two phases, named separately: a two-hour hearing spends real
+                  minutes travelling to storage before anything is transcribed,
+                  and one label for both would look stalled. */}
+              {isUploading ? (
+                <>
+                  <Upload className="w-4 h-4 animate-pulse" />
+                  <span>Enviando la grabación...</span>
+                </>
+              ) : isTranscribing ? (
                 <>
                   <Cpu className="w-4 h-4 animate-spin" />
                   <span>Transcribiendo y separando interlocutores...</span>
