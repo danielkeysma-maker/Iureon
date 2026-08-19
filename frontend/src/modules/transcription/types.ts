@@ -10,7 +10,11 @@ export type SpeakerRole =
   | 'MINISTERIO_PUBLICO'
   | 'DEFENSOR_PUEBLO'
   | 'DEFENSOR'
+  | 'INDICIADO'
+  | 'IMPUTADO'
+  | 'ACUSADO'
   | 'PROCESADO'
+  | 'CONDENADO'
   | 'VICTIMA'
   | 'REPRESENTANTE_VICTIMAS'
   | 'APODERADO_DEMANDANTE'
@@ -67,7 +71,11 @@ export const ROLE_OPTIONS: Record<TranscriptionKind, SpeakerRole[]> = {
     'MINISTERIO_PUBLICO',
     'DEFENSOR_PUEBLO',
     'DEFENSOR',
+    'INDICIADO',
+    'IMPUTADO',
+    'ACUSADO',
     'PROCESADO',
+    'CONDENADO',
     'VICTIMA',
     'REPRESENTANTE_VICTIMAS',
     'APODERADO_DEMANDANTE',
@@ -89,7 +97,11 @@ export const ROLE_LABELS: Record<SpeakerRole, string> = {
   MINISTERIO_PUBLICO: 'Ministerio Público',
   DEFENSOR_PUEBLO: 'Defensor del Pueblo',
   DEFENSOR: 'Defensor',
+  INDICIADO: 'Indiciado',
+  IMPUTADO: 'Imputado',
+  ACUSADO: 'Acusado',
   PROCESADO: 'Procesado',
+  CONDENADO: 'Condenado',
   VICTIMA: 'Víctima',
   REPRESENTANTE_VICTIMAS: 'Representante de víctimas',
   APODERADO_DEMANDANTE: 'Apoderado demandante',

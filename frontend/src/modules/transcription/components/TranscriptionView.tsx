@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { Mic, Upload, FileAudio, AlertTriangle, Cpu, Copy, CheckCircle2, RotateCcw } from 'lucide-react';
 import { useTranscription } from '../hooks/useTranscription';
 import { TranscriptSegments } from './TranscriptSegments';
+import { AudioPreview } from './AudioPreview';
 import { NotPersistedWarning, RoleProposals } from './RoleProposals';
 import { buildSpeakerNames } from '../speakerNames';
 import { ROLE_LABELS, SUPPORTED_AUDIO_EXTENSIONS, type SpeakerRole, type TranscriptSegment, type TranscriptionKind } from '../types';
@@ -35,7 +36,7 @@ const toPlainText = (
  * mis-transcribed without it.
  */
 export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AUDIENCIA' }) => {
-  const { hasFirm, isAvailable, isUploading, isTranscribing, result, error, roleProposals, persisted, maxAudioBytes, transcribe, assignRole, reset } =
+  const { hasFirm, isAvailable, isUploading, isTranscribing, result, error, roleProposals, persisted, maxAudioBytes, transcribe, assignRole, editSegment, canEdit, reset } =
     useTranscription(kind);
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -246,7 +247,17 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AU
               }}
             />
 
-            <TranscriptSegments result={result} kind={kind} onAssignRole={assignRole} />
+            {/* The recording plays from the browser's own copy of the file, so
+                a doubtful word can be checked against what was actually said —
+                the audio itself is deleted from storage once transcribed. */}
+            <AudioPreview file={selectedFile} />
+
+            <TranscriptSegments
+              result={result}
+              kind={kind}
+              onAssignRole={assignRole}
+              onEditSegment={canEdit ? editSegment : undefined}
+            />
           </>
         )}
       </div>

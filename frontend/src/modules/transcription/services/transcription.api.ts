@@ -191,6 +191,24 @@ export const transcriptionApi = {
       persisted: Boolean(data.persisted),
       roleProposals: data.roleProposals ?? []
     };
+  },
+
+  /**
+   * Persists a correction to one intervention.
+   *
+   * Saved rather than kept on screen, because the alternative is retyping
+   * "desembargo" every time the transcript is opened.
+   */
+  async editSegment(
+    firmId: string,
+    id: string,
+    segmentIndex: number,
+    text: string
+  ): Promise<void> {
+    await httpClient.patch(`/api/transcription/${id}/segment`, {
+      firmId,
+      body: { segmentIndex, text }
+    });
   }
 };
 

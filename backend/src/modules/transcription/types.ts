@@ -17,7 +17,11 @@ export type SpeakerRole =
   | 'DEFENSOR_PUEBLO'
   // Defensa penal y la persona procesada
   | 'DEFENSOR'
+  | 'INDICIADO'
+  | 'IMPUTADO'
+  | 'ACUSADO'
   | 'PROCESADO'
+  | 'CONDENADO'
   // Víctimas
   | 'VICTIMA'
   | 'REPRESENTANTE_VICTIMAS'

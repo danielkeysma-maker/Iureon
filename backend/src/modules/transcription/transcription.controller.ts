@@ -324,3 +324,44 @@ export const transcribeFromStorageController = async (
     });
   }
 };
+
+/**
+ * PATCH /api/transcription/:id/segment — Corrects the text of one intervention.
+ *
+ * A transcript is a draft until a lawyer reads it: the model wrote "desembarco"
+ * for DESEMBARGO and "con recámaras" for CONFECÁMARAS, both fluent and both
+ * wrong in a way only someone who knows the field catches. Key terms make that
+ * rarer, never impossible.
+ *
+ * Only the text changes. Speaker, role and timestamps are not editable here —
+ * this corrects what was said, never who said it or when.
+ */
+export const editTranscriptionSegmentController = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const index = Number(req.body.segmentIndex);
+  const text = typeof req.body.text === 'string' ? req.body.text : null;
+
+  if (!Number.isInteger(index) || index < 0 || text === null) {
+    res.status(400).json({
+      error: 'INVALID_EDIT',
+      message: 'Se requieren "segmentIndex" (entero) y "text".'
+    });
+    return;
+  }
+
+  const updated = await transcriptionStore.editSegment(
+    req.firmId as string,
+    String(req.params.id),
+    index,
+    text
+  );
+
+  if (!updated) {
+    res.status(404).json({ error: 'NOT_FOUND', message: 'No se encontró la intervención.' });
+    return;
+  }
+
+  res.json({ success: true, item: updated });
+};

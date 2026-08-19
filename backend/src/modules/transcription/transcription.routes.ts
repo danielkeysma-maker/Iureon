@@ -3,6 +3,7 @@ import multer, { MulterError } from 'multer';
 import {
   assignTranscriptionRolesController,
   deleteTranscriptionController,
+  editTranscriptionSegmentController,
   listTranscriptionsController,
   transcribeAudioController,
   transcribeFromStorageController,
@@ -72,6 +73,7 @@ const router = Router();
 router.get('/transcription', listTranscriptionsController as any);
 router.post('/transcription/from-storage', transcribeFromStorageController as any);
 router.patch('/transcription/:id/roles', assignTranscriptionRolesController as any);
+router.patch('/transcription/:id/segment', editTranscriptionSegmentController as any);
 router.delete('/transcription/:id', deleteTranscriptionController as any);
 router.post(
   '/transcription',

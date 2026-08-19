@@ -142,6 +142,69 @@ export class TranscriptionStore {
   }
 
   /**
+   * Replaces the text of one intervention, keeping everything else intact.
+   *
+   * A transcript is a draft until a human reads it. The model wrote "desembarco"
+   * for DESEMBARGO and "con recámaras" for CONFECÁMARAS — fluent, plausible, and
+   * wrong in a way only a lawyer catches. Key terms make that rarer, never
+   * impossible, so the person reading has to be able to fix it where they read
+   * it.
+   *
+   * The correction persists, because the alternative is fixing the same word on
+   * every visit. Speaker, role and timestamps are untouched: this edits what was
+   * said, never who said it or when.
+   */
+  async editSegment(
+    firmId: string,
+    id: string,
+    segmentIndex: number,
+    text: string
+  ): Promise<StoredTranscription | null> {
+    if (!supabase) return null;
+
+    const { data: existing, error: readError } = await supabase
+      .from('transcriptions')
+      .select('*')
+      .eq('firm_id', firmId)
+      .eq('id', id)
+      .single();
+
+    if (readError || !existing) {
+      console.error('[TRANSCRIPTION] Transcrito no encontrado para editar.');
+      return null;
+    }
+
+    const segments = [...(((existing as StoredTranscription).segments ?? []) as TranscriptSegment[])];
+
+    if (segmentIndex < 0 || segmentIndex >= segments.length) {
+      console.error(`[TRANSCRIPTION] Intervención ${segmentIndex} fuera de rango.`);
+      return null;
+    }
+
+    segments[segmentIndex] = { ...segments[segmentIndex], text };
+
+    const { data, error } = await supabase
+      .from('transcriptions')
+      .update({
+        segments,
+        // Kept in step so the copied text and the stored one never diverge.
+        full_text: segments.map((segment) => segment.text).join('\n\n'),
+        updated_at: new Date().toISOString()
+      })
+      .eq('firm_id', firmId)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('[TRANSCRIPTION] No se pudo guardar la corrección:', error.message);
+      return null;
+    }
+
+    return data as StoredTranscription;
+  }
+
+  /**
    * Deletion is the firm's, by design. Privileged material must not outlive the
    * decision of whoever owns it.
    */

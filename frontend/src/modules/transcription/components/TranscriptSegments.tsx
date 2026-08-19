@@ -13,6 +13,8 @@ interface TranscriptSegmentsProps {
   result: TranscriptionResult;
   kind: TranscriptionKind;
   onAssignRole: (speakerLabel: string, role: SpeakerRole) => void;
+  /** Absent when the transcript could not be stored: there is nothing to save into. */
+  onEditSegment?: (segmentIndex: number, text: string) => void;
 }
 
 /** Colour per speaker so a long hearing stays readable at a glance. */
@@ -45,7 +47,8 @@ const formatTimestamp = (seconds: number | null): string => {
 export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
   result,
   kind,
-  onAssignRole
+  onAssignRole,
+  onEditSegment
 }) => {
   const styleFor = (speakerLabel: string): string =>
     SPEAKER_STYLES[result.speakerLabels.indexOf(speakerLabel) % SPEAKER_STYLES.length];
@@ -116,7 +119,34 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                 </span>
               )}
             </div>
-            <p className="text-xs text-slate-700 leading-relaxed">{segment.text}</p>
+            {/*
+              Editable in place. A transcript is a draft until a lawyer reads
+              it: the model wrote "desembarco" for DESEMBARGO and "con
+              recámaras" for CONFECÁMARAS — fluent, plausible, and wrong in a
+              way only someone who knows the field catches. Corrections have to
+              happen where the mistake is read.
+
+              Saved when the field loses focus, so nothing is lost by clicking
+              away, and only when the text actually changed.
+            */}
+            <p
+              contentEditable={Boolean(onEditSegment)}
+              suppressContentEditableWarning
+              onBlur={(e) => {
+                const nuevo = e.currentTarget.textContent ?? '';
+                if (onEditSegment && nuevo.trim() && nuevo !== segment.text) {
+                  onEditSegment(index, nuevo.trim());
+                }
+              }}
+              className={`text-xs text-slate-700 leading-relaxed ${
+                onEditSegment
+                  ? 'outline-none focus:bg-amber-50/60 focus:ring-1 focus:ring-amber-300 rounded px-1 -mx-1 cursor-text'
+                  : ''
+              }`}
+              title={onEditSegment ? 'Haz clic para corregir el texto' : undefined}
+            >
+              {segment.text}
+            </p>
           </div>
         ))}
       </div>

@@ -42,7 +42,7 @@ interface RequestOptions {
 }
 
 const request = async <T>(
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
   path: string,
   { firmId, body, signal }: RequestOptions
 ): Promise<T> => {
@@ -116,6 +116,10 @@ export const httpClient = {
   get: <T>(path: string, options: RequestOptions) => request<T>('GET', path, options),
   post: <T>(path: string, options: RequestOptions) => request<T>('POST', path, options),
   put: <T>(path: string, options: RequestOptions) => request<T>('PUT', path, options),
+  // Added for partial updates — correcting one intervention of a transcript
+  // changes its text and nothing else, and PUT would imply replacing the whole
+  // record.
+  patch: <T>(path: string, options: RequestOptions) => request<T>('PATCH', path, options),
   delete: <T>(path: string, options: RequestOptions) => request<T>('DELETE', path, options),
   postForm
 };

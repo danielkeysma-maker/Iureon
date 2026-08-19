@@ -64,6 +64,8 @@ export const useTranscription = (kind: TranscriptionKind) => {
    * backend was willing to accept.
    */
   const [maxAudioBytes, setMaxAudioBytes] = useState<number>(FALLBACK_MAX_AUDIO_BYTES);
+  /** Id of the stored transcript. Null when it could not be saved. */
+  const [transcriptionId, setTranscriptionId] = useState<string | null>(null);
   /**
    * Whether the recording can go straight to storage instead of through the
    * API. It is what makes a two-hour hearing possible: the deployment rejects
@@ -129,6 +131,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
         setResult(outcome.result);
         setRoleProposals(outcome.roleProposals);
         setPersisted(outcome.persisted);
+        setTranscriptionId(outcome.id);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'No se pudo transcribir el audio.');
       } finally {
@@ -152,8 +155,42 @@ export const useTranscription = (kind: TranscriptionKind) => {
     );
   }, []);
 
+  /**
+   * Corrects one intervention, on screen and in the database.
+   *
+   * Applied locally first so the reader is not left waiting on a round trip for
+   * a word they just typed, and persisted because the alternative is retyping
+   * "desembargo" every time the transcript is opened.
+   */
+  const editSegment = useCallback(
+    async (segmentIndex: number, text: string) => {
+      setResult((current) =>
+        current
+          ? {
+              ...current,
+              segments: current.segments.map((segment, i) =>
+                i === segmentIndex ? { ...segment, text } : segment
+              )
+            }
+          : current
+      );
+
+      if (!transcriptionId) return;
+
+      try {
+        await transcriptionApi.editSegment(firmId, transcriptionId, segmentIndex, text);
+      } catch (err) {
+        // Surfaced, not swallowed: a correction the lawyer believes was saved
+        // and was not is worse than one they know to redo.
+        setError(err instanceof Error ? err.message : 'La corrección no se pudo guardar.');
+      }
+    },
+    [firmId, transcriptionId]
+  );
+
   const reset = useCallback(() => {
     setResult(null);
+    setTranscriptionId(null);
     setError(null);
     setRoleProposals([]);
     setPersisted(true);
@@ -172,6 +209,8 @@ export const useTranscription = (kind: TranscriptionKind) => {
     maxAudioBytes,
     transcribe,
     assignRole,
+    editSegment,
+    canEdit: Boolean(transcriptionId),
     reset
   };
 };
