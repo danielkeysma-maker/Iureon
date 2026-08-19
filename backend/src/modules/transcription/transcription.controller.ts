@@ -5,6 +5,7 @@ import {
   TranscriptionUnavailableError
 } from './transcription.service';
 import { proposeRoles } from './roleProposer';
+import { detectVoiceConflicts } from './voiceConflicts';
 import { BackblazeB2TenantStorageService } from '../documents/b2.service';
 import { transcriptionStore } from './transcriptionStore.service';
 import type { SpeakerRole, TranscriptionKind } from './types';
@@ -117,7 +118,10 @@ export const transcribeAudioController = async (req: Request, res: Response): Pr
       result,
       id: stored?.id ?? null,
       persisted: Boolean(stored),
-      roleProposals: proposeRoles(result.segments)
+      roleProposals: proposeRoles(result.segments),
+      // Recomputed fresh on every response: a warning must withdraw itself the
+      // moment the lawyer fixes what it pointed at.
+      voiceConflicts: detectVoiceConflicts(result.segments)
     });
   } catch (err) {
     if (err instanceof InvalidAudioError) {
@@ -183,7 +187,7 @@ export const assignTranscriptionRolesController = async (
     return;
   }
 
-  res.json({ success: true, item: updated });
+  res.json({ success: true, item: updated, voiceConflicts: detectVoiceConflicts(updated.segments) });
 };
 
 /**
@@ -305,7 +309,10 @@ export const transcribeFromStorageController = async (
       id: stored?.id ?? null,
       persisted: Boolean(stored),
       audioDeleted,
-      roleProposals: proposeRoles(result.segments)
+      roleProposals: proposeRoles(result.segments),
+      // Recomputed fresh on every response: a warning must withdraw itself the
+      // moment the lawyer fixes what it pointed at.
+      voiceConflicts: detectVoiceConflicts(result.segments)
     });
   } catch (err) {
     // Discarded here too, and awaited before the error reply for the same
@@ -363,7 +370,7 @@ export const editTranscriptionSegmentController = async (
     return;
   }
 
-  res.json({ success: true, item: updated });
+  res.json({ success: true, item: updated, voiceConflicts: detectVoiceConflicts(updated.segments) });
 };
 
 /**
@@ -409,7 +416,7 @@ export const reassignTranscriptionSpeakerController = async (
     return;
   }
 
-  res.json({ success: true, item: updated });
+  res.json({ success: true, item: updated, voiceConflicts: detectVoiceConflicts(updated.segments) });
 };
 
 /**
@@ -459,5 +466,5 @@ export const splitTranscriptionSegmentController = async (
     return;
   }
 
-  res.json({ success: true, item: updated });
+  res.json({ success: true, item: updated, voiceConflicts: detectVoiceConflicts(updated.segments) });
 };

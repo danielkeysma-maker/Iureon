@@ -1,12 +1,13 @@
 import React from 'react';
-import { Scissors, User, UserCog } from 'lucide-react';
+import { AlertTriangle, Scissors, User, UserCog } from 'lucide-react';
 import { buildSpeakerNames } from '../speakerNames';
 import {
   ROLE_LABELS,
   ROLE_OPTIONS,
   type SpeakerRole,
   type TranscriptionKind,
-  type TranscriptionResult
+  type TranscriptionResult,
+  type VoiceConflict
 } from '../types';
 
 interface TranscriptSegmentsProps {
@@ -24,6 +25,8 @@ interface TranscriptSegmentsProps {
    * intervention, this solves two people the engine filed under one label.
    */
   onReassignSpeaker?: (segmentIndex: number, speakerLabel: string) => void;
+  /** Labels whose own words claim two different people. Server-computed. */
+  voiceConflicts?: VoiceConflict[];
 }
 
 /** Colour per speaker so a long hearing stays readable at a glance. */
@@ -59,7 +62,8 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
   onAssignRole,
   onEditSegment,
   onSplitSegment,
-  onReassignSpeaker
+  onReassignSpeaker,
+  voiceConflicts = []
 }) => {
   const styleFor = (speakerLabel: string): string =>
     SPEAKER_STYLES[result.speakerLabels.indexOf(speakerLabel) % SPEAKER_STYLES.length];
@@ -151,6 +155,48 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
           ))}
         </div>
       </div>
+
+      {/*
+        One label, two people — said out loud, with the evidence.
+
+        The engine merges voices it cannot tell apart, and this hearing's own
+        text betrayed it: speaker_1 introduced himself as Tomás Wilches at 01:04
+        and as José Omar Gaitán, opposing counsel, at 03:15. The lawyer had to
+        catch that by reading. Now the app reads first, and shows the exact
+        phrases and minutes so the human can move the intervention — or decide
+        a name was simply misheard. It never separates anything by itself.
+      */}
+      {voiceConflicts.map((conflict) => (
+        <div
+          key={conflict.speakerLabel}
+          className="bg-amber-50 border border-amber-300 rounded-xl p-4"
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+            <h4 className="font-bold text-amber-900 text-xs">
+              La voz {speakerNames[conflict.speakerLabel] ?? conflict.speakerLabel} parece contener a{' '}
+              {conflict.identities.length} personas distintas
+            </h4>
+          </div>
+          <ul className="space-y-1 mb-2">
+            {conflict.identities.map((identity) => (
+              <li key={`${identity.segmentIndex}-${identity.name}`} className="text-[11px] text-amber-900">
+                <span className="font-semibold">{identity.name}</span>
+                {identity.atSeconds !== null && (
+                  <span className="font-mono text-amber-700"> · {formatTimestamp(identity.atSeconds)}</span>
+                )}
+                <span className="text-amber-800"> — «{identity.phrase}»</span>
+              </li>
+            ))}
+          </ul>
+          <p className="text-[11px] text-amber-800">
+            Cada quien se presentó con su propio nombre. Busca la intervención que no corresponde y
+            usa <span className="font-semibold">«Otra voz»</span> para dársela a la persona correcta,
+            o corrige el nombre si la transcripción lo oyó mal. Si esta voz es un intérprete que
+            habla por otras personas, asígnale el rol de Intérprete y este aviso se retira.
+          </p>
+        </div>
+      ))}
 
       {/* Transcript */}
       <div className="bg-white border border-slate-200 rounded-xl divide-y divide-slate-100">

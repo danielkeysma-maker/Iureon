@@ -36,7 +36,7 @@ const toPlainText = (
  * mis-transcribed without it.
  */
 export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AUDIENCIA' }) => {
-  const { hasFirm, isAvailable, isUploading, isTranscribing, result, error, roleProposals, persisted, maxAudioBytes, transcribe, assignRole, editSegment, splitSegment, reassignSpeaker, canEdit, reset } =
+  const { hasFirm, isAvailable, isUploading, isTranscribing, result, error, roleProposals, persisted, maxAudioBytes, transcribe, assignRole, editSegment, splitSegment, reassignSpeaker, voiceConflicts, canEdit, reset } =
     useTranscription(kind);
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -238,6 +238,24 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AU
 
             {!persisted && <NotPersistedWarning />}
 
+            {/*
+              The mutation errors, IN the result view. The only other error
+              display lives inside the upload panel, which unmounts the moment a
+              transcript exists — so a failed correction, cut, move or role
+              assignment set an error nobody could ever see. The edit stayed on
+              screen looking saved while the server still had the old text: a
+              silent lie in a legal transcript editor. Reported by review, not
+              by a user, but reachable by any transient network failure.
+            */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-xl p-3 flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+                <p className="text-[11px] text-red-800">
+                  {error} La pantalla se devolvió a lo último que sí quedó guardado.
+                </p>
+              </div>
+            )}
+
             <RoleProposals
               proposals={roleProposals}
               assigned={confirmed}
@@ -259,6 +277,7 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AU
               onEditSegment={canEdit ? editSegment : undefined}
               onSplitSegment={canEdit ? splitSegment : undefined}
               onReassignSpeaker={canEdit ? reassignSpeaker : undefined}
+              voiceConflicts={voiceConflicts}
             />
           </>
         )}

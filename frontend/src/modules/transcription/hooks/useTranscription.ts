@@ -7,7 +7,8 @@ import {
   type RoleProposal,
   type SpeakerRole,
   type TranscriptionKind,
-  type TranscriptionResult
+  type TranscriptionResult,
+  type VoiceConflict
 } from '../types';
 
 const megabytes = (bytes: number): string => (bytes / (1024 * 1024)).toFixed(1);
@@ -75,6 +76,13 @@ export const useTranscription = (kind: TranscriptionKind) => {
   const [result, setResult] = useState<TranscriptionResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [roleProposals, setRoleProposals] = useState<RoleProposal[]>([]);
+  /**
+   * Labels whose own words claim two different people. Replaced wholesale on
+   * every server response so a warning withdraws itself the moment the lawyer
+   * fixes what it pointed at — a stale warning teaches them to ignore all of
+   * them.
+   */
+  const [voiceConflicts, setVoiceConflicts] = useState<VoiceConflict[]>([]);
   /**
    * False after a transcription that could not be stored. The lawyer is about
    * to close a tab holding the only copy, so the screen has to say so.
@@ -152,6 +160,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
 
         setResult(outcome.result);
         setRoleProposals(outcome.roleProposals);
+        setVoiceConflicts(outcome.voiceConflicts);
         setPersisted(outcome.persisted);
         setTranscriptionId(outcome.id);
       } catch (err) {
@@ -181,6 +190,12 @@ export const useTranscription = (kind: TranscriptionKind) => {
    */
   const assignRole = useCallback(
     async (speakerLabel: string, role: SpeakerRole) => {
+      // Captured BEFORE the optimistic apply, because reverting is a promise
+      // this comment used to make and the code did not keep: review found the
+      // catch only set an error message, leaving the role on screen looking
+      // saved after a failed write.
+      const before = result?.segments;
+
       setResult((current) =>
         current
           ? {
@@ -195,7 +210,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
       if (!transcriptionId) return;
 
       try {
-        const { item } = await transcriptionApi.assignRoles(firmId, transcriptionId, {
+        const { item, voiceConflicts: fresh } = await transcriptionApi.assignRoles(firmId, transcriptionId, {
           [speakerLabel]: role
         });
 
@@ -204,11 +219,14 @@ export const useTranscription = (kind: TranscriptionKind) => {
             ? { ...current, segments: item.segments, speakerLabels: item.speaker_labels }
             : current
         );
+        setVoiceConflicts(fresh ?? []);
+        setError(null);
       } catch (err) {
+        setResult((current) => (current && before ? { ...current, segments: before } : current));
         setError(err instanceof Error ? err.message : 'No se pudo guardar el rol del interlocutor.');
       }
     },
-    [firmId, transcriptionId]
+    [firmId, transcriptionId, result]
   );
 
   /**
@@ -220,6 +238,8 @@ export const useTranscription = (kind: TranscriptionKind) => {
    */
   const editSegment = useCallback(
     async (segmentIndex: number, text: string) => {
+      const before = result?.segments;
+
       setResult((current) =>
         current
           ? {
@@ -234,14 +254,23 @@ export const useTranscription = (kind: TranscriptionKind) => {
       if (!transcriptionId) return;
 
       try {
-        await transcriptionApi.editSegment(firmId, transcriptionId, segmentIndex, text);
+        const { voiceConflicts: fresh } = await transcriptionApi.editSegment(
+          firmId,
+          transcriptionId,
+          segmentIndex,
+          text
+        );
+        setVoiceConflicts(fresh ?? []);
+        setError(null);
       } catch (err) {
-        // Surfaced, not swallowed: a correction the lawyer believes was saved
-        // and was not is worse than one they know to redo.
+        // Surfaced AND reverted: a correction the lawyer believes was saved
+        // and was not is worse than one they know to redo — and the belief
+        // came precisely from the corrected text staying on screen.
+        setResult((current) => (current && before ? { ...current, segments: before } : current));
         setError(err instanceof Error ? err.message : 'La corrección no se pudo guardar.');
       }
     },
-    [firmId, transcriptionId]
+    [firmId, transcriptionId, result]
   );
 
   /**
@@ -268,7 +297,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
         speakerLabel === '__nueva__' ? nextSpeakerLabel(result.speakerLabels) : speakerLabel;
 
       try {
-        const { item } = await transcriptionApi.splitSegment(
+        const { item, voiceConflicts: fresh } = await transcriptionApi.splitSegment(
           firmId,
           transcriptionId,
           segmentIndex,
@@ -284,6 +313,8 @@ export const useTranscription = (kind: TranscriptionKind) => {
             ? { ...current, segments: item.segments, speakerLabels: item.speaker_labels }
             : current
         );
+        setVoiceConflicts(fresh ?? []);
+        setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'No se pudo dividir la intervención.');
       }
@@ -309,7 +340,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
         speakerLabel === '__nueva__' ? nextSpeakerLabel(result.speakerLabels) : speakerLabel;
 
       try {
-        const { item } = await transcriptionApi.reassignSpeaker(
+        const { item, voiceConflicts: fresh } = await transcriptionApi.reassignSpeaker(
           firmId,
           transcriptionId,
           segmentIndex,
@@ -321,6 +352,8 @@ export const useTranscription = (kind: TranscriptionKind) => {
             ? { ...current, segments: item.segments, speakerLabels: item.speaker_labels }
             : current
         );
+        setVoiceConflicts(fresh ?? []);
+        setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'No se pudo cambiar la voz de la intervención.');
       }
@@ -333,6 +366,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
     setTranscriptionId(null);
     setError(null);
     setRoleProposals([]);
+    setVoiceConflicts([]);
     setPersisted(true);
   }, []);
 
@@ -345,6 +379,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
     result,
     error,
     roleProposals,
+    voiceConflicts,
     persisted,
     maxAudioBytes,
     transcribe,

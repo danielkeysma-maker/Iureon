@@ -4,7 +4,8 @@ import type {
   SpeakerRole,
   TranscriptSegment,
   TranscriptionKind,
-  TranscriptionResult
+  TranscriptionResult,
+  VoiceConflict
 } from '../types';
 
 interface StatusResponse {
@@ -35,6 +36,7 @@ interface TranscribeResponse {
    */
   persisted: boolean;
   roleProposals: RoleProposal[];
+  voiceConflicts?: VoiceConflict[];
 }
 
 export interface TranscriptionOutcome {
@@ -42,6 +44,7 @@ export interface TranscriptionOutcome {
   id: string | null;
   persisted: boolean;
   roleProposals: RoleProposal[];
+  voiceConflicts: VoiceConflict[];
 }
 
 interface UploadTarget {
@@ -125,7 +128,8 @@ export const transcriptionApi = {
       result: data.result,
       id: data.id ?? null,
       persisted: Boolean(data.persisted),
-      roleProposals: data.roleProposals ?? []
+      roleProposals: data.roleProposals ?? [],
+      voiceConflicts: data.voiceConflicts ?? []
     };
   },
 
@@ -195,7 +199,8 @@ export const transcriptionApi = {
       result: data.result,
       id: data.id ?? null,
       persisted: Boolean(data.persisted),
-      roleProposals: data.roleProposals ?? []
+      roleProposals: data.roleProposals ?? [],
+      voiceConflicts: data.voiceConflicts ?? []
     };
   },
 
@@ -210,8 +215,10 @@ export const transcriptionApi = {
     id: string,
     segmentIndex: number,
     text: string
-  ): Promise<void> {
-    await httpClient.patch(`/api/transcription/${id}/segment`, {
+  ): Promise<{ voiceConflicts?: VoiceConflict[] }> {
+    // The conflicts ride back because fixing one misheard word can be exactly
+    // what creates or resolves a two-people warning: names are words too.
+    return httpClient.patch(`/api/transcription/${id}/segment`, {
       firmId,
       body: { segmentIndex, text }
     });
@@ -236,7 +243,7 @@ export const transcriptionApi = {
     firmId: string,
     id: string,
     roles: Record<string, SpeakerRole>
-  ): Promise<{ item: { segments: TranscriptSegment[]; speaker_labels: string[] } }> {
+  ): Promise<{ item: { segments: TranscriptSegment[]; speaker_labels: string[] }; voiceConflicts?: VoiceConflict[] }> {
     return httpClient.patch(`/api/transcription/${id}/roles`, {
       firmId,
       body: { roles }
@@ -255,7 +262,7 @@ export const transcriptionApi = {
     id: string,
     segmentIndex: number,
     speakerLabel: string
-  ): Promise<{ item: { segments: TranscriptSegment[]; speaker_labels: string[] } }> {
+  ): Promise<{ item: { segments: TranscriptSegment[]; speaker_labels: string[] }; voiceConflicts?: VoiceConflict[] }> {
     return httpClient.patch(`/api/transcription/${id}/speaker`, {
       firmId,
       body: { segmentIndex, speakerLabel }
@@ -268,7 +275,7 @@ export const transcriptionApi = {
     segmentIndex: number,
     charOffset: number,
     speakerLabel: string
-  ): Promise<{ item: { segments: TranscriptSegment[]; speaker_labels: string[] } }> {
+  ): Promise<{ item: { segments: TranscriptSegment[]; speaker_labels: string[] }; voiceConflicts?: VoiceConflict[] }> {
     return httpClient.patch(`/api/transcription/${id}/split`, {
       firmId,
       body: { segmentIndex, charOffset, speakerLabel }

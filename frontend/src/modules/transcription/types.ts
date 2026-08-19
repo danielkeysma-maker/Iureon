@@ -141,6 +141,26 @@ export interface RoleEvidence {
   atSeconds: number | null;
 }
 
+/**
+ * One diarization label that introduced itself as two different people.
+ *
+ * The acoustic engine merges voices it cannot tell apart, and a Colombian
+ * hearing makes everyone identify themselves on the record — so the text
+ * betrays the merge even when the audio hides it. Warned, never auto-fixed:
+ * the lawyer moves the intervention, or decides a name was just misheard.
+ */
+export interface VoiceIdentity {
+  name: string;
+  phrase: string;
+  atSeconds: number | null;
+  segmentIndex: number;
+}
+
+export interface VoiceConflict {
+  speakerLabel: string;
+  identities: VoiceIdentity[];
+}
+
 export interface RoleProposal {
   speakerLabel: string;
   proposedRole: SpeakerRole;

@@ -12,6 +12,7 @@
     "smoke:embeddings": "npx ts-node --transpile-only src/scripts/smokeLocalEmbeddings.ts",
     "check:search": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/search/__checks__/search.check.ts",
     "check:roles": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/transcription/__checks__/roleProposer.check.ts",
+    "check:conflicts": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/transcription/__checks__/voiceConflicts.check.ts",
     "check:retrieval": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/search/__checks__/retrieval.check.ts",
     "ingest:corpus": "npx ts-node --transpile-only src/scripts/ingestCorpus.ts"
   },
