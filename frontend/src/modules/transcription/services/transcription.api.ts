@@ -1,5 +1,11 @@
 import { ApiError, httpClient } from '../../../config/httpClient';
-import type { RoleProposal, TranscriptSegment, TranscriptionKind, TranscriptionResult } from '../types';
+import type {
+  RoleProposal,
+  SpeakerRole,
+  TranscriptSegment,
+  TranscriptionKind,
+  TranscriptionResult
+} from '../types';
 
 interface StatusResponse {
   success: boolean;
@@ -218,6 +224,25 @@ export const transcriptionApi = {
    * split changes indices for every intervention after it, and guessing at that
    * on the client is how two views of the same transcript drift apart.
    */
+  /**
+   * Persists who each voice is.
+   *
+   * The endpoint existed from the start and nothing ever called it, so the
+   * lawyer's own identifications lived only on screen: the next operation that
+   * read the transcript back from the server returned the stored roles and
+   * erased them.
+   */
+  async assignRoles(
+    firmId: string,
+    id: string,
+    roles: Record<string, SpeakerRole>
+  ): Promise<{ item: { segments: TranscriptSegment[]; speaker_labels: string[] } }> {
+    return httpClient.patch(`/api/transcription/${id}/roles`, {
+      firmId,
+      body: { roles }
+    });
+  },
+
   /**
    * Moves one whole intervention to another voice.
    *

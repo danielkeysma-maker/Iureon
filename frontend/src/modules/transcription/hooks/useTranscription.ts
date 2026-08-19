@@ -164,18 +164,52 @@ export const useTranscription = (kind: TranscriptionKind) => {
   );
 
   /** Applies a procedural role to every segment of one diarized speaker. */
-  const assignRole = useCallback((speakerLabel: string, role: SpeakerRole) => {
-    setResult((current) =>
-      current
-        ? {
-            ...current,
-            segments: current.segments.map((segment) =>
-              segment.speakerLabel === speakerLabel ? { ...segment, role } : segment
-            )
-          }
-        : current
-    );
-  }, []);
+  /**
+   * Records who a voice is, on screen and in the database.
+   *
+   * IT ONLY LIVED ON SCREEN, AND THAT DESTROYED THE LAWYER'S WORK. The endpoint
+   * existed from the first day and nothing ever called it, so identifying the
+   * judge never left the browser. Every operation that reads the transcript back
+   * from the server — a cut, a reassignment, a correction — replaces the
+   * segments with the stored ones, and the stored ones still said DESCONOCIDO.
+   * Naming the voices and then cutting an intervention silently undid the
+   * naming, which read as the app refusing to let it be changed.
+   *
+   * Applied locally first so the choice lands immediately, then persisted. If
+   * the write fails the roles are put back as the server has them rather than
+   * left looking saved.
+   */
+  const assignRole = useCallback(
+    async (speakerLabel: string, role: SpeakerRole) => {
+      setResult((current) =>
+        current
+          ? {
+              ...current,
+              segments: current.segments.map((segment) =>
+                segment.speakerLabel === speakerLabel ? { ...segment, role } : segment
+              )
+            }
+          : current
+      );
+
+      if (!transcriptionId) return;
+
+      try {
+        const { item } = await transcriptionApi.assignRoles(firmId, transcriptionId, {
+          [speakerLabel]: role
+        });
+
+        setResult((current) =>
+          current
+            ? { ...current, segments: item.segments, speakerLabels: item.speaker_labels }
+            : current
+        );
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'No se pudo guardar el rol del interlocutor.');
+      }
+    },
+    [firmId, transcriptionId]
+  );
 
   /**
    * Corrects one intervention, on screen and in the database.
