@@ -214,56 +214,19 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                 </span>
               )}
             </div>
+
             {/*
-              Editable in place. A transcript is a draft until a lawyer reads
-              it: the model wrote "desembarco" for DESEMBARGO and "con
-              recámaras" for CONFECÁMARAS — fluent, plausible, and wrong in a
-              way only someone who knows the field catches. Corrections have to
-              happen where the mistake is read.
+              Ancladas a la cabecera, junto al botón que las abre, y no debajo
+              del texto.
 
-              Saved when the field loses focus, so nothing is lost by clicking
-              away, and only when the text actually changed.
+              Debajo funcionaba con intervenciones cortas y rompía el corte por
+              completo en las largas — que son justo las que hay que partir. Una
+              intervención de tres mil caracteres ocupa la pantalla entera, así
+              que el panel se abría cientos de píxeles más abajo, fuera de la
+              vista: se pulsaba Dividir y no ocurría nada visible. El defecto no
+              estaba en el corte sino en dónde aparecía la respuesta, y por eso
+              se comportaba distinto según la grabación.
             */}
-            <p
-              contentEditable={Boolean(onEditSegment)}
-              suppressContentEditableWarning
-              /*
-                The caret is reported as it moves, not read when Dividir is
-                pressed. Mouse and keyboard both, because a lawyer proof-reading
-                a transcript arrives at the cut point either way.
-
-                Not cleared on blur on purpose: pressing Dividir blurs this
-                paragraph, and clearing here would throw away the very position
-                the button is about to use.
-              */
-              onMouseUp={(e) => {
-                const offset = offsetEnParrafo(e.currentTarget);
-                if (offset === null) return;
-                setCaret({ index, offset });
-                setAviso(null);
-              }}
-              onKeyUp={(e) => {
-                const offset = offsetEnParrafo(e.currentTarget);
-                if (offset === null) return;
-                setCaret({ index, offset });
-                setAviso(null);
-              }}
-              onBlur={(e) => {
-                const nuevo = e.currentTarget.textContent ?? '';
-                if (onEditSegment && nuevo.trim() && nuevo !== segment.text) {
-                  onEditSegment(index, nuevo.trim());
-                }
-              }}
-              className={`text-xs text-slate-700 leading-relaxed ${
-                onEditSegment
-                  ? 'outline-none focus:bg-amber-50/60 focus:ring-1 focus:ring-amber-300 rounded px-1 -mx-1 cursor-text'
-                  : ''
-              }`}
-              title={onEditSegment ? 'Haz clic para corregir el texto' : undefined}
-            >
-              {segment.text}
-            </p>
-
             {/*
               The guidance that used to be a window.alert. A browser asked to
               stop showing dialogs silences alert() for the rest of the session,
@@ -321,6 +284,56 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                 </button>
               </div>
             )}
+            {/*
+              Editable in place. A transcript is a draft until a lawyer reads
+              it: the model wrote "desembarco" for DESEMBARGO and "con
+              recámaras" for CONFECÁMARAS — fluent, plausible, and wrong in a
+              way only someone who knows the field catches. Corrections have to
+              happen where the mistake is read.
+
+              Saved when the field loses focus, so nothing is lost by clicking
+              away, and only when the text actually changed.
+            */}
+            <p
+              contentEditable={Boolean(onEditSegment)}
+              suppressContentEditableWarning
+              /*
+                The caret is reported as it moves, not read when Dividir is
+                pressed. Mouse and keyboard both, because a lawyer proof-reading
+                a transcript arrives at the cut point either way.
+
+                Not cleared on blur on purpose: pressing Dividir blurs this
+                paragraph, and clearing here would throw away the very position
+                the button is about to use.
+              */
+              onMouseUp={(e) => {
+                const offset = offsetEnParrafo(e.currentTarget);
+                if (offset === null) return;
+                setCaret({ index, offset });
+                setAviso(null);
+              }}
+              onKeyUp={(e) => {
+                const offset = offsetEnParrafo(e.currentTarget);
+                if (offset === null) return;
+                setCaret({ index, offset });
+                setAviso(null);
+              }}
+              onBlur={(e) => {
+                const nuevo = e.currentTarget.textContent ?? '';
+                if (onEditSegment && nuevo.trim() && nuevo !== segment.text) {
+                  onEditSegment(index, nuevo.trim());
+                }
+              }}
+              className={`text-xs text-slate-700 leading-relaxed ${
+                onEditSegment
+                  ? 'outline-none focus:bg-amber-50/60 focus:ring-1 focus:ring-amber-300 rounded px-1 -mx-1 cursor-text'
+                  : ''
+              }`}
+              title={onEditSegment ? 'Haz clic para corregir el texto' : undefined}
+            >
+              {segment.text}
+            </p>
+
           </div>
         ))}
       </div>
