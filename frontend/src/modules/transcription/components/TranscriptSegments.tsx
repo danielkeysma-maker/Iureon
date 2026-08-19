@@ -64,13 +64,45 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
   const speakerNames = buildSpeakerNames(result.segments, ROLE_LABELS);
 
   /**
-   * The cut in progress: which intervention, and where the caret was.
+   * Where the caret sits, and which intervention it sits in.
    *
-   * The offset is captured when Dividir is pressed, before the selector below
-   * takes focus and destroys the selection — reading it later would always give
-   * zero.
+   * Tracked as the lawyer moves it rather than read when Dividir is pressed,
+   * because `window.getSelection()` is global: it answers "where is the caret in
+   * the document", not "where is the caret in this paragraph". Reading it from
+   * the button meant pressing Dividir on the judge while the caret rested in the
+   * defence's intervention cut the judge at the defence's offset — silently, at
+   * a position nobody chose.
    */
+  const [caret, setCaret] = React.useState<{ index: number; offset: number } | null>(null);
+
+  /** The intervention showing the "put the caret in the text first" notice. */
+  const [aviso, setAviso] = React.useState<number | null>(null);
+
+  /** The cut in progress: which intervention, and where it is being cut. */
   const [cutting, setCutting] = React.useState<{ index: number; offset: number } | null>(null);
+
+  /**
+   * The caret's offset within a paragraph, or null when the caret is elsewhere.
+   *
+   * Measured by selecting from the start of the paragraph up to the caret and
+   * counting that text, rather than trusting `anchorOffset`. The two agree only
+   * while the paragraph holds a single text node, and it does not: editing a
+   * transcript in place splits it into several, and from then on `anchorOffset`
+   * counts from the start of whichever fragment was clicked.
+   */
+  const offsetEnParrafo = (parrafo: HTMLElement): number | null => {
+    const seleccion = window.getSelection();
+    if (!seleccion || seleccion.rangeCount === 0) return null;
+
+    const rango = seleccion.getRangeAt(0);
+    if (!parrafo.contains(rango.startContainer)) return null;
+
+    const hastaElCursor = rango.cloneRange();
+    hastaElCursor.selectNodeContents(parrafo);
+    hastaElCursor.setEnd(rango.startContainer, rango.startOffset);
+
+    return hastaElCursor.toString().length;
+  };
 
   return (
     <div className="space-y-4">
@@ -132,29 +164,49 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                 under one label, and no role assignment can fix that. Only a cut
                 can.
               */}
-              {onSplitSegment && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    const seleccion = window.getSelection();
-                    const offset = seleccion?.anchorOffset ?? 0;
+              {onSplitSegment &&
+                (() => {
+                  // Armed only when the caret is inside THIS intervention and
+                  // leaves text on both sides. Shown in the button itself so the
+                  // lawyer can see the cut is ready before pressing, instead of
+                  // pressing and being told afterwards.
+                  const armado =
+                    caret !== null &&
+                    caret.index === index &&
+                    caret.offset > 0 &&
+                    caret.offset < segment.text.length;
 
-                    if (offset <= 0 || offset >= segment.text.length) {
-                      window.alert(
-                        'Haz clic dentro del texto, justo donde empieza a hablar la otra persona, y vuelve a pulsar Dividir.'
-                      );
-                      return;
-                    }
+                  return (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!armado) {
+                          // Told in the page, not through window.alert: a browser
+                          // that has been asked to stop showing dialogs silences
+                          // alert() outright, and the guard then failed with no
+                          // sign at all — Dividir simply did nothing.
+                          setAviso(index);
+                          setCutting(null);
+                          return;
+                        }
 
-                    setCutting({ index, offset });
-                  }}
-                  className="text-[10px] font-semibold text-slate-500 hover:text-blue-900 flex items-center gap-1"
-                  title="Separa esta intervención en dos, desde donde tengas el cursor"
-                >
-                  <Scissors className="w-3 h-3" />
-                  Dividir
-                </button>
-              )}
+                        setAviso(null);
+                        setCutting({ index, offset: caret.offset });
+                      }}
+                      className={`text-[10px] font-semibold flex items-center gap-1 ${
+                        armado ? 'text-blue-900' : 'text-slate-400 hover:text-slate-600'
+                      }`}
+                      title={
+                        armado
+                          ? 'Corta aquí, donde tienes el cursor'
+                          : 'Haz clic dentro del texto, donde empieza a hablar la otra persona'
+                      }
+                    >
+                      <Scissors className="w-3 h-3" />
+                      Dividir
+                    </button>
+                  );
+                })()}
 
               {segment.startSeconds !== null && (
                 <span className="text-[10px] font-mono text-slate-400 ml-auto">
@@ -175,6 +227,27 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
             <p
               contentEditable={Boolean(onEditSegment)}
               suppressContentEditableWarning
+              /*
+                The caret is reported as it moves, not read when Dividir is
+                pressed. Mouse and keyboard both, because a lawyer proof-reading
+                a transcript arrives at the cut point either way.
+
+                Not cleared on blur on purpose: pressing Dividir blurs this
+                paragraph, and clearing here would throw away the very position
+                the button is about to use.
+              */
+              onMouseUp={(e) => {
+                const offset = offsetEnParrafo(e.currentTarget);
+                if (offset === null) return;
+                setCaret({ index, offset });
+                setAviso(null);
+              }}
+              onKeyUp={(e) => {
+                const offset = offsetEnParrafo(e.currentTarget);
+                if (offset === null) return;
+                setCaret({ index, offset });
+                setAviso(null);
+              }}
               onBlur={(e) => {
                 const nuevo = e.currentTarget.textContent ?? '';
                 if (onEditSegment && nuevo.trim() && nuevo !== segment.text) {
@@ -190,6 +263,19 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
             >
               {segment.text}
             </p>
+
+            {/*
+              The guidance that used to be a window.alert. A browser asked to
+              stop showing dialogs silences alert() for the rest of the session,
+              and the check then failed invisibly: Dividir did nothing at all,
+              with no way to tell a refused cut from a broken button.
+            */}
+            {aviso === index && (
+              <p className="mt-2 text-[11px] text-amber-900 bg-amber-50 border border-amber-200 rounded-lg p-2">
+                Haz clic dentro del texto, justo donde empieza a hablar la otra persona, y vuelve a
+                pulsar Dividir.
+              </p>
+            )}
 
             {/*
               Whose the cut half is, asked rather than assumed. Always creating a
@@ -209,6 +295,9 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                     const destino = e.target.value || `speaker_${result.speakerLabels.length}`;
                     onSplitSegment?.(cutting.index, cutting.offset, destino);
                     setCutting(null);
+                    // A cut shifts every index after it, so the remembered
+                    // position no longer means what it did.
+                    setCaret(null);
                   }}
                   className="bg-white border border-slate-200 rounded-lg p-1.5 text-[11px] text-slate-900 focus:outline-none focus:border-blue-900"
                 >
