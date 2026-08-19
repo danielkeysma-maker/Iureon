@@ -1,4 +1,5 @@
 import { config } from '../../../config/env.config';
+import { COLOMBIAN_LEGAL_TERMS } from '../legalVocabulary';
 import type {
   RemoteTranscriptionRequest,
   TranscriptSegment,
@@ -96,22 +97,28 @@ export const mergeConsecutive = (segments: TranscriptSegment[]): TranscriptSegme
   }, []);
 
 /**
- * Domain vocabulary goes in as key terms, which is what the parameter exists
- * for. Colombian legal wording — "caducidad", "sustanciador", a radicado read
- * aloud — is mis-transcribed often enough that this is not a nicety, and party
- * names are the words a lawyer will notice getting wrong first.
+ * What the model is told to expect, in two layers.
+ *
+ * The firm's own context comes FIRST because it is unique to one hearing —
+ * party names, the court, a radicado read aloud — and the model has no chance
+ * at those otherwise. The standing Colombian legal vocabulary follows, because
+ * a lawyer cannot be expected to declare "desaprehensión" in advance: they only
+ * learn it was needed by reading the word "desaparición" in their own
+ * transcript, which is exactly how this was found.
+ *
+ * Deepgram's guidance is 20-50 terms against a 500-token ceiling. The standing
+ * list is 48 terms and roughly 150 tokens, so a firm's context always fits
+ * alongside it rather than competing for room.
  */
-const toKeyTerms = (contextPrompt?: string): string[] => {
-  if (!contextPrompt) return [];
+const KEYTERM_CAP = 60;
 
-  return [
-    ...new Set(
-      contextPrompt
-        .split(/[,;\n]/)
-        .map((term) => term.trim())
-        .filter((term) => term.length > 2 && term.length < 80)
-    )
-  ].slice(0, 100);
+const toKeyTerms = (contextPrompt?: string): string[] => {
+  const fromFirm = (contextPrompt ?? '')
+    .split(/[,;\n]/)
+    .map((term) => term.trim())
+    .filter((term) => term.length > 2 && term.length < 80);
+
+  return [...new Set([...fromFirm, ...COLOMBIAN_LEGAL_TERMS])].slice(0, KEYTERM_CAP);
 };
 
 export class DeepgramTranscriptionProvider implements TranscriptionProvider {
