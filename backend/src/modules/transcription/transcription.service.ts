@@ -21,6 +21,15 @@ import {
  * Cloudflare Workers AI — is cheaper still and does not diarize, so wiring it in
  * would mean returning a transcript that looks complete and silently is not.
  */
+/**
+ * Hard ceiling imposed by the host, not by us or the vendor.
+ *
+ * Vercel sets `VERCEL=1` in its runtime and rejects request bodies over 4.5 MB
+ * on every plan, with no configuration to raise it. Anywhere else the platform
+ * imposes nothing, so the provider's own limit stands.
+ */
+const PLATFORM_MAX_BODY_BYTES = process.env.VERCEL ? 4.5 * 1024 * 1024 : Number.MAX_SAFE_INTEGER;
+
 const resolveProvider = (): TranscriptionProvider =>
   config.deepgram.enabled ? new DeepgramTranscriptionProvider() : new OpenAITranscriptionProvider();
 
@@ -82,8 +91,26 @@ export class TranscriptionService {
     return this.provider.transcribeFromUrl(url, request);
   }
 
-  /** The configured backend's ceiling, so callers do not guess it. */
+  /**
+   * Largest file that can reach us THROUGH THE API, which is not the same as
+   * what the provider accepts.
+   *
+   * Vercel functions reject any request body over 4.5 MB, so on that platform
+   * the effective ceiling is theirs, not Deepgram's 200 MB. Reporting the
+   * provider's number in production was a fresh lie of exactly the kind this
+   * codebase keeps removing: the screen would promise 200 MB, the lawyer would
+   * send a 50 MB hearing, and Vercel would answer 413 before our code ran —
+   * an opaque failure pointing at nothing.
+   *
+   * The larger limit is still real, but only through storage: audio uploaded
+   * straight to B2 never crosses this function. See `supportsRemoteAudio`.
+   */
   get maxAudioBytes(): number {
+    return Math.min(this.provider.maxAudioBytes, PLATFORM_MAX_BODY_BYTES);
+  }
+
+  /** What the provider itself accepts, reachable via the storage path. */
+  get providerMaxAudioBytes(): number {
     return this.provider.maxAudioBytes;
   }
 

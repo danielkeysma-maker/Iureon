@@ -30,7 +30,13 @@ export const transcriptionStatusController = (_req: Request, res: Response): voi
   res.json({
     success: true,
     available: transcriptionService.isAvailable(),
-    maxAudioBytes: transcriptionService.maxAudioBytes
+    // What fits through the API here, which on Vercel is the platform's 4.5 MB
+    // and not the provider's 200. The browser validates against this one.
+    maxAudioBytes: transcriptionService.maxAudioBytes,
+    // What the provider accepts when the audio reaches it via storage instead
+    // of through us. The gap between the two is why that path exists.
+    maxAudioBytesViaStorage: transcriptionService.providerMaxAudioBytes,
+    supportsRemoteAudio: transcriptionService.supportsRemoteAudio
   });
 };
 
