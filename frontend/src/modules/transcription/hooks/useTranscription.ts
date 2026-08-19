@@ -45,6 +45,28 @@ const validate = (file: File, limit: number): string | null => {
  * different people spoke; only someone who was in the room knows which one was
  * the judge.
  */
+/**
+ * Names a voice that is not in the hearing yet.
+ *
+ * Counting the voices and calling the new one `speaker_<count>` looked safe and
+ * was not: moving a voice's last intervention away retires it, so the count
+ * stops matching the highest number in use. With speaker_1 retired, three voices
+ * remain — 0, 2, 3 — and a count of three names the new one `speaker_3`, which
+ * already belongs to somebody. The intervention would be filed under that
+ * person and inherit their procedural role, silently, which is the very defect
+ * this pair of tools exists to undo.
+ *
+ * So the first free number wins, whatever the count says.
+ */
+const nextSpeakerLabel = (existing: string[]): string => {
+  const taken = new Set(existing);
+
+  for (let n = 0; ; n += 1) {
+    const label = `speaker_${n}`;
+    if (!taken.has(label)) return label;
+  }
+};
+
 export const useTranscription = (kind: TranscriptionKind) => {
   const { firmId } = useTenant();
 
@@ -204,12 +226,12 @@ export const useTranscription = (kind: TranscriptionKind) => {
     async (segmentIndex: number, charOffset: number, speakerLabel: string) => {
       if (!transcriptionId || !result) return;
 
-      // "__nueva__" is the UI's way of saying "nobody here": mint a label that
-      // does not collide. Anything else is a voice already in the transcript,
-      // and the server gives the cut half that voice's role — which is what
-      // keeps an interrupted judge from coming back as a second judge.
+      // "__nueva__" is the UI's way of saying "nobody here". Anything else is a
+      // voice already in the transcript, and the server gives the cut half that
+      // voice's role — which is what keeps an interrupted judge from coming
+      // back as a second judge.
       const destino =
-        speakerLabel === '__nueva__' ? `speaker_${result.speakerLabels.length}` : speakerLabel;
+        speakerLabel === '__nueva__' ? nextSpeakerLabel(result.speakerLabels) : speakerLabel;
 
       try {
         const { item } = await transcriptionApi.splitSegment(
@@ -250,7 +272,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
       if (!transcriptionId || !result) return;
 
       const destino =
-        speakerLabel === '__nueva__' ? `speaker_${result.speakerLabels.length}` : speakerLabel;
+        speakerLabel === '__nueva__' ? nextSpeakerLabel(result.speakerLabels) : speakerLabel;
 
       try {
         const { item } = await transcriptionApi.reassignSpeaker(
