@@ -111,6 +111,7 @@ export const transcribeAudioController = async (req: Request, res: Response): Pr
      * the phrase and second that produced it so the lawyer confirms from
      * evidence rather than from our confidence.
      */
+
     res.json({
       success: true,
       result,
@@ -250,20 +251,34 @@ export const transcribeFromStorageController = async (
   }
 
   /*
-   * Deletion runs in `finally`, and that placement is the point.
+   * The recording is deleted BEFORE responding, in both outcomes.
    *
-   * It used to sit after the transcription, inside the try, so any failure
-   * before it — a bad link, a provider error, an exhausted quota — left the
-   * recording in B2 permanently. A first test proved it: Deepgram answered 404
-   * for a malformed URL and the audio stayed behind, which is privileged
-   * material accumulating through the very path built to avoid storing it.
+   * Two placements failed before this one. Deleting after the transcription
+   * inside the `try` left the audio behind whenever transcription threw — a
+   * first test proved it, Deepgram answering 404 and the file staying in B2
+   * forever. Moving it to `finally` fixed that locally and still failed in
+   * production, which is the interesting part: a serverless function is frozen
+   * once its response is sent, so work scheduled after `res.json()` may simply
+   * never run. The local server kept going and did the delete; Vercel did not.
    *
-   * Deleted whether or not the transcript succeeded. The recording is a
-   * transient artefact of an upload limit; if a transcription fails the lawyer
-   * re-uploads, and that costs a minute. Audio nobody can account for costs
-   * more.
+   * So it happens inside the request, before the reply. Deleted whether or not
+   * the transcript succeeded: the recording is a transient artefact of an
+   * upload limit, a failed transcription costs a re-upload, and privileged
+   * audio nobody can account for costs more.
    */
-  let deleted = false;
+  const discardAudio = async (): Promise<boolean> => {
+    const removed = await b2StorageService.deleteObject(firmId, fileKey).catch(() => false);
+
+    if (!removed) {
+      // Worded for both cases: the delete returns false for "failed" and for
+      // "was not there" alike, and b2.service already logged which. Claiming
+      // privileged audio is sitting in storage when the object never existed is
+      // a false alarm, and false alarms are how real ones get ignored.
+      console.warn(`[TRANSCRIPTION] El audio ${fileKey} no se borró (falló o no existía).`);
+    }
+
+    return removed;
+  };
 
   try {
     const audioUrl = await b2StorageService.generateDownloadPresignedUrl(firmId, fileKey);
@@ -282,14 +297,21 @@ export const transcribeFromStorageController = async (
       result
     );
 
+    const audioDeleted = await discardAudio();
+
     res.json({
       success: true,
       result,
       id: stored?.id ?? null,
       persisted: Boolean(stored),
+      audioDeleted,
       roleProposals: proposeRoles(result.segments)
     });
   } catch (err) {
+    // Discarded here too, and awaited before the error reply for the same
+    // reason: after the response there may be no process left to do it.
+    await discardAudio();
+
     if (err instanceof TranscriptionUnavailableError) {
       res.status(503).json({ error: 'TRANSCRIPTION_UNAVAILABLE', message: err.message });
       return;
@@ -300,16 +322,5 @@ export const transcribeFromStorageController = async (
       error: 'TRANSCRIPTION_FAILED',
       message: err instanceof Error ? err.message : 'No se pudo transcribir el audio.'
     });
-  } finally {
-    deleted = await b2StorageService.deleteObject(firmId, fileKey).catch(() => false);
-
-    if (!deleted) {
-      // Worded for both cases, because the delete returns false for "failed"
-      // and for "was not there" alike, and b2.service has already logged which.
-      // Claiming privileged audio is sitting in storage when the object never
-      // existed is a false alarm, and false alarms are how real ones get
-      // ignored.
-      console.warn(`[TRANSCRIPTION] El audio ${fileKey} no se borró (falló o no existía).`);
-    }
   }
 };
