@@ -3,6 +3,7 @@ import { DeepgramTranscriptionProvider } from './providers/deepgram.provider';
 import { OpenAITranscriptionProvider } from './providers/openai.provider';
 import {
   SUPPORTED_AUDIO_FORMATS,
+  type RemoteTranscriptionRequest,
   type TranscriptionProvider,
   type TranscriptionRequest,
   type TranscriptionResult
@@ -52,6 +53,34 @@ const megabytes = (bytes: number): string => (bytes / (1024 * 1024)).toFixed(1);
  */
 export class TranscriptionService {
   constructor(private readonly provider: TranscriptionProvider = resolveProvider()) {}
+
+  /**
+   * Whether the backend can fetch audio itself, which is what makes a real
+   * hearing possible at all: the deployment rejects request bodies over 4.5 MB
+   * and a two-hour recording is around 50.
+   */
+  get supportsRemoteAudio(): boolean {
+    return typeof this.provider.transcribeFromUrl === 'function';
+  }
+
+  /** Transcribes audio the provider downloads from a signed, temporary link. */
+  async transcribeFromUrl(url: string, request: RemoteTranscriptionRequest): Promise<TranscriptionResult> {
+    if (!this.provider.isConfigured()) {
+      throw new TranscriptionUnavailableError(
+        'El motor de transcripción no está configurado. Falta DEEPGRAM_API_KEY en el servidor ' +
+          '(o OPENAI_API_KEY si prefieres ese proveedor).'
+      );
+    }
+
+    if (!this.provider.transcribeFromUrl) {
+      throw new TranscriptionUnavailableError(
+        `El proveedor "${this.provider.name}" no puede leer audio desde una URL, así que una ` +
+          'grabación larga no tiene cómo llegarle. Configura Deepgram.'
+      );
+    }
+
+    return this.provider.transcribeFromUrl(url, request);
+  }
 
   /** The configured backend's ceiling, so callers do not guess it. */
   get maxAudioBytes(): number {

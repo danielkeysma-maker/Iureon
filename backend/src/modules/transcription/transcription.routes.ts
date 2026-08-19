@@ -5,6 +5,7 @@ import {
   deleteTranscriptionController,
   listTranscriptionsController,
   transcribeAudioController,
+  transcribeFromStorageController,
   transcriptionStatusController
 } from './transcription.controller';
 import { transcriptionService } from './transcription.controller';
@@ -69,6 +70,7 @@ export const transcriptionPublicRoutes = publicRouter;
 
 const router = Router();
 router.get('/transcription', listTranscriptionsController as any);
+router.post('/transcription/from-storage', transcribeFromStorageController as any);
 router.patch('/transcription/:id/roles', assignTranscriptionRolesController as any);
 router.delete('/transcription/:id', deleteTranscriptionController as any);
 router.post(

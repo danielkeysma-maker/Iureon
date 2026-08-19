@@ -1,5 +1,6 @@
 import { config } from '../../../config/env.config';
 import type {
+  RemoteTranscriptionRequest,
   TranscriptSegment,
   TranscriptionProvider,
   TranscriptionRequest,
@@ -103,7 +104,8 @@ export class DeepgramTranscriptionProvider implements TranscriptionProvider {
     return Boolean(config.deepgram?.apiKey);
   }
 
-  async transcribe(request: TranscriptionRequest): Promise<TranscriptionResult> {
+  /** Shared by both paths so the two cannot drift into different settings. */
+  private buildParams(request: RemoteTranscriptionRequest): URLSearchParams {
     const params = new URLSearchParams({
       model: MODEL,
       language: request.language ?? DEFAULT_LANGUAGE,
@@ -117,7 +119,11 @@ export class DeepgramTranscriptionProvider implements TranscriptionProvider {
       params.append('keyterm', term);
     }
 
-    const response = await fetch(`${ENDPOINT}?${params.toString()}`, {
+    return params;
+  }
+
+  async transcribe(request: TranscriptionRequest): Promise<TranscriptionResult> {
+    const response = await fetch(`${ENDPOINT}?${this.buildParams(request).toString()}`, {
       method: 'POST',
       headers: {
         Authorization: `Token ${config.deepgram.apiKey}`,
@@ -125,6 +131,35 @@ export class DeepgramTranscriptionProvider implements TranscriptionProvider {
       },
       body: new Uint8Array(request.audio)
     });
+
+    return this.toResult(await this.readResponse(response), request.kind);
+  }
+
+  /**
+   * Hands Deepgram a URL and lets it fetch the audio itself.
+   *
+   * This is the path a real hearing takes. Vercel functions reject bodies over
+   * 4.5 MB and a two-hour recording is around 50, so the audio never travels
+   * through the API: the browser uploads it to B2, and only a signed, temporary
+   * link crosses the wire. The caller deletes the object afterwards — the
+   * detour through storage is acceptable only because it ends.
+   */
+  async transcribeFromUrl(url: string, request: RemoteTranscriptionRequest): Promise<TranscriptionResult> {
+    const response = await fetch(`${ENDPOINT}?${this.buildParams(request).toString()}`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Token ${config.deepgram.apiKey}`,
+        // Required for the URL form. Without it Deepgram reads the JSON as audio
+        // and answers "corrupt or unsupported data", which points at the file.
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ url })
+    });
+
+    return this.toResult(await this.readResponse(response), request.kind);
+  }
+
+  private async readResponse(response: Response): Promise<DeepgramResponse> {
 
     if (!response.ok) {
       // Surfaced with the provider's own wording: "audio too short" and "quota
@@ -134,18 +169,21 @@ export class DeepgramTranscriptionProvider implements TranscriptionProvider {
       throw new Error(`Deepgram respondió ${response.status}: ${detail.slice(0, 300)}`);
     }
 
-    const payload = (await response.json()) as DeepgramResponse;
+    return (await response.json()) as DeepgramResponse;
+  }
+
+  private toResult(payload: DeepgramResponse, kind: TranscriptionRequest['kind']): TranscriptionResult {
     const utterances = payload.results?.utterances ?? [];
     const segments = toSegments(utterances);
 
     const channelTranscript = payload.results?.channels?.[0]?.alternatives?.[0]?.transcript;
 
     return {
-      kind: request.kind,
+      kind,
       fullText: channelTranscript ?? segments.map((segment) => segment.text).join('\n'),
       segments,
       speakerLabels: [...new Set(segments.map((segment) => segment.speakerLabel))],
-      language: payload.results?.channels?.[0]?.detected_language ?? request.language ?? DEFAULT_LANGUAGE,
+      language: payload.results?.channels?.[0]?.detected_language ?? DEFAULT_LANGUAGE,
       durationSeconds: payload.metadata?.duration ?? null,
       model: `${MODEL}+diarize:${DIARIZATION_MODEL}`,
       transcribedAt: new Date().toISOString()

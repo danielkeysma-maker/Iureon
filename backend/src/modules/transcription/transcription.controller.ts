@@ -5,10 +5,14 @@ import {
   TranscriptionUnavailableError
 } from './transcription.service';
 import { proposeRoles } from './roleProposer';
+import { BackblazeB2TenantStorageService } from '../documents/b2.service';
 import { transcriptionStore } from './transcriptionStore.service';
 import type { SpeakerRole, TranscriptionKind } from './types';
 
 export const transcriptionService = new TranscriptionService();
+
+/** Reads the uploaded audio and deletes it once transcribed. */
+const b2StorageService = new BackblazeB2TenantStorageService();
 
 const VALID_KINDS: TranscriptionKind[] = ['AUDIENCIA', 'ENTREVISTA'];
 
@@ -187,4 +191,101 @@ export const deleteTranscriptionController = async (req: Request, res: Response)
   }
 
   res.json({ success: true });
+};
+
+/**
+ * POST /api/transcription/from-storage — Transcribes audio already in B2.
+ *
+ * THE PATH A REAL HEARING TAKES. Vercel functions reject request bodies over
+ * 4.5 MB and a two-hour recording is around 50, so the audio cannot travel
+ * through the API at all. The browser uploads it straight to B2 with a signed
+ * URL, sends only the resulting key here, and Deepgram fetches it from a
+ * temporary link. Nothing large crosses this function.
+ *
+ * The recording is DELETED once transcribed. That matters: the upload path
+ * keeps audio in memory precisely so privileged material never persists, and
+ * routing it through storage would quietly undo that if the object stayed. The
+ * detour is acceptable only because it ends.
+ */
+export const transcribeFromStorageController = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const fileKey = String(req.body.fileKey ?? '').trim();
+  const kind = (req.body.kind as TranscriptionKind) || 'AUDIENCIA';
+
+  if (!fileKey) {
+    res.status(400).json({
+      error: 'MISSING_FILE_KEY',
+      message: 'Se requiere "fileKey": la ruta del audio ya subido a almacenamiento.'
+    });
+    return;
+  }
+
+  if (!VALID_KINDS.includes(kind)) {
+    res.status(400).json({
+      error: 'INVALID_KIND',
+      message: `El campo "kind" debe ser uno de: ${VALID_KINDS.join(', ')}.`
+    });
+    return;
+  }
+
+  const firmId = req.firmId as string;
+
+  // The firm prefix is checked before anything else. Without it, a caller could
+  // name another firm's object and have us transcribe — and store — a hearing
+  // that is not theirs.
+  if (!fileKey.startsWith(`${firmId}/`)) {
+    res.status(403).json({
+      error: 'FORBIDDEN',
+      message: 'Ese archivo no pertenece a la firma autenticada.'
+    });
+    return;
+  }
+
+  try {
+    const audioUrl = await b2StorageService.generateDownloadPresignedUrl(firmId, fileKey);
+
+    const result = await transcriptionService.transcribeFromUrl(audioUrl, {
+      kind,
+      contextPrompt: req.body.contextPrompt,
+      language: req.body.language
+    });
+
+    const stored = await transcriptionStore.save(
+      firmId,
+      (req.body.userEmail as string) || 'desconocido',
+      (req.body.title as string) || fileKey.split('/').pop() || 'Transcripción',
+      fileKey,
+      result
+    );
+
+    // Deleted even when the save failed: the transcript may be lost, but the
+    // recording must not linger either way. Reported, never silent.
+    const deleted = await b2StorageService.deleteObject(firmId, fileKey);
+
+    if (!deleted) {
+      console.warn(`[TRANSCRIPTION] El audio ${fileKey} no se pudo borrar de B2 y sigue almacenado.`);
+    }
+
+    res.json({
+      success: true,
+      result,
+      id: stored?.id ?? null,
+      persisted: Boolean(stored),
+      audioDeleted: deleted,
+      roleProposals: proposeRoles(result.segments)
+    });
+  } catch (err) {
+    if (err instanceof TranscriptionUnavailableError) {
+      res.status(503).json({ error: 'TRANSCRIPTION_UNAVAILABLE', message: err.message });
+      return;
+    }
+
+    console.error('[TRANSCRIPTION] Error transcribiendo desde almacenamiento:', err);
+    res.status(502).json({
+      error: 'TRANSCRIPTION_FAILED',
+      message: err instanceof Error ? err.message : 'No se pudo transcribir el audio.'
+    });
+  }
 };

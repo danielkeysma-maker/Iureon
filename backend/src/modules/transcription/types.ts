@@ -78,6 +78,23 @@ export interface TranscriptionProvider {
   /** True when the provider has credentials and can actually be called. */
   isConfigured(): boolean;
   transcribe(request: TranscriptionRequest): Promise<TranscriptionResult>;
+  /**
+   * Transcribes audio the provider fetches itself, from a URL we hand it.
+   *
+   * Declared optional because it is a real capability difference, not a detail:
+   * Deepgram reads remote audio, OpenAI's endpoint does not. It matters because
+   * the deployment target rejects request bodies over 4.5 MB, so a two-hour
+   * hearing cannot travel through the API at all — the browser uploads it
+   * straight to storage and only this path can reach it.
+   */
+  transcribeFromUrl?(url: string, request: RemoteTranscriptionRequest): Promise<TranscriptionResult>;
+}
+
+/** Everything a transcription needs except the audio itself. */
+export interface RemoteTranscriptionRequest {
+  kind: TranscriptionKind;
+  contextPrompt?: string;
+  language?: string;
 }
 
 /** Audio formats the transcription API accepts. */
