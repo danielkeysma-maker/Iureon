@@ -21,6 +21,15 @@ export interface B2FileObject {
 export class BackblazeB2TenantStorageService {
   private b2: any;
   private isAuthorized = false;
+  /**
+   * Download host, taken from B2's own authorize response.
+   *
+   * It was hardcoded to `f000.backblazeb2.com`, and this account lives on
+   * `f005`. Every download link pointed at the wrong pod, which is why Deepgram
+   * fetched a 404 for a file that had uploaded successfully seconds earlier.
+   * B2 reports the correct host on every authorisation; nothing was reading it.
+   */
+  private downloadHost = '';
 
   constructor() {
     this.b2 = new B2({
@@ -33,7 +42,8 @@ export class BackblazeB2TenantStorageService {
     if (this.isAuthorized) return;
     try {
       if (config.backblaze.applicationKeyId && config.backblaze.applicationKeyId !== 'MOCK_B2_KEY_ID') {
-        await this.b2.authorize();
+        const auth = await this.b2.authorize();
+        this.downloadHost = auth?.data?.downloadUrl ?? '';
         this.isAuthorized = true;
       }
     } catch (err: any) {
@@ -104,7 +114,10 @@ export class BackblazeB2TenantStorageService {
           validDurationInSeconds: 900
         });
 
-        return `https://f000.backblazeb2.com/file/${config.backblaze.bucketId}/${fileKey}?Authorization=${downloadAuth.data.authorizationToken}`;
+        // By NAME, not by id: B2's download-by-name route is
+        // /file/{bucketName}/{fileName}, and passing the id yields a 404 that
+        // looks like a missing file rather than a malformed URL.
+        return `${this.downloadHost}/file/${config.backblaze.bucketName}/${fileKey}?Authorization=${downloadAuth.data.authorizationToken}`;
       } catch (err: any) {
         console.warn('[B2-DOWNLOAD-FALLBACK] Error generando token:', err.message);
       }
@@ -188,7 +201,7 @@ export class BackblazeB2TenantStorageService {
           fileKey: file.fileName,
           sizeBytes: file.contentLength,
           uploadTimestamp: new Date(file.uploadTimestamp).toISOString(),
-          downloadUrl: `https://f000.backblazeb2.com/file/${config.backblaze.bucketId}/${file.fileName}`
+          downloadUrl: `${this.downloadHost}/file/${config.backblaze.bucketName}/${file.fileName}`
         }));
       } catch (err: any) {
         console.warn('[B2-LIST-FALLBACK] Error listando archivos:', err.message);

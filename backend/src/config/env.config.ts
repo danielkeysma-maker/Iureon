@@ -143,6 +143,9 @@ export const config = {
     enabled: backblazeEnabled,
     applicationKeyId: read('B2_APPLICATION_KEY_ID'),
     applicationKey: read('B2_APPLICATION_KEY'),
-    bucketId: read('B2_BUCKET_ID')
+    bucketId: read('B2_BUCKET_ID'),
+    // Needed for download URLs, which B2 builds by NAME and not by id. Its
+    // absence is why Deepgram fetched a 404 from a file that was there.
+    bucketName: read('B2_BUCKET_NAME')
   }
 };

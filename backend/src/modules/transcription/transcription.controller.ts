@@ -249,6 +249,22 @@ export const transcribeFromStorageController = async (
     return;
   }
 
+  /*
+   * Deletion runs in `finally`, and that placement is the point.
+   *
+   * It used to sit after the transcription, inside the try, so any failure
+   * before it — a bad link, a provider error, an exhausted quota — left the
+   * recording in B2 permanently. A first test proved it: Deepgram answered 404
+   * for a malformed URL and the audio stayed behind, which is privileged
+   * material accumulating through the very path built to avoid storing it.
+   *
+   * Deleted whether or not the transcript succeeded. The recording is a
+   * transient artefact of an upload limit; if a transcription fails the lawyer
+   * re-uploads, and that costs a minute. Audio nobody can account for costs
+   * more.
+   */
+  let deleted = false;
+
   try {
     const audioUrl = await b2StorageService.generateDownloadPresignedUrl(firmId, fileKey);
 
@@ -266,20 +282,11 @@ export const transcribeFromStorageController = async (
       result
     );
 
-    // Deleted even when the save failed: the transcript may be lost, but the
-    // recording must not linger either way. Reported, never silent.
-    const deleted = await b2StorageService.deleteObject(firmId, fileKey);
-
-    if (!deleted) {
-      console.warn(`[TRANSCRIPTION] El audio ${fileKey} no se pudo borrar de B2 y sigue almacenado.`);
-    }
-
     res.json({
       success: true,
       result,
       id: stored?.id ?? null,
       persisted: Boolean(stored),
-      audioDeleted: deleted,
       roleProposals: proposeRoles(result.segments)
     });
   } catch (err) {
@@ -293,5 +300,16 @@ export const transcribeFromStorageController = async (
       error: 'TRANSCRIPTION_FAILED',
       message: err instanceof Error ? err.message : 'No se pudo transcribir el audio.'
     });
+  } finally {
+    deleted = await b2StorageService.deleteObject(firmId, fileKey).catch(() => false);
+
+    if (!deleted) {
+      // Worded for both cases, because the delete returns false for "failed"
+      // and for "was not there" alike, and b2.service has already logged which.
+      // Claiming privileged audio is sitting in storage when the object never
+      // existed is a false alarm, and false alarms are how real ones get
+      // ignored.
+      console.warn(`[TRANSCRIPTION] El audio ${fileKey} no se borró (falló o no existía).`);
+    }
   }
 };
