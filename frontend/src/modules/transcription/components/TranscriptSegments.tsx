@@ -16,7 +16,7 @@ interface TranscriptSegmentsProps {
   /** Absent when the transcript could not be stored: there is nothing to save into. */
   onEditSegment?: (segmentIndex: number, text: string) => void;
   /** Cuts an intervention that holds two voices. Same storage requirement. */
-  onSplitSegment?: (segmentIndex: number, charOffset: number) => void;
+  onSplitSegment?: (segmentIndex: number, charOffset: number, speakerLabel: string) => void;
 }
 
 /** Colour per speaker so a long hearing stays readable at a glance. */
@@ -62,6 +62,15 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
   // Shared with the copied text so the screen and the clipboard never disagree
   // about who said what.
   const speakerNames = buildSpeakerNames(result.segments, ROLE_LABELS);
+
+  /**
+   * The cut in progress: which intervention, and where the caret was.
+   *
+   * The offset is captured when Dividir is pressed, before the selector below
+   * takes focus and destroys the selection — reading it later would always give
+   * zero.
+   */
+  const [cutting, setCutting] = React.useState<{ index: number; offset: number } | null>(null);
 
   return (
     <div className="space-y-4">
@@ -137,7 +146,7 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                       return;
                     }
 
-                    onSplitSegment(index, offset);
+                    setCutting({ index, offset });
                   }}
                   className="text-[10px] font-semibold text-slate-500 hover:text-blue-900 flex items-center gap-1"
                   title="Separa esta intervención en dos, desde donde tengas el cursor"
@@ -181,6 +190,48 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
             >
               {segment.text}
             </p>
+
+            {/*
+              Whose the cut half is, asked rather than assumed. Always creating a
+              new voice produced a visible bug: cutting an interruption out of
+              the judge's turn left her second half as a separate voice, and once
+              it was marked JUEZ the transcript read "Juez 1" and "Juez 2" for one
+              person. Handing the tail back to somebody already in the room is the
+              common case — most often whoever was interrupted.
+            */}
+            {cutting?.index === index && (
+              <div className="mt-2 flex flex-wrap items-center gap-2 bg-amber-50/70 border border-amber-200 rounded-lg p-2">
+                <span className="text-[11px] text-slate-700">Lo que sigue lo dice:</span>
+
+                <select
+                  defaultValue=""
+                  onChange={(e) => {
+                    const destino = e.target.value || `speaker_${result.speakerLabels.length}`;
+                    onSplitSegment?.(cutting.index, cutting.offset, destino);
+                    setCutting(null);
+                  }}
+                  className="bg-white border border-slate-200 rounded-lg p-1.5 text-[11px] text-slate-900 focus:outline-none focus:border-blue-900"
+                >
+                  <option value="" disabled>
+                    Elige quién…
+                  </option>
+                  {result.speakerLabels.map((label) => (
+                    <option key={label} value={label}>
+                      {speakerNames[label] ?? label}
+                    </option>
+                  ))}
+                  <option value="__nueva__">Otra persona (voz nueva)</option>
+                </select>
+
+                <button
+                  type="button"
+                  onClick={() => setCutting(null)}
+                  className="text-[11px] text-slate-500 hover:text-slate-700"
+                >
+                  Cancelar
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>

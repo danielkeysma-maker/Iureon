@@ -282,9 +282,19 @@ export class TranscriptionStore {
       { ...target, text: antes, endSeconds: corte },
       {
         speakerLabel: newSpeakerLabel,
-        // The new half starts unassigned on purpose: it was cut off precisely
-        // because we do not know whose it is.
-        role: 'DESCONOCIDO',
+        /*
+         * Inherits the role when the cut half is given to a voice already in the
+         * transcript, and that case is the common one: cutting crosstalk usually
+         * hands the tail back to somebody already in the room — most often the
+         * judge, who was interrupted and then carried on.
+         *
+         * Forcing DESCONOCIDO here produced a visible bug: the judge came back
+         * as a second, unidentified voice, and once the lawyer marked it JUEZ the
+         * transcript read "Juez 1" and "Juez 2" for one person. Only a genuinely
+         * new voice starts unassigned, because that is the case where nobody
+         * knows yet whose it is.
+         */
+        role: segments.find((s) => s.speakerLabel === newSpeakerLabel)?.role ?? 'DESCONOCIDO',
         text: despues,
         startSeconds: corte,
         endSeconds: fin

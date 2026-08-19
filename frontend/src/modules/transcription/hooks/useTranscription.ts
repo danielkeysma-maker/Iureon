@@ -201,10 +201,15 @@ export const useTranscription = (kind: TranscriptionKind) => {
    * knows yet whose it is.
    */
   const splitSegment = useCallback(
-    async (segmentIndex: number, charOffset: number) => {
+    async (segmentIndex: number, charOffset: number, speakerLabel: string) => {
       if (!transcriptionId || !result) return;
 
-      const nuevo = `speaker_${result.speakerLabels.length}`;
+      // "__nueva__" is the UI's way of saying "nobody here": mint a label that
+      // does not collide. Anything else is a voice already in the transcript,
+      // and the server gives the cut half that voice's role — which is what
+      // keeps an interrupted judge from coming back as a second judge.
+      const destino =
+        speakerLabel === '__nueva__' ? `speaker_${result.speakerLabels.length}` : speakerLabel;
 
       try {
         const { item } = await transcriptionApi.splitSegment(
@@ -212,7 +217,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
           transcriptionId,
           segmentIndex,
           charOffset,
-          nuevo
+          destino
         );
 
         // Taken from the server rather than patched here: a split shifts every
