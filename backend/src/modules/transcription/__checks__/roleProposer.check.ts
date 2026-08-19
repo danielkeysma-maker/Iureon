@@ -195,5 +195,38 @@ for (const [label, rol] of Object.entries(esperado)) {
 }
 
 
+// ---------------------------------------------------------------------------
+// 8. Whoever presides narrates everyone else's role, and must not inherit it.
+//
+// Verbatim from a real hearing. The judge said "el apoderado de la parte
+// demandada" three times while explaining what he had filed, and the proposer
+// labelled HER as that apoderado — with three quotes behind it and every
+// appearance of certainty. Naming somebody describes them, not the speaker.
+// ---------------------------------------------------------------------------
+const narrando = proposeRoles([
+  say('speaker_0', 'Se declara abierta la audiencia. Se le concede el uso de la palabra.', 4),
+  say('speaker_0', 'La solicitud allegada por el apoderado de la parte demandada queda notificada.', 804),
+  say('speaker_0', 'Como lo denomina el apoderado de la parte demandada, y sin mayores preámbulos.', 204),
+  say('speaker_0', 'Se manifiesta por parte del apoderado de la parte demandada un acuerdo verbal.', 593)
+]);
+
+if (roleOf(narrando, 'speaker_0') === 'JUEZ') {
+  pass('quien narra el papel de otros no hereda ese papel: sigue siendo JUEZ');
+} else {
+  fail(`la jueza que menciona al apoderado quedó como ${roleOf(narrando, 'speaker_0')}`);
+}
+
+// The counterpart: a real self-identification must still be recognised.
+const presentandose = proposeRoles([
+  say('speaker_1', 'Buenos días, señora juez. Soy el apoderado de la parte demandante.', 81)
+]);
+
+if (roleOf(presentandose, 'speaker_1') === 'APODERADO_DEMANDANTE') {
+  pass('quien dice "soy el apoderado de la parte demandante" sí se reconoce');
+} else {
+  fail(`la autoidentificación quedó como ${roleOf(presentandose, 'speaker_1')}`);
+}
+
+
 console.log(failures === 0 ? '\nALL CHECKS PASSED' : `\n${failures} CHECK(S) FAILED`);
 process.exit(failures === 0 ? 0 : 1);

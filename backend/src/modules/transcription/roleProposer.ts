@@ -75,32 +75,73 @@ const MARKERS: Marker[] = [
   { role: 'ABOGADO', pattern: /\bse[ñn]or[a]?\s+juez\b/i, weight: 3 },
 
   // Self-identification, which Colombian hearings do on the record at the start.
+  /*
+   * PRIMERA PERSONA OBLIGATORIA, y esto costó una propuesta abiertamente falsa.
+   *
+   * El patrón anterior era `apoderado de la parte demandada` a secas, y en una
+   * audiencia real la JUEZA lo dijo tres veces narrando — "como lo denomina el
+   * apoderado de la parte demandada", "la solicitud allegada por el apoderado
+   * de la parte demandada" — así que el proponedor la etiquetó como el
+   * apoderado de la contraparte, con tres citas de respaldo y aire de certeza.
+   *
+   * Es la misma trampa que ya estaba prevista para los tratamientos: nombrar a
+   * alguien habla de esa persona, no de quien habla. Quien preside narra lo que
+   * hacen los demás durante toda la diligencia, así que su transcrito está lleno
+   * de los roles ajenos.
+   *
+   * Ahora exige que la voz se atribuya el rol a sí misma: "soy", "actúo como",
+   * "en calidad de", "me presento como". Una identificación sin esas fórmulas no
+   * se propone — que es preferible a proponer al juez como apoderado.
+   */
   {
     role: 'APODERADO_DEMANDANTE',
-    pattern: /\bapoderad[oa]\s+(judicial\s+)?de\s+la\s+parte\s+(demandante|actora|accionante)\b/i,
+    pattern:
+      /\b(soy|actúo|actuo|me\s+presento|en\s+calidad\s+de|en\s+mi\s+calidad\s+de)\s+(\w+\s+){0,3}apoderad[oa]\s+(judicial\s+)?(de\s+la\s+parte\s+)?(demandante|actora|accionante)\b/i,
     weight: 6
   },
   {
     role: 'APODERADO_DEMANDADO',
-    pattern: /\bapoderad[oa]\s+(judicial\s+)?de\s+la\s+parte\s+(demandada|accionada)\b/i,
+    pattern:
+      /\b(soy|actúo|actuo|me\s+presento|en\s+calidad\s+de|en\s+mi\s+calidad\s+de)\s+(\w+\s+){0,3}apoderad[oa]\s+(judicial\s+)?(de\s+la\s+parte\s+)?(demandada|accionada)\b/i,
     weight: 6
   },
-  { role: 'FISCAL', pattern: /\bfiscal[ía]?\s+(\w+\s+)?delegad[oa]\b/i, weight: 5 },
+  {
+    role: 'FISCAL',
+    pattern: /\b(soy|actúo|actuo|me\s+presento|en\s+calidad\s+de|en\s+mi\s+calidad\s+de|represento\s+a)\s+(\w+\s+){0,3}fiscal[ía]?\s*(\w+\s+)?delegad[oa]?\b/i,
+    weight: 5
+  },
 
+  // Every one of these demands first person for the same reason the apoderado
+  // markers do: whoever presides narrates what the others do, so a judge's
+  // transcript is full of "el fiscal delegado manifestó" and "la secretaría del
+  // juzgado certificará". Matching those would hand the bench somebody else's
+  // role, which is precisely the failure a real hearing exposed.
   // Roles added after a lawyer pointed out the list held only half a hearing.
   // Each still needs a formula somebody says about THEMSELVES; a role with no
   // marker simply never gets proposed, which is the correct outcome.
   { role: 'DEFENSOR', pattern: /\b(soy|como)\s+(el\s+|la\s+)?defensor[a]?\b/i, weight: 6 },
   { role: 'DEFENSOR', pattern: /\bla\s+defensa\s+(solicita|se\s+opone|manifiesta)\b/i, weight: 4 },
-  { role: 'DEFENSOR_PUEBLO', pattern: /\bdefensor[íi]a\s+del\s+pueblo\b/i, weight: 5 },
+  {
+    role: 'DEFENSOR_PUEBLO',
+    pattern: /\b(soy|actúo|actuo|en\s+representación\s+de|por)\s+(\w+\s+){0,3}(la\s+)?defensor[íi]a\s+del\s+pueblo\b/i,
+    weight: 5
+  },
   {
     role: 'REPRESENTANTE_VICTIMAS',
-    pattern: /\brepresent(o|ante)\s+(a\s+)?(las?\s+)?v[íi]ctimas?\b/i,
+    pattern: /\brepresento\s+(a\s+)?(las?\s+)?v[íi]ctimas?\b/i,
     weight: 6
   },
-  { role: 'SECRETARIO', pattern: /\bsecretar[íi]a?\s+del\s+(juzgado|despacho)\b/i, weight: 5 },
+  {
+    role: 'SECRETARIO',
+    pattern: /\b(soy|actúo|actuo|me\s+presento|en\s+calidad\s+de|en\s+mi\s+calidad\s+de|represento\s+a)\s+(\w+\s+){0,3}secretari[oa]\s+(del\s+)?(juzgado|despacho)\b/i,
+    weight: 5
+  },
   { role: 'INTERPRETE', pattern: /\b(soy|como)\s+(el\s+|la\s+)?int[ée]rprete\b/i, weight: 6 },
-  { role: 'MINISTERIO_PUBLICO', pattern: /\b(agente\s+del\s+)?ministerio\s+p[úu]blico\b/i, weight: 5 },
+  {
+    role: 'MINISTERIO_PUBLICO',
+    pattern: /\b(soy|actúo|actuo|en\s+representación\s+de|por)\s+(\w+\s+){0,3}(el\s+)?(agente\s+del\s+)?ministerio\s+p[úu]blico\b/i,
+    weight: 5
+  },
   { role: 'PERITO', pattern: /\b(rindo|como)\s+(mi\s+)?(dictamen|peritaje)\b/i, weight: 5 },
 
   // The oath answer marks the person being sworn, not the one administering it.

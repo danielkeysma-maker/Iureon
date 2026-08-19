@@ -74,7 +74,7 @@ const MIN_TEXT = 2000;
 const OLE_SIGNATURE = Buffer.from([0xd0, 0xcf, 0x11, 0xe0]);
 
 const looksBinary = (raw: string): boolean => {
-  if (raw.startsWith('%PDF') || raw.startsWith('PK')) return true;
+  if (raw.startsWith('%PDF') || raw.startsWith('PK\x03\x04')) return true;
   // Word 97 compound-file signature.
   if (raw.charCodeAt(0) === 0xd0 && raw.charCodeAt(1) === 0xcf) return true;
 
