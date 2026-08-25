@@ -51,13 +51,49 @@ const CORPUS = 'SYSTEM_CORPUS';
  */
 const MAX_TURNOS = 4;
 
-/** Below this the match is noise dressed as precedent. */
-const UMBRAL = 0.45;
+/**
+ * Below this the match is noise dressed as precedent.
+ *
+ * MEASURED AGAINST THIS CORPUS, not guessed. A query the corpus genuinely
+ * covers scores 66-69%; a query on an adjacent topic it does NOT cover scores
+ * 50-51%; and "receta de arroz con pollo" scores 36-41%. The first threshold
+ * here was 0.45, which sits between nonsense and adjacent — so an interview
+ * about desembargo returned three rulings at 50% and presented the corpus's
+ * silence as three findings.
+ *
+ * At 0.60 that interview returns nothing and the screen says the corpus has
+ * nothing close, which is the true answer. 62 providencias do not cover
+ * Colombian law, and a tool that never says so is worse than one that says it
+ * plainly.
+ */
+const UMBRAL = 0.6;
 
 const CLIENT_ROLES = new Set(['CLIENTE', 'DEMANDANTE', 'DEMANDADO', 'VICTIMA', 'TESTIGO']);
 
+/**
+ * Every indexed chunk is prefixed with a machine header — [CORPORACIÓN: …]
+ * [TIPO: …] [PROVIDENCIA: …] [PONENTE: …] [RESULTADO: …] followed by HECHOS and
+ * RATIO — see jurisprudenceIngestion. It is there to be embedded, not to be
+ * read: showing it back made every suggestion open with square brackets and
+ * bury the ruling's actual words below the fold.
+ */
+const stripHeader = (chunk: string): string =>
+  chunk
+    .replace(/^(\[[^\]]*\]\s*)+/, '')
+    .replace(/^HECHOS:\s*/m, '')
+    .replace(/^RATIO:\s*/m, '')
+    .trim();
+
 const excerpt = (text: string, max = 260): string =>
   text.length <= max ? text : `${text.slice(0, max).trim()}…`;
+
+/** Pulled from the header when the metadata column does not carry it. */
+const fromHeader = (chunk: string, campo: string): string | null => {
+  // Doble barra a propósito: dentro de una plantilla, `\[` es solo `[` y la clase
+  // de caracteres se rompe. Verificado ejecutándola, no leyéndola.
+  const match = new RegExp(`\\[${campo}:\\s*([^\\]]+)\\]`).exec(chunk);
+  return match ? match[1].trim() : null;
+};
 
 const asString = (value: unknown): string | null =>
   typeof value === 'string' && value.trim() ? value.trim() : null;
@@ -67,11 +103,17 @@ const toSuggestion = (match: VectorMatch, fromClient: string): InterviewSuggesti
 
   return {
     fromClient: excerpt(fromClient, 160),
-    providencia: asString(meta.providencia) ?? asString(meta.numero) ?? match.fileName,
-    corporacion: asString(meta.corporacion),
-    ponente: asString(meta.ponente),
+    providencia:
+      asString(meta.providencia) ??
+      asString(meta.numero) ??
+      fromHeader(match.contentChunk, 'PROVIDENCIA') ??
+      match.fileName,
+    corporacion: asString(meta.corporacion) ?? fromHeader(match.contentChunk, 'CORPORACIÓN'),
+    // The metadata column does not carry the ponente for these rows; the header
+    // does, and a precedent without its magistrado is harder to look up.
+    ponente: asString(meta.ponente) ?? fromHeader(match.contentChunk, 'PONENTE'),
     sourceUrl: asString(meta.sourceUrl) ?? asString(meta.source_url),
-    excerpt: excerpt(match.contentChunk),
+    excerpt: excerpt(stripHeader(match.contentChunk)),
     similarity: match.similarity
   };
 };
@@ -127,5 +169,22 @@ export const suggestForInterview = async (segments: TranscriptSegment[]): Promis
 
   const suggestions = [...porProvidencia.values()].sort((a, b) => b.similarity - a.similarity);
 
-  return suggestions.length > 0 ? { suggestions } : { suggestions: [], reason: motivo };
+  if (suggestions.length > 0) return { suggestions };
+
+  /*
+   * Empty is an answer and it needs saying.
+   *
+   * Two very different silences reach here: the search could not run at all
+   * (no embeddings provider, no index), or it ran and nothing cleared the
+   * threshold. Returning a bare empty list for both left the reader to guess
+   * whether the tool was broken or the corpus simply does not cover their case
+   * — and the second is the ordinary outcome for 62 providencias.
+   */
+  return {
+    suggestions: [],
+    reason:
+      motivo ??
+      'El corpus no tiene ninguna providencia lo bastante cercana a lo que narró el cliente. ' +
+        'Son 62 sentencias curadas, no toda la jurisprudencia colombiana.'
+  };
 };
