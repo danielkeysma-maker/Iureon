@@ -5,6 +5,7 @@ import type {
   TranscriptSegment,
   TranscriptionKind,
   TranscriptionResult,
+  SpeakerNameProposal,
   VoiceConflict
 } from '../types';
 
@@ -37,6 +38,7 @@ interface TranscribeResponse {
   persisted: boolean;
   roleProposals: RoleProposal[];
   voiceConflicts?: VoiceConflict[];
+  nameProposals?: SpeakerNameProposal[];
 }
 
 /** A transcript as the database holds it. */
@@ -60,6 +62,7 @@ export interface TranscriptionOutcome {
   persisted: boolean;
   roleProposals: RoleProposal[];
   voiceConflicts: VoiceConflict[];
+  nameProposals: SpeakerNameProposal[];
 }
 
 interface UploadTarget {
@@ -144,7 +147,8 @@ export const transcriptionApi = {
       id: data.id ?? null,
       persisted: Boolean(data.persisted),
       roleProposals: data.roleProposals ?? [],
-      voiceConflicts: data.voiceConflicts ?? []
+      voiceConflicts: data.voiceConflicts ?? [],
+      nameProposals: data.nameProposals ?? []
     };
   },
 
@@ -213,7 +217,8 @@ export const transcriptionApi = {
       id: data.id ?? null,
       persisted: Boolean(data.persisted),
       roleProposals: data.roleProposals ?? [],
-      voiceConflicts: data.voiceConflicts ?? []
+      voiceConflicts: data.voiceConflicts ?? [],
+      nameProposals: data.nameProposals ?? []
     };
   },
 
@@ -228,7 +233,7 @@ export const transcriptionApi = {
     id: string,
     segmentIndex: number,
     text: string
-  ): Promise<{ voiceConflicts?: VoiceConflict[] }> {
+  ): Promise<{ voiceConflicts?: VoiceConflict[]; nameProposals?: SpeakerNameProposal[] }> {
     // The conflicts ride back because fixing one misheard word can be exactly
     // what creates or resolves a two-people warning: names are words too.
     return httpClient.patch(`/api/transcription/${id}/segment`, {
@@ -274,9 +279,25 @@ export const transcriptionApi = {
     
     id: string,
     roles: Record<string, SpeakerRole>
-  ): Promise<{ item: { segments: TranscriptSegment[]; speaker_labels: string[] }; voiceConflicts?: VoiceConflict[] }> {
+  ): Promise<{ item: { segments: TranscriptSegment[]; speaker_labels: string[] }; voiceConflicts?: VoiceConflict[]; nameProposals?: SpeakerNameProposal[] }> {
     return httpClient.patch(`/api/transcription/${id}/roles`, {
       body: { roles }
+    });
+  },
+
+  /**
+   * Names a voice, or clears the name with an empty string.
+   *
+   * Applies to every intervention of that voice at once, like a role: the
+   * person did not change halfway through the hearing.
+   */
+  async assignSpeakerName(
+    id: string,
+    speakerLabel: string,
+    name: string
+  ): Promise<{ item: { segments: TranscriptSegment[]; speaker_labels: string[] }; voiceConflicts?: VoiceConflict[]; nameProposals?: SpeakerNameProposal[] }> {
+    return httpClient.patch(`/api/transcription/${id}/speaker-name`, {
+      body: { speakerLabel, name }
     });
   },
 
@@ -292,7 +313,7 @@ export const transcriptionApi = {
     id: string,
     segmentIndex: number,
     speakerLabel: string
-  ): Promise<{ item: { segments: TranscriptSegment[]; speaker_labels: string[] }; voiceConflicts?: VoiceConflict[] }> {
+  ): Promise<{ item: { segments: TranscriptSegment[]; speaker_labels: string[] }; voiceConflicts?: VoiceConflict[]; nameProposals?: SpeakerNameProposal[] }> {
     return httpClient.patch(`/api/transcription/${id}/speaker`, {
       body: { segmentIndex, speakerLabel }
     });
@@ -304,7 +325,7 @@ export const transcriptionApi = {
     segmentIndex: number,
     charOffset: number,
     speakerLabel: string
-  ): Promise<{ item: { segments: TranscriptSegment[]; speaker_labels: string[] }; voiceConflicts?: VoiceConflict[] }> {
+  ): Promise<{ item: { segments: TranscriptSegment[]; speaker_labels: string[] }; voiceConflicts?: VoiceConflict[]; nameProposals?: SpeakerNameProposal[] }> {
     return httpClient.patch(`/api/transcription/${id}/split`, {
       body: { segmentIndex, charOffset, speakerLabel }
     });

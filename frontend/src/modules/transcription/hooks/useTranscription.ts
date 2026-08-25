@@ -8,6 +8,7 @@ import {
   type SpeakerRole,
   type TranscriptionKind,
   type TranscriptionResult,
+  type SpeakerNameProposal,
   type VoiceConflict
 } from '../types';
 
@@ -83,6 +84,15 @@ export const useTranscription = (kind: TranscriptionKind) => {
    * them.
    */
   const [voiceConflicts, setVoiceConflicts] = useState<VoiceConflict[]>([]);
+
+  /**
+   * The name each voice gave for itself, read out of the transcript.
+   *
+   * Proposed, never applied: a name the app assigned on its own would be a
+   * fabricated attribution in a document that gets quoted in court. The lawyer
+   * accepts it, edits it, or types one from having been in the room.
+   */
+  const [nameProposals, setNameProposals] = useState<SpeakerNameProposal[]>([]);
   /**
    * False after a transcription that could not be stored. The lawyer is about
    * to close a tab holding the only copy, so the screen has to say so.
@@ -161,6 +171,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
         setResult(outcome.result);
         setRoleProposals(outcome.roleProposals);
         setVoiceConflicts(outcome.voiceConflicts);
+        setNameProposals(outcome.nameProposals);
         setPersisted(outcome.persisted);
         setTranscriptionId(outcome.id);
       } catch (err) {
@@ -210,7 +221,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
       if (!transcriptionId) return;
 
       try {
-        const { item, voiceConflicts: fresh } = await transcriptionApi.assignRoles(transcriptionId, {
+        const { item, voiceConflicts: fresh, nameProposals: frescos } = await transcriptionApi.assignRoles(transcriptionId, {
           [speakerLabel]: role
         });
 
@@ -220,6 +231,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
             : current
         );
         setVoiceConflicts(fresh ?? []);
+        setNameProposals(frescos ?? []);
         setError(null);
       } catch (err) {
         setResult((current) => (current && before ? { ...current, segments: before } : current));
@@ -254,12 +266,13 @@ export const useTranscription = (kind: TranscriptionKind) => {
       if (!transcriptionId) return;
 
       try {
-        const { voiceConflicts: fresh } = await transcriptionApi.editSegment(
+        const { voiceConflicts: fresh, nameProposals: frescos } = await transcriptionApi.editSegment(
           transcriptionId,
           segmentIndex,
           text
         );
         setVoiceConflicts(fresh ?? []);
+        setNameProposals(frescos ?? []);
         setError(null);
       } catch (err) {
         // Surfaced AND reverted: a correction the lawyer believes was saved
@@ -296,7 +309,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
         speakerLabel === '__nueva__' ? nextSpeakerLabel(result.speakerLabels) : speakerLabel;
 
       try {
-        const { item, voiceConflicts: fresh } = await transcriptionApi.splitSegment(
+        const { item, voiceConflicts: fresh, nameProposals: frescos } = await transcriptionApi.splitSegment(
           transcriptionId,
           segmentIndex,
           charOffset,
@@ -312,6 +325,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
             : current
         );
         setVoiceConflicts(fresh ?? []);
+        setNameProposals(frescos ?? []);
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'No se pudo dividir la intervención.');
@@ -338,7 +352,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
         speakerLabel === '__nueva__' ? nextSpeakerLabel(result.speakerLabels) : speakerLabel;
 
       try {
-        const { item, voiceConflicts: fresh } = await transcriptionApi.reassignSpeaker(
+        const { item, voiceConflicts: fresh, nameProposals: frescos } = await transcriptionApi.reassignSpeaker(
           transcriptionId,
           segmentIndex,
           destino
@@ -350,6 +364,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
             : current
         );
         setVoiceConflicts(fresh ?? []);
+        setNameProposals(frescos ?? []);
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'No se pudo cambiar la voz de la intervención.');
@@ -403,6 +418,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
     // showing stale ones would be worse than showing none.
     setRoleProposals([]);
     setVoiceConflicts([]);
+    setNameProposals([]);
   }, []);
 
   const deleteStored = useCallback(
@@ -422,9 +438,34 @@ export const useTranscription = (kind: TranscriptionKind) => {
           setResult(null);
           setRoleProposals([]);
           setVoiceConflicts([]);
+    setNameProposals([]);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'No se pudo borrar el transcrito.');
+      }
+    },
+    [transcriptionId]
+  );
+
+  /** Sets who a voice is, on screen and in the database. */
+  const assignSpeakerName = useCallback(
+    async (speakerLabel: string, name: string) => {
+      if (!transcriptionId) return;
+
+      try {
+        const { item, voiceConflicts: fresh, nameProposals: frescos } =
+          await transcriptionApi.assignSpeakerName(transcriptionId, speakerLabel, name);
+
+        setResult((current) =>
+          current
+            ? { ...current, segments: item.segments, speakerLabels: item.speaker_labels }
+            : current
+        );
+        setVoiceConflicts(fresh ?? []);
+        setNameProposals(frescos ?? []);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'No se pudo guardar el nombre.');
       }
     },
     [transcriptionId]
@@ -436,6 +477,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
     setError(null);
     setRoleProposals([]);
     setVoiceConflicts([]);
+    setNameProposals([]);
     setPersisted(true);
   }, []);
 
@@ -449,6 +491,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
     error,
     roleProposals,
     voiceConflicts,
+    nameProposals,
     stored,
     isLoadingStored,
     loadStored,
@@ -458,6 +501,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
     maxAudioBytes,
     transcribe,
     assignRole,
+    assignSpeakerName,
     editSegment,
     splitSegment,
     reassignSpeaker,

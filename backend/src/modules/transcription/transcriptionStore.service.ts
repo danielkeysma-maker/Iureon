@@ -322,6 +322,68 @@ export class TranscriptionStore {
   }
 
   /**
+   * Names a voice, or clears the name.
+   *
+   * WHY A NAME AND NOT JUST A ROLE. A role makes a transcript readable; a name
+   * makes it citable. "El apoderado de la demandada manifestó" is a summary,
+   * "el doctor José Omar Gaitán Guevara manifestó" is a quotation a judge can
+   * check against the recording. Teams shows names because everyone joins with
+   * an account; from audio alone the app has to be told — either by accepting
+   * what the voice said about itself, or by a lawyer who was in the room.
+   *
+   * An empty name removes it rather than storing a blank, so the transcript
+   * falls back to the role instead of showing a nameless heading.
+   */
+  async assignSpeakerName(
+    firmId: string,
+    id: string,
+    speakerLabel: string,
+    name: string
+  ): Promise<StoredTranscription | null> {
+    if (!supabase) return null;
+
+    const { data: existing, error: readError } = await supabase
+      .from('transcriptions')
+      .select('*')
+      .eq('firm_id', firmId)
+      .eq('id', id)
+      .single();
+
+    if (readError || !existing) {
+      console.error('[TRANSCRIPTION] Transcrito no encontrado para nombrar la voz.');
+      return null;
+    }
+
+    const limpio = name.trim();
+
+    const segments = ((existing as StoredTranscription).segments ?? []).map((segment) => {
+      if (segment.speakerLabel !== speakerLabel) return segment;
+
+      if (!limpio) {
+        const { speakerName: _descartado, ...resto } = segment;
+        return resto as TranscriptSegment;
+      }
+
+      return { ...segment, speakerName: limpio };
+    });
+
+    const { data, error } = await supabase
+      .from('transcriptions')
+      .update({ segments, updated_at: new Date().toISOString() })
+      .eq('firm_id', firmId)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('[TRANSCRIPTION] No se pudo guardar el nombre:', error.message);
+      return null;
+    }
+
+    return data as StoredTranscription;
+  }
+
+  /**
    * Moves one whole intervention to a different voice.
    *
    * WHY CUTTING IS NOT ENOUGH. `splitSegment` solves two people inside ONE

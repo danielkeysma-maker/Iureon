@@ -208,7 +208,7 @@ const excerpt = (text: string, match: string): string => {
  * stale warning about a solved problem would teach the lawyer to ignore all of
  * them.
  */
-export const detectVoiceConflicts = (segments: TranscriptSegment[]): VoiceConflict[] => {
+const identitiesByLabel = (segments: TranscriptSegment[]): Map<string, VoiceIdentity[]> => {
   const byLabel = new Map<string, VoiceIdentity[]>();
 
   segments.forEach((segment, segmentIndex) => {
@@ -262,7 +262,49 @@ export const detectVoiceConflicts = (segments: TranscriptSegment[]): VoiceConfli
     }
   });
 
-  return [...byLabel.entries()]
+  return byLabel;
+};
+
+/**
+ * Labels that introduce themselves as MORE than one person.
+ *
+ * Two or more identities under one label is the merge; exactly one is simply a
+ * person who said their name, which is the next function's business.
+ */
+export const detectVoiceConflicts = (segments: TranscriptSegment[]): VoiceConflict[] =>
+  [...identitiesByLabel(segments).entries()]
     .filter(([, identities]) => identities.length >= 2)
     .map(([speakerLabel, identities]) => ({ speakerLabel, identities }));
-};
+
+export interface SpeakerNameProposal {
+  speakerLabel: string;
+  name: string;
+  /** The phrase that produced it, so the lawyer can judge rather than trust. */
+  phrase: string;
+  atSeconds: number | null;
+}
+
+/**
+ * The name each voice gave for ITSELF, proposed and never applied.
+ *
+ * The machinery was already here and its result was being thrown away: the
+ * conflict detector reads self-introductions and only kept the labels that
+ * produced two or more. A label that produced exactly one is the ordinary case
+ * — somebody stated their name on the record — and that name is the single most
+ * useful thing the transcript can carry, because a filing quotes people, not
+ * `speaker_2`.
+ *
+ * Proposed with its phrase and its minute, like every other inference in this
+ * codebase. A voice with two candidate names proposes NOTHING: that is a
+ * conflict, and guessing which of two men a label is would be exactly the
+ * confident wrong answer the conflict warning exists to prevent.
+ */
+export const proposeSpeakerNames = (segments: TranscriptSegment[]): SpeakerNameProposal[] =>
+  [...identitiesByLabel(segments).entries()]
+    .filter(([, identities]) => identities.length === 1)
+    .map(([speakerLabel, [identity]]) => ({
+      speakerLabel,
+      name: identity.name,
+      phrase: identity.phrase,
+      atSeconds: identity.atSeconds
+    }));

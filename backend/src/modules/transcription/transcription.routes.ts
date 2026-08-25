@@ -7,6 +7,7 @@ import {
   listTranscriptionsController,
   splitTranscriptionSegmentController,
   reassignTranscriptionSpeakerController,
+  assignSpeakerNameController,
   transcribeAudioController,
   transcribeFromStorageController,
   transcriptionStatusController
@@ -78,6 +79,7 @@ router.patch('/transcription/:id/roles', assignTranscriptionRolesController as a
 router.patch('/transcription/:id/segment', editTranscriptionSegmentController as any);
 router.patch('/transcription/:id/split', splitTranscriptionSegmentController as any);
 router.patch('/transcription/:id/speaker', reassignTranscriptionSpeakerController as any);
+router.patch('/transcription/:id/speaker-name', assignSpeakerNameController as any);
 router.delete('/transcription/:id', deleteTranscriptionController as any);
 router.post(
   '/transcription',

@@ -47,6 +47,16 @@ export interface TranscriptSegment {
   speakerLabel: string;
   /** Procedural role, once a human has mapped the label. */
   role: SpeakerRole;
+  /**
+   * Who this voice is, by name.
+   *
+   * Optional because a hearing does not always put it on the record, and a name
+   * this app invented would be worse than none. Carried per segment rather than
+   * in a column of its own so it follows exactly the path `role` already
+   * follows — set for every segment of a label at once, and needing no schema
+   * change to exist.
+   */
+  speakerName?: string;
   text: string;
   /** Seconds from the start of the recording. */
   startSeconds: number | null;

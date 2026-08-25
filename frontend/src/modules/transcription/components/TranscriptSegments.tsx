@@ -7,6 +7,7 @@ import {
   type SpeakerRole,
   type TranscriptionKind,
   type TranscriptionResult,
+  type SpeakerNameProposal,
   type VoiceConflict
 } from '../types';
 
@@ -27,6 +28,10 @@ interface TranscriptSegmentsProps {
   onReassignSpeaker?: (segmentIndex: number, speakerLabel: string) => void;
   /** Labels whose own words claim two different people. Server-computed. */
   voiceConflicts?: VoiceConflict[];
+  /** The name each voice gave for itself, read out of the transcript. */
+  nameProposals?: SpeakerNameProposal[];
+  /** Sets who a voice is. An empty name clears it. */
+  onAssignSpeakerName?: (speakerLabel: string, name: string) => void;
 }
 
 /**
@@ -85,7 +90,9 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
   onEditSegment,
   onSplitSegment,
   onReassignSpeaker,
-  voiceConflicts = []
+  voiceConflicts = [],
+  nameProposals = [],
+  onAssignSpeakerName
 }) => {
   const colorFor = (speakerLabel: string): string =>
     SPEAKER_COLORS[
@@ -110,6 +117,25 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
    * a position nobody chose.
    */
   const [caret, setCaret] = React.useState<{ index: number; offset: number } | null>(null);
+
+  /**
+   * What is typed in each name box before it is saved.
+   *
+   * Saved on blur or Enter rather than on every keystroke: a name is written in
+   * one go, and a request per letter would fight the typing.
+   */
+  const [nameDrafts, setNameDrafts] = React.useState<Record<string, string>>({});
+
+  const proposalFor = (label: string): SpeakerNameProposal | undefined =>
+    nameProposals.find((p) => p.speakerLabel === label);
+
+  const nameOf = (label: string): string =>
+    result.segments.find((s) => s.speakerLabel === label)?.speakerName ?? '';
+
+  const saveName = (label: string, value: string): void => {
+    if (value.trim() === nameOf(label)) return;
+    onAssignSpeakerName?.(label, value.trim());
+  };
 
   /** The intervention showing the "put the caret in the text first" notice. */
   const [aviso, setAviso] = React.useState<number | null>(null);
@@ -163,7 +189,8 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
         */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-2">
           {result.speakerLabels.map((label) => (
-            <div key={label} className="flex items-center gap-2">
+            <div key={label} className="space-y-1">
+            <div className="flex items-center gap-2">
               <div
                 className={`w-8 h-8 rounded-full ${colorFor(label)} flex items-center justify-center shrink-0`}
                 title={speakerNames[label]}
@@ -172,12 +199,42 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                   {initials(speakerNames[label] ?? label)}
                 </span>
               </div>
-              <span
-                className="text-[11px] font-semibold text-slate-700 flex-1 min-w-0 truncate"
-                title={label}
-              >
-                {speakerNames[label] ?? label}
-              </span>
+              {/*
+                THE NAME, WHICH IS WHAT MAKES A TRANSCRIPT CITABLE.
+
+                A role makes it readable — "el apoderado de la demandada
+                manifestó" — but a filing quotes people. Teams shows names
+                because everyone joins with an account; from audio alone the app
+                has to be told. So it proposes what the voice said about ITSELF
+                (see proposeSpeakerNames) and otherwise leaves the box empty for
+                a lawyer who was in the room and simply knows.
+
+                Never filled in automatically. A name this app invented would be
+                a fabricated attribution in a document a judge may check against
+                the recording.
+              */}
+              {onAssignSpeakerName ? (
+                <input
+                  value={nameDrafts[label] ?? nameOf(label)}
+                  onChange={(e) => setNameDrafts({ ...nameDrafts, [label]: e.target.value })}
+                  onBlur={(e) => saveName(label, e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') e.currentTarget.blur();
+                  }}
+                  placeholder={proposalFor(label)?.name ?? 'Nombre (opcional)'}
+                  className="flex-1 min-w-0 bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 text-[11px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-900"
+                  title={
+                    proposalFor(label)
+                      ? `Se presentó así: «${proposalFor(label)!.phrase}»`
+                      : 'Escribe el nombre si lo sabes'
+                  }
+                />
+              ) : (
+                <span className="text-[11px] font-semibold text-slate-700 flex-1 min-w-0 truncate">
+                  {speakerNames[label] ?? label}
+                </span>
+              )}
+
               <select
                 value={roleOf(label)}
                 onChange={(e) => onAssignRole(label, e.target.value as SpeakerRole)}
@@ -189,6 +246,35 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                   </option>
                 ))}
               </select>
+            </div>
+
+            {/*
+              The proposal offered rather than applied, with the phrase that
+              produced it so the lawyer judges instead of trusting — the same
+              contract every inference in this codebase works under.
+            */}
+            {onAssignSpeakerName && !nameOf(label) && proposalFor(label) && (
+              <div className="flex items-start gap-2 pl-10">
+                <p className="text-[10px] text-slate-500 flex-1">
+                  Se presentó como{' '}
+                  <span className="font-semibold text-slate-700">{proposalFor(label)!.name}</span>
+                  {proposalFor(label)!.atSeconds !== null && (
+                    <span className="font-mono text-slate-400">
+                      {' '}
+                      · {formatTimestamp(proposalFor(label)!.atSeconds)}
+                    </span>
+                  )}
+                  <span className="text-slate-400"> — «{proposalFor(label)!.phrase}»</span>
+                </p>
+                <button
+                  type="button"
+                  onClick={() => onAssignSpeakerName(label, proposalFor(label)!.name)}
+                  className="text-[10px] font-semibold text-blue-900 hover:underline shrink-0"
+                >
+                  Usar este nombre
+                </button>
+              </div>
+            )}
             </div>
           ))}
         </div>

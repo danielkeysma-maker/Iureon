@@ -5,7 +5,7 @@ import {
   TranscriptionUnavailableError
 } from './transcription.service';
 import { proposeRoles } from './roleProposer';
-import { detectVoiceConflicts } from './voiceConflicts';
+import { detectVoiceConflicts, proposeSpeakerNames } from './voiceConflicts';
 import { BackblazeB2TenantStorageService } from '../documents/b2.service';
 import { transcriptionStore } from './transcriptionStore.service';
 import type { SpeakerRole, TranscriptionKind } from './types';
@@ -121,7 +121,8 @@ export const transcribeAudioController = async (req: Request, res: Response): Pr
       roleProposals: proposeRoles(result.segments),
       // Recomputed fresh on every response: a warning must withdraw itself the
       // moment the lawyer fixes what it pointed at.
-      voiceConflicts: detectVoiceConflicts(result.segments)
+      voiceConflicts: detectVoiceConflicts(result.segments),
+      nameProposals: proposeSpeakerNames(result.segments)
     });
   } catch (err) {
     if (err instanceof InvalidAudioError) {
@@ -195,7 +196,12 @@ export const assignTranscriptionRolesController = async (
     return;
   }
 
-  res.json({ success: true, item: updated, voiceConflicts: detectVoiceConflicts(updated.segments) });
+  res.json({
+    success: true,
+    item: updated,
+    voiceConflicts: detectVoiceConflicts(updated.segments),
+    nameProposals: proposeSpeakerNames(updated.segments)
+  });
 };
 
 /**
@@ -320,7 +326,8 @@ export const transcribeFromStorageController = async (
       roleProposals: proposeRoles(result.segments),
       // Recomputed fresh on every response: a warning must withdraw itself the
       // moment the lawyer fixes what it pointed at.
-      voiceConflicts: detectVoiceConflicts(result.segments)
+      voiceConflicts: detectVoiceConflicts(result.segments),
+      nameProposals: proposeSpeakerNames(result.segments)
     });
   } catch (err) {
     // Discarded here too, and awaited before the error reply for the same
@@ -378,7 +385,55 @@ export const editTranscriptionSegmentController = async (
     return;
   }
 
-  res.json({ success: true, item: updated, voiceConflicts: detectVoiceConflicts(updated.segments) });
+  res.json({
+    success: true,
+    item: updated,
+    voiceConflicts: detectVoiceConflicts(updated.segments),
+    nameProposals: proposeSpeakerNames(updated.segments)
+  });
+};
+
+/**
+ * PATCH /api/transcription/:id/speaker-name — Names a voice.
+ *
+ * The name can come from the proposal the transcript itself produced, or from a
+ * lawyer who was in the room and simply knows. Either way a human sets it: a
+ * name the app assigned on its own would be a fabricated attribution in a
+ * document meant to be quoted.
+ */
+export const assignSpeakerNameController = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const speakerLabel = String(req.body.speakerLabel ?? '').trim();
+  const name = typeof req.body.name === 'string' ? req.body.name : '';
+
+  if (!speakerLabel) {
+    res.status(400).json({
+      error: 'MISSING_SPEAKER',
+      message: 'Se requiere "speakerLabel".'
+    });
+    return;
+  }
+
+  const updated = await transcriptionStore.assignSpeakerName(
+    req.firmId as string,
+    String(req.params.id),
+    speakerLabel,
+    name
+  );
+
+  if (!updated) {
+    res.status(404).json({ error: 'NOT_FOUND', message: 'No se encontró el transcrito.' });
+    return;
+  }
+
+  res.json({
+    success: true,
+    item: updated,
+    voiceConflicts: detectVoiceConflicts(updated.segments),
+    nameProposals: proposeSpeakerNames(updated.segments)
+  });
 };
 
 /**
@@ -424,7 +479,12 @@ export const reassignTranscriptionSpeakerController = async (
     return;
   }
 
-  res.json({ success: true, item: updated, voiceConflicts: detectVoiceConflicts(updated.segments) });
+  res.json({
+    success: true,
+    item: updated,
+    voiceConflicts: detectVoiceConflicts(updated.segments),
+    nameProposals: proposeSpeakerNames(updated.segments)
+  });
 };
 
 /**
@@ -474,5 +534,10 @@ export const splitTranscriptionSegmentController = async (
     return;
   }
 
-  res.json({ success: true, item: updated, voiceConflicts: detectVoiceConflicts(updated.segments) });
+  res.json({
+    success: true,
+    item: updated,
+    voiceConflicts: detectVoiceConflicts(updated.segments),
+    nameProposals: proposeSpeakerNames(updated.segments)
+  });
 };

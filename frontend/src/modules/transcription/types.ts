@@ -34,6 +34,8 @@ export interface TranscriptSegment {
   text: string;
   startSeconds: number | null;
   endSeconds: number | null;
+  /** Who this voice is, once a human has said so. Absent until then. */
+  speakerName?: string;
 }
 
 export type TranscriptionKind = 'AUDIENCIA' | 'ENTREVISTA';
@@ -149,6 +151,19 @@ export interface RoleEvidence {
  * betrays the merge even when the audio hides it. Warned, never auto-fixed:
  * the lawyer moves the intervention, or decides a name was just misheard.
  */
+/**
+ * The name a voice gave for itself, proposed from the transcript.
+ *
+ * Never applied on its own: a name invented by the app would be a fabricated
+ * attribution in a document meant to be quoted in court.
+ */
+export interface SpeakerNameProposal {
+  speakerLabel: string;
+  name: string;
+  phrase: string;
+  atSeconds: number | null;
+}
+
 export interface VoiceIdentity {
   name: string;
   phrase: string;

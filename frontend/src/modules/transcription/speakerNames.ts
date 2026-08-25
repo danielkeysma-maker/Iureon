@@ -21,6 +21,21 @@ export const buildSpeakerNames = (
   segments: TranscriptSegment[],
   labels: Record<SpeakerRole, string>
 ): Record<string, string> => {
+  /*
+   * A name a human set wins over everything below.
+   *
+   * The numbering exists because a role repeated is ambiguous — three
+   * "Testigo" tell the reader nothing. A name is never ambiguous, so it needs
+   * no disambiguation and no number: "José Omar Gaitán Guevara" is already the
+   * answer the numbering was trying to approximate.
+   */
+  const nameByLabel = new Map<string, string>();
+  for (const segment of segments) {
+    if (segment.speakerName && !nameByLabel.has(segment.speakerLabel)) {
+      nameByLabel.set(segment.speakerLabel, segment.speakerName);
+    }
+  }
+
   const roleByLabel = new Map<string, SpeakerRole>();
 
   for (const segment of segments) {
@@ -38,6 +53,13 @@ export const buildSpeakerNames = (
   const names: Record<string, string> = {};
 
   for (const [speakerLabel, role] of roleByLabel) {
+    const propio = nameByLabel.get(speakerLabel);
+
+    if (propio) {
+      names[speakerLabel] = propio;
+      continue;
+    }
+
     const label = labels[role] ?? role;
     const total = countByRole.get(role) ?? 1;
 
