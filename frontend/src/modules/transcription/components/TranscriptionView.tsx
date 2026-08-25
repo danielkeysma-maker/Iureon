@@ -6,11 +6,14 @@ import { AudioPreview } from './AudioPreview';
 import { NotPersistedWarning, RoleProposals } from './RoleProposals';
 import { StoredTranscriptions } from './StoredTranscriptions';
 import { exportTranscriptToPdf, exportTranscriptToWord } from '../transcriptExport';
-import { ClientPicker } from '../../clients/components/ClientPicker';
-import { InterviewInsights } from '../../clients/components/InterviewInsights';
-import { clientsApi } from '../../clients/clients.api';
 import { buildSpeakerNames } from '../speakerNames';
-import { ROLE_LABELS, SUPPORTED_AUDIO_EXTENSIONS, type SpeakerRole, type TranscriptSegment, type TranscriptionKind } from '../types';
+import { toPlainText } from '../toPlainText';
+import {
+  ROLE_LABELS,
+  SUPPORTED_AUDIO_EXTENSIONS,
+  type SpeakerRole,
+  type TranscriptionKind
+} from '../types';
 
 interface TranscriptionViewProps {
   kind?: TranscriptionKind;
@@ -19,29 +22,19 @@ interface TranscriptionViewProps {
 const megabytes = (bytes: number): string => (bytes / (1024 * 1024)).toFixed(1);
 
 /**
- * Plain text of the transcript, ready to paste into a filing.
+ * Hearing transcription.
  *
- * Prefixed by the disambiguated speaker name rather than the bare role. With
- * two apoderados or three witnesses the old form wrote "Testigo:" over and
- * over and the reader could not tell which one spoke — in a document that gets
- * quoted, that is not untidy, it is unusable.
- */
-const toPlainText = (
-  segments: TranscriptSegment[],
-  names: Record<string, string>
-): string =>
-  segments.map((s) => `${names[s.speakerLabel] ?? s.speakerLabel}: ${s.text}`).join('\n\n');
-
-/**
- * Hearing and interview transcription.
+ * The recording is uploaded — a court publishes it and the lawyer downloads it
+ * afterwards — separated by speaker, and the lawyer assigns the procedural role
+ * of each voice. Context (party names, court, radicado) is offered up front
+ * because Colombian legal vocabulary is frequently mis-transcribed without it.
  *
- * The recording is uploaded, separated by speaker, and the lawyer assigns the
- * procedural role of each voice. Context (party names, court, radicado) is
- * offered up front because Colombian legal vocabulary is frequently
- * mis-transcribed without it.
+ * Client interviews are their own screen: see modules/clients/InterviewView.
+ * They share this engine and nothing of the flow, because a hearing arrives as
+ * a file and an interview happens in the room.
  */
 export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AUDIENCIA' }) => {
-  const { hasFirm, isAvailable, isUploading, isTranscribing, result, error, roleProposals, persisted, maxAudioBytes, transcribe, assignRole, editSegment, splitSegment, reassignSpeaker, voiceConflicts, nameProposals, assignSpeakerName, transcriptionId, stored, isLoadingStored, loadStored, openStored, deleteStored, canEdit, reset } =
+  const { hasFirm, isAvailable, isUploading, isTranscribing, result, error, roleProposals, persisted, maxAudioBytes, transcribe, assignRole, editSegment, splitSegment, reassignSpeaker, voiceConflicts, nameProposals, assignSpeakerName, stored, isLoadingStored, loadStored, openStored, deleteStored, canEdit, reset } =
     useTranscription(kind);
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -68,24 +61,6 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AU
    * The uploaded file while one is in hand, the stored title after reopening —
    * a transcript exported from the saved list must not be called "grabación".
    */
-  /*
-   * Who the interview is with.
-   *
-   * Choosable BEFORE the recording is transcribed, because that is when the
-   * lawyer knows it — they have just been sitting with the person. The link is
-   * written as soon as there is a transcript to attach it to, so the choice is
-   * never lost between the two moments.
-   */
-  const [clientId, setClientId] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!transcriptionId || !clientId) return;
-
-    void clientsApi.linkInterview(transcriptionId, clientId).catch(() => {
-      /* Surfaced by the module's own error path; the transcript itself is safe. */
-    });
-  }, [transcriptionId, clientId]);
-
   const [openedTitle, setOpenedTitle] = useState('');
   const exportTitle = selectedFile?.name || openedTitle || 'transcripcion';
 
@@ -153,16 +128,6 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AU
             </span>
           </div>
         )}
-
-        {/*
-          Who the interview is with, asked before the recording goes up.
-          
-          A hearing is found by its radicado, which is already in the file's
-          name. An interview is found by the person: months later the lawyer
-          looks for what the client told them, not for a file called
-          audio_2026-08-18.m4a.
-        */}
-        {kind === 'ENTREVISTA' && <ClientPicker value={clientId} onChange={setClientId} />}
 
         {!result && (
           <StoredTranscriptions
@@ -342,15 +307,6 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AU
 
             {!persisted && <NotPersistedWarning />}
 
-            {/*
-              Jurisprudence for what the CLIENT said, once there is a stored
-              transcript to read it from. Asked for on demand rather than run
-              automatically: the search depends on which voice was marked as the
-              client, and that happens after the transcript exists.
-            */}
-            {kind === 'ENTREVISTA' && transcriptionId && (
-              <InterviewInsights transcriptionId={transcriptionId} />
-            )}
 
             {/*
               The mutation errors, IN the result view. The only other error

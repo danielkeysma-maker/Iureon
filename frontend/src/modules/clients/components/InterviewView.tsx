@@ -1,0 +1,275 @@
+import React from 'react';
+import { AlertTriangle, ArrowLeft, Copy, CheckCircle2, FileDown, FileText, Upload, UserRound } from 'lucide-react';
+import { useTranscription } from '../../transcription/hooks/useTranscription';
+import { TranscriptSegments } from '../../transcription/components/TranscriptSegments';
+import { StoredTranscriptions } from '../../transcription/components/StoredTranscriptions';
+import { NotPersistedWarning } from '../../transcription/components/RoleProposals';
+import { exportTranscriptToPdf, exportTranscriptToWord } from '../../transcription/transcriptExport';
+import { buildSpeakerNames } from '../../transcription/speakerNames';
+import { ROLE_LABELS } from '../../transcription/types';
+import { toPlainText } from '../../transcription/toPlainText';
+import { ClientPicker } from './ClientPicker';
+import { InterviewInsights } from './InterviewInsights';
+import { AudioRecorder } from './AudioRecorder';
+import { clientsApi } from '../clients.api';
+
+/**
+ * The client interview, as its own screen.
+ *
+ * WHY IT IS NOT THE TRANSCRIPTION SCREEN WITH A DROPDOWN. It was, and a lawyer
+ * said so: an audiencia and an interview are different work. A hearing arrives
+ * as a file the court published, is read for what the judge ordered, and gets
+ * quoted in a filing. An interview happens in the office, right now, with a
+ * person sitting there; it starts with who they are, it is recorded rather than
+ * uploaded, and what comes out of it is a case to take or decline.
+ *
+ * WHAT IS STILL SHARED, DELIBERATELY. The engine underneath: diarization, role
+ * assignment, cutting an intervention that holds two voices, moving one to
+ * another speaker, naming, in-place correction, export. That surface needed
+ * eight separate fixes in one day — the cut panel opening off-screen, roles
+ * that were never persisted, name suggestions dropped on reopen, Enter breaking
+ * the record, a phantom second judge, a label collision. Duplicating it would
+ * mean fixing every one of those twice, and the second copy is the one nobody
+ * notices is broken.
+ *
+ * So: two screens, two flows, one engine.
+ */
+export const InterviewView: React.FC = () => {
+  const {
+    hasFirm,
+    isAvailable,
+    isUploading,
+    isTranscribing,
+    result,
+    error,
+    persisted,
+    voiceConflicts,
+    nameProposals,
+    stored,
+    isLoadingStored,
+    loadStored,
+    openStored,
+    deleteStored,
+    transcribe,
+    assignRole,
+    assignSpeakerName,
+    editSegment,
+    splitSegment,
+    reassignSpeaker,
+    transcriptionId,
+    canEdit,
+    reset
+  } = useTranscription('ENTREVISTA');
+
+  const [clientId, setClientId] = React.useState<string | null>(null);
+  const [copiado, setCopiado] = React.useState(false);
+  const [titulo, setTitulo] = React.useState('');
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    void loadStored();
+  }, [loadStored]);
+
+  // Written as soon as there is a transcript to attach it to, so the choice
+  // made before recording is never lost between the two moments.
+  React.useEffect(() => {
+    if (!transcriptionId || !clientId) return;
+
+    void clientsApi.linkInterview(transcriptionId, clientId).catch(() => {
+      /* The transcript itself is safe; the link can be made again. */
+    });
+  }, [transcriptionId, clientId]);
+
+  const empezar = (file: File) => {
+    setTitulo(file.name);
+    void transcribe(file);
+  };
+
+  const copiar = async () => {
+    if (!result) return;
+
+    await navigator.clipboard.writeText(
+      toPlainText(result.segments, buildSpeakerNames(result.segments, ROLE_LABELS))
+    );
+    setCopiado(true);
+    window.setTimeout(() => setCopiado(false), 2000);
+  };
+
+  const trabajando = isUploading || isTranscribing;
+
+  if (!isAvailable) {
+    return (
+      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-2">
+        <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+        <p className="text-[11px] text-amber-900">
+          El motor de transcripción no está configurado en el servidor.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-blue-950 flex items-center justify-center shrink-0">
+          <UserRound className="w-5 h-5 text-blue-200" />
+        </div>
+        <div>
+          <h2 className="text-lg font-black text-slate-900 tracking-tight">Entrevista de cliente</h2>
+          <p className="text-[11px] text-slate-500">
+            Graba la conversación, identifica quién habla y mira qué dice la jurisprudencia.
+          </p>
+        </div>
+      </div>
+
+      {!hasFirm && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start gap-2">
+          <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+          <p className="text-[11px] text-amber-900">
+            Sin una firma no se puede guardar la entrevista.
+          </p>
+        </div>
+      )}
+
+      {error && (
+        <div className="bg-rose-50 border border-rose-200 rounded-xl p-3 flex items-start gap-2">
+          <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+          <p className="text-[11px] text-rose-800">{error}</p>
+        </div>
+      )}
+
+      {/*
+        Step one, always: who this is with. An interview is found by the person
+        months later, not by a filename.
+      */}
+      <ClientPicker value={clientId} onChange={setClientId} />
+
+      {!result ? (
+        <>
+          <StoredTranscriptions
+            items={stored}
+            isLoading={isLoadingStored}
+            onOpen={(item) => {
+              setTitulo(item.title);
+              openStored(item);
+            }}
+            onDelete={deleteStored}
+            onRefresh={() => void loadStored()}
+          />
+
+          {trabajando ? (
+            <div className="border border-slate-200 rounded-xl p-6 text-center">
+              <p className="text-xs font-bold text-slate-900">
+                {isUploading ? 'Enviando la grabación…' : 'Transcribiendo…'}
+              </p>
+              <p className="text-[11px] text-slate-500 mt-1">
+                Separando las voces y ordenando la conversación.
+              </p>
+            </div>
+          ) : (
+            <>
+              <AudioRecorder onRecorded={empezar} disabled={!hasFirm} />
+
+              {/*
+                Uploading stays, second. Not every interview happens at the
+                desk — a call recorded on a phone is still an interview — but
+                recording is the ordinary case and gets the ordinary place.
+              */}
+              <div className="text-center">
+                <input
+                  ref={inputRef}
+                  type="file"
+                  accept="audio/*,video/mp4"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) empezar(file);
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => inputRef.current?.click()}
+                  disabled={!hasFirm}
+                  className="text-[11px] font-semibold text-slate-600 hover:text-blue-900 flex items-center gap-1.5 mx-auto disabled:opacity-50"
+                >
+                  <Upload className="w-3 h-3" />
+                  O sube una grabación que ya tengas
+                </button>
+              </div>
+            </>
+          )}
+
+          <p className="text-[11px] text-slate-500 bg-slate-50 border border-slate-200 rounded-lg p-2.5">
+            <b className="text-slate-700">Qué se guarda:</b> el texto de la entrevista queda guardado
+            en tu firma y puedes borrarlo cuando quieras desde la lista de arriba.{' '}
+            <b className="text-slate-700">La grabación no se guarda</b>: se borra del almacenamiento
+            apenas termina de transcribirse.
+          </p>
+        </>
+      ) : (
+        <>
+          <div className="flex flex-wrap items-center justify-between gap-2 bg-white border border-slate-200 rounded-xl px-4 py-2.5">
+            <span className="text-[11px] text-slate-600">
+              <b className="text-slate-900">{result.segments.length}</b> intervenciones ·{' '}
+              <b className="text-slate-900">{result.speakerLabels.length}</b> voces
+            </span>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => void copiar()}
+                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg text-[11px] font-semibold flex items-center gap-1.5"
+              >
+                {copiado ? (
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                ) : (
+                  <Copy className="w-3.5 h-3.5" />
+                )}
+                <span>{copiado ? 'Copiado' : 'Copiar texto'}</span>
+              </button>
+
+              <button
+                onClick={() => void exportTranscriptToWord(result, titulo || 'entrevista')}
+                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg text-[11px] font-semibold flex items-center gap-1.5"
+              >
+                <FileText className="w-3.5 h-3.5" />
+                <span>Word</span>
+              </button>
+
+              <button
+                onClick={() => exportTranscriptToPdf(result, titulo || 'entrevista')}
+                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg text-[11px] font-semibold flex items-center gap-1.5"
+              >
+                <FileDown className="w-3.5 h-3.5" />
+                <span>PDF</span>
+              </button>
+
+              <button
+                onClick={reset}
+                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg text-[11px] font-semibold flex items-center gap-1.5"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Otra entrevista</span>
+              </button>
+            </div>
+          </div>
+
+          {!persisted && <NotPersistedWarning />}
+
+          {transcriptionId && <InterviewInsights transcriptionId={transcriptionId} />}
+
+          <TranscriptSegments
+            result={result}
+            kind="ENTREVISTA"
+            onAssignRole={assignRole}
+            onEditSegment={canEdit ? editSegment : undefined}
+            onSplitSegment={canEdit ? splitSegment : undefined}
+            onReassignSpeaker={canEdit ? reassignSpeaker : undefined}
+            onAssignSpeakerName={canEdit ? assignSpeakerName : undefined}
+            voiceConflicts={voiceConflicts}
+            nameProposals={nameProposals}
+          />
+        </>
+      )}
+    </div>
+  );
+};
