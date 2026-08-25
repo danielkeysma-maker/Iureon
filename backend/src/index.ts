@@ -3,6 +3,7 @@ import cors from 'cors';
 import { config } from './config/env.config';
 import { authMiddleware, optionalAuthMiddleware } from './modules/auth/auth.middleware';
 import { authPublicRoutes, authRoutes } from './modules/auth/auth.routes';
+import { adminRoutes } from './modules/admin/admin.routes';
 import { healthRoutes } from './modules/health/health.routes';
 import { agentRoutes } from './modules/agent/agent.routes';
 import { documentRoutes } from './modules/documents/document.routes';
@@ -76,6 +77,15 @@ app.use('/api', authMiddleware);
 
 // Carga Modular de Rutas de la API
 app.use('/api', authRoutes);
+/*
+ * Mounted at its own prefix, not at /api.
+ *
+ * The router applies requireSuperAdmin with `router.use`, which runs for every
+ * request that ENTERS the router — not only those matching one of its routes.
+ * At /api it would have answered 403 to every ordinary lawyer on every
+ * endpoint below it.
+ */
+app.use('/api/admin', adminRoutes);
 app.use('/api', healthRoutes);
 app.use('/api', agentRoutes);
 app.use('/api', documentRoutes);

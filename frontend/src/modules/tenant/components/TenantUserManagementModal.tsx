@@ -3,6 +3,8 @@ import { X, Building2, Users, Key, Shield } from 'lucide-react';
 import type { LawFirmTenant } from './Header';
 import { ActionConfirmationModal } from './ActionConfirmationModal';
 import { FirmsTab } from './tabs/FirmsTab';
+import { OperatorConsole } from '../../admin/components/OperatorConsole';
+import { readSession } from '../../auth/session';
 import { UsersTab } from './tabs/UsersTab';
 import { LoginTab } from './tabs/LoginTab';
 import { useActionConfirmation } from '../hooks/useActionConfirmation';
@@ -43,6 +45,10 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
   onUpdateFirm,
   onDeleteFirm
 }) => {
+  // From the signed session: the console renders for a role the server also
+  // enforces, so hiding it is presentation and never protection.
+  const isSuperAdmin = readSession()?.user.role === 'SUPER_ADMIN';
+
   const [activeTab, setActiveTab] = useState<TabKey>('firms');
   const { confirm, modalProps } = useActionConfirmation();
   const { users, addUser, updateUser, removeUser } = useFirmUsers();
@@ -91,7 +97,16 @@ export const TenantUserManagementModal: React.FC<TenantUserManagementModalProps>
 
         {/* Body Content */}
         <div className="p-6 overflow-y-auto flex-1 space-y-5 text-xs">
-          {activeTab === 'firms' && (
+          {/*
+            The operator console replaces the old firms tab for a super
+            administrator. That tab created and deleted tenants in localStorage,
+            which is why the registry table stayed empty; this one runs the real
+            business — plans, balances, accounts — against the API, and shows
+            volume figures only.
+          */}
+          {activeTab === 'firms' && isSuperAdmin && <OperatorConsole />}
+
+          {activeTab === 'firms' && !isSuperAdmin && (
             <FirmsTab
               firms={firms}
               activeFirm={activeFirm}
