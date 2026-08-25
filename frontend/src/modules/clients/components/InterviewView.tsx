@@ -6,7 +6,7 @@ import { StoredTranscriptions } from '../../transcription/components/StoredTrans
 import { NotPersistedWarning } from '../../transcription/components/RoleProposals';
 import { exportTranscriptToPdf, exportTranscriptToWord } from '../../transcription/transcriptExport';
 import { buildSpeakerNames } from '../../transcription/speakerNames';
-import { ROLE_LABELS } from '../../transcription/types';
+import { ROLE_LABELS, SUPPORTED_AUDIO_EXTENSIONS } from '../../transcription/types';
 import { toPlainText } from '../../transcription/toPlainText';
 import { ClientPicker } from './ClientPicker';
 import { InterviewInsights } from './InterviewInsights';
@@ -46,6 +46,7 @@ export const InterviewView: React.FC = () => {
     voiceConflicts,
     nameProposals,
     stored,
+    maxAudioBytes,
     isLoadingStored,
     loadStored,
     openStored,
@@ -94,6 +95,8 @@ export const InterviewView: React.FC = () => {
     setCopiado(true);
     window.setTimeout(() => setCopiado(false), 2000);
   };
+
+  const megabytes = (bytes: number): string => (bytes / (1024 * 1024)).toFixed(1);
 
   const trabajando = isUploading || isTranscribing;
 
@@ -195,6 +198,19 @@ export const InterviewView: React.FC = () => {
                   <Upload className="w-3 h-3" />
                   O sube una grabación que ya tengas
                 </button>
+
+                {/*
+                  Said before choosing, not after.
+                  
+                  The limits are enforced either way — the hook validates before
+                  uploading — but a file rejected after the picker closed makes
+                  the lawyer guess which of the two rules they broke. The ceiling
+                  is the server's own, not a number written here: it depends on
+                  the host and the provider.
+                */}
+                <p className="text-[10px] text-slate-400 mt-1">
+                  {SUPPORTED_AUDIO_EXTENSIONS.join(', ')} · máximo {megabytes(maxAudioBytes)} MB
+                </p>
               </div>
             </>
           )}
