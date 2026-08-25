@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useTenant } from '../../tenant/TenantContext';
 import { catalogApi } from '../services/catalog.api';
 import type { LegalBranch } from '../types';
 
@@ -16,7 +15,6 @@ import type { LegalBranch } from '../types';
  * own fallback rather than showing an empty selector.
  */
 export const useCatalogBranches = (): LegalBranch[] => {
-  const { firmId } = useTenant();
   const [branches, setBranches] = useState<LegalBranch[]>([]);
 
   useEffect(() => {
@@ -34,7 +32,7 @@ export const useCatalogBranches = (): LegalBranch[] => {
     return () => {
       cancelled = true;
     };
-  }, [firmId]);
+  }, []);
 
   return branches;
 };

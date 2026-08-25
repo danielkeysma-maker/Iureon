@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useTenant } from '../../tenant/TenantContext';
 import { catalogApi } from '../services/catalog.api';
 import type { ActuacionRole, LegalBranch } from '../types';
 
@@ -17,7 +16,6 @@ import type { ActuacionRole, LegalBranch } from '../types';
  * empty selector.
  */
 export const useBranchActuaciones = (branch: string, role: ActuacionRole): string[] => {
-  const { firmId } = useTenant();
   const [names, setNames] = useState<string[]>([]);
 
   useEffect(() => {
@@ -39,7 +37,7 @@ export const useBranchActuaciones = (branch: string, role: ActuacionRole): strin
     return () => {
       cancelled = true;
     };
-  }, [firmId, branch, role]);
+  }, [branch, role]);
 
   return names;
 };

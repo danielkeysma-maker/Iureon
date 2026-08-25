@@ -12,11 +12,11 @@
  */
 import { supabase } from '../../../config/supabase.config';
 import { signIn, userFromToken, AuthError } from '../auth.service';
-import { crearFirmaConSesion } from './helpers';
+import { crearFirmaConSesion, clavePrueba } from './helpers';
 
 const marca = Date.now();
-const A = { firmName: `Firma A ${marca}`, nit: `900${marca}`, email: `a${marca}@iureon.test`, password: 'contrasena-larga-A' };
-const B = { firmName: `Firma B ${marca}`, nit: `901${marca}`, email: `b${marca}@iureon.test`, password: 'contrasena-larga-B' };
+const A = { firmName: `Firma A ${marca}`, nit: `900${marca}`, email: `a${marca}@iureon.test`, password: clavePrueba() };
+const B = { firmName: `Firma B ${marca}`, nit: `901${marca}`, email: `b${marca}@iureon.test`, password: clavePrueba() };
 
 let fallos = 0;
 const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'OK  ' : 'FALLA'} ${n}${d ? ' — ' + d : ''}`); if (!ok) fallos++; };

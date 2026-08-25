@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useTenant } from '../../tenant/TenantContext';
 import { catalogApi } from '../services/catalog.api';
 import type { Actuacion, CatalogMeta, CurationStatus, LegalBranch, VerificationInput } from '../types';
 
@@ -11,7 +10,6 @@ import type { Actuacion, CatalogMeta, CurationStatus, LegalBranch, VerificationI
  * client-side guess could show a term the backend rejected or normalised.
  */
 export const useCatalogCuration = () => {
-  const { firmId } = useTenant();
 
   const [actuaciones, setActuaciones] = useState<Actuacion[]>([]);
   const [branches, setBranches] = useState<LegalBranch[]>([]);
@@ -41,7 +39,7 @@ export const useCatalogCuration = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [firmId]);
+  }, []);
 
   useEffect(() => {
     void load();
@@ -63,7 +61,7 @@ export const useCatalogCuration = () => {
         setIsSaving(false);
       }
     },
-    [firmId, load]
+    [load]
   );
 
   const revert = useCallback(
@@ -82,7 +80,7 @@ export const useCatalogCuration = () => {
         setIsSaving(false);
       }
     },
-    [firmId, load]
+    [load]
   );
 
   const visible = useMemo(() => {

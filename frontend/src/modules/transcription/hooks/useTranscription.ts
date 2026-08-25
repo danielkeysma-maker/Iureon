@@ -238,7 +238,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
         setError(err instanceof Error ? err.message : 'No se pudo guardar el rol del interlocutor.');
       }
     },
-    [firmId, transcriptionId, result]
+    [transcriptionId, result]
   );
 
   /**
@@ -282,7 +282,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
         setError(err instanceof Error ? err.message : 'La corrección no se pudo guardar.');
       }
     },
-    [firmId, transcriptionId, result]
+    [transcriptionId, result]
   );
 
   /**
@@ -331,7 +331,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
         setError(err instanceof Error ? err.message : 'No se pudo dividir la intervención.');
       }
     },
-    [firmId, transcriptionId, result]
+    [transcriptionId, result]
   );
 
   /**
@@ -370,7 +370,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
         setError(err instanceof Error ? err.message : 'No se pudo cambiar la voz de la intervención.');
       }
     },
-    [firmId, transcriptionId, result]
+    [transcriptionId, result]
   );
 
   /**

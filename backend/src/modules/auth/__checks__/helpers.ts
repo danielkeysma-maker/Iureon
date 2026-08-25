@@ -25,3 +25,15 @@ export const crearFirmaConSesion = async (input: {
 
   return signIn(input.email, input.password);
 };
+
+/**
+ * A throwaway password for a check's throwaway account.
+ *
+ * Generated rather than written down, and not to satisfy the secrets gate —
+ * that gate is right, and a literal password in source is a literal password in
+ * source whatever it protects. Generating it means there is nothing to leak,
+ * nothing to accidentally reuse somewhere real, and a different value on every
+ * run.
+ */
+export const clavePrueba = (): string =>
+  `pr-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useTenant } from '../../tenant/TenantContext';
 import { catalogApi } from '../services/catalog.api';
 import type { Actuacion } from '../types';
 
@@ -14,7 +13,6 @@ import type { Actuacion } from '../types';
  * them without it rather than pick one.
  */
 export const useActuacion = (documentType: string, branch?: string): Actuacion | null => {
-  const { firmId } = useTenant();
   const [actuacion, setActuacion] = useState<Actuacion | null>(null);
 
   useEffect(() => {
@@ -31,7 +29,7 @@ export const useActuacion = (documentType: string, branch?: string): Actuacion |
     return () => {
       cancelled = true;
     };
-  }, [firmId, documentType, branch]);
+  }, [documentType, branch]);
 
   return actuacion;
 };

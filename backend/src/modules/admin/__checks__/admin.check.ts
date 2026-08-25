@@ -16,7 +16,7 @@ import { authPublicRoutes, authRoutes } from '../../auth/auth.routes';
 import { adminRoutes } from '../admin.routes';
 import { transcriptionRoutes } from '../../transcription/transcription.routes';
 import { auditRoutes } from '../../audit/audit.routes';
-import { crearFirmaConSesion } from '../../auth/__checks__/helpers';
+import { clavePrueba, crearFirmaConSesion } from '../../auth/__checks__/helpers';
 
 const app = express();
 app.use(express.json());
@@ -53,7 +53,7 @@ const PRIVILEGIADO = 'material privilegiado';
     }).then(async (r) => ({ status: r.status, body: await r.json().catch(() => null) }));
 
   const correoOperador = `op${m}@iureon.test`;
-  const claveOperador = 'contrasena-operador';
+  const claveOperador = clavePrueba();
 
   const op = await crearFirmaConSesion({
     firmName: `Operador ${m}`,
@@ -65,7 +65,7 @@ const PRIVILEGIADO = 'material privilegiado';
     firmName: `Cliente ${m}`,
     nit: `971${m}`,
     email: `cl${m}@iureon.test`,
-    password: 'contrasena-cliente'
+    password: clavePrueba()
   });
 
   await c.from('transcriptions').insert({
@@ -159,7 +159,7 @@ const PRIVILEGIADO = 'material privilegiado';
   // ─── El rol no se puede pedir por la red ──────────────────────────────────
   const pidiendoRol = await pedir(`/admin/firms/${cliente.user.firmId}/users`, opToken, {
     method: 'POST',
-    body: JSON.stringify({ email: `colado${m}@iureon.test`, password: 'contrasena-larga', role: 'SUPER_ADMIN' })
+    body: JSON.stringify({ email: `colado${m}@iureon.test`, password: clavePrueba(), role: 'SUPER_ADMIN' })
   });
   const { data: tras } = await c.auth.admin.listUsers();
   const colado = tras.users.find((u) => u.email === `colado${m}@iureon.test`);

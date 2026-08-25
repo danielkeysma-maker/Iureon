@@ -121,7 +121,7 @@ export const useSavedDrafts = (firmId: string, userEmail: string, enabled: boole
       writeLocal(storageKey, updated);
       return '✅ Borrador guardado (almacenamiento local). Podrás abrirlo y editarlo en cualquier momento.';
     },
-    [firmId, userEmail, loadedDraftId, savedDrafts, storageKey, reload]
+    [userEmail, loadedDraftId, savedDrafts, storageKey, reload]
   );
 
   const deleteDraft = useCallback(
@@ -135,7 +135,7 @@ export const useSavedDrafts = (firmId: string, userEmail: string, enabled: boole
       setSavedDrafts(updated);
       writeLocal(storageKey, updated);
     },
-    [firmId, savedDrafts, storageKey, reload]
+    [savedDrafts, storageKey, reload]
   );
 
   return { savedDrafts, loadedDraftId, setLoadedDraftId, reload, saveDraft, deleteDraft };
