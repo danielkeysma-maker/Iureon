@@ -71,20 +71,29 @@ export function App() {
   const currentUserEmail = session?.user.email ?? '';
 
   /*
-   * The module survives a reload.
+   * The module survives a RELOAD, and only a reload.
    *
-   * Refreshing while reading a two-hour transcript threw the lawyer back to the
-   * drafting workspace, which is the one screen they were not looking at — and
-   * a reload is exactly what somebody does when a page misbehaves, so the app
-   * punished the reflex it had provoked. Going home stays deliberate: the
-   * Redacción module, or the logo.
+   * Refreshing while reading a two-hour transcript used to throw the lawyer back
+   * to the drafting workspace — the one screen they were not looking at — and a
+   * reload is exactly what somebody does when a page misbehaves, so the app
+   * punished the reflex it had provoked.
+   *
+   * But opening the application afresh should open it at the beginning. Those
+   * are different intentions and `sessionStorage` is exactly the line between
+   * them: it belongs to the tab, so it survives F5 and is empty in a new tab or
+   * after the browser is closed. `localStorage` cannot tell the two apart —
+   * it would have carried yesterday's module into tomorrow's first visit.
    *
    * The stored value is checked against the modules that exist, because a
    * renamed one would otherwise render an empty shell with no way back.
    */
   const [mainView, setMainViewState] = useState<MainView>(() => {
     try {
-      const guardado = localStorage.getItem('iureon_main_view');
+      // Left behind by the first version of this, which used localStorage and
+      // therefore followed the user into every new tab.
+      localStorage.removeItem('iureon_main_view');
+
+      const guardado = sessionStorage.getItem('iureon_main_view');
       return guardado && MAIN_VIEWS.includes(guardado as MainView)
         ? (guardado as MainView)
         : 'workspace';
@@ -96,7 +105,7 @@ export function App() {
   const setMainView = (view: MainView): void => {
     setMainViewState(view);
     try {
-      localStorage.setItem('iureon_main_view', view);
+      sessionStorage.setItem('iureon_main_view', view);
     } catch {
       /* The module still changes for this session; only the memory is lost. */
     }
