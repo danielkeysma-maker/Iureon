@@ -153,7 +153,15 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
           quién. Asigna el rol procesal de cada una.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+        {/*
+          One voice per row at this width.
+          
+          Two columns put a 32px avatar, a name and a select into 265px, and the
+          name ran under the select — the panel that exists to say who is who was
+          the one place a name could not be read. It splits into two columns only
+          when there is genuinely room.
+        */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-2">
           {result.speakerLabels.map((label) => (
             <div key={label} className="flex items-center gap-2">
               <div
@@ -165,7 +173,7 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                 </span>
               </div>
               <span
-                className="text-[11px] font-semibold text-slate-700 w-28 shrink-0 truncate"
+                className="text-[11px] font-semibold text-slate-700 flex-1 min-w-0 truncate"
                 title={label}
               >
                 {speakerNames[label] ?? label}
@@ -173,7 +181,7 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
               <select
                 value={roleOf(label)}
                 onChange={(e) => onAssignRole(label, e.target.value as SpeakerRole)}
-                className="flex-1 bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-[11px] text-slate-900 focus:outline-none focus:border-blue-900"
+                className="w-44 shrink-0 bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-[11px] text-slate-900 focus:outline-none focus:border-blue-900"
               >
                 {ROLE_OPTIONS[kind].map((role) => (
                   <option key={role} value={role}>
