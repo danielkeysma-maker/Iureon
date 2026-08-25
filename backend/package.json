@@ -16,6 +16,7 @@
     "check:admin": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/admin/__checks__/admin.check.ts",
     "check:auth": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/auth/__checks__/auth.check.ts",
     "check:roles": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/transcription/__checks__/roleProposer.check.ts",
+    "check:stored": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/transcription/__checks__/storedList.check.ts",
     "check:conflicts": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/transcription/__checks__/voiceConflicts.check.ts",
     "check:retrieval": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/search/__checks__/retrieval.check.ts",
     "ingest:corpus": "npx ts-node --transpile-only src/scripts/ingestCorpus.ts"

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTenant } from '../../tenant/TenantContext';
-import { transcriptionApi } from '../services/transcription.api';
+import { transcriptionApi, type StoredTranscription } from '../services/transcription.api';
 import {
   FALLBACK_MAX_AUDIO_BYTES,
   SUPPORTED_AUDIO_EXTENSIONS,
@@ -358,6 +358,78 @@ export const useTranscription = (kind: TranscriptionKind) => {
     [firmId, transcriptionId, result]
   );
 
+  /**
+   * The transcripts already stored for this firm.
+   *
+   * WHY THIS SCREEN NEEDED TO EXIST. Every transcription was saved on the
+   * server the moment the provider answered — deliberately, so closing a tab
+   * would not lose a two-hour hearing or force paying to redo it — but nothing
+   * ever showed them. A lawyer had no way to know their hearings were kept, no
+   * way to reopen one, and no way to delete it. For privileged material that is
+   * backwards: what is stored has to be visible to whoever it belongs to, and
+   * they have to be able to remove it.
+   */
+  const [stored, setStored] = useState<StoredTranscription[]>([]);
+  const [isLoadingStored, setIsLoadingStored] = useState(false);
+
+  const loadStored = useCallback(async () => {
+    if (!firmId) return;
+
+    setIsLoadingStored(true);
+    try {
+      setStored(await transcriptionApi.list());
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudieron cargar los transcritos guardados.');
+    } finally {
+      setIsLoadingStored(false);
+    }
+  }, [firmId]);
+
+  /** Reopens a stored transcript into the working view. */
+  const openStored = useCallback((item: StoredTranscription) => {
+    setTranscriptionId(item.id);
+    setPersisted(true);
+    setResult({
+      kind: item.kind,
+      fullText: item.full_text,
+      segments: item.segments,
+      speakerLabels: item.speaker_labels,
+      language: item.language,
+      durationSeconds: item.duration_seconds,
+      model: item.model,
+      transcribedAt: item.transcribed_at
+    });
+    // Proposals and conflicts are recomputed by the server on the next change;
+    // showing stale ones would be worse than showing none.
+    setRoleProposals([]);
+    setVoiceConflicts([]);
+  }, []);
+
+  const deleteStored = useCallback(
+    async (id: string) => {
+      try {
+        await transcriptionApi.remove(id);
+        setStored((actuales) => actuales.filter((t) => t.id !== id));
+
+        /*
+         * A transcript still on screen after being deleted is worse than one
+         * that was never shown: every edit, cut and role assignment would fail
+         * against a row that no longer exists, and the lawyer would be working
+         * on something the database has already forgotten.
+         */
+        if (transcriptionId === id) {
+          setTranscriptionId(null);
+          setResult(null);
+          setRoleProposals([]);
+          setVoiceConflicts([]);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'No se pudo borrar el transcrito.');
+      }
+    },
+    [transcriptionId]
+  );
+
   const reset = useCallback(() => {
     setResult(null);
     setTranscriptionId(null);
@@ -377,6 +449,11 @@ export const useTranscription = (kind: TranscriptionKind) => {
     error,
     roleProposals,
     voiceConflicts,
+    stored,
+    isLoadingStored,
+    loadStored,
+    openStored,
+    deleteStored,
     persisted,
     maxAudioBytes,
     transcribe,

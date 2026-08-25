@@ -39,6 +39,21 @@ interface TranscribeResponse {
   voiceConflicts?: VoiceConflict[];
 }
 
+/** A transcript as the database holds it. */
+export interface StoredTranscription {
+  id: string;
+  kind: TranscriptionKind;
+  title: string;
+  source_file_name: string;
+  full_text: string;
+  segments: TranscriptSegment[];
+  speaker_labels: string[];
+  language: string | null;
+  duration_seconds: number | null;
+  model: string;
+  transcribed_at: string;
+}
+
 export interface TranscriptionOutcome {
   result: TranscriptionResult;
   id: string | null;
@@ -228,6 +243,25 @@ export const transcriptionApi = {
    * split changes indices for every intervention after it, and guessing at that
    * on the client is how two views of the same transcript drift apart.
    */
+  /**
+   * The transcripts this firm has stored.
+   *
+   * The endpoint has existed since the store was written and NOTHING EVER
+   * CALLED IT, so a transcript vanished from the screen the moment the tab was
+   * closed while the row stayed in the database. The lawyer was never told any
+   * of it was being kept — which is the wrong way round for privileged
+   * material: what is stored has to be visible to whoever it belongs to.
+   */
+  async list(): Promise<StoredTranscription[]> {
+    const data = await httpClient.get<{ items: StoredTranscription[] }>('/api/transcription');
+    return data.items ?? [];
+  },
+
+  /** Deletion is the firm's. Privileged material must not outlive their decision. */
+  async remove(id: string): Promise<void> {
+    await httpClient.delete(`/api/transcription/${id}`);
+  },
+
   /**
    * Persists who each voice is.
    *

@@ -1,9 +1,10 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Mic, Upload, FileAudio, AlertTriangle, Cpu, Copy, CheckCircle2, RotateCcw } from 'lucide-react';
 import { useTranscription } from '../hooks/useTranscription';
 import { TranscriptSegments } from './TranscriptSegments';
 import { AudioPreview } from './AudioPreview';
 import { NotPersistedWarning, RoleProposals } from './RoleProposals';
+import { StoredTranscriptions } from './StoredTranscriptions';
 import { buildSpeakerNames } from '../speakerNames';
 import { ROLE_LABELS, SUPPORTED_AUDIO_EXTENSIONS, type SpeakerRole, type TranscriptSegment, type TranscriptionKind } from '../types';
 
@@ -36,7 +37,7 @@ const toPlainText = (
  * mis-transcribed without it.
  */
 export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AUDIENCIA' }) => {
-  const { hasFirm, isAvailable, isUploading, isTranscribing, result, error, roleProposals, persisted, maxAudioBytes, transcribe, assignRole, editSegment, splitSegment, reassignSpeaker, voiceConflicts, canEdit, reset } =
+  const { hasFirm, isAvailable, isUploading, isTranscribing, result, error, roleProposals, persisted, maxAudioBytes, transcribe, assignRole, editSegment, splitSegment, reassignSpeaker, voiceConflicts, stored, isLoadingStored, loadStored, openStored, deleteStored, canEdit, reset } =
     useTranscription(kind);
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -46,6 +47,14 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AU
    */
   const [confirmed, setConfirmed] = useState<Record<string, SpeakerRole>>({});
   const [contextPrompt, setContextPrompt] = useState('');
+  /*
+   * Loaded on entry, because the whole point is that the lawyer does not have
+   * to be told their hearings are stored — they see them.
+   */
+  useEffect(() => {
+    void loadStored();
+  }, [loadStored]);
+
   const [copied, setCopied] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -115,6 +124,16 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AU
         )}
 
         {!result && (
+          <StoredTranscriptions
+            items={stored}
+            isLoading={isLoadingStored}
+            onOpen={openStored}
+            onDelete={deleteStored}
+            onRefresh={() => void loadStored()}
+          />
+        )}
+
+        {!result && (
           <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4">
             <div className="border-2 border-dashed border-slate-200 hover:border-blue-900/60 rounded-xl p-6 flex flex-col items-center text-center bg-slate-50/60 transition-colors relative">
               <input
@@ -153,6 +172,23 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AU
                 </div>
               )}
             </div>
+
+            {/*
+              SAID BEFORE, NOT DISCOVERED AFTER.
+              
+              The transcript is stored the moment the provider answers, which is
+              what keeps a two-hour hearing from being lost by closing a tab —
+              but nothing said so, and a user found out only by being told
+              weeks later. Retention of privileged material is not something to
+              learn afterwards, and the sentence is here rather than in a
+              settings page because this is the moment the material arrives.
+            */}
+            <p className="text-[11px] text-slate-500 bg-slate-50 border border-slate-200 rounded-lg p-2.5">
+              <b className="text-slate-700">Qué se guarda:</b> el texto de la transcripción queda
+              guardado en tu firma para que no lo pierdas al cerrar la pestaña, y puedes borrarlo
+              cuando quieras desde la lista de arriba. <b className="text-slate-700">La grabación no
+              se guarda</b>: se borra del almacenamiento apenas termina de transcribirse.
+            </p>
 
             <div>
               <label className="text-[11px] font-semibold text-slate-700 block mb-1">
