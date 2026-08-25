@@ -9,9 +9,17 @@ interface FirmsTabProps {
   firms: LawFirmTenant[];
   activeFirm: LawFirmTenant;
   onSelectFirm: (firm: LawFirmTenant) => void;
-  onCreateFirm: (firm: LawFirmTenant) => void;
+  /**
+   * Absent now that a firm is created by REGISTERING it, which issues its
+   * first administrator in the same call. Creating a tenant here wrote it to
+   * localStorage and nowhere else: the registry table stayed empty, and the
+   * firm died with the browser while its hearings survived in the database,
+   * unreachable.
+   */
+  onCreateFirm?: (firm: LawFirmTenant) => void;
   onUpdateFirm: (firm: LawFirmTenant) => void;
-  onDeleteFirm: (firmId: string) => void;
+  /** Absent as well: deleting a tenant a live session is bound to only strands that session. */
+  onDeleteFirm?: (firmId: string) => void;
   confirm: (request: ConfirmationRequest) => void;
 }
 
@@ -49,7 +57,7 @@ export const FirmsTab: React.FC<FirmsTabProps> = ({
       confirmText: 'Registrar Firma',
       variant: 'primary',
       onConfirm: () => {
-        onCreateFirm({
+        onCreateFirm?.({
           id: `firm-${Date.now()}`,
           name: newFirmName.trim(),
           nit: newFirmNit.trim(),
@@ -97,7 +105,7 @@ export const FirmsTab: React.FC<FirmsTabProps> = ({
       message: `¿Está seguro de que desea eliminar la firma "${f.name}"? Se revocarán los accesos de todos los usuarios vinculados. Esta acción es irreversible.`,
       confirmText: 'Sí, Eliminar Firma',
       variant: 'danger',
-      onConfirm: () => onDeleteFirm(f.id)
+      onConfirm: () => onDeleteFirm?.(f.id)
     });
   };
 

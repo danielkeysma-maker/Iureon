@@ -23,7 +23,7 @@ export const useCatalogBranches = (): LegalBranch[] => {
     let cancelled = false;
 
     catalogApi
-      .list(firmId)
+      .list()
       .then((result) => {
         if (!cancelled) setBranches(result.branches);
       })

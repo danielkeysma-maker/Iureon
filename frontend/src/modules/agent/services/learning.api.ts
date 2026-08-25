@@ -8,10 +8,9 @@ import { httpClient } from '../../../config/httpClient';
  * failure here must never surface as an error.
  */
 export const learningApi = {
-  async teachStyle(firmId: string, originalText: string, editedText: string): Promise<void> {
+  async teachStyle(originalText: string, editedText: string): Promise<void> {
     try {
       await httpClient.post('/api/agent/learn-edits', {
-        firmId,
         body: { originalText, editedText }
       });
     } catch {

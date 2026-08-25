@@ -31,7 +31,7 @@ export const useCatalogCuration = () => {
     setLoadError(null);
 
     try {
-      const result = await catalogApi.list(firmId);
+      const result = await catalogApi.list();
       setActuaciones(result.actuaciones);
       setBranches(result.branches);
       setMeta(result.meta);
@@ -53,7 +53,7 @@ export const useCatalogCuration = () => {
       setSaveError(null);
 
       try {
-        await catalogApi.saveVerification(firmId, input);
+        await catalogApi.saveVerification(input);
         await load();
         return true;
       } catch (error) {
@@ -72,7 +72,7 @@ export const useCatalogCuration = () => {
       setSaveError(null);
 
       try {
-        await catalogApi.deleteVerification(firmId, actuacionId);
+        await catalogApi.deleteVerification(actuacionId);
         await load();
         return true;
       } catch (error) {

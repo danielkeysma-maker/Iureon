@@ -6,7 +6,6 @@ import DOMPurify from 'dompurify';
 
 export type { GeneratedDraft } from '../types';
 import type { GeneratedDraft } from '../types';
-import { useTenant } from '../../tenant/TenantContext';
 import { learningApi } from '../../agent/services/learning.api';
 
 
@@ -27,7 +26,6 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
   onSaveDraft,
   onOpenSavedDraftsModal
 }) => {
-  const { firmId } = useTenant();
   const [editableText, setEditableText] = useState(draft.legalText);
   const [selectedText, setSelectedText] = useState('');
   const [isJargonModalOpen, setIsJargonModalOpen] = useState(false);
@@ -77,7 +75,7 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
   const handleSaveAndTeachStyle = async () => {
     setIsStyleSaved(true);
     try {
-      await learningApi.teachStyle(firmId, draft.legalText, editableText);
+      await learningApi.teachStyle(draft.legalText, editableText);
     } finally {
       setTimeout(() => setIsStyleSaved(false), 3000);
     }

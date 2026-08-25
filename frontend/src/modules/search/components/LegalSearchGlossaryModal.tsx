@@ -50,7 +50,7 @@ export const LegalSearchGlossaryModal: React.FC<LegalSearchGlossaryModalProps> =
     const controller = new AbortController();
     setIsLoading(true);
 
-    searchGlossary(firmId, searchQuery.trim(), 'TODAS', controller.signal)
+    searchGlossary(searchQuery.trim(), 'TODAS', controller.signal)
       .then((response) => {
         setItems(response.items ?? []);
         setReason(response.reason);

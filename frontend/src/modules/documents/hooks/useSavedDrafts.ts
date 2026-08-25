@@ -79,7 +79,7 @@ export const useSavedDrafts = (firmId: string, userEmail: string, enabled: boole
     }
 
     if (firmId) {
-      const remote = await draftsApi.list(firmId, userEmail);
+      const remote = await draftsApi.list();
       if (remote) {
         setSavedDrafts(remote);
         return;
@@ -97,7 +97,7 @@ export const useSavedDrafts = (firmId: string, userEmail: string, enabled: boole
   const saveDraft = useCallback(
     async (draft: GeneratedDraft): Promise<string> => {
       if (loadedDraftId) {
-        if (await draftsApi.update(firmId, loadedDraftId, draft)) {
+        if (await draftsApi.update(loadedDraftId, draft)) {
           await reload();
           return '✅ Borrador actualizado exitosamente.';
         }
@@ -110,7 +110,7 @@ export const useSavedDrafts = (firmId: string, userEmail: string, enabled: boole
         return '✅ Borrador actualizado (almacenamiento local).';
       }
 
-      if (await draftsApi.create(firmId, userEmail, draft)) {
+      if (await draftsApi.create(draft)) {
         await reload();
         return '✅ Borrador guardado en la nube. Podrás abrirlo y editarlo en cualquier momento.';
       }
@@ -126,7 +126,7 @@ export const useSavedDrafts = (firmId: string, userEmail: string, enabled: boole
 
   const deleteDraft = useCallback(
     async (id: string): Promise<void> => {
-      if (await draftsApi.remove(firmId, id)) {
+      if (await draftsApi.remove(id)) {
         await reload();
         return;
       }

@@ -1,45 +1,78 @@
 import React, { useState } from 'react';
-import { Scale, Mail, Key, ShieldCheck, ArrowRight, AlertCircle } from 'lucide-react';
-import type { LawFirmTenant } from './Header';
+import { Scale, Mail, Key, ShieldCheck, ArrowRight, AlertCircle, Building2 } from 'lucide-react';
+import { authApi } from '../../auth/auth.api';
+import type { Session } from '../../auth/session';
 
 interface LoginPortalViewProps {
-  onLoginSuccess: (userEmail: string, firm: LawFirmTenant) => void;
-  registeredFirms: LawFirmTenant[];
+  onLoginSuccess: (session: Session) => void;
 }
 
-export const LoginPortalView: React.FC<LoginPortalViewProps> = ({
-  onLoginSuccess,
-  registeredFirms
-}) => {
+/**
+ * The door, and now it is actually locked.
+ *
+ * WHAT THIS USED TO DO. It checked that both fields were non-empty, waited on a
+ * setTimeout that existed only to look busy, and let anyone in — then handed
+ * the app whichever firm happened to be first in localStorage. The footer said
+ * "Autenticación Cifrada Supabase Auth & Multi-Tenant RLS", which was false in
+ * every word.
+ *
+ * Both halves live here because they are the same moment for a new user:
+ * signing in needs an account, and the first account of a firm is created by
+ * registering the firm. Registration mints the tenant server-side and issues
+ * its first administrator; it cannot join an existing firm, so the form has no
+ * way to name one.
+ */
+export const LoginPortalView: React.FC<LoginPortalViewProps> = ({ onLoginSuccess }) => {
+  const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [firmName, setFirmName] = useState('');
+  const [nit, setNit] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  const registering = mode === 'register';
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
 
-    if (!email.trim() || !password.trim()) {
-      setErrorMsg('Por favor ingrese su correo y contraseña corporativa.');
+    if (!email.trim() || !password) {
+      setErrorMsg('Ingresa tu correo y tu contraseña.');
+      return;
+    }
+
+    if (registering && (!firmName.trim() || !nit.trim())) {
+      setErrorMsg('Ingresa el nombre y el NIT de la firma.');
       return;
     }
 
     setIsLoading(true);
 
-    setTimeout(() => {
-      setIsLoading(false);
-      // Resolucion automatica de la firma por el usuario o asignacion limpia
-      const chosenFirm = registeredFirms[0] || {
-        id: '',
-        name: 'Sin Firma Registrada',
-        nit: 'REGISTRA TU FIRMA',
-        creditsBalance: 0,
-        status: 'active'
-      };
+    try {
+      const { session } = registering
+        ? await authApi.registerFirm({
+            firmName: firmName.trim(),
+            nit: nit.trim(),
+            email: email.trim(),
+            password
+          })
+        : await authApi.login(email.trim(), password);
 
-      onLoginSuccess(email.trim(), chosenFirm);
-    }, 600);
+      onLoginSuccess(session);
+    } catch (err) {
+      // The API answers in Spanish and distinguishes nothing an attacker could
+      // use — "Correo o contraseña incorrectos" covers both a wrong password
+      // and an address with no account.
+      setErrorMsg(err instanceof Error ? err.message : 'No se pudo completar la operación.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const switchMode = () => {
+    setMode(registering ? 'login' : 'register');
+    setErrorMsg('');
   };
 
   return (
@@ -57,13 +90,47 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({
             <Scale className="w-7 h-7 text-blue-200" />
           </div>
           <h1 className="text-2xl font-black text-slate-900 tracking-tight">IUREON</h1>
-          <p className="text-xs font-medium text-slate-500">Plataforma LegalTech &amp; Ecosistema Judicial Colombia</p>
+          <p className="text-xs font-medium text-slate-500">
+            Plataforma LegalTech &amp; Ecosistema Judicial Colombia
+          </p>
         </div>
 
-        {/* Credentials Form */}
-        <form onSubmit={handleLoginSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {registering && (
+            <>
+              <div>
+                <label className="text-xs font-semibold text-slate-700 block mb-1">
+                  Nombre de la firma o despacho:
+                </label>
+                <div className="relative">
+                  <Building2 className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                  <input
+                    type="text"
+                    value={firmName}
+                    onChange={(e) => setFirmName(e.target.value)}
+                    placeholder="Wilches & Asociados S.A.S."
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-900 font-medium focus:outline-none focus:border-blue-900 focus:bg-white transition-all"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-slate-700 block mb-1">NIT:</label>
+                <input
+                  type="text"
+                  value={nit}
+                  onChange={(e) => setNit(e.target.value)}
+                  placeholder="900.123.456-7"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs text-slate-900 font-mono focus:outline-none focus:border-blue-900 focus:bg-white transition-all"
+                />
+              </div>
+            </>
+          )}
+
           <div>
-            <label className="text-xs font-semibold text-slate-700 block mb-1">Correo Electrónico Corporativo:</label>
+            <label className="text-xs font-semibold text-slate-700 block mb-1">
+              Correo Electrónico Corporativo:
+            </label>
             <div className="relative">
               <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
               <input
@@ -78,7 +145,9 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-slate-700 block mb-1">Contraseña de Acceso:</label>
+            <label className="text-xs font-semibold text-slate-700 block mb-1">
+              Contraseña de Acceso:
+            </label>
             <div className="relative">
               <Key className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
               <input
@@ -90,6 +159,9 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({
                 required
               />
             </div>
+            {registering && (
+              <p className="text-[11px] text-slate-500 mt-1">Mínimo 8 caracteres.</p>
+            )}
           </div>
 
           {errorMsg && (
@@ -102,35 +174,37 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 bg-blue-950 hover:bg-blue-900 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.99]"
+            className="w-full py-3 bg-blue-950 hover:bg-blue-900 disabled:bg-slate-400 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.99]"
           >
             {isLoading ? (
-              <span>Autenticando credenciales...</span>
+              <span>{registering ? 'Registrando la firma…' : 'Verificando credenciales…'}</span>
             ) : (
               <>
                 <ShieldCheck className="w-4 h-4 text-blue-300" />
-                <span>Ingresar al Workspace Judicial</span>
+                <span>{registering ? 'Registrar firma y crear cuenta' : 'Ingresar al Workspace Judicial'}</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
           </button>
         </form>
 
-        {/*
-          This said "Autenticación Cifrada Supabase Auth & Multi-Tenant RLS".
-          None of it was true: handleLoginSubmit checks that the two fields are
-          non-empty, waits on a setTimeout that exists only to look busy, and
-          lets anyone in. There is no Supabase call and no credential check.
-
-          A product whose whole thesis is that it never states what it has not
-          verified cannot promise security it does not have — a false claim here
-          is the same defect as a fabricated ruling, and more dangerous, because
-          a firm would decide to trust it with client data. Says what is true
-          until real authentication lands.
-        */}
-        <div className="pt-4 border-t border-slate-100 text-center text-[11px] text-slate-500">
-          <p className="font-semibold text-amber-700">Entorno de desarrollo</p>
-          <p className="mt-0.5">El acceso todavía no se verifica. No cargue información real de clientes.</p>
+        <div className="pt-4 border-t border-slate-100 text-center text-[11px] text-slate-500 space-y-2">
+          <button
+            type="button"
+            onClick={switchMode}
+            className="text-blue-900 font-semibold hover:underline"
+          >
+            {registering
+              ? '¿Ya tienes cuenta? Inicia sesión'
+              : '¿Tu firma no está registrada? Regístrala'}
+          </button>
+          {/*
+            Says what is true, as the previous warning did when nothing was
+            verified. Now it is: the password is checked against Supabase Auth,
+            and the firm travels inside the signed token rather than in a header
+            the browser writes.
+          */}
+          <p>Acceso verificado. Cada firma solo ve sus propios expedientes.</p>
         </div>
       </div>
     </div>

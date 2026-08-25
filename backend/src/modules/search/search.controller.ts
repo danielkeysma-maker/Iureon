@@ -40,12 +40,11 @@ export const searchPrecedentsController = async (req: Request, res: Response): P
   // did nothing. That is the defect the catalogue already fixed by mounting its
   // reads before the tenant middleware, and this route now follows it.
   //
-  // The firm is NOT taken from the caller. It is pinned server-side, because
-  // tenant.middleware only checks that the x-firm-id header is PRESENT — it
-  // never verifies the firm exists or that the caller belongs to it. Reading a
-  // firm id from an unauthenticated request would let anyone name someone
-  // else's firm and read their documents. Searching a tenant's own files stays
-  // on /api/legal/semantic, behind the middleware.
+  // The firm is NOT taken from the caller, and this route is reachable without
+  // a session at all. Pinning SYSTEM_CORPUS server-side is what makes that
+  // safe: the shared corpus is the same for everyone, so there is no tenant to
+  // resolve. Searching a firm's OWN files stays on /api/legal/semantic, behind
+  // the session middleware, where the firm comes from the verified token.
   const SHARED_CORPUS = 'SYSTEM_CORPUS';
 
   const query = String(req.query.query ?? '').trim();

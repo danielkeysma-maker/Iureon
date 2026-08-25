@@ -8,7 +8,9 @@ const draftsService = new DraftsService();
  */
 export const listDraftsController = async (req: Request, res: Response): Promise<void> => {
   const firmId = req.firmId || '';
-  const userEmail = (req.query.userEmail as string) || '';
+  // From the verified session, not the query string: naming somebody else's
+  // address must not list their drafts.
+  const userEmail = req.user?.email ?? '';
 
   if (!userEmail) {
     res.status(400).json({ error: 'MISSING_USER_EMAIL', message: 'Se requiere el parámetro userEmail.' });
@@ -24,7 +26,9 @@ export const listDraftsController = async (req: Request, res: Response): Promise
  */
 export const createDraftController = async (req: Request, res: Response): Promise<void> => {
   const firmId = req.firmId || '';
-  const { userEmail, title, documentType, legalText, jurisprudenciaCitada, excepcionesFormuladas, tokensConsumed } = req.body;
+  const { title, documentType, legalText, jurisprudenciaCitada, excepcionesFormuladas, tokensConsumed } = req.body;
+  // The author is whoever the token says, never whoever the body claims.
+  const userEmail = req.user?.email ?? '';
 
   if (!userEmail || !title || !legalText) {
     res.status(400).json({ error: 'MISSING_FIELDS', message: 'Se requieren userEmail, title y legalText.' });

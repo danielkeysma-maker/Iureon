@@ -1,7 +1,8 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import { config } from './config/env.config';
-import { tenantMiddleware } from './modules/tenant/tenant.middleware';
+import { authMiddleware, optionalAuthMiddleware } from './modules/auth/auth.middleware';
+import { authPublicRoutes, authRoutes } from './modules/auth/auth.routes';
 import { healthRoutes } from './modules/health/health.routes';
 import { agentRoutes } from './modules/agent/agent.routes';
 import { documentRoutes } from './modules/documents/document.routes';
@@ -34,6 +35,11 @@ app.get('/ping', (_req: Request, res: Response) => {
 
 // Reading the actuación catalogue is product knowledge, not tenant data, so it
 // is mounted BEFORE the tenant middleware. Curation writes stay behind it.
+// Before the public readers: a lawyer with a session gets their firm's
+// curation overlaid, a visitor without one still gets the shipped catalogue.
+// The overlay is tenant data, so it may only come from a verified token.
+app.use('/api', optionalAuthMiddleware);
+
 app.use('/api', catalogPublicRoutes);
 
 // The jurisprudence corpus is the same case: SYSTEM_CORPUS holds the identical
@@ -47,10 +53,29 @@ app.use('/api', searchPublicRoutes);
 // whose only problem was having no firm registered yet.
 app.use('/api', transcriptionPublicRoutes);
 
-// Middleware Global Multi-Tenant (Requisito x-firm-id)
-app.use('/api', tenantMiddleware);
+// Signing in, registering a firm and refreshing a token cannot require a
+// session: a caller who has none is exactly who calls them.
+app.use('/api', authPublicRoutes);
+
+/*
+ * THE TENANT NOW COMES FROM THE TOKEN, NOT FROM A HEADER.
+ *
+ * This used to be `tenantMiddleware`, which read `x-firm-id` and believed it.
+ * Isolation held in the database — every query filters by firm — but the filter
+ * ran on a value the browser supplied, so reading another firm's hearings
+ * needed their id and nothing else: no password, no account, no session. The
+ * firms themselves were never persisted either; the registry table was empty
+ * and the tenant lived in localStorage.
+ *
+ * `authMiddleware` verifies a Supabase JWT and takes the firm from
+ * `app_metadata`, the half of the metadata only the service role can write. The
+ * database was built for this from the start: `current_firm_id()` in schema.sql
+ * reads that same claim.
+ */
+app.use('/api', authMiddleware);
 
 // Carga Modular de Rutas de la API
+app.use('/api', authRoutes);
 app.use('/api', healthRoutes);
 app.use('/api', agentRoutes);
 app.use('/api', documentRoutes);

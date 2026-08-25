@@ -1,4 +1,4 @@
-import { API_BASE_URL } from '../../../config/api.config';
+import { httpClient } from '../../../config/httpClient';
 import type { GeneratedDraft, SavedDraftEntry } from '../types';
 
 /**
@@ -44,23 +44,30 @@ const toEntry = (row: SavedDraftRow): SavedDraftEntry => ({
   }
 });
 
-const tenantHeaders = (firmId: string, withBody: boolean): Record<string, string> => ({
-  'x-firm-id': firmId,
-  ...(withBody ? { 'Content-Type': 'application/json' } : {})
-});
+/*
+ * THIS FILE USED TO BYPASS THE SHARED CLIENT AND WRITE ITS OWN TENANT HEADER.
+ *
+ * `tenantHeaders` sent `x-firm-id` on a raw fetch, so it neither carried the
+ * session nor renewed it. With the tenant now resolved from the token, those
+ * calls would simply have started returning 401 — and the drafts screen falls
+ * back to localStorage on failure, so it would have looked like the drafts had
+ * been lost rather than like a bug.
+ *
+ * Everything below goes through httpClient, which attaches the session and
+ * refreshes it before it expires. The author is no longer sent at all: the
+ * server reads it from the same token.
+ */
 
 export const draftsApi = {
   /** Returns null when the API is unreachable or has no drafts to offer. */
-  async list(firmId: string, userEmail: string): Promise<SavedDraftEntry[] | null> {
+  async list(): Promise<SavedDraftEntry[] | null> {
     try {
-      const res = await fetch(
-        `${API_BASE_URL}/api/drafts?userEmail=${encodeURIComponent(userEmail)}`,
-        { headers: tenantHeaders(firmId, false) }
+      const json = await httpClient.get<{ success: boolean; drafts?: SavedDraftRow[] }>(
+        '/api/drafts'
       );
-      const json = await res.json();
 
-      if (json.success && json.drafts?.length > 0) {
-        return (json.drafts as SavedDraftRow[]).map(toEntry);
+      if (json.success && json.drafts?.length) {
+        return json.drafts.map(toEntry);
       }
     } catch {
       // Unreachable API is an expected state; the caller uses localStorage.
@@ -69,54 +76,43 @@ export const draftsApi = {
     return null;
   },
 
-  async create(firmId: string, userEmail: string, draft: GeneratedDraft): Promise<boolean> {
+  async create(draft: GeneratedDraft): Promise<boolean> {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/drafts`, {
-        method: 'POST',
-        headers: tenantHeaders(firmId, true),
-        body: JSON.stringify({
-          userEmail,
+      const json = await httpClient.post<{ success: boolean; draft?: unknown }>('/api/drafts', {
+        body: {
           title: draft.title,
           documentType: draft.documentType,
           legalText: draft.legalText,
           jurisprudenciaCitada: draft.jurisprudenciaCitada,
           excepcionesFormuladas: draft.excepcionesFormuladas,
           tokensConsumed: draft.tokensConsumed
-        })
+        }
       });
-      const json = await res.json();
       return Boolean(json.success && json.draft);
     } catch {
       return false;
     }
   },
 
-  async update(firmId: string, draftId: string, draft: GeneratedDraft): Promise<boolean> {
+  async update(draftId: string, draft: GeneratedDraft): Promise<boolean> {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/drafts/${draftId}`, {
-        method: 'PUT',
-        headers: tenantHeaders(firmId, true),
-        body: JSON.stringify({
+      const json = await httpClient.put<{ success: boolean }>(`/api/drafts/${draftId}`, {
+        body: {
           title: draft.title,
           legalText: draft.legalText,
           jurisprudenciaCitada: draft.jurisprudenciaCitada,
           excepcionesFormuladas: draft.excepcionesFormuladas
-        })
+        }
       });
-      const json = await res.json();
       return Boolean(json.success);
     } catch {
       return false;
     }
   },
 
-  async remove(firmId: string, draftId: string): Promise<boolean> {
+  async remove(draftId: string): Promise<boolean> {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/drafts/${draftId}`, {
-        method: 'DELETE',
-        headers: tenantHeaders(firmId, false)
-      });
-      const json = await res.json();
+      const json = await httpClient.delete<{ success: boolean }>(`/api/drafts/${draftId}`);
       return Boolean(json.success);
     } catch {
       return false;

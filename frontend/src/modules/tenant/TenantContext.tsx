@@ -4,7 +4,14 @@ import type { LawFirmTenant } from './types';
 interface TenantContextValue {
   activeFirm: LawFirmTenant;
   currentUserEmail: string;
-  /** Tenant id for the x-firm-id header. Empty until a firm is selected. */
+  /**
+   * The firm this session belongs to.
+   *
+   * It no longer travels to the server — the token carries it — so this is for
+   * the screen alone: labels, per-firm cache keys, and knowing whether there is
+   * a tenant at all. It comes from the signed session, so it cannot be edited
+   * into someone else's.
+   */
   firmId: string;
 }
 

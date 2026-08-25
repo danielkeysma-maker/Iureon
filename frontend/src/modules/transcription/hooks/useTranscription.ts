@@ -149,13 +149,13 @@ export const useTranscription = (kind: TranscriptionKind) => {
         if (viaStorage) {
           setIsUploading(true);
           try {
-            const fileKey = await transcriptionApi.uploadAudioToStorage(firmId, file);
-            outcome = await transcriptionApi.transcribeFromStorage(firmId, fileKey, { kind, contextPrompt });
+            const fileKey = await transcriptionApi.uploadAudioToStorage(file);
+            outcome = await transcriptionApi.transcribeFromStorage(fileKey, { kind, contextPrompt });
           } finally {
             setIsUploading(false);
           }
         } else {
-          outcome = await transcriptionApi.transcribe(firmId, { file, kind, contextPrompt });
+          outcome = await transcriptionApi.transcribe({ file, kind, contextPrompt });
         }
 
         setResult(outcome.result);
@@ -210,7 +210,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
       if (!transcriptionId) return;
 
       try {
-        const { item, voiceConflicts: fresh } = await transcriptionApi.assignRoles(firmId, transcriptionId, {
+        const { item, voiceConflicts: fresh } = await transcriptionApi.assignRoles(transcriptionId, {
           [speakerLabel]: role
         });
 
@@ -255,7 +255,6 @@ export const useTranscription = (kind: TranscriptionKind) => {
 
       try {
         const { voiceConflicts: fresh } = await transcriptionApi.editSegment(
-          firmId,
           transcriptionId,
           segmentIndex,
           text
@@ -298,7 +297,6 @@ export const useTranscription = (kind: TranscriptionKind) => {
 
       try {
         const { item, voiceConflicts: fresh } = await transcriptionApi.splitSegment(
-          firmId,
           transcriptionId,
           segmentIndex,
           charOffset,
@@ -341,7 +339,6 @@ export const useTranscription = (kind: TranscriptionKind) => {
 
       try {
         const { item, voiceConflicts: fresh } = await transcriptionApi.reassignSpeaker(
-          firmId,
           transcriptionId,
           segmentIndex,
           destino

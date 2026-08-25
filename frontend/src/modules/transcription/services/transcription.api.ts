@@ -111,7 +111,7 @@ export const transcriptionApi = {
     }
   },
 
-  async transcribe(firmId: string, input: TranscribeInput): Promise<TranscriptionOutcome> {
+  async transcribe(input: TranscribeInput): Promise<TranscriptionOutcome> {
     const form = new FormData();
     form.append('audio', input.file);
     form.append('kind', input.kind);
@@ -121,7 +121,7 @@ export const transcriptionApi = {
     }
 
     const data = await httpClient.postForm<TranscribeResponse>('/api/transcription', form, {
-      firmId
+
     });
 
     return {
@@ -145,9 +145,8 @@ export const transcriptionApi = {
    * caller can "show its simulated result instead of an error" — which is how a
    * firm ends up believing a file was stored when it went nowhere.
    */
-  async uploadAudioToStorage(firmId: string, file: File): Promise<string> {
+  async uploadAudioToStorage(file: File): Promise<string> {
     const data = await httpClient.post<UploadUrlResponse>('/api/documents/upload-url', {
-      firmId,
       body: { caseId: 'audiencias', fileName: file.name }
     });
 
@@ -182,12 +181,11 @@ export const transcriptionApi = {
 
   /** Transcribes a recording already in storage, and the server deletes it after. */
   async transcribeFromStorage(
-    firmId: string,
+    
     fileKey: string,
     input: Omit<TranscribeInput, 'file'>
   ): Promise<TranscriptionOutcome> {
     const data = await httpClient.post<TranscribeResponse>('/api/transcription/from-storage', {
-      firmId,
       body: {
         fileKey,
         kind: input.kind,
@@ -211,7 +209,7 @@ export const transcriptionApi = {
    * "desembargo" every time the transcript is opened.
    */
   async editSegment(
-    firmId: string,
+    
     id: string,
     segmentIndex: number,
     text: string
@@ -219,7 +217,6 @@ export const transcriptionApi = {
     // The conflicts ride back because fixing one misheard word can be exactly
     // what creates or resolves a two-people warning: names are words too.
     return httpClient.patch(`/api/transcription/${id}/segment`, {
-      firmId,
       body: { segmentIndex, text }
     });
   },
@@ -240,12 +237,11 @@ export const transcriptionApi = {
    * erased them.
    */
   async assignRoles(
-    firmId: string,
+    
     id: string,
     roles: Record<string, SpeakerRole>
   ): Promise<{ item: { segments: TranscriptSegment[]; speaker_labels: string[] }; voiceConflicts?: VoiceConflict[] }> {
     return httpClient.patch(`/api/transcription/${id}/roles`, {
-      firmId,
       body: { roles }
     });
   },
@@ -258,26 +254,24 @@ export const transcriptionApi = {
    * label across several.
    */
   async reassignSpeaker(
-    firmId: string,
+    
     id: string,
     segmentIndex: number,
     speakerLabel: string
   ): Promise<{ item: { segments: TranscriptSegment[]; speaker_labels: string[] }; voiceConflicts?: VoiceConflict[] }> {
     return httpClient.patch(`/api/transcription/${id}/speaker`, {
-      firmId,
       body: { segmentIndex, speakerLabel }
     });
   },
 
   async splitSegment(
-    firmId: string,
+    
     id: string,
     segmentIndex: number,
     charOffset: number,
     speakerLabel: string
   ): Promise<{ item: { segments: TranscriptSegment[]; speaker_labels: string[] }; voiceConflicts?: VoiceConflict[] }> {
     return httpClient.patch(`/api/transcription/${id}/split`, {
-      firmId,
       body: { segmentIndex, charOffset, speakerLabel }
     });
   }

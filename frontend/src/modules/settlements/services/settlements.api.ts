@@ -17,10 +17,9 @@ interface SettlementResponse<T> {
  * caller can fall back to its own estimate.
  */
 export const settlementsApi = {
-  async calculate<T>(firmId: string, body: SettlementCalculationRequest): Promise<T | null> {
+  async calculate<T>(body: SettlementCalculationRequest): Promise<T | null> {
     try {
       const data = await httpClient.post<SettlementResponse<T>>('/api/settlement/calculate', {
-        firmId,
         body
       });
       return data.success && data.result ? data.result : null;

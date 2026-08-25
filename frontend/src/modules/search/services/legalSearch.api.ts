@@ -67,12 +67,12 @@ export const searchPrecedents = (
   );
 
 export const searchGlossary = (
-  firmId: string,
+  
   query: string,
   category = 'TODAS',
   signal?: AbortSignal
 ): Promise<SearchResponse<GlossaryTerm>> =>
   httpClient.get<SearchResponse<GlossaryTerm>>(
     `/api/legal/glossary?query=${encodeURIComponent(query)}&category=${encodeURIComponent(category)}`,
-    { firmId, signal }
+    { signal }
   );

@@ -33,12 +33,19 @@ const respondStoreError = (res: Response, error: VerificationStoreError): void =
  * Tenant for a READ of the catalogue.
  *
  * Optional on purpose: the shipped catalogue is product knowledge, the same for
- * everyone, and only the curation overlay is per firm. These routes are mounted
- * before the tenant middleware, so the header is read directly here.
+ * everyone, and only the curation overlay is per firm — so a visitor with no
+ * session still gets the 378 actuaciones.
+ *
+ * IT USED TO READ THE HEADER, AND THAT LEAKED. These routes are mounted before
+ * the session middleware, and the old line fell back to `x-firm-id` when
+ * `req.firmId` was absent — which on a route with no middleware was always. Any
+ * unauthenticated caller could name another firm and read its curation, the one
+ * piece of this endpoint that IS tenant data. Now the value can only arrive
+ * from `optionalAuthMiddleware`, which sets it from a verified token or not at
+ * all.
  */
 const optionalFirmId = (req: Request): string | null => {
-  const header = req.headers['x-firm-id'];
-  const value = req.firmId ?? (typeof header === 'string' ? header : undefined);
+  const value = req.firmId;
   return value?.trim() ? value.trim() : null;
 };
 

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { X, DollarSign, Calculator, Scale } from 'lucide-react';
-import { useTenant } from '../../tenant/TenantContext';
 import { settlementsApi } from '../services/settlements.api';
 
 interface LaborSettlementModalProps {
@@ -12,7 +11,6 @@ export const LaborSettlementModal: React.FC<LaborSettlementModalProps> = ({
   isOpen,
   onClose
 }) => {
-  const { firmId } = useTenant();
   const [monthlySalary, setMonthlySalary] = useState<number>(3500000);
   const [startDate, setStartDate] = useState<string>('2023-01-15');
   const [endDate, setEndDate] = useState<string>('2026-03-15');
@@ -27,7 +25,7 @@ export const LaborSettlementModal: React.FC<LaborSettlementModalProps> = ({
     setIsCalculating(true);
 
     try {
-      const calculated = await settlementsApi.calculate(firmId, { monthlySalary, startDate, endDate, terminationType });
+      const calculated = await settlementsApi.calculate({ monthlySalary, startDate, endDate, terminationType });
       if (calculated) {
         setResult(calculated);
         return;

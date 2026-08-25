@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { X, Calendar, Clock, AlertTriangle, CheckCircle2, Scale } from 'lucide-react';
-import { useTenant } from '../../tenant/TenantContext';
 import { termsApi } from '../services/terms.api';
 
 interface ProceduralTermsModalProps {
@@ -12,7 +11,6 @@ export const ProceduralTermsModal: React.FC<ProceduralTermsModalProps> = ({
   isOpen,
   onClose
 }) => {
-  const { firmId } = useTenant();
   const [notifiedDate, setNotifiedDate] = useState<string>('2026-07-28');
   const [termInDays, setTermInDays] = useState<number>(10);
   const [jurisdictionType, setJurisdictionType] = useState<'LABORAL' | 'CIVIL' | 'CONSTITUCIONAL'>('LABORAL');
@@ -26,7 +24,7 @@ export const ProceduralTermsModal: React.FC<ProceduralTermsModalProps> = ({
     setIsCalculating(true);
 
     try {
-      const result = await termsApi.calculate(firmId, { notifiedDate, termInDays, jurisdictionType });
+      const result = await termsApi.calculate({ notifiedDate, termInDays, jurisdictionType });
       if (result) {
         setCalculationResult(result);
         return;

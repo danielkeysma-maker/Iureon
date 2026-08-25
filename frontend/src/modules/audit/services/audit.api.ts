@@ -19,9 +19,9 @@ interface AuditLogsResponse {
  * caller keeps its local sample data rather than showing an empty audit trail.
  */
 export const auditApi = {
-  async listLogs(firmId: string): Promise<AuditLogEntry[] | null> {
+  async listLogs(): Promise<AuditLogEntry[] | null> {
     try {
-      const data = await httpClient.get<AuditLogsResponse>('/api/audit/logs', { firmId });
+      const data = await httpClient.get<AuditLogsResponse>('/api/audit/logs', {});
       return data.success && data.logs ? data.logs : null;
     } catch {
       return null;

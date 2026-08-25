@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { API_BASE_URL } from '../../../config/api.config';
+import { streamRequest } from '../../../config/httpClient';
 import type { AgentLog } from '../../agent/types';
 import type { GeneratedDraft } from '../../documents/types';
 
-export function useLegalAgentWorkflow(firmId?: string) {
+/** The firm is no longer a parameter: the session carries it. */
+export function useLegalAgentWorkflow() {
 
   const [rightView, setRightView] = useState<'pdf' | 'draft'>('pdf');
   const [legalPrompt, setLegalPrompt] = useState('');
@@ -70,19 +71,21 @@ Por favor espere unos segundos mientras se finaliza la redacción solemne.`,
     ]);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/agent/stream-draft`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-firm-id': firmId || 'unknown-firm'
-        },
-        body: JSON.stringify({
-          documentType,
-          legalBranch,
-          legalPrompt,
-          expedienteId: 'EXP-2026-904',
-          existingDraft: activeDraftText || undefined
-        })
+      /*
+       * Through streamRequest so the session travels and renews itself.
+       *
+       * This sent `x-firm-id: firmId || 'unknown-firm'` on a raw fetch — the
+       * literal shape of the defect being removed: a tenant the browser named,
+       * with a made-up fallback when it had none. Drafting is the product's
+       * central act, so it was also the most valuable thing that string could
+       * have reached.
+       */
+      const response = await streamRequest('/api/agent/stream-draft', {
+        documentType,
+        legalBranch,
+        legalPrompt,
+        expedienteId: 'EXP-2026-904',
+        existingDraft: activeDraftText || undefined
       });
 
       if (response.ok && response.body) {

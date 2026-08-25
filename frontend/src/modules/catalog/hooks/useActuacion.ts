@@ -24,7 +24,7 @@ export const useActuacion = (documentType: string, branch?: string): Actuacion |
     // chosen document type would be actively misleading.
     setActuacion(null);
 
-    catalogApi.resolve(firmId, documentType, branch).then((found) => {
+    catalogApi.resolve(documentType, branch).then((found) => {
       if (!cancelled) setActuacion(found);
     });
 

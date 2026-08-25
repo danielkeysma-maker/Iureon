@@ -41,12 +41,12 @@ export const FileDropzoneModal: React.FC<FileDropzoneModalProps> = ({
     setUploadStep('Solicitando URL pre-firmada a Backblaze B2 Vault...');
 
     try {
-      const fileKey = await documentsApi.requestUploadUrl(firmId, CASE_ID, selectedFile.name);
+      const fileKey = await documentsApi.requestUploadUrl(CASE_ID, selectedFile.name);
       const b2Url = fileKey || `${firmId}/${CASE_ID}/${selectedFile.name}`;
 
       setUploadStep('Iniciando ingestión y vectorización en Supabase pgvector (1536d)...');
 
-      const ingested = await documentsApi.ingest(firmId, {
+      const ingested = await documentsApi.ingest({
         title: selectedFile.name,
         b2FileUrl: `b2://iureon-vault/${b2Url}`
       });

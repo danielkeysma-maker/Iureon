@@ -98,7 +98,7 @@ export const transcribeAudioController = async (req: Request, res: Response): Pr
      */
     const stored = await transcriptionStore.save(
       req.firmId as string,
-      (req.body.userEmail as string) || 'desconocido',
+      req.user?.email ?? 'desconocido',
       (req.body.title as string) || file.originalname,
       file.originalname,
       result
@@ -151,9 +151,17 @@ export const transcribeAudioController = async (req: Request, res: Response): Pr
  * of by uploading the recording again.
  */
 export const listTranscriptionsController = async (req: Request, res: Response): Promise<void> => {
+  /*
+   * The author comes from the token, like the firm.
+   *
+   * It used to be a query parameter defaulting to 'desconocido', so a lawyer
+   * could list a colleague's transcripts by naming their address — a smaller
+   * version of the same defect as the tenant header, and pointless now that the
+   * session carries a verified e-mail.
+   */
   const items = await transcriptionStore.list(
     req.firmId as string,
-    (req.query.userEmail as string) || 'desconocido'
+    req.user?.email ?? 'desconocido'
   );
 
   res.json({ success: true, items });
@@ -295,7 +303,7 @@ export const transcribeFromStorageController = async (
 
     const stored = await transcriptionStore.save(
       firmId,
-      (req.body.userEmail as string) || 'desconocido',
+      req.user?.email ?? 'desconocido',
       (req.body.title as string) || fileKey.split('/').pop() || 'Transcripción',
       fileKey,
       result

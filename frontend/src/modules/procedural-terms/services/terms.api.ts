@@ -16,9 +16,9 @@ interface TermsResponse<T> {
  * Resolves to null on failure so the caller can fall back to its own estimate.
  */
 export const termsApi = {
-  async calculate<T>(firmId: string, body: TermsCalculationRequest): Promise<T | null> {
+  async calculate<T>(body: TermsCalculationRequest): Promise<T | null> {
     try {
-      const data = await httpClient.post<TermsResponse<T>>('/api/terms/calculate', { firmId, body });
+      const data = await httpClient.post<TermsResponse<T>>('/api/terms/calculate', { body });
       return data.success && data.result ? data.result : null;
     } catch {
       return null;

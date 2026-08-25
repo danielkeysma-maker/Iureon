@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { httpClient, setSessionLostHandler } from './config/httpClient';
+import { clearSession, readSession, saveSession, type Session } from './modules/auth/session';
 import { SidebarLeft } from './modules/tenant/components/SidebarLeft';
 import { HeaderTop } from './modules/tenant/components/HeaderTop';
 import type { LawFirmTenant } from './modules/tenant/types';
@@ -28,8 +30,6 @@ import type { MainView } from './modules/tenant/types';
 
 const COST_PER_DRAFT_COP = 2000;
 
-const INITIAL_REGISTERED_FIRMS: LawFirmTenant[] = [];
-
 const EMPTY_FIRM_PLACEHOLDER: LawFirmTenant = {
   id: '',
   name: 'Sin Firma Registrada',
@@ -38,39 +38,84 @@ const EMPTY_FIRM_PLACEHOLDER: LawFirmTenant = {
   status: 'active'
 };
 
-export function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    try {
-      return localStorage.getItem('iureon_is_authenticated') === 'true';
-    } catch {
-      return false;
-    }
-  });
+/**
+ * The firm as the session reports it, before the registry row is fetched.
+ *
+ * Enough to render the shell without waiting on a round trip, and honest about
+ * what it does not know yet: the name and NIT arrive from /api/auth/me.
+ */
+const firmFromSession = (session: { user: { firmId: string } } | null): LawFirmTenant =>
+  session
+    ? { id: session.user.firmId, name: 'Cargando…', nit: '', creditsBalance: 0, status: 'active' }
+    : EMPTY_FIRM_PLACEHOLDER;
 
-  const [currentUserEmail, setCurrentUserEmail] = useState<string>(() => {
-    try {
-      return localStorage.getItem('iureon_current_user_email') || 'ingdanielma@gmail.com';
-    } catch {
-      return 'ingdanielma@gmail.com';
-    }
-  });
+export function App() {
+  /*
+   * THE SESSION IS THE SOURCE OF TRUTH, AND IT IS SIGNED.
+   *
+   * Authentication used to be the string "true" in localStorage, and the firm
+   * an object the registration form wrote next to it. Both were the browser's
+   * to edit, and the server believed the firm it was told — so reading another
+   * firm's hearings needed nothing but their id. The firms were never persisted
+   * either: the registry table was empty and clearing site data destroyed the
+   * tenant while its transcripts stayed in the database, unreachable.
+   *
+   * Now the browser holds a token it cannot forge. Everything below reads the
+   * firm out of it.
+   */
+  const [session, setSession] = useState(() => readSession());
+  const isAuthenticated = Boolean(session);
+  const currentUserEmail = session?.user.email ?? '';
 
   const [mainView, setMainView] = useState<MainView>('workspace');
 
-  const [registeredFirms, setRegisteredFirms] = useState<LawFirmTenant[]>(() => {
-    try {
-      const stored = localStorage.getItem('iureon_registered_firms');
-      if (!stored) return INITIAL_REGISTERED_FIRMS;
-      const parsed: LawFirmTenant[] = JSON.parse(stored);
-      // Clean out any legacy mock firm data from localStorage
-      const clean = parsed.filter(f => f.id !== 'firm-default-01' && f.name !== 'FIRMA / DESPACHO ACTIVO' && !f.name.includes('FIRMA APODERADA'));
-      return clean;
-    } catch {
-      return INITIAL_REGISTERED_FIRMS;
-    }
-  });
+  /*
+   * The firm's registry row, and the way back to the login screen.
+   *
+   * A refresh token can be spent or revoked between visits, and the screens
+   * below are all tenant-scoped: without this the app would render a full
+   * workspace whose every button answers 401. The handler lives in httpClient
+   * so any call can trigger the return, not just this one.
+   */
+  useEffect(() => {
+    setSessionLostHandler(() => {
+      setSession(null);
+      setActiveFirm(EMPTY_FIRM_PLACEHOLDER);
+    });
 
-  const [activeFirm, setActiveFirm] = useState<LawFirmTenant>(registeredFirms[0] || EMPTY_FIRM_PLACEHOLDER);
+    return () => setSessionLostHandler(null);
+  }, []);
+
+  useEffect(() => {
+    if (!session) return;
+
+    let cancelled = false;
+
+    httpClient
+      .get<{ firm: { id: string; name: string; nit: string; creditsBalance: number } | null }>(
+        '/api/auth/me'
+      )
+      .then(({ firm }) => {
+        if (cancelled || !firm) return;
+        setActiveFirm({
+          id: firm.id,
+          name: firm.name,
+          nit: firm.nit ?? '',
+          creditsBalance: firm.creditsBalance ?? 0,
+          status: 'active'
+        });
+      })
+      .catch(() => {
+        /* httpClient already returns to login on a rejected session. */
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [session]);
+
+  const [activeFirm, setActiveFirm] = useState<LawFirmTenant>(() => firmFromSession(readSession()));
+  const registeredFirms = useMemo(() => (session ? [activeFirm] : []), [session, activeFirm]);
   const [isFirmDropdownOpen, setIsFirmDropdownOpen] = useState(false);
   const [isBrandingModalOpen, setIsBrandingModalOpen] = useState(false);
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
@@ -80,39 +125,20 @@ export function App() {
   const [isSavedDraftsModalOpen, setIsSavedDraftsModalOpen] = useState(false);
 
   const [firmBranding, setFirmBranding] = useState<FirmBrandingConfig>(DEFAULT_FIRM_BRANDING);
-  const workflow = useLegalAgentWorkflow(activeFirm.id);
+  const workflow = useLegalAgentWorkflow();
 
-  const handleCreateFirm = (newFirm: LawFirmTenant) => {
-    const updated = [newFirm, ...registeredFirms];
-    setRegisteredFirms(updated);
-    setActiveFirm(newFirm);
-    try {
-      localStorage.setItem('iureon_registered_firms', JSON.stringify(updated));
-    } catch (err) {
-      console.warn('LocalStorage save firm fail:', err);
-    }
-  };
-
+  /*
+   * A firm is created by REGISTERING it, which issues its first account at the
+   * same time — see /api/auth/register-firm. These three handlers used to
+   * create, edit and delete tenants in localStorage, which is why the registry
+   * table was empty and why a firm vanished with the browser.
+   *
+   * Editing the firm on screen still works, and stays local until there is an
+   * endpoint to persist it; deleting a tenant a session is bound to would only
+   * strand that session, so it is no longer offered here.
+   */
   const handleUpdateFirm = (updatedFirm: LawFirmTenant) => {
-    const updated = registeredFirms.map((f) => (f.id === updatedFirm.id ? updatedFirm : f));
-    setRegisteredFirms(updated);
     if (activeFirm.id === updatedFirm.id) setActiveFirm(updatedFirm);
-    try {
-      localStorage.setItem('iureon_registered_firms', JSON.stringify(updated));
-    } catch (err) {
-      console.warn('LocalStorage update firm fail:', err);
-    }
-  };
-
-  const handleDeleteFirm = (firmId: string) => {
-    const updated = registeredFirms.filter((f) => f.id !== firmId);
-    setRegisteredFirms(updated);
-    if (updated.length > 0) setActiveFirm(updated[0]);
-    try {
-      localStorage.setItem('iureon_registered_firms', JSON.stringify(updated));
-    } catch (err) {
-      console.warn('LocalStorage delete firm fail:', err);
-    }
   };
 
   // ═══ Clave de localStorage scoped por firma+usuario ═══
@@ -164,34 +190,19 @@ export function App() {
     ]
   };
 
-  const handleLoginSuccess = (userEmail: string, firm: LawFirmTenant) => {
-    setIsAuthenticated(true);
-    setCurrentUserEmail(userEmail);
-    setActiveFirm(firm);
-    try {
-      localStorage.setItem('iureon_is_authenticated', 'true');
-      localStorage.setItem('iureon_current_user_email', userEmail);
-    } catch (err) {
-      console.warn('LocalStorage save auth fail:', err);
-    }
+  const handleLoginSuccess = (fresh: Session) => {
+    setSession(saveSession(fresh));
+    setActiveFirm(firmFromSession(fresh));
   };
 
   if (!isAuthenticated) {
-    return (
-      <LoginPortalView
-        onLoginSuccess={handleLoginSuccess}
-        registeredFirms={registeredFirms}
-      />
-    );
+    return <LoginPortalView onLoginSuccess={handleLoginSuccess} />;
   }
 
   const handleLogout = () => {
-    setIsAuthenticated(false);
-    try {
-      localStorage.removeItem('iureon_is_authenticated');
-    } catch (err) {
-      console.warn('LocalStorage logout fail:', err);
-    }
+    clearSession();
+    setSession(null);
+    setActiveFirm(EMPTY_FIRM_PLACEHOLDER);
   };
 
   const handleRechargeSuccess = (addedAmount: number) => {
@@ -235,9 +246,7 @@ export function App() {
         firms={registeredFirms}
         activeFirm={activeFirm}
         onSelectFirm={(f) => setActiveFirm(f)}
-        onCreateFirm={handleCreateFirm}
         onUpdateFirm={handleUpdateFirm}
-        onDeleteFirm={handleDeleteFirm}
       />
       <FirmCreditsRechargeModal
         isOpen={isRechargeModalOpen}

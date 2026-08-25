@@ -28,7 +28,7 @@ export const useBranchActuaciones = (branch: string, role: ActuacionRole): strin
     setNames([]);
 
     catalogApi
-      .list(firmId, { branch: branch as LegalBranch, role })
+      .list({ branch: branch as LegalBranch, role })
       .then((result) => {
         if (!cancelled) setNames(result.actuaciones.map((a) => a.exactName));
       })

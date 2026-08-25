@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { X, ShieldCheck, User, Cpu } from 'lucide-react';
-import { useTenant } from '../../tenant/TenantContext';
 import { auditApi } from '../services/audit.api';
 
 interface AuditLogsModalProps {
@@ -12,7 +11,6 @@ export const AuditLogsModal: React.FC<AuditLogsModalProps> = ({
   isOpen,
   onClose
 }) => {
-  const { firmId } = useTenant();
   const [logs, setLogs] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -25,7 +23,7 @@ export const AuditLogsModal: React.FC<AuditLogsModalProps> = ({
   const fetchAuditLogs = async () => {
     setIsLoading(true);
     try {
-      const logs = await auditApi.listLogs(firmId);
+      const logs = await auditApi.listLogs();
       if (logs) {
         setLogs(logs);
         return;

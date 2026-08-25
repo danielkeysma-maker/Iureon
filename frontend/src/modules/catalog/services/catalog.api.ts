@@ -36,7 +36,7 @@ interface SaveResponse {
  * learn that the verification was not recorded, so it throws.
  */
 export const catalogApi = {
-  async resolve(firmId: string, documentType: string, branch?: string): Promise<Actuacion | null> {
+  async resolve(documentType: string, branch?: string): Promise<Actuacion | null> {
     if (!documentType.trim()) return null;
 
     const params = new URLSearchParams({ documentType });
@@ -45,7 +45,7 @@ export const catalogApi = {
     try {
       const data = await httpClient.get<ResolveResponse>(
         `/api/catalog/actuaciones/resolve?${params.toString()}`,
-        { firmId }
+        {}
       );
 
       return data.actuacion;
@@ -55,7 +55,7 @@ export const catalogApi = {
   },
 
   async list(
-    firmId: string,
+    
     filters: { branch?: LegalBranch; role?: ActuacionRole } = {}
   ): Promise<{
     actuaciones: Actuacion[];
@@ -70,7 +70,7 @@ export const catalogApi = {
     const query = params.toString();
     const data = await httpClient.get<ListResponse>(
       `/api/catalog/actuaciones${query ? `?${query}` : ''}`,
-      { firmId }
+      {}
     );
 
     return {
@@ -82,9 +82,8 @@ export const catalogApi = {
   },
 
   /** Records the firm's verification. Throws with the API's message on rejection. */
-  async saveVerification(firmId: string, input: VerificationInput): Promise<Actuacion | null> {
+  async saveVerification(input: VerificationInput): Promise<Actuacion | null> {
     const data = await httpClient.put<SaveResponse>('/api/catalog/verifications', {
-      firmId,
       body: input
     });
 
@@ -92,10 +91,10 @@ export const catalogApi = {
   },
 
   /** Drops the firm's override so the shipped catalogue applies again. */
-  async deleteVerification(firmId: string, actuacionId: string): Promise<void> {
+  async deleteVerification(actuacionId: string): Promise<void> {
     await httpClient.delete(
       `/api/catalog/verifications?actuacionId=${encodeURIComponent(actuacionId)}`,
-      { firmId }
+      {}
     );
   }
 };

@@ -18,10 +18,9 @@ interface IngestResponse {
  * result instead of an error.
  */
 export const documentsApi = {
-  async requestUploadUrl(firmId: string, caseId: string, fileName: string) {
+  async requestUploadUrl(caseId: string, fileName: string) {
     try {
       const data = await httpClient.post<UploadUrlResponse>('/api/documents/upload-url', {
-        firmId,
         body: { caseId, fileName }
       });
       return data.uploadInfo?.fileKey ?? null;
@@ -30,9 +29,9 @@ export const documentsApi = {
     }
   },
 
-  async ingest(firmId: string, body: Record<string, unknown>) {
+  async ingest(body: Record<string, unknown>) {
     try {
-      const data = await httpClient.post<IngestResponse>('/api/documents/ingest', { firmId, body });
+      const data = await httpClient.post<IngestResponse>('/api/documents/ingest', { body });
       return data.success && data.result ? data.result : null;
     } catch {
       return null;

@@ -18,9 +18,9 @@ interface TenantUserManagementModalProps {
   firms: LawFirmTenant[];
   activeFirm: LawFirmTenant;
   onSelectFirm: (firm: LawFirmTenant) => void;
-  onCreateFirm: (newFirm: LawFirmTenant) => void;
+  onCreateFirm?: (newFirm: LawFirmTenant) => void;
   onUpdateFirm: (updatedFirm: LawFirmTenant) => void;
-  onDeleteFirm: (firmId: string) => void;
+  onDeleteFirm?: (firmId: string) => void;
 }
 
 const TAB_STYLES = 'px-4 py-2.5 font-semibold rounded-t-xl transition-all flex items-center gap-2';
