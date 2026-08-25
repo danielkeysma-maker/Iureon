@@ -17,7 +17,8 @@ import { supabase } from '../config/supabase.config';
  * what makes the boundary practical instead of merely stated: nothing ever
  * pushes them into a client's firm to get work done.
  *
- *   npm run superadmin
+ *   npm run superadmin -- correo@dominio.co   (promueve una cuenta ya registrada)
+ *   npm run superadmin                        (crea cuenta y firma desde cero)
  *
  * The password is typed in, never passed as an argument: a command line ends up
  * in the shell history and in the process list.
@@ -34,6 +35,46 @@ const salir: (mensaje: string) => never = (mensaje) => {
 (async () => {
   const client = supabase;
   if (!client) salir('Supabase no está configurado.');
+
+  /*
+   * PROMOCIÓN DIRECTA, sin preguntas.
+   *
+   * El camino cómodo para una persona que no vive en una terminal: registra su
+   * firma en la aplicación, eligiendo allí su propia contraseña, y aquí solo se
+   * eleva esa cuenta. Nadie tiene que teclear ni transmitir una clave, que es
+   * la parte que conviene que no ocurra.
+   *
+   *   npm run superadmin -- correo@dominio.co
+   */
+  const correoDirecto = process.argv[2]?.trim().toLowerCase();
+
+  if (correoDirecto) {
+    const { data: usuarios } = await client.auth.admin.listUsers();
+    const cuenta = usuarios.users.find((u) => u.email?.toLowerCase() === correoDirecto);
+
+    if (!cuenta) {
+      salir(
+        `No hay ninguna cuenta con el correo ${correoDirecto}.\n` +
+          'Regístrate primero en la aplicación y vuelve a correr esto.'
+      );
+    }
+
+    const firmaActual = (cuenta!.app_metadata as Record<string, unknown>)?.firm_id;
+
+    if (typeof firmaActual !== 'string' || !firmaActual) {
+      salir('Esa cuenta no pertenece a ninguna firma. Regístrala desde la aplicación.');
+    }
+
+    const { error } = await client.auth.admin.updateUserById(cuenta!.id, {
+      app_metadata: { firm_id: firmaActual, role: 'SUPER_ADMIN' }
+    });
+
+    if (error) salir(`No se pudo promover la cuenta: ${error.message}`);
+
+    console.log(`\n${correoDirecto} ahora es SUPER_ADMIN, sobre su firma ${firmaActual}.`);
+    console.log('Cierra sesión en la aplicación y vuelve a entrar: el rol viaja en el token nuevo.');
+    return;
+  }
 
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
