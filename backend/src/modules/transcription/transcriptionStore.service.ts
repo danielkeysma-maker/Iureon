@@ -76,15 +76,32 @@ export class TranscriptionStore {
     return data as StoredTranscription;
   }
 
-  async list(firmId: string, userEmail: string): Promise<StoredTranscription[]> {
+  /**
+   * The firm's transcripts of ONE kind.
+   *
+   * Filtering by kind is not tidiness: without it the interview module listed
+   * the firm's hearings and the hearings module listed its interviews. Two
+   * screens sharing an engine must not share a filing cabinet — an audiencia of
+   * a juzgado has no business appearing under a client's interviews, and the
+   * reverse is worse, since an interview is a private conversation and a hearing
+   * is a public act.
+   */
+  async list(
+    firmId: string,
+    userEmail: string,
+    kind?: TranscriptionResult['kind']
+  ): Promise<StoredTranscription[]> {
     if (!supabase) return [];
 
-    const { data, error } = await supabase
+    let query = supabase
       .from('transcriptions')
       .select('*')
       .eq('firm_id', firmId)
-      .eq('user_email', userEmail)
-      .order('transcribed_at', { ascending: false });
+      .eq('user_email', userEmail);
+
+    if (kind) query = query.eq('kind', kind);
+
+    const { data, error } = await query.order('transcribed_at', { ascending: false });
 
     if (error) {
       console.error('[TRANSCRIPTION] Error al listar transcritos:', error.message);

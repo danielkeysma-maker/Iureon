@@ -34,6 +34,30 @@ import { clientsApi } from '../clients.api';
  *
  * So: two screens, two flows, one engine.
  */
+/**
+ * A numbered step.
+ *
+ * The screen was a stack of cards of equal weight — client, saved list, record,
+ * two notices — and a stack does not say what to do first. An interview is a
+ * procedure: who is this with, capture it, read it. Numbering the first two says
+ * so without a paragraph explaining it.
+ */
+const Paso: React.FC<{ numero: number; titulo: string; children: React.ReactNode }> = ({
+  numero,
+  titulo,
+  children
+}) => (
+  <section className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+    <header className="flex items-center gap-2 px-4 py-2.5 border-b border-slate-100 bg-slate-50/60">
+      <span className="w-5 h-5 rounded-full bg-blue-950 text-white text-[10px] font-bold flex items-center justify-center shrink-0">
+        {numero}
+      </span>
+      <h3 className="text-xs font-bold text-slate-900">{titulo}</h3>
+    </header>
+    <div className="p-4">{children}</div>
+  </section>
+);
+
 export const InterviewView: React.FC = () => {
   const {
     hasFirm,
@@ -141,14 +165,79 @@ export const InterviewView: React.FC = () => {
         </div>
       )}
 
-      {/*
-        Step one, always: who this is with. An interview is found by the person
-        months later, not by a filename.
-      */}
-      <ClientPicker value={clientId} onChange={setClientId} />
-
       {!result ? (
         <>
+          <Paso numero={1} titulo="¿Con quién es la entrevista?">
+            <ClientPicker value={clientId} onChange={setClientId} />
+          </Paso>
+
+          <Paso numero={2} titulo="Captura la conversación">
+            {trabajando ? (
+              <div className="py-6 text-center">
+                <p className="text-xs font-bold text-slate-900">
+                  {isUploading ? 'Enviando la grabación…' : 'Transcribiendo…'}
+                </p>
+                <p className="text-[11px] text-slate-500 mt-1">
+                  Separando las voces y ordenando la conversación.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <AudioRecorder onRecorded={empezar} disabled={!hasFirm} />
+
+                {/*
+                  Uploading stays, second. Not every interview happens at the
+                  desk — a call recorded on a phone is still an interview — but
+                  recording is the ordinary case and gets the ordinary place.
+                */}
+                <div className="text-center border-t border-slate-100 pt-3">
+                  <input
+                    ref={inputRef}
+                    type="file"
+                    accept="audio/*,video/mp4"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) empezar(file);
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => inputRef.current?.click()}
+                    disabled={!hasFirm}
+                    className="text-[11px] font-semibold text-slate-600 hover:text-blue-900 flex items-center gap-1.5 mx-auto disabled:opacity-50"
+                  >
+                    <Upload className="w-3 h-3" />
+                    O sube una grabación que ya tengas
+                  </button>
+
+                  {/*
+                    Said before choosing, not after. The limits are enforced
+                    either way — the hook validates before uploading — but a
+                    file rejected once the picker has closed leaves the lawyer
+                    guessing which of the two rules they broke. The ceiling is
+                    the server's own: it depends on the host and the provider.
+                  */}
+                  <p className="text-[10px] text-slate-400 mt-1">
+                    {SUPPORTED_AUDIO_EXTENSIONS.join(', ')} · máximo {megabytes(maxAudioBytes)} MB
+                  </p>
+                </div>
+
+                <p className="text-[11px] text-slate-500 bg-slate-50 border border-slate-200 rounded-lg p-2.5">
+                  <b className="text-slate-700">Qué se guarda:</b> el texto queda guardado en tu firma
+                  y puedes borrarlo cuando quieras.{' '}
+                  <b className="text-slate-700">La grabación no se guarda</b>: se borra del
+                  almacenamiento apenas termina de transcribirse.
+                </p>
+              </div>
+            )}
+          </Paso>
+
+          {/*
+            Below the two steps, not between them: this is where a lawyer
+            returns to work already done, and it must not stand between them and
+            starting the interview they came here for.
+          */}
           <StoredTranscriptions
             items={stored}
             isLoading={isLoadingStored}
@@ -159,68 +248,6 @@ export const InterviewView: React.FC = () => {
             onDelete={deleteStored}
             onRefresh={() => void loadStored()}
           />
-
-          {trabajando ? (
-            <div className="border border-slate-200 rounded-xl p-6 text-center">
-              <p className="text-xs font-bold text-slate-900">
-                {isUploading ? 'Enviando la grabación…' : 'Transcribiendo…'}
-              </p>
-              <p className="text-[11px] text-slate-500 mt-1">
-                Separando las voces y ordenando la conversación.
-              </p>
-            </div>
-          ) : (
-            <>
-              <AudioRecorder onRecorded={empezar} disabled={!hasFirm} />
-
-              {/*
-                Uploading stays, second. Not every interview happens at the
-                desk — a call recorded on a phone is still an interview — but
-                recording is the ordinary case and gets the ordinary place.
-              */}
-              <div className="text-center">
-                <input
-                  ref={inputRef}
-                  type="file"
-                  accept="audio/*,video/mp4"
-                  className="hidden"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) empezar(file);
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={() => inputRef.current?.click()}
-                  disabled={!hasFirm}
-                  className="text-[11px] font-semibold text-slate-600 hover:text-blue-900 flex items-center gap-1.5 mx-auto disabled:opacity-50"
-                >
-                  <Upload className="w-3 h-3" />
-                  O sube una grabación que ya tengas
-                </button>
-
-                {/*
-                  Said before choosing, not after.
-                  
-                  The limits are enforced either way — the hook validates before
-                  uploading — but a file rejected after the picker closed makes
-                  the lawyer guess which of the two rules they broke. The ceiling
-                  is the server's own, not a number written here: it depends on
-                  the host and the provider.
-                */}
-                <p className="text-[10px] text-slate-400 mt-1">
-                  {SUPPORTED_AUDIO_EXTENSIONS.join(', ')} · máximo {megabytes(maxAudioBytes)} MB
-                </p>
-              </div>
-            </>
-          )}
-
-          <p className="text-[11px] text-slate-500 bg-slate-50 border border-slate-200 rounded-lg p-2.5">
-            <b className="text-slate-700">Qué se guarda:</b> el texto de la entrevista queda guardado
-            en tu firma y puedes borrarlo cuando quieras desde la lista de arriba.{' '}
-            <b className="text-slate-700">La grabación no se guarda</b>: se borra del almacenamiento
-            apenas termina de transcribirse.
-          </p>
         </>
       ) : (
         <>
@@ -267,6 +294,11 @@ export const InterviewView: React.FC = () => {
                 <span>Otra entrevista</span>
               </button>
             </div>
+          </div>
+
+          <div className="bg-white border border-slate-200 rounded-xl p-4">
+            <h3 className="text-xs font-bold text-slate-900 mb-2">Cliente de la entrevista</h3>
+            <ClientPicker value={clientId} onChange={setClientId} />
           </div>
 
           {!persisted && <NotPersistedWarning />}

@@ -44,9 +44,15 @@ const check = (n: string, ok: boolean, d = ''): void => {
   const A = await crearFirmaConSesion({ firmName: `Lista A ${m}`, nit: `980${m}`, email: `la${m}@iureon.test`, password: clavePrueba() });
   const B = await crearFirmaConSesion({ firmName: `Lista B ${m}`, nit: `981${m}`, email: `lb${m}@iureon.test`, password: clavePrueba() });
 
-  const sembrar = (firmId: string, email: string, title: string, segments: unknown[] = []) =>
+  const sembrar = (
+    firmId: string,
+    email: string,
+    title: string,
+    segments: unknown[] = [],
+    kind: 'AUDIENCIA' | 'ENTREVISTA' = 'AUDIENCIA'
+  ) =>
     c.from('transcriptions').insert({
-      firm_id: firmId, user_email: email, kind: 'AUDIENCIA', title,
+      firm_id: firmId, user_email: email, kind, title,
       source_file_name: 'x.mp3', full_text: 't', segments, speaker_labels: [],
       model: 'x', transcribed_at: new Date().toISOString()
     }).select('id').single();
@@ -90,6 +96,40 @@ const check = (n: string, ok: boolean, d = ''): void => {
     'los avisos de voces fusionadas viajan igual',
     Array.isArray(guardado?.voiceConflicts),
     JSON.stringify(guardado?.voiceConflicts)
+  );
+
+  /*
+   * Cada pantalla ve solo lo suyo.
+   *
+   * Sin filtrar por tipo, el módulo de entrevistas listaba las audiencias de la
+   * firma y viceversa: dos pantallas que comparten motor no pueden compartir
+   * archivador. Una audiencia de un juzgado no tiene nada que hacer bajo las
+   * entrevistas de un cliente, y al revés es peor — una entrevista es una
+   * conversación privada y una audiencia es un acto público.
+   */
+  await sembrar(A.user.firmId, A.user.email, 'ENTREVISTA DE A', [], 'ENTREVISTA');
+
+  const soloAudiencias = await pedir('/transcription?kind=AUDIENCIA', A.accessToken);
+  const tAud = (soloAudiencias.body?.items ?? []).map((t: { title: string }) => t.title);
+  check(
+    'el módulo de audiencias no ve entrevistas',
+    !tAud.includes('ENTREVISTA DE A') && tAud.includes('AUDIENCIA DE A'),
+    tAud.join(', ')
+  );
+
+  const soloEntrevistas = await pedir('/transcription?kind=ENTREVISTA', A.accessToken);
+  const tEnt = (soloEntrevistas.body?.items ?? []).map((t: { title: string }) => t.title);
+  check(
+    'el módulo de entrevistas no ve audiencias',
+    tEnt.includes('ENTREVISTA DE A') && !tEnt.includes('AUDIENCIA DE A'),
+    tEnt.join(', ')
+  );
+
+  const tipoInventado = await pedir('/transcription?kind=NO_EXISTE', A.accessToken);
+  check(
+    'un tipo inventado no destapa todo',
+    (tipoInventado.body?.items ?? []).length >= 2,
+    'devuelve la lista completa, que es el comportamiento sin filtro'
   );
 
   // 3. Borrar lo ajeno no puede reportar éxito.

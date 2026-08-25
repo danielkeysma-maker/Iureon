@@ -261,8 +261,13 @@ export const transcriptionApi = {
    * of it was being kept — which is the wrong way round for privileged
    * material: what is stored has to be visible to whoever it belongs to.
    */
-  async list(): Promise<StoredTranscription[]> {
-    const data = await httpClient.get<{ items: StoredTranscription[] }>('/api/transcription');
+  async list(kind: TranscriptionKind): Promise<StoredTranscription[]> {
+    // The kind is always sent: a hearings screen listing interviews, or the
+    // reverse, is a filing cabinet shared between two rooms that should not
+    // share one.
+    const data = await httpClient.get<{ items: StoredTranscription[] }>(
+      `/api/transcription?kind=${kind}`
+    );
     return data.items ?? [];
   },
 

@@ -392,13 +392,13 @@ export const useTranscription = (kind: TranscriptionKind) => {
 
     setIsLoadingStored(true);
     try {
-      setStored(await transcriptionApi.list());
+      setStored(await transcriptionApi.list(kind));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudieron cargar los transcritos guardados.');
     } finally {
       setIsLoadingStored(false);
     }
-  }, [firmId]);
+  }, [firmId, kind]);
 
   /** Reopens a stored transcript into the working view. */
   const openStored = useCallback((item: StoredTranscription) => {

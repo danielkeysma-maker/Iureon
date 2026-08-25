@@ -160,9 +160,16 @@ export const listTranscriptionsController = async (req: Request, res: Response):
    * version of the same defect as the tenant header, and pointless now that the
    * session carries a verified e-mail.
    */
+  // An unknown kind lists nothing rather than everything: a typo in the query
+  // must not turn a filtered screen into an unfiltered one.
+  const kind = VALID_KINDS.includes(req.query.kind as TranscriptionKind)
+    ? (req.query.kind as TranscriptionKind)
+    : undefined;
+
   const items = await transcriptionStore.list(
     req.firmId as string,
-    req.user?.email ?? 'desconocido'
+    req.user?.email ?? 'desconocido',
+    kind
   );
 
   /*

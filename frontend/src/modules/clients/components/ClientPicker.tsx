@@ -69,15 +69,19 @@ export const ClientPicker: React.FC<ClientPickerProps> = ({ value, onChange }) =
 
   const seleccionado = clients.find((c) => c.id === value);
 
+  /*
+   * No card of its own: the caller decides the frame.
+   *
+   * It used to carry a heading and a border, so inside the numbered step it
+   * became a box within a box with two titles saying the same thing. A
+   * component that assumes its own chrome can only ever be placed one way.
+   */
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-3">
+    <div className="space-y-3">
       <div className="flex items-center justify-between gap-2">
-        <div>
-          <h4 className="font-bold text-slate-900 text-xs">Cliente de la entrevista</h4>
-          <p className="text-[11px] text-slate-500">
-            Para encontrar esta conversación por la persona, no por el nombre del archivo.
-          </p>
-        </div>
+        <p className="text-[11px] text-slate-500">
+          Para encontrar esta conversación por la persona, no por el nombre del archivo.
+        </p>
 
         <button
           type="button"
