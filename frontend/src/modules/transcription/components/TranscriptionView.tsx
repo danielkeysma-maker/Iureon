@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Mic, Upload, FileAudio, AlertTriangle, Cpu, Copy, CheckCircle2, RotateCcw } from 'lucide-react';
+import { Mic, Upload, FileAudio, AlertTriangle, Cpu, Copy, CheckCircle2, RotateCcw, FileText, FileDown } from 'lucide-react';
 import { useTranscription } from '../hooks/useTranscription';
 import { TranscriptSegments } from './TranscriptSegments';
 import { AudioPreview } from './AudioPreview';
 import { NotPersistedWarning, RoleProposals } from './RoleProposals';
 import { StoredTranscriptions } from './StoredTranscriptions';
+import { exportTranscriptToPdf, exportTranscriptToWord } from '../transcriptExport';
 import { buildSpeakerNames } from '../speakerNames';
 import { ROLE_LABELS, SUPPORTED_AUDIO_EXTENSIONS, type SpeakerRole, type TranscriptSegment, type TranscriptionKind } from '../types';
 
@@ -57,6 +58,15 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AU
 
   const [copied, setCopied] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  /*
+   * The name the export carries.
+   *
+   * The uploaded file while one is in hand, the stored title after reopening —
+   * a transcript exported from the saved list must not be called "grabación".
+   */
+  const [openedTitle, setOpenedTitle] = useState('');
+  const exportTitle = selectedFile?.name || openedTitle || 'transcripcion';
 
   const handleCopy = async () => {
     if (!result) return;
@@ -127,7 +137,10 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AU
           <StoredTranscriptions
             items={stored}
             isLoading={isLoadingStored}
-            onOpen={openStored}
+            onOpen={(item) => {
+              setOpenedTitle(item.title);
+              openStored(item);
+            }}
             onDelete={deleteStored}
             onRefresh={() => void loadStored()}
           />
@@ -261,6 +274,30 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AU
                     <Copy className="w-3.5 h-3.5" />
                   )}
                   <span>{copied ? 'Copiado' : 'Copiar texto'}</span>
+                </button>
+                {/*
+                  Word and PDF, which the transcript never had.
+                  
+                  Its whole purpose is to be quoted — in a memorial, an alegato,
+                  a recurso — and until now it could only leave as clipboard
+                  text, so the identification work arrived at the document as a
+                  paragraph somebody had to reformat by hand.
+                */}
+                <button
+                  onClick={() => result && void exportTranscriptToWord(result, exportTitle)}
+                  className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg text-[11px] font-semibold flex items-center gap-1.5"
+                  title="Descargar como documento de Word"
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  <span>Word</span>
+                </button>
+                <button
+                  onClick={() => result && exportTranscriptToPdf(result, exportTitle)}
+                  className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg text-[11px] font-semibold flex items-center gap-1.5"
+                  title="Descargar como PDF"
+                >
+                  <FileDown className="w-3.5 h-3.5" />
+                  <span>PDF</span>
                 </button>
                 <button
                   onClick={handleStartOver}
