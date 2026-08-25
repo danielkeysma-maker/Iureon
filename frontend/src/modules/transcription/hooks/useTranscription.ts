@@ -516,6 +516,8 @@ export const useTranscription = (kind: TranscriptionKind) => {
     editSegment,
     splitSegment,
     reassignSpeaker,
+    /** The stored transcript's id, which an interview needs to attach a client. */
+    transcriptionId,
     canEdit: Boolean(transcriptionId),
     reset
   };

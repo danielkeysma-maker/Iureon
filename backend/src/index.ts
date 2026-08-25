@@ -4,6 +4,7 @@ import { config } from './config/env.config';
 import { authMiddleware, optionalAuthMiddleware } from './modules/auth/auth.middleware';
 import { authPublicRoutes, authRoutes } from './modules/auth/auth.routes';
 import { adminRoutes } from './modules/admin/admin.routes';
+import { clientsRoutes } from './modules/clients/clients.routes';
 import { healthRoutes } from './modules/health/health.routes';
 import { agentRoutes } from './modules/agent/agent.routes';
 import { documentRoutes } from './modules/documents/document.routes';
@@ -97,6 +98,7 @@ app.use('/api', auditRoutes);
 app.use('/api', searchRoutes);
 app.use('/api', draftsRoutes);
 app.use('/api', transcriptionRoutes);
+app.use('/api', clientsRoutes);
 app.use('/api', catalogRoutes);
 
 // Servidor Express

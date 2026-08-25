@@ -1,5 +1,12 @@
 /** Top-level sections of the workspace, as listed in the sidebar. */
-export type MainView = 'workspace' | 'audiencias' | 'search' | 'catalogo' | 'tools' | 'audit';
+export type MainView =
+  | 'workspace'
+  | 'audiencias'
+  | 'entrevistas'
+  | 'search'
+  | 'catalogo'
+  | 'tools'
+  | 'audit';
 
 /** A client law firm: the tenant every request and record is scoped to. */
 export interface LawFirmTenant {

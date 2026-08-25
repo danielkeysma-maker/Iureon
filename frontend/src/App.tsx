@@ -29,7 +29,15 @@ import { FirmCreditsRechargeModal } from './modules/tenant/components/FirmCredit
 import type { MainView } from './modules/tenant/types';
 
 /** Every module the shell can show, for validating what was stored. */
-const MAIN_VIEWS: MainView[] = ['workspace', 'audiencias', 'search', 'catalogo', 'tools', 'audit'];
+const MAIN_VIEWS: MainView[] = [
+  'workspace',
+  'audiencias',
+  'entrevistas',
+  'search',
+  'catalogo',
+  'tools',
+  'audit'
+];
 
 const COST_PER_DRAFT_COP = 2000;
 
@@ -373,6 +381,7 @@ export function App() {
           )}
 
           {mainView === 'audiencias' && <TranscriptionView kind="AUDIENCIA" />}
+          {mainView === 'entrevistas' && <TranscriptionView kind="ENTREVISTA" />}
           {mainView === 'search' && <SearchView />}
           {mainView === 'catalogo' && <CatalogCurationView />}
           {mainView === 'tools' && <ToolsView />}

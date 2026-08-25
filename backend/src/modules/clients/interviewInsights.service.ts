@@ -1,0 +1,131 @@
+import { vectorSearchService, type VectorMatch } from '../search/vectorSearch.service';
+import type { TranscriptSegment } from '../transcription/types';
+
+/**
+ * Jurisprudence the corpus offers for what a client actually said.
+ *
+ * WHY THE CLIENT'S WORDS AND NOT THE WHOLE TRANSCRIPT. An interview is mostly
+ * the lawyer: greetings, questions, explanations of procedure. Searching all of
+ * it retrieves precedent for the lawyer's own vocabulary, which is circular —
+ * the corpus would answer the questions rather than the facts. The facts are in
+ * what the client narrates, so that is what gets searched.
+ *
+ * WHY IT SUGGESTS AND NEVER CONCLUDES. This is vector similarity over a
+ * conversation, and a similar paragraph is not an applicable precedent: the
+ * facts may rhyme and the ruling still not govern. Every suggestion carries its
+ * providencia, its corporación and its score so the lawyer can dismiss it in a
+ * second, which is the outcome most of them deserve.
+ *
+ * WHAT IS ABSENT AND SHOULD BE SAID: doctrine. The corpus holds 62 providencias
+ * and no doctrinal work, so this searches jurisprudence alone. Offering a
+ * "doctrina" tab fed by case law would be labelling one thing as another.
+ */
+
+export interface InterviewSuggestion {
+  /** The client's own words that produced this, so the lawyer can judge it. */
+  fromClient: string;
+  providencia: string | null;
+  corporacion: string | null;
+  ponente: string | null;
+  sourceUrl: string | null;
+  excerpt: string;
+  /** 1 - cosine distance. Higher is closer, and closer is not the same as applicable. */
+  similarity: number;
+}
+
+export interface InterviewInsights {
+  suggestions: InterviewSuggestion[];
+  /** Present when nothing could be searched, so the screen can say why. */
+  reason?: string;
+}
+
+const CORPUS = 'SYSTEM_CORPUS';
+
+/**
+ * How many of the client's turns are searched.
+ *
+ * The longest ones, because in an interview length tracks substance: "sí,
+ * doctor" is a turn and so is the account of what happened, and only the second
+ * describes a case. Four keeps the round trips bounded on a two-hour
+ * conversation.
+ */
+const MAX_TURNOS = 4;
+
+/** Below this the match is noise dressed as precedent. */
+const UMBRAL = 0.45;
+
+const CLIENT_ROLES = new Set(['CLIENTE', 'DEMANDANTE', 'DEMANDADO', 'VICTIMA', 'TESTIGO']);
+
+const excerpt = (text: string, max = 260): string =>
+  text.length <= max ? text : `${text.slice(0, max).trim()}…`;
+
+const asString = (value: unknown): string | null =>
+  typeof value === 'string' && value.trim() ? value.trim() : null;
+
+const toSuggestion = (match: VectorMatch, fromClient: string): InterviewSuggestion => {
+  const meta = match.metadata ?? {};
+
+  return {
+    fromClient: excerpt(fromClient, 160),
+    providencia: asString(meta.providencia) ?? asString(meta.numero) ?? match.fileName,
+    corporacion: asString(meta.corporacion),
+    ponente: asString(meta.ponente),
+    sourceUrl: asString(meta.sourceUrl) ?? asString(meta.source_url),
+    excerpt: excerpt(match.contentChunk),
+    similarity: match.similarity
+  };
+};
+
+export const suggestForInterview = async (segments: TranscriptSegment[]): Promise<InterviewInsights> => {
+  const delCliente = segments
+    .filter((segment) => CLIENT_ROLES.has(segment.role))
+    .map((segment) => segment.text.trim())
+    .filter((text) => text.length >= 80)
+    .sort((a, b) => b.length - a.length)
+    .slice(0, MAX_TURNOS);
+
+  if (delCliente.length === 0) {
+    return {
+      suggestions: [],
+      reason:
+        'Todavía no hay intervenciones del cliente lo bastante largas. Asigna el rol de Cliente a su voz y vuelve a consultar.'
+    };
+  }
+
+  const encontradas: InterviewSuggestion[] = [];
+  let motivo: string | undefined;
+
+  for (const turno of delCliente) {
+    const resultado = await vectorSearchService.search(CORPUS, turno, 3);
+
+    if (resultado.status !== 'OK') {
+      motivo = resultado.reason;
+      continue;
+    }
+
+    for (const match of resultado.matches) {
+      if (match.similarity < UMBRAL) continue;
+      encontradas.push(toSuggestion(match, turno));
+    }
+  }
+
+  /*
+   * One providencia per suggestion list, keeping its best match.
+   *
+   * The same ruling answers several turns of the same story — that is what a
+   * coherent account looks like — and repeating it three times reads as three
+   * findings when it is one.
+   */
+  const porProvidencia = new Map<string, InterviewSuggestion>();
+  for (const sugerencia of encontradas) {
+    const clave = sugerencia.providencia ?? sugerencia.excerpt.slice(0, 40);
+    const previa = porProvidencia.get(clave);
+    if (!previa || sugerencia.similarity > previa.similarity) {
+      porProvidencia.set(clave, sugerencia);
+    }
+  }
+
+  const suggestions = [...porProvidencia.values()].sort((a, b) => b.similarity - a.similarity);
+
+  return suggestions.length > 0 ? { suggestions } : { suggestions: [], reason: motivo };
+};
