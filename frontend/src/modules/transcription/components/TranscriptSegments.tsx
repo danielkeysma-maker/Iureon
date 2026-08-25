@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, Scissors, UserCog } from 'lucide-react';
+import { AlertTriangle, Check, Scissors, UserCog } from 'lucide-react';
 import { buildSpeakerNames } from '../speakerNames';
 import {
   ROLE_LABELS,
@@ -142,6 +142,18 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
 
   /** The cut in progress: which intervention, and where it is being cut. */
   const [cutting, setCutting] = React.useState<{ index: number; offset: number } | null>(null);
+
+  /**
+   * Which intervention is being corrected, and which one just saved.
+   *
+   * The correction always persisted on blur and NOTHING SAID SO. A lawyer
+   * fixing "desembarco" had no way to know whether clicking away had kept it,
+   * and asked outright how to save — which is the answer: an invisible save is
+   * indistinguishable from no save at all, and in a transcript that gets quoted
+   * the doubt is worse than the typo.
+   */
+  const [editing, setEditing] = React.useState<number | null>(null);
+  const [justSaved, setJustSaved] = React.useState<number | null>(null);
 
   /** The intervention whose voice is being changed. */
   const [moving, setMoving] = React.useState<number | null>(null);
@@ -598,10 +610,43 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                 setCaret({ index, offset });
                 setAviso(null);
               }}
+              onFocus={() => {
+                setEditing(index);
+                setJustSaved(null);
+              }}
+              /*
+                Enter saves and Escape discards.
+                
+                Enter also had to be intercepted for correctness: inside a
+                contentEditable it was inserting a line break into a
+                transcript that is one paragraph per turn by definition, so the
+                key that a person presses to mean "done" was quietly damaging
+                the record.
+              */
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  e.currentTarget.blur();
+                  return;
+                }
+
+                if (e.key === 'Escape') {
+                  e.preventDefault();
+                  e.currentTarget.textContent = segment.text;
+                  setEditing(null);
+                  e.currentTarget.blur();
+                }
+              }}
               onBlur={(e) => {
                 const nuevo = e.currentTarget.textContent ?? '';
+                setEditing(null);
+
                 if (onEditSegment && nuevo.trim() && nuevo !== segment.text) {
                   onEditSegment(index, nuevo.trim());
+                  setJustSaved(index);
+                  // Long enough to be read, short enough not to become part of
+                  // the page: the transcript is what the reader came for.
+                  window.setTimeout(() => setJustSaved((actual) => (actual === index ? null : actual)), 2500);
                 }
               }}
               /*
@@ -614,10 +659,36 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                   ? 'outline-none focus:bg-amber-50/60 focus:ring-1 focus:ring-amber-300 rounded px-1 -mx-1 cursor-text'
                   : ''
               }`}
-              title={onEditSegment ? 'Haz clic para corregir el texto' : undefined}
+              title={
+                onEditSegment
+                  ? 'Haz clic para corregir el texto. Enter guarda, Esc descarta.'
+                  : undefined
+              }
             >
               {segment.text}
             </p>
+
+            {/*
+              Says how to save while saving is possible, and says it saved.
+              
+              Both halves matter: the first because a lawyer asked how, the
+              second because a correction believed saved and not saved is the
+              worst outcome this screen can produce.
+            */}
+            {editing === index && (
+              <p className="mt-1 text-[10px] text-slate-500">
+                <span className="font-semibold">Enter</span> guarda ·{' '}
+                <span className="font-semibold">Esc</span> descarta · también se guarda al hacer
+                clic fuera
+              </p>
+            )}
+
+            {justSaved === index && (
+              <p className="mt-1 text-[10px] font-semibold text-emerald-700 flex items-center gap-1">
+                <Check className="w-3 h-3" />
+                Corrección guardada
+              </p>
+            )}
             </div>
           </div>
         ))}
