@@ -4,7 +4,13 @@ const BASE_URL = 'https://openrouter.ai/api/v1';
 
 /** The three engines the drafting pipeline is allowed to call. */
 export const ENGINE = {
-  GEMINI: 'google/gemini-3.6-flash',
+  /*
+   * 3.7, released 13 August 2026. Same 1M context as 3.6 and exactly half the
+   * price — $0.38/M in and $1.88/M out against $0.75 and $3.75 — which matters
+   * because Gemini runs the fact-extraction stage, the one that consumes the
+   * most input in the pipeline.
+   */
+  GEMINI: 'google/gemini-3.7-flash',
   GPT: 'openai/gpt-5.6-sol',
   OPUS: 'anthropic/claude-opus-5'
 } as const;
@@ -64,6 +70,17 @@ export const callOpenRouterModel = async (
       },
       body: JSON.stringify({
         model,
+        /*
+         * Medium reasoning effort on Opus, deliberately.
+         *
+         * Opus bills reasoning tokens like any other output, and the drafting
+         * stage it runs already has its structure decided: Gemini extracted the
+         * facts and GPT laid out the dogmatic outline. What is left is writing
+         * the document well, which is what Opus is for — not re-deriving a plan
+         * that already exists. Medium is the level that buys the writing
+         * without paying for the re-derivation.
+         */
+        ...(isOpus ? { reasoning_effort: 'medium' } : {}),
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }

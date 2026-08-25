@@ -124,9 +124,18 @@ export const InterviewView: React.FC = () => {
 
   const trabajando = isUploading || isTranscribing;
 
+  /*
+   * THE SCROLL CONTAINER, WHICH THIS VIEW SHIPPED WITHOUT.
+   *
+   * `<main>` in App.tsx is `flex overflow-hidden`, so every module supplies its
+   * own scrolling surface — the hearings view and the search view both do. This
+   * one returned a bare `space-y-4`, so a two-hour interview rendered its whole
+   * transcript into a box that was clipped at the fold with no way to reach the
+   * rest. The transcript was there; the page simply had no way to move.
+   */
   if (!isAvailable) {
     return (
-      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-2">
+      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-2 m-6">
         <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
         <p className="text-[11px] text-amber-900">
           El motor de transcripción no está configurado en el servidor.
@@ -136,7 +145,8 @@ export const InterviewView: React.FC = () => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex-1 overflow-y-auto p-6 bg-slate-100">
+      <div className="max-w-4xl mx-auto space-y-4 font-sans">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-xl bg-blue-950 flex items-center justify-center shrink-0">
           <UserRound className="w-5 h-5 text-blue-200" />
@@ -318,6 +328,7 @@ export const InterviewView: React.FC = () => {
           />
         </>
       )}
+      </div>
     </div>
   );
 };
