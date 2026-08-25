@@ -165,7 +165,25 @@ export const listTranscriptionsController = async (req: Request, res: Response):
     req.user?.email ?? 'desconocido'
   );
 
-  res.json({ success: true, items });
+  /*
+   * Each transcript carries its own proposals and warnings.
+   *
+   * They used to travel only on the response that CREATED a transcript, so
+   * reopening a saved one showed neither: the app had read the names out of the
+   * hearing and then forgotten them the moment the tab was closed. Both are
+   * pure functions of the segments the list already holds, so recomputing here
+   * costs one pass over text that is in memory anyway — and recomputing is the
+   * correct behaviour regardless, since editing a name changes what the text
+   * says about itself.
+   */
+  res.json({
+    success: true,
+    items: items.map((item) => ({
+      ...item,
+      voiceConflicts: detectVoiceConflicts(item.segments),
+      nameProposals: proposeSpeakerNames(item.segments)
+    }))
+  });
 };
 
 /**

@@ -414,11 +414,22 @@ export const useTranscription = (kind: TranscriptionKind) => {
       model: item.model,
       transcribedAt: item.transcribed_at
     });
-    // Proposals and conflicts are recomputed by the server on the next change;
-    // showing stale ones would be worse than showing none.
+    /*
+     * Restored from the stored transcript, not cleared.
+     *
+     * These used to be emptied here, which meant the app read the names out of
+     * a hearing and then forgot them the moment the tab was closed — the
+     * suggestion only ever appeared in the seconds after transcribing. The
+     * server recomputes both on every read, so what comes back is current for
+     * the text as it stands now, edits included.
+     *
+     * Role proposals stay empty: they are produced once, from the untouched
+     * transcription, and a stale one after the lawyer has already assigned
+     * roles would argue with work they have finished.
+     */
     setRoleProposals([]);
-    setVoiceConflicts([]);
-    setNameProposals([]);
+    setVoiceConflicts(item.voiceConflicts ?? []);
+    setNameProposals(item.nameProposals ?? []);
   }, []);
 
   const deleteStored = useCallback(

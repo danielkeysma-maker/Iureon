@@ -54,6 +54,10 @@ export interface StoredTranscription {
   duration_seconds: number | null;
   model: string;
   transcribed_at: string;
+  /** Recomputed by the server on every read: reopening must show what a fresh
+      transcription would. */
+  voiceConflicts?: VoiceConflict[];
+  nameProposals?: SpeakerNameProposal[];
 }
 
 export interface TranscriptionOutcome {

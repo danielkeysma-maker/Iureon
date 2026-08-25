@@ -44,10 +44,10 @@ const check = (n: string, ok: boolean, d = ''): void => {
   const A = await crearFirmaConSesion({ firmName: `Lista A ${m}`, nit: `980${m}`, email: `la${m}@iureon.test`, password: 'contrasena-larga-A' });
   const B = await crearFirmaConSesion({ firmName: `Lista B ${m}`, nit: `981${m}`, email: `lb${m}@iureon.test`, password: 'contrasena-larga-B' });
 
-  const sembrar = (firmId: string, email: string, title: string) =>
+  const sembrar = (firmId: string, email: string, title: string, segments: unknown[] = []) =>
     c.from('transcriptions').insert({
       firm_id: firmId, user_email: email, kind: 'AUDIENCIA', title,
-      source_file_name: 'x.mp3', full_text: 't', segments: [], speaker_labels: [],
+      source_file_name: 'x.mp3', full_text: 't', segments, speaker_labels: [],
       model: 'x', transcribed_at: new Date().toISOString()
     }).select('id').single();
 
@@ -60,7 +60,39 @@ const check = (n: string, ok: boolean, d = ''): void => {
   check('la firma ve su propio transcrito', titulosA.includes('AUDIENCIA DE A'), titulosA.join(', '));
   check('y NO ve el de la otra firma', !titulosA.includes('AUDIENCIA DE B'), titulosA.join(', '));
 
-  // 2. Borrar lo ajeno no puede reportar éxito.
+  /*
+   * 2. Reabrir un transcrito debe mostrar lo que mostraría uno recién hecho.
+   *
+   * Las propuestas viajaban solo en la respuesta que CREABA el transcrito, así
+   * que la app leía los nombres de la audiencia y los olvidaba al cerrar la
+   * pestaña: la sugerencia existía durante unos segundos y nunca más.
+   */
+  const { data: conNombres } = await sembrar(A.user.firmId, A.user.email, 'CON PRESENTACIONES', [
+    { speakerLabel: 'speaker_0', role: 'JUEZ', text: 'Se declara abierta la audiencia.', startSeconds: 0, endSeconds: 5 },
+    { speakerLabel: 'speaker_1', role: 'DESCONOCIDO', text: 'Buenos días, mi nombre es Tomás Enrique Wilches Salsa.', startSeconds: 64, endSeconds: 78 }
+  ]);
+
+  const conLista = await pedir('/transcription', A.accessToken);
+  const guardado = (conLista.body?.items ?? []).find(
+    (t: { id: string }) => t.id === (conNombres as { id: string }).id
+  );
+  check(
+    'un transcrito guardado trae su propuesta de nombre',
+    guardado?.nameProposals?.[0]?.name === 'Tomás Enrique Wilches Salsa',
+    JSON.stringify(guardado?.nameProposals)
+  );
+  check(
+    'y la propuesta viene con su frase para poder juzgarla',
+    Boolean(guardado?.nameProposals?.[0]?.phrase),
+    guardado?.nameProposals?.[0]?.phrase
+  );
+  check(
+    'los avisos de voces fusionadas viajan igual',
+    Array.isArray(guardado?.voiceConflicts),
+    JSON.stringify(guardado?.voiceConflicts)
+  );
+
+  // 3. Borrar lo ajeno no puede reportar éxito.
   const ajeno = await pedir(`/transcription/${(deB as { id: string }).id}`, A.accessToken, { method: 'DELETE' });
   const { data: sigueVivo } = await c
     .from('transcriptions')
