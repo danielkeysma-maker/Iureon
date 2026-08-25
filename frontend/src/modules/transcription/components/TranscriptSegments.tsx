@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, Scissors, User, UserCog } from 'lucide-react';
+import { AlertTriangle, Scissors, UserCog } from 'lucide-react';
 import { buildSpeakerNames } from '../speakerNames';
 import {
   ROLE_LABELS,
@@ -29,15 +29,37 @@ interface TranscriptSegmentsProps {
   voiceConflicts?: VoiceConflict[];
 }
 
-/** Colour per speaker so a long hearing stays readable at a glance. */
-const SPEAKER_STYLES = [
-  'border-l-blue-700 bg-blue-50/40',
-  'border-l-emerald-700 bg-emerald-50/40',
-  'border-l-amber-700 bg-amber-50/40',
-  'border-l-purple-700 bg-purple-50/40',
-  'border-l-rose-700 bg-rose-50/40',
-  'border-l-cyan-700 bg-cyan-50/40'
+/**
+ * Colour per speaker so a long hearing stays readable at a glance.
+ *
+ * Carried by an avatar rather than a tinted row. Six washed-out backgrounds
+ * stacked down a two-hour transcript fought the text for attention and made the
+ * page look like a spreadsheet; the same colour on a small initialled circle
+ * identifies the voice just as fast and leaves the reading surface white, which
+ * is what a document meant to be read for an hour has to be.
+ */
+const SPEAKER_COLORS = [
+  'bg-blue-700',
+  'bg-emerald-700',
+  'bg-amber-600',
+  'bg-purple-700',
+  'bg-rose-700',
+  'bg-cyan-700'
 ];
+
+/**
+ * The initials on the avatar, from the display name the reader already sees —
+ * "Apoderado demandado" gives AD, "Juez" gives J. Never the diarization label:
+ * an S over every circle identifies nobody.
+ */
+const initials = (name: string): string =>
+  name
+    .replace(/\s*\d+$/, '')
+    .split(/\s+/)
+    .filter((word) => word.length > 2)
+    .slice(0, 2)
+    .map((word) => word[0]?.toUpperCase() ?? '')
+    .join('') || name.slice(0, 1).toUpperCase();
 
 const formatTimestamp = (seconds: number | null): string => {
   if (seconds === null) return '';
@@ -65,8 +87,10 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
   onReassignSpeaker,
   voiceConflicts = []
 }) => {
-  const styleFor = (speakerLabel: string): string =>
-    SPEAKER_STYLES[result.speakerLabels.indexOf(speakerLabel) % SPEAKER_STYLES.length];
+  const colorFor = (speakerLabel: string): string =>
+    SPEAKER_COLORS[
+      Math.max(0, result.speakerLabels.indexOf(speakerLabel)) % SPEAKER_COLORS.length
+    ];
 
   const roleOf = (speakerLabel: string): SpeakerRole =>
     result.segments.find((s) => s.speakerLabel === speakerLabel)?.role ?? 'DESCONOCIDO';
@@ -133,12 +157,18 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
           {result.speakerLabels.map((label) => (
             <div key={label} className="flex items-center gap-2">
               <div
-                className={`w-7 h-7 rounded-lg border-l-4 ${styleFor(label)} flex items-center justify-center shrink-0`}
+                className={`w-8 h-8 rounded-full ${colorFor(label)} flex items-center justify-center shrink-0`}
+                title={speakerNames[label]}
               >
-                <User className="w-3.5 h-3.5 text-slate-600" />
+                <span className="text-[10px] font-bold text-white tracking-tight">
+                  {initials(speakerNames[label] ?? label)}
+                </span>
               </div>
-              <span className="text-[11px] font-mono text-slate-500 w-20 shrink-0" title={speakerNames[label]}>
-                {label}
+              <span
+                className="text-[11px] font-semibold text-slate-700 w-28 shrink-0 truncate"
+                title={label}
+              >
+                {speakerNames[label] ?? label}
               </span>
               <select
                 value={roleOf(label)}
@@ -199,20 +229,40 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
       ))}
 
       {/* Transcript */}
-      <div className="bg-white border border-slate-200 rounded-xl divide-y divide-slate-100">
+      <div className="bg-white border border-slate-200 rounded-xl divide-y divide-slate-100/80 overflow-hidden">
         {result.segments.map((segment, index) => (
           <div
             key={`${segment.speakerLabel}-${index}`}
-            className={`border-l-4 ${styleFor(segment.speakerLabel)} p-3`}
+            /*
+              `group` so the editing controls can stay hidden until the reader
+              actually goes near this intervention. They used to sit visible on
+              every row, which put two buttons between the reader and every
+              paragraph of a two-hour transcript — the page read like a form
+              instead of like a record of what was said.
+            */
+            className="group flex gap-3 px-4 py-3 hover:bg-slate-50/70 transition-colors"
           >
-            <div className="flex items-center gap-2 mb-1">
+            <div
+              className={`w-8 h-8 rounded-full ${colorFor(segment.speakerLabel)} flex items-center justify-center shrink-0 mt-0.5`}
+              title={speakerNames[segment.speakerLabel]}
+            >
+              <span className="text-[10px] font-bold text-white tracking-tight">
+                {initials(speakerNames[segment.speakerLabel] ?? ROLE_LABELS[segment.role])}
+              </span>
+            </div>
+
+            <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 mb-0.5 min-h-[18px]">
               {/* The disambiguated name, not the bare role: with three
                   witnesses "Testigo" three times tells the reader nothing. */}
-              <span className="text-[11px] font-bold text-slate-800">
+              <span className="text-xs font-bold text-slate-900">
                 {speakerNames[segment.speakerLabel] ?? ROLE_LABELS[segment.role]}
               </span>
-              {segment.role === 'DESCONOCIDO' && (
-                <span className="text-[10px] font-mono text-slate-400">{segment.speakerLabel}</span>
+
+              {segment.startSeconds !== null && (
+                <span className="text-[10px] font-mono text-slate-400">
+                  {formatTimestamp(segment.startSeconds)}
+                </span>
               )}
               {/*
                 Cuts where the caret sits. Diarization cannot separate people
@@ -221,6 +271,7 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                 under one label, and no role assignment can fix that. Only a cut
                 can.
               */}
+              <span className="ml-auto flex items-center gap-3 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
               {onSplitSegment &&
                 (() => {
                   // Armed only when the caret is inside THIS intervention and
@@ -292,12 +343,7 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                   Otra voz
                 </button>
               )}
-
-              {segment.startSeconds !== null && (
-                <span className="text-[10px] font-mono text-slate-400 ml-auto">
-                  {formatTimestamp(segment.startSeconds)}
-                </span>
-              )}
+              </span>
             </div>
 
             {/*
@@ -446,7 +492,12 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                   onEditSegment(index, nuevo.trim());
                 }
               }}
-              className={`text-xs text-slate-700 leading-relaxed ${
+              /*
+                Reading size, not form size. This was text-xs — 12px — for a
+                document a lawyer reads for an hour and quotes in a filing. The
+                controls around it can stay small; the words cannot.
+              */
+              className={`text-[13px] text-slate-700 leading-[1.65] ${
                 onEditSegment
                   ? 'outline-none focus:bg-amber-50/60 focus:ring-1 focus:ring-amber-300 rounded px-1 -mx-1 cursor-text'
                   : ''
@@ -455,7 +506,7 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
             >
               {segment.text}
             </p>
-
+            </div>
           </div>
         ))}
       </div>
