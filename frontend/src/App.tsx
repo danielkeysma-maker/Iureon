@@ -28,6 +28,9 @@ import { LoginPortalView } from './modules/tenant/components/LoginPortalView';
 import { FirmCreditsRechargeModal } from './modules/tenant/components/FirmCreditsRechargeModal';
 import type { MainView } from './modules/tenant/types';
 
+/** Every module the shell can show, for validating what was stored. */
+const MAIN_VIEWS: MainView[] = ['workspace', 'audiencias', 'search', 'catalogo', 'tools', 'audit'];
+
 const COST_PER_DRAFT_COP = 2000;
 
 const EMPTY_FIRM_PLACEHOLDER: LawFirmTenant = {
@@ -67,7 +70,37 @@ export function App() {
   const isAuthenticated = Boolean(session);
   const currentUserEmail = session?.user.email ?? '';
 
-  const [mainView, setMainView] = useState<MainView>('workspace');
+  /*
+   * The module survives a reload.
+   *
+   * Refreshing while reading a two-hour transcript threw the lawyer back to the
+   * drafting workspace, which is the one screen they were not looking at — and
+   * a reload is exactly what somebody does when a page misbehaves, so the app
+   * punished the reflex it had provoked. Going home stays deliberate: the
+   * Redacción module, or the logo.
+   *
+   * The stored value is checked against the modules that exist, because a
+   * renamed one would otherwise render an empty shell with no way back.
+   */
+  const [mainView, setMainViewState] = useState<MainView>(() => {
+    try {
+      const guardado = localStorage.getItem('iureon_main_view');
+      return guardado && MAIN_VIEWS.includes(guardado as MainView)
+        ? (guardado as MainView)
+        : 'workspace';
+    } catch {
+      return 'workspace';
+    }
+  });
+
+  const setMainView = (view: MainView): void => {
+    setMainViewState(view);
+    try {
+      localStorage.setItem('iureon_main_view', view);
+    } catch {
+      /* The module still changes for this session; only the memory is lost. */
+    }
+  };
 
   /*
    * The firm's registry row, and the way back to the login screen.

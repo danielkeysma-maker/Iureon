@@ -59,8 +59,21 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
     >
       {/* BRAND HEADER */}
       <div className="p-4 border-b border-slate-200/80 flex items-center justify-between">
+        {/*
+          The logo goes home, which it never did.
+          
+          Now that a reload keeps the lawyer in the module they were reading,
+          leaving one has to be something they can actually ask for. Every
+          application puts that on its own mark, and this one looked like it did
+          without doing it.
+        */}
         {!isCollapsed ? (
-          <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setMainView('workspace')}
+            className="flex items-center gap-3 text-left rounded-xl hover:opacity-80 transition-opacity"
+            title="Ir al workspace de redacción"
+          >
             <div className="w-9 h-9 rounded-xl bg-blue-950 text-white flex items-center justify-center font-black text-sm shadow-xs border border-blue-900">
               <Scale className="w-5 h-5 text-blue-200" />
             </div>
@@ -68,11 +81,16 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
               <div className="font-black text-slate-900 tracking-tight text-base leading-none">IUREON</div>
               <div className="text-[10px] font-semibold text-slate-400 mt-0.5">LegalTech Colombia</div>
             </div>
-          </div>
+          </button>
         ) : (
-          <div className="w-9 h-9 rounded-xl bg-blue-950 text-white flex items-center justify-center font-black text-sm mx-auto shadow-xs border border-blue-900">
+          <button
+            type="button"
+            onClick={() => setMainView('workspace')}
+            className="w-9 h-9 rounded-xl bg-blue-950 text-white flex items-center justify-center font-black text-sm mx-auto shadow-xs border border-blue-900 hover:opacity-80 transition-opacity"
+            title="Ir al workspace de redacción"
+          >
             <Scale className="w-5 h-5 text-blue-200" />
-          </div>
+          </button>
         )}
       </div>
 

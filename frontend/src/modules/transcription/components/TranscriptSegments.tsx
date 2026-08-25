@@ -353,6 +353,24 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                 {speakerNames[segment.speakerLabel] ?? ROLE_LABELS[segment.role]}
               </span>
 
+              {/*
+                The procedural role beside the name, quieter than it.
+                
+                Both matter and they answer different questions. The name is who
+                spoke, which is what a quotation needs; the role is what they
+                were in the proceeding, which is what makes the quotation mean
+                something — "Tomás Enrique Wilches Salsa dijo" is a person,
+                "(Demandante)" is why a judge should care.
+                
+                Only when a name has been set. Without one the heading already IS
+                the role, and "Juez (Juez)" says the same thing twice.
+              */}
+              {segment.speakerName && segment.role !== 'DESCONOCIDO' && (
+                <span className="text-[11px] font-normal text-slate-500">
+                  ({ROLE_LABELS[segment.role]})
+                </span>
+              )}
+
               {segment.startSeconds !== null && (
                 <span className="text-[10px] font-mono text-slate-400">
                   {formatTimestamp(segment.startSeconds)}
