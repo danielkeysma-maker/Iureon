@@ -15,7 +15,7 @@ import { supabase } from '../../../config/supabase.config';
 import { authMiddleware } from '../../auth/auth.middleware';
 import { authPublicRoutes } from '../../auth/auth.routes';
 import { transcriptionRoutes } from '../transcription.routes';
-import { registerFirm } from '../../auth/auth.service';
+import { crearFirmaConSesion } from '../../auth/__checks__/helpers';
 
 const app = express();
 app.use(express.json());
@@ -41,8 +41,8 @@ const check = (n: string, ok: boolean, d = ''): void => {
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', ...(init.headers ?? {}) }
     }).then(async (r) => ({ status: r.status, body: await r.json().catch(() => null) }));
 
-  const A = await registerFirm({ firmName: `Lista A ${m}`, nit: `980${m}`, email: `la${m}@iureon.test`, password: 'contrasena-larga-A' });
-  const B = await registerFirm({ firmName: `Lista B ${m}`, nit: `981${m}`, email: `lb${m}@iureon.test`, password: 'contrasena-larga-B' });
+  const A = await crearFirmaConSesion({ firmName: `Lista A ${m}`, nit: `980${m}`, email: `la${m}@iureon.test`, password: 'contrasena-larga-A' });
+  const B = await crearFirmaConSesion({ firmName: `Lista B ${m}`, nit: `981${m}`, email: `lb${m}@iureon.test`, password: 'contrasena-larga-B' });
 
   const sembrar = (firmId: string, email: string, title: string) =>
     c.from('transcriptions').insert({

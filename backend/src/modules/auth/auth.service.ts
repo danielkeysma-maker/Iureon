@@ -169,89 +169,16 @@ export const refreshSession = async (refreshToken: string): Promise<Session> => 
 };
 
 /**
- * Registers a firm and issues its first account, as one transaction in intent.
+ * Adds an account to an existing firm.
  *
- * The firm row is written FIRST and the user second, because the user carries
- * the firm's id and an account pointing at a firm that does not exist is worse
- * than a firm with nobody in it: the first is a session the middleware accepts
- * and every query then fails on, the second is an empty registry row a retry
- * can reuse.
- */
-export const registerFirm = async (input: {
-  firmName: string;
-  nit: string;
-  email: string;
-  password: string;
-}): Promise<Session> => {
-  const client = requireSupabase();
-
-  const firmName = input.firmName.trim();
-  const nit = input.nit.trim();
-  const email = input.email.trim().toLowerCase();
-
-  if (!firmName || !nit) {
-    throw new AuthError('INVALID_FIRM', 'Se requieren el nombre y el NIT de la firma.');
-  }
-
-  if (input.password.length < 8) {
-    throw new AuthError('WEAK_PASSWORD', 'La contraseña debe tener al menos 8 caracteres.');
-  }
-
-  const { data: existing } = await client
-    .from('firms')
-    .select('firm_id')
-    .eq('nit', nit)
-    .maybeSingle();
-
-  if (existing) {
-    throw new AuthError('FIRM_EXISTS', 'Ya hay una firma registrada con ese NIT.', 409);
-  }
-
-  const firmId = `firm-${Date.now()}`;
-
-  const { error: firmError } = await client.from('firms').insert({
-    firm_id: firmId,
-    name: firmName,
-    nit,
-    plan_tier: 'PRO_FIRM',
-    subscription_status: 'active'
-  });
-
-  if (firmError) {
-    console.error('[AUTH] No se pudo crear la firma:', firmError.message);
-    throw new AuthError('FIRM_NOT_CREATED', 'No se pudo registrar la firma.', 502);
-  }
-
-  const { data: created, error: userError } = await client.auth.admin.createUser({
-    email,
-    password: input.password,
-    // Confirmed here because this project has no outbound mail: the alternative
-    // is an account nobody can ever activate.
-    email_confirm: true,
-    app_metadata: { firm_id: firmId, role: 'FIRM_ADMIN' satisfies FirmUserRole }
-  });
-
-  if (userError || !created.user) {
-    // The firm row is left behind on purpose. Deleting it would race a
-    // concurrent retry, and an empty firm is inert — nothing reads it until an
-    // account points at it.
-    console.error('[AUTH] No se pudo crear el usuario:', userError?.message);
-
-    const alreadyRegistered = /already|exists|registered/i.test(userError?.message ?? '');
-    throw new AuthError(
-      alreadyRegistered ? 'EMAIL_EXISTS' : 'USER_NOT_CREATED',
-      alreadyRegistered
-        ? 'Ese correo ya tiene una cuenta. Inicia sesión.'
-        : 'No se pudo crear la cuenta.',
-      alreadyRegistered ? 409 : 502
-    );
-  }
-
-  return signIn(email, input.password);
-};
-
-/**
- * Adds a lawyer to an existing firm.
+ * THE ONLY WAY AN ACCOUNT COMES INTO BEING, and it always needs a firm that
+ * already exists. Public self-registration was removed: it let anyone create a
+ * tenant and start using the product without ever becoming a client, which is
+ * not a security defect but a business one — and the two are the same shape
+ * here, since a tenant is what the product bills.
+ *
+ * Firms are created by the operator (see modules/admin) or, for the very first
+ * account on an empty database, by `npm run superadmin`.
  *
  * The firm comes from the CALLER'S session, never from the request body — the
  * whole point of this module is that no client names its own tenant, and an

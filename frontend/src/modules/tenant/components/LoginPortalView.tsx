@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Scale, Mail, Key, ShieldCheck, ArrowRight, AlertCircle, Building2 } from 'lucide-react';
+import { Scale, Mail, Key, ShieldCheck, ArrowRight, AlertCircle } from 'lucide-react';
 import { authApi } from '../../auth/auth.api';
 import type { Session } from '../../auth/session';
 
@@ -16,22 +16,18 @@ interface LoginPortalViewProps {
  * "Autenticación Cifrada Supabase Auth & Multi-Tenant RLS", which was false in
  * every word.
  *
- * Both halves live here because they are the same moment for a new user:
- * signing in needs an account, and the first account of a firm is created by
- * registering the firm. Registration mints the tenant server-side and issues
- * its first administrator; it cannot join an existing firm, so the form has no
- * way to name one.
+ * AND IT NO LONGER OFFERS TO REGISTER A FIRM. Self-registration lived here
+ * briefly, which meant anyone could open a tenant and start using the product
+ * without ever becoming a client — a business defect and a security one in the
+ * same shape, since a tenant is exactly what the product bills. Firms are
+ * opened from the operator console, by whoever knows what was agreed and
+ * charged.
  */
 export const LoginPortalView: React.FC<LoginPortalViewProps> = ({ onLoginSuccess }) => {
-  const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [firmName, setFirmName] = useState('');
-  const [nit, setNit] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
-  const registering = mode === 'register';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,37 +38,19 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({ onLoginSuccess
       return;
     }
 
-    if (registering && (!firmName.trim() || !nit.trim())) {
-      setErrorMsg('Ingresa el nombre y el NIT de la firma.');
-      return;
-    }
-
     setIsLoading(true);
 
     try {
-      const { session } = registering
-        ? await authApi.registerFirm({
-            firmName: firmName.trim(),
-            nit: nit.trim(),
-            email: email.trim(),
-            password
-          })
-        : await authApi.login(email.trim(), password);
-
+      const { session } = await authApi.login(email.trim(), password);
       onLoginSuccess(session);
     } catch (err) {
       // The API answers in Spanish and distinguishes nothing an attacker could
       // use — "Correo o contraseña incorrectos" covers both a wrong password
-      // and an address with no account.
-      setErrorMsg(err instanceof Error ? err.message : 'No se pudo completar la operación.');
+      // and an address that has no account.
+      setErrorMsg(err instanceof Error ? err.message : 'No se pudo iniciar sesión.');
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const switchMode = () => {
-    setMode(registering ? 'login' : 'register');
-    setErrorMsg('');
   };
 
   return (
@@ -96,37 +74,6 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({ onLoginSuccess
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {registering && (
-            <>
-              <div>
-                <label className="text-xs font-semibold text-slate-700 block mb-1">
-                  Nombre de la firma o despacho:
-                </label>
-                <div className="relative">
-                  <Building2 className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-                  <input
-                    type="text"
-                    value={firmName}
-                    onChange={(e) => setFirmName(e.target.value)}
-                    placeholder="Wilches & Asociados S.A.S."
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-900 font-medium focus:outline-none focus:border-blue-900 focus:bg-white transition-all"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="text-xs font-semibold text-slate-700 block mb-1">NIT:</label>
-                <input
-                  type="text"
-                  value={nit}
-                  onChange={(e) => setNit(e.target.value)}
-                  placeholder="900.123.456-7"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs text-slate-900 font-mono focus:outline-none focus:border-blue-900 focus:bg-white transition-all"
-                />
-              </div>
-            </>
-          )}
-
           <div>
             <label className="text-xs font-semibold text-slate-700 block mb-1">
               Correo Electrónico Corporativo:
@@ -159,9 +106,6 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({ onLoginSuccess
                 required
               />
             </div>
-            {registering && (
-              <p className="text-[11px] text-slate-500 mt-1">Mínimo 8 caracteres.</p>
-            )}
           </div>
 
           {errorMsg && (
@@ -177,34 +121,33 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({ onLoginSuccess
             className="w-full py-3 bg-blue-950 hover:bg-blue-900 disabled:bg-slate-400 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.99]"
           >
             {isLoading ? (
-              <span>{registering ? 'Registrando la firma…' : 'Verificando credenciales…'}</span>
+              <span>Verificando credenciales…</span>
             ) : (
               <>
                 <ShieldCheck className="w-4 h-4 text-blue-300" />
-                <span>{registering ? 'Registrar firma y crear cuenta' : 'Ingresar al Workspace Judicial'}</span>
+                <span>Ingresar al Workspace Judicial</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
           </button>
         </form>
 
-        <div className="pt-4 border-t border-slate-100 text-center text-[11px] text-slate-500 space-y-2">
-          <button
-            type="button"
-            onClick={switchMode}
-            className="text-blue-900 font-semibold hover:underline"
-          >
-            {registering
-              ? '¿Ya tienes cuenta? Inicia sesión'
-              : '¿Tu firma no está registrada? Regístrala'}
-          </button>
-          {/*
-            Says what is true, as the previous warning did when nothing was
-            verified. Now it is: the password is checked against Supabase Auth,
-            and the firm travels inside the signed token rather than in a header
-            the browser writes.
-          */}
+        {/*
+          Says what is true, as the previous notice did back when nothing was
+          verified at all. Now it is: the password is checked against Supabase
+          Auth, and the firm travels inside a signed token rather than in a
+          header the browser writes.
+
+          And it tells a firm that lands here how to become a client, because
+          removing self-registration in silence would read as the product being
+          broken rather than as it being sold.
+        */}
+        <div className="pt-4 border-t border-slate-100 text-center text-[11px] text-slate-500 space-y-1">
           <p>Acceso verificado. Cada firma solo ve sus propios expedientes.</p>
+          <p className="text-slate-400">
+            El acceso a Iureon es por contratación. Si tu firma quiere usarlo, contáctanos y
+            abrimos su cuenta.
+          </p>
         </div>
       </div>
     </div>

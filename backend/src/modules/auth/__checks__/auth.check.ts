@@ -11,7 +11,8 @@
  * instead of failing loudly.
  */
 import { supabase } from '../../../config/supabase.config';
-import { registerFirm, signIn, userFromToken, AuthError } from '../auth.service';
+import { signIn, userFromToken, AuthError } from '../auth.service';
+import { crearFirmaConSesion } from './helpers';
 
 const marca = Date.now();
 const A = { firmName: `Firma A ${marca}`, nit: `900${marca}`, email: `a${marca}@iureon.test`, password: 'contrasena-larga-A' };
@@ -21,11 +22,11 @@ let fallos = 0;
 const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'OK  ' : 'FALLA'} ${n}${d ? ' — ' + d : ''}`); if (!ok) fallos++; };
 
 (async () => {
-  const sa = await registerFirm(A);
-  const sb = await registerFirm(B);
+  const sa = await crearFirmaConSesion(A);
+  const sb = await crearFirmaConSesion(B);
 
-  check('registrar crea la firma en la base', true, sa.user.firmId);
-  check('cada registro crea un inquilino distinto', sa.user.firmId !== sb.user.firmId,
+  check('crear una firma la deja en la base', true, sa.user.firmId);
+  check('cada firma creada es un inquilino distinto', sa.user.firmId !== sb.user.firmId,
     `${sa.user.firmId} vs ${sb.user.firmId}`);
   check('el primer usuario es administrador', sa.user.role === 'FIRM_ADMIN', sa.user.role);
 
@@ -54,12 +55,12 @@ const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'OK  ' :
 
   // NIT repetido.
   let duplicado = false;
-  try { await registerFirm({ ...B, email: `c${marca}@iureon.test` }); } catch (e) { duplicado = e instanceof AuthError && e.code === 'FIRM_EXISTS'; }
-  check('no se puede registrar dos veces el mismo NIT', duplicado);
+  try { await crearFirmaConSesion({ ...B, email: `c${marca}@iureon.test` }); } catch (e) { duplicado = e instanceof AuthError && e.code === 'FIRM_EXISTS'; }
+  check('no se puede crear dos veces el mismo NIT', duplicado);
 
   // Contraseña débil.
   let debil = false;
-  try { await registerFirm({ firmName: 'X', nit: `902${marca}`, email: `d${marca}@iureon.test`, password: 'corta' }); }
+  try { await crearFirmaConSesion({ firmName: 'X', nit: `902${marca}`, email: `d${marca}@iureon.test`, password: 'corta' }); }
   catch (e) { debil = e instanceof AuthError && e.code === 'WEAK_PASSWORD'; }
   check('una contraseña corta se rechaza', debil);
 

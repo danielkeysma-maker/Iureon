@@ -128,8 +128,9 @@ export function App() {
   const workflow = useLegalAgentWorkflow();
 
   /*
-   * A firm is created by REGISTERING it, which issues its first account at the
-   * same time — see /api/auth/register-firm. These three handlers used to
+   * A firm is created from the OPERATOR CONSOLE, which issues its first account
+   * at the same time. Self-registration was removed: it let anyone open a
+   * tenant and use the product without becoming a client. These three handlers used to
    * create, edit and delete tenants in localStorage, which is why the registry
    * table was empty and why a firm vanished with the browser.
    *

@@ -4,10 +4,14 @@ import type { Session } from './session';
 /**
  * The sign-in calls, which deliberately do NOT go through `httpClient`.
  *
- * That client attaches the session to every request; these three are the ones
- * made without a session — logging in, registering a firm, and trading an
- * expired access token for a fresh one. Routing them through it would make the
- * refresh call depend on the token it exists to replace.
+ * That client attaches the session to every request; these two are the ones
+ * made without a session — logging in, and trading an expired access token for
+ * a fresh one. Routing them through it would make the refresh call depend on
+ * the token it exists to replace.
+ *
+ * There is no registration here any more. A firm is opened by the operator, who
+ * knows what was agreed and charged; a public sign-up let anyone use the
+ * product without ever becoming a client.
  */
 
 export interface FirmProfile {
@@ -40,9 +44,6 @@ const post = async <T>(path: string, body: unknown): Promise<T> => {
 export const authApi = {
   login: (email: string, password: string) =>
     post<{ session: Session }>('/api/auth/login', { email, password }),
-
-  registerFirm: (input: { firmName: string; nit: string; email: string; password: string }) =>
-    post<{ session: Session }>('/api/auth/register-firm', input),
 
   refresh: (refreshToken: string) =>
     post<{ session: Session }>('/api/auth/refresh', { refreshToken })

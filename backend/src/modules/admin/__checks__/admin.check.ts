@@ -16,7 +16,7 @@ import { authPublicRoutes, authRoutes } from '../../auth/auth.routes';
 import { adminRoutes } from '../admin.routes';
 import { transcriptionRoutes } from '../../transcription/transcription.routes';
 import { auditRoutes } from '../../audit/audit.routes';
-import { registerFirm } from '../../auth/auth.service';
+import { crearFirmaConSesion } from '../../auth/__checks__/helpers';
 
 const app = express();
 app.use(express.json());
@@ -55,13 +55,13 @@ const PRIVILEGIADO = 'material privilegiado';
   const correoOperador = `op${m}@iureon.test`;
   const claveOperador = 'contrasena-operador';
 
-  const op = await registerFirm({
+  const op = await crearFirmaConSesion({
     firmName: `Operador ${m}`,
     nit: `970${m}`,
     email: correoOperador,
     password: claveOperador
   });
-  const cliente = await registerFirm({
+  const cliente = await crearFirmaConSesion({
     firmName: `Cliente ${m}`,
     nit: `971${m}`,
     email: `cl${m}@iureon.test`,

@@ -4,7 +4,6 @@ import {
   addUserToFirm,
   firmProfile,
   refreshSession,
-  registerFirm,
   signIn,
   type FirmUserRole
 } from './auth.service';
@@ -42,30 +41,6 @@ export const loginController = async (req: Request, res: Response): Promise<void
     res.json({ success: true, session: await signIn(email, password) });
   } catch (err) {
     fail(res, err, 'No se pudo iniciar sesión.');
-  }
-};
-
-/**
- * POST /api/auth/register-firm — public, and it is what makes a tenant exist.
- *
- * Public on purpose: a firm has to be able to sign itself up. What it CANNOT do
- * is join an existing firm — the id is minted here, never accepted from the
- * body, so registration only ever creates a tenant of its own.
- */
-export const registerFirmController = async (req: Request, res: Response): Promise<void> => {
-  const { email, password } = readCredentials(req);
-
-  try {
-    const session = await registerFirm({
-      firmName: typeof req.body.firmName === 'string' ? req.body.firmName : '',
-      nit: typeof req.body.nit === 'string' ? req.body.nit : '',
-      email,
-      password
-    });
-
-    res.status(201).json({ success: true, session });
-  } catch (err) {
-    fail(res, err, 'No se pudo registrar la firma.');
   }
 };
 
