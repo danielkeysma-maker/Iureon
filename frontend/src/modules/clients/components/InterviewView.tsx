@@ -133,7 +133,21 @@ export const InterviewView: React.FC = () => {
    * transcript into a box that was clipped at the fold with no way to reach the
    * rest. The transcript was there; the page simply had no way to move.
    */
-  if (!isAvailable) {
+  /*
+   * `=== false`, and the difference is the whole defect.
+   *
+   * `isAvailable` is `boolean | null`: null means the status request has not
+   * come back yet. Written as `!isAvailable` that reads as "not available", so
+   * every visit to this screen flashed "el motor de transcripción no está
+   * configurado" for the length of one round trip and then replaced it with the
+   * working page.
+   *
+   * A warning that appears and vanishes is worse than no warning: the lawyer
+   * saw something was wrong and had nothing to act on. Not knowing yet is not
+   * the same as knowing it is broken — the hearings view already spelled this
+   * `=== false` and I did not carry it across.
+   */
+  if (isAvailable === false) {
     return (
       <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-2 m-6">
         <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
