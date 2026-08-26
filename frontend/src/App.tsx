@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { httpClient, setSessionLostHandler } from './config/httpClient';
 import { billingApi } from './modules/billing/billing.api';
+import { BalancePanel } from './modules/billing/components/BalancePanel';
 import { clearSession, readSession, saveSession, type Session } from './modules/auth/session';
 import { SidebarLeft } from './modules/tenant/components/SidebarLeft';
 import { HeaderTop } from './modules/tenant/components/HeaderTop';
@@ -27,7 +28,6 @@ import { useSavedDrafts } from './modules/documents/hooks/useSavedDrafts';
 
 import { TenantUserManagementModal } from './modules/tenant/components/TenantUserManagementModal';
 import { LoginPortalView } from './modules/tenant/components/LoginPortalView';
-import { FirmCreditsRechargeModal } from './modules/tenant/components/FirmCreditsRechargeModal';
 import type { MainView } from './modules/tenant/types';
 
 /** Every module the shell can show, for validating what was stored. */
@@ -257,11 +257,18 @@ export function App() {
     setActiveFirm(EMPTY_FIRM_PLACEHOLDER);
   };
 
-  const handleRechargeSuccess = (addedAmount: number) => {
-    const updatedFirm = { ...activeFirm, creditsBalance: (activeFirm.creditsBalance ?? 0) + addedAmount };
-    setActiveFirm(updatedFirm);
-    handleUpdateFirm(updatedFirm);
-  };
+  /*
+   * The recharge modal is gone, and it had to be.
+   *
+   * It waited 800ms on a setTimeout and then announced "Recarga de $500.000 COP
+   * acreditada exitosamente" — no payment, no server call, no money. Every other
+   * invention removed from this codebase was a fabricated fact; that one was a
+   * fabricated receipt, shown to the person paying.
+   *
+   * Credit is added by the operator once a payment is confirmed, and the panel
+   * that replaces this says so. Automating it needs a Colombian payment gateway,
+   * which needs merchant credentials nobody can invent either.
+   */
 
   /*
    * THE DEDUCTION IS THE SERVER'S, AND IT USED TO BE A LIE HERE.
@@ -313,6 +320,12 @@ export function App() {
         onLoadDraft={handleLoadDraft}
         onDeleteDraft={deleteDraft}
       />
+      <BalancePanel
+        isOpen={isRechargeModalOpen}
+        onClose={() => setIsRechargeModalOpen(false)}
+        firmName={activeFirm.name}
+      />
+
       <TenantUserManagementModal
         isOpen={isUserManagementModalOpen}
         onClose={() => setIsUserManagementModalOpen(false)}
@@ -320,12 +333,6 @@ export function App() {
         activeFirm={activeFirm}
         onSelectFirm={(f) => setActiveFirm(f)}
         onUpdateFirm={handleUpdateFirm}
-      />
-      <FirmCreditsRechargeModal
-        isOpen={isRechargeModalOpen}
-        onClose={() => setIsRechargeModalOpen(false)}
-        firm={activeFirm}
-        onRechargeSuccess={handleRechargeSuccess}
       />
 
       {/* ENTERPRISE LEFT SIDEBAR — hidden in focus mode so the editor owns the screen */}
