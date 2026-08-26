@@ -2,6 +2,7 @@ import { Document, Packer, Paragraph, TextRun, AlignmentType, Footer as DocxFoot
 import { saveAs } from 'file-saver';
 import { jsPDF } from 'jspdf';
 import { buildSpeakerNames } from './speakerNames';
+import { colorForSpeaker, type SpeakerColor } from './speakerColors';
 import { ROLE_LABELS, type TranscriptionResult } from './types';
 
 /**
@@ -61,6 +62,8 @@ interface Linea {
   rol: string;
   minuto: string;
   texto: string;
+  /** The same colour the avatar carries on screen. */
+  color: SpeakerColor;
 }
 
 /**
@@ -83,7 +86,8 @@ const lineas = (result: TranscriptionResult): Linea[] => {
       quien: nombre,
       rol,
       minuto: formatTimestamp(segment.startSeconds),
-      texto: segment.text
+      texto: segment.text,
+      color: colorForSpeaker(segment.speakerLabel, result.speakerLabels)
     };
   });
 };
@@ -144,7 +148,7 @@ export const exportTranscriptToWord = async (
       new Paragraph({
         spacing: { before: 160, after: 40 },
         children: [
-          new TextRun({ text: linea.quien, bold: true, font: 'Calibri', size: 22 }),
+          new TextRun({ text: linea.quien, bold: true, font: 'Calibri', size: 22, color: linea.color.hex }),
           ...(linea.rol
             ? [new TextRun({ text: ` (${linea.rol})`, font: 'Calibri', size: 20, color: '475569' })]
             : []),
@@ -198,6 +202,23 @@ export const exportTranscriptToPdf = (result: TranscriptionResult, titulo: strin
   const alto = 279.4;
   let y = margenSup;
 
+  /**
+   * Wraps text at the CURRENT font size, and that ordering is the whole point.
+   *
+   * `splitTextToSize` measures with whatever size is set when it is called, and
+   * the first version called it before setting the body size — so the opening
+   * intervention of every export was split at 8pt and drawn at 10pt, and ran
+   * off the right edge of the page. Every transcript came out with its first
+   * paragraph clipped, which is exactly the paragraph a reader starts with.
+   *
+   * Setting the font is now part of measuring, so the two cannot disagree.
+   */
+  const trozos = (texto: string, estilo: 'normal' | 'bold' | 'italic', tamano: number): string[] => {
+    doc.setFont('helvetica', estilo);
+    doc.setFontSize(tamano);
+    return doc.splitTextToSize(texto, ancho) as string[];
+  };
+
   /** Starts a new page when the next block would fall off this one. */
   const asegurarEspacio = (necesario: number): void => {
     if (y + necesario > alto - 20) {
@@ -206,53 +227,71 @@ export const exportTranscriptToPdf = (result: TranscriptionResult, titulo: strin
     }
   };
 
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(12);
-  for (const linea of encabezado(result, titulo)) {
-    doc.text(linea, 215.9 / 2, y, { align: 'center' });
-    y += 6;
-    doc.setFontSize(10);
-  }
+  // ─── Encabezado ───────────────────────────────────────────────────────────
+  const cabecera = encabezado(result, titulo);
 
-  doc.setFont('helvetica', 'italic');
-  doc.setFontSize(8);
+  cabecera.forEach((linea, indice) => {
+    // The title is larger; the filename below it is frequently long enough to
+    // need wrapping of its own, which the first version never gave it.
+    const tamano = indice === 0 ? 13 : 10;
+    for (const trozo of trozos(linea, 'bold', tamano)) {
+      doc.text(trozo, 215.9 / 2, y, { align: 'center' });
+      y += tamano === 13 ? 7 : 5;
+    }
+  });
+
+  y += 3;
   doc.setTextColor(100, 116, 139);
-  for (const trozo of doc.splitTextToSize(NOTA, ancho) as string[]) {
-    y += 4;
+  for (const trozo of trozos(NOTA, 'italic', 8)) {
     doc.text(trozo, 215.9 / 2, y, { align: 'center' });
+    y += 4;
   }
 
-  y += 10;
+  y += 8;
   doc.setTextColor(0, 0, 0);
 
+  // ─── Intervenciones ───────────────────────────────────────────────────────
   for (const linea of lineas(result)) {
-    const cuerpo = doc.splitTextToSize(linea.texto, ancho) as string[];
-    asegurarEspacio(8 + cuerpo.length * 4.6);
+    const cuerpo = trozos(linea.texto, 'normal', 10);
+    asegurarEspacio(9 + cuerpo.length * 4.8);
+
+    /*
+     * A colour bar in the margin, and the name in that colour.
+     *
+     * On screen each voice carries a coloured avatar, and the first export
+     * dropped that entirely — the reader had to re-learn who is who from names
+     * alone, in the artefact that gets read most carefully. The bar survives a
+     * black-and-white print as a shade, which the name alone does not.
+     */
+    const [r, g, b] = linea.color.rgb;
+    doc.setFillColor(r, g, b);
+    doc.rect(margenIzq - 4, y - 3.4, 1.4, 4.4, 'F');
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(10);
+    doc.setTextColor(r, g, b);
     doc.text(linea.quien, margenIzq, y);
-
     const anchoNombre = doc.getTextWidth(linea.quien);
+
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
-    doc.setTextColor(71, 85, 105);
+    doc.setTextColor(100, 116, 139);
     const sufijo = [linea.rol ? `(${linea.rol})` : '', linea.minuto ? `[${linea.minuto}]` : '']
       .filter(Boolean)
       .join('  ');
     if (sufijo) doc.text(sufijo, margenIzq + anchoNombre + 2, y);
 
     y += 5;
-    doc.setTextColor(0, 0, 0);
+    doc.setTextColor(15, 23, 42);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
 
     for (const trozo of cuerpo) {
       doc.text(trozo, margenIzq, y);
-      y += 4.6;
+      y += 4.8;
     }
 
-    y += 3;
+    y += 3.5;
   }
 
   const paginas = doc.getNumberOfPages();

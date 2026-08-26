@@ -1,6 +1,7 @@
 import React from 'react';
 import { AlertTriangle, Check, Scissors, UserCog } from 'lucide-react';
 import { buildSpeakerNames } from '../speakerNames';
+import { colorForSpeaker } from '../speakerColors';
 import {
   ROLE_LABELS,
   ROLE_OPTIONS,
@@ -34,23 +35,11 @@ interface TranscriptSegmentsProps {
   onAssignSpeakerName?: (speakerLabel: string, name: string) => void;
 }
 
-/**
- * Colour per speaker so a long hearing stays readable at a glance.
- *
- * Carried by an avatar rather than a tinted row. Six washed-out backgrounds
- * stacked down a two-hour transcript fought the text for attention and made the
- * page look like a spreadsheet; the same colour on a small initialled circle
- * identifies the voice just as fast and leaves the reading surface white, which
- * is what a document meant to be read for an hour has to be.
+/*
+ * The palette moved to ../speakerColors so the exports use the same one.
+ * A document that comes out in black and white throws away the identification
+ * the screen just made, in the artefact that gets read most carefully.
  */
-const SPEAKER_COLORS = [
-  'bg-blue-700',
-  'bg-emerald-700',
-  'bg-amber-600',
-  'bg-purple-700',
-  'bg-rose-700',
-  'bg-cyan-700'
-];
 
 /**
  * The initials on the avatar, from the display name the reader already sees —
@@ -95,9 +84,7 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
   onAssignSpeakerName
 }) => {
   const colorFor = (speakerLabel: string): string =>
-    SPEAKER_COLORS[
-      Math.max(0, result.speakerLabels.indexOf(speakerLabel)) % SPEAKER_COLORS.length
-    ];
+    colorForSpeaker(speakerLabel, result.speakerLabels).className;
 
   const roleOf = (speakerLabel: string): SpeakerRole =>
     result.segments.find((s) => s.speakerLabel === speakerLabel)?.role ?? 'DESCONOCIDO';
