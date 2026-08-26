@@ -12,24 +12,7 @@
       "El divorcio y la separación por mutuo consentimiento también pueden tramitarse ante notario (Ley 962 de 2005, Decreto 4436 de 2005). Este catálogo cubre la vía judicial; la notarial corresponde a la rama NOTARIAL, aún no catalogada.",
       "Los procesos de sucesión están catalogados en la rama CIVIL; ante juez de familia corresponden los de mayor cuantía (art. 22 num. 9 CGP)."
     ],
-    "unverified": [
-      {
-        "actuacion": "Demanda de alimentos a favor de niño, niña o adolescente",
-        "reason": "No pude leer en fuente oficial un artículo que fije o excluya caducidad para la demanda de alimentos de NNA. El art. 24 de la Ley 1098 de 2006 solo consagra el derecho a los alimentos y el art. 23 la custodia; el art. 111 de la Ley 1098 (trámite ante defensor o comisario de familia, con término de cinco días para oponerse a la fijación administrativa) no pudo obtenerse en texto íntegro desde funcionpublica.gov.co ni icbf.gov.co (páginas truncadas o portal JS), y secretariasenado.gov.co y suin-juriscol.gov.co estuvieron fuera de servicio. No se afirma término por analogía ni por resumen secundario."
-      },
-      {
-        "actuacion": "Demanda de nulidad de capitulaciones matrimoniales",
-        "reason": "El art. 22 num. 14 del CGP solo asigna competencia; no fija término. No logré leer en fuente oficial una norma que establezca caducidad o prescripción propia de la acción de nulidad de las capitulaciones matrimoniales (Código Civil, arts. 1771 y ss.), ni verificar si le aplica el término de la acción rescisoria del art. 1750 C.C. Sin remisión expresa leída en la norma, no se cataloga término."
-      },
-      {
-        "actuacion": "Demanda de pérdida o suspensión de la patria potestad",
-        "reason": "El art. 22 num. 4 del CGP solo asigna competencia. No pude leer el texto oficial de los arts. 310 y 315 del Código Civil (secretariasenado.gov.co y suin-juriscol.gov.co rechazaron la conexión; alcaldiabogota.gov.co y funcionpublica.gov.co devuelven el Código Civil truncado antes de esos artículos), de modo que no puedo confirmar en la norma misma la ausencia de término de caducidad."
-      },
-      {
-        "actuacion": "Demanda de regulación de visitas",
-        "reason": "La regulación de visitas se apoya en el derecho de visita del Código Civil (art. 256) y en la Ley 1098 de 2006; no pude leer en fuente oficial el texto del art. 256 C.C. ni una norma que fije o excluya caducidad para esta pretensión autónoma. El art. 386 num. 6 del CGP, citado como base en el registro, solo opera dentro del proceso de filiación."
-      }
-    ]
+    "unverified": []
   },
   "actuaciones": [
     {
@@ -37,7 +20,7 @@
       "role": "LITIGANTE",
       "legal_basis": "Ley 1564 de 2012, arts. 22 num. 1, 82, 369 y 388; Código Civil, art. 154",
       "competent_authority": "Juez de familia en primera instancia (art. 22 num. 1)",
-      "term": "Al ser un proceso verbal, admitida la demanda se corre traslado al demandado por veinte (20) días para contestarla (art. 369).",
+      "term": "Al ser un proceso verbal, admitida la demanda se corre traslado al demandado por veinte (20) días para contestarla (art. 369). Regla de integración del proceso que la ficha omite: son partes únicamente los cónyuges —y si fueren menores de edad podrán intervenir también sus padres—, y el Ministerio Público debe ser citado en interés de los hijos (art. 388); omitir esa citación vicia la actuación. Causales de terminación anticipada que corren contra la pretensión: el desistimiento presentado por los cónyuges o sus apoderados, y la muerte de uno de ellos o la reconciliación ocurridas durante el proceso, que le ponen fin (art. 388 nums. 1 y 3).",
       "required_sections": [
         {
           "n": 1,
@@ -88,7 +71,7 @@
           "basis": "Art. 82 num. 10"
         }
       ],
-      "source_url": "https://leyes.co/codigo_general_del_proceso/388.htm"
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr013.html#388"
     },
     {
       "exact_name": "Solicitud de divorcio por mutuo consentimiento",
@@ -168,14 +151,14 @@
           "basis": "Art. 82 num. 6"
         }
       ],
-      "source_url": "https://leyes.co/codigo_general_del_proceso/388.htm"
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr013.html#388"
     },
     {
       "exact_name": "Demanda de separación de cuerpos",
       "role": "LITIGANTE",
       "legal_basis": "Ley 1564 de 2012, arts. 22 num. 1 y 388 par.",
       "competent_authority": "Juez de familia en primera instancia",
-      "term": "Al proceso de separación de cuerpos, de matrimonio civil o religioso, se aplican las mismas reglas del divorcio (art. 388 par.).",
+      "term": "Al proceso de separación de cuerpos, de matrimonio civil o religioso, se aplican las mismas reglas del divorcio (art. 388 par.). La ficha remite a \"las mismas reglas del divorcio\" sin publicar ningún plazo. El término concreto es el del proceso verbal: admitida la demanda se corre traslado al demandado por veinte (20) días para contestarla (art. 369). Se aplican además las reglas del art. 388: son partes únicamente los cónyuges, el Ministerio Público es citado en interés de los hijos, y el desistimiento conjunto, la muerte de un cónyuge o la reconciliación ponen fin al proceso. Regla posterior a la sentencia: ejecutoriada esta, si los cónyuges de común acuerdo solicitan poner fin a la separación, el juez dicta de plano la sentencia respectiva (art. 388 parágrafo).",
       "required_sections": [
         {
           "n": 1,
@@ -202,7 +185,7 @@
           "basis": null
         }
       ],
-      "source_url": "https://leyes.co/codigo_general_del_proceso/388.htm"
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr013.html#388"
     },
     {
       "exact_name": "Demanda de separación de bienes",
@@ -315,9 +298,9 @@
     {
       "exact_name": "Demanda de alimentos a favor de mayor de edad",
       "role": "LITIGANTE",
-      "legal_basis": "Ley 1564 de 2012, art. 397",
+      "legal_basis": "Ley 1564 de 2012, art. 397 (alimentos a favor del mayor de edad). Para alimentos a favor de niños, niñas y adolescentes el artículo aplicable ya no es el 397 sino el art. 397A, adicionado por el art. 3 de la Ley 2541 de 2025, que remite a la Ley 1098 de 2006.",
       "competent_authority": "Juez de familia o juez civil municipal, según el caso",
-      "term": "El juez ordena alimentos provisionales desde la presentación de la demanda cuando el demandante acredite con prueba sumaria la capacidad económica del demandado; si la cuantía supera un salario mínimo, debe acreditarse además el monto de las necesidades del alimentario (art. 397).",
+      "term": "El juez ordena alimentos provisionales desde la presentación de la demanda cuando el demandante acredite con prueba sumaria la capacidad económica del demandado; si la cuantía supera un salario mínimo, debe acreditarse además el monto de las necesidades del alimentario (art. 397). Reloj del demandante tras la sentencia, que la ficha omite: si la sentencia dispone asegurar los alimentos mediante la constitución de un capital y el demandado no cumple la orden \"en el curso de los diez (10) días siguientes\", el demandante puede ejecutar la sentencia conforme al art. 306 (art. 397 num. 4). Reloj del demandado: ejecutoriada la sentencia, puede obtener el levantamiento de las medidas cautelares practicadas si presta garantía suficiente del pago de alimentos por los próximos dos (2) años (art. 397 num. 4). En esas ejecuciones solo puede proponerse la excepción de cumplimiento de la obligación (art. 397 num. 5).",
       "required_sections": [
         {
           "n": 1,
@@ -356,14 +339,14 @@
           "basis": "Art. 82 num. 6"
         }
       ],
-      "source_url": "https://leyes.co/codigo_general_del_proceso/397.htm"
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr013.html#397"
     },
     {
       "exact_name": "Demanda de alimentos a favor de niño, niña o adolescente",
       "role": "LITIGANTE",
-      "legal_basis": "Ley 1098 de 2006, arts. 111 y siguientes; Ley 1564 de 2012, art. 397",
+      "legal_basis": "Ley 1098 de 2006, art. 111 (vía administrativa ante defensor o comisario de familia) y Ley 1564 de 2012, art. 397A —adicionado por el art. 3 de la Ley 2541 de 2025—, que es el que regula los alimentos a favor de menores de edad; el trámite judicial es el proceso verbal sumario del art. 390 num. 2 del CGP cuando la cuota no ha sido señalada judicialmente. El art. 397 del CGP citado en la ficha regula los alimentos a favor del MAYOR de edad y no aplica a niños, niñas y adolescentes.",
       "competent_authority": "Juez de familia o defensor de familia, según la vía",
-      "term": null,
+      "term": "Fracasada la conciliación ante el defensor o comisario de familia, el interesado tiene CINCO (5) DÍAS HÁBILES para solicitar que el informe se remita al Juez de Familia; si nadie lo pide dentro de ese plazo, el asunto no pasa al juez y solo queda la cuota provisional fijada por la autoridad administrativa. Este es el plazo del ciudadano. La acción de alimentos a favor de un niño, niña o adolescente no tiene término de caducidad para demandar. Los cinco (5) días hábiles del art. 111 num. 2 de la Ley 1098 de 2006 para pedir que el informe del defensor o comisario de familia se remita al Juez de Familia tras la conciliación fallida. La ficha no trae ningún término (term: null) y este es el único plazo perentorio que le cierra una posibilidad al cliente; debe publicarse identificándolo como plazo del solicitante, no de la autoridad.",
       "required_sections": [
         {
           "n": 1,
@@ -396,14 +379,14 @@
           "basis": "Art. 397"
         }
       ],
-      "source_url": "https://leyes.co/codigo_general_del_proceso/397.htm"
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=22106 (Ley 1098 de 2006, art. 111) y https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr013.html (Ley 1564 de 2012, arts. 390, 397 y 397A)"
     },
     {
       "exact_name": "Solicitud de aumento, disminución o exoneración de alimentos",
       "role": "LITIGANTE",
-      "legal_basis": "Ley 1564 de 2012, art. 397",
+      "legal_basis": "Ley 1564 de 2012, arts. 397 num. 6 y 390 num. 2 y parágrafo 2. Cuando la solicitud se refiere a alimentos a favor de niños, niñas y adolescentes debe atenderse además el art. 397A, adicionado por el art. 3 de la Ley 2541 de 2025, que remite a la Ley 1098 de 2006.",
       "competent_authority": "El mismo juez que conoció del proceso de alimentos",
-      "term": "Se tramita ante el mismo juez y en el mismo expediente (art. 397).",
+      "term": "Se tramita ante el mismo juez y en el mismo expediente (art. 397). La regla publicada solo aplica cuando los alimentos YA fueron señalados judicialmente. Si no lo han sido, la fijación, aumento, disminución, exoneración y restitución de pensiones alimenticias se tramitan por proceso verbal sumario (art. 390 num. 2), de única instancia, con diez (10) días para contestar la demanda y tres (3) días de traslado al demandante si se proponen excepciones de mérito (art. 391). Condición que la ficha omite tratándose de menores: la solicitud se tramita ante el mismo juez y en el mismo expediente \"siempre y cuando el menor conserve el mismo domicilio\" (art. 390 parágrafo 2); si cambió de domicilio, hay que promover proceso nuevo ante el juez competente.",
       "required_sections": [
         {
           "n": 1,
@@ -430,7 +413,7 @@
           "basis": "Art. 397"
         }
       ],
-      "source_url": "https://leyes.co/codigo_general_del_proceso/397.htm"
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr013.html#397"
     },
     {
       "exact_name": "Demanda de investigación de la paternidad o la maternidad",
@@ -517,7 +500,7 @@
       "role": "LITIGANTE",
       "legal_basis": "Ley 1564 de 2012, art. 22 num. 4; Código Civil, arts. 310 y 315",
       "competent_authority": "Juez de familia en primera instancia",
-      "term": null,
+      "term": "Del CGP se verificó únicamente lo siguiente: el asunto es de competencia del juez de familia en primera instancia (art. 22 num. 4) y, al ser contencioso y no estar sometido a trámite especial, se rige por el proceso verbal (art. 368), de modo que admitida la demanda se corre traslado al demandado por veinte (20) días (art. 369). ADVERTENCIA: las causales de pérdida o suspensión de la patria potestad y cualquier término de caducidad o prescripción de la acción provienen del Código Civil (arts. 310 y 315), que NO se leyó en esta verificación; la ficha no debe afirmar plazo alguno de caducidad hasta comprobarlo en fuente oficial.",
       "required_sections": [
         {
           "n": 1,
@@ -550,7 +533,7 @@
           "basis": "Art. 82 num. 6"
         }
       ],
-      "source_url": "https://leyes.co/codigo_general_del_proceso/22.htm"
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012.html#22"
     },
     {
       "exact_name": "Demanda de custodia y cuidado personal",
@@ -595,9 +578,9 @@
     {
       "exact_name": "Demanda de regulación de visitas",
       "role": "LITIGANTE",
-      "legal_basis": "Ley 1098 de 2006, art. 23; Ley 1564 de 2012, art. 386 num. 6",
+      "legal_basis": "Ley 1098 de 2006, art. 111 num. 3 (\"De ser el caso, la autoridad promoverá la conciliación sobre custodia, régimen de visitas y demás aspectos conexos\") y arts. 52 par. 3º y 99 par. 1º para la vía administrativa; Ley 1564 de 2012, art. 21 num. 3 (competencia del juez de familia en única instancia sobre visitas) y art. 390 (proceso verbal sumario, única instancia). El art. 23 de la Ley 1098 regula custodia y cuidado personal, no visitas; y el art. 386 num. 6 del CGP solo permite decidir sobre visitas de manera accesoria dentro del proceso de investigación o impugnación de la paternidad o la maternidad, no como demanda autónoma de regulación de visitas.",
       "competent_authority": "Juez de familia o defensor de familia, según la vía",
-      "term": null,
+      "term": "No hay término de caducidad para demandar la regulación de visitas: puede promoverse en cualquier tiempo mientras el niño, niña o adolescente sea menor de edad. El único plazo perentorio del ciudadano es el de cinco (5) días para pedir que el funcionario administrativo presente la demanda ante el juez competente cuando fracasa la conciliación y solo quedan fijadas obligaciones provisionales. Los cinco (5) días del art. 99 par. 1º (y art. 52 par. 3º) de la Ley 1098 de 2006 para solicitar que el defensor o comisario de familia presente la demanda ante el juez competente tras la conciliación fallida. Vencidos, la regulación de visitas queda solo en las obligaciones provisionales fijadas por resolución administrativa y el interesado debe iniciar el proceso judicial por su cuenta.",
       "required_sections": [
         {
           "n": 1,
@@ -624,7 +607,7 @@
           "basis": "Ley 1098 de 2006, art. 8"
         }
       ],
-      "source_url": "https://leyes.co/codigo_general_del_proceso/386.htm"
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=22106 (Ley 1098 de 2006, arts. 23, 52, 99 y 111) y https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012.html (Ley 1564 de 2012, art. 21 num. 3)"
     },
     {
       "exact_name": "Solicitud de adjudicación judicial de apoyos",
@@ -955,7 +938,7 @@
       "role": "LITIGANTE",
       "legal_basis": "Ley 1564 de 2012, art. 22 num. 14",
       "competent_authority": "Juez de familia en primera instancia",
-      "term": null,
+      "term": "Del CGP se verificó únicamente lo siguiente: el asunto es de competencia del juez de familia en primera instancia (art. 22 num. 14) y, al ser contencioso y no estar sometido a trámite especial, se rige por el proceso verbal (art. 368), de modo que admitida la demanda se corre traslado al demandado por veinte (20) días (art. 369). ADVERTENCIA: el CGP no fija término alguno de caducidad ni de prescripción para esta acción; ese plazo, si existe, proviene del Código Civil, que NO se leyó en esta verificación. La ficha no debe publicar ningún término de caducidad hasta comprobarlo en fuente oficial.",
       "required_sections": [
         {
           "n": 1,
@@ -982,7 +965,7 @@
           "basis": null
         }
       ],
-      "source_url": "https://leyes.co/codigo_general_del_proceso/22.htm"
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012.html#22"
     },
     {
       "exact_name": "Solicitud de medida de protección por violencia intrafamiliar",
@@ -1029,7 +1012,7 @@
       "role": "DESPACHO",
       "legal_basis": "Ley 1564 de 2012, arts. 90 y 369",
       "competent_authority": "Juez de familia",
-      "term": "En proceso verbal, admitida la demanda se corre traslado al demandado por veinte (20) días (art. 369).",
+      "term": "En proceso verbal, admitida la demanda se corre traslado al demandado por veinte (20) días (art. 369). Los veinte (20) días son el reloj del DEMANDADO. Reloj del JUZGADO, que la ficha calla: dentro de los treinta (30) días siguientes a la presentación de la demanda debe notificarse al demandante el auto admisorio o el auto de rechazo; si vence sin notificarse, el plazo de duración del proceso del art. 121 se computa desde el día siguiente a la presentación de la demanda (art. 90). En el mismo auto admisorio el juez debe integrar el litisconsorcio necesario y ordenar al demandado aportar, durante el traslado, los documentos que estén en su poder y que el demandante haya solicitado (art. 90).",
       "required_sections": [
         {
           "n": 1,
@@ -1062,14 +1045,14 @@
           "basis": "Ley 1098 de 2006"
         }
       ],
-      "source_url": "https://leyes.co/codigo_general_del_proceso/90.htm"
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr003.html#90"
     },
     {
       "exact_name": "Auto que decreta alimentos provisionales",
       "role": "DESPACHO",
       "legal_basis": "Ley 1564 de 2012, arts. 386 num. 5 y 397",
       "competent_authority": "Juez de familia",
-      "term": "En el proceso de alimentos, se decretan desde la presentación de la demanda con prueba sumaria de la capacidad económica del demandado; en investigación de paternidad, desde la admisión cuando haya fundamento razonable (arts. 397 y 386 num. 5).",
+      "term": "En el proceso de alimentos, se decretan desde la presentación de la demanda con prueba sumaria de la capacidad económica del demandado; en investigación de paternidad, desde la admisión cuando haya fundamento razonable (arts. 397 y 386 num. 5). Contracara que la ficha omite y que juega contra el alimentario: en el proceso de investigación de la paternidad el juez \"podrá suspenderlos desde que exista fundamento razonable de exclusión de la paternidad\" (art. 386 num. 5), de modo que los provisionales pueden cesar antes de la sentencia. Cobro: se adelanta en el mismo expediente, y si se promueve proceso ejecutivo no es admisible la intervención de terceros acreedores (art. 397 num. 2). Cuando los alimentos son a favor de niños, niñas y adolescentes debe atenderse además el art. 397A, adicionado por el art. 3 de la Ley 2541 de 2025, que remite a la Ley 1098 de 2006.",
       "required_sections": [
         {
           "n": 1,
@@ -1096,14 +1079,14 @@
           "basis": "Art. 397"
         }
       ],
-      "source_url": "https://leyes.co/codigo_general_del_proceso/397.htm"
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr013.html#397"
     },
     {
       "exact_name": "Sentencia de divorcio",
       "role": "DESPACHO",
       "legal_basis": "Ley 1564 de 2012, arts. 280 y 388",
       "competent_authority": "Juez de familia",
-      "term": "El juez dicta sentencia de plano cuando los cónyuges llegan a un acuerdo; la muerte de uno de ellos o la reconciliación ponen fin al proceso (art. 388).",
+      "term": "El juez dicta sentencia de plano si las partes llegan a un acuerdo, SIEMPRE QUE ESTE SE ENCUENTRE AJUSTADO AL DERECHO SUSTANCIAL (art. 388); el acuerdo no vincula al juez por sí solo. La muerte de uno de los cónyuges o la reconciliación ocurridas durante el proceso le ponen fin, pero el divorcio puede demandarse nuevamente por causa que sobrevenga a la reconciliación (art. 388 num. 3). Trámite posterior a cargo del despacho, que condiciona la oponibilidad de la sentencia: copia de la sentencia que decrete el divorcio se envía al funcionario del estado civil para su inscripción en el folio de matrimonio y en el de nacimiento de cada uno de los cónyuges (art. 388 num. 2).",
       "required_sections": [
         {
           "n": 1,
@@ -1142,14 +1125,14 @@
           "basis": "Art. 388"
         }
       ],
-      "source_url": "https://leyes.co/codigo_general_del_proceso/388.htm"
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr013.html#388"
     },
     {
       "exact_name": "Sentencia de investigación de la paternidad",
       "role": "DESPACHO",
       "legal_basis": "Ley 1564 de 2012, art. 386",
       "competent_authority": "Juez de familia",
-      "term": "Se dicta de plano cuando no hay oposición, o cuando la prueba genética favorece al demandante y no se solicitó un nuevo dictamen (art. 386 num. 4).",
+      "term": "Se dicta de plano cuando no hay oposición, o cuando la prueba genética favorece al demandante y no se solicitó un nuevo dictamen (art. 386 num. 4). Reloj del demandado, que es exactamente el que la sentencia de plano hace precluir y que la ficha no publica: del dictamen genético se corre traslado por TRES (3) DÍAS, dentro de los cuales debe solicitarse la aclaración, complementación o un nuevo dictamen, a costa del interesado, mediante solicitud motivada en la que se precisen los errores del primer dictamen (art. 386 num. 2). Vencidos esos tres días sin pedirlo en debida forma, se falla de plano acogiendo las pretensiones. Advertencia previa: en el auto admisorio el juez ordena la prueba de ADN aun de oficio y advierte al demandado que su renuencia hará presumir cierta la paternidad, maternidad o impugnación alegada; la prueba debe practicarse antes de la audiencia inicial (art. 386 num. 2).",
       "required_sections": [
         {
           "n": 1,
@@ -1182,7 +1165,7 @@
           "basis": null
         }
       ],
-      "source_url": "https://leyes.co/codigo_general_del_proceso/386.htm"
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr013.html#386"
     },
     {
       "exact_name": "Sentencia de adjudicación judicial de apoyos",

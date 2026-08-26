@@ -12,12 +12,7 @@
       "Términos del procedimiento administrativo de cobro coactivo (arts. 823 y siguientes), incluidas las excepciones contra el mandamiento de pago: no verificados.",
       "Los tributos territoriales — impuesto de industria y comercio, predial, vehículos — se rigen por los acuerdos y ordenanzas de cada entidad, que remiten al Estatuto Tributario con plazos propios. No están cubiertos."
     ],
-    "unverified": [
-      {
-        "actuacion": "Respuesta al pliego de cargos",
-        "reason": "El Estatuto Tributario NO establece un término general para responder el pliego de cargos. El art. 638 —único invocado en el legal_basis junto con el 637— presupone la existencia de ese término («Vencido el término de respuesta del pliego de cargos, la Administración Tributaria tendrá un plazo de seis meses para aplicar la sanción») pero no lo fija. El art. 637 solo indica que las sanciones se imponen en resolución independiente o en liquidación oficial, sin plazo alguno. Se revisaron todas las apariciones de «pliego de cargos» en el Libro Quinto del E.T. (páginas pr024 a pr034 del texto oficial): el término de un (1) mes aparece únicamente en regímenes sancionatorios ESPECÍFICOS —art. 670 (devoluciones o compensaciones improcedentes), art. 684-4 (proveedores tecnológicos y autorizados) y art. 795-1 (responsables solidarios del art. 795)— y el art. 764-6 fija dos (2) meses cuando la Liquidación Provisional reemplaza el pliego de cargos. Ninguno de ellos es una regla general. Catalogar «un mes» como término general sería una inferencia por analogía, no una lectura de la norma. El mantenedor debe decidir si adopta el término supletorio del procedimiento administrativo sancionatorio del CPACA (Ley 1437 de 2011, art. 47) o si sostiene que el término lo fija el propio pliego; ninguna de las dos vías se pudo leer en el Estatuto Tributario."
-      }
-    ]
+    "unverified": []
   },
   "actuaciones": [
     {
@@ -269,9 +264,9 @@
     {
       "exact_name": "Respuesta al pliego de cargos",
       "role": "LITIGANTE",
-      "legal_basis": "Estatuto Tributario, arts. 637 y 638",
+      "legal_basis": "Para el término de respuesta: el artículo sancionatorio invocado en el pliego. UN (1) MES en los arts. 651, 650-2, 655, 663, 667, 669, 671 y 860 del E.T. y en el art. 260-11 par. 1º; DIEZ (10) DÍAS en los arts. 616-3, 652 y 657 par. 2º; QUINCE (15) DÍAS en el art. 678 (entidades recaudadoras). Los arts. 637 y 638 aportan solo el marco (dónde se imponen las sanciones y la caducidad de la facultad sancionatoria) y deben conservarse como soporte complementario, no como fuente del plazo.",
       "competent_authority": "Dirección de Impuestos y Aduanas Nacionales (DIAN)",
-      "term": null,
+      "term": "Un (1) mes contado desde la notificación del pliego de cargos para responderlo, aportar y solicitar pruebas — es el término del CONTRIBUYENTE y es la regla general en el Estatuto Tributario. Se reduce a diez (10) días cuando se trata de clausura del establecimiento o de sanciones por facturación (arts. 616-3, 652 y 657 par. 2º) y es de quince (15) días para las entidades recaudadoras (art. 678). La ficha debe indicar de qué artículo sancionatorio proviene el pliego, porque de él depende el plazo. El reloj de la DIAN, que el cliente necesita para alegar caducidad: la DIAN debe formular el pliego de cargos dentro de los DOS (2) AÑOS siguientes a la presentación de la declaración del período en que ocurrió o cesó la irregularidad (CINCO (5) AÑOS para la sanción por no declarar, los intereses de mora y las sanciones de los arts. 659, 659-1 y 660), y una vez vencido el término de respuesta tiene SEIS (6) MESES para aplicar la sanción. La ficha debe traer los dos plazos y decir cuál es de quién: un (1) mes del contribuyente para responder; dos años / seis meses de la DIAN.",
       "required_sections": [
         {
           "n": 1,
@@ -298,7 +293,7 @@
           "basis": "Art. 640"
         }
       ],
-      "source_url": "https://actualicese.com/estatutotributario/707-2/"
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=6533"
     },
     {
       "exact_name": "Solicitud de revocatoria directa en materia tributaria",

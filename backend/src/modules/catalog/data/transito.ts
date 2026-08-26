@@ -42,7 +42,7 @@ export const TRANSITO_CATALOG: BranchCatalog = {
       { n: 5, name: 'Designación de apoderado, cuando se ejerza esa facultad', mandatory: false, basis: 'Art. 135' },
       { n: 6, name: 'Dirección para notificaciones', mandatory: true, basis: 'Art. 135' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_nacional_de_transito_terrestre/135.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0769_2002_pr003.html'
   },
   {
     id: 'transito/solicitud-de-reduccion-de-la-multa-de-transito',
@@ -59,7 +59,7 @@ export const TRANSITO_CATALOG: BranchCatalog = {
       { n: 4, name: 'Liquidación del porcentaje aplicable según la fecha de pago', mandatory: true, basis: 'Art. 136' },
       { n: 5, name: 'Advertencia: aceptar la infracción cierra la posibilidad de controvertirla', mandatory: true, basis: 'Art. 136' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_nacional_de_transito_terrestre/136.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0769_2002_pr003.html'
   },
   {
     id: 'transito/recurso-de-reposicion-contra-resolucion-de-transito',
@@ -68,14 +68,14 @@ export const TRANSITO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 769 de 2002, art. 142',
     competentAuthority: 'El mismo funcionario que profirió la providencia',
-    term: { status: 'VERIFICADO', description: 'Se interpone y sustenta en la propia audiencia en que se pronuncie la providencia (art. 142). La autoridad debe decidir el recurso dentro del año siguiente a su interposición; de no hacerlo, se entiende fallado a favor del recurrente (art. 161).' },
+    term: { status: 'VERIFICADO', description: 'La reposición procede contra los AUTOS dictados dentro del proceso contravencional —no contra la resolución que pone fin a la primera instancia, que es apelable— y debe interponerse y sustentarse oralmente en la propia audiencia en que se pronuncia el auto, ante el mismo funcionario (art. 142). Toda providencia queda en firme cuando, vencido el término de su ejecutoria, no se ha interpuesto recurso alguno o este ha sido negado. Cuando el recurso procede, la decisión que lo resuelve debe expedirse dentro del año siguiente a su debida y oportuna interposición; de lo contrario se entiende fallado a favor del recurrente (art. 161, modificado por el art. 11 de la Ley 1843 de 2017).' },
     requiredSections: [
       { n: 1, name: 'Interposición oral en la audiencia, inmediatamente después de la providencia', mandatory: true, basis: 'Art. 142' },
       { n: 2, name: 'Sustentación de las razones de inconformidad', mandatory: true, basis: 'Art. 142' },
       { n: 3, name: 'Petición de revocatoria o modificación', mandatory: true, basis: 'Art. 142' },
       { n: 4, name: 'Apelación subsidiaria, cuando la resolución ponga fin a la primera instancia', mandatory: false, basis: 'Art. 142' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_nacional_de_transito_terrestre/142.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0769_2002_pr003.html'
   },
   {
     id: 'transito/recurso-de-apelacion-en-materia-de-transito',
@@ -91,7 +91,7 @@ export const TRANSITO_CATALOG: BranchCatalog = {
       { n: 3, name: 'Sustentación de los reparos', mandatory: true, basis: 'Art. 142' },
       { n: 4, name: 'Petición de revocatoria de la sanción', mandatory: true, basis: 'Art. 142' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_nacional_de_transito_terrestre/142.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0769_2002_pr003.html'
   },
   {
     id: 'transito/solicitud-de-caducidad-de-la-accion-contravencional-de-transito',
@@ -108,7 +108,7 @@ export const TRANSITO_CATALOG: BranchCatalog = {
       { n: 4, name: 'Petición de declaratoria de caducidad y archivo', mandatory: true, basis: 'Art. 161' },
       { n: 5, name: 'Advertencia: no confundir con la prescripción trienal del art. 159', mandatory: true, basis: 'Art. 159' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_nacional_de_transito_terrestre/161.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0769_2002_pr004.html'
   },
   {
     id: 'transito/solicitud-de-prescripcion-de-la-sancion-de-transito',
@@ -125,7 +125,7 @@ export const TRANSITO_CATALOG: BranchCatalog = {
       { n: 4, name: 'Petición de declaratoria de prescripción y de cesación del cobro', mandatory: true, basis: 'Art. 159' },
       { n: 5, name: 'Solicitud de retiro del registro en el RUNT y en el SIMIT', mandatory: false, basis: null }
     ],
-    sourceUrl: 'https://leyes.co/codigo_nacional_de_transito_terrestre/159.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0769_2002_pr003.html'
   },
   {
     id: 'transito/solicitud-de-silencio-administrativo-positivo-por-recurso-no-resuelto',
@@ -141,39 +141,39 @@ export const TRANSITO_CATALOG: BranchCatalog = {
       { n: 3, name: 'Constancia de que no se notificó decisión alguna', mandatory: true, basis: 'Art. 161' },
       { n: 4, name: 'Petición de reconocimiento del fallo favorable al recurrente', mandatory: true, basis: 'Art. 161' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_nacional_de_transito_terrestre/161.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0769_2002_pr004.html'
   },
   {
     id: 'transito/solicitud-de-nulidad-del-comparendo-por-indebida-notificacion',
     exactName: 'Solicitud de nulidad del comparendo por indebida notificación',
     branch: 'TRANSITO',
     role: 'LITIGANTE',
-    legalBasis: 'Ley 769 de 2002, art. 135; Ley 1437 de 2011, art. 137',
+    legalBasis: 'Ley 769 de 2002, arts. 135 y 142; Ley 1843 de 2017, art. 8 (fotodetección); Ley 1437 de 2011, arts. 138 y 164 num. 2 lit. d)',
     competentAuthority: 'Organismo de tránsito competente; en sede judicial, la jurisdicción contencioso administrativa',
-    term: { status: 'VERIFICADO', description: 'La copia del comparendo debe enviarse por correo dentro de los tres (3) días hábiles siguientes al propietario del vehículo, a la empresa vinculada y a la Superintendencia de Puertos y Transporte; la autoridad debe entregarla al funcionario competente dentro de las doce (12) horas siguientes (art. 135).' },
+    term: { status: 'VERIFICADO', description: 'En sede administrativa la indebida notificación se alega dentro del propio proceso contravencional, mediante los recursos del art. 142 interpuestos y sustentados en la audiencia. RELOJ DEL CLIENTE (el que extingue su derecho): agotada la vía administrativa, la demanda de nulidad y restablecimiento del derecho contra la resolución sancionatoria debe presentarse dentro de los cuatro (4) meses siguientes al día siguiente de su notificación, ejecución o publicación (Ley 1437 de 2011, art. 164 num. 2 lit. d); vencido ese plazo opera la caducidad. RELOJES DE LA AUTORIDAD, que sustentan la nulidad pero no son plazos del cliente: entregar la copia de la orden de comparendo al funcionario competente dentro de las doce (12) horas siguientes, so pena de mala conducta (art. 135, par. 1); enviar por correo copia del comparendo al propietario, a la empresa vinculada y a la Superintendencia de Puertos y Transporte dentro de los tres (3) días hábiles siguientes (art. 135); y, en fotodetección, enviar el comparendo y sus soportes dentro de los tres (3) días hábiles siguientes a la validación del comparendo, con notificación por aviso si no es posible identificar al propietario en la dirección registrada en el RUNT (Ley 1843 de 2017, art. 8).' },
     requiredSections: [
       { n: 1, name: 'Identificación del comparendo y de la fecha de su expedición', mandatory: true, basis: 'Art. 135' },
       { n: 2, name: 'Demostración del incumplimiento del término de notificación', mandatory: true, basis: 'Art. 135' },
       { n: 3, name: 'Afectación concreta del derecho de defensa', mandatory: true, basis: null },
       { n: 4, name: 'Petición de nulidad de lo actuado', mandatory: true, basis: null }
     ],
-    sourceUrl: 'https://leyes.co/codigo_nacional_de_transito_terrestre/135.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1437_2011_pr004.html'
   },
   {
     id: 'transito/impugnacion-de-comparendo-por-deteccion-electronica',
     exactName: 'Impugnación de comparendo por detección electrónica',
     branch: 'TRANSITO',
     role: 'LITIGANTE',
-    legalBasis: 'Ley 769 de 2002, arts. 129, 135 y 136',
+    legalBasis: 'Ley 1843 de 2017, art. 8; Ley 769 de 2002, arts. 129 (pars. 1 y 2) y 136 (par. 2, adicionado por el art. 7 de la Ley 1843 de 2017)',
     competentAuthority: 'Organismo de tránsito competente',
-    term: { status: 'VERIFICADO', description: 'Rige el mismo término de comparecencia de cinco (5) días hábiles del art. 135 y el régimen de descuentos del art. 136.' },
+    term: { status: 'VERIFICADO', description: 'Cuando la infracción se detecta por sistemas automáticos, semiautomáticos u otros medios tecnológicos NO rigen los cinco (5) días hábiles del art. 135: el propietario debe presentarse ante la autoridad de tránsito dentro de los once (11) días hábiles siguientes, contados desde el recibo del comparendo en la última dirección registrada en el RUNT (Ley 1843 de 2017, art. 8). La autoridad debe enviar el comparendo y sus soportes dentro de los tres (3) días hábiles siguientes a la validación del comparendo y, si no logra identificar al propietario en la dirección del RUNT, notificarlo por aviso. Si el comparendo no fue notificado o lo fue indebidamente, los plazos de descuento del art. 136 (50% dentro de cinco días, 75% dentro de veinte días) empiezan a correr desde la fecha real de la notificación (art. 136, par. 2). El propietario no responde por su sola condición de tal: la Corte Constitucional declaró INEXEQUIBLE el par. 1 del art. 8 de la Ley 1843 de 2017 mediante Sentencia C-038 de 2020, y sigue rigiendo el par. 1 del art. 129 de la Ley 769 de 2002: "Las multas no podrán ser impuestas a persona distinta de quien cometió la infracción".' },
     requiredSections: [
       { n: 1, name: 'Identificación del fotocomparendo, del vehículo y de la fecha', mandatory: true, basis: 'Art. 129' },
       { n: 2, name: 'Cuestionamiento de la validez de la prueba electrónica o de su calibración', mandatory: false, basis: 'Art. 129' },
       { n: 3, name: 'Demostración de que el conductor no era el propietario, cuando aplique', mandatory: false, basis: 'Art. 129' },
       { n: 4, name: 'Solicitud de pruebas', mandatory: true, basis: 'Art. 135' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_nacional_de_transito_terrestre/135.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1843_2017.html'
   },
   {
     id: 'transito/solicitud-de-revocatoria-directa-de-comparendo',
@@ -196,16 +196,16 @@ export const TRANSITO_CATALOG: BranchCatalog = {
     exactName: 'Solicitud de acuerdo de pago de multas de tránsito',
     branch: 'TRANSITO',
     role: 'LITIGANTE',
-    legalBasis: 'Ley 769 de 2002, art. 159',
+    legalBasis: 'Ley 1066 de 2006, art. 5; Estatuto Tributario, art. 814 (por remisión). El art. 159 de la Ley 769 de 2002 solo sirve como fuente de la jurisdicción coactiva del organismo de tránsito y de la prescripción.',
     competentAuthority: 'Organismo de tránsito competente',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'El art. 159 de la Ley 769 de 2002 solo inviste al organismo de tránsito de jurisdicción coactiva; no fija plazos ni condiciones de acuerdo de pago. La facilidad de pago se rige por el procedimiento del Estatuto Tributario, aplicable por mandato del art. 5 de la Ley 1066 de 2006: puede concederse hasta por cinco (5) años con garantía, o sin garantía cuando el plazo no supere un (1) año y el deudor no haya incumplido facilidades durante el año anterior a la solicitud (E.T., art. 814). La solicitud no tiene plazo legal de presentación, pero está acotada por dos relojes: la sanción prescribe en tres (3) años desde la ocurrencia del hecho y esa prescripción se interrumpe con la notificación del mandamiento de pago (Ley 769 de 2002, art. 159); y, notificado el mandamiento de pago, el deudor tiene quince (15) días para pagar o proponer excepciones (E.T., art. 830).' },
     requiredSections: [
       { n: 1, name: 'Relación de las multas cuyo acuerdo se solicita', mandatory: true, basis: 'Art. 159' },
       { n: 2, name: 'Verificación previa de que ninguna esté prescrita', mandatory: true, basis: 'Art. 159' },
       { n: 3, name: 'Plazo y forma de amortización propuestos', mandatory: true, basis: null },
       { n: 4, name: 'Advertencia: suscribir el acuerdo reconoce la deuda e interrumpe la prescripción', mandatory: true, basis: 'Art. 159' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_nacional_de_transito_terrestre/159.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1066_2006.html'
   },
   {
     id: 'transito/acta-de-conciliacion-por-danos-materiales-en-accidente-de-transito',
@@ -214,7 +214,7 @@ export const TRANSITO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 769 de 2002, art. 143, modificado por la Ley 2251 de 2022',
     competentAuthority: 'Centros de conciliación legalmente constituidos, o directamente las aseguradoras',
-    term: { status: 'VERIFICADO', description: 'Cuando el accidente causa solo daños materiales y no hay lesiones personales, no interviene la autoridad de tránsito. El acta de conciliación suscrita por las partes y la autoridad tiene fuerza de cosa juzgada, y en todo caso debe hacerse el retiro inmediato de los vehículos (art. 143).' },
+    term: { status: 'VERIFICADO', description: 'En todo accidente con solo daños materiales y sin lesiones personales —estén los vehículos asegurados o no—, los conductores, aseguradoras e interesados recaudan ellos mismos las pruebas mediante herramientas técnicas y tecnológicas, y ese material probatorio REEMPLAZA el informe de accidente de tránsito que expide la autoridad competente. Los conductores deben retirar inmediatamente los vehículos colisionados y acudir a los centros de conciliación debidamente autorizados por el Ministerio de Justicia y del Derecho. No se requiere informe de accidente ni presencia de autoridad de tránsito en la audiencia de conciliación. Si la conciliación fracasa, cualquiera de las partes puede acudir a los demás mecanismos de acceso a la justicia (art. 143, modificado por el art. 16 de la Ley 2251 de 2022).' },
     requiredSections: [
       { n: 1, name: 'Identificación de los conductores, con licencia de conducción y licencia de tránsito', mandatory: true, basis: 'Art. 143' },
       { n: 2, name: 'Domicilio, residencia y números telefónicos de cada parte', mandatory: true, basis: 'Art. 143' },
@@ -223,7 +223,7 @@ export const TRANSITO_CATALOG: BranchCatalog = {
       { n: 5, name: 'Acuerdo indemnizatorio y forma de pago', mandatory: true, basis: 'Art. 143' },
       { n: 6, name: 'Constancia del retiro inmediato de los vehículos', mandatory: true, basis: 'Art. 143' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_nacional_de_transito_terrestre/143.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0769_2002_pr003.html'
   },
   {
     id: 'transito/solicitud-de-levantamiento-de-inmovilizacion-de-vehiculo',
@@ -248,7 +248,7 @@ export const TRANSITO_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 769 de 2002, arts. 135 y 137',
     competentAuthority: 'Agente o autoridad de tránsito',
-    term: { status: 'VERIFICADO', description: 'La autoridad debe entregar la copia de la orden al funcionario competente dentro de las doce (12) horas siguientes, so pena de mala conducta; y enviarla por correo al propietario del vehículo, a la empresa vinculada y a la Superintendencia de Puertos y Transporte dentro de los tres (3) días hábiles siguientes (art. 135).' },
+    term: { status: 'VERIFICADO', description: 'RELOJ DEL CLIENTE (el que extingue su derecho): el infractor debe presentarse ante la autoridad de tránsito competente dentro de los cinco (5) días hábiles siguientes a la orden de comparendo (art. 135); y para acceder a los descuentos tiene cinco (5) días para pagar el 50% y veinte (20) días para pagar el 75%, en ambos casos con asistencia obligatoria al curso sobre normas de tránsito (art. 136). Si la infracción fue detectada por ayudas tecnológicas, el término de comparecencia es de once (11) días hábiles contados desde el recibo del comparendo (Ley 1843 de 2017, art. 8). RELOJES DE LA AUTORIDAD: entregar la copia de la orden al funcionario competente o a la entidad recaudadora dentro de las doce (12) horas siguientes, so pena de mala conducta (art. 135, par. 1); y enviar por correo copia del comparendo al propietario del vehículo, a la empresa a la que está vinculado y a la Superintendencia de Puertos y Transporte dentro de los tres (3) días hábiles siguientes (art. 135).' },
     requiredSections: [
       { n: 1, name: 'Identificación del presunto contraventor y del vehículo', mandatory: true, basis: 'Art. 135' },
       { n: 2, name: 'Descripción de la infracción y norma infringida', mandatory: true, basis: 'Art. 135' },
@@ -257,7 +257,7 @@ export const TRANSITO_CATALOG: BranchCatalog = {
       { n: 5, name: 'Indicación del término de cinco (5) días hábiles para comparecer', mandatory: true, basis: 'Art. 135' },
       { n: 6, name: 'Información sobre los descuentos del art. 136 y el curso obligatorio', mandatory: true, basis: 'Art. 136' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_nacional_de_transito_terrestre/135.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0769_2002_pr003.html'
   },
   {
     id: 'transito/resolucion-que-impone-sancion-de-transito',
@@ -275,7 +275,7 @@ export const TRANSITO_CATALOG: BranchCatalog = {
       { n: 5, name: 'Liquidación de la multa en salarios mínimos diarios legales vigentes', mandatory: true, basis: 'Art. 131' },
       { n: 6, name: 'Indicación de los recursos de reposición y apelación', mandatory: true, basis: 'Art. 142' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_nacional_de_transito_terrestre/136.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0769_2002_pr003.html'
   },
   {
     id: 'transito/resolucion-que-resuelve-recurso-en-materia-de-transito',
@@ -291,7 +291,7 @@ export const TRANSITO_CATALOG: BranchCatalog = {
       { n: 3, name: 'Valoración de las pruebas practicadas', mandatory: true, basis: 'Art. 135' },
       { n: 4, name: 'Decisión: confirma, modifica o revoca la sanción', mandatory: true, basis: 'Art. 142' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_nacional_de_transito_terrestre/161.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0769_2002_pr004.html'
   },
   {
     id: 'transito/auto-que-declara-la-prescripcion-de-la-sancion-de-transito',
@@ -307,16 +307,16 @@ export const TRANSITO_CATALOG: BranchCatalog = {
       { n: 3, name: 'Declaratoria de prescripción de oficio', mandatory: true, basis: 'Art. 159' },
       { n: 4, name: 'Orden de retiro del registro en el RUNT y en el SIMIT', mandatory: true, basis: null }
     ],
-    sourceUrl: 'https://leyes.co/codigo_nacional_de_transito_terrestre/159.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0769_2002_pr003.html'
   },
   {
     id: 'transito/mandamiento-de-pago-de-multas-de-transito',
     exactName: 'Mandamiento de pago de multas de tránsito',
     branch: 'TRANSITO',
     role: 'DESPACHO',
-    legalBasis: 'Ley 769 de 2002, art. 159; Estatuto Tributario, arts. 823 y siguientes por remisión',
+    legalBasis: 'Ley 769 de 2002, art. 159; Ley 1066 de 2006, art. 5; Estatuto Tributario, arts. 830 y 831',
     competentAuthority: 'Organismo de tránsito con funciones de cobro coactivo',
-    term: { status: 'VERIFICADO', description: 'Su notificación interrumpe el término de prescripción de tres (3) años del art. 159.' },
+    term: { status: 'VERIFICADO', description: 'RELOJ DEL CLIENTE (el que extingue su derecho de defensa): notificado el mandamiento de pago, el deudor tiene quince (15) días para cancelar el monto de la deuda con sus intereses o para proponer por escrito las excepciones del art. 831 del Estatuto Tributario, aplicable a los organismos de tránsito por remisión del art. 5 de la Ley 1066 de 2006 ("deberán seguir el procedimiento descrito en el Estatuto Tributario"). EFECTO SOBRE LA PRESCRIPCIÓN: la notificación del mandamiento de pago interrumpe el término de prescripción de tres (3) años contado desde la ocurrencia del hecho (Ley 769 de 2002, art. 159, modificado por el art. 206 del Decreto Ley 019 de 2012); esa prescripción debe declararse de oficio y la autoridad no puede iniciar cobro coactivo de sanciones ya prescritas.' },
     requiredSections: [
       { n: 1, name: 'Verificación previa de que la sanción no ha prescrito', mandatory: true, basis: 'Art. 159' },
       { n: 2, name: 'Identificación del título ejecutivo: resolución sancionatoria en firme', mandatory: true, basis: 'Art. 159' },
@@ -324,7 +324,7 @@ export const TRANSITO_CATALOG: BranchCatalog = {
       { n: 4, name: 'Orden de pago y término para proponer excepciones', mandatory: true, basis: 'E.T. art. 830' },
       { n: 5, name: 'Constancia de notificación, que es la que interrumpe la prescripción', mandatory: true, basis: 'Art. 159' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_nacional_de_transito_terrestre/159.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/estatuto_tributario_pr033.html'
   }
   ]
 };

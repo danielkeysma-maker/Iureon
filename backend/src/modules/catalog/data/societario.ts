@@ -32,7 +32,7 @@ export const SOCIETARIO_CATALOG: BranchCatalog = {
     branch: 'SOCIETARIO',
     role: 'LITIGANTE',
     legalBasis: 'Código de Comercio, arts. 190 y 191; Ley 1564 de 2012, arts. 24 y 382',
-    competentAuthority: 'Superintendencia de Sociedades en ejercicio de funciones jurisdiccionales, o juez civil del circuito; la competencia opera a prevención (art. 24 CGP)',
+    competentAuthority: 'Superintendencia de Sociedades en ejercicio de funciones jurisdiccionales, cuando se trate de personas jurídicas sometidas a su supervisión: Ley 1564 de 2012, art. 24 num. 5 lit. c) — \'La impugnación de actos de asambleas, juntas directivas, juntas de socios o de cualquier otro órgano directivo de personas sometidas a su supervisión\'; también lit. b) para los conflictos societarios entre los accionistas, o entre estos y la sociedad o sus administradores. En sede judicial, juez civil del circuito en primera instancia: art. 20 num. 8 —\'De la impugnación de actos de asambleas, juntas directivas, juntas de socios o de cualquier otro órgano directivo de personas jurídicas sometidas al derecho privado\'— y num. 4 para las controversias del contrato de sociedad. La competencia es A PREVENCIÓN: art. 24 parágrafo 1 — \'Las funciones jurisdiccionales a que se refiere este artículo, generan competencia a prevención y, por ende, no excluyen la competencia otorgada por la ley a las autoridades judiciales\'. LÍMITE: la acción indemnizatoria por los perjuicios que se deriven del acto o decisión declarados nulos es competencia EXCLUSIVA del juez, nunca de la Superintendencia (art. 24 num. 5 lit. c, inciso final).',
     term: { status: 'VERIFICADO', description: 'Dos (2) meses siguientes a la fecha de la reunión en que se adoptaron las decisiones. Si se trata de acuerdos o actos que deban inscribirse en el registro mercantil, los dos meses se cuentan desde la fecha de la inscripción (art. 191 C.Co).' },
     requiredSections: [
       { n: 1, name: 'Acreditación de la legitimación: administrador, revisor fiscal o socio ausente o disidente', mandatory: true, basis: 'Art. 191 C.Co' },
@@ -42,7 +42,7 @@ export const SOCIETARIO_CATALOG: BranchCatalog = {
       { n: 5, name: 'Copia del acta y de los estatutos vigentes', mandatory: true, basis: 'Art. 382 CGP' },
       { n: 6, name: 'Solicitud de suspensión del acto impugnado', mandatory: false, basis: 'Art. 382 CGP' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_de_comercio/191.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/codigo_comercio_pr005.html#191'
   },
   {
     id: 'societario/demanda-de-resolucion-de-conflictos-societarios',
@@ -250,8 +250,8 @@ export const SOCIETARIO_CATALOG: BranchCatalog = {
     exactName: 'Solicitud de ejercicio del derecho de inspección',
     branch: 'SOCIETARIO',
     role: 'LITIGANTE',
-    legalBasis: 'Código de Comercio, arts. 48, 328 y 447; Ley 222 de 1995, art. 48',
-    competentAuthority: 'La sociedad; la Superintendencia de Sociedades ante su negativa',
+    legalBasis: 'Código de Comercio, arts. 328, 446 y 447; Ley 222 de 1995, art. 48. Debe RETIRARSE de legalBasis el art. 48 del Código de Comercio, que no regula el derecho de inspección sino la conformidad de la contabilidad del comerciante (\'ARTÍCULO 48. <CONFORMIDAD DE LIBROS Y PAPELES DEL COMERCIANTE A LAS NORMAS COMERCIALES...>. Todo comerciante conformará su contabilidad, libros, registros contables, inventarios y estados financieros en general, a las disposiciones de este Código y demás normas sobre la materia.\'). El artículo 48 que sí regula la materia es el de la LEY 222 DE 1995, ya citado en la ficha. Debe AGREGARSE el art. 446 C.Co, porque el art. 447 remite a él (\'los documentos indicados en el artículo anterior\') y es el que enumera el balance y los documentos anexos que la junta directiva y el representante legal presentan a la asamblea.',
+    competentAuthority: 'La sociedad, por conducto de la administración, en las oficinas de la administración que funcionen en el domicilio principal (Ley 222 de 1995, art. 48; y, para el balance de fin de ejercicio, C.Co art. 447). Ante la negativa, la Superintendencia de Sociedades por dos vías distintas que la ficha debe separar: (i) en ejercicio de inspección, vigilancia y control, sancionando el incumplimiento —C.Co art. 447 inciso 2: \'Los administradores y funcionarios directivos así como el revisor fiscal que no dieren cumplimiento a lo preceptuado en este artículo, serán sancionados por el superintendente con multas sucesivas\'—; y (ii) en ejercicio de funciones jurisdiccionales sobre personas sometidas a su supervisión, para resolver el conflicto societario de fondo (Ley 1564 de 2012, art. 24 num. 5 lit. b), competencia a prevención con el juez civil del circuito (arts. 20 num. 4 y 24 parágrafo 1).',
     term: { status: 'VERIFICADO', description: 'Los documentos del artículo 446, junto con los libros y demás comprobantes exigidos por la ley, deben ponerse a disposición de los accionistas en las oficinas de la administración durante los quince (15) días hábiles que preceden a la reunión de la asamblea; es dentro de esa ventana que se ejerce el derecho de inspección respecto de los balances de fin de ejercicio (art. 447 C.Co).' },
     requiredSections: [
       { n: 1, name: 'Acreditación de la calidad de socio o accionista', mandatory: true, basis: null },
@@ -259,7 +259,7 @@ export const SOCIETARIO_CATALOG: BranchCatalog = {
       { n: 3, name: 'Constancia de la negativa de la sociedad', mandatory: true, basis: null },
       { n: 4, name: 'Petición de orden para permitir la inspección', mandatory: true, basis: null }
     ],
-    sourceUrl: 'https://leyes.co/codigo_de_comercio/447.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/codigo_comercio_pr013.html#447'
   },
   {
     id: 'societario/demanda-de-disolucion-y-liquidacion-de-sociedad',
@@ -283,7 +283,7 @@ export const SOCIETARIO_CATALOG: BranchCatalog = {
     branch: 'SOCIETARIO',
     role: 'LITIGANTE',
     legalBasis: 'Código de Comercio, arts. 190 y 191; Ley 1564 de 2012, art. 382',
-    competentAuthority: 'Superintendencia de Sociedades o juez civil del circuito',
+    competentAuthority: 'Superintendencia de Sociedades en ejercicio de funciones jurisdiccionales, tratándose de personas jurídicas sometidas a su supervisión (Ley 1564 de 2012, art. 24 num. 5 lit. c, impugnación de actos de asambleas, juntas directivas y juntas de socios; y lit. b para los conflictos societarios), o juez civil del circuito en primera instancia (art. 20 num. 8 y num. 4). La competencia es A PREVENCIÓN (art. 24 parágrafo 1), de modo que radicar ante una excluye a la otra por reparto, pero ninguna desplaza legalmente a la otra de antemano. La acción indemnizatoria derivada del acto declarado nulo es competencia exclusiva del juez (art. 24 num. 5 lit. c, inciso final).',
     term: { status: 'VERIFICADO', description: 'Cuando la reforma deba inscribirse en el registro mercantil, los dos (2) meses para impugnarla se cuentan desde la fecha de la inscripción (art. 191 C.Co).' },
     requiredSections: [
       { n: 1, name: 'Identificación de la reforma y de la reunión que la aprobó', mandatory: true, basis: 'Art. 191 C.Co' },
@@ -291,7 +291,7 @@ export const SOCIETARIO_CATALOG: BranchCatalog = {
       { n: 3, name: 'Causal de nulidad: violación de la ley o de los estatutos', mandatory: true, basis: 'Art. 190 C.Co' },
       { n: 4, name: 'Copia de la escritura o del documento de reforma', mandatory: true, basis: null }
     ],
-    sourceUrl: 'https://leyes.co/codigo_de_comercio/191.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/codigo_comercio_pr005.html#191'
   },
   {
     id: 'societario/solicitud-de-nombramiento-de-perito-para-avaluo-de-acciones-o-cuotas',
@@ -382,8 +382,8 @@ export const SOCIETARIO_CATALOG: BranchCatalog = {
     branch: 'SOCIETARIO',
     role: 'DESPACHO',
     legalBasis: 'Código de Comercio, arts. 190 y 191; Ley 1564 de 2012, arts. 24 y 382',
-    competentAuthority: 'Superintendencia de Sociedades o juez civil del circuito',
-    term: { status: 'VERIFICADO', description: 'Debe verificarse que la demanda se presentó dentro de los dos (2) meses siguientes a la reunión o a la inscripción en el registro mercantil (art. 191 C.Co).' },
+    competentAuthority: 'Profiere la sentencia la Superintendencia de Sociedades en ejercicio de funciones jurisdiccionales, cuando la persona jurídica esté sometida a su supervisión (Ley 1564 de 2012, art. 24 num. 5 lit. c), o el juez civil del circuito en primera instancia (art. 20 num. 8); competencia a prevención (art. 24 parágrafo 1). PRECISIÓN QUE FALTABA: la acción indemnizatoria por los perjuicios derivados del acto o decisión que se declaren nulos —la del art. 193 C.Co— es competencia EXCLUSIVA DEL JUEZ y no puede tramitarse ante la Superintendencia (art. 24 num. 5 lit. c, inciso final: \'Con todo, la acción indemnizatoria a que haya lugar por los posibles perjuicios que se deriven del acto o decisión que se declaren nulos será competencia exclusiva del Juez\'). Las apelaciones contra providencias de la Superintendencia en primera instancia las resuelve el superior funcional del juez que habría sido competente (art. 24 parágrafo 3).',
+    term: { status: 'VERIFICADO', description: 'Debe verificarse que la demanda se presentó dentro de los dos (2) meses siguientes a la reunión o a la inscripción en el registro mercantil (art. 191 C.Co). UN (1) AÑO desde la ejecutoria de la sentencia para la acción de indemnización, plazo que extingue un derecho del cliente y que la ficha no trae. Código de Comercio, art. 193: \'La acción de indemnización prevista en este artículo sólo podrá ser propuesta dentro del año siguiente a la fecha de la ejecutoria de la sentencia que declare nula la decisión impugnada. La acción podrá ser ejercida por cualquier administrador, por el revisor fiscal o por cualquier asociado en interés de la sociedad.\' Los perjuicios que sufra la sociedad \'le serán indemnizados solidariamente por los administradores que hayan cumplido la decisión, quienes podrán repetir contra los socios que la aprobaron\' (art. 193 inciso 1). Debe agregarse también el deber que la sentencia activa de inmediato en cabeza de los administradores (art. 192 C.Co): declarada la nulidad, deben tomar, bajo su propia responsabilidad por los perjuicios que ocasione su negligencia, las medidas necesarias para que se cumpla la sentencia, y si se trata de decisiones inscritas en el registro mercantil \'se inscribirá la parte resolutiva de la sentencia respectiva\'.' },
     requiredSections: [
       { n: 1, name: 'Verificación de la legitimación del impugnante', mandatory: true, basis: 'Art. 191 C.Co' },
       { n: 2, name: 'Verificación del término de dos (2) meses', mandatory: true, basis: 'Art. 191 C.Co' },
@@ -391,7 +391,7 @@ export const SOCIETARIO_CATALOG: BranchCatalog = {
       { n: 4, name: 'Decisión sobre la nulidad o ineficacia de la decisión impugnada', mandatory: true, basis: 'Art. 190 C.Co' },
       { n: 5, name: 'Orden de inscripción de la decisión en el registro mercantil', mandatory: false, basis: null }
     ],
-    sourceUrl: 'https://leyes.co/codigo_de_comercio/191.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/codigo_comercio_pr005.html#193'
   },
   {
     id: 'societario/sentencia-de-desestimacion-de-la-personalidad-juridica',

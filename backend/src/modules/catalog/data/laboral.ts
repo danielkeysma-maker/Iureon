@@ -53,14 +53,14 @@ export const LABORAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 2452 de 2025, art. 66',
     competentAuthority: 'El mismo juez que inadmitió la demanda',
-    term: { status: 'VERIFICADO', description: 'Cinco (5) días para subsanar los defectos relacionados por el juez, so pena de rechazo (art. 66).' },
+    term: { status: 'VERIFICADO', description: 'Cinco (5) días para subsanar los defectos relacionados por el juez, so pena de rechazo (art. 66). Añadir: el auto que inadmite NO admite recurso alguno (art. 66), de modo que subsanar dentro de los cinco (5) días es la única vía y no hay reposición que suspenda ese plazo. Si el demandante no subsana en tiempo, la demanda se rechaza; el auto de rechazo SÍ es apelable (art. 228, num. 1) y esa apelación se rige por el art. 230: oralmente en la audiencia en que se profiera, o por escrito dentro de los tres (3) días siguientes si se notifica fuera de audiencia, término dentro del cual además debe sustentarse. Los cinco (5) días de subsanación y los tres (3) días de apelación del rechazo son relojes del cliente; el código no fija plazo al juez para resolver sobre la subsanación.' },
     requiredSections: [
       { n: 1, name: 'Referencia al auto inadmisorio y a cada defecto relacionado', mandatory: true, basis: 'Art. 66' },
       { n: 2, name: 'Corrección puntual de cada defecto', mandatory: true, basis: 'Art. 66' },
       { n: 3, name: 'Anexos legales que se echaron de menos', mandatory: true, basis: 'Art. 66' },
       { n: 4, name: 'Solicitud de admisión de la demanda subsanada', mandatory: true, basis: 'Art. 66' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/66.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_2452_2025_pr001.html#66'
   },
   {
     id: 'laboral/contestacion-de-la-demanda-laboral',
@@ -69,7 +69,7 @@ export const LABORAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 2452 de 2025, arts. 69 y 255',
     competentAuthority: 'El juez que conoce del proceso',
-    term: { status: 'VERIFICADO', description: 'Diez (10) días de traslado común, contados desde la notificación del auto admisorio (art. 255).' },
+    term: { status: 'VERIFICADO', description: 'Diez (10) días de traslado común para contestar, so pena de nulidad (art. 255). El plazo NO se cuenta «desde la notificación del auto admisorio»: el art. 255 dispone que el traslado se entiende surtido con el envío del auto admisorio como mensaje de datos a la dirección electrónica o canal digital suministrado, junto con la copia de la demanda y sus anexos. Ese envío es el hito de conteo y es reloj del cliente. Añadir el segundo plazo del cliente: si la contestación no reúne los requisitos del art. 69 o le faltan los anexos distintos de las pruebas, el juez señala los defectos y concede cinco (5) días para subsanarla; si no se subsana, la demanda se tiene por NO contestada, con la consecuencia del num. 3 del art. 69 (los hechos sobre los que no hubo pronunciamiento concreto se tienen por probados, salvo que requieran prueba solemne). Añadir también que la falta de contestación produce ese mismo efecto (art. 69, par. 2).' },
     requiredSections: [
       { n: 1, name: 'Nombre del demandado, domicilio, dirección física, correo electrónico y canal digital', mandatory: true, basis: 'Art. 69 num. 1' },
       { n: 2, name: 'Pronunciamiento expreso sobre cada pretensión', mandatory: true, basis: 'Art. 69 num. 2' },
@@ -79,7 +79,7 @@ export const LABORAL_CATALOG: BranchCatalog = {
       { n: 6, name: 'Excepciones que se pretenda hacer valer, debidamente fundamentadas', mandatory: true, basis: 'Art. 69 num. 6' },
       { n: 7, name: 'Anexos: poder, documentos probatorios y prueba de existencia legal si es persona jurídica', mandatory: true, basis: 'Art. 69' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/69.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_2452_2025_pr006.html#255'
   },
   {
     id: 'laboral/excepciones-previas-en-proceso-laboral',
@@ -95,7 +95,7 @@ export const LABORAL_CATALOG: BranchCatalog = {
       { n: 3, name: 'Hechos en que se fundamenta', mandatory: true, basis: 'Art. 74' },
       { n: 4, name: 'Pruebas que se pretende hacer valer', mandatory: true, basis: 'Art. 74' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/74.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_2452_2025_pr001.html#74'
   },
   {
     id: 'laboral/demanda-de-reconvencion-laboral',
@@ -127,7 +127,7 @@ export const LABORAL_CATALOG: BranchCatalog = {
       { n: 3, name: 'Petición de reforma o revocatoria', mandatory: true, basis: 'Art. 227' },
       { n: 4, name: 'Apelación subsidiaria, cuando el auto sea apelable', mandatory: false, basis: 'Art. 228' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/227.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_2452_2025_pr005.html#227'
   },
   {
     id: 'laboral/recurso-de-apelacion-laboral',
@@ -136,14 +136,14 @@ export const LABORAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 2452 de 2025, arts. 228 a 230',
     competentAuthority: 'Se interpone ante el juez que profirió la providencia; lo resuelve la sala laboral del tribunal superior',
-    term: { status: 'VERIFICADO', description: 'Oralmente en la audiencia en que se profiera la providencia, o por escrito dentro de los tres (3) días siguientes cuando se notifique fuera de audiencia. Tratándose de sentencia, la sustentación se presenta por escrito dentro de los cinco (5) días siguientes (art. 230).' },
+    term: { status: 'VERIFICADO', description: 'Oralmente en la audiencia en que se profiera la providencia, o por escrito dentro de los tres (3) días siguientes cuando se notifique fuera de audiencia. Tratándose de sentencia, la sustentación se presenta por escrito dentro de los cinco (5) días siguientes (art. 230). Añadir dos cargas del cliente que la ficha omite. Primera: la sustentación debe expresar las razones jurídicas y fácticas de la inconformidad; si no se sustenta, o se sustenta fuera de término, el juez de primera instancia declara DESIERTO el recurso (art. 230, par. 2) — no basta con interponerlo en tiempo. Segunda: quien no apeló puede ADHERIR a la apelación del contrario en lo que la providencia le sea desfavorable, y debe presentarla y sustentarla ante el juez que profirió la providencia dentro del término que este tiene para resolver sobre la concesión, esto es, los tres (3) días siguientes al vencimiento del traslado a los no recurrentes (art. 230, par. 1 y art. 230 inc. final); la adhesión queda sin efecto si el apelante principal desiste. Añadir también que, una vez sustentado el recurso, se corre traslado por secretaría a las partes no recurrentes por el mismo término.' },
     requiredSections: [
       { n: 1, name: 'Identificación de la providencia apelada', mandatory: true, basis: 'Art. 230' },
       { n: 2, name: 'Manifestación expresa de interponer la apelación', mandatory: true, basis: 'Art. 230' },
       { n: 3, name: 'Sustentación: reparos concretos contra la providencia', mandatory: true, basis: 'Art. 230' },
       { n: 4, name: 'Petición de revocatoria o modificación', mandatory: true, basis: 'Art. 230' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/230.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_2452_2025_pr005.html#230'
   },
   {
     id: 'laboral/recurso-de-queja-laboral',
@@ -151,14 +151,14 @@ export const LABORAL_CATALOG: BranchCatalog = {
     branch: 'LABORAL',
     role: 'LITIGANTE',
     legalBasis: 'Ley 2452 de 2025, art. 232',
-    competentAuthority: 'El superior del juez que denegó o concedió indebidamente la apelación',
-    term: { status: 'VERIFICADO', description: 'Debe interponerse y sustentarse en el acto cuando el auto que niega la apelación se profiera en audiencia; si se profiere fuera de audiencia, dentro de los tres (3) días siguientes (art. 232).' },
+    competentAuthority: 'El superior funcional de quien denegó el recurso o lo concedió en el efecto que no correspondía: la sala laboral del tribunal superior cuando se denegó la apelación, y la Sala de Casación Laboral de la Corte Suprema de Justicia cuando se denegó la casación o la anulación (art. 232).',
+    term: { status: 'VERIFICADO', description: 'Debe interponerse y sustentarse en el acto cuando el auto que niega la apelación se profiera en audiencia; si se profiere fuera de audiencia, dentro de los tres (3) días siguientes (art. 232). Añadir el ámbito ampliado del recurso, que el nuevo código extiende frente al código de 1948: la queja procede no solo cuando se deniega la apelación o se concede en el efecto que no corresponde, sino también cuando se DENIEGA EL RECURSO DE CASACIÓN Y EL DE ANULACIÓN (art. 232). Añadir además el traslado a la contraparte: interpuesta la queja, el escrito permanece en secretaría por tres (3) días a disposición de la otra parte para que manifieste lo que estime oportuno, y surtido ese traslado se decide el recurso; esos tres (3) días son el reloj de la contraparte, distinto de los tres (3) días de interposición que corren para el recurrente.' },
     requiredSections: [
       { n: 1, name: 'Identificación del auto que denegó o concedió indebidamente la apelación', mandatory: true, basis: 'Art. 232' },
       { n: 2, name: 'Razones por las cuales el recurso denegado era procedente', mandatory: true, basis: 'Art. 232' },
       { n: 3, name: 'Sustentación en el acto o dentro del término, según corresponda', mandatory: true, basis: 'Art. 232' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/232.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_2452_2025_pr005.html#232'
   },
   {
     id: 'laboral/interposicion-del-recurso-de-casacion-laboral',
@@ -167,13 +167,13 @@ export const LABORAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 2452 de 2025, arts. 239 y 243',
     competentAuthority: 'Se interpone ante el tribunal; lo resuelve la Sala de Casación Laboral de la Corte Suprema de Justicia',
-    term: { status: 'VERIFICADO', description: 'Cinco (5) días siguientes a la notificación de la sentencia de segunda instancia (art. 243).' },
+    term: { status: 'VERIFICADO', description: 'Cinco (5) días siguientes a la notificación de la sentencia de segunda instancia (art. 243). Añadir el segundo plazo del cliente, que es el que le cuesta el recurso: concedido el recurso en el efecto devolutivo, el tribunal corre traslado por VEINTE (20) DÍAS para presentar la demanda de casación; si no se sustenta oportunamente, el tribunal lo DECLARA DESIERTO y devuelve la actuación al juzgado de origen (art. 243). Añadir el requisito de procedencia del art. 239: solo son susceptibles de casación las sentencias de segunda instancia de los tribunales en procesos declarativos —ordinarios y especiales— cuando el valor actual de la decisión desfavorable al recurrente exceda de ciento cincuenta (150) SMLMV; por debajo de ese interés la vía es la selección de la sentencia (art. 240), que no está en manos de la parte. Añadir, como carga eventual del cliente, que si al interponer el recurso pide la suspensión del cumplimiento de la sentencia debe ofrecer caución y constituirla dentro de los diez (10) días siguientes a la notificación del auto que la fija, so pena de que la sentencia recurrida pueda ejecutarse.' },
     requiredSections: [
       { n: 1, name: 'Identificación de la sentencia de segunda instancia recurrida', mandatory: true, basis: 'Art. 243' },
       { n: 2, name: 'Manifestación de interponer el recurso de casación', mandatory: true, basis: 'Art. 243' },
       { n: 3, name: 'Acreditación de que la sentencia es susceptible del recurso', mandatory: true, basis: 'Art. 239' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/243.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_2452_2025_pr006.html#243'
   },
   {
     id: 'laboral/demanda-de-casacion-laboral',
@@ -199,14 +199,14 @@ export const LABORAL_CATALOG: BranchCatalog = {
     branch: 'LABORAL',
     role: 'LITIGANTE',
     legalBasis: 'Ley 2452 de 2025, art. 240',
-    competentAuthority: 'Sala de Casación Laboral de la Corte Suprema de Justicia',
-    term: { status: 'VERIFICADO', description: 'Quince (15) días siguientes a la ejecutoria de la sentencia de segunda instancia. La Sala decide sobre la selección en un término de veinte (20) días (art. 240).' },
+    competentAuthority: 'La solicitud de selección la eleva el tribunal superior que profirió la sentencia de segunda instancia, de oficio; la decide la Sala de Casación Laboral de la Corte Suprema de Justicia por mayoría de sus integrantes, que además puede seleccionar de oficio (art. 239, inc. 3, y art. 240). La parte no es titular de la solicitud.',
+    term: { status: 'VERIFICADO', description: 'Los quince (15) días NO son un plazo de la parte. El art. 240 los pone en cabeza del TRIBUNAL SUPERIOR, único legitimado para elevar la solicitud: dentro de los quince (15) días siguientes a la ejecutoria de la sentencia de segunda instancia el tribunal eleva la solicitud motivada a la Sala de Casación Laboral, previa comunicación a las partes para que se pronuncien. La SALA DE CASACIÓN LABORAL debe aprobarla por mayoría de sus integrantes en un término de veinte (20) días, y contra esa decisión no procede recurso alguno. La parte no tiene término propio de solicitud: su única carga es pronunciarse cuando el tribunal le comunique la solicitud, y esa es la oportunidad que el abogado debe vigilar. El art. 239, inciso 3, admite además la selección OFICIOSA por la propia Sala de Casación Laboral, caso en el cual tampoco media solicitud de parte.' },
     requiredSections: [
       { n: 1, name: 'Identificación de la sentencia de segunda instancia', mandatory: true, basis: 'Art. 240' },
       { n: 2, name: 'Criterio de selección que se invoca', mandatory: true, basis: 'Art. 240' },
       { n: 3, name: 'Razones que justifican la selección', mandatory: true, basis: 'Art. 240' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/240.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_2452_2025_pr006.html#240'
   },
   {
     id: 'laboral/recurso-extraordinario-de-revision-laboral',
@@ -222,16 +222,16 @@ export const LABORAL_CATALOG: BranchCatalog = {
       { n: 3, name: 'Hechos que configuran la causal', mandatory: true, basis: 'Art. 233' },
       { n: 4, name: 'Pruebas que se acompañan o se solicitan', mandatory: true, basis: 'Art. 233' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/236.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_2452_2025_pr006.html#236'
   },
   {
     id: 'laboral/demanda-de-reintegro-por-fuero-sindical',
     exactName: 'Demanda de reintegro por fuero sindical',
     branch: 'LABORAL',
     role: 'LITIGANTE',
-    legalBasis: 'Ley 2452 de 2025, arts. 293 y 294',
+    legalBasis: 'Ley 2452 de 2025, arts. 293, 294 y 298',
     competentAuthority: 'Juez laboral del circuito',
-    term: { status: 'VERIFICADO', description: 'Admitida la demanda se da traslado por término común de cinco (5) días para contestarla por escrito. La audiencia pública debe celebrarse a más tardar dentro de los diez (10) días siguientes al vencimiento de ese término (art. 294).' },
+    term: { status: 'VERIFICADO', description: 'Plazo del cliente, que extingue la acción: UN (1) AÑO para que el trabajador aforado demande el amparo del fuero sindical, contado desde la fecha del despido, el traslado o la desmejora (art. 298). Durante el trámite de la reclamación previa de empleados públicos y trabajadores oficiales se suspende el término prescriptivo; culminado ese trámite —o presentada la reclamación escrita, tratándose de trabajadores particulares— el año «comenzará a contarse nuevamente». Plazos del despacho y de la contraparte, ya admitida la demanda (art. 294): traslado común de cinco (5) días para contestar por escrito; la demanda puede reformarse por una sola vez hasta dentro de los tres (3) días siguientes al vencimiento de ese traslado, con igual término para contestar la reforma; y la audiencia pública debe celebrarse a más tardar dentro de los diez (10) días siguientes al vencimiento del término para contestar. Añadir la carga probatoria de admisibilidad: el fuero se acredita con copia del certificado de inscripción de la junta directiva o comité ejecutivo, o con copia de la comunicación al empleador (art. 293). Añadir también que el auto admisorio debe notificarse personalmente a la organización sindical de la cual hace parte el aforado (art. 294) y que no tiene efecto alguno la conciliación celebrada sin anuencia del sindicato (art. 294, par.).' },
     requiredSections: [
       { n: 1, name: 'Acreditación de la condición de aforado del trabajador', mandatory: true, basis: 'Art. 293' },
       { n: 2, name: 'Hechos del despido, traslado o desmejora sin autorización judicial', mandatory: true, basis: 'Art. 293' },
@@ -239,16 +239,16 @@ export const LABORAL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Vinculación del sindicato al proceso', mandatory: true, basis: 'Art. 299' },
       { n: 5, name: 'Petición de pruebas', mandatory: true, basis: 'Art. 293' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/294.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_2452_2025_pr007.html#298'
   },
   {
     id: 'laboral/demanda-de-levantamiento-de-fuero-sindical',
     exactName: 'Demanda de levantamiento de fuero sindical',
     branch: 'LABORAL',
     role: 'LITIGANTE',
-    legalBasis: 'Ley 2452 de 2025, arts. 292 y 294',
+    legalBasis: 'Ley 2452 de 2025, arts. 292, 294 y 298',
     competentAuthority: 'Juez laboral del circuito',
-    term: { status: 'VERIFICADO', description: 'Traslado común de cinco (5) días para contestar por escrito; audiencia pública a más tardar dentro de los diez (10) días siguientes (art. 294).' },
+    term: { status: 'VERIFICADO', description: 'Plazo del cliente, que extingue la acción: UN (1) AÑO (art. 298) para que el empleador promueva el permiso judicial para despedir, trasladar o desmejorar al trabajador aforado, contado desde la fecha en que tuvo conocimiento del hecho que se invoca como justa causa, o desde que se agotó el procedimiento convencional o reglamentario correspondiente, según el caso. La demanda «deberá expresar la justa causa invocada» (art. 292). Plazos del despacho y de la contraparte (art. 294): traslado común de cinco (5) días para contestar por escrito; reforma por una sola vez hasta dentro de los tres (3) días siguientes al vencimiento del traslado, con igual término para contestarla; audiencia pública a más tardar dentro de los diez (10) días siguientes al vencimiento del término para contestar. Añadir que el auto admisorio debe notificarse personalmente a la organización sindical de la cual hace parte el aforado, que puede coadyuvarlo y ejercer los actos procesales permitidos al trabajador (arts. 294 y 299), y que no produce efecto la conciliación celebrada sin anuencia del sindicato (art. 294, par.).' },
     requiredSections: [
       { n: 1, name: 'Identificación del trabajador aforado y de su condición', mandatory: true, basis: 'Art. 292' },
       { n: 2, name: 'Justa causa que se invoca para el despido, traslado o desmejora', mandatory: true, basis: 'Art. 292' },
@@ -256,7 +256,7 @@ export const LABORAL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Vinculación del sindicato', mandatory: true, basis: 'Art. 299' },
       { n: 5, name: 'Petición de pruebas', mandatory: true, basis: 'Art. 292' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/292.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_2452_2025_pr007.html#298'
   },
   {
     id: 'laboral/demanda-ejecutiva-laboral',
@@ -282,14 +282,14 @@ export const LABORAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 2452 de 2025, art. 317',
     competentAuthority: 'El juez que conoce del proceso',
-    term: { status: 'VERIFICADO', description: 'Las acciones que emanan de las leyes sociales prescriben en tres (3) años, contados desde que la respectiva obligación se hizo exigible, salvo las prescripciones especiales del código (art. 317).' },
+    term: { status: 'VERIFICADO', description: 'Las acciones que emanan de las leyes sociales prescriben en tres (3) años, contados desde que la respectiva obligación se hizo exigible, salvo las prescripciones especiales del código (art. 317). Añadir cuál es la prescripción especial que desplaza a la trienal, porque el art. 317 la anuncia sin nombrarla: en los procesos de fuero sindical el término es de UN (1) AÑO (art. 298), contado para el trabajador desde el despido, traslado o desmejora, y para el empleador desde que conoció el hecho invocado como justa causa o desde que se agotó el procedimiento convencional o reglamentario. Aplicar los tres (3) años del art. 317 a un asunto de fuero sindical hace perder la acción. Añadir también la causal del art. 318 que impide contar la interrupción: cuando el proceso termine por nulidad que comprenda la notificación del auto admisorio y la causa sea atribuible al demandante, y que en el auto que declare la nulidad se indicará expresamente su efecto sobre la interrupción o no de la prescripción.' },
     requiredSections: [
       { n: 1, name: 'Identificación de las pretensiones alcanzadas por la prescripción', mandatory: true, basis: 'Art. 317' },
       { n: 2, name: 'Fecha en que cada obligación se hizo exigible', mandatory: true, basis: 'Art. 317' },
       { n: 3, name: 'Cómputo del trienio', mandatory: true, basis: 'Art. 317' },
       { n: 4, name: 'Pronunciamiento sobre actos interruptivos o suspensivos alegados', mandatory: true, basis: 'Arts. 318 a 323' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/317.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_2452_2025_pr008.html#317'
   },
   {
     id: 'laboral/solicitud-de-medidas-cautelares-en-proceso-laboral',
@@ -320,7 +320,7 @@ export const LABORAL_CATALOG: BranchCatalog = {
       { n: 3, name: 'Pruebas que se pretende hacer valer', mandatory: true, basis: 'Art. 93' },
       { n: 4, name: 'Petición de invalidez de lo actuado', mandatory: true, basis: 'Art. 93' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/93.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_2452_2025_pr002.html#93'
   },
   {
     id: 'laboral/solicitud-de-acumulacion-de-pretensiones-laborales',
@@ -362,14 +362,14 @@ export const LABORAL_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 2452 de 2025, arts. 66 y 255',
     competentAuthority: 'El juez que conoce del proceso',
-    term: { status: 'VERIFICADO', description: 'Admitida la demanda, se corre traslado al demandado por término común de diez (10) días (art. 255).' },
+    term: { status: 'VERIFICADO', description: 'Admitida la demanda, se corre traslado al demandado por término común de diez (10) días (art. 255). Añadir la carga que el auto admisorio impone al demandado y que corre dentro del mismo traslado de diez (10) días: el juez le ordena aportar, DURANTE el traslado, los documentos que estén en su poder y hayan sido solicitados por el actor, cuando los considere pertinentes y conducentes (art. 66); si se trata de las pruebas extraprocesales en su poder y de los registros que por ley o reglamento esté obligado a llevar el empleador, no aportarlos hace que se tengan por ciertos los hechos que con ellos pretendía probar el demandante (art. 69, par. 1, num. 3). Añadir que el traslado se entiende surtido con el envío del auto admisorio como mensaje de datos junto con la copia de la demanda y sus anexos, y que omitir el traslado al Agente del Ministerio Público o a la Agencia Nacional de Defensa Jurídica del Estado, cuando proceda, está sancionado con nulidad (art. 255).' },
     requiredSections: [
       { n: 1, name: 'Verificación de los requisitos legales de la demanda', mandatory: true, basis: 'Art. 66' },
       { n: 2, name: 'Integración de la litis con quienes se advierta necesario', mandatory: true, basis: 'Art. 255' },
       { n: 3, name: 'Orden de traslado con indicación del término', mandatory: true, basis: 'Art. 255' },
       { n: 4, name: 'Orden de notificación por mensaje de datos al canal digital informado', mandatory: true, basis: 'Art. 255' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/255.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_2452_2025_pr006.html#255'
   },
   {
     id: 'laboral/auto-inadmisorio-de-la-demanda-laboral',
@@ -378,13 +378,13 @@ export const LABORAL_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 2452 de 2025, art. 66',
     competentAuthority: 'El juez que conoce del proceso',
-    term: { status: 'VERIFICADO', description: 'Se concede al demandante un término de cinco (5) días para subsanar, so pena de rechazo (art. 66).' },
+    term: { status: 'VERIFICADO', description: 'Se concede al demandante un término de cinco (5) días para subsanar, so pena de rechazo (art. 66). Añadir que el auto que inadmite no es susceptible de recurso alguno (art. 66): dentro de los cinco (5) días solo cabe subsanar. Añadir que las causales de inadmisión son taxativas y son siete, entre ellas no indicar el canal digital o la dirección física de notificación —salvo que el demandante manifieste no tenerlos o desconocerlos— y haberse cumplido el término de caducidad para iniciar la acción. Añadir que el rechazo in limine procede por falta de jurisdicción o de competencia, caso en el cual el mismo auto ordena la remisión al juez que se considere competente. Añadir, como salida cuando se pierde el plazo, que el auto de rechazo sí es apelable (art. 228, num. 1) conforme al art. 230: oralmente en la audiencia, o por escrito dentro de los tres (3) días siguientes si se notifica fuera de audiencia, con sustentación dentro del mismo término.' },
     requiredSections: [
       { n: 1, name: 'Relación precisa y clara de los defectos de que adolece la demanda', mandatory: true, basis: 'Art. 66' },
       { n: 2, name: 'Concesión del término de cinco (5) días para subsanar', mandatory: true, basis: 'Art. 66' },
       { n: 3, name: 'Advertencia de rechazo si no se subsana', mandatory: true, basis: 'Art. 66' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/66.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_2452_2025_pr001.html#66'
   },
   {
     id: 'laboral/auto-de-rechazo-in-limine-de-la-demanda-laboral',
@@ -407,13 +407,13 @@ export const LABORAL_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 2452 de 2025, art. 74',
     competentAuthority: 'El juez que conoce del proceso',
-    term: { status: 'VERIFICADO', description: 'Del escrito que contiene las excepciones previas se corre traslado al demandante por tres (3) días (art. 74).' },
+    term: { status: 'VERIFICADO', description: 'Del escrito que contiene las excepciones previas se corre traslado al demandante por tres (3) días (art. 74). Añadir de quién es cada reloj y cuál es el recurso. Los tres (3) días son del DEMANDANTE, para pronunciarse sobre las excepciones y, si es del caso, subsanar los defectos anotados. El juez no tiene plazo en días: decide antes de la audiencia inicial las que no requieran pruebas, y resuelve en la audiencia concentrada aquellas que sí las requieran. El auto que decide sobre las excepciones previas ES APELABLE, salvo cuando declare la falta de jurisdicción y competencia (art. 228, num. 13), y esa apelación se rige por el art. 230: oralmente en la audiencia en que se profiera, con sustentación en la misma audiencia por tratarse de auto, o por escrito dentro de los tres (3) días siguientes si se notifica fuera de audiencia. Añadir los efectos: si prospera la de falta de jurisdicción o competencia se remite el expediente al juez que corresponda y lo actuado conserva validez; si prospera la de compromiso o cláusula compromisoria se termina el proceso y se devuelve la demanda; si prospera la de trámite inadecuado, el juez ordena darle el que legalmente corresponda.' },
     requiredSections: [
       { n: 1, name: 'Identificación de cada excepción propuesta', mandatory: true, basis: 'Art. 74' },
       { n: 2, name: 'Análisis probatorio de los hechos que las fundan', mandatory: true, basis: 'Art. 74' },
       { n: 3, name: 'Decisión sobre cada excepción y sus efectos', mandatory: true, basis: 'Art. 74' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/74.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_2452_2025_pr001.html#74'
   },
   {
     id: 'laboral/auto-que-concede-el-recurso-de-apelacion-laboral',
@@ -422,13 +422,13 @@ export const LABORAL_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 2452 de 2025, arts. 229 y 230',
     competentAuthority: 'El juez que profirió la providencia apelada',
-    term: { status: 'VERIFICADO', description: 'El juez decide sobre la concesión dentro de los tres (3) días siguientes; el secretario remite el expediente al superior dentro de los cinco (5) días contados desde la ejecutoria del auto que lo concede (art. 230).' },
+    term: { status: 'VERIFICADO', description: 'Ambos plazos son del despacho, no del cliente. Los tres (3) días para decidir sobre la concesión del recurso y su efecto NO corren desde la interposición: corren desde el VENCIMIENTO DEL TRASLADO a las partes no recurrentes, traslado que se surte por secretaría una vez sustentado el recurso y por el mismo término de la sustentación (conjuntamente si son varios los recurrentes). El secretario remite la actuación al superior dentro del término máximo de cinco (5) días contados a partir de la ejecutoria del auto que concede el recurso. Añadir los relojes del cliente que dependen de este auto. Primero: quien no apeló puede ADHERIR a la apelación, y debe presentarla y sustentarla ante el juez que profirió la providencia dentro del término que este tiene para resolver sobre la concesión —los tres (3) días—, adhesión que queda sin efecto si el apelante principal desiste (art. 230, par. 1). Segundo: si el juez deniega la apelación o la concede en un efecto que no corresponde, procede el recurso de QUEJA, que debe interponerse y sustentarse en el acto si el auto se profiere en audiencia, o dentro de los tres (3) días siguientes si se emite fuera de audiencia (art. 232). Añadir los efectos del art. 229: las sentencias se apelan en el efecto suspensivo y los autos en el devolutivo, salvo que la providencia impida la continuación del proceso o implique su terminación; y que el auto que concede la apelación parcial debe indicar cuáles decisiones quedan ejecutoriadas.' },
     requiredSections: [
       { n: 1, name: 'Verificación de la oportunidad y sustentación del recurso', mandatory: true, basis: 'Art. 230' },
       { n: 2, name: 'Determinación del efecto: suspensivo para sentencias, devolutivo para autos', mandatory: true, basis: 'Art. 229' },
       { n: 3, name: 'Orden de remisión al superior', mandatory: true, basis: 'Art. 230' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/229.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_2452_2025_pr005.html#230'
   },
   {
     id: 'laboral/sentencia-laboral-de-primera-instancia',
@@ -471,14 +471,14 @@ export const LABORAL_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 2452 de 2025, arts. 292 a 299',
     competentAuthority: 'Juez laboral del circuito',
-    term: { status: 'VERIFICADO', description: 'Si no es posible dictar sentencia inmediatamente, se cita a nueva audiencia dentro de los dos (2) días siguientes (art. 294).' },
+    term: { status: 'VERIFICADO', description: 'Si no es posible dictar sentencia inmediatamente, se cita a nueva audiencia dentro de los dos (2) días siguientes (art. 294). Añadir el plazo del cliente frente a la sentencia, que la ficha omite por completo: la sentencia de fuero sindical es APELABLE en el efecto suspensivo (art. 297), y la oportunidad para recurrirla se rige por el art. 230 —oralmente en la audiencia en que se profiera, con sustentación por escrito dentro de los cinco (5) días siguientes por tratarse de sentencia, o por escrito dentro de los tres (3) días siguientes si se notifica fuera de audiencia—, so pena de que el juez de primera instancia la declare desierta. Precisar que los dos (2) días para la nueva audiencia y los cinco (5) días del art. 297 son relojes del despacho: los primeros del juez que no pudo fallar de inmediato, los segundos del tribunal, que decide de plano dentro de los cinco (5) días siguientes al recibido del expediente. Añadir el contenido del fallo (art. 296): en la acción del trabajador, comprobado el despido sin sujeción a las normas del fuero, se ordena el reintegro y se condena al empleador a pagar, sin solución de continuidad, salarios, prestaciones y demás emolumentos dejados de percibir.' },
     requiredSections: [
       { n: 1, name: 'Verificación de la condición de aforado', mandatory: true, basis: 'Art. 293' },
       { n: 2, name: 'Verificación de la vinculación del sindicato al proceso', mandatory: true, basis: 'Art. 299' },
       { n: 3, name: 'Análisis de la justa causa invocada, cuando se pide levantamiento', mandatory: true, basis: 'Art. 292' },
       { n: 4, name: 'Decisión: autoriza, niega, o dispone el reintegro con salarios dejados de percibir', mandatory: true, basis: 'Arts. 292 y 293' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_procesal_del_trabajo_y_de_la_seguridad_social/294.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_2452_2025_pr007.html#297'
   },
   {
     id: 'laboral/mandamiento-de-pago-laboral',

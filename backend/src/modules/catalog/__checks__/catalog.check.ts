@@ -478,12 +478,33 @@ const CASES: Case[] = [
   // Internacional. The seat of the arbitration decides whether recognition is
   // needed at all — asking for it when it is not costs months, skipping it
   // when it is makes the award unenforceable.
+  //
+  // THIS ASSERTION USED TO ENCODE THE DEFECT IT WAS GUARDING AGAINST. It
+  // demanded the phrase "sin necesidad de reconocimiento previo" and got it,
+  // because the entry stopped exactly where art. 111 stops being convenient:
+  // the article's final clause says direct execution is available "SALVO
+  // cuando se haya renunciado al recurso de anulación, caso en el cual será
+  // necesario su reconocimiento". A lawyer following the half the check
+  // demanded files for direct execution after a waiver and the request fails.
+  //
+  // Written from the ficha rather than from the article, the check certified
+  // the omission for as long as it existed. It now asserts the exception,
+  // which is the half that can lose the case.
   {
     label: 'Solicitud de ejecución de laudo internacional con sede en Colombia',
     expect: 'MATCH',
     branch: 'INTERNACIONAL',
     exactMatch: 'Solicitud de ejecución de laudo internacional con sede en Colombia',
-    mustContain: 'sin necesidad de reconocimiento previo'
+    mustContain: 'sin reconocimiento previo'
+  },
+  {
+    // Same actuación, second assertion: `label` is what gets resolved, so it
+    // must stay the catalogued name.
+    label: 'Solicitud de ejecución de laudo internacional con sede en Colombia',
+    expect: 'MATCH',
+    branch: 'INTERNACIONAL',
+    exactMatch: 'Solicitud de ejecución de laudo internacional con sede en Colombia',
+    mustContain: 'renunciaron al recurso de anulación'
   },
   {
     label: 'Solicitud de reconocimiento de laudo arbitral extranjero',

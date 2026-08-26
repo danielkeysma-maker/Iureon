@@ -58,7 +58,7 @@
     {
       "exact_name": "Querella",
       "role": "LITIGANTE",
-      "legal_basis": "Ley 906 de 2004, arts. 70 a 74, modificados por la Ley 1826 de 2017",
+      "legal_basis": "Ley 906 de 2004, arts. 70 a 74; el art. 73 modificado por el art. 4 de la Ley 1826 de 2017 y el art. 74 modificado por el art. 22 de la Ley 2197 de 2022, corregido por el art. 10 del Decreto 207 de 2022",
       "competent_authority": "Fiscalía General de la Nación",
       "term": "Debe presentarse dentro de los seis (6) meses siguientes a la comisión de la conducta punible. Si por fuerza mayor o caso fortuito comprobados el querellante no tuvo conocimiento, el término corre desde que desaparecen esas circunstancias, sin exceder tampoco los seis meses (art. 73).",
       "required_sections": [
@@ -93,14 +93,14 @@
           "basis": null
         }
       ],
-      "source_url": "https://leyes.co/codigo_de_procedimiento_penal/73.htm"
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr001.html#73"
     },
     {
       "exact_name": "Solicitud de control de legalidad de la captura",
       "role": "LITIGANTE",
-      "legal_basis": "Ley 906 de 2004, art. 297; Constitución Política, art. 28",
+      "legal_basis": "Ley 906 de 2004, arts. 297 (modificado por el art. 19 de la Ley 1142 de 2007) y 302 (inciso adicionado por el art. 6 de la Ley 2111 de 2021); Constitución Política, art. 28",
       "competent_authority": "Juez de control de garantías",
-      "term": "La persona capturada debe ser puesta a disposición del juez de control de garantías en el plazo máximo de treinta y seis (36) horas para la audiencia de control de legalidad (art. 297).",
+      "term": "La persona capturada debe ser puesta a disposición del juez de control de garantías en el plazo máximo de treinta y seis (36) horas para la audiencia de control de legalidad (art. 297). Añadir el supuesto de flagrancia, que la ficha no cubre: cuando la captura es en flagrancia el plazo de treinta y seis (36) horas se rige por el inciso 5º del art. 302 y corre desde la aprehensión, y la Fiscalía es quien debe presentar al capturado ante el juez de control de garantías. Excepción de conteo: si la captura en flagrancia se produce en ríos o en tierra donde el arribo a la cabecera municipal más cercana solo puede surtirse por vía fluvial, o concurren dificultades objetivas de acceso al territorio acreditadas, las treinta y seis (36) horas se cuentan a partir de la llegada al puerto o municipio más cercano (art. 302, inciso adicionado por el art. 6 de la Ley 2111 de 2021).",
       "required_sections": [
         {
           "n": 1,
@@ -133,14 +133,14 @@
           "basis": "Art. 297"
         }
       ],
-      "source_url": "https://leyes.co/codigo_de_procedimiento_penal/297.htm"
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr007.html#297"
     },
     {
       "exact_name": "Solicitud de libertad por vencimiento de términos",
       "role": "LITIGANTE",
-      "legal_basis": "Ley 906 de 2004, art. 317",
-      "competent_authority": "Juez de control de garantías",
-      "term": "Procede cuando transcurren sesenta (60) días desde la imputación sin que se presente el escrito de acusación; ciento veinte (120) días desde la presentación del escrito de acusación sin que se inicie la audiencia de juicio; o ciento cincuenta (150) días desde el inicio del juicio sin audiencia de lectura de fallo. Estos términos se duplican en justicia especializada, con tres o más imputados, o en delitos de corrupción (art. 317).",
+      "legal_basis": "Ley 906 de 2004, art. 317 (modificado por el art. 6 de la Ley 2477 de 2025); art. 307 parágrafo 1º (modificado por el art. 1 de la Ley 1786 de 2016); arts. 153 y 154 num. 8 para la competencia",
+      "competent_authority": "Juez de control de garantías, en audiencia preliminar, cuando la petición de libertad se presente con anterioridad al anuncio del sentido del fallo (arts. 153 y 154 num. 8). Las peticiones posteriores a ese anuncio no se tramitan en audiencia preliminar y quedan a cargo del juez de conocimiento.",
+      "term": "Procede cuando transcurren sesenta (60) días desde la fecha de imputación sin que se haya presentado el escrito de acusación ni solicitado la preclusión; ciento veinte (120) días desde la presentación del escrito de acusación sin que se haya dado inicio a la audiencia de juicio; o ciento cincuenta (150) días desde el inicio de la audiencia de juicio sin que se haya celebrado la audiencia de lectura de fallo o su equivalente. Esos tres términos se incrementan por el mismo término inicial (se duplican) cuando el proceso se surte ante la justicia penal especializada, cuando hay tres (3) o más imputados o acusados, en actos de corrupción de la Ley 1474 de 2011, en cualquiera de las conductas del Título IV del Libro Segundo del Código Penal (delitos contra la libertad, integridad y formación sexuales) y en los delitos de los arts. 103A y 104A (feminicidio) del Código Penal. No se contabilizan los días empleados en maniobras dilatorias del acusado o su defensor (parágrafo 3º). Con causal propia y distinta, el art. 307 parágrafo 1º (modificado por el art. 1 de la Ley 1786 de 2016) limita la medida de aseguramiento privativa de la libertad a un (1) año, prorrogable hasta por el mismo término inicial en esos mismos supuestos agravados; vencido, el juez puede sustituirla por medidas no privativas de la libertad. (Art. 317, modificado por el art. 6 de la Ley 2477 de 2025.)",
       "required_sections": [
         {
           "n": 1,
@@ -173,14 +173,14 @@
           "basis": "Art. 317"
         }
       ],
-      "source_url": "https://leyes.co/codigo_de_procedimiento_penal/317.htm"
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr007.html#317"
     },
     {
       "exact_name": "Solicitud de preclusión de la investigación",
       "role": "LITIGANTE",
-      "legal_basis": "Ley 906 de 2004, arts. 294, 331 a 334",
+      "legal_basis": "Ley 906 de 2004, arts. 294 (modificado por el art. 55 de la Ley 1453 de 2011), 331 (modificado por el art. 9 de la Ley 2477 de 2025), 332 (numeral 1 y parágrafo modificados por el art. 10 de la Ley 2477 de 2025), 333 y 334",
       "competent_authority": "Juez de conocimiento",
-      "term": "Cuando el fiscal deja vencer el término del art. 175 pierde competencia; el fiscal que lo reemplaza dispone de sesenta (60) días para decidir, o noventa (90) si hay concurso de delitos, tres o más imputados o competencia de jueces penales especializados. Vencidos, el imputado queda en libertad inmediata y la defensa o el Ministerio Público solicitan la preclusión (art. 294).",
+      "term": "Cuando el fiscal deja vencer el término del art. 175 pierde competencia; el fiscal que lo reemplaza dispone de sesenta (60) días para decidir, o noventa (90) si hay concurso de delitos, tres o más imputados o competencia de jueces penales especializados. Vencidos, el imputado queda en libertad inmediata y la defensa o el Ministerio Público solicitan la preclusión (art. 294). Añadir la legitimación de la defensa, que es lo que el cliente puede usar: la preclusión la pide por regla general el fiscal (art. 331), y la defensa solo en dos supuestos. Primero, vencido el plazo del art. 294 sin definición, cuando el imputado queda en libertad inmediata y la defensa o el Ministerio Público solicitan la preclusión al juez de conocimiento (causal 7 del art. 332: vencimiento del término máximo del inciso segundo del art. 294). Segundo, durante el juzgamiento, si sobrevienen las causales 1 (imposibilidad de iniciar o continuar el ejercicio de la acción penal) o 3 (inexistencia del hecho investigado), caso en el cual el procesado o su defensor —además del fiscal y del Ministerio Público— pueden solicitar la preclusión al juez de conocimiento (art. 332 parágrafo, modificado por el art. 10 de la Ley 2477 de 2025). Los plazos de 60 y 90 días del art. 294 son del fiscal reemplazante, no de la defensa.",
       "required_sections": [
         {
           "n": 1,
@@ -213,7 +213,7 @@
           "basis": "Art. 334"
         }
       ],
-      "source_url": "https://leyes.co/codigo_de_procedimiento_penal/294.htm"
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr007.html#294"
     },
     {
       "exact_name": "Recurso de reposición penal",
@@ -247,7 +247,7 @@
           "basis": "Art. 176"
         }
       ],
-      "source_url": "https://leyes.co/codigo_de_procedimiento_penal/176.htm"
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr004.html#176"
     },
     {
       "exact_name": "Recurso de apelación penal",
@@ -309,14 +309,14 @@
           "basis": "Art. 181"
         }
       ],
-      "source_url": "https://leyes.co/codigo_de_procedimiento_penal/183.htm"
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr004.html#183"
     },
     {
       "exact_name": "Demanda de casación penal",
       "role": "LITIGANTE",
-      "legal_basis": "Ley 906 de 2004, arts. 183 y 184",
+      "legal_basis": "Ley 906 de 2004, arts. 183 (modificado por el art. 98 de la Ley 1395 de 2010) y 184",
       "competent_authority": "Sala de Casación Penal de la Corte Suprema de Justicia",
-      "term": "Treinta (30) días siguientes al vencimiento del término de interposición para presentar la demanda; si no se presenta, el recurso se declara desierto mediante auto que admite reposición (art. 183).",
+      "term": "Treinta (30) días siguientes al vencimiento del término de interposición para presentar la demanda; si no se presenta, el recurso se declara desierto mediante auto que admite reposición (art. 183). Añadir de quién es cada reloj. El de treinta (30) días para presentar la demanda es del RECURRENTE y es perentorio: es un término posterior común que corre desde el vencimiento de los cinco (5) días de interposición, y si la demanda no se presenta dentro de él el recurso se declara desierto mediante auto que admite reposición. En cambio, los dos plazos de treinta (30) días del art. 184 son de la CORTE y no obligan al abogado: la Sala de Casación Penal decide sobre la admisión de la demanda dentro de los treinta (30) días siguientes a su remisión con los antecedentes, y fijada la admisión señala la audiencia de sustentación para dentro de los treinta (30) días siguientes, a la que pueden concurrir los no recurrentes para ejercer contradicción dentro de los límites de la demanda. La demanda no seleccionada se rechaza por auto motivado que admite recurso de insistencia de un magistrado de la Sala o del Ministerio Público.",
       "required_sections": [
         {
           "n": 1,
@@ -349,7 +349,7 @@
           "basis": "Art. 184"
         }
       ],
-      "source_url": "https://leyes.co/codigo_de_procedimiento_penal/183.htm"
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr004.html#183"
     },
     {
       "exact_name": "Acción de revisión penal",
@@ -712,9 +712,9 @@
     {
       "exact_name": "Escrito de acusación",
       "role": "DESPACHO",
-      "legal_basis": "Ley 906 de 2004, arts. 175, 336 y 337",
+      "legal_basis": "Ley 906 de 2004, arts. 175 (modificado por el art. 49 de la Ley 1453 de 2011; parágrafo 3º adicionado por el art. 35 de la Ley 1474 de 2011), 294, 336 y 337",
       "competent_authority": "Fiscalía General de la Nación; se radica ante el juez de conocimiento",
-      "term": "La Fiscalía dispone de noventa (90) días contados desde el día siguiente a la formulación de la imputación para presentar el escrito de acusación o solicitar la preclusión. El término es de ciento veinte (120) días cuando hay concurso de delitos, tres o más imputados, o delitos de competencia de jueces penales especializados (art. 175).",
+      "term": "La Fiscalía dispone de noventa (90) días contados desde el día siguiente a la formulación de la imputación para presentar el escrito de acusación o solicitar la preclusión. El término es de ciento veinte (120) días cuando hay concurso de delitos, tres o más imputados, o delitos de competencia de jueces penales especializados (art. 175). Añadir la duplicación y, sobre todo, el reloj del cliente. Los términos de noventa (90) y ciento veinte (120) días SE DUPLICAN en los procesos por delitos de competencia de los jueces penales del circuito especializados, por delitos contra la Administración Pública y por delitos contra el patrimonio económico que recaigan sobre bienes del Estado respecto de los cuales proceda la detención preventiva, cuando sean tres (3) o más los imputados o los delitos objeto de investigación (art. 175 parágrafo 3º). Vencido el término sin acusar ni pedir preclusión, el fiscal pierde competencia y el superior designa uno nuevo, que decide en sesenta (60) días, o noventa (90) si hay concurso, tres o más imputados o competencia de jueces penales del circuito especializado (art. 294). Y el reloj del cliente detenido es más corto y es el que primero se vence: a los sesenta (60) días contados desde la fecha de imputación sin escrito de acusación ni solicitud de preclusión procede la libertad por vencimiento de términos (art. 317 num. 4). Los 90/120 días obligan a la Fiscalía; los 60 días liberan al imputado.",
       "required_sections": [
         {
           "n": 1,
@@ -753,14 +753,14 @@
           "basis": "Art. 337"
         }
       ],
-      "source_url": "https://leyes.co/codigo_de_procedimiento_penal/175.htm"
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr004.html#175"
     },
     {
       "exact_name": "Formulación de imputación",
       "role": "DESPACHO",
-      "legal_basis": "Ley 906 de 2004, arts. 286 a 288",
+      "legal_basis": "Ley 906 de 2004, arts. 286 a 288 y art. 175 parágrafos 1º y 2º (parágrafo 2º adicionado por el art. 2 de la Ley 2205 de 2022)",
       "competent_authority": "Fiscalía General de la Nación, ante el juez de control de garantías",
-      "term": "Desde su formulación corren los términos del art. 175 para acusar o precluir, y los del art. 317 para la libertad por vencimiento de términos.",
+      "term": "Desde su formulación corren los términos del art. 175 para acusar o precluir, y los del art. 317 para la libertad por vencimiento de términos. Añadir el plazo máximo para imputar, que la ficha no traía y es el que puede cerrarle la puerta a la Fiscalía y al denunciante. La Fiscalía debe formular la imputación u ordenar motivadamente el archivo de la indagación dentro de los dos (2) años siguientes a la recepción de la noticia criminal; tres (3) años cuando hay concurso de delitos o tres o más imputados; cinco (5) años en delitos de competencia de los jueces penales del circuito especializado (art. 175 parágrafo 1º). En homicidio, feminicidio, violencia intrafamiliar y delitos contra la libertad, integridad y formación sexuales cometidos contra menores de dieciocho (18) años el plazo es de ocho (8) meses desde la noticia criminal, prorrogable por una sola vez hasta por seis (6) meses con justificación razonable; vencido, el fiscal es relevado en tres (3) días hábiles y el nuevo debe resolver en un término perentorio de noventa (90) días (art. 175 parágrafo 2º, adicionado por el art. 2 de la Ley 2205 de 2022). Esos son relojes de la Fiscalía. Una vez formulada la imputación empiezan a correr los noventa (90) o ciento veinte (120) días del art. 175 para acusar o precluir —reloj de la Fiscalía— y los sesenta (60) días del art. 317 num. 4 para la libertad por vencimiento de términos —reloj del imputado detenido—.",
       "required_sections": [
         {
           "n": 1,
@@ -787,7 +787,7 @@
           "basis": "Art. 288"
         }
       ],
-      "source_url": "https://leyes.co/codigo_de_procedimiento_penal/288.htm"
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr004.html#175"
     },
     {
       "exact_name": "Solicitud de medida de aseguramiento",
@@ -826,9 +826,9 @@
     {
       "exact_name": "Auto de control de legalidad de la captura",
       "role": "DESPACHO",
-      "legal_basis": "Ley 906 de 2004, arts. 297, 302 y 303",
+      "legal_basis": "Ley 906 de 2004, arts. 297 (modificado por el art. 19 de la Ley 1142 de 2007), 302 (inciso adicionado por el art. 6 de la Ley 2111 de 2021) y 303",
       "competent_authority": "Juez de control de garantías",
-      "term": "Debe realizarse dentro de las treinta y seis (36) horas siguientes a la captura (art. 297).",
+      "term": "Debe realizarse dentro de las treinta y seis (36) horas siguientes a la captura (art. 297). Añadir desde cuándo corren las treinta y seis (36) horas en cada modalidad de captura. Por orden judicial, desde la captura, y el juez de control de garantías efectúa la audiencia, ordena la cancelación de la orden y dispone lo pertinente sobre el aprehendido (art. 297). En flagrancia, la Fiscalía debe presentar al aprehendido inmediatamente o a más tardar dentro de las treinta y seis (36) horas siguientes (art. 302, inciso 5º); si la captura en flagrancia ocurre en ríos o en zonas cuyo arribo a la cabecera municipal más cercana solo puede surtirse por vía fluvial, o median dificultades objetivas de acceso acreditadas por la autoridad competente, las treinta y seis (36) horas se cuentan desde la llegada al puerto o municipio más cercano (art. 302, inciso adicionado por el art. 6 de la Ley 2111 de 2021). Al capturado debe informársele de manera inmediata el hecho y el funcionario que ordenó la captura, su derecho a indicar a quién comunicar la aprehensión, su derecho a guardar silencio y su derecho a designar y entrevistarse con un abogado de confianza en el menor tiempo posible (art. 303).",
       "required_sections": [
         {
           "n": 1,
@@ -861,7 +861,7 @@
           "basis": "Art. 297"
         }
       ],
-      "source_url": "https://leyes.co/codigo_de_procedimiento_penal/297.htm"
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr007.html#297"
     },
     {
       "exact_name": "Auto de preclusión",
@@ -906,9 +906,9 @@
     {
       "exact_name": "Sentencia penal condenatoria",
       "role": "DESPACHO",
-      "legal_basis": "Ley 906 de 2004, arts. 446 a 448",
+      "legal_basis": "Ley 906 de 2004, arts. 446, 447 (modificado por el art. 100 de la Ley 1395 de 2010) y 448 — el término de la actuación está en el art. 447, no en el art. 317",
       "competent_authority": "Juez de conocimiento",
-      "term": "Si transcurren ciento cincuenta (150) días desde el inicio de la audiencia de juicio sin que se celebre la audiencia de lectura de fallo, procede la libertad por vencimiento de términos (art. 317 num. 6).",
+      "term": "Si transcurren ciento cincuenta (150) días desde el inicio de la audiencia de juicio sin que se celebre la audiencia de lectura de fallo, procede la libertad por vencimiento de términos (art. 317 num. 6). Añadir el término propio de la actuación, que la ficha no traía. El sentido del fallo se da a conocer de manera oral y pública inmediatamente después del receso previsto en el art. 445, individualizado frente a cada enjuiciado y cada cargo (art. 446). Anunciado el fallo condenatorio, o aceptado el acuerdo con la Fiscalía, el juez oye brevemente y por una sola vez al fiscal y a la defensa sobre las condiciones individuales, familiares, sociales, modo de vivir y antecedentes del culpable, y señala la audiencia para proferir sentencia en un término que no podrá exceder de quince (15) días contados a partir de la terminación del juicio oral; el mismo término rige para la sentencia absolutoria (art. 447). Si el juez estima necesario ampliar la información, el experto designado debe responder en el término improrrogable de diez (10) días hábiles. Ese plazo de quince (15) días es el reloj del juez de conocimiento. El plazo de ciento cincuenta (150) días desde el inicio de la audiencia de juicio sin audiencia de lectura de fallo o su equivalente es un reloj distinto y a favor del procesado: no obliga al juez a fallar, sino que da lugar a la libertad por vencimiento de términos (art. 317 num. 6, modificado por el art. 6 de la Ley 2477 de 2025). El acusado no podrá ser declarado culpable por hechos que no consten en la acusación ni por delitos por los cuales no se ha solicitado condena (art. 448).",
       "required_sections": [
         {
           "n": 1,
@@ -947,7 +947,7 @@
           "basis": "Art. 102"
         }
       ],
-      "source_url": "https://leyes.co/codigo_de_procedimiento_penal/447.htm"
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr010.html#447"
     },
     {
       "exact_name": "Sentencia penal absolutoria",
@@ -986,9 +986,9 @@
     {
       "exact_name": "Auto que decreta pruebas en audiencia preparatoria",
       "role": "DESPACHO",
-      "legal_basis": "Ley 906 de 2004, arts. 175, 356 y 357",
+      "legal_basis": "Ley 906 de 2004, arts. 175 (modificado por el art. 49 de la Ley 1453 de 2011; parágrafo 3º adicionado por el art. 35 de la Ley 1474 de 2011), 356 y 357",
       "competent_authority": "Juez de conocimiento",
-      "term": "La audiencia preparatoria debe realizarse en un término máximo de cuarenta y cinco (45) días después de la audiencia de acusación, y la de juicio oral dentro de los cuarenta y cinco (45) días siguientes a la preparatoria (art. 175).",
+      "term": "La audiencia preparatoria debe realizarse en un término máximo de cuarenta y cinco (45) días después de la audiencia de acusación, y la de juicio oral dentro de los cuarenta y cinco (45) días siguientes a la preparatoria (art. 175). Precisar el punto de partida y añadir la duplicación. Los cuarenta y cinco (45) días del juicio oral se cuentan desde la CONCLUSIÓN de la audiencia preparatoria, no desde su realización, y los de la preparatoria desde la audiencia de formulación de acusación. Ambos términos se duplican en los procesos por delitos de competencia de los jueces penales del circuito especializados, por delitos contra la Administración Pública y por delitos contra el patrimonio económico sobre bienes del Estado respecto de los cuales proceda la detención preventiva, cuando sean tres (3) o más los imputados o los delitos objeto de investigación (art. 175 parágrafo 3º). Son relojes del juzgado, no de las partes; el reloj del acusado detenido es el de ciento veinte (120) días desde la presentación del escrito de acusación sin inicio de la audiencia de juicio, que da lugar a la libertad por vencimiento de términos (art. 317 num. 5). El auto que decreta pruebas no tiene término legal propio: se profiere dentro de la audiencia preparatoria, oída la Fiscalía y luego la defensa, y el juez decreta las pruebas cuando se refieran a los hechos de la acusación que requieran prueba, conforme a las reglas de pertinencia y admisibilidad (art. 357).",
       "required_sections": [
         {
           "n": 1,
@@ -1021,7 +1021,7 @@
           "basis": "Art. 175"
         }
       ],
-      "source_url": "https://leyes.co/codigo_de_procedimiento_penal/357.htm"
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr004.html#175"
     }
   ]
 }

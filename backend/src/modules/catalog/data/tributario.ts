@@ -134,16 +134,16 @@ export const TRIBUTARIO_CATALOG: BranchCatalog = {
     exactName: 'Respuesta al pliego de cargos',
     branch: 'TRIBUTARIO',
     role: 'LITIGANTE',
-    legalBasis: 'Estatuto Tributario, arts. 637 y 638',
+    legalBasis: 'Para el término de respuesta: el artículo sancionatorio invocado en el pliego. UN (1) MES en los arts. 651, 650-2, 655, 663, 667, 669, 671 y 860 del E.T. y en el art. 260-11 par. 1º; DIEZ (10) DÍAS en los arts. 616-3, 652 y 657 par. 2º; QUINCE (15) DÍAS en el art. 678 (entidades recaudadoras). Los arts. 637 y 638 aportan solo el marco (dónde se imponen las sanciones y la caducidad de la facultad sancionatoria) y deben conservarse como soporte complementario, no como fuente del plazo.',
     competentAuthority: 'Dirección de Impuestos y Aduanas Nacionales (DIAN)',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'Un (1) mes contado desde la notificación del pliego de cargos para responderlo, aportar y solicitar pruebas — es el término del CONTRIBUYENTE y es la regla general en el Estatuto Tributario. Se reduce a diez (10) días cuando se trata de clausura del establecimiento o de sanciones por facturación (arts. 616-3, 652 y 657 par. 2º) y es de quince (15) días para las entidades recaudadoras (art. 678). La ficha debe indicar de qué artículo sancionatorio proviene el pliego, porque de él depende el plazo. El reloj de la DIAN, que el cliente necesita para alegar caducidad: la DIAN debe formular el pliego de cargos dentro de los DOS (2) AÑOS siguientes a la presentación de la declaración del período en que ocurrió o cesó la irregularidad (CINCO (5) AÑOS para la sanción por no declarar, los intereses de mora y las sanciones de los arts. 659, 659-1 y 660), y una vez vencido el término de respuesta tiene SEIS (6) MESES para aplicar la sanción. La ficha debe traer los dos plazos y decir cuál es de quién: un (1) mes del contribuyente para responder; dos años / seis meses de la DIAN.' },
     requiredSections: [
       { n: 1, name: 'Identificación del pliego de cargos y de la sanción propuesta', mandatory: true, basis: 'Art. 638' },
       { n: 2, name: 'Objeciones a cada cargo formulado', mandatory: true, basis: 'Art. 638' },
       { n: 3, name: 'Pruebas que se aportan o se solicitan', mandatory: true, basis: 'Art. 638' },
       { n: 4, name: 'Alegación de la reducción de la sanción, cuando proceda', mandatory: false, basis: 'Art. 640' }
     ],
-    sourceUrl: 'https://actualicese.com/estatutotributario/707-2/'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=6533'
   },
   {
     id: 'tributario/solicitud-de-revocatoria-directa-en-materia-tributaria',

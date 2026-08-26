@@ -33,8 +33,8 @@ export const INTERNACIONAL_CATALOG: BranchCatalog = {
     branch: 'INTERNACIONAL',
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, arts. 605, 606 y 607',
-    competentAuthority: 'Sala de Casación Civil de la Corte Suprema de Justicia (art. 607)',
-    term: { status: 'VERIFICADO', description: 'Presentada la demanda y admitida, se corre traslado por cinco (5) días a la parte afectada por la sentencia y al procurador delegado que corresponda (art. 607).' },
+    competentAuthority: 'Sala de Casación Civil de la Corte Suprema de Justicia, salvo que conforme a los tratados internacionales corresponda a otro juez (art. 607).',
+    term: { status: 'VERIFICADO', description: 'Presentada la demanda y admitida, se corre traslado por cinco (5) días a la parte afectada por la sentencia y al procurador delegado que corresponda (art. 607). Carga que debe cumplirse en la demanda misma, so pena de rechazo: las pruebas deben pedirse EN la demanda (art. 607 num. 1), y la Corte rechaza la demanda si falta alguno de los requisitos de los numerales 1 a 4 del art. 606 —que la sentencia no verse sobre derechos reales constituidos en bienes que estaban en Colombia al iniciarse el proceso, que no se oponga a leyes colombianas de orden público salvo las de procedimiento, que esté ejecutoriada conforme a la ley de origen y se presente en copia debidamente legalizada, y que el asunto no sea de competencia exclusiva de los jueces colombianos—. Requisito documental: si la sentencia o cualquier documento no está en castellano, debe presentarse con la copia del original su traducción en legal forma (art. 607).' },
     requiredSections: [
       { n: 1, name: 'Copia de la sentencia extranjera debidamente legalizada y ejecutoriada conforme a la ley de su país de origen', mandatory: true, basis: 'Art. 606 num. 3' },
       { n: 2, name: 'Demostración de que no versa sobre derechos reales constituidos en bienes situados en Colombia', mandatory: true, basis: 'Art. 606 num. 1' },
@@ -45,7 +45,7 @@ export const INTERNACIONAL_CATALOG: BranchCatalog = {
       { n: 7, name: 'Petición de las pruebas que se pretenda hacer valer', mandatory: true, basis: 'Art. 607 num. 1' },
       { n: 8, name: 'Acreditación de la reciprocidad diplomática o legislativa con el país de origen', mandatory: true, basis: 'Art. 605' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/607.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr021.html#607'
   },
   {
     id: 'internacional/solicitud-de-reconocimiento-de-laudo-arbitral-extranjero',
@@ -53,7 +53,7 @@ export const INTERNACIONAL_CATALOG: BranchCatalog = {
     branch: 'INTERNACIONAL',
     role: 'LITIGANTE',
     legalBasis: 'Ley 1563 de 2012, arts. 111, 112 y 115',
-    competentAuthority: 'Autoridad judicial competente conforme al art. 115',
+    competentAuthority: 'Sala de Casación Civil de la Corte Suprema de Justicia. La Ley 1563 de 2012, art. 68 inciso 2, dispone que \'el reconocimiento y ejecución previstos en el artículo 113\' son de competencia de esa Sala. Cuando sea parte una entidad pública colombiana o quien ejerza funciones administrativas colombianas, la competencia corresponde a la Sala Plena de la Sección Tercera de la Sala de lo Contencioso Administrativo del Consejo de Estado (art. 68 inciso 4). El trámite es de única instancia y contra la decisión no procede recurso ni acción alguna (art. 113).',
     term: { status: 'VERIFICADO', description: 'Admitida la solicitud, se notifica a las otras partes para que se pronuncien dentro de diez (10) días. Vencido el traslado y sin trámite adicional, la autoridad judicial decide dentro de los veinte (20) días siguientes (art. 115).' },
     requiredSections: [
       { n: 1, name: 'Laudo original o copia de él', mandatory: true, basis: 'Art. 111' },
@@ -62,7 +62,7 @@ export const INTERNACIONAL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Identificación de las partes y del acuerdo de arbitraje', mandatory: true, basis: 'Art. 111' },
       { n: 5, name: 'Pronunciamiento sobre la ausencia de causales de denegación del reconocimiento', mandatory: true, basis: 'Art. 112' }
     ],
-    sourceUrl: 'https://leyes.co/estatuto_de_arbitraje_nacional_e_internacional/115.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1563_2012_pr002.html#115'
   },
   {
     id: 'internacional/solicitud-de-ejecucion-de-laudo-internacional-con-sede-en-colombia',
@@ -70,15 +70,15 @@ export const INTERNACIONAL_CATALOG: BranchCatalog = {
     branch: 'INTERNACIONAL',
     role: 'LITIGANTE',
     legalBasis: 'Ley 1563 de 2012, art. 111',
-    competentAuthority: 'Juez de ejecución competente según las reglas generales',
-    term: { status: 'VERIFICADO', description: 'Los arbitrajes internacionales cuya sede sea Colombia se consideran nacionales y sus laudos pueden ejecutarse DIRECTAMENTE, sin necesidad de reconocimiento previo (art. 111).' },
+    competentAuthority: 'Para la ejecución: juez civil del circuito (Ley 1563 de 2012, art. 68 inciso 1, que enlista expresamente los artículos 111 y 116 entre los asuntos de su competencia); será el juez administrativo cuando se trate de tribunales arbitrales en los que sea parte una entidad pública colombiana o quien ejerza funciones administrativas colombianas (mismo inciso). Para el reconocimiento previo, exigible solo si se renunció al recurso de anulación: Sala de Casación Civil de la Corte Suprema de Justicia (art. 68 inciso 2), o Sala Plena de la Sección Tercera de la Sala de lo Contencioso Administrativo del Consejo de Estado si es parte una entidad pública colombiana o quien ejerza funciones administrativas colombianas (art. 68 inciso 4).',
+    term: { status: 'VERIFICADO', description: 'Los laudos dictados en arbitrajes internacionales cuya sede sea Colombia se consideran laudos nacionales y, por regla general, no están sujetos al procedimiento de reconocimiento: pueden ejecutarse DIRECTAMENTE, sin reconocimiento previo. EXCEPCIÓN: si las partes renunciaron al recurso de anulación —renuncia que el art. 107 inciso 2 solo permite cuando ninguna de ellas tenga domicilio o residencia en Colombia—, el reconocimiento previo SÍ es necesario y se tramita conforme al art. 115: admitida la solicitud, traslado de diez (10) días a la otra u otras partes y decisión dentro de los veinte (20) días siguientes al vencimiento del traslado.' },
     requiredSections: [
       { n: 1, name: 'Acreditación de que la sede del arbitraje fue Colombia', mandatory: true, basis: 'Art. 111' },
       { n: 2, name: 'Laudo original o copia, con constancia de su notificación', mandatory: true, basis: 'Art. 111' },
       { n: 3, name: 'Constancia de que no se requiere reconocimiento previo', mandatory: true, basis: 'Art. 111' },
       { n: 4, name: 'Pretensión ejecutiva con la liquidación de lo adeudado', mandatory: true, basis: null }
     ],
-    sourceUrl: 'https://leyes.co/estatuto_de_arbitraje_nacional_e_internacional/111.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1563_2012_pr002.html#111'
   },
   {
     id: 'internacional/recurso-de-anulacion-de-laudo-arbitral-internacional',
@@ -86,8 +86,8 @@ export const INTERNACIONAL_CATALOG: BranchCatalog = {
     branch: 'INTERNACIONAL',
     role: 'LITIGANTE',
     legalBasis: 'Ley 1563 de 2012, arts. 108 y 109',
-    competentAuthority: 'Sala Civil del Tribunal Superior del Distrito Judicial de la sede del tribunal arbitral',
-    term: { status: 'VERIFICADO', description: 'Dentro del mes siguiente a la notificación del laudo o, en su caso, a la notificación del laudo adicional o de la providencia que resuelva sobre su corrección o aclaración. La interposición NO suspende la ejecución del laudo, y contra la decisión que resuelve la anulación no procede recurso alguno (art. 109).' },
+    competentAuthority: 'Sala de Casación Civil de la Corte Suprema de Justicia, por regla general: Ley 1563 de 2012, art. 68 inciso 2 — \'La anulación a que se refiere el artículo 108 y el reconocimiento y ejecución previstos en el artículo 113, serán de competencia de la Sala de Casación Civil de la Corte Suprema de Justicia\'. Cuando se trate de anulación de laudos proferidos por tribunales arbitrales con sede en Colombia en los que sea parte una entidad pública colombiana o quien ejerza funciones administrativas colombianas, la competencia corresponde a la Sala Plena de la Sección Tercera de la Sala de lo Contencioso Administrativo del Consejo de Estado (art. 68 inciso 3). NO es competente la Sala Civil del Tribunal Superior del Distrito Judicial: esa es la regla del arbitraje NACIONAL y no se aplica al arbitraje internacional.',
+    term: { status: 'VERIFICADO', description: 'Dentro del mes siguiente a la notificación del laudo o, en su caso, a la notificación del laudo adicional o de la providencia que resuelva sobre su corrección o aclaración. La interposición NO suspende la ejecución del laudo, y contra la decisión que resuelve la anulación no procede recurso alguno (art. 109). Los otros dos plazos del art. 109, que NO son del cliente y deben quedar identificados como ajenos: (i) num. 2 — \'Al admitir el recurso se correrá traslado común por el término de un (1) mes a la parte o partes opositoras para que presenten sus alegaciones\', traslado que se surte en la secretaría de la autoridad competente; (ii) num. 3 — al día siguiente del vencimiento del traslado el secretario pasa el expediente al despacho \'para sentencia, que deberá proferirse dentro de los dos (2) meses siguientes\', providencia en la que se liquidan costas y condenas y se ordenan las restituciones a que haya lugar cuando el laudo anulado ya se hubiere ejecutado en todo o en parte.' },
     requiredSections: [
       { n: 1, name: 'Identificación del laudo y de la fecha exacta de su notificación', mandatory: true, basis: 'Art. 109' },
       { n: 2, name: 'Causal de anulación invocada entre las taxativas', mandatory: true, basis: 'Art. 108' },
@@ -95,7 +95,7 @@ export const INTERNACIONAL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Advertencia de que el recurso no suspende la ejecución del laudo', mandatory: true, basis: 'Art. 109' },
       { n: 5, name: 'Petición de anulación total o parcial', mandatory: true, basis: 'Art. 109' }
     ],
-    sourceUrl: 'https://leyes.co/estatuto_de_arbitraje_nacional_e_internacional/109.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1563_2012_pr002.html#109'
   },
   {
     id: 'internacional/demanda-arbitral-internacional',
@@ -148,23 +148,23 @@ export const INTERNACIONAL_CATALOG: BranchCatalog = {
       { n: 6, name: 'Solicitud de pruebas dentro del traslado de diez (10) días', mandatory: true, basis: 'Art. 500' },
       { n: 7, name: 'Alegato de conclusión dentro de los cinco (5) días de secretaría', mandatory: true, basis: 'Art. 500' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_de_procedimiento_penal/500.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr012.html#500'
   },
   {
     id: 'internacional/renuncia-al-procedimiento-de-extradicion',
     exactName: 'Renuncia al procedimiento de extradición',
     branch: 'INTERNACIONAL',
     role: 'LITIGANTE',
-    legalBasis: 'Ley 906 de 2004, art. 500 par.',
+    legalBasis: 'Ley 906 de 2004, art. 500 parágrafo 1º (extradición simplificada), adicionado por el art. 70 de la Ley 1453 de 2011',
     competentAuthority: 'Sala de Casación Penal de la Corte Suprema de Justicia',
-    term: { status: 'VERIFICADO', description: 'La persona requerida, con asistencia de su defensor y del Ministerio Público, puede renunciar al procedimiento ordinario y solicitar directamente el concepto; la Sala debe responder dentro de veinte (20) días si se cumplen los requisitos (art. 500).' },
+    term: { status: 'VERIFICADO', description: 'La persona requerida en extradición, con la COADYUVANCIA de su defensor y del Ministerio Público —no basta su mera asistencia: ambos deben respaldar la solicitud—, puede renunciar al procedimiento del art. 500 y pedir a la Sala de Casación Penal de la Corte Suprema de Justicia que emita de plano el concepto. La Sala procederá dentro de los veinte (20) días siguientes si se cumplen los presupuestos para hacerlo; ese plazo de veinte (20) días es el de la Corte, no un plazo del solicitante. La renuncia no tiene término propio: puede presentarse mientras el trámite del art. 500 esté en curso. La misma facultad opera respecto del trámite de extradición de la Ley 600 de 2000 (parágrafo 2o).' },
     requiredSections: [
       { n: 1, name: 'Manifestación libre, voluntaria e informada de renunciar al procedimiento', mandatory: true, basis: 'Art. 500' },
       { n: 2, name: 'Constancia de la asistencia del defensor y del Ministerio Público', mandatory: true, basis: 'Art. 500' },
       { n: 3, name: 'Solicitud expresa de que se emita concepto de inmediato', mandatory: true, basis: 'Art. 500' },
       { n: 4, name: 'Verificación previa de que se cumplen los requisitos legales', mandatory: true, basis: 'Art. 500' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_de_procedimiento_penal/500.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr012.html#500'
   },
   {
     id: 'internacional/peticion-individual-ante-la-comision-interamericana-de-derechos-humanos',
@@ -256,8 +256,8 @@ export const INTERNACIONAL_CATALOG: BranchCatalog = {
     branch: 'INTERNACIONAL',
     role: 'DESPACHO',
     legalBasis: 'Ley 1564 de 2012, arts. 606 y 607',
-    competentAuthority: 'Sala de Casación Civil de la Corte Suprema de Justicia',
-    term: { status: 'VERIFICADO', description: 'Vencido el traslado de cinco (5) días se decretan y practican las pruebas, se convoca a audiencia y se dicta sentencia (art. 607).' },
+    competentAuthority: 'Sala de Casación Civil de la Corte Suprema de Justicia para conceder el exequátur, salvo que conforme a los tratados internacionales corresponda a otro juez (art. 607). Concedido el exequátur, la EJECUCIÓN de la sentencia extranjera no la adelanta la Corte: conoce de ella el juez competente conforme a las reglas generales (art. 607 num. 5).',
+    term: { status: 'VERIFICADO', description: 'Vencido el traslado de cinco (5) días se decretan y practican las pruebas, se convoca a audiencia y se dicta sentencia (art. 607). Paso posterior que la ficha omite y sin el cual la sentencia de exequátur no produce el resultado buscado: concedido el exequátur, si la sentencia extranjera requiere ejecución, el interesado debe promoverla ante el juez competente conforme a las reglas generales (art. 607 num. 5), no ante la Corte. El efecto que se reconoce es el que le concedan los tratados existentes con el país de origen y, en su defecto, el que allí se reconozca a las sentencias proferidas en Colombia (art. 605).' },
     requiredSections: [
       { n: 1, name: 'Verificación de los siete requisitos del artículo 606', mandatory: true, basis: 'Art. 606' },
       { n: 2, name: 'Constancia del traslado a la parte afectada y al procurador delegado', mandatory: true, basis: 'Art. 607 num. 3' },
@@ -265,7 +265,7 @@ export const INTERNACIONAL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Decisión de conceder o negar el exequátur', mandatory: true, basis: 'Art. 607' },
       { n: 5, name: 'Indicación de que, concedido, la ejecución corresponde al juez competente por las reglas generales', mandatory: true, basis: 'Art. 607 num. 5' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/607.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr021.html#607'
   },
   {
     id: 'internacional/providencia-de-reconocimiento-de-laudo-extranjero',
@@ -273,7 +273,7 @@ export const INTERNACIONAL_CATALOG: BranchCatalog = {
     branch: 'INTERNACIONAL',
     role: 'DESPACHO',
     legalBasis: 'Ley 1563 de 2012, arts. 112 y 115',
-    competentAuthority: 'Autoridad judicial competente',
+    competentAuthority: 'Sala de Casación Civil de la Corte Suprema de Justicia (Ley 1563 de 2012, art. 68 inciso 2, que le atribuye \'el reconocimiento y ejecución previstos en el artículo 113\'). Cuando sea parte una entidad pública colombiana o quien ejerza funciones administrativas colombianas, la providencia corresponde a la Sala Plena de la Sección Tercera de la Sala de lo Contencioso Administrativo del Consejo de Estado (art. 68 inciso 4). El trámite es de única instancia y contra la providencia no procede recurso ni acción alguna (art. 113). Reconocido el laudo en todo o en parte, de su ejecución conoce el juez civil del circuito, o el juez administrativo si es parte una entidad pública (arts. 116 y 68 inciso 1).',
     term: { status: 'VERIFICADO', description: 'Vencido el traslado de diez (10) días a las otras partes, y sin trámite adicional, la autoridad judicial decide dentro de los veinte (20) días siguientes (art. 115).' },
     requiredSections: [
       { n: 1, name: 'Verificación de la documentación exigida por el artículo 111', mandatory: true, basis: 'Art. 111' },
@@ -281,16 +281,16 @@ export const INTERNACIONAL_CATALOG: BranchCatalog = {
       { n: 3, name: 'Análisis de las causales de denegación del reconocimiento', mandatory: true, basis: 'Art. 112' },
       { n: 4, name: 'Decisión de reconocer o denegar, dentro de los veinte (20) días', mandatory: true, basis: 'Art. 115' }
     ],
-    sourceUrl: 'https://leyes.co/estatuto_de_arbitraje_nacional_e_internacional/115.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1563_2012_pr002.html#115'
   },
   {
     id: 'internacional/concepto-sobre-extradicion',
     exactName: 'Concepto sobre extradición',
     branch: 'INTERNACIONAL',
     role: 'DESPACHO',
-    legalBasis: 'Ley 906 de 2004, arts. 500 a 502',
-    competentAuthority: 'Sala de Casación Penal de la Corte Suprema de Justicia',
-    term: { status: 'VERIFICADO', description: 'Se emite tras el traslado de diez (10) días, el período probatorio de diez (10) días más el término de distancia y los cinco (5) días de alegatos. Si la persona requerida renuncia al procedimiento, el concepto debe emitirse dentro de los veinte (20) días siguientes (art. 500).' },
+    legalBasis: 'Ley 906 de 2004, arts. 500 a 503',
+    competentAuthority: 'El concepto lo emite la Sala de Casación Penal de la Corte Suprema de Justicia (arts. 499 y 501); la resolución que concede o niega la extradición la profiere el Gobierno Nacional dentro de los quince (15) días siguientes al recibo del expediente con el concepto (art. 503), y la concesión u ofrecimiento es facultativa del Gobierno aunque requiere concepto previo y favorable de la Corte (art. 492).',
+    term: { status: 'VERIFICADO', description: 'Se emite tras el traslado de diez (10) días, el período probatorio de diez (10) días más el término de distancia y los cinco (5) días de alegatos. Si la persona requerida renuncia al procedimiento, el concepto debe emitirse dentro de los veinte (20) días siguientes (art. 500). Precisión sobre de quién es cada reloj: en el trámite ORDINARIO el art. 501 no fija plazo alguno para que la Corte emita el concepto —solo dice que lo emitirá \'vencido el término anterior\', es decir, los cinco (5) días de alegatos del art. 500—; el plazo de veinte (20) días opera únicamente en la extradición simplificada del art. 500 parágrafo 1º. El art. 502 fija los fundamentos del concepto (validez formal de la documentación, plena identidad del solicitado, doble incriminación, equivalencia de la providencia extranjera y, cuando fuere el caso, lo previsto en los tratados públicos), no un término. Y el reloj que sigue no es de la Corte sino del Gobierno: recibido el expediente con el concepto, hay quince (15) días para dictar la resolución que concede o niega la extradición (art. 503). El concepto negativo de la Corte obliga al Gobierno; el favorable lo deja en libertad de obrar según las conveniencias nacionales (art. 501).' },
     requiredSections: [
       { n: 1, name: 'Validez formal de la documentación presentada por el Estado requirente', mandatory: true, basis: 'Art. 502' },
       { n: 2, name: 'Plena identidad de la persona solicitada', mandatory: true, basis: 'Art. 502' },
@@ -299,7 +299,7 @@ export const INTERNACIONAL_CATALOG: BranchCatalog = {
       { n: 5, name: 'Cumplimiento de lo previsto en los tratados públicos aplicables', mandatory: true, basis: 'Art. 502' },
       { n: 6, name: 'Condicionamientos al Gobierno sobre garantías del solicitado', mandatory: true, basis: 'Art. 494' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_de_procedimiento_penal/500.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr012.html#501'
   },
   {
     id: 'internacional/laudo-arbitral-internacional',

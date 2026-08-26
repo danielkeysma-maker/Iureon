@@ -46,7 +46,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 9, name: 'Lugar, dirección física y electrónica para notificaciones de las partes y sus apoderados', mandatory: true, basis: 'Art. 82 num. 10' },
       { n: 10, name: 'Anexos: poder, prueba de la existencia y representación, y documentos que se pretenda hacer valer', mandatory: true, basis: 'Art. 84' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/369.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr012.html#369'
   },
   {
     id: 'civil/demanda-de-proceso-verbal-sumario',
@@ -55,7 +55,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, arts. 82, 390 y 391',
     competentAuthority: 'Juez civil municipal en única instancia (art. 390)',
-    term: { status: 'VERIFICADO', description: 'El término para contestar la demanda será de diez (10) días (art. 391).' },
+    term: { status: 'VERIFICADO', description: 'El término para contestar la demanda será de diez (10) días (art. 391). El proceso verbal sumario es de única instancia (art. 390 parágrafo 1): la sentencia no es apelable, de modo que el demandante no dispone de un segundo grado y todo debe jugarse en la única audiencia. Reloj del demandante: si el demandado propone excepciones de mérito, el demandante tiene tres (3) días de traslado para pedir pruebas sobre ellas (art. 391); vencidos, pierde esa oportunidad probatoria.' },
     requiredSections: [
       { n: 1, name: 'Designación del juez a quien se dirige', mandatory: true, basis: 'Art. 82 num. 1' },
       { n: 2, name: 'Nombre y domicilio de las partes y de sus representantes', mandatory: true, basis: 'Art. 82 num. 2' },
@@ -65,7 +65,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 6, name: 'Fundamentos de derecho', mandatory: true, basis: 'Art. 82 num. 8' },
       { n: 7, name: 'Lugar y dirección para notificaciones', mandatory: true, basis: 'Art. 82 num. 10' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/391.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr013.html#391'
   },
   {
     id: 'civil/demanda-ejecutiva-singular',
@@ -120,7 +120,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 3, name: 'Anexos que se echaron de menos', mandatory: false, basis: 'Art. 84' },
       { n: 4, name: 'Solicitud de admisión de la demanda subsanada', mandatory: true, basis: 'Art. 90' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/90.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr003.html#90'
   },
   {
     id: 'civil/reforma-de-la-demanda',
@@ -153,7 +153,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 5, name: 'Objeción razonada al juramento estimatorio', mandatory: false, basis: 'Art. 206' },
       { n: 6, name: 'Lugar y dirección para notificaciones', mandatory: true, basis: 'Art. 96 num. 5' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/369.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr012.html#369'
   },
   {
     id: 'civil/contestacion-de-la-demanda-en-proceso-verbal-sumario',
@@ -162,7 +162,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, arts. 96 y 391',
     competentAuthority: 'Juez civil municipal en única instancia',
-    term: { status: 'VERIFICADO', description: 'Diez (10) días para contestar la demanda (art. 391).' },
+    term: { status: 'VERIFICADO', description: 'Diez (10) días para contestar la demanda (art. 391). Reloj del demandado, distinto del de la contestación: en verbal sumario las excepciones previas NO se proponen en la contestación sino mediante recurso de reposición contra el auto admisorio, que debe interponerse dentro de los tres (3) días siguientes a su notificación (art. 318). Quien las incluya solo en la contestación las pierde. Si prospera alguna que no termine el proceso, el juez puede conceder al demandante cinco (5) días para subsanar, so pena de revocar el auto admisorio (art. 391).' },
     requiredSections: [
       { n: 1, name: 'Pronunciamiento sobre las pretensiones', mandatory: true, basis: 'Art. 96 num. 2' },
       { n: 2, name: 'Pronunciamiento sobre cada hecho', mandatory: true, basis: 'Art. 96 num. 2' },
@@ -170,7 +170,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Petición de pruebas', mandatory: true, basis: 'Art. 96 num. 4' },
       { n: 5, name: 'Lugar y dirección para notificaciones', mandatory: true, basis: 'Art. 96 num. 5' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/391.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr013.html#391'
   },
   {
     id: 'civil/excepciones-previas',
@@ -195,14 +195,14 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, art. 442',
     competentAuthority: 'El juez que libró el mandamiento de pago',
-    term: { status: 'VERIFICADO', description: 'Diez (10) días siguientes a la notificación del mandamiento ejecutivo para proponer excepciones de mérito (art. 442 num. 1).' },
+    term: { status: 'VERIFICADO', description: 'Diez (10) días siguientes a la notificación del mandamiento ejecutivo para proponer excepciones de mérito (art. 442 num. 1). Reloj del ejecutado, distinto de los diez (10) días: el beneficio de excusión y los hechos que configuren excepciones previas se alegan por reposición contra el mandamiento de pago, dentro de los tres (3) días siguientes a su notificación (arts. 442 num. 3 y 318); no caben como excepciones de mérito. Además, cuando se cobra una providencia judicial, una conciliación o una transacción aprobada por quien ejerza función jurisdiccional, solo pueden alegarse las excepciones de pago, compensación, confusión, novación, remisión, prescripción o transacción basadas en hechos POSTERIORES a esa providencia, más la nulidad por indebida representación o falta de notificación o emplazamiento y la pérdida de la cosa debida (art. 442 num. 2). Reloj del ejecutante: si prospera una excepción previa que no termina el proceso, dispone de cinco (5) días para subsanar o aportar los documentos omitidos, so pena de que se revoque la orden de pago con condena en costas y perjuicios (art. 442 num. 3).' },
     requiredSections: [
       { n: 1, name: 'Identificación del proceso ejecutivo y del mandamiento de pago', mandatory: true, basis: 'Art. 442' },
       { n: 2, name: 'Enunciación de cada excepción de mérito', mandatory: true, basis: 'Art. 442 num. 1' },
       { n: 3, name: 'Hechos en que se fundamentan las excepciones', mandatory: true, basis: 'Art. 442 num. 1' },
       { n: 4, name: 'Pruebas que se acompañan o se solicitan', mandatory: true, basis: 'Art. 442 num. 1' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/442.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr015.html#442'
   },
   {
     id: 'civil/demanda-de-reconvencion',
@@ -260,14 +260,14 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, arts. 318 y 319',
     competentAuthority: 'El mismo juez o magistrado que dictó el auto',
-    term: { status: 'VERIFICADO', description: 'Tres (3) días siguientes al de la notificación del auto, cuando se pronuncie fuera de audiencia (art. 318).' },
+    term: { status: 'VERIFICADO', description: 'Tres (3) días siguientes al de la notificación del auto, cuando se pronuncie fuera de audiencia (art. 318). La ficha solo publica el plazo de los autos dictados fuera de audiencia. Reloj del recurrente en audiencia: el recurso debe interponerse "en forma verbal inmediatamente se pronuncie el auto" y con expresión de las razones que lo sustenten (art. 318); no hay tres días, se pierde en el acto. Reloj de la contraparte: cuando el recurso se formula por escrito, se resuelve previo traslado por tres (3) días (art. 319). Los autos de las salas de decisión no tienen reposición; solo cabe pedir aclaración o complementación dentro del término de su ejecutoria (art. 318).' },
     requiredSections: [
       { n: 1, name: 'Identificación del auto recurrido y su fecha de notificación', mandatory: true, basis: 'Art. 318' },
       { n: 2, name: 'Expresión de las razones de inconformidad', mandatory: true, basis: 'Art. 318' },
       { n: 3, name: 'Petición de que se reforme o revoque el auto', mandatory: true, basis: 'Art. 318' },
       { n: 4, name: 'Apelación subsidiaria, cuando el auto sea apelable', mandatory: false, basis: 'Art. 322' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/318.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr011.html#318'
   },
   {
     id: 'civil/recurso-de-apelacion',
@@ -276,14 +276,14 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, arts. 320 a 322',
     competentAuthority: 'Se interpone ante el juez que dictó la providencia; lo resuelve el superior',
-    term: { status: 'VERIFICADO', description: 'Tres (3) días siguientes a la notificación por estado, si la providencia se dictó fuera de audiencia; en audiencia, en el acto de su notificación. La sustentación se surte dentro de los tres (3) días siguientes (art. 322).' },
+    term: { status: 'VERIFICADO', description: 'Providencia dictada EN audiencia: el recurso se interpone en forma verbal inmediatamente después de pronunciada (art. 322 num. 1); no hay plazo posterior. Providencia dictada FUERA de audiencia: se interpone ante el juez que la dictó, en el acto de su notificación personal, o por escrito dentro de los tres (3) días siguientes a su notificación por estado (art. 322 num. 1). Sustentación: tratándose de AUTOS, se sustenta ante el juez que dictó la providencia dentro de los tres (3) días siguientes a su notificación o a la del auto que niega la reposición, so pena de que se declare desierto (art. 322 num. 3). Tratándose de SENTENCIAS, dentro de ese mismo plazo de tres (3) días solo deben precisarse los reparos concretos; la sustentación propiamente dicha se surte después ante el superior, y este declarará desierto el recurso que no sea sustentado (art. 322 num. 3).' },
     requiredSections: [
       { n: 1, name: 'Identificación de la providencia apelada', mandatory: true, basis: 'Art. 322' },
       { n: 2, name: 'Manifestación expresa de interponer el recurso de apelación', mandatory: true, basis: 'Art. 322' },
       { n: 3, name: 'Sustentación: reparos concretos contra la providencia', mandatory: true, basis: 'Art. 322' },
       { n: 4, name: 'Petición de revocatoria o modificación', mandatory: true, basis: 'Art. 322' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/322.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr011.html#322'
   },
   {
     id: 'civil/recurso-de-suplica',
@@ -292,13 +292,13 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, art. 331',
     competentAuthority: 'Los demás magistrados de la sala, con exclusión del sustanciador',
-    term: { status: 'VERIFICADO', description: 'Tres (3) días siguientes a la notificación del auto (art. 331).' },
+    term: { status: 'VERIFICADO', description: 'Tres (3) días siguientes a la notificación del auto (art. 331). Requisito que la ficha omite y que hace perder el recurso dentro del mismo plazo: el escrito debe dirigirse al magistrado sustanciador y expresar las razones de la inconformidad (art. 331); una súplica sin motivación no está debidamente formulada. Límite de procedencia: no procede contra los autos que resuelven la apelación o la queja (art. 331). Vencido el traslado, el expediente pasa al magistrado que sigue en turno al que dictó la providencia, y contra lo decidido no procede recurso (art. 332).' },
     requiredSections: [
       { n: 1, name: 'Escrito dirigido al magistrado sustanciador', mandatory: true, basis: 'Art. 331' },
       { n: 2, name: 'Identificación del auto suplicado', mandatory: true, basis: 'Art. 331' },
       { n: 3, name: 'Razones de inconformidad', mandatory: true, basis: 'Art. 331' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/331.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr011.html#331'
   },
   {
     id: 'civil/recurso-de-queja',
@@ -323,13 +323,13 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, arts. 336 y 337',
     competentAuthority: 'Se interpone ante el tribunal; lo resuelve la Sala de Casación Civil de la Corte Suprema de Justicia',
-    term: { status: 'VERIFICADO', description: 'Cinco (5) días siguientes a la notificación de la sentencia. Si se pidió adición, corrección o aclaración, el término corre desde el día siguiente al de la notificación de la providencia respectiva (art. 337).' },
+    term: { status: 'VERIFICADO', description: 'Cinco (5) días siguientes a la notificación de la sentencia. Si se pidió adición, corrección o aclaración, el término corre desde el día siguiente al de la notificación de la providencia respectiva (art. 337). Barrera de legitimación que la ficha omite y que se decide mucho antes de los cinco (5) días: "No podrá interponer el recurso quien no apeló de la sentencia de primer grado, cuando la proferida por el tribunal hubiere sido exclusivamente confirmatoria de aquella" (art. 337). Quien no apeló en primera instancia ya no tiene casación contra la sentencia confirmatoria, por oportuno que sea el escrito.' },
     requiredSections: [
       { n: 1, name: 'Identificación de la sentencia recurrida', mandatory: true, basis: 'Art. 337' },
       { n: 2, name: 'Manifestación de interponer el recurso de casación', mandatory: true, basis: 'Art. 337' },
       { n: 3, name: 'Acreditación del interés para recurrir', mandatory: true, basis: 'Art. 337' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/337.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr011.html#337'
   },
   {
     id: 'civil/demanda-de-casacion',
@@ -338,7 +338,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, arts. 343 y 344',
     competentAuthority: 'Sala de Casación Civil de la Corte Suprema de Justicia',
-    term: { status: 'VERIFICADO', description: 'Treinta (30) días de traslado común, contados desde el auto que admite el recurso; vencidos sin presentarla, se declara desierto el recurso (art. 343).' },
+    term: { status: 'VERIFICADO', description: 'Treinta (30) días de traslado común, contados desde el auto que admite el recurso; vencidos sin presentarla, se declara desierto el recurso (art. 343). Regla que la ficha omite y que es la que más recursos hace desertar: el término de treinta (30) días "no se interrumpirá por el cambio de apoderado, ni por su renuncia o la sustitución del poder" (art. 343). El reloj corre contra el recurrente aunque cambie de abogado dentro del traslado.' },
     requiredSections: [
       { n: 1, name: 'Designación de las partes', mandatory: true, basis: 'Art. 344' },
       { n: 2, name: 'Síntesis del proceso y de los hechos materia del litigio', mandatory: true, basis: 'Art. 344' },
@@ -347,7 +347,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 5, name: 'Normas de derecho sustancial que se estiman violadas', mandatory: true, basis: 'Art. 344' },
       { n: 6, name: 'Demostración del cargo', mandatory: true, basis: 'Art. 344' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/343.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr011.html#343'
   },
   {
     id: 'civil/recurso-extraordinario-de-revision',
@@ -356,7 +356,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, arts. 354 a 356',
     competentAuthority: 'La Corte Suprema de Justicia o el tribunal superior, según quién dictó la sentencia (art. 354)',
-    term: { status: 'VERIFICADO', description: 'Dos (2) años siguientes a la ejecutoria de la sentencia para las causales 1, 6, 8 y 9. Para la causal 7 el término corre desde que el perjudicado conoce la sentencia, sin exceder cinco (5) años (art. 356).' },
+    term: { status: 'VERIFICADO', description: 'Dos (2) años siguientes a la ejecutoria de la sentencia para las causales 1, 6, 8 y 9. Para la causal 7 el término corre desde que el perjudicado conoce la sentencia, sin exceder cinco (5) años (art. 356). Dos reglas del art. 356 que la ficha omite y que mueven la fecha en que caduca el recurso. Primera, a favor del recurrente: cuando la sentencia debe inscribirse en un registro público, los términos de dos (2) y cinco (5) años "sólo comenzarán a correr a partir de la fecha de la inscripción". Segunda: para las causales 2, 3, 4 y 5 (documentos declarados falsos, falso testimonio, dictamen de perito condenado, violencia o cohecho) rige el mismo término de dos (2) años contados desde la ejecutoria de la sentencia, y si el proceso penal no ha terminado se suspende la sentencia de revisión hasta la ejecutoria del fallo penal, sin que esa suspensión pueda exceder de dos (2) años. El recurso debe interponerse dentro de los dos años aunque el proceso penal siga en curso: esperar el fallo penal para presentarlo hace perder el término.' },
     requiredSections: [
       { n: 1, name: 'Identificación de la sentencia impugnada y de las partes', mandatory: true, basis: 'Art. 355' },
       { n: 2, name: 'Causal de revisión invocada entre las nueve del art. 355', mandatory: true, basis: 'Art. 355' },
@@ -364,7 +364,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Pruebas que se acompañan o se solicitan', mandatory: true, basis: 'Art. 355' },
       { n: 5, name: 'Caución para responder por perjuicios, cuando la ley la exija', mandatory: false, basis: 'Art. 357' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/356.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr012.html#356'
   },
   {
     id: 'civil/solicitud-de-aclaracion-de-providencia',
@@ -373,13 +373,13 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, art. 285',
     competentAuthority: 'El mismo juez que profirió la providencia',
-    term: { status: 'VERIFICADO', description: 'Dentro del término de ejecutoria de la providencia (art. 285). La ejecutoria de las providencias dictadas fuera de audiencia se cumple tres (3) días después de notificadas (art. 302).' },
+    term: { status: 'VERIFICADO', description: 'Dentro del término de ejecutoria de la providencia (art. 285). La ejecutoria de las providencias dictadas fuera de audiencia se cumple tres (3) días después de notificadas (art. 302). Efecto de la solicitud sobre los demás plazos, que la ficha omite: pedida la aclaración, la providencia "solo quedará ejecutoriada una vez resuelta la solicitud" (art. 302), de modo que los términos para recurrir no corren mientras esté pendiente. Correlativamente, el art. 337 hace contar los cinco (5) días de casación desde la notificación de la providencia que resuelve la aclaración. Límite material: la aclaración solo procede sobre conceptos o frases que ofrezcan verdadero motivo de duda "siempre que estén contenidas en la parte resolutiva de la sentencia o influyan en ella" (art. 285); pedirla sobre la parte motiva no suspende nada porque será rechazada. La providencia que resuelve la aclaración no admite recursos, pero dentro de su ejecutoria pueden interponerse los que procedan contra la providencia aclarada.' },
     requiredSections: [
       { n: 1, name: 'Identificación de la providencia y de su notificación', mandatory: true, basis: 'Art. 285' },
       { n: 2, name: 'Señalamiento del concepto o frase que ofrece verdadero motivo de duda', mandatory: true, basis: 'Art. 285' },
       { n: 3, name: 'Demostración de que está en la parte resolutiva o influye en ella', mandatory: true, basis: 'Art. 285' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/285.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr009.html#285'
   },
   {
     id: 'civil/solicitud-de-adicion-de-providencia',
@@ -388,13 +388,13 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, art. 287',
     competentAuthority: 'El mismo juez que profirió la providencia',
-    term: { status: 'VERIFICADO', description: 'Dentro del término de ejecutoria de la providencia (art. 287).' },
+    term: { status: 'VERIFICADO', description: 'Dentro del término de ejecutoria de la providencia (art. 287). La ficha remite al "término de ejecutoria" sin decir cuánto dura: las providencias dictadas fuera de audiencia quedan ejecutoriadas tres (3) días después de notificadas (art. 302), y las dictadas en audiencia quedan ejecutoriadas una vez notificadas cuando no se impugnan o no admiten recursos, de modo que la adición debe pedirse en el acto. La misma regla y el mismo plazo se aplican a los autos (art. 287). Efecto que la ficha omite: dentro del término de ejecutoria de la providencia que resuelve la complementación puede recurrirse también la providencia principal (art. 287), y el art. 322 num. 2 permite apelar la principal dentro de la ejecutoria de la complementaria o de la que niega la adición.' },
     requiredSections: [
       { n: 1, name: 'Identificación de la providencia', mandatory: true, basis: 'Art. 287' },
       { n: 2, name: 'Señalamiento del extremo de la litis o punto omitido', mandatory: true, basis: 'Art. 287' },
       { n: 3, name: 'Petición de sentencia o auto complementario', mandatory: true, basis: 'Art. 287' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/287.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr009.html#287'
   },
   {
     id: 'civil/solicitud-de-correccion-de-errores-aritmeticos',
@@ -435,7 +435,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, art. 375',
     competentAuthority: 'Juez civil del circuito o municipal del lugar de ubicación del inmueble',
-    term: { status: 'VERIFICADO', description: 'Un (1) mes para contestar, contado desde la inclusión del proceso en el Registro Nacional de Procesos de Pertenencia (art. 375).' },
+    term: { status: 'VERIFICADO', description: 'Un (1) mes para contestar, contado desde la inclusión del proceso en el Registro Nacional de Procesos de Pertenencia (art. 375). El mes que publica la ficha es el reloj de los EMPLAZADOS (personas indeterminadas y demandados de dirección ignorada), no el de todos los demandados. El demandado cierto —el titular de derecho real que figura en el certificado del registrador y contra quien debe dirigirse la demanda (art. 375 num. 5)— se rige por el traslado del proceso verbal: veinte (20) días (art. 369). Reloj de un tercero, no del cliente: el registrador de instrumentos públicos debe responder la petición del certificado dentro de quince (15) días (art. 375 num. 5), plazo que hay que anticipar al preparar la demanda. Reloj propio del demandado que alega la prescripción por vía de excepción: debe cumplir los numerales 5, 6 y 7, y si a los treinta (30) días del vencimiento del traslado de la demanda no ha cumplido lo de los numerales 6 y 7, el proceso sigue su curso pero en la sentencia no podrá declararse la pertenencia (art. 375 parágrafo 1).' },
     requiredSections: [
       { n: 1, name: 'Requisitos generales de la demanda', mandatory: true, basis: 'Art. 82' },
       { n: 2, name: 'Identificación precisa del bien: linderos, cabida y ubicación', mandatory: true, basis: 'Art. 375' },
@@ -444,7 +444,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 5, name: 'Demanda dirigida contra el titular inscrito, y citación del acreedor hipotecario o prendario', mandatory: true, basis: 'Art. 375' },
       { n: 6, name: 'Fotografías del inmueble y compromiso de instalar la valla informativa', mandatory: true, basis: 'Art. 375' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/375.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr013.html#375'
   },
   {
     id: 'civil/demanda-de-restitucion-de-inmueble-arrendado',
@@ -453,7 +453,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, art. 384',
     competentAuthority: 'Juez civil municipal o del circuito del lugar del inmueble',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'Se tramita como proceso verbal: admitida la demanda se corre traslado al demandado por veinte (20) días (arts. 368 y 369), y si no se opone dentro de ese término el juez profiere sentencia ordenando la restitución (art. 384 num. 3). Cuando la única causal invocada es la mora en el pago del canon, el proceso es de única instancia (art. 384 num. 9). Reloj del demandante, antes de demandar: desde el 30 de diciembre de 2022 la conciliación extrajudicial SÍ es requisito de procedibilidad, porque el art. 146 de la Ley 2220 de 2022 derogó el inciso del art. 384 num. 6 que eximía de agotarla; demandar sin agotarla lleva a inadmisión (art. 90 num. 7). Reloj del demandado: si la demanda se funda en falta de pago, no será oído hasta que consigne a órdenes del juzgado el valor total de los cánones y demás conceptos adeudados, o presente los recibos de pago de los tres (3) últimos períodos, y debe seguir consignando los cánones que se causen durante el proceso en ambas instancias (art. 384 num. 4). Reloj del demandante tras la sentencia: las medidas cautelares se levantan si no promueve la ejecución en el mismo expediente dentro de los treinta (30) días siguientes a la ejecutoria de la sentencia, o del auto que aprueba las costas, o de la notificación del auto que ordena obedecer lo dispuesto por el superior (art. 384 num. 7).' },
     requiredSections: [
       { n: 1, name: 'Requisitos generales de la demanda', mandatory: true, basis: 'Art. 82' },
       { n: 2, name: 'Prueba del contrato de arrendamiento', mandatory: true, basis: 'Art. 384' },
@@ -461,7 +461,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Cuando la causal es la mora: manifestación bajo juramento sobre los cánones adeudados', mandatory: true, basis: 'Art. 384 num. 2' },
       { n: 5, name: 'Solicitud de embargo y secuestro, cuando proceda', mandatory: false, basis: 'Art. 384' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/384.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr013.html#384'
   },
   {
     id: 'civil/demanda-de-rendicion-provocada-de-cuentas',
@@ -646,7 +646,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 1564 de 2012, arts. 90 y 369',
     competentAuthority: 'El juez que conoce del proceso',
-    term: { status: 'VERIFICADO', description: 'Admitida la demanda en proceso verbal, se corre traslado al demandado por veinte (20) días (art. 369).' },
+    term: { status: 'VERIFICADO', description: 'Admitida la demanda en proceso verbal, se corre traslado al demandado por veinte (20) días (art. 369). Los veinte (20) días son el reloj del DEMANDADO. Reloj del JUZGADO, que la ficha calla y que le sirve al demandante para reclamar: dentro de los treinta (30) días siguientes a la presentación de la demanda debe notificársele el auto admisorio, el mandamiento de pago o el auto de rechazo; si vence sin notificarse, el plazo de duración del proceso del art. 121 se computa desde el día siguiente a la presentación de la demanda (art. 90). Carga del demandado dentro del mismo traslado: aportar los documentos que estén en su poder y que el demandante haya solicitado, según se le ordene en el auto admisorio (art. 90).' },
     requiredSections: [
       { n: 1, name: 'Verificación de los requisitos de la demanda y de sus anexos', mandatory: true, basis: 'Arts. 82 y 84' },
       { n: 2, name: 'Declaración de admisión', mandatory: true, basis: 'Art. 90' },
@@ -654,7 +654,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Orden de notificación personal', mandatory: true, basis: 'Art. 291' },
       { n: 5, name: 'Pronunciamiento sobre las medidas cautelares solicitadas', mandatory: false, basis: 'Art. 590' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/90.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr003.html#90'
   },
   {
     id: 'civil/auto-inadmisorio-de-la-demanda',
@@ -663,13 +663,13 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 1564 de 2012, art. 90',
     competentAuthority: 'El juez que conoce del proceso',
-    term: { status: 'VERIFICADO', description: 'Se concede al demandante un término de cinco (5) días para subsanar, so pena de rechazo (art. 90).' },
+    term: { status: 'VERIFICADO', description: 'Se concede al demandante un término de cinco (5) días para subsanar, so pena de rechazo (art. 90). Regla que la ficha omite y que hace perder los cinco (5) días a quien intenta recurrir: el auto que declara inadmisible la demanda es "no susceptible de recursos" (art. 90). La única conducta útil es subsanar dentro del término. Solo el auto de RECHAZO es apelable, y ese recurso comprende el que negó la admisión; la apelación se concede en el efecto suspensivo y se resuelve de plano (art. 90). La inadmisión solo procede por las siete causales taxativas del art. 90.' },
     requiredSections: [
       { n: 1, name: 'Señalamiento preciso de cada defecto, entre las causales taxativas del art. 90', mandatory: true, basis: 'Art. 90' },
       { n: 2, name: 'Concesión del término de cinco (5) días para subsanar', mandatory: true, basis: 'Art. 90' },
       { n: 3, name: 'Advertencia de rechazo en caso de no subsanarse', mandatory: true, basis: 'Art. 90' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/90.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr003.html#90'
   },
   {
     id: 'civil/auto-de-rechazo-de-la-demanda',
@@ -691,16 +691,16 @@ export const CIVIL_CATALOG: BranchCatalog = {
     exactName: 'Mandamiento de pago',
     branch: 'CIVIL',
     role: 'DESPACHO',
-    legalBasis: 'Ley 1564 de 2012, arts. 422 y 430',
+    legalBasis: 'Ley 1564 de 2012, arts. 422, 430 y 442',
     competentAuthority: 'El juez de la ejecución',
-    term: { status: 'VERIFICADO', description: 'Notificado el mandamiento ejecutivo, el ejecutado dispone de diez (10) días para proponer excepciones de mérito (art. 442 num. 1).' },
+    term: { status: 'VERIFICADO', description: 'Notificado el mandamiento ejecutivo, el ejecutado dispone de diez (10) días para proponer excepciones de mérito (art. 442 num. 1). Los diez (10) días son el reloj del EJECUTADO. Reloj del EJECUTANTE, que la ficha calla y que es el que puede extinguir su crédito: si por reposición se revoca el mandamiento de pago por ausencia de los requisitos del título, tiene cinco (5) días desde la ejecutoria de ese auto para presentar demanda declarativa en el mismo expediente; solo presentándola en tiempo conserva la interrupción de la prescripción y la inoperancia de la caducidad generadas por el proceso ejecutivo (art. 430). Vencido el plazo, la demanda solo puede formularse en proceso separado, sin ese efecto conservativo. Regla de preclusión para el ejecutado: los requisitos formales del título solo pueden discutirse por reposición contra el mandamiento; no podrán reconocerse ni declararse después en la sentencia ni en el auto que ordena seguir adelante la ejecución (art. 430).' },
     requiredSections: [
       { n: 1, name: 'Verificación de que el título presta mérito ejecutivo: obligación clara, expresa y exigible', mandatory: true, basis: 'Art. 422' },
       { n: 2, name: 'Orden de pago con determinación de capital, intereses y plazo', mandatory: true, basis: 'Art. 430' },
       { n: 3, name: 'Advertencia del término para proponer excepciones', mandatory: true, basis: 'Art. 442' },
       { n: 4, name: 'Pronunciamiento sobre las medidas cautelares solicitadas', mandatory: false, basis: 'Art. 599' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/430.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr015.html#430'
   },
   {
     id: 'civil/auto-que-resuelve-excepciones-previas',
@@ -739,9 +739,9 @@ export const CIVIL_CATALOG: BranchCatalog = {
     exactName: 'Sentencia de primera instancia en proceso declarativo',
     branch: 'CIVIL',
     role: 'DESPACHO',
-    legalBasis: 'Ley 1564 de 2012, arts. 278 a 280 y 373',
+    legalBasis: 'Ley 1564 de 2012, arts. 121, 278 a 280 y 373',
     competentAuthority: 'El juez que conoce del proceso',
-    term: { status: 'VERIFICADO', description: 'No podrá transcurrir un lapso superior a un (1) año para dictar sentencia de primera o única instancia, contado desde la notificación del auto admisorio al demandado (art. 121).' },
+    term: { status: 'VERIFICADO', description: 'No podrá transcurrir un lapso superior a un (1) año para dictar sentencia de primera o única instancia, contado desde la notificación del auto admisorio al demandado (art. 121). El año del art. 121 es el reloj del JUEZ, no del cliente: su vencimiento le hace perder automáticamente competencia y lo obliga a remitir el expediente al que le sigue en turno, que dispone de hasta seis (6) meses; además el juez puede prorrogarlo por una sola vez hasta por seis (6) meses más mediante auto que no admite recurso. Reloj del CLIENTE frente a esta sentencia: si se profiere oralmente en audiencia, la apelación se interpone verbalmente en el acto y los reparos concretos se precisan en ese momento o dentro de los tres (3) días siguientes a la finalización de la audiencia; si se dicta por fuera de audiencia, dentro de los tres (3) días siguientes a su notificación (arts. 322 y 373). Si solo se anuncia el sentido del fallo, la decisión escrita debe emitirse dentro de los diez (10) días siguientes (art. 373 num. 5).' },
     requiredSections: [
       { n: 1, name: 'Síntesis de la demanda y de su contestación', mandatory: true, basis: 'Art. 280' },
       { n: 2, name: 'Motivación: examen crítico de las pruebas y razonamientos legales', mandatory: true, basis: 'Art. 280' },
@@ -750,7 +750,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 5, name: 'Congruencia con los hechos y pretensiones', mandatory: true, basis: 'Art. 281' },
       { n: 6, name: 'Condena en costas', mandatory: true, basis: 'Art. 365' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/280.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr004.html#121'
   },
   {
     id: 'civil/sentencia-de-segunda-instancia',
@@ -759,7 +759,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 1564 de 2012, arts. 280, 328 y 121',
     competentAuthority: 'Tribunal superior o juez civil del circuito, según el caso',
-    term: { status: 'VERIFICADO', description: 'El plazo para resolver la segunda instancia no podrá ser superior a seis (6) meses, contados desde la recepción del expediente en la secretaría (art. 121).' },
+    term: { status: 'VERIFICADO', description: 'El plazo para resolver la segunda instancia no podrá ser superior a seis (6) meses, contados desde la recepción del expediente en la secretaría (art. 121). Los seis (6) meses del art. 121 son el reloj del TRIBUNAL, no del cliente, y son prorrogables por una sola vez hasta por seis (6) meses más mediante auto que no admite recurso. Reloj del CLIENTE frente a la sentencia de segunda instancia: cinco (5) días para interponer el recurso extraordinario de casación, contados desde su notificación, o desde el día siguiente a la notificación de la providencia que resuelva la adición, corrección o aclaración pedida oportunamente (art. 337); y no puede interponerlo quien no apeló en primera instancia si la sentencia del tribunal fue exclusivamente confirmatoria.' },
     requiredSections: [
       { n: 1, name: 'Delimitación de la competencia del superior a los reparos formulados por el apelante', mandatory: true, basis: 'Art. 328' },
       { n: 2, name: 'Síntesis del proceso y de la sentencia apelada', mandatory: true, basis: 'Art. 280' },
@@ -767,7 +767,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Decisión: confirma, revoca o modifica', mandatory: true, basis: 'Art. 328' },
       { n: 5, name: 'Condena en costas de la instancia', mandatory: true, basis: 'Art. 365' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/328.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr004.html#121'
   },
   {
     id: 'civil/auto-que-ordena-seguir-adelante-la-ejecucion',
@@ -825,7 +825,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'SECRETARIA',
     legalBasis: 'Ley 1564 de 2012, art. 302',
     competentAuthority: 'Secretaria del juzgado',
-    term: { status: 'VERIFICADO', description: 'Las providencias proferidas en audiencia quedan ejecutoriadas una vez notificadas cuando no se impugnan o no admiten recursos; las dictadas fuera de audiencia, tres (3) dias despues de notificadas (art. 302).' },
+    term: { status: 'VERIFICADO', description: 'Las providencias proferidas en audiencia quedan ejecutoriadas una vez notificadas cuando no se impugnan o no admiten recursos; las dictadas fuera de audiencia, tres (3) dias despues de notificadas (art. 302). Falta el inciso 2 del art. 302, que desplaza la fecha de ejecutoria y con ella todos los plazos que dependen de ella: "cuando se pida aclaración o complementación de una providencia, solo quedará ejecutoriada una vez resuelta la solicitud". Falta también la tercera hipótesis del inciso final: la providencia dictada fuera de audiencia contra la que sí se interpusieron recursos no queda ejecutoriada a los tres días, sino cuando quede ejecutoriada la providencia que los resuelva. Contar tres días fijos desde la notificación en esos casos anticipa mal la ejecutoria y, con ella, el vencimiento de los términos de aclaración, adición, apelación y casación.' },
     requiredSections: [
       { n: 1, name: 'Identificacion del proceso y de la providencia', mandatory: true, basis: 'Art. 302' },
       { n: 2, name: 'Fecha y forma de su notificacion', mandatory: true, basis: 'Art. 302' },
@@ -833,7 +833,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Fecha exacta en que quedo ejecutoriada', mandatory: true, basis: 'Art. 302' },
       { n: 5, name: 'Firma del secretario', mandatory: true, basis: 'Art. 302' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/302.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr010.html#302'
   },
   {
     id: 'civil/estado-para-notificacion-de-providencias',
@@ -842,7 +842,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'SECRETARIA',
     legalBasis: 'Ley 1564 de 2012, art. 295',
     competentAuthority: 'Secretaria del juzgado',
-    term: { status: 'VERIFICADO', description: 'El estado se fija en lugar visible de la secretaria al comenzar la primera hora habil del respectivo dia y se desfija al finalizar la ultima hora habil del mismo dia (art. 295).' },
+    term: { status: 'VERIFICADO', description: 'El estado se fija en lugar visible de la secretaria al comenzar la primera hora habil del respectivo dia y se desfija al finalizar la ultima hora habil del mismo dia (art. 295). Reforma vigente que la ficha no advierte: por el art. 9 de la Ley 2213 de 2022 —legislación permanente— las notificaciones por estado se fijan VIRTUALMENTE, con inserción de la providencia, sin necesidad de imprimirlas ni de que el secretario las firme ni deje constancia al pie; se exceptúan las providencias que decretan medidas cautelares, mencionan menores o están sujetas a reserva legal, que no se insertan en el estado electrónico. Los ejemplares de los estados virtuales se conservan en línea para consulta permanente. Dato que fija el arranque del cómputo y que la ficha omite: la inserción en el estado se hace "al día siguiente a la fecha de la providencia" (art. 295), y cuando se hayan habilitado sistemas de información de la gestión judicial la notificación por estado solo puede hacerse después de incorporar la información en dicho sistema.' },
     requiredSections: [
       { n: 1, name: 'Clase de proceso', mandatory: true, basis: 'Art. 295' },
       { n: 2, name: 'Nombres de las partes interesadas', mandatory: true, basis: 'Art. 295' },
@@ -850,7 +850,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Fecha del estado y firma del secretario', mandatory: true, basis: 'Art. 295' },
       { n: 5, name: 'Publicacion por mensaje de datos cuando se disponga de los recursos tecnicos, sin impresion ni firma fisica', mandatory: false, basis: 'Art. 295' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/295.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr010.html#295'
   },
   {
     id: 'civil/citacion-para-notificacion-personal',
@@ -859,7 +859,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'SECRETARIA',
     legalBasis: 'Ley 1564 de 2012, art. 291',
     competentAuthority: 'Secretaria del juzgado; su entrega la apoya el citador',
-    term: { status: 'VERIFICADO', description: 'El citado debe comparecer dentro de los cinco (5) dias siguientes a la entrega de la comunicacion en el lugar de destino si es en el mismo municipio del juzgado; diez (10) dias si es en municipio distinto; y treinta (30) dias si es en el exterior. Si no comparece, procede la notificacion por aviso (art. 291).' },
+    term: { status: 'VERIFICADO', description: 'El citado debe comparecer dentro de los cinco (5) dias siguientes a la entrega de la comunicacion en el lugar de destino si es en el mismo municipio del juzgado; diez (10) dias si es en municipio distinto; y treinta (30) dias si es en el exterior. Si no comparece, procede la notificacion por aviso (art. 291). Vía alternativa vigente que la ficha no contempla y que corre con otro calendario: por el art. 8 de la Ley 2213 de 2022 —legislación permanente— la notificación personal también puede hacerse enviando la providencia como mensaje de datos a la dirección electrónica que suministre el interesado, SIN citación ni aviso previos. En ese caso la notificación se entiende realizada una vez transcurridos DOS (2) DÍAS HÁBILES siguientes al envío del mensaje, y los términos empiezan a contarse cuando el iniciador reciba acuse de recibo o se constate por otro medio el acceso del destinatario. El interesado afirma bajo juramento que la dirección corresponde a la persona por notificar, informa cómo la obtuvo y allega las evidencias. Se aplica cualquiera sea la naturaleza de la actuación, incluidas las pruebas extraprocesales y los procesos declarativos, monitorios y ejecutivos. Reloj del notificado que discrepe: para alegar nulidad debe manifestar bajo juramento que no se enteró, además de cumplir los arts. 132 a 138 del CGP.' },
     requiredSections: [
       { n: 1, name: 'Identificacion del destinatario y de su direccion', mandatory: true, basis: 'Art. 291' },
       { n: 2, name: 'Informacion sobre la existencia del proceso, su naturaleza y la fecha de la providencia', mandatory: true, basis: 'Art. 291' },
@@ -867,7 +867,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Envio por servicio postal autorizado', mandatory: true, basis: 'Art. 291' },
       { n: 5, name: 'Constancia de entrega expedida por la empresa postal, para el expediente', mandatory: true, basis: 'Art. 291' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/291.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr010.html#291'
   },
   {
     id: 'civil/aviso-de-notificacion',
@@ -876,7 +876,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'SECRETARIA',
     legalBasis: 'Ley 1564 de 2012, art. 292',
     competentAuthority: 'Secretaria del juzgado',
-    term: { status: 'VERIFICADO', description: 'La notificacion por aviso se considera surtida al finalizar el dia siguiente al de la entrega del aviso en el lugar de destino (art. 292).' },
+    term: { status: 'VERIFICADO', description: 'La notificacion por aviso se considera surtida al finalizar el dia siguiente al de la entrega del aviso en el lugar de destino (art. 292). Requisito de validez que la ficha omite: cuando se trata de auto admisorio de la demanda o de mandamiento ejecutivo, el aviso debe ir acompañado de copia informal de la providencia que se notifica (art. 292); sin ese anexo la notificación es atacable y el término no queda bien surtido. Vía alternativa vigente: por el art. 8 de la Ley 2213 de 2022 la notificación personal puede hacerse enviando la providencia como mensaje de datos sin necesidad de aviso previo, y se entiende realizada a los DOS (2) DÍAS HÁBILES siguientes al envío del mensaje, contándose los términos desde el acuse de recibo o desde que se constate el acceso del destinatario.' },
     requiredSections: [
       { n: 1, name: 'Fecha del aviso y fecha de la providencia que se notifica', mandatory: true, basis: 'Art. 292' },
       { n: 2, name: 'Juzgado, naturaleza del proceso y nombres de las partes', mandatory: true, basis: 'Art. 292' },
@@ -884,7 +884,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Copia informal de la providencia, cuando se trate del auto admisorio o del mandamiento ejecutivo', mandatory: true, basis: 'Art. 292' },
       { n: 5, name: 'Comprobante de entrega de la empresa postal y copia sellada del aviso, incorporados al expediente', mandatory: true, basis: 'Art. 292' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/292.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr010.html#292'
   },
   {
     id: 'civil/emplazamiento-y-remision-al-registro-nacional-de-personas-emplazadas',
@@ -893,7 +893,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'SECRETARIA',
     legalBasis: 'Ley 1564 de 2012, art. 108',
     competentAuthority: 'Secretaria del juzgado; el Registro lo administra el Consejo Superior de la Judicatura',
-    term: { status: 'VERIFICADO', description: 'El emplazamiento se entiende surtido quince (15) dias despues de publicada la informacion en el Registro Nacional de Personas Emplazadas. La publicacion en el medio se hace por una sola vez y su contenido debe permanecer en la pagina web del medio durante todo el termino del emplazamiento (art. 108).' },
+    term: { status: 'VERIFICADO', description: 'El emplazamiento se surte únicamente mediante la inclusión de la información en el Registro Nacional de Personas Emplazadas, sin necesidad de publicación en un medio escrito ni en otro medio masivo de comunicación (Ley 2213 de 2022, art. 10, legislación permanente). Se entiende surtido quince (15) días después de publicada la información en dicho registro (art. 108 CGP). Surtido el emplazamiento se procede a la designación de curador ad lítem, si a ello hubiere lugar. El Consejo Superior de la Judicatura administra el registro y debe permitir la consulta de la información por lo menos durante un (1) año contado desde la publicación del emplazamiento.' },
     requiredSections: [
       { n: 1, name: 'Nombre del sujeto emplazado', mandatory: true, basis: 'Art. 108' },
       { n: 2, name: 'Nombres de las partes, clase de proceso y juzgado que lo requiere', mandatory: true, basis: 'Art. 108' },
@@ -901,7 +901,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Remision de la informacion al Registro Nacional de Personas Emplazadas', mandatory: true, basis: 'Art. 108' },
       { n: 5, name: 'Computo de los quince (15) dias desde la publicacion en el Registro', mandatory: true, basis: 'Art. 108' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/108.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr003.html#108'
   },
   {
     id: 'civil/constancia-de-traslado-en-secretaria',
@@ -910,14 +910,14 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'SECRETARIA',
     legalBasis: 'Ley 1564 de 2012, art. 110',
     competentAuthority: 'Secretaria del juzgado',
-    term: { status: 'VERIFICADO', description: 'El traslado que deba surtirse fuera de audiencia se cumple en secretaria por tres (3) dias, sin necesidad de auto ni constancia en el expediente; se incluye en una lista que permanece a disposicion en la secretaria por un (1) dia, y el termino corre desde el dia siguiente (art. 110).' },
+    term: { status: 'VERIFICADO', description: 'El traslado que deba surtirse fuera de audiencia se cumple en secretaria por tres (3) dias, sin necesidad de auto ni constancia en el expediente; se incluye en una lista que permanece a disposicion en la secretaria por un (1) dia, y el termino corre desde el dia siguiente (art. 110). Reforma vigente que cambia el cómputo: por el art. 9 de la Ley 2213 de 2022 —legislación permanente— los traslados que deban surtirse por fuera de audiencia pueden surtirse virtualmente, y su parágrafo dispone que cuando una parte acredite haber enviado el escrito a los demás sujetos procesales por canal digital "se prescindirá del traslado por Secretaría, el cual se entenderá realizado a los DOS (2) DÍAS HÁBILES siguientes al del envío del mensaje", empezando a correr el término respectivo cuando el iniciador reciba acuse de recibo o se constate el acceso del destinatario. En esa hipótesis no hay lista en secretaría ni el día de disposición del art. 110: quien espere la lista para empezar a contar llega tarde.' },
     requiredSections: [
       { n: 1, name: 'Identificacion del proceso y del escrito o memorial que se traslada', mandatory: true, basis: 'Art. 110' },
       { n: 2, name: 'Inclusion en la lista de traslados de la secretaria', mandatory: true, basis: 'Art. 110' },
       { n: 3, name: 'Fecha de inclusion y fecha de inicio del termino', mandatory: true, basis: 'Art. 110' },
       { n: 4, name: 'Advertencia: no requiere auto que lo ordene ni constancia en el expediente', mandatory: true, basis: 'Art. 110' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/110.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr003.html#110'
   },
   {
     id: 'civil/constancia-secretarial-de-recibo-de-memorial',
@@ -926,7 +926,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     role: 'SECRETARIA',
     legalBasis: 'Ley 1564 de 2012, art. 109',
     competentAuthority: 'Secretaria del juzgado',
-    term: { status: 'VERIFICADO', description: 'El memorial es oportuno si se recibe antes del cierre del despacho del dia en que vence el termino. Cuando se ejercen recursos o facultades con terminos comunes, el secretario debe esperar a que el termino transcurra respecto de todas las partes (art. 109).' },
+    term: { status: 'VERIFICADO', description: 'El memorial es oportuno si se recibe antes del cierre del despacho del dia en que vence el termino. Cuando se ejercen recursos o facultades con terminos comunes, el secretario debe esperar a que el termino transcurra respecto de todas las partes (art. 109). Regla que la ficha omite y que puede salvar un término vencido: cuando el memorial se radica en centros administrativos, de apoyo, secretarías conjuntas, centros de radicación o similares con destino a un despacho determinado, "la presentación se entenderá realizada el día en que fue radicado el memorial en alguna de estas dependencias" (art. 109 parágrafo), no el día en que llega al juzgado. Los memoriales pueden presentarse y las comunicaciones transmitirse por cualquier medio idóneo, y las autoridades judiciales deben llevar control de los mensajes recibidos con fecha y hora de recepción.' },
     requiredSections: [
       { n: 1, name: 'Fecha y hora exactas de presentacion del memorial o comunicacion', mandatory: true, basis: 'Art. 109' },
       { n: 2, name: 'Identificacion de quien lo presenta y del proceso', mandatory: true, basis: 'Art. 109' },
@@ -934,7 +934,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Pronunciamiento sobre la oportunidad frente al vencimiento del termino', mandatory: true, basis: 'Art. 109' },
       { n: 5, name: 'Constancia del medio de presentacion, incluido el mensaje de datos', mandatory: true, basis: 'Art. 109' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/109.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr003.html#109'
   },
   {
     id: 'civil/informe-secretarial',
@@ -1043,8 +1043,8 @@ export const CIVIL_CATALOG: BranchCatalog = {
     branch: 'CIVIL',
     role: 'SECRETARIA',
     legalBasis: 'Ley 1564 de 2012, arts. 291 y 292; manual de funciones del citador, Consejo Superior de la Judicatura',
-    competentAuthority: 'Citador de la secretaria del juzgado',
-    term: { status: 'VERIFICADO', description: 'De la fecha de entrega registrada en la planilla dependen los terminos de comparecencia del art. 291 y la fecha en que se entiende surtida la notificacion por aviso del art. 292.' },
+    competentAuthority: 'Empresa de servicio postal autorizada por el Ministerio de Tecnologías de la Información y las Comunicaciones, que coteja, sella y expide la constancia de entrega incorporada al expediente (art. 291 num. 3). Solo por excepción la notificación la practica un empleado del juzgado, cuando en el lugar no haya empresa de servicio postal autorizada o el juez lo estime aconsejable (art. 291 parágrafo 1).',
+    term: { status: 'VERIFICADO', description: 'De la fecha de entrega registrada en la planilla dependen los terminos de comparecencia del art. 291 y la fecha en que se entiende surtida la notificacion por aviso del art. 292. De la fecha de entrega dependen los términos de comparecencia del art. 291 y la fecha en que se entiende surtida la notificación por aviso del art. 292, pero existe hoy una vía que prescinde de la entrega física: por el art. 8 de la Ley 2213 de 2022 la notificación personal puede hacerse enviando la providencia como mensaje de datos, sin citación ni aviso, y se entiende realizada a los DOS (2) DÍAS HÁBILES siguientes al envío, contándose los términos desde el acuse de recibo o desde que se constate el acceso del destinatario. Regla adicional del art. 291 num. 4: si en el lugar de destino rehúsan recibir la comunicación, la empresa postal la deja allí y emite constancia, y "para todos los efectos legales, la comunicación se entenderá entregada", de modo que el término de comparecencia corre igual.' },
     requiredSections: [
       { n: 1, name: 'Relacion de las comunicaciones, citaciones y avisos entregados', mandatory: true, basis: 'Art. 291' },
       { n: 2, name: 'Destinatario y direccion de cada entrega', mandatory: true, basis: 'Art. 291' },
@@ -1052,7 +1052,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Constancia de recibido o causal de no entrega', mandatory: true, basis: 'Art. 291' },
       { n: 5, name: 'Incorporacion de la constancia al expediente', mandatory: true, basis: 'Art. 292' }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/291.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr010.html#291'
   },
   {
     id: 'civil/sentencia-de-declaracion-de-pertenencia',

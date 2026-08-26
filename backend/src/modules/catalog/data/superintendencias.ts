@@ -251,7 +251,7 @@ export const SUPERINTENDENCIAS_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1564 de 2012, art. 24 num. 2',
     competentAuthority: 'Superintendencia Financiera de Colombia en funciones jurisdiccionales; competencia a prevención con los jueces',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'El art. 24 no fija términos propios: "Las autoridades administrativas tramitarán los procesos a través de las mismas vías procesales previstas en la ley para los jueces" (art. 24 parágrafo 3). Según la cuantía y la naturaleza del asunto, el trámite será verbal —traslado de veinte (20) días para contestar (art. 369)— o verbal sumario de única instancia —diez (10) días para contestar (arts. 390 y 391)—. La competencia es a prevención con los jueces (art. 24 parágrafo 1): la elección del foro corresponde al demandante. Reglas de impugnación que condicionan la elección del foro y que la ficha no publica: las providencias que la Superintendencia dicta en ejercicio de funciones jurisdiccionales NO son impugnables ante la jurisdicción contencioso administrativa; las apelaciones de las dictadas en primera instancia las resuelve el superior funcional del juez que habría sido competente, y si el juez habría conocido en única instancia el asunto ante la Superintendencia también será de única instancia, es decir, sin apelación (art. 24 parágrafo 3). Reloj de la autoridad: el plazo máximo de duración del proceso del art. 121 se aplica a las autoridades administrativas cuando ejercen funciones jurisdiccionales, y al perder competencia deben remitir el expediente inmediatamente a la autoridad judicial desplazada (art. 121 parágrafo). Ante la Superintendencia las partes pueden concurrir sin abogado solo en los casos en que tampoco habría sido necesario ante el juez (art. 24 parágrafo 4).' },
     requiredSections: [
       { n: 1, name: 'Identificación del consumidor financiero y de la entidad vigilada', mandatory: true, basis: 'Art. 24 num. 2' },
       { n: 2, name: 'Acreditación de que la controversia versa sobre la relación de consumo financiero', mandatory: true, basis: 'Art. 24 num. 2' },
@@ -259,7 +259,7 @@ export const SUPERINTENDENCIAS_CATALOG: BranchCatalog = {
       { n: 4, name: 'Constancia del trámite previo ante el Defensor del Consumidor Financiero, cuando aplique', mandatory: false, basis: 'Ley 1328 de 2009' },
       { n: 5, name: 'Petición de pruebas', mandatory: true, basis: null }
     ],
-    sourceUrl: 'https://leyes.co/codigo_general_del_proceso/24.htm'
+    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012.html#24'
   },
   {
     id: 'superintendencias/denuncia-administrativa-por-infraccion-al-estatuto-del-consumidor',

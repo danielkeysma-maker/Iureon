@@ -202,7 +202,8 @@ def main():
                     item['competent_authority'] = r['autoridad_correcta']
 
             despues = {'term': item.get('term'), 'legal_basis': item.get('legal_basis'),
-                       'source_url': item.get('source_url')}
+                       'source_url': item.get('source_url'),
+                       'competent_authority': item.get('competent_authority')}
             if antes != despues:
                 cambios.append((filename, rid, veredicto, antes, despues))
 
