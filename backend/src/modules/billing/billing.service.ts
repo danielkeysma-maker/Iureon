@@ -143,26 +143,97 @@ export const balanceOf = async (firmId: string): Promise<number> => {
 };
 
 /**
- * Refuses BEFORE the money is spent upstream.
+ * Takes the floor price BEFORE the work starts, and returns what is left.
  *
- * Checking afterwards would mean the platform pays OpenRouter for work it
- * cannot charge for — and telling the lawyer their draft is ready but
- * unaffordable is worse than telling them up front that it is.
+ * WHY RESERVING AND NOT MERELY CHECKING. Checking reads the balance and lets go
+ * of it. With $2.000 on the account and three lawyers of the same firm pressing
+ * generate at the same second, all three checks pass, all three documents are
+ * written — and only one can be charged. Demonstrated against the database: two
+ * drafts produced, paid for upstream, and unbillable.
+ *
+ * So the credit is taken at the start, like a card authorisation. The debit is
+ * atomic, so exactly as many lawyers proceed as the balance can pay for; the
+ * rest are told before any model is called. What the operation really cost is
+ * settled at the end — the difference charged if the document ran long, the
+ * whole reservation returned if nothing was produced.
  */
-export const ensureBalance = async (firmId: string, operation: Operation): Promise<void> => {
-  const precio = PRICE_COP[operation];
-  if (precio <= 0) return;
+export const reserveForOperation = async (input: {
+  firmId: string;
+  userEmail: string;
+  operation: Operation;
+}): Promise<{ reserved: number; balance: number }> => {
+  const db = requireDb();
+  const precio = PRICE_COP[input.operation];
 
-  const saldo = await balanceOf(firmId);
+  if (precio <= 0) return { reserved: 0, balance: await balanceOf(input.firmId) };
 
-  if (saldo < precio) {
+  const { data: nuevoSaldo, error } = await db.rpc('debit_firm_credits', {
+    p_firm_id: input.firmId,
+    p_amount: precio
+  });
+
+  if (error) {
+    console.error('[BILLING] No se pudo reservar:', error.message);
+    throw new BillingError('CHARGE_FAILED', 'No se pudo verificar el saldo.', 502);
+  }
+
+  if (nuevoSaldo === null) {
+    const saldo = await balanceOf(input.firmId);
     throw new BillingError(
       'INSUFFICIENT_CREDITS',
-      `Saldo insuficiente: esta operación cuesta $${precio.toLocaleString('es-CO')} COP y la firma tiene $${saldo.toLocaleString('es-CO')} COP.`,
+      `Saldo insuficiente: esta operación cuesta desde $${precio.toLocaleString('es-CO')} COP y la firma tiene $${saldo.toLocaleString('es-CO')} COP.`,
       402,
       saldo
     );
   }
+
+  return { reserved: precio, balance: Number(nuevoSaldo) };
+};
+
+/**
+ * Returns a reservation when the operation produced nothing.
+ *
+ * A firm must not pay for a draft that failed. Never throws: the work already
+ * went wrong, and failing the refund on top would turn one problem into two —
+ * the gap is visible in the log instead.
+ */
+export const refundReservation = async (input: {
+  firmId: string;
+  userEmail: string;
+  operation: Operation;
+  reason: string;
+}): Promise<void> => {
+  if (!supabase) return;
+
+  const precio = PRICE_COP[input.operation];
+  if (precio <= 0) return;
+
+  const { data: firma } = await supabase
+    .from('firms')
+    .select('credit_balance_cop')
+    .eq('firm_id', input.firmId)
+    .maybeSingle();
+
+  const saldo = Number((firma as { credit_balance_cop: number } | null)?.credit_balance_cop ?? 0) + precio;
+
+  const { error } = await supabase
+    .from('firms')
+    .update({ credit_balance_cop: saldo, updated_at: new Date().toISOString() })
+    .eq('firm_id', input.firmId);
+
+  if (error) {
+    console.error('[BILLING] No se pudo devolver la reserva:', error.message);
+    return;
+  }
+
+  await supabase.from('credit_movements').insert({
+    firm_id: input.firmId,
+    kind: 'DEVOLUCION',
+    amount_cop: precio,
+    balance_after_cop: saldo,
+    description: input.reason,
+    actor_email: input.userEmail
+  });
 };
 
 /**
@@ -198,32 +269,29 @@ export const recordUsage = async (input: {
 };
 
 /**
- * Charges the firm for one completed operation.
+ * Settles an operation whose floor price is already reserved.
  *
- * THE DEBIT IS ATOMIC, and that is not caution for its own sake. Reading the
- * balance, subtracting in the application and writing it back loses money the
- * moment two requests overlap: both read 10.000, both write 8.000, and the firm
- * paid for one draft out of two. With two lawyers of the same firm drafting at
- * once that is not an unlikely race, it is Tuesday.
+ * Only the DIFFERENCE moves here. The reservation covered the ordinary price
+ * before any model ran, so a normal document settles at zero — no second debit,
+ * no second race. A long one charges what it cost above the floor, and that
+ * second debit can fail if the balance moved meanwhile, which is the residual
+ * loss and a much smaller one than paying for whole unbilled documents.
  *
- * `debit_firm_credits` subtracts and returns in one statement, and refuses when
- * the balance is short — so a charge that cannot be covered leaves the balance
- * untouched instead of driving it negative.
+ * The movement is written here rather than at reservation time so the ledger
+ * carries one line per document, naming what it was, rather than a reservation
+ * and an adjustment the lawyer has to add up.
  */
-export const chargeOperation = async (input: {
+export const settleOperation = async (input: {
   firmId: string;
   userEmail: string;
   operation: Operation;
   operationId: string;
   description: string;
+  /** What was already taken when the work started. */
+  reserved: number;
 }): Promise<{ charged: number; balance: number; costUsd: number }> => {
   const db = requireDb();
 
-  /*
-   * The price comes from what this operation actually consumed, floored at the
-   * ordinary price. Summed across every stage of the operation, because a draft
-   * is three model calls and the firm is charged for the document.
-   */
   const { data: consumo } = await db
     .from('ai_usage')
     .select('cost_usd')
@@ -236,57 +304,49 @@ export const chargeOperation = async (input: {
   );
 
   const precio = priceFor(input.operation, costUsd);
+  const diferencia = precio - input.reserved;
 
-  if (precio <= 0) return { charged: 0, balance: await balanceOf(input.firmId), costUsd };
+  let balance = await balanceOf(input.firmId);
 
-  const { data: nuevoSaldo, error } = await db.rpc('debit_firm_credits', {
-    p_firm_id: input.firmId,
-    p_amount: precio
-  });
+  if (diferencia > 0) {
+    const { data: nuevoSaldo } = await db.rpc('debit_firm_credits', {
+      p_firm_id: input.firmId,
+      p_amount: diferencia
+    });
 
-  if (error) {
-    console.error('[BILLING] No se pudo descontar:', error.message);
-    throw new BillingError('CHARGE_FAILED', 'No se pudo aplicar el cobro.', 502);
+    if (nuevoSaldo === null) {
+      // The document ran long and the balance no longer covers the excess. The
+      // firm keeps the draft and pays the floor; the platform absorbs the rest
+      // and says so, rather than billing for something it cannot collect.
+      console.error(
+        `[BILLING] No se pudo cobrar el excedente de $${diferencia} a ${input.firmId}; se cobra solo el piso.`
+      );
+    } else {
+      balance = Number(nuevoSaldo);
+    }
   }
 
-  if (nuevoSaldo === null) {
-    // The balance moved between the pre-flight check and here — another draft
-    // finished first. The work is done and unbilled, which is the platform's
-    // loss to notice rather than the client's to discover.
-    console.error(`[BILLING] Saldo insuficiente al cobrar ${input.operation} a ${input.firmId}.`);
-    throw new BillingError(
-      'INSUFFICIENT_CREDITS',
-      'El saldo se agotó mientras se procesaba la operación.',
-      402,
-      await balanceOf(input.firmId)
-    );
-  }
-
-  const balance = Number(nuevoSaldo);
+  const cobrado = Math.max(input.reserved, Math.min(precio, input.reserved + Math.max(0, diferencia)));
 
   await db.from('credit_movements').insert({
     firm_id: input.firmId,
     kind: 'CONSUMO',
-    amount_cop: -precio,
+    amount_cop: -cobrado,
     balance_after_cop: balance,
-    // Says WHY it cost what it cost when it went above the floor, so a lawyer
-    // reading their movements is not left guessing why one draft cost triple.
     description:
-      precio > PRICE_COP[input.operation]
+      cobrado > PRICE_COP[input.operation]
         ? `${input.description} (documento extenso)`
         : input.description,
     actor_email: input.userEmail
   });
 
-  // The charge is attached to the operation's last usage row so the ledger can
-  // be read either way: what one document cost, and what one firm was charged.
   await db
     .from('ai_usage')
-    .update({ charged_cop: precio })
+    .update({ charged_cop: cobrado })
     .eq('operation_id', input.operationId)
     .eq('firm_id', input.firmId);
 
-  return { charged: precio, balance, costUsd };
+  return { charged: cobrado, balance, costUsd };
 };
 
 export interface UsageSummary {

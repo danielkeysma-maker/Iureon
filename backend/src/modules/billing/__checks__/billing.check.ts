@@ -17,8 +17,9 @@ import {
   maxOutputTokensFor,
   priceFor,
   balanceOf,
-  chargeOperation,
-  ensureBalance,
+  refundReservation,
+  reserveForOperation,
+  settleOperation,
   movements,
   recordUsage,
   usageSummary
@@ -55,20 +56,20 @@ const PRECIO = PRICE_COP.BORRADOR;
   // ─── Sin saldo no se empieza ──────────────────────────────────────────────
   let sinSaldo = '';
   try {
-    await ensureBalance(A.user.firmId, 'BORRADOR');
+    await reserveForOperation({ firmId: A.user.firmId, userEmail: A.user.email, operation: 'BORRADOR' });
   } catch (err) {
     sinSaldo = err instanceof BillingError ? err.code : 'otro error';
   }
   check('una firma sin saldo no puede empezar', sinSaldo === 'INSUFFICIENT_CREDITS', sinSaldo);
 
   await recargar(A.user.firmId, PRECIO * 2);
-  let conSaldo = 'pasó';
-  try {
-    await ensureBalance(A.user.firmId, 'BORRADOR');
-  } catch {
-    conSaldo = 'rechazó con saldo suficiente';
-  }
-  check('con saldo suficiente sí empieza', conSaldo === 'pasó', conSaldo);
+  const reserva = await reserveForOperation({
+    firmId: A.user.firmId,
+    userEmail: A.user.email,
+    operation: 'BORRADOR'
+  });
+  check('reservar toma el precio de piso al empezar', reserva.reserved === PRECIO, `$${reserva.reserved}`);
+  check('y el saldo baja de inmediato', reserva.balance === PRECIO, `$${reserva.balance}`);
 
   // ─── El consumo se registra con su costo real ─────────────────────────────
   const op1 = `1111${m}`.slice(0, 8).padEnd(8, '0');
@@ -87,16 +88,17 @@ const PRECIO = PRICE_COP.BORRADOR;
 
   // ─── El cobro descuenta de verdad ─────────────────────────────────────────
   const antes = await balanceOf(A.user.firmId);
-  const cobro = await chargeOperation({
+  const cobro = await settleOperation({
     firmId: A.user.firmId,
     userEmail: A.user.email,
     operation: 'BORRADOR',
     operationId: operacion1,
-    description: 'Borrador de prueba'
+    description: 'Borrador de prueba',
+    reserved: reserva.reserved
   });
 
-  check('el cobro descuenta el precio', cobro.balance === antes - PRECIO, `${antes} -> ${cobro.balance}`);
-  check('y el saldo persiste en la base', (await balanceOf(A.user.firmId)) === cobro.balance);
+  check('un documento normal no cobra nada extra al liquidar', cobro.balance === antes, `${antes} -> ${cobro.balance}`);
+  check('y el total cobrado es el piso', cobro.charged === PRECIO, `$${cobro.charged}`);
 
   const movs = await movements(A.user.firmId);
   check(
@@ -106,51 +108,72 @@ const PRECIO = PRICE_COP.BORRADOR;
   );
 
   /*
-   * ─── DOS BORRADORES A LA VEZ ─────────────────────────────────────────────
+   * ─── TRES ABOGADOS DE LA MISMA FIRMA, AL MISMO TIEMPO ────────────────────
    *
-   * El caso que justifica que el débito sea una sola sentencia. Con lectura,
-   * resta en la aplicación y escritura, ambas peticiones leen el mismo saldo y
-   * ambas escriben el mismo resultado: la firma paga UN borrador de dos. Con
-   * dos abogados de la misma firma redactando al tiempo eso no es improbable.
+   * Este era un agujero real y está demostrado contra la base: con saldo para
+   * UN borrador, los tres pasaban la comprobación, los tres generaban, y solo
+   * uno se podía cobrar. Dos documentos escritos, pagados a OpenRouter y no
+   * facturables.
+   *
+   * Con reserva, exactamente tantos abogados arrancan como el saldo aguanta, y
+   * a los demás se les dice ANTES de llamar a ningún modelo.
    */
-  await recargar(B.user.firmId, PRECIO * 3);
+  await recargar(B.user.firmId, PRECIO);   // alcanza para UNO
   const saldoInicialB = await balanceOf(B.user.firmId);
 
-  const cobros = await Promise.all(
+  const intentos = await Promise.all(
     [1, 2, 3].map((n) =>
-      chargeOperation({
+      reserveForOperation({
         firmId: B.user.firmId,
-        userEmail: B.user.email,
-        operation: 'BORRADOR',
-        operationId: `2222${String(n)}${m}`.slice(0, 8) + '-0000-4000-8000-' + String(m + n).slice(-12).padStart(12, '0'),
-        description: `Borrador simultáneo ${n}`
-      }).catch(() => null)
+        userEmail: `abogado${n}@firma.co`,
+        operation: 'BORRADOR'
+      })
+        .then(() => 'arranca')
+        .catch(() => 'bloqueado')
     )
   );
 
-  const exitosos = cobros.filter(Boolean).length;
-  const saldoFinalB = await balanceOf(B.user.firmId);
+  const arrancaron = intentos.filter((x) => x === 'arranca').length;
+  const saldoTrasReservas = await balanceOf(B.user.firmId);
 
   check(
-    'tres cobros simultáneos descuentan tres veces',
-    saldoFinalB === saldoInicialB - PRECIO * exitosos && exitosos === 3,
-    `${exitosos} cobros · ${saldoInicialB} -> ${saldoFinalB}`
+    'con saldo para uno, solo UNO arranca',
+    arrancaron === 1,
+    `${arrancaron} de 3 · ${intentos.join(', ')}`
+  );
+  check(
+    'y el saldo refleja exactamente esa reserva',
+    saldoTrasReservas === saldoInicialB - PRECIO,
+    `${saldoInicialB} -> ${saldoTrasReservas}`
   );
 
+  /*
+   * ─── UN BORRADOR QUE FALLA DEVUELVE LA RESERVA ───────────────────────────
+   *
+   * El cobro por adelantado solo es aceptable si un fallo lo devuelve: una
+   * firma no puede pagar por un documento que nunca existió.
+   */
+  await refundReservation({
+    firmId: B.user.firmId,
+    userEmail: 'abogado1@firma.co',
+    operation: 'BORRADOR',
+    reason: 'Devolución de prueba'
+  });
+  check('un fallo devuelve la reserva', (await balanceOf(B.user.firmId)) === saldoInicialB, String(await balanceOf(B.user.firmId)));
+
+  const movsB = await movements(B.user.firmId);
+  check('y la devolución queda registrada', movsB[0]?.kind === 'DEVOLUCION', JSON.stringify(movsB[0]?.kind));
+
   // ─── No se puede gastar más de lo que hay ─────────────────────────────────
+  await c.from('firms').update({ credit_balance_cop: 0 }).eq('firm_id', B.user.firmId);
+
   let sobregiro = '';
   try {
-    await chargeOperation({
-      firmId: B.user.firmId,
-      userEmail: B.user.email,
-      operation: 'BORRADOR',
-      operationId: `3333${m}`.slice(0, 8) + '-0000-4000-8000-' + String(m).slice(-12).padStart(12, '0'),
-      description: 'Uno de más'
-    });
+    await reserveForOperation({ firmId: B.user.firmId, userEmail: B.user.email, operation: 'BORRADOR' });
   } catch (err) {
     sobregiro = err instanceof BillingError ? err.code : 'otro error';
   }
-  check('no se puede cobrar sin saldo', sobregiro === 'INSUFFICIENT_CREDITS', sobregiro);
+  check('sin saldo no se reserva', sobregiro === 'INSUFFICIENT_CREDITS', sobregiro);
   check('y el saldo no queda negativo', (await balanceOf(B.user.firmId)) === 0, String(await balanceOf(B.user.firmId)));
 
   /*
@@ -197,7 +220,7 @@ const PRECIO = PRICE_COP.BORRADOR;
   const resumenB = await usageSummary(B.user.firmId);
   check(
     'cada firma ve solo su propio consumo',
-    resumenA.spentCop === PRECIO && resumenB.spentCop === PRECIO * 3,
+    resumenA.spentCop === PRECIO && resumenB.spentCop === 0,
     `A=${resumenA.spentCop} B=${resumenB.spentCop}`
   );
   check('el resumen reporta el costo real en dólares', resumenA.costUsd > 0, String(resumenA.costUsd));

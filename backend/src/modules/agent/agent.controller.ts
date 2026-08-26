@@ -4,9 +4,10 @@ import { OpenRouterMultiEngineService, AgentExecutionStep } from './openrouter.s
 import {
   BillingError,
   balanceOf,
-  chargeOperation,
-  ensureBalance,
-  maxOutputTokensFor
+  maxOutputTokensFor,
+  refundReservation,
+  reserveForOperation,
+  settleOperation
 } from '../billing/billing.service';
 
 const aiService = new OpenRouterMultiEngineService();
@@ -33,8 +34,14 @@ export const streamAgentDraftController = async (req: Request, res: Response): P
    * A plain JSON error, not an SSE event: the stream has not started, so the
    * client can read this as an ordinary failure.
    */
+  let reserved = 0;
+
   try {
-    await ensureBalance(firmId as string, 'BORRADOR');
+    ({ reserved } = await reserveForOperation({
+      firmId: firmId as string,
+      userEmail: req.user?.email ?? 'desconocido',
+      operation: 'BORRADOR'
+    }));
   } catch (err) {
     if (err instanceof BillingError) {
       res.status(err.status).json({ error: err.code, message: err.message, balance: err.balance });
@@ -93,12 +100,13 @@ export const streamAgentDraftController = async (req: Request, res: Response): P
      * charging for that would be selling a form letter at the price of a
      * drafted document. The stages recorded what they cost either way.
      */
-    const cobro = await chargeOperation({
+    const cobro = await settleOperation({
       firmId: firmId as string,
       userEmail: req.user?.email ?? 'desconocido',
       operation: 'BORRADOR',
       operationId,
-      description: `Borrador: ${result.title}`
+      description: `Borrador: ${result.title}`,
+      reserved
     });
 
     sendEvent('COMPLETED', {
@@ -112,6 +120,21 @@ export const streamAgentDraftController = async (req: Request, res: Response): P
     res.end();
   } catch (error: any) {
     console.error('[AGENT-CONTROLLER-ERROR]', error);
+
+    /*
+     * The reservation goes back when nothing was produced.
+     *
+     * A firm must not pay for a draft that failed — and the credit was taken
+     * before the work precisely so nobody could start one they could not pay
+     * for, which only holds up if a failure returns it.
+     */
+    await refundReservation({
+      firmId: firmId as string,
+      userEmail: req.user?.email ?? 'desconocido',
+      operation: 'BORRADOR',
+      reason: 'Devolución: el borrador no se pudo generar'
+    });
+
     sendEvent('ERROR', { message: error.message || 'Error durante la orquestación del agente RAG' });
     res.end();
   }
