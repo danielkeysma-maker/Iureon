@@ -16,6 +16,8 @@ import {
   PRICE_COP,
   maxOutputTokensFor,
   priceFor,
+  MIN_RECHARGE_COP,
+  rechargeFeeCop,
   balanceOf,
   refundReservation,
   reserveForOperation,
@@ -33,6 +35,8 @@ const check = (n: string, ok: boolean, d = ''): void => {
 };
 
 const PRECIO = PRICE_COP.BORRADOR;
+/** El markup del servicio, para comprobar que el margen aguanta la pasarela. */
+const MARKUP_ESPERADO = 2.3;
 
 (async () => {
   const c = supabase!;
@@ -214,6 +218,57 @@ const PRECIO = PRICE_COP.BORRADOR;
   check('sin saldo el tope es mínimo', (topeSinSaldo ?? 0) <= 512, String(topeSinSaldo));
   check('con más saldo el tope crece', (topeChico ?? 0) > (topeSinSaldo ?? 0), `${topeSinSaldo} -> ${topeChico}`);
   check('con saldo holgado no hay tope', topeGrande === undefined, String(topeGrande));
+
+
+  /*
+   * ─── LA RECARGA MÍNIMA ───────────────────────────────────────────────────
+   *
+   * $100.000 no es un número elegido a gusto: sale de la comisión de Wompi,
+   * 2,65% + $700 + IVA por transacción exitosa. El porcentaje cuesta lo mismo
+   * en cualquier monto; los $700 son un peaje por recarga, y son ellos los que
+   * hacen cara una recarga pequeña.
+   *
+   * Se comprueba la aritmética y el efecto, no la cifra: si mañana cambia la
+   * tarifa, lo que tiene que fallar es el mínimo, no una constante repetida.
+   */
+  check(
+    'la comisión de Wompi se calcula con IVA sobre la comisión, no sobre la recarga',
+    rechargeFeeCop(100_000) === 3987,
+    `$${rechargeFeeCop(100_000)}`
+  );
+
+  const pesoFijo = (monto: number): number => rechargeFeeCop(monto) / monto;
+
+  check(
+    'una recarga pequeña sale proporcionalmente más cara',
+    pesoFijo(50_000) > pesoFijo(500_000),
+    `$50.000 = ${(pesoFijo(50_000) * 100).toFixed(1)}% vs $500.000 = ${(pesoFijo(500_000) * 100).toFixed(1)}%`
+  );
+
+  check(
+    'en el mínimo la comisión se queda por debajo del 4,1%',
+    pesoFijo(MIN_RECHARGE_COP) < 0.041,
+    `${(pesoFijo(MIN_RECHARGE_COP) * 100).toFixed(2)}%`
+  );
+
+  /*
+   * El mínimo solo sirve si el margen lo aguanta. Con markup 2,3 el margen es
+   * ~56%; la pasarela se lleva ~4% de lo recargado, así que el negocio tiene
+   * que seguir en pie DESPUÉS de pagarla, o el mínimo está mal puesto.
+   */
+  const margenBruto = 1 - 1 / MARKUP_ESPERADO;
+  const margenNeto = margenBruto - pesoFijo(MIN_RECHARGE_COP);
+  check(
+    'el margen sobrevive a la comisión de la pasarela',
+    margenNeto > 0.5,
+    `${(margenBruto * 100).toFixed(1)}% -> ${(margenNeto * 100).toFixed(1)}%`
+  );
+
+  check(
+    'el mínimo alcanza para varias operaciones, no para una',
+    MIN_RECHARGE_COP / PRECIO >= 10,
+    `${Math.floor(MIN_RECHARGE_COP / PRECIO)} borradores`
+  );
 
   // ─── Aislamiento ──────────────────────────────────────────────────────────
   const resumenA = await usageSummary(A.user.firmId);

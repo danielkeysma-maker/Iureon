@@ -1,5 +1,11 @@
 import { Request, Response } from 'express';
-import { BillingError, PRICE_COP, movements, usageSummary } from './billing.service';
+import {
+  BillingError,
+  MIN_RECHARGE_COP,
+  PRICE_COP,
+  movements,
+  usageSummary
+} from './billing.service';
 
 /**
  * What the firm has, what it spent, and why.
@@ -26,7 +32,10 @@ export const billingSummaryController = async (req: Request, res: Response): Pro
       summary: await usageSummary(req.firmId as string),
       // Sent so the screen states the price from the same source that charges
       // it, rather than repeating a number that can drift out of step.
-      prices: PRICE_COP
+      prices: PRICE_COP,
+      // Same reason: the screen tells a firm the smallest recharge it can buy,
+      // and the rule that will reject a smaller one is this same constant.
+      minRecharge: MIN_RECHARGE_COP
     });
   } catch (err) {
     fail(res, err);

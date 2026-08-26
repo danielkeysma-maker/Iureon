@@ -29,9 +29,12 @@ export interface Movement {
 
 export const billingApi = {
   summary: () =>
-    httpClient.get<{ summary: BillingSummary; prices: Record<string, number> }>(
-      '/api/billing/summary'
-    ),
+    httpClient.get<{
+      summary: BillingSummary;
+      prices: Record<string, number>;
+      /** The smallest recharge a firm can buy, decided by the server. */
+      minRecharge: number;
+    }>('/api/billing/summary'),
 
   movements: () =>
     httpClient.get<{ movements: Movement[] }>('/api/billing/movements').then((r) => r.movements)

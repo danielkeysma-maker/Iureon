@@ -123,6 +123,50 @@ export const maxOutputTokensFor = (balanceCop: number): number | undefined => {
   return tokens > 180_000 ? undefined : Math.max(512, tokens);
 };
 
+/**
+ * The smallest recharge a firm can buy, in pesos.
+ *
+ * WHY THERE IS A FLOOR AT ALL. Wompi charges 2,65% + $700 + IVA per SUCCESSFUL
+ * transaction — a month with no recharges costs nothing, and a declined card
+ * costs nothing — and it is the fixed $700, not the percentage, that decides
+ * this number. The percentage costs the same at any size; the $700 is a toll
+ * paid once per recharge, punishing on small ones and negligible on large ones:
+ *
+ *     $50.000  ->  $2.410 in fees  (4,8%)
+ *     $100.000 ->  $3.987 in fees  (4,0%)
+ *     $500.000 -> $16.601 in fees  (3,3%)
+ *
+ * A firm topping up $50.000 five times pays that toll five times; the same
+ * $250.000 in one go pays it once. $100.000 is where the fixed part stops being
+ * worth arguing about, and the margin absorbs it without moving the price of a
+ * single draft.
+ *
+ * This governs what a firm BUYS, not what the operator can grant: a courtesy
+ * credit, a correction or a compensation is a different act and is deliberately
+ * not bound by a commercial minimum — see `addCredits` in the admin module.
+ */
+export const MIN_RECHARGE_COP = 100_000;
+
+/** Wompi's per-transaction rate, and the IVA levied on the commission itself. */
+const WOMPI_RATE = 0.0265;
+const WOMPI_FIXED_COP = 700;
+const IVA = 0.19;
+
+/**
+ * What a recharge of this size costs the platform in gateway fees.
+ *
+ * The IVA falls on the COMMISSION, not on the recharge. Worth encoding rather
+ * than remembering: read the other way round it overstates the fee by an order
+ * of magnitude, which is exactly the kind of error that sets a minimum
+ * somewhere absurd and then gets defended because it is written down.
+ *
+ * Lives beside the margin it comes out of, so that the day a recharge is
+ * reconciled against what the bank actually deposited there is one figure to
+ * compare and not a spreadsheet.
+ */
+export const rechargeFeeCop = (amountCop: number): number =>
+  Math.round((amountCop * WOMPI_RATE + WOMPI_FIXED_COP) * (1 + IVA));
+
 const requireDb = () => {
   if (!supabase) {
     throw new BillingError('DB_UNAVAILABLE', 'La base de datos no está configurada.', 503);

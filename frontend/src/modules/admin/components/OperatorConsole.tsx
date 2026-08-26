@@ -75,8 +75,21 @@ export const OperatorConsole: React.FC = () => {
     }
   };
 
+  /*
+   * The operator's recharge is NOT bound by the commercial minimum.
+   *
+   * $100.000 is the smallest amount a firm can BUY, and it exists because
+   * Wompi's fixed $700 per transaction makes anything smaller expensive to
+   * collect. None of that applies here: crediting $20.000 as compensation for a
+   * failed draft, or correcting an amount typed wrong, is a different act with
+   * no gateway involved. Enforcing the sales floor on the repair tool would
+   * leave the only person who can fix a balance unable to fix it precisely.
+   *
+   * So the minimum is the default in the box, where it belongs — a nudge toward
+   * the amount that is usually right — and not a rule that rejects the operator.
+   */
   const recargar = async (firm: FirmSummary) => {
-    const texto = window.prompt(`Recargar saldo de ${firm.name}. Monto en COP:`, '50000');
+    const texto = window.prompt(`Recargar saldo de ${firm.name}. Monto en COP:`, '100000');
     if (!texto) return;
 
     const monto = Number(texto.replace(/[^\d]/g, ''));

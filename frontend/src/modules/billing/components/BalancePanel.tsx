@@ -36,6 +36,9 @@ const fecha = (iso: string): string =>
 
 export const BalancePanel: React.FC<BalancePanelProps> = ({ isOpen, onClose, firmName }) => {
   const [summary, setSummary] = React.useState<BillingSummary | null>(null);
+  // Read from the server rather than written here, so the figure on screen and
+  // the rule that enforces it can never say two different things.
+  const [minRecharge, setMinRecharge] = React.useState(0);
   const [movements, setMovements] = React.useState<Movement[]>([]);
   const [cargando, setCargando] = React.useState(false);
   const [error, setError] = React.useState('');
@@ -45,11 +48,12 @@ export const BalancePanel: React.FC<BalancePanelProps> = ({ isOpen, onClose, fir
     setError('');
 
     try {
-      const [{ summary: resumen }, movs] = await Promise.all([
+      const [{ summary: resumen, minRecharge: minimo }, movs] = await Promise.all([
         billingApi.summary(),
         billingApi.movements()
       ]);
       setSummary(resumen);
+      setMinRecharge(minimo);
       setMovements(movs);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo cargar el saldo.');
@@ -129,6 +133,11 @@ export const BalancePanel: React.FC<BalancePanelProps> = ({ isOpen, onClose, fir
             answer today is "ask us" — the operator credits the account once the
             payment is confirmed. That is smaller than a checkout, and unlike the
             modal it replaces, it is true.
+
+            The minimum is stated HERE, before the firm picks an amount, and not
+            as a rejection after it has already decided. A rule a client meets
+            by being told costs nothing; the same rule delivered as an error is
+            a wasted trip for both sides.
           */}
           <div className="bg-blue-50/60 border border-blue-200 rounded-xl p-3">
             <p className="text-[11px] font-bold text-blue-950 mb-1">¿Cómo recargo?</p>
@@ -137,6 +146,12 @@ export const BalancePanel: React.FC<BalancePanelProps> = ({ isOpen, onClose, fir
               saldo el mismo día; el movimiento queda registrado abajo con la fecha y quién lo
               aplicó.
             </p>
+            {minRecharge > 0 && (
+              <p className="text-[11px] text-blue-900 mt-1.5">
+                Recarga mínima: <strong>{pesos(minRecharge)}</strong>. El saldo se descuenta
+                únicamente por lo que uses, operación por operación.
+              </p>
+            )}
           </div>
 
           <div>
