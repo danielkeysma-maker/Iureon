@@ -1,7 +1,13 @@
 import { Request, Response } from 'express';
 import { randomUUID } from 'node:crypto';
 import { OpenRouterMultiEngineService, AgentExecutionStep } from './openrouter.service';
-import { BillingError, chargeOperation, ensureBalance } from '../billing/billing.service';
+import {
+  BillingError,
+  balanceOf,
+  chargeOperation,
+  ensureBalance,
+  maxOutputTokensFor
+} from '../billing/billing.service';
 
 const aiService = new OpenRouterMultiEngineService();
 
@@ -41,6 +47,17 @@ export const streamAgentDraftController = async (req: Request, res: Response): P
   // document cost across three engines rather than only what one stage did.
   const operationId = randomUUID();
 
+  /*
+   * The balance decides how long the document may be.
+   *
+   * Without this the model writes whatever it likes, and the charge either has
+   * to truncate a filing mid-sentence by a rule nobody was told, or land above
+   * what the firm can pay — work already done and unbillable. Capping at what
+   * the balance affords means a short draft always has a reason the lawyer can
+   * see: they ran out of credit, and they can recharge.
+   */
+  const maxDraftTokens = maxOutputTokensFor(await balanceOf(firmId as string));
+
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
@@ -58,6 +75,7 @@ export const streamAgentDraftController = async (req: Request, res: Response): P
         firmId: firmId || 'unknown-firm',
         userEmail: req.user?.email ?? 'desconocido',
         operationId,
+        maxDraftTokens,
         documentType: documentType || 'Contestación de Demanda',
         legalPrompt,
         expedienteId,
@@ -83,7 +101,14 @@ export const streamAgentDraftController = async (req: Request, res: Response): P
       description: `Borrador: ${result.title}`
     });
 
-    sendEvent('COMPLETED', { ...result, charged: cobro.charged, balance: cobro.balance });
+    sendEvent('COMPLETED', {
+      ...result,
+      charged: cobro.charged,
+      balance: cobro.balance,
+      // Sent so the screen can explain a charge above the ordinary price
+      // instead of leaving the lawyer to discover it in their movements.
+      costUsd: cobro.costUsd
+    });
     res.end();
   } catch (error: any) {
     console.error('[AGENT-CONTROLLER-ERROR]', error);

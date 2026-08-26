@@ -14,6 +14,8 @@ import { clavePrueba, crearFirmaConSesion } from '../../auth/__checks__/helpers'
 import {
   BillingError,
   PRICE_COP,
+  maxOutputTokensFor,
+  priceFor,
   balanceOf,
   chargeOperation,
   ensureBalance,
@@ -150,6 +152,45 @@ const PRECIO = PRICE_COP.BORRADOR;
   }
   check('no se puede cobrar sin saldo', sobregiro === 'INSUFFICIENT_CREDITS', sobregiro);
   check('y el saldo no queda negativo', (await balanceOf(B.user.firmId)) === 0, String(await balanceOf(B.user.firmId)));
+
+  /*
+   * ─── UN DOCUMENTO LARGO CUESTA MÁS ───────────────────────────────────────
+   *
+   * Con precio plano, todo escrito de más de ~27 páginas se redactaba a
+   * pérdida: cuesta $2.862 y se cobraban $2.000. El precio ahora tiene piso, no
+   * techo, y el margen se sostiene en cualquier extensión.
+   */
+  check('un documento corto paga el precio de piso', priceFor('BORRADOR', 0.05) === PRECIO, String(priceFor('BORRADOR', 0.05)));
+
+  const costoLargo = 0.7157; // ~40 páginas, medido contra los precios reales
+  const cobroLargo = priceFor('BORRADOR', costoLargo);
+  const margenLargo = (cobroLargo - costoLargo * 4000) / cobroLargo;
+
+  check('un documento extenso cobra más que el piso', cobroLargo > PRECIO, `$${cobroLargo}`);
+  check(
+    'y el margen se mantiene por encima del 50%',
+    margenLargo > 0.5,
+    `${(margenLargo * 100).toFixed(1)}%`
+  );
+  check(
+    'el costo nunca supera al cobro',
+    costoLargo * 4000 < cobroLargo,
+    `costo $${(costoLargo * 4000).toFixed(0)} vs cobro $${cobroLargo}`
+  );
+
+  /*
+   * ─── EL SALDO LIMITA LA EXTENSIÓN ────────────────────────────────────────
+   *
+   * Para que una firma no pueda generar lo que no puede pagar, ni recibir un
+   * escrito cortado por una regla que nadie le contó.
+   */
+  const topeSinSaldo = maxOutputTokensFor(0);
+  const topeChico = maxOutputTokensFor(5000);
+  const topeGrande = maxOutputTokensFor(500000);
+
+  check('sin saldo el tope es mínimo', (topeSinSaldo ?? 0) <= 512, String(topeSinSaldo));
+  check('con más saldo el tope crece', (topeChico ?? 0) > (topeSinSaldo ?? 0), `${topeSinSaldo} -> ${topeChico}`);
+  check('con saldo holgado no hay tope', topeGrande === undefined, String(topeGrande));
 
   // ─── Aislamiento ──────────────────────────────────────────────────────────
   const resumenA = await usageSummary(A.user.firmId);

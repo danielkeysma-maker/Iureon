@@ -26,6 +26,15 @@ export type PipelineRequest = WorkflowRequest & {
   firmId: string;
   userEmail: string;
   operationId: string;
+  /**
+   * How long a document this firm's balance can pay for, in output tokens.
+   *
+   * Undefined when the balance covers more than any sane filing, which is the
+   * ordinary case. Present it caps the drafting model — so a firm can never
+   * generate a document it cannot pay for, and a truncated draft always has a
+   * reason the lawyer can see and fix: they ran out of credit.
+   */
+  maxDraftTokens?: number;
 };
 
 export interface WorkflowRequest {
@@ -344,7 +353,8 @@ export class OpenRouterService {
     const { text: draft, usage } = await callOpenRouterWithUsage(
       ENGINE.OPUS,
       systemPrompt,
-      userMessage
+      userMessage,
+      req.maxDraftTokens
     );
 
     await recordUsage({

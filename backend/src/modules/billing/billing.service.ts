@@ -41,19 +41,86 @@ export class BillingError extends Error {
 }
 
 /**
- * What each operation costs a firm, in Colombian pesos.
+ * The floor price of each operation, in Colombian pesos.
  *
- * A FIXED PRICE, NOT A METERED ONE, AND THAT IS A PRODUCT DECISION. A lawyer
- * quoting a service needs to know what it costs before they run it; "between
- * 900 and 4.000 pesos depending on how long the judge spoke" is not a price
- * anybody can plan around. The real cost is metered anyway and recorded next to
- * the charge, so the margin is visible and this number can be corrected with
- * evidence instead of by feel.
+ * A FLOOR AND NOT A FLAT FEE, because a flat fee loses money on exactly the
+ * documents that matter most. Measured against the real model prices: a
+ * five-page contestación costs about $528 and a forty-page demanda about
+ * $2.862, so one price for both means the platform pays to write the long ones.
+ * Past roughly 27 pages every draft was a loss, and nothing capped the length.
+ *
+ * So the floor covers an ordinary document and anything longer is charged on
+ * what it actually cost — see `priceFor`. A lawyer understands this immediately
+ * because it is how they bill: a forty-page demanda is more work than a
+ * five-page memorial, and it is worth more.
  */
 export const PRICE_COP: Record<Operation, number> = {
   BORRADOR: 2000,
   TRANSCRIPCION: 3000,
   BUSQUEDA: 0
+};
+
+/**
+ * Pesos per dollar, for turning an upstream cost into a Colombian price.
+ *
+ * Deliberately generous rather than the day's exact rate: the alternative is a
+ * live FX lookup on every draft, which adds a dependency and a failure mode to
+ * the billing path in exchange for accuracy nobody needs at these amounts. A
+ * few points of drift are absorbed by the margin.
+ */
+const COP_PER_USD = 4000;
+
+/**
+ * What the platform charges over its own cost.
+ *
+ * 2.3 holds the margin at about 56% at every document length, which is the same
+ * margin the flat $2.000 gave on an ordinary draft. The price scales; the
+ * business does not change shape.
+ */
+const MARKUP = 2.3;
+
+/**
+ * What one completed operation costs, given what it really consumed.
+ *
+ * The floor wins for ordinary work, so the common case has one predictable
+ * price. Only a document long enough to cost more than the floor is charged on
+ * measurement — and by then the lawyer has a forty-page demanda in their hands,
+ * which is the moment a higher price is easiest to justify.
+ */
+export const priceFor = (operation: Operation, costUsd: number): number => {
+  const piso = PRICE_COP[operation];
+  if (piso <= 0) return 0;
+
+  const medido = Math.round(costUsd * COP_PER_USD * MARKUP);
+  return Math.max(piso, medido);
+};
+
+/**
+ * How long a document this balance can pay for, in output tokens.
+ *
+ * THE BALANCE IS THE LENGTH LIMIT, and that is what removes the ugly choice.
+ * Without it the model writes whatever it likes and the charge either truncates
+ * a filing mid-sentence or lands above what the firm can pay — work already
+ * done and unbillable. Capping the model at what the balance affords means a
+ * firm can never generate something it cannot pay for, and never has a document
+ * cut short by a rule it did not know about: it ran out of credit, which is a
+ * thing it can see and fix.
+ *
+ * Undefined when the balance covers more than any sane filing, so the ordinary
+ * case carries no cap at all.
+ */
+export const maxOutputTokensFor = (balanceCop: number): number | undefined => {
+  const disponibleUsd = balanceCop / MARKUP / COP_PER_USD;
+  // What the analysis stages and Opus's own input already consumed.
+  const restante = disponibleUsd - 0.05;
+  if (restante <= 0) return 256;
+
+  // Opus output, at 25 USD per million.
+  const tokens = Math.floor((restante / 25) * 1_000_000);
+
+  // Beyond this the cap stops being a protection and starts being a number
+  // nobody will ever reach — about 260 pages.
+  return tokens > 180_000 ? undefined : Math.max(512, tokens);
 };
 
 const requireDb = () => {
@@ -149,11 +216,28 @@ export const chargeOperation = async (input: {
   operation: Operation;
   operationId: string;
   description: string;
-}): Promise<{ charged: number; balance: number }> => {
+}): Promise<{ charged: number; balance: number; costUsd: number }> => {
   const db = requireDb();
-  const precio = PRICE_COP[input.operation];
 
-  if (precio <= 0) return { charged: 0, balance: await balanceOf(input.firmId) };
+  /*
+   * The price comes from what this operation actually consumed, floored at the
+   * ordinary price. Summed across every stage of the operation, because a draft
+   * is three model calls and the firm is charged for the document.
+   */
+  const { data: consumo } = await db
+    .from('ai_usage')
+    .select('cost_usd')
+    .eq('operation_id', input.operationId)
+    .eq('firm_id', input.firmId);
+
+  const costUsd = ((consumo ?? []) as { cost_usd: number }[]).reduce(
+    (total, fila) => total + Number(fila.cost_usd ?? 0),
+    0
+  );
+
+  const precio = priceFor(input.operation, costUsd);
+
+  if (precio <= 0) return { charged: 0, balance: await balanceOf(input.firmId), costUsd };
 
   const { data: nuevoSaldo, error } = await db.rpc('debit_firm_credits', {
     p_firm_id: input.firmId,
@@ -185,7 +269,12 @@ export const chargeOperation = async (input: {
     kind: 'CONSUMO',
     amount_cop: -precio,
     balance_after_cop: balance,
-    description: input.description,
+    // Says WHY it cost what it cost when it went above the floor, so a lawyer
+    // reading their movements is not left guessing why one draft cost triple.
+    description:
+      precio > PRICE_COP[input.operation]
+        ? `${input.description} (documento extenso)`
+        : input.description,
     actor_email: input.userEmail
   });
 
@@ -197,7 +286,7 @@ export const chargeOperation = async (input: {
     .eq('operation_id', input.operationId)
     .eq('firm_id', input.firmId);
 
-  return { charged: precio, balance };
+  return { charged: precio, balance, costUsd };
 };
 
 export interface UsageSummary {
