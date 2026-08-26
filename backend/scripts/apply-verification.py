@@ -48,7 +48,16 @@ FILE_FOR_BRANCH = {
 
 PREFIX_FOR_BRANCH = {b: b.lower() for b in FILE_FOR_BRANCH}
 
-VEREDICTOS = {'CORRECTO', 'TERMINO_ERRADO', 'ARTICULO_ERRADO', 'NORMA_DEROGADA', 'ILEGIBLE'}
+# INCOMPLETO earns its own verdict because CORRECTO was swallowing the defect
+# this catalogue actually has. Six entries so far published a deadline that was
+# accurate and useless: the court's clock, the counterparty's clock, the term to
+# file — while the one whose expiry destroys the client's right went unmentioned.
+# Under a two-way CORRECTO/ERRADO split those all read as correct, and the
+# correction ended up in a free-text note where no applicator could reach it.
+#
+# A term that omits the clock that kills the right is not a correct term.
+VEREDICTOS = {'CORRECTO', 'INCOMPLETO', 'TERMINO_ERRADO', 'ARTICULO_ERRADO',
+              'NORMA_DEROGADA', 'ILEGIBLE'}
 
 
 def slugify(text):
@@ -114,6 +123,12 @@ def main():
     errores = []
     cambios = []
     ilegibles = []
+    # Entries that WERE declared unverified and now carry a term read from an
+    # official source. Without this the correction lands in the research file
+    # and the generator still stamps NO_VERIFICADO, because `_meta.unverified`
+    # outranks the term text — which is exactly the fix made in 422fc5e working
+    # against itself. Verification has to be able to move in both directions.
+    resueltos = []
     resumen = {v: 0 for v in VEREDICTOS}
 
     for parche in parches:
@@ -143,13 +158,25 @@ def main():
             filename, item = index[rid]
 
             # A verdict that changes something must bring the evidence for it.
-            if veredicto in ('TERMINO_ERRADO', 'ARTICULO_ERRADO', 'NORMA_DEROGADA'):
+            if veredicto in ('INCOMPLETO', 'TERMINO_ERRADO', 'ARTICULO_ERRADO', 'NORMA_DEROGADA'):
                 if not (r.get('cita_verbatim') or '').strip():
                     errores.append('%s: %s corrige sin cita verbatim: %s' % (nombre, veredicto, rid))
                     continue
 
+                # A verdict that says something is wrong must also say what is
+                # right, in a field the applicator reads. Prose is not a patch.
+                if not any(r.get(k) for k in ('termino_correcto', 'termino_faltante',
+                                              'articulo_correcto', 'autoridad_correcta')):
+                    errores.append('%s: %s sin ninguna correccion estructurada: %s'
+                                   % (nombre, veredicto, rid))
+                    continue
+
             antes = {'term': item.get('term'), 'legal_basis': item.get('legal_basis'),
-                     'source_url': item.get('source_url')}
+                     'source_url': item.get('source_url'),
+                     'competent_authority': item.get('competent_authority')}
+
+            if veredicto != 'ILEGIBLE' and (r.get('termino_correcto') or r.get('termino_faltante')):
+                resueltos.append((filename, item['exact_name']))
 
             if veredicto == 'ILEGIBLE':
                 # Unverified means unverified: the term goes, and the reason is
@@ -165,6 +192,14 @@ def main():
                     item['legal_basis'] = r['articulo_correcto']
                 if r.get('source_url_oficial'):
                     item['source_url'] = r['source_url_oficial']
+                # A CORRECT term filed before the wrong court is still a lost
+                # case: the arbitration entries named the Tribunal Superior,
+                # which is the NATIONAL rule, while art. 68 sends international
+                # annulment to the Corte Suprema — inside a one-month window
+                # with no second chance. The verdict was CORRECTO and the defect
+                # sat in a free-text note, where no applicator could reach it.
+                if r.get('autoridad_correcta'):
+                    item['competent_authority'] = r['autoridad_correcta']
 
             despues = {'term': item.get('term'), 'legal_basis': item.get('legal_basis'),
                        'source_url': item.get('source_url')}
@@ -189,7 +224,7 @@ def main():
 
     for filename, rid, veredicto, antes, despues in cambios:
         print('\n  %s  [%s]' % (rid, veredicto))
-        for campo in ('legal_basis', 'term', 'source_url'):
+        for campo in ('legal_basis', 'term', 'source_url', 'competent_authority'):
             if antes[campo] != despues[campo]:
                 print('     %s:' % campo)
                 print('       - %s' % str(antes[campo])[:160])
@@ -199,10 +234,22 @@ def main():
         print('\n--dry: no se escribio nada.')
         return
 
-    escritos = set(f for f, _, _, _, _ in cambios) | set(por_archivo)
+    escritos = (set(f for f, _, _, _, _ in cambios) | set(por_archivo)
+                | set(f for f, _ in resueltos))
     for filename in sorted(escritos):
         path = os.path.join(RESEARCH_DIR, filename)
         data = cargados[filename]
+
+        # Clear the ones this pass managed to verify, before adding the new
+        # gaps: an entry can appear in both lists across successive passes.
+        nombres_resueltos = {n for f, n in resueltos if f == filename}
+        if nombres_resueltos:
+            meta = data.setdefault('_meta', {})
+            previos = meta.get('unverified') or []
+            meta['unverified'] = [x for x in previos if x.get('actuacion') not in nombres_resueltos]
+            quitados = len(previos) - len(meta['unverified'])
+            if quitados:
+                print('  %s: %d salieron de unverified (ya tienen termino oficial)' % (filename, quitados))
 
         if filename in por_archivo:
             meta = data.setdefault('_meta', {})
