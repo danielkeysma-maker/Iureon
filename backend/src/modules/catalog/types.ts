@@ -20,7 +20,8 @@ export type LegalBranch =
   | 'NOTARIAL'
   | 'CONTRATACION'
   | 'SUPERINTENDENCIAS'
-  | 'INTERNACIONAL';
+  | 'INTERNACIONAL'
+  | 'AGRARIO';
 
 /** Who authors the document. */
 /**

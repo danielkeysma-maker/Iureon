@@ -50,6 +50,7 @@ FILE_FOR_BRANCH = {
     'CONTRATACION': 'actuaciones-contratacion.json',
     'INTERNACIONAL': 'actuaciones-internacional.json',
     'SUPERINTENDENCIAS': 'actuaciones-superintendencias.json',
+    'AGRARIO': 'actuaciones-agrario.json',
 }
 
 # Mirrors the allowlist in catalog.check.ts. Duplicated on purpose: a merge that
@@ -217,6 +218,24 @@ def main():
         json.dumps(dest, ensure_ascii=False, indent=2) + '\n'
     )
     print('\nescrito: %s  (%d actuaciones)' % (FILE_FOR_BRANCH[rama], len(dest['actuaciones'])))
+
+    if nueva_rama:
+        # Deliberately NOT automated. A branch is a promise the drafting engine
+        # makes to a lawyer: every actuacion inside it resolves to a verified
+        # article and a deadline. Generating these four edits would let a branch
+        # appear in the product because a JSON file landed in a directory.
+        print()
+        print('RAMA NUEVA: falta registrarla a mano en cuatro sitios.')
+        print('  1. backend/scripts/build-catalog.py -> BRANCHES')
+        print("       ('%s'," % FILE_FOR_BRANCH[rama])
+        print("        '%s.ts'," % rama.lower().replace('_', '-'))
+        print("        '%s_CATALOG'," % rama)
+        print("        '%s'," % rama)
+        print("        '%s')" % rama.lower())
+        print("  2. backend/src/modules/catalog/types.ts -> LegalBranch: | '%s'" % rama)
+        print("  3. frontend/src/modules/catalog/branchLabels.ts -> BRANCH_LABELS['%s']" % rama)
+        print('  4. backend/scripts/{apply-verification,merge-actuaciones}.py -> FILE_FOR_BRANCH')
+
     print('Ahora: python backend/scripts/build-catalog.py')
 
 

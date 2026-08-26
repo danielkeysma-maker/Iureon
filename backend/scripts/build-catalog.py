@@ -109,6 +109,13 @@ BRANCHES = [
         'SUPERINTENDENCIAS',
         'superintendencias',
     ),
+    (
+        'actuaciones-agrario.json',
+        'agrario.ts',
+        'AGRARIO_CATALOG',
+        'AGRARIO',
+        'agrario',
+    ),
 ]
 
 
