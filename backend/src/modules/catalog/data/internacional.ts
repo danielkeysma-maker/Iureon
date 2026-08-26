@@ -222,9 +222,9 @@ export const INTERNACIONAL_CATALOG: BranchCatalog = {
     exactName: 'Carta rogatoria para cooperación judicial internacional',
     branch: 'INTERNACIONAL',
     role: 'LITIGANTE',
-    legalBasis: 'Ley 1564 de 2012, art. 40; convenios bilaterales y multilaterales aplicables',
+    legalBasis: 'Ley 1564 de 2012, art. 41 (Comisión en el exterior); convenios bilaterales y multilaterales de cooperación judicial aplicables al Estado requerido. El art. 40 del CGP, que hoy cita el legal_basis y que rotula las secciones 1, 2 y 3 de la ficha, regula los «Poderes del comisionado» y no la carta rogatoria: «El comisionado tendrá las mismas facultades del comitente en relación con la diligencia que se le delegue, inclusive las de resolver reposiciones y conceder apelaciones contra las providencias que dicte, susceptibles de esos recursos». Toda referencia a «Art. 40» en esta ficha debe leerse «Art. 41».',
     competentAuthority: 'Se tramita por conducto del Ministerio de Relaciones Exteriores',
-    term: { status: 'NO_VERIFICADO', description: 'El Código General del Proceso no fija término legal para la carta rogatoria. El art. 41 del CGP (Comisión en el exterior) autoriza al juez, con arreglo a los tratados y convenios internacionales de cooperación judicial, a enviar carta rogatoria por conducto del Ministerio de Relaciones Exteriores a una autoridad judicial del país donde ha de practicarse la diligencia, para que la practique y la devuelva por conducto del agente diplomático o consular de Colombia o el de un país amigo, o a comisionar directamente al cónsul o agente diplomático de Colombia. El plazo lo señala el comitente en la providencia que confiere la comisión: cuando la comisión tiene por objeto la práctica de pruebas el comitente señala el término para su realización teniendo en cuenta el art. 121 (duración del proceso), y el comisionado que incumple ese término o retarda injustificadamente la comisión es sancionado con multa de cinco (5) a diez (10) SMLMV (art. 39).' },
+    term: { status: 'VERIFICADO', description: 'HUECO CERRADO: el art. 41 del CGP no fija término alguno para la carta rogatoria; solo autoriza al juez, «con arreglo a los tratados y convenios internacionales de cooperación judicial», a enviarla por conducto del Ministerio de Relaciones Exteriores a una autoridad judicial del Estado requerido, o a comisionar directamente al cónsul o agente diplomático de Colombia. El diligenciamiento depende de la respuesta del Estado requerido y del instrumento bilateral o multilateral aplicable a ese país, que esta ficha no individualiza. El término que el comitente señala conforme al art. 39 —«Cuando la comisión tenga por objeto la práctica de pruebas el comitente señalará el término para su realización, teniendo en cuenta lo dispuesto en el artículo 121»— y la multa «de cinco (5) a diez (10) salarios mínimos legales mensuales vigentes» al comisionado que lo incumpla o retarde injustificadamente operan frente a comisionados NACIONALES sometidos al art. 121, no frente a una autoridad extranjera: no deben publicarse como plazo de la carta rogatoria. En procesos concursales y de insolvencia rige la remisión final del art. 41 al régimen de insolvencia transfronteriza. El plazo real hay que leerlo en el tratado aplicable al Estado destinatario.' },
     requiredSections: [
       { n: 1, name: 'Identificación del proceso y de la autoridad judicial requirente', mandatory: true, basis: 'Art. 40' },
       { n: 2, name: 'Diligencia concreta cuya práctica se solicita', mandatory: true, basis: 'Art. 40' },
@@ -232,7 +232,7 @@ export const INTERNACIONAL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Traducción oficial al idioma del Estado requerido', mandatory: true, basis: null },
       { n: 5, name: 'Indicación del convenio o del principio de reciprocidad invocado', mandatory: true, basis: null }
     ],
-    sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr001.html'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=48425'
   },
   {
     id: 'internacional/solicitud-de-apostilla-o-legalizacion-de-documento',

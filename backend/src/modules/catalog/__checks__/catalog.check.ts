@@ -846,10 +846,21 @@ if (!wellFormed.ok) {
 
 // A firm override must actually reach the drafting engine, and must carry its
 // provenance so nobody mistakes it for the shipped catalogue.
-const baseForMerge = catalogService.list().find((a) => a.term.status === 'NO_VERIFICADO');
+//
+// THE FIXTURE IS BUILT, NOT BORROWED, and it had to be. This used to search the
+// shipped catalogue for a NO_VERIFICADO entry to override — which worked only
+// for as long as the catalogue still had one. The last verification pass closed
+// the final ten, and the check failed: not because curation broke, but because
+// the data got better. A test that needs a defect in production data to run is
+// a test that rewards leaving the defect there.
+const baseSource = catalogService.list()[0];
+const baseForMerge = baseSource && {
+  ...baseSource,
+  term: { status: 'NO_VERIFICADO' as const, description: null }
+};
 
 if (!baseForMerge) {
-  console.error('FAIL curation: no NO_VERIFICADO actuación available to exercise the merge');
+  console.error('FAIL curation: el catálogo está vacío');
   failures++;
 } else {
   const verification: CatalogVerification = {

@@ -13,12 +13,7 @@
       "Los tratados de libre comercio, el arbitraje de inversión (CIADI) y la contratación internacional privada no están cubiertos.",
       "La restitución internacional de menores está catalogada en la rama FAMILIA (art. 22 num. 23 del CGP)."
     ],
-    "unverified": [
-      {
-        "actuacion": "Carta rogatoria para cooperación judicial internacional",
-        "reason": "La norma aplicable es el artículo 41 del CGP (\"Comisión en el exterior\"), no el artículo 40 que cita el catálogo, y ese artículo 41 no fija término alguno: se limita a autorizar al juez, \"con arreglo a los tratados y convenios internacionales de cooperación judicial\", a enviar carta rogatoria por conducto del Ministerio de Relaciones Exteriores o a comisionar directamente al cónsul o agente diplomático. El término de cumplimiento de la comisión que el comitente señala conforme al artículo 39 opera frente a comisionados nacionales sometidos al artículo 121; el diligenciamiento de una carta rogatoria depende de la respuesta del Estado requerido y del tratado bilateral o multilateral aplicable a ese país, que este catálogo no individualiza. No es posible leer un término en la norma sin identificar previamente el instrumento aplicable al Estado destinatario."
-      }
-    ]
+    "unverified": []
   },
   "actuaciones": [
     {
@@ -482,9 +477,9 @@
     {
       "exact_name": "Carta rogatoria para cooperación judicial internacional",
       "role": "LITIGANTE",
-      "legal_basis": "Ley 1564 de 2012, art. 40; convenios bilaterales y multilaterales aplicables",
+      "legal_basis": "Ley 1564 de 2012, art. 41 (Comisión en el exterior); convenios bilaterales y multilaterales de cooperación judicial aplicables al Estado requerido. El art. 40 del CGP, que hoy cita el legal_basis y que rotula las secciones 1, 2 y 3 de la ficha, regula los «Poderes del comisionado» y no la carta rogatoria: «El comisionado tendrá las mismas facultades del comitente en relación con la diligencia que se le delegue, inclusive las de resolver reposiciones y conceder apelaciones contra las providencias que dicte, susceptibles de esos recursos». Toda referencia a «Art. 40» en esta ficha debe leerse «Art. 41».",
       "competent_authority": "Se tramita por conducto del Ministerio de Relaciones Exteriores",
-      "term": "El Código General del Proceso no fija término legal para la carta rogatoria. El art. 41 del CGP (Comisión en el exterior) autoriza al juez, con arreglo a los tratados y convenios internacionales de cooperación judicial, a enviar carta rogatoria por conducto del Ministerio de Relaciones Exteriores a una autoridad judicial del país donde ha de practicarse la diligencia, para que la practique y la devuelva por conducto del agente diplomático o consular de Colombia o el de un país amigo, o a comisionar directamente al cónsul o agente diplomático de Colombia. El plazo lo señala el comitente en la providencia que confiere la comisión: cuando la comisión tiene por objeto la práctica de pruebas el comitente señala el término para su realización teniendo en cuenta el art. 121 (duración del proceso), y el comisionado que incumple ese término o retarda injustificadamente la comisión es sancionado con multa de cinco (5) a diez (10) SMLMV (art. 39).",
+      "term": "HUECO CERRADO: el art. 41 del CGP no fija término alguno para la carta rogatoria; solo autoriza al juez, «con arreglo a los tratados y convenios internacionales de cooperación judicial», a enviarla por conducto del Ministerio de Relaciones Exteriores a una autoridad judicial del Estado requerido, o a comisionar directamente al cónsul o agente diplomático de Colombia. El diligenciamiento depende de la respuesta del Estado requerido y del instrumento bilateral o multilateral aplicable a ese país, que esta ficha no individualiza. El término que el comitente señala conforme al art. 39 —«Cuando la comisión tenga por objeto la práctica de pruebas el comitente señalará el término para su realización, teniendo en cuenta lo dispuesto en el artículo 121»— y la multa «de cinco (5) a diez (10) salarios mínimos legales mensuales vigentes» al comisionado que lo incumpla o retarde injustificadamente operan frente a comisionados NACIONALES sometidos al art. 121, no frente a una autoridad extranjera: no deben publicarse como plazo de la carta rogatoria. En procesos concursales y de insolvencia rige la remisión final del art. 41 al régimen de insolvencia transfronteriza. El plazo real hay que leerlo en el tratado aplicable al Estado destinatario.",
       "required_sections": [
         {
           "n": 1,
@@ -517,7 +512,7 @@
           "basis": null
         }
       ],
-      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr001.html"
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=48425"
     },
     {
       "exact_name": "Solicitud de apostilla o legalización de documento",

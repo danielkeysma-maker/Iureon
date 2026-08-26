@@ -816,13 +816,13 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     exactName: 'Acto administrativo ficto positivo por silencio administrativo',
     branch: 'ADMINISTRATIVO',
     role: 'DESPACHO',
-    legalBasis: 'Ley 1437 de 2011, art. 84 (silencio positivo); art. 85 (procedimiento para invocarlo)',
+    legalBasis: 'Ley 1437 de 2011, art. 84 (silencio positivo); art. 85 (protocolización para invocarlo); art. 87 num. 5 (firmeza desde el día siguiente al de la protocolización); art. 97 (la revocación del acto ficto de carácter particular exige el consentimiento previo, expreso y escrito del titular)',
     competentAuthority: 'La autoridad ante la cual se presentó la petición',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'HUECO CERRADO: la norma NO fija la duración del silencio positivo. El art. 84 del CPACA solo lo admite «en los casos expresamente previstos en disposiciones legales especiales», de modo que la duración la fija cada disposición especial y no puede catalogarse un valor único. Lo que el artículo SÍ fija, y la ficha callaba, es el punto de partida del cómputo: «Los términos para que se entienda producida la decisión positiva presunta comienzan a contarse a partir del día en que se presentó la petición o recurso» (art. 84 inc. 2). RELOJ DEL INTERESADO, que la ficha tampoco traía: producido el silencio, el beneficio no se consolida solo — el art. 85 exige que quien se halle en esas condiciones «protocolizará la constancia o copia de que trata el artículo 15, junto con una declaración jurada de no haberle sido notificada la decisión dentro del término previsto», y solo entonces «la escritura y sus copias auténticas producirán todos los efectos legales de la decisión favorable que se pidió, y es deber de todas las personas y autoridades reconocerla así»; el acto queda en firme «desde el día siguiente al de la protocolización a que alude el artículo 85 para el silencio administrativo positivo» (art. 87 num. 5). RELOJ DE LA AUTORIDAD: el acto positivo presunto es revocable directamente, pero por ser de carácter particular y concreto le ampara el art. 97, que impide revocar un acto «bien sea expreso o ficto» sin el consentimiento previo, expreso y escrito del titular, debiendo la Administración demandarlo si el titular lo niega.' },
     requiredSections: [
       { n: 1, name: 'No aplica: se trata de un acto ficto, sin texto escrito', mandatory: false, basis: 'art. 84' }
     ],
-    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=41249'
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=41249'
   },
   {
     id: 'administrativo/decision-de-la-autoridad-sobre-la-peticion-de-extension-de-la-jurisprudencia',
@@ -1120,9 +1120,9 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     exactName: 'Solicitud de atención prioritaria de la petición',
     branch: 'ADMINISTRATIVO',
     role: 'LITIGANTE',
-    legalBasis: 'Ley 1755 de 2015, art. 20',
+    legalBasis: 'Ley 1755 de 2015, art. 20 (atención prioritaria); art. 14 y su parágrafo (términos de fondo y prórroga que no puede exceder del doble del inicialmente previsto); Ley 1437 de 2011, art. 83 (silencio negativo a los tres meses)',
     competentAuthority: 'La autoridad ante la que cursa la petición',
-    term: { status: 'NO_VERIFICADO', description: null },
+    term: { status: 'VERIFICADO', description: 'HUECO CERRADO: el art. 20 de la Ley 1755 de 2015 NO fija término alguno — ni al peticionario para pedir la prioridad, ni a la autoridad para decidir sobre ella. «De inmediato» (medidas de urgencia ante peligro inminente para la vida o la integridad) y «preferencialmente» (peticiones de periodistas) no son plazos computables. El plazo de fondo sigue siendo el del art. 14 según la modalidad de la petición, y es RELOJ DE LA AUTORIDAD: «Salvo norma legal especial y so pena de sanción disciplinaria, toda petición deberá resolverse dentro de los quince (15) días siguientes a su recepción»; las de documentos e información dentro de los diez (10) días, con silencio positivo expreso — «Si en ese lapso no se ha dado respuesta al peticionario, se entenderá, para todos los efectos legales, que la respectiva solicitud ha sido aceptada y, por consiguiente, la administración ya no podrá negar la entrega de dichos documentos», entregándose las copias dentro de los tres (3) días siguientes (art. 14 num. 1); las consultas dentro de los treinta (30) días (art. 14 num. 2). El parágrafo del art. 14 permite a la autoridad, informando antes del vencimiento, señalar un plazo razonable «que no podrá exceder del doble del inicialmente previsto». RELOJ DEL PETICIONARIO, que la ficha no publicaba: vencido el término sin respuesta, a los tres (3) meses de presentada la petición opera el silencio negativo del art. 83 del CPACA y desde ahí se abre la vía contenciosa. Artículo 20 declarado EXEQUIBLE, sin condicionamiento (Sentencia C-951 de 2014).' },
     requiredSections: [
       { n: 1, name: 'La designación de la autoridad a la que se dirige', mandatory: true, basis: 'Ley 1755 de 2015, art. 16 num. 1' },
       { n: 2, name: 'Los nombres y apellidos completos del solicitante y de su representante y/o apoderado, si es el caso, con indicación de su documento de identidad y de la dirección donde recibirá correspondencia', mandatory: true, basis: 'Ley 1755 de 2015, art. 16 num. 2' },

@@ -12,20 +12,7 @@
       "Los regímenes exceptuados del Estatuto General —empresas de servicios públicos domiciliarios, entidades financieras estatales, salud, ciencia y tecnología, entre otros— se rigen por el derecho privado y sus propias normas. No están cubiertos.",
       "Los plazos específicos de cada modalidad de selección —selección abreviada, concurso de méritos, mínima cuantía— están reglamentados en el Decreto 1082 de 2015 y no se verificaron aquí; sólo se catalogó la licitación pública de la Ley 80."
     ],
-    "unverified": [
-      {
-        "actuacion": "Solicitud de restablecimiento del equilibrio económico del contrato",
-        "reason": "El art. 27 de la Ley 80 de 1993 —leído en su texto vigente— no fija término alguno: se limita a ordenar que, roto el equilibrio por causas no imputables al afectado, «las partes adoptarán en el menor tiempo posible las medidas necesarias para su restablecimiento». Los arts. 4 num. 8 y 5 num. 1 tampoco señalan plazo. El límite temporal que se maneja en la práctica —dejar la salvedad al suscribir el acta de liquidación, so pena de que la reclamación se entienda renunciada— es de origen jurisprudencial del Consejo de Estado, no de la norma, y el término de caducidad de dos (2) años de las controversias contractuales pertenece a la etapa judicial (CPACA, art. 164), no a esta petición ante la entidad. No se cataloga un término que la norma no contiene."
-      },
-      {
-        "actuacion": "Solicitud de adición o prórroga del contrato estatal",
-        "reason": "El parágrafo del art. 40 de la Ley 80 de 1993 dice únicamente: «Los contratos no podrán adicionarse en más del 50 por ciento de su valor inicial». Es un límite de CUANTÍA, no un término. Ni ese parágrafo ni el resto del art. 40 fijan plazo para solicitar o suscribir la adición o la prórroga. La regla de que debe pedirse antes del vencimiento del plazo de ejecución deriva de que un contrato ya vencido no puede prorrogarse, no de un plazo legal expreso; el cronograma concreto lo fija el pliego o el propio contrato. No se cataloga un término inexistente en la norma."
-      },
-      {
-        "actuacion": "Resolución de declaratoria de desierta",
-        "reason": "El art. 25 num. 18 de la Ley 80 de 1993 —vigente, con la sola derogatoria de la expresión «concurso» por el art. 32 de la Ley 1150 de 2007— establece la causal («motivos o causas que impidan la escogencia objetiva») y el deber de motivación expresa y detallada, pero NO señala término alguno para expedir el acto. La oportunidad se agota dentro del plazo para adjudicar, y ese plazo lo fija el PLIEGO DE CONDICIONES, no la ley (Ley 80, art. 30). Sin leer el pliego del proceso concreto no puede afirmarse un término."
-      }
-    ]
+    "unverified": []
   },
   "actuaciones": [
     {
@@ -305,9 +292,9 @@
     {
       "exact_name": "Solicitud de restablecimiento del equilibrio económico del contrato",
       "role": "LITIGANTE",
-      "legal_basis": "Ley 80 de 1993, arts. 4 num. 8, 5 num. 1 y 27",
+      "legal_basis": "Ley 80 de 1993, arts. 4 num. 8, 5 num. 1 y 27; Ley 1437 de 2011, art. 164 num. 2 lit. j) (caducidad de dos años de las controversias contractuales)",
       "competent_authority": "Entidad estatal contratante",
-      "term": null,
+      "term": "HUECO CERRADO en la petición ante la entidad: el art. 27 de la Ley 80 de 1993 NO fija término; se limita a ordenar que «las partes adoptarán en el menor tiempo posible las medidas necesarias para su restablecimiento». Tampoco lo fijan los arts. 4 num. 8 ni 5 num. 1. RELOJ DEL CONTRATISTA, que la ficha callaba y que sí es legal y computable: la reclamación judicial caduca a los dos (2) años — «En las relativas a contratos el término para demandar será de dos (2) años que se contarán a partir del día siguiente a la ocurrencia de los motivos de hecho o de derecho que les sirvan de fundamento» (Ley 1437 de 2011, art. 164 num. 2 lit. j). El mismo literal fija el dies a quo según el contrato: «i) En los de ejecución instantánea desde el día siguiente a cuando se cumplió o debió cumplirse el objeto del contrato; ii) En los que no requieran de liquidación, desde el día siguiente al de la terminación del contrato por cualquier causa; iii) En los que requieran de liquidación y esta sea efectuada de común acuerdo por las partes, desde el día siguiente al de la firma del acta; iv) En los que requieran de liquidación y esta sea efectuada unilateralmente por la administración, desde el día siguiente al de la ejecutoria del acto administrativo que la apruebe; v) En los que requieran de liquidación y esta no se logre por mutuo acuerdo o no se practique por la administración unilateralmente, una vez cumplido el término de dos (2) meses contados a partir del vencimiento del plazo convenido para hacerlo bilateralmente o, en su defecto, del término de los cuatro (4) meses siguientes a la terminación del contrato». La carga de dejar la salvedad al suscribir el acta de liquidación, so pena de entenderse renunciada la reclamación, es jurisprudencia del Consejo de Estado y no texto de la norma: no se cataloga como término legal.",
       "required_sections": [
         {
           "n": 1,
@@ -345,9 +332,9 @@
     {
       "exact_name": "Solicitud de adición o prórroga del contrato estatal",
       "role": "LITIGANTE",
-      "legal_basis": "Ley 80 de 1993, art. 40 par.",
+      "legal_basis": "Ley 80 de 1993, art. 40, parágrafo (límite de cuantía: el 50% del valor inicial expresado en salarios mínimos legales mensuales; incisos adicionados por el art. 8 del Decreto 537 de 2020, de vigencia atada a la Emergencia Sanitaria por COVID-19)",
       "competent_authority": "Entidad estatal contratante",
-      "term": null,
+      "term": "HUECO CERRADO: el parágrafo del art. 40 de la Ley 80 de 1993 fija un límite de CUANTÍA, no un término. Ni ese parágrafo ni el resto del art. 40 señalan plazo para solicitar o suscribir la adición o la prórroga: el cronograma lo fijan el contrato y el pliego, y la regla práctica de pedirla antes del vencimiento del plazo de ejecución deriva de que un contrato ya vencido no puede prorrogarse, no de un plazo legal expreso. PRECISIÓN DEL TEXTO OFICIAL que la ficha recortaba: el límite del cincuenta por ciento (50%) va referido al valor inicial «expresado éste en salarios mínimos legales mensuales», no al valor nominal; y el mismo parágrafo limita el pago anticipado y el anticipo, cuyo «monto no podrá exceder del cincuenta por ciento (50%) del valor del respectivo contrato». EXCEPCIÓN DE VIGENCIA AGOTADA, que consta en el texto oficial: los incisos adicionados por el art. 8 del Decreto 537 de 2020 permitieron adicionar «sin limitación al valor» los contratos relacionados con la mitigación de la pandemia, pero solo «durante la vigencia de la Emergencia Sanitaria declarada por el Ministerio de Salud y Protección Social» y «durante el término que dicho estado esté vigente»: no habilita adiciones hoy.",
       "required_sections": [
         {
           "n": 1,
@@ -683,9 +670,9 @@
     {
       "exact_name": "Resolución de declaratoria de desierta",
       "role": "DESPACHO",
-      "legal_basis": "Ley 80 de 1993, art. 25 num. 18; Ley 1150 de 2007",
+      "legal_basis": "Ley 80 de 1993, art. 25 num. 18 (causal y deber de motivación expresa y detallada) y art. 30 num. 9 (oportunidad: dentro del mismo término de adjudicación fijado en el pliego, prorrogable por un término total no mayor a la mitad del inicial); Ley 1150 de 2007, art. 32 (derogatoria de la expresión «concurso»)",
       "competent_authority": "Entidad estatal contratante",
-      "term": null,
+      "term": "HUECO PARCIALMENTE CERRADO: la ley NO fija un plazo en días para expedir la declaratoria de desierta, pero SÍ fija su marco, que la ficha no citaba — «Dentro del mismo término de adjudicación, podrá declararse desierta la licitación o concurso conforme a lo previsto en este estatuto» (art. 30 num. 9 inc. 3). Ese término de adjudicación lo señala el PLIEGO DE CONDICIONES «teniendo en cuenta su naturaleza, objeto y cuantía», y solo puede prorrogarlo el jefe o representante de la entidad, antes de su vencimiento, «por un término total no mayor a la mitad del inicialmente fijado». Vencido ese término sin acto de adjudicación ni de declaratoria de desierta, la entidad pierde la oportunidad. Causal y motivación: «La declaratoria de desierta de la licitación o concurso únicamente procederá por motivos o causas que impidan la escogencia objetiva y se declarará en acto administrativo en el que se señalarán en forma expresa y detallada las razones que han conducido a esa decisión» (art. 25 num. 18). La expresión «concurso» de ambos artículos fue derogada por el art. 32 de la Ley 1150 de 2007. Sin leer el pliego del proceso concreto no puede afirmarse un número de días: el término existe, pero su medida es contractual, no legal.",
       "required_sections": [
         {
           "n": 1,
