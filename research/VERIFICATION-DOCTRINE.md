@@ -46,12 +46,27 @@ Nunca completes con lo que "sabes".
 
 ## 3. Una fuente oficial también puede estar desactualizada
 
-Comprobado en este proyecto:
+### Y "la fuente está truncada" suele ser tu lector, no la fuente
+
+**Corregido el 2026-08-26, y era una regla escrita de este proyecto.** Estaba
+anotado que `funcionpublica` truncaba la Ley 906 cerca del art. 100 y publicaba
+el Código de Comercio solo hasta el art. 159. **Es falso.** Bajando el HTML crudo
+—1,2 MB— aparece el Código de Comercio completo hasta el art. 2199, con 1742
+artículos, incluidos el 191, el 218 y el 447. Comprobado directamente.
+
+Lo que truncaba era el lector de la herramienta de fetch. Dos pasadas anteriores
+declararon fichas ilegibles por eso, y diez huecos que parecían cerrados se
+cerraron el día que alguien descargó el archivo entero.
+
+**Antes de dar una norma por ilegible, descarga el HTML crudo y cuenta los
+artículos.** Una ausencia afirmada exige decir dónde se buscó — y "la
+herramienta no me lo mostró" no es "la fuente no lo tiene".
+
+### Lo que sí está comprobado
 
 - `funcionpublica` sirve el art. 159 **original** de la Ley 769 de 2002, no el
-  reformado por el Decreto Ley 019 de 2012 art. 206.
-- Trunca la Ley 906 de 2004 cerca del art. 100.
-- Publica el Código de Comercio solo hasta el art. 159.
+  reformado por el Decreto Ley 019 de 2012 art. 206. Ese sí es un problema de
+  contenido, no de lectura.
 - `secretariasenado` guarda sus notas de vigencia en un JS aparte
   (`basedoc/js/<norma>.js`): sin descargarlo, el texto **no muestra qué reformas
   trae**. Fue así como se encontraron cuatro reformas vigentes que ninguna ficha
