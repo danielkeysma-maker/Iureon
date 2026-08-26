@@ -29,6 +29,7 @@ Then regenerate:
 import io
 import json
 import os
+import re
 import sys
 import urllib.parse
 
@@ -90,16 +91,38 @@ def main():
     src = json.load(io.open(src_path, encoding='utf-8'))
     rama = (src.get('rama') or src.get('branch') or '').upper()
 
-    if rama not in FILE_FOR_BRANCH:
-        raise SystemExit('FATAL: rama desconocida %r. Debe ser una de: %s'
-                         % (rama, ', '.join(sorted(FILE_FOR_BRANCH))))
+    nueva_rama = rama not in FILE_FOR_BRANCH
+
+    if nueva_rama and '--nueva' not in sys.argv:
+        raise SystemExit(
+            'FATAL: rama desconocida %r.\n'
+            'Si es una rama NUEVA, vuelve a correr con --nueva y este script\n'
+            'creara su archivo de investigacion y te dira que codigo falta tocar.\n'
+            'Ramas conocidas: %s' % (rama, ', '.join(sorted(FILE_FOR_BRANCH))))
+
+    if nueva_rama:
+        if not re.match(r'^[A-Z][A-Z_]*$', rama):
+            raise SystemExit('FATAL: %r no sirve como clave de rama. Solo A-Z y _.' % rama)
+        FILE_FOR_BRANCH[rama] = 'actuaciones-%s.json' % rama.lower().replace('_', '-')
 
     nuevas = src.get('actuaciones') or []
     if not nuevas:
         raise SystemExit('FATAL: el archivo no trae actuaciones')
 
     dest_path = os.path.join(RESEARCH_DIR, FILE_FOR_BRANCH[rama])
-    dest = json.load(io.open(dest_path, encoding='utf-8'))
+
+    if nueva_rama:
+        if os.path.exists(dest_path):
+            raise SystemExit('FATAL: %s ya existe pero la rama no esta registrada. '
+                             'Revisa a mano antes de seguir.' % FILE_FOR_BRANCH[rama])
+        dest = {'_meta': {'branch': rama,
+                          'verified_at': src.get('verified_at', ''),
+                          'source_of_truth': src.get('vigencia', ''),
+                          'gaps': [],
+                          'unverified': []},
+                'actuaciones': []}
+    else:
+        dest = json.load(io.open(dest_path, encoding='utf-8'))
 
     existentes = {a['exact_name'] for a in dest.get('actuaciones', [])}
     nombres_nuevos = set()
