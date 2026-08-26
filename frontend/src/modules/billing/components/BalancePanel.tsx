@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowDownRight, ArrowUpRight, CreditCard, RefreshCw, X } from 'lucide-react';
-import { billingApi, type BillingSummary, type Movement } from '../billing.api';
+import { billingApi, type BillingSummary, type CheckoutIntent, type Movement } from '../billing.api';
 
 interface BalancePanelProps {
   isOpen: boolean;
@@ -42,6 +42,8 @@ export const BalancePanel: React.FC<BalancePanelProps> = ({ isOpen, onClose, fir
   const [movements, setMovements] = React.useState<Movement[]>([]);
   const [cargando, setCargando] = React.useState(false);
   const [error, setError] = React.useState('');
+  const [monto, setMonto] = React.useState('');
+  const [abriendo, setAbriendo] = React.useState(false);
 
   const cargar = React.useCallback(async () => {
     setCargando(true);
@@ -61,6 +63,59 @@ export const BalancePanel: React.FC<BalancePanelProps> = ({ isOpen, onClose, fir
       setCargando(false);
     }
   }, []);
+
+  /*
+   * Hands the browser off to Wompi's checkout.
+   *
+   * A form POST and not a fetch, because the client has to LAND on Wompi's page
+   * to type their card: an XHR would fetch the checkout HTML into this tab and
+   * show nothing. Every field comes from the server's intent — including the
+   * signature, which is what makes editing any of them produce a checkout Wompi
+   * refuses.
+   */
+  const irAlCheckout = (intent: CheckoutIntent): void => {
+    const form = document.createElement('form');
+    form.method = 'GET';
+    form.action = 'https://checkout.wompi.co/p/';
+
+    const campos: Record<string, string> = {
+      'public-key': intent.publicKey,
+      currency: intent.currency,
+      'amount-in-cents': String(intent.amountInCents),
+      reference: intent.reference,
+      'signature:integrity': intent.signature
+    };
+
+    // Only when configured: an empty redirect-url sends the client to a blank
+    // page after paying, which reads as a failed payment.
+    if (intent.redirectUrl) campos['redirect-url'] = intent.redirectUrl;
+
+    Object.entries(campos).forEach(([nombre, valor]) => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = nombre;
+      input.value = valor;
+      form.appendChild(input);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
+  };
+
+  const recargar = async () => {
+    const valor = Number(monto);
+    if (!valor) return;
+
+    setAbriendo(true);
+    setError('');
+
+    try {
+      irAlCheckout(await billingApi.startRecharge(valor));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudo iniciar la recarga.');
+      setAbriendo(false);
+    }
+  };
 
   React.useEffect(() => {
     if (isOpen) void cargar();
@@ -150,6 +205,55 @@ export const BalancePanel: React.FC<BalancePanelProps> = ({ isOpen, onClose, fir
               <p className="text-[11px] text-blue-900 mt-1.5">
                 Recarga mínima: <strong>{pesos(minRecharge)}</strong>. El saldo se descuenta
                 únicamente por lo que uses, operación por operación.
+              </p>
+            )}
+          </div>
+
+          {/*
+            The recharge, for real this time.
+
+            What stood here before was a setTimeout that announced a receipt for
+            money nobody had paid. This sends the amount to the server, which
+            writes down what it promises to credit BEFORE the client pays and
+            signs it, and then hands the browser a checkout it cannot alter.
+            Nothing is credited here — the balance moves when Wompi says the
+            card went through, and only then.
+          */}
+          <div className="border border-slate-200 rounded-xl p-3">
+            <label className="block text-[11px] font-bold text-slate-900 mb-1.5">
+              Recargar saldo
+            </label>
+
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] text-slate-400">
+                  $
+                </span>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={monto}
+                  /* Only digits: a thousands separator typed by hand becomes a
+                     different number once parsed, and the amount is money. */
+                  onChange={(e) => setMonto(e.target.value.replace(/[^\d]/g, ''))}
+                  placeholder={String(minRecharge || 100000)}
+                  className="w-full pl-6 pr-2 py-1.5 text-[11px] border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-900"
+                />
+              </div>
+
+              <button
+                onClick={() => void recargar()}
+                disabled={abriendo || Number(monto) < minRecharge}
+                className="px-3 py-1.5 bg-blue-950 text-white text-[11px] font-bold rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:bg-blue-900 shrink-0"
+              >
+                {abriendo ? 'Abriendo…' : 'Pagar'}
+              </button>
+            </div>
+
+            {/* Says why the button is disabled, instead of leaving it dead. */}
+            {monto !== '' && Number(monto) < minRecharge && (
+              <p className="text-[10px] text-slate-500 mt-1">
+                El mínimo es {pesos(minRecharge)}.
               </p>
             )}
           </div>

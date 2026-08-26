@@ -27,6 +27,25 @@ export interface Movement {
   createdAt: string;
 }
 
+/** What the Wompi checkout needs, all of it decided by the server. */
+export interface CheckoutIntent {
+  reference: string;
+  amountInCents: number;
+  currency: 'COP';
+  publicKey: string;
+  /** Signs the amount so editing it in the page produces a checkout Wompi rejects. */
+  signature: string;
+  redirectUrl: string;
+  sandbox: boolean;
+}
+
+export interface Recharge {
+  reference: string;
+  amountCop: number;
+  status: string;
+  createdAt: string;
+}
+
 export const billingApi = {
   summary: () =>
     httpClient.get<{
@@ -37,5 +56,17 @@ export const billingApi = {
     }>('/api/billing/summary'),
 
   movements: () =>
-    httpClient.get<{ movements: Movement[] }>('/api/billing/movements').then((r) => r.movements)
+    httpClient.get<{ movements: Movement[] }>('/api/billing/movements').then((r) => r.movements),
+
+  /*
+   * The amount is sent, but not trusted: the server bounds it by the minimum
+   * and signs it, so what the checkout charges is what the server decided.
+   */
+  startRecharge: (amount: number) =>
+    httpClient
+      .post<{ intent: CheckoutIntent }>('/api/billing/recharge', { body: { amount } })
+      .then((r) => r.intent),
+
+  recharges: () =>
+    httpClient.get<{ recharges: Recharge[] }>('/api/billing/recharges').then((r) => r.recharges)
 };

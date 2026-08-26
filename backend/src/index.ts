@@ -18,6 +18,7 @@ import { searchPublicRoutes, searchRoutes } from './modules/search/search.routes
 import { draftsRoutes } from './modules/drafts/drafts.routes';
 import { transcriptionPublicRoutes, transcriptionRoutes } from './modules/transcription/transcription.routes';
 import { catalogPublicRoutes, catalogRoutes } from './modules/catalog/catalog.routes';
+import { wompiPublicRoutes, wompiRoutes } from './modules/billing/wompi/wompi.routes';
 import { embeddingsService } from './modules/embeddings/embeddings.service';
 import { EMBEDDING_DIMENSIONS } from './modules/embeddings/types';
 
@@ -61,6 +62,15 @@ app.use('/api', transcriptionPublicRoutes);
 app.use('/api', authPublicRoutes);
 
 /*
+ * Wompi confirms a payment by calling us, and it holds no session to do it
+ * with. The webhook is therefore public and authenticated by the checksum in
+ * its own body — see `eventoEsAutentico`. Mounted here, before the tenant
+ * middleware, because behind it every confirmation would be rejected as
+ * unauthenticated and no recharge would ever be credited.
+ */
+app.use('/api', wompiPublicRoutes);
+
+/*
  * THE TENANT NOW COMES FROM THE TOKEN, NOT FROM A HEADER.
  *
  * This used to be `tenantMiddleware`, which read `x-firm-id` and believed it.
@@ -101,6 +111,7 @@ app.use('/api', draftsRoutes);
 app.use('/api', transcriptionRoutes);
 app.use('/api', clientsRoutes);
 app.use('/api', billingRoutes);
+app.use('/api', wompiRoutes);
 app.use('/api', catalogRoutes);
 
 // Servidor Express

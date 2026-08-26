@@ -28,6 +28,8 @@ jobs:
       - run: npm ci
       - name: Typecheck
         run: npx tsc --noEmit
+      - name: Payment gateway guard (no forgeable webhook)
+        run: npm run check:wompi
       - name: Catalogue correctness checks
         run: npm run check:catalog
       - name: Embeddings guard (no fabricated vectors)
