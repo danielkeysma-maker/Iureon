@@ -10,12 +10,22 @@
       "TRANSITO: ninguna actuación verificada. Falta leer verbatim la Ley 769 de 2002 (arts. 26, 125, 132, 135, 136, 137, 142, 159), la Ley 1383 de 2010, la Ley 1843 de 2017 (fotomultas, arts. 8 y 10) y la Sentencia C-038 de 2020 de la Corte Constitucional para determinar qué cayó exactamente sobre la solidaridad del propietario.",
       "ADMINISTRATIVO — términos no verificados: plazo de traslado para contestar la demanda (art. 172 y ss.); plazos de los recursos judiciales de apelación (art. 244), súplica (art. 246), revisión (art. 251) y unificación (art. 260); término de caducidad de la pérdida de investidura; término del medio de control de protección de derechos e intereses colectivos; requisitos y trámite de la conciliación extrajudicial en la Ley 640 de 2001; texto completo de la Ley 1755 de 2015 (derecho de petición, arts. 13-33) — NO se verificó ninguno de sus artículos, por lo que el derecho de petición NO se incluyó en este archivo.",
       "ADMINISTRATIVO — required_sections: sólo están verificados verbatim los de la demanda (art. 162), anexos (art. 166), recursos en vía gubernativa (art. 77), contestación (art. 175, numerales 1-5 leídos), petición de extensión ante la autoridad (art. 102) y solicitud de extensión ante el Consejo de Estado (art. 269). Las demás entradas llevan required_sections derivadas de esos mismos artículos por remisión, no de un artículo propio.",
-      "No se verificaron actuaciones de notificación (arts. 66-73, 197-205) ni el régimen de firmeza (art. 87)."
+      "No se verificaron actuaciones de notificación (arts. 66-73, 197-205) ni el régimen de firmeza (art. 87).",
+      "DERECHO DE PETICION - no catalogada: Acción de tutela por violación del derecho de petición. No se cataloga porque la Ley 1755 de 2015 no la regula: ninguno de los arts. 13 a 33 la menciona ni fija término para acudir a ella. Su régimen está en el art. 86 de la Constitución Política y en el Decreto 2591 de 1991, que no se verificaron en esta consulta. ADVERTENCIA DE RELOJ: los términos de 15, 10 y 30 días del art. 14 son de la AUTORIDAD para responder; su vencimiento habilita el reclamo del peticionario, pero el plazo del peticionario para tutelar no está en esta norma y no puede deducirse de ella.",
+      "DERECHO DE PETICION - no catalogada: Petición ante empresas de servicios públicos domiciliarios (término especial). El art. 33 extiende a esas empresas las disposiciones sobre derecho de petición «sin perjuicio de lo dispuesto en leyes especiales», y el art. 14 abre con «Salvo norma legal especial». El régimen de peticiones, quejas y recursos de los servicios públicos domiciliarios está en la Ley 142 de 1994, que no se verificó en esta consulta. La ficha catalogada refleja únicamente el término supletivo de la Ley 1755 de 2015; el término especial de la Ley 142 queda sin verificar y debe confirmarse en su propia norma antes de usarse.",
+      "DERECHO DE PETICION - no catalogada: Recurso de reposición contra el acto que decreta el desistimiento tácito. El art. 17 inc. 4 dispone que contra ese acto «únicamente procede recurso de reposición», pero NO fija su término: el plazo para interponerlo lo señala el art. 76 de la Ley 1437 de 2011, que no forma parte del Título II sustituido por la Ley 1755 de 2015 y no se leyó en esta consulta. Por eso no se cataloga como ficha autónoma con término; corresponde a la ficha general de recursos del CPACA en la rama ADMINISTRATIVO.",
+      "DERECHO DE PETICION (Ley 1755 de 2015), verificado el 2026-08-26: VIGENTE. La Ley Estatutaria 1755 de 30 de junio de 2015, por su art. 1, sustituyó el Título II —Derecho de Petición, Capítulos I, II y III, artículos 13 a 33— de la Parte Primera de la Ley 1437 de 2011 (CPACA). Su art. 2 dispone que «rige a partir de la fecha de su promulgación y deroga las disposiciones que le sean contrarias». El texto íntegro de los arts. 13 a 33 se leyó en el Gestor Normativo de la Función Pública (norma.php?i=65334). CONTROL PREVIO — SENTENCIA C-951 DE 2014: se leyó la parte resolutiva completa en corteconstitucional.gov.co/relatoria/2014/C-951-14.htm. La Corte declaró EXEQUIBLE el proyecto de ley estatutaria (núm. 65 de 2012 Senado, 227 de 2012 Cámara) por haber sido expedido conforme al procedimiento constitucional, y exequible su título; declaró EXEQUIBLES sin condicionamiento los arts. 14, 17, 18, 19, 20, 21, 23, 25, 27, 28, 29, 30 y 33 (numeral tercero) —de modo que el art. 14, que fija TODOS los términos catalogados aquí, quedó exequible puro y simple—; art. 13 EXEQUIBLE con excepción de la expresión «en relación a (sic) las entidades dedicadas a su protección o formación», declarada exequible «siempre y cuando no excluya la posibilidad de que los menores de edad presenten directamente peticiones dirigidas a otras entidades para el pleno ejercicio de sus derechos fundamentales» (numeral cuarto); art. 15: INEXEQUIBLES las expresiones «ante el funcionario competente» del inciso primero y «o ante el servidor público competente» del parágrafo 3, y EXEQ"
     ],
     "field_notes": {
       "term": "null significa que la norma no fija un término o que no se verificó. Todo término presente en este archivo fue leído verbatim en el texto oficial.",
       "required_sections": "Arreglo ordenado; 'mandatory': true marca la sección cuya omisión es causal típica de inadmisión o de fracaso del cargo."
-    }
+    },
+    "unverified": [
+      {
+        "actuacion": "Solicitud de atención prioritaria de la petición",
+        "reason": "El art. 20 de la Ley 1755 de 2015 —leído literalmente y declarado EXEQUIBLE sin condicionamiento por la C-951 de 2014, numeral tercero— ordena que las autoridades «darán atención prioritaria a las peticiones de reconocimiento de un derecho fundamental cuando deban ser resueltas para evitar un perjuicio irremediable al peticionario» y que, ante peligro inminente para la vida o la integridad, la autoridad «adoptará de inmediato las medidas de urgencia necesarias para conjurar dicho peligro»; pero NO fija término en días, ni al peticionario para solicitar la prioridad, ni a la autoridad para decidir sobre ella. «De inmediato» y «preferencialmente» —peticiones de periodistas— no son plazos computables. No se cataloga un término que la norma no contiene: el plazo de fondo sigue siendo el del art. 14 según la modalidad de la petición."
+      }
+    ]
   },
   "actuaciones": [
     {
@@ -2727,6 +2737,1014 @@
       ],
       "notes": "Sólo se verificó el encabezado del art. 270: «Para los efectos de este Código se tendrán como sentencias de unificación...». La enumeración concreta de cuáles son NO se leyó verbatim.",
       "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1437_2011_pr006.html"
+    },
+    {
+      "exact_name": "Petición de interés general",
+      "area": "ADMINISTRATIVO",
+      "role": "LITIGANTE",
+      "legal_basis": "Constitución Política, art. 23; Ley 1755 de 2015, arts. 13, 14 y 16 (sustitutivos de los arts. 13, 14 y 16 de la Ley 1437 de 2011)",
+      "competent_authority": "La autoridad a la que se dirige la petición (Ley 1755 de 2015, art. 16 num. 1)",
+      "term": "RELOJ DE LA AUTORIDAD, no del peticionario. El art. 13 reconoce el derecho a presentar peticiones respetuosas «por motivos de interés general o particular, y a obtener pronta resolución completa y de fondo sobre la misma»; no fija plazo alguno al peticionario para presentarla: puede presentarse en cualquier tiempo. El plazo corre contra la autoridad: art. 14, «Salvo norma legal especial y so pena de sanción disciplinaria, toda petición deberá resolverse dentro de los quince (15) días siguientes a su recepción». Excepcionalmente la autoridad puede ampliarlo (art. 14 par.), informando al interesado antes del vencimiento y sin que el nuevo plazo «podrá exceder del doble del inicialmente previsto». Si la autoridad no es competente, los términos «se contarán a partir del día siguiente a la recepción de la Petición por la autoridad competente» (art. 21). Ninguna norma de la Ley 1755 de 2015 fija término al peticionario para insistir ni para acudir a la acción de tutela.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "La designación de la autoridad a la que se dirige",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 1"
+        },
+        {
+          "n": 2,
+          "name": "Los nombres y apellidos completos del solicitante y de su representante y/o apoderado, si es el caso, con indicación de su documento de identidad y de la dirección donde recibirá correspondencia",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "El objeto de la petición",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 3"
+        },
+        {
+          "n": 4,
+          "name": "Las razones en las que fundamenta su petición",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 4"
+        },
+        {
+          "n": 5,
+          "name": "La relación de los documentos que desee presentar para iniciar el trámite",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 5"
+        },
+        {
+          "n": 6,
+          "name": "La firma del peticionario cuando fuere el caso",
+          "mandatory": false,
+          "basis": "Ley 1755 de 2015, art. 16 num. 6"
+        }
+      ],
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=65334"
+    },
+    {
+      "exact_name": "Petición de interés particular",
+      "area": "ADMINISTRATIVO",
+      "role": "LITIGANTE",
+      "legal_basis": "Constitución Política, art. 23; Ley 1755 de 2015, arts. 13, 14 y 16",
+      "competent_authority": "La autoridad a la que se dirige la petición (Ley 1755 de 2015, art. 16 num. 1)",
+      "term": "RELOJ DE LA AUTORIDAD. El peticionario no tiene plazo: el art. 13 permite pedir «por motivos de interés general o particular» y precisa que mediante el derecho de petición «se podrá solicitar: el reconocimiento de un derecho, la intervención de una entidad o funcionario, la resolución de una situación jurídica, la prestación de un servicio». La autoridad debe resolver «dentro de los quince (15) días siguientes a su recepción» (art. 14 inc. 1), prorrogables excepcionalmente hasta el doble informando al interesado antes del vencimiento (art. 14 par.). ADVERTENCIA: el art. 14 abre con «Salvo norma legal especial», de modo que los trámites con norma propia —pensional, tributario, servicios públicos domiciliarios— pueden tener término distinto, que debe verificarse en su propia norma.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "La designación de la autoridad a la que se dirige",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 1"
+        },
+        {
+          "n": 2,
+          "name": "Los nombres y apellidos completos del solicitante y de su representante y/o apoderado, si es el caso, con indicación de su documento de identidad y de la dirección donde recibirá correspondencia",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "El objeto de la petición",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 3"
+        },
+        {
+          "n": 4,
+          "name": "Las razones en las que fundamenta su petición",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 4"
+        },
+        {
+          "n": 5,
+          "name": "La relación de los documentos que desee presentar para iniciar el trámite",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 5"
+        },
+        {
+          "n": 6,
+          "name": "La firma del peticionario cuando fuere el caso",
+          "mandatory": false,
+          "basis": "Ley 1755 de 2015, art. 16 num. 6"
+        },
+        {
+          "n": 7,
+          "name": "Acreditación de la calidad o del interés particular invocado",
+          "mandatory": false,
+          "basis": null
+        },
+        {
+          "n": 8,
+          "name": "Petición concreta de reconocimiento del derecho o de resolución de la situación jurídica",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 13 inc. 2"
+        }
+      ],
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=65334"
+    },
+    {
+      "exact_name": "Petición de información",
+      "area": "ADMINISTRATIVO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1755 de 2015, arts. 13, 14 num. 1, 16 y 24",
+      "competent_authority": "La autoridad que posee la información solicitada",
+      "term": "RELOJ DE LA AUTORIDAD: diez (10) días. Art. 14 num. 1: «Las peticiones de documentos y de información deberán resolverse dentro de los diez (10) días siguientes a su recepción. Si en ese lapso no se ha dado respuesta al peticionario, se entenderá, para todos los efectos legales, que la respectiva solicitud ha sido aceptada y, por consiguiente, la administración ya no podrá negar la entrega de dichos documentos al peticionario, y como consecuencia las copias se entregarán dentro de los tres (3) días siguientes». Ese silencio es POSITIVO. El plazo es prorrogable excepcionalmente hasta el doble, informando antes de su vencimiento (art. 14 par.). RELOJ DEL PETICIONARIO —distinto y preclusivo—: si la autoridad rechaza la petición invocando reserva legal, la insistencia «deberá interponerse por escrito y sustentado en la diligencia de notificación, o dentro de los diez (10) días siguientes a ella» (art. 26 par.).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "La designación de la autoridad a la que se dirige",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 1"
+        },
+        {
+          "n": 2,
+          "name": "Los nombres y apellidos completos del solicitante y de su representante y/o apoderado, si es el caso, con indicación de su documento de identidad y de la dirección donde recibirá correspondencia",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "El objeto de la petición",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 3"
+        },
+        {
+          "n": 4,
+          "name": "Las razones en las que fundamenta su petición",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 4"
+        },
+        {
+          "n": 5,
+          "name": "La relación de los documentos que desee presentar para iniciar el trámite",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 5"
+        },
+        {
+          "n": 6,
+          "name": "La firma del peticionario cuando fuere el caso",
+          "mandatory": false,
+          "basis": "Ley 1755 de 2015, art. 16 num. 6"
+        },
+        {
+          "n": 7,
+          "name": "Identificación precisa de la información solicitada",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 13 inc. 2"
+        },
+        {
+          "n": 8,
+          "name": "Manifestación de la calidad de titular, apoderado o persona autorizada con facultad expresa, cuando la información esté sometida a reserva por los numerales 3, 5, 6, 7 u 8 del art. 24",
+          "mandatory": false,
+          "basis": "Ley 1755 de 2015, art. 24 par.; C-951 de 2014, numeral octavo"
+        },
+        {
+          "n": 9,
+          "name": "Indicación del medio idóneo por el cual se desea recibir la respuesta",
+          "mandatory": false,
+          "basis": "Ley 1755 de 2015, art. 15"
+        }
+      ],
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=65334"
+    },
+    {
+      "exact_name": "Petición de copias o de examen de documentos",
+      "area": "ADMINISTRATIVO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1755 de 2015, arts. 13, 14 num. 1, 16, 24 y 29",
+      "competent_authority": "La autoridad en cuyos archivos reposan los documentos",
+      "term": "RELOJ DE LA AUTORIDAD: diez (10) días para resolver y tres (3) días para entregar las copias cuando opera el silencio positivo. Art. 14 num. 1: «Las peticiones de documentos y de información deberán resolverse dentro de los diez (10) días siguientes a su recepción [...] y como consecuencia las copias se entregarán dentro de los tres (3) días siguientes». El art. 13 inc. 2 incluye expresamente entre las modalidades «examinar y requerir copias de documentos». Costos, art. 29: «En ningún caso el precio de las copias podrá exceder el valor de la reproducción. Los costos de la expedición de las copias correrán por cuenta del interesado en obtenerlas», y «El valor de la reproducción no podrá ser superior al valor comercial de referencia en el mercado». RELOJ DEL PETICIONARIO: diez (10) días siguientes a la notificación para insistir si se niega por reserva (art. 26 par.).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "La designación de la autoridad a la que se dirige",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 1"
+        },
+        {
+          "n": 2,
+          "name": "Los nombres y apellidos completos del solicitante y de su representante y/o apoderado, si es el caso, con indicación de su documento de identidad y de la dirección donde recibirá correspondencia",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "El objeto de la petición",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 3"
+        },
+        {
+          "n": 4,
+          "name": "Las razones en las que fundamenta su petición",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 4"
+        },
+        {
+          "n": 5,
+          "name": "La relación de los documentos que desee presentar para iniciar el trámite",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 5"
+        },
+        {
+          "n": 6,
+          "name": "La firma del peticionario cuando fuere el caso",
+          "mandatory": false,
+          "basis": "Ley 1755 de 2015, art. 16 num. 6"
+        },
+        {
+          "n": 7,
+          "name": "Identificación de los documentos cuya copia o examen se solicita",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 13 inc. 2"
+        },
+        {
+          "n": 8,
+          "name": "Manifestación sobre la asunción del costo de la reproducción",
+          "mandatory": false,
+          "basis": "Ley 1755 de 2015, art. 29"
+        },
+        {
+          "n": 9,
+          "name": "Acreditación de la titularidad o autorización expresa cuando el documento esté sometido a reserva",
+          "mandatory": false,
+          "basis": "Ley 1755 de 2015, art. 24 par."
+        }
+      ],
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=65334"
+    },
+    {
+      "exact_name": "Petición de consulta",
+      "area": "ADMINISTRATIVO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1755 de 2015, arts. 13, 14 num. 2, 16 y 28",
+      "competent_authority": "La autoridad competente en la materia objeto de consulta",
+      "term": "RELOJ DE LA AUTORIDAD: treinta (30) días. Art. 14 num. 2: «Las peticiones mediante las cuales se eleva una consulta a las autoridades en relación con las materias a su cargo deberán resolverse dentro de los treinta (30) días siguientes a su recepción». Prorrogable excepcionalmente hasta el doble, informando antes del vencimiento (art. 14 par.). ADVERTENCIA sustantiva: el concepto que responde la consulta NO obliga. Art. 28: «Salvo disposición legal en contrario, los conceptos emitidos por las autoridades como respuestas a peticiones realizadas en ejercicio del derecho a formular consultas no serán de obligatorio cumplimiento o ejecución». La consulta no suspende ni interrumpe los términos de otras actuaciones.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "La designación de la autoridad a la que se dirige",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 1"
+        },
+        {
+          "n": 2,
+          "name": "Los nombres y apellidos completos del solicitante y de su representante y/o apoderado, si es el caso, con indicación de su documento de identidad y de la dirección donde recibirá correspondencia",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "El objeto de la petición",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 3"
+        },
+        {
+          "n": 4,
+          "name": "Las razones en las que fundamenta su petición",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 4"
+        },
+        {
+          "n": 5,
+          "name": "La relación de los documentos que desee presentar para iniciar el trámite",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 5"
+        },
+        {
+          "n": 6,
+          "name": "La firma del peticionario cuando fuere el caso",
+          "mandatory": false,
+          "basis": "Ley 1755 de 2015, art. 16 num. 6"
+        },
+        {
+          "n": 7,
+          "name": "Formulación concreta de la consulta, sobre materia a cargo de la autoridad consultada",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 14 num. 2"
+        },
+        {
+          "n": 8,
+          "name": "Supuesto de hecho sobre el que se consulta",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 4"
+        },
+        {
+          "n": 9,
+          "name": "Constancia de que el concepto no será de obligatorio cumplimiento o ejecución",
+          "mandatory": false,
+          "basis": "Ley 1755 de 2015, art. 28"
+        }
+      ],
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=65334"
+    },
+    {
+      "exact_name": "Petición ante organizaciones e instituciones privadas y ante particulares",
+      "area": "ADMINISTRATIVO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1755 de 2015, arts. 32 y 33 (Capítulo III); Sentencia C-951 de 2014",
+      "competent_authority": "Organizaciones privadas con o sin personería jurídica —sociedades, corporaciones, fundaciones, asociaciones, organizaciones religiosas, cooperativas, instituciones financieras o clubes— (art. 32); Cajas de Compensación Familiar, instituciones del Sistema de Seguridad Social Integral, entidades del sistema financiero y bursátil y empresas que prestan servicios públicos y servicios públicos domiciliarios regidas por el derecho privado (art. 33); y personas naturales frente a las cuales el solicitante se encuentre en situación de indefensión o subordinación, o que ejerzan posición dominante (art. 32 par. 1)",
+      "term": "RELOJ DEL DESTINATARIO PRIVADO, remitido a las reglas del Capítulo I. Art. 32 inc. 2: «Salvo norma legal especial, el trámite y resolución de estas peticiones estarán sometidos a los principios y reglas establecidos en el Capítulo I de este título» —esto es, los términos del art. 14: quince (15) días regla general, diez (10) días documentos e información, treinta (30) días consultas—. La Corte Constitucional declaró EXEQUIBLE esa expresión «bajo el entendido de que al derecho de petición ante organizaciones privadas se aplicarán, en lo pertinente, aquellas disposiciones del Capítulo I que sean compatibles con la naturaleza de las funciones que ejercen los particulares» (C-951 de 2014, numeral undécimo). El art. 33 extiende las mismas disposiciones «en lo pertinente» y «sin perjuicio de lo dispuesto en leyes especiales» —en servicios públicos domiciliarios rige la ley especial, que no se verificó aquí—. El art. 32 par. 3 prohíbe a toda entidad privada negarse a recibir y radicar peticiones respetuosas. No hay término a cargo del peticionario.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "La designación de la autoridad a la que se dirige",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 1"
+        },
+        {
+          "n": 2,
+          "name": "Los nombres y apellidos completos del solicitante y de su representante y/o apoderado, si es el caso, con indicación de su documento de identidad y de la dirección donde recibirá correspondencia",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "El objeto de la petición",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 3"
+        },
+        {
+          "n": 4,
+          "name": "Las razones en las que fundamenta su petición",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 4"
+        },
+        {
+          "n": 5,
+          "name": "La relación de los documentos que desee presentar para iniciar el trámite",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 5"
+        },
+        {
+          "n": 6,
+          "name": "La firma del peticionario cuando fuere el caso",
+          "mandatory": false,
+          "basis": "Ley 1755 de 2015, art. 16 num. 6"
+        },
+        {
+          "n": 7,
+          "name": "Identificación de la organización privada, institución o particular destinatario",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, arts. 32 y 33"
+        },
+        {
+          "n": 8,
+          "name": "Derecho fundamental cuya garantía se persigue",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 32 inc. 1"
+        },
+        {
+          "n": 9,
+          "name": "Cuando se dirija a persona natural, acreditación de la situación de indefensión, subordinación o posición dominante",
+          "mandatory": false,
+          "basis": "Ley 1755 de 2015, art. 32 par. 1"
+        },
+        {
+          "n": 10,
+          "name": "Cuando se dirija a una entidad del art. 33, acreditación de la calidad de usuario",
+          "mandatory": false,
+          "basis": "Ley 1755 de 2015, art. 33"
+        }
+      ],
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=65334"
+    },
+    {
+      "exact_name": "Solicitud de atención prioritaria de la petición",
+      "area": "ADMINISTRATIVO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1755 de 2015, art. 20",
+      "competent_authority": "La autoridad ante la que cursa la petición",
+      "term": null,
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "La designación de la autoridad a la que se dirige",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 1"
+        },
+        {
+          "n": 2,
+          "name": "Los nombres y apellidos completos del solicitante y de su representante y/o apoderado, si es el caso, con indicación de su documento de identidad y de la dirección donde recibirá correspondencia",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "El objeto de la petición",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 3"
+        },
+        {
+          "n": 4,
+          "name": "Las razones en las que fundamenta su petición",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 4"
+        },
+        {
+          "n": 5,
+          "name": "La relación de los documentos que desee presentar para iniciar el trámite",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 5"
+        },
+        {
+          "n": 6,
+          "name": "La firma del peticionario cuando fuere el caso",
+          "mandatory": false,
+          "basis": "Ley 1755 de 2015, art. 16 num. 6"
+        },
+        {
+          "n": 7,
+          "name": "Identificación del derecho fundamental cuyo reconocimiento se pide",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 20 inc. 1"
+        },
+        {
+          "n": 8,
+          "name": "Prueba sumaria de la titularidad del derecho",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 20 inc. 1"
+        },
+        {
+          "n": 9,
+          "name": "Prueba sumaria del riesgo del perjuicio irremediable invocado",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 20 inc. 1"
+        },
+        {
+          "n": 10,
+          "name": "Invocación del peligro inminente para la vida o la integridad por razones de salud o de seguridad personal, cuando exista",
+          "mandatory": false,
+          "basis": "Ley 1755 de 2015, art. 20 inc. 2"
+        },
+        {
+          "n": 11,
+          "name": "Acreditación de la calidad de periodista, cuando se invoque el trámite preferencial",
+          "mandatory": false,
+          "basis": "Ley 1755 de 2015, art. 20 inc. 2"
+        }
+      ],
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=65334"
+    },
+    {
+      "exact_name": "Desistimiento expreso de la petición",
+      "area": "ADMINISTRATIVO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1755 de 2015, art. 18",
+      "competent_authority": "La autoridad ante la que cursa la petición",
+      "term": "SIN PLAZO PRECLUSIVO PARA EL PETICIONARIO. Art. 18: «Los interesados podrán desistir en cualquier tiempo de sus peticiones, sin perjuicio de que la respectiva solicitud pueda ser nuevamente presentada con el lleno de los requisitos legales, pero las autoridades podrán continuar de oficio la actuación si la consideran necesaria por razones de interés público; en tal caso expedirán resolución motivada». Es decir: puede desistirse en cualquier tiempo mientras la actuación esté en curso; el desistimiento no extingue el derecho a volver a pedir; y no vincula necesariamente a la autoridad, que puede continuar de oficio mediante resolución motivada. Artículo declarado EXEQUIBLE (C-951 de 2014, numeral tercero de la parte resolutiva).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Designación de la autoridad ante la que cursa la petición",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 1"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del peticionario y de su apoderado, con documento de identidad y dirección de correspondencia",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "Identificación de la petición que se desiste, con su número y fecha de radicación",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 18"
+        },
+        {
+          "n": 4,
+          "name": "Manifestación expresa e inequívoca de desistir",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 18"
+        },
+        {
+          "n": 5,
+          "name": "Reserva del derecho a presentar nuevamente la solicitud con el lleno de los requisitos legales",
+          "mandatory": false,
+          "basis": "Ley 1755 de 2015, art. 18"
+        },
+        {
+          "n": 6,
+          "name": "Firma del peticionario cuando fuere el caso",
+          "mandatory": false,
+          "basis": "Ley 1755 de 2015, art. 16 num. 6"
+        }
+      ],
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=65334"
+    },
+    {
+      "exact_name": "Respuesta al requerimiento por petición incompleta y solicitud de prórroga",
+      "area": "ADMINISTRATIVO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1755 de 2015, art. 17",
+      "competent_authority": "La autoridad que formuló el requerimiento",
+      "term": "RELOJ DEL PETICIONARIO, preclusivo —este es el plazo del cliente—. Art. 17: la autoridad «requerirá al peticionario dentro de los diez (10) días siguientes a la fecha de radicación para que la complete en el término máximo de un (1) mes». El peticionario dispone de ese mes. «Se entenderá que el peticionario ha desistido de su solicitud o de la actuación cuando no satisfaga el requerimiento, salvo que antes de vencer el plazo concedido solicite prórroga hasta por un término igual» —la prórroga debe pedirse ANTES del vencimiento y es hasta por un (1) mes más—. «Vencidos los términos establecidos en este artículo, sin que el peticionario haya cumplido el requerimiento, la autoridad decretará el desistimiento y el archivo del expediente, mediante acto administrativo motivado, que se notificará personalmente, contra el cual únicamente procede recurso de reposición». RELOJ DE LA AUTORIDAD: los diez (10) días para requerir, y la reactivación del término para resolver «a partir del día siguiente en que el interesado aporte los documentos o informes requeridos».",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Designación de la autoridad requirente",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 1"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del peticionario, con documento de identidad y dirección de correspondencia",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "Identificación del requerimiento, de su fecha de recibo y de la petición radicada",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 17"
+        },
+        {
+          "n": 4,
+          "name": "Aporte de los documentos o informes requeridos, o solicitud de prórroga presentada antes de vencer el plazo concedido",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 17"
+        },
+        {
+          "n": 5,
+          "name": "Verificación de que la prórroga solicitada no excede un término igual al concedido",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 17"
+        },
+        {
+          "n": 6,
+          "name": "Firma del peticionario cuando fuere el caso",
+          "mandatory": false,
+          "basis": "Ley 1755 de 2015, art. 16 num. 6"
+        }
+      ],
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=65334"
+    },
+    {
+      "exact_name": "Corrección o aclaración de petición oscura",
+      "area": "ADMINISTRATIVO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1755 de 2015, art. 19",
+      "competent_authority": "La autoridad que devolvió la petición",
+      "term": "RELOJ DEL PETICIONARIO: diez (10) días. Art. 19: «Toda petición debe ser respetuosa so pena de rechazo. Solo cuando no se comprenda la finalidad u objeto de la petición esta se devolverá al interesado para que la corrija o aclare dentro de los diez (10) días siguientes. En caso de no corregirse o aclararse, se archivará la petición. En ningún caso se devolverán peticiones que se consideren inadecuadas o incompletas». La sanción por dejar vencer el plazo es el archivo. La devolución solo procede por oscuridad: lo incompleto se rige por el art. 17, con término de un (1) mes.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Designación de la autoridad que devolvió la petición",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 1"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del peticionario, con documento de identidad y dirección de correspondencia",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "Identificación de la petición devuelta y de la fecha de la devolución",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 19"
+        },
+        {
+          "n": 4,
+          "name": "Aclaración de la finalidad u objeto de la petición",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 19"
+        },
+        {
+          "n": 5,
+          "name": "Razones en las que se fundamenta la petición aclarada",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 4"
+        },
+        {
+          "n": 6,
+          "name": "Firma del peticionario cuando fuere el caso",
+          "mandatory": false,
+          "basis": "Ley 1755 de 2015, art. 16 num. 6"
+        }
+      ],
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=65334"
+    },
+    {
+      "exact_name": "Recurso de insistencia por reserva de la información o de los documentos",
+      "area": "ADMINISTRATIVO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1755 de 2015, arts. 25 y 26; Sentencia C-951 de 2014",
+      "competent_authority": "Se interpone ante la autoridad que invoca la reserva; decide en única instancia el Tribunal Administrativo con jurisdicción en el lugar donde se encuentren los documentos —autoridades nacionales, departamentales o del Distrito Capital de Bogotá— o el juez administrativo —autoridades distritales y municipales—; en los municipios en los que no exista juez administrativo, cualquier juez del lugar (C-951 de 2014, numeral noveno)",
+      "term": "DOS RELOJES DISTINTOS. (1) DEL PETICIONARIO, preclusivo: art. 26 par., «El recurso de insistencia deberá interponerse por escrito y sustentado en la diligencia de notificación, o dentro de los diez (10) días siguientes a ella». (2) DEL JUEZ: enviada la documentación, el tribunal o el juez administrativo «decidirá dentro de los diez (10) días siguientes», término que se interrumpe cuando pida copias o información adicional, y cuando la autoridad solicite a la sección del Consejo de Estado avocar conocimiento —«Si al cabo de cinco (5) días la sección guarda silencio, o decide no avocar conocimiento, la actuación continuará ante el respectivo tribunal o juzgado administrativo»—. Nota: contra la decisión que rechaza por reserva legal «no procede recurso alguno, salvo lo previsto en el artículo siguiente» (art. 25), y «La restricción por reserva legal no se extenderá a otras piezas del respectivo expediente o actuación que no estén cubiertas por ella».",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Designación de la autoridad que invocó la reserva, ante la cual se presenta la insistencia",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, arts. 16 num. 1 y 26"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del peticionario y de su apoderado, con documento de identidad y dirección de correspondencia",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "Identificación de la petición de información o de documentos y del acto que la rechazó, con su fecha de notificación",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 26 par."
+        },
+        {
+          "n": 4,
+          "name": "Objeto: que se decida si se niega o se acepta, total o parcialmente, la petición formulada",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 26"
+        },
+        {
+          "n": 5,
+          "name": "Sustentación escrita: razones por las que la reserva invocada no cubre la información o los documentos pedidos",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, arts. 16 num. 4 y 26 par."
+        },
+        {
+          "n": 6,
+          "name": "Señalamiento de las piezas del expediente no cubiertas por la reserva",
+          "mandatory": false,
+          "basis": "Ley 1755 de 2015, art. 25 inc. 2"
+        },
+        {
+          "n": 7,
+          "name": "Relación de los documentos que se aportan",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 5"
+        },
+        {
+          "n": 8,
+          "name": "Firma del peticionario cuando fuere el caso",
+          "mandatory": false,
+          "basis": "Ley 1755 de 2015, art. 16 num. 6"
+        }
+      ],
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=65334"
+    },
+    {
+      "exact_name": "Respuesta de fondo a la petición",
+      "area": "ADMINISTRATIVO",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 1755 de 2015, arts. 13, 14, 16 par. 1 y 31",
+      "competent_authority": "La autoridad destinataria de la petición",
+      "term": "RELOJ DE LA AUTORIDAD. Art. 14: «Salvo norma legal especial y so pena de sanción disciplinaria, toda petición deberá resolverse dentro de los quince (15) días siguientes a su recepción. Estará sometida a término especial la resolución de las siguientes peticiones: 1. Las peticiones de documentos y de información deberán resolverse dentro de los diez (10) días siguientes a su recepción [...] 2. Las peticiones mediante las cuales se eleva una consulta a las autoridades en relación con las materias a su cargo deberán resolverse dentro de los treinta (30) días siguientes a su recepción». La respuesta debe ser «pronta resolución completa y de fondo» (art. 13 inc. 1). El incumplimiento es falta disciplinaria: art. 31, «La falta de atención a las peticiones y a los términos para resolver, la contravención a las prohibiciones y el desconocimiento de los derechos de las personas de que trata esta Parte Primera del Código, constituirán falta para el servidor público y darán lugar a las sanciones correspondientes de acuerdo con el régimen disciplinario»; la Corte declaró INEXEQUIBLE la expresión «gravísima» que traía el proyecto (C-951 de 2014, numeral décimo).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la petición, de su fecha de radicación y del peticionario",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 15"
+        },
+        {
+          "n": 2,
+          "name": "Examen integral de la petición, sin estimarla incompleta por falta de requisitos o documentos que no se encuentren dentro del marco jurídico vigente, que no sean necesarios para resolverla o que se encuentren dentro de sus archivos",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 par. 1"
+        },
+        {
+          "n": 3,
+          "name": "Pronunciamiento sobre todos los aspectos y pruebas planteados o presentados, más allá del contenido de los formularios",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 15"
+        },
+        {
+          "n": 4,
+          "name": "Resolución completa y de fondo sobre lo pedido",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 13 inc. 1"
+        },
+        {
+          "n": 5,
+          "name": "Fundamento jurídico de la decisión",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 13 inc. 1"
+        },
+        {
+          "n": 6,
+          "name": "Constancia de comunicación o notificación al peticionario en la dirección o medio señalado",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 2"
+        },
+        {
+          "n": 7,
+          "name": "Tratándose de petición anónima con justificación seria y creíble para mantener la reserva de la identidad, constancia de que se admitió a trámite y se resolvió de fondo",
+          "mandatory": false,
+          "basis": "C-951 de 2014, numeral sexto de la parte resolutiva"
+        },
+        {
+          "n": 8,
+          "name": "Cuando se responda una petición reiterativa ya resuelta, remisión a las respuestas anteriores, salvo derechos imprescriptibles o peticiones negadas por no acreditar requisitos ya subsanados",
+          "mandatory": false,
+          "basis": "Ley 1755 de 2015, art. 19 inc. 2"
+        }
+      ],
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=65334"
+    },
+    {
+      "exact_name": "Comunicación de ampliación del plazo para resolver la petición",
+      "area": "ADMINISTRATIVO",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 1755 de 2015, art. 14 par.",
+      "competent_authority": "La autoridad que tramita la petición",
+      "term": "RELOJ DE LA AUTORIDAD, con oportunidad preclusiva para ella. Art. 14 par.: «Cuando excepcionalmente no fuere posible resolver la petición en los plazos aquí señalados, la autoridad debe informar esta circunstancia al interesado, antes del vencimiento del término señalado en la ley expresando los motivos de la demora y señalando a la vez el plazo razonable en que se resolverá o dará respuesta, que no podrá exceder del doble del inicialmente previsto». Tres exigencias acumulativas: (i) el aviso debe darse ANTES del vencimiento del término original —después ya no sanea la mora—; (ii) debe expresar los motivos de la demora; (iii) el nuevo plazo no puede exceder del doble del inicial: máximo treinta (30) días en la petición general, veinte (20) en documentos e información y sesenta (60) en consultas. ADVERTENCIA: esta es la ampliación ordinaria del art. 14 par.; NO son los términos ampliados del art. 5 del Decreto Legislativo 491 de 2020, derogado por el art. 2 de la Ley 2207 de 2022.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la petición y de su fecha de radicación",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 14 par."
+        },
+        {
+          "n": 2,
+          "name": "Constancia de que la comunicación se envía antes del vencimiento del término legal",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 14 par."
+        },
+        {
+          "n": 3,
+          "name": "Expresión de los motivos de la demora",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 14 par."
+        },
+        {
+          "n": 4,
+          "name": "Señalamiento del plazo razonable en que se resolverá o dará respuesta, sin exceder el doble del inicialmente previsto",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 14 par."
+        },
+        {
+          "n": 5,
+          "name": "Constancia de envío al interesado",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 14 par."
+        }
+      ],
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=65334"
+    },
+    {
+      "exact_name": "Petición entre autoridades",
+      "area": "ADMINISTRATIVO",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 1755 de 2015, arts. 27 y 30",
+      "competent_authority": "La autoridad requerida",
+      "term": "RELOJ DE LA AUTORIDAD REQUERIDA: diez (10) días para información y documentos. Art. 30: «Cuando una autoridad formule una petición de información o de documentos a otra, esta deberá resolverla en un término no mayor de diez (10) días. En los demás casos, resolverá las solicitudes dentro de los plazos previstos en el artículo 14» —quince (15) días como regla general y treinta (30) días en consultas—. Concordancia sustantiva: art. 27, el carácter reservado «no será oponible a las autoridades judiciales, legislativas, ni a las autoridades administrativas que siendo constitucional o legalmente competentes para ello, los soliciten para el debido ejercicio de sus funciones», quedando la autoridad solicitante obligada a asegurar la reserva.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Designación de la autoridad requerida",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 1"
+        },
+        {
+          "n": 2,
+          "name": "Identificación de la autoridad solicitante y del funcionario que suscribe",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "Objeto: información o documentos concretos que se solicitan",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, arts. 16 num. 3 y 30"
+        },
+        {
+          "n": 4,
+          "name": "Fundamento de la competencia constitucional o legal y función en cuyo ejercicio se requieren",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 27"
+        },
+        {
+          "n": 5,
+          "name": "Compromiso de asegurar la reserva de las informaciones y documentos que se lleguen a conocer",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 27"
+        },
+        {
+          "n": 6,
+          "name": "Indicación del término no mayor de diez (10) días para resolver",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 30"
+        },
+        {
+          "n": 7,
+          "name": "Firma del funcionario",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 16 num. 6"
+        }
+      ],
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=65334"
+    },
+    {
+      "exact_name": "Requerimiento por petición incompleta y acto que decreta el desistimiento tácito",
+      "area": "ADMINISTRATIVO",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 1755 de 2015, art. 17",
+      "competent_authority": "La autoridad ante la que se radicó la petición",
+      "term": "DOS RELOJES. (1) DE LA AUTORIDAD: debe requerir «dentro de los diez (10) días siguientes a la fecha de radicación» (art. 17 inc. 1). (2) DEL PETICIONARIO: «el término máximo de un (1) mes» para completar, prorrogable «hasta por un término igual» si lo solicita antes de vencer el plazo concedido. Solo «vencidos los términos establecidos en este artículo, sin que el peticionario haya cumplido el requerimiento, la autoridad decretará el desistimiento y el archivo del expediente, mediante acto administrativo motivado, que se notificará personalmente, contra el cual únicamente procede recurso de reposición, sin perjuicio de que la respectiva solicitud pueda ser nuevamente presentada con el lleno de los requisitos legales». Además, «A partir del día siguiente en que el interesado aporte los documentos o informes requeridos, se reactivará el término para resolver la petición». Artículo declarado EXEQUIBLE (C-951 de 2014, numeral tercero).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la petición, del peticionario y de la fecha de radicación",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 17"
+        },
+        {
+          "n": 2,
+          "name": "Constancia de que el requerimiento se formuló dentro de los diez (10) días siguientes a la radicación",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 17 inc. 1"
+        },
+        {
+          "n": 3,
+          "name": "Indicación precisa de lo que falta o de la gestión de trámite a cargo del peticionario, necesaria para adoptar una decisión de fondo",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 17 inc. 1"
+        },
+        {
+          "n": 4,
+          "name": "Concesión del término máximo de un (1) mes y advertencia de la prórroga hasta por término igual, solicitable antes de su vencimiento",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 17 inc. 3"
+        },
+        {
+          "n": 5,
+          "name": "En el acto que decreta el desistimiento: motivación y verificación del vencimiento de los términos",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 17 inc. 4"
+        },
+        {
+          "n": 6,
+          "name": "Orden de archivo del expediente",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 17 inc. 4"
+        },
+        {
+          "n": 7,
+          "name": "Constancia de notificación personal",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 17 inc. 4"
+        },
+        {
+          "n": 8,
+          "name": "Indicación de que únicamente procede recurso de reposición y de que la solicitud puede presentarse nuevamente",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 17 inc. 4"
+        }
+      ],
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=65334"
+    },
+    {
+      "exact_name": "Remisión de la petición por falta de competencia",
+      "area": "ADMINISTRATIVO",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 1755 de 2015, art. 21",
+      "competent_authority": "La autoridad que recibió la petición sin ser competente",
+      "term": "RELOJ DE LA AUTORIDAD. Art. 21: «Si la autoridad a quien se dirige la petición no es la competente, se informará de inmediato al interesado si este actúa verbalmente, o dentro de los cinco (5) días siguientes al de la recepción, si obró por escrito. Dentro del término señalado remitirá la petición al competente y enviará copia del oficio remisorio al peticionario o en caso de no existir funcionario competente así se lo comunicará». REGLA DE CÓMPUTO decisiva para el peticionario: «Los términos para decidir o responder se contarán a partir del día siguiente a la recepción de la Petición por la autoridad competente» —el plazo del art. 14 no corre desde la radicación inicial ante la autoridad incompetente—.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la petición, del peticionario y de la fecha de recepción",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 21"
+        },
+        {
+          "n": 2,
+          "name": "Constancia de la falta de competencia",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 21"
+        },
+        {
+          "n": 3,
+          "name": "Información al interesado: de inmediato si actúa verbalmente, o dentro de los cinco (5) días siguientes al de la recepción si obró por escrito",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 21"
+        },
+        {
+          "n": 4,
+          "name": "Oficio de remisión a la autoridad competente dentro del mismo término",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 21"
+        },
+        {
+          "n": 5,
+          "name": "Envío de copia del oficio remisorio al peticionario, o comunicación de que no existe funcionario competente",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 21"
+        },
+        {
+          "n": 6,
+          "name": "Advertencia de que los términos para decidir o responder se cuentan desde el día siguiente a la recepción por la autoridad competente",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 21"
+        }
+      ],
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=65334"
+    },
+    {
+      "exact_name": "Decisión que rechaza la petición de información o de documentos por reserva legal",
+      "area": "ADMINISTRATIVO",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 1755 de 2015, arts. 24, 25 y 26",
+      "competent_authority": "La autoridad que custodia la información o los documentos",
+      "term": "RELOJ DE LA AUTORIDAD: el art. 25 no fija término propio; la decisión debe adoptarse dentro del término del art. 14 num. 1 aplicable a la petición que rechaza, esto es, «dentro de los diez (10) días siguientes a su recepción» tratándose de documentos e información. Vencido ese plazo sin respuesta opera el silencio POSITIVO del art. 14 num. 1 y «la administración ya no podrá negar la entrega de dichos documentos al peticionario». Contenido obligatorio, art. 25: «Toda decisión que rechace la petición de informaciones o documentos será motivada, indicará en forma precisa las disposiciones legales que impiden la entrega de información o documentos pertinentes y deberá notificarse al peticionario. Contra la decisión que rechace la petición de informaciones o documentos por motivos de reserva legal, no procede recurso alguno, salvo lo previsto en el artículo siguiente». RELOJ DEL PETICIONARIO frente a esta decisión: diez (10) días siguientes a la notificación para insistir (art. 26 par.).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la petición de información o de documentos y de su fecha de radicación",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 25"
+        },
+        {
+          "n": 2,
+          "name": "Motivación del rechazo",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 25"
+        },
+        {
+          "n": 3,
+          "name": "Indicación precisa de las disposiciones constitucionales o legales que impiden la entrega",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, arts. 24 y 25"
+        },
+        {
+          "n": 4,
+          "name": "Delimitación de la reserva: precisión de que no se extiende a otras piezas del respectivo expediente o actuación no cubiertas por ella",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 25 inc. 2"
+        },
+        {
+          "n": 5,
+          "name": "Cuando se invoquen los numerales 3, 5, 6, 7 u 8 del art. 24, verificación de si el solicitante es el titular de la información, su apoderado o persona autorizada con facultad expresa",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 24 par.; C-951 de 2014, numeral octavo"
+        },
+        {
+          "n": 6,
+          "name": "Constancia de notificación al peticionario",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 25"
+        },
+        {
+          "n": 7,
+          "name": "Advertencia de que no procede recurso alguno, salvo el de insistencia del art. 26",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, arts. 25 y 26"
+        }
+      ],
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=65334"
+    },
+    {
+      "exact_name": "Respuesta única a peticiones análogas de más de diez personas",
+      "area": "ADMINISTRATIVO",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 1755 de 2015, art. 22; Sentencia C-951 de 2014",
+      "competent_authority": "La autoridad destinataria de las peticiones",
+      "term": "RELOJ DE LA AUTORIDAD: el art. 22 no fija término propio; rigen los del art. 14 según la modalidad de cada petición (15 / 10 / 30 días). Art. 22 inc. 2: «Cuando más de diez (10) personas formulen peticiones análogas, de información, de interés general o de consulta, la Administración podrá dar una única respuesta que publicará en un diario de amplia circulación, la pondrá en su página web y entregará copias de la misma a quienes las soliciten». La Corte Constitucional lo declaró EXEQUIBLE «sin perjuicio de que deba enviarse la respuesta a todos los que hayan formulado la petición» (C-951 de 2014, numeral séptimo): la publicación NO releva del envío individual.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Verificación de que más de diez (10) personas formularon peticiones análogas de información, de interés general o de consulta",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 22 inc. 2"
+        },
+        {
+          "n": 2,
+          "name": "Respuesta única, completa y de fondo sobre lo pedido",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, arts. 13 y 22"
+        },
+        {
+          "n": 3,
+          "name": "Constancia de publicación en un diario de amplia circulación",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 22 inc. 2"
+        },
+        {
+          "n": 4,
+          "name": "Constancia de publicación en la página web de la entidad",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 22 inc. 2"
+        },
+        {
+          "n": 5,
+          "name": "Constancia de envío de la respuesta a todos los que hayan formulado la petición",
+          "mandatory": true,
+          "basis": "C-951 de 2014, numeral séptimo de la parte resolutiva"
+        },
+        {
+          "n": 6,
+          "name": "Disponibilidad de copias para quienes las soliciten",
+          "mandatory": true,
+          "basis": "Ley 1755 de 2015, art. 22 inc. 2"
+        }
+      ],
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=65334"
     }
   ]
 }

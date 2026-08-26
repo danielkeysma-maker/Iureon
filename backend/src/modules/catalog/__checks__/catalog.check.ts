@@ -957,5 +957,64 @@ if (!baseForMerge) {
   }
 }
 
+/*
+ * ─── DE DÓNDE PUEDE VENIR UNA FICHA ────────────────────────────────────────
+ *
+ * Este check existe porque 103 entradas se apoyaban en leyes.co y un blog
+ * contable, y al leerlas contra el texto oficial 76 estaban mal: plazos
+ * recortados, artículos que regulan otra cosa, texto derogado, y reformas
+ * vigentes que ninguna registraba.
+ *
+ * LA PROCEDENCIA NO ERA "METADATO IMPRECISO". Era el defecto. Una fuente que no
+ * sostiene la entrada significa que el término nunca se verificó — solo lo
+ * parecía —, y eso ya se había demostrado antes a pequeña escala: de nueve
+ * entradas con fuente rota, seis traían el plazo equivocado. A escala de 103 la
+ * proporción resultó peor.
+ *
+ * Así que la lista es blanca y no negra: prohibir leyes.co dejaría entrar al
+ * siguiente espejo. Un dominio nuevo entra aquí a mano, que es exactamente la
+ * fricción que se busca.
+ */
+{
+  const OFICIALES = [
+    'funcionpublica.gov.co',
+    'secretariasenado.gov.co',
+    'suin-juriscol.gov.co',
+    'alcaldiabogota.gov.co',
+    'corteconstitucional.gov.co',
+    'ramajudicial.gov.co',
+    'icbf.gov.co',
+    'supersalud.gov.co',
+    'colpensiones.gov.co',
+    // Tratados: sus depositarios son la fuente oficial de su propio texto.
+    'oas.org',
+    'hcch.net',
+    'tribunalandino.org.ec'
+  ];
+
+  const esOficial = (url: string): boolean => {
+    let host: string;
+    try {
+      host = new URL(url).hostname.replace(/^www\./, '');
+    } catch {
+      return false;
+    }
+    return OFICIALES.some((dominio) => host === dominio || host.endsWith('.' + dominio));
+  };
+
+  const sospechosas = catalogService
+    .list()
+    .filter((a) => !a.sourceUrl || !esOficial(a.sourceUrl))
+    .map((a) => `${a.branch} · ${a.exactName} — ${a.sourceUrl || '(sin fuente)'}`);
+
+  if (sospechosas.length > 0) {
+    console.error('FAIL fuentes: hay fichas que no se apoyan en una fuente oficial');
+    sospechosas.forEach((linea) => console.error('     ' + linea));
+    failures++;
+  } else {
+    console.log(`ok   las ${catalogService.list().length} fichas citan fuente oficial`);
+  }
+}
+
 console.log(failures === 0 ? '\nALL CHECKS PASSED' : `\n${failures} CHECK(S) FAILED`);
 process.exit(failures === 0 ? 0 : 1);
