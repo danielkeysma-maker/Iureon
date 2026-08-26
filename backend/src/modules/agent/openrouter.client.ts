@@ -26,6 +26,29 @@ const DEFAULT_MAX_TOKENS = 2048;
 const MIN_USABLE_LENGTH = 50;
 
 /**
+ * What one model call actually consumed.
+ *
+ * Reported by OpenRouter, not derived: `cost` is the amount that left the
+ * platform's account for this exact request. The pipeline attributes it to the
+ * firm that caused it, which is the only way a per-firm balance means anything
+ * when every firm draws from one upstream account.
+ */
+export interface CallUsage {
+  model: string;
+  promptTokens: number;
+  completionTokens: number;
+  costUsd: number;
+}
+
+export interface CallResult {
+  text: string;
+  /** Absent when the call failed before producing anything billable. */
+  usage: CallUsage | null;
+}
+
+const SIN_RESULTADO: CallResult = { text: '', usage: null };
+
+/**
  * Calls one OpenRouter model and returns its text, or an empty string on any
  * failure. Callers are expected to degrade gracefully rather than propagate:
  * the pipeline has a static template fallback for exactly this case.
@@ -34,17 +57,25 @@ const MIN_USABLE_LENGTH = 50;
  * the analysis engines are capped because their output is a short structured
  * summary and an overrun is pure cost.
  */
-export const callOpenRouterModel = async (
+/**
+ * Calls one model and returns its text ALONG WITH what it cost.
+ *
+ * The cost used to be discarded, so the pipeline reported a hardcoded 4820
+ * tokens for every draft it ever produced — a fabricated figure in the one
+ * place a firm is charged money. Callers that do not care about billing can
+ * still ignore `usage`; the ones that bill cannot invent it.
+ */
+export const callOpenRouterWithUsage = async (
   model: EngineModel | string,
   systemPrompt: string,
   userPrompt: string,
   maxTokens?: number
-): Promise<string> => {
+): Promise<CallResult> => {
   const apiKey = config.openRouter.apiKey;
 
   if (!apiKey) {
     console.warn('[OPENROUTER] No API key configured; skipping call.');
-    return '';
+    return SIN_RESULTADO;
   }
 
   const isOpus = model.includes('claude-opus');
@@ -86,7 +117,14 @@ export const callOpenRouterModel = async (
           { role: 'user', content: userPrompt }
         ],
         temperature: 0.2,
-        max_tokens: resolvedMaxTokens
+        max_tokens: resolvedMaxTokens,
+        /*
+         * Without this OpenRouter omits usage.cost, and the platform is left
+         * estimating what a call cost from a price table that goes stale every
+         * time a provider changes. Asked for on every call because a firm's
+         * balance is only honest if it is drawn down by what actually happened.
+         */
+        usage: { include: true }
       })
     });
 
@@ -94,21 +132,56 @@ export const callOpenRouterModel = async (
 
     if (json.error) {
       console.warn(`[OPENROUTER] ${model} returned an error:`, json.error.message || json.error);
-      return '';
+      return SIN_RESULTADO;
     }
+
+    /*
+     * The usage travels even when the text is unusable, because the money left
+     * the account either way. A failed generation that is not recorded is a
+     * cost the platform absorbs silently and cannot explain later.
+     */
+    const usage: CallUsage | null = json.usage
+      ? {
+          model,
+          promptTokens: Number(json.usage.prompt_tokens ?? 0),
+          completionTokens: Number(json.usage.completion_tokens ?? 0),
+          costUsd: Number(json.usage.cost ?? 0)
+        }
+      : null;
 
     const text: string = json.choices?.[0]?.message?.content?.trim() ?? '';
 
     if (text.length > MIN_USABLE_LENGTH) {
-      console.log(`[OPENROUTER] ${model} responded with ${text.length} characters.`);
-      return text;
+      console.log(
+        `[OPENROUTER] ${model} responded with ${text.length} characters` +
+          (usage ? ` (US$${usage.costUsd.toFixed(6)})` : '')
+      );
+      return { text, usage };
     }
 
-    return '';
+    // Too short to use, but it was still billed: the usage travels so the cost
+    // is recorded even though the text is thrown away.
+    return { text: '', usage };
   } catch (err: any) {
     console.warn(`[OPENROUTER] ${model} call failed:`, err.message);
-    return '';
+    return SIN_RESULTADO;
   } finally {
     clearTimeout(timeoutId);
   }
 };
+
+/**
+ * The text alone, for callers that do not bill.
+ *
+ * Kept so the pipeline's many call sites did not each have to learn about
+ * usage on the same day — but every one of them that charges a firm uses
+ * `callOpenRouterWithUsage`, because a charge derived from nothing is the
+ * hardcoded 4820 all over again.
+ */
+export const callOpenRouterModel = async (
+  model: EngineModel | string,
+  systemPrompt: string,
+  userPrompt: string,
+  maxTokens?: number
+): Promise<string> =>
+  (await callOpenRouterWithUsage(model, systemPrompt, userPrompt, maxTokens)).text;

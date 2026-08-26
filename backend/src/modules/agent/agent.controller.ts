@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
+import { randomUUID } from 'node:crypto';
 import { OpenRouterMultiEngineService, AgentExecutionStep } from './openrouter.service';
+import { BillingError, chargeOperation, ensureBalance } from '../billing/billing.service';
 
 const aiService = new OpenRouterMultiEngineService();
 
@@ -11,6 +13,33 @@ export const streamAgentDraftController = async (req: Request, res: Response): P
     res.status(400).json({ error: 'MISSING_PROMPT', message: 'Se requiere la instrucción jurídica en legalPrompt' });
     return;
   }
+
+  /*
+   * The balance is checked BEFORE the stream opens, and before a peso is spent
+   * upstream.
+   *
+   * Two reasons it cannot wait until the end. The platform pays OpenRouter per
+   * call whether or not the firm can be charged, so a late check means Iureon
+   * funds work it cannot bill. And telling a lawyer their draft is finished but
+   * unaffordable is worse than telling them at the start that it is — one is a
+   * decision they can still make, the other is a document they cannot have.
+   *
+   * A plain JSON error, not an SSE event: the stream has not started, so the
+   * client can read this as an ordinary failure.
+   */
+  try {
+    await ensureBalance(firmId as string, 'BORRADOR');
+  } catch (err) {
+    if (err instanceof BillingError) {
+      res.status(err.status).json({ error: err.code, message: err.message, balance: err.balance });
+      return;
+    }
+    throw err;
+  }
+
+  // Shared by every model call of this draft, so the ledger can total what ONE
+  // document cost across three engines rather than only what one stage did.
+  const operationId = randomUUID();
 
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
@@ -27,6 +56,8 @@ export const streamAgentDraftController = async (req: Request, res: Response): P
     const result = await aiService.executeMultiEnginePipeline(
       {
         firmId: firmId || 'unknown-firm',
+        userEmail: req.user?.email ?? 'desconocido',
+        operationId,
         documentType: documentType || 'Contestación de Demanda',
         legalPrompt,
         expedienteId,
@@ -37,7 +68,22 @@ export const streamAgentDraftController = async (req: Request, res: Response): P
       }
     );
 
-    sendEvent('COMPLETED', result);
+    /*
+     * Charged once the document exists, not when the request arrived.
+     *
+     * The pipeline degrades to a static template when the engines fail, and
+     * charging for that would be selling a form letter at the price of a
+     * drafted document. The stages recorded what they cost either way.
+     */
+    const cobro = await chargeOperation({
+      firmId: firmId as string,
+      userEmail: req.user?.email ?? 'desconocido',
+      operation: 'BORRADOR',
+      operationId,
+      description: `Borrador: ${result.title}`
+    });
+
+    sendEvent('COMPLETED', { ...result, charged: cobro.charged, balance: cobro.balance });
     res.end();
   } catch (error: any) {
     console.error('[AGENT-CONTROLLER-ERROR]', error);

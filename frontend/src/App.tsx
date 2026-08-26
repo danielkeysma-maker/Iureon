@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { httpClient, setSessionLostHandler } from './config/httpClient';
+import { billingApi } from './modules/billing/billing.api';
 import { clearSession, readSession, saveSession, type Session } from './modules/auth/session';
 import { SidebarLeft } from './modules/tenant/components/SidebarLeft';
 import { HeaderTop } from './modules/tenant/components/HeaderTop';
@@ -40,7 +41,6 @@ const MAIN_VIEWS: MainView[] = [
   'audit'
 ];
 
-const COST_PER_DRAFT_COP = 2000;
 
 const EMPTY_FIRM_PLACEHOLDER: LawFirmTenant = {
   id: '',
@@ -263,13 +263,34 @@ export function App() {
     handleUpdateFirm(updatedFirm);
   };
 
-  // Descontar $2.000 COP por cada borrador generado
-  const handleDeductCredits = () => {
-    const newBalance = Math.max(0, (activeFirm.creditsBalance ?? 0) - COST_PER_DRAFT_COP);
-    const updatedFirm = { ...activeFirm, creditsBalance: newBalance };
-    setActiveFirm(updatedFirm);
-    handleUpdateFirm(updatedFirm);
-  };
+  /*
+   * THE DEDUCTION IS THE SERVER'S, AND IT USED TO BE A LIE HERE.
+   *
+   * This subtracted a constant from React state after every draft and called
+   * `handleUpdateFirm`, which only sets local state — so the balance on screen
+   * drifted from the database on the first reload, and a firm at zero could
+   * draft for ever. The charge now happens where the money is actually spent:
+   * the drafting endpoint refuses before calling any model if the balance is
+   * short, and debits atomically once the document exists.
+   *
+   * What is left here is reading back what the server decided.
+   */
+  const refreshBalance = React.useCallback(async () => {
+    if (!session) return;
+
+    try {
+      const { summary } = await billingApi.summary();
+      setActiveFirm((actual) => ({ ...actual, creditsBalance: summary.balance }));
+    } catch {
+      /* The balance simply does not update; it is never invented. */
+    }
+  }, [session]);
+
+  // Read on entry, and again after every operation that spends: the balance is
+  // reported, never derived.
+  useEffect(() => {
+    void refreshBalance();
+  }, [refreshBalance]);
 
   return (
     <TenantProvider activeFirm={activeFirm} currentUserEmail={currentUserEmail}>
@@ -355,7 +376,7 @@ export function App() {
                   isProcessing={workflow.isProcessing}
                   handleSendPrompt={async (e) => {
                     await workflow.handleSendPrompt(e);
-                    handleDeductCredits();
+                    void refreshBalance();
                     setLoadedDraftId(null);
                   }}
                   logs={workflow.logs}

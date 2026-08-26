@@ -1,4 +1,5 @@
-import { ENGINE, callOpenRouterModel } from './openrouter.client';
+import { ENGINE, callOpenRouterWithUsage } from './openrouter.client';
+import { recordUsage } from '../billing/billing.service';
 import { vectorSearchService } from '../search/vectorSearch.service';
 import { detectLegalTopic } from './topicDetector';
 import { generateCleanDocumentTitle } from './documentTitle';
@@ -12,6 +13,20 @@ import { buildSolemnColombianDraft } from './solemnDraft.fallback';
  * draft must cite published jurisprudence, not another client's document.
  */
 const SHARED_CORPUS = 'SYSTEM_CORPUS';
+
+/**
+ * A workflow request with the billing context attached.
+ *
+ * The firm, the user and the operation id travel through every stage so each
+ * model call records what it cost against the document being written. Without
+ * them the ledger could say what the platform spent but not on whose behalf,
+ * which is the same as not knowing.
+ */
+export type PipelineRequest = WorkflowRequest & {
+  firmId: string;
+  userEmail: string;
+  operationId: string;
+};
 
 export interface WorkflowRequest {
   documentType: string;
@@ -65,14 +80,14 @@ const DRAFT_CONTEXT_CHARS = 3000;
 export class OpenRouterService {
 
   public async executeMultiEnginePipeline(
-    req: WorkflowRequest & { firmId: string },
+    req: PipelineRequest,
     onStepLog: (step: AgentExecutionStep) => void
   ): Promise<any> {
     return this.processWorkflowPipeline(req, onStepLog);
   }
 
   public async processWorkflowPipeline(
-    req: WorkflowRequest & { firmId?: string },
+    req: PipelineRequest,
     onStepLog: (stepData: any) => void
   ) {
     const startTime = Date.now();
@@ -100,7 +115,15 @@ export class OpenRouterService {
         ? ['Protección Inmediata del Debido Proceso (Art. 29 C.P.)', 'Habeas Data Procesal & Corrección de Registros (Art. 15 C.P.)']
         : ['Prescripción Trienal (Art. 151 CPTSS)', 'Inexistencia de la Obligación'],
       legalText,
-      tokensConsumed: 4820,
+      /*
+       * Zero, not 4820.
+       *
+       * That number was hardcoded and reported for every draft the pipeline had
+       * ever produced — a fabricated figure in the one place a client is
+       * charged money. The real consumption now lives in `ai_usage`, one row
+       * per model call, so this field has nothing true to say and says nothing.
+       */
+      tokensConsumed: 0,
       isContinuation
     };
   }
@@ -110,7 +133,7 @@ export class OpenRouterService {
    * continuation mode it lists the requested changes instead of re-reading the
    * whole case.
    */
-  private async runFactExtraction(req: WorkflowRequest, onStepLog: (step: any) => void): Promise<string> {
+  private async runFactExtraction(req: PipelineRequest, onStepLog: (step: any) => void): Promise<string> {
     onStepLog({
       stage: 'STAGE_1_INGESTION',
       engine: 'GEMINI',
@@ -126,12 +149,22 @@ export class OpenRouterService {
       ? `${req.legalPrompt}\n\n--- BORRADOR EXISTENTE (primeros ${DRAFT_CONTEXT_CHARS} caracteres) ---\n${req.existingDraft.substring(0, DRAFT_CONTEXT_CHARS)}`
       : req.legalPrompt;
 
-    const extraction = await callOpenRouterModel(
+    const { text: extraction, usage } = await callOpenRouterWithUsage(
       ENGINE.GEMINI,
       systemPrompt,
       userPrompt,
       req.existingDraft ? MAX_TOKENS.GEMINI_CONTINUATION : MAX_TOKENS.GEMINI_NEW
     );
+
+    // Recorded per stage, charged once for the document: three engines produce
+    // one draft, and a firm should see one price, not three line items.
+    await recordUsage({
+      firmId: req.firmId,
+      userEmail: req.userEmail,
+      operation: 'BORRADOR',
+      operationId: req.operationId,
+      usage
+    });
 
     console.log(`[PIPELINE] Gemini 3.6 Flash: ${extraction.length} caracteres extraídos.`);
     return extraction;
@@ -154,7 +187,7 @@ export class OpenRouterService {
    * pipeline cannot be allowed to have.
    */
   private async runPrecedentSearch(
-    req: WorkflowRequest,
+    req: PipelineRequest,
     onStepLog: (step: any) => void
   ): Promise<string[]> {
     const query = [req.documentType, req.legalPrompt].filter(Boolean).join('. ').trim();
@@ -211,7 +244,7 @@ export class OpenRouterService {
    * defences, governing norms and argumentative strategy. It never drafts.
    */
   private async runDogmaticOutline(
-    req: WorkflowRequest,
+    req: PipelineRequest,
     geminiExtraction: string,
     jurisprudencia: string[],
     onStepLog: (step: any) => void
@@ -232,12 +265,20 @@ export class OpenRouterService {
       ? `CAMBIOS IDENTIFICADOS POR GEMINI:\n${facts}\n\nJURISPRUDENCIA RAG:\n${jurisprudencia.join('\n')}\n\nINSTRUCCIÓN DEL USUARIO: ${req.legalPrompt}\n\nTIPO DE DOCUMENTO: ${req.documentType}`
       : `HECHOS EXTRAÍDOS POR GEMINI:\n${facts}\n\nJURISPRUDENCIA RAG:\n${jurisprudencia.join('\n')}\n\nTIPO DE DOCUMENTO: ${req.documentType}`;
 
-    const structure = await callOpenRouterModel(
+    const { text: structure, usage } = await callOpenRouterWithUsage(
       ENGINE.GPT,
       systemPrompt,
       userPrompt,
       req.existingDraft ? MAX_TOKENS.GPT_CONTINUATION : MAX_TOKENS.GPT_NEW
     );
+
+    await recordUsage({
+      firmId: req.firmId,
+      userEmail: req.userEmail,
+      operation: 'BORRADOR',
+      operationId: req.operationId,
+      usage
+    });
 
     console.log(`[PIPELINE] GPT-5.6 Sol: ${structure.length} caracteres de esquema.`);
 
@@ -257,7 +298,7 @@ export class OpenRouterService {
    * fails, so the lawyer never faces an empty canvas.
    */
   private async runDrafting(
-    req: WorkflowRequest & { firmId?: string },
+    req: PipelineRequest,
     geminiExtraction: string,
     jurisprudencia: string[],
     gptStructure: string,
@@ -300,7 +341,19 @@ export class OpenRouterService {
       existingDraft: req.existingDraft
     });
 
-    const draft = await callOpenRouterModel(ENGINE.OPUS, systemPrompt, userMessage);
+    const { text: draft, usage } = await callOpenRouterWithUsage(
+      ENGINE.OPUS,
+      systemPrompt,
+      userMessage
+    );
+
+    await recordUsage({
+      firmId: req.firmId,
+      userEmail: req.userEmail,
+      operation: 'BORRADOR',
+      operationId: req.operationId,
+      usage
+    });
 
     if (draft.length > MIN_DRAFT_LENGTH) {
       return draft;
