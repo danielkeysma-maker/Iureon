@@ -193,6 +193,44 @@ export function App() {
     if (activeFirm.id === updatedFirm.id) setActiveFirm(updatedFirm);
   };
 
+  /*
+   * THE DEDUCTION IS THE SERVER'S, AND IT USED TO BE A LIE HERE.
+   *
+   * This subtracted a constant from React state after every draft and called
+   * `handleUpdateFirm`, which only sets local state — so the balance on screen
+   * drifted from the database on the first reload, and a firm at zero could
+   * draft for ever. The charge now happens where the money is actually spent:
+   * the drafting endpoint refuses before calling any model if the balance is
+   * short, and debits atomically once the document exists.
+   *
+   * What is left here is reading back what the server decided.
+   *
+   * ABOVE THE EARLY RETURN, AND THAT IS NOT A STYLE CHOICE. These two hooks sat
+   * below `if (!isAuthenticated) return <LoginPortalView/>`, so a logged-out
+   * render ran two hooks fewer than a logged-in one. React counts hooks by
+   * position: the render right after a successful login asks for two that were
+   * never there, which is the "Rendered more hooks than during the previous
+   * render" crash — on the first screen after signing in. Hoisted here they run
+   * on every render, and the `!session` guard inside makes the logged-out case
+   * a no-op instead of a request.
+   */
+  const refreshBalance = React.useCallback(async () => {
+    if (!session) return;
+
+    try {
+      const { summary } = await billingApi.summary();
+      setActiveFirm((actual) => ({ ...actual, creditsBalance: summary.balance }));
+    } catch {
+      /* The balance simply does not update; it is never invented. */
+    }
+  }, [session]);
+
+  // Read on entry, and again after every operation that spends: the balance is
+  // reported, never derived.
+  useEffect(() => {
+    void refreshBalance();
+  }, [refreshBalance]);
+
   // ═══ Clave de localStorage scoped por firma+usuario ═══
   const {
     savedDrafts,
@@ -269,35 +307,6 @@ export function App() {
    * that replaces this says so. Automating it needs a Colombian payment gateway,
    * which needs merchant credentials nobody can invent either.
    */
-
-  /*
-   * THE DEDUCTION IS THE SERVER'S, AND IT USED TO BE A LIE HERE.
-   *
-   * This subtracted a constant from React state after every draft and called
-   * `handleUpdateFirm`, which only sets local state — so the balance on screen
-   * drifted from the database on the first reload, and a firm at zero could
-   * draft for ever. The charge now happens where the money is actually spent:
-   * the drafting endpoint refuses before calling any model if the balance is
-   * short, and debits atomically once the document exists.
-   *
-   * What is left here is reading back what the server decided.
-   */
-  const refreshBalance = React.useCallback(async () => {
-    if (!session) return;
-
-    try {
-      const { summary } = await billingApi.summary();
-      setActiveFirm((actual) => ({ ...actual, creditsBalance: summary.balance }));
-    } catch {
-      /* The balance simply does not update; it is never invented. */
-    }
-  }, [session]);
-
-  // Read on entry, and again after every operation that spends: the balance is
-  // reported, never derived.
-  useEffect(() => {
-    void refreshBalance();
-  }, [refreshBalance]);
 
   return (
     <TenantProvider activeFirm={activeFirm} currentUserEmail={currentUserEmail}>
