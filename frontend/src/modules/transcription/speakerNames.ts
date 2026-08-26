@@ -82,3 +82,21 @@ export const buildSpeakerNames = (
 
   return names;
 };
+
+/**
+ * The initials on a voice's avatar — "Apoderado demandado" gives AD, "Juez"
+ * gives J.
+ *
+ * Never the diarization label: an S over every circle identifies nobody. Here
+ * rather than in the component because the exported Word and PDF draw the same
+ * avatar, and two functions deciding what a person's initials are would
+ * eventually disagree in the document that gets read most carefully.
+ */
+export const initials = (name: string): string =>
+  name
+    .replace(/\s*\d+$/, '')
+    .split(/\s+/)
+    .filter((word) => word.length > 2)
+    .slice(0, 2)
+    .map((word) => word[0]?.toUpperCase() ?? '')
+    .join('') || name.slice(0, 1).toUpperCase();

@@ -1,7 +1,7 @@
 import { Document, Packer, Paragraph, TextRun, AlignmentType, Footer as DocxFooter, PageNumber } from 'docx';
 import { saveAs } from 'file-saver';
 import { jsPDF } from 'jspdf';
-import { buildSpeakerNames } from './speakerNames';
+import { buildSpeakerNames, initials } from './speakerNames';
 import { colorForSpeaker, type SpeakerColor } from './speakerColors';
 import { ROLE_LABELS, type TranscriptionResult } from './types';
 
@@ -64,6 +64,8 @@ interface Linea {
   texto: string;
   /** The same colour the avatar carries on screen. */
   color: SpeakerColor;
+  /** What goes inside the circle. */
+  iniciales: string;
 }
 
 /**
@@ -87,7 +89,8 @@ const lineas = (result: TranscriptionResult): Linea[] => {
       rol,
       minuto: formatTimestamp(segment.startSeconds),
       texto: segment.text,
-      color: colorForSpeaker(segment.speakerLabel, result.speakerLabels)
+      color: colorForSpeaker(segment.speakerLabel, result.speakerLabels),
+      iniciales: initials(nombre)
     };
   });
 };
@@ -148,7 +151,26 @@ export const exportTranscriptToWord = async (
       new Paragraph({
         spacing: { before: 160, after: 40 },
         children: [
-          new TextRun({ text: linea.quien, bold: true, font: 'Calibri', size: 22, color: linea.color.hex }),
+          /*
+           * The nearest a Word document gets to the avatar.
+           *
+           * docx draws no circles without dropping into raw drawing XML, which
+           * is a lot of machinery for a decoration. A shaded run with the
+           * initials in white reads as the same badge — same colour, same
+           * letters, same job of telling two voices apart at a glance — and it
+           * survives being pasted into somebody else's document, which a
+           * floating shape does not.
+           */
+          new TextRun({
+            text: ` ${linea.iniciales} `,
+            bold: true,
+            font: 'Calibri',
+            size: 16,
+            color: 'FFFFFF',
+            shading: { fill: linea.color.hex }
+          }),
+          new TextRun({ text: '  ', font: 'Calibri', size: 22 }),
+          new TextRun({ text: linea.quien, bold: true, font: 'Calibri', size: 22 }),
           ...(linea.rol
             ? [new TextRun({ text: ` (${linea.rol})`, font: 'Calibri', size: 20, color: '475569' })]
             : []),
@@ -251,26 +273,48 @@ export const exportTranscriptToPdf = (result: TranscriptionResult, titulo: strin
   doc.setTextColor(0, 0, 0);
 
   // ─── Intervenciones ───────────────────────────────────────────────────────
+  /*
+   * The avatar the screen draws, drawn here too.
+   *
+   * A coloured bar in the margin was the first attempt and it did not read as
+   * the same thing: on screen a voice is a circle with its initials, and the
+   * document is where that identification matters most. jsPDF can draw the
+   * circle, so there is no reason for the export to settle for a hint of it.
+   *
+   * The text indents past the avatar, exactly as the row does on screen, so the
+   * paragraph never runs under the circle.
+   */
+  const RADIO = 3.2;
+  const SANGRIA = 10;
+  const anchoTexto = ancho - SANGRIA;
+
+  /** Wraps within the indented column, at the size it will be drawn. */
+  const trozosCuerpo = (texto: string): string[] => {
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    return doc.splitTextToSize(texto, anchoTexto) as string[];
+  };
+
   for (const linea of lineas(result)) {
-    const cuerpo = trozos(linea.texto, 'normal', 10);
+    const cuerpo = trozosCuerpo(linea.texto);
     asegurarEspacio(9 + cuerpo.length * 4.8);
 
-    /*
-     * A colour bar in the margin, and the name in that colour.
-     *
-     * On screen each voice carries a coloured avatar, and the first export
-     * dropped that entirely — the reader had to re-learn who is who from names
-     * alone, in the artefact that gets read most carefully. The bar survives a
-     * black-and-white print as a shade, which the name alone does not.
-     */
     const [r, g, b] = linea.color.rgb;
+
     doc.setFillColor(r, g, b);
-    doc.rect(margenIzq - 4, y - 3.4, 1.4, 4.4, 'F');
+    doc.circle(margenIzq + RADIO, y - 1.1, RADIO, 'F');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(6.5);
+    doc.setTextColor(255, 255, 255);
+    doc.text(linea.iniciales, margenIzq + RADIO, y + 0.2, { align: 'center' });
+
+    const x = margenIzq + SANGRIA;
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(10);
-    doc.setTextColor(r, g, b);
-    doc.text(linea.quien, margenIzq, y);
+    doc.setTextColor(15, 23, 42);
+    doc.text(linea.quien, x, y);
     const anchoNombre = doc.getTextWidth(linea.quien);
 
     doc.setFont('helvetica', 'normal');
@@ -279,19 +323,19 @@ export const exportTranscriptToPdf = (result: TranscriptionResult, titulo: strin
     const sufijo = [linea.rol ? `(${linea.rol})` : '', linea.minuto ? `[${linea.minuto}]` : '']
       .filter(Boolean)
       .join('  ');
-    if (sufijo) doc.text(sufijo, margenIzq + anchoNombre + 2, y);
+    if (sufijo) doc.text(sufijo, x + anchoNombre + 2, y);
 
     y += 5;
-    doc.setTextColor(15, 23, 42);
+    doc.setTextColor(30, 41, 59);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
 
     for (const trozo of cuerpo) {
-      doc.text(trozo, margenIzq, y);
+      doc.text(trozo, x, y);
       y += 4.8;
     }
 
-    y += 3.5;
+    y += 4;
   }
 
   const paginas = doc.getNumberOfPages();

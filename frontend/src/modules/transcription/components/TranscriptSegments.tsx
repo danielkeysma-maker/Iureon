@@ -2,6 +2,7 @@ import React from 'react';
 import { AlertTriangle, Check, Scissors, UserCog } from 'lucide-react';
 import { buildSpeakerNames } from '../speakerNames';
 import { colorForSpeaker } from '../speakerColors';
+import { initials } from '../speakerNames';
 import {
   ROLE_LABELS,
   ROLE_OPTIONS,
@@ -40,20 +41,6 @@ interface TranscriptSegmentsProps {
  * A document that comes out in black and white throws away the identification
  * the screen just made, in the artefact that gets read most carefully.
  */
-
-/**
- * The initials on the avatar, from the display name the reader already sees —
- * "Apoderado demandado" gives AD, "Juez" gives J. Never the diarization label:
- * an S over every circle identifies nobody.
- */
-const initials = (name: string): string =>
-  name
-    .replace(/\s*\d+$/, '')
-    .split(/\s+/)
-    .filter((word) => word.length > 2)
-    .slice(0, 2)
-    .map((word) => word[0]?.toUpperCase() ?? '')
-    .join('') || name.slice(0, 1).toUpperCase();
 
 const formatTimestamp = (seconds: number | null): string => {
   if (seconds === null) return '';
