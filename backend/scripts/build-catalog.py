@@ -118,12 +118,37 @@ def slugify(text):
     return re.sub(r'-+', '-', text)
 
 
-def classify_term(raw):
-    """Split 'no deadline' from 'nobody checked'. Conflating them is dangerous."""
-    if not raw or not str(raw).strip():
+def classify_term(raw, declared_unverified=False):
+    """Split 'no deadline' from 'nobody checked'. Conflating them is dangerous.
+
+    `declared_unverified` comes from the branch's `_meta.unverified` list, which
+    is the RECORD OF WHAT NOBODY COULD CONFIRM, written during the verification
+    pass with a reason for each entry. It wins over every other signal here.
+
+    IT HAD TO WIN, AND IT DID NOT: this function used to decide the status from
+    the term string alone, so the label depended on how the researcher happened
+    to fill the field rather than on whether anyone verified anything. Fourteen
+    of the sixteen declared-unverified entries came out NO_VERIFICADO only
+    because their `term` was left null; the two that carried a sentence
+    explaining WHY there is no deadline were stamped VERIFICADO for having text
+    in them. One of those published concrete deadlines — three hábiles here,
+    fifteen there — read off a decree whose official text the researcher wrote
+    down that they could never open.
+
+    That is the project's own rule turned inside out: a source that does not
+    support the entry means the term was never verified. Prose explaining a gap
+    is evidence of the gap, not evidence against it.
+    """
+    text = str(raw).strip() if raw is not None else ''
+
+    # Kept as the description even when unverified: it says WHY there is no
+    # term, which is more useful to a lawyer than an empty field.
+    if declared_unverified:
+        return 'NO_VERIFICADO', text or None
+
+    if not text:
         return 'NO_VERIFICADO', None
 
-    text = str(raw).strip()
     lowered = text.lower()
 
     # Only treat as NO_CADUCA when the source explicitly says so.
@@ -147,7 +172,7 @@ def ts(value):
     return "'" + escaped + "'"
 
 
-def build_entry(item, branch, prefix, seen):
+def build_entry(item, branch, prefix, seen, unverified_names=frozenset()):
     name = item['exact_name']
     slug = slugify(name)
     key = prefix + '/' + slug
@@ -159,7 +184,9 @@ def build_entry(item, branch, prefix, seen):
         suffix += 1
     seen.add(key)
 
-    status, description = classify_term(item.get('term'))
+    status, description = classify_term(
+        item.get('term'), declared_unverified=name in unverified_names
+    )
 
     sections = []
     for section in item.get('required_sections') or []:
@@ -227,14 +254,27 @@ def build(src_name, out_name, export_name, branch, prefix):
     data = json.load(open(src, encoding='utf-8'))
     meta = data['_meta']
 
+    # The authoritative record of what could NOT be verified, by exact name.
+    unverified_names = frozenset(
+        x.get('actuacion') for x in (meta.get('unverified') or []) if x.get('actuacion')
+    )
+
     seen = set()
     entries = []
     counts = {'VERIFICADO': 0, 'NO_CADUCA': 0, 'NO_VERIFICADO': 0}
 
     for item in data['actuaciones']:
-        entry, status = build_entry(item, branch, prefix, seen)
+        entry, status = build_entry(item, branch, prefix, seen, unverified_names)
         entries.append(entry)
         counts[status] += 1
+
+    catalogued = {item['exact_name'] for item in data['actuaciones']}
+    huerfanos = sorted(unverified_names - catalogued)
+    if huerfanos:
+        raise SystemExit(
+            'FATAL: %s declares these as unverified but has no such actuacion: %s'
+            % (src_name, '; '.join(huerfanos))
+        )
 
     output = HEADER.format(
         branch=branch,

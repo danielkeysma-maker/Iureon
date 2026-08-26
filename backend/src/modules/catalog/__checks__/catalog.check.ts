@@ -10,6 +10,8 @@
  * Plain script rather than a test-runner suite so it runs in CI today; it moves
  * to Vitest unchanged when a runner is added.
  */
+import fs from 'fs';
+import path from 'path';
 import { catalogService } from '../catalog.service';
 import { buildCatalogGuidance, renderCatalogGuidance } from '../../agent/catalogGuidance';
 import { validateVerificationInput } from '../verification.validate';
@@ -870,6 +872,67 @@ if (!baseForMerge) {
     failures++;
   } else {
     console.log('ok   retracting a term restores the unverified warning');
+  }
+}
+
+/*
+ * ─── LO QUE NADIE PUDO VERIFICAR TIENE QUE DECIRLO ─────────────────────────
+ *
+ * `_meta.unverified` de cada rama es el registro de la verificación: qué
+ * entrada no se pudo confirmar y por qué, escrito a mano al leer las normas.
+ * Este check cruza ese registro contra el catálogo que sirve la aplicación.
+ *
+ * EXISTE PORQUE FALLÓ. El generador decidía el estado leyendo el texto del
+ * término y nunca ese registro, así que la etiqueta dependía de cómo se hubiera
+ * llenado el campo: catorce entradas salieron NO_VERIFICADO sólo porque su
+ * `term` quedó en null, y las dos que traían una frase explicando POR QUÉ no
+ * hay término se marcaron VERIFICADO por tener texto. Una de ellas publicaba
+ * plazos concretos —tres días hábiles aquí, quince allá— leídos de un decreto
+ * cuyo texto oficial el propio registro dice que nunca se pudo abrir.
+ *
+ * Un plazo equivocado es el defecto que pierde un caso, y llevaba una etiqueta
+ * que decía que alguien lo había comprobado.
+ */
+{
+  const researchDir = path.join(__dirname, '..', '..', '..', '..', '..', 'research');
+  const archivos = fs.existsSync(researchDir)
+    ? fs.readdirSync(researchDir).filter((f) => f.startsWith('actuaciones-') && f.endsWith('.json'))
+    : [];
+
+  if (archivos.length === 0) {
+    console.log('skip declared-unverified cross-check: research/ no está disponible');
+  } else {
+    const incumplen: string[] = [];
+    let declarados = 0;
+
+    for (const archivo of archivos) {
+      const datos = JSON.parse(fs.readFileSync(path.join(researchDir, archivo), 'utf8'));
+      const rama = datos?._meta?.branch as LegalBranch | undefined;
+      const lista = (datos?._meta?.unverified ?? []) as Array<{ actuacion?: string }>;
+      if (!rama || lista.length === 0) continue;
+
+      for (const { actuacion } of lista) {
+        if (!actuacion) continue;
+        declarados++;
+
+        const entrada = catalogService.findByDocumentType(actuacion, rama);
+        if (!entrada) {
+          incumplen.push(`${rama} · ${actuacion} — declarada sin verificar pero no está en el catálogo`);
+          continue;
+        }
+        if (entrada.term.status !== 'NO_VERIFICADO') {
+          incumplen.push(`${rama} · ${actuacion} — declarada sin verificar y publicada como ${entrada.term.status}`);
+        }
+      }
+    }
+
+    if (incumplen.length > 0) {
+      console.error('FAIL unverified: el catálogo afirma términos que nadie verificó');
+      incumplen.forEach((linea) => console.error('     ' + linea));
+      failures++;
+    } else {
+      console.log(`ok   las ${declarados} actuaciones declaradas sin verificar se publican como NO_VERIFICADO`);
+    }
   }
 }
 
