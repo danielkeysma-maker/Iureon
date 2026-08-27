@@ -51,6 +51,7 @@ FILE_FOR_BRANCH = {
     'INTERNACIONAL': 'actuaciones-internacional.json',
     'SUPERINTENDENCIAS': 'actuaciones-superintendencias.json',
     'AGRARIO': 'actuaciones-agrario.json',
+    'ADUANERO': 'actuaciones-aduanero.json',
 }
 
 # Mirrors the allowlist in catalog.check.ts. Duplicated on purpose: a merge that
@@ -58,7 +59,7 @@ FILE_FOR_BRANCH = {
 OFICIALES = (
     'funcionpublica.gov.co', 'secretariasenado.gov.co', 'suin-juriscol.gov.co',
     'alcaldiabogota.gov.co', 'corteconstitucional.gov.co', 'ramajudicial.gov.co',
-    'icbf.gov.co', 'supersalud.gov.co', 'colpensiones.gov.co',
+    'icbf.gov.co', 'supersalud.gov.co', 'colpensiones.gov.co', 'dian.gov.co',
     'oas.org', 'hcch.net', 'tribunalandino.org.ec',
 )
 

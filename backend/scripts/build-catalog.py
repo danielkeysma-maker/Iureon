@@ -116,6 +116,13 @@ BRANCHES = [
         'AGRARIO',
         'agrario',
     ),
+    (
+        'actuaciones-aduanero.json',
+        'aduanero.ts',
+        'ADUANERO_CATALOG',
+        'ADUANERO',
+        'aduanero',
+    ),
 ]
 
 

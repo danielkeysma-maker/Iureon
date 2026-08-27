@@ -997,6 +997,11 @@ if (!baseForMerge) {
     'icbf.gov.co',
     'supersalud.gov.co',
     'colpensiones.gov.co',
+    // La DIAN publica en su propio normograma el Estatuto Aduanero que
+    // administra, y es el unico sitio oficial que lo sirve: secretariasenado
+    // devuelve 404 y funcionpublica no lo tiene. Verificado antes de abrir la
+    // lista: 2,1 MB con el art. 188 verbatim.
+    'dian.gov.co',
     // Tratados: sus depositarios son la fuente oficial de su propio texto.
     'oas.org',
     'hcch.net',

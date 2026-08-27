@@ -21,7 +21,8 @@ export type LegalBranch =
   | 'CONTRATACION'
   | 'SUPERINTENDENCIAS'
   | 'INTERNACIONAL'
-  | 'AGRARIO';
+  | 'AGRARIO'
+  | 'ADUANERO';
 
 /** Who authors the document. */
 /**

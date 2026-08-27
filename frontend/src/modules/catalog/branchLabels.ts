@@ -26,6 +26,7 @@ export const BRANCH_LABELS: Record<string, string> = {
   // Named for the procedure that exists, not the jurisdiction that does not:
   // the Procedimiento Unico of Decreto Ley 902 de 2017, before the ANT.
   AGRARIO: 'Agrario & Ordenamiento Rural (ANT)',
+  ADUANERO: 'Aduanero & Comercio Exterior (DIAN)',
   // Not catalogued: kept so its legacy document types remain reachable.
   'PEQUEÑAS_CAUSAS': 'Pequeñas Causas (Mínima Cuantía)'
 };

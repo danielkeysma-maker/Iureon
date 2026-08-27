@@ -1,0 +1,1878 @@
+{
+  "_meta": {
+    "branch": "ADUANERO",
+    "verified_at": "",
+    "source_of_truth": "PASO 0 — LA RAMA SE JUSTIFICA COMO RAMA PROPIA, pero la norma que la rige NO es la que pedía el encargo. HALLAZGO CENTRAL: el procedimiento sancionatorio, de decomiso y de liquidación oficial aduanera YA NO ESTÁ en el Decreto 1165 de 2019. (1) El Decreto 1165 de 2019 sí es el Estatuto Aduanero vigente y sí sustituyó a sus antecesores: su art. 774 dice literalmente «A partir de la entrada en vigencia del presente decreto, quedan derogadas las siguientes disposiciones: el Decreto 2685 de 1999; el Decreto 390 de 2016 con excepción del primer inciso del artículo 675; los Títulos II y III del Decreto 2147 de 2016; el Decreto 349 de 2018», y su art. 775 fija la vigencia «una vez transcurridos treinta (30) días comunes contados a partir del día siguiente al de su publicación en el Diario Oficial, conforme con lo previsto en el parágrafo 2 del artículo 2o de la Ley 1609 de 2013» (firmado el 2 de julio de 2019; rige desde el 2 de agosto de 2019). No hay régimen de transición general en el 1165 más allá de esa vacancia de 30 días. (2) PERO los Títulos 15, 16 y concordantes del Decreto 1165 —arts. 606 a 709: acta de aprehensión, objeción, período probatorio, requerimiento especial aduanero, decomiso, resolución sancionatoria, recurso de reconsideración, silencio positivo, caducidad de la acción sancionatoria— fueron DEROGADOS por el art. 155 del Decreto Ley 920 de 2023, a partir del 9 de junio de 2023. La compilación oficial de la DIAN marca cada uno de esos artículos con la nota «<Artículo derogado por el artículo 155 del Decreto Ley 920 de 2023 a partir del 9 de junio de 2023>». (3) Y el Decreto Ley 920 de 2023 fue declarado INEXEQUIBLE por consecuencia por la Corte Constitucional, Sentencia C-072-25 del 27 de febrero de 2025 (M.P. Cristina Pardo Schlesinger), con efectos diferidos hasta el 20 de junio de 2026, «lapso dentro del cual el Congreso de la República deberá [...] expedir la ley que contenga el régimen sancionatorio y el decomiso de mercancías en materia de aduanas, así como el proceso administrativo aplicable» (nota de vigencia de secretariasenado, basedoc/js/decreto_0920_2023.js). (4) EL CONGRESO LA EXPIDIÓ: la LEY 2586 DE 19 DE JUNIO DE 2026, publicada en el Diario Oficial No. 53.527 del 19 de junio de 2026, «por medio de la cual se adopta el nuevo régimen sancionatorio y de decomiso de mercancías en materia aduanera, así como el procedimiento aplicable ante el incumplimiento de obligaciones y disposiciones aduaneras». Su art. 114: «La presente ley entra a regir a partir de su promulgación y deroga el Decreto Ley 920 de 2023 y el artículo 51 de la Ley 1762 de 2015». ESTA ES LA NORMA VIGENTE HOY (26 de agosto de 2026) y es la fuente de casi todas las fichas de este archivo. (5) RÉGIMEN DE TRANSICIÓN: art. 112 de la Ley 2586 — «Cuando una operación aduanera se haya iniciado en vigencia del Decreto Ley 920 de 2023, y en todo caso antes de la vigencia de la presente ley, el régimen de obligaciones, infracciones y sanciones aplicables será el establecido en las descripciones previstas en la norma vigente al momento de su inicio, sin perjuicio de la aplicación del principio de favorabilidad. Los procesos administrativos aduaneros en curso se regirán por las normas vigentes al tiempo de su iniciación, de conformidad con el artículo 40 de la Ley 153 de 1887, modificado por el artículo 624 de la Ley 1564 de 2012». Su parágrafo 2 añade que las remisiones del Decreto 1165 «con relación a los asuntos sancionatorios, de decomiso, liquidaciones oficiales [...] se entenderán hechas a las disposiciones de la presente ley». CONSECUENCIA PRÁCTICA: un proceso iniciado antes del 19 de junio de 2026 puede seguir corriendo bajo el Decreto Ley 920 de 2023 (o bajo el Decreto 1165 si es anterior al 9 de junio de 2023). Ninguna ficha de este archivo debe aplicarse a ciegas a un expediente viejo. (6) EL DECRETO 1165 DE 2019 SIGUE VIGENTE en todo lo demás —regímenes, modalidades, levante, firmeza, abandono, legalización, rescate— con las modificaciones de los Decretos 360 de 2021, 572 de 2021, 2068 de 2023, 659 de 2024 y 218 de 2026, todas leídas en la compilación oficial de la DIAN actualizada. (7) CORRECCIÓN AL ENCARGO: el DECRETO 1742 DE 2020 NO MODIFICA el Decreto 1165. Es el decreto de estructura orgánica y funciones de la DIAN (su art. 56 es el de la facultad de absolver consultas). Se contaron cero (0) referencias a «Decreto 1742 de 2020» en los 775 artículos del texto compilado del 1165. Los modificatorios reales son los cinco decretos citados en (6). (8) RESOLUCIÓN 46 DE 2019 DE LA DIAN: es la reglamentaria del Decreto 1165 y sigue existiendo como tal, pero NO se usó como fundamento de ninguna ficha porque todos los términos catalogados aquí están en la ley y en el decreto, no en la resolución; y porque no se pudo confirmar en fuente oficial de la lista blanca cuál es su texto vigente tras la Ley 2586. Ninguna ficha depende de ella. (9) DECISIÓN ANDINA 671 Y NORMATIVA CAN: NO se aplicó. En el articulado de la Ley 2586 de 2026 no aparece una sola referencia a Decisión alguna de la CAN, y el procedimiento sancionatorio y de decomiso es íntegramente de derecho interno. La Decisión 671 armoniza regímenes aduaneros comunitarios, no crea actuaciones procesales con términos propios para el usuario en Colombia. No se catalogó ninguna ficha con base en ella; ver _gaps. (10) SOLAPAMIENTO CON TRIBUTARIO Y ADMINISTRATIVO — respuesta honesta: NO es el procedimiento tributario aplicado a otra materia. Se leyeron actuaciones-tributario.json (20 fichas del Estatuto Tributario) y actuaciones-administrativo-tributario-transito.json (69 fichas del CPACA). Los nombres coinciden en tres casos y los relojes NO: el requerimiento especial TRIBUTARIO se responde en 3 meses (E.T. art. 707) mientras el REQUERIMIENTO ESPECIAL ADUANERO se responde en 15 DÍAS HÁBILES (Ley 2586, art. 70); el recurso de reconsideración TRIBUTARIO se interpone en 2 meses (E.T. art. 720) mientras el ADUANERO se interpone en 15 DÍAS HÁBILES (Ley 2586, art. 88). Un abogado que aplique el reloj tributario a un expediente aduanero pierde el término por un factor de cuatro a seis. Además, todo el proceso de aprehensión y decomiso —acta de aprehensión, escrito de objeciones, garantía en reemplazo, rescate, decomiso directo, Comité de Revisión de Aprehensiones— no tiene equivalente en ninguna otra rama del catálogo. Para evitar el choque de exact_name se nombraron con el calificativo «aduanero/aduanera» las tres actuaciones homónimas. (11) FUENTES REALMENTE LEÍDAS: Ley 2586 de 2026 en http://www.secretariasenado.gov.co/senado/basedoc/ley_2586_2026.html (arts. 1-38), _pr001.html (arts. 39-81) y _pr002.html (arts. 82-114), más sus notas de vigencia en basedoc/js/ley_2586_2026.js; Decreto Ley 920 de 2023 y sus notas de inexequibilidad en basedoc/decreto_0920_2023.html y basedoc/js/decreto_0920_2023.js; Decreto 1165 de 2019 en la compilación jurídica oficial de la DIAN, https://normograma.dian.gov.co/dian/compilacion/docs/decreto_1165_2019.htm, HTML crudo de 2,18 MB descargado entero, del que se contaron 775 artículos hasta el art. 775 (regla 3 de la doctrina: no se declaró nada ilegible sin bajar el archivo completo). ADVERTENCIA DE FUENTE: suin-juriscol.gov.co no fue accesible desde este entorno (la conexión TLS se cierra abruptamente y el certificado no se pudo verificar) y funcionpublica.gov.co/eva/gestornormativo no sirve el Decreto 1165 en ningún identificador probado; secretariasenado no publica ese decreto (404). Por eso las seis fichas cuyo fundamento está en el Decreto 1165 llevan source_url del normograma de la DIAN, que es el compilador oficial de la entidad que administra la norma, pero que puede NO estar en la lista blanca de catalog.check.ts. Quedan señaladas en _meta_unverified para que se re-fuente o se agregue el dominio a mano.",
+    "gaps": [
+      "ADUANERO: CONTRABANDO Y DEMÁS DELITOS ADUANEROS (Ley 1762 de 2015, arts. 4 a 11; Código Penal arts. 319 y ss.): no se catalogó nada. Es materia penal y va en la rama PENAL, como indica el encargo. La Ley 2586 de 2026 lo confirma desde su propio lado: su art. 10 declara la independencia de procesos y su art. 12 impone el deber de denuncia ante la Fiscalía.",
+      "ADUANERO: DEMANDA DE NULIDAD Y RESTABLECIMIENTO DEL DERECHO contra la resolución de decomiso, la resolución sancionatoria o la liquidación oficial aduanera: NO se catalogó aquí porque ya existe en ADMINISTRATIVO («Demanda de nulidad y restablecimiento del derecho»). Duplicarla rompería el exact_name. Sí se dejó constancia en las fichas del recurso de reconsideración de que el art. 88 par. 2 de la Ley 2586 permite prescindir del recurso y acudir directamente a la jurisdicción cuando se atendió el requerimiento o se presentó el escrito de objeciones.",
+      "ADUANERO: PROCESO DE COBRO COACTIVO de la sanción aduanera: no se catalogó. El art. 6 de la Ley 2586 de 2026 remite expresamente al procedimiento del Estatuto Tributario (arts. 571, 572, 573, 793, 794, 794-1, 798 y 828-1 y Título VIII del Libro Quinto), y el catálogo ya tiene «Excepciones contra el mandamiento de pago en cobro coactivo» y «Mandamiento de pago en cobro coactivo» en TRIBUTARIO. Aquí sí sería el procedimiento tributario aplicado a otra materia, y por eso no se duplica.",
+      "ADUANERO: REVOCATORIA DIRECTA del acto administrativo aduanero (Ley 2586 de 2026, art. 97): no se catalogó como ficha propia porque el artículo remite al CPACA y el catálogo ya tiene «Solicitud de revocación directa de actos administrativos» en ADMINISTRATIVO y «Solicitud de revocatoria directa en materia tributaria» en TRIBUTARIO. Lo único propiamente aduanero es que por el art. 18 num. 6 de la Ley 2586 la reducción de sanción por tope de ingresos brutos puede pedirse dentro del término de la revocatoria directa; eso quedó recogido en la ficha del escrito de allanamiento y reducción.",
+      "ADUANERO: DECISIÓN ANDINA 671 y demás normativa de la CAN: no generó ninguna ficha. No se encontró una sola referencia a Decisiones andinas en el articulado de la Ley 2586 de 2026, y el Decreto 1165 de 2019 tampoco las invoca como fuente de un trámite con término propio para el usuario. La normativa CAN armoniza regímenes aduaneros, pero el procedimiento sancionatorio y de decomiso colombiano no depende de ella. Catalogarla habría sido inventar actuaciones.",
+      "ADUANERO: PROCEDIMIENTO DE VERIFICACIÓN DE ORIGEN (Ley 2586 de 2026, arts. 86 y 87): no se catalogó en esta pasada. Tiene términos propios y verificados en el texto —10 meses para la verificación de mercancías exportadas, recurso de apelación ante la Dirección de Gestión de Aduanas contra la resolución de determinación de origen— pero sus actuaciones dependen del acuerdo comercial aplicable en cada caso, lo que exige verificar acuerdo por acuerdo. Es un hueco declarado, no una omisión.",
+      "ADUANERO: SUSPENSIÓN Y CANCELACIÓN DE LA AUTORIZACIÓN AL OPERADOR ECONÓMICO AUTORIZADO (Ley 2586 de 2026, arts. 76 a 80) y EFECTIVIDAD DE GARANTÍAS (arts. 81 a 85): no se catalogaron. Son procedimientos reales y vigentes, pero de nicho —solo afectan a usuarios aduaneros habilitados— y catalogarlos bien exige leer además el régimen de garantías del Decreto 1165, que no se alcanzó a verificar artículo por artículo en esta pasada.",
+      "ADUANERO: SANCIÓN DE CIERRE DEL ESTABLECIMIENTO DE COMERCIO (Ley 2586 de 2026, art. 55): no se catalogó como ficha autónoma. No es un escrito separado: se propone dentro del acta de aprehensión y se impone dentro de la misma resolución de decomiso. Se recogió como sección obligatoria en esas dos fichas.",
+      "ADUANERO: RESOLUCIÓN ANTICIPADA y demás trámites del Decreto 1165 de 2019 (arts. 298 a 302): no se catalogaron. Son trámites de determinación previa, no actuaciones del procedimiento sancionatorio o de decomiso que define esta rama.",
+      "ADUANERO, verificado el esta pasada: PASO 0 — LA RAMA SE JUSTIFICA COMO RAMA PROPIA, pero la norma que la rige NO es la que pedía el encargo. HALLAZGO CENTRAL: el procedimiento sancionatorio, de decomiso y de liquidación oficial aduanera YA NO ESTÁ en el Decreto 1165 de 2019. (1) El Decreto 1165 de 2019 sí es el Estatuto Aduanero vigente y sí sustituyó a sus antecesores: su art. 774 dice literalmente «A partir de la entrada en vigencia del presente decreto, quedan derogadas las siguientes disposiciones: el Decreto 2685 de 1999; el Decreto 390 de 2016 con excepción del primer inciso del artículo 675; los Títulos II y III del Decreto 2147 de 2016; el Decreto 349 de 2018», y su art. 775 fija la vigencia «una vez transcurridos treinta (30) días comunes contados a partir del día siguiente al de su publicación en el Diario Oficial, conforme con lo previsto en el parágrafo 2 del artículo 2o de la Ley 1609 de 2013» (firmado el 2 de julio de 2019; rige desde el 2 de agosto de 2019). No hay régimen de transición general en el 1165 más allá de esa vacancia de 30 días. (2) PERO los Títulos 15, 16 y concordantes del Decreto 1165 —arts. 606 a 709: acta de aprehensión, objeción, período probatorio, requerimiento especial aduanero, decomiso, resolución sancionatoria, recurso de reconsideración, silencio positivo, caducidad de la acción sancionatoria— fueron DEROGADOS por el art. 155 del Decreto Ley 920 de 2023, a partir del 9 de junio de 2023. La compilación oficial de la DIAN marca cada uno de esos artículos con la nota «<Artí"
+    ],
+    "unverified": [
+      {
+        "actuacion": "Declaración de legalización con pago de rescate",
+        "reason": "El término y los porcentajes de rescate se leyeron verbatim en el art. 293 del Decreto 1165 de 2019, pero en la compilación de la DIAN (normograma.dian.gov.co), no en un dominio de la lista blanca de la doctrina, porque suin-juriscol cerró la conexión TLS y ni funcionpublica ni secretariasenado publican ese decreto. El texto sí trae las modificaciones del Decreto 360 de 2021 art. 73 y del Decreto 659 de 2024 art. 37."
+      },
+      {
+        "actuacion": "Declaración de corrección de la declaración de importación",
+        "reason": "Mismo problema de dominio: art. 296 del Decreto 1165 leído en normograma.dian.gov.co. Además su inciso final remite al art. 610 del propio Decreto 1165, artículo derogado por el Decreto Ley 920 de 2023; por el art. 112 par. 2 de la Ley 2586 de 2026 esa remisión debe entenderse hecha hoy a los arts. 18 y 19 de la Ley 2586. Esa relectura es una inferencia del texto de la ley, no una cita literal de un artículo que lo diga caso por caso."
+      },
+      {
+        "actuacion": "Solicitud de rescate de mercancía en abandono legal",
+        "reason": "Mismo problema de dominio: arts. 171 par. 1 y 293 num. 1 del Decreto 1165 leídos en normograma.dian.gov.co. Adicionalmente el inciso que excluye del rescate a la mercancía en abandono del art. 169 fue adicionado por el art. 37 del Decreto 659 de 2024 y su entrada en vigor está condicionada a que la DIAN certifique el funcionamiento de los servicios informáticos; no se pudo verificar si esa certificación ya se produjo."
+      },
+      {
+        "actuacion": "Solicitud de revisión ante el Comité de Revisión de Aprehensiones",
+        "reason": "El artículo está vigente y se leyó completo, pero su parágrafo 2 escalona la operación del Comité por cuantía: desde el 1 de agosto de 2026 solo para aprehensiones inferiores a 2.000 UVT, desde el 1 de agosto de 2027 hasta 4.000 UVT y desde el 1 de agosto de 2028 hasta 10.000 UVT. Hoy la actuación solo está disponible por debajo de 2.000 UVT."
+      },
+      {
+        "actuacion": "Solicitud de declaratoria de silencio administrativo positivo aduanero",
+        "reason": "El art. 96 de la Ley 2586 de 2026 fija el plazo por remisión —«dentro del término establecido para presentar el medio de control correspondiente sobre dicho acto ante la jurisdicción de lo contencioso administrativo»— y ese término está en el art. 164 del CPACA, que no se leyó en fuente oficial en esta pasada. El plazo concreto queda sin verificar."
+      }
+    ]
+  },
+  "actuaciones": [
+    {
+      "exact_name": "Escrito de objeciones a la aprehensión",
+      "area": "ADUANERO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 2586 de 2026, art. 45 (escrito de objeciones a la aprehensión: término y requisitos); art. 40 (acta de aprehensión que se objeta); art. 102 (notificación del acta, desde la que corre el término); art. 36 (la aprehensión y este escrito son la oportunidad para pedir pruebas); art. 96 (si no se presenta el escrito NO se configura el silencio administrativo positivo); art. 32 parágrafo (si la DIAN corrige la causal de aprehensión, se restituyen los 15 días hábiles); art. 8 parágrafo 1 (la solicitud ante el Comité de Revisión de Aprehensiones suspende este término)",
+      "competent_authority": "División de Fiscalización y Liquidación de la Dirección Seccional de Aduanas o de Impuestos y Aduanas de la DIAN donde continúa el proceso de decomiso, según la Dirección Seccional indicada en el acta de aprehensión (Ley 2586 de 2026, arts. 40 y 43)",
+      "term": "EL RELOJ DEL CLIENTE: quince (15) DÍAS HÁBILES siguientes a la notificación del acta de aprehensión. Art. 45: «El titular de los derechos o el responsable de la mercancía aprehendida dispondrá de quince (15) días hábiles siguientes a la notificación del Acta de Aprehensión para presentar el Escrito de Objeciones a la aprehensión y/o al reconocimiento y avalúo de la mercancía». Es un término preclusivo y de tres consecuencias: (a) es la ÚNICA oportunidad para pedir pruebas en esta etapa (art. 36); (b) es el término dentro del cual debe constituirse la garantía en reemplazo de aprehensión si se quiere recuperar la mercancía antes de la decisión (art. 43); (c) SI NO SE PRESENTA, NO SE CONFIGURA EL SILENCIO ADMINISTRATIVO POSITIVO aunque la DIAN se pase de los 70 días hábiles para decidir — art. 96: «No se configurará el silencio administrativo positivo cuando no se haya presentado el documento de objeción a la aprehensión». El escrito se tiene POR NO PRESENTADO si se interpone fuera del plazo, sin firma del interesado, representante o apoderado, o sin expresión concreta de los motivos de inconformidad (art. 45 num. 1). EL RELOJ DE LA DIAN, que es otro: 20 días hábiles para proferir el auto de pruebas (art. 46) y 70 días hábiles para expedir y notificar la resolución de decomiso (art. 47). SUSPENSIÓN: el término de los 15 días hábiles se suspende desde que se radica en debida forma la solicitud ante el Comité de Revisión de Aprehensiones hasta la decisión del Director Seccional (art. 8 par. 1). REAPERTURA: si la DIAN corrige por auto la causal de aprehensión, «se restituirán los términos al interesado para que interponga dentro de los quince (15) días hábiles siguientes, el Escrito de objeción a la aprehensión» (art. 32 par.). SALVAVIDAS DEL PARÁGRAFO: aun sin cumplir los requisitos formales, si se aportan pruebas que desvirtúen la causal, la autoridad podrá valorarlas (art. 45 par.).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del acta de aprehensión objetada, su fecha y fecha de notificación",
+          "mandatory": true,
+          "basis": "art. 45 num. 1"
+        },
+        {
+          "n": 2,
+          "name": "Identificación y calidad de quien objeta (titular de derechos o responsable de la mercancía) y acreditación de la personería del apoderado",
+          "mandatory": true,
+          "basis": "art. 45 num. 1"
+        },
+        {
+          "n": 3,
+          "name": "Dirección de notificaciones del objetante y la de su apoderado",
+          "mandatory": true,
+          "basis": "art. 45 num. 2"
+        },
+        {
+          "n": 4,
+          "name": "Expresión concreta de los motivos de inconformidad con la aprehensión y con la causal invocada",
+          "mandatory": true,
+          "basis": "art. 45 num. 1"
+        },
+        {
+          "n": 5,
+          "name": "Nombre y dirección de quien transfirió la propiedad o posesión, si la mercancía se adquirió en el territorio nacional, o manifestación de que no se conoce o no se recuerda",
+          "mandatory": true,
+          "basis": "art. 45 num. 3"
+        },
+        {
+          "n": 6,
+          "name": "Objeciones al reconocimiento y avalúo de la mercancía, si las hay",
+          "mandatory": false,
+          "basis": "arts. 44 y 45"
+        },
+        {
+          "n": 7,
+          "name": "Pruebas que acreditan la legal introducción o permanencia de la mercancía en el territorio aduanero nacional, anexadas al escrito",
+          "mandatory": true,
+          "basis": "art. 45 inciso 2"
+        },
+        {
+          "n": 8,
+          "name": "Solicitud de práctica de pruebas útiles, conducentes, pertinentes y necesarias, con la indicación de qué prueba demuestra qué hecho",
+          "mandatory": false,
+          "basis": "arts. 36 y 45 inciso 2"
+        },
+        {
+          "n": 9,
+          "name": "Hechos, razones y pruebas contra la sanción accesoria de cierre del establecimiento de comercio, si fue propuesta en el acta",
+          "mandatory": false,
+          "basis": "art. 45 num. 4"
+        },
+        {
+          "n": 10,
+          "name": "Petición de devolución de la mercancía y de archivo del expediente",
+          "mandatory": true,
+          "basis": "art. 53"
+        },
+        {
+          "n": 11,
+          "name": "Firma del interesado, su representante o su apoderado",
+          "mandatory": true,
+          "basis": "art. 45 num. 1"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_2586_2026_pr001.html"
+    },
+    {
+      "exact_name": "Respuesta al requerimiento especial aduanero",
+      "area": "ADUANERO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 2586 de 2026, art. 70 (notificación y respuesta al requerimiento especial aduanero); art. 66 (con la notificación del requerimiento se inicia formalmente el proceso); art. 69 (contenido del requerimiento que se contesta); art. 36 (la respuesta es oportunidad para pedir pruebas); art. 19 num. 3 (allanamiento después de notificado el requerimiento: sanción al 40%); art. 96 (si no se responde NO opera el silencio administrativo positivo); Decreto 1165 de 2019, art. 186 (levante si se corrige y paga dentro de los 5 días siguientes a la notificación)",
+      "competent_authority": "División de Fiscalización y Liquidación de la Dirección Seccional de Aduanas o de Impuestos y Aduanas de la DIAN que profirió el requerimiento especial aduanero",
+      "term": "EL RELOJ DEL CLIENTE: quince (15) DÍAS HÁBILES siguientes a la notificación del requerimiento especial aduanero. Art. 70: «La respuesta al Requerimiento Especial Aduanero se presentará por el interesado, dentro de los quince (15) días hábiles siguientes a su notificación y en ella formulará sus objeciones y solicitará las pruebas que pretenda hacer valer. Tal escrito no requiere de presentación personal». CUIDADO — NO ES EL TÉRMINO TRIBUTARIO: el requerimiento especial del Estatuto Tributario se responde en tres (3) meses; el aduanero, en 15 días hábiles. AMPLIACIÓN, y solo por una causa: «El plazo de respuesta al Requerimiento Especial Aduanero se podrá ampliar en aquellos casos en que sea necesario acreditar el cumplimiento de restricciones legales o administrativas como soporte de la declaración de corrección, cuando haya lugar a ello, sin que supere los setenta (70) días hábiles» (art. 70). NO responder cuesta el silencio positivo: art. 96 — «Tampoco se configurará el silencio administrativo positivo cuando no se haya presentado respuesta al requerimiento especial aduanero». DOS RELOJES MÁS DENTRO DE ESTE: (a) para conservar la mercancía, si el requerimiento propone liquidación oficial, el declarante que corrige, cancela sanciones y mayores valores DENTRO DE LOS CINCO (5) DÍAS siguientes a la notificación obtiene el levante (Decreto 1165 de 2019, art. 186); (b) el allanamiento por escrito después de notificado el requerimiento y hasta antes de notificarse la decisión de fondo reduce la multa al cuarenta por ciento (40%) — antes del requerimiento habría sido el 20%, o sin sanción si el reconocimiento fue voluntario y sin intervención de la autoridad (art. 19 nums. 1, 2 y 3). EL RELOJ DE LA DIAN, que es otro: 10 días hábiles para el auto de pruebas (art. 71) y 70 días hábiles para expedir y notificar la resolución sancionatoria o la liquidación oficial (art. 72), prorrogables un (1) mes por auto de suspensión.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del requerimiento especial aduanero, su número, fecha y fecha de notificación",
+          "mandatory": true,
+          "basis": "art. 70"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del presunto infractor o del declarante y acreditación de la personería del apoderado",
+          "mandatory": true,
+          "basis": "art. 70"
+        },
+        {
+          "n": 3,
+          "name": "Dirección electrónica y física de notificaciones",
+          "mandatory": true,
+          "basis": "arts. 99 y 104"
+        },
+        {
+          "n": 4,
+          "name": "Objeciones a cada uno de los hechos que el requerimiento califica como infracción y a las normas en que se sustenta",
+          "mandatory": true,
+          "basis": "arts. 69 y 70"
+        },
+        {
+          "n": 5,
+          "name": "Objeciones a la cuantificación propuesta de tributos aduaneros, rescate y sanciones",
+          "mandatory": false,
+          "basis": "art. 69"
+        },
+        {
+          "n": 6,
+          "name": "Causales de exoneración de responsabilidad o errores formales no sancionables que se invocan, con su prueba",
+          "mandatory": false,
+          "basis": "arts. 22 y 23"
+        },
+        {
+          "n": 7,
+          "name": "Solicitud de pruebas que se pretenden hacer valer, con expresión de su conducencia y pertinencia",
+          "mandatory": true,
+          "basis": "arts. 36 y 70"
+        },
+        {
+          "n": 8,
+          "name": "Elementos adicionales de comprensión de la operación logística (videos, presentaciones, flujogramas, certificaciones)",
+          "mandatory": false,
+          "basis": "art. 70 inciso final"
+        },
+        {
+          "n": 9,
+          "name": "Allanamiento total o parcial y solicitud de reducción de la sanción, con copia del recibo oficial de pago",
+          "mandatory": false,
+          "basis": "art. 19 nums. 3 y par. 4"
+        },
+        {
+          "n": 10,
+          "name": "Solicitud de ampliación del plazo para acreditar restricciones legales o administrativas, si es el caso",
+          "mandatory": false,
+          "basis": "art. 70 inciso 3"
+        },
+        {
+          "n": 11,
+          "name": "Petición concreta de archivo del expediente o de reducción de lo propuesto",
+          "mandatory": true,
+          "basis": "art. 72 par."
+        },
+        {
+          "n": 12,
+          "name": "Firma del interesado o de su apoderado",
+          "mandatory": true,
+          "basis": "art. 70"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_2586_2026_pr001.html"
+    },
+    {
+      "exact_name": "Recurso de reconsideración aduanero",
+      "area": "ADUANERO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 2586 de 2026, art. 88 (procedencia y término del recurso de reconsideración); art. 89 (entrega y presentación electrónica por el Sistema Electrónico de Recursos); art. 91 (requisitos); art. 92 (inadmisión y recurso de reposición contra el auto inadmisorio); art. 93 (período probatorio en el recurso); art. 94 (término de la DIAN para decidir); art. 95 (efectos); art. 49 (contra el acta de aprehensión y decomiso directo solo procede este recurso); art. 19 num. 4 (allanamiento dentro del término del recurso: sanción al 60%); art. 18 num. 6 (solicitud de reducción por tope de ingresos brutos dentro del término del recurso)",
+      "competent_authority": "La dependencia de la DIAN que establezca el decreto de estructura orgánica de la entidad (Ley 2586 de 2026, art. 88). El recurso se entrega electrónicamente por el Sistema Electrónico de Recursos, o físicamente en la Dirección Seccional que habrá de resolverlo o, en su defecto, en una Dirección Seccional de una ciudad diferente (art. 89)",
+      "term": "EL RELOJ DEL CLIENTE: quince (15) DÍAS HÁBILES siguientes a la notificación del acto. Art. 88: «Contra las liquidaciones oficiales, decomisos, resoluciones que impongan sanciones y en las demás circunstancias previstas en la presente ley [...] procede el recurso de reconsideración, que se interpondrá dentro de los quince (15) días hábiles siguientes a su notificación». CUIDADO — NO ES EL TÉRMINO TRIBUTARIO: el recurso de reconsideración del Estatuto Tributario se interpone en dos (2) meses; el aduanero, en 15 días hábiles. LA EXTEMPORANEIDAD NO ES SUBSANABLE: art. 92 inciso final — «No es subsanable el incumplimiento del requisito previsto en el numeral dos (2) del artículo anterior», que es «interponerse dentro de la oportunidad legal» (art. 91 num. 2). Los demás requisitos sí se subsanan por la vía del auto inadmisorio y del recurso de reposición de 5 días hábiles contra él (art. 92). AGENTE OFICIOSO: solo abogado, y el interesado debe ratificar dentro de los DOS (2) MESES siguientes al día siguiente de la interposición, «si no hubiere ratificación se entenderá que el recurso no se presentó sin acto administrativo que así lo declare» (arts. 31 y 91 num. 3). ADICIONES AL RECURSO: los escritos y pruebas posteriores se entienden adición del recurso solo si se presentan dentro de los mismos 15 días hábiles (art. 88 par. 1). ALTERNATIVA — SE PUEDE PRESCINDIR DEL RECURSO: art. 88 par. 2 — quien atendió en debida forma el requerimiento especial aduanero o presentó el escrito de objeciones «podrá prescindir del recurso de reconsideración y acudir directamente ante la jurisdicción de lo contencioso-administrativo». DOS RELOJES QUE CORREN DENTRO DE ESTE MISMO PLAZO: (a) allanarse por escrito dentro del término del recurso reduce la multa al sesenta por ciento (60%) (art. 19 num. 4); (b) la solicitud de reducción de la sanción al tope del 40% de los ingresos brutos debe pedirse «dentro del término para interponer el recurso de reconsideración, o la revocatoria directa» (art. 18 num. 6). RESCATE: si antes de que se expida el acto que resuelve el recurso el recurrente presenta la declaración de legalización con el rescate, se aplican los arts. 52 y 53 y se devuelve la mercancía (art. 94 par. 1). EL RELOJ DE LA DIAN, que es otro: CINCO (5) MESES para expedir y notificar la decisión, suspendidos por el tiempo del período probatorio (art. 94); vencidos sin decisión, procede el silencio administrativo positivo (art. 96). Contra la decisión del recurso no procede recurso alguno y con ella se agota la actuación administrativa (art. 95).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del acto recurrido (resolución de decomiso, acta de aprehensión y decomiso directo, resolución sancionatoria o liquidación oficial), su número, fecha y fecha de notificación",
+          "mandatory": true,
+          "basis": "arts. 88 y 91"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del recurrente y calidad en que actúa; acreditación de la personería del apoderado o de la calidad de agente oficioso abogado",
+          "mandatory": true,
+          "basis": "arts. 31 y 91 num. 3"
+        },
+        {
+          "n": 3,
+          "name": "Constancia de interposición dentro de la oportunidad legal",
+          "mandatory": true,
+          "basis": "art. 91 num. 2"
+        },
+        {
+          "n": 4,
+          "name": "Expresión concreta de los motivos de inconformidad, hecho por hecho y norma por norma",
+          "mandatory": true,
+          "basis": "art. 91 num. 1"
+        },
+        {
+          "n": 5,
+          "name": "Solicitud y aporte de pruebas dentro del mismo escrito",
+          "mandatory": false,
+          "basis": "arts. 36 y 91 num. 1"
+        },
+        {
+          "n": 6,
+          "name": "Solicitud de declaratoria del silencio administrativo positivo, si se incumplió el término de la decisión de fondo",
+          "mandatory": false,
+          "basis": "art. 96 inciso 3"
+        },
+        {
+          "n": 7,
+          "name": "Solicitud de reducción de la sanción por tope de ingresos brutos, o allanamiento con el pago correspondiente",
+          "mandatory": false,
+          "basis": "arts. 18 num. 6 y 19 num. 4"
+        },
+        {
+          "n": 8,
+          "name": "Petición concreta de revocatoria del acto y de devolución de la mercancía o de archivo del expediente",
+          "mandatory": true,
+          "basis": "arts. 91 num. 1 y 95"
+        },
+        {
+          "n": 9,
+          "name": "Dirección electrónica y física de notificaciones",
+          "mandatory": true,
+          "basis": "art. 99"
+        },
+        {
+          "n": 10,
+          "name": "Firma del recurrente, de su representante legal o de su apoderado, o firma digital o Instrumento de Firma Electrónica si se radica por el Sistema Electrónico de Recursos",
+          "mandatory": true,
+          "basis": "arts. 89 y 91 num. 3"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_2586_2026_pr002.html"
+    },
+    {
+      "exact_name": "Solicitud de garantía en reemplazo de aprehensión",
+      "area": "ADUANERO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 2586 de 2026, art. 43 (garantía en reemplazo de aprehensión: término, monto, vigencia y trámite); art. 45 (término del escrito de objeciones, que fija el plazo de esta solicitud); art. 44 (avalúo que sirve de base a la garantía)",
+      "competent_authority": "División de Fiscalización y Liquidación de la Dirección Seccional de la DIAN donde se surte el proceso de decomiso (Ley 2586 de 2026, art. 43)",
+      "term": "EL RELOJ DEL CLIENTE: la garantía debe presentarse DENTRO DEL TÉRMINO PARA PRESENTAR EL ESCRITO DE OBJECIÓN A LA APREHENSIÓN, esto es, dentro de los quince (15) DÍAS HÁBILES siguientes a la notificación del acta de aprehensión. Art. 43: «La autoridad aduanera podrá autorizar la entrega de las mercancías aprehendidas antes de la decisión de fondo [...] previo el otorgamiento de una garantía equivalente al cien por ciento (100%) del valor FOB o del avalúo de la misma, según el caso, dentro del término para presentar el Escrito de Objeción a la aprehensión». La garantía «deberá constituirse por un término de quince (15) meses». NO PROCEDE cuando hay restricciones legales o administrativas no acreditadas, ni «cuando no sea procedente el rescate de las mercancías aprehendidas, en los términos previstos en el Decreto número 1165 de 2019». OTROS RELOJES DEL CLIENTE QUE NACEN DESPUÉS: (a) si el avalúo definitivo resulta superior al del acta, el interesado debe ajustar la garantía DENTRO DE LOS DIEZ (10) DÍAS siguientes a la notificación del auto de reajuste, «so pena de quedar sin efecto la autorización de entrega de la mercancía o de entender desistida la petición, sin necesidad de acto administrativo que así lo declare»; (b) contra el auto de reajuste procede reposición dentro de los diez (10) días hábiles siguientes; (c) contra la negativa de la solicitud de garantía procede reposición dentro de los TRES (3) DÍAS HÁBILES siguientes; (d) decretado el decomiso, la mercancía debe ponerse a disposición de la aduana a más tardar dentro de los QUINCE (15) DÍAS HÁBILES siguientes a la ejecutoria de la resolución, o diez (10) días si es fungible, so pena de hacerse efectiva la garantía sin trámite adicional. EL RELOJ DE LA DIAN, que es otro: se pronuncia sobre la aceptación de la garantía y la entrega de la mercancía dentro de los tres (3) días hábiles siguientes a su presentación, y resuelve la reposición dentro de los tres (3) días hábiles siguientes a su interposición.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del acta de aprehensión, la mercancía y el expediente",
+          "mandatory": true,
+          "basis": "art. 43"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del solicitante y acreditación de su calidad de titular de derechos o responsable de la mercancía",
+          "mandatory": true,
+          "basis": "art. 43"
+        },
+        {
+          "n": 3,
+          "name": "Manifestación y prueba de que sobre la mercancía no existen restricciones legales o administrativas, o acreditación de su cumplimiento",
+          "mandatory": true,
+          "basis": "art. 43 inciso 1"
+        },
+        {
+          "n": 4,
+          "name": "Manifestación de que procede el rescate de la mercancía conforme al Decreto 1165 de 2019",
+          "mandatory": true,
+          "basis": "art. 43 inciso final"
+        },
+        {
+          "n": 5,
+          "name": "Garantía constituida por el 100% del valor FOB o del avalúo, con vigencia de quince (15) meses",
+          "mandatory": true,
+          "basis": "art. 43 incisos 1 y 2"
+        },
+        {
+          "n": 6,
+          "name": "Indicación del objeto garantizado: poner la mercancía a disposición si es decomisada, o rescatarla con el 75% de su valor más los tributos aduaneros",
+          "mandatory": true,
+          "basis": "art. 43 inciso 1"
+        },
+        {
+          "n": 7,
+          "name": "Petición expresa de entrega de la mercancía",
+          "mandatory": true,
+          "basis": "art. 43 inciso 3"
+        },
+        {
+          "n": 8,
+          "name": "Dirección electrónica y física de notificaciones",
+          "mandatory": true,
+          "basis": "art. 99"
+        },
+        {
+          "n": 9,
+          "name": "Firma del solicitante o de su apoderado",
+          "mandatory": true,
+          "basis": "art. 43"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_2586_2026_pr001.html"
+    },
+    {
+      "exact_name": "Solicitud de devolución de la mercancía aprehendida",
+      "area": "ADUANERO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 2586 de 2026, art. 53 (devolución de la mercancía); art. 52 (entrega de la mercancía por rescate); art. 94 par. 1 (rescate presentado antes de resolverse el recurso de reconsideración); art. 95 (efectos de la revocatoria del decomiso sobre el levante); art. 96 num. 3 (devolución por silencio administrativo positivo)",
+      "competent_authority": "La dependencia de la DIAN que esté conociendo de la actuación: División de Fiscalización y Liquidación de la Dirección Seccional durante el proceso de decomiso, o la dependencia competente para resolver el recurso de reconsideración si el proceso ya está en esa etapa (Ley 2586 de 2026, arts. 53 y 94 par. 1)",
+      "term": "EL RELOJ DEL CLIENTE: se puede pedir EN CUALQUIER ESTADO DEL PROCESO Y HASTA ANTES DE QUE QUEDE EN FIRME EL ACTO ADMINISTRATIVO DE DECOMISO. Art. 53: «En cualquier estado del proceso, y hasta antes de quedar en firme el acto administrativo de decomiso de oficio o a petición de parte, cuando se desvirtúe la causal o causales que originaron la aprehensión o cuando se hubieren rescatado las mercancías mediante la declaración correspondiente que tenga levante, pago de los tributos aduaneros, sanciones y el valor de rescate que corresponda, la dependencia que está conociendo de la actuación, mediante acto administrativo motivado ordenará la terminación del proceso, la devolución inmediata de las mercancías y el archivo del expediente». LA FIRMEZA ES LA FRONTERA QUE MATA EL DERECHO: una vez en firme el decomiso, la mercancía queda declarada de propiedad de la Nación (art. 47 num. 2.8) y ya no hay devolución ni rescate. Los actos quedan en firme cuando no procede recurso, cuando vence el término para interponerlo sin haberse interpuesto o sin haberse presentado en debida forma, al día siguiente de la renuncia expresa a los recursos, al día siguiente de la firmeza del acto que acepta el desistimiento, o cuando los recursos interpuestos se deciden definitivamente (art. 98). DOS CAMINOS: (a) desvirtuar la causal, que no cuesta dinero; (b) rescatar la mercancía pagando —50% del valor en aduana después de aprehendida, 75% si ya se expidió la resolución de decomiso y aún no está ejecutoriada (Decreto 1165 de 2019, art. 293)—, que se puede hacer incluso antes de que se resuelva el recurso de reconsideración (Ley 2586 de 2026, art. 94 par. 1). TERCERA VÍA: si la DIAN incumplió el término de decisión y sí se presentó el escrito de objeciones, la devolución procede por silencio administrativo positivo, previa presentación y aceptación de la declaración aduanera (art. 96 num. 3).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del expediente, del acta de aprehensión y de la mercancía cuya devolución se pide",
+          "mandatory": true,
+          "basis": "art. 53"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del solicitante y de su calidad de titular de derechos o responsable de la mercancía",
+          "mandatory": true,
+          "basis": "art. 53"
+        },
+        {
+          "n": 3,
+          "name": "Constancia de que el acto administrativo de decomiso no se encuentra en firme, o de que no se ha proferido",
+          "mandatory": true,
+          "basis": "arts. 53 y 98"
+        },
+        {
+          "n": 4,
+          "name": "Demostración de que quedó desvirtuada la causal o las causales que originaron la aprehensión, con las pruebas que lo acreditan",
+          "mandatory": false,
+          "basis": "art. 53"
+        },
+        {
+          "n": 5,
+          "name": "Alternativamente, prueba del rescate: declaración de legalización con levante y recibos de pago de tributos aduaneros, sanciones y valor de rescate",
+          "mandatory": false,
+          "basis": "arts. 52, 53 y 94 par. 1"
+        },
+        {
+          "n": 6,
+          "name": "Petición expresa de terminación del proceso, devolución inmediata de la mercancía y archivo del expediente",
+          "mandatory": true,
+          "basis": "art. 53"
+        },
+        {
+          "n": 7,
+          "name": "Solicitud de devolución de la garantía en reemplazo de aprehensión, si se constituyó",
+          "mandatory": false,
+          "basis": "arts. 43 y 72 par."
+        },
+        {
+          "n": 8,
+          "name": "Dirección electrónica y física de notificaciones",
+          "mandatory": true,
+          "basis": "art. 99"
+        },
+        {
+          "n": 9,
+          "name": "Firma del solicitante o de su apoderado",
+          "mandatory": true,
+          "basis": "art. 53"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_2586_2026_pr001.html"
+    },
+    {
+      "exact_name": "Solicitud de revisión ante el Comité de Revisión de Aprehensiones",
+      "area": "ADUANERO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 2586 de 2026, art. 8 (Comité de Revisión de Aprehensiones: objeto, oportunidad, trámite, suspensión de términos y escalonamiento por cuantía); art. 9 (contra el acto que adopta la medida cautelar no procede recurso, sin perjuicio de activar el Comité); art. 45 (escrito de objeciones, cuyo término se suspende)",
+      "competent_authority": "Dirección Seccional de la DIAN competente, con copia obligatoria a la Secretaría Técnica del Comité de Revisión de Aprehensiones. La decisión final la adopta el Director Seccional, que puede apartarse de la recomendación del Comité motivando por escrito (Ley 2586 de 2026, art. 8)",
+      "term": "EL RELOJ DEL CLIENTE: la solicitud puede presentarse «con anterioridad o una vez adoptada la medida de aprehensión y HASTA ANTES DE QUE SE PRESENTEN OBJECIONES A LA APREHENSIÓN o el recurso de reconsideración en el caso de decomiso directo» (art. 8 inciso 1). Presentar primero el escrito de objeciones CIERRA esta puerta. Y AL REVÉS, EL DATO QUE SALVA EL TÉRMINO: la solicitud «no constituye instancia adicional al proceso y SUSPENDE LOS TÉRMINOS DE PRESENTACIÓN DEL ESCRITO DE OBJECIONES desde la fecha de la solicitud presentada por el usuario en debida forma, hasta la fecha de la decisión del Director Seccional sobre la mercancía» (art. 8 par. 1). OTRO RELOJ DEL CLIENTE: si el Comité pide documentos adicionales por correo electrónico, deben suministrarse «dentro de los dos (2) días hábiles siguientes a la fecha del requerimiento». LOS RELOJES DE LA ADMINISTRACIÓN, que son otros: el Director Seccional remite las diligencias a la Secretaría Técnica en 2 días hábiles; esta cita a los miembros en los 2 días hábiles siguientes; el Comité sesiona dentro de los 5 días hábiles siguientes; la recomendación se informa al Director Seccional al día hábil siguiente; si el Comité recomienda devolver la mercancía o continuar el trámite, el Director Seccional tiene un término perentorio de 3 días hábiles para pronunciarse; y «si transcurridos quince (15) días hábiles después de haber efectuado la solicitud en debida forma, el comité no ha emitido la recomendación correspondiente, el Director Seccional deberá adoptar la decisión de aprehender o no la mercancía, decisión que no será delegable». LÍMITE DE CUANTÍA VIGENTE HOY (art. 8 par. 2): desde el 1 de agosto de 2026 el Comité solo opera para aprehensiones de cuantía inferior a dos mil (2.000) UVT; desde el 1 de agosto de 2027, inferiores a 4.000 UVT; desde el 1 de agosto de 2028, inferiores a 10.000 UVT.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la acción de control o del acta de aprehensión y de la mercancía",
+          "mandatory": true,
+          "basis": "art. 8"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del usuario aduanero solicitante y de su calidad",
+          "mandatory": true,
+          "basis": "art. 8"
+        },
+        {
+          "n": 3,
+          "name": "Constancia de que aún no se ha presentado el escrito de objeciones a la aprehensión ni el recurso de reconsideración contra el decomiso directo",
+          "mandatory": true,
+          "basis": "art. 8 inciso 1"
+        },
+        {
+          "n": 4,
+          "name": "Acreditación de que la cuantía de la aprehensión está dentro del rango en que el Comité opera",
+          "mandatory": true,
+          "basis": "art. 8 par. 2"
+        },
+        {
+          "n": 5,
+          "name": "Escrito motivado: hechos, razones jurídicas y por qué la causal de aprehensión no se configura",
+          "mandatory": true,
+          "basis": "art. 8 inciso final del trámite"
+        },
+        {
+          "n": 6,
+          "name": "Invocación de la normativa, la doctrina, los lineamientos de la entidad y la jurisprudencia aplicables al caso",
+          "mandatory": false,
+          "basis": "art. 8 lit. a)"
+        },
+        {
+          "n": 7,
+          "name": "Petición concreta: que se recomiende no aprehender, la entrega de la mercancía o la continuación del trámite de importación",
+          "mandatory": true,
+          "basis": "art. 8 lit. a)"
+        },
+        {
+          "n": 8,
+          "name": "Constancia de radicación electrónica ante la Dirección Seccional con copia a la Secretaría Técnica del Comité",
+          "mandatory": true,
+          "basis": "art. 8"
+        },
+        {
+          "n": 9,
+          "name": "Manifestación de que la solicitud suspende el término para presentar el escrito de objeciones",
+          "mandatory": true,
+          "basis": "art. 8 par. 1"
+        },
+        {
+          "n": 10,
+          "name": "Firma del usuario aduanero o de su apoderado",
+          "mandatory": true,
+          "basis": "art. 8"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_2586_2026.html"
+    },
+    {
+      "exact_name": "Escrito de allanamiento a la infracción aduanera",
+      "area": "ADUANERO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 2586 de 2026, art. 19 (allanamiento y reconocimiento de la comisión del hecho sancionable: porcentajes y momentos); art. 18 (reducción de la sanción, incluida la del num. 6 por tope de ingresos brutos); art. 17 (gradualidad); art. 22 (errores formales no sancionables); art. 23 (causales de exoneración de responsabilidad)",
+      "competent_authority": "La dependencia de la DIAN que esté conociendo de la actuación administrativa, que es la competente para resolver la solicitud de reducción (Ley 2586 de 2026, art. 19 inciso final)",
+      "term": "EL RELOJ DEL CLIENTE ES UNA ESCALERA QUE SOLO BAJA, y cada peldaño perdido cuesta dinero. Art. 19: «1. Sin sanción cuando el presunto infractor sin intervención, aduanera reconozca voluntariamente y por escrito haber cometido la infracción, antes de que se notifique el Requerimiento Especial Aduanero. Lo previsto en este literal no aplica para las sanciones gravísimas. 2. Al veinte por ciento (20%), cuando el presunto infractor reconozca voluntariamente y por escrito haber cometido la infracción, antes de que se notifique el Requerimiento Especial Aduanero. 3. Al cuarenta por ciento (40%), cuando el presunto infractor reconozca por escrito haber cometido la infracción, después de notificado el Requerimiento Especial Aduanero y hasta antes de notificarse la decisión de fondo. 4. Al sesenta por ciento (60%), cuando el presunto infractor reconozca por escrito haber cometido la infracción dentro del término para interponer el recurso contra el acto administrativo que decide de fondo». Después de vencido el término del recurso de reconsideración (15 días hábiles, art. 88) ya no hay reducción por allanamiento. REQUISITO SIN EL CUAL NO PROCEDE: hay que anexar al escrito la copia del recibo oficial de pago de los tributos aduaneros, los intereses y la sanción reducida —salvo en el evento del numeral 1—, y acreditar el cumplimiento del trámite u obligación incumplido cuando haya lugar. ALLANAMIENTO PARCIAL: es admisible y el proceso continúa solo sobre el monto no allanado (art. 19 par. 4). NO CUBRE intereses de mora ni el valor del rescate (art. 19 par. 1). CASO ESPECIAL: en la sanción del art. 29 —mercancía que no pudo aprehenderse— el allanamiento reduce solo un 20%, se paga el 80% de la multa, cualquiera sea el momento, siempre que sea antes de la firmeza del acto sancionatorio (art. 19 par. 3). OTRO RELOJ, DISTINTO Y POSTERIOR: la reducción por tope del 40% de los ingresos brutos se solicita «dentro del término para interponer el recurso de reconsideración, o la revocatoria directa» y se resuelve en el acto que decida ese recurso (art. 18 num. 6). RECURSO: contra el auto que niega el allanamiento solo procede reposición (art. 19 inciso final).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del expediente, de la actuación y, si existe, del requerimiento especial aduanero o del acto que decidió de fondo",
+          "mandatory": true,
+          "basis": "art. 19"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del presunto infractor y calidad en que actúa",
+          "mandatory": true,
+          "basis": "art. 19"
+        },
+        {
+          "n": 3,
+          "name": "Reconocimiento expreso y por escrito de la comisión del hecho sancionable, total o parcial, con individualización del monto allanado por declaración o por operación",
+          "mandatory": true,
+          "basis": "art. 19 y par. 4"
+        },
+        {
+          "n": 4,
+          "name": "Indicación del momento procesal y del porcentaje de reducción que se invoca",
+          "mandatory": true,
+          "basis": "art. 19 nums. 1 a 4"
+        },
+        {
+          "n": 5,
+          "name": "Liquidación de la sanción reducida y de los tributos aduaneros e intereses",
+          "mandatory": true,
+          "basis": "art. 19 inciso final"
+        },
+        {
+          "n": 6,
+          "name": "Copia del recibo oficial de pago de tributos aduaneros, intereses y sanción reducida",
+          "mandatory": true,
+          "basis": "art. 19 inciso final"
+        },
+        {
+          "n": 7,
+          "name": "Acreditación del cumplimiento del trámite u obligación incumplido, cuando haya lugar",
+          "mandatory": true,
+          "basis": "art. 19 inciso final"
+        },
+        {
+          "n": 8,
+          "name": "Invocación acumulativa de las demás reducciones procedentes (extemporaneidad, ausencia de antecedentes en el INFAD, OEA)",
+          "mandatory": false,
+          "basis": "art. 18 y su par."
+        },
+        {
+          "n": 9,
+          "name": "Petición de terminación del proceso y archivo del expediente respecto de lo allanado",
+          "mandatory": true,
+          "basis": "art. 19 inciso final"
+        },
+        {
+          "n": 10,
+          "name": "Firma del interesado o de su apoderado",
+          "mandatory": true,
+          "basis": "art. 19"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_2586_2026.html"
+    },
+    {
+      "exact_name": "Solicitud de liquidación oficial para disminuir tributos aduaneros, sanciones o rescate",
+      "area": "ADUANERO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 2586 de 2026, art. 63 (liquidación oficial para disminuir el valor de los tributos aduaneros, sanciones y/o rescate: término, requisitos, inadmisión, rechazo y decisión); art. 57 num. 3 (procedencia); art. 71 inciso final (pruebas en este trámite); art. 72 num. 4 (cómputo del término de decisión); Decreto 1165 de 2019, art. 188 (término de firmeza de la declaración de importación, que es el plazo de esta solicitud); Decreto 1165 de 2019, art. 314 (tratamiento preferencial)",
+      "competent_authority": "División de Fiscalización y Liquidación de la Dirección Seccional de Aduanas o de Impuestos y Aduanas de la DIAN competente (Ley 2586 de 2026, arts. 57 y 63)",
+      "term": "EL RELOJ DEL CLIENTE: la solicitud «deberá presentarse dentro del término de firmeza de la declaración aduanera» (Ley 2586 de 2026, art. 63), y ese término es de TRES (3) AÑOS contados desde la presentación y aceptación de la declaración de importación, salvo que se haya notificado requerimiento especial aduanero (Decreto 1165 de 2019, art. 188: «La Declaración de Importación quedará en firme transcurridos tres (3) años contados a partir de la fecha de su presentación y aceptación, salvo que se haya notificado Requerimiento Especial Aduanero»). Si la declaración se corrigió o modificó, los tres años se cuentan desde la presentación y aceptación de la declaración de corrección o de la modificación. Si la mercancía es objeto de verificación de origen, la firmeza se suspende desde la notificación del requerimiento ordinario de verificación hasta la ejecutoria de la resolución de determinación de origen (art. 188 par.). RECHAZO DEFINITIVO, SIN RECURSO: la solicitud se rechaza «cuando sea presentada de manera extemporánea», cuando la declaración ya fue objeto de corrección, o cuando ya está ejecutoriada una decisión que negó la misma solicitud sobre la misma declaración; el rechazo se profiere dentro de los 30 días hábiles siguientes a la radicación y contra él no procede recurso (art. 63). SUBSANACIÓN: si faltan requisitos, la DIAN inadmite por auto dentro de los 10 días hábiles siguientes a la radicación y el interesado tiene DIEZ (10) DÍAS HÁBILES desde su notificación para subsanar, «en caso contrario, se entenderá desistida sin que implique pronunciamiento expreso de la administración»; contra el auto inadmisorio no procede recurso. EL RELOJ DE LA DIAN, que es otro: decide expidiendo la liquidación oficial o negándola «a más tardar dentro de los setenta (70) días hábiles siguientes a la fecha de presentación de la solicitud en debida forma», y contra esa decisión procede el recurso de reconsideración (15 días hábiles, art. 88).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la declaración o declaraciones de importación cuya liquidación se pide disminuir, con fecha de presentación y aceptación",
+          "mandatory": true,
+          "basis": "art. 63"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del declarante o importador y acreditación de la personería",
+          "mandatory": true,
+          "basis": "art. 63"
+        },
+        {
+          "n": 3,
+          "name": "Constancia de que la solicitud se presenta dentro del término de firmeza de la declaración",
+          "mandatory": true,
+          "basis": "art. 63 y Decreto 1165 de 2019, art. 188"
+        },
+        {
+          "n": 4,
+          "name": "Información detallada de las circunstancias de la operación de comercio que dieron lugar a los errores aritméticos o inexactitudes",
+          "mandatory": true,
+          "basis": "art. 63 num. 1"
+        },
+        {
+          "n": 5,
+          "name": "Estimación razonada de la cuantía, con el monto de los tributos aduaneros, sanciones y rescate objeto de corrección",
+          "mandatory": true,
+          "basis": "art. 63 num. 1"
+        },
+        {
+          "n": 6,
+          "name": "Documentos soporte y pruebas pertinentes, necesarias y conducentes de la operación",
+          "mandatory": true,
+          "basis": "art. 63 num. 2"
+        },
+        {
+          "n": 7,
+          "name": "Traducción oficial al español de los documentos en otro idioma",
+          "mandatory": true,
+          "basis": "art. 63 num. 3"
+        },
+        {
+          "n": 8,
+          "name": "Prueba de origen e información del carácter originario de la mercancía, si se solicita trato arancelario preferencial y reembolso de derechos",
+          "mandatory": false,
+          "basis": "art. 63 incisos finales"
+        },
+        {
+          "n": 9,
+          "name": "Petición concreta de expedición de la liquidación oficial que disminuye tributos, sanciones o rescate",
+          "mandatory": true,
+          "basis": "arts. 57 num. 3 y 63"
+        },
+        {
+          "n": 10,
+          "name": "Dirección electrónica y física de notificaciones",
+          "mandatory": true,
+          "basis": "art. 99"
+        },
+        {
+          "n": 11,
+          "name": "Firma del solicitante o de su apoderado",
+          "mandatory": true,
+          "basis": "art. 63"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_2586_2026_pr001.html"
+    },
+    {
+      "exact_name": "Recurso de reposición contra el auto que niega pruebas en el proceso aduanero",
+      "area": "ADUANERO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 2586 de 2026, art. 46 (período probatorio en el proceso de decomiso: reposición en efecto suspensivo dentro de los 10 días hábiles); art. 71 (período probatorio en el proceso sancionatorio y de liquidación oficial: reposición dentro de los 5 días hábiles); art. 93 (período probatorio en el recurso de reconsideración: reposición dentro de los 5 días hábiles); art. 36 (carga de la prueba y oportunidades para solicitarla); art. 44 (reposición de 5 días hábiles contra la revisión oficiosa del avalúo)",
+      "competent_authority": "La misma dependencia de la DIAN que profirió el auto: División de Fiscalización y Liquidación de la Dirección Seccional en decomiso y en el proceso sancionatorio, o la dependencia competente para resolver el recurso de reconsideración cuando el auto se profiere en esa etapa (Ley 2586 de 2026, arts. 46, 71 y 93)",
+      "term": "EL RELOJ DEL CLIENTE CAMBIA SEGÚN LA ETAPA, Y ESE ES EL ERROR QUE SE PAGA. (a) EN EL PROCESO DE DECOMISO: DIEZ (10) DÍAS HÁBILES. Art. 46: «Contra el auto que niegue total o parcialmente las pruebas procederá el recurso de reposición en efecto suspensivo dentro de los diez (10) días hábiles siguientes a su notificación y se resolverá dentro de los cinco (5) días hábiles siguientes a su interposición». (b) EN EL PROCESO SANCIONATORIO O DE LIQUIDACIÓN OFICIAL: CINCO (5) DÍAS HÁBILES. Art. 71: «Contra el auto que niegue las pruebas procederá el recurso de reposición dentro de los cinco (5) días hábiles siguientes a su notificación y se resolverá dentro de los cinco (5) días hábiles siguientes a su interposición por parte del último de los recurrentes». (c) EN EL RECURSO DE RECONSIDERACIÓN: CINCO (5) DÍAS HÁBILES (art. 93). (d) CONTRA LA REVISIÓN OFICIOSA DEL AVALÚO DEFINITIVO: CINCO (5) DÍAS HÁBILES (art. 44). CONSECUENCIA DE PERDER EL TÉRMINO EN DECOMISO: «En el evento en que se confirme la decisión de negar la totalidad de las pruebas y no se decreten de oficio, comenzarán a contarse los términos de que trata el artículo 72 de la presente ley para expedir el acto administrativo de fondo» (art. 46); es decir, el expediente queda listo para decidir sin la prueba del interesado. CONTRA EL AUTO QUE DECRETA pruebas y contra el auto que ordena el CIERRE del período probatorio NO procede recurso alguno (arts. 46, 71 y 93). LOS RELOJES DE LA DIAN, que son otros: 20 días hábiles para el auto de pruebas en decomiso (art. 46), 10 días hábiles en el sancionatorio (art. 71), un (1) mes en el recurso de reconsideración (art. 93); y practicadas, 2 meses en el país o 3 meses en el exterior (4 meses en el sancionatorio, art. 71).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del auto recurrido, su fecha y fecha de notificación, y de la etapa procesal en que se profirió",
+          "mandatory": true,
+          "basis": "arts. 46, 71 y 93"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del recurrente y acreditación de la personería",
+          "mandatory": true,
+          "basis": "art. 31"
+        },
+        {
+          "n": 3,
+          "name": "Constancia de interposición dentro del término que corresponde a esa etapa (10 días hábiles en decomiso; 5 días hábiles en el sancionatorio y en la reconsideración)",
+          "mandatory": true,
+          "basis": "arts. 46, 71 y 93"
+        },
+        {
+          "n": 4,
+          "name": "Individualización de cada prueba negada",
+          "mandatory": true,
+          "basis": "art. 36"
+        },
+        {
+          "n": 5,
+          "name": "Demostración de la conducencia de cada prueba: idoneidad del medio para demostrar el hecho",
+          "mandatory": true,
+          "basis": "art. 36 inciso final"
+        },
+        {
+          "n": 6,
+          "name": "Demostración de la pertinencia: relación del medio probatorio con el hecho por demostrar",
+          "mandatory": true,
+          "basis": "art. 36 inciso final"
+        },
+        {
+          "n": 7,
+          "name": "Demostración de la utilidad y necesidad de la prueba para la decisión",
+          "mandatory": true,
+          "basis": "arts. 33 y 36"
+        },
+        {
+          "n": 8,
+          "name": "Petición concreta de revocar el auto y decretar la práctica de las pruebas",
+          "mandatory": true,
+          "basis": "arts. 46, 71 y 93"
+        },
+        {
+          "n": 9,
+          "name": "Firma del recurrente o de su apoderado",
+          "mandatory": true,
+          "basis": "art. 31"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_2586_2026_pr001.html"
+    },
+    {
+      "exact_name": "Alegatos de conclusión en el proceso aduanero",
+      "area": "ADUANERO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 2586 de 2026, art. 46 (alegatos tras el cierre del período probatorio en el proceso de decomiso); art. 71 (alegatos en el proceso sancionatorio y de liquidación oficial); art. 93 (escrito sobre las pruebas en el recurso de reconsideración); art. 37 (valoración de las pruebas conforme a la sana crítica y deber de exponer razonadamente el mérito de cada una)",
+      "competent_authority": "La dependencia de la DIAN competente para expedir la decisión de fondo o para resolver el recurso de reconsideración, según la etapa (Ley 2586 de 2026, arts. 46, 71 y 93)",
+      "term": "EL RELOJ DEL CLIENTE: CINCO (5) DÍAS HÁBILES siguientes a la notificación del auto que ordena el cierre del período probatorio, en las tres etapas. Art. 46: «Dentro de los cinco (5) días hábiles siguientes a la notificación de dicha providencia, el titular de los derechos o el responsable de las mercancías, que haya actuado dentro del proceso, o su representante o apoderado debidamente constituido, podrá presentar, a manera de alegatos de conclusión, un escrito en el que se pronuncie en relación con las pruebas allegadas al proceso, sin que ello dé lugar a la suspensión de los términos procesales». Igual término en el proceso sancionatorio (art. 71) y en el recurso de reconsideración (art. 93). NO SUSPENDE NADA: presentarlos no detiene el término de la DIAN para decidir. NO HAY ALEGATOS SI NO HUBO PRUEBAS: «En caso de no abrirse el periodo probatorio, no habrá lugar a la presentación de alegatos de conclusión» (art. 46 inciso final). LEGITIMACIÓN: solo puede alegar quien haya actuado dentro del proceso —es decir, quien presentó escrito de objeciones o respuesta al requerimiento—, lo que convierte esos escritos previos en presupuesto de este. CONTRA EL AUTO DE CIERRE del período probatorio no procede recurso alguno (arts. 46, 71 y 93). EL RELOJ DE LA DIAN, que es otro: desde el día siguiente a la notificación del auto de cierre corren sus 70 días hábiles para decidir de fondo (arts. 47 num. 1.3 y 72 num. 3).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del expediente, del auto de cierre del período probatorio y de su fecha de notificación",
+          "mandatory": true,
+          "basis": "arts. 46, 71 y 93"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del interesado y constancia de haber actuado dentro del proceso",
+          "mandatory": true,
+          "basis": "art. 46"
+        },
+        {
+          "n": 3,
+          "name": "Relación de las pruebas decretadas y efectivamente practicadas",
+          "mandatory": true,
+          "basis": "arts. 46 y 93"
+        },
+        {
+          "n": 4,
+          "name": "Análisis de cada prueba y del mérito que debe asignársele conforme a las reglas de la sana crítica",
+          "mandatory": true,
+          "basis": "art. 37"
+        },
+        {
+          "n": 5,
+          "name": "Confrontación de las pruebas con la causal de aprehensión o con la infracción imputada",
+          "mandatory": true,
+          "basis": "arts. 34 y 64"
+        },
+        {
+          "n": 6,
+          "name": "Petición concreta de archivo, de devolución de la mercancía o de absolución",
+          "mandatory": true,
+          "basis": "arts. 53 y 72 par."
+        },
+        {
+          "n": 7,
+          "name": "Firma del interesado, su representante o su apoderado debidamente constituido",
+          "mandatory": true,
+          "basis": "art. 46"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_2586_2026_pr001.html"
+    },
+    {
+      "exact_name": "Solicitud de declaratoria de silencio administrativo positivo aduanero",
+      "area": "ADUANERO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 2586 de 2026, art. 96 (incumplimiento de términos y silencio administrativo positivo); art. 47 (70 días hábiles para decidir el decomiso); art. 72 (70 días hábiles para la sanción o la liquidación oficial); art. 94 (5 meses para resolver el recurso de reconsideración); art. 45 (escrito de objeciones, sin el cual no hay silencio); art. 70 (respuesta al requerimiento, sin la cual no hay silencio)",
+      "competent_authority": "La dependencia de la DIAN que presuntamente incumplió el término. Si se pide con el recurso de reconsideración, la resuelve la dependencia competente para decidirlo (Ley 2586 de 2026, art. 96)",
+      "term": "EL RELOJ DEL CLIENTE: art. 96 — «En todo caso la solicitud de declaratoria de silencio administrativo positivo deberá presentarse dentro del término establecido para presentar el medio de control correspondiente sobre dicho acto ante la jurisdicción de lo contencioso administrativo». Es decir, el plazo para pedirlo es el mismo plazo de caducidad del medio de control ante lo contencioso administrativo; vencido este, se pierden los dos. FORMA: «se solicitará en escrito separado o con el recurso de reconsideración, según corresponda, ante la dependencia competente». LOS PLAZOS CUYO INCUMPLIMIENTO SE INVOCA, que son los de la DIAN: 70 días hábiles para expedir y notificar la resolución de decomiso (art. 47), 70 días hábiles para la resolución sancionatoria o la liquidación oficial (art. 72) y CINCO (5) MESES para expedir y notificar la decisión del recurso de reconsideración (art. 94); en los dos primeros el término puede suspenderse hasta por un (1) mes por auto motivado, y en el recurso se suspende por el tiempo del período probatorio. CUÁNDO NO OPERA, y aquí es donde se pierde por descuido propio: no se configura el silencio positivo si no se presentó el escrito de objeción a la aprehensión, si no se respondió el requerimiento especial aduanero, si se trata de mercancía cuyo rescate no procede, o de mercancía con restricciones legales o administrativas no acreditadas (art. 96). EFECTOS: en el proceso sancionatorio, «se entenderá absuelto el procesado»; en el de liquidación oficial, «dará lugar a la firmeza de la declaración»; en el de decomiso, la devolución de la mercancía previa presentación y aceptación de la declaración aduanera con el pago de tributos e intereses.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del expediente y del proceso (decomiso, sancionatorio, liquidación oficial o recurso de reconsideración)",
+          "mandatory": true,
+          "basis": "art. 96"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del solicitante y acreditación de la personería",
+          "mandatory": true,
+          "basis": "art. 31"
+        },
+        {
+          "n": 3,
+          "name": "Cómputo del término incumplido: fecha desde la que corrió, norma que lo fija y fecha de su vencimiento sin expedición ni notificación del acto",
+          "mandatory": true,
+          "basis": "arts. 47, 72, 94 y 96"
+        },
+        {
+          "n": 4,
+          "name": "Constancia de que no hubo auto de suspensión del término, o de que la suspensión ya venció",
+          "mandatory": true,
+          "basis": "arts. 72 y 94"
+        },
+        {
+          "n": 5,
+          "name": "Prueba de haber presentado el escrito de objeciones a la aprehensión o la respuesta al requerimiento especial aduanero, según el proceso",
+          "mandatory": true,
+          "basis": "art. 96 incisos 5 y 6"
+        },
+        {
+          "n": 6,
+          "name": "Manifestación de que la mercancía es susceptible de rescate y de que no tiene restricciones legales o administrativas, o acreditación de su cumplimiento",
+          "mandatory": true,
+          "basis": "art. 96 inciso 5"
+        },
+        {
+          "n": 7,
+          "name": "Constancia de que la solicitud se presenta dentro del término para promover el medio de control ante la jurisdicción de lo contencioso administrativo",
+          "mandatory": true,
+          "basis": "art. 96 inciso 2"
+        },
+        {
+          "n": 8,
+          "name": "Petición concreta: que se declare el silencio administrativo positivo y se revoque el acto impugnado, con los efectos del art. 96",
+          "mandatory": true,
+          "basis": "art. 96"
+        },
+        {
+          "n": 9,
+          "name": "Firma del solicitante o de su apoderado",
+          "mandatory": true,
+          "basis": "art. 31"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_2586_2026_pr002.html"
+    },
+    {
+      "exact_name": "Declaración de legalización con pago de rescate",
+      "area": "ADUANERO",
+      "role": "LITIGANTE",
+      "legal_basis": "Decreto 1165 de 2019, art. 290 (procedencia de la legalización); art. 291 (declaración de legalización); art. 292 (retiro de la mercancía y cesación de los procedimientos en curso); art. 293 num. 2 (legalización con pago de rescate y sus porcentajes); Ley 2586 de 2026, art. 52 (entrega de la mercancía por rescate); art. 53 (devolución y terminación del proceso); art. 94 par. 1 (rescate antes de resolverse el recurso); art. 48 par. (mercancías que no pueden legalizarse en decomiso directo)",
+      "competent_authority": "Dirección Seccional de Aduanas o de Impuestos y Aduanas de la DIAN competente; la declaración se presenta y acepta ante la autoridad aduanera y el levante se autoriza el mismo día de su presentación y aceptación (Decreto 1165 de 2019, art. 292)",
+      "term": "EL RELOJ DEL CLIENTE ES EL DE LA FIRMEZA DEL DECOMISO, Y EL PRECIO SUBE CON EL TIEMPO. Decreto 1165 de 2019, art. 293 num. 2: «Después de aprehendida la mercancía se podrá rescatar mediante la presentación de la declaración de legalización, en la cual se cancele, por concepto de rescate, el cincuenta por ciento (50%) del valor en aduana de la mercancía, sin perjuicio del pago de los tributos aduaneros correspondientes» y «Expedida la resolución que ordene el decomiso y siempre que no se encuentre ejecutoriada, podrá rescatarse la mercancía, presentando la declaración de legalización, en la cual se cancele, además de los tributos aduaneros, el setenta y cinco por ciento (75%) del valor en aduana de la misma por concepto de rescate». EJECUTORIADA LA RESOLUCIÓN DE DECOMISO SE PIERDE LA MERCANCÍA: queda declarada de propiedad de la Nación (Ley 2586 de 2026, art. 47 num. 2.8). LEGALIZACIÓN VOLUNTARIA, ANTES DE QUE INTERVENGA LA AUTORIDAD, MÁS BARATA: 10% del valor en aduana para subsanar descripción errada o incompleta; 15% si se presenta después del levante para subsanar descripción errada o incompleta que viole una restricción o genere menores tributos, y 15% para errores u omisiones en serial; 20% para subsanar cualquier otra causal de aprehensión; 50% si se presenta por fuera del término del inciso 4 del art. 291 o en los casos de declaración anticipada omitida (art. 293 num. 2). EFECTO PROCESAL: presentada y aceptada la declaración de legalización con el lleno de los requisitos, la autoridad autoriza el levante el mismo día y «esta actuación de la Aduana conllevará la cesación automática de los procedimientos administrativos que se encuentren en curso» (art. 292). LÍMITE: en decomiso directo, el tabaco, cigarrillos, cigarrillos electrónicos, vapeadores, SEAN, SSSN, PTC y PNO NO pueden legalizarse con pago de rescate (Ley 2586 de 2026, art. 48 par.).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la mercancía objeto de legalización y de la declaración inicial, si existe",
+          "mandatory": true,
+          "basis": "Decreto 1165 de 2019, art. 291"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del declarante o importador y del expediente de aprehensión o decomiso",
+          "mandatory": true,
+          "basis": "Decreto 1165 de 2019, arts. 290 y 291"
+        },
+        {
+          "n": 3,
+          "name": "Indicación de la modalidad de importación que corresponde a la naturaleza y condiciones de la operación",
+          "mandatory": true,
+          "basis": "Decreto 1165 de 2019, art. 290"
+        },
+        {
+          "n": 4,
+          "name": "Liquidación y pago de los tributos aduaneros a que haya lugar",
+          "mandatory": true,
+          "basis": "Decreto 1165 de 2019, art. 291"
+        },
+        {
+          "n": 5,
+          "name": "Liquidación y pago del valor del rescate al porcentaje que corresponda al momento procesal (10%, 15%, 20%, 50% o 75%)",
+          "mandatory": true,
+          "basis": "Decreto 1165 de 2019, art. 293 num. 2"
+        },
+        {
+          "n": 6,
+          "name": "Acreditación del cumplimiento de las restricciones legales o administrativas aplicables a la mercancía",
+          "mandatory": true,
+          "basis": "Decreto 1165 de 2019, art. 293 num. 2"
+        },
+        {
+          "n": 7,
+          "name": "Documentos soporte de la operación y, cuando se modifique el valor declarado, nueva Declaración Andina del Valor",
+          "mandatory": false,
+          "basis": "Decreto 1165 de 2019, arts. 291 y 296 par. 1"
+        },
+        {
+          "n": 8,
+          "name": "Petición de levante y de cesación de los procedimientos administrativos en curso",
+          "mandatory": true,
+          "basis": "Decreto 1165 de 2019, art. 292"
+        },
+        {
+          "n": 9,
+          "name": "Firma del declarante o de la agencia de aduanas",
+          "mandatory": true,
+          "basis": "Decreto 1165 de 2019, art. 291"
+        }
+      ],
+      "source_url": "https://normograma.dian.gov.co/dian/compilacion/docs/decreto_1165_2019.htm"
+    },
+    {
+      "exact_name": "Solicitud de rescate de mercancía en abandono legal",
+      "area": "ADUANERO",
+      "role": "LITIGANTE",
+      "legal_basis": "Decreto 1165 de 2019, art. 171 par. 1 (permanencia de la mercancía en el depósito, configuración del abandono legal y término de un mes para rescatarla); art. 293 num. 1 (rescate de mercancía en abandono: 10% del valor en aduana); art. 291 (declaración de legalización); art. 496 (abandono en zona franca) y art. 503 (abandono de bienes de zona franca), que remiten al mismo término de un mes",
+      "competent_authority": "Dirección Seccional de Aduanas o de Impuestos y Aduanas de la DIAN competente en el lugar del depósito habilitado o del lugar de arribo (Decreto 1165 de 2019, arts. 171 y 291)",
+      "term": "EL RELOJ QUE HACE PERDER LA MERCANCÍA: UN (1) MES desde que se produce el abandono legal. Decreto 1165 de 2019, art. 171 par. 1: «Vencido el término previsto en este artículo sin que se hubiere obtenido el levante, o sin que se hubiere reembarcado la mercancía, operará el abandono legal. El interesado podrá rescatar la mercancía de conformidad con lo dispuesto en el inciso primero del numeral 1 del artículo 293 del presente decreto dentro del mes siguiente a la fecha en que se produzca el abandono». Y el inciso siguiente dice qué pasa si se deja vencer: «Transcurrido el término establecido para rescatar la mercancía, sin que se hubiere presentado la respectiva declaración de legalización, la Unidad Administrativa Especial Dirección de Impuestos y Aduanas Nacionales (DIAN) podrá disponer de la mercancía por ser esta de propiedad de la Nación». ANTES DE ESE MES CORRE OTRO PLAZO, EL QUE EVITA EL ABANDONO: la mercancía puede permanecer almacenada mientras se tramita el levante «hasta por el término de un (1) mes, contado desde la fecha de su llegada al territorio aduanero nacional», prorrogable hasta por un (1) mes adicional en los casos autorizados por la autoridad aduanera; el tránsito aduanero suspende ese término (art. 171). COSTO DEL RESCATE: 10% del valor en aduana de la mercancía, además de los tributos aduaneros, y acreditando el pago de los gastos de almacenamiento causados (art. 293 num. 1). EXCEPCIÓN SIN RESCATE: las mercancías importadas por la Nación, entidades de derecho público, organismos internacionales intergubernamentales, misiones diplomáticas acreditadas y las de convenios de cooperación internacional se rescatan dentro del mismo mes sin pagar rescate, solo los tributos aduaneros (art. 293 num. 1). LÍMITE ADICIONADO POR EL DECRETO 659 DE 2024: «La mercancía que quede incursa en abandono legal en los términos y condiciones del artículo 169 del presente decreto, no es susceptible del rescate de que trata el presente numeral» — su entrada en vigor está condicionada a la certificación de los servicios informáticos por la DIAN (art. 67 del Decreto 659 de 2024). OTROS ABANDONOS CON EL MISMO MES: zona franca (art. 496), bienes del art. 501 (art. 503), envíos urgentes y depósitos de provisiones de a bordo con plazos de permanencia propios (arts. 100 y siguientes).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la mercancía en abandono, del documento de transporte y del depósito habilitado o lugar de arribo",
+          "mandatory": true,
+          "basis": "Decreto 1165 de 2019, arts. 171 y 291"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del interesado y acreditación de su derecho sobre la mercancía",
+          "mandatory": true,
+          "basis": "Decreto 1165 de 2019, art. 171 par. 1"
+        },
+        {
+          "n": 3,
+          "name": "Fecha en que se produjo el abandono legal y constancia de que la solicitud se presenta dentro del mes siguiente",
+          "mandatory": true,
+          "basis": "Decreto 1165 de 2019, art. 171 par. 1"
+        },
+        {
+          "n": 4,
+          "name": "Declaración de legalización con la modalidad de importación que corresponda",
+          "mandatory": true,
+          "basis": "Decreto 1165 de 2019, arts. 291 y 293 num. 1"
+        },
+        {
+          "n": 5,
+          "name": "Liquidación y pago de los tributos aduaneros",
+          "mandatory": true,
+          "basis": "Decreto 1165 de 2019, art. 293 num. 1"
+        },
+        {
+          "n": 6,
+          "name": "Liquidación y pago del rescate equivalente al 10% del valor en aduana, o invocación de la exención cuando el importador es la Nación, una entidad pública, un organismo internacional o una misión diplomática",
+          "mandatory": true,
+          "basis": "Decreto 1165 de 2019, art. 293 num. 1"
+        },
+        {
+          "n": 7,
+          "name": "Acreditación del pago de los gastos de almacenamiento causados",
+          "mandatory": true,
+          "basis": "Decreto 1165 de 2019, art. 293 num. 1"
+        },
+        {
+          "n": 8,
+          "name": "Acreditación del cumplimiento de las restricciones legales o administrativas aplicables",
+          "mandatory": true,
+          "basis": "Decreto 1165 de 2019, art. 291"
+        },
+        {
+          "n": 9,
+          "name": "Petición de levante y de entrega de la mercancía",
+          "mandatory": true,
+          "basis": "Decreto 1165 de 2019, art. 292"
+        },
+        {
+          "n": 10,
+          "name": "Firma del interesado, del declarante o de la agencia de aduanas",
+          "mandatory": true,
+          "basis": "Decreto 1165 de 2019, art. 291"
+        }
+      ],
+      "source_url": "https://normograma.dian.gov.co/dian/compilacion/docs/decreto_1165_2019.htm"
+    },
+    {
+      "exact_name": "Declaración de corrección de la declaración de importación",
+      "area": "ADUANERO",
+      "role": "LITIGANTE",
+      "legal_basis": "Decreto 1165 de 2019, art. 296 (declaración de corrección voluntaria y provocada); art. 188 (término de firmeza, que es el plazo para corregir); art. 186 (levante con posterioridad al requerimiento especial aduanero si se corrige y paga dentro de los 5 días); art. 297 (modificación de la declaración); Ley 2586 de 2026, arts. 18 y 19 (reducción y allanamiento aplicables a la sanción que debe liquidarse, por remisión del art. 112 par. 2)",
+      "competent_authority": "Dirección Seccional de Aduanas o de Impuestos y Aduanas de la DIAN. Cuando la corrección se presenta con ocasión de un requerimiento especial aduanero, la presentación y aceptación se efectúa «en la Dirección Seccional de Aduanas o de Impuestos y Aduanas donde se profirió el Requerimiento Especial Aduanero» (Decreto 1165 de 2019, art. 291 par. 3)",
+      "term": "EL RELOJ DEL CLIENTE: la corrección voluntaria «sólo procederá dentro del término previsto en el artículo 188 del presente decreto» (Decreto 1165 de 2019, art. 296), es decir, dentro de los TRES (3) AÑOS de firmeza de la declaración de importación contados desde su presentación y aceptación, salvo que se haya notificado requerimiento especial aduanero. Y SOLO UNA VEZ: «Sin perjuicio de lo dispuesto en el artículo 338 de este decreto, la Declaración de Corrección voluntaria procederá por una sola vez». SOLO PARA ESTOS ERRORES: subpartida arancelaria, tarifas, tasa de cambio, sanciones, operación aritmética, modalidad, tratamientos preferenciales, valor FOB, fletes, seguros, otros gastos, ajustes y valor en aduana; los demás errores exigen corrección provocada con autorización previa de la autoridad aduanera (art. 296). PUERTA QUE SE CIERRA: «No procederá Declaración de Corrección cuando la autoridad aduanera hubiere formulado liquidación oficial de corrección o de revisión del valor» (art. 296). RELOJ CORTO Y DECISIVO CUANDO YA HAY REQUERIMIENTO: si el requerimiento especial aduanero propone liquidación oficial de corrección o de revisión de valor, el declarante que corrige, cancela las sanciones y los mayores valores propuestos DENTRO DE LOS CINCO (5) DÍAS siguientes a su notificación —o responde el requerimiento corrigiendo y pagando lo reconocido y otorgando garantía por la suma en discusión— obtiene el levante (Decreto 1165 de 2019, art. 186). COSTO: siempre que se presente declaración de corrección hay que liquidar y pagar, además de los mayores tributos e intereses, la sanción que corresponda, con la reducción aplicable; la remisión del art. 296 al art. 610 del Decreto 1165 debe entenderse hecha hoy a los arts. 18 y 19 de la Ley 2586 de 2026 (art. 112 par. 2 de esa ley).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la declaración de importación que se corrige, con su número, fecha de presentación y aceptación",
+          "mandatory": true,
+          "basis": "Decreto 1165 de 2019, art. 296"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del declarante o importador y de la agencia de aduanas, si interviene",
+          "mandatory": true,
+          "basis": "Decreto 1165 de 2019, art. 296"
+        },
+        {
+          "n": 3,
+          "name": "Constancia de que la corrección se presenta dentro del término de firmeza del art. 188 y de que es la primera corrección voluntaria",
+          "mandatory": true,
+          "basis": "Decreto 1165 de 2019, arts. 188 y 296"
+        },
+        {
+          "n": 4,
+          "name": "Indicación del error que se subsana, dentro de los taxativamente permitidos para la corrección voluntaria",
+          "mandatory": true,
+          "basis": "Decreto 1165 de 2019, art. 296 inciso 1"
+        },
+        {
+          "n": 5,
+          "name": "Cuando es corrección provocada, referencia al requerimiento especial aduanero o al resultado de la inspección, o a la autorización previa de la autoridad",
+          "mandatory": false,
+          "basis": "Decreto 1165 de 2019, art. 296 inciso 3"
+        },
+        {
+          "n": 6,
+          "name": "Liquidación y pago de los mayores tributos aduaneros y de los intereses",
+          "mandatory": true,
+          "basis": "Decreto 1165 de 2019, art. 296 inciso 5"
+        },
+        {
+          "n": 7,
+          "name": "Liquidación y pago de la sanción, con la reducción por allanamiento que corresponda",
+          "mandatory": true,
+          "basis": "Decreto 1165 de 2019, art. 296 inciso 5; Ley 2586 de 2026, arts. 18, 19 y 112 par. 2"
+        },
+        {
+          "n": 8,
+          "name": "Nueva Declaración Andina del Valor cuando se modifica el valor inicialmente declarado",
+          "mandatory": false,
+          "basis": "Decreto 1165 de 2019, art. 296 par. 1"
+        },
+        {
+          "n": 9,
+          "name": "Documentos soporte de la corrección",
+          "mandatory": true,
+          "basis": "Decreto 1165 de 2019, art. 296"
+        },
+        {
+          "n": 10,
+          "name": "Firma del declarante o de la agencia de aduanas",
+          "mandatory": true,
+          "basis": "Decreto 1165 de 2019, art. 296"
+        }
+      ],
+      "source_url": "https://normograma.dian.gov.co/dian/compilacion/docs/decreto_1165_2019.htm"
+    },
+    {
+      "exact_name": "Acta de aprehensión",
+      "area": "ADUANERO",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 2586 de 2026, art. 40 (acta de aprehensión: contenido, plazo de expedición y naturaleza); art. 41 (efectos sobre la autorización de levante); art. 26 (causales de aprehensión y decomiso); art. 39 (ámbito y término de cinco años para iniciar la acción de control); art. 44 (reconocimiento y avalúo); art. 102 (notificación especial del acta); art. 55 (sanción de cierre del establecimiento de comercio, que se propone en el acta)",
+      "competent_authority": "Unidad aprehensora de la DIAN que practica la acción de control; el proceso de decomiso continúa en la Dirección Seccional que el acta indique (Ley 2586 de 2026, art. 40)",
+      "term": "EL RELOJ DE LA AUTORIDAD: «El Acta de Aprehensión deberá expedirse el mismo día en el que se practique la acción de control que da lugar a ella, salvo que por el volumen de las mercancías o por circunstancias especiales debidamente justificadas se requiera un plazo adicional, el cual no podrá ser superior a cinco (5) días hábiles. En casos excepcionales el jefe de la unidad aprehensora podrá autorizar mediante auto un plazo mayor al de los cinco (5) días hábiles sin que pueda exceder el término de un mes» (art. 40). La fecha del acta es la del día de finalización de la diligencia y se notifica conforme al art. 102. TÉRMINO DE CADUCIDAD DE LA ACCIÓN DE CONTROL, que enmarca el acta: CINCO (5) AÑOS. Art. 39: «La facultad para iniciar la acción de control sobre mercancías sujetas a la aprehensión y decomiso por las causales previstas en los numerales 1, 4 y 5 del artículo 26 de la presente ley, deberá ejercerse dentro de los cinco (5) años contados a partir de que la autoridad aduanera tenga conocimiento del hecho de la ilegal introducción de mercancías al territorio aduanero nacional. En los demás casos [...] dentro de los cinco (5) años contados a partir de la fecha de los documentos que soportan la introducción de la mercancía al territorio aduanero nacional. Dentro de este término el acto administrativo de decomiso ordinario o directo debe quedar debidamente expedido y notificado». NO ES RECURRIBLE, PERO ABRE EL RELOJ DEL PARTICULAR: «El Acta de Aprehensión es un acto administrativo de trámite contra el que no procede recurso alguno en sede administrativa», y con su notificación empiezan a correr los quince (15) días hábiles del escrito de objeciones (art. 45) y del ofrecimiento de garantía en reemplazo (art. 43). EFECTO INMEDIATO: «con el Acta de Aprehensión queda automáticamente suspendido el levante en relación con las mercancías objeto de la medida mientras se resuelve si procede o no su decomiso» (art. 41). AVALÚO: se consigna en el acta; si requiere conceptos o análisis especializados, la diligencia de reconocimiento y avalúo definitivo se hace dentro de los veinte (20) días hábiles siguientes a la notificación del acta (art. 44).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Dependencia que practica la diligencia",
+          "mandatory": true,
+          "basis": "art. 40"
+        },
+        {
+          "n": 2,
+          "name": "Lugar y fecha de la diligencia, correspondiendo la fecha al día de su finalización",
+          "mandatory": true,
+          "basis": "art. 40"
+        },
+        {
+          "n": 3,
+          "name": "Causal o causales de aprehensión invocadas",
+          "mandatory": true,
+          "basis": "arts. 26 y 40"
+        },
+        {
+          "n": 4,
+          "name": "Identificación del medio de transporte en que se moviliza la mercancía, cuando haya lugar",
+          "mandatory": true,
+          "basis": "art. 40"
+        },
+        {
+          "n": 5,
+          "name": "Identificación y dirección de quienes intervienen en la diligencia y de los titulares de derechos o responsables de las mercancías",
+          "mandatory": true,
+          "basis": "art. 40"
+        },
+        {
+          "n": 6,
+          "name": "Descripción de las mercancías por naturaleza, marca, referencia, serial, cantidad y peso cuando se requiera",
+          "mandatory": true,
+          "basis": "art. 40"
+        },
+        {
+          "n": 7,
+          "name": "Avalúo unitario y total, o avalúo provisional cuando se requieran conceptos o análisis especializados",
+          "mandatory": true,
+          "basis": "arts. 40 y 44"
+        },
+        {
+          "n": 8,
+          "name": "Dirección Seccional donde continuará el proceso de decomiso",
+          "mandatory": true,
+          "basis": "art. 40"
+        },
+        {
+          "n": 9,
+          "name": "Objeciones presentadas por el interesado durante la diligencia y relación de las pruebas que aportó, cuando no consten en el acta de hechos",
+          "mandatory": true,
+          "basis": "art. 40 inciso 3"
+        },
+        {
+          "n": 10,
+          "name": "Constancia de las condiciones en que la mercancía se entrega al depósito, valiendo el acta como documento de ingreso al recinto de almacenamiento",
+          "mandatory": true,
+          "basis": "art. 40 inciso 3"
+        },
+        {
+          "n": 11,
+          "name": "Propuesta de imposición de la sanción accesoria de cierre del establecimiento de comercio, cuando pudiere haber lugar a ella",
+          "mandatory": false,
+          "basis": "arts. 40 inciso 4 y 55"
+        },
+        {
+          "n": 12,
+          "name": "Vinculación del transportador, evaluadas las condiciones logísticas y operativas del contrato de transporte",
+          "mandatory": false,
+          "basis": "art. 40 par. 1"
+        },
+        {
+          "n": 13,
+          "name": "Vinculación de la agencia de aduanas para que pueda discutir la configuración de la causal",
+          "mandatory": false,
+          "basis": "art. 40 par. 2"
+        },
+        {
+          "n": 14,
+          "name": "Advertencia del término de quince (15) días hábiles para presentar el escrito de objeciones y forma de notificación",
+          "mandatory": true,
+          "basis": "arts. 45 y 102"
+        },
+        {
+          "n": 15,
+          "name": "Firma del funcionario que practica la diligencia, admitiéndose firma electrónica o digital",
+          "mandatory": true,
+          "basis": "art. 30 inciso 2"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_2586_2026_pr001.html"
+    },
+    {
+      "exact_name": "Acta de aprehensión y decomiso directo",
+      "area": "ADUANERO",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 2586 de 2026, art. 48 (decomiso directo: mercancías en que procede); art. 49 (procedimiento del decomiso directo); art. 40 (contenido del acta de aprehensión, aplicable); art. 44 (el avalúo del acta de decomiso directo es definitivo); art. 88 (recurso de reconsideración, único procedente); art. 102 num. 2 (notificación)",
+      "competent_authority": "Unidad aprehensora de la DIAN que practica la diligencia, la cual profiere simultáneamente la aprehensión y el decomiso (Ley 2586 de 2026, arts. 48 y 49)",
+      "term": "EL RELOJ DE LA AUTORIDAD: el decomiso directo «es el que se realiza simultáneamente con la aprehensión» (art. 48), de modo que no hay etapa de objeciones ni período probatorio: «Dentro de la misma diligencia de decomiso directo el interesado deberá aportar los documentos que amparen la mercancía de procedencia extranjera, que demuestren su legal importación e impidan su decomiso» (art. 49). EL RELOJ DEL PARTICULAR, que nace de inmediato: el acta «es una decisión de fondo y contra la cual procede únicamente el recurso de reconsideración», que se interpone dentro de los QUINCE (15) DÍAS HÁBILES siguientes a su notificación (arts. 49 y 88). PROCEDE SOLO EN ESTOS CASOS (art. 48): mercancías de valor inferior o igual a 500 UVT; hidrocarburos o sus derivados; licores, vinos, aperitivos, cervezas, sifones y refajos; tabaco, cigarrillos, cigarrillos electrónicos, vapeadores, SEAN, SSSN, PTC y PNO; perfumes; animales vivos; mercancías de prohibida importación; mercancías objeto de devolución por convenios internacionales; mercancías de alto riesgo para la salubridad pública certificado por la autoridad respectiva; las del numeral 1 del art. 383 del Decreto 1165 de 2019; y mercancía perecedera. AVALÚO DEFINITIVO: el que se realice en el acta de aprehensión y decomiso directo es definitivo, y su revisión oficiosa se hace en la etapa del recurso de reconsideración (arts. 44 y 49). EFECTO AL QUEDAR EN FIRME: «queda automáticamente cancelado el levante de las declaraciones con las cuales se pretendió amparar la mercancía» (art. 49 par.). LÍMITE AL RESCATE: el tabaco y productos asimilados decomisados por esta vía no pueden legalizarse con pago de rescate (art. 48 par.).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Dependencia, lugar y fecha de la diligencia",
+          "mandatory": true,
+          "basis": "arts. 40 y 49"
+        },
+        {
+          "n": 2,
+          "name": "Causal de aprehensión y encuadramiento en uno de los once eventos del art. 48 que habilitan el decomiso directo",
+          "mandatory": true,
+          "basis": "art. 48"
+        },
+        {
+          "n": 3,
+          "name": "Identificación y dirección de los intervinientes y de los titulares de derechos o responsables de la mercancía",
+          "mandatory": true,
+          "basis": "art. 40"
+        },
+        {
+          "n": 4,
+          "name": "Descripción de las mercancías por naturaleza, marca, referencia, serial, cantidad y peso",
+          "mandatory": true,
+          "basis": "art. 40"
+        },
+        {
+          "n": 5,
+          "name": "Avalúo unitario y total, que en el decomiso directo es definitivo",
+          "mandatory": true,
+          "basis": "arts. 44 y 49"
+        },
+        {
+          "n": 6,
+          "name": "Relación de los documentos aportados por el interesado dentro de la misma diligencia y su valoración",
+          "mandatory": true,
+          "basis": "art. 49 inciso 1"
+        },
+        {
+          "n": 7,
+          "name": "Decisión de fondo: el decomiso de las mercancías y su declaratoria como propiedad de la Nación",
+          "mandatory": true,
+          "basis": "arts. 47 num. 2.8 y 49"
+        },
+        {
+          "n": 8,
+          "name": "Indicación de que solo procede el recurso de reconsideración, del término de quince (15) días hábiles y de la dependencia ante la cual se interpone",
+          "mandatory": true,
+          "basis": "arts. 49 y 88"
+        },
+        {
+          "n": 9,
+          "name": "Forma de notificación conforme a las reglas especiales",
+          "mandatory": true,
+          "basis": "arts. 49 y 102 num. 2"
+        },
+        {
+          "n": 10,
+          "name": "Orden de remitir copia al Departamento correspondiente cuando la mercancía está sujeta al impuesto al consumo de la Ley 223 de 1995",
+          "mandatory": false,
+          "basis": "art. 49 inciso 4"
+        },
+        {
+          "n": 11,
+          "name": "Firma del funcionario competente",
+          "mandatory": true,
+          "basis": "art. 30 inciso 2"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_2586_2026_pr001.html"
+    },
+    {
+      "exact_name": "Requerimiento especial aduanero",
+      "area": "ADUANERO",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 2586 de 2026, art. 66 (requerimiento especial aduanero: objeto y efecto de iniciar formalmente el proceso); art. 67 (expedición y notificación oportuna); art. 68 (vinculación de terceros); art. 69 (contenido); art. 70 (notificación y respuesta); art. 20 (caducidad de la acción sancionatoria); art. 64 (correspondencia entre el requerimiento y la decisión de fondo); Decreto 1165 de 2019, art. 188 (firmeza de la declaración)",
+      "competent_authority": "División de Fiscalización y Liquidación de la Dirección Seccional de Aduanas o de Impuestos y Aduanas de la DIAN competente (Ley 2586 de 2026, arts. 66 y 67)",
+      "term": "DOS RELOJES DISTINTOS Y LOS DOS SON DE LA AUTORIDAD. (a) PLAZO INTERNO DE EXPEDICIÓN: art. 67 — «sin perjuicio de los términos de caducidad y de firmeza de la declaración, el funcionario responsable del proceso lo expedirá a más tardar dentro de los treinta (30) días hábiles siguientes a la fecha en que se haya establecido la presunta comisión de una infracción administrativa aduanera o identificada la inexactitud de la declaración que da lugar a la expedición de Liquidaciones Oficiales». (b) LÍMITES QUE SÍ EXTINGUEN LA FACULTAD: la CADUCIDAD DE LA ACCIÓN SANCIONATORIA es de TRES (3) AÑOS «contados a partir de la comisión del hecho o de la omisión constitutiva de infracción administrativa aduanera, término dentro del cual el acto administrativo que impone la sanción debe haber sido expedido y notificado» (art. 20); se eleva a OCHO (8) AÑOS cuando el hecho está además tipificado como contrabando, fraude aduanero, lavado de activos y los demás delitos que enumera el art. 20 par. 1; y cuando la sanción se impone dentro de una liquidación oficial, «la caducidad se someterá a los términos y condiciones previstos para la firmeza de la declaración», esto es, TRES (3) AÑOS desde la presentación y aceptación de la declaración de importación (art. 20 par. 2 y Decreto 1165 de 2019, art. 188). En hechos de ejecución sucesiva, continuada o permanente el término corre desde el último hecho, acto u omisión. EL RELOJ QUE ESTE ACTO ABRE PARA EL PARTICULAR: quince (15) DÍAS HÁBILES para responder (art. 70). LO QUE EL REQUERIMIENTO FIJA Y NO PUEDE AMPLIARSE DESPUÉS: la liquidación oficial, la resolución sanción y el decomiso «guardarán correspondencia» con los hechos y circunstancias contemplados en el requerimiento especial aduanero o en el acta de aprehensión (art. 64). PRESCRIPCIÓN POSTERIOR, distinta de la caducidad: la facultad para hacer efectivas las sanciones prescribe en CINCO (5) AÑOS desde la ejecutoria del acto que las impone (art. 21).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del presunto autor o autores de la infracción, o del declarante o usuario aduanero",
+          "mandatory": true,
+          "basis": "art. 66"
+        },
+        {
+          "n": 2,
+          "name": "Aspectos de la declaración aduanera que se proponen modificar",
+          "mandatory": true,
+          "basis": "art. 69"
+        },
+        {
+          "n": 3,
+          "name": "Cuantificación de los tributos aduaneros, del rescate y de las sanciones que se proponen",
+          "mandatory": true,
+          "basis": "art. 69"
+        },
+        {
+          "n": 4,
+          "name": "Hechos que constituyen la infracción",
+          "mandatory": true,
+          "basis": "art. 69"
+        },
+        {
+          "n": 5,
+          "name": "Normas en que se sustenta la propuesta",
+          "mandatory": true,
+          "basis": "art. 69"
+        },
+        {
+          "n": 6,
+          "name": "Vinculación del agente de aduanas, del garante y de los terceros a que haya lugar",
+          "mandatory": true,
+          "basis": "arts. 68 y 69"
+        },
+        {
+          "n": 7,
+          "name": "Fecha en que se estableció la presunta comisión de la infracción o la inexactitud, con el soporte del informe de posibles inconsistencias",
+          "mandatory": true,
+          "basis": "art. 67"
+        },
+        {
+          "n": 8,
+          "name": "Advertencia del término de quince (15) días hábiles para responder y de la posibilidad de ampliarlo hasta setenta (70) días hábiles para acreditar restricciones legales o administrativas",
+          "mandatory": true,
+          "basis": "art. 70"
+        },
+        {
+          "n": 9,
+          "name": "Advertencia de los porcentajes de reducción por allanamiento aplicables según el momento",
+          "mandatory": false,
+          "basis": "art. 19"
+        },
+        {
+          "n": 10,
+          "name": "Forma de notificación, electrónica y en su defecto por correo físico",
+          "mandatory": true,
+          "basis": "arts. 70 y 104"
+        },
+        {
+          "n": 11,
+          "name": "Firma del funcionario competente",
+          "mandatory": true,
+          "basis": "art. 30 inciso 2"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_2586_2026_pr001.html"
+    },
+    {
+      "exact_name": "Resolución de decomiso",
+      "area": "ADUANERO",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 2586 de 2026, art. 47 (acto administrativo que decide de fondo el proceso de decomiso: término y contenido); art. 39 (término de cinco años de la acción de control); art. 43 (orden de hacer efectiva la garantía en reemplazo de aprehensión); art. 55 (sanción de cierre del establecimiento de comercio); art. 88 (recurso de reconsideración); art. 96 (silencio administrativo positivo por incumplimiento del término); art. 98 (firmeza y ejecutoria)",
+      "competent_authority": "División de Fiscalización y Liquidación de la Dirección Seccional de Aduanas o de Impuestos y Aduanas de la DIAN que adelanta el proceso de decomiso (Ley 2586 de 2026, arts. 40 y 47)",
+      "term": "EL RELOJ DE LA AUTORIDAD: SETENTA (70) DÍAS HÁBILES. Art. 47: «La autoridad aduanera dispondrá de setenta (70) días hábiles para expedir y notificar el acto de fondo que decide sobre el proceso de decomiso y su avalúo si a ello hubiere lugar, mediante resolución motivada». Se cuentan desde el día siguiente al vencimiento del término para presentar el último escrito de objeción, o desde el día siguiente a su presentación cuando el interesado renuncia al resto del término, o desde el día siguiente a la notificación del auto que cierra el período probatorio, o desde la ejecutoria del auto que deniega la totalidad de las pruebas. LÍMITE EXTERNO QUE NO SE PUEDE PASAR: dentro de los cinco (5) años del art. 39 «el acto administrativo de decomiso ordinario o directo debe quedar debidamente expedido y notificado». CONSECUENCIA DE PASARSE DE LOS 70 DÍAS: silencio administrativo positivo y devolución de la mercancía, salvo que el interesado no haya presentado el escrito de objeciones, que no proceda el rescate o que existan restricciones legales o administrativas no acreditadas (art. 96). EL RELOJ QUE ESTE ACTO ABRE PARA EL PARTICULAR, y es el que mata el derecho: quince (15) DÍAS HÁBILES para el recurso de reconsideración (art. 88), y mientras la resolución no esté ejecutoriada aún puede rescatarse la mercancía pagando el 75% de su valor en aduana más los tributos (Decreto 1165 de 2019, art. 293 num. 2). EJECUTORIADA, la mercancía es propiedad de la Nación (art. 47 num. 2.8). PLAZO PARA ENTREGAR LA MERCANCÍA ENTREGADA CON GARANTÍA: la resolución fija el término, a más tardar quince (15) días hábiles siguientes a su ejecutoria, o diez (10) días si es fungible, so pena de hacerse efectiva la garantía sin trámite adicional (art. 43).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Fecha de expedición de la resolución",
+          "mandatory": true,
+          "basis": "art. 47 num. 2.1"
+        },
+        {
+          "n": 2,
+          "name": "Nombre o razón social del responsable o responsables de las mercancías",
+          "mandatory": true,
+          "basis": "art. 47 num. 2.2"
+        },
+        {
+          "n": 3,
+          "name": "Identificación y lugar de residencia del responsable o responsables",
+          "mandatory": true,
+          "basis": "art. 47 num. 2.3"
+        },
+        {
+          "n": 4,
+          "name": "Fecha y lugar de la aprehensión",
+          "mandatory": true,
+          "basis": "art. 47 num. 2.4"
+        },
+        {
+          "n": 5,
+          "name": "Descripción de las mercancías",
+          "mandatory": true,
+          "basis": "art. 47 num. 2.5"
+        },
+        {
+          "n": 6,
+          "name": "Identificación de la causal que sustenta el decomiso",
+          "mandatory": true,
+          "basis": "art. 47 num. 2.6"
+        },
+        {
+          "n": 7,
+          "name": "Valoración conjunta de las pruebas conforme a la sana crítica, con exposición razonada del mérito asignado a cada una",
+          "mandatory": true,
+          "basis": "arts. 37 y 47 num. 2.7"
+        },
+        {
+          "n": 8,
+          "name": "Cancelación del levante, decomiso de las mercancías y declaratoria de propiedad de la Nación",
+          "mandatory": true,
+          "basis": "art. 47 num. 2.8"
+        },
+        {
+          "n": 9,
+          "name": "Orden de hacer efectiva la garantía constituida en reemplazo de la aprehensión y de enviar copia a cobranzas, cuando corresponda",
+          "mandatory": false,
+          "basis": "arts. 43 y 47 num. 2.9"
+        },
+        {
+          "n": 10,
+          "name": "Orden de enviar copia, una vez en firme, a la dependencia encargada de promover la acción penal, cuando fuere del caso",
+          "mandatory": false,
+          "basis": "art. 47 num. 2.10"
+        },
+        {
+          "n": 11,
+          "name": "Resolución de las objeciones al avalúo y demás aspectos pendientes, y orden de poner la mercancía a disposición de la autoridad competente cuando norma especial lo disponga",
+          "mandatory": true,
+          "basis": "arts. 44 y 47 num. 2.11"
+        },
+        {
+          "n": 12,
+          "name": "Motivación y pruebas de la sanción accesoria de cierre del establecimiento de comercio, si hay lugar a imponerla",
+          "mandatory": false,
+          "basis": "arts. 47 inciso final y 55"
+        },
+        {
+          "n": 13,
+          "name": "Forma de notificación",
+          "mandatory": true,
+          "basis": "art. 47 num. 2.12"
+        },
+        {
+          "n": 14,
+          "name": "Recurso que procede, término para interponerlo y dependencia ante quien se interpone",
+          "mandatory": true,
+          "basis": "art. 47 num. 2.13"
+        },
+        {
+          "n": 15,
+          "name": "Firma del funcionario competente",
+          "mandatory": true,
+          "basis": "art. 47 num. 2.14"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_2586_2026_pr001.html"
+    },
+    {
+      "exact_name": "Resolución sancionatoria aduanera",
+      "area": "ADUANERO",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 2586 de 2026, art. 72 (acto administrativo que decide de fondo: término y cómputo); art. 74 (contenido de la resolución sancionatoria); art. 20 (caducidad de la acción sancionatoria); art. 21 (prescripción de la sanción); art. 64 (correspondencia con el requerimiento especial aduanero); art. 88 (recurso de reconsideración); art. 96 (silencio administrativo positivo); art. 24 (registro en el INFAD)",
+      "competent_authority": "División de Fiscalización y Liquidación de la Dirección Seccional de Aduanas o de Impuestos y Aduanas de la DIAN competente (Ley 2586 de 2026, art. 72)",
+      "term": "EL RELOJ DE LA AUTORIDAD: SETENTA (70) DÍAS HÁBILES. Art. 72: «La autoridad aduanera dispondrá de setenta (70) días hábiles para expedir y notificar el acto administrativo que decida de fondo sobre la imposición de la sanción, la formulación de la liquidación oficial o el archivo del expediente». Se cuentan desde el día siguiente al vencimiento del término para responder el requerimiento especial aduanero cuando no hay pruebas que decretar, desde el día siguiente a la respuesta cuando el interesado renuncia al resto del término, desde el día siguiente a la notificación del auto que cierra el período probatorio, o desde el día siguiente a la radicación de la solicitud de liquidación oficial que disminuye tributos. SUSPENSIÓN: hasta por un (1) mes por auto motivado proferido dentro de los diez (10) días hábiles anteriores a la finalización del término. LÍMITE QUE EXTINGUE LA FACULTAD: la caducidad de TRES (3) AÑOS del art. 20 —dentro de los cuales la resolución debe estar EXPEDIDA Y NOTIFICADA—, u OCHO (8) AÑOS en los casos del par. 1, o el término de firmeza de la declaración cuando la sanción se impone dentro de una liquidación oficial. CONSECUENCIA DE PASARSE DE LOS 70 DÍAS: silencio administrativo positivo y absolución del procesado, salvo que no se hubiera respondido el requerimiento (art. 96). EL RELOJ QUE ESTE ACTO ABRE PARA EL PARTICULAR: quince (15) DÍAS HÁBILES para el recurso de reconsideración (art. 88); dentro de ese mismo término, allanarse reduce la multa al 60% (art. 19 num. 4) y puede pedirse la reducción por tope de ingresos brutos (art. 18 num. 6). OTRO RELOJ DEL SANCIONADO, dentro de la propia resolución: debe demostrar el pago de los derechos, impuestos e intereses y la satisfacción de la obligación «a más tardar, dentro de los veinte (20) días siguientes al de ejecutoria de la resolución, si aún no se hubiere hecho [...] so pena de cancelación de la autorización o habilitación» (art. 74 num. 9). PRESCRIPCIÓN POSTERIOR: cinco (5) años desde la ejecutoria para hacer efectiva la sanción (art. 21).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Fecha",
+          "mandatory": true,
+          "basis": "art. 74 num. 1"
+        },
+        {
+          "n": 2,
+          "name": "Nombre o razón social del sancionado o sancionados",
+          "mandatory": true,
+          "basis": "art. 74 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "Número de identificación tributaria",
+          "mandatory": true,
+          "basis": "art. 74 num. 3"
+        },
+        {
+          "n": 4,
+          "name": "Identificación de la infracción que da lugar a la sanción",
+          "mandatory": true,
+          "basis": "art. 74 num. 4"
+        },
+        {
+          "n": 5,
+          "name": "Exposición de motivos con los hechos, las pruebas allegadas y las normas jurídicas pertinentes",
+          "mandatory": true,
+          "basis": "arts. 37 y 74 num. 5"
+        },
+        {
+          "n": 6,
+          "name": "Sanción impuesta y, si es multa, identificación de la base de cálculo de su cuantía, con la gradualidad y las reducciones aplicadas",
+          "mandatory": true,
+          "basis": "arts. 17, 18, 19 y 74 num. 6"
+        },
+        {
+          "n": 7,
+          "name": "Orden de hacer efectiva la garantía, cuando haya lugar",
+          "mandatory": false,
+          "basis": "art. 74 num. 7"
+        },
+        {
+          "n": 8,
+          "name": "Orden de enviar copia ejecutoriada a la dependencia de cobranzas",
+          "mandatory": true,
+          "basis": "art. 74 num. 8"
+        },
+        {
+          "n": 9,
+          "name": "Advertencia de que la sanción no exime del pago de derechos, impuestos e intereses ni de la satisfacción de la obligación, que debe demostrarse dentro de los veinte (20) días siguientes a la ejecutoria",
+          "mandatory": true,
+          "basis": "art. 74 num. 9"
+        },
+        {
+          "n": 10,
+          "name": "Medidas especiales que deban adoptarse en relación con las infracciones que así lo establezcan",
+          "mandatory": false,
+          "basis": "art. 74 num. 10"
+        },
+        {
+          "n": 11,
+          "name": "Forma de notificación",
+          "mandatory": true,
+          "basis": "art. 74 num. 11"
+        },
+        {
+          "n": 12,
+          "name": "Recurso que procede, término para interponerlo y dependencia ante quien se interpone",
+          "mandatory": true,
+          "basis": "art. 74 num. 12"
+        },
+        {
+          "n": 13,
+          "name": "Firma del funcionario competente",
+          "mandatory": true,
+          "basis": "art. 74 num. 13"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_2586_2026_pr001.html"
+    },
+    {
+      "exact_name": "Liquidación oficial aduanera",
+      "area": "ADUANERO",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 2586 de 2026, art. 57 (procedencia de la liquidación oficial); art. 73 (contenido de la liquidación oficial); art. 72 (término para expedirla y notificarla); art. 58 (liquidación para corregir errores o inexactitudes que generen un menor pago); art. 59 (error aritmético); art. 61 (liquidación que afecta la valoración); art. 63 (liquidación que disminuye tributos, sanciones o rescate); art. 64 (correspondencia con el requerimiento especial aduanero); Decreto 1165 de 2019, art. 188 (firmeza de la declaración)",
+      "competent_authority": "División de Fiscalización y Liquidación de la Dirección Seccional de Aduanas o de Impuestos y Aduanas de la DIAN competente (Ley 2586 de 2026, arts. 57 y 72)",
+      "term": "EL RELOJ DE LA AUTORIDAD: SETENTA (70) DÍAS HÁBILES para expedir y notificar la liquidación oficial, contados en la forma del art. 72; cuando se trata de la liquidación solicitada por el interesado para disminuir tributos, sanciones o rescate, los 70 días hábiles corren desde la presentación de la solicitud en debida forma (art. 63). SUSPENSIÓN: hasta por un (1) mes cuando la cantidad, naturaleza o complejidad de las pruebas lo amerite (arts. 71 y 72). LÍMITE EXTERNO QUE EXTINGUE LA FACULTAD, y es el reloj que también protege al contribuyente: la declaración de importación queda EN FIRME a los TRES (3) AÑOS de su presentación y aceptación «salvo que se haya notificado Requerimiento Especial Aduanero» (Decreto 1165 de 2019, art. 188); en firme, ya no puede modificarse por liquidación oficial. El término se cuenta desde la corrección o modificación si la declaración fue corregida, y se suspende mientras dura una verificación de origen. En los procesos de liquidación oficial de corrección no hay período probatorio independiente: las pruebas se practican dentro del mismo término de decisión (art. 71 inciso 5). CONSECUENCIA DE PASARSE DEL TÉRMINO: silencio administrativo positivo, cuyo efecto es «la firmeza de la declaración» (art. 96 num. 2). EL RELOJ QUE ESTE ACTO ABRE PARA EL PARTICULAR: quince (15) DÍAS HÁBILES para el recurso de reconsideración (art. 88).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Fecha",
+          "mandatory": true,
+          "basis": "art. 73 num. 1"
+        },
+        {
+          "n": 2,
+          "name": "Declaración o declaraciones de importación a las que corresponde",
+          "mandatory": true,
+          "basis": "art. 73 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "Nombre o razón social del importador y número de identificación tributaria",
+          "mandatory": true,
+          "basis": "art. 73 nums. 3 y 4"
+        },
+        {
+          "n": 4,
+          "name": "Subpartidas arancelarias de las mercancías declaradas",
+          "mandatory": true,
+          "basis": "art. 73 num. 5"
+        },
+        {
+          "n": 5,
+          "name": "Bases de cuantificación del valor en aduanas y de los tributos aduaneros",
+          "mandatory": true,
+          "basis": "art. 73 num. 6"
+        },
+        {
+          "n": 6,
+          "name": "Identificación de la omisión, error o inexactitud de la declaración",
+          "mandatory": true,
+          "basis": "art. 73 num. 7"
+        },
+        {
+          "n": 7,
+          "name": "Monto de los derechos, impuestos, rescate y sanciones a cargo del declarante o de la agencia de aduanas",
+          "mandatory": true,
+          "basis": "art. 73 num. 8"
+        },
+        {
+          "n": 8,
+          "name": "Identificación de los responsables solidarios con el monto de concurrencia de cada uno, o del responsable subsidiario",
+          "mandatory": false,
+          "basis": "arts. 6 y 73 num. 9"
+        },
+        {
+          "n": 9,
+          "name": "Explicación de las modificaciones efectuadas a la declaración de importación",
+          "mandatory": true,
+          "basis": "art. 73 num. 10"
+        },
+        {
+          "n": 10,
+          "name": "Valoración de las pruebas allegadas, con el mérito probatorio dado a cada medio",
+          "mandatory": true,
+          "basis": "arts. 37 y 73 num. 11"
+        },
+        {
+          "n": 11,
+          "name": "Orden de hacer efectiva la garantía y de enviar copia ejecutoriada a cobranzas",
+          "mandatory": true,
+          "basis": "art. 73 nums. 12 y 13"
+        },
+        {
+          "n": 12,
+          "name": "Orden de enviar copia, una vez en firme, a la dependencia encargada de promover la acción penal, cuando fuere del caso",
+          "mandatory": false,
+          "basis": "art. 73 num. 14"
+        },
+        {
+          "n": 13,
+          "name": "Forma de notificación, recurso que procede, término y dependencia ante quien se interpone",
+          "mandatory": true,
+          "basis": "art. 73 nums. 15 y 16"
+        },
+        {
+          "n": 14,
+          "name": "Firma del funcionario competente",
+          "mandatory": true,
+          "basis": "art. 73 num. 17"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_2586_2026_pr001.html"
+    },
+    {
+      "exact_name": "Auto que decreta pruebas en el proceso aduanero",
+      "area": "ADUANERO",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 2586 de 2026, art. 46 (auto de pruebas en el proceso de decomiso); art. 71 (auto de pruebas en el proceso sancionatorio y de liquidación oficial); art. 93 (auto de pruebas en el recurso de reconsideración); art. 33 (principios del derecho probatorio); art. 35 (medios de prueba); art. 36 (carga de la prueba, conducencia y pertinencia); art. 38 (inspección administrativa)",
+      "competent_authority": "La dependencia de la DIAN que adelanta la actuación: División de Fiscalización y Liquidación de la Dirección Seccional en decomiso y en el proceso sancionatorio, o la dependencia competente para resolver el recurso de reconsideración (Ley 2586 de 2026, arts. 46, 71 y 93)",
+      "term": "EL RELOJ DE LA AUTORIDAD, DISTINTO EN CADA ETAPA. (a) DECOMISO: «El auto que decrete la práctica de pruebas o las de oficio que se consideren necesarias se deberá proferir dentro de los veinte (20) días hábiles siguientes contados a partir del día siguiente al vencimiento del plazo para la presentación del escrito que objeta la aprehensión» (art. 46). (b) SANCIONATORIO Y LIQUIDACIÓN OFICIAL: «dentro de los diez (10) días hábiles siguientes» al vencimiento del término para responder el requerimiento especial aduanero (art. 71). (c) RECURSO DE RECONSIDERACIÓN: «dentro del mes siguiente» a la recepción del recurso y del expediente, o a la ejecutoria de la resolución que admite el recurso (art. 93). PLAZO DE PRÁCTICA, ejecutoriado el auto: dos (2) meses en el país; tres (3) meses cuando alguna deba practicarse en el exterior en decomiso y en el recurso (arts. 46 y 93), y CUATRO (4) MESES en el proceso sancionatorio (art. 71). CIERRE: vencido el período probatorio, o antes si ya se practicaron todas las pruebas, se ordena por auto el cierre, que se notifica electrónicamente y contra el cual no procede recurso. EL RELOJ QUE ESTE AUTO ABRE PARA EL PARTICULAR: contra el auto que NIEGA total o parcialmente las pruebas procede reposición —diez (10) días hábiles y en efecto suspensivo en decomiso (art. 46); cinco (5) días hábiles en el proceso sancionatorio (art. 71) y en el recurso de reconsideración (art. 93)—; y desde la notificación del auto de cierre corren cinco (5) días hábiles para los alegatos de conclusión. CONTRA EL AUTO QUE DECRETA pruebas no procede recurso.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del expediente, de la etapa procesal y del interesado",
+          "mandatory": true,
+          "basis": "arts. 46, 71 y 93"
+        },
+        {
+          "n": 2,
+          "name": "Relación de las pruebas solicitadas por el interesado y decisión individual sobre cada una",
+          "mandatory": true,
+          "basis": "art. 36"
+        },
+        {
+          "n": 3,
+          "name": "Motivación de la decisión, con exposición de las razones del rechazo de las pruebas notoriamente inconducentes, impertinentes o inútiles",
+          "mandatory": true,
+          "basis": "art. 36 incisos 4 y 5"
+        },
+        {
+          "n": 4,
+          "name": "Pruebas decretadas de oficio, cuando la autoridad las considere necesarias",
+          "mandatory": false,
+          "basis": "arts. 36 y 46"
+        },
+        {
+          "n": 5,
+          "name": "Señalamiento del término de práctica: dos meses en el país; tres o cuatro meses cuando alguna deba practicarse en el exterior, según la etapa",
+          "mandatory": true,
+          "basis": "arts. 46, 71 y 93"
+        },
+        {
+          "n": 6,
+          "name": "Designación del perito o de los funcionarios comisionados y de los hechos materia de la prueba, cuando se decreta inspección administrativa o prueba pericial",
+          "mandatory": false,
+          "basis": "arts. 35 par. y 38"
+        },
+        {
+          "n": 7,
+          "name": "Forma de notificación: electrónica y, de no ser posible, por correo físico",
+          "mandatory": true,
+          "basis": "arts. 46, 71, 93 y 104"
+        },
+        {
+          "n": 8,
+          "name": "Indicación de que contra el auto que decreta pruebas no procede recurso y de que contra el que las niega procede reposición, con su término",
+          "mandatory": true,
+          "basis": "arts. 46, 71 y 93"
+        },
+        {
+          "n": 9,
+          "name": "Firma del funcionario competente",
+          "mandatory": true,
+          "basis": "art. 30 inciso 2"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_2586_2026_pr001.html"
+    },
+    {
+      "exact_name": "Resolución que resuelve el recurso de reconsideración aduanero",
+      "area": "ADUANERO",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 2586 de 2026, art. 94 (término para decidir el recurso de reconsideración); art. 88 (motivación exigida al acto que resuelve el recurso); art. 95 (efectos de la decisión); art. 96 (silencio administrativo positivo y pronunciamiento sobre él); art. 98 (firmeza y ejecutoria de los actos); art. 18 num. 6 (resolución de la solicitud de reducción por tope de ingresos brutos en este mismo acto)",
+      "competent_authority": "La dependencia de la DIAN que establezca el decreto de estructura orgánica de la entidad para conocer del recurso de reconsideración (Ley 2586 de 2026, art. 88)",
+      "term": "EL RELOJ DE LA AUTORIDAD: CINCO (5) MESES. Art. 94: «El término para expedir y notificar el acto que resuelve el recurso de reconsideración será de cinco (5) meses», contados desde el día siguiente a la recepción del recurso y del expediente por el área competente cuando no se profirió auto inadmisorio, a la ejecutoria de la resolución que admite el recurso al resolver la reposición, o a la ratificación del interesado de la actuación del agente oficioso. «Dicho término se suspenderá por el mismo tiempo que dura el periodo probatorio, contado a partir de la fecha de ejecutoria del auto que decreta las pruebas». VARIOS RECURRENTES: el término corre desde la presentación del último recurso oportuno (art. 94 par. 2). CONSECUENCIA DE PASARSE: silencio administrativo positivo (art. 96). EFECTOS DE LA DECISIÓN, que cierran el reloj administrativo del particular: «Contra la decisión que resuelve el recurso de reconsideración no procede recurso alguno y con esta se entiende agotada la actuación en sede administrativa» (art. 95); a partir de allí el único camino es la jurisdicción de lo contencioso administrativo. SI SE REVOCA EL DECOMISO: «se entenderá que queda sin efecto alguno la suspensión del levante de las mercancías que operó con ocasión de la aprehensión [...] y, por tanto, el levante continuará vigente en las condiciones en que inicialmente fue otorgado» (art. 95). RESCATE HASTA EL ÚLTIMO MOMENTO: si antes de expedirse este acto el recurrente presenta la declaración con el rescate, se aplican los arts. 52 y 53 y se devuelve la mercancía (art. 94 par. 1).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del acto recurrido, del recurrente y de la fecha de interposición del recurso",
+          "mandatory": true,
+          "basis": "arts. 88 y 94"
+        },
+        {
+          "n": 2,
+          "name": "Cómputo del término de cinco meses, con indicación del hito desde el que se contó y de las suspensiones por período probatorio",
+          "mandatory": true,
+          "basis": "art. 94"
+        },
+        {
+          "n": 3,
+          "name": "Valoración conjunta de las pruebas conforme a las reglas de la sana crítica",
+          "mandatory": true,
+          "basis": "arts. 37 y 88 inciso 2"
+        },
+        {
+          "n": 4,
+          "name": "Razonamientos constitucionales, legales y doctrinarios estrictamente necesarios, con indicación de las disposiciones aplicadas",
+          "mandatory": true,
+          "basis": "art. 88 inciso 2"
+        },
+        {
+          "n": 5,
+          "name": "Respuesta a cada motivo de inconformidad y a las adiciones oportunas del recurso",
+          "mandatory": true,
+          "basis": "art. 88 par. 1"
+        },
+        {
+          "n": 6,
+          "name": "Pronunciamiento expreso sobre la solicitud de silencio administrativo positivo, declarándolo o denegándolo",
+          "mandatory": false,
+          "basis": "art. 96"
+        },
+        {
+          "n": 7,
+          "name": "Pronunciamiento sobre la solicitud de reducción de la sanción por tope de ingresos brutos",
+          "mandatory": false,
+          "basis": "art. 18 num. 6"
+        },
+        {
+          "n": 8,
+          "name": "Decisión: confirma, modifica o revoca el acto recurrido, con los efectos sobre el levante cuando se revoca el decomiso",
+          "mandatory": true,
+          "basis": "art. 95"
+        },
+        {
+          "n": 9,
+          "name": "Advertencia de que contra la decisión no procede recurso alguno y de que se agota la actuación en sede administrativa",
+          "mandatory": true,
+          "basis": "art. 95"
+        },
+        {
+          "n": 10,
+          "name": "Forma de notificación",
+          "mandatory": true,
+          "basis": "arts. 100 y 104"
+        },
+        {
+          "n": 11,
+          "name": "Firma del funcionario competente",
+          "mandatory": true,
+          "basis": "art. 30 inciso 2"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_2586_2026_pr002.html"
+    },
+    {
+      "exact_name": "Auto inadmisorio del recurso de reconsideración aduanero",
+      "area": "ADUANERO",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 2586 de 2026, art. 92 (inadmisión del recurso de reconsideración); art. 91 (requisitos cuyo incumplimiento genera la inadmisión); art. 31 (agencia oficiosa reservada a abogados); art. 89 (entrega del recurso)",
+      "competent_authority": "La dependencia de la DIAN competente para resolver el recurso de reconsideración (Ley 2586 de 2026, art. 92)",
+      "term": "EL RELOJ DE LA AUTORIDAD: DIEZ (10) DÍAS HÁBILES. Art. 92: «En el evento de incumplimiento de alguno de los requisitos previstos en el artículo anterior, la dependencia competente para resolver el recurso de reconsideración, dentro de los diez (10) días hábiles siguientes al recibo del recurso y del expediente por parte de la dependencia competente para resolverlo, dictará un auto mediante el cual inadmite el mismo». Si se radicaron escritos en fechas distintas dentro del término, los diez días corren desde el último; si hay varios recurrentes contra el mismo acto, desde el vencimiento del término del último notificado; si el recurrente es agente oficioso, desde el día siguiente a la ratificación. EL RELOJ DEL PARTICULAR QUE ESTE AUTO ABRE: CINCO (5) DÍAS HÁBILES para el recurso de reposición, que se resuelve dentro de los cinco (5) días hábiles siguientes a su recepción por el área competente, «una vez vencido el término para interponer el recurso, salvo que se haya renunciado a términos». LO QUE NO SE PUEDE SALVAR: «No es subsanable el incumplimiento del requisito previsto en el numeral dos (2) del artículo anterior», que es interponer el recurso dentro de la oportunidad legal (arts. 91 num. 2 y 92). CONSECUENCIA DE CONFIRMARSE LA INADMISIÓN: el auto que resuelve la reposición «confirmará la inadmisión, el archivo del expediente y su devolución a la dependencia de origen», con lo cual el acto recurrido queda en firme (arts. 92 y 98).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del recurso, del recurrente y del acto recurrido",
+          "mandatory": true,
+          "basis": "art. 92"
+        },
+        {
+          "n": 2,
+          "name": "Fecha de recibo del recurso y del expediente por la dependencia competente, con el cómputo de los diez días hábiles",
+          "mandatory": true,
+          "basis": "art. 92"
+        },
+        {
+          "n": 3,
+          "name": "Identificación precisa del requisito del art. 91 que se incumple",
+          "mandatory": true,
+          "basis": "arts. 91 y 92"
+        },
+        {
+          "n": 4,
+          "name": "Indicación de si el defecto es subsanable, advirtiendo que la extemporaneidad no lo es",
+          "mandatory": true,
+          "basis": "art. 92 inciso final"
+        },
+        {
+          "n": 5,
+          "name": "Forma de notificación: electrónica y, de no ser posible, por correo físico",
+          "mandatory": true,
+          "basis": "arts. 92 y 104"
+        },
+        {
+          "n": 6,
+          "name": "Indicación del recurso de reposición, del término de cinco días hábiles y de la dependencia ante la cual se interpone",
+          "mandatory": true,
+          "basis": "art. 92"
+        },
+        {
+          "n": 7,
+          "name": "Firma del funcionario competente",
+          "mandatory": true,
+          "basis": "art. 30 inciso 2"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_2586_2026_pr002.html"
+    },
+    {
+      "exact_name": "Auto de corrección de la causal de aprehensión",
+      "area": "ADUANERO",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 2586 de 2026, art. 32 parágrafo (corrección de la causal de aprehensión por auto motivado y restitución de términos); art. 45 (escrito de objeciones cuyo término se restituye); art. 64 (correspondencia entre el acta corregida y la decisión de fondo); art. 46 (período probatorio, que marca el límite temporal de la corrección)",
+      "competent_authority": "El funcionario de la DIAN que adelanta el proceso de decomiso, con el visto bueno del jefe de la División de Fiscalización y Liquidación o de quien haga sus veces (Ley 2586 de 2026, art. 32 par.)",
+      "term": "EL RELOJ DE LA AUTORIDAD, Y SOLO TIENE UNA OPORTUNIDAD: art. 32 par. — «Cuando la autoridad aduanera identifique que la causal de aprehensión es diferente a la invocada en el acta respectiva, así se indicará mediante auto motivado que se expedirá POR UNA SOLA VEZ». Límite temporal: «Cuando haya lugar a decretar pruebas, la corrección se podrá hacer hasta antes de la expedición del auto que las ordena. Cuando no hubiere pruebas que decretar ni a petición de parte ni de oficio, esta corrección podrá hacerse por una sola vez, dentro de los veinte (20) días siguientes al vencimiento del término para presentar el Escrito de Objeción a la aprehensión, o a partir del día siguiente a la presentación del último Escrito de Objeción a la aprehensión cuando el interesado renuncia al resto del término que le faltare». EL RELOJ QUE ESTE AUTO DEVUELVE AL PARTICULAR, y es lo esencial de la ficha: «A partir de la notificación del auto de corrección de la causal de aprehensión se restituirán los términos al interesado para que interponga dentro de los quince (15) días hábiles siguientes, el Escrito de objeción a la aprehensión, de conformidad con lo señalado en artículo 45 de la presente ley». Es decir, el término de defensa se reabre íntegro. EFECTO SOBRE LA DECISIÓN DE FONDO: cuando se corrigió la causal, la correspondencia entre el acta y la resolución de decomiso «aplicará sobre la causal de aprehensión señalada en el auto de corrección» (art. 64 inciso 2). NOTIFICACIÓN: electrónica y, de no ser posible, por correo físico.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del expediente, del acta de aprehensión y de la mercancía",
+          "mandatory": true,
+          "basis": "art. 32 par."
+        },
+        {
+          "n": 2,
+          "name": "Causal de aprehensión inicialmente invocada y causal que se identifica como correcta",
+          "mandatory": true,
+          "basis": "art. 32 par."
+        },
+        {
+          "n": 3,
+          "name": "Motivación de la corrección, con los hechos y las normas que la sustentan",
+          "mandatory": true,
+          "basis": "art. 32 par."
+        },
+        {
+          "n": 4,
+          "name": "Constancia de que la corrección se hace por una sola vez y dentro de la oportunidad legal",
+          "mandatory": true,
+          "basis": "art. 32 par."
+        },
+        {
+          "n": 5,
+          "name": "Visto bueno del jefe de la División de Fiscalización y Liquidación o de quien haga sus veces",
+          "mandatory": true,
+          "basis": "art. 32 par."
+        },
+        {
+          "n": 6,
+          "name": "Restitución expresa del término de quince (15) días hábiles para presentar el escrito de objeciones a la aprehensión",
+          "mandatory": true,
+          "basis": "arts. 32 par. y 45"
+        },
+        {
+          "n": 7,
+          "name": "Constancia de que no se desconocen los argumentos ni las pruebas ya practicadas o aportadas por el interesado",
+          "mandatory": true,
+          "basis": "art. 32 inciso 2"
+        },
+        {
+          "n": 8,
+          "name": "Forma de notificación: electrónica y, de no ser posible, por correo físico",
+          "mandatory": true,
+          "basis": "arts. 32 par. y 104"
+        },
+        {
+          "n": 9,
+          "name": "Firma del funcionario que adelanta el proceso de decomiso",
+          "mandatory": true,
+          "basis": "art. 32 par."
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_2586_2026.html"
+    },
+    {
+      "exact_name": "Resolución que declara el silencio administrativo positivo aduanero",
+      "area": "ADUANERO",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 2586 de 2026, art. 96 (incumplimiento de términos, declaratoria del silencio administrativo positivo y sus efectos); art. 47 (término de decisión en decomiso); art. 72 (término de decisión en el proceso sancionatorio y de liquidación oficial); art. 94 (término de decisión del recurso de reconsideración)",
+      "competent_authority": "La dependencia de la DIAN que presuntamente incumplió el término, o la dependencia competente para resolver el recurso de reconsideración cuando el silencio se pidió con el recurso (Ley 2586 de 2026, art. 96)",
+      "term": "QUÉ DECLARA: art. 96 — «Transcurrido el plazo para expedir y notificar el acto administrativo que resuelve de fondo un proceso de fiscalización relativo a una liquidación oficial, una sanción, el decomiso, o el recurso de reconsideración previstos en la presente ley, dará lugar a la ocurrencia del silencio administrativo positivo, que se declarará de oficio o a petición de parte ante la dependencia que presuntamente incumplió el término, mediante resolución motivada». Los plazos cuyo incumplimiento se declara son 70 días hábiles en decomiso (art. 47), 70 días hábiles en el sancionatorio y de liquidación oficial (art. 72) y cinco (5) meses en el recurso de reconsideración (art. 94). EFECTOS QUE LA RESOLUCIÓN DEBE DECLARAR: «1. Cuando se trate de un proceso sancionatorio, se entenderá absuelto el procesado. 2. Cuando se trate de un proceso para expedir una liquidación oficial, dará lugar a la firmeza de la declaración. 3. Cuando se trate de un proceso de decomiso, dará lugar a la devolución de las mercancías al interesado, previa presentación y aceptación de la declaración aduanera [...]». EL RELOJ DEL CLIENTE QUE NACE DEL NUMERAL 3, y que se pasa por alto con facilidad: en el decomiso, la declaración aduanera «deberá presentarse dentro del mes siguiente a la declaratoria del silencio positivo; en caso contrario la autoridad aduanera se pronunciará de fondo» (art. 96, en la redacción del efecto del decomiso). CUÁNDO NO PUEDE DECLARARSE: si no se presentó el escrito de objeción a la aprehensión, si no se respondió el requerimiento especial aduanero, si la mercancía no admite rescate o si tiene restricciones legales o administrativas no acreditadas; en tales casos «se proferirá la decisión de fondo, aun estando fuera del término para ello» (art. 96).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del expediente, del proceso y del interesado",
+          "mandatory": true,
+          "basis": "art. 96"
+        },
+        {
+          "n": 2,
+          "name": "Cómputo del término incumplido, con la norma que lo fija, el hito inicial y la fecha de vencimiento",
+          "mandatory": true,
+          "basis": "arts. 47, 72, 94 y 96"
+        },
+        {
+          "n": 3,
+          "name": "Verificación de que no operan las causales que impiden el silencio positivo (falta de escrito de objeciones, falta de respuesta al requerimiento, mercancía no rescatable o con restricciones)",
+          "mandatory": true,
+          "basis": "art. 96 incisos 5 y 6"
+        },
+        {
+          "n": 4,
+          "name": "Pronunciamiento sobre las pretensiones del interesado",
+          "mandatory": true,
+          "basis": "art. 96 inciso 4"
+        },
+        {
+          "n": 5,
+          "name": "Declaratoria de la ocurrencia del silencio administrativo positivo y revocatoria del acto impugnado, si hay lugar",
+          "mandatory": true,
+          "basis": "art. 96 inciso 4"
+        },
+        {
+          "n": 6,
+          "name": "Indicación de los efectos según el proceso: absolución, firmeza de la declaración o devolución de la mercancía",
+          "mandatory": true,
+          "basis": "art. 96 nums. 1 a 3"
+        },
+        {
+          "n": 7,
+          "name": "Advertencia del término de un mes para presentar la declaración aduanera cuando el efecto es la devolución de la mercancía",
+          "mandatory": true,
+          "basis": "art. 96 num. 3"
+        },
+        {
+          "n": 8,
+          "name": "Forma de notificación: electrónica y, de no ser posible, por correo físico",
+          "mandatory": true,
+          "basis": "arts. 96 y 104"
+        },
+        {
+          "n": 9,
+          "name": "Firma del funcionario competente",
+          "mandatory": true,
+          "basis": "art. 30 inciso 2"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_2586_2026_pr002.html"
+    }
+  ]
+}
