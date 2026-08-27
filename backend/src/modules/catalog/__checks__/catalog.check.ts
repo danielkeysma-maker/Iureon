@@ -1002,6 +1002,15 @@ if (!baseForMerge) {
     // devuelve 404 y funcionpublica no lo tiene. Verificado antes de abrir la
     // lista: 2,1 MB con el art. 188 verbatim.
     'dian.gov.co',
+    // Entidades que publican SUS PROPIOS conceptos. Para un concepto, la
+    // entidad que lo redacto es la fuente mas oficial que existe — lo
+    // contrario de leyes.co, que era un espejo privado de norma ajena.
+    // Comprobado que los cuatro repositorios responden antes de abrirlos.
+    'consejodeestado.gov.co',
+    'supersociedades.gov.co',
+    'sic.gov.co',
+    'colombiacompra.gov.co',
+    'mintrabajo.gov.co',
     // Tratados: sus depositarios son la fuente oficial de su propio texto.
     'oas.org',
     'hcch.net',

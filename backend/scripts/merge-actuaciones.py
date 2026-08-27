@@ -67,6 +67,7 @@ OFICIALES = (
     'funcionpublica.gov.co', 'secretariasenado.gov.co', 'suin-juriscol.gov.co',
     'alcaldiabogota.gov.co', 'corteconstitucional.gov.co', 'ramajudicial.gov.co',
     'icbf.gov.co', 'supersalud.gov.co', 'colpensiones.gov.co', 'dian.gov.co',
+    'consejodeestado.gov.co', 'supersociedades.gov.co', 'sic.gov.co', 'colombiacompra.gov.co', 'mintrabajo.gov.co',
     'oas.org', 'hcch.net', 'tribunalandino.org.ec',
 )
 

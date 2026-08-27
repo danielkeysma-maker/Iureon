@@ -1,0 +1,193 @@
+{
+  "verified_at": "2026-08-27",
+  "criterio_de_aptitud": "Apta = (1) el alcance de sus conceptos esta fijado en norma oficial legible y citada verbatim, y (2) existe un repositorio oficial de la propia entidad donde cada concepto es identificable, fechado y consultable por tema, de modo que pueda comprobarse si la entidad se pronuncio despues sobre lo mismo. El campo 'vigencia_formal_declarada' distingue el caso en que ademas existe un regimen normativo de vigencia / reconsideracion de la doctrina.",
+  "entidades": [
+    {
+      "entidad": "DIAN",
+      "apta_para_el_corpus": true,
+      "vigencia_formal_declarada": true,
+      "norma_que_fija_el_alcance": "Ley 2010 de 2019, art. 131 (norma especial que desplaza la regla general del CPACA art. 28). Reglamentada por el Decreto 1742 de 2020, art. 55 num. 20 y par. 1, y art. 56 num. 1; y por la Resolucion DIAN 91 de 2021, arts. 7-1, 8 y 12 (adicionados/modificados por la Resolucion DIAN 70 de 2023).",
+      "cita_verbatim": "“Los conceptos emitidos por la direccion de gestion juridica o la subdireccion de gestion de normativa y doctrina de la Direccion de Impuestos y Aduanas Nacionales, constituyen interpretacion oficial para los empleados publicos de la Direccion de Impuestos y Aduanas Nacionales; por lo tanto, tendran caracter obligatorio para los mismos. Los contribuyentes podran sustentar sus actuaciones en la via gubernativa y en la jurisdiccional con base en la ley.”",
+      "citas_verbatim_de_apoyo": [
+        "Decreto 1742 de 2020, art. 55 par. 1: “Los conceptos emitidos por la Direccion de Gestion Juridica en materia tributaria, aduanera y cambiaria, en ejercicio de la facultad establecida en el articulo 131 de la ley 2010 de 2019, que sean publicados en la pagina WEB de la Entidad, constituyen interpretacion oficial para los empleados publicos de la DIAN y por ende de su obligatoria observancia.”",
+        "Decreto 1742 de 2020, art. 55 num. 20: “Proferir los conceptos unificados y absolver las peticiones de reconsideracion de conceptos expedidos por la Subdireccion de Normativa y Doctrina, en materia tributaria, aduanera o de Fiscalizacion Cambiaria, en lo de competencia de la Entidad.”",
+        "Resolucion DIAN 91 de 2021, art. 7-1 num. 2 (adicionado por la Res. 70 de 2023), sobre los conceptos unificados: “(i) de naturaleza compilatoria de la doctrina vigente y (ii) interpretativos y compilatorios de la doctrina anterior. En ambos casos, derogan la doctrina previa.”",
+        "Resolucion DIAN 91 de 2021, art. 7-1 par. 1 num. 1: “Cuando el concepto aclare, modifique o reconsidere una doctrina oficial anterior, el escrito debera contener como minimo: a) la transcripcion de la doctrina anterior y b) las razones suficientes y validas a la luz del ordenamiento juridico y los supuestos de hecho y de derecho que justifiquen el cambio doctrinal.”"
+      ],
+      "obliga_a": "Obliga unicamente a los empleados publicos de la DIAN, y solo respecto de los conceptos publicados en la pagina web de la entidad (la publicacion es constitutiva). NO obliga al contribuyente, que sustenta sus actuaciones 'con base en la ley'. NO obliga a los jueces. La Corte Constitucional declaro CONDICIONALMENTE EXEQUIBLE ese aparte (art. 113 de la Ley 1943 de 2018, de identico texto) “en el entendido de que la palabra “ley” a la que hace referencia comprende a todas las fuentes del derecho que admite el ordenamiento nacional”, Sentencia C-514-19 de 29 de octubre de 2019, M.P. Cristina Pardo Schlesinger.",
+      "no_obliga_a_jueces": true,
+      "cambio_de_criterio": "NO existe hoy proteccion legal de la confianza. La regla que amparaba al contribuyente ('las actuaciones tributarias realizadas a su amparo no podran ser objetadas por las autoridades tributarias') era el art. 264 de la Ley 223 de 1995, DEROGADO por el art. 160 de la Ley 2010 de 2019. La unica garantia vigente es de forma y reglamentaria: el concepto que cambia la doctrina debe transcribir la anterior y motivar el cambio.",
+      "reconsideracion_o_derogatoria": "Ambas. Los conceptos individuales se RECONSIDERAN: la peticion de reconsideracion de un concepto de la Subdireccion de Normativa y Doctrina la resuelve la Direccion de Gestion Juridica (Decreto 1742 de 2020, art. 55 num. 20). Los conceptos unificados DEROGAN la doctrina previa (Res. 91/2021 art. 7-1 num. 2), y a su vez pueden ser adicionados o modificados por conceptos individuales interpretativos.",
+      "como_se_verifica_vigencia": "Si, y es la unica entidad con regimen normativo de vigencia doctrinal. (1) Solo es doctrina oficial lo publicado en la web de la DIAN (Res. 91/2021 art. 12), de modo que la no publicacion es dato. (2) La Compilacion Juridica de la DIAN enlaza en cada norma la 'Doctrina Concordante' vigente: https://normograma.dian.gov.co/dian/compilacion/ . (3) La cadena reconsideracion/unificacion es rastreable porque el concepto nuevo debe transcribir el anterior.",
+      "source_url": "https://normograma.dian.gov.co/dian/compilacion/docs/ley_2010_2019.htm | https://normograma.dian.gov.co/dian/compilacion/docs/decreto_1742_2020.htm | https://normograma.dian.gov.co/dian/compilacion/docs/resolucion_dian_0091_2021.htm | https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=159687 (Ley 2010 de 2019, arts. 131 y 160)",
+      "razon_si_no_es_apta": null
+    },
+    {
+      "entidad": "Consejo de Estado - Sala de Consulta y Servicio Civil",
+      "apta_para_el_corpus": true,
+      "vigencia_formal_declarada": false,
+      "norma_que_fija_el_alcance": "Ley 1437 de 2011 (CPACA), art. 112, inciso 2 (inciso 1 y nums. 7 y 10 modificados por el art. 19 de la Ley 2080 de 2021). Fundamento constitucional de la funcion: Constitucion Politica, art. 237 num. 3.",
+      "cita_verbatim": "“Los conceptos de la Sala no seran vinculantes, salvo que la ley disponga lo contrario.”",
+      "citas_verbatim_de_apoyo": [
+        "Constitucion Politica, art. 237 num. 3: “Actuar como cuerpo supremo consultivo del Gobierno en asuntos de administracion, debiendo ser necesariamente oido en todos aquellos casos que la Constitucion y las leyes determinen.”",
+        "CPACA art. 112 num. 7 (concepto para precaver litigios entre entidades publicas): “El concepto emitido por la Sala no esta sujeto a recurso alguno.” y “La solicitud de concepto suspendera todos los terminos legales, incluida la caducidad del respectivo medio de control y la prescripcion, hasta el dia siguiente a la fecha de comunicacion del concepto.”",
+        "CPACA art. 112 par. 1: “Los conceptos de la Sala de Consulta y Servicio Civil estaran amparados por reserva legal de seis (6) meses. Esta podra ser prorrogada hasta por cuatro (4) anos por el Gobierno Nacional.”"
+      ],
+      "obliga_a": "A nadie, por regla general: ni al Gobierno consultante, ni a los administrados, ni a los jueces. Solo vincula cuando una ley expresamente lo disponga. Es la Sala CONSULTIVA, que cumple funciones separadas de las jurisdiccionales (art. 112 inc. 1): un concepto suyo NO es jurisprudencia ni precedente del Consejo de Estado. Excepciones propias: el concepto del num. 7 no admite recurso y suspende terminos, caducidad y prescripcion; los conflictos de competencias administrativas del num. 10 se DECIDEN, no se conceptuan, y si son obligatorios.",
+      "no_obliga_a_jueces": true,
+      "cambio_de_criterio": "No hay regimen normativo. La Sala puede rectificar su criterio en un concepto posterior; al no ser vinculante el concepto, no genera situacion juridica protegible para quien actuo confiado en el.",
+      "reconsideracion_o_derogatoria": "Ninguna de las dos figuras existe formalmente: los conceptos de la Sala no se derogan ni se reconsideran por procedimiento reglado; se superan de hecho con un concepto posterior de la misma Sala.",
+      "como_se_verifica_vigencia": "Parcialmente. La relatoria oficial (SAMAI - 'Mi Relatoria') indexa los pronunciamientos de la Sala bajo las clases de proceso 'CONSULTA ELEVADA POR EL GOBIERNO', 'CONCEPTOS PARA PRECAVER LITIGIOS' y 'CONFLICTOS DE COMPETENCIA', con numero interno, fecha y descriptores, lo que permite buscar pronunciamientos posteriores sobre el mismo tema: https://samai.consejodeestado.gov.co/TitulacionRelatoria/BuscadorProvidenciasTituladas.aspx . NO existe marca de vigencia ni de derogatoria. Advertencia operativa: la reserva legal de 6 meses (prorrogable hasta 4 anos) implica que un concepto puede existir y no ser publico todavia; la ausencia en el repositorio no prueba inexistencia.",
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=41249 (Ley 1437 de 2011, art. 112 - texto servido por el Gestor Normativo) | https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=4125 (Constitucion Politica 1 de 1991, art. 237) | https://samai.consejodeestado.gov.co/",
+      "razon_si_no_es_apta": null
+    },
+    {
+      "entidad": "Departamento Administrativo de la Funcion Publica (DAFP)",
+      "apta_para_el_corpus": true,
+      "vigencia_formal_declarada": false,
+      "norma_que_fija_el_alcance": "Regla general: Ley 1437 de 2011 (CPACA), art. 28, en el texto del art. 1 de la Ley 1755 de 2015. La competencia doctrinal esta en el Decreto 430 de 2016, art. 16 num. 1 (modificado por el art. 3 del Decreto 1603 de 2023). No se hallo norma especial que haga vinculantes sus conceptos.",
+      "cita_verbatim": "\"Salvo disposicion legal en contrario, los conceptos emitidos por las autoridades como respuestas a peticiones realizadas en ejercicio del derecho a formular consultas no seran de obligatorio cumplimiento o ejecucion.\" (Ley 1437 de 2011, art. 28, texto modificado por el art. 1 de la Ley 1755 de 2015)",
+      "citas_verbatim_de_apoyo": [
+        "Decreto 430 de 2016, art. 16 num. 1 (Direccion Juridica): “Servir de autoridad en doctrina juridica para las entidades y organismos del Estado en los temas de competencia del Departamento”.",
+        "Cierre estandar de los conceptos del DAFP (p. ej. Concepto 285331 de 2025): “El anterior concepto se imparte en los terminos del articulo 28 del Codigo de Procedimiento Administrativo y de lo Contencioso Administrativo.”"
+      ],
+      "obliga_a": "A nadie. 'Autoridad en doctrina juridica' es competencia para fijar la posicion del sector, no fuerza vinculante: el propio DAFP cierra cada concepto invocando el art. 28 del CPACA. No obliga a las entidades destinatarias, ni a los servidores, ni a los jueces. Distincion que hay que codificar: lo que si obliga son los decretos y las circulares del DAFP, no sus conceptos.",
+      "no_obliga_a_jueces": true,
+      "cambio_de_criterio": "No hay regimen normativo ni proteccion de confianza legitima explicita; rige la regla general del art. 28. En la practica el DAFP aclara o modifica su posicion mediante un concepto posterior sobre el mismo tema/subtema.",
+      "reconsideracion_o_derogatoria": "Ninguna figura reglada: no hay reconsideracion formal ni derogatoria de conceptos. Existe una consolidacion tematica parcial mediante 'Conceptos marco' (10 documentos, 2014-2018) y 'Conceptos Guias', que no cubren la doctrina reciente.",
+      "como_se_verifica_vigencia": "Parcialmente, y es la mejor infraestructura despues de la DIAN. Cada concepto tiene ficha propia en el Gestor Normativo con 'Fecha de Expedicion', 'Fecha de Entrada en Vigencia', tema/subtema y un bloque 'Conceptos (n)' que lista los conceptos POSTERIORES del mismo subtema, lo que permite comprobar si el DAFP volvio a pronunciarse: https://www.funcionpublica.gov.co/eva/gestornormativo/ . LIMITACION VERIFICADA: la ficha tiene tambien un bloque 'Vigencias(n)' destinado a registrar derogatorias, y en los 37 conceptos del DAFP muestreados aparecio siempre como 'Vigencias(0)'; el campo existe pero no se usa para marcar doctrina superada.",
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=68813 (Decreto 430 de 2016, art. 16) | https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=261036 (Concepto 285331 de 2025, ejemplo de ficha y de cierre) | https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=62891 (Conceptos marco de la Funcion Publica)",
+      "razon_si_no_es_apta": null
+    },
+    {
+      "entidad": "Superintendencia de Sociedades",
+      "apta_para_el_corpus": true,
+      "vigencia_formal_declarada": false,
+      "norma_que_fija_el_alcance": "Ley 1437 de 2011 (CPACA), art. 28, en el texto del art. 1 de la Ley 1755 de 2015. No se hallo norma especial que altere ese alcance para sus oficios/conceptos.",
+      "cita_verbatim": "\"Salvo disposicion legal en contrario, los conceptos emitidos por las autoridades como respuestas a peticiones realizadas en ejercicio del derecho a formular consultas no seran de obligatorio cumplimiento o ejecucion.\" (Ley 1437 de 2011, art. 28, texto modificado por el art. 1 de la Ley 1755 de 2015)",
+      "citas_verbatim_de_apoyo": [
+        "Cierre estandar de los oficios de la entidad (Oficio 220-001087 de 3 de enero de 2024): “el presente oficio tiene los alcances del articulo 28 del Codigo de Procedimiento Administrativo y de lo Contencioso Administrativo, y que en la Pagina WEB de esta entidad puede consultar directamente la normatividad, los conceptos que la misma emite sobre las materias de su competencia y la Circular Basica Juridica, asi como el aplicativo Tesauro donde podra consultar la doctrina juridica y la jurisprudencia mercantil de la Entidad.”"
+      ],
+      "obliga_a": "A nadie: no obliga al consultante, ni a las sociedades vigiladas, ni a los jueces, ni a la propia Superintendencia. DISTINCION CRITICA para el corpus: lo que si es de obligatorio cumplimiento para los vigilados son las instrucciones de la Circular Basica Juridica y las circulares externas, que son actos administrativos, no conceptos. Tampoco confundir con las sentencias de la Delegatura de Procedimientos Mercantiles, que son ejercicio de funcion jurisdiccional.",
+      "no_obliga_a_jueces": true,
+      "cambio_de_criterio": "No hay regimen normativo ni proteccion de quien actuo confiado; rige el art. 28 del CPACA.",
+      "reconsideracion_o_derogatoria": "No hay figura reglada de reconsideracion ni de derogatoria de oficios. La entidad rectifica en un oficio posterior sobre el mismo problema juridico.",
+      "como_se_verifica_vigencia": "Parcialmente. La entidad remite a su aplicativo oficial Tesauro (https://tesauro.supersociedades.gov.co/), que cataloga la doctrina por 'Temas y Problemas' y permite ver todos los pronunciamientos sobre un mismo problema juridico, con fecha. LIMITACION VERIFICADA: se inspecciono el bundle de la aplicacion del Tesauro y no existe campo ni filtro de vigencia, derogatoria, revocatoria o reconsideracion; la unica forma de saber si un oficio sigue reflejando la posicion de la entidad es comparar fechas dentro del mismo problema juridico.",
+      "source_url": "https://tesauro.supersociedades.gov.co/ | https://www.supersociedades.gov.co/documents/107391/159040/OFICIO+220-001087+DE+3+DE+ENERO+DE+2024.pdf | https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=41249 (Ley 1437 de 2011, art. 28)",
+      "razon_si_no_es_apta": null
+    },
+    {
+      "entidad": "Superintendencia de Industria y Comercio (SIC)",
+      "apta_para_el_corpus": true,
+      "vigencia_formal_declarada": false,
+      "norma_que_fija_el_alcance": "Ley 1437 de 2011 (CPACA), art. 28, en el texto del art. 1 de la Ley 1755 de 2015. No se hallo norma especial que altere ese alcance para los conceptos de su Oficina Asesora Juridica.",
+      "cita_verbatim": "\"Salvo disposicion legal en contrario, los conceptos emitidos por las autoridades como respuestas a peticiones realizadas en ejercicio del derecho a formular consultas no seran de obligatorio cumplimiento o ejecucion.\" (Ley 1437 de 2011, art. 28, texto modificado por el art. 1 de la Ley 1755 de 2015)",
+      "citas_verbatim_de_apoyo": [
+        "Cierre estandar de los conceptos de la SIC (Radicado 23-571469, enero de 2024): “reiterandole que la misma se expone bajo los parametros del articulo 28 de la Ley 1437 de 2011, esto es, bajo el entendido que la misma no compromete la responsabilidad de esta Superintendencia ni resulta de obligatorio cumplimiento ni ejecucion.”",
+        "Advertencia de competencia en el mismo concepto: “la SUPERINTENDENCIA DE INDUSTRIA Y COMERCIO a traves de su Oficina Asesora Juridica no le asiste la facultad de dirimir situaciones de caracter particular, debido a que, una lectura en tal sentido, implicaria la flagrante vulneracion del debido proceso como garantia constitucional.”"
+      ],
+      "obliga_a": "A nadie: no compromete ni siquiera la responsabilidad de la propia SIC, segun su propio texto. No obliga al consultante ni a los jueces, y la Oficina Asesora Juridica carece de facultad para dirimir casos particulares. DISTINCION CRITICA para el corpus: la SIC ejerce ademas funciones jurisdiccionales (proteccion al consumidor, competencia desleal, propiedad industrial) y expide circulares externas y resoluciones sancionatorias; ninguna de esas es un concepto, y mezclarlas le daria a una opinion el peso de una decision.",
+      "no_obliga_a_jueces": true,
+      "cambio_de_criterio": "No hay regimen normativo ni proteccion de confianza; rige el art. 28 del CPACA, reforzado por la advertencia de la propia SIC de que el concepto no compromete su responsabilidad.",
+      "reconsideracion_o_derogatoria": "No hay figura reglada. La entidad rectifica emitiendo un concepto posterior; en datos personales y consumo suele hacerlo ademas por circular externa, que si es vinculante.",
+      "como_se_verifica_vigencia": "Parcialmente. Hay dos repositorios oficiales: el Buscador de Conceptos Juridicos (https://buscadorconceptos.sic.gov.co/) y el Boletin Juridico de la Sede Electronica (https://sedeelectronica.sic.gov.co/publicaciones/boletin-juridico/concepto), con cada concepto identificado por radicado y fecha de publicacion. LIMITACION VERIFICADA: se inspecciono el bundle del Buscador de Conceptos y no contiene campo alguno de vigencia, derogatoria ni reconsideracion; el Boletin tampoco marca conceptos superados.",
+      "source_url": "https://buscadorconceptos.sic.gov.co/ | https://sedeelectronica.sic.gov.co/sites/default/files/boletin-juridico/conceptos/23-571469.pdf | https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=41249 (Ley 1437 de 2011, art. 28)",
+      "razon_si_no_es_apta": null
+    },
+    {
+      "entidad": "Ministerio del Trabajo",
+      "apta_para_el_corpus": false,
+      "vigencia_formal_declarada": false,
+      "norma_que_fija_el_alcance": "Ley 1437 de 2011 (CPACA), art. 28, en el texto del art. 1 de la Ley 1755 de 2015, reforzado por el Codigo Sustantivo del Trabajo, art. 486 num. 1 (texto del art. 20 de la Ley 584 de 2000).",
+      "cita_verbatim": "“Dichos funcionarios no quedan facultados, sin embargo, para declarar derechos individuales ni definir controversias cuya decision este atribuida a los jueces, aunque si para actuar en esos casos como conciliadores.” (CST, art. 486 num. 1)",
+      "citas_verbatim_de_apoyo": [
+        "\"Salvo disposicion legal en contrario, los conceptos emitidos por las autoridades como respuestas a peticiones realizadas en ejercicio del derecho a formular consultas no seran de obligatorio cumplimiento o ejecucion.\" (Ley 1437 de 2011, art. 28, texto modificado por el art. 1 de la Ley 1755 de 2015)",
+        "Cierre estandar de los conceptos del Ministerio (Radicado 02EE2019410600000038008): “La presente consulta se absuelve en los terminos del Articulo 28 del Codigo de Procedimiento Administrativo y de lo Contencioso Administrativo, sustituido por el Articulo 1 de la Ley 1755 de 2015, en virtud del cual los conceptos emitidos por las autoridades como respuestas a peticiones realizadas en ejercicio del derecho a formular consultas no seran de obligatorio cumplimiento, constituyendose simplemente en un criterio orientador.”",
+        "CST art. 486 (texto de la Ley 1610 de 2013): “La imposicion de multas, de otras sanciones o de otras medidas propias de su funcion como autoridades de policia laboral por parte de los funcionarios del Ministerio del Trabajo que cumplan funciones de inspeccion, vigilancia y control, no implican en ningun caso, la declaratoria de derechos individuales o definicion de controversias.”"
+      ],
+      "obliga_a": "A nadie: es 'simplemente un criterio orientador' por declaracion del propio Ministerio. El limite es mas fuerte que el del CPACA: por mandato del CST art. 486 el Ministerio no puede declarar derechos individuales ni definir controversias laborales, ni siquiera cuando sanciona. Un concepto suyo NO decide si un despido fue justo, si una prima se debe, ni si hubo contrato realidad: eso es del juez laboral.",
+      "no_obliga_a_jueces": true,
+      "cambio_de_criterio": "No hay regimen normativo ni proteccion de quien actuo confiado en un concepto anterior.",
+      "reconsideracion_o_derogatoria": "No hay figura reglada. Se observo que cuando el Ministerio deja sin efectos un concepto la unica huella es el nombre del archivo publicado (p. ej. '08SE20207417001000008676 Concepto Suspension Contratos - deja sin efectos.pdf'), sin registro estructurado que vincule el concepto revocado con el que lo reemplaza.",
+      "como_se_verifica_vigencia": "NO se puede. Los conceptos se publican como PDFs sueltos en una biblioteca documental Liferay ('Conceptos Institucionales', https://www.mintrabajo.gov.co/normatividad/conceptos-institucionales), organizada por carpetas y ordenada por fecha de modificacion del archivo, sin numeracion doctrinal estable, sin indice tematico, sin descriptores y sin campo alguno de vigencia. No existe manera oficial de confirmar que un concepto siga reflejando la posicion del Ministerio.",
+      "source_url": "https://www.mintrabajo.gov.co/normatividad/conceptos-institucionales | https://www.mintrabajo.gov.co/documents/20147/0/02EE2019410600000038008+Vaciones+en+jornada+inferior+a+la+m%C3%A1xima+legal+.pdf | https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=199983 (Decreto 2663 de 1950 - CST, art. 486)",
+      "razon_si_no_es_apta": "El alcance si quedo verificado (CPACA art. 28 + CST art. 486), pero no existe forma oficial de confirmar vigencia: repositorio de PDFs sueltos, sin numeracion doctrinal, sin indice tematico y sin marca de vigencia; las revocatorias solo se detectan leyendo el nombre del archivo. Por la regla operativa acordada, no entra al corpus."
+    },
+    {
+      "entidad": "Agencia Nacional de Contratacion Publica - Colombia Compra Eficiente (ANCP-CCE)",
+      "apta_para_el_corpus": true,
+      "vigencia_formal_declarada": false,
+      "norma_que_fija_el_alcance": "Ley 1437 de 2011 (CPACA), art. 28, en el texto del art. 1 de la Ley 1755 de 2015. La competencia para conceptuar esta en el Decreto 4170 de 2011, art. 3 num. 5. No se hallo norma especial que haga vinculantes sus conceptos.",
+      "cita_verbatim": "\"Salvo disposicion legal en contrario, los conceptos emitidos por las autoridades como respuestas a peticiones realizadas en ejercicio del derecho a formular consultas no seran de obligatorio cumplimiento o ejecucion.\" (Ley 1437 de 2011, art. 28, texto modificado por el art. 1 de la Ley 1755 de 2015)",
+      "citas_verbatim_de_apoyo": [
+        "Decreto 4170 de 2011, art. 3 num. 5: “Absolver consultas sobre la aplicacion de normas de caracter general y expedir circulares externas en materia de compras y contratacion publica.”",
+        "Cierre estandar de los conceptos de la Subdireccion de Gestion Contractual: “Este concepto tiene el alcance previsto en el articulo 28 del Codigo de Procedimiento Administrativo y de lo Contencioso Administrativo.”"
+      ],
+      "obliga_a": "A nadie: no obliga a la entidad estatal consultante, ni a proponentes o contratistas, ni a los jueces ni a los tribunales de arbitramento. DISTINCION CRITICA para el corpus: la misma norma que le da la competencia separa 'absolver consultas' de 'expedir circulares externas'; las circulares externas (p. ej. la Circular Externa Unica) si son actos administrativos obligatorios en lo que instruyen. Ademas la competencia es sobre 'normas de caracter general': la ANCP-CCE no resuelve casos concretos de un proceso de seleccion en curso.",
+      "no_obliga_a_jueces": true,
+      "cambio_de_criterio": "No hay regimen normativo ni proteccion de quien actuo confiado; rige el art. 28 del CPACA.",
+      "reconsideracion_o_derogatoria": "No hay figura reglada de reconsideracion ni derogatoria. En la practica la Agencia reitera, precisa o modifica su tesis en un concepto posterior, identificado con numero propio (formato C-<numero> de <ano>).",
+      "como_se_verifica_vigencia": "Parcialmente. La Relatoria oficial (https://relatoria.colombiacompra.gov.co/) publica cada concepto con identificador estable (p. ej. 'C-1087 de 2026'), fecha y descriptores tematicos, y permite ver todos los conceptos sobre el mismo descriptor, de modo que puede comprobarse si hay pronunciamiento posterior. LIMITACION VERIFICADA: se consulto la API de la Relatoria y los registros de conceptos no tienen ningun campo de vigencia, derogatoria o revocatoria; los unicos metadatos son titulo, fecha y descriptores. Advertencia adicional: la Relatoria publica EXTRACTOS del concepto, no siempre el texto integro. Queda sin comprobar el sistema 'Sintesis' de la Agencia, inalcanzable desde este entorno (ver dominios_necesarios).",
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=44643 (Decreto 4170 de 2011, art. 3) | https://relatoria.colombiacompra.gov.co/conceptos/c-1087-de-2026/ | https://www.colombiacompra.gov.co/wp-content/uploads/2025/03/4201912000002802_0.pdf | https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=41249 (Ley 1437 de 2011, art. 28)",
+      "razon_si_no_es_apta": null
+    }
+  ],
+  "pistas_falsas": [
+    "FALSA - 'Estatuto Tributario art. 264'. Ese texto nunca fue del Estatuto Tributario: era el art. 264 de la LEY 223 DE 1995, verificado verbatim: “Los contribuyentes que actuen con base en conceptos escritos de la Subdireccion Juridica de la Direccion de Impuestos y Aduanas Nacionales podran sustentar sus actuaciones en la via gubernativa y en la jurisdiccional con base en los mismos. Durante el tiempo en que tales conceptos se encuentren vigentes, las actuaciones tributarias realizadas a su amparo no podran ser objetadas por las autoridades tributarias. Cuando la Direccion de Impuestos y Aduanas Nacionales cambie la posicion asumida en un concepto previamente emitido por ella debera publicarlo.” Y ademas esta DEROGADO expresamente: Ley 2010 de 2019, art. 160: “La presente ley rige a partir de su promulgacion y deroga el articulo 264 de la Ley 223 de 1995...”. La norma vigente (Ley 2010 de 2019, art. 131) dice practicamente lo contrario: el concepto obliga a la DIAN y ya no ampara al contribuyente. Publicar la pista como venia le habria prometido al abogado una inmunidad que se perdio en 2019.",
+    "PARCIALMENTE CIERTA - 'CPACA (Ley 1437 de 2011) art. 28'. El articulo existe, se titula 'Alcance de los conceptos' y dice lo que la pista sugiere, pero su texto vigente NO es el de la Ley 1437: el original fue declarado INEXEQUIBLE con efectos diferidos hasta el 31 de diciembre de 2014 por la Sentencia C-818 de 2011, y el texto que hoy rige fue introducido por el art. 1 de la Ley 1755 de 2015 (declarado EXEQUIBLE por la Sentencia C-951 de 2014). La cita correcta es 'Ley 1437 de 2011, art. 28, modificado por el art. 1 de la Ley 1755 de 2015'.",
+    "CIERTA PERO NO ES LA NORMA DE ALCANCE - 'Constitucion art. 237 num. 3'. Verbatim: “3. Actuar como cuerpo supremo consultivo del Gobierno en asuntos de administracion, debiendo ser necesariamente oido en todos aquellos casos que la Constitucion y las leyes determinen.” Fija la FUNCION consultiva, no el alcance de los conceptos. La no vinculatoriedad esta en el CPACA art. 112 inciso 2."
+  ],
+  "hallazgos_transversales": [
+    "Ninguna de las siete entidades produce conceptos que obliguen a un juez. La DIAN es la unica cuyos conceptos obligan a alguien - a sus propios funcionarios - y por norma expresa.",
+    "Solo la DIAN tiene regimen normativo de vigencia doctrinal (publicacion constitutiva, reconsideracion y conceptos unificados que derogan la doctrina previa). En las demas, 'vigencia' solo puede aproximarse comparando fechas dentro de un mismo tema en el repositorio oficial.",
+    "En cinco de las siete entidades la regla de alcance no esta en una norma sectorial sino en el mismo articulo: CPACA art. 28. Los decretos de estructura (4170/2011, 430/2016, 1742/2020) asignan la competencia para conceptuar, no el alcance; el de la DIAN es la excepcion, y remite al art. 131 de la Ley 2010 de 2019.",
+    "Riesgo de mezcla que hay que codificar en el corpus: en SIC, Supersociedades y ANCP-CCE conviven conceptos (no vinculantes) con circulares externas, resoluciones y - en la SIC y en la Delegatura de Procedimientos Mercantiles - decisiones jurisdiccionales. El campo que distingue el tipo de documento pesa tanto como el texto."
+  ],
+  "dominios_necesarios": [
+    {
+      "dominio": "normograma.dian.gov.co",
+      "alcanzable_hoy": true,
+      "razon": "Compilacion Juridica de la DIAN: repositorio oficial donde la publicacion del concepto es constitutiva de su caracter de doctrina oficial (Res. DIAN 91 de 2021 art. 12). Alli se leyeron verbatim la Ley 2010 de 2019 art. 131, el Decreto 1742 de 2020 y la Resolucion 91 de 2021. Imprescindible para DIAN."
+    },
+    {
+      "dominio": "samai.consejodeestado.gov.co",
+      "alcanzable_hoy": true,
+      "razon": "Sede electronica y relatoria oficial del Consejo de Estado; unico indice de los conceptos de la Sala de Consulta y Servicio Civil."
+    },
+    {
+      "dominio": "tesauro.supersociedades.gov.co y www.supersociedades.gov.co",
+      "alcanzable_hoy": true,
+      "razon": "Tesauro (doctrina por temas y problemas) y biblioteca de oficios; repositorio que la propia entidad senala en cada oficio."
+    },
+    {
+      "dominio": "buscadorconceptos.sic.gov.co y sedeelectronica.sic.gov.co",
+      "alcanzable_hoy": true,
+      "razon": "Buscador de Conceptos Juridicos y Boletin Juridico: los dos repositorios oficiales de conceptos de la SIC."
+    },
+    {
+      "dominio": "relatoria.colombiacompra.gov.co y www.colombiacompra.gov.co",
+      "alcanzable_hoy": true,
+      "razon": "Relatoria oficial de la ANCP-CCE (conceptos C-<n> de <ano> con descriptores) y sede de los PDF completos."
+    },
+    {
+      "dominio": "www.mintrabajo.gov.co",
+      "alcanzable_hoy": true,
+      "razon": "Unica sede de los 'Conceptos Institucionales'. Se deja constancia aunque el Ministerio quede fuera del corpus, por si mas adelante se decide indexarlo con reservas."
+    },
+    {
+      "dominio": "www.secretariasenado.gov.co",
+      "alcanzable_hoy": false,
+      "razon": "Fuente n.1 de la doctrina de verificacion del proyecto. NO FUE ALCANZABLE desde este entorno en toda la pasada (curl: connect timeout, HTTP 000). Toda la verificacion normativa tuvo que apoyarse en funcionpublica.gov.co y normograma.dian.gov.co. Hay que abrirla o confirmar si el bloqueo es de red."
+    },
+    {
+      "dominio": "www.suin-juriscol.gov.co",
+      "alcanzable_hoy": false,
+      "razon": "Fuente n.3 de la doctrina. NO FUE ALCANZABLE (curl: schannel server closed abruptly, HTTP 000). Seria el segundo control independiente para las derogatorias."
+    },
+    {
+      "dominio": "sintesis.colombiacompra.gov.co",
+      "alcanzable_hoy": false,
+      "razon": "Sistema 'Sintesis' de la ANCP-CCE, que podria contener marcas de vigencia de normativa y doctrina de contratacion. NO FUE ALCANZABLE (connect timeout tras tres intentos). Sin abrirlo no puede descartarse que la ANCP-CCE si tenga control de vigencia y suba de categoria."
+    }
+  ]
+}
