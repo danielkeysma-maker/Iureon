@@ -285,3 +285,30 @@ con un JWT que **expira en pocas horas**. Sirve el texto, y aun así no vale
 como fuente: una ficha cuya URL muere el mismo día es una ficha sin fuente
 mañana. El patrón que sí sirve es la página de resultados filtrada por número
 de proceso, que entrega la titulación completa en HTML plano.
+
+### La cita puede ser auténtica y aun así no estar donde la URL la busca
+
+Cuatro conceptos de Colombia Compra fallaron con la URL viva y el documento
+completo descargado. La causa fue la más fina de toda la pasada: **la relatoría**
+**publica un EXTRACTO, y las citas se habían tomado del DOCX íntegro.**
+
+La cita era real y estaba en un documento oficial de la entidad — pero no en el
+documento que esa URL entrega. Un abogado que siga el enlace no la encuentra.
+
+Al aplicar el criterio estricto apareció un quinto que iba camino de fallar: su
+cita añadía una frase que vive en el íntegro y no en el extracto.
+
+**La regla no es «la cita existe», es «la cita está en la URL que se publica».**
+Si el pasaje que necesitas solo vive en un descargable, o publicas ese
+descargable como fuente, o citas lo que el extracto sí dice.
+
+Dos hábitos que salieron de ahí:
+
+1. **Nada de `[…]` para unir pasajes separados.** Una cita es un pasaje
+   contiguo. El joiner es una bomba de relojería para cualquier comprobación
+   que busque la cadena completa.
+2. **Un `source_url` es UNA sola URL.** Uno traía dos concatenadas con texto
+   en medio, y la descarga salió a buscar esa cadena entera.
+
+Y la puntuación cuenta: una fuente usaba comillas angulares `«»` donde la
+transcripción puso curvas. Misma sustancia, distinta letra.
