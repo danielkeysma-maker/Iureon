@@ -16,6 +16,7 @@ import { CatalogCurationView } from './modules/catalog/components/CatalogCuratio
 import { ToolsView } from './modules/tools/components/ToolsView';
 import { AuditView } from './modules/audit/components/AuditView';
 import { SubprocessorsView } from './modules/privacy/components/SubprocessorsView';
+import { TriageView } from './modules/catalog/components/TriageView';
 import { FirmBrandingModal } from './modules/tenant/components/FirmBrandingModal';
 import { FirmSubscriptionModal } from './modules/subscriptions/components/FirmSubscriptionModal';
 import type { FirmSubscriptionInfo } from './modules/subscriptions/types';
@@ -40,7 +41,8 @@ const MAIN_VIEWS: MainView[] = [
   'catalogo',
   'tools',
   'audit',
-  'privacidad'
+  'privacidad',
+  'orientacion'
 ];
 
 
@@ -427,6 +429,22 @@ export function App() {
           {mainView === 'tools' && <ToolsView />}
           {mainView === 'audit' && <AuditView />}
           {mainView === 'privacidad' && <SubprocessorsView />}
+          {mainView === 'orientacion' && (
+            <TriageView
+              setMainView={setMainView}
+              /*
+               * Una sugerencia se convierte en borrador sin volver a escribir su
+               * nombre. El nombre catalogado es el contrato con el motor de
+               * redacción: cualquier otra cadena resuelve a una plantilla
+               * genérica, así que se pasa tal cual vino del catálogo.
+               */
+              onDraft={(nombre, rama) => {
+                workflow.setLegalBranch(rama);
+                workflow.setDocumentType(nombre);
+                setMainView('workspace');
+              }}
+            />
+          )}
         </main>
       </div>
     </div>

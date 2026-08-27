@@ -98,3 +98,27 @@ export const catalogApi = {
     );
   }
 };
+
+/**
+ * Orientacion desde unos hechos hacia las actuaciones que podrian aplicar.
+ *
+ * `descartadas` son los nombres que el modelo propuso y el catalogo no
+ * reconocio. Se devuelven a proposito: si el motor empieza a inventar, esa
+ * lista lo dice antes de que nadie lo note por otra via.
+ */
+export interface TriageSuggestion {
+  actuacion: Actuacion;
+  razon: string;
+}
+
+export interface TriageResponse {
+  status: 'OK' | 'SIN_COINCIDENCIA' | 'NO_PROVIDER' | 'FAILED';
+  reason?: string;
+  suggestions: TriageSuggestion[];
+  descartadas: string[];
+}
+
+export const triageApi = {
+  orientar: (hechos: string) =>
+    httpClient.post<TriageResponse>('/api/catalog/triage', { body: { hechos } })
+};

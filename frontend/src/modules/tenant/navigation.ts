@@ -1,4 +1,4 @@
-import { Sparkles, Mic, BookOpen, Library, Wrench, Shield, UserRound, ShieldCheck } from 'lucide-react';
+import { Sparkles, Mic, BookOpen, Library, Wrench, Shield, UserRound, ShieldCheck, Compass } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { MainView } from './types';
 
@@ -30,6 +30,20 @@ export interface NavModule {
 }
 
 export const NAV_MODULES: NavModule[] = [
+  /*
+   * Primero en la lista a propósito.
+   *
+   * Todos los demás módulos suponen que la pregunta jurídica ya está formada:
+   * el buscador quiere una doctrina, la redacción quiere el nombre de un
+   * escrito. Quien no sabe ninguna de las dos cosas necesita encontrar esta
+   * puerta sin que nadie se la señale.
+   */
+  {
+    id: 'orientacion',
+    label: 'Orientación',
+    description: 'Desde los hechos del caso',
+    icon: Compass
+  },
   { id: 'workspace', label: 'Redacción', description: 'Providencias judiciales', icon: Sparkles },
   { id: 'audiencias', label: 'Audiencias', description: 'Transcripción de grabaciones', icon: Mic },
   {
