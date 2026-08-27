@@ -77,16 +77,25 @@ const CASES: RetrievalCase[] = [
     why: 'recovered from a Word 97 binary, so it also guards that reader'
   },
   {
-    // KNOWN GAP, asserted at the level it actually performs so that further
-    // decay is visible. C-590 de 2005 ESTABLISHED these requisitos, but rulings
-    // that merely apply them (T-384 de 2018, SU-087 de 2022) outrank it: they
-    // restate the doctrine in language closer to the query. Vector similarity
-    // does not distinguish a doctrine's source from those who cite it. The fix
-    // is re-ranking or metadata weighting, not a chunking change.
+    // La brecha era MITAD ARTEFACTO, y medirlo lo demostró.
+    //
+    // C-590 de 2005 ESTABLECIÓ estos requisitos y quedaba en el puesto 12
+    // mientras las sentencias que solo los APLICAN —T-384 de 2018, SU-087 de
+    // 2022— la superaban: repiten la doctrina en lenguaje más cercano al de la
+    // consulta. Eso sigue siendo cierto y es un límite real de la similitud
+    // vectorial, que no distingue la fuente de una doctrina de quien la cita.
+    //
+    // Pero la mitad de la distancia no era eso: era que UN MISMO DOCUMENTO
+    // ocupaba varios puestos con chunks distintos. Al quedarse con el mejor
+    // chunk por documento, C-590 subió del puesto 10 al 5 sin tocar el orden
+    // — nada se reponderó, solo dejaron de contarse copias.
+    //
+    // El 5 queda como techo para que una regresión se vea. Lo que falta para
+    // el puesto 1 sí exige una señal de autoridad, no otro ajuste de lectura.
     query: 'requisitos de procedibilidad de la tutela contra providencia judicial',
     expect: /C-590 de 2005/,
-    within: 12,
-    why: 'known gap: the founding ruling is outranked by those applying it'
+    within: 5,
+    why: 'la fundadora aún pierde contra las que la aplican; la duplicación ya no la empuja'
   }
 ];
 
