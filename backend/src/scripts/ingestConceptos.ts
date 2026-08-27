@@ -72,6 +72,22 @@ const readSeeds = (): EntidadSeed[] =>
     .map((name) => JSON.parse(readFileSync(join(RESEARCH, name), 'utf8')) as EntidadSeed)
     .filter((seed) => Array.isArray(seed.conceptos));
 
+/**
+ * Two files name the same entity and must agree, so neither spelling decides.
+ *
+ * `conceptos-alcance.json` wrote "Departamento Administrativo de la Funcion
+ * Publica" and the seed wrote "Función Pública". Matched as display strings,
+ * two accents silently dropped eleven verified conceptos into the skipped list,
+ * under a message that read like a missing verification rather than a typo.
+ */
+const entityKey = (name: string): string =>
+  name
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+
 /** Who each entity's conceptos bind, verified once and read from disk. */
 const readBindingScopes = (): Map<string, string> => {
   const path = join(RESEARCH, 'conceptos-alcance.json');
@@ -82,7 +98,7 @@ const readBindingScopes = (): Map<string, string> => {
   return new Map(
     data.entidades
       .filter((e) => e.apta_para_el_corpus)
-      .map((e) => [e.entidad, e.obliga_a])
+      .map((e) => [entityKey(e.entidad), e.obliga_a])
   );
 };
 
@@ -102,7 +118,7 @@ async function main(): Promise<void> {
     // An entity whose binding scope was never verified does not enter, however
     // good its doctrine: a concepto that cannot say who it binds is an opinion
     // wearing the corpus's authority.
-    const bindingScope = scopes.get(seed.entidad);
+    const bindingScope = scopes.get(entityKey(seed.entidad));
 
     if (!bindingScope) {
       skipped.push(`${seed.entidad}: sin alcance verificado en conceptos-alcance.json (${seed.conceptos.length} conceptos)`);

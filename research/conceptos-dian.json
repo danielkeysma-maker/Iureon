@@ -1,0 +1,320 @@
+{
+  "entidad": "DIAN",
+  "verified_at": "2026-08-27",
+  "conceptos": [
+    {
+      "numero": "Concepto Unificado 0106 (911428) de 2022",
+      "tipo_documento": "CONCEPTO_UNIFICADO",
+      "fecha": "2022-08-19",
+      "rama": "TRIBUTARIO",
+      "tema": "Obligación de facturar y sistema de factura electrónica",
+      "pregunta": "¿Cuál es la naturaleza jurídica de la obligación de facturar y cuáles operaciones deben facturarse?",
+      "tesis": "El deber de facturar es una obligación fiscal autónoma: no depende de la naturaleza jurídica del sujeto ni de que sea o no contribuyente del impuesto sobre las ventas. La regla es que toda venta de bienes y toda prestación de servicios se factura, y la excepción es taxativa: solo no facturan los sujetos que los artículos 616-2 del Estatuto Tributario, 1.6.1.4.3. del Decreto 1625 de 2016 y 7 de la Resolución DIAN 000042 de 2020 enumeran. La factura, además, es el soporte de costos, gastos e impuestos descontables conforme al artículo 771-2 del Estatuto Tributario, de modo que no expedirla o no exigirla golpea también la depuración de la renta.",
+      "cita_verbatim": "\"El deber de facturar constituye una obligación fiscal independientemente de la naturaleza jurídica de una entidad o persona, de su calidad de contribuyente o no, y de la clase de contrato o supervisión que se advierta y en los términos de los artículos 615, 616, 616-1 y 617 del Estatuto Tributario vigentes, se cumple con la expedición de la factura de venta o los documentos equivalentes a la misma, documentos que deben presentarse como soporte de costos, gastos o impuesto descontables, de conformidad con el artículo 771-2 del Estatuto Tributario.\" (Descriptor 1.1.1)",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Notas de Vigencia oficiales del propio documento en la Compilación Jurídica de la DIAN (se descargó el JS que las sirve: https://normograma.dian.gov.co/dian/compilacion/docs/js/concepto_tributario_dian_0000106_2022.js). La lista completa registra únicamente adiciones, aclaraciones y modificaciones parciales —la más reciente el Concepto 12008 int. 1012 de 23 de junio de 2026—; no hay ninguna nota de revocatoria ni de derogatoria del concepto unificado, y el descriptor 1.1.1 citado no lleva marca de modificación. Texto en https://normograma.dian.gov.co/dian/compilacion/docs/concepto_tributario_dian_0000106_2022.htm",
+      "reemplaza_o_reconsidera": "Deroga la doctrina previa sobre obligación de facturar y facturación electrónica (Res. DIAN 91 de 2021, art. 7-1 num. 2: los conceptos unificados 'derogan la doctrina previa')",
+      "source_url": "https://normograma.dian.gov.co/dian/compilacion/docs/concepto_tributario_dian_0000106_2022.htm"
+    },
+    {
+      "numero": "Concepto 032143 (interno 1465) de 2019",
+      "tipo_documento": "CONCEPTO_UNIFICADO",
+      "fecha": "2019-12-31",
+      "rama": "ADUANERO",
+      "tema": "Procedimientos administrativos aduaneros — plazo para responder el Requerimiento Especial Aduanero",
+      "pregunta": "¿Con qué plazo cuenta el interesado para responder el requerimiento especial aduanero, y en qué eventos puede ampliarse?",
+      "tesis": "El reloj que corre contra el usuario aduanero es de quince (15) días hábiles contados desde la notificación del Requerimiento Especial Aduanero; en ese escrito —que no requiere presentación personal— deben formularse las objeciones y pedirse todas las pruebas. La ampliación no es general: el artículo 684 del Decreto 1165 de 2019 solo la admite cuando haya que acreditar el cumplimiento de restricciones legales o administrativas como soporte de una declaración de corrección, y el plazo total no puede pasar de cuarenta y cinco (45) días hábiles. Los términos de la autoridad —10 días hábiles para decretar pruebas, 2 meses para practicarlas en el país, 4 si alguna se practica en el exterior— son distintos y no alargan el del interesado.",
+      "cita_verbatim": "\"Dispone el artículo 684 del Decreto 1165 de 2019, que la respuesta al Requerimiento Especial Aduanero se presentará por el interesado, dentro de los quince (15) días hábiles siguientes a su notificación y en ella formulará sus objeciones y solicitará las pruebas que pretenda hacer valer.\" (Descriptor 5.7)",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Notas de Vigencia oficiales servidas por https://normograma.dian.gov.co/dian/compilacion/docs/js/concepto_aduanero_dian_0001465_2019.js — la lista registra adiciones, modificaciones y una reconsideración parcial (Concepto 6682 int. 747 de 16 de abril de 2026), pero ninguna revocatoria ni derogatoria del concepto general. El descriptor 5.7 aquí citado no lleva marca de modificación ni de reconsideración en el texto compilado.",
+      "reemplaza_o_reconsidera": null,
+      "source_url": "https://normograma.dian.gov.co/dian/compilacion/docs/concepto_aduanero_dian_0001465_2019.htm"
+    },
+    {
+      "numero": "Concepto 900829 (interno 027) de 2021",
+      "tipo_documento": "CONCEPTO_UNIFICADO",
+      "fecha": "2021-02-03",
+      "rama": "ADUANERO",
+      "tema": "Garantías aduaneras — renovación de la garantía global",
+      "pregunta": "¿Cuándo deben renovarse las garantías globales y qué ocurre si no se hace en la oportunidad legal?",
+      "tesis": "La renovación debe presentarse ante la DIAN a más tardar dos (2) meses antes del vencimiento de la garantía: ese es el término del usuario aduanero, no el de la entidad. Si la renovación se radica dentro de esos dos meses finales y la garantía vence antes de que culmine el trámite, la autorización, reconocimiento, inscripción o habilitación queda suspendida de pleno derecho —sin acto administrativo que lo declare— desde el día siguiente al vencimiento y hasta que la DIAN resuelva; mientras dure la suspensión no pueden ejercerse las actividades autorizadas. La DIAN, por su parte, tiene dos (2) meses para decidir, suspendidos entre el requerimiento de información y la respuesta.",
+      "cita_verbatim": "\"De conformidad con el artículo 30 del Decreto 1165 de 2019, la renovación debe realizarse ante la DIAN a más tardar dos (2) meses antes de su vencimiento.\" y \"la autorización reconocimiento e inscripción o habilitación quedará suspendida sin necesidad de acto administrativo que así lo declare, a partir del día siguiente al vencimiento de la garantía aprobada y hasta que la autoridad aduanera resuelva el trámite de renovación\" (Descriptor 3.2.4)",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Notas de Vigencia oficiales servidas por https://normograma.dian.gov.co/dian/compilacion/docs/js/concepto_aduanero_dian_0000027_2021.js: solo registran adiciones (Oficios 901861 y 902441 de 2021, Concepto 18571 int. 847 de 3 de octubre de 2024) y una reconsideración puntual del numeral 3.2.16.11 por el Concepto 1907 int. 163 de 30 de enero de 2024 — numeral distinto del 3.2.4 aquí citado. No hay revocatoria del concepto. Además, este concepto revocó al anterior sobre la misma materia: la ficha del Concepto 908031 (int. 0561) de 2020 aparece marcada 'Revocado' en el árbol oficial de doctrina aduanera unificada.",
+      "reemplaza_o_reconsidera": "Concepto 908031 (interno 0561) de 2020, marcado como Revocado en la Compilación Jurídica de la DIAN",
+      "source_url": "https://normograma.dian.gov.co/dian/compilacion/docs/concepto_aduanero_dian_0000027_2021.htm"
+    },
+    {
+      "numero": "Concepto Unificado 14116 (interno 0662) de 2017",
+      "tipo_documento": "CONCEPTO_UNIFICADO",
+      "fecha": "2017-07-26",
+      "rama": "TRIBUTARIO",
+      "tema": "Procedimiento tributario y régimen tributario sancionatorio — acumulación de rebajas sancionatorias",
+      "pregunta": "¿Las rebajas del artículo 640 del Estatuto Tributario (50% y 75%) se acumulan con las reducciones que cada tipo sancionatorio contempla?",
+      "tesis": "Sí. Son rebajas de naturaleza distinta y por eso se suman. Las reducciones propias de cada tipo sancionatorio premian la colaboración del contribuyente —que evita el desgaste del aparato administrativo—; las del artículo 640, además de eso, miden los antecedentes del contribuyente. Por tanto se aplican en la última instancia de determinación y liquidación de la sanción, sobre el valor ya reducido por el tipo respectivo. Con este mismo concepto la DIAN revocó el Concepto 006237 del 22 de marzo de 2017.",
+      "cita_verbatim": "\"En este sentido, las rebajas previstas en la norma en comento –a saber, al 50 o al 75%, según el caso– son empleadas en la última instancia de determinación y liquidación de las sanciones, con lo cual, resultan acumulables con las aminoraciones que cada tipo sancionatorio contempla.\" (Numeral 4, Acumulación de rebajas sancionatorias)",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Notas de Vigencia oficiales servidas por https://normograma.dian.gov.co/dian/compilacion/docs/js/concepto_tributario_dian_0014116_2017.js : solo dos notas —adición por el Oficio 20292 de 2 de octubre de 2017 y reconsideración parcial por el Oficio 1543 (902789) de 2018— ninguna de las cuales toca el numeral 4 aquí citado. ADVERTENCIA verificada en la misma fuente: el último inciso del numeral 3 (aplicación del artículo 640 en el tiempo, sobre sanciones liquidadas antes del 29 de diciembre de 2016) fue declarado NULO por el Consejo de Estado, Sección Cuarta, exp. 11001-03-27-000-2024-00009-00 (28504) de 28/05/2026; en el texto compilado aparece entre corchetes y marcado '<Inciso NULO>'.",
+      "reemplaza_o_reconsidera": "Revoca el Concepto 006237 del 22 de marzo de 2017",
+      "source_url": "https://normograma.dian.gov.co/dian/compilacion/docs/concepto_tributario_dian_0014116_2017.htm"
+    },
+    {
+      "numero": "Concepto General Unificado 1466 de 2017",
+      "tipo_documento": "CONCEPTO_UNIFICADO",
+      "fecha": "2017-12-29",
+      "rama": "TRIBUTARIO",
+      "tema": "Gravamen a los Movimientos Financieros (GMF) — cuenta de ahorro exenta",
+      "pregunta": "¿A quién y a cuántas cuentas cobija la exención del numeral 1 del artículo 879 del Estatuto Tributario? ¿Solo a personas naturales?",
+      "tesis": "La exención de los retiros que no excedan de 350 UVT mensuales opera sobre una sola cuenta de ahorros, depósito electrónico o tarjeta prepago por titular, y exige que el titular indique ante la entidad financiera cuál es la cuenta beneficiada. La DIAN precisa que la norma señala como beneficiario al titular sin distinguir entre persona natural y persona jurídica: una sociedad también puede marcar su cuenta exenta. Si una persona tiene varias cuentas en uno o varios establecimientos, debe elegir una y comunicarlo; el beneficio no se reparte entre ellas.",
+      "cita_verbatim": "\"Es de observar que el numeral 1 del artículo 879 del Estatuto Tributario incorpora la exención del Gravamen a los Movimientos Financieros (GMF) exclusivamente a una sola cuenta de ahorros, que no exceda mensualmente de trescientos cincuenta (350) UVT, y señala como beneficiario de la exención al titular de la cuenta, sin limitar ni hacer distinción alguna de que sea persona natural o jurídica\" (Descriptor 8.3)",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Notas de Vigencia oficiales servidas por https://normograma.dian.gov.co/dian/compilacion/docs/js/concepto_tributario_dian_0001466_2017.js : registran adiciones, una sustitución parcial (Concepto 556/905902 de 2020) y una reconsideración parcial (Concepto 5356 int. 751 de 28 de abril de 2025), pero ninguna revocatoria del concepto unificado; la adición más reciente es el Concepto 6064 int. 537 de 16 de abril de 2026. El Descriptor 8.3 aquí citado no lleva marca de modificación en el texto compilado, a diferencia del 8.5, que sí la lleva.",
+      "reemplaza_o_reconsidera": "Deroga la doctrina previa sobre GMF; en el árbol oficial los Conceptos Generales 2 y 4 de 2003 sobre GMF figuran marcados 'Revocado'",
+      "source_url": "https://normograma.dian.gov.co/dian/compilacion/docs/concepto_tributario_dian_0001466_2017.htm"
+    },
+    {
+      "numero": "Concepto 007585 (interno 712) de 2023",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2023-06-22",
+      "rama": "TRIBUTARIO",
+      "tema": "Declaraciones de IVA presentadas en un periodo gravable distinto al obligado",
+      "pregunta": "Tras la nulidad del parágrafo 2 del artículo 1.6.1.6.3. del Decreto 1625 de 2016, ¿qué debe hacer el responsable que declaró el IVA cuatrimestralmente estando obligado a hacerlo bimestralmente?",
+      "tesis": "Esas declaraciones ya no son 'sin efecto legal alguno': el Consejo de Estado anuló ese aparte reglamentario (Sección Cuarta, sentencia de 3 de noviembre de 2022, rad. 25406 y acumulados) por crear una consecuencia que el legislador no previó, y con efectos ex tunc. La consecuencia práctica es que el artículo 92 de la Ley 2277 de 2022 quedó sin aplicación por sustracción de materia. El responsable debe corregir la declaración cuatrimestral por los artículos 588 y 589 del E.T. para dejarla como la de uno de los bimestres a su elección, y presentar la declaración del bimestre restante liquidando sanción por extemporaneidad e intereses de mora, que corren desde el vencimiento del bimestre —no desde el del cuatrimestre—, diferencia que puede acercarse a dos meses. Si en el bimestre restante no hubo operaciones gravadas ni impuestos descontables, no hay obligación de declarar (art. 601 E.T.).",
+      "cita_verbatim": "\"deberá corregir la declaración cuatrimestral (enero-abril en el ejemplo) para, en su lugar, incluir y ajustar la información relativa a ingresos, compras, liquidación privada, impuestos descontables y demás conceptos correspondientes a cualquiera de los bimestres (enero-febrero o marzo- abril en el ejemplo) a su elección, además de liquidar las sanciones a que haya lugar. En relación con el otro bimestre, deberá presentar la correspondiente declaración tributaria, liquidando la sanción por extemporaneidad que sea del caso\" (Escenario #1)",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Notas de Vigencia oficiales servidas por https://normograma.dian.gov.co/dian/compilacion/docs/js/oficio_dian_7585_2023.js : la única nota es la ratificación por el Concepto 1925 int. 190 de 13 de febrero de 2025. No hay reconsideración ni revocatoria.",
+      "reemplaza_o_reconsidera": null,
+      "source_url": "https://normograma.dian.gov.co/dian/compilacion/docs/oficio_dian_7585_2023.htm"
+    },
+    {
+      "numero": "Concepto 002211 (interno 224) de 2023",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2023-02-24",
+      "rama": "TRIBUTARIO",
+      "tema": "Impuesto de timbre nacional sobre la enajenación de inmuebles por escritura pública",
+      "pregunta": "¿Cómo se liquida el impuesto de timbre del parágrafo 3 del artículo 519 del Estatuto Tributario: por tramos o aplicando una sola tarifa a todo el valor?",
+      "tesis": "La tarifa es marginal y progresiva, es decir, por escalones: no se aplica una tarifa única al valor total. Sobre las primeras 20.000 UVT la tarifa es 0%; el excedente hasta 50.000 UVT tributa al 1,5% y lo que pase de 50.000 UVT al 3%, sumando el resultado de cada rango. La propia DIAN ilustra: un inmueble de 77.000 UVT genera ((77.000 − 50.000) × 3%) + 450 UVT = 1.260 UVT. El impuesto se causa además cuando el valor es igual o inferior a 20.000 UVT, solo que con tarifa del 0%, y se causa al elevar el documento a escritura pública, no al registrarlo.",
+      "cita_verbatim": "\"La tarifa del Impuesto es marginal y progresiva, tal y como se desprende del parágrafo 3° del artículo 519 del Estatuto Tributario.\" (Numeral 2)",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Notas de Vigencia oficiales servidas por https://normograma.dian.gov.co/dian/compilacion/docs/js/oficio_dian_2211_2023.js : adiciones (Conceptos 6453 de 2023, 11642 de 2023 y 14941 de 2023) y confirmaciones parciales (Conceptos 302 int. 95 de 25 de enero de 2024 y 5415 int. 1362 de 8 de agosto de 2024); ninguna revocatoria. Las compilaciones en los Conceptos 11080 de 2023, 19560 de 2023 y 3028 de 2024 advierten en su propio texto que son 'en aras de facilitar su búsqueda y consulta; documento que, en todo caso, no sustituye la doctrina compilada'. Nota: el Concepto 10871 int. 1124 de 2023, que lo confirmó parcialmente, figura marcado 'Anulado' en el árbol oficial de doctrina tributaria.",
+      "reemplaza_o_reconsidera": null,
+      "source_url": "https://normograma.dian.gov.co/dian/compilacion/docs/oficio_dian_2211_2023.htm"
+    },
+    {
+      "numero": "Concepto 006363 (interno 618) de 2023",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2023-05-29",
+      "rama": "TRIBUTARIO",
+      "tema": "Renta de personas jurídicas (Ley 2277 de 2022) — tasa mínima de tributación",
+      "pregunta": "¿Quiénes están sometidos a la Tasa de Tributación Depurada (TTD) del 15% del parágrafo 6 del artículo 240 del Estatuto Tributario?",
+      "tesis": "La tasa mínima solo alcanza a quienes son contribuyentes del impuesto sobre la renta de los artículos 240 y 240-1 del E.T., excluidas las personas jurídicas extranjeras sin residencia en el país. Quien no es contribuyente —artículos 22, 23, 23-1 y 23-2 del E.T.— queda por fuera. La DIAN aplica ese razonamiento a la propiedad horizontal: en principio no está sujeta a la TTD por ser no contribuyente, pero la excepción reaparece cuando la propiedad horizontal comercial o de uso mixto destina bienes o áreas comunes a explotación comercial o industrial, caso en el cual sí es contribuyente y sí queda sujeta.",
+      "cita_verbatim": "\"De lo reseñado, es de colegir que los sujetos que tienen la calidad de no contribuyentes del Impuesto (cfr. artículos 22, 23, 23-1 y 23-2 del Estatuto Tributario, entre otros) no están sujetos a su tasa mínima de tributación, como sería -en principio- el caso de las personas jurídicas originadas en la constitución de propiedad horizontal\" (Título VI, numeral 1)",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Notas de Vigencia oficiales servidas por https://normograma.dian.gov.co/dian/compilacion/docs/js/oficio_dian_6363_2023.js : diecisiete adiciones, correcciones y confirmaciones parciales entre 2023 y 2024, y una aclaración por el Concepto 13399 int. 1602 de 2 de octubre de 2025; ninguna revocatoria ni reconsideración del concepto general.",
+      "reemplaza_o_reconsidera": null,
+      "source_url": "https://normograma.dian.gov.co/dian/compilacion/docs/oficio_dian_6363_2023.htm"
+    },
+    {
+      "numero": "Concepto 006365 (interno 619) de 2023",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2023-05-29",
+      "rama": "TRIBUTARIO",
+      "tema": "Impuesto al patrimonio creado por la Ley 2277 de 2022 — qué es patrimonio poseído",
+      "pregunta": "¿Qué debe entenderse por patrimonio poseído a 1 de enero para efectos del impuesto al patrimonio?",
+      "tesis": "Patrimonio, para este impuesto, es el patrimonio líquido: patrimonio bruto poseído al 1 de enero menos las deudas vigentes en esa misma fecha (art. 294-3 E.T.), y el umbral es 72.000 UVT. La posesión no se define por el título sino por el aprovechamiento económico: los artículos 263 a 266 del E.T. entienden por posesión el aprovechamiento económico, potencial o real, del bien en beneficio del contribuyente, y presumen que quien figura como propietario, usufructuario o poseedor inscrito lo aprovecha en su propio beneficio. De ahí que el impuesto pueda recaer sobre quien no es propietario formal.",
+      "cita_verbatim": "\"De acuerdo con el artículo 294-3 del Estatuto Tributario y para efectos del Impuesto, por patrimonio debe entenderse el patrimonio líquido.\" y \"Se entiende por posesión, el aprovechamiento económico, potencial o real, de cualquier bien en beneficio del contribuyente.\" (Numeral 1)",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Notas de Vigencia oficiales servidas por https://normograma.dian.gov.co/dian/compilacion/docs/js/oficio_dian_6365_2023.js : dos adiciones (Conceptos 8692 int. 770 de 11 de julio de 2023 y 10268 int. 837 de 27 de julio de 2023) y tres compilaciones que expresamente no sustituyen la doctrina compilada; ninguna revocatoria ni reconsideración.",
+      "reemplaza_o_reconsidera": null,
+      "source_url": "https://normograma.dian.gov.co/dian/compilacion/docs/oficio_dian_6365_2023.htm"
+    },
+    {
+      "numero": "Concepto General Unificado 0468 de 2020",
+      "tipo_documento": "CONCEPTO_UNIFICADO",
+      "fecha": "2020-06",
+      "rama": "ADUANERO",
+      "tema": "Abandono de mercancías — rescate de la mercancía en abandono legal",
+      "pregunta": "¿Es posible rescatar la mercancía sobre la que operó el abandono legal, en qué plazo y a qué costo?",
+      "tesis": "Sí, pero el plazo del interesado es de un (1) mes contado desde la fecha en que se produce el abandono legal (parágrafo 1 del art. 171 del Decreto 1165 de 2019). El rescate se hace presentando Declaración de Legalización en la que se paguen, además de los tributos aduaneros, un diez por ciento (10%) del valor en aduana de la mercancía por concepto de rescate, y debe acreditarse el pago de los gastos de almacenamiento causados. Dos advertencias que la ficha debe conservar: (i) la fecha en que se produce el abandono no es única, depende del término de almacenamiento del tipo de depósito (arts. 88, 90, 92, 94, 100, 171, 252, 260 y 513 del mismo decreto); (ii) el mes se cuenta de fecha a fecha por el art. 59 del Código de Régimen Político y Municipal y el art. 67 del Código Civil, y si el último día es feriado se extiende al primer día hábil siguiente.",
+      "cita_verbatim": "\"el inciso primero del numeral 1 del artículo 293 del Decreto 1165 de 2019 determina que la mercancía que se encuentre en abandono legal podrá ser rescatada presentando Declaración de Legalización, dentro del mes siguiente a la fecha en que se produzca el abandono, en la cual se cancele, además de los tributos aduaneros, por concepto de rescate, el diez por ciento (10%) del valor en aduana de la mercancía.\" (Descriptor 5.2)",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Notas de Vigencia oficiales servidas por https://normograma.dian.gov.co/dian/compilacion/docs/js/concepto_aduanero_dian_0000468_2020.js : cuatro notas, todas de adición o modificación por oficios de 2021 y 2022 (901229, 909541, 912405 y 901276); ninguna revocatoria ni reconsideración, y ninguna recae sobre los descriptores 5.2 y 5.3 aquí citados. Nota sobre la fecha: el texto oficial solo dice «Junio 2020» y el árbol de doctrina lo identifica como Concepto 468 de 2020, sin día; no se completa el día con lo que no consta en la fuente.",
+      "reemplaza_o_reconsidera": null,
+      "source_url": "https://normograma.dian.gov.co/dian/compilacion/docs/concepto_aduanero_dian_0000468_2020.htm"
+    },
+    {
+      "numero": "Concepto Unificado 015215 (interno 1391) de 2023",
+      "tipo_documento": "CONCEPTO_UNIFICADO",
+      "fecha": "2023-09-15",
+      "rama": "ADUANERO",
+      "tema": "Operaciones entre Sociedades de Comercialización Internacional y usuarios de zona franca",
+      "pregunta": "¿Cumple la C.I. su compromiso de exportación cuando vende a un usuario industrial de zona franca bienes respecto de los cuales expidió Certificado al Proveedor?",
+      "tesis": "No. La salida de mercancías a zona franca es exportación para efectos del Decreto 1165 de 2019, pero no es exportación al exterior, que es lo que exigen los artículos 1 y 2 de la Ley 67 de 1979. La C.I. que expidió Certificado al Proveedor y solo llevó los bienes a una zona franca incumple su obligación, con la consecuencia legal de tener que pagar al fisco una suma igual al valor de los incentivos y exenciones que ella y el productor obtuvieron, más intereses moratorios y sanciones. En cambio, si la C.I. vende al usuario industrial de zona franca sin expedir Certificado al Proveedor, la operación es exportación definitiva ordinaria (arts. 346 y 479 del Decreto 1165 de 2019), queda fuera de la Ley 67 de 1979, y el eventual reingreso al territorio aduanero nacional se somete a las reglas de una importación ordinaria (art. 459 del E.T.). El plazo de la C.I. para exportar es de seis (6) meses desde la expedición del Certificado al Proveedor.",
+      "cita_verbatim": "\"Cuando una C.I. vende mercancías a un usuario industrial de Z.F. respecto de los cuales expidió un C.P., aunque se está en presencia de una exportación definitiva, no cumple con la obligación de las C.I. pues como se ha visto, el hecho de que la mercancía ingrese a la Z.F. constituye una exportación pero no al exterior\" (Conclusión 2 del Título 1)",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "El documento compilado no tiene bloque 'Resumen de Notas de Vigencia' —solo 'Doctrina Concordante', que enlaza el Concepto DIAN 7663 de 2026—, lo que en la Compilación Jurídica de la DIAN significa que no se ha registrado ninguna modificación, adición, reconsideración ni revocatoria. Comprobado descargando el HTML crudo (49 KB) y el archivo de notas https://normograma.dian.gov.co/dian/compilacion/docs/js/oficio_dian_15215_2023.js , que solo contiene la tabla de doctrina concordante.",
+      "reemplaza_o_reconsidera": "Como concepto unificado, deroga la doctrina previa sobre la materia (Res. DIAN 91 de 2021, art. 7-1 num. 2)",
+      "source_url": "https://normograma.dian.gov.co/dian/compilacion/docs/oficio_dian_15215_2023.htm"
+    },
+    {
+      "numero": "Concepto 015665 (interno 1850) de 2025",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2025-11-10",
+      "rama": "ADUANERO",
+      "tema": "Declaración de legalización — porcentaje de rescate cuando hubo intervención de la autoridad aduanera",
+      "pregunta": "Cuando existe intervención de la autoridad aduanera, ¿siempre hay que pagar porcentaje de rescate en la declaración de legalización que subsana el incumplimiento que daría lugar a aprehensión?",
+      "tesis": "No hay una regla única: el porcentaje de rescate depende de lo que para cada supuesto prevén los artículos 291 y 293 del Decreto 1165 de 2019, y hay casos en que la propia norma dispone que no se paga rescate. Lo que sí queda fijado es cuándo se entiende que hubo intervención: la intervención de la autoridad aduanera empieza con la notificación del acto administrativo que autoriza la acción de control (art. 3 del Decreto 1165 de 2019), la inspección aduanera es una forma de intervención en el control simultáneo, y en el control posterior la intervención se materializa cuando la acción de control se inicia después de la nacionalización. Antes de ese momento la legalización sigue siendo voluntaria.",
+      "cita_verbatim": "\"El porcentaje de rescate que se debe cancelar en las declaraciones de legalización en los que se hace referencia a la intervención de la autoridad aduanera, depende de lo previsto para el efecto, en los artículos 291 y 293 del Decreto 1165 de 2019.\" (Tesis Jurídica)",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "El documento no tiene bloque 'Resumen de Notas de Vigencia' y no existe archivo de notas asociado: https://normograma.dian.gov.co/dian/compilacion/docs/js/oficio_dian_15665_2025.js responde HTTP 404. En la Compilación Jurídica de la DIAN esa ausencia significa que no se ha registrado modificación, reconsideración ni revocatoria. El concepto se publicó en la página web de la DIAN el 25 de noviembre de 2025, que es lo que lo hace doctrina oficial (Res. DIAN 91 de 2021, art. 12).",
+      "reemplaza_o_reconsidera": null,
+      "source_url": "https://normograma.dian.gov.co/dian/compilacion/docs/oficio_dian_15665_2025.htm"
+    },
+    {
+      "numero": "Concepto 003082 (interno 278) de 2026",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2026-02-27",
+      "rama": "ADUANERO",
+      "tema": "Cobro coactivo de obligaciones aduaneras — excepciones al mandamiento de pago y suspensión por demanda",
+      "pregunta": "¿La admisión de la demanda de nulidad y restablecimiento contra el título ejecutivo aduanero suspende el proceso de cobro coactivo? ¿Proceden las excepciones de los artículos 829 num. 4 y 831 num. 5 del Estatuto Tributario?",
+      "tesis": "No y no. Demandar el título ante la jurisdicción de lo contencioso administrativo no suspende el cobro coactivo: el artículo 835 del Estatuto Tributario dice expresamente que la admisión de la demanda no lo suspende, y por eso no opera la suspensión del numeral 2 del artículo 101 del CPACA. Y en vigencia de los Decretos 349 de 2018 y 1165 de 2019 no proceden, para el cobro coactivo de deudas aduaneras, ni el numeral 4 del artículo 829 ni la excepción del numeral 5 del artículo 831 del Estatuto Tributario. Esa es la posición vigente tras la reconsideración del numeral 8 del Concepto 008873 int. 1027 de 15 de noviembre de 2024 por el Concepto 001981 int. 286 de 11 de febrero de 2026. Para el abogado esto significa que la defensa contenciosa no compra tiempo frente al cobro: hay que pedir la medida cautelar por separado.",
+      "cita_verbatim": "\"se puede concluir que en caso de que el título ejecutivo haya sido objeto de demanda ante la jurisdicción de lo contencioso administrativo NO prosperaría la suspensión del proceso coactivo en la forma prevista en el artículo 101 del CPACA, teniendo en cuenta que el artículo 835 del E.T. señala expresamente que la admisión de la demanda no suspende el proceso de cobro\" (numeral 4, transcribiendo el texto del Concepto 001981 int. 286 de 2026)",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Notas del documento servidas por https://normograma.dian.gov.co/dian/compilacion/docs/js/oficio_dian_3082_2026.js : el único registro es la doctrina concordante (Concepto DIAN 3894 de 2026); no hay bloque de Notas de Vigencia, es decir, no se ha registrado reconsideración ni revocatoria. Es además el pronunciamiento más reciente de la cadena: recoge y aplica la reconsideración que el Concepto 001981 int. 286 de 11 de febrero de 2026 hizo del Concepto 008873 int. 1027 de 2024 y del numeral 4 del Concepto 0033215 de 2023. Publicado en la web de la DIAN el 10 de marzo de 2026.",
+      "reemplaza_o_reconsidera": "Aplica la reconsideración del Concepto 008873 (interno 1027) de 15 de noviembre de 2024 y del numeral 4 del Concepto 0033215 de 25 de mayo de 2023, hecha por el Concepto 001981 (interno 286) de 11 de febrero de 2026",
+      "source_url": "https://normograma.dian.gov.co/dian/compilacion/docs/oficio_dian_3082_2026.htm"
+    },
+    {
+      "numero": "Concepto Unificado 018075 (interno 1621) de 2023",
+      "tipo_documento": "CONCEPTO_UNIFICADO",
+      "fecha": "2023-10-17",
+      "rama": "TRIBUTARIO",
+      "tema": "Criptoactivos — naturaleza fiscal y tratamiento del intercambio (swap)",
+      "pregunta": "¿Qué son fiscalmente las criptomonedas y los NFT, y el intercambio de un criptoactivo por otro constituye enajenación gravada?",
+      "tesis": "Las criptomonedas no son moneda de curso legal en Colombia y por eso fiscalmente son activos, en concreto activos intangibles; los NFT reciben el mismo tratamiento. De ahí se sigue que el intercambio de un criptoactivo por otro es una permuta del artículo 1955 del Código Civil: cada parte se reputa vendedora de lo que da, y la utilidad o pérdida se determina por el artículo 90 del E.T., como diferencia entre precio de venta y costo fiscal. Si el criptoactivo se poseyó más de dos años como activo fijo, la utilidad es ganancia ocasional; en caso contrario, renta ordinaria. El tratamiento es el mismo en un exchange centralizado o descentralizado. En cambio, mover criptomonedas entre billeteras del mismo titular no está gravado, porque no hay transferencia de titularidad ni ingreso que incremente el patrimonio, salvo que la operación implique un cambio de tipo de criptoactivo que sí genere ese ingreso.",
+      "cita_verbatim": "\"Teniendo en cuenta que ningún criptoactivo tiene la connotación legal de moneda, los intercambios de estos se consideran permutas. En este orden de ideas, cada una de las partes involucradas en estas operaciones se reputa vendedor de la cosa que da.\" (Descriptor 1.2.4.3)",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "El documento compilado no tiene bloque 'Resumen de Notas de Vigencia': el archivo https://normograma.dian.gov.co/dian/compilacion/docs/js/oficio_dian_18075_2023.js solo sirve tablas de doctrina concordante (Concepto DIAN 3873 de 2024). En la Compilación Jurídica de la DIAN esa ausencia significa que no se ha registrado adición, modificación, reconsideración ni revocatoria del concepto unificado.",
+      "reemplaza_o_reconsidera": "Como concepto unificado, deroga la doctrina previa sobre criptoactivos (Res. DIAN 91 de 2021, art. 7-1 num. 2)",
+      "source_url": "https://normograma.dian.gov.co/dian/compilacion/docs/oficio_dian_18075_2023.htm"
+    },
+    {
+      "numero": "Concepto General 003979 (interno 415) de 2023",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2023-03-31",
+      "rama": "TRIBUTARIO",
+      "tema": "Ventas de bienes por comercio electrónico desde Colombia al exterior — IVA y devolución",
+      "pregunta": "¿La venta de bienes a compradores en el exterior por comercio electrónico está gravada con IVA, y el IVA pagado en la cadena es susceptible de devolución?",
+      "tesis": "La venta de bienes corporales muebles está gravada como regla general (art. 420 E.T.), pero los bienes que se exportan son exentos (arts. 479 y 481 E.T.). Al ser exentos con derecho a devolución bimestral, el IVA pagado por el vendedor en la cadena de producción o comercialización es descontable y devolvible. La restricción que hay que leer: el artículo 489 del E.T. limita ese descuento y devolución bimestral a quien sea responsable del impuesto sobre las ventas en los términos del artículo 481; y el artículo 493 prohíbe que el IVA que deba tratarse como descontable se lleve además como costo o gasto en renta.",
+      "cita_verbatim": "\"en línea con el artículo 481 ibidem, los bienes corporales muebles que se exporten tienen la calidad de exentos con derecho a devolución bimestral, con lo cual el IVA pagado por el vendedor en la cadena de producción y/o comercialización de los bienes es susceptible de devolución.\" (Título II, numeral 2)",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "El documento compilado no tiene bloque 'Resumen de Notas de Vigencia'; https://normograma.dian.gov.co/dian/compilacion/docs/js/oficio_dian_3979_2023.js solo contiene la tabla de doctrina concordante (Oficio DIAN 6554 de 2023). No hay registro de adición, reconsideración ni revocatoria.",
+      "reemplaza_o_reconsidera": null,
+      "source_url": "https://normograma.dian.gov.co/dian/compilacion/docs/oficio_dian_3979_2023.htm"
+    },
+    {
+      "numero": "Concepto General 003966 (interno 416) de 2023",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2023-03-31",
+      "rama": "TRIBUTARIO",
+      "tema": "Renta de personas naturales (Ley 2277 de 2022) — deducción por dependientes",
+      "pregunta": "¿Las 72 UVT por dependiente del inciso 2 del numeral 3 del artículo 336 del E.T. son anuales, qué se entiende por dependiente y pueden dos contribuyentes distintos deducir el mismo dependiente?",
+      "tesis": "Las 72 UVT son anuales, porque el artículo 336 fija límites anuales y el período gravable de renta es el año calendario. 'Dependiente' se toma del parágrafo 2 del artículo 387 del E.T. —hijos hasta 18 años; hijos de 18 a 23 cuyo estudio superior financia el contribuyente; hijos mayores de 18 en situación de dependencia física o psicológica certificada por Medicina Legal; cónyuge o compañero permanente, y padres y hermanos, en dependencia por ausencia de ingresos o ingresos anuales menores a 260 UVT certificados por contador público—. Y el punto que más se pregunta: sí, distintos contribuyentes pueden tomar la deducción sobre el mismo dependiente. La prohibición de que un dependiente fuera solicitado por más de un contribuyente estaba en el Decreto 99 de 2013 y no se recogió al compilarlo en el artículo 1.2.4.1.18. del Decreto 1625 de 2016, cuya derogatoria integral (art. 5.1.1.) la dejó sin vigencia; queda a salvo la facultad de fiscalización del artículo 684 del E.T.",
+      "cita_verbatim": "\"Por ende, diferentes contribuyentes podrán tomar la deducción por dependientes (tanto la prevista en el artículo 336 del Estatuto Tributario como la contenida en el artículo 387 ibidem), siempre que tengan derecho a ello, lo cual podrá ser fiscalizado e investigado por la Administración Tributaria atendiendo lo consagrado en el artículo 684 ibidem.\" (Descriptor II, numeral 4)",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Notas de Vigencia oficiales servidas por https://normograma.dian.gov.co/dian/compilacion/docs/js/oficio_dian_3966_2023.js : seis adiciones sucesivas entre 2023 y 2024 (la sexta por el Concepto 17978 int. 812 de 24 de septiembre de 2024) y varias compilaciones que, por su propio texto, 'no sustituyen la doctrina compilada'. No hay revocatoria ni reconsideración. El numeral 4 aquí citado no lleva marca de modificación ni de nulidad.",
+      "reemplaza_o_reconsidera": null,
+      "source_url": "https://normograma.dian.gov.co/dian/compilacion/docs/oficio_dian_3966_2023.htm"
+    },
+    {
+      "numero": "Concepto General 000977 (interno 131) de 2023",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2023-01-30",
+      "rama": "TRIBUTARIO",
+      "tema": "Régimen Simple de Tributación (SIMPLE) — qué límite de ingresos aplica a educación y salud",
+      "pregunta": "Una persona dedicada a la educación o a la atención de la salud humana y asistencia social, ¿debe mirar el límite de 100.000 UVT o el de 12.000 UVT del numeral 2 del artículo 905 del E.T. para pertenecer o permanecer en el SIMPLE?",
+      "tesis": "El de 100.000 UVT. El límite de 12.000 UVT del inciso 2 del numeral 2 del artículo 905 está redactado en simetría exacta con el Grupo 5 del artículo 908 —servicios profesionales de consultoría y científicos en los que predomine el factor intelectual, incluidas las profesiones liberales— y solo a ese grupo se aplica. Educación y salud humana y asistencia social forman el Grupo 4, con límite de 100.000 UVT; leerlo de otro modo dejaría sin efecto práctico las tarifas del 5,4% y 5,9% que el Grupo 4 prevé para ingresos iguales o superiores a 15.000 UVT. Advertencia de plazo: el límite de ingresos no es solo requisito de inscripción sino condición no subsanable de permanencia, y quien lo excede debe pedir la actualización del RUT y su exclusión del SIMPLE (art. 1.5.8.4.4. del Decreto 1625 de 2016).",
+      "cita_verbatim": "\"para efectos de pertenecer/permanecer en el SIMPLE, una persona dedicada al ejercicio de la educación y/o actividades de atención de la salud humana y de asistencia social deberá tener en cuenta el límite de 100.000 UVT por concepto de ingresos brutos obtenidos en el año gravable anterior.\" (Numeral 1.6, adicionado por el Oficio 2263 int. 223 de 2023)",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Notas de Vigencia oficiales servidas por https://normograma.dian.gov.co/dian/compilacion/docs/js/oficio_dian_0977_2023.js : cinco adiciones y una aclaración entre 2023 y 2024; ninguna revocatoria. ADVERTENCIA verificada en la misma fuente, que el corpus debe conservar: el concepto tiene apartes anulados por el Consejo de Estado —incisos declarados NULOS por la Sección Cuarta, exp. 11001-03-27-000-2023-00013-00 (27524) de 09/09/2024 en lo relativo a la interpretación del artículo 42 de la Ley 2277 de 2022, y nulidad parcial 'en lo relativo al numeral 2.3.' y del numeral sobre tarifas por la Sección Cuarta, exp. 11001-03-27-000-2024-00021-00 (28690) de 4/07/2026—. El numeral 1.6 aquí citado NO está entre los anulados: en el texto compilado no lleva marca '<Inciso NULO>'.",
+      "reemplaza_o_reconsidera": null,
+      "source_url": "https://normograma.dian.gov.co/dian/compilacion/docs/oficio_dian_0977_2023.htm"
+    },
+    {
+      "numero": "Concepto General Unificado 0481 de 2018",
+      "tipo_documento": "CONCEPTO_UNIFICADO",
+      "fecha": "2018-04-27",
+      "rama": "TRIBUTARIO",
+      "tema": "Entidades sin ánimo de lucro y donaciones (ESAL) — quién puede tomar el descuento del artículo 257 del E.T.",
+      "pregunta": "¿Quiénes pueden optar por el beneficio tributario del artículo 257 del Estatuto Tributario por donaciones?",
+      "tesis": "Todas las personas naturales y jurídicas que sean contribuyentes declarantes del impuesto sobre la renta y complementarios, cuando donen a (i) entidades del Régimen Tributario Especial del artículo 1.2.1.5.1.2. del Decreto 1625 de 2016 y (ii) entidades no contribuyentes de los artículos 22 y 23 del E.T., siempre que cumplan los requisitos de los artículos 125-1 y siguientes del E.T. y del artículo 1.2.1.4.3. del Decreto 1625 de 2016. La donación, para estos efectos, no se limita a transferir la propiedad plena: puede recaer sobre el derecho a usar o explotar económicamente el bien, o sobre la nuda propiedad. El tratamiento del artículo 257 aplica desde el año gravable 2017, no antes, por tratarse de un impuesto de período (art. 338 de la Constitución).",
+      "cita_verbatim": "\"todas las personas naturales y jurídicas contribuyentes declarantes del impuesto sobre la renta y complementarios que realicen donaciones a (i) los contribuyentes del Régimen Tributario Especial de que trata el artículo 1.2.1.5.1.2. del Decreto 1625 de 2016 y (ii) a las entidades de que tratan los artículos 22 y 23 del E.T. con el lleno de los demás requisitos enunciados en los artículos 125-1 y siguientes del E.T.\" (Descriptor 2.2)",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Notas de Vigencia oficiales servidas por https://normograma.dian.gov.co/dian/compilacion/docs/js/concepto_tributario_dian_0000481_2018.js : ocho notas, todas de adición o modificación —la más reciente la modificación por el Concepto 7468 de 21 de junio de 2023—; ninguna revocatoria ni reconsideración del concepto unificado. El Descriptor 2.2 aquí citado no lleva marca de modificación en el texto compilado, a diferencia del Descriptor sobre Donaciones de la línea 886, que sí la lleva.",
+      "reemplaza_o_reconsidera": "Como concepto unificado, deroga la doctrina previa sobre entidades sin ánimo de lucro y donaciones (Res. DIAN 91 de 2021, art. 7-1 num. 2)",
+      "source_url": "https://normograma.dian.gov.co/dian/compilacion/docs/concepto_tributario_dian_0000481_2018.htm"
+    },
+    {
+      "numero": "Concepto General Unificado 9193 (interno 0386) de 2018",
+      "tipo_documento": "CONCEPTO_UNIFICADO",
+      "fecha": "2018-04-13",
+      "rama": "TRIBUTARIO",
+      "tema": "Régimen de Entidades Controladas del Exterior (ECE) — quiénes son sujetos pasivos",
+      "pregunta": "Como el artículo 883 del E.T. habla de participación del 10% o más de residentes colombianos, ¿solo las personas naturales son sujetos pasivos del Régimen ECE?",
+      "tesis": "No. El orden de análisis es el inverso al que sugiere la pregunta: primero hay que verificar que la entidad del exterior sea controlada en los términos del artículo 882 del E.T., que remite a los criterios de vinculación del régimen de precios de transferencia, y esos criterios incluyen supuestos en que la controlante es una persona jurídica (matriz-filial, oficina principal-sucursal). Solo después se comprueba la participación igual o superior al 10% del artículo 883. Por interpretación sistemática, tanto el control del artículo 882 como la participación del artículo 883 pueden predicarse de personas jurídicas: una sociedad colombiana también queda sometida al régimen ECE.",
+      "cita_verbatim": "\"apelando a una interpretación sistemática, se concluye que respecto de las personas jurídicas se pueden predicar las situaciones de control previstas en el artículo 882 del E.T. y también se puede verificar la participación establecida en el artículo 883 del E.T.\" (Descriptor: Sujetos del Régimen ECE sin residencia fiscal en Colombia — artículo 883 del E.T.)",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Notas de Vigencia oficiales servidas por https://normograma.dian.gov.co/dian/compilacion/docs/js/concepto_tributario_dian_0009193_2018.js : una sola nota, la modificación por el Oficio 19320 de 25 de julio de 2018, que adicionó el numeral 4.9 del Título 4 (activos que generan rentas pasivas) y no toca el descriptor citado. El árbol oficial registra además un solo pronunciamiento posterior sobre la materia, el Oficio 903738 int. 493 de 2020, que aclara el descriptor 4.6 (ingresos pasivos). No hay revocatoria.",
+      "reemplaza_o_reconsidera": "Como concepto unificado, deroga la doctrina previa sobre el régimen ECE (Res. DIAN 91 de 2021, art. 7-1 num. 2)",
+      "source_url": "https://normograma.dian.gov.co/dian/compilacion/docs/concepto_tributario_dian_0009193_2018.htm"
+    },
+    {
+      "numero": "Concepto 015962 (interno 1873) de 2025",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2025-11-12",
+      "rama": "ADUANERO",
+      "tema": "Acceso a copias de actos administrativos sancionatorios aduaneros en firme (art. 17 del Decreto Ley 920 de 2023)",
+      "pregunta": "¿Debe la DIAN entregar copias e información de actos administrativos sancionatorios aduaneros en firme cuando no contienen información reservada ni datos sensibles?",
+      "tesis": "Sí. El acto sancionatorio aduanero en firme es información pública y la DIAN debe entregar copia, digital o física, y dar acceso a la información general sobre él. Solo puede negarse cuando el acto contenga información reservada, y en ese caso está obligada a fundamentar la causal legal específica, no a negar en bloque. Si lo que contiene son datos sensibles o datos personales privados o semiprivados que puedan afectar la intimidad del titular, la salida no es negar el acceso sino aplicar uno de los dos tratamientos legales: autorización previa del titular, o anonimización.",
+      "cita_verbatim": "\"La UAE-DIAN debe entregar copias (digitales o físicas) de actos administrativos sancionatorios aduaneros en firme, y dar acceso a información general sobre aquellos, siempre que no contengan información reservada, datos sensibles, o datos personales (privados y semiprivados) que pudiesen afectar el derecho a la intimidad del titular.\" (Tesis Jurídica)",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "El documento no tiene bloque 'Resumen de Notas de Vigencia' y no existe archivo de notas asociado: https://normograma.dian.gov.co/dian/compilacion/docs/js/oficio_dian_15962_2025.js responde HTTP 404, es decir, la Compilación Jurídica de la DIAN no ha registrado modificación, reconsideración ni revocatoria. Publicado en la página web de la DIAN el 28 de noviembre de 2025, publicación que es lo que lo constituye en doctrina oficial (Res. DIAN 91 de 2021, art. 12).",
+      "reemplaza_o_reconsidera": null,
+      "source_url": "https://normograma.dian.gov.co/dian/compilacion/docs/oficio_dian_15962_2025.htm"
+    }
+  ],
+  "descartados": [
+    {
+      "numero": "Concepto Unificado 0001 de 2003 (IVA)",
+      "razon": "Formalmente vigente, pero la propia Compilación Jurídica de la DIAN registra catorce notas de vigencia —modificaciones y reconsideraciones parciales entre 2003 y 2025, la última el Concepto 2430 int. 212 de 11 de febrero de 2025— sobre una base normativa (Libro III del Estatuto Tributario) reformada por las Leyes 1607 de 2012, 1819 de 2016, 2010 de 2019 y 2277 de 2022. No es posible afirmar la vigencia de un descriptor concreto sin verificarlo uno por uno, y la regla del proyecto es no incluir lo que no se puede confirmar."
+    },
+    {
+      "numero": "Concepto General Unificado 007546 (interno 585) de 2020 — Estampilla Pro Universidad Nacional",
+      "razon": "Parcialmente revocado: el Concepto 15019 int. 1868 de 25 de septiembre de 2025 revocó los numerales 2.2.1.1 y 2.2.1.2 (contratos de concesión y APP), y antes el Concepto 5271 int. 1419 de 18 de septiembre de 2023 lo reconsideró. Con dos capas de revocatoria parcial sobre el mismo capítulo del hecho generador, cualquier ficha exigiría verificar descriptor por descriptor; se deja fuera."
+    },
+    {
+      "numero": "Concepto General 008537 de 2018 — Contratos de cuentas en participación",
+      "razon": "El texto compilado se publica con la advertencia '<Apartes tachados NULOS>' y un bloque '<Incisos NULOS>': el Consejo de Estado, Sección Cuarta, exp. 11001-03-27-000-2021-00003-00 (26085) de 30/08/2024 anuló los incisos que negaban el traslado de retenciones en la fuente al partícipe oculto. Como las conclusiones finales del concepto reiteran esa misma tesis anulada, no puede fijarse con seguridad qué queda vigente sin leer la sentencia; se deja fuera."
+    },
+    {
+      "numero": "Concepto General 001328 (interno 165) de 2023 — Procedimiento tributario y aduanero, Ley 2277 de 2022",
+      "razon": "Vigente y sin revocatoria, pero su contenido útil es en su mayoría transitorio: gira alrededor de los artículos 91 a 93 de la Ley 2277 de 2022 (tasa de interés moratoria transitoria hasta el 30 de junio de 2023, reducción de sanciones para omisos hasta el 31 de mayo de 2023, declaraciones de IVA sin efecto legal). Esos plazos ya vencieron y una ficha construida sobre ellos le daría al abogado un beneficio inexistente."
+    },
+    {
+      "numero": "Concepto 002430 (interno 212) de 2025 — reconsideración del Descriptor 2.18 del Concepto Unificado de IVA",
+      "razon": "Vigente y correctamente identificable, pero su objeto —devolución de IVA a misiones diplomáticas y gobiernos extranjeros sobre la base de reciprocidad o de programas de utilidad común— es demasiado específico para el criterio de 'duda frecuente de un abogado tributarista'. Se deja registrado por si el corpus decide cubrir fiscalidad diplomática."
+    },
+    {
+      "numero": "Concepto 032146 (interno 1466) de 2019 — Importaciones de diplomáticos",
+      "razon": "Vigente (nueve notas de vigencia, todas de adición o modificación, la última el Concepto 3509 int. 297 de 3 de marzo de 2026; ninguna revocatoria). Se deja fuera solo por el criterio de selección: el régimen de franquicias, cupos y menaje de misiones diplomáticas es un nicho, no una duda frecuente del abogado aduanero. Queda anotado por si el corpus decide cubrirlo."
+    },
+    {
+      "numero": "Concepto 001900 (interno 91) de 2020 — Conciliación contencioso-administrativa en materia tributaria, aduanera y cambiaria",
+      "razon": "Su objeto es la conciliación transitoria del artículo 118 de la Ley 2010 de 2019, cuyos plazos vencieron en 2020. Publicar la ficha ofrecería un beneficio extinguido."
+    },
+    {
+      "numero": "Concepto General Unificado 0912 de 2018 — Impuesto sobre la renta de las personas naturales",
+      "razon": "Formalmente vigente (seis notas de adición y corrección; ninguna revocatoria), pero está construido sobre el sistema de cinco cédulas de la Ley 1819 de 2016, que la Ley 2010 de 2019 redujo a tres y que la Ley 2277 de 2022 volvió a modificar. La propia Compilación de la DIAN encabeza el documento con la advertencia '<Consultar el Concepto 3966 [416] de 2023 con motivo de la Ley 2277 de 2022>'. Publicar sus descriptores de clasificación cedular y depuración sería publicar un régimen que ya no rige; se incluye en su lugar el Concepto 3966 de 2023."
+    }
+  ]
+}

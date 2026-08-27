@@ -67,10 +67,15 @@ herramienta no me lo mostró" no es "la fuente no lo tiene".
 - `funcionpublica` sirve el art. 159 **original** de la Ley 769 de 2002, no el
   reformado por el Decreto Ley 019 de 2012 art. 206. Ese sí es un problema de
   contenido, no de lectura.
-- `secretariasenado` guarda sus notas de vigencia en un JS aparte
-  (`basedoc/js/<norma>.js`): sin descargarlo, el texto **no muestra qué reformas
-  trae**. Fue así como se encontraron cuatro reformas vigentes que ninguna ficha
-  del CGP registraba.
+- **LAS NOTAS DE VIGENCIA VIVEN EN UN JS APARTE, y ya son tres sitios.**
+  `secretariasenado` las sirve en `basedoc/js/<norma>.js`; la Compilación
+  Jurídica de la DIAN en `compilacion/docs/js/<nombre>.js`, invocado por
+  `insRow1()`. Sin descargar ese archivo el texto **no muestra reformas,
+  adiciones, reconsideraciones, revocatorias ni nulidades** — y se lee como si
+  estuviera intacto. Así se encontraron cuatro reformas vigentes que ninguna
+  ficha del CGP registraba, y así se supo que dos conceptos de la DIAN tienen
+  apartes anulados por el Consejo de Estado. **Ante un sitio oficial, mira si
+  hay un JS hermano antes de dar el texto por completo.**
 
 Prefiere oficial, pero confirma que el texto traiga la reforma que esperas.
 
@@ -237,3 +242,25 @@ razonamiento sigue siendo razonamiento.
 `merge-actuaciones.py` ya no lo deduce: exige `fuente_de_verdad` y
 `verified_at`, o rechaza el archivo. El razonamiento completo se conserva en
 `gaps`, que es donde sirve.
+
+---
+
+## Una URL oficial puede no servir el documento
+
+Nueve conceptos del Consejo de Estado llegaron con URL de `samai.consejodeestado.gov.co`,
+dominio oficial y correcto. Descargada, esa URL devuelve **1.998 caracteres de**
+**navegación**: menú, «Cargando...» y un iframe vacío. El texto lo carga
+JavaScript después, así que el enlace por sí solo no lo sirve.
+
+Quien investigó lo leyó renderizado y de buena fe. La diferencia entre «lo vi
+en esa página» y «esa URL entrega el texto» no se nota hasta que alguien
+descarga el enlace.
+
+Por eso la ingesta de conceptos **descarga cada documento y comprueba que la
+cita literal esté ahí**. Sin esa guarda se habrían indexado nueve filas del
+menú de SAMAI bajo nombres de conceptos del Consejo de Estado — el mismo
+defecto que el tag-stripper corriendo sobre un binario: ruido con apariencia
+de texto.
+
+**Antes de dar una URL como fuente, descárgala y cuenta los caracteres de
+texto útil.** Si son dos mil y aparece «Cargando», es el cascarón.
