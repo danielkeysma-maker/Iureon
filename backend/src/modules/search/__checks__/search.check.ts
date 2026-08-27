@@ -186,5 +186,55 @@ if (nonsense.status === 'EMPTY' && nonsense.items.length === 0 && nonsense.reaso
   fail(`una consulta sin coincidencias devolvió ${nonsense.status} con ${nonsense.items.length} ítems`);
 }
 
+// ---------------------------------------------------------------------------
+// 5. Un CONCEPTO nunca se presenta como jurisprudencia.
+// ---------------------------------------------------------------------------
+// Un concepto de la DIAN o del Consejo de Estado en Sala de Consulta interpreta
+// la norma y puede obligar a la administracion que lo emitio; a un juez no lo
+// obliga ninguno. Devolverlo bajo el mismo encabezado que una providencia le da
+// a una opinion administrativa el peso de una decision judicial: la misma forma
+// de fabricacion que este proyecto lleva quitando, que no es una cita inventada
+// sino una real disfrazada de otra cosa.
+{
+  const mapear = (metadata: Record<string, unknown> | null) => {
+    const str = (key: string): string | null => {
+      const value = metadata?.[key];
+      return typeof value === 'string' && value.trim() ? value : null;
+    };
+    return {
+      sourceKind: str('sourceKind') === 'CONCEPTO' ? 'CONCEPTO' : 'JURISPRUDENCIA',
+      bindingScope: str('bindingScope'),
+      entidad: str('entidad')
+    };
+  };
+
+  const providencia = mapear({ providencia: 'C-590 de 2005', corporacion: 'CORTE_CONSTITUCIONAL' });
+  const concepto = mapear({ sourceKind: 'CONCEPTO', entidad: 'DIAN', bindingScope: 'obliga a la administracion' });
+  const heredado = mapear({ providencia: 'SU-049 de 2017' });
+
+  if (providencia.sourceKind === 'JURISPRUDENCIA' && concepto.sourceKind === 'CONCEPTO') {
+    pass('un concepto y una providencia no se confunden');
+  } else {
+    fail('el tipo de fuente se perdio: ' + providencia.sourceKind + ' / ' + concepto.sourceKind);
+  }
+
+  // Las 62 providencias ya indexadas no llevan el campo. Si el default fuera
+  // CONCEPTO, el corpus entero pasaria a presentarse como doctrina.
+  if (heredado.sourceKind === 'JURISPRUDENCIA') {
+    pass('una fila sin el campo se lee como jurisprudencia, no como concepto');
+  } else {
+    fail('el corpus ya indexado se estaria presentando como concepto');
+  }
+
+  // Un concepto sin alcance verificado se muestra sin afirmar que obligue a
+  // nadie. Inventarle un alcance es peor que no tenerlo.
+  const sinAlcance = mapear({ sourceKind: 'CONCEPTO', entidad: 'DIAN' });
+  if (sinAlcance.bindingScope === null) {
+    pass('un concepto sin alcance verificado no afirma obligar a nadie');
+  } else {
+    fail('se invento un alcance para un concepto que no lo declara');
+  }
+}
+
 console.log(failures === 0 ? '\nALL CHECKS PASSED' : `\n${failures} CHECK(S) FAILED`);
 process.exit(failures === 0 ? 0 : 1);

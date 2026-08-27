@@ -76,6 +76,11 @@ export class JurisprudenceIngestionPipeline {
             embedding: vectors[index],
             chunk_index: index,
             metadata: {
+              // Explícito aunque la búsqueda trate lo ausente como
+              // jurisprudencia: una fila nueva que no dice qué es depende de un
+              // default para no mentir, y un default es más fácil de cambiar
+              // que un dato.
+              sourceKind: 'JURISPRUDENCIA',
               providencia: ruling.numeroProvidencia,
               corporacion: ruling.corporacion,
               tipoSentencia: ruling.tipoSentencia,

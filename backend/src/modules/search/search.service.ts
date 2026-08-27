@@ -57,6 +57,23 @@ export interface SearchResponse<T> {
   reason?: string;
 }
 
+/**
+ * De qué clase es un resultado del corpus.
+ *
+ * EXISTE PARA QUE UN CONCEPTO NO PUEDA PASAR POR SENTENCIA. Un concepto de la
+ * DIAN o del Consejo de Estado en Sala de Consulta interpreta la norma y puede
+ * obligar a la administración que lo emitió; a un juez no lo obliga ninguno.
+ * Devolverlos mezclados con providencias, bajo el mismo encabezado y sin decir
+ * cuál es cuál, le daría a una opinión administrativa el peso de una decisión
+ * judicial — que es la misma forma de fabricación que este proyecto lleva toda
+ * la sesión quitando: no una cita inventada, sino una real disfrazada de otra
+ * cosa.
+ *
+ * Las 62 providencias ya indexadas no llevan el campo, y por eso su ausencia se
+ * lee como JURISPRUDENCIA: el corpus existente no se reindexa ni se toca.
+ */
+export type CorpusSourceKind = 'JURISPRUDENCIA' | 'CONCEPTO';
+
 export interface PrecedentItem {
   id: string;
   contentChunk: string;
@@ -70,6 +87,18 @@ export interface PrecedentItem {
   sourceUrl: string | null;
   /** SYSTEM_CORPUS = shared law corpus; anything else = this firm's own files. */
   isSharedCorpus: boolean;
+  /** Jurisprudencia o concepto. Nunca se presenta uno como el otro. */
+  sourceKind: CorpusSourceKind;
+  /**
+   * A quién obliga, con su norma, cuando se trata de un concepto.
+   *
+   * Null en jurisprudencia y en cualquier concepto cuyo alcance no se haya
+   * verificado. Un concepto sin este dato se muestra sin afirmar que obligue a
+   * nadie, que es lo único honesto que se puede decir de él.
+   */
+  bindingScope: string | null;
+  /** La entidad que emitió el concepto. Null en jurisprudencia. */
+  entidad: string | null;
 }
 
 const normalise = (value: string): string =>
@@ -213,7 +242,12 @@ export class LegalSearchService {
         magistradoPonente: str(m.metadata, 'magistradoPonente'),
         outcome: str(m.metadata, 'resuelveOutcome'),
         sourceUrl: str(m.metadata, 'sourceUrl'),
-        isSharedCorpus: m.firmId === 'SYSTEM_CORPUS'
+        isSharedCorpus: m.firmId === 'SYSTEM_CORPUS',
+        // Lo ausente es jurisprudencia: así el corpus ya indexado sigue
+        // respondiendo igual sin reindexar una sola fila.
+        sourceKind: str(m.metadata, 'sourceKind') === 'CONCEPTO' ? 'CONCEPTO' : 'JURISPRUDENCIA',
+        bindingScope: str(m.metadata, 'bindingScope'),
+        entidad: str(m.metadata, 'entidad')
       }))
     };
   }
