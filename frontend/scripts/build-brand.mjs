@@ -164,9 +164,6 @@ const faviconAdaptativo = () => `<svg xmlns="http://www.w3.org/2000/svg" viewBox
  * aplicación no pasa porque la fuente se carga; en un SVG que viaje por correo,
  * sí. En Figma o Illustrator: `Texto → Contornos`.
  */
-const FUENTE = "'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif";
-const PESO_MARCA = 700;
-const PESO_DISPLAY = 500;
 
 /* ─── EL WORDMARK ───────────────────────────────────────────────────────── */
 const wordmark = (color) =>
@@ -196,9 +193,6 @@ const wordmark = (color) =>
  * abogados colombianos: un eslogan en ingles en la firma de un correo a un
  * juzgado desentona.
  */
-const ESLOGAN_EN = 'SMART JUSTICE';
-const ESLOGAN_ES = 'JUSTICIA VERIFICADA';
-const FUNDACION = 'FOUNDED 2026';
 
 /** Imagotipo horizontal: símbolo a la izquierda, nombre a la derecha. */
 const horizontal = ({ colorA, colorB, fondo = null }) => {
@@ -294,6 +288,56 @@ const horizontalExtendido = ({ colorA, colorB, fondo = null, eslogan = 'en' }) =
 </svg>`;
 };
 
+/**
+ * El componente React de la marca, emitido desde ESTA misma geometría.
+ *
+ * POR QUÉ SE GENERA Y NO SE ESCRIBE A MANO. La cabecera y el login pintaban un
+ * icono `Scale` de lucide dentro de una caja de color — un marcador de posición
+ * que llevaba meses haciéndose pasar por la marca. Escribir el símbolo a mano en
+ * un `.tsx` habría creado una copia que envejece por su cuenta: el día que
+ * alguien ajuste la curva aquí, la aplicación seguiría con la vieja y nadie lo
+ * notaría, porque las dos se ven "bien".
+ *
+ * VA EN LÍNEA Y NO COMO `<img src>`. Un `img` pide un archivo por red: en la
+ * primera pintura de la aplicación la cabecera aparece sin marca y luego salta.
+ * En línea se pinta con el resto y hereda `currentColor`, así que sirve sobre
+ * fondo claro y oscuro sin dos archivos.
+ */
+const componente = () => `/* GENERADO POR scripts/build-brand.mjs — NO EDITAR A MANO */
+import React from 'react';
+
+interface IureonMarkProps {
+  /** Alto en píxeles. El símbolo es cuadrado. */
+  size?: number;
+  /**
+   * Cuando es \`true\`, ambas hebras y la flecha usan \`currentColor\`.
+   *
+   * Es lo que se necesita sobre un fondo de color o dentro de un botón: la
+   * versión de dos colores desaparece contra un azul marino, y la de una tinta
+   * hereda el color del texto que la rodea.
+   */
+  mono?: boolean;
+  className?: string;
+}
+
+export const IureonMark: React.FC<IureonMarkProps> = ({ size = 32, mono = false, className }) => (
+  <svg
+    viewBox="0 0 64 64"
+    width={size}
+    height={size}
+    className={className}
+    role="img"
+    aria-label="Iureon"
+  >
+    <g fill="none" strokeWidth={7} strokeLinecap="round" strokeLinejoin="round">
+      <path d="${HEBRA_B}" stroke={mono ? 'currentColor' : '${GOLD}'} />
+      <path d="${HEBRA_A}" stroke={mono ? 'currentColor' : '${NAVY}'} />
+    </g>
+    <path d="${FLECHA}" fill={mono ? 'currentColor' : '${NAVY}'} />
+  </svg>
+);
+`;
+
 const PIEZAS = {
   // 1-2 · Favicon
   'favicon.svg': faviconAdaptativo(),
@@ -344,5 +388,9 @@ for (const [nombre, contenido] of Object.entries(PIEZAS)) {
   writeFileSync(join(SALIDA, nombre), contenido + '\n', 'utf8');
 }
 
+const COMPONENTE = join(AQUI, '..', 'src', 'modules', 'tenant', 'components', 'IureonMark.tsx');
+writeFileSync(COMPONENTE, componente(), 'utf8');
+
 console.log(`${Object.keys(PIEZAS).length} piezas escritas en public/brand/`);
+console.log('+ src/modules/tenant/components/IureonMark.tsx');
 console.log('Todas desde la misma geometría: cambiar HEBRA_A/HEBRA_B/FLECHA las cambia todas.');

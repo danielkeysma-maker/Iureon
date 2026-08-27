@@ -67,7 +67,7 @@ const RADIO = 95;
  * vueltas y media, y esa diferencia cambia por completo la lectura: una vuelta
  * es una cinta doblada, dos y media es una hélice.
  */
-const VUELTAS = 1;
+const VUELTAS = 1.5;
 
 const punto = (t, oscura) => {
   const y = 680 - 410 * t;

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Scale, Building2, ShieldCheck, ChevronDown, Check, Calendar, DollarSign, Shield, Settings, Wrench, Search } from 'lucide-react';
+import { IureonMark } from './IureonMark';
+import { Building2, ShieldCheck, ChevronDown, Check, Calendar, DollarSign, Shield, Settings, Wrench, Search } from 'lucide-react';
 import { ProceduralTermsModal } from '../../procedural-terms/components/ProceduralTermsModal';
 import { LaborSettlementModal } from '../../settlements/components/LaborSettlementModal';
 import { AuditLogsModal } from '../../audit/components/AuditLogsModal';
@@ -70,9 +71,12 @@ export const Header: React.FC = () => {
         {/* BRAND & TENANT SELECTOR */}
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-white shadow-xs">
-              <Scale className="w-4 h-4" />
-            </div>
+            {/*
+              La marca, no un icono prestado. Iba un `Scale` de lucide dentro de
+              una caja negra: el mismo icono que usa media aplicación jurídica
+              del mundo, haciéndose pasar por identidad.
+            */}
+            <IureonMark size={30} />
             <div>
               <h1 className="text-sm font-extrabold tracking-tight text-slate-900 flex items-center gap-2 font-sans">
                 IUREON <span className="text-[10px] font-mono font-bold text-blue-900 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">v2.0 LegalTech</span>

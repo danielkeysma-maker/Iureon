@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Scale, Mail, Key, ShieldCheck, ArrowRight, AlertCircle } from 'lucide-react';
+import { IureonMark } from './IureonMark';
+import { Mail, Key, ShieldCheck, ArrowRight, AlertCircle } from 'lucide-react';
 import { authApi } from '../../auth/auth.api';
 import type { Session } from '../../auth/session';
 
@@ -64,9 +65,12 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({ onLoginSuccess
       <div className="w-full max-w-md bg-white/95 backdrop-blur-md border border-slate-800/20 rounded-3xl p-8 shadow-2xl relative z-10 space-y-6">
         {/* Brand Header */}
         <div className="text-center space-y-2">
-          <div className="w-14 h-14 bg-gradient-to-br from-blue-950 to-blue-800 text-white rounded-2xl flex items-center justify-center mx-auto shadow-lg border border-blue-700/30">
-            <Scale className="w-7 h-7 text-blue-200" />
-          </div>
+          {/*
+            En el login la marca va sola y sin caja: es la primera impresión del
+            producto, y encerrarla en un cuadrado de color la convierte en el
+            icono de una aplicación cualquiera.
+          */}
+          <IureonMark size={56} className="mx-auto" />
           <h1 className="text-2xl font-black text-slate-900 tracking-tight">IUREON</h1>
           <p className="text-xs font-medium text-slate-500">
             Plataforma LegalTech &amp; Ecosistema Judicial Colombia

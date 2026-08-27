@@ -2,7 +2,17 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!--
+      El favicon RESPONDE al modo del sistema desde dentro del propio SVG, con
+      un `prefers-color-scheme` en su `<style>`. Un archivo en vez de dos, y no
+      hace falta JavaScript para cambiarlo cuando el usuario alterna el tema.
+
+      Reemplaza al que habia: un rayo morado generico con dieciseis desenfoques
+      gaussianos, que no era una marca de Iureon sino un icono prestado.
+    -->
+    <link rel="icon" type="image/svg+xml" href="/brand/favicon.svg" />
+    <link rel="apple-touch-icon" href="/brand/app-icon-1024.svg" />
+    <meta name="theme-color" content="#14294A" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Iureon - Inteligencia & Automatización Jurídica B2B</title>
     <!-- Google Fonts: Plus Jakarta Sans (UI), Lora (Legal Drafts), JetBrains Mono (Logs) -->
