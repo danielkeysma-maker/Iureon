@@ -32,7 +32,8 @@
     "check:triage": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/catalog/__checks__/triage.check.ts",
     "check:precedent": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/__checks__/precedent.check.ts",
     "check:csj": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/jurisprudence/__checks__/csjRuling.check.ts",
-    "check:runway": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/admin/__checks__/runway.check.ts"
+    "check:runway": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/admin/__checks__/runway.check.ts",
+    "check:cupo": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/catalog/__checks__/orientacionQuota.check.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

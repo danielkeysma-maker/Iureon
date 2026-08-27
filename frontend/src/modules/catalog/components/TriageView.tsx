@@ -1,6 +1,7 @@
 import React from 'react';
-import { AlertTriangle, Compass, ExternalLink, Loader2, PenLine, Search } from 'lucide-react';
+import { AlertTriangle, Clock, Compass, ExternalLink, Loader2, PenLine, Search } from 'lucide-react';
 import { triageApi, type TriageResponse } from '../services/catalog.api';
+import { ApiError } from '../../../config/httpClient';
 import { BRANCH_LABELS } from '../branchLabels';
 import type { MainView } from '../../tenant/types';
 
@@ -47,6 +48,15 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
   const [result, setResult] = React.useState<TriageResponse | null>(null);
   const [cargando, setCargando] = React.useState(false);
   const [error, setError] = React.useState('');
+  /*
+   * El cupo agotado se separa del error, y no es un detalle de estilo.
+   *
+   * Pintarlo en rojo junto a las averías le enseña al abogado que la aplicación
+   * se rompió, cuando lo que pasó es que usó su cupo del día. Una es una falla
+   * nuestra y la otra es una regla nuestra; confundirlas hace que deje de leer
+   * las dos.
+   */
+  const [cupoAgotado, setCupoAgotado] = React.useState('');
 
   const orientar = async (texto?: string) => {
     const consulta = (texto ?? hechos).trim();
@@ -55,12 +65,18 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
     if (texto) setHechos(texto);
     setCargando(true);
     setError('');
+    setCupoAgotado('');
     setResult(null);
 
     try {
       setResult(await triageApi.orientar(consulta));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'No se pudo obtener la orientación.');
+      // 429 es "ya usaste el de hoy", no "esto falló".
+      if (err instanceof ApiError && err.status === 429) {
+        setCupoAgotado(err.message);
+      } else {
+        setError(err instanceof Error ? err.message : 'No se pudo obtener la orientación.');
+      }
     } finally {
       setCargando(false);
     }
@@ -140,6 +156,22 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
           no reconoce presenta su propio vacío como tres hallazgos. Y a un junior
           eso lo manda por un camino que nadie eligió.
         */}
+        {cupoAgotado && (
+          <div className="bg-slate-50 border border-slate-300 rounded-xl p-4 flex items-start gap-3">
+            <Clock className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
+            <div className="text-[12px] text-slate-700 leading-relaxed">
+              <p className="font-semibold mb-1 text-slate-900">Cupo de orientaciones de hoy</p>
+              <p>{cupoAgotado}</p>
+              <button
+                onClick={() => setMainView('search')}
+                className="mt-2 text-[11px] text-blue-800 hover:underline"
+              >
+                Buscar jurisprudencia mientras tanto →
+              </button>
+            </div>
+          </div>
+        )}
+
         {result && result.status !== 'OK' && (
           <div className="bg-amber-50/60 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
             <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
