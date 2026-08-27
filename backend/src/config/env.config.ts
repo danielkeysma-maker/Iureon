@@ -143,6 +143,46 @@ if (wompiEnabled) {
   if (wompiSandbox !== read('WOMPI_PRIVATE_KEY').startsWith('prv_test_')) {
     errors.push('WOMPI_PUBLIC_KEY and WOMPI_PRIVATE_KEY belong to different environments.');
   }
+
+  /*
+   * Los dos SECRETOS también, y este es el que de verdad cuesta plata.
+   *
+   * Wompi entrega cuatro llaves por ambiente, no dos: pub_/prv_ para
+   * autenticar, y events_/integrity_ para firmar. Se validaban las dos primeras
+   * y las dos últimas no, así que un despliegue podía tener llaves de
+   * producción y un secreto de eventos de prueba, y arrancar sin decir nada.
+   *
+   * El resultado de esa mezcla no es una falla visible: Wompi COBRA el dinero
+   * real, envía la confirmación firmada con el secreto de producción, nuestro
+   * verificador la compara contra el de prueba, no coincide, y la rechaza con
+   * toda la razón. El cliente pagó y su saldo nunca se movió. Nadie se entera
+   * hasta que reclama.
+   *
+   * La de integridad falla al revés y por eso es menos peligrosa: el checkout
+   * ni siquiera abre. Se valida igual, porque una salida ruidosa temprano es
+   * más barata que una ruidosa delante del cliente.
+   */
+  const ambiente = wompiSandbox ? 'test' : 'prod';
+
+  const secretos: Array<[string, string]> = [
+    ['WOMPI_EVENTS_SECRET', 'events'],
+    ['WOMPI_INTEGRITY_SECRET', 'integrity']
+  ];
+
+  for (const [variable, tipo] of secretos) {
+    const valor = read(variable);
+    const esperado = `${ambiente}_${tipo}_`;
+
+    if (!new RegExp(`^(test|prod)_${tipo}_`).test(valor)) {
+      errors.push(`${variable} must start with test_${tipo}_ or prod_${tipo}_.`);
+    } else if (!valor.startsWith(esperado)) {
+      errors.push(
+        `${variable} is from the ${valor.startsWith('test_') ? 'sandbox' : 'production'} environment ` +
+          `but the API keys are from ${wompiSandbox ? 'sandbox' : 'production'}. ` +
+          `Con esta mezcla Wompi cobra y la recarga nunca se acredita.`
+      );
+    }
+  }
 }
 const backblazeEnabled = requireGroup('Backblaze B2', [
   'B2_APPLICATION_KEY_ID',
