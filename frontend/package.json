@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
     "lint": "oxlint",
+    "check:tipo": "npx tsx src/modules/workspace/__checks__/documentTypeSelection.check.ts",
     "preview": "vite preview"
   },
   "dependencies": {

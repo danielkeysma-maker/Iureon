@@ -3,7 +3,8 @@ import { Sparkles, Database, Cpu, Send, Scale, Building, Paperclip, FileText, X,
 import { AgentConsoleStream } from '../../agent/components/AgentConsoleStream';
 import { ActuacionInfoPanel } from '../../catalog/components/ActuacionInfoPanel';
 import { useActuacionLookup } from '../../catalog/hooks/useActuacion';
-import { useBranchActuaciones } from '../../catalog/hooks/useBranchActuaciones';
+import { useBranchActuacionesState } from '../../catalog/hooks/useBranchActuaciones';
+import { reemplazoDeTipoDeDocumento } from '../documentTypeSelection';
 import { useCatalogBranches } from '../../catalog/hooks/useCatalogBranches';
 import { branchLabel } from '../../catalog/branchLabels';
 import { LEGACY_DOCUMENT_OPTIONS } from '../data/legacyDocumentOptions';
@@ -92,7 +93,8 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
   const [importedFiles, setImportedFiles] = useState<CaseStudyFile[]>([]);
 
 
-  const catalogued = useBranchActuaciones(legalBranch, userRole);
+  const catalogo = useBranchActuacionesState(legalBranch, userRole);
+  const catalogued = catalogo.nombres;
   const catalogBranches = useCatalogBranches();
 
   // Catalogued branches first, then any legacy-only branch that still has
@@ -118,14 +120,58 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
   const isCatalogued = catalogued.length > 0;
   const currentOptions = isCatalogued ? catalogued : legacyFor(legalBranch, userRole);
 
-  // Keep the selection valid: when the branch or role changes the previous
-  // document type usually belongs to neither list, and a selector showing a
-  // value it does not contain silently sends the old one to the engine.
+  /*
+   * El rol sigue a la actuación, no al revés.
+   *
+   * Orientación propone sobre el catálogo ENTERO — 651 actuaciones —, y este
+   * panel solo ofrece las del rol que tiene seleccionado, que arranca en
+   * LITIGANTE. El 41% del catálogo es de despacho o de secretaría, así que
+   * proponer "Acto administrativo sancionatorio" y aterrizar en un panel que no
+   * lo tiene en su lista lo dejaba fuera y lo reemplazaba por el primero de otra
+   * cosa.
+   *
+   * Se mueve el rol en vez de descartar la actuación porque el abogado ya
+   * decidió qué quiere redactar; el selector de rol es un filtro de la
+   * herramienta, no una afirmación sobre el caso.
+   */
+  const rolSincronizadoPara = React.useRef<string | null>(null);
+
   useEffect(() => {
-    if (currentOptions.length > 0 && !currentOptions.includes(documentType)) {
-      setDocumentType(currentOptions[0]);
-    }
-  }, [currentOptions, documentType, setDocumentType]);
+    if (lookup.estado !== 'ENCONTRADA' || !actuacion) return;
+
+    /*
+     * Solo al CAMBIAR de actuación, y esto no es una micro-optimización.
+     *
+     * Sin la marca, el efecto compara rol y actuación en cada render y devuelve
+     * el selector a su sitio: el abogado escoge DESPACHO, el efecto ve que la
+     * actuación en curso es de litigante y lo regresa a LITIGANTE de inmediato.
+     * El filtro de rol quedaría inservible — cambiar un defecto por otro.
+     *
+     * Con la marca, el rol se mueve una sola vez, cuando llega una actuación
+     * nueva, y a partir de ahí el selector es del abogado otra vez.
+     */
+    if (rolSincronizadoPara.current === actuacion.exactName) return;
+    rolSincronizadoPara.current = actuacion.exactName;
+
+    if (actuacion.role !== userRole) setUserRole(actuacion.role);
+  }, [lookup.estado, actuacion, userRole]);
+
+  /*
+   * Mantener la selección válida — pero NUNCA mientras el catálogo va en camino.
+   *
+   * Esto reemplazaba el tipo de documento en la fracción de segundo que tarda la
+   * lista en llegar: con `catalogued` todavía vacío, `currentOptions` caía a la
+   * lista escrita a mano, que jamás está vacía porque `legacyFor` retrocede a
+   * CONSTITUCIONAL. La actuación elegida en Orientación no estaba ahí, así que
+   * se perdía antes de que nadie la viera, y el abogado llegaba al taller con un
+   * tipo de documento que no escogió.
+   *
+   * CARGANDO no es VACÍA. Con esa distinción, esperar es posible.
+   */
+  useEffect(() => {
+    const reemplazo = reemplazoDeTipoDeDocumento(catalogo, currentOptions, documentType);
+    if (reemplazo) setDocumentType(reemplazo);
+  }, [catalogo, currentOptions, documentType, setDocumentType]);
 
   const handleBranchChange = (branch: string) => {
     setLegalBranch(branch);
