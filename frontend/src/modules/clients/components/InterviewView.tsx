@@ -1,12 +1,12 @@
 import React from 'react';
-import { AlertTriangle, ArrowLeft, Copy, CheckCircle2, FileDown, FileText, Upload, UserRound } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, Copy, CheckCircle2, FileDown, FileText, PenLine, Upload, UserRound } from 'lucide-react';
 import { useTranscription } from '../../transcription/hooks/useTranscription';
 import { TranscriptSegments } from '../../transcription/components/TranscriptSegments';
 import { StoredTranscriptions } from '../../transcription/components/StoredTranscriptions';
 import { NotPersistedWarning } from '../../transcription/components/RoleProposals';
 import { exportTranscriptToPdf, exportTranscriptToWord } from '../../transcription/transcriptExport';
 import { buildSpeakerNames } from '../../transcription/speakerNames';
-import { ROLE_LABELS, SUPPORTED_AUDIO_EXTENSIONS } from '../../transcription/types';
+import { ROLE_LABELS, ROLES_DEL_RELATO, SUPPORTED_AUDIO_EXTENSIONS } from '../../transcription/types';
 import { toPlainText } from '../../transcription/toPlainText';
 import { ClientPicker } from './ClientPicker';
 import { InterviewInsights } from './InterviewInsights';
@@ -58,7 +58,19 @@ const Paso: React.FC<{ numero: number; titulo: string; children: React.ReactNode
   </section>
 );
 
-export const InterviewView: React.FC = () => {
+interface InterviewViewProps {
+  /**
+   * Lleva a redacción lo que la persona NARRÓ, no la entrevista entera.
+   *
+   * Una entrevista es en su mayoría el abogado: saludos, preguntas y
+   * explicaciones de procedimiento. Mandarla completa haría que el extractor de
+   * hechos trabajara sobre el interrogatorio, y los hechos del caso quedarían
+   * ahogados en la voz de quien pregunta.
+   */
+  onDraft?: (hechos: string) => void;
+}
+
+export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
   const {
     hasFirm,
     isAvailable,
@@ -121,6 +133,15 @@ export const InterviewView: React.FC = () => {
   };
 
   const megabytes = (bytes: number): string => (bytes / (1024 * 1024)).toFixed(1);
+
+  /** Solo los turnos de quien narra, con su rol al frente para dar contexto. */
+  const relatoDelCliente = (): string =>
+    (result?.segments ?? [])
+      .filter((s) => ROLES_DEL_RELATO.has(s.role))
+      .map((s) => `${ROLE_LABELS[s.role] ?? s.role}: ${s.text.trim()}`)
+      .filter((linea) => linea.length > 40)
+      .join('\n\n');
+
 
   const trabajando = isUploading || isTranscribing;
 
@@ -293,6 +314,26 @@ export const InterviewView: React.FC = () => {
                 )}
                 <span>{copiado ? 'Copiado' : 'Copiar texto'}</span>
               </button>
+
+              {/*
+                El puente que faltaba entre escuchar y escribir.
+
+                Los hechos ya están dichos y transcritos; volver a teclearlos en
+                el panel de redacción es transcribir dos veces la misma historia,
+                y la segunda siempre sale más corta que la primera.
+
+                Solo aparece si hay algo que llevarse: si nadie tiene un rol de
+                los que narran, el botón no promete un puente que no existe.
+              */}
+              {onDraft && relatoDelCliente().length > 0 && (
+                <button
+                  onClick={() => onDraft(relatoDelCliente())}
+                  className="px-3 py-1.5 bg-blue-950 hover:bg-blue-900 text-white rounded-lg text-[11px] font-semibold flex items-center gap-1.5"
+                >
+                  <PenLine className="w-3.5 h-3.5" />
+                  <span>Redactar con estos hechos</span>
+                </button>
+              )}
 
               <button
                 onClick={() => void exportTranscriptToWord(result, titulo || 'entrevista')}

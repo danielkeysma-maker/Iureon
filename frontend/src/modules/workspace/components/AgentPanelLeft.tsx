@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Sparkles, Database, Cpu, Send, Scale, Building, Paperclip, FileText, X, UploadCloud, RefreshCw } from 'lucide-react';
 import { AgentConsoleStream } from '../../agent/components/AgentConsoleStream';
 import { ActuacionInfoPanel } from '../../catalog/components/ActuacionInfoPanel';
-import { useActuacion } from '../../catalog/hooks/useActuacion';
+import { useActuacionLookup } from '../../catalog/hooks/useActuacion';
 import { useBranchActuaciones } from '../../catalog/hooks/useBranchActuaciones';
 import { useCatalogBranches } from '../../catalog/hooks/useCatalogBranches';
 import { branchLabel } from '../../catalog/branchLabels';
@@ -86,7 +86,8 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
   activeDraftText,
   onClearActiveDraft
 }) => {
-  const actuacion = useActuacion(documentType, legalBranch);
+  const lookup = useActuacionLookup(documentType, legalBranch);
+  const actuacion = lookup.actuacion;
   const [userRole, setUserRole] = useState<ActuacionRole>('LITIGANTE');
   const [importedFiles, setImportedFiles] = useState<CaseStudyFile[]>([]);
 
@@ -245,6 +246,30 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
             <span>
               Esta rama aún no tiene catálogo verificado. El borrador se redactará sin norma ni
               término confirmados; verifícalos antes de radicar.
+            </span>
+          </p>
+        )}
+
+        {/*
+          El aviso que faltaba, y que el de arriba ya no alcanza a dar.
+
+          Ese avisa por RAMA, y desde que se catalogaron las 22 no vuelve a
+          aparecer nunca. Pero una actuación concreta todavía puede no resolver
+          — y entonces el motor de redacción cae a una plantilla de texto libre y
+          Claude escribe la norma y el término DE MEMORIA. Eso es exactamente lo
+          que el catálogo existe para impedir, y hasta ahora ocurría sin que el
+          abogado lo supiera.
+          
+          Se dispara solo en SIN_CATALOGAR: mientras carga no se dice nada,
+          porque una advertencia que parpadea enseña a ignorar todas las demás.
+        */}
+        {isCatalogued && lookup.estado === 'SIN_CATALOGAR' && (
+          <p className="text-[10px] text-amber-700 leading-snug flex items-start gap-1">
+            <span aria-hidden="true">⚠</span>
+            <span>
+              <strong>"{documentType}"</strong> no está en el catálogo verificado. El borrador se
+              redactará con la norma y el término que el modelo recuerde, no con los comprobados:
+              revísalos antes de radicar, o escoge una actuación de la lista.
             </span>
           </p>
         )}

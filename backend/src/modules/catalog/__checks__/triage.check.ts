@@ -17,6 +17,25 @@ const check = (n: string, ok: boolean, d = ''): void => {
   if (!ok) fallos++;
 };
 
+/**
+ * Una observación sobre el modelo, que se reporta pero NO tumba la compilación.
+ *
+ * La garantía de este módulo es determinista: un nombre que el catálogo no
+ * resuelve no llega al abogado, y eso se comprueba sin llamar a nadie. La
+ * CALIDAD del criterio del modelo es otra cosa — vale medirla, y va a variar
+ * entre corridas porque un LLM no es una función pura.
+ *
+ * Se separó tras ver este check fallar y pasar tres veces seguidas con el mismo
+ * código. Un gate que se pone rojo por el humor de un proveedor entrena a la
+ * gente a reintentar hasta que salga verde, y a partir de ahí ya no protege
+ * nada: es exactamente el "gate ignorado" que este proyecto tiene documentado.
+ */
+let observaciones = 0;
+const observa = (n: string, ok: boolean, d = ''): void => {
+  console.log(`${ok ? 'ok  ' : 'OJO '} ${n}${d ? ' — ' + d : ''}`);
+  if (!ok) observaciones++;
+};
+
 /*
  * ─── LA GARANTÍA, PROBADA CONTRA EL CATÁLOGO REAL ──────────────────────────
  *
@@ -116,7 +135,7 @@ check(
      * presenta su propio silencio como tres hallazgos — el mismo defecto que
      * tuvo el umbral 0,45 de la jurisprudencia.
      */
-    check(
+    observa(
       'un disparate no recibe actuaciones inventadas para rellenar',
       disparate.status === 'SIN_COINCIDENCIA' && disparate.suggestions.length === 0,
       `${disparate.status} con ${disparate.suggestions.length}`
@@ -126,7 +145,7 @@ check(
       'el papá de los niños no ha dado un peso en ocho meses y ellos viven con la mamá'
     );
 
-    check(
+    observa(
       'unos hechos reales sí reciben orientación',
       real.status === 'OK' && real.suggestions.length > 0,
       `${real.status} con ${real.suggestions.length}`
@@ -134,7 +153,7 @@ check(
 
     // Y lo devuelto es del catálogo, con su término: la ficha no la escribe el modelo.
     const sinTermino = real.suggestions.filter((s) => !s.actuacion.term || !s.actuacion.legalBasis);
-    check(
+    observa(
       'cada sugerencia llega con el término y el artículo del catálogo',
       sinTermino.length === 0,
       sinTermino.map((s) => s.actuacion.exactName).join(', ')

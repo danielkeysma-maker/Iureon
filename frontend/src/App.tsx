@@ -423,7 +423,25 @@ export function App() {
           )}
 
           {mainView === 'audiencias' && <TranscriptionView kind="AUDIENCIA" />}
-          {mainView === 'entrevistas' && <InterviewView />}
+          {mainView === 'entrevistas' && (
+            <InterviewView
+              /*
+               * De escuchar a escribir sin volver a teclear.
+               *
+               * Los hechos ya están dichos y transcritos. Solo viaja lo que
+               * NARRÓ la persona: mandar la entrevista completa haría que el
+               * extractor trabajara sobre las preguntas del abogado.
+               *
+               * No se toca el tipo de documento: cuál es la actuación sigue
+               * siendo decisión del abogado, y suponerla por él sería
+               * calificar el caso desde una transcripción.
+               */
+              onDraft={(hechos) => {
+                workflow.setLegalPrompt(hechos);
+                setMainView('workspace');
+              }}
+            />
+          )}
           {mainView === 'search' && <SearchView />}
           {mainView === 'catalogo' && <CatalogCurationView />}
           {mainView === 'tools' && <ToolsView />}
@@ -438,9 +456,11 @@ export function App() {
                * redacción: cualquier otra cadena resuelve a una plantilla
                * genérica, así que se pasa tal cual vino del catálogo.
                */
-              onDraft={(nombre, rama) => {
+              onDraft={(nombre, rama, hechos) => {
                 workflow.setLegalBranch(rama);
                 workflow.setDocumentType(nombre);
+                // Los hechos que ya escribió, para que no los escriba dos veces.
+                if (hechos) workflow.setLegalPrompt(hechos);
                 setMainView('workspace');
               }}
             />

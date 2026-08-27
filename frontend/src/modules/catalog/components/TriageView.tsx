@@ -25,8 +25,14 @@ import type { MainView } from '../../tenant/types';
  */
 
 interface TriageViewProps {
-  /** Lets a suggestion become a draft without retyping its name. */
-  onDraft: (actuacionName: string, branch: string) => void;
+  /**
+   * Turns a suggestion into a draft carrying the name AND the facts.
+   *
+   * The facts travel because the lawyer already wrote them here. Asking for
+   * them again is how a two-screen flow becomes two transcriptions of the same
+   * story, and the second one is always shorter than the first.
+   */
+  onDraft: (actuacionName: string, branch: string, hechos: string) => void;
   setMainView: (view: MainView) => void;
 }
 
@@ -175,7 +181,7 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
                       <h3 className="text-[13px] font-black text-slate-900">{a.exactName}</h3>
                     </div>
                     <button
-                      onClick={() => onDraft(a.exactName, a.branch)}
+                      onClick={() => onDraft(a.exactName, a.branch, hechos.trim())}
                       className="text-[10px] font-bold text-white bg-blue-950 hover:bg-blue-900 px-2.5 py-1.5 rounded-lg flex items-center gap-1 shrink-0"
                     >
                       <PenLine className="w-3 h-3" />

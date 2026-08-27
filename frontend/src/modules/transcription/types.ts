@@ -183,3 +183,24 @@ export interface RoleProposal {
   matches: number;
   evidence: RoleEvidence[];
 }
+
+/**
+ * Quien narra los hechos en una entrevista.
+ *
+ * Una entrevista es en su mayoría el abogado: saludos, preguntas, explicaciones
+ * de procedimiento. Los HECHOS están en lo que cuenta la persona, y separarlos
+ * es lo que permite llevarlos a la redacción sin arrastrar el interrogatorio.
+ *
+ * El backend tiene esta misma lista para sugerir jurisprudencia. Son dos
+ * copias y lo son a propósito: la de allá decide qué se busca en el corpus, la
+ * de acá qué se le muestra al abogado para llevarse. Si un día divergen, lo
+ * peor que pasa es que una pantalla ofrezca un rol que la otra no busca — no
+ * que algo se afirme sin comprobar.
+ */
+export const ROLES_DEL_RELATO: ReadonlySet<string> = new Set([
+  'CLIENTE',
+  'DEMANDANTE',
+  'DEMANDADO',
+  'VICTIMA',
+  'TESTIGO'
+]);
