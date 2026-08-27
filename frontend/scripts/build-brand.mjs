@@ -102,19 +102,52 @@ const faviconAdaptativo = () => `<svg xmlns="http://www.w3.org/2000/svg" viewBox
   <path d="${FLECHA}" class="p"/>
 </svg>`;
 
-/* ─── EL WORDMARK ─────────────────────────────────────────────────────────
+/* ─── TIPOGRAFÍA ──────────────────────────────────────────────────────────
  *
- * En texto vivo y no en trazados, a propósito para este repositorio: así se
- * puede leer, buscar y traducir, y pesa nada. Para imprenta y para terceros hay
- * que convertirlo a trazados (`Texto → Contornos`), o la palabra se dibuja con
- * la tipografía que el lector tenga.
+ * ESTO EMPEZÓ EN GEORGIA Y ERA UN ERROR. Se eligió por "serif = serio", sin
+ * preguntarse CUÁL serif: Georgia es de 1993 y se dibujó para monitores CRT de
+ * baja resolución, con serifas gruesas y proporciones anchas. Lee como página
+ * web de Windows 95, que es exactamente lo contrario de lo que este producto
+ * quiere decir.
  *
- * La serif es deliberada: es lo que hace que se lea como despacho jurídico y no
- * como aplicación de consumo.
+ * Y HAY UN PROBLEMA LEGAL QUE DECIDE MÁS QUE EL GUSTO. Georgia, Constantia,
+ * Candara, Segoe y Trebuchet son de Microsoft: su licencia permite mostrarlas
+ * en pantalla, NO usarlas como marca registrada. Una identidad construida
+ * sobre ellas nace impugnable. Lato, Montserrat, Open Sans y Roboto son Open
+ * Font License, que sí permite uso comercial y conversión a trazados para un
+ * logo.
+ *
+ * LA ELEGIDA ES PLUS JAKARTA SANS, y la decidio una prueba, no el gusto.
+ *
+ * Se comparo contra Inter, Libre Franklin, Archivo, Instrument Serif, Spectral,
+ * Newsreader y Lora — todas de Google Fonts, todas OFL — renderizando el lockup
+ * a tamano de lamina Y a veinte pixeles, que es el tamano al que esta marca se
+ * va a ver el noventa por ciento del tiempo. A veinte pixeles Jakarta se
+ * sostiene con mas fuerza que cualquier serif de la lista: las serifas de Lora
+ * y Newsreader se enturbian, y los trazos finos de Instrument Serif se pierden.
+ *
+ * Un logo se elige por como sobrevive a su uso MAS FRECUENTE, no por como luce
+ * en la lamina de presentacion.
+ *
+ * Y es de 2020, asi que no puede leerse como antigua — que era la queja que
+ * mato a Georgia. Ademas YA ESTA CARGADA en la aplicacion: no agrega una cuarta
+ * familia a las tres que ya viajan, y hace que el logo y la interfaz hablen el
+ * mismo idioma tipografico en vez de convivir a la fuerza.
+ *
+ * PENDIENTE ANTES DE PUBLICAR FUERA: convertir el texto a TRAZADOS. Mientras
+ * sea `<text font-family="Lato">`, la palabra se dibuja con la tipografía que
+ * tenga el lector — y quien no tenga Lato verá otra marca. Dentro de la
+ * aplicación no pasa porque la fuente se carga; en un SVG que viaje por correo,
+ * sí. En Figma o Illustrator: `Texto → Contornos`.
  */
+const FUENTE = "'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif";
+const PESO_MARCA = 700;
+const PESO_DISPLAY = 500;
+
+/* ─── EL WORDMARK ───────────────────────────────────────────────────────── */
 const wordmark = (color, ancho = 300) =>
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${ancho} 60" width="${ancho}" height="60" role="img" aria-label="Iureon">
-  <text x="0" y="44" font-family="Georgia, 'Times New Roman', serif" font-size="46" letter-spacing="6" fill="${color}">IUREON</text>
+  <text x="0" y="44" font-family="${FUENTE}" font-weight="${PESO_MARCA}" font-size="46" letter-spacing="7" fill="${color}">IUREON</text>
 </svg>`;
 
 /**
@@ -154,7 +187,7 @@ const horizontal = ({ colorA, colorB, fondo = null }) => {
     </g>
     <path d="${FLECHA}" fill="${colorA}"/>
   </g>
-  <text x="88" y="47" font-family="Georgia, 'Times New Roman', serif" font-size="36" letter-spacing="5" fill="${colorA}">IUREON</text>
+  <text x="88" y="47" font-family="${FUENTE}" font-weight="${PESO_MARCA}" font-size="34" letter-spacing="6" fill="${colorA}">IUREON</text>
 </svg>`;
 };
 
@@ -169,7 +202,7 @@ const vertical = ({ colorA, colorB, fondo = null }) => {
     </g>
     <path d="${FLECHA}" fill="${colorA}"/>
   </g>
-  <text x="100" y="112" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="30" letter-spacing="4" fill="${colorA}">IUREON</text>
+  <text x="100" y="112" text-anchor="middle" font-family="${FUENTE}" font-weight="${PESO_MARCA}" font-size="28" letter-spacing="5" fill="${colorA}">IUREON</text>
 </svg>`;
 };
 
@@ -199,7 +232,7 @@ const verticalExtendido = ({ colorA, colorB, fondo = null, eslogan = ESLOGAN_EN,
   <rect width="220" height="${alto}" fill="${fondo}"/>` : '';
   const lineaAno = ano
     ? `
-  <text x="110" y="152" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="11" letter-spacing="2.5" fill="${colorB}">${ano}</text>`
+  <text x="110" y="152" text-anchor="middle" font-family="${FUENTE}" font-weight="${PESO_DISPLAY}" font-size="10" letter-spacing="3" fill="${colorB}">${ano}</text>`
     : '';
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 ${alto}" width="220" height="${alto}" role="img" aria-label="Iureon — ${eslogan}">${rect}
   <g transform="translate(78 4)">
@@ -209,8 +242,8 @@ const verticalExtendido = ({ colorA, colorB, fondo = null, eslogan = ESLOGAN_EN,
     </g>
     <path d="${FLECHA}" fill="${colorA}"/>
   </g>
-  <text x="110" y="110" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="30" letter-spacing="4" fill="${colorA}">IUREON</text>
-  <text x="110" y="132" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="13" letter-spacing="4.5" fill="${colorA}" opacity="0.72">${eslogan}</text>${lineaAno}
+  <text x="110" y="110" text-anchor="middle" font-family="${FUENTE}" font-weight="${PESO_MARCA}" font-size="28" letter-spacing="5" fill="${colorA}">IUREON</text>
+  <text x="110" y="132" text-anchor="middle" font-family="${FUENTE}" font-weight="${PESO_DISPLAY}" font-size="12" letter-spacing="5.5" fill="${colorA}" opacity="0.72">${eslogan}</text>${lineaAno}
 </svg>`;
 };
 
@@ -226,8 +259,8 @@ const horizontalExtendido = ({ colorA, colorB, fondo = null, eslogan = ESLOGAN_E
     </g>
     <path d="${FLECHA}" fill="${colorA}"/>
   </g>
-  <text x="88" y="42" font-family="Georgia, 'Times New Roman', serif" font-size="34" letter-spacing="5" fill="${colorA}">IUREON</text>
-  <text x="90" y="60" font-family="Georgia, 'Times New Roman', serif" font-size="12" letter-spacing="4" fill="${colorA}" opacity="0.72">${eslogan}</text>
+  <text x="88" y="42" font-family="${FUENTE}" font-weight="${PESO_MARCA}" font-size="32" letter-spacing="6" fill="${colorA}">IUREON</text>
+  <text x="90" y="60" font-family="${FUENTE}" font-weight="${PESO_DISPLAY}" font-size="11" letter-spacing="5" fill="${colorA}" opacity="0.72">${eslogan}</text>
 </svg>`;
 };
 
