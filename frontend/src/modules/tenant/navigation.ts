@@ -1,4 +1,4 @@
-import { Sparkles, Mic, BookOpen, Library, Wrench, Shield, UserRound } from 'lucide-react';
+import { Sparkles, Mic, BookOpen, Library, Wrench, Shield, UserRound, ShieldCheck } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { MainView } from './types';
 
@@ -41,7 +41,13 @@ export const NAV_MODULES: NavModule[] = [
   { id: 'search', label: 'Buscador', description: 'Sentencias & precedentes', icon: BookOpen },
   { id: 'catalogo', label: 'Catálogo', description: 'Actuaciones y términos verificados', icon: Library },
   { id: 'tools', label: 'Herramientas', description: 'Cálculos & utilidades', icon: Wrench },
-  { id: 'audit', label: 'Seguridad', description: 'Auditoría & gestión', icon: Shield }
+  { id: 'audit', label: 'Seguridad', description: 'Auditoría & gestión', icon: Shield },
+  {
+    id: 'privacidad',
+    label: 'Privacidad',
+    description: 'Quién procesa tus datos',
+    icon: ShieldCheck
+  }
 ];
 
 /**

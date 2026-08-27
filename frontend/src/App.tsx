@@ -15,6 +15,7 @@ import { InterviewView } from './modules/clients/components/InterviewView';
 import { CatalogCurationView } from './modules/catalog/components/CatalogCurationView';
 import { ToolsView } from './modules/tools/components/ToolsView';
 import { AuditView } from './modules/audit/components/AuditView';
+import { SubprocessorsView } from './modules/privacy/components/SubprocessorsView';
 import { FirmBrandingModal } from './modules/tenant/components/FirmBrandingModal';
 import { FirmSubscriptionModal } from './modules/subscriptions/components/FirmSubscriptionModal';
 import type { FirmSubscriptionInfo } from './modules/subscriptions/types';
@@ -38,7 +39,8 @@ const MAIN_VIEWS: MainView[] = [
   'search',
   'catalogo',
   'tools',
-  'audit'
+  'audit',
+  'privacidad'
 ];
 
 
@@ -424,6 +426,7 @@ export function App() {
           {mainView === 'catalogo' && <CatalogCurationView />}
           {mainView === 'tools' && <ToolsView />}
           {mainView === 'audit' && <AuditView />}
+          {mainView === 'privacidad' && <SubprocessorsView />}
         </main>
       </div>
     </div>

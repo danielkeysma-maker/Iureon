@@ -38,6 +38,8 @@ jobs:
         run: npm run check:search
       - name: Doctrine guard (no unsourced quote)
         run: npm run check:conceptos
+      - name: Subprocessor register matches the running config
+        run: npm run check:subprocessors
 
       - name: Build
         run: npm run build
