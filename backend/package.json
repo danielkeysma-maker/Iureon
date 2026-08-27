@@ -28,7 +28,8 @@
     "ingest:conceptos": "npx ts-node --transpile-only src/scripts/ingestConceptos.ts",
     "check:subprocessors": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/privacy/__checks__/subprocessors.check.ts",
     "check:ruling": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/jurisprudence/__checks__/officialRuling.check.ts",
-    "check:discovery": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/jurisprudence/__checks__/discovery.check.ts"
+    "check:discovery": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/jurisprudence/__checks__/discovery.check.ts",
+    "check:triage": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/catalog/__checks__/triage.check.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

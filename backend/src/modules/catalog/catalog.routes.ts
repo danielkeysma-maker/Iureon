@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { triageController } from './triage.controller';
 import {
   deleteVerificationController,
   getBranchCatalogController,
@@ -26,6 +27,16 @@ publicRouter.get('/catalog/actuaciones/resolve', resolveActuacionController as a
 
 /** Curation: writing to the knowledge base is always firm-scoped. */
 const tenantRouter = Router();
+
+/*
+ * La orientación por hechos va en el router de firma, no en el público.
+ *
+ * Gasta una llamada a un modelo, y por tanto saldo: un endpoint abierto sería
+ * una forma de que un desconocido gaste el crédito de las firmas. Además va
+ * declarada ANTES de "/catalog/:branch", que si no se traga "triage" como si
+ * fuera el nombre de una rama.
+ */
+tenantRouter.post('/catalog/triage', triageController as any);
 
 tenantRouter.get('/catalog/verifications', listVerificationsController as any);
 tenantRouter.put('/catalog/verifications', saveVerificationController as any);

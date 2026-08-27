@@ -44,6 +44,8 @@ jobs:
         run: npm run check:ruling
       - name: Topic discovery cannot admit what the Court does not have
         run: npm run check:discovery
+      - name: Facts triage cannot invent an actuación
+        run: npm run check:triage
 
       - name: Build
         run: npm run build

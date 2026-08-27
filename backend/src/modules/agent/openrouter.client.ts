@@ -22,7 +22,19 @@ const OPUS_TIMEOUT_MS = 120_000;
 const DEFAULT_TIMEOUT_MS = 20_000;
 const DEFAULT_MAX_TOKENS = 2048;
 
-/** A response shorter than this is treated as a failed generation, not content. */
+/**
+ * A response shorter than this is treated as a failed generation, not content.
+ *
+ * Right for drafting — a thirty-character escrito is a model that gave up — and
+ * WRONG for a caller whose correct answer is short. The triage that classifies
+ * facts against the catalogue answers `{"actuaciones":[]}` when nothing applies:
+ * eighteen characters, and the most honest thing it can say. Discarded by this
+ * floor it came back as empty text, which the caller then read as "no engine
+ * configured" — a refusal reported as an outage.
+ *
+ * So the floor stays where it protects drafting and the caller may lower it for
+ * itself. Nobody lowers it globally to make one case work.
+ */
 const MIN_USABLE_LENGTH = 50;
 
 /**
@@ -69,7 +81,9 @@ export const callOpenRouterWithUsage = async (
   model: EngineModel | string,
   systemPrompt: string,
   userPrompt: string,
-  maxTokens?: number
+  maxTokens?: number,
+  /** Overrides the usable-length floor for a caller whose short answer means something. */
+  minUsableLength: number = MIN_USABLE_LENGTH
 ): Promise<CallResult> => {
   const apiKey = config.openRouter.apiKey;
 
@@ -151,7 +165,7 @@ export const callOpenRouterWithUsage = async (
 
     const text: string = json.choices?.[0]?.message?.content?.trim() ?? '';
 
-    if (text.length > MIN_USABLE_LENGTH) {
+    if (text.length > minUsableLength) {
       console.log(
         `[OPENROUTER] ${model} responded with ${text.length} characters` +
           (usage ? ` (US$${usage.costUsd.toFixed(6)})` : '')
