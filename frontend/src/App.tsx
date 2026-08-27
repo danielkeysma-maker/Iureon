@@ -371,6 +371,10 @@ export function App() {
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         <HeaderTop
           mainView={mainView}
+          // El nombre del escrito, no una miga de pan. Sin borrador todavía se
+          // muestra el tipo de actuación: es lo que alguien necesita al volver a
+          // una pestaña abierta desde ayer.
+          tituloDelEscrito={workflow.generatedDraft?.title || workflow.documentType}
           rightView={workflow.rightView}
           setRightView={workflow.setRightView}
           copied={workflow.copied}
