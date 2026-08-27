@@ -4,6 +4,8 @@
   "description": "Backend API SaaS Multi-tenant para Iureon (Automatización Jurídica RAG en Colombia)",
   "main": "dist/index.js",
   "scripts": {
+    "test": "node scripts/run-all-checks.mjs",
+    "test:todos": "node scripts/run-all-checks.mjs --todos",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
