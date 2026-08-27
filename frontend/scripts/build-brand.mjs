@@ -34,11 +34,35 @@
  *
  * Correr con: node scripts/build-brand.mjs
  */
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
+
+/**
+ * El wordmark llega YA CONVERTIDO A TRAZADOS, no como nombre de fuente.
+ *
+ * Mientras el SVG dijera `<text font-family="...">`, la palabra se dibujaba con
+ * la tipografia que tuviera QUIEN LO ABRE: un socio que recibe el logo por
+ * correo, un impresor, un directorio juridico. Ninguno tiene Tenor Sans, y
+ * todos veian otra marca. Un wordmark que depende de una fuente instalada no es
+ * un wordmark, es una sugerencia.
+ *
+ * Los trazados los produce `scripts/wordmark-to-paths.py`. Si se cambia la
+ * tipografia o el texto, hay que volver a correrlo ANTES que este generador.
+ */
+const LETRAS = JSON.parse(readFileSync(join(AQUI, 'wordmark-paths.json'), 'utf8'));
+
+/** Pinta un bloque de texto ya trazado, en la posicion y color pedidos. */
+const texto = (bloque, x, y, color, opacidad = 1) =>
+  `<g transform="translate(${x} ${y})" fill="${color}"${opacidad < 1 ? ` opacity="${opacidad}"` : ''}>` +
+  bloque.paths.join('') +
+  '</g>';
+
+/** Centrado: hace falta el ancho, que el conversor ya midio. */
+const centrado = (bloque, centroX, y, color, opacidad = 1) =>
+  texto(bloque, centroX - bloque.ancho / 2, y, color, opacidad);
 const SALIDA = join(AQUI, '..', 'public', 'brand');
 
 /* ─── PALETA ──────────────────────────────────────────────────────────────
@@ -145,9 +169,9 @@ const PESO_MARCA = 700;
 const PESO_DISPLAY = 500;
 
 /* ─── EL WORDMARK ───────────────────────────────────────────────────────── */
-const wordmark = (color, ancho = 300) =>
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${ancho} 60" width="${ancho}" height="60" role="img" aria-label="Iureon">
-  <text x="0" y="44" font-family="${FUENTE}" font-weight="${PESO_MARCA}" font-size="46" letter-spacing="7" fill="${color}">IUREON</text>
+const wordmark = (color) =>
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${Math.ceil(LETRAS.marca.ancho) + 8} 56" width="${Math.ceil(LETRAS.marca.ancho) + 8}" height="56" role="img" aria-label="Iureon">
+  ${texto(LETRAS.marca, 4, 42, color)}
 </svg>`;
 
 /**
@@ -178,8 +202,10 @@ const FUNDACION = 'FOUNDED 2026';
 
 /** Imagotipo horizontal: símbolo a la izquierda, nombre a la derecha. */
 const horizontal = ({ colorA, colorB, fondo = null }) => {
-  const rect = fondo ? `\n  <rect width="340" height="72" fill="${fondo}"/>` : '';
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 72" width="340" height="72" role="img" aria-label="Iureon">${rect}
+  const ancho = Math.ceil(88 + LETRAS.marca_pequena.ancho + 12);
+  const rect = fondo ? `
+  <rect width="${ancho}" height="72" fill="${fondo}"/>` : '';
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${ancho} 72" width="${ancho}" height="72" role="img" aria-label="Iureon">${rect}
   <g transform="translate(4 4)">
     <g fill="none" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
       <path d="${HEBRA_B}" stroke="${colorB}"/>
@@ -187,22 +213,24 @@ const horizontal = ({ colorA, colorB, fondo = null }) => {
     </g>
     <path d="${FLECHA}" fill="${colorA}"/>
   </g>
-  <text x="88" y="47" font-family="${FUENTE}" font-weight="${PESO_MARCA}" font-size="34" letter-spacing="6" fill="${colorA}">IUREON</text>
+  ${texto(LETRAS.marca_pequena, 88, 46, colorA)}
 </svg>`;
 };
 
 /** Imagotipo vertical: símbolo arriba, nombre debajo. Para espacios estrechos. */
 const vertical = ({ colorA, colorB, fondo = null }) => {
-  const rect = fondo ? `\n  <rect width="200" height="132" fill="${fondo}"/>` : '';
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 132" width="200" height="132" role="img" aria-label="Iureon">${rect}
-  <g transform="translate(68 4)">
+  const ancho = Math.ceil(Math.max(200, LETRAS.marca_pequena.ancho + 40));
+  const rect = fondo ? `
+  <rect width="${ancho}" height="128" fill="${fondo}"/>` : '';
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${ancho} 128" width="${ancho}" height="128" role="img" aria-label="Iureon">${rect}
+  <g transform="translate(${(ancho - 64) / 2} 4)">
     <g fill="none" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
       <path d="${HEBRA_B}" stroke="${colorB}"/>
       <path d="${HEBRA_A}" stroke="${colorA}"/>
     </g>
     <path d="${FLECHA}" fill="${colorA}"/>
   </g>
-  <text x="100" y="112" text-anchor="middle" font-family="${FUENTE}" font-weight="${PESO_MARCA}" font-size="28" letter-spacing="5" fill="${colorA}">IUREON</text>
+  ${centrado(LETRAS.marca_pequena, ancho / 2, 108, colorA)}
 </svg>`;
 };
 
@@ -226,32 +254,34 @@ const iconoApp = () => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 102
 </svg>`;
 
 /** Imagotipo vertical extendido: simbolo, nombre y eslogan. */
-const verticalExtendido = ({ colorA, colorB, fondo = null, eslogan = ESLOGAN_EN, ano = null }) => {
-  const alto = ano ? 168 : 152;
+const verticalExtendido = ({ colorA, colorB, fondo = null, eslogan = 'en', ano = false }) => {
+  const bloqueEslogan = eslogan === 'es' ? LETRAS.eslogan_es : LETRAS.eslogan_en;
+  const ancho = Math.ceil(Math.max(220, bloqueEslogan.ancho + 48));
+  const alto = ano ? 166 : 148;
   const rect = fondo ? `
-  <rect width="220" height="${alto}" fill="${fondo}"/>` : '';
-  const lineaAno = ano
-    ? `
-  <text x="110" y="152" text-anchor="middle" font-family="${FUENTE}" font-weight="${PESO_DISPLAY}" font-size="10" letter-spacing="3" fill="${colorB}">${ano}</text>`
-    : '';
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 ${alto}" width="220" height="${alto}" role="img" aria-label="Iureon — ${eslogan}">${rect}
-  <g transform="translate(78 4)">
+  <rect width="${ancho}" height="${alto}" fill="${fondo}"/>` : '';
+  const lineaAno = ano ? `
+  ${centrado(LETRAS.fundacion, ancho / 2, 150, colorB)}` : '';
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${ancho} ${alto}" width="${ancho}" height="${alto}" role="img" aria-label="Iureon">${rect}
+  <g transform="translate(${(ancho - 64) / 2} 4)">
     <g fill="none" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
       <path d="${HEBRA_B}" stroke="${colorB}"/>
       <path d="${HEBRA_A}" stroke="${colorA}"/>
     </g>
     <path d="${FLECHA}" fill="${colorA}"/>
   </g>
-  <text x="110" y="110" text-anchor="middle" font-family="${FUENTE}" font-weight="${PESO_MARCA}" font-size="28" letter-spacing="5" fill="${colorA}">IUREON</text>
-  <text x="110" y="132" text-anchor="middle" font-family="${FUENTE}" font-weight="${PESO_DISPLAY}" font-size="12" letter-spacing="5.5" fill="${colorA}" opacity="0.72">${eslogan}</text>${lineaAno}
+  ${centrado(LETRAS.marca_pequena, ancho / 2, 108, colorA)}
+  ${centrado(bloqueEslogan, ancho / 2, 130, colorA, 0.72)}${lineaAno}
 </svg>`;
 };
 
 /** Imagotipo horizontal extendido: el eslogan bajo el nombre, no al lado. */
-const horizontalExtendido = ({ colorA, colorB, fondo = null, eslogan = ESLOGAN_EN }) => {
+const horizontalExtendido = ({ colorA, colorB, fondo = null, eslogan = 'en' }) => {
+  const bloqueEslogan = eslogan === 'es' ? LETRAS.eslogan_es : LETRAS.eslogan_en;
+  const ancho = Math.ceil(88 + Math.max(LETRAS.marca_pequena.ancho, bloqueEslogan.ancho) + 12);
   const rect = fondo ? `
-  <rect width="360" height="72" fill="${fondo}"/>` : '';
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 72" width="360" height="72" role="img" aria-label="Iureon — ${eslogan}">${rect}
+  <rect width="${ancho}" height="72" fill="${fondo}"/>` : '';
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${ancho} 72" width="${ancho}" height="72" role="img" aria-label="Iureon">${rect}
   <g transform="translate(4 4)">
     <g fill="none" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
       <path d="${HEBRA_B}" stroke="${colorB}"/>
@@ -259,8 +289,8 @@ const horizontalExtendido = ({ colorA, colorB, fondo = null, eslogan = ESLOGAN_E
     </g>
     <path d="${FLECHA}" fill="${colorA}"/>
   </g>
-  <text x="88" y="42" font-family="${FUENTE}" font-weight="${PESO_MARCA}" font-size="32" letter-spacing="6" fill="${colorA}">IUREON</text>
-  <text x="90" y="60" font-family="${FUENTE}" font-weight="${PESO_DISPLAY}" font-size="11" letter-spacing="5" fill="${colorA}" opacity="0.72">${eslogan}</text>
+  ${texto(LETRAS.marca_pequena, 88, 40, colorA)}
+  ${texto(bloqueEslogan, 89, 58, colorA, 0.72)}
 </svg>`;
 };
 
@@ -296,12 +326,12 @@ const PIEZAS = {
   'vertical-tagline-dark.svg': verticalExtendido({ colorA: HUESO, colorB: GOLD, fondo: CARBON }),
 
   // 17-18 · En español, para uso en Colombia
-  'horizontal-tagline-es-light.svg': horizontalExtendido({ colorA: NAVY, colorB: GOLD, eslogan: ESLOGAN_ES }),
-  'vertical-tagline-es-light.svg': verticalExtendido({ colorA: NAVY, colorB: GOLD, eslogan: ESLOGAN_ES }),
+  'horizontal-tagline-es-light.svg': horizontalExtendido({ colorA: NAVY, colorB: GOLD, eslogan: 'es' }),
+  'vertical-tagline-es-light.svg': verticalExtendido({ colorA: NAVY, colorB: GOLD, eslogan: 'es' }),
 
   // 19-20 · Formal con año fundacional: membrete, contratos, papelería
-  'formal-light.svg': verticalExtendido({ colorA: NAVY, colorB: GOLD, ano: FUNDACION }),
-  'formal-dark.svg': verticalExtendido({ colorA: HUESO, colorB: GOLD, fondo: CARBON, ano: FUNDACION }),
+  'formal-light.svg': verticalExtendido({ colorA: NAVY, colorB: GOLD, ano: true }),
+  'formal-dark.svg': verticalExtendido({ colorA: HUESO, colorB: GOLD, fondo: CARBON, ano: true }),
 
   // Monocromo. La prueba de fuego: mismas hebras, un solo color.
   'mono-black.svg': isotipo({ colorA: '#000000', colorB: '#000000' }),
