@@ -411,6 +411,8 @@ export function App() {
               )}
 
               <DocumentCanvasRight
+                documentType={workflow.documentType}
+                legalBranch={workflow.legalBranch}
                 rightView={workflow.rightView}
                 setRightView={workflow.setRightView}
                 generatedDraft={workflow.generatedDraft}
