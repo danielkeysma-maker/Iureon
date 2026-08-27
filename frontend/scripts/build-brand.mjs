@@ -117,6 +117,32 @@ const wordmark = (color, ancho = 300) =>
   <text x="0" y="44" font-family="Georgia, 'Times New Roman', serif" font-size="46" letter-spacing="6" fill="${color}">IUREON</text>
 </svg>`;
 
+/**
+ * El eslogan y el ano fundacional, en piezas APARTE de la marca primaria.
+ *
+ * POR QUE NO VAN EN EL LOCKUP PRINCIPAL. La marca primaria vive en la cabecera
+ * de la aplicacion y en el favicon, donde el nombre mide veinte pixeles de alto
+ * y un renglon de "SMART JUSTICE" a esa escala no se lee: es una franja gris. Y
+ * lo que no se lee no comunica, solo ensucia.
+ *
+ * Por eso hay tres niveles y cada uno tiene su sitio: la marca sola para la
+ * aplicacion, la extendida con eslogan para presentaciones y firma de correo, y
+ * la formal con el ano para membrete, contratos y papeleria.
+ *
+ * SOBRE "FOUNDED 2026", y lo digo una vez: un ano dentro del logo envejece con
+ * el. En 2031 dice "llevamos cinco anos", que es informacion, pero en 2045 dira
+ * "somos de otra epoca". Ademas obliga a rehacer el archivo si alguna vez se
+ * discute la fecha de constitucion. Se incluye porque asi se pidio, y se aisla
+ * en la version formal para que ese costo lo pague solo el membrete.
+ *
+ * En espanol tambien, porque el producto es colombiano y sus usuarios son
+ * abogados colombianos: un eslogan en ingles en la firma de un correo a un
+ * juzgado desentona.
+ */
+const ESLOGAN_EN = 'SMART JUSTICE';
+const ESLOGAN_ES = 'JUSTICIA VERIFICADA';
+const FUNDACION = 'FOUNDED 2026';
+
 /** Imagotipo horizontal: símbolo a la izquierda, nombre a la derecha. */
 const horizontal = ({ colorA, colorB, fondo = null }) => {
   const rect = fondo ? `\n  <rect width="340" height="72" fill="${fondo}"/>` : '';
@@ -166,6 +192,45 @@ const iconoApp = () => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 102
   </g>
 </svg>`;
 
+/** Imagotipo vertical extendido: simbolo, nombre y eslogan. */
+const verticalExtendido = ({ colorA, colorB, fondo = null, eslogan = ESLOGAN_EN, ano = null }) => {
+  const alto = ano ? 168 : 152;
+  const rect = fondo ? `
+  <rect width="220" height="${alto}" fill="${fondo}"/>` : '';
+  const lineaAno = ano
+    ? `
+  <text x="110" y="152" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="11" letter-spacing="2.5" fill="${colorB}">${ano}</text>`
+    : '';
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 ${alto}" width="220" height="${alto}" role="img" aria-label="Iureon — ${eslogan}">${rect}
+  <g transform="translate(78 4)">
+    <g fill="none" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="${HEBRA_B}" stroke="${colorB}"/>
+      <path d="${HEBRA_A}" stroke="${colorA}"/>
+    </g>
+    <path d="${FLECHA}" fill="${colorA}"/>
+  </g>
+  <text x="110" y="110" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="30" letter-spacing="4" fill="${colorA}">IUREON</text>
+  <text x="110" y="132" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="13" letter-spacing="4.5" fill="${colorA}" opacity="0.72">${eslogan}</text>${lineaAno}
+</svg>`;
+};
+
+/** Imagotipo horizontal extendido: el eslogan bajo el nombre, no al lado. */
+const horizontalExtendido = ({ colorA, colorB, fondo = null, eslogan = ESLOGAN_EN }) => {
+  const rect = fondo ? `
+  <rect width="360" height="72" fill="${fondo}"/>` : '';
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 72" width="360" height="72" role="img" aria-label="Iureon — ${eslogan}">${rect}
+  <g transform="translate(4 4)">
+    <g fill="none" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="${HEBRA_B}" stroke="${colorB}"/>
+      <path d="${HEBRA_A}" stroke="${colorA}"/>
+    </g>
+    <path d="${FLECHA}" fill="${colorA}"/>
+  </g>
+  <text x="88" y="42" font-family="Georgia, 'Times New Roman', serif" font-size="34" letter-spacing="5" fill="${colorA}">IUREON</text>
+  <text x="90" y="60" font-family="Georgia, 'Times New Roman', serif" font-size="12" letter-spacing="4" fill="${colorA}" opacity="0.72">${eslogan}</text>
+</svg>`;
+};
+
 const PIEZAS = {
   // 1-2 · Favicon
   'favicon.svg': faviconAdaptativo(),
@@ -191,7 +256,21 @@ const PIEZAS = {
   'vertical-light.svg': vertical({ colorA: NAVY, colorB: GOLD }),
   'vertical-dark.svg': vertical({ colorA: HUESO, colorB: GOLD, fondo: CARBON }),
 
-  // 12 · Monocromo. La prueba de fuego: mismas hebras, un solo color.
+  // 13-16 · Extendidos con eslogan, para presentaciones y firma de correo
+  'horizontal-tagline-light.svg': horizontalExtendido({ colorA: NAVY, colorB: GOLD }),
+  'horizontal-tagline-dark.svg': horizontalExtendido({ colorA: HUESO, colorB: GOLD, fondo: CARBON }),
+  'vertical-tagline-light.svg': verticalExtendido({ colorA: NAVY, colorB: GOLD }),
+  'vertical-tagline-dark.svg': verticalExtendido({ colorA: HUESO, colorB: GOLD, fondo: CARBON }),
+
+  // 17-18 · En español, para uso en Colombia
+  'horizontal-tagline-es-light.svg': horizontalExtendido({ colorA: NAVY, colorB: GOLD, eslogan: ESLOGAN_ES }),
+  'vertical-tagline-es-light.svg': verticalExtendido({ colorA: NAVY, colorB: GOLD, eslogan: ESLOGAN_ES }),
+
+  // 19-20 · Formal con año fundacional: membrete, contratos, papelería
+  'formal-light.svg': verticalExtendido({ colorA: NAVY, colorB: GOLD, ano: FUNDACION }),
+  'formal-dark.svg': verticalExtendido({ colorA: HUESO, colorB: GOLD, fondo: CARBON, ano: FUNDACION }),
+
+  // Monocromo. La prueba de fuego: mismas hebras, un solo color.
   'mono-black.svg': isotipo({ colorA: '#000000', colorB: '#000000' }),
   'mono-white.svg': isotipo({ colorA: '#FFFFFF', colorB: '#FFFFFF', grosor: 8, fondo: CARBON })
 };

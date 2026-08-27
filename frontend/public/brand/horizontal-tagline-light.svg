@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 72" width="360" height="72" role="img" aria-label="Iureon — SMART JUSTICE">
+  <g transform="translate(4 4)">
+    <g fill="none" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M39 57C39 48 25 44 25 34C25 27 30 23 32 21" stroke="#C8A046"/>
+      <path d="M25 57C25 48 39 44 39 34C39 27 34 23 32 21" stroke="#14294A"/>
+    </g>
+    <path d="M32 6L40 19H24Z" fill="#14294A"/>
+  </g>
+  <text x="88" y="42" font-family="Georgia, 'Times New Roman', serif" font-size="34" letter-spacing="5" fill="#14294A">IUREON</text>
+  <text x="90" y="60" font-family="Georgia, 'Times New Roman', serif" font-size="12" letter-spacing="4" fill="#14294A" opacity="0.72">SMART JUSTICE</text>
+</svg>
