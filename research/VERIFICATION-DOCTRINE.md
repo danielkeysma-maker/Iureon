@@ -221,3 +221,19 @@ Escrito desde la ficha en vez de desde el artículo, el check **certificó la
 omisión durante todo el tiempo que existió**.
 
 Al escribir un check sobre una ficha, ve al artículo.
+
+---
+
+## Una rama nueva declara su norma, no su razonamiento
+
+`source_of_truth` es el encabezado que el abogado lee al abrir la rama. Debe
+nombrar la norma que rige, en una o dos frases.
+
+AGRARIO y ADUANERO se publicaron con un encabezado que empezaba "PASO 0 —":
+siete mil caracteres del razonamiento del agente. El intento de arreglarlo
+tomando el primer párrafo tampoco sirvió, porque el primer párrafo de un
+razonamiento sigue siendo razonamiento.
+
+`merge-actuaciones.py` ya no lo deduce: exige `fuente_de_verdad` y
+`verified_at`, o rechaza el archivo. El razonamiento completo se conserva en
+`gaps`, que es donde sirve.
