@@ -48,7 +48,17 @@
   --brand-700: 23 69 107; /* #17456B · 7.4:1 */
   --brand-800: 17 54 82; /* #113652 · hover */
   --brand-50: 234 240 245; /* #EAF0F5 · selección */
+  /*
+   * LA BARRA ES CROMO, NO MODO OSCURO. Separa "dónde estoy" de "con qué
+   * trabajo" sin una sola línea divisoria más, y deja todo el contraste alto
+   * del blanco para el documento. Por eso es oscura también en tema claro.
+   */
   --nav-900: 15 34 51; /* #0F2233 · barra */
+  --nav-active: 27 60 86; /* #1B3C56 · ítem seleccionado */
+  --nav-accent: 127 168 196; /* #7FA8C4 · barra izquierda del activo, enlaces */
+  --nav-ink: 169 188 204; /* #A9BCCC · texto de ítem */
+  --nav-muted: 109 131 152; /* #6D8398 · etiqueta de grupo */
+  --nav-line: 255 255 255; /* en claro el borde no hace falta: ver regla 04 */
 
   /*
    * Sobre el primario va texto claro. En oscuro esto invierte, y es la ÚNICA
@@ -132,6 +142,11 @@
      * contraste de color.
      */
     --nav-900: 10 18 26; /* #0A121A */
+    --nav-active: 22 41 58; /* #16293A */
+    --nav-accent: 78 144 196; /* #4E90C4 */
+    --nav-ink: 147 163 184; /* #93A3B8 */
+    --nav-muted: 109 131 152; /* #6D8398 · el mismo: ya funciona en ambos */
+    --nav-line: 28 39 50; /* #1C2732 · el borde de la regla 04 */
 
     /*
      * Marca y semánticos SE ACLARAN, no se invierten. Verde y ámbar suben de

@@ -65,6 +65,52 @@ export const NAV_MODULES: NavModule[] = [
 ];
 
 /**
+ * Los cuatro grupos de la barra lateral, nombrados con VERBOS.
+ *
+ * POR QUÉ VERBOS Y NO CATEGORÍAS. El abogado llega con una intención, no con un
+ * módulo en mente: quiere producir un escrito, registrar lo que pasó en una
+ * audiencia, consultar una fuente. Nueve elementos planos lo obligaban a leer
+ * los nueve para encontrar el suyo; cuatro verbos lo llevan al grupo correcto
+ * antes de leer una sola etiqueta.
+ *
+ * EL ORDEN DENTRO DE "PRODUCIR" CAMBIÓ, y vale decir por qué. Orientación
+ * estaba primera en toda la barra para que quien no sabe qué preguntar
+ * encontrara esa puerta sin que nadie se la señalara. Con los grupos esa razón
+ * ya no aplica: "Producir" es el primer bloque, siempre visible, y Orientación
+ * es el segundo de dos elementos. Se encuentra igual, y Redacción —que es el
+ * uso diario— recupera el primer lugar.
+ */
+export interface NavGroup {
+  /** El verbo. Va en mono, versales y tracking amplio: es etiqueta, no título. */
+  titulo: string;
+  modulos: MainView[];
+  /**
+   * Los grupos plegables arrancan cerrados. Solo "Administrar", que se consulta
+   * una vez al mes y no debe competir con el trabajo diario.
+   */
+  plegable?: boolean;
+}
+
+export const NAV_GROUPS: NavGroup[] = [
+  { titulo: 'Producir', modulos: ['workspace', 'orientacion'] },
+  { titulo: 'Registrar', modulos: ['audiencias', 'entrevistas'] },
+  { titulo: 'Consultar', modulos: ['search', 'catalogo', 'tools'] },
+  { titulo: 'Administrar', modulos: ['audit', 'privacidad'], plegable: true }
+];
+
+/**
+ * Comprueba que los grupos cubren todos los módulos, sin sobras ni faltantes.
+ *
+ * Un módulo que se agregue a `NAV_MODULES` y no a un grupo desaparece de la
+ * barra: existe, funciona, y nadie lo encuentra. Es exactamente la clase de
+ * defecto que no lanza error — por eso se comprueba aquí y no se confía.
+ */
+export const modulosSinGrupo = (): MainView[] => {
+  const enGrupos = new Set(NAV_GROUPS.flatMap((g) => g.modulos));
+  return NAV_MODULES.filter((m) => !enGrupos.has(m.id)).map((m) => m.id);
+};
+
+/**
  * Falls back instead of throwing: reading `.icon` off an unknown view is what
  * took the header down before. An unnamed module is a bug, but a blank header
  * bar hides every other module too.

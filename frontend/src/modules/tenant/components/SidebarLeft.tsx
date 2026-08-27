@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
 import {
-  Scale,
   Building2,
-  ChevronDown,
   Check,
-  Shield,
-  Settings,
-  CreditCard,
+  ChevronDown,
+  ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  User } from 'lucide-react';
+  Settings,
+  Shield,
+  User
+} from 'lucide-react';
 import type { LawFirmTenant } from './Header';
 import type { MainView } from '../types';
-import { NAV_MODULES } from '../navigation';
+import { NAV_GROUPS, NAV_MODULES, navModule } from '../navigation';
+import { IureonMark } from './IureonMark';
 
 interface SidebarLeftProps {
   mainView: MainView;
@@ -28,7 +29,21 @@ interface SidebarLeftProps {
   onOpenRechargeModal?: () => void;
   isSuperUser?: boolean;
   isParticularUser?: boolean;
+  /**
+   * Trabajo pendiente de un humano, por módulo.
+   *
+   * SOLO ESO. El diseño es explícito: los dos únicos contadores de la barra
+   * significan transcripciones por revisar y actuaciones por curar, y ningún
+   * badge es decorativo. Mientras nadie los calcule de verdad, no se pintan —
+   * un "2" inventado en la barra es la misma clase de adorno que la pastilla
+   * verde de "Cifrado" que ya se quitó de aquí por afirmar lo que nadie medía.
+   */
+  pendientes?: Partial<Record<MainView, number>>;
 }
+
+/** Ancho expandido y ancho del riel. El riel es el mismo componente. */
+const ANCHO = 'w-[224px]';
+const RIEL = 'w-[56px]';
 
 export const SidebarLeft: React.FC<SidebarLeftProps> = ({
   mainView,
@@ -43,285 +58,259 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
   onOpenUserManagementModal,
   onOpenRechargeModal,
   isSuperUser = false,
-  isParticularUser = false
+  isParticularUser = false,
+  pendientes = {}
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [administrarAbierto, setAdministrarAbierto] = useState(false);
 
-  // Shared with HeaderTop. See navigation.ts: these were two lists that had
-  // drifted into six different names for the same six modules.
-  const navItems = NAV_MODULES;
+  const contexto = isSuperUser
+    ? { nombre: 'SuperUsuario', detalle: 'Acceso total · sin firma', Icono: Shield }
+    : isParticularUser
+    ? { nombre: 'Abogado particular', detalle: 'Uso personal · sin firma', Icono: User }
+    : { nombre: activeFirm.name, detalle: activeFirm.nit, Icono: Building2 };
+
+  /** Un módulo de la barra. El mismo en riel y expandida. */
+  const Item = ({ id }: { id: MainView }) => {
+    const { label, icon: Icon } = navModule(id);
+    const activo = mainView === id;
+    const pendiente = pendientes[id];
+
+    return (
+      <button
+        type="button"
+        onClick={() => setMainView(id)}
+        title={isCollapsed ? label : undefined}
+        aria-current={activo ? 'page' : undefined}
+        className={`flex w-full items-center gap-2.5 rounded-control px-2 py-[7px] text-left transition-colors ${
+          isCollapsed ? 'justify-center' : ''
+        } ${
+          activo
+            ? // La barra izquierda de 2px es la señal de "aquí estoy": sobrevive
+              // al riel comprimido, donde la etiqueta ya no está.
+              'bg-nav-active shadow-[inset_2px_0_0_rgb(var(--nav-accent))]'
+            : 'hover:bg-white/5'
+        }`}
+      >
+        <Icon
+          className={`h-[15px] w-[15px] shrink-0 ${activo ? 'text-white' : 'text-nav-ink'}`}
+          strokeWidth={2}
+        />
+        {!isCollapsed && (
+          <>
+            <span className={`truncate text-ui ${activo ? 'font-medium text-white' : 'text-nav-ink'}`}>
+              {label}
+            </span>
+            {pendiente !== undefined && pendiente > 0 && (
+              <span className="ml-auto shrink-0 rounded-full bg-white/10 px-1.5 font-mono text-[10px] font-semibold text-nav-ink">
+                {pendiente}
+              </span>
+            )}
+          </>
+        )}
+      </button>
+    );
+  };
 
   return (
     <aside
-      className={`bg-white border-r border-slate-200/80 flex flex-col h-full transition-all duration-300 relative select-none font-sans ${
-        isCollapsed ? 'w-[72px]' : 'w-64'
+      className={`flex h-full flex-col border-r border-nav-line bg-nav font-sans transition-[width] duration-200 ${
+        isCollapsed ? RIEL : ANCHO
       }`}
     >
-      {/* BRAND HEADER */}
-      <div className="p-4 border-b border-slate-200/80 flex items-center justify-between">
-        {/*
-          The logo goes home, which it never did.
-          
-          Now that a reload keeps the lawyer in the module they were reading,
-          leaving one has to be something they can actually ask for. Every
-          application puts that on its own mark, and this one looked like it did
-          without doing it.
-        */}
-        {!isCollapsed ? (
-          <button
-            type="button"
-            onClick={() => setMainView('workspace')}
-            className="flex items-center gap-3 text-left rounded-xl hover:opacity-80 transition-opacity"
-            title="Ir al workspace de redacción"
-          >
-            <div className="w-9 h-9 rounded-xl bg-blue-950 text-white flex items-center justify-center font-black text-sm shadow-xs border border-blue-900">
-              <Scale className="w-5 h-5 text-blue-200" />
-            </div>
-            <div>
-              <div className="font-black text-slate-900 tracking-tight text-base leading-none">IUREON</div>
-              <div className="text-[10px] font-semibold text-slate-400 mt-0.5">LegalTech Colombia</div>
-            </div>
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={() => setMainView('workspace')}
-            className="w-9 h-9 rounded-xl bg-blue-950 text-white flex items-center justify-center font-black text-sm mx-auto shadow-xs border border-blue-900 hover:opacity-80 transition-opacity"
-            title="Ir al workspace de redacción"
-          >
-            <Scale className="w-5 h-5 text-blue-200" />
-          </button>
-        )}
+      {/* ─── MARCA ─────────────────────────────────────────────────────────
+          El logo va a casa. Ahora que una recarga deja al abogado en el módulo
+          que estaba leyendo, salir de uno tiene que ser algo que pueda pedir. */}
+      <div className={`flex items-center gap-2.5 px-3 pb-3 pt-3.5 ${isCollapsed ? 'justify-center' : ''}`}>
+        <button
+          type="button"
+          onClick={() => setMainView('workspace')}
+          title="Ir a Redacción"
+          className="flex items-center gap-2.5 rounded-control transition-opacity hover:opacity-80"
+        >
+          <IureonMark size={22} mono className="shrink-0 text-nav-accent" />
+          {!isCollapsed && (
+            <span className="text-subtitle tracking-[0.02em] text-white">Iureon</span>
+          )}
+        </button>
       </div>
 
-      {/* FIRM SWITCHER DROPDOWN / USER CONTEXT */}
-      <div className="p-3 border-b border-slate-200/80 bg-slate-50/50">
-        {!isCollapsed ? (
-          <div className="relative">
-            {isSuperUser ? (
-              <button
-                onClick={() => setIsFirmDropdownOpen(!isFirmDropdownOpen)}
-                className="w-full p-2.5 bg-gradient-to-r from-slate-950 to-blue-950 text-white border border-blue-900/80 rounded-xl text-left hover:border-blue-700 transition-all shadow-xs flex items-center justify-between"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <Shield className="w-4 h-4 text-blue-300 flex-shrink-0" />
-                  <div className="truncate">
-                    <div className="font-bold text-white text-xs truncate flex items-center gap-1">
-                      <span>SuperUsuario Global</span>
-                    </div>
-                    <div className="text-[10px] text-blue-300/90 truncate font-semibold">Acceso Total (Sin Firma)</div>
-                  </div>
-                </div>
-                <ChevronDown className="w-4 h-4 text-blue-300 flex-shrink-0" />
-              </button>
-            ) : isParticularUser ? (
-              <button
-                onClick={() => setIsFirmDropdownOpen(!isFirmDropdownOpen)}
-                className="w-full p-2.5 bg-gradient-to-r from-teal-950 to-slate-900 text-white border border-teal-800/80 rounded-xl text-left hover:border-teal-600 transition-all shadow-xs flex items-center justify-between"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <User className="w-4 h-4 text-teal-300 flex-shrink-0" />
-                  <div className="truncate">
-                    <div className="font-bold text-white text-xs truncate flex items-center gap-1">
-                      <span>Abogado Particular</span>
-                    </div>
-                    <div className="text-[10px] text-teal-300/90 truncate font-semibold">Sin Firma (Uso Personal)</div>
-                  </div>
-                </div>
-                <ChevronDown className="w-4 h-4 text-teal-300 flex-shrink-0" />
-              </button>
-            ) : (
-              <button
-                onClick={() => setIsFirmDropdownOpen(!isFirmDropdownOpen)}
-                className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-left hover:border-slate-300 transition-all shadow-2xs flex items-center justify-between"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <Building2 className="w-4 h-4 text-blue-900 flex-shrink-0" />
-                  <div className="truncate">
-                    <div className="font-bold text-slate-900 text-xs truncate">{activeFirm.name}</div>
-                    <div className="text-[10px] font-mono text-slate-400 truncate">{activeFirm.nit}</div>
-                  </div>
-                </div>
-                <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0" />
-              </button>
-            )}
+      {/* ─── CONTEXTO: LA FIRMA ────────────────────────────────────────────
+          Debajo de la marca y en un renglón, no en una tarjeta con degradado.
+          Es contexto permanente: quién soy y con qué firma trabajo. */}
+      {!isCollapsed ? (
+        <div className="relative px-3 pb-3">
+          <button
+            type="button"
+            onClick={() => setIsFirmDropdownOpen(!isFirmDropdownOpen)}
+            className="flex w-full items-center gap-2 rounded-control px-1 py-1 text-left hover:bg-white/5"
+          >
+            <contexto.Icono className="h-3.5 w-3.5 shrink-0 text-nav-muted" />
+            <span className="min-w-0 flex-1 truncate text-meta text-nav-ink">{contexto.nombre}</span>
+            <ChevronDown className="h-3.5 w-3.5 shrink-0 text-nav-muted" />
+          </button>
 
-            {isFirmDropdownOpen && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-30 overflow-hidden py-1">
-                {isSuperUser ? (
-                  <div className="px-3 py-2 bg-slate-900 text-white text-[11px] font-bold border-b border-slate-800 flex items-center justify-between">
-                    <span>Contexto: SuperUsuario Global</span>
-                    <span className="text-[9px] bg-blue-500/30 text-blue-200 px-1.5 py-0.5 rounded uppercase">ROOT</span>
-                  </div>
-                ) : isParticularUser ? (
-                  <div className="px-3 py-2 bg-teal-950 text-white text-[11px] font-bold border-b border-teal-900 flex items-center justify-between">
-                    <span>Contexto: Abogado Particular</span>
-                    <span className="text-[9px] bg-teal-500/30 text-teal-200 px-1.5 py-0.5 rounded uppercase">SIN FIRMA</span>
-                  </div>
-                ) : null}
-                {sampleFirms.map((firm) => (
+          {isFirmDropdownOpen && (
+            <div className="surface-raised absolute left-3 right-3 top-full z-30 mt-1 overflow-hidden py-1">
+              {(isSuperUser || isParticularUser) && (
+                <p className="border-b border-line-100 px-3 py-2 text-label uppercase text-ink-500">
+                  {contexto.detalle}
+                </p>
+              )}
+              {sampleFirms.map((firm) => (
+                <button
+                  key={firm.id}
+                  onClick={() => {
+                    setActiveFirm(firm);
+                    setIsFirmDropdownOpen(false);
+                  }}
+                  className={`flex w-full items-center justify-between px-3 py-1.5 text-left text-ui hover:bg-canvas ${
+                    firm.id === activeFirm.id ? 'font-medium text-brand-700' : 'text-ink-700'
+                  }`}
+                >
+                  <span className="truncate">{firm.name}</span>
+                  {firm.id === activeFirm.id && (
+                    <Check className="ml-2 h-3.5 w-3.5 shrink-0 text-brand-700" />
+                  )}
+                </button>
+              ))}
+              {onOpenUserManagementModal && (
+                <div className="mt-1 border-t border-line-100 p-1">
                   <button
-                    key={firm.id}
                     onClick={() => {
-                      setActiveFirm(firm);
                       setIsFirmDropdownOpen(false);
+                      onOpenUserManagementModal();
                     }}
-                    className={`w-full px-3 py-2 text-left hover:bg-slate-50 transition-colors flex items-center justify-between text-xs ${
-                      firm.id === activeFirm.id ? 'bg-blue-50/50 text-blue-900 font-semibold' : 'text-slate-700'
-                    }`}
+                    className="btn-secondary btn-sm w-full"
                   >
-                    <span className="truncate">{firm.name}</span>
-                    {firm.id === activeFirm.id && <Check className="w-3.5 h-3.5 text-blue-900 flex-shrink-0 ml-2" />}
+                    <Shield className="h-3.5 w-3.5" />
+                    Firmas y usuarios
                   </button>
-                ))}
-                {onOpenUserManagementModal && (
-                  <div className="p-1 border-t border-slate-100 mt-1">
-                    <button
-                      onClick={() => {
-                        setIsFirmDropdownOpen(false);
-                        onOpenUserManagementModal();
-                      }}
-                      className="w-full px-2.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-lg text-[11px] flex items-center justify-center gap-1.5 transition-colors"
-                    >
-                      <Shield className="w-3.5 h-3.5 text-blue-300" />
-                      <span>Gestionar Firmas &amp; Usuarios</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        ) : (
-          <div
-            className={`w-10 h-10 rounded-xl border flex items-center justify-center mx-auto ${
-              isSuperUser
-                ? 'bg-slate-950 text-blue-300 border-blue-900'
-                : isParticularUser
-                ? 'bg-teal-950 text-teal-300 border-teal-800'
-                : 'bg-white text-blue-900 border-slate-200'
-            }`}
-            title={
-              isSuperUser
-                ? 'SuperUsuario Global (Sin Firma)'
-                : isParticularUser
-                ? 'Abogado Particular (Sin Firma)'
-                : activeFirm.name
-            }
-          >
-            {isSuperUser ? (
-              <Shield className="w-4 h-4 text-blue-300" />
-            ) : isParticularUser ? (
-              <User className="w-4 h-4 text-teal-300" />
-            ) : (
-              <Building2 className="w-4 h-4 text-blue-900" />
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* NAVIGATION ITEMS */}
-      <nav className="flex-1 p-3 space-y-1.5 overflow-y-auto">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = mainView === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => setMainView(item.id)}
-              className={`w-full flex items-center gap-3 p-2.5 rounded-xl transition-all duration-150 text-left ${
-                isActive
-                  ? 'bg-blue-950 text-white font-semibold shadow-xs'
-                  : 'text-slate-600 hover:bg-slate-100/70 hover:text-slate-900'
-              }`}
-              title={isCollapsed ? item.label : undefined}
-            >
-              <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-blue-300' : 'text-slate-500'}`} />
-              {!isCollapsed && (
-                <div className="min-w-0">
-                  <div className="text-xs font-semibold leading-tight">{item.label}</div>
-                  <div className={`text-[10px] leading-tight truncate ${isActive ? 'text-blue-200/80' : 'text-slate-400'}`}>
-                    {item.description}
-                  </div>
                 </div>
               )}
-            </button>
-          );
-        })}
-      </nav>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="flex justify-center pb-3" title={contexto.nombre}>
+          <contexto.Icono className="h-4 w-4 text-nav-muted" />
+        </div>
+      )}
 
-      {/* FOOTER ACCENTS */}
-      <div className="p-3 border-t border-slate-200/80 space-y-2">
-        {!isCollapsed ? (
-          <>
-            <button
-              onClick={onOpenRechargeModal || onOpenSubscriptionModal}
-              className="w-full p-3 bg-emerald-50/70 hover:bg-emerald-100/80 border border-emerald-200/80 rounded-xl text-left transition-colors flex items-center gap-3"
-            >
-              <div className="w-8 h-8 rounded-lg bg-emerald-700 text-white flex items-center justify-center flex-shrink-0">
-                <CreditCard className="w-4 h-4" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="font-bold text-slate-900 text-[12px]">Saldo de Recargas</div>
-                <div className="text-[10px] text-emerald-800 font-mono font-bold">
-                  ${(activeFirm.creditsBalance ?? 0).toLocaleString('es-CO')} COP
-                </div>
-              </div>
-            </button>
+      {/* ─── LOS CUATRO GRUPOS ─────────────────────────────────────────────*/}
+      <nav className="flex-1 overflow-y-auto px-3">
+        {NAV_GROUPS.map((grupo, i) => {
+          const abierto = !grupo.plegable || administrarAbierto;
 
-            <div className="flex items-center gap-2">
-              <button
-                onClick={onOpenBrandingModal}
-                className="flex-1 py-2 px-3 bg-white hover:bg-slate-50 border border-slate-200/80 rounded-xl text-slate-700 text-[12px] font-semibold flex items-center justify-center gap-1.5 transition-colors"
-              >
-                <Settings className="w-3.5 h-3.5 text-slate-400" />
-                <span>Membrete</span>
-              </button>
+          return (
+            <div key={grupo.titulo} className={i > 0 ? 'mt-4' : ''}>
+              {!isCollapsed &&
+                (grupo.plegable ? (
+                  <button
+                    type="button"
+                    onClick={() => setAdministrarAbierto((v) => !v)}
+                    className="flex w-full items-center gap-1 px-1.5 pb-[7px] text-left"
+                    aria-expanded={abierto}
+                  >
+                    <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-nav-muted">
+                      {grupo.titulo}
+                    </span>
+                    <ChevronRight
+                      className={`h-3 w-3 text-nav-muted transition-transform ${abierto ? 'rotate-90' : ''}`}
+                    />
+                  </button>
+                ) : (
+                  <p className="px-1.5 pb-[7px] font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-nav-muted">
+                    {grupo.titulo}
+                  </p>
+                ))}
 
               {/*
-                A green "Cifrado" pill sat here. It was static markup: no state
-                behind it, nothing measured, nothing to turn it off if encryption
-                were ever absent — and today the login verifies nothing at all,
-                so it asserted the opposite of the truth. A reassurance nobody
-                can revoke is not a status indicator, it is decoration that
-                happens to lie. It also made this corner the busiest part of the
-                rail, mixing a balance, a settings button and a security claim.
+                En el riel comprimido el grupo plegable se abre siempre: sin
+                etiquetas no hay forma de saber que hay algo escondido, y un
+                módulo invisible es un módulo que no existe.
               */}
+              {(abierto || isCollapsed) && (
+                <div className="space-y-0.5">
+                  {grupo.modulos.map((id) => (
+                    <Item key={id} id={id} />
+                  ))}
+                </div>
+              )}
             </div>
-          </>
-        ) : (
-          <div className="flex flex-col items-center gap-2">
+          );
+        })}
+
+        {/*
+          Un módulo que exista y no esté en ningún grupo desaparecería de la
+          barra en silencio. Aquí se ve, en desarrollo, antes que en producción.
+        */}
+        {import.meta.env.DEV &&
+          NAV_MODULES.filter((m) => !NAV_GROUPS.some((g) => g.modulos.includes(m.id))).map((m) => (
+            <p key={m.id} className="mt-2 px-1.5 text-meta text-unverified">
+              ⚠ {m.label} no está en ningún grupo
+            </p>
+          ))}
+      </nav>
+
+      {/* ─── SALDO ─────────────────────────────────────────────────────────
+          Vive en la barra y no en un menú: es lo único que puede detener el
+          trabajo a mitad de un término. */}
+      <div className="mt-auto px-3 pt-3">
+        <div className="border-t border-white/10 pt-3">
+          {!isCollapsed ? (
+            <>
+              <div className="flex items-baseline gap-1.5">
+                <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-nav-muted">
+                  Saldo
+                </span>
+                <button
+                  onClick={onOpenRechargeModal || onOpenSubscriptionModal}
+                  className="ml-auto text-[11px] font-medium text-nav-accent hover:underline"
+                >
+                  Recargar
+                </button>
+              </div>
+              {/* En mono porque es un dato, no interfaz. */}
+              <p className="mt-1 font-mono text-[15px] font-semibold text-white">
+                ${(activeFirm.creditsBalance ?? 0).toLocaleString('es-CO')}
+              </p>
+            </>
+          ) : (
             <button
               onClick={onOpenRechargeModal || onOpenSubscriptionModal}
-              className="w-10 h-10 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl flex items-center justify-center transition-colors text-emerald-800"
-              title="Recargar Saldo"
+              title={`Saldo $${(activeFirm.creditsBalance ?? 0).toLocaleString('es-CO')}`}
+              className="mx-auto block font-mono text-[10px] font-semibold text-nav-accent"
             >
-              <CreditCard className="w-4 h-4 text-emerald-700" />
+              $
             </button>
-            <button
-              onClick={onOpenBrandingModal}
-              className="w-10 h-10 bg-white hover:bg-slate-50 border border-slate-200/80 rounded-xl flex items-center justify-center transition-colors"
-              title="Membrete"
-            >
-              <Settings className="w-4 h-4 text-slate-500" />
-            </button>
-          </div>
-        )}
+          )}
+        </div>
+      </div>
 
-        {/* COLLAPSE TOGGLE — bottom rail */}
+      {/* ─── PIE: MEMBRETE Y RIEL ──────────────────────────────────────────*/}
+      <div className={`flex items-center gap-1 px-3 py-3 ${isCollapsed ? 'flex-col' : ''}`}>
+        <button
+          onClick={onOpenBrandingModal}
+          title="Membrete de la firma"
+          className={`flex items-center gap-2 rounded-control px-2 py-1.5 text-meta text-nav-ink hover:bg-white/5 ${
+            isCollapsed ? '' : 'flex-1'
+          }`}
+        >
+          <Settings className="h-3.5 w-3.5 shrink-0 text-nav-muted" />
+          {!isCollapsed && <span>Membrete</span>}
+        </button>
+
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className={`w-full flex items-center ${
-            isCollapsed ? 'justify-center' : 'justify-between'
-          } py-2 px-3 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-all duration-200 group`}
-          title={isCollapsed ? 'Expandir menú' : 'Colapsar menú'}
+          title={isCollapsed ? 'Expandir' : 'Comprimir'}
+          aria-label={isCollapsed ? 'Expandir la barra' : 'Comprimir la barra'}
+          className="rounded-control p-1.5 text-nav-muted hover:bg-white/5 hover:text-nav-ink"
         >
-          {!isCollapsed && (
-            <span className="text-[11px] font-medium text-slate-400 group-hover:text-slate-500">Colapsar</span>
-          )}
           {isCollapsed ? (
-            <ChevronsRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+            <ChevronsRight className="h-4 w-4" />
           ) : (
-            <ChevronsLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
+            <ChevronsLeft className="h-4 w-4" />
           )}
         </button>
       </div>

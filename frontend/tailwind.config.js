@@ -87,7 +87,14 @@ export default {
           700: token('brand-700'),
           800: token('brand-800')
         },
-        nav: token('nav-900'),
+        nav: {
+          DEFAULT: token('nav-900'),
+          active: token('nav-active'),
+          accent: token('nav-accent'),
+          ink: token('nav-ink'),
+          muted: token('nav-muted'),
+          line: token('nav-line')
+        },
         'on-brand': token('on-brand'),
 
         /* Los tres estados de una afirmación jurídica. */
