@@ -37,6 +37,27 @@ const MODEL = '@cf/baai/bge-m3';
  */
 const MAX_BATCH = 100;
 
+/**
+ * Cloudflare caps a request by TOKENS, not by how many texts it carries.
+ *
+ * `maxBatch` counts items, and 100 chunks of 2500 characters is about 82,000
+ * tokens against a 60,000-token window — the exact figure the API returned when
+ * it refused. It is not a concepto problem: any document past ~75 chunks hits
+ * it, and this corpus holds a two-million-character ruling.
+ *
+ * So the split happens HERE, where the limit lives. A caller cannot be expected
+ * to know one vendor's context window, and the one that guesses wrong fails
+ * halfway through a document with part of it already written.
+ *
+ * Measured against the API's own arithmetic: it counted 82,464 tokens for
+ * 250,000 characters, or 3.03 characters per token. Three is the conservative
+ * read of that, and the ceiling sits well under the window because the model's
+ * own output counts against it too.
+ */
+const CHARS_PER_TOKEN = 3;
+const MAX_TOKENS_PER_REQUEST = 45_000;
+const MAX_CHARS_PER_REQUEST = MAX_TOKENS_PER_REQUEST * CHARS_PER_TOKEN;
+
 interface CloudflareEmbeddingResponse {
   success?: boolean;
   errors?: { code?: number; message?: string }[];
@@ -66,6 +87,28 @@ export class CloudflareEmbeddingsProvider implements EmbeddingsProvider {
     // one the local provider applies. A silently shortened chunk embeds fine and
     // loses the end of a holding.
     const input = texts.map((text) => text.slice(0, MAX_CHUNK_CHARS));
+
+    // Split by accumulated characters before anything leaves. One text longer
+    // than the ceiling still goes alone rather than being dropped: it is
+    // already truncated to MAX_CHUNK_CHARS above, so it fits.
+    if (input.reduce((total, text) => total + text.length, 0) > MAX_CHARS_PER_REQUEST) {
+      const vectors: number[][] = [];
+      let group: string[] = [];
+      let chars = 0;
+
+      for (const text of input) {
+        if (group.length > 0 && chars + text.length > MAX_CHARS_PER_REQUEST) {
+          vectors.push(...(await this.embed(group)));
+          group = [];
+          chars = 0;
+        }
+        group.push(text);
+        chars += text.length;
+      }
+
+      if (group.length > 0) vectors.push(...(await this.embed(group)));
+      return vectors;
+    }
 
     const response = await fetch(
       `https://api.cloudflare.com/client/v4/accounts/${config.cloudflare.accountId}/ai/run/${MODEL}`,
