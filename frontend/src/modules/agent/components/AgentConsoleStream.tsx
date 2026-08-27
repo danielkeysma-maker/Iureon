@@ -28,7 +28,15 @@ export const AgentConsoleStream: React.FC<AgentConsoleStreamProps> = ({ logs, is
   }, [logs]);
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 border-t border-slate-200/80 bg-slate-50/50 font-mono text-[11px]">
+    /*
+      ALTURA ACOTADA, NO `flex-1`.
+
+      Tenía `flex-1` igual que el formulario de arriba, así que los dos crecían
+      a la vez y la consola terminaba pintándose ENCIMA del aviso de adjuntos —
+      dos textos superpuestos y ninguno legible. Ahora la consola ocupa lo suyo
+      y el formulario se queda con el resto.
+    */
+    <div className="flex max-h-[180px] shrink-0 flex-col border-t border-line-200 bg-canvas font-mono text-[11px]">
       <div className="px-4 py-2 flex items-center justify-between">
         <div className="flex items-center gap-1.5">
           <Terminal className="w-3 h-3 text-slate-400" />

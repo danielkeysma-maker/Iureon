@@ -140,7 +140,12 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
       />
 
       <section className="flex min-h-0 w-full flex-col border-r border-line-200 bg-surface lg:w-[364px] xl:w-[400px]">
-        <form onSubmit={generar} className="flex min-h-0 flex-1 flex-col p-4">
+        {/*
+          `overflow-y-auto`: en una pantalla baja el formulario se desplaza en
+          vez de derramarse sobre la consola. Antes ambos eran `flex-1` y se
+          pisaban.
+        */}
+        <form onSubmit={generar} className="flex min-h-0 flex-1 flex-col overflow-y-auto p-4">
           <div className="flex items-baseline gap-2">
             <h2 className="text-subtitle text-ink-900">Qué debe hacer este escrito</h2>
             <span className="ml-auto shrink-0 font-mono text-[11px] text-ink-400">⌘↵ generar</span>

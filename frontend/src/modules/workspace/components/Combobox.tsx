@@ -166,25 +166,43 @@ export const Combobox: React.FC<ComboboxProps> = ({
                   onChange(o.valor);
                   setAbierto(false);
                 }}
-                className={`flex w-full items-center gap-2 border-b border-line-100 px-3 py-2 text-left last:border-0 ${
+                title={o.detalle ? `${o.etiqueta} — ${o.detalle}` : o.etiqueta}
+                className={`flex w-full items-start gap-2 border-b border-line-100 px-3 py-2 text-left last:border-0 ${
                   o.valor === valor ? 'bg-brand-50' : 'hover:bg-canvas'
                 }`}
               >
-                <span
-                  className={`min-w-0 flex-1 truncate text-ui ${
-                    o.valor === valor ? 'font-medium text-brand-700' : 'text-ink-900'
-                  }`}
-                >
-                  {o.etiqueta}
+                {/*
+                  DOS RENGLONES, CON EL NOMBRE ARRIBA.
+                  
+                  Estaban en uno solo, nombre a la izquierda y detalle a la
+                  derecha, y el detalle llevaba `shrink-0`. Los términos de este
+                  catálogo NO son "4 meses": son párrafos —«Dentro de los diez
+                  (10) días siguientes a la presentación de la solicitud el juez
+                  proferirá el fallo…»— así que el detalle se comía la fila
+                  entera y aplastaba el nombre a cero. La lista mostraba términos
+                  donde debía mostrar actuaciones.
+                */}
+                <span className="min-w-0 flex-1">
+                  <span
+                    className={`block truncate text-ui ${
+                      o.valor === valor ? 'font-medium text-brand-700' : 'text-ink-900'
+                    }`}
+                  >
+                    {o.etiqueta}
+                  </span>
+                  {o.detalle && (
+                    <span className="mt-0.5 block truncate font-mono text-[11px] text-ink-500">
+                      {o.detalle}
+                    </span>
+                  )}
                 </span>
 
-                {o.detalle && (
-                  <span className="shrink-0 font-mono text-[11px] text-ink-500">{o.detalle}</span>
-                )}
-                {o.icono}
-                {o.valor === valor && (
-                  <Check className="h-3.5 w-3.5 shrink-0 text-brand-700" strokeWidth={2.6} />
-                )}
+                <span className="mt-0.5 flex shrink-0 items-center gap-1.5">
+                  {o.icono}
+                  {o.valor === valor && (
+                    <Check className="h-3.5 w-3.5 text-brand-700" strokeWidth={2.6} />
+                  )}
+                </span>
               </button>
             ))}
           </div>

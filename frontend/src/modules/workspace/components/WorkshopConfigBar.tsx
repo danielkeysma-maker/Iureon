@@ -115,6 +115,16 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
 
   const verificadas = catalogo.actuaciones.filter((a) => a.term.status === 'VERIFICADO').length;
 
+  /*
+   * CUÁNTAS HAY EN LA RAMA CON LOS OTROS ROLES.
+   *
+   * La lista está filtrada por quién firma, y eso confunde: Constitucional tiene
+   * 35 actuaciones pero un litigante ve 20, y la pantalla no decía por qué —
+   * parecía que faltaban. Ahora se dice, y se dice dónde están las otras.
+   */
+  const todasDeLaRama = useBranchActuacionesState(legalBranch);
+  const otrosRoles = Math.max(0, todasDeLaRama.nombres.length - catalogo.nombres.length);
+
   return (
     /*
       SIN `overflow` Y SIN `flex-wrap`, y las dos ausencias son deliberadas.
@@ -172,8 +182,19 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
           catalogo.estado === 'LISTA' ? (
             <>
               <b className="font-mono font-semibold text-ink-900">{verificadas}</b> de{' '}
-              <b className="font-mono font-semibold text-ink-900">{catalogo.nombres.length}</b>{' '}
-              actuaciones de esta rama tienen su término verificado contra la norma.
+              <b className="font-mono font-semibold text-ink-900">{catalogo.nombres.length}</b> con
+              término verificado contra la norma.
+              {otrosRoles > 0 && (
+                <>
+                  {' '}
+                  La lista muestra solo las que firma{' '}
+                  <b className="font-semibold text-ink-700">
+                    {ROLES.find((r) => r.valor === userRole)?.etiqueta}
+                  </b>
+                  ; hay <b className="font-mono font-semibold text-ink-900">{otrosRoles}</b> más en
+                  esta rama con otro rol.
+                </>
+              )}
             </>
           ) : (
             'Esta rama aún no tiene catálogo verificado.'

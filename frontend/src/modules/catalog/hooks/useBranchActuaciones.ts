@@ -31,9 +31,16 @@ export type BranchActuaciones =
   /** It answered, and there are none — or it could not be reached. */
   | { estado: 'VACIA'; nombres: []; actuaciones: [] };
 
+/**
+ * @param role Sin rol devuelve TODAS las de la rama.
+ *
+ * Hace falta para poder decirle al abogado por qué su lista es más corta que la
+ * rama: Constitucional tiene 35 actuaciones y un litigante ve 20, y sin esa
+ * comparación la pantalla parecía estar perdiendo actuaciones.
+ */
 export const useBranchActuacionesState = (
   branch: string,
-  role: ActuacionRole
+  role?: ActuacionRole
 ): BranchActuaciones => {
   const [estado, setEstado] = useState<BranchActuaciones>({
     estado: 'CARGANDO',
