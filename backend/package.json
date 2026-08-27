@@ -37,7 +37,7 @@
     "check:runway": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/admin/__checks__/runway.check.ts",
     "check:cupo": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/catalog/__checks__/orientacionQuota.check.ts",
     "check:prefs": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/preferences/__checks__/preferences.check.ts",
-    "check:drafts": "npx tsx src/modules/drafts/__checks__/drafts.check.ts"
+    "check:drafts": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/drafts/__checks__/drafts.check.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

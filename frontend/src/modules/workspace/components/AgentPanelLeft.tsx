@@ -264,15 +264,64 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
               no lo tenga no se pinta. */}
           {lookup.estado === 'ENCONTRADA' && actuacion && (
             <div className="mt-3 rounded-card border border-line-200">
-              <p className="border-b border-line-100 px-3 py-2 font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
+              <p className="flex items-baseline gap-2 border-b border-line-100 px-3 py-2 font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
                 Con qué se va a redactar
+                <span className="ml-auto normal-case tracking-normal text-verified">
+                  {obligatorias} obligatorias
+                </span>
               </p>
               <ul className="divide-y divide-line-100">
-                <Fundamento
-                  icono={Scale}
-                  titulo={`${obligatorias} secciones obligatorias`}
-                  detalle={actuacion.legalBasis}
-                />
+                {/*
+                  LAS SECCIONES, POR NOMBRE.
+                  
+                  Decía solo "4 secciones obligatorias", y ese número no le sirve
+                  a nadie: lo que el abogado necesita saber antes de generar es
+                  CUÁLES — hechos, pretensiones, fundamentos, notificaciones —
+                  porque es lo que va a revisar cuando el escrito salga. El dato
+                  estaba en la ficha y se estaba contando en vez de mostrando.
+                */}
+                <li className="px-3 py-2">
+                  <div className="flex items-start gap-2">
+                    <Scale className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink-400" />
+                    <div className="min-w-0">
+                      <p className="text-meta font-medium text-ink-900">
+                        Estructura exigida por la norma
+                      </p>
+                      <p className="mt-0.5 line-clamp-2 text-meta leading-[1.45] text-ink-500">
+                        {actuacion.legalBasis}
+                      </p>
+                    </div>
+                  </div>
+
+                  <ol className="mt-2 space-y-1 pl-5">
+                    {actuacion.requiredSections.map((sec) => (
+                      <li key={sec.n} className="flex items-baseline gap-1.5 text-meta">
+                        <span className="shrink-0 font-mono text-[10px] text-ink-400">{sec.n}.</span>
+                        <span className={sec.mandatory ? 'text-ink-900' : 'text-ink-500'}>
+                          {sec.name}
+                        </span>
+                        {/*
+                          El catálogo distingue lo que la norma EXIGE de lo que
+                          es costumbre, y esa diferencia decide si omitir una
+                          sección es un defecto o una elección de redacción.
+                        */}
+                        {sec.mandatory && (
+                          <span className="shrink-0 font-mono text-[9px] uppercase tracking-[0.08em] text-verified">
+                            oblig.
+                          </span>
+                        )}
+                        {sec.basis && (
+                          <span
+                            className="ml-auto shrink-0 truncate font-mono text-[10px] text-ink-400"
+                            title={sec.basis}
+                          >
+                            {sec.basis}
+                          </span>
+                        )}
+                      </li>
+                    ))}
+                  </ol>
+                </li>
 
                 {actuacion.competentAuthority && (
                   <Fundamento

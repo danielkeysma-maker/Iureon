@@ -212,23 +212,25 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
         propio escrito.
       */}
       {/*
-        `min-w-0` en el contenedor y truncado dentro: SIN ESO LA PÁGINA ENTERA SE
-        CORTA A LA DERECHA.
+        EL TÉRMINO VA CON ANCHO DURO, no solo con `min-w-0`.
 
-        El término de este catálogo no es "4 meses": es un párrafo —«Vencido el
-        traslado de cinco (5) días se decretan y practican las pruebas…»— y con
-        `whitespace-nowrap` sin límite de ancho empujaba el ancho de toda la
-        aplicación, sacando una barra de desplazamiento horizontal. Un dato de
-        contexto no puede decidir el ancho de la pantalla.
+        Un `inline-flex` no cede ancho como un bloque, así que el truncado no
+        llegaba a aplicarse y el texto seguía empujando la página: los términos
+        de este catálogo son párrafos —«La Sala de Selección, integrada por dos
+        magistrados designados por sorteo, selecciona sin motivación expresa…»—,
+        no etiquetas de tres palabras.
+
+        Con `max-w` explícito el corte ocurre siempre, y el texto completo vive
+        en el `title` y en la ficha de la izquierda, donde sí se puede leer.
       */}
-      <div className="ml-auto flex min-w-0 items-center gap-3.5 pl-3">
+      <div className="ml-auto flex min-w-0 items-center gap-3 pl-3">
         {lookup.estado !== 'CARGANDO' && (
-          <span className="hidden min-w-0 items-center gap-1.5 lg:inline-flex">
+          <span
+            className="hidden max-w-[280px] items-center gap-1.5 xl:flex"
+            title={actuacion?.term.description ?? undefined}
+          >
             <IconoEstado actuacion={actuacion} sinCatalogar={lookup.estado === 'SIN_CATALOGAR'} />
-            <span
-              className="min-w-0 truncate text-meta text-ink-700"
-              title={actuacion?.term.description ?? undefined}
-            >
+            <span className="min-w-0 truncate text-meta text-ink-700">
               {lookup.estado === 'SIN_CATALOGAR' ? (
                 <span className="text-unverified">Sin catalogar</span>
               ) : actuacion?.term.status === 'NO_CADUCA' ? (
@@ -237,22 +239,13 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
                 <span className="text-unverified">Término sin verificar</span>
               ) : (
                 <>
-                  Término{' '}
-                  <b className="font-mono font-semibold text-ink-900">
+                  <span className="text-ink-500">Término </span>
+                  <span className="font-mono font-semibold text-ink-900">
                     {actuacion?.term.description}
-                  </b>
+                  </span>
                 </>
               )}
             </span>
-          </span>
-        )}
-
-        {actuacion?.competentAuthority && (
-          <span
-            className="hidden max-w-[240px] truncate text-meta text-ink-500 xl:inline"
-            title={actuacion.competentAuthority}
-          >
-            {actuacion.competentAuthority}
           </span>
         )}
       </div>

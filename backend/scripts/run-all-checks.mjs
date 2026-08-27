@@ -48,6 +48,30 @@ console.log(
 );
 console.log('');
 
+/*
+ * LA COMPILACIÓN VA PRIMERO, y hace falta porque los checks corren con
+ * `--transpile-only`.
+ *
+ * Eso significa que NO comprueban tipos: un check con `import.meta.url` en un
+ * proyecto CommonJS pasa en verde aquí y tumba el despliegue en Vercel. Pasó
+ * exactamente así. Verde en local, rojo en producción, y la causa era un
+ * archivo de check — no código de producto.
+ */
+console.log('Compilando…');
+try {
+  execSync('npx tsc --noEmit', { encoding: 'utf8', stdio: 'pipe' });
+  console.log('  ok    compila');
+} catch (error) {
+  console.log('  FALLA la compilación — los checks no se corren:');
+  console.log(`${error.stdout ?? ''}${error.stderr ?? ''}`.trim());
+  console.log(
+    '\nUn check que no compila tumba el despliegue aunque pase en verde aquí.'
+  );
+  process.exitCode = 1;
+  process.exit(1);
+}
+console.log('');
+
 const fallidos = [];
 const rotos = [];
 

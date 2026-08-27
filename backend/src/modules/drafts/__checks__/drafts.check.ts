@@ -9,11 +9,22 @@
  * lo que dice.
  */
 import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { join } from 'node:path';
 
-const AQUI = dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'));
-const SERVICIO = readFileSync(join(AQUI, '..', 'drafts.service.ts'), 'utf8');
-const SQL = readFileSync(join(AQUI, '..', '..', '..', '..', '..', 'supabase', 'migration-borradores.sql'), 'utf8');
+/*
+ * `__dirname` y no `import.meta.url`.
+ *
+ * Este backend compila a CommonJS, y `import.meta` ahí es un error de
+ * compilación —no de ejecución—, así que `npm test` lo dejaba pasar (corre con
+ * `--transpile-only`) y `npm run build` lo tumbaba. Es decir: verde en local,
+ * rojo en el despliegue. El proyecto ya tenía escrito que `tsconfig.check.json`
+ * fuerza commonjs; esta es la segunda vez que muerde.
+ */
+const SERVICIO = readFileSync(join(__dirname, '..', 'drafts.service.ts'), 'utf8');
+const SQL = readFileSync(
+  join(__dirname, '..', '..', '..', '..', '..', 'supabase', 'migration-borradores.sql'),
+  'utf8'
+);
 
 let fallos = 0;
 const check = (n: string, ok: boolean, d = ''): void => {
