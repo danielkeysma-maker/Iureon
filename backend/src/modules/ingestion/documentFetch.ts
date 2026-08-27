@@ -1,6 +1,3 @@
-import { PDFParse } from 'pdf-parse';
-import WordExtractor from 'word-extractor';
-
 /**
  * Downloads a legal document and returns its readable text, or says why not.
  *
@@ -10,6 +7,20 @@ import WordExtractor from 'word-extractor';
  * three shapes the relatorías serve rulings in. Copying it would have produced a
  * second reader missing whichever of these lessons nobody remembered, and the
  * copy is the one nobody notices is broken.
+ *
+ * PDF AND WORD ARE LOADED LAZILY, AND THAT IS NOT AN OPTIMISATION. Importing
+ * them at the top of this file put them in the API's startup path the moment a
+ * route imported this module — and the whole backend stopped booting in
+ * production: every endpoint, `/ping` included, answered
+ * FUNCTION_INVOCATION_FAILED. Before this module existed they lived only in
+ * `scripts/ingestCorpus.ts`, which is never bundled into the serverless
+ * function.
+ *
+ * The API path never parses a PDF: fetching a ruling from the relatoría gets
+ * HTML. So the readers load only when a document actually turns out to be one,
+ * which in practice means only the ingestion scripts ever pay for them. It is
+ * the same shape as the rule already recorded here about keeping the
+ * `@huggingface/transformers` import inside its method.
  *
  * Every guard below exists because its absence put garbage in a corpus:
  *
@@ -140,6 +151,7 @@ export const fetchDocumentText = async (
 
   if (isPdf) {
     try {
+      const { PDFParse } = await import('pdf-parse');
       const parser = new PDFParse({ data: buffer });
       try {
         text = (await parser.getText()).text.replace(/\s+/g, ' ').trim();
@@ -151,6 +163,7 @@ export const fetchDocumentText = async (
     }
   } else if (buffer.subarray(0, 4).equals(OLE_SIGNATURE)) {
     try {
+      const { default: WordExtractor } = await import('word-extractor');
       text = (await new WordExtractor().extract(buffer)).getBody().replace(/\s+/g, ' ').trim();
     } catch (error) {
       return { ok: false, reason: `.doc ilegible (${(error as Error).message})` };
