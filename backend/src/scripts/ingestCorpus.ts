@@ -21,8 +21,7 @@
  *   - anything that cannot be fetched is SKIPPED and reported, never filled in.
  */
 import { readFileSync } from 'fs';
-import { PDFParse } from 'pdf-parse';
-import WordExtractor from 'word-extractor';
+import { fetchDocumentText } from '../modules/ingestion/documentFetch';
 import { join } from 'path';
 import { JurisprudenceIngestionPipeline } from '../modules/ingestion/jurisprudenceIngestion.service';
 import { embeddingsService } from '../modules/embeddings/embeddings.service';
@@ -50,106 +49,17 @@ const DRY = process.argv.includes('--dry');
 /** Minimum characters a fetched page must yield to count as a ruling body. */
 const MIN_TEXT = 2000;
 
-/**
- * A length floor alone is not enough, and that was a real hole here.
+/*
+ * El lector de documentos vive en `modules/ingestion/documentFetch.ts`.
  *
- * The Consejo de Estado serves rulings from `/uploads/sun/` as binary Word
- * files. Running an HTML tag-stripper over one produces thousands of characters
- * of compression noise — it sails past MIN_TEXT and lands in the corpus as if
- * it were the providencia. The gate has to check that what came back is TEXT,
- * not merely that there is a lot of it.
+ * Se movió allí cuando el corpus de doctrina necesitó exactamente el mismo:
+ * los sitios oficiales colombianos sirven conceptos en las mismas tres formas
+ * en que las relatorías sirven providencias — HTML en windows-1252, PDF y Word
+ * 97 binario. Copiarlo habría dejado un segundo lector al que le faltara
+ * cualquiera de estas lecciones, y la copia es la que nadie nota que está rota.
+ *
+ * Todas las guardas y su historia siguen documentadas en ese archivo.
  */
-/**
- * OLE compound-file signature — the container Word 97 `.doc` files live in.
- *
- * The Corte Suprema publishes a good part of its casación civil and penal this
- * way. Those rulings are not reachable as HTML or PDF at all, so without this
- * branch the corpus simply has a hole where they should be.
- *
- * Note what this is NOT: converting the file to PDF first. Anything able to
- * render a .doc into a PDF can already read its text, so the PDF step only adds
- * a layout pass whose page furniture — headers, footers, page numbers — comes
- * back interleaved into the prose we are about to chunk.
- */
-const OLE_SIGNATURE = Buffer.from([0xd0, 0xcf, 0x11, 0xe0]);
-
-const looksBinary = (raw: string): boolean => {
-  if (raw.startsWith('%PDF') || raw.startsWith('PK\x03\x04')) return true;
-  // Word 97 compound-file signature.
-  if (raw.charCodeAt(0) === 0xd0 && raw.charCodeAt(1) === 0xcf) return true;
-
-  const sample = raw.slice(0, 4000);
-  let control = 0;
-  for (let i = 0; i < sample.length; i++) {
-    const code = sample.charCodeAt(i);
-    if (code === 0 || (code < 9) || (code > 13 && code < 32) || code === 0xfffd) control++;
-  }
-  return control / Math.max(sample.length, 1) > 0.05;
-};
-
-/**
- * Decodes a page with the charset it declares instead of assuming UTF-8.
- *
- * This is not a nicety. The Colombian relatorías serve **windows-1252**, and
- * `buffer.toString('utf8')` turns every á, é, í, ó, ú and ñ in them into U+FFFD
- * — a replacement character, which is a permanent loss, not a display glitch.
- * It destroyed 193,742 characters across 23 providencias before anyone read the
- * stored text: byte `e1` is "á" in windows-1252 and simply is not valid UTF-8.
- *
- * What made it survive review is worth remembering: the SEARCH still worked.
- * bge-m3 ranked the mangled rulings first anyway, so every retrieval test
- * passed. Only a lawyer pasting `c�rceles` into a brief would have found it.
- *
- * The header usually omits the charset, so the document's own meta tag decides.
- * That tag is read as latin1 because ASCII survives every candidate encoding —
- * we only need the tag legible, not the document.
- */
-const decodeBody = (buffer: Buffer, contentType: string): string => {
-  const fromHeader = /charset=["']?([\w-]+)/i.exec(contentType)?.[1];
-  const fromMeta = /charset=["']?([\w-]+)/i.exec(buffer.subarray(0, 4096).toString('latin1'))?.[1];
-  const charset = (fromHeader ?? fromMeta ?? 'utf-8').toLowerCase();
-
-  try {
-    return new TextDecoder(charset).decode(buffer);
-  } catch {
-    // An unknown label is not a reason to lose the document; UTF-8 is still the
-    // best guess, and the mojibake guard below catches it if that guess is bad.
-    return buffer.toString('utf8');
-  }
-};
-
-/**
- * Share of characters lost to decoding, as a fraction.
- *
- * A correctly decoded ruling has zero. Spanish legal prose is roughly 3% accented
- * characters, so anything past a thousandth means the decoder picked wrong — and
- * refusing beats storing text a lawyer cannot quote.
- */
-const MAX_REPLACEMENT_RATIO = 0.001;
-
-const replacementRatio = (text: string): number =>
-  (text.match(/�/g)?.length ?? 0) / Math.max(text.length, 1);
-
-/**
- * Pulls readable text out of a relatoría page. Deliberately conservative: if
- * the result is too short the caller refuses the ruling rather than indexing a
- * navigation menu as if it were a holding.
- */
-const extractText = (html: string): string =>
-  html
-    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
-    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&aacute;/g, 'á')
-    .replace(/&eacute;/g, 'é')
-    .replace(/&iacute;/g, 'í')
-    .replace(/&oacute;/g, 'ó')
-    .replace(/&uacute;/g, 'ú')
-    .replace(/&ntilde;/g, 'ñ')
-    .replace(/&[a-z]+;/gi, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
 
 /**
  * Providencias already present in SYSTEM_CORPUS, by `file_name`.
@@ -240,102 +150,18 @@ async function main(): Promise<void> {
       continue;
     }
 
-    if (!/^https?:\/\//.test(ruling.url ?? '')) {
-      skipped.push(`${ruling.numeroProvidencia}: sin URL http(s)`);
+    // Toda la lectura —HTTP, PDF, Word 97, charset declarado y la guarda de
+    // mojibake— vive en `fetchDocumentText`. El piso de 2000 caracteres se pasa
+    // desde aquí porque el cuerpo de una providencia y el de un concepto no
+    // miden lo mismo, y un piso afinado para uno rechaza al otro en silencio.
+    const fetched = await fetchDocumentText(ruling.url ?? '', { minText: MIN_TEXT });
+
+    if (!fetched.ok) {
+      skipped.push(`${ruling.numeroProvidencia}: ${fetched.reason}`);
       continue;
     }
 
-    let fullText: string;
-
-    try {
-      const response = await fetch(ruling.url, {
-        headers: { 'User-Agent': 'IureonLegalTechBot/1.0 (+https://iureon.co)' }
-      });
-
-      if (!response.ok) {
-        skipped.push(`${ruling.numeroProvidencia}: HTTP ${response.status}`);
-        continue;
-      }
-
-      // A 200 proves nothing. The Corte Constitucional's relatoría answers 200
-      // with 32 characters for ruling numbers that do not exist — byte for byte
-      // the same response a deliberately fake number gets. So the body decides,
-      // not the status.
-      const contentType = response.headers.get('content-type') ?? '';
-      const buffer = Buffer.from(await response.arrayBuffer());
-      const isPdf = /application\/pdf/i.test(contentType) || buffer.subarray(0, 4).toString() === '%PDF';
-
-      if (isPdf) {
-        // The Corte Suprema publishes casación as PDF: half this corpus is
-        // unreachable without reading them. Parsing beats the alternative of
-        // silently indexing only the courts that happen to serve HTML.
-        try {
-          const parser = new PDFParse({ data: buffer });
-          try {
-            fullText = (await parser.getText()).text.replace(/\s+/g, ' ').trim();
-          } finally {
-            await parser.destroy();
-          }
-        } catch (error) {
-          skipped.push(`${ruling.numeroProvidencia}: PDF ilegible (${(error as Error).message})`);
-          continue;
-        }
-      } else if (buffer.subarray(0, 4).equals(OLE_SIGNATURE)) {
-        // Read straight out of the OLE `WordDocument` stream. One conversion,
-        // no external binary, and it runs on a server — unlike automating Word.
-        try {
-          fullText = (await new WordExtractor().extract(buffer))
-            .getBody()
-            .replace(/\s+/g, ' ')
-            .trim();
-        } catch (error) {
-          skipped.push(`${ruling.numeroProvidencia}: .doc ilegible (${(error as Error).message})`);
-          continue;
-        }
-      } else {
-        const raw = buffer.toString('utf8');
-
-        if (looksBinary(raw)) {
-          // PDF and Word 97 are handled above, so whatever this is, we have no
-          // reader for it. Running the HTML stripper over a binary yields
-          // thousands of characters of noise that sail past MIN_TEXT and land in
-          // the corpus looking like prose — the failure that has to stay loud.
-          skipped.push(
-            `${ruling.numeroProvidencia}: binario sin lector (ni PDF ni Word 97); extraerlo daría ruido con apariencia de texto`
-          );
-          continue;
-        }
-
-        fullText = extractText(decodeBody(buffer, contentType));
-      }
-    } catch (error) {
-      skipped.push(`${ruling.numeroProvidencia}: ${(error as Error).message}`);
-      continue;
-    }
-
-    // A page that yields almost nothing is a redirect, a login wall or a menu.
-    // Indexing it would put the site's navigation into the corpus under a
-    // providencia's name.
-    if (fullText.length < MIN_TEXT) {
-      skipped.push(
-        `${ruling.numeroProvidencia}: la página rindió ${fullText.length} caracteres (mínimo ${MIN_TEXT})`
-      );
-      continue;
-    }
-
-    // Length says the text arrived; this says it arrived READABLE. Both are
-    // needed, and only the second would have caught the windows-1252 defect:
-    // the mangled rulings were long, ranked first in every search, and passed
-    // every test — the loss only shows when a human reads a quote.
-    const ratio = replacementRatio(fullText);
-
-    if (ratio > MAX_REPLACEMENT_RATIO) {
-      skipped.push(
-        `${ruling.numeroProvidencia}: ${(ratio * 100).toFixed(1)}% del texto son caracteres de reemplazo; ` +
-          'la codificación declarada no corresponde y las tildes se perderían de forma irrecuperable'
-      );
-      continue;
-    }
+    const fullText = fetched.text;
 
     console.log(`  ${ruling.numeroProvidencia} — ${fullText.length} caracteres`);
 

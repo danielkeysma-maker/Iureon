@@ -1,0 +1,181 @@
+{
+  "entidad": "Departamento Administrativo de la Función Pública (DAFP)",
+  "verified_at": "2026-08-27",
+  "alcance": "Ley 1437 de 2011 (CPACA), art. 28, en el texto del art. 1 de la Ley 1755 de 2015: los conceptos no son de obligatorio cumplimiento ni ejecución. Cada concepto listado cierra invocando esa norma.",
+  "metodo_de_vigencia": "El Gestor Normativo no marca doctrina superada (el bloque 'Vigencias(n)' aparece siempre en 0). La comprobación se hizo con el buscador oficial https://www.funcionpublica.gov.co/dafpIndexerBGN/norma/index filtrado por filtroTipoDocumento=Concepto y filtroAnio, buscando conceptos posteriores del DAFP sobre el mismo punto. Se prefirieron los conceptos más recientes publicados (2026) para minimizar el riesgo de superación.",
+  "conceptos": [
+    {
+      "numero": "Concepto 042881 de 2026 (radicado 20266000042881)",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2026-01-30",
+      "rama": "LABORAL_ADMINISTRATIVO",
+      "tema": "Intereses a las cesantías del servidor público: fecha límite de pago y arranque de la prescripción",
+      "pregunta": "Hasta qué fecha debe el empleador público pagar los intereses a las cesantías de los servidores vinculados con posterioridad al 31 de diciembre de 1996, y desde cuándo corre el término para reclamarlos.",
+      "tesis": "En el régimen anualizado el empleador paga directamente al servidor el 12% anual de intereses sobre las cesantías causadas. La normativa no fija fecha expresa, pero por aplicación analógica de la Ley 52 de 1975 el plazo máximo es el 31 de enero de cada año. Desde el 1 de febrero la obligación es exigible y empieza a correr la prescripción para reclamarla. Para los servidores del orden territorial el Fondo Nacional del Ahorro no reconoce esos intereses cuando los recursos no estuvieron en su poder, por el artículo 193 del Decreto Ley 019 de 2012, de modo que responde la entidad empleadora.",
+      "cita_verbatim": "\"Aunque la normativa vigente no establece expresamente la fecha límite para el pago de dichos intereses, mediante la aplicación analógica de la Ley 52 de 1975 se concluye que el plazo máximo para su pago es el 31 de enero de cada año. En consecuencia, a partir del 1 de febrero la obligación se torna exigible y comienza a contarse el término de prescripción para reclamar su reconocimiento.\"",
+      "reloj_del_cliente": "El plazo del 31 de enero obliga a la ENTIDAD. El que corre contra el servidor es la prescripción, que arranca el 1 de febrero.",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Búsqueda oficial en el buscador del Gestor Normativo, filtroTipoDocumento=Concepto, consulta 'cesantías' con filtroAnio=2026: los conceptos de 2026 del tema PRESTACIONES SOCIALES son 069491, 063381, 008521, 042881, 026481, 018271, 001701 y 162431, y ninguno posterior vuelve sobre la fecha límite de los intereses. Bloque 'Vigencias(0)' en la ficha. https://www.funcionpublica.gov.co/dafpIndexerBGN/norma/index?find=FindNext&query=cesant%C3%ADas&filtroTipoDocumento=Concepto&filtroAnio=2026",
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=274956"
+    },
+    {
+      "numero": "Concepto 065361 de 2026 (radicado 20266000065361)",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2026-02-11",
+      "rama": "LABORAL_ADMINISTRATIVO",
+      "tema": "Encargo por vacancia temporal: hasta cuándo se extiende y si da derecho a la remuneración del empleo encargado",
+      "pregunta": "Si el encargo conferido durante la incapacidad del titular se mantiene cuando a esa incapacidad siguen las vacaciones del titular, y si el encargado tiene derecho al salario del empleo que ejerce.",
+      "tesis": "El encargo por vacancia temporal dura lo que dure esa vacancia concreta: hay que leer el acto administrativo que lo confirió, y si se otorgó para una situación administrativa determinada no puede extenderse a otra distinta. Además, el encargado por ausencia temporal del titular no tiene derecho a la remuneración del empleo que desempeña temporalmente mientras el titular la siga devengando; el pago de la diferencia salarial queda condicionado a lo que diga el acto administrativo.",
+      "cita_verbatim": "\"en caso de vacancia temporal, el encargo se efectuará durante el término de ésta, de manera que, será necesario revisar el acto administrativo mediante el cual se confirió, para establecer hasta cuando se extiende; en este sentido cabe precisar que, si se otorgó para una situación administrativa en particular, no resulta viable extenderlo a una distinta.\"",
+      "reloj_del_cliente": "Cita verbatim de apoyo sobre el salario: \"Los servidores públicos que sean encargados, por ausencia temporal del titular, para asumir empleos diferentes de aquellos para los cuales han sido nombrados, no tendrán derecho al pago de la remuneración señalada para el empleo que se desempeña temporalmente, mientras su titular la esté devengando\".",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Búsqueda oficial filtroTipoDocumento=Concepto, query 'encargo', filtroAnio=2026: siete conceptos de 2026 (065361, 061531, 056281, 037471, 015171, 062931, 055691) y este del 11-02-2026 es el más reciente sobre la duración del encargo por vacancia temporal. Bloque 'Vigencias(0)'. https://www.funcionpublica.gov.co/dafpIndexerBGN/norma/index?find=FindNext&query=encargo&filtroTipoDocumento=Concepto&filtroAnio=2026",
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=274376"
+    },
+    {
+      "numero": "Concepto 074971 de 2026 (radicado 20266000074971)",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2026-02-18",
+      "rama": "LABORAL_ADMINISTRATIVO",
+      "tema": "Reclamación por derecho preferencial de encargo: instancias y términos",
+      "pregunta": "Quién resuelve la reclamación del servidor de carrera por el derecho preferencial de encargo, en qué plazo, y cómo se surte la segunda instancia.",
+      "tesis": "La reclamación la conoce en primera instancia la Comisión de Personal de la entidad. Como la Ley 909 de 2004 y el Decreto Ley 760 de 2005 no fijan término, se aplica supletoriamente el CPACA: quince (15) días para resolver. Contra esa decisión procede reclamación en segunda instancia ante la Comisión Nacional del Servicio Civil, que debe presentarse ante la Comisión de Personal de la entidad dentro de los diez (10) días hábiles siguientes a la notificación de la decisión de primera instancia.",
+      "cita_verbatim": "\"procede reclamación en segunda instancia ante la Comisión Nacional del Servicio Civil, la cual deberá ser presentada ante la Comisión de Personal de la entidad, dentro de los diez (10) días hábiles siguientes a la notificación de la decisión de primera instancia, conforme a lo dispuesto en el Código de Procedimiento Administrativo y de lo Contencioso Administrativo, aplicable por remisión del artículo 5 del Decreto Ley 760 de 2005.\"",
+      "reloj_del_cliente": "Los 15 días son de la ENTIDAD para resolver. El plazo que extingue el derecho del servidor son los 10 días hábiles para la segunda instancia, y se presenta ante la Comisión de Personal, no ante la CNSC. El DAFP se declaró sin competencia para decir si esos 10 días corren desde el vencimiento del plazo cuando no hubo notificación: eso lo define la CNSC.",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Búsqueda oficial filtroTipoDocumento=Concepto, query 'derechos de carrera', filtroAnio=2026: conceptos de 2026 del tema CARRERA ADMINISTRATIVA (115131, 094831, 074971, 065431, 024801, 473511, 120331); este del 18-02-2026 es el único sobre reclamación ante la Comisión de Personal por derecho preferencial de encargo. Bloque 'Vigencias(0)'. https://www.funcionpublica.gov.co/dafpIndexerBGN/norma/index?find=FindNext&query=derechos+de+carrera&filtroTipoDocumento=Concepto&filtroAnio=2026",
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=274876"
+    },
+    {
+      "numero": "Concepto 058771 de 2026 (radicado 20266000058771)",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2026-02-06",
+      "rama": "LABORAL_ADMINISTRATIVO",
+      "tema": "Prescripción de las vacaciones del servidor público",
+      "pregunta": "Si las vacaciones del empleado público se pierden y en qué término prescribe el derecho a disfrutarlas o a que se compensen en dinero.",
+      "tesis": "Las vacaciones no se pierden por no disfrutarse: se pierden porque el derecho prescribe. El disfrute de cada período, o su compensación en dinero, prescribe en cuatro (4) años contados desde la causación del derecho, es decir desde el día en que se cumple el año de servicio, o desde la fecha del aplazamiento o interrupción consignada en el acto administrativo. El aplazamiento interrumpe la prescripción siempre que medie providencia, y solo puede aplazarse hasta las vacaciones correspondientes a dos años de servicio.",
+      "cita_verbatim": "\"el disfrute de cada periodo de vacaciones o la respectiva compensación en dinero, prescribe en cuatro (04) años, contados a partir de la fecha en que se haya causado el derecho – fecha en que se hicieron exigibles, o a partir de la fecha del aplazamiento consagrado en el respectivo acto administrativo.\"",
+      "reloj_del_cliente": "Los 4 años corren contra el SERVIDOR y arrancan el día en que cumple el año de servicio, no el día en que la entidad le niega las vacaciones. Verbatim de la ficha oficial: \"el inicio del conteo de la prescripción corresponde al día en que se cumple el año de servicio y nace el derecho (causación); desde este momento corren los 4 años para reclamarlas.\"",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Búsqueda oficial filtroTipoDocumento=Concepto, query 'vacaciones', filtroAnio=2026: cinco conceptos de 2026 (058771, 742982, 062621, 050101 y 050101), y este del 06-02-2026 es el que fija la prescripción; ninguno posterior la modifica. Bloque 'Vigencias(0)'. https://www.funcionpublica.gov.co/dafpIndexerBGN/norma/index?find=FindNext&query=vacaciones&filtroTipoDocumento=Concepto&filtroAnio=2026",
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=274018"
+    },
+    {
+      "numero": "Concepto 062381 de 2026 (radicado 20266000062381)",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2026-02-10",
+      "rama": "LABORAL_ADMINISTRATIVO",
+      "tema": "Licencia no remunerada para adelantar estudios: requisitos, duración y modalidad virtual",
+      "pregunta": "Si procede conceder licencia no remunerada para estudios cuando el programa académico es virtual, y bajo qué requisitos y por cuánto tiempo.",
+      "tesis": "La licencia no remunerada para estudios se concede por un término no superior a doce (12) meses, prorrogable por un período igual hasta por dos veces. Su otorgamiento es potestativo del empleador, condicionado a que no se afecte la prestación del servicio y a que el servidor lleve al menos un (1) año de servicio continuo en la entidad, acredite nivel sobresaliente en la calificación del último año, acredite la duración del programa y adjunte copia de la matrícula. El Decreto 1083 de 2015 no exige que los estudios sean presenciales, de modo que la modalidad virtual no es obstáculo. No es un derecho automático del servidor.",
+      "cita_verbatim": "\"Se podrá conceder una licencia no remunerada para adelantar estudios por un término que no podrá ser superior a doce (12) meses, prorrogable por un período igual hasta por dos veces, cuyo otorgamiento es potestativo del empleador siempre que no se afecte la prestación del servicio\"",
+      "reloj_del_cliente": "El plazo es un tope de la licencia, no un término procesal. Lo que puede costarle el derecho al servidor es el requisito previo: un año de servicio continuo y nivel sobresaliente en la última calificación.",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Búsqueda oficial filtroTipoDocumento=Concepto, query 'licencia no remunerada', filtroAnio=2026: cinco conceptos de 2026 (062381, 043111, 049431, 033771, 019971) y este del 10-02-2026 es el más reciente sobre licencia para estudios. Bloque 'Vigencias(0)'. https://www.funcionpublica.gov.co/dafpIndexerBGN/norma/index?find=FindNext&query=licencia+no+remunerada&filtroTipoDocumento=Concepto&filtroAnio=2026",
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=274019"
+    },
+    {
+      "numero": "Concepto 041721 de 2026 (radicado 20266000041721)",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2026-01-30",
+      "rama": "LABORAL_ADMINISTRATIVO",
+      "tema": "Prima técnica para el servidor que ejerce un cargo directivo en encargo",
+      "pregunta": "Si es procedente otorgar prima técnica a servidores que cumplen los requisitos del cargo directivo pero no están nombrados en propiedad, sino en encargo.",
+      "tesis": "El único caso en que es viable otorgar prima técnica a un servidor en encargo es la prima técnica automática del Decreto 1624 de 1991. Puede percibirse siempre que el titular del empleo no la esté cobrando, y se suspenden las demás primas técnicas que el encargado viniera devengando, conforme a los Decretos 611 de 2025 y 1624 de 1991. Las demás modalidades de prima técnica no proceden en encargo.",
+      "cita_verbatim": "\"para el único caso en el cual es viable otorgar prima técnica a un servidor público en encargo es cuando estamos frente a la figura de la Prima Técnica Automática consagrada en el Decreto 1624 de 1991.\"",
+      "reloj_del_cliente": "No hay plazo. El límite es sustantivo: el encargado que reclame otra modalidad de prima técnica no tiene derecho, y la automática está condicionada a que el titular no la esté devengando.",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Búsqueda oficial filtroTipoDocumento=Concepto, query 'prima de servicios' y 'prima técnica', filtroAnio=2026: los conceptos de 2026 del tema REMUNERACIÓN son 185271, 071821, 066321, 041721, 033171 y 011611; ninguno posterior vuelve sobre la prima técnica en encargo. Bloque 'Vigencias(0)'. https://www.funcionpublica.gov.co/dafpIndexerBGN/norma/index?find=FindNext&query=prima+de+servicios&filtroTipoDocumento=Concepto&filtroAnio=2026",
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=274356"
+    },
+    {
+      "numero": "Concepto 059181 de 2026 (radicado 20266000059181)",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2026-02-06",
+      "rama": "ADMINISTRATIVO",
+      "tema": "Conflicto de intereses del servidor público: no es taxativo y se valora caso por caso",
+      "pregunta": "Cómo se determina si un servidor público está incurso en conflicto de intereses, y si las causales están enumeradas en la ley como ocurre con las inhabilidades.",
+      "tesis": "A diferencia de las inhabilidades e incompatibilidades, el conflicto de intereses no es taxativo: las conductas que lo originan no están expresamente determinadas en la norma, de modo que exige el análisis de cada caso concreto. Corresponde a la administración, al servidor o al interesado establecer si concurre de forma antagónica el interés particular con el interés público en la toma de una decisión; si concurre, quien deba decidir está obligado a declararse impedido.",
+      "cita_verbatim": "\"El conflicto de intereses, al contrario de las inhabilidades e incompatibilidades no son taxativas; es decir, las acciones que lo originan no se encuentran expresamente determinadas en las normas, por lo tanto, requiere para su tratamiento del análisis de cada caso concreto\"",
+      "reloj_del_cliente": "No hay término. El deber es de oportunidad: quien debe decidir está obligado a declararse impedido ANTES de decidir. Verbatim: \"en cuyo caso quien deba tomarla estará obligado a declararse impedido para hacerlo.\"",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Búsqueda oficial filtroTipoDocumento=Concepto, query 'conflicto de intereses', filtroAnio=2026: cuatro conceptos de 2026 (059571, 059181, 059271, 042881). El bloque 'Conceptos' de la ficha lista los posteriores del mismo tema INHABILIDADES E INCOMPATIBILIDADES (018391, 018561, 065901, 059271, 075601) y ninguno rectifica el carácter no taxativo del conflicto de intereses. Bloque 'Vigencias(0)'. https://www.funcionpublica.gov.co/dafpIndexerBGN/norma/index?find=FindNext&query=conflicto+de+intereses&filtroTipoDocumento=Concepto&filtroAnio=2026",
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=274516"
+    },
+    {
+      "numero": "Concepto 059271 de 2026 (radicado 20266000059271)",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2026-02-06",
+      "rama": "ADMINISTRATIVO",
+      "tema": "Incentivos educativos a favor de quien decide sobre ellos: conflicto de intereses en el sistema de estímulos",
+      "pregunta": "Si es posible destinar recursos del presupuesto de la Personería para financiar educación formal (especialización o maestría) del propio Personero, bajo la figura de incentivos educativos.",
+      "tesis": "Los programas de bienestar e incentivos educativos hacen parte del sistema de estímulos de los servidores públicos y pueden incluir financiación de educación formal. Pero cuando el eventual beneficiario es a la vez la autoridad que adopta la decisión administrativa, deben observarse las reglas de conflicto de intereses y la declaratoria de impedimento. El régimen de inhabilidades e incompatibilidades se interpreta de manera restrictiva, por su carácter limitativo del derecho de acceso a la función pública. El DAFP se declaró sin competencia para calificar la legalidad del caso concreto: eso corresponde a la entidad.",
+      "cita_verbatim": "\"cuando el eventual beneficiario es también la autoridad que adopta las decisiones administrativas, deben observarse las reglas sobre conflicto de intereses y declaratoria de impedimento para garantizar la transparencia y la prevalencia del interés general.\"",
+      "reloj_del_cliente": "No hay plazo, pero sí una advertencia de competencia que importa: el DAFP no autoriza ni valida la destinación presupuestal, de modo que un concepto favorable de Función Pública no blinda la decisión frente al control fiscal o disciplinario.",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Búsqueda oficial filtroTipoDocumento=Concepto, query 'conflicto de intereses', filtroAnio=2026: es uno de los cuatro conceptos de 2026 sobre el subtema y no hay posterior sobre incentivos educativos al nominador. Bloque 'Vigencias(0)'.",
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=275176"
+    },
+    {
+      "numero": "Concepto 623911 de 2024 (radicado 20243000623911)",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2024-10-21",
+      "rama": "LABORAL_ADMINISTRATIVO",
+      "tema": "Teletrabajo del empleado público: no es un derecho ni una obligación, y se puede terminar unilateralmente",
+      "pregunta": "Si una entidad pública puede restringir el acceso al teletrabajo a los funcionarios que residan en la ciudad de la casa matriz, limitarlo a ciertos días, y cómo se garantiza la igualdad de acceso en todo el territorio nacional.",
+      "tesis": "El teletrabajo es una modalidad de organización laboral basada en la voluntariedad: es la suma de las voluntades de la administración y del empleado. No es un derecho del servidor ni una obligación de la entidad; ninguna está obligada a implementarlo y el empleado no está obligado a aceptarlo. La entidad debe evaluar previamente si las funciones del empleo son susceptibles de desarrollarse así y si el servidor reúne las competencias. Es jurídicamente viable extenderlo a servidores que residan en áreas metropolitanas o zonas conurbadas, siempre que la política institucional lo contemple y exista cobertura de la ARL. Cualquiera de las partes puede darlo por terminado unilateralmente, caso en el cual el servidor vuelve a las instalaciones físicas de la entidad.",
+      "cita_verbatim": "\"el teletrabajo no es un derecho, sino una modalidad laboral de trabajo, que depende del acuerdo al que llegue el servidor y entidad de manera voluntaria, por tanto, en ningún caso la entidad está obligada a implementarlo, por su parte, el empleado no está obligado a aceptarlo. Igualmente, las partes tienen la facultad para dar por terminado de forma unilateral el teletrabajo\"",
+      "reloj_del_cliente": "No hay término, y ahí está el riesgo: la terminación unilateral no exige preaviso ni causal, de modo que el servidor no tiene un plazo que defender sino una situación revocable en cualquier momento.",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Es el concepto MÁS RECIENTE del DAFP sobre teletrabajo. Búsqueda oficial filtroTipoDocumento=Concepto, query 'teletrabajo': 45 conceptos, ninguno posterior a octubre de 2024; con filtroAnio=2026 y filtroAnio=2025 el buscador devuelve 0 resultados para 'teletrabajo'. Bloque 'Vigencias(0)'. https://www.funcionpublica.gov.co/dafpIndexerBGN/norma/index?find=FindNext&query=teletrabajo&filtroTipoDocumento=Concepto",
+      "nota_de_riesgo": "Es el único de este archivo que no es de 2026. Se incluye porque la búsqueda oficial acredita que el DAFP no ha vuelto a pronunciarse sobre teletrabajo desde entonces, no porque no se haya buscado.",
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=277516"
+    },
+    {
+      "numero": "Concepto 044771 de 2026 (radicado 20266000044771)",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2026-02-02",
+      "rama": "LABORAL_ADMINISTRATIVO",
+      "tema": "Comisión de estudios: es facultativa del empleador, y qué pasa si la entidad no responde",
+      "pregunta": "Si el empleado público tiene derecho a que se le conceda comisión de estudios, por qué motivos puede negarse, y qué puede hacer si llega la fecha de inicio de los estudios sin respuesta de la entidad.",
+      "tesis": "El empleado puede solicitar comisión de estudios para formación, capacitación o perfeccionamiento en las funciones propias del empleo del que es titular o en relación con las competencias de la entidad, pero la entidad NO está obligada a conferirla: es facultativo del empleador. Entre los motivos de negativa está el incumplimiento de los requisitos legalmente establecidos. Si la entidad no responde antes del inicio de los estudios, el DAFP se declara sin competencia para indicar el remedio: corresponde al empleado escoger las acciones judiciales o administrativas que estime pertinentes.",
+      "cita_verbatim": "\"en todo caso, la entidad no está obligada a conferir dicha comisión, siendo facultativo del empleador otorgarla.\"",
+      "reloj_del_cliente": "Aquí el catálogo debe advertir lo que el concepto calla: el DAFP no nombra el remedio. El silencio de la entidad frente a la solicitud es una petición sin respuesta, y el término que corre contra el servidor es el del derecho de petición y, después, el de caducidad del medio de control correspondiente, no un plazo de la comisión.",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Búsqueda oficial filtroTipoDocumento=Concepto, query 'comisión de servicios', filtroAnio=2026: siete conceptos de 2026 (074971, 044771, 185271, 024471, 041801, 041021, 138331); este del 02-02-2026 es el que trata la comisión de estudios y no hay posterior sobre el punto. Bloque 'Vigencias(0)'.",
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=274017"
+    },
+    {
+      "numero": "Concepto 115131 de 2026 (radicado 20264000115131)",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2026-03-24",
+      "rama": "LABORAL_ADMINISTRATIVO",
+      "tema": "Equivalencias entre estudios y experiencia en la provisión de empleos por encargo",
+      "pregunta": "Si en la provisión de un empleo mediante encargo pueden aplicarse las equivalencias entre estudios y experiencia, y en qué orden se examinan frente a los servidores que cumplen los requisitos plenos.",
+      "tesis": "Las equivalencias son alternativas excepcionales de acreditación y solo proceden cuando están expresamente previstas en el Manual Específico de Funciones y Competencias Laborales de la entidad. En el encargo la entidad debe verificar PRIMERO si hay servidores de carrera que cumplan íntegramente los requisitos de formación y experiencia del empleo; solo si no los hay se evalúan las equivalencias. Antes del nombramiento, el jefe de la unidad de personal debe verificar y certificar el cumplimiento de requisitos conforme al art. 2.2.5.1.5 del Decreto 1083 de 2015. La provisión por encargo se sujeta a los criterios de mérito, evaluación del desempeño y reglas objetivas de la Ley 909 de 2004, la Ley 1960 de 2019 y los lineamientos de la CNSC.",
+      "cita_verbatim": "\"Al establecer un encargo, se deben considerar primero los funcionarios que cumplen con los requisitos de formación y experiencia, y luego se evalúan las equivalencias. Esto significa que, si no hay candidatos que cumplan en su totalidad con los requisitos de formación y experiencia establecidos en el Manual Específico de Funciones y Competencias Laborales, se revisarán los candidatos que cuenten con las equivalencias establecidas para el cargo que se pretende proveer.\"",
+      "reloj_del_cliente": "No hay término. Lo que decide es el orden de prelación: el servidor que solo cumple por equivalencia queda desplazado por cualquiera que acredite los requisitos plenos, y si el Manual no prevé la equivalencia, esta no existe.",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Búsqueda oficial filtroTipoDocumento=Concepto, query 'derechos de carrera', filtroAnio=2026: es el concepto más reciente del tema CARRERA ADMINISTRATIVA localizado (24-03-2026) y ninguno posterior vuelve sobre las equivalencias en el encargo. Bloque 'Vigencias(0)'.",
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=276376"
+    }
+  ],
+  "descartados": [
+    {
+      "numero": "Concepto 059571 de 2026 (i=274497), conflicto de intereses",
+      "razon": "No fija tesis: el DAFP se declara reiteradamente incompetente para el caso concreto y solo remite al marco general del art. 11 del CPACA. Sin tesis no hay ficha."
+    },
+    {
+      "numero": "Circular Conjunta 008 de 2023 del DAFP (i=218910), teletrabajo en jornadas del día sin carro",
+      "razon": "NO ES UN CONCEPTO. El Gestor Normativo la clasifica como 'Circular Conjunta'. Apareció entre los resultados de la búsqueda de 'teletrabajo' y se excluyó deliberadamente: las circulares y directivas del DAFP son actos administrativos, mientras que sus conceptos no son de obligatorio cumplimiento (CPACA art. 28). Mezclarlas le daría a una opinión el peso de una instrucción."
+    },
+    {
+      "numero": "Concepto Marco y Directiva localizados en la misma búsqueda de 'teletrabajo'",
+      "razon": "Tipos de documento distintos del concepto individual. El buscador oficial los separa con la faceta 'Tipo de Documento' (Concepto Marco, Directiva, Circular Externa, Resolución, Decreto, Ley, Sentencia); solo se tomaron los marcados 'Concepto'."
+    },
+    {
+      "numero": "Conceptos del DAFP anteriores a 2026 sobre situaciones administrativas, carrera y prestaciones",
+      "razon": "Existiendo pronunciamientos de 2026 sobre el mismo subtema, un concepto anterior pudo ser superado sin que el repositorio lo marque: el bloque 'Vigencias(n)' de la ficha aparece siempre en 0 y no se usa para señalar doctrina superada. Se prefirió el más reciente y se dejaron fuera los anteriores."
+    }
+  ]
+}
