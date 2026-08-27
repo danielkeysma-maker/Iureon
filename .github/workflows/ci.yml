@@ -36,6 +36,8 @@ jobs:
         run: npm run check:embeddings
       - name: Legal search guard (no fabricated law)
         run: npm run check:search
+      - name: Doctrine guard (no unsourced quote)
+        run: npm run check:conceptos
 
       - name: Build
         run: npm run build
