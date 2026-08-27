@@ -30,18 +30,33 @@ const CHUNK_CHARS = 2500;
 const CHUNK_OVERLAP = 200;
 
 /**
-  * Todo lo que profiere la Corte Constitucional es materia constitucional.
+ * En qué rama se archiva lo que profirió cada corporación.
  *
- * El registro del Estado guarda el TIPO DE PROCESO — tutela, demanda de
- * inconstitucionalidad, ley aprobatoria de tratado — que no es una rama del
- * derecho. Deducir de ahi una rama distinta seria adivinar, y archivar una
- * sentencia bajo la rama equivocada la esconde del abogado que la necesita
- * mientras parece una ingesta que funciono.
+ * Todo lo de la Corte Constitucional es materia constitucional: el registro del
+ * Estado guarda el TIPO DE PROCESO — tutela, demanda de inconstitucionalidad,
+ * ley aprobatoria de tratado — que no es una rama del derecho, y deducir de ahí
+ * una rama distinta sería adivinar.
  *
- * Esta constante existe para que se lea como decision y no como omision: el
- * dia que entren sentencias de otra corporacion, aqui hay que pensar.
+ * La Corte Suprema es distinta y por eso hay una tabla y no una constante: la
+ * Corte separa su trabajo por salas, y esa separación SÍ es de materia. Una
+ * casación laboral es laboral. Lo que no se puede resolver así son sus tutelas
+ * — la Sala Penal falla tutelas sobre salud, la Civil sobre debido proceso — y
+ * esas se archivan como constitucionales, que es lo que son.
+ *
+ * Archivar una sentencia bajo la rama equivocada la esconde del abogado que la
+ * necesita mientras parece una ingesta que funcionó.
  */
-const BRANCH = 'CONSTITUCIONAL';
+const BRANCH_BY_PROCESO: Record<string, string> = {
+  'Casación Laboral': 'LABORAL',
+  'Casación Civil': 'CIVIL',
+  'Casación Penal': 'PENAL',
+  Tutela: 'CONSTITUCIONAL'
+};
+
+const branchFor = (ruling: OfficialRuling): string =>
+  ruling.corporacion === 'CORTE_CONSTITUCIONAL'
+    ? 'CONSTITUCIONAL'
+    : BRANCH_BY_PROCESO[ruling.proceso] ?? 'CONSTITUCIONAL';
 
 const fileNameFor = (citation: string): string =>
   `auto-${citation.replace(/[^A-Za-z0-9]+/g, '-').toLowerCase()}.txt`;
@@ -100,9 +115,9 @@ const indexRuling = async (ruling: OfficialRuling): Promise<AutoIngestOutcome> =
   // The header carries only what the official register recorded. No summary,
   // no ratio, nothing anybody would have had to write.
   const header =
-    `[CORPORACIÓN: CORTE_CONSTITUCIONAL] [TIPO: ${ruling.tipo}] ` +
+    `[CORPORACIÓN: ${ruling.corporacion}] [TIPO: ${ruling.tipo}] ` +
     `[PROVIDENCIA: ${ruling.citation}] [PONENTE: ${ruling.magistrado}] ` +
-    `[PROCESO: ${ruling.proceso}] [FECHA: ${ruling.fecha}]\n\n`;
+    `[SALA: ${ruling.sala}] [PROCESO: ${ruling.proceso}] [FECHA: ${ruling.fecha}]\n\n`;
 
   const withHeader = chunks.map((c) => header + c);
   const vectors = await embeddingsService.embedAll(withHeader);
@@ -118,7 +133,7 @@ const indexRuling = async (ruling: OfficialRuling): Promise<AutoIngestOutcome> =
   for (const [index, chunk] of withHeader.entries()) {
     const { error } = await supabase!.from('document_embeddings').insert({
       firm_id: 'SYSTEM_CORPUS',
-      branch: BRANCH,
+      branch: branchFor(ruling),
       file_name: fileName,
       content_chunk: chunk,
       embedding: vectors[index],
@@ -126,7 +141,7 @@ const indexRuling = async (ruling: OfficialRuling): Promise<AutoIngestOutcome> =
       metadata: {
         sourceKind: 'JURISPRUDENCIA',
         providencia: ruling.citation,
-        corporacion: 'CORTE_CONSTITUCIONAL',
+        corporacion: ruling.corporacion,
         tipoSentencia: ruling.tipo,
         magistradoPonente: ruling.magistrado,
         fecha: ruling.fecha,

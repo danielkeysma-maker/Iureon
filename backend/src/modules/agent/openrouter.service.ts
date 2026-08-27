@@ -2,6 +2,7 @@ import { ENGINE, callOpenRouterWithUsage } from './openrouter.client';
 import { recordUsage } from '../billing/billing.service';
 import { vectorSearchService } from '../search/vectorSearch.service';
 import { discoverRulings } from '../jurisprudence/discovery.service';
+import { discoverCsjRulings } from '../jurisprudence/csjRuling.service';
 import { indexFetchedRulings } from '../jurisprudence/autoIngest.service';
 import { detectLegalTopic } from './topicDetector';
 import { generateCleanDocumentTitle } from './documentTitle';
@@ -321,35 +322,66 @@ export class OpenRouterService {
     query: string,
     onStepLog: (step: any) => void
   ): Promise<string[]> {
-    const discovery = await conPlazo(discoverRulings(query), PLAZO_DESCUBRIMIENTO, {
-      status: 'FAILED' as const,
-      found: [],
-      descartadas: [],
-      reason: 'la búsqueda tardó más de lo que el borrador puede esperar'
-    });
+    /*
+     * Las dos cortes se consultan a la vez, y no es solo por velocidad.
+     *
+     * Llegan por caminos distintos a propósito. La Corte Constitucional no
+     * publica un índice consultable, así que hay que entrar por un buscador web
+     * restringido a su dominio y confirmar cada cita contra el registro del
+     * Estado. La Corte Suprema sí busca sobre sus propias providencias y
+     * responde con los nombres de archivo que guardó, así que el resultado ES la
+     * confirmación — no hay tercero de quien desconfiar, ni llave que pedir.
+     *
+     * Consecuencia práctica que vale escribir: sin BRAVE_API_KEY la Corte
+     * Suprema sigue funcionando. Antes, sin llave no había descubrimiento
+     * ninguno, y toda la materia laboral, civil y penal se quedaba sin
+     * precedente aunque las providencias estuvieran a una consulta de distancia.
+     */
+    const [discovery, csj] = await Promise.all([
+      conPlazo(discoverRulings(query), PLAZO_DESCUBRIMIENTO, {
+        status: 'FAILED' as const,
+        found: [],
+        descartadas: [],
+        reason: 'la búsqueda tardó más de lo que el borrador puede esperar'
+      }),
+      conPlazo(discoverCsjRulings(query), PLAZO_DESCUBRIMIENTO, [])
+    ]);
 
-    if (discovery.status !== 'OK' || discovery.found.length === 0) {
+    const halladas = [
+      ...discovery.found.map((f) => f.ruling),
+      ...csj.map((c) => c.ruling)
+    ];
+
+    if (halladas.length === 0) {
       onStepLog({
         stage: 'STAGE_1_RAG',
         engine: 'SUPABASE',
         message:
           discovery.status === 'NO_PROVIDER'
             ? '[Descubrimiento] No configurado. La redacción continúa sin jurisprudencia y se le prohíbe al modelo citar de memoria.'
-            : `[Descubrimiento] Sin providencias verificables en el registro oficial (${discovery.descartadas.length} candidata(s) descartada(s)). La redacción continúa sin jurisprudencia.`,
+            : `[Descubrimiento] Ni la Corte Constitucional ni la Corte Suprema tienen providencias verificables para esta consulta (${discovery.descartadas.length} candidata(s) descartada(s)). La redacción continúa sin jurisprudencia.`,
         timestamp: new Date().toISOString(),
         data: { jurisprudencia: [], descartadas: discovery.descartadas }
       });
       return [];
     }
 
-    const jurisprudencia = discovery.found.map(({ ruling }) =>
-      `${ruling.citation} (CORTE CONSTITUCIONAL — M.P. ${ruling.magistrado} — ${ruling.sourceUrl})`
-    );
+    const jurisprudencia = [
+      ...discovery.found.map(
+        ({ ruling }) =>
+          `${ruling.citation} (CORTE CONSTITUCIONAL — M.P. ${ruling.magistrado} — ${ruling.sourceUrl})`
+      ),
+      ...csj.map(
+        ({ ruling }) => `${ruling.citation} (CORTE SUPREMA DE JUSTICIA, ${ruling.sala} — M.P. ${ruling.magistrado})`
+      )
+    ];
 
     onStepLog({
       stage: 'STAGE_1_RAG',
       engine: 'SUPABASE',
-      message: `[Descubrimiento] ${jurisprudencia.length} providencia(s) confirmadas contra el registro oficial de la Corte Constitucional.`,
+      message:
+        `[Descubrimiento] ${jurisprudencia.length} providencia(s) confirmadas — ` +
+        `${discovery.found.length} de la Corte Constitucional, ${csj.length} de la Corte Suprema.`,
       timestamp: new Date().toISOString(),
       data: { jurisprudencia, descartadas: discovery.descartadas }
     });
@@ -366,7 +398,7 @@ export class OpenRouterService {
      */
     try {
       const indexado = await conPlazo(
-        indexFetchedRulings(discovery.found.map((f) => f.ruling)),
+        indexFetchedRulings(halladas),
         PLAZO_INDEXADO,
         []
       );

@@ -123,29 +123,22 @@ export type FetchedDocument =
  * `minText` is the caller's floor: a ruling body and a concepto are not the
  * same length, and a floor tuned for one silently rejects the other.
  */
-export const fetchDocumentText = async (
-  url: string,
-  options: { minText: number; timeoutMs?: number } = { minText: 2000 }
+/**
+ * Turns downloaded bytes into citable text: PDF, Word 97 and HTML.
+ *
+ * Separado de la descarga porque no todas las fuentes oficiales sirven sus
+ * documentos por GET. El buscador de la Corte Suprema entrega los suyos por
+ * POST contra `/downloadFile`, asi que tiene los bytes pero no una URL que
+ * `fetchDocumentText` pueda pedir. Duplicar aqui la lectura de PDF y Word 97
+ * habria dejado dos lectores que envejecen por separado — y uno de ellos con
+ * las mismas trampas: el binario sin lector que parece texto, y la
+ * decodificacion mala que se cita igual de bien.
+ */
+export const decodeDocument = async (
+  buffer: Buffer,
+  contentType: string,
+  minText: number
 ): Promise<FetchedDocument> => {
-  if (!/^https?:\/\//i.test(url)) return { ok: false, reason: 'sin URL http(s)' };
-
-  let buffer: Buffer;
-  let contentType: string;
-
-  try {
-    const response = await fetch(url, {
-      redirect: 'follow',
-      signal: AbortSignal.timeout(options.timeoutMs ?? 120_000)
-    });
-
-    if (!response.ok) return { ok: false, reason: `HTTP ${response.status}` };
-
-    contentType = response.headers.get('content-type') ?? '';
-    buffer = Buffer.from(await response.arrayBuffer());
-  } catch (error) {
-    return { ok: false, reason: (error as Error).message };
-  }
-
   let text: string;
   const isPdf = /application\/pdf/i.test(contentType) || buffer.subarray(0, 4).toString() === '%PDF';
 
@@ -185,8 +178,8 @@ export const fetchDocumentText = async (
   }
 
   // A page that yields almost nothing is a redirect, a login wall or a menu.
-  if (text.length < options.minText) {
-    return { ok: false, reason: `la página rindió ${text.length} caracteres (mínimo ${options.minText})` };
+  if (text.length < minText) {
+    return { ok: false, reason: `la página rindió ${text.length} caracteres (mínimo ${minText})` };
   }
 
   const ratio = replacementRatio(text);
@@ -198,4 +191,30 @@ export const fetchDocumentText = async (
   }
 
   return { ok: true, text };
+};
+
+export const fetchDocumentText = async (
+  url: string,
+  options: { minText: number; timeoutMs?: number } = { minText: 2000 }
+): Promise<FetchedDocument> => {
+  if (!/^https?:\/\//i.test(url)) return { ok: false, reason: 'sin URL http(s)' };
+
+  let buffer: Buffer;
+  let contentType: string;
+
+  try {
+    const response = await fetch(url, {
+      redirect: 'follow',
+      signal: AbortSignal.timeout(options.timeoutMs ?? 120_000)
+    });
+
+    if (!response.ok) return { ok: false, reason: `HTTP ${response.status}` };
+
+    contentType = response.headers.get('content-type') ?? '';
+    buffer = Buffer.from(await response.arrayBuffer());
+  } catch (error) {
+    return { ok: false, reason: (error as Error).message };
+  }
+
+  return decodeDocument(buffer, contentType, options.minText);
 };

@@ -30,7 +30,8 @@
     "check:ruling": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/jurisprudence/__checks__/officialRuling.check.ts",
     "check:discovery": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/jurisprudence/__checks__/discovery.check.ts",
     "check:triage": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/catalog/__checks__/triage.check.ts",
-    "check:precedent": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/__checks__/precedent.check.ts"
+    "check:precedent": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/__checks__/precedent.check.ts",
+    "check:csj": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/jurisprudence/__checks__/csjRuling.check.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

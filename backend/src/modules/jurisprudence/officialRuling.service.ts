@@ -38,7 +38,19 @@ export interface Citation {
   anio: number;
 }
 
+/** Las corporaciones que este módulo sabe leer, cada una con su lector. */
+export type Corporacion = 'CORTE_CONSTITUCIONAL' | 'CORTE_SUPREMA';
+
 export interface OfficialRuling {
+  /*
+   * Quién la profirió, y viaja con la providencia en vez de deducirse.
+   *
+   * Antes el indexador escribía CORTE_CONSTITUCIONAL fijo, porque era la única
+   * corporación que había. Archivar una casación laboral bajo la Corte
+   * Constitucional sería una atribución falsa que se ve idéntica a una correcta
+   * una vez indexada, y que el abogado citaría tal cual.
+   */
+  corporacion: Corporacion;
   citation: string;
   tipo: string;
   fecha: string;
@@ -178,6 +190,7 @@ export const fetchOfficialRuling = async (raw: string): Promise<RulingOutcome> =
   return {
     status: 'FOUND',
     ruling: {
+      corporacion: 'CORTE_CONSTITUCIONAL',
       citation: indexKey(citation),
       tipo: row.sentencia_tipo ?? citation.tipo,
       fecha: (row.fecha_sentencia ?? '').slice(0, 10),
