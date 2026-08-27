@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { fetchOfficialRuling } from './officialRuling.service';
 import { discoverRulings } from './discovery.service';
+import { autoIngest } from './autoIngest.service';
 
 /**
  * GET /api/jurisprudence/ruling?cita=C-590+de+2005
@@ -74,4 +75,32 @@ export const discoverController = async (req: Request, res: Response): Promise<v
     // y por qué no entró, que es la única forma de ver si está apuntando bien.
     descartadas: result.descartadas
   });
+};
+
+/**
+ * POST /api/jurisprudence/index   { citas: string[] }
+ *
+ * Indexa en el corpus compartido las sentencias que el descubrimiento acaba de
+ * traer, para que la proxima consulta las tenga sin salir a internet.
+ *
+ * ES UNA PETICION APARTE, y no un remate de la anterior. Una funcion sin
+ * servidor SE CONGELA al responder: cualquier trabajo que quede despues de
+ * `res.json()` no esta garantizado donde esto se despliega, y una ingesta a
+ * medias deja el corpus con la mitad de una sentencia. Asi que el navegador
+ * pide primero los resultados y luego la indexacion, y esta responde cuando
+ * termino de verdad.
+ *
+ * Solo viajan CITAS. El texto se vuelve a descargar del sitio oficial: un
+ * navegador que suministra el texto de una sentencia es un navegador que decide
+ * que dice esa sentencia.
+ */
+export const indexRulingsController = async (req: Request, res: Response): Promise<void> => {
+  const citas = Array.isArray(req.body?.citas) ? req.body.citas.map(String).slice(0, 10) : [];
+
+  if (citas.length === 0) {
+    res.status(400).json({ success: false, error: 'MISSING_CITATIONS', message: 'Faltan las citas.' });
+    return;
+  }
+
+  res.json({ success: true, results: await autoIngest(citas) });
 };

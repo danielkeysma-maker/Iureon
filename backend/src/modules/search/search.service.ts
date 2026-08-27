@@ -99,6 +99,15 @@ export interface PrecedentItem {
   bindingScope: string | null;
   /** La entidad que emitió el concepto. Null en jurisprudencia. */
   entidad: string | null;
+  /**
+   * Si alguien leyó esta providencia antes de indexarla.
+   *
+   * Las 62 del corpus original llevan hechos y ratio escritos por una persona
+   * que la abrió. Una traída por el descubrimiento automático lleva el texto y
+   * nada más — es igual de real y NO es lo mismo, y el abogado tiene que poder
+   * verlo. Lo ausente se lee como curado: el corpus viejo no trae el campo.
+   */
+  curado: boolean;
 }
 
 const normalise = (value: string): string =>
@@ -247,7 +256,8 @@ export class LegalSearchService {
         // respondiendo igual sin reindexar una sola fila.
         sourceKind: str(m.metadata, 'sourceKind') === 'CONCEPTO' ? 'CONCEPTO' : 'JURISPRUDENCIA',
         bindingScope: str(m.metadata, 'bindingScope'),
-        entidad: str(m.metadata, 'entidad')
+        entidad: str(m.metadata, 'entidad'),
+        curado: (m.metadata as Record<string, unknown> | null)?.curado !== false
       }))
     };
   }

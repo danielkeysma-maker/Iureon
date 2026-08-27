@@ -4,6 +4,7 @@ import {
   searchPrecedents,
   fetchOfficialRuling,
   discoverRulings,
+  indexDiscovered,
   citationShape
 } from '../services/legalSearch.api';
 import type {
@@ -106,6 +107,7 @@ export const SearchView: React.FC = () => {
    */
   const [discovery, setDiscovery] = useState<DiscoveryResponse | null>(null);
   const [loadingDiscovery, setLoadingDiscovery] = useState(false);
+  const [indexed, setIndexed] = useState(0);
 
   const runSearch = async () => {
     const query = searchQuery.trim();
@@ -121,6 +123,7 @@ export const SearchView: React.FC = () => {
     setRuling(null);
     setRulingError('');
     setDiscovery(null);
+    setIndexed(0);
     setLastQuery(query);
 
     try {
@@ -145,7 +148,29 @@ export const SearchView: React.FC = () => {
       if (response.status === 'EMPTY' && !citationShape(query)) {
         setLoadingDiscovery(true);
         try {
-          setDiscovery(await discoverRulings(query));
+          const hallazgo = await discoverRulings(query);
+          setDiscovery(hallazgo);
+
+          /*
+           * Se indexa en una petición APARTE, después de mostrar.
+           *
+           * Una función sin servidor se congela al responder: dejar la ingesta
+           * detrás de la respuesta no garantiza que termine, y una a medias
+           * deja el corpus con la mitad de una sentencia. Así el abogado ve el
+           * resultado de inmediato y el corpus crece en segundo plano, pero con
+           * una petición que sí espera a terminar.
+           *
+           * Solo viajan las citas. El servidor vuelve a descargar el texto.
+           */
+          if (hallazgo.status === 'OK' && hallazgo.found.length > 0) {
+            try {
+              const { results } = await indexDiscovered(hallazgo.found.map((f) => f.ruling.citation));
+              setIndexed(results.filter((r) => r.status === 'INDEXED').length);
+            } catch {
+              // No indexar no invalida lo encontrado: sigue en pantalla, con su
+              // fuente. Solo significa que la próxima consulta volverá a salir.
+            }
+          }
         } catch {
           // El descubrimiento es un extra: si falla, la pantalla ya dijo que el
           // corpus no tiene nada, que sigue siendo verdad.
@@ -336,6 +361,12 @@ export const SearchView: React.FC = () => {
                   confirmada{discovery.found.length === 1 ? '' : 's'} contra el registro oficial y
                   descargada{discovery.found.length === 1 ? '' : 's'}.
                 </p>
+                {indexed > 0 && (
+                  <p className="text-[11px] text-blue-300 mt-0.5">
+                    {indexed} quedó{indexed === 1 ? '' : 'aron'} en el corpus: la próxima consulta
+                    sobre esto responde al instante.
+                  </p>
+                )}
               </div>
 
               {discovery.found.map(({ ruling: r, motivo }) => (
@@ -402,6 +433,13 @@ export const SearchView: React.FC = () => {
             </div>
           )}
 
+          {/*
+            Lo traído automáticamente se marca en su propia tarjeta.
+
+            Es igual de real que lo curado y no es lo mismo: nadie lo ha leído,
+            así que no lleva hechos ni ratio escritos por una persona. Dejarlo
+            pasar por curado sería promoverlo en silencio.
+          */}
           {visible.map((item) => (
             <div
               key={item.id}
@@ -421,6 +459,14 @@ export const SearchView: React.FC = () => {
                   <div className="min-w-0">
                     <h3 className="font-bold text-slate-900 text-[14px] leading-tight">
                       {item.providencia ?? 'Fragmento sin providencia registrada'}
+                      {item.curado === false && (
+                        <span
+                          className="ml-2 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 align-middle"
+                          title="Traída del sitio oficial por el buscador. El texto es el de la fuente; nadie la ha leído para extraer sus hechos ni su ratio."
+                        >
+                          sin curar
+                        </span>
+                      )}
                     </h3>
                     <span className="text-[11px] text-slate-400 font-medium mt-0.5 block">
                       {[item.corporacion?.replace(/_/g, ' '), item.magistradoPonente && `M.P. ${item.magistradoPonente}`, item.branch]

@@ -19,6 +19,14 @@ export type CorpusStatus =
   | 'FAILED';
 
 export interface CorpusPrecedent {
+  /**
+   * Si alguien leyo esta providencia antes de indexarla.
+   *
+   * Lo traido por el descubrimiento automatico es igual de real y NO es lo
+   * mismo que lo curado: lleva el texto de la fuente y nada mas. Lo ausente se
+   * lee como curado, porque el corpus original no trae el campo.
+   */
+  curado?: boolean;
   id: string;
   contentChunk: string;
   similarity: number;
@@ -127,4 +135,11 @@ export interface DiscoveryResponse {
 export const discoverRulings = (tema: string) =>
   httpClient.get<DiscoveryResponse>(
     `/api/jurisprudence/discover?tema=${encodeURIComponent(tema)}`
+  );
+
+/** Indexa en el corpus lo que el descubrimiento acaba de traer. */
+export const indexDiscovered = (citas: string[]) =>
+  httpClient.post<{ results: Array<{ citation: string; status: string; chunks?: number }> }>(
+    '/api/jurisprudence/index',
+    { body: { citas } }
   );
