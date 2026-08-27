@@ -18,6 +18,7 @@ import { searchPublicRoutes, searchRoutes } from './modules/search/search.routes
 import { draftsRoutes } from './modules/drafts/drafts.routes';
 import { transcriptionPublicRoutes, transcriptionRoutes } from './modules/transcription/transcription.routes';
 import { catalogPublicRoutes, catalogRoutes } from './modules/catalog/catalog.routes';
+import { preferencesRoutes } from './modules/preferences/preferences.routes';
 import { wompiPublicRoutes, wompiRoutes } from './modules/billing/wompi/wompi.routes';
 import { privacyRoutes } from './modules/privacy/privacy.routes';
 import { jurisprudenceRoutes } from './modules/jurisprudence/jurisprudence.routes';
@@ -117,6 +118,7 @@ app.use('/api', wompiRoutes);
 app.use('/api', privacyRoutes);
 app.use('/api', jurisprudenceRoutes);
 app.use('/api', catalogRoutes);
+app.use('/api', preferencesRoutes);
 
 // Servidor Express
 app.listen(config.port, () => {

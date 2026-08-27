@@ -11,6 +11,7 @@
     "brand": "node scripts/build-brand.mjs && node scripts/build-brand-illustration.mjs",
     "brand:letras": "python scripts/wordmark-to-paths.py",
     "check:tipo": "npx tsx src/modules/workspace/__checks__/documentTypeSelection.check.ts",
+    "check:tokens": "npx tsx src/design/__checks__/tokens.check.ts",
     "preview": "vite preview"
   },
   "dependencies": {

@@ -7,14 +7,20 @@
  * mezclaban slate-100, slate-200 y slate-200/80 sin criterio, y los radios
  * cambiaban dentro del mismo bloque.
  *
- * EL MODO OSCURO SIGUE AL SISTEMA OPERATIVO Y NO TIENE INTERRUPTOR. Un abogado
- * que trabaja de noche ya lo configuró en su equipo; un tercer ajuste solo
- * produce pantallas inconsistentes entre su portátil y su teléfono. Por eso todo
- * vive en `prefers-color-scheme` y no en una clase `dark` que haya que alternar.
+ * ─── EL TEMA TIENE TRES ESTADOS, NO DOS ─────────────────────────────────────
+ *
+ * Por defecto sigue al sistema operativo, que es lo correcto: un abogado que
+ * trabaja de noche ya lo configuró en su equipo. Pero Ajustes permite forzarlo,
+ * y forzarlo tiene que GANARLE al sistema — si no, elegir "Claro siempre" no
+ * hace nada cuando el portátil está en oscuro, que es justo cuando alguien lo
+ * elegiría.
+ *
+ * De ahí la estructura: los valores oscuros viven UNA VEZ como `--dark-*`, y dos
+ * selectores los remapean. El `:not([data-theme='light'])` es lo que permite que
+ * la preferencia explícita venza a la del sistema.
  *
  * NO SE INVIERTE LA PALETA: SE SUSTITUYE TOKEN POR TOKEN. La estructura, el
- * espaciado y los tamaños son idénticos en ambos temas. Cambian superficies,
- * bordes y saturación de los semánticos, nada más.
+ * espaciado y los tamaños son idénticos en ambos temas.
  *
  * Los valores se guardan como CANALES RGB separados por espacio, no como hex,
  * porque es lo que le permite a Tailwind componer `bg-surface/60`. Un hex aquí
@@ -22,7 +28,7 @@
  */
 
 :root {
-  /* ─── NEUTROS ─────────────────────────────────────────────────────────────
+  /* ─── NEUTROS · claro ─────────────────────────────────────────────────────
    * Grises fríos con un punto de calidez, para no verse clínicos.
    */
   --ink-900: 16 24 34; /* #101822 · texto */
@@ -42,22 +48,21 @@
   --surface: 255 255 255; /* #FFFFFF · panel */
   --raised: 255 255 255; /* en claro, un panel flotante sigue siendo blanco */
 
-  /* ─── MARCA ───────────────────────────────────────────────────────────────
-   * Un azul institucional, no un azul de producto.
-   */
+  /* ─── MARCA · un azul institucional, no un azul de producto ───────────────*/
   --brand-700: 23 69 107; /* #17456B · 7.4:1 */
   --brand-800: 17 54 82; /* #113652 · hover */
   --brand-50: 234 240 245; /* #EAF0F5 · selección */
+
   /*
    * LA BARRA ES CROMO, NO MODO OSCURO. Separa "dónde estoy" de "con qué
    * trabajo" sin una sola línea divisoria más, y deja todo el contraste alto
    * del blanco para el documento. Por eso es oscura también en tema claro.
    */
-  --nav-900: 15 34 51; /* #0F2233 · barra */
-  --nav-active: 27 60 86; /* #1B3C56 · ítem seleccionado */
-  --nav-accent: 127 168 196; /* #7FA8C4 · barra izquierda del activo, enlaces */
-  --nav-ink: 169 188 204; /* #A9BCCC · texto de ítem */
-  --nav-muted: 109 131 152; /* #6D8398 · etiqueta de grupo */
+  --nav-900: 15 34 51; /* #0F2233 */
+  --nav-active: 27 60 86; /* #1B3C56 */
+  --nav-accent: 127 168 196; /* #7FA8C4 */
+  --nav-ink: 169 188 204; /* #A9BCCC */
+  --nav-muted: 109 131 152; /* #6D8398 · el mismo en ambos temas */
   --nav-line: 255 255 255; /* en claro el borde no hace falta: ver regla 04 */
 
   /*
@@ -67,8 +72,7 @@
    */
   --on-brand: 255 255 255;
 
-  /* ─── SEMÁNTICOS ──────────────────────────────────────────────────────────
-   * Desaturados a propósito: informan, no alarman.
+  /* ─── SEMÁNTICOS · desaturados a propósito: informan, no alarman ──────────
    *
    * NO HAY ROJO EN LA PALETA DE ESTADO. El rojo queda reservado para acciones
    * destructivas —eliminar un escrito— y para nada más: un término que vence no
@@ -78,15 +82,13 @@
   --verified: 20 101 63; /* #14653F · 5.9:1 */
   --unverified: 138 90 18; /* #8A5A12 · 5.5:1 */
   --neutral-fact: 74 86 107; /* #4A566B · 7.1:1 */
+  --danger: 140 47 38; /* #8C2F26 · solo destructivo */
 
-  /* Destructivo. Fuera de la paleta de estado, y solo para eso. */
-  --danger: 140 47 38; /* #8C2F26 */
-
-  /* ─── SUPERFICIES Y BORDES DE LOS ESTADOS ─────────────────────────────────
-   * Cada estado tiene su propio fondo y su propio borde, y el borde del
-   * "sin verificar" es DISCONTINUO. Esa discontinuidad es la señal principal:
-   * se lee como "incompleto" en escala de grises, y por eso los tres estados
-   * siguen siendo distinguibles sin color.
+  /*
+   * Cada estado tiene su propio fondo y su propio borde, y el del "sin
+   * verificar" es DISCONTINUO. Esa discontinuidad es la señal principal: se lee
+   * como "incompleto" en escala de grises, y por eso los tres estados siguen
+   * siendo distinguibles sin color.
    */
   --verified-surf: 233 242 236; /* #E9F2EC */
   --verified-line: 168 200 182; /* #A8C8B6 */
@@ -104,92 +106,208 @@
   --paper: 255 255 255;
   --paper-ink: 16 24 34;
 
-  /* ─── ELEVACIÓN · 2 ───────────────────────────────────────────────────────
-   * Nada tiene sombra por estar quieto. `e2` solo si flota sobre contenido.
-   */
+  /* ─── ELEVACIÓN · 2 · nada tiene sombra por estar quieto ──────────────────*/
   --e1: 0 1px 2px rgb(16 24 34 / 0.06);
   --e2: 0 8px 24px rgb(16 24 34 / 0.12);
+
+  /* ═══ LOS VALORES OSCUROS, DEFINIDOS UNA SOLA VEZ ═════════════════════════
+   *
+   * Viven aquí y no dentro del `@media` para que los dos selectores de tema
+   * —el del sistema y el forzado— puedan remapearlos sin repetir un solo color.
+   * Si un token cambia, cambia en un sitio.
+   */
+  --dark-ink-900: 232 237 242; /* #E8EDF2 · 14,1:1 sobre surface */
+  --dark-ink-700: 195 205 216; /* #C3CDD8 · prosa */
+  --dark-ink-500: 143 160 178; /* #8FA0B2 · 6,2:1 */
+  --dark-ink-400: 111 130 150; /* #6F8296 */
+
+  /* REGLA 02 — LOS BORDES SUBEN DE PESO: en oscuro además delimitan. */
+  --dark-line-200: 36 48 61; /* #24303D */
+  --dark-line-100: 28 39 50; /* #1C2732 */
+
+  --dark-canvas: 11 18 25; /* #0B1219 */
+  --dark-surface: 19 27 36; /* #131B24 */
+
+  /* REGLA 01 — LA ELEVACIÓN SE EXPRESA CON SUPERFICIE, NO CON SOMBRA. */
+  --dark-raised: 26 36 48; /* #1A2430 */
+
+  /* REGLA 04 — LA BARRA DEJA DE SER CROMO: se separa con borde, no con color. */
+  --dark-nav-900: 10 18 26; /* #0A121A */
+  --dark-nav-active: 22 41 58; /* #16293A */
+  --dark-nav-accent: 78 144 196; /* #4E90C4 */
+  --dark-nav-ink: 147 163 184; /* #93A3B8 */
+  --dark-nav-line: 28 39 50; /* #1C2732 */
+
+  --dark-brand-700: 78 144 196; /* #4E90C4 */
+  --dark-brand-800: 158 197 226; /* #9EC5E2 */
+  --dark-brand-50: 22 41 58; /* #16293A */
+  --dark-brand-line: 42 76 107; /* #2A4C6B */
+
+  /* LA ÚNICA INVERSIÓN DEL SISTEMA: texto oscuro sobre azul claro. */
+  --dark-on-brand: 11 18 25;
+
+  --dark-verified: 79 180 131; /* #4FB483 */
+  --dark-unverified: 217 166 74; /* #D9A64A */
+  --dark-neutral-fact: 143 160 178;
+  --dark-danger: 217 115 106; /* #D9736A */
+
+  --dark-verified-surf: 18 41 31; /* #12291F */
+  --dark-verified-line: 36 92 65; /* #245C41 */
+  --dark-unverified-surf: 42 35 20; /* #2A2314 */
+  --dark-unverified-line: 92 74 34; /* #5C4A22 */
+  --dark-neutral-surf: 26 36 48; /* #1A2430 */
+  --dark-neutral-line: 46 59 74; /* #2E3B4A */
+  /* Derivado: el diseño no muestra destructivo en oscuro. */
+  --dark-danger-line: 92 46 42;
+
+  /*
+   * REGLA 05 — EL ESCRITO NO SE IMPRIME EN OSCURO. En pantalla el lienzo es
+   * #16202B con serif #E6EBF0; el .docx y el PDF salen siempre en papel blanco,
+   * y el pie del taller lo dice.
+   */
+  --dark-paper: 22 32 43; /* #16202B */
+  --dark-paper-ink: 230 235 240; /* #E6EBF0 */
 }
 
+/*
+ * El mapeo oscuro. Aparece dos veces a propósito y no contiene un solo color:
+ * solo apunta a los `--dark-*` de arriba. Si se agrega un token hay que
+ * agregarlo en los dos bloques, y olvidarlo se ve de inmediato porque ese token
+ * se queda claro sobre fondo oscuro.
+ *
+ * `:not([data-theme='light'])` es lo que hace que "Claro siempre" gane sobre un
+ * sistema en oscuro.
+ */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --ink-900: 232 237 242; /* #E8EDF2 · 14,1:1 sobre surface */
-    --ink-700: 195 205 216; /* #C3CDD8 · prosa */
-    --ink-500: 143 160 178; /* #8FA0B2 · 6,2:1 */
-    --ink-400: 111 130 150; /* #6F8296 · etiquetas */
-
-    /*
-     * REGLA 02 — LOS BORDES SUBEN DE PESO. En claro un borde separa; en oscuro
-     * además delimita, así que toda tarjeta lleva borde visible y no solo un
-     * cambio de fondo.
-     */
-    --line-200: 36 48 61; /* #24303D */
-    --line-100: 28 39 50; /* #1C2732 */
-
-    --canvas: 11 18 25; /* #0B1219 */
-    --surface: 19 27 36; /* #131B24 */
-
-    /*
-     * REGLA 01 — LA ELEVACIÓN SE EXPRESA CON SUPERFICIE, NO CON SOMBRA.
-     * Un menú o un diálogo se aclara un paso. La sombra en oscuro no se ve y
-     * solo ensucia.
-     */
-    --raised: 26 36 48; /* #1A2430 */
-
-    /*
-     * REGLA 04 — LA BARRA DEJA DE SER CROMO DISTINTIVO. En oscuro casi coincide
-     * con el fondo, así que se separa con un borde de 1px en vez de por
-     * contraste de color.
-     */
-    --nav-900: 10 18 26; /* #0A121A */
-    --nav-active: 22 41 58; /* #16293A */
-    --nav-accent: 78 144 196; /* #4E90C4 */
-    --nav-ink: 147 163 184; /* #93A3B8 */
-    --nav-muted: 109 131 152; /* #6D8398 · el mismo: ya funciona en ambos */
-    --nav-line: 28 39 50; /* #1C2732 · el borde de la regla 04 */
-
-    /*
-     * Marca y semánticos SE ACLARAN, no se invierten. Verde y ámbar suben de
-     * luminosidad y bajan de saturación para conservar 5:1 sobre superficie
-     * oscura sin volverse neón.
-     */
-    --brand-700: 78 144 196; /* #4E90C4 */
-    --brand-800: 158 197 226; /* #9EC5E2 · hover, más claro */
-    --brand-50: 22 41 58; /* #16293A · selección */
-
-    /*
-     * LA ÚNICA INVERSIÓN DEL SISTEMA. El azul institucional #17456B sobre
-     * #131B24 casi desaparece, así que el primario pasa a texto oscuro sobre
-     * azul claro.
-     */
-    --on-brand: 11 18 25;
-
-    --verified: 79 180 131; /* #4FB483 */
-    --unverified: 217 166 74; /* #D9A64A */
-    --neutral-fact: 143 160 178;
-    --danger: 217 115 106; /* #D9736A */
-
-    --verified-surf: 18 41 31; /* #12291F */
-    --verified-line: 36 92 65; /* #245C41 */
-    --unverified-surf: 42 35 20; /* #2A2314 */
-    --unverified-line: 92 74 34; /* #5C4A22 */
-    --neutral-surf: 26 36 48; /* #1A2430 */
-    --neutral-line: 46 59 74; /* #2E3B4A */
-    --brand-line: 42 76 107; /* #2A4C6B */
-    /* Derivado: el diseño no muestra destructivo en oscuro. Misma relación
-       claro/oscuro que el verificado, para no inventar un tono suelto. */
-    --danger-line: 92 46 42;
-
-    /*
-     * REGLA 05 — EL ESCRITO NO SE IMPRIME EN OSCURO. En pantalla el lienzo es
-     * #16202B con serif #E6EBF0; el .docx y el PDF salen siempre en papel
-     * blanco, y el pie del taller lo dice.
-     */
-    --paper: 22 32 43; /* #16202B */
-    --paper-ink: 230 235 240; /* #E6EBF0 */
-
-    /* Ver regla 01: en oscuro la sombra no comunica elevación. */
+  :root:not([data-theme='light']) {
+    --ink-900: var(--dark-ink-900);
+    --ink-700: var(--dark-ink-700);
+    --ink-500: var(--dark-ink-500);
+    --ink-400: var(--dark-ink-400);
+    --line-200: var(--dark-line-200);
+    --line-100: var(--dark-line-100);
+    --canvas: var(--dark-canvas);
+    --surface: var(--dark-surface);
+    --raised: var(--dark-raised);
+    --nav-900: var(--dark-nav-900);
+    --nav-active: var(--dark-nav-active);
+    --nav-accent: var(--dark-nav-accent);
+    --nav-ink: var(--dark-nav-ink);
+    --nav-line: var(--dark-nav-line);
+    --brand-700: var(--dark-brand-700);
+    --brand-800: var(--dark-brand-800);
+    --brand-50: var(--dark-brand-50);
+    --brand-line: var(--dark-brand-line);
+    --on-brand: var(--dark-on-brand);
+    --verified: var(--dark-verified);
+    --unverified: var(--dark-unverified);
+    --neutral-fact: var(--dark-neutral-fact);
+    --danger: var(--dark-danger);
+    --verified-surf: var(--dark-verified-surf);
+    --verified-line: var(--dark-verified-line);
+    --unverified-surf: var(--dark-unverified-surf);
+    --unverified-line: var(--dark-unverified-line);
+    --neutral-surf: var(--dark-neutral-surf);
+    --neutral-line: var(--dark-neutral-line);
+    --danger-line: var(--dark-danger-line);
+    --paper: var(--dark-paper);
+    --paper-ink: var(--dark-paper-ink);
     --e1: none;
     --e2: none;
   }
+}
+
+:root[data-theme='dark'] {
+  --ink-900: var(--dark-ink-900);
+  --ink-700: var(--dark-ink-700);
+  --ink-500: var(--dark-ink-500);
+  --ink-400: var(--dark-ink-400);
+  --line-200: var(--dark-line-200);
+  --line-100: var(--dark-line-100);
+  --canvas: var(--dark-canvas);
+  --surface: var(--dark-surface);
+  --raised: var(--dark-raised);
+  --nav-900: var(--dark-nav-900);
+  --nav-active: var(--dark-nav-active);
+  --nav-accent: var(--dark-nav-accent);
+  --nav-ink: var(--dark-nav-ink);
+  --nav-line: var(--dark-nav-line);
+  --brand-700: var(--dark-brand-700);
+  --brand-800: var(--dark-brand-800);
+  --brand-50: var(--dark-brand-50);
+  --brand-line: var(--dark-brand-line);
+  --on-brand: var(--dark-on-brand);
+  --verified: var(--dark-verified);
+  --unverified: var(--dark-unverified);
+  --neutral-fact: var(--dark-neutral-fact);
+  --danger: var(--dark-danger);
+  --verified-surf: var(--dark-verified-surf);
+  --verified-line: var(--dark-verified-line);
+  --unverified-surf: var(--dark-unverified-surf);
+  --unverified-line: var(--dark-unverified-line);
+  --neutral-surf: var(--dark-neutral-surf);
+  --neutral-line: var(--dark-neutral-line);
+  --danger-line: var(--dark-danger-line);
+  --paper: var(--dark-paper);
+  --paper-ink: var(--dark-paper-ink);
+  --e1: none;
+  --e2: none;
+}
+
+/*
+ * ─── DENSIDAD ───────────────────────────────────────────────────────────────
+ *
+ * Cambia altos de fila y de control, NUNCA los tamaños de letra. El mínimo de
+ * 11px de las etiquetas no se toca en ninguna opción: reducir la letra para
+ * caber más filas es lo que vuelve una tabla densa una tabla ilegible.
+ */
+:root,
+:root[data-density='normal'] {
+  --row-h: 36px;
+  --control-h: 34px;
+}
+
+:root[data-density='compact'] {
+  --row-h: 26px;
+  --control-h: 28px;
+}
+
+:root[data-density='comfortable'] {
+  --row-h: 44px;
+  --control-h: 40px;
+}
+
+/*
+ * ─── TIPOGRAFÍA DE LA INTERFAZ ──────────────────────────────────────────────
+ *
+ * La familia de la interfaz es elegible; la MONOESPACIADA NO. Términos,
+ * radicados y saldos van siempre en mono, cualquiera sea la elección: es lo que
+ * impide confundir un 1 con una l en un radicado de veintitrés dígitos.
+ *
+ * La del documento tampoco se toca aquí — vive en Ajustes · Documento, porque
+ * es de la firma y no de la persona.
+ */
+:root {
+  --font-ui: 'IBM Plex Sans', system-ui, sans-serif;
+}
+
+:root[data-font='jakarta'] {
+  --font-ui: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+:root[data-font='manrope'] {
+  --font-ui: 'Manrope', system-ui, sans-serif;
+}
+
+:root[data-font='instrument'] {
+  --font-ui: 'Instrument Sans', system-ui, sans-serif;
+}
+
+:root[data-font='public'] {
+  --font-ui: 'Public Sans', system-ui, sans-serif;
+}
+
+/* "La del sistema": no descarga nada y se ve como el resto de su equipo. */
+:root[data-font='system'] {
+  --font-ui: system-ui, -apple-system, 'Segoe UI', sans-serif;
 }

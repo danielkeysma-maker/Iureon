@@ -47,7 +47,12 @@ export default {
          * El mono NO es estilo: marca lo citable. Si un número está en mono, el
          * abogado lo puede pegar en un escrito; si está en sans, es interfaz.
          */
-        sans: ['"IBM Plex Sans"', 'system-ui', 'sans-serif'],
+        /*
+         * Apunta a una VARIABLE, no a una familia: Ajustes · Apariencia deja
+         * elegir entre seis, y con la familia escrita aquí esa opción no podría
+         * existir sin recompilar.
+         */
+        sans: ['var(--font-ui)'],
         legal: ['"Source Serif 4"', 'Georgia', 'serif'],
         mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace']
       },
