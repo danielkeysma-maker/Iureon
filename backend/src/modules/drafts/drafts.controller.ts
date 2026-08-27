@@ -17,7 +17,15 @@ export const listDraftsController = async (req: Request, res: Response): Promise
     return;
   }
 
-  const drafts = await draftsService.listDrafts(firmId, userEmail);
+  /*
+   * Por defecto, los de la FIRMA.
+   *
+   * Filtraba siempre por usuario, y eso escondía el trabajo de la firma de sí
+   * misma: dos socios del mismo caso no veían los borradores del otro. `?alcance
+   * =MIOS` conserva la vista personal para quien la quiera.
+   */
+  const alcance = req.query.alcance === 'MIOS' ? 'MIOS' : 'FIRMA';
+  const drafts = await draftsService.listDrafts(firmId, userEmail, alcance);
   res.json({ success: true, drafts });
 };
 
@@ -26,7 +34,19 @@ export const listDraftsController = async (req: Request, res: Response): Promise
  */
 export const createDraftController = async (req: Request, res: Response): Promise<void> => {
   const firmId = req.firmId || '';
-  const { title, documentType, legalText, jurisprudenciaCitada, excepcionesFormuladas, tokensConsumed } = req.body;
+  const {
+    title,
+    documentType,
+    legalText,
+    jurisprudenciaCitada,
+    excepcionesFormuladas,
+    tokensConsumed,
+    legalBranch,
+    venceEl,
+    cliente,
+    despacho,
+    radicado
+  } = req.body;
   // The author is whoever the token says, never whoever the body claims.
   const userEmail = req.user?.email ?? '';
 
@@ -43,7 +63,21 @@ export const createDraftController = async (req: Request, res: Response): Promis
     legal_text: legalText,
     jurisprudencia_citada: jurisprudenciaCitada || [],
     excepciones_formuladas: excepcionesFormuladas || [],
-    tokens_consumed: tokensConsumed || 0
+    tokens_consumed: tokensConsumed || 0,
+    legal_branch: legalBranch ?? null,
+    /*
+     * La fecha de vencimiento la pone quien lleva el caso, no el sistema. El
+     * catálogo tiene el término como TEXTO —«dentro de los diez (10) días
+     * siguientes a la presentación»— y de ahí no sale una fecha sin saber
+     * cuándo empezó a correr. Inventarla sería inventar un plazo.
+     */
+    vence_el: venceEl ?? null,
+    cliente: cliente ?? null,
+    despacho: despacho ?? null,
+    radicado: radicado ?? null,
+    estado: 'BORRADOR',
+    radicado_el: null,
+    version: 1
   });
 
   if (!draft) {
@@ -61,21 +95,58 @@ export const createDraftController = async (req: Request, res: Response): Promis
 export const updateDraftController = async (req: Request, res: Response): Promise<void> => {
   const firmId = req.firmId || '';
   const draftId = req.params.id as string;
-  const { title, legalText, jurisprudenciaCitada, excepcionesFormuladas } = req.body;
-
-  const updated = await draftsService.updateDraft(draftId, firmId, {
+  const {
     title,
-    legal_text: legalText,
-    jurisprudencia_citada: jurisprudenciaCitada,
-    excepciones_formuladas: excepcionesFormuladas
-  });
+    legalText,
+    jurisprudenciaCitada,
+    excepcionesFormuladas,
+    venceEl,
+    cliente,
+    despacho,
+    radicado,
+    estado
+  } = req.body;
 
-  if (!updated) {
-    res.json({ success: false, useLocalFallback: true });
-    return;
+  /*
+   * Solo lo que llegó. Un `undefined` en Supabase borraría el valor, así que
+   * mandar el objeto completo convertiría "corregir el cliente" en "vaciar la
+   * fecha de vencimiento" — perdiendo el término del escrito en silencio.
+   */
+  const cambios: Record<string, unknown> = {};
+  if (title !== undefined) cambios.title = title;
+  if (legalText !== undefined) cambios.legal_text = legalText;
+  if (jurisprudenciaCitada !== undefined) cambios.jurisprudencia_citada = jurisprudenciaCitada;
+  if (excepcionesFormuladas !== undefined) cambios.excepciones_formuladas = excepcionesFormuladas;
+  if (venceEl !== undefined) cambios.vence_el = venceEl;
+  if (cliente !== undefined) cambios.cliente = cliente;
+  if (despacho !== undefined) cambios.despacho = despacho;
+  if (radicado !== undefined) cambios.radicado = radicado;
+  if (estado !== undefined) cambios.estado = estado;
+
+  try {
+    const updated = await draftsService.updateDraft(draftId, firmId, cambios);
+
+    if (!updated) {
+      res.json({ success: false, useLocalFallback: true });
+      return;
+    }
+
+    res.json({ success: true, draft: updated });
+  } catch (error) {
+    /*
+     * 409 y el mensaje de la base tal cual.
+     *
+     * El único error esperado aquí es intentar editar un escrito ya radicado, y
+     * el disparador lo dice en español con su fecha. Traducirlo a "no se pudo
+     * guardar" le esconde al abogado la única información que necesita: que ese
+     * escrito ya está en el juzgado y es una copia inmutable.
+     */
+    res.status(409).json({
+      success: false,
+      error: 'ESCRITO_RADICADO',
+      message: (error as Error).message
+    });
   }
-
-  res.json({ success: true, draft: updated });
 };
 
 /**
