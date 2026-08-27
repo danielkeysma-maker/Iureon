@@ -67,7 +67,7 @@ Todos los `<label>` usan 12px y el mismo gris; los tres selectores tienen ancho 
 3. **Espaciado, radios y elevación** — una escala corta, no doce valores.
 4. **Los componentes base**: botón (primario/secundario/fantasma), campo de texto, selector, pestaña, tarjeta, aviso, chip de estado, tabla, estado vacío, estado de carga.
 
-**Después, las pantallas, en 1440px.** Son quince más un patrón de modal; si es demasiado para una sola entrega, priorízalas en este orden y dilo: el taller de redacción, el modal, la barra lateral y Orientación son las que más devuelven.
+**Después, las pantallas, en 1440px.** Son veinte más un patrón de modal; si es demasiado para una sola entrega, priorízalas en este orden y dilo: el taller de redacción, el modal, la barra lateral y Orientación son las que más devuelven.
 
 5. **El taller de redacción**: panel de control + lienzo del documento, resolviendo la saturación superior.
 6. **Orientación** (`modules/catalog/components/TriageView.tsx`): el abogado escribe hechos y recibe hasta 6 actuaciones sugeridas, cada una con su término, su artículo y su autoridad. Incluye el estado "el catálogo no reconoce nada", que es una respuesta legítima y no un error.
@@ -87,7 +87,19 @@ Todos los `<label>` usan 12px y el mismo gris; los tres selectores tienen ancho 
 
 16. **Saldo y recarga**: saldo en pesos, historial y recarga mínima de $100.000 COP.
 
-17. **EL PATRÓN DE MODAL, que es donde más se nota el desorden.** Hay **siete** modales sin un patrón común: liquidación laboral, suscripción de la firma, cálculo de términos procesales, cargar archivos, sugerencia de jerga, borradores guardados y detalle de auditoría. Cada uno resuelve su cabecera, su cierre y sus botones a su manera. **Diseña UN modal** —cabecera, cuerpo, pie de acciones, comportamiento con contenido largo, tamaños S/M/L— y muestra dos de los siete resueltos con él. Ese solo cambio arregla buena parte de la sensación de desorden.
+17. **Glosario jurídico** (`modules/search/components/LegalSearchGlossaryModal.tsx`) — términos del derecho colombiano **leídos del catálogo verificado**, no escritos a mano. Importa por qué: la versión anterior tenía entradas manuales que citaban el CPTSS —código derogado por la Ley 2452 de 2025, con todos los artículos renumerados— y ofrecía como "cita" la cadena *"Corte Suprema, Sala Laboral, Sentencia 2024 (Reconocimiento Horas Extras Teletrabajo)"*, que no es una cita sino una descripción con forma de cita. **El glosario tiene que verse como algo que se consulta con confianza**, y cada entrada debe mostrar de dónde salió.
+
+18. **Sugerencia de jerga** (`modules/documents/components/JargonSuggestionModal.tsx`) — el abogado selecciona texto en el borrador y recibe formulaciones alternativas, algunas **aprendidas del estilo de su propia firma**. Esa distinción —lo que propone el sistema contra lo que la firma ya escribe así— tiene que verse.
+
+19. **Personalización de marca de la firma** (`FirmBrandingModal.tsx`) — cada firma pone su membrete y su formato, y eso manda sobre el formato por defecto en la redacción.
+
+20. **Gestión de usuarios de la firma** (`TenantUserManagementModal.tsx`) — altas, bajas y roles dentro del despacho.
+
+21. **EL PATRÓN DE MODAL, que es donde más se nota el desorden.** Hay **once** modales sin un patrón común:
+
+    `ActionConfirmationModal` · `AuditLogsModal` · `FileDropzoneModal` · `FirmBrandingModal` · `FirmSubscriptionModal` · `JargonSuggestionModal` · `LaborSettlementModal` · `LegalSearchGlossaryModal` · `ProceduralTermsModal` · `SavedDraftsModal` · `TenantUserManagementModal`
+
+    Cada uno resuelve su cabecera, su cierre y sus botones a su manera. Y no son todos del mismo tipo: hay confirmaciones de una línea, formularios, calculadoras y visores de contenido largo. **Diseña UN sistema de modal** —cabecera, cuerpo, pie de acciones, comportamiento con contenido que desborda, y los tamaños S/M/L que cubran esos cuatro tipos— y muestra tres resueltos con él: una confirmación, un formulario y un visor. **Ese solo cambio arregla buena parte de la sensación de desorden**, porque un usuario abre varios de estos al día y cada uno le exige reaprender dónde está el botón de cerrar.
 
 ## El corazón del producto: tres estados de una afirmación jurídica
 
