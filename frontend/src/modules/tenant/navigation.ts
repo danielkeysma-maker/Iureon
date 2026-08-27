@@ -1,4 +1,4 @@
-import { Sparkles, Mic, BookOpen, Library, Wrench, Shield, UserRound, ShieldCheck, Compass } from 'lucide-react';
+import { Sparkles, Mic, BookOpen, Library, Wrench, Shield, UserRound, ShieldCheck, Compass, SlidersHorizontal } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { MainView } from './types';
 
@@ -61,7 +61,8 @@ export const NAV_MODULES: NavModule[] = [
     label: 'Privacidad',
     description: 'Quién procesa tus datos',
     icon: ShieldCheck
-  }
+  },
+  { id: 'ajustes', label: 'Ajustes', description: 'Apariencia y firma', icon: SlidersHorizontal }
 ];
 
 /**
@@ -95,7 +96,7 @@ export const NAV_GROUPS: NavGroup[] = [
   { titulo: 'Producir', modulos: ['workspace', 'orientacion'] },
   { titulo: 'Registrar', modulos: ['audiencias', 'entrevistas'] },
   { titulo: 'Consultar', modulos: ['search', 'catalogo', 'tools'] },
-  { titulo: 'Administrar', modulos: ['audit', 'privacidad'], plegable: true }
+  { titulo: 'Administrar', modulos: ['audit', 'privacidad', 'ajustes'], plegable: true }
 ];
 
 /**

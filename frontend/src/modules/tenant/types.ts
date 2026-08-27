@@ -8,7 +8,8 @@ export type MainView =
   | 'tools'
   | 'audit'
   | 'privacidad'
-  | 'orientacion';
+  | 'orientacion'
+  | 'ajustes';
 
 /** A client law firm: the tenant every request and record is scoped to. */
 export interface LawFirmTenant {

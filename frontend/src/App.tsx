@@ -17,6 +17,7 @@ import { ToolsView } from './modules/tools/components/ToolsView';
 import { AuditView } from './modules/audit/components/AuditView';
 import { SubprocessorsView } from './modules/privacy/components/SubprocessorsView';
 import { TriageView } from './modules/catalog/components/TriageView';
+import { SettingsView } from './modules/settings/components/SettingsView';
 import { FirmBrandingModal } from './modules/tenant/components/FirmBrandingModal';
 import { FirmSubscriptionModal } from './modules/subscriptions/components/FirmSubscriptionModal';
 import type { FirmSubscriptionInfo } from './modules/subscriptions/types';
@@ -447,6 +448,7 @@ export function App() {
           {mainView === 'tools' && <ToolsView />}
           {mainView === 'audit' && <AuditView />}
           {mainView === 'privacidad' && <SubprocessorsView />}
+          {mainView === 'ajustes' && <SettingsView />}
           {mainView === 'orientacion' && (
             <TriageView
               setMainView={setMainView}
