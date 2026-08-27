@@ -1,5 +1,5 @@
 import { httpClient } from '../../../config/httpClient';
-import type { GeneratedDraft, SavedDraftEntry } from '../types';
+import type { EstadoBorrador, GeneratedDraft, SavedDraftEntry } from '../types';
 
 /**
  * Saved drafts REST client.
@@ -20,6 +20,25 @@ interface SavedDraftRow {
   tokens_consumed?: number;
   saved_at: string;
   updated_at?: string;
+
+  /*
+   * THESE COLUMNS EXISTED IN THE DATABASE AND THIS MAPPER THREW THEM AWAY.
+   *
+   * `toEntry` built an object with title, type and text, so the list could only
+   * ever show the name of a file. The deadline, the case and the version were
+   * being read from Postgres and discarded one function later — which is why
+   * the drafts screen sorted by last edit even though the server sorts by
+   * expiry: the field it sorts on never reached the client.
+   */
+  vence_el?: string | null;
+  legal_branch?: string | null;
+  cliente?: string | null;
+  despacho?: string | null;
+  radicado?: string | null;
+  estado?: EstadoBorrador;
+  radicado_el?: string | null;
+  version?: number;
+  user_email?: string | null;
 }
 
 const formatSavedAt = (value: string): string =>
@@ -41,7 +60,22 @@ const toEntry = (row: SavedDraftRow): SavedDraftEntry => ({
     jurisprudenciaCitada: row.jurisprudencia_citada || [],
     excepcionesFormuladas: row.excepciones_formuladas || [],
     tokensConsumed: row.tokens_consumed || 0
-  }
+  },
+
+  /*
+   * `?? null` and not `|| null`: an empty string is a value the lawyer typed
+   * and then cleared, and it must survive as such. Only a missing column
+   * becomes null, so the UI can tell "no lo sabemos" from "está vacío".
+   */
+  venceEl: row.vence_el ?? null,
+  legalBranch: row.legal_branch ?? null,
+  cliente: row.cliente ?? null,
+  despacho: row.despacho ?? null,
+  radicado: row.radicado ?? null,
+  estado: row.estado ?? 'BORRADOR',
+  radicadoEl: row.radicado_el ?? null,
+  version: row.version ?? 1,
+  autor: row.user_email ?? null
 });
 
 /*

@@ -250,6 +250,7 @@ export function App() {
   // ═══ Clave de localStorage scoped por firma+usuario ═══
   const {
     savedDrafts,
+    loadedDraftId,
     setLoadedDraftId,
     saveDraft,
     deleteDraft
@@ -338,12 +339,20 @@ export function App() {
         onClose={() => setIsSubscriptionModalOpen(false)}
         info={sampleSubscriptionInfo}
       />
+      {/*
+        `procesoActual` sale del borrador abierto en el panel, no de un campo
+        que el abogado tenga que llenar. Con un escrito nuevo sin guardar
+        todavía no hay proceso, y el filtro «Este proceso» no se ofrece — en
+        vez de abrirse sobre una lista vacía sin explicación.
+      */}
       <SavedDraftsModal
         isOpen={isSavedDraftsModalOpen}
         onClose={() => setIsSavedDraftsModalOpen(false)}
         savedDrafts={savedDrafts}
         onLoadDraft={handleLoadDraft}
         onDeleteDraft={deleteDraft}
+        userEmail={currentUserEmail}
+        procesoActual={savedDrafts.find((d) => d.id === loadedDraftId)?.cliente ?? null}
       />
       <BalancePanel
         isOpen={isRechargeModalOpen}

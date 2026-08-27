@@ -16,9 +16,43 @@ export interface GeneratedDraft {
   tokensConsumed: number;
 }
 
-/** A draft persisted for a firm, either in Supabase or localStorage. */
+/** BORRADOR | REVISAR | LISTO | RADICADO. The same set the database checks. */
+export type EstadoBorrador = 'BORRADOR' | 'REVISAR' | 'LISTO' | 'RADICADO';
+
+/**
+ * A draft persisted for a firm, either in Supabase or localStorage.
+ *
+ * EVERYTHING BELOW `draft` IS OPTIONAL, and that is not laziness. The offline
+ * fallback writes to localStorage, where these columns do not exist; a draft
+ * saved during a backend outage is still a valid draft. The list must render
+ * one that only knows its title, so every consumer treats these as absent
+ * rather than empty.
+ */
 export interface SavedDraftEntry {
   id: string;
   savedAt: string;
   draft: GeneratedDraft;
+
+  /**
+   * The DATE it expires, never the catalogue term.
+   *
+   * The term is prose — «Dentro de los diez (10) días siguientes a la
+   * presentación» — and no date comes out of it without knowing when the clock
+   * started. Only whoever runs the case knows that; computing it here would be
+   * inventing a deadline.
+   */
+  venceEl?: string | null;
+  legalBranch?: string | null;
+
+  /** "Mosquera · Juzgado 12 Laboral" — how a lawyer recognises it among thirty. */
+  cliente?: string | null;
+  despacho?: string | null;
+  radicado?: string | null;
+
+  estado?: EstadoBorrador;
+  /** Once set, the text can no longer change. The database enforces it. */
+  radicadoEl?: string | null;
+  version?: number;
+  /** Who last saved it. Comes from the token, never from the client. */
+  autor?: string | null;
 }
