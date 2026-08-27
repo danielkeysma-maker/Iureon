@@ -42,6 +42,8 @@ jobs:
         run: npm run check:subprocessors
       - name: On-demand ruling fetch refuses what the Court does not have
         run: npm run check:ruling
+      - name: Topic discovery cannot admit what the Court does not have
+        run: npm run check:discovery
 
       - name: Build
         run: npm run build

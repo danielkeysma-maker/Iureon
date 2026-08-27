@@ -91,6 +91,18 @@ const deepgramEnabled = requireGroup('Deepgram (transcripción)', ['DEEPGRAM_API
 const supabaseEnabled = requireGroup('Supabase', ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY']);
 
 /**
+ * Buscador web, usado SOLO para apuntar hacia sentencias en el sitio de la Corte.
+ *
+ * Nunca decide qué dice una providencia ni que exista: produce números de
+ * sentencia que el registro oficial confirma o rechaza. Ausente, el
+ * descubrimiento por tema queda apagado y el resto del buscador sigue igual —
+ * el corpus indexado y la consulta por cita no dependen de esto.
+ */
+const searchEnabled = requireGroup('Buscador web (descubrimiento por tema)', [
+  'BRAVE_SEARCH_API_KEY'
+]);
+
+/**
  * Wompi, the payment gateway a firm recharges through.
  *
  * ALL FOUR OR NONE, and this is the group where that rule earns its keep. The
@@ -181,6 +193,10 @@ export const config = {
   deepgram: {
     enabled: deepgramEnabled,
     apiKey: read('DEEPGRAM_API_KEY')
+  },
+  search: {
+    enabled: searchEnabled,
+    braveApiKey: read('BRAVE_SEARCH_API_KEY')
   },
   wompi: {
     enabled: wompiEnabled,

@@ -104,3 +104,27 @@ export const fetchOfficialRuling = (cita: string) =>
   httpClient.get<{ ruling: OfficialRuling }>(
     `/api/jurisprudence/ruling?cita=${encodeURIComponent(cita)}`
   );
+
+/**
+ * Sentencias sobre un tema que el corpus no tiene, traidas del sitio oficial.
+ *
+ * `descartadas` viene a proposito: dice que propuso el buscador y por que el
+ * registro de la Corte lo rechazo. Es la unica forma de ver si esta apuntando
+ * bien, y esconderlo dejaria un motor cuya punteria nadie puede juzgar.
+ */
+export interface DiscoveredRuling {
+  ruling: OfficialRuling;
+  motivo: string;
+}
+
+export interface DiscoveryResponse {
+  status: 'OK' | 'NO_PROVIDER' | 'FAILED';
+  reason?: string;
+  found: DiscoveredRuling[];
+  descartadas: Array<{ cita: string; razon: string }>;
+}
+
+export const discoverRulings = (tema: string) =>
+  httpClient.get<DiscoveryResponse>(
+    `/api/jurisprudence/discover?tema=${encodeURIComponent(tema)}`
+  );

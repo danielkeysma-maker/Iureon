@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { fetchOfficialRuling } from './officialRuling.service';
+import { discoverRulings } from './discovery.service';
 
 /**
  * GET /api/jurisprudence/ruling?cita=C-590+de+2005
@@ -37,4 +38,40 @@ export const rulingController = async (req: Request, res: Response): Promise<voi
       res.status(503).json({ success: false, error: outcome.status, message: outcome.reason });
       return;
   }
+};
+
+/**
+ * GET /api/jurisprudence/discover?tema=...
+ *
+ * Busca en el sitio oficial de la Corte sentencias sobre un tema que el corpus
+ * no tiene, las confirma contra el registro del Estado y las descarga.
+ *
+ * `NO_PROVIDER` responde 200, no un error: el descubrimiento por tema es
+ * opcional y estar apagado no es un fallo. Devolver 503 haría que la pantalla
+ * mostrara una alarma por una función que nadie encendió.
+ */
+export const discoverController = async (req: Request, res: Response): Promise<void> => {
+  const tema = String(req.query.tema ?? '').trim();
+
+  if (!tema) {
+    res.status(400).json({ success: false, error: 'MISSING_TOPIC', message: 'Falta el tema.' });
+    return;
+  }
+
+  const result = await discoverRulings(tema);
+
+  if (result.status === 'FAILED') {
+    res.status(502).json({ success: false, error: result.status, message: result.reason });
+    return;
+  }
+
+  res.json({
+    success: true,
+    status: result.status,
+    reason: result.reason,
+    found: result.found,
+    // Las descartadas se devuelven a propósito: dicen qué propuso el buscador
+    // y por qué no entró, que es la única forma de ver si está apuntando bien.
+    descartadas: result.descartadas
+  });
 };

@@ -3,9 +3,15 @@ import { Search, Scale, ThumbsUp, ThumbsDown, Copy, Check, Filter, ExternalLink,
 import {
   searchPrecedents,
   fetchOfficialRuling,
+  discoverRulings,
   citationShape
 } from '../services/legalSearch.api';
-import type { CorpusPrecedent, CorpusStatus, OfficialRuling } from '../services/legalSearch.api';
+import type {
+  CorpusPrecedent,
+  CorpusStatus,
+  OfficialRuling,
+  DiscoveryResponse
+} from '../services/legalSearch.api';
 
 /**
  * Jurisprudence search over the ingested corpus.
@@ -91,6 +97,15 @@ export const SearchView: React.FC = () => {
   const [ruling, setRuling] = useState<OfficialRuling | null>(null);
   const [rulingError, setRulingError] = useState('');
   const [loadingRuling, setLoadingRuling] = useState(false);
+  /*
+   * El descubrimiento se dispara SOLO cuando el corpus vuelve vacío.
+   *
+   * Ese vacío es la señal de demanda: dice que un abogado preguntó algo que la
+   * cobertura no alcanza. Buscar en cada consulta gastaría dinero en preguntas
+   * que el corpus ya responde bien, y no enseñaría nada nuevo sobre dónde falta.
+   */
+  const [discovery, setDiscovery] = useState<DiscoveryResponse | null>(null);
+  const [loadingDiscovery, setLoadingDiscovery] = useState(false);
 
   const runSearch = async () => {
     const query = searchQuery.trim();
@@ -105,6 +120,7 @@ export const SearchView: React.FC = () => {
     setIsLoading(true);
     setRuling(null);
     setRulingError('');
+    setDiscovery(null);
     setLastQuery(query);
 
     try {
@@ -121,6 +137,23 @@ export const SearchView: React.FC = () => {
        * nada cuando la Corte la publica sería falso; el servidor la confirma
        * contra el registro del Estado antes de descargar nada.
        */
+      /*
+       * El corpus no tuvo nada, y la consulta no es una cita: se busca en el
+       * sitio de la Corte. Lo que vuelva se confirma contra el registro oficial
+       * antes de mostrarse — el buscador solo apunta.
+       */
+      if (response.status === 'EMPTY' && !citationShape(query)) {
+        setLoadingDiscovery(true);
+        try {
+          setDiscovery(await discoverRulings(query));
+        } catch {
+          // El descubrimiento es un extra: si falla, la pantalla ya dijo que el
+          // corpus no tiene nada, que sigue siendo verdad.
+        } finally {
+          setLoadingDiscovery(false);
+        }
+      }
+
       if (citationShape(query)) {
         setLoadingRuling(true);
         try {
@@ -275,6 +308,87 @@ export const SearchView: React.FC = () => {
                   </p>
                 )}
               </div>
+            </div>
+          )}
+
+          {loadingDiscovery && (
+            <div className="bg-white border border-slate-200/80 rounded-xl p-4 flex items-center gap-2 text-[13px] text-slate-500">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              El corpus no tiene nada sobre esto. Buscando en el sitio de la Corte…
+            </div>
+          )}
+
+          {/*
+            Lo traído por tema va marcado como lo que es, igual que una cita.
+
+            No estaba en el corpus: se encontró hace segundos porque nadie había
+            preguntado esto antes. Mostrarlo junto a lo indexado haría que un
+            hallazgo recién descargado pareciera curado.
+          */}
+          {discovery?.status === 'OK' && discovery.found.length > 0 && (
+            <div className="space-y-3">
+              <div className="bg-blue-950 text-white rounded-xl px-4 py-2.5">
+                <p className="text-[10px] uppercase tracking-wide text-blue-300 font-bold">
+                  No estaba en el corpus · traído del sitio oficial de la Corte
+                </p>
+                <p className="text-[12px]">
+                  {discovery.found.length} sentencia{discovery.found.length === 1 ? '' : 's'}{' '}
+                  confirmada{discovery.found.length === 1 ? '' : 's'} contra el registro oficial y
+                  descargada{discovery.found.length === 1 ? '' : 's'}.
+                </p>
+              </div>
+
+              {discovery.found.map(({ ruling: r, motivo }) => (
+                <div key={r.citation} className="bg-white border border-blue-900/20 rounded-xl overflow-hidden">
+                  <header className="px-4 py-3 border-b border-slate-100 bg-slate-50/60">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <h3 className="text-[13px] font-black text-slate-900">Sentencia {r.citation}</h3>
+                        <p className="text-[11px] text-slate-500">
+                          {[r.proceso, r.sala, r.fecha, r.magistrado && `M.P. ${r.magistrado}`]
+                            .filter(Boolean)
+                            .join(' · ')}
+                        </p>
+                      </div>
+                      <a
+                        href={r.sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[11px] text-blue-800 hover:underline flex items-center gap-1 flex-shrink-0"
+                      >
+                        Abrir <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                    {motivo && <p className="text-[10px] text-slate-400 mt-1 truncate">{motivo}</p>}
+                  </header>
+                  <p className="p-4 text-[13px] text-slate-700 leading-relaxed max-h-48 overflow-y-auto whitespace-pre-wrap">
+                    {r.text.slice(0, 2500)}
+                    {r.text.length > 2500 && '…'}
+                  </p>
+                </div>
+              ))}
+
+              {/*
+                Lo que el buscador propuso y el registro rechazó. Se muestra a
+                propósito: es la única forma de que alguien pueda juzgar si el
+                motor está apuntando bien, y esconderlo dejaría un buscador cuya
+                puntería nadie puede evaluar.
+              */}
+              {discovery.descartadas.length > 0 && (
+                <details className="bg-slate-50 border border-slate-200 rounded-xl p-3">
+                  <summary className="text-[11px] text-slate-600 cursor-pointer">
+                    {discovery.descartadas.length} propuesta
+                    {discovery.descartadas.length === 1 ? '' : 's'} que el registro oficial rechazó
+                  </summary>
+                  <ul className="mt-2 space-y-1">
+                    {discovery.descartadas.map((d) => (
+                      <li key={d.cita} className="text-[10px] text-slate-500">
+                        <span className="font-semibold">{d.cita}</span> — {d.razon}
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              )}
             </div>
           )}
 
