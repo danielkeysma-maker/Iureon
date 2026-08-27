@@ -68,7 +68,7 @@ export const PRICE_COP: Record<Operation, number> = {
  * the billing path in exchange for accuracy nobody needs at these amounts. A
  * few points of drift are absorbed by the margin.
  */
-const COP_PER_USD = 4000;
+export const COP_PER_USD = 4000;
 
 /**
  * What the platform charges over its own cost.
@@ -77,7 +77,7 @@ const COP_PER_USD = 4000;
  * margin the flat $2.000 gave on an ordinary draft. The price scales; the
  * business does not change shape.
  */
-const MARKUP = 2.3;
+export const MARKUP = 2.3;
 
 /**
  * What one completed operation costs, given what it really consumed.

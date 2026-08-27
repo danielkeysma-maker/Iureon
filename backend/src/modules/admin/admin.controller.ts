@@ -3,6 +3,7 @@ import { AuthError } from '../auth/auth.service';
 import { auditService } from '../audit/audit.service';
 import { callerIp } from './admin.middleware';
 import { addCredits, addUserToAnyFirm, createFirm, listFirms, updateFirm } from './admin.service';
+import { calcularRunway } from './runway.service';
 
 /**
  * The operator console.
@@ -133,5 +134,23 @@ export const addUserController = async (req: Request, res: Response): Promise<vo
     res.status(201).json({ success: true, user });
   } catch (err) {
     fail(res, err, 'No se pudo crear la cuenta.');
+  }
+};
+
+/**
+ * Cuánto crédito de OpenRouter hace falta para honrar lo que ya se vendió.
+ *
+ * Es del superadmin y no de la firma: el saldo de una firma es suyo, pero el
+ * pasivo agregado y el crédito del proveedor son de la casa.
+ */
+export const runwayController = async (_req: Request, res: Response): Promise<void> => {
+  try {
+    res.json({ success: true, runway: await calcularRunway() });
+  } catch (error) {
+    res.status(502).json({
+      success: false,
+      error: 'RUNWAY_UNAVAILABLE',
+      message: (error as Error).message
+    });
   }
 };

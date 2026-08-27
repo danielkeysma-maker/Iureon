@@ -6,7 +6,8 @@ import {
   createFirmController,
   listFirmsController,
   updateFirmController
-} from './admin.controller';
+,
+  runwayController} from './admin.controller';
 
 /**
  * The operator console, gated as a whole.
@@ -28,6 +29,7 @@ const router = Router();
 
 router.use(requireSuperAdmin);
 
+router.get('/runway', runwayController as any);
 router.get('/firms', listFirmsController as any);
 router.post('/firms', createFirmController as any);
 router.patch('/firms/:firmId', updateFirmController as any);
