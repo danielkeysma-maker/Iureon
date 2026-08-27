@@ -1,6 +1,7 @@
 /** Top-level sections of the workspace, as listed in the sidebar. */
 export type MainView =
   | 'workspace'
+  | 'borradores'
   | 'audiencias'
   | 'entrevistas'
   | 'search'

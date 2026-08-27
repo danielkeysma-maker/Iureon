@@ -101,6 +101,7 @@ export const updateDraftController = async (req: Request, res: Response): Promis
     jurisprudenciaCitada,
     excepcionesFormuladas,
     venceEl,
+    legalBranch,
     cliente,
     despacho,
     radicado,
@@ -118,6 +119,13 @@ export const updateDraftController = async (req: Request, res: Response): Promis
   if (jurisprudenciaCitada !== undefined) cambios.jurisprudencia_citada = jurisprudenciaCitada;
   if (excepcionesFormuladas !== undefined) cambios.excepciones_formuladas = excepcionesFormuladas;
   if (venceEl !== undefined) cambios.vence_el = venceEl;
+  /*
+   * La rama SÍ se corrige. `createDraft` la acepta y este controlador no la
+   * aceptaba, así que un escrito guardado bajo la rama equivocada se quedaba
+   * ahí para siempre: la pantalla de borradores filtra por rama, y ese escrito
+   * desaparecía del filtro correcto sin que nada fallara.
+   */
+  if (legalBranch !== undefined) cambios.legal_branch = legalBranch;
   if (cliente !== undefined) cambios.cliente = cliente;
   if (despacho !== undefined) cambios.despacho = despacho;
   if (radicado !== undefined) cambios.radicado = radicado;

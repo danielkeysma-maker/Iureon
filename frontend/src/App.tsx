@@ -28,6 +28,7 @@ import type { FirmBrandingConfig } from './modules/documents/services/documentEx
 import { useLegalAgentWorkflow } from './modules/workspace/hooks/useLegalAgentWorkflow';
 
 import { SavedDraftsModal } from './modules/documents/components/SavedDraftsModal';
+import { SavedDraftsView } from './modules/documents/components/SavedDraftsView';
 import type { SavedDraftEntry } from './modules/documents/types';
 import { useSavedDrafts } from './modules/documents/hooks/useSavedDrafts';
 
@@ -253,7 +254,8 @@ export function App() {
     loadedDraftId,
     setLoadedDraftId,
     saveDraft,
-    deleteDraft
+    deleteDraft,
+    updateMetadata
   } = useSavedDrafts(activeFirm.id, currentUserEmail, isAuthenticated);
 
   const handleSaveDraft = async (updatedText: string) => {
@@ -464,6 +466,37 @@ export function App() {
               />
               </div>
             </div>
+          )}
+
+          {mainView === 'borradores' && (
+            <SavedDraftsView
+              savedDrafts={savedDrafts}
+              onAbrir={(entrada) => {
+                handleLoadDraft(entrada);
+                setMainView('workspace');
+              }}
+              onEliminar={deleteDraft}
+              onDuplicar={(entrada) => {
+                /*
+                  Duplicar es la unica forma de continuar a partir de un escrito
+                  radicado: el original queda intacto en el expediente y la copia
+                  nace como borrador nuevo. Va sin `id`, asi que el panel la
+                  guardara como otro escrito y no sobre el sellado.
+                */
+                handleLoadDraft({
+                  ...entrada,
+                  id: '',
+                  estado: 'BORRADOR',
+                  radicadoEl: null,
+                  radicado: null,
+                  version: 1,
+                  draft: { ...entrada.draft, title: `${entrada.draft.title} (copia)` }
+                });
+                setMainView('workspace');
+              }}
+              onGuardarDatos={updateMetadata}
+              onRedactar={() => setMainView('workspace')}
+            />
           )}
 
           {mainView === 'audiencias' && <TranscriptionView kind="AUDIENCIA" />}

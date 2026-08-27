@@ -138,5 +138,44 @@ export const useSavedDrafts = (firmId: string, userEmail: string, enabled: boole
     [savedDrafts, storageKey, reload]
   );
 
-  return { savedDrafts, loadedDraftId, setLoadedDraftId, reload, saveDraft, deleteDraft };
+  /**
+   * Los datos del expediente: proceso, término, estado.
+   *
+   * VA APARTE DE `saveDraft` A PROPÓSITO. Guardar el escrito sube la versión —
+   * v4 es la cuarta redacción— y corregir el nombre del cliente no es redactar
+   * de nuevo. Si compartieran camino, el número de versión dejaría de servir
+   * para lo único que sirve: que dos abogados sepan cuál es el escrito bueno.
+   *
+   * Sin backend, el cambio se queda en local. No se pierde, pero tampoco lo ve
+   * el resto de la firma, y por eso el llamador recibe el aviso.
+   */
+  const updateMetadata = useCallback(
+    async (
+      id: string,
+      campos: Partial<
+        Pick<SavedDraftEntry, 'venceEl' | 'cliente' | 'despacho' | 'radicado' | 'legalBranch' | 'estado'>
+      >
+    ): Promise<boolean> => {
+      if (await draftsApi.patch(id, campos)) {
+        await reload();
+        return true;
+      }
+
+      const updated = savedDrafts.map((d) => (d.id === id ? { ...d, ...campos } : d));
+      setSavedDrafts(updated);
+      writeLocal(storageKey, updated);
+      return false;
+    },
+    [savedDrafts, storageKey, reload]
+  );
+
+  return {
+    savedDrafts,
+    loadedDraftId,
+    setLoadedDraftId,
+    reload,
+    saveDraft,
+    deleteDraft,
+    updateMetadata
+  };
 };

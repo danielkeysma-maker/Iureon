@@ -1,4 +1,4 @@
-import { Sparkles, Mic, BookOpen, Library, Wrench, Shield, UserRound, ShieldCheck, Compass, SlidersHorizontal } from 'lucide-react';
+import { Sparkles, Mic, BookOpen, Library, Wrench, Shield, UserRound, ShieldCheck, Compass, SlidersHorizontal, FileClock } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { MainView } from './types';
 
@@ -45,6 +45,20 @@ export const NAV_MODULES: NavModule[] = [
     icon: Compass
   },
   { id: 'workspace', label: 'Redacción', description: 'Providencias judiciales', icon: Sparkles },
+  /*
+   * Un reloj y no una carpeta, y la descripción habla de términos.
+   *
+   * Los borradores estaban solo detrás de un botón dentro del panel de
+   * redacción, así que para saber qué vence esta semana había que entrar a
+   * redactar. Un borrador jurídico no es un archivo que espera: es un plazo que
+   * corre, y merece su propia puerta en la barra.
+   */
+  {
+    id: 'borradores',
+    label: 'Borradores',
+    description: 'Escritos por terminar y sus términos',
+    icon: FileClock
+  },
   { id: 'audiencias', label: 'Audiencias', description: 'Transcripción de grabaciones', icon: Mic },
   {
     id: 'entrevistas',
@@ -93,7 +107,7 @@ export interface NavGroup {
 }
 
 export const NAV_GROUPS: NavGroup[] = [
-  { titulo: 'Producir', modulos: ['workspace', 'orientacion'] },
+  { titulo: 'Producir', modulos: ['workspace', 'borradores', 'orientacion'] },
   { titulo: 'Registrar', modulos: ['audiencias', 'entrevistas'] },
   { titulo: 'Consultar', modulos: ['search', 'catalogo', 'tools'] },
   { titulo: 'Administrar', modulos: ['audit', 'privacidad', 'ajustes'], plegable: true }

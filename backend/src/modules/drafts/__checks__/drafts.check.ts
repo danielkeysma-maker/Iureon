@@ -21,6 +21,7 @@ import { join } from 'node:path';
  * fuerza commonjs; esta es la segunda vez que muerde.
  */
 const SERVICIO = readFileSync(join(__dirname, '..', 'drafts.service.ts'), 'utf8');
+const CONTROLADOR = readFileSync(join(__dirname, '..', 'drafts.controller.ts'), 'utf8');
 const SQL = readFileSync(
   join(__dirname, '..', '..', '..', '..', '..', 'supabase', 'migration-borradores.sql'),
   'utf8'
@@ -121,6 +122,46 @@ check(
 check(
   'la fecha de vencimiento se guarda, no se deduce del término',
   !/vence_el\s*[:=][^;]*(?:addDays|setDate|\+\s*\d+\s*\*\s*24)/.test(SERVICIO),
+  ''
+);
+
+/*
+ * --- TODO CAMPO QUE SE PUEDE CREAR, SE PUEDE CORREGIR ------------------------
+ *
+ * `createDraft` aceptaba `legal_branch` y el controlador de actualizacion no lo
+ * leia del cuerpo, asi que un escrito guardado bajo la rama equivocada se
+ * quedaba ahi para siempre. La pantalla de borradores filtra por rama: ese
+ * escrito desaparecia del filtro correcto y nada fallaba.
+ *
+ * El defecto no era la linea que faltaba, sino la ASIMETRIA — y esto comprueba
+ * la asimetria entera, no el unico caso que ya se corrigio.
+ */
+const CREABLES = ['legal_branch', 'vence_el', 'cliente', 'despacho', 'radicado'];
+const noCorregibles = CREABLES.filter((columna) => {
+  // Se crea si aparece en el insert; se corrige si el controlador lo mapea.
+  // Sin expresiones regulares a proposito: los backslashes de este archivo ya
+  // se colapsaron una vez al escribirlo, y una regex rota no falla — deja de
+  // encontrar, y el check pasa en verde sin comprobar nada.
+  const seCrea = SERVICIO.includes(columna + ': draft.');
+  const seCorrige = CONTROLADOR.includes('cambios.' + columna + ' =');
+  return seCrea && !seCorrige;
+});
+
+check(
+  'todo campo del expediente que se puede crear tambien se puede corregir',
+  noCorregibles.length === 0,
+  noCorregibles.length ? `sin forma de corregir: ${noCorregibles.join(', ')}` : ''
+);
+
+/*
+ * `undefined` en Supabase BORRA el valor. Si el controlador mandara el objeto
+ * completo, corregir el nombre del cliente vaciaria la fecha de vencimiento y
+ * el escrito perderia su termino en silencio.
+ */
+check(
+  'solo se mandan a la base los campos que llegaron en la peticion',
+  CONTROLADOR.includes('const cambios: Record<string, unknown> = {};') &&
+    CONTROLADOR.includes('if (estado !== undefined) cambios.estado = estado;'),
   ''
 );
 

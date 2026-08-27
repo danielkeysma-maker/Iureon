@@ -144,6 +144,40 @@ export const draftsApi = {
     }
   },
 
+  /**
+   * Los datos del EXPEDIENTE, aparte del texto.
+   *
+   * `update` manda título y texto, y eso sube la versión: v4 significa la
+   * cuarta redacción. Corregir el nombre del cliente o poner la fecha de
+   * vencimiento no es redactar de nuevo, y si pasara por ahí, dos abogados ya
+   * no podrían usar el número de versión para saber cuál es el escrito bueno —
+   * que es exactamente para lo que sirve.
+   *
+   * Solo se mandan las claves presentes: el servidor distingue `undefined` de
+   * `null`, así que omitir un campo lo deja como estaba y mandarlo en `null` lo
+   * borra a propósito.
+   */
+  async patch(
+    draftId: string,
+    campos: {
+      venceEl?: string | null;
+      cliente?: string | null;
+      despacho?: string | null;
+      radicado?: string | null;
+      legalBranch?: string | null;
+      estado?: EstadoBorrador;
+    }
+  ): Promise<boolean> {
+    try {
+      const json = await httpClient.put<{ success: boolean }>(`/api/drafts/${draftId}`, {
+        body: campos
+      });
+      return Boolean(json.success);
+    } catch {
+      return false;
+    }
+  },
+
   async remove(draftId: string): Promise<boolean> {
     try {
       const json = await httpClient.delete<{ success: boolean }>(`/api/drafts/${draftId}`);
