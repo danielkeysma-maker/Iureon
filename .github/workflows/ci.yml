@@ -40,6 +40,8 @@ jobs:
         run: npm run check:conceptos
       - name: Subprocessor register matches the running config
         run: npm run check:subprocessors
+      - name: On-demand ruling fetch refuses what the Court does not have
+        run: npm run check:ruling
 
       - name: Build
         run: npm run build

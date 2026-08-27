@@ -26,7 +26,8 @@
     "check:wompi": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/billing/wompi/__checks__/wompi.check.ts",
     "check:conceptos": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/ingestion/__checks__/conceptos.check.ts",
     "ingest:conceptos": "npx ts-node --transpile-only src/scripts/ingestConceptos.ts",
-    "check:subprocessors": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/privacy/__checks__/subprocessors.check.ts"
+    "check:subprocessors": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/privacy/__checks__/subprocessors.check.ts",
+    "check:ruling": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/jurisprudence/__checks__/officialRuling.check.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

@@ -87,9 +87,23 @@ const isComment = (line: string): boolean => /^\s*(\/\/|\*|\/\*)/.test(line);
  * entries cite rulings that were read at the source, and they are built from
  * research/ by a script rather than typed into a component.
  */
+/*
+ * Los archivos de `__checks__` quedan fuera, y la razón es la misma que sostiene
+ * la regla.
+ *
+ * Esta guarda impide que el CÓDIGO QUE SE ENVÍA afirme una providencia que
+ * nadie abrió. Un check que verifica la detección de citas falsas tiene que
+ * CONTENER citas falsas: `officialRuling.check.ts` usa SU-049 de 2022 y C-999
+ * de 2022 como controles, exactamente igual que el comentario de más abajo
+ * cuenta que se usó SU-049 para validar esta misma guarda.
+ *
+ * Un fixture no es una afirmación. Se contrasta contra la realidad — el check
+ * exige que esas dos se declaren INEXISTENTES — mientras que una cita en el
+ * código de producción se le entrega a un abogado.
+ */
 const scanned = [join(REPO, 'backend', 'src', 'modules'), join(REPO, 'frontend', 'src', 'modules')]
   .flatMap(walk)
-  .filter((file) => !file.includes(join('catalog', 'data')));
+  .filter((file) => !file.includes(join('catalog', 'data')) && !file.includes('__checks__'));
 
 /**
  * Citations allowed to appear in source, each one opened at the relatoría.

@@ -20,6 +20,7 @@ import { transcriptionPublicRoutes, transcriptionRoutes } from './modules/transc
 import { catalogPublicRoutes, catalogRoutes } from './modules/catalog/catalog.routes';
 import { wompiPublicRoutes, wompiRoutes } from './modules/billing/wompi/wompi.routes';
 import { privacyRoutes } from './modules/privacy/privacy.routes';
+import { jurisprudenceRoutes } from './modules/jurisprudence/jurisprudence.routes';
 import { embeddingsService } from './modules/embeddings/embeddings.service';
 import { EMBEDDING_DIMENSIONS } from './modules/embeddings/types';
 
@@ -114,6 +115,7 @@ app.use('/api', clientsRoutes);
 app.use('/api', billingRoutes);
 app.use('/api', wompiRoutes);
 app.use('/api', privacyRoutes);
+app.use('/api', jurisprudenceRoutes);
 app.use('/api', catalogRoutes);
 
 // Servidor Express
