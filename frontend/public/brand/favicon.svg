@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Iureon">
+  <style>
+    .a { stroke: #14294A; }
+    .b { stroke: #C8A046; }
+    .p { fill: #14294A; }
+    @media (prefers-color-scheme: dark) {
+      .a { stroke: #F4F1EA; }
+      .p { fill: #F4F1EA; }
+    }
+  </style>
+  <g fill="none" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M39 57C39 48 25 44 25 34C25 27 30 23 32 21" class="b"/>
+    <path d="M25 57C25 48 39 44 39 34C39 27 34 23 32 21" class="a"/>
+  </g>
+  <path d="M32 6L40 19H24Z" class="p"/>
+</svg>

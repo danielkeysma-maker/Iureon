@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 132" width="200" height="132" role="img" aria-label="Iureon">
+  <g transform="translate(68 4)">
+    <g fill="none" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M39 57C39 48 25 44 25 34C25 27 30 23 32 21" stroke="#C8A046"/>
+      <path d="M25 57C25 48 39 44 39 34C39 27 34 23 32 21" stroke="#14294A"/>
+    </g>
+    <path d="M32 6L40 19H24Z" fill="#14294A"/>
+  </g>
+  <text x="100" y="112" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="30" letter-spacing="4" fill="#14294A">IUREON</text>
+</svg>
