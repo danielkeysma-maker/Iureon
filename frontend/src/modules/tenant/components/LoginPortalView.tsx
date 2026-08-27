@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
+import { AlertCircle, Eye, EyeOff, Lock } from 'lucide-react';
 import { IureonMark } from './IureonMark';
-import { Mail, Key, ShieldCheck, ArrowRight, AlertCircle } from 'lucide-react';
 import { authApi } from '../../auth/auth.api';
 import type { Session } from '../../auth/session';
 
@@ -23,12 +23,44 @@ interface LoginPortalViewProps {
  * same shape, since a tenant is exactly what the product bills. Firms are
  * opened from the operator console, by whoever knows what was agreed and
  * charged.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * LA PANTALLA, REDISEÑADA. Antes era una tarjeta flotando sobre un fondo con
+ * degradados difusos y una retícula decorativa — el aspecto de una aplicación de
+ * consumo. Ahora son dos mitades: a la izquierda qué es el producto y qué
+ * garantiza, a la derecha entrar. Es la primera impresión, y un abogado que no
+ * conoce Iureon merece saber a qué está entrando antes de escribir su contraseña.
+ *
+ * Las cifras de la izquierda son las reales, no adorno: 651 actuaciones y los
+ * dos registros que se consultan en vivo. Si alguna deja de ser cierta hay que
+ * cambiarla aquí, y por eso viven en una constante y no sueltas en el marcado.
  */
+
+/**
+ * Lo que la portada afirma sobre el producto.
+ *
+ * Cada cifra es comprobable contra el catálogo y el módulo de jurisprudencia. No
+ * se ponen aquí números redondeados hacia arriba: esta pantalla la lee alguien
+ * que todavía no confía en el producto, y una cifra inflada que después no
+ * cuadra es la forma más rápida de perderlo.
+ */
+const PRUEBAS = [
+  {
+    cifra: '651',
+    texto: 'actuaciones procesales catalogadas, verificadas contra el texto oficial de la norma'
+  },
+  {
+    cifra: '2',
+    texto: 'registros consultados en vivo: Corte Constitucional y Corte Suprema de Justicia'
+  }
+] as const;
+
 export const LoginPortalView: React.FC<LoginPortalViewProps> = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [verContrasena, setVerContrasena] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,105 +87,149 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({ onLoginSuccess
   };
 
   return (
-    <div className="min-h-screen w-full bg-slate-950 flex items-center justify-center p-4 font-sans select-none relative overflow-hidden">
-      {/* Dynamic Grid Background Accent */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b15_1px,transparent_1px),linear-gradient(to_bottom,#1e293b15_1px,transparent_1px)] bg-[size:4rem_4rem]" />
-      <div className="absolute -top-40 -right-40 w-96 h-96 bg-blue-900/20 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-indigo-900/20 rounded-full blur-3xl pointer-events-none" />
+    <div className="flex min-h-screen w-full font-sans">
+      {/*
+        LA MITAD IZQUIERDA SE OCULTA EN MÓVIL, no se encoge. Un argumento
+        comercial comprimido a 390px deja de ser argumento y se vuelve un muro
+        de texto entre el abogado y el campo de contraseña.
 
-      {/* Main Login Card */}
-      <div className="w-full max-w-md bg-white/95 backdrop-blur-md border border-slate-800/20 rounded-3xl p-8 shadow-2xl relative z-10 space-y-6">
-        {/* Brand Header */}
-        <div className="text-center space-y-2">
-          {/*
-            En el login la marca va sola y sin caja: es la primera impresión del
-            producto, y encerrarla en un cuadrado de color la convierte en el
-            icono de una aplicación cualquiera.
-          */}
-          <IureonMark size={56} className="mx-auto" />
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">IUREON</h1>
-          <p className="text-xs font-medium text-slate-500">
-            Plataforma LegalTech &amp; Ecosistema Judicial Colombia
-          </p>
+        Conserva el azul de la barra (`nav`) en los dos temas: es la superficie
+        de marca, y en oscuro apenas se oscurece un paso.
+      */}
+      <aside className="hidden w-[46%] max-w-[596px] flex-col bg-nav p-8 lg:flex">
+        <div className="flex items-center gap-2.5">
+          <IureonMark size={28} mono className="text-white/80" />
+          <span className="text-subtitle tracking-[0.02em] text-white">Iureon</span>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="text-xs font-semibold text-slate-700 block mb-1">
-              Correo Electrónico Corporativo:
-            </label>
-            <div className="relative">
-              <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+        <div className="mt-auto">
+          <h1 className="max-w-[420px] text-[30px] font-semibold leading-[1.25] text-white [text-wrap:pretty]">
+            Escritos jurídicos con el término y el artículo verificados contra la norma oficial.
+          </h1>
+          <p className="mt-3.5 max-w-[430px] text-body leading-[1.65] text-white/70 [text-wrap:pretty]">
+            Tres modelos trabajando sobre un catálogo curado por abogados, no sobre una respuesta
+            genérica. Lo que no está verificado, se lo decimos.
+          </p>
+
+          <dl className="mt-8 grid max-w-[440px] grid-cols-2 gap-x-6 gap-y-3.5">
+            {PRUEBAS.map(({ cifra, texto }) => (
+              <div key={cifra} className="border-t border-white/15 pt-3">
+                {/* En mono porque es un dato, no interfaz. */}
+                <dt className="font-mono text-[22px] font-semibold text-white">{cifra}</dt>
+                <dd className="mt-1 text-meta leading-[1.5] text-white/55">{texto}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+
+        <p className="mt-auto pt-8 font-mono text-[11px] leading-[1.6] text-white/45">
+          Tratamiento de datos conforme a la Ley 1581 de 2012 · subencargados publicados en la
+          sección Privacidad
+        </p>
+      </aside>
+
+      <main className="flex flex-1 items-center justify-center bg-surface p-6">
+        <div className="w-full max-w-[352px]">
+          {/* La marca solo aquí en móvil, donde la mitad izquierda no existe. */}
+          <div className="mb-6 flex items-center gap-2.5 lg:hidden">
+            <IureonMark size={26} />
+            <span className="text-subtitle text-ink-900">Iureon</span>
+          </div>
+
+          <h2 className="text-title text-ink-900">Entrar</h2>
+          <p className="mt-1 text-ui text-ink-500">Con el correo de su firma.</p>
+
+          <form onSubmit={handleSubmit} className="mt-6 space-y-3.5">
+            <div>
+              <label htmlFor="correo" className="mb-1.5 block text-meta font-medium text-ink-700">
+                Correo
+              </label>
               <input
+                id="correo"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="abogado@tufirma.co"
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-900 font-medium focus:outline-none focus:border-blue-900 focus:bg-white transition-all"
+                placeholder="nombre@sufirma.co"
+                autoComplete="email"
+                className="field h-[38px]"
                 required
               />
             </div>
-          </div>
 
-          <div>
-            <label className="text-xs font-semibold text-slate-700 block mb-1">
-              Contraseña de Acceso:
-            </label>
-            <div className="relative">
-              <Key className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••••••"
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-900 font-mono focus:outline-none focus:border-blue-900 focus:bg-white transition-all"
-                required
-              />
+            <div>
+              <div className="mb-1.5 flex items-baseline gap-2">
+                <label htmlFor="clave" className="text-meta font-medium text-ink-700">
+                  Contraseña
+                </label>
+                {/*
+                  Sin recuperación automática todavía: el acceso lo abre el
+                  operador. Decirlo es más honesto que un enlace que lleva a una
+                  pantalla que no existe.
+                */}
+                <span className="ml-auto text-meta text-ink-400">La restablece su firma</span>
+              </div>
+              <div className="relative">
+                <input
+                  id="clave"
+                  type={verContrasena ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••••"
+                  autoComplete="current-password"
+                  className="field h-[38px] pr-10 font-mono tracking-[0.12em]"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setVerContrasena((v) => !v)}
+                  aria-label={verContrasena ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  className="absolute right-0 top-0 flex h-[38px] w-10 items-center justify-center text-ink-400 hover:text-ink-700"
+                >
+                  {verContrasena ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
-          </div>
 
-          {errorMsg && (
-            <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-xs font-medium flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-              <span>{errorMsg}</span>
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full py-3 bg-blue-950 hover:bg-blue-900 disabled:bg-slate-400 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.99]"
-          >
-            {isLoading ? (
-              <span>Verificando credenciales…</span>
-            ) : (
-              <>
-                <ShieldCheck className="w-4 h-4 text-blue-300" />
-                <span>Ingresar al Workspace Judicial</span>
-                <ArrowRight className="w-4 h-4" />
-              </>
+            {errorMsg && (
+              <div
+                role="alert"
+                className="flex items-start gap-2 rounded-card border border-[rgb(var(--danger-line))] bg-[rgb(var(--danger)/0.07)] px-3 py-2.5 text-ui text-ink-900"
+              >
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-danger" />
+                <span>{errorMsg}</span>
+              </div>
             )}
-          </button>
-        </form>
 
-        {/*
-          Says what is true, as the previous notice did back when nothing was
-          verified at all. Now it is: the password is checked against Supabase
-          Auth, and the firm travels inside a signed token rather than in a
-          header the browser writes.
+            <button type="submit" disabled={isLoading} className="btn-primary mt-1 h-10 w-full">
+              {isLoading ? 'Verificando…' : 'Entrar'}
+            </button>
+          </form>
 
-          And it tells a firm that lands here how to become a client, because
-          removing self-registration in silence would read as the product being
-          broken rather than as it being sold.
-        */}
-        <div className="pt-4 border-t border-slate-100 text-center text-[11px] text-slate-500 space-y-1">
-          <p>Acceso verificado. Cada firma solo ve sus propios expedientes.</p>
-          <p className="text-slate-400">
-            El acceso a Iureon es por contratación. Si tu firma quiere usarlo, contáctanos y
-            abrimos su cuenta.
+          {/*
+            Dice lo que es cierto, como ya lo decía cuando nada estaba verificado.
+            Ahora sí lo está: la contraseña se comprueba contra Supabase Auth y la
+            firma viaja dentro de un token firmado, no en una cabecera que el
+            navegador escribe.
+          */}
+          <div className="mt-5 flex gap-2 rounded-card border border-line-200 bg-canvas px-3 py-2.5">
+            <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink-500" />
+            <p className="text-meta leading-[1.55] text-ink-500">
+              Sus documentos y grabaciones no se usan para entrenar modelos. Cada acceso queda en
+              Auditoría, y cada firma solo ve sus propios expedientes.
+            </p>
+          </div>
+
+          {/*
+            Y le dice a una firma que aterrice aquí cómo volverse cliente: quitar
+            el auto-registro en silencio se leería como que el producto está
+            roto, en vez de como que se vende.
+          */}
+          <p className="mt-4 text-meta leading-[1.6] text-ink-400">
+            ¿Su firma aún no tiene cuenta? El acceso a Iureon es por contratación: escríbanos y
+            abrimos la suya.
           </p>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

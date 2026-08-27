@@ -72,6 +72,21 @@
   /* Destructivo. Fuera de la paleta de estado, y solo para eso. */
   --danger: 140 47 38; /* #8C2F26 */
 
+  /* ─── SUPERFICIES Y BORDES DE LOS ESTADOS ─────────────────────────────────
+   * Cada estado tiene su propio fondo y su propio borde, y el borde del
+   * "sin verificar" es DISCONTINUO. Esa discontinuidad es la señal principal:
+   * se lee como "incompleto" en escala de grises, y por eso los tres estados
+   * siguen siendo distinguibles sin color.
+   */
+  --verified-surf: 233 242 236; /* #E9F2EC */
+  --verified-line: 168 200 182; /* #A8C8B6 */
+  --unverified-surf: 251 243 228; /* #FBF3E4 */
+  --unverified-line: 207 174 110; /* #CFAE6E */
+  --neutral-surf: 237 240 244; /* #EDF0F4 */
+  --neutral-line: 207 214 224; /* #CFD6E0 */
+  --brand-line: 203 217 228; /* #CBD9E4 · borde del secundario */
+  --danger-line: 229 198 194; /* #E5C6C2 */
+
   /* ─── EL LIENZO DEL ESCRITO ───────────────────────────────────────────────
    * Tiene su propia superficie porque lo que se radica se lee como documento,
    * no como interfaz.
@@ -138,6 +153,17 @@
     --unverified: 217 166 74; /* #D9A64A */
     --neutral-fact: 143 160 178;
     --danger: 217 115 106; /* #D9736A */
+
+    --verified-surf: 18 41 31; /* #12291F */
+    --verified-line: 36 92 65; /* #245C41 */
+    --unverified-surf: 42 35 20; /* #2A2314 */
+    --unverified-line: 92 74 34; /* #5C4A22 */
+    --neutral-surf: 26 36 48; /* #1A2430 */
+    --neutral-line: 46 59 74; /* #2E3B4A */
+    --brand-line: 42 76 107; /* #2A4C6B */
+    /* Derivado: el diseño no muestra destructivo en oscuro. Misma relación
+       claro/oscuro que el verificado, para no inventar un tono suelto. */
+    --danger-line: 92 46 42;
 
     /*
      * REGLA 05 — EL ESCRITO NO SE IMPRIME EN OSCURO. En pantalla el lienzo es

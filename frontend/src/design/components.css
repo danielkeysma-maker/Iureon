@@ -1,0 +1,205 @@
+/*
+ * Los componentes base del sistema, escritos una vez.
+ *
+ * POR QUÉ CLASES Y NO CADENAS DE TAILWIND REPETIDAS EN CADA PANTALLA. Un botón
+ * primario son once declaraciones; repetirlas en veinte pantallas garantiza que
+ * a la tercera alguien escriba diez, y la diferencia no se ve. Aquí el sistema
+ * es la definición: si el diseño cambia el alto de control, cambia en un sitio.
+ *
+ * Todo apunta a los tokens de `tokens.css`, así que cada componente ya sabe
+ * comportarse en modo oscuro sin una sola clase `dark:`.
+ */
+
+@layer components {
+  /* ─── BOTONES ───────────────────────────────────────────────────────────────
+   *
+   * DOS ALTURAS, NO CINCO: 34px para lo principal y 28px para barras densas. Y
+   * el radio siempre 4px, para que nada se lea como "pastilla".
+   *
+   * UN SOLO PRIMARIO POR PANTALLA. El fantasma nunca va junto a otro fantasma.
+   */
+  .btn {
+    @apply inline-flex h-[34px] items-center justify-center gap-2 rounded-control
+           px-4 text-ui font-medium transition-colors
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700/40;
+  }
+
+  .btn-sm {
+    @apply h-[28px] gap-1.5 px-2.5 text-meta;
+  }
+
+  /*
+   * El primario invierte en oscuro —texto oscuro sobre azul claro— porque el
+   * azul institucional sobre #131B24 casi desaparece. Es la única inversión del
+   * sistema, y por eso el botón sigue siendo lo más brillante de la pantalla.
+   * El token `on-brand` ya lo resuelve.
+   */
+  .btn-primary {
+    @apply btn border border-brand-700 bg-brand-700 font-semibold text-on-brand
+           hover:border-brand-800 hover:bg-brand-800
+           disabled:cursor-not-allowed disabled:border-line-200 disabled:bg-line-100
+           disabled:text-ink-400 disabled:hover:bg-line-100;
+  }
+
+  .btn-secondary {
+    @apply btn border border-[rgb(var(--brand-line))] bg-surface text-brand-700
+           hover:bg-brand-50
+           disabled:cursor-not-allowed disabled:border-line-200 disabled:text-ink-400;
+  }
+
+  /* Neutro: para acciones que no compiten con la principal. */
+  .btn-neutral {
+    @apply btn border border-line-200 bg-surface text-ink-700 hover:bg-canvas;
+  }
+
+  .btn-ghost {
+    @apply btn border border-transparent bg-transparent text-ink-700 hover:bg-canvas;
+  }
+
+  /* Destructivo. Es la ÚNICA presencia del rojo en la interfaz. */
+  .btn-danger {
+    @apply btn border border-[rgb(var(--danger-line))] bg-surface text-danger
+           hover:bg-[rgb(var(--danger)/0.06)];
+  }
+
+  /* ─── CAMPOS Y SELECTORES ──────────────────────────────────────────────────*/
+  .field {
+    @apply h-[34px] w-full rounded-control border border-line-200 bg-surface px-3
+           text-ui text-ink-900 placeholder:text-ink-400
+           focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-700/25;
+  }
+
+  .field-area {
+    @apply w-full rounded-control border border-line-200 bg-surface p-3
+           text-body text-ink-900 placeholder:text-ink-400
+           focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-700/25;
+  }
+
+  /*
+   * La etiqueta de un campo, y de cualquier bloque.
+   * Mayúsculas con tracking .09em — el tamaño `label` del sistema ya lo lleva.
+   */
+  .field-label {
+    @apply mb-1.5 block text-label uppercase text-ink-500;
+  }
+
+  /* ─── CHIPS DE ESTADO ──────────────────────────────────────────────────────
+   *
+   * EL ESTADO NUNCA VIAJA SOLO EN COLOR: siempre ícono + palabra, en mono y
+   * mayúscula. Y cada estado tiene además un borde distinto — el "sin verificar"
+   * es DISCONTINUO, que se lee como "incompleto" incluso en escala de grises.
+   *
+   * Esa redundancia es el punto: quitando el color, los tres siguen siendo
+   * distinguibles. Es lo que hace el producto usable para quien no distingue
+   * verde de ámbar, y estos avisos son sobre plazos que vencen.
+   */
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-[3px]
+           font-mono text-[11px] font-semibold uppercase tracking-[0.07em];
+  }
+
+  .chip-verified {
+    @apply chip border border-[rgb(var(--verified-line))]
+           bg-[rgb(var(--verified-surf))] text-verified;
+  }
+
+  /* El borde discontinuo es la señal principal, no el color. */
+  .chip-unverified {
+    @apply chip border border-dashed border-[rgb(var(--unverified-line))]
+           bg-[rgb(var(--unverified-surf))] text-unverified;
+  }
+
+  /*
+   * "No caduca" usa la misma solidez visual que el verificado porque también es
+   * un hecho comprobado: la norma no fija término. Lo único que cambia es el
+   * matiz neutro y que no hay cifra que copiar.
+   */
+  .chip-neutral {
+    @apply chip border border-[rgb(var(--neutral-line))]
+           bg-[rgb(var(--neutral-surf))] text-neutral-fact;
+  }
+
+  /* Curado por un abogado, frente a lo hallado por descubrimiento automático. */
+  .chip-curated {
+    @apply chip border border-[rgb(var(--brand-line))] bg-brand-50 text-brand-700;
+  }
+
+  .chip-auto {
+    @apply chip border border-line-200 bg-canvas text-ink-500;
+  }
+
+  .chip-solid {
+    @apply chip bg-neutral-fact text-white;
+  }
+
+  /* ─── SUPERFICIES ──────────────────────────────────────────────────────────
+   *
+   * En oscuro toda tarjeta lleva borde visible y no solo un cambio de fondo:
+   * es la regla 02 del diseño. Como el borde ya está aquí, se cumple sola.
+   */
+  .card {
+    @apply rounded-card border border-line-200 bg-surface;
+  }
+
+  /* Cabecera de tarjeta o de panel: divisor abajo, nunca borde. */
+  .card-head {
+    @apply flex items-center gap-3 border-b border-line-100 px-4 py-3;
+  }
+
+  /*
+   * Flotante — menú, popover, diálogo. En claro se separa con sombra; en oscuro
+   * con superficie, porque la sombra ahí no se ve y solo ensucia. Los tokens
+   * `raised` y `e2` ya hacen esa sustitución.
+   */
+  .surface-raised {
+    @apply rounded-card border border-line-200 bg-raised shadow-e2;
+  }
+
+  /* ─── AVISO ────────────────────────────────────────────────────────────────
+   * Una línea, ícono a la izquierda, sin título propio.
+   */
+  .notice {
+    @apply flex items-start gap-2 rounded-card border border-[rgb(var(--brand-line))]
+           bg-brand-50 px-3 py-2.5 text-ui text-ink-900;
+  }
+
+  .notice-unverified {
+    @apply flex items-start gap-2 rounded-card border border-dashed
+           border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))]
+           px-3 py-2.5 text-ui text-ink-900;
+  }
+
+  /* ─── TABLA ────────────────────────────────────────────────────────────────
+   * Fila de 36px. Cebra en gris canvas, SIN bordes verticales: la retícula la
+   * dan las columnas alineadas.
+   */
+  .t-head {
+    @apply border-b border-line-200 bg-canvas px-3 py-[7px]
+           font-mono text-[11px] font-semibold uppercase tracking-[0.07em] text-ink-400;
+  }
+
+  .t-row {
+    @apply border-b border-line-100 px-3 py-[9px] text-ui text-ink-900;
+  }
+
+  .t-row-alt {
+    @apply t-row bg-canvas;
+  }
+
+  /*
+   * El dato citable va en mono, y eso no es estilo: si un número está en mono,
+   * el abogado lo puede pegar en un escrito; si está en sans, es interfaz.
+   */
+  .datum {
+    @apply font-mono text-meta text-ink-700;
+  }
+
+  /* ─── EL LIENZO DEL ESCRITO ────────────────────────────────────────────────
+   * Serif, y con su propia superficie: lo que se radica se lee como documento.
+   * En oscuro es un paso más claro que la app — pero el .docx y el PDF salen
+   * siempre en papel blanco, y el pie del taller lo dice.
+   */
+  .paper-canvas {
+    @apply bg-paper font-legal text-paper-ink;
+  }
+}

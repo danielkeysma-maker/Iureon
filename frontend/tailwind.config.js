@@ -20,6 +20,24 @@ const token = (nombre) => `rgb(var(--${nombre}) / <alpha-value>)`;
 
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+
+  /*
+   * Los chips de estado se conservan aunque el escaneo no los vea.
+   *
+   * Tailwind purga lo que no encuentra escrito literalmente, y el estado de una
+   * afirmación jurídica es justo lo que se compone en tiempo de ejecución:
+   * `chip-${estado.toLowerCase()}`. Sin esta lista la clase desaparece del CSS
+   * y el chip sale sin estilo — en producción, sobre el dato que más importa de
+   * la aplicación, y sin un solo error en consola.
+   */
+  safelist: [
+    'chip-verified',
+    'chip-unverified',
+    'chip-neutral',
+    'chip-curated',
+    'chip-auto',
+    'chip-solid'
+  ],
   theme: {
     extend: {
       fontFamily: {
