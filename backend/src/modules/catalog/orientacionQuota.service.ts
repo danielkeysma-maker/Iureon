@@ -3,15 +3,22 @@ import { supabase } from '../../config/supabase.config';
 /**
  * Caps how many orientations one firm can ask for in a day.
  *
- * WHY A CAP AND NOT A PRICE. Orientación is the door for the lawyer who does
- * not yet know what to ask, and charging at that door turns away exactly the
- * person the screen was built for. But free AND unbounded is not a commercial
- * decision, it is an open tap on the company card: the screen sends the whole
- * catalogue to a paid model on every press, and nothing stopped a legitimate
- * session from pressing it five thousand times.
+ * WHY A FREE ALLOWANCE AND THEN A PRICE, RATHER THAN EITHER ALONE. Orientación
+ * is the door for the lawyer who does not yet know what to ask, and charging at
+ * that door turns away exactly the person the screen was built for. But free
+ * AND unbounded is not a commercial decision, it is an open tap on the company
+ * card: the screen sends the whole catalogue to a paid model on every press,
+ * and nothing stopped a legitimate session from pressing it five thousand times.
  *
- * The cap turns an unbounded risk into a known cost: worst case per day is
- * firms × cap × cost per query. That is a number you can plan around.
+ * A hard wall was the first answer and it was the wrong one. It punishes the
+ * firm working a heavy day exactly as hard as the one abusing the endpoint, and
+ * the firm that genuinely needs the thirty-first is simply told no.
+ *
+ * So: the allowance is free and generous, and past it the consultation is
+ * charged to the firm's own balance. The hook stays free for everyone who has
+ * not paid, the intense user is served, and beyond the allowance the cost is
+ * borne by whoever is generating it — which is what makes abuse stop being the
+ * company's problem.
  *
  * IT COUNTS BEFORE CALLING THE MODEL, WHICH IS THE WHOLE POINT. Counting after
  * would mean the abusive call is paid for and then recorded — the cap would
@@ -31,8 +38,17 @@ import { supabase } from '../../config/supabase.config';
 export const TOPE_DIARIO = 30;
 
 export type CupoResultado =
-  | { permitido: true; consultasHoy: number; restantes: number }
-  | { permitido: false; motivo: string }
+  /** Dentro del cupo gratuito del día. No se cobra nada. */
+  | { permitido: true; cobrar: false; consultasHoy: number; restantes: number }
+  /*
+   * Pasado el cupo. NO se niega: se cobra.
+   *
+   * Un muro duro castiga igual al uso legítimo intenso que al abusivo, y la
+   * firma que de verdad necesita la número treinta y uno se queda sin ella. Al
+   * cobrar, el gancho gratuito se conserva íntegro y el consumo de más lo paga
+   * quien lo hace, con lo cual deja de salir de la tarjeta de la casa.
+   */
+  | { permitido: true; cobrar: true; consultasHoy: number; restantes: 0 }
   /*
    * Sin base de datos no se puede contar, y hay que decidir qué hacer.
    *
@@ -42,7 +58,7 @@ export type CupoResultado =
    * fallar cerrado— tendría sentido si esto guardara dinero o datos ajenos, y
    * no es el caso.
    */
-  | { permitido: true; consultasHoy: 0; restantes: number; sinContar: true };
+  | { permitido: true; cobrar: false; consultasHoy: 0; restantes: number; sinContar: true };
 
 /**
  * El día en Colombia, no en UTC.
@@ -61,7 +77,7 @@ export const diaEnColombia = (ahora: Date = new Date()): string =>
 
 export const consumirCupo = async (firmId: string): Promise<CupoResultado> => {
   if (!supabase) {
-    return { permitido: true, consultasHoy: 0, restantes: TOPE_DIARIO, sinContar: true };
+    return { permitido: true, cobrar: false, consultasHoy: 0, restantes: TOPE_DIARIO, sinContar: true };
   }
 
   const { data, error } = await supabase.rpc('consumir_orientacion', {
@@ -72,7 +88,7 @@ export const consumirCupo = async (firmId: string): Promise<CupoResultado> => {
 
   if (error) {
     console.warn(`[ORIENTACION] No se pudo contar el cupo de ${firmId}: ${error.message}`);
-    return { permitido: true, consultasHoy: 0, restantes: TOPE_DIARIO, sinContar: true };
+    return { permitido: true, cobrar: false, consultasHoy: 0, restantes: TOPE_DIARIO, sinContar: true };
   }
 
   /*
@@ -84,12 +100,15 @@ export const consumirCupo = async (firmId: string): Promise<CupoResultado> => {
    * abogado lean 29 y ambas se crean con derecho a la número 30.
    */
   if (data === null || data === undefined) {
-    return {
-      permitido: false,
-      motivo: `Esta firma alcanzó las ${TOPE_DIARIO} orientaciones de hoy. El cupo se reinicia mañana; entre tanto puedes buscar jurisprudencia o redactar directamente si ya sabes qué actuación corresponde.`
-    };
+    // El cupo gratuito se agotó. No se niega la consulta: el que llama cobra.
+    return { permitido: true, cobrar: true, consultasHoy: TOPE_DIARIO, restantes: 0 };
   }
 
   const consultasHoy = Number(data);
-  return { permitido: true, consultasHoy, restantes: Math.max(0, TOPE_DIARIO - consultasHoy) };
+  return {
+    permitido: true,
+    cobrar: false,
+    consultasHoy,
+    restantes: Math.max(0, TOPE_DIARIO - consultasHoy)
+  };
 };

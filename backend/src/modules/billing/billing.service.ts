@@ -23,7 +23,7 @@ import type { CallUsage } from '../agent/openrouter.client';
  * cannot answer a client asking why their balance moved.
  */
 
-export type Operation = 'BORRADOR' | 'TRANSCRIPCION' | 'BUSQUEDA';
+export type Operation = 'BORRADOR' | 'TRANSCRIPCION' | 'BUSQUEDA' | 'ORIENTACION';
 
 export class BillingError extends Error {
   readonly code: string;
@@ -57,7 +57,24 @@ export class BillingError extends Error {
 export const PRICE_COP: Record<Operation, number> = {
   BORRADOR: 2000,
   TRANSCRIPCION: 3000,
-  BUSQUEDA: 0
+  BUSQUEDA: 0,
+  /*
+   * Lo que cuesta una orientación PASADO el cupo diario gratuito.
+   *
+   * Dentro del cupo no se cobra y este número no se toca: la pantalla es la
+   * puerta de entrada para el abogado que todavía no sabe qué preguntar, y
+   * cobrarle ahí ahuyenta justamente a quien se construyó para atender.
+   *
+   * Pasado el cupo sí, y por dos razones distintas. La primera es que una firma
+   * que de verdad necesita la número treinta y uno debe poder tenerla: un muro
+   * duro castiga el uso legítimo intenso igual que el abusivo. La segunda es
+   * que a partir de ahí el consumo lo paga quien consume, así que el abuso deja
+   * de salir de la tarjeta de la casa y se vuelve un problema de quien lo hace.
+   *
+   * Cuesta unos $13 arriba; a $50 el margen es parecido al de un borrador y el
+   * precio sigue siendo trivial para una firma que está trabajando.
+   */
+  ORIENTACION: 50
 };
 
 /**

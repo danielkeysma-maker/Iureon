@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { triageFacts } from './triage.service';
-import { consumirCupo } from './orientacionQuota.service';
+import { consumirCupo, TOPE_DIARIO } from './orientacionQuota.service';
+import { reserveForOperation, refundReservation, BillingError, PRICE_COP } from '../billing/billing.service';
 
 /**
  * POST /api/catalog/triage   { hechos: string }
@@ -12,6 +13,11 @@ import { consumirCupo } from './orientacionQuota.service';
  * materia es una respuesta sobre el caso, no un error de la petición. Devolver
  * un error haría que la pantalla mostrara una avería cuando lo que hubo fue un
  * "no sé", que es justo lo que se quiere poder decir.
+ *
+ * PASADO EL CUPO NO SE NIEGA, SE COBRA. Un muro duro castiga igual al uso
+ * legítimo intenso que al abusivo, y la firma que de verdad necesita la número
+ * treinta y uno se queda sin ella. Cobrando, el gancho gratuito queda intacto
+ * para quien nunca ha pagado, y el consumo de más lo paga quien lo genera.
  *
  * EL CUPO SE CONSUME ANTES DE LLAMAR AL MODELO, y ese orden es el tope entero.
  * Esta pantalla le manda el catálogo completo a un motor pago y no le cobra
@@ -41,16 +47,55 @@ export const triageController = async (req: Request, res: Response): Promise<voi
   }
 
   const cupo = await consumirCupo(firmId);
+  const userEmail = req.user?.email ?? 'desconocido';
 
-  if (!cupo.permitido) {
-    // 429 y no 403: no es que no tenga derecho, es que ya usó el de hoy.
-    res.status(429).json({ success: false, error: 'CUPO_AGOTADO', message: cupo.motivo });
-    return;
+  if (cupo.cobrar) {
+    try {
+      await reserveForOperation({ firmId, userEmail, operation: 'ORIENTACION' });
+    } catch (error) {
+      if (error instanceof BillingError) {
+        /*
+         * 402 y no 429: la diferencia importa para el abogado. 429 diría "ya
+         * usaste lo tuyo, vuelve mañana"; 402 dice "puedes seguir hoy mismo,
+         * recargando". La primera es una puerta cerrada y la segunda es una
+         * puerta con precio, y solo una de las dos es cierta.
+         */
+        res.status(402).json({
+          success: false,
+          error: 'SALDO_INSUFICIENTE',
+          message:
+            `Usaste las ${TOPE_DIARIO} orientaciones gratuitas de hoy. A partir de aquí cada una ` +
+            `cuesta $${PRICE_COP.ORIENTACION} COP y la firma no tiene saldo. ` +
+            'Recarga para seguir, o vuelve mañana cuando el cupo gratuito se reinicie.'
+        });
+        return;
+      }
+      throw error;
+    }
   }
 
   const result = await triageFacts(hechos);
 
   if (result.status === 'FAILED') {
+    /*
+     * Se devuelve lo cobrado, y solo aquí.
+     *
+     * Dentro del cupo gratuito un intento fallido SÍ se gasta, a propósito: un
+     * tope que se esquiva haciendo fallar las llamadas no es un tope. Pero
+     * cuando hay dinero de la firma de por medio la regla se invierte — nadie
+     * paga por una orientación que no recibió —, y aquí no reabre el hueco
+     * porque el cliente no puede provocar este fallo: depende de nuestro motor,
+     * no de lo que él escriba.
+     */
+    if (cupo.cobrar) {
+      await refundReservation({
+        firmId,
+        userEmail,
+        operation: 'ORIENTACION',
+        reason: 'la orientación no produjo resultado'
+      });
+    }
+
     res.status(502).json({ success: false, error: result.status, message: result.reason });
     return;
   }
@@ -64,7 +109,9 @@ export const triageController = async (req: Request, res: Response): Promise<voi
     // única forma de ver si está proponiendo cosas que no existen.
     descartadas: result.descartadas,
     // Para que la pantalla pueda avisar antes de que se acabe, en vez de
-    // sorprender al abogado con una puerta cerrada.
-    cupoRestante: cupo.restantes
+    // sorprender al abogado con un cobro que no esperaba.
+    cupoRestante: cupo.restantes,
+    /** Lo que se cobró por ESTA consulta: 0 dentro del cupo. */
+    cobradoCop: cupo.cobrar ? PRICE_COP.ORIENTACION : 0
   });
 };

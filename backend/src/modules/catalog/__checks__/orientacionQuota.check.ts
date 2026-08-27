@@ -14,6 +14,7 @@
  * dos pestañas del mismo abogado lean 29 y ambas se crean con derecho a la 30.
  */
 import { TOPE_DIARIO, diaEnColombia } from '../orientacionQuota.service';
+import { PRICE_COP, COP_PER_USD, MARKUP } from '../../billing/billing.service';
 
 let fallos = 0;
 const check = (n: string, ok: boolean, d = ''): void => {
@@ -117,6 +118,54 @@ check(
   'y el tope es holgado para el uso real de un abogado',
   TOPE_DIARIO >= 20,
   String(TOPE_DIARIO)
+);
+
+/*
+ * ─── Y PASADO EL CUPO SE COBRA, NO SE NIEGA ────────────────────────────────
+ *
+ * Un muro duro castiga igual al uso legítimo intenso que al abusivo, y la firma
+ * que de verdad necesita la número treinta y uno se queda sin ella. Al cobrar,
+ * el gancho gratuito queda intacto para quien nunca ha pagado y el consumo de
+ * más lo paga quien lo genera.
+ *
+ * Lo que hay que comprobar es que ese precio CUBRA el costo: uno que no lo
+ * cubra convierte cada consulta pasada del cupo en una pérdida, que es peor que
+ * no cobrar — el abuso saldría más barato para quien abusa y más caro para la
+ * casa que dejarlo gratis.
+ */
+check(
+  'la orientación pasada del cupo tiene precio',
+  PRICE_COP.ORIENTACION > 0,
+  `$${PRICE_COP.ORIENTACION} COP`
+);
+
+check(
+  'y ese precio cubre el costo con margen, no lo deja en pérdida',
+  PRICE_COP.ORIENTACION >= COSTO_POR_CONSULTA_COP * 2,
+  `$${PRICE_COP.ORIENTACION} contra un costo de $${COSTO_POR_CONSULTA_COP}`
+);
+
+/*
+ * Pero sigue siendo una fracción de un borrador. Es una orientación, no un
+ * escrito: cobrarla como un escrito ahuyentaría el uso legítimo intenso que
+ * esta regla existe justamente para permitir.
+ */
+check(
+  'y es una fracción de lo que cuesta un borrador',
+  PRICE_COP.ORIENTACION < PRICE_COP.BORRADOR / 10,
+  `$${PRICE_COP.ORIENTACION} contra $${PRICE_COP.BORRADOR}`
+);
+
+/*
+ * El costo de arriba se deriva del mismo par que fija todos los precios, para
+ * que el día que se mueva la tasa o el margen esto se mueva con ellos en vez de
+ * seguir afirmando un margen que dejó de existir.
+ */
+const costoUsdDeUnaOrientacion = COSTO_POR_CONSULTA_COP / COP_PER_USD;
+check(
+  'el precio guarda relación con el margen del resto del producto',
+  PRICE_COP.ORIENTACION >= Math.round(costoUsdDeUnaOrientacion * COP_PER_USD * MARKUP),
+  `$${PRICE_COP.ORIENTACION} contra $${Math.round(costoUsdDeUnaOrientacion * COP_PER_USD * MARKUP)} al margen estándar`
 );
 
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);

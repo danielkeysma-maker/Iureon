@@ -116,6 +116,10 @@ export interface TriageResponse {
   reason?: string;
   suggestions: TriageSuggestion[];
   descartadas: string[];
+  /** Orientaciones gratuitas que le quedan hoy a la firma. */
+  cupoRestante?: number;
+  /** Lo que costó ESTA consulta. 0 mientras haya cupo gratuito. */
+  cobradoCop?: number;
 }
 
 export const triageApi = {

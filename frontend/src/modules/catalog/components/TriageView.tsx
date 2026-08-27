@@ -56,7 +56,12 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
    * nuestra y la otra es una regla nuestra; confundirlas hace que deje de leer
    * las dos.
    */
-  const [cupoAgotado, setCupoAgotado] = React.useState('');
+  /*
+   * Sin saldo Y sin cupo. No es lo mismo que un error, ni que un muro: el
+   * abogado puede seguir hoy mismo recargando, y decirlo en rojo junto a las
+   * averías le enseñaría que la aplicación se rompió.
+   */
+  const [sinSaldo, setSinSaldo] = React.useState('');
 
   const orientar = async (texto?: string) => {
     const consulta = (texto ?? hechos).trim();
@@ -65,15 +70,15 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
     if (texto) setHechos(texto);
     setCargando(true);
     setError('');
-    setCupoAgotado('');
+    setSinSaldo('');
     setResult(null);
 
     try {
       setResult(await triageApi.orientar(consulta));
     } catch (err) {
       // 429 es "ya usaste el de hoy", no "esto falló".
-      if (err instanceof ApiError && err.status === 429) {
-        setCupoAgotado(err.message);
+      if (err instanceof ApiError && err.status === 402) {
+        setSinSaldo(err.message);
       } else {
         setError(err instanceof Error ? err.message : 'No se pudo obtener la orientación.');
       }
@@ -156,12 +161,12 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
           no reconoce presenta su propio vacío como tres hallazgos. Y a un junior
           eso lo manda por un camino que nadie eligió.
         */}
-        {cupoAgotado && (
+        {sinSaldo && (
           <div className="bg-slate-50 border border-slate-300 rounded-xl p-4 flex items-start gap-3">
             <Clock className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
             <div className="text-[12px] text-slate-700 leading-relaxed">
-              <p className="font-semibold mb-1 text-slate-900">Cupo de orientaciones de hoy</p>
-              <p>{cupoAgotado}</p>
+              <p className="font-semibold mb-1 text-slate-900">Cupo gratuito de hoy agotado</p>
+              <p>{sinSaldo}</p>
               <button
                 onClick={() => setMainView('search')}
                 className="mt-2 text-[11px] text-blue-800 hover:underline"
@@ -170,6 +175,21 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
               </button>
             </div>
           </div>
+        )}
+
+        {/*
+          El aviso va ANTES del cobro, no después.
+          Enterarse de que una consulta costaba cuando ya se cobró es la forma
+          más rápida de que un abogado deje de confiar en el saldo.
+        */}
+        {result?.cupoRestante !== undefined && result.cupoRestante <= 5 && (
+          <p className="text-[11px] text-slate-600 px-1">
+            {result.cupoRestante > 0
+              ? `Te quedan ${result.cupoRestante} orientaciones gratuitas hoy. Después de eso, cada una descuenta $50 del saldo.`
+              : `Ya usaste las gratuitas de hoy${
+                  result.cobradoCop ? `; esta descontó $${result.cobradoCop} del saldo` : ''
+                }. Mañana se reinicia el cupo.`}
+          </p>
         )}
 
         {result && result.status !== 'OK' && (
