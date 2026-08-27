@@ -1,9 +1,15 @@
 import { ENGINE, callOpenRouterWithUsage } from './openrouter.client';
 import { recordUsage } from '../billing/billing.service';
 import { vectorSearchService } from '../search/vectorSearch.service';
+import { discoverRulings } from '../jurisprudence/discovery.service';
+import { indexFetchedRulings } from '../jurisprudence/autoIngest.service';
 import { detectLegalTopic } from './topicDetector';
 import { generateCleanDocumentTitle } from './documentTitle';
-import { buildClaudeDraftPrompt, buildClaudeUserMessage } from './claudeDraft.prompt';
+import {
+  buildClaudeDraftPrompt,
+  buildClaudeUserMessage,
+  renderJurisprudencia
+} from './claudeDraft.prompt';
 import { buildCatalogGuidanceForFirm } from './catalogGuidance';
 import type { LegalBranch } from '../catalog/types';
 import { buildSolemnColombianDraft } from './solemnDraft.fallback';
@@ -86,6 +92,45 @@ const DRAFT_CONTEXT_CHARS = 3000;
  * Opus writes the document from both. Each stage reports progress through
  * onStepLog so the frontend can stream the console.
  */
+/**
+ * The precedent search runs on borrowed time, and the draft owns the clock.
+ *
+ * WHY A DEADLINE AND NOT A RETRY. This phase reaches the open network — a search
+ * engine, then up to six downloads from the Court's relatoría — inside a request
+ * that already spends three model calls and streams to a lawyer who is waiting.
+ * A relatoría having a slow afternoon must not be able to cost somebody their
+ * document.
+ *
+ * FAILING OPEN IS SAFE HERE, and that is not true of every timeout. Giving up on
+ * discovery yields an empty citation list, and an empty list is now an explicit
+ * instruction not to cite anything rather than a blank the model would fill. So
+ * the degraded path is the honest one: the draft comes out without precedent and
+ * says so, instead of not coming out at all.
+ *
+ * The promise is abandoned, not cancelled. Whatever it was doing finishes or
+ * dies with the invocation; nothing downstream reads it either way.
+ */
+const PLAZO_DESCUBRIMIENTO = 20_000;
+
+/** Growing the corpus is a bonus. It never delays the document that paid for it. */
+const PLAZO_INDEXADO = 15_000;
+
+const conPlazo = async <T>(trabajo: Promise<T>, ms: number, alVencer: T): Promise<T> => {
+  let reloj: NodeJS.Timeout | undefined;
+  const plazo = new Promise<T>((resolve) => {
+    reloj = setTimeout(() => resolve(alVencer), ms);
+  });
+
+  try {
+    return await Promise.race([trabajo, plazo]);
+  } finally {
+    // Sin esto el temporizador sostiene el event loop hasta vencer, y una
+    // función serverless que ya respondió se queda viva pagando por nada.
+    if (reloj) clearTimeout(reloj);
+  }
+};
+
+
 export class OpenRouterService {
 
   public async executeMultiEnginePipeline(
@@ -245,6 +290,94 @@ export class OpenRouterService {
       data: { jurisprudencia }
     });
 
+    if (jurisprudencia.length > 0) return jurisprudencia;
+
+    return this.runPrecedentDiscovery(query, onStepLog);
+  }
+
+  /**
+   * Phase 1.6 — what happens when the corpus has nothing.
+   *
+   * WHY THIS EXISTS. The corpus holds 62 curated providencias against a national
+   * body of tens of thousands. For most matters it will return nothing, and
+   * until now that silence went straight into the prompt as an empty field — two
+   * lines under an instruction to cite. That is the precise condition under
+   * which a model fills the blank, and this codebase already shipped one draft
+   * citing SU-049 de 2022, a providencia that does not exist.
+   *
+   * WHAT THIS IS NOT. It is not "let the model look things up". A search engine
+   * never decides what a ruling says, or that it exists. It is restricted to the
+   * Court's own domain and produces nothing but citation strings, and each one
+   * then passes through `fetchOfficialRuling` — the same door a citation typed
+   * by hand goes through, where the State's register confirms it and the
+   * relatoría supplies the text. What the search engine believes never reaches
+   * the draft.
+   *
+   * WHAT IT DOES NOT COVER. Corte Constitucional only. A labour or contentious
+   * matter still finds nothing here, and gets the honest empty-handed prompt
+   * rather than a search over blogs.
+   */
+  private async runPrecedentDiscovery(
+    query: string,
+    onStepLog: (step: any) => void
+  ): Promise<string[]> {
+    const discovery = await conPlazo(discoverRulings(query), PLAZO_DESCUBRIMIENTO, {
+      status: 'FAILED' as const,
+      found: [],
+      descartadas: [],
+      reason: 'la búsqueda tardó más de lo que el borrador puede esperar'
+    });
+
+    if (discovery.status !== 'OK' || discovery.found.length === 0) {
+      onStepLog({
+        stage: 'STAGE_1_RAG',
+        engine: 'SUPABASE',
+        message:
+          discovery.status === 'NO_PROVIDER'
+            ? '[Descubrimiento] No configurado. La redacción continúa sin jurisprudencia y se le prohíbe al modelo citar de memoria.'
+            : `[Descubrimiento] Sin providencias verificables en el registro oficial (${discovery.descartadas.length} candidata(s) descartada(s)). La redacción continúa sin jurisprudencia.`,
+        timestamp: new Date().toISOString(),
+        data: { jurisprudencia: [], descartadas: discovery.descartadas }
+      });
+      return [];
+    }
+
+    const jurisprudencia = discovery.found.map(({ ruling }) =>
+      `${ruling.citation} (CORTE CONSTITUCIONAL — M.P. ${ruling.magistrado} — ${ruling.sourceUrl})`
+    );
+
+    onStepLog({
+      stage: 'STAGE_1_RAG',
+      engine: 'SUPABASE',
+      message: `[Descubrimiento] ${jurisprudencia.length} providencia(s) confirmadas contra el registro oficial de la Corte Constitucional.`,
+      timestamp: new Date().toISOString(),
+      data: { jurisprudencia, descartadas: discovery.descartadas }
+    });
+
+    /*
+     * Lo encontrado se queda, y por eso se espera en vez de dispararse al aire.
+     *
+     * Una función serverless se congela al responder: nada lanzado sin await
+     * después de `res.json()` tiene garantía de correr. Un `void indexar()` aquí
+     * parecería que hace crecer el corpus y no lo haría nunca.
+     *
+     * Y falla en silencio a propósito: que el índice no acepte una sentencia no
+     * es razón para tumbarle el borrador al abogado que ya la tiene confirmada.
+     */
+    try {
+      const indexado = await conPlazo(
+        indexFetchedRulings(discovery.found.map((f) => f.ruling)),
+        PLAZO_INDEXADO,
+        []
+      );
+      const nuevas = indexado.filter((r) => r.status === 'INDEXED').length;
+      if (nuevas > 0) {
+        console.log(`[PIPELINE] ${nuevas} providencia(s) incorporadas al corpus por descubrimiento.`);
+      }
+    } catch (error) {
+      console.warn(`[PIPELINE] El corpus no aceptó lo descubierto: ${(error as Error).message}`);
+    }
+
     return jurisprudencia;
   }
 
@@ -271,8 +404,8 @@ export class OpenRouterService {
 
     const facts = geminiExtraction || req.legalPrompt;
     const userPrompt = req.existingDraft
-      ? `CAMBIOS IDENTIFICADOS POR GEMINI:\n${facts}\n\nJURISPRUDENCIA RAG:\n${jurisprudencia.join('\n')}\n\nINSTRUCCIÓN DEL USUARIO: ${req.legalPrompt}\n\nTIPO DE DOCUMENTO: ${req.documentType}`
-      : `HECHOS EXTRAÍDOS POR GEMINI:\n${facts}\n\nJURISPRUDENCIA RAG:\n${jurisprudencia.join('\n')}\n\nTIPO DE DOCUMENTO: ${req.documentType}`;
+      ? `CAMBIOS IDENTIFICADOS POR GEMINI:\n${facts}\n\n${renderJurisprudencia(jurisprudencia)}\n\nINSTRUCCIÓN DEL USUARIO: ${req.legalPrompt}\n\nTIPO DE DOCUMENTO: ${req.documentType}`
+      : `HECHOS EXTRAÍDOS POR GEMINI:\n${facts}\n\n${renderJurisprudencia(jurisprudencia)}\n\nTIPO DE DOCUMENTO: ${req.documentType}`;
 
     const { text: structure, usage } = await callOpenRouterWithUsage(
       ENGINE.GPT,

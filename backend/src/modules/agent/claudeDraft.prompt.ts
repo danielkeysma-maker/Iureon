@@ -34,6 +34,31 @@ interface ClaudeUserMessageInput {
  * A firm's taught format ("Enseñar Estilo") replaces the reference structure
  * entirely rather than being appended to it.
  */
+/**
+ * Renders the jurisprudence section — including, above all, its absence.
+ *
+ * THE DEFECT THIS REPLACES. The line joined the citations with a semicolon
+ * after a bare label. With nothing found, that rendered as the two words `JURISPRUDENCIA: .` — an
+ * empty field, two lines below an instruction to cite. A model does not read a
+ * blank as "there is none"; it reads it as a slot, and it fills slots. This
+ * codebase already shipped a draft citing SU-049 de 2022, a providencia that
+ * does not exist, and twenty dockets in the shape TSB-LAB-2024-1102 that no
+ * Colombian court issues.
+ *
+ * So silence is now stated. Everything listed here passed through the State's
+ * own register, and the model is told both facts: these exist, and nothing else
+ * may be added to them.
+ */
+export const renderJurisprudencia = (citations: string[]): string =>
+  citations.length > 0
+    ? `JURISPRUDENCIA VERIFICADA — la existencia de cada una fue confirmada contra el registro oficial de la corporación que la profirió:
+${citations.map((c) => `- ${c}`).join('\n')}
+
+REGLA DE CITACIÓN JURISPRUDENCIAL: cita ÚNICAMENTE las providencias de esta lista. NO agregues otras de memoria, ni siquiera si estás seguro de que existen: una sola cita sin comprobar invalida el escrito ante el despacho.`
+    : `JURISPRUDENCIA: NINGUNA. El corpus verificado no tiene providencias para este asunto y la búsqueda en el registro oficial tampoco devolvió ninguna.
+
+REGLA DE CITACIÓN JURISPRUDENCIAL: NO cites ninguna sentencia, auto ni providencia. No escribas radicados, no escribas magistrados ponentes, no escribas años de providencias. Si el argumento necesita respaldo jurisprudencial, sustenta con la norma y señala en el texto que el precedente aplicable debe verificarse antes de presentar. Un radicado inventado es peor que su ausencia, porque el abogado lo firma.`;
+
 export const buildClaudeDraftPrompt = ({
   documentType,
   prompt,
@@ -66,7 +91,7 @@ INDICACIÓN DEL USUARIO: "${prompt}".
 
 NORMATIVIDAD: Cita artículos pertinentes de CGP, CST, CPACA, CP, C. Civil, C. Penal, Ley 1755/2015, Decreto 2591/1991, Ley 906/2004, Ley 472/1998 o la que corresponda.
 
-JURISPRUDENCIA: ${citations.join('; ')}.
+${renderJurisprudencia(citations)}
 
 ${customFormat ? `⚠️ LA FIRMA HA PERSONALIZADO EL FORMATO — USA ESTE FORMATO POR ENCIMA DEL DEFAULT:\n${customFormat}` : `GUÍA DE REFERENCIA para "${documentType}" (usa tu criterio jurídico para estructurar el documento como mejor corresponda según la práctica procesal colombiana, pero asegúrate de NO OMITIR la sección de petición/pretensiones/resuelve):\n${estructuraObligatoria}`}
     `;
@@ -86,6 +111,14 @@ export const buildClaudeUserMessage = ({
     : '';
 
   return existingDraft
-    ? `Instrucción del usuario: "${prompt}".${schemaBlock}Insumos fácticos de Gemini: ${facts}. Jurisprudencia: ${citations.join('; ')}. Toma el borrador existente como base y aplica las correcciones. Entrega el documento COMPLETO resultante.`
-    : `Genera el documento jurídico "${documentType}" COMPLETO hasta la firma.${schemaBlock}Hechos extraídos por Gemini: ${facts}. Jurisprudencia: ${citations.join('; ')}. El documento debe estar COMPLETO incluyendo PETICIÓN/PRETENSIONES/RESUELVE.`;
+    ? `Instrucción del usuario: "${prompt}".${schemaBlock}Insumos fácticos de Gemini: ${facts}.
+
+${renderJurisprudencia(citations)}
+
+Toma el borrador existente como base y aplica las correcciones. Entrega el documento COMPLETO resultante.`
+    : `Genera el documento jurídico "${documentType}" COMPLETO hasta la firma.${schemaBlock}Hechos extraídos por Gemini: ${facts}.
+
+${renderJurisprudencia(citations)}
+
+El documento debe estar COMPLETO incluyendo PETICIÓN/PRETENSIONES/RESUELVE.`;
 };

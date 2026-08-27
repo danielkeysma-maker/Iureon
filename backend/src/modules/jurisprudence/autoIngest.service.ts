@@ -164,6 +164,24 @@ const indexRuling = async (ruling: OfficialRuling): Promise<AutoIngestOutcome> =
  * shape as one that names its own credit balance. The citation is the only
  * thing it gets to choose, and even that the Court's register has to confirm.
  */
+/**
+ * Indexes rulings whose text has ALREADY been downloaded and confirmed.
+ *
+ * `autoIngest` re-fetches on purpose, because there the citation arrives from a
+ * browser and nothing else about it can be trusted. Here the caller is
+ * `discoverRulings`, which got each `OfficialRuling` out of `fetchOfficialRuling`
+ * — the same door, already passed. Downloading the same providencia a second
+ * time would buy no additional guarantee and would spend seconds a lawyer is
+ * sitting through.
+ */
+export const indexFetchedRulings = async (
+  rulings: OfficialRuling[]
+): Promise<AutoIngestOutcome[]> => {
+  const results: AutoIngestOutcome[] = [];
+  for (const ruling of rulings) results.push(await indexRuling(ruling));
+  return results;
+};
+
 export const autoIngest = async (citations: string[]): Promise<AutoIngestOutcome[]> => {
   const results: AutoIngestOutcome[] = [];
 
