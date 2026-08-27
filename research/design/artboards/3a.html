@@ -1,0 +1,158 @@
+<div class="dv-opt" id="3a">
+<div class="dv-olabel"><a class="dv-oid" href="#3a">3a</a>Sistema de diálogos — anatomía, cuatro tipos, tres tamaños, reglas de cierre y desbordamiento</div>
+<div class="dv-card" style="width:1440px;background:#fff">
+  <div style="padding:28px 40px;border-bottom:1px solid #EEF1F4">
+    <div style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.09em;text-transform:uppercase;color:#8B96A6">Diálogos</div>
+    <div style="font:600 22px/1.25 'IBM Plex Sans',sans-serif;color:#101822;margin-top:6px">Once diálogos, una sola anatomía: el cierre y el botón principal siempre en el mismo píxel</div>
+    <div style="font:400 13.5px/1.6 'IBM Plex Sans',sans-serif;color:#667487;margin-top:7px;max-width:900px;text-wrap:pretty">Lo que cambia entre un diálogo y otro es el cuerpo. La cabecera, el pie y la posición de la × son idénticos en los once, de modo que abrir el sexto diálogo del día no obligue a buscar nada.</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:454px 1fr;border-bottom:1px solid #EEF1F4">
+    <div style="padding:26px 32px 26px 40px;border-right:1px solid #EEF1F4">
+      <div style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.09em;text-transform:uppercase;color:#8B96A6;margin-bottom:14px">Anatomía · las tres zonas no cambian nunca</div>
+      <div style="border:1px solid #E3E7EC;border-radius:8px;box-shadow:0 16px 40px -12px rgba(16,24,34,.28);overflow:hidden">
+        <div style="padding:15px 18px;border-bottom:1px solid #E3E7EC;display:flex;align-items:flex-start;gap:12px">
+          <div>
+            <div style="font:600 16px 'IBM Plex Sans',sans-serif;color:#101822">Título en una línea</div>
+            <div style="font:400 12.5px/1.5 'IBM Plex Sans',sans-serif;color:#667487;margin-top:3px">Subtítulo opcional: contexto, no instrucciones.</div>
+          </div>
+          <button style="width:26px;height:26px;flex:none;margin-left:auto;border:1px solid #E3E7EC;background:#fff;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="#667487" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12"></path><path d="M18 6L6 18"></path></svg></button>
+        </div>
+        <div style="padding:18px;background:#F7F8FA;min-height:118px;display:flex;align-items:center;justify-content:center">
+          <div style="text-align:center">
+            <div style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.09em;text-transform:uppercase;color:#8B96A6">Cuerpo</div>
+            <div style="font:400 12.5px/1.55 'IBM Plex Sans',sans-serif;color:#667487;margin-top:5px;max-width:290px">La única zona que cambia por tipo. Padding 18px; scroll propio si desborda.</div>
+          </div>
+        </div>
+        <div style="padding:13px 18px;border-top:1px solid #E3E7EC;display:flex;align-items:center;gap:9px">
+          <span style="font:400 11.5px 'IBM Plex Mono',monospace;color:#8B96A6">Esc cierra</span>
+          <button style="font:500 12.5px 'IBM Plex Sans',sans-serif;color:#445064;background:#fff;border:1px solid #E3E7EC;border-radius:4px;padding:7px 12px;margin-left:auto;cursor:pointer">Cancelar</button>
+          <button style="font:600 12.5px 'IBM Plex Sans',sans-serif;color:#fff;background:#17456B;border:0;border-radius:4px;padding:8px 14px;cursor:pointer">Acción principal</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px;margin-top:16px">
+        <div style="display:grid;grid-template-columns:96px 1fr;gap:12px;font:400 12.5px/1.55 'IBM Plex Sans',sans-serif;color:#2B3542"><span style="font:500 11px 'IBM Plex Mono',monospace;color:#17456B;padding-top:2px">Cabecera</span><span>Título, subtítulo opcional y × a la derecha. Nunca lleva controles ni pestañas.</span></div>
+        <div style="display:grid;grid-template-columns:96px 1fr;gap:12px;font:400 12.5px/1.55 'IBM Plex Sans',sans-serif;color:#2B3542"><span style="font:500 11px 'IBM Plex Mono',monospace;color:#17456B;padding-top:2px">Cuerpo</span><span>Fondo <code>#F7F8FA</code> cuando contiene tarjetas o filas; blanco cuando es prosa o un formulario simple.</span></div>
+        <div style="display:grid;grid-template-columns:96px 1fr;gap:12px;font:400 12.5px/1.55 'IBM Plex Sans',sans-serif;color:#2B3542"><span style="font:500 11px 'IBM Plex Mono',monospace;color:#17456B;padding-top:2px">Pie</span><span>Un solo primario, siempre abajo a la derecha; secundario a su izquierda; texto de estado a la izquierda del todo.</span></div>
+        <div style="display:grid;grid-template-columns:96px 1fr;gap:12px;font:400 12.5px/1.55 'IBM Plex Sans',sans-serif;color:#2B3542"><span style="font:500 11px 'IBM Plex Mono',monospace;color:#17456B;padding-top:2px">Velo</span><span><code>rgba(16,24,34,.42)</code>, sin desenfoque. Elevación e3 exclusiva del diálogo: <code>0 16px 40px -12px</code>.</span></div>
+      </div>
+    </div>
+
+    <div style="padding:26px 40px 26px 32px">
+      <div style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.09em;text-transform:uppercase;color:#8B96A6;margin-bottom:14px">Tres tamaños · el ancho lo decide el contenido, no el módulo</div>
+      <div style="display:flex;gap:14px;align-items:flex-start">
+        <div style="width:170px">
+          <div style="height:104px;border:1px solid #E3E7EC;border-radius:6px;display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(16,24,34,.08)">
+            <div style="height:26px;border-bottom:1px solid #EEF1F4"></div><div style="flex:1;background:#F7F8FA"></div><div style="height:24px;border-top:1px solid #EEF1F4"></div>
+          </div>
+          <div style="font:600 12px 'IBM Plex Sans',sans-serif;color:#101822;margin-top:8px">S · 420px</div>
+          <div style="font:400 11.5px/1.5 'IBM Plex Sans',sans-serif;color:#667487;margin-top:3px">Confirmaciones. Alto libre, nunca scroll.</div>
+        </div>
+        <div style="width:250px">
+          <div style="height:104px;border:1px solid #E3E7EC;border-radius:6px;display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(16,24,34,.08)">
+            <div style="height:26px;border-bottom:1px solid #EEF1F4"></div><div style="flex:1;background:#F7F8FA"></div><div style="height:24px;border-top:1px solid #EEF1F4"></div>
+          </div>
+          <div style="font:600 12px 'IBM Plex Sans',sans-serif;color:#101822;margin-top:8px">M · 640px</div>
+          <div style="font:400 11.5px/1.5 'IBM Plex Sans',sans-serif;color:#667487;margin-top:3px">Formularios y calculadoras. Alto máx. 72vh.</div>
+        </div>
+        <div style="flex:1">
+          <div style="height:104px;border:1px solid #E3E7EC;border-radius:6px;display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(16,24,34,.08)">
+            <div style="height:26px;border-bottom:1px solid #EEF1F4"></div><div style="flex:1;background:#F7F8FA"></div><div style="height:24px;border-top:1px solid #EEF1F4"></div>
+          </div>
+          <div style="font:600 12px 'IBM Plex Sans',sans-serif;color:#101822;margin-top:8px">L · 960px</div>
+          <div style="font:400 11.5px/1.5 'IBM Plex Sans',sans-serif;color:#667487;margin-top:3px">Visores y tablas: dos columnas dentro. Alto fijo 80vh, cuerpo con scroll.</div>
+        </div>
+      </div>
+
+      <div style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.09em;text-transform:uppercase;color:#8B96A6;margin:22px 0 12px">Los once, repartidos en cuatro tipos</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+        <div style="border:1px solid #E3E7EC;border-top:3px solid #4A566B;border-radius:6px;padding:12px 13px">
+          <div style="font:600 13px 'IBM Plex Sans',sans-serif;color:#101822">1 · Confirmación</div>
+          <div style="font:400 11.5px 'IBM Plex Mono',monospace;color:#8B96A6;margin-top:2px">S · sin scroll</div>
+          <div style="font:400 12px/1.55 'IBM Plex Sans',sans-serif;color:#2B3542;margin-top:8px">Una pregunta, la consecuencia escrita y dos botones. Nunca lleva campos.</div>
+          <div style="margin-top:9px;padding-top:8px;border-top:1px solid #EEF1F4;font:400 11.5px/1.6 'IBM Plex Mono',monospace;color:#667487">ActionConfirmation</div>
+        </div>
+        <div style="border:1px solid #E3E7EC;border-top:3px solid #17456B;border-radius:6px;padding:12px 13px">
+          <div style="font:600 13px 'IBM Plex Sans',sans-serif;color:#101822">2 · Formulario</div>
+          <div style="font:400 11.5px 'IBM Plex Mono',monospace;color:#8B96A6;margin-top:2px">M o L · guarda</div>
+          <div style="font:400 12px/1.55 'IBM Plex Sans',sans-serif;color:#2B3542;margin-top:8px">Campos que se guardan. El primario dice el verbo real (“Guardar membrete”), nunca “OK”.</div>
+          <div style="margin-top:9px;padding-top:8px;border-top:1px solid #EEF1F4;font:400 11.5px/1.6 'IBM Plex Mono',monospace;color:#667487">FirmBranding · TenantUserManagement · FirmSubscription · FileDropzone</div>
+        </div>
+        <div style="border:1px solid #E3E7EC;border-top:3px solid #14653F;border-radius:6px;padding:12px 13px">
+          <div style="font:600 13px 'IBM Plex Sans',sans-serif;color:#101822">3 · Calculadora</div>
+          <div style="font:400 11.5px 'IBM Plex Mono',monospace;color:#8B96A6;margin-top:2px">M · dos zonas</div>
+          <div style="font:400 12px/1.55 'IBM Plex Sans',sans-serif;color:#2B3542;margin-top:8px">Entradas arriba, resultado en bloque verificado abajo. El primario inserta en el escrito.</div>
+          <div style="margin-top:9px;padding-top:8px;border-top:1px solid #EEF1F4;font:400 11.5px/1.6 'IBM Plex Mono',monospace;color:#667487">ProceduralTerms · LaborSettlement</div>
+        </div>
+        <div style="border:1px solid #E3E7EC;border-top:3px solid #8A5A12;border-radius:6px;padding:12px 13px">
+          <div style="font:600 13px 'IBM Plex Sans',sans-serif;color:#101822">4 · Visor</div>
+          <div style="font:400 11.5px 'IBM Plex Mono',monospace;color:#8B96A6;margin-top:2px">L · scroll + filtro</div>
+          <div style="font:400 12px/1.55 'IBM Plex Sans',sans-serif;color:#2B3542;margin-top:8px">Contenido largo que se consulta y se cierra. Cabecera fija, buscador dentro del cuerpo.</div>
+          <div style="margin-top:9px;padding-top:8px;border-top:1px solid #EEF1F4;font:400 11.5px/1.6 'IBM Plex Mono',monospace;color:#667487">LegalSearchGlossary · AuditLogs · SavedDrafts · JargonSuggestion</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr)">
+    <div style="padding:24px 32px 26px 40px;border-right:1px solid #EEF1F4">
+      <div style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.09em;text-transform:uppercase;color:#8B96A6;margin-bottom:12px">Reglas de cierre</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;gap:9px;font:400 12.5px/1.55 'IBM Plex Sans',sans-serif;color:#2B3542"><svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="#14653F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:3px"><path d="M5 13l4 4L19 7"></path></svg><span>× arriba a la derecha, 26px, siempre en el mismo lugar en los once.</span></div>
+        <div style="display:flex;gap:9px;font:400 12.5px/1.55 'IBM Plex Sans',sans-serif;color:#2B3542"><svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="#14653F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:3px"><path d="M5 13l4 4L19 7"></path></svg><span><b style="font-weight:600">Esc</b> cierra siempre, y el pie lo dice por escrito.</span></div>
+        <div style="display:flex;gap:9px;font:400 12.5px/1.55 'IBM Plex Sans',sans-serif;color:#2B3542"><svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="#14653F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:3px"><path d="M5 13l4 4L19 7"></path></svg><span>Clic en el velo cierra los visores y calculadoras (nada que perder).</span></div>
+        <div style="display:flex;gap:9px;font:400 12.5px/1.55 'IBM Plex Sans',sans-serif;color:#2B3542"><svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="#8A5A12" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:3px"><path d="M12 4.5L21 19.5H3z"></path><path d="M12 10v4"></path></svg><span>En formularios con cambios sin guardar, el velo <b style="font-weight:600">no</b> cierra: pregunta.</span></div>
+        <div style="display:flex;gap:9px;font:400 12.5px/1.55 'IBM Plex Sans',sans-serif;color:#2B3542"><svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="#14653F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:3px"><path d="M5 13l4 4L19 7"></path></svg><span>Foco al primer control al abrir; al elemento que lo invocó al cerrar.</span></div>
+        <div style="display:flex;gap:9px;font:400 12.5px/1.55 'IBM Plex Sans',sans-serif;color:#2B3542"><svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="#8A5A12" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:3px"><path d="M12 4.5L21 19.5H3z"></path><path d="M12 10v4"></path></svg><span>Nunca un diálogo sobre otro. La única excepción es la confirmación de descartar.</span></div>
+      </div>
+    </div>
+    <div style="padding:24px 32px;border-right:1px solid #EEF1F4">
+      <div style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.09em;text-transform:uppercase;color:#8B96A6;margin-bottom:12px">Desbordamiento</div>
+      <div style="border:1px solid #E3E7EC;border-radius:6px;overflow:hidden">
+        <div style="padding:11px 14px;border-bottom:1px solid #E3E7EC;display:flex;align-items:center;gap:10px"><span style="font:600 13px 'IBM Plex Sans',sans-serif;color:#101822">Cabecera fija</span><span style="margin-left:auto;font:400 11px 'IBM Plex Mono',monospace;color:#8B96A6">no scrollea</span></div>
+        <div style="background:#F7F8FA;position:relative">
+          <div style="padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+            <div style="height:9px;width:88%;background:#E3E7EC;border-radius:3px"></div>
+            <div style="height:9px;width:96%;background:#E3E7EC;border-radius:3px"></div>
+            <div style="height:9px;width:72%;background:#E3E7EC;border-radius:3px"></div>
+            <div style="height:9px;width:91%;background:#E3E7EC;border-radius:3px"></div>
+            <div style="height:9px;width:64%;background:#EEF1F4;border-radius:3px"></div>
+          </div>
+          <div style="position:absolute;right:5px;top:10px;bottom:26px;width:4px;background:#CFD6E0;border-radius:999px"></div>
+          <div style="height:22px;background:linear-gradient(180deg,rgba(247,248,250,0),#F7F8FA)"></div>
+        </div>
+        <div style="padding:11px 14px;border-top:1px solid #E3E7EC;display:flex;align-items:center"><span style="font:600 13px 'IBM Plex Sans',sans-serif;color:#101822">Pie fijo</span><span style="margin-left:auto;font:400 11px 'IBM Plex Mono',monospace;color:#8B96A6">botón siempre visible</span></div>
+      </div>
+      <div style="font:400 12.5px/1.6 'IBM Plex Sans',sans-serif;color:#667487;margin-top:11px;text-wrap:pretty">Scroll solo en el cuerpo, con degradado de 22px que avisa que hay más. El pie no se desplaza nunca: en un diálogo de 60 entradas, perder el botón es perder la tarea.</div>
+    </div>
+    <div style="padding:24px 40px 26px 32px">
+      <div style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.09em;text-transform:uppercase;color:#8B96A6;margin-bottom:12px">Confirmación · el tipo 1 completo (S)</div>
+      <div style="border:1px solid #E3E7EC;border-radius:8px;box-shadow:0 16px 40px -12px rgba(16,24,34,.28);overflow:hidden">
+        <div style="padding:14px 16px;border-bottom:1px solid #E3E7EC;display:flex;align-items:flex-start;gap:12px">
+          <div style="font:600 15px 'IBM Plex Sans',sans-serif;color:#101822">¿Eliminar el borrador?</div>
+          <button style="width:26px;height:26px;flex:none;margin-left:auto;border:1px solid #E3E7EC;background:#fff;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="#667487" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12"></path><path d="M18 6L6 18"></path></svg></button>
+        </div>
+        <div style="padding:16px">
+          <div style="font:400 13.5px/1.65 'IBM Plex Sans',sans-serif;color:#2B3542;text-wrap:pretty">“Queja — Juzgado 12 Civil” se borra para toda la firma y no se puede recuperar. El evento queda en Auditoría.</div>
+        </div>
+        <div style="padding:12px 16px;border-top:1px solid #E3E7EC;display:flex;align-items:center;gap:9px">
+          <span style="font:400 11.5px 'IBM Plex Mono',monospace;color:#8B96A6">Esc cierra</span>
+          <button style="font:500 12.5px 'IBM Plex Sans',sans-serif;color:#445064;background:#fff;border:1px solid #E3E7EC;border-radius:4px;padding:7px 12px;margin-left:auto;cursor:pointer">Conservar</button>
+          <button style="font:600 12.5px 'IBM Plex Sans',sans-serif;color:#fff;background:#8C2F26;border:0;border-radius:4px;padding:8px 14px;cursor:pointer">Eliminar</button>
+        </div>
+      </div>
+      <div style="font:400 12.5px/1.6 'IBM Plex Sans',sans-serif;color:#667487;margin-top:11px;text-wrap:pretty">Los botones nombran el resultado —<b style="font-weight:600;color:#2B3542">Conservar / Eliminar</b>, no Cancelar / OK— y el cuerpo dice el alcance real: para toda la firma, irreversible, auditado.</div>
+    </div>
+  </div>
+</div>
+<sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}">
+<ul class="dv-notes">
+<li>La constante del sistema es la <b>posición</b>, no el estilo: × arriba a la derecha, primario abajo a la derecha, Esc siempre. Es lo único que hace que once diálogos se sientan como uno.</li>
+<li>Los cuatro tipos se distinguen por el <b>cuerpo y el pie</b>, no por el chrome. El único indicio de tipo es el filete superior de 3px, y existe para esta documentación más que para el usuario.</li>
+<li>El clic en el velo no se comporta igual en todos: cierra donde no hay nada que perder y pregunta donde sí. Un cierre accidental que borra veinte minutos de membrete es peor que una regla no uniforme.</li>
+<li>Pie fijo con scroll solo en el cuerpo, en los tres tamaños: es la regla que evita los diálogos donde hay que desplazarse hasta el fondo para encontrar “Guardar”.</li>
+<li>Rojo solo en el primario destructivo del tipo 1: es la segunda y última aparición del rojo en la app, junto al punto de grabación de <a class="dv-oid" href="#2a">2a</a>.</li>
+</ul>
+</sc-if>
+</div>
+

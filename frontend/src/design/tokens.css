@@ -1,0 +1,154 @@
+/*
+ * Los fundamentos del sistema de UI, tal como los definió el diseño.
+ *
+ * SIETE TAMAÑOS DE TEXTO, SEIS PASOS DE ESPACIADO, TRES RADIOS, DOS ELEVACIONES.
+ * Lo que no está aquí no existe en la interfaz. La regla anterior no era ninguna:
+ * los tamaños iban de text-[10px] a text-[13px] elegidos uno por uno, los bordes
+ * mezclaban slate-100, slate-200 y slate-200/80 sin criterio, y los radios
+ * cambiaban dentro del mismo bloque.
+ *
+ * EL MODO OSCURO SIGUE AL SISTEMA OPERATIVO Y NO TIENE INTERRUPTOR. Un abogado
+ * que trabaja de noche ya lo configuró en su equipo; un tercer ajuste solo
+ * produce pantallas inconsistentes entre su portátil y su teléfono. Por eso todo
+ * vive en `prefers-color-scheme` y no en una clase `dark` que haya que alternar.
+ *
+ * NO SE INVIERTE LA PALETA: SE SUSTITUYE TOKEN POR TOKEN. La estructura, el
+ * espaciado y los tamaños son idénticos en ambos temas. Cambian superficies,
+ * bordes y saturación de los semánticos, nada más.
+ *
+ * Los valores se guardan como CANALES RGB separados por espacio, no como hex,
+ * porque es lo que le permite a Tailwind componer `bg-surface/60`. Un hex aquí
+ * mataría todos los modificadores de opacidad de la aplicación.
+ */
+
+:root {
+  /* ─── NEUTROS ─────────────────────────────────────────────────────────────
+   * Grises fríos con un punto de calidez, para no verse clínicos.
+   */
+  --ink-900: 16 24 34; /* #101822 · texto */
+  --ink-700: 43 53 66; /* #2B3542 · prosa */
+  --ink-500: 102 116 135; /* #667487 · meta, AA */
+  --ink-400: 139 150 166; /* #8B96A6 · etiquetas */
+
+  /*
+   * UN SOLO BORDE Y UN SOLO DIVISOR.
+   * La regla: borde si separa dos superficies, divisor si separa dos filas de
+   * la misma. Eso es lo que elimina el `slate-200/80`.
+   */
+  --line-200: 227 231 236; /* #E3E7EC · borde */
+  --line-100: 238 241 244; /* #EEF1F4 · divisor */
+
+  --canvas: 247 248 250; /* #F7F8FA · fondo */
+  --surface: 255 255 255; /* #FFFFFF · panel */
+  --raised: 255 255 255; /* en claro, un panel flotante sigue siendo blanco */
+
+  /* ─── MARCA ───────────────────────────────────────────────────────────────
+   * Un azul institucional, no un azul de producto.
+   */
+  --brand-700: 23 69 107; /* #17456B · 7.4:1 */
+  --brand-800: 17 54 82; /* #113652 · hover */
+  --brand-50: 234 240 245; /* #EAF0F5 · selección */
+  --nav-900: 15 34 51; /* #0F2233 · barra */
+
+  /*
+   * Sobre el primario va texto claro. En oscuro esto invierte, y es la ÚNICA
+   * inversión del sistema — por eso el botón sigue siendo el elemento más
+   * brillante de la pantalla.
+   */
+  --on-brand: 255 255 255;
+
+  /* ─── SEMÁNTICOS ──────────────────────────────────────────────────────────
+   * Desaturados a propósito: informan, no alarman.
+   *
+   * NO HAY ROJO EN LA PALETA DE ESTADO. El rojo queda reservado para acciones
+   * destructivas —eliminar un escrito— y para nada más: un término que vence no
+   * es un error del usuario. La urgencia se comunica con la POSICIÓN del
+   * término y su fecha exacta, no con alarma cromática.
+   */
+  --verified: 20 101 63; /* #14653F · 5.9:1 */
+  --unverified: 138 90 18; /* #8A5A12 · 5.5:1 */
+  --neutral-fact: 74 86 107; /* #4A566B · 7.1:1 */
+
+  /* Destructivo. Fuera de la paleta de estado, y solo para eso. */
+  --danger: 140 47 38; /* #8C2F26 */
+
+  /* ─── EL LIENZO DEL ESCRITO ───────────────────────────────────────────────
+   * Tiene su propia superficie porque lo que se radica se lee como documento,
+   * no como interfaz.
+   */
+  --paper: 255 255 255;
+  --paper-ink: 16 24 34;
+
+  /* ─── ELEVACIÓN · 2 ───────────────────────────────────────────────────────
+   * Nada tiene sombra por estar quieto. `e2` solo si flota sobre contenido.
+   */
+  --e1: 0 1px 2px rgb(16 24 34 / 0.06);
+  --e2: 0 8px 24px rgb(16 24 34 / 0.12);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink-900: 232 237 242; /* #E8EDF2 · 14,1:1 sobre surface */
+    --ink-700: 195 205 216; /* #C3CDD8 · prosa */
+    --ink-500: 143 160 178; /* #8FA0B2 · 6,2:1 */
+    --ink-400: 111 130 150; /* #6F8296 · etiquetas */
+
+    /*
+     * REGLA 02 — LOS BORDES SUBEN DE PESO. En claro un borde separa; en oscuro
+     * además delimita, así que toda tarjeta lleva borde visible y no solo un
+     * cambio de fondo.
+     */
+    --line-200: 36 48 61; /* #24303D */
+    --line-100: 28 39 50; /* #1C2732 */
+
+    --canvas: 11 18 25; /* #0B1219 */
+    --surface: 19 27 36; /* #131B24 */
+
+    /*
+     * REGLA 01 — LA ELEVACIÓN SE EXPRESA CON SUPERFICIE, NO CON SOMBRA.
+     * Un menú o un diálogo se aclara un paso. La sombra en oscuro no se ve y
+     * solo ensucia.
+     */
+    --raised: 26 36 48; /* #1A2430 */
+
+    /*
+     * REGLA 04 — LA BARRA DEJA DE SER CROMO DISTINTIVO. En oscuro casi coincide
+     * con el fondo, así que se separa con un borde de 1px en vez de por
+     * contraste de color.
+     */
+    --nav-900: 10 18 26; /* #0A121A */
+
+    /*
+     * Marca y semánticos SE ACLARAN, no se invierten. Verde y ámbar suben de
+     * luminosidad y bajan de saturación para conservar 5:1 sobre superficie
+     * oscura sin volverse neón.
+     */
+    --brand-700: 78 144 196; /* #4E90C4 */
+    --brand-800: 158 197 226; /* #9EC5E2 · hover, más claro */
+    --brand-50: 22 41 58; /* #16293A · selección */
+
+    /*
+     * LA ÚNICA INVERSIÓN DEL SISTEMA. El azul institucional #17456B sobre
+     * #131B24 casi desaparece, así que el primario pasa a texto oscuro sobre
+     * azul claro.
+     */
+    --on-brand: 11 18 25;
+
+    --verified: 79 180 131; /* #4FB483 */
+    --unverified: 217 166 74; /* #D9A64A */
+    --neutral-fact: 143 160 178;
+    --danger: 217 115 106; /* #D9736A */
+
+    /*
+     * REGLA 05 — EL ESCRITO NO SE IMPRIME EN OSCURO. En pantalla el lienzo es
+     * #16202B con serif #E6EBF0; el .docx y el PDF salen siempre en papel
+     * blanco, y el pie del taller lo dice.
+     */
+    --paper: 22 32 43; /* #16202B */
+    --paper-ink: 230 235 240; /* #E6EBF0 */
+
+    /* Ver regla 01: en oscuro la sombra no comunica elevación. */
+    --e1: none;
+    --e2: none;
+  }
+}

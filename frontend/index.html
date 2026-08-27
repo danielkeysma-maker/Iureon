@@ -12,15 +12,21 @@
     -->
     <link rel="icon" type="image/svg+xml" href="/brand/favicon.svg" />
     <link rel="apple-touch-icon" href="/brand/app-icon-1024.svg" />
-    <meta name="theme-color" content="#14294A" />
+    <!--
+      Dos `theme-color`: el navegador móvil pinta su barra con el que
+      corresponda al tema del dispositivo. Con uno solo, la barra del teléfono
+      queda clara sobre una app oscura.
+    -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0F2233" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0A121A" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Iureon - Inteligencia & Automatización Jurídica B2B</title>
-    <!-- Google Fonts: Plus Jakarta Sans (UI), Lora (Legal Drafts), JetBrains Mono (Logs) -->
+    <!-- IBM Plex Sans (UI) · Source Serif 4 (lienzo del escrito) · IBM Plex Mono (dato citable) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
   </head>
-  <body class="bg-slate-50 text-slate-900 antialiased selection:bg-indigo-100 selection:text-indigo-900">
+  <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

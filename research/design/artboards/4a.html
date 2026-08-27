@@ -1,0 +1,95 @@
+<div class="dv-opt" id="4a">
+<div class="dv-olabel"><a class="dv-oid" href="#4a">4a</a>Modo oscuro — mapeo de tokens y las cinco reglas que no se pueden invertir</div>
+<div class="dv-card" style="width:1440px;background:#0B1219;border-color:#24303D">
+  <div style="padding:28px 40px;border-bottom:1px solid #1C2732">
+    <div style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.09em;text-transform:uppercase;color:#6F8296">Modo oscuro</div>
+    <div style="font:600 22px/1.25 'IBM Plex Sans',sans-serif;color:#E8EDF2;margin-top:6px">No se invierte la paleta: se sustituye token por token, y los tres estados conservan su significado</div>
+    <div style="font:400 13.5px/1.6 'IBM Plex Sans',sans-serif;color:#8FA0B2;margin-top:7px;max-width:900px;text-wrap:pretty">El modo oscuro sigue el ajuste del sistema operativo del dispositivo. La estructura, el espaciado y los tamaños son idénticos al modo claro: cambian superficies, bordes y saturación de los semánticos, nada más.</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #1C2732">
+    <div style="padding:26px 32px 26px 40px;border-right:1px solid #1C2732">
+      <div style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.09em;text-transform:uppercase;color:#6F8296;margin-bottom:16px">Superficies y texto · claro → oscuro</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div><div style="height:46px;background:#0B1219;border:1px solid #24303D;border-radius:6px"></div><div style="font:500 11px 'IBM Plex Mono',monospace;color:#E8EDF2;margin-top:5px">canvas</div><div style="font:400 11px 'IBM Plex Mono',monospace;color:#6F8296">#F7F8FA → #0B1219</div></div>
+        <div><div style="height:46px;background:#131B24;border:1px solid #24303D;border-radius:6px"></div><div style="font:500 11px 'IBM Plex Mono',monospace;color:#E8EDF2;margin-top:5px">surface</div><div style="font:400 11px 'IBM Plex Mono',monospace;color:#6F8296">#FFFFFF → #131B24</div></div>
+        <div><div style="height:46px;background:#1A2430;border:1px solid #24303D;border-radius:6px"></div><div style="font:500 11px 'IBM Plex Mono',monospace;color:#E8EDF2;margin-top:5px">raised</div><div style="font:400 11px 'IBM Plex Mono',monospace;color:#6F8296">e2 → superficie más clara</div></div>
+        <div><div style="height:46px;background:#0A121A;border:1px solid #24303D;border-radius:6px"></div><div style="font:500 11px 'IBM Plex Mono',monospace;color:#E8EDF2;margin-top:5px">nav</div><div style="font:400 11px 'IBM Plex Mono',monospace;color:#6F8296">#0F2233 → #0A121A</div></div>
+        <div><div style="height:46px;background:#24303D;border-radius:6px"></div><div style="font:500 11px 'IBM Plex Mono',monospace;color:#E8EDF2;margin-top:5px">line-200</div><div style="font:400 11px 'IBM Plex Mono',monospace;color:#6F8296">#E3E7EC → #24303D</div></div>
+        <div><div style="height:46px;background:#1C2732;border-radius:6px"></div><div style="font:500 11px 'IBM Plex Mono',monospace;color:#E8EDF2;margin-top:5px">line-100</div><div style="font:400 11px 'IBM Plex Mono',monospace;color:#6F8296">#EEF1F4 → #1C2732</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">
+        <div><div style="height:46px;background:#E8EDF2;border-radius:6px"></div><div style="font:500 11px 'IBM Plex Mono',monospace;color:#E8EDF2;margin-top:5px">ink-900</div><div style="font:400 11px 'IBM Plex Mono',monospace;color:#6F8296">#101822 → #E8EDF2 · 14,1:1</div></div>
+        <div><div style="height:46px;background:#C3CDD8;border-radius:6px"></div><div style="font:500 11px 'IBM Plex Mono',monospace;color:#E8EDF2;margin-top:5px">ink-700</div><div style="font:400 11px 'IBM Plex Mono',monospace;color:#6F8296">#2B3542 → #C3CDD8 · prosa</div></div>
+        <div><div style="height:46px;background:#8FA0B2;border-radius:6px"></div><div style="font:500 11px 'IBM Plex Mono',monospace;color:#E8EDF2;margin-top:5px">ink-500</div><div style="font:400 11px 'IBM Plex Mono',monospace;color:#6F8296">#667487 → #8FA0B2 · 6,2:1</div></div>
+        <div><div style="height:46px;background:#6F8296;border-radius:6px"></div><div style="font:500 11px 'IBM Plex Mono',monospace;color:#E8EDF2;margin-top:5px">ink-400</div><div style="font:400 11px 'IBM Plex Mono',monospace;color:#6F8296">#8B96A6 → #6F8296 · etiquetas</div></div>
+      </div>
+      <div style="margin-top:16px;padding:13px 15px;background:#131B24;border:1px solid #24303D;border-radius:6px">
+        <div style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.09em;text-transform:uppercase;color:#6F8296">El texto no llega a blanco puro</div>
+        <div style="font:400 12.5px/1.6 'IBM Plex Sans',sans-serif;color:#C3CDD8;margin-top:6px;text-wrap:pretty">#E8EDF2 sobre #131B24 da 14,1:1. El blanco puro sobre estos fondos produce halo en lecturas largas, y aquí se leen escritos de dos mil palabras.</div>
+      </div>
+    </div>
+
+    <div style="padding:26px 40px 26px 32px">
+      <div style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.09em;text-transform:uppercase;color:#6F8296;margin-bottom:16px">Marca y semánticos · se aclaran, no se invierten</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+        <div><div style="height:46px;background:#4E90C4;border-radius:6px"></div><div style="font:500 11px 'IBM Plex Mono',monospace;color:#E8EDF2;margin-top:5px">brand</div><div style="font:400 11px 'IBM Plex Mono',monospace;color:#6F8296">#17456B → #4E90C4</div></div>
+        <div><div style="height:46px;background:#16293A;border:1px solid #2A4C6B;border-radius:6px"></div><div style="font:500 11px 'IBM Plex Mono',monospace;color:#E8EDF2;margin-top:5px">brand-surf</div><div style="font:400 11px 'IBM Plex Mono',monospace;color:#6F8296">#EAF0F5 → #16293A</div></div>
+        <div><div style="height:46px;background:#4FB483;border-radius:6px"></div><div style="font:500 11px 'IBM Plex Mono',monospace;color:#E8EDF2;margin-top:5px">verified</div><div style="font:400 11px 'IBM Plex Mono',monospace;color:#6F8296">#14653F → #4FB483</div></div>
+        <div><div style="height:46px;background:#D9A64A;border-radius:6px"></div><div style="font:500 11px 'IBM Plex Mono',monospace;color:#E8EDF2;margin-top:5px">unverified</div><div style="font:400 11px 'IBM Plex Mono',monospace;color:#6F8296">#8A5A12 → #D9A64A</div></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:16px">
+        <span style="display:inline-flex;align-items:center;gap:6px;font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#4FB483;background:#12291F;border:1px solid #245C41;border-radius:999px;padding:3px 9px"><svg width="12" height="12" sc-camel-view-box="0 0 24 24" fill="none" stroke="#4FB483" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.5l2.6 2.6L16 9.5"></path></svg>Verificado</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#D9A64A;background:#2A2314;border:1px dashed #5C4A22;border-radius:999px;padding:3px 9px"><svg width="12" height="12" sc-camel-view-box="0 0 24 24" fill="none" stroke="#D9A64A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5L21 19.5H3z"></path><path d="M12 10v4"></path></svg>Sin verificar</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#93A3B8;background:#1A2430;border:1px solid #2E3B4A;border-radius:999px;padding:3px 9px"><svg width="12" height="12" sc-camel-view-box="0 0 24 24" fill="none" stroke="#93A3B8" stroke-width="2.4" stroke-linecap="round"><path d="M4 12h16"></path></svg>No caduca</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#4E90C4;background:#16293A;border:1px solid #2A4C6B;border-radius:999px;padding:3px 9px">Curada</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#D9736A;background:#2B1715;border:1px solid #5E2B26;border-radius:999px;padding:3px 9px"><span style="width:7px;height:7px;border-radius:50%;background:#D9736A"></span>Grabando</span>
+      </div>
+
+      <div style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.09em;text-transform:uppercase;color:#6F8296;margin:22px 0 12px">Cinco reglas</div>
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <div style="display:grid;grid-template-columns:20px 1fr;gap:10px;font:400 12.5px/1.6 'IBM Plex Sans',sans-serif;color:#C3CDD8"><span style="font:500 11px 'IBM Plex Mono',monospace;color:#4E90C4;padding-top:3px">01</span><span><b style="font-weight:600;color:#E8EDF2">La elevación se expresa con superficie, no con sombra.</b> Un menú o un diálogo se aclara un paso (#1A2430); la sombra en oscuro no se ve y solo ensucia.</span></div>
+        <div style="display:grid;grid-template-columns:20px 1fr;gap:10px;font:400 12.5px/1.6 'IBM Plex Sans',sans-serif;color:#C3CDD8"><span style="font:500 11px 'IBM Plex Mono',monospace;color:#4E90C4;padding-top:3px">02</span><span><b style="font-weight:600;color:#E8EDF2">Los bordes suben de peso.</b> En claro un borde separa; en oscuro también delimita, así que toda tarjeta lleva borde visible, no solo cambio de fondo.</span></div>
+        <div style="display:grid;grid-template-columns:20px 1fr;gap:10px;font:400 12.5px/1.6 'IBM Plex Sans',sans-serif;color:#C3CDD8"><span style="font:500 11px 'IBM Plex Mono',monospace;color:#4E90C4;padding-top:3px">03</span><span><b style="font-weight:600;color:#E8EDF2">La redundancia de los tres estados se mantiene intacta:</b> ícono con silueta propia, borde continuo o discontinuo y palabra escrita. La trama diagonal del “sin verificar” también.</span></div>
+        <div style="display:grid;grid-template-columns:20px 1fr;gap:10px;font:400 12.5px/1.6 'IBM Plex Sans',sans-serif;color:#C3CDD8"><span style="font:500 11px 'IBM Plex Mono',monospace;color:#4E90C4;padding-top:3px">04</span><span><b style="font-weight:600;color:#E8EDF2">La barra de navegación deja de ser cromo distintivo.</b> En oscuro casi coincide con el fondo, así que se separa con un borde derecho de 1px en vez de por contraste de color.</span></div>
+        <div style="display:grid;grid-template-columns:20px 1fr;gap:10px;font:400 12.5px/1.6 'IBM Plex Sans',sans-serif;color:#C3CDD8"><span style="font:500 11px 'IBM Plex Mono',monospace;color:#4E90C4;padding-top:3px">05</span><span><b style="font-weight:600;color:#E8EDF2">El escrito no se imprime en oscuro.</b> En pantalla el lienzo es #16202B con serif #E6EBF0; el .docx y el PDF salen siempre en papel blanco, y el pie del taller lo dice.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:24px 40px">
+    <div style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.09em;text-transform:uppercase;color:#6F8296;margin-bottom:14px">Controles equivalentes</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px">
+      <div>
+        <div style="display:flex;flex-wrap:wrap;gap:9px;align-items:center">
+          <button style="font:600 13px 'IBM Plex Sans',sans-serif;color:#0B1219;background:#4E90C4;border:0;border-radius:4px;padding:8px 15px;height:34px;cursor:pointer">Generar escrito</button>
+          <button style="font:500 13px 'IBM Plex Sans',sans-serif;color:#9EC5E2;background:transparent;border:1px solid #2A4C6B;border-radius:4px;padding:8px 13px;height:34px;cursor:pointer">Guardar</button>
+        </div>
+        <div style="font:400 11.5px/1.55 'IBM Plex Sans',sans-serif;color:#6F8296;margin-top:9px">El primario invierte: texto oscuro sobre azul claro. Es la única inversión del sistema.</div>
+      </div>
+      <div>
+        <div style="height:34px;border:1px solid #24303D;border-radius:4px;padding:0 10px;display:flex;align-items:center;font:400 13px 'IBM Plex Mono',monospace;color:#E8EDF2;background:#131B24">11001310300320250014700</div>
+        <div style="height:34px;border:1px solid #4E90C4;box-shadow:0 0 0 3px rgba(78,144,196,.20);border-radius:4px;padding:0 10px;display:flex;align-items:center;margin-top:9px;font:400 13px 'IBM Plex Sans',sans-serif;color:#E8EDF2;background:#131B24">Con foco<span style="width:1px;height:16px;background:#4E90C4;margin-left:1px"></span></div>
+      </div>
+      <div style="border:1px solid #24303D;border-radius:6px;overflow:hidden">
+        <div style="display:grid;grid-template-columns:1fr 74px;gap:10px;padding:7px 12px;background:#0F1720;border-bottom:1px solid #24303D;font:600 10.5px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#6F8296"><div>Escrito</div><div>Estado</div></div>
+        <div style="display:grid;grid-template-columns:1fr 74px;gap:10px;padding:8px 12px;border-bottom:1px solid #1C2732;font:400 12.5px 'IBM Plex Sans',sans-serif;color:#E8EDF2;background:#131B24"><div>Tutela — Salud EPS</div><div style="font:600 10.5px 'IBM Plex Mono',monospace;text-transform:uppercase;color:#4FB483">Listo</div></div>
+        <div style="display:grid;grid-template-columns:1fr 74px;gap:10px;padding:8px 12px;font:400 12.5px 'IBM Plex Sans',sans-serif;color:#E8EDF2;background:#0F1720"><div>Queja — Juzgado 12</div><div style="font:600 10.5px 'IBM Plex Mono',monospace;text-transform:uppercase;color:#D9A64A">Revisar</div></div>
+      </div>
+      <div style="border:1px solid #24303D;border-radius:6px;background:#16202B;padding:14px 16px">
+        <div style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#6F8296">Lienzo del escrito</div>
+        <div style="font:400 13.5px/1.75 'Source Serif 4',serif;color:#E6EBF0;margin-top:6px">La demanda se presenta dentro del término de <span style="border-bottom:1.5px solid #4FB483">cuatro (4) meses</span> previsto en el artículo 164.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}">
+<ul class="dv-notes">
+<li>El modo oscuro sigue al sistema operativo y no tiene interruptor propio en la app: un abogado que trabaja de noche ya lo configuró en su equipo, y un tercer ajuste solo genera pantallas inconsistentes entre su portátil y su teléfono.</li>
+<li>Verde y ámbar suben de luminosidad y bajan de saturación (#14653F → #4FB483, #8A5A12 → #D9A64A) para conservar 5:1 sobre superficie oscura sin volverse neón.</li>
+<li>El primario invierte a texto oscuro sobre azul claro porque el azul institucional (#17456B) sobre #131B24 casi desaparece; es la única inversión, y por eso el botón sigue siendo el elemento más brillante de la pantalla.</li>
+<li>El escrito conserva su propio lienzo, un paso más claro que la app, y se advierte que la exportación sale en papel blanco: nadie quiere radicar un .docx con fondo negro.</li>
+</ul>
+</sc-if>
+</div>
+
