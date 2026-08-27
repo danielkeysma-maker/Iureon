@@ -55,6 +55,9 @@ FILE_FOR_BRANCH = {
     'PROPIEDAD_INTELECTUAL': 'actuaciones-propiedad-intelectual.json',
     'POLICIVO': 'actuaciones-policivo.json',
     'DISCIPLINARIO': 'actuaciones-disciplinario.json',
+    'ARBITRAJE': 'actuaciones-arbitraje.json',
+    'INSOLVENCIA': 'actuaciones-insolvencia.json',
+    'AMBIENTAL': 'actuaciones-ambiental.json',
 }
 
 # Mirrors the allowlist in catalog.check.ts. Duplicated on purpose: a merge that

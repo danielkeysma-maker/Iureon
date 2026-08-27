@@ -17,6 +17,9 @@ import { ADUANERO_CATALOG } from './aduanero';
 import { PROPIEDAD_INTELECTUAL_CATALOG } from './propiedad-intelectual';
 import { POLICIVO_CATALOG } from './policivo';
 import { DISCIPLINARIO_CATALOG } from './disciplinario';
+import { ARBITRAJE_CATALOG } from './arbitraje';
+import { INSOLVENCIA_CATALOG } from './insolvencia';
+import { AMBIENTAL_CATALOG } from './ambiental';
 
 /**
  * Every branch catalogue the product ships with.
@@ -43,5 +46,8 @@ export const ALL_CATALOGS: BranchCatalog[] = [
   ADUANERO_CATALOG,
   PROPIEDAD_INTELECTUAL_CATALOG,
   POLICIVO_CATALOG,
-  DISCIPLINARIO_CATALOG
+  DISCIPLINARIO_CATALOG,
+  ARBITRAJE_CATALOG,
+  INSOLVENCIA_CATALOG,
+  AMBIENTAL_CATALOG
 ];

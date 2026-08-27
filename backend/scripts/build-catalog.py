@@ -144,6 +144,27 @@ BRANCHES = [
         'DISCIPLINARIO',
         'disciplinario',
     ),
+    (
+        'actuaciones-arbitraje.json',
+        'arbitraje.ts',
+        'ARBITRAJE_CATALOG',
+        'ARBITRAJE',
+        'arbitraje',
+    ),
+    (
+        'actuaciones-insolvencia.json',
+        'insolvencia.ts',
+        'INSOLVENCIA_CATALOG',
+        'INSOLVENCIA',
+        'insolvencia',
+    ),
+    (
+        'actuaciones-ambiental.json',
+        'ambiental.ts',
+        'AMBIENTAL_CATALOG',
+        'AMBIENTAL',
+        'ambiental',
+    ),
 ]
 
 

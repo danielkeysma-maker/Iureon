@@ -30,6 +30,9 @@ export const BRANCH_LABELS: Record<string, string> = {
   PROPIEDAD_INTELECTUAL: 'Propiedad Intelectual (SIC & DNDA)',
   POLICIVO: 'Policivo & Convivencia (Ley 1801)',
   DISCIPLINARIO: 'Disciplinario (Servidores & Abogados)',
+  ARBITRAJE: 'Arbitraje Nacional (Ley 1563)',
+  INSOLVENCIA: 'Insolvencia de Persona Natural',
+  AMBIENTAL: 'Ambiental & Sancionatorio (ANLA & CAR)',
   // Not catalogued: kept so its legacy document types remain reachable.
   'PEQUEÑAS_CAUSAS': 'Pequeñas Causas (Mínima Cuantía)'
 };

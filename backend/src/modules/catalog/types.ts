@@ -25,7 +25,10 @@ export type LegalBranch =
   | 'ADUANERO'
   | 'PROPIEDAD_INTELECTUAL'
   | 'POLICIVO'
-  | 'DISCIPLINARIO';
+  | 'DISCIPLINARIO'
+  | 'ARBITRAJE'
+  | 'INSOLVENCIA'
+  | 'AMBIENTAL';
 
 /** Who authors the document. */
 /**
