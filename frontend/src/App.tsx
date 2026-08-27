@@ -18,6 +18,8 @@ import { AuditView } from './modules/audit/components/AuditView';
 import { SubprocessorsView } from './modules/privacy/components/SubprocessorsView';
 import { TriageView } from './modules/catalog/components/TriageView';
 import { SettingsView } from './modules/settings/components/SettingsView';
+import { WorkshopConfigBar } from './modules/workspace/components/WorkshopConfigBar';
+import type { ActuacionRole } from './modules/catalog/types';
 import { FirmBrandingModal } from './modules/tenant/components/FirmBrandingModal';
 import { FirmSubscriptionModal } from './modules/subscriptions/components/FirmSubscriptionModal';
 import type { FirmSubscriptionInfo } from './modules/subscriptions/types';
@@ -182,6 +184,15 @@ export function App() {
 
   const [firmBranding, setFirmBranding] = useState<FirmBrandingConfig>(DEFAULT_FIRM_BRANDING);
   const workflow = useLegalAgentWorkflow();
+
+  /*
+   * Quién firma el escrito.
+   *
+   * Vive aquí y no dentro del panel porque la barra de configuración abarca el
+   * ancho completo —sobre el panel Y sobre el documento— y el panel necesita el
+   * mismo valor para el verbo del botón y para seguir a la actuación elegida.
+   */
+  const [userRole, setUserRole] = useState<ActuacionRole>('LITIGANTE');
 
   /*
    * A firm is created from the OPERATOR CONSOLE, which issues its first account
@@ -389,13 +400,29 @@ export function App() {
 
         <main className="flex-1 flex overflow-hidden">
           {mainView === 'workspace' && (
-            <>
+            /*
+              LA BARRA ABARCA EL ANCHO COMPLETO, sobre el panel y sobre el
+              documento. Estaba metida dentro del panel izquierdo, así que su
+              contenedor se llevaba todo el ancho disponible y dejaba el lienzo
+              del documento reducido a una franja en blanco.
+            */
+            <div className="flex min-h-0 flex-1 flex-col">
+              <WorkshopConfigBar
+                userRole={userRole}
+                setUserRole={setUserRole}
+                legalBranch={workflow.legalBranch}
+                setLegalBranch={workflow.setLegalBranch}
+                documentType={workflow.documentType}
+                setDocumentType={workflow.setDocumentType}
+              />
+
+              <div className="flex min-h-0 flex-1">
               {!workflow.isFocusMode && (
                 <AgentPanelLeft
+                  userRole={userRole}
+                  setUserRole={setUserRole}
                   documentType={workflow.documentType}
-                  setDocumentType={workflow.setDocumentType}
                   legalBranch={workflow.legalBranch}
-                  setLegalBranch={workflow.setLegalBranch}
                   legalPrompt={workflow.legalPrompt}
                   setLegalPrompt={workflow.setLegalPrompt}
                   isProcessing={workflow.isProcessing}
@@ -426,7 +453,8 @@ export function App() {
                 onSaveDraft={handleSaveDraft}
                 onOpenSavedDraftsModal={() => setIsSavedDraftsModalOpen(true)}
               />
-            </>
+              </div>
+            </div>
           )}
 
           {mainView === 'audiencias' && <TranscriptionView kind="AUDIENCIA" />}

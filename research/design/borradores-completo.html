@@ -1,0 +1,2507 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="045cc618-da6b-4530-bfe6-c90ff5cbba9c"></script>
+
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics=""><meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<style>/* cyrillic-ext */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("7f8cbaf0-332c-4839-be62-12fe9cb8c738") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("f1d3f7fc-2114-4e64-b9ca-c89e578dbf4d") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("2524db81-c50f-4d9c-ae17-a36ad42b075a") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("dab7b388-9b9e-4ea8-b619-552404dac44b") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("34dc8550-233f-4980-b721-093d0c000a27") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("6539f1cf-132d-4724-aac6-6af03ef6da63") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("2d70f12f-1dd7-47ca-9fb9-0bef7180ff46") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("592e2a8b-beae-49ca-ba75-7fb66dd537f3") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("2c157a6e-464d-4eba-8c7b-8c0a99d39e10") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("bb1bce59-eb71-45e3-8ed7-dad7c5ad61fb") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("014b4280-39cc-404d-843d-203be8ba494a") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("2ab611dc-f177-4656-a6e4-0ac26cd1b295") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("a16f5401-7e5b-4f9c-84d3-456afcaf8559") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("478fb9b1-e836-42c0-839f-7963466fdef6") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("2b341690-b484-4850-ae23-d5a01569e655") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("db4f84a6-f3f7-43d2-ae90-dd0a2e697630") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("df7f1ba2-21d3-4589-9803-1230236bc4a3") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("74b73565-ae4e-4140-8f3d-8d9fde9e4431") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("47106943-a924-4416-b649-dd6aaeb71b69") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("5b3c99cf-7970-40e8-819a-ea87361551d2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("3ab5d5ec-5d4d-415c-a38b-9b8b331218bf") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("db4f84a6-f3f7-43d2-ae90-dd0a2e697630") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("df7f1ba2-21d3-4589-9803-1230236bc4a3") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("74b73565-ae4e-4140-8f3d-8d9fde9e4431") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("47106943-a924-4416-b649-dd6aaeb71b69") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("5b3c99cf-7970-40e8-819a-ea87361551d2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("3ab5d5ec-5d4d-415c-a38b-9b8b331218bf") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("db4f84a6-f3f7-43d2-ae90-dd0a2e697630") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("df7f1ba2-21d3-4589-9803-1230236bc4a3") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("74b73565-ae4e-4140-8f3d-8d9fde9e4431") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("47106943-a924-4416-b649-dd6aaeb71b69") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("5b3c99cf-7970-40e8-819a-ea87361551d2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("3ab5d5ec-5d4d-415c-a38b-9b8b331218bf") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("db4f84a6-f3f7-43d2-ae90-dd0a2e697630") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("df7f1ba2-21d3-4589-9803-1230236bc4a3") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("74b73565-ae4e-4140-8f3d-8d9fde9e4431") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("47106943-a924-4416-b649-dd6aaeb71b69") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("5b3c99cf-7970-40e8-819a-ea87361551d2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("3ab5d5ec-5d4d-415c-a38b-9b8b331218bf") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("444eb1ef-c617-4979-88d2-abc6168d8a1b") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("2dd71f24-1f42-4499-b08b-55ff86ee4af2") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("5c994a7c-d0c0-4dc5-8d32-14a3932253de") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fa812092-f940-4e5a-9aa6-52e353b0558a") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("9bb61595-8fa1-46ab-ba81-eed507dd682b") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("6dbde26b-8da9-4a76-b837-ee7ea2fa4d76") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("444eb1ef-c617-4979-88d2-abc6168d8a1b") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("2dd71f24-1f42-4499-b08b-55ff86ee4af2") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("5c994a7c-d0c0-4dc5-8d32-14a3932253de") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("fa812092-f940-4e5a-9aa6-52e353b0558a") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("9bb61595-8fa1-46ab-ba81-eed507dd682b") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("6dbde26b-8da9-4a76-b837-ee7ea2fa4d76") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+</style>
+<style>/* cyrillic-ext */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("0674d4e0-3dc6-47fd-be41-a75fa65624cd") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("6e455e72-5b93-463b-a9ab-36c01bc74e3e") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("22629e0a-e5c6-4be4-b52f-3df2f7fe48ca") format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("da21f2ad-ea16-4975-bef5-a6842f114edb") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("e310ef0c-57d7-45ee-8e6b-e76a68b9ee99") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("3eb875d9-f3ba-4df9-ba7d-c49c4e709cfb") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("e490a05b-cd89-4e0c-8724-70bb0abc51a4") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("0674d4e0-3dc6-47fd-be41-a75fa65624cd") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("6e455e72-5b93-463b-a9ab-36c01bc74e3e") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("22629e0a-e5c6-4be4-b52f-3df2f7fe48ca") format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("da21f2ad-ea16-4975-bef5-a6842f114edb") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("e310ef0c-57d7-45ee-8e6b-e76a68b9ee99") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("3eb875d9-f3ba-4df9-ba7d-c49c4e709cfb") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("e490a05b-cd89-4e0c-8724-70bb0abc51a4") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("0674d4e0-3dc6-47fd-be41-a75fa65624cd") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("6e455e72-5b93-463b-a9ab-36c01bc74e3e") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("22629e0a-e5c6-4be4-b52f-3df2f7fe48ca") format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("da21f2ad-ea16-4975-bef5-a6842f114edb") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("e310ef0c-57d7-45ee-8e6b-e76a68b9ee99") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("3eb875d9-f3ba-4df9-ba7d-c49c4e709cfb") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("e490a05b-cd89-4e0c-8724-70bb0abc51a4") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Instrument Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("9e5ff04e-1e3b-410f-b316-4dac4ddebaac") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Instrument Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("8876cea3-142c-4422-a014-e9dffe134f14") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Instrument Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("9e5ff04e-1e3b-410f-b316-4dac4ddebaac") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Instrument Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("8876cea3-142c-4422-a014-e9dffe134f14") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Instrument Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("9e5ff04e-1e3b-410f-b316-4dac4ddebaac") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Instrument Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("8876cea3-142c-4422-a014-e9dffe134f14") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Libre Baskerville';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("17650a58-eb9b-4369-b5cf-87fcb06f2f04") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Libre Baskerville';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("d2c76542-ba0a-4053-8202-ba408ae715ff") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Libre Baskerville';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("17650a58-eb9b-4369-b5cf-87fcb06f2f04") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Libre Baskerville';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("d2c76542-ba0a-4053-8202-ba408ae715ff") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("2e850c7d-a965-4bf1-b56a-e90dfc09b787") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("6fe9a464-9c9c-4514-9746-063fcc3389a2") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* math */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("325db75a-ec25-43ae-bb00-7e904449abe4") format('woff2');
+  unicode-range: U+0302-0303, U+0305, U+0307-0308, U+0310, U+0312, U+0315, U+031A, U+0326-0327, U+032C, U+032F-0330, U+0332-0333, U+0338, U+033A, U+0346, U+034D, U+0391-03A1, U+03A3-03A9, U+03B1-03C9, U+03D1, U+03D5-03D6, U+03F0-03F1, U+03F4-03F5, U+2016-2017, U+2034-2038, U+203C, U+2040, U+2043, U+2047, U+2050, U+2057, U+205F, U+2070-2071, U+2074-208E, U+2090-209C, U+20D0-20DC, U+20E1, U+20E5-20EF, U+2100-2112, U+2114-2115, U+2117-2121, U+2123-214F, U+2190, U+2192, U+2194-21AE, U+21B0-21E5, U+21F1-21F2, U+21F4-2211, U+2213-2214, U+2216-22FF, U+2308-230B, U+2310, U+2319, U+231C-2321, U+2336-237A, U+237C, U+2395, U+239B-23B7, U+23D0, U+23DC-23E1, U+2474-2475, U+25AF, U+25B3, U+25B7, U+25BD, U+25C1, U+25CA, U+25CC, U+25FB, U+266D-266F, U+27C0-27FF, U+2900-2AFF, U+2B0E-2B11, U+2B30-2B4C, U+2BFE, U+3030, U+FF5B, U+FF5D, U+1D400-1D7FF, U+1EE00-1EEFF;
+}
+/* symbols */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("4074d627-85e5-4967-81b1-899779043b8d") format('woff2');
+  unicode-range: U+0001-000C, U+000E-001F, U+007F-009F, U+20DD-20E0, U+20E2-20E4, U+2150-218F, U+2190, U+2192, U+2194-2199, U+21AF, U+21E6-21F0, U+21F3, U+2218-2219, U+2299, U+22C4-22C6, U+2300-243F, U+2440-244A, U+2460-24FF, U+25A0-27BF, U+2800-28FF, U+2921-2922, U+2981, U+29BF, U+29EB, U+2B00-2BFF, U+4DC0-4DFF, U+FFF9-FFFB, U+10140-1018E, U+10190-1019C, U+101A0, U+101D0-101FD, U+102E0-102FB, U+10E60-10E7E, U+1D2C0-1D2D3, U+1D2E0-1D37F, U+1F000-1F0FF, U+1F100-1F1AD, U+1F1E6-1F1FF, U+1F30D-1F30F, U+1F315, U+1F31C, U+1F31E, U+1F320-1F32C, U+1F336, U+1F378, U+1F37D, U+1F382, U+1F393-1F39F, U+1F3A7-1F3A8, U+1F3AC-1F3AF, U+1F3C2, U+1F3C4-1F3C6, U+1F3CA-1F3CE, U+1F3D4-1F3E0, U+1F3ED, U+1F3F1-1F3F3, U+1F3F5-1F3F7, U+1F408, U+1F415, U+1F41F, U+1F426, U+1F43F, U+1F441-1F442, U+1F444, U+1F446-1F449, U+1F44C-1F44E, U+1F453, U+1F46A, U+1F47D, U+1F4A3, U+1F4B0, U+1F4B3, U+1F4B9, U+1F4BB, U+1F4BF, U+1F4C8-1F4CB, U+1F4D6, U+1F4DA, U+1F4DF, U+1F4E3-1F4E6, U+1F4EA-1F4ED, U+1F4F7, U+1F4F9-1F4FB, U+1F4FD-1F4FE, U+1F503, U+1F507-1F50B, U+1F50D, U+1F512-1F513, U+1F53E-1F54A, U+1F54F-1F5FA, U+1F610, U+1F650-1F67F, U+1F687, U+1F68D, U+1F691, U+1F694, U+1F698, U+1F6AD, U+1F6B2, U+1F6B9-1F6BA, U+1F6BC, U+1F6C6-1F6CF, U+1F6D3-1F6D7, U+1F6E0-1F6EA, U+1F6F0-1F6F3, U+1F6F7-1F6FC, U+1F700-1F7FF, U+1F800-1F80B, U+1F810-1F847, U+1F850-1F859, U+1F860-1F887, U+1F890-1F8AD, U+1F8B0-1F8BB, U+1F8C0-1F8C1, U+1F900-1F90B, U+1F93B, U+1F946, U+1F984, U+1F996, U+1F9E9, U+1FA00-1FA6F, U+1FA70-1FA7C, U+1FA80-1FA89, U+1FA8F-1FAC6, U+1FACE-1FADC, U+1FADF-1FAE9, U+1FAF0-1FAF8, U+1FB00-1FBFF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("ead1ad4b-a3ec-4423-b05c-1471d9a7fcee") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("08f1ac70-5d14-49b0-a7c0-5b628f9610b3") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("84f41026-c530-4492-9338-e03718dc79da") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("2e850c7d-a965-4bf1-b56a-e90dfc09b787") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("6fe9a464-9c9c-4514-9746-063fcc3389a2") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* math */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("325db75a-ec25-43ae-bb00-7e904449abe4") format('woff2');
+  unicode-range: U+0302-0303, U+0305, U+0307-0308, U+0310, U+0312, U+0315, U+031A, U+0326-0327, U+032C, U+032F-0330, U+0332-0333, U+0338, U+033A, U+0346, U+034D, U+0391-03A1, U+03A3-03A9, U+03B1-03C9, U+03D1, U+03D5-03D6, U+03F0-03F1, U+03F4-03F5, U+2016-2017, U+2034-2038, U+203C, U+2040, U+2043, U+2047, U+2050, U+2057, U+205F, U+2070-2071, U+2074-208E, U+2090-209C, U+20D0-20DC, U+20E1, U+20E5-20EF, U+2100-2112, U+2114-2115, U+2117-2121, U+2123-214F, U+2190, U+2192, U+2194-21AE, U+21B0-21E5, U+21F1-21F2, U+21F4-2211, U+2213-2214, U+2216-22FF, U+2308-230B, U+2310, U+2319, U+231C-2321, U+2336-237A, U+237C, U+2395, U+239B-23B7, U+23D0, U+23DC-23E1, U+2474-2475, U+25AF, U+25B3, U+25B7, U+25BD, U+25C1, U+25CA, U+25CC, U+25FB, U+266D-266F, U+27C0-27FF, U+2900-2AFF, U+2B0E-2B11, U+2B30-2B4C, U+2BFE, U+3030, U+FF5B, U+FF5D, U+1D400-1D7FF, U+1EE00-1EEFF;
+}
+/* symbols */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("4074d627-85e5-4967-81b1-899779043b8d") format('woff2');
+  unicode-range: U+0001-000C, U+000E-001F, U+007F-009F, U+20DD-20E0, U+20E2-20E4, U+2150-218F, U+2190, U+2192, U+2194-2199, U+21AF, U+21E6-21F0, U+21F3, U+2218-2219, U+2299, U+22C4-22C6, U+2300-243F, U+2440-244A, U+2460-24FF, U+25A0-27BF, U+2800-28FF, U+2921-2922, U+2981, U+29BF, U+29EB, U+2B00-2BFF, U+4DC0-4DFF, U+FFF9-FFFB, U+10140-1018E, U+10190-1019C, U+101A0, U+101D0-101FD, U+102E0-102FB, U+10E60-10E7E, U+1D2C0-1D2D3, U+1D2E0-1D37F, U+1F000-1F0FF, U+1F100-1F1AD, U+1F1E6-1F1FF, U+1F30D-1F30F, U+1F315, U+1F31C, U+1F31E, U+1F320-1F32C, U+1F336, U+1F378, U+1F37D, U+1F382, U+1F393-1F39F, U+1F3A7-1F3A8, U+1F3AC-1F3AF, U+1F3C2, U+1F3C4-1F3C6, U+1F3CA-1F3CE, U+1F3D4-1F3E0, U+1F3ED, U+1F3F1-1F3F3, U+1F3F5-1F3F7, U+1F408, U+1F415, U+1F41F, U+1F426, U+1F43F, U+1F441-1F442, U+1F444, U+1F446-1F449, U+1F44C-1F44E, U+1F453, U+1F46A, U+1F47D, U+1F4A3, U+1F4B0, U+1F4B3, U+1F4B9, U+1F4BB, U+1F4BF, U+1F4C8-1F4CB, U+1F4D6, U+1F4DA, U+1F4DF, U+1F4E3-1F4E6, U+1F4EA-1F4ED, U+1F4F7, U+1F4F9-1F4FB, U+1F4FD-1F4FE, U+1F503, U+1F507-1F50B, U+1F50D, U+1F512-1F513, U+1F53E-1F54A, U+1F54F-1F5FA, U+1F610, U+1F650-1F67F, U+1F687, U+1F68D, U+1F691, U+1F694, U+1F698, U+1F6AD, U+1F6B2, U+1F6B9-1F6BA, U+1F6BC, U+1F6C6-1F6CF, U+1F6D3-1F6D7, U+1F6E0-1F6EA, U+1F6F0-1F6F3, U+1F6F7-1F6FC, U+1F700-1F7FF, U+1F800-1F80B, U+1F810-1F847, U+1F850-1F859, U+1F860-1F887, U+1F890-1F8AD, U+1F8B0-1F8BB, U+1F8C0-1F8C1, U+1F900-1F90B, U+1F93B, U+1F946, U+1F984, U+1F996, U+1F9E9, U+1FA00-1FA6F, U+1FA70-1FA7C, U+1FA80-1FA89, U+1FA8F-1FAC6, U+1FACE-1FADC, U+1FADF-1FAE9, U+1FAF0-1FAF8, U+1FB00-1FBFF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("ead1ad4b-a3ec-4423-b05c-1471d9a7fcee") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("08f1ac70-5d14-49b0-a7c0-5b628f9610b3") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("84f41026-c530-4492-9338-e03718dc79da") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("2e850c7d-a965-4bf1-b56a-e90dfc09b787") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("6fe9a464-9c9c-4514-9746-063fcc3389a2") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* math */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("325db75a-ec25-43ae-bb00-7e904449abe4") format('woff2');
+  unicode-range: U+0302-0303, U+0305, U+0307-0308, U+0310, U+0312, U+0315, U+031A, U+0326-0327, U+032C, U+032F-0330, U+0332-0333, U+0338, U+033A, U+0346, U+034D, U+0391-03A1, U+03A3-03A9, U+03B1-03C9, U+03D1, U+03D5-03D6, U+03F0-03F1, U+03F4-03F5, U+2016-2017, U+2034-2038, U+203C, U+2040, U+2043, U+2047, U+2050, U+2057, U+205F, U+2070-2071, U+2074-208E, U+2090-209C, U+20D0-20DC, U+20E1, U+20E5-20EF, U+2100-2112, U+2114-2115, U+2117-2121, U+2123-214F, U+2190, U+2192, U+2194-21AE, U+21B0-21E5, U+21F1-21F2, U+21F4-2211, U+2213-2214, U+2216-22FF, U+2308-230B, U+2310, U+2319, U+231C-2321, U+2336-237A, U+237C, U+2395, U+239B-23B7, U+23D0, U+23DC-23E1, U+2474-2475, U+25AF, U+25B3, U+25B7, U+25BD, U+25C1, U+25CA, U+25CC, U+25FB, U+266D-266F, U+27C0-27FF, U+2900-2AFF, U+2B0E-2B11, U+2B30-2B4C, U+2BFE, U+3030, U+FF5B, U+FF5D, U+1D400-1D7FF, U+1EE00-1EEFF;
+}
+/* symbols */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("4074d627-85e5-4967-81b1-899779043b8d") format('woff2');
+  unicode-range: U+0001-000C, U+000E-001F, U+007F-009F, U+20DD-20E0, U+20E2-20E4, U+2150-218F, U+2190, U+2192, U+2194-2199, U+21AF, U+21E6-21F0, U+21F3, U+2218-2219, U+2299, U+22C4-22C6, U+2300-243F, U+2440-244A, U+2460-24FF, U+25A0-27BF, U+2800-28FF, U+2921-2922, U+2981, U+29BF, U+29EB, U+2B00-2BFF, U+4DC0-4DFF, U+FFF9-FFFB, U+10140-1018E, U+10190-1019C, U+101A0, U+101D0-101FD, U+102E0-102FB, U+10E60-10E7E, U+1D2C0-1D2D3, U+1D2E0-1D37F, U+1F000-1F0FF, U+1F100-1F1AD, U+1F1E6-1F1FF, U+1F30D-1F30F, U+1F315, U+1F31C, U+1F31E, U+1F320-1F32C, U+1F336, U+1F378, U+1F37D, U+1F382, U+1F393-1F39F, U+1F3A7-1F3A8, U+1F3AC-1F3AF, U+1F3C2, U+1F3C4-1F3C6, U+1F3CA-1F3CE, U+1F3D4-1F3E0, U+1F3ED, U+1F3F1-1F3F3, U+1F3F5-1F3F7, U+1F408, U+1F415, U+1F41F, U+1F426, U+1F43F, U+1F441-1F442, U+1F444, U+1F446-1F449, U+1F44C-1F44E, U+1F453, U+1F46A, U+1F47D, U+1F4A3, U+1F4B0, U+1F4B3, U+1F4B9, U+1F4BB, U+1F4BF, U+1F4C8-1F4CB, U+1F4D6, U+1F4DA, U+1F4DF, U+1F4E3-1F4E6, U+1F4EA-1F4ED, U+1F4F7, U+1F4F9-1F4FB, U+1F4FD-1F4FE, U+1F503, U+1F507-1F50B, U+1F50D, U+1F512-1F513, U+1F53E-1F54A, U+1F54F-1F5FA, U+1F610, U+1F650-1F67F, U+1F687, U+1F68D, U+1F691, U+1F694, U+1F698, U+1F6AD, U+1F6B2, U+1F6B9-1F6BA, U+1F6BC, U+1F6C6-1F6CF, U+1F6D3-1F6D7, U+1F6E0-1F6EA, U+1F6F0-1F6F3, U+1F6F7-1F6FC, U+1F700-1F7FF, U+1F800-1F80B, U+1F810-1F847, U+1F850-1F859, U+1F860-1F887, U+1F890-1F8AD, U+1F8B0-1F8BB, U+1F8C0-1F8C1, U+1F900-1F90B, U+1F93B, U+1F946, U+1F984, U+1F996, U+1F9E9, U+1FA00-1FA6F, U+1FA70-1FA7C, U+1FA80-1FA89, U+1FA8F-1FAC6, U+1FACE-1FADC, U+1FADF-1FAE9, U+1FAF0-1FAF8, U+1FB00-1FBFF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("ead1ad4b-a3ec-4423-b05c-1471d9a7fcee") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("08f1ac70-5d14-49b0-a7c0-5b628f9610b3") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("84f41026-c530-4492-9338-e03718dc79da") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("f123e874-d05e-47d9-b9a1-02233fae339f") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("d5f7e5e2-98e9-4c5d-a612-164914303d20") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("ef1e7518-6347-4731-b394-f05f77a84e99") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("2ae75139-e718-46ce-887c-60e1abf0b372") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("37e93934-9b4b-44e3-97ad-59ca2850230b") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("64b5ba56-854a-4375-9747-b726d9a434e5") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("f123e874-d05e-47d9-b9a1-02233fae339f") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("d5f7e5e2-98e9-4c5d-a612-164914303d20") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("ef1e7518-6347-4731-b394-f05f77a84e99") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("2ae75139-e718-46ce-887c-60e1abf0b372") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("37e93934-9b4b-44e3-97ad-59ca2850230b") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("64b5ba56-854a-4375-9747-b726d9a434e5") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("f123e874-d05e-47d9-b9a1-02233fae339f") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("d5f7e5e2-98e9-4c5d-a612-164914303d20") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("ef1e7518-6347-4731-b394-f05f77a84e99") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("2ae75139-e718-46ce-887c-60e1abf0b372") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("37e93934-9b4b-44e3-97ad-59ca2850230b") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("64b5ba56-854a-4375-9747-b726d9a434e5") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("f123e874-d05e-47d9-b9a1-02233fae339f") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("d5f7e5e2-98e9-4c5d-a612-164914303d20") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("ef1e7518-6347-4731-b394-f05f77a84e99") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("2ae75139-e718-46ce-887c-60e1abf0b372") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("37e93934-9b4b-44e3-97ad-59ca2850230b") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("64b5ba56-854a-4375-9747-b726d9a434e5") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("066586d1-6ed1-433e-8f77-18c9036d0bd7") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("2ded84f8-c249-4b0f-8731-2c7fdc9bc1c9") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("4b6ef256-0454-4a8d-b410-67380915a110") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("0dc1885a-1aae-4aec-8657-bf1f8f075273") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("066586d1-6ed1-433e-8f77-18c9036d0bd7") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("2ded84f8-c249-4b0f-8731-2c7fdc9bc1c9") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("4b6ef256-0454-4a8d-b410-67380915a110") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("0dc1885a-1aae-4aec-8657-bf1f8f075273") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("066586d1-6ed1-433e-8f77-18c9036d0bd7") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("2ded84f8-c249-4b0f-8731-2c7fdc9bc1c9") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("4b6ef256-0454-4a8d-b410-67380915a110") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("0dc1885a-1aae-4aec-8657-bf1f8f075273") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("066586d1-6ed1-433e-8f77-18c9036d0bd7") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("2ded84f8-c249-4b0f-8731-2c7fdc9bc1c9") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("4b6ef256-0454-4a8d-b410-67380915a110") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("0dc1885a-1aae-4aec-8657-bf1f8f075273") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Public Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("e20d2b85-f94b-4b23-bb53-e3a480b5f66b") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Public Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("0c7c4747-dff9-4ab5-8df9-9e921b2c3530") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Public Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("1ef0ab0a-bd90-412c-bfba-db8b1cef29be") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Public Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("e20d2b85-f94b-4b23-bb53-e3a480b5f66b") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Public Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("0c7c4747-dff9-4ab5-8df9-9e921b2c3530") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Public Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("1ef0ab0a-bd90-412c-bfba-db8b1cef29be") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Public Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("e20d2b85-f94b-4b23-bb53-e3a480b5f66b") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Public Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("0c7c4747-dff9-4ab5-8df9-9e921b2c3530") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Public Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("1ef0ab0a-bd90-412c-bfba-db8b1cef29be") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+</style>
+<style>/* cyrillic-ext */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("08f8fed5-e2b0-4b69-a426-d5df6e6b469d") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("d9451881-7e88-4712-a7b8-748e9b431ff5") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("442c8450-97f3-4c2b-9dfd-3e7720cd5819") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("7d97c277-c528-40bd-ab3c-c7bd14aeebba") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("5295d4fa-d100-4998-ab14-427f613aec8e") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("08f8fed5-e2b0-4b69-a426-d5df6e6b469d") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("d9451881-7e88-4712-a7b8-748e9b431ff5") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("442c8450-97f3-4c2b-9dfd-3e7720cd5819") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("7d97c277-c528-40bd-ab3c-c7bd14aeebba") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("5295d4fa-d100-4998-ab14-427f613aec8e") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("08f8fed5-e2b0-4b69-a426-d5df6e6b469d") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("d9451881-7e88-4712-a7b8-748e9b431ff5") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("442c8450-97f3-4c2b-9dfd-3e7720cd5819") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("7d97c277-c528-40bd-ab3c-c7bd14aeebba") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("5295d4fa-d100-4998-ab14-427f613aec8e") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Crimson Pro';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("c006188a-c808-4d3f-bec5-8c6bf84e246c") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Crimson Pro';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("5a753f0d-dec9-4ce8-a7ba-313ed89e7993") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Crimson Pro';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("c680ff81-917e-4ae9-9e3d-176bea77cab4") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Crimson Pro';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("c006188a-c808-4d3f-bec5-8c6bf84e246c") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Crimson Pro';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("5a753f0d-dec9-4ce8-a7ba-313ed89e7993") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Crimson Pro';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("c680ff81-917e-4ae9-9e3d-176bea77cab4") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Crimson Pro';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("c006188a-c808-4d3f-bec5-8c6bf84e246c") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Crimson Pro';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("5a753f0d-dec9-4ce8-a7ba-313ed89e7993") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Crimson Pro';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("c680ff81-917e-4ae9-9e3d-176bea77cab4") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Figtree';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("656745c9-cc45-4cea-a167-e706052e4cc8") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Figtree';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("5f5a28d9-ab98-4502-b339-fbfe355d3b02") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Figtree';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("656745c9-cc45-4cea-a167-e706052e4cc8") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Figtree';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("5f5a28d9-ab98-4502-b339-fbfe355d3b02") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Figtree';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("656745c9-cc45-4cea-a167-e706052e4cc8") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Figtree';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("5f5a28d9-ab98-4502-b339-fbfe355d3b02") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("1c673ae1-4a9f-4394-bb9c-005cd9638418") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("3e8ec541-254a-4e40-8c09-7f6eeba278cd") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("6a082d05-ee25-4a8f-9f4c-691dc989e041") format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("f1843af6-7e11-40b2-8bc6-d163cb0051dd") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("332e0cce-a79b-493a-979c-d21903ebd0b8") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("8ffc1e61-e02b-4a47-806e-d5cdc2ab3ff8") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("90d8f79b-f23f-4ca1-bfcd-a2b5e1914582") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("1c673ae1-4a9f-4394-bb9c-005cd9638418") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("3e8ec541-254a-4e40-8c09-7f6eeba278cd") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("6a082d05-ee25-4a8f-9f4c-691dc989e041") format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("f1843af6-7e11-40b2-8bc6-d163cb0051dd") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("332e0cce-a79b-493a-979c-d21903ebd0b8") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("8ffc1e61-e02b-4a47-806e-d5cdc2ab3ff8") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("90d8f79b-f23f-4ca1-bfcd-a2b5e1914582") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("5dd1c68d-5597-4594-8e35-c36619987ce8") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("0689c76e-dc8d-48f4-8052-39599df8fae7") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("ed635798-8c62-4316-ab6b-eacb4b09f4b4") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("5dd1c68d-5597-4594-8e35-c36619987ce8") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("0689c76e-dc8d-48f4-8052-39599df8fae7") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("ed635798-8c62-4316-ab6b-eacb4b09f4b4") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("48b21f70-266f-4f92-b20d-c747caaa837a") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("1bf7df67-7b88-4869-8501-18c16f9d2684") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("9d59a06b-aa12-489d-814c-9cb83ba88655") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("798c9ea3-27ee-4753-b54a-542aea0253f0") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("df050683-17ce-4168-a483-ccc014029cc7") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("87b1cd85-a9e9-4c67-b2cf-8d49e4ed60ae") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("a345c6ad-76d1-4185-a25c-c6bf8a7ac794") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("dd5d209d-07ae-48ce-b2e5-73acfb8c1425") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("caeaf691-f167-4106-bdf6-f0139f813a15") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("ed58e549-5619-4712-843a-86decca22b89") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("43994587-761f-41b0-87a0-54d24419d995") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("7d71463b-9de5-4d47-9fa3-5ab16b89a7f4") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("7601fd00-bd64-4f32-9dc9-e16616eff923") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("0e90643c-ea9e-4436-9b02-9f7d6324ecd2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("c503cafb-c46f-42c4-a849-2447f75865a2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+</style>
+<style>
+body{margin:0;background:#eceef1;font-family:'IBM Plex Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(16,24,34,.08);scroll-margin-top:16px}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 20px}
+.dv-tid{font:600 10px 'IBM Plex Mono',monospace;padding:3px 7px;background:#101822;color:#fff;border-radius:4px;text-decoration:none}
+.dv-tname{font:600 13px/1.2 'IBM Plex Sans',sans-serif;color:#101822}
+.dv-opts{display:flex;flex-direction:column;gap:44px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px}
+.dv-oid{font:600 10.5px 'IBM Plex Mono',monospace;padding:3px 7px;background:rgba(16,24,34,.08);color:#101822;border-radius:5px;text-decoration:none}
+.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11.5px/1.3 'IBM Plex Sans',sans-serif;color:rgba(16,24,34,.55)}
+.dv-card{max-width:100%;background:#fff;border:1px solid rgba(16,24,34,.10);border-radius:8px;box-shadow:0 1px 3px rgba(16,24,34,.07);overflow:hidden}
+.dv-opt:target .dv-oid{background:#17456B;color:#fff}
+.dv-notes{margin:2px 0 0;padding:0 0 0 16px;max-width:1060px;font:400 12px/1.65 'IBM Plex Sans',sans-serif;color:rgba(16,24,34,.62)}
+.dv-notes li{margin:0 0 3px}
+.dv-notes code{font:500 11px 'IBM Plex Mono',monospace;color:#17456B;background:rgba(23,69,107,.07);padding:1px 4px;border-radius:3px}
+.dv-next{margin:22px 0 0;font:12px/1.5 'IBM Plex Sans',sans-serif;color:rgba(16,24,34,.5)}
+a{color:#17456B}a:hover{color:#113652}
+@keyframes iu-spin{to{transform:rotate(360deg)}}
+</style></helmet>
+
+<section class="dv-turn" id="t10">
+<div class="dv-thd"><a class="dv-tid" href="#t10">10</a><span class="dv-tname">Borradores guardados — la pantalla y el modal del panel de redacción (SavedDraftsModal)</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="10a">
+<div class="dv-olabel"><a class="dv-oid" href="#10a">10a</a>Borradores guardados · pantalla — ordenados por término que corre, no por fecha de edición</div>
+<div class="dv-card" style="width:1440px;background:#F7F8FA">
+  <div style="background:#fff;border-bottom:1px solid #E3E7EC;padding:16px 28px">
+    <div style="display:flex;align-items:flex-start;gap:14px">
+      <div>
+        <div style="font:600 20px 'IBM Plex Sans',sans-serif;color:#101822">Borradores guardados</div>
+        <div style="font:400 13px 'IBM Plex Sans',sans-serif;color:#667487;margin-top:3px">34 escritos sin radicar · 3 con término esta semana</div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px">
+        <button style="font:500 12.5px 'IBM Plex Sans',sans-serif;color:#445064;background:#fff;border:1px solid #E3E7EC;border-radius:4px;padding:7px 12px;height:32px;cursor:pointer">Exportar lista</button>
+        <button style="font:600 13px 'IBM Plex Sans',sans-serif;color:#fff;background:#17456B;border:0;border-radius:4px;padding:8px 14px;height:32px;cursor:pointer">Redactar escrito</button>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:7px;margin-top:14px">
+      <div style="height:30px;border:1px solid #E3E7EC;border-radius:4px;display:flex;align-items:center;gap:7px;padding:0 10px;min-width:260px">
+        <svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="#8B96A6" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M16.5 16.5L21 21"></path></svg>
+        <span style="font:400 12.5px 'IBM Plex Sans',sans-serif;color:#8B96A6">Buscar por cliente, radicado o actuación</span>
+      </div>
+      <span style="height:30px;display:inline-flex;align-items:center;gap:7px;font:500 12px 'IBM Plex Sans',sans-serif;color:#101822;background:#EAF0F5;border:1px solid #CBD9E4;border-radius:4px;padding:0 10px">De la firma<svg width="12" height="12" sc-camel-view-box="0 0 24 24" fill="none" stroke="#17456B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span>
+      <span style="height:30px;display:inline-flex;align-items:center;gap:7px;font:400 12px 'IBM Plex Sans',sans-serif;color:#445064;background:#fff;border:1px solid #E3E7EC;border-radius:4px;padding:0 10px">Estado: sin radicar</span>
+      <span style="height:30px;display:inline-flex;align-items:center;gap:7px;font:400 12px 'IBM Plex Sans',sans-serif;color:#445064;background:#fff;border:1px solid #E3E7EC;border-radius:4px;padding:0 10px">Rama: todas</span>
+      <button style="font:500 12px 'IBM Plex Sans',sans-serif;color:#17456B;background:transparent;border:0;padding:0 6px;cursor:pointer">Limpiar</button>
+      <span style="margin-left:auto;font:400 11.5px 'IBM Plex Mono',monospace;color:#8B96A6">Orden: término más próximo</span>
+    </div>
+  </div>
+
+  <div style="padding:16px 28px 24px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
+      <span style="display:inline-flex;align-items:center;gap:6px;font:600 10.5px 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#8A5A12"><svg width="12" height="12" sc-camel-view-box="0 0 24 24" fill="none" stroke="#8A5A12" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5L21 19.5H3z"></path><path d="M12 10v4"></path></svg>Vence esta semana · 3</span>
+      <div style="flex:1;height:1px;background:#E4D6B4"></div>
+    </div>
+    <div style="background:#fff;border:1px solid #E3E7EC;border-radius:6px;overflow:hidden">
+      <div style="display:grid;grid-template-columns:1fr 176px 132px 108px 96px 150px 24px;gap:12px;padding:8px 16px;background:#F7F8FA;border-bottom:1px solid #E3E7EC;font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#8B96A6"><div>Escrito</div><div>Término</div><div>Sin verificar</div><div>Versión</div><div>Estado</div><div>Últ. edición</div><div></div></div>
+
+      <div style="display:grid;grid-template-columns:1fr 176px 132px 108px 96px 150px 24px;gap:12px;padding:10px 16px;border-bottom:1px solid #EEF1F4;align-items:center;border-left:3px solid #8A5A12;background:#FDFAF3">
+        <div style="min-width:0"><div style="font:500 13.5px 'IBM Plex Sans',sans-serif;color:#101822">Reintegro por fuero de salud</div><div style="font:400 11.5px 'IBM Plex Sans',sans-serif;color:#667487;margin-top:2px">Mosquera · Juzgado 12 Laboral · sin radicar</div></div>
+        <div><div style="font:600 13px 'IBM Plex Mono',monospace;color:#101822">3 may 2025</div><div style="font:500 11.5px 'IBM Plex Sans',sans-serif;color:#8A5A12;margin-top:2px">en 2 días</div></div>
+        <div><span style="display:inline-flex;align-items:center;gap:5px;font:600 10.5px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#8A5A12;background:#fff;border:1px dashed #CFAE6E;border-radius:999px;padding:2px 8px"><svg width="10" height="10" sc-camel-view-box="0 0 24 24" fill="none" stroke="#8A5A12" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5L21 19.5H3z"></path><path d="M12 10v4"></path></svg>2</span></div>
+        <div style="font:500 12.5px 'IBM Plex Mono',monospace;color:#101822">v4</div>
+        <div><span style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#8A5A12">Revisar</span></div>
+        <div><div style="font:400 12px 'IBM Plex Sans',sans-serif;color:#2B3542">C. Restrepo</div><div style="font:400 11px 'IBM Plex Mono',monospace;color:#8B96A6">hoy 14:02</div></div>
+        <svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="#8A5A12" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="5" r="1.4"></circle><circle cx="12" cy="12" r="1.4"></circle><circle cx="12" cy="19" r="1.4"></circle></svg>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 176px 132px 108px 96px 150px 24px;gap:12px;padding:10px 16px;border-bottom:1px solid #EEF1F4;align-items:center;border-left:3px solid #8A5A12;background:#FDFAF3">
+        <div style="min-width:0"><div style="font:500 13.5px 'IBM Plex Sans',sans-serif;color:#101822">Recurso de queja ante superior</div><div style="font:400 11.5px 'IBM Plex Sans',sans-serif;color:#667487;margin-top:2px">Ortega Ruiz · Juzgado 12 Civil</div></div>
+        <div><div style="font:600 13px 'IBM Plex Mono',monospace;color:#101822">5 may 2025</div><div style="font:500 11.5px 'IBM Plex Sans',sans-serif;color:#8A5A12;margin-top:2px">en 4 días</div></div>
+        <div><span style="font:600 10.5px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#14653F;background:#E9F2EC;border:1px solid #A8C8B6;border-radius:999px;padding:2px 8px">0</span></div>
+        <div style="font:500 12.5px 'IBM Plex Mono',monospace;color:#101822">v2</div>
+        <div><span style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#14653F">Listo</span></div>
+        <div><div style="font:400 12px 'IBM Plex Sans',sans-serif;color:#2B3542">J. Peña</div><div style="font:400 11px 'IBM Plex Mono',monospace;color:#8B96A6">ayer 17:40</div></div>
+        <svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="#8A5A12" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="5" r="1.4"></circle><circle cx="12" cy="12" r="1.4"></circle><circle cx="12" cy="19" r="1.4"></circle></svg>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 176px 132px 108px 96px 150px 24px;gap:12px;padding:10px 16px;align-items:center;border-left:3px solid #8A5A12;background:#FDFAF3">
+        <div style="min-width:0"><div style="font:500 13.5px 'IBM Plex Sans',sans-serif;color:#101822">Nulidad y restablecimiento — Res. 8842</div><div style="font:400 11.5px 'IBM Plex Sans',sans-serif;color:#667487;margin-top:2px">Mosquera · Juzgado 34 Admin.</div></div>
+        <div><div style="font:600 13px 'IBM Plex Mono',monospace;color:#101822">7 may 2025</div><div style="font:500 11.5px 'IBM Plex Sans',sans-serif;color:#8A5A12;margin-top:2px">en 6 días</div></div>
+        <div><span style="display:inline-flex;align-items:center;gap:5px;font:600 10.5px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#8A5A12;background:#fff;border:1px dashed #CFAE6E;border-radius:999px;padding:2px 8px">1</span></div>
+        <div style="font:500 12.5px 'IBM Plex Mono',monospace;color:#101822">v6</div>
+        <div><span style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#8A5A12">Revisar</span></div>
+        <div><div style="font:400 12px 'IBM Plex Sans',sans-serif;color:#2B3542">D. Cárdenas</div><div style="font:400 11px 'IBM Plex Mono',monospace;color:#8B96A6">22 abr</div></div>
+        <svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="#8A5A12" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="5" r="1.4"></circle><circle cx="12" cy="12" r="1.4"></circle><circle cx="12" cy="19" r="1.4"></circle></svg>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:8px;margin:18px 0 9px">
+      <span style="font:600 10.5px 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#8B96A6">Más adelante · 24</span>
+      <div style="flex:1;height:1px;background:#E3E7EC"></div>
+    </div>
+    <div style="background:#fff;border:1px solid #E3E7EC;border-radius:6px;overflow:hidden">
+      <div style="display:grid;grid-template-columns:1fr 176px 132px 108px 96px 150px 24px;gap:12px;padding:10px 16px;border-bottom:1px solid #EEF1F4;align-items:center">
+        <div style="min-width:0"><div style="font:500 13.5px 'IBM Plex Sans',sans-serif;color:#101822">Tutela — mínimo vital</div><div style="font:400 11.5px 'IBM Plex Sans',sans-serif;color:#667487;margin-top:2px">Mosquera · reparto</div></div>
+        <div><div style="font:500 13px 'IBM Plex Sans',sans-serif;color:#4A566B">No caduca</div><div style="font:400 11px 'IBM Plex Sans',sans-serif;color:#8B96A6;margin-top:2px">art. 86 C.P.</div></div>
+        <div><span style="font:600 10.5px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#14653F;background:#E9F2EC;border:1px solid #A8C8B6;border-radius:999px;padding:2px 8px">0</span></div>
+        <div style="font:500 12.5px 'IBM Plex Mono',monospace;color:#101822">v1</div>
+        <div><span style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#4A566B">Borrador</span></div>
+        <div><div style="font:400 12px 'IBM Plex Sans',sans-serif;color:#2B3542">J. Peña</div><div style="font:400 11px 'IBM Plex Mono',monospace;color:#8B96A6">18 abr</div></div>
+        <svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="#C3CBD6" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="5" r="1.4"></circle><circle cx="12" cy="12" r="1.4"></circle><circle cx="12" cy="19" r="1.4"></circle></svg>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 176px 132px 108px 96px 150px 24px;gap:12px;padding:10px 16px;border-bottom:1px solid #EEF1F4;align-items:center;background:#F7F8FA">
+        <div style="min-width:0"><div style="font:500 13.5px 'IBM Plex Sans',sans-serif;color:#101822">Reclamación prestaciones ARL</div><div style="font:400 11.5px 'IBM Plex Sans',sans-serif;color:#667487;margin-top:2px">Mosquera · reclamación previa</div></div>
+        <div><div style="font:600 13px 'IBM Plex Mono',monospace;color:#101822">3 feb 2028</div><div style="font:400 11.5px 'IBM Plex Sans',sans-serif;color:#667487;margin-top:2px">en 2 años</div></div>
+        <div><span style="font:600 10.5px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#14653F;background:#E9F2EC;border:1px solid #A8C8B6;border-radius:999px;padding:2px 8px">0</span></div>
+        <div style="font:500 12.5px 'IBM Plex Mono',monospace;color:#101822">v3</div>
+        <div><span style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#4A566B">Borrador</span></div>
+        <div><div style="font:400 12px 'IBM Plex Sans',sans-serif;color:#2B3542">C. Restrepo</div><div style="font:400 11px 'IBM Plex Mono',monospace;color:#8B96A6">14 abr</div></div>
+        <svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="#C3CBD6" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="5" r="1.4"></circle><circle cx="12" cy="12" r="1.4"></circle><circle cx="12" cy="19" r="1.4"></circle></svg>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 176px 132px 108px 96px 150px 24px;gap:12px;padding:10px 16px;align-items:center;opacity:.66">
+        <div style="min-width:0"><div style="display:flex;align-items:center;gap:7px"><svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="#667487" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><rect x="5" y="10" width="14" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 018 0v3"></path></svg><span style="font:500 13.5px 'IBM Plex Sans',sans-serif;color:#101822">Nulidad simple — Decreto 118</span></div><div style="font:400 11.5px 'IBM Plex Sans',sans-serif;color:#667487;margin-top:2px">Radicado el 12 mar · copia inmutable</div></div>
+        <div><div style="font:400 12.5px 'IBM Plex Sans',sans-serif;color:#667487">Radicado a tiempo</div></div>
+        <div><span style="font:600 10.5px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#667487">—</span></div>
+        <div style="font:500 12.5px 'IBM Plex Mono',monospace;color:#667487">v8 · final</div>
+        <div><span style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#667487">Radicado</span></div>
+        <div><div style="font:400 12px 'IBM Plex Sans',sans-serif;color:#667487">D. Cárdenas</div><div style="font:400 11px 'IBM Plex Mono',monospace;color:#8B96A6">12 mar</div></div>
+        <svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="#C3CBD6" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="5" r="1.4"></circle><circle cx="12" cy="12" r="1.4"></circle><circle cx="12" cy="19" r="1.4"></circle></svg>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:flex-start;gap:12px;margin-top:14px">
+      <div style="flex:1;background:#fff;border:1px solid #E3E7EC;border-radius:6px;padding:13px 15px;display:flex;gap:10px">
+        <svg width="15" height="15" sc-camel-view-box="0 0 24 24" fill="none" stroke="#667487" stroke-width="2.2" stroke-linecap="round" style="flex:none;margin-top:2px"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5"></path><path d="M12 8h.01"></path></svg>
+        <div>
+          <div style="font:600 13px 'IBM Plex Sans',sans-serif;color:#101822">Ningún borrador se borra solo</div>
+          <div style="font:400 12.5px/1.55 'IBM Plex Sans',sans-serif;color:#667487;margin-top:3px;text-wrap:pretty">Se conservan mientras la cuenta exista, incluso si el término ya venció. Eliminar es siempre una decisión de una persona, y queda en Auditoría.</div>
+        </div>
+      </div>
+      <div style="width:352px;flex:none;background:#fff;border:1px solid #E3E7EC;border-radius:6px;padding:13px 15px">
+        <div style="font:600 10.5px 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#8B96A6">Menú de cada borrador</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:9px">
+          <span style="font:400 12px 'IBM Plex Sans',sans-serif;color:#2B3542;background:#F7F8FA;border:1px solid #E3E7EC;border-radius:4px;padding:4px 9px">Abrir</span>
+          <span style="font:400 12px 'IBM Plex Sans',sans-serif;color:#2B3542;background:#F7F8FA;border:1px solid #E3E7EC;border-radius:4px;padding:4px 9px">Ver versiones</span>
+          <span style="font:400 12px 'IBM Plex Sans',sans-serif;color:#2B3542;background:#F7F8FA;border:1px solid #E3E7EC;border-radius:4px;padding:4px 9px">Duplicar</span>
+          <span style="font:400 12px 'IBM Plex Sans',sans-serif;color:#2B3542;background:#F7F8FA;border:1px solid #E3E7EC;border-radius:4px;padding:4px 9px">Guardar como plantilla</span>
+          <span style="font:400 12px 'IBM Plex Sans',sans-serif;color:#2B3542;background:#F7F8FA;border:1px solid #E3E7EC;border-radius:4px;padding:4px 9px">Marcar radicado</span>
+          <span style="font:400 12px 'IBM Plex Sans',sans-serif;color:#8C2F26;background:#fff;border:1px solid #E5C6C2;border-radius:4px;padding:4px 9px">Eliminar</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}">
+<ul class="dv-notes">
+<li>El orden por defecto es <b>término más próximo</b>, no última edición: un borrador jurídico no es un archivo que espera, es un plazo que corre. El grupo “Vence esta semana” va primero, con la trama ámbar.</li>
+<li>El término se muestra en <b>fecha absoluta y en días restantes</b>, en ese orden: la fecha es la que se cita, los días son los que asustan.</li>
+<li><b>Sin verificar</b> es columna, no detalle: dice cuántas afirmaciones faltan comprobar antes de firmar, y con 0 se ve verde. Es lo que decide si el escrito puede radicarse mañana.</li>
+<li>Los radicados no desaparecen de la lista: quedan atenuados, con candado y marcados como <b>copia inmutable</b>. Lo que se llevó al juzgado no se edita nunca más, pero se consulta.</li>
+<li>La versión (v4, v6) va en mono y con el historial a un clic: en una firma dos abogados editan el mismo escrito y hay que saber cuál es la buena.</li>
+<li>Se declara que nada se borra automáticamente. Una app que purga borradores viejos es inaceptable cuando el borrador es la prueba de que se trabajó el caso.</li>
+</ul>
+</sc-if>
+</div>
+
+<div class="dv-opt" id="10b">
+<div class="dv-olabel"><a class="dv-oid" href="#10b">10b</a>SavedDraftsModal — tipo 4 (visor, L) desde el panel de redacción, con vista previa y versiones</div>
+<div class="dv-card" style="width:1216px;padding:32px;background:#EDEFF2">
+  <div style="width:960px;margin:0 auto;background:#fff;border:1px solid #E3E7EC;border-radius:8px;box-shadow:0 16px 40px -12px rgba(16,24,34,.28);overflow:hidden">
+    <div style="padding:15px 18px;border-bottom:1px solid #E3E7EC;display:flex;align-items:flex-start;gap:12px">
+      <div>
+        <div style="font:600 16px 'IBM Plex Sans',sans-serif;color:#101822">Abrir un borrador</div>
+        <div style="font:400 12.5px/1.5 'IBM Plex Sans',sans-serif;color:#667487;margin-top:3px">34 sin radicar · lo que abra reemplaza lo que tiene en el panel, que ya quedó guardado como v4</div>
+      </div>
+      <button style="width:26px;height:26px;flex:none;margin-left:auto;border:1px solid #E3E7EC;background:#fff;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="#667487" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12"></path><path d="M18 6L6 18"></path></svg></button>
+    </div>
+
+    <div style="display:flex;height:492px">
+      <div style="width:494px;flex:none;border-right:1px solid #E3E7EC;display:flex;flex-direction:column">
+        <div style="padding:12px 14px;border-bottom:1px solid #EEF1F4">
+          <div style="height:32px;border:1px solid #17456B;box-shadow:0 0 0 3px rgba(23,69,107,.10);border-radius:4px;display:flex;align-items:center;gap:8px;padding:0 10px">
+            <svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="#667487" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M16.5 16.5L21 21"></path></svg>
+            <span style="font:400 12.5px 'IBM Plex Sans',sans-serif;color:#101822">mosquera</span><span style="width:1px;height:14px;background:#17456B"></span>
+            <span style="margin-left:auto;font:400 11px 'IBM Plex Mono',monospace;color:#8B96A6">4 de 34</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:9px">
+            <span style="font:500 11.5px 'IBM Plex Sans',sans-serif;color:#101822;background:#EAF0F5;border:1px solid #CBD9E4;border-radius:999px;padding:3px 10px">Este proceso</span>
+            <span style="font:400 11.5px 'IBM Plex Sans',sans-serif;color:#445064;background:#fff;border:1px solid #E3E7EC;border-radius:999px;padding:3px 10px">Míos</span>
+            <span style="font:400 11.5px 'IBM Plex Sans',sans-serif;color:#445064;background:#fff;border:1px solid #E3E7EC;border-radius:999px;padding:3px 10px">De la firma</span>
+            <span style="margin-left:auto;font:400 11px 'IBM Plex Mono',monospace;color:#8B96A6">término ↑</span>
+          </div>
+        </div>
+        <div style="flex:1;overflow:hidden">
+          <div style="padding:7px 14px 5px;font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#8A5A12;background:#FDFAF3;border-bottom:1px solid #E4D6B4">Vence esta semana</div>
+          <div style="padding:10px 14px;background:#EAF0F5;border-left:3px solid #17456B">
+            <div style="display:flex;align-items:flex-start;gap:10px">
+              <div style="min-width:0">
+                <div style="font:600 13.5px 'IBM Plex Sans',sans-serif;color:#101822">Reintegro por fuero de salud</div>
+                <div style="font:400 11.5px 'IBM Plex Sans',sans-serif;color:#667487;margin-top:2px">Mosquera · v4 · C. Restrepo, hoy 14:02</div>
+              </div>
+              <div style="margin-left:auto;text-align:right;flex:none">
+                <div style="font:600 12.5px 'IBM Plex Mono',monospace;color:#101822">3 may</div>
+                <div style="font:500 11px 'IBM Plex Sans',sans-serif;color:#8A5A12">en 2 días</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:7px;margin-top:8px">
+              <span style="display:inline-flex;align-items:center;gap:5px;font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#8A5A12;background:#fff;border:1px dashed #CFAE6E;border-radius:999px;padding:2px 8px"><svg width="10" height="10" sc-camel-view-box="0 0 24 24" fill="none" stroke="#8A5A12" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5L21 19.5H3z"></path><path d="M12 10v4"></path></svg>2 sin verificar</span>
+              <span style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#8A5A12">Revisar</span>
+            </div>
+          </div>
+          <div style="padding:10px 14px;border-top:1px solid #EEF1F4">
+            <div style="display:flex;align-items:flex-start;gap:10px">
+              <div style="min-width:0"><div style="font:500 13.5px 'IBM Plex Sans',sans-serif;color:#101822">Nulidad y restablecimiento — Res. 8842</div><div style="font:400 11.5px 'IBM Plex Sans',sans-serif;color:#667487;margin-top:2px">Mosquera · v6 · D. Cárdenas, 22 abr</div></div>
+              <div style="margin-left:auto;text-align:right;flex:none"><div style="font:600 12.5px 'IBM Plex Mono',monospace;color:#101822">7 may</div><div style="font:500 11px 'IBM Plex Sans',sans-serif;color:#8A5A12">en 6 días</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:7px;margin-top:8px">
+              <span style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#8A5A12;background:#fff;border:1px dashed #CFAE6E;border-radius:999px;padding:2px 8px">1 sin verificar</span>
+            </div>
+          </div>
+          <div style="padding:7px 14px 5px;font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#8B96A6;background:#F7F8FA;border-top:1px solid #EEF1F4;border-bottom:1px solid #EEF1F4">Más adelante</div>
+          <div style="padding:10px 14px">
+            <div style="display:flex;align-items:flex-start;gap:10px">
+              <div style="min-width:0"><div style="font:500 13.5px 'IBM Plex Sans',sans-serif;color:#101822">Tutela — mínimo vital</div><div style="font:400 11.5px 'IBM Plex Sans',sans-serif;color:#667487;margin-top:2px">Mosquera · v1 · J. Peña, 18 abr</div></div>
+              <div style="margin-left:auto;text-align:right;flex:none"><div style="font:500 12.5px 'IBM Plex Sans',sans-serif;color:#4A566B">No caduca</div></div>
+            </div>
+          </div>
+          <div style="padding:10px 14px;border-top:1px solid #EEF1F4;opacity:.66">
+            <div style="display:flex;align-items:flex-start;gap:10px">
+              <div style="min-width:0"><div style="display:flex;align-items:center;gap:6px"><svg width="12" height="12" sc-camel-view-box="0 0 24 24" fill="none" stroke="#667487" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><rect x="5" y="10" width="14" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 018 0v3"></path></svg><span style="font:500 13.5px 'IBM Plex Sans',sans-serif;color:#101822">Nulidad simple — Decreto 118</span></div><div style="font:400 11.5px 'IBM Plex Sans',sans-serif;color:#667487;margin-top:2px">Radicado el 12 mar · v8 final</div></div>
+              <div style="margin-left:auto;font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#667487;flex:none">Radicado</div>
+            </div>
+          </div>
+          <div style="height:22px;background:linear-gradient(180deg,rgba(255,255,255,0),#fff)"></div>
+        </div>
+      </div>
+
+      <div style="flex:1;min-width:0;background:#F7F8FA;display:flex;flex-direction:column">
+        <div style="padding:14px 18px 0;flex:1;min-height:0;overflow:hidden">
+          <div style="display:flex;align-items:flex-start gap:10px">
+            <div>
+              <div style="font:600 16px/1.3 'IBM Plex Sans',sans-serif;color:#101822">Reintegro por fuero de salud</div>
+              <div style="font:400 12px 'IBM Plex Mono',monospace;color:#667487;margin-top:3px">Mosquera vs. Distrilácteos · Juzgado 12 Laboral</div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
+            <div style="background:#fff;border:1px solid #E3E7EC;border-radius:6px;padding:10px 12px"><div style="font:600 9.5px 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#8B96A6">Vence</div><div style="font:600 15px 'IBM Plex Mono',monospace;color:#101822;margin-top:3px">3 may 2025</div><div style="font:500 11.5px 'IBM Plex Sans',sans-serif;color:#8A5A12;margin-top:2px">en 2 días</div></div>
+            <div style="background:#fff;border:1px dashed #CFAE6E;border-left:3px solid #8A5A12;border-radius:6px;padding:10px 12px"><div style="font:600 9.5px 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#8B96A6">Sin verificar</div><div style="font:600 15px 'IBM Plex Mono',monospace;color:#101822;margin-top:3px">2</div><div style="font:400 11.5px 'IBM Plex Sans',sans-serif;color:#445064;margin-top:2px">secc. II y IV</div></div>
+          </div>
+          <div style="margin-top:12px;background:#fff;border:1px solid #E3E7EC;border-radius:6px;padding:14px 16px;max-height:150px;overflow:hidden;position:relative">
+            <div style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.09em;text-transform:uppercase;color:#8B96A6">I. Pretensiones</div>
+            <div style="font:400 13.5px/1.8 'Source Serif 4',serif;color:#101822;margin-top:6px;text-wrap:pretty">Solicito al despacho declarar ineficaz el despido de mi representado, ordenar su reintegro al cargo que desempeñaba y el pago de los salarios y prestaciones causados desde la terminación, así como la indemnización de <span style="border-bottom:1.5px solid #14653F">ciento ochenta (180) días</span> prevista en el artículo 26 de la Ley 361 de 1997.</div>
+            <div style="position:absolute;left:0;right:0;bottom:0;height:26px;background:linear-gradient(180deg,rgba(255,255,255,0),#fff)"></div>
+          </div>
+          <div style="margin-top:12px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#8B96A6">Versiones</span>
+              <div style="flex:1;height:1px;background:#E3E7EC"></div>
+              <a href="#10b" style="font:500 11.5px 'IBM Plex Sans',sans-serif;color:#17456B;text-decoration:none">Comparar v3 y v4</a>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:5px;margin-top:8px">
+              <div style="display:flex;align-items:center;gap:9px;padding:7px 10px;background:#fff;border:1px solid #CBD9E4;border-radius:4px"><span style="font:600 12px 'IBM Plex Mono',monospace;color:#17456B">v4</span><span style="font:400 12px 'IBM Plex Sans',sans-serif;color:#101822">C. Restrepo</span><span style="margin-left:auto;font:400 11px 'IBM Plex Mono',monospace;color:#667487">hoy 14:02 · actual</span></div>
+              <div style="display:flex;align-items:center;gap:9px;padding:7px 10px;background:#fff;border:1px solid #E3E7EC;border-radius:4px"><span style="font:600 12px 'IBM Plex Mono',monospace;color:#667487">v3</span><span style="font:400 12px 'IBM Plex Sans',sans-serif;color:#101822">C. Restrepo</span><span style="margin-left:auto;font:400 11px 'IBM Plex Mono',monospace;color:#667487">hoy 11:20</span></div>
+              <div style="display:flex;align-items:center;gap:9px;padding:7px 10px;background:#fff;border:1px solid #E3E7EC;border-radius:4px"><span style="font:600 12px 'IBM Plex Mono',monospace;color:#667487">v2</span><span style="font:400 12px 'IBM Plex Sans',sans-serif;color:#101822">J. Peña</span><span style="margin-left:auto;font:400 11px 'IBM Plex Mono',monospace;color:#667487">ayer 16:48</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:12px 18px;border-top:1px solid #E3E7EC;display:flex;align-items:center;gap:9px">
+      <span style="font:400 11.5px 'IBM Plex Mono',monospace;color:#8B96A6">Esc cierra · ↑↓ recorre · ↵ abre</span>
+      <button style="font:500 12.5px 'IBM Plex Sans',sans-serif;color:#8C2F26;background:#fff;border:1px solid #E5C6C2;border-radius:4px;padding:7px 12px;margin-left:auto;cursor:pointer">Eliminar</button>
+      <button style="font:500 12.5px 'IBM Plex Sans',sans-serif;color:#445064;background:#fff;border:1px solid #E3E7EC;border-radius:4px;padding:7px 12px;cursor:pointer">Duplicar</button>
+      <button style="font:600 12.5px 'IBM Plex Sans',sans-serif;color:#fff;background:#17456B;border:0;border-radius:4px;padding:8px 14px;cursor:pointer">Abrir en el panel</button>
+    </div>
+  </div>
+
+  <div style="width:420px;margin:20px auto 0">
+    <div class="dv-olabel" style="margin-bottom:9px"><a class="dv-oid" href="#10b">10b′</a>Eliminar · tipo 1 (S), la única confirmación que se apila sobre otro diálogo</div>
+    <div style="background:#fff;border:1px solid #E3E7EC;border-radius:8px;box-shadow:0 16px 40px -12px rgba(16,24,34,.28);overflow:hidden">
+      <div style="padding:14px 16px;border-bottom:1px solid #E3E7EC;display:flex;align-items:flex-start;gap:12px">
+        <div style="font:600 15px 'IBM Plex Sans',sans-serif;color:#101822">¿Eliminar este borrador?</div>
+        <button style="width:26px;height:26px;flex:none;margin-left:auto;border:1px solid #E3E7EC;background:#fff;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="#667487" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12"></path><path d="M18 6L6 18"></path></svg></button>
+      </div>
+      <div style="padding:16px">
+        <div style="font:400 13.5px/1.65 'IBM Plex Sans',sans-serif;color:#2B3542;text-wrap:pretty">“Reintegro por fuero de salud” y sus <b style="font-weight:600">4 versiones</b> se borran para toda la firma y no se pueden recuperar.</div>
+        <div style="display:flex;gap:8px;margin-top:12px;padding:10px 12px;border:1px dashed #CFAE6E;background:#FBF3E4;border-radius:6px">
+          <svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="#8A5A12" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px"><path d="M12 4.5L21 19.5H3z"></path><path d="M12 10v4"></path></svg>
+          <span style="font:400 12.5px/1.55 'IBM Plex Sans',sans-serif;color:#2B3542">Este escrito tiene un término que vence <b style="font-weight:600">en 2 días</b> y no se ha radicado.</span>
+        </div>
+      </div>
+      <div style="padding:12px 16px;border-top:1px solid #E3E7EC;display:flex;align-items:center;gap:9px">
+        <span style="font:400 11.5px 'IBM Plex Mono',monospace;color:#8B96A6">Esc cierra</span>
+        <button style="font:500 12.5px 'IBM Plex Sans',sans-serif;color:#445064;background:#fff;border:1px solid #E3E7EC;border-radius:4px;padding:7px 12px;margin-left:auto;cursor:pointer">Conservar</button>
+        <button style="font:600 12.5px 'IBM Plex Sans',sans-serif;color:#fff;background:#8C2F26;border:0;border-radius:4px;padding:8px 14px;cursor:pointer">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}">
+<ul class="dv-notes">
+<li>El subtítulo resuelve el miedo real al abrir el modal: <b>lo que tiene en el panel ya quedó guardado como v4</b>. Sin esa frase, nadie abre la lista a mitad de un escrito.</li>
+<li>Lista a la izquierda y <b>vista previa a la derecha</b>: el nombre de un escrito jurídico no basta para saber si es el que se busca; hacen falta el término, las afirmaciones sin verificar y el primer párrafo real.</li>
+<li>El filtro por defecto es <b>“Este proceso”</b>, no “todos”: el modal se abre desde un escrito en curso, y el 90% de las veces se busca un hermano del mismo caso.</li>
+<li>Los radicados aparecen atenuados y con candado también aquí: se pueden consultar y duplicar, nunca continuar.</li>
+<li>Las versiones se listan con autor y hora, y con “Comparar v3 y v4”, porque el caso frecuente es que otro abogado editó y hay que ver qué cambió.</li>
+<li>La confirmación de eliminar es la única excepción a “nunca un diálogo sobre otro” de <a class="dv-oid" href="#3a">3a</a>, y añade el dato que puede detener la mano: ese escrito tiene un término venciendo en 2 días.</li>
+</ul>
+</sc-if>
+</div>
+
+<div class="dv-opt" id="10c">
+<div class="dv-olabel"><a class="dv-oid" href="#10c">10c</a>Borradores en oscuro y en móvil (claro y oscuro)</div>
+<div class="dv-card" style="width:1440px;background:#0B1219;border-color:#24303D;padding:0">
+  <div style="background:#131B24;border-bottom:1px solid #24303D;padding:16px 28px">
+    <div style="display:flex;align-items:flex-start;gap:14px">
+      <div>
+        <div style="font:600 20px 'IBM Plex Sans',sans-serif;color:#E8EDF2">Borradores guardados</div>
+        <div style="font:400 13px 'IBM Plex Sans',sans-serif;color:#8FA0B2;margin-top:3px">34 escritos sin radicar · 3 con término esta semana</div>
+      </div>
+      <button style="font:600 13px 'IBM Plex Sans',sans-serif;color:#0B1219;background:#4E90C4;border:0;border-radius:4px;padding:8px 14px;height:32px;margin-left:auto;cursor:pointer">Redactar escrito</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:7px;margin-top:14px">
+      <div style="height:30px;border:1px solid #24303D;border-radius:4px;display:flex;align-items:center;gap:7px;padding:0 10px;min-width:260px;background:#0F1720">
+        <svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="#6F8296" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M16.5 16.5L21 21"></path></svg>
+        <span style="font:400 12.5px 'IBM Plex Sans',sans-serif;color:#6F8296">Buscar por cliente, radicado o actuación</span>
+      </div>
+      <span style="height:30px;display:inline-flex;align-items:center;gap:7px;font:500 12px 'IBM Plex Sans',sans-serif;color:#9EC5E2;background:#16293A;border:1px solid #2A4C6B;border-radius:4px;padding:0 10px">De la firma</span>
+      <span style="height:30px;display:inline-flex;align-items:center;gap:7px;font:400 12px 'IBM Plex Sans',sans-serif;color:#C3CDD8;background:#1A2430;border:1px solid #24303D;border-radius:4px;padding:0 10px">Estado: sin radicar</span>
+      <span style="margin-left:auto;font:400 11.5px 'IBM Plex Mono',monospace;color:#6F8296">Orden: término más próximo</span>
+    </div>
+  </div>
+  <div style="padding:16px 28px 22px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
+      <span style="display:inline-flex;align-items:center;gap:6px;font:600 10.5px 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#D9A64A"><svg width="12" height="12" sc-camel-view-box="0 0 24 24" fill="none" stroke="#D9A64A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5L21 19.5H3z"></path><path d="M12 10v4"></path></svg>Vence esta semana · 3</span>
+      <div style="flex:1;height:1px;background:#5C4A22"></div>
+    </div>
+    <div style="border:1px solid #24303D;border-radius:6px;overflow:hidden">
+      <div style="display:grid;grid-template-columns:1fr 176px 132px 108px 96px 150px;gap:12px;padding:8px 16px;background:#0F1720;border-bottom:1px solid #24303D;font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#6F8296"><div>Escrito</div><div>Término</div><div>Sin verificar</div><div>Versión</div><div>Estado</div><div>Últ. edición</div></div>
+      <div style="display:grid;grid-template-columns:1fr 176px 132px 108px 96px 150px;gap:12px;padding:10px 16px;border-bottom:1px solid #1C2732;align-items:center;border-left:3px solid #D9A64A;background:#231C0F">
+        <div style="min-width:0"><div style="font:500 13.5px 'IBM Plex Sans',sans-serif;color:#E8EDF2">Reintegro por fuero de salud</div><div style="font:400 11.5px 'IBM Plex Sans',sans-serif;color:#8FA0B2;margin-top:2px">Mosquera · Juzgado 12 Laboral</div></div>
+        <div><div style="font:600 13px 'IBM Plex Mono',monospace;color:#E8EDF2">3 may 2025</div><div style="font:500 11.5px 'IBM Plex Sans',sans-serif;color:#D9A64A;margin-top:2px">en 2 días</div></div>
+        <div><span style="display:inline-flex;align-items:center;gap:5px;font:600 10.5px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#D9A64A;background:#2A2314;border:1px dashed #5C4A22;border-radius:999px;padding:2px 8px">2</span></div>
+        <div style="font:500 12.5px 'IBM Plex Mono',monospace;color:#E8EDF2">v4</div>
+        <div><span style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#D9A64A">Revisar</span></div>
+        <div><div style="font:400 12px 'IBM Plex Sans',sans-serif;color:#C3CDD8">C. Restrepo</div><div style="font:400 11px 'IBM Plex Mono',monospace;color:#6F8296">hoy 14:02</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 176px 132px 108px 96px 150px;gap:12px;padding:10px 16px;border-bottom:1px solid #1C2732;align-items:center;border-left:3px solid #D9A64A;background:#1E1A10">
+        <div style="min-width:0"><div style="font:500 13.5px 'IBM Plex Sans',sans-serif;color:#E8EDF2">Recurso de queja ante superior</div><div style="font:400 11.5px 'IBM Plex Sans',sans-serif;color:#8FA0B2;margin-top:2px">Ortega Ruiz · Juzgado 12 Civil</div></div>
+        <div><div style="font:600 13px 'IBM Plex Mono',monospace;color:#E8EDF2">5 may 2025</div><div style="font:500 11.5px 'IBM Plex Sans',sans-serif;color:#D9A64A;margin-top:2px">en 4 días</div></div>
+        <div><span style="font:600 10.5px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#4FB483;background:#12291F;border:1px solid #245C41;border-radius:999px;padding:2px 8px">0</span></div>
+        <div style="font:500 12.5px 'IBM Plex Mono',monospace;color:#E8EDF2">v2</div>
+        <div><span style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#4FB483">Listo</span></div>
+        <div><div style="font:400 12px 'IBM Plex Sans',sans-serif;color:#C3CDD8">J. Peña</div><div style="font:400 11px 'IBM Plex Mono',monospace;color:#6F8296">ayer 17:40</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 176px 132px 108px 96px 150px;gap:12px;padding:10px 16px;align-items:center;background:#131B24;opacity:.7">
+        <div style="min-width:0"><div style="display:flex;align-items:center;gap:7px"><svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="#8FA0B2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><rect x="5" y="10" width="14" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 018 0v3"></path></svg><span style="font:500 13.5px 'IBM Plex Sans',sans-serif;color:#E8EDF2">Nulidad simple — Decreto 118</span></div><div style="font:400 11.5px 'IBM Plex Sans',sans-serif;color:#8FA0B2;margin-top:2px">Radicado el 12 mar · copia inmutable</div></div>
+        <div style="font:400 12.5px 'IBM Plex Sans',sans-serif;color:#8FA0B2">Radicado a tiempo</div>
+        <div style="font:600 10.5px 'IBM Plex Mono',monospace;color:#6F8296">—</div>
+        <div style="font:500 12.5px 'IBM Plex Mono',monospace;color:#8FA0B2">v8 · final</div>
+        <div><span style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#8FA0B2">Radicado</span></div>
+        <div><div style="font:400 12px 'IBM Plex Sans',sans-serif;color:#8FA0B2">D. Cárdenas</div><div style="font:400 11px 'IBM Plex Mono',monospace;color:#6F8296">12 mar</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="dv-card" style="width:820px;background:#EDEFF2;border-color:rgba(16,24,34,.10);padding:24px 22px;margin-top:14px">
+  <div style="display:flex;gap:16px;justify-content:center;align-items:flex-start">
+    <div style="width:360px;flex:none;background:#F7F8FA;border:1px solid rgba(16,24,34,.16);border-radius:22px;overflow:hidden;display:flex;flex-direction:column;height:740px">
+      <div style="height:42px;flex:none;background:#fff;display:flex;align-items:flex-end;justify-content:space-between;padding:0 22px 6px"><span style="font:600 13px 'IBM Plex Sans',sans-serif;color:#101822">14:02</span><span style="width:22px;height:11px;border:1.2px solid #101822;border-radius:3px;display:inline-block;position:relative"><span style="position:absolute;inset:1.5px;right:6px;background:#101822;border-radius:1px"></span></span></div>
+      <div style="flex:none;background:#fff;border-bottom:1px solid #E3E7EC;padding:8px 15px 12px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <svg width="18" height="18" sc-camel-view-box="0 0 24 24" fill="none" stroke="#445064" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M15 6l-6 6 6 6"></path></svg>
+          <div><div style="font:600 15px 'IBM Plex Sans',sans-serif;color:#101822">Borradores</div><div style="font:400 11px 'IBM Plex Mono',monospace;color:#8B96A6">34 sin radicar</div></div>
+        </div>
+        <div style="height:36px;border:1px solid #E3E7EC;border-radius:8px;display:flex;align-items:center;gap:8px;padding:0 11px;margin-top:11px;background:#F7F8FA">
+          <svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="#8B96A6" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M16.5 16.5L21 21"></path></svg>
+          <span style="font:400 12.5px 'IBM Plex Sans',sans-serif;color:#8B96A6">Buscar borrador</span>
+        </div>
+      </div>
+      <div style="flex:1;min-height:0;overflow:hidden;padding:12px 15px;display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:7px">
+          <span style="display:inline-flex;align-items:center;gap:5px;font:600 9.5px 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#8A5A12"><svg width="11" height="11" sc-camel-view-box="0 0 24 24" fill="none" stroke="#8A5A12" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5L21 19.5H3z"></path><path d="M12 10v4"></path></svg>Vence esta semana</span>
+          <div style="flex:1;height:1px;background:#E4D6B4"></div>
+        </div>
+        <div style="background:#FDFAF3;border:1px dashed #CFAE6E;border-left:3px solid #8A5A12;border-radius:8px;padding:12px 13px">
+          <div style="display:flex;align-items:flex-start;gap:9px">
+            <div style="min-width:0"><div style="font:600 13.5px/1.4 'IBM Plex Sans',sans-serif;color:#101822">Reintegro por fuero de salud</div><div style="font:400 11.5px 'IBM Plex Sans',sans-serif;color:#667487;margin-top:2px">Mosquera · v4 · hoy 14:02</div></div>
+            <div style="margin-left:auto;text-align:right;flex:none"><div style="font:600 13px 'IBM Plex Mono',monospace;color:#101822">3 may</div><div style="font:500 11px 'IBM Plex Sans',sans-serif;color:#8A5A12">en 2 días</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:7px;margin-top:9px">
+            <span style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#8A5A12;background:#fff;border:1px dashed #CFAE6E;border-radius:999px;padding:2px 8px">2 sin verificar</span>
+          </div>
+          <button style="width:100%;height:44px;font:600 13px 'IBM Plex Sans',sans-serif;color:#fff;background:#17456B;border:0;border-radius:6px;margin-top:10px">Abrir</button>
+        </div>
+        <div style="background:#fff;border:1px solid #E3E7EC;border-radius:8px;padding:12px 13px">
+          <div style="display:flex;align-items:flex-start;gap:9px">
+            <div style="min-width:0"><div style="font:500 13.5px/1.4 'IBM Plex Sans',sans-serif;color:#101822">Recurso de queja ante superior</div><div style="font:400 11.5px 'IBM Plex Sans',sans-serif;color:#667487;margin-top:2px">Ortega Ruiz · v2 · ayer</div></div>
+            <div style="margin-left:auto;text-align:right;flex:none"><div style="font:600 13px 'IBM Plex Mono',monospace;color:#101822">5 may</div><div style="font:500 11px 'IBM Plex Sans',sans-serif;color:#8A5A12">en 4 días</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:7px;margin-top:9px">
+            <span style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#14653F;background:#E9F2EC;border:1px solid #A8C8B6;border-radius:999px;padding:2px 8px">Listo para firma</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:7px;margin-top:4px">
+          <span style="font:600 9.5px 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#8B96A6">Más adelante</span>
+          <div style="flex:1;height:1px;background:#E3E7EC"></div>
+        </div>
+        <div style="background:#fff;border:1px solid #E3E7EC;border-radius:8px;padding:12px 13px">
+          <div style="display:flex;align-items:flex-start;gap:9px">
+            <div style="min-width:0"><div style="font:500 13.5px/1.4 'IBM Plex Sans',sans-serif;color:#101822">Tutela — mínimo vital</div><div style="font:400 11.5px 'IBM Plex Sans',sans-serif;color:#667487;margin-top:2px">Mosquera · v1 · 18 abr</div></div>
+            <div style="margin-left:auto;font:500 12px 'IBM Plex Sans',sans-serif;color:#4A566B;flex:none">No caduca</div>
+          </div>
+        </div>
+        <div style="background:#fff;border:1px solid #E3E7EC;border-radius:8px;padding:12px 13px;opacity:.66">
+          <div style="display:flex;align-items:center;gap:7px">
+            <svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="#667487" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><rect x="5" y="10" width="14" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 018 0v3"></path></svg>
+            <div style="min-width:0"><div style="font:500 13px 'IBM Plex Sans',sans-serif;color:#101822">Nulidad simple — Decreto 118</div><div style="font:400 11px 'IBM Plex Mono',monospace;color:#8B96A6;margin-top:1px">Radicado · v8 final</div></div>
+          </div>
+        </div>
+      </div>
+      <div style="height:58px;flex:none;background:#fff;border-top:1px solid #E3E7EC;display:grid;grid-template-columns:repeat(4,1fr);align-items:center;padding:0 4px 8px">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px"><svg width="19" height="19" sc-camel-view-box="0 0 24 24" fill="none" stroke="#17456B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"></path><path d="M14 3v5h5"></path></svg><span style="font:600 10.5px 'IBM Plex Sans',sans-serif;color:#17456B">Redactar</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px"><svg width="19" height="19" sc-camel-view-box="0 0 24 24" fill="none" stroke="#8B96A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a7 7 0 00-4 12.7V19h8v-3.3A7 7 0 0012 3z"></path></svg><span style="font:500 10.5px 'IBM Plex Sans',sans-serif;color:#8B96A6">Orientar</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px"><svg width="19" height="19" sc-camel-view-box="0 0 24 24" fill="none" stroke="#8B96A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a4 4 0 004-4V7a4 4 0 10-8 0v4a4 4 0 004 4z"></path><path d="M12 19v2"></path></svg><span style="font:500 10.5px 'IBM Plex Sans',sans-serif;color:#8B96A6">Grabar</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px"><svg width="19" height="19" sc-camel-view-box="0 0 24 24" fill="none" stroke="#8B96A6" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="12" r="1.6"></circle><circle cx="12" cy="12" r="1.6"></circle><circle cx="19" cy="12" r="1.6"></circle></svg><span style="font:500 10.5px 'IBM Plex Sans',sans-serif;color:#8B96A6">Más</span></div>
+      </div>
+    </div>
+
+    <div style="width:360px;flex:none;background:#0B1219;border:1px solid #24303D;border-radius:22px;overflow:hidden;display:flex;flex-direction:column;height:740px">
+      <div style="height:42px;flex:none;background:#131B24;display:flex;align-items:flex-end;justify-content:space-between;padding:0 22px 6px"><span style="font:600 13px 'IBM Plex Sans',sans-serif;color:#E8EDF2">22:48</span><span style="width:22px;height:11px;border:1.2px solid #E8EDF2;border-radius:3px;display:inline-block;position:relative"><span style="position:absolute;inset:1.5px;right:6px;background:#E8EDF2;border-radius:1px"></span></span></div>
+      <div style="flex:none;background:#131B24;border-bottom:1px solid #24303D;padding:8px 15px 12px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <svg width="18" height="18" sc-camel-view-box="0 0 24 24" fill="none" stroke="#C3CDD8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M15 6l-6 6 6 6"></path></svg>
+          <div><div style="font:600 15px 'IBM Plex Sans',sans-serif;color:#E8EDF2">Borradores</div><div style="font:400 11px 'IBM Plex Mono',monospace;color:#6F8296">34 sin radicar</div></div>
+        </div>
+        <div style="height:36px;border:1px solid #24303D;border-radius:8px;display:flex;align-items:center;gap:8px;padding:0 11px;margin-top:11px;background:#0F1720">
+          <svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="#6F8296" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M16.5 16.5L21 21"></path></svg>
+          <span style="font:400 12.5px 'IBM Plex Sans',sans-serif;color:#6F8296">Buscar borrador</span>
+        </div>
+      </div>
+      <div style="flex:1;min-height:0;overflow:hidden;padding:12px 15px;display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:7px">
+          <span style="display:inline-flex;align-items:center;gap:5px;font:600 9.5px 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#D9A64A"><svg width="11" height="11" sc-camel-view-box="0 0 24 24" fill="none" stroke="#D9A64A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5L21 19.5H3z"></path><path d="M12 10v4"></path></svg>Vence esta semana</span>
+          <div style="flex:1;height:1px;background:#5C4A22"></div>
+        </div>
+        <div style="background:repeating-linear-gradient(135deg,#1E1A10 0 6px,#231C0F 6px 12px);border:1px dashed #5C4A22;border-left:3px solid #D9A64A;border-radius:8px;padding:12px 13px">
+          <div style="display:flex;align-items:flex-start;gap:9px">
+            <div style="min-width:0"><div style="font:600 13.5px/1.4 'IBM Plex Sans',sans-serif;color:#E8EDF2">Reintegro por fuero de salud</div><div style="font:400 11.5px 'IBM Plex Sans',sans-serif;color:#8FA0B2;margin-top:2px">Mosquera · v4 · hoy 14:02</div></div>
+            <div style="margin-left:auto;text-align:right;flex:none"><div style="font:600 13px 'IBM Plex Mono',monospace;color:#E8EDF2">3 may</div><div style="font:500 11px 'IBM Plex Sans',sans-serif;color:#D9A64A">en 2 días</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:7px;margin-top:9px">
+            <span style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#D9A64A;background:#2A2314;border:1px dashed #5C4A22;border-radius:999px;padding:2px 8px">2 sin verificar</span>
+          </div>
+          <button style="width:100%;height:44px;font:600 13px 'IBM Plex Sans',sans-serif;color:#0B1219;background:#4E90C4;border:0;border-radius:6px;margin-top:10px">Abrir</button>
+        </div>
+        <div style="background:#131B24;border:1px solid #24303D;border-radius:8px;padding:12px 13px">
+          <div style="display:flex;align-items:flex-start;gap:9px">
+            <div style="min-width:0"><div style="font:500 13.5px/1.4 'IBM Plex Sans',sans-serif;color:#E8EDF2">Recurso de queja ante superior</div><div style="font:400 11.5px 'IBM Plex Sans',sans-serif;color:#8FA0B2;margin-top:2px">Ortega Ruiz · v2 · ayer</div></div>
+            <div style="margin-left:auto;text-align:right;flex:none"><div style="font:600 13px 'IBM Plex Mono',monospace;color:#E8EDF2">5 may</div><div style="font:500 11px 'IBM Plex Sans',sans-serif;color:#D9A64A">en 4 días</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:7px;margin-top:9px">
+            <span style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:#4FB483;background:#12291F;border:1px solid #245C41;border-radius:999px;padding:2px 8px">Listo para firma</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:7px;margin-top:4px">
+          <span style="font:600 9.5px 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#6F8296">Más adelante</span>
+          <div style="flex:1;height:1px;background:#24303D"></div>
+        </div>
+        <div style="background:#131B24;border:1px solid #24303D;border-radius:8px;padding:12px 13px">
+          <div style="display:flex;align-items:flex-start;gap:9px">
+            <div style="min-width:0"><div style="font:500 13.5px/1.4 'IBM Plex Sans',sans-serif;color:#E8EDF2">Tutela — mínimo vital</div><div style="font:400 11.5px 'IBM Plex Sans',sans-serif;color:#8FA0B2;margin-top:2px">Mosquera · v1 · 18 abr</div></div>
+            <div style="margin-left:auto;font:500 12px 'IBM Plex Sans',sans-serif;color:#93A3B8;flex:none">No caduca</div>
+          </div>
+        </div>
+        <div style="background:#131B24;border:1px solid #24303D;border-radius:8px;padding:12px 13px;opacity:.7">
+          <div style="display:flex;align-items:center;gap:7px">
+            <svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="#8FA0B2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><rect x="5" y="10" width="14" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 018 0v3"></path></svg>
+            <div style="min-width:0"><div style="font:500 13px 'IBM Plex Sans',sans-serif;color:#E8EDF2">Nulidad simple — Decreto 118</div><div style="font:400 11px 'IBM Plex Mono',monospace;color:#6F8296;margin-top:1px">Radicado · v8 final</div></div>
+          </div>
+        </div>
+      </div>
+      <div style="height:58px;flex:none;background:#0A121A;border-top:1px solid #24303D;display:grid;grid-template-columns:repeat(4,1fr);align-items:center;padding:0 4px 8px">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px"><svg width="19" height="19" sc-camel-view-box="0 0 24 24" fill="none" stroke="#4E90C4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"></path><path d="M14 3v5h5"></path></svg><span style="font:600 10.5px 'IBM Plex Sans',sans-serif;color:#4E90C4">Redactar</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px"><svg width="19" height="19" sc-camel-view-box="0 0 24 24" fill="none" stroke="#6F8296" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a7 7 0 00-4 12.7V19h8v-3.3A7 7 0 0012 3z"></path></svg><span style="font:500 10.5px 'IBM Plex Sans',sans-serif;color:#6F8296">Orientar</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px"><svg width="19" height="19" sc-camel-view-box="0 0 24 24" fill="none" stroke="#6F8296" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a4 4 0 004-4V7a4 4 0 10-8 0v4a4 4 0 004 4z"></path><path d="M12 19v2"></path></svg><span style="font:500 10.5px 'IBM Plex Sans',sans-serif;color:#6F8296">Grabar</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px"><svg width="19" height="19" sc-camel-view-box="0 0 24 24" fill="none" stroke="#6F8296" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="12" r="1.6"></circle><circle cx="12" cy="12" r="1.6"></circle><circle cx="19" cy="12" r="1.6"></circle></svg><span style="font:500 10.5px 'IBM Plex Sans',sans-serif;color:#6F8296">Más</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+<sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}">
+<ul class="dv-notes">
+<li>En móvil la tabla se vuelve fichas y el término sube a la esquina derecha, en mono, con los días debajo: es el dato por el que se abre esta pantalla desde el teléfono.</li>
+<li>Solo la ficha del término más próximo lleva botón “Abrir” de 44px; las demás se abren tocando la tarjeta. Un botón por fila convierte la lista en un muro de azul.</li>
+<li>El grupo ámbar conserva su trama en oscuro y el radicado su candado y su atenuación: el estado se lee igual en las cuatro combinaciones.</li>
+</ul>
+</sc-if>
+</div>
+
+</div>
+<p class="dv-next">Sigue: "comparar dos versiones lado a lado" · "guardar como plantilla de la firma" · "el estado vacío de borradores" · "el modal en móvil como hoja inferior"</p>
+</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;showNotes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return { notes: this.props.showNotes ?? true };
+  }
+}
+</script>
+
+
+</body></html>

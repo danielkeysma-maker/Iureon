@@ -211,11 +211,24 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
         redactando importa más, y el término además está en la ficha y en el
         propio escrito.
       */}
-      <div className="ml-auto flex shrink-0 items-center gap-3.5 pl-3">
+      {/*
+        `min-w-0` en el contenedor y truncado dentro: SIN ESO LA PÁGINA ENTERA SE
+        CORTA A LA DERECHA.
+
+        El término de este catálogo no es "4 meses": es un párrafo —«Vencido el
+        traslado de cinco (5) días se decretan y practican las pruebas…»— y con
+        `whitespace-nowrap` sin límite de ancho empujaba el ancho de toda la
+        aplicación, sacando una barra de desplazamiento horizontal. Un dato de
+        contexto no puede decidir el ancho de la pantalla.
+      */}
+      <div className="ml-auto flex min-w-0 items-center gap-3.5 pl-3">
         {lookup.estado !== 'CARGANDO' && (
-          <span className="hidden items-center gap-1.5 lg:inline-flex">
+          <span className="hidden min-w-0 items-center gap-1.5 lg:inline-flex">
             <IconoEstado actuacion={actuacion} sinCatalogar={lookup.estado === 'SIN_CATALOGAR'} />
-            <span className="whitespace-nowrap text-meta text-ink-700">
+            <span
+              className="min-w-0 truncate text-meta text-ink-700"
+              title={actuacion?.term.description ?? undefined}
+            >
               {lookup.estado === 'SIN_CATALOGAR' ? (
                 <span className="text-unverified">Sin catalogar</span>
               ) : actuacion?.term.status === 'NO_CADUCA' ? (

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   BookOpen,
+  ExternalLink,
   FileText,
   Landmark,
   Paperclip,
@@ -10,7 +11,6 @@ import {
   X
 } from 'lucide-react';
 import { AgentConsoleStream } from '../../agent/components/AgentConsoleStream';
-import { WorkshopConfigBar } from './WorkshopConfigBar';
 import { useActuacionLookup } from '../../catalog/hooks/useActuacion';
 import type { AgentLog } from '../../agent/types';
 import type { ActuacionRole } from '../../catalog/types';
@@ -44,11 +44,18 @@ interface ArchivoAdjunto {
 }
 
 interface AgentPanelLeftProps {
+  /* Solo de lectura: quien los CAMBIA es la barra de configuración de arriba. */
   documentType: string;
-  setDocumentType: (type: string) => void;
-  /** Owned by the workflow: the catalogue needs it to resolve a filing name. */
   legalBranch: string;
-  setLegalBranch: (branch: string) => void;
+  /*
+   * El rol vive ARRIBA, no aquí.
+   *
+   * La barra de configuración abarca el ancho completo —sobre el panel y sobre
+   * el documento—, así que el rol lo comparten los dos y no puede ser estado
+   * privado de esta columna.
+   */
+  userRole: ActuacionRole;
+  setUserRole: (role: ActuacionRole) => void;
   legalPrompt: string;
   setLegalPrompt: (prompt: string) => void;
   isProcessing: boolean;
@@ -60,9 +67,9 @@ interface AgentPanelLeftProps {
 
 export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
   documentType,
-  setDocumentType,
   legalBranch,
-  setLegalBranch,
+  userRole,
+  setUserRole,
   legalPrompt,
   setLegalPrompt,
   isProcessing,
@@ -71,7 +78,6 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
   activeDraftText,
   onClearActiveDraft
 }) => {
-  const [userRole, setUserRole] = useState<ActuacionRole>('LITIGANTE');
   const [importedFiles, setImportedFiles] = useState<ArchivoAdjunto[]>([]);
 
   const lookup = useActuacionLookup(documentType, legalBranch);
@@ -123,23 +129,20 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
 
   const removeFile = (id: string) => setImportedFiles((prev) => prev.filter((f) => f.id !== id));
 
+  /*
+   * Solo las OBLIGATORIAS. El catálogo distingue las que la norma exige de las
+   * que son costumbre, y decir "9 secciones" contando ambas infla el dato justo
+   * donde el abogado lo usa para saber si su escrito está completo.
+   */
+  const obligatorias = actuacion?.requiredSections.filter((sec) => sec.mandatory).length ?? 0;
+
   const generar = (e: React.FormEvent) => {
     if (!legalPrompt.trim() || isProcessing) return;
     handleSendPrompt(e);
   };
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
-      <WorkshopConfigBar
-        userRole={userRole}
-        setUserRole={setUserRole}
-        legalBranch={legalBranch}
-        setLegalBranch={setLegalBranch}
-        documentType={documentType}
-        setDocumentType={setDocumentType}
-      />
-
-      <section className="flex min-h-0 w-full flex-col border-r border-line-200 bg-surface lg:w-[364px] xl:w-[400px]">
+    <section className="flex min-h-0 w-full shrink-0 flex-col border-r border-line-200 bg-surface lg:w-[364px] xl:w-[400px]">
         {/*
           `overflow-y-auto`: en una pantalla baja el formulario se desplaza en
           vez de derramarse sobre la consola. Antes ambos eran `flex-1` y se
@@ -250,38 +253,57 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
           </div>
 
           {/* ─── FUNDAMENTOS QUE VA A USAR ─────────────────────────────────
-              Lo que el escrito tendrá detrás, dicho ANTES de generar. Es lo que
-              distingue este producto de una respuesta genérica, y hasta ahora
-              solo se sabía leyendo la consola mientras corría. */}
-          <div className="mt-3 rounded-card border border-line-200">
-            <p className="border-b border-line-100 px-3 py-2 font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
-              Fundamentos que va a usar
-            </p>
-            <ul className="divide-y divide-line-100">
-              <Fundamento
-                icono={Scale}
-                titulo="Catálogo"
-                detalle={
-                  lookup.estado === 'ENCONTRADA' && actuacion
-                    ? `${actuacion.requiredSections.length} secciones exigidas`
-                    : lookup.estado === 'CARGANDO'
-                    ? 'consultando…'
-                    : 'sin ficha verificada'
-                }
-                atenuado={lookup.estado === 'SIN_CATALOGAR'}
-              />
-              <Fundamento
-                icono={BookOpen}
-                titulo="Jurisprudencia"
-                detalle="del corpus curado, si hay precedente"
-              />
-              <Fundamento
-                icono={Landmark}
-                titulo="Registros en vivo"
-                detalle="Corte Constitucional y Suprema"
-              />
-            </ul>
-          </div>
+              LO QUE HAY DETRÁS DEL ESCRITO, CON DATOS Y NO CON FRASES.
+
+              La primera versión decía "del corpus curado, si hay precedente" y
+              "Corte Constitucional y Suprema" — descripciones de capacidad, no
+              información. Un abogado las leía y no sabía nada nuevo: ocupaban
+              sitio afirmando que el producto tiene funciones.
+
+              Ahora cada línea trae un dato comprobable de ESTE escrito, y la que
+              no lo tenga no se pinta. */}
+          {lookup.estado === 'ENCONTRADA' && actuacion && (
+            <div className="mt-3 rounded-card border border-line-200">
+              <p className="border-b border-line-100 px-3 py-2 font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
+                Con qué se va a redactar
+              </p>
+              <ul className="divide-y divide-line-100">
+                <Fundamento
+                  icono={Scale}
+                  titulo={`${obligatorias} secciones obligatorias`}
+                  detalle={actuacion.legalBasis}
+                />
+
+                {actuacion.competentAuthority && (
+                  <Fundamento
+                    icono={Landmark}
+                    titulo="Ante"
+                    detalle={actuacion.competentAuthority}
+                  />
+                )}
+
+                {actuacion.term.status !== 'NO_VERIFICADO' && (
+                  <Fundamento
+                    icono={BookOpen}
+                    titulo={actuacion.term.status === 'NO_CADUCA' ? 'No caduca' : 'Término'}
+                    detalle={actuacion.term.description ?? ''}
+                  />
+                )}
+              </ul>
+
+              {actuacion.sourceUrl && (
+                <a
+                  href={actuacion.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 border-t border-line-100 px-3 py-2 text-meta text-brand-700 hover:underline"
+                >
+                  Ver la norma
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+              )}
+            </div>
+          )}
 
           {/*
             EL AVISO QUE MÁS IMPORTA, y por eso va pegado al botón y no arriba.
@@ -319,24 +341,30 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
           </div>
         </form>
 
-        <AgentConsoleStream logs={logs} isProcessing={isProcessing} />
-      </section>
-    </div>
+      <AgentConsoleStream logs={logs} isProcessing={isProcessing} />
+    </section>
   );
 };
 
 /** Una fuente que el escrito va a usar, con su estado. */
+/**
+ * Una fuente del escrito, en dos renglones.
+ *
+ * En uno solo no cabe: `legalBasis` y `term.description` de este catálogo son
+ * párrafos con artículos y salvedades, no etiquetas. Puestos a la derecha de un
+ * título aplastaban el título a cero — el mismo defecto que tuvo la lista de
+ * actuaciones. Aquí el detalle va debajo y con tres líneas de tope.
+ */
 const Fundamento: React.FC<{
   icono: React.ComponentType<{ className?: string }>;
   titulo: string;
   detalle: string;
-  atenuado?: boolean;
-}> = ({ icono: Icono, titulo, detalle, atenuado }) => (
-  <li className="flex items-center gap-2 px-3 py-2">
-    <Icono className={`h-3.5 w-3.5 shrink-0 ${atenuado ? 'text-unverified' : 'text-ink-400'}`} />
-    <span className="text-meta font-medium text-ink-900">{titulo}</span>
-    <span className={`ml-auto truncate text-meta ${atenuado ? 'text-unverified' : 'text-ink-500'}`}>
-      {detalle}
-    </span>
+}> = ({ icono: Icono, titulo, detalle }) => (
+  <li className="flex items-start gap-2 px-3 py-2">
+    <Icono className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink-400" />
+    <div className="min-w-0">
+      <p className="text-meta font-medium text-ink-900">{titulo}</p>
+      <p className="mt-0.5 line-clamp-3 text-meta leading-[1.45] text-ink-500">{detalle}</p>
+    </div>
   </li>
 );
