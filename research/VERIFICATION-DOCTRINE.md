@@ -264,3 +264,24 @@ de texto.
 
 **Antes de dar una URL como fuente, descárgala y cuenta los caracteres de
 texto útil.** Si son dos mil y aparece «Cargando», es el cascarón.
+
+### Y la guarda atrapa transcripciones, no solo enlaces rotos
+
+De 62 conceptos, tres fallaron con la URL correcta y el documento entero
+descargado. La causa no era la fuente: la relatoría del Consejo de Estado abre
+sus extractos con la inicial entre corchetes —`[E]l régimen de inhabilidades`—
+y quien transcribió normalizó el corchete.
+
+La cita era correcta en sustancia y distinta en la letra. Comprobar contra la
+fuente detecta eso, que ninguna revisión humana habría notado.
+
+**Transcribe carácter por carácter.** Corchetes, elipsis, mayúsculas iniciales
+y comillas son parte de la cita.
+
+### Un endpoint que sirve el documento pero caduca no es citable
+
+El botón «Ver documento» de SAMAI llama a `VerProvidencia.aspx?tokenDocumento=`
+con un JWT que **expira en pocas horas**. Sirve el texto, y aun así no vale
+como fuente: una ficha cuya URL muere el mismo día es una ficha sin fuente
+mañana. El patrón que sí sirve es la página de resultados filtrada por número
+de proceso, que entrega la titulación completa en HTML plano.

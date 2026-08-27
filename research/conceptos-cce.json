@@ -1,0 +1,111 @@
+{
+  "entidad": "Agencia Nacional de Contratación Pública - Colombia Compra Eficiente (ANCP-CCE)",
+  "verified_at": "2026-08-27",
+  "conceptos": [
+    {
+      "numero": "C-1028 de 2026",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2026-08-03",
+      "rama": "CONTRATACION",
+      "tema": "Modalidad de selección en la administración delegada de recursos",
+      "pregunta": "i) ¿Es jurídicamente procedente celebrar un contrato de administración delegada de recursos mediante la modalidad de selección de mínima cuantía?; ii) para determinar la modalidad de selección, ¿debe atenderse al valor de los honorarios o comisión del administrador, o al valor total de los recursos públicos comprometidos?; iii) ¿configura indebida estructuración o elusión de la modalidad estructurar el contrato por mínima cuantía atendiendo solo a los honorarios?",
+      "tesis": "La modalidad de selección se determina sobre el valor total del contrato. En la administración delegada ese valor no se agota en los honorarios o comisión del administrador: comprende también los recursos públicos entregados en administración. Encuadrar el contrato en mínima cuantía mirando solo los honorarios, cuando el total supera el tope del artículo 94 de la Ley 1474 de 2011, desatiende los deberes de planeación y selección objetiva de los artículos 2 y 5 de la Ley 1150 de 2007 y la carga de justificar la modalidad sobre el valor estimado del artículo 2.2.1.1.2.1.1 del Decreto 1082 de 2015; puede configurar fraccionamiento o elusión de la modalidad, con vicio de ilegalidad.",
+      "cita_verbatim": "\"Ese valor, tratándose de administración delegada, no se agota en los honorarios o comisión del administrador, sino que comprende también los recursos públicos entregados para su administración y ejecución. […] La mínima cuantía, procedente conforme al artículo 94 de la Ley 1474 de 2011 cuando el valor a contratar no excede del diez por ciento (10%) de la menor cuantía de la entidad, solo resulta viable si ese valor total no supera dicho tope, aun cuando los honorarios, considerados aisladamente, no lo hagan.\"",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "No hay marca formal de vigencia en la ANCP-CCE. Se comprobó por tema y fecha en la Relatoría oficial: consultado el descriptor MODALIDADES DE SELECCIÓN (id 12020, 35 conceptos publicados) ordenado por fecha descendente el 2026-08-27, C-1028 de 2026 es el pronunciamiento más reciente de la Agencia bajo ese descriptor. https://relatoria.colombiacompra.gov.co/wp-json/wp/v2/conceptos?descriptor=12020&orderby=date&order=desc",
+      "source_url": "https://relatoria.colombiacompra.gov.co/conceptos/c-1028-de-2026/ | texto íntegro: https://relatoria.colombiacompra.gov.co/wp-content/uploads/2026/08/C-1028-1.docx"
+    },
+    {
+      "numero": "C-1095 de 2026",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2026-08-20",
+      "rama": "CONTRATACION",
+      "tema": "Requisitos habilitantes de experiencia en proponentes plurales",
+      "pregunta": "i) ¿Cómo deben acreditar las uniones temporales la experiencia en un proceso de contratación estatal?; ii) ¿pueden las entidades exigir como requisito habilitante que el proponente cuente con una sucursal en el lugar de ejecución del contrato?; iii) ¿puede exigirse que únicamente el integrante 'líder' de la unión temporal acredite la experiencia y la sucursal?",
+      "tesis": "La entidad estatal es autónoma para fijar los requisitos habilitantes de experiencia y su forma de acreditación, que debe quedar expresa en los estudios previos y en el pliego: puede exigir la sumatoria de la experiencia de cada miembro, exigirla a cada uno, o admitir que la acredite uno solo. Esa autonomía tiene límite en los principios de igualdad y libre concurrencia. Ni el artículo 7 de la Ley 80 de 1993 ni el Decreto 1082 de 2015 dan efecto jurídico a la designación de un integrante como 'líder', de modo que exigir que solo él acredite la experiencia puede resultar desproporcionado e irrazonable, sobre todo si no guarda relación con el porcentaje de participación ni con las reglas de responsabilidad del proponente plural.",
+      "cita_verbatim": "\"Ni el artículo 7 de la Ley 80 de 1993 ni el Decreto 1082 de 2015 atribuyen efectos a la designación de un integrante como \\\"líder\\\", pues el marco jurídico se refiere al representante de la estructura plural, como una figura de interlocución y administración. En consecuencia, si bien la Entidad Estatal conserva autonomía para establecer los requisitos habilitantes y sus medios de acreditación, debe ser cuidadosa al fijar reglas que exijan que uno solo de los miembros del proponente plural acredite la experiencia requerida\"",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Sin marca formal de vigencia. Verificado por tema y fecha en la Relatoría: descriptor REQUISITOS HABILITANTES (id 11489, 191 conceptos) ordenado por fecha descendente el 2026-08-27; C-1095 de 2026 encabeza la serie. https://relatoria.colombiacompra.gov.co/wp-json/wp/v2/conceptos?descriptor=11489&orderby=date&order=desc",
+      "source_url": "https://relatoria.colombiacompra.gov.co/conceptos/c-1095-de-2026/"
+    },
+    {
+      "numero": "C-1071 de 2026",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2026-08-17",
+      "rama": "CONTRATACION",
+      "tema": "Garantía única de cumplimiento: amparos, beneficio de excusión y aprobación de pólizas",
+      "pregunta": "i) ¿Qué amparos tiene la garantía única de cumplimiento?; ii) ¿el beneficio de excusión aplica a las pólizas de seguro?; iii) ¿cuándo deben entregarse y aprobarse las pólizas de seguro de un contrato estatal?",
+      "tesis": "El artículo 2.2.1.3.1.7 del Decreto 1082 de 2015 fija los amparos de la garantía de cumplimiento: buen manejo y correcta inversión del anticipo, devolución del pago anticipado, cumplimiento del contrato, pago de salarios y prestaciones, estabilidad y calidad de la obra, calidad del servicio, calidad y correcto funcionamiento de los bienes, y los demás que la entidad considere. El amparo de cumplimiento cubre las multas y la cláusula penal y debe incluirse obligatoriamente, pues por él la entidad hace efectivas las sanciones contractuales por el procedimiento del artículo 86 de la Ley 1474 de 2011. La renuncia al beneficio de excusión solo opera en garantías bancarias; como la responsabilidad civil extracontractual únicamente puede ampararse mediante contrato de seguro (art. 2.2.1.2.3.1.5 del Decreto 1082 de 2015), en esa póliza no cabe exigirla.",
+      "cita_verbatim": "\"como la responsabilidad civil extracontractual no se puede cubrir con garantía bancaria, no se incluye la renuncia al beneficio de excusión que solo aplica para garantías bancarias.\"",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Sin marca formal de vigencia. Verificado por tema y fecha: descriptor GARANTÍA DE CUMPLIMIENTO (id 16061, 42 conceptos) ordenado por fecha descendente el 2026-08-27; C-1071 de 2026 encabeza la serie, sin pronunciamiento posterior. https://relatoria.colombiacompra.gov.co/wp-json/wp/v2/conceptos?descriptor=16061&orderby=date&order=desc",
+      "source_url": "https://relatoria.colombiacompra.gov.co/conceptos/c-1071-de-2026/"
+    },
+    {
+      "numero": "C-1081 de 2026",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2026-08-20",
+      "rama": "CONTRATACION",
+      "tema": "Liquidación del contrato estatal: clases, plazos y pérdida de competencia de la entidad",
+      "pregunta": "¿Cuándo pierde la entidad estatal la competencia para liquidar un contrato estatal?",
+      "tesis": "Conforme al artículo 11 de la Ley 1150 de 2007 hay tres clases de liquidación. La bilateral se hace en el término que estipulen las partes o, en su defecto, dentro de los cuatro meses supletivos. La unilateral se practica dentro de los dos meses siguientes al vencimiento del término acordado o, ante el silencio de las partes, de los cuatro meses de la bilateral. Agotados esos plazos, la liquidación solo puede hacerla la Jurisdicción de lo Contencioso Administrativo o un tribunal de arbitramento, dentro de un proceso de controversias contractuales, y para pedirla existe un plazo máximo de dos años contados desde los dos meses de la liquidación unilateral. En las entidades de régimen especial la liquidación bilateral se rige por el plazo que acuerden las partes en el contrato o, en su defecto, por el del manual de contratación.",
+      "cita_verbatim": "\"Finalmente, la tercera la realiza la Jurisdicción de lo Contencioso Administrativo o un tribunal de arbitramento dentro de un proceso judicial de controversias contractuales, y puede darse con ocasión de una demanda del interesado solicitando dicha liquidación. Para ello, existe un plazo máximo de dos (2) años contados a partir de los dos meses establecidos en la Ley para realizar la liquidación unilateral\"",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Sin marca formal de vigencia. Verificado por tema y fecha en la Relatoría: descriptor LIQUIDACIÓN DEL CONTRATO (id 11296, 88 conceptos) ordenado por fecha descendente el 2026-08-27; C-1081 de 2026 es el más reciente. https://relatoria.colombiacompra.gov.co/wp-json/wp/v2/conceptos?descriptor=11296&orderby=date&order=desc",
+      "source_url": "https://relatoria.colombiacompra.gov.co/conceptos/c-1081-de-2026/"
+    },
+    {
+      "numero": "C-493 de 2026",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2026-05-08",
+      "rama": "CONTRATACION",
+      "tema": "Riesgos previsibles y mecanismos de equilibrio económico del contrato estatal",
+      "pregunta": "¿Qué mecanismos establece el ordenamiento jurídico para promover el equilibrio económico del contrato estatal?",
+      "tesis": "El artículo 4 de la Ley 1150 de 2007 obliga a la entidad a estimar, tipificar y asignar los riesgos previsibles en el pliego de condiciones o su equivalente; oídas las observaciones de los interesados y lo debatido en la audiencia de asignación de riesgos, la decisión final sobre su contenido es de la entidad. El AIU no está regulado normativamente: integra el precio y su fijación es libre para el contratista, salvo pacto en contrario, y no existe deber legal de rendir cuentas sobre su destinación salvo que el pliego o el contrato lo impongan. Los imprevistos del AIU no deben confundirse con los riesgos que rompen el equilibrio financiero: los primeros son parte del alea normal del negocio y del riesgo asumido por el contratista; los segundos exceden la ejecución ordinaria y pueden dar lugar al restablecimiento de la ecuación económica, a veces por decisión judicial.",
+      "cita_verbatim": "\"el artículo 4 de la Ley 1150 de 2007 obliga a las entidades estatales a estimar, tipificar y asignar los riesgos previsibles involucrados en la contratación dentro de los pliegos de condiciones o en sus equivalentes. En este sentido, si bien deben tener en consideración las observaciones formuladas por los interesados […] corresponde a cada entidad analizar y pronunciarse motivadamente frente a dichas observaciones, correspondiendo a la entidad tomar la decisión final sobre el contenido de los riesgos.\"",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Sin marca formal de vigencia. Verificado por tema y fecha en la Relatoría: descriptor RIESGOS EN LA CONTRATACIÓN ESTATAL (id 20927, 6 conceptos) ordenado por fecha descendente el 2026-08-27; C-493 de 2026 es el más reciente de esa serie. https://relatoria.colombiacompra.gov.co/wp-json/wp/v2/conceptos?descriptor=20927&orderby=date&order=desc",
+      "source_url": "https://relatoria.colombiacompra.gov.co/conceptos/c-493-de-2026/"
+    },
+    {
+      "numero": "C-1517 de 2025",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2025-11-14",
+      "rama": "CONTRATACION",
+      "tema": "Acuerdos Marco de Precios: obligatoriedad y bienes de características técnicas uniformes",
+      "pregunta": "¿Cuáles son las particularidades que permiten a una entidad pública identificar si un bien o servicio es de características técnicas uniformes y de común utilización y, por ende, si debe usar alguna de las modalidades de selección del artículo 2 de la Ley 1150 de 2007?",
+      "tesis": "La regla general sigue siendo la licitación pública (art. 2, num. 1 de la Ley 1150 de 2007); la adquisición de bienes y servicios de características técnicas uniformes y de común utilización es causal de selección abreviada del literal a) del numeral 2. Prima la definición legal sobre el uso general o el significado técnico del bien. Los Acuerdos Marco de Precios son instrumentos de agregación de demanda de aplicación obligatoria siempre que exista un acuerdo marco vigente para ese bien o servicio: la entidad está obligada a verificarlo en la etapa de planeación (arts. 2.2.1.2.1.2.7 y 2.2.1.2.1.2.9 del Decreto 1082 de 2015). Si no existe acuerdo marco vigente, debe acudirse a selección abreviada por subasta inversa o bolsa de productos para bienes uniformes, y a licitación pública —o selección abreviada de menor cuantía según la cuantía— para los no uniformes.",
+      "cita_verbatim": "\"Se precisa pues, que los Acuerdos Marco de Precios como instrumentos de agregación de demanda se aplican de forma obligatoria con la condición de que esté un acuerdo marco vigente para la adquisición de bienes y servicios de características uniformes y servicios no uniformes de común utilización, de conformidad con lo dispuesto en el artículo 2.2.1.2.1.2.7. del Decreto 1082 de 2015.\"",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Sin marca formal de vigencia. Verificado por tema y fecha en la Relatoría: descriptores ACUERDOS MARCO DE PRECIOS (id 11751, 6 conceptos) y ACUERDO MARCO DE PRECIOS (id 14609, 3 conceptos) ordenados por fecha descendente el 2026-08-27; C-1517 de 2025 es el más reciente de ambos. https://relatoria.colombiacompra.gov.co/wp-json/wp/v2/conceptos?descriptor=11751&orderby=date&order=desc",
+      "source_url": "https://relatoria.colombiacompra.gov.co/conceptos/c-1517-de-2025/"
+    },
+    {
+      "numero": "C-910 de 2026",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2026-07-16",
+      "rama": "CONTRATACION",
+      "tema": "Cómo se escoge la modalidad de selección: la licitación pública como regla general",
+      "pregunta": "¿Cómo se escogen las modalidades de contratación?",
+      "tesis": "Las modalidades están en el artículo 2 de la Ley 1150 de 2007, que sustituyó el numeral 1 del artículo 24 de la Ley 80 de 1993. Salvo norma especial que ordene otra cosa, rige la licitación pública como regla general; según el objeto o el valor del presupuesto oficial proceden otros procedimientos, con pluralidad de oferentes (selección abreviada de menor cuantía, mínima cuantía) o sin concurrencia de proponentes (contratación directa). La selección abreviada del numeral 2 se justifica en objetos y circunstancias que admiten trámites más ágiles, y su literal a) cubre los bienes y servicios de características técnicas uniformes y de común utilización.",
+      "cita_verbatim": "\"Así, salvo norma especial que ordene la celebración del negocio jurídico por otra modalidad de selección, debe aplicarse la regla general de licitación pública. Por ello, dependiendo del objeto o el valor del presupuesto oficial, es posible la aplicación de otros procedimientos contractuales.\"",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Sin marca formal de vigencia, y NO es el más reciente bajo el descriptor MODALIDADES DE SELECCIÓN (id 12020): lo es C-1028 de 2026, de 3 de agosto de 2026. La tesis se mantiene porque no fue rectificada sino reiterada: la misma frase sobre la licitación pública como regla general aparece literalmente en C-1517 de 2025 y el criterio se aplica sin variación en C-1028 de 2026. Comprobado el 2026-08-27 sobre la serie completa del descriptor. https://relatoria.colombiacompra.gov.co/wp-json/wp/v2/conceptos?descriptor=12020&orderby=date&order=desc",
+      "source_url": "https://relatoria.colombiacompra.gov.co/conceptos/c-910-de-2026/"
+    }
+  ],
+  "descartados": [
+    {
+      "numero": "Circular Externa 002 de 2026 y Circular Externa 003 de 2026 de la ANCP-CCE",
+      "razon": "No son conceptos sino actos administrativos que instruyen (la 002 fija el deber de reporte de multas, sanciones e inhabilidades ante Cámaras de Comercio, Procuraduría y SECOP, con consecuencias disciplinarias por omitirlo). El Decreto 4170 de 2011, art. 3 num. 5, separa expresamente 'absolver consultas' de 'expedir circulares externas'. Aparecen citadas dentro del cuerpo de los conceptos recogidos y podrían confundirse con doctrina."
+    },
+    {
+      "numero": "Colecciones 'providencias', 'laudo' y 'normativa' de la Relatoría de la ANCP-CCE",
+      "razon": "La Relatoría publica cuatro tipos de contenido bajo la misma interfaz: /wp/v2/conceptos, /wp/v2/providencias, /wp/v2/laudo y /wp/v2/normativa. Solo la primera contiene conceptos. Las providencias son decisiones judiciales y los laudos son decisiones arbitrales: no tienen el alcance del artículo 28 del CPACA y no pueden mezclarse con doctrina."
+    },
+    {
+      "numero": "Sistema 'Síntesis' de la ANCP-CCE (sintesis.colombiacompra.gov.co)",
+      "razon": "No se pudo verificar: el dominio resuelve en DNS a 129.159.121.231 pero no acepta conexión TCP en los puertos 443 ni 80 (timeout por curl y por socket directo; ECONNREFUSED por el cliente de fetch). Queda como hueco declarado. Evidencia indirecta obtenida de resultados de búsqueda de sus propias URLs (/jurisprudencia/ficha/, /content/) indica que indexa normativa, jurisprudencia de altas cortes y laudos arbitrales, no conceptos; de confirmarse, no elevaría a la ANCP-CCE al nivel de la DIAN, porque un control de vigencia sobre normativa y jurisprudencia no es control de vigencia sobre la doctrina propia de la entidad. NO SE PUDO COMPROBAR."
+    }
+  ]
+}

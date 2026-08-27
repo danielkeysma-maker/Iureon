@@ -1,0 +1,119 @@
+{
+  "entidad": "Superintendencia de Industria y Comercio (SIC) - Oficina Asesora Jurídica",
+  "verified_at": "2026-08-27",
+  "conceptos": [
+    {
+      "numero": "Concepto (radicado) 25-625951",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2026-02-25",
+      "rama": "SUPERINTENDENCIAS",
+      "tema": "Alcance de la Circular Externa 002 de 2025: transferencia frente a transmisión de datos personales",
+      "pregunta": "Se pidió aclarar el alcance de la Circular Externa 002 de 2025, sobre instrucciones aplicables a los procesos de transferencia de tecnología en los que se transfieran datos personales o tecnologías que permitan tratarlos.",
+      "tesis": "La circular tiene contenido orientativo, instructivo o informativo y carece del elemento de unilateralidad y coercibilidad propio del acto administrativo. Su ámbito se limita a los dos supuestos que ella misma enuncia. La distinción decisiva es entre transferencia y transmisión: si la operación envía datos personales a un receptor que a su vez es Responsable del Tratamiento, queda plenamente sujeta a la Circular 002 de 2025; si solo hay transmisión —comunicación de datos para que un Encargado los trate por cuenta del Responsable— la circular no se aplica, sin perjuicio de que el Encargado deba cumplir las políticas de tratamiento del Responsable. La Oficina Asesora Jurídica advierte además que carece de competencia para determinar, en un caso concreto, quién es Responsable y quién Encargado.",
+      "cita_verbatim": "\"En tal sentido, si las operaciones contemplan la transferencia de datos - envío de la información o los datos personales a un receptor, que a su vez es Responsable del Tratamiento-, esta se encuentra plenamente sujeta a las disposiciones de la Circular 002 de 2025. Sin embargo, si se realiza exclusivamente la transmisión de datos - comunicación de los mismos que tiene por objeto la realización de un Tratamiento por el Encargado por cuenta del Responsable -, no resulta aplicable la precitada circular\"",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "La SIC no marca vigencia y su Buscador de Conceptos Jurídicos está inoperante (ver 'descartados'). Se verificó por tema y fecha en el otro repositorio oficial, el Boletín Jurídico de la Sede Electrónica: se recorrieron sus 14 páginas de la sección Conceptos (162 registros, de 2018 a 2026) y este es el pronunciamiento más reciente publicado sobre datos personales, con fecha de publicación 25 de febrero de 2026; no hay concepto posterior sobre la Circular 002 de 2025. Advertencia: el PDF publicado solo fecha el concepto como 'enero de 2026' (la SIC suprime el día en la versión publicada), por lo que el campo 'fecha' recoge la fecha de publicación oficial en el Boletín. Advertencia adicional: el Boletín rotuló este PDF con el título de otro registro (aparece bajo 'Obligatoriedad del RNBD'); el contenido se tomó del PDF, no del rótulo. https://sedeelectronica.sic.gov.co/publicaciones/boletin-juridico/concepto",
+      "source_url": "https://sedeelectronica.sic.gov.co/sites/default/files/publicaciones/25-625951.pdf"
+    },
+    {
+      "numero": "Concepto (radicado) 25-632634",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2026-02-25",
+      "rama": "SUPERINTENDENCIAS",
+      "tema": "Obligatoriedad del Registro Nacional de Bases de Datos para entidades públicas",
+      "pregunta": "El Tribunal de Ética Médica de Antioquia consultó si el Registro Nacional de Bases de Datos (RNBD) es de obligatorio cumplimiento para él en calidad de Responsable del Tratamiento, atendiendo a su naturaleza jurídica.",
+      "tesis": "El RNBD, creado por el artículo 25 de la Ley 1581 de 2012, es un directorio público de consulta libre que administra la SIC. Conforme al artículo 1 del Decreto 090 de 2018, compilado en el Decreto 1074 de 2015, el umbral de activos de 100.000 UVT solo opera para sociedades y entidades sin ánimo de lucro; las entidades de naturaleza pública deben registrar sus bases de datos sin importar el valor de sus activos. Al registrar, el responsable debe aportar sus políticas de tratamiento, que lo obligan y cuyo incumplimiento acarrea sanción, y que en ningún caso pueden ser inferiores a los deberes de la Ley 1581 de 2012.",
+      "cita_verbatim": "\"conforme a lo dispuesto en el artículo 1 del Decreto 090 de 2018, compilado en el Decreto 1074 de 2015, deben registrar sus bases de datos: • Las sociedades y entidades sin ánimo de lucro cuyos activos totales superen las 100.000 Unidades de Valor Tributario (UVT). • Las entidades de naturaleza pública, sin importar el valor de sus activos.\"",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Sin marca de vigencia; buscador oficial inoperante. Verificado por tema y fecha sobre los 162 registros de la sección Conceptos del Boletín Jurídico de la Sede Electrónica (14 páginas, 2018-2026): es el registro más reciente sobre RNBD y no existe concepto posterior publicado que lo rectifique. El PDF fecha el concepto en 'enero de 2026'; el campo 'fecha' recoge la fecha de publicación en el Boletín (25 de febrero de 2026). El Boletín intercambió los rótulos de este PDF y del 25-625951; el contenido se tomó del PDF. https://sedeelectronica.sic.gov.co/publicaciones/boletin-juridico/concepto",
+      "source_url": "https://sedeelectronica.sic.gov.co/sites/default/files/publicaciones/25-632634.pdf"
+    },
+    {
+      "numero": "Concepto (radicado) 25-494351",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2025-12-31",
+      "rama": "SUPERINTENDENCIAS",
+      "tema": "Bases de datos de prevención de lavado de activos: excepción de ámbito de la Ley 1581 de 2012 y datos de menores",
+      "pregunta": "¿Pueden las empresas del sector real y de transporte hacer debida diligencia y validación de antecedentes en listas restrictivas respecto de menores de edad vinculados como aprendices o trabajadores, y cómo se armoniza eso con el interés superior del menor y con el consentimiento para el tratamiento de sus datos?",
+      "tesis": "El artículo 2 de la Ley 1581 de 2012 excluye de su ámbito de aplicación las bases de datos que tengan por finalidad la prevención, detección, monitoreo y control del lavado de activos y la financiación del terrorismo, pero se trata de un caso exceptuado y no excluido: por mandato del parágrafo del artículo 2 y de la Sentencia C-748 de 2011, esas bases siguen sujetas a los principios del artículo 4 —legalidad, finalidad, libertad, veracidad o calidad, transparencia, acceso y circulación restringida, seguridad y confidencialidad—. Tratándose de datos de niños, niñas y adolescentes rige además el estándar reforzado: al pedir la autorización debe informarse de manera expresa y clara que responder las preguntas sobre esos datos es facultativo (art. 12, lit. b).",
+      "cita_verbatim": "\"pese a que el legislador lo ha contemplado como una excepción a la aplicación de las disposiciones generales de la Ley 1581 de 2012, deben atender a los principios que la misma ley contiene, como dicta el parágrafo del Artículo 2 y la Corte Constitucional. […] En consecuencia, quien administre una base de datos de tal naturaleza, deberá igualmente velar porque el tratamiento de los datos personales se haga bajo los principios de legalidad, finalidad, libertad, veracidad o calidad, transparencia, acceso y circulación restringida, seguridad y confidencialidad.\"",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Sin marca de vigencia; buscador oficial inoperante. Verificado por tema y fecha sobre los 162 registros de la sección Conceptos del Boletín Jurídico: publicado el 31 de diciembre de 2025, es el pronunciamiento más reciente sobre el ámbito de aplicación de la Ley 1581 de 2012, y los dos conceptos posteriores publicados (25-625951 y 25-632634, febrero de 2026) tratan la Circular 002 de 2025 y el RNBD, no este punto. El PDF fecha el concepto en 'noviembre de 2025'. https://sedeelectronica.sic.gov.co/publicaciones/boletin-juridico/concepto",
+      "source_url": "https://sedeelectronica.sic.gov.co/sites/default/files/publicaciones/25-494351%20RVDO.pdf"
+    },
+    {
+      "numero": "Concepto (radicado) 25-310342",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2025-08-27",
+      "rama": "SUPERINTENDENCIAS",
+      "tema": "Comercio electrónico: enlace obligatorio a la SIC en las plataformas del proveedor",
+      "pregunta": "¿Basta un hipervínculo de texto simple —por ejemplo 'Acceda a la SIC aquí'— redireccionado a la página oficial de la Superintendencia, o es obligatorio incluir también el logotipo oficial de la SIC como parte del hipervínculo?",
+      "tesis": "En cumplimiento del parágrafo del artículo 50 de la Ley 1480 de 2011, el proveedor o expendedor que comercialice por medios electrónicos debe incluir en sus plataformas digitales un enlace directo a https://sedeelectronica.sic.gov.co/ para dar a conocer al consumidor sus derechos; omitirlo incumple sus obligaciones y puede acarrear sanción. En cambio, incorporar el logotipo de la entidad no es obligatorio: es optativo, y su uso no requiere autorización siempre que se haga en los términos del artículo 157 de la Decisión 486 de 2000.",
+      "cita_verbatim": "\"es deber incluir en sus plataformas digitales un enlace directo a la página web https://sedeelectronica.sic.gov.co/, con la finalidad de dar a conocer al consumidor los derechos con los que cuenta al realizar este tipo de transacciones. Omitir el enlace constituiría un incumplimiento de las obligaciones a cargo del proveedor o expendedor y podría derivar en la imposición de una sanción por parte de esta entidad. Se reitera que la adición del logotipo de la entidad no es una obligación y será optativo del productor o proveedor incorporarla\"",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Sin marca de vigencia; buscador oficial inoperante. Verificado por tema y fecha sobre los 162 registros de la sección Conceptos del Boletín Jurídico: entre los publicados en materia de protección al consumidor, ninguno posterior al 27 de agosto de 2025 vuelve sobre el deber de enlace del parágrafo del artículo 50 de la Ley 1480 de 2011. El PDF fecha el concepto en 'julio de 2025'. https://sedeelectronica.sic.gov.co/publicaciones/boletin-juridico/concepto",
+      "source_url": "https://sedeelectronica.sic.gov.co/sites/default/files/publicaciones/25310342.pdf"
+    },
+    {
+      "numero": "Concepto (radicado) 25-402476",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2025-10-30",
+      "rama": "PROPIEDAD_INTELECTUAL",
+      "tema": "Denominación de origen: quién está legitimado para pedir la autorización de uso y con qué requisitos",
+      "pregunta": "¿Tiene la Federación Nacional de Cafeteros facultades para administrar la denominación de origen 'Café de Colombia', expedir licencias de uso e imponer restricciones a productores y exportadores? ¿Puede prohibir el uso de las expresiones 'Café' y 'Colombia' para café efectivamente cultivado en Colombia?",
+      "tesis": "La protección de una denominación de origen nace con el acto de declaración que expide la oficina nacional competente (Decisión 486 de 2000). Conforme al artículo 207 de esa Decisión y al numeral 7.6 del Capítulo Séptimo del Título X de la Circular Única de la SIC, están legitimados para pedir la autorización de uso: los beneficiarios que solicitaron la declaración de protección; quienes, sin ser de ese grupo, se dediquen directamente a la extracción, producción o elaboración dentro de la zona geográfica delimitada y cumplan los demás requisitos; y quienes comercialicen los productos protegidos y necesiten usarla. Los dos últimos deben presentar declaración de interés y certificado de conformidad de calidades. La entidad delegada debe evaluar la solicitud dentro de los quince días hábiles siguientes a su presentación. La Oficina Asesora Jurídica se niega expresamente a decidir el caso concreto: determinar si hay infracción marcaria es de las autoridades jurisdiccionales.",
+      "cita_verbatim": "\"quien tenga interés en solicitar la autorización de uso de la denominación de origen, debe obedecer las normas citadas y todas las que desarrollen el trámite en cuestión para no incurrir en una infracción al derecho de propiedad industrial.\"",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Sin marca de vigencia; buscador oficial inoperante. Verificado por tema y fecha sobre los 162 registros de la sección Conceptos del Boletín Jurídico: es el pronunciamiento más reciente publicado en materia de propiedad industrial (30 de octubre de 2025); los registros posteriores de esa materia son sentencias del Consejo de Estado y de tribunales, no conceptos. El PDF fecha el concepto en 'septiembre de 2025'. https://sedeelectronica.sic.gov.co/publicaciones/boletin-juridico/concepto",
+      "source_url": "https://sedeelectronica.sic.gov.co/sites/default/files/publicaciones/25402476.pdf"
+    },
+    {
+      "numero": "Concepto (radicado) 25-179024",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2025-06-27",
+      "rama": "SUPERINTENDENCIAS",
+      "tema": "Información al consumidor inmobiliario: el precio de la VIS y la VIP debe informarse en pesos, no en salarios mínimos",
+      "pregunta": "¿Puede informarse al consumidor el precio de una vivienda de interés social (VIS) o de interés prioritario (VIP) en salarios mínimos legales mensuales vigentes, dado que el artículo 293 de la Ley 2294 de 2023 fija sus topes en SMLMV?",
+      "tesis": "No. El artículo 26 de la Ley 1480 de 2011 exige indicar el precio en pesos colombianos y como valor total, incluidos impuestos y costos adicionales. Que la Ley 2294 de 2023 fije el valor máximo de la VIS en 135 SMLMV y el de la VIP en 90 SMLMV es un criterio de tope legal, no una autorización para comunicar el precio en salarios mínimos: la norma no dice que el precio pueda o deba informarse así. Supeditar el precio al SMLMV que decrete a futuro el Gobierno vulnera el derecho a información veraz, precisa e idónea del numeral 1.3 del artículo 3 de la Ley 1480 de 2011, porque deja al consumidor en incertidumbre sobre el costo real del inmueble.",
+      "cita_verbatim": "\"la disposición legal no indica que el precio pueda o deba ser informado en salarios mínimos legales mensuales vigentes. […] Al supeditar la información relacionada con el precio al SMLMV decretado por el Gobierno Nacional en el futuro, no se está cumpliendo con ninguno de estos postulados, dejando en incertidumbre al consumidor sobre cuanto será el costo real que deberá asumir por el inmueble.\"",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Sin marca de vigencia; buscador oficial inoperante. Verificado por tema y fecha sobre los 162 registros de la sección Conceptos del Boletín Jurídico: ningún concepto posterior al 27 de junio de 2025 vuelve sobre la forma de informar el precio de VIS y VIP. El PDF lleva firma digital fechada el 28 de mayo de 2025 y el encabezado dice 'mayo de 2025'; el campo 'fecha' recoge la fecha de publicación en el Boletín. https://sedeelectronica.sic.gov.co/publicaciones/boletin-juridico/concepto",
+      "source_url": "https://sedeelectronica.sic.gov.co/sites/default/files/publicaciones/Concepto%2025-179024.pdf"
+    },
+    {
+      "numero": "Concepto (radicado) 23-378413",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2023-10-30",
+      "rama": "SUPERINTENDENCIAS",
+      "tema": "Garantía legal de los equipos terminales móviles: término y efectividad",
+      "pregunta": "Un consumidor cuyo celular se hinchó y se curvó sin mal manejo consulta cómo opera la garantía de los equipos terminales móviles.",
+      "tesis": "La garantía de los equipos terminales móviles se rige por la Ley 1480 de 2011. Si el productor o proveedor no señala expresamente el término, la garantía legal del equipo nuevo es de un año. El equipo usado cuya garantía legal ya expiró puede venderse sin garantía, pero solo si el vendedor informa esa circunstancia y el comprador la acepta por escrito; ante el silencio del vendedor se entiende que el equipo usado tiene garantía de tres meses. La garantía legal no admite contraprestación adicional al precio, y ante fallas de calidad o idoneidad el consumidor puede reclamar su efectividad directamente ante el proveedor, el distribuidor o el productor.",
+      "cita_verbatim": "\"el término de la garantía legal de los ETM nuevos al no indicarse expresamente por el productor y/o proveedor será de un año. Ahora bien, los ETM usados en los que haya expirado el término de la garantía legal, podrán ser vendidos sin garantía, siempre y cuando el vendedor informe al usuario de tal situación al comprador y este debe aceptarla por escrito, en caso contrario ante el silencio del vendedor se entenderá que el ETM usado tiene garantía de tres (3) meses.\"",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Sin marca de vigencia; buscador oficial inoperante. Verificado por tema y fecha sobre los 162 registros de la sección Conceptos del Boletín Jurídico: es el único y más reciente concepto publicado sobre el término de la garantía legal de equipos terminales móviles; el anterior sobre la misma materia (21-511224, garantía legal en servicios tecnológicos, febrero de 2022) no fue rectificado sino precedido. Advertencia declarada: entre 2023 y 2026 la SIC no ha publicado en el Boletín ningún concepto posterior sobre garantías, de modo que la comprobación de vigencia se apoya en la ausencia de pronunciamiento posterior en el único repositorio operativo, no en una marca de la entidad. https://sedeelectronica.sic.gov.co/publicaciones/boletin-juridico/concepto",
+      "source_url": "https://sedeelectronica.sic.gov.co/sites/default/files/boletin-juridico/conceptos/23-378413.pdf"
+    }
+  ],
+  "descartados": [
+    {
+      "numero": "Buscador de Conceptos Jurídicos de la SIC (https://buscadorconceptos.sic.gov.co/)",
+      "razon": "No es un descarte de documento sino una constancia operativa, y es el hallazgo más grave de esta pasada: el repositorio que la propia SIC señala en el pie de cada concepto está inoperante al 2026-08-27. Sus endpoints /api/anios y /api/temas devuelven HTTP 500, y /api/consultar responde cod_respuesta 000 con num_resultados_total 0 para toda consulta (con texto, sin texto, por año y por tema). Probado por HTTP directo y reproducido en navegador, con los mismos errores 500 registrados en la consola. Toda la recolección de la SIC tuvo que apoyarse en el Boletín Jurídico de la Sede Electrónica."
+    },
+    {
+      "numero": "Sentencias publicadas dentro de la sección 'Conceptos' del Boletín Jurídico de la SIC",
+      "razon": "La sección Conceptos del Boletín mezcla conceptos con decisiones judiciales sobre actos de la SIC. De los 162 registros recorridos, al menos 19 son sentencias o autos (Consejo de Estado, Tribunal Administrativo de Cundinamarca, de Nariño, Tribunal de Justicia de la Comunidad Andina) y varios son resoluciones sancionatorias. Ejemplos descartados: Sentencia 25000234100020140140500 (EEB/ISAGEN), Sentencia 11001-03-24-000-2014-00486-00 (Genentech), Sentencia 110013334004-2021-00157-01 (conceptos técnicos del MinMinas), Sentencia 52001333300220190023701. Ninguna es un concepto ni tiene el alcance del artículo 28 del CPACA."
+    },
+    {
+      "numero": "Circular Externa 002 de 2025 y Circular Única de la SIC (Título X, Capítulo Séptimo)",
+      "razon": "No son conceptos sino instrucciones. Aparecen citadas dentro de los conceptos recogidos —el 25-625951 interpreta la Circular 002 de 2025 y el 25-402476 se apoya en la Circular Única— y podrían confundirse con doctrina. El propio concepto 25-625951 advierte que la circular es contenido orientativo o instructivo, sin la unilateralidad y coercibilidad del acto administrativo; en lo que instruye, sin embargo, obliga a los vigilados, cosa que un concepto nunca hace."
+    },
+    {
+      "numero": "Decisiones jurisdiccionales de la SIC (Relatoría, https://relatoria.sic.gov.co/)",
+      "razon": "La SIC ejerce funciones jurisdiccionales en competencia desleal, protección al consumidor y propiedad industrial, y publica esas decisiones en una herramienta distinta que sus propios conceptos señalan ('herramienta a través de la cual se pueden consultar decisiones jurisprudenciales adoptadas por la entidad', Concepto 25-625951). No se recogió ninguna: son decisiones de juez, no opiniones no vinculantes."
+    },
+    {
+      "numero": "Cláusulas abusivas (tema solicitado)",
+      "razon": "HUECO DECLARADO. No se recogió ningún concepto sobre cláusulas abusivas. El único buscador temático de la entidad está caído, y el recorrido completo de los 162 registros de la sección Conceptos del Boletín Jurídico (2018-2026) no arroja ninguno cuyo asunto sea cláusulas abusivas del artículo 42 y siguientes de la Ley 1480 de 2011. No se afirma que no existan: se afirma que no son hallables hoy en ninguno de los dos repositorios oficiales."
+    }
+  ]
+}

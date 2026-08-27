@@ -88,6 +88,25 @@ const entityKey = (name: string): string =>
     .replace(/[^a-z0-9]+/g, ' ')
     .trim();
 
+/**
+ * Names that mean the same legal person as one whose scope was verified.
+ *
+ * The SIC's conceptos are signed by its "Oficina Asesora Jurídica", which is an
+ * office inside the Superintendencia and not another entity: the scope verified
+ * for the SIC — CPACA art. 28, non-binding — is exactly the scope of what that
+ * office issues. Matched literally, seven verified conceptos were dropped with
+ * a message saying nobody had checked who they bind, which was false.
+ *
+ * Kept explicit rather than solved by prefix-matching. A rule that quietly
+ * accepts any longer name would also accept a genuinely different body whose
+ * conceptos carry a different weight, and that is the one mistake this whole
+ * module exists to prevent.
+ */
+const ENTITY_ALIASES: Record<string, string> = {
+  'superintendencia de industria y comercio sic oficina asesora juridica':
+    'superintendencia de industria y comercio sic'
+};
+
 /** Who each entity's conceptos bind, verified once and read from disk. */
 const readBindingScopes = (): Map<string, string> => {
   const path = join(RESEARCH, 'conceptos-alcance.json');
@@ -118,7 +137,8 @@ async function main(): Promise<void> {
     // An entity whose binding scope was never verified does not enter, however
     // good its doctrine: a concepto that cannot say who it binds is an opinion
     // wearing the corpus's authority.
-    const bindingScope = scopes.get(entityKey(seed.entidad));
+    const clave = entityKey(seed.entidad);
+    const bindingScope = scopes.get(ENTITY_ALIASES[clave] ?? clave);
 
     if (!bindingScope) {
       skipped.push(`${seed.entidad}: sin alcance verificado en conceptos-alcance.json (${seed.conceptos.length} conceptos)`);

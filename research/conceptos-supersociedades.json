@@ -1,0 +1,124 @@
+{
+  "entidad": "Superintendencia de Sociedades",
+  "verified_at": "2026-08-27",
+  "conceptos": [
+    {
+      "numero": "Oficio 220-317010 de 2026",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2026-07-21",
+      "rama": "SOCIETARIO",
+      "tema": "Disolución y liquidación privada de una S.A.S.: intervención de la Superintendencia e inventario del patrimonio social",
+      "pregunta": "En la liquidación voluntaria de una S.A.S. que nunca fue vigilada por la Superintendencia, ¿debe remitírsele la información de los artículos 233 y 234 del Código de Comercio? Y el inventario del patrimonio social del artículo 234, ¿debe ser autorizado por contador público aun cuando la sociedad nunca operó y no tiene activos ni pasivos?",
+      "tesis": "La liquidación voluntaria es un trámite privado en el que, por regla general, no interviene autoridad pública: la Superintendencia solo designa liquidador y aprueba el estado de inventario en los casos taxativos del numeral 7.2 de la Circular Básica Jurídica, con fundamento en el numeral 6 del artículo 84 de la Ley 222 de 1995, el artículo 2.2.2.1.3.1 del Decreto 1074 de 2015 y el artículo 124 de la Ley 1116 de 2006. En cambio, la exigencia del artículo 234 del Código de Comercio no admite excepción: el inventario del patrimonio social debe ser autorizado por contador público, sigue vigente al inicio de la liquidación y no fue reemplazado por el informe del párrafo 62 del Decreto 2101 de 2016.",
+      "cita_verbatim": "\"Por lo tanto, no hay lugar a interpretación alguna diferente ya que la normativa es clara y determina que el inventario del patrimonio social deberá ser autorizado por un contador público.\"",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "La entidad no marca vigencia. Se descargó el índice completo del repositorio oficial de conceptos jurídicos (Liferay, carpeta 107391/159040, 12.951 oficios, sin circulares, resoluciones ni sentencias) desde https://www.supersociedades.gov.co/api/jsonws/dlapp/get-file-entries/repository-id/107391/folder-id/159040 y se ordenaron por fecha los oficios cuyo asunto menciona disolución o sociedad por acciones simplificada: el 220-317010 de 21 de julio de 2026 es el más reciente sobre este punto al 2026-08-27. Se contrastó con el Tesauro (https://tesauro.supersociedades.gov.co/), descriptor 'Sociedad por acciones simplificada', cuyo último registro indexado es de febrero de 2026, anterior: el repositorio documental está más al día que el Tesauro.",
+      "source_url": "https://www.supersociedades.gov.co/documents/107391/159040/OFICIO%20220-317010%20DEL%2021%20DE%20JULIO%20DE%202026.pdf/4e614864-bc96-2543-571e-d7a5fbc1fbb4?version=1.0"
+    },
+    {
+      "numero": "Oficio 220-315000 de 2026",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2026-07-15",
+      "rama": "SOCIETARIO",
+      "tema": "Causal de disolución por no renovación de la matrícula mercantil (art. 31 de la Ley 1727 de 2014)",
+      "pregunta": "Que una sociedad figure 'disuelta y en estado de liquidación' por aplicación automática del artículo 31 de la Ley 1727 de 2014, ¿implica únicamente una causal legal de disolución o supone también el inicio formal del proceso liquidatorio?",
+      "tesis": "El incumplimiento de la obligación de renovar la matrícula mercantil durante cinco años disuelve la sociedad por ministerio de la ley, y esa disolución no queda en suspenso: por mandato del artículo 222 del Código de Comercio, disuelta la sociedad se procede de inmediato a su liquidación, no puede iniciar nuevas operaciones y conserva capacidad jurídica solo para los actos necesarios a la liquidación inmediata. Los administradores deben adelantar sin dilación el trámite liquidatorio, y quien acredite interés legítimo puede pedir a la Superintendencia que designe liquidador. Todo acto ajeno a ese fin hace responsables ilimitada y solidariamente al liquidador y al revisor fiscal que no se hubiere opuesto.",
+      "cita_verbatim": "\"De la norma anterior se colige que, por ministerio de la ley, si una sociedad incumple la obligación de renovar la matricula por cinco (5) años, la misma quedará disuelta y en estado de liquidación, por lo cual, los administradores deberán adelantar las diligencias pertinentes para el desarrollo del trámite liquidatario.\"",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Sin marca de vigencia en la entidad. Verificado por tema y fecha sobre el índice completo del repositorio oficial (carpeta 107391/159040): entre los 327 oficios cuyo asunto menciona disolución, el 220-315000 de 15 de julio de 2026 es el más reciente sobre la causal del artículo 31 de la Ley 1727 de 2014, y él mismo reitera —sin apartarse de él— el oficio anterior 220-302452 de 24 de octubre de 2024, de modo que la línea es continua y no rectificada. https://www.supersociedades.gov.co/api/jsonws/dlapp/get-file-entries/repository-id/107391/folder-id/159040",
+      "source_url": "https://www.supersociedades.gov.co/documents/107391/159040/OFICIO%20220-315000%20DEL%2015%20DE%20JULIO%20DE%202026.pdf/58db1340-7632-e219-9ca1-921d2a5e6401?version=1.1"
+    },
+    {
+      "numero": "Oficio 220-315232 de 2026",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2026-07-16",
+      "rama": "SOCIETARIO",
+      "tema": "Reuniones no presenciales de asamblea en S.A.S.: firma del acta y ausencia del representante legal",
+      "pregunta": "Si en una reunión virtual de asamblea de una S.A.S. el representante legal no se conecta o se desconecta antes de terminar, ¿son válidas la reunión y sus decisiones? ¿Puede el acta firmarla un accionista designado, o el presidente y el secretario de la reunión, en lugar del representante legal?",
+      "tesis": "La reunión no presencial y sus decisiones son válidas cuando todos los socios puedan deliberar y decidir por comunicación simultánea o sucesiva, en los términos del artículo 19 de la Ley 222 de 1995 y del Decreto 398 de 2020; la ausencia del representante legal no las invalida. Pero la firma del acta es cosa distinta: el artículo 21 de la Ley 222 de 1995 exige la firma del representante legal y del secretario, y solo permite sustituir al secretario por un asociado, no al representante legal. Ningún accionista, presidente o comisión aprobatoria puede reemplazar esa firma. La salida práctica es que firme un suplente del representante legal, y la advertencia operativa es que la cámara de comercio puede abstenerse de inscribir el acta que carezca de esa firma.",
+      "cita_verbatim": "\"la norma contempla la sustitución del secretario de la sociedad por un asociado para la suscripción del acta, más no la del representante legal, por lo cual un accionista no podría reemplazar la firma de aquel cuando se trate de un acta de reunión no presencial reglada por el artículo 21 de la Ley 222 de 1995.\"",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Sin marca de vigencia. Verificado por tema y fecha sobre el índice completo del repositorio oficial (carpeta 107391/159040): entre los 195 oficios cuyo asunto menciona asamblea, el 220-315232 de 16 de julio de 2026 es el más reciente sobre reuniones no presenciales, y reitera expresamente el Oficio 220-083832 anterior, sin apartarse de él. https://www.supersociedades.gov.co/api/jsonws/dlapp/get-file-entries/repository-id/107391/folder-id/159040",
+      "source_url": "https://www.supersociedades.gov.co/documents/107391/159040/OFICIO%20220-315232%20DEL%2016%20DE%20JULIO%20DE%202026.pdf/889363e9-bb69-f949-16ad-c80407dbb152?version=1.0"
+    },
+    {
+      "numero": "Oficio 220-282194 de 2026",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2026-05-06",
+      "rama": "SOCIETARIO",
+      "tema": "Capitalización de utilidades frente a nuevos aportes, y reserva para readquisición de acciones",
+      "pregunta": "¿Debe una sociedad capitalizar primero sus utilidades acumuladas antes de aumentar capital con nuevos aportes? ¿Y para constituir una reserva destinada a readquirir acciones debe distribuirse antes la utilidad?",
+      "tesis": "La ley no fija prelación entre capitalizar utilidades y aumentar el capital con nuevos aportes: ambas decisiones son autónomas y corresponden a la voluntad del máximo órgano social según criterios de conveniencia empresarial. Del mismo modo, la constitución de una reserva para readquirir acciones no exige distribución previa de utilidades: la sociedad puede apropiarlas directamente a una reserva específica. La colocación de acciones propias readquiridas no supone nueva emisión, ni modifica el capital social, ni es operación de patrimonio.",
+      "cita_verbatim": "\"Al respecto, la ley no establece una prelación frente a capitalizar utilidades y realizar aumentos de capital con nuevos aportes. Ambas decisiones son autónomas y dependen de la voluntad del máximo órgano social según criterios de conveniencia empresarial.\"",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Sin marca de vigencia. Verificado por tema y fecha sobre el índice completo del repositorio oficial (carpeta 107391/159040): entre los 540 oficios cuyo asunto menciona capital, el 220-282194 de 6 de mayo de 2026 es el más reciente sobre capital social y utilidades (los posteriores de 2026 tratan capital de sucursales extranjeras y régimen cambiario, no este punto). El oficio reitera y transcribe el 220-015899 de 2019, sin apartarse de él. https://www.supersociedades.gov.co/api/jsonws/dlapp/get-file-entries/repository-id/107391/folder-id/159040",
+      "source_url": "https://www.supersociedades.gov.co/documents/107391/159040/OFICIO%20220-282194%20%20DEL%2006%20DE%20MAYO%20DE%202026.pdf/76368b4e-673a-6c6d-ccc8-81dad0400eaf?version=1.0"
+    },
+    {
+      "numero": "Oficio 220-235904 de 2026",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2026-02-20",
+      "rama": "SOCIETARIO",
+      "tema": "Reforma estatutaria cuando una cláusula de los estatutos contraviene una norma superior",
+      "pregunta": "Si los estatutos contravienen un decreto, ¿es necesaria una reforma estatutaria para ajustar la disposición, o se entiende derogada tácitamente? ¿Puede un socio o miembro de junta directiva exigir que se aplique la cláusula contraria a la norma? Y de no requerirse reforma, ¿debe registrarse el acto ante la cámara de comercio?",
+      "tesis": "Todas las sociedades, cualquiera sea su objeto, están sometidas a la legislación mercantil (art. 100 del Código de Comercio, según el art. 1 de la Ley 222 de 1995). La cláusula estatutaria contraria a norma imperativa no se depura sola por derogatoria tácita: encaja en el artículo 899 del Código de Comercio y puede ser demandada para que se declare su nulidad absoluta, sin perjuicio de que la ley prevea otro efecto en cada caso. Las reformas estatutarias, además de solemnizarse, deben inscribirse en el registro mercantil del domicilio social (num. 9 del art. 28 del Código de Comercio); sin ese requisito la reforma no produce efecto alguno frente a terceros, aunque produce efectos entre los asociados desde que se acuerda conforme a los estatutos.",
+      "cita_verbatim": "\"Por lo tanto, posiblemente si el contrato social, es decir, los estatutos, contemplan alguna disposición contraria a la ley, esta podría ser objeto de una demanda con el fin de que se declare su nulidad absoluta en los términos antes anotados. Sin embargo, deberá revisarse cada caso particular a fin de determinar si normativamente se contempla otro efecto.\"",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Sin marca de vigencia. Verificado por tema y fecha sobre el índice completo del repositorio oficial (carpeta 107391/159040): entre los 154 oficios cuyo asunto menciona materia estatutaria, el más reciente rotulado exactamente 'REFORMAS ESTATUTARIAS' es el 220-235904 de 20 de febrero de 2026; el único posterior (220-243308 de 3 de marzo de 2026) trata de estados financieros extraordinarios para reformas estatutarias, no de este punto. Contrastado con el Tesauro, descriptor 'Reformas estatutarias' (198 conceptos), donde también encabeza la serie. https://tesauro.supersociedades.gov.co/",
+      "source_url": "https://www.supersociedades.gov.co/documents/107391/159040/OFICIO%20220-235904%20DEL%2020%20DE%20FEBRERO%20DE%202026.pdf/109fd5ed-bf37-26e2-ff42-0885e72b7bd5?version=1.0"
+    },
+    {
+      "numero": "Oficio 220-218157 de 2026",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2026-01-19",
+      "rama": "SOCIETARIO",
+      "tema": "Término de duración de la sociedad: improcedencia de la cláusula de prórroga automática",
+      "pregunta": "¿Es jurídicamente válida en Colombia una cláusula estatutaria de prórroga automática del término de duración en una sociedad anónima? ¿Y puede presumirse la continuidad de la sociedad mientras esa cláusula esté inscrita en el registro mercantil?",
+      "tesis": "No. Por disposición legal el término de duración debe ser preciso y determinado (num. 9 del art. 110 del Código de Comercio), de modo que no es de recibo una cláusula de prórroga automática, porque conduciría a una duración indefinida. La consecuencia es dura y es la que le interesa al cliente: conforme al numeral 1 del artículo 218 y al artículo 219, vencido el término sin prórroga válida anterior a su expiración, la disolución se produce entre los asociados y frente a terceros desde la fecha de expiración, sin necesidad de formalidad alguna. La excepción es la sociedad por acciones simplificada, cuya duración sí puede ser indefinida por el numeral 4 del artículo 5 de la Ley 1258 de 2008.",
+      "cita_verbatim": "\"por disposición de la ley el término de duración de la sociedad debe ser preciso y determinado en el tiempo, por lo cual no es de recibo la inclusión de una cláusula estatutaria de prórroga automática del mismo, toda vez que la aplicación de esta resultaría en un término de duración de la sociedad por un periodo indefinido en el tiempo. Lo anterior, sin perjuicio de lo dispuesto en el numeral 4 del artículo 5 de la Ley 1258 de 2008 para las sociedades por acciones simplificadas, pues esta duración puede ser indefinida.\"",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Sin marca de vigencia. Verificado por tema y fecha sobre el índice completo del repositorio oficial (carpeta 107391/159040): no existe oficio posterior al 19 de enero de 2026 sobre término de duración o prórroga del término. Contrastado con el Tesauro, descriptor 'Reformas estatutarias', donde figura como 220-218157 con fecha 19 de enero de 2026 y sin pronunciamiento posterior sobre el mismo problema jurídico. https://tesauro.supersociedades.gov.co/",
+      "source_url": "https://www.supersociedades.gov.co/documents/107391/159040/OFICIO%20220-218157%20DE%2019%20DE%20ENERO%20DE%202026.pdf.pdf/40f58879-9831-64f6-538b-39e65d4ab113?version=1.0"
+    },
+    {
+      "numero": "Oficio 220-130398 de 2025",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2025-09-25",
+      "rama": "SOCIETARIO",
+      "tema": "Conflicto de intereses de los administradores por parentesco con el representante legal",
+      "pregunta": "En una junta directiva cuyos miembros son parientes del representante legal, ¿hay conflicto de intereses al fijar su salario, sus metas e indicadores y sus bonos? De haberlo, ¿basta la abstención de los parientes en segundo grado, o deben las decisiones subir a la asamblea general de accionistas?",
+      "tesis": "La materia está reglada por el Decreto 046 de 2024, que sustituyó el Capítulo 3 del Título 2 de la Parte 2 del Libro 2 del Decreto 1074 de 2015 y reglamentó el numeral 7 del artículo 23 de la Ley 222 de 1995. El conflicto de intereses no se define por el parentesco en sí, sino por la existencia de un interés directo o indirecto que pueda comprometer el criterio o la independencia del administrador al decidir en el mejor interés de la sociedad, y la enumeración de supuestos del reglamento es enunciativa y no limitativa. La Superintendencia responde en abstracto: advierte expresamente que el concepto no resuelve situaciones particulares, no es vinculante y no compromete su responsabilidad.",
+      "cita_verbatim": "\"ARTÍCULO 2.2.2.3.1. Alcance del conflicto de intereses. Habrá conflicto de intereses en el marco de lo dispuesto en el numeral 7 del artículo 23 de la Ley 222 de 1995, de forma enunciativa y no limitativa, cuando exista, por parte del administrador un interés directo o indirecto que pueda comprometer su criterio o independencia en la toma de decisiones en el mejor interés de la sociedad, en lo relativo a uno o varios actos, en los que sea parte o esté involucrada la sociedad en la que dicho administrador ejerce sus funciones.\"",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Sin marca de vigencia. Verificado por tema y fecha en los dos repositorios oficiales: (1) el índice del repositorio documental de conceptos (carpeta 107391/159040) arroja 60 oficios cuyo asunto menciona conflicto de intereses, y el 220-130398 de 25 de septiembre de 2025 es el más reciente; (2) el Tesauro (https://tesauro.supersociedades.gov.co/), descriptor principal 'Administradores' con la frase 'conflicto de interés', devuelve 59 conceptos, y el único posterior es el 220-149794 de 21 de octubre de 2025, que versa sobre enajenación de acciones y no sobre el alcance del conflicto de intereses. No se halló pronunciamiento posterior que rectifique la tesis.",
+      "source_url": "https://www.supersociedades.gov.co/documents/107391/159040/OFICIO%20220-130398%20DE%2025%20DE%20SEPTIEMBRE%20%20DE%202025.pdf/b865c3f5-c659-82fc-36b7-300c047fd1ab?version=1.1"
+    },
+    {
+      "numero": "Oficio 220-152943 de 2023",
+      "tipo_documento": "CONCEPTO",
+      "fecha": "2023-08-02",
+      "rama": "SOCIETARIO",
+      "tema": "Grupo empresarial, matrices y subordinadas: responsabilidad subsidiaria de la matriz en insolvencia",
+      "pregunta": "¿Puede una subordinada determinar la unidad de propósito y dirección del grupo? ¿Puede una matriz serlo de más de un grupo empresarial? Y si la declaratoria de grupo empresarial se produce después de iniciado el proceso de reorganización, ¿responde igualmente la matriz de forma subsidiaria conforme al artículo 61 de la Ley 1116 de 2006?",
+      "tesis": "La unidad de propósito y dirección la determina en principio la matriz o controlante, porque es quien ejerce el poder de decisión sobre las subordinadas; una misma matriz puede encabezar varios grupos empresariales siempre que concurran los presupuestos del artículo 28 de la Ley 222 de 1995. Las presunciones de subordinación del artículo 261 del Código de Comercio no son taxativas y son legales, luego admiten prueba en contrario: lo determinante es la realidad del control. La responsabilidad subsidiaria del artículo 61 de la Ley 1116 de 2006 exige que la situación de control sea previa a la apertura del concurso y a los hechos que causaron la crisis, y que se demuestre que la subordinada no puede atender sus obligaciones; opera como presunción a menos que la matriz demuestre otra causa, y la acción, que conoce el juez del concurso por procedimiento abreviado, tiene caducidad de cuatro años.",
+      "cita_verbatim": "\"la responsabilidad que nos ocupa, sólo aplica para el caso de la situación de control societario y requiere que la misma sea previa a la apertura del proceso concursal, y a los hechos que dieron lugar a la crisis presentada. […] para que se dé la responsabilidad subsidiaria, es necesario demostrar que la sociedad subordinada no está en condiciones de atender las obligaciones a su cargo, con el consiguiente perjuicio económico para los acreedores.\"",
+      "vigente": true,
+      "como_se_confirmo_la_vigencia": "Sin marca de vigencia. Verificado por tema y fecha sobre el índice completo del repositorio oficial (carpeta 107391/159040): entre los 43 oficios cuyo asunto menciona subordinadas y los 105 que mencionan grupo empresarial, el 220-152943 de 2 de agosto de 2023 sigue siendo el más reciente que trata la responsabilidad subsidiaria de la matriz del artículo 61 de la Ley 1116 de 2006 (los posteriores de 2025 y 2026 tratan inscripción de situaciones de control, vigilancia y SAGRILAFT). Contrastado con el Tesauro, descriptor 'Matriz' (202 conceptos), sin pronunciamiento posterior sobre este problema jurídico. https://tesauro.supersociedades.gov.co/",
+      "source_url": "https://www.supersociedades.gov.co/documents/107391/159040/OFICIO%20%20%20%20220-%20152943%20%20%20%2002%20DE%20AGOSTO%20DE%202023.pdf/0c758dda-e919-8740-488c-c88517eeeefe?version=1.0"
+    }
+  ],
+  "descartados": [
+    {
+      "numero": "Circular Básica Jurídica 100-000008 de 2022 y Circular Externa 100-000020 de 2 de julio de 2026",
+      "razon": "No son conceptos sino instrucciones de obligatorio cumplimiento para los vigilados. Aparecen citadas dentro de los oficios recogidos (el 220-317010 se apoya en los numerales 7.1 y 7.2 del capítulo de liquidación voluntaria de la Circular Básica Jurídica) y podrían confundirse con doctrina. La propia entidad las enumera aparte de 'los conceptos que la misma emite' en el cierre de cada oficio."
+    },
+    {
+      "numero": "Sentencias de la Delegatura de Procedimientos Mercantiles indexadas en el Tesauro",
+      "razon": "El Tesauro cataloga bajo la misma interfaz cuatro tipos de contenido, comprobados por agregación sobre su índice: 'Conceptos jurídicos' (12.975), 'Sentencia procedimiento mercantil' (1.209), 'Sentencia en audiencia oral' (271) y 'Temas y problemas' (209). Los 1.480 registros de sentencia son ejercicio de función jurisdiccional, no doctrina consultiva: no tienen el alcance del artículo 28 del CPACA y no pueden entrar al corpus de conceptos."
+    },
+    {
+      "numero": "Oficios de la serie 115- (Grupo de Asuntos Contables), p. ej. 115-177167 de 18 de noviembre de 2025",
+      "razon": "No fueron recogidos: viven en otra carpeta documental (107391/159044) y responden consultas contables, no jurídicas. Se deja constancia porque el Oficio 220-317010 los cita y su numeración se parece a la de la serie 220-."
+    }
+  ]
+}
