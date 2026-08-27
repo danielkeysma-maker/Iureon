@@ -14,6 +14,9 @@ import { INTERNACIONAL_CATALOG } from './internacional';
 import { SUPERINTENDENCIAS_CATALOG } from './superintendencias';
 import { AGRARIO_CATALOG } from './agrario';
 import { ADUANERO_CATALOG } from './aduanero';
+import { PROPIEDAD_INTELECTUAL_CATALOG } from './propiedad-intelectual';
+import { POLICIVO_CATALOG } from './policivo';
+import { DISCIPLINARIO_CATALOG } from './disciplinario';
 
 /**
  * Every branch catalogue the product ships with.
@@ -37,5 +40,8 @@ export const ALL_CATALOGS: BranchCatalog[] = [
   INTERNACIONAL_CATALOG,
   SUPERINTENDENCIAS_CATALOG,
   AGRARIO_CATALOG,
-  ADUANERO_CATALOG
+  ADUANERO_CATALOG,
+  PROPIEDAD_INTELECTUAL_CATALOG,
+  POLICIVO_CATALOG,
+  DISCIPLINARIO_CATALOG
 ];

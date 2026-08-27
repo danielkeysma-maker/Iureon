@@ -22,7 +22,10 @@ export type LegalBranch =
   | 'SUPERINTENDENCIAS'
   | 'INTERNACIONAL'
   | 'AGRARIO'
-  | 'ADUANERO';
+  | 'ADUANERO'
+  | 'PROPIEDAD_INTELECTUAL'
+  | 'POLICIVO'
+  | 'DISCIPLINARIO';
 
 /** Who authors the document. */
 /**

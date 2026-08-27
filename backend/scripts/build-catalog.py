@@ -123,6 +123,27 @@ BRANCHES = [
         'ADUANERO',
         'aduanero',
     ),
+    (
+        'actuaciones-propiedad-intelectual.json',
+        'propiedad-intelectual.ts',
+        'PROPIEDAD_INTELECTUAL_CATALOG',
+        'PROPIEDAD_INTELECTUAL',
+        'propiedad_intelectual',
+    ),
+    (
+        'actuaciones-policivo.json',
+        'policivo.ts',
+        'POLICIVO_CATALOG',
+        'POLICIVO',
+        'policivo',
+    ),
+    (
+        'actuaciones-disciplinario.json',
+        'disciplinario.ts',
+        'DISCIPLINARIO_CATALOG',
+        'DISCIPLINARIO',
+        'disciplinario',
+    ),
 ]
 
 

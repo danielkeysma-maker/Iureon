@@ -27,6 +27,9 @@ export const BRANCH_LABELS: Record<string, string> = {
   // the Procedimiento Unico of Decreto Ley 902 de 2017, before the ANT.
   AGRARIO: 'Agrario & Ordenamiento Rural (ANT)',
   ADUANERO: 'Aduanero & Comercio Exterior (DIAN)',
+  PROPIEDAD_INTELECTUAL: 'Propiedad Intelectual (SIC & DNDA)',
+  POLICIVO: 'Policivo & Convivencia (Ley 1801)',
+  DISCIPLINARIO: 'Disciplinario (Servidores & Abogados)',
   // Not catalogued: kept so its legacy document types remain reachable.
   'PEQUEÑAS_CAUSAS': 'Pequeñas Causas (Mínima Cuantía)'
 };

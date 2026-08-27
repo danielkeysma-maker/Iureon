@@ -1,0 +1,1466 @@
+{
+  "_meta": {
+    "branch": "POLICIVO",
+    "verified_at": "2026-08-26",
+    "source_of_truth": "Ley 1801 de 2016, Codigo Nacional de Seguridad y Convivencia Ciudadana, Libro Tercero (arts. 213 a 234), con el proceso verbal abreviado del art. 223 y el verbal inmediato del art. 224 vigentes; el 223 fue adicionado — no sustituido — por el 223A de la Ley 2197 de 2022 art. 47. La C-223 de 2017 declaro inexequibles el Titulo VI del Libro Segundo (arts. 47 a 75, aglomeraciones y derecho de reunion) y el art. 162, con efectos diferidos ya vencidos: hoy no rigen. La Ley 2492 de 2025 renombro a los Inspectores de Policia como Inspectores de Convivencia y Paz y reescribio el art. 206; la Ley 2450 de 2025 art. 19 reescribio el art. 180. Esta rama NO cubre las medidas de proteccion por violencia intrafamiliar: la Ley 2126 de 2021 hace de las comisarias de familia entidades administrativas con funciones jurisdiccionales, el comisario no figura entre las autoridades de policia del art. 198, y el tramite es administrativo especial.",
+    "gaps": [
+      "POLICIVO: MEDIDAS DE PROTECCIÓN POR VIOLENCIA INTRAFAMILIAR ANTE COMISARÍA DE FAMILIA. No se catalogan en POLICIVO. Verificado en la Ley 2126 de 2021, art. 3: las Comisarías de Familia son \"dependencias o entidades de carácter administrativo e interdisciplinario del orden municipal o distrital, con funciones administrativas y jurisdiccionales\", y su art. 15 remite las medidas a la Ley 294 de 1996, la Ley 575 de 2000 y la Ley 1257 de 2008. El comisario no es autoridad de policía del art. 198 de la Ley 1801 y el trámite no es el proceso único de policía de los arts. 213 a 234: es un procedimiento administrativo especial. Además, la ficha LITIGANTE ya existe en FAMILIA y duplicarla haría ambiguo el exact_name. La cara DESPACHO —resolución de medida de protección del comisario— corresponde a una rama de autoridades administrativas de familia, aún no catalogada, que debería construirse sobre la Ley 2126 de 2021 y no sobre la Ley 1801.",
+      "POLICIVO: AUTO QUE AVOCA CONOCIMIENTO. No existe en la Ley 1801 de 2016. El proceso verbal abreviado no tiene auto admisorio ni auto que avoque: el art. 223 num. 1 regula la \"Iniciación de la acción\" de oficio o a petición de parte, y el acto escrito siguiente es la citación a audiencia del num. 2. Se catalogó en su lugar el \"Auto de citación a audiencia pública en proceso verbal abreviado\", que sí tiene término propio de cinco días.",
+      "POLICIVO: AUTO DE ARCHIVO. No existe en la Ley 1801 de 2016; la palabra no aparece con ese sentido en ninguno de los 243 artículos. Lo más próximo es el deber del inspector de \"abstenerse de iniciar proceso único de policía y actualizar el estado de cumplimiento de la medida correctiva en el Registro Nacional de Medidas Correctivas\" cuando hay aceptación ficta de responsabilidad (art. 223A lit. d), que no es una providencia de archivo ni tiene término. No se cataloga para no inventar una figura.",
+      "POLICIVO: SILENCIO ADMINISTRATIVO. La expresión no aparece en ninguno de los 243 artículos de la Ley 1801 de 2016. Lo más cercano es el art. 203 inc. 2, que permite al gobernador asumir la competencia cuando el alcalde \"no se pronuncie dentro de los términos establecidos en las normas que para tal fin expida el Gobierno nacional\", lo que es una asunción de competencia y no un silencio positivo ni negativo. El silencio administrativo positivo por recurso no resuelto ya está catalogado en TRANSITO bajo la Ley 769 de 2002 y no se replica aquí.",
+      "POLICIVO: ROL SECRETARIA. La Ley 1801 de 2016 no regula actos de secretaría: el proceso único de policía es oral, la decisión \"quedará notificada en estrados\" (art. 223 num. 3 lit. d) y los recursos \"se solicitarán, concederán y sustentarán dentro de la misma audiencia\" (num. 4). No hay estados, traslados en secretaría ni constancias de ejecutoria regulados por el Código. Ninguna ficha SECRETARIA se catalogó, porque construirlas exigiría trasladar el CGP a un procedimiento que no lo recibe.",
+      "POLICIVO: PERMISO PARA MANIFESTACIÓN PÚBLICA, AUTORIZACIÓN DE AGLOMERACIONES DE PÚBLICO, PLANES DE EMERGENCIA Y CONTINGENCIA Y ESPECTÁCULOS TAURINOS. No se catalogan: el Título VI del Libro Segundo y sus arts. 47 a 75 fueron declarados INEXEQUIBLES por la Sentencia C-223 de 20 de abril de 2017, con efectos diferidos \"hasta antes del 20 de junio de 2019\". El plazo venció y son figuras abolidas.",
+      "POLICIVO: ORDEN ESCRITA DE INGRESO A INMUEBLE (MANDAMIENTO DE REGISTRO DE DOMICILIO). No se cataloga: el art. 162 de la Ley 1801 fue declarado INEXEQUIBLE por la Sentencia C-223 de 2017, con efectos diferidos ya vencidos, y el num. 8 del art. 149, que lo listaba como medio material de policía, también es INEXEQUIBLE. Subsiste únicamente el ingreso a inmueble SIN orden escrita del art. 163, que es una actuación material y no un documento firmado.",
+      "POLICIVO: PROCEDIMIENTO SANCIONATORIO POR INFRACCIÓN URBANÍSTICA. Se catalogó únicamente lo común —recursos, efecto suspensivo de la apelación, dosificación—, pero no las actuaciones propias del control urbanístico de los arts. 135 a 138 ni la multa especial del art. 181 num. 2, que se apoyan en la Ley 388 de 1997 y en los planes de ordenamiento territorial y exigen verificación aparte. Se deja constancia del término hallado: la función policial de control urbanístico \"caducará en tres (3) años sólo cuando se trate de: parcelar, urbanizar, intervenir y construir en terrenos aptos para estas actuaciones\" (art. 138).",
+      "POLICIVO: COBRO COACTIVO DE LAS MULTAS. El art. 223 parágrafo 3 y los arts. 182 y 185 remiten a \"la vía de la jurisdicción coactiva\", cuyo procedimiento no lo regula la Ley 1801 sino el CPACA y el Estatuto Tributario. Corresponde a ADMINISTRATIVO y no se duplica aquí.",
+      "POLICIVO: AMPARO ADMINISTRATIVO MINERO. El art. 108 de la Ley 1801 permite al titular minero interponer ante el gobernador \"las medidas de amparo administrativo correspondientes\", pero su regulación está en el Código de Minas (Ley 685 de 2001) y no en este Código; no se cataloga sin verificar esa norma.",
+      "POLICIVO: CONCILIACIÓN Y MEDIACIÓN EN CONVIVENCIA. Los arts. 231 a 234, modificados por los arts. 73 a 76 de la Ley 2220 de 2022, no fijan términos propios: la conciliación \"procederá ante la autoridad de policía que conozca del caso, en cualquier etapa del trámite del procedimiento o en el momento en que se presente el conflicto\" (art. 232). El acta de conciliación \"hará tránsito a cosa juzgada y prestará mérito ejecutivo\", pero su forma la gobierna la Ley 2220 de 2022 y no este Código, por lo que no se catalogó ficha autónoma; la invitación a conciliar sí quedó como sección obligatoria en las fichas de audiencia. Advertencia recogida en el art. 232: no son conciliables los comportamientos contrarios a las normas urbanísticas, ambientales, sanitarias, del espacio público, de la actividad económica, de la libertad de circulación, los que afectan a niños, niñas y adolescentes, el ejercicio de la prostitución y el derecho de reunión.",
+      "POLICIVO: TRASLADO POR PROTECCIÓN Y DEMÁS MEDIOS MATERIALES DE POLICÍA (arts. 149 y 155). Son actuaciones materiales, no documentos que alguien firme como escrito de parte o providencia, y por eso no encajan en el contrato de exact_name del motor de redacción.",
+      "POLICIVO, verificado el esta pasada: PASO 0 — LA RAMA SE JUSTIFICA. (1) ¿EXISTE HOY EL PROCEDIMIENTO? Sí: es el PROCESO ÚNICO DE POLICÍA del Libro Tercero de la Ley 1801 de 2016 (Código Nacional de Seguridad y Convivencia Ciudadana), arts. 213 a 234, con dos clases de actuación (art. 221): el proceso verbal inmediato (art. 222) y el proceso verbal abreviado (art. 223). El texto se leyó artículo por artículo descargando el HTML crudo de secretariasenado.gov.co —los cinco archivos de la ley (ley_1801_2016.html y ley_1801_2016_pr001 a pr005.html) y los cinco archivos de notas de vigencia (basedoc/js/ley_1801_2016*.js)—, con corte de actualización del 15 de agosto de 2026 (Diario Oficial No. 53.578 de 5 de agosto de 2026). Se contaron los 243 artículos de la ley: no hay truncamiento. LOS ARTS. 223 Y 224 SIGUEN VIGENTES. El art. 223 conserva íntegro su régimen de cinco etapas y sus cinco parágrafos, y fue ADICIONADO —no sustituido— por el art. 223A, que introdujo el art. 47 de la Ley 2197 de 2022, corregido por el art. 25 del Decreto 207 de 2022, para las multas tipo 1 a 4. El art. 224 conserva su texto original: \"El que desacate, sustraiga u omita el cumplimiento de las decisiones u órdenes de las autoridades de Policía, dispuestas al finalizar el proceso verbal abreviado o inmediato, incurrirá en conducta punible de conformidad con la legislación penal\". REFORMAS VIGENTES QUE UNA RAMA HECHA DE MEMORIA HABRÍA OMITIDO: (a) LEY 2492 DE 23 DE JULIO DE 2025, art. 1, que sustituyó la denominación \"Inspectores de Policía\""
+    ],
+    "unverified": [
+      {
+        "actuacion": "Solicitud de asunción de competencia especial por el gobernador en materia policiva",
+        "reason": "El art. 203 de la Ley 1801 de 2016 no fija plazo alguno en días: remite dos veces a \"los términos establecidos en las normas que para tal fin expida el Gobierno nacional\". El supuesto de hecho, la autoridad competente y el efecto quedaron verificados en el texto oficial; el plazo concreto depende de un reglamento que no se localizó en fuente oficial y debe consultarse antes de radicar."
+      }
+    ]
+  },
+  "actuaciones": [
+    {
+      "exact_name": "Querella policiva por perturbación a la posesión o mera tenencia de bien inmueble",
+      "area": "POLICIVO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1801 de 2016, art. 77 (comportamientos contrarios a la posesión y mera tenencia); art. 79 (legitimación para instaurar querella ante el inspector); art. 80 parágrafo (caducidad de la acción); art. 190 (medida correctiva de restitución y protección de bienes inmuebles); art. 216 (factor de competencia); art. 223 (trámite del proceso verbal abreviado); art. 206 num. 5 lit. e, modificado por el art. 6 de la Ley 2492 de 2025 (competencia en primera instancia)",
+      "competent_authority": "Inspector de Convivencia y Paz (denominación vigente: el art. 1 de la Ley 2492 de 23 de julio de 2025 sustituyó \"Inspectores de Policía\" por \"Inspectores de Convivencia y Paz\", y su art. 6 reescribió el art. 206 de la Ley 1801 de 2016) del lugar donde sucedieron los hechos (art. 216)",
+      "term": "RELOJ DEL QUERELLANTE, Y ES EL QUE MATA EL DERECHO: \"La acción policial de protección a la posesión, la mera tenencia y servidumbres de los inmuebles de los particulares, caducará dentro de los cuatro (4) meses siguientes a la perturbación por ocupación ilegal\" (art. 80 parágrafo). Vencidos los cuatro meses no queda acción policiva y solo resta la vía judicial civil. OJO CON LA REGLA CONTRARIA: si la perturbación recae sobre bienes de uso público, fiscales, zonas de reserva forestal, bienes privados afectados al espacio público, de empresas de servicios públicos, o declarados de utilidad pública o de interés social, cultural, arquitectónico o histórico, \"no existe caducidad de la acción policiva\" (art. 226 inc. 1). RELOJ DE LA AUTORIDAD, que no releva al querellante del suyo: la autoridad cita a audiencia pública \"a los cinco (5) días siguientes de conocida la querella\" (art. 223 num. 2); si conoce en flagrancia puede iniciar de inmediato la audiencia (art. 223 num. 1). RELOJ DENTRO DE LA AUDIENCIA: cada parte tiene un máximo de veinte (20) minutos para exponer argumentos y pruebas (art. 223 num. 3 lit. a); las pruebas adicionales se practican en un término máximo de cinco (5) días y la audiencia se reanuda al día siguiente al vencimiento (lit. c). SI EL PRESUNTO INFRACTOR NO ASISTE la autoridad tiene por ciertos los hechos (art. 223 parágrafo 1), parte que la Corte Constitucional declaró CONDICIONALMENTE EXEQUIBLE en la Sentencia C-349 de 25 de mayo de 2017 \"en el entendido que en caso de inasistencia a la audiencia, el procedimiento se suspenderá por un término máximo de tres (3) días, dentro de los cuales el presunto infractor deberá aportar prueba siquiera sumaria de una justa causa de inasistencia\". EJECUCIÓN: \"Una vez ejecutoriada la decisión que contenga una orden de Policía o una medida correctiva, esta se cumplirá en un término máximo de cinco (5) días\" (art. 223 num. 5), y tratándose de ocupación de hecho \"El desalojo se deberá efectuar dentro de las veinticuatro (24) horas siguientes a la orden\" (art. 79 parágrafo 1). NATURALEZA PRECARIA, que el cliente debe conocer antes de querellar: el amparo \"es una medida de carácter precario y provisional, de efecto inmediato, cuya única finalidad, es mantener el statu quo mientras el juez ordinario competente decide definitivamente sobre la titularidad de los derechos reales en controversia\" (art. 80 inc. 1); la querella policiva no sustituye el proceso civil de pertenencia ni el de restitución de inmueble arrendado.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Designación de la autoridad de policía a quien se dirige",
+          "mandatory": true,
+          "basis": "Art. 79"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del querellante y prueba de su calidad de poseedor o mero tenedor, o del apoderado o representante legal",
+          "mandatory": true,
+          "basis": "Art. 79 nums. 1 y 3"
+        },
+        {
+          "n": 3,
+          "name": "Identificación e individualización del presunto infractor o perturbador",
+          "mandatory": true,
+          "basis": "Art. 223 num. 1"
+        },
+        {
+          "n": 4,
+          "name": "Identificación y ubicación del inmueble objeto de la perturbación",
+          "mandatory": true,
+          "basis": "Art. 77"
+        },
+        {
+          "n": 5,
+          "name": "Relato de los hechos de perturbación con la FECHA EXACTA de la ocupación ilegal, de la que corren los cuatro meses de caducidad",
+          "mandatory": true,
+          "basis": "Art. 80 parágrafo"
+        },
+        {
+          "n": 6,
+          "name": "Encuadramiento del comportamiento en uno de los numerales del art. 77",
+          "mandatory": true,
+          "basis": "Art. 77"
+        },
+        {
+          "n": 7,
+          "name": "Petición de la medida correctiva de restitución y protección del bien inmueble y, si procede, de reparación de daños materiales",
+          "mandatory": true,
+          "basis": "Arts. 188 y 190"
+        },
+        {
+          "n": 8,
+          "name": "Solicitud de inspección al lugar de los hechos y demás pruebas",
+          "mandatory": false,
+          "basis": "Arts. 217 y 223 parágrafo 2"
+        },
+        {
+          "n": 9,
+          "name": "Pruebas que se aportan y las que se solicitan",
+          "mandatory": true,
+          "basis": "Art. 217"
+        },
+        {
+          "n": 10,
+          "name": "Indicación del propietario inscrito, para su comunicación",
+          "mandatory": false,
+          "basis": "Art. 79 parágrafo 2"
+        },
+        {
+          "n": 11,
+          "name": "Dirección de notificaciones y medio electrónico para citaciones",
+          "mandatory": true,
+          "basis": "Art. 223 num. 2"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1801_2016_pr001.html"
+    },
+    {
+      "exact_name": "Querella policiva por perturbación al derecho de servidumbre",
+      "area": "POLICIVO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1801 de 2016, art. 78 (comportamientos contrarios al derecho de servidumbre); art. 79 (legitimación); art. 80 parágrafo (caducidad); art. 189 (medida correctiva de restablecimiento del derecho de servidumbre y reparación de daños materiales); art. 216 (factor de competencia); art. 223 (trámite); art. 206 num. 5 lit. f, modificado por el art. 6 de la Ley 2492 de 2025",
+      "competent_authority": "Inspector de Convivencia y Paz (denominación vigente: el art. 1 de la Ley 2492 de 23 de julio de 2025 sustituyó \"Inspectores de Policía\" por \"Inspectores de Convivencia y Paz\", y su art. 6 reescribió el art. 206 de la Ley 1801 de 2016) del lugar donde sucedieron los hechos (art. 216)",
+      "term": "RELOJ DEL QUERELLANTE: la caducidad de cuatro (4) meses del art. 80 parágrafo cubre expresamente las servidumbres — \"La acción policial de protección a la posesión, la mera tenencia y servidumbres de los inmuebles de los particulares, caducará dentro de los cuatro (4) meses siguientes a la perturbación por ocupación ilegal\". El término se cuenta desde el acto de perturbación, no desde que el querellante decide reclamar. RELOJ DE LA AUTORIDAD: citación a audiencia dentro de los cinco (5) días siguientes a conocida la querella (art. 223 num. 2); pruebas adicionales en máximo cinco (5) días (art. 223 num. 3 lit. c); cumplimiento de la medida en máximo cinco (5) días desde la ejecutoria (art. 223 num. 5). LÍMITE SUSTANCIAL QUE DECIDE LA VIABILIDAD: la medida solo consiste en \"permitir en el predio sirviente, el uso de la servidumbre señalada en escritura pública a que tiene derecho y si se causaron daños naturales repararlos a su costa\" (art. 189): sin escritura pública que constituya la servidumbre la vía policiva no prospera y el asunto es del juez civil. Si el comportamiento es no permitir el acceso al predio sirviente para mantenimiento o reparación, la medida correctiva es multa general tipo 2 (art. 78 parágrafo), no el restablecimiento.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Designación de la autoridad de policía a quien se dirige",
+          "mandatory": true,
+          "basis": "Art. 79"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del querellante titular del predio dominante",
+          "mandatory": true,
+          "basis": "Art. 79 num. 1"
+        },
+        {
+          "n": 3,
+          "name": "Identificación del presunto infractor y del predio sirviente",
+          "mandatory": true,
+          "basis": "Art. 78"
+        },
+        {
+          "n": 4,
+          "name": "Escritura pública que constituye la servidumbre y su registro",
+          "mandatory": true,
+          "basis": "Art. 189"
+        },
+        {
+          "n": 5,
+          "name": "Relato de los hechos con la fecha de la perturbación",
+          "mandatory": true,
+          "basis": "Art. 80 parágrafo"
+        },
+        {
+          "n": 6,
+          "name": "Encuadramiento en el numeral 1 o 2 del art. 78",
+          "mandatory": true,
+          "basis": "Art. 78"
+        },
+        {
+          "n": 7,
+          "name": "Petición de restablecimiento del derecho de servidumbre y reparación de daños",
+          "mandatory": true,
+          "basis": "Art. 189"
+        },
+        {
+          "n": 8,
+          "name": "Pruebas que se aportan y que se solicitan, incluida la inspección al lugar",
+          "mandatory": true,
+          "basis": "Arts. 217 y 223 parágrafo 2"
+        },
+        {
+          "n": 9,
+          "name": "Dirección de notificaciones",
+          "mandatory": true,
+          "basis": "Art. 223 num. 2"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1801_2016_pr001.html"
+    },
+    {
+      "exact_name": "Querella de amparo al domicilio",
+      "area": "POLICIVO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1801 de 2016, art. 82 (derecho a la protección del domicilio); art. 216 (factor de competencia); art. 223 (trámite del proceso verbal abreviado)",
+      "competent_authority": "Inspector de Convivencia y Paz (denominación vigente: el art. 1 de la Ley 2492 de 23 de julio de 2025 sustituyó \"Inspectores de Policía\" por \"Inspectores de Convivencia y Paz\", y su art. 6 reescribió el art. 206 de la Ley 1801 de 2016) del lugar donde sucedieron los hechos (art. 216)",
+      "term": "NO HAY CADUCIDAD PROPIA Y ESE ES EL PUNTO: la caducidad de cuatro (4) meses del art. 80 parágrafo está escrita para \"la posesión, la mera tenencia y servidumbres\" y no menciona el domicilio, de modo que no puede trasladarse a esta acción; pero tampoco existe norma que la declare imprescriptible, por lo que conviene instaurarla de inmediato y, si el supuesto de hecho también configura perturbación a la posesión o la tenencia (art. 77), el querellante queda igualmente atado a los cuatro meses de esa vía. RELOJES DEL TRÁMITE: citación a audiencia pública dentro de los cinco (5) días siguientes a conocida la querella (art. 223 num. 2); veinte (20) minutos por parte para argumentos y pruebas (art. 223 num. 3 lit. a); pruebas adicionales en máximo cinco (5) días (lit. c); recursos de reposición y en subsidio apelación que \"se solicitarán, concederán y sustentarán dentro de la misma audiencia\" (art. 223 num. 4); cumplimiento de la orden en máximo cinco (5) días desde la ejecutoria (num. 5). EFECTO: \"La protección del domicilio es una medida de efecto inmediato, cuya única finalidad es mantener el statu quo, mientras el juez ordinario competente decide definitivamente sobre los derechos en controversia\" (art. 82 inc. 2), y \"deberá ser reportada a la oficina de registro de instrumentos públicos de la jurisdicción del inmueble\" (parágrafo). ADVERTENCIA DE VIGENCIA: no existe ya la orden escrita de ingreso a inmueble del art. 162, declarada INEXEQUIBLE por la Sentencia C-223 de 20 de abril de 2017, con efectos diferidos hasta antes del 20 de junio de 2019, plazo ya vencido.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Designación de la autoridad de policía a quien se dirige",
+          "mandatory": true,
+          "basis": "Art. 82"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del querellante y prueba de que se encuentra domiciliado en el inmueble",
+          "mandatory": true,
+          "basis": "Art. 82"
+        },
+        {
+          "n": 3,
+          "name": "Identificación del inmueble que constituye el domicilio",
+          "mandatory": true,
+          "basis": "Art. 82"
+        },
+        {
+          "n": 4,
+          "name": "Identificación del presunto perturbador",
+          "mandatory": true,
+          "basis": "Art. 223 num. 1"
+        },
+        {
+          "n": 5,
+          "name": "Relato de los actos de perturbación o alteración ilegal del domicilio, con fechas",
+          "mandatory": true,
+          "basis": "Art. 82"
+        },
+        {
+          "n": 6,
+          "name": "Petición de amparo y de restablecimiento del statu quo físico y jurídico del bien",
+          "mandatory": true,
+          "basis": "Art. 82 parágrafo"
+        },
+        {
+          "n": 7,
+          "name": "Solicitud de reporte de la medida a la oficina de registro de instrumentos públicos",
+          "mandatory": true,
+          "basis": "Art. 82 parágrafo"
+        },
+        {
+          "n": 8,
+          "name": "Pruebas que se aportan y que se solicitan",
+          "mandatory": true,
+          "basis": "Art. 217"
+        },
+        {
+          "n": 9,
+          "name": "Dirección de notificaciones",
+          "mandatory": true,
+          "basis": "Art. 223 num. 2"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1801_2016_pr001.html"
+    },
+    {
+      "exact_name": "Solicitud de expulsión de domicilio",
+      "area": "POLICIVO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1801 de 2016, art. 173 num. 4 (catálogo de medidas correctivas); art. 177 (expulsión de domicilio); art. 206 num. 4 lit. b, modificado por el art. 6 de la Ley 2492 de 2025 (competencia en única instancia); art. 223 y su parágrafo 4 (trámite y ausencia de apelación en única instancia)",
+      "competent_authority": "Inspector de Convivencia y Paz o corregidor, en ÚNICA INSTANCIA (art. 206 num. 4 lit. b, modificado por el art. 6 de la Ley 2492 de 2025), del lugar donde sucedieron los hechos (art. 216)",
+      "term": "EL DATO QUE PIERDE EL CASO NO ES UN PLAZO SINO LA INSTANCIA: la expulsión de domicilio se conoce en ÚNICA INSTANCIA (art. 206 num. 4 lit. b) y, por mandato del art. 223 parágrafo 4, \"El numeral 4 del presente artículo no procederá en los procedimientos de única instancia\", es decir NO hay recurso de apelación; solo cabe reposición en la misma audiencia. El Código no fija caducidad para pedir esta medida. RELOJES DEL TRÁMITE: citación a audiencia pública dentro de los cinco (5) días siguientes a conocida la solicitud (art. 223 num. 2); veinte (20) minutos por parte (num. 3 lit. a); pruebas adicionales en máximo cinco (5) días (lit. c); decisión notificada en estrados al final de la audiencia (lit. d); cumplimiento en máximo cinco (5) días desde la ejecutoria (num. 5). PRESUPUESTOS DE FONDO, que son acumulativos y cuya falta de prueba hunde la solicitud: la medida \"Consiste en expulsar del domicilio por solicitud de su morador, poseedor o tenedor, a quien reside en el mismo, en contra de su voluntad, y que haya ingresado bajo su consentimiento, haya permanecido gratuitamente y no tenga derecho legítimo de permanecer en él\" (art. 177): si hubo pago de canon o cualquier título, la vía es el proceso civil de restitución de inmueble arrendado y no esta.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Designación de la autoridad de policía a quien se dirige",
+          "mandatory": true,
+          "basis": "Art. 206 num. 4"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del solicitante y prueba de su calidad de morador, poseedor o tenedor",
+          "mandatory": true,
+          "basis": "Art. 177"
+        },
+        {
+          "n": 3,
+          "name": "Identificación de la persona cuya expulsión se pide",
+          "mandatory": true,
+          "basis": "Art. 177"
+        },
+        {
+          "n": 4,
+          "name": "Prueba de que el ingreso se dio bajo consentimiento del solicitante",
+          "mandatory": true,
+          "basis": "Art. 177"
+        },
+        {
+          "n": 5,
+          "name": "Prueba de la permanencia gratuita y de la ausencia de título o derecho legítimo de permanencia",
+          "mandatory": true,
+          "basis": "Art. 177"
+        },
+        {
+          "n": 6,
+          "name": "Manifestación de que la permanencia es contra la voluntad del solicitante",
+          "mandatory": true,
+          "basis": "Art. 177"
+        },
+        {
+          "n": 7,
+          "name": "Petición de la medida correctiva de expulsión de domicilio",
+          "mandatory": true,
+          "basis": "Art. 173 num. 4"
+        },
+        {
+          "n": 8,
+          "name": "Pruebas que se aportan y que se solicitan",
+          "mandatory": true,
+          "basis": "Art. 217"
+        },
+        {
+          "n": 9,
+          "name": "Dirección de notificaciones",
+          "mandatory": true,
+          "basis": "Art. 223 num. 2"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1801_2016_pr003.html"
+    },
+    {
+      "exact_name": "Objeción a la orden de comparendo por comportamiento contrario a la convivencia",
+      "area": "POLICIVO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1801 de 2016, art. 180, modificado por el art. 19 de la Ley 2450 de 4 de marzo de 2025 (multas, descuento por pronto pago y objeción); art. 223A, adicionado por el art. 47 de la Ley 2197 de 2022 y corregido por el art. 25 del Decreto 207 de 2022 (procedimiento para multas tipo 1 a 4); art. 218 (definición de orden de comparendo); art. 219 (procedimiento para la imposición de comparendo)",
+      "competent_authority": "Autoridad de policía competente para conocer del comportamiento: Inspector de Convivencia y Paz o corregidor del lugar de los hechos (arts. 206 num. 5 lit. h y 216)",
+      "term": "RELOJ DEL CIUDADANO, DE TRES DÍAS HÁBILES Y NO DE CINCO: \"Si la persona no está de acuerdo con la aplicación de la multa señalada en la orden de comparendo o con el cumplimiento de la medida de participación en programa comunitario o actividad pedagógica de convivencia, cuando este aplique, podrá presentarse dentro de los tres (3) días hábiles siguientes ante la autoridad competente, para objetar la medida mediante el procedimiento establecido en este Código\" (art. 180, modificado por el art. 19 de la Ley 2450 de 2025). El art. 223A lit. b lo confirma como perentorio: \"Vencidos los 3 días hábiles posteriores a la expedición de la orden de comparendo en la que se señale Multa General, sin que se haya objetado; de conformidad con el principio de celeridad, no podrá iniciarse el proceso verbal abreviado, por cuanto se pierde la oportunidad legal\". LOS OTROS DOS RELOJES QUE CORREN AL MISMO TIEMPO Y QUE NO SON EL DE LA OBJECIÓN: (i) cinco (5) días hábiles siguientes a la expedición del comparendo para pagar con descuento del cincuenta por ciento (50%) por pronto pago, o para pedir la conmutación de las multas tipo 1 y 2 por participación en programa comunitario o actividad pedagógica de convivencia (art. 180); (ii) \"No objetada, una vez vencidos los cinco (5) días posteriores a la expedición de la orden, la multa queda en firme, pudiéndose iniciar el cobro coactivo\" (art. 223A lit. e). PRECIO DE OBJETAR, que debe advertirse al cliente: \"Cuando se objete la multa general señalada por el uniformado en la orden de comparendo, se pierde el derecho a los descuentos por pronto pago\" (art. 223A lit. f). ACEPTACIÓN FICTA: pagar dentro de los tres (3) días siguientes a la imposición del comparendo, o cambiar el pago de las multas tipo 1 y 2 por el programa comunitario, se entiende como aceptación de responsabilidad (art. 223A lit. c). CONSECUENCIA DEL NO PAGO: transcurridos seis (6) meses desde la imposición sin pago, operan las inhabilidades del art. 183.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Designación de la autoridad de policía competente",
+          "mandatory": true,
+          "basis": "Art. 180"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del objetante y número de la orden de comparendo, con su fecha de expedición",
+          "mandatory": true,
+          "basis": "Art. 218"
+        },
+        {
+          "n": 3,
+          "name": "Manifestación expresa de que se objeta dentro de los tres (3) días hábiles siguientes",
+          "mandatory": true,
+          "basis": "Art. 180"
+        },
+        {
+          "n": 4,
+          "name": "Razones de hecho por las que no se incurrió en el comportamiento",
+          "mandatory": true,
+          "basis": "Art. 223A lit. a"
+        },
+        {
+          "n": 5,
+          "name": "Razones de derecho, incluida la falta de proporcionalidad, razonabilidad o necesidad de la medida",
+          "mandatory": true,
+          "basis": "Art. 223A lit. a"
+        },
+        {
+          "n": 6,
+          "name": "Pruebas que se aportan y las que se solicitan",
+          "mandatory": true,
+          "basis": "Art. 217"
+        },
+        {
+          "n": 7,
+          "name": "Petición de que se convoque a audiencia de proceso verbal abreviado y no se imponga la medida",
+          "mandatory": true,
+          "basis": "Art. 223"
+        },
+        {
+          "n": 8,
+          "name": "Dirección de notificaciones y medio electrónico para la citación",
+          "mandatory": true,
+          "basis": "Art. 223 num. 2"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1801_2016_pr004.html"
+    },
+    {
+      "exact_name": "Escrito de descargos en proceso verbal abreviado",
+      "area": "POLICIVO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1801 de 2016, art. 223 num. 3 lits. a, b y c y parágrafo 1 (audiencia pública, argumentos, pruebas e inasistencia); art. 217 (medios de prueba); art. 223A lit. a (dosificación de la medida); Sentencia C-349 de 2017 de la Corte Constitucional",
+      "competent_authority": "Inspector de Convivencia y Paz (denominación vigente: el art. 1 de la Ley 2492 de 23 de julio de 2025 sustituyó \"Inspectores de Policía\" por \"Inspectores de Convivencia y Paz\", y su art. 6 reescribió el art. 206 de la Ley 1801 de 2016) del lugar donde sucedieron los hechos (art. 216)",
+      "term": "EL RELOJ NO ES DE DÍAS SINO DE UNA AUDIENCIA: el proceso verbal abreviado es oral y el Código no prevé traslado escrito; los descargos se exponen en la audiencia pública, donde la autoridad \"otorgará tanto al presunto infractor como al quejoso un tiempo máximo de veinte (20) minutos para exponer sus argumentos y pruebas\" (art. 223 num. 3 lit. a). El escrito se radica antes o al instalarse la audiencia y NO sustituye la comparecencia. LO QUE SE PIERDE POR NO ASISTIR ES EL CASO ENTERO: \"Si el presunto infractor no se presenta a la audiencia sin comprobar la ocurrencia de caso fortuito o fuerza mayor, la autoridad tendrá por ciertos los hechos que dieron lugar al comportamiento contrario a la convivencia y entrará a resolver de fondo\" (art. 223 parágrafo 1). Ese parágrafo fue declarado CONDICIONALMENTE EXEQUIBLE por la Corte Constitucional en la Sentencia C-349 de 25 de mayo de 2017, M.P. Carlos Bernal Pulido, \"en el entendido que en caso de inasistencia a la audiencia, el procedimiento se suspenderá por un término máximo de tres (3) días, dentro de los cuales el presunto infractor deberá aportar prueba siquiera sumaria de una justa causa de inasistencia, la cual, de resultar admisible por la autoridad de policía, dará lugar a la programación de una nueva audiencia\": TRES DÍAS, y no más, para justificar la inasistencia, y ese plazo no está en el texto de la ley. CITACIÓN PREVIA: la autoridad cita a audiencia dentro de los cinco (5) días siguientes de conocida la querella o el comportamiento (art. 223 num. 2); si se decretó inspección al lugar, la notificación se surte con antelación no menor a veinticuatro (24) horas (art. 223 parágrafo 2). PRUEBAS: las adicionales que se pidan se practican en un término máximo de cinco (5) días y la audiencia se reanuda al día siguiente al vencimiento (art. 223 num. 3 lit. c). LOS RECURSOS NO ESPERAN: \"se solicitarán, concederán y sustentarán dentro de la misma audiencia\" (art. 223 num. 4), de modo que quien no llevó preparada la reposición la perdió.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Designación de la autoridad de policía y radicado de la actuación",
+          "mandatory": true,
+          "basis": "Art. 223"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del presunto infractor y de su apoderado",
+          "mandatory": true,
+          "basis": "Art. 223 num. 1"
+        },
+        {
+          "n": 3,
+          "name": "Pronunciamiento sobre cada uno de los hechos de la querella o del informe de policía",
+          "mandatory": true,
+          "basis": "Art. 223 num. 3 lit. a"
+        },
+        {
+          "n": 4,
+          "name": "Argumentos de defensa, con el fundamento normativo",
+          "mandatory": true,
+          "basis": "Art. 223 num. 3 lit. a"
+        },
+        {
+          "n": 5,
+          "name": "Pruebas que se aportan",
+          "mandatory": true,
+          "basis": "Art. 217"
+        },
+        {
+          "n": 6,
+          "name": "Pruebas adicionales que se solicitan, con su pertinencia y conducencia",
+          "mandatory": true,
+          "basis": "Art. 223 num. 3 lit. c"
+        },
+        {
+          "n": 7,
+          "name": "Manifestación sobre la invitación a conciliar",
+          "mandatory": false,
+          "basis": "Arts. 223 num. 3 lit. b y 232"
+        },
+        {
+          "n": 8,
+          "name": "Petición de que no se imponga la medida correctiva o de que se dosifique conforme a proporcionalidad, razonabilidad y necesidad",
+          "mandatory": true,
+          "basis": "Art. 223A lit. a"
+        },
+        {
+          "n": 9,
+          "name": "Anuncio de la reposición y en subsidio apelación, que deben interponerse en la misma audiencia",
+          "mandatory": true,
+          "basis": "Art. 223 num. 4"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1801_2016_pr005.html"
+    },
+    {
+      "exact_name": "Recurso de reposición y en subsidio de apelación contra la orden de policía o la medida correctiva",
+      "area": "POLICIVO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1801 de 2016, art. 223 num. 4 y parágrafos 4 y 5 (recursos en el proceso verbal abreviado); art. 219 parágrafo 2 (deber de informar los recursos); arts. 205 nums. 8 y 14 y 207 (quién resuelve la apelación); art. 79 parágrafo 3 inc. final (efecto devolutivo en protección de bienes inmuebles)",
+      "competent_authority": "La reposición, ante la misma autoridad que profirió la decisión (Inspector de Convivencia y Paz o corregidor). La apelación, ante el superior jerárquico: la autoridad administrativa especial de policía según la materia —salud, seguridad, ambiente, minera, ordenamiento territorial, planeación, vivienda y espacio público— (art. 207 inc. 1) y, donde no exista, el alcalde distrital o municipal (arts. 205 nums. 8 y 14 y 207 inc. 2). En el departamento Archipiélago de San Andrés, Providencia y Santa Catalina conoce el Gobernador o las autoridades administrativas con competencias especiales de convivencia (art. 205 parágrafo 1)",
+      "term": "NO HAY CINCO DÍAS: EL PLAZO ES LA AUDIENCIA MISMA. \"Contra la decisión proferida por la autoridad de Policía proceden los recursos de reposición y, en subsidio, el de apelación ante el superior jerárquico, los cuales se solicitarán, concederán y sustentarán dentro de la misma audiencia\" (art. 223 num. 4), porque \"La decisión quedará notificada en estrados\" (art. 223 num. 3 lit. d). Quien se retira de la audiencia o espera una notificación escrita pierde ambos recursos. \"El recurso de reposición se resolverá inmediatamente, y de ser procedente el recurso de apelación, se interpondrá y concederá en el efecto devolutivo dentro de la audiencia y se remitirá al superior jerárquico dentro de los dos (2) días siguientes, ante quien se sustentará dentro de los dos (2) días siguientes al recibo del recurso. El recurso de apelación se resolverá dentro de los ocho (8) días siguientes al recibo de la actuación\" (art. 223 num. 4): la sustentación ante el superior es una SEGUNDA carga del recurrente, de dos días, distinta de la sustentación en audiencia. EFECTO, QUE DECIDE SI LA MEDIDA SE CUMPLE MIENTRAS SE APELA: por regla general devolutivo, de modo que la orden se ejecuta pese a la apelación; \"Para la aplicación de medidas correctivas en asuntos relativos a infracciones urbanísticas, el recurso de apelación se concederá en el efecto suspensivo\" (art. 223 num. 4 inc. 2); en los procedimientos de protección a bienes inmuebles \"El recurso de apelación se concederá en efecto devolutivo\" (art. 79 parágrafo 3 inc. final). LÍMITES: \"Los recursos solo procederán contra las decisiones definitivas de las autoridades de Policía\" (art. 223 num. 4 inc. 3); \"El numeral 4 del presente artículo no procederá en los procedimientos de única instancia\" (parágrafo 4), esto es, reparación de daños materiales de muebles o inmuebles, expulsión de domicilio, prohibición de ingreso a actividad con aglomeraciones y decomiso (art. 206 num. 4), y restitución de playa y terrenos de bajamar (art. 205 num. 17); y \"El recurso de apelación se resolverá de plano\" (parágrafo 5). DEBER DE LA AUTORIDAD, que no reemplaza el deber del abogado: \"Las autoridades de Policía al imponer una medida correctiva, deberán de oficio suministrar toda la información al infractor, acerca de los recursos que le corresponde y los términos que tiene para interponerlos\" (art. 219 parágrafo 2).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Designación de la autoridad que profirió la decisión y del superior ante quien se apela en subsidio",
+          "mandatory": true,
+          "basis": "Arts. 223 num. 4 y 207"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del recurrente y de la decisión recurrida, notificada en estrados",
+          "mandatory": true,
+          "basis": "Art. 223 num. 3 lit. d"
+        },
+        {
+          "n": 3,
+          "name": "Manifestación expresa de interponer reposición y, en subsidio, apelación, dentro de la misma audiencia",
+          "mandatory": true,
+          "basis": "Art. 223 num. 4"
+        },
+        {
+          "n": 4,
+          "name": "Sustentación: reparos concretos contra la valoración probatoria",
+          "mandatory": true,
+          "basis": "Art. 223 num. 3 lit. d"
+        },
+        {
+          "n": 5,
+          "name": "Sustentación: reparos contra el fundamento normativo y la dosificación de la medida",
+          "mandatory": true,
+          "basis": "Art. 223A lit. a"
+        },
+        {
+          "n": 6,
+          "name": "Petición de revocatoria o modificación de la orden de policía o de la medida correctiva",
+          "mandatory": true,
+          "basis": "Art. 223 num. 4"
+        },
+        {
+          "n": 7,
+          "name": "Solicitud sobre el efecto en que debe concederse la apelación, con indicación de si se trata de infracción urbanística",
+          "mandatory": true,
+          "basis": "Art. 223 num. 4 inc. 2"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1801_2016_pr005.html"
+    },
+    {
+      "exact_name": "Sustentación del recurso de apelación ante el superior jerárquico en materia de policía",
+      "area": "POLICIVO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1801 de 2016, art. 223 num. 4 y parágrafo 5 (remisión, sustentación y decisión de la apelación); art. 207 (autoridades administrativas especiales de policía); art. 205 nums. 8 y 14 y parágrafo 1; art. 227 (falta disciplinaria por incumplimiento de términos)",
+      "competent_authority": "Autoridad administrativa especial de policía según la materia (art. 207 inc. 1); donde no exista, el alcalde distrital o municipal (arts. 205 nums. 8 y 14 y 207 inc. 2); en San Andrés, Providencia y Santa Catalina, el Gobernador o la autoridad administrativa con competencia especial de convivencia (art. 205 parágrafo 1)",
+      "term": "RELOJ DEL APELANTE, Y CORRE DESPUÉS DE LA AUDIENCIA: concedida la apelación en la audiencia, el expediente \"se remitirá al superior jerárquico dentro de los dos (2) días siguientes, ante quien se sustentará dentro de los dos (2) días siguientes al recibo del recurso\" (art. 223 num. 4). Son dos días contados desde el RECIBO POR EL SUPERIOR, no desde la audiencia ni desde la remisión, lo que obliga al apoderado a vigilar la fecha de radicación ante el superior. RELOJ DEL SUPERIOR: \"El recurso de apelación se resolverá dentro de los ocho (8) días siguientes al recibo de la actuación\" (art. 223 num. 4) y \"se resolverá de plano\" (parágrafo 5), es decir sin nueva audiencia ni período probatorio: todo lo que el apelante quiera decir debe estar en esta sustentación. EFECTO MIENTRAS TANTO: devolutivo por regla general, de modo que la medida correctiva se cumple aunque la apelación esté pendiente (art. 223 num. 4), salvo infracciones urbanísticas, donde es suspensivo. INCUMPLIMIENTO DE TÉRMINOS POR LA AUTORIDAD: \"La autoridad de Policía que incumpla los términos señalados en este capítulo o que incurra en omisión y permita la caducidad de la acción o de las medidas correctivas, incurrirá en falta disciplinaria grave\" (art. 227), pero esa falta no revive el término perdido por el apelante.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Designación del superior jerárquico competente según la materia",
+          "mandatory": true,
+          "basis": "Art. 207"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del recurrente, del radicado y de la fecha de recibo de la actuación por el superior",
+          "mandatory": true,
+          "basis": "Art. 223 num. 4"
+        },
+        {
+          "n": 3,
+          "name": "Constancia de que la apelación fue interpuesta y concedida en la audiencia",
+          "mandatory": true,
+          "basis": "Art. 223 num. 4"
+        },
+        {
+          "n": 4,
+          "name": "Síntesis de la decisión apelada y de sus fundamentos",
+          "mandatory": true,
+          "basis": "Art. 223 num. 3 lit. d"
+        },
+        {
+          "n": 5,
+          "name": "Reparos concretos: error en la valoración de las pruebas practicadas en la audiencia",
+          "mandatory": true,
+          "basis": "Art. 217"
+        },
+        {
+          "n": 6,
+          "name": "Reparos concretos: error en el encuadramiento del comportamiento y en la dosificación de la medida",
+          "mandatory": true,
+          "basis": "Art. 223A lit. a"
+        },
+        {
+          "n": 7,
+          "name": "Reparos sobre el debido proceso, con la constancia de la nulidad pedida en audiencia",
+          "mandatory": false,
+          "basis": "Art. 228"
+        },
+        {
+          "n": 8,
+          "name": "Petición concreta de revocatoria o modificación",
+          "mandatory": true,
+          "basis": "Art. 223 num. 4"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1801_2016_pr005.html"
+    },
+    {
+      "exact_name": "Recurso de apelación contra la medida correctiva impuesta en proceso verbal inmediato",
+      "area": "POLICIVO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1801 de 2016, art. 222 y sus parágrafos 1, 2 y 3 (trámite del proceso verbal inmediato y recurso); art. 210 parágrafo 2 (recurso contra las medidas del personal uniformado); art. 209 (atribuciones de los comandantes de estación); art. 221 (clases de actuaciones); art. 224 (alcance penal)",
+      "competent_authority": "Se interpone ante el personal uniformado de la Policía Nacional, el comandante de estación, subestación o de Centro de Atención Inmediata que impuso la medida, y lo resuelve el Inspector de Convivencia y Paz (arts. 222 parágrafo 1 y 210 parágrafo 2)",
+      "term": "EL RECURSO SE INTERPONE EN EL ACTO, NO DESPUÉS: el proceso verbal inmediato se agota en el sitio de los hechos —\"la autoridad de Policía lo abordará en el sitio donde ocurran los hechos... El presunto infractor deberá ser oído en descargos\"— y la medida se impone allí mismo mediante orden de policía (art. 222 nums. 2, 3 y 4), de modo que la oportunidad para recurrir es la propia diligencia; el Código no concede plazo posterior alguno. NO HAY REPOSICIÓN: \"En contra de la orden de Policía o la medida correctiva, procederá el recurso de apelación, el cual se concederá en el efecto devolutivo y se remitirá al Inspector de Policía dentro de las veinticuatro (24) horas siguientes. El recurso de apelación se resolverá dentro de los tres (3) días hábiles siguientes al recibo de la actuación y será notificado por medio más eficaz y expedito\" (art. 222 parágrafo 1). Ese aparte fue declarado EXEQUIBLE por la Corte Constitucional en la Sentencia C-282 de 3 de mayo de 2017, M.P. Luis Guillermo Guerrero Pérez. EFECTO DEVOLUTIVO: la medida se cumple mientras se decide, y por eso el recurso no evita, por sí solo, la remoción, inutilización o destrucción del bien. LO QUE SIGUE SI NO SE CUMPLE: \"En caso de que no se cumpliere la orden de Policía, o que el infractor incurra en reincidencia, se impondrá una medida correctiva de multa, mediante la aplicación del proceso verbal abreviado\" (art. 222 parágrafo 2), y el desacato de la decisión \"incurrirá en conducta punible de conformidad con la legislación penal\" (art. 224), que es el fraude a resolución judicial o administrativa de policía del art. 454 de la Ley 599 de 2000 (art. 150 parágrafo). DOCUMENTACIÓN: para suspensión temporal de actividad, inutilización de bienes, destrucción de bien y disolución de reunión o actividad con aglomeraciones no complejas \"se deberá levantar acta... suscrita por quien impone la medida y el infractor\" (art. 222 parágrafo 3): sin acta firmada no hay soporte del recurso.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la autoridad que impuso la medida y del Inspector de Convivencia y Paz que resolverá",
+          "mandatory": true,
+          "basis": "Art. 222 parágrafo 1"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del recurrente y de la medida correctiva impuesta, con fecha, hora y lugar",
+          "mandatory": true,
+          "basis": "Art. 222 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "Manifestación de interponer apelación contra la orden de policía o la medida correctiva",
+          "mandatory": true,
+          "basis": "Art. 222 parágrafo 1"
+        },
+        {
+          "n": 4,
+          "name": "Constancia de los descargos rendidos en la diligencia",
+          "mandatory": true,
+          "basis": "Art. 222 num. 3"
+        },
+        {
+          "n": 5,
+          "name": "Razones de hecho y de derecho contra la medida",
+          "mandatory": true,
+          "basis": "Art. 222 num. 4"
+        },
+        {
+          "n": 6,
+          "name": "Referencia al acta suscrita, cuando la medida la exija",
+          "mandatory": false,
+          "basis": "Art. 222 parágrafo 3"
+        },
+        {
+          "n": 7,
+          "name": "Petición de revocatoria de la medida",
+          "mandatory": true,
+          "basis": "Art. 222 parágrafo 1"
+        },
+        {
+          "n": 8,
+          "name": "Medio de notificación más eficaz y expedito para la decisión",
+          "mandatory": true,
+          "basis": "Art. 222 parágrafo 1"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1801_2016_pr004.html"
+    },
+    {
+      "exact_name": "Solicitud de nulidad por violación del debido proceso en proceso único de policía",
+      "area": "POLICIVO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1801 de 2016, art. 228 (nulidades); art. 213 (principios del procedimiento); art. 223 num. 4 y parágrafo 5 (recursos); Constitución Política, art. 29",
+      "competent_authority": "La autoridad de policía que adelanta la audiencia: Inspector de Convivencia y Paz, corregidor, alcalde o autoridad administrativa especial de policía (arts. 205, 206 y 207)",
+      "term": "ES EL TÉRMINO MÁS CORTO DEL CÓDIGO Y NO ADMITE ESCRITO POSTERIOR: \"Los intervinientes en el proceso podrán pedir únicamente dentro de la audiencia, la nulidad del mismo por violación del debido proceso consagrado en el artículo 29 de la Constitución Política, solicitud que se resolverá de plano. Contra esta decisión solo procederá el recurso de reposición, que se resolverá dentro de la misma audiencia\" (art. 228). Fuera de la audiencia no hay nulidad que pedir ante la autoridad de policía: la única vía restante es la judicial. CAUSAL ÚNICA: la violación del debido proceso del art. 29 de la Constitución; el Código no enumera causales adicionales ni remite a las del Código General del Proceso. NO HAY APELACIÓN contra la decisión que resuelve la nulidad, solo reposición, y esta se agota en la misma audiencia. CONSERVACIÓN DEL REPARO: si la nulidad se niega, la constancia de haberla pedido en audiencia es lo que permite reiterar el reparo al sustentar la apelación contra la decisión definitiva ante el superior (art. 223 num. 4), pues allí se resuelve de plano y sin pruebas nuevas (art. 223 parágrafo 5).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la autoridad y del radicado de la actuación",
+          "mandatory": true,
+          "basis": "Art. 228"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del interviniente que solicita la nulidad",
+          "mandatory": true,
+          "basis": "Art. 228"
+        },
+        {
+          "n": 3,
+          "name": "Manifestación de que la solicitud se formula dentro de la audiencia",
+          "mandatory": true,
+          "basis": "Art. 228"
+        },
+        {
+          "n": 4,
+          "name": "Descripción concreta de la actuación viciada",
+          "mandatory": true,
+          "basis": "Art. 228"
+        },
+        {
+          "n": 5,
+          "name": "Explicación de la garantía del art. 29 de la Constitución que resultó violada",
+          "mandatory": true,
+          "basis": "Art. 228"
+        },
+        {
+          "n": 6,
+          "name": "Petición de que se declare la nulidad y se rehaga la actuación",
+          "mandatory": true,
+          "basis": "Art. 228"
+        },
+        {
+          "n": 7,
+          "name": "Anuncio de reposición contra la decisión que la resuelva, para dejar constancia",
+          "mandatory": true,
+          "basis": "Art. 228"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1801_2016_pr005.html"
+    },
+    {
+      "exact_name": "Recusación de la autoridad de policía",
+      "area": "POLICIVO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1801 de 2016, art. 229 y sus parágrafos 1 y 2 (impedimentos y recusaciones, con remisión expresa al CPACA); art. 205 num. 7 (el alcalde resuelve los de las autoridades de primera instancia); Ley 1437 de 2011, arts. 11 y 12 (causales y trámite), por remisión del art. 229",
+      "competent_authority": "El superior jerárquico de la autoridad recusada, que la resuelve en dos (2) días (art. 229 parágrafo 1). Tratándose de alcaldes distritales, municipales o locales, resuelve el personero municipal o distrital en dos (2) días, y si se declara el impedimento o la recusación conoce del asunto el alcalde de la jurisdicción más cercana (art. 229 parágrafo 2). Los impedimentos y recusaciones de las autoridades de policía de primera instancia los resuelve el alcalde (art. 205 num. 7)",
+      "term": "RELOJ DE QUIEN RESUELVE, DE DOS DÍAS: \"Los impedimentos y recusaciones serán resueltos por el superior jerárquico en el término de dos (2) días\" (art. 229 parágrafo 1) y, frente a alcaldes, \"resolverá el impedimento o recusación, el personero municipal o distrital en el término de dos (2) días\" (art. 229 parágrafo 2). RELOJ DEL RECUSANTE, QUE EL ARTÍCULO NO ESCRIBE Y HAY QUE IR A BUSCAR: el art. 229 no fija oportunidad ni causales propias, sino que dispone que \"Las autoridades de Policía podrán declararse impedidas o ser recusadas por las causales establecidas en las disposiciones del Código de Procedimiento Administrativo y de lo Contencioso Administrativo\"; en consecuencia se aplican las causales del art. 11 y el trámite del art. 12 de la Ley 1437 de 2011, que exige formularla tan pronto se conozca la causal y en todo caso antes de que se profiera la decisión. Dado que el proceso verbal abreviado se agota en una sola audiencia notificada en estrados (art. 223 num. 3 lit. d), en la práctica la recusación debe presentarse antes o al instalarse la audiencia: después de la decisión ya no hay actuación que separar. La demora de la autoridad en resolver constituye falta disciplinaria grave (art. 227) pero no reabre la oportunidad del recusante.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Designación del superior jerárquico o del personero competente para resolver",
+          "mandatory": true,
+          "basis": "Art. 229 parágrafos 1 y 2"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del recusante, de la autoridad recusada y del radicado",
+          "mandatory": true,
+          "basis": "Art. 229"
+        },
+        {
+          "n": 3,
+          "name": "Causal invocada, con cita del numeral del art. 11 de la Ley 1437 de 2011",
+          "mandatory": true,
+          "basis": "Art. 229"
+        },
+        {
+          "n": 4,
+          "name": "Hechos que configuran la causal y fecha en que el recusante los conoció",
+          "mandatory": true,
+          "basis": "Art. 229"
+        },
+        {
+          "n": 5,
+          "name": "Pruebas que sustentan la causal",
+          "mandatory": true,
+          "basis": "Art. 217"
+        },
+        {
+          "n": 6,
+          "name": "Petición de separación del conocimiento y de remisión a quien deba continuar",
+          "mandatory": true,
+          "basis": "Art. 229 parágrafo 2"
+        },
+        {
+          "n": 7,
+          "name": "Solicitud de suspensión de la audiencia mientras se resuelve",
+          "mandatory": false,
+          "basis": "Art. 229 parágrafo 1"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1801_2016_pr005.html"
+    },
+    {
+      "exact_name": "Querella policiva por perturbación a bien de uso público o al espacio público",
+      "area": "POLICIVO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1801 de 2016, art. 77 (comportamientos contrarios a la posesión y mera tenencia, incluidos bienes de uso público y fiscales); art. 79 num. 2 (legitimación de las entidades de derecho público); art. 139 (definición de espacio público); art. 140 (comportamientos contrarios al cuidado e integridad del espacio público); art. 190 (restitución y protección de bienes inmuebles); art. 215 (acción de policía a solicitud de cualquier persona); art. 226 (caducidad y prescripción); art. 223 (trámite)",
+      "competent_authority": "Inspector de Convivencia y Paz o corregidor del lugar de los hechos, en primera instancia (arts. 206 num. 5 lit. e y 216). El gobernador o su delegado asume la competencia cuando a la autoridad distrital o municipal se le dificulte por razones de orden público adelantar el procedimiento o ejecutar la restitución, o cuando el alcalde no se pronuncie en los términos del reglamento (art. 203). En playas y terrenos de bajamar conoce el alcalde en ÚNICA instancia (art. 205 num. 17)",
+      "term": "AQUÍ NO CORREN LOS CUATRO MESES, Y ES LA DIFERENCIA QUE DECIDE EL CASO: \"Cuando se trate de hechos de perturbación de bienes de uso público, bienes fiscales, zonas de reserva forestal, bienes de propiedad privada afectados al espacio público, bienes de las empresas de servicios públicos, o bienes declarados de utilidad pública o de interés social, cultural, arquitectónico o histórico, no existe caducidad de la acción policiva\" (art. 226 inc. 1). La caducidad de cuatro (4) meses del art. 80 parágrafo está escrita solo para \"los inmuebles de los particulares\" y no se aplica a estos bienes. INTERVENCIÓN DEL MINISTERIO PÚBLICO: \"La autoridad de Policía comunicará la iniciación de la actuación al personero, quien podrá pedir directamente, o por intermedio de delegado, que se le tenga como interesado en el proceso\" (art. 226 inc. 1). LEGITIMACIÓN AMPLIA: la acción de policía \"se inicia de oficio por parte de las autoridades de Policía o a solicitud de cualquier persona\" (art. 215), sin perjuicio de la legitimación específica de las entidades de derecho público para instaurar querella (art. 79 num. 2). RELOJES DEL TRÁMITE: citación a audiencia dentro de los cinco (5) días siguientes a conocida la querella (art. 223 num. 2); pruebas adicionales en máximo cinco (5) días (num. 3 lit. c); recursos en la misma audiencia (num. 4); cumplimiento de la orden en máximo cinco (5) días desde la ejecutoria (num. 5); desalojo del ocupante de hecho \"dentro de las veinticuatro (24) horas siguientes a la orden\" (art. 79 parágrafo 1); acción preventiva de la Policía Nacional \"dentro de las cuarenta y ocho (48) horas siguientes a la ocupación\" (art. 81). PRESCRIPCIÓN DE LA MEDIDA, distinta de la caducidad de la acción: \"Las medidas correctivas prescribirán en cinco (5) años, a partir de la fecha en que quede en firme la decisión de las autoridades de Policía en el proceso único de Policía\" (art. 226 inc. 2).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Designación de la autoridad de policía a quien se dirige",
+          "mandatory": true,
+          "basis": "Art. 79"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del querellante: entidad de derecho público, su representante o apoderado, o cualquier persona que ejerza la acción de policía",
+          "mandatory": true,
+          "basis": "Arts. 79 num. 2 y 215"
+        },
+        {
+          "n": 3,
+          "name": "Identificación y ubicación del bien, con la prueba de su calidad de bien de uso público, fiscal o afectado al espacio público",
+          "mandatory": true,
+          "basis": "Arts. 139 y 226"
+        },
+        {
+          "n": 4,
+          "name": "Identificación del ocupante o perturbador",
+          "mandatory": true,
+          "basis": "Art. 223 num. 1"
+        },
+        {
+          "n": 5,
+          "name": "Relato de los actos de ocupación o perturbación por vías de hecho",
+          "mandatory": true,
+          "basis": "Art. 77 num. 1"
+        },
+        {
+          "n": 6,
+          "name": "Manifestación expresa de que la acción no está sujeta a caducidad",
+          "mandatory": true,
+          "basis": "Art. 226 inc. 1"
+        },
+        {
+          "n": 7,
+          "name": "Petición de la medida correctiva de restitución y protección del bien inmueble",
+          "mandatory": true,
+          "basis": "Art. 190"
+        },
+        {
+          "n": 8,
+          "name": "Solicitud de comunicación al personero municipal o distrital",
+          "mandatory": true,
+          "basis": "Art. 226 inc. 1"
+        },
+        {
+          "n": 9,
+          "name": "Pruebas que se aportan y que se solicitan, incluida la inspección al lugar",
+          "mandatory": true,
+          "basis": "Arts. 217 y 223 parágrafo 2"
+        },
+        {
+          "n": 10,
+          "name": "Dirección de notificaciones",
+          "mandatory": true,
+          "basis": "Art. 223 num. 2"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1801_2016_pr005.html"
+    },
+    {
+      "exact_name": "Solicitud de asunción de competencia especial por el gobernador en materia policiva",
+      "area": "POLICIVO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1801 de 2016, art. 203 (competencia especial del gobernador); arts. 200 y 201 (competencia y atribuciones del gobernador); art. 190 (restitución y protección de bienes inmuebles)",
+      "competent_authority": "Gobernador del departamento o su delegado (art. 203 inc. 1). Si el gobernador no asume la competencia en el término que fije el Gobierno nacional, \"este asumirá la competencia a través de su delegado\" (art. 203 inc. 3)",
+      "term": "EL CÓDIGO NO FIJA EL PLAZO Y LO REMITE AL REGLAMENTO, LO QUE OBLIGA A VERIFICARLO ANTES DE RADICAR: el art. 203 condiciona la asunción de competencia a \"los términos establecidos en las normas que para tal fin expida el Gobierno nacional\" y al \"término establecido en las normas que para tal efecto establezca el Gobierno nacional\", sin señalar días en la ley. Dos supuestos habilitan la solicitud: (i) que \"a las autoridades de Policía distrital o municipal se les dificulte por razones de orden público adelantar un procedimiento policivo o ejecutar las órdenes de restitución\", caso en el cual \"por solicitud del Alcalde Distrital o Municipal, o de quien solicita la intervención de la autoridad de Policía, asumirá la competencia el gobernador o su delegado\"; y (ii) que \"el alcalde distrital o municipal, no se pronuncien dentro de los términos establecidos en las normas que para tal fin expida el Gobierno nacional\", caso en el cual el gobernador asume \"a solicitud del accionante, o de oficio\". El gobernador también \"ejecutará la orden de restitución de tierras ordenada por un juez, cuando por razones de orden público a la autoridad de Policía distrital o municipal se le dificulte materializarla\". CONSECUENCIA DE LA INERCIA: la asunción opera \"sin perjuicio de las investigaciones disciplinarias a que haya lugar\", y si el gobernador tampoco asume, el Gobierno nacional lo hace por delegado y pide a la Procuraduría General de la Nación las investigaciones pertinentes (art. 203 incs. 2 y 3). ATENCIÓN: la caducidad de la acción policiva original —cuatro (4) meses del art. 80 parágrafo para inmuebles de particulares— sigue corriendo con independencia de esta solicitud, que no la interrumpe.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Designación del gobernador del departamento",
+          "mandatory": true,
+          "basis": "Art. 203"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del solicitante: alcalde distrital o municipal, o quien solicitó la intervención de la autoridad de policía, o el accionante",
+          "mandatory": true,
+          "basis": "Art. 203 incs. 1 y 2"
+        },
+        {
+          "n": 3,
+          "name": "Identificación del bien inmueble o de la actividad de utilidad pública o interés social afectada",
+          "mandatory": true,
+          "basis": "Art. 203 inc. 1"
+        },
+        {
+          "n": 4,
+          "name": "Radicado y estado de la actuación policiva distrital o municipal",
+          "mandatory": true,
+          "basis": "Art. 203"
+        },
+        {
+          "n": 5,
+          "name": "Supuesto invocado: dificultad por razones de orden público, o falta de pronunciamiento oportuno del alcalde",
+          "mandatory": true,
+          "basis": "Art. 203 incs. 1 y 2"
+        },
+        {
+          "n": 6,
+          "name": "Prueba de las razones de orden público o de la inactividad",
+          "mandatory": true,
+          "basis": "Art. 217"
+        },
+        {
+          "n": 7,
+          "name": "Petición de asunción de competencia y de protección, restitución o cese de la perturbación",
+          "mandatory": true,
+          "basis": "Art. 203 inc. 1"
+        },
+        {
+          "n": 8,
+          "name": "Petición subsidiaria de traslado a la Procuraduría General de la Nación",
+          "mandatory": false,
+          "basis": "Art. 203 inc. 3"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1801_2016_pr004.html"
+    },
+    {
+      "exact_name": "Auto de citación a audiencia pública en proceso verbal abreviado",
+      "area": "POLICIVO",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 1801 de 2016, art. 223 nums. 1 y 2 y parágrafos 1 y 2 (iniciación de la acción, citación, inasistencia y notificación cuando se decreta inspección); art. 215 (acción de policía); art. 216 (factor de competencia); art. 227 (falta disciplinaria por incumplimiento de términos)",
+      "competent_authority": "Inspector de Convivencia y Paz (denominación vigente: el art. 1 de la Ley 2492 de 23 de julio de 2025 sustituyó \"Inspectores de Policía\" por \"Inspectores de Convivencia y Paz\", y su art. 6 reescribió el art. 206 de la Ley 1801 de 2016) del lugar donde sucedieron los hechos (art. 216)",
+      "term": "RELOJ DEL DESPACHO, DE CINCO DÍAS: \"Las mencionadas autoridades, a los cinco (5) días siguientes de conocida la querella o el comportamiento contrario a la convivencia, en caso de que no hubiera sido posible iniciar la audiencia de manera inmediata, citará a audiencia pública al quejoso y al presunto infractor, mediante comunicación escrita, correo certificado, medio electrónico, medio de comunicación del que disponga, o por el medio más expedito o idóneo, donde se señale dicho comportamiento\" (art. 223 num. 2). SIN CITACIÓN PREVIA SOLO EN FLAGRANCIA: \"Cuando la autoridad conozca en flagrancia del comportamiento contrario a la convivencia, podrá iniciar de inmediato la audiencia pública\" (art. 223 num. 1). CUANDO SE DECRETA INSPECCIÓN AL LUGAR LA ANTELACIÓN ES DE HORAS, NO DE DÍAS: la autoridad \"fijará fecha y hora para la práctica de la audiencia, y notificará al presunto infractor o perturbador de convivencia y al quejoso personalmente, y de no ser posible, mediante aviso que se fijará en la puerta de acceso del lugar de los hechos o parte visible de este, con antelación no menor a veinticuatro (24) horas, de la fecha y hora de la diligencia\" (art. 223 parágrafo 2). LUGAR: \"La audiencia pública se realizará en el lugar de los hechos, en el despacho del inspector o de la autoridad especial de Policía\" (art. 223 num. 3). EFECTO DE LA CITACIÓN SOBRE EL CITADO: es la citación la que activa la carga de comparecer cuyo incumplimiento hace tener por ciertos los hechos (art. 223 parágrafo 1), parágrafo declarado CONDICIONALMENTE EXEQUIBLE por la Sentencia C-349 de 2017, que concede al inasistente un máximo de tres (3) días para probar la justa causa. Incumplir este término de cinco días es falta disciplinaria grave (art. 227).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la autoridad de policía y del radicado",
+          "mandatory": true,
+          "basis": "Art. 216"
+        },
+        {
+          "n": 2,
+          "name": "Fecha en que se conoció la querella, el informe de policía o el comportamiento, de la que corren los cinco días",
+          "mandatory": true,
+          "basis": "Art. 223 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "Descripción del comportamiento contrario a la convivencia que se señala al citado",
+          "mandatory": true,
+          "basis": "Art. 223 num. 2"
+        },
+        {
+          "n": 4,
+          "name": "Identificación del quejoso y del presunto infractor citados",
+          "mandatory": true,
+          "basis": "Art. 223 num. 2"
+        },
+        {
+          "n": 5,
+          "name": "Fecha, hora y lugar de la audiencia pública",
+          "mandatory": true,
+          "basis": "Art. 223 num. 3"
+        },
+        {
+          "n": 6,
+          "name": "Medio de comunicación empleado para la citación y constancia de su envío",
+          "mandatory": true,
+          "basis": "Art. 223 num. 2"
+        },
+        {
+          "n": 7,
+          "name": "Advertencia de las consecuencias de la inasistencia y del plazo de tres días para justificarla",
+          "mandatory": true,
+          "basis": "Art. 223 parágrafo 1 y Sentencia C-349 de 2017"
+        },
+        {
+          "n": 8,
+          "name": "Orden de comunicar al propietario inscrito, en los procedimientos de protección de bienes inmuebles",
+          "mandatory": false,
+          "basis": "Art. 79 parágrafo 2"
+        },
+        {
+          "n": 9,
+          "name": "Orden de comunicar al personero, cuando se trate de bienes de uso público o fiscales",
+          "mandatory": false,
+          "basis": "Art. 226 inc. 1"
+        },
+        {
+          "n": 10,
+          "name": "Decreto de inspección al lugar, con aviso de antelación no menor a veinticuatro horas, si procede",
+          "mandatory": false,
+          "basis": "Art. 223 parágrafo 2"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1801_2016_pr005.html"
+    },
+    {
+      "exact_name": "Orden de comparendo por comportamiento contrario a la convivencia",
+      "area": "POLICIVO",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 1801 de 2016, art. 218 (definición de orden de comparendo); art. 219 y sus parágrafos 1 y 2 (procedimiento para la imposición); art. 180, modificado por el art. 19 de la Ley 2450 de 2025 (multas, descuento y objeción); art. 223A, adicionado por el art. 47 de la Ley 2197 de 2022 (procedimiento para multas tipo 1 a 4); arts. 172 parágrafo 2 y 184 (registro de las medidas correctivas); art. 183 (consecuencias por el no pago)",
+      "competent_authority": "Personal uniformado de la Policía Nacional (arts. 210 y 219). La medida correctiva subsiguiente corresponde a la autoridad de policía competente según el comportamiento (art. 219 inc. 2)",
+      "term": "LO QUE EL COMPARENDO DEBE DECIRLE AL CIUDADANO SON SUS PLAZOS, Y SON TRES DISTINTOS: (i) tres (3) días hábiles siguientes para OBJETAR la multa o la medida ante la autoridad competente (art. 180, modificado por el art. 19 de la Ley 2450 de 2025; art. 223A lit. b); (ii) cinco (5) días hábiles siguientes a la expedición para PAGAR con descuento del cincuenta por ciento (50%) por pronto pago, o para pedir la conmutación de las multas tipo 1 y 2 por programa comunitario o actividad pedagógica de convivencia (art. 180); (iii) vencidos cinco (5) días posteriores a la expedición sin objeción, \"la multa queda en firme, pudiéndose iniciar el cobro coactivo\" (art. 223A lit. e). DEBER EXPRESO DE INFORMARLOS: \"Las autoridades de Policía al imponer una medida correctiva, deberán de oficio suministrar toda la información al infractor, acerca de los recursos que le corresponde y los términos que tiene para interponerlos\" (art. 219 parágrafo 2). ACEPTACIÓN FICTA: pagar dentro de los tres (3) días siguientes a la imposición, o conmutar las multas tipo 1 y 2, equivale a aceptar la responsabilidad, y recibida esa información \"el inspector de policía deberá abstenerse de iniciar proceso único de policía y actualizar el estado de cumplimiento de la medida correctiva en el Registro Nacional de Medidas Correctivas\" (art. 223A lits. c y d). PROHIBICIONES DE IMPONERLO POR COMPARENDO: \"Las medidas correctivas por los comportamientos contrarios a la integridad urbanística, o a la organización de eventos que involucren aglomeraciones de público, no se impondrán en orden de comparendo. El personal uniformado de la Policía Nacional pondrá en conocimiento de la autoridad competente, los comportamientos mencionados mediante informe escrito\" (art. 219 parágrafo 1). MORA: transcurridos seis meses desde la imposición sin pago, operan las inhabilidades del art. 183. ESTE NO ES EL COMPARENDO DE TRÁNSITO: el de la Ley 769 de 2002 tiene su propio régimen y no se rige por estos plazos.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del personal uniformado que expide la orden",
+          "mandatory": true,
+          "basis": "Art. 218"
+        },
+        {
+          "n": 2,
+          "name": "Identificación e individualización del presunto infractor",
+          "mandatory": true,
+          "basis": "Art. 219"
+        },
+        {
+          "n": 3,
+          "name": "Lugar, fecha y hora del comportamiento y de la expedición de la orden",
+          "mandatory": true,
+          "basis": "Art. 219"
+        },
+        {
+          "n": 4,
+          "name": "Descripción del comportamiento contrario a la convivencia y del artículo y numeral infringidos",
+          "mandatory": true,
+          "basis": "Art. 219"
+        },
+        {
+          "n": 5,
+          "name": "Evidencia del hecho",
+          "mandatory": true,
+          "basis": "Art. 180"
+        },
+        {
+          "n": 6,
+          "name": "Medida correctiva señalada y tipo de multa general aplicable",
+          "mandatory": true,
+          "basis": "Arts. 173 y 180"
+        },
+        {
+          "n": 7,
+          "name": "Orden escrita o virtual de presentarse ante autoridad de policía o de cumplir la medida correctiva",
+          "mandatory": true,
+          "basis": "Art. 218"
+        },
+        {
+          "n": 8,
+          "name": "Información sobre el plazo de tres días hábiles para objetar y sobre la pérdida del descuento por pronto pago si se objeta",
+          "mandatory": true,
+          "basis": "Arts. 180 y 223A lits. b y f"
+        },
+        {
+          "n": 9,
+          "name": "Información sobre el plazo de cinco días hábiles para el pago con descuento del cincuenta por ciento o para pedir la conmutación",
+          "mandatory": true,
+          "basis": "Art. 180"
+        },
+        {
+          "n": 10,
+          "name": "Información sobre los recursos y sus términos",
+          "mandatory": true,
+          "basis": "Art. 219 parágrafo 2"
+        },
+        {
+          "n": 11,
+          "name": "Advertencia sobre el registro en el Registro Nacional de Medidas Correctivas",
+          "mandatory": true,
+          "basis": "Arts. 172 parágrafo 2 y 184"
+        },
+        {
+          "n": 12,
+          "name": "Firma del uniformado y espacio para la del presunto infractor",
+          "mandatory": true,
+          "basis": "Art. 218"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1801_2016_pr004.html"
+    },
+    {
+      "exact_name": "Auto que decreta la práctica de pruebas en proceso verbal abreviado",
+      "area": "POLICIVO",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 1801 de 2016, art. 217 (medios de prueba); art. 223 num. 3 lit. c (pruebas en la audiencia); art. 220 (carga de la prueba en materia ambiental y de salud pública, con el aparte declarado inexequible por la Sentencia C-225 de 2017)",
+      "competent_authority": "Inspector de Convivencia y Paz (denominación vigente: el art. 1 de la Ley 2492 de 23 de julio de 2025 sustituyó \"Inspectores de Policía\" por \"Inspectores de Convivencia y Paz\", y su art. 6 reescribió el art. 206 de la Ley 1801 de 2016) del lugar donde sucedieron los hechos (art. 216)",
+      "term": "RELOJ DEL DESPACHO, DE CINCO DÍAS, Y REANUDACIÓN AUTOMÁTICA AL DÍA SIGUIENTE: \"Si el presunto infractor o el quejoso solicitan la práctica de pruebas adicionales, pertinentes y conducentes, y si la autoridad las considera viables o las requiere, las decretará y se practicarán en un término máximo de cinco (5) días. Igualmente la autoridad podrá decretar de oficio las pruebas que requiera y dispondrá que se practiquen dentro del mismo término. La audiencia se reanudará al día siguiente al del vencimiento de la práctica de pruebas\" (art. 223 num. 3 lit. c). Ese día siguiente es también el reloj de las partes: quien no comparece a la reanudación queda expuesto al art. 223 parágrafo 1. CUANDO SE PUEDE PRESCINDIR DE PRUEBAS: \"Tratándose de hechos notorios o de negaciones indefinidas, se podrá prescindir de la práctica de pruebas y la autoridad de Policía decidirá de plano\" (mismo literal). PERITAJE OFICIOSO: \"Cuando se requieran conocimientos técnicos especializados, los servidores públicos del sector central y descentralizado del nivel territorial, darán informes por solicitud de la autoridad de Policía\". MEDIOS ADMISIBLES: informe de policía, documentos, testimonio, entrevista, inspección, peritaje y los demás consagrados en la Ley 1564 de 2012 (art. 217). CARGA DE LA PRUEBA EN AMBIENTE Y SALUD PÚBLICA: el art. 220 conserva la regla solo en cuanto al deber del infractor de probar que no incurrió en el comportamiento; el aparte que presumía la culpa o el dolo fue declarado INEXEQUIBLE por la Corte Constitucional en la Sentencia C-225 de 20 de abril de 2017, M.P. Alejandro Linares Cantillo, de modo que no puede fundarse el auto en presunción de culpa.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la autoridad, del radicado y de la audiencia en curso",
+          "mandatory": true,
+          "basis": "Art. 223 num. 3"
+        },
+        {
+          "n": 2,
+          "name": "Relación de las pruebas solicitadas por el quejoso y por el presunto infractor",
+          "mandatory": true,
+          "basis": "Art. 223 num. 3 lit. c"
+        },
+        {
+          "n": 3,
+          "name": "Pronunciamiento sobre pertinencia, conducencia y viabilidad de cada prueba",
+          "mandatory": true,
+          "basis": "Art. 223 num. 3 lit. c"
+        },
+        {
+          "n": 4,
+          "name": "Pruebas decretadas de oficio, si las hay",
+          "mandatory": false,
+          "basis": "Art. 223 num. 3 lit. c"
+        },
+        {
+          "n": 5,
+          "name": "Fijación del término de práctica, que no puede exceder de cinco días",
+          "mandatory": true,
+          "basis": "Art. 223 num. 3 lit. c"
+        },
+        {
+          "n": 6,
+          "name": "Solicitud de informe técnico especializado a servidores públicos, cuando se requiera",
+          "mandatory": false,
+          "basis": "Art. 223 num. 3 lit. c"
+        },
+        {
+          "n": 7,
+          "name": "Señalamiento de la fecha de reanudación de la audiencia, al día siguiente del vencimiento",
+          "mandatory": true,
+          "basis": "Art. 223 num. 3 lit. c"
+        },
+        {
+          "n": 8,
+          "name": "Motivación de la decisión de prescindir de pruebas por hecho notorio o negación indefinida, si es del caso",
+          "mandatory": false,
+          "basis": "Art. 223 num. 3 lit. c"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1801_2016_pr005.html"
+    },
+    {
+      "exact_name": "Acta de la diligencia de inspección al lugar de los hechos",
+      "area": "POLICIVO",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 1801 de 2016, art. 223 parágrafo 2 (casos en que se requiere inspección al lugar) y parágrafo 4 (statu quo por suspensión); art. 217 num. 5 (la inspección como medio de prueba); art. 223 num. 4 (recursos)",
+      "competent_authority": "Inspector de Convivencia y Paz (denominación vigente: el art. 1 de la Ley 2492 de 23 de julio de 2025 sustituyó \"Inspectores de Policía\" por \"Inspectores de Convivencia y Paz\", y su art. 6 reescribió el art. 206 de la Ley 1801 de 2016) del lugar donde sucedieron los hechos (art. 216)",
+      "term": "RELOJES DE LA DILIGENCIA, TODOS CORTOS: notificación personal al presunto infractor o perturbador y al quejoso y, de no ser posible, aviso fijado en la puerta de acceso del lugar de los hechos o parte visible de este, \"con antelación no menor a veinticuatro (24) horas, de la fecha y hora de la diligencia\"; en la diligencia la autoridad \"oirá a las partes máximo por quince (15) minutos cada una y recibirá y practicará las pruebas que considere conducentes para el esclarecimiento de los hechos\"; \"El informe técnico especializado se rendirá dentro de la diligencia de inspección ocular. Excepcionalmente y a juicio del inspector de Policía, podrá suspenderse la diligencia hasta por un término no mayor de tres (3) días con el objeto de que el servidor público rinda el informe técnico\"; y \"La autoridad de Policía proferirá la decisión dentro de la misma diligencia de inspección, o si ella hubiere sido suspendida, a la terminación del plazo de suspensión\" (art. 223 parágrafo 2). ATENCIÓN AL CLIENTE: quince minutos son el único espacio de alegación, y la decisión se dicta en la misma diligencia, de modo que los recursos deben interponerse allí mismo (art. 223 num. 4). SUSPENSIÓN POR FUERZA MAYOR: \"Cuando por caso fortuito o fuerza mayor demostrados, excepcionalmente deba suspenderse la audiencia pública, la autoridad competente decretará el statu quo sobre los bienes objeto de la misma, dejando constancia y registro documental, fijando fecha y hora para su reanudación\" (art. 223 parágrafo 4).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la autoridad, del radicado, y fecha y hora de la diligencia",
+          "mandatory": true,
+          "basis": "Art. 223 parágrafo 2"
+        },
+        {
+          "n": 2,
+          "name": "Constancia de la notificación personal o del aviso fijado con antelación no menor a veinticuatro horas",
+          "mandatory": true,
+          "basis": "Art. 223 parágrafo 2"
+        },
+        {
+          "n": 3,
+          "name": "Identificación de los comparecientes y del servidor público técnico especializado, cuando asista",
+          "mandatory": true,
+          "basis": "Art. 223 parágrafo 2"
+        },
+        {
+          "n": 4,
+          "name": "Descripción del lugar inspeccionado y de lo percibido directamente por la autoridad",
+          "mandatory": true,
+          "basis": "Art. 217 num. 5"
+        },
+        {
+          "n": 5,
+          "name": "Constancia de la intervención de cada parte, con el límite de quince minutos",
+          "mandatory": true,
+          "basis": "Art. 223 parágrafo 2"
+        },
+        {
+          "n": 6,
+          "name": "Pruebas recibidas y practicadas en la diligencia",
+          "mandatory": true,
+          "basis": "Art. 223 parágrafo 2"
+        },
+        {
+          "n": 7,
+          "name": "Informe técnico especializado rendido en la diligencia, o constancia de su suspensión por un máximo de tres días",
+          "mandatory": false,
+          "basis": "Art. 223 parágrafo 2"
+        },
+        {
+          "n": 8,
+          "name": "Decreto del statu quo y registro documental, si la diligencia se suspende por caso fortuito o fuerza mayor",
+          "mandatory": false,
+          "basis": "Art. 223 parágrafo 4"
+        },
+        {
+          "n": 9,
+          "name": "Decisión proferida en la misma diligencia o al terminar la suspensión",
+          "mandatory": true,
+          "basis": "Art. 223 parágrafo 2"
+        },
+        {
+          "n": 10,
+          "name": "Constancia de los recursos interpuestos y firmas de los intervinientes",
+          "mandatory": true,
+          "basis": "Art. 223 num. 4"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1801_2016_pr005.html"
+    },
+    {
+      "exact_name": "Orden de policía",
+      "area": "POLICIVO",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 1801 de 2016, art. 149 (medios de policía); art. 150 y su parágrafo (orden de policía y consecuencia penal de su incumplimiento); art. 222 num. 4 (orden de policía en el proceso verbal inmediato); art. 223 num. 3 lit. d, num. 5 y parágrafo 3 (decisión, cumplimiento y ejecución a costa del obligado); art. 224 (alcance penal); art. 226 inc. 2 (prescripción de las medidas correctivas)",
+      "competent_authority": "La autoridad de policía competente según el comportamiento y la medida: personal uniformado de la Policía Nacional y comandantes de estación, subestación o Centro de Atención Inmediata en el proceso verbal inmediato (arts. 209, 210 y 222); Inspector de Convivencia y Paz, corregidor, alcalde o autoridad administrativa especial de policía en el proceso verbal abreviado (arts. 205, 206, 207 y 223)",
+      "term": "RELOJ DE CUMPLIMIENTO, DE CINCO DÍAS DESDE LA EJECUTORIA: \"Una vez ejecutoriada la decisión que contenga una orden de Policía o una medida correctiva, esta se cumplirá en un término máximo de cinco (5) días\" (art. 223 num. 5). Cuando la orden no sea de inmediato cumplimiento, \"la autoridad conminará a la persona para que la cumpla en un plazo determinado, sin perjuicio de las acciones legales pertinentes\" (art. 150 inc. 2). EN OCUPACIÓN DE HECHO EL PLAZO ES DE HORAS: \"El desalojo se deberá efectuar dentro de las veinticuatro (24) horas siguientes a la orden\" (art. 79 parágrafo 1). DEFINICIÓN: \"La orden de Policía es un mandato claro, preciso y conciso dirigido en forma individual o de carácter general, escrito o verbal, emanado de la autoridad de Policía, para prevenir o superar comportamientos o hechos contrarios a la convivencia, o para restablecerla. Las órdenes de Policía son de obligatorio cumplimiento\" (art. 150 inc. 1). LO QUE CUESTA DESOBEDECERLA, Y ES MATERIA PENAL: \"El incumplimiento de la orden de Policía mediante la cual se imponen medidas correctivas configura el tipo penal establecido para el fraude a resolución judicial o administrativa de Policía establecido en el artículo 454 de la Ley 599 de 2000\" (art. 150 parágrafo), en concordancia con el art. 224. EJECUCIÓN SUBSIDIARIA: \"Si el infractor o perturbador no cumple la orden de Policía o la medida correctiva, la autoridad de Policía competente, por intermedio de la entidad correspondiente, podrá ejecutarla a costa del obligado, si ello fuere posible. Los costos de la ejecución podrán cobrarse por la vía de la jurisdicción coactiva\" (art. 223 parágrafo 3). PRESCRIPCIÓN: las medidas correctivas prescriben en cinco (5) años desde la firmeza de la decisión (art. 226 inc. 2).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la autoridad de policía que la emite y del radicado",
+          "mandatory": true,
+          "basis": "Art. 150"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del destinatario, individual o general",
+          "mandatory": true,
+          "basis": "Art. 150"
+        },
+        {
+          "n": 3,
+          "name": "Mandato claro, preciso y conciso de lo que debe hacerse o dejar de hacerse",
+          "mandatory": true,
+          "basis": "Art. 150"
+        },
+        {
+          "n": 4,
+          "name": "Fundamento normativo y hechos que la justifican",
+          "mandatory": true,
+          "basis": "Art. 223 num. 3 lit. d"
+        },
+        {
+          "n": 5,
+          "name": "Plazo de cumplimiento, que no puede exceder de cinco días desde la ejecutoria",
+          "mandatory": true,
+          "basis": "Art. 223 num. 5"
+        },
+        {
+          "n": 6,
+          "name": "Advertencia sobre la ejecución a costa del obligado y el cobro por jurisdicción coactiva",
+          "mandatory": true,
+          "basis": "Art. 223 parágrafo 3"
+        },
+        {
+          "n": 7,
+          "name": "Advertencia sobre el alcance penal del incumplimiento, art. 454 de la Ley 599 de 2000",
+          "mandatory": true,
+          "basis": "Arts. 150 parágrafo y 224"
+        },
+        {
+          "n": 8,
+          "name": "Información sobre los recursos procedentes y sus términos",
+          "mandatory": true,
+          "basis": "Art. 219 parágrafo 2"
+        },
+        {
+          "n": 9,
+          "name": "Constancia de notificación, en estrados cuando se profiere en audiencia",
+          "mandatory": true,
+          "basis": "Art. 223 num. 3 lit. d"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1801_2016_pr003.html"
+    },
+    {
+      "exact_name": "Resolución que impone medida correctiva en proceso verbal abreviado",
+      "area": "POLICIVO",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 1801 de 2016, art. 172 (objeto y naturaleza no sancionatoria de las medidas correctivas); art. 173 (catálogo de medidas correctivas); art. 212 (reiteración del comportamiento y escalonamiento de medidas); art. 223 num. 3 lit. d, num. 5 y parágrafo 3 (decisión, cumplimiento y ejecución); art. 219 parágrafo 2; art. 184 (Registro Nacional de Medidas Correctivas); art. 223A lit. a (dosificación); art. 226 inc. 2 (prescripción)",
+      "competent_authority": "Inspector de Convivencia y Paz (denominación vigente: el art. 1 de la Ley 2492 de 23 de julio de 2025 sustituyó \"Inspectores de Policía\" por \"Inspectores de Convivencia y Paz\", y su art. 6 reescribió el art. 206 de la Ley 1801 de 2016) del lugar donde sucedieron los hechos (art. 216)",
+      "term": "LA DECISIÓN SE DICTA EN LA AUDIENCIA Y ALLÍ QUEDA NOTIFICADA: \"Agotada la etapa probatoria, la autoridad de Policía valorará las pruebas y dictará la orden de Policía o medida correctiva, si hay lugar a ello, sustentando su decisión con los respectivos fundamentos normativos y hechos conducentes demostrados. La decisión quedará notificada en estrados\" (art. 223 num. 3 lit. d). De ahí que los recursos \"se solicitarán, concederán y sustentarán dentro de la misma audiencia\" (num. 4): no hay traslado ni notificación posterior que reabra el término del administrado. CUMPLIMIENTO: máximo cinco (5) días desde la ejecutoria (num. 5); si no se cumple, ejecución a costa del obligado y cobro por jurisdicción coactiva (parágrafo 3), y el desacato configura conducta punible (arts. 224 y 150 parágrafo). NATURALEZA: \"Las medidas correctivas no tienen carácter sancionatorio\" (art. 172 parágrafo 1). DOSIFICACIÓN OBLIGATORIA: \"Será obligatorio para las autoridades de policía tener en cuenta al momento de expedir la orden de comparendo y de aplicar o imponer una medida correctiva, los principios de proporcionalidad, razonabilidad y necesidad frente al bien jurídico tutelado\" (art. 223A lit. a). REGISTRO: \"Cuando las autoridades de Policía impongan una medida correctiva deberán informar a la Policía Nacional para que proceda a su registro en una base de datos de orden nacional y acceso público\" (art. 172 parágrafo 2), sin perjuicio del Registro Nacional de Medidas Correctivas del art. 184. PRESCRIPCIÓN DE LA MEDIDA: cinco (5) años desde la firmeza de la decisión (art. 226 inc. 2). MORA EN EL PAGO DE MULTAS: transcurridos seis (6) meses desde la imposición sin pago, operan las inhabilidades del art. 183.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la autoridad, del radicado, del quejoso y del infractor",
+          "mandatory": true,
+          "basis": "Art. 223"
+        },
+        {
+          "n": 2,
+          "name": "Síntesis de los hechos y de la actuación surtida en la audiencia",
+          "mandatory": true,
+          "basis": "Art. 223 num. 3"
+        },
+        {
+          "n": 3,
+          "name": "Constancia de la invitación a conciliar y de su resultado",
+          "mandatory": true,
+          "basis": "Arts. 223 num. 3 lit. b y 232"
+        },
+        {
+          "n": 4,
+          "name": "Valoración de las pruebas practicadas",
+          "mandatory": true,
+          "basis": "Art. 223 num. 3 lit. d"
+        },
+        {
+          "n": 5,
+          "name": "Hechos conducentes demostrados",
+          "mandatory": true,
+          "basis": "Art. 223 num. 3 lit. d"
+        },
+        {
+          "n": 6,
+          "name": "Fundamentos normativos, con el artículo y numeral del comportamiento contrario a la convivencia",
+          "mandatory": true,
+          "basis": "Art. 223 num. 3 lit. d"
+        },
+        {
+          "n": 7,
+          "name": "Medida correctiva impuesta y su dosificación según proporcionalidad, razonabilidad y necesidad",
+          "mandatory": true,
+          "basis": "Arts. 173 y 223A lit. a"
+        },
+        {
+          "n": 8,
+          "name": "Pronunciamiento sobre reiteración y escalonamiento de medidas, si procede",
+          "mandatory": false,
+          "basis": "Art. 212"
+        },
+        {
+          "n": 9,
+          "name": "Plazo de cumplimiento de máximo cinco días desde la ejecutoria",
+          "mandatory": true,
+          "basis": "Art. 223 num. 5"
+        },
+        {
+          "n": 10,
+          "name": "Advertencia de ejecución a costa del obligado, cobro coactivo y alcance penal del desacato",
+          "mandatory": true,
+          "basis": "Arts. 223 parágrafo 3 y 224"
+        },
+        {
+          "n": 11,
+          "name": "Información de oficio sobre los recursos y sus términos",
+          "mandatory": true,
+          "basis": "Art. 219 parágrafo 2"
+        },
+        {
+          "n": 12,
+          "name": "Orden de registro de la medida correctiva",
+          "mandatory": true,
+          "basis": "Arts. 172 parágrafo 2 y 184"
+        },
+        {
+          "n": 13,
+          "name": "Constancia de notificación en estrados y de los recursos interpuestos",
+          "mandatory": true,
+          "basis": "Art. 223 nums. 3 lit. d y 4"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1801_2016_pr005.html"
+    },
+    {
+      "exact_name": "Decisión de segunda instancia que resuelve el recurso de apelación en materia de policía",
+      "area": "POLICIVO",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 1801 de 2016, art. 223 num. 4 y parágrafos 4 y 5; art. 207 (autoridades administrativas especiales de policía); art. 205 nums. 8 y 14 y parágrafo 1; art. 222 parágrafo 1 (apelación en el proceso verbal inmediato); art. 79 parágrafo 3 inc. final; art. 227 (falta disciplinaria por incumplir términos)",
+      "competent_authority": "En el proceso verbal abreviado: la autoridad administrativa especial de policía según la materia —salud, seguridad, ambiente, minera, ordenamiento territorial, planeación, vivienda y espacio público— (art. 207 inc. 1); donde no exista, el alcalde distrital o municipal (arts. 205 nums. 8 y 14 y 207 inc. 2); en San Andrés, Providencia y Santa Catalina, el Gobernador o la autoridad administrativa con competencia especial de convivencia (art. 205 parágrafo 1). En el proceso verbal inmediato: el Inspector de Convivencia y Paz (arts. 222 parágrafo 1 y 210 parágrafo 2)",
+      "term": "RELOJ DEL SUPERIOR, DISTINTO SEGÚN EL PROCESO: en el verbal abreviado, \"El recurso de apelación se resolverá dentro de los ocho (8) días siguientes al recibo de la actuación\" (art. 223 num. 4) y \"se resolverá de plano\" (parágrafo 5), sin audiencia ni pruebas nuevas; en el verbal inmediato, \"El recurso de apelación se resolverá dentro de los tres (3) días hábiles siguientes al recibo de la actuación y será notificado por medio más eficaz y expedito\" (art. 222 parágrafo 1). ANTES DE ESO: la actuación se remite al superior \"dentro de los dos (2) días siguientes\" a la concesión en el verbal abreviado (art. 223 num. 4) y \"dentro de las veinticuatro (24) horas siguientes\" en el verbal inmediato (art. 222 parágrafo 1). LO QUE EL SUPERIOR DEBE VERIFICAR ANTES DE ENTRAR AL FONDO: que el apelante haya sustentado \"dentro de los dos (2) días siguientes al recibo del recurso\" (art. 223 num. 4); que la decisión apelada sea definitiva, porque \"Los recursos solo procederán contra las decisiones definitivas de las autoridades de Policía\" (num. 4 inc. 3); y que no se trate de un procedimiento de única instancia, en el que \"El numeral 4 del presente artículo no procederá\" (parágrafo 4). EFECTO: devolutivo por regla general y suspensivo en infracciones urbanísticas (art. 223 num. 4 inc. 2); en los procedimientos de protección a bienes inmuebles, \"El recurso de apelación se concederá en efecto devolutivo\" (art. 79 parágrafo 3 inc. final). Incumplir estos términos es falta disciplinaria grave (art. 227).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del superior jerárquico competente y del radicado",
+          "mandatory": true,
+          "basis": "Art. 207"
+        },
+        {
+          "n": 2,
+          "name": "Fecha de recibo de la actuación, de la que corren los ocho días o los tres días hábiles",
+          "mandatory": true,
+          "basis": "Arts. 223 num. 4 y 222 parágrafo 1"
+        },
+        {
+          "n": 3,
+          "name": "Verificación de la procedencia del recurso: decisión definitiva y proceso de doble instancia",
+          "mandatory": true,
+          "basis": "Art. 223 num. 4 inc. 3 y parágrafo 4"
+        },
+        {
+          "n": 4,
+          "name": "Verificación de la sustentación oportuna dentro de los dos días siguientes al recibo",
+          "mandatory": true,
+          "basis": "Art. 223 num. 4"
+        },
+        {
+          "n": 5,
+          "name": "Síntesis de la decisión apelada y de los reparos del recurrente",
+          "mandatory": true,
+          "basis": "Art. 223 num. 4"
+        },
+        {
+          "n": 6,
+          "name": "Resolución de plano de los reparos, sin práctica de pruebas nuevas",
+          "mandatory": true,
+          "basis": "Art. 223 parágrafo 5"
+        },
+        {
+          "n": 7,
+          "name": "Pronunciamiento sobre las nulidades alegadas en audiencia, si las hubo",
+          "mandatory": false,
+          "basis": "Art. 228"
+        },
+        {
+          "n": 8,
+          "name": "Decisión de confirmar, modificar o revocar la orden de policía o la medida correctiva",
+          "mandatory": true,
+          "basis": "Art. 223 num. 4"
+        },
+        {
+          "n": 9,
+          "name": "Orden de devolución del expediente a la primera instancia para el cumplimiento",
+          "mandatory": true,
+          "basis": "Art. 223 num. 5"
+        },
+        {
+          "n": 10,
+          "name": "Constancia de notificación por el medio más eficaz y expedito",
+          "mandatory": true,
+          "basis": "Art. 222 parágrafo 1"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1801_2016_pr005.html"
+    },
+    {
+      "exact_name": "Auto que resuelve la solicitud de nulidad en la audiencia de policía",
+      "area": "POLICIVO",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 1801 de 2016, art. 228 (nulidades); art. 213 (principios del procedimiento); art. 223 num. 4 y parágrafo 5; art. 227; Constitución Política, art. 29",
+      "competent_authority": "La autoridad de policía que adelanta la audiencia: Inspector de Convivencia y Paz, corregidor, alcalde o autoridad administrativa especial de policía (arts. 205, 206 y 207)",
+      "term": "SE RESUELVE EN EL ACTO Y NO SALE DE LA AUDIENCIA: \"Los intervinientes en el proceso podrán pedir únicamente dentro de la audiencia, la nulidad del mismo por violación del debido proceso consagrado en el artículo 29 de la Constitución Política, solicitud que se resolverá de plano. Contra esta decisión solo procederá el recurso de reposición, que se resolverá dentro de la misma audiencia\" (art. 228). No hay apelación contra esta decisión ni término para pronunciarse distinto del acto mismo. CAUSAL ÚNICA: violación del debido proceso del art. 29 de la Constitución. CONSECUENCIA PARA EL INTERVINIENTE: negada la nulidad, su único camino es la reposición inmediata y la constancia para reiterar el reparo al sustentar la apelación contra la decisión definitiva, que el superior resuelve de plano (art. 223 num. 4 y parágrafo 5). La demora de la autoridad es falta disciplinaria grave (art. 227).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la autoridad, del radicado y de la audiencia en curso",
+          "mandatory": true,
+          "basis": "Art. 228"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del interviniente que solicitó la nulidad y constancia de que lo hizo dentro de la audiencia",
+          "mandatory": true,
+          "basis": "Art. 228"
+        },
+        {
+          "n": 3,
+          "name": "Síntesis de la actuación señalada como viciada y de la garantía invocada",
+          "mandatory": true,
+          "basis": "Art. 228"
+        },
+        {
+          "n": 4,
+          "name": "Análisis de si hubo violación del debido proceso del art. 29 de la Constitución",
+          "mandatory": true,
+          "basis": "Art. 228"
+        },
+        {
+          "n": 5,
+          "name": "Decisión de declarar o negar la nulidad, resuelta de plano",
+          "mandatory": true,
+          "basis": "Art. 228"
+        },
+        {
+          "n": 6,
+          "name": "Alcance de la nulidad declarada y actuación que debe rehacerse, si procede",
+          "mandatory": false,
+          "basis": "Art. 228"
+        },
+        {
+          "n": 7,
+          "name": "Constancia de notificación en estrados y de la reposición interpuesta y resuelta en la misma audiencia",
+          "mandatory": true,
+          "basis": "Art. 228"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1801_2016_pr005.html"
+    },
+    {
+      "exact_name": "Acta del proceso verbal inmediato",
+      "area": "POLICIVO",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 1801 de 2016, art. 222 y sus parágrafos 1, 2 y 3 (trámite del proceso verbal inmediato y acta); arts. 209 y 210 (autoridades competentes); art. 221 (clases de actuaciones); art. 150 (orden de policía); art. 219 parágrafo 2 (deber de informar los recursos)",
+      "competent_authority": "Personal uniformado de la Policía Nacional, comandantes de estación, subestación o de Centros de Atención Inmediata de la Policía Nacional, o sus delegados (arts. 209, 210 y 222)",
+      "term": "NO HAY PLAZOS DE DÍAS EN LA ETAPA DE IMPOSICIÓN: el proceso verbal inmediato se agota en el sitio de los hechos, donde la autoridad aborda al presunto infractor, le informa que su acción u omisión configura un comportamiento contrario a la convivencia, lo oye en descargos, hace una primera ponderación, procura la mediación policial y, de no lograrla, \"impondrá la medida correctiva a través de la orden de Policía\" (art. 222 nums. 2 a 4). CUÁNDO EL ACTA ES OBLIGATORIA: \"Para la imposición de las medidas correctivas de suspensión temporal de actividad, inutilización de bienes, destrucción de bien y disolución de reunión o actividad que involucra aglomeraciones de público no complejas, se deberá levantar acta en la que se documente el procedimiento señalado en el presente artículo, la cual debe estar suscrita por quien impone la medida y el infractor\" (art. 222 parágrafo 3). RELOJES POSTERIORES: la apelación se concede en el efecto devolutivo y \"se remitirá al Inspector de Policía dentro de las veinticuatro (24) horas siguientes\"; se resuelve \"dentro de los tres (3) días hábiles siguientes al recibo de la actuación\" (art. 222 parágrafo 1). REINCIDENCIA O INCUMPLIMIENTO: \"En caso de que no se cumpliere la orden de Policía, o que el infractor incurra en reincidencia, se impondrá una medida correctiva de multa, mediante la aplicación del proceso verbal abreviado\" (art. 222 parágrafo 2).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la autoridad que impone la medida y de su unidad",
+          "mandatory": true,
+          "basis": "Art. 222"
+        },
+        {
+          "n": 2,
+          "name": "Lugar, fecha y hora de la actuación",
+          "mandatory": true,
+          "basis": "Art. 222 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "Identificación del presunto infractor",
+          "mandatory": true,
+          "basis": "Art. 222 num. 2"
+        },
+        {
+          "n": 4,
+          "name": "Constancia de haberle informado que su acción u omisión configura un comportamiento contrario a la convivencia",
+          "mandatory": true,
+          "basis": "Art. 222 num. 2"
+        },
+        {
+          "n": 5,
+          "name": "Descargos rendidos por el presunto infractor",
+          "mandatory": true,
+          "basis": "Art. 222 num. 3"
+        },
+        {
+          "n": 6,
+          "name": "Ponderación de los hechos y constancia del intento de mediación policial y su resultado",
+          "mandatory": true,
+          "basis": "Art. 222 num. 4"
+        },
+        {
+          "n": 7,
+          "name": "Medida correctiva impuesta mediante orden de policía, con su fundamento normativo",
+          "mandatory": true,
+          "basis": "Arts. 222 num. 4 y 150"
+        },
+        {
+          "n": 8,
+          "name": "Descripción de los bienes objeto de suspensión, inutilización o destrucción, cuando aplique",
+          "mandatory": true,
+          "basis": "Art. 222 parágrafo 3"
+        },
+        {
+          "n": 9,
+          "name": "Información sobre el recurso de apelación, su efecto devolutivo y su trámite",
+          "mandatory": true,
+          "basis": "Arts. 219 parágrafo 2 y 222 parágrafo 1"
+        },
+        {
+          "n": 10,
+          "name": "Firma de quien impone la medida y del infractor",
+          "mandatory": true,
+          "basis": "Art. 222 parágrafo 3"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1801_2016_pr004.html"
+    }
+  ]
+}

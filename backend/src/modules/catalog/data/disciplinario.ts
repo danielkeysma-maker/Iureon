@@ -1,0 +1,583 @@
+import type { BranchCatalog } from '../types';
+
+/**
+ * DISCIPLINARIO catalogue.
+ *
+ * Generated from research/actuaciones-disciplinario.json, whose entries were verified against the
+ * official text of the governing norms. Do not hand-edit: regenerate with
+ * `python backend/scripts/build-catalog.py` so data and provenance never drift.
+ *
+ * Coverage is partial by design and the gaps are declared below rather than
+ * hidden, because a silent gap in procedural deadlines is the dangerous kind.
+ */
+export const DISCIPLINARIO_CATALOG: BranchCatalog = {
+  meta: {
+    branch: 'DISCIPLINARIO',
+    verifiedAt: '2026-08-26',
+    sourceOfTruth: 'Ley 1952 de 2019, Codigo General Disciplinario, reformada por la Ley 2094 de 2021 y vigente desde el 29 de marzo de 2022, para los servidores publicos; y Ley 1123 de 2007, Codigo Disciplinario del Abogado, vigente, para los abogados. La Ley 734 de 2002 solo subsiste por transicion: procesos con pliego notificado o audiencia verbal instalada antes del 29 de marzo de 2022, y la oficina disciplinaria de la Fiscalia para hechos anteriores al 13 de enero de 2021. La C-030 de 2023 declaro inexequible el caracter jurisdiccional de la funcion de la Procuraduria: es funcion administrativa, y la imposicion definitiva de destitucion, suspension e inhabilidad a elegidos por voto popular corresponde al juez contencioso administrativo. Por el Acto Legislativo 02 de 2015 el juez disciplinario del abogado es hoy la Comision Seccional o Nacional de Disciplina Judicial, no el Consejo Seccional de la Judicatura que nombra el texto de la Ley 1123. No hay caducidad de la accion disciplinaria: hay prescripcion de cinco anos, doce en las faltas del art. 52.',
+    gaps: [
+    'DISCIPLINARIO: PROCEDIMIENTO DE LA LEY 734 DE 2002. No se catalogó, aunque conserva vigencia por transición para los procesos con pliego de cargos notificado o audiencia verbal instalada antes del 29 de marzo de 2022 (art. 263 de la Ley 1952) y para la Oficina de Control Disciplinario Interno de la Fiscalía respecto de hechos anteriores al 13 de enero de 2021 (art. 93 par. transitorio). Sus términos son distintos de los aquí catalogados y ponerlos en la misma rama produciría dos fichas con el mismo exact_name y plazos contradictorios. Es un vacío deliberado: un proceso en transición debe verificarse contra la Ley 734, no contra estas fichas.',
+    'DISCIPLINARIO: REGÍMENES DISCIPLINARIOS ESPECIALES. El art. 265 de la Ley 1952 de 2019 dispone que «Los regímenes especiales en materia disciplinaria y las norma relacionadas con la Comisión de Ética del Congreso conservarán su vigencia». Quedan fuera el régimen disciplinario de las Fuerzas Militares, el de la Policía Nacional y el de los congresistas ante la Comisión de Ética. No se leyeron sus normas y no se inventan fichas.',
+    'DISCIPLINARIO: RÉGIMEN DE LOS FUNCIONARIOS Y EMPLEADOS JUDICIALES ANTE LA COMISIÓN NACIONAL DE DISCIPLINA JUDICIAL. Título XI de la Ley 1952 de 2019 (arts. 239 a 262, varios modificados por los arts. 61 a 70 de la Ley 2094 de 2021). Tiene procedimiento propio —el auto de citación a audiencia lo dicta el magistrado sustanciador (art. 222 par.), la sentencia la profiere la Sala (art. 244) y el art. 254 fija 5 días para registrar el proyecto y 8 para el fallo—, y se dejó fuera para no mezclarlo con el procedimiento ante la Procuraduría, que es el que usa la inmensa mayoría de los casos. Es un hueco identificado, no un olvido.',
+    'DISCIPLINARIO: RÉGIMEN DISCIPLINARIO DE LOS NOTARIOS. Los arts. 75 a 82 de la Ley 1952 de 2019 lo regulan y su órgano competente es la Superintendencia de Notariado y Registro (art. 76). No se catalogó aquí para no chocar con la rama NOTARIAL ya existente; verificarlo y ubicarlo es trabajo pendiente de esa rama.',
+    'DISCIPLINARIO: RÉGIMEN DE LOS PARTICULARES QUE EJERCEN FUNCIONES PÚBLICAS. Arts. 69 a 74 de la Ley 1952 de 2019. Se rige por el mismo procedimiento aquí catalogado, de modo que las fichas de LITIGANTE y DESPACHO le sirven; no se crearon fichas separadas para no duplicar exact_name.',
+    'DISCIPLINARIO: EFECTO DE LA CONCILIACIÓN EXTRAJUDICIAL SOBRE LA CADUCIDAD DE CUATRO MESES. El art. 161 num. 1 del CPACA exige la conciliación como requisito de procedibilidad de la nulidad y restablecimiento del derecho, y se citó verbatim en la ficha correspondiente. Cuánto suspende la caducidad esa solicitud lo fija hoy la Ley 2220 de 2022 (Estatuto de Conciliación), que NO se leyó en fuente oficial en esta pasada. La ficha por eso afirma solo los cuatro (4) meses del art. 164 num. 2 lit. d, verificados, y no un cómputo con suspensión que no se comprobó.',
+    'DISCIPLINARIO: DEMANDA CONTENCIOSA CONTRA LA SENTENCIA DISCIPLINARIA DEL ABOGADO. No se catalogó, y la ausencia es la regla: las decisiones de las Comisiones Seccionales y de la Comisión Nacional de Disciplina Judicial son sentencias en ejercicio de la función jurisdiccional disciplinaria (Constitución Política, art. 257A), no actos administrativos. Contra ellas no procede nulidad y restablecimiento del derecho. La diferencia con el régimen de servidores públicos es exactamente lo que la Sentencia C-030 de 2023 dejó claro al negar naturaleza jurisdiccional a la Procuraduría.',
+    'DISCIPLINARIO: DOBLE CONFORMIDAD ANTE EL PROCURADOR GENERAL. Los arts. 12, 93, 101 y 102 de la Ley 1952 de 2019 la mencionan y se citaron donde corresponde, pero ninguno le fija término propio: el art. 12 remite a que «su trámite será el previsto en esta ley para el recurso de apelación». No se creó ficha autónoma para no publicar como plazo de doble conformidad uno que la ley no le asigna; quien la interponga debe usar los términos de apelación de los arts. 225G o 233 según el juicio.',
+    'DISCIPLINARIO: REVOCATORIA DIRECTA ANTE LAS PERSONERÍAS O ANTE LAS OFICINAS DE CONTROL INTERNO. No existe: el art. 141 permite revocar sus fallos, pero el art. 142 reserva la competencia al Procurador General de la Nación como «única autoridad competente». Presentarla ante la personería no interrumpe nada.',
+    'DISCIPLINARIO, verificado el esta pasada: QUÉ RIGE HOY, verificado artículo por artículo en secretariasenado.gov.co (actualización del sitio: 15 de agosto de 2026, Diario Oficial No. 53.578 de 5 de agosto de 2026). El texto completo de la Ley 1952 de 2019 se descargó en HTML crudo en sus siete páginas (base y pr001 a pr006): los 265 artículos están presentes, sin huecos. 1) SERVIDORES PÚBLICOS — RIGE LA LEY 1952 DE 2019 (Código General Disciplinario) REFORMADA POR LA LEY 2094 DE 2021, DESDE EL 29 DE MARZO DE 2022. El art. 265, modificado por el art. 73 de la Ley 2094 de 2021, dice: «Las disposiciones previstas en la presente ley, y las contenidas en la Ley 1952 de 2019, que no son objeto de reforma, entrarán a regir nueve (9) meses después de su promulgación. Durante este período conservará su vigencia plena la Ley 734 de 2002, con sus reformas». La Ley 2094 se promulgó el 29 de junio de 2021 (Diario Oficial No. 51.720), luego los nueve meses vencieron el 29 de marzo de 2022 — fecha que el propio compilador confirma al anotar que el aparte «y la consulta» del num. 1 del art. 59 de la Ley 1123 de 2007 quedó derogado «a partir del 29 de marzo de 2022 por el artículo 73 de la Ley 2094 de 2021». La entrada en vigencia de la Ley 1952 se había aplazado antes: su texto original la fijaba en cuatro meses, y el art. 140 de la Ley 1955 de 2019 (Plan Nacional de Desarrollo) la prorrogó hasta el 1 de julio de 2021. 2) LA LEY 734 DE 2002 CONSERVA VIGENCIA, PERO SOLO POR TRANSICIÓN, Y EN DOS SUPUESTOS COMPROBADOS. (a) Art. 263,'
+    ]
+  },
+  actuaciones: [
+  {
+    id: 'disciplinario/descargos-en-el-proceso-disciplinario',
+    exactName: 'Descargos en el proceso disciplinario',
+    branch: 'DISCIPLINARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1952 de 2019, art. 225B (adicionado por el art. 41 de la Ley 2094 de 2021: traslado de 15 días para descargos y pruebas en el juicio ordinario); art. 227 (modificado por el art. 48 de la Ley 2094 de 2021: descargos orales en el juicio verbal); art. 222 (contra el pliego de cargos no procede recurso alguno)',
+    competentAuthority: 'El funcionario de juzgamiento —distinto del instructor (art. 12, modificado por el art. 3 de la Ley 2094 de 2021)—: la Oficina de Control Disciplinario Interno de la entidad, la personería distrital o municipal, o la Procuraduría General de la Nación según la competencia (arts. 93 y 95)',
+    term: { status: 'VERIFICADO', description: 'RELOJ DEL DISCIPLINADO, y es preclusivo. JUICIO ORDINARIO: quince (15) días, contados desde el auto que decide aplicar el procedimiento ordinario, durante los cuales «el expediente quede a disposición de los sujetos procesales en la secretaría. En este plazo, podrán presentar descargos, así como aportar y solicitar pruebas» (art. 225B). Contra ese auto «no procede recurso alguno» y «la renuencia del investigado o su defensor a presentar descargos no interrumpen el trámite de la actuación» (art. 225B). JUICIO VERBAL: no hay traslado escrito; los descargos se rinden ORALMENTE en la audiencia de descargos y pruebas, que se celebra «en un término no menor a los diez (10) días ni mayor a los veinte (20) días de la fecha del auto de citación» (art. 225H). ADVERTENCIA: el pliego de cargos NO es recurrible (art. 222); los descargos son la primera y única oportunidad de contradicción, y la solicitud de nulidad debe formularse a más tardar antes del traslado para alegatos de conclusión (art. 206).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del disciplinado, del defensor y del proceso', mandatory: true, basis: null },
+      { n: 2, name: 'Pronunciamiento concreto frente a cada cargo formulado en el pliego', mandatory: true, basis: 'Art. 223 nums. 3 y 4' },
+      { n: 3, name: 'Controversia sobre la ilicitud sustancial y sobre la culpabilidad imputadas', mandatory: true, basis: 'Art. 223 nums. 5 y 6' },
+      { n: 4, name: 'Refutación del análisis probatorio del pliego', mandatory: true, basis: 'Art. 223 num. 7' },
+      { n: 5, name: 'Causales de exclusión de responsabilidad que se invocan', mandatory: false, basis: 'Ley 1952 de 2019, art. 31' },
+      { n: 6, name: 'Solicitud y aporte de pruebas', mandatory: true, basis: 'Art. 225B' },
+      { n: 7, name: 'Solicitud de nulidad, si hay lugar a ella', mandatory: false, basis: 'Arts. 202 y 206' },
+      { n: 8, name: 'Petición concreta de archivo o de absolución', mandatory: true, basis: null }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1952_2019_pr005.html'
+  },
+  {
+    id: 'disciplinario/solicitud-de-pruebas-en-el-proceso-disciplinario',
+    exactName: 'Solicitud de pruebas en el proceso disciplinario',
+    branch: 'DISCIPLINARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1952 de 2019, art. 151 (petición y negación de pruebas); art. 225B (adicionado por el art. 41 de la Ley 2094 de 2021: 15 días para solicitar y aportar); art. 225C (adicionado por el art. 42 de la Ley 2094 de 2021: término probatorio de 90 días); art. 227 (modificado por el art. 48 de la Ley 2094 de 2021: 20 días prorrogables en el juicio verbal); arts. 133 y 134 (recursos contra la negativa de pruebas)',
+    competentAuthority: 'El funcionario de juzgamiento en la etapa de juicio; el instructor en la etapa de investigación (arts. 12 y 212)',
+    term: { status: 'VERIFICADO', description: 'RELOJ DEL DISCIPLINADO: en el juicio ordinario, los quince (15) días del traslado de descargos (art. 225B); en el juicio verbal, dentro de la audiencia de descargos y pruebas (art. 227). Vencida esa oportunidad, la prueba solo se admite excepcionalmente (art. 225C). RELOJ DEL DESPACHO: «Las pruebas ordenadas se practicarán en un término no mayor de noventa (90) días» en el ordinario (art. 225C), y «hasta por el término de veinte (20) días prorrogables por una sola vez hasta por el mismo lapso» en el verbal (art. 227). NO SE CONFUNDAN LOS RECURSOS: contra la negativa de pruebas EN LA INVESTIGACIÓN procede REPOSICIÓN (art. 133); contra la negativa de pruebas EN LA ETAPA DE JUICIO procede APELACIÓN (art. 134), que en el verbal «debe interponerse y sustentarse en la misma sesión» (art. 227). La apelación se concede en el efecto suspensivo solo «si no se han decretado de oficio»; si la negativa es parcial o se decretan pruebas de oficio, se concede en el devolutivo (art. 134).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del proceso y del solicitante', mandatory: true, basis: null },
+      { n: 2, name: 'Enunciación separada de cada medio de prueba pedido', mandatory: true, basis: 'Ley 1952 de 2019, art. 149' },
+      { n: 3, name: 'Conducencia, pertinencia y utilidad de cada prueba', mandatory: true, basis: 'Art. 225C' },
+      { n: 4, name: 'Hecho que se pretende probar con cada medio', mandatory: true, basis: 'Ley 1952 de 2019, art. 147' },
+      { n: 5, name: 'Aporte de las pruebas documentales en poder del solicitante', mandatory: true, basis: 'Ley 1952 de 2019, art. 188' },
+      { n: 6, name: 'Solicitud de fecha para la práctica y, si procede, comisión', mandatory: false, basis: 'Ley 1952 de 2019, art. 152' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1952_2019_pr005.html'
+  },
+  {
+    id: 'disciplinario/alegatos-precalificatorios',
+    exactName: 'Alegatos precalificatorios',
+    branch: 'DISCIPLINARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1952 de 2019, art. 220 (cierre de la investigación y traslado de 10 días); art. 221 (modificado por el art. 38 de la Ley 2094 de 2021: decisión de evaluación)',
+    competentAuthority: 'El funcionario instructor de conocimiento: Oficina de Control Disciplinario Interno, personería o Procuraduría General de la Nación (arts. 93 y 95)',
+    term: { status: 'VERIFICADO', description: 'DIEZ (10) DÍAS, y es RELOJ DEL DISCIPLINADO: cerrada la investigación «ordenará correr traslado por el término de diez (10) días para que los sujetos procesales puedan presentar alegatos previos a la evaluación de la investigación» (art. 220). Es la última oportunidad de pedir el archivo ANTES de que se formule pliego de cargos: vencido el traslado, el funcionario «evaluará el mérito de las pruebas recaudadas y formulará pliego de cargos al disciplinable o terminará la actuación y ordenará el archivo» (art. 221), y contra el pliego «no procede recurso alguno» (art. 222).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del proceso, del disciplinado y del defensor', mandatory: true, basis: null },
+      { n: 2, name: 'Síntesis de los hechos investigados y del cargo que se anticipa', mandatory: true, basis: null },
+      { n: 3, name: 'Análisis de las pruebas recaudadas y de su insuficiencia', mandatory: true, basis: 'Art. 221' },
+      { n: 4, name: 'Argumentos sobre atipicidad, ausencia de ilicitud sustancial o de culpabilidad', mandatory: true, basis: 'Ley 1952 de 2019, arts. 26 y 31' },
+      { n: 5, name: 'Alegación de prescripción de la acción, si ha operado', mandatory: false, basis: 'Ley 1952 de 2019, art. 33' },
+      { n: 6, name: 'Petición expresa de archivo definitivo', mandatory: true, basis: 'Arts. 221 y 224' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1952_2019_pr005.html'
+  },
+  {
+    id: 'disciplinario/alegatos-de-conclusion-en-el-proceso-disciplinario',
+    exactName: 'Alegatos de conclusión en el proceso disciplinario',
+    branch: 'DISCIPLINARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1952 de 2019, art. 225E (adicionado por el art. 44 de la Ley 2094 de 2021: traslado común de 10 días en el juicio ordinario); art. 230 (modificado por el art. 51 de la Ley 2094 de 2021: suspensión de 10 días y alegación oral en el juicio verbal); art. 206 (modificado por el art. 32 de la Ley 2094 de 2021: la nulidad debe pedirse antes de este traslado)',
+    competentAuthority: 'El funcionario de juzgamiento competente (arts. 12, 93, 95, 101 y 102)',
+    term: { status: 'VERIFICADO', description: 'DIEZ (10) DÍAS, RELOJ DEL DISCIPLINADO. Juicio ordinario: «ordenará el traslado común por diez (10) días; para que los sujetos procesales presenten alegatos de conclusión» (art. 225E), y el fallo se profiere «dentro de los treinta (30) días hábiles siguientes al vencimiento del término de traslado» (art. 225F). Juicio verbal: «se suspenderá la audiencia por el término de diez (10) días para que los sujetos procesales preparen sus alegatos previos a la decisión», que se exponen oralmente en el orden Ministerio Público, víctima, disciplinable y defensor, y «se citará para dentro de los quince (15) días siguientes, con el fin de dar a conocer el contenido de la decisión» (art. 230). PLAZO QUE MUERE ANTES: la solicitud de nulidad «podrá formularse hasta antes de dar traslado para alegatos de conclusión» (art. 206); quien llega a los alegatos sin haberla pedido, la perdió.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del proceso y de los sujetos procesales', mandatory: true, basis: null },
+      { n: 2, name: 'Delimitación de los cargos formulados y de su variación, si la hubo', mandatory: true, basis: 'Arts. 223 y 225D' },
+      { n: 3, name: 'Análisis integral de la prueba practicada en el juicio', mandatory: true, basis: 'Ley 1952 de 2019, art. 159' },
+      { n: 4, name: 'Argumentación sobre tipicidad, ilicitud sustancial y culpabilidad', mandatory: true, basis: 'Art. 225F nums. 5, 6 y 7' },
+      { n: 5, name: 'Insuficiencia de la prueba para sancionar', mandatory: true, basis: 'Ley 1952 de 2019, art. 160' },
+      { n: 6, name: 'Prescripción de la acción disciplinaria, si ha operado', mandatory: false, basis: 'Ley 1952 de 2019, art. 33' },
+      { n: 7, name: 'Subsidiariamente, criterios de graduación y dosificación de la sanción', mandatory: false, basis: 'Ley 1952 de 2019, art. 50' },
+      { n: 8, name: 'Petición concreta de absolución', mandatory: true, basis: null }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1952_2019_pr005.html'
+  },
+  {
+    id: 'disciplinario/solicitud-de-nulidad-en-el-proceso-disciplinario',
+    exactName: 'Solicitud de nulidad en el proceso disciplinario',
+    branch: 'DISCIPLINARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1952 de 2019, art. 202 (causales); art. 203 (principios y convalidación); art. 206 (modificado por el art. 32 de la Ley 2094 de 2021: oportunidad y requisitos); art. 207 (modificado por el art. 33 de la Ley 2094 de 2021: 5 días para resolver y recurso de reposición)',
+    competentAuthority: 'El funcionario que conoce de la actuación en el momento de la solicitud: instructor o funcionario de juzgamiento (arts. 12 y 207)',
+    term: { status: 'VERIFICADO', description: 'OPORTUNIDAD PRECLUSIVA DEL DISCIPLINADO: «La solicitud de nulidad podrá formularse hasta antes de dar traslado para alegatos de conclusión» (art. 206). Después de ese traslado la nulidad ya no puede pedirse a instancia de parte; solo subsiste la declaratoria oficiosa, que procede «en cualquier estado de la actuación disciplinaria» y contra la cual «no procede recurso» (art. 204). RELOJ DEL DESPACHO: «El funcionario competente resolverá la solicitud de nulidad dentro de los cinco (5) días siguientes a la fecha de su recibo. Si la misma se presenta en el marco de una audiencia, se resolverá en esta. Contra la decisión que se pronuncia sobre la solicitud de nulidad procede el recurso de reposición» (art. 207), que se interpone y sustenta dentro de los cinco (5) días siguientes a la notificación o en la misma audiencia si se notificó en estrados (arts. 131 y 132).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del proceso, del solicitante y de la actuación que se ataca', mandatory: true, basis: null },
+      { n: 2, name: 'Indicación concreta de la causal o causales invocadas', mandatory: true, basis: 'Arts. 202 y 206' },
+      { n: 3, name: 'Fundamentos de hecho que la sustentan', mandatory: true, basis: 'Art. 206' },
+      { n: 4, name: 'Fundamentos de derecho que la sustentan', mandatory: true, basis: 'Art. 206' },
+      { n: 5, name: 'Demostración de que la irregularidad sustancial afecta garantías o desconoce las bases de la instrucción y el juzgamiento', mandatory: true, basis: 'Art. 203 num. 2' },
+      { n: 6, name: 'Razón por la cual no existe otro medio procesal para subsanarla', mandatory: true, basis: 'Art. 203 num. 5' },
+      { n: 7, name: 'Petición del momento procesal desde el cual debe reponerse la actuación', mandatory: true, basis: 'Art. 205' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1952_2019_pr005.html'
+  },
+  {
+    id: 'disciplinario/recurso-de-reposicion-disciplinario',
+    exactName: 'Recurso de reposición disciplinario',
+    branch: 'DISCIPLINARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1952 de 2019, art. 130 (clases de recursos); art. 131 (modificado por el art. 25 de la Ley 2094 de 2021: oportunidad); art. 132 (modificado por el art. 26 de la Ley 2094 de 2021: sustentación so pena de deserción); art. 133 (modificado por el art. 27 de la Ley 2094 de 2021: decisiones susceptibles de reposición)',
+    competentAuthority: 'El mismo funcionario que profirió la decisión (art. 132)',
+    term: { status: 'VERIFICADO', description: 'CINCO (5) DÍAS, RELOJ DEL RECURRENTE: «Los recursos de reposición y apelación se podrán interponer desde la fecha de expedición de la decisión hasta el vencimiento de los cinco (5) días siguientes a la notificación respectiva. Si la notificación de la decisión se hace en estrados, los recursos deberán interponerse y sustentarse en el curso de la audiencia o diligencia» (art. 131). LA SUSTENTACIÓN CORRE EN EL MISMO PLAZO, no en uno posterior: «Si la sustentación no se presenta en tiempo o no se realiza en debida forma, el recurso se declarará desierto» (art. 132). PROCEDENCIA TAXATIVA: solo contra «la que decide sobre la solicitud de nulidad, la que niega la solicitud de copias, la que niega las pruebas en la etapa de investigación, la que declara la no procedencia de la objeción al dictamen pericial, la que niega la acumulación, y la decisión que finalice el procedimiento para el testigo renuente y el quejoso temerario» (art. 133). Contra el pliego de cargos y contra el auto que fija el juzgamiento a seguir no procede recurso alguno (arts. 222 y 225A).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del proceso, del recurrente y de la decisión impugnada', mandatory: true, basis: null },
+      { n: 2, name: 'Verificación de que la decisión es de las enlistadas en el art. 133', mandatory: true, basis: 'Art. 133' },
+      { n: 3, name: 'Oportunidad: fecha de notificación y cómputo de los cinco días', mandatory: true, basis: 'Art. 131' },
+      { n: 4, name: 'Razones concretas en que se sustenta el recurso', mandatory: true, basis: 'Art. 132' },
+      { n: 5, name: 'Petición de revocatoria, modificación o aclaración de la decisión', mandatory: true, basis: null },
+      { n: 6, name: 'Apelación subsidiaria, cuando la decisión también la admita', mandatory: false, basis: 'Art. 134' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1952_2019_pr003.html'
+  },
+  {
+    id: 'disciplinario/recurso-de-apelacion-disciplinario',
+    exactName: 'Recurso de apelación disciplinario',
+    branch: 'DISCIPLINARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1952 de 2019, art. 134 (decisiones apelables y efectos); art. 131 (modificado por el art. 25 de la Ley 2094 de 2021: regla general de 5 días); art. 225G (adicionado por el art. 46 de la Ley 2094 de 2021: 10 días contra el fallo del juicio ORDINARIO); art. 233 (5 días para sustentar en el juicio VERBAL); art. 135 (prohibición de reformatio in pejus); art. 234 (45 días de la segunda instancia)',
+    competentAuthority: 'Se interpone ante el funcionario que profirió la decisión y lo resuelve su superior funcional: la Procuraduría General de la Nación cuando la entidad no puede garantizar la segunda instancia (art. 93), el Procurador General respecto de las Salas Disciplinarias de Juzgamiento (art. 102), o las Salas Disciplinarias respecto de las procuradurías delegadas (art. 101 par. 1)',
+    term: { status: 'VERIFICADO', description: 'TRES PLAZOS DISTINTOS Y CONFUNDIRLOS PIERDE EL RECURSO. (a) REGLA GENERAL, autos apelables: cinco (5) días siguientes a la notificación, o en la misma audiencia si se notificó en estrados (art. 131), con sustentación en el mismo plazo so pena de que «el recurso se declarará desierto» (art. 132). (b) FALLO DE PRIMERA INSTANCIA EN JUICIO ORDINARIO: DIEZ (10) DÍAS — «Contra el fallo de primera instancia procede el recurso de apelación. Este deberá interponerse y sustentarse por escrito dentro de los diez (10) días siguientes a su notificación ante la secretaría del despacho» (art. 225G). (c) FALLO DE PRIMERA INSTANCIA EN JUICIO VERBAL: se interpone en la misma diligencia y «se podrá sustentar verbalmente de forma inmediata o por escrito dentro de los cinco (5) días siguientes ante la Secretaría del Despacho» (art. 233). PROCEDENCIA TAXATIVA: «la decisión que niega pruebas en etapa de juicio, la decisión de archivo, la decisión que finalice el procedimiento para el testigo renuente y el quejoso temerario, y el fallo de primera instancia» (art. 134). RELOJ DEL DESPACHO: la segunda instancia «deberá decidir por escrito dentro de los cuarenta y cinco (45) días siguientes a la fecha en que hubiere recibido el proceso» (art. 234). GARANTÍA: si el investigado es apelante único, el superior «no podrá agravar la sanción impuesta» (art. 135); y la competencia del superior se limita «únicamente a los aspectos impugnados y aquellos otros que resulten inescindiblemente vinculados al objeto de impugnación» (art. 234), de modo que lo no sustentado queda en firme.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del proceso, del recurrente y de la decisión apelada', mandatory: true, basis: null },
+      { n: 2, name: 'Oportunidad: fecha de notificación y cómputo del plazo aplicable (5 o 10 días, o audiencia)', mandatory: true, basis: 'Arts. 131, 225G y 233' },
+      { n: 3, name: 'Delimitación expresa de los aspectos impugnados', mandatory: true, basis: 'Art. 234' },
+      { n: 4, name: 'Sustentación fáctica y probatoria de cada reparo', mandatory: true, basis: 'Art. 132' },
+      { n: 5, name: 'Sustentación jurídica: normas violadas y concepto de la violación', mandatory: true, basis: null },
+      { n: 6, name: 'Subsidiariamente, reparos sobre la dosificación de la sanción', mandatory: false, basis: 'Ley 1952 de 2019, art. 50' },
+      { n: 7, name: 'Petición concreta de revocatoria o modificación del fallo', mandatory: true, basis: null },
+      { n: 8, name: 'Invocación de la prohibición de reformatio in pejus cuando se es apelante único', mandatory: false, basis: 'Art. 135' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1952_2019_pr005.html'
+  },
+  {
+    id: 'disciplinario/recurso-de-queja-disciplinario',
+    exactName: 'Recurso de queja disciplinario',
+    branch: 'DISCIPLINARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1952 de 2019, art. 136 (procedencia); art. 137 (trámite); art. 138 (ejecutoria de las decisiones)',
+    competentAuthority: 'Se interpone ante el funcionario que negó la apelación y lo decide su superior funcional (art. 137)',
+    term: { status: 'VERIFICADO', description: 'RELOJ DEL RECURRENTE, y es breve: «Dentro del término de ejecutoria de la decisión que niega el recurso de apelación, se podrá interponer y sustentar el recurso de queja. Si no se hiciere oportunamente, se rechazará» (art. 137). Ese término de ejecutoria es de cinco (5) días después de la última notificación para las decisiones dictadas fuera de audiencia (art. 138), y al finalizar la audiencia o sesión para las dictadas en ella (art. 138). RELOJ DEL DESPACHO: «Dentro de los dos (2) días siguientes al vencimiento del término anterior, el funcionario competente enviará al superior funcional las copias pertinentes para que decida el recurso» (art. 137). El costo de las copias corre a cargo del impugnante (art. 137).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del proceso y de la decisión que negó la apelación', mandatory: true, basis: null },
+      { n: 2, name: 'Oportunidad: fecha de notificación y término de ejecutoria', mandatory: true, basis: 'Arts. 137 y 138' },
+      { n: 3, name: 'Demostración de que la decisión apelada es de las apelables', mandatory: true, basis: 'Art. 134' },
+      { n: 4, name: 'Sustentación de la procedencia del recurso negado', mandatory: true, basis: 'Art. 137' },
+      { n: 5, name: 'Señalamiento de las piezas procesales cuyas copias deben remitirse', mandatory: true, basis: 'Art. 137' },
+      { n: 6, name: 'Petición de que se conceda la apelación en el efecto que corresponda', mandatory: true, basis: 'Arts. 134 y 137' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1952_2019_pr003.html'
+  },
+  {
+    id: 'disciplinario/solicitud-de-revocatoria-directa-del-fallo-disciplinario',
+    exactName: 'Solicitud de revocatoria directa del fallo disciplinario',
+    branch: 'DISCIPLINARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1952 de 2019, art. 141 (modificado por el art. 28 de la Ley 2094 de 2021: procedencia y plazos); art. 142 (competencia exclusiva del Procurador General); art. 143 (causal); art. 144 (revocatoria a solicitud del sancionado); art. 145 (plazo de 5 años y requisitos); art. 146 (no revive los términos de los medios de control contencioso administrativos)',
+    competentAuthority: 'El Procurador General de la Nación: «será la única autoridad competente que podrá revocar los fallos sancionatorios, los autos de archivo y el fallo absolutorio» (art. 142), incluidos los proferidos por las personerías y las oficinas de control interno disciplinario (art. 141)',
+    term: { status: 'VERIFICADO', description: 'DOS RELOJES DISTINTOS. (a) SANCIONADO: cinco (5) años — «La solicitud de revocatoria se formulará dentro de los cinco años siguientes a la fecha de ejecutoria del fallo» (art. 145) — pero solo «por una única vez» y «siempre y cuando no hubiere interpuesto contra aquellos recursos ordinarios previstos en este Código» (art. 144). (b) QUEJOSO, VÍCTIMAS O PERJUDICADOS, contra el fallo absolutorio o el archivo y solo en faltas contra el DIDH y el DIH: «dentro de los cuatro (4) meses siguientes al conocimiento de la respectiva decisión» (art. 141). EL PLAZO QUE MATA EL DERECHO Y NO ESTÁ EN EL ARTÍCULO DE LA REVOCATORIA: pedirla NO detiene ni reabre la caducidad de la acción judicial — «Ni la petición de revocatoria de un fallo ni la decisión que la resuelve revivirán los términos legales para el ejercicio de los medios de control en materia contenciosoadministrativa. Tampoco darán lugar a interponer recurso alguno ni a la aplicación del silencio administrativo» (art. 146). Los cuatro (4) meses para la nulidad y restablecimiento del derecho (Ley 1437 de 2011, art. 164 num. 2 lit. d) siguen corriendo mientras la revocatoria se tramita, y la Procuraduría dispone de hasta seis (6) meses para resolverla (art. 141). RELOJ DEL DESPACHO: al disciplinable se le informa la petición ajena «para que se pronuncie, dentro de los diez (10) días siguientes a la entrega de la comunicación» (art. 141).' },
+    requiredSections: [
+      { n: 1, name: 'Nombre completo del investigado o de su defensor, documento de identidad y dirección única para la actuación', mandatory: true, basis: 'Art. 145 num. 1' },
+      { n: 2, name: 'Identificación del fallo cuya revocatoria se solicita', mandatory: true, basis: 'Art. 145 num. 2' },
+      { n: 3, name: 'Sustentación expresa de los motivos de inconformidad relacionados con la causal invocada', mandatory: true, basis: 'Art. 145 num. 3' },
+      { n: 4, name: 'Demostración de la infracción manifiesta de normas constitucionales, legales o reglamentarias, o de la vulneración de derechos fundamentales', mandatory: true, basis: 'Art. 143' },
+      { n: 5, name: 'Manifestación de que no se interpusieron los recursos ordinarios contra el fallo', mandatory: true, basis: 'Art. 144' },
+      { n: 6, name: 'Acreditación de la oportunidad: fecha de ejecutoria del fallo', mandatory: true, basis: 'Art. 145' },
+      { n: 7, name: 'Petición de revocatoria total o parcial', mandatory: true, basis: 'Art. 144' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1952_2019_pr003.html'
+  },
+  {
+    id: 'disciplinario/demanda-de-nulidad-y-restablecimiento-del-derecho-contra-el-fallo-disciplinario',
+    exactName: 'Demanda de nulidad y restablecimiento del derecho contra el fallo disciplinario',
+    branch: 'DISCIPLINARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1437 de 2011, art. 138 (medio de control); art. 161 num. 1 (conciliación extrajudicial como requisito de procedibilidad) y num. 2 (agotamiento de los recursos obligatorios); art. 162 (contenido de la demanda); art. 164 num. 2 lit. d (caducidad de 4 meses); Ley 1952 de 2019, art. 93 par. 2 (control contencioso de las decisiones de las oficinas de control interno y de las personerías); art. 146 (la revocatoria directa no revive los términos); Corte Constitucional, Sentencia C-030 de 2023 (las funciones disciplinarias de la PGN son administrativas, no jurisdiccionales)',
+    competentAuthority: 'La Jurisdicción de lo Contencioso Administrativo. El fallo disciplinario de la Procuraduría, de las personerías y de las oficinas de control interno disciplinario es un ACTO ADMINISTRATIVO: la Sentencia C-030 de 2023 declaró inexequible la expresión «jurisdiccionales» de los arts. 1, 54, 73 y 74 de la Ley 2094 de 2021 y condicionó los arts. 13, 16 y 17 «en el entendido de que las funciones disciplinarias que ejerce la PGN son de naturaleza administrativa y no jurisdiccional». NO es esta la vía contra las sentencias de la Comisión Nacional de Disciplina Judicial, que son decisiones judiciales.',
+    term: { status: 'VERIFICADO', description: 'CUATRO (4) MESES, y es EL RELOJ QUE EXTINGUE EL DERECHO DEL SANCIONADO: «Cuando se pretenda la nulidad y restablecimiento del derecho, la demanda deberá presentarse dentro del término de cuatro (4) meses contados a partir del día siguiente al de la comunicación, notificación, ejecución o publicación del acto administrativo, según el caso, salvo las excepciones establecidas en otras disposiciones legales» (Ley 1437 de 2011, art. 164 num. 2 lit. d). Se cuenta desde la notificación del FALLO DE SEGUNDA INSTANCIA, porque antes deben haberse «ejercido y decidido los recursos que de acuerdo con la ley fueren obligatorios» (art. 161 num. 2). TRAMPA FRECUENTE: pedir la revocatoria directa NO suspende ni reabre estos cuatro meses (Ley 1952 de 2019, art. 146). REQUISITO PREVIO: «Cuando los asuntos sean conciliables, el trámite de la conciliación extrajudicial constituirá requisito de procedibilidad de toda demanda en que se formulen pretensiones relativas a nulidad con restablecimiento del derecho» (art. 161 num. 1). SERVIDORES DE ELECCIÓN POPULAR: cuando la sanción es de destitución, suspensión o inhabilidad, la vía NO es esta sino la revisión judicial automática ante el Consejo de Estado o los Tribunales Administrativos (Ley 1952 de 2019, arts. 238A a 238G, condicionados por la Sentencia C-030 de 2023).' },
+    requiredSections: [
+      { n: 1, name: 'Designación del juez o tribunal competente y de las partes y sus representantes', mandatory: true, basis: 'Ley 1437 de 2011, art. 162 num. 1' },
+      { n: 2, name: 'Pretensiones de nulidad del fallo y de restablecimiento del derecho, formuladas por separado', mandatory: true, basis: 'Ley 1437 de 2011, art. 162 num. 2' },
+      { n: 3, name: 'Hechos y omisiones determinados, clasificados y numerados', mandatory: true, basis: 'Ley 1437 de 2011, art. 162 num. 3' },
+      { n: 4, name: 'Normas violadas y concepto de la violación', mandatory: true, basis: 'Ley 1437 de 2011, art. 162 num. 4' },
+      { n: 5, name: 'Petición de pruebas y aporte de las documentales en poder del demandante', mandatory: true, basis: 'Ley 1437 de 2011, art. 162 num. 5' },
+      { n: 6, name: 'Estimación razonada de la cuantía cuando determine la competencia', mandatory: true, basis: 'Ley 1437 de 2011, art. 162 num. 6' },
+      { n: 7, name: 'Lugar, dirección y canal digital para notificaciones', mandatory: true, basis: 'Ley 1437 de 2011, art. 162 num. 7' },
+      { n: 8, name: 'Acreditación del envío de copia de la demanda y anexos a los demandados', mandatory: true, basis: 'Ley 1437 de 2011, art. 162 num. 8' },
+      { n: 9, name: 'Constancia del trámite de conciliación extrajudicial', mandatory: true, basis: 'Ley 1437 de 2011, art. 161 num. 1' },
+      { n: 10, name: 'Solicitud de medida cautelar de suspensión de la ejecución de la sanción', mandatory: false, basis: 'Ley 1952 de 2019, art. 238D inc. final' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1437_2011_pr004.html'
+  },
+  {
+    id: 'disciplinario/recurso-extraordinario-de-revision-contra-el-fallo-disciplinario',
+    exactName: 'Recurso extraordinario de revisión contra el fallo disciplinario',
+    branch: 'DISCIPLINARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1952 de 2019, arts. 238A a 238G (adicionados por los arts. 54 a 60 de la Ley 2094 de 2021: procedencia, competencia, causales, término, requisitos, trámite y sentencia), CONDICIONADOS por la Corte Constitucional, Sentencia C-030 de 2023 de 16 de febrero de 2023, que declaró inexequibles en el art. 238A las expresiones «jurisdiccional» y «ejecutoriadas»; Consejo de Estado, Sala Plena, sentencia de unificación 11001-03-15-000-2023-00871-00 de 3 de diciembre de 2024',
+    competentAuthority: '«Las Salas Especiales de Decisión del Consejo de Estado conocerán de los recursos extraordinarios de revisión contra las decisiones de segunda instancia o de doble conformidad dictadas por el Procurador General de la Nación, las Salas de Juzgamiento y los Procuradores Delegados. […] Los Tribunales Administrativos de lo Contencioso Administrativo de los recursos extraordinarios de revisión contra las decisiones de segunda instancia o de doble conformidad dictadas por los Procuradores Regionales de Juzgamiento» (art. 238B). Radicar ante el foro equivocado pierde el término.',
+    term: { status: 'VERIFICADO', description: 'ÁMBITO REDUCIDO POR LA CORTE, Y ES LO PRIMERO QUE HAY QUE VERIFICAR. La Sentencia C-030 de 2023 condicionó el art. 238A «en el entendido de que el recurso extraordinario de revisión operará solamente cuando se impongan sanciones de destitución, suspensión e inhabilidad a servidores públicos de elección popular, por ministerio de la ley, de manera automática e inmediata. En todo caso el disciplinado podrá ejercer todas las actividades procesales que estime pertinentes a su defensa propias del medio de control de nulidad y restablecimiento del derecho. Las sanciones impuestas a los funcionarios de elección popular se suspenderán en su ejecución durante el trámite judicial de revisión, el cual finiquitará con una sentencia que determinará de manera definitiva la sanción aplicable». Para todo OTRO sancionado la vía es la nulidad y restablecimiento del derecho, con caducidad de cuatro (4) meses. TÉRMINO LEGAL, hoy desplazado por la remisión automática en el caso de los elegidos: «El recurso extraordinario de revisión podrá interponerse dentro de los treinta (30) días siguientes a la ejecutoria de la respectiva decisión disciplinaria por el disciplinado […] o por el quejoso, víctima o perjudicado en el caso de las decisiones absolutorias o de archivo cuando se trate de conductas contrarias a los derechos humanos o el derecho internacional humanitario. En el caso de las causales contempladas en los numerales 6 a 9, el término de los treinta (30) días se contará una vez se produzca el hecho en que se fundamenta la causal» (art. 238D). SUSPENSIÓN DE LA EJECUCIÓN: para los elegidos opera de pleno derecho (art. 238D inc. 3 y C-030 de 2023); para los demás procesos hay que pedirla como medida cautelar conforme al CPACA, y «esta solicitud deberá ser resuelta en el auto admisorio» (art. 238D). RELOJES DEL DESPACHO: admisión en diez (10) días; subsanación en cinco (5) días; contestación de la Procuraduría en cinco (5) días; práctica de pruebas hasta veinte (20) días (art. 238F); sentencia dentro de seis (6) meses contados desde la admisión (art. 238G). DOBLE CONFORMIDAD: si la sentencia confirma la sanción, el Consejo de Estado unificó que procede el recurso de doble conformidad «y su trámite será el previsto en el artículo 247 del CPACA» (sentencia de unificación de 3 de diciembre de 2024).' },
+    requiredSections: [
+      { n: 1, name: 'Designación de las partes, sus apoderados o representantes', mandatory: true, basis: 'Art. 238E num. 1' },
+      { n: 2, name: 'Nombre y domicilio del recurrente', mandatory: true, basis: 'Art. 238E num. 2' },
+      { n: 3, name: 'Causal invocada y fundamentos de hecho y de derecho en que se apoya', mandatory: true, basis: 'Art. 238E num. 3' },
+      { n: 4, name: 'Pretensión resarcitoria debidamente fundamentada, cuando sea procedente', mandatory: false, basis: 'Art. 238E num. 4' },
+      { n: 5, name: 'Poder para la presentación del recurso', mandatory: true, basis: 'Art. 238E inc. final' },
+      { n: 6, name: 'Pruebas en poder del recurrente y solicitud de las que pretende hacer valer', mandatory: true, basis: 'Art. 238E inc. final' },
+      { n: 7, name: 'Acreditación de la calidad de servidor de elección popular y de la sanción impuesta', mandatory: true, basis: 'Sentencia C-030 de 2023' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_2094_2021_pr001.html'
+  },
+  {
+    id: 'disciplinario/auto-de-apertura-de-indagacion-previa',
+    exactName: 'Auto de apertura de indagación previa',
+    branch: 'DISCIPLINARIO',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 1952 de 2019, art. 208 (modificado por el art. 34 de la Ley 2094 de 2021: procedencia, objetivo, duración y archivo); art. 209 (decisión inhibitoria); art. 117 (10 días para las decisiones motivadas de esta etapa)',
+    competentAuthority: 'La Oficina de Control Disciplinario Interno de la entidad, la personería distrital o municipal, o la Procuraduría General de la Nación en ejercicio del poder preferente (arts. 93, 95 y 216)',
+    term: { status: 'VERIFICADO', description: 'SEIS (6) MESES, RELOJ DE LA AUTORIDAD: «La indagación previa tendrá una duración de seis (6) meses y culminará con el archivo definitivo o auto de apertura de investigación. Cuando se trate de investigaciones por violación a los Derechos Humanos o al Derecho Internacional Humanitario, el término de indagación previa podrá extenderse a otros seis (6) meses» (art. 208). Procede únicamente «en caso de duda sobre la identificación o individualización del posible autor de una falta disciplinaria», y «cuando a la actuación se allegue medio probatorio que permita identificar al presunto autor, inmediatamente se deberá emitir la decisión de apertura de investigación» (art. 208). El archivo por no lograr identificar al autor «no hará tránsito a cosa juzgada material» (art. 208 par.), a diferencia del archivo del art. 224. EL RELOJ QUE CORRE POR DEBAJO: la indagación previa NO interrumpe la prescripción de la acción, que solo se interrumpe «con la notificación del fallo de primera instancia» (art. 33).' },
+    requiredSections: [
+      { n: 1, name: 'Relación de los hechos y de la queja, informe o iniciación oficiosa', mandatory: true, basis: null },
+      { n: 2, name: 'Motivación de la duda sobre la identificación o individualización del autor', mandatory: true, basis: 'Art. 208' },
+      { n: 3, name: 'Objetivo concreto de la indagación', mandatory: true, basis: null },
+      { n: 4, name: 'Relación de las pruebas cuya práctica se ordena', mandatory: true, basis: 'Art. 208' },
+      { n: 5, name: 'Término de la indagación y su eventual extensión en casos de DIDH o DIH', mandatory: true, basis: 'Art. 208' },
+      { n: 6, name: 'Orden de comunicación al quejoso y a las autoridades que corresponda', mandatory: false, basis: 'Ley 1952 de 2019, art. 129' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1952_2019_pr005.html'
+  },
+  {
+    id: 'disciplinario/auto-de-apertura-de-investigacion-disciplinaria',
+    exactName: 'Auto de apertura de investigación disciplinaria',
+    branch: 'DISCIPLINARIO',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 1952 de 2019, art. 211 (procedencia); art. 212 (fines y trámite); art. 213 (modificado por el art. 36 de la Ley 2094 de 2021: término); art. 215 (modificado por el art. 37 de la Ley 2094 de 2021: contenido); art. 216 (informe de la iniciación)',
+    competentAuthority: 'El funcionario instructor competente: Oficina de Control Disciplinario Interno, personería o Procuraduría General de la Nación; en la Procuraduría, las Salas Disciplinarias conocen de la instrucción y del juzgamiento según sus competencias (arts. 93, 95 y 101)',
+    term: { status: 'VERIFICADO', description: 'SEIS (6) MESES PRORROGABLES, RELOJ DE LA AUTORIDAD: «La investigación tendrá una duración de seis (6) meses, contados a partir de la decisión de apertura. Este término podrá prorrogarse hasta en otro tanto, cuando en la misma actuación se investiguen varias faltas o a dos (2) o más servidores o particulares en ejercicio de función pública y culminará con el archivo definitivo o la notificación de la formulación del pliego de cargos. Cuando se trate de investigaciones por infracción al Derecho Internacional de los Derechos Humanos o al Derecho Internacional Humanitario, el término de investigación no podrá exceder de dieciocho (18) meses. Con todo, si hicieren falta pruebas que puedan modificar la situación jurídica del disciplinable, los términos previstos en los incisos anteriores se prorrogarán hasta por tres (3) meses más. Vencido el cual, si no ha surgido prueba que permita formular cargos se archivará definitivamente la actuación» (art. 213). AVISO OBLIGATORIO: si la abre una Oficina de Control Disciplinario Interno, «dará aviso inmediato a la Viceprocuraduría General de la Nación y al funcionario competente de esa entidad o de la personería correspondiente, para que decida sobre el ejercicio del poder disciplinario preferente» (art. 216).' },
+    requiredSections: [
+      { n: 1, name: 'La identidad del posible autor o autores', mandatory: true, basis: 'Art. 215 num. 1' },
+      { n: 2, name: 'Relación clara y sucinta de los hechos disciplinariamente relevantes en lenguaje comprensible', mandatory: true, basis: 'Art. 215 num. 2' },
+      { n: 3, name: 'La relación de pruebas cuya práctica se ordena', mandatory: true, basis: 'Art. 215 num. 3' },
+      { n: 4, name: 'Orden de incorporar antecedentes disciplinarios, certificación de vinculación, constancia de sueldo y última dirección conocida', mandatory: true, basis: 'Art. 215 num. 4' },
+      { n: 5, name: 'Información sobre los beneficios de la confesión o aceptación de cargos', mandatory: true, basis: 'Art. 215 num. 5' },
+      { n: 6, name: 'Orden de informar y comunicar la decisión en los términos del art. 216', mandatory: true, basis: 'Art. 215 num. 6' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1952_2019_pr005.html'
+  },
+  {
+    id: 'disciplinario/pliego-de-cargos-disciplinario',
+    exactName: 'Pliego de cargos disciplinario',
+    branch: 'DISCIPLINARIO',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 1952 de 2019, art. 221 (modificado por el art. 38 de la Ley 2094 de 2021: decisión de evaluación); art. 222 (procedencia de la citación a audiencia y formulación de cargos; irrecurrible); art. 223 (modificado por el art. 72 de la Ley 2094 de 2021: contenido); art. 225 (modificado por el art. 39 de la Ley 2094 de 2021: notificación y remisión al juzgador)',
+    competentAuthority: 'El funcionario INSTRUCTOR de conocimiento, que no puede ser el mismo que juzgue: «En el proceso disciplinario debe garantizarse que el funcionario instructor no sea el mismo que adelante el juzgamiento» (art. 12, modificado por el art. 3 de la Ley 2094 de 2021). En la jurisdicción disciplinaria «el auto de citación a audiencia será dictado por el magistrado sustanciador» (art. 222 par.)',
+    term: { status: 'VERIFICADO', description: 'RELOJES DE LA AUTORIDAD Y DEL DISCIPLINADO EN LA MISMA NORMA. La notificación del pliego CIERRA el término de la investigación (art. 213), pero NO interrumpe la prescripción: esta solo se interrumpe con la notificación del fallo de primera instancia (art. 33). Notificación: «El pliego de cargos se notificará personalmente al procesado o a su defensor si lo tuviere. Para el efecto, inmediatamente se librará comunicación y se surtirá con el primero que se presente. Si vencido el término de cinco (5) días contados a partir del día siguiente a la entrega de la comunicación en la última dirección registrada y al correo electrónico, no se ha presentado el procesado o su defensor, si lo tuviere, se procederá a designar defensor de oficio […] con quien se surtirá la notificación personal» (art. 225). Cumplidas las notificaciones, «dentro del término improrrogable de tres (3) días, remitirá el expediente al funcionario de juzgamiento correspondiente» (art. 225). PROCEDENCIA: solo «cuando esté objetivamente demostrada la falta y exista prueba que comprometa la responsabilidad del disciplinado. Contra esta decisión no procede recurso alguno» (art. 222).' },
+    requiredSections: [
+      { n: 1, name: 'La identificación del autor o autores de la falta', mandatory: true, basis: 'Art. 223 num. 1' },
+      { n: 2, name: 'La denominación del cargo o la función desempeñada en la época de comisión de la conducta', mandatory: true, basis: 'Art. 223 num. 2' },
+      { n: 3, name: 'La descripción y determinación de la conducta investigada, con circunstancias de tiempo, modo y lugar', mandatory: true, basis: 'Art. 223 num. 3' },
+      { n: 4, name: 'Las normas presuntamente violadas y el concepto de la violación, concretando la modalidad específica de la conducta', mandatory: true, basis: 'Art. 223 num. 4' },
+      { n: 5, name: 'El análisis de la ilicitud sustancial del comportamiento', mandatory: true, basis: 'Art. 223 num. 5' },
+      { n: 6, name: 'El análisis de la culpabilidad', mandatory: true, basis: 'Art. 223 num. 6' },
+      { n: 7, name: 'El análisis de las pruebas que fundamentan cada uno de los cargos formulados', mandatory: true, basis: 'Art. 223 num. 7' },
+      { n: 8, name: 'La exposición fundada de los criterios de gravedad o levedad de la falta conforme al art. 47', mandatory: true, basis: 'Art. 223 num. 8' },
+      { n: 9, name: 'El análisis de los argumentos expuestos por los sujetos procesales', mandatory: true, basis: 'Art. 223 num. 9' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1952_2019_pr005.html'
+  },
+  {
+    id: 'disciplinario/auto-de-archivo-definitivo-disciplinario',
+    exactName: 'Auto de archivo definitivo disciplinario',
+    branch: 'DISCIPLINARIO',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 1952 de 2019, art. 224 (archivo definitivo y cosa juzgada); art. 90 (terminación del proceso disciplinario); art. 213 (archivo por vencimiento del término de investigación); art. 221 (modificado por el art. 38 de la Ley 2094 de 2021); art. 134 (apelación en el efecto suspensivo)',
+    competentAuthority: 'El funcionario de conocimiento que adelanta la instrucción; su revocatoria solo compete al Procurador General de la Nación y únicamente en faltas contra el DIDH y el DIH (arts. 141 y 142)',
+    term: { status: 'VERIFICADO', description: 'RELOJ DE LA AUTORIDAD: procede al cerrar la evaluación de la investigación (art. 221), en los casos de terminación del art. 90, y por vencimiento del término de investigación sin prueba para formular cargos (art. 213). EFECTO: «Tal decisión hará tránsito a cosa juzgada. Cuando no haya sido posible identificar e individualizar al presunto autor, el archivo hará tránsito a cosa juzgada formal» (art. 224) — distinto del archivo de la indagación previa, que «no hará tránsito a cosa juzgada material» (art. 208 par.). RELOJ DEL QUEJOSO Y DE LAS VÍCTIMAS: la decisión de archivo ES APELABLE y la apelación «se concederá en el efecto suspensivo» (art. 134), dentro de los cinco (5) días siguientes a la notificación (art. 131); y en faltas contra el DIDH y el DIH pueden pedir su revocatoria directa «dentro de los cuatro (4) meses siguientes al conocimiento de la respectiva decisión» (art. 141).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del expediente, del disciplinable y de los hechos', mandatory: true, basis: null },
+      { n: 2, name: 'Motivación de la causal de archivo o de terminación invocada', mandatory: true, basis: 'Arts. 90, 213 y 221' },
+      { n: 3, name: 'Evaluación del mérito de las pruebas recaudadas', mandatory: true, basis: 'Art. 221' },
+      { n: 4, name: 'Declaración del alcance de la cosa juzgada, material o formal', mandatory: true, basis: 'Art. 224' },
+      { n: 5, name: 'Orden de notificación y advertencia del recurso de apelación', mandatory: true, basis: 'Arts. 131 y 134' },
+      { n: 6, name: 'Comunicación al quejoso y a las víctimas o perjudicados', mandatory: false, basis: 'Ley 1952 de 2019, art. 129' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1952_2019_pr005.html'
+  },
+  {
+    id: 'disciplinario/auto-que-resuelve-la-solicitud-de-nulidad-disciplinaria',
+    exactName: 'Auto que resuelve la solicitud de nulidad disciplinaria',
+    branch: 'DISCIPLINARIO',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 1952 de 2019, art. 202 (causales); art. 203 (principios y convalidación); art. 204 (declaratoria oficiosa, irrecurrible); art. 205 (efectos); art. 207 (modificado por el art. 33 de la Ley 2094 de 2021: 5 días para resolver y recurso de reposición)',
+    competentAuthority: 'El funcionario que conoce de la actuación al momento de la solicitud: instructor o funcionario de juzgamiento (arts. 12 y 207); en el juicio ordinario, las nulidades propuestas con los descargos se resuelven al vencer ese traslado (art. 225C); en el verbal, en la audiencia (art. 227)',
+    term: { status: 'VERIFICADO', description: 'CINCO (5) DÍAS, RELOJ DE LA AUTORIDAD: «El funcionario competente resolverá la solicitud de nulidad dentro de los cinco (5) días siguientes a la fecha de su recibo. Si la misma se presenta en el marco de una audiencia, se resolverá en esta. Contra la decisión que se pronuncia sobre la solicitud de nulidad procede el recurso de reposición» (art. 207). RELOJ DEL SOLICITANTE: esa reposición debe interponerse y sustentarse dentro de los cinco (5) días siguientes a la notificación, o en la misma audiencia si la decisión se notificó en estrados, so pena de que se declare desierta (arts. 131 y 132). LA DECLARATORIA OFICIOSA ES OTRA COSA: procede «en cualquier estado de la actuación disciplinaria» y «contra esta providencia no procede recurso» (art. 204).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del proceso, del solicitante y de la causal invocada', mandatory: true, basis: null },
+      { n: 2, name: 'Análisis de cada causal a la luz del art. 202', mandatory: true, basis: 'Art. 202' },
+      { n: 3, name: 'Aplicación de los principios de convalidación y trascendencia', mandatory: true, basis: 'Art. 203' },
+      { n: 4, name: 'Determinación del momento procesal en que se presentó la causal', mandatory: true, basis: 'Art. 205' },
+      { n: 5, name: 'Orden de reponer la actuación que dependa de la decisión anulada y salvedad sobre las pruebas legalmente practicadas', mandatory: true, basis: 'Art. 205' },
+      { n: 6, name: 'Advertencia del recurso de reposición y de su término', mandatory: true, basis: 'Arts. 131 y 207' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1952_2019_pr005.html'
+  },
+  {
+    id: 'disciplinario/auto-de-fijacion-del-juzgamiento-a-seguir',
+    exactName: 'Auto de fijación del juzgamiento a seguir',
+    branch: 'DISCIPLINARIO',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 1952 de 2019, art. 225A (adicionado por el art. 40 de la Ley 2094 de 2021: elección entre juicio ordinario y juicio verbal); art. 225B (juicio ordinario); art. 225H (juicio verbal)',
+    competentAuthority: 'El funcionario de JUZGAMIENTO, distinto del instructor, una vez recibido el expediente (arts. 12 y 225A)',
+    term: { status: 'NO_VERIFICADO', description: null },
+    requiredSections: [
+      { n: 1, name: 'Identificación del expediente recibido y del funcionario de juzgamiento', mandatory: true, basis: null },
+      { n: 2, name: 'Determinación del procedimiento aplicable: ordinario o verbal', mandatory: true, basis: 'Art. 225A' },
+      { n: 3, name: 'Motivación con base en las causales del juicio verbal (flagrancia, faltas leves o faltas gravísimas enlistadas)', mandatory: true, basis: 'Art. 225A inc. 2' },
+      { n: 4, name: 'Motivación de la excepción por complejidad, número de disciplinables, número de cargos o carencia de recursos', mandatory: true, basis: 'Art. 225A par.' },
+      { n: 5, name: 'En el ordinario: traslado de quince (15) días para descargos y pruebas', mandatory: true, basis: 'Art. 225B' },
+      { n: 6, name: 'En el verbal: fecha y hora de la audiencia, no menor a 10 ni mayor a 20 días', mandatory: true, basis: 'Art. 225H' },
+      { n: 7, name: 'Advertencia de que contra esta decisión no procede recurso alguno', mandatory: true, basis: 'Art. 225A' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1952_2019_pr005.html'
+  },
+  {
+    id: 'disciplinario/fallo-disciplinario-de-primera-instancia',
+    exactName: 'Fallo disciplinario de primera instancia',
+    branch: 'DISCIPLINARIO',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 1952 de 2019, art. 225F (adicionado por el art. 45 de la Ley 2094 de 2021: 30 días hábiles y contenido en el juicio ordinario); art. 231 (contenido del fallo en el juicio verbal); art. 230 (modificado por el art. 51 de la Ley 2094 de 2021: citación dentro de los 15 días); art. 225G (adicionado por el art. 46 de la Ley 2094 de 2021: notificación y apelación); art. 232 (ejecutoria); art. 233 (apelación en el verbal); art. 33 (interrupción de la prescripción)',
+    competentAuthority: 'El funcionario de juzgamiento competente, distinto del instructor (art. 12): Oficina de Control Disciplinario Interno, personería, procuraduría delegada o Sala Disciplinaria de Juzgamiento de la Procuraduría General de la Nación (arts. 93, 95 y 101). El juzgamiento de servidores públicos de elección popular corresponde a la Sala Disciplinaria de Juzgamiento creada por el art. 17 de la Ley 2094 de 2021, artículo declarado CONDICIONALMENTE exequible por la Sentencia C-030 de 2023',
+    term: { status: 'VERIFICADO', description: 'TREINTA (30) DÍAS HÁBILES en el juicio ORDINARIO, RELOJ DE LA AUTORIDAD: «El funcionario de conocimiento proferirá el fallo dentro de los treinta (30) días hábiles siguientes al vencimiento del término de traslado para presentar alegatos de conclusión» (art. 225F). En el juicio VERBAL, finalizados los alegatos «se citará para dentro de los quince (15) días siguientes, con el fin de dar a conocer el contenido de la decisión» (art. 230). EL RELOJ QUE DECIDE EL PROCESO: la notificación de este fallo INTERRUMPE la prescripción de la acción, y desde ella la segunda instancia debe notificarse dentro de dos (2) años —tres (3) para las faltas del art. 52— so pena de que la prescripción se produzca (art. 33). RELOJ DEL SANCIONADO: en el ordinario, apelación por escrito dentro de los diez (10) días siguientes a la notificación (art. 225G); en el verbal, en la misma diligencia, con sustentación inmediata o por escrito dentro de los cinco (5) días (art. 233). Ejecutoria en el verbal: «La decisión final se entenderá notificada en estrados y quedará ejecutoriada a la terminación de la misma, si no fuere recurrida» (art. 232).' },
+    requiredSections: [
+      { n: 1, name: 'La identidad del disciplinable', mandatory: true, basis: 'Art. 225F num. 1' },
+      { n: 2, name: 'Un resumen de los hechos', mandatory: true, basis: 'Art. 225F num. 2' },
+      { n: 3, name: 'El análisis de las pruebas en que se basa', mandatory: true, basis: 'Art. 225F num. 3' },
+      { n: 4, name: 'El análisis y la valoración jurídica de los cargos, de los descargos y de las alegaciones presentadas', mandatory: true, basis: 'Art. 225F num. 4' },
+      { n: 5, name: 'La fundamentación de la calificación de la falta', mandatory: true, basis: 'Art. 225F nums. 5 y 8' },
+      { n: 6, name: 'El análisis de la ilicitud del comportamiento', mandatory: true, basis: 'Art. 225F num. 6' },
+      { n: 7, name: 'El análisis de culpabilidad', mandatory: true, basis: 'Art. 225F num. 7' },
+      { n: 8, name: 'Las razones de la sanción o de la absolución', mandatory: true, basis: 'Art. 225F num. 9' },
+      { n: 9, name: 'Los criterios de graduación de la sanción y la decisión en la parte resolutiva', mandatory: true, basis: 'Art. 225F num. 10' },
+      { n: 10, name: 'Constancia de notificación personal o por edicto y advertencia del recurso de apelación y su término', mandatory: true, basis: 'Arts. 225G y 233' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1952_2019_pr005.html'
+  },
+  {
+    id: 'disciplinario/fallo-disciplinario-de-segunda-instancia',
+    exactName: 'Fallo disciplinario de segunda instancia',
+    branch: 'DISCIPLINARIO',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 1952 de 2019, art. 234 (45 días y limitación a los aspectos impugnados); art. 235 (modificado por el art. 52 de la Ley 2094 de 2021: pruebas en segunda instancia o en doble conformidad); art. 135 (prohibición de reformatio in pejus); art. 33 (prescripción por falta de notificación oportuna); art. 138 (ejecutoria); art. 12 (doble conformidad)',
+    competentAuthority: 'El superior funcional: la Procuraduría General de la Nación cuando la entidad no garantiza la segunda instancia (art. 93), las Salas Disciplinarias respecto de las procuradurías delegadas (art. 101 par. 1), el Procurador General respecto de las Salas Disciplinarias de Juzgamiento (art. 102). La doble conformidad de las decisiones sancionatorias del Procurador General «será resuelta por una sala compuesta por tres (3) personas que cumplan los mismos requisitos del artículo 232 de la Constitución Política» (art. 102)',
+    term: { status: 'VERIFICADO', description: 'CUARENTA Y CINCO (45) DÍAS, RELOJ DE LA AUTORIDAD: «El funcionario de segunda instancia deberá decidir por escrito dentro de los cuarenta y cinco (45) días siguientes a la fecha en que hubiere recibido el proceso» (art. 234). EL PLAZO QUE EXTINGUE LA ACCIÓN Y NO ESTÁ EN ESTE ARTÍCULO: «Interrumpida la prescripción, esta se producirá si transcurridos dos (2) años desde la notificación del fallo de primera instancia no se notifica la decisión de segunda instancia»; para las faltas del art. 52 el plazo es de tres (3) años (art. 33). Si se decretan pruebas, «luego de practicadas las pruebas, se dará traslado por el término de cinco (5) días a los sujetos procesales, vencidos estos, el fallo se proferirá en el término de cuarenta (40) días» (art. 235). LÍMITES: la competencia se restringe «únicamente a los aspectos impugnados y aquellos otros que resulten inescindiblemente vinculados al objeto de impugnación» (art. 234), y no puede agravarse la sanción si el investigado es apelante único (art. 135). EJECUTORIA: «Las decisiones que resuelvan los recursos de apelación y queja, la consulta y aquellas contra las cuales no procede recurso alguno quedarán en firme el día que sean notificadas» (art. 138) — y desde ese día corren los cuatro (4) meses de caducidad de la nulidad y restablecimiento del derecho (Ley 1437 de 2011, art. 164 num. 2 lit. d).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del proceso, del apelante y del fallo apelado', mandatory: true, basis: null },
+      { n: 2, name: 'Delimitación de los aspectos impugnados y de los inescindiblemente vinculados', mandatory: true, basis: 'Art. 234' },
+      { n: 3, name: 'Análisis de cada reparo del recurrente', mandatory: true, basis: 'Art. 234' },
+      { n: 4, name: 'Valoración de las pruebas practicadas en segunda instancia, si las hubo', mandatory: false, basis: 'Art. 235' },
+      { n: 5, name: 'Verificación de que no ha operado la prescripción de la acción', mandatory: true, basis: 'Art. 33' },
+      { n: 6, name: 'Aplicación de la prohibición de reformatio in pejus cuando hay apelante único', mandatory: true, basis: 'Art. 135' },
+      { n: 7, name: 'Decisión de confirmar, revocar o modificar, y motivación de la dosificación', mandatory: true, basis: 'Ley 1952 de 2019, art. 50' },
+      { n: 8, name: 'Orden de notificación y constancia de que queda en firme el día de la notificación', mandatory: true, basis: 'Art. 138' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1952_2019_pr005.html'
+  },
+  {
+    id: 'disciplinario/auto-de-suspension-provisional-del-servidor-investigado',
+    exactName: 'Auto de suspensión provisional del servidor investigado',
+    branch: 'DISCIPLINARIO',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 1952 de 2019, art. 217 (suspensión provisional, consulta y prórrogas); art. 218 (reintegro del suspendido); art. 219 (medidas preventivas)',
+    competentAuthority: 'El funcionario que adelanta la investigación o el juzgamiento; la decisión es objeto de CONSULTA ante el superior (art. 217). Las medidas preventivas del art. 219 «solo podrá[n] ser adoptada[s] por el Procurador General, por quien este delegue de manera especial, y el Personero»',
+    term: { status: 'VERIFICADO', description: 'TRES (3) MESES PRORROGABLES, RELOJ DE LA AUTORIDAD: «El término de la suspensión provisional será de tres meses, prorrogable hasta en otro tanto. Dicha suspensión podrá prorrogarse por otros tres meses, una vez proferido el fallo de primera o única instancia» (art. 217). Procede solo «durante la investigación disciplinaria o el juzgamiento por faltas calificadas como gravísimas o graves» y con «serios elementos de juicio» sobre interferencia, continuación o reiteración de la falta (art. 217). CONSULTA OBLIGATORIA, y aquí está el reloj del disciplinado: «El auto que decreta la suspensión provisional y las decisiones de prórroga serán objeto de consulta, sin perjuicio de su inmediato cumplimiento. […] Recibido el expediente, el superior dispondrá que permanezca en Secretaría por el término de tres días, durante los cuales el disciplinado podrá presentar alegaciones en su favor, acompañadas de las pruebas en que las sustente. Vencido dicho término, se decidirá dentro de los diez días siguientes» (art. 217). REINTEGRO Y PAGO: procede «cuando la investigación termine con fallo absolutorio, o decisión de archivo o de terminación del proceso, o cuando expire el término de suspensión sin que se hubiere proferido fallo de primera o única instancia» (art. 218).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del servidor, del cargo y del proceso', mandatory: true, basis: null },
+      { n: 2, name: 'Calificación provisional de la falta como gravísima o grave', mandatory: true, basis: 'Art. 217' },
+      { n: 3, name: 'Serios elementos de juicio sobre interferencia, continuación o reiteración de la falta', mandatory: true, basis: 'Art. 217' },
+      { n: 4, name: 'Término de la suspensión y advertencia sobre su prórroga', mandatory: true, basis: 'Art. 217' },
+      { n: 5, name: 'Orden de remisión inmediata al superior para la consulta y de comunicación al afectado', mandatory: true, basis: 'Art. 217' },
+      { n: 6, name: 'Orden de comunicación al nominador para su inmediato cumplimiento', mandatory: true, basis: 'Art. 217' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1952_2019_pr005.html'
+  },
+  {
+    id: 'disciplinario/recurso-de-reposicion-en-el-proceso-disciplinario-del-abogado',
+    exactName: 'Recurso de reposición en el proceso disciplinario del abogado',
+    branch: 'DISCIPLINARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1123 de 2007, art. 79 (clases de recursos); art. 80 (recurso de reposición); art. 69 (multa al quejoso temerario: 2 días); art. 83 (ejecutoria); art. 105 (reposición contra la negativa de pruebas en audiencia)',
+    competentAuthority: 'La Comisión Seccional de Disciplina Judicial que profirió la decisión, o la Comisión Nacional de Disciplina Judicial en los procesos de su conocimiento (Constitución Política, art. 257A, adicionado por el art. 19 del Acto Legislativo 02 de 2015; las referencias de la Ley 1123 a las Salas Jurisdiccionales Disciplinarias deben entenderse hechas a estas Comisiones)',
+    term: { status: 'VERIFICADO', description: 'ORAL Y EN EL ACTO, RELOJ DEL ABOGADO DISCIPLINADO: «Procede contra las decisiones interlocutorias dictadas en audiencia o diligencia; se interpondrá y sustentará de manera oral en el mismo acto, y será resuelto inmediatamente; el auto que lo decida se notificará en estrados» (art. 80). No hay plazo posterior: quien calla en la audiencia pierde el recurso. TAMBIÉN procede contra los autos que imponen multa al quejoso temerario y al testigo renuente, y contra el que decide la solicitud de rehabilitación (art. 80). EXCEPCIÓN CON PLAZO PROPIO: contra la multa por queja temeraria el recurso «puede ser interpuesto dentro de los dos días siguientes a su notificación personal o por estado» (art. 69). CONTRA LA NEGATIVA DE PRUEBAS: se notifica en estrados y «contra ella procede el recurso de reposición que debe resolverse en el mismo acto y en subsidio el de apelación» (art. 105) — la apelación debe pedirse allí mismo como subsidiaria, o se pierde.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del proceso y de la decisión impugnada', mandatory: true, basis: null },
+      { n: 2, name: 'Razones concretas de la inconformidad, expuestas oralmente en el mismo acto', mandatory: true, basis: 'Art. 80' },
+      { n: 3, name: 'Petición de revocatoria o modificación de la decisión', mandatory: true, basis: null },
+      { n: 4, name: 'Apelación subsidiaria cuando la decisión la admita', mandatory: true, basis: 'Arts. 81 y 105' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1123_2007_pr002.html'
+  },
+  {
+    id: 'disciplinario/recurso-de-apelacion-en-el-proceso-disciplinario-del-abogado',
+    exactName: 'Recurso de apelación en el proceso disciplinario del abogado',
+    branch: 'DISCIPLINARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1123 de 2007, art. 81 (procedencia, efecto suspensivo y término de 3 días); art. 82 (prohibición de reformatio in pejus); art. 83 (ejecutoria); art. 105 (apelación subsidiaria contra la negativa de pruebas y término del quejoso ausente); art. 107 (trámite de la segunda instancia); art. 59 num. 1 (la consulta fue derogada por el art. 73 de la Ley 2094 de 2021 a partir del 29 de marzo de 2022)',
+    competentAuthority: 'Se interpone ante la Comisión Seccional de Disciplina Judicial que profirió la decisión y lo resuelve la COMISIÓN NACIONAL DE DISCIPLINA JUDICIAL, que asumió los procesos de la Sala Jurisdiccional Disciplinaria del Consejo Superior de la Judicatura (Constitución Política, art. 257A, par. transitorio 1, adicionado por el art. 19 del Acto Legislativo 02 de 2015)',
+    term: { status: 'VERIFICADO', description: 'TRES (3) DÍAS, RELOJ DEL ABOGADO DISCIPLINADO, y es el plazo más corto de esta rama: «Se concederá en el efecto suspensivo y salvo norma expresa en contrario, deberá interponerse y sustentarse por escrito dentro de los tres (3) días siguientes a la última notificación. Vencido este término, los no apelantes podrán pronunciarse en relación con el recurso dentro de los dos (2) días siguientes. […] El recurso será rechazado cuando no sea sustentado o se interponga de manera extemporánea, decisión contra la cual no procede recurso alguno» (art. 81). INTERPOSICIÓN Y SUSTENTACIÓN CORREN JUNTAS: no hay traslado separado para sustentar. PROCEDENCIA TAXATIVA: «contra las decisiones de terminación del procedimiento, de nulidad decretada al momento de dictar sentencia de primer grado, de rehabilitación, la que niega la práctica de pruebas y contra la sentencia de primera instancia» (art. 81). La que niega pruebas en audiencia se apela como subsidiaria de la reposición, en el mismo acto (art. 105). QUEJOSO AUSENTE de la audiencia de terminación: «podrá interponerlo y sustentarlo dentro de los tres (3) días siguientes a la terminación de la audiencia» (art. 105). RELOJ DE LA AUTORIDAD: el magistrado ponente de segunda instancia «dispondrá de veinte (20) días para registrar proyecto de decisión que será dictada por la Sala en la mitad de este término» (art. 107). GARANTÍA: siendo apelante único, el superior «no podrá agravar la sanción impuesta» (art. 82). LÍMITE QUE NO ESTÁ EN ESTE ARTÍCULO: la acción disciplinaria prescribe en cinco (5) años desde la consumación de la falta (art. 24), y la Ley 1123 no prevé que la apelación ni el fallo de primera instancia lo interrumpan.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del proceso, del abogado disciplinado y de la decisión apelada', mandatory: true, basis: null },
+      { n: 2, name: 'Oportunidad: fecha de la última notificación y cómputo de los tres días', mandatory: true, basis: 'Art. 81' },
+      { n: 3, name: 'Verificación de que la decisión es de las apelables', mandatory: true, basis: 'Art. 81' },
+      { n: 4, name: 'Sustentación fáctica y probatoria de cada reparo', mandatory: true, basis: 'Art. 81' },
+      { n: 5, name: 'Sustentación jurídica: normas violadas y concepto de la violación', mandatory: true, basis: null },
+      { n: 6, name: 'Alegación de prescripción de la acción disciplinaria, si ha operado', mandatory: false, basis: 'Art. 24' },
+      { n: 7, name: 'Subsidiariamente, reparos sobre la dosificación de la sanción', mandatory: false, basis: 'Arts. 13 y 45' },
+      { n: 8, name: 'Petición concreta de revocatoria o modificación de la sentencia', mandatory: true, basis: null }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1123_2007_pr002.html'
+  },
+  {
+    id: 'disciplinario/solicitud-de-nulidad-en-el-proceso-disciplinario-del-abogado',
+    exactName: 'Solicitud de nulidad en el proceso disciplinario del abogado',
+    branch: 'DISCIPLINARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1123 de 2007, art. 98 (causales); art. 99 (declaratoria oficiosa); art. 100 (requisitos de la solicitud); art. 101 (principios que orientan la declaratoria y su convalidación); art. 106 (las nulidades planteadas después de la audiencia de pruebas y calificación se resuelven en la sentencia); art. 81 (apelación de la nulidad decretada al dictar sentencia de primer grado)',
+    competentAuthority: 'La Comisión Seccional de Disciplina Judicial de conocimiento; en segunda instancia, la Comisión Nacional de Disciplina Judicial (Constitución Política, art. 257A)',
+    term: { status: 'VERIFICADO', description: 'NO HAY PLAZO EN DÍAS, y eso está verificado: el art. 100 no fija término y el art. 99 permite la declaratoria oficiosa «en cualquier estado de la actuación disciplinaria». LO QUE SÍ CAMBIA ES EL MOMENTO EN QUE SE RESUELVE, y de ahí depende el recurso: las nulidades propuestas hasta la audiencia de pruebas y calificación se deciden en ella; en cambio «Las nulidades generadas y planteadas con posterioridad a la audiencia de pruebas y calificación serán resueltas en la sentencia» (art. 106). Cuando la nulidad se decreta al dictar sentencia de primer grado, esa decisión es apelable dentro de los tres (3) días siguientes a la última notificación (art. 81). LÍMITE MATERIAL: «no podrá formular una nueva, sino por causal diferente o por hechos posteriores» (art. 100), y «Solo puede decretarse cuando no exista otro medio procesal para subsanar la irregularidad sustancial» (art. 101 num. 5).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del proceso, del solicitante y de la actuación que se ataca', mandatory: true, basis: null },
+      { n: 2, name: 'Determinación de la causal que se invoca', mandatory: true, basis: 'Arts. 98 y 100' },
+      { n: 3, name: 'Razones de hecho y de derecho en que se funda', mandatory: true, basis: 'Art. 100' },
+      { n: 4, name: 'Demostración de que la irregularidad sustancial afecta garantías de los intervinientes o desconoce las bases de la instrucción y el juzgamiento', mandatory: true, basis: 'Art. 101 num. 2' },
+      { n: 5, name: 'Razón por la cual no existe otro medio procesal para subsanarla', mandatory: true, basis: 'Art. 101 num. 5' },
+      { n: 6, name: 'Manifestación de que no se ha formulado antes por la misma causal ni por los mismos hechos', mandatory: true, basis: 'Art. 100' },
+      { n: 7, name: 'Petición del momento procesal desde el cual debe reponerse la actuación', mandatory: true, basis: 'Art. 99' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1123_2007_pr002.html'
+  },
+  {
+    id: 'disciplinario/solicitud-de-pruebas-en-el-proceso-disciplinario-del-abogado',
+    exactName: 'Solicitud de pruebas en el proceso disciplinario del abogado',
+    branch: 'DISCIPLINARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1123 de 2007, art. 88 (petición y rechazo de pruebas); art. 105 (audiencia de pruebas y calificación provisional: suspensión hasta 5 días y suspensión hasta 30 días para su práctica); art. 106 (pruebas en la audiencia de juzgamiento); art. 86 (medios de prueba); art. 97 (prueba para sancionar)',
+    competentAuthority: 'La Comisión Seccional de Disciplina Judicial de conocimiento; en segunda instancia el magistrado ponente puede decretar pruebas de oficio (art. 107)',
+    term: { status: 'VERIFICADO', description: 'EN LA AUDIENCIA, RELOJ DEL ABOGADO DISCIPLINADO: en la audiencia de pruebas y calificación provisional el disciplinable o su defensor pueden «solicitar o aportar las pruebas que pretendan allegar; en el mismo acto de audiencia se determinará su conducencia y pertinencia» (art. 105). PRÓRROGA QUE HAY QUE PEDIR EXPRESAMENTE: «El disciplinado o su defensor podrá solicitar la suspensión de la audiencia hasta por cinco días para ejercer su derecho a solicitar y aportar pruebas en caso de que no lo pueda hacer en el momento de conocer la queja o informe» (art. 105). SEGUNDA OPORTUNIDAD: formulados los cargos, «los intervinientes podrán solicitar la práctica de pruebas a realizarse en la audiencia de juzgamiento» (art. 105). RELOJ DE LA AUTORIDAD: si la prueba no puede practicarse de inmediato, «la audiencia se suspenderá con tal fin por un término que no excederá de treinta (30) días» (art. 105), y la audiencia de juzgamiento «se celebrará dentro de los veinte (20) días siguientes» (art. 105). SI SE NIEGAN: reposición oral en el mismo acto y apelación subsidiaria, allí mismo (art. 105).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del proceso y del solicitante', mandatory: true, basis: null },
+      { n: 2, name: 'Enunciación separada de cada medio de prueba pedido', mandatory: true, basis: 'Art. 86' },
+      { n: 3, name: 'Conducencia y pertinencia de cada prueba', mandatory: true, basis: 'Art. 105' },
+      { n: 4, name: 'Hecho que se pretende probar con cada medio', mandatory: true, basis: 'Art. 84' },
+      { n: 5, name: 'Aporte de las pruebas documentales en poder del solicitante', mandatory: true, basis: 'Art. 105' },
+      { n: 6, name: 'Si procede, solicitud de suspensión de la audiencia hasta por cinco días', mandatory: false, basis: 'Art. 105' },
+      { n: 7, name: 'Reserva expresa de reposición y apelación subsidiaria en caso de negativa', mandatory: true, basis: 'Art. 105' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1123_2007_pr002.html'
+  },
+  {
+    id: 'disciplinario/solicitud-de-rehabilitacion-del-abogado-excluido',
+    exactName: 'Solicitud de rehabilitación del abogado excluido',
+    branch: 'DISCIPLINARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1123 de 2007, art. 108 (término de rehabilitación, artículo CONDICIONALMENTE exequible); art. 109 (ante quién se solicita); art. 110 (procedimiento); art. 44 (exclusión); art. 26 num. 3 (la rehabilitación como causal de extinción de la sanción); art. 80 (reposición contra el auto que la decide) y art. 81 (apelación)',
+    competentAuthority: '«El excluido del ejercicio profesional podrá solicitar ante la Sala que dictó la sentencia de primer grado, la rehabilitación» (art. 109), esto es, la Comisión Seccional de Disciplina Judicial que profirió la sentencia de primera instancia (Constitución Política, art. 257A)',
+    term: { status: 'VERIFICADO', description: 'CINCO (5) AÑOS COMO REGLA, Y DIEZ (10) EN EL CASO QUE MÁS SE OLVIDA: «El profesional excluido podrá ser rehabilitado luego de transcurridos cinco (5) años desde la ejecutoria de la sentencia […]. El término aquí previsto será de diez (10) años, cuando los hechos que originen la imposición de la sanción de exclusión tengan lugar en actuaciones judiciales o extrajudiciales del abogado que se desempeñe o se haya desempeñado como apoderado o contraparte de una entidad pública. El abogado que adelante y apruebe los cursos de capacitación autorizados por el Consejo Superior de la Judicatura en instituciones acreditadas podrá rehabilitarse en tres (3) y cinco (5) años, respectivamente» (art. 108). REQUISITO TEMPORAL PRECLUSIVO: «La solicitud de rehabilitación solo podrá rechazarse por el no cumplimiento del requisito temporal, mediante auto motivado susceptible del recurso de reposición» (art. 110 lit. b). RELOJES DE LA AUTORIDAD: admitida la solicitud, cinco (5) días para que los intervinientes soliciten o aporten pruebas; cinco (5) días para decretarlas; hasta treinta (30) días para practicarlas; y diez (10) días para decidir, «determinación que es susceptible del recurso de apelación» (art. 110), que debe interponerse y sustentarse dentro de los tres (3) días siguientes (art. 81).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del abogado excluido, número de tarjeta profesional y del proceso en que se impuso la exclusión', mandatory: true, basis: null },
+      { n: 2, name: 'Acreditación del cumplimiento del requisito temporal aplicable (5, 10, 3 o 5 años)', mandatory: true, basis: 'Arts. 108 y 110 lit. b' },
+      { n: 3, name: 'Fecha de ejecutoria de la sentencia de exclusión', mandatory: true, basis: 'Art. 108' },
+      { n: 4, name: 'Exposición de la conducta observada que aconseja la reincorporación al ejercicio de la profesión', mandatory: true, basis: 'Art. 108' },
+      { n: 5, name: 'Certificación de los cursos de capacitación aprobados, si se invoca el término reducido', mandatory: false, basis: 'Art. 108' },
+      { n: 6, name: 'Solicitud y aporte de pruebas', mandatory: true, basis: 'Art. 110 lit. a' },
+      { n: 7, name: 'Petición expresa de rehabilitación y de comunicación a las autoridades a quienes se comunicó la exclusión', mandatory: true, basis: 'Art. 110 lit. e' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1123_2007_pr002.html'
+  },
+  {
+    id: 'disciplinario/auto-de-apertura-de-proceso-disciplinario-contra-abogado',
+    exactName: 'Auto de apertura de proceso disciplinario contra abogado',
+    branch: 'DISCIPLINARIO',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 1123 de 2007, art. 102 (iniciación mediante queja o informe y reparto); art. 104 (trámite preliminar: 5 días para acreditar la calidad de disciplinable y 15 días perentorios para la audiencia); art. 67 (formas de iniciar la acción); art. 68 (examen de procedencia); art. 69 (quejas falsas o temerarias)',
+    competentAuthority: 'El Magistrado de la Comisión Seccional de Disciplina Judicial a quien corresponda el reparto: «La actuación en primera instancia estará a cargo del Magistrado del Consejo Seccional de la Judicatura que le haya correspondido en reparto hasta el momento de dictar sentencia, determinación que se emitirá por la Sala plural respectiva» (art. 102), hoy Comisión Seccional de Disciplina Judicial (Constitución Política, art. 257A, adicionado por el art. 19 del Acto Legislativo 02 de 2015)',
+    term: { status: 'VERIFICADO', description: 'CINCO (5) DÍAS Y QUINCE (15) DÍAS PERENTORIOS, RELOJ DE LA AUTORIDAD: «Efectuado el reparto, dentro de los cinco (5) días siguientes se acreditará la condición de disciplinable del denunciado por el medio más expedito; verificado este requisito de procedibilidad, se dictará auto de trámite de apertura de proceso disciplinario, señalando fecha y hora para la audiencia de pruebas y calificación de lo cual se enterará al Ministerio Público; dicha diligencia se celebrará dentro del término perentorio de quince (15) días» (art. 104). EMPLAZAMIENTO: si no se conoce el paradero, «se enviará la comunicación a las direcciones anotadas en el Registro Nacional de Abogados fijándose además edicto emplazatorio en la Secretaría de la Sala por el término de tres (3) días»; si no comparece, «se fijará edicto emplazatorio por tres (3) días, acto seguido se declarará persona ausente y se le designará defensor de oficio» (art. 104). EL RELOJ QUE EXTINGUE LA ACCIÓN: cinco (5) años desde la consumación de la falta, o desde el último acto ejecutivo si es permanente o continuada (art. 24); la apertura no lo interrumpe.' },
+    requiredSections: [
+      { n: 1, name: 'Constancia del reparto y de la acreditación de la condición de disciplinable del denunciado', mandatory: true, basis: 'Art. 104' },
+      { n: 2, name: 'Relación de la queja o informe y de los hechos', mandatory: true, basis: 'Arts. 67 y 102' },
+      { n: 3, name: 'Examen de procedencia de la acción y de la ausencia de causal objetiva de improcedibilidad', mandatory: true, basis: 'Art. 68' },
+      { n: 4, name: 'Señalamiento de fecha y hora de la audiencia de pruebas y calificación, dentro de los quince días', mandatory: true, basis: 'Art. 104' },
+      { n: 5, name: 'Orden de citación al disciplinable, al quejoso y de enteramiento al Ministerio Público', mandatory: true, basis: 'Art. 104' },
+      { n: 6, name: 'Orden de emplazamiento y designación de defensor de oficio en caso de no comparecencia', mandatory: false, basis: 'Art. 104' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1123_2007_pr002.html'
+  },
+  {
+    id: 'disciplinario/decision-de-terminacion-anticipada-del-proceso-disciplinario-del-abogado',
+    exactName: 'Decisión de terminación anticipada del proceso disciplinario del abogado',
+    branch: 'DISCIPLINARIO',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 1123 de 2007, art. 103 (terminación anticipada); art. 105 (calificación que dispone la terminación y su notificación en estrados); art. 81 (apelación en el efecto suspensivo); art. 83 (ejecutoria)',
+    competentAuthority: 'El Magistrado de conocimiento de la Comisión Seccional de Disciplina Judicial; en segunda instancia, la Comisión Nacional de Disciplina Judicial (Constitución Política, art. 257A)',
+    term: { status: 'VERIFICADO', description: 'SIN PLAZO EN DÍAS PARA PROFERIRLA, y así lo dice la norma: procede «En cualquier etapa de la actuación disciplinaria en que aparezca plenamente demostrado que el hecho atribuido no existió, que la conducta no está prevista en la ley como falta disciplinaria, que el disciplinable no la cometió, que existe una causal de exclusión de responsabilidad, o que la actuación no podía iniciarse o proseguirse, el funcionario de conocimiento, mediante decisión motivada, así lo declarará y ordenará la terminación del procedimiento» (art. 103). LOS RELOJES QUE SÍ CORREN, Y SON DE LOS DEMÁS: la decisión es APELABLE en el efecto suspensivo, y si se adopta en audiencia «es susceptible del recurso de apelación que deberá interponerse y sustentarse en el mismo acto»; «Si el quejoso no estuvo presente en la audiencia, podrá interponerlo y sustentarlo dentro de los tres (3) días siguientes a la terminación de la audiencia» (art. 105). Por fuera de audiencia, el plazo es de tres (3) días desde la última notificación (art. 81), y la decisión queda en firme tres días después de la última notificación si no se impugna (art. 83).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del proceso, del abogado disciplinable y de la queja', mandatory: true, basis: null },
+      { n: 2, name: 'Determinación de la causal de terminación acreditada', mandatory: true, basis: 'Art. 103' },
+      { n: 3, name: 'Motivación probatoria de que la causal aparece plenamente demostrada', mandatory: true, basis: 'Art. 103' },
+      { n: 4, name: 'Declaración de terminación del procedimiento y orden de archivo', mandatory: true, basis: 'Art. 103' },
+      { n: 5, name: 'Notificación en estrados o personal, según el caso, y advertencia del recurso de apelación y su término', mandatory: true, basis: 'Arts. 81 y 105' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1123_2007_pr002.html'
+  },
+  {
+    id: 'disciplinario/sentencia-disciplinaria-de-primera-instancia-contra-abogado',
+    exactName: 'Sentencia disciplinaria de primera instancia contra abogado',
+    branch: 'DISCIPLINARIO',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 1123 de 2007, art. 106 (audiencia de juzgamiento, 5 días para registrar proyecto y 5 días para la sentencia, y contenido); art. 105 (formulación de cargos y confesión); art. 102 (la sentencia la emite la Sala plural); arts. 40 a 44 (sanciones); art. 45 (criterios de graduación); art. 46 (motivación de la dosificación); art. 24 (prescripción de la acción); art. 27 (prescripción de la sanción)',
+    competentAuthority: 'La Sala plural de la Comisión Seccional de Disciplina Judicial: la actuación está a cargo del Magistrado de conocimiento «hasta el momento de dictar sentencia, determinación que se emitirá por la Sala plural respectiva» (art. 102), hoy Comisión Seccional de Disciplina Judicial (Constitución Política, art. 257A). Es una decisión JUDICIAL, no un acto administrativo: no procede contra ella demanda de nulidad y restablecimiento del derecho ante lo contencioso administrativo',
+    term: { status: 'VERIFICADO', description: 'CINCO (5) MÁS CINCO (5) DÍAS, RELOJ DE LA AUTORIDAD: «El Magistrado ponente dispondrá de cinco (5) días para registrar el proyecto de fallo, y la Sala de cinco (5) días para proferir sentencia» (art. 106). Antes: la audiencia de juzgamiento se celebra «dentro de los veinte (20) días siguientes» a la audiencia de pruebas y calificación (art. 105). NULIDADES: «Las nulidades generadas y planteadas con posterioridad a la audiencia de pruebas y calificación serán resueltas en la sentencia» (art. 106). EL PLAZO QUE EXTINGUE LA ACCIÓN Y NO ESTÁ EN ESTE ARTÍCULO: «La acción disciplinaria prescribe en cinco años, contados para las faltas instantáneas desde el día de su consumación y para las de carácter permanente o continuado desde la realización del último acto ejecutivo de la misma. Cuando fueren varias las conductas juzgadas en un solo proceso, la prescripción de las acciones se cumple independientemente para cada una de ellas» (art. 24). RELOJ DEL ABOGADO SANCIONADO: apelación por escrito dentro de los tres (3) días siguientes a la última notificación, con sustentación en el mismo plazo (art. 81). Y la sanción impuesta «prescribe en un término de cinco (5) años, contados a partir de la ejecutoria del fallo» (art. 27).' },
+    requiredSections: [
+      { n: 1, name: 'La identidad del investigado', mandatory: true, basis: 'Art. 106 num. 1' },
+      { n: 2, name: 'Un resumen de los hechos', mandatory: true, basis: 'Art. 106 num. 2' },
+      { n: 3, name: 'Análisis de las pruebas que dan certeza sobre la existencia de la falta y la responsabilidad, y valoración jurídica de los cargos, de los argumentos defensivos y de las alegaciones', mandatory: true, basis: 'Art. 106 num. 3' },
+      { n: 4, name: 'Fundamentación de la calificación de la falta y de la culpabilidad y razones de la sanción o de la absolución', mandatory: true, basis: 'Art. 106 num. 4' },
+      { n: 5, name: 'Exposición razonada de los criterios tenidos en cuenta para la graduación de la sanción', mandatory: true, basis: 'Art. 106 num. 5' },
+      { n: 6, name: 'Resolución de las nulidades planteadas con posterioridad a la audiencia de pruebas y calificación', mandatory: true, basis: 'Art. 106' },
+      { n: 7, name: 'Verificación de que no ha operado la prescripción de la acción', mandatory: true, basis: 'Art. 24' },
+      { n: 8, name: 'Advertencia del recurso de apelación y de su término de tres días', mandatory: true, basis: 'Art. 81' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1123_2007_pr002.html'
+  },
+  {
+    id: 'disciplinario/sentencia-disciplinaria-de-segunda-instancia-contra-abogado',
+    exactName: 'Sentencia disciplinaria de segunda instancia contra abogado',
+    branch: 'DISCIPLINARIO',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 1123 de 2007, art. 107 (trámite en segunda instancia: 20 días para registrar y la mitad para dictar; pruebas de oficio en 15 días); art. 82 (prohibición de reformatio in pejus); art. 83 (ejecutoria); art. 47 (ejecución y registro de la sanción); art. 24 (prescripción de la acción); art. 27 (prescripción de la sanción); art. 59 num. 1 (la consulta fue derogada)',
+    competentAuthority: 'La COMISIÓN NACIONAL DE DISCIPLINA JUDICIAL, que asumió los procesos de la Sala Jurisdiccional Disciplinaria del Consejo Superior de la Judicatura (Constitución Política, art. 257A y su parágrafo transitorio 1, adicionados por el art. 19 del Acto Legislativo 02 de 2015): «La Comisión Nacional de Disciplina Judicial será la encargada de examinar la conducta y sancionar las faltas de los abogados en ejercicio de su profesión, en la instancia que señale la ley, salvo que esta función se atribuya por la ley a un Colegio de Abogados»',
+    term: { status: 'VERIFICADO', description: 'VEINTE (20) DÍAS MÁS DIEZ (10), RELOJ DE LA AUTORIDAD: «Una vez ingrese la actuación al despacho del Magistrado Ponente, este dispondrá de veinte (20) días para registrar proyecto de decisión que será dictada por la Sala en la mitad de este término» (art. 107). Si se decretan pruebas de oficio, «se evacuarán en un término no superior a quince (15) días y fuera de audiencia» (art. 107). «La apelación de providencias distintas del fallo será desatada de plano, en los mismos términos previstos en el inciso primero de este artículo» (art. 107). SIN CONSULTA: el aparte del art. 59 num. 1 que preveía la consulta de las providencias de los consejos seccionales fue derogado a partir del 29 de marzo de 2022 por el art. 73 de la Ley 2094 de 2021. LÍMITES: siendo apelante único el disciplinado, «no podrá agravar la sanción impuesta» (art. 82). EL PLAZO QUE EXTINGUE LA ACCIÓN: cinco (5) años desde la consumación de la falta (art. 24) — la Ley 1123 no prevé interrupción de la prescripción por la notificación del fallo de primera instancia, a diferencia del art. 33 de la Ley 1952 de 2019, de modo que el término corre sin pausa durante toda la segunda instancia. Ejecutoriada la sentencia, la sanción prescribe a los cinco (5) años (art. 27).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del proceso, del apelante y de la sentencia apelada', mandatory: true, basis: null },
+      { n: 2, name: 'Delimitación de los reparos sustentados en la apelación', mandatory: true, basis: 'Art. 81' },
+      { n: 3, name: 'Análisis de cada reparo y valoración de las pruebas de oficio practicadas, si las hubo', mandatory: true, basis: 'Art. 107' },
+      { n: 4, name: 'Verificación de que no ha operado la prescripción de la acción disciplinaria', mandatory: true, basis: 'Art. 24' },
+      { n: 5, name: 'Aplicación de la prohibición de reformatio in pejus cuando hay apelante único', mandatory: true, basis: 'Art. 82' },
+      { n: 6, name: 'Decisión de confirmar, revocar o modificar y motivación de la dosificación de la sanción', mandatory: true, basis: 'Arts. 45 y 46' },
+      { n: 7, name: 'Orden de ejecución y registro de la sanción', mandatory: true, basis: 'Art. 47' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1123_2007_pr002.html'
+  }
+  ]
+};

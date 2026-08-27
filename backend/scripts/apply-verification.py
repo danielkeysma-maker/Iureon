@@ -46,6 +46,9 @@ FILE_FOR_BRANCH = {
     'SUPERINTENDENCIAS': 'actuaciones-superintendencias.json',
     'AGRARIO': 'actuaciones-agrario.json',
     'ADUANERO': 'actuaciones-aduanero.json',
+    'PROPIEDAD_INTELECTUAL': 'actuaciones-propiedad-intelectual.json',
+    'POLICIVO': 'actuaciones-policivo.json',
+    'DISCIPLINARIO': 'actuaciones-disciplinario.json',
 }
 
 PREFIX_FOR_BRANCH = {b: b.lower() for b in FILE_FOR_BRANCH}

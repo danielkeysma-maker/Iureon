@@ -52,6 +52,9 @@ FILE_FOR_BRANCH = {
     'SUPERINTENDENCIAS': 'actuaciones-superintendencias.json',
     'AGRARIO': 'actuaciones-agrario.json',
     'ADUANERO': 'actuaciones-aduanero.json',
+    'PROPIEDAD_INTELECTUAL': 'actuaciones-propiedad-intelectual.json',
+    'POLICIVO': 'actuaciones-policivo.json',
+    'DISCIPLINARIO': 'actuaciones-disciplinario.json',
 }
 
 # Mirrors the allowlist in catalog.check.ts. Duplicated on purpose: a merge that
@@ -71,6 +74,8 @@ CAMPOS = ('exact_name', 'area', 'role', 'legal_basis', 'competent_authority',
 
 ROLES = ('LITIGANTE', 'DESPACHO', 'SECRETARIA')
 
+NL = chr(10)
+
 
 def es_oficial(url):
     if not url:
@@ -85,10 +90,16 @@ def es_oficial(url):
 
 def main():
     if len(sys.argv) < 2:
-        raise SystemExit('uso: merge-actuaciones.py <out-file.json> [--dry]')
+        raise SystemExit('uso: merge-actuaciones.py <out-file.json> '
+                         '[--nueva --fecha=AAAA-MM-DD] [--dry]')
 
     src_path = sys.argv[1]
     dry = '--dry' in sys.argv
+
+    # Passed in rather than read from the clock: the date belongs to when the
+    # norms were read, not to when the file happened to be merged.
+    fecha = next((a.split('=', 1)[1] for a in sys.argv if a.startswith('--fecha=')), '')
+    fuente = next((a.split('=', 1)[1] for a in sys.argv if a.startswith('--fuente=')), '')
 
     src = json.load(io.open(src_path, encoding='utf-8'))
     rama = (src.get('rama') or src.get('branch') or '').upper()
@@ -117,9 +128,31 @@ def main():
         if os.path.exists(dest_path):
             raise SystemExit('FATAL: %s ya existe pero la rama no esta registrada. '
                              'Revisa a mano antes de seguir.' % FILE_FOR_BRANCH[rama])
+        if not fecha and not src.get('verified_at'):
+            raise SystemExit('FATAL: una rama nueva necesita --fecha=AAAA-MM-DD '
+                             '(cuando se leyeron las normas).')
+
+        # `source_of_truth` is the branch header a lawyer reads, and it must
+        # state the norm that governs — not how it was worked out.
+        #
+        # Deriving it from `vigencia` was tried and was wrong: the agents put
+        # their whole paso-0 reasoning there, eight thousand characters of it
+        # for ADUANERO, and the first paragraph of reasoning is still reasoning.
+        # Both branches shipped with a header starting 'PASO 0 —'. The full
+        # text is not lost; `gaps` already keeps it.
+        #
+        # So it is required, never guessed.
+        resumen = (src.get('fuente_de_verdad') or fuente or '').strip()
+        if not resumen:
+            raise SystemExit(
+                'FATAL: una rama nueva necesita su fuente de verdad: la norma '
+                'que la rige, en prosa breve. Pasala como --fuente="..." o como '
+                '"fuente_de_verdad" en el JSON. NO se deriva de "vigencia": '
+                'eso es el razonamiento, no el encabezado.')
+
         dest = {'_meta': {'branch': rama,
-                          'verified_at': src.get('verified_at', ''),
-                          'source_of_truth': src.get('vigencia', ''),
+                          'verified_at': src.get('verified_at') or fecha,
+                          'source_of_truth': resumen,
                           'gaps': [],
                           'unverified': []},
                 'actuaciones': []}
