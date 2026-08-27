@@ -23,9 +23,20 @@ const check = (n: string, ok: boolean, d = ''): void => {
   if (!ok) fallos++;
 };
 
-const CARGANDO: BranchActuaciones = { estado: 'CARGANDO', nombres: [] };
-const VACIA: BranchActuaciones = { estado: 'VACIA', nombres: [] };
-const lista = (...n: string[]): BranchActuaciones => ({ estado: 'LISTA', nombres: n });
+const CARGANDO: BranchActuaciones = { estado: 'CARGANDO', nombres: [], actuaciones: [] };
+const VACIA: BranchActuaciones = { estado: 'VACIA', nombres: [], actuaciones: [] };
+/*
+ * La lista lleva ahora las actuaciones completas y no solo sus nombres: es lo
+ * que le permite al selector decir si cada tipo de documento está verificado.
+ * Aquí solo importan los nombres, así que las actuaciones van vacías y se dice
+ * por qué — una lista incoherente en un check es una trampa para el siguiente
+ * que lo lea.
+ */
+const lista = (...n: string[]): BranchActuaciones => ({
+  estado: 'LISTA',
+  nombres: n,
+  actuaciones: []
+});
 
 /** Lo que ofrece el panel mientras el catálogo no ha llegado. Nunca vacío. */
 const RESPALDO = ['Acción de tutela', 'Derecho de petición', 'Demanda ejecutiva'];

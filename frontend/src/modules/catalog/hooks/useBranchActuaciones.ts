@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { catalogApi } from '../services/catalog.api';
-import type { ActuacionRole, LegalBranch } from '../types';
+import type { Actuacion, ActuacionRole, LegalBranch } from '../types';
 
 /**
  * The catalogued filing names for one branch and role, to offer as the
@@ -25,17 +25,21 @@ import type { ActuacionRole, LegalBranch } from '../types';
  * where `null` meant both "loading" and "not in the catalogue".
  */
 export type BranchActuaciones =
-  | { estado: 'CARGANDO'; nombres: [] }
+  | { estado: 'CARGANDO'; nombres: []; actuaciones: [] }
   /** The catalogue answered with entries for this branch and role. */
-  | { estado: 'LISTA'; nombres: string[] }
+  | { estado: 'LISTA'; nombres: string[]; actuaciones: Actuacion[] }
   /** It answered, and there are none — or it could not be reached. */
-  | { estado: 'VACIA'; nombres: [] };
+  | { estado: 'VACIA'; nombres: []; actuaciones: [] };
 
 export const useBranchActuacionesState = (
   branch: string,
   role: ActuacionRole
 ): BranchActuaciones => {
-  const [estado, setEstado] = useState<BranchActuaciones>({ estado: 'CARGANDO', nombres: [] });
+  const [estado, setEstado] = useState<BranchActuaciones>({
+    estado: 'CARGANDO',
+    nombres: [],
+    actuaciones: []
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -43,19 +47,34 @@ export const useBranchActuacionesState = (
     // Back to CARGANDO up front: offering another branch's filings would be
     // worse than offering none, and claiming this branch is empty before
     // asking would be worse than either.
-    setEstado({ estado: 'CARGANDO', nombres: [] });
+    setEstado({ estado: 'CARGANDO', nombres: [], actuaciones: [] });
 
     catalogApi
       .list({ branch: branch as LegalBranch, role })
       .then((result) => {
         if (cancelled) return;
-        const nombres = result.actuaciones.map((a) => a.exactName);
-        setEstado(nombres.length > 0 ? { estado: 'LISTA', nombres } : { estado: 'VACIA', nombres: [] });
+        /*
+         * SE CONSERVA LA ACTUACIÓN ENTERA, no solo su nombre.
+         *
+         * El hook devolvía únicamente `exactName` y tiraba el resto, así que
+         * quien pintaba la lista no tenía forma de saber si un tipo de documento
+         * está verificado, no caduca o nadie lo comprobó. La consecuencia fue
+         * inmediata al construir el selector nuevo: se pintaba un visto verde en
+         * TODAS las opciones, afirmando una verificación que el catálogo no
+         * respalda. El dato siempre estuvo en la respuesta.
+         */
+        const actuaciones = result.actuaciones;
+        const nombres = actuaciones.map((a) => a.exactName);
+        setEstado(
+          nombres.length > 0
+            ? { estado: 'LISTA', nombres, actuaciones }
+            : { estado: 'VACIA', nombres: [], actuaciones: [] }
+        );
       })
       .catch(() => {
         // Un fallo se reporta como vacía y no como carga eterna: el panel tiene
         // su lista de respaldo y el abogado tiene que poder seguir trabajando.
-        if (!cancelled) setEstado({ estado: 'VACIA', nombres: [] });
+        if (!cancelled) setEstado({ estado: 'VACIA', nombres: [], actuaciones: [] });
       });
 
     return () => {
