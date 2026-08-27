@@ -76,3 +76,31 @@ export const searchGlossary = (
     `/api/legal/glossary?query=${encodeURIComponent(query)}&category=${encodeURIComponent(category)}`,
     { signal }
   );
+
+/**
+ * Una sentencia traída del sitio oficial, que el corpus no tiene.
+ *
+ * `citationShape` es DELIBERADAMENTE laxo: solo decide si vale la pena
+ * preguntarle al servidor. Quién es una cita válida, y sobre todo si existe, lo
+ * resuelve el registro oficial de la Corte — duplicar aquí esa lógica crearía
+ * una segunda opinión sobre qué existe, y la del navegador no puede ganar.
+ */
+export const citationShape = (query: string): boolean =>
+  /\b(su|c|t)\s*-?\s*\d{1,4}\s*(?:\/|\s+de\s+|-)\s*\d{2,4}\b/i.test(query);
+
+export interface OfficialRuling {
+  citation: string;
+  tipo: string;
+  fecha: string;
+  magistrado: string;
+  sala: string;
+  proceso: string;
+  sourceUrl: string;
+  /** El texto tal como se descargó ahora. Nunca compuesto aquí. */
+  text: string;
+}
+
+export const fetchOfficialRuling = (cita: string) =>
+  httpClient.get<{ ruling: OfficialRuling }>(
+    `/api/jurisprudence/ruling?cita=${encodeURIComponent(cita)}`
+  );

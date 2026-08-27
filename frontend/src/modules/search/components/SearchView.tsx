@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { Search, Scale, ThumbsUp, ThumbsDown, Copy, Check, Filter, ExternalLink, AlertTriangle, Loader2 } from 'lucide-react';
-import { searchPrecedents } from '../services/legalSearch.api';
-import type { CorpusPrecedent, CorpusStatus } from '../services/legalSearch.api';
+import {
+  searchPrecedents,
+  fetchOfficialRuling,
+  citationShape
+} from '../services/legalSearch.api';
+import type { CorpusPrecedent, CorpusStatus, OfficialRuling } from '../services/legalSearch.api';
 
 /**
  * Jurisprudence search over the ingested corpus.
@@ -75,6 +79,18 @@ export const SearchView: React.FC = () => {
   const [reason, setReason] = useState<string | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
   const [lastQuery, setLastQuery] = useState('');
+  /*
+   * Una sentencia traída del sitio oficial vive aparte de los resultados del
+   * corpus, y esa separación es el punto.
+   *
+   * El corpus contiene providencias leídas e indexadas; esto se descargó hace
+   * dos segundos porque el abogado la nombró. Mezclarlas en la misma lista haría
+   * que un texto recién traído pareciera curado — la misma confusión que ya se
+   * evitó entre un concepto y una sentencia.
+   */
+  const [ruling, setRuling] = useState<OfficialRuling | null>(null);
+  const [rulingError, setRulingError] = useState('');
+  const [loadingRuling, setLoadingRuling] = useState(false);
 
   const runSearch = async () => {
     const query = searchQuery.trim();
@@ -87,6 +103,8 @@ export const SearchView: React.FC = () => {
     if (!query) return;
 
     setIsLoading(true);
+    setRuling(null);
+    setRulingError('');
     setLastQuery(query);
 
     try {
@@ -94,6 +112,28 @@ export const SearchView: React.FC = () => {
       setResults(response.items ?? []);
       setStatus(response.status);
       setReason(response.reason);
+
+      /*
+       * Si la consulta tiene forma de cita, se pide también al sitio oficial.
+       *
+       * El corpus tiene 62 providencias de 29.424, así que un abogado que nombra
+       * una sentencia casi siempre nombra una que no está. Decirle que no hay
+       * nada cuando la Corte la publica sería falso; el servidor la confirma
+       * contra el registro del Estado antes de descargar nada.
+       */
+      if (citationShape(query)) {
+        setLoadingRuling(true);
+        try {
+          const { ruling: traida } = await fetchOfficialRuling(query);
+          setRuling(traida);
+        } catch (err) {
+          // El mensaje del servidor distingue "no existe" de "no se pudo
+          // consultar", y esa diferencia es la que el abogado necesita.
+          setRulingError(err instanceof Error ? err.message : 'No se pudo traer la sentencia.');
+        } finally {
+          setLoadingRuling(false);
+        }
+      }
     } catch (error) {
       setResults([]);
       setStatus('FAILED');
@@ -171,6 +211,70 @@ export const SearchView: React.FC = () => {
           {status === null && !isLoading && (
             <div className="bg-white border border-slate-200/80 rounded-xl p-8 text-center text-slate-400 text-[13px]">
               Escriba una consulta para buscar en el corpus indexado.
+            </div>
+          )}
+
+          {/*
+            La sentencia traída del sitio oficial va ARRIBA y se ve distinta.
+
+            No es un resultado del corpus y no puede parecerlo: se descargó al
+            momento porque el abogado la nombró, y lo que se muestra es el texto
+            que respondió la relatoría, no un fragmento curado. La procedencia
+            —ponente, fecha, sala— viene del registro oficial del Estado, que es
+            además lo que confirmó que la sentencia existe antes de descargarla.
+          */}
+          {loadingRuling && (
+            <div className="bg-white border border-slate-200/80 rounded-xl p-4 flex items-center gap-2 text-[13px] text-slate-500">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Buscando la sentencia en el sitio de la Corte…
+            </div>
+          )}
+
+          {rulingError && !loadingRuling && (
+            <div className="bg-amber-50/60 border border-amber-200/70 rounded-xl p-4 flex items-start gap-3">
+              <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+              <p className="text-[13px] text-amber-900 leading-relaxed">{rulingError}</p>
+            </div>
+          )}
+
+          {ruling && (
+            <div className="bg-white border-2 border-blue-900/25 rounded-xl overflow-hidden shadow-sm">
+              <header className="px-4 py-3 bg-blue-950 text-white">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-[10px] uppercase tracking-wide text-blue-300 font-bold">
+                      Traída del sitio oficial de la Corte, no del corpus
+                    </p>
+                    <h3 className="text-sm font-black">Sentencia {ruling.citation}</h3>
+                  </div>
+                  <a
+                    href={ruling.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[11px] text-blue-200 hover:text-white flex items-center gap-1 flex-shrink-0"
+                  >
+                    Abrir en la relatoría <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+                <p className="text-[11px] text-blue-200 mt-1">
+                  {[ruling.proceso, ruling.sala, ruling.fecha, ruling.magistrado && `M.P. ${ruling.magistrado}`]
+                    .filter(Boolean)
+                    .join(' · ')}
+                </p>
+              </header>
+
+              <div className="p-4">
+                <p className="text-[13px] text-slate-700 leading-relaxed whitespace-pre-wrap max-h-72 overflow-y-auto">
+                  {ruling.text.slice(0, 4000)}
+                  {ruling.text.length > 4000 && '…'}
+                </p>
+                {ruling.text.length > 4000 && (
+                  <p className="text-[11px] text-slate-500 mt-2">
+                    Se muestran los primeros 4.000 de {ruling.text.length.toLocaleString('es-CO')}{' '}
+                    caracteres. El texto completo está en la relatoría.
+                  </p>
+                )}
+              </div>
             </div>
           )}
 
