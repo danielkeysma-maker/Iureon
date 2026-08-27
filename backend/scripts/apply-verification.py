@@ -52,6 +52,7 @@ FILE_FOR_BRANCH = {
     'ARBITRAJE': 'actuaciones-arbitraje.json',
     'INSOLVENCIA': 'actuaciones-insolvencia.json',
     'AMBIENTAL': 'actuaciones-ambiental.json',
+    'FAMILIA_ADMINISTRATIVA': 'actuaciones-familia-administrativa.json',
 }
 
 PREFIX_FOR_BRANCH = {b: b.lower() for b in FILE_FOR_BRANCH}

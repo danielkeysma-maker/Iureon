@@ -1,0 +1,1350 @@
+{
+  "_meta": {
+    "branch": "FAMILIA_ADMINISTRATIVA",
+    "verified_at": "2026-08-26",
+    "source_of_truth": "Ley 294 de 1996, modificada por la Ley 575 de 2000, la Ley 1257 de 2008 y la Ley 2126 de 2021 —cuyo art. 17 fue a su vez modificado por el art. 60 de la Ley 2197 de 2022—, reglamentada por el Capítulo 8 del Título 3 de la Parte 2 del Libro 2 del Decreto 1069 de 2015, para las medidas de protección ante la comisaría de familia. Y la Ley 1098 de 2006, arts. 96 a 111, modificados por la Ley 1878 de 2018 y, en el art. 103, por el art. 208 de la Ley 1955 de 2019, para el proceso administrativo de restablecimiento de derechos ante el defensor o comisario de familia.",
+    "gaps": [
+      "FAMILIA_ADMINISTRATIVA: 'Solicitud de medida de protección por violencia intrafamiliar': NO se cataloga aquí. Ya existe en actuaciones-familia.json con rol LITIGANTE y con los términos de los arts. 9, 11, 12, 15, 16 y 17 de la Ley 294 de 1996 correctamente publicados. Duplicar el exact_name haría que el motor de redacción escogiera una de las dos al azar. ADVERTENCIA PARA EL FUSIONADOR, que no es una ficha nueva: esa entrada de FAMILIA cita 'Ley 294 de 1996; Ley 575 de 2000; Ley 1257 de 2008' y le faltan tres capas vigentes que sí se verificaron aquí — (1) el art. 5 de la Ley 294 con el texto del art. 17 de la Ley 2126 de 2021 MODIFICADO por el art. 60 de la Ley 2197 de 2022; (2) el art. 20 de la Ley 2126 de 2021, que cambia el factor de competencia territorial y obliga a la primera comisaría que conozca a dictar las provisionales aunque no sea la competente; y (3) el cómputo diferido de los treinta días del art. 2.2.3.8.1.3 del Decreto 1069 de 2015 cuando la víctima estuvo imposibilitada por encierro o violencia del agresor. Esa ficha tampoco publica el plazo de TRES (3) DÍAS para apelar.",
+      "FAMILIA_ADMINISTRATIVA: 'Solicitud de medida de protección provisional' como escrito autónomo: NO se cataloga. Verificado que no es un escrito separado: la autoridad 'recibirá y avocará en forma inmediata la petición' y puede dictarla dentro de las cuatro horas hábiles siguientes sin que medie petición adicional (Ley 294 de 1996, art. 11). Lo que sí es un escrito autónomo es la solicitud de MODIFICACIÓN o de medida COMPLEMENTARIA del art. 2.2.3.8.2.4 parágrafo 1 del Decreto 1069 de 2015, y esa sí está catalogada.",
+      "FAMILIA_ADMINISTRATIVA: 'Solicitud de medida de atención' de la Ley 1257 de 2008, art. 19 (habitación y alimentación a cargo del Sistema General de Seguridad Social en Salud, o subsidio monetario mensual): NO se cataloga. El término sí se leyó —'La aplicación de las medidas definidas en los literales a) y b) será hasta por seis meses, prorrogables hasta por seis meses más siempre y cuando la situación lo amerite' (art. 19 parágrafo 1)— y la acreditación también: 'Las situaciones de violencia que dan lugar a la atención de las mujeres, sus hijos e hijas, se acreditarán con la medida de protección expedida por la autoridad competente, sin que puedan exigirse requisitos adicionales' (art. 21). Pero la autoridad que las ORDENA y el trámite ante la EPS están reglamentados fuera de las normas leídas aquí (Decreto 1630 de 2019, compilado en el Decreto 780 de 2016 del Sector Salud), que no se descargó. Por la regla 7 —la autoridad competente es parte del plazo— se declara el hueco en vez de publicar una ficha con destinatario incierto.",
+      "FAMILIA_ADMINISTRATIVA: 'Solicitud de estabilización' de la Ley 1257 de 2008, art. 22 (acceso preferente a educación técnica o superior, reingreso al sistema educativo, seminternados): NO se cataloga. El artículo enuncia lo que la autoridad competente 'podrá' ordenar, sin fijar término, procedimiento ni recurso. Sería una ficha sin reloj y sin trámite.",
+      "FAMILIA_ADMINISTRATIVA: Providencias del juez de familia que cierran estos procedimientos —'Sentencia de homologación de la declaratoria de adoptabilidad', 'Sentencia que define la situación jurídica del niño, niña o adolescente por pérdida de competencia de la autoridad administrativa' y 'Sentencia de revisión de las decisiones administrativas del defensor o comisario de familia'—: NO se catalogan. Ya están en actuaciones-familia.json con rol DESPACHO y con sus términos verificados. Esta rama cubre lo administrativo y los actos del ciudadano que abren la puerta al juez.",
+      "FAMILIA_ADMINISTRATIVA: Recurso de apelación contra la resolución que resuelve el incidente de cancelación de las medidas de protección: NO se cataloga como ficha aparte. El Decreto 1069 de 2015, art. 2.2.3.8.2.4 parágrafo 2, dice que 'Frente a esta decisión podrá interponerse el recurso de apelación', y su trámite y término son los mismos de la ficha 'Recurso de apelación contra la decisión definitiva sobre medida de protección', dentro de la cual se publican. Una segunda ficha repetiría el mismo articulado sin agregar un reloj nuevo.",
+      "FAMILIA_ADMINISTRATIVA: Actuaciones de las INSPECCIONES DE POLICÍA en asuntos de familia: no se catalogan como fichas propias. Verificado que su competencia es SUBSIDIARIA y de segundo grado, no autónoma: 'En los municipios donde no haya Defensor de Familia, las funciones que este Código le atribuye serán cumplidas por el comisario de familia. En ausencia de este último, las funciones asignadas al defensor y al comisario de familia corresponderán al inspector de policía' (Ley 1098 de 2006, art. 98). Y en las medidas de protección de la Ley 294 de 1996 el suplente del comisario NO es el inspector sino el Juez Civil Municipal o Promiscuo Municipal (art. 4; Ley 2126 de 2021, art. 20 parágrafo 1). Por eso el inspector figura dentro del campo competent_authority de las fichas del PARD y no aparece en las de medidas de protección: fichas propias sugerirían una competencia que no tiene.",
+      "FAMILIA_ADMINISTRATIVA: Rescate y allanamiento por el comisario de familia (Ley 2126 de 2021, art. 13 num. 8; Ley 1098 de 2006, art. 106): no se cataloga. El art. 106 está declarado CONDICIONALMENTE exequible y ninguna de las dos normas fija término. Es una diligencia material, no un escrito con estructura y plazo.",
+      "FAMILIA_ADMINISTRATIVA: Trámite de las medidas de protección ante la autoridad indígena: no se cataloga. 'En los casos de violencia intrafamiliar en las comunidades indígenas, el competente para conocer de estos casos es la respectiva autoridad indígena, en desarrollo de la jurisdicción especial prevista por la Constitución Nacional en el artículo 246' (Ley 294 de 1996, art. 4 parágrafo). El art. 20 parágrafo 3 de la Ley 2126 de 2021 permite al comisario asumir competencia con enfoque diferencial y diálogo intercultural, y eso sí queda anotado en el campo competent_authority de la resolución definitiva; el procedimiento propio de cada jurisdicción especial no es catalogable desde la ley nacional.",
+      "FAMILIA_ADMINISTRATIVA: Objeción o recurso contra la decisión del Juez de Control de Garantías que dicta medidas de protección provisionales en el proceso penal por violencia en el contexto familiar (Ley 2126 de 2021, art. 20 parágrafo 2; Decreto 1069 de 2015, art. 2.2.3.8.2.2): no se cataloga aquí. Es actuación penal, corresponde a la rama PENAL, y el propio reglamento ordena que una vez dictada la provisional 'remitirá las diligencias a la Comisaría de Familia, Juez Civil Municipal o Promiscuo Municipal para que se continúe con el procedimiento en la forma y términos señalados en la Ley 575 de 2000', que es lo que sí queda catalogado.",
+      "FAMILIA_ADMINISTRATIVA: Lineamientos técnicos del Ministerio de Justicia y del Derecho como ente rector (Ley 2126 de 2021, arts. 31 y 32; Decreto 1069 de 2015, art. 2.2.3.8.2.11) y sanciones del ente rector a las alcaldías o comisarías (Ley 2126 de 2021, arts. 34 a 40): no se catalogaron. Son actos administrativos generales o de inspección, vigilancia y control sobre la entidad, no actuaciones de parte ni providencias de un expediente de familia.",
+      "FAMILIA_ADMINISTRATIVA, verificado el 2026-08-26: PASO 0, PREGUNTA 1 — ¿HAY PROCEDIMIENTO PROPIO Y VIGENTE? SÍ, y no es el CPACA, ni el CGP, ni la Ley 1801 de 2016. Son dos procedimientos administrativos autónomos, ejercidos por autoridades administrativas con funciones jurisdiccionales. (a) MEDIDAS DE PROTECCIÓN: Ley 294 de 1996, Título III 'PROCEDIMIENTO', arts. 9 a 18, casi todos con el texto que les dio la Ley 575 de 2000 (arts. 5 a 12), leídos en http://www.secretariasenado.gov.co/senado/basedoc/ley_0294_1996.html. Sus vacíos NO se llenan con el CPACA ni con el CGP: 'Serán aplicables al procedimiento previsto en la presente ley las normas procesales contenidas en el Decreto número 2591 de 1991, en cuanto su naturaleza lo permita' (art. 18 inc. 3). (b) RESTABLECIMIENTO DE DERECHOS: Ley 1098 de 2006, arts. 96 a 108, con el texto de la Ley 1878 de 2018 y, en el art. 103, del art. 208 de la Ley 1955 de 2019, leídos en http://www.secretariasenado.gov.co/senado/basedoc/ley_1098_2006_pr002.html; su norma supletoria tampoco es el CPACA: 'En todo caso, ante cualquier vacío jurídico deberá remitirse a lo reglamentado en la legislación procesal civil vigente' (art. 100 parágrafo 6). La Ley 1801 de 2016 no gobierna nada de esto.\n\nPISTA 1 — LEY 2126 DE 2021, ART. 3: CONFIRMADA, VERBATIM. 'Las Comisarías de Familia son dependencias o entidades de carácter administrativo e interdisciplinario del orden municipal o distrital, CON FUNCIONES ADMINISTRATIVAS Y JURISDICCIONALES, conforme a los términos establecidos en la presente ley.' Conc"
+    ],
+    "unverified": []
+  },
+  "actuaciones": [
+    {
+      "exact_name": "Solicitud de modificación de la medida de protección o de imposición de medida de protección complementaria",
+      "area": "FAMILIA_ADMINISTRATIVA",
+      "role": "LITIGANTE",
+      "legal_basis": "Decreto 1069 de 2015, art. 2.2.3.8.2.4 parágrafo 1 (compila el art. 3 del Decreto 4799 de 2011); Ley 294 de 1996, art. 5 —texto del art. 17 de la Ley 2126 de 2021, modificado por el art. 60 de la Ley 2197 de 2022— (catálogo de medidas); Ley 2126 de 2021, art. 16 (tipos de medidas); Ley 294 de 1996, art. 17 inc. 2 (audiencia de incumplimiento)",
+      "competent_authority": "Comisario o comisaria de familia que impuso la medida; en el municipio donde no haya comisaría, el Juez Civil Municipal o Promiscuo Municipal (Ley 294 de 1996, art. 4, modificado por el art. 16 de la Ley 1257 de 2008; Ley 2126 de 2021, art. 20 parágrafo 1). Después de la providencia que puso fin al proceso también puede modificarla el Juez de Control de Garantías cuando conoce del delito",
+      "term": "NO HAY PLAZO PARA PEDIRLA, Y ESO ES LO QUE HAY QUE SABER: 'A solicitud de la víctima o quien represente sus intereses, procederá la modificación de la medida de protección provisional o definitiva o la imposición de una medida de protección complementaria, EN CUALQUIER MOMENTO en que las circunstancias lo demanden' (Decreto 1069 de 2015, art. 2.2.3.8.2.4 parágrafo 1 inc. 1). LO QUE SÍ CAMBIA ES CUÁNDO SE DECIDE, y de eso depende la estrategia: 'Si se solicita la modificación de la medida de protección o la imposición de una medida de protección complementaria, ANTES de proferirse la medida de protección definitiva, el Comisario de Familia, o en su defecto el Juez Civil Municipal o Promiscuo Municipal, la decretará en la providencia que ponga fin al proceso' (inc. 2); 'Si se solicita la modificación de la medida de protección o la imposición de una medida de protección complementaria CON POSTERIORIDAD a la providencia que puso fin al proceso, EN EL TRÁMITE DE SANCIÓN POR INCUMPLIMIENTO, además de la imposición de la multa podrá el Comisario de Familia, o en su defecto el Juez Civil Municipal o Promiscuo Municipal o el Juez de Control de Garantías, modificar la medida decretada o adicionar una o más medidas que garanticen la protección efectiva de la víctima' (inc. 3). Es decir: pedida antes del fallo se difiere al fallo; pedida después, solo se resuelve dentro del incidente de incumplimiento, cuya audiencia 'deberá celebrarse dentro de los diez (10) días siguientes a su solicitud' (Ley 294 de 1996, art. 17 inc. 2, modificado por el art. 11 de la Ley 575 de 2000).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del proceso de medida de protección y de la providencia que la impuso",
+          "mandatory": true,
+          "basis": "Decreto 1069 de 2015, art. 2.2.3.8.2.4 par. 1"
+        },
+        {
+          "n": 2,
+          "name": "Identificación de la víctima solicitante o de quien representa sus intereses",
+          "mandatory": true,
+          "basis": "Decreto 1069 de 2015, art. 2.2.3.8.2.4 par. 1"
+        },
+        {
+          "n": 3,
+          "name": "Relato del cambio de circunstancias que hace insuficiente la medida vigente",
+          "mandatory": true,
+          "basis": "Decreto 1069 de 2015, art. 2.2.3.8.2.4 par. 1"
+        },
+        {
+          "n": 4,
+          "name": "Medida cuya modificación se pide, o medida complementaria solicitada, identificada por su literal del art. 5 de la Ley 294 de 1996",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 5"
+        },
+        {
+          "n": 5,
+          "name": "Pruebas que se aportan o se solicitan",
+          "mandatory": false,
+          "basis": null
+        },
+        {
+          "n": 6,
+          "name": "Manifestación, si es del caso, de que la solicitud se formula dentro del trámite de sanción por incumplimiento",
+          "mandatory": false,
+          "basis": "Decreto 1069 de 2015, art. 2.2.3.8.2.4 par. 1 inc. 3"
+        }
+      ],
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=74174"
+    },
+    {
+      "exact_name": "Solicitud de sanción por incumplimiento de la medida de protección",
+      "area": "FAMILIA_ADMINISTRATIVA",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 294 de 1996, art. 7 (sanciones) y art. 17 (audiencia de incumplimiento y arresto), modificados por los arts. 4 y 11 de la Ley 575 de 2000; art. 8 (retaliación y evasión de alimentos); Decreto 1069 de 2015, arts. 2.2.3.8.1.10 y 2.2.3.8.2.8; Ley 2126 de 2021, arts. 13 num. 12 y 16 parágrafo 3",
+      "competent_authority": "El mismo funcionario que expidió la orden de protección: 'El funcionario que expidió la orden de protección mantendrá la competencia para la ejecución y el cumplimiento de las medidas de protección' (Ley 294 de 1996, art. 17 inc. 1). Es el comisario o comisaria de familia, o el Juez Civil Municipal o Promiscuo Municipal donde no haya comisaría. EL ARRESTO NO LO DECRETA EL COMISARIO: lo pide al Juez de Familia o Promiscuo de Familia, o en su defecto al Juez Civil Municipal o Promiscuo",
+      "term": "RELOJ DE LA AUTORIDAD: 'Las sanciones por incumplimiento de las medidas de protección se impondrán en audiencia que deberá celebrarse dentro de los diez (10) días siguientes a su solicitud, luego de haberse practicado las pruebas pertinentes y oídos los descargos de la parte acusada' (Ley 294 de 1996, art. 17 inc. 2). RELOJ DEL JUEZ PARA EL ARRESTO: 'cuando a juicio de Comisario sean necesario ordenar el arresto, luego de practicar las pruebas y oídos los descargos, le pedirá al Juez de Familia o Promiscuo de Familia, o en su defecto, al Civil Municipal o al Promiscuo que expida la orden correspondiente, lo que decidirá dentro de las 48 horas siguientes' (art. 17 inc. 3); esa solicitud 'tendrá trámite preferente, salvo los procesos de tutela o hábeas corpus' (Ley 2126 de 2021, art. 16 parágrafo 3). RELOJ DEL SANCIONADO, QUE NO ES EL DEL SOLICITANTE: la multa de la primera vez 'debe consignarse dentro de los cinco (5) días siguientes a su imposición. La Conversión en arresto se adoptará de plano mediante auto que sólo tendrá recursos de reposición, a razón de tres (3) días por cada salario mínimo' (art. 7 lit. a); 'Si el incumplimiento de las medidas de protección se repitiere en el plazo de dos (2) años, la sanción será de arresto entre treinta (30) y cuarenta y cinco (45) días' (art. 7 lit. b). NO HAY TÉRMINO DE CADUCIDAD PARA DENUNCIAR EL INCUMPLIMIENTO: los treinta (30) días del art. 9 rigen la petición inicial de medida de protección, no la denuncia de su incumplimiento; leído el art. 17 completo, no fija plazo alguno al solicitante. QUÉ CUENTA COMO INCUMPLIMIENTO: 'Todo comportamiento de retaliación, venganza o evasión de los deberes alimentarios por parte del agresor, se entenderá como incumplimiento de las medidas de protección que le fueron impuestas' (art. 8).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la providencia que impuso la medida de protección provisional o definitiva y de su fecha de notificación",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 17"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del agresor obligado y de la víctima",
+          "mandatory": true,
+          "basis": null
+        },
+        {
+          "n": 3,
+          "name": "Descripción concreta de la medida incumplida, con su literal del art. 5 de la Ley 294 de 1996",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 5"
+        },
+        {
+          "n": 4,
+          "name": "Relato de los hechos de incumplimiento, con fechas",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 17"
+        },
+        {
+          "n": 5,
+          "name": "Manifestación, si procede, de que el incumplimiento se repite dentro de los dos (2) años, para la sanción de arresto",
+          "mandatory": false,
+          "basis": "Ley 294 de 1996, art. 7 lit. b"
+        },
+        {
+          "n": 6,
+          "name": "Pruebas del incumplimiento",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 17 inc. 2"
+        },
+        {
+          "n": 7,
+          "name": "Petición de sanción y, si es del caso, de modificación o adición de medidas de protección",
+          "mandatory": false,
+          "basis": "Decreto 1069 de 2015, art. 2.2.3.8.2.4 par. 1 inc. 3"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0294_1996.html"
+    },
+    {
+      "exact_name": "Recurso de apelación contra la decisión definitiva sobre medida de protección",
+      "area": "FAMILIA_ADMINISTRATIVA",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 294 de 1996, art. 18 incs. 2 y 3, modificado por el art. 12 de la Ley 575 de 2000; art. 16 (notificación en estrados); art. 11 inc. 2 (irrecurribilidad de la provisional); Decreto 1069 de 2015, art. 2.2.3.8.1.11; Decreto 2591 de 1991, arts. 31 y 32",
+      "competent_authority": "Se interpone ante el comisario o comisaria de familia —o ante el Juez Civil Municipal o Promiscuo Municipal— que dictó la decisión, y lo resuelve el JUEZ DE FAMILIA O PROMISCUO DE FAMILIA. No es el Juez Civil del Circuito, ni el alcalde, ni ningún superior jerárquico administrativo del comisario: 'procederá en el efecto devolutivo, el Recurso de Apelación ante el Juez de Familia o Promiscuo de Familia' (Ley 294 de 1996, art. 18 inc. 2)",
+      "term": "EL PLAZO QUE MATA EL DERECHO NO ESTÁ EN EL ARTÍCULO QUE CONCEDE EL RECURSO: el art. 18 de la Ley 294 de 1996 no fija término. Lo fija la remisión. 'Serán aplicables al procedimiento previsto en la presente ley las normas procesales contenidas en el Decreto número 2591 de 1991, en cuanto su naturaleza lo permita' (Ley 294 de 1996, art. 18 inc. 3), y el reglamento precisa que 'La apelación a que se contrae el inciso 2o. del artículo 12 de la Ley 575 de 2000, se sujetará en lo pertinente, al trámite previsto en el artículo 32 del Decreto 2591 de 1991' (Decreto 1069 de 2015, art. 2.2.3.8.1.11). El término correlativo del régimen así incorporado es de TRES (3) DÍAS: 'Dentro de los tres días siguientes a su notificación el fallo podrá ser impugnado por el Defensor del Pueblo, el solicitante, la autoridad pública o el representante del órgano correspondiente, sin perjuicio de su cumplimiento inmediato' (Decreto 2591 de 1991, art. 31). Y ese plazo corre desde la audiencia, no desde un traslado escrito: 'La resolución o sentencia se dictará al finalizar la audiencia y será notificada a las partes en estrados. Se entenderán surtidos los efectos de la notificación desde su pronunciamiento' (Ley 294 de 1996, art. 16 inc. 1). RELOJES DE LOS DESPACHOS, QUE NO SON EL DEL CLIENTE: 'Presentada debidamente la impugnación el juez remitirá el expediente dentro de los dos días siguientes al superior jerárquico correspondiente', y el que conoce de la impugnación 'proferirá el fallo dentro de los 20 días siguientes a la recepción del expediente' (Decreto 2591 de 1991, art. 32). EFECTO DEVOLUTIVO: la medida se sigue cumpliendo mientras se surte la apelación (Ley 294 de 1996, art. 18 inc. 2). CONTRA LA MEDIDA PROVISIONAL NO HAY RECURSO: 'Contra la medida provisional de protección no procederá recurso alguno' (art. 11 inc. 2); esperar a apelarla es perder el término de la definitiva.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la resolución o sentencia apelada, con la fecha de la audiencia en que se notificó en estrados",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 16"
+        },
+        {
+          "n": 2,
+          "name": "Manifestación de que el recurso se interpone dentro de los tres (3) días siguientes a la notificación",
+          "mandatory": true,
+          "basis": "Decreto 2591 de 1991, art. 31"
+        },
+        {
+          "n": 3,
+          "name": "Identificación del apelante y de su legitimación",
+          "mandatory": true,
+          "basis": null
+        },
+        {
+          "n": 4,
+          "name": "Motivos concretos de inconformidad frente a cada medida impuesta o negada",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 18 inc. 2"
+        },
+        {
+          "n": 5,
+          "name": "Petición de revocatoria, modificación o adición de las medidas",
+          "mandatory": true,
+          "basis": null
+        },
+        {
+          "n": 6,
+          "name": "Solicitud de concesión del recurso ante el Juez de Familia o Promiscuo de Familia como superior competente",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 18 inc. 2"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0294_1996.html"
+    },
+    {
+      "exact_name": "Solicitud de terminación de las medidas de protección",
+      "area": "FAMILIA_ADMINISTRATIVA",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 294 de 1996, art. 18 inc. 1, modificado por el art. 12 de la Ley 575 de 2000; art. 17 inc. 1; Decreto 1069 de 2015, art. 2.2.3.8.2.4 parágrafo 2; Decreto 2591 de 1991, art. 31",
+      "competent_authority": "El funcionario que expidió la orden: comisario o comisaria de familia, o el Juez Civil Municipal o Promiscuo Municipal que la impuso (Ley 294 de 1996, arts. 17 inc. 1 y 18 inc. 1). Contra la decisión que resuelve el incidente procede apelación ante el Juez de Familia o Promiscuo de Familia",
+      "term": "SIN PLAZO, PERO CON CARGA PROBATORIA PLENA: 'En cualquier momento, las partes interesadas, el Ministerio Público, el Defensor de Familia, DEMOSTRANDO PLENAMENTE que se han superado las circunstancias que dieron origen a las medidas de protección interpuestas, podrán pedir al funcionario que expidió las orden la terminación de los efectos de las declaraciones hechas y la terminación de las medidas ordenadas' (Ley 294 de 1996, art. 18 inc. 1). VIGENCIA MIENTRAS TANTO Y VÍA PROCESAL, QUE ES UN INCIDENTE Y NO UNA SIMPLE PETICIÓN: 'Las medidas de protección de acuerdo con el artículo 12 de la Ley 575 de 2000, tendrán vigencia por el tiempo que se mantengan las circunstancias que dieron lugar a estas y serán canceladas MEDIANTE INCIDENTE, por el funcionario que las impuso, a solicitud de las partes, del Ministerio Público o del Defensor de Familia, cuando se superen las razones que las originaron. Frente a esta decisión PODRÁ INTERPONERSE EL RECURSO DE APELACIÓN' (Decreto 1069 de 2015, art. 2.2.3.8.2.4 parágrafo 2). El término para apelar esa decisión es el mismo de TRES (3) DÍAS del art. 31 del Decreto 2591 de 1991, incorporado por el art. 18 inc. 3 de la Ley 294 de 1996 y por el art. 2.2.3.8.1.11 del Decreto 1069 de 2015.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la providencia que impuso las medidas y del proceso",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 18"
+        },
+        {
+          "n": 2,
+          "name": "Legitimación del solicitante: parte interesada, Ministerio Público o Defensor de Familia",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 18 inc. 1"
+        },
+        {
+          "n": 3,
+          "name": "Exposición de las circunstancias que dieron origen a las medidas",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 18 inc. 1"
+        },
+        {
+          "n": 4,
+          "name": "Prueba plena de que esas circunstancias fueron superadas",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 18 inc. 1"
+        },
+        {
+          "n": 5,
+          "name": "Petición de cancelación de las medidas por vía de incidente ante el mismo funcionario que las impuso",
+          "mandatory": true,
+          "basis": "Decreto 1069 de 2015, art. 2.2.3.8.2.4 par. 2"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0294_1996.html"
+    },
+    {
+      "exact_name": "Solicitud de restablecimiento de derechos ante el defensor o comisario de familia",
+      "area": "FAMILIA_ADMINISTRATIVA",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1098 de 2006, arts. 96, 97, 98, 99 (modificado por el art. 3 de la Ley 1878 de 2018), 100 (modificado por el art. 4 de la Ley 1878 de 2018) y 138; Ley 2126 de 2021, art. 5 parágrafos 1, 2 y 3",
+      "competent_authority": "Defensor de familia del ICBF; comisario o comisaria de familia; en ausencia de ambos, el inspector de policía (Ley 1098 de 2006, art. 98). REPARTO DE COMPETENCIA DONDE CONCURREN DEFENSORÍA Y COMISARÍA, que es donde se equivoca el radicado: el comisario conoce las vulneraciones ocurridas EN CONTEXTO DE VIOLENCIA FAMILIAR salvo cualquier forma de violencia sexual; el defensor conoce las demás y TODA violencia sexual, sin distinción de quién la cometa (Ley 2126 de 2021, art. 5 parágrafo 1 nums. 1 a 4). Territorialmente: 'Será competente la autoridad del lugar donde se encuentre el niño, la niña o el adolescente' (Ley 1098 de 2006, art. 97)",
+      "term": "NO HAY TÉRMINO DE CADUCIDAD PARA PEDIRLO: 'El niño, la niña o adolescente, su representante legal, la persona que lo tenga bajo su cuidado o custodia, o CUALQUIER PERSONA, podrá solicitar ante el Defensor o Comisario de Familia, o en su defecto el Inspector de Policía la protección de los derechos de aquel cuando se encuentren vulnerados o amenazados' (Ley 1098 de 2006, art. 99 inc. 1). EL RELOJ QUE IMPORTA ES EL DE LA AUTORIDAD, PORQUE SU VENCIMIENTO SACA EL CASO DE LA COMISARÍA Y LO PASA AL JUEZ: 'la definición de la situación jurídica deberá resolverse declarando en vulneración de derechos o adoptabilidad al niño, niña y adolescente, dentro de los SEIS (6) MESES siguientes, contados a partir del CONOCIMIENTO de la presunta amenaza o vulneración de los derechos del menor de edad, término que será improrrogable y no podrá extenderse ni por actuación de autoridad administrativa o judicial' (art. 100). Ese conteo arranca con el conocimiento del caso, de modo que la fecha y hora de radicación de esta solicitud es la prueba del vencimiento: consérvese. APERTURA SIN RECURSO: recibida la solicitud, la autoridad 'dará apertura al Proceso Administrativo de Restablecimiento de Derechos, mediante auto contra el cual NO PROCEDE RECURSO ALGUNO' (art. 99 inc. 2). INOBSERVANCIA (no vulneración): las órdenes a las entidades del Sistema Nacional de Bienestar Familiar se dictan 'de manera que se cumplan en un término no mayor a diez (10) días' (art. 99 parágrafo 2). SI SE RADICA ANTE LA AUTORIDAD EQUIVOCADA NO SE PIERDE NADA: la que recibe 'verificará la garantía de derechos, y de ser necesario dará inicio el proceso de restablecimiento de derechos, ordenará las medidas de protección y de restablecimiento de derechos y remitirá a la autoridad competente a más tardar al TERCER DÍA HÁBIL siguiente, que se contarán a partir del conocimiento del caso' (Ley 2126 de 2021, art. 5 parágrafo 2). CONFLICTO DE COMPETENCIA: se tramita a prevención por la primera autoridad que conoció y 'El juez de familia tendrá un término de quince (15) días para resolver el conflicto de competencia que se presente y en caso de no hacerlo incurrirá en causal de mala conducta'; 'En caso de declararse falta de competencia respecto de quien venía conociendo a prevención, lo actuado conservará plena validez' (Ley 1098 de 2006, art. 99 parágrafo 3). VERIFICACIÓN INMEDIATA OBLIGATORIA: 'En todos los casos y de manera inmediata a su conocimiento, la autoridad competente deberá realizar la verificación de la garantía de derechos ordenada en el artículo 52 de esta ley' (art. 138).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del niño, niña o adolescente y del lugar donde se encuentra",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 97"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del solicitante y de su relación con el niño, niña o adolescente",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 99 inc. 1"
+        },
+        {
+          "n": 3,
+          "name": "Identificación de los representantes legales, convivientes y responsables de su cuidado, para su citación",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 99 num. 1"
+        },
+        {
+          "n": 4,
+          "name": "Relato de los hechos de amenaza o vulneración, con fechas",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 99"
+        },
+        {
+          "n": 5,
+          "name": "Indicación de si los hechos ocurren en contexto de violencia familiar y de si hay violencia sexual, que es lo que define si es competente el comisario o el defensor",
+          "mandatory": true,
+          "basis": "Ley 2126 de 2021, art. 5 par. 1"
+        },
+        {
+          "n": 6,
+          "name": "Medidas de restablecimiento provisionales de urgencia que se solicitan",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 99 num. 2"
+        },
+        {
+          "n": 7,
+          "name": "Pruebas que se aportan o se solicitan",
+          "mandatory": false,
+          "basis": "Ley 1098 de 2006, art. 99 num. 4"
+        },
+        {
+          "n": 8,
+          "name": "Petición de constancia de radicación con fecha, por ser el hito del que corren los seis (6) meses",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 100"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1098_2006_pr002.html"
+    },
+    {
+      "exact_name": "Oposición en el proceso administrativo de restablecimiento de derechos",
+      "area": "FAMILIA_ADMINISTRATIVA",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1098 de 2006, art. 100 incs. 1 a 5 (modificado por el art. 4 de la Ley 1878 de 2018); art. 102 (modificado por el art. 5 de la Ley 1878 de 2018); art. 108 inc. 1 (modificado por el art. 8 de la Ley 1878 de 2018)",
+      "competent_authority": "Defensor de familia, comisario o comisaria de familia o, en su defecto, inspector de policía que adelanta el proceso (Ley 1098 de 2006, arts. 98 y 100). No se dirige al juez: el control judicial solo se abre después, y solo si hubo esta oposición",
+      "term": "DOS TRASLADOS DE CINCO DÍAS, Y AMBOS SON DEL CIUDADANO. (1) Traslado del auto de apertura: 'Una vez se dé apertura al Proceso Administrativo de Restablecimiento de Derechos a favor de un niño, niña o adolescente, el funcionario notificará y correrá traslado del auto de apertura POR CINCO (5) DÍAS, a las personas que de conformidad con el artículo 99 del presente Código deben ser citadas, para que se pronuncien y aporten las pruebas que deseen hacer valer' (Ley 1098 de 2006, art. 100 inc. 1). (2) Traslado de las pruebas practicadas antes de la audiencia: 'De las pruebas practicadas antes de la audiencia de pruebas y fallo, mediante auto notificado por estado, se correrá traslado a las partes por un término de 5 DÍAS, para que se pronuncien conforme a las reglas establecidas en el procedimiento civil vigente' (art. 100 inc. 4). POR QUÉ ES DECISIVO OPONERSE Y DEJAR CONSTANCIA EXPRESA: la homologación judicial de la adoptabilidad solo procede 'HABIENDO EXISTIDO OPOSICIÓN en cualquier etapa de la actuación administrativa, y cuando la oposición se presente en la oportunidad prevista en el artículo 100' (art. 108 inc. 1). Sin oposición oportuna no hay juez que revise la declaratoria de adoptabilidad. CUÁNDO EMPIEZA A CORRER SI NO LO ENCUENTRAN: citado por publicación en la página del ICBF y en un medio masivo, 'La notificación en este último caso se entenderá surtida si transcurridos cinco (5) días, contados a partir del cumplimiento del término establecido para las publicaciones en los medios de comunicación, el citado no comparece' (art. 102 inc. 2). Y en audiencia no hay traslado escrito que espere: 'Las providencias que se dicten en el curso de las audiencias y diligencias se consideran notificadas en estrados inmediatamente después de proferidas, AUN CUANDO LAS PARTES NO HAYAN CONCURRIDO' (art. 102 inc. 3).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del proceso administrativo y del auto de apertura del que se corre traslado",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 100 inc. 1"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del opositor y de su calidad de representante legal, conviviente, cuidador o citado",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 99 num. 1"
+        },
+        {
+          "n": 3,
+          "name": "Pronunciamiento sobre cada hecho de amenaza o vulneración imputado",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 100 inc. 1"
+        },
+        {
+          "n": 4,
+          "name": "Manifestación EXPRESA de oposición, que es el requisito que habilita la homologación judicial",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 108 inc. 1"
+        },
+        {
+          "n": 5,
+          "name": "Pruebas que se aportan y pruebas que se solicitan",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 100 incs. 1 y 2"
+        },
+        {
+          "n": 6,
+          "name": "Pronunciamiento sobre las medidas provisionales de urgencia decretadas en el auto de apertura",
+          "mandatory": false,
+          "basis": "Ley 1098 de 2006, art. 99 num. 2"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1098_2006_pr002.html"
+    },
+    {
+      "exact_name": "Recurso de reposición contra el fallo del proceso administrativo de restablecimiento de derechos",
+      "area": "FAMILIA_ADMINISTRATIVA",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1098 de 2006, art. 100 incs. 6 y 7 y parágrafo 5 (modificado por el art. 4 de la Ley 1878 de 2018); art. 103 inc. 1 (modificado por el art. 6 de la Ley 1878 de 2018); art. 99 inc. 2; Ley 1564 de 2012 (términos de interposición)",
+      "competent_authority": "La misma autoridad administrativa que profirió el fallo: defensor de familia, comisario o comisaria de familia o, en su defecto, inspector de policía (Ley 1098 de 2006, arts. 98 y 100). El recurso NO se dirige al juez de familia: el juez interviene después, por homologación, por revisión o por pérdida de competencia",
+      "term": "DOS FORMAS DE INTERPONERLO SEGÚN SE HAYA ASISTIDO O NO A LA AUDIENCIA, Y QUIEN ASISTIÓ Y CALLÓ LO PIERDE: 'El fallo es susceptible de recurso de reposición que debe interponerse VERBALMENTE EN LA AUDIENCIA, por quienes asistieron a la misma, y PARA QUIENES NO ASISTIERON SE LES NOTIFICARÁ POR ESTADO; el recurso se interpondrá EN LOS TÉRMINOS DEL CÓDIGO GENERAL DEL PROCESO y se resolverá dentro de los diez (10) días siguientes a su formulación' (Ley 1098 de 2006, art. 100 inc. 6). RELOJ DE LA AUTORIDAD PARA RESOLVERLO, Y SU VENCIMIENTO LE QUITA EL CASO: 'Vencido el término para fallar o para resolver el recurso de reposición sin haberse emitido la decisión correspondiente, la autoridad administrativa PERDERÁ COMPETENCIA para seguir conociendo del asunto y remitirá dentro de los tres (3) días siguientes el expediente al juez de familia para que resuelva el recurso o defina la situación jurídica del niño, niña o adolescente en un término máximo de dos (2) meses' (art. 100). EL PLAZO SIGUIENTE, QUE ES EL QUE MÁS SE PIERDE: resuelta la reposición o vencido el término para interponerla, 'el expediente deberá ser remitido al juez de familia para homologar el fallo, SI DENTRO DE LOS QUINCE (15) DÍAS SIGUIENTES A SU EJECUTORIA, alguna de las partes o el Ministerio Público manifiestan su inconformidad con la decisión' (art. 100). La reposición no basta: hay que manifestar además la inconformidad. ESTE MISMO RECURSO PROCEDE contra la resolución que modifica las medidas de restablecimiento proferida después del fallo, porque queda 'sometida a los mecanismos de oposición establecidos para el fallo en el artículo 100' (art. 103 inc. 1), y contra el auto motivado que decreta una nulidad (art. 100 parágrafo 5). NO TIENEN RECURSO: el auto de apertura, 'contra el cual no procede recurso alguno' (art. 99 inc. 2); el auto que fija fecha y hora de audiencia, que 'se notificará por estado y no tendrá recursos' (art. 103 inc. 2); y el auto motivado de cambio de medida anterior a la audiencia de pruebas y fallo, que 'no es susceptible de recurso alguno' (art. 103 inc. 3).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del fallo recurrido y de la audiencia en que se profirió",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 100 inc. 6"
+        },
+        {
+          "n": 2,
+          "name": "Constancia de si el recurrente asistió a la audiencia —recurso verbal— o fue notificado por estado",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 100 inc. 6"
+        },
+        {
+          "n": 3,
+          "name": "Motivos de inconformidad frente a la declaratoria de vulneración de derechos o de adoptabilidad",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, arts. 100 y 107"
+        },
+        {
+          "n": 4,
+          "name": "Motivos de inconformidad frente a las medidas de restablecimiento adoptadas",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 107"
+        },
+        {
+          "n": 5,
+          "name": "Petición de revocatoria o modificación del fallo",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 100 inc. 6"
+        },
+        {
+          "n": 6,
+          "name": "Anuncio de la manifestación de inconformidad dentro de los quince (15) días siguientes a la ejecutoria, para provocar la homologación",
+          "mandatory": false,
+          "basis": "Ley 1098 de 2006, art. 100"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1098_2006_pr002.html"
+    },
+    {
+      "exact_name": "Manifestación de inconformidad con el fallo administrativo para su homologación ante el juez de familia",
+      "area": "FAMILIA_ADMINISTRATIVA",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1098 de 2006, art. 100 (modificado por el art. 4 de la Ley 1878 de 2018); art. 103 inc. 1 (modificado por el art. 6 de la Ley 1878 de 2018); art. 108 y su parágrafo (modificado por el art. 8 de la Ley 1878 de 2018); arts. 119 num. 1 y 120",
+      "competent_authority": "Se presenta ANTE la autoridad administrativa que profirió el fallo —defensor de familia, comisario o comisaria de familia o, en su defecto, inspector de policía—, porque es ella la que debe remitir el expediente. Quien homologa es el JUEZ DE FAMILIA en ÚNICA instancia; donde no exista, el Juez Civil Municipal o Promiscuo Municipal (Ley 1098 de 2006, arts. 119 num. 1 y 120). Al ser de única instancia, la sentencia de homologación no tiene apelación",
+      "term": "ESTE ES EL PLAZO QUE EXTINGUE EL CONTROL JUDICIAL, Y SON QUINCE DÍAS: 'Resuelto el recurso de reposición o vencido el término para interponerlo, el expediente deberá ser remitido al juez de familia para homologar el fallo, SI DENTRO DE LOS QUINCE (15) DÍAS SIGUIENTES A SU EJECUTORIA, alguna de las partes o el Ministerio Público manifiestan su inconformidad con la decisión. El Ministerio Público lo solicitará con las expresiones de las razones en que funda su oposición' (Ley 1098 de 2006, art. 100). LO QUE PASA SI SE VENCEN: el fallo queda en firme sin control judicial y, si declaró la adoptabilidad, 'producirá, respecto de los padres, la terminación de la patria potestad del niño, niña o adolescente adoptable y deberá ser inscrita en el libro de varios de la notaría o en la oficina de registro del estado civil correspondiente' (art. 108 inc. 2), y opera un cierre absoluto: 'En firme la providencia que declara al niño, niña o adolescente en adoptabilidad o el acto de voluntad de darlo en adopción, no podrá adelantarse proceso alguno de reclamación de la paternidad, o maternidad, ni procederá el reconocimiento voluntario del niño, niña o adolescente, y de producirse serán nulos e ineficaces de pleno derecho' (art. 108 parágrafo). VÍA PARALELA QUE NO DEPENDE DE ESTE ESCRITO: si además hubo oposición en cualquier etapa de la actuación administrativa, la remisión para homologación procede por el art. 108 inc. 1. RELOJ DEL JUEZ, QUE NO ES EL DEL CLIENTE: 'El juez resolverá en un término no superior a veinte (20) días, contados a partir del día siguiente a la radicación del proceso' (art. 100). LA MISMA MANIFESTACIÓN PROCEDE contra la resolución que modifica las medidas de restablecimiento proferida después del fallo, sometida 'a los mecanismos de oposición establecidos para el fallo en el artículo 100' (art. 103 inc. 1).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del fallo administrativo y de la fecha de su ejecutoria",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 100"
+        },
+        {
+          "n": 2,
+          "name": "Constancia de que la manifestación se presenta dentro de los quince (15) días siguientes a la ejecutoria",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 100"
+        },
+        {
+          "n": 3,
+          "name": "Legitimación: parte del proceso o Ministerio Público",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 100"
+        },
+        {
+          "n": 4,
+          "name": "Expresión de las razones en que se funda la inconformidad",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 100"
+        },
+        {
+          "n": 5,
+          "name": "Petición de remisión del expediente al juez de familia para homologación",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, arts. 100 y 108 inc. 1"
+        },
+        {
+          "n": 6,
+          "name": "Constancia de la oposición presentada durante la actuación administrativa, cuando la hubo",
+          "mandatory": false,
+          "basis": "Ley 1098 de 2006, art. 108 inc. 1"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1098_2006_pr002.html"
+    },
+    {
+      "exact_name": "Solicitud de fijación de cuota alimentaria ante el defensor o comisario de familia",
+      "area": "FAMILIA_ADMINISTRATIVA",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1098 de 2006, art. 111 nums. 1 a 4; art. 82 nums. 8, 9 y 13; art. 104 y su parágrafo; art. 100 parágrafo 1 (modificado por el art. 4 de la Ley 1878 de 2018); Ley 2126 de 2021, art. 13 nums. 10 y 11",
+      "competent_authority": "Defensor de familia o comisario o comisaria de familia; en ausencia de ambos, el inspector de policía (Ley 1098 de 2006, art. 98). El comisario puede además fijar cuota provisional de alimentos de PERSONAS ADULTAS MAYORES 'conforme a lo dispuesto en el artículo 34A de la Ley 1251 de 2008' (Ley 2126 de 2021, art. 13 num. 11), y definir provisionalmente alimentos, custodia y visitas en situaciones de violencia en el contexto familiar (art. 13 num. 10)",
+      "term": "EL PLAZO QUE PIERDE EL CLIENTE ESTÁ DESPUÉS DE LA AUDIENCIA, NO ANTES, Y ES DE CINCO DÍAS HÁBILES: 'Siempre que se conozca la dirección donde puede recibir notificaciones el obligado a suministrar alimentos, el defensor o comisario de familia lo citará a audiencia de conciliación. En caso contrario, elaborará informe que suplirá la demanda y lo remitirá al Juez de Familia para que inicie el respectivo proceso. Cuando habiendo sido debidamente citado a la audiencia el obligado no haya concurrido, o habiendo concurrido no se haya logrado la conciliación, fijará cuota provisional de alimentos, pero SÓLO SE REMITIRÁ EL INFORME AL JUEZ SI ALGUNA DE LAS PARTES LO SOLICITA DENTRO DE LOS CINCO DÍAS HÁBILES SIGUIENTES' (Ley 1098 de 2006, art. 111 num. 2). Vencidos esos cinco días hábiles sin solicitud, el asunto se queda en la cuota provisional administrativa y no pasa al juez por esa vía. La misma regla de cinco días opera dentro del proceso de restablecimiento: 'en caso de que fracase o se declare fallida, mediante resolución motivada fijará las obligaciones provisionales respecto a custodia, alimentos y visitas y en caso de que alguna de las partes lo solicite DENTRO DE LOS CINCO (5) DÍAS SIGUIENTES, el funcionario presentará demanda ante el Juez competente' (art. 100 parágrafo 1). NO HAY TÉRMINO PARA PEDIR LA FIJACIÓN: 'La mujer grávida podrá reclamar alimentos a favor del hijo que está por nacer, respecto del padre legítimo o del extramatrimonial que haya reconocido la paternidad' (art. 111 num. 1), y la regla se aplica también 'al ofrecimiento de alimentos a niños, las niñas o los adolescentes' (num. 4). PODER DE INVESTIGACIÓN PATRIMONIAL QUE CONVIENE PEDIR: la autoridad puede 'solicitar información al respectivo pagador y a la Dirección de Impuestos Nacionales sobre la solvencia de las personas obligadas a suministrar alimentos' y 'sancionar con multa de uno a tres salarios mínimos legales mensuales vigentes, a los particulares que rehúsen o retarden el trámite de las solicitudes formuladas en ejercicio de las funciones que esta ley les atribuye' (art. 104 y su parágrafo).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del niño, niña o adolescente alimentario y de su representante",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 111"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del obligado y DIRECCIÓN donde puede recibir notificaciones, de la que depende que haya audiencia o informe directo al juez",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 111 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "Prueba del vínculo que origina la obligación alimentaria",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 111"
+        },
+        {
+          "n": 4,
+          "name": "Necesidades del alimentario y capacidad económica del obligado, con las pruebas disponibles",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, arts. 104 y 111"
+        },
+        {
+          "n": 5,
+          "name": "Petición de citación a audiencia de conciliación y de fijación de cuota provisional si fracasa",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 111 num. 2"
+        },
+        {
+          "n": 6,
+          "name": "Petición de que se solicite información al pagador y a la DIAN sobre la solvencia del obligado",
+          "mandatory": false,
+          "basis": "Ley 1098 de 2006, art. 104"
+        },
+        {
+          "n": 7,
+          "name": "Petición de que se promueva también la conciliación sobre custodia y régimen de visitas",
+          "mandatory": false,
+          "basis": "Ley 1098 de 2006, art. 111 num. 3"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1098_2006_pr002.html"
+    },
+    {
+      "exact_name": "Solicitud de remisión del informe al juez de familia por conciliación fallida ante la autoridad administrativa",
+      "area": "FAMILIA_ADMINISTRATIVA",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1098 de 2006, art. 111 num. 2; art. 100 parágrafo 1 (modificado por el art. 4 de la Ley 1878 de 2018); art. 82 nums. 8, 9 y 11",
+      "competent_authority": "Se presenta ante el defensor de familia o el comisario o comisaria de familia que celebró la audiencia de conciliación; es esa autoridad la que elabora el informe que suple la demanda y la que presenta la demanda ante el Juez de Familia competente (Ley 1098 de 2006, arts. 100 parágrafo 1 y 111 num. 2). El escrito NO se radica ante el juzgado",
+      "term": "CINCO DÍAS, Y SU VENCIMIENTO DEJA EL ASUNTO CONGELADO EN LA CUOTA PROVISIONAL. Dos normas fijan el mismo plazo según el escenario, y una cuenta días hábiles y la otra no. (1) TRÁMITE DE ALIMENTOS: 'Cuando habiendo sido debidamente citado a la audiencia el obligado no haya concurrido, o habiendo concurrido no se haya logrado la conciliación, fijará cuota provisional de alimentos, pero sólo se remitirá el informe al juez si alguna de las partes lo solicita DENTRO DE LOS CINCO DÍAS HÁBILES SIGUIENTES' (Ley 1098 de 2006, art. 111 num. 2). (2) DENTRO DEL PROCESO ADMINISTRATIVO DE RESTABLECIMIENTO DE DERECHOS: 'En caso de evidenciarse vulneración de derechos susceptibles de conciliación en cualquier etapa del proceso, el funcionario provocará la conciliación y en caso de que fracase o se declare fallida, mediante resolución motivada fijará las obligaciones provisionales respecto a custodia, alimentos y visitas y en caso de que alguna de las partes lo solicite DENTRO DE LOS CINCO (5) DÍAS SIGUIENTES, el funcionario presentará demanda ante el Juez competente' (art. 100 parágrafo 1). ÚNICO CASO EN QUE NO HAY QUE PEDIR NADA: si no se conoce la dirección de notificación del obligado, la autoridad 'elaborará informe que suplirá la demanda y lo remitirá al Juez de Familia para que inicie el respectivo proceso' de oficio (art. 111 num. 2). Perder este plazo no extingue el derecho de alimentos, que es irrenunciable (art. 133), pero obliga a promover un proceso judicial nuevo en lugar de aprovechar el informe que suple la demanda.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la audiencia de conciliación y de su fecha, y constancia de que fracasó o se declaró fallida",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, arts. 100 par. 1 y 111 num. 2"
+        },
+        {
+          "n": 2,
+          "name": "Constancia de que la solicitud se presenta dentro de los cinco (5) días siguientes, hábiles en el trámite de alimentos",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 111 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "Identificación de la resolución que fijó las obligaciones provisionales de alimentos, custodia y visitas",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 100 par. 1"
+        },
+        {
+          "n": 4,
+          "name": "Petición expresa de remisión del informe que suple la demanda, o de presentación de la demanda ante el Juez de Familia",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, arts. 100 par. 1 y 111 num. 2"
+        },
+        {
+          "n": 5,
+          "name": "Identificación del juez competente y del domicilio de las partes",
+          "mandatory": false,
+          "basis": null
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1098_2006_pr002.html"
+    },
+    {
+      "exact_name": "Solicitud de conciliación extrajudicial en derecho de familia ante el defensor o comisario de familia",
+      "area": "FAMILIA_ADMINISTRATIVA",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1098 de 2006, art. 82 nums. 8, 9 y 10; art. 111 nums. 2 y 3; art. 100 parágrafo 1; art. 109; Ley 2126 de 2021, arts. 13 num. 10 y 26; Decreto 1069 de 2015, art. 2.2.3.8.2.6",
+      "competent_authority": "Defensor de familia del ICBF, que además APRUEBA la conciliación (Ley 1098 de 2006, art. 82 num. 9); comisario o comisaria de familia en las competencias subsidiarias de conciliación extrajudicial en derecho de familia (Ley 2126 de 2021, art. 26) y en las situaciones de violencia en el contexto familiar (art. 13 num. 10); en ausencia de ambos, inspector de policía (Ley 1098 de 2006, art. 98). SIN PERJUICIO DE LA COMPETENCIA DE LOS NOTARIOS, que el art. 82 num. 9 salva expresamente",
+      "term": "NO HAY TÉRMINO PARA PEDIRLA. LO QUE HAY ES UN PLAZO DESPUÉS DE QUE FRACASE, Y ES DE CINCO DÍAS: si no se logra la conciliación sobre alimentos, 'sólo se remitirá el informe al juez si alguna de las partes lo solicita dentro de los cinco días hábiles siguientes' (Ley 1098 de 2006, art. 111 num. 2); y en el proceso de restablecimiento, 'en caso de que alguna de las partes lo solicite dentro de los cinco (5) días siguientes, el funcionario presentará demanda ante el Juez competente' (art. 100 parágrafo 1). MATERIAS CONCILIABLES, QUE DELIMITAN QUÉ PUEDE PEDIRSE AQUÍ Y QUÉ NO: al defensor corresponde 'Promover la conciliación extrajudicial en los asuntos relacionados con derechos y obligaciones entre cónyuges, compañeros permanentes, padres e hijos, miembros de la familia o personas responsables del cuidado del niño, niña o adolescente' (art. 82 num. 8) y 'Aprobar las conciliaciones en relación con la asignación de la custodia y cuidado personal del niño, el establecimiento de las relaciones materno o paterno filiales, la determinación de la cuota alimentaria, la fijación provisional de residencia separada, la suspensión de la vida en común de los cónyuges o compañeros permanentes, la separación de cuerpos y de bienes del matrimonio civil o religioso, las cauciones de comportamiento conyugal, la disolución y liquidación de sociedad conyugal por causa distinta de la muerte del cónyuge y los demás aspectos relacionados con el régimen económico del matrimonio y los derechos sucesorales, sin perjuicio de la competencia atribuida por la ley a los notarios' (art. 82 num. 9). RECONOCIMIENTO DE PATERNIDAD EN LA MISMA SEDE: 'Cuando el padre extramatrimonial reconozca, ante el defensor, el comisario de familia o el inspector de policía, la paternidad de un niño, una niña o un adolescente, se levantará acta y se ordenará su inscripción en el registro del estado civil' (art. 109). DERECHO QUE HAY QUE INVOCAR PARA NO QUEDAR ATRAPADO EN LA ETAPA: la mujer víctima tiene derecho a no ser confrontada con el agresor, lo que 'incluye el derecho a manifestar ante la Fiscalía General de la Nación directamente, por escrito o a través de representante judicial, su intención de no conciliar... Con la manifestación de la mujer víctima de no conciliar QUEDARÁ AGOTADA LA ETAPA DE CONCILIACIÓN y se dará continuidad al proceso' (Decreto 1069 de 2015, art. 2.2.3.8.2.6).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de convocantes y convocados y de su relación familiar",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 82 num. 8"
+        },
+        {
+          "n": 2,
+          "name": "Identificación de los niños, niñas o adolescentes involucrados",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 82 num. 8"
+        },
+        {
+          "n": 3,
+          "name": "Asuntos concretos que se someten a conciliación, dentro de las materias del art. 82 num. 9",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 82 num. 9"
+        },
+        {
+          "n": 4,
+          "name": "Fórmula de arreglo propuesta, con monto, forma y lugar de pago cuando incluya alimentos",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 111 num. 3"
+        },
+        {
+          "n": 5,
+          "name": "Dirección de notificación de la parte convocada",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 111 num. 2"
+        },
+        {
+          "n": 6,
+          "name": "Manifestación, si la solicitante es mujer víctima de violencia, sobre su derecho a no ser confrontada y a no conciliar",
+          "mandatory": false,
+          "basis": "Decreto 1069 de 2015, art. 2.2.3.8.2.6"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1098_2006_pr002.html"
+    },
+    {
+      "exact_name": "Auto que avoca el conocimiento de la petición de medida de protección y decreta medidas provisionales",
+      "area": "FAMILIA_ADMINISTRATIVA",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 294 de 1996, arts. 9, 10, 11 y 12, modificados por los arts. 5, 6 y 7 de la Ley 575 de 2000; Decreto 1069 de 2015, arts. 2.2.3.8.1.1, 2.2.3.8.1.3, 2.2.3.8.1.5, 2.2.3.8.2.5 y 2.2.3.8.2.9; Ley 2126 de 2021, arts. 15, 16 y 20; Ley 294 de 1996, art. 5 parágrafo 3",
+      "competent_authority": "Comisario o comisaria de familia del lugar donde ocurrieron los hechos; donde no haya comisaría, el Juez Civil Municipal o Promiscuo Municipal (Ley 294 de 1996, art. 4; Ley 2126 de 2021, art. 20 parágrafo 1). LA PRIMERA COMISARÍA QUE CONOZCA DEBE DICTAR LAS PROVISIONALES AUNQUE NO SEA LA COMPETENTE, y solo después repartir o trasladar: 'la primera Comisaría de Familia que tenga conocimiento del caso deberá adoptar las medidas de protección provisionales a que haya lugar. Luego de esto, la petición se someterá en forma inmediata a reparto'; y si la petición se hace en jurisdicción distinta al domicilio de la víctima, 'la Comisaría de Familia que tenga conocimiento deberá adoptar las medidas de protección provisionales a que haya lugar, luego la trasladará a la autoridad que por competencia deba seguir conociendo el asunto' (Ley 2126 de 2021, art. 20 incs. 2 y 3)",
+      "term": "CUATRO HORAS HÁBILES PARA LO PROVISIONAL: 'El Comisario o el Juez, según el caso, recibirá y avocará EN FORMA INMEDIATA la petición, y si estuviere fundada en al menos indicios leves, podrá dictar DENTRO DE LAS CUATRO (4) HORAS HÁBILES SIGUIENTES, medidas de protección en forma provisional tendientes a evitar la continuación de todo acto de violencia, agresión, maltrato, amenaza u ofensa contra la víctima' (Ley 294 de 1996, art. 11 inc. 1); 'Contra la medida provisional de protección no procederá recurso alguno' (inc. 2). CITACIÓN A AUDIENCIA: 'Radicada la petición, el Comisario o el Juez, según el caso, citará al acusado para que comparezca a una audiencia que tendrá lugar entre los cinco (5) y diez (10) días siguientes a la presentación de la petición. A esta audiencia deberá concurrir la víctima' (art. 12 inc. 1), y el tope es duro: 'En ningún caso el término de la audiencia podrá exceder de diez (10) días contados a partir de la fecha de presentación de la petición de protección' (Decreto 1069 de 2015, art. 2.2.3.8.1.5). AGRESOR SIN DOMICILIO CONOCIDO: 'La autoridad competente, en forma inmediata citará al presunto agresor mediante aviso que se fijará en el domicilio familiar que haya tenido en los últimos 30 días, para que comparezca dentro de las cuarenta y ocho horas siguientes a notificarse. Si este no se presenta dentro de dicho término, se notificará por edicto' (Decreto 1069 de 2015, art. 2.2.3.8.2.9 inc. 3). ADMISIBILIDAD QUE ESTE AUTO DEBE VERIFICAR, Y QUE ES EL RELOJ DEL CIUDADANO: la petición 'deberá presentarse a más tardar dentro de los treinta (30) días siguientes a su acaecimiento' (Ley 294 de 1996, art. 9 inc. 3), con el cómputo especial del reglamento cuando la víctima estuvo imposibilitada: 'cuando la víctima manifestare bajo la gravedad del juramento que por encierro, incomunicación o cualquier otro acto de fuerza o violencia proveniente del agresor, se encontraba imposibilitada para comparecer, el término empezará a correr en los hechos de violencia intrafamiliar instantáneos desde el día de la consumación y desde la perpetración del último acto en los tentados o permanentes' (Decreto 1069 de 2015, art. 2.2.3.8.1.3). MOTIVACIÓN OBLIGATORIA: 'la providencia que imponga medida de protección provisional o definitiva, será motivada' (art. 2.2.3.8.2.5). VÍCTIMA CON DISCAPACIDAD EN SITUACIÓN DE INDEFENSIÓN: 'deberá ser notificada la personería. El Personero o su delegado deberá estar presente en las audiencias. Su ausencia no impide la realización de la misma, pero constituye falta grave disciplinaria' (Ley 294 de 1996, art. 12 parágrafo).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Constancia de recibo y de avocamiento inmediato, con fecha y hora de radicación",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 11 inc. 1"
+        },
+        {
+          "n": 2,
+          "name": "Verificación de la competencia territorial y de los datos exigidos por el art. 10 de la Ley 294 de 1996",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, arts. 4 y 10"
+        },
+        {
+          "n": 3,
+          "name": "Verificación de que la petición se presentó dentro de los treinta (30) días, con el cómputo especial cuando la víctima estuvo imposibilitada",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 9; Decreto 1069 de 2015, art. 2.2.3.8.1.3"
+        },
+        {
+          "n": 4,
+          "name": "Valoración de los indicios leves y decreto motivado de las medidas provisionales, identificadas por su literal",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, arts. 5 y 11"
+        },
+        {
+          "n": 5,
+          "name": "Advertencia de que contra la medida provisional no procede recurso alguno",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 11 inc. 2"
+        },
+        {
+          "n": 6,
+          "name": "Fijación de fecha y hora de audiencia entre los cinco (5) y diez (10) días siguientes a la presentación de la petición",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 12; Decreto 1069 de 2015, art. 2.2.3.8.1.5"
+        },
+        {
+          "n": 7,
+          "name": "Orden de citación al agresor, con la forma supletoria por aviso y edicto cuando se desconoce su domicilio",
+          "mandatory": true,
+          "basis": "Decreto 1069 de 2015, art. 2.2.3.8.2.9"
+        },
+        {
+          "n": 8,
+          "name": "Orden de intervención del defensor de familia o, en su defecto, del personero municipal cuando haya menores de edad involucrados",
+          "mandatory": true,
+          "basis": "Decreto 1069 de 2015, art. 2.2.3.8.1.1"
+        },
+        {
+          "n": 9,
+          "name": "Orden de notificación a la personería cuando la víctima sea persona con discapacidad en situación de indefensión",
+          "mandatory": false,
+          "basis": "Ley 294 de 1996, art. 12 par."
+        },
+        {
+          "n": 10,
+          "name": "Orden de valoración por el equipo interdisciplinario, con nivel de riesgo y valoración de riesgo de feminicidio",
+          "mandatory": true,
+          "basis": "Ley 2126 de 2021, art. 15"
+        },
+        {
+          "n": 11,
+          "name": "Orden de remisión del caso a la Fiscalía General de la Nación",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 5 par. 3"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0294_1996.html"
+    },
+    {
+      "exact_name": "Resolución que impone medida de protección definitiva por violencia en el contexto familiar",
+      "area": "FAMILIA_ADMINISTRATIVA",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 294 de 1996, art. 5 —texto del art. 17 de la Ley 2126 de 2021, modificado por el art. 60 de la Ley 2197 de 2022—, y arts. 14, 15, 16, 17 inc. 1 y 18, modificados por los arts. 8, 9, 10, 11 y 12 de la Ley 575 de 2000; Ley 1257 de 2008, art. 18; Ley 2126 de 2021, arts. 3, 5, 16, 18 y 20; Decreto 1069 de 2015, arts. 2.2.3.8.1.5, 2.2.3.8.1.6, 2.2.3.8.2.4, 2.2.3.8.2.5 y 2.2.3.8.2.6",
+      "competent_authority": "Comisario o comisaria de familia del lugar donde ocurrieron los hechos, como AUTORIDAD ADMINISTRATIVA EN EJERCICIO DE FUNCIONES JURISDICCIONALES: 'Las Comisarías de Familia son dependencias o entidades de carácter administrativo e interdisciplinario del orden municipal o distrital, con funciones administrativas y jurisdiccionales' (Ley 2126 de 2021, art. 3), y el comisario 'fungirá como Jefe de despacho bajo los principios de autonomía e independencia, como autoridad administrativa en ejercicio de funciones jurisdiccionales' (art. 11, sustituido por el art. 83 de la Ley 2294 de 2023). Donde no haya comisaría, el Juez Civil Municipal o Promiscuo Municipal (Ley 294 de 1996, art. 4; Ley 2126 de 2021, art. 20 parágrafo 1). En comunidades indígenas concurre la autoridad indígena del art. 246 de la Constitución, y el comisario puede asumir competencia con enfoque diferencial y diálogo intercultural (Ley 2126 de 2021, art. 20 parágrafo 3)",
+      "term": "SE DICTA AL CERRAR LA AUDIENCIA Y SE NOTIFICA ALLÍ MISMO: 'La resolución o sentencia se dictará AL FINALIZAR LA AUDIENCIA y será notificada a las partes EN ESTRADOS. Se entenderán surtidos los efectos de la notificación desde su pronunciamiento. Si alguna de las partes estuviere ausente, se le comunicará la decisión mediante aviso, telegrama o por cualquier otro medio idóneo' (Ley 294 de 1996, art. 16 inc. 1). Ese instante abre el plazo de TRES (3) DÍAS del ciudadano para apelar, por remisión del art. 18 inc. 3 de la Ley 294 al Decreto 2591 de 1991 —'Dentro de los tres días siguientes a su notificación el fallo podrá ser impugnado' (art. 31)— y del art. 2.2.3.8.1.11 del Decreto 1069 de 2015 al art. 32 del mismo decreto; la apelación se concede EN EL EFECTO DEVOLUTIVO ante el Juez de Familia o Promiscuo de Familia (Ley 294 de 1996, art. 18 inc. 2). LÍMITE EXTERNO DE LA AUDIENCIA: 'En ningún caso el término de la audiencia podrá exceder de diez (10) días contados a partir de la fecha de presentación de la petición de protección' (Decreto 1069 de 2015, art. 2.2.3.8.1.5), y la excusa de inasistencia solo cabe una vez: 'las partes podrán excusarse de la inasistencia por una sola vez antes de la audiencia o dentro de la misma, siempre que medie justa causa. El funcionario evaluará la excusa y, si la encuentra procedente, fijará fecha para celebrar la nueva audiencia dentro de los cinco (5) días siguientes' (Ley 294 de 1996, art. 15 inc. 2). INASISTENCIA DEL AGRESOR: 'Si el agresor no compareciere a la audiencia se entenderá que acepta los cargos formulados en su contra' (art. 15 inc. 1). MEDIDA OBLIGATORIA POR GRAVEDAD DE LA LESIÓN: 'Cuando el maltrato o el daño en el cuerpo o en la salud generen incapacidad médico-legal igual o superior a treinta (30) días, deformidad, perturbación funcional o psíquica, o pérdida anatómica o funcional, SERÁ OBLIGATORIO para la autoridad competente adoptar esta medida de protección' —tratamiento reeducativo y terapéutico a costa del victimario— (art. 5 lit. d). MEDIDA QUE EL COMISARIO NO PUEDE DECRETAR POR SÍ MISMO: la prohibición de enajenar o gravar bienes sujetos a registro, porque 'Esta medida será decretada por Autoridad Judicial' (art. 5 lit. l), y debe solicitarse al Juez de Familia (Decreto 1069 de 2015, art. 2.2.3.8.2.4 num. 7). VIGENCIA: las medidas 'tendrán vigencia por el tiempo que se mantengan las circunstancias que dieron lugar a estas y serán canceladas mediante incidente' (art. 2.2.3.8.2.4 parágrafo 2).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de las partes y de la relación familiar, de convivencia o de pareja del art. 5 de la Ley 2126 de 2021",
+          "mandatory": true,
+          "basis": "Ley 2126 de 2021, art. 5"
+        },
+        {
+          "n": 2,
+          "name": "Síntesis de los hechos y examen crítico de las pruebas practicadas en la audiencia",
+          "mandatory": true,
+          "basis": "Decreto 1069 de 2015, art. 2.2.3.8.2.5"
+        },
+        {
+          "n": 3,
+          "name": "Constancia del resultado de la etapa de conciliación, o de la manifestación de la mujer víctima de no conciliar",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 14; Decreto 1069 de 2015, art. 2.2.3.8.2.6"
+        },
+        {
+          "n": 4,
+          "name": "Constancia de la inasistencia del agresor y del efecto de aceptación de los cargos, cuando proceda",
+          "mandatory": false,
+          "basis": "Ley 294 de 1996, art. 15 inc. 1"
+        },
+        {
+          "n": 5,
+          "name": "Determinación de que hubo violencia y orden al agresor de abstenerse de la conducta objeto de la queja",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 5 inc. 1"
+        },
+        {
+          "n": 6,
+          "name": "Enumeración motivada de cada medida de protección impuesta, identificada por su literal",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 5"
+        },
+        {
+          "n": 7,
+          "name": "Adopción obligatoria del tratamiento reeducativo y terapéutico cuando la incapacidad médico-legal sea igual o superior a treinta (30) días",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 5 lit. d"
+        },
+        {
+          "n": 8,
+          "name": "Órdenes de comunicación a la Policía Nacional para la ejecución del desalojo, el alejamiento y la protección temporal especial",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 5 lits. a, f y g; Decreto 1069 de 2015, art. 2.2.3.8.2.4"
+        },
+        {
+          "n": 9,
+          "name": "Orden de dispositivo de distanciamiento y alerta de aproximación cuando la gravedad de las amenazas lo exija",
+          "mandatory": false,
+          "basis": "Ley 2126 de 2021, art. 18"
+        },
+        {
+          "n": 10,
+          "name": "Decisiones provisionales sobre custodia, régimen de visitas, alimentos y uso de la vivienda familiar",
+          "mandatory": false,
+          "basis": "Ley 294 de 1996, art. 5 lits. h, j y k"
+        },
+        {
+          "n": 11,
+          "name": "Solicitud al Juez de Familia de la prohibición de enajenar o gravar bienes sujetos a registro, por exceder la competencia del comisario",
+          "mandatory": false,
+          "basis": "Ley 294 de 1996, art. 5 lit. l; Decreto 1069 de 2015, art. 2.2.3.8.2.4 num. 7"
+        },
+        {
+          "n": 12,
+          "name": "Orden de remisión del caso a la Fiscalía General de la Nación",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 5 par. 3"
+        },
+        {
+          "n": 13,
+          "name": "Notificación en estrados y advertencia del recurso de apelación ante el Juez de Familia en efecto devolutivo",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, arts. 16 y 18"
+        },
+        {
+          "n": 14,
+          "name": "Constancia en acta y entrega de copia a cada una de las partes",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 16 inc. 2"
+        },
+        {
+          "n": 15,
+          "name": "Orden de seguimiento al cumplimiento y efectividad de las medidas",
+          "mandatory": true,
+          "basis": "Decreto 1069 de 2015, art. 2.2.3.8.2.4 par. 3"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0294_1996.html"
+    },
+    {
+      "exact_name": "Resolución que sanciona el incumplimiento de la medida de protección",
+      "area": "FAMILIA_ADMINISTRATIVA",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 294 de 1996, arts. 7 y 8, y art. 17 incs. 2 a 4, modificados por los arts. 4 y 11 de la Ley 575 de 2000; Decreto 1069 de 2015, arts. 2.2.3.8.1.10, 2.2.3.8.2.4 parágrafo 1 y 2.2.3.8.2.8; Ley 2126 de 2021, art. 13 num. 12",
+      "competent_authority": "El funcionario que expidió la orden de protección: comisario o comisaria de familia, o Juez Civil Municipal o Promiscuo Municipal donde no haya comisaría (Ley 294 de 1996, art. 17 inc. 1). El ARRESTO excede su competencia: 'El arresto procederá a solicitud del Comisario de Familia y será decretado por el Juez de Familia, o en su defecto, por el Juez Civil Municipal o Promiscuo Municipal' (Decreto 1069 de 2015, art. 2.2.3.8.2.8 lit. b)",
+      "term": "DIEZ DÍAS PARA LA AUDIENCIA: 'Las sanciones por incumplimiento de las medidas de protección se impondrán en audiencia que deberá celebrarse dentro de los diez (10) días siguientes a su solicitud, luego de haberse practicado las pruebas pertinentes y oídos los descargos de la parte acusada' (Ley 294 de 1996, art. 17 inc. 2). ESCALA SANCIONATORIA Y EL RELOJ DEL SANCIONADO, QUE NO ES EL DE LA VÍCTIMA: 'Por la primera vez, multa entre dos (2) y diez (10) salarios mínimos legales mensuales, convertibles en arresto, la cual DEBE CONSIGNARSE DENTRO DE LOS CINCO (5) DÍAS SIGUIENTES A SU IMPOSICIÓN. La Conversión en arresto se adoptará DE PLANO mediante auto que SÓLO TENDRÁ RECURSOS DE REPOSICIÓN, a razón de tres (3) días por cada salario mínimo' (art. 7 lit. a); 'Si el incumplimiento de las medidas de protección se repitiere en el plazo de dos (2) años, la sanción será de arresto entre treinta (30) y cuarenta y cinco (45) días' (art. 7 lit. b). Y hay un efecto penal: 'En el caso de incumplimiento de medidas de protección impuestas por actos de violencia o maltrato que constituyeren delito o contravención, al agresor se le revocarán los beneficios de excarcelación y los subrogados penales de que estuviere gozando' (art. 7 inc. final). CUARENTA Y OCHO HORAS DEL JUEZ PARA EL ARRESTO: el comisario 'le pedirá al Juez de Familia o Promiscuo de Familia, o en su defecto, al Civil Municipal o al Promiscuo que expida la orden correspondiente, lo que decidirá dentro de las 48 horas siguientes' (art. 17 inc. 3). FORMA: 'La Providencia que imponga las sanciones por incumplimiento de la orden de protección, provisional o definitiva, será motivada y notificada personalmente en la audiencia o mediante aviso' (art. 17 inc. 4). QUÉ CUENTA COMO INCUMPLIMIENTO: 'Todo comportamiento de retaliación, venganza o evasión de los deberes alimentarios por parte del agresor, se entenderá como incumplimiento de las medidas de protección que le fueron impuestas' (art. 8). DESTINO DE LA MULTA: se consigna en la tesorería distrital o municipal 'con destino a un fondo cuenta especial que deberá ser creado por cada entidad territorial... para cubrir costos de los centros o programas de asistencia legal o de salud para las mujeres víctimas de violencia', y el arresto se cumple 'sin que sea posible sustituirlo por arresto domiciliario' (Decreto 1069 de 2015, art. 2.2.3.8.2.8 lits. a y b).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la medida de protección incumplida y de la providencia que la impuso",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 17"
+        },
+        {
+          "n": 2,
+          "name": "Constancia de la audiencia celebrada dentro de los diez (10) días siguientes a la solicitud",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 17 inc. 2"
+        },
+        {
+          "n": 3,
+          "name": "Descargos de la parte acusada y valoración de las pruebas practicadas",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 17 inc. 2"
+        },
+        {
+          "n": 4,
+          "name": "Determinación de si es la primera vez o si el incumplimiento se repite dentro de los dos (2) años",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 7"
+        },
+        {
+          "n": 5,
+          "name": "Imposición motivada de la multa, con monto, plazo de cinco (5) días para consignar y equivalencia en arresto",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 7 lit. a"
+        },
+        {
+          "n": 6,
+          "name": "Orden de consignación en el fondo cuenta especial de la entidad territorial",
+          "mandatory": true,
+          "basis": "Decreto 1069 de 2015, art. 2.2.3.8.2.8 lit. a"
+        },
+        {
+          "n": 7,
+          "name": "Orden de comunicación para la revocatoria de beneficios de excarcelación y subrogados penales, cuando proceda",
+          "mandatory": false,
+          "basis": "Ley 294 de 1996, art. 7 inc. final"
+        },
+        {
+          "n": 8,
+          "name": "Decisión sobre modificación o adición de medidas de protección, si se solicitó",
+          "mandatory": false,
+          "basis": "Decreto 1069 de 2015, art. 2.2.3.8.2.4 par. 1 inc. 3"
+        },
+        {
+          "n": 9,
+          "name": "Notificación personal en la audiencia o mediante aviso",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 17 inc. 4"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0294_1996.html"
+    },
+    {
+      "exact_name": "Solicitud de orden de arresto al juez de familia por incumplimiento de la medida de protección",
+      "area": "FAMILIA_ADMINISTRATIVA",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 294 de 1996, art. 7 y art. 17 inc. 3, modificados por los arts. 4 y 11 de la Ley 575 de 2000; Decreto 1069 de 2015, arts. 2.2.3.8.1.8 y 2.2.3.8.2.8 lit. b; Ley 2126 de 2021, art. 16 parágrafo 3",
+      "competent_authority": "La firma el comisario o comisaria de familia y se dirige al JUEZ DE FAMILIA O PROMISCUO DE FAMILIA; en su defecto, al Juez Civil Municipal o Promiscuo. El comisario NO puede decretar el arresto: 'El arresto procederá a solicitud del Comisario de Familia y será decretado por el Juez de Familia, o en su defecto, por el Juez Civil Municipal o Promiscuo Municipal' (Decreto 1069 de 2015, art. 2.2.3.8.2.8 lit. b)",
+      "term": "CUARENTA Y OCHO HORAS DEL JUEZ, Y TRÁMITE PREFERENTE: 'cuando a juicio de Comisario sean necesario ordenar el arresto, luego de practicar las pruebas y oídos los descargos, le pedirá al Juez de Familia o Promiscuo de Familia, o en su defecto, al Civil Municipal o al Promiscuo que expida la orden correspondiente, LO QUE DECIDIRÁ DENTRO DE LAS 48 HORAS SIGUIENTES' (Ley 294 de 1996, art. 17 inc. 3). 'Todas las solicitudes que efectúen los comisarios de familia al Juez de familia o promiscuo de familia o en su defecto al Juez Civil Municipal o al Promiscuo para que se expida una orden de arresto por incumplimiento de las medidas de protección definitivas o provisionales de los agresores, TENDRÁN TRÁMITE PREFERENTE, salvo los procesos de tutela o hábeas corpus. Su inobservancia hará incurrir al juez o funcionario responsable en causal de mala conducta sancionable de conformidad con la ley' (Ley 2126 de 2021, art. 16 parágrafo 3). REQUISITO PREVIO QUE NO PUEDE SALTARSE: la solicitud solo procede DESPUÉS de practicar las pruebas y oír los descargos en la audiencia del art. 17 inc. 2, que debe celebrarse dentro de los diez (10) días siguientes a la solicitud de sanción. FORMA DE LA ORDEN Y SU EJECUCIÓN: 'la orden de arresto prevista se expedirá por el juez de familia o promiscuo de familia, o en su defecto por el juez civil municipal o promiscuo, mediante auto motivado, CON INDICACIÓN DEL TÉRMINO Y LUGAR DE RECLUSIÓN. Para su cumplimiento se remitirá oficio al comandante de policía municipal o Distrital según corresponda con el fin de que se conduzca al agresor al establecimiento de reclusión' (Decreto 1069 de 2015, art. 2.2.3.8.1.8), 'sin que sea posible sustituirlo por arresto domiciliario' (art. 2.2.3.8.2.8 lit. b). DURACIÓN A SOLICITAR: tres (3) días por cada salario mínimo en la conversión de la multa impagada (Ley 294 de 1996, art. 7 lit. a), o de treinta (30) a cuarenta y cinco (45) días en la reincidencia dentro de dos años (lit. b).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del comisario solicitante y del juez destinatario",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 17 inc. 3"
+        },
+        {
+          "n": 2,
+          "name": "Identificación de la medida de protección incumplida, provisional o definitiva, y de la providencia que la impuso",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 17"
+        },
+        {
+          "n": 3,
+          "name": "Constancia de que se practicaron las pruebas y se oyeron los descargos del agresor",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 17 inc. 3"
+        },
+        {
+          "n": 4,
+          "name": "Fundamento de la sanción: conversión de la multa no consignada dentro de los cinco (5) días, o reincidencia dentro de dos (2) años",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 7"
+        },
+        {
+          "n": 5,
+          "name": "Término de arresto solicitado y su liquidación",
+          "mandatory": true,
+          "basis": "Ley 294 de 1996, art. 7"
+        },
+        {
+          "n": 6,
+          "name": "Invocación del trámite preferente y de las cuarenta y ocho (48) horas para decidir",
+          "mandatory": true,
+          "basis": "Ley 2126 de 2021, art. 16 par. 3; Ley 294 de 1996, art. 17 inc. 3"
+        },
+        {
+          "n": 7,
+          "name": "Petición de que la orden indique término y lugar de reclusión y de que se oficie al comandante de policía",
+          "mandatory": true,
+          "basis": "Decreto 1069 de 2015, art. 2.2.3.8.1.8"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0294_1996.html"
+    },
+    {
+      "exact_name": "Auto de apertura del proceso administrativo de restablecimiento de derechos",
+      "area": "FAMILIA_ADMINISTRATIVA",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 1098 de 2006, art. 99 (modificado por el art. 3 de la Ley 1878 de 2018); art. 100 incs. 1 y 2 (modificado por el art. 4 de la Ley 1878 de 2018); arts. 102, 105 y 138; Ley 2126 de 2021, art. 5 parágrafos 1 y 2",
+      "competent_authority": "Defensor de familia, comisario o comisaria de familia o, en su defecto, inspector de policía, del lugar donde se encuentre el niño, niña o adolescente (Ley 1098 de 2006, arts. 97 y 98). Donde concurran defensoría y comisaría, la competencia se reparte por el art. 5 parágrafo 1 de la Ley 2126 de 2021: comisario para la violencia en contexto familiar salvo violencia sexual; defensor para las demás causas y para TODA forma de violencia sexual, y también para los demás niños del núcleo cuando uno es víctima sexual",
+      "term": "EL AUTO ARRANCA UN RELOJ IMPRORROGABLE DE SEIS MESES CUYO VENCIMIENTO LE QUITA EL CASO A LA AUTORIDAD: 'la definición de la situación jurídica deberá resolverse declarando en vulneración de derechos o adoptabilidad al niño, niña y adolescente, dentro de los SEIS (6) MESES siguientes, contados a partir del conocimiento de la presunta amenaza o vulneración de los derechos del menor de edad, término que será IMPRORROGABLE y no podrá extenderse ni por actuación de autoridad administrativa o judicial' (Ley 1098 de 2006, art. 100). EL AUTO NO TIENE RECURSO: la autoridad 'dará apertura al Proceso Administrativo de Restablecimiento de Derechos, mediante auto contra el cual NO PROCEDE RECURSO ALGUNO' (art. 99 inc. 2). TRASLADO DE CINCO DÍAS A LOS CITADOS: 'el funcionario notificará y correrá traslado del auto de apertura POR CINCO (5) DÍAS, a las personas que de conformidad con el artículo 99 del presente Código deben ser citadas, para que se pronuncien y aporten las pruebas que deseen hacer valer' (art. 100 inc. 1). NOTIFICACIÓN CUANDO SE IGNORA IDENTIDAD O DIRECCIÓN: publicación en una página de internet del ICBF 'por un término de cinco días y por transmisión en un medio masivo de comunicación, que incluirá una fotografía del niño, si fuere posible', y 'La notificación en este último caso se entenderá surtida si transcurridos cinco (5) días, contados a partir del cumplimiento del término establecido para las publicaciones en los medios de comunicación, el citado no comparece' (art. 102). INOBSERVANCIA DE DERECHOS: las órdenes al Sistema Nacional de Bienestar Familiar se dictan 'de manera que se cumplan en un término no mayor a diez (10) días' (art. 99 parágrafo 2). VERIFICACIÓN PREVIA OBLIGATORIA: 'En todos los casos y de manera inmediata a su conocimiento, la autoridad competente deberá realizar la verificación de la garantía de derechos ordenada en el artículo 52 de esta ley' (art. 138). DENUNCIA PENAL: 'Si la autoridad competente advierte la ocurrencia de un posible delito, deberá denunciarlo ante la autoridad penal competente de manera inmediata' (art. 99 parágrafo 1).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del niño, niña o adolescente y constancia de la verificación de la garantía de derechos",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, arts. 52 y 138"
+        },
+        {
+          "n": 2,
+          "name": "Fecha de conocimiento de la presunta amenaza o vulneración, de la que corren los seis (6) meses improrrogables",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 100"
+        },
+        {
+          "n": 3,
+          "name": "Identificación y orden de citación de representantes legales, convivientes y responsables de su cuidado",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 99 num. 1"
+        },
+        {
+          "n": 4,
+          "name": "Medidas de restablecimiento de derechos provisionales de urgencia",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 99 num. 2"
+        },
+        {
+          "n": 5,
+          "name": "Orden de entrevista al niño, niña o adolescente",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, arts. 26, 99 num. 3 y 105"
+        },
+        {
+          "n": 6,
+          "name": "Decreto de las pruebas necesarias para establecer los hechos",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 99 num. 4"
+        },
+        {
+          "n": 7,
+          "name": "Orden de traslado por cinco (5) días a los citados",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 100 inc. 1"
+        },
+        {
+          "n": 8,
+          "name": "Advertencia de que contra el auto de apertura no procede recurso alguno",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 99 inc. 2"
+        },
+        {
+          "n": 9,
+          "name": "Orden de denuncia penal inmediata si se advierte la ocurrencia de un posible delito",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 99 par. 1"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1098_2006_pr002.html"
+    },
+    {
+      "exact_name": "Auto que decreta pruebas en el proceso administrativo de restablecimiento de derechos",
+      "area": "FAMILIA_ADMINISTRATIVA",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 1098 de 2006, art. 100 incs. 2 a 5 y parágrafos 5 y 6 (modificado por el art. 4 de la Ley 1878 de 2018); arts. 102, 104 y 105; Ley 2126 de 2021, art. 15",
+      "competent_authority": "Defensor de familia, comisario o comisaria de familia o, en su defecto, inspector de policía que adelanta el proceso (Ley 1098 de 2006, art. 98). En la comisaría, el equipo interdisciplinario debe 'Practicar pruebas que el comisario o comisaria considere útiles, conducentes y pertinentes' (Ley 2126 de 2021, art. 15 num. 8), y elaborar los informes periciales conforme a los estándares de Medicina Legal, que son gratuitos (num. 3)",
+      "term": "SECUENCIA CON DOS TRASLADOS DE CINCO DÍAS Y UNA SANCIÓN POR NO PRACTICAR LO DECRETADO: 'Vencido el traslado, la autoridad administrativa decretará de oficio o a solicitud de parte, las pruebas que no hayan sido ordenadas en el auto de apertura, que sean conducentes, útiles y pertinentes, las cuales se practicarán en audiencia de pruebas y fallo o fuera de ella, de acuerdo con su naturaleza y con sujeción a las reglas del procedimiento civil vigente. Las pruebas que fueron debidamente decretadas DEBERÁN PRACTICARSE, en caso contrario, la autoridad administrativa competente, MEDIANTE AUTO MOTIVADO REVOCARÁ SU DECRETO. De las pruebas practicadas antes de la audiencia de pruebas y fallo, mediante auto notificado por estado, se correrá traslado a las partes por un término de 5 DÍAS, para que se pronuncien conforme a las reglas establecidas en el procedimiento civil vigente. Vencido el término del traslado, mediante auto que será notificado por estado, se fijará la fecha para la audiencia de pruebas y fallo, en donde se practicarán las pruebas que no hayan sido adelantadas, se dará traslado de estas y se emitirá el fallo que en derecho corresponda' (Ley 1098 de 2006, art. 100 incs. 2 a 5). TODO ELLO CABE DENTRO DE LOS SEIS (6) MESES IMPRORROGABLES del art. 100, cuyo vencimiento traslada el asunto al juez de familia: el cronograma probatorio no puede diseñarse sin ese tope. PODER SANCIONATORIO PARA OBTENER LA PRUEBA: la autoridad puede 'sancionar con multa de uno a tres salarios mínimos legales mensuales vigentes, a los particulares que rehúsen o retarden el trámite de las solicitudes formuladas en ejercicio de las funciones que esta ley les atribuye. Si el renuente fuere servidor público, además se dará aviso al respectivo superior y a la Procuraduría General de la Nación' (art. 104 parágrafo). NULIDADES: son las del CGP, 'las cuales deberán ser decretadas mediante auto motivado, susceptible de recurso de reposición, siempre y cuando se evidencien ANTES del vencimiento del término de seis (6) meses señalado anteriormente. En caso de haberse superado este término, la autoridad administrativa deberá remitir el expediente al Juez de Familia para que asuma la competencia' (art. 100 parágrafo 5). NORMA SUPLETORIA: 'En todo caso, ante cualquier vacío jurídico deberá remitirse a lo reglamentado en la legislación procesal civil vigente' (art. 100 parágrafo 6) —no al CPACA—.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del proceso y constancia del vencimiento del traslado del auto de apertura",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 100 incs. 1 y 2"
+        },
+        {
+          "n": 2,
+          "name": "Decreto motivado de las pruebas, con juicio expreso de conducencia, utilidad y pertinencia",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 100 inc. 2"
+        },
+        {
+          "n": 3,
+          "name": "Indicación de las pruebas a cargo del equipo interdisciplinario, incluidas la valoración del nivel de riesgo y la de riesgo de feminicidio cuando proceda",
+          "mandatory": false,
+          "basis": "Ley 2126 de 2021, art. 15"
+        },
+        {
+          "n": 4,
+          "name": "Orden de traslado por cinco (5) días de las pruebas practicadas antes de la audiencia, notificado por estado",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 100 inc. 4"
+        },
+        {
+          "n": 5,
+          "name": "Fijación de fecha y hora de la audiencia de pruebas y fallo, notificada por estado",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 100 inc. 5"
+        },
+        {
+          "n": 6,
+          "name": "Revocatoria motivada del decreto de las pruebas que no pudieron practicarse",
+          "mandatory": false,
+          "basis": "Ley 1098 de 2006, art. 100 inc. 3"
+        },
+        {
+          "n": 7,
+          "name": "Verificación de que el cronograma probatorio cabe dentro de los seis (6) meses improrrogables",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 100"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1098_2006_pr002.html"
+    },
+    {
+      "exact_name": "Resolución que declara la vulneración de derechos del niño, niña o adolescente",
+      "area": "FAMILIA_ADMINISTRATIVA",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 1098 de 2006, art. 100 incs. 5 a 7 y parágrafo 4 (modificado por el art. 4 de la Ley 1878 de 2018); art. 101; art. 103 (modificado por el art. 6 de la Ley 1878 de 2018 y por el art. 208 de la Ley 1955 de 2019); art. 107 (modificado por el art. 7 de la Ley 1878 de 2018); arts. 53 a 56",
+      "competent_authority": "Defensor de familia, comisario o comisaria de familia o, en su defecto, inspector de policía (Ley 1098 de 2006, art. 98), en ejercicio de funciones administrativas y jurisdiccionales (Ley 2126 de 2021, art. 3). NO ES UNA SENTENCIA JUDICIAL: el juez de familia interviene después, por homologación, por revisión o por pérdida de competencia",
+      "term": "SEIS MESES IMPRORROGABLES PARA DICTARLA: 'la definición de la situación jurídica deberá resolverse declarando en vulneración de derechos o adoptabilidad al niño, niña y adolescente, dentro de los seis (6) meses siguientes, contados a partir del conocimiento de la presunta amenaza o vulneración de los derechos del menor de edad, término que será improrrogable' (Ley 1098 de 2006, art. 100). RECURSO Y SU FORMA: 'El fallo es susceptible de recurso de reposición que debe interponerse verbalmente en la audiencia, por quienes asistieron a la misma, y para quienes no asistieron se les notificará por Estado; el recurso se interpondrá en los términos del Código General del Proceso y se resolverá dentro de los diez (10) días siguientes a su formulación' (art. 100 inc. 6). PLAZO DEL CIUDADANO PARA LLEVARLA AL JUEZ: quince (15) días siguientes a la ejecutoria para manifestar inconformidad (art. 100). SEGUIMIENTO, QUE ES EL RELOJ POSTERIOR AL FALLO Y EL QUE MÁS EXPEDIENTES PIERDE: 'En los procesos donde se declare en situación de vulneración de derechos a los niños, niñas y adolescentes, la autoridad administrativa deberá hacer seguimiento por un término que NO EXCEDA SEIS (6) MESES, contados a partir de la ejecutoria del fallo, término en el cual determinará si procede el cierre del proceso cuando el niño, niña o adolescente esté ubicado en medio familiar y ya se hubiera superado la vulneración de derechos; el reintegro al medio familiar cuando el niño se hubiera encontrado institucionalizado y la familia cuente con las condiciones para garantizar sus derechos; o la declaratoria de adoptabilidad cuando del seguimiento se hubiera establecido que la familia no cuenta con las condiciones para garantizar los derechos' (art. 103), prorrogable 'mediante resolución motivada por un término que no podrá exceder de seis (6) meses' (art. 103). DURACIÓN TOTAL: 'El Proceso Administrativo de Restablecimiento de Derechos con el seguimiento tendrá una duración de DIECIOCHO (18) MESES, contados a partir del conocimiento de los hechos por parte de la autoridad administrativa hasta la declaratoria de adoptabilidad o el cierre del proceso' (art. 103, texto del art. 208 de la Ley 1955 de 2019). VENCIMIENTO QUE LE QUITA EL CASO: 'Cuando la autoridad administrativa supere los términos establecidos en este artículo sin resolver de fondo la situación jurídica o cuando excedió el término inicial de seguimiento sin emitir la prórroga, PERDERÁ COMPETENCIA de manera inmediata y deberá remitir el expediente al Juez de Familia para que este decida de fondo la situación jurídica en un término no superior a dos (2) meses' (art. 103). SANCIÓN: 'El incumplimiento de los términos para la tramitación y decisión del proceso administrativo de restablecimiento de derechos por parte de las autoridades administrativas y judiciales será causal de falta gravísima' (art. 100 parágrafo 4).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Síntesis de los hechos en que se funda",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 101 inc. 1"
+        },
+        {
+          "n": 2,
+          "name": "Examen crítico de las pruebas y fundamentos jurídicos de la decisión",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 101 inc. 1"
+        },
+        {
+          "n": 3,
+          "name": "Declaratoria expresa de la situación de vulneración de derechos",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 100"
+        },
+        {
+          "n": 4,
+          "name": "Señalamiento concreto de una o varias medidas de restablecimiento, con su justificación y forma de cumplimiento",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, arts. 101 inc. 2 y 107"
+        },
+        {
+          "n": 5,
+          "name": "Periodicidad de la evaluación de la medida y orden de seguimiento por término no superior a seis (6) meses desde la ejecutoria",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, arts. 101 inc. 2 y 103"
+        },
+        {
+          "n": 6,
+          "name": "Órdenes a particulares y a autoridades prestadoras de servicios para la ejecución inmediata de la medida",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 101 inc. 2"
+        },
+        {
+          "n": 7,
+          "name": "Constancia de notificación en estrados y del recurso de reposición interpuesto verbalmente por los asistentes",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, arts. 100 inc. 6 y 102 inc. 3"
+        },
+        {
+          "n": 8,
+          "name": "Advertencia del término de quince (15) días desde la ejecutoria para manifestar inconformidad y provocar la homologación",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 100"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1098_2006_pr002.html"
+    },
+    {
+      "exact_name": "Resolución que declara la adoptabilidad del niño, niña o adolescente",
+      "area": "FAMILIA_ADMINISTRATIVA",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 1098 de 2006, art. 100 y parágrafo 7 (modificado por el art. 4 de la Ley 1878 de 2018); art. 101; art. 103 (modificado por el art. 6 de la Ley 1878 de 2018 y por el art. 208 de la Ley 1955 de 2019); art. 107 (modificado por el art. 7 de la Ley 1878 de 2018); art. 108 y su parágrafo (modificado por el art. 8 de la Ley 1878 de 2018)",
+      "competent_authority": "Defensor de familia del ICBF: 'Declarar la situación de adoptabilidad en que se encuentre el niño, niña o adolescente' es función suya (Ley 1098 de 2006, art. 82 num. 14). El comisario o comisaria de familia la profiere únicamente en los municipios donde el ICBF no haya designado defensor, porque 'La competencia subsidiaria prevista en el artículo 98 de la Ley 1098 de 2006 o la norma que la modifique o adicione, será asumida por los comisarios y Comisarías de Familia SOLO en aquellos municipios donde el Instituto Colombiano de Bienestar Familiar no hubiere designado un defensor o defensora de familia' (Ley 2126 de 2021, art. 5 parágrafo 3). La HOMOLOGACIÓN, cuando procede, corresponde al Juez de Familia en ÚNICA instancia (Ley 1098 de 2006, art. 119 num. 1)",
+      "term": "SEIS MESES IMPRORROGABLES para definir la situación jurídica (Ley 1098 de 2006, art. 100). CUÁNDO SUBE AL JUEZ Y CUÁNDO NO, QUE ES LO QUE DECIDE TODO: 'Cuando se declare la adoptabilidad de un niño, una niña o un adolescente HABIENDO EXISTIDO OPOSICIÓN en cualquier etapa de la actuación administrativa, y cuando la oposición se presente en la oportunidad prevista en el artículo 100 del presente Código, el Defensor de Familia deberá remitir el expediente al Juez de Familia para su homologación' (art. 108 inc. 1); y por la vía del art. 100, la remisión procede 'si dentro de los quince (15) días siguientes a su ejecutoria, alguna de las partes o el Ministerio Público manifiestan su inconformidad con la decisión'. SIN OPOSICIÓN NI INCONFORMIDAD OPORTUNA NO HAY JUEZ, y el efecto es inmediato: 'La resolución que declare la adoptabilidad producirá, respecto de los padres, la terminación de la patria potestad del niño, niña o adolescente adoptable y deberá ser inscrita en el libro de varios de la notaría o en la oficina de registro del estado civil correspondiente. La anotación deberá realizarse en un término no superior a diez (10) días a partir de la solicitud de la autoridad' (art. 108 inc. 2). EFECTO PRECLUSIVO ABSOLUTO: 'En firme la providencia que declara al niño, niña o adolescente en adoptabilidad o el acto de voluntad de darlo en adopción, NO PODRÁ ADELANTARSE PROCESO ALGUNO DE RECLAMACIÓN DE LA PATERNIDAD, O MATERNIDAD, ni procederá el reconocimiento voluntario del niño, niña o adolescente, y de producirse serán nulos e ineficaces de pleno derecho' (art. 108 parágrafo). REMISIÓN AL COMITÉ DE ADOPCIONES: la historia de atención se remite 'en un término no mayor a diez (10) días' (art. 108 inc. 3). RECURSO: reposición verbal en la audiencia para quienes asistieron, o notificación por estado para quienes no, resuelta 'dentro de los diez (10) días siguientes a su formulación' (art. 100 inc. 6). CONSENTIMIENTO PARA LA ADOPCIÓN: 'Cuando la definición de la situación jurídica concluya con resolución que deje en firme el consentimiento para la adopción, deberá adelantar el trámite establecido en los incisos 2 y 3 del artículo 108' (art. 100 parágrafo 7).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Síntesis de los hechos, examen crítico de las pruebas y fundamentos jurídicos",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 101 inc. 1"
+        },
+        {
+          "n": 2,
+          "name": "Constancia del agotamiento del seguimiento y de por qué la familia no cuenta con condiciones para garantizar los derechos",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 103"
+        },
+        {
+          "n": 3,
+          "name": "Declaratoria expresa de la situación de adoptabilidad",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, arts. 100 y 108"
+        },
+        {
+          "n": 4,
+          "name": "Orden de una o varias medidas de restablecimiento de derechos",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 107"
+        },
+        {
+          "n": 5,
+          "name": "Declaración de la terminación de la patria potestad respecto de los padres",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 108 inc. 2"
+        },
+        {
+          "n": 6,
+          "name": "Orden de inscripción en el libro de varios de la notaría o en la oficina de registro del estado civil, dentro de los diez (10) días",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 108 inc. 2"
+        },
+        {
+          "n": 7,
+          "name": "Constancia de si hubo oposición en la actuación administrativa, que es lo que determina la remisión al juez para homologación",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 108 inc. 1"
+        },
+        {
+          "n": 8,
+          "name": "Orden de remisión de la historia de atención al Comité de Adopciones dentro de los diez (10) días",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 108 inc. 3"
+        },
+        {
+          "n": 9,
+          "name": "Advertencia del recurso de reposición y del término de quince (15) días para manifestar inconformidad",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 100"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1098_2006_pr002.html"
+    },
+    {
+      "exact_name": "Resolución que modifica la medida de restablecimiento de derechos",
+      "area": "FAMILIA_ADMINISTRATIVA",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 1098 de 2006, art. 103 (modificado por el art. 6 de la Ley 1878 de 2018 y por el art. 208 de la Ley 1955 de 2019); art. 100 incs. 6 y 7; arts. 53 a 56, 101 y 107",
+      "competent_authority": "La autoridad administrativa que tenga la competencia del proceso: defensor de familia, comisario o comisaria de familia o, en su defecto, inspector de policía (Ley 1098 de 2006, arts. 98 y 103)",
+      "term": "LA FORMA DEPENDE DEL MOMENTO, Y DE ELLA DEPENDE SI HAY CONTROL JUDICIAL. (1) DESPUÉS DEL FALLO: 'La autoridad administrativa que tenga la competencia del proceso podrá modificar las medidas de restablecimiento de derechos previstas en este Código cuando esté demostrada la alteración de las circunstancias que dieron lugar a ellas. La resolución que así lo disponga se proferirá EN AUDIENCIA y estará sometida a los MECANISMOS DE OPOSICIÓN ESTABLECIDOS PARA EL FALLO en el artículo 100 del presente Código, cuando la modificación se genere con posterioridad a dicha actuación' (Ley 1098 de 2006, art. 103 inc. 1) —es decir, reposición verbal en audiencia o por estado, resuelta dentro de los diez (10) días, y manifestación de inconformidad dentro de los quince (15) días siguientes a la ejecutoria para provocar la homologación—. (2) ANTES DE LA AUDIENCIA DE PRUEBAS Y FALLO: 'Cuando el cambio de medida se produzca antes de la audiencia de pruebas y fallo, deberá realizarse mediante AUTO MOTIVADO, notificado por estado, EL CUAL NO ES SUSCEPTIBLE DE RECURSO ALGUNO' (art. 103 inc. 3). TAMPOCO TIENE RECURSO el auto que fija fecha y hora de la audiencia: 'se notificará por estado y no tendrá recursos' (art. 103 inc. 2). PRESUPUESTO SUSTANCIAL: la modificación solo procede 'cuando esté demostrada la alteración de las circunstancias que dieron lugar a ellas' (inc. 1). RELOJ EXTERNO QUE SIGUE CORRIENDO MIENTRAS SE MODIFICA: los seis (6) meses de seguimiento desde la ejecutoria del fallo, su prórroga de hasta seis (6) meses por resolución motivada notificada por estado, y el tope de dieciocho (18) meses del proceso con seguimiento; superados, la autoridad 'perderá competencia de manera inmediata y deberá remitir el expediente al Juez de Familia para que este decida de fondo la situación jurídica en un término no superior a dos (2) meses. Si la autoridad administrativa no remite el expediente, el Director Regional hará la remisión al Juez de Familia' (art. 103).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del proceso, del fallo y de la medida vigente que se modifica",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 103 inc. 1"
+        },
+        {
+          "n": 2,
+          "name": "Prueba de la alteración de las circunstancias que dieron lugar a la medida",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 103 inc. 1"
+        },
+        {
+          "n": 3,
+          "name": "Determinación de la forma: resolución en audiencia si es posterior al fallo, o auto motivado notificado por estado si es anterior a la audiencia de pruebas y fallo",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 103 incs. 1 y 3"
+        },
+        {
+          "n": 4,
+          "name": "Señalamiento concreto de la nueva medida, su justificación, forma de cumplimiento y periodicidad de evaluación",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, arts. 101 inc. 2 y 107"
+        },
+        {
+          "n": 5,
+          "name": "Advertencia de los mecanismos de oposición del art. 100, o de que el auto no admite recurso alguno, según el caso",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 103 incs. 1 y 3"
+        },
+        {
+          "n": 6,
+          "name": "Verificación de que no se han superado el término de seguimiento ni el tope de dieciocho (18) meses",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 103"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1098_2006_pr002.html"
+    },
+    {
+      "exact_name": "Resolución de prórroga del término de seguimiento en el proceso administrativo de restablecimiento de derechos",
+      "area": "FAMILIA_ADMINISTRATIVA",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 1098 de 2006, art. 103 (modificado por el art. 6 de la Ley 1878 de 2018 y por el art. 208 de la Ley 1955 de 2019); art. 100 parágrafo 4",
+      "competent_authority": "La autoridad administrativa que tenga la competencia del proceso: defensor de familia, comisario o comisaria de familia o, en su defecto, inspector de policía (Ley 1098 de 2006, arts. 98 y 103). Si no se expide a tiempo, la competencia pasa por ministerio de la ley al JUEZ DE FAMILIA, y si la autoridad no remite el expediente, 'el Director Regional hará la remisión al Juez de Familia'",
+      "term": "ESTA RESOLUCIÓN EXISTE PARA EVITAR UNA PÉRDIDA DE COMPETENCIA, Y SU OMISIÓN LA CAUSA POR SÍ SOLA. Seguimiento inicial: 'la autoridad administrativa deberá hacer seguimiento por un término que no exceda SEIS (6) MESES, contados a partir de la ejecutoria del fallo' (Ley 1098 de 2006, art. 103). Prórroga: 'En los casos excepcionales que la autoridad administrativa considere que debe superarse el término de seguimiento, deberá prorrogarlo mediante RESOLUCIÓN MOTIVADA por un término que NO PODRÁ EXCEDER DE SEIS (6) MESES, contados a partir del vencimiento del término de seguimiento inicial. La prórroga deberá notificarse por Estado' (art. 103). Tope global: 'El Proceso Administrativo de Restablecimiento de Derechos con el seguimiento tendrá una duración de DIECIOCHO (18) MESES, contados a partir del conocimiento de los hechos por parte de la autoridad administrativa hasta la declaratoria de adoptabilidad o el cierre del proceso por haberse evidenciado con los seguimientos, que la ubicación en medio familiar fue la medida idónea' (art. 103, texto del art. 208 de la Ley 1955 de 2019). SANCIÓN PROCESAL EXPRESA POR NO PRORROGAR A TIEMPO: 'Cuando la autoridad administrativa supere los términos establecidos en este artículo sin resolver de fondo la situación jurídica o CUANDO EXCEDIÓ EL TÉRMINO INICIAL DE SEGUIMIENTO SIN EMITIR LA PRÓRROGA, perderá competencia de manera inmediata y deberá remitir el expediente al Juez de Familia para que este decida de fondo la situación jurídica en un término no superior a dos (2) meses' (art. 103). AMPLIACIÓN EXCEPCIONAL DEL TÉRMINO MÁXIMO, QUE ES OTRA FIGURA Y EXIGE AVAL PREVIO: 'en los casos en que se advierta que un proceso no puede ser definido de fondo en el término máximo establecido, por las situaciones fácticas y probatorias que reposan en el expediente, el ICBF reglamentará un mecanismo para analizar el proceso y darle el aval a la autoridad administrativa para la ampliación del término'; y 'En los casos en que se otorgue el aval, la autoridad administrativa emitirá una resolución motivada decretando la ampliación del término y relacionando el acervo documental que soporta esta decisión' (art. 103, incisos adicionados por el art. 208 de la Ley 1955 de 2019). SANCIÓN DISCIPLINARIA: el incumplimiento de los términos 'será causal de falta gravísima' (art. 100 parágrafo 4).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del proceso, del fallo y de la fecha de su ejecutoria",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 103"
+        },
+        {
+          "n": 2,
+          "name": "Constancia de la fecha de vencimiento del término inicial de seguimiento de seis (6) meses",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 103"
+        },
+        {
+          "n": 3,
+          "name": "Motivación del carácter excepcional de la prórroga",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 103"
+        },
+        {
+          "n": 4,
+          "name": "Fijación del nuevo término, que no puede exceder de seis (6) meses contados desde el vencimiento del inicial",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 103"
+        },
+        {
+          "n": 5,
+          "name": "Verificación de que el proceso con seguimiento no supera los dieciocho (18) meses, y aval del ICBF cuando se requiera ampliación del término máximo",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 103, texto del art. 208 de la Ley 1955 de 2019"
+        },
+        {
+          "n": 6,
+          "name": "Relación del acervo documental que soporta la decisión, cuando se trate de ampliación avalada por el ICBF",
+          "mandatory": false,
+          "basis": "Ley 1098 de 2006, art. 103"
+        },
+        {
+          "n": 7,
+          "name": "Orden de notificación por estado",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 103"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1098_2006_pr002.html"
+    },
+    {
+      "exact_name": "Auto que remite el expediente al juez de familia por pérdida de competencia de la autoridad administrativa",
+      "area": "FAMILIA_ADMINISTRATIVA",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 1098 de 2006, art. 100 y sus parágrafos 2, 4 y 5 (modificado por el art. 4 de la Ley 1878 de 2018); art. 103 (modificado por el art. 6 de la Ley 1878 de 2018 y por el art. 208 de la Ley 1955 de 2019); arts. 119 y 120",
+      "competent_authority": "Lo profiere el defensor de familia, comisario o comisaria de familia o, en su defecto, inspector de policía que perdió la competencia; se dirige al JUEZ DE FAMILIA y, donde no exista, al Juez Civil Municipal o Promiscuo Municipal (Ley 1098 de 2006, art. 120). Si la autoridad administrativa no remite: 'En los casos que la autoridad administrativa pierda competencia y no remita el proceso al Juez de Familia dentro del término señalado en este artículo, el Director Regional del ICBF estará facultado para remitirlo al juez de familia' (art. 100)",
+      "term": "TRES DÍAS PARA REMITIR, Y LA COMPETENCIA YA ESTÁ PERDIDA ANTES DE ESCRIBIRLO: 'Vencido el término para fallar o para resolver el recurso de reposición sin haberse emitido la decisión correspondiente, la autoridad administrativa PERDERÁ COMPETENCIA para seguir conociendo del asunto y remitirá DENTRO DE LOS TRES (3) DÍAS SIGUIENTES el expediente al juez de familia para que resuelva el recurso o defina la situación jurídica del niño, niña o adolescente en un término máximo de dos (2) meses. Cuando el juez reciba el expediente deberá informarlo a la Procuraduría General de la Nación para que se promueva la investigación disciplinaria a que haya lugar' (Ley 1098 de 2006, art. 100). CUATRO CAUSALES DISTINTAS, CADA UNA CON SU RELOJ: (1) vencimiento de los SEIS (6) MESES improrrogables para definir la situación jurídica (art. 100); (2) vencimiento del término para resolver la reposición, que es de diez (10) días desde su formulación (art. 100 inc. 6); (3) yerros del trámite advertidos después de vencido ese término: 'La subsanación de los yerros que se produzcan en el trámite administrativo, podrán hacerse mediante auto que decrete la nulidad de la actuación específica, siempre y cuando se evidencien antes del vencimiento del término para definir la situación jurídica; EN CASO DE HABERSE SUPERADO ESTE TÉRMINO, la autoridad administrativa competente no podrá subsanar la actuación y deberá remitir el expediente al Juez de Familia para su revisión, quien determinará si hay lugar a decretar la nulidad de lo actuado y en estos casos, resolver de fondo la situación jurídica del niño, niña y adolescente conforme los términos establecidos en esta ley e informará a la Procuraduría General de la Nación' (art. 100 parágrafo 2), regla que se repite para las nulidades del CGP (parágrafo 5); (4) exceso del término de seguimiento o falta de prórroga oportuna: 'perderá competencia de manera inmediata y deberá remitir el expediente al Juez de Familia para que este decida de fondo la situación jurídica en un término no superior a dos (2) meses' (art. 103). RELOJES DEL JUEZ, QUE NO SON LOS DEL CLIENTE: 'El juez resolverá en un término no superior a DOS (2) MESES, contados a partir del día siguiente a la radicación del proceso, so pena que se promueva la investigación disciplinaria a que haya lugar'; 'Si el juez no resuelve el proceso en este término, perderá competencia para seguir conociendo del asunto, remitirá inmediatamente el expediente al juez de familia que le sigue en turno y se pondrá en conocimiento del Consejo Superior de la Judicatura' (art. 100); si lo que se remite es la homologación del fallo, el término del juez es de veinte (20) días (art. 100). SANCIÓN: 'El incumplimiento de los términos para la tramitación y decisión del proceso administrativo de restablecimiento de derechos por parte de las autoridades administrativas y judiciales será causal de falta gravísima' (art. 100 parágrafo 4).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del proceso, del niño, niña o adolescente y de las medidas de restablecimiento vigentes",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, arts. 100 y 101"
+        },
+        {
+          "n": 2,
+          "name": "Indicación de la causal de pérdida de competencia y de la fecha exacta en que se produjo",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, arts. 100 y 103"
+        },
+        {
+          "n": 3,
+          "name": "Constancia de la fecha de conocimiento de los hechos, de la que corren los seis (6) meses improrrogables",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 100"
+        },
+        {
+          "n": 4,
+          "name": "Constancia de que la remisión se hace dentro de los tres (3) días siguientes",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 100"
+        },
+        {
+          "n": 5,
+          "name": "Identificación de lo que el juez debe resolver: recurso de reposición pendiente, definición de la situación jurídica, o revisión y eventual nulidad de lo actuado",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, arts. 100 y 100 par. 2"
+        },
+        {
+          "n": 6,
+          "name": "Orden de informe a la Procuraduría General de la Nación",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 100 y par. 2"
+        },
+        {
+          "n": 7,
+          "name": "Relación del expediente y del estado de cumplimiento de las medidas en curso",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, arts. 101 y 103"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1098_2006_pr002.html"
+    },
+    {
+      "exact_name": "Resolución que fija obligaciones provisionales de alimentos, custodia y visitas por conciliación fallida",
+      "area": "FAMILIA_ADMINISTRATIVA",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 1098 de 2006, art. 100 parágrafo 1 (modificado por el art. 4 de la Ley 1878 de 2018); art. 111 nums. 2 y 3; art. 82 nums. 9 y 13; Ley 2126 de 2021, art. 13 nums. 10 y 11",
+      "competent_authority": "Defensor de familia, comisario o comisaria de familia o, en su defecto, inspector de policía (Ley 1098 de 2006, art. 98). El comisario de familia también puede 'Definir provisionalmente sobre la custodia y cuidado personal, la cuota de alimentos y la reglamentación de visitas, la suspensión de la vida en común de los cónyuges o compañeros permanentes y fijar las cauciones de comportamiento conyugal, en las situaciones de violencia señaladas en el numeral 4o del artículo 5o de esta ley' (Ley 2126 de 2021, art. 13 num. 10), y fijar cuota provisional de alimentos de personas adultas mayores (num. 11)",
+      "term": "EL PLAZO QUE SIGUE A ESTA RESOLUCIÓN ES DEL CIUDADANO, Y SON CINCO DÍAS: 'En caso de evidenciarse vulneración de derechos susceptibles de conciliación en cualquier etapa del proceso, el funcionario provocará la conciliación y en caso de que fracase o se declare fallida, mediante RESOLUCIÓN MOTIVADA fijará las obligaciones provisionales respecto a custodia, alimentos y visitas y en caso de que alguna de las partes lo solicite DENTRO DE LOS CINCO (5) DÍAS SIGUIENTES, el funcionario presentará demanda ante el Juez competente' (Ley 1098 de 2006, art. 100 parágrafo 1). En el trámite autónomo de alimentos el plazo es de cinco días HÁBILES: 'sólo se remitirá el informe al juez si alguna de las partes lo solicita dentro de los cinco días hábiles siguientes' (art. 111 num. 2). Vencidos sin solicitud, la fijación provisional administrativa queda como única decisión y el asunto no pasa al juez por esa vía. CUÁNDO NO HACE FALTA QUE NADIE LO PIDA: si se ignora la dirección de notificación del obligado, la autoridad 'elaborará informe que suplirá la demanda y lo remitirá al Juez de Familia para que inicie el respectivo proceso' de oficio (art. 111 num. 2). LO QUE DEBE CONTENER EL ACTA SI SÍ HAY ACUERDO, y que esta resolución sustituye cuando no lo hay: 'el monto de la cuota alimentaria y la fórmula para su reajuste periódico; el lugar y la forma de su cumplimento; la persona a quien debe hacerse el pago, los descuentos salariales, las garantías que ofrece el obligado y demás aspectos que se estimen necesarios para asegurar el cabal cumplimiento de la obligación alimentaria' (art. 111 num. 3). ESTA RESOLUCIÓN NO SUSPENDE LOS SEIS (6) MESES improrrogables del art. 100 para definir la situación jurídica.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del proceso y de las partes, y constancia de que la conciliación fracasó o se declaró fallida",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 100 par. 1"
+        },
+        {
+          "n": 2,
+          "name": "Motivación sobre la vulneración de derechos susceptible de conciliación",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 100 par. 1"
+        },
+        {
+          "n": 3,
+          "name": "Fijación provisional de la cuota de alimentos, con monto, fórmula de reajuste, lugar y forma de pago y persona a quien debe pagarse",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, arts. 100 par. 1 y 111 num. 3"
+        },
+        {
+          "n": 4,
+          "name": "Fijación provisional de la custodia y cuidado personal",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 100 par. 1"
+        },
+        {
+          "n": 5,
+          "name": "Fijación provisional del régimen de visitas",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 100 par. 1"
+        },
+        {
+          "n": 6,
+          "name": "Advertencia del término de cinco (5) días para solicitar que se presente la demanda ante el juez competente",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, arts. 100 par. 1 y 111 num. 2"
+        },
+        {
+          "n": 7,
+          "name": "Constancia de la citación del obligado o de que se desconoce su dirección de notificación, caso en el cual el informe se remite de oficio",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 111 num. 2"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1098_2006_pr002.html"
+    },
+    {
+      "exact_name": "Acta de conciliación ante el defensor o comisario de familia",
+      "area": "FAMILIA_ADMINISTRATIVA",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 1098 de 2006, art. 111 nums. 2, 3 y 4; art. 82 nums. 8, 9 y 10; art. 109; art. 100 parágrafo 1; Ley 2126 de 2021, arts. 13 num. 10 y 26; Decreto 1069 de 2015, art. 2.2.3.8.2.6",
+      "competent_authority": "Defensor de familia del ICBF, que además APRUEBA la conciliación (Ley 1098 de 2006, art. 82 num. 9); comisario o comisaria de familia en sus competencias propias y subsidiarias (Ley 2126 de 2021, arts. 13 num. 10 y 26; Ley 1098 de 2006, art. 98); en ausencia de ambos, inspector de policía. La aprobación no corresponde al juez de familia",
+      "term": "EL ACTA CIERRA EL PLAZO DE CINCO DÍAS QUE HABRÍA CORRIDO SI NO HUBIERA ACUERDO: solo si la conciliación fracasa nace la carga de pedir la remisión al juez 'dentro de los cinco días hábiles siguientes' (Ley 1098 de 2006, art. 111 num. 2) o 'dentro de los cinco (5) días siguientes' (art. 100 parágrafo 1). CONTENIDO OBLIGATORIO, VERIFICADO EN EL TEXTO: 'Cuando se logre conciliación se levantará acta en la que se indicará: el monto de la cuota alimentaria y la fórmula para su reajuste periódico; el lugar y la forma de su cumplimento; la persona a quien debe hacerse el pago, los descuentos salariales, las garantías que ofrece el obligado y demás aspectos que se estimen necesarios para asegurar el cabal cumplimiento de la obligación alimentaria. De ser el caso, la autoridad promoverá la conciliación sobre custodia, régimen de visitas y demás aspectos conexos' (art. 111 num. 3). Se aplica también 'al ofrecimiento de alimentos a niños, las niñas o los adolescentes' (num. 4). RECONOCIMIENTO DE PATERNIDAD EN LA MISMA SEDE Y CON LA MISMA FORMA: 'Cuando el padre extramatrimonial reconozca, ante el defensor, el comisario de familia o el inspector de policía, la paternidad de un niño, una niña o un adolescente, se levantará acta y se ordenará su inscripción en el registro del estado civil' (art. 109). LÍMITE QUE AGOTA LA ETAPA SIN ACUERDO: 'Con la manifestación de la mujer víctima de no conciliar quedará agotada la etapa de conciliación y se dará continuidad al proceso' (Decreto 1069 de 2015, art. 2.2.3.8.2.6). NO SE VERIFICÓ TÉRMINO ALGUNO para celebrar la audiencia de conciliación ni para suscribir el acta: leídos los arts. 82, 100 parágrafo 1, 109 y 111 de la Ley 1098 de 2006, ninguno lo fija. Lo que sí existe es el tope general de seis (6) meses del art. 100 cuando la conciliación se provoca dentro de un proceso de restablecimiento de derechos.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la autoridad, de las partes y de los niños, niñas o adolescentes beneficiarios",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 111"
+        },
+        {
+          "n": 2,
+          "name": "Monto de la cuota alimentaria y fórmula para su reajuste periódico",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 111 num. 3"
+        },
+        {
+          "n": 3,
+          "name": "Lugar y forma de cumplimiento y persona a quien debe hacerse el pago",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 111 num. 3"
+        },
+        {
+          "n": 4,
+          "name": "Descuentos salariales y garantías que ofrece el obligado",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 111 num. 3"
+        },
+        {
+          "n": 5,
+          "name": "Acuerdos sobre custodia, cuidado personal y régimen de visitas y demás aspectos conexos",
+          "mandatory": false,
+          "basis": "Ley 1098 de 2006, arts. 82 num. 9 y 111 num. 3"
+        },
+        {
+          "n": 6,
+          "name": "Aprobación de la conciliación por el defensor de familia",
+          "mandatory": true,
+          "basis": "Ley 1098 de 2006, art. 82 num. 9"
+        },
+        {
+          "n": 7,
+          "name": "Constancia de que a la mujer víctima se le informó su derecho a no ser confrontada con el agresor y a no conciliar",
+          "mandatory": false,
+          "basis": "Decreto 1069 de 2015, art. 2.2.3.8.2.6"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1098_2006_pr002.html"
+    }
+  ]
+}

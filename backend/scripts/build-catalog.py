@@ -165,6 +165,13 @@ BRANCHES = [
         'AMBIENTAL',
         'ambiental',
     ),
+    (
+        'actuaciones-familia-administrativa.json',
+        'familia-administrativa.ts',
+        'FAMILIA_ADMINISTRATIVA_CATALOG',
+        'FAMILIA_ADMINISTRATIVA',
+        'familia_administrativa',
+    ),
 ]
 
 

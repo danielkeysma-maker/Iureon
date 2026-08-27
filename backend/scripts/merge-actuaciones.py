@@ -58,6 +58,7 @@ FILE_FOR_BRANCH = {
     'ARBITRAJE': 'actuaciones-arbitraje.json',
     'INSOLVENCIA': 'actuaciones-insolvencia.json',
     'AMBIENTAL': 'actuaciones-ambiental.json',
+    'FAMILIA_ADMINISTRATIVA': 'actuaciones-familia-administrativa.json',
 }
 
 # Mirrors the allowlist in catalog.check.ts. Duplicated on purpose: a merge that

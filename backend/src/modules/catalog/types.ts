@@ -28,7 +28,8 @@ export type LegalBranch =
   | 'DISCIPLINARIO'
   | 'ARBITRAJE'
   | 'INSOLVENCIA'
-  | 'AMBIENTAL';
+  | 'AMBIENTAL'
+  | 'FAMILIA_ADMINISTRATIVA';
 
 /** Who authors the document. */
 /**

@@ -33,6 +33,10 @@ export const BRANCH_LABELS: Record<string, string> = {
   ARBITRAJE: 'Arbitraje Nacional (Ley 1563)',
   INSOLVENCIA: 'Insolvencia de Persona Natural',
   AMBIENTAL: 'Ambiental & Sancionatorio (ANLA & CAR)',
+  // Comisarias y defensorias de familia: administrativo, no policivo ni
+  // judicial. El comisario no figura entre las autoridades de policia del
+  // art. 198 de la Ley 1801, y el juez de familia entra despues.
+  FAMILIA_ADMINISTRATIVA: 'Comisarías & Defensorías de Familia',
   // Not catalogued: kept so its legacy document types remain reachable.
   'PEQUEÑAS_CAUSAS': 'Pequeñas Causas (Mínima Cuantía)'
 };
