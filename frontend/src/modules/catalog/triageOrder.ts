@@ -21,6 +21,22 @@ import type { Actuacion } from './types';
  * caducan (no hay reloj que comparar) y con las no verificadas (afirmar un
  * plazo que nadie comprobó es justo lo que el catálogo existe para impedir).
  *
+ * LÍMITE CONOCIDO, Y ES EL DEFECTO CARACTERÍSTICO DE ESTE CATÁLOGO CON OTRO
+ * TRAJE: se lee el PRIMER plazo de la frase, y ese puede ser el reloj de la
+ * autoridad y no el del cliente. Visto en producción con la acción de tutela:
+ * su término empieza «Dentro de los diez (10) días siguientes… el juez
+ * proferirá el fallo», que es el plazo del JUEZ para decidir; para quien la
+ * interpone la tutela no caduca — «puede interponerse en todo momento y
+ * lugar». Aquí el orden salió bien por otra razón (la tutela es lo más urgente
+ * de todos modos), pero el criterio no distingue de quién es el reloj.
+ *
+ * NO SE ARREGLA AQUÍ CON MÁS EXPRESIONES REGULARES. La distinción vive en la
+ * prosa de la ficha, no en un campo: el catálogo no guarda «días del cliente»
+ * aparte de «días de la autoridad». Arreglarlo de verdad pide un campo nuevo
+ * en la ficha, y hasta que exista este orden es una ayuda, no una afirmación
+ * — por eso la pantalla dice en qué se basa el orden, en vez de presentarlo
+ * como un hecho.
+ *
  * SIN `normalize('NFD')` NI CLASES DE COMBINANTES. La primera versión quitaba
  * las tildes con una clase de acentos sueltos, que son invisibles en el editor
  * y en el diff: si un guardado los normaliza, la clase deja de coincidir sin
