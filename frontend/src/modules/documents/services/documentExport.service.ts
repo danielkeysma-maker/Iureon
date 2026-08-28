@@ -88,6 +88,27 @@ export function markdownBoldToHtml(text: string): string {
     .replace(/^-{3,}$/gm, '');
 }
 
+/**
+ * Decisiones POR ESCRITO, no preferencias permanentes.
+ *
+ * Cada exportacion las decide de nuevo: el mismo abogado radica un PDF con
+ * membrete ante un juzgado y manda un Word sin membrete a un colega. Si
+ * vivieran en Ajustes, la eleccion de un escrito quedaria pegada al siguiente.
+ */
+export interface OpcionesDeExportacion {
+  /** El encabezado y pie con los datos de la firma. */
+  conMembrete: boolean;
+  /**
+   * La jurisprudencia citada, como hoja final del documento.
+   *
+   * Va como LISTA y no como booleano: las fuentes son del borrador, no del
+   * servicio, y este archivo no debe conocer de donde salen.
+   */
+  fuentes?: string[];
+}
+
+const OPCIONES_POR_DEFECTO: OpcionesDeExportacion = { conMembrete: true };
+
 export class DocumentExportService {
   /**
    * Exporta el borrador jurídico a Microsoft Word (.docx) con negritas reales
@@ -95,7 +116,8 @@ export class DocumentExportService {
   public static async exportToWordDocx(
     documentTitle: string,
     legalContentText: string,
-    branding: FirmBrandingConfig = DEFAULT_FIRM_BRANDING
+    branding: FirmBrandingConfig = DEFAULT_FIRM_BRANDING,
+    opciones: OpcionesDeExportacion = OPCIONES_POR_DEFECTO
   ): Promise<void> {
     const paragraphs = legalContentText.split('\n').map((rawLine) => {
       const line = cleanMarkdownLine(rawLine);
@@ -124,6 +146,30 @@ export class DocumentExportService {
       });
     });
 
+    /*
+     * LA HOJA DE FUENTES VA AL FINAL Y EN SU PROPIA SECCION VISUAL.
+     * Es la lista de jurisprudencia que el escrito uso, para que quien reciba
+     * el documento pueda verificar cada cita sin tener la aplicacion.
+     */
+    if (opciones.fuentes && opciones.fuentes.length > 0) {
+      paragraphs.push(
+        new Paragraph({ spacing: { after: 240 }, children: [] }),
+        new Paragraph({
+          spacing: { after: 160 },
+          children: [
+            new TextRun({ text: 'FUENTES CITADAS', bold: true, size: 24, font: 'Calibri' })
+          ]
+        }),
+        ...opciones.fuentes.map(
+          (fuente) =>
+            new Paragraph({
+              spacing: { after: 100 },
+              children: [new TextRun({ text: `- ${fuente}`, size: 20, font: 'Calibri' })]
+            })
+        )
+      );
+    }
+
     const doc = new Document({
       sections: [
         {
@@ -137,8 +183,14 @@ export class DocumentExportService {
               }
             }
           },
-          headers: {
-            default: new DocxHeader({
+          /*
+           * Sin membrete no hay encabezado, y el pie conserva SOLO la
+           * numeracion: "Pagina 2 de 6" no es identidad de la firma, es lo que
+           * evita que un juzgado reciba hojas sueltas sin orden.
+           */
+          headers: opciones.conMembrete
+            ? {
+                default: new DocxHeader({
               children: [
                 new Paragraph({
                   alignment: AlignmentType.RIGHT,
@@ -159,19 +211,24 @@ export class DocumentExportService {
                   ]
                 })
               ]
-            })
-          },
+                })
+              }
+            : undefined,
           footers: {
             default: new DocxFooter({
               children: [
                 new Paragraph({
                   alignment: AlignmentType.CENTER,
                   children: [
-                    new TextRun({
-                      text: `${branding.firmAddress} - ${branding.firmPhone} - `,
-                      size: 14,
-                      color: '64748B'
-                    }),
+                    ...(opciones.conMembrete
+                      ? [
+                          new TextRun({
+                            text: `${branding.firmAddress} - ${branding.firmPhone} - `,
+                            size: 14,
+                            color: '64748B'
+                          })
+                        ]
+                      : []),
                     new TextRun({
                       children: ['Página ', PageNumber.CURRENT, ' de ', PageNumber.TOTAL_PAGES],
                       size: 14,
@@ -197,7 +254,8 @@ export class DocumentExportService {
   public static async exportToPdf(
     documentTitle: string,
     legalContentText: string,
-    branding: FirmBrandingConfig = DEFAULT_FIRM_BRANDING
+    branding: FirmBrandingConfig = DEFAULT_FIRM_BRANDING,
+    opciones: OpcionesDeExportacion = OPCIONES_POR_DEFECTO
   ): Promise<void> {
     const doc = new jsPDF({
       orientation: 'p',
@@ -211,19 +269,21 @@ export class DocumentExportService {
     const contentWidth = 215.9 - pageMarginLeft - pageMarginRight;
     let currentY = pageMarginTop;
 
-    // Membrete de la Firma en la parte superior
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.setTextColor(30, 41, 59);
-    doc.text(branding.firmName, pageMarginLeft, 15);
+    // Membrete de la Firma en la parte superior — solo si el escrito lo pide.
+    if (opciones.conMembrete) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(30, 41, 59);
+      doc.text(branding.firmName, pageMarginLeft, 15);
 
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    doc.setTextColor(100, 116, 139);
-    doc.text(`${branding.firmNit} | ${branding.firmPhone}`, pageMarginLeft, 19);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(100, 116, 139);
+      doc.text(`${branding.firmNit} | ${branding.firmPhone}`, pageMarginLeft, 19);
 
-    doc.setDrawColor(203, 213, 225);
-    doc.line(pageMarginLeft, 22, 215.9 - pageMarginRight, 22);
+      doc.setDrawColor(203, 213, 225);
+      doc.line(pageMarginLeft, 22, 215.9 - pageMarginRight, 22);
+    }
 
     // Formatear líneas del texto jurídico
     doc.setFontSize(10.5);
@@ -255,12 +315,14 @@ export class DocumentExportService {
           if (currentY > 250) {
             doc.addPage();
             currentY = 25;
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(9);
-            doc.setTextColor(100, 116, 139);
-            doc.text(branding.firmName, pageMarginLeft, 15);
-            doc.setDrawColor(203, 213, 225);
-            doc.line(pageMarginLeft, 17, 215.9 - pageMarginRight, 17);
+            if (opciones.conMembrete) {
+              doc.setFont('helvetica', 'bold');
+              doc.setFontSize(9);
+              doc.setTextColor(100, 116, 139);
+              doc.text(branding.firmName, pageMarginLeft, 15);
+              doc.setDrawColor(203, 213, 225);
+              doc.line(pageMarginLeft, 17, 215.9 - pageMarginRight, 17);
+            }
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(10.5);
             doc.setTextColor(15, 23, 42);
@@ -278,12 +340,14 @@ export class DocumentExportService {
           if (currentY > 250) {
             doc.addPage();
             currentY = 25;
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(9);
-            doc.setTextColor(100, 116, 139);
-            doc.text(branding.firmName, pageMarginLeft, 15);
-            doc.setDrawColor(203, 213, 225);
-            doc.line(pageMarginLeft, 17, 215.9 - pageMarginRight, 17);
+            if (opciones.conMembrete) {
+              doc.setFont('helvetica', 'bold');
+              doc.setFontSize(9);
+              doc.setTextColor(100, 116, 139);
+              doc.text(branding.firmName, pageMarginLeft, 15);
+              doc.setDrawColor(203, 213, 225);
+              doc.line(pageMarginLeft, 17, 215.9 - pageMarginRight, 17);
+            }
             doc.setFontSize(10.5);
             doc.setTextColor(15, 23, 42);
           }
@@ -323,6 +387,36 @@ export class DocumentExportService {
         }
       }
       currentY += 2;
+    }
+
+    /*
+     * LA HOJA DE FUENTES CITADAS, en pagina propia.
+     * Para que quien reciba el PDF pueda verificar cada cita sin la aplicacion.
+     */
+    if (opciones.fuentes && opciones.fuentes.length > 0) {
+      doc.addPage();
+      currentY = pageMarginTop;
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(15, 23, 42);
+      doc.text('FUENTES CITADAS', pageMarginLeft, currentY);
+      currentY += 8;
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9.5);
+      for (const fuente of opciones.fuentes) {
+        const envueltas = doc.splitTextToSize(`- ${fuente}`, contentWidth);
+        for (const linea of envueltas) {
+          if (currentY > 250) {
+            doc.addPage();
+            currentY = 25;
+          }
+          doc.text(linea, pageMarginLeft, currentY);
+          currentY += 5.5;
+        }
+        currentY += 1.5;
+      }
     }
 
     doc.save(documentTitle.endsWith('.pdf') ? documentTitle : `${documentTitle}.pdf`);

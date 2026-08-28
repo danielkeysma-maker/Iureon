@@ -96,7 +96,11 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
         onApplyReplacement={handleApplyReplacement}
       />
 
-      <div className={`mx-auto w-full ${isFocusMode ? 'max-w-[860px]' : 'max-w-[684px]'}`}>
+      {/*
+        816px EN PANTALLA COMPLETA: el ancho de una carta a 96dpi. En pantalla
+        completa el escrito se revisa como papel, y el papel tiene un ancho.
+      */}
+      <div className={`mx-auto w-full ${isFocusMode ? 'max-w-[816px]' : 'max-w-[684px]'}`}>
         {/*
           EL PAPEL. Sin borde inferior ni radio abajo: se apoya en el fondo del
           lienzo, como una hoja que sigue más allá del recorte. Un rectángulo

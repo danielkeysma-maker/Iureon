@@ -273,17 +273,43 @@ export function App() {
     setIsSavedDraftsModalOpen(false);
   };
 
-  const handleExportWord = () => {
+  /*
+   * Las opciones vienen de la barra superior, donde se deciden por escrito.
+   * `conFuentes` se traduce aqui a la lista real: el header decide SI se anexa,
+   * y este es quien tiene el borrador con la jurisprudencia citada.
+   */
+  const opcionesDeExportacion = (opts?: { conMembrete: boolean; conFuentes: boolean }) => ({
+    conMembrete: opts?.conMembrete ?? true,
+    fuentes:
+      opts?.conFuentes && workflow.generatedDraft?.jurisprudenciaCitada.length
+        ? workflow.generatedDraft.jurisprudenciaCitada
+        : undefined
+  });
+
+  const handleExportWord = (opts?: { conMembrete: boolean; conFuentes: boolean }) => {
     if (workflow.generatedDraft) {
-      DocumentExportService.exportToWordDocx(workflow.generatedDraft.title, workflow.generatedDraft.legalText, firmBranding);
+      DocumentExportService.exportToWordDocx(
+        workflow.generatedDraft.title,
+        workflow.generatedDraft.legalText,
+        firmBranding,
+        opcionesDeExportacion(opts)
+      );
     }
   };
 
-  const handleExportPdf = () => {
+  const handleExportPdf = (opts?: { conMembrete: boolean; conFuentes: boolean }) => {
     if (workflow.generatedDraft) {
-      DocumentExportService.exportToPdf(workflow.generatedDraft.title, workflow.generatedDraft.legalText, firmBranding);
+      DocumentExportService.exportToPdf(
+        workflow.generatedDraft.title,
+        workflow.generatedDraft.legalText,
+        firmBranding,
+        opcionesDeExportacion(opts)
+      );
     }
   };
+
+  /* El borrador guardado que esta abierto en el panel, si hay uno. */
+  const borradorAbierto = savedDrafts.find((d) => d.id === loadedDraftId) ?? null;
 
   const sampleSubscriptionInfo: FirmSubscriptionInfo = {
     firmName: activeFirm.name,
@@ -403,6 +429,13 @@ export function App() {
           onCopyText={workflow.handleCopyText}
           onExportWord={handleExportWord}
           onExportPdf={handleExportPdf}
+          hayFuentes={(workflow.generatedDraft?.jurisprudenciaCitada.length ?? 0) > 0}
+          estadoDelBorrador={borradorAbierto?.estado ?? null}
+          onMarcarListo={
+            borradorAbierto
+              ? () => void updateMetadata(borradorAbierto.id, { estado: 'LISTO' })
+              : undefined
+          }
           isFocusMode={workflow.isFocusMode}
           onToggleFocusMode={() => workflow.setIsFocusMode(!workflow.isFocusMode)}
           onOpenUserManagementModal={() => setIsUserManagementModalOpen(true)}
