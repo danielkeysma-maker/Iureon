@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { Building2, Palette, User } from 'lucide-react';
 import { usePreferences } from '../preferences';
 import { AppearanceSection } from './AppearanceSection';
+import { FirmBrandingModal } from '../../tenant/components/FirmBrandingModal';
+import { FirmUsersDialog } from '../../tenant/components/FirmUsersDialog';
+import { useTenant } from '../../tenant/TenantContext';
 
 /**
  * Ajustes, dividido en "Suyos" y "De la firma".
@@ -35,16 +38,33 @@ const SUYOS: Entrada[] = [
   { id: 'cuenta', label: 'Su cuenta', icono: User, pendiente: true }
 ];
 
+/*
+ * Tres de las cuatro dejaron de ser "pronto": la marca vive en la firma
+ * (firms.branding), el formato viaja al motor que escribe, y los usuarios
+ * salen de Supabase Auth con su consumo del mes. Documento y formato ES la
+ * seccion de formato del mismo dialogo de marca — separarlos duplicaria el
+ * formulario que decide una sola cosa. Plan y facturacion sigue pendiente:
+ * la facturacion electronica esta en cola con nombre propio.
+ */
 const DE_LA_FIRMA: Entrada[] = [
-  { id: 'documento', label: 'Documento y formato', icono: Building2, pendiente: true },
-  { id: 'membrete', label: 'Marca y membrete', icono: Building2, pendiente: true },
-  { id: 'usuarios', label: 'Usuarios y roles', icono: Building2, pendiente: true },
+  { id: 'documento', label: 'Documento y formato', icono: Building2 },
+  { id: 'membrete', label: 'Marca y membrete', icono: Building2 },
+  { id: 'usuarios', label: 'Usuarios y roles', icono: Building2 },
   { id: 'plan', label: 'Plan y facturación', icono: Building2, pendiente: true }
 ];
 
 export const SettingsView: React.FC = () => {
   const [seccion, setSeccion] = useState<Seccion>('apariencia');
   const { prefs, cambiar } = usePreferences();
+  const { activeFirm } = useTenant();
+  const [marcaAbierta, setMarcaAbierta] = useState(false);
+  const [usuariosAbierto, setUsuariosAbierto] = useState(false);
+
+  const abrirEntrada = (id: string) => {
+    if (id === 'documento' || id === 'membrete') setMarcaAbierta(true);
+    else if (id === 'usuarios') setUsuariosAbierto(true);
+    else setSeccion(id as Seccion);
+  };
 
   const Grupo: React.FC<{ titulo: string; entradas: Entrada[] }> = ({ titulo, entradas }) => (
     <div className="mb-5">
@@ -57,7 +77,7 @@ export const SettingsView: React.FC = () => {
           <button
             key={e.id}
             disabled={e.pendiente}
-            onClick={() => !e.pendiente && setSeccion(e.id as Seccion)}
+            onClick={() => !e.pendiente && abrirEntrada(e.id)}
             title={e.pendiente ? 'Todavía no está construido' : undefined}
             className={`flex w-full items-center gap-2 rounded-control px-2 py-[7px] text-left text-ui transition-colors ${
               activa
@@ -96,6 +116,14 @@ export const SettingsView: React.FC = () => {
         <main className="min-w-0 flex-1">
           {seccion === 'apariencia' && <AppearanceSection prefs={prefs} cambiar={cambiar} />}
         </main>
+
+        <FirmBrandingModal isOpen={marcaAbierta} onClose={() => setMarcaAbierta(false)} />
+        <FirmUsersDialog
+          isOpen={usuariosAbierto}
+          onClose={() => setUsuariosAbierto(false)}
+          firmName={activeFirm?.name ?? ''}
+          firmNit={activeFirm?.nit}
+        />
       </div>
     </div>
   );
