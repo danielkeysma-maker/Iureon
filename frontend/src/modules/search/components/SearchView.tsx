@@ -220,34 +220,44 @@ export const SearchView: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 bg-slate-50/50 p-6 lg:p-8 overflow-y-auto font-sans">
-      <div className="max-w-5xl mx-auto space-y-5">
-        <div className="bg-white border border-slate-200/80 rounded-xl p-4 space-y-3 shadow-sm">
+    <div className="flex h-full min-h-0 flex-1 flex-col bg-canvas font-sans">
+      <header className="flex shrink-0 flex-wrap items-end gap-3 border-b border-line-200 bg-surface px-5 py-3.5">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-title text-ink-900">Buscador</h1>
+          <p className="mt-0.5 text-meta text-ink-500">
+            Jurisprudencia del corpus, y del registro oficial cuando el corpus no alcanza.
+          </p>
+        </div>
+      </header>
+
+      <div className="min-h-0 flex-1 overflow-y-auto p-5">
+      <div className="max-w-5xl mx-auto space-y-4">
+        <div className="bg-surface border border-line-200 rounded-card p-4 space-y-3 shadow-e1">
           <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
             <div className="flex-1 relative">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+              <Search className="w-4 h-4 text-ink-400 absolute left-3.5 top-3" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && runSearch()}
                 placeholder="Buscar en el corpus indexado (ej. estabilidad laboral reforzada, mínimo vital, contrato realidad)..."
-                className="w-full bg-slate-50/70 border border-slate-200/80 rounded-xl pl-10 pr-4 py-2.5 text-slate-800 text-[13px] font-sans focus:outline-none focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900/40"
+                className="w-full bg-canvas border border-line-200 rounded-card pl-10 pr-4 py-2.5 text-ink-900 text-[13px] font-sans focus:outline-none focus:ring-1 focus:ring-brand-700/20 focus:border-brand-700"
               />
             </div>
 
             <button
               onClick={runSearch}
               disabled={isLoading || !searchQuery.trim()}
-              className="px-4 py-2.5 bg-blue-950 text-white rounded-xl text-[13px] font-semibold flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-blue-900 transition-colors"
+              className="px-4 py-2.5 bg-brand-700 text-white rounded-card text-[13px] font-semibold flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-brand-800 transition-colors"
             >
               {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Scale className="w-4 h-4" />}
               <span>{isLoading ? 'Buscando' : 'Buscar'}</span>
             </button>
           </div>
 
-          <div className="flex items-center gap-2 pt-2 border-t border-slate-100 text-[12px] flex-wrap">
-            <span className="text-slate-400 font-medium flex items-center gap-1">
+          <div className="flex items-center gap-2 pt-2 border-t border-line-100 text-[12px] flex-wrap">
+            <span className="text-ink-400 font-medium flex items-center gap-1">
               <Filter className="w-3 h-3" />
               Corporación:
             </span>
@@ -255,8 +265,8 @@ export const SearchView: React.FC = () => {
               <button
                 key={corp.id}
                 onClick={() => setSelectedCorp(corp.id)}
-                className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all ${
-                  selectedCorp === corp.id ? 'bg-blue-950 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'
+                className={`px-2.5 py-1 rounded-control text-[11px] font-semibold transition-all ${
+                  selectedCorp === corp.id ? 'bg-brand-700 text-white' : 'bg-canvas text-ink-500 hover:bg-line-100'
                 }`}
               >
                 {corp.label}
@@ -267,7 +277,7 @@ export const SearchView: React.FC = () => {
 
         <div className="space-y-3">
           {status === null && !isLoading && (
-            <div className="bg-white border border-slate-200/80 rounded-xl p-8 text-center text-slate-400 text-[13px]">
+            <div className="bg-surface border border-line-200 rounded-card p-8 text-center text-ink-400 text-[13px]">
               Escriba una consulta para buscar en el corpus indexado.
             </div>
           )}
@@ -282,25 +292,25 @@ export const SearchView: React.FC = () => {
             además lo que confirmó que la sentencia existe antes de descargarla.
           */}
           {loadingRuling && (
-            <div className="bg-white border border-slate-200/80 rounded-xl p-4 flex items-center gap-2 text-[13px] text-slate-500">
+            <div className="bg-surface border border-line-200 rounded-card p-4 flex items-center gap-2 text-[13px] text-ink-500">
               <Loader2 className="w-4 h-4 animate-spin" />
               Buscando la sentencia en el sitio de la Corte…
             </div>
           )}
 
           {rulingError && !loadingRuling && (
-            <div className="bg-amber-50/60 border border-amber-200/70 rounded-xl p-4 flex items-start gap-3">
-              <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-              <p className="text-[13px] text-amber-900 leading-relaxed">{rulingError}</p>
+            <div className="bg-[rgb(var(--unverified-surf))] border border-[rgb(var(--unverified-line))] rounded-card p-4 flex items-start gap-3">
+              <AlertTriangle className="w-4 h-4 text-unverified flex-shrink-0 mt-0.5" />
+              <p className="text-[13px] text-ink-900 leading-relaxed">{rulingError}</p>
             </div>
           )}
 
           {ruling && (
-            <div className="bg-white border-2 border-blue-900/25 rounded-xl overflow-hidden shadow-sm">
-              <header className="px-4 py-3 bg-blue-950 text-white">
+            <div className="bg-surface border-2 border-brand-700 rounded-card overflow-hidden shadow-e1">
+              <header className="px-4 py-3 bg-brand-700 text-white">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-[10px] uppercase tracking-wide text-blue-300 font-bold">
+                    <p className="text-[10px] uppercase tracking-wide text-on-brand font-bold">
                       Traída del sitio oficial de la Corte, no del corpus
                     </p>
                     <h3 className="text-sm font-black">Sentencia {ruling.citation}</h3>
@@ -309,12 +319,12 @@ export const SearchView: React.FC = () => {
                     href={ruling.sourceUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[11px] text-blue-200 hover:text-white flex items-center gap-1 flex-shrink-0"
+                    className="text-[11px] text-on-brand hover:text-on-brand flex items-center gap-1 flex-shrink-0"
                   >
                     Abrir en la relatoría <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>
-                <p className="text-[11px] text-blue-200 mt-1">
+                <p className="text-[11px] text-on-brand mt-1">
                   {[ruling.proceso, ruling.sala, ruling.fecha, ruling.magistrado && `M.P. ${ruling.magistrado}`]
                     .filter(Boolean)
                     .join(' · ')}
@@ -322,12 +332,12 @@ export const SearchView: React.FC = () => {
               </header>
 
               <div className="p-4">
-                <p className="text-[13px] text-slate-700 leading-relaxed whitespace-pre-wrap max-h-72 overflow-y-auto">
+                <p className="text-[13px] text-ink-700 leading-relaxed whitespace-pre-wrap max-h-72 overflow-y-auto">
                   {ruling.text.slice(0, 4000)}
                   {ruling.text.length > 4000 && '…'}
                 </p>
                 {ruling.text.length > 4000 && (
-                  <p className="text-[11px] text-slate-500 mt-2">
+                  <p className="text-[11px] text-ink-500 mt-2">
                     Se muestran los primeros 4.000 de {ruling.text.length.toLocaleString('es-CO')}{' '}
                     caracteres. El texto completo está en la relatoría.
                   </p>
@@ -337,7 +347,7 @@ export const SearchView: React.FC = () => {
           )}
 
           {loadingDiscovery && (
-            <div className="bg-white border border-slate-200/80 rounded-xl p-4 flex items-center gap-2 text-[13px] text-slate-500">
+            <div className="bg-surface border border-line-200 rounded-card p-4 flex items-center gap-2 text-[13px] text-ink-500">
               <Loader2 className="w-4 h-4 animate-spin" />
               El corpus no tiene nada sobre esto. Buscando en el sitio de la Corte…
             </div>
@@ -352,8 +362,8 @@ export const SearchView: React.FC = () => {
           */}
           {discovery?.status === 'OK' && discovery.found.length > 0 && (
             <div className="space-y-3">
-              <div className="bg-blue-950 text-white rounded-xl px-4 py-2.5">
-                <p className="text-[10px] uppercase tracking-wide text-blue-300 font-bold">
+              <div className="bg-brand-700 text-white rounded-card px-4 py-2.5">
+                <p className="text-[10px] uppercase tracking-wide text-on-brand font-bold">
                   No estaba en el corpus · traído del sitio oficial de la Corte
                 </p>
                 <p className="text-[12px]">
@@ -362,7 +372,7 @@ export const SearchView: React.FC = () => {
                   descargada{discovery.found.length === 1 ? '' : 's'}.
                 </p>
                 {indexed > 0 && (
-                  <p className="text-[11px] text-blue-300 mt-0.5">
+                  <p className="text-[11px] text-on-brand mt-0.5">
                     {indexed} quedó{indexed === 1 ? '' : 'aron'} en el corpus: la próxima consulta
                     sobre esto responde al instante.
                   </p>
@@ -370,12 +380,12 @@ export const SearchView: React.FC = () => {
               </div>
 
               {discovery.found.map(({ ruling: r, motivo }) => (
-                <div key={r.citation} className="bg-white border border-blue-900/20 rounded-xl overflow-hidden">
-                  <header className="px-4 py-3 border-b border-slate-100 bg-slate-50/60">
+                <div key={r.citation} className="bg-surface border border-line-200 rounded-card overflow-hidden">
+                  <header className="px-4 py-3 border-b border-line-100 bg-canvas">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <h3 className="text-[13px] font-black text-slate-900">Sentencia {r.citation}</h3>
-                        <p className="text-[11px] text-slate-500">
+                        <h3 className="text-[13px] font-black text-ink-900">Sentencia {r.citation}</h3>
+                        <p className="text-[11px] text-ink-500">
                           {[r.proceso, r.sala, r.fecha, r.magistrado && `M.P. ${r.magistrado}`]
                             .filter(Boolean)
                             .join(' · ')}
@@ -385,14 +395,14 @@ export const SearchView: React.FC = () => {
                         href={r.sourceUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[11px] text-blue-800 hover:underline flex items-center gap-1 flex-shrink-0"
+                        className="text-[11px] text-brand-700 hover:underline flex items-center gap-1 flex-shrink-0"
                       >
                         Abrir <ExternalLink className="w-3 h-3" />
                       </a>
                     </div>
-                    {motivo && <p className="text-[10px] text-slate-400 mt-1 truncate">{motivo}</p>}
+                    {motivo && <p className="text-[10px] text-ink-400 mt-1 truncate">{motivo}</p>}
                   </header>
-                  <p className="p-4 text-[13px] text-slate-700 leading-relaxed max-h-48 overflow-y-auto whitespace-pre-wrap">
+                  <p className="p-4 text-[13px] text-ink-700 leading-relaxed max-h-48 overflow-y-auto whitespace-pre-wrap">
                     {r.text.slice(0, 2500)}
                     {r.text.length > 2500 && '…'}
                   </p>
@@ -406,14 +416,14 @@ export const SearchView: React.FC = () => {
                 puntería nadie puede evaluar.
               */}
               {discovery.descartadas.length > 0 && (
-                <details className="bg-slate-50 border border-slate-200 rounded-xl p-3">
-                  <summary className="text-[11px] text-slate-600 cursor-pointer">
+                <details className="bg-canvas border border-line-200 rounded-card p-3">
+                  <summary className="text-[11px] text-ink-500 cursor-pointer">
                     {discovery.descartadas.length} propuesta
                     {discovery.descartadas.length === 1 ? '' : 's'} que el registro oficial rechazó
                   </summary>
                   <ul className="mt-2 space-y-1">
                     {discovery.descartadas.map((d) => (
-                      <li key={d.cita} className="text-[10px] text-slate-500">
+                      <li key={d.cita} className="text-[10px] text-ink-500">
                         <span className="font-semibold">{d.cita}</span> — {d.razon}
                       </li>
                     ))}
@@ -424,9 +434,9 @@ export const SearchView: React.FC = () => {
           )}
 
           {status !== null && visible.length === 0 && !isLoading && (
-            <div className="bg-amber-50/60 border border-amber-200/70 rounded-xl p-6 flex items-start gap-3">
-              <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-              <div className="text-[13px] text-amber-900 leading-relaxed">
+            <div className="bg-[rgb(var(--unverified-surf))] border border-[rgb(var(--unverified-line))] rounded-card p-6 flex items-start gap-3">
+              <AlertTriangle className="w-4 h-4 text-unverified flex-shrink-0 mt-0.5" />
+              <div className="text-[13px] text-ink-900 leading-relaxed">
                 <p className="font-semibold mb-1">Sin resultados</p>
                 <p>{emptyMessage(status, reason, lastQuery)}</p>
               </div>
@@ -440,35 +450,42 @@ export const SearchView: React.FC = () => {
             así que no lleva hechos ni ratio escritos por una persona. Dejarlo
             pasar por curado sería promoverlo en silencio.
           */}
-          {visible.map((item) => (
+          {/*
+            DOS BLOQUES CON ENCABEZADO PROPIO, no un chip perdido en la tarjeta.
+
+            Lo curado lo leyo una persona y lleva sus hechos y su ratio; lo
+            automatico lo trajo el buscador del registro oficial y NADIE lo ha
+            leido. La diferencia no es un matiz de estilo: citar algo que nadie
+            leyo debe costar un clic mas — por eso el bloque automatico no tiene
+            boton de copiar cita, solo el camino a la fuente.
+          */}
+          {visible.filter((i) => i.curado !== false).length > 0 && (
+            <p className="t-head rounded-t-card border border-b-0 border-line-200">
+              Corpus curado · {visible.filter((i) => i.curado !== false).length} — una persona la leyó y extrajo sus hechos y su ratio
+            </p>
+          )}
+          {visible.filter((i) => i.curado !== false).map((item) => (
             <div
               key={item.id}
-              className="bg-white border border-slate-200/80 rounded-xl p-5 space-y-3 shadow-sm"
+              className="bg-surface border border-line-200 rounded-card p-5 space-y-3 shadow-e1"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-3 min-w-0">
                   {item.outcome && (
-                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                      item.outcome === 'CONCEDIDO' ? 'bg-emerald-50' : 'bg-rose-50'
+                    <div className={`w-7 h-7 rounded-control flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                      item.outcome === 'CONCEDIDO' ? 'bg-[rgb(var(--verified-surf))]' : 'bg-[rgb(var(--danger)/0.08)]'
                     }`}>
                       {item.outcome === 'CONCEDIDO'
-                        ? <ThumbsUp className="w-3.5 h-3.5 text-emerald-600" />
-                        : <ThumbsDown className="w-3.5 h-3.5 text-rose-500" />}
+                        ? <ThumbsUp className="w-3.5 h-3.5 text-verified" />
+                        : <ThumbsDown className="w-3.5 h-3.5 text-danger" />}
                     </div>
                   )}
                   <div className="min-w-0">
-                    <h3 className="font-bold text-slate-900 text-[14px] leading-tight">
+                    {/* En mono y de primero: es el dato que el abogado copia. */}
+                    <h3 className="font-mono text-[13.5px] font-semibold leading-tight text-ink-900">
                       {item.providencia ?? 'Fragmento sin providencia registrada'}
-                      {item.curado === false && (
-                        <span
-                          className="ml-2 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 align-middle"
-                          title="Traída del sitio oficial por el buscador. El texto es el de la fuente; nadie la ha leído para extraer sus hechos ni su ratio."
-                        >
-                          sin curar
-                        </span>
-                      )}
                     </h3>
-                    <span className="text-[11px] text-slate-400 font-medium mt-0.5 block">
+                    <span className="text-[11px] text-ink-400 font-medium mt-0.5 block">
                       {[item.corporacion?.replace(/_/g, ' '), item.magistradoPonente && `M.P. ${item.magistradoPonente}`, item.branch]
                         .filter(Boolean)
                         .join(' · ') || 'Procedencia no registrada'}
@@ -476,20 +493,20 @@ export const SearchView: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5 flex-shrink-0">
-                  <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                  <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-canvas text-ink-700 border border-line-200">
                     {(item.similarity * 100).toFixed(0)}%
                   </span>
                   {item.isSharedCorpus && (
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-blue-50 text-blue-800">
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-brand-50 text-brand-700">
                       CORPUS
                     </span>
                   )}
                 </div>
               </div>
 
-              <div className="text-[12px] text-slate-600 leading-relaxed bg-slate-50 p-3.5 rounded-lg whitespace-pre-wrap">
+              <blockquote className="whitespace-pre-wrap border-l-2 border-brand-700 pl-3.5 font-legal text-[13px] leading-[1.7] text-ink-700">
                 {readableChunk(item.contentChunk)}
-              </div>
+              </blockquote>
 
               <div className="flex items-center justify-between pt-1">
                 {item.sourceUrl ? (
@@ -497,13 +514,13 @@ export const SearchView: React.FC = () => {
                     href={item.sourceUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-[11px] text-blue-900 font-semibold flex items-center gap-1 hover:underline"
+                    className="text-[11px] text-brand-700 font-semibold flex items-center gap-1 hover:underline"
                   >
-                    <ExternalLink className="w-3.5 h-3.5 text-blue-700" />
+                    <ExternalLink className="w-3.5 h-3.5 text-brand-700" />
                     <span>Leer la providencia en la fuente oficial</span>
                   </a>
                 ) : (
-                  <span className="text-[11px] text-slate-400 font-medium">
+                  <span className="text-[11px] text-ink-400 font-medium">
                     Este fragmento no registró su fuente.
                   </span>
                 )}
@@ -511,15 +528,74 @@ export const SearchView: React.FC = () => {
                 <button
                   onClick={() => handleCopyCitation(item)}
                   disabled={!item.providencia}
-                  className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200/80 text-slate-700 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 transition-colors flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-3 py-1.5 bg-canvas hover:bg-line-100 text-ink-700 rounded-control text-[11px] font-semibold flex items-center gap-1.5 transition-colors flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  {copiedId === item.id ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3 text-slate-400" />}
-                  <span>{copiedId === item.id ? 'Copiado' : 'Copiar cita'}</span>
+                  {copiedId === item.id ? <Check className="w-3 h-3 text-verified" /> : <Copy className="w-3 h-3 text-ink-400" />}
+                  <span>{copiedId === item.id ? 'Copiada' : 'Citar en el escrito'}</span>
                 </button>
               </div>
             </div>
           ))}
+
+          {/* ─── DESCUBRIMIENTO AUTOMÁTICO · nadie de la firma la ha leído ── */}
+          {visible.filter((i) => i.curado === false).length > 0 && (
+            <>
+              <p className="t-head mt-4 rounded-t-card border border-b-0 border-line-200">
+                Descubrimiento automático · {visible.filter((i) => i.curado === false).length} —
+                relevancia del modelo, sin lectura humana
+              </p>
+              {visible.filter((i) => i.curado === false).map((item) => (
+                <div
+                  key={item.id}
+                  /* Más bajo en contraste a propósito: es igual de real y no es lo mismo. */
+                  className="space-y-2.5 rounded-card border border-line-200 bg-canvas p-4"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      {/* La providencia en mono: es el dato que se copia. */}
+                      <h3 className="font-mono text-[13.5px] font-semibold text-ink-900">
+                        {item.providencia ?? 'Fragmento sin providencia registrada'}
+                      </h3>
+                      <span className="mt-0.5 block text-[12px] text-ink-500">
+                        {[item.corporacion?.replace(/_/g, ' '), item.magistradoPonente && `M.P. ${item.magistradoPonente}`]
+                          .filter(Boolean)
+                          .join(' · ') || 'Procedencia no registrada'}
+                      </span>
+                    </div>
+                    <span className="chip-unverified shrink-0">Automático</span>
+                  </div>
+
+                  {/* Filete PUNTEADO: la cita de algo que nadie ha leído. */}
+                  <blockquote className="border-l-2 border-dashed border-line-200 pl-3 font-legal text-[13px] leading-[1.7] text-ink-700">
+                    {readableChunk(item.contentChunk).slice(0, 600)}
+                  </blockquote>
+
+                  {/*
+                    SIN BOTÓN DE CITAR. El único camino es leerla en la fuente:
+                    citar algo que nadie leyó debe costar un clic más.
+                  */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-meta text-ink-400">
+                      Hallada en el registro oficial · sin lectura humana
+                    </span>
+                    {item.sourceUrl && (
+                      <a
+                        href={item.sourceUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center gap-1 text-[11.5px] font-semibold text-brand-700 hover:underline"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                        Leer en la fuente oficial
+                      </a>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
         </div>
+      </div>
       </div>
     </div>
   );
