@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { fetchOfficialRuling } from './officialRuling.service';
 import { discoverRulings } from './discovery.service';
+import { buscarEnCndj } from './cndjRuling.service';
 import { autoIngest } from './autoIngest.service';
 
 /**
@@ -36,6 +37,48 @@ export const rulingController = async (req: Request, res: Response): Promise<voi
     case 'UNREACHABLE':
       // 503 y no 404: el registro no respondió, que no es lo mismo que decir
       // que la sentencia no existe.
+      res.status(503).json({ success: false, error: outcome.status, message: outcome.reason });
+      return;
+  }
+};
+
+/**
+ * GET /api/jurisprudence/disciplinaria?tema=...
+ *
+ * La Comisión Nacional de Disciplina Judicial, que es la que juzga la conducta
+ * de abogados y funcionarios judiciales.
+ *
+ * VA APARTE DEL DESCUBRIMIENTO Y NO ES CAPRICHO. `discover` busca en la
+ * relatoría de la Corte Constitucional y confirma cada candidata contra el
+ * registro abierto del Estado; la CNDJ tiene su propia relatoría, con su propio
+ * formato de radicación y sin registro externo que la respalde. Mezclarlas en
+ * un endpoint obligaría a la pantalla a adivinar de dónde vino cada cosa, y de
+ * dónde viene una providencia es justo lo que decide si se puede citar.
+ *
+ * LOS TRES ESTADOS SE DEVUELVEN DISTINTOS, por la misma razón que en `ruling`:
+ * «no tiene nada» y «no se pudo consultar» son respuestas opuestas para quien
+ * pregunta.
+ */
+export const disciplinariaController = async (req: Request, res: Response): Promise<void> => {
+  const tema = String(req.query.tema ?? '').trim();
+
+  if (!tema) {
+    res.status(400).json({ success: false, error: 'MISSING_TOPIC', message: 'Falta el tema.' });
+    return;
+  }
+
+  const outcome = await buscarEnCndj(tema);
+
+  switch (outcome.status) {
+    case 'FOUND':
+      res.json({ success: true, rulings: outcome.rulings });
+      return;
+    case 'NOT_FOUND':
+      res.json({ success: true, rulings: [], reason: outcome.reason });
+      return;
+    case 'UNAVAILABLE':
+      // 503: la relatoría no respondió. No es lo mismo que decir que no hay
+      // providencias sobre el asunto.
       res.status(503).json({ success: false, error: outcome.status, message: outcome.reason });
       return;
   }

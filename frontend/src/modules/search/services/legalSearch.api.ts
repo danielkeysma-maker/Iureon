@@ -137,6 +137,26 @@ export const discoverRulings = (tema: string) =>
     `/api/jurisprudence/discover?tema=${encodeURIComponent(tema)}`
   );
 
+/**
+ * La Comisión Nacional de Disciplina Judicial, por su relatoría propia.
+ *
+ * VA APARTE DEL DESCUBRIMIENTO porque su procedencia es otra: `discover` trae
+ * de la Corte Constitucional y confirma cada cita contra el registro abierto
+ * del Estado; esto viene de la relatoría de la CNDJ, sin registro externo que
+ * la respalde. De dónde viene una providencia es lo que decide si se puede
+ * citar, así que la pantalla no debe tener que adivinarlo.
+ */
+export interface DisciplinariaResponse {
+  success: boolean;
+  rulings: OfficialRuling[];
+  reason?: string;
+}
+
+export const buscarDisciplinaria = (tema: string) =>
+  httpClient.get<DisciplinariaResponse>(
+    `/api/jurisprudence/disciplinaria?tema=${encodeURIComponent(tema)}`
+  );
+
 /** Indexa en el corpus lo que el descubrimiento acaba de traer. */
 export const indexDiscovered = (citas: string[]) =>
   httpClient.post<{ results: Array<{ citation: string; status: string; chunks?: number }> }>(

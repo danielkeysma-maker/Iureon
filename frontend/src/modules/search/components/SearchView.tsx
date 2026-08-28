@@ -3,6 +3,7 @@ import { Search, Scale, ThumbsUp, ThumbsDown, Copy, Check, Filter, ExternalLink,
 import {
   searchPrecedents,
   fetchOfficialRuling,
+  buscarDisciplinaria,
   discoverRulings,
   indexDiscovered,
   citationShape
@@ -35,11 +36,24 @@ import type {
  *     source instead.
  */
 
+/*
+ * LAS CORPORACIONES QUE ESTE PRODUCTO PUEDE ALCANZAR DE VERDAD.
+ *
+ * Se retiró «Consejo de Estado». Estaba en la lista sin fuente detrás: su API
+ * oficial existe pero responde «No se envió Api Key», y las credenciales no son
+ * de autoservicio — hay un derecho de petición redactado y sin enviar. Una
+ * opción que el abogado elige y que jamás puede devolver nada le enseña que el
+ * buscador no sirve, sobre la única pantalla cuyo valor es que lo que muestra
+ * está comprobado. Vuelve el día que haya llave.
+ *
+ * Entra la Comisión Nacional de Disciplina Judicial, que sí tiene relatoría
+ * propia alcanzable y es la que juzga la conducta de abogados y funcionarios.
+ */
 const CORPORACIONES = [
   { id: 'TODAS', label: 'Todas las corporaciones' },
   { id: 'CORTE_CONSTITUCIONAL', label: 'Corte Constitucional' },
   { id: 'CORTE_SUPREMA', label: 'Corte Suprema' },
-  { id: 'CONSEJO_ESTADO', label: 'Consejo de Estado' }
+  { id: 'COMISION_DISCIPLINA', label: 'Disciplina Judicial' }
 ];
 
 /**
@@ -110,6 +124,12 @@ export const SearchView: React.FC = () => {
    * que el corpus ya responde bien, y no enseñaría nada nuevo sobre dónde falta.
    */
   const [discovery, setDiscovery] = useState<DiscoveryResponse | null>(null);
+  /*
+   * Lo que la relatoría de la CNDJ devolvió. Va aparte del descubrimiento
+   * porque su procedencia es otra y la pantalla lo dice.
+   */
+  const [disciplinarias, setDisciplinarias] = useState<OfficialRuling[]>([]);
+  const [buscandoDisciplinaria, setBuscandoDisciplinaria] = useState(false);
   const [loadingDiscovery, setLoadingDiscovery] = useState(false);
   const [indexed, setIndexed] = useState(0);
 
@@ -128,6 +148,7 @@ export const SearchView: React.FC = () => {
     setRuling(null);
     setRulingError('');
     setDiscovery(null);
+    setDisciplinarias([]);
     setIndexed(0);
     setLastQuery(query);
 
@@ -187,6 +208,22 @@ export const SearchView: React.FC = () => {
        * antes de mostrarse — el buscador solo apunta.
        */
       if (!corpusAlcanza && !citationShape(query)) {
+        /*
+         * LA CNDJ SE CONSULTA EN PARALELO, no después.
+         *
+         * Son fuentes distintas que no compiten: la relatoría de la Corte
+         * Constitucional y la de la Comisión Nacional de Disciplina Judicial no
+         * tienen las mismas providencias, y encadenarlas haría esperar dos
+         * viajes al abogado para que solo respondiera una. Falla en silencio
+         * porque es un extra: si la relatoría disciplinaria no está, la búsqueda
+         * en la Corte sigue su curso.
+         */
+        setBuscandoDisciplinaria(true);
+        void buscarDisciplinaria(query)
+          .then((r) => setDisciplinarias(r.rulings ?? []))
+          .catch(() => setDisciplinarias([]))
+          .finally(() => setBuscandoDisciplinaria(false));
+
         setLoadingDiscovery(true);
         try {
           const hallazgo = await discoverRulings(query);
@@ -454,6 +491,70 @@ export const SearchView: React.FC = () => {
             preguntado esto antes. Mostrarlo junto a lo indexado haría que un
             hallazgo recién descargado pareciera curado.
           */}
+          {buscandoDisciplinaria && (
+            <div className="flex items-center gap-2 rounded-card border border-line-200 bg-surface p-4 text-[13px] text-ink-500">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Consultando la relatoría de Disciplina Judicial…
+            </div>
+          )}
+
+          {/*
+            ─── LO DISCIPLINARIO, CON SU PROCEDENCIA A LA VISTA ──────────────
+
+            Bloque propio y no mezclado con lo demás. Estas providencias vienen
+            de la relatoría de la Comisión Nacional de Disciplina Judicial, que
+            es la que juzga la conducta de abogados y funcionarios judiciales —
+            no de la Corte Constitucional ni del corpus curado, y NO pasan por el
+            registro abierto del Estado, porque para esta corporación no existe
+            uno. Un abogado que va a citar necesita saber eso antes de citar.
+          */}
+          {disciplinarias.length > 0 && (
+            <div className="space-y-3">
+              <div className="rounded-card bg-brand-700 px-4 py-2.5 text-on-brand">
+                <p className="text-[10px] font-bold uppercase tracking-wide">
+                  Comisión Nacional de Disciplina Judicial · relatoría oficial
+                </p>
+                <p className="text-[12px]">
+                  {disciplinarias.length} providencia{disciplinarias.length === 1 ? '' : 's'}{' '}
+                  descargada{disciplinarias.length === 1 ? '' : 's'} de la fuente. No están en el
+                  corpus curado: nadie de la firma las ha leído todavía.
+                </p>
+              </div>
+
+              {disciplinarias.map((r) => (
+                <article
+                  key={r.sourceUrl}
+                  className="overflow-hidden rounded-card border border-line-200 bg-surface"
+                >
+                  <header className="flex items-start justify-between gap-3 border-b border-line-100 bg-canvas px-4 py-3">
+                    <div className="min-w-0">
+                      <h3 className="text-[13px] font-black text-ink-900">
+                        Radicación {r.citation}
+                      </h3>
+                      <p className="text-[11px] text-ink-500">
+                        {[r.sala, r.fecha].filter(Boolean).join(' · ')}
+                      </p>
+                    </div>
+                    <a
+                      href={r.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex flex-shrink-0 items-center gap-1 text-[11px] text-brand-700 hover:underline"
+                    >
+                      Ver el PDF oficial
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </header>
+
+                  <p className="max-h-48 overflow-y-auto p-4 text-justify text-[13px] leading-relaxed text-ink-700 [text-wrap:pretty]">
+                    {r.text.slice(0, 1200)}
+                    {r.text.length > 1200 ? '…' : ''}
+                  </p>
+                </article>
+              ))}
+            </div>
+          )}
+
           {/*
             ─── EL DESCUBRIMIENTO QUE NO ENCUENTRA TAMBIÉN SE DICE ───────────
             Solo se pintaba el caso OK con hallazgos, así que sin llave, sin
