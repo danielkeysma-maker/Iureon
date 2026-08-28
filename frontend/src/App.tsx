@@ -34,6 +34,7 @@ import type { SavedDraftEntry } from './modules/documents/types';
 import { useSavedDrafts } from './modules/documents/hooks/useSavedDrafts';
 
 import { TenantUserManagementModal } from './modules/tenant/components/TenantUserManagementModal';
+import { FirmUsersDialog } from './modules/tenant/components/FirmUsersDialog';
 import { LoginPortalView } from './modules/tenant/components/LoginPortalView';
 import type { MainView } from './modules/tenant/types';
 
@@ -423,14 +424,28 @@ export function App() {
         firmName={activeFirm.name}
       />
 
-      <TenantUserManagementModal
-        isOpen={isUserManagementModalOpen}
-        onClose={() => setIsUserManagementModalOpen(false)}
-        firms={registeredFirms}
-        activeFirm={activeFirm}
-        onSelectFirm={(f) => setActiveFirm(f)}
-        onUpdateFirm={handleUpdateFirm}
-      />
+      {/*
+        Dos gestiones distintas: la del SOCIO administra SU firma (usuarios
+        reales de Supabase Auth, consumo del mes, roles con imposicion en el
+        servidor); la del superusuario conserva su consola de operacion.
+      */}
+      {currentUserEmail === 'ingdanielma@gmail.com' ? (
+        <TenantUserManagementModal
+          isOpen={isUserManagementModalOpen}
+          onClose={() => setIsUserManagementModalOpen(false)}
+          firms={registeredFirms}
+          activeFirm={activeFirm}
+          onSelectFirm={(f) => setActiveFirm(f)}
+          onUpdateFirm={handleUpdateFirm}
+        />
+      ) : (
+        <FirmUsersDialog
+          isOpen={isUserManagementModalOpen}
+          onClose={() => setIsUserManagementModalOpen(false)}
+          firmName={activeFirm.name}
+          firmNit={activeFirm.nit}
+        />
+      )}
 
       {/* ENTERPRISE LEFT SIDEBAR — hidden in focus mode so the editor owns the screen */}
       {!workflow.isFocusMode && (

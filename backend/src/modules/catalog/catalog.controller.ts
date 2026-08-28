@@ -141,6 +141,20 @@ export const listVerificationsController = async (req: Request, res: Response): 
 export const saveVerificationController = async (req: Request, res: Response): Promise<void> => {
   const firmId = requireFirmId(req, res);
   if (!firmId) return;
+  /*
+   * LA UNICA FRONTERA QUE IMPORTA: verificar es de administradores de la
+   * firma. De eso depende que "612 actuaciones verificadas" signifique algo —
+   * si cualquiera puede marcar verificado, el chip verde no certifica nada.
+   * Un abogado litigante PROPONE; un socio VERIFICA.
+   */
+  if (req.user?.role !== 'FIRM_ADMIN' && req.user?.role !== 'SUPER_ADMIN') {
+    res.status(403).json({
+      error: 'FORBIDDEN',
+      message: 'Verificar el catálogo es de los administradores de la firma. Puede proponer la corrección a un socio.'
+    });
+    return;
+  }
+
 
   const body = (req.body ?? {}) as Record<string, unknown>;
   const validation = validateVerificationInput(body, String(body.actuacionId ?? ''));
@@ -195,6 +209,20 @@ export const saveVerificationController = async (req: Request, res: Response): P
 export const deleteVerificationController = async (req: Request, res: Response): Promise<void> => {
   const firmId = requireFirmId(req, res);
   if (!firmId) return;
+  /*
+   * LA UNICA FRONTERA QUE IMPORTA: verificar es de administradores de la
+   * firma. De eso depende que "612 actuaciones verificadas" signifique algo —
+   * si cualquiera puede marcar verificado, el chip verde no certifica nada.
+   * Un abogado litigante PROPONE; un socio VERIFICA.
+   */
+  if (req.user?.role !== 'FIRM_ADMIN' && req.user?.role !== 'SUPER_ADMIN') {
+    res.status(403).json({
+      error: 'FORBIDDEN',
+      message: 'Verificar el catálogo es de los administradores de la firma. Quitar una verificación también es de socios.'
+    });
+    return;
+  }
+
 
   const actuacionId = String(req.query.actuacionId ?? '').trim();
 

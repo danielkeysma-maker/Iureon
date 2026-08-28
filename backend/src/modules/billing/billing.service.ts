@@ -522,6 +522,31 @@ export const usageSummary = async (firmId: string): Promise<UsageSummary> => {
   };
 };
 
+/**
+ * Lo cobrado este mes, por usuario. Para la pantalla de gestion de la firma:
+ * en una firma el saldo se reparte por abogado, y un socio necesita ver quien
+ * consume que sin abrir la auditoria.
+ */
+export const consumoDelMesPorUsuario = async (firmId: string): Promise<Record<string, number>> => {
+  const db = requireDb();
+
+  const inicioDeMes = new Date();
+  inicioDeMes.setDate(1);
+  inicioDeMes.setHours(0, 0, 0, 0);
+
+  const { data } = await db
+    .from('ai_usage')
+    .select('user_email, charged_cop')
+    .eq('firm_id', firmId)
+    .gte('created_at', inicioDeMes.toISOString());
+
+  const porUsuario: Record<string, number> = {};
+  for (const fila of (data ?? []) as { user_email: string; charged_cop: number }[]) {
+    porUsuario[fila.user_email] = (porUsuario[fila.user_email] ?? 0) + Number(fila.charged_cop ?? 0);
+  }
+  return porUsuario;
+};
+
 export interface Movement {
   kind: string;
   amountCop: number;

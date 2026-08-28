@@ -215,6 +215,112 @@ export const addUserToFirm = async (
   return { id: created.user.id, email: created.user.email ?? email };
 };
 
+/** Un usuario de la firma, como lo administra un socio. */
+export interface UsuarioDeFirma {
+  id: string;
+  email: string;
+  role: FirmUserRole;
+  creadoEl: string;
+  /** null si nunca ha entrado — que es informacion, no un hueco. */
+  ultimoAcceso: string | null;
+  desactivado: boolean;
+}
+
+/**
+ * Los usuarios de UNA firma, leidos de Supabase Auth.
+ *
+ * `listUsers` es global y se filtra aqui por app_metadata.firm_id — el mismo
+ * metadato que el middleware usa para resolver el tenant, asi que la lista y
+ * el acceso no pueden contar historias distintas.
+ */
+export const listFirmUsers = async (firmId: string): Promise<UsuarioDeFirma[]> => {
+  const client = requireSupabase();
+
+  const { data, error } = await client.auth.admin.listUsers({ page: 1, perPage: 1000 });
+  if (error) throw new AuthError('USERS_UNAVAILABLE', 'No se pudieron listar los usuarios.', 502);
+
+  return (data?.users ?? [])
+    .filter((u) => (u.app_metadata as Record<string, unknown>)?.firm_id === firmId)
+    .map((u) => ({
+      id: u.id,
+      email: u.email ?? '',
+      role: ((u.app_metadata as Record<string, unknown>)?.role as FirmUserRole) ?? 'LAWYER',
+      creadoEl: u.created_at,
+      ultimoAcceso: u.last_sign_in_at ?? null,
+      // GoTrue expresa el bloqueo como banned_until en el futuro.
+      desactivado: Boolean(
+        (u as { banned_until?: string }).banned_until &&
+          new Date((u as { banned_until?: string }).banned_until as string) > new Date()
+      )
+    }))
+    .sort((a, b) => a.email.localeCompare(b.email));
+};
+
+/** El usuario, solo si pertenece a la firma del que pregunta. */
+const usuarioDeLaFirma = async (firmId: string, userId: string) => {
+  const client = requireSupabase();
+  const { data, error } = await client.auth.admin.getUserById(userId);
+
+  if (error || !data.user) {
+    throw new AuthError('USER_NOT_FOUND', 'Ese usuario no existe.', 404);
+  }
+  if ((data.user.app_metadata as Record<string, unknown>)?.firm_id !== firmId) {
+    // 404 y no 403: confirmar que el id existe en OTRA firma ya es filtrar.
+    throw new AuthError('USER_NOT_FOUND', 'Ese usuario no existe.', 404);
+  }
+  return data.user;
+};
+
+/**
+ * Desactiva o reactiva. AL DESACTIVAR NADA SE BORRA: sus escritos, sus
+ * verificaciones y su rastro en auditoria permanecen — solo pierde el acceso.
+ * Por eso es un ban y no un delete: borrar la cuenta rompe la autoria de todo
+ * lo que esa persona hizo.
+ */
+export const setUserActive = async (
+  firmId: string,
+  userId: string,
+  activo: boolean,
+  quienLlama: string
+): Promise<void> => {
+  const client = requireSupabase();
+  const objetivo = await usuarioDeLaFirma(firmId, userId);
+
+  if (objetivo.email?.toLowerCase() === quienLlama.toLowerCase()) {
+    throw new AuthError('SELF_LOCKOUT', 'No puede desactivarse a sí mismo: la firma quedaría sin ese administrador.', 400);
+  }
+
+  const { error } = await client.auth.admin.updateUserById(userId, {
+    // 100 años o cero: GoTrue no tiene "indefinido" y esto es lo mas cercano.
+    ban_duration: activo ? 'none' : '876000h'
+  });
+
+  if (error) throw new AuthError('USER_UPDATE_FAILED', 'No se pudo cambiar el estado del usuario.', 502);
+};
+
+/** Cambia el rol dentro de la firma. Nunca SUPER_ADMIN, y nunca a uno mismo. */
+export const setUserRole = async (
+  firmId: string,
+  userId: string,
+  role: 'FIRM_ADMIN' | 'LAWYER',
+  quienLlama: string
+): Promise<void> => {
+  const client = requireSupabase();
+  const objetivo = await usuarioDeLaFirma(firmId, userId);
+
+  if (objetivo.email?.toLowerCase() === quienLlama.toLowerCase()) {
+    // Bajarse a si mismo de rol dejaria una firma sin administradores sin que
+    // nadie lo decidiera; subirse no aplica (ya es admin si puede llamar esto).
+    throw new AuthError('SELF_DEMOTION', 'No puede cambiar su propio rol.', 400);
+  }
+
+  const { error } = await client.auth.admin.updateUserById(userId, {
+    app_metadata: { ...(objetivo.app_metadata as Record<string, unknown>), role }
+  });
+
+  if (error) throw new AuthError('USER_UPDATE_FAILED', 'No se pudo cambiar el rol.', 502);
+};
+
 /** The firm's own registry row, for the header and the subscription screen. */
 export const firmProfile = async (firmId: string) => {
   const client = requireSupabase();

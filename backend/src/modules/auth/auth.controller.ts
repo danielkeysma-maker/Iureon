@@ -1,7 +1,11 @@
 import { Request, Response } from 'express';
+import { consumoDelMesPorUsuario } from '../billing/billing.service';
 import {
   AuthError,
   addUserToFirm,
+  listFirmUsers,
+  setUserActive,
+  setUserRole,
   firmProfile,
   refreshSession,
   signIn,
@@ -71,6 +75,71 @@ export const meController = async (req: Request, res: Response): Promise<void> =
     user: req.user,
     firm: await firmProfile(req.firmId as string)
   });
+};
+
+
+/** Solo administradores: la gestion de usuarios es de socios. */
+const soloAdmin = (req: Request, res: Response): boolean => {
+  if (req.user?.role !== 'FIRM_ADMIN' && req.user?.role !== 'SUPER_ADMIN') {
+    res.status(403).json({ success: false, error: 'FORBIDDEN', message: 'La gestión de usuarios es de los administradores de la firma.' });
+    return false;
+  }
+  return true;
+};
+
+/** GET /auth/users — los usuarios de la firma, con su consumo del mes. */
+export const listUsersController = async (req: Request, res: Response): Promise<void> => {
+  if (!soloAdmin(req, res)) return;
+
+  try {
+    const [usuarios, consumo] = await Promise.all([
+      listFirmUsers(req.firmId as string),
+      consumoDelMesPorUsuario(req.firmId as string).catch(() => ({} as Record<string, number>))
+    ]);
+
+    res.json({
+      success: true,
+      users: usuarios.map((u) => ({ ...u, consumoMesCop: consumo[u.email] ?? 0 }))
+    });
+  } catch (err) {
+    fail(res, err, 'No se pudieron listar los usuarios.');
+  }
+};
+
+/** PATCH /auth/users/:id/estado — desactiva o reactiva. Nada se borra. */
+export const setUserActiveController = async (req: Request, res: Response): Promise<void> => {
+  if (!soloAdmin(req, res)) return;
+
+  const activo = req.body?.activo;
+  if (typeof activo !== 'boolean') {
+    res.status(400).json({ success: false, error: 'BAD_REQUEST', message: 'Se requiere el campo activo (true/false).' });
+    return;
+  }
+
+  try {
+    await setUserActive(req.firmId as string, String(req.params.id), activo, req.user?.email ?? '');
+    res.json({ success: true });
+  } catch (err) {
+    fail(res, err, 'No se pudo cambiar el estado.');
+  }
+};
+
+/** PATCH /auth/users/:id/rol — FIRM_ADMIN o LAWYER, nunca SUPER_ADMIN. */
+export const setUserRoleController = async (req: Request, res: Response): Promise<void> => {
+  if (!soloAdmin(req, res)) return;
+
+  const role = req.body?.role;
+  if (role !== 'FIRM_ADMIN' && role !== 'LAWYER') {
+    res.status(400).json({ success: false, error: 'BAD_REQUEST', message: 'El rol debe ser FIRM_ADMIN o LAWYER.' });
+    return;
+  }
+
+  try {
+    await setUserRole(req.firmId as string, String(req.params.id), role, req.user?.email ?? '');
+    res.json({ success: true });
+  } catch (err) {
+    fail(res, err, 'No se pudo cambiar el rol.');
+  }
 };
 
 /**

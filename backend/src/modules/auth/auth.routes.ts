@@ -1,9 +1,12 @@
 import { Router } from 'express';
 import {
   addUserController,
+  listUsersController,
   loginController,
   meController,
   refreshController,
+  setUserActiveController,
+  setUserRoleController,
 } from './auth.controller';
 
 /**
@@ -29,6 +32,9 @@ export const authPublicRoutes = publicRouter;
 const router = Router();
 
 router.get('/auth/me', meController as any);
+router.get('/auth/users', listUsersController as any);
 router.post('/auth/users', addUserController as any);
+router.patch('/auth/users/:id/estado', setUserActiveController as any);
+router.patch('/auth/users/:id/rol', setUserRoleController as any);
 
 export const authRoutes = router;
