@@ -11,6 +11,10 @@ export interface FirmBrandingConfig {
   fontFamily: 'Inter' | 'Times New Roman' | 'Arial' | 'Calibri';
   primaryColorHex: string;
   logoUrl?: string;
+  /** Tamaño del escrito en puntos. Lo fija la marca de la firma; 12 por defecto. */
+  fontSizePt?: number;
+  /** Interlineado del escrito: '1.0' | '1.5' | '2.0'. */
+  lineSpacing?: '1.0' | '1.5' | '2.0';
   customFormatInstruction?: string; // Ej: Orden exacto de secciones (Hechos primero, Pretensiones al final)
   customSampleTemplate?: string;   // Modelo o minuta de referencia de la firma
 }
@@ -131,17 +135,26 @@ export class DocumentExportService {
       // Parsear **negritas** markdown dentro de la línea
       const segments = parseMarkdownBold(line);
 
+      /*
+       * El tamano y el interlineado los fija LA MARCA DE LA FIRMA (3d/6b), no
+       * este archivo: docx mide en medios puntos (12pt = 24) y el interlineado
+       * en 240avos de linea (1,5 = 360). Antes estaban quemados en 11pt/1,5 y
+       * el ajuste de la marca era decorativo en el documento exportado.
+       */
+      const tamanoBase = (branding.fontSizePt ?? 12) * 2;
+      const lineaDocx = Math.round(240 * Number(branding.lineSpacing ?? '1.5'));
+
       const children = segments.map((seg) => new TextRun({
         text: seg.text,
         font: branding.fontFamily === 'Inter' ? 'Calibri' : branding.fontFamily,
         bold: seg.bold || isHeader || isSectionTitle,
-        size: isSectionTitle ? 24 : 22,
+        size: isSectionTitle ? tamanoBase + 2 : tamanoBase,
         color: isSectionTitle ? '1E293B' : '000000'
       }));
 
       return new Paragraph({
         alignment: isHeader ? AlignmentType.LEFT : isSectionTitle ? AlignmentType.LEFT : AlignmentType.JUSTIFIED,
-        spacing: { after: 160, line: 360 },
+        spacing: { after: 160, line: lineaDocx },
         children
       });
     });
@@ -286,7 +299,10 @@ export class DocumentExportService {
     }
 
     // Formatear líneas del texto jurídico
-    doc.setFontSize(10.5);
+    /* El tamano y el salto vienen de la marca de la firma (3d/6b). */
+    const tamanoPdf = ((branding.fontSizePt ?? 12) * 10.5) / 12;
+    const saltoLinea = 5.5 * (Number(branding.lineSpacing ?? '1.5') / 1.5);
+    doc.setFontSize(tamanoPdf);
     doc.setTextColor(15, 23, 42);
 
     const lines = legalContentText.split('\n');
@@ -324,11 +340,11 @@ export class DocumentExportService {
               doc.line(pageMarginLeft, 17, 215.9 - pageMarginRight, 17);
             }
             doc.setFont('helvetica', 'normal');
-            doc.setFontSize(10.5);
+            doc.setFontSize(tamanoPdf);
             doc.setTextColor(15, 23, 42);
           }
           doc.text(sl, pageMarginLeft, currentY);
-          currentY += 5.5;
+          currentY += saltoLinea;
         }
       } else {
         // Línea con negritas inline — renderizar segmento por segmento
@@ -348,7 +364,7 @@ export class DocumentExportService {
               doc.setDrawColor(203, 213, 225);
               doc.line(pageMarginLeft, 17, 215.9 - pageMarginRight, 17);
             }
-            doc.setFontSize(10.5);
+            doc.setFontSize(tamanoPdf);
             doc.setTextColor(15, 23, 42);
           }
 
@@ -383,7 +399,7 @@ export class DocumentExportService {
             doc.text(remaining, xPos, currentY);
           }
 
-          currentY += 5.5;
+          currentY += saltoLinea;
         }
       }
       currentY += 2;

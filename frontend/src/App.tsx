@@ -217,7 +217,11 @@ export function App() {
       firmPhone: b.firmPhone || prev.firmPhone,
       firmEmail: b.firmEmail || prev.firmEmail,
       fontFamily: b.fontFamily as FirmBrandingConfig['fontFamily'],
-      logoUrl: b.logoUrl ?? undefined
+      logoUrl: b.logoUrl ?? undefined,
+      // El documento exportado obedece a la marca: tamano e interlineado ya no
+      // estan quemados en el servicio de exportacion.
+      fontSizePt: b.fontSizePt,
+      lineSpacing: b.lineSpacing
     }));
   };
   const workflow = useLegalAgentWorkflow(marcaDeFirma ? formatoComoInstruccion(marcaDeFirma) : undefined);
