@@ -54,6 +54,17 @@ export interface StoredTranscription {
   duration_seconds: number | null;
   model: string;
   transcribed_at: string;
+  /** Quien la subio. Dato de la fila, no filtro: la lista es de la firma. */
+  user_email?: string;
+  /** Una audiencia se revisa; "ACTA_LISTA" solo lo da una persona. */
+  estado_revision?: 'POR_REVISAR' | 'ACTA_LISTA';
+  revisada_por?: string | null;
+  revisada_el?: string | null;
+  /** Una entrevista se decide; declinar lleva motivo. */
+  decision?: 'SIN_DECIDIR' | 'TOMADO' | 'DECLINADO';
+  decision_motivo?: string | null;
+  decidido_por?: string | null;
+  decidido_el?: string | null;
   /** Recomputed by the server on every read: reopening must show what a fresh
       transcription would. */
   voiceConflicts?: VoiceConflict[];
@@ -108,6 +119,39 @@ export interface TranscribeInput {
  * of those in Spanish, so the message is surfaced as-is.
  */
 export const transcriptionApi = {
+  /** El acto humano que da o quita "Acta lista" a una audiencia. */
+  async marcarRevision(
+    id: string,
+    estado: 'POR_REVISAR' | 'ACTA_LISTA'
+  ): Promise<StoredTranscription | null> {
+    try {
+      const r = await httpClient.patch<{ success: boolean; item?: StoredTranscription }>(
+        `/api/transcription/${id}/revision`,
+        { body: { estado } }
+      );
+      return r.success && r.item ? r.item : null;
+    } catch {
+      return null;
+    }
+  },
+
+  /** Cierra una entrevista. Declinar sin motivo lo rechaza el servidor con mensaje propio. */
+  async decidir(
+    id: string,
+    decision: 'SIN_DECIDIR' | 'TOMADO' | 'DECLINADO',
+    motivo?: string
+  ): Promise<{ item: StoredTranscription | null; error?: string }> {
+    try {
+      const r = await httpClient.patch<{ success: boolean; item?: StoredTranscription; message?: string }>(
+        `/api/transcription/${id}/decision`,
+        { body: { decision, motivo } }
+      );
+      return r.success && r.item ? { item: r.item } : { item: null, error: r.message };
+    } catch (e) {
+      return { item: null, error: e instanceof Error ? e.message : 'No se pudo registrar la decisión.' };
+    }
+  },
+
   /**
    * Takes no firm: this asks whether the SERVER has an engine, which is the same
    * answer for everyone. It used to send one, so a user with no firm registered

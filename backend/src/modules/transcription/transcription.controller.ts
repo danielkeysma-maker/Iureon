@@ -199,6 +199,59 @@ export const transcriptionResumenController = async (req: Request, res: Response
   res.json({ success: true, resumen, desdeCache: false });
 };
 
+/** PATCH /transcription/:id/revision — el acto humano que da o quita "Acta lista". */
+export const marcarRevisionController = async (req: Request, res: Response): Promise<void> => {
+  const estado = req.body?.estado as string;
+
+  if (estado !== 'POR_REVISAR' && estado !== 'ACTA_LISTA') {
+    res.status(400).json({ success: false, error: 'ESTADO_INVALIDO', message: 'El estado debe ser POR_REVISAR o ACTA_LISTA.' });
+    return;
+  }
+
+  const item = await transcriptionStore.marcarRevision(
+    req.firmId as string,
+    String(req.params.id),
+    estado,
+    req.user?.email ?? 'desconocido'
+  );
+
+  if (!item) {
+    res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'No se encontró esa transcripción.' });
+    return;
+  }
+  res.json({ success: true, item });
+};
+
+/** PATCH /transcription/:id/decision — cierra una entrevista: tomar, declinar con motivo, o reabrir. */
+export const decidirEntrevistaController = async (req: Request, res: Response): Promise<void> => {
+  const decision = req.body?.decision as string;
+  const motivo = typeof req.body?.motivo === 'string' ? req.body.motivo.trim() || null : null;
+
+  if (decision !== 'SIN_DECIDIR' && decision !== 'TOMADO' && decision !== 'DECLINADO') {
+    res.status(400).json({ success: false, error: 'DECISION_INVALIDA', message: 'La decisión debe ser SIN_DECIDIR, TOMADO o DECLINADO.' });
+    return;
+  }
+
+  try {
+    const item = await transcriptionStore.decidir(
+      req.firmId as string,
+      String(req.params.id),
+      decision,
+      motivo,
+      req.user?.email ?? 'desconocido'
+    );
+
+    if (!item) {
+      res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'No se encontró esa entrevista.' });
+      return;
+    }
+    res.json({ success: true, item });
+  } catch (err) {
+    // El unico throw del servicio: declinar sin motivo. Mensaje en espanol tal cual.
+    res.status(400).json({ success: false, error: 'MOTIVO_REQUERIDO', message: err instanceof Error ? err.message : 'Declinar exige un motivo.' });
+  }
+};
+
 export const listTranscriptionsController = async (req: Request, res: Response): Promise<void> => {
   /*
    * The author comes from the token, like the firm.
@@ -214,11 +267,8 @@ export const listTranscriptionsController = async (req: Request, res: Response):
     ? (req.query.kind as TranscriptionKind)
     : undefined;
 
-  const items = await transcriptionStore.list(
-    req.firmId as string,
-    req.user?.email ?? 'desconocido',
-    kind
-  );
+  // De la firma entera: quien subio cada una viaja en la fila, no como filtro.
+  const items = await transcriptionStore.list(req.firmId as string, kind);
 
   /*
    * Each transcript carries its own proposals and warnings.

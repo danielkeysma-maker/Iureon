@@ -2,7 +2,7 @@ import React from 'react';
 import { AlertTriangle, ArrowLeft, Copy, CheckCircle2, FileText, PenLine, Upload } from 'lucide-react';
 import { useTranscription } from '../../transcription/hooks/useTranscription';
 import { TranscriptSegments } from '../../transcription/components/TranscriptSegments';
-import { StoredTranscriptions } from '../../transcription/components/StoredTranscriptions';
+import { EntrevistasList } from './EntrevistasList';
 import { NotPersistedWarning } from '../../transcription/components/RoleProposals';
 import { exportTranscriptToPdf, exportTranscriptToWord } from '../../transcription/transcriptExport';
 import { buildSpeakerNames } from '../../transcription/speakerNames';
@@ -337,7 +337,7 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
             returns to work already done, and it must not stand between them and
             starting the interview they came here for.
           */}
-          <StoredTranscriptions
+          <EntrevistasList
             items={stored}
             isLoading={isLoadingStored}
             onOpen={(item) => {

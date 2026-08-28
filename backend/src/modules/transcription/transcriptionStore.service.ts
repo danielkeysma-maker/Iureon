@@ -16,6 +16,19 @@ export interface StoredTranscription {
   model: string;
   /** El resumen y los hechos relevantes generados por el motor, si ya se pidieron. */
   resumen?: unknown;
+  /*
+   * Una audiencia se REVISA: la transcripcion automatica no es un acta hasta
+   * que un humano la lee, y "ACTA_LISTA" solo lo da una persona. Una entrevista
+   * se DECIDE: se toma el caso o se declina con motivo. Los dos estados nacen
+   * pendientes y ningun proceso automatico los cambia.
+   */
+  estado_revision?: 'POR_REVISAR' | 'ACTA_LISTA';
+  revisada_por?: string | null;
+  revisada_el?: string | null;
+  decision?: 'SIN_DECIDIR' | 'TOMADO' | 'DECLINADO';
+  decision_motivo?: string | null;
+  decidido_por?: string | null;
+  decidido_el?: string | null;
   transcribed_at: string;
   saved_at: string;
   updated_at: string;
@@ -88,9 +101,15 @@ export class TranscriptionStore {
    * reverse is worse, since an interview is a private conversation and a hearing
    * is a public act.
    */
+  /*
+   * DE LA FIRMA, NO DE LA PERSONA. Filtraba por user_email, y eso escondia el
+   * trabajo de la firma de si misma: la audiencia que subio un socio era
+   * invisible para quien tenia que citarla — el mismo defecto que ya se corrigio
+   * en borradores. Quien la subio sigue en cada fila (`user_email`), como dato
+   * y no como muro.
+   */
   async list(
     firmId: string,
-    userEmail: string,
     kind?: TranscriptionResult['kind']
   ): Promise<StoredTranscription[]> {
     if (!supabase) return [];
@@ -98,8 +117,7 @@ export class TranscriptionStore {
     let query = supabase
       .from('transcriptions')
       .select('*')
-      .eq('firm_id', firmId)
-      .eq('user_email', userEmail);
+      .eq('firm_id', firmId);
 
     if (kind) query = query.eq('kind', kind);
 
@@ -143,6 +161,77 @@ export class TranscriptionStore {
       .eq('id', id);
 
     if (error) console.error('[TRANSCRIPTION] No se pudo guardar el resumen:', error.message);
+  }
+
+  /**
+   * El acto humano que convierte una transcripcion en acta. Registra quien y
+   * cuando, porque ese acto es el que la vuelve citable.
+   */
+  async marcarRevision(
+    firmId: string,
+    id: string,
+    estado: 'POR_REVISAR' | 'ACTA_LISTA',
+    por: string
+  ): Promise<StoredTranscription | null> {
+    if (!supabase) return null;
+
+    const { data, error } = await supabase
+      .from('transcriptions')
+      .update(
+        estado === 'ACTA_LISTA'
+          ? { estado_revision: estado, revisada_por: por, revisada_el: new Date().toISOString() }
+          : // Volver a revisar borra la firma anterior: un acta que dejo de
+            // estar lista no puede seguir diciendo quien la aprobo.
+            { estado_revision: estado, revisada_por: null, revisada_el: null }
+      )
+      .eq('firm_id', firmId)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error || !data) {
+      console.error('[TRANSCRIPTION] No se pudo marcar la revision:', error?.message);
+      return null;
+    }
+    return data as StoredTranscription;
+  }
+
+  /**
+   * La decision que cierra una entrevista. DECLINADO exige motivo — lo exige
+   * tambien la base con un CHECK, pero fallar aqui da un mensaje en espanol en
+   * vez de un error de constraint.
+   */
+  async decidir(
+    firmId: string,
+    id: string,
+    decision: 'SIN_DECIDIR' | 'TOMADO' | 'DECLINADO',
+    motivo: string | null,
+    por: string
+  ): Promise<StoredTranscription | null> {
+    if (!supabase) return null;
+
+    if (decision === 'DECLINADO' && !motivo) {
+      throw new Error('Declinar exige un motivo: la firma necesita saber qué está rechazando.');
+    }
+
+    const { data, error } = await supabase
+      .from('transcriptions')
+      .update({
+        decision,
+        decision_motivo: decision === 'DECLINADO' ? motivo : null,
+        decidido_por: decision === 'SIN_DECIDIR' ? null : por,
+        decidido_el: decision === 'SIN_DECIDIR' ? null : new Date().toISOString()
+      })
+      .eq('firm_id', firmId)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error || !data) {
+      console.error('[TRANSCRIPTION] No se pudo registrar la decision:', error?.message);
+      return null;
+    }
+    return data as StoredTranscription;
   }
 
   /**

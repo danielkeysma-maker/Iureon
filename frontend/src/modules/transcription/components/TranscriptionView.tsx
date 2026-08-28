@@ -5,7 +5,8 @@ import { TranscriptSegments } from './TranscriptSegments';
 import { TranscriptSummary } from './TranscriptSummary';
 import { AudioPreview } from './AudioPreview';
 import { NotPersistedWarning, RoleProposals } from './RoleProposals';
-import { StoredTranscriptions } from './StoredTranscriptions';
+import { AudienciasList } from './AudienciasList';
+import { transcriptionApi } from '../services/transcription.api';
 import { exportTranscriptToPdf, exportTranscriptToWord } from '../transcriptExport';
 import { buildSpeakerNames } from '../speakerNames';
 import { toPlainText } from '../toPlainText';
@@ -197,7 +198,7 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
         )}
 
         {!result && (
-          <StoredTranscriptions
+          <AudienciasList
             items={stored}
             isLoading={isLoadingStored}
             onOpen={(item) => {
@@ -206,6 +207,9 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
             }}
             onDelete={deleteStored}
             onRefresh={() => void loadStored()}
+            onMarcarRevision={(id, estado) => {
+              void transcriptionApi.marcarRevision(id, estado).then(() => void loadStored());
+            }}
           />
         )}
 
