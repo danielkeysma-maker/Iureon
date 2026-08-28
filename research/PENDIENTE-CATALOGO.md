@@ -294,3 +294,102 @@ Luego `python backend/scripts/build-catalog.py`.
   modificados por la Ley 797 de 2003. Hay que ir a la ley modificatoria.
 - Lanzar **dos o tres agentes, nunca siete**: siete agotaron el límite de sesión
   y ninguna investigación entregó.
+
+---
+
+## 7. BARRIDO DE HUECOS (28 ago 2026) — el diagnóstico de fondo
+
+Se hizo al revés de los censos anteriores: sin lista de temas, partiendo del
+trabajo de un mes de firma y contrastándolo contra las 731 fichas. El resultado
+no fue una lista de temas sueltos sino un diagnóstico:
+
+> **El catálogo está construido desde los códigos de procedimiento hacia afuera,
+> y la mitad del trabajo de una firma colombiana no vive en un código de
+> procedimiento.**
+
+Por eso los censos anteriores no lo veían: buscaban dentro de códigos.
+
+### 7.1 El hueco número uno, y es vergonzoso de lo obvio
+
+**No existe UNA SOLA ficha con la palabra «poder».** Ni poder especial, ni
+general, ni sustitución, ni renuncia. Es el documento que una firma firma más
+veces al mes que cualquier otro, y sin él no hay actuación posible.
+Norma verificada: **Ley 2213 de 2022, art. 5**. La renuncia va por el **CGP art.
+76** *(no releído)* y su reloj es del abogado: no lo desliga hasta cinco días
+después de notificado el poderdante.
+
+### 7.2 Los desbalances estructurales
+
+- **LABORAL: 37 fichas y las 37 son litigio.** Cero preventivo. Faltan contrato
+  de trabajo, carta de terminación con justa causa, citación y acta de descargos,
+  liquidación de prestaciones, reglamento interno, pliego de peticiones, huelga.
+  Un despido mal documentado es el caso que después se pierde.
+- **PENAL: 27 fichas y la víctima solo tiene tres puertas** (denuncia, querella,
+  incidente de reparación). Entre la denuncia y la sentencia no puede hacer nada.
+  Y la ejecución de penas no existe: el catálogo termina en la sentencia y el
+  proceso no.
+- **FAMILIA: 53 fichas que saben declarar derechos y no ejecutarlos.** Sabe fijar
+  la cuota alimentaria; no sabe cobrarla.
+- **SOCIETARIO: 32 fichas de litigio y garantías mobiliarias**, sin la vida
+  ordinaria de una sociedad (constitución, actas, reformas, nombramientos,
+  disolución, registro en cámara).
+- **CIVIL: la más grande y con el ciclo procesal incompleto por dentro** —
+  costas (art. 366), desistimiento tácito (art. 317), transacción y conciliación
+  judicial (art. 312), sucesión procesal (arts. 159-161), contradicción del
+  dictamen, tachas, oposición a la entrega, inventarios y partición.
+- **El Ministerio de Trabajo no aparece ni una vez en las 731 fichas.**
+
+### 7.3 Ramas que faltan enteras, por costo de no tenerlas
+
+1. **Responsabilidad fiscal (Contraloría)** — Ley 610 de 2000 + Ley 1474 de 2011.
+   Normas verificadas. **Reloj del presunto responsable: 10 días** desde la
+   notificación del auto de imputación (art. 50). Y ojo: la caducidad de 5 años
+   del art. 9 es **el reloj de la Contraloría**, no del cliente — el defecto que
+   este proyecto ya conoce, esperando a ser cometido otra vez.
+2. **Contratos y minutas de derecho privado** — el catálogo tiene exactamente
+   tres contratos. Es la mitad no litigiosa del oficio.
+3. **Restitución de tierras y víctimas** (Ley 1448 de 2011, prorrogada por la Ley
+   2078 de 2021) — jurisdicción propia. *Vigencia no reverificada.*
+4. **Extinción de dominio** (Ley 1708 de 2014). *Articulado no verificado.*
+5. **Ejecución de penas** — puede vivir dentro de PENAL.
+6. **Urbanismo y licencias** (curadores urbanos, Decreto 1077 de 2015). *No
+   verificado.*
+7. **Sanitaria / INVIMA.**
+
+Descartadas por frecuencia baja frente al costo: JEP, minero-energético,
+Supertransporte.
+
+### 7.4 Normas nuevas que hay que traer ANTES de catalogar
+
+Dos reformas recientes que harían salir mal cualquier ficha escrita de memoria:
+
+- **Ley 2209 de 2022, art. 1**, que modificó el art. 18 de la Ley 1010 de 2006:
+  la caducidad del acoso laboral es de **TRES AÑOS**, no de seis meses. El propio
+  agente iba a escribir «6 meses» y se corrigió al leer el texto. Es el error
+  clásico del dominio: artículo correcto, ley correcta, **número viejo**.
+- **Ley 2466 de 2025, art. 7**, que reescribió el **CST art. 115** (descargos).
+- **Ley 2220 de 2022** (Estatuto de Conciliación), arts. 67, 68 y 69: la
+  conciliación extrajudicial civil y de familia es requisito de procedibilidad, y
+  el catálogo solo tiene la contencioso-administrativa. Nota verificada del **art.
+  67 par. 1: en laboral NO es requisito de procedibilidad**. El art. 68 exceptúa
+  al monitorio.
+- **CST art. 240, modificado por el art. 2 de la Ley 2141 de 2021**: permiso del
+  Inspector de Trabajo para despedir en embarazo o lactancia, 18 semanas posparto.
+  Sin autorización el despido es ineficaz.
+
+### 7.5 Falsas alarmas que el barrido descartó
+
+Sirven de prueba de que sí revisó, y de que no hay que volver a mirarlas: amparo
+de pobreza (está en CIVIL y en ARBITRAJE), prueba extraprocesal, caducidad de la
+querella penal, caducidad del incidente de reparación, prescripción trienal
+laboral, arrendamiento no litigioso (las cinco fichas nuevas), **todo el
+ejecutivo por dentro** —«el mejor tramo del catálogo»—, la derogatoria de la Ley
+640 por la Ley 2220 (ya declarada), la Ley 2492 de 2025 en POLICIVO (ya usa
+«Inspectores de Convivencia y Paz»), la interdicción (correctamente ausente, con
+los apoyos en su lugar) y las garantías mobiliarias.
+
+### 7.6 Ramas que el barrido declaró completas
+
+POLICIVO —«el mejor tratamiento del reloj de todo el catálogo»—, CONSTITUCIONAL,
+TRANSITO, ADUANERO, AMBIENTAL, DISCIPLINARIO, AGRARIO, FAMILIA_ADMINISTRATIVA, y
+ADMINISTRATIVO salvo responsabilidad fiscal, que en rigor es rama aparte.
