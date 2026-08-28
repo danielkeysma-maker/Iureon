@@ -1,222 +1,220 @@
-import React, { useState, useMemo } from 'react';
-import { FileText, ZoomIn, ZoomOut, ChevronLeft, ChevronRight, Eye, UploadCloud, Printer } from 'lucide-react';
-import { markdownBoldToHtml } from '../services/documentExport.service';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { FileUp, Printer, X, ZoomIn, ZoomOut } from 'lucide-react';
 import DOMPurify from 'dompurify';
+import { markdownBoldToHtml } from '../services/documentExport.service';
+
+/**
+ * La pestaña Expediente: el borrador como se imprime, o un PDF del proceso.
+ *
+ * LO QUE ESTA PANTALLA DEJÓ DE AFIRMAR. La versión anterior decía «Bóveda
+ * Cifrada · Rama Judicial» bajo el nombre del archivo — dos afirmaciones que
+ * nada en el sistema respalda: aquí no hay bóveda, no hay cifrado propio y la
+ * Rama Judicial no tiene nada que ver con un PDF que el abogado subió. Es la
+ * misma clase de adorno que la pastilla de «Cifrado» que se quitó de la barra
+ * lateral: prometía seguridad que nadie medía.
+ *
+ * LA PAGINACIÓN FALSA TAMBIÉN SE FUE. El texto se cortaba cada 3.000
+ * caracteres y eso se llamaba «Página 2 de 6» — pero un corte por conteo de
+ * caracteres no coincide con ninguna página real: el Word y el PDF exportados
+ * paginan distinto. Un abogado que cite «página 3» mirando este visor citaría
+ * una página que no existe en lo que radicó. El escrito se lee continuo, como
+ * en la pestaña Documento, y los números de página reales los pone la
+ * exportación.
+ *
+ * ADJUNTAR UN PDF AHORA ES POSIBLE. El estado vacío llevaba meses invitando a
+ * «adjuntar un expediente PDF» sin que existiera ningún botón para hacerlo: la
+ * promesa estaba escrita y el mecanismo no. El archivo se abre localmente con
+ * un object URL — no se sube a ningún servidor, y eso también se dice, porque
+ * un expediente judicial es exactamente el documento que un abogado no quiere
+ * subir a ciegas.
+ */
 
 interface PdfViewerCanvasProps {
-  fileName?: string;
-  pdfUrl?: string;
   draftText?: string;
   draftTitle?: string;
 }
 
-export const PdfViewerCanvas: React.FC<PdfViewerCanvasProps> = ({
-  fileName,
-  pdfUrl,
-  draftText,
-  draftTitle
-}) => {
-  const [zoomLevel, setZoomLevel] = useState(100);
-  const [viewMode, setViewMode] = useState<'document' | 'raw_text'>('document');
-  const [currentPage, setCurrentPage] = useState(1);
+export const PdfViewerCanvas: React.FC<PdfViewerCanvasProps> = ({ draftText, draftTitle }) => {
+  const [zoom, setZoom] = useState(100);
+  const [pdf, setPdf] = useState<{ url: string; nombre: string } | null>(null);
+  const inputArchivo = useRef<HTMLInputElement>(null);
 
-  const handleZoomIn = () => setZoomLevel((prev) => Math.min(prev + 15, 150));
-  const handleZoomOut = () => setZoomLevel((prev) => Math.max(prev - 15, 60));
+  /*
+   * El object URL se libera al reemplazarlo y al desmontar. Sin esto, cada PDF
+   * abierto en la sesión queda vivo en memoria hasta cerrar la pestaña — y los
+   * expedientes escaneados pesan cientos de megas.
+   */
+  useEffect(() => {
+    return () => {
+      if (pdf) URL.revokeObjectURL(pdf.url);
+    };
+  }, [pdf]);
 
-  const hasDraft = !!draftText;
-  const hasFile = !!pdfUrl || !!fileName;
-  const isEmpty = !hasDraft && !hasFile;
+  const abrirPdf = (archivo: File) => {
+    if (pdf) URL.revokeObjectURL(pdf.url);
+    setPdf({ url: URL.createObjectURL(archivo), nombre: archivo.name });
+  };
 
-  // Título limpio: quitar artículos, leyes entre paréntesis, EXP-xxxx
-  const cleanTitle = useMemo(() => {
-    const raw = draftTitle || fileName || 'Documento';
-    return raw
-      .replace(/\s*\(.*?\)\s*/g, '')
-      .replace(/_(Art\..*?)(?=_|$)/g, '')
-      .replace(/_EXP-[\w-]+/g, '')
-      .replace(/^(Redacción_de_|Proyección_de_|Elaboración_de_|Formulación_de_)/i, '')
-      .replace(/_/g, ' ')
-      .trim();
-  }, [draftTitle, fileName]);
-
-  // Dividir el texto en "páginas" simuladas de ~3000 caracteres para paginación
-  const pages = useMemo(() => {
-    if (!draftText) return [''];
-    const pageSize = 3000;
-    // Limpiar markdown: ## headings → texto plano, --- → eliminar
-    const cleaned = draftText
-      .replace(/^#{1,6}\s+/gm, '')
-      .replace(/^-{3,}$/gm, '');
-    return Array.from(
-      { length: Math.ceil(cleaned.length / pageSize) },
-      (_, i) => cleaned.slice(i * pageSize, (i + 1) * pageSize)
+  const html = useMemo(() => {
+    if (!draftText) return '';
+    const limpio = draftText.replace(/^#{1,6}\s+/gm, '').replace(/^-{3,}$/gm, '');
+    return DOMPurify.sanitize(
+      markdownBoldToHtml(limpio)
+        .split('\n\n')
+        .map((p) => `<p style="margin-bottom:12px;text-align:justify;">${p.replace(/\n/g, '<br/>')}</p>`)
+        .join('')
     );
   }, [draftText]);
 
-  const totalPages = Math.max(pages.length, 1);
-
-  const handlePrint = () => {
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
-    const content = draftText || '';
-    // Convertir **negritas** a <strong> para impresión y limpiar ## y ---
-    const htmlContent = markdownBoldToHtml(content)
-      .split('\n\n').map(p => `<p style="margin-bottom:10px;text-align:justify;">${p.replace(/\n/g, '<br/>')}</p>`).join('');
-    printWindow.document.write(`
+  const imprimir = () => {
+    const ventana = window.open('', '_blank');
+    if (!ventana || !draftText) return;
+    ventana.document.write(`
       <html>
         <head>
-          <title>${draftTitle || 'Documento Jurídico'}</title>
+          <title>${draftTitle || 'Escrito'}</title>
           <style>
             @page { margin: 2.54cm; }
             body { font-family: 'Times New Roman', Times, serif; font-size: 12pt; line-height: 1.8; color: #000; }
-            strong { font-weight: bold; }
-            p { margin: 0; }
+            p { margin: 0 0 10px; text-align: justify; }
           </style>
         </head>
-        <body>${htmlContent}</body>
+        <body>${html}</body>
       </html>
     `);
-    printWindow.document.close();
-    printWindow.print();
+    ventana.document.close();
+    ventana.print();
   };
 
-  // Estado vacío: no hay archivo ni borrador
-  if (isEmpty) {
+  /* El selector de archivo, compartido por el estado vacío y la barra. */
+  const selector = (
+    <input
+      ref={inputArchivo}
+      type="file"
+      accept="application/pdf"
+      className="hidden"
+      onChange={(e) => {
+        const archivo = e.target.files?.[0];
+        if (archivo) abrirPdf(archivo);
+        // Permite volver a elegir el mismo archivo tras cerrarlo.
+        e.target.value = '';
+      }}
+    />
+  );
+
+  /* ─── PDF ADJUNTO: ocupa el panel entero ───────────────────────────────── */
+  if (pdf) {
     return (
-      <div className="max-w-4xl mx-auto space-y-5 font-sans">
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-12 text-center shadow-sm space-y-4">
-          <div className="w-16 h-16 bg-blue-50 text-blue-900 rounded-2xl flex items-center justify-center mx-auto border border-blue-100">
-            <UploadCloud className="w-8 h-8 text-blue-900" />
-          </div>
+      /*
+       * `-mx-4 -mt-5` cancela el padding del lienzo: un PDF se lee a sangre,
+       * no como una tarjeta flotando. El alto es de la ventana y no `h-full`
+       * porque este panel vive dentro de un contenedor con scroll — ahi
+       * `h-full` mas el padding produce un desborde de 20px que deja una
+       * barra de scroll fantasma.
+       */
+      <div className="-mx-4 -mt-5 flex flex-col">
+        {selector}
+        <div className="flex shrink-0 items-center gap-2 border-b border-line-200 bg-surface px-4 py-2">
+          <span className="min-w-0 flex-1 truncate font-mono text-[12px] text-ink-900" title={pdf.nombre}>
+            {pdf.nombre}
+          </span>
+          {/*
+            SE DICE DÓNDE ESTÁ EL ARCHIVO. Un expediente judicial es lo último
+            que un abogado quiere subir a ciegas; que no salga de su equipo es
+            información, no letra pequeña.
+          */}
+          <span className="shrink-0 text-meta text-ink-400">
+            Se abre en este equipo · no se sube a ningún servidor
+          </span>
+          <button
+            onClick={() => {
+              URL.revokeObjectURL(pdf.url);
+              setPdf(null);
+            }}
+            className="btn-neutral btn-sm shrink-0"
+          >
+            <X className="h-3 w-3" />
+            Cerrar
+          </button>
+        </div>
+        <iframe src={pdf.url} title={pdf.nombre} className="h-[calc(100vh-140px)] w-full border-0" />
+      </div>
+    );
+  }
 
-          <div className="space-y-1 max-w-md mx-auto">
-            <h3 className="text-base font-bold text-slate-900">Visor de Documento</h3>
-            <p className="text-xs text-slate-500 leading-relaxed">
-              Genere un borrador con el orquestador de la izquierda para visualizar el documento aquí en formato de impresión, o adjunte un expediente PDF para examinar sus folios.
-            </p>
-          </div>
-
-          <div className="pt-2">
-            <span className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-xs font-semibold">
-              <FileText className="w-4 h-4 text-slate-500" />
-              <span>Vista previa de impresión • PDF • DOCX</span>
-            </span>
-          </div>
+  /* ─── SIN BORRADOR NI PDF ──────────────────────────────────────────────── */
+  if (!draftText) {
+    return (
+      <div className="mx-auto w-full max-w-[560px] px-4 py-10">
+        {selector}
+        <div className="card flex flex-col items-center gap-2 py-10 text-center">
+          <FileUp className="h-8 w-8 text-ink-400" />
+          <p className="text-ui text-ink-900">Aquí se examina el expediente.</p>
+          <p className="max-w-sm text-meta leading-[1.6] text-ink-500">
+            Abra el PDF de un proceso para leerlo junto al escrito, o genere un borrador en el
+            panel de la izquierda y véalo aquí como se imprime.
+          </p>
+          <button onClick={() => inputArchivo.current?.click()} className="btn-secondary btn-sm mt-2">
+            <FileUp className="h-3.5 w-3.5" />
+            Abrir un PDF
+          </button>
+          <p className="text-meta text-ink-400">Se abre en este equipo, no se sube.</p>
         </div>
       </div>
     );
   }
 
+  /* ─── EL BORRADOR, COMO SE IMPRIME ─────────────────────────────────────── */
   return (
-    <div className="max-w-4xl mx-auto space-y-4 font-sans">
-      {/* Controls bar */}
-      <div className="bg-white border border-slate-200/80 rounded-xl px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
-            <FileText className="w-4 h-4 text-blue-900" />
-          </div>
-          <div>
-            <h3 className="text-[13px] font-semibold text-slate-900">
-              {hasDraft ? (cleanTitle || 'Borrador Jurídico') : (fileName || 'Expediente_Adjunto.pdf')}
-            </h3>
-            <p className="text-[11px] text-slate-400 font-medium mt-0.5">
-              {hasDraft ? 'Vista Previa de Impresión • Generado por IA' : 'Bóveda Cifrada • Rama Judicial'}
-            </p>
-          </div>
+    <div className="mx-auto w-full max-w-[816px] px-4 pb-8">
+      {selector}
+      <div className="sticky top-0 z-10 -mx-4 mb-3 flex flex-wrap items-center gap-2 border-b border-line-200 bg-canvas px-4 py-2">
+        <span className="min-w-0 flex-1 truncate text-ui font-medium text-ink-900">
+          {draftTitle || 'Escrito sin título'}
+        </span>
+
+        <div className="flex items-center gap-0.5 rounded-control border border-line-200 bg-surface px-1 py-0.5">
+          <button
+            onClick={() => setZoom((z) => Math.max(z - 15, 70))}
+            className="rounded p-1 text-ink-500 hover:bg-canvas hover:text-ink-900"
+            aria-label="Alejar"
+          >
+            <ZoomOut className="h-3.5 w-3.5" />
+          </button>
+          <span className="w-[42px] text-center font-mono text-[11px] text-ink-700">{zoom}%</span>
+          <button
+            onClick={() => setZoom((z) => Math.min(z + 15, 160))}
+            className="rounded p-1 text-ink-500 hover:bg-canvas hover:text-ink-900"
+            aria-label="Acercar"
+          >
+            <ZoomIn className="h-3.5 w-3.5" />
+          </button>
         </div>
 
-        {/* Toolbar */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex items-center bg-slate-100/80 rounded-lg p-0.5 text-xs text-slate-700">
-            <button onClick={handleZoomOut} className="p-1 hover:bg-white rounded transition-colors" title="Alejar">
-              <ZoomOut className="w-3.5 h-3.5" />
-            </button>
-            <span className="px-2 font-mono font-semibold text-[11px]">{zoomLevel}%</span>
-            <button onClick={handleZoomIn} className="p-1 hover:bg-white rounded transition-colors" title="Acercar">
-              <ZoomIn className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          {totalPages > 1 && (
-            <div className="flex items-center gap-1.5 bg-slate-100/80 px-2.5 py-1 rounded-lg text-[11px] font-medium text-slate-700">
-              <button disabled={currentPage <= 1} onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} className="disabled:opacity-40 hover:text-blue-900">
-                <ChevronLeft className="w-3.5 h-3.5" />
-              </button>
-              <span>Página {currentPage} de {totalPages}</span>
-              <button disabled={currentPage >= totalPages} onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} className="disabled:opacity-40 hover:text-blue-900">
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          )}
-
-          {hasDraft && (
-            <button
-              onClick={() => setViewMode(viewMode === 'document' ? 'raw_text' : 'document')}
-              className="px-2.5 py-1 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-lg text-[11px] font-medium flex items-center gap-1.5 transition-colors"
-            >
-              <Eye className="w-3.5 h-3.5 text-slate-500" />
-              <span>{viewMode === 'document' ? 'Texto Plano' : 'Vista Documento'}</span>
-            </button>
-          )}
-
-          {hasDraft && (
-            <button
-              onClick={handlePrint}
-              className="px-2.5 py-1 bg-blue-900 hover:bg-blue-950 text-white rounded-lg text-[11px] font-medium flex items-center gap-1.5 transition-colors"
-            >
-              <Printer className="w-3.5 h-3.5" />
-              <span>Imprimir</span>
-            </button>
-          )}
-        </div>
+        <button onClick={() => inputArchivo.current?.click()} className="btn-neutral btn-sm">
+          <FileUp className="h-3.5 w-3.5" />
+          Abrir PDF
+        </button>
+        <button onClick={imprimir} className="btn-secondary btn-sm">
+          <Printer className="h-3.5 w-3.5" />
+          Imprimir
+        </button>
       </div>
 
-      {/* Paper Canvas — simula una hoja de papel */}
+      {/*
+        SIN NÚMEROS DE PÁGINA A PROPÓSITO. Los números reales los pone la
+        exportación; inventarlos aquí cortando por caracteres hacía citar
+        páginas que no existen en lo radicado.
+      */}
       <div
-        className="bg-white border border-slate-200/80 rounded-xl shadow-sm relative border-t-4 border-t-slate-800 transition-all duration-300"
-        style={{ minHeight: '800px' }}
-      >
-        {viewMode === 'document' ? (
-          hasDraft ? (
-            <div
-              className="text-slate-900 leading-[1.8] transition-all duration-200"
-              style={{
-                fontFamily: "'Times New Roman', Times, serif",
-                fontSize: `${Math.round(12 * zoomLevel / 100)}px`,
-                padding: `${Math.round(48 * zoomLevel / 100)}px ${Math.round(64 * zoomLevel / 100)}px`,
-                transformOrigin: 'top center'
-              }}
-              dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(
-                  markdownBoldToHtml(pages[currentPage - 1])
-                    .split('\n\n').map(p => `<p style="margin-bottom:10px;text-align:justify;">${p.replace(/\n/g, '<br/>')}</p>`).join('')
-                )
-              }}
-            />
-          ) : pdfUrl ? (
-            <iframe src={pdfUrl} title="Visor PDF Integrado" className="w-full h-[600px] border-0 rounded-lg" />
-          ) : (
-            <div className="p-8 text-center bg-slate-50 rounded-xl border border-slate-200 text-slate-600 text-xs m-8">
-              Visualización de expediente digital ({fileName}).
-            </div>
-          )
-        ) : (
-          <div className="bg-slate-900 text-emerald-400 font-mono text-xs p-5 rounded-xl space-y-2 overflow-x-auto m-4">
-            <div className="text-slate-400 pb-2 border-b border-slate-800 flex justify-between">
-              <span>/// TEXTO PLANO DEL DOCUMENTO GENERADO</span>
-              <span>{draftText?.length?.toLocaleString()} caracteres</span>
-            </div>
-            <pre className="whitespace-pre-wrap leading-relaxed">
-              {pages[currentPage - 1]}
-            </pre>
-          </div>
-        )}
+        className="paper-canvas rounded-card border border-line-200 px-10 py-10 font-legal text-paper-ink shadow-e1 sm:px-14"
+        style={{ fontSize: `${Math.round(14.5 * (zoom / 100))}px`, lineHeight: 1.8 }}
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
 
-        <div className="px-8 py-4 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
-          <span>Vista Previa de Documento • IUREON B2B</span>
-          <span>Página {currentPage} de {totalPages}</span>
-        </div>
-      </div>
+      <p className="mt-2 text-center text-meta text-ink-400">
+        Vista de lectura. La impresión y la exportación salen siempre sobre papel blanco.
+      </p>
     </div>
   );
 };
