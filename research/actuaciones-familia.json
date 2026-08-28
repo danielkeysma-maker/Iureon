@@ -2348,6 +2348,141 @@
         }
       ],
       "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_2220_2022_pr001.html"
+    },
+    {
+      "exact_name": "Contestación de la demanda de divorcio o de separación de cuerpos",
+      "area": "FAMILIA",
+      "role": "LITIGANTE",
+      "legal_basis": "Código General del Proceso, arts. 369 y 370 (proceso verbal) y art. 388 (reglas propias del divorcio y de la separación de cuerpos); Código Civil, art. 154",
+      "competent_authority": "El juez de familia que conoce del proceso verbal",
+      "term": "VEINTE (20) DÍAS, RELOJ DEL DEMANDADO Y PRECLUSIVO: «Admitida la demanda se correrá traslado al demandado por el término de VEINTE (20) DÍAS» (art. 369). Es el proceso verbal, no el sumario, así que quien traslade los diez días del sumario radica tarde.\n\nLO QUE SE PIERDE AL NO CONTESTAR no es solo la defensa: las excepciones de mérito solo se proponen aquí, y proponerlas abre un traslado de CINCO (5) DÍAS al demandante para que pida pruebas sobre los hechos en que se fundan (art. 370).\n\nDOS SALIDAS QUE TERMINAN EL PROCESO Y CONVIENE EVALUAR ANTES DE PELEAR, porque ahorran años: «El juez declarará terminado el proceso por DESISTIMIENTO presentado por los cónyuges o sus apoderados. Si se hiciere durante la audiencia, BASTARÁ LA MANIFESTACIÓN VERBAL DE AMBOS» (art. 388 num. 1); y «La MUERTE de uno de los cónyuges o la RECONCILIACIÓN ocurridas durante el proceso, PONEN FIN A ESTE» (num. 3). La reconciliación no suspende: termina — aunque «el divorcio podrá ser demandado nuevamente por causa que sobrevenga a la reconciliación».\n\nY UNA TERCERA QUE ES LA MÁS RÁPIDA: «El Juez dictará SENTENCIA DE PLANO si las partes llegaren a un acuerdo, siempre que este se encuentre AJUSTADO AL DERECHO SUSTANCIAL» (art. 388 num. 2).\n\nDEFECTO DE INTEGRACIÓN QUE HAY QUE ALEGAR SI FALTA, y vicia la actuación: son partes ÚNICAMENTE LOS CÓNYUGES —si fueren menores de edad podrán intervenir también sus padres— y EL MINISTERIO PÚBLICO DEBE SER CITADO EN INTERÉS DE LOS HIJOS (art. 388).\n\nEN SEPARACIÓN DE CUERPOS rigen las mismas normas «en lo pertinente» (art. 388 par.), con una ventaja que no tiene el divorcio: ejecutoriada la sentencia, si los cónyuges de común acuerdo piden ponerle fin a la separación, el juez DICTA DE PLANO la sentencia respectiva.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Pronunciamiento expreso sobre cada hecho de la demanda y sobre la causal invocada",
+          "mandatory": true,
+          "basis": "Código General del Proceso, arts. 96 y 369"
+        },
+        {
+          "n": 2,
+          "name": "Excepciones de mérito, que solo pueden proponerse en la contestación",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 370"
+        },
+        {
+          "n": 3,
+          "name": "Pruebas que se aportan y las que se solicitan",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 369"
+        },
+        {
+          "n": 4,
+          "name": "Verificación de que el Ministerio Público fue citado en interés de los hijos",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 388"
+        },
+        {
+          "n": 5,
+          "name": "Pronunciamiento sobre custodia, alimentos y visitas cuando hay hijos menores",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 388"
+        },
+        {
+          "n": 6,
+          "name": "Constancia de presentación dentro de los veinte (20) días del traslado",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 369"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr013.html"
+    },
+    {
+      "exact_name": "Contestación de la demanda de alimentos, custodia o visitas",
+      "area": "FAMILIA",
+      "role": "LITIGANTE",
+      "legal_basis": "Código General del Proceso, arts. 390 num. 2 y 391 (proceso verbal sumario) y art. 397; art. 397A, adicionado por el art. 3 de la Ley 2541 de 2025",
+      "competent_authority": "El juez de familia, en proceso verbal sumario y de ÚNICA INSTANCIA",
+      "term": "DIEZ (10) DÍAS, RELOJ DEL DEMANDADO, Y EN UN PROCESO DE ÚNICA INSTANCIA — lo que se pierda aquí no se recupera en apelación porque no hay apelación. «El término para contestar la demanda será de DIEZ (10) DÍAS» (art. 391).\n\nLAS EXCEPCIONES PREVIAS NO SE PROPONEN COMO TALES, Y ESE ES EL ERROR DE FORMA MÁS COMÚN EN ESTE TRÁMITE: «Los hechos que configuren excepciones previas DEBERÁN SER ALEGADOS MEDIANTE RECURSO DE REPOSICIÓN CONTRA EL AUTO ADMISORIO DE LA DEMANDA» (art. 391). Quien las presenta con la contestación no las hace valer. Si prospera alguna que no termina el proceso, el juez concede al demandante CINCO (5) DÍAS para subsanar so pena de revocar el auto admisorio.\n\nSI SE PROPONEN EXCEPCIONES DE MÉRITO, se corre traslado al demandante por TRES (3) DÍAS para que pida pruebas relacionadas con ellas.\n\nCARGA QUE ACOMPAÑA A LA CONTESTACIÓN: «deberán aportarse los documentos que se encuentren en poder del demandado y pedirse las pruebas que se pretenda hacer valer». La contestación puede hacerse VERBALMENTE ANTE EL SECRETARIO, que levanta acta — vía útil cuando el término se agota.\n\nLO QUE YA ESTÁ CORRIENDO ANTES DE CONTESTAR, y suele sorprender: en alimentos el juez ordena ALIMENTOS PROVISIONALES DESDE LA PRESENTACIÓN DE LA DEMANDA con prueba sumaria de la capacidad económica del demandado (art. 397), de modo que la contestación llega cuando ya hay una obligación en curso; discutirla es parte del escrito.\n\nADVERTENCIA DE NORMA APLICABLE: tratándose de niños, niñas y adolescentes debe atenderse además el art. 397A, adicionado por el art. 3 de la Ley 2541 de 2025, que remite a la Ley 1098 de 2006.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Pronunciamiento expreso sobre cada hecho de la demanda",
+          "mandatory": true,
+          "basis": "Código General del Proceso, arts. 96 y 391"
+        },
+        {
+          "n": 2,
+          "name": "Documentos en poder del demandado, aportados con la contestación",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 391"
+        },
+        {
+          "n": 3,
+          "name": "Prueba de la capacidad económica real, frente a la sumaria del demandante",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 397"
+        },
+        {
+          "n": 4,
+          "name": "Excepciones de mérito, que abren traslado de tres (3) días al demandante",
+          "mandatory": false,
+          "basis": "Código General del Proceso, art. 391"
+        },
+        {
+          "n": 5,
+          "name": "Reposición separada contra el auto admisorio, si hay hechos de excepción previa",
+          "mandatory": false,
+          "basis": "Código General del Proceso, art. 391"
+        },
+        {
+          "n": 6,
+          "name": "Constancia de presentación dentro de los diez (10) días",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 391"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr013.html"
+    },
+    {
+      "exact_name": "Contestación de la demanda de investigación o impugnación de la paternidad",
+      "area": "FAMILIA",
+      "role": "LITIGANTE",
+      "legal_basis": "Código General del Proceso, art. 386; arts. 369 y 370 (traslado del proceso verbal)",
+      "competent_authority": "El juez de familia",
+      "term": "VEINTE (20) DÍAS PARA CONTESTAR, PERO EL PLAZO QUE DECIDE EL CASO ES OTRO Y DURA TRES: DEL DICTAMEN GENÉTICO SE CORRE TRASLADO POR TRES (3) DÍAS, y dentro de ellos debe pedirse la aclaración, la complementación o UN NUEVO DICTAMEN, a costa del interesado, «mediante solicitud motivada EN LA QUE SE PRECISEN LOS ERRORES del primer dictamen» (art. 386 num. 2). Vencidos sin pedirlo en debida forma, el juez dicta SENTENCIA DE PLANO acogiendo las pretensiones (num. 4). Una solicitud genérica, sin señalar errores concretos, no detiene ese fallo.\n\nLA ADVERTENCIA QUE VIENE EN EL AUTO ADMISORIO Y DEFINE EL RESULTADO ANTES DE DISCUTIR NADA: el juez ordena la prueba de ADN AUN DE OFICIO y advierte al demandado que SU RENUENCIA HARÁ PRESUMIR CIERTA la paternidad, maternidad o impugnación alegada. No comparecer a la toma de muestra no dilata el proceso: lo pierde. La prueba debe practicarse ANTES DE LA AUDIENCIA INICIAL.\n\nSE FALLA DE PLANO TAMBIÉN SI NO HAY OPOSICIÓN (art. 386 num. 4), de modo que el silencio equivale a allanarse.\n\nLO QUE PUEDE ESTAR CORRIENDO YA CONTRA EL DEMANDADO: en investigación de paternidad se decretan ALIMENTOS PROVISIONALES desde la admisión cuando haya fundamento razonable, y solo se suspenden «desde que exista fundamento razonable DE EXCLUSIÓN de la paternidad» (art. 386 num. 5) — pedir esa suspensión con el dictamen favorable es parte de la defensa.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Pronunciamiento expreso sobre cada hecho y sobre la relación alegada",
+          "mandatory": true,
+          "basis": "Código General del Proceso, arts. 96 y 369"
+        },
+        {
+          "n": 2,
+          "name": "Manifestación de comparecencia a la prueba de ADN, cuya renuencia presume cierta la pretensión",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 386 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "Objeción al dictamen genético dentro de los tres (3) días, precisando los errores del primer dictamen",
+          "mandatory": false,
+          "basis": "Código General del Proceso, art. 386 num. 2"
+        },
+        {
+          "n": 4,
+          "name": "Solicitud de suspensión de los alimentos provisionales, si hay fundamento razonable de exclusión",
+          "mandatory": false,
+          "basis": "Código General del Proceso, art. 386 num. 5"
+        },
+        {
+          "n": 5,
+          "name": "Constancia de presentación dentro de los veinte (20) días del traslado",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 369"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr013.html"
     }
   ]
 }

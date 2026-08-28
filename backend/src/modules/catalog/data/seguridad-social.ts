@@ -231,6 +231,57 @@ export const SEGURIDAD_SOCIAL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Constancia de radicación, de la que corre el plazo de la entidad', mandatory: true, basis: 'Ley 1755 de 2015, art. 14' }
     ],
     sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=65334'
+  },
+  {
+    id: 'seguridad_social/resolucion-que-reconoce-o-niega-la-pension',
+    exactName: 'Resolución que reconoce o niega la pensión',
+    branch: 'SEGURIDAD_SOCIAL',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 100 de 1993, art. 33, con el parágrafo 1 modificado por el art. 9 de la Ley 797 de 2003; Ley 1755 de 2015, art. 14; Ley 1437 de 2011, arts. 74, 76 y 87',
+    competentAuthority: 'Colpensiones, la Administradora de Fondos de Pensiones o la entidad de previsión social. Es un ACTO ADMINISTRATIVO de una entidad, no una providencia judicial: no lo firma un juez y su control posterior corresponde al juez laboral',
+    term: { status: 'VERIFICADO', description: 'CUATRO (4) MESES PARA EXPEDIRLA, Y ESE RELOJ ES DE LA ENTIDAD: «Los fondos encargados reconocerán la pensión en un tiempo NO SUPERIOR A CUATRO (4) MESES después de radicada la solicitud por el peticionario, con la correspondiente documentación que acredite su derecho. LOS FONDOS NO PODRÁN ADUCIR QUE LAS DIFERENTES CAJAS NO LES HAN EXPEDIDO EL BONO PENSIONAL O LA CUOTA PARTE» (art. 33 par. 1). Esa última frase cierra la excusa más usada para no decidir. EL RELOJ DEL CLIENTE EMPIEZA CUANDO ESTA RESOLUCIÓN SE NOTIFICA, Y ES DE DIEZ (10) DÍAS: los recursos de reposición y apelación se interponen «dentro de los DIEZ (10) DÍAS siguientes a la notificación personal, a la notificación por aviso o al vencimiento del término de publicación» (Ley 1437 de 2011, art. 76). La APELACIÓN ES OBLIGATORIA para acceder después a la jurisdicción; la reposición no. QUÉ DEBE CONTENER PARA SER ATACABLE CON PROVECHO, y su ausencia es el vicio más frecuente: la motivación de por qué se niega, con la norma y las semanas o el requisito que se echan de menos. Una resolución que niega sin discriminar los períodos no permite controvertir la historia laboral. SI NO RESUELVEN: a los TRES (3) MESES de presentada la petición opera el silencio negativo (art. 83), y desde ahí se abre la vía judicial. El derecho pensional no prescribe; lo que prescribe son las mesadas ya causadas, a los tres (3) años. CUÁNDO QUEDA EN FIRME, que es de lo que cuelga todo lo demás: por el art. 87, desde el día siguiente a la notificación si no procede recurso; desde el día siguiente a la notificación de la decisión de los recursos; o desde el día siguiente al vencimiento del término para interponerlos si no se interpusieron.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del peticionario, del régimen y de la fecha de radicación de la solicitud', mandatory: true, basis: 'Ley 100 de 1993, art. 33' },
+      { n: 2, name: 'Relación de semanas cotizadas y períodos reconocidos, discriminados', mandatory: true, basis: 'Ley 100 de 1993, art. 33' },
+      { n: 3, name: 'Motivación de hecho y de derecho de la decisión, con la norma aplicada', mandatory: true, basis: 'Ley 1437 de 2011, art. 42' },
+      { n: 4, name: 'Liquidación del ingreso base y de la mesada, cuando se reconoce', mandatory: false, basis: 'Ley 100 de 1993, art. 33' },
+      { n: 5, name: 'Indicación de los recursos que proceden, ante quién y en qué plazo', mandatory: true, basis: 'Ley 1437 de 2011, art. 74' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=7223'
+  },
+  {
+    id: 'seguridad_social/resolucion-que-resuelve-el-recurso-contra-el-acto-de-reconocimiento-pensional',
+    exactName: 'Resolución que resuelve el recurso contra el acto de reconocimiento pensional',
+    branch: 'SEGURIDAD_SOCIAL',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 1437 de 2011, arts. 74, 76, 79, 80 y 87; Ley 100 de 1993, art. 33',
+    competentAuthority: 'El mismo funcionario que expidió el acto, para la reposición; su superior o el funcionario competente de la entidad, para la apelación',
+    term: { status: 'VERIFICADO', description: 'ES EL ACTO QUE AGOTA LA VÍA ADMINISTRATIVA Y ABRE LA JUDICIAL, ASÍ QUE SU NOTIFICACIÓN ES EL PUNTO CERO DE LA DEMANDA. Por el art. 87 la firmeza se produce «desde el día siguiente a la publicación, comunicación o notificación de la decisión sobre los recursos interpuestos». LA APELACIÓN ES OBLIGATORIA PARA IR AL JUEZ, y omitirla deja la puerta cerrada aunque el derecho exista: por el art. 76, la reposición y la queja no son necesarias para acceder a la jurisdicción, pero la apelación sí. SI LA ENTIDAD NO RESUELVE EL RECURSO, EL SILENCIO NO ES NEUTRO EN LO SANCIONATORIO Y CONVIENE VERIFICAR SI APLICA: fuera de la materia sancionatoria rige el silencio negativo general del art. 83 —tres (3) meses—, que habilita acudir al juez sin esperar más. LO QUE NO PUEDE HACER LA DECISIÓN DEL RECURSO: agravar la situación del recurrente único, ni cambiar los fundamentos por otros no debatidos. Y debe pronunciarse sobre TODAS las razones expuestas, no solo sobre las que le convienen — omitirlo es el vicio que después sostiene la demanda. EL RELOJ DEL CLIENTE TRAS ESTA RESOLUCIÓN es la prescripción trienal de las mesadas (Ley 2452 de 2025, art. 317), no una caducidad: el derecho pensional en sí no prescribe, pero cada mes que pasa sin demandar se pierde una mesada por el otro extremo.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del acto recurrido, del recurso y de su fecha de interposición', mandatory: true, basis: 'Ley 1437 de 2011, art. 76' },
+      { n: 2, name: 'Pronunciamiento sobre TODAS las razones expuestas por el recurrente', mandatory: true, basis: 'Ley 1437 de 2011, art. 80' },
+      { n: 3, name: 'Motivación de por qué se confirma, revoca o modifica el acto', mandatory: true, basis: 'Ley 1437 de 2011, art. 42' },
+      { n: 4, name: 'Constancia de que no se agrava la situación del recurrente único', mandatory: true, basis: 'Ley 1437 de 2011, art. 80' },
+      { n: 5, name: 'Declaración de que con ella queda agotada la vía administrativa', mandatory: true, basis: 'Ley 1437 de 2011, art. 87' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1437_2011_pr001.html'
+  },
+  {
+    id: 'seguridad_social/dictamen-de-perdida-de-capacidad-laboral-de-la-junta-de-calificacion-de-invalidez',
+    exactName: 'Dictamen de pérdida de capacidad laboral de la junta de calificación de invalidez',
+    branch: 'SEGURIDAD_SOCIAL',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 100 de 1993, art. 41, modificado por el art. 142 del Decreto-ley 019 de 2012; Decreto 1072 de 2015, arts. 2.2.5.1.41 (recursos) y 2.2.5.1.43 (firmeza); Decreto 1507 de 2014 (manual único vigente)',
+    competentAuthority: 'La Junta Regional de Calificación de Invalidez, y la Junta Nacional en apelación. NO son autoridad judicial: son particulares que ejercen función pública, y sus dictámenes NO son actos administrativos',
+    term: { status: 'VERIFICADO', description: 'DIEZ (10) DÍAS DESDE LA NOTIFICACIÓN PARA RECURRIRLO, Y VENCIDOS EL DICTAMEN QUEDA EN FIRME. «Contra el dictamen emitido por la Junta Regional de Calificación de Invalidez proceden los recursos de reposición y/o apelación, presentados por cualquiera de los interesados ANTE LA JUNTA REGIONAL QUE LO PROFIRIÓ […] dentro de los DIEZ (10) DÍAS siguientes a su notificación» (Decreto 1072 de 2015, art. 2.2.5.1.41), y «Los dictámenes adquieren firmeza cuando […] no se haya interpuesto el recurso […] dentro del término de diez (10) días» (art. 2.2.5.1.43). Se presentan ante la Junta que lo dictó, no ante la Nacional. QUÉ DEBE CONTENER PARA PODER ATACARSE, y su ausencia es lo que más se alega: el porcentaje discriminado por deficiencia, discapacidad y minusvalía conforme al manual del Decreto 1507 de 2014; el ORIGEN —común o laboral—, que decide quién paga; y la FECHA DE ESTRUCTURACIÓN, que decide si hay derecho, porque de ella dependen las cincuenta semanas en los tres años anteriores. TRES UMBRALES QUE EL DICTAMEN DEFINE Y CAMBIAN LA PRESTACIÓN ENTERA: menos del 5%, sin indemnización; entre el 5% y menos del 50%, indemnización por incapacidad permanente parcial a cargo de la ARL si el origen es laboral; 50% o más, invalidez. DOS PLAZOS QUE NO SON DEL CLIENTE Y NO HAY QUE CONFUNDIR CON SUS DIEZ DÍAS: la Junta tiene diez días calendario para resolver la reposición y dos días hábiles para remitir el expediente a la Nacional. ADVERTENCIA DE CÓMPUTO QUE HAY QUE DARLE AL CLIENTE: la norma dice «diez (10) días» SIN precisar si son hábiles o calendario, aunque en otros incisos del mismo artículo sí lo hace. Ante esa ambigüedad se cuenta en el escenario más corto.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del evaluado, de la entidad solicitante y de la fecha del dictamen', mandatory: true, basis: 'Decreto 1072 de 2015, art. 2.2.5.1.41' },
+      { n: 2, name: 'Porcentaje de pérdida de capacidad laboral discriminado conforme al manual vigente', mandatory: true, basis: 'Decreto 1507 de 2014' },
+      { n: 3, name: 'Origen de la contingencia: común o laboral', mandatory: true, basis: 'Ley 100 de 1993, art. 41' },
+      { n: 4, name: 'Fecha de estructuración, con su fundamentación clínica', mandatory: true, basis: 'Ley 100 de 1993, art. 41' },
+      { n: 5, name: 'Indicación de los recursos, del plazo de diez (10) días y de la Junta ante la que se presentan', mandatory: true, basis: 'Decreto 1072 de 2015, art. 2.2.5.1.41' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=62506'
   }
   ]
 };
