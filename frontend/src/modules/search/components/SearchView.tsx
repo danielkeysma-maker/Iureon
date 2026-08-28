@@ -133,9 +133,45 @@ export const SearchView: React.FC = () => {
 
     try {
       const response = await searchPrecedents(query);
-      setResults(response.items ?? []);
-      setStatus(response.status);
-      setReason(response.reason);
+
+      /*
+       * ─── EL CORPUS NO ALCANZA AUNQUE DEVUELVA FILAS ────────────────────
+       *
+       * La búsqueda vectorial SIEMPRE devuelve los vecinos más cercanos: no
+       * tiene forma de contestar «no sé». Con 62 providencias contra las
+       * 29.424 de la Corte Constitucional, lo más cercano a una consulta que
+       * el corpus no cubre es ruido — y se estaba presentando como hallazgo.
+       * Medido en producción: «estabilidad laboral reforzada», que el corpus
+       * sí cubre, devuelve 67% y 66%; «servidumbre de tránsito predio
+       * enclavado», que no cubre, devolvía un pleito por un accidente de
+       * tránsito al 46%.
+       *
+       * El umbral es el mismo 0,60 que ya se midió para las sugerencias de la
+       * entrevista de cliente, y por la misma razón: 66-69% cuando hay
+       * cobertura, 50-51% en un tema adyacente, 36-41% ante un disparate.
+       *
+       * Y ESTO ES LO QUE TENÍA APAGADO EL DESCUBRIMIENTO. La salida al
+       * registro oficial estaba condicionada a `status === 'EMPTY'`, y el
+       * corpus casi nunca contesta vacío: contesta ruido. Así que Brave y el
+       * buscador de la Corte estaban conectados y configurados, y la puerta
+       * que los llama no se abría casi nunca.
+       */
+      const UMBRAL_COBERTURA = 0.6;
+      const items = response.items ?? [];
+      const relevantes = items.filter((i) => i.similarity >= UMBRAL_COBERTURA);
+      const corpusAlcanza = relevantes.length > 0;
+
+      setResults(relevantes);
+      setStatus(corpusAlcanza ? response.status : 'EMPTY');
+      setReason(
+        corpusAlcanza
+          ? response.reason
+          : items.length > 0
+          ? `El corpus curado no tiene nada suficientemente cercano a esta consulta (lo más parecido quedó en ${(
+              Math.max(...items.map((i) => i.similarity)) * 100
+            ).toFixed(0)}%). Se busca en el registro oficial.`
+          : response.reason
+      );
 
       /*
        * Si la consulta tiene forma de cita, se pide también al sitio oficial.
@@ -150,7 +186,7 @@ export const SearchView: React.FC = () => {
        * sitio de la Corte. Lo que vuelva se confirma contra el registro oficial
        * antes de mostrarse — el buscador solo apunta.
        */
-      if (response.status === 'EMPTY' && !citationShape(query)) {
+      if (!corpusAlcanza && !citationShape(query)) {
         setLoadingDiscovery(true);
         try {
           const hallazgo = await discoverRulings(query);
