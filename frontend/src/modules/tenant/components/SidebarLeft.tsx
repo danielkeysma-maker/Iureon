@@ -288,6 +288,18 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
         </div>
       </div>
 
+      {/*
+        EL SELLO DE VERSION. Un deploy "Ready" en Vercel no prueba lo que ESTE
+        navegador corre: una pestana abierta de ayer sirve la version de ayer
+        para siempre. Con el commit a la vista, "no veo los cambios" se
+        responde en un segundo comparando dos hashes — sin adivinar cachés.
+      */}
+      {!isCollapsed && (
+        <p className="px-4 pb-1 text-center font-mono text-[9px] tracking-wider text-nav-muted/60">
+          v. {__COMMIT__}
+        </p>
+      )}
+
       {/* ─── PIE: MEMBRETE Y RIEL ──────────────────────────────────────────*/}
       <div className={`flex items-center gap-1 px-3 py-3 ${isCollapsed ? 'flex-col' : ''}`}>
         <button
