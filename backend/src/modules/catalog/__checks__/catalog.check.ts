@@ -658,7 +658,17 @@ for (const testCase of CASES) {
 
   if (found && testCase.mustContain) {
     const guidance = buildCatalogGuidance(testCase.label, testCase.branch) ?? '';
-    if (!guidance.includes(testCase.mustContain)) {
+    /*
+     * Sin acentos y sin mayusculas. Lo que este check afirma es que LA CIFRA
+     * DEL PLAZO llega a la guia que lee el modelo, y «CINCO (5) DIAS» cumple
+     * eso exactamente igual que «Cinco (5) dias». Comparar literal hacia dentro
+     * hacia que reescribir un termino para enfatizar su plazo —justo lo que
+     * hay que hacer cuando el plazo es el que mata el derecho— rompiera el
+     * check que lo vigila, y la salida facil habria sido bajar el enfasis.
+     */
+    const plano = (t: string): string =>
+      t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+    if (!plano(guidance).includes(plano(testCase.mustContain))) {
       console.error(`FAIL "${testCase.label}": guidance missing "${testCase.mustContain}" (matched ${found.exactName})`);
       failures++;
       continue;
