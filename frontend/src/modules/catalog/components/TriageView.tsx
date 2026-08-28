@@ -1,6 +1,6 @@
 import React from 'react';
 import { AlertTriangle, Clock, Compass, ExternalLink, Loader2, PenLine, Search } from 'lucide-react';
-import { triageApi, type TriageResponse } from '../services/catalog.api';
+import { triageApi, type OrientacionGuardada, type TriageResponse } from '../services/catalog.api';
 import { ApiError } from '../../../config/httpClient';
 import { BRANCH_LABELS } from '../branchLabels';
 import type { MainView } from '../../tenant/types';
@@ -46,6 +46,33 @@ const EJEMPLOS = [
 export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) => {
   const [hechos, setHechos] = React.useState('');
   const [result, setResult] = React.useState<TriageResponse | null>(null);
+  /*
+   * El historial: cada consulta guardada vale para la siguiente — la mitad de
+   * los casos que entran a una firma se parecen a uno anterior. Y los huecos
+   * (consultas iguales sin actuacion, contadas) son la lista de trabajo del
+   * catalogo.
+   */
+  const [historial, setHistorial] = React.useState<OrientacionGuardada[]>([]);
+  const [huecos, setHuecos] = React.useState<Array<{ hechos: string; veces: number }>>([]);
+  const [busquedaHist, setBusquedaHist] = React.useState('');
+
+  const cargarHistorial = React.useCallback(() => {
+    triageApi
+      .historial()
+      .then((r) => {
+        if (r.success) {
+          setHistorial(r.historial);
+          setHuecos(r.huecos);
+        }
+      })
+      .catch(() => {
+        /* El historial es un extra: sin el, la consulta sigue funcionando. */
+      });
+  }, []);
+
+  React.useEffect(() => {
+    cargarHistorial();
+  }, [cargarHistorial]);
   const [cargando, setCargando] = React.useState(false);
   const [error, setError] = React.useState('');
   /*
@@ -75,6 +102,8 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
 
     try {
       setResult(await triageApi.orientar(consulta));
+      // La consulta recien hecha aparece en el historial sin recargar la pantalla.
+      cargarHistorial();
     } catch (err) {
       // 429 es "ya usaste el de hoy", no "esto falló".
       if (err instanceof ApiError && err.status === 402) {
@@ -374,6 +403,101 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
           </div>
         )}
       </div>
+
+      {/* ─── HISTORIAL · cada consulta vale para la siguiente ─────────────── */}
+      {historial.length > 0 && (
+        <div className="mx-auto mt-6 max-w-3xl space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-ui font-semibold text-ink-900">
+              Orientaciones de la firma · {historial.length}
+            </h2>
+            <input
+              value={busquedaHist}
+              onChange={(e) => setBusquedaHist(e.target.value)}
+              placeholder="Buscar por hechos: «despido incapacidad inspector»"
+              className="field ml-auto w-[280px] max-w-full"
+            />
+          </div>
+
+          <div className="overflow-hidden rounded-card border border-line-200 bg-surface">
+            {historial
+              .filter(
+                (h) =>
+                  !busquedaHist.trim() ||
+                  h.hechos.toLowerCase().includes(busquedaHist.trim().toLowerCase())
+              )
+              .slice(0, 15)
+              .map((h) => (
+                <div key={h.id} className="t-row flex flex-wrap items-start gap-3">
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-ui leading-snug text-ink-900">{h.hechos}</span>
+                    <span className="mt-0.5 block font-mono text-[11px] text-ink-500">
+                      {h.userEmail.split('@')[0]} ·{' '}
+                      {new Date(h.createdAt).toLocaleDateString('es-CO', {
+                        day: 'numeric',
+                        month: 'short'
+                      })}
+                      {h.senales?.rama ? ` · ${h.senales.rama}` : ''}
+                    </span>
+                  </span>
+
+                  <span className="w-[190px] shrink-0">
+                    {h.status === 'OK' ? (
+                      <span className="block truncate text-[12px] text-ink-900">
+                        {h.sugerencias[0]?.nombre ?? ''}
+                        {h.sugerencias.length > 1 && (
+                          <span className="text-ink-400"> · de {h.sugerencias.length}</span>
+                        )}
+                      </span>
+                    ) : (
+                      <span className="chip-unverified">Sin actuación en catálogo</span>
+                    )}
+                  </span>
+
+                  {/*
+                    REUTILIZAR copia los HECHOS, nunca los datos del cliente
+                    anterior — es el atajo real de una firma que ve el mismo
+                    caso dos veces por semana.
+                  */}
+                  <button
+                    onClick={() => {
+                      setHechos(h.hechos);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="btn-neutral btn-sm shrink-0"
+                    title="Copia los hechos al cuadro de consulta. Nunca los datos del cliente anterior."
+                  >
+                    Reutilizar
+                  </button>
+                </div>
+              ))}
+          </div>
+
+          {/* ─── LOS HUECOS DEL CATÁLOGO · la lista de trabajo ─────────────── */}
+          {huecos.length > 0 && (
+            <div className="rounded-card border border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))] p-4">
+              <h3 className="text-ui font-semibold text-ink-900">
+                Huecos del catálogo · {huecos.reduce((n, x) => n + x.veces, 0)} consultas sin
+                actuación
+              </h3>
+              <p className="mt-0.5 text-meta leading-[1.5] text-ink-700">
+                Consultas iguales agrupadas y contadas: dicen exactamente qué le falta curar a la
+                firma, antes que cualquier métrica.
+              </p>
+              <ul className="mt-2 space-y-1">
+                {huecos.slice(0, 6).map((hu) => (
+                  <li key={hu.hechos} className="flex items-start gap-2 text-ui text-ink-900">
+                    <span className="shrink-0 font-mono text-[11px] font-semibold text-unverified">
+                      {hu.veces}×
+                    </span>
+                    <span className="min-w-0 truncate">{hu.hechos}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

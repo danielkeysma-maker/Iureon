@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { triageFacts } from './triage.service';
+import { guardarOrientacion, listarOrientaciones, huecosDelCatalogo } from './orientacionHistory.service';
 import { consumirCupo, TOPE_DIARIO } from './orientacionQuota.service';
 import { reserveForOperation, refundReservation, BillingError, PRICE_COP } from '../billing/billing.service';
 
@@ -100,6 +101,20 @@ export const triageController = async (req: Request, res: Response): Promise<voi
     return;
   }
 
+  /*
+   * Al historial ANTES de responder: serverless se congela al responder y un
+   * guardado "para despues" no ocurre. Nunca bloquea la respuesta — el
+   * historial es un extra y la orientacion no puede fallar por el.
+   */
+  await guardarOrientacion({
+    firmId,
+    userEmail,
+    hechos,
+    status: result.status === 'OK' ? 'OK' : 'SIN_COINCIDENCIA',
+    senales: result.senales ?? null,
+    sugerencias: result.suggestions.map((s) => ({ id: s.actuacion.id, nombre: s.actuacion.exactName }))
+  });
+
   res.json({
     success: true,
     status: result.status,
@@ -114,4 +129,17 @@ export const triageController = async (req: Request, res: Response): Promise<voi
     /** Lo que se cobró por ESTA consulta: 0 dentro del cupo. */
     cobradoCop: cupo.cobrar ? PRICE_COP.ORIENTACION : 0
   });
+};
+
+
+/** GET /api/catalog/orientaciones — el historial de la firma, con sus huecos. */
+export const listarOrientacionesController = async (req: Request, res: Response): Promise<void> => {
+  const firmId = req.firmId;
+  if (!firmId) {
+    res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Se requiere una sesión.' });
+    return;
+  }
+
+  const historial = await listarOrientaciones(firmId);
+  res.json({ success: true, historial, huecos: huecosDelCatalogo(historial) });
 };

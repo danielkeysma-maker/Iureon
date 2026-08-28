@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { triageController } from './triage.controller';
+import { triageController, listarOrientacionesController } from './triage.controller';
 import {
   deleteVerificationController,
   getBranchCatalogController,
@@ -37,6 +37,7 @@ const tenantRouter = Router();
  * fuera el nombre de una rama.
  */
 tenantRouter.post('/catalog/triage', triageController as any);
+tenantRouter.get('/catalog/orientaciones', listarOrientacionesController as any);
 
 tenantRouter.get('/catalog/verifications', listVerificationsController as any);
 tenantRouter.put('/catalog/verifications', saveVerificationController as any);

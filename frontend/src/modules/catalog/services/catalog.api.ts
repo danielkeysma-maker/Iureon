@@ -126,7 +126,25 @@ export interface TriageResponse {
   cobradoCop?: number;
 }
 
+export interface OrientacionGuardada {
+  id: string;
+  hechos: string;
+  status: 'OK' | 'SIN_COINCIDENCIA';
+  senales: { rama: string | null; elementos: string[] } | null;
+  sugerencias: Array<{ id: string; nombre: string }>;
+  userEmail: string;
+  createdAt: string;
+}
+
 export const triageApi = {
   orientar: (hechos: string) =>
-    httpClient.post<TriageResponse>('/api/catalog/triage', { body: { hechos } })
+    httpClient.post<TriageResponse>('/api/catalog/triage', { body: { hechos } }),
+
+  /** El historial de la firma con sus huecos agrupados. */
+  historial: () =>
+    httpClient.get<{
+      success: boolean;
+      historial: OrientacionGuardada[];
+      huecos: Array<{ hechos: string; veces: number }>;
+    }>('/api/catalog/orientaciones')
 };
