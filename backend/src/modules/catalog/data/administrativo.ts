@@ -999,6 +999,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Constitución Política, art. 23; Ley 1755 de 2015, arts. 13, 14 y 16 (sustitutivos de los arts. 13, 14 y 16 de la Ley 1437 de 2011)',
     competentAuthority: 'La autoridad a la que se dirige la petición (Ley 1755 de 2015, art. 16 num. 1)',
+    transversal: true,
     term: { status: 'VERIFICADO', description: 'RELOJ DE LA AUTORIDAD, no del peticionario. El art. 13 reconoce el derecho a presentar peticiones respetuosas «por motivos de interés general o particular, y a obtener pronta resolución completa y de fondo sobre la misma»; no fija plazo alguno al peticionario para presentarla: puede presentarse en cualquier tiempo. El plazo corre contra la autoridad: art. 14, «Salvo norma legal especial y so pena de sanción disciplinaria, toda petición deberá resolverse dentro de los quince (15) días siguientes a su recepción». Excepcionalmente la autoridad puede ampliarlo (art. 14 par.), informando al interesado antes del vencimiento y sin que el nuevo plazo «podrá exceder del doble del inicialmente previsto». Si la autoridad no es competente, los términos «se contarán a partir del día siguiente a la recepción de la Petición por la autoridad competente» (art. 21). Ninguna norma de la Ley 1755 de 2015 fija término al peticionario para insistir ni para acudir a la acción de tutela.' },
     requiredSections: [
       { n: 1, name: 'La designación de la autoridad a la que se dirige', mandatory: true, basis: 'Ley 1755 de 2015, art. 16 num. 1' },
@@ -1017,6 +1018,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Constitución Política, art. 23; Ley 1755 de 2015, arts. 13, 14 y 16',
     competentAuthority: 'La autoridad a la que se dirige la petición (Ley 1755 de 2015, art. 16 num. 1)',
+    transversal: true,
     term: { status: 'VERIFICADO', description: 'RELOJ DE LA AUTORIDAD. El peticionario no tiene plazo: el art. 13 permite pedir «por motivos de interés general o particular» y precisa que mediante el derecho de petición «se podrá solicitar: el reconocimiento de un derecho, la intervención de una entidad o funcionario, la resolución de una situación jurídica, la prestación de un servicio». La autoridad debe resolver «dentro de los quince (15) días siguientes a su recepción» (art. 14 inc. 1), prorrogables excepcionalmente hasta el doble informando al interesado antes del vencimiento (art. 14 par.). ADVERTENCIA: el art. 14 abre con «Salvo norma legal especial», de modo que los trámites con norma propia —pensional, tributario, servicios públicos domiciliarios— pueden tener término distinto, que debe verificarse en su propia norma.' },
     requiredSections: [
       { n: 1, name: 'La designación de la autoridad a la que se dirige', mandatory: true, basis: 'Ley 1755 de 2015, art. 16 num. 1' },
@@ -1037,6 +1039,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1755 de 2015, arts. 13, 14 num. 1, 16 y 24',
     competentAuthority: 'La autoridad que posee la información solicitada',
+    transversal: true,
     term: { status: 'VERIFICADO', description: 'RELOJ DE LA AUTORIDAD: diez (10) días. Art. 14 num. 1: «Las peticiones de documentos y de información deberán resolverse dentro de los diez (10) días siguientes a su recepción. Si en ese lapso no se ha dado respuesta al peticionario, se entenderá, para todos los efectos legales, que la respectiva solicitud ha sido aceptada y, por consiguiente, la administración ya no podrá negar la entrega de dichos documentos al peticionario, y como consecuencia las copias se entregarán dentro de los tres (3) días siguientes». Ese silencio es POSITIVO. El plazo es prorrogable excepcionalmente hasta el doble, informando antes de su vencimiento (art. 14 par.). RELOJ DEL PETICIONARIO —distinto y preclusivo—: si la autoridad rechaza la petición invocando reserva legal, la insistencia «deberá interponerse por escrito y sustentado en la diligencia de notificación, o dentro de los diez (10) días siguientes a ella» (art. 26 par.).' },
     requiredSections: [
       { n: 1, name: 'La designación de la autoridad a la que se dirige', mandatory: true, basis: 'Ley 1755 de 2015, art. 16 num. 1' },
@@ -1058,6 +1061,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1755 de 2015, arts. 13, 14 num. 1, 16, 24 y 29',
     competentAuthority: 'La autoridad en cuyos archivos reposan los documentos',
+    transversal: true,
     term: { status: 'VERIFICADO', description: 'RELOJ DE LA AUTORIDAD: diez (10) días para resolver y tres (3) días para entregar las copias cuando opera el silencio positivo. Art. 14 num. 1: «Las peticiones de documentos y de información deberán resolverse dentro de los diez (10) días siguientes a su recepción [...] y como consecuencia las copias se entregarán dentro de los tres (3) días siguientes». El art. 13 inc. 2 incluye expresamente entre las modalidades «examinar y requerir copias de documentos». Costos, art. 29: «En ningún caso el precio de las copias podrá exceder el valor de la reproducción. Los costos de la expedición de las copias correrán por cuenta del interesado en obtenerlas», y «El valor de la reproducción no podrá ser superior al valor comercial de referencia en el mercado». RELOJ DEL PETICIONARIO: diez (10) días siguientes a la notificación para insistir si se niega por reserva (art. 26 par.).' },
     requiredSections: [
       { n: 1, name: 'La designación de la autoridad a la que se dirige', mandatory: true, basis: 'Ley 1755 de 2015, art. 16 num. 1' },
@@ -1079,6 +1083,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1755 de 2015, arts. 13, 14 num. 2, 16 y 28',
     competentAuthority: 'La autoridad competente en la materia objeto de consulta',
+    transversal: true,
     term: { status: 'VERIFICADO', description: 'RELOJ DE LA AUTORIDAD: treinta (30) días. Art. 14 num. 2: «Las peticiones mediante las cuales se eleva una consulta a las autoridades en relación con las materias a su cargo deberán resolverse dentro de los treinta (30) días siguientes a su recepción». Prorrogable excepcionalmente hasta el doble, informando antes del vencimiento (art. 14 par.). ADVERTENCIA sustantiva: el concepto que responde la consulta NO obliga. Art. 28: «Salvo disposición legal en contrario, los conceptos emitidos por las autoridades como respuestas a peticiones realizadas en ejercicio del derecho a formular consultas no serán de obligatorio cumplimiento o ejecución». La consulta no suspende ni interrumpe los términos de otras actuaciones.' },
     requiredSections: [
       { n: 1, name: 'La designación de la autoridad a la que se dirige', mandatory: true, basis: 'Ley 1755 de 2015, art. 16 num. 1' },
@@ -1100,6 +1105,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1755 de 2015, arts. 32 y 33 (Capítulo III); Sentencia C-951 de 2014',
     competentAuthority: 'Organizaciones privadas con o sin personería jurídica —sociedades, corporaciones, fundaciones, asociaciones, organizaciones religiosas, cooperativas, instituciones financieras o clubes— (art. 32); Cajas de Compensación Familiar, instituciones del Sistema de Seguridad Social Integral, entidades del sistema financiero y bursátil y empresas que prestan servicios públicos y servicios públicos domiciliarios regidas por el derecho privado (art. 33); y personas naturales frente a las cuales el solicitante se encuentre en situación de indefensión o subordinación, o que ejerzan posición dominante (art. 32 par. 1)',
+    transversal: true,
     term: { status: 'VERIFICADO', description: 'RELOJ DEL DESTINATARIO PRIVADO, remitido a las reglas del Capítulo I. Art. 32 inc. 2: «Salvo norma legal especial, el trámite y resolución de estas peticiones estarán sometidos a los principios y reglas establecidos en el Capítulo I de este título» —esto es, los términos del art. 14: quince (15) días regla general, diez (10) días documentos e información, treinta (30) días consultas—. La Corte Constitucional declaró EXEQUIBLE esa expresión «bajo el entendido de que al derecho de petición ante organizaciones privadas se aplicarán, en lo pertinente, aquellas disposiciones del Capítulo I que sean compatibles con la naturaleza de las funciones que ejercen los particulares» (C-951 de 2014, numeral undécimo). El art. 33 extiende las mismas disposiciones «en lo pertinente» y «sin perjuicio de lo dispuesto en leyes especiales» —en servicios públicos domiciliarios rige la ley especial, que no se verificó aquí—. El art. 32 par. 3 prohíbe a toda entidad privada negarse a recibir y radicar peticiones respetuosas. No hay término a cargo del peticionario.' },
     requiredSections: [
       { n: 1, name: 'La designación de la autoridad a la que se dirige', mandatory: true, basis: 'Ley 1755 de 2015, art. 16 num. 1' },
@@ -1122,6 +1128,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1755 de 2015, art. 20 (atención prioritaria); art. 14 y su parágrafo (términos de fondo y prórroga que no puede exceder del doble del inicialmente previsto); Ley 1437 de 2011, art. 83 (silencio negativo a los tres meses)',
     competentAuthority: 'La autoridad ante la que cursa la petición',
+    transversal: true,
     term: { status: 'VERIFICADO', description: 'HUECO CERRADO: el art. 20 de la Ley 1755 de 2015 NO fija término alguno — ni al peticionario para pedir la prioridad, ni a la autoridad para decidir sobre ella. «De inmediato» (medidas de urgencia ante peligro inminente para la vida o la integridad) y «preferencialmente» (peticiones de periodistas) no son plazos computables. El plazo de fondo sigue siendo el del art. 14 según la modalidad de la petición, y es RELOJ DE LA AUTORIDAD: «Salvo norma legal especial y so pena de sanción disciplinaria, toda petición deberá resolverse dentro de los quince (15) días siguientes a su recepción»; las de documentos e información dentro de los diez (10) días, con silencio positivo expreso — «Si en ese lapso no se ha dado respuesta al peticionario, se entenderá, para todos los efectos legales, que la respectiva solicitud ha sido aceptada y, por consiguiente, la administración ya no podrá negar la entrega de dichos documentos», entregándose las copias dentro de los tres (3) días siguientes (art. 14 num. 1); las consultas dentro de los treinta (30) días (art. 14 num. 2). El parágrafo del art. 14 permite a la autoridad, informando antes del vencimiento, señalar un plazo razonable «que no podrá exceder del doble del inicialmente previsto». RELOJ DEL PETICIONARIO, que la ficha no publicaba: vencido el término sin respuesta, a los tres (3) meses de presentada la petición opera el silencio negativo del art. 83 del CPACA y desde ahí se abre la vía contenciosa. Artículo 20 declarado EXEQUIBLE, sin condicionamiento (Sentencia C-951 de 2014).' },
     requiredSections: [
       { n: 1, name: 'La designación de la autoridad a la que se dirige', mandatory: true, basis: 'Ley 1755 de 2015, art. 16 num. 1' },
@@ -1145,6 +1152,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1755 de 2015, art. 18',
     competentAuthority: 'La autoridad ante la que cursa la petición',
+    transversal: true,
     term: { status: 'VERIFICADO', description: 'SIN PLAZO PRECLUSIVO PARA EL PETICIONARIO. Art. 18: «Los interesados podrán desistir en cualquier tiempo de sus peticiones, sin perjuicio de que la respectiva solicitud pueda ser nuevamente presentada con el lleno de los requisitos legales, pero las autoridades podrán continuar de oficio la actuación si la consideran necesaria por razones de interés público; en tal caso expedirán resolución motivada». Es decir: puede desistirse en cualquier tiempo mientras la actuación esté en curso; el desistimiento no extingue el derecho a volver a pedir; y no vincula necesariamente a la autoridad, que puede continuar de oficio mediante resolución motivada. Artículo declarado EXEQUIBLE (C-951 de 2014, numeral tercero de la parte resolutiva).' },
     requiredSections: [
       { n: 1, name: 'Designación de la autoridad ante la que cursa la petición', mandatory: true, basis: 'Ley 1755 de 2015, art. 16 num. 1' },
@@ -1163,6 +1171,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1755 de 2015, art. 17',
     competentAuthority: 'La autoridad que formuló el requerimiento',
+    transversal: true,
     term: { status: 'VERIFICADO', description: 'RELOJ DEL PETICIONARIO, preclusivo —este es el plazo del cliente—. Art. 17: la autoridad «requerirá al peticionario dentro de los diez (10) días siguientes a la fecha de radicación para que la complete en el término máximo de un (1) mes». El peticionario dispone de ese mes. «Se entenderá que el peticionario ha desistido de su solicitud o de la actuación cuando no satisfaga el requerimiento, salvo que antes de vencer el plazo concedido solicite prórroga hasta por un término igual» —la prórroga debe pedirse ANTES del vencimiento y es hasta por un (1) mes más—. «Vencidos los términos establecidos en este artículo, sin que el peticionario haya cumplido el requerimiento, la autoridad decretará el desistimiento y el archivo del expediente, mediante acto administrativo motivado, que se notificará personalmente, contra el cual únicamente procede recurso de reposición». RELOJ DE LA AUTORIDAD: los diez (10) días para requerir, y la reactivación del término para resolver «a partir del día siguiente en que el interesado aporte los documentos o informes requeridos».' },
     requiredSections: [
       { n: 1, name: 'Designación de la autoridad requirente', mandatory: true, basis: 'Ley 1755 de 2015, art. 16 num. 1' },
@@ -1181,6 +1190,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1755 de 2015, art. 19',
     competentAuthority: 'La autoridad que devolvió la petición',
+    transversal: true,
     term: { status: 'VERIFICADO', description: 'RELOJ DEL PETICIONARIO: diez (10) días. Art. 19: «Toda petición debe ser respetuosa so pena de rechazo. Solo cuando no se comprenda la finalidad u objeto de la petición esta se devolverá al interesado para que la corrija o aclare dentro de los diez (10) días siguientes. En caso de no corregirse o aclararse, se archivará la petición. En ningún caso se devolverán peticiones que se consideren inadecuadas o incompletas». La sanción por dejar vencer el plazo es el archivo. La devolución solo procede por oscuridad: lo incompleto se rige por el art. 17, con término de un (1) mes.' },
     requiredSections: [
       { n: 1, name: 'Designación de la autoridad que devolvió la petición', mandatory: true, basis: 'Ley 1755 de 2015, art. 16 num. 1' },
@@ -1199,6 +1209,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Ley 1755 de 2015, arts. 25 y 26; Sentencia C-951 de 2014',
     competentAuthority: 'Se interpone ante la autoridad que invoca la reserva; decide en única instancia el Tribunal Administrativo con jurisdicción en el lugar donde se encuentren los documentos —autoridades nacionales, departamentales o del Distrito Capital de Bogotá— o el juez administrativo —autoridades distritales y municipales—; en los municipios en los que no exista juez administrativo, cualquier juez del lugar (C-951 de 2014, numeral noveno)',
+    transversal: true,
     term: { status: 'VERIFICADO', description: 'DOS RELOJES DISTINTOS. (1) DEL PETICIONARIO, preclusivo: art. 26 par., «El recurso de insistencia deberá interponerse por escrito y sustentado en la diligencia de notificación, o dentro de los diez (10) días siguientes a ella». (2) DEL JUEZ: enviada la documentación, el tribunal o el juez administrativo «decidirá dentro de los diez (10) días siguientes», término que se interrumpe cuando pida copias o información adicional, y cuando la autoridad solicite a la sección del Consejo de Estado avocar conocimiento —«Si al cabo de cinco (5) días la sección guarda silencio, o decide no avocar conocimiento, la actuación continuará ante el respectivo tribunal o juzgado administrativo»—. Nota: contra la decisión que rechaza por reserva legal «no procede recurso alguno, salvo lo previsto en el artículo siguiente» (art. 25), y «La restricción por reserva legal no se extenderá a otras piezas del respectivo expediente o actuación que no estén cubiertas por ella».' },
     requiredSections: [
       { n: 1, name: 'Designación de la autoridad que invocó la reserva, ante la cual se presenta la insistencia', mandatory: true, basis: 'Ley 1755 de 2015, arts. 16 num. 1 y 26' },
@@ -1219,6 +1230,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 1755 de 2015, arts. 13, 14, 16 par. 1 y 31',
     competentAuthority: 'La autoridad destinataria de la petición',
+    transversal: true,
     term: { status: 'VERIFICADO', description: 'RELOJ DE LA AUTORIDAD. Art. 14: «Salvo norma legal especial y so pena de sanción disciplinaria, toda petición deberá resolverse dentro de los quince (15) días siguientes a su recepción. Estará sometida a término especial la resolución de las siguientes peticiones: 1. Las peticiones de documentos y de información deberán resolverse dentro de los diez (10) días siguientes a su recepción [...] 2. Las peticiones mediante las cuales se eleva una consulta a las autoridades en relación con las materias a su cargo deberán resolverse dentro de los treinta (30) días siguientes a su recepción». La respuesta debe ser «pronta resolución completa y de fondo» (art. 13 inc. 1). El incumplimiento es falta disciplinaria: art. 31, «La falta de atención a las peticiones y a los términos para resolver, la contravención a las prohibiciones y el desconocimiento de los derechos de las personas de que trata esta Parte Primera del Código, constituirán falta para el servidor público y darán lugar a las sanciones correspondientes de acuerdo con el régimen disciplinario»; la Corte declaró INEXEQUIBLE la expresión «gravísima» que traía el proyecto (C-951 de 2014, numeral décimo).' },
     requiredSections: [
       { n: 1, name: 'Identificación de la petición, de su fecha de radicación y del peticionario', mandatory: true, basis: 'Ley 1755 de 2015, art. 15' },
@@ -1239,6 +1251,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 1755 de 2015, art. 14 par.',
     competentAuthority: 'La autoridad que tramita la petición',
+    transversal: true,
     term: { status: 'VERIFICADO', description: 'RELOJ DE LA AUTORIDAD, con oportunidad preclusiva para ella. Art. 14 par.: «Cuando excepcionalmente no fuere posible resolver la petición en los plazos aquí señalados, la autoridad debe informar esta circunstancia al interesado, antes del vencimiento del término señalado en la ley expresando los motivos de la demora y señalando a la vez el plazo razonable en que se resolverá o dará respuesta, que no podrá exceder del doble del inicialmente previsto». Tres exigencias acumulativas: (i) el aviso debe darse ANTES del vencimiento del término original —después ya no sanea la mora—; (ii) debe expresar los motivos de la demora; (iii) el nuevo plazo no puede exceder del doble del inicial: máximo treinta (30) días en la petición general, veinte (20) en documentos e información y sesenta (60) en consultas. ADVERTENCIA: esta es la ampliación ordinaria del art. 14 par.; NO son los términos ampliados del art. 5 del Decreto Legislativo 491 de 2020, derogado por el art. 2 de la Ley 2207 de 2022.' },
     requiredSections: [
       { n: 1, name: 'Identificación de la petición y de su fecha de radicación', mandatory: true, basis: 'Ley 1755 de 2015, art. 14 par.' },
@@ -1256,6 +1269,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 1755 de 2015, arts. 27 y 30',
     competentAuthority: 'La autoridad requerida',
+    transversal: true,
     term: { status: 'VERIFICADO', description: 'RELOJ DE LA AUTORIDAD REQUERIDA: diez (10) días para información y documentos. Art. 30: «Cuando una autoridad formule una petición de información o de documentos a otra, esta deberá resolverla en un término no mayor de diez (10) días. En los demás casos, resolverá las solicitudes dentro de los plazos previstos en el artículo 14» —quince (15) días como regla general y treinta (30) días en consultas—. Concordancia sustantiva: art. 27, el carácter reservado «no será oponible a las autoridades judiciales, legislativas, ni a las autoridades administrativas que siendo constitucional o legalmente competentes para ello, los soliciten para el debido ejercicio de sus funciones», quedando la autoridad solicitante obligada a asegurar la reserva.' },
     requiredSections: [
       { n: 1, name: 'Designación de la autoridad requerida', mandatory: true, basis: 'Ley 1755 de 2015, art. 16 num. 1' },
@@ -1275,6 +1289,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 1755 de 2015, art. 17',
     competentAuthority: 'La autoridad ante la que se radicó la petición',
+    transversal: true,
     term: { status: 'VERIFICADO', description: 'DOS RELOJES. (1) DE LA AUTORIDAD: debe requerir «dentro de los diez (10) días siguientes a la fecha de radicación» (art. 17 inc. 1). (2) DEL PETICIONARIO: «el término máximo de un (1) mes» para completar, prorrogable «hasta por un término igual» si lo solicita antes de vencer el plazo concedido. Solo «vencidos los términos establecidos en este artículo, sin que el peticionario haya cumplido el requerimiento, la autoridad decretará el desistimiento y el archivo del expediente, mediante acto administrativo motivado, que se notificará personalmente, contra el cual únicamente procede recurso de reposición, sin perjuicio de que la respectiva solicitud pueda ser nuevamente presentada con el lleno de los requisitos legales». Además, «A partir del día siguiente en que el interesado aporte los documentos o informes requeridos, se reactivará el término para resolver la petición». Artículo declarado EXEQUIBLE (C-951 de 2014, numeral tercero).' },
     requiredSections: [
       { n: 1, name: 'Identificación de la petición, del peticionario y de la fecha de radicación', mandatory: true, basis: 'Ley 1755 de 2015, art. 17' },
@@ -1295,6 +1310,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 1755 de 2015, art. 21',
     competentAuthority: 'La autoridad que recibió la petición sin ser competente',
+    transversal: true,
     term: { status: 'VERIFICADO', description: 'RELOJ DE LA AUTORIDAD. Art. 21: «Si la autoridad a quien se dirige la petición no es la competente, se informará de inmediato al interesado si este actúa verbalmente, o dentro de los cinco (5) días siguientes al de la recepción, si obró por escrito. Dentro del término señalado remitirá la petición al competente y enviará copia del oficio remisorio al peticionario o en caso de no existir funcionario competente así se lo comunicará». REGLA DE CÓMPUTO decisiva para el peticionario: «Los términos para decidir o responder se contarán a partir del día siguiente a la recepción de la Petición por la autoridad competente» —el plazo del art. 14 no corre desde la radicación inicial ante la autoridad incompetente—.' },
     requiredSections: [
       { n: 1, name: 'Identificación de la petición, del peticionario y de la fecha de recepción', mandatory: true, basis: 'Ley 1755 de 2015, art. 21' },
@@ -1313,6 +1329,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 1755 de 2015, arts. 24, 25 y 26',
     competentAuthority: 'La autoridad que custodia la información o los documentos',
+    transversal: true,
     term: { status: 'VERIFICADO', description: 'RELOJ DE LA AUTORIDAD: el art. 25 no fija término propio; la decisión debe adoptarse dentro del término del art. 14 num. 1 aplicable a la petición que rechaza, esto es, «dentro de los diez (10) días siguientes a su recepción» tratándose de documentos e información. Vencido ese plazo sin respuesta opera el silencio POSITIVO del art. 14 num. 1 y «la administración ya no podrá negar la entrega de dichos documentos al peticionario». Contenido obligatorio, art. 25: «Toda decisión que rechace la petición de informaciones o documentos será motivada, indicará en forma precisa las disposiciones legales que impiden la entrega de información o documentos pertinentes y deberá notificarse al peticionario. Contra la decisión que rechace la petición de informaciones o documentos por motivos de reserva legal, no procede recurso alguno, salvo lo previsto en el artículo siguiente». RELOJ DEL PETICIONARIO frente a esta decisión: diez (10) días siguientes a la notificación para insistir (art. 26 par.).' },
     requiredSections: [
       { n: 1, name: 'Identificación de la petición de información o de documentos y de su fecha de radicación', mandatory: true, basis: 'Ley 1755 de 2015, art. 25' },
@@ -1332,6 +1349,7 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     role: 'DESPACHO',
     legalBasis: 'Ley 1755 de 2015, art. 22; Sentencia C-951 de 2014',
     competentAuthority: 'La autoridad destinataria de las peticiones',
+    transversal: true,
     term: { status: 'VERIFICADO', description: 'RELOJ DE LA AUTORIDAD: el art. 22 no fija término propio; rigen los del art. 14 según la modalidad de cada petición (15 / 10 / 30 días). Art. 22 inc. 2: «Cuando más de diez (10) personas formulen peticiones análogas, de información, de interés general o de consulta, la Administración podrá dar una única respuesta que publicará en un diario de amplia circulación, la pondrá en su página web y entregará copias de la misma a quienes las soliciten». La Corte Constitucional lo declaró EXEQUIBLE «sin perjuicio de que deba enviarse la respuesta a todos los que hayan formulado la petición» (C-951 de 2014, numeral séptimo): la publicación NO releva del envío individual.' },
     requiredSections: [
       { n: 1, name: 'Verificación de que más de diez (10) personas formularon peticiones análogas de información, de interés general o de consulta', mandatory: true, basis: 'Ley 1755 de 2015, art. 22 inc. 2' },

@@ -278,6 +278,12 @@ def build_entry(item, branch, prefix, seen, unverified_names=frozenset()):
         '    role: %s,' % ts(item.get('role') or 'LITIGANTE'),
         '    legalBasis: %s,' % ts(item.get('legal_basis')),
         '    competentAuthority: %s,' % ts(item.get('competent_authority')),
+        # Sin esta linea el campo se perdia entre el JSON y el TS: `transversal`
+        # existia en types.ts y catalog.service.ts lo leia, pero NINGUNA ficha
+        # llegaba a tenerlo, asi que las 18 del derecho de peticion seguian
+        # visibles solo en ADMINISTRATIVO — justo el defecto que se habia dado
+        # por corregido. Una capacidad que nadie emite es una capacidad muerta.
+        '    transversal: true,' if item.get('transversal') else None,
         "    term: { status: '%s', description: %s }," % (status, ts(description)),
         '    requiredSections: [',
         ',\n'.join(sections),
@@ -286,7 +292,7 @@ def build_entry(item, branch, prefix, seen, unverified_names=frozenset()):
         '  }',
     ]
 
-    return '\n'.join(lines), status
+    return '\n'.join(line for line in lines if line is not None), status
 
 
 HEADER = """import type {{ BranchCatalog }} from '../types';
