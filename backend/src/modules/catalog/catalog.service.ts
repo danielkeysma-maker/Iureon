@@ -88,12 +88,31 @@ export class CatalogService {
   }
 
   list(branch?: LegalBranch, role?: ActuacionRole): Actuacion[] {
-    return this.actuaciones.filter(
+    const encontradas = this.actuaciones.filter(
       // Lo transversal aparece en TODA rama: el derecho de peticion se ejerce
       // ante cualquier autoridad, y esconderlo fuera de administrativo dejaba
       // al laboralista sin la actuacion que mas radica.
       (a) => (!branch || a.branch === branch || a.transversal === true) && (!role || a.role === role)
     );
+
+    /*
+     * LO PROPIO DE LA RAMA VA PRIMERO; LO TRANSVERSAL, DETRAS.
+     *
+     * El filtro conservaba el orden del catalogo global, y las 18 fichas
+     * transversales del derecho de peticion viven en `administrativo.ts`, que
+     * es el primer archivo del indice. Resultado medido en produccion sobre
+     * CONSTITUCIONAL: de 31 opciones, las ONCE primeras eran peticiones y la
+     * "Accion de tutela" quedaba en el puesto doce. Quien abre la rama de
+     * tutelas busca la tutela, no once variantes de peticion antes de ella.
+     *
+     * Estable dentro de cada grupo: no se reordena nada mas, solo se empuja lo
+     * prestado detras de lo propio. Sin `branch` no hay nada que separar.
+     */
+    if (!branch) return encontradas;
+
+    const propias = encontradas.filter((a) => a.branch === branch);
+    const prestadas = encontradas.filter((a) => a.branch !== branch);
+    return [...propias, ...prestadas];
   }
 
   getById(id: string): Actuacion | null {

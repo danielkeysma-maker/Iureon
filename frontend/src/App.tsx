@@ -308,6 +308,16 @@ export function App() {
   const handleLoadDraft = (entry: SavedDraftEntry) => {
     workflow.setGeneratedDraft(entry.draft);
     workflow.setActiveDraftText(entry.draft.legalText);
+    /*
+     * LA RAMA VIAJA CON EL TIPO, y antes no lo hacía.
+     *
+     * Se restauraba solo `documentType` y la rama se quedaba en la que hubiera
+     * elegida, así que un borrador de familia abierto con la rama en civil
+     * emparejaba su actuación con una rama donde no existe: la barra lo
+     * declaraba sin catalogar y continuar el borrador lo redactaba sin norma
+     * verificada. La fila ya traía `legalBranch` desde el servidor.
+     */
+    if (entry.legalBranch) workflow.setLegalBranch(entry.legalBranch);
     workflow.setDocumentType(entry.draft.documentType);
     workflow.setRightView('draft');
     setLoadedDraftId(entry.id);

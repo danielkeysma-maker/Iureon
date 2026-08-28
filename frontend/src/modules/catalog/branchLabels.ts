@@ -36,9 +36,16 @@ export const BRANCH_LABELS: Record<string, string> = {
   // Comisarias y defensorias de familia: administrativo, no policivo ni
   // judicial. El comisario no figura entre las autoridades de policia del
   // art. 198 de la Ley 1801, y el juez de familia entra despues.
-  FAMILIA_ADMINISTRATIVA: 'Comisarías & Defensorías de Familia',
-  // Not catalogued: kept so its legacy document types remain reachable.
-  'PEQUEÑAS_CAUSAS': 'Pequeñas Causas (Mínima Cuantía)'
+  FAMILIA_ADMINISTRATIVA: 'Comisarías & Defensorías de Familia'
+  /*
+   * Aqui vivia 'PEQUEÑAS_CAUSAS', conservada —decia su comentario— «para que
+   * sus tipos de documento heredados sigan alcanzables». Esos tipos heredados
+   * ya no existen: el archivo que los contenia se borro y nada los importa. La
+   * etiqueta no la puede pintar nadie, porque el selector se construye desde
+   * las ramas que devuelve la API y esta no es una de ellas. Una entrada que
+   * ningun camino alcanza no es compatibilidad: es una rama inventada
+   * esperando a que alguien la crea real.
+   */
 };
 
 /** Falls back to the raw key so a new branch is never invisible. */

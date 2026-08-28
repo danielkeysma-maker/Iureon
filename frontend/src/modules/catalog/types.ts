@@ -3,6 +3,16 @@
  * backend/src/modules/catalog/types.ts.
  */
 
+/**
+ * Las 22 ramas del catálogo. DEBE coincidir con la unión del backend.
+ *
+ * Se quedó en trece mientras el catálogo crecía a veintidós, así que el tipo
+ * afirmaba una cosa y la API devolvía otra: `useCatalogBranches` se declara
+ * `LegalBranch[]` y recibía nueve valores que este tipo decía imposibles. No
+ * rompía en pantalla —`BRANCH_LABELS` es `Record<string,string>`— y por eso
+ * nadie lo veía; lo que sí hacía era volver inútil el typecheck justo donde el
+ * contrato con el catálogo importa.
+ */
 export type LegalBranch =
   | 'CONSTITUCIONAL'
   | 'ADMINISTRATIVO'
@@ -16,7 +26,16 @@ export type LegalBranch =
   | 'NOTARIAL'
   | 'CONTRATACION'
   | 'SUPERINTENDENCIAS'
-  | 'INTERNACIONAL';
+  | 'INTERNACIONAL'
+  | 'AGRARIO'
+  | 'ADUANERO'
+  | 'PROPIEDAD_INTELECTUAL'
+  | 'POLICIVO'
+  | 'DISCIPLINARIO'
+  | 'ARBITRAJE'
+  | 'INSOLVENCIA'
+  | 'AMBIENTAL'
+  | 'FAMILIA_ADMINISTRATIVA';
 
 /**
  * Who signs the document.

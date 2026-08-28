@@ -11,11 +11,22 @@ import type { LegalBranch } from '../types';
  * Reading the list from the source makes that drift impossible.
  *
  * Works with no firm selected — the shipped catalogue is product knowledge.
- * Returns an empty array while loading and on failure, so the caller keeps its
- * own fallback rather than showing an empty selector.
+ *
+ * WHY IT REPORTS A STATE. It used to answer `[]` while loading AND on failure,
+ * two facts flattened into one value, so the caller — which shows "Cargando…"
+ * on an empty list — spun forever on a branch request that had already failed,
+ * with a footer reading "0 ramas". The same defect this codebase already fixed
+ * in `useBranchActuacionesState` and in `useActuacion`: a hook that cannot say
+ * "I failed" forces every caller to guess, and they all guess "still loading".
  */
-export const useCatalogBranches = (): LegalBranch[] => {
-  const [branches, setBranches] = useState<LegalBranch[]>([]);
+export type CatalogBranches =
+  | { estado: 'CARGANDO'; ramas: [] }
+  | { estado: 'LISTA'; ramas: LegalBranch[] }
+  /** The catalogue could not be reached. Distinct from "it answered with none". */
+  | { estado: 'ERROR'; ramas: [] };
+
+export const useCatalogBranchesState = (): CatalogBranches => {
+  const [estado, setEstado] = useState<CatalogBranches>({ estado: 'CARGANDO', ramas: [] });
 
   useEffect(() => {
     let cancelled = false;
@@ -23,10 +34,10 @@ export const useCatalogBranches = (): LegalBranch[] => {
     catalogApi
       .list()
       .then((result) => {
-        if (!cancelled) setBranches(result.branches);
+        if (!cancelled) setEstado({ estado: 'LISTA', ramas: result.branches });
       })
       .catch(() => {
-        if (!cancelled) setBranches([]);
+        if (!cancelled) setEstado({ estado: 'ERROR', ramas: [] });
       });
 
     return () => {
@@ -34,5 +45,8 @@ export const useCatalogBranches = (): LegalBranch[] => {
     };
   }, []);
 
-  return branches;
+  return estado;
 };
+
+/** The plain list, for callers that only need the values. */
+export const useCatalogBranches = (): LegalBranch[] => useCatalogBranchesState().ramas;

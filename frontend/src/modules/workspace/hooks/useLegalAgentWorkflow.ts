@@ -14,7 +14,16 @@ export function useLegalAgentWorkflow(formatoDeFirma?: string) {
   const [rightView, setRightView] = useState<'pdf' | 'draft'>('pdf');
   const [legalPrompt, setLegalPrompt] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [documentType, setDocumentType] = useState('Contestación de Demanda');
+  /*
+   * NACE SIN ACTUACIÓN ELEGIDA, y eso es lo correcto.
+   *
+   * Arrancaba en 'Contestación de Demanda', que NO es un `exactName` de ninguna
+   * de las 651 fichas: cada taller recién abierto empezaba ya en SIN_CATALOGAR,
+   * con el aviso de «la norma que el modelo recuerde» encendido sobre una
+   * actuación que el abogado nunca eligió. Un valor por defecto que no existe
+   * en el catálogo es peor que ninguno, porque parece una elección.
+   */
+  const [documentType, setDocumentType] = useState('');
   // The branch belongs to the workflow, not to the panel that renders its
   // selector: the catalogue cannot resolve a filing name without it. "Recurso
   // de reposición" exists in civil and administrativo with different deadlines,

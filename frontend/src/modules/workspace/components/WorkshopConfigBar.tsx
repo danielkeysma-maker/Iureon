@@ -1,9 +1,9 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { CheckCircle2, ChevronRight, CircleDashed, MinusCircle } from 'lucide-react';
 import { Combobox, type OpcionCombobox } from './Combobox';
 import { useActuacionLookup } from '../../catalog/hooks/useActuacion';
 import { useBranchActuacionesState } from '../../catalog/hooks/useBranchActuaciones';
-import { useCatalogBranches } from '../../catalog/hooks/useCatalogBranches';
+import { useCatalogBranchesState } from '../../catalog/hooks/useCatalogBranches';
 import { BRANCH_LABELS } from '../../catalog/branchLabels';
 import type { Actuacion, ActuacionRole } from '../../catalog/types';
 
@@ -78,7 +78,8 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
   documentType,
   setDocumentType
 }) => {
-  const ramas = useCatalogBranches();
+  const ramasEstado = useCatalogBranchesState();
+  const ramas = ramasEstado.ramas;
   const catalogo = useBranchActuacionesState(legalBranch, userRole);
   const lookup = useActuacionLookup(documentType, legalBranch);
   const actuacion = lookup.actuacion;
@@ -125,6 +126,35 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
   const todasDeLaRama = useBranchActuacionesState(legalBranch);
   const otrosRoles = Math.max(0, todasDeLaRama.nombres.length - catalogo.nombres.length);
 
+  /*
+   * UNA ACTUACIÓN NO SOBREVIVE A SU RAMA.
+   *
+   * Nada soltaba el tipo elegido al cambiar de rama, así que quedaba huérfano:
+   * reproducido en producción, con la rama en «Constitucional & Tutelas» el
+   * selector mostraba «Elegir actuación…» mientras el estado seguía valiendo
+   * «Contestación de Demanda», el título del documento la anunciaba y el aviso
+   * de «no está en el catálogo verificado» ya estaba encendido. Generar ahí
+   * redacta con la norma que el modelo recuerde — exactamente lo que el
+   * catálogo existe para impedir — y el abogado no tenía cómo verlo, porque el
+   * control decía estar vacío.
+   *
+   * Se espera a que la lista de la rama esté CARGADA antes de soltar nada: en
+   * CARGANDO todavía no se sabe si pertenece, y limpiar por adelantado borraría
+   * la elección legítima de quien acaba de llegar desde Orientación.
+   *
+   * Y se compara contra la rama COMPLETA, no contra la lista filtrada por rol:
+   * las 18 fichas transversales del derecho de petición viven en todas las
+   * ramas, y una actuación que sigue siendo válida no debe perderse por cambiar
+   * de rama. Si el rol es el que la esconde, de eso ya habla el pie del
+   * selector.
+   */
+  useEffect(() => {
+    if (!documentType) return;
+    if (todasDeLaRama.estado !== 'LISTA') return;
+    if (todasDeLaRama.nombres.includes(documentType)) return;
+    setDocumentType('');
+  }, [documentType, todasDeLaRama, setDocumentType]);
+
   return (
     /*
       SIN `overflow` Y SIN `flex-wrap`, y las dos ausencias son deliberadas.
@@ -164,8 +194,19 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
         opciones={opcionesRama}
         onChange={setLegalBranch}
         anchoBoton="max-w-[190px]"
-        cargando={ramas.length === 0}
-        pie={`${ramas.length} ramas. La rama decide qué actuaciones se ofrecen y con qué término.`}
+        cargando={ramasEstado.estado === 'CARGANDO'}
+        pie={
+          /*
+           * UN FALLO NO ES UNA CARGA. El hook devolvia [] en ambos casos, asi
+           * que una peticion caida dejaba el selector diciendo «Cargando…»
+           * para siempre y el pie anunciando «0 ramas».
+           */
+          ramasEstado.estado === 'ERROR'
+            ? 'No se pudo leer el catálogo. Revise la conexión y vuelva a intentarlo.'
+            : ramasEstado.estado === 'CARGANDO'
+            ? 'Consultando las ramas del catálogo…'
+            : `${ramas.length} ramas. La rama decide qué actuaciones se ofrecen y con qué término.`
+        }
       />
 
       <Flecha />
@@ -195,6 +236,23 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
                   esta rama con otro rol.
                 </>
               )}
+            </>
+          ) : catalogo.estado === 'CARGANDO' ? (
+            'Consultando el catálogo de esta rama…'
+          ) : otrosRoles > 0 ? (
+            /*
+             * VACÍA POR EL ROL NO ES VACÍA POR LA RAMA, y decir lo segundo es
+             * mentir sobre el catálogo. Solo CIVIL (14) y ARBITRAJE (2) tienen
+             * fichas de secretaría, así que en las otras veinte ramas un
+             * secretario leía «esta rama aún no tiene catálogo verificado»
+             * sobre ramas con decenas de actuaciones comprobadas.
+             */
+            <>
+              Ninguna actuación de esta rama la firma{' '}
+              <b className="font-semibold text-ink-700">
+                {ROLES.find((r) => r.valor === userRole)?.etiqueta}
+              </b>
+              ; hay <b className="font-mono font-semibold text-ink-900">{otrosRoles}</b> con otro rol.
             </>
           ) : (
             'Esta rama aún no tiene catálogo verificado.'

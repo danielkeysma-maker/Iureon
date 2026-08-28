@@ -151,8 +151,19 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
    */
   const obligatorias = actuacion?.requiredSections.filter((sec) => sec.mandatory).length ?? 0;
 
+  /*
+   * SIN ACTUACION NO SE GENERA.
+   *
+   * El tipo es el contrato con el catalogo: es lo que resuelve el articulo, la
+   * autoridad y el termino verificado. Permitir generar sin el produce un
+   * escrito con la norma que el modelo recuerde, que es justo lo que el
+   * catalogo existe para impedir — y el abogado no tiene como distinguirlo del
+   * bueno una vez esta escrito.
+   */
+  const faltaActuacion = !documentType;
+
   const generar = (e: React.FormEvent) => {
-    if (!legalPrompt.trim() || isProcessing) return;
+    if (!legalPrompt.trim() || isProcessing || faltaActuacion) return;
     handleSendPrompt(e);
   };
 
@@ -203,7 +214,9 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
             placeholder={
               activeDraftText
                 ? 'Qué corregir, continuar o ampliar del borrador cargado…'
-                : `Describa los hechos y la pretensión para ${documentType.toLowerCase()}…`
+                : documentType
+                ? `Describa los hechos y la pretensión para ${documentType.toLowerCase()}…`
+                : 'Describa los hechos y la pretensión de este escrito…'
             }
             className="field-area mt-2.5 min-h-[140px] flex-1 resize-none"
           />
@@ -308,31 +321,51 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
                     </div>
                   </div>
 
-                  <ol className="mt-2 space-y-1 pl-5">
+                  {/*
+                    DOS RENGLONES, CON EL NOMBRE ARRIBA — la misma lección que
+                    el Combobox ya había aprendido y que aquí faltaba aplicar.
+
+                    Estaban en UNA fila: número · nombre · «oblig.» · fundamento,
+                    y el fundamento llevaba `shrink-0`. Los fundamentos de este
+                    catálogo no son «art. 14»: son frases enteras —«Decreto 2591
+                    de 1991, art. 14 (no es indispensable citar norma)»—, así que
+                    con `shrink-0` no cedían un píxel. Medido en producción sobre
+                    la acción de tutela: el panel mide 399 px y su contenido
+                    llegaba a 1047; un fundamento ocupaba 900 px él solo y
+                    aplastaba el nombre de la sección a 74 px, que es como se
+                    leía «Identificación / y residencia / del / solicitante» en
+                    columna, con la cita cortada contra el borde.
+
+                    Ahora el nombre manda y ocupa el ancho; el fundamento va
+                    debajo, truncado con su `title` para leerlo completo.
+                  */}
+                  <ol className="mt-2 space-y-1.5 pl-5">
                     {actuacion.requiredSections.map((sec) => (
-                      <li key={sec.n} className="flex items-baseline gap-1.5 text-meta">
+                      <li key={sec.n} className="flex min-w-0 items-baseline gap-1.5 text-meta">
                         <span className="shrink-0 font-mono text-[10px] text-ink-400">{sec.n}.</span>
-                        <span className={sec.mandatory ? 'text-ink-900' : 'text-ink-500'}>
-                          {sec.name}
+                        <span className="min-w-0 flex-1">
+                          <span className={sec.mandatory ? 'text-ink-900' : 'text-ink-500'}>
+                            {sec.name}
+                          </span>
+                          {/*
+                            El catálogo distingue lo que la norma EXIGE de lo que
+                            es costumbre, y esa diferencia decide si omitir una
+                            sección es un defecto o una elección de redacción.
+                          */}
+                          {sec.mandatory && (
+                            <span className="ml-1.5 whitespace-nowrap font-mono text-[9px] uppercase tracking-[0.08em] text-verified">
+                              oblig.
+                            </span>
+                          )}
+                          {sec.basis && (
+                            <span
+                              className="mt-0.5 block truncate font-mono text-[10px] text-ink-400"
+                              title={sec.basis}
+                            >
+                              {sec.basis}
+                            </span>
+                          )}
                         </span>
-                        {/*
-                          El catálogo distingue lo que la norma EXIGE de lo que
-                          es costumbre, y esa diferencia decide si omitir una
-                          sección es un defecto o una elección de redacción.
-                        */}
-                        {sec.mandatory && (
-                          <span className="shrink-0 font-mono text-[9px] uppercase tracking-[0.08em] text-verified">
-                            oblig.
-                          </span>
-                        )}
-                        {sec.basis && (
-                          <span
-                            className="ml-auto shrink-0 truncate font-mono text-[10px] text-ink-400"
-                            title={sec.basis}
-                          >
-                            {sec.basis}
-                          </span>
-                        )}
                       </li>
                     ))}
                   </ol>
@@ -378,7 +411,7 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
             Solo en SIN_CATALOGAR: mientras carga no se dice nada, porque una
             advertencia que parpadea enseña a ignorar todas las demás.
           */}
-          {lookup.estado === 'SIN_CATALOGAR' && (
+          {lookup.estado === 'SIN_CATALOGAR' && documentType && (
             <p className="notice-unverified mt-3">
               <span>
                 <b className="font-semibold">“{documentType}”</b> no está en el catálogo verificado.
@@ -389,11 +422,14 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
 
           <div className="mt-3 flex items-center gap-3 border-t border-line-100 pt-3">
             <p className="text-meta leading-[1.4] text-ink-500">
-              3 modelos · el saldo se descuenta al terminar
+              {faltaActuacion
+                ? 'Elija la actuación arriba: es la que trae el artículo y el término verificados.'
+                : '3 modelos · el saldo se descuenta al terminar'}
             </p>
             <button
               type="submit"
-              disabled={!legalPrompt.trim() || isProcessing}
+              disabled={!legalPrompt.trim() || isProcessing || faltaActuacion}
+              title={faltaActuacion ? 'Elija la actuación en la barra de arriba' : undefined}
               className="btn-primary ml-auto shrink-0"
             >
               {isProcessing

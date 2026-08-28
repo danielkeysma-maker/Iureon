@@ -15,7 +15,29 @@ const aiService = new OpenRouterMultiEngineService();
 
 export const streamAgentDraftController = async (req: Request, res: Response): Promise<void> => {
   const firmId = req.firmId;
-  const { documentType, legalPrompt, expedienteId, existingDraft, customFormatInstruction } = req.body;
+  /*
+   * LA RAMA VIAJA HASTA EL CATALOGO, y antes se caia aqui.
+   *
+   * El taller la enviaba desde el primer dia y este destructuring no la leia,
+   * asi que `buildCatalogGuidanceForFirm` resolvia contra las 651 fichas sin
+   * rama. La guarda de ambiguedad hace entonces lo que debe — se niega — y
+   * "Solicitud de medidas cautelares", "Recurso de suplica" o "Recurso
+   * extraordinario de revision", que existen en ADMINISTRATIVO y en CIVIL con
+   * plazos distintos, resolvian a null: sin articulo, sin autoridad y sin
+   * termino verificado, el modelo escribia la norma DE MEMORIA.
+   *
+   * Es el defecto mas caro posible porque es invisible: la pantalla muestra la
+   * ficha correcta (los selectores SI mandan la rama a /catalog) mientras el
+   * escrito se redacta sin ella.
+   */
+  const {
+    documentType,
+    legalBranch,
+    legalPrompt,
+    expedienteId,
+    existingDraft,
+    customFormatInstruction
+  } = req.body;
 
   if (!legalPrompt) {
     res.status(400).json({ error: 'MISSING_PROMPT', message: 'Se requiere la instrucción jurídica en legalPrompt' });
@@ -85,6 +107,7 @@ export const streamAgentDraftController = async (req: Request, res: Response): P
         operationId,
         maxDraftTokens,
         documentType: documentType || 'Contestación de Demanda',
+        legalBranch,
         legalPrompt,
         expedienteId,
         existingDraft,
