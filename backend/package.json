@@ -41,7 +41,8 @@
     "check:cupo": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/catalog/__checks__/orientacionQuota.check.ts",
     "check:prefs": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/preferences/__checks__/preferences.check.ts",
     "check:drafts": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/drafts/__checks__/drafts.check.ts",
-    "check:relojes": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/catalog/__checks__/relojes.check.ts"
+    "check:relojes": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/catalog/__checks__/relojes.check.ts",
+    "check:cndj": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/jurisprudence/__checks__/cndjRuling.check.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
