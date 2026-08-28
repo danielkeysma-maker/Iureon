@@ -62,10 +62,60 @@ const AGENTE =
  * caracteres alcanza de sobra para las primeras decenas de filas, que es lo
  * único que se va a mostrar.
  */
-const MAX_RESULTADOS_BYTES = 1_500_000;
+const MAX_RESULTADOS_BYTES = 4_000_000;
 
-/** Cuántas providencias se devuelven como máximo. */
-const MAX_PROVIDENCIAS = 8;
+/**
+ * Cuántas radicaciones basta con haber visto para dejar de leer.
+ *
+ * SE CORTA POR LO QUE SE NECESITA, NO POR PESO. La primera versión cortaba a
+ * un millón y medio de caracteres, y eso es tosco: medido contra la relatoría,
+ * «sancion disciplinaria abogado» devuelve 36 MB con 10.393 radicaciones en 22
+ * segundos, y los primeros bytes traen sobre todo cabecera — el corte por peso
+ * dejaba DOS radicaciones donde había diez mil. Se pide el doble del máximo
+ * porque no toda ficha tiene documento descargable, y no más: con una consulta
+ * amplia cada radicación de más cuesta segundos de descarga que la función no
+ * tiene.
+ */
+const RADICACIONES_SUFICIENTES = 6;
+
+/**
+ * Cuántas providencias se devuelven como máximo.
+ *
+ * TRES, Y NO OCHO, PORQUE HAY UN PRESUPUESTO DE TIEMPO REAL. Esto corre en una
+ * función sin servidor que se corta a los diez segundos, y cada providencia
+ * cuesta dos peticiones más descargar y parsear un PDF de medio megabyte. Con
+ * ocho, la función moría entera y el buscador recibía «fetch failed» — un fallo
+ * que se lee como «la fuente no responde» cuando la fuente estaba perfectamente.
+ */
+const MAX_PROVIDENCIAS = 3;
+
+/**
+ * Lo que puede tardar la búsqueda completa antes de devolver lo que lleve.
+ *
+ * DEVOLVER TRES PROVIDENCIAS TARDE ES PEOR QUE DEVOLVER UNA A TIEMPO, porque
+ * tarde no se devuelve nada: la plataforma corta la función y el abogado ve un
+ * error. El presupuesto se consulta antes de empezar cada providencia, así que
+ * lo ya descargado siempre se entrega.
+ */
+const PRESUPUESTO_MS = 24_000;
+
+/**
+ * EL COSTE ESTÁ EN EL SERVIDOR, NO EN EL TRANSPORTE, y esto cambió el diseño.
+ *
+ * Medido contra la relatoría: para «sancion disciplinaria abogado» —10.393
+ * fichas— el tiempo hasta el PRIMER BYTE es de 17,5 segundos; en cuanto empieza
+ * a llegar, las seis primeras radicaciones aparecen en 20 milisegundos. La
+ * relatoría genera la consulta entera antes de enviar nada.
+ *
+ * Consecuencia: **cortar el stream no ahorra tiempo en una consulta amplia**.
+ * Lo único que ahorra es que la consulta sea más específica. Por eso, cuando se
+ * agota el plazo, el mensaje no dice «no se pudo consultar» a secas — dice qué
+ * hacer, que es acotar la búsqueda.
+ */
+const AVISO_DE_CONSULTA_AMPLIA =
+  'La relatoría de la Comisión Nacional de Disciplina Judicial tardó demasiado en responder. ' +
+  'Suele pasar con consultas de pocas palabras, que le devuelven miles de fichas: ' +
+  'añada términos para acotarla y vuelva a intentarlo.';
 
 export interface CndjHit {
   /** El número único de radicación, que es como la CNDJ identifica el proceso. */
@@ -189,6 +239,9 @@ const buscar = async (tema: string, sesion: Sesion, timeoutMs: number): Promise<
       const { done, value } = await lector.read();
       if (done) break;
       html += decodificador.decode(value, { stream: true });
+
+      // Lo que se busca; el peso es solo la red de seguridad.
+      if (radicacionesEn(html).length >= RADICACIONES_SUFICIENTES) break;
       if (html.length >= MAX_RESULTADOS_BYTES) break;
     }
   } finally {
@@ -311,7 +364,15 @@ export const buscarEnCndj = async (
   tema: string,
   opciones: { timeoutMs?: number; maximo?: number } = {}
 ): Promise<CndjOutcome> => {
-  const timeoutMs = opciones.timeoutMs ?? 20_000;
+  /*
+   * Cada petición se topa muy por debajo del presupuesto total: una sola que
+   * agote veinte segundos se lleva por delante la función entera.
+   */
+  /*
+   * Por debajo del plazo de la función (30 s declarados en `vercel.json`) y por
+   * encima del tiempo real que la relatoría tarda en empezar a responder.
+   */
+  const timeoutMs = opciones.timeoutMs ?? 22_000;
   const maximo = Math.min(opciones.maximo ?? MAX_PROVIDENCIAS, MAX_PROVIDENCIAS);
 
   if (tema.trim().length < 3) {
@@ -321,6 +382,8 @@ export const buscarEnCndj = async (
     };
   }
 
+  const iniciado = Date.now();
+
   let sesion: Sesion;
   let html: string;
 
@@ -328,11 +391,20 @@ export const buscarEnCndj = async (
     sesion = await abrirSesion(timeoutMs);
     html = await buscar(tema.trim(), sesion, timeoutMs);
   } catch (err) {
+    /*
+     * El plazo agotado tiene causa conocida y remedio conocido, así que se
+     * separa del fallo genérico: decirle «fetch failed» a un abogado no le
+     * permite hacer nada, y decirle que acote la consulta sí.
+     */
+    const abortada = err instanceof Error && /abort|timeout/i.test(err.message);
+
     return {
       status: 'UNAVAILABLE',
-      reason: `No se pudo consultar la relatoría de la Comisión Nacional de Disciplina Judicial: ${
-        err instanceof Error ? err.message : 'sin detalle'
-      }`
+      reason: abortada
+        ? AVISO_DE_CONSULTA_AMPLIA
+        : `No se pudo consultar la relatoría de la Comisión Nacional de Disciplina Judicial: ${
+            err instanceof Error ? err.message : 'sin detalle'
+          }`
     };
   }
 
@@ -354,6 +426,12 @@ export const buscarEnCndj = async (
    * segundos y es lo que mantiene la fuente en pie.
    */
   for (const radicacion of radicaciones) {
+    /*
+     * Se comprueba ANTES de empezar cada una, no en medio: abandonar una
+     * providencia a medio descargar gasta el tiempo sin entregar nada.
+     */
+    if (Date.now() - iniciado > PRESUPUESTO_MS) break;
+
     try {
       const archivo = await nombreDelArchivo({ radicacion, ficha: '1' }, sesion, timeoutMs);
       if (!archivo) continue;

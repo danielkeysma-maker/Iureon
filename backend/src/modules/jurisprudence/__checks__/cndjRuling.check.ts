@@ -109,9 +109,15 @@ const main = async (): Promise<void> => {
      * LA CADENA COMPLETA. Es lo único que prueba que las cinco peticiones
      * encajan: token, búsqueda, resultados, nombre de archivo y PDF leído.
      */
-    const hallazgo = await buscarEnCndj('falta disciplinaria abogado', {
-      timeoutMs: 30_000,
-      maximo: 2
+    /*
+     * El término importa. «falta disciplinaria abogado» devuelve fichas cuyas
+     * primeras dos NO tienen documento descargable —caso real y legítimo— y con
+     * un máximo de dos el check no llegaba a ejercitar el camino completo.
+     * Este otro sí tiene cobertura, medido contra la relatoría.
+     */
+    const hallazgo = await buscarEnCndj('estabilidad laboral reforzada', {
+      timeoutMs: 25_000,
+      maximo: 3
     });
 
     if (hallazgo.status === 'FOUND') {
