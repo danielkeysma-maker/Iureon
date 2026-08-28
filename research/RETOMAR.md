@@ -30,6 +30,46 @@ investigación en la raíz del repo.
 
 ---
 
+## 0. BLOQUEO ACTIVO: Vercel dejó de desplegar (28 ago, 16:49)
+
+**El código está completo, verificado y subido. Lo que no está es desplegado.**
+
+76 despliegues en el día y **ninguno después de las 16:49 UTC**. Es el límite de
+compilaciones del plan Hobby (~100/día en ventana rodante, concurrencia 1). No
+hay nada que arreglar en el código: hay que esperar a que la ventana avance, o
+subir de plan.
+
+| Proyecto | Último desplegado | Falta desplegar |
+|---|---|---|
+| `iureon-app` (frontend) | `085adb5` | `8ff3ce2` |
+| `iureon` (backend) | **`c625222`** | `8f02136`, `b9170f9`, `085adb5`, `8ff3ce2` |
+
+**Consecuencia concreta y visible:** el Buscador llama a
+`/api/jurisprudence/disciplinaria` y el backend responde **404**, porque la ruta
+vive en `8f02136`/`085adb5` y producción sirve `c625222`. La relatoría de
+Disciplina Judicial no funcionará hasta que el backend se despliegue. En local
+todo pasa: 21/21.
+
+### Dos trampas de diagnóstico que costaron tiempo hoy — no repetirlas
+
+1. **Un 401 NO prueba que una ruta exista.** El middleware de sesión rechaza
+   ANTES de resolver la ruta, así que responde igual para una ruta real y para
+   una inexistente. Probar el endpoint «a ver si da 401» dio un falso positivo.
+   Lo que sí funcionó: instrumentar `fetch` en el navegador y mirar la llamada
+   real de la aplicación, que devolvía 404.
+2. **Una pestaña abierta antes del despliegue sirve el bundle viejo.** La primera
+   reproducción se hizo con la pestaña ya cargada y no ejercitó el código nuevo.
+   Recargar con `force` antes de reproducir.
+
+### Además: BRAVE_SEARCH_API_KEY no está puesta en producción
+
+El Buscador muestra «la búsqueda fuera del corpus no está configurada». El
+descubrimiento en la relatoría de la Corte Constitucional **no funciona hoy para
+nadie**. Es pendiente del usuario, no del código. Se supo solo porque los
+estados mudos del Buscador se corrigieron esta mañana; antes la pantalla callaba.
+
+---
+
 ## 1. Lo que SÍ quedó terminado y subido hoy
 
 | Commit | Qué |
