@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Upload, FileAudio, AlertTriangle, Cpu, Copy, CheckCircle2, RotateCcw, FileText } from 'lucide-react';
 import { useTranscription } from '../hooks/useTranscription';
 import { TranscriptSegments } from './TranscriptSegments';
+import { TranscriptSummary } from './TranscriptSummary';
 import { AudioPreview } from './AudioPreview';
 import { NotPersistedWarning, RoleProposals } from './RoleProposals';
 import { StoredTranscriptions } from './StoredTranscriptions';
@@ -45,7 +46,7 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
   kind = 'AUDIENCIA',
   onUsarEnRedaccion
 }) => {
-  const { hasFirm, isAvailable, isUploading, isTranscribing, result, error, roleProposals, persisted, maxAudioBytes, transcribe, assignRole, editSegment, splitSegment, reassignSpeaker, voiceConflicts, nameProposals, assignSpeakerName, stored, isLoadingStored, loadStored, openStored, deleteStored, canEdit, reset } =
+  const { hasFirm, isAvailable, isUploading, isTranscribing, result, error, roleProposals, persisted, maxAudioBytes, transcribe, assignRole, editSegment, splitSegment, reassignSpeaker, voiceConflicts, nameProposals, assignSpeakerName, stored, isLoadingStored, loadStored, openStored, deleteStored, canEdit, reset, transcriptionId } =
     useTranscription(kind);
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -354,6 +355,11 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
                 a doubtful word can be checked against what was actually said —
                 the audio itself is deleted from storage once transcribed. */}
             <AudioPreview file={selectedFile} />
+
+            {/* Lo esencial sin releer dos horas: mismo componente que en Entrevistas. */}
+            {transcriptionId && (
+              <TranscriptSummary transcriptionId={transcriptionId} kind="AUDIENCIA" />
+            )}
 
             <TranscriptSegments
               result={result}

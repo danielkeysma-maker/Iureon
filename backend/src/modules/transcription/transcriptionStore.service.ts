@@ -14,6 +14,8 @@ export interface StoredTranscription {
   language: string | null;
   duration_seconds: number | null;
   model: string;
+  /** El resumen y los hechos relevantes generados por el motor, si ya se pidieron. */
+  resumen?: unknown;
   transcribed_at: string;
   saved_at: string;
   updated_at: string;
@@ -109,6 +111,38 @@ export class TranscriptionStore {
     }
 
     return (data ?? []) as StoredTranscription[];
+  }
+
+  /** Una transcripcion de la firma, completa. Para el resumen y para releer. */
+  async get(firmId: string, id: string): Promise<StoredTranscription | null> {
+    if (!supabase) return null;
+
+    const { data, error } = await supabase
+      .from('transcriptions')
+      .select('*')
+      .eq('firm_id', firmId)
+      .eq('id', id)
+      .single();
+
+    if (error || !data) return null;
+    return data as StoredTranscription;
+  }
+
+  /**
+   * Guarda el resumen generado, para que abrir la transcripcion manana no
+   * vuelva a pagar la llamada al modelo. Falla en silencio: un resumen que no
+   * se pudo guardar sigue siendo un resumen valido en pantalla.
+   */
+  async saveResumen(firmId: string, id: string, resumen: unknown): Promise<void> {
+    if (!supabase) return;
+
+    const { error } = await supabase
+      .from('transcriptions')
+      .update({ resumen, updated_at: new Date().toISOString() })
+      .eq('firm_id', firmId)
+      .eq('id', id);
+
+    if (error) console.error('[TRANSCRIPTION] No se pudo guardar el resumen:', error.message);
   }
 
   /**

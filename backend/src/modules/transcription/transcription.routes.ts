@@ -5,6 +5,7 @@ import {
   deleteTranscriptionController,
   editTranscriptionSegmentController,
   listTranscriptionsController,
+  transcriptionResumenController,
   splitTranscriptionSegmentController,
   reassignTranscriptionSpeakerController,
   assignSpeakerNameController,
@@ -74,6 +75,8 @@ export const transcriptionPublicRoutes = publicRouter;
 
 const router = Router();
 router.get('/transcription', listTranscriptionsController as any);
+// El resumen es POST: puede disparar una llamada al modelo, no es una lectura pura.
+router.post('/transcription/:id/resumen', transcriptionResumenController as any);
 router.post('/transcription/from-storage', transcribeFromStorageController as any);
 router.patch('/transcription/:id/roles', assignTranscriptionRolesController as any);
 router.patch('/transcription/:id/segment', editTranscriptionSegmentController as any);

@@ -10,6 +10,7 @@ import { ROLE_LABELS, ROLES_DEL_RELATO, SUPPORTED_AUDIO_EXTENSIONS } from '../..
 import { toPlainText } from '../../transcription/toPlainText';
 import { ClientPicker } from './ClientPicker';
 import { InterviewInsights } from './InterviewInsights';
+import { TranscriptSummary } from '../../transcription/components/TranscriptSummary';
 import { AudioRecorder } from './AudioRecorder';
 import { clientsApi } from '../clients.api';
 
@@ -356,6 +357,9 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
 
           {!persisted && <NotPersistedWarning />}
 
+          {transcriptionId && (
+            <TranscriptSummary transcriptionId={transcriptionId} kind="ENTREVISTA" />
+          )}
           {transcriptionId && <InterviewInsights transcriptionId={transcriptionId} />}
 
           <TranscriptSegments

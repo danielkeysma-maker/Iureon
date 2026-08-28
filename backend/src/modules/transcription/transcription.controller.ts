@@ -8,6 +8,7 @@ import { proposeRoles } from './roleProposer';
 import { detectVoiceConflicts, proposeSpeakerNames } from './voiceConflicts';
 import { BackblazeB2TenantStorageService } from '../documents/b2.service';
 import { transcriptionStore } from './transcriptionStore.service';
+import { generarResumen, type ResumenDeTranscripcion } from './resumen.service';
 import type { SpeakerRole, TranscriptionKind } from './types';
 
 export const transcriptionService = new TranscriptionService();
@@ -151,6 +152,53 @@ export const transcribeAudioController = async (req: Request, res: Response): Pr
  * Exists so a closed tab costs nothing: the work is recovered from here instead
  * of by uploading the recording again.
  */
+/**
+ * El resumen y los hechos relevantes, generados por el motor.
+ *
+ * SE GENERA UNA VEZ Y SE GUARDA. Reabrirla manana no vuelve a llamar al modelo:
+ * devuelve lo guardado, salvo que se pida regenerar (?regenerar=1) — que es lo
+ * correcto despues de corregir intervenciones, porque el resumen viejo resume
+ * un texto que ya no existe.
+ *
+ * NO SE COBRA APARTE. La transcripcion ya se pago ($3.000) y este resumen es
+ * parte de su valor; la llamada a Gemini sobre texto ya transcrito cuesta
+ * centavos y la absorbe el margen, igual que el triage de redaccion.
+ */
+export const transcriptionResumenController = async (req: Request, res: Response): Promise<void> => {
+  const firmId = req.firmId as string;
+  const id = String(req.params.id);
+
+  const transcripcion = await transcriptionStore.get(firmId, id);
+  if (!transcripcion) {
+    res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'No se encontro esa transcripcion.' });
+    return;
+  }
+
+  const regenerar = req.query.regenerar === '1';
+  const guardado = transcripcion.resumen as ResumenDeTranscripcion | null | undefined;
+
+  if (guardado && !regenerar) {
+    res.json({ success: true, resumen: guardado, desdeCache: true });
+    return;
+  }
+
+  const { resumen } = await generarResumen(transcripcion.segments ?? [], transcripcion.kind);
+
+  if (!resumen) {
+    // El motor no respondio o respondio ilegible. Se dice tal cual: un resumen
+    // inventado por el servidor seria peor que ninguno.
+    res.status(502).json({
+      success: false,
+      error: 'SIN_RESUMEN',
+      message: 'El motor no pudo generar el resumen en este momento. Intente de nuevo.'
+    });
+    return;
+  }
+
+  await transcriptionStore.saveResumen(firmId, id, resumen);
+  res.json({ success: true, resumen, desdeCache: false });
+};
+
 export const listTranscriptionsController = async (req: Request, res: Response): Promise<void> => {
   /*
    * The author comes from the token, like the firm.
