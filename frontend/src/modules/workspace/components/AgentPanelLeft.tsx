@@ -92,14 +92,22 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
    * del abogado: sin ella el efecto lo devolvía a su sitio en cada render y el
    * filtro de rol quedaba inservible.
    */
+  /*
+   * La marca es EL TIPO DE DOCUMENTO, no la actuacion resuelta — y esa
+   * diferencia fue una regresion real: cambiar de RAMA re-resuelve el mismo
+   * tipo como otra actuacion (otro exactName), el guard dejaba pasar, y el rol
+   * que el abogado acababa de poner en Secretaria volvia solo a Litigante.
+   * El tipo solo cambia cuando alguien lo elige (aqui u Orientacion): esa es
+   * la unica senal que justifica mover el rol.
+   */
   const rolSincronizadoPara = React.useRef<string | null>(null);
 
   useEffect(() => {
     if (lookup.estado !== 'ENCONTRADA' || !actuacion) return;
-    if (rolSincronizadoPara.current === actuacion.exactName) return;
-    rolSincronizadoPara.current = actuacion.exactName;
+    if (rolSincronizadoPara.current === documentType) return;
+    rolSincronizadoPara.current = documentType;
     if (actuacion.role !== userRole) setUserRole(actuacion.role);
-  }, [lookup.estado, actuacion, userRole]);
+  }, [lookup.estado, actuacion, userRole, documentType]);
 
   /**
    * Adjuntar archivos.

@@ -282,21 +282,66 @@ export class DocumentExportService {
     const contentWidth = 215.9 - pageMarginLeft - pageMarginRight;
     let currentY = pageMarginTop;
 
-    // Membrete de la Firma en la parte superior — solo si el escrito lo pide.
+    /*
+     * ─── MEMBRETE (14a): el documento es DE LA FIRMA, no de Iureon ─────────
+     *
+     * Logo a la izquierda cuando la marca lo tiene (PNG/JPEG en data URI —
+     * jsPDF no rasteriza SVG y un logo que no carga no puede tumbar el
+     * escrito: por eso el try). Razon social en mayusculas, NIT y direccion en
+     * una linea de metadatos, y la fecha larga del dia — que es la del
+     * documento que se radica.
+     */
+    let membreteBase = 15;
     if (opciones.conMembrete) {
+      let xTexto = pageMarginLeft;
+
+      if (branding.logoUrl && /^data:image\/(png|jpe?g)/.test(branding.logoUrl)) {
+        try {
+          doc.addImage(branding.logoUrl, pageMarginLeft, 10, 24, 12, undefined, 'FAST');
+          xTexto = pageMarginLeft + 28;
+        } catch {
+          /* Logo ilegible: el membrete sale sin el, nunca rompe el escrito. */
+        }
+      }
+
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10);
-      doc.setTextColor(30, 41, 59);
-      doc.text(branding.firmName, pageMarginLeft, 15);
+      doc.setFontSize(11);
+      doc.setTextColor(15, 23, 42);
+      doc.text((branding.firmName || '').toUpperCase(), xTexto, 15);
 
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8);
+      doc.setFontSize(7.5);
       doc.setTextColor(100, 116, 139);
-      doc.text(`${branding.firmNit} | ${branding.firmPhone}`, pageMarginLeft, 19);
+      doc.text(
+        [branding.firmNit && `NIT ${branding.firmNit}`, branding.firmAddress, branding.firmPhone]
+          .filter(Boolean)
+          .join(' · '),
+        xTexto,
+        19.5
+      );
 
       doc.setDrawColor(203, 213, 225);
-      doc.line(pageMarginLeft, 22, 215.9 - pageMarginRight, 22);
+      doc.line(pageMarginLeft, 23, 215.9 - pageMarginRight, 23);
+
+      // La fecha del documento, en el idioma del documento.
+      doc.setFontSize(9);
+      doc.setTextColor(15, 23, 42);
+      doc.text(
+        new Date().toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' }),
+        pageMarginLeft,
+        29
+      );
+      membreteBase = 34;
     }
+    currentY = Math.max(currentY, membreteBase);
+
+    /*
+     * EL CUERPO EN LA LETRA DE LA MARCA. jsPDF trae 'times' de fabrica: un
+     * escrito judicial colombiano se espera en Times 12 — helvetica lo hacia
+     * leerse como borrador de software, no como documento que se radica.
+     */
+    const fuentePdf = branding.fontFamily === 'Times New Roman' ? 'times' : 'helvetica';
+    doc.setFont(fuentePdf, 'normal');
 
     // Formatear líneas del texto jurídico
     /* El tamano y el salto vienen de la marca de la firma (3d/6b). */
@@ -324,7 +369,7 @@ export class DocumentExportService {
 
       if (!hasInlineBold) {
         // Línea simple sin negritas inline — renderizar toda de una
-        doc.setFont('helvetica', (isSectionTitle || isHeader) ? 'bold' : 'normal');
+        doc.setFont(fuentePdf, (isSectionTitle || isHeader) ? 'bold' : 'normal');
         const splitLines = doc.splitTextToSize(line, contentWidth);
 
         for (const sl of splitLines) {
@@ -332,14 +377,14 @@ export class DocumentExportService {
             doc.addPage();
             currentY = 25;
             if (opciones.conMembrete) {
-              doc.setFont('helvetica', 'bold');
+              doc.setFont(fuentePdf, 'bold');
               doc.setFontSize(9);
               doc.setTextColor(100, 116, 139);
               doc.text(branding.firmName, pageMarginLeft, 15);
               doc.setDrawColor(203, 213, 225);
               doc.line(pageMarginLeft, 17, 215.9 - pageMarginRight, 17);
             }
-            doc.setFont('helvetica', 'normal');
+            doc.setFont(fuentePdf, 'normal');
             doc.setFontSize(tamanoPdf);
             doc.setTextColor(15, 23, 42);
           }
@@ -357,7 +402,7 @@ export class DocumentExportService {
             doc.addPage();
             currentY = 25;
             if (opciones.conMembrete) {
-              doc.setFont('helvetica', 'bold');
+              doc.setFont(fuentePdf, 'bold');
               doc.setFontSize(9);
               doc.setTextColor(100, 116, 139);
               doc.text(branding.firmName, pageMarginLeft, 15);
@@ -378,13 +423,13 @@ export class DocumentExportService {
             // Encontrar cuánto del segmento cabe en esta línea
             const segText = seg.text;
             if (remaining.startsWith(segText)) {
-              doc.setFont('helvetica', (seg.bold || isSectionTitle || isHeader) ? 'bold' : 'normal');
+              doc.setFont(fuentePdf, (seg.bold || isSectionTitle || isHeader) ? 'bold' : 'normal');
               doc.text(segText, xPos, currentY);
               xPos += doc.getTextWidth(segText);
               remaining = remaining.slice(segText.length);
             } else if (remaining.includes(segText.substring(0, Math.min(5, segText.length)))) {
               // Partial match — simplified rendering
-              doc.setFont('helvetica', (seg.bold || isSectionTitle || isHeader) ? 'bold' : 'normal');
+              doc.setFont(fuentePdf, (seg.bold || isSectionTitle || isHeader) ? 'bold' : 'normal');
               const partLen = Math.min(segText.length, remaining.length);
               const part = remaining.substring(0, partLen);
               doc.text(part, xPos, currentY);
@@ -395,7 +440,7 @@ export class DocumentExportService {
 
           // Fallback: si quedó texto sin renderizar
           if (remaining.length > 0) {
-            doc.setFont('helvetica', 'normal');
+            doc.setFont(fuentePdf, 'normal');
             doc.text(remaining, xPos, currentY);
           }
 
@@ -413,13 +458,13 @@ export class DocumentExportService {
       doc.addPage();
       currentY = pageMarginTop;
 
-      doc.setFont('helvetica', 'bold');
+      doc.setFont(fuentePdf, 'bold');
       doc.setFontSize(11);
       doc.setTextColor(15, 23, 42);
       doc.text('FUENTES CITADAS', pageMarginLeft, currentY);
       currentY += 8;
 
-      doc.setFont('helvetica', 'normal');
+      doc.setFont(fuentePdf, 'normal');
       doc.setFontSize(9.5);
       for (const fuente of opciones.fuentes) {
         const envueltas = doc.splitTextToSize(`- ${fuente}`, contentWidth);
@@ -433,6 +478,26 @@ export class DocumentExportService {
         }
         currentY += 1.5;
       }
+    }
+
+    /*
+     * ─── PIE EN CADA PAGINA (14a): firma · correo | Pagina N de M ──────────
+     *
+     * La paginacion es REAL — la del documento que se radica — y por eso vive
+     * aqui y no en el visor de pantalla, donde inventarla hacia citar paginas
+     * inexistentes. Sin marca de Iureon: un juzgado recibe un documento de la
+     * firma, no un entregable de un proveedor.
+     */
+    const totalPaginas = doc.getNumberOfPages();
+    for (let pagina = 1; pagina <= totalPaginas; pagina++) {
+      doc.setPage(pagina);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(148, 163, 184);
+
+      const pieIzq = [branding.firmName, branding.firmEmail].filter(Boolean).join(' · ');
+      if (opciones.conMembrete && pieIzq) doc.text(pieIzq, pageMarginLeft, 272);
+      doc.text(`Página ${pagina} de ${totalPaginas}`, 215.9 - pageMarginRight, 272, { align: 'right' });
     }
 
     doc.save(documentTitle.endsWith('.pdf') ? documentTitle : `${documentTitle}.pdf`);
