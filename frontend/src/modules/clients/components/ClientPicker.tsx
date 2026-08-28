@@ -5,7 +5,13 @@ import { clientsApi, type Client } from '../clients.api';
 interface ClientPickerProps {
   /** The client currently attached to this interview, if any. */
   value: string | null;
-  onChange: (clientId: string | null) => void;
+  /**
+   * El segundo argumento es la ficha completa, no solo el id: el acta de
+   * entrevista (14b) imprime «Consultante: nombre — C.C. documento» y su
+   * linea de firma, y pedirle al llamador que vuelva a buscar por id lo que
+   * este componente ya tiene en memoria es un viaje de red por nada.
+   */
+  onChange: (clientId: string | null, client: Client | null) => void;
 }
 
 /**
@@ -59,7 +65,7 @@ export const ClientPicker: React.FC<ClientPickerProps> = ({ value, onChange }) =
       // Selected immediately: registering a client in this form means this
       // interview is theirs, and asking again in the next dropdown would be
       // asking the same question twice.
-      onChange(client.id);
+      onChange(client.id, client);
       setNuevo({ fullName: '', documentId: '', email: '', phone: '', notes: '' });
       setCreando(false);
     } catch (err) {
@@ -157,7 +163,10 @@ export const ClientPicker: React.FC<ClientPickerProps> = ({ value, onChange }) =
 
         <select
           value={value ?? ''}
-          onChange={(e) => onChange(e.target.value || null)}
+          onChange={(e) => {
+            const id = e.target.value || null;
+            onChange(id, clients.find((c) => c.id === id) ?? null);
+          }}
           disabled={cargando}
           className="flex-1 min-w-0 bg-canvas border border-line-200 rounded-control px-2 py-1.5 text-[11px] text-ink-900 focus:outline-none focus:border-brand-700 disabled:opacity-60"
         >

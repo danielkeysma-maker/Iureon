@@ -1,7 +1,8 @@
 import { Document, Packer, Paragraph, TextRun, AlignmentType, Header as DocxHeader, Footer as DocxFooter, PageNumber } from 'docx';
 import { saveAs } from 'file-saver';
 import { jsPDF } from 'jspdf';
-import { drawRuns, type PdfRun } from './pdfTextLayout';
+import { drawRuns } from './pdfTextLayout';
+import { registrarJakarta } from './pdfFonts';
 
 export interface FirmBrandingConfig {
   firmName: string;
@@ -263,7 +264,25 @@ export class DocumentExportService {
   }
 
   /**
-   * Exporta el borrador jurídico a PDF (.pdf) con negritas reales
+   * El escrito en PDF, calcado del papel que dibujó el artboard 14a.
+   *
+   * LO QUE EL ARTBOARD FIJA, medido sobre su propio HTML y no supuesto: papel
+   * de 640 px con 62 px de aire a cada lado, que sobre carta con márgenes de
+   * 3/2,5 cm da la escala de 0,884 pt por píxel usada abajo. Cuerpo de 12,5 px
+   * a 1,9 de interlínea, JUSTIFICADO; destinatario CENTRADO en negrita con
+   * «E. S. D.» en renglón propio y peso normal; referencia como rejilla de
+   * etiqueta y valor —«Referencia:», no «REFERENCIA:»— con la columna de 104
+   * px; títulos de sección en negrita MÁS PEQUEÑA que el cuerpo (12 contra
+   * 12,5) y con letter-spacing; filete oscuro bajo el membrete y filete claro
+   * sobre el pie.
+   *
+   * Y la letra es Plus Jakarta Sans, la misma del acta y la del sistema de
+   * diseño. La placa del artboard dice «Times 12 pt» pero su papel está
+   * dibujado en Jakarta, y el papel es el que manda: era la diferencia que
+   * hacía irreconocible el escrito exportado.
+   *
+   * SIN MARCA DE IUREON, por decisión del 14a: un juzgado recibe un documento
+   * de la firma. La trazabilidad viaja en las propiedades del archivo.
    */
   public static async exportToPdf(
     documentTitle: string,
@@ -271,227 +290,302 @@ export class DocumentExportService {
     branding: FirmBrandingConfig = DEFAULT_FIRM_BRANDING,
     opciones: OpcionesDeExportacion = OPCIONES_POR_DEFECTO
   ): Promise<void> {
-    const doc = new jsPDF({
-      orientation: 'p',
-      unit: 'mm',
-      format: 'letter'
-    });
+    const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'letter' });
+    const F = registrarJakarta(doc);
+
+    /* ─── Geometría: carta con los márgenes que declara el artboard ──────── */
+    const ANCHO_PAGINA = 215.9;
+    const ALTO_PAGINA = 279.4;
+    const IZQ = 30; // 3 cm — el margen de encuadernación judicial
+    const DER = 25; // 2,5 cm
+    const SUP = 25;
+    const ANCHO = ANCHO_PAGINA - IZQ - DER;
+    const Y_PIE = ALTO_PAGINA - 18;
+    const LIMITE = Y_PIE - 9;
 
     /*
-     * MARGENES DEL 14a: 3 cm izquierdo (encuadernacion judicial), 2,5 cm los
-     * demas. La placa del artboard los declara — «Carta · márgenes 3/2,5 cm ·
-     * Times 12 pt · 1,5» — y son la referencia, no una preferencia.
+     * La escala del artboard a puntos, y el tamaño de la marca de la firma
+     * como factor: una firma que pide 14 pt agranda todo el papel en la misma
+     * proporción, sin romper las relaciones que el diseño fijó.
      */
-    const pageMarginLeft = 30;
-    const pageMarginTop = 25;
-    const pageMarginRight = 25;
-    const pageMarginBottom = 25;
-    const pageHeight = 279.4;
-    const pageBottomLimit = pageHeight - pageMarginBottom;
-    const contentWidth = 215.9 - pageMarginLeft - pageMarginRight;
-    let currentY = pageMarginTop;
+    const PX = 0.884;
+    const factor = (branding.fontSizePt ?? 12) / 12;
+    const pt = (px: number): number => px * PX * factor;
+    const mm = (px: number): number => px * 0.3118 * factor;
 
     /*
-     * La trazabilidad del 14a viaja en las propiedades del archivo, no en el
-     * papel: un juzgado recibe un documento de la firma, y quien inspeccione
-     * los metadatos encuentra el origen.
+     * El interlineado del artboard es 1,9 de CSS, que es exactamente lo que
+     * Word llama «1,5 líneas» — su línea sencilla ya vale ~1,2. Traducir la
+     * elección de la firma en vez de aplicarla cruda es lo que hace que el
+     * papel exportado y el dibujado coincidan.
      */
+    const INTERLINEA_CSS: Record<string, number> = { '1.0': 1.25, '1.5': 1.9, '2.0': 2.5 };
+    const interlinea = INTERLINEA_CSS[branding.lineSpacing ?? '1.5'] ?? 1.9;
+
+    const PT_CUERPO = pt(12.5);
+    const LINEA_CUERPO = PT_CUERPO * interlinea * 0.3528;
+
+    /* La paleta del artboard, en RGB. */
+    const TINTA: [number, number, number] = [16, 24, 34]; // #101822
+    const GRIS: [number, number, number] = [102, 116, 135]; // #667487
+    const GRIS_PIE: [number, number, number] = [139, 150, 166]; // #8B96A6
+    const LINEA_PIE: [number, number, number] = [195, 203, 214]; // #C3CBD6
+
     doc.setProperties({
-      title: documentTitle,
+      title: documentTitle.replace(/\.pdf$/i, ''),
       author: branding.firmName || undefined,
       creator: 'Iureon'
     });
 
-    /*
-     * ─── MEMBRETE (14a): el documento es DE LA FIRMA, no de Iureon ─────────
-     *
-     * Logo a la izquierda cuando la marca lo tiene (PNG/JPEG en data URI —
-     * jsPDF no rasteriza SVG y un logo que no carga no puede tumbar el
-     * escrito: por eso el try). Razon social en mayusculas, NIT y direccion en
-     * una linea de metadatos, y la fecha larga del dia — que es la del
-     * documento que se radica.
-     */
-    let membreteBase = pageMarginTop;
-    if (opciones.conMembrete) {
-      let xTexto = pageMarginLeft;
+    let y = SUP;
+    const enLinea = (yy: number): number => {
+      if (yy > LIMITE) {
+        doc.addPage();
+        return SUP;
+      }
+      return yy;
+    };
+    const asegurar = (necesario: number): void => {
+      if (y + necesario > LIMITE) {
+        doc.addPage();
+        y = SUP;
+      }
+    };
 
+    /* ─── MEMBRETE (solo la primera hoja, como una hoja membreteada) ─────── */
+    if (opciones.conMembrete) {
+      let xTexto = IZQ;
       if (branding.logoUrl && /^data:image\/(png|jpe?g)/.test(branding.logoUrl)) {
         try {
-          doc.addImage(branding.logoUrl, pageMarginLeft, 10, 24, 12, undefined, 'FAST');
-          xTexto = pageMarginLeft + 28;
+          doc.addImage(branding.logoUrl, IZQ, y - 4, mm(70), mm(40), undefined, 'FAST');
+          xTexto = IZQ + mm(84);
         } catch {
-          /* Logo ilegible: el membrete sale sin el, nunca rompe el escrito. */
+          /* Un logo ilegible jamás tumba el escrito. */
         }
       }
 
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11);
-      doc.setTextColor(16, 24, 34);
-      doc.text((branding.firmName || '').toUpperCase(), xTexto, 15);
+      doc.setFont(F, 'bold');
+      doc.setFontSize(pt(11.5));
+      doc.setTextColor(...TINTA);
+      doc.setCharSpace(pt(11.5) * 0.02);
+      doc.text((branding.firmName || '').toUpperCase(), xTexto, y);
+      doc.setCharSpace(0);
 
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(7.5);
-      doc.setTextColor(102, 116, 135);
+      doc.setFont(F, 'normal');
+      doc.setFontSize(pt(9.5));
+      doc.setTextColor(...GRIS);
       doc.text(
-        [branding.firmNit && `NIT ${branding.firmNit}`, branding.firmAddress, branding.firmPhone]
+        [branding.firmNit && `NIT ${branding.firmNit}`, branding.firmAddress]
           .filter(Boolean)
           .join(' · '),
         xTexto,
-        19.5
+        y + mm(15)
       );
 
-      // La fecha del documento, a la derecha del membrete como el 14a.
-      doc.setFontSize(9);
-      doc.setTextColor(102, 116, 135);
+      /*
+       * La fecha del documento a la derecha, como el artboard. La ciudad que
+       * él muestra encima NO se imprime: saldría de adivinar dentro de la
+       * dirección, y una ciudad equivocada en un escrito que se radica es
+       * peor que una ausencia.
+       */
       doc.text(
         new Date().toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' }),
-        215.9 - pageMarginRight,
-        15,
+        ANCHO_PAGINA - DER,
+        y,
         { align: 'right' }
       );
 
-      /* El filete del membrete del 14a es OSCURO (1,5 px #101822), no gris. */
-      doc.setDrawColor(16, 24, 34);
-      doc.setLineWidth(0.5);
-      doc.line(pageMarginLeft, 23, 215.9 - pageMarginRight, 23);
+      /* El filete del membrete es OSCURO y de 1,5 px, no un hilo gris. */
+      doc.setDrawColor(...TINTA);
+      doc.setLineWidth(0.4);
+      doc.line(IZQ, y + mm(28), ANCHO_PAGINA - DER, y + mm(28));
       doc.setLineWidth(0.2);
-      membreteBase = 31;
+      y += mm(28) + mm(22);
     }
-    currentY = Math.max(currentY, membreteBase);
 
-    /*
-     * EL CUERPO EN LA LETRA DE LA MARCA. jsPDF trae 'times' de fabrica: un
-     * escrito judicial colombiano se espera en Times 12 — helvetica lo hacia
-     * leerse como borrador de software, no como documento que se radica.
-     */
-    const fuentePdf = branding.fontFamily === 'Times New Roman' ? 'times' : 'helvetica';
-    doc.setFont(fuentePdf, 'normal');
+    /* ─── El texto, clasificado renglón por renglón ──────────────────────── */
+    const ETIQUETA_REF =
+      /^\s*(Referencia|Ref|Radicado|Radicación|Asunto|Proceso|Expediente|Demandante|Demandada|Demandado|Accionante|Accionada|Accionado|Convocante|Convocada|Convocado|Ejecutante|Ejecutado|Querellante|Querellado|Peticionario|Entidad|Tercero)\s*:\s*/i;
 
-    /*
-     * EL TAMANO ES EL DE LA MARCA, EN PUNTOS REALES. La version anterior
-     * reescalaba 12 pt a 10,5 y el «Times 12» de la placa del 14a nunca
-     * llegaba al papel. El interlineado tambien es el declarado: 1,5 lineas de
-     * un cuerpo de 12 pt son 18 pt = 6,35 mm entre renglones, no 5,5.
-     */
-    const tamanoPdf = branding.fontSizePt ?? 12;
-    const saltoLinea = tamanoPdf * 0.3528 * Number(branding.lineSpacing ?? '1.5');
-    const TINTA: [number, number, number] = [16, 24, 34];
+    /** «REFERENCIA:» del motor se pinta «Referencia:», como el artboard. */
+    const capitalizar = (etiqueta: string): string =>
+      etiqueta.charAt(0).toUpperCase() + etiqueta.slice(1).toLowerCase();
 
-    const nuevaPagina = (): void => {
-      doc.addPage();
-      currentY = pageMarginTop;
-      if (opciones.conMembrete) {
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(9);
-        doc.setTextColor(102, 116, 135);
-        doc.text(branding.firmName, pageMarginLeft, 15);
-        doc.setDrawColor(16, 24, 34);
-        doc.setLineWidth(0.5);
-        doc.line(pageMarginLeft, 17.5, 215.9 - pageMarginRight, 17.5);
-        doc.setLineWidth(0.2);
-      }
-    };
+    const X_VALOR_REF = IZQ + mm(104);
 
-    const asegurarLinea = (y: number): number => {
-      if (y > pageBottomLimit) {
-        nuevaPagina();
-        return currentY;
-      }
-      return y;
-    };
-
-    const lines = legalContentText.split('\n');
-
-    for (const rawLine of lines) {
+    for (const rawLine of legalContentText.split('\n')) {
       const line = cleanMarkdownLine(rawLine);
-
       if (line.trim() === '') {
-        currentY += 3;
+        y += mm(8);
         continue;
       }
 
-      const isHeader = line.startsWith('SEÑOR JUEZ') || line.startsWith('REFERENCIA:') || line.startsWith('DEMANDANTE:') || line.startsWith('DEMANDADO:');
-      const isSectionTitle = /^[IVX]+\.\s/.test(line) || /^(PRIMERO|SEGUNDO|TERCERO|CUARTO|QUINTO|SEXTO|SÉPTIMO|OCTAVO|NOVENO|DÉCIMO)[\.:]/i.test(line);
+      /* ── Destinatario: centrado, negrita, con «E. S. D.» en renglón propio */
+      if (/^(SEÑOR|SEÑORES|SENOR|HONORABLE|SEÑORA)/i.test(line)) {
+        const conCierre = line.match(/^(.*?)[\s,·]*\b(E\.?\s*S\.?\s*[DM]\.?\s*)$/i);
+        const cuerpo = (conCierre ? conCierre[1] : line).trim().replace(/[.\s]+$/, '');
+        const cierre = conCierre ? conCierre[2].trim() : '';
 
-      /* Un titulo de seccion respira antes de su bloque, como el 14a. */
-      if (isSectionTitle) currentY += 2.5;
+        asegurar(mm(40));
+        y = drawRuns(doc, [{ text: cuerpo, style: 'bold' }], {
+          x: IZQ,
+          y,
+          width: ANCHO,
+          lineMm: pt(11.5) * 1.5 * 0.3528,
+          font: F,
+          sizePt: pt(11.5),
+          color: TINTA,
+          align: 'center',
+          ensure: enLinea
+        });
+        if (cierre) {
+          /* El cierre va en peso NORMAL bajo el destinatario, como el 14a. */
+          y = drawRuns(doc, [{ text: cierre.toUpperCase().replace(/\s+/g, ' ') }], {
+            x: IZQ,
+            y,
+            width: ANCHO,
+            lineMm: pt(11.5) * 1.5 * 0.3528,
+            font: F,
+            sizePt: pt(11.5),
+            color: TINTA,
+            align: 'center',
+            ensure: enLinea
+          });
+        }
+        y += mm(14);
+        continue;
+      }
 
-      const runs: PdfRun[] = parseMarkdownBold(line).map((seg) => ({
-        text: seg.text,
-        style: seg.bold || isHeader || isSectionTitle ? 'bold' : 'normal'
-      }));
+      /* ── Referencia y partes: rejilla etiqueta / valor ─────────────────── */
+      const ref = line.match(ETIQUETA_REF);
+      if (ref) {
+        const etiqueta = `${capitalizar(ref[1])}:`;
+        const valor = line.slice(ref[0].length).trim();
 
-      currentY = asegurarLinea(currentY);
+        y = enLinea(y);
+        doc.setFont(F, 'normal');
+        doc.setFontSize(pt(12));
+        doc.setTextColor(...TINTA);
+        const yEtiqueta = y;
+        y = drawRuns(doc, [{ text: valor }], {
+          x: X_VALOR_REF,
+          y,
+          width: ANCHO_PAGINA - DER - X_VALOR_REF,
+          lineMm: pt(12) * 1.7 * 0.3528,
+          font: F,
+          sizePt: pt(12),
+          color: TINTA,
+          ensure: enLinea
+        });
+        doc.setFont(F, 'normal');
+        doc.setFontSize(pt(12));
+        doc.setTextColor(...TINTA);
+        doc.text(etiqueta, IZQ, yEtiqueta);
+        y += mm(3);
+        continue;
+      }
 
-      /*
-       * TODO PARRAFO DEL CUERPO VA JUSTIFICADO — es la forma de un escrito
-       * judicial y la del artboard (`text-align:justify`). Encabezados y
-       * titulos de seccion quedan a la izquierda, tambien como el artboard.
-       */
-      currentY = drawRuns(doc, runs, {
-        x: pageMarginLeft,
-        y: currentY,
-        width: contentWidth,
-        lineMm: saltoLinea,
-        font: fuentePdf,
-        sizePt: tamanoPdf,
-        color: TINTA,
-        justify: !isHeader && !isSectionTitle,
-        ensure: asegurarLinea
-      });
+      /* ── Títulos de sección: negrita más pequeña, con letter-spacing ───── */
+      const esTitulo =
+        /^[IVXLC]+\.\s/.test(line) ||
+        /^(PRIMERO|SEGUNDO|TERCERO|CUARTO|QUINTO|SEXTO|SÉPTIMO|OCTAVO|NOVENO|DÉCIMO)[.:]/i.test(line);
+      if (esTitulo) {
+        y += mm(18);
+        asegurar(mm(30));
+        y = drawRuns(doc, [{ text: line, style: 'bold' }], {
+          x: IZQ,
+          y,
+          width: ANCHO,
+          lineMm: pt(12) * 1.4 * 0.3528,
+          font: F,
+          sizePt: pt(12),
+          color: TINTA,
+          ensure: enLinea
+        });
+        y += mm(4);
+        continue;
+      }
 
-      /* Espacio entre parrafos (8 px del artboard ≈ 2,5 mm). */
-      currentY += isSectionTitle ? 0.5 : 2.5;
+      /* ── Cuerpo: justificado, con las negritas del motor intactas ──────── */
+      y = enLinea(y);
+      y = drawRuns(
+        doc,
+        parseMarkdownBold(line).map((seg) => ({ text: seg.text, style: seg.bold ? 'bold' : 'normal' })),
+        {
+          x: IZQ,
+          y,
+          width: ANCHO,
+          lineMm: LINEA_CUERPO,
+          font: F,
+          sizePt: PT_CUERPO,
+          color: TINTA,
+          align: 'justify',
+          ensure: enLinea
+        }
+      );
+      y += mm(6);
     }
 
     /*
-     * LA HOJA DE FUENTES CITADAS, en pagina propia.
-     * Para que quien reciba el PDF pueda verificar cada cita sin la aplicacion.
+     * ─── HOJA DE FUENTES CITADAS ──────────────────────────────────────────
+     * Para que quien reciba el PDF pueda verificar cada cita sin la aplicación.
      */
     if (opciones.fuentes && opciones.fuentes.length > 0) {
       doc.addPage();
-      currentY = pageMarginTop;
+      y = SUP;
 
-      doc.setFont(fuentePdf, 'bold');
-      doc.setFontSize(11);
-      doc.setTextColor(16, 24, 34);
-      doc.text('FUENTES CITADAS', pageMarginLeft, currentY);
-      currentY += 8;
+      y = drawRuns(doc, [{ text: 'FUENTES CITADAS', style: 'bold' }], {
+        x: IZQ,
+        y,
+        width: ANCHO,
+        lineMm: pt(12) * 1.4 * 0.3528,
+        font: F,
+        sizePt: pt(12),
+        color: TINTA
+      });
+      y += mm(10);
 
-      doc.setFont(fuentePdf, 'normal');
-      doc.setFontSize(9.5);
       for (const fuente of opciones.fuentes) {
-        const envueltas = doc.splitTextToSize(`- ${fuente}`, contentWidth);
-        for (const linea of envueltas) {
-          if (currentY > pageBottomLimit) {
-            doc.addPage();
-            currentY = pageMarginTop;
+        y = enLinea(y);
+        y = drawRuns(doc, [{ text: fuente }], {
+          x: IZQ + mm(14),
+          y,
+          width: ANCHO - mm(14),
+          lineMm: pt(11) * 1.7 * 0.3528,
+          font: F,
+          sizePt: pt(11),
+          color: TINTA,
+          ensure: enLinea,
+          onFirstLine: (yFuente) => {
+            doc.setFont(F, 'normal');
+            doc.setFontSize(pt(11));
+            doc.setTextColor(...GRIS);
+            doc.text('·', IZQ + mm(4), yFuente);
           }
-          doc.text(linea, pageMarginLeft, currentY);
-          currentY += 5.5;
-        }
-        currentY += 1.5;
+        });
+        y += mm(6);
       }
     }
 
     /*
-     * ─── PIE EN CADA PAGINA (14a): firma · correo | Pagina N de M ──────────
-     *
-     * La paginacion es REAL — la del documento que se radica — y por eso vive
-     * aqui y no en el visor de pantalla, donde inventarla hacia citar paginas
-     * inexistentes. Sin marca de Iureon: un juzgado recibe un documento de la
-     * firma, no un entregable de un proveedor.
+     * ─── PIE EN CADA HOJA: filete claro, firma·correo a la izquierda y la
+     * paginación REAL a la derecha, como el artboard. Sin marca de Iureon.
      */
     const totalPaginas = doc.getNumberOfPages();
-    for (let pagina = 1; pagina <= totalPaginas; pagina++) {
-      doc.setPage(pagina);
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(7.5);
-      doc.setTextColor(148, 163, 184);
+    const pieIzquierda = [branding.firmName, branding.firmEmail].filter(Boolean).join(' · ');
 
-      const pieIzq = [branding.firmName, branding.firmEmail].filter(Boolean).join(' · ');
-      if (opciones.conMembrete && pieIzq) doc.text(pieIzq, pageMarginLeft, 267);
-      doc.text(`Página ${pagina} de ${totalPaginas}`, 215.9 - pageMarginRight, 267, { align: 'right' });
+    for (let pagina = 1; pagina <= totalPaginas; pagina += 1) {
+      doc.setPage(pagina);
+      doc.setDrawColor(...LINEA_PIE);
+      doc.setLineWidth(0.15);
+      doc.line(IZQ, Y_PIE - mm(9), ANCHO_PAGINA - DER, Y_PIE - mm(9));
+      doc.setLineWidth(0.2);
+
+      doc.setFont(F, 'normal');
+      doc.setFontSize(pt(8.5));
+      doc.setTextColor(...GRIS_PIE);
+      if (opciones.conMembrete && pieIzquierda) doc.text(pieIzquierda, IZQ, Y_PIE);
+      doc.text(`Página ${pagina} de ${totalPaginas}`, ANCHO_PAGINA - DER, Y_PIE, { align: 'right' });
     }
 
     doc.save(documentTitle.endsWith('.pdf') ? documentTitle : `${documentTitle}.pdf`);

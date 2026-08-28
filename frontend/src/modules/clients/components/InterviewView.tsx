@@ -13,7 +13,7 @@ import { ClientPicker } from './ClientPicker';
 import { InterviewInsights } from './InterviewInsights';
 import { TranscriptSummary } from '../../transcription/components/TranscriptSummary';
 import { AudioRecorder } from './AudioRecorder';
-import { clientsApi } from '../clients.api';
+import { clientsApi, type Client } from '../clients.api';
 
 /**
  * The client interview, as its own screen.
@@ -102,6 +102,17 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
   } = useTranscription('ENTREVISTA');
 
   const [clientId, setClientId] = React.useState<string | null>(null);
+  /*
+   * La ficha del consultante, no solo su id: el acta de entrevista (14b)
+   * imprime su nombre y su cedula en los metadatos y en la linea de firma que
+   * se le lee o se le entrega.
+   */
+  const [cliente, setCliente] = React.useState<Client | null>(null);
+
+  const elegirCliente = (id: string | null, ficha: Client | null): void => {
+    setClientId(id);
+    setCliente(ficha);
+  };
   const [copiado, setCopiado] = React.useState(false);
   const [titulo, setTitulo] = React.useState('');
   /*
@@ -153,7 +164,8 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
       actaLista: fila?.estado_revision === 'ACTA_LISTA',
       hechosClave: fila?.resumen?.hechos,
       decision: fila?.decision,
-      decisionMotivo: fila?.decision_motivo ?? null
+      decisionMotivo: fila?.decision_motivo ?? null,
+      consultante: cliente ? { nombre: cliente.fullName, documento: cliente.documentId } : null
     };
   };
 
@@ -307,7 +319,7 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
       {!result ? (
         <>
           <Paso numero={1} titulo="¿Con quién es la entrevista?">
-            <ClientPicker value={clientId} onChange={setClientId} />
+            <ClientPicker value={clientId} onChange={elegirCliente} />
           </Paso>
 
           <Paso numero={2} titulo="Captura la conversación">
@@ -420,7 +432,7 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
         <>
           <div className="bg-surface border border-line-200 rounded-card p-4">
             <h3 className="text-xs font-bold text-ink-900 mb-2">Cliente de la entrevista</h3>
-            <ClientPicker value={clientId} onChange={setClientId} />
+            <ClientPicker value={clientId} onChange={elegirCliente} />
           </div>
 
           {!persisted && <NotPersistedWarning />}

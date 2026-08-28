@@ -40,7 +40,8 @@ export interface DrawRunsOptions {
   font: string;
   sizePt: number;
   color: RGB;
-  justify?: boolean;
+  /** 'justify' stretches every line but the last; 'center' centres each line. */
+  align?: 'left' | 'center' | 'justify';
   /**
    * Page-break hook: receives the baseline about to be used and returns the
    * baseline to actually draw at (same value, or the top of a fresh page).
@@ -151,25 +152,22 @@ export const drawRuns = (doc: jsPDF, runs: PdfRun[], opts: DrawRunsOptions): num
       first = false;
     }
 
+    const natural = line.reduce(
+      (total, t, idx) => total + t.width + (idx < line.length - 1 && t.glue ? t.spaceW : 0),
+      0
+    );
+
     // Justify every line but the paragraph's last. A line whose leftover is
     // huge (short last-ish line before a break) would open rivers wider than
     // words — beyond a third of the width the line stays left-aligned.
     let perGap = 0;
-    if (opts.justify && i < lines.length - 1 && line.length > 1) {
-      let natural = 0;
-      let gaps = 0;
-      line.forEach((t, idx) => {
-        natural += t.width;
-        if (idx < line.length - 1 && t.glue) {
-          natural += t.spaceW;
-          gaps += 1;
-        }
-      });
+    if (opts.align === 'justify' && i < lines.length - 1 && line.length > 1) {
+      const gaps = line.filter((t, idx) => idx < line.length - 1 && t.glue).length;
       const extra = opts.width - natural;
       if (gaps > 0 && extra > 0 && extra < opts.width * 0.35) perGap = extra / gaps;
     }
 
-    let x = opts.x;
+    let x = opts.x + (opts.align === 'center' ? Math.max(0, (opts.width - natural) / 2) : 0);
     for (let idx = 0; idx < line.length; idx++) {
       const t = line[idx];
       setTokenFont(doc, t);

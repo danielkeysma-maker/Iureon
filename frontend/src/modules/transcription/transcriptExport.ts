@@ -1,6 +1,6 @@
 import { Document, Packer, Paragraph, TextRun, AlignmentType, Footer as DocxFooter, PageNumber } from 'docx';
 import { saveAs } from 'file-saver';
-import { registrarJakarta } from './actaFonts';
+import { registrarJakarta } from '../documents/services/pdfFonts';
 import { getMarcaActual } from '../tenant/services/branding.api';
 import { jsPDF } from 'jspdf';
 import { drawRuns, measureRuns, type PdfRun, type RGB } from '../documents/services/pdfTextLayout';
@@ -132,6 +132,11 @@ export interface ActaInfo {
   /** La decision de la entrevista, para el III. RESULTADO. */
   decision?: 'SIN_DECIDIR' | 'TOMADO' | 'DECLINADO';
   decisionMotivo?: string | null;
+  /**
+   * El consultante de la entrevista, para la fila «Consultante:» y la segunda
+   * linea de firma del 14b. Solo cuando hay cliente atado a la entrevista.
+   */
+  consultante?: { nombre: string; documento: string } | null;
 }
 
 const fraccionRevisada = (segments: TranscriptionResult['segments']): { n: number; total: number } => ({
@@ -307,487 +312,679 @@ export const exportTranscriptToWord = async (
   saveAs(await Packer.toBlob(doc), nombreArchivo(titulo, 'docx'));
 };
 
-/**
- * El acta en PDF, tal como el artboard 14b la dibuja.
+/*
+ * ═══════════════════════════════════════════════════════════════════════════
+ * EL ACTA EN PDF — dos papeles distintos, como el artboard 14b los dibuja
+ * ═══════════════════════════════════════════════════════════════════════════
  *
- * Membrete de la firma arriba (es un documento DE LA FIRMA) con filete OSCURO,
- * titulo que se declara transcripcion, metadatos como tabla etiqueta:valor, la
- * caja de naturaleza/advertencia con barra ambar, INTERVINIENTES con su cuadro
- * de color, el DESARROLLO con nombre abreviado ("D. Madera (juez):") — minuto
- * en mono al margen, cuerpo JUSTIFICADO con interlineado 1,75 del artboard y
- * la marca [ininteligible mm:ss] resaltada en linea — y la caja final de
- * tramos ininteligibles. Tipografia Plus Jakarta Sans embebida (OFL).
+ * SON DOS DOCUMENTOS, NO UNO CON UN INTERRUPTOR. El artboard los dibuja lado a
+ * lado y no comparten estructura:
  *
- * TODO SALE DE DATOS REALES O NO SALE: el proceso/radicado/despacho del
- * artboard no existen aun como columnas de la transcripcion y sus filas no se
- * pintan; los "tramos ininteligibles" solo si el texto los trae; el resultado
- * (entrevista) solo con decision registrada; el firmante solo con acta lista.
- * El porcentaje de audio ininteligible del artboard NO se imprime: exigiria la
- * duracion de cada tramo, que el transcrito no tiene — un numero inventado con
- * cara de medida es exactamente lo que este producto no hace.
+ *   Acta de ENTREVISTA — «Documento interno» en el membrete; un solo renglón
+ *   de título; los intervinientes viven DENTRO de los metadatos, con su nombre
+ *   en negrita y su papel al lado; caja de «Naturaleza de este documento»;
+ *   secciones numeradas I. HECHOS / II. TRANSCRIPCIÓN / III. RESULTADO; y DOS
+ *   líneas de firma — la del abogado que revisó y la del consultante, porque
+ *   es el documento que se le entrega o se le lee.
+ *
+ *   Acta de AUDIENCIA — sin «Documento interno»; caja de «Advertencia»; una
+ *   sección INTERVINIENTES propia, cada voz con el cuadro de color que la
+ *   identifica en pantalla, y la nota de que los nombres los puso el revisor;
+ *   el cuerpo se llama DESARROLLO; caja de tramos ininteligibles al cierre; y
+ *   UNA línea de firma, la de quien revisó.
+ *
+ * TODO SALE DE DATOS REALES O NO SALE. El artboard muestra proceso, radicado,
+ * despacho, lugar y el porcentaje de audio ininteligible: ninguno existe como
+ * dato de la transcripción, así que sus filas no se pintan en vez de salir
+ * inventadas. El subtítulo con el tipo de audiencia tampoco.
  */
-export const exportTranscriptToPdf = (result: TranscriptionResult, titulo: string, acta?: ActaInfo): void => {
+
+/** La geometría y la paleta del papel del 14b, compartidas por las dos actas. */
+const ANCHO_PAGINA = 215.9;
+const ALTO_PAGINA = 279.4;
+const MARGEN = 20;
+const ANCHO = ANCHO_PAGINA - MARGEN * 2;
+const Y_PIE = ALTO_PAGINA - 14;
+const LIMITE = Y_PIE - 10;
+
+const TINTA: RGB = [16, 24, 34]; // #101822
+const GRIS: RGB = [102, 116, 135]; // #667487
+const GRIS_TENUE: RGB = [139, 150, 166]; // #8B96A6
+const TEXTO_CAJA: RGB = [43, 53, 66]; // #2B3542
+const AMBAR: RGB = [138, 90, 18]; // #8A5A12
+const AMBAR_FONDO: RGB = [251, 243, 228]; // #FBF3E4
+const CAJA_FONDO: RGB = [247, 248, 250]; // #F7F8FA
+const TRAMOS_BORDE: RGB = [228, 214, 180]; // #E4D6B4
+const TRAMOS_FONDO: RGB = [253, 250, 243]; // #FDFAF3
+const FILETE_PIE: RGB = [195, 203, 214]; // #C3CBD6
+const FIRMA_DETALLE: RGB = [68, 80, 100]; // #445064
+
+/* El cuerpo del artboard: 11,5 px a 1,75 de interlínea sobre papel de 640 px. */
+const CUERPO_PT = 10.5;
+const LINEA_CUERPO = CUERPO_PT * 1.75 * 0.3528;
+
+/** El andamio común: la página, sus cortes y el avance vertical. */
+interface Lienzo {
+  doc: jsPDF;
+  F: string;
+  y: number;
+  enLinea: (y: number) => number;
+  asegurar: (necesario: number) => void;
+}
+
+const nuevoLienzo = (titulo: string, nombreFirma?: string): Lienzo => {
   const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'letter' });
   const F = registrarJakarta(doc);
 
-  const margen = 20;
-  const anchoPagina = 215.9;
-  const ancho = anchoPagina - margen * 2;
-  const alto = 279.4;
-  const LIMITE = alto - 24;
-  let y = 16;
+  doc.setProperties({ title: titulo, author: nombreFirma || undefined, creator: 'Iureon' });
 
-  const marca = getMarcaActual();
-
-  /* ─── La paleta del 14b, en RGB del artboard ─────────────────────────── */
-  const TINTA: RGB = [16, 24, 34]; // #101822
-  const GRIS_ETIQUETA: RGB = [102, 116, 135]; // #667487
-  const GRIS_MINUTO: RGB = [139, 150, 166]; // #8B96A6
-  const TEXTO_CAJA: RGB = [43, 53, 66]; // #2B3542
-  const AMBAR: RGB = [138, 90, 18]; // #8A5A12
-  const AMBAR_FONDO: RGB = [251, 243, 228]; // #FBF3E4
-  const CAJA_FONDO: RGB = [247, 248, 250]; // #F7F8FA
-  const TRAMOS_BORDE: RGB = [228, 214, 180]; // #E4D6B4
-  const TRAMOS_FONDO: RGB = [253, 250, 243]; // #FDFAF3
-  const PIE_SEPARADOR: RGB = [195, 203, 214]; // #C3CBD6
-  const FIRMA_DETALLE: RGB = [68, 80, 100]; // #445064
-
-  /*
-   * El interlineado del artboard: cuerpo 11 pt a 1,75 lineas = 6,8 mm entre
-   * renglones. Era 4,4 mm — la mitad del aire que el diseno pide — y esa
-   * estrechez es exactamente lo que hacia ver el acta como recibo.
-   */
-  const CUERPO_PT = 11;
-  const AVANCE_CUERPO = 6.8;
-
-  doc.setProperties({
-    title: nombreArchivo(titulo, 'pdf'),
-    author: marca?.firmName || undefined,
-    creator: 'Iureon'
-  });
-
-  const saltoDePagina = (): number => {
-    doc.addPage();
-    return 18;
-  };
-  const enLinea = (yy: number): number => (yy > LIMITE ? saltoDePagina() : yy);
-  const asegurar = (necesario: number): void => {
-    if (y + necesario > LIMITE) y = saltoDePagina();
-  };
-
-  /* Las marcas [ininteligible mm:ss] del texto, como runs resaltados (14b). */
-  const runsDeTexto = (texto: string): PdfRun[] => {
-    const runs: PdfRun[] = [];
-    const regex = /\[ininteligible[^\]]*\]/gi;
-    let previo = 0;
-    let m: RegExpExecArray | null;
-    while ((m = regex.exec(texto)) !== null) {
-      if (m.index > previo) runs.push({ text: texto.slice(previo, m.index) });
-      runs.push({ text: m[0], font: 'courier', sizePt: 9.5, bg: AMBAR_FONDO, noBreak: true });
-      previo = regex.lastIndex;
+  const lienzo: Lienzo = {
+    doc,
+    F,
+    y: 16,
+    enLinea: (y: number) => {
+      if (y > LIMITE) {
+        doc.addPage();
+        lienzo.y = 18;
+        return 18;
+      }
+      return y;
+    },
+    asegurar: (necesario: number) => {
+      if (lienzo.y + necesario > LIMITE) {
+        doc.addPage();
+        lienzo.y = 18;
+      }
     }
-    if (previo < texto.length) runs.push({ text: texto.slice(previo) });
-    return runs;
   };
 
-  // --- MEMBRETE: filete oscuro de 1,5 px como el artboard -------------------
-  let xTexto = margen;
+  return lienzo;
+};
+
+/** El membrete del acta: logo, razón social, NIT y filete oscuro de 1,5 px. */
+const membrete = (L: Lienzo, marca: ReturnType<typeof getMarcaActual>, aviso?: string): void => {
+  const { doc, F } = L;
+  let xTexto = MARGEN;
+
   if (marca?.logoUrl && /^data:image\/(png|jpe?g)/.test(marca.logoUrl)) {
     try {
-      doc.addImage(marca.logoUrl, margen, y - 5, 22, 11, undefined, 'FAST');
-      xTexto = margen + 26;
+      doc.addImage(marca.logoUrl, MARGEN, L.y - 5, 20, 11, undefined, 'FAST');
+      xTexto = MARGEN + 24;
     } catch {
-      /* Un logo ilegible jamas tumba el acta. */
+      /* Un logo ilegible jamás tumba el acta. */
     }
   }
+
   doc.setFont(F, 'bold');
-  doc.setFontSize(10);
-  doc.setTextColor(TINTA[0], TINTA[1], TINTA[2]);
-  doc.text((marca?.firmName || 'Documento de la firma').toUpperCase(), xTexto, y);
+  doc.setFontSize(9.5);
+  doc.setTextColor(...TINTA);
+  doc.text((marca?.firmName || 'Documento de la firma').toUpperCase(), xTexto, L.y);
+
   doc.setFont(F, 'normal');
-  doc.setFontSize(8);
-  doc.setTextColor(GRIS_ETIQUETA[0], GRIS_ETIQUETA[1], GRIS_ETIQUETA[2]);
-  if (marca?.firmNit) doc.text(`NIT ${marca.firmNit}`, xTexto, y + 4);
-  if (result.kind === 'ENTREVISTA') {
-    // «Documento interno», a la derecha del membrete: es el acta de la firma.
-    doc.text('Documento interno', anchoPagina - margen, y, { align: 'right' });
-  }
-  doc.setDrawColor(TINTA[0], TINTA[1], TINTA[2]);
-  doc.setLineWidth(0.5);
-  doc.line(margen, y + 8, anchoPagina - margen, y + 8);
+  doc.setFontSize(7.5);
+  doc.setTextColor(...GRIS);
+  if (marca?.firmNit) doc.text(`NIT ${marca.firmNit}`, xTexto, L.y + 3.6);
+
+  /* «Documento interno» al vuelo derecho: solo el acta de entrevista lo lleva. */
+  if (aviso) doc.text(aviso, ANCHO_PAGINA - MARGEN, L.y, { align: 'right' });
+
+  doc.setDrawColor(...TINTA);
+  doc.setLineWidth(0.45);
+  doc.line(MARGEN, L.y + 7.5, ANCHO_PAGINA - MARGEN, L.y + 7.5);
   doc.setLineWidth(0.2);
-  y += 17;
+  L.y += 16;
+};
 
-  // --- TITULO: se declara transcripcion (el archivo va en los metadatos) ----
-  const tituloActa =
-    result.kind === 'ENTREVISTA' ? 'ACTA DE ENTREVISTA INICIAL' : 'TRANSCRIPCIÓN DE AUDIENCIA';
-  doc.setFont(F, 'bold');
-  doc.setFontSize(11.5);
-  doc.setTextColor(TINTA[0], TINTA[1], TINTA[2]);
-  doc.text(tituloActa, anchoPagina / 2, y, { align: 'center' });
-  y += 8;
+/** El título centrado del acta. */
+const tituloCentrado = (L: Lienzo, texto: string): void => {
+  L.doc.setFont(L.F, 'bold');
+  L.doc.setFontSize(11);
+  L.doc.setTextColor(...TINTA);
+  L.doc.text(texto, ANCHO_PAGINA / 2, L.y, { align: 'center' });
+  L.y += 8;
+};
 
-  // --- METADATOS: etiqueta : valor, columna de 40 mm como el artboard -------
-  const dur = duracion(result.durationSeconds);
-  const filas: Array<[string, string, boolean?]> = [
-    ['Fecha:', `${fechaLarga(result.transcribedAt)}${dur ? ` · duración ${dur}` : ''}`],
-    ['Grabación:', titulo.replace(/^\d{10,}_/, ''), true]
-  ];
-  if (acta?.autorizadoEl) {
-    filas.push([
-      'Autorización:',
-      `grabación autorizada el ${new Date(acta.autorizadoEl).toLocaleString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`
-    ]);
-  }
+/** Una fila de la rejilla de metadatos: etiqueta gris a la izquierda, valor. */
+interface FilaMeta {
+  etiqueta: string;
+  valor?: string;
+  /** Valor compuesto — los intervinientes de la entrevista van así. */
+  runs?: PdfRun[];
+  mono?: boolean;
+}
 
-  const X_VALOR = margen + 40;
-  for (const [etiqueta, valor, mono] of filas) {
-    doc.setFont(F, 'normal');
-    doc.setFontSize(10.5);
-    doc.setTextColor(GRIS_ETIQUETA[0], GRIS_ETIQUETA[1], GRIS_ETIQUETA[2]);
-    doc.text(etiqueta, margen, y);
-    doc.setFont(mono ? 'courier' : F, 'normal');
-    doc.setFontSize(mono ? 9.5 : 10.5);
-    doc.setTextColor(TINTA[0], TINTA[1], TINTA[2]);
-    const cuerpoValor = doc.splitTextToSize(valor, ancho - 40) as string[];
-    cuerpoValor.forEach((linea, i) => {
-      doc.text(linea, X_VALOR, y + i * 5.2);
-    });
-    y += cuerpoValor.length * 5.2 + 1.2;
-  }
-  y += 4;
+const X_VALOR = MARGEN + 33;
 
-  // --- NATURALEZA / ADVERTENCIA: la caja del 14b, con barra ambar -----------
-  const f = fraccionRevisada(result.segments);
-  const esEntrevista = result.kind === 'ENTREVISTA';
+const rejillaMetadatos = (L: Lienzo, filas: FilaMeta[]): void => {
+  for (const fila of filas) {
+    L.y = L.enLinea(L.y);
+    const yEtiqueta = L.y;
 
-  /* La fraccion contada, nunca supuesta — la regla de siempre. */
-  const revision =
-    f.total > 0 && f.n === f.total
-      ? ', revisada íntegramente por la firma'
-      : f.n > 0
-      ? `, con ${f.n} de ${f.total} intervenciones revisadas por la firma`
-      : ', aún sin revisión humana';
-
-  const marcaMono: PdfRun = {
-    text: esEntrevista ? '[ininteligible]' : '[ininteligible mm:ss]',
-    font: 'courier',
-    sizePt: 9,
-    noBreak: true
-  };
-  const runsCaja: PdfRun[] = esEntrevista
-    ? [
-        { text: 'Naturaleza de este documento.', style: 'bold' },
-        { text: ` Es la transcripción automática de una grabación${revision}. Los fragmentos que el audio no permitió establecer con certeza se señalan como ` },
-        marcaMono,
-        { text: '. No constituye declaración rendida ante autoridad ni prueba anticipada.' }
-      ]
-    : [
-        { text: 'Advertencia.', style: 'bold' },
-        { text: ` Transcripción automática${revision}. No sustituye el acta oficial del despacho ni la grabación original, que prevalecen. Los tramos que el audio no permitió establecer se indican como ` },
-        marcaMono,
-        { text: '.' }
-      ];
-
-  const cajaOpts = {
-    x: margen + 4.5,
-    y: 0,
-    width: ancho - 9,
-    lineMm: 5.8,
-    font: F,
-    sizePt: 10,
-    color: TEXTO_CAJA
-  };
-  const lineasCaja = measureRuns(doc, runsCaja, { ...cajaOpts, y });
-  const altoCaja = lineasCaja * 5.8 + 4.5;
-  asegurar(altoCaja + 4);
-  doc.setFillColor(CAJA_FONDO[0], CAJA_FONDO[1], CAJA_FONDO[2]);
-  doc.rect(margen, y - 4.5, ancho, altoCaja, 'F');
-  doc.setFillColor(AMBAR[0], AMBAR[1], AMBAR[2]);
-  doc.rect(margen, y - 4.5, 1.0, altoCaja, 'F');
-  y = drawRuns(doc, runsCaja, { ...cajaOpts, y });
-  y += 4;
-
-  // --- INTERVINIENTES -------------------------------------------------------
-  const nombres = buildSpeakerNames(result.segments, ROLE_LABELS);
-  asegurar(12);
-  doc.setFont(F, 'bold');
-  doc.setFontSize(10.5);
-  doc.setTextColor(TINTA[0], TINTA[1], TINTA[2]);
-  doc.text('INTERVINIENTES', margen, y);
-  y += 6;
-
-  for (const label of result.speakerLabels) {
-    const seg = result.segments.find((sg) => sg.speakerLabel === label);
-    const nombre = nombres[label] ?? (seg ? ROLE_LABELS[seg.role] : label);
-    const rol = seg && seg.speakerName && seg.role !== 'DESCONOCIDO' ? ROLE_LABELS[seg.role].toLowerCase() : '';
-
-    const color = colorForSpeaker(label, result.speakerLabels);
-    const runsFila: PdfRun[] = rol
-      ? [{ text: nombre, style: 'bold' }, { text: ` — ${rol}`, color: TEXTO_CAJA }]
-      : [{ text: nombre, style: 'bold' }];
-
-    y = enLinea(y);
-    y = drawRuns(doc, runsFila, {
-      x: margen + 5.5,
-      y,
-      width: ancho - 5.5,
-      lineMm: 6.3,
-      font: F,
-      sizePt: 11,
-      color: TINTA,
-      ensure: enLinea,
-      onFirstLine: (yFila) => {
-        doc.setFillColor(color.rgb[0], color.rgb[1], color.rgb[2]);
-        doc.rect(margen + 0.8, yFila - 2.3, 2.7, 2.7, 'F');
-      }
-    });
-  }
-
-  y += 1;
-  y = enLinea(y);
-  y = drawRuns(
-    doc,
-    [{ text: 'Los nombres los asignó el revisor a las voces separadas por el sistema. En el desarrollo, cada intervención se identifica con el nombre y el rol abreviado.' }],
-    { x: margen, y, width: ancho, lineMm: 5.2, font: F, sizePt: 9.5, color: GRIS_ETIQUETA, ensure: enLinea }
-  );
-  y += 4;
-
-  // --- I. HECHOS RELEVANTES (si el resumen existe) --------------------------
-  if (acta?.hechosClave && acta.hechosClave.length > 0) {
-    asegurar(12);
-    doc.setFont(F, 'bold');
-    doc.setFontSize(10.5);
-    doc.setTextColor(TINTA[0], TINTA[1], TINTA[2]);
-    doc.text('I. HECHOS RELEVANTES MANIFESTADOS', margen, y);
-    y += 6.5;
-    for (const h of acta.hechosClave) {
-      y = enLinea(y);
-      y = drawRuns(doc, runsDeTexto(h.hecho), {
-        x: margen + 14,
-        y,
-        width: ancho - 14,
-        lineMm: AVANCE_CUERPO,
-        font: F,
-        sizePt: CUERPO_PT,
-        color: TINTA,
-        justify: true,
-        ensure: enLinea,
-        onFirstLine: (yHecho) => {
-          doc.setFont('courier', 'normal');
-          doc.setFontSize(9);
-          doc.setTextColor(GRIS_MINUTO[0], GRIS_MINUTO[1], GRIS_MINUTO[2]);
-          doc.text(minutoDe(h.t), margen, yHecho);
-        }
-      });
-      y += 0.5;
-    }
-    y += 4;
-  }
-
-  // --- DESARROLLO / II. TRANSCRIPCION ---------------------------------------
-  asegurar(12);
-  doc.setFont(F, 'bold');
-  doc.setFontSize(10.5);
-  doc.setTextColor(TINTA[0], TINTA[1], TINTA[2]);
-  doc.text(
-    acta?.hechosClave && acta.hechosClave.length > 0 ? 'II. TRANSCRIPCIÓN' : 'DESARROLLO',
-    margen,
-    y
-  );
-  y += 7;
-
-  /*
-   * "D. Madera (juez):" — inicial del nombre + primer apellido, como el
-   * artboard: la lista de intervinientes ya dio el nombre completo, y el
-   * desarrollo se lee mejor sin repetirlo entero cincuenta veces.
-   */
-  const abreviar = (nombre: string): string => {
-    const partes = nombre.trim().split(/\s+/);
-    if (partes.length < 2) return nombre;
-    return `${partes[0][0]}. ${partes[1]}`;
-  };
-
-  const SANGRIA = 16;
-
-  for (const linea of lineas(result)) {
-    const quienAbrev = abreviar(linea.quien);
-    const rolCorto = linea.rol ? ` (${linea.rol.toLowerCase()})` : '';
-    const minuto = linea.minuto;
-
-    /*
-     * El turno entero como UN parrafo de runs: encabezado en negrita y el
-     * texto corriendo detras, JUSTIFICADO y con el interlineado del artboard.
-     * El minuto se pinta cuando la primera linea ya tiene pagina — antes se
-     * pintaba antes del corte y podia quedar huerfano al pie.
-     */
-    const runsTurno: PdfRun[] = [
-      { text: `${quienAbrev}${rolCorto}:`, style: 'bold' },
-      { text: ' ' },
-      ...runsDeTexto(linea.texto)
+    const runs: PdfRun[] = fila.runs ?? [
+      { text: fila.valor ?? '', ...(fila.mono ? { font: 'courier', sizePt: 9 } : {}) }
     ];
 
-    y = enLinea(y);
-    y = drawRuns(doc, runsTurno, {
-      x: margen + SANGRIA,
-      y,
-      width: ancho - SANGRIA,
-      lineMm: AVANCE_CUERPO,
-      font: F,
+    L.y = drawRuns(L.doc, runs, {
+      x: X_VALOR,
+      y: L.y,
+      width: ANCHO_PAGINA - MARGEN - X_VALOR,
+      lineMm: CUERPO_PT * 1.75 * 0.3528,
+      font: L.F,
       sizePt: CUERPO_PT,
       color: TINTA,
-      justify: true,
-      ensure: enLinea,
-      onFirstLine: (yTurno) => {
-        if (!minuto) return;
-        doc.setFont('courier', 'normal');
-        doc.setFontSize(9);
-        doc.setTextColor(GRIS_MINUTO[0], GRIS_MINUTO[1], GRIS_MINUTO[2]);
-        doc.text(minuto, margen, yTurno);
-      }
+      ensure: L.enLinea
     });
-    /* Separacion entre turnos: los 9 px del artboard ≈ 3 mm. */
-    y += 3 - (AVANCE_CUERPO - CUERPO_PT * 0.3528);
-  }
 
-  // --- TRAMOS ININTELIGIBLES: caja con borde ambar, minutos contados --------
-  const minutosMarcados: string[] = [];
-  let marcasSinMinuto = 0;
+    L.doc.setFont(L.F, 'normal');
+    L.doc.setFontSize(CUERPO_PT);
+    L.doc.setTextColor(...GRIS);
+    L.doc.text(fila.etiqueta, MARGEN, yEtiqueta);
+    L.y += 0.8;
+  }
+  L.y += 3.5;
+};
+
+/**
+ * La caja gris con barra ámbar: «Naturaleza de este documento» en la
+ * entrevista, «Advertencia» en la audiencia.
+ */
+const cajaDeNaturaleza = (L: Lienzo, runs: PdfRun[]): void => {
+  const opts = {
+    x: MARGEN + 4.5,
+    y: L.y,
+    width: ANCHO - 9,
+    lineMm: 5.4,
+    font: L.F,
+    sizePt: 9.5,
+    color: TEXTO_CAJA
+  };
+  const alto = measureRuns(L.doc, runs, opts) * 5.4 + 4.5;
+  L.asegurar(alto + 4);
+
+  L.doc.setFillColor(...CAJA_FONDO);
+  L.doc.rect(MARGEN, L.y - 4.2, ANCHO, alto, 'F');
+  L.doc.setFillColor(...AMBAR);
+  L.doc.rect(MARGEN, L.y - 4.2, 1.0, alto, 'F');
+
+  L.y = drawRuns(L.doc, runs, { ...opts, y: L.y });
+  L.y += 5;
+};
+
+/** Un encabezado de sección: negrita pequeña, como el 14b. */
+const seccion = (L: Lienzo, texto: string): void => {
+  L.asegurar(12);
+  L.doc.setFont(L.F, 'bold');
+  L.doc.setFontSize(9.5);
+  L.doc.setTextColor(...TINTA);
+  L.doc.text(texto, MARGEN, L.y);
+  L.y += 6;
+};
+
+/** Las marcas [ininteligible mm:ss] del texto, resaltadas en línea. */
+const runsDeTexto = (texto: string): PdfRun[] => {
+  const runs: PdfRun[] = [];
+  const regex = /\[ininteligible[^\]]*\]/gi;
+  let previo = 0;
+  let m: RegExpExecArray | null;
+
+  while ((m = regex.exec(texto)) !== null) {
+    if (m.index > previo) runs.push({ text: texto.slice(previo, m.index) });
+    runs.push({ text: m[0], font: 'courier', sizePt: 9, bg: AMBAR_FONDO, noBreak: true });
+    previo = regex.lastIndex;
+  }
+  if (previo < texto.length) runs.push({ text: texto.slice(previo) });
+  return runs;
+};
+
+/** «D. Madera» — inicial y primer apellido, como el desarrollo del artboard. */
+const abreviar = (nombre: string): string => {
+  const partes = nombre.trim().split(/\s+/);
+  return partes.length < 2 ? nombre : `${partes[0][0]}. ${partes[1]}`;
+};
+
+/** Un turno: el minuto en mono al margen y el texto sangrado y justificado. */
+const SANGRIA = 15;
+
+const turno = (L: Lienzo, linea: Linea): void => {
+  const rolCorto = linea.rol ? ` (${linea.rol.toLowerCase()})` : '';
+  const runs: PdfRun[] = [
+    { text: `${abreviar(linea.quien)}${rolCorto}:`, style: 'bold' },
+    { text: ' ' },
+    ...runsDeTexto(linea.texto)
+  ];
+
+  L.y = L.enLinea(L.y);
+  L.y = drawRuns(L.doc, runs, {
+    x: MARGEN + SANGRIA,
+    y: L.y,
+    width: ANCHO - SANGRIA,
+    lineMm: LINEA_CUERPO,
+    font: L.F,
+    sizePt: CUERPO_PT,
+    color: TINTA,
+    align: 'justify',
+    ensure: L.enLinea,
+    onFirstLine: (yTurno) => {
+      if (!linea.minuto) return;
+      L.doc.setFont('courier', 'normal');
+      L.doc.setFontSize(8);
+      L.doc.setTextColor(...GRIS_TENUE);
+      L.doc.text(linea.minuto, MARGEN, yTurno);
+    }
+  });
+  L.y += 2.4;
+};
+
+/** Un hecho relevante: el mismo patrón de minuto al margen y texto sangrado. */
+const hechoRelevante = (L: Lienzo, h: { t: number | null; hecho: string }): void => {
+  L.y = L.enLinea(L.y);
+  L.y = drawRuns(L.doc, runsDeTexto(h.hecho), {
+    x: MARGEN + SANGRIA,
+    y: L.y,
+    width: ANCHO - SANGRIA,
+    lineMm: LINEA_CUERPO,
+    font: L.F,
+    sizePt: CUERPO_PT,
+    color: TINTA,
+    align: 'justify',
+    ensure: L.enLinea,
+    onFirstLine: (yHecho) => {
+      L.doc.setFont('courier', 'normal');
+      L.doc.setFontSize(8);
+      L.doc.setTextColor(...GRIS_TENUE);
+      L.doc.text(minutoDe(h.t), MARGEN, yHecho);
+    }
+  });
+  L.y += 1.6;
+};
+
+/** Una línea de firma: filete oscuro, nombre y su detalle debajo. */
+const lineaDeFirma = (L: Lienzo, x: number, ancho: number, nombre: string, detalle: string): void => {
+  L.doc.setDrawColor(...TINTA);
+  L.doc.setLineWidth(0.3);
+  L.doc.line(x, L.y, x + ancho, L.y);
+  L.doc.setLineWidth(0.2);
+
+  L.doc.setFont(L.F, 'bold');
+  L.doc.setFontSize(9);
+  L.doc.setTextColor(...TINTA);
+  L.doc.text(nombre, x, L.y + 4);
+
+  L.doc.setFont(L.F, 'normal');
+  L.doc.setFontSize(8);
+  L.doc.setTextColor(...FIRMA_DETALLE);
+  L.doc.text(detalle, x, L.y + 8);
+};
+
+/**
+ * El pie del artboard: filete claro y una línea en mono con lo que el acta
+ * puede afirmar de sí misma. Se mide contra la paginación y suelta partes
+ * opcionales antes que montarse encima de ella.
+ */
+const pieDeActa = (L: Lienzo, partes: string[]): void => {
+  const { doc } = L;
+  const total = doc.getNumberOfPages();
+
+  doc.setFont('courier', 'normal');
+  doc.setFontSize(7.5);
+  const anchoPaginacion = doc.getTextWidth(`página ${total} de ${total}`);
+  const restantes = [...partes];
+  while (
+    restantes.length > 1 &&
+    doc.getTextWidth(restantes.join(' · ')) > ANCHO - anchoPaginacion - 6
+  ) {
+    restantes.pop();
+  }
+  const izquierda = restantes.join(' · ');
+
+  for (let pagina = 1; pagina <= total; pagina += 1) {
+    doc.setPage(pagina);
+    doc.setDrawColor(...FILETE_PIE);
+    doc.setLineWidth(0.15);
+    doc.line(MARGEN, Y_PIE - 4.5, ANCHO_PAGINA - MARGEN, Y_PIE - 4.5);
+    doc.setLineWidth(0.2);
+
+    doc.setFont('courier', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(...GRIS_TENUE);
+    doc.text(izquierda, MARGEN, Y_PIE);
+    doc.text(`página ${pagina} de ${total}`, ANCHO_PAGINA - MARGEN, Y_PIE, { align: 'right' });
+  }
+};
+
+/** La caja de cierre con los tramos que el audio no dejó establecer. */
+const cajaDeTramos = (L: Lienzo, result: TranscriptionResult): void => {
+  const minutos: string[] = [];
+  let sinMinuto = 0;
+
   for (const seg of result.segments) {
-    const halladas = seg.text.matchAll(/\[ininteligible(?:\s+(\d{1,3}:\d{2}))?\]/gi);
-    for (const m of halladas) {
-      if (m[1]) minutosMarcados.push(m[1]);
-      else marcasSinMinuto += 1;
+    for (const m of seg.text.matchAll(/\[ininteligible(?:\s+(\d{1,3}:\d{2}))?\]/gi)) {
+      if (m[1]) minutos.push(m[1]);
+      else sinMinuto += 1;
     }
   }
-  const totalTramos = minutosMarcados.length + marcasSinMinuto;
-  if (totalTramos > 0) {
-    /*
-     * El artboard suma «1 min 12 s (2,5% del audio)»; ese numero exige la
-     * duracion de cada tramo y el transcrito no la tiene. Se listan minutos y
-     * conteo — lo medible — y nada mas.
-     */
-    const partes: string[] = [];
-    if (minutosMarcados.length > 0) partes.push(minutosMarcados.join(' · '));
-    if (marcasSinMinuto > 0)
-      partes.push(`${marcasSinMinuto} sin minuto marcado`);
-    const cuerpoTramosRuns: PdfRun[] = [{ text: partes.join(' — ') }];
 
-    const tramosOpts = {
-      x: margen + 4.5,
-      y: 0,
-      width: ancho - 9,
-      lineMm: 5.9,
-      font: F,
-      sizePt: 10,
-      color: TEXTO_CAJA
-    };
-    const lineasTramos = measureRuns(doc, cuerpoTramosRuns, { ...tramosOpts, y });
-    const altoTramos = lineasTramos * 5.9 + 10;
-    y += 4;
-    asegurar(altoTramos + 4);
+  const total = minutos.length + sinMinuto;
+  if (total === 0) return;
 
-    doc.setFillColor(TRAMOS_FONDO[0], TRAMOS_FONDO[1], TRAMOS_FONDO[2]);
-    doc.setDrawColor(TRAMOS_BORDE[0], TRAMOS_BORDE[1], TRAMOS_BORDE[2]);
-    doc.setLineWidth(0.3);
-    doc.rect(margen, y - 4.5, ancho, altoTramos, 'FD');
-    doc.setLineWidth(0.2);
+  /*
+   * El artboard suma «1 min 12 s (2,5% del audio)». Ese número exige la
+   * duración de cada tramo, que la transcripción no guarda: se listan los
+   * minutos y el conteo — lo medible — y nada más.
+   */
+  const partes: string[] = [];
+  if (minutos.length > 0) partes.push(minutos.join(' · '));
+  if (sinMinuto > 0) partes.push(`${sinMinuto} sin minuto marcado`);
+  const runs: PdfRun[] = [{ text: partes.join(' — ') }];
 
-    const plural = totalTramos === 1 ? '' : 'S';
-    doc.setFont('courier', 'bold');
-    doc.setFontSize(8.5);
-    doc.setTextColor(AMBAR[0], AMBAR[1], AMBAR[2]);
-    doc.text(`${totalTramos} TRAMO${plural} ININTELIGIBLE${plural}`, margen + 4.5, y);
-    y += 5.5;
-    y = drawRuns(doc, cuerpoTramosRuns, { ...tramosOpts, y });
-    y += 4;
-  }
+  const opts = {
+    x: MARGEN + 4.5,
+    y: L.y,
+    width: ANCHO - 9,
+    lineMm: 5.4,
+    font: L.F,
+    sizePt: 9.5,
+    color: TEXTO_CAJA
+  };
+  const alto = measureRuns(L.doc, runs, opts) * 5.4 + 9.5;
 
-  // --- III. RESULTADO (entrevista con decision registrada) ------------------
-  if (result.kind === 'ENTREVISTA' && acta?.decision && acta.decision !== 'SIN_DECIDIR') {
-    asegurar(16);
-    y += 2;
-    doc.setFont(F, 'bold');
-    doc.setFontSize(10.5);
-    doc.setTextColor(TINTA[0], TINTA[1], TINTA[2]);
-    doc.text('III. RESULTADO', margen, y);
-    y += 6.5;
-    const resultado =
-      acta.decision === 'TOMADO'
-        ? 'Se toma el caso.'
-        : `Se declina el caso${acta.decisionMotivo ? `: ${acta.decisionMotivo}.` : '.'}`;
-    y = drawRuns(doc, [{ text: resultado }], {
-      x: margen,
-      y,
-      width: ancho,
-      lineMm: AVANCE_CUERPO,
-      font: F,
-      sizePt: CUERPO_PT,
-      color: TINTA,
-      justify: true,
-      ensure: enLinea
-    });
-    y += 2;
-  }
+  L.y += 4;
+  L.asegurar(alto + 4);
 
-  // --- FIRMANTE: solo cuando el acta esta lista -----------------------------
-  if (acta?.actaLista && acta.revisadaPor) {
-    asegurar(24);
-    y += 9;
-    /* La linea de firma del 14b: oscura y de 77 mm, no un hilo gris corto. */
-    doc.setDrawColor(TINTA[0], TINTA[1], TINTA[2]);
-    doc.setLineWidth(0.35);
-    doc.line(margen, y, margen + 77, y);
-    doc.setLineWidth(0.2);
-    y += 4.5;
-    doc.setFont(F, 'bold');
-    doc.setFontSize(9.5);
-    doc.setTextColor(TINTA[0], TINTA[1], TINTA[2]);
-    doc.text(acta.revisadaPor, margen, y);
-    y += 4.5;
-    doc.setFont(F, 'normal');
-    doc.setFontSize(8.5);
-    doc.setTextColor(FIRMA_DETALLE[0], FIRMA_DETALLE[1], FIRMA_DETALLE[2]);
-    doc.text('Revisó la transcripción y marcó el acta como lista.', margen, y);
-  }
+  L.doc.setFillColor(...TRAMOS_FONDO);
+  L.doc.setDrawColor(...TRAMOS_BORDE);
+  L.doc.setLineWidth(0.3);
+  L.doc.rect(MARGEN, L.y - 4.2, ANCHO, alto, 'FD');
+  L.doc.setLineWidth(0.2);
 
-  // --- PIE EN CADA PAGINA: separador + fraccion real + paginacion real ------
-  const totalPaginas = doc.getNumberOfPages();
-  const audioMmSs = formatTimestamp(result.durationSeconds);
-  const partesPie: string[] = [
+  const plural = total === 1 ? '' : 'S';
+  L.doc.setFont('courier', 'bold');
+  L.doc.setFontSize(8);
+  L.doc.setTextColor(...AMBAR);
+  L.doc.text(`${total} TRAMO${plural} ININTELIGIBLE${plural}`, MARGEN + 4.5, L.y);
+  L.y += 5;
+  L.y = drawRuns(L.doc, runs, { ...opts, y: L.y });
+  L.y += 4;
+};
+
+/** La revisión contada, nunca supuesta — para la caja de naturaleza. */
+const fraseDeRevision = (f: { n: number; total: number }): string =>
+  f.total > 0 && f.n === f.total
+    ? ', revisada íntegramente por la firma'
+    : f.n > 0
+    ? `, con ${f.n} de ${f.total} intervenciones revisadas por la firma`
+    : ', aún sin revisión humana';
+
+/** Las partes del pie que el acta puede afirmar de sí misma. */
+const partesDelPie = (result: TranscriptionResult, f: { n: number; total: number }): string[] => {
+  const partes = [
     f.total > 0 && f.n === f.total
       ? `Transcripción revisada íntegramente (${f.n}/${f.total} intervenciones)`
       : `${f.n} de ${f.total} intervenciones revisadas`
   ];
-  const hayNombres = result.segments.some((seg) => seg.speakerName);
-  if (hayNombres) partesPie.push('voces nombradas por el revisor');
-  if (audioMmSs) partesPie.push(`audio ${audioMmSs}`);
+  if (result.segments.some((seg) => seg.speakerName)) partes.push('voces nombradas por el revisor');
+  const audio = formatTimestamp(result.durationSeconds);
+  if (audio) partes.push(`audio ${audio}`);
+  return partes;
+};
+
+/** El acta de ENTREVISTA: intervinientes en los metadatos y dos firmas. */
+const actaDeEntrevista = (result: TranscriptionResult, titulo: string, acta?: ActaInfo): jsPDF => {
+  const marca = getMarcaActual();
+  const L = nuevoLienzo(nombreArchivo(titulo, 'pdf'), marca?.firmName);
+  const f = fraccionRevisada(result.segments);
+  const nombres = buildSpeakerNames(result.segments, ROLE_LABELS);
+
+  membrete(L, marca, 'Documento interno');
+  tituloCentrado(L, 'ACTA DE ENTREVISTA INICIAL');
+
+  /* Los intervinientes van DENTRO de los metadatos, con su papel al lado. */
+  const runsIntervinientes: PdfRun[] = [];
+  result.speakerLabels.forEach((label, i) => {
+    const seg = result.segments.find((sg) => sg.speakerLabel === label);
+    const nombre = nombres[label] ?? (seg ? ROLE_LABELS[seg.role] : label);
+    const rol =
+      seg && seg.speakerName && seg.role !== 'DESCONOCIDO' ? ROLE_LABELS[seg.role].toLowerCase() : '';
+    if (i > 0) runsIntervinientes.push({ text: '  ·  ' });
+    runsIntervinientes.push({ text: nombre, style: 'bold' });
+    if (rol) runsIntervinientes.push({ text: ` — ${rol}`, color: TEXTO_CAJA });
+  });
+
+  const filas: FilaMeta[] = [];
+  if (acta?.consultante) {
+    filas.push({
+      etiqueta: 'Consultante:',
+      valor: `${acta.consultante.nombre} — C.C. ${acta.consultante.documento}`
+    });
+  }
+  const dur = duracion(result.durationSeconds);
+  filas.push({
+    etiqueta: 'Fecha y hora:',
+    valor: `${fechaLarga(result.transcribedAt)}${dur ? ` · duración ${dur}` : ''}`
+  });
+  filas.push({ etiqueta: 'Grabación:', valor: titulo.replace(/^\d{10,}_/, ''), mono: true });
+  if (runsIntervinientes.length > 0) {
+    filas.push({ etiqueta: 'Intervinientes:', runs: runsIntervinientes });
+  }
+  if (acta?.autorizadoEl) {
+    filas.push({
+      etiqueta: 'Autorizaciones:',
+      valor: `Grabación autorizada el ${new Date(acta.autorizadoEl).toLocaleString('es-CO', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })}.`
+    });
+  }
+  rejillaMetadatos(L, filas);
+
+  cajaDeNaturaleza(L, [
+    { text: 'Naturaleza de este documento.', style: 'bold' },
+    {
+      text: ` Es la transcripción automática de una grabación${fraseDeRevision(
+        f
+      )}. Los fragmentos que el audio no permitió establecer con certeza se señalan como `
+    },
+    { text: '[ininteligible]', font: 'courier', sizePt: 9, noBreak: true },
+    { text: '. No constituye declaración rendida ante autoridad ni prueba anticipada.' }
+  ]);
+
+  const numeradas = Boolean(acta?.hechosClave && acta.hechosClave.length > 0);
+  if (numeradas && acta?.hechosClave) {
+    seccion(L, 'I. HECHOS RELEVANTES MANIFESTADOS');
+    for (const h of acta.hechosClave) hechoRelevante(L, h);
+    L.y += 3;
+    seccion(L, 'II. TRANSCRIPCIÓN');
+  } else {
+    seccion(L, 'TRANSCRIPCIÓN');
+  }
+
+  for (const linea of lineas(result)) turno(L, linea);
+
+  cajaDeTramos(L, result);
+
+  if (acta?.decision && acta.decision !== 'SIN_DECIDIR') {
+    L.y += 3;
+    seccion(L, numeradas ? 'III. RESULTADO' : 'RESULTADO');
+    L.y = drawRuns(
+      L.doc,
+      [
+        {
+          text:
+            acta.decision === 'TOMADO'
+              ? 'Se toma el caso.'
+              : `Se declina el caso${acta.decisionMotivo ? `: ${acta.decisionMotivo}.` : '.'}`
+        }
+      ],
+      {
+        x: MARGEN,
+        y: L.y,
+        width: ANCHO,
+        lineMm: LINEA_CUERPO,
+        font: L.F,
+        sizePt: CUERPO_PT,
+        color: TINTA,
+        align: 'justify',
+        ensure: L.enLinea
+      }
+    );
+  }
 
   /*
-   * El pie no puede montarse sobre «página N de M»: se mide con la fuente
-   * real y se sueltan partes opcionales (de atras hacia adelante) hasta que
-   * quepa. La fraccion de revision — la que importa — nunca se suelta.
+   * LAS DOS FIRMAS del 14b, lado a lado: la de quien revisó y la del
+   * consultante — es el documento que se le entrega o se le lee. Cada una sale
+   * solo si su dato existe.
    */
-  doc.setFont('courier', 'normal');
-  doc.setFontSize(8);
-  const anchoPaginacion = doc.getTextWidth(`página ${totalPaginas} de ${totalPaginas}`);
-  while (partesPie.length > 1 && doc.getTextWidth(partesPie.join(' · ')) > ancho - anchoPaginacion - 6) {
-    partesPie.pop();
+  const firmaRevisor = Boolean(acta?.actaLista && acta.revisadaPor);
+  if (firmaRevisor || acta?.consultante) {
+    L.asegurar(28);
+    L.y += 14;
+    const anchoFirma = (ANCHO - 12) / 2;
+    if (firmaRevisor && acta?.revisadaPor) {
+      lineaDeFirma(L, MARGEN, anchoFirma, acta.revisadaPor, 'revisó la transcripción');
+    }
+    if (acta?.consultante) {
+      lineaDeFirma(
+        L,
+        MARGEN + anchoFirma + 12,
+        anchoFirma,
+        acta.consultante.nombre,
+        `C.C. ${acta.consultante.documento} · consultante`
+      );
+    }
+    L.y += 12;
   }
-  const pieIzquierda = partesPie.join(' · ');
 
-  for (let pagina = 1; pagina <= totalPaginas; pagina += 1) {
-    doc.setPage(pagina);
-    doc.setDrawColor(PIE_SEPARADOR[0], PIE_SEPARADOR[1], PIE_SEPARADOR[2]);
-    doc.setLineWidth(0.2);
-    doc.line(margen, alto - 16, anchoPagina - margen, alto - 16);
-    doc.setFont('courier', 'normal');
-    doc.setFontSize(8);
-    doc.setTextColor(GRIS_MINUTO[0], GRIS_MINUTO[1], GRIS_MINUTO[2]);
-    doc.text(pieIzquierda, margen, alto - 11.5);
-    doc.text(`página ${pagina} de ${totalPaginas}`, anchoPagina - margen, alto - 11.5, { align: 'right' });
+  pieDeActa(L, partesDelPie(result, f));
+  return L.doc;
+};
+
+/** El acta de AUDIENCIA: INTERVINIENTES con colores, DESARROLLO y una firma. */
+const actaDeAudiencia = (result: TranscriptionResult, titulo: string, acta?: ActaInfo): jsPDF => {
+  const marca = getMarcaActual();
+  const L = nuevoLienzo(nombreArchivo(titulo, 'pdf'), marca?.firmName);
+  const f = fraccionRevisada(result.segments);
+  const nombres = buildSpeakerNames(result.segments, ROLE_LABELS);
+
+  membrete(L, marca);
+  tituloCentrado(L, 'TRANSCRIPCIÓN DE AUDIENCIA');
+
+  const dur = duracion(result.durationSeconds);
+  rejillaMetadatos(L, [
+    {
+      etiqueta: 'Fecha:',
+      valor: `${fechaLarga(result.transcribedAt)}${dur ? ` · duración ${dur}` : ''}`
+    },
+    { etiqueta: 'Grabación:', valor: titulo.replace(/^\d{10,}_/, ''), mono: true }
+  ]);
+
+  cajaDeNaturaleza(L, [
+    { text: 'Advertencia.', style: 'bold' },
+    {
+      text: ` Transcripción automática${fraseDeRevision(
+        f
+      )}. No sustituye el acta oficial del despacho ni la grabación original, que prevalecen. Los tramos que el audio no permitió establecer se indican como `
+    },
+    { text: '[ininteligible mm:ss]', font: 'courier', sizePt: 9, noBreak: true },
+    { text: '.' }
+  ]);
+
+  /* INTERVINIENTES como sección propia, cada voz con su cuadro de color. */
+  seccion(L, 'INTERVINIENTES');
+  for (const label of result.speakerLabels) {
+    const seg = result.segments.find((sg) => sg.speakerLabel === label);
+    const nombre = nombres[label] ?? (seg ? ROLE_LABELS[seg.role] : label);
+    const rol =
+      seg && seg.speakerName && seg.role !== 'DESCONOCIDO' ? ROLE_LABELS[seg.role].toLowerCase() : '';
+    const color = colorForSpeaker(label, result.speakerLabels);
+
+    L.y = L.enLinea(L.y);
+    L.y = drawRuns(
+      L.doc,
+      rol
+        ? [{ text: nombre, style: 'bold' }, { text: ` — ${rol}`, color: TEXTO_CAJA }]
+        : [{ text: nombre, style: 'bold' }],
+      {
+        x: MARGEN + 5.5,
+        y: L.y,
+        width: ANCHO - 5.5,
+        lineMm: CUERPO_PT * 1.7 * 0.3528,
+        font: L.F,
+        sizePt: CUERPO_PT,
+        color: TINTA,
+        ensure: L.enLinea,
+        onFirstLine: (yFila) => {
+          L.doc.setFillColor(color.rgb[0], color.rgb[1], color.rgb[2]);
+          L.doc.rect(MARGEN + 0.8, yFila - 2.2, 2.6, 2.6, 'F');
+        }
+      }
+    );
   }
+
+  L.y += 1.5;
+  L.y = L.enLinea(L.y);
+  L.y = drawRuns(
+    L.doc,
+    [
+      {
+        text: 'Los nombres los asignó el revisor a las voces separadas por el sistema. En el desarrollo, cada intervención se identifica con el nombre y el rol abreviado.'
+      }
+    ],
+    {
+      x: MARGEN,
+      y: L.y,
+      width: ANCHO,
+      lineMm: 4.8,
+      font: L.F,
+      sizePt: 8.5,
+      color: GRIS,
+      ensure: L.enLinea
+    }
+  );
+  L.y += 4;
+
+  if (acta?.hechosClave && acta.hechosClave.length > 0) {
+    seccion(L, 'HECHOS RELEVANTES');
+    for (const h of acta.hechosClave) hechoRelevante(L, h);
+    L.y += 3;
+  }
+
+  seccion(L, 'DESARROLLO');
+  for (const linea of lineas(result)) turno(L, linea);
+
+  cajaDeTramos(L, result);
+
+  /* UNA sola firma: la de quien revisó. Un acta de audiencia no la firma nadie más. */
+  if (acta?.actaLista && acta.revisadaPor) {
+    L.asegurar(28);
+    L.y += 14;
+    lineaDeFirma(L, MARGEN, 62, acta.revisadaPor, 'revisó la transcripción');
+    L.y += 12;
+  }
+
+  pieDeActa(L, partesDelPie(result, f));
+  return L.doc;
+};
+
+/**
+ * Exporta el acta al papel que le corresponde: entrevista o audiencia.
+ *
+ * El tipo del transcrito decide, y no un parámetro: una entrevista exportada
+ * con la estructura de audiencia saldría afirmando cosas que no le tocan —
+ * «no sustituye el acta oficial del despacho» en una conversación de oficina —
+ * y quien la abriera no tendría cómo notarlo.
+ */
+export const exportTranscriptToPdf = (
+  result: TranscriptionResult,
+  titulo: string,
+  acta?: ActaInfo
+): void => {
+  const doc =
+    result.kind === 'ENTREVISTA'
+      ? actaDeEntrevista(result, titulo, acta)
+      : actaDeAudiencia(result, titulo, acta);
 
   doc.save(nombreArchivo(titulo, 'pdf'));
 };
-
