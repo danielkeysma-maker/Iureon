@@ -123,15 +123,20 @@ export interface TranscribeInput {
  * of those in Spanish, so the message is surfaced as-is.
  */
 export const transcriptionApi = {
-  /** El resumen guardado (o recién generado) de una transcripción. */
+  /**
+   * El resumen de una transcripción. `soloCache` devuelve lo guardado o null
+   * SIN llamar al modelo — es el modo de la exportación: un clic en PDF no
+   * puede esperar a Gemini ni pagar una llamada que nadie pidió.
+   */
   async resumen(
-    id: string
+    id: string,
+    soloCache = false
   ): Promise<{ hechos: Array<{ t: number | null; quien: string; hecho: string }> } | null> {
     try {
       const r = await httpClient.post<{
         success: boolean;
-        resumen?: { hechos: Array<{ t: number | null; quien: string; hecho: string }> };
-      }>(`/api/transcription/${id}/resumen`, {});
+        resumen?: { hechos: Array<{ t: number | null; quien: string; hecho: string }> } | null;
+      }>(`/api/transcription/${id}/resumen${soloCache ? '?soloCache=1' : ''}`, {});
       return r.success && r.resumen ? r.resumen : null;
     } catch {
       return null;

@@ -201,6 +201,17 @@ export const transcriptionResumenController = async (req: Request, res: Response
     return;
   }
 
+  /*
+   * SOLO CACHE: responde lo guardado o nada, sin tocar el modelo. Es el modo
+   * de la exportacion — un clic en "PDF" no puede colgarse veinte segundos
+   * esperando a Gemini, ni disparar una llamada paga que nadie pidio. El acta
+   * sale sin hechos clave si nunca se generaron, y eso es lo honesto.
+   */
+  if (req.query.soloCache === '1') {
+    res.json({ success: true, resumen: null, desdeCache: true });
+    return;
+  }
+
   const { resumen } = await generarResumen(transcripcion.segments ?? [], transcripcion.kind);
 
   if (!resumen) {

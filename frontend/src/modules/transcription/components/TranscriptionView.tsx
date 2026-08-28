@@ -83,7 +83,7 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
   const armarActa = async () => {
     if (!transcriptionId) return undefined;
     const fila = stored.find((i) => i.id === transcriptionId);
-    const resumen = await transcriptionApi.resumen(transcriptionId);
+    const resumen = await transcriptionApi.resumen(transcriptionId, true);
     return {
       autorizadoEl: fila?.autorizo_grabacion_el ?? null,
       revisadaPor: fila?.revisada_por ?? null,

@@ -38,8 +38,10 @@ const formatTimestamp = (seconds: number | null): string => {
 };
 
 const KIND_LABEL: Record<string, string> = {
-  AUDIENCIA: 'Transcripción de audiencia',
-  ENTREVISTA: 'Transcripción de entrevista'
+  // El documento se declara ACTA desde el titulo (14b): es lo que la firma
+  // archiva, y "transcripcion" ya lo dice la nota de naturaleza.
+  AUDIENCIA: 'Acta de audiencia',
+  ENTREVISTA: 'Acta de entrevista'
 };
 
 const fechaLarga = (iso: string): string =>
@@ -341,28 +343,106 @@ export const exportTranscriptToPdf = (result: TranscriptionResult, titulo: strin
     }
   };
 
-  // ─── Encabezado ───────────────────────────────────────────────────────────
-  const cabecera = encabezado(result, titulo);
-
-  cabecera.forEach((linea, indice) => {
-    // The title is larger; the filename below it is frequently long enough to
-    // need wrapping of its own, which the first version never gave it.
-    const tamano = indice === 0 ? 13 : 10;
-    for (const trozo of trozos(linea, 'bold', tamano)) {
-      doc.text(trozo, 215.9 / 2, y, { align: 'center' });
-      y += tamano === 13 ? 7 : 5;
-    }
-  });
-
-  y += 3;
+  // ─── ACTA (14b): título, metadatos, naturaleza, hechos ────────────────────
+  /*
+   * El documento se DECLARA como lo que es desde el título: ACTA DE ENTREVISTA
+   * o ACTA DE AUDIENCIA, uso interno de la firma. Los metadatos son los que un
+   * socio necesita al reabrirla: fecha y duración, quiénes hablan con su rol, y
+   * la autorización con su hora real — o su ausencia, dicha igual.
+   */
+  doc.setTextColor(0, 0, 0);
+  const tituloActa =
+    result.kind === 'ENTREVISTA' ? 'ACTA DE ENTREVISTA' : 'ACTA DE AUDIENCIA';
+  for (const trozo of trozos(tituloActa, 'bold', 14)) {
+    doc.text(trozo, 215.9 / 2, y, { align: 'center' });
+    y += 7;
+  }
   doc.setTextColor(100, 116, 139);
-  for (const trozo of trozos(nota(result, acta), 'italic', 8)) {
+  for (const trozo of trozos('Documento interno de la firma · no sustituye el registro oficial', 'normal', 8)) {
     doc.text(trozo, 215.9 / 2, y, { align: 'center' });
     y += 4;
   }
-
-  y += 8;
+  y += 4;
   doc.setTextColor(0, 0, 0);
+
+  // Metadatos como pares etiqueta—valor, alineados a la izquierda.
+  const nombres = buildSpeakerNames(result.segments, ROLE_LABELS);
+  const intervinientes = result.speakerLabels
+    .map((label) => {
+      const seg = result.segments.find((sg) => sg.speakerLabel === label);
+      const nombre = nombres[label] ?? (seg ? ROLE_LABELS[seg.role] : label);
+      const rol = seg && seg.speakerName && seg.role !== 'DESCONOCIDO' ? ` — ${ROLE_LABELS[seg.role].toLowerCase()}` : '';
+      return `${nombre}${rol}`;
+    })
+    .join(' · ');
+
+  const dur = duracion(result.durationSeconds);
+  const metadatos: Array<[string, string]> = [
+    ['Grabación', titulo.replace(/^\d{10,}_/, '')],
+    ['Fecha', `${fechaLarga(result.transcribedAt)}${dur ? ` · ${dur}` : ''}`],
+    ['Intervinientes', intervinientes],
+    [
+      'Autorización de grabación',
+      acta?.autorizadoEl
+        ? `registrada el ${new Date(acta.autorizadoEl).toLocaleString('es-CO', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`
+        : 'sin registro en el sistema'
+    ]
+  ];
+
+  for (const [etiqueta, valor] of metadatos) {
+    const cuerpoMeta = trozos(`${etiqueta}: ${valor}`, 'normal', 9.5);
+    asegurarEspacio(cuerpoMeta.length * 4.6 + 2);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9.5);
+    doc.text(`${etiqueta}:`, margenIzq, y);
+    const anchoEtiqueta = doc.getTextWidth(`${etiqueta}: `);
+    doc.setFont('helvetica', 'normal');
+    const cuerpoValor = doc.splitTextToSize(valor, ancho - anchoEtiqueta) as string[];
+    cuerpoValor.forEach((linea, i) => {
+      doc.text(linea, margenIzq + (i === 0 ? anchoEtiqueta : 0), y);
+      y += 4.6;
+    });
+  }
+
+  // Naturaleza del documento — con la fracción de revisión CONTADA.
+  y += 2;
+  doc.setTextColor(100, 116, 139);
+  for (const trozo of trozos(nota(result, acta), 'italic', 8)) {
+    doc.text(trozo, margenIzq, y);
+    y += 4;
+  }
+  y += 4;
+  doc.setTextColor(0, 0, 0);
+
+  /*
+   * I. HECHOS RELEVANTES MANIFESTADOS — del resumen del motor, cada uno con su
+   * minuto y su voz: el ancla es lo que permite comprobarlo contra la
+   * grabación antes de usarlo. Si nunca se generó el resumen, la sección no
+   * existe — el acta dice lo que hay.
+   */
+  if (acta?.hechosClave && acta.hechosClave.length > 0) {
+    asegurarEspacio(10 + acta.hechosClave.length * 5);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text('I. HECHOS RELEVANTES MANIFESTADOS', margenIzq, y);
+    y += 6;
+
+    for (const h of acta.hechosClave) {
+      const cuerpoHecho = trozos(`${minutoDe(h.t)}  ${h.hecho} — ${h.quien}`, 'normal', 9.5);
+      asegurarEspacio(cuerpoHecho.length * 4.6 + 1);
+      for (const linea of cuerpoHecho) {
+        doc.text(linea, margenIzq, y);
+        y += 4.6;
+      }
+      y += 1;
+    }
+
+    y += 4;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text(acta.hechosClave.length > 0 ? 'II. TRANSCRIPCIÓN' : 'TRANSCRIPCIÓN', margenIzq, y);
+    y += 7;
+  }
 
   // ─── Intervenciones ───────────────────────────────────────────────────────
   /*
@@ -437,6 +517,19 @@ export const exportTranscriptToPdf = (result: TranscriptionResult, titulo: strin
     doc.setFontSize(8);
     doc.setTextColor(148, 163, 184);
     doc.text(`Página ${pagina} de ${paginas}`, 215.9 / 2, alto - 12, { align: 'center' });
+  }
+
+  if (acta?.actaLista && acta.revisadaPor) {
+    asegurarEspacio(16);
+    y += 8;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.text(acta.revisadaPor, margenIzq, y);
+    y += 4.5;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(100, 116, 139);
+    doc.text('Revisó la transcripción y marcó el acta como lista.', margenIzq, y);
   }
 
   doc.save(nombreArchivo(titulo, 'pdf'));
