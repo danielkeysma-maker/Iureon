@@ -34,10 +34,19 @@ investigación en la raíz del repo.
 
 **El código está completo, verificado y subido. Lo que no está es desplegado.**
 
-76 despliegues en el día y **ninguno después de las 16:49 UTC**. Es el límite de
-compilaciones del plan Hobby (~100/día en ventana rodante, concurrencia 1). No
-hay nada que arreglar en el código: hay que esperar a que la ventana avance, o
-subir de plan.
+76 despliegues en el día y ninguno después de las 16:49 UTC. **Confirmado por el
+propio Vercel**, al intentar un redespliegue manual:
+
+> Resource is limited - try again in 24 hours (more than 100, code:
+> `api-deployments-free-per-day`)
+
+No hay nada que arreglar en el código: hay que esperar 24 horas, o subir de plan.
+
+**Y ojo con esto al retomar: poner una variable de entorno NO basta.** Vercel las
+inyecta en el momento del despliegue, así que una variable añadida mientras el
+límite está activo no tiene efecto hasta que haya un despliegue nuevo. El primero
+que entre traerá de golpe: la llave de Brave, el servicio de la CNDJ y el
+endpoint `disciplinaria`.
 
 | Proyecto | Último desplegado | Falta desplegar |
 |---|---|---|
@@ -61,12 +70,26 @@ todo pasa: 21/21.
    reproducción se hizo con la pestaña ya cargada y no ejercitó el código nuevo.
    Recargar con `force` antes de reproducir.
 
-### Además: BRAVE_SEARCH_API_KEY no está puesta en producción
+### BRAVE_SEARCH_API_KEY estaba en el proyecto EQUIVOCADO — resuelto, pendiente de desplegar
 
-El Buscador muestra «la búsqueda fuera del corpus no está configurada». El
-descubrimiento en la relatoría de la Corte Constitucional **no funciona hoy para
-nadie**. Es pendiente del usuario, no del código. Se supo solo porque los
-estados mudos del Buscador se corrigieron esta mañana; antes la pantalla callaba.
+El Buscador mostraba «la búsqueda fuera del corpus no está configurada» y el
+backend devolvía `NO_PROVIDER`, que significa exactamente que
+`process.env.BRAVE_SEARCH_API_KEY` llega vacío.
+
+**La llave existía, estaba bien escrita y en Production… pero en `iureon-app`, el
+proyecto del FRONTEND, que jamás la lee.** Este repositorio despliega DOS
+proyectos de Vercel desde el mismo commit —`iureon` con raíz `backend/` e
+`iureon-app` con raíz `frontend/`— y **las variables de entorno no se comparten
+entre ellos**. Todo lo que lee `backend/src/config/env.config.ts` pertenece al
+primero.
+
+Ya está copiada al backend. Surtirá efecto en el primer despliegue que pase el
+límite. El aviso de arranque ahora **nombra el proyecto** para que el próximo no
+pierda una tarde: dice en cuál ponerla y en cuál no.
+
+Cómo se diagnosticó, por si se repite con otra llave: el corpus respondía, así
+que Supabase y Cloudflare sí se leían — el backend leía bien SUS variables. Lo
+que faltaba era esa, en ese proyecto.
 
 ---
 

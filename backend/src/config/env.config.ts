@@ -31,11 +31,31 @@ if (!Number.isInteger(port) || port <= 0 || port > 65535) {
   errors.push(`PORT must be an integer between 1 and 65535, received "${read('PORT')}".`);
 }
 
+/**
+ * DÓNDE VAN ESTAS VARIABLES, dicho en el aviso y no solo sabido.
+ *
+ * Este repositorio despliega DOS proyectos de Vercel desde el mismo commit:
+ * `iureon` (raíz `backend/`) e `iureon-app` (raíz `frontend/`). Las variables de
+ * entorno NO se comparten entre ellos, y todo lo que este archivo lee pertenece
+ * al primero.
+ *
+ * Costó una tarde: `BRAVE_SEARCH_API_KEY` estaba puesta —correctamente escrita,
+ * en Production, visible en el panel— pero en `iureon-app`, que jamás la lee. El
+ * descubrimiento por tema llevaba días apagado en producción y el aviso decía
+ * «no está configurada», que era cierto y sonaba a mentira con la variable a la
+ * vista en la pantalla de al lado. Ahora el aviso nombra el proyecto.
+ */
+const PROYECTO_BACKEND = 'iureon';
+
 const requireGroup = (name: string, keys: string[]): boolean => {
   const present = keys.filter((key) => read(key) !== '');
 
   if (present.length === 0) {
-    warnings.push(`${name} is not configured; the app will run with its ${name} features disabled.`);
+    warnings.push(
+      `${name} is not configured; the app will run with its ${name} features disabled. ` +
+        `Set ${keys.join(', ')} in the "${PROYECTO_BACKEND}" Vercel project — NOT in "iureon-app", ` +
+        `which never reads them.`
+    );
     return false;
   }
 
