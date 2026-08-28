@@ -37,7 +37,7 @@ export const CONSTITUCIONAL_CATALOG: BranchCatalog = {
     role: 'LITIGANTE',
     legalBasis: 'Art. 86 C.P.; Decreto 2591 de 1991, arts. 1, 5, 6, 10, 14, 15 y 37',
     competentAuthority: 'Los jueces o tribunales con jurisdicción en el lugar donde ocurriere la violación o la amenaza que motivaren la presentación de la solicitud (Decreto 2591 de 1991, art. 37). Los jueces del circuito del lugar conocen de las acciones dirigidas contra los medios de comunicación (art. 37, inciso final).',
-    term: { status: 'VERIFICADO', description: '"Dentro de los diez (10) días siguientes a la presentación de la solicitud" el juez proferirá el fallo (Decreto 2591 de 1991, art. 29). Los términos son perentorios e improrrogables (art. 15). La acción puede interponerse en todo momento y lugar (art. 1).' },
+    term: { status: 'VERIFICADO', description: 'EL RELOJ DEL CLIENTE: NO HAY PLAZO DE CADUCIDAD. «La acción de tutela podrá ejercerse en todo momento y lugar» (Decreto 2591 de 1991, art. 1). LOS DIEZ (10) DÍAS SON DEL JUEZ, NO DEL ACCIONANTE: «dentro de los diez (10) días siguientes a la presentación de la solicitud» el juez proferirá el fallo (art. 29), y los términos son perentorios e improrrogables (art. 15). LO QUE SÍ CORRE CONTRA EL CLIENTE ES LA IMPUGNACIÓN: tres (3) días siguientes a la notificación del fallo (art. 31).' },
     requiredSections: [
       { n: 1, name: 'Designación del juez o tribunal al que se dirige', mandatory: false, basis: null },
       { n: 2, name: 'Identificación y residencia del solicitante', mandatory: true, basis: 'Decreto 2591 de 1991, art. 14' },

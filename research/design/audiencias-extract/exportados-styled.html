@@ -1,0 +1,2368 @@
+
+"<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="5c8b2aa1-5215-456b-af20-7f84940222d8"><\u002Fscript>
+
+<\u002Fhead>
+<body>
+<x-dc>
+<helmet data-dc-atomics=""><meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<style>/* cyrillic-ext */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("b197df2d-83dc-4be8-884e-1e00627e9e19") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("eee279bd-0ddb-4763-a5cc-581070fe41dc") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("c98886c9-c01f-4a03-b9ee-4be4026a3b82") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("64462ae3-3760-40b2-b1dd-337d17e16a12") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("df4faf8a-72bc-4a5b-b8fb-3dbd9c6c4176") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("6ad1b6da-429e-4306-9cb7-5fe297c07efc") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("a072c84b-7322-467f-9c7c-f9d94a3f4325") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("fe4ada72-822e-4c97-a0ab-f7c0f5fa70ca") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("caa60ec8-50b8-4e23-af58-f880947f434a") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("2fb3b217-5a06-49ad-abb7-c659d8adeea8") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("8a492109-7d10-434e-a8bc-5c9ade3e0f4e") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("86396c83-6252-4c23-8d5b-97b27c50211b") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("9fcd87fb-40bd-4d22-ae4e-092fd2be35ef") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("c3b07659-de42-4f87-b062-f725cebf1de4") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("d0433ae8-67e9-4ecb-afb6-a3033c06a859") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("26936c24-b5db-4a9a-a6df-c04ecb5a7125") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("882510a4-e9ce-4378-8dd3-b82a48e420c5") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("6a492053-8f7a-477e-8616-e37ae118c85a") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("3d2a7cea-6e78-45e5-b46f-34efe2e5adef") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("699b05a9-e703-4181-abad-1e683ca8e9c7") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("9d63194e-6141-4b62-90d7-0031ab718250") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("26936c24-b5db-4a9a-a6df-c04ecb5a7125") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("882510a4-e9ce-4378-8dd3-b82a48e420c5") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("6a492053-8f7a-477e-8616-e37ae118c85a") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("3d2a7cea-6e78-45e5-b46f-34efe2e5adef") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("699b05a9-e703-4181-abad-1e683ca8e9c7") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("9d63194e-6141-4b62-90d7-0031ab718250") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("26936c24-b5db-4a9a-a6df-c04ecb5a7125") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("882510a4-e9ce-4378-8dd3-b82a48e420c5") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("6a492053-8f7a-477e-8616-e37ae118c85a") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("3d2a7cea-6e78-45e5-b46f-34efe2e5adef") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("699b05a9-e703-4181-abad-1e683ca8e9c7") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("9d63194e-6141-4b62-90d7-0031ab718250") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("26936c24-b5db-4a9a-a6df-c04ecb5a7125") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("882510a4-e9ce-4378-8dd3-b82a48e420c5") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("6a492053-8f7a-477e-8616-e37ae118c85a") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("3d2a7cea-6e78-45e5-b46f-34efe2e5adef") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("699b05a9-e703-4181-abad-1e683ca8e9c7") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("9d63194e-6141-4b62-90d7-0031ab718250") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("8d3009bd-3ca5-4504-84bc-1248b5bfebd3") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("528d29af-e9d0-469f-976a-c1b062d40cb4") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("a32a7180-0228-45cc-adf3-1c231fe13a39") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("8735bd5b-8297-4671-abe3-03ecff3ce759") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("768b6616-a2d4-4668-bba5-c70e38d78837") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("74fae909-6042-42ec-8569-056a9cce4dd4") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("8d3009bd-3ca5-4504-84bc-1248b5bfebd3") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("528d29af-e9d0-469f-976a-c1b062d40cb4") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("a32a7180-0228-45cc-adf3-1c231fe13a39") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("8735bd5b-8297-4671-abe3-03ecff3ce759") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("768b6616-a2d4-4668-bba5-c70e38d78837") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("74fae909-6042-42ec-8569-056a9cce4dd4") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+<\u002Fstyle>
+<style>/* cyrillic-ext */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("97202987-7d8c-4927-b69a-ac87d87103fd") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("6eee4061-0ba9-4304-b4af-34ab0a6914c7") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("95542c5b-d3ae-4332-a853-188135d88e2e") format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("4774e9ed-f893-4cf9-854f-3fda788e09ae") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("cfd78f96-7db6-4211-aa72-31a98fd370fe") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("d31f0e2f-d7fb-445f-91e5-1159b2e79438") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("dfbfc43e-4939-48b9-8d34-71967c231142") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("97202987-7d8c-4927-b69a-ac87d87103fd") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("6eee4061-0ba9-4304-b4af-34ab0a6914c7") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("95542c5b-d3ae-4332-a853-188135d88e2e") format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("4774e9ed-f893-4cf9-854f-3fda788e09ae") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("cfd78f96-7db6-4211-aa72-31a98fd370fe") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("d31f0e2f-d7fb-445f-91e5-1159b2e79438") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("dfbfc43e-4939-48b9-8d34-71967c231142") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("97202987-7d8c-4927-b69a-ac87d87103fd") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("6eee4061-0ba9-4304-b4af-34ab0a6914c7") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("95542c5b-d3ae-4332-a853-188135d88e2e") format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("4774e9ed-f893-4cf9-854f-3fda788e09ae") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("cfd78f96-7db6-4211-aa72-31a98fd370fe") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("d31f0e2f-d7fb-445f-91e5-1159b2e79438") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("dfbfc43e-4939-48b9-8d34-71967c231142") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Instrument Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("7e338676-a3d0-4833-bb7a-381cb0821a53") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Instrument Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("e64fb238-81b3-4308-8e37-2166759308f8") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Instrument Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("7e338676-a3d0-4833-bb7a-381cb0821a53") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Instrument Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("e64fb238-81b3-4308-8e37-2166759308f8") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Instrument Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("7e338676-a3d0-4833-bb7a-381cb0821a53") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Instrument Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("e64fb238-81b3-4308-8e37-2166759308f8") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Libre Baskerville';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("2dbbc751-4509-4890-9083-359576a10573") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Libre Baskerville';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("b958d47d-bb95-4c40-b914-68316a80963e") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Libre Baskerville';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("2dbbc751-4509-4890-9083-359576a10573") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Libre Baskerville';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("b958d47d-bb95-4c40-b914-68316a80963e") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("37c32cc1-bc04-49da-a8b8-71c474c33741") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("7b8f8448-83a5-42db-9694-308e4b3f9ece") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* math */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("317875fe-b848-4f7e-b504-107480d6689a") format('woff2');
+  unicode-range: U+0302-0303, U+0305, U+0307-0308, U+0310, U+0312, U+0315, U+031A, U+0326-0327, U+032C, U+032F-0330, U+0332-0333, U+0338, U+033A, U+0346, U+034D, U+0391-03A1, U+03A3-03A9, U+03B1-03C9, U+03D1, U+03D5-03D6, U+03F0-03F1, U+03F4-03F5, U+2016-2017, U+2034-2038, U+203C, U+2040, U+2043, U+2047, U+2050, U+2057, U+205F, U+2070-2071, U+2074-208E, U+2090-209C, U+20D0-20DC, U+20E1, U+20E5-20EF, U+2100-2112, U+2114-2115, U+2117-2121, U+2123-214F, U+2190, U+2192, U+2194-21AE, U+21B0-21E5, U+21F1-21F2, U+21F4-2211, U+2213-2214, U+2216-22FF, U+2308-230B, U+2310, U+2319, U+231C-2321, U+2336-237A, U+237C, U+2395, U+239B-23B7, U+23D0, U+23DC-23E1, U+2474-2475, U+25AF, U+25B3, U+25B7, U+25BD, U+25C1, U+25CA, U+25CC, U+25FB, U+266D-266F, U+27C0-27FF, U+2900-2AFF, U+2B0E-2B11, U+2B30-2B4C, U+2BFE, U+3030, U+FF5B, U+FF5D, U+1D400-1D7FF, U+1EE00-1EEFF;
+}
+/* symbols */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("8adbfd04-2fcb-4111-9188-2295fcbd23c5") format('woff2');
+  unicode-range: U+0001-000C, U+000E-001F, U+007F-009F, U+20DD-20E0, U+20E2-20E4, U+2150-218F, U+2190, U+2192, U+2194-2199, U+21AF, U+21E6-21F0, U+21F3, U+2218-2219, U+2299, U+22C4-22C6, U+2300-243F, U+2440-244A, U+2460-24FF, U+25A0-27BF, U+2800-28FF, U+2921-2922, U+2981, U+29BF, U+29EB, U+2B00-2BFF, U+4DC0-4DFF, U+FFF9-FFFB, U+10140-1018E, U+10190-1019C, U+101A0, U+101D0-101FD, U+102E0-102FB, U+10E60-10E7E, U+1D2C0-1D2D3, U+1D2E0-1D37F, U+1F000-1F0FF, U+1F100-1F1AD, U+1F1E6-1F1FF, U+1F30D-1F30F, U+1F315, U+1F31C, U+1F31E, U+1F320-1F32C, U+1F336, U+1F378, U+1F37D, U+1F382, U+1F393-1F39F, U+1F3A7-1F3A8, U+1F3AC-1F3AF, U+1F3C2, U+1F3C4-1F3C6, U+1F3CA-1F3CE, U+1F3D4-1F3E0, U+1F3ED, U+1F3F1-1F3F3, U+1F3F5-1F3F7, U+1F408, U+1F415, U+1F41F, U+1F426, U+1F43F, U+1F441-1F442, U+1F444, U+1F446-1F449, U+1F44C-1F44E, U+1F453, U+1F46A, U+1F47D, U+1F4A3, U+1F4B0, U+1F4B3, U+1F4B9, U+1F4BB, U+1F4BF, U+1F4C8-1F4CB, U+1F4D6, U+1F4DA, U+1F4DF, U+1F4E3-1F4E6, U+1F4EA-1F4ED, U+1F4F7, U+1F4F9-1F4FB, U+1F4FD-1F4FE, U+1F503, U+1F507-1F50B, U+1F50D, U+1F512-1F513, U+1F53E-1F54A, U+1F54F-1F5FA, U+1F610, U+1F650-1F67F, U+1F687, U+1F68D, U+1F691, U+1F694, U+1F698, U+1F6AD, U+1F6B2, U+1F6B9-1F6BA, U+1F6BC, U+1F6C6-1F6CF, U+1F6D3-1F6D7, U+1F6E0-1F6EA, U+1F6F0-1F6F3, U+1F6F7-1F6FC, U+1F700-1F7FF, U+1F800-1F80B, U+1F810-1F847, U+1F850-1F859, U+1F860-1F887, U+1F890-1F8AD, U+1F8B0-1F8BB, U+1F8C0-1F8C1, U+1F900-1F90B, U+1F93B, U+1F946, U+1F984, U+1F996, U+1F9E9, U+1FA00-1FA6F, U+1FA70-1FA7C, U+1FA80-1FA89, U+1FA8F-1FAC6, U+1FACE-1FADC, U+1FADF-1FAE9, U+1FAF0-1FAF8, U+1FB00-1FBFF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("de41d21a-763c-4fb9-a60e-7d9134c12060") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fc077f78-d8ce-437a-aa82-aadc3bff1419") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("dae96b80-2d01-48eb-b312-45c1d9eefa92") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("37c32cc1-bc04-49da-a8b8-71c474c33741") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("7b8f8448-83a5-42db-9694-308e4b3f9ece") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* math */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("317875fe-b848-4f7e-b504-107480d6689a") format('woff2');
+  unicode-range: U+0302-0303, U+0305, U+0307-0308, U+0310, U+0312, U+0315, U+031A, U+0326-0327, U+032C, U+032F-0330, U+0332-0333, U+0338, U+033A, U+0346, U+034D, U+0391-03A1, U+03A3-03A9, U+03B1-03C9, U+03D1, U+03D5-03D6, U+03F0-03F1, U+03F4-03F5, U+2016-2017, U+2034-2038, U+203C, U+2040, U+2043, U+2047, U+2050, U+2057, U+205F, U+2070-2071, U+2074-208E, U+2090-209C, U+20D0-20DC, U+20E1, U+20E5-20EF, U+2100-2112, U+2114-2115, U+2117-2121, U+2123-214F, U+2190, U+2192, U+2194-21AE, U+21B0-21E5, U+21F1-21F2, U+21F4-2211, U+2213-2214, U+2216-22FF, U+2308-230B, U+2310, U+2319, U+231C-2321, U+2336-237A, U+237C, U+2395, U+239B-23B7, U+23D0, U+23DC-23E1, U+2474-2475, U+25AF, U+25B3, U+25B7, U+25BD, U+25C1, U+25CA, U+25CC, U+25FB, U+266D-266F, U+27C0-27FF, U+2900-2AFF, U+2B0E-2B11, U+2B30-2B4C, U+2BFE, U+3030, U+FF5B, U+FF5D, U+1D400-1D7FF, U+1EE00-1EEFF;
+}
+/* symbols */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("8adbfd04-2fcb-4111-9188-2295fcbd23c5") format('woff2');
+  unicode-range: U+0001-000C, U+000E-001F, U+007F-009F, U+20DD-20E0, U+20E2-20E4, U+2150-218F, U+2190, U+2192, U+2194-2199, U+21AF, U+21E6-21F0, U+21F3, U+2218-2219, U+2299, U+22C4-22C6, U+2300-243F, U+2440-244A, U+2460-24FF, U+25A0-27BF, U+2800-28FF, U+2921-2922, U+2981, U+29BF, U+29EB, U+2B00-2BFF, U+4DC0-4DFF, U+FFF9-FFFB, U+10140-1018E, U+10190-1019C, U+101A0, U+101D0-101FD, U+102E0-102FB, U+10E60-10E7E, U+1D2C0-1D2D3, U+1D2E0-1D37F, U+1F000-1F0FF, U+1F100-1F1AD, U+1F1E6-1F1FF, U+1F30D-1F30F, U+1F315, U+1F31C, U+1F31E, U+1F320-1F32C, U+1F336, U+1F378, U+1F37D, U+1F382, U+1F393-1F39F, U+1F3A7-1F3A8, U+1F3AC-1F3AF, U+1F3C2, U+1F3C4-1F3C6, U+1F3CA-1F3CE, U+1F3D4-1F3E0, U+1F3ED, U+1F3F1-1F3F3, U+1F3F5-1F3F7, U+1F408, U+1F415, U+1F41F, U+1F426, U+1F43F, U+1F441-1F442, U+1F444, U+1F446-1F449, U+1F44C-1F44E, U+1F453, U+1F46A, U+1F47D, U+1F4A3, U+1F4B0, U+1F4B3, U+1F4B9, U+1F4BB, U+1F4BF, U+1F4C8-1F4CB, U+1F4D6, U+1F4DA, U+1F4DF, U+1F4E3-1F4E6, U+1F4EA-1F4ED, U+1F4F7, U+1F4F9-1F4FB, U+1F4FD-1F4FE, U+1F503, U+1F507-1F50B, U+1F50D, U+1F512-1F513, U+1F53E-1F54A, U+1F54F-1F5FA, U+1F610, U+1F650-1F67F, U+1F687, U+1F68D, U+1F691, U+1F694, U+1F698, U+1F6AD, U+1F6B2, U+1F6B9-1F6BA, U+1F6BC, U+1F6C6-1F6CF, U+1F6D3-1F6D7, U+1F6E0-1F6EA, U+1F6F0-1F6F3, U+1F6F7-1F6FC, U+1F700-1F7FF, U+1F800-1F80B, U+1F810-1F847, U+1F850-1F859, U+1F860-1F887, U+1F890-1F8AD, U+1F8B0-1F8BB, U+1F8C0-1F8C1, U+1F900-1F90B, U+1F93B, U+1F946, U+1F984, U+1F996, U+1F9E9, U+1FA00-1FA6F, U+1FA70-1FA7C, U+1FA80-1FA89, U+1FA8F-1FAC6, U+1FACE-1FADC, U+1FADF-1FAE9, U+1FAF0-1FAF8, U+1FB00-1FBFF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("de41d21a-763c-4fb9-a60e-7d9134c12060") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("fc077f78-d8ce-437a-aa82-aadc3bff1419") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("dae96b80-2d01-48eb-b312-45c1d9eefa92") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("37c32cc1-bc04-49da-a8b8-71c474c33741") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("7b8f8448-83a5-42db-9694-308e4b3f9ece") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* math */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("317875fe-b848-4f7e-b504-107480d6689a") format('woff2');
+  unicode-range: U+0302-0303, U+0305, U+0307-0308, U+0310, U+0312, U+0315, U+031A, U+0326-0327, U+032C, U+032F-0330, U+0332-0333, U+0338, U+033A, U+0346, U+034D, U+0391-03A1, U+03A3-03A9, U+03B1-03C9, U+03D1, U+03D5-03D6, U+03F0-03F1, U+03F4-03F5, U+2016-2017, U+2034-2038, U+203C, U+2040, U+2043, U+2047, U+2050, U+2057, U+205F, U+2070-2071, U+2074-208E, U+2090-209C, U+20D0-20DC, U+20E1, U+20E5-20EF, U+2100-2112, U+2114-2115, U+2117-2121, U+2123-214F, U+2190, U+2192, U+2194-21AE, U+21B0-21E5, U+21F1-21F2, U+21F4-2211, U+2213-2214, U+2216-22FF, U+2308-230B, U+2310, U+2319, U+231C-2321, U+2336-237A, U+237C, U+2395, U+239B-23B7, U+23D0, U+23DC-23E1, U+2474-2475, U+25AF, U+25B3, U+25B7, U+25BD, U+25C1, U+25CA, U+25CC, U+25FB, U+266D-266F, U+27C0-27FF, U+2900-2AFF, U+2B0E-2B11, U+2B30-2B4C, U+2BFE, U+3030, U+FF5B, U+FF5D, U+1D400-1D7FF, U+1EE00-1EEFF;
+}
+/* symbols */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("8adbfd04-2fcb-4111-9188-2295fcbd23c5") format('woff2');
+  unicode-range: U+0001-000C, U+000E-001F, U+007F-009F, U+20DD-20E0, U+20E2-20E4, U+2150-218F, U+2190, U+2192, U+2194-2199, U+21AF, U+21E6-21F0, U+21F3, U+2218-2219, U+2299, U+22C4-22C6, U+2300-243F, U+2440-244A, U+2460-24FF, U+25A0-27BF, U+2800-28FF, U+2921-2922, U+2981, U+29BF, U+29EB, U+2B00-2BFF, U+4DC0-4DFF, U+FFF9-FFFB, U+10140-1018E, U+10190-1019C, U+101A0, U+101D0-101FD, U+102E0-102FB, U+10E60-10E7E, U+1D2C0-1D2D3, U+1D2E0-1D37F, U+1F000-1F0FF, U+1F100-1F1AD, U+1F1E6-1F1FF, U+1F30D-1F30F, U+1F315, U+1F31C, U+1F31E, U+1F320-1F32C, U+1F336, U+1F378, U+1F37D, U+1F382, U+1F393-1F39F, U+1F3A7-1F3A8, U+1F3AC-1F3AF, U+1F3C2, U+1F3C4-1F3C6, U+1F3CA-1F3CE, U+1F3D4-1F3E0, U+1F3ED, U+1F3F1-1F3F3, U+1F3F5-1F3F7, U+1F408, U+1F415, U+1F41F, U+1F426, U+1F43F, U+1F441-1F442, U+1F444, U+1F446-1F449, U+1F44C-1F44E, U+1F453, U+1F46A, U+1F47D, U+1F4A3, U+1F4B0, U+1F4B3, U+1F4B9, U+1F4BB, U+1F4BF, U+1F4C8-1F4CB, U+1F4D6, U+1F4DA, U+1F4DF, U+1F4E3-1F4E6, U+1F4EA-1F4ED, U+1F4F7, U+1F4F9-1F4FB, U+1F4FD-1F4FE, U+1F503, U+1F507-1F50B, U+1F50D, U+1F512-1F513, U+1F53E-1F54A, U+1F54F-1F5FA, U+1F610, U+1F650-1F67F, U+1F687, U+1F68D, U+1F691, U+1F694, U+1F698, U+1F6AD, U+1F6B2, U+1F6B9-1F6BA, U+1F6BC, U+1F6C6-1F6CF, U+1F6D3-1F6D7, U+1F6E0-1F6EA, U+1F6F0-1F6F3, U+1F6F7-1F6FC, U+1F700-1F7FF, U+1F800-1F80B, U+1F810-1F847, U+1F850-1F859, U+1F860-1F887, U+1F890-1F8AD, U+1F8B0-1F8BB, U+1F8C0-1F8C1, U+1F900-1F90B, U+1F93B, U+1F946, U+1F984, U+1F996, U+1F9E9, U+1FA00-1FA6F, U+1FA70-1FA7C, U+1FA80-1FA89, U+1FA8F-1FAC6, U+1FACE-1FADC, U+1FADF-1FAE9, U+1FAF0-1FAF8, U+1FB00-1FBFF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("de41d21a-763c-4fb9-a60e-7d9134c12060") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("fc077f78-d8ce-437a-aa82-aadc3bff1419") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("dae96b80-2d01-48eb-b312-45c1d9eefa92") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("2a28888f-c568-4005-b9ce-eda56dce7201") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("85ebacf4-01d6-421b-b678-b98893850759") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("20b5ceb9-e2d8-4604-918f-2694c47d23a7") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("e9b2dc83-88f9-486a-a38b-79c8983e536d") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("3d27842b-9280-4a02-8b5d-02036df3763b") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("e7099466-115f-48d9-8b45-84ecbc233c1b") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("2a28888f-c568-4005-b9ce-eda56dce7201") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("85ebacf4-01d6-421b-b678-b98893850759") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("20b5ceb9-e2d8-4604-918f-2694c47d23a7") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("e9b2dc83-88f9-486a-a38b-79c8983e536d") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("3d27842b-9280-4a02-8b5d-02036df3763b") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("e7099466-115f-48d9-8b45-84ecbc233c1b") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("2a28888f-c568-4005-b9ce-eda56dce7201") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("85ebacf4-01d6-421b-b678-b98893850759") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("20b5ceb9-e2d8-4604-918f-2694c47d23a7") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("e9b2dc83-88f9-486a-a38b-79c8983e536d") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("3d27842b-9280-4a02-8b5d-02036df3763b") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("e7099466-115f-48d9-8b45-84ecbc233c1b") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("2a28888f-c568-4005-b9ce-eda56dce7201") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("85ebacf4-01d6-421b-b678-b98893850759") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("20b5ceb9-e2d8-4604-918f-2694c47d23a7") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("e9b2dc83-88f9-486a-a38b-79c8983e536d") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("3d27842b-9280-4a02-8b5d-02036df3763b") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("e7099466-115f-48d9-8b45-84ecbc233c1b") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("88f2aa78-34ab-458a-b5b2-c3792d7ad749") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("7cbbb685-6adc-4117-8c95-68543a79cf44") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("a7506ec7-234c-429f-8b40-45f6ef415e87") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("bdd494b4-7704-441e-9d8b-7c4dc75df897") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("88f2aa78-34ab-458a-b5b2-c3792d7ad749") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("7cbbb685-6adc-4117-8c95-68543a79cf44") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("a7506ec7-234c-429f-8b40-45f6ef415e87") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("bdd494b4-7704-441e-9d8b-7c4dc75df897") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("88f2aa78-34ab-458a-b5b2-c3792d7ad749") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("7cbbb685-6adc-4117-8c95-68543a79cf44") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("a7506ec7-234c-429f-8b40-45f6ef415e87") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("bdd494b4-7704-441e-9d8b-7c4dc75df897") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("88f2aa78-34ab-458a-b5b2-c3792d7ad749") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("7cbbb685-6adc-4117-8c95-68543a79cf44") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("a7506ec7-234c-429f-8b40-45f6ef415e87") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("bdd494b4-7704-441e-9d8b-7c4dc75df897") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("88f2aa78-34ab-458a-b5b2-c3792d7ad749") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("7cbbb685-6adc-4117-8c95-68543a79cf44") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("a7506ec7-234c-429f-8b40-45f6ef415e87") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("bdd494b4-7704-441e-9d8b-7c4dc75df897") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Public Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("31c0fc29-c49e-4b28-88c7-47c84f2f8c3e") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Public Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("33346d54-861a-4b22-9089-1142e34eecff") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Public Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("37856e70-42c7-4035-8ff4-479a2ac5c90d") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Public Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("31c0fc29-c49e-4b28-88c7-47c84f2f8c3e") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Public Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("33346d54-861a-4b22-9089-1142e34eecff") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Public Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("37856e70-42c7-4035-8ff4-479a2ac5c90d") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Public Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("31c0fc29-c49e-4b28-88c7-47c84f2f8c3e") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Public Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("33346d54-861a-4b22-9089-1142e34eecff") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Public Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("37856e70-42c7-4035-8ff4-479a2ac5c90d") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+<\u002Fstyle>
+<style>/* cyrillic-ext */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("4a351c45-3c80-4f3e-92a4-a944beddf039") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("ca262a9e-3548-45d8-b470-c7cdca29e68a") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("779c1099-c1bc-4c10-b963-d406a2ee9486") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("2e047e8e-34d9-4a36-b0a8-9c0e0552efaa") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("c3ee4fee-1707-492a-84de-ebae779deb97") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("4a351c45-3c80-4f3e-92a4-a944beddf039") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("ca262a9e-3548-45d8-b470-c7cdca29e68a") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("779c1099-c1bc-4c10-b963-d406a2ee9486") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("2e047e8e-34d9-4a36-b0a8-9c0e0552efaa") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("c3ee4fee-1707-492a-84de-ebae779deb97") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("4a351c45-3c80-4f3e-92a4-a944beddf039") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("ca262a9e-3548-45d8-b470-c7cdca29e68a") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("779c1099-c1bc-4c10-b963-d406a2ee9486") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("2e047e8e-34d9-4a36-b0a8-9c0e0552efaa") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("c3ee4fee-1707-492a-84de-ebae779deb97") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Crimson Pro';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("19778fce-bd54-4432-9af1-ade6e8675071") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Crimson Pro';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("b78c0c5b-9856-4fe1-bd77-57099660552e") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Crimson Pro';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fa88c203-7db9-429f-b6a4-d1fd9d1edd63") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Crimson Pro';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("19778fce-bd54-4432-9af1-ade6e8675071") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Crimson Pro';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("b78c0c5b-9856-4fe1-bd77-57099660552e") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Crimson Pro';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("fa88c203-7db9-429f-b6a4-d1fd9d1edd63") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Crimson Pro';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("19778fce-bd54-4432-9af1-ade6e8675071") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Crimson Pro';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("b78c0c5b-9856-4fe1-bd77-57099660552e") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Crimson Pro';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("fa88c203-7db9-429f-b6a4-d1fd9d1edd63") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Figtree';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("ccd61d5b-d093-482b-916f-bc8dfba0a0f7") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Figtree';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("66e384c1-624d-4474-aeb2-622206a21f2a") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Figtree';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("ccd61d5b-d093-482b-916f-bc8dfba0a0f7") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Figtree';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("66e384c1-624d-4474-aeb2-622206a21f2a") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Figtree';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("ccd61d5b-d093-482b-916f-bc8dfba0a0f7") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Figtree';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("66e384c1-624d-4474-aeb2-622206a21f2a") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("9c87e939-10c1-4e20-95b7-07a769fe006b") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("f5e5fc1a-da1d-4931-8c15-627ec16851f0") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("6e946a23-c434-47c2-a06c-e08d31eafc06") format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("4e3ed90f-fef5-4a20-bf3a-19e4a0c36438") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fcba5fd5-7980-4649-9475-a868a3981172") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("4865b022-14bf-47aa-804c-d69ec447bf42") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("b3822146-209b-4039-bac4-7d237e195182") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("9c87e939-10c1-4e20-95b7-07a769fe006b") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("f5e5fc1a-da1d-4931-8c15-627ec16851f0") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("6e946a23-c434-47c2-a06c-e08d31eafc06") format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("4e3ed90f-fef5-4a20-bf3a-19e4a0c36438") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("fcba5fd5-7980-4649-9475-a868a3981172") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("4865b022-14bf-47aa-804c-d69ec447bf42") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("b3822146-209b-4039-bac4-7d237e195182") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("d4cdc143-2929-41fc-9d11-575f0361cd55") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("8bef899e-066e-43de-88f8-5f13da80dc52") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("0f34ebe9-da95-4c17-a156-d78becfd0385") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("d4cdc143-2929-41fc-9d11-575f0361cd55") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("8bef899e-066e-43de-88f8-5f13da80dc52") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("0f34ebe9-da95-4c17-a156-d78becfd0385") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("9c5b51ba-9b91-4691-8781-3ebb0afb9c6d") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fb2bb033-94ff-435a-ac04-487588a688e4") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("4714643b-819c-479b-8e91-eaab62f78c8c") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("3c41f514-a5b9-46ce-8be3-5d2774a59044") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("caf0c9ca-0ade-42e8-84a9-bfbf1957e6f6") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("92dcac78-bfc5-4a2d-82cf-af3aea7fd8e0") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("aac85f57-4fa8-4723-b166-955651935ba2") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("d2f59c1b-e5f4-45a1-92c2-f1a77ef70d7d") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("04ee6db5-66df-4689-b86f-7e5ae9c16033") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("22a3126d-54b5-4a00-98b0-9c09c06233f3") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("d62c13b7-c2c3-4282-8ec9-bcade1030f18") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("07c7d039-78ad-4321-a70a-612c80a3d4e4") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("2015a037-cb8d-463b-bced-1111c76be36d") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("23d1325a-f279-4a2a-a9c7-37d9e60f04e9") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("1dc88266-f1c7-4b31-a041-66f3f8d23a49") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+<\u002Fstyle>
+<style>
+body{margin:0;background:#eceef1;font-family:'IBM Plex Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(16,24,34,.08);scroll-margin-top:16px}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 20px}
+.dv-tid{font:600 10px 'IBM Plex Mono',monospace;padding:3px 7px;background:#101822;color:#fff;border-radius:4px;text-decoration:none}
+.dv-tname{font:600 13px/1.2 'IBM Plex Sans',sans-serif;color:#101822}
+.dv-opts{display:flex;flex-direction:column;gap:44px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px}
+.dv-oid{font:600 10.5px 'IBM Plex Mono',monospace;padding:3px 7px;background:rgba(16,24,34,.08);color:#101822;border-radius:5px;text-decoration:none}
+.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11.5px/1.3 'IBM Plex Sans',sans-serif;color:rgba(16,24,34,.55)}
+.dv-card{max-width:100%;background:#fff;border:1px solid rgba(16,24,34,.10);border-radius:8px;box-shadow:0 1px 3px rgba(16,24,34,.07);overflow:hidden}
+.dv-opt:target .dv-oid{background:#17456B;color:#fff}
+.dv-notes{margin:2px 0 0;padding:0 0 0 16px;max-width:1060px;font:400 12px/1.65 'IBM Plex Sans',sans-serif;color:rgba(16,24,34,.62)}
+.dv-notes li{margin:0 0 3px}
+.dv-notes code{font:500 11px 'IBM Plex Mono',monospace;color:#17456B;background:rgba(23,69,107,.07);padding:1px 4px;border-radius:3px}
+.dv-next{margin:22px 0 0;font:12px/1.5 'IBM Plex Sans',sans-serif;color:rgba(16,24,34,.5)}
+a{color:#17456B}a:hover{color:#113652}
+@keyframes iu-spin{to{transform:rotate(360deg)}}
+<\u002Fstyle><\u002Fhelmet>
+
+<section class="dv-turn" id="t14">
+<div class="dv-thd"><a class="dv-tid" href="#t14">14<\u002Fa><span class="dv-tname">Los documentos exportados — qué contiene el .docx y el PDF de un escrito, de una entrevista y de una audiencia<\u002Fspan><\u002Fdiv>
+<div class="dv-opts">
+
+<div class="dv-opt" id="14a">
+<div class="dv-olabel"><a class="dv-oid" href="#14a">14a<\u002Fa>Escrito exportado — PDF (izquierda) y .docx (derecha): mismo documento, marcas distintas<\u002Fdiv>
+<div class="dv-card" style="width:1392px;background:#DFE3E8;padding:28px 24px">
+  <div style="display:flex;gap:24px;justify-content:center;align-items:flex-start">
+
+    <div style="width:640px;flex:none">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:11px">
+        <span style="display:inline-flex;align-items:center;gap:7px;font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.09em;text-transform:uppercase;color:#101822;background:#fff;border:1px solid #CFD6E0;border-radius:999px;padding:4px 11px"><svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="#101822" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"><\u002Fpath><path d="M9 14h6"><\u002Fpath><\u002Fsvg>PDF · para radicar<\u002Fspan>
+        <span style="font:400 12px 'IBM Plex Sans',sans-serif;color:#445064">Carta · márgenes 3/2,5 cm · Times 12 pt · 1,5<\u002Fspan>
+      <\u002Fdiv>
+      <div style="background:#fff;border:1px solid #CFD6E0;box-shadow:0 6px 20px -6px rgba(16,24,34,.28);padding:52px 62px 40px;position:relative">
+        <div style="display:flex;align-items:flex-start;gap:14px;padding-bottom:11px;border-bottom:1.5px solid #101822">
+          <div style="width:70px;height:40px;flex:none;border:1px dashed #CFD6E0;border-radius:2px;display:flex;align-items:center;justify-content:center;font:500 9.5px 'IBM Plex Sans',sans-serif;color:#8B96A6">Logo<\u002Fdiv>
+          <div style="padding-top:2px">
+            <div style="font:700 11.5px 'Plus Jakarta Sans',sans-serif;color:#101822;letter-spacing:.02em">RESTREPO &amp; CÁRDENAS ABOGADOS<\u002Fdiv>
+            <div style="font:400 9.5px 'Plus Jakarta Sans',sans-serif;color:#667487;margin-top:2px">NIT 900.482.117-3 · Cra. 11 # 93-46 of. 302, Bogotá<\u002Fdiv>
+          <\u002Fdiv>
+          <div style="margin-left:auto;text-align:right;padding-top:2px">
+            <div style="font:400 9.5px 'Plus Jakarta Sans',sans-serif;color:#667487">Bogotá D.C.<\u002Fdiv>
+            <div style="font:400 9.5px 'Plus Jakarta Sans',sans-serif;color:#667487">28 de agosto de 2026<\u002Fdiv>
+          <\u002Fdiv>
+        <\u002Fdiv>
+
+        <div style="text-align:center;font:700 11.5px 'Plus Jakarta Sans',sans-serif;color:#101822;letter-spacing:.02em;margin-top:22px;line-height:1.5">SEÑOR JUEZ TREINTA Y CUATRO (34) ADMINISTRATIVO<br>DEL CIRCUITO DE BOGOTÁ<br><span style="font-weight:400">E.&nbsp;S.&nbsp;D.<\u002Fspan><\u002Fdiv>
+
+        <div style="margin-top:20px;display:grid;grid-template-columns:104px 1fr;gap:3px 10px;font:400 12px/1.7 'Plus Jakarta Sans',sans-serif;color:#101822">
+          <span>Referencia:<\u002Fspan><span>Medio de control de nulidad y restablecimiento del derecho<\u002Fspan>
+          <span>Demandante:<\u002Fspan><span>Jorge Elías Mosquera Rentería<\u002Fspan>
+          <span>Demandada:<\u002Fspan><span>Administradora Colombiana de Pensiones — Colpensiones<\u002Fspan>
+        <\u002Fdiv>
+
+        <div style="margin-top:18px;font:400 12.5px/1.9 'Plus Jakarta Sans',sans-serif;color:#101822;text-align:justify;text-wrap:pretty">CAMILA RESTREPO VÉLEZ, mayor de edad, abogada en ejercicio, portadora de la tarjeta profesional 214.882 del Consejo Superior de la Judicatura, actuando como apoderada judicial del señor JORGE ELÍAS MOSQUERA RENTERÍA, me permito instaurar demanda en ejercicio del medio de control de nulidad y restablecimiento del derecho, con fundamento en los siguientes:<\u002Fdiv>
+
+        <div style="margin-top:18px;font:700 12px 'Plus Jakarta Sans',sans-serif;color:#101822;letter-spacing:.03em">I. PRETENSIONES<\u002Fdiv>
+        <div style="margin-top:8px;font:400 12.5px/1.9 'Plus Jakarta Sans',sans-serif;color:#101822;text-align:justify;text-wrap:pretty"><b style="font-weight:800">PRIMERA.<\u002Fb> Que se declare la nulidad de la Resolución 8842 del 12 de noviembre de 2024, expedida por Colpensiones, mediante la cual se negó el reconocimiento de la pensión de invalidez.<\u002Fdiv>
+        <div style="margin-top:8px;font:400 12.5px/1.9 'Plus Jakarta Sans',sans-serif;color:#101822;text-align:justify;text-wrap:pretty"><b style="font-weight:800">SEGUNDA.<\u002Fb> Que, a título de restablecimiento del derecho, se ordene el reconocimiento y pago de la prestación desde la fecha de estructuración, con la indexación correspondiente.<\u002Fdiv>
+
+        <div style="margin-top:18px;font:700 12px 'Plus Jakarta Sans',sans-serif;color:#101822;letter-spacing:.03em">II. OPORTUNIDAD DE LA DEMANDA<\u002Fdiv>
+        <div style="position:relative;margin-top:8px">
+          <div style="position:absolute;left:-46px;top:0;bottom:0;display:flex;flex-direction:column;align-items:center;gap:4px">
+            <span style="flex:1;width:4px;background:#CFAE6E;border-radius:2px"><\u002Fspan>
+            <span style="font:600 9px 'IBM Plex Mono',monospace;color:#8A5A12;flex:none">1<\u002Fspan>
+          <\u002Fdiv>
+          <div style="font:400 12.5px/1.9 'Plus Jakarta Sans',sans-serif;color:#101822;text-align:justify;text-wrap:pretty">La presente demanda se instaura dentro del término de cuatro (4) meses previsto en el artículo 164, numeral 1, literal d) de la Ley 1437 de 2011, contados a partir de la notificación personal surtida el 18 de marzo de 2025. El requisito de conciliación extrajudicial<sup style="font:600 8.5px 'IBM Plex Mono',monospace;color:#8A5A12">[1]<\u002Fsup> se entiende satisfecho conforme a la constancia que se anexa.<\u002Fdiv>
+        <\u002Fdiv>
+
+        <div style="margin-top:18px;font:700 12px 'Plus Jakarta Sans',sans-serif;color:#101822;letter-spacing:.03em">III. HECHOS<\u002Fdiv>
+        <div style="margin-top:8px;font:400 12.5px/1.9 'Plus Jakarta Sans',sans-serif;color:#101822;text-align:justify">1. La Junta Regional de Calificación de Invalidez de Cundinamarca dictaminó una pérdida de capacidad laboral del 62,3% con fecha de estructuración del 14 de octubre de 2023.<\u002Fdiv>
+
+        <div style="margin-top:34px;padding-top:9px;border-top:.5px solid #C3CBD6;display:flex;align-items:baseline;gap:10px">
+          <span style="font:400 8.5px 'Plus Jakarta Sans',sans-serif;color:#8B96A6">Restrepo &amp; Cárdenas Abogados · notificaciones@rcabogados.co<\u002Fspan>
+          <span style="margin-left:auto;font:400 8.5px 'Plus Jakarta Sans',sans-serif;color:#8B96A6">Página 1 de 6<\u002Fspan>
+        <\u002Fdiv>
+      <\u002Fdiv>
+
+      <div style="background:#fff;border:1px solid #CFD6E0;border-top:0;box-shadow:0 6px 20px -6px rgba(16,24,34,.28);padding:44px 62px 36px;margin-top:18px">
+        <div style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.09em;text-transform:uppercase;color:#8A5A12;padding-bottom:7px;border-bottom:1px solid #E4D6B4">Anexo · afirmaciones sin verificar<\u002Fdiv>
+        <div style="font:400 11px/1.7 'Plus Jakarta Sans',sans-serif;color:#445064;margin-top:9px">Esta hoja la genera el sistema para control interno de la firma. <b style="font-weight:800">No forma parte del escrito que se radica<\u002Fb>: se imprime aparte y no se numera en la paginación del documento.<\u002Fdiv>
+        <div style="margin-top:13px;display:flex;flex-direction:column;gap:10px">
+          <div style="display:grid;grid-template-columns:20px 1fr;gap:10px">
+            <span style="font:600 10px 'IBM Plex Mono',monospace;color:#8A5A12;padding-top:3px">[1]<\u002Fspan>
+            <div>
+              <div style="font:400 12px/1.7 'Plus Jakarta Sans',sans-serif;color:#101822">Pág. 1, sección II — “El requisito de conciliación extrajudicial se entiende satisfecho”.<\u002Fdiv>
+              <div style="font:400 11px/1.6 'IBM Plex Sans',sans-serif;color:#667487;margin-top:3px">Sin artículo confirmado en el catálogo. Verifíquelo antes de radicar.<\u002Fdiv>
+            <\u002Fdiv>
+          <\u002Fdiv>
+          <div style="display:grid;grid-template-columns:20px 1fr;gap:10px">
+            <span style="font:600 10px 'IBM Plex Mono',monospace;color:#8A5A12;padding-top:3px">[2]<\u002Fspan>
+            <div>
+              <div style="font:400 12px/1.7 'Plus Jakarta Sans',sans-serif;color:#101822">Pág. 2, sección IV — interés moratorio del 1,8% mensual.<\u002Fdiv>
+              <div style="font:400 11px/1.6 'IBM Plex Sans',sans-serif;color:#667487;margin-top:3px">Tasa del trimestre en curso sin confirmar contra la Superintendencia Financiera.<\u002Fdiv>
+            <\u002Fdiv>
+          <\u002Fdiv>
+        <\u002Fdiv>
+        <div style="margin-top:16px;padding-top:10px;border-top:.5px solid #C3CBD6;font:400 10.5px/1.65 'IBM Plex Mono',monospace;color:#8B96A6">14 afirmaciones verificadas contra norma vigente al 26 ago 2026 · 2 sin verificar · borrador v4 · generado el 28 ago 2026 14:02 por C. Restrepo<\u002Fdiv>
+      <\u002Fdiv>
+    <\u002Fdiv>
+
+    <div style="width:640px;flex:none">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:11px">
+        <span style="display:inline-flex;align-items:center;gap:7px;font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.09em;text-transform:uppercase;color:#101822;background:#fff;border:1px solid #CFD6E0;border-radius:999px;padding:4px 11px"><svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="#101822" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"><\u002Fpath><path d="M14 3v5h5"><\u002Fpath><path d="M9 13h6"><\u002Fpath><\u002Fsvg>.docx · para seguir editando<\u002Fspan>
+        <span style="font:400 12px 'IBM Plex Sans',sans-serif;color:#445064">Estilos y numeración editables<\u002Fspan>
+      <\u002Fdiv>
+      <div style="background:#fff;border:1px solid #CFD6E0;box-shadow:0 6px 20px -6px rgba(16,24,34,.28);overflow:hidden">
+        <div style="height:30px;background:#F7F8FA;border-bottom:1px solid #E3E7EC;display:flex;align-items:center;gap:12px;padding:0 14px">
+          <span style="font:400 10.5px 'IBM Plex Sans',sans-serif;color:#667487">Vista del procesador de texto<\u002Fspan>
+          <span style="margin-left:auto;font:400 10.5px 'IBM Plex Mono',monospace;color:#8B96A6">2 comentarios<\u002Fspan>
+        <\u002Fdiv>
+        <div style="display:flex">
+          <div style="flex:1;min-width:0;padding:44px 34px 34px 46px">
+            <div style="display:flex;align-items:flex-start;gap:12px;padding-bottom:10px;border-bottom:1.5px solid #101822">
+              <div style="width:62px;height:36px;flex:none;border:1px dashed #CFD6E0;border-radius:2px;display:flex;align-items:center;justify-content:center;font:500 9px 'IBM Plex Sans',sans-serif;color:#8B96A6">Logo<\u002Fdiv>
+              <div style="padding-top:1px"><div style="font:700 10.5px 'Plus Jakarta Sans',sans-serif;color:#101822;letter-spacing:.02em">RESTREPO &amp; CÁRDENAS ABOGADOS<\u002Fdiv><div style="font:400 8.5px 'Plus Jakarta Sans',sans-serif;color:#667487;margin-top:2px">NIT 900.482.117-3<\u002Fdiv><\u002Fdiv>
+            <\u002Fdiv>
+            <div style="text-align:center;font:700 10.5px 'Plus Jakarta Sans',sans-serif;color:#101822;letter-spacing:.02em;margin-top:18px;line-height:1.5">SEÑOR JUEZ TREINTA Y CUATRO (34) ADMINISTRATIVO<br>DEL CIRCUITO DE BOGOTÁ<\u002Fdiv>
+            <div style="margin-top:16px;display:grid;grid-template-columns:88px 1fr;gap:3px 9px;font:400 11px/1.7 'Plus Jakarta Sans',sans-serif;color:#101822">
+              <span>Referencia:<\u002Fspan><span>Nulidad y restablecimiento del derecho<\u002Fspan>
+              <span>Demandante:<\u002Fspan><span>Jorge Elías Mosquera Rentería<\u002Fspan>
+            <\u002Fdiv>
+            <div style="margin-top:16px;font:700 11px 'Plus Jakarta Sans',sans-serif;color:#101822;letter-spacing:.03em">I. PRETENSIONES<\u002Fdiv>
+            <div style="margin-top:7px;font:400 11.5px/1.9 'Plus Jakarta Sans',sans-serif;color:#101822;text-align:justify;text-wrap:pretty"><b style="font-weight:800">PRIMERA.<\u002Fb> Que se declare la nulidad de la Resolución 8842 del 12 de noviembre de 2024, expedida por Colpensiones.<\u002Fdiv>
+            <div style="margin-top:16px;font:700 11px 'Plus Jakarta Sans',sans-serif;color:#101822;letter-spacing:.03em">II. OPORTUNIDAD DE LA DEMANDA<\u002Fdiv>
+            <div style="margin-top:7px;font:400 11.5px/1.9 'Plus Jakarta Sans',sans-serif;color:#101822;text-align:justify;text-wrap:pretty">La presente demanda se instaura dentro del término de cuatro (4) meses previsto en el artículo 164 de la Ley 1437 de 2011, contados desde la notificación personal surtida el 18 de marzo de 2025. El requisito de <span style="background:#FBF3E4;border-bottom:1.5px solid #CFAE6E">conciliación extrajudicial<\u002Fspan> se entiende satisfecho conforme a la constancia anexa.<\u002Fdiv>
+            <div style="margin-top:24px;font:400 11.5px/1.9 'Plus Jakarta Sans',sans-serif;color:#101822">Atentamente,<\u002Fdiv>
+            <div style="margin-top:26px;border-top:1px solid #101822;width:200px;padding-top:4px">
+              <div style="font:700 11px 'Plus Jakarta Sans',sans-serif;color:#101822">CAMILA RESTREPO VÉLEZ<\u002Fdiv>
+              <div style="font:400 10px 'Plus Jakarta Sans',sans-serif;color:#445064">C.C. 52.418.907 · T.P. 214.882 del C.S.J.<\u002Fdiv>
+              <div style="font:400 10px 'Plus Jakarta Sans',sans-serif;color:#445064">notificaciones@rcabogados.co<\u002Fdiv>
+            <\u002Fdiv>
+          <\u002Fdiv>
+          <div style="width:186px;flex:none;background:#F7F8FA;border-left:1px solid #E3E7EC;padding:14px 12px;display:flex;flex-direction:column;gap:10px">
+            <div style="background:#fff;border:1px solid #CFAE6E;border-left:3px solid #8A5A12;border-radius:4px;padding:9px 10px">
+              <div style="font:600 9.5px 'IBM Plex Sans',sans-serif;color:#8A5A12">Iureon · sin verificar<\u002Fdiv>
+              <div style="font:400 10.5px/1.55 'IBM Plex Sans',sans-serif;color:#2B3542;margin-top:4px">“Conciliación extrajudicial”: requisito afirmado sin artículo confirmado. Verifíquelo antes de radicar.<\u002Fdiv>
+              <div style="font:400 9.5px 'IBM Plex Mono',monospace;color:#8B96A6;margin-top:5px">28 ago · v4<\u002Fdiv>
+            <\u002Fdiv>
+            <div style="background:#fff;border:1px solid #CFAE6E;border-left:3px solid #8A5A12;border-radius:4px;padding:9px 10px">
+              <div style="font:600 9.5px 'IBM Plex Sans',sans-serif;color:#8A5A12">Iureon · sin verificar<\u002Fdiv>
+              <div style="font:400 10.5px/1.55 'IBM Plex Sans',sans-serif;color:#2B3542;margin-top:4px">Pág. 2: interés moratorio 1,8% — tasa del trimestre sin confirmar.<\u002Fdiv>
+            <\u002Fdiv>
+            <div style="margin-top:auto;font:400 9.5px/1.5 'IBM Plex Sans',sans-serif;color:#8B96A6">Los comentarios se borran al aceptarlos en Word y no se imprimen.<\u002Fdiv>
+          <\u002Fdiv>
+        <\u002Fdiv>
+      <\u002Fdiv>
+
+      <div style="margin-top:18px;background:#fff;border:1px solid #E3E7EC;border-radius:8px;padding:15px 17px">
+        <div style="font:600 10.5px 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#8B96A6">Reglas del documento exportado<\u002Fdiv>
+        <div style="display:flex;flex-direction:column;gap:9px;margin-top:11px">
+          <div style="display:flex;gap:9px;font:400 12.5px/1.55 'IBM Plex Sans',sans-serif;color:#2B3542"><svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="#14653F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:3px"><path d="M5 13l4 4L19 7"><\u002Fpath><\u002Fsvg><span><b style="font-weight:600">El escrito no lleva marca de Iureon.<\u002Fb> Es un documento de la firma que va a un juzgado: la trazabilidad viaja en las propiedades del archivo, no en el papel.<\u002Fspan><\u002Fdiv>
+          <div style="display:flex;gap:9px;font:400 12.5px/1.55 'IBM Plex Sans',sans-serif;color:#2B3542"><svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="#14653F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:3px"><path d="M5 13l4 4L19 7"><\u002Fpath><\u002Fsvg><span>En <b style="font-weight:600">PDF<\u002Fb> lo sin verificar se marca con una barra ámbar en el margen y una llamada <sup style="font-size:9px">[n]<\u002Fsup>, y se detalla en una hoja anexa que no se radica.<\u002Fspan><\u002Fdiv>
+          <div style="display:flex;gap:9px;font:400 12.5px/1.55 'IBM Plex Sans',sans-serif;color:#2B3542"><svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="#14653F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:3px"><path d="M5 13l4 4L19 7"><\u002Fpath><\u002Fsvg><span>En <b style="font-weight:600">.docx<\u002Fb> se marca como <b style="font-weight:600">comentario nativo<\u002Fb>: se acepta o se borra en Word y nunca se imprime.<\u002Fspan><\u002Fdiv>
+          <div style="display:flex;gap:9px;font:400 12.5px/1.55 'IBM Plex Sans',sans-serif;color:#2B3542"><svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="#8A5A12" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:3px"><path d="M12 4.5L21 19.5H3z"><\u002Fpath><path d="M12 10v4"><\u002Fpath><\u002Fsvg><span>Se pueden quitar las marcas, pero el diálogo lo advierte y el evento queda en Auditoría: exportar “limpio” un escrito con 2 sin verificar es una decisión con nombre y hora.<\u002Fspan><\u002Fdiv>
+        <\u002Fdiv>
+      <\u002Fdiv>
+    <\u002Fdiv>
+  <\u002Fdiv>
+<\u002Fdiv>
+<sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}">
+<ul class="dv-notes">
+<li>La decisión de fondo: <b>el escrito exportado no lleva marca de Iureon<\u002Fb>. Un juzgado recibe un documento de la firma, no un entregable de un proveedor; la trazabilidad va en los metadatos del archivo.<\u002Fli>
+<li>PDF y .docx no marcan igual porque no sirven para lo mismo: el PDF <b>se radica<\u002Fb>, así que la advertencia va al margen y el detalle a una hoja anexa que no forma parte del escrito; el .docx <b>se sigue editando<\u002Fb>, así que usa comentarios nativos que el abogado acepta o borra.<\u002Fli>
+<li>La hoja anexa dice de sí misma que no se radica y no entra en la paginación: sin esa frase, alguien la va a anexar al expediente por error.<\u002Fli>
+<li>El pie del anexo es la única línea con lenguaje de sistema —14 verificadas contra norma vigente al 26 ago, 2 sin verificar, v4, autor y hora—: es el recibo interno de la firma.<\u002Fli>
+<li>El documento respeta el membrete y el formato de <a class="dv-oid" href="#6b">6b<\u002Fa>: encabezado con logo, “E. S. D.”, romanos en secciones, “PRIMERA/SEGUNDA” en pretensiones y bloque de firma con T.P. y correo de notificaciones judiciales.<\u002Fli>
+<li>Quitar las marcas es posible pero auditado. Prohibirlo sería paternalista; hacerlo invisible sería peor.<\u002Fli>
+<\u002Ful>
+<\u002Fsc-if>
+<\u002Fdiv>
+
+<div class="dv-opt" id="14b">
+<div class="dv-olabel"><a class="dv-oid" href="#14b">14b<\u002Fa>Acta de entrevista y acta de audiencia — aquí sí se declara que es una transcripción<\u002Fdiv>
+<div class="dv-card" style="width:1392px;background:#DFE3E8;padding:28px 24px">
+  <div style="display:flex;gap:24px;justify-content:center;align-items:flex-start">
+
+    <div style="width:640px;flex:none">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:11px">
+        <span style="display:inline-flex;align-items:center;gap:7px;font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.09em;text-transform:uppercase;color:#101822;background:#fff;border:1px solid #CFD6E0;border-radius:999px;padding:4px 11px"><svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="#101822" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a4 4 0 004-4V7a4 4 0 10-8 0v4a4 4 0 004 4z"><\u002Fpath><path d="M12 19v2"><\u002Fpath><\u002Fsvg>Acta de entrevista<\u002Fspan>
+        <span style="font:400 12px 'IBM Plex Sans',sans-serif;color:#445064">.docx y PDF · uso interno de la firma<\u002Fspan>
+      <\u002Fdiv>
+      <div style="background:#fff;border:1px solid #CFD6E0;box-shadow:0 6px 20px -6px rgba(16,24,34,.28);padding:48px 58px 38px">
+        <div style="display:flex;align-items:flex-start;gap:14px;padding-bottom:10px;border-bottom:1.5px solid #101822">
+          <div style="width:64px;height:36px;flex:none;border:1px dashed #CFD6E0;border-radius:2px;display:flex;align-items:center;justify-content:center;font:500 9px 'IBM Plex Sans',sans-serif;color:#8B96A6">Logo<\u002Fdiv>
+          <div style="padding-top:1px"><div style="font:700 10.5px 'Plus Jakarta Sans',sans-serif;color:#101822;letter-spacing:.02em">RESTREPO &amp; CÁRDENAS ABOGADOS<\u002Fdiv><div style="font:400 8.5px 'Plus Jakarta Sans',sans-serif;color:#667487;margin-top:2px">NIT 900.482.117-3<\u002Fdiv><\u002Fdiv>
+          <div style="margin-left:auto;font:400 8.5px 'Plus Jakarta Sans',sans-serif;color:#667487;padding-top:2px">Documento interno<\u002Fdiv>
+        <\u002Fdiv>
+
+        <div style="text-align:center;font:700 12px 'Plus Jakarta Sans',sans-serif;color:#101822;letter-spacing:.02em;margin-top:20px">ACTA DE ENTREVISTA INICIAL<\u002Fdiv>
+
+        <div style="margin-top:16px;display:grid;grid-template-columns:118px 1fr;gap:3px 10px;font:400 11.5px/1.75 'Plus Jakarta Sans',sans-serif;color:#101822">
+          <span style="color:#667487">Consultante:<\u002Fspan><span>Jorge Elías Mosquera Rentería — C.C. 79.482.117<\u002Fspan>
+          <span style="color:#667487">Fecha y hora:<\u002Fspan><span>28 de agosto de 2026, 10:58 a 11:29<\u002Fspan>
+          <span style="color:#667487">Lugar:<\u002Fspan><span>Oficina de la firma, Bogotá D.C.<\u002Fspan>
+          <span style="color:#667487">Intervinientes:<\u002Fspan><span><b style="font-weight:800">Camila Restrepo Vélez<\u002Fb> — abogada de la firma, atendió la entrevista, T.P. 214.882 del C.S.J.<br><b style="font-weight:800">Jorge Elías Mosquera Rentería<\u002Fb> — consultante<br><b style="font-weight:800">María Elena Rentería Ospina<\u002Fb> — esposa del consultante, acompañante<\u002Fspan>
+          <span style="color:#667487">Autorizaciones:<\u002Fspan><span>Grabación autorizada verbalmente el 28/08/2026 10:57. Autorización de tratamiento de datos: pendiente de firma.<\u002Fspan>
+        <\u002Fdiv>
+
+        <div style="margin-top:16px;padding:11px 13px;background:#F7F8FA;border-left:3px solid #8A5A12">
+          <div style="font:400 10.5px/1.65 'Plus Jakarta Sans',sans-serif;color:#2B3542"><b style="font-weight:800">Naturaleza de este documento.<\u002Fb> Es la transcripción automática de una grabación, revisada por la abogada que atendió la entrevista. Los fragmentos que el audio no permitió establecer con certeza se señalan como <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px">[ininteligible]<\u002Fspan>. No constituye declaración rendida ante autoridad ni prueba anticipada.<\u002Fdiv>
+        <\u002Fdiv>
+
+        <div style="margin-top:18px;font:700 11px 'Plus Jakarta Sans',sans-serif;color:#101822;letter-spacing:.03em">I. HECHOS RELEVANTES MANIFESTADOS<\u002Fdiv>
+        <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px">
+          <div style="display:grid;grid-template-columns:40px 1fr;gap:9px;font:400 11.5px/1.75 'Plus Jakarta Sans',sans-serif;color:#101822"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8B96A6;padding-top:4px">11:12<\u002Fspan><span>La empresa no solicitó autorización al inspector de trabajo antes de terminar el contrato.<\u002Fspan><\u002Fdiv>
+          <div style="display:grid;grid-template-columns:40px 1fr;gap:9px;font:400 11.5px/1.75 'Plus Jakarta Sans',sans-serif;color:#101822"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8B96A6;padding-top:4px">12:04<\u002Fspan><span>La incapacidad médica se extendía hasta el 20 de febrero; el consultante conserva copia.<\u002Fspan><\u002Fdiv>
+          <div style="display:grid;grid-template-columns:40px 1fr;gap:9px;font:400 11.5px/1.75 'Plus Jakarta Sans',sans-serif;color:#101822"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8B96A6;padding-top:4px">19:37<\u002Fspan><span>El accidente de trabajo no fue reportado a la ARL por el empleador.<\u002Fspan><\u002Fdiv>
+        <\u002Fdiv>
+
+        <div style="margin-top:18px;font:700 11px 'Plus Jakarta Sans',sans-serif;color:#101822;letter-spacing:.03em">II. TRANSCRIPCIÓN<\u002Fdiv>
+        <div style="margin-top:8px;display:flex;flex-direction:column;gap:9px">
+          <div style="display:grid;grid-template-columns:40px 1fr;gap:9px;font:400 11.5px/1.75 'Plus Jakarta Sans',sans-serif;color:#101822"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8B96A6;padding-top:4px">10:58<\u002Fspan><span><b style="font-weight:800">C. Restrepo (abogada):<\u002Fb> ¿Recuerda si la empresa le pidió permiso al inspector de trabajo antes de terminarle el contrato?<\u002Fspan><\u002Fdiv>
+          <div style="display:grid;grid-template-columns:40px 1fr;gap:9px;font:400 11.5px/1.75 'Plus Jakarta Sans',sans-serif;color:#101822"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8B96A6;padding-top:4px">11:12<\u002Fspan><span><b style="font-weight:800">J. Mosquera (consultante):<\u002Fb> No, nunca. Me llamaron a recursos humanos, me dieron la carta y me dijeron que entregara el carné ese mismo día.<\u002Fspan><\u002Fdiv>
+          <div style="display:grid;grid-template-columns:40px 1fr;gap:9px;font:400 11.5px/1.75 'Plus Jakarta Sans',sans-serif;color:#101822"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8B96A6;padding-top:4px">12:04<\u002Fspan><span><b style="font-weight:800">M. Rentería (acompañante):<\u002Fb> Sí doctora, yo soy la esposa; la incapacidad iba hasta el 20 de febrero, aquí tengo la copia.<\u002Fspan><\u002Fdiv>
+        <\u002Fdiv>
+
+        <div style="margin-top:26px;font:700 11px 'Plus Jakarta Sans',sans-serif;color:#101822;letter-spacing:.03em">III. RESULTADO<\u002Fdiv>
+        <div style="margin-top:8px;font:400 11.5px/1.8 'Plus Jakarta Sans',sans-serif;color:#101822;text-align:justify">Se toma el caso. Actuación identificada: acción de reintegro por fuero de salud (artículo 26 de la Ley 361 de 1997), con término de tres (3) meses que vence el 3 de mayo de 2025.<\u002Fdiv>
+
+        <div style="margin-top:30px;display:flex;gap:40px">
+          <div style="flex:1;border-top:1px solid #101822;padding-top:4px"><div style="font:700 10px 'Plus Jakarta Sans',sans-serif;color:#101822">Camila Restrepo Vélez<\u002Fdiv><div style="font:400 9px 'Plus Jakarta Sans',sans-serif;color:#445064">T.P. 214.882 del C.S.J. · revisó la transcripción<\u002Fdiv><\u002Fdiv>
+          <div style="flex:1;border-top:1px solid #101822;padding-top:4px"><div style="font:700 10px 'Plus Jakarta Sans',sans-serif;color:#101822">Jorge Elías Mosquera Rentería<\u002Fdiv><div style="font:400 9px 'Plus Jakarta Sans',sans-serif;color:#445064">C.C. 79.482.117 · consultante<\u002Fdiv><\u002Fdiv>
+        <\u002Fdiv>
+        <div style="margin-top:22px;padding-top:8px;border-top:.5px solid #C3CBD6;font:400 8.5px/1.6 'IBM Plex Mono',monospace;color:#8B96A6">Transcripción revisada íntegramente (58/58 intervenciones) · audio 31:12 · el archivo de audio se conserva en la cuenta de la firma · página 1 de 3<\u002Fdiv>
+      <\u002Fdiv>
+    <\u002Fdiv>
+
+    <div style="width:640px;flex:none">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:11px">
+        <span style="display:inline-flex;align-items:center;gap:7px;font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.09em;text-transform:uppercase;color:#101822;background:#fff;border:1px solid #CFD6E0;border-radius:999px;padding:4px 11px"><svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="#101822" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"><\u002Fpath><path d="M8 7v10"><\u002Fpath><path d="M16 7v10"><\u002Fpath><\u002Fsvg>Acta de audiencia<\u002Fspan>
+        <span style="font:400 12px 'IBM Plex Sans',sans-serif;color:#445064">con marcas de tiempo · anexable al expediente<\u002Fspan>
+      <\u002Fdiv>
+      <div style="background:#fff;border:1px solid #CFD6E0;box-shadow:0 6px 20px -6px rgba(16,24,34,.28);padding:48px 58px 38px">
+        <div style="display:flex;align-items:flex-start;gap:14px;padding-bottom:10px;border-bottom:1.5px solid #101822">
+          <div style="width:64px;height:36px;flex:none;border:1px dashed #CFD6E0;border-radius:2px;display:flex;align-items:center;justify-content:center;font:500 9px 'IBM Plex Sans',sans-serif;color:#8B96A6">Logo<\u002Fdiv>
+          <div style="padding-top:1px"><div style="font:700 10.5px 'Plus Jakarta Sans',sans-serif;color:#101822;letter-spacing:.02em">RESTREPO &amp; CÁRDENAS ABOGADOS<\u002Fdiv><div style="font:400 8.5px 'Plus Jakarta Sans',sans-serif;color:#667487;margin-top:2px">NIT 900.482.117-3<\u002Fdiv><\u002Fdiv>
+        <\u002Fdiv>
+
+        <div style="text-align:center;font:700 12px 'Plus Jakarta Sans',sans-serif;color:#101822;letter-spacing:.02em;margin-top:20px;line-height:1.5">TRANSCRIPCIÓN DE AUDIENCIA<br><span style="font-weight:400;font-size:11px">Audiencia de conciliación<\u002Fspan><\u002Fdiv>
+
+        <div style="margin-top:16px;display:grid;grid-template-columns:118px 1fr;gap:3px 10px;font:400 11.5px/1.75 'Plus Jakarta Sans',sans-serif;color:#101822">
+          <span style="color:#667487">Proceso:<\u002Fspan><span>Mosquera Rentería vs. Colpensiones<\u002Fspan>
+          <span style="color:#667487">Radicado:<\u002Fspan><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px">11001333603420250011800<\u002Fspan>
+          <span style="color:#667487">Despacho:<\u002Fspan><span>Juzgado 34 Administrativo del Circuito de Bogotá<\u002Fspan>
+          <span style="color:#667487">Fecha:<\u002Fspan><span>14 de marzo de 2025 · duración 47:12<\u002Fspan>
+          <span style="color:#667487">Origen del audio:<\u002Fspan><span>Grabación publicada por el despacho en el expediente digital<\u002Fspan>
+        <\u002Fdiv>
+
+        <div style="margin-top:16px;padding:11px 13px;background:#F7F8FA;border-left:3px solid #8A5A12">
+          <div style="font:400 10.5px/1.65 'Plus Jakarta Sans',sans-serif;color:#2B3542"><b style="font-weight:800">Advertencia.<\u002Fb> Transcripción automática revisada por la firma. No sustituye el acta oficial del despacho ni la grabación original, que prevalecen. Los tramos que el audio no permitió establecer se indican como <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px">[ininteligible mm:ss]<\u002Fspan>.<\u002Fdiv>
+        <\u002Fdiv>
+
+        <div style="margin-top:16px;font:700 11px 'Plus Jakarta Sans',sans-serif;color:#101822;letter-spacing:.03em">INTERVINIENTES<\u002Fdiv>
+        <div style="margin-top:8px;display:flex;flex-direction:column;gap:5px">
+          <div style="display:grid;grid-template-columns:14px 1fr;gap:9px;align-items:baseline"><span style="width:8px;height:8px;border-radius:2px;background:#17456B"><\u002Fspan><span style="font:400 11.5px/1.7 'Plus Jakarta Sans',sans-serif;color:#101822"><b style="font-weight:800">Daniel Madera Quintero<\u002Fb> — juez, ponente<\u002Fspan><\u002Fdiv>
+          <div style="display:grid;grid-template-columns:14px 1fr;gap:9px;align-items:baseline"><span style="width:8px;height:8px;border-radius:2px;background:#14653F"><\u002Fspan><span style="font:400 11.5px/1.7 'Plus Jakarta Sans',sans-serif;color:#101822"><b style="font-weight:800">Juanita García Peláez<\u002Fb> — apoderada del demandante, T.P. 214.882 del C.S.J.<\u002Fspan><\u002Fdiv>
+          <div style="display:grid;grid-template-columns:14px 1fr;gap:9px;align-items:baseline"><span style="width:8px;height:8px;border-radius:2px;background:#8A5A12"><\u002Fspan><span style="font:400 11.5px/1.7 'Plus Jakarta Sans',sans-serif;color:#101822"><b style="font-weight:800">José Arroyo Beltrán<\u002Fb> — apoderado de la demandada (Colpensiones), T.P. 176.043 del C.S.J.<\u002Fspan><\u002Fdiv>
+          <div style="display:grid;grid-template-columns:14px 1fr;gap:9px;align-items:baseline"><span style="width:8px;height:8px;border-radius:2px;background:#4A566B"><\u002Fspan><span style="font:400 11.5px/1.7 'Plus Jakarta Sans',sans-serif;color:#101822"><b style="font-weight:800">Iván Contreras Lozano<\u002Fb> — representante legal de la ARL, tercero vinculado<\u002Fspan><\u002Fdiv>
+          <div style="display:grid;grid-template-columns:14px 1fr;gap:9px;align-items:baseline"><span style="width:8px;height:8px;border-radius:2px;background:#8B96A6"><\u002Fspan><span style="font:400 11.5px/1.7 'Plus Jakarta Sans',sans-serif;color:#101822"><b style="font-weight:800">Julio Toscano Mena<\u002Fb> — Defensoría del Pueblo, agente del Ministerio Público<\u002Fspan><\u002Fdiv>
+        <\u002Fdiv>
+        <div style="font:400 10px/1.6 'Plus Jakarta Sans',sans-serif;color:#667487;margin-top:7px">Los nombres los asignó el revisor a las voces separadas por el sistema. En el desarrollo, cada intervención se identifica con el nombre y el rol abreviado.<\u002Fdiv>
+
+        <div style="margin-top:16px;font:700 11px 'Plus Jakarta Sans',sans-serif;color:#101822;letter-spacing:.03em">DESARROLLO<\u002Fdiv>
+        <div style="margin-top:8px;display:flex;flex-direction:column;gap:9px">
+          <div style="display:grid;grid-template-columns:46px 1fr;gap:9px;font:400 11.5px/1.75 'Plus Jakarta Sans',sans-serif;color:#101822"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8B96A6;padding-top:4px">12:04<\u002Fspan><span><b style="font-weight:800">D. Madera (juez):<\u002Fb> Se declara abierta la audiencia. Se deja constancia de la asistencia de las partes y se procede a interrogar sobre la posibilidad de conciliar.<\u002Fspan><\u002Fdiv>
+          <div style="display:grid;grid-template-columns:46px 1fr;gap:9px;font:400 11.5px/1.75 'Plus Jakarta Sans',sans-serif;color:#101822"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8B96A6;padding-top:4px">12:31<\u002Fspan><span><b style="font-weight:800">J. García (apoderada del demandante):<\u002Fb> Señor juez, mi representado fue calificado con 62,3% de pérdida de capacidad laboral por la junta regional el 14 de octubre, dictamen que obra a folio 42.<\u002Fspan><\u002Fdiv>
+          <div style="display:grid;grid-template-columns:46px 1fr;gap:9px;font:400 11.5px/1.75 'Plus Jakarta Sans',sans-serif;color:#101822"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8B96A6;padding-top:4px">13:02<\u002Fspan><span><b style="font-weight:800">J. Arroyo (apoderado de la demandada):<\u002Fb> La entidad se opone porque el dictamen fue notificado por fuera del término de <span style="background:#FBF3E4;font-family:'IBM Plex Mono',monospace;font-size:10px">[ininteligible 13:09]<\u002Fspan> y no se acreditó la fecha de estructuración.<\u002Fspan><\u002Fdiv>
+          <div style="display:grid;grid-template-columns:46px 1fr;gap:9px;font:400 11.5px/1.75 'Plus Jakarta Sans',sans-serif;color:#101822"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8B96A6;padding-top:4px">13:20<\u002Fspan><span><b style="font-weight:800">D. Madera (juez):<\u002Fb> Se concede el uso de la palabra a la parte demandante para que se pronuncie sobre la oposición.<\u002Fspan><\u002Fdiv>
+        <\u002Fdiv>
+
+        <div style="margin-top:24px;padding:11px 13px;border:1px solid #E4D6B4;background:#FDFAF3">
+          <div style="font:600 9.5px 'IBM Plex Mono',monospace;letter-spacing:.09em;text-transform:uppercase;color:#8A5A12">6 tramos ininteligibles<\u002Fdiv>
+          <div style="font:400 10.5px/1.7 'Plus Jakarta Sans',sans-serif;color:#2B3542;margin-top:5px">13:09 · 18:44 · 26:02 · 31:57 · 39:10 · 44:28 — corresponden a 1 min 12 s de un total de 47:12 (2,5% del audio).<\u002Fdiv>
+        <\u002Fdiv>
+
+        <div style="margin-top:26px;border-top:1px solid #101822;width:230px;padding-top:4px">
+          <div style="font:700 10px 'Plus Jakarta Sans',sans-serif;color:#101822">Daniel Cárdenas Ortiz<\u002Fdiv>
+          <div style="font:400 9px 'Plus Jakarta Sans',sans-serif;color:#445064">T.P. 198.440 del C.S.J. · revisó la transcripción el 15 mar 2025<\u002Fdiv>
+        <\u002Fdiv>
+        <div style="margin-top:20px;padding-top:8px;border-top:.5px solid #C3CBD6;font:400 8.5px/1.6 'IBM Plex Mono',monospace;color:#8B96A6">58 de 58 intervenciones revisadas · voces nombradas por el revisor · audio original conservado por el despacho · página 1 de 9<\u002Fdiv>
+      <\u002Fdiv>
+    <\u002Fdiv>
+  <\u002Fdiv>
+
+  <div style="width:1304px;margin:20px auto 0;background:#fff;border:1px solid #E3E7EC;border-radius:8px;padding:16px 18px">
+    <div style="display:flex;gap:20px">
+      <div style="flex:1">
+        <div style="font:600 10.5px 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#8B96A6">Por qué las actas sí declaran su origen y el escrito no<\u002Fdiv>
+        <div style="font:400 13px/1.65 'IBM Plex Sans',sans-serif;color:#2B3542;margin-top:8px;text-wrap:pretty">Un escrito es <b style="font-weight:600">autoría de la firma<\u002Fb>: quien lo firma responde por cada palabra, y decir cómo se redactó no aporta nada al juez. Un acta es <b style="font-weight:600">reproducción de lo que otros dijeron<\u002Fb>: si no se dice que es automática, revisada por quién y qué tramos no se entendieron, se está afirmando una fidelidad que nadie puede sostener.<\u002Fdiv>
+      <\u002Fdiv>
+      <div style="width:420px;flex:none">
+        <div style="font:600 10.5px 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#8B96A6">Lo que va en ambas actas, sin excepción<\u002Fdiv>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-top:9px">
+          <div style="display:flex;gap:8px;font:400 12.5px/1.5 'IBM Plex Sans',sans-serif;color:#2B3542"><svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="#14653F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:3px"><path d="M5 13l4 4L19 7"><\u002Fpath><\u002Fsvg>Quién revisó, con su tarjeta profesional y la fecha<\u002Fdiv>
+          <div style="display:flex;gap:8px;font:400 12.5px/1.5 'IBM Plex Sans',sans-serif;color:#2B3542"><svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="#14653F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:3px"><path d="M5 13l4 4L19 7"><\u002Fpath><\u002Fsvg>Cuántas intervenciones se revisaron, en fracción<\u002Fdiv>
+          <div style="display:flex;gap:8px;font:400 12.5px/1.5 'IBM Plex Sans',sans-serif;color:#2B3542"><svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="#14653F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:3px"><path d="M5 13l4 4L19 7"><\u002Fpath><\u002Fsvg>Los tramos ininteligibles, con su minuto y su porcentaje<\u002Fdiv>
+          <div style="display:flex;gap:8px;font:400 12.5px/1.5 'IBM Plex Sans',sans-serif;color:#2B3542"><svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="#14653F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:3px"><path d="M5 13l4 4L19 7"><\u002Fpath><\u002Fsvg>Que la grabación original prevalece sobre la transcripción<\u002Fdiv>
+        <\u002Fdiv>
+      <\u002Fdiv>
+    <\u002Fdiv>
+  <\u002Fdiv>
+<\u002Fdiv>
+<sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}">
+<ul class="dv-notes">
+<li>Las dos actas abren con un bloque de <b>naturaleza del documento<\u002Fb> antes del contenido: transcripción automática, revisada por una persona con tarjeta profesional, con los tramos ininteligibles señalados y sin sustituir el acta oficial.<\u002Fli>
+<li>El acta de entrevista registra las <b>autorizaciones con hora<\u002Fb> —grabación autorizada 10:57, tratamiento pendiente de firma—: es el documento que prueba que se cumplió la Ley 1581 en la sala.<\u002Fli>
+<li>Los <b>hechos relevantes<\u002Fb> van antes de la transcripción completa: nadie relee 31 minutos, pero todos releen los siete hechos que se marcaron en vivo.<\u002Fli>
+<li>Los tramos ininteligibles se resumen al final <b>con minuto y porcentaje del audio<\u002Fb> (1:12 de 47:12, 2,5%): un dato honesto sobre la calidad, no una disculpa.<\u002Fli>
+<li>El acta de audiencia trae radicado y despacho en mono desde el encabezado, porque su destino natural es el expediente.<\u002Fli>
+<li>Las dos llevan línea de firma del revisor; la de entrevista, también del consultante — es el documento que se le entrega o se le lee.<\u002Fli>
+<li>Los intervinientes se listan con <b>nombre completo y rol procesal<\u002Fb> —juez, apoderado del demandante, apoderado de la demandada, tercero vinculado, Ministerio Público— y ese rol se repite abreviado en cada intervención. Un acta que dice “Apoderado:” obliga a reconstruir de memoria quién hablaba, y a los tres meses nadie se acuerda.<\u002Fli>
+<\u002Ful>
+<\u002Fsc-if>
+<\u002Fdiv>
+
+<\u002Fdiv>
+<p class="dv-next">Sigue: "el diálogo de exportación con todas sus variantes" · "el acta en oscuro dentro del visor" · "hoja de fuentes citadas del escrito" · "exportar el acta con el audio adjunto"<\u002Fp>
+<\u002Fsection>
+
+<\u002Fx-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;showNotes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return { notes: this.props.showNotes ?? true };
+  }
+}
+<\u002Fscript>
+
+
+<\u002Fbody><\u002Fhtml>"
+  

@@ -596,6 +596,25 @@ export const AMBIENTAL_CATALOG: BranchCatalog = {
       { n: 11, name: 'Orden de notificación y publicación conforme a los artículos 70 y 71 de la Ley 99 de 1993 y envío de copia a las alcaldías', mandatory: true, basis: 'Art. 2.2.1.1.7.11' }
     ],
     sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=78153'
+  },
+  {
+    id: 'ambiental/recurso-de-apelacion-contra-la-resolucion-sancionatoria-ambiental',
+    exactName: 'Recurso de apelación contra la resolución sancionatoria ambiental',
+    branch: 'AMBIENTAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1333 de 2009, art. 30 (procede «siempre que exista superior jerárquico»); Ley 1437 de 2011, art. 74 num. 2 (ante el inmediato superior administrativo o funcional, y sus exclusiones), art. 76 (oportunidad, forma y carácter obligatorio para acceder a la jurisdicción) y art. 74 num. 3 (queja); Ley 99 de 1993, art. 23 (naturaleza de las CAR); Decreto 3573 de 2011, arts. 1 y 9 num. 8 (ANLA)',
+    competentAuthority: 'El inmediato superior administrativo o funcional de quien profirió la sanción. En la práctica ambiental esto ocurre cuando la sanción la impuso un funcionario POR DELEGACIÓN — por ejemplo un subdirector de la CAR o de la ANLA —, y el superior es el Director General. NO hay superior jerárquico, y por tanto no procede apelación, contra la decisión del Director General de una CAR (ente corporativo con personería jurídica propia, Ley 99 de 1993, art. 23), contra la del Director de la ANLA (que solo resuelve reposición, Decreto 3573 de 2011, art. 9 num. 8), ni contra la del alcalde o gobernador, excluidos por el art. 74 num. 2 del CPACA.',
+    term: { status: 'VERIFICADO', description: 'EL RELOJ DEL CLIENTE ES DE DIEZ (10) DÍAS, LOS MISMOS DE LA REPOSICIÓN, Y AQUÍ PERDERLO CUESTA EL PROCESO ENTERO. Ley 1437 de 2011, art. 76: «Los recursos de reposición y apelación deberán interponerse por escrito en la diligencia de notificación personal, o dentro de los diez (10) días siguientes a ella, o a la notificación por aviso, o al vencimiento del término de publicación, según el caso». LO QUE HACE DISTINTO A ESTE RECURSO: el mismo art. 76 remata — «El recurso de apelación podrá interponerse directamente, o como subsidiario del de reposición y cuando proceda será obligatorio para acceder a la jurisdicción. Los recursos de reposición y de queja no serán obligatorios». Es decir: donde la apelación PROCEDE, el sancionado que solo repuso NO agota la vía administrativa y pierde el acceso a la jurisdicción contencioso administrativa. ANTES DE CONFIAR EN ESTE RECURSO HAY QUE MIRAR QUIÉN FIRMÓ: la Ley 1333 de 2009, art. 30, solo lo concede «siempre que exista superior jerárquico», y la mayoría de las resoluciones sancionatorias ambientales las firma quien no lo tiene. SI SE LO RECHAZAN, EL RELOJ ES DE CINCO (5) DÍAS: el recurso de queja procede «cuando se rechace el de apelación» y «de este recurso se podrá hacer uso dentro de los cinco (5) días siguientes a la notificación de la decisión» (art. 74 num. 3). VIGENCIA COMPROBADA: la Ley 2387 de 2024 modificó los arts. 1, 2, 3, 5, 6, 7, 9, 10, 20, 24, 27, 36, 37, 40, 42 y 49 de la Ley 1333 y adicionó los 3A, 9A, 18A y 52A; NO tocó el art. 30, de modo que el régimen de recursos quedó intacto.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación de la resolución apelada, de su fecha, de la autoridad que la profirió y de la forma en que fue notificada', mandatory: true, basis: 'Ley 1437 de 2011, art. 77 num. 1' },
+      { n: 2, name: 'Constancia de que quien profirió la sanción tiene superior jerárquico, con indicación de la delegación o del acto de estructura que lo acredita', mandatory: true, basis: 'Ley 1333 de 2009, art. 30; Ley 1437 de 2011, art. 74 num. 2' },
+      { n: 3, name: 'Interposición dentro de los diez (10) días siguientes a la notificación, en forma directa o como subsidiaria de la reposición', mandatory: true, basis: 'Ley 1437 de 2011, art. 76' },
+      { n: 4, name: 'Sustentación con expresión concreta de los motivos de inconformidad', mandatory: true, basis: 'Ley 1437 de 2011, art. 77 num. 2' },
+      { n: 5, name: 'Nombre y dirección del recurrente para notificaciones', mandatory: true, basis: 'Ley 1437 de 2011, art. 77 num. 3' },
+      { n: 6, name: 'Relación de las pruebas que se pretende hacer valer', mandatory: false, basis: 'Ley 1437 de 2011, art. 77 num. 4' },
+      { n: 7, name: 'Petición de que se revoque o modifique la sanción y, en subsidio, la de graduarla conforme a los criterios de atenuación', mandatory: true, basis: 'Ley 1437 de 2011, art. 74 num. 2; Ley 1333 de 2009, art. 40' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=36879'
   }
   ]
 };

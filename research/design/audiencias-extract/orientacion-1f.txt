@@ -1,0 +1,73 @@
+id="1f">
+1f Orientación — hechos en lenguaje corriente → hasta 6 actuaciones, más el estado “no reconozco nada” 
+Orientación 
+Describa los hechos; el catálogo propone la actuación 
+651 actuaciones · 612 verificadas 
+Los hechos, como se los contaría a un colega 
+A mi cliente lo despidieron sin justa causa el 3 de febrero. Estaba incapacitado desde diciembre por una lesión de hombro que se originó cargando en la bodega. La empresa nunca reportó el accidente a la ARL y no pidió permiso al inspector de trabajo. 
+Sin datos personales del cliente 
+Orientar 
+Lo que el catálogo leyó 
+Laboral 
+Despido en incapacidad 
+Accidente no reportado 
+Sin permiso de inspector 
+Corrija un elemento y las sugerencias se recalculan. 
+4 actuaciones posibles 
+ordenadas por término más corto — lo que se vence primero va primero 
+Acción de reintegro por fuero de salud 
+Verificado 
+Término 3 meses 
+Vence 3 may 2025 
+Norma Art. 26, Ley 361 de 1997 
+Autoridad Juez laboral del circuito 
+Redactar esta 
+Ver ficha 
+Ver norma 
+Reclamación de prestaciones por accidente de trabajo 
+Verificado 
+Término 3 años 
+Vence 3 feb 2028 
+Norma Art. 151, C.P.T.S.S. 
+Autoridad ARL · reclamación directa previa 
+Redactar esta 
+Ver ficha 
+Ver norma 
+Acción de tutela — mínimo vital y estabilidad reforzada 
+No caduca 
+No aplica término de caducidad 
+Norma Art. 86 C.P. · Dcto. 2591/91 
+Autoridad Cualquier juez con jurisdicción 
+Redactar esta 
+Ver ficha 
+Ver norma 
+Querella ante inspector de trabajo 
+Sin verificar 
+Término propuesto 2 años 
+Artículo Sin confirmar 
+El modelo la propone por los hechos, pero no está en el catálogo. No la dé por cierta. 
+Verificar y catalogar 
+Descartar 
+1f′ “El catálogo no reconoce nada” — respuesta legítima, con salidas 
+El catálogo no reconoce una actuación para estos hechos 
+No es un error: significa que ninguna de las 651 actuaciones verificadas encaja con lo descrito. Puede ocurrir porque los hechos son de una materia que aún no catalogamos, o porque falta un dato que define la vía procesal. 
+Puede que falte precisar 
+01 Contra quién se dirige: ¿entidad pública o particular? 
+02 ¿Hubo acto administrativo notificado, y en qué fecha? 
+03 ¿Se agotó algún recurso o reclamación previa? 
+Completar los hechos 
+Buscar en jurisprudencia 
+Redactar sin catálogo 
+Si redacta sin catálogo, ningún término ni artículo del escrito quedará verificado . Todo saldrá marcado como sin verificar. 
+Las sugerencias se ordenan por término más corto primero , no por confianza del modelo: lo que puede vencerse esta semana importa más que lo que el modelo cree más probable. 
+Cada tarjeta trae término, vencimiento calculado, artículo y autoridad en el mismo orden fijo; el vencimiento en fecha absoluta porque “3 meses” obliga a hacer una cuenta mental bajo presión. 
+Solo una tarjeta tiene botón primario (la de término más corto y verificada); las demás quedan en secundario. Seis primarios equivalen a ninguno. 
+La tarjeta sin verificar cambia de textura , no solo de color, y su acción principal no es “redactar” sino “verificar y catalogar”: convierte el hallazgo en activo de la firma. 
+“Lo que el catálogo leyó” expone los elementos extraídos y los hace corregibles: es más rápido corregir una etiqueta que reescribir el párrafo. 
+El vacío no pide disculpas ni sugiere reintentar: nombra el hecho, lista los tres datos que suelen faltar y ofrece tres salidas reales, con la consecuencia de la más riesgosa escrita. 
+class Component extends DCLogic {
+renderVals() {
+return { notes: this.props.showNotes ?? true };
+}
+}
+"
