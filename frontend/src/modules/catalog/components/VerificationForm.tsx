@@ -93,16 +93,16 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col h-full bg-white">
-      <header className="px-5 py-4 border-b border-slate-200 flex items-start justify-between gap-3">
+    <form onSubmit={handleSubmit} className="flex flex-col h-full bg-surface">
+      <header className="px-5 py-4 border-b border-line-200 flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-slate-900 leading-tight">{actuacion.exactName}</p>
-          <p className="text-[11px] text-slate-500 mt-0.5">{actuacion.branch}</p>
+          <p className="text-sm font-semibold text-ink-900 leading-tight">{actuacion.exactName}</p>
+          <p className="text-[11px] text-ink-500 mt-0.5">{actuacion.branch}</p>
         </div>
         <button
           type="button"
           onClick={onClose}
-          className="p-1 text-slate-400 hover:text-slate-700 transition-colors"
+          className="p-1 text-ink-400 hover:text-ink-700 transition-colors"
           aria-label="Cerrar"
         >
           <X className="w-4 h-4" />
@@ -111,7 +111,7 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({
 
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
         {actuacion.verification && (
-          <div className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2.5 text-[11px] text-blue-900 leading-snug">
+          <div className="rounded-control border border-blue-200 bg-brand-50 px-3 py-2.5 text-[11px] text-brand-700 leading-snug">
             Verificada por <strong>{actuacion.verification.verifiedBy}</strong> el{' '}
             {new Date(actuacion.verification.verifiedAt).toLocaleDateString('es-CO')}. El catálogo base
             decía: <em>{actuacion.verification.replaced.description ?? 'término no verificado'}</em>.
@@ -119,7 +119,7 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({
         )}
 
         <fieldset>
-          <legend className="text-[11px] font-bold uppercase tracking-wide text-slate-500 mb-2">
+          <legend className="text-[11px] font-bold uppercase tracking-wide text-ink-500 mb-2">
             Estado del término
           </legend>
           <div className="space-y-2">
@@ -130,10 +130,10 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({
               return (
                 <label
                   key={option.value}
-                  className={`flex gap-2.5 items-start rounded-lg border p-2.5 cursor-pointer transition-colors ${
+                  className={`flex gap-2.5 items-start rounded-control border p-2.5 cursor-pointer transition-colors ${
                     selected
-                      ? 'border-blue-900 bg-blue-50/60'
-                      : 'border-slate-200 hover:border-slate-300'
+                      ? 'border-brand-700 bg-brand-50/60'
+                      : 'border-line-200 hover:border-line-200'
                   }`}
                 >
                   <input
@@ -144,11 +144,11 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({
                     onChange={() => setTermStatus(option.value)}
                   />
                   <Icon
-                    className={`w-4 h-4 shrink-0 mt-0.5 ${selected ? 'text-blue-900' : 'text-slate-400'}`}
+                    className={`w-4 h-4 shrink-0 mt-0.5 ${selected ? 'text-brand-700' : 'text-ink-400'}`}
                   />
                   <span className="min-w-0">
-                    <span className="block text-[12px] font-semibold text-slate-900">{option.label}</span>
-                    <span className="block text-[11px] text-slate-500 leading-snug">{option.help}</span>
+                    <span className="block text-[12px] font-semibold text-ink-900">{option.label}</span>
+                    <span className="block text-[11px] text-ink-500 leading-snug">{option.help}</span>
                   </span>
                 </label>
               );
@@ -159,7 +159,7 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({
         {claimsTerm && (
           <>
             <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wide text-slate-500 mb-1.5">
+              <label className="block text-[11px] font-bold uppercase tracking-wide text-ink-500 mb-1.5">
                 Término, como lo dice la norma
               </label>
               <textarea
@@ -167,12 +167,12 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({
                 onChange={(e) => setTermDescription(e.target.value)}
                 rows={3}
                 placeholder="Ej.: Cuatro (4) meses contados a partir del día siguiente a la notificación del acto."
-                className="w-full text-[12px] border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 resize-none"
+                className="w-full text-[12px] border border-line-200 rounded-control px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-700/20 focus:border-brand-700 resize-none"
               />
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wide text-slate-500 mb-1.5">
+              <label className="block text-[11px] font-bold uppercase tracking-wide text-ink-500 mb-1.5">
                 Fuente donde lo verificaste
               </label>
               <input
@@ -180,9 +180,9 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({
                 value={sourceUrl}
                 onChange={(e) => setSourceUrl(e.target.value)}
                 placeholder="https://www.suin-juriscol.gov.co/..."
-                className="w-full text-[12px] border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900"
+                className="w-full text-[12px] border border-line-200 rounded-control px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-700/20 focus:border-brand-700"
               />
-              <p className="text-[10px] text-slate-500 mt-1 leading-snug">
+              <p className="text-[10px] text-ink-500 mt-1 leading-snug">
                 Obligatoria. Sin fuente no es una verificación, es una afirmación.
               </p>
             </div>
@@ -190,7 +190,7 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({
         )}
 
         <div>
-          <label className="block text-[11px] font-bold uppercase tracking-wide text-slate-500 mb-1.5">
+          <label className="block text-[11px] font-bold uppercase tracking-wide text-ink-500 mb-1.5">
             Fundamento normativo
           </label>
           <input
@@ -198,49 +198,49 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({
             value={legalBasis}
             onChange={(e) => setLegalBasis(e.target.value)}
             placeholder="Ley 1437 de 2011, art. 138"
-            className="w-full text-[12px] border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900"
+            className="w-full text-[12px] border border-line-200 rounded-control px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-700/20 focus:border-brand-700"
           />
         </div>
 
         <div>
-          <label className="block text-[11px] font-bold uppercase tracking-wide text-slate-500 mb-1.5">
+          <label className="block text-[11px] font-bold uppercase tracking-wide text-ink-500 mb-1.5">
             Quién verifica
           </label>
           <input
             type="text"
             value={verifiedBy}
             onChange={(e) => setVerifiedBy(e.target.value)}
-            className="w-full text-[12px] border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900"
+            className="w-full text-[12px] border border-line-200 rounded-control px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-700/20 focus:border-brand-700"
           />
-          <p className="text-[10px] text-slate-500 mt-1 leading-snug">
+          <p className="text-[10px] text-ink-500 mt-1 leading-snug">
             Queda registrado: toda afirmación sobre un término es atribuible.
           </p>
         </div>
 
         <div>
-          <label className="block text-[11px] font-bold uppercase tracking-wide text-slate-500 mb-1.5">
-            Nota interna <span className="font-normal normal-case text-slate-400">(opcional)</span>
+          <label className="block text-[11px] font-bold uppercase tracking-wide text-ink-500 mb-1.5">
+            Nota interna <span className="font-normal normal-case text-ink-400">(opcional)</span>
           </label>
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
             rows={2}
-            className="w-full text-[12px] border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 resize-none"
+            className="w-full text-[12px] border border-line-200 rounded-control px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-700/20 focus:border-brand-700 resize-none"
           />
         </div>
 
         {error && (
-          <div className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2.5 text-[11px] text-rose-900 leading-snug">
+          <div className="rounded-control border border-[rgb(var(--danger)/0.35)] bg-[rgb(var(--danger)/0.06)] px-3 py-2.5 text-[11px] text-danger leading-snug">
             {error}
           </div>
         )}
       </div>
 
-      <footer className="px-5 py-3 border-t border-slate-200 flex items-center gap-2">
+      <footer className="px-5 py-3 border-t border-line-200 flex items-center gap-2">
         <button
           type="submit"
           disabled={!canSubmit || isSaving}
-          className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-blue-900 px-4 py-2 text-[12px] font-semibold text-white transition-colors hover:bg-blue-800 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-control bg-brand-700 px-4 py-2 text-[12px] font-semibold text-white transition-colors hover:bg-blue-800 disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
           Guardar verificación
@@ -252,7 +252,7 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({
             disabled={isSaving}
             onClick={() => void onRevert(actuacion.id)}
             title="Descartar la verificación de la firma y volver al catálogo base"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-2 text-[12px] font-semibold text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-40"
+            className="inline-flex items-center gap-1.5 rounded-control border border-line-200 px-3 py-2 text-[12px] font-semibold text-ink-700 transition-colors hover:bg-canvas disabled:opacity-40"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             Revertir

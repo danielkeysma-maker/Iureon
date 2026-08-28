@@ -88,33 +88,33 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 bg-slate-100">
+    <div className="flex-1 overflow-y-auto p-6 bg-canvas">
       <div className="max-w-4xl mx-auto space-y-4 font-sans">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-blue-950 flex items-center justify-center shrink-0">
-            <Compass className="w-5 h-5 text-blue-200" />
+          <div className="w-10 h-10 rounded-card bg-brand-700 flex items-center justify-center shrink-0">
+            <Compass className="w-5 h-5 text-on-brand" />
           </div>
           <div>
-            <h2 className="text-lg font-black text-slate-900 tracking-tight">
+            <h2 className="text-lg font-black text-ink-900 tracking-tight">
               ¿Qué actuación corresponde?
             </h2>
-            <p className="text-[11px] text-slate-500">
+            <p className="text-[11px] text-ink-500">
               Describe los hechos como te los contaron. No necesitas saber el nombre jurídico.
             </p>
           </div>
         </div>
 
-        <section className="bg-white border border-slate-200 rounded-xl p-4 space-y-3">
+        <section className="bg-surface border border-line-200 rounded-card p-4 space-y-3">
           <textarea
             value={hechos}
             onChange={(e) => setHechos(e.target.value)}
             placeholder="Ej: a mi cliente lo detuvieron anoche y no le han dicho de qué lo acusan…"
             rows={4}
-            className="w-full text-[13px] text-slate-800 border border-slate-200 rounded-lg p-3 resize-y focus:outline-none focus:ring-1 focus:ring-blue-900"
+            className="w-full text-[13px] text-ink-900 border border-line-200 rounded-control p-3 resize-y focus:outline-none focus:ring-1 focus:ring-brand-700"
           />
 
           <div className="flex items-center justify-between gap-3">
-            <p className="text-[10px] text-slate-400">
+            <p className="text-[10px] text-ink-400">
               {hechos.trim().length < 20
                 ? 'Cuéntalo con algo más de detalle: quién, qué pasó y qué se busca.'
                 : `${hechos.trim().length} caracteres`}
@@ -122,7 +122,7 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
             <button
               onClick={() => void orientar()}
               disabled={hechos.trim().length < 20 || cargando}
-              className="px-4 py-2 bg-blue-950 text-white text-[11px] font-bold rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:bg-blue-900 shrink-0 flex items-center gap-2"
+              className="px-4 py-2 bg-brand-700 text-white text-[11px] font-bold rounded-control disabled:opacity-40 disabled:cursor-not-allowed hover:bg-brand-800 shrink-0 flex items-center gap-2"
             >
               {cargando ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Search className="w-3.5 h-3.5" />}
               {cargando ? 'Buscando…' : 'Orientarme'}
@@ -130,14 +130,14 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
           </div>
 
           {!result && !cargando && (
-            <div className="pt-1 border-t border-slate-100">
-              <p className="text-[10px] text-slate-400 mb-1.5">O prueba con uno de estos:</p>
+            <div className="pt-1 border-t border-line-100">
+              <p className="text-[10px] text-ink-400 mb-1.5">O prueba con uno de estos:</p>
               <div className="space-y-1">
                 {EJEMPLOS.map((e) => (
                   <button
                     key={e}
                     onClick={() => void orientar(e)}
-                    className="block text-left text-[11px] text-blue-800 hover:underline"
+                    className="block text-left text-[11px] text-brand-700 hover:underline"
                   >
                     {e}
                   </button>
@@ -148,9 +148,9 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
         </section>
 
         {error && (
-          <div className="bg-rose-50 border border-rose-200 rounded-xl p-3 flex items-start gap-2">
-            <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-            <p className="text-[11px] text-rose-900">{error}</p>
+          <div className="bg-[rgb(var(--danger)/0.06)] border border-[rgb(var(--danger)/0.35)] rounded-card p-3 flex items-start gap-2">
+            <AlertTriangle className="w-4 h-4 text-danger shrink-0 mt-0.5" />
+            <p className="text-[11px] text-danger">{error}</p>
           </div>
         )}
 
@@ -162,14 +162,14 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
           eso lo manda por un camino que nadie eligió.
         */}
         {sinSaldo && (
-          <div className="bg-slate-50 border border-slate-300 rounded-xl p-4 flex items-start gap-3">
-            <Clock className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
-            <div className="text-[12px] text-slate-700 leading-relaxed">
-              <p className="font-semibold mb-1 text-slate-900">Cupo gratuito de hoy agotado</p>
+          <div className="bg-canvas border border-line-200 rounded-card p-4 flex items-start gap-3">
+            <Clock className="w-4 h-4 text-ink-500 shrink-0 mt-0.5" />
+            <div className="text-[12px] text-ink-700 leading-relaxed">
+              <p className="font-semibold mb-1 text-ink-900">Cupo gratuito de hoy agotado</p>
               <p>{sinSaldo}</p>
               <button
                 onClick={() => setMainView('search')}
-                className="mt-2 text-[11px] text-blue-800 hover:underline"
+                className="mt-2 text-[11px] text-brand-700 hover:underline"
               >
                 Buscar jurisprudencia mientras tanto →
               </button>
@@ -183,7 +183,7 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
           más rápida de que un abogado deje de confiar en el saldo.
         */}
         {result?.cupoRestante !== undefined && result.cupoRestante <= 5 && (
-          <p className="text-[11px] text-slate-600 px-1">
+          <p className="text-[11px] text-ink-500 px-1">
             {result.cupoRestante > 0
               ? `Te quedan ${result.cupoRestante} orientaciones gratuitas hoy. Después de eso, cada una descuenta $50 del saldo.`
               : `Ya usaste las gratuitas de hoy${
@@ -193,9 +193,9 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
         )}
 
         {result && result.status !== 'OK' && (
-          <div className="bg-amber-50/60 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
-            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-            <div className="text-[12px] text-amber-900 leading-relaxed">
+          <div className="bg-[rgb(var(--unverified-surf))]/60 border border-[rgb(var(--unverified-line))] rounded-card p-4 flex items-start gap-3">
+            <AlertTriangle className="w-4 h-4 text-unverified shrink-0 mt-0.5" />
+            <div className="text-[12px] text-ink-900 leading-relaxed">
               <p className="font-semibold mb-1">
                 {result.status === 'SIN_COINCIDENCIA'
                   ? 'El catálogo no reconoce una actuación para estos hechos'
@@ -205,7 +205,7 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
               {result.status === 'SIN_COINCIDENCIA' && (
                 <button
                   onClick={() => setMainView('search')}
-                  className="mt-2 text-[11px] text-blue-800 hover:underline"
+                  className="mt-2 text-[11px] text-brand-700 hover:underline"
                 >
                   Buscar jurisprudencia sobre estos hechos →
                 </button>
@@ -216,31 +216,31 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
 
         {result?.status === 'OK' && (
           <div className="space-y-3">
-            <p className="text-[11px] text-slate-500 px-1">
+            <p className="text-[11px] text-ink-500 px-1">
               {result.suggestions.length} actuación{result.suggestions.length === 1 ? '' : 'es'} del
               catálogo que podrían aplicar. Cada una con su término verificado — decide tú cuál
               corresponde.
             </p>
 
             {result.suggestions.map(({ actuacion: a, razon }) => (
-              <article key={a.id} className="bg-white border border-slate-200 rounded-xl overflow-hidden">
-                <header className="px-4 py-3 border-b border-slate-100 bg-slate-50/60">
+              <article key={a.id} className="bg-surface border border-line-200 rounded-card overflow-hidden">
+                <header className="px-4 py-3 border-b border-line-100 bg-canvas">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <span className="text-[10px] font-bold text-blue-950 uppercase tracking-wide">
+                      <span className="text-[10px] font-bold text-brand-700 uppercase tracking-wide">
                         {BRANCH_LABELS[a.branch] ?? a.branch}
                       </span>
-                      <h3 className="text-[13px] font-black text-slate-900">{a.exactName}</h3>
+                      <h3 className="text-[13px] font-black text-ink-900">{a.exactName}</h3>
                     </div>
                     <button
                       onClick={() => onDraft(a.exactName, a.branch, hechos.trim())}
-                      className="text-[10px] font-bold text-white bg-blue-950 hover:bg-blue-900 px-2.5 py-1.5 rounded-lg flex items-center gap-1 shrink-0"
+                      className="text-[10px] font-bold text-white bg-brand-700 hover:bg-brand-800 px-2.5 py-1.5 rounded-control flex items-center gap-1 shrink-0"
                     >
                       <PenLine className="w-3 h-3" />
                       Redactar
                     </button>
                   </div>
-                  {razon && <p className="text-[11px] text-slate-600 mt-1.5 italic">{razon}</p>}
+                  {razon && <p className="text-[11px] text-ink-500 mt-1.5 italic">{razon}</p>}
                 </header>
 
                 <div className="p-4 space-y-2">
@@ -250,31 +250,31 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
                     usuario no sabe que tiene que preguntar.
                   */}
                   <div
-                    className={`rounded-lg p-2.5 border ${
+                    className={`rounded-control p-2.5 border ${
                       a.term.status === 'NO_VERIFICADO'
-                        ? 'bg-amber-50 border-amber-200'
-                        : 'bg-slate-50 border-slate-200'
+                        ? 'bg-[rgb(var(--unverified-surf))] border-[rgb(var(--unverified-line))]'
+                        : 'bg-canvas border-line-200'
                     }`}
                   >
-                    <p className="text-[10px] font-bold text-slate-700 uppercase tracking-wide mb-0.5">
+                    <p className="text-[10px] font-bold text-ink-700 uppercase tracking-wide mb-0.5">
                       {a.term.status === 'NO_CADUCA'
                         ? 'No caduca'
                         : a.term.status === 'NO_VERIFICADO'
                         ? 'Término no verificado'
                         : 'Término'}
                     </p>
-                    <p className="text-[11px] text-slate-800 leading-relaxed">
+                    <p className="text-[11px] text-ink-900 leading-relaxed">
                       {a.term.description ?? 'Nadie ha comprobado este término. No lo des por cierto.'}
                     </p>
                   </div>
 
-                  <p className="text-[11px] text-slate-600">
-                    <span className="font-semibold text-slate-800">Fundamento:</span> {a.legalBasis}
+                  <p className="text-[11px] text-ink-500">
+                    <span className="font-semibold text-ink-900">Fundamento:</span> {a.legalBasis}
                   </p>
 
                   {a.competentAuthority && (
-                    <p className="text-[11px] text-slate-600">
-                      <span className="font-semibold text-slate-800">Ante quién:</span>{' '}
+                    <p className="text-[11px] text-ink-500">
+                      <span className="font-semibold text-ink-900">Ante quién:</span>{' '}
                       {a.competentAuthority}
                     </p>
                   )}
@@ -284,7 +284,7 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
                       href={a.sourceUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[10px] text-blue-800 hover:underline inline-flex items-center gap-1"
+                      className="text-[10px] text-brand-700 hover:underline inline-flex items-center gap-1"
                     >
                       Ver la norma <ExternalLink className="w-3 h-3" />
                     </a>
@@ -299,14 +299,14 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
               que alguien lo note por otra vía.
             */}
             {result.descartadas.length > 0 && (
-              <details className="bg-slate-50 border border-slate-200 rounded-xl p-3">
-                <summary className="text-[11px] text-slate-600 cursor-pointer">
+              <details className="bg-canvas border border-line-200 rounded-card p-3">
+                <summary className="text-[11px] text-ink-500 cursor-pointer">
                   {result.descartadas.length} propuesta
                   {result.descartadas.length === 1 ? '' : 's'} que el catálogo no reconoció
                 </summary>
                 <ul className="mt-2 space-y-0.5">
                   {result.descartadas.map((d) => (
-                    <li key={d} className="text-[10px] text-slate-500">
+                    <li key={d} className="text-[10px] text-ink-500">
                       {d}
                     </li>
                   ))}
@@ -314,7 +314,7 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
               </details>
             )}
 
-            <p className="text-[10px] text-slate-500 px-1 pb-2">
+            <p className="text-[10px] text-ink-500 px-1 pb-2">
               Esto orienta, no decide. La calificación jurídica del caso es tuya.
             </p>
           </div>
