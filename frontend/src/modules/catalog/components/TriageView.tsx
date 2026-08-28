@@ -403,8 +403,14 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
             {/* ─── EL ORDEN, DICHO ─────────────────────────────────────────── */}
             <div className="flex flex-wrap items-baseline gap-x-2 px-1">
               <p className="text-ui font-semibold text-ink-900">
-                {sugerencias.length} actuación{sugerencias.length === 1 ? '' : 'es'} posible
-                {sugerencias.length === 1 ? '' : 's'}
+                {/*
+                  «actuaciones», no «actuaciónes»: la palabra PIERDE la tilde
+                  al pasar al plural, porque deja de ser aguda terminada en n.
+                  Añadir «es» al singular es el error que sale de tratar el
+                  plural español como una concatenación.
+                */}
+                {sugerencias.length}{' '}
+                {sugerencias.length === 1 ? 'actuación posible' : 'actuaciones posibles'}
               </p>
               <p className="text-meta text-ink-500">
                 ordenadas por término más corto — lo que se vence primero va primero
