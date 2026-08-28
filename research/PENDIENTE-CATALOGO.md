@@ -393,3 +393,88 @@ los apoyos en su lugar) y las garantías mobiliarias.
 POLICIVO —«el mejor tratamiento del reloj de todo el catálogo»—, CONSTITUCIONAL,
 TRANSITO, ADUANERO, AMBIENTAL, DISCIPLINARIO, AGRARIO, FAMILIA_ADMINISTRATIVA, y
 ADMINISTRATIVO salvo responsabilidad fiscal, que en rigor es rama aparte.
+
+---
+
+## 8. SALDO DE VERIFICACIÓN AL 28 DE AGOSTO DE 2026 (medido, no recordado)
+
+Dos correcciones a lo que este mismo documento traía como deuda abierta:
+
+**Las 111 URLs de leyes.co YA NO EXISTEN.** Se contaron las 752 fichas una por
+una y **ninguna** cita una fuente no oficial. El reparto real de dominios es:
+`secretariasenado.gov.co` 396, `funcionpublica.gov.co` 295,
+`alcaldiabogota.gov.co` 21, `tribunalandino.org.ec` 17 (Comunidad Andina, que es
+su fuente propia), y el resto en normogramas oficiales de Colpensiones, ICBF,
+Supersalud, DIAN, la Corte Constitucional, la OEA y la Conferencia de La Haya.
+**Esa deuda está cerrada.**
+
+**Los `_meta.gaps` tampoco son 212 advertencias vivas.** Varias listas traen su
+propia nota de que son anteriores a la verificación masiva del 14 de agosto y que
+lo vigente vive en `_meta.unverified`. Hay que leerlos como historia, no como
+pendientes, salvo los que declaran una materia entera sin catalogar — y esos sí
+importan: TRIBUTARIO declara que no leyó verbatim el Estatuto, CONSTITUCIONAL que
+no leyó los arts. 86, 87, 88 y 241 de la Constitución, y AGRARIO que la
+jurisdicción agraria como tal no produjo ni una ficha.
+
+### Lo que SÍ queda: 20 fichas publicadas como NO_VERIFICADO
+
+Se publican con la advertencia visible, que es lo correcto, pero son el saldo
+real. Están concentradas y por eso son cerrables:
+
+- **ADUANERO (5)** — Solicitud de revisión ante el Comité de Revisión de
+  Aprehensiones · Solicitud de declaratoria de silencio administrativo positivo
+  aduanero · Declaración de legalización con pago de rescate · Solicitud de
+  rescate de mercancía en abandono legal · Declaración de corrección de la
+  declaración de importación.
+- **AMBIENTAL (4)** — Solicitud de levantamiento de medida preventiva ambiental ·
+  Solicitud de aprovechamiento forestal · Solicitud de reconocimiento como
+  tercero interviniente en la actuación administrativa ambiental · Resolución que
+  otorga o niega el aprovechamiento forestal.
+- **PROPIEDAD_INTELECTUAL (4)** — Demanda de nulidad del registro de marca ·
+  Solicitud de medidas en frontera por infracción de marca · Solicitud de
+  registro de obra ante la DNDA · Demanda por infracción de derecho de autor y
+  derechos conexos.
+- **AGRARIO (3)** — Demanda de resolución de controversias sobre la adjudicación ·
+  Solicitud de acumulación de procesos al Procedimiento Único · Solicitud de
+  conciliación en el marco del Procedimiento Único.
+- **Una cada una** — ARBITRAJE: Solicitud de arbitraje social. DISCIPLINARIO:
+  Auto de fijación del juzgamiento a seguir. NOTARIAL: Escritura pública de
+  cancelación o sustitución voluntaria del patrimonio de familia inembargable.
+  POLICIVO: Solicitud de asunción de competencia especial por el gobernador.
+
+Las mismas seis de esa lista tienen además el campo `term` vacío, no solo
+declarado sin verificar: las tres de AGRARIO, la de ARBITRAJE, la de
+DISCIPLINARIO y la de NOTARIAL.
+
+### El hueco de ROL, medido
+
+| Rol | Fichas |
+|---|---|
+| LITIGANTE | 483 |
+| DESPACHO | 251 |
+| **SECRETARIA** | **18** |
+
+Las 18 de SECRETARIA son **16 en CIVIL y 2 en ARBITRAJE. Veintiuna ramas en
+cero.** No todas deben tener secretaría judicial —en las ramas administrativas la
+figura equivalente es la secretaría general o la notificación de la entidad—,
+pero veintiuna en cero no es una decisión, es un vacío.
+
+### El hueco de POSICIÓN, comprobado en una rama y probablemente general
+
+CONSTITUCIONAL tiene 35 fichas: la tutela, la transitoria, la que va contra
+providencia, la medida provisional, la impugnación, el desacato y la insistencia
+—**todas del accionante**— más los 15 autos y sentencias del juez.
+**No hay una sola ficha para CONTESTAR una tutela**, ni para responder el
+incidente de desacato, ni para el informe de cumplimiento de la entidad
+accionada. El cliente al que le ponen la tutela no tiene nada, y responder
+tutelas es de los documentos que más produce una firma colombiana.
+
+### Brave, comprobado
+
+`npm run check:discovery` pasa entero con la llave real: el descubrimiento
+responde, toda sentencia propuesta llega con su texto descargado y con su ponente
+y fecha del registro oficial, y una cita inventada no entra al corpus. **Lo que
+no está comprobado es la producción**: sin una petición autenticada no se puede
+distinguir si la llave quedó en el proyecto `iureon` (backend) o en `iureon-app`
+(frontend), que nunca la lee. El 401 de la raíz no sirve como prueba: el
+middleware de sesión responde igual para una ruta real y una inexistente.
