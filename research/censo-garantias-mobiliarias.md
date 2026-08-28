@@ -182,29 +182,97 @@ el `ambiguity guard` existe para rechazar.
 
 ---
 
-## 5. Lo que NO se comprobó
+## 5. Vigencia del reglamento y tarifas — VERIFICADO (2ª pasada)
 
-1. **Decretos posteriores a 2015 que modifiquen los arts. 2.2.2.4.x del Decreto
-   1074.** Hay un candidato real: la nota oficial al art. 80 de la Ley 1676 remite
-   a «(Ver Decreto 1133 de 2021)», sobre sitios de internet y martillo
-   electrónico. No se verificó qué artículos tocó. Tampoco se descartaron los
-   Decretos 466, 1349 y 2101 de 2016. **Consecuencia: las citas de martillo
-   electrónico (DUR .61 a .66) son las de mayor riesgo de estar desactualizadas;
-   las de registro y ejecución especial, poco.**
-2. **Sentencias de constitucionalidad distintas de C-145/2018 y C-882/2014.** No
-   se barrieron los arts. 60, 61, 62, 66, 67 y 68 — justo los que un demandante
-   atacaría. La ausencia de «Notas de Vigencia» descarta reformas legislativas,
-   **no descarta condicionamientos jurisprudenciales**.
-3. **Tarifas y requisitos operativos.** Verificada la habilitación (art. 44 y DUR
-   .40: las fija el MinCIT por resolución a favor de Confecámaras; las consultas
-   al archivo son gratuitas) y los requisitos previos (cuenta de usuario con
-   verificación de identidad, formularios y derechos pagados). **No se confirmó
-   cuál es la resolución del MinCIT vigente ni los valores.** Apareció una
-   «Resolución 069 de 2026» que **no se verificó y por eso no se afirma**. Igual
-   pendiente: la tarifa máxima de notarios y cámaras (DUR .23), donde solo se
-   comprobó la regla: «un valor fijo y razonable… que en ningún caso será ad
-   valórem», y «Las expensas causadas a lo largo del procedimiento deberán ser
-   asumidas por el acreedor garantizado».
+Segunda verificación sobre el DUR 1074 compilado íntegro (2,86 MB del Gestor
+Normativo, que ya incorpora normas de 2025), aislando el Capítulo 4 completo
+—2.2.2.4.1.1 a 2.2.2.4.2.78, 171.256 caracteres— y buscando toda nota de
+«Modificado / Adicionado / Derogado por».
 
-**Ninguna ficha de las secciones A, B, C ni D depende de estos pendientes**, salvo
-la advertencia sobre martillo electrónico del punto 1.
+### Solo DOS decretos tocan el Capítulo 4, y ninguno derogó nada
+
+**Decreto 1133 de 2021** (`norma.php?i=171466`). Su vigencia lo dice verbatim:
+«modifica, en lo pertinente, los artículos 2.2.2.4.2.61, 2.2.2.4.2.63,
+2.2.2.4.2.64, 2.2.2.4.2.65 y 2.2.2.4.2.66 del Decreto 1074 de 2015». Es todo
+**martillo electrónico**: definiciones de acceso, profesionalización y
+transparencia; supervisión por Superfinanciera y SIC; solicitud de enajenación;
+tarifas de los sitios de internet; y enajenación fallida. Cambio de fondo: los
+sitios «serán operados y administrados por las cámaras de comercio y los
+martillos legalmente autorizados» — antes exigían operación conjunta.
+
+**Decreto 2642 de 2022, art. 34** (`norma.php?i=200584`). Modifica el inciso 2
+del num. 3.3 del art. 2.2.2.4.2.57 — el procedimiento notarial de cancelación:
+la tarifa notarial pasó de salarios mínimos diarios a **UVT**.
+
+**Descartados uno por uno**: Decreto 466 de 2016 (modifica el 2555 de 2010, no el
+1074); Decreto 1349 de 2016 (adiciona el Capítulo 53, factura electrónica; solo
+*remite* al art. 2.2.2.4.1.3); Decreto 2101 de 2016 (Decreto 2420, información
+financiera); Decreto 1533 de 2022 (Decreto 2555).
+
+### La Ley 1676 no ha sido reformada, pero hay un impacto indirecto
+
+La **Ley 2069 de 2020** se descargó completa (84 artículos): **cero menciones** a
+la Ley 1676 y cero a «garantías mobiliarias». Su art. 84 no la deroga. Los
+Decretos 560 y 772 de 2020 la citan sin modificarla — el 560 la preserva
+expresamente y el 772 la usa.
+
+**Lo que sí cambia una lectura: la Ley 2437 de 2024** (12 dic 2024) incorporó
+como legislación permanente los Decretos 560 y 772, y su art. 21 **derogó los
+arts. 37 y 38 de la Ley 1116 de 2006**: «En todos los casos en que resultaría
+aplicable la liquidación por adjudicación procederá la liquidación judicial o la
+liquidación judicial simplificada según corresponda». El último inciso del art.
+50 de la Ley 1676 remite a la «liquidación por adjudicación», **figura que ya no
+existe**: hoy debe leerse como liquidación judicial o judicial simplificada. Es
+una nota obligatoria para la ficha 23.
+
+### Constitucionalidad: tres fallos más, todos inhibitorios
+
+| Sentencia | Norma | Decisión |
+|---|---|---|
+| C-882 de 2014 | art. 89 | Inexequibilidad parcial |
+| C-145 de 2018 | arts. 50 y 51 | Condicionalmente exequibles — **conserva vigencia** |
+| C-447 de 2015 | art. 52 inc. 5 | **Inhibida** (ineptitud sustantiva) |
+| C-085 de 2018 | art. 76 | **Inhibida** — el actor le atribuyó carácter obligatorio a un procedimiento que la ley redacta como potestativo («podrá») |
+| C-483 de 2024 | arts. 50, 51, 52 | **Inhibida** — no tocó el condicionamiento de C-145/18 |
+
+**No hay pronunciamiento sobre los arts. 60, 61, 62, 66, 67 ni 68** (pago
+directo, apropiación, oposición), buscado en la relatoría oficial.
+
+### Tarifas del registro — vigentes 2026
+
+La resolución que fija los derechos es la **834 del 3 de marzo de 2014** del
+MinCIT, **no sustituida**, modificada solo en su art. 2 por la **Resolución 0356
+de 2015**, que introdujo el ajuste anual: «Los derechos de registro se
+incrementarán anualmente, el primero (1°) de enero de cada año, de acuerdo con el
+índice de Precios al Consumidor (IPC) del año inmediatamente anterior».
+
+Las demás resoluciones —001/2015, 1320/2020, 1362/2020, 1520/2021 y la
+**Resolución 069 del 15 de enero de 2026**— modifican **formularios, no
+derechos**. (La 069 aparecía en la primera pasada como sospecha sin verificar;
+verificada, es de formularios.)
+
+Tarifas 2026 del operador (Confecámaras), **sin IVA del 19 %**:
+
+| Formulario | Valor |
+|---|---|
+| Inscripción inicial · Modificación global del acreedor · Ejecución concursal | $56.000 |
+| Modificación · Cancelación · Cesión · Ejecución · Terminación · Restitución | $15.000 |
+| Certificados | $8.000 |
+
+**Dato que afecta a la ficha 2 (prórroga): la prórroga NO tiene tarifa propia.**
+No figura como formulario tarifado ni en el Anexo 2 de la Res. 834/2014 ni en la
+tabla de 2026 — se tramita con el **formulario de modificación, $15.000**. Es
+decir: la renovación que salva la prelación cuesta quince mil pesos y vence sin
+que nadie avise.
+
+De la tarifa de notarios y cámaras por la ejecución especial (DUR .23) solo se
+comprobó la regla: «un valor fijo y razonable… que en ningún caso será ad
+valórem», y «Las expensas causadas a lo largo del procedimiento deberán ser
+asumidas por el acreedor garantizado».
+
+### Limitación metodológica de esta pasada
+
+`suin-juriscol.gov.co` y `secretariasenado.gov.co` **no respondieron** desde esa
+red (timeout y socket hang up). La verificación se apoyó en funcionpublica.gov.co,
+corteconstitucional.gov.co, mincit.gov.co y el sitio del operador del registro.
+Es el mismo patrón de intermitencia que hoy afecta a la API de la Corte Suprema.
