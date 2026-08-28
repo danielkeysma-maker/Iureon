@@ -646,7 +646,16 @@ export function App() {
                * genérica, así que se pasa tal cual vino del catálogo.
                */
               onDraft={(nombre, rama, hechos) => {
-                workflow.setLegalBranch(rama);
+                /*
+                 * VACÍO SIGNIFICA «NO LO SÉ», Y SE RESPETA.
+                 *
+                 * La salida «Redactar sin catálogo» del 1f′ llega aquí sin
+                 * nombre ni rama, porque el catálogo no reconoció nada. Pisar
+                 * la rama con una cadena vacía dejaría el selector sin valor y
+                 * la lista de actuaciones sin poder cargarse; se conserva la
+                 * que haya, y el taller pedirá la actuación.
+                 */
+                if (rama) workflow.setLegalBranch(rama);
                 workflow.setDocumentType(nombre);
                 // Los hechos que ya escribió, para que no los escriba dos veces.
                 if (hechos) workflow.setLegalPrompt(hechos);

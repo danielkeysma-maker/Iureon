@@ -315,7 +315,10 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
                       <p className="text-meta font-medium text-ink-900">
                         Estructura exigida por la norma
                       </p>
-                      <p className="mt-0.5 line-clamp-2 text-meta leading-[1.45] text-ink-500">
+                      <p
+                        className="mt-0.5 line-clamp-2 text-justify text-meta leading-[1.45] text-ink-500 [text-wrap:pretty]"
+                        title={actuacion.legalBasis}
+                      >
                         {actuacion.legalBasis}
                       </p>
                     </div>
@@ -343,7 +346,22 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
                     {actuacion.requiredSections.map((sec) => (
                       <li key={sec.n} className="flex min-w-0 items-baseline gap-1.5 text-meta">
                         <span className="shrink-0 font-mono text-[10px] text-ink-400">{sec.n}.</span>
-                        <span className="min-w-0 flex-1">
+                        {/*
+                          JUSTIFICADO, como el escrito que va a producir. Los
+                          nombres de sección de este catálogo son frases —«Los
+                          nombres y apellidos completos del solicitante y de su
+                          representante y/o apoderado, si es el caso, con
+                          indicación de su documento de identidad»— y en una
+                          columna de 300 px ocupan tres y cuatro renglones: en
+                          bandera dejaban un borde derecho dentado que se lee
+                          como lista de notas sueltas y no como la estructura
+                          de un documento.
+
+                          `text-wrap:pretty` evita la palabra huérfana en el
+                          último renglón, que es lo que en columna estrecha
+                          hace fea la justificación.
+                        */}
+                        <span className="min-w-0 flex-1 text-justify [text-wrap:pretty]">
                           <span className={sec.mandatory ? 'text-ink-900' : 'text-ink-500'}>
                             {sec.name}
                           </span>
@@ -464,7 +482,18 @@ const Fundamento: React.FC<{
     <Icono className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink-400" />
     <div className="min-w-0">
       <p className="text-meta font-medium text-ink-900">{titulo}</p>
-      <p className="mt-0.5 line-clamp-3 text-meta leading-[1.45] text-ink-500">{detalle}</p>
+      {/*
+        Justificado y con `title`: son párrafos —un término del catálogo puede
+        ser «Dentro de los diez (10) días siguientes a la presentación de la
+        solicitud el juez proferirá el fallo…»— y el recorte a tres renglones
+        esconde el resto, así que el texto completo vive en el `title`.
+      */}
+      <p
+        className="mt-0.5 line-clamp-3 text-justify text-meta leading-[1.45] text-ink-500 [text-wrap:pretty]"
+        title={detalle}
+      >
+        {detalle}
+      </p>
     </div>
   </li>
 );
