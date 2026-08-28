@@ -454,6 +454,55 @@ export const SearchView: React.FC = () => {
             preguntado esto antes. Mostrarlo junto a lo indexado haría que un
             hallazgo recién descargado pareciera curado.
           */}
+          {/*
+            ─── EL DESCUBRIMIENTO QUE NO ENCUENTRA TAMBIÉN SE DICE ───────────
+            Solo se pintaba el caso OK con hallazgos, así que sin llave, sin
+            resultados o con el servicio caído la pantalla quedaba MUDA: el
+            abogado veía «sin coincidencias en el corpus» y no tenía forma de
+            saber si además se había salido a buscar fuera. Una capacidad que
+            no se presenta no existe, y una que calla al fallar se lee como
+            que nunca estuvo.
+          */}
+          {discovery && discovery.status !== 'OK' && (
+            <div className="flex items-start gap-2 rounded-card border border-line-200 bg-canvas p-4">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-unverified" />
+              <div className="text-[13px] leading-relaxed text-ink-700">
+                <p className="font-semibold text-ink-900">
+                  {discovery.status === 'NO_PROVIDER'
+                    ? 'La búsqueda fuera del corpus no está configurada'
+                    : 'No se pudo consultar el registro oficial'}
+                </p>
+                <p className="mt-0.5 text-justify [text-wrap:pretty]">
+                  {discovery.reason ??
+                    (discovery.status === 'NO_PROVIDER'
+                      ? 'Falta la llave del buscador. Mientras tanto solo se consulta el corpus indexado.'
+                      : 'El servicio de la Corte no respondió. Vuelva a intentarlo en unos minutos.')}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {discovery?.status === 'OK' && discovery.found.length === 0 && (
+            <div className="rounded-card border border-line-200 bg-canvas p-4 text-[13px] leading-relaxed text-ink-700">
+              <p className="font-semibold text-ink-900">
+                El registro oficial tampoco tiene nada para esta consulta
+              </p>
+              <p className="mt-0.5 text-justify [text-wrap:pretty]">
+                Se buscó en la relatoría de la Corte Constitucional y ninguna candidata pasó la
+                verificación contra el registro del Estado
+                {discovery.descartadas.length > 0
+                  ? `: ${discovery.descartadas.length} propuesta${
+                      discovery.descartadas.length === 1 ? '' : 's'
+                    } fue${discovery.descartadas.length === 1 ? '' : 'ron'} descartada${
+                      discovery.descartadas.length === 1 ? '' : 's'
+                    }.`
+                  : '.'}{' '}
+                Si el asunto es de casación civil, laboral o penal, o de lo contencioso
+                administrativo, es probable que no viva en esa relatoría.
+              </p>
+            </div>
+          )}
+
           {discovery?.status === 'OK' && discovery.found.length > 0 && (
             <div className="space-y-3">
               <div className="bg-brand-700 text-white rounded-card px-4 py-2.5">
