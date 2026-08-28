@@ -390,7 +390,7 @@ export const SearchView: React.FC = () => {
               </header>
 
               <div className="p-4">
-                <p className="text-[13px] text-ink-700 leading-relaxed whitespace-pre-wrap max-h-72 overflow-y-auto">
+                <p className="text-justify text-[13px] text-ink-700 leading-relaxed whitespace-pre-wrap max-h-72 overflow-y-auto [text-wrap:pretty]">
                   {ruling.text.slice(0, 4000)}
                   {ruling.text.length > 4000 && '…'}
                 </p>
@@ -460,7 +460,7 @@ export const SearchView: React.FC = () => {
                     </div>
                     {motivo && <p className="text-[10px] text-ink-400 mt-1 truncate">{motivo}</p>}
                   </header>
-                  <p className="p-4 text-[13px] text-ink-700 leading-relaxed max-h-48 overflow-y-auto whitespace-pre-wrap">
+                  <p className="p-4 text-justify text-[13px] text-ink-700 leading-relaxed max-h-48 overflow-y-auto whitespace-pre-wrap [text-wrap:pretty]">
                     {r.text.slice(0, 2500)}
                     {r.text.length > 2500 && '…'}
                   </p>
@@ -494,7 +494,7 @@ export const SearchView: React.FC = () => {
           {status !== null && visible.length === 0 && !isLoading && (
             <div className="bg-[rgb(var(--unverified-surf))] border border-[rgb(var(--unverified-line))] rounded-card p-6 flex items-start gap-3">
               <AlertTriangle className="w-4 h-4 text-unverified flex-shrink-0 mt-0.5" />
-              <div className="text-[13px] text-ink-900 leading-relaxed">
+              <div className="text-justify text-[13px] text-ink-900 leading-relaxed [text-wrap:pretty]">
                 <p className="font-semibold mb-1">Sin resultados</p>
                 <p>{emptyMessage(status, reason, lastQuery)}</p>
               </div>
@@ -562,7 +562,7 @@ export const SearchView: React.FC = () => {
                 </div>
               </div>
 
-              <blockquote className="whitespace-pre-wrap border-l-2 border-brand-700 pl-3.5 font-legal text-[13px] leading-[1.7] text-ink-700">
+              <blockquote className="whitespace-pre-wrap border-l-2 border-brand-700 pl-3.5 text-justify font-legal text-[13px] leading-[1.7] text-ink-700 [text-wrap:pretty]">
                 {readableChunk(item.contentChunk)}
               </blockquote>
 
@@ -624,7 +624,7 @@ export const SearchView: React.FC = () => {
                   </div>
 
                   {/* Filete PUNTEADO: la cita de algo que nadie ha leído. */}
-                  <blockquote className="border-l-2 border-dashed border-line-200 pl-3 font-legal text-[13px] leading-[1.7] text-ink-700">
+                  <blockquote className="border-l-2 border-dashed border-line-200 pl-3 text-justify font-legal text-[13px] leading-[1.7] text-ink-700 [text-wrap:pretty]">
                     {readableChunk(item.contentChunk).slice(0, 600)}
                   </blockquote>
 
