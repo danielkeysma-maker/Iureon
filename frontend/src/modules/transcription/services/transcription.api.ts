@@ -56,6 +56,8 @@ export interface StoredTranscription {
   transcribed_at: string;
   /** Quien la subio. Dato de la fila, no filtro: la lista es de la firma. */
   user_email?: string;
+  /** El resumen guardado, si ya se generó. Viaja con la fila: exportar no va a la red. */
+  resumen?: { hechos: Array<{ t: number | null; quien: string; hecho: string }> } | null;
   /** Hora real en que se autorizó la grabación, si quedó registrada. */
   autorizo_grabacion_el?: string | null;
   /** Una audiencia se revisa; "ACTA_LISTA" solo lo da una persona. */

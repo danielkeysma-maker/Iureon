@@ -3,7 +3,6 @@ import { AlertTriangle, ArrowLeft, Copy, CheckCircle2, FileText, PenLine, Upload
 import { useTranscription } from '../../transcription/hooks/useTranscription';
 import { TranscriptSegments } from '../../transcription/components/TranscriptSegments';
 import { EntrevistasList } from './EntrevistasList';
-import { transcriptionApi } from '../../transcription/services/transcription.api';
 import { CerrarEntrevistaDialog } from './CerrarEntrevistaDialog';
 import { NotPersistedWarning } from '../../transcription/components/RoleProposals';
 import { exportTranscriptToPdf, exportTranscriptToWord } from '../../transcription/transcriptExport';
@@ -139,20 +138,20 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
 
 
   /*
-   * El ACTA con datos reales: la hora de autorizacion y la revision salen de
-   * la fila guardada; los hechos clave, del resumen del motor (cacheado — si
-   * nunca se pidio, esta llamada lo genera y lo deja guardado). Nada se
-   * inventa: lo que no exista simplemente no aparece en el documento.
+   * El ACTA con datos reales — y SIN RED. Todo sale de la fila que la lista ya
+   * tiene en memoria: la hora de autorizacion, quien reviso, y el resumen si
+   * alguna vez se genero. La version anterior hacia un POST al exportar y el
+   * clic pagaba el arranque en frio de la funcion: segundos de boton mudo por
+   * datos que ya estaban aqui.
    */
-  const armarActa = async () => {
+  const armarActa = () => {
     if (!transcriptionId) return undefined;
     const fila = stored.find((i) => i.id === transcriptionId);
-    const resumen = await transcriptionApi.resumen(transcriptionId, true);
     return {
       autorizadoEl: fila?.autorizo_grabacion_el ?? null,
       revisadaPor: fila?.revisada_por ?? null,
       actaLista: fila?.estado_revision === 'ACTA_LISTA',
-      hechosClave: resumen?.hechos
+      hechosClave: fila?.resumen?.hechos
     };
   };
 
@@ -244,14 +243,14 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
             {/* El acta, en dos formatos del mismo peso: el .docx se edita, el PDF se anexa. */}
             <div className="flex">
               <button
-                onClick={() => void armarActa().then((a) => exportTranscriptToWord(result, titulo || 'entrevista', a))}
+                onClick={() => void exportTranscriptToWord(result, titulo || 'entrevista', armarActa())}
                 className="btn-secondary btn-sm rounded-r-none"
               >
                 <FileText className="h-3 w-3" />
                 Word
               </button>
               <button
-                onClick={() => void armarActa().then((a) => exportTranscriptToPdf(result, titulo || 'entrevista', a))}
+                onClick={() => exportTranscriptToPdf(result, titulo || 'entrevista', armarActa())}
                 className="btn-secondary btn-sm -ml-px rounded-l-none"
               >
                 PDF
