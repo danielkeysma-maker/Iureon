@@ -16,6 +16,16 @@ export interface BillingSummary {
   /** What that work cost the platform upstream, in dollars. */
   costUsd: number;
   operations: number;
+  /** El mes en curso. `costoMedioEsReal` false = el promedio es el piso de tarifa. */
+  mes?: {
+    escritos: number;
+    transcripciones: number;
+    orientaciones: number;
+    cobradoCop: number;
+    costoMedioEscritoCop: number;
+    costoMedioEsReal: boolean;
+    escritosRestantes: number;
+  };
 }
 
 export interface Movement {

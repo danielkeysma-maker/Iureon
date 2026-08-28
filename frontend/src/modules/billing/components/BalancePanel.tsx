@@ -1,40 +1,62 @@
 import React from 'react';
-import { ArrowDownRight, ArrowUpRight, CreditCard, RefreshCw, X } from 'lucide-react';
+import { ArrowDownRight, ArrowUpRight, Download, RefreshCw } from 'lucide-react';
+import { Dialog } from '../../../design/Dialog';
 import { billingApi, type BillingSummary, type CheckoutIntent, type Movement } from '../billing.api';
 
 interface BalancePanelProps {
   isOpen: boolean;
   onClose: () => void;
   firmName: string;
+  /** El NIT va en la cabecera: la cuenta es de la firma, no de quien mira. */
+  firmNit?: string;
 }
 
 /**
- * The firm's balance, what it has spent, and why.
+ * Saldo y recarga. Diálogo tipo 4 —visor— en tamaño L, según el artboard 1k.
  *
- * WHAT THIS REPLACES, AND WHY IT HAD TO GO. A recharge modal that waited 800ms
- * on a setTimeout and then announced "✅ Recarga de $500.000 COP acreditada
- * exitosamente". No payment, no server call, no money — a fabricated financial
- * confirmation shown to the person paying. Every other invention in this
- * codebase has been a fabricated fact; this one was a fabricated receipt.
+ * ─── EL SALDO SE TRADUCE A ESCRITOS ─────────────────────────────────────────
  *
- * WHAT IT SAYS INSTEAD. What the balance actually is, read from the server,
- * with the movements that produced it — and the truth about how credit is
- * added: the operator does it, once payment is confirmed. A firm that wants to
- * top up needs to know who to ask, which is a smaller thing to offer than a
- * checkout that does not exist, and an honest one.
+ * «$412.500» no dice si alcanza para el término de mañana; «≈121 escritos» sí.
+ * La traducción usa el costo medio REAL de los escritos de esta firma este
+ * mes, calculado por el servidor — y cuando el mes no tiene escritos, la cifra
+ * se declara «al precio base», porque un promedio de cero escritos no es un
+ * promedio.
+ *
+ * ─── LO QUE EL ARTBOARD PIDE Y AQUÍ NO ESTÁ, con la razón ──────────────────
+ *
+ * · El desglose de IVA (19%) sobre la recarga: el servidor firma el monto tal
+ *   cual y la comisión de la pasarela la absorbe la plataforma — mostrar un
+ *   IVA que no se cobra sería inventar un impuesto.
+ * · «Factura electrónica al correo de facturación»: la facturación no existe
+ *   todavía; anunciarla sería prometer un documento que no va a llegar.
+ * · «Avisar a los socios bajo $120.000»: no hay sistema de avisos. La regla
+ *   que SÍ es real se declara abajo: el cobro se reserva al INICIAR el
+ *   escrito, así que la generación nunca se corta a mitad de uno.
+ *
+ * Lo que sí reemplazó esta pantalla desde su primera versión: un modal que
+ * anunciaba «✅ Recarga acreditada» tras un setTimeout, sin pago ni servidor.
+ * Todo lo de aquí viene del servidor, incluida la firma del checkout de Wompi.
  */
 
 const pesos = (valor: number): string => `$${Math.round(valor).toLocaleString('es-CO')}`;
 
 const fecha = (iso: string): string =>
-  new Date(iso).toLocaleString('es-CO', {
-    day: '2-digit',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
+  new Date(iso).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' });
 
-export const BalancePanel: React.FC<BalancePanelProps> = ({ isOpen, onClose, firmName }) => {
+const MES_ACTUAL = new Date().toLocaleDateString('es-CO', { month: 'long' });
+
+/** Los montos que una firma recarga de verdad. «Otro» abre el campo. */
+const PRESETS = [100_000, 300_000, 500_000, 1_000_000];
+
+const csv = (valor: string | number | null | undefined): string =>
+  `"${String(valor ?? '').replace(/"/g, '""')}"`;
+
+export const BalancePanel: React.FC<BalancePanelProps> = ({
+  isOpen,
+  onClose,
+  firmName,
+  firmNit
+}) => {
   const [summary, setSummary] = React.useState<BillingSummary | null>(null);
   // Read from the server rather than written here, so the figure on screen and
   // the rule that enforces it can never say two different things.
@@ -43,6 +65,7 @@ export const BalancePanel: React.FC<BalancePanelProps> = ({ isOpen, onClose, fir
   const [cargando, setCargando] = React.useState(false);
   const [error, setError] = React.useState('');
   const [monto, setMonto] = React.useState('');
+  const [otroAbierto, setOtroAbierto] = React.useState(false);
   const [abriendo, setAbriendo] = React.useState(false);
 
   const cargar = React.useCallback(async () => {
@@ -117,116 +140,154 @@ export const BalancePanel: React.FC<BalancePanelProps> = ({ isOpen, onClose, fir
     }
   };
 
+  /** La tabla tal como se ve, con BOM para que Excel lea los acentos. */
+  const exportarCsv = () => {
+    const cabecera = ['Fecha', 'Concepto', 'Usuario', 'Valor', 'Saldo'];
+    const filas = movements.map((m) =>
+      [csv(fecha(m.createdAt)), csv(m.description), csv(m.actorEmail), csv(m.amountCop), csv(m.balanceAfterCop)].join(',')
+    );
+    const blob = new Blob(['﻿' + [cabecera.map(csv).join(','), ...filas].join('\r\n')], {
+      type: 'text/csv;charset=utf-8'
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `movimientos-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   React.useEffect(() => {
     if (isOpen) void cargar();
   }, [isOpen, cargar]);
 
-  if (!isOpen) return null;
+  const valorElegido = Number(monto);
+  const mes = summary?.mes;
 
   return (
-    <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl">
-        <header className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-          <div className="flex items-center gap-2">
-            <CreditCard className="w-4 h-4 text-blue-900" />
-            <div>
-              <h3 className="text-xs font-bold text-slate-900">Saldo de {firmName}</h3>
-              <p className="text-[11px] text-slate-500">Consumo de inteligencia artificial</p>
-            </div>
-          </div>
+    <Dialog
+      abierto={isOpen}
+      onCerrar={onClose}
+      tamano="L"
+      titulo="Saldo"
+      subtitulo={
+        <>
+          Cuenta de la firma · {firmName}
+          {firmNit && <span className="font-mono"> · {firmNit}</span>}
+        </>
+      }
+      cuerpoEnCanvas
+      pieIzquierda={
+        /*
+         * LA REGLA REAL, donde el usuario la puede verificar: el cobro se
+         * reserva al iniciar el escrito, así que la generación nunca se corta
+         * a mitad de uno. Sin umbral de aviso — ese sistema no existe aún.
+         */
+        <span>
+          Sin saldo suficiente, un escrito no inicia — pero ninguno se corta a mitad.
+        </span>
+      }
+      acciones={
+        <button onClick={() => void cargar()} className="btn-neutral btn-sm" disabled={cargando}>
+          <RefreshCw className={`h-3.5 w-3.5 ${cargando ? 'animate-spin' : ''}`} />
+          Actualizar
+        </button>
+      }
+    >
+      <div className="space-y-4">
+        {error && <p className="notice-unverified">{error}</p>}
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => void cargar()}
-              className="text-slate-400 hover:text-slate-700"
-              title="Actualizar"
-            >
-              <RefreshCw className={`w-4 h-4 ${cargando ? 'animate-spin' : ''}`} />
-            </button>
-            <button onClick={onClose} className="text-slate-400 hover:text-slate-700">
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        </header>
-
-        <div className="p-5 space-y-4 overflow-y-auto">
-          {error && (
-            <p className="text-[11px] text-rose-800 bg-rose-50 border border-rose-200 rounded-lg p-2">
-              {error}
-            </p>
-          )}
-
-          {summary && (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3">
-                <p className="text-[10px] font-semibold text-emerald-800 uppercase tracking-wide">
-                  Saldo disponible
-                </p>
-                <p className="text-lg font-black text-emerald-900">{pesos(summary.balance)}</p>
-              </div>
-
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-3">
-                <p className="text-[10px] font-semibold text-slate-600 uppercase tracking-wide">
-                  Consumido
-                </p>
-                <p className="text-lg font-black text-slate-900">{pesos(summary.spentCop)}</p>
-              </div>
-
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-3">
-                <p className="text-[10px] font-semibold text-slate-600 uppercase tracking-wide">
-                  Operaciones
-                </p>
-                <p className="text-lg font-black text-slate-900">{summary.operations}</p>
-              </div>
-            </div>
-          )}
-
-          {/*
-            How credit is actually added, said plainly.
-
-            A firm with no balance needs to know what to do next, and the honest
-            answer today is "ask us" — the operator credits the account once the
-            payment is confirmed. That is smaller than a checkout, and unlike the
-            modal it replaces, it is true.
-
-            The minimum is stated HERE, before the firm picks an amount, and not
-            as a rejection after it has already decided. A rule a client meets
-            by being told costs nothing; the same rule delivered as an error is
-            a wasted trip for both sides.
-          */}
-          <div className="bg-blue-50/60 border border-blue-200 rounded-xl p-3">
-            <p className="text-[11px] font-bold text-blue-950 mb-1">¿Cómo recargo?</p>
-            <p className="text-[11px] text-blue-900">
-              Escríbenos con el monto que quieres recargar. Confirmamos el pago y acreditamos el
-              saldo el mismo día; el movimiento queda registrado abajo con la fecha y quién lo
-              aplicó.
-            </p>
-            {minRecharge > 0 && (
-              <p className="text-[11px] text-blue-900 mt-1.5">
-                Recarga mínima: <strong>{pesos(minRecharge)}</strong>. El saldo se descuenta
-                únicamente por lo que uses, operación por operación.
+        {/* ─── LAS TRES CIFRAS ────────────────────────────────────────────── */}
+        {summary && (
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+            <div className="rounded-card border border-line-200 bg-surface p-3.5">
+              <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
+                Saldo disponible
               </p>
+              <p className="mt-1 font-mono text-[22px] font-semibold text-ink-900">
+                {pesos(summary.balance)}
+              </p>
+              {mes && (
+                <p className="mt-0.5 text-meta text-ink-500">
+                  ≈ {mes.escritosRestantes.toLocaleString('es-CO')} escritos{' '}
+                  {mes.costoMedioEsReal ? 'al consumo de este mes' : 'al precio base'}
+                </p>
+              )}
+            </div>
+
+            <div className="rounded-card border border-line-200 bg-surface p-3.5">
+              <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
+                Consumo de {MES_ACTUAL}
+              </p>
+              <p className="mt-1 font-mono text-[22px] font-semibold text-ink-900">
+                {mes ? pesos(mes.cobradoCop) : '—'}
+              </p>
+              {mes && (
+                <p className="mt-0.5 text-meta text-ink-500">
+                  {mes.escritos} {mes.escritos === 1 ? 'escrito' : 'escritos'} ·{' '}
+                  {mes.transcripciones}{' '}
+                  {mes.transcripciones === 1 ? 'transcripción' : 'transcripciones'}
+                </p>
+              )}
+            </div>
+
+            <div className="rounded-card border border-line-200 bg-surface p-3.5">
+              <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
+                Costo medio por escrito
+              </p>
+              <p className="mt-1 font-mono text-[22px] font-semibold text-ink-900">
+                {mes ? pesos(mes.costoMedioEscritoCop) : '—'}
+              </p>
+              <p className="mt-0.5 text-meta text-ink-500">3 modelos, según extensión</p>
+            </div>
+          </div>
+        )}
+
+        {/* ─── RECARGAR ───────────────────────────────────────────────────── */}
+        <div className="rounded-card border border-line-200 bg-surface p-4">
+          <div className="flex items-baseline justify-between gap-2">
+            <h4 className="text-ui font-semibold text-ink-900">Recargar</h4>
+            {minRecharge > 0 && (
+              <span className="text-meta text-ink-500">
+                Mínimo {pesos(minRecharge)}. Sin vencimiento.
+              </span>
             )}
           </div>
 
-          {/*
-            The recharge, for real this time.
+          <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+            {PRESETS.map((p) => (
+              <button
+                key={p}
+                onClick={() => {
+                  setMonto(String(p));
+                  setOtroAbierto(false);
+                }}
+                className={`rounded-control border px-3 py-1.5 font-mono text-[12.5px] font-medium transition-colors ${
+                  valorElegido === p && !otroAbierto
+                    ? 'border-brand-700 bg-brand-50 text-brand-700'
+                    : 'border-line-200 bg-canvas text-ink-700 hover:border-brand-700'
+                }`}
+              >
+                {pesos(p)}
+              </button>
+            ))}
+            <button
+              onClick={() => {
+                setOtroAbierto(true);
+                setMonto('');
+              }}
+              className={`rounded-control border px-3 py-1.5 text-[12.5px] font-medium ${
+                otroAbierto
+                  ? 'border-brand-700 bg-brand-50 text-brand-700'
+                  : 'border-line-200 bg-canvas text-ink-700 hover:border-brand-700'
+              }`}
+            >
+              Otro valor
+            </button>
 
-            What stood here before was a setTimeout that announced a receipt for
-            money nobody had paid. This sends the amount to the server, which
-            writes down what it promises to credit BEFORE the client pays and
-            signs it, and then hands the browser a checkout it cannot alter.
-            Nothing is credited here — the balance moves when Wompi says the
-            card went through, and only then.
-          */}
-          <div className="border border-slate-200 rounded-xl p-3">
-            <label className="block text-[11px] font-bold text-slate-900 mb-1.5">
-              Recargar saldo
-            </label>
-
-            <div className="flex items-center gap-2">
-              <div className="relative flex-1">
-                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] text-slate-400">
+            {otroAbierto && (
+              <div className="relative">
+                <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-[12px] text-ink-400">
                   $
                 </span>
                 <input
@@ -237,74 +298,102 @@ export const BalancePanel: React.FC<BalancePanelProps> = ({ isOpen, onClose, fir
                      different number once parsed, and the amount is money. */
                   onChange={(e) => setMonto(e.target.value.replace(/[^\d]/g, ''))}
                   placeholder={String(minRecharge || 100000)}
-                  className="w-full pl-6 pr-2 py-1.5 text-[11px] border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-900"
+                  autoFocus
+                  className="field w-[140px] pl-6 font-mono"
                 />
               </div>
-
-              <button
-                onClick={() => void recargar()}
-                disabled={abriendo || Number(monto) < minRecharge}
-                className="px-3 py-1.5 bg-blue-950 text-white text-[11px] font-bold rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:bg-blue-900 shrink-0"
-              >
-                {abriendo ? 'Abriendo…' : 'Pagar'}
-              </button>
-            </div>
-
-            {/* Says why the button is disabled, instead of leaving it dead. */}
-            {monto !== '' && Number(monto) < minRecharge && (
-              <p className="text-[10px] text-slate-500 mt-1">
-                El mínimo es {pesos(minRecharge)}.
-              </p>
             )}
+
+            <button
+              onClick={() => void recargar()}
+              disabled={abriendo || valorElegido < minRecharge}
+              className="btn-primary btn-sm ml-auto"
+            >
+              {abriendo
+                ? 'Abriendo…'
+                : valorElegido >= minRecharge
+                ? `Pagar ${pesos(valorElegido)}`
+                : 'Pagar'}
+            </button>
           </div>
 
-          <div>
-            <h4 className="text-[11px] font-bold text-slate-900 mb-2">Movimientos</h4>
+          {/* Says why the button is disabled, instead of leaving it dead. */}
+          {monto !== '' && valorElegido < minRecharge && (
+            <p className="mt-1.5 text-meta text-ink-500">El mínimo es {pesos(minRecharge)}.</p>
+          )}
 
-            {movements.length === 0 ? (
-              <p className="text-[11px] text-slate-500">
-                Todavía no hay movimientos. Aparecerán aquí las recargas y cada operación que
-                consuma saldo.
-              </p>
-            ) : (
-              <div className="border border-slate-200 rounded-xl divide-y divide-slate-100">
-                {movements.map((mov, i) => {
-                  const entra = mov.amountCop > 0;
+          <p className="mt-2 text-meta text-ink-400">
+            El pago se hace en la pasarela de Wompi — PSE, tarjeta o los medios que ofrezca. El
+            saldo se acredita cuando la pasarela confirma el pago, y el movimiento queda abajo.
+          </p>
+        </div>
 
-                  return (
-                    <div key={`${mov.createdAt}-${i}`} className="flex items-center gap-3 px-3 py-2">
-                      {entra ? (
-                        <ArrowUpRight className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                      ) : (
-                        <ArrowDownRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                      )}
+        {/* ─── MOVIMIENTOS · Fecha Concepto Usuario Valor Saldo ──────────── */}
+        <div className="overflow-hidden rounded-card border border-line-200 bg-surface">
+          <div className="flex items-center justify-between border-b border-line-100 px-4 py-2.5">
+            <h4 className="text-ui font-semibold text-ink-900">Movimientos</h4>
+            <button
+              onClick={exportarCsv}
+              className="btn-neutral btn-sm"
+              disabled={movements.length === 0}
+            >
+              <Download className="h-3.5 w-3.5" />
+              Descargar CSV
+            </button>
+          </div>
 
-                      <div className="min-w-0 flex-1">
-                        <p className="text-[11px] text-slate-800 truncate">{mov.description}</p>
-                        <p className="text-[10px] text-slate-400">
-                          {fecha(mov.createdAt)} · {mov.actorEmail}
-                        </p>
-                      </div>
-
-                      <div className="text-right shrink-0">
-                        <p
-                          className={`text-[11px] font-bold ${entra ? 'text-emerald-700' : 'text-slate-700'}`}
-                        >
-                          {entra ? '+' : ''}
-                          {pesos(mov.amountCop)}
-                        </p>
-                        <p className="text-[10px] text-slate-400 font-mono">
-                          {pesos(mov.balanceAfterCop)}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
+          {movements.length === 0 ? (
+            <p className="px-4 py-6 text-center text-meta text-ink-500">
+              Todavía no hay movimientos. Aparecerán aquí las recargas y cada operación que
+              consuma saldo.
+            </p>
+          ) : (
+            <>
+              <div className="t-head hidden items-center gap-3 md:flex">
+                <span className="w-[52px] shrink-0">Fecha</span>
+                <span className="min-w-0 flex-1">Concepto</span>
+                <span className="w-[120px] shrink-0">Usuario</span>
+                <span className="w-[90px] shrink-0 text-right">Valor</span>
+                <span className="w-[90px] shrink-0 text-right">Saldo</span>
               </div>
-            )}
-          </div>
+
+              {movements.map((mov, i) => {
+                const entra = mov.amountCop > 0;
+                return (
+                  <div key={`${mov.createdAt}-${i}`} className="t-row flex items-center gap-3">
+                    <span className="w-[52px] shrink-0 font-mono text-[11px] text-ink-500">
+                      {fecha(mov.createdAt)}
+                    </span>
+                    <span className="flex min-w-0 flex-1 items-center gap-1.5">
+                      {entra ? (
+                        <ArrowUpRight className="h-3 w-3 shrink-0 text-verified" />
+                      ) : (
+                        <ArrowDownRight className="h-3 w-3 shrink-0 text-ink-400" />
+                      )}
+                      <span className="truncate text-ui text-ink-900">{mov.description}</span>
+                    </span>
+                    <span className="hidden w-[120px] shrink-0 truncate text-meta text-ink-500 md:block">
+                      {mov.actorEmail.split('@')[0]}
+                    </span>
+                    {/* En mono: es plata, y la plata se coteja dígito a dígito. */}
+                    <span
+                      className={`w-[90px] shrink-0 text-right font-mono text-[12px] font-medium ${
+                        entra ? 'text-verified' : 'text-ink-900'
+                      }`}
+                    >
+                      {entra ? '+' : ''}
+                      {pesos(mov.amountCop)}
+                    </span>
+                    <span className="w-[90px] shrink-0 text-right font-mono text-[11px] text-ink-400">
+                      {pesos(mov.balanceAfterCop)}
+                    </span>
+                  </div>
+                );
+              })}
+            </>
+          )}
         </div>
       </div>
-    </div>
+    </Dialog>
   );
 };

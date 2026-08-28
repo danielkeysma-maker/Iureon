@@ -46,6 +46,14 @@ export interface Subprocessor {
   retiene: boolean;
   /** How long, when we control it. */
   retencion: string;
+  /**
+   * Con que base sale el dato del pais. Es la cuarta pregunta que hace un
+   * abogado (que recibe, donde, con que base, cuanto se conserva), y la unica
+   * que exige la Ley 1581 para una transferencia internacional. Se declara el
+   * MECANISMO (el acuerdo de tratamiento del proveedor), no una tesis juridica:
+   * calificar la licitud de la transferencia es trabajo del abogado, no nuestro.
+   */
+  baseDeTransferencia: string;
   /** Whose contract they sit under: ours directly, or behind another. */
   atravesDe: string | null;
   sitio: string;
@@ -83,6 +91,7 @@ export const subprocessors = (): Subprocessor[] => {
         'Base de datos de la aplicación: la firma, sus usuarios, los clientes, los borradores, los transcritos y el saldo.',
       datos: ['IDENTIFICACION', 'CONTENIDO_DEL_CASO', 'TRANSCRITO', 'METADATOS_DE_USO'],
       ubicacion: 'Estados Unidos',
+      baseDeTransferencia: 'Acuerdo de tratamiento de datos (DPA) del proveedor · transferencia internacional, Ley 1581 art. 26',
       retiene: true,
       retencion: 'Mientras la firma mantenga su cuenta. Al borrar un registro se borra de la base.',
       atravesDe: null,
@@ -97,6 +106,7 @@ export const subprocessors = (): Subprocessor[] => {
         'Almacenamiento temporal del audio de una audiencia mientras el proveedor de transcripción lo lee.',
       datos: ['AUDIO_DE_AUDIENCIA'],
       ubicacion: 'Estados Unidos',
+      baseDeTransferencia: 'Acuerdo de tratamiento de datos (DPA) del proveedor · transferencia internacional, Ley 1581 art. 26',
       retiene: false,
       retencion:
         'Minutos. El servidor borra el archivo ANTES de responder la petición, no después: una función serverless se congela al responder y lo que quede detrás no se ejecuta.',
@@ -112,6 +122,7 @@ export const subprocessors = (): Subprocessor[] => {
         'Transcripción del audio con separación de interlocutores. Recibe una URL firmada y temporal del archivo, no el archivo por nuestra API.',
       datos: ['AUDIO_DE_AUDIENCIA'],
       ubicacion: 'Estados Unidos',
+      baseDeTransferencia: 'Acuerdo de tratamiento de datos (DPA) del proveedor · transferencia internacional, Ley 1581 art. 26',
       retiene: false,
       retencion: 'No conservamos copia del audio. La política de retención del proveedor es la suya.',
       atravesDe: null,
@@ -126,6 +137,7 @@ export const subprocessors = (): Subprocessor[] => {
         'Convierte en vectores el texto de una búsqueda para poder recuperar jurisprudencia. Recibe la consulta, no el expediente.',
       datos: ['CONTENIDO_DEL_CASO'],
       ubicacion: 'Red global',
+      baseDeTransferencia: 'Acuerdo de tratamiento de datos (DPA) del proveedor · transferencia internacional, Ley 1581 art. 26',
       retiene: false,
       retencion: 'No almacena el texto; devuelve el vector y termina.',
       atravesDe: null,
@@ -139,6 +151,7 @@ export const subprocessors = (): Subprocessor[] => {
       proposito: 'Proveedor alternativo de vectores para la búsqueda, cuando está seleccionado.',
       datos: ['CONTENIDO_DEL_CASO'],
       ubicacion: 'Estados Unidos',
+      baseDeTransferencia: 'Acuerdo de tratamiento de datos (DPA) del proveedor · transferencia internacional, Ley 1581 art. 26',
       retiene: false,
       retencion: 'No almacena el texto para entrenar, según su política para API.',
       atravesDe: null,
@@ -152,6 +165,7 @@ export const subprocessors = (): Subprocessor[] => {
       'Encamina la redacción hacia los modelos de lenguaje. Recibe los hechos del caso que el abogado escribe.',
     datos: ['CONTENIDO_DEL_CASO'],
     ubicacion: 'Estados Unidos',
+    baseDeTransferencia: 'Acuerdo de tratamiento de datos (DPA) del proveedor · transferencia internacional, Ley 1581 art. 26',
     retiene: false,
     retencion: 'Enruta la petición; no la conserva para entrenamiento.',
     atravesDe: null,
@@ -166,6 +180,7 @@ export const subprocessors = (): Subprocessor[] => {
       proposito: `Redacta o analiza el escrito con el modelo ${modelo}.`,
       datos: ['CONTENIDO_DEL_CASO'],
       ubicacion: 'Estados Unidos',
+      baseDeTransferencia: 'Acuerdo de tratamiento de datos (DPA) del proveedor · transferencia internacional, Ley 1581 art. 26',
       retiene: false,
       retencion: 'Según la política del proveedor para peticiones de API.',
       atravesDe: 'OpenRouter, Inc.',
@@ -180,6 +195,7 @@ export const subprocessors = (): Subprocessor[] => {
         'Procesa la recarga de saldo. Los datos de la tarjeta se digitan en su sitio y nunca pasan por Iureon.',
       datos: ['IDENTIFICACION', 'DATOS_DE_PAGO'],
       ubicacion: 'Colombia',
+      baseDeTransferencia: 'Sin transferencia internacional: se procesa en Colombia',
       retiene: true,
       retencion: 'La que exija la regulación financiera colombiana.',
       atravesDe: null,
@@ -192,6 +208,7 @@ export const subprocessors = (): Subprocessor[] => {
     proposito: 'Aloja la aplicación y su API. Toda petición pasa por su infraestructura.',
     datos: ['IDENTIFICACION', 'CONTENIDO_DEL_CASO', 'METADATOS_DE_USO'],
     ubicacion: 'Estados Unidos',
+    baseDeTransferencia: 'Acuerdo de tratamiento de datos (DPA) del proveedor · transferencia internacional, Ley 1581 art. 26',
     retiene: false,
     retencion: 'Registros de acceso según su política.',
     atravesDe: null,

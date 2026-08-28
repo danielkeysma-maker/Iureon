@@ -417,6 +417,17 @@ export interface UsageSummary {
   /** What that work cost the platform upstream, in dollars. */
   costUsd: number;
   operations: number;
+  /** El mes en curso, para traducir el saldo a trabajo restante. */
+  mes: {
+    escritos: number;
+    transcripciones: number;
+    orientaciones: number;
+    cobradoCop: number;
+    costoMedioEscritoCop: number;
+    /** false cuando el mes no tiene escritos y el promedio es el piso de tarifa. */
+    costoMedioEsReal: boolean;
+    escritosRestantes: number;
+  };
 }
 
 /** What a firm has consumed, for its own screen. */
@@ -449,13 +460,65 @@ export const usageSummary = async (firmId: string): Promise<UsageSummary> => {
   const filasConsumo = (consumo ?? []) as { cost_usd: number }[];
   const filasCobro = (cobros ?? []) as { amount_cop: number }[];
 
+  /*
+   * ─── LAS CIFRAS DEL MES, PARA TRADUCIR EL SALDO A TRABAJO ──────────────────
+   *
+   * "$412.500" no dice si alcanza para el término de mañana; "≈121 escritos" sí.
+   * La traducción exige el costo medio REAL de un escrito de esta firma, y ese
+   * dato sale de ai_usage (que tiene la operación tipada) y no de
+   * credit_movements (que tiene la plata autoritativa pero sin tipo).
+   *
+   * Cuando el mes no tiene escritos todavía, el costo medio cae al PISO de
+   * tarifa — y el que consume esta cifra debe decir "al precio base", porque un
+   * promedio de cero escritos no es un promedio.
+   */
+  const inicioDeMes = new Date();
+  inicioDeMes.setDate(1);
+  inicioDeMes.setHours(0, 0, 0, 0);
+
+  const { data: usoDelMes } = await db
+    .from('ai_usage')
+    .select('operation, operation_id, charged_cop')
+    .eq('firm_id', firmId)
+    .gte('created_at', inicioDeMes.toISOString());
+
+  const filasMes = (usoDelMes ?? []) as {
+    operation: string;
+    operation_id: string;
+    charged_cop: number;
+  }[];
+
+  // Un borrador llama a tres modelos: se cuenta por operation_id, no por fila.
+  const contar = (op: string): number =>
+    new Set(filasMes.filter((f) => f.operation === op).map((f) => f.operation_id)).size;
+
+  const escritosDelMes = contar('BORRADOR');
+  const cobradoEscritosMes = filasMes
+    .filter((f) => f.operation === 'BORRADOR')
+    .reduce((t, f) => t + Number(f.charged_cop ?? 0), 0);
+
+  const costoMedioEscrito =
+    escritosDelMes > 0 ? Math.round(cobradoEscritosMes / escritosDelMes) : PRICE_COP.BORRADOR;
+
+  const balance = await balanceOf(firmId);
+
   return {
-    balance: await balanceOf(firmId),
+    balance,
     // Charges are stored negative, because that is the direction they move the
     // balance; the summary states them as an amount spent.
     spentCop: filasCobro.reduce((total, f) => total + Math.abs(Number(f.amount_cop ?? 0)), 0),
     costUsd: filasConsumo.reduce((total, f) => total + Number(f.cost_usd ?? 0), 0),
-    operations: filasCobro.length
+    operations: filasCobro.length,
+    mes: {
+      escritos: escritosDelMes,
+      transcripciones: contar('TRANSCRIPCION'),
+      orientaciones: contar('ORIENTACION'),
+      cobradoCop: filasMes.reduce((t, f) => t + Number(f.charged_cop ?? 0), 0),
+      costoMedioEscritoCop: costoMedioEscrito,
+      // true = el promedio es de escritos reales del mes; false = es el piso.
+      costoMedioEsReal: escritosDelMes > 0,
+      escritosRestantes: costoMedioEscrito > 0 ? Math.floor(balance / costoMedioEscrito) : 0
+    }
   };
 };
 

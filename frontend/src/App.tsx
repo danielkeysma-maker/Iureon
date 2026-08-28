@@ -385,6 +385,7 @@ export function App() {
       <BalancePanel
         isOpen={isRechargeModalOpen}
         onClose={() => setIsRechargeModalOpen(false)}
+        firmNit={activeFirm.nit}
         firmName={activeFirm.name}
       />
 

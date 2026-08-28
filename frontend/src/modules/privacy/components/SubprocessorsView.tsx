@@ -1,26 +1,34 @@
 import React from 'react';
-import { AlertTriangle, ExternalLink, ShieldCheck, Server, RefreshCw } from 'lucide-react';
+import { ExternalLink, RefreshCw, Server } from 'lucide-react';
 import { privacyApi, type Disclosure, type Subprocessor, type DataClass } from '../privacy.api';
 
 /**
- * Who processes this firm's data, named.
+ * Privacidad y seguridad. La pantalla que se proyecta ante un cliente.
  *
- * WHY A SCREEN AND NOT A CLAUSE IN THE TERMS. Under Ley 1581 de 2012 the firm
- * is the *responsable* of its clients' data and Iureon its *encargado*, so
- * every provider below is a SUBENCARGADO OF THE FIRM — not a supplier of ours
- * in relation to that data. A lawyer whose client asks "who else has seen my
- * contract" cannot answer "a technology provider", and their files are covered
- * by professional secrecy.
+ * ─── POR QUÉ EL ENCABEZADO ES OSCURO ────────────────────────────────────────
  *
- * THE LIST IS DERIVED, WHICH IS THE WHOLE POINT. It is generated from the same
- * configuration flags the runtime reads, so it cannot drift: a provider that is
- * switched off stops appearing, and one that is switched on appears without
- * anyone remembering to add it. A register maintained by hand is worse than
- * none — it reads as diligence while describing a system that no longer exists.
+ * Es la única pantalla de la aplicación pensada para mostrarse en una reunión
+ * de ventas o leerse frente al cliente de la firma: tiene que leerse como
+ * documento institucional, no como una página de ajustes. El azul de la barra
+ * lateral es la identidad; aquí se usa una sola vez más, a propósito.
  *
- * It also names the layer a generic notice omits: OpenRouter is a router, so
- * the case facts reach the model vendors behind it. Naming only the router
- * would be literally true and leave the firm unable to answer the question.
+ * ─── LA JERARQUÍA LA FIJA LA SENSIBILIDAD DEL DATO ──────────────────────────
+ *
+ * Los subencargados que tocan CONTENIDO DEL CASO —lo que cubre el secreto
+ * profesional— van como fichas amplias que responden las cuatro preguntas de
+ * un abogado en orden fijo: qué recibe, dónde se procesa, con qué base sale
+ * del país, cuánto se conserva. Los de infraestructura van en tabla densa.
+ * No es orden alfabético ni de contrato: es el orden del riesgo.
+ *
+ * ─── LO QUE EL ARTBOARD PIDE Y AQUÍ NO ESTÁ, con la razón ──────────────────
+ *
+ * · «Certificado en PDF» y «avisarme de cambios»: no hay generación de
+ *   certificados ni sistema de avisos. Prometerlos sería decorar.
+ * · El panel «¿quién ha visto el contrato de mi cliente?» por documento: exige
+ *   un registro de envíos por documento que no existe todavía. Es la pieza más
+ *   valiosa del artboard y merece su propio backend, no una imitación.
+ * · «0 cambios en 90 días»: no hay historial del registro. La lista es
+ *   derivada de la configuración viva — eso sí se dice, porque es verdad.
  */
 
 const ETIQUETA_DATOS: Record<DataClass, string> = {
@@ -36,11 +44,15 @@ const ETIQUETA_DATOS: Record<DataClass, string> = {
 const esSensible = (dato: DataClass): boolean =>
   dato === 'CONTENIDO_DEL_CASO' || dato === 'AUDIO_DE_AUDIENCIA' || dato === 'TRANSCRITO';
 
+const tocaElCaso = (s: Subprocessor): boolean => s.datos.some(esSensible);
+
 export const SubprocessorsView: React.FC = () => {
   const [disclosure, setDisclosure] = React.useState<Disclosure | null>(null);
   const [lista, setLista] = React.useState<Subprocessor[]>([]);
   const [cargando, setCargando] = React.useState(true);
   const [error, setError] = React.useState('');
+  /* La hora de la lectura: es lo que respalda el sello «derivado del sistema». */
+  const [leidoEl, setLeidoEl] = React.useState<Date | null>(null);
 
   const cargar = React.useCallback(async () => {
     setCargando(true);
@@ -50,6 +62,7 @@ export const SubprocessorsView: React.FC = () => {
       const { disclosure: d, subprocessors: s } = await privacyApi.subprocessors();
       setDisclosure(d);
       setLista(s);
+      setLeidoEl(new Date());
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo cargar el registro.');
     } finally {
@@ -61,185 +74,242 @@ export const SubprocessorsView: React.FC = () => {
     void cargar();
   }, [cargar]);
 
-  const directos = lista.filter((s) => !s.atravesDe);
-  const indirectos = lista.filter((s) => s.atravesDe);
+  const sensibles = lista.filter(tocaElCaso);
+  const infraestructura = lista.filter((s) => !tocaElCaso(s));
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 bg-slate-100">
-      <div className="max-w-4xl mx-auto space-y-4 font-sans">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-blue-950 flex items-center justify-center shrink-0">
-            <ShieldCheck className="w-5 h-5 text-blue-200" />
-          </div>
+    <div className="flex h-full min-h-0 flex-1 flex-col bg-canvas font-sans">
+      {/* ─── ENCABEZADO INSTITUCIONAL ──────────────────────────────────────── */}
+      <header className="shrink-0 bg-nav px-6 py-5">
+        <div className="mx-auto flex max-w-4xl flex-wrap items-end gap-3">
           <div className="min-w-0 flex-1">
-            <h2 className="text-lg font-black text-slate-900 tracking-tight">
-              Quién procesa los datos de tu firma
-            </h2>
-            <p className="text-[11px] text-slate-500">
-              Registro de subencargados, generado desde la configuración que está corriendo.
+            <h1 className="text-title text-white">Privacidad y seguridad</h1>
+            <p className="mt-1 text-ui leading-[1.5] text-nav-ink">
+              Quién más puede haber visto el contrato de su cliente.
+            </p>
+            {disclosure && (
+              <p className="mt-2 max-w-2xl text-meta leading-[1.6] text-nav-muted">
+                Su firma es la <span className="font-medium text-nav-ink">responsable</span> del
+                tratamiento; Iureon es su{' '}
+                <span className="font-medium text-nav-ink">encargado</span>. Cada proveedor de esta
+                lista es, por tanto, un subencargado de su firma. {disclosure.marcoLegal}.
+              </p>
+            )}
+          </div>
+
+          <div className="shrink-0 text-right">
+            {/*
+              EL SELLO. La lista se genera desde la configuración que está
+              corriendo — nadie la mantiene a mano — y la hora es la de ESTA
+              lectura, no una promesa de comprobación programada que no existe.
+            */}
+            <span className="inline-block rounded-control border border-nav-line px-2.5 py-1 font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-nav-ink">
+              Derivado del sistema
+            </span>
+            {leidoEl && (
+              <p className="mt-1 font-mono text-[10.5px] text-nav-muted">
+                Leído de la configuración{' '}
+                {leidoEl.toLocaleString('es-CO', {
+                  day: 'numeric',
+                  month: 'short',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </p>
+            )}
+            <p className="mt-0.5 font-mono text-[10.5px] text-nav-muted">
+              {lista.length} subencargados activos
             </p>
           </div>
-          <button
-            onClick={() => void cargar()}
-            className="text-slate-400 hover:text-slate-700 shrink-0"
-            title="Actualizar"
-          >
-            <RefreshCw className={`w-4 h-4 ${cargando ? 'animate-spin' : ''}`} />
-          </button>
         </div>
+      </header>
 
-        {error && (
-          <div className="bg-rose-50 border border-rose-200 rounded-xl p-3 flex items-start gap-2">
-            <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-            <p className="text-[11px] text-rose-900">{error}</p>
-          </div>
-        )}
+      <div className="min-h-0 flex-1 overflow-y-auto p-5">
+        <div className="mx-auto max-w-4xl space-y-4">
+          {error && <p className="notice-unverified">{error}</p>}
 
-        {disclosure && (
-          <>
-            {/*
-              La posición de cada quien, primero.
+          {cargando && lista.length === 0 && (
+            <p className="text-meta text-ink-500">Leyendo la configuración…</p>
+          )}
 
-              No es preámbulo: una firma que le responde a su cliente, o que
-              radica ante la SIC, necesita saber que la RESPONSABLE es ella y no
-              nosotros. Es lo que la mayoría supone al revés.
-            */}
-            <section className="bg-white border border-slate-200 rounded-xl overflow-hidden">
-              <header className="px-4 py-2.5 border-b border-slate-100 bg-slate-50/60">
-                <h3 className="text-xs font-bold text-slate-900">
-                  Tu posición jurídica · {disclosure.marcoLegal}
+          {/* ─── POSICIÓN JURÍDICA ───────────────────────────────────────── */}
+          {disclosure && (
+            <section className="overflow-hidden rounded-card border border-line-200 bg-surface">
+              <header className="border-b border-line-100 bg-canvas px-4 py-2.5">
+                <h3 className="text-ui font-semibold text-ink-900">
+                  Su posición jurídica · {disclosure.marcoLegal}
                 </h3>
               </header>
-              <div className="p-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                  <p className="text-[10px] font-bold text-blue-950 uppercase tracking-wide">Tu firma</p>
-                  <p className="text-[11px] text-slate-700 mt-0.5">{disclosure.posicionDeLaFirma}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] font-bold text-blue-950 uppercase tracking-wide">Iureon</p>
-                  <p className="text-[11px] text-slate-700 mt-0.5">{disclosure.posicionDeIureon}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] font-bold text-blue-950 uppercase tracking-wide">
-                    Los de abajo
-                  </p>
-                  <p className="text-[11px] text-slate-700 mt-0.5">
-                    {disclosure.posicionDeEstosTerceros}
-                  </p>
-                </div>
+              <div className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-3">
+                {(
+                  [
+                    ['Su firma', disclosure.posicionDeLaFirma],
+                    ['Iureon', disclosure.posicionDeIureon],
+                    ['Estos terceros', disclosure.posicionDeEstosTerceros]
+                  ] as const
+                ).map(([titulo, texto]) => (
+                  <div key={titulo}>
+                    <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
+                      {titulo}
+                    </p>
+                    <p className="mt-1 text-ui leading-[1.55] text-ink-700">{texto}</p>
+                  </div>
+                ))}
               </div>
             </section>
+          )}
 
-            <section className="bg-emerald-50/60 border border-emerald-200 rounded-xl p-4">
-              <h3 className="text-xs font-bold text-emerald-950 mb-2">Lo que NO se hace</h3>
-              <ul className="space-y-1.5">
+          {/* ─── LOS QUE TOCAN EL CASO · fichas amplias ──────────────────── */}
+          {sensibles.length > 0 && (
+            <section>
+              <h3 className="t-head rounded-t-card border border-b-0 border-line-200">
+                Tocan contenido del caso · {sensibles.length} — lo que cubre el secreto profesional
+              </h3>
+              <div className="divide-y divide-line-100 rounded-b-card border border-line-200 bg-surface">
+                {sensibles.map((s, i) => (
+                  <div key={`${s.nombre}-${i}`} className="p-4">
+                    <div className="mb-2 flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <h4 className="text-ui font-semibold text-ink-900">{s.nombre}</h4>
+                        <p className="text-meta text-ink-500">
+                          {s.proposito}
+                          {s.atravesDe && (
+                            <span className="text-ink-400"> · a través de {s.atravesDe}</span>
+                          )}
+                        </p>
+                      </div>
+                      <a
+                        href={s.sitio}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex shrink-0 items-center gap-1 text-meta text-brand-700 hover:underline"
+                      >
+                        Su política <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </div>
+
+                    {/*
+                      LAS CUATRO PREGUNTAS DE UN ABOGADO, en su orden fijo.
+                      Qué recibe · dónde · con qué base sale del país · cuánto
+                      se conserva. Cada ficha responde las cuatro, siempre.
+                    */}
+                    <dl className="grid grid-cols-1 gap-x-5 gap-y-1.5 sm:grid-cols-2">
+                      <div>
+                        <dt className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
+                          Qué recibe
+                        </dt>
+                        <dd className="mt-0.5 flex flex-wrap gap-1">
+                          {s.datos.map((d) => (
+                            <span
+                              key={d}
+                              className={esSensible(d) ? 'chip-unverified' : 'chip-neutral'}
+                            >
+                              {ETIQUETA_DATOS[d]}
+                            </span>
+                          ))}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
+                          Dónde se procesa
+                        </dt>
+                        <dd className="mt-0.5 text-ui text-ink-900">{s.ubicacion}</dd>
+                      </div>
+                      <div>
+                        <dt className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
+                          Base de transferencia
+                        </dt>
+                        <dd className="mt-0.5 text-ui leading-[1.5] text-ink-700">
+                          {s.baseDeTransferencia}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
+                          {s.retiene ? 'Cuánto conserva' : 'No conserva'}
+                        </dt>
+                        <dd className="mt-0.5 text-ui leading-[1.5] text-ink-700">{s.retencion}</dd>
+                      </div>
+                    </dl>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* ─── INFRAESTRUCTURA · tabla densa ───────────────────────────── */}
+          {infraestructura.length > 0 && (
+            <section className="overflow-hidden rounded-card border border-line-200 bg-surface">
+              <header className="flex items-center gap-2 border-b border-line-100 bg-canvas px-4 py-2.5">
+                <Server className="h-3.5 w-3.5 shrink-0 text-ink-400" />
+                <h3 className="text-ui font-semibold text-ink-900">
+                  Infraestructura · {infraestructura.length}
+                </h3>
+              </header>
+
+              <div className="t-head hidden items-center gap-3 md:flex">
+                <span className="w-[180px] shrink-0">Subencargado</span>
+                <span className="min-w-0 flex-1">Qué recibe</span>
+                <span className="w-[110px] shrink-0">Ubicación</span>
+                <span className="w-[170px] shrink-0">Retención</span>
+              </div>
+
+              {infraestructura.map((s, i) => (
+                <div key={`${s.nombre}-${i}`} className="t-row flex flex-wrap items-center gap-3">
+                  <span className="w-[180px] shrink-0">
+                    <a
+                      href={s.sitio}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-ui text-ink-900 hover:text-brand-700 hover:underline"
+                      title={s.proposito}
+                    >
+                      {s.nombre}
+                    </a>
+                  </span>
+                  <span className="min-w-0 flex-1 truncate text-meta text-ink-500">
+                    {s.datos.map((d) => ETIQUETA_DATOS[d]).join(', ')}
+                  </span>
+                  <span className="w-[110px] shrink-0 text-meta text-ink-700">{s.ubicacion}</span>
+                  <span
+                    className="w-[170px] shrink-0 truncate text-meta text-ink-500"
+                    title={s.retencion}
+                  >
+                    {s.retencion}
+                  </span>
+                </div>
+              ))}
+            </section>
+          )}
+
+          {/* ─── LO QUE NUNCA OCURRE ─────────────────────────────────────── */}
+          {disclosure && (
+            <section className="rounded-card border border-[rgb(var(--verified-line))] bg-[rgb(var(--verified-surf))] p-4">
+              <h3 className="text-ui font-semibold text-ink-900">Lo que nunca ocurre</h3>
+              <ul className="mt-2 space-y-1.5">
                 {disclosure.loQueNoHacemos.map((linea, i) => (
-                  <li key={i} className="text-[11px] text-emerald-900 flex gap-2">
-                    <span className="text-emerald-600 shrink-0">—</span>
+                  <li key={i} className="flex gap-2 text-ui leading-[1.55] text-ink-700">
+                    <span className="shrink-0 text-verified">—</span>
                     <span>{linea}</span>
                   </li>
                 ))}
               </ul>
             </section>
-          </>
-        )}
+          )}
 
-        {cargando && lista.length === 0 && (
-          <p className="text-[11px] text-slate-500">Leyendo la configuración…</p>
-        )}
+          {disclosure && (
+            <p className="px-1 pb-2 text-meta leading-[1.6] text-ink-400">
+              {disclosure.advertencia}
+            </p>
+          )}
 
-        {directos.length > 0 && (
-          <Grupo
-            titulo="Subencargados directos"
-            subtitulo="Reciben datos por contrato con Iureon, por cuenta de tu firma."
-            items={directos}
-          />
-        )}
-
-        {indirectos.length > 0 && (
-          <Grupo
-            titulo="Detrás del enrutador"
-            subtitulo="Los hechos del caso no se detienen en el enrutador: llegan a estas empresas."
-            items={indirectos}
-          />
-        )}
-
-        {disclosure && (
-          <p className="text-[10px] text-slate-500 leading-relaxed px-1 pb-2">
-            {disclosure.advertencia}
-          </p>
-        )}
+          <div className="flex justify-end pb-4">
+            <button onClick={() => void cargar()} className="btn-neutral btn-sm">
+              <RefreshCw className={`h-3.5 w-3.5 ${cargando ? 'animate-spin' : ''}`} />
+              Volver a leer la configuración
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
-
-const Grupo: React.FC<{ titulo: string; subtitulo: string; items: Subprocessor[] }> = ({
-  titulo,
-  subtitulo,
-  items
-}) => (
-  <section className="bg-white border border-slate-200 rounded-xl overflow-hidden">
-    <header className="px-4 py-2.5 border-b border-slate-100 bg-slate-50/60 flex items-center gap-2">
-      <Server className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-      <div className="min-w-0">
-        <h3 className="text-xs font-bold text-slate-900">
-          {titulo} <span className="text-slate-400 font-medium">({items.length})</span>
-        </h3>
-        <p className="text-[10px] text-slate-500">{subtitulo}</p>
-      </div>
-    </header>
-
-    <div className="divide-y divide-slate-100">
-      {items.map((s, i) => (
-        <div key={`${s.nombre}-${i}`} className="p-4">
-          <div className="flex items-start justify-between gap-3 mb-1.5">
-            <div className="min-w-0">
-              <h4 className="text-[12px] font-bold text-slate-900">{s.nombre}</h4>
-              {s.atravesDe && (
-                <p className="text-[10px] text-slate-500">a través de {s.atravesDe}</p>
-              )}
-            </div>
-            <a
-              href={s.sitio}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[10px] text-blue-800 hover:underline flex items-center gap-1 shrink-0"
-            >
-              Su política <ExternalLink className="w-3 h-3" />
-            </a>
-          </div>
-
-          <p className="text-[11px] text-slate-700 mb-2">{s.proposito}</p>
-
-          <div className="flex flex-wrap gap-1.5 mb-2">
-            {s.datos.map((d) => (
-              <span
-                key={d}
-                className={`text-[10px] px-2 py-0.5 rounded-full border ${
-                  esSensible(d)
-                    ? 'bg-amber-50 text-amber-900 border-amber-200'
-                    : 'bg-slate-50 text-slate-600 border-slate-200'
-                }`}
-              >
-                {ETIQUETA_DATOS[d]}
-              </span>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
-            <p className="text-[10px] text-slate-500">
-              <span className="font-semibold text-slate-700">Dónde:</span> {s.ubicacion}
-            </p>
-            <p className="text-[10px] text-slate-500">
-              <span className="font-semibold text-slate-700">
-                {s.retiene ? 'Conserva:' : 'No conserva:'}
-              </span>{' '}
-              {s.retencion}
-            </p>
-          </div>
-        </div>
-      ))}
-    </div>
-  </section>
-);

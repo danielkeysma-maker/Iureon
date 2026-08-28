@@ -25,6 +25,8 @@ export interface Subprocessor {
   ubicacion: string;
   retiene: boolean;
   retencion: string;
+  /** Con qué base sale el dato del país: el mecanismo, no una tesis jurídica. */
+  baseDeTransferencia: string;
   /** Whose contract they sit under, when they are not ours directly. */
   atravesDe: string | null;
   sitio: string;
