@@ -342,7 +342,7 @@ export const PENAL_CATALOG: BranchCatalog = {
     id: 'penal/escrito-de-acusacion',
     exactName: 'Escrito de acusación',
     branch: 'PENAL',
-    role: 'DESPACHO',
+    role: 'LITIGANTE',
     legalBasis: 'Ley 906 de 2004, arts. 175 (modificado por el art. 49 de la Ley 1453 de 2011; parágrafo 3º adicionado por el art. 35 de la Ley 1474 de 2011), 294, 336 y 337',
     competentAuthority: 'Fiscalía General de la Nación; se radica ante el juez de conocimiento',
     term: { status: 'VERIFICADO', description: 'La Fiscalía dispone de noventa (90) días contados desde el día siguiente a la formulación de la imputación para presentar el escrito de acusación o solicitar la preclusión. El término es de ciento veinte (120) días cuando hay concurso de delitos, tres o más imputados, o delitos de competencia de jueces penales especializados (art. 175). Añadir la duplicación y, sobre todo, el reloj del cliente. Los términos de noventa (90) y ciento veinte (120) días SE DUPLICAN en los procesos por delitos de competencia de los jueces penales del circuito especializados, por delitos contra la Administración Pública y por delitos contra el patrimonio económico que recaigan sobre bienes del Estado respecto de los cuales proceda la detención preventiva, cuando sean tres (3) o más los imputados o los delitos objeto de investigación (art. 175 parágrafo 3º). Vencido el término sin acusar ni pedir preclusión, el fiscal pierde competencia y el superior designa uno nuevo, que decide en sesenta (60) días, o noventa (90) si hay concurso, tres o más imputados o competencia de jueces penales del circuito especializado (art. 294). Y el reloj del cliente detenido es más corto y es el que primero se vence: a los sesenta (60) días contados desde la fecha de imputación sin escrito de acusación ni solicitud de preclusión procede la libertad por vencimiento de términos (art. 317 num. 4). Los 90/120 días obligan a la Fiscalía; los 60 días liberan al imputado.' },
@@ -360,7 +360,7 @@ export const PENAL_CATALOG: BranchCatalog = {
     id: 'penal/formulacion-de-imputacion',
     exactName: 'Formulación de imputación',
     branch: 'PENAL',
-    role: 'DESPACHO',
+    role: 'LITIGANTE',
     legalBasis: 'Ley 906 de 2004, arts. 286 a 288 y art. 175 parágrafos 1º y 2º (parágrafo 2º adicionado por el art. 2 de la Ley 2205 de 2022)',
     competentAuthority: 'Fiscalía General de la Nación, ante el juez de control de garantías',
     term: { status: 'VERIFICADO', description: 'Desde su formulación corren los términos del art. 175 para acusar o precluir, y los del art. 317 para la libertad por vencimiento de términos. Añadir el plazo máximo para imputar, que la ficha no traía y es el que puede cerrarle la puerta a la Fiscalía y al denunciante. La Fiscalía debe formular la imputación u ordenar motivadamente el archivo de la indagación dentro de los dos (2) años siguientes a la recepción de la noticia criminal; tres (3) años cuando hay concurso de delitos o tres o más imputados; cinco (5) años en delitos de competencia de los jueces penales del circuito especializado (art. 175 parágrafo 1º). En homicidio, feminicidio, violencia intrafamiliar y delitos contra la libertad, integridad y formación sexuales cometidos contra menores de dieciocho (18) años el plazo es de ocho (8) meses desde la noticia criminal, prorrogable por una sola vez hasta por seis (6) meses con justificación razonable; vencido, el fiscal es relevado en tres (3) días hábiles y el nuevo debe resolver en un término perentorio de noventa (90) días (art. 175 parágrafo 2º, adicionado por el art. 2 de la Ley 2205 de 2022). Esos son relojes de la Fiscalía. Una vez formulada la imputación empiezan a correr los noventa (90) o ciento veinte (120) días del art. 175 para acusar o precluir —reloj de la Fiscalía— y los sesenta (60) días del art. 317 num. 4 para la libertad por vencimiento de términos —reloj del imputado detenido—.' },
@@ -376,7 +376,7 @@ export const PENAL_CATALOG: BranchCatalog = {
     id: 'penal/solicitud-de-medida-de-aseguramiento',
     exactName: 'Solicitud de medida de aseguramiento',
     branch: 'PENAL',
-    role: 'DESPACHO',
+    role: 'LITIGANTE',
     legalBasis: 'Ley 906 de 2004, arts. 306 a 313',
     competentAuthority: 'Fiscalía o Ministerio Público ante el juez de control de garantías',
     term: { status: 'NO_CADUCA', description: 'Los arts. 306 y 308 no fijan término ni caducidad para solicitar la medida de aseguramiento: la Fiscalía —y también la víctima o su apoderado en los términos del art. 306— puede pedirla ante el juez de control de garantías mientras dure la actuación, de modo que no opera caducidad. Lo que sí tiene término es su duración: la medida privativa de la libertad no puede exceder de un (1) año, prorrogable hasta por el mismo término inicial cuando el proceso se surta ante la justicia penal especializada, haya tres (3) o más acusados con detención vigente o se trate de actos de corrupción de la Ley 1474 de 2011 (art. 307, parágrafo 1, modificado por el art. 1 de la Ley 1786 de 2016); tres (3) años para miembros de Grupos Delictivos Organizados y cuatro (4) años para Grupos Armados Organizados (art. 307A); y ciento ochenta (180) días en el procedimiento especial abreviado (art. 548).' },
@@ -472,6 +472,40 @@ export const PENAL_CATALOG: BranchCatalog = {
       { n: 5, name: 'Fijación de la fecha de la audiencia de juicio oral', mandatory: true, basis: 'Art. 175' }
     ],
     sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr004.html#175'
+  },
+  {
+    id: 'penal/solicitud-de-reconocimiento-e-intervencion-de-la-victima-en-la-actuacion-penal',
+    exactName: 'Solicitud de reconocimiento e intervención de la víctima en la actuación penal',
+    branch: 'PENAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 906 de 2004, art. 137, con su numeral 4 declarado INEXEQUIBLE',
+    competentAuthority: 'El fiscal del caso, para las medidas de protección y la designación de abogado de oficio; el juez de conocimiento o de control de garantías, para la intervención en audiencia',
+    term: { status: 'VERIFICADO', description: 'SIN PLAZO PARA PEDIRLO — Y ESE ES EL PUNTO, PORQUE LA LEY LO DICE AL REVÉS DE COMO SE PRACTICA: la víctima «tiene el derecho de INTERVENIR EN TODAS LAS FASES de la actuación penal» (art. 137), no solo al final en el incidente de reparación. LO QUE SÍ CAMBIA CON EL TIEMPO ES LA EXIGENCIA DE ABOGADO, y hay que advertírselo antes: «Para el ejercicio de sus derechos NO ES OBLIGATORIO que las víctimas estén representadas por un abogado; sin embargo, A PARTIR DE LA AUDIENCIA PREPARATORIA y para intervenir TENDRÁN QUE SER ASISTIDAS por un profesional del derecho o estudiante de consultorio jurídico de facultad de derecho debidamente aprobada» (num. 3). Quien llega a la preparatoria sin apoderado no interviene. ABOGADO DE OFICIO PARA LA VÍCTIMA, que casi nadie pide: «Si la víctima no contare con medios suficientes para contratar un abogado a fin de intervenir, PREVIA SOLICITUD Y COMPROBACIÓN SUMARIA DE LA NECESIDAD, la Fiscalía General de la Nación LE DESIGNARÁ UNO DE OFICIO» (num. 5). MEDIDAS DE PROTECCIÓN, sin plazo y ante el fiscal: «Las víctimas podrán solicitar al fiscal EN CUALQUIER MOMENTO de la actuación medidas de protección frente a probables hostigamientos, amenazas o atentados en su contra o DE SUS FAMILIARES» (num. 1). DOS GARANTÍAS MÁS QUE SE PIDEN Y NO SE OTORGAN SOLAS: el interrogatorio debe practicarse «con respeto de su situación personal, derechos y dignidad» (num. 2), y el juez «podrá en forma excepcional, y con el fin de proteger a las víctimas, decretar que durante su intervención EL JUICIO SE CELEBRE A PUERTA CERRADA» (num. 6). ADVERTENCIA DE VIGENCIA: el numeral 4 fue declarado INEXEQUIBLE y no debe invocarse.' },
+    requiredSections: [
+      { n: 1, name: 'Acreditación de la condición de víctima del injusto y del daño sufrido', mandatory: true, basis: 'Ley 906 de 2004, art. 137' },
+      { n: 2, name: 'Identificación de la fase procesal en que se interviene y del despacho', mandatory: true, basis: 'Ley 906 de 2004, art. 137' },
+      { n: 3, name: 'Poder o designación de abogado, obligatorio a partir de la audiencia preparatoria', mandatory: true, basis: 'Ley 906 de 2004, art. 137 num. 3' },
+      { n: 4, name: 'Solicitud de designación de abogado de oficio, con comprobación sumaria de la necesidad', mandatory: false, basis: 'Ley 906 de 2004, art. 137 num. 5' },
+      { n: 5, name: 'Medidas de protección que se solicitan frente a hostigamientos o amenazas, propias o de familiares', mandatory: false, basis: 'Ley 906 de 2004, art. 137 num. 1' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr003.html'
+  },
+  {
+    id: 'penal/oposicion-de-la-victima-a-la-solicitud-de-preclusion',
+    exactName: 'Oposición de la víctima a la solicitud de preclusión',
+    branch: 'PENAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 906 de 2004, arts. 333 (declarado condicionalmente exequible, con un aparte inexequible), 334 y 335',
+    competentAuthority: 'El juez de conocimiento, en la audiencia que se cita para estudiar la preclusión',
+    term: { status: 'VERIFICADO', description: 'LA OPORTUNIDAD ES ÚNICA, ORAL Y DENTRO DE LA AUDIENCIA: SE PREPARA DESDE LA CITACIÓN, PORQUE NO HAY SEGUNDA VUELTA. «Previa solicitud del fiscal EL JUEZ CITARÁ A AUDIENCIA, DENTRO DE LOS CINCO (5) DÍAS SIGUIENTES, en la que se estudiará la petición de preclusión» (art. 333) — esos cinco días son del despacho para citar, no de la víctima, pero son todo el tiempo real que hay para armar la oposición. En la audiencia «se conferirá el uso de la palabra A LA VÍCTIMA, al agente del Ministerio Público y al defensor del imputado, EN EL EVENTO EN QUE QUISIEREN OPONERSE a la petición del fiscal». LIMITACIÓN QUE DEFINE CÓMO SE PREPARA, y es dura: «EN NINGÚN CASO HABRÁ LUGAR A SOLICITUD NI PRÁCTICA DE PRUEBAS». La oposición es argumentativa sobre los elementos materiales que el fiscal expone, no probatoria: se ataca la causal invocada y la suficiencia de lo que la sustenta. LO QUE SE PIERDE SI PROSPERA LA PRECLUSIÓN ES DEFINITIVO: «En firme la sentencia que decreta la preclusión, CESARÁ CON EFECTOS DE COSA JUZGADA la persecución penal en contra del imputado por esos hechos. Igualmente, SE REVOCARÁN TODAS LAS MEDIDAS CAUTELARES que se le hayan impuesto» (art. 334). LO QUE SE GANA SI LA OPOSICIÓN TRIUNFA: «En firme el auto que rechaza la preclusión las diligencias VOLVERÁN A LA FISCALÍA, RESTITUYÉNDOSE EL TÉRMINO QUE DURÓ EL TRÁMITE de la preclusión» (art. 335) — no solo sigue el caso: se le devuelve a la Fiscalía el tiempo consumido, lo que importa frente a los plazos del art. 175. ADVERTENCIA DE VIGENCIA: el art. 333 es condicionalmente exequible y el aparte tachado de su inciso tercero fue declarado inexequible; conviene leer el fallo antes de apoyarse en su literalidad.' },
+    requiredSections: [
+      { n: 1, name: 'Acreditación de la condición de víctima y de su representación por abogado', mandatory: true, basis: 'Ley 906 de 2004, art. 137 num. 3' },
+      { n: 2, name: 'Identificación de la causal de preclusión invocada por el fiscal y de los elementos que la sustentan', mandatory: true, basis: 'Ley 906 de 2004, art. 333' },
+      { n: 3, name: 'Argumentación sobre por qué la causal no se configura, sin solicitar pruebas', mandatory: true, basis: 'Ley 906 de 2004, art. 333' },
+      { n: 4, name: 'Señalamiento de los elementos materiales probatorios del expediente que contradicen la causal', mandatory: true, basis: 'Ley 906 de 2004, art. 333' },
+      { n: 5, name: 'Advertencia al cliente de que la preclusión en firme produce cosa juzgada', mandatory: true, basis: 'Ley 906 de 2004, art. 334' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr008.html'
   }
   ]
 };

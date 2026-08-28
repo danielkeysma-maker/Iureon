@@ -1556,6 +1556,158 @@
         }
       ],
       "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_sustantivo_trabajo_pr008.html"
+    },
+    {
+      "exact_name": "Notificación por estado electrónico en el proceso laboral",
+      "area": "LABORAL",
+      "role": "SECRETARIA",
+      "legal_basis": "Ley 2452 de 2025, art. 208 num. 4; art. 82 (traslados); art. 214 (ejecutoria)",
+      "competent_authority": "El secretario del juzgado laboral o de la sala laboral",
+      "term": "EL ESTADO YA NO LO FIRMA EL SECRETARIO, Y ESTE ES EL CAMBIO QUE MÁS PLANTILLAS DEJA OBSOLETAS: «Las notificaciones por estado se fijarán VIRTUALMENTE, con inserción de la providencia, y NO SERÁ NECESARIO IMPRIMIRLOS, NI FIRMARLOS POR EL SECRETARIO, NI DEJAR CONSTANCIA CON FIRMA AL PIE de la providencia respectiva» (art. 208). Cualquier formato que exija la firma del secretario al pie viene de la ley derogada. QUÉ SE NOTIFICA POR ESTADO: los autos dictados fuera de audiencia; las sentencias de casación, revisión y anulación y demás de la Sala Laboral de la Corte Suprema y de las salas laborales de tribunales; las sentencias que resuelven apelación Y LA CONSULTA; y las proferidas por escrito conforme al art. 259. TRES CLASES DE PROVIDENCIA NO SE INSERTAN y hay que buscarlas en el expediente: las que decretan medidas cautelares, las que mencionan menores y las sujetas a reserva legal. LO QUE EL ESTADO DISPARA, Y ES SU VALOR REAL: los TRES (3) DÍAS de traslado ordinario del art. 82, que corren «desde el día siguiente a la notificación por estados»; y los TRES (3) DÍAS de ejecutoria de las providencias dictadas fuera de audiencia (art. 214). Ambos son relojes de la parte. EL TRASLADO NO NECESITA AUTO NI CONSTANCIA: «todo traslado que deba surtirse POR FUERA DE AUDIENCIA se realizará POR ESTADOS, por el término de tres (3) días y NO REQUERIRÁ AUTO NI CONSTANCIA EN EL EXPEDIENTE» (art. 82) — quien espere una providencia que le avise, no la va a recibir. Los ejemplares se conservan en línea para consulta permanente.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del proceso y de la providencia, con inserción de su texto",
+          "mandatory": true,
+          "basis": "Ley 2452 de 2025, art. 208"
+        },
+        {
+          "n": 2,
+          "name": "Fecha de la providencia y fecha del estado",
+          "mandatory": true,
+          "basis": "Ley 2452 de 2025, art. 208"
+        },
+        {
+          "n": 3,
+          "name": "Verificación de que la providencia no es de las excluidas: cautelares, menores o reserva legal",
+          "mandatory": true,
+          "basis": "Ley 2452 de 2025, art. 208"
+        },
+        {
+          "n": 4,
+          "name": "Publicación virtual, sin impresión ni firma del secretario",
+          "mandatory": true,
+          "basis": "Ley 2452 de 2025, art. 208"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_2452_2025.html"
+    },
+    {
+      "exact_name": "Certificación de ejecutoria de providencia laboral",
+      "area": "LABORAL",
+      "role": "SECRETARIA",
+      "legal_basis": "Ley 2452 de 2025, art. 84 (certificaciones), art. 83 num. 2 (copias como título ejecutivo) y art. 214 (ejecutoria)",
+      "competent_authority": "El secretario del juzgado, que la expide sin providencia que la ordene",
+      "term": "LA CERTIFICACIÓN NO TIENE PLAZO PROPIO Y SE EXPIDE SIN AUTO, PERO ES LA LLAVE DE TODO LO QUE VIENE DESPUÉS. «EL SECRETARIO, por solicitud verbal o escrita, puede expedir certificaciones sobre la existencia de procesos, el estado de los mismos y LA EJECUTORIA DE PROVIDENCIAS JUDICIALES, SIN NECESIDAD DE AUTO QUE LAS ORDENE» (art. 84). PARA QUÉ SIRVE, Y ES LO QUE LA HACE INDISPENSABLE: «las copias que se pretendan usar como TÍTULO EJECUTIVO REQUIEREN CONSTANCIA DE SU EJECUTORIA» (art. 83 num. 2). Sin ella, la sentencia ganada no se puede ejecutar. TRES REGÍMENES DE EJECUTORIA QUE LA CERTIFICACIÓN DEBE DISTINGUIR (art. 214): las providencias dictadas EN AUDIENCIA quedan ejecutoriadas UNA VEZ NOTIFICADAS, cuando no se impugnan o no admiten recursos — ejecutoria instantánea; las dictadas FUERA DE AUDIENCIA, TRES (3) DÍAS después de notificadas; y si se pidió oportunamente aclaración, complementación, adición o corrección, SOLO QUEDAN EJECUTORIADAS UNA VEZ RESUELTA LA SOLICITUD. LA TRAMPA QUE HAY QUE VERIFICAR ANTES DE CERTIFICAR, y es propia de esta rama: si la sentencia está sujeta al grado jurisdiccional de consulta, NO HAY EJECUTORIA. El parágrafo del art. 231 no deja margen: «MIENTRAS NO SE SURTA EL GRADO JURISDICCIONAL DE CONSULTA, LA PROVIDENCIA NO QUEDARÁ EJECUTORIADA.» Certificar la ejecutoria de una sentencia consultable es certificar algo que no ha ocurrido.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la providencia y de la fecha y forma de su notificación",
+          "mandatory": true,
+          "basis": "Ley 2452 de 2025, art. 214"
+        },
+        {
+          "n": 2,
+          "name": "Determinación del régimen aplicable: en audiencia, fuera de audiencia, o con solicitud de aclaración pendiente",
+          "mandatory": true,
+          "basis": "Ley 2452 de 2025, art. 214"
+        },
+        {
+          "n": 3,
+          "name": "Verificación de que la sentencia no está sujeta al grado jurisdiccional de consulta",
+          "mandatory": true,
+          "basis": "Ley 2452 de 2025, art. 231 par."
+        },
+        {
+          "n": 4,
+          "name": "Constancia de que no se interpusieron recursos o de que los interpuestos quedaron resueltos y en firme",
+          "mandatory": true,
+          "basis": "Ley 2452 de 2025, art. 214"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_2452_2025.html"
+    },
+    {
+      "exact_name": "Remisión del expediente al superior en el proceso laboral",
+      "area": "LABORAL",
+      "role": "SECRETARIA",
+      "legal_basis": "Ley 2452 de 2025, art. 230 (apelación, traslado y remisión), art. 229 (efectos) y art. 231 (grado jurisdiccional de consulta)",
+      "competent_authority": "El secretario del juzgado de primera instancia, que remite a la sala laboral del tribunal o a la Corte Suprema",
+      "term": "CINCO (5) DÍAS DESDE LA EJECUTORIA DEL AUTO QUE CONCEDE, Y EL RELOJ ES EXPRESAMENTE DEL SECRETARIO — no hay equivalente en el procedimiento penal. «EL SECRETARIO DEBERÁ REMITIR LA ACTUACIÓN AL SUPERIOR DENTRO DEL TÉRMINO MÁXIMO DE CINCO (5) DÍAS CONTADOS A PARTIR DE LA EJECUTORIA DEL AUTO QUE CONCEDE EL RECURSO» (art. 230). LO QUE OCURRE ANTES Y SÍ ES RELOJ DEL CLIENTE: la apelación se interpone oralmente en la audiencia donde se profiere la providencia, sustentándose allí mismo si es auto y POR ESCRITO DENTRO DE LOS CINCO (5) DÍAS SIGUIENTES si es sentencia; o por escrito dentro de los TRES (3) DÍAS cuando la providencia se notifica fuera de audiencia, término dentro del cual también debe sustentarse. Sustentación insuficiente o extemporánea: «el juez de primera instancia LO DECLARA DESIERTO». Sustentado, «se correrá traslado POR SECRETARÍA a las partes no recurrentes, por el mismo término», y vencido, el juez decide sobre la concesión y el efecto dentro de los TRES (3) DÍAS siguientes. VACÍO NORMATIVO QUE HAY QUE DECLARAR Y NO RELLENAR: la Ley 2452 NO FIJA PLAZO DE REMISIÓN AL SUPERIOR EN EL GRADO DE CONSULTA. Los cinco días del art. 230 cuelgan de «la ejecutoria del auto que CONCEDE EL RECURSO», y en la consulta no hay recurso ni auto que lo conceda. Se comprobó por barrido de la ley: no existe. LA CONSULTA YA NO ES SOLO A FAVOR DEL TRABAJADOR: son siete supuestos del art. 231 —incluidas las sentencias meramente declarativas, las que niegan honorarios y los fallos inhibitorios— y sube sola, sin que nadie apele. Omitirla es CAUSAL DE NULIDAD (art. 92 num. 8), y mientras no se surta la providencia no queda ejecutoriada.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del auto que concedió el recurso, de su efecto y de su fecha de ejecutoria",
+          "mandatory": true,
+          "basis": "Ley 2452 de 2025, arts. 229 y 230"
+        },
+        {
+          "n": 2,
+          "name": "Constancia de que se surtió el traslado por secretaría a las partes no recurrentes",
+          "mandatory": true,
+          "basis": "Ley 2452 de 2025, art. 230"
+        },
+        {
+          "n": 3,
+          "name": "Verificación de si la sentencia debe subir en grado de consulta, aunque no haya sido apelada",
+          "mandatory": true,
+          "basis": "Ley 2452 de 2025, art. 231"
+        },
+        {
+          "n": 4,
+          "name": "Indicación de las decisiones que quedan ejecutoriadas, cuando la apelación es parcial",
+          "mandatory": true,
+          "basis": "Ley 2452 de 2025, art. 229"
+        },
+        {
+          "n": 5,
+          "name": "Constancia de remisión dentro de los cinco (5) días siguientes a la ejecutoria",
+          "mandatory": true,
+          "basis": "Ley 2452 de 2025, art. 230"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_2452_2025.html"
+    },
+    {
+      "exact_name": "Notificación personal por medios electrónicos en el proceso laboral",
+      "area": "LABORAL",
+      "role": "SECRETARIA",
+      "legal_basis": "Ley 2452 de 2025, arts. 208 num. 1, 209 (notificación personal electrónica), 211 (por medios físicos), 210 (aviso) y 212 (conducta concluyente)",
+      "competent_authority": "El secretario del juzgado laboral, que envía y deja la constancia. Para entidades públicas, privadas con funciones públicas, Ministerio Público y ANDJE, al buzón del art. 197 del CPACA",
+      "term": "DOS (2) DÍAS HÁBILES PARA QUE LA NOTIFICACIÓN SE ENTIENDA HECHA, PERO LOS TÉRMINOS ARRANCAN DE OTRO MOMENTO — Y ESA DISTINCIÓN ES LA QUE SE PIERDE AL CONTAR. La notificación «SE ENTIENDE REALIZADA una vez transcurridos DOS (2) DÍAS HÁBILES siguientes al envío del mensaje», y sin embargo «los términos EMPEZARÁN A CORRER DESDE EL DÍA SIGUIENTE A LA CONSTATACIÓN DE ENTREGA O ACUSE» (art. 209). Son dos fechas distintas y el catálogo debe separarlas. LA CONSTANCIA NO TIENE PLAZO PROPIO PERO ES LA QUE HACE CORRER TODO: «EL SECRETARIO HARÁ CONSTAR ESTE HECHO EN EL EXPEDIENTE». Sin ella no hay cómputo posible. NO SE REQUIERE CITACIÓN PREVIA: el envío de la providencia como mensaje de datos basta, con el juramento del interesado sobre la dirección, prestado con la presentación de la demanda. SI NO HAY CANAL DIGITAL, la vía es postal y abre los relojes del demandado: comparecencia en CINCO (5) DÍAS en el mismo municipio, DIEZ (10) en municipio distinto y TREINTA (30) en el exterior, y «la empresa postal COTEJARÁ Y SELLARÁ COPIA Y EXPEDIRÁ CONSTANCIA DE ENTREGA; ambos documentos se incorporan al expediente» (art. 211). Imposible la personal, el aviso da DIEZ (10) DÍAS desde su fijación para comparecer, y vencidos vienen curador ad lítem y emplazamiento (art. 210). LA NOTIFICACIÓN QUE OCURRE SIN QUE NADIE LA PRACTIQUE, y sorprende a quien no la conoce: «quien constituya apoderado SE ENTIENDE NOTIFICADO DE TODO EL DÍA EN QUE SE NOTIFIQUE EL AUTO QUE LE RECONOCE PERSONERÍA» (art. 212) — el auto de reconocimiento notifica hacia atrás todas las providencias del proceso, incluido el admisorio.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del destinatario y del canal digital al que se envía",
+          "mandatory": true,
+          "basis": "Ley 2452 de 2025, art. 209"
+        },
+        {
+          "n": 2,
+          "name": "Envío de la providencia como mensaje de datos, sin citación previa",
+          "mandatory": true,
+          "basis": "Ley 2452 de 2025, art. 209"
+        },
+        {
+          "n": 3,
+          "name": "Constancia del secretario sobre la entrega o el acuse, de la que corren los términos",
+          "mandatory": true,
+          "basis": "Ley 2452 de 2025, art. 209"
+        },
+        {
+          "n": 4,
+          "name": "Cómputo separado de los dos (2) días hábiles y de la fecha de constatación de entrega",
+          "mandatory": true,
+          "basis": "Ley 2452 de 2025, art. 209"
+        },
+        {
+          "n": 5,
+          "name": "Constancia postal de entrega, cotejo y sello, cuando la notificación es por medios físicos",
+          "mandatory": false,
+          "basis": "Ley 2452 de 2025, art. 211"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_2452_2025.html"
     }
   ]
 }
