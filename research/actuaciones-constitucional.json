@@ -1895,7 +1895,8 @@
           "basis": "Decreto 2591 de 1991, art. 19"
         }
       ],
-      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/decreto_2591_1991.html"
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/decreto_2591_1991.html",
+      "transversal": true
     },
     {
       "exact_name": "Respuesta al incidente de desacato",
@@ -1934,6 +1935,61 @@
           "name": "Constancia de presentación dentro del término que señaló el auto que abrió el incidente",
           "mandatory": true,
           "basis": "Decreto 2591 de 1991, art. 52"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/decreto_2591_1991.html",
+      "transversal": true
+    },
+    {
+      "exact_name": "Informe del despacho accionado en acción de tutela",
+      "area": "CONSTITUCIONAL",
+      "role": "DESPACHO",
+      "transversal": true,
+      "legal_basis": "Decreto 2591 de 1991, arts. 19 (informes), 20 (presunción de veracidad) y 27 (cumplimiento); requisitos de procedibilidad de la tutela contra providencia judicial: Corte Constitucional, sentencia C-590 de 2005",
+      "competent_authority": "El juez de tutela que requirió el informe — que puede ser de igual o superior jerarquía que el despacho accionado, y en la tutela contra providencia suele ser el superior funcional",
+      "term": "ENTRE UNO Y TRES DÍAS, PORQUE EL PLAZO NO ESTÁ EN LA LEY: LO FIJA EL JUEZ DE TUTELA EN EL AUTO ADMISORIO. «El juez PODRÁ REQUERIR INFORMES al órgano o a la autoridad contra quien se hubiere hecho la solicitud y pedir el expediente administrativo o la documentación donde consten los antecedentes del asunto. LA OMISIÓN INJUSTIFICADA DE ENVIAR ESAS PRUEBAS AL JUEZ ACARREARÁ RESPONSABILIDAD» (art. 19).\n\nEL SILENCIO DEL DESPACHO CUESTA EL CASO Y ADEMÁS COMPROMETE AL FUNCIONARIO: «SI EL INFORME NO FUERE RENDIDO DENTRO DEL PLAZO CORRESPONDIENTE, SE TENDRÁN POR CIERTOS LOS HECHOS Y SE ENTRARÁ A RESOLVER DE PLANO, salvo que el juez estime necesaria otra averiguación previa» (art. 20). Un despacho que no informa deja que se den por ciertas las afirmaciones del accionante sobre su propia actuación.\n\nPOR QUÉ ESTA FICHA ES TRANSVERSAL Y NO SOLO CONSTITUCIONAL: la tutela se dirige contra CUALQUIER autoridad pública, y un juzgado civil, laboral, penal, de familia o administrativo la recibe contra sus propias providencias. Es un escrito que firma el despacho, no un litigante.\n\nQUÉ DEBE CONTENER CUANDO ES CONTRA UNA PROVIDENCIA JUDICIAL, y esto es jurisprudencia, no ley — la Corte Constitucional lo construyó en la C-590 de 2005 y no hay artículo que lo enumere: el informe defiende la providencia mostrando que NO se configura ninguna causal específica de procedibilidad —defecto orgánico, procedimental absoluto, fáctico, material o sustantivo, error inducido, decisión sin motivación, desconocimiento del precedente o violación directa de la Constitución— y que faltan los requisitos generales, señaladamente la SUBSIDIARIEDAD (que el accionante agotó o no los recursos ordinarios y extraordinarios) y la INMEDIATEZ (que acudió en un plazo razonable). La irregularidad procesal alegada debe tener efecto decisivo en la sentencia.\n\nLO QUE SE DEFIENDE ADEMÁS DE LA DECISIÓN es la autonomía judicial: el desacuerdo con la valoración probatoria o con la interpretación de la norma no es defecto fáctico ni sustantivo, y decirlo es el núcleo del informe.\n\nSI EL FALLO CONCEDE EL AMPARO, el reloj se vuelve inmediato: «Proferido el fallo que conceda la tutela, la autoridad responsable del agravio DEBERÁ CUMPLIRLA SIN DEMORA» (art. 27), y el plazo que fije el fallo «en ningún caso podrá exceder de cuarenta y ocho (48) horas». Después vienen el desacato y la responsabilidad personal del funcionario.\n\nEL RELOJ PARA IMPUGNAR TAMBIÉN CORRE CONTRA EL DESPACHO ACCIONADO: tres (3) días desde la notificación del fallo (art. 31), y la autoridad pública está expresamente legitimada para impugnar.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del proceso, de la providencia atacada y de la fecha en que el despacho fue notificado",
+          "mandatory": true,
+          "basis": "Decreto 2591 de 1991, art. 19"
+        },
+        {
+          "n": 2,
+          "name": "Relación cronológica de la actuación, con los soportes del expediente que el juez de tutela pidió",
+          "mandatory": true,
+          "basis": "Decreto 2591 de 1991, art. 19"
+        },
+        {
+          "n": 3,
+          "name": "Pronunciamiento sobre CADA hecho de la tutela, para que no opere la presunción de veracidad",
+          "mandatory": true,
+          "basis": "Decreto 2591 de 1991, art. 20"
+        },
+        {
+          "n": 4,
+          "name": "Subsidiariedad: qué recursos ordinarios y extraordinarios tenía el accionante y si los agotó",
+          "mandatory": true,
+          "basis": "Corte Constitucional, C-590 de 2005"
+        },
+        {
+          "n": 5,
+          "name": "Inmediatez: tiempo transcurrido entre la providencia y la interposición de la tutela",
+          "mandatory": true,
+          "basis": "Corte Constitucional, C-590 de 2005"
+        },
+        {
+          "n": 6,
+          "name": "Refutación de la causal específica invocada, y defensa de la autonomía judicial en la valoración e interpretación",
+          "mandatory": true,
+          "basis": "Corte Constitucional, C-590 de 2005"
+        },
+        {
+          "n": 7,
+          "name": "Copia íntegra del expediente o de las piezas pertinentes",
+          "mandatory": true,
+          "basis": "Decreto 2591 de 1991, art. 19"
         }
       ],
       "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/decreto_2591_1991.html"
