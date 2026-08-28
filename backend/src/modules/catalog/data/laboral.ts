@@ -510,6 +510,122 @@ export const LABORAL_CATALOG: BranchCatalog = {
       { n: 3, name: 'Orden de rehacer la actuación anulada', mandatory: true, basis: 'Art. 93' }
     ],
     sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=259639'
+  },
+  {
+    id: 'laboral/solicitud-de-embargo-y-secuestro-en-proceso-ejecutivo-laboral',
+    exactName: 'Solicitud de embargo y secuestro en proceso ejecutivo laboral',
+    branch: 'LABORAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 2452 de 2025 (Código Procesal del Trabajo y de la Seguridad Social), art. 271; art. 330 (vigencia y régimen de transición)',
+    competentAuthority: 'El juez laboral del circuito o el juez municipal de pequeñas causas laborales que conoce de la ejecución',
+    term: { status: 'VERIFICADO', description: 'SIN PLAZO PARA PEDIRLO, Y CON UNA DIFERENCIA FRENTE AL CIVIL QUE CONVIENE APROVECHAR: AQUÍ EL DECRETO ES INMEDIATO Y NO SE EXIGE CAUCIÓN AL EJECUTANTE. «Desde la presentación de la demanda el ejecutante podrá solicitar el embargo y secuestro de bienes del ejecutado o cualquier otra medida que resulte viable para llevar a debido efecto la ejecución», y «Previa denuncia de bienes, hecha bajo juramento, EL JUEZ DECRETARÁ INMEDIATAMENTE el embargo y secuestro de los bienes muebles o el mero embargo de inmuebles del deudor» (art. 271). LA DENUNCIA BAJO JURAMENTO ES REQUISITO, no formalidad: sin ella no hay decreto inmediato. HERRAMIENTA QUE NO EXISTE EN EL CGP y que casi nadie pide: el mismo artículo faculta al juez, a petición de parte, para requerir información patrimonial del ejecutado a entidades financieras o depositarias y a particulares que por su actividad puedan conocer sus bienes, «Dentro de los límites del derecho a la intimidad personal». ADVERTENCIA DE APLICACIÓN EN EL TIEMPO: este código rige desde el 2 de abril de 2026 y su art. 330 dispone que «Todos los procesos iniciados con anterioridad a la vigencia de este código se continuarán tramitando por las normas procesales anteriores» — en un ejecutivo abierto antes de esa fecha se aplica el régimen derogado, no este.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del título ejecutivo y de la suma que se ordena pagar', mandatory: true, basis: 'Ley 2452 de 2025, art. 271' },
+      { n: 2, name: 'Denuncia de bienes hecha bajo juramento', mandatory: true, basis: 'Ley 2452 de 2025, art. 271' },
+      { n: 3, name: 'Individualización de los bienes y de los sujetos a registro, para su comunicación inmediata', mandatory: true, basis: 'Ley 2452 de 2025, art. 271' },
+      { n: 4, name: 'Solicitud de información patrimonial a entidades financieras o a terceros, si se pide', mandatory: false, basis: 'Ley 2452 de 2025, art. 271' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=259639'
+  },
+  {
+    id: 'laboral/solicitud-de-medidas-cautelares-en-proceso-declarativo-laboral',
+    exactName: 'Solicitud de medidas cautelares en proceso declarativo laboral',
+    branch: 'LABORAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 2452 de 2025, arts. 315 y 316; remisión a los arts. 593 y 594 del Código General del Proceso',
+    competentAuthority: 'El juez laboral que conoce del proceso ordinario o del especial de fuero sindical',
+    term: { status: 'NO_CADUCA', description: 'SE PIDE DESDE LA PRESENTACIÓN DE LA DEMANDA Y NO CADUCA, PERO LOS DOS PLAZOS DEL ARTÍCULO SON AJENOS AL ABOGADO. El de resolver es del juez: «La medida cautelar será decretada mediante auto, DENTRO DE LOS CINCO (5) DÍAS siguientes a la radicación de la solicitud» (art. 316). Y el de practicar el embargo tras ganar en primera instancia también: obtenida sentencia favorable, a petición del demandante el juez ordena el embargo y secuestro «dentro de los TREINTA (30) DÍAS siguientes a la petición» (art. 315 num. 1). LO QUE SÍ ES CARGA DEL CLIENTE ES LA CAUCIÓN, y aquí es más barata que en lo civil: «el demandante deberá prestar caución, que el juez fijará y podrá corresponder HASTA EL DIEZ POR CIENTO (10%) del valor de las pretensiones estimadas en la demanda» — contra el veinte por ciento del art. 590 del CGP. CARGA ARGUMENTATIVA QUE DECIDE LA SUERTE DEL ESCRITO: «el juez deberá analizar la apariencia de buen derecho, la necesidad y proporcionalidad de la medida», así que la solicitud que no sustenta los tres se niega.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del proceso declarativo y de las pretensiones estimadas', mandatory: true, basis: 'Ley 2452 de 2025, art. 316' },
+      { n: 2, name: 'Medida que se solicita: inscripción de la demanda o medida innominada, con su alcance y duración', mandatory: true, basis: 'Ley 2452 de 2025, art. 315' },
+      { n: 3, name: 'Sustentación de la apariencia de buen derecho, la necesidad y la proporcionalidad', mandatory: true, basis: 'Ley 2452 de 2025, art. 316' },
+      { n: 4, name: 'Pruebas que se aportan para respaldar la solicitud', mandatory: true, basis: 'Ley 2452 de 2025, art. 316' },
+      { n: 5, name: 'Ofrecimiento de la caución de hasta el diez por ciento (10%) de las pretensiones', mandatory: true, basis: 'Ley 2452 de 2025, art. 316' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=259639'
+  },
+  {
+    id: 'laboral/excepciones-en-proceso-ejecutivo-laboral',
+    exactName: 'Excepciones en proceso ejecutivo laboral',
+    branch: 'LABORAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 2452 de 2025, art. 275 num. 1 y num. 2; art. 273 (orden de ejecución)',
+    competentAuthority: 'El juez laboral que conoce de la ejecución',
+    term: { status: 'VERIFICADO', description: 'CINCO (5) DÍAS, RELOJ DEL EJECUTADO, Y SON LA MITAD DE LOS DEL CGP: quien traslade la costumbre del ejecutivo civil pierde el término. «DENTRO DE LOS CINCO (5) DÍAS siguientes a la notificación del mandamiento ejecutivo, el ejecutado podrá proponer excepciones, expresando los hechos en que se funden» (art. 275 num. 1). LÍMITE MATERIAL QUE HAY QUE VERIFICAR ANTES DE REDACTAR, porque deja casi sin defensa al ejecutado: «Cuando el título ejecutivo consista en una SENTENCIA, un auto o un laudo o en conciliación o transacción judicial, SÓLO PODRÁN PROPONERSE LAS EXCEPCIONES DE PAGO, O COMPENSACIÓN, siempre que se sustente en hechos posteriores al título ejecutivo y la pérdida de la cosa», con los documentos anexos y el juez decidiendo de plano. LO QUE NO VA POR ESTA VÍA: los defectos formales del título, las excepciones previas y el beneficio de excusión «solo podrán alegarse mediante la interposición del RECURSO DE REPOSICIÓN» contra la orden de pago (art. 273), y si prospera, el ejecutante tiene cinco (5) días para subsanar so pena de revocatoria y condena en costas y perjuicios.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del mandamiento ejecutivo y de la fecha de su notificación', mandatory: true, basis: 'Ley 2452 de 2025, art. 275 num. 1' },
+      { n: 2, name: 'Excepciones propuestas con expresión de los hechos en que se fundan', mandatory: true, basis: 'Ley 2452 de 2025, art. 275 num. 1' },
+      { n: 3, name: 'Verificación de la naturaleza del título: si es sentencia, auto, laudo, conciliación o transacción, solo pago, compensación o pérdida de la cosa', mandatory: true, basis: 'Ley 2452 de 2025, art. 275 num. 2' },
+      { n: 4, name: 'Documentos que sustentan las excepciones y demás pruebas que se piden', mandatory: true, basis: 'Ley 2452 de 2025, art. 275 num. 2' },
+      { n: 5, name: 'Constancia de presentación dentro de los cinco (5) días', mandatory: true, basis: 'Ley 2452 de 2025, art. 275 num. 1' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=259639'
+  },
+  {
+    id: 'laboral/objecion-a-la-liquidacion-del-credito-en-proceso-ejecutivo-laboral',
+    exactName: 'Objeción a la liquidación del crédito en proceso ejecutivo laboral',
+    branch: 'LABORAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 2452 de 2025, art. 278 num. 2 y num. 4',
+    competentAuthority: 'El juez laboral que conoce de la ejecución',
+    term: { status: 'VERIFICADO', description: 'UN (1) DÍA EN ESTADO ELECTRÓNICO, Y ES EL RELOJ MÁS CORTO DE TODO EL CÓDIGO. El traslado de la liquidación «NO REQUERIRÁ AUTO NI CONSTANCIA EN EL EXPEDIENTE. Estos traslados se incluirán en una lista que se mantendrá fijada en el ESTADO ELECTRÓNICO POR UN (1) DÍA y correrá desde el siguiente» (art. 278 num. 2). No hay auto que notifique ni anotación que recuerde: quien no revisa el estado electrónico a diario no se entera de que el traslado corrió. CARGA DE FORMA IDÉNTICA A LA DEL CGP Y CON LA MISMA SANCIÓN: «donde deberá acompañar, SO PENA DE RECHAZO, una liquidación alternativa en la que se precisen los errores puntuales que le atribuye a la liquidación objetada». NO CONFUNDIRLO CON EL PLAZO DEL JUEZ, que vive en el mismo artículo y es veinte veces más largo: «El juez deberá aprobar o modificar la liquidación del crédito en un término no mayor a VEINTE (20) DÍAS, contados a partir de su presentación por la parte ejecutante. El incumplimiento de este plazo será causal de falta disciplinaria» — esos veinte días son del despacho, no del abogado.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación de la liquidación objetada y del estado electrónico en que se fijó el traslado', mandatory: true, basis: 'Ley 2452 de 2025, art. 278 num. 2' },
+      { n: 2, name: 'Señalamiento puntual de cada error atribuido a la liquidación', mandatory: true, basis: 'Ley 2452 de 2025, art. 278 num. 2' },
+      { n: 3, name: 'Liquidación alternativa que se acompaña, so pena de rechazo', mandatory: true, basis: 'Ley 2452 de 2025, art. 278 num. 2' },
+      { n: 4, name: 'Constancia de presentación dentro del día de traslado', mandatory: true, basis: 'Ley 2452 de 2025, art. 278 num. 2' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=259639'
+  },
+  {
+    id: 'laboral/presentacion-y-observaciones-al-avaluo-en-proceso-ejecutivo-laboral',
+    exactName: 'Presentación y observaciones al avalúo en proceso ejecutivo laboral',
+    branch: 'LABORAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 2452 de 2025, art. 279 num. 1, 3, 5, 7 y 8',
+    competentAuthority: 'El juez laboral que conoce de la ejecución',
+    term: { status: 'VERIFICADO', description: 'VEINTE (20) DÍAS PARA PRESENTARLO Y DIEZ (10) DE TRASLADO SIN AUTO QUE LO ORDENE. AMBOS RELOJES SON DEL CLIENTE. «Cualquiera de las partes podrá presentar el avalúo o experticia especializada dentro de los VEINTE (20) DÍAS siguientes a la ejecutoria del auto que ordena seguir adelante la ejecución, o después de consumado el secuestro» (num. 1). «De los avalúos presentados oportunamente se correrá traslado por DIEZ (10) DÍAS SIN NECESIDAD DE AUTO QUE LO ORDENE» (num. 3) — no hay providencia que avise, hay que vigilar. Si se aporta un avalúo diferente, su traslado es de tres (3) días. LA MISMA TRAMPA DEL CGP, Y AQUÍ TAMBIÉN CUESTA LA CONTRADICCIÓN: «Si no se allega oportunamente el avalúo, el juez designará el perito avaluador […] En estos eventos, TAMPOCO HABRÁ LUGAR A OBJECIONES» (num. 8). REGLAS DE VALOR PROPIAS DE ESTE CÓDIGO que evitan pagar un perito: el inmueble vale «el del avalúo catastral del predio INCREMENTADO EN UN CINCUENTA POR CIENTO (50%)» y el vehículo, el valor oficial del impuesto de rodamiento. RIESGO PARA EL EJECUTADO QUE OBSTRUYE: multa de cinco (5) a diez (10) salarios mínimos si no presta colaboración o impide la inspección.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del auto que ordena seguir adelante la ejecución o de la fecha del secuestro', mandatory: true, basis: 'Ley 2452 de 2025, art. 279 num. 1' },
+      { n: 2, name: 'Avalúo de cada bien, con la regla de valor que corresponde a su naturaleza', mandatory: true, basis: 'Ley 2452 de 2025, art. 279 num. 5 y 7' },
+      { n: 3, name: 'Avalúo catastral incrementado en el cincuenta por ciento (50%) tratándose de inmuebles, o dictamen que lo sustituya', mandatory: false, basis: 'Ley 2452 de 2025, art. 279 num. 5' },
+      { n: 4, name: 'Observaciones al avalúo de la contraparte, dentro de los diez (10) días de traslado', mandatory: false, basis: 'Ley 2452 de 2025, art. 279 num. 3' },
+      { n: 5, name: 'Solicitud de división en lotes con dictamen que la sustente, si se pide', mandatory: false, basis: 'Ley 2452 de 2025, art. 279 num. 6' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=259639'
+  },
+  {
+    id: 'laboral/postura-y-consignacion-del-saldo-en-el-remate-laboral',
+    exactName: 'Postura y consignación del saldo en el remate laboral',
+    branch: 'LABORAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 2452 de 2025, art. 280 num. 3, 6, 7 y 10; art. 283 (consignación de saldos); art. 284 (aprobación del remate); art. 281 (cartelera electrónica)',
+    competentAuthority: 'El juez laboral que adelanta la subasta',
+    term: { status: 'VERIFICADO', description: 'DOS RELOJES DE CINCO (5) DÍAS, AMBOS DEL CLIENTE, Y EL SEGUNDO ES FATAL. PARA PUJAR: «Todo el que pretenda hacer postura en la subasta deberá consignar previamente, en dinero, a órdenes del juzgado, el porcentaje fijado DENTRO DE LOS CINCO (5) DÍAS ANTERIORES AL REMATE» (art. 280 num. 7) — se cuenta hacia atrás desde la diligencia, que es lo que lo hace fácil de perder, y ese porcentaje es el cuarenta por ciento (40%) del avalúo. PARA PAGAR: «El rematante deberá consignar el saldo del precio dentro de los CINCO (5) DÍAS siguientes a la diligencia […] y presentar el recibo de pago del impuesto de remate, si existiere» (art. 283). BASE DE LA LICITACIÓN: el setenta por ciento (70%) del avalúo. EXCEPCIÓN QUE AHORRA EL DEPÓSITO: el único ejecutante o el acreedor de mejor derecho «podrá rematar por cuenta de su crédito […] sin necesidad de consignar porcentaje, siempre que aquel equivalga por lo menos al cuarenta por ciento (40%) del avalúo». DOS RELOJES QUE NO SON DEL ABOGADO: la publicación en la cartelera electrónica va «con antelación no inferior a DIEZ (10) DÍAS a la fecha señalada para el remate», y el juez aprueba el remate «dentro de los CINCO (5) DÍAS siguientes» (art. 284). REQUISITOS QUE CADUCAN Y HAY QUE RENOVAR: el certificado de tradición debe estar «expedido dentro del mes anterior a la fecha prevista para la diligencia», y el apoderado que licite «requerirá FACULTAD EXPRESA».' },
+    requiredSections: [
+      { n: 1, name: 'Identificación de la diligencia de remate, de los bienes y de la base de la licitación', mandatory: true, basis: 'Ley 2452 de 2025, art. 280 num. 3' },
+      { n: 2, name: 'Título de consignación del cuarenta por ciento (40%) del avalúo, o invocación de la excepción del ejecutante único', mandatory: true, basis: 'Ley 2452 de 2025, art. 280 num. 7 y 10' },
+      { n: 3, name: 'Poder con facultad expresa para licitar, cuando actúa apoderado', mandatory: true, basis: 'Ley 2452 de 2025, art. 280' },
+      { n: 4, name: 'Certificado de tradición y libertad expedido dentro del mes anterior a la diligencia', mandatory: true, basis: 'Ley 2452 de 2025, art. 280 num. 6' },
+      { n: 5, name: 'Consignación del saldo y recibo del impuesto de remate, dentro de los cinco (5) días siguientes', mandatory: true, basis: 'Ley 2452 de 2025, art. 283' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=259639'
+  },
+  {
+    id: 'laboral/solicitud-de-levantamiento-del-secuestro-por-tercero-poseedor-en-proceso-laboral',
+    exactName: 'Solicitud de levantamiento del secuestro por tercero poseedor en proceso laboral',
+    branch: 'LABORAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 2452 de 2025, art. 272',
+    competentAuthority: 'El juez laboral que conoce de la ejecución, que la resuelve de plano',
+    term: { status: 'VERIFICADO', description: 'EN CUALQUIER TIEMPO ANTES DEL REMATE, Y AQUÍ EL RÉGIMEN ES MÁS GENEROSO QUE EL CIVIL: NO HAY VEINTE NI CINCO DÍAS QUE PERDER. «Queda a salvo el derecho de terceras personas, si prestan caución de indemnizar a las partes los perjuicios que de su acción se les sigan, para pedir EN CUALQUIER TIEMPO, ANTES DEL REMATE, que se levante el secuestro de bienes, alegando que tenían la posesión de ellos al tiempo en que aquel se hizo» (art. 272). LO QUE SÍ CUESTA, Y HAY QUE ADVERTÍRSELO AL TERCERO ANTES: la caución es requisito para pedirlo, no una eventualidad. Y no hay etapa probatoria que ganar tiempo: «Junto con su petición, el tercero deberá presentar LAS PRUEBAS EN QUE LA FUNDE y el juez la resolverá DE PLANO» — lo que no se aporte con el escrito no se aporta después. EL HITO QUE SÍ CIERRA LA PUERTA ES EL REMATE: consumado, esta vía se acabó.' },
+    requiredSections: [
+      { n: 1, name: 'Acreditación de la calidad de tercero poseedor al tiempo del secuestro', mandatory: true, basis: 'Ley 2452 de 2025, art. 272' },
+      { n: 2, name: 'Pruebas de la posesión, aportadas con la petición porque el juez resuelve de plano', mandatory: true, basis: 'Ley 2452 de 2025, art. 272' },
+      { n: 3, name: 'Caución de indemnizar a las partes los perjuicios de la solicitud', mandatory: true, basis: 'Ley 2452 de 2025, art. 272' },
+      { n: 4, name: 'Constancia de que aún no se ha consumado el remate', mandatory: true, basis: 'Ley 2452 de 2025, art. 272' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=259639'
   }
   ]
 };

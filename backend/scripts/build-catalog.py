@@ -172,6 +172,13 @@ BRANCHES = [
         'FAMILIA_ADMINISTRATIVA',
         'familia_administrativa',
     ),
+    (
+        'actuaciones-seguridad-social.json',
+        'seguridad-social.ts',
+        'SEGURIDAD_SOCIAL_CATALOG',
+        'SEGURIDAD_SOCIAL',
+        'seguridad_social',
+    ),
 ]
 
 

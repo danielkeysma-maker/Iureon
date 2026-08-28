@@ -36,7 +36,14 @@ export const BRANCH_LABELS: Record<string, string> = {
   // Comisarias y defensorias de familia: administrativo, no policivo ni
   // judicial. El comisario no figura entre las autoridades de policia del
   // art. 198 de la Ley 1801, y el juez de familia entra despues.
-  FAMILIA_ADMINISTRATIVA: 'Comisarías & Defensorías de Familia'
+  FAMILIA_ADMINISTRATIVA: 'Comisarías & Defensorías de Familia',
+  // Separada de LABORAL a proposito. LABORAL es procedimiento judicial ante
+  // juez laboral sobre la Ley 2452; aqui casi ninguna actuacion llega a un
+  // juzgado: se surten ante Colpensiones, una AFP, una ARL, una EPS o una
+  // Junta de Calificacion. Meterlas en LABORAL mentiria sobre la autoridad, y
+  // en ADMINISTRATIVO mentiria sobre el reloj, porque su control judicial no
+  // va al contencioso sino al juez laboral.
+  SEGURIDAD_SOCIAL: 'Seguridad Social (Colpensiones, AFP, ARL & Juntas)'
   /*
    * Aqui vivia 'PEQUEÑAS_CAUSAS', conservada —decia su comentario— «para que
    * sus tipos de documento heredados sigan alcanzables». Esos tipos heredados

@@ -534,9 +534,9 @@
     {
       "exact_name": "Solicitud de medidas cautelares",
       "role": "LITIGANTE",
-      "legal_basis": "Ley 1564 de 2012, art. 590",
+      "legal_basis": "Ley 1564 de 2012, art. 590; art. 306 (por remision del art. 590 par. 2); cf. art. 599 para el regimen ejecutivo",
       "competent_authority": "El juez que conoce del proceso",
-      "term": "En los procesos declarativos las medidas cautelares pueden pedirse por el demandante desde la presentación de la demanda (art. 590, num. 1); la norma no señala fecha límite para solicitarlas: no opera caducidad de la solicitud. El demandante debe prestar caución equivalente al veinte por ciento (20%) del valor de las pretensiones estimadas, salvo para embargos y secuestros posteriores a sentencia favorable de primera instancia (art. 590, num. 2). Por remisión expresa del parágrafo segundo del art. 590, las medidas de los literales b) y c) se levantarán si el demandante no promueve la ejecución dentro del término del art. 306, esto es, dentro de los treinta (30) días siguientes a la ejecutoria de la sentencia o a la notificación del auto de obedecimiento a lo resuelto por el superior.",
+      "term": "SE PIDE DESDE LA PRESENTACION DE LA DEMANDA Y NO CADUCA, PERO ESTA FICHA ES SOLO LA DEL PROCESO DECLARATIVO (art. 590). Si el proceso es EJECUTIVO, el regimen es otro y esta en la ficha «Solicitud de embargo y secuestro de bienes del ejecutado» (art. 599): alli el ejecutante NO presta caucion, y la del 10% la presta el ejecutado como contracautela. Aplicar aqui el 20% a un ejecutivo es cobrarle al cliente una garantia que la ley no le exige.\n\nREGIMEN DECLARATIVO: «En los procesos declarativos las medidas cautelares pueden pedirse por el demandante desde la presentacion de la demanda» (art. 590 num. 1), sin fecha limite: la solicitud no caduca. CARGA DEL CLIENTE: caucion equivalente al VEINTE POR CIENTO (20%) del valor de las pretensiones estimadas, salvo para los embargos y secuestros posteriores a sentencia favorable de primera instancia (art. 590 num. 2).\n\nEL RELOJ QUE MATA LA CAUTELA ES POSTERIOR Y ES DEL CLIENTE: TREINTA (30) DIAS. Por el paragrafo segundo del art. 590, las medidas de los literales b) y c) se levantan si el demandante no promueve la ejecucion dentro del termino del art. 306, esto es, dentro de los treinta (30) dias siguientes a la ejecutoria de la sentencia o a la notificacion del auto de obedecimiento a lo resuelto por el superior. Se gana el pleito y, por dejar pasar el mes, los bienes cautelados quedan libres justo cuando iban a servir.",
       "required_sections": [
         {
           "n": 1,
@@ -1566,9 +1566,9 @@
     {
       "exact_name": "Auto que decreta medidas cautelares",
       "role": "DESPACHO",
-      "legal_basis": "Ley 1564 de 2012, art. 590",
+      "legal_basis": "Ley 1564 de 2012, arts. 588, 590 y 595 num. 1",
       "competent_authority": "El juez que conoce del proceso",
-      "term": "El artículo 590 no fija plazo para proferir el auto que decreta la medida. La caución previa equivale al veinte por ciento (20%) del valor de las pretensiones estimadas en la demanda, salvo los embargos y secuestros posteriores a sentencia favorable de primera instancia (art. 590 num. 2). Las medidas de los literales b) y c) del numeral 1 se levantan si el demandante no promueve la ejecución dentro del término a que se refiere el artículo 306 (art. 590 par. 2), esto es, dentro de los treinta (30) días siguientes a la ejecutoria de la sentencia o a la notificación del auto de obedecimiento a lo resuelto por el superior (art. 306).",
+      "term": "EL ARTICULO 590 NO FIJA PLAZO PARA PROFERIR EL AUTO, PERO EL 588 SI, Y ESE DIA ES DEL DESPACHO, NO DE LA PARTE: «Cuando la solicitud de medidas cautelares se haga por fuera de audiencia, el juez resolvera, a mas tardar, al dia siguiente del reparto o a la presentacion de la solicitud» (art. 588). Publicarlo como si fuera un termino del abogado seria invertir de quien es el reloj.\n\nCONTENIDO QUE DEBE LLEVAR EL AUTO cuando decreta secuestro: «En el auto que lo decrete se senalara fecha y hora para la diligencia y se designara secuestre que debera concurrir a ella, so pena de multa de diez (10) a veinte (20) salarios minimos mensuales» (art. 595 num. 1).\n\nCAUCION: el veinte por ciento (20%) de las pretensiones estimadas en el declarativo (art. 590 num. 2), salvo los embargos y secuestros posteriores a sentencia favorable de primera instancia. En el EJECUTIVO no hay caucion del ejecutante (art. 599).\n\nLEVANTAMIENTO POR INACTIVIDAD, RELOJ DE LA PARTE: las medidas de los literales b) y c) del num. 1 se levantan si el demandante no promueve la ejecucion dentro de los treinta (30) dias del art. 306 (art. 590 par. 2).",
       "required_sections": [
         {
           "n": 1,
@@ -2582,6 +2582,1325 @@
         }
       ],
       "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=54297"
+    },
+    {
+      "exact_name": "Solicitud de embargo y secuestro de bienes del ejecutado",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código General del Proceso, art. 599 (oportunidad y contracautela), art. 593 (formas de practicar el embargo según el bien), art. 595 (diligencia de secuestro) y art. 588 (plazo del juez para resolver)",
+      "competent_authority": "El juez que conoce del proceso ejecutivo",
+      "term": "NO CADUCA, Y EL RELOJ QUE APARECE EN EL ARTÍCULO VECINO NO ES DEL CLIENTE. Para el ejecutante no hay plazo: «Desde la presentación de la demanda el ejecutante podrá solicitar el embargo y secuestro de bienes del ejecutado» (art. 599). CUIDADO CON CONFUNDIRLO CON EL PLAZO DEL JUEZ: el art. 588 dispone que «Cuando la solicitud de medidas cautelares se haga por fuera de audiencia, el juez resolverá, a más tardar, al día siguiente del reparto o a la presentación de la solicitud» — ese día es del despacho para decidir, no un término que el abogado deba cumplir. LO QUE SÍ PUEDE COSTARLE AL EJECUTANTE: si el ejecutado propone excepciones de mérito o un tercero resulta afectado, pueden pedir que el ejecutante preste caución hasta por el 10% del valor de la ejecución, y entonces sí corre un plazo suyo de quince (15) días «so pena de levantamiento» (art. 599 inc. 5) — ver la ficha de contracautela.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del proceso ejecutivo y del mandamiento de pago",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 599"
+        },
+        {
+          "n": 2,
+          "name": "Individualización de los bienes cuyo embargo se pide, con los datos que exige su forma de registro",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 593"
+        },
+        {
+          "n": 3,
+          "name": "Indicación de la forma de perfeccionar el embargo según la clase de bien: registro, oficio al banco, al pagador o a la sociedad",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 593"
+        },
+        {
+          "n": 4,
+          "name": "Solicitud de secuestro y designación de secuestre, cuando el bien lo admite",
+          "mandatory": false,
+          "basis": "Código General del Proceso, art. 595"
+        },
+        {
+          "n": 5,
+          "name": "Manifestación de que los bienes no están comprendidos en las causales de inembargabilidad",
+          "mandatory": false,
+          "basis": "Código General del Proceso, art. 594"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr015.html"
+    },
+    {
+      "exact_name": "Insistencia en perseguir los derechos del ejecutado tras el levantamiento del secuestro",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código General del Proceso, art. 596 num. 3; art. 596 num. 2 (remisión al trámite de la oposición del art. 309)",
+      "competent_authority": "El juez que conoce del proceso ejecutivo, o el comisionado ante quien se practicó la diligencia",
+      "term": "TRES (3) DÍAS, RELOJ DEL CLIENTE, Y ES DE LOS QUE MÁS EMBARGOS PIERDE POR DESCONOCIMIENTO. Prosperada la oposición de un tercero, el embargo se cae solo si el ejecutante se queda callado: «dentro de los tres (3) días siguientes a la ejecutoria del auto favorable al opositor, que levante el secuestro, o se abstenga de practicarlo en razón de la oposición, podrá el interesado expresar que INSISTE en perseguir los derechos que tenga el demandado en ellos, caso en el cual se practicará el correspondiente avalúo; DE LO CONTRARIO SE LEVANTARÁ EL EMBARGO» (art. 596 num. 3). Son tres días desde la ejecutoria, no desde la diligencia, y no hay quien lo recuerde: el auto favorece al opositor y el expediente sigue su curso. QUÉ SE CONSERVA AL INSISTIR: no el bien, sino los derechos que el ejecutado tenga sobre él, que se avalúan y se persiguen.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del auto que resolvió la oposición y de la fecha de su ejecutoria",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 596 num. 3"
+        },
+        {
+          "n": 2,
+          "name": "Manifestación expresa de que se INSISTE en perseguir los derechos del ejecutado sobre el bien",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 596 num. 3"
+        },
+        {
+          "n": 3,
+          "name": "Constancia de presentación dentro de los tres (3) días siguientes a la ejecutoria",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 596 num. 3"
+        },
+        {
+          "n": 4,
+          "name": "Solicitud de que se practique el avalúo de esos derechos",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 596 num. 3"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr015.html"
+    },
+    {
+      "exact_name": "Solicitud de ejecución a continuación de la sentencia",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código General del Proceso, art. 306 (ejecución a continuación); art. 597 num. 6 (levantamiento de las cautelas por no pedirla); art. 590 parágrafo 2",
+      "competent_authority": "El mismo juez que profirió la sentencia, a continuación del proceso declarativo",
+      "term": "TREINTA (30) DÍAS, RELOJ DEL CLIENTE, Y ES EL PLAZO QUE MÁS MEDIDAS CAUTELARES MATA EN COLOMBIA. Ganada la sentencia, quien no pide la ejecución dentro del mes pierde dos cosas a la vez. LA PRIMERA, LA NOTIFICACIÓN FÁCIL: «Si la solicitud de la ejecución se formula dentro de los treinta (30) días siguientes a la ejecutoria de la sentencia, o a la notificación del auto de obedecimiento a lo resuelto por el superior, según fuere el caso, el mandamiento ejecutivo se notificará por estado. DE SER FORMULADA CON POSTERIORIDAD, la notificación del mandamiento ejecutivo al ejecutado deberá realizarse PERSONALMENTE» (art. 306). LA SEGUNDA, Y ES LA GRAVE, LAS CAUTELAS: el art. 597 num. 6 ordena levantar el embargo y el secuestro «Si el demandante en proceso declarativo no formula la solicitud de que trata el inciso primero del artículo 306 dentro de los treinta (30) días siguientes a la ejecutoria de la sentencia que contenga la condena». Es decir: se gana el pleito, se deja pasar el mes, y los bienes que llevaban años embargados quedan libres justo cuando iban a servir.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la sentencia que contiene la condena y de la fecha de su ejecutoria",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 306"
+        },
+        {
+          "n": 2,
+          "name": "Constancia de presentación dentro de los treinta (30) días siguientes a la ejecutoria",
+          "mandatory": true,
+          "basis": "Código General del Proceso, arts. 306 y 597 num. 6"
+        },
+        {
+          "n": 3,
+          "name": "Liquidación de la obligación que se pretende ejecutar, conforme a la condena",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 306"
+        },
+        {
+          "n": 4,
+          "name": "Petición de que se mantengan las medidas cautelares practicadas en el declarativo",
+          "mandatory": false,
+          "basis": "Código General del Proceso, art. 597 num. 6"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr010.html"
+    },
+    {
+      "exact_name": "Incidente de levantamiento del secuestro por el tercero poseedor",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código General del Proceso, art. 597 num. 8",
+      "competent_authority": "El juez del conocimiento",
+      "term": "VEINTE (20) DÍAS SI ESTUVO AUSENTE, CINCO (5) SI ESTUVO PRESENTE SIN ABOGADO. RELOJ DEL CLIENTE, Y CON MULTA SI PIERDE. «Si un tercero poseedor que no estuvo presente en la diligencia de secuestro solicita al juez del conocimiento, dentro de los VEINTE (20) DÍAS siguientes a la práctica de la diligencia, si lo hizo el juez de conocimiento, o a la notificación del auto que ordena agregar el despacho comisorio, que se declare que tenía la posesión material del bien al tiempo en que aquella se practicó, y obtiene decisión favorable» se levanta el secuestro. Y para quien sí estuvo: «También podrá promover el incidente el tercero poseedor que haya estado presente en la diligencia SIN LA REPRESENTACIÓN DE APODERADO JUDICIAL, pero el término para hacerlo será de CINCO (5) DÍAS». EL RIESGO DE PERDERLO ESTÁ ESCRITO: «Si el incidente se decide desfavorablemente a quien lo promueve, se impondrá a este una multa de cinco (5) a veinte (20) salarios mínimos mensuales». Es una defensa con costo, y hay que advertírselo al cliente antes de promoverla.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Acreditación de la calidad de tercero poseedor material al tiempo de la diligencia",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 597 num. 8"
+        },
+        {
+          "n": 2,
+          "name": "Constancia de que no estuvo presente en la diligencia, o de que estuvo sin apoderado judicial",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 597 num. 8"
+        },
+        {
+          "n": 3,
+          "name": "Presentación dentro de los veinte (20) días, o de los cinco (5) según el caso",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 597 num. 8"
+        },
+        {
+          "n": 4,
+          "name": "Pruebas de la posesión material anterior al secuestro",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 597 num. 8"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr015.html"
+    },
+    {
+      "exact_name": "Comparecencia del acreedor con garantía real citado al proceso ejecutivo",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código General del Proceso, art. 462",
+      "competent_authority": "El juez que conoce del proceso ejecutivo al que se cita al acreedor",
+      "term": "VEINTE (20) DÍAS DESDE LA NOTIFICACIÓN PERSONAL, RELOJ DEL CLIENTE Y PRECLUSIVO. Citado el acreedor con garantía real, sus créditos «se harán exigibles si no lo fueren», y debe hacerlos valer «ante el mismo juez, bien sea en proceso separado o en el que se les cita, DENTRO DE LOS VEINTE (20) DÍAS SIGUIENTES A SU NOTIFICACIÓN PERSONAL» (art. 462). LO QUE SE PIERDE AL DEJARLO VENCER ES LA ELECCIÓN DEL FORO, NO EL CRÉDITO: «Si vencido el término […] el acreedor notificado no hubiere instaurado alguna de las demandas ejecutivas, SÓLO PODRÁ HACER VALER SUS DERECHOS EN EL PROCESO AL QUE FUE CITADO». Es decir, queda atado al proceso ajeno, con su ritmo y su avalúo, sin poder abrir el suyo.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del proceso al que fue citado y de la fecha de su notificación personal",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 462"
+        },
+        {
+          "n": 2,
+          "name": "Título ejecutivo y prueba de la garantía real que se hace valer",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 462"
+        },
+        {
+          "n": 3,
+          "name": "Constancia de presentación dentro de los veinte (20) días siguientes a la notificación personal",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 462"
+        },
+        {
+          "n": 4,
+          "name": "Manifestación de si se acude en proceso separado o dentro del proceso al que fue citado",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 462"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr016.html"
+    },
+    {
+      "exact_name": "Consignación del saldo del precio del remate",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código General del Proceso, art. 453; art. 451 (postura y depósito previo del 40%)",
+      "competent_authority": "El juzgado de conocimiento, a cuyas órdenes se consigna",
+      "term": "CINCO (5) DÍAS, RELOJ DEL REMATANTE, FATAL Y CON MULTA. «El rematante deberá consignar el saldo del precio dentro de los CINCO (5) DÍAS siguientes a la diligencia a órdenes del juzgado de conocimiento, descontada la suma que depositó para hacer postura, y presentar el recibo de pago del impuesto de remate si existiere el impuesto» (art. 453). LO QUE CUESTA DEJARLO VENCER ESTÁ EN EL MISMO ARTÍCULO: «Vencido el término sin que se hubiere hecho la consignación y el pago del impuesto, el juez IMPROBARÁ EL REMATE y decretará la PÉRDIDA DE LA MITAD DE LA SUMA DEPOSITADA para hacer postura, a título de multa». Se pierde el bien y la mitad del 40% consignado para pujar.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la diligencia de remate y del bien adjudicado",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 453"
+        },
+        {
+          "n": 2,
+          "name": "Título de consignación del saldo, descontado el depósito previo del cuarenta por ciento (40%)",
+          "mandatory": true,
+          "basis": "Código General del Proceso, arts. 451 y 453"
+        },
+        {
+          "n": 3,
+          "name": "Recibo de pago del impuesto de remate, si existiere",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 453"
+        },
+        {
+          "n": 4,
+          "name": "Constancia de presentación dentro de los cinco (5) días siguientes a la diligencia",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 453"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr016.html"
+    },
+    {
+      "exact_name": "Presentación del avalúo de los bienes embargados",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código General del Proceso, art. 444 num. 1",
+      "competent_authority": "El juez que conoce del proceso ejecutivo",
+      "term": "VEINTE (20) DÍAS, RELOJ DEL CLIENTE, Y LO QUE SE PIERDE NO ES EL AVALÚO SINO LA CONTRADICCIÓN. «Las partes podrán presentar el avalúo dentro de los VEINTE (20) DÍAS siguientes a la ejecutoria de la sentencia o del auto que ordena seguir adelante la ejecución» (art. 444 num. 1). Dejarlo vencer tiene una consecuencia doble escrita en el mismo numeral: «Si no se allega oportunamente el avalúo, el juez designará el perito evaluador […] tampoco habrá lugar a objeciones». Es decir, avalúa un perito que el ejecutante no escogió y el ejecutado se queda sin poder objetarlo. En un ejecutivo con inmueble, ese silencio de veinte días fija la base del remate.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la sentencia o del auto que ordena seguir adelante la ejecución, con su fecha de ejecutoria",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 444 num. 1"
+        },
+        {
+          "n": 2,
+          "name": "Individualización de cada bien embargado que se avalúa",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 444 num. 1"
+        },
+        {
+          "n": 3,
+          "name": "Dictamen de avalúo con la calidad del perito y su fundamentación",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 444 num. 1"
+        },
+        {
+          "n": 4,
+          "name": "Constancia de presentación dentro de los veinte (20) días siguientes a la ejecutoria",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 444 num. 1"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr016.html"
+    },
+    {
+      "exact_name": "Observaciones al avalúo de los bienes embargados",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código General del Proceso, art. 444 num. 2",
+      "competent_authority": "El juez que conoce del proceso ejecutivo",
+      "term": "DIEZ (10) DÍAS DE TRASLADO, RELOJ DEL CLIENTE. «Del avalúo se correrá traslado por DIEZ (10) DÍAS mediante auto, para que los interesados presenten sus observaciones» (art. 444 num. 2). SI SE APORTA UN AVALÚO DIFERENTE, EL SEGUNDO RELOJ ES MÁS CORTO: de ese avalúo distinto se corre traslado por TRES (3) DÍAS. ADVERTENCIA QUE HAY QUE DARLE AL CLIENTE ANTES: quien no presentó su avalúo dentro de los veinte (20) días del num. 1 y dejó que lo designara el juez NO TIENE ESTA OPORTUNIDAD — «tampoco habrá lugar a objeciones». El traslado solo existe para quien llegó a tiempo antes.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del auto que corrió traslado del avalúo y de su fecha",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 444 num. 2"
+        },
+        {
+          "n": 2,
+          "name": "Observaciones concretas al avalúo, bien por bien",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 444 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "Avalúo diferente que se aporta, si es el caso",
+          "mandatory": false,
+          "basis": "Código General del Proceso, art. 444 num. 2"
+        },
+        {
+          "n": 4,
+          "name": "Constancia de presentación dentro de los diez (10) días del traslado",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 444 num. 2"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr016.html"
+    },
+    {
+      "exact_name": "Liquidación del crédito y de las costas en proceso ejecutivo",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código General del Proceso, art. 446 num. 1",
+      "competent_authority": "El juez que conoce del proceso ejecutivo",
+      "term": "SIN PLAZO EN LA NORMA: NO HAY DÍAS QUE CONTAR, SINO UNA CONDICIÓN DE OPORTUNIDAD. La liquidación se presenta ejecutoriada la sentencia o el auto que ordena seguir adelante la ejecución, o desde que quede en firme la providencia que resuelva sobre las excepciones. Nada extingue el derecho a presentarla, pero mientras no exista liquidación en firme no se puede señalar fecha de remate ni pagar. EL RELOJ APARECE DESPUÉS, Y ES CORTO: presentada la liquidación, quien quiera objetarla tiene tres (3) días y una carga de forma — ver la ficha de objeción.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la providencia que ordena seguir adelante la ejecución",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 446 num. 1"
+        },
+        {
+          "n": 2,
+          "name": "Estado de cuenta con capital, intereses y su tasa, discriminado por períodos",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 446 num. 1"
+        },
+        {
+          "n": 3,
+          "name": "Liquidación de las costas y de las agencias en derecho",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 446 num. 1"
+        },
+        {
+          "n": 4,
+          "name": "Abonos y pagos parciales imputados",
+          "mandatory": false,
+          "basis": "Código General del Proceso, art. 446 num. 1"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr016.html"
+    },
+    {
+      "exact_name": "Objeción a la liquidación del crédito",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código General del Proceso, art. 446 num. 2",
+      "competent_authority": "El juez que conoce del proceso ejecutivo",
+      "term": "TRES (3) DÍAS, RELOJ DEL CLIENTE, Y CON UNA CARGA DE FORMA QUE SE RECHAZA DE PLANO SI FALTA. El objetante «SÓLO podrá formular objeciones relativas al estado de cuenta, para cuyo trámite deberá acompañar, SO PENA DE RECHAZO, una liquidación alternativa en la que se precisen los errores puntuales» (art. 446 num. 2). Dos consecuencias que hay que advertir antes de redactar: PRIMERA, no sirve objetar en abstracto ni discutir de nuevo la obligación — la objeción que no señala el error puntual y no trae su propia cuenta se rechaza sin estudiarla. SEGUNDA, el ámbito está cerrado al estado de cuenta: lo que debió alegarse como excepción ya precluyó.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la liquidación objetada y de la fecha del traslado",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 446 num. 2"
+        },
+        {
+          "n": 2,
+          "name": "Señalamiento puntual de cada error del estado de cuenta",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 446 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "Liquidación alternativa que se acompaña, so pena de rechazo",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 446 num. 2"
+        },
+        {
+          "n": 4,
+          "name": "Constancia de presentación dentro de los tres (3) días del traslado",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 446 num. 2"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr016.html"
+    },
+    {
+      "exact_name": "Solicitud de señalamiento de fecha para el remate",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código General del Proceso, art. 448",
+      "competent_authority": "El juez que conoce del proceso ejecutivo",
+      "term": "SIN PLAZO, PERO CON TRES CONDICIONES QUE DEBEN ESTAR CUMPLIDAS ANTES: los bienes deben estar EMBARGADOS, SECUESTRADOS Y AVALUADOS, y la liquidación del crédito en firme. Pedir el remate sin alguna de las tres solo produce un auto que niega y pierde meses. LO QUE FIJA EL JUEZ Y CONVIENE ANTICIPARLE AL CLIENTE: «fijará la base de la licitación, que será el SETENTA POR CIENTO (70%) DEL AVALÚO de los bienes» — de ahí que el avalúo de los veinte días del art. 444 sea la pieza que decide cuánto se recupera.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de los bienes embargados, secuestrados y avaluados que se pide rematar",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 448"
+        },
+        {
+          "n": 2,
+          "name": "Constancia de que el avalúo y la liquidación del crédito están en firme",
+          "mandatory": true,
+          "basis": "Código General del Proceso, arts. 444, 446 y 448"
+        },
+        {
+          "n": 3,
+          "name": "Indicación del valor del avalúo, del que se derivará la base del setenta por ciento (70%)",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 448"
+        },
+        {
+          "n": 4,
+          "name": "Solicitud de comisión para el remate ante notario, cámara de comercio o martillo, si se pide",
+          "mandatory": false,
+          "basis": "Código General del Proceso, art. 454"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr016.html"
+    },
+    {
+      "exact_name": "Postura para el remate con depósito previo",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código General del Proceso, art. 451",
+      "competent_authority": "El juzgado de conocimiento, o el notario, la cámara de comercio o el martillo comisionado para el remate",
+      "term": "CINCO (5) DÍAS ANTERIORES AL REMATE, RELOJ DEL CLIENTE Y HACIA ATRÁS: se cuenta desde la fecha de la diligencia, no desde una notificación, que es lo que lo hace fácil de perder. «Todo el que pretenda hacer postura en la subasta deberá consignar previamente en dinero, a órdenes del juzgado, el CUARENTA POR CIENTO (40%) DEL AVALÚO […] y podrá hacer postura DENTRO DE LOS CINCO (5) DÍAS ANTERIORES AL REMATE» (art. 451). EXCEPCIÓN QUE SE USA TODOS LOS DÍAS: el ejecutante único «podrá rematar por cuenta de su crédito los bienes materia de la subasta, SIN NECESIDAD DE CONSIGNAR PORCENTAJE», siempre que el crédito lo permita. La postura se presenta en sobre cerrado.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la diligencia de remate y de los bienes sobre los que se puja",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 451"
+        },
+        {
+          "n": 2,
+          "name": "Título de consignación del cuarenta por ciento (40%) del avalúo, o invocación de la excepción del ejecutante único",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 451"
+        },
+        {
+          "n": 3,
+          "name": "Valor ofrecido, que no puede ser inferior a la base de la licitación",
+          "mandatory": true,
+          "basis": "Código General del Proceso, arts. 448 y 451"
+        },
+        {
+          "n": 4,
+          "name": "Presentación en sobre cerrado dentro de los cinco (5) días anteriores al remate",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 451"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr016.html"
+    },
+    {
+      "exact_name": "Alegación de nulidad o irregularidades del remate",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código General del Proceso, art. 452 inc. 3; art. 455",
+      "competent_authority": "El juez que conoce del proceso ejecutivo",
+      "term": "HASTA ANTES DE LA ADJUDICACIÓN. NO SON DÍAS: ES UN HITO, Y PASADO NO HAY SEGUNDA OPORTUNIDAD NI PARA EL VICIO MÁS GRAVE. «Las irregularidades que puedan afectar la validez del remate se considerarán SANEADAS si no son alegadas ANTES DE LA ADJUDICACIÓN. Las solicitudes de nulidad que se formulen DESPUÉS DE ESTA, NO SERÁN OÍDAS». Esto obliga a revisar la diligencia mientras ocurre —publicación, base, posturas, capacidad del postor— porque el saneamiento opera solo, sin que nadie lo declare. La aprobación del remate por el juez tiene su propio plazo de cinco (5) días, pero ESE RELOJ ES DEL JUZGADO, no del abogado, y su incumplimiento es falta disciplinaria gravísima del funcionario, no una carga de la parte.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la diligencia de remate y del momento procesal en que se alega",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 452"
+        },
+        {
+          "n": 2,
+          "name": "Descripción concreta de la irregularidad que afecta la validez del remate",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 452 inc. 3"
+        },
+        {
+          "n": 3,
+          "name": "Constancia de que se alega ANTES de la adjudicación",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 452 inc. 3"
+        },
+        {
+          "n": 4,
+          "name": "Pruebas de la irregularidad alegada",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 452"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr016.html"
+    },
+    {
+      "exact_name": "Solicitud de contracautela al ejecutante en proceso ejecutivo",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código General del Proceso, art. 599 inc. 5",
+      "competent_authority": "El juez que conoce del proceso ejecutivo",
+      "term": "SIN PLAZO PARA PEDIRLA, PERO ABRE UN RELOJ DE QUINCE (15) DÍAS QUE CORRE CONTRA EL EJECUTANTE, NO CONTRA QUIEN LA PIDE. Propuestas excepciones de mérito, o afectado un tercero, puede exigirse que el ejecutante preste caución hasta por el diez por ciento (10%) del valor actual de la ejecución para responder por los perjuicios de las cautelas. «La caución deberá prestarse DENTRO DE LOS QUINCE (15) DÍAS SIGUIENTES A LA NOTIFICACIÓN DEL AUTO QUE LA ORDENE», so pena de levantamiento de las medidas. DOS EXCEPCIONES QUE HAY QUE VERIFICAR ANTES DE REDACTAR, porque hacen inútil la solicitud: no se exige caución a las entidades vigiladas por la Superintendencia Financiera ni a las de derecho público.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del proceso ejecutivo y de las medidas cautelares practicadas",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 599"
+        },
+        {
+          "n": 2,
+          "name": "Acreditación de haber propuesto excepciones de mérito, o de la afectación como tercero",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 599 inc. 5"
+        },
+        {
+          "n": 3,
+          "name": "Valor actual de la ejecución y cuantificación del diez por ciento (10%) que se pide",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 599 inc. 5"
+        },
+        {
+          "n": 4,
+          "name": "Manifestación de que el ejecutante no es entidad vigilada por la Superintendencia Financiera ni de derecho público",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 599 inc. 5"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr015.html"
+    },
+    {
+      "exact_name": "Solicitud de reducción de embargos",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código General del Proceso, art. 600",
+      "competent_authority": "El juez que conoce del proceso ejecutivo",
+      "term": "LA OPORTUNIDAD SE CIERRA CON UN HITO, NO CON DÍAS: SE PIDE ANTES DE QUE SE FIJE FECHA PARA EL REMATE. Procede cuando los bienes embargados exceden notoriamente lo necesario para el pago del crédito y las costas. UNA VEZ REQUERIDO EL EJECUTANTE, EL RELOJ ES SUYO: cuenta con cinco (5) días para pronunciarse sobre cuáles bienes deben quedar afectados. Es la defensa del ejecutado a quien le embargaron tres inmuebles por una obligación que uno solo cubre, y pierde sentido apenas señalada la fecha de subasta.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de todos los bienes embargados y de su avalúo o valor estimado",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 600"
+        },
+        {
+          "n": 2,
+          "name": "Valor actual del crédito y de las costas, para demostrar el exceso notorio",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 600"
+        },
+        {
+          "n": 3,
+          "name": "Indicación de los bienes cuyo desembargo se solicita y de los que deben quedar afectados",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 600"
+        },
+        {
+          "n": 4,
+          "name": "Constancia de que aún no se ha señalado fecha para el remate",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 600"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr015.html"
+    },
+    {
+      "exact_name": "Solicitud de beneficio de competencia",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código General del Proceso, art. 445",
+      "competent_authority": "El juez que conoce del proceso ejecutivo",
+      "term": "DURANTE LA EJECUTORIA DEL AUTO QUE CORRE TRASLADO DEL AVALÚO, ES DECIR TRES (3) DÍAS, Y EL RELOJ ES DEL EJECUTADO. Es una ventana angosta y única: pedido antes no hay avalúo sobre el cual medir el patrimonio, y pedido después ya precluyó. CARGA PROBATORIA QUE DEFINE EL ÉXITO: el ejecutado debe demostrar que los bienes avaluados son su ÚNICO patrimonio, de modo que la solicitud sin prueba de esa condición se niega. Es la defensa de última hora del deudor persona natural cuyo remate lo dejaría sin nada para subsistir.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del auto que corrió traslado del avalúo y de su fecha",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 445"
+        },
+        {
+          "n": 2,
+          "name": "Prueba de que los bienes avaluados constituyen el único patrimonio del ejecutado",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 445"
+        },
+        {
+          "n": 3,
+          "name": "Indicación de lo indispensable para la subsistencia del ejecutado",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 445"
+        },
+        {
+          "n": 4,
+          "name": "Constancia de presentación dentro de la ejecutoria del auto de traslado",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 445"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr016.html"
+    },
+    {
+      "exact_name": "Solicitud de acumulación de demandas ejecutivas",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código General del Proceso, art. 463; art. 464 (acumulación de procesos)",
+      "competent_authority": "El juez que conoce del proceso ejecutivo al que se acumula",
+      "term": "HASTA ANTES DEL AUTO QUE FIJE LA PRIMERA FECHA PARA EL REMATE. NO SON DÍAS SINO UN HITO DEL EXPEDIENTE AJENO, así que se vigila el proceso al que se quiere entrar, no el propio. Los acreedores emplazados que comparecen tienen a su vez cinco (5) días. LÍMITE QUE HAY QUE VERIFICAR ANTES DE REDACTAR, porque hace inadmisible la solicitud: «No son acumulables procesos ejecutivos seguidos ante jueces de distintas especialidades» (art. 464) — un ejecutivo laboral no se acumula a uno civil, por más que el deudor y el bien sean los mismos.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del proceso ejecutivo al que se pretende acumular y de su estado",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 463"
+        },
+        {
+          "n": 2,
+          "name": "Título ejecutivo que se hace valer",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 463"
+        },
+        {
+          "n": 3,
+          "name": "Constancia de que aún no se ha proferido el auto que fija la primera fecha de remate",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 463"
+        },
+        {
+          "n": 4,
+          "name": "Manifestación de que ambos procesos corresponden a jueces de la misma especialidad",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 464"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr016.html"
+    },
+    {
+      "exact_name": "Levantamiento de embargo por inembargabilidad de recursos públicos",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código General del Proceso, art. 594 parágrafo; art. 597 num. 11",
+      "competent_authority": "El juez que decretó la medida, y el destinatario del oficio de embargo",
+      "term": "TRES (3) DÍAS HÁBILES, Y EL RELOJ NO ES DEL ABOGADO SINO DEL DESTINATARIO DEL OFICIO: SU SILENCIO REVOCA LA MEDIDA SOLO. «Si pasados TRES (3) DÍAS HÁBILES el destinatario no recibe oficio alguno, SE ENTENDERÁ REVOCADA LA MEDIDA CAUTELAR.» Por eso la actuación útil no es esperar el auto sino acreditar la naturaleza de los recursos. LEGITIMACIÓN ESPECIAL Y AMPLIA, que conviene aprovechar: pueden pedirlo el Procurador General, el ministro del ramo, el alcalde, el gobernador o la Agencia Nacional de Defensa Jurídica del Estado, además de la entidad afectada. ADVERTENCIA DE VIGENCIA: la compilación oficial marca el art. 594 como declarado condicionalmente exequible; el fallo respectivo no se abrió al verificar esta ficha.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la cuenta o del recurso embargado y del oficio que lo ordenó",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 593"
+        },
+        {
+          "n": 2,
+          "name": "Acreditación de que los recursos son inembargables, con el numeral del art. 594 aplicable",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 594"
+        },
+        {
+          "n": 3,
+          "name": "Certificación de la naturaleza de los recursos expedida por la entidad competente",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 594 par."
+        },
+        {
+          "n": 4,
+          "name": "Calidad en que se actúa, cuando se invoca la legitimación especial del parágrafo",
+          "mandatory": false,
+          "basis": "Código General del Proceso, art. 594 par."
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr015.html"
+    },
+    {
+      "exact_name": "Solicitud de embargo de remanentes y de bienes desembargados",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código General del Proceso, art. 466",
+      "competent_authority": "El juez del proceso donde ya existe el embargo, que comunica al juez que decreta el de remanentes",
+      "term": "SIN PLAZO EN LA NORMA, PERO LLEGAR TARDE NO SE MIDE EN DÍAS SINO EN ORDEN DE TURNO. Es la herramienta del acreedor que encuentra el bien ya embargado por otro: se persigue lo que sobre del remate ajeno y lo que se desembargue. LO QUE DEBE ADVERTIRSE AL CLIENTE: el remanente es eventual — si el primer remate no alcanza a cubrir el crédito anterior, no queda nada, y el embargo de remanentes no da prelación alguna sobre el crédito que ya estaba.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del proceso y del juzgado donde los bienes ya están embargados",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 466"
+        },
+        {
+          "n": 2,
+          "name": "Individualización de los bienes cuyo remanente se persigue",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 466"
+        },
+        {
+          "n": 3,
+          "name": "Solicitud de que se comunique el embargo de remanentes al juez del proceso anterior",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 466"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr016.html"
+    },
+    {
+      "exact_name": "Recurso de reposición en concurrencia de embargos de distintas especialidades",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código General del Proceso, art. 465",
+      "competent_authority": "El juez que recibió el oficio de embargo concurrente",
+      "term": "DIEZ (10) DÍAS DESDE EL RECIBO DEL OFICIO, RELOJ DEL CLIENTE. Cuando concurren embargos decretados por jueces de distintas especialidades sobre el mismo bien, la parte que discute la prelación o el destino del bien cuenta con diez (10) días contados desde el recibo del oficio para reponer. Es un plazo que corre desde un acto de comunicación entre despachos y no desde una notificación al abogado, y por eso se pierde: hay que vigilar el expediente, no el estado.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de los procesos concurrentes y de los jueces de cada especialidad",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 465"
+        },
+        {
+          "n": 2,
+          "name": "Fecha de recibo del oficio, de la que corren los diez (10) días",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 465"
+        },
+        {
+          "n": 3,
+          "name": "Razones de la reposición sobre la prelación o el destino del bien",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 465"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr016.html"
+    },
+    {
+      "exact_name": "Levantamiento de cautelas por no promover la liquidación de la sociedad conyugal o patrimonial",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código General del Proceso, art. 598 num. 3",
+      "competent_authority": "El juez de familia que conoció del proceso, aun de oficio",
+      "term": "DOS (2) MESES, RELOJ DEL CLIENTE, Y SE VENCE EN EL MOMENTO EN QUE LA GENTE CREE QUE YA GANÓ. «Si dentro de los DOS (2) MESES siguientes a la ejecutoria de la sentencia que disuelva la sociedad conyugal o patrimonial, NO SE HUBIERE PROMOVIDO LA LIQUIDACIÓN de esta, SE LEVANTARÁN AUN DE OFICIO las medidas cautelares» (art. 598 num. 3). Disuelta la sociedad, el cónyuge respira y deja pasar el trámite; a los dos meses los bienes que se cautelaron para asegurar su parte quedan libres y disponibles para el otro. El juez lo hace SIN QUE NADIE SE LO PIDA, así que no hay contraparte a quien culpar ni auto que recurrir por sorpresa.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la sentencia que disolvió la sociedad conyugal o patrimonial y de su ejecutoria",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 598 num. 3"
+        },
+        {
+          "n": 2,
+          "name": "Individualización de las medidas cautelares vigentes sobre los bienes sociales",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 598"
+        },
+        {
+          "n": 3,
+          "name": "Constancia de si se promovió o no la liquidación dentro de los dos (2) meses",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 598 num. 3"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr015.html"
+    },
+    {
+      "exact_name": "Promesa de compraventa de inmueble",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código Civil, art. 1611, subrogado por el art. 89 de la Ley 153 de 1887",
+      "competent_authority": "Ninguna. Es un documento privado: no requiere escritura pública ni intervención de notario o juez",
+      "term": "SIN PLAZO LEGAL PARA CELEBRARLA, PERO CON CUATRO REQUISITOS DE VALIDEZ QUE SE EXIGEN JUNTOS, Y SI FALTA UNO LA PROMESA NO VALE NADA. La norma no dice «es anulable»: dice que «NO PRODUCE OBLIGACIÓN ALGUNA». «La promesa de celebrar un contrato no produce obligación alguna, salvo que concurran las circunstancias siguientes: 1a.) Que la promesa conste POR ESCRITO. 2a.) Que el contrato a que la promesa se refiere no sea de aquellos que las leyes declaran ineficaces por no concurrir los requisitos que establece el artículo 1502 del Código Civil. 3a.) Que la promesa contenga un PLAZO O CONDICIÓN QUE FIJE LA ÉPOCA en que ha de celebrarse el contrato. 4a.) Que se DETERMINE DE TAL SUERTE EL CONTRATO, que para perfeccionarlo solo falte la tradición de la cosa o las formalidades legales.» EL RELOJ DEL CLIENTE NACE DEL REQUISITO TERCERO Y LO FIJAN LAS PARTES, NO LA LEY: la promesa sin fecha ni condición es inválida, y la que sí la trae impone una carga de calendario que hay que llevar al cliente. Redactar mal ese plazo es la causa más común de que una promesa se caiga entera.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de las partes y del inmueble prometido, con su matrícula inmobiliaria",
+          "mandatory": true,
+          "basis": "Código Civil, art. 1611 num. 4"
+        },
+        {
+          "n": 2,
+          "name": "Plazo o condición que fije la época en que ha de celebrarse el contrato prometido",
+          "mandatory": true,
+          "basis": "Código Civil, art. 1611 num. 3"
+        },
+        {
+          "n": 3,
+          "name": "Determinación del contrato prometido de modo que solo falte la tradición o las formalidades legales",
+          "mandatory": true,
+          "basis": "Código Civil, art. 1611 num. 4"
+        },
+        {
+          "n": 4,
+          "name": "Precio, forma de pago y notaría en que se otorgará la escritura",
+          "mandatory": true,
+          "basis": "Código Civil, art. 1611 num. 4"
+        },
+        {
+          "n": 5,
+          "name": "Arras o cláusula penal, si se pactan, con expresión de su naturaleza",
+          "mandatory": false,
+          "basis": "Código Civil, arts. 1859 a 1861"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil.html"
+    },
+    {
+      "exact_name": "Demanda ejecutiva para que se suscriba la escritura pública prometida",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código General del Proceso, arts. 434 y 436; Código Civil, art. 1610 num. 1",
+      "competent_authority": "El juez civil, que otorga la escritura en nombre del ejecutado si este no la suscribe",
+      "term": "EL PLAZO DE TRES (3) DÍAS QUE TRAE EL ARTÍCULO ES DEL DEUDOR, NO DEL CLIENTE, Y CONFUNDIRLO ES EL ERROR TÍPICO: «el mandamiento ejecutivo […] comprenderá la prevención al demandado de que EN CASO DE NO SUSCRIBIR la escritura o el documento en el término de tres (3) días, contados a partir de la notificación del mandamiento, EL JUEZ PROCEDERÁ A HACERLO EN SU NOMBRE» (art. 434). EL RELOJ DEL CLIENTE ES LA PRESCRIPCIÓN EJECUTIVA: CINCO (5) AÑOS desde que la obligación se hizo exigible (Código Civil, art. 2536, modificado por el art. 8 de la Ley 791 de 2002). REQUISITO QUE HUNDE DEMANDAS Y HAY QUE CUMPLIR ANTES DE RADICAR: «para que pueda dictarse mandamiento ejecutivo será necesario que EL BIEN OBJETO DE LA ESCRITURA SE HAYA EMBARGADO COMO MEDIDA PREVIA y que se presente CERTIFICADO QUE ACREDITE LA PROPIEDAD». Es decir, primero la cautela, después la ejecución. Y el otorgamiento por el juez «no podrá llevarse a efecto sino una vez ejecutoriada la providencia que ordene seguir adelante la ejecución» (art. 436).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Promesa de compraventa que sirve de título ejecutivo, con sus cuatro requisitos de validez acreditados",
+          "mandatory": true,
+          "basis": "Código Civil, art. 1611; Código General del Proceso, art. 422"
+        },
+        {
+          "n": 2,
+          "name": "Solicitud de embargo previo del bien objeto de la escritura",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 434"
+        },
+        {
+          "n": 3,
+          "name": "Certificado que acredite la propiedad del ejecutado sobre el inmueble",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 434"
+        },
+        {
+          "n": 4,
+          "name": "Petición de que el juez otorgue la escritura en nombre del ejecutado si no la suscribe en tres (3) días",
+          "mandatory": true,
+          "basis": "Código General del Proceso, arts. 434 y 436"
+        },
+        {
+          "n": 5,
+          "name": "Perjuicios moratorios que se demanden",
+          "mandatory": false,
+          "basis": "Código General del Proceso, art. 434"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr016.html"
+    },
+    {
+      "exact_name": "Demanda de resolución de la promesa de compraventa por incumplimiento",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código Civil, art. 1546 (condición resolutoria tácita) y arts. 1613 a 1616 (perjuicios); art. 2536, modificado por el art. 8 de la Ley 791 de 2002",
+      "competent_authority": "El juez civil, por el trámite del proceso verbal",
+      "term": "NO HAY CADUCIDAD. EL RELOJ DEL CLIENTE ES LA PRESCRIPCIÓN ORDINARIA DE DIEZ (10) AÑOS: «La acción ejecutiva se prescribe por cinco (5) años. Y la ordinaria por diez (10)» (art. 2536, modificado por la Ley 791 de 2002). LA ELECCIÓN QUE DEFINE EL PLEITO Y HAY QUE HACER AL REDACTAR: «En los contratos bilaterales va envuelta la condición resolutoria en caso de no cumplirse por uno de los contratantes lo pactado» (art. 1546), y el acreedor puede pedir a su arbitrio la RESOLUCIÓN o el CUMPLIMIENTO, en ambos casos con indemnización de perjuicios. Pedir la resolución deshace el negocio y obliga a restituciones mutuas; pedir el cumplimiento va por la vía ejecutiva del art. 434 del CGP y conserva el inmueble. No son acumulables sin subsidiariedad.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Promesa de compraventa y prueba de su validez",
+          "mandatory": true,
+          "basis": "Código Civil, art. 1611"
+        },
+        {
+          "n": 2,
+          "name": "Acreditación del incumplimiento del demandado y del cumplimiento propio",
+          "mandatory": true,
+          "basis": "Código Civil, art. 1546"
+        },
+        {
+          "n": 3,
+          "name": "Pretensión de resolución, o de cumplimiento como subsidiaria",
+          "mandatory": true,
+          "basis": "Código Civil, art. 1546"
+        },
+        {
+          "n": 4,
+          "name": "Liquidación de los perjuicios, o invocación de la cláusula penal pactada",
+          "mandatory": true,
+          "basis": "Código Civil, arts. 1613 a 1616"
+        },
+        {
+          "n": 5,
+          "name": "Restituciones mutuas que se solicitan",
+          "mandatory": true,
+          "basis": "Código Civil, art. 1546"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil.html"
+    },
+    {
+      "exact_name": "Retractación por arras y reclamación de arras dobladas",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código Civil, arts. 1859, 1860 y 1861",
+      "competent_authority": "Extrajudicial en primer término; el juez civil si se discute la naturaleza de las arras o su devolución",
+      "term": "DOS (2) MESES, RELOJ DEL CLIENTE, Y ADEMÁS SE EXTINGUE POR HECHOS, NO SOLO POR EL PASO DEL TIEMPO: «Si los contratantes no hubieren fijado plazo dentro del cual puedan retractarse, perdiendo las arras, NO HABRÁ LUGAR A LA RETRACTACIÓN DESPUÉS DE LOS DOS MESES subsiguientes a la convención, NI DESPUÉS DE OTORGADA ESCRITURA PÚBLICA de la venta O DE PRINCIPIADA LA ENTREGA» (art. 1860). Entregar las llaves cierra la puerta igual que el calendario. LA DISTINCIÓN QUE DECIDE EL CASO ANTES DE MIRAR EL PLAZO: si las arras se dieron «como parte del precio, o como señal de quedar convenidos los contratantes, QUEDARÁ PERFECTA LA VENTA» (art. 1861) — y entonces no hay retractación posible, sino un contrato perfeccionado que solo se deshace por resolución. Redactar la promesa sin decir de qué clase son las arras es lo que produce este pleito.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Cláusula de arras y calificación de su naturaleza: de retractación o parte del precio",
+          "mandatory": true,
+          "basis": "Código Civil, arts. 1859 y 1861"
+        },
+        {
+          "n": 2,
+          "name": "Fecha de la convención, de la que corren los dos (2) meses",
+          "mandatory": true,
+          "basis": "Código Civil, art. 1860"
+        },
+        {
+          "n": 3,
+          "name": "Constancia de que no se ha otorgado escritura pública ni principiado la entrega",
+          "mandatory": true,
+          "basis": "Código Civil, art. 1860"
+        },
+        {
+          "n": 4,
+          "name": "Manifestación de retractación, o reclamación de las arras dobladas según quién se retracte",
+          "mandatory": true,
+          "basis": "Código Civil, art. 1859"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil.html"
+    },
+    {
+      "exact_name": "Demanda de rescisión por lesión enorme",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código Civil, arts. 1946, 1947, 1949 (subrogado por el art. 32 de la Ley 57 de 1887), 1950, 1951 y 1954",
+      "competent_authority": "El juez civil",
+      "term": "CUATRO (4) AÑOS DE CADUCIDAD, RELOJ DEL CLIENTE, Y SE CUENTAN DESDE LA FECHA DEL CONTRATO — NO DESDE QUE EL CLIENTE DESCUBRE QUE LE PAGARON DE MENOS, QUE ES CUANDO SUELE CONSULTAR. «La acción rescisoria por lesión enorme EXPIRA EN CUATRO AÑOS, CONTADOS DESDE LA FECHA DE CONTRATO» (art. 1954). UMBRAL QUE HAY QUE MEDIR ANTES DE DEMANDAR: «El vendedor sufre lesión enorme cuando el precio que recibe es INFERIOR A LA MITAD DEL JUSTO PRECIO de la cosa que vende; y el comprador a su vez sufre lesión enorme, cuando el justo precio de la cosa que compra es inferior a la mitad del precio que paga por ella» (art. 1947). TRES FILTROS DE IMPROCEDENCIA QUE HAY QUE VERIFICAR PRIMERO, porque hacen inútil la demanda: no procede «en las ventas de bienes muebles, ni en las que se hubieren hecho por ministerio de la justicia» (art. 1949); se pierde si el comprador ya enajenó la cosa (art. 1951); y la renuncia anticipada a la acción no vale (art. 1950).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Escritura de compraventa y fecha del contrato, de la que corren los cuatro (4) años",
+          "mandatory": true,
+          "basis": "Código Civil, art. 1954"
+        },
+        {
+          "n": 2,
+          "name": "Avalúo que acredite el justo precio al tiempo del contrato y demuestre el umbral de la mitad",
+          "mandatory": true,
+          "basis": "Código Civil, art. 1947"
+        },
+        {
+          "n": 3,
+          "name": "Constancia de que el bien es inmueble y de que la venta no se hizo por ministerio de la justicia",
+          "mandatory": true,
+          "basis": "Código Civil, art. 1949"
+        },
+        {
+          "n": 4,
+          "name": "Certificado de tradición que acredite que el comprador no ha enajenado la cosa",
+          "mandatory": true,
+          "basis": "Código Civil, art. 1951"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil.html"
+    },
+    {
+      "exact_name": "Demanda de saneamiento por vicios redhibitorios",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código Civil, arts. 1914, 1915, 1923 y 1926",
+      "competent_authority": "El juez civil",
+      "term": "CUATRO PLAZOS DISTINTOS, TODOS RELOJ DEL CLIENTE, Y LO QUE DECIDE CUÁL APLICA ES QUÉ SE PIDE Y SOBRE QUÉ BIEN. PARA DESHACER LA VENTA (acción redhibitoria): «La acción redhibitoria durará SEIS MESES respecto de las cosas MUEBLES y UN AÑO respecto de los BIENES RAÍCES, en todos los casos en que las leyes especiales o las estipulaciones de los contratantes no hubieren ampliado o restringido este plazo. EL TIEMPO SE CONTARÁ DESDE LA ENTREGA REAL» (art. 1923). PARA REBAJAR EL PRECIO Y QUEDARSE CON EL BIEN: «La acción para pedir rebaja del precio […] PRESCRIBE EN UN AÑO para los bienes MUEBLES y en DIEZ Y OCHO MESES para los bienes RAÍCES» (art. 1926). EN INMUEBLES, ENTONCES: un año para rescindir y dieciocho meses para rebajar, contados desde la entrega real y no desde que apareció el vicio. Un cliente que descubre la humedad al año y medio ya solo tiene la rebaja, y por poco tiempo. LAS PARTES PUEDEN HABER AMPLIADO O RESTRINGIDO ESOS PLAZOS EN EL CONTRATO: hay que leer la escritura antes de contar.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Fecha de la entrega real del bien, de la que corren todos los plazos",
+          "mandatory": true,
+          "basis": "Código Civil, art. 1923"
+        },
+        {
+          "n": 2,
+          "name": "Descripción del vicio y prueba de que era oculto, grave y anterior a la venta",
+          "mandatory": true,
+          "basis": "Código Civil, art. 1915"
+        },
+        {
+          "n": 3,
+          "name": "Elección de la acción: rescisión de la venta o rebaja del precio, con el plazo que corresponde",
+          "mandatory": true,
+          "basis": "Código Civil, arts. 1923 y 1926"
+        },
+        {
+          "n": 4,
+          "name": "Revisión de la escritura para verificar si las partes ampliaron o restringieron el plazo",
+          "mandatory": true,
+          "basis": "Código Civil, art. 1923"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil.html"
+    },
+    {
+      "exact_name": "Demanda de saneamiento por evicción",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código Civil, arts. 1893 y 1913; art. 2536, modificado por el art. 8 de la Ley 791 de 2002",
+      "competent_authority": "El juez civil",
+      "term": "CUATRO (4) AÑOS PARA EL SANEAMIENTO, PERO LA SOLA RESTITUCIÓN DEL PRECIO VA POR DIEZ (10), Y ESA DIFERENCIA SALVA CASOS QUE PARECEN VENCIDOS. «La acción de saneamiento por evicción PRESCRIBE EN CUATRO AÑOS; mas por lo tocante a LA SOLA RESTITUCIÓN DEL PRECIO, prescribe según las reglas generales» (art. 1913) — es decir, por la prescripción ordinaria de diez (10) años del art. 2536. Al cliente que llega a los cinco años se le acabó la indemnización de perjuicios, pero no necesariamente la devolución de lo que pagó. QUÉ COMPRENDE LA OBLIGACIÓN: «amparar al comprador en el dominio y posesión pacífica de la cosa vendida, y responder de los defectos ocultos de ésta, llamados vicios redhibitorios» (art. 1893). CARGA PROCESAL QUE SE PIERDE POR OMISIÓN: el comprador demandado por un tercero debe DENUNCIAR EL PLEITO al vendedor dentro del proceso; no hacerlo compromete el saneamiento.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Título de adquisición y prueba de la turbación o privación del dominio por un tercero",
+          "mandatory": true,
+          "basis": "Código Civil, art. 1893"
+        },
+        {
+          "n": 2,
+          "name": "Constancia de la denuncia del pleito al vendedor, cuando la evicción se discute en otro proceso",
+          "mandatory": true,
+          "basis": "Código Civil, art. 1899"
+        },
+        {
+          "n": 3,
+          "name": "Pretensión: restitución del precio y, si el plazo lo permite, indemnización de perjuicios",
+          "mandatory": true,
+          "basis": "Código Civil, art. 1913"
+        },
+        {
+          "n": 4,
+          "name": "Cómputo del plazo aplicable según lo que se reclama",
+          "mandatory": true,
+          "basis": "Código Civil, arts. 1913 y 2536"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil.html"
+    },
+    {
+      "exact_name": "Impugnación de decisiones de la asamblea de copropietarios",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 675 de 2001, art. 49 (legitimación y causal); Código General del Proceso, art. 382 (el término)",
+      "competent_authority": "El juez civil, por el trámite del proceso verbal. NO es el comité de convivencia, que carece de poder decisorio, ni la alcaldía",
+      "term": "DOS (2) MESES DE CADUCIDAD, RELOJ DEL CLIENTE, Y EL PLAZO YA NO VIVE EN LA LEY 675 — QUIEN LO BUSQUE ALLÍ CITA NORMA MUERTA. El inciso del art. 49 que lo fijaba fue DEROGADO por el literal c) del art. 626 de la Ley 1564 de 2012, con vigencia desde el 1 de enero de 2014; se comprobó en el texto oficial. Hoy el término lo da el CGP: «La demanda de impugnación de actos o decisiones de asambleas, juntas directivas, juntas de socios o de cualquier otro órgano directivo de personas jurídicas de derecho privado, SOLO PODRÁ PROPONERSE, SO PENA DE CADUCIDAD, DENTRO DE LOS DOS (2) MESES siguientes a la fecha del acto respectivo y deberá dirigirse contra la entidad. Si se tratare de acuerdos o actos SUJETOS A REGISTRO, el término se contará DESDE LA FECHA DE LA INSCRIPCIÓN» (art. 382). ESA SEGUNDA REGLA CAMBIA EL CÓMPUTO EN LAS REFORMAS DE REGLAMENTO, que sí se registran. LEGITIMACIÓN TASADA: «El administrador, el Revisor Fiscal y los propietarios de bienes privados» (Ley 675, art. 49) — un arrendatario no está legitimado. Puede pedirse suspensión provisional del acto impugnado, prestando caución (art. 382 inc. 2).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Acta de la asamblea y fecha del acto, o fecha de su inscripción si es acto sujeto a registro",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 382"
+        },
+        {
+          "n": 2,
+          "name": "Acreditación de la legitimación: administrador, revisor fiscal o propietario de bien privado",
+          "mandatory": true,
+          "basis": "Ley 675 de 2001, art. 49"
+        },
+        {
+          "n": 3,
+          "name": "Señalamiento de la prescripción legal o del reglamento que la decisión desconoce",
+          "mandatory": true,
+          "basis": "Ley 675 de 2001, art. 49"
+        },
+        {
+          "n": 4,
+          "name": "Demanda dirigida contra la persona jurídica de la copropiedad",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 382"
+        },
+        {
+          "n": 5,
+          "name": "Solicitud de suspensión provisional del acto, con ofrecimiento de caución",
+          "mandatory": false,
+          "basis": "Código General del Proceso, art. 382 inc. 2"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_0675_2001_pr001.html"
+    },
+    {
+      "exact_name": "Demanda ejecutiva de cobro de cuotas de administración",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 675 de 2001, art. 48 (título ejecutivo) y art. 30 (intereses); Código General del Proceso, art. 422; Código Civil, art. 2536, modificado por el art. 8 de la Ley 791 de 2002",
+      "competent_authority": "El juez civil municipal o del circuito, según la cuantía",
+      "term": "SIN CADUCIDAD. EL RELOJ DEL CLIENTE ES LA PRESCRIPCIÓN EJECUTIVA DE CINCO (5) AÑOS, y corre CUOTA POR CUOTA desde que cada una se hizo exigible (Código Civil, art. 2536, modificado por la Ley 791 de 2002): una copropiedad que deja dormir la cartera pierde las cuotas más viejas mientras las nuevas siguen vivas. EL TÍTULO ES TASADO Y NO ADMITE ADORNOS: «el título ejecutivo contentivo de la obligación QUE SERÁ SOLAMENTE EL CERTIFICADO EXPEDIDO POR EL ADMINISTRADOR SIN NINGÚN REQUISITO NI PROCEDIMIENTO ADICIONAL» (art. 48). NO HAY REQUISITO DE PROCEDIBILIDAD, y conviene saberlo porque muchas copropiedades pierden meses en conciliaciones inútiles: «La acción ejecutiva a que se refiere este artículo, NO ESTARÁ SUPEDITADA AL AGOTAMIENTO PREVIO DE LOS MECANISMOS PARA LA SOLUCIÓN DE CONFLICTOS previstos en la presente ley.»",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Certificado de deuda expedido por el administrador, que es el título ejecutivo",
+          "mandatory": true,
+          "basis": "Ley 675 de 2001, art. 48"
+        },
+        {
+          "n": 2,
+          "name": "Certificado de existencia y representación legal de la persona jurídica de la copropiedad",
+          "mandatory": true,
+          "basis": "Ley 675 de 2001, art. 48"
+        },
+        {
+          "n": 3,
+          "name": "Liquidación de las cuotas adeudadas por período, con verificación de que ninguna pasó de cinco (5) años",
+          "mandatory": true,
+          "basis": "Código Civil, art. 2536"
+        },
+        {
+          "n": 4,
+          "name": "Certificado de los intereses causados",
+          "mandatory": true,
+          "basis": "Ley 675 de 2001, art. 30"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_0675_2001_pr001.html"
+    },
+    {
+      "exact_name": "Impugnación de sanción por incumplimiento del reglamento de propiedad horizontal",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 675 de 2001, arts. 59, 60 y 62",
+      "competent_authority": "El juez civil. La sanción, en cambio, la impone la asamblea general o el consejo de administración cuando el reglamento le atribuyó esa facultad — órganos privados, no autoridad pública",
+      "term": "UN (1) MES, RELOJ DEL CLIENTE, Y SIGUE VIGENTE PESE A QUE EL ARTÍCULO APARECE PARCIALMENTE TACHADO. «La impugnación SÓLO PODRÁ INTENTARSE DENTRO DEL MES SIGUIENTE a la fecha de la comunicación de la respectiva sanción» (art. 62). ALCANCE EXACTO DE LA DEROGATORIA, COMPROBADO EN EL TEXTO OFICIAL: el literal c) del art. 626 de la Ley 1564 de 2012 tachó ÚNICAMENTE la frase que remitía al procedimiento del art. 194 del Código de Comercio; la oración del plazo quedó fuera del tachado y conserva su vigencia. Quien lea la nota de derogatoria por encima puede creer que el artículo entero murió y dejar pasar el mes. LO QUE HAY QUE REVISAR PARA ATACAR LA SANCIÓN: «Para su imposición se respetarán los procedimientos contemplados en el reglamento de propiedad horizontal, consultando el DEBIDO PROCESO, el derecho de defensa y contradicción e impugnación» (art. 60), además de la proporcionalidad y la valoración de la intencionalidad. TOPES LEGALES QUE SUELEN EXCEDERSE: las multas sucesivas «no podrán ser superiores, cada una, a DOS (2) VECES el valor de las expensas necesarias mensuales […] que, en todo caso, SUMADAS NO PODRÁN EXCEDER DE DIEZ (10) VECES las expensas necesarias mensuales a cargo del infractor» (art. 59), y está prohibido restringir el uso de bienes comunes esenciales.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Comunicación de la sanción y su fecha, de la que corre el mes",
+          "mandatory": true,
+          "basis": "Ley 675 de 2001, art. 62"
+        },
+        {
+          "n": 2,
+          "name": "Reglamento de propiedad horizontal y verificación de que atribuye la facultad sancionatoria al órgano que la ejerció",
+          "mandatory": true,
+          "basis": "Ley 675 de 2001, art. 60"
+        },
+        {
+          "n": 3,
+          "name": "Señalamiento de las garantías del debido proceso que se desconocieron",
+          "mandatory": true,
+          "basis": "Ley 675 de 2001, art. 60"
+        },
+        {
+          "n": 4,
+          "name": "Verificación de los topes de la multa y de la prohibición de restringir bienes comunes esenciales",
+          "mandatory": true,
+          "basis": "Ley 675 de 2001, art. 59"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_0675_2001_pr001.html"
+    },
+    {
+      "exact_name": "Reforma del reglamento de propiedad horizontal",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 675 de 2001, art. 46 num. 5 y su parágrafo, y art. 45; Código General del Proceso, art. 382 (caducidad de la impugnación)",
+      "competent_authority": "La asamblea general de copropietarios aprueba; el notario protocoliza la escritura y la Oficina de Registro de Instrumentos Públicos la inscribe",
+      "term": "SIN PLAZO PARA REFORMARLO, PERO EL RELOJ QUE IMPORTA ES EL DE QUIEN QUIERA ATACARLA: DOS (2) MESES DE CADUCIDAD QUE CORREN DESDE LA INSCRIPCIÓN, NO DESDE LA ASAMBLEA, POR SER ACTO SUJETO A REGISTRO (Código General del Proceso, art. 382). Al redactar hay que advertirlo a ambos lados: la copropiedad no queda tranquila el día de la asamblea sino dos meses después de registrar. MAYORÍA CALIFICADA: «las siguientes decisiones requerirán mayoría calificada del SETENTA POR CIENTO (70%) de los coeficientes de copropiedad que integran el edificio o conjunto: […] 5. Reforma a los estatutos y reglamento» (art. 46). TOPE QUE ANULA LOS REGLAMENTOS MÁS EXIGENTES: «Para ninguna decisión, salvo la relativa a la extinción de la propiedad horizontal, se podrá exigir una mayoría superior al setenta por ciento (70%) […] LAS MAYORÍAS SUPERIORES PREVISTAS EN LOS REGLAMENTOS SE ENTENDERÁN POR NO ESCRITAS», y «Las decisiones que se adopten en contravención a lo prescrito en este artículo, SERÁN ABSOLUTAMENTE NULAS» (art. 45). RESTRICCIÓN DE FORMA QUE INVALIDA LA REFORMA: estas decisiones no pueden tomarse en reuniones no presenciales ni de segunda convocatoria, salvo que se obtenga la mayoría legal (art. 46 par.).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Convocatoria y acta que acrediten la mayoría del setenta por ciento (70%) de los coeficientes",
+          "mandatory": true,
+          "basis": "Ley 675 de 2001, art. 46 num. 5"
+        },
+        {
+          "n": 2,
+          "name": "Constancia de que la reunión fue presencial y de primera convocatoria, o de que se obtuvo la mayoría legal",
+          "mandatory": true,
+          "basis": "Ley 675 de 2001, art. 46 par."
+        },
+        {
+          "n": 3,
+          "name": "Texto de la reforma, sin exigencias de mayoría superiores al setenta por ciento (70%)",
+          "mandatory": true,
+          "basis": "Ley 675 de 2001, art. 45"
+        },
+        {
+          "n": 4,
+          "name": "Escritura pública de protocolización y su inscripción en la Oficina de Registro de Instrumentos Públicos",
+          "mandatory": true,
+          "basis": "Ley 675 de 2001, art. 46"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_0675_2001_pr001.html"
+    },
+    {
+      "exact_name": "Preaviso de terminación del arrendamiento de vivienda por el arrendador",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 820 de 2003, art. 22 num. 8 (al vencimiento, con causal) y num. 7 en concordancia con el art. 23 (durante prórrogas, con indemnización)",
+      "competent_authority": "Ninguna autoridad recibe el preaviso: se dirige al arrendatario a través de SERVICIO POSTAL AUTORIZADO. La indemnización del num. 7 se consigna a órdenes de la autoridad competente que señale el Gobierno Nacional",
+      "term": "TRES (3) MESES, RELOJ DEL ARRENDADOR, Y ES FATAL: PERDERLO REGALA UN PERÍODO COMPLETO DEL CONTRATO. «previo aviso escrito al arrendatario a través del SERVICIO POSTAL AUTORIZADO con una antelación NO MENOR A TRES (3) MESES a la referida fecha de vencimiento», y la consecuencia está escrita: «DE NO MEDIAR CONSTANCIA POR ESCRITO DEL PREAVISO, EL CONTRATO DE ARRENDAMIENTO SE ENTENDERÁ RENOVADO AUTOMÁTICAMENTE por un término igual al inicialmente pactado» (art. 22 num. 8). LA CONSTANCIA ES PRUEBA, NO FORMALISMO: el correo electrónico o el mensaje de texto no sustituyen el servicio postal autorizado, y sin esa constancia el preaviso no existe. CARGA ADICIONAL EN LAS CAUSALES DE LOS LITERALES a), b) y c) — necesitar el inmueble para vivienda propia, para demolerlo o para entregarlo a un nuevo arrendatario: debe acompañarse CAUCIÓN EQUIVALENTE A SEIS (6) MESES DE CANON, y la causal invocada debe cumplirse DENTRO DE LOS SEIS (6) MESES SIGUIENTES A LA RESTITUCIÓN, so pena de responder. TERMINACIÓN DURANTE LA PRÓRROGA, SIN CAUSAL: el mismo preaviso de tres meses más «el pago de una INDEMNIZACIÓN EQUIVALENTE AL PRECIO DE TRES (3) MESES de arrendamiento» (art. 22 num. 7).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del contrato, de su fecha de vencimiento y del período que corre",
+          "mandatory": true,
+          "basis": "Ley 820 de 2003, art. 22"
+        },
+        {
+          "n": 2,
+          "name": "Causal invocada, o manifestación de que se termina durante la prórroga con indemnización",
+          "mandatory": true,
+          "basis": "Ley 820 de 2003, art. 22 num. 7 y 8"
+        },
+        {
+          "n": 3,
+          "name": "Constancia de envío por servicio postal autorizado con tres (3) meses de antelación",
+          "mandatory": true,
+          "basis": "Ley 820 de 2003, art. 22 num. 8"
+        },
+        {
+          "n": 4,
+          "name": "Caución de seis (6) meses de canon, en las causales de los literales a), b) y c)",
+          "mandatory": false,
+          "basis": "Ley 820 de 2003, art. 22 num. 8"
+        },
+        {
+          "n": 5,
+          "name": "Consignación de la indemnización de tres (3) meses, cuando se termina durante la prórroga",
+          "mandatory": false,
+          "basis": "Ley 820 de 2003, arts. 22 num. 7 y 23"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_0820_2003.html"
+    },
+    {
+      "exact_name": "Preaviso de terminación del arrendamiento de vivienda por el arrendatario",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 820 de 2003, art. 24 num. 4 y num. 5, en concordancia con el art. 25",
+      "competent_authority": "Ninguna: se dirige al arrendador a través de SERVICIO POSTAL AUTORIZADO",
+      "term": "TRES (3) MESES EN AMBOS CASOS, RELOJ DEL ARRENDATARIO, Y LA DIFERENCIA DE DINERO ENTRE AVISAR A TIEMPO O NO DEPENDE SOLO DE CUÁNDO SE AVISA. AL VENCIMIENTO, SIN PAGAR NADA: «siempre y cuando dé previo aviso escrito al arrendador a través del servicio postal autorizado, con una antelación NO MENOR DE TRES (3) MESES a la referida fecha de vencimiento. En este caso el arrendatario NO ESTARÁ OBLIGADO A INVOCAR CAUSAL ALGUNA diferente a la de su plena voluntad, NI DEBERÁ INDEMNIZAR AL ARRENDADOR» (art. 24 num. 5). DURANTE EL TÉRMINO, PAGANDO: la terminación unilateral anticipada del num. 4 exige el mismo preaviso y una indemnización. ESTA ES LA FICHA QUE MÁS DINERO LE AHORRA A UN CLIENTE: el inquilino que quiere irse y consulta con tres meses de anticipación no paga nada; el que consulta con uno, paga indemnización por una diferencia de calendario que nadie le explicó.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del contrato y de su fecha de vencimiento",
+          "mandatory": true,
+          "basis": "Ley 820 de 2003, art. 24"
+        },
+        {
+          "n": 2,
+          "name": "Manifestación de terminación por la plena voluntad del arrendatario, sin invocar causal",
+          "mandatory": true,
+          "basis": "Ley 820 de 2003, art. 24 num. 5"
+        },
+        {
+          "n": 3,
+          "name": "Constancia de envío por servicio postal autorizado con tres (3) meses de antelación",
+          "mandatory": true,
+          "basis": "Ley 820 de 2003, art. 24 num. 5"
+        },
+        {
+          "n": 4,
+          "name": "Ofrecimiento de la indemnización, solo si la terminación es anticipada dentro del término",
+          "mandatory": false,
+          "basis": "Ley 820 de 2003, arts. 24 num. 4 y 25"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_0820_2003.html"
+    },
+    {
+      "exact_name": "Consignación extrajudicial del canon de arrendamiento",
+      "area": "CIVIL",
+      "role": "SECRETARIA",
+      "legal_basis": "Ley 820 de 2003, art. 10; art. 22 num. 1 (mora como causal de restitución)",
+      "competent_authority": "No es autoridad judicial: la entidad autorizada por el Gobierno Nacional del lugar de ubicación del inmueble, que en la práctica es el Banco Agrario",
+      "term": "DOS RELOJES DEL ARRENDATARIO, AMBOS DE CINCO (5) DÍAS Y AMBOS FATALES. PARA CONSIGNAR: «consignando las respectivas sumas a favor del arrendador en las entidades autorizadas por el Gobierno Nacional, del lugar de ubicación del inmueble, DENTRO DE LOS CINCO (5) DÍAS HÁBILES SIGUIENTES AL VENCIMIENTO DEL PLAZO O PERÍODO PACTADO» (art. 10). PARA AVISAR: otros cinco (5) días para comunicarlo al arrendador entregándole el duplicado del título. LA CONSECUENCIA ESTÁ ESCRITA Y ES LA MÁS CARA QUE PUEDE COMETER UN INQUILINO: «El incumplimiento de lo aquí previsto HARÁ INCURRIR AL ARRENDATARIO EN MORA EN EL PAGO DEL CANON de arrendamiento.» Es decir, consignar tarde o consignar bien y no avisar produce mora, y la mora es la causal de restitución del art. 22 num. 1: el arrendatario que pagó puede perder el inmueble por no haber avisado.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Constancia de la negativa del arrendador a recibir el canon",
+          "mandatory": true,
+          "basis": "Ley 820 de 2003, art. 10"
+        },
+        {
+          "n": 2,
+          "name": "Título de consignación en la entidad autorizada del lugar del inmueble, dentro de los cinco (5) días hábiles",
+          "mandatory": true,
+          "basis": "Ley 820 de 2003, art. 10"
+        },
+        {
+          "n": 3,
+          "name": "Comunicación al arrendador con el duplicado del título, dentro de los cinco (5) días siguientes",
+          "mandatory": true,
+          "basis": "Ley 820 de 2003, art. 10"
+        },
+        {
+          "n": 4,
+          "name": "Constancia de envío de esa comunicación, como prueba frente a la causal de mora",
+          "mandatory": true,
+          "basis": "Ley 820 de 2003, arts. 10 y 22 num. 1"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_0820_2003.html"
+    },
+    {
+      "exact_name": "Comunicación de reajuste del canon de arrendamiento",
+      "area": "CIVIL",
+      "role": "SECRETARIA",
+      "legal_basis": "Ley 820 de 2003, art. 20 (reajuste y notificación) y art. 18 (tope del precio)",
+      "competent_authority": "Ninguna: se comunica al arrendatario por servicio postal autorizado o por el medio de notificación pactado",
+      "term": "CADA DOCE (12) MESES DE EJECUCIÓN BAJO UN MISMO PRECIO, RELOJ DEL ARRENDADOR, Y NO NOTIFICAR NO SOLO RETRASA EL AUMENTO: LO HACE INOPONIBLE. «Cada DOCE (12) MESES de ejecución del contrato bajo un mismo precio, el arrendador podrá incrementar el canon hasta en una proporción que NO SEA SUPERIOR AL CIENTO POR CIENTO (100%) DEL INCREMENTO QUE HAYA TENIDO EL ÍNDICE DE PRECIOS AL CONSUMIDOR en el año calendario inmediatamente anterior», y «deberá informarle al arrendatario el monto del incremento y la fecha en que se hará efectivo […] SO PENA DE SER INOPONIBLE AL ARRENDATARIO» (art. 20). El arrendador que sube el canon sin comunicarlo no puede cobrar la diferencia ni fundar en ella una mora. TOPE SUSTANTIVO QUE HAY QUE VERIFICAR ANTES DE FIJAR EL PRECIO: el canon «no podrá exceder el UNO POR CIENTO (1%) DEL VALOR COMERCIAL DEL INMUEBLE», y «La estimación comercial […] no podrá exceder el equivalente a DOS (2) VECES EL AVALÚO CATASTRAL VIGENTE» (art. 18).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del contrato y constancia de los doce (12) meses de ejecución bajo el mismo precio",
+          "mandatory": true,
+          "basis": "Ley 820 de 2003, art. 20"
+        },
+        {
+          "n": 2,
+          "name": "Monto del incremento, con el índice de precios al consumidor del año calendario anterior",
+          "mandatory": true,
+          "basis": "Ley 820 de 2003, art. 20"
+        },
+        {
+          "n": 3,
+          "name": "Fecha en que se hará efectivo el incremento",
+          "mandatory": true,
+          "basis": "Ley 820 de 2003, art. 20"
+        },
+        {
+          "n": 4,
+          "name": "Constancia de la comunicación, sin la cual el incremento es inoponible",
+          "mandatory": true,
+          "basis": "Ley 820 de 2003, art. 20"
+        },
+        {
+          "n": 5,
+          "name": "Verificación de que el canon resultante no excede el uno por ciento (1%) del valor comercial",
+          "mandatory": true,
+          "basis": "Ley 820 de 2003, art. 18"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_0820_2003.html"
+    },
+    {
+      "exact_name": "Terminación del arrendamiento por subarriendo o cesión no autorizados",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 820 de 2003, arts. 17 y 22 num. 3",
+      "competent_authority": "Ninguna para la terminación, que se comunica por escrito al arrendatario; el juez civil si se pide la restitución",
+      "term": "SIN PLAZO EN LA NORMA PARA EJERCERLA, PERO CON UNA EXIGENCIA DE FORMA QUE NO SE PUEDE OMITIR: LA COMUNICACIÓN ESCRITA. «El arrendatario no tiene la facultad de ceder el arriendo ni de subarrendar, a menos que medie autorización expresa del arrendador. En caso de contravención, el arrendador podrá dar por terminado el contrato de arrendamiento y exigir la entrega del inmueble o celebrar un nuevo contrato con los usuarios reales, caso en el cual el contrato anterior quedará sin efectos, SITUACIONES ÉSTAS QUE SE COMUNICARÁN POR ESCRITO AL ARRENDATARIO» (art. 17). EFECTO PROCESAL QUE CONVIENE AL ARRENDADOR Y QUE HAY QUE INVOCAR: «Cuando la cesión del contrato NO LE HAYA SIDO NOTIFICADA AL ARRENDADOR, el cesionario NO SERÁ CONSIDERADO DENTRO DEL PROCESO NI COMO PARTE NI COMO INTERVINIENTE LITISCONSORCIAL» — el subarrendatario clandestino no puede oponerse a la restitución.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Prueba del subarriendo o de la cesión y de que no medió autorización expresa",
+          "mandatory": true,
+          "basis": "Ley 820 de 2003, art. 17"
+        },
+        {
+          "n": 2,
+          "name": "Comunicación escrita al arrendatario dando por terminado el contrato",
+          "mandatory": true,
+          "basis": "Ley 820 de 2003, art. 17"
+        },
+        {
+          "n": 3,
+          "name": "Opción que se ejerce: exigir la entrega o celebrar nuevo contrato con los usuarios reales",
+          "mandatory": true,
+          "basis": "Ley 820 de 2003, art. 17"
+        },
+        {
+          "n": 4,
+          "name": "Invocación de que el cesionario no notificado no es parte ni interviniente en el proceso",
+          "mandatory": false,
+          "basis": "Ley 820 de 2003, art. 17"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_0820_2003.html"
     }
   ]
 }

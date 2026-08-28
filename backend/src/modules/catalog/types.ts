@@ -29,7 +29,8 @@ export type LegalBranch =
   | 'ARBITRAJE'
   | 'INSOLVENCIA'
   | 'AMBIENTAL'
-  | 'FAMILIA_ADMINISTRATIVA';
+  | 'FAMILIA_ADMINISTRATIVA'
+  | 'SEGURIDAD_SOCIAL';
 
 /** Who authors the document. */
 /**
