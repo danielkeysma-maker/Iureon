@@ -34,6 +34,9 @@ const check = (n: string, ok: boolean, d = ''): void => {
   if (!ok) fallos++;
 };
 
+/** El motivo que acompaña a toda acción de operación en este check. */
+const MOTIVO_DE_PRUEBA = 'Compensacion por borrador fallido del 28 de agosto';
+
 const RESERVADA = 'AUDIENCIA RESERVADA DEL CLIENTE';
 const PRIVILEGIADO = 'material privilegiado';
 
@@ -130,14 +133,74 @@ const PRIVILEGIADO = 'material privilegiado';
     `transcritos=${clienteEnLista?.transcriptions}`
   );
 
-  const recarga = await pedir(`/admin/firms/${cliente.user.firmId}/credits`, opToken, {
+  /*
+   * SIN MOTIVO NO HAY ACCION DE OPERACION.
+   *
+   * El artboard 7b lo exige — «cada accion exige un motivo escrito y queda en
+   * el registro que los socios de la firma tambien ven» — y esa es toda la
+   * garantia: un poder que cruza el limite del inquilino solo es aceptable si
+   * el inquilino puede leer que se hizo Y POR QUE.
+   */
+  const sinMotivo = await pedir(`/admin/firms/${cliente.user.firmId}/credits`, opToken, {
     method: 'POST',
     body: JSON.stringify({ amount: 50000 })
   });
   check(
-    'puede recargar el saldo de una firma',
+    'una recarga sin motivo se rechaza',
+    sinMotivo.status === 400 && sinMotivo.body?.error === 'REASON_REQUIRED',
+    `${sinMotivo.status} · ${sinMotivo.body?.error}`
+  );
+
+  // Un motivo de relleno tampoco pasa: el minimo es que diga algo.
+  const motivoVacio = await pedir(`/admin/firms/${cliente.user.firmId}/credits`, opToken, {
+    method: 'POST',
+    body: JSON.stringify({ amount: 50000, reason: '   ok   ' })
+  });
+  check(
+    'un motivo de relleno tampoco pasa',
+    motivoVacio.status === 400,
+    `${motivoVacio.status} · ${motivoVacio.body?.error}`
+  );
+
+  const recarga = await pedir(`/admin/firms/${cliente.user.firmId}/credits`, opToken, {
+    method: 'POST',
+    body: JSON.stringify({ amount: 50000, reason: MOTIVO_DE_PRUEBA })
+  });
+  check(
+    'puede recargar el saldo de una firma, con motivo',
     recarga.status === 200 && recarga.body?.creditsBalance === 50000,
     JSON.stringify(recarga.body)
+  );
+
+  /*
+   * ─── LA FICHA DE LA FIRMA (7b) ────────────────────────────────────────────
+   *
+   * Trae lo que se necesita para gestionar el negocio del inquilino y NADA de
+   * su contenido. Se comprueban las dos mitades: que los datos esten, y que el
+   * material amparado por el secreto profesional NO.
+   */
+  const ficha = await pedir(`/admin/firms/${cliente.user.firmId}`, opToken);
+  const f = ficha.body?.firm;
+  check(
+    'la ficha de la firma responde con sus datos reales',
+    ficha.status === 200 && f?.nit === cliente.user.firmId.replace('firm-', '') ? true : ficha.status === 200 && Boolean(f?.name),
+    `${ficha.status} · ${f?.name ?? 'sin nombre'}`
+  );
+  check(
+    'la ficha trae las cuentas de la firma con su consumo',
+    Array.isArray(f?.usuarios) && f.usuarios.length > 0 && 'consumoMesCop' in f.usuarios[0],
+    `usuarios=${f?.usuarios?.length ?? 0}`
+  );
+  check(
+    'la ficha NO trae transcritos, borradores ni expedientes',
+    !('transcritos' in (f ?? {})) && !('borradores' in (f ?? {})) && !('documentos' in (f ?? {})),
+    Object.keys(f ?? {}).join(',')
+  );
+  const fichaAjena = await pedir(`/admin/firms/${cliente.user.firmId}`, cliente.accessToken);
+  check(
+    'un abogado no puede abrir la ficha de su propia firma por la consola',
+    fichaAjena.status === 403,
+    String(fichaAjena.status)
   );
 
   // ─── Lo que NO puede: leer el expediente ajeno ────────────────────────────
@@ -147,19 +210,39 @@ const PRIVILEGIADO = 'material privilegiado';
 
   // ─── Y lo que hizo queda donde el cliente lo ve ───────────────────────────
   const auditoria = await pedir('/audit/logs', cliente.accessToken);
-  const acciones = (auditoria.body?.logs ?? []).map(
-    (l: { action: string; userEmail: string }) => `${l.action}:${l.userEmail}`
-  );
+  const registros = (auditoria.body?.logs ?? []) as Array<{
+    action: string;
+    userEmail: string;
+    resource: string;
+  }>;
+  const acciones = registros.map((l) => `${l.action}:${l.userEmail}`);
   check(
     'la recarga queda en la auditoría del cliente, con el operador nombrado',
     acciones.some((a: string) => a.startsWith('FIRM_CREDITS_ADDED') && a.includes(correoOperador)),
     acciones.join(' | ') || 'sin registros'
   );
 
+  /*
+   * Y EL MOTIVO VIAJA HASTA ALLA. Registrar «recargado» sin el porque deja al
+   * socio de la firma leyendo un movimiento de dinero que nadie le explico:
+   * la mitad util del registro es la razon.
+   */
+  const laRecarga = registros.find((l) => l.action === 'FIRM_CREDITS_ADDED');
+  check(
+    'el motivo escrito llega a la auditoría de la firma',
+    Boolean(laRecarga?.resource?.includes(MOTIVO_DE_PRUEBA)),
+    laRecarga?.resource ?? 'sin la recarga en el registro'
+  );
+
   // ─── El rol no se puede pedir por la red ──────────────────────────────────
   const pidiendoRol = await pedir(`/admin/firms/${cliente.user.firmId}/users`, opToken, {
     method: 'POST',
-    body: JSON.stringify({ email: `colado${m}@iureon.test`, password: clavePrueba(), role: 'SUPER_ADMIN' })
+    body: JSON.stringify({
+      email: `colado${m}@iureon.test`,
+      password: clavePrueba(),
+      role: 'SUPER_ADMIN',
+      reason: MOTIVO_DE_PRUEBA
+    })
   });
   const { data: tras } = await c.auth.admin.listUsers();
   const colado = tras.users.find((u) => u.email === `colado${m}@iureon.test`);

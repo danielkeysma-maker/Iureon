@@ -4,6 +4,7 @@ import {
   addCreditsController,
   addUserController,
   createFirmController,
+  firmDetailController,
   listFirmsController,
   updateFirmController
 ,
@@ -31,6 +32,12 @@ router.use(requireSuperAdmin);
 
 router.get('/runway', runwayController as any);
 router.get('/firms', listFirmsController as any);
+/*
+ * La ficha va DESPUES de la lista y ANTES de las rutas con sufijo: Express
+ * casa por orden, y `/firms/:firmId` no puede quedar por encima de
+ * `/firms/:firmId/credits` sin comerselas.
+ */
+router.get('/firms/:firmId', firmDetailController as any);
 router.post('/firms', createFirmController as any);
 router.patch('/firms/:firmId', updateFirmController as any);
 router.post('/firms/:firmId/credits', addCreditsController as any);

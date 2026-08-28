@@ -1,6 +1,13 @@
 import { catalogService } from '../catalog/catalog.service';
 import { supabase } from '../../config/supabase.config';
-import { AuthError, addUserToFirm, type FirmUserRole } from '../auth/auth.service';
+import {
+  AuthError,
+  addUserToFirm,
+  listFirmUsers,
+  type FirmUserRole
+} from '../auth/auth.service';
+import { consumoDelMesPorUsuario } from '../billing/billing.service';
+import { auditService, type AuditLogEntry } from '../audit/audit.service';
 
 /**
  * Running the platform: the firms on it, their plans, their balances.
@@ -41,6 +48,123 @@ const requireClient = () => {
   return supabase;
 };
 
+interface FirmRow {
+  firm_id: string;
+  name: string;
+  nit: string;
+  plan_tier: string;
+  subscription_status: string;
+  credit_balance_cop: number | string;
+  created_at: string;
+}
+
+const FIRM_COLUMNS =
+  'firm_id, name, nit, plan_tier, subscription_status, credit_balance_cop, created_at';
+
+/** The volume figures a firm is judged by. Counts, never contents. */
+interface FirmVolumes {
+  users: number;
+  transcriptions: number;
+  consumo30dCop: number;
+  catalogoCuradas: number;
+}
+
+/**
+ * The volume figures, for every firm or for one.
+ *
+ * ONE IMPLEMENTATION, TWO SCREENS. The list (7a) and the firm's own page (7b)
+ * show the same numbers and must agree; two copies of this arithmetic would
+ * drift and the drift would only be visible to whoever compared the screens.
+ * `scope` narrows each query when a single firm is asked for, so opening one
+ * firm does not pay for reading the whole platform.
+ *
+ * ─── LAS DOS COLUMNAS DE PRIMERA CLASE DEL 7a ─────────────────────────────
+ *
+ * CONSUMO 30 DIAS: de credit_movements CONSUMO (la plata autoritativa),
+ * agrupado en memoria. Es lo que vuelve el saldo LEGIBLE: $41.200 no dice
+ * nada; "4 dias al ritmo actual" es una alarma operable.
+ *
+ * CATALOGO CURADO: verificaciones de la firma contadas contra el total del
+ * catalogo. Es la salud del activo que la firma construye — una firma con 2%
+ * curado a los seis meses esta usando el producto a medias, y eso se ve aqui
+ * antes de que se vea en el churn.
+ */
+const firmVolumes = async (scope?: string): Promise<Map<string, FirmVolumes>> => {
+  const client = requireClient();
+  const volumes = new Map<string, FirmVolumes>();
+
+  const bucket = (firmId: string): FirmVolumes => {
+    let current = volumes.get(firmId);
+    if (!current) {
+      current = { users: 0, transcriptions: 0, consumo30dCop: 0, catalogoCuradas: 0 };
+      volumes.set(firmId, current);
+    }
+    return current;
+  };
+
+  // GoTrue has no server-side filter on app_metadata, so the accounts are always
+  // read whole and narrowed here.
+  const { data: users } = await client.auth.admin.listUsers();
+  for (const user of users?.users ?? []) {
+    const firmId = (user.app_metadata as Record<string, unknown>)?.firm_id;
+    if (typeof firmId !== 'string') continue;
+    if (scope && firmId !== scope) continue;
+    bucket(firmId).users += 1;
+  }
+
+  // One query for the ids alone, counted in memory: a per-firm round trip would
+  // be a query per row on a screen whose whole point is seeing them together.
+  let transcriptionsQuery = client.from('transcriptions').select('firm_id');
+  if (scope) transcriptionsQuery = transcriptionsQuery.eq('firm_id', scope);
+  const { data: transcritos } = await transcriptionsQuery;
+  for (const row of (transcritos ?? []) as { firm_id: string }[]) {
+    bucket(row.firm_id).transcriptions += 1;
+  }
+
+  const hace30 = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  let consumoQuery = client
+    .from('credit_movements')
+    .select('firm_id, amount_cop')
+    .eq('kind', 'CONSUMO')
+    .gte('created_at', hace30);
+  if (scope) consumoQuery = consumoQuery.eq('firm_id', scope);
+  const { data: consumos } = await consumoQuery;
+  for (const row of (consumos ?? []) as { firm_id: string; amount_cop: number }[]) {
+    bucket(row.firm_id).consumo30dCop += Math.abs(Number(row.amount_cop ?? 0));
+  }
+
+  let verificacionesQuery = client.from('catalog_verifications').select('firm_id');
+  if (scope) verificacionesQuery = verificacionesQuery.eq('firm_id', scope);
+  const { data: verificaciones } = await verificacionesQuery;
+  for (const row of (verificaciones ?? []) as { firm_id: string }[]) {
+    bucket(row.firm_id).catalogoCuradas += 1;
+  }
+
+  return volumes;
+};
+
+const EMPTY_VOLUMES: FirmVolumes = {
+  users: 0,
+  transcriptions: 0,
+  consumo30dCop: 0,
+  catalogoCuradas: 0
+};
+
+const toSummary = (row: FirmRow, volumes: FirmVolumes, catalogoTotal: number): FirmSummary => ({
+  id: row.firm_id,
+  name: row.name,
+  nit: row.nit,
+  planTier: row.plan_tier,
+  status: row.subscription_status,
+  creditsBalance: Number(row.credit_balance_cop ?? 0),
+  createdAt: row.created_at,
+  users: volumes.users,
+  transcriptions: volumes.transcriptions,
+  consumo30dCop: volumes.consumo30dCop,
+  catalogoCuradas: volumes.catalogoCuradas,
+  catalogoTotal
+});
+
 /**
  * Every firm, with the numbers needed to run the business.
  *
@@ -52,7 +176,7 @@ export const listFirms = async (): Promise<FirmSummary[]> => {
 
   const { data: firms, error } = await client
     .from('firms')
-    .select('firm_id, name, nit, plan_tier, subscription_status, credit_balance_cop, created_at')
+    .select(FIRM_COLUMNS)
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -60,80 +184,120 @@ export const listFirms = async (): Promise<FirmSummary[]> => {
     throw new AuthError('FIRMS_UNAVAILABLE', 'No se pudieron listar las firmas.', 502);
   }
 
-  const { data: users } = await client.auth.admin.listUsers();
-  const porFirma = new Map<string, number>();
-  for (const user of users?.users ?? []) {
-    const firmId = (user.app_metadata as Record<string, unknown>)?.firm_id;
-    if (typeof firmId === 'string') porFirma.set(firmId, (porFirma.get(firmId) ?? 0) + 1);
-  }
+  const volumes = await firmVolumes();
+  const catalogoTotal = catalogService.list().length;
 
-  // One query for the ids alone, counted in memory: a per-firm round trip would
-  // be a query per row on a screen whose whole point is seeing them together.
-  const { data: transcritos } = await client.from('transcriptions').select('firm_id');
-  const transcritosPorFirma = new Map<string, number>();
-  for (const row of (transcritos ?? []) as { firm_id: string }[]) {
-    transcritosPorFirma.set(row.firm_id, (transcritosPorFirma.get(row.firm_id) ?? 0) + 1);
-  }
+  return ((firms ?? []) as unknown as FirmRow[]).map((row) =>
+    toSummary(row, volumes.get(row.firm_id) ?? EMPTY_VOLUMES, catalogoTotal)
+  );
+};
 
-  /*
-   * ─── LAS DOS COLUMNAS DE PRIMERA CLASE DEL 7a ─────────────────────────────
+/**
+ * The actions the operator console itself performs on a firm.
+ *
+ * Nothing else in the product writes them — they are emitted only by this
+ * module's controllers — so the trail filtered down to them is exactly "what
+ * was done TO this firm from the outside", which is what both the operator and
+ * the firm's own partners need to read.
+ */
+const OPERATION_ACTIONS = new Set([
+  'FIRM_CREATED',
+  'FIRM_UPDATED',
+  'FIRM_CREDITS_ADDED',
+  'FIRM_STATUS_CHANGED',
+  'USER_CREATED'
+]);
+
+export interface FirmUserDetail {
+  id: string;
+  email: string;
+  role: string;
+  /** Charged this calendar month, from `ai_usage`. Zero means it drafted nothing. */
+  consumoMesCop: number;
+  /** `null` for an account that has never signed in — not a zero, an absence. */
+  ultimoAcceso: string | null;
+  creadoEl: string;
+  desactivado: boolean;
+}
+
+export interface FirmDetail extends FirmSummary {
+  /**
+   * Days the balance lasts at the last 30 days' rate.
    *
-   * CONSUMO 30 DIAS: de credit_movements CONSUMO (la plata autoritativa),
-   * agrupado en memoria. Es lo que vuelve el saldo LEGIBLE: $41.200 no dice
-   * nada; "4 dias al ritmo actual" es una alarma operable.
-   *
-   * CATALOGO CURADO: verificaciones de la firma contadas contra el total del
-   * catalogo. Es la salud del activo que la firma construye — una firma con 2%
-   * curado a los seis meses esta usando el producto a medias, y eso se ve aqui
-   * antes de que se vea en el churn.
+   * `null` when nothing was consumed in those 30 days: there is no rate, so
+   * there is no number of days, and inventing one would be the exact failure
+   * this codebase refuses.
    */
-  const hace30 = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-  const { data: consumos } = await client
-    .from('credit_movements')
-    .select('firm_id, amount_cop')
-    .eq('kind', 'CONSUMO')
-    .gte('created_at', hace30);
-  const consumo30PorFirma = new Map<string, number>();
-  for (const row of (consumos ?? []) as { firm_id: string; amount_cop: number }[]) {
-    consumo30PorFirma.set(
-      row.firm_id,
-      (consumo30PorFirma.get(row.firm_id) ?? 0) + Math.abs(Number(row.amount_cop ?? 0))
-    );
+  diasDeSaldo: number | null;
+  /** Accounts that signed in over the last 14 days, of the firm's total. */
+  usuariosActivos14d: number;
+  usuarios: FirmUserDetail[];
+  registroDeOperacion: AuditLogEntry[];
+}
+
+/**
+ * One firm, whole: identity, money, accounts, catalogue health and the record of
+ * what operation has done to it.
+ *
+ * WHAT IS ABSENT IS THE POINT. Not one field here reads a transcript, a draft, a
+ * client or a document. Running a tenant and reading its privileged material are
+ * different powers, and this endpoint only exercises the first.
+ */
+export const getFirmDetail = async (firmId: string): Promise<FirmDetail> => {
+  const client = requireClient();
+
+  const { data: firm, error } = await client
+    .from('firms')
+    .select(FIRM_COLUMNS)
+    .eq('firm_id', firmId)
+    .maybeSingle();
+
+  if (error) {
+    console.error('[ADMIN] No se pudo leer la firma:', error.message);
+    throw new AuthError('FIRM_UNAVAILABLE', 'No se pudo leer la firma.', 502);
+  }
+  if (!firm) {
+    throw new AuthError('FIRM_NOT_FOUND', 'No existe esa firma.', 404);
   }
 
-  const { data: verificaciones } = await client.from('catalog_verifications').select('firm_id');
-  const curadasPorFirma = new Map<string, number>();
-  for (const row of (verificaciones ?? []) as { firm_id: string }[]) {
-    curadasPorFirma.set(row.firm_id, (curadasPorFirma.get(row.firm_id) ?? 0) + 1);
-  }
-  const totalCatalogo = catalogService.list().length;
+  const row = firm as unknown as FirmRow;
 
-  return (firms ?? []).map((f) => {
-    const row = f as {
-      firm_id: string;
-      name: string;
-      nit: string;
-      plan_tier: string;
-      subscription_status: string;
-      credit_balance_cop: number | string;
-      created_at: string;
-    };
+  const [volumes, cuentas, consumoPorUsuario, trail] = await Promise.all([
+    firmVolumes(firmId),
+    listFirmUsers(firmId),
+    consumoDelMesPorUsuario(firmId),
+    auditService.getAuditLogs(firmId, 200)
+  ]);
 
-    return {
-      id: row.firm_id,
-      name: row.name,
-      nit: row.nit,
-      planTier: row.plan_tier,
-      status: row.subscription_status,
-      creditsBalance: Number(row.credit_balance_cop ?? 0),
-      createdAt: row.created_at,
-      users: porFirma.get(row.firm_id) ?? 0,
-      transcriptions: transcritosPorFirma.get(row.firm_id) ?? 0,
-      consumo30dCop: consumo30PorFirma.get(row.firm_id) ?? 0,
-      catalogoCuradas: curadasPorFirma.get(row.firm_id) ?? 0,
-      catalogoTotal: totalCatalogo
-    };
-  });
+  const summary = toSummary(
+    row,
+    volumes.get(firmId) ?? EMPTY_VOLUMES,
+    catalogService.list().length
+  );
+
+  const ritmoDiario = summary.consumo30dCop / 30;
+  const hace14 = Date.now() - 14 * 24 * 60 * 60 * 1000;
+
+  return {
+    ...summary,
+    // The account count comes from the same listing the rows come from, so the
+    // header and the table can never disagree.
+    users: cuentas.length,
+    diasDeSaldo: ritmoDiario > 0 ? Math.floor(summary.creditsBalance / ritmoDiario) : null,
+    usuariosActivos14d: cuentas.filter(
+      (u) => u.ultimoAcceso && new Date(u.ultimoAcceso).getTime() >= hace14
+    ).length,
+    usuarios: cuentas.map((u) => ({
+      id: u.id,
+      email: u.email,
+      role: u.role,
+      consumoMesCop: consumoPorUsuario[u.email] ?? 0,
+      ultimoAcceso: u.ultimoAcceso,
+      creadoEl: u.creadoEl,
+      desactivado: u.desactivado
+    })),
+    registroDeOperacion: trail.filter((entry) => OPERATION_ACTIONS.has(entry.action))
+  };
 };
 
 /**
@@ -212,6 +376,36 @@ export const createFirm = async (input: {
   };
 };
 
+/** Shortest reason that can actually say something. "ok", "test" and "." cannot. */
+const MIN_REASON_LENGTH = 10;
+
+/**
+ * The written reason every operation mutation must carry.
+ *
+ * WHY IT IS ENFORCED HERE AND NOT AT THE EDGE. The reason is not input
+ * validation, it is the substance of the audit line: the firm's partners read
+ * this trail and "plan cambiado" tells them nothing, "plan cambiado a Despacho a
+ * solicitud de C. Restrepo, ticket 412" tells them whether to object. A rule
+ * that lives in the service cannot be forgotten by a controller added later.
+ *
+ * WHITESPACE IS COLLAPSED BEFORE MEASURING because a field padded with spaces or
+ * newlines to clear a length check is exactly the empty reason the rule exists
+ * to reject. The normalized text is what gets recorded.
+ */
+export const requireReason = (raw: unknown): string => {
+  const reason = typeof raw === 'string' ? raw.replace(/\s+/g, ' ').trim() : '';
+
+  if (reason.length < MIN_REASON_LENGTH) {
+    throw new AuthError(
+      'REASON_REQUIRED',
+      'Toda acción de operación exige un motivo escrito: al menos 10 caracteres, y lo leerán los socios de la firma.',
+      400
+    );
+  }
+
+  return reason;
+};
+
 /**
  * Adds credit to a firm's balance.
  *
@@ -219,8 +413,16 @@ export const createFirm = async (input: {
  * resulting balance can both be recorded: an audit line saying "recharged" with
  * no figures explains nothing when a client disputes it.
  */
-export const addCredits = async (firmId: string, amount: number): Promise<number> => {
+export const addCredits = async (
+  firmId: string,
+  amount: number,
+  reason: unknown
+): Promise<{ balance: number; reason: string }> => {
   const client = requireClient();
+
+  // Before touching money: a recharge with no stated reason must not happen at
+  // all, not happen and then fail to be explained.
+  const motivo = requireReason(reason);
 
   if (!Number.isFinite(amount) || amount <= 0) {
     throw new AuthError('INVALID_AMOUNT', 'El monto de la recarga debe ser mayor que cero.');
@@ -248,7 +450,7 @@ export const addCredits = async (firmId: string, amount: number): Promise<number
     throw new AuthError('RECHARGE_FAILED', 'No se pudo aplicar la recarga.', 502);
   }
 
-  return nuevo;
+  return { balance: nuevo, reason: motivo };
 };
 
 const PLANES = new Set(['PRO_FIRM', 'INDEPENDIENTE', 'ENTERPRISE']);
@@ -257,9 +459,12 @@ const ESTADOS = new Set(['active', 'past_due', 'canceled']);
 /** Changes a firm's plan or subscription status. */
 export const updateFirm = async (
   firmId: string,
-  changes: { planTier?: string; status?: string; name?: string }
-): Promise<void> => {
+  changes: { planTier?: string; status?: string; name?: string },
+  reason: unknown
+): Promise<string> => {
   const client = requireClient();
+
+  const motivo = requireReason(reason);
 
   const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
 
@@ -291,14 +496,18 @@ export const updateFirm = async (
     console.error('[ADMIN] No se pudo actualizar la firma:', error.message);
     throw new AuthError('UPDATE_FAILED', 'No se pudo actualizar la firma.', 502);
   }
+
+  return motivo;
 };
 
 /** Adds an account to any firm, for onboarding and support. */
 export const addUserToAnyFirm = async (
   firmId: string,
-  input: { email: string; password: string; role: FirmUserRole }
+  input: { email: string; password: string; role: FirmUserRole; reason: unknown }
 ) => {
   const client = requireClient();
+
+  const motivo = requireReason(input.reason);
 
   const { data: firm } = await client
     .from('firms')
@@ -315,5 +524,7 @@ export const addUserToAnyFirm = async (
   // something reachable over the network.
   const role: FirmUserRole = input.role === 'FIRM_ADMIN' ? 'FIRM_ADMIN' : 'LAWYER';
 
-  return addUserToFirm(firmId, { email: input.email, password: input.password, role });
+  const user = await addUserToFirm(firmId, { email: input.email, password: input.password, role });
+
+  return { user, role, reason: motivo };
 };

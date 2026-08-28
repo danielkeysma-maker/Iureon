@@ -2,7 +2,14 @@ import { Request, Response } from 'express';
 import { AuthError } from '../auth/auth.service';
 import { auditService } from '../audit/audit.service';
 import { callerIp } from './admin.middleware';
-import { addCredits, addUserToAnyFirm, createFirm, listFirms, updateFirm } from './admin.service';
+import {
+  addCredits,
+  addUserToAnyFirm,
+  createFirm,
+  getFirmDetail,
+  listFirms,
+  updateFirm
+} from './admin.service';
 import { calcularRunway } from './runway.service';
 
 /**
@@ -29,6 +36,23 @@ export const listFirmsController = async (req: Request, res: Response): Promise<
     res.json({ success: true, firms: await listFirms() });
   } catch (err) {
     fail(res, err, 'No se pudieron listar las firmas.');
+  }
+};
+
+/**
+ * GET /api/admin/firms/:firmId — la ficha completa de una firma (7b).
+ *
+ * LO QUE TRAE Y LO QUE NO. Identidad, saldo, consumo, sus cuentas con lo que
+ * gastó cada una, la salud de su catálogo y el registro de lo que operación ha
+ * hecho sobre ella. Ni un transcrito, ni un borrador, ni un expediente:
+ * gestionar un inquilino y leer su material privilegiado son poderes distintos
+ * y este endpoint solo tiene el primero.
+ */
+export const firmDetailController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    res.json({ success: true, firm: await getFirmDetail(String(req.params.firmId)) });
+  } catch (err) {
+    fail(res, err, 'No se pudo leer la ficha de la firma.');
   }
 };
 
@@ -63,14 +87,18 @@ export const addCreditsController = async (req: Request, res: Response): Promise
   const amount = Number(req.body.amount);
 
   try {
-    const balance = await addCredits(firmId, amount);
+    const { balance, reason } = await addCredits(firmId, amount, req.body.reason);
 
     await auditService.record({
       firmId,
       userEmail: req.user!.email,
       action: 'FIRM_CREDITS_ADDED',
-      // Both figures, because "recharged" alone settles no dispute.
-      resource: `+$${amount.toLocaleString('es-CO')} COP · saldo resultante $${balance.toLocaleString('es-CO')} COP`,
+      /*
+       * Las dos cifras Y EL MOTIVO. «Recargado» a secas no resuelve una
+       * disputa, y sin el porqué el socio de la firma lee un movimiento de
+       * dinero que nadie le explicó.
+       */
+      resource: `+$${amount.toLocaleString('es-CO')} COP · saldo resultante $${balance.toLocaleString('es-CO')} COP · motivo: ${reason}`,
       ipAddress: callerIp(req)
     });
 
@@ -91,7 +119,7 @@ export const updateFirmController = async (req: Request, res: Response): Promise
   };
 
   try {
-    await updateFirm(firmId, changes);
+    const reason = await updateFirm(firmId, changes, req.body.reason);
 
     const descrito = Object.entries(changes)
       .filter(([, v]) => v !== undefined)
@@ -102,7 +130,7 @@ export const updateFirmController = async (req: Request, res: Response): Promise
       firmId,
       userEmail: req.user!.email,
       action: changes.status ? 'FIRM_STATUS_CHANGED' : 'FIRM_UPDATED',
-      resource: descrito,
+      resource: `${descrito} · motivo: ${reason}`,
       ipAddress: callerIp(req)
     });
 
@@ -117,17 +145,23 @@ export const addUserController = async (req: Request, res: Response): Promise<vo
   const firmId = String(req.params.firmId);
 
   try {
-    const user = await addUserToAnyFirm(firmId, {
+    const { user, role, reason } = await addUserToAnyFirm(firmId, {
       email: String(req.body.email ?? ''),
       password: String(req.body.password ?? ''),
-      role: req.body.role === 'FIRM_ADMIN' ? 'FIRM_ADMIN' : 'LAWYER'
+      role: req.body.role === 'FIRM_ADMIN' ? 'FIRM_ADMIN' : 'LAWYER',
+      reason: req.body.reason
     });
 
     await auditService.record({
       firmId,
       userEmail: req.user!.email,
       action: 'USER_CREATED',
-      resource: `${user.email} (${req.body.role === 'FIRM_ADMIN' ? 'FIRM_ADMIN' : 'LAWYER'})`,
+      /*
+       * El ROL EFECTIVO que devolvió el servicio, no el que pidió el cuerpo:
+       * las rutas degradan a LAWYER cualquier cosa que no sea FIRM_ADMIN, y
+       * la auditoría debe registrar lo que quedó, no lo que se pidió.
+       */
+      resource: `${user.email} (${role}) · motivo: ${reason}`,
       ipAddress: callerIp(req)
     });
 
