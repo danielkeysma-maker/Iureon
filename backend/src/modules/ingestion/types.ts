@@ -14,6 +14,12 @@ export type Corporacion =
   | 'CORTE_CONSTITUCIONAL'
   | 'CORTE_SUPREMA'
   | 'CONSEJO_ESTADO'
+  /*
+   * La que juzga la conducta de abogados y funcionarios judiciales. Reemplazo a
+   * la Sala Jurisdiccional Disciplinaria del Consejo Superior de la Judicatura
+   * (Acto Legislativo 02 de 2015) y opera desde enero de 2021.
+   */
+  | 'COMISION_DISCIPLINA'
   | 'TRIBUNAL_SUPERIOR'
   | 'TRIBUNAL_ADMINISTRATIVO';
 

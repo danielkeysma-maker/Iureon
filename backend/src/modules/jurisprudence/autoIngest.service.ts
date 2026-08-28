@@ -53,10 +53,20 @@ const BRANCH_BY_PROCESO: Record<string, string> = {
   Tutela: 'CONSTITUCIONAL'
 };
 
-const branchFor = (ruling: OfficialRuling): string =>
-  ruling.corporacion === 'CORTE_CONSTITUCIONAL'
-    ? 'CONSTITUCIONAL'
-    : BRANCH_BY_PROCESO[ruling.proceso] ?? 'CONSTITUCIONAL';
+const branchFor = (ruling: OfficialRuling): string => {
+  if (ruling.corporacion === 'CORTE_CONSTITUCIONAL') return 'CONSTITUCIONAL';
+
+  /*
+   * Lo disciplinario va a DISCIPLINARIO, y no puede caer en el reparto por
+   * proceso de la Corte Suprema: ese mapa habla de salas de casación, y una
+   * providencia de la Comisión Nacional de Disciplina Judicial archivada como
+   * constitucional sería una atribución falsa — idéntica a una correcta una vez
+   * indexada, y citada tal cual por quien la encuentre.
+   */
+  if (ruling.corporacion === 'COMISION_DISCIPLINA') return 'DISCIPLINARIO';
+
+  return BRANCH_BY_PROCESO[ruling.proceso] ?? 'CONSTITUCIONAL';
+};
 
 const fileNameFor = (citation: string): string =>
   `auto-${citation.replace(/[^A-Za-z0-9]+/g, '-').toLowerCase()}.txt`;

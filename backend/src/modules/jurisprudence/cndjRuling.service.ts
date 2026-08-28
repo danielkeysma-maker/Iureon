@@ -1,3 +1,4 @@
+import { decodeDocument } from '../ingestion/documentFetch';
 import type { OfficialRuling } from './officialRuling.service';
 
 /**
@@ -85,12 +86,34 @@ interface Sesion {
 
 const conPlazo = (ms: number): AbortSignal => AbortSignal.timeout(ms);
 
-/** Junta las cookies que el servidor pidió guardar, en la forma que espera de vuelta. */
-const cookiesDe = (res: Response): string =>
-  res.headers
-    .getSetCookie()
-    .map((c) => c.split(';')[0])
-    .join('; ');
+/**
+ * Acumula las cookies de una respuesta sobre las que ya se traían.
+ *
+ * ESTE PASO NO ES ADORNO Y COSTÓ ENCONTRARLO. La portada entrega la cookie
+ * antifalsificación, pero **la consulta se guarda en una cookie de sesión que
+ * emite la BÚSQUEDA**, no la portada: `.AspNetCore.Session`. Llevando solo las
+ * de la portada, el paso siguiente responde 200 con la página VACÍA — 44 KB y
+ * cero radicaciones en vez de 331 KB y noventa y dos. Un 200 sin resultados es
+ * indistinguible de «no hay providencias», así que el servicio contestaba
+ * NOT_FOUND con toda confianza sobre una relatoría que sí tenía la respuesta.
+ *
+ * Se reemplaza por nombre, que es como se comporta un navegador: una cookie
+ * reemitida pisa a la anterior en vez de duplicarse.
+ */
+const acumularCookies = (previas: string, res: Response): string => {
+  const mapa = new Map<string, string>();
+
+  for (const par of previas.split('; ')) {
+    if (par) mapa.set(par.split('=')[0], par);
+  }
+
+  for (const cruda of res.headers.getSetCookie()) {
+    const par = cruda.split(';')[0];
+    mapa.set(par.split('=')[0], par);
+  }
+
+  return [...mapa.values()].join('; ');
+};
 
 /**
  * Paso 1: la portada, por su token antifalsificación y su cookie.
@@ -117,7 +140,7 @@ const abrirSesion = async (timeoutMs: number): Promise<Sesion> => {
     throw new Error('la portada no trajo el token de verificación');
   }
 
-  return { cookie: cookiesDe(res), token };
+  return { cookie: acumularCookies('', res), token };
 };
 
 /** Pasos 2 y 3: se registra la consulta y se lee la página de resultados. */
@@ -137,6 +160,9 @@ const buscar = async (tema: string, sesion: Sesion, timeoutMs: number): Promise<
   if (!registrada.ok) {
     throw new Error(`la búsqueda respondió ${registrada.status}`);
   }
+
+  /* Aquí llega `.AspNetCore.Session`, que es la que lleva la consulta. */
+  sesion.cookie = acumularCookies(sesion.cookie, registrada);
 
   const pagina = await fetch(`${BASE}/Resultados`, {
     headers: { 'User-Agent': AGENTE, Cookie: sesion.cookie },
@@ -250,3 +276,122 @@ export const descargarProvidencia = async (
 /** La URL pública de una providencia, para que el abogado la abra en la fuente. */
 export const urlDeProvidencia = (archivo: string): string =>
   `${DOCS}/${encodeURIComponent(archivo)}.pdf`;
+
+/**
+ * El número de radicación como lo escribe la CNDJ en sus providencias: los 23
+ * dígitos partidos antes de los dos últimos, que es el consecutivo de instancia.
+ *
+ * Se cita así en los escritos, y publicar el bloque corrido obligaría al
+ * abogado a reformatearlo a mano cada vez.
+ */
+export const citaDeRadicacion = (radicacion: string): string =>
+  radicacion.length > 2
+    ? `${radicacion.slice(0, -2)} ${radicacion.slice(-2)}`
+    : radicacion;
+
+/** El mínimo de texto para creer que un PDF se leyó y no solo se abrió. */
+const MIN_TEXTO = 400;
+
+/**
+ * Busca en la relatoría y devuelve las providencias CON SU TEXTO.
+ *
+ * Orquesta los cinco pasos y es lo único que el resto del backend necesita
+ * conocer. Falla ABIERTO: si la relatoría no responde, el llamador recibe
+ * `UNAVAILABLE` y sigue su camino — la redacción no se detiene porque una
+ * fuente externa esté caída, del mismo modo que ya ocurre con el descubrimiento
+ * de la Corte Constitucional.
+ *
+ * LAS QUE NO TRAEN DOCUMENTO SE OMITEN EN SILENCIO, y es deliberado: la CNDJ
+ * publica fichas cuyo archivo nunca subió, y devolver una providencia sin texto
+ * la haría aparecer en pantalla como hallazgo citable cuando no hay nada que
+ * citar. Lo que sí se cuenta es cuántas se descartaron, para que la pantalla
+ * pueda decirlo.
+ */
+export const buscarEnCndj = async (
+  tema: string,
+  opciones: { timeoutMs?: number; maximo?: number } = {}
+): Promise<CndjOutcome> => {
+  const timeoutMs = opciones.timeoutMs ?? 20_000;
+  const maximo = Math.min(opciones.maximo ?? MAX_PROVIDENCIAS, MAX_PROVIDENCIAS);
+
+  if (tema.trim().length < 3) {
+    return {
+      status: 'NOT_FOUND',
+      reason: 'La relatoría de la CNDJ no responde a consultas de menos de tres letras.'
+    };
+  }
+
+  let sesion: Sesion;
+  let html: string;
+
+  try {
+    sesion = await abrirSesion(timeoutMs);
+    html = await buscar(tema.trim(), sesion, timeoutMs);
+  } catch (err) {
+    return {
+      status: 'UNAVAILABLE',
+      reason: `No se pudo consultar la relatoría de la Comisión Nacional de Disciplina Judicial: ${
+        err instanceof Error ? err.message : 'sin detalle'
+      }`
+    };
+  }
+
+  const radicaciones = radicacionesEn(html).slice(0, maximo);
+
+  if (radicaciones.length === 0) {
+    return {
+      status: 'NOT_FOUND',
+      reason: 'La Comisión Nacional de Disciplina Judicial no tiene providencias para esa consulta.'
+    };
+  }
+
+  const rulings: OfficialRuling[] = [];
+
+  /*
+   * EN SERIE, NO EN PARALELO. Estos servicios oficiales se caen con dos
+   * peticiones concurrentes — la relatoría de la Rama devuelve 504, y la API de
+   * procesos empieza a responder 403 tras una ráfaga. Ir de a uno cuesta
+   * segundos y es lo que mantiene la fuente en pie.
+   */
+  for (const radicacion of radicaciones) {
+    try {
+      const archivo = await nombreDelArchivo({ radicacion, ficha: '1' }, sesion, timeoutMs);
+      if (!archivo) continue;
+
+      const pdf = await descargarProvidencia(archivo, timeoutMs);
+      if (!pdf) continue;
+
+      const leido = await decodeDocument(pdf, 'application/pdf', MIN_TEXTO);
+      if (!leido.ok) continue;
+
+      rulings.push({
+        corporacion: 'COMISION_DISCIPLINA',
+        citation: citaDeRadicacion(radicacion),
+        tipo: 'Providencia disciplinaria',
+        /*
+         * La fecha vive dentro del nombre del archivo que la relatoría asigna
+         * (…ADJUNTA20260729111023). No se inventa cuando no se puede leer: se
+         * deja vacía, porque una fecha equivocada en una cita es peor que
+         * ninguna.
+         */
+        fecha: archivo.match(/(\d{4})(\d{2})(\d{2})\d{6}$/)?.slice(1, 4).join('-') ?? '',
+        magistrado: '',
+        sala: 'Comisión Nacional de Disciplina Judicial',
+        proceso: 'Disciplinario',
+        sourceUrl: urlDeProvidencia(archivo),
+        text: leido.text
+      });
+    } catch {
+      /* Una providencia que falla no tumba las demás: se omite y se sigue. */
+    }
+  }
+
+  if (rulings.length === 0) {
+    return {
+      status: 'NOT_FOUND',
+      reason: `La CNDJ tiene ${radicaciones.length} ficha(s) para esa consulta, pero ninguna con documento descargable.`
+    };
+  }
+
+  return { status: 'FOUND', rulings };
+};

@@ -39,7 +39,7 @@ export interface Citation {
 }
 
 /** Las corporaciones que este módulo sabe leer, cada una con su lector. */
-export type Corporacion = 'CORTE_CONSTITUCIONAL' | 'CORTE_SUPREMA';
+export type Corporacion = 'CORTE_CONSTITUCIONAL' | 'CORTE_SUPREMA' | 'COMISION_DISCIPLINA';
 
 export interface OfficialRuling {
   /*

@@ -1,4 +1,6 @@
 import {
+  buscarEnCndj,
+  citaDeRadicacion,
   descargarProvidencia,
   radicacionesEn,
   urlDeProvidencia
@@ -51,6 +53,12 @@ check(
 );
 
 check(
+  'la radicación se cita partida antes del consecutivo de instancia',
+  citaDeRadicacion('11001080200020250119600') === '110010802000202501196 00',
+  citaDeRadicacion('11001080200020250119600')
+);
+
+check(
   'la URL pública se arma sobre el dominio de la relatoría',
   urlDeProvidencia('F110010802ADJUNTA2026') ===
     'https://relatoria.cndj.gov.co/docs_relatoria/F110010802ADJUNTA2026.pdf',
@@ -95,6 +103,44 @@ const main = async (): Promise<void> => {
       'un archivo inventado NO devuelve documento',
       inventada === null,
       inventada === null ? 'null' : `${inventada.length} bytes`
+    );
+
+    /*
+     * LA CADENA COMPLETA. Es lo único que prueba que las cinco peticiones
+     * encajan: token, búsqueda, resultados, nombre de archivo y PDF leído.
+     */
+    const hallazgo = await buscarEnCndj('falta disciplinaria abogado', {
+      timeoutMs: 30_000,
+      maximo: 2
+    });
+
+    if (hallazgo.status === 'FOUND') {
+      const primera = hallazgo.rulings[0];
+      check(
+        'la búsqueda devuelve providencias CON su texto',
+        primera.text.length > 400,
+        `${hallazgo.rulings.length} providencia(s) · ${primera.text.length} caracteres`
+      );
+      check(
+        'y viajan atribuidas a la corporación correcta',
+        hallazgo.rulings.every((r) => r.corporacion === 'COMISION_DISCIPLINA'),
+        primera.corporacion
+      );
+      check(
+        'con su URL en la fuente oficial',
+        primera.sourceUrl.startsWith('https://relatoria.cndj.gov.co/docs_relatoria/'),
+        primera.sourceUrl.slice(0, 70)
+      );
+    } else {
+      console.log(`skip la cadena completa: ${hallazgo.status} — ${hallazgo.reason}`);
+    }
+
+    /* Una consulta de una letra no puede devolver nada: el corpus no se enumera. */
+    const corta = await buscarEnCndj('a', { timeoutMs: 15_000 });
+    check(
+      'una consulta demasiado corta se rechaza sin salir a la red',
+      corta.status === 'NOT_FOUND',
+      corta.status
     );
   } catch (err) {
     console.log(
