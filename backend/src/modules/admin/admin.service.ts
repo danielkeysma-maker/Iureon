@@ -1,3 +1,4 @@
+import { catalogService } from '../catalog/catalog.service';
 import { supabase } from '../../config/supabase.config';
 import { AuthError, addUserToFirm, type FirmUserRole } from '../auth/auth.service';
 
@@ -26,6 +27,11 @@ export interface FirmSummary {
   users: number;
   /** How many hearings it has transcribed. Counts, never contents. */
   transcriptions: number;
+  /** Lo cobrado en los últimos 30 días. Vuelve el saldo legible: días de vida, no pesos. */
+  consumo30dCop: number;
+  /** Verificaciones propias de la firma, contra el total del catálogo. */
+  catalogoCuradas: number;
+  catalogoTotal: number;
 }
 
 const requireClient = () => {
@@ -69,6 +75,39 @@ export const listFirms = async (): Promise<FirmSummary[]> => {
     transcritosPorFirma.set(row.firm_id, (transcritosPorFirma.get(row.firm_id) ?? 0) + 1);
   }
 
+  /*
+   * ─── LAS DOS COLUMNAS DE PRIMERA CLASE DEL 7a ─────────────────────────────
+   *
+   * CONSUMO 30 DIAS: de credit_movements CONSUMO (la plata autoritativa),
+   * agrupado en memoria. Es lo que vuelve el saldo LEGIBLE: $41.200 no dice
+   * nada; "4 dias al ritmo actual" es una alarma operable.
+   *
+   * CATALOGO CURADO: verificaciones de la firma contadas contra el total del
+   * catalogo. Es la salud del activo que la firma construye — una firma con 2%
+   * curado a los seis meses esta usando el producto a medias, y eso se ve aqui
+   * antes de que se vea en el churn.
+   */
+  const hace30 = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  const { data: consumos } = await client
+    .from('credit_movements')
+    .select('firm_id, amount_cop')
+    .eq('kind', 'CONSUMO')
+    .gte('created_at', hace30);
+  const consumo30PorFirma = new Map<string, number>();
+  for (const row of (consumos ?? []) as { firm_id: string; amount_cop: number }[]) {
+    consumo30PorFirma.set(
+      row.firm_id,
+      (consumo30PorFirma.get(row.firm_id) ?? 0) + Math.abs(Number(row.amount_cop ?? 0))
+    );
+  }
+
+  const { data: verificaciones } = await client.from('catalog_verifications').select('firm_id');
+  const curadasPorFirma = new Map<string, number>();
+  for (const row of (verificaciones ?? []) as { firm_id: string }[]) {
+    curadasPorFirma.set(row.firm_id, (curadasPorFirma.get(row.firm_id) ?? 0) + 1);
+  }
+  const totalCatalogo = catalogService.list().length;
+
   return (firms ?? []).map((f) => {
     const row = f as {
       firm_id: string;
@@ -89,7 +128,10 @@ export const listFirms = async (): Promise<FirmSummary[]> => {
       creditsBalance: Number(row.credit_balance_cop ?? 0),
       createdAt: row.created_at,
       users: porFirma.get(row.firm_id) ?? 0,
-      transcriptions: transcritosPorFirma.get(row.firm_id) ?? 0
+      transcriptions: transcritosPorFirma.get(row.firm_id) ?? 0,
+      consumo30dCop: consumo30PorFirma.get(row.firm_id) ?? 0,
+      catalogoCuradas: curadasPorFirma.get(row.firm_id) ?? 0,
+      catalogoTotal: totalCatalogo
     };
   });
 };
@@ -163,7 +205,10 @@ export const createFirm = async (input: {
     creditsBalance: credits,
     createdAt: new Date().toISOString(),
     users: 1,
-    transcriptions: 0
+    transcriptions: 0,
+    consumo30dCop: 0,
+    catalogoCuradas: 0,
+    catalogoTotal: catalogService.list().length
   };
 };
 

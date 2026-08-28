@@ -98,7 +98,7 @@ export const leerMarca = async (firmId: string): Promise<FirmBranding | null> =>
   const { data, error } = await supabase
     .from('firms')
     .select('branding')
-    .eq('id', firmId)
+    .eq('firm_id', firmId)
     .maybeSingle();
 
   if (error || !data?.branding) return null;
@@ -113,7 +113,7 @@ export const guardarMarca = async (firmId: string, crudo: unknown): Promise<Firm
   const { error } = await supabase
     .from('firms')
     .update({ branding: marca, updated_at: new Date().toISOString() })
-    .eq('id', firmId);
+    .eq('firm_id', firmId);
 
   if (error) {
     console.error('[MARCA] No se pudo guardar:', error.message);

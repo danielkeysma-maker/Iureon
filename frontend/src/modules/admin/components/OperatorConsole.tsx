@@ -25,9 +25,9 @@ const ESTADO_ETIQUETA: Record<string, string> = {
 };
 
 const ESTADO_ESTILO: Record<string, string> = {
-  active: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-  past_due: 'bg-amber-50 text-amber-800 border-amber-200',
-  canceled: 'bg-rose-50 text-rose-800 border-rose-200'
+  active: 'bg-[rgb(var(--verified-surf))] text-verified border-[rgb(var(--verified-line))]',
+  past_due: 'bg-[rgb(var(--unverified-surf))] text-unverified border-[rgb(var(--unverified-line))]',
+  canceled: 'bg-[rgb(var(--danger)/0.06)] text-danger border-[rgb(var(--danger)/0.35)]'
 };
 
 export const OperatorConsole: React.FC = () => {
@@ -125,14 +125,72 @@ export const OperatorConsole: React.FC = () => {
     }
   };
 
+  /*
+   * DIAS DE SALDO AL RITMO ACTUAL: balance / (consumo30/30). Solo se calcula
+   * con consumo real — una firma sin actividad no tiene "ritmo" y estimarle
+   * dias seria inventar una alarma. null = sin estimacion, y se dice.
+   */
+  const diasDeSaldo = (f: FirmSummary): number | null => {
+    if (f.consumo30dCop <= 0) return null;
+    return Math.floor(f.creditsBalance / (f.consumo30dCop / 30));
+  };
+
+  /*
+   * ORDEN POR RIESGO OPERATIVO, no alfabetico: la firma a punto de quedarse
+   * sin saldo va PRIMERO — es a la que hay que llamar hoy. Despues las de
+   * menos catalogo curado (usan el producto a medias), y el resto por consumo.
+   */
+  const ordenadas = [...firms].sort((a, b) => {
+    const da = diasDeSaldo(a);
+    const db = diasDeSaldo(b);
+    const riesgoA = da !== null && da <= 7 ? da : 999;
+    const riesgoB = db !== null && db <= 7 ? db : 999;
+    if (riesgoA !== riesgoB) return riesgoA - riesgoB;
+    return b.consumo30dCop - a.consumo30dCop;
+  });
+
+  const saldoAgregado = firms.reduce((t, f) => t + f.creditsBalance, 0);
+  const consumo30Agregado = firms.reduce((t, f) => t + f.consumo30dCop, 0);
+  const porAgotarse = firms.filter((f) => {
+    const d = diasDeSaldo(f);
+    return d !== null && d <= 7;
+  }).length;
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between bg-white border border-slate-200 rounded-xl px-4 py-3">
+      {/* ─── LAS CIFRAS AGREGADAS (7a): la salud de la casa de un vistazo ── */}
+      {firms.length > 0 && (
+        <div className="grid grid-cols-2 gap-px overflow-hidden rounded-card border border-line-200 bg-line-100 sm:grid-cols-4">
+          <div className="bg-surface px-4 py-2.5">
+            <p className="font-mono text-[18px] font-semibold text-ink-900">
+              ${saldoAgregado.toLocaleString('es-CO')}
+            </p>
+            <p className="text-meta text-ink-500">Saldo agregado — es pasivo: trabajo ya vendido</p>
+          </div>
+          <div className="bg-surface px-4 py-2.5">
+            <p className="font-mono text-[18px] font-semibold text-ink-900">
+              ${consumo30Agregado.toLocaleString('es-CO')}
+            </p>
+            <p className="text-meta text-ink-500">Consumo 30 días</p>
+          </div>
+          <div className="bg-surface px-4 py-2.5">
+            <p className={`font-mono text-[18px] font-semibold ${porAgotarse > 0 ? 'text-unverified' : 'text-ink-900'}`}>
+              {porAgotarse}
+            </p>
+            <p className="text-meta text-ink-500">Con ≤7 días de saldo al ritmo actual</p>
+          </div>
+          <div className="bg-surface px-4 py-2.5">
+            <p className="font-mono text-[18px] font-semibold text-ink-900">{firms.length}</p>
+            <p className="text-meta text-ink-500">Firmas en la plataforma</p>
+          </div>
+        </div>
+      )}
+      <div className="flex items-center justify-between bg-surface border border-line-200 rounded-card px-4 py-3">
         <div className="flex items-center gap-2">
-          <ShieldCheck className="w-4 h-4 text-blue-900" />
+          <ShieldCheck className="w-4 h-4 text-brand-700" />
           <div>
-            <h3 className="font-bold text-slate-900 text-xs">Firmas en la plataforma</h3>
-            <p className="text-[11px] text-slate-500">
+            <h3 className="font-bold text-ink-900 text-xs">Firmas en la plataforma</h3>
+            <p className="text-[11px] text-ink-500">
               {firms.length} {firms.length === 1 ? 'firma registrada' : 'firmas registradas'}
             </p>
           </div>
@@ -141,14 +199,14 @@ export const OperatorConsole: React.FC = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => void cargar()}
-            className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg text-[11px] font-semibold flex items-center gap-1.5"
+            className="px-3 py-1.5 bg-canvas hover:bg-line-100 text-ink-700 border border-line-200 rounded-control text-[11px] font-semibold flex items-center gap-1.5"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${cargando ? 'animate-spin' : ''}`} />
             <span>Actualizar</span>
           </button>
           <button
             onClick={() => setCreando((v) => !v)}
-            className="px-3 py-1.5 bg-blue-950 hover:bg-blue-900 text-white rounded-lg text-[11px] font-semibold flex items-center gap-1.5"
+            className="px-3 py-1.5 bg-brand-700 hover:bg-brand-800 text-white rounded-control text-[11px] font-semibold flex items-center gap-1.5"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Nueva firma</span>
@@ -157,16 +215,16 @@ export const OperatorConsole: React.FC = () => {
       </div>
 
       {error && (
-        <div className="bg-rose-50 border border-rose-200 rounded-xl p-3 flex items-start gap-2">
-          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-          <p className="text-[11px] text-rose-800">{error}</p>
+        <div className="bg-[rgb(var(--danger)/0.06)] border border-[rgb(var(--danger)/0.35)] rounded-card p-3 flex items-start gap-2">
+          <AlertCircle className="w-4 h-4 text-danger shrink-0 mt-0.5" />
+          <p className="text-[11px] text-danger">{error}</p>
         </div>
       )}
 
       {creando && (
-        <form onSubmit={crear} className="bg-white border border-slate-200 rounded-xl p-4 space-y-3">
-          <h4 className="font-bold text-slate-900 text-xs">Registrar una firma cliente</h4>
-          <p className="text-[11px] text-slate-500">
+        <form onSubmit={crear} className="bg-surface border border-line-200 rounded-card p-4 space-y-3">
+          <h4 className="font-bold text-ink-900 text-xs">Registrar una firma cliente</h4>
+          <p className="text-[11px] text-ink-500">
             Se crea la firma y la cuenta de su administrador en un solo paso. Entrégale la contraseña
             por un canal seguro y pídele que la cambie.
           </p>
@@ -176,14 +234,14 @@ export const OperatorConsole: React.FC = () => {
               value={nueva.firmName}
               onChange={(e) => setNueva({ ...nueva, firmName: e.target.value })}
               placeholder="Nombre de la firma"
-              className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[11px] focus:outline-none focus:border-blue-900"
+              className="bg-canvas border border-line-200 rounded-control px-3 py-2 text-[11px] focus:outline-none focus:border-brand-700"
               required
             />
             <input
               value={nueva.nit}
               onChange={(e) => setNueva({ ...nueva, nit: e.target.value })}
               placeholder="NIT"
-              className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[11px] font-mono focus:outline-none focus:border-blue-900"
+              className="bg-canvas border border-line-200 rounded-control px-3 py-2 text-[11px] font-mono focus:outline-none focus:border-brand-700"
               required
             />
             <input
@@ -191,7 +249,7 @@ export const OperatorConsole: React.FC = () => {
               value={nueva.adminEmail}
               onChange={(e) => setNueva({ ...nueva, adminEmail: e.target.value })}
               placeholder="Correo del administrador"
-              className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[11px] focus:outline-none focus:border-blue-900"
+              className="bg-canvas border border-line-200 rounded-control px-3 py-2 text-[11px] focus:outline-none focus:border-brand-700"
               required
             />
             <input
@@ -199,7 +257,7 @@ export const OperatorConsole: React.FC = () => {
               value={nueva.adminPassword}
               onChange={(e) => setNueva({ ...nueva, adminPassword: e.target.value })}
               placeholder="Contraseña inicial (mínimo 8)"
-              className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[11px] font-mono focus:outline-none focus:border-blue-900"
+              className="bg-canvas border border-line-200 rounded-control px-3 py-2 text-[11px] font-mono focus:outline-none focus:border-brand-700"
               required
             />
             <input
@@ -207,21 +265,21 @@ export const OperatorConsole: React.FC = () => {
               value={nueva.initialCredits || ''}
               onChange={(e) => setNueva({ ...nueva, initialCredits: Number(e.target.value) })}
               placeholder="Saldo inicial en COP (opcional)"
-              className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[11px] focus:outline-none focus:border-blue-900"
+              className="bg-canvas border border-line-200 rounded-control px-3 py-2 text-[11px] focus:outline-none focus:border-brand-700"
             />
           </div>
 
           <div className="flex items-center gap-2">
             <button
               type="submit"
-              className="px-3 py-1.5 bg-blue-950 hover:bg-blue-900 text-white rounded-lg text-[11px] font-semibold"
+              className="px-3 py-1.5 bg-brand-700 hover:bg-brand-800 text-white rounded-control text-[11px] font-semibold"
             >
               Crear firma y cuenta
             </button>
             <button
               type="button"
               onClick={() => setCreando(false)}
-              className="text-[11px] text-slate-500 hover:text-slate-700"
+              className="text-[11px] text-ink-500 hover:text-ink-700"
             >
               Cancelar
             </button>
@@ -230,54 +288,80 @@ export const OperatorConsole: React.FC = () => {
       )}
 
       {cargando && firms.length === 0 ? (
-        <p className="text-[11px] text-slate-500 px-1">Cargando firmas…</p>
+        <p className="text-[11px] text-ink-500 px-1">Cargando firmas…</p>
       ) : firms.length === 0 ? (
-        <div className="bg-white border border-slate-200 rounded-xl p-6 text-center">
+        <div className="bg-surface border border-line-200 rounded-card p-6 text-center">
           <Building2 className="w-6 h-6 text-slate-300 mx-auto mb-2" />
-          <p className="text-[11px] text-slate-500">
+          <p className="text-[11px] text-ink-500">
             Todavía no hay firmas registradas en la plataforma.
           </p>
         </div>
       ) : (
-        <div className="bg-white border border-slate-200 rounded-xl divide-y divide-slate-100">
-          {firms.map((firm) => (
+        <div className="bg-surface border border-line-200 rounded-card divide-y divide-line-100">
+          {ordenadas.map((firm) => (
             <div key={firm.id} className="p-4 space-y-2">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="font-bold text-slate-900 text-xs truncate">{firm.name}</p>
-                  <p className="text-[11px] text-slate-500 font-mono">NIT {firm.nit}</p>
+                  <p className="font-bold text-ink-900 text-xs truncate">{firm.name}</p>
+                  <p className="text-[11px] text-ink-500 font-mono">NIT {firm.nit}</p>
                 </div>
 
                 <span
                   className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border shrink-0 ${
-                    ESTADO_ESTILO[firm.status] ?? 'bg-slate-50 text-slate-700 border-slate-200'
+                    ESTADO_ESTILO[firm.status] ?? 'bg-canvas text-ink-700 border-line-200'
                   }`}
                 >
                   {ESTADO_ETIQUETA[firm.status] ?? firm.status}
                 </span>
               </div>
 
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-slate-600">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-ink-500">
                 <span className="flex items-center gap-1">
-                  <CreditCard className="w-3 h-3 text-slate-400" />
-                  Saldo <b className="text-slate-900">{pesos(firm.creditsBalance)}</b>
+                  <CreditCard className="w-3 h-3 text-ink-400" />
+                  Saldo <b className="text-ink-900">{pesos(firm.creditsBalance)}</b>
+                  {/*
+                    LOS DIAS, no solo los pesos: "4 dias de saldo" es la alarma
+                    que hace llamar hoy. Solo con consumo real — sin ritmo no
+                    hay estimacion, y se dice "sin consumo" en vez de inventar.
+                  */}
+                  {(() => {
+                    const d = diasDeSaldo(firm);
+                    if (d === null)
+                      return <span className="text-ink-400">· sin consumo este mes</span>;
+                    return (
+                      <span className={d <= 7 ? 'font-semibold text-unverified' : 'text-ink-400'}>
+                        · ≈{d} {d === 1 ? 'día' : 'días'} al ritmo actual
+                      </span>
+                    );
+                  })()}
                 </span>
+                <span>Consumo 30 d <b className="text-ink-900">{pesos(firm.consumo30dCop)}</b></span>
                 <span className="flex items-center gap-1">
-                  <Users className="w-3 h-3 text-slate-400" />
+                  <Users className="w-3 h-3 text-ink-400" />
                   {firm.users} {firm.users === 1 ? 'cuenta' : 'cuentas'}
                 </span>
                 <span>
-                  {firm.transcriptions}{' '}
-                  {firm.transcriptions === 1 ? 'audiencia transcrita' : 'audiencias transcritas'}
+                  {/* La salud del activo que la firma construye: curado bajo = producto a medias. */}
+                  Catálogo curado{' '}
+                  <b className="text-ink-900">
+                    {firm.catalogoTotal > 0
+                      ? `${Math.round((firm.catalogoCuradas / firm.catalogoTotal) * 100)}%`
+                      : '—'}
+                  </b>
+                  <span className="text-ink-400"> ({firm.catalogoCuradas})</span>
                 </span>
-                <span className="font-mono text-slate-400">{firm.planTier}</span>
+                <span>
+                  {firm.transcriptions}{' '}
+                  {firm.transcriptions === 1 ? 'transcripción' : 'transcripciones'}
+                </span>
+                <span className="font-mono text-ink-400">{firm.planTier}</span>
               </div>
 
               <div className="flex flex-wrap items-center gap-2 pt-1">
                 <button
                   onClick={() => void recargar(firm)}
                   disabled={recargando === firm.id}
-                  className="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-lg text-[11px] font-semibold disabled:opacity-50"
+                  className="px-2.5 py-1 bg-[rgb(var(--verified-surf))] hover:bg-[rgb(var(--verified-surf))] text-verified border border-[rgb(var(--verified-line))] rounded-control text-[11px] font-semibold disabled:opacity-50"
                 >
                   {recargando === firm.id ? 'Recargando…' : 'Recargar saldo'}
                 </button>
@@ -285,7 +369,7 @@ export const OperatorConsole: React.FC = () => {
                 <select
                   value={firm.status}
                   onChange={(e) => void cambiarEstado(firm, e.target.value)}
-                  className="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-[11px] focus:outline-none focus:border-blue-900"
+                  className="bg-canvas border border-line-200 rounded-control px-2 py-1 text-[11px] focus:outline-none focus:border-brand-700"
                 >
                   <option value="active">Activa</option>
                   <option value="past_due">En mora</option>
@@ -302,7 +386,7 @@ export const OperatorConsole: React.FC = () => {
         console — and because a firm that asks deserves an answer that matches
         what the code does.
       */}
-      <p className="text-[11px] text-slate-500 px-1">
+      <p className="text-[11px] text-ink-500 px-1">
         Esta consola gestiona el negocio de cada firma: su plan, su saldo y sus cuentas. No da acceso
         a sus audiencias, borradores ni expedientes — eso es material amparado por el secreto
         profesional. Cada cambio queda registrado en la auditoría de la firma afectada, con tu correo.

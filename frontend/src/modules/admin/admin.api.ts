@@ -19,6 +19,10 @@ export interface FirmSummary {
   /** Volume, never contents: how many, never what they say. */
   users: number;
   transcriptions: number;
+  /** Lo cobrado en los últimos 30 días — vuelve el saldo legible en días. */
+  consumo30dCop: number;
+  catalogoCuradas: number;
+  catalogoTotal: number;
 }
 
 export const adminApi = {
