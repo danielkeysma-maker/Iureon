@@ -404,6 +404,19 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
         )}
       </div>
 
+      {/*
+        El historial VACIO tambien se anuncia: sin esta linea, el modulo entero
+        parece no haber cambiado hasta la primera consulta — y nadie descubre
+        una capacidad que no se presenta.
+      */}
+      {historial.length === 0 && (
+        <p className="mx-auto mt-6 max-w-3xl rounded-card border border-line-200 bg-surface px-4 py-3 text-meta leading-[1.6] text-ink-500">
+          Desde ahora, cada orientación queda guardada aquí para toda la firma: se busca por los
+          hechos, se reutiliza para otro cliente, y las consultas sin actuación se agrupan como la
+          lista de trabajo del catálogo.
+        </p>
+      )}
+
       {/* ─── HISTORIAL · cada consulta vale para la siguiente ─────────────── */}
       {historial.length > 0 && (
         <div className="mx-auto mt-6 max-w-3xl space-y-3">
