@@ -20,6 +20,16 @@ export interface FirmBranding {
   signatureImageUrl: string | null;
 }
 
+/*
+ * La marca cargada, en memoria de módulo. App la escribe al autenticar y al
+ * guardar; el acta la LEE SIN RED — exportar jamás espera a un servidor.
+ */
+let marcaActual: FirmBranding | null = null;
+export const setMarcaActual = (b: FirmBranding | null): void => {
+  marcaActual = b;
+};
+export const getMarcaActual = (): FirmBranding | null => marcaActual;
+
 export const brandingApi = {
   /** La marca guardada, y si la firma la configuró alguna vez. */
   async get(): Promise<{ branding: FirmBranding; configurada: boolean }> {

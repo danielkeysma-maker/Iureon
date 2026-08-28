@@ -5,7 +5,7 @@ import { TranscriptSegments } from '../../transcription/components/TranscriptSeg
 import { EntrevistasList } from './EntrevistasList';
 import { CerrarEntrevistaDialog } from './CerrarEntrevistaDialog';
 import { NotPersistedWarning } from '../../transcription/components/RoleProposals';
-import { exportTranscriptToPdf, exportTranscriptToWord } from '../../transcription/transcriptExport';
+// Carga diferida: el acta embebe Plus Jakarta Sans (~500 KB) y solo la paga quien exporta.
 import { buildSpeakerNames } from '../../transcription/speakerNames';
 import { ROLE_LABELS, ROLES_DEL_RELATO, SUPPORTED_AUDIO_EXTENSIONS } from '../../transcription/types';
 import { toPlainText } from '../../transcription/toPlainText';
@@ -151,7 +151,9 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
       autorizadoEl: fila?.autorizo_grabacion_el ?? null,
       revisadaPor: fila?.revisada_por ?? null,
       actaLista: fila?.estado_revision === 'ACTA_LISTA',
-      hechosClave: fila?.resumen?.hechos
+      hechosClave: fila?.resumen?.hechos,
+      decision: fila?.decision,
+      decisionMotivo: fila?.decision_motivo ?? null
     };
   };
 
@@ -243,14 +245,14 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
             {/* El acta, en dos formatos del mismo peso: el .docx se edita, el PDF se anexa. */}
             <div className="flex">
               <button
-                onClick={() => void exportTranscriptToWord(result, titulo || 'entrevista', armarActa())}
+                onClick={() => void import('../../transcription/transcriptExport').then((m) => m.exportTranscriptToWord(result, titulo || 'entrevista', armarActa()))}
                 className="btn-secondary btn-sm rounded-r-none"
               >
                 <FileText className="h-3 w-3" />
                 Word
               </button>
               <button
-                onClick={() => exportTranscriptToPdf(result, titulo || 'entrevista', armarActa())}
+                onClick={() => void import('../../transcription/transcriptExport').then((m) => m.exportTranscriptToPdf(result, titulo || 'entrevista', armarActa()))}
                 className="btn-secondary btn-sm -ml-px rounded-l-none"
               >
                 PDF

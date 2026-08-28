@@ -8,7 +8,7 @@ import { NotPersistedWarning, RoleProposals } from './RoleProposals';
 import { AudienciasList } from './AudienciasList';
 import { SubirAudienciaDialog } from './SubirAudienciaDialog';
 import { transcriptionApi } from '../services/transcription.api';
-import { exportTranscriptToPdf, exportTranscriptToWord } from '../transcriptExport';
+// Carga diferida: el acta embebe Plus Jakarta Sans (~500 KB) y solo la paga quien exporta.
 import { buildSpeakerNames } from '../speakerNames';
 import { toPlainText } from '../toPlainText';
 import { ROLE_LABELS, type SpeakerRole, type TranscriptionKind } from '../types';
@@ -88,7 +88,9 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
       autorizadoEl: fila?.autorizo_grabacion_el ?? null,
       revisadaPor: fila?.revisada_por ?? null,
       actaLista: fila?.estado_revision === 'ACTA_LISTA',
-      hechosClave: fila?.resumen?.hechos
+      hechosClave: fila?.resumen?.hechos,
+      decision: fila?.decision,
+      decisionMotivo: fila?.decision_motivo ?? null
     };
   };
 
@@ -151,7 +153,7 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
             {/* Word y PDF unidos, como en el taller: un formato, no dos decisiones. */}
             <div className="flex">
               <button
-                onClick={() => result && void exportTranscriptToWord(result, exportTitle, armarActa())}
+                onClick={() => result && void import('../transcriptExport').then((m) => m.exportTranscriptToWord(result, exportTitle, armarActa()))}
                 className="btn-secondary btn-sm rounded-r-none"
                 title="El .docx es el que se edita para el acta"
               >
@@ -159,7 +161,7 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
                 Word
               </button>
               <button
-                onClick={() => result && exportTranscriptToPdf(result, exportTitle, armarActa())}
+                onClick={() => result && void import('../transcriptExport').then((m) => m.exportTranscriptToPdf(result, exportTitle, armarActa()))}
                 className="btn-secondary btn-sm -ml-px rounded-l-none"
                 title="El PDF es el que se anexa al expediente"
               >

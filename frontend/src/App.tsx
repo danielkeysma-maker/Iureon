@@ -21,7 +21,7 @@ import { SettingsView } from './modules/settings/components/SettingsView';
 import { WorkshopConfigBar } from './modules/workspace/components/WorkshopConfigBar';
 import type { ActuacionRole } from './modules/catalog/types';
 import { FirmBrandingModal } from './modules/tenant/components/FirmBrandingModal';
-import { brandingApi, formatoComoInstruccion, type FirmBranding } from './modules/tenant/services/branding.api';
+import { brandingApi, formatoComoInstruccion, setMarcaActual, type FirmBranding } from './modules/tenant/services/branding.api';
 import { FirmSubscriptionModal } from './modules/subscriptions/components/FirmSubscriptionModal';
 import type { FirmSubscriptionInfo } from './modules/subscriptions/types';
 import { DEFAULT_FIRM_BRANDING, DocumentExportService } from './modules/documents/services/documentExport.service';
@@ -209,6 +209,7 @@ export function App() {
   /* La marca nueva alimenta a la vieja estructura de exportacion sin romperla. */
   const aplicarMarca = (b: FirmBranding) => {
     setMarcaDeFirma(b);
+    setMarcaActual(b);
     setFirmBranding((prev) => ({
       ...prev,
       firmName: b.firmName || prev.firmName,
