@@ -1952,6 +1952,75 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Texto corregido que se propone', mandatory: true, basis: 'Código General del Proceso, art. 286' }
     ],
     sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr009.html'
+  },
+  {
+    id: 'civil/auto-que-resuelve-el-recurso-de-reposicion',
+    exactName: 'Auto que resuelve el recurso de reposición',
+    branch: 'CIVIL',
+    role: 'DESPACHO',
+    legalBasis: 'Código General del Proceso, arts. 318 y 319',
+    competentAuthority: 'El mismo juez que dictó el auto recurrido; el magistrado sustanciador o la Sala de Casación Civil en su caso',
+    transversal: true,
+    term: { status: 'VERIFICADO', description: 'TRES (3) DÍAS PARA INTERPONERLO SI EL AUTO SE DICTÓ FUERA DE AUDIENCIA, Y VERBALMENTE E INMEDIATO SI SE DICTÓ EN ELLA. RELOJ DEL RECURRENTE: «deberá interponerse CON EXPRESIÓN DE LAS RAZONES QUE LO SUSTENTEN, en forma verbal INMEDIATAMENTE se pronuncie el auto. Cuando el auto se pronuncie fuera de audiencia el recurso deberá interponerse por escrito dentro de los TRES (3) DÍAS siguientes al de la notificación del auto» (art. 318). Sin razones no está interpuesto. CONTRA QUÉ NO PROCEDE, y saberlo evita gastar el término: «no procede contra los autos que resuelvan un recurso de APELACIÓN, una SÚPLICA o una QUEJA». Y «Los autos que dicten las salas de decisión NO TIENEN REPOSICIÓN; podrá pedirse su aclaración o complementación dentro del término de su ejecutoria». EL AUTO QUE LA DECIDE CIERRA LA DISCUSIÓN, con una sola salida: «no es susceptible de ningún recurso, SALVO QUE CONTENGA PUNTOS NO DECIDIDOS EN EL ANTERIOR, caso en el cual podrán interponerse los recursos pertinentes respecto de los puntos nuevos» (art. 318). LA REGLA QUE SALVA AL QUE SE EQUIVOCA DE RECURSO, y casi nadie invoca: «Cuando el recurrente impugne una providencia judicial MEDIANTE UN RECURSO IMPROCEDENTE, el juez DEBERÁ tramitar la impugnación POR LAS REGLAS DEL RECURSO QUE RESULTARE PROCEDENTE, siempre que haya sido INTERPUESTO OPORTUNAMENTE» (art. 318 par.). Lo que no perdona es la extemporaneidad; el nombre equivocado, sí. TRÁMITE: «se decidirá en la audiencia, previo traslado en ella a la parte contraria» (art. 319); fuera de audiencia, el traslado corre en secretaría por tres días sin auto (art. 110).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del auto recurrido y de su fecha de notificación', mandatory: true, basis: 'Código General del Proceso, art. 318' },
+      { n: 2, name: 'Pronunciamiento sobre cada razón expuesta por el recurrente', mandatory: true, basis: 'Código General del Proceso, art. 318' },
+      { n: 3, name: 'Decisión de reformar, revocar o mantener el auto, con su motivación', mandatory: true, basis: 'Código General del Proceso, art. 318' },
+      { n: 4, name: 'Advertencia de que no admite recursos, salvo respecto de puntos nuevos', mandatory: true, basis: 'Código General del Proceso, art. 318' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr011.html'
+  },
+  {
+    id: 'civil/auto-que-concede-o-deniega-la-apelacion-y-fija-su-efecto',
+    exactName: 'Auto que concede o deniega la apelación y fija su efecto',
+    branch: 'CIVIL',
+    role: 'DESPACHO',
+    legalBasis: 'Código General del Proceso, arts. 321, 322, 323 y 324',
+    competentAuthority: 'El juez de primera instancia, que concede y remite; el superior, que la admite o inadmite',
+    transversal: true,
+    term: { status: 'VERIFICADO', description: 'DECIDE DOS COSAS QUE CAMBIAN EL PROCESO ENTERO: SI HAY SEGUNDA INSTANCIA Y SI LA PRIMERA SE EJECUTA MIENTRAS TANTO. QUÉ ES APELABLE, Y LA LISTA ES CERRADA (art. 321): las sentencias de primera instancia salvo las dictadas en equidad; y estos autos — «1. El que rechace la demanda, su reforma o la contestación a cualquiera de ellas. 2. El que niegue la intervención de sucesores procesales o de terceros. 3. El que NIEGUE el decreto o la práctica de pruebas. 4. El que niegue total o parcialmente el mandamiento de pago y el que rechace de plano las excepciones de mérito en el proceso ejecutivo. 5. El que rechace de plano un incidente y el que lo resuelva. 6. El que niegue el trámite de una nulidad procesal y el que la resuelva. 7. El que por cualquier causa LE PONGA FIN AL PROCESO. 8. El que resuelva sobre una MEDIDA CAUTELAR, o fije el monto de la caución para decretarla, impedirla o levantarla. 9. El que resuelva sobre la OPOSICIÓN A LA ENTREGA de bienes, y el que la rechace de plano. 10. Los demás expresamente señalados en este código.» El que DECRETA pruebas no es apelable; solo el que las niega. EL EFECTO ES LO QUE DECIDE SI EL CLIENTE PAGA AHORA O DESPUÉS: suspensivo detiene el cumplimiento; devolutivo lo deja seguir. Fijarlo mal es apelable por vía de reposición, y advertirlo tarde es no advertirlo. SI NO SE CONCEDE, SE RECHAZA O SE DECLARA DESIERTA, LA VÍA ES LA QUEJA — no insistir ante el mismo juez. RELOJ DE LA SECRETARÍA, CON SANCIÓN, QUE CONVIENE INVOCAR CUANDO EL EXPEDIENTE NO SUBE: «El secretario deberá remitir el expediente o la reproducción al superior DENTRO DEL TÉRMINO MÁXIMO DE CINCO (5) DÍAS», y «EL INCUMPLIMIENTO DE ESTE DEBER SE CONSIDERARÁ FALTA GRAVÍSIMA» (art. 324). Si el juez conserva competencia, el recurrente debe suministrar las expensas de las copias en CINCO (5) DÍAS SO PENA DE DESIERTO — ese sí es reloj del cliente.' },
+    requiredSections: [
+      { n: 1, name: 'Verificación de que la providencia está en la lista cerrada de apelables del art. 321', mandatory: true, basis: 'Código General del Proceso, art. 321' },
+      { n: 2, name: 'Constancia de que el recurso fue interpuesto y sustentado en tiempo', mandatory: true, basis: 'Código General del Proceso, art. 322' },
+      { n: 3, name: 'Efecto en que se concede: suspensivo, devolutivo o diferido, con su fundamento', mandatory: true, basis: 'Código General del Proceso, art. 323' },
+      { n: 4, name: 'Orden de remisión del expediente o de las copias al superior', mandatory: true, basis: 'Código General del Proceso, art. 324' },
+      { n: 5, name: 'Requerimiento de expensas al recurrente, con los cinco (5) días so pena de desierto', mandatory: false, basis: 'Código General del Proceso, art. 324' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr011.html'
+  },
+  {
+    id: 'civil/auto-que-decreta-el-desistimiento-tacito',
+    exactName: 'Auto que decreta el desistimiento tácito',
+    branch: 'CIVIL',
+    role: 'DESPACHO',
+    legalBasis: 'Código General del Proceso, art. 317',
+    competentAuthority: 'El juez que conoce del proceso, que puede decretarlo DE OFICIO',
+    term: { status: 'VERIFICADO', description: 'ES LA PROVIDENCIA QUE MATA EL PROCESO DEL CLIENTE POR INACTIVIDAD, Y EN SU SEGUNDA MODALIDAD NO AVISA ANTES. PRIMERA MODALIDAD — TREINTA (30) DÍAS TRAS REQUERIMIENTO: cuando para continuar el trámite se requiere una carga procesal de quien lo promovió, el juez ordena cumplirla «dentro de los treinta (30) días siguientes mediante providencia QUE SE NOTIFICARÁ POR ESTADO», y vencidos sin cumplirla tiene por desistida la actuación «en providencia en la que ADEMÁS IMPONDRÁ CONDENA EN COSTAS» (num. 1). SEGUNDA MODALIDAD — UN (1) AÑO DE INACTIVIDAD, SIN REQUERIMIENTO PREVIO Y DE OFICIO: cuando el proceso «permanezca inactivo en la secretaría del despacho, porque no se solicita o realiza ninguna actuación durante el plazo de UN (1) AÑO en primera o única instancia, contados desde el día siguiente a la última notificación o desde la última diligencia o actuación, a petición de parte o DE OFICIO, se decretará la terminación por desistimiento tácito SIN NECESIDAD DE REQUERIMIENTO PREVIO» (num. 2). Aquí no hay condena en costas. LO QUE ARRASTRA, Y ES LO QUE DUELE EN UN EJECUTIVO CON BIENES: «Decretado el desistimiento tácito quedará terminado el proceso y SE ORDENARÁ EL LEVANTAMIENTO DE LAS MEDIDAS CAUTELARES PRACTICADAS» (lit. d). TRES REGLAS QUE SALVAN EL CASO: no se cuenta el tiempo de suspensión acordada por las partes (lit. a); si hay sentencia ejecutoriada a favor del demandante o auto que ordena seguir adelante la ejecución, el plazo es de DOS (2) AÑOS (lit. b); y «CUALQUIER ACTUACIÓN, de oficio o a petición de parte, DE CUALQUIER NATURALEZA, INTERRUMPIRÁ los términos» (lit. c) — un memorial cualquiera reinicia el año. QUÉ PASA DESPUÉS, Y ES DONDE ESTÁ EL VERDADERO CASTIGO: hay SEIS (6) MESES desde la ejecutoria para volver a demandar, y son ineficaces los efectos de la demanda anterior sobre la interrupción de la prescripción y la inoperancia de la caducidad (lit. f). A LA SEGUNDA VEZ SE EXTINGUE EL DERECHO PRETENDIDO (lit. g). RECURSOS: se notifica por estado y es apelable en el efecto SUSPENSIVO si lo decreta, DEVOLUTIVO si lo niega (lit. e).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación de la modalidad: incumplimiento de carga tras requerimiento, o inactividad de un año', mandatory: true, basis: 'Código General del Proceso, art. 317 nums. 1 y 2' },
+      { n: 2, name: 'Cómputo de la inactividad desde la última notificación o actuación, descontando suspensiones acordadas', mandatory: true, basis: 'Código General del Proceso, art. 317 lit. a' },
+      { n: 3, name: 'Verificación de si aplica el plazo de dos (2) años por existir sentencia o auto de seguir adelante', mandatory: true, basis: 'Código General del Proceso, art. 317 lit. b' },
+      { n: 4, name: 'Orden de levantamiento de las medidas cautelares practicadas', mandatory: true, basis: 'Código General del Proceso, art. 317 lit. d' },
+      { n: 5, name: 'Condena en costas, solo en la modalidad de incumplimiento de carga', mandatory: false, basis: 'Código General del Proceso, art. 317 num. 1' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr010.html'
+  },
+  {
+    id: 'civil/auto-que-aprueba-la-liquidacion-de-costas',
+    exactName: 'Auto que aprueba la liquidación de costas',
+    branch: 'CIVIL',
+    role: 'DESPACHO',
+    legalBasis: 'Código General del Proceso, art. 366',
+    competentAuthority: 'El juez que conoció del proceso en primera o única instancia, donde la liquidación se hace de manera concentrada',
+    term: { status: 'VERIFICADO', description: 'SE DICTA «INMEDIATAMENTE QUEDE EJECUTORIADA LA PROVIDENCIA QUE LE PONGA FIN AL PROCESO o notificado el auto de obedecimiento a lo dispuesto por el superior» (art. 366). No hay plazo en días para el juez, pero sí un hito que lo dispara. QUIÉN HACE QUÉ: «El SECRETARIO hará la liquidación y corresponderá AL JUEZ aprobarla o rehacerla» (num. 1). ESTE AUTO ES LA ÚNICA PUERTA PARA DISCUTIR LAS COSTAS, y ahí está el reloj del cliente: «La liquidación de las expensas y el monto de las agencias en derecho SOLO PODRÁN CONTROVERTIRSE MEDIANTE LOS RECURSOS DE REPOSICIÓN Y APELACIÓN CONTRA EL AUTO QUE APRUEBE LA LIQUIDACIÓN» (num. 5). La apelación va en efecto DIFERIDO, o suspensivo si no hay actuación pendiente. Un incidente o un memorial suelto no sirven. QUÉ DEBE ENTRAR Y SUELE QUEDARSE POR FUERA: «la TOTALIDAD de las condenas que se hayan impuesto en los autos que hayan resuelto los recursos, en los incidentes y trámites que los sustituyan, en las sentencias de AMBAS INSTANCIAS y en el recurso extraordinario de casación» (num. 2); los honorarios de auxiliares, los gastos comprobados y útiles, y las agencias en derecho «AUNQUE SE LITIGUE SIN APODERADO» (num. 3). Los honorarios de peritos contratados directamente por las partes entran si están comprobados y el juez los encuentra razonables; si exceden los parámetros del Consejo Superior de la Judicatura, el juez los regula. AGENCIAS EN DERECHO: se aplican las tarifas del Consejo Superior de la Judicatura, y cuando fijan un mínimo o un rango el juez pondera «la naturaleza, calidad y duración de la gestión realizada», SIN EXCEDER EL MÁXIMO (num. 4).' },
+    requiredSections: [
+      { n: 1, name: 'Liquidación elaborada por el secretario, que el juez aprueba o rehace', mandatory: true, basis: 'Código General del Proceso, art. 366 num. 1' },
+      { n: 2, name: 'Inclusión de todas las condenas de recursos, incidentes y ambas instancias', mandatory: true, basis: 'Código General del Proceso, art. 366 num. 2' },
+      { n: 3, name: 'Honorarios de auxiliares y gastos comprobados y útiles, con sus soportes', mandatory: true, basis: 'Código General del Proceso, art. 366 num. 3' },
+      { n: 4, name: 'Agencias en derecho conforme a las tarifas del Consejo Superior de la Judicatura, sin exceder el máximo', mandatory: true, basis: 'Código General del Proceso, art. 366 num. 4' },
+      { n: 5, name: 'Advertencia de que solo se controvierte por reposición y apelación contra este auto', mandatory: true, basis: 'Código General del Proceso, art. 366 num. 5' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr012.html'
   }
   ]
 };
