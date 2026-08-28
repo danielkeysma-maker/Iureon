@@ -4196,6 +4196,123 @@
         }
       ],
       "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr014.html"
+    },
+    {
+      "exact_name": "Demanda ejecutiva con base en título valor",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código de Comercio, arts. 621, 789, 790, 791, 792 y 793; Código General del Proceso, art. 422",
+      "competent_authority": "El juez civil municipal o del circuito, según la cuantía",
+      "term": "TRES PLAZOS DISTINTOS, TODOS DEL CLIENTE, Y CUÁL APLICA DEPENDE DE CONTRA QUIÉN SE COBRA — NO DE QUÉ TÍTULO SE TIENE. CONTRA EL OBLIGADO DIRECTO (el girador del pagaré, el aceptante de la letra): «La acción cambiaria directa PRESCRIBE EN TRES AÑOS a partir del día del vencimiento» (art. 789). CONTRA LOS OBLIGADOS DE REGRESO (endosantes y avalistas), y aquí ya no son tres años sino uno: «La acción cambiaria de regreso del último tenedor PRESCRIBIRÁ EN UN AÑO contado desde la fecha del protesto o, si el título fuere sin protesto, DESDE LA FECHA DEL VENCIMIENTO; y, en su caso, desde que concluyan los plazos de presentación» (art. 790). ENTRE OBLIGADOS: «La acción del obligado del regreso contra los demás obligados anteriores PRESCRIBE EN SEIS MESES, contados a partir de la fecha del pago voluntario o de la fecha en que se le notifique la demanda» (art. 791). LA TRAMPA PROCESAL QUE ARRUINA COBROS CONTRA VARIOS DEUDORES: «Las causas que interrumpen la prescripción respecto de uno de los deudores cambiarios NO LA INTERRUMPE RESPECTO DE LOS OTROS, salvo el caso de los signatarios en un mismo grado» (art. 792). Demandar a tiempo al girador no salva la acción contra el avalista: hay que interrumpir contra cada uno. VENTAJA PROCESAL QUE AHORRA UN TRÁMITE ENTERO: «El cobro de un título-valor dará lugar al procedimiento ejecutivo, SIN NECESIDAD DE RECONOCIMIENTO DE FIRMAS» (art. 793).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Título valor original, con la mención del derecho y la firma de quien lo crea",
+          "mandatory": true,
+          "basis": "Código de Comercio, art. 621"
+        },
+        {
+          "n": 2,
+          "name": "Determinación de contra quién se cobra: obligado directo, de regreso o anterior",
+          "mandatory": true,
+          "basis": "Código de Comercio, arts. 789 a 791"
+        },
+        {
+          "n": 3,
+          "name": "Cómputo del plazo que corresponde a esa acción, con la fecha desde la que corre",
+          "mandatory": true,
+          "basis": "Código de Comercio, arts. 789 a 791"
+        },
+        {
+          "n": 4,
+          "name": "Interrupción de la prescripción frente a CADA deudor que se pretenda vincular",
+          "mandatory": true,
+          "basis": "Código de Comercio, art. 792"
+        },
+        {
+          "n": 5,
+          "name": "Liquidación del capital, los intereses y su tasa",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 422"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_comercio_pr024.html"
+    },
+    {
+      "exact_name": "Presentación del cheque para su pago y constancia de rechazo",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código de Comercio, arts. 718, 727, 729, 730 y 731",
+      "competent_authority": "El banco librado o la cámara de compensación. NO es autoridad judicial: la anotación del rechazo es un acto bancario, y sin embargo produce efectos procesales",
+      "term": "DOS RELOJES INDEPENDIENTES MATAN LA MISMA ACCIÓN, Y HAY QUE VIGILAR LOS DOS. PRIMERO, LA PRESENTACIÓN, cuyo incumplimiento produce CADUCIDAD: «Los cheques deberán presentarse para su pago: 1) Dentro de los QUINCE DÍAS a partir de su fecha, si fueren pagaderos en el mismo lugar de su expedición; 2) Dentro de UN MES, si fueren pagaderos en el mismo país de su expedición, pero en lugar distinto al de ésta; 3) Dentro de TRES MESES, si fueren expedidos en un país latinoamericano y pagaderos en algún otro país de América Latina, y 4) Dentro de CUATRO MESES, si fueren expedidos en algún país latinoamericano para ser pagados fuera de América Latina» (art. 718). La acción contra el librador y sus avalistas «CADUCA por no haber sido presentado y protestado el cheque en tiempo, SI durante todo el plazo de presentación el librador tuvo fondos suficientes en poder del librado y, por causa no imputable al librador, el cheque dejó de pagarse» (art. 729) — la caducidad no opera si nunca hubo fondos. SEGUNDO, LA PRESCRIPCIÓN, que corre aunque se haya presentado a tiempo: «Las acciones cambiarias derivadas del cheque prescriben: Las del último tenedor, en SEIS MESES, contados desde la presentación; las de los endosantes y avalistas, en el mismo término, contado desde el día siguiente a aquel en que paguen el cheque» (art. 730). SEIS MESES, NO TRES AÑOS: quien traslade al cheque el plazo del pagaré llega tarde. LO QUE SUSTITUYE AL PROTESTO Y HAY QUE PEDIRLE AL BANCO EN EL ACTO: «La anotación que el librado o la cámara de compensación ponga en el cheque, de haber sido presentado en tiempo y no pagado total o parcialmente, SURTIRÁ LOS EFECTOS DEL PROTESTO» (art. 727). Sin esa anotación no hay prueba del rechazo. SANCIÓN ADICIONAL QUE SE RECLAMA EN LA MISMA DEMANDA: el art. 731 impone al librador el veinte por ciento (20%) del importe del cheque, declarado exequible por la sentencia C-451 de 2002.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Cheque original con la anotación de rechazo del banco librado o de la cámara de compensación",
+          "mandatory": true,
+          "basis": "Código de Comercio, art. 727"
+        },
+        {
+          "n": 2,
+          "name": "Constancia de que se presentó dentro del plazo que corresponde al lugar de expedición y de pago",
+          "mandatory": true,
+          "basis": "Código de Comercio, art. 718"
+        },
+        {
+          "n": 3,
+          "name": "Cómputo de los seis (6) meses de prescripción desde la presentación",
+          "mandatory": true,
+          "basis": "Código de Comercio, art. 730"
+        },
+        {
+          "n": 4,
+          "name": "Pronunciamiento sobre si el librador tuvo fondos, que decide si opera la caducidad",
+          "mandatory": true,
+          "basis": "Código de Comercio, art. 729"
+        },
+        {
+          "n": 5,
+          "name": "Reclamación de la sanción del veinte por ciento (20%) a cargo del librador",
+          "mandatory": false,
+          "basis": "Código de Comercio, art. 731"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_comercio_pr022.html"
+    },
+    {
+      "exact_name": "Acción de enriquecimiento sin causa por caducidad o prescripción del título valor",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código de Comercio, art. 882",
+      "competent_authority": "El juez civil",
+      "term": "UN (1) AÑO, RELOJ DEL CLIENTE, Y ES LA ÚLTIMA PUERTA DESPUÉS DE UN DESASTRE QUE POCA GENTE VE VENIR: DEJAR PRESCRIBIR EL TÍTULO NO SOLO MATA EL COBRO CAMBIARIO, MATA TAMBIÉN LA DEUDA QUE LO ORIGINÓ. «La entrega de letras, cheques, pagarés y demás títulos-valores de contenido crediticio, POR UNA OBLIGACIÓN ANTERIOR, valdrá como pago de ésta si no se estipula otra cosa; pero llevará implícita la condición resolutoria del pago, en caso de que el instrumento sea rechazado o no sea descargado de cualquier manera. […] SI EL ACREEDOR DEJA CADUCAR O PRESCRIBIR EL INSTRUMENTO, LA OBLIGACIÓN ORIGINARIA O FUNDAMENTAL SE EXTINGUIRÁ ASÍ MISMO; no obstante, tendrá acción contra quien se haya enriquecido sin causa a consecuencia de la caducidad o prescripción. ESTA ACCIÓN PRESCRIBIRÁ EN UN AÑO» (art. 882). En términos prácticos: el acreedor que recibió un pagaré por una factura y lo dejó vencer no puede volver a cobrar la factura — se extinguió con el título. Solo le queda el enriquecimiento sin causa, y por doce meses. LO QUE HAY QUE HACER MIENTRAS EL TÍTULO VIVE, y está en el mismo artículo: cumplida la condición resolutoria, «el acreedor podrá hacer efectivo el pago de la obligación originaria o fundamental, DEVOLVIENDO EL INSTRUMENTO o dando caución, a satisfacción del juez, de indemnizar al deudor los perjuicios que pueda causarle la no devolución del mismo». Es decir, la obligación de fondo sí se puede cobrar, pero devolviendo el título — no conservando ambos.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Título valor caducado o prescrito y prueba de la fecha en que ocurrió",
+          "mandatory": true,
+          "basis": "Código de Comercio, art. 882"
+        },
+        {
+          "n": 2,
+          "name": "Acreditación de la obligación anterior por la cual se entregó el título",
+          "mandatory": true,
+          "basis": "Código de Comercio, art. 882"
+        },
+        {
+          "n": 3,
+          "name": "Demostración del enriquecimiento del demandado y del empobrecimiento correlativo",
+          "mandatory": true,
+          "basis": "Código de Comercio, art. 882"
+        },
+        {
+          "n": 4,
+          "name": "Constancia de presentación dentro del año siguiente a la caducidad o prescripción",
+          "mandatory": true,
+          "basis": "Código de Comercio, art. 882"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_comercio_pr027.html"
     }
   ]
 }

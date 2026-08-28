@@ -1333,6 +1333,229 @@
         }
       ],
       "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=259639"
+    },
+    {
+      "exact_name": "Citación a descargos y acta de la diligencia",
+      "area": "LABORAL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código Sustantivo del Trabajo, art. 115, modificado por el art. 7 de la Ley 2466 de 2025",
+      "competent_authority": "Ninguna: es un procedimiento interno del empleador. No interviene juez ni inspector, y por eso su validez depende enteramente de que el escrito cumpla el debido proceso",
+      "term": "CINCO (5) DÍAS COMO MÍNIMO PARA QUE EL TRABAJADOR SE DEFIENDA, Y ES UN PISO, NO UN TECHO: el empleador puede dar más, nunca menos. «La indicación de un término durante el cual el trabajador o trabajadora pueda manifestarse frente a los motivos del proceso, controvertir las pruebas y allegar las que considere necesarias para sustentar su defensa EL CUAL EN TODO CASO NO PODRÁ SER INFERIOR A 5 DÍAS» (num. 4). Citar a descargos «para mañana» invalida el procedimiento entero y con él la justa causa que se pretenda derivar. EL PROCEDIMIENTO ES DE SIETE PASOS Y TODOS SON MÍNIMOS: comunicación formal de la apertura; indicación POR ESCRITO de los hechos, conductas u omisiones; traslado al trabajador de TODAS Y CADA UNA de las pruebas que los fundamentan; el término de defensa de al menos cinco días; pronunciamiento definitivo motivado que identifique específicamente la causa; sanción proporcional; y «La posibilidad del trabajador de IMPUGNAR la decisión». SI LOS DESCARGOS SON VERBALES, hay que levantar acta «en la que se transcribirá la versión o descargos rendidos por el trabajador». RELOJ SIN NÚMERO PERO EXIGIBLE: el par. 1 ordena que todo se haga «en un término razonable atendiendo al PRINCIPIO DE INMEDIATEZ», salvo que la convención, el laudo o el reglamento fijen otro. Sancionar meses después del hecho es perder la causa por tardanza. TRES GARANTÍAS QUE SE OMITEN Y ANULAN LA SANCIÓN: el trabajador sindicalizado puede estar acompañado por uno o dos representantes del sindicato que sean trabajadores de la empresa; el trabajador con discapacidad debe contar con ajustes razonables que garanticen la comunicación recíproca; y el procedimiento puede hacerse por medios tecnológicos SOLO si el trabajador cuenta con esas herramientas. EXCEPCIÓN QUE HAY QUE VERIFICAR ANTES DE ARMAR EL EXPEDIENTE: el par. 6 exime de este procedimiento a los trabajadores del hogar y a «las micro y pequeñas empresas de menos de diez (10) trabajadores», que solo deben escuchar previamente al trabajador respetando el derecho de defensa.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Comunicación formal de la apertura del proceso disciplinario",
+          "mandatory": true,
+          "basis": "Código Sustantivo del Trabajo, art. 115 num. 1"
+        },
+        {
+          "n": 2,
+          "name": "Indicación por escrito de los hechos, conductas u omisiones que lo motivan",
+          "mandatory": true,
+          "basis": "Código Sustantivo del Trabajo, art. 115 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "Traslado de todas y cada una de las pruebas que fundamentan los cargos",
+          "mandatory": true,
+          "basis": "Código Sustantivo del Trabajo, art. 115 num. 3"
+        },
+        {
+          "n": 4,
+          "name": "Señalamiento del término de defensa, que no puede ser inferior a cinco (5) días",
+          "mandatory": true,
+          "basis": "Código Sustantivo del Trabajo, art. 115 num. 4"
+        },
+        {
+          "n": 5,
+          "name": "Acta que transcriba la versión del trabajador, cuando los descargos sean verbales",
+          "mandatory": true,
+          "basis": "Código Sustantivo del Trabajo, art. 115 num. 4"
+        },
+        {
+          "n": 6,
+          "name": "Advertencia del derecho a estar acompañado por representantes del sindicato y de los ajustes razonables si hay discapacidad",
+          "mandatory": true,
+          "basis": "Código Sustantivo del Trabajo, art. 115 par. 2 y 3"
+        },
+        {
+          "n": 7,
+          "name": "Pronunciamiento motivado que identifique la causa, con sanción proporcional y aviso de la posibilidad de impugnar",
+          "mandatory": true,
+          "basis": "Código Sustantivo del Trabajo, art. 115 num. 5, 6 y 7"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_sustantivo_trabajo_pr003.html"
+    },
+    {
+      "exact_name": "Carta de terminación del contrato de trabajo con justa causa",
+      "area": "LABORAL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código Sustantivo del Trabajo, arts. 62 (subrogado por el art. 7 del Decreto 2351 de 1965) y 66; art. 115, modificado por el art. 7 de la Ley 2466 de 2025",
+      "competent_authority": "Ninguna: la terminación la comunica el empleador al trabajador. El control es judicial y posterior, ante el juez laboral",
+      "term": "NO HAY PLAZO PARA DESPEDIR, PERO SÍ UNA REGLA QUE CIERRA LA PUERTA EN EL INSTANTE Y NO SE PUEDE REABRIR DESPUÉS: «La parte que termina unilateralmente el contrato de trabajo DEBE MANIFESTAR A LA OTRA, EN EL MOMENTO DE LA EXTINCIÓN, la causal o motivo de esta determinación. POSTERIORMENTE NO PUEDEN ALEGARSE VÁLIDAMENTE CAUSALES O MOTIVOS DISTINTOS» (art. 66). Esa frase es la que decide el pleito dos años después: lo que no quedó escrito en la carta no existe en el juicio, por probado que esté. De ahí que la carta se redacte con los hechos completos y no con una remisión genérica al numeral. EL RELOJ QUE SÍ CORRE ES EL DE LA INMEDIATEZ, sin número: el par. 1 del art. 115 exige que el procedimiento disciplinario se surta «en un término razonable atendiendo al principio de inmediatez». Despedir por un hecho de hace seis meses convierte la justa causa en una decisión tardía. REQUISITO PREVIO QUE SE OMITE Y TUMBA EL DESPIDO: cuando la causal supone una falta del trabajador, hay que agotar antes el procedimiento del art. 115 —descargos con mínimo cinco días y traslado de pruebas—, salvo la excepción de su par. 6 para trabajadores del hogar y empresas de menos de diez trabajadores. VERIFICACIÓN QUE VA ANTES DE TODO: si la trabajadora está en embarazo o en las dieciocho semanas posteriores al parto, o si el trabajador tiene cónyuge o compañera embarazada sin empleo formal, NO SE PUEDE DESPEDIR sin autorización del Inspector del Trabajo (arts. 239 y 240).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de las partes, del contrato y de su fecha de terminación",
+          "mandatory": true,
+          "basis": "Código Sustantivo del Trabajo, art. 66"
+        },
+        {
+          "n": 2,
+          "name": "Relato completo de los hechos que configuran la causal, no la sola cita del numeral",
+          "mandatory": true,
+          "basis": "Código Sustantivo del Trabajo, art. 66"
+        },
+        {
+          "n": 3,
+          "name": "Causal invocada del art. 62, expresada en el momento de la extinción",
+          "mandatory": true,
+          "basis": "Código Sustantivo del Trabajo, arts. 62 y 66"
+        },
+        {
+          "n": 4,
+          "name": "Constancia del procedimiento disciplinario previo, cuando la causal supone falta del trabajador",
+          "mandatory": true,
+          "basis": "Código Sustantivo del Trabajo, art. 115"
+        },
+        {
+          "n": 5,
+          "name": "Verificación de que el trabajador no está amparado por fuero de maternidad, paternidad, sindical o de salud",
+          "mandatory": true,
+          "basis": "Código Sustantivo del Trabajo, arts. 239 y 240"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_sustantivo_trabajo_pr001.html"
+    },
+    {
+      "exact_name": "Liquidación definitiva de prestaciones sociales",
+      "area": "LABORAL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código Sustantivo del Trabajo, art. 65, modificado por el art. 29 de la Ley 789 de 2002 (con apartes declarados inexequibles y un régimen distinto para quien devenga menos de un salario mínimo)",
+      "competent_authority": "Ninguna: el empleador liquida y paga a la terminación del contrato. El cobro posterior va al juez laboral",
+      "term": "VEINTICUATRO (24) MESES, Y ES UN RELOJ DEL TRABAJADOR QUE CASI NADIE LEE COMO TAL PORQUE VIVE DENTRO DE UN ARTÍCULO SOBRE LA SANCIÓN AL EMPLEADOR. La indemnización moratoria es «una suma igual al último salario diario por cada día de retardo, HASTA POR VEINTICUATRO (24) MESES, o hasta cuando el pago se verifique si el período es menor. SI TRANSCURRIDOS VEINTICUATRO (24) MESES contados desde la fecha de terminación del contrato, EL TRABAJADOR NO HA INICIADO SU RECLAMACIÓN POR LA VÍA ORDINARIA o si presentara la demanda, no ha habido pronunciamiento judicial, el empleador deberá pagar al trabajador INTERESES MORATORIOS a la tasa máxima de créditos de libre asignación […] a partir de la iniciación del mes veinticinco (25) hasta cuando el pago se verifique». Es decir: quien demanda dentro de los dos años conserva un salario diario por cada día de retardo; quien deja pasar los dos años cae a intereses, que valen mucho menos. DOS REGÍMENES SEGÚN EL SALARIO, y confundirlos cuesta dinero: para quien devenga MENOS de un salario mínimo mensual sigue vigente el texto ORIGINAL del art. 65, sin el tope de veinticuatro meses; el texto de la Ley 789 de 2002, con el tope, aplica a los demás. EXCEPCIÓN QUE EL EMPLEADOR DEBE INVOCAR: la sanción no procede en «los casos de retención autorizados por la ley o convenidos por las partes».",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del contrato, su fecha de inicio y de terminación y el último salario",
+          "mandatory": true,
+          "basis": "Código Sustantivo del Trabajo, art. 65"
+        },
+        {
+          "n": 2,
+          "name": "Liquidación discriminada de cesantías, intereses a las cesantías, prima y vacaciones",
+          "mandatory": true,
+          "basis": "Código Sustantivo del Trabajo, art. 65"
+        },
+        {
+          "n": 3,
+          "name": "Indemnización por despido sin justa causa, cuando corresponda",
+          "mandatory": false,
+          "basis": "Código Sustantivo del Trabajo, art. 64"
+        },
+        {
+          "n": 4,
+          "name": "Deducciones aplicadas, con el título legal o el acuerdo que las autoriza",
+          "mandatory": true,
+          "basis": "Código Sustantivo del Trabajo, art. 65"
+        },
+        {
+          "n": 5,
+          "name": "Constancia de pago a la terminación, de la que corren los veinticuatro (24) meses",
+          "mandatory": true,
+          "basis": "Código Sustantivo del Trabajo, art. 65"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_sustantivo_trabajo_pr001.html"
+    },
+    {
+      "exact_name": "Queja por acoso laboral",
+      "area": "LABORAL",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1010 de 2006, art. 18, modificado por el art. 1 de la Ley 2209 de 2022",
+      "competent_authority": "El comité de convivencia laboral de la empresa; el Inspector del Trabajo; y, para las acciones sancionatorias, el juez laboral. Ninguna de las dos primeras es autoridad judicial",
+      "term": "TRES (3) AÑOS DE CADUCIDAD, RELOJ DEL TRABAJADOR, Y ESTE ES EL NÚMERO QUE MÁS SE CITA MAL EN COLOMBIA. «Las acciones derivadas del acoso laboral CADUCARÁN EN TRES (3) AÑOS a partir de la fecha en que hayan ocurrido las conductas a que hace referencia esta ley» (art. 18, modificado por el art. 1 de la Ley 2209 de 2022). EL TEXTO ORIGINAL DECÍA SEIS (6) MESES y sigue circulando en formatos, manuales y respuestas dadas de memoria: quien lo repita hoy le dice a un cliente que su derecho murió cuando le quedan años. Se comprobó en el texto oficial. EL PUNTO DE PARTIDA ES LA CONDUCTA, NO EL DESPIDO NI LA RENUNCIA: los tres años corren «a partir de la fecha en que hayan ocurrido las conductas», de modo que en un acoso prolongado cada conducta tiene su propio vencimiento y conviene fechar cada hecho en la queja, uno por uno, en vez de narrarlos como un período.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del quejoso, del presunto acosador y de la relación laboral entre ambos",
+          "mandatory": true,
+          "basis": "Ley 1010 de 2006, art. 18"
+        },
+        {
+          "n": 2,
+          "name": "Relato de las conductas CON SU FECHA una por una, de la que corren los tres (3) años de cada una",
+          "mandatory": true,
+          "basis": "Ley 1010 de 2006, art. 18"
+        },
+        {
+          "n": 3,
+          "name": "Encuadre de las conductas en las modalidades de acoso de la ley",
+          "mandatory": true,
+          "basis": "Ley 1010 de 2006, arts. 2 y 7"
+        },
+        {
+          "n": 4,
+          "name": "Pruebas que se aportan: mensajes, testigos, documentos y antecedentes médicos",
+          "mandatory": true,
+          "basis": "Ley 1010 de 2006, art. 18"
+        },
+        {
+          "n": 5,
+          "name": "Autoridad ante la que se presenta: comité de convivencia, Inspector del Trabajo o juez laboral",
+          "mandatory": true,
+          "basis": "Ley 1010 de 2006, art. 18"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1010_2006.html"
+    },
+    {
+      "exact_name": "Solicitud de permiso al Inspector del Trabajo para despedir a trabajador con fuero de maternidad o paternidad",
+      "area": "LABORAL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código Sustantivo del Trabajo, art. 240, modificado por el art. 2 de la Ley 2141 de 2021, y art. 239, modificado por el art. 2 de la Ley 1822 de 2017 y el art. 1 de la Ley 2141 de 2021",
+      "competent_authority": "El Inspector del Trabajo, o el Alcalde Municipal donde no exista aquel funcionario. NO es autoridad judicial. Si decide el alcalde, «su providencia tiene carácter provisional y debe ser revisada por el Inspector del Trabajo residente en el lugar más cercano»",
+      "term": "NO ES UN PLAZO SINO UN REQUISITO DE VALIDEZ: SIN LA AUTORIZACIÓN EL DESPIDO NO VALE, POR JUSTA QUE SEA LA CAUSA. «Ninguna trabajadora podrá ser despedida por motivo de embarazo o lactancia SIN LA AUTORIZACIÓN PREVIA DEL MINISTERIO DE TRABAJO que avale una justa causa» (art. 239 num. 1). LA VENTANA PROTEGIDA ES DE DIECIOCHO (18) SEMANAS POSPARTO, no doce: «Se PRESUME el despido efectuado por motivo de embarazo o lactancia, cuando este haya tenido lugar dentro del período de embarazo y/o dentro de las DIECIOCHO (18) SEMANAS POSTERIORES AL PARTO» (art. 239 num. 2, modificado por la Ley 2141 de 2021). Es una presunción: la carga de desvirtuarla es del empleador. EL FUERO NO ES SOLO DE ELLA, Y ESTO SE PASA POR ALTO TODO EL TIEMPO: «La misma autorización se requerirá para despedir AL TRABAJADOR CUYA CÓNYUGE, PAREJA O COMPAÑERA PERMANENTE SE ENCUENTRE EN ESTADO DE EMBARAZO Y NO TENGA UN EMPLEO FORMAL, adjuntando prueba que así lo acredite o que se encuentre afiliada como beneficiaria en el Sistema de Seguridad Social en Salud» (art. 240 num. 1). COSTO DE DESPEDIR SIN PERMISO: «tendrán derecho al pago adicional de una INDEMNIZACIÓN IGUAL A SESENTA (60) DÍAS DE TRABAJO, fuera de las indemnizaciones y prestaciones a que hubiere lugar» (art. 239 num. 3). QUÉ PUEDE INVOCARSE Y QUÉ NO: «El permiso de que trata este artículo SÓLO PUEDE CONCEDERSE con el fundamento en alguna de las causas que tiene el empleador para dar por terminado el contrato de trabajo y que se enumeran en los artículos 62 y 63. ANTES DE RESOLVER, EL FUNCIONARIO DEBE OÍR A LA TRABAJADORA y practicar todas las pruebas conducentes solicitadas por las partes» (art. 240 num. 2). No sirve la terminación sin justa causa ni la reestructuración.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del empleador, del trabajador y del contrato",
+          "mandatory": true,
+          "basis": "Código Sustantivo del Trabajo, art. 240"
+        },
+        {
+          "n": 2,
+          "name": "Causal de los arts. 62 o 63 que se invoca, con los hechos que la configuran",
+          "mandatory": true,
+          "basis": "Código Sustantivo del Trabajo, art. 240 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "Pruebas de la causal y solicitud de las que deban practicarse",
+          "mandatory": true,
+          "basis": "Código Sustantivo del Trabajo, art. 240 num. 2"
+        },
+        {
+          "n": 4,
+          "name": "Constancia del procedimiento disciplinario previo del art. 115, cuando la causal supone falta del trabajador",
+          "mandatory": true,
+          "basis": "Código Sustantivo del Trabajo, art. 115"
+        },
+        {
+          "n": 5,
+          "name": "Prueba del embarazo de la cónyuge, pareja o compañera y de que no tiene empleo formal, cuando se trata del fuero de paternidad",
+          "mandatory": false,
+          "basis": "Código Sustantivo del Trabajo, art. 240 num. 1"
+        },
+        {
+          "n": 6,
+          "name": "Dirección del trabajador para que el funcionario lo oiga antes de resolver",
+          "mandatory": true,
+          "basis": "Código Sustantivo del Trabajo, art. 240 num. 2"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_sustantivo_trabajo_pr008.html"
     }
   ]
 }
