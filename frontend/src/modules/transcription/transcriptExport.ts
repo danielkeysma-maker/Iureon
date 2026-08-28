@@ -230,31 +230,19 @@ export const exportTranscriptToWord = async (
         spacing: { before: 160, after: 40 },
         children: [
           /*
-           * The nearest a Word document gets to the avatar.
-           *
-           * docx draws no circles without dropping into raw drawing XML, which
-           * is a lot of machinery for a decoration. A shaded run with the
-           * initials in white reads as the same badge — same colour, same
-           * letters, same job of telling two voices apart at a glance — and it
-           * survives being pasted into somebody else's document, which a
-           * floating shape does not.
+           * Formato 14b: «10:58 C. Restrepo (juez):» — el minuto primero y en
+           * gris, sin placa de iniciales. La placa era interfaz de pantalla;
+           * en el acta que la firma archiva leia como chat, y era lo que hacia
+           * decir "sigue igual" aunque la cabecera ya fuera acta.
            */
-          new TextRun({
-            text: ` ${linea.iniciales} `,
-            bold: true,
-            font: 'Calibri',
-            size: 16,
-            color: 'FFFFFF',
-            shading: { fill: linea.color.hex }
-          }),
-          new TextRun({ text: '  ', font: 'Calibri', size: 22 }),
+          ...(linea.minuto
+            ? [new TextRun({ text: `${linea.minuto}  `, font: 'Consolas', size: 16, color: '94A3B8' })]
+            : []),
           new TextRun({ text: linea.quien, bold: true, font: 'Calibri', size: 22 }),
           ...(linea.rol
             ? [new TextRun({ text: ` (${linea.rol})`, font: 'Calibri', size: 20, color: '475569' })]
             : []),
-          ...(linea.minuto
-            ? [new TextRun({ text: `  [${linea.minuto}]`, font: 'Calibri', size: 18, color: '94A3B8' })]
-            : [])
+          new TextRun({ text: ':', bold: true, font: 'Calibri', size: 22 })
         ]
       })
     );
@@ -456,58 +444,69 @@ export const exportTranscriptToPdf = (result: TranscriptionResult, titulo: strin
    * The text indents past the avatar, exactly as the row does on screen, so the
    * paragraph never runs under the circle.
    */
-  const RADIO = 3.2;
-  const SANGRIA = 10;
-  const anchoTexto = ancho - SANGRIA;
+  /*
+   * ─── II. TRANSCRIPCIÓN, como el 14b la dibuja ──────────────────────────────
+   *
+   * Lineas compactas «10:58 C. Restrepo (juez): texto…» — SIN circulos de
+   * colores con iniciales. Los avatares son interfaz de pantalla; en un acta
+   * que se archiva leian como chat, y eran justo lo que hacia decir "sigue
+   * igual" aunque la cabecera ya fuera la nueva. El minuto va primero y en
+   * gris: es el ancla contra la grabacion, no el protagonista.
+   */
+  if (!acta?.hechosClave || acta.hechosClave.length === 0) {
+    // Con hechos, el encabezado "II. TRANSCRIPCIÓN" ya salio arriba.
+    asegurarEspacio(10);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(15, 23, 42);
+    doc.text('TRANSCRIPCIÓN', margenIzq, y);
+    y += 7;
+  }
 
-  /** Wraps within the indented column, at the size it will be drawn. */
+  const SANGRIA_TEXTO = 14;
+  const anchoTexto = ancho - SANGRIA_TEXTO;
+
   const trozosCuerpo = (texto: string): string[] => {
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
+    doc.setFontSize(9.5);
     return doc.splitTextToSize(texto, anchoTexto) as string[];
   };
 
   for (const linea of lineas(result)) {
     const cuerpo = trozosCuerpo(linea.texto);
-    asegurarEspacio(9 + cuerpo.length * 4.8);
+    asegurarEspacio(6 + cuerpo.length * 4.5);
 
-    const [r, g, b] = linea.color.rgb;
-
-    doc.setFillColor(r, g, b);
-    doc.circle(margenIzq + RADIO, y - 1.1, RADIO, 'F');
-
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(6.5);
-    doc.setTextColor(255, 255, 255);
-    doc.text(linea.iniciales, margenIzq + RADIO, y + 0.2, { align: 'center' });
-
-    const x = margenIzq + SANGRIA;
-
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.setTextColor(15, 23, 42);
-    doc.text(linea.quien, x, y);
-    const anchoNombre = doc.getTextWidth(linea.quien);
-
+    // Minuto en gris, nombre en negrilla, rol entre parentesis — una linea.
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
-    doc.setTextColor(100, 116, 139);
-    const sufijo = [linea.rol ? `(${linea.rol})` : '', linea.minuto ? `[${linea.minuto}]` : '']
-      .filter(Boolean)
-      .join('  ');
-    if (sufijo) doc.text(sufijo, x + anchoNombre + 2, y);
+    doc.setTextColor(148, 163, 184);
+    if (linea.minuto) doc.text(linea.minuto, margenIzq, y);
 
-    y += 5;
-    doc.setTextColor(30, 41, 59);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9.5);
+    doc.setTextColor(15, 23, 42);
+    doc.text(linea.quien, margenIzq + SANGRIA_TEXTO, y);
 
-    for (const trozo of cuerpo) {
-      doc.text(trozo, x, y);
-      y += 4.8;
+    if (linea.rol) {
+      const anchoNombre = doc.getTextWidth(linea.quien);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(100, 116, 139);
+      doc.text(`(${linea.rol})`, margenIzq + SANGRIA_TEXTO + anchoNombre + 2, y);
     }
 
-    y += 4;
+    y += 4.6;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9.5);
+    doc.setTextColor(30, 41, 59);
+
+    for (const trozo of cuerpo) {
+      asegurarEspacio(5);
+      doc.text(trozo, margenIzq + SANGRIA_TEXTO, y);
+      y += 4.5;
+    }
+
+    y += 2.5;
   }
 
   const paginas = doc.getNumberOfPages();
