@@ -3901,6 +3901,301 @@
         }
       ],
       "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_0820_2003.html"
+    },
+    {
+      "exact_name": "Poder especial para actuación judicial",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "transversal": true,
+      "legal_basis": "Ley 2213 de 2022, art. 5; Código General del Proceso, arts. 74, 75 y 77",
+      "competent_authority": "Ninguna: no requiere presentación personal, reconocimiento ni intervención de notario. Se aporta al despacho donde se actúa",
+      "term": "NO TIENE PLAZO, Y SIN EMBARGO ES EL DOCUMENTO QUE MÁS VECES FIRMA UNA FIRMA AL MES: SIN ÉL NO HAY ACTUACIÓN POSIBLE. FORMA VIGENTE, QUE SIGUE SORPRENDIENDO A QUIEN ARRASTRA LA COSTUMBRE ANTIGUA: «Los poderes especiales para cualquier actuación judicial se podrán conferir MEDIANTE MENSAJE DE DATOS, SIN FIRMA MANUSCRITA O DIGITAL, CON LA SOLA ANTEFIRMA, se presumirán auténticos y NO REQUERIRÁN DE NINGUNA PRESENTACIÓN PERSONAL O RECONOCIMIENTO» (Ley 2213 de 2022, art. 5). Ya no hay que mandar al cliente a la notaría. DOS REQUISITOS DE ESE MISMO ARTÍCULO QUE SÍ SE PIERDEN POR OMISIÓN: «En el poder se indicará expresamente LA DIRECCIÓN DE CORREO ELECTRÓNICO DEL APODERADO QUE DEBERÁ COINCIDIR CON LA INSCRITA EN EL REGISTRO NACIONAL DE ABOGADOS», y «Los poderes otorgados por personas inscritas en el registro mercantil DEBERÁN SER REMITIDOS DESDE LA DIRECCIÓN DE CORREO ELECTRÓNICO INSCRITA para recibir notificaciones judiciales» — el poder de una sociedad enviado desde el correo personal del gerente no cumple. GENERAL CONTRA ESPECIAL: «Los poderes generales para toda clase de procesos SOLO PODRÁN CONFERIRSE POR ESCRITURA PÚBLICA. El poder especial para uno o varios procesos podrá conferirse por documento privado. En los poderes especiales LOS ASUNTOS DEBERÁN ESTAR DETERMINADOS Y CLARAMENTE IDENTIFICADOS» (CGP art. 74), y «El poder especial para un proceso PREVALECE SOBRE EL GENERAL conferido por la misma parte» (art. 75). ALCANCE POR DEFECTO, QUE EVITA PEDIR PODERES DE MÁS: salvo estipulación en contrario el poder para litigar cubre medidas y pruebas extraprocesales, todo el trámite, los recursos ordinarios, la casación y la anulación, las actuaciones posteriores a la sentencia en el mismo expediente y el cobro ejecutivo de las condenas (art. 77). LO QUE SÍ EXIGE FACULTAD EXPRESA es lo que dispone del derecho — conciliar, transigir, desistir, recibir, sustituir — y licitar en un remate.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del poderdante y, si es persona jurídica, de su representante legal",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 74"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del apoderado con su tarjeta profesional",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 74"
+        },
+        {
+          "n": 3,
+          "name": "Asunto determinado y claramente identificado sobre el que se confiere",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 74"
+        },
+        {
+          "n": 4,
+          "name": "Correo electrónico del apoderado, que debe coincidir con el del Registro Nacional de Abogados",
+          "mandatory": true,
+          "basis": "Ley 2213 de 2022, art. 5"
+        },
+        {
+          "n": 5,
+          "name": "Facultades expresas para conciliar, transigir, desistir, recibir y sustituir, si se otorgan",
+          "mandatory": false,
+          "basis": "Código General del Proceso, art. 77"
+        },
+        {
+          "n": 6,
+          "name": "Antefirma del poderdante y envío desde el correo inscrito, si el poderdante figura en el registro mercantil",
+          "mandatory": true,
+          "basis": "Ley 2213 de 2022, art. 5"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_2213_2022.html"
+    },
+    {
+      "exact_name": "Sustitución, revocación o renuncia del poder",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "transversal": true,
+      "legal_basis": "Código General del Proceso, arts. 75 y 76",
+      "competent_authority": "El despacho donde cursa el proceso, por radicación en secretaría",
+      "term": "DOS RELOJES, Y LOS DOS SON DEL ABOGADO, NO DEL CLIENTE — POR ESO ESTA FICHA ES DE RESPONSABILIDAD PROPIA. RENUNCIA, CINCO (5) DÍAS: «La renuncia NO PONE TÉRMINO AL PODER SINO CINCO (5) DÍAS DESPUÉS de presentado el memorial de renuncia en el juzgado, ACOMPAÑADO DE LA COMUNICACIÓN ENVIADA AL PODERDANTE en tal sentido» (art. 76). Es decir: quien renuncia sigue siendo apoderado cinco días más, y si no adjunta la prueba de haber avisado al cliente, no empieza a correr nada. Un término que venza en esa ventana es suyo. HONORARIOS TRAS LA REVOCATORIA, TREINTA (30) DÍAS Y ES PRECLUSIVO EN CUANTO AL FORO: «Dentro de los TREINTA (30) DÍAS siguientes a la notificación de dicha providencia, el apoderado a quien se le haya revocado el poder podrá pedir al juez que se regulen sus honorarios mediante incidente […] VENCIDO EL TÉRMINO INDICADO, LA REGULACIÓN DE LOS HONORARIOS PODRÁ DEMANDARSE ANTE EL JUEZ LABORAL» — no se pierde el derecho, se pierde el trámite barato dentro del propio proceso y toca abrir uno nuevo. El mismo derecho lo tienen los herederos y el cónyuge sobreviviente del apoderado fallecido. CUÁNDO TERMINA EL PODER: «con la radicación en secretaría del escrito en virtud del cual se revoque o se designe otro apoderado, a menos que el nuevo poder se hubiese otorgado para recursos o gestiones determinadas». LO QUE NO LO TERMINA, y evita pánicos: la muerte del mandante o la extinción de la persona jurídica no ponen fin al mandato si ya se presentó la demanda, ni la cesación de funciones de quien lo confirió como representante. REGLA QUE INVALIDA ACTUACIONES: «En ningún caso podrá actuar simultáneamente más de un apoderado judicial de una misma persona» (art. 75). Quien sustituye puede reasumir en cualquier momento, y con ello queda revocada la sustitución.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del proceso y del poder que se sustituye, revoca o renuncia",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 76"
+        },
+        {
+          "n": 2,
+          "name": "Comunicación enviada al poderdante, que debe acompañar el memorial de renuncia",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 76"
+        },
+        {
+          "n": 3,
+          "name": "Constancia del estado del proceso y de los términos en curso durante los cinco (5) días",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 76"
+        },
+        {
+          "n": 4,
+          "name": "Identificación del sustituto con su tarjeta profesional, cuando se sustituye",
+          "mandatory": false,
+          "basis": "Código General del Proceso, art. 75"
+        },
+        {
+          "n": 5,
+          "name": "Solicitud de regulación de honorarios dentro de los treinta (30) días, cuando hubo revocatoria",
+          "mandatory": false,
+          "basis": "Código General del Proceso, art. 76"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr003.html"
+    },
+    {
+      "exact_name": "Solicitud de conciliación extrajudicial en derecho en materia civil",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 2220 de 2022 (Estatuto de Conciliación), arts. 67, 68 y 70",
+      "competent_authority": "Centro de conciliación autorizado, conciliador inscrito o notario. No es autoridad judicial",
+      "term": "NO TIENE PLAZO PARA PRESENTARSE, PERO SIN SU CONSTANCIA LA DEMANDA SE RECHAZA: ES REQUISITO DE PROCEDIBILIDAD. «la conciliación extrajudicial en derecho como requisito de procedibilidad DEBERÁ INTENTARSE ANTES DE ACUDIR a la especialidad jurisdiccional civil EN LOS PROCESOS DECLARATIVOS» (art. 68). CUATRO EXCEPCIONES QUE HAY QUE VERIFICAR ANTES DE PERDER TRES MESES, porque en ellas se va directo al juez: los procesos DIVISORIOS, los de EXPROPIACIÓN, los MONITORIOS «que se adelanten en cualquier jurisdicción», y aquellos «en donde se demande o sea obligatoria la citación de INDETERMINADOS» (art. 68). TRES EXCEPCIONES MÁS, en los parágrafos del art. 67: cuando el demandante declare bajo juramento que no conoce el domicilio, la habitación ni el trabajo del demandado o este esté ausente y sin paradero conocido; cuando quien demande sea una entidad pública; y —la que más sirve y menos se usa— «En todo proceso y ante cualquier jurisdicción, CUANDO SE SOLICITE LA PRÁCTICA DE MEDIDAS CAUTELARES SE PODRÁ ACUDIR DIRECTAMENTE AL JUEZ, sin necesidad de agotar la conciliación prejudicial». EL RELOJ QUE DESBLOQUEA AL CLIENTE ES DE TRES (3) MESES Y CORRE CONTRA EL CENTRO, NO CONTRA ÉL: el requisito se entiende cumplido «Cuando vencido el término de TRES (3) MESES a partir de la presentación de la solicitud […] la audiencia no se hubiere celebrado por cualquier causa; en este último evento se podrá acudir directamente a la Jurisdicción Ordinaria CON LA SOLA PRESENTACIÓN DE LA SOLICITUD» (art. 70). También se cumple si hubo audiencia sin acuerdo, o si una parte no compareció. ADVERTENCIA DE VIGENCIA: esta ley derogó íntegramente la Ley 640 de 2001; citar la 640 hoy es citar norma muerta.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de las partes y de sus canales de notificación",
+          "mandatory": true,
+          "basis": "Ley 2220 de 2022, art. 67"
+        },
+        {
+          "n": 2,
+          "name": "Hechos y pretensiones que se someten a conciliación, con su cuantía",
+          "mandatory": true,
+          "basis": "Ley 2220 de 2022, art. 68"
+        },
+        {
+          "n": 3,
+          "name": "Verificación de que el asunto es conciliable y no está en las excepciones del art. 68",
+          "mandatory": true,
+          "basis": "Ley 2220 de 2022, art. 68"
+        },
+        {
+          "n": 4,
+          "name": "Pruebas que se aportan para respaldar la pretensión",
+          "mandatory": true,
+          "basis": "Ley 2220 de 2022, art. 67"
+        },
+        {
+          "n": 5,
+          "name": "Constancia de presentación, de la que corren los tres (3) meses que habilitan acudir al juez",
+          "mandatory": true,
+          "basis": "Ley 2220 de 2022, art. 70"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_2220_2022_pr001.html"
+    },
+    {
+      "exact_name": "Objeción a la liquidación de costas y agencias en derecho",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código General del Proceso, art. 366",
+      "competent_authority": "El juzgado que conoció del proceso en primera o única instancia, donde la liquidación se hace de manera concentrada",
+      "term": "NO SE ATACA POR INCIDENTE NI POR MEMORIAL SUELTO, Y ESE ES EL ERROR QUE DEJA LAS COSTAS EN FIRME: «La liquidación de las expensas y el monto de las agencias en derecho SOLO PODRÁN CONTROVERTIRSE MEDIANTE LOS RECURSOS DE REPOSICIÓN Y APELACIÓN CONTRA EL AUTO QUE APRUEBE LA LIQUIDACIÓN de costas. La apelación se concederá en el efecto diferido, pero si no existiere actuación pendiente, se concederá en el suspensivo» (art. 366 num. 5). El reloj es entonces el de la ejecutoria de ese auto, y quien deja pasar la reposición pierde la discusión entera. CUÁNDO SE LIQUIDA: «inmediatamente quede ejecutoriada la providencia que le ponga fin al proceso o notificado el auto de obedecimiento a lo dispuesto por el superior», y la hace el secretario para que el juez la apruebe o la rehaga (num. 1). QUÉ DEBE ENTRAR Y SUELE QUEDARSE POR FUERA: la totalidad de las condenas de todos los autos que resolvieron recursos, de los incidentes, de las sentencias de ambas instancias y de la casación (num. 2); los honorarios de auxiliares, los gastos comprobados y útiles, y las agencias en derecho «AUNQUE SE LITIGUE SIN APODERADO» (num. 3). Los honorarios de peritos contratados directamente por las partes entran si están comprobados y el juez los encuentra razonables; si exceden los parámetros del Consejo Superior de la Judicatura, el juez los regula. AGENCIAS EN DERECHO: se aplican las tarifas del Consejo Superior de la Judicatura, y cuando fijan mínimo o rango el juez pondera «la naturaleza, calidad y duración de la gestión realizada», sin exceder el máximo (num. 4). Es el último dinero de todo proceso ganado y se pierde por no revisar una cuenta.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del auto que aprobó la liquidación y de su notificación",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 366 num. 5"
+        },
+        {
+          "n": 2,
+          "name": "Señalamiento de las condenas de recursos, incidentes y ambas instancias que se omitieron",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 366 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "Gastos comprobados y útiles que deben incluirse, con sus soportes",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 366 num. 3"
+        },
+        {
+          "n": 4,
+          "name": "Confrontación de las agencias en derecho con las tarifas del Consejo Superior de la Judicatura",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 366 num. 4"
+        },
+        {
+          "n": 5,
+          "name": "Recurso de reposición y, en subsidio, apelación — única vía para controvertirla",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 366 num. 5"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr012.html"
+    },
+    {
+      "exact_name": "Cumplimiento de la carga procesal para evitar el desistimiento tácito",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código General del Proceso, art. 317",
+      "competent_authority": "El juez que conoce del proceso, que puede decretarlo de oficio",
+      "term": "DOS RELOJES DEL CLIENTE, Y EL SEGUNDO NO AVISA. TREINTA (30) DÍAS TRAS EL REQUERIMIENTO: cuando para continuar el trámite se requiera una carga procesal de la parte que lo promovió, «el juez le ordenará cumplirlo DENTRO DE LOS TREINTA (30) DÍAS SIGUIENTES mediante providencia QUE SE NOTIFICARÁ POR ESTADO. Vencido dicho término sin que quien haya promovido el trámite respectivo cumpla la carga […] el juez TENDRÁ POR DESISTIDA TÁCITAMENTE la respectiva actuación y así lo declarará en providencia en la que ADEMÁS IMPONDRÁ CONDENA EN COSTAS» (num. 1). Se notifica por estado, no personalmente. UN (1) AÑO DE INACTIVIDAD, SIN REQUERIMIENTO PREVIO, Y ES EL QUE MATA PROCESOS ENTEROS EN SILENCIO: «Cuando un proceso o actuación de cualquier naturaleza, en cualquiera de sus etapas, permanezca inactivo en la secretaría del despacho, porque no se solicita o realiza ninguna actuación durante el plazo de UN (1) AÑO en primera o única instancia, contados desde el día siguiente a la última notificación o desde la última diligencia o actuación, a petición de parte o DE OFICIO, se decretará la terminación por desistimiento tácito SIN NECESIDAD DE REQUERIMIENTO PREVIO» (num. 2). En este caso no hay condena en costas. LO QUE SE PIERDE, y por eso importa en un ejecutivo con bienes: «Decretado el desistimiento tácito quedará terminado el proceso o la actuación correspondiente y SE ORDENARÁ EL LEVANTAMIENTO DE LAS MEDIDAS CAUTELARES PRACTICADAS» (lit. d). TRES REGLAS QUE SALVAN EL CASO: no se cuenta el tiempo de suspensión acordada por las partes (lit. a); si hay sentencia ejecutoriada a favor del demandante o auto que ordena seguir adelante la ejecución, el plazo es de DOS (2) AÑOS (lit. b); y «CUALQUIER ACTUACIÓN, de oficio o a petición de parte, DE CUALQUIER NATURALEZA, INTERRUMPIRÁ los términos» (lit. c) — un memorial cualquiera reinicia el año. La providencia que lo decreta es apelable en el efecto suspensivo.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la carga procesal ordenada y de la fecha del estado que la notificó",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 317 num. 1"
+        },
+        {
+          "n": 2,
+          "name": "Cumplimiento de la carga dentro de los treinta (30) días",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 317 num. 1"
+        },
+        {
+          "n": 3,
+          "name": "Cómputo de la inactividad desde la última notificación o actuación, descontando las suspensiones acordadas",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 317 num. 2 y lit. a"
+        },
+        {
+          "n": 4,
+          "name": "Verificación de si aplica el plazo de dos (2) años por existir sentencia o auto de seguir adelante",
+          "mandatory": false,
+          "basis": "Código General del Proceso, art. 317 lit. b"
+        },
+        {
+          "n": 5,
+          "name": "Recurso de apelación contra la providencia que lo decrete, en el efecto suspensivo",
+          "mandatory": false,
+          "basis": "Código General del Proceso, art. 317 lit. e"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr010.html"
+    },
+    {
+      "exact_name": "Demanda de proceso monitorio",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código General del Proceso, arts. 419, 420 y 421; art. 25 (cuantía); Ley 2220 de 2022, art. 68 (exceptuado de conciliación previa)",
+      "competent_authority": "El juez civil municipal, por ser asunto de mínima cuantía",
+      "term": "SIN PLAZO PROPIO PARA PRESENTARLA, MÁS ALLÁ DE LA PRESCRIPCIÓN DE LA OBLIGACIÓN DE FONDO. «Quien pretenda el pago de una obligación en dinero, de naturaleza contractual, determinada y exigible QUE SEA DE MÍNIMA CUANTÍA, podrá promover proceso monitorio» (art. 419), declarado exequible sin condicionamiento por las sentencias C-726 de 2014 y C-159 de 2016. VENTAJA QUE HAY QUE APROVECHAR: el art. 68 de la Ley 2220 de 2022 exceptúa a los monitorios del requisito de conciliación previa — se radica directo y se ahorran tres meses. LÍMITE DE CUANTÍA, CON UNA ADVERTENCIA DE 2026: son de mínima cuantía las pretensiones que no excedan CUARENTA (40) SALARIOS MÍNIMOS, y «El salario mínimo legal mensual a que se refiere este artículo, SERÁ EL VIGENTE AL MOMENTO DE LA PRESENTACIÓN DE LA DEMANDA» (art. 25). EL SALARIO MÍNIMO ESTÁ HOY EN DISPUTA JUDICIAL: el Decreto 1469 de 2025 fue suspendido provisionalmente por el Consejo de Estado y el Decreto 0159 del 19 de febrero de 2026 lo fijó TRANSITORIAMENTE «hasta que se dicte sentencia», de modo que el tope de la mínima cuantía puede moverse — hay que confirmar la cifra vigente el día de la radicación y no darla por sabida. REQUISITO SIN EL CUAL EL PROCESO NO AVANZA NUNCA: el requerimiento de pago «SE NOTIFICARÁ PERSONALMENTE AL DEUDOR», y el parágrafo del art. 421 excluye el emplazamiento y el curador ad litem — si no se logra la notificación personal, no hay a quién nombrarle curador y el asunto queda paralizado. Conviene verificar la dirección antes de radicar.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Afirmación de que la obligación es contractual, en dinero, determinada y exigible",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 419"
+        },
+        {
+          "n": 2,
+          "name": "Cuantía, verificada contra el salario mínimo vigente el día de la presentación",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 25"
+        },
+        {
+          "n": 3,
+          "name": "Manifestación expresa de que el pago no se ha recibido y de la forma como se contrajo la obligación",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 420"
+        },
+        {
+          "n": 4,
+          "name": "Documentos de la obligación que se aportan, o afirmación de que no existen",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 420"
+        },
+        {
+          "n": 5,
+          "name": "Dirección para la notificación personal del deudor, sin la cual el proceso no avanza",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 421 par."
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr014.html"
+    },
+    {
+      "exact_name": "Contestación del requerimiento de pago en el proceso monitorio",
+      "area": "CIVIL",
+      "role": "LITIGANTE",
+      "legal_basis": "Código General del Proceso, art. 421",
+      "competent_authority": "El juez civil municipal que libró el requerimiento",
+      "term": "DIEZ (10) DÍAS, RELOJ DEL DEUDOR, Y ES EL MÁS LETAL DEL CGP PORQUE EL SILENCIO NO PRODUCE UNA CONDENA CUALQUIERA SINO UNA COSA JUZGADA SIN RECURSOS. «el juez ordenará requerir al deudor para que EN EL PLAZO DE DIEZ (10) DÍAS pague o exponga en la contestación de la demanda las razones concretas que le sirven de sustento para negar total o parcialmente la deuda reclamada. El auto que contiene el requerimiento de pago NO ADMITE RECURSOS y se notificará personalmente al deudor, con la advertencia de que si no paga o no justifica su renuencia, SE DICTARÁ SENTENCIA QUE TAMPOCO ADMITE RECURSOS Y CONSTITUYE COSA JUZGADA, en la cual se le condenará al pago del monto reclamado, de los intereses causados y de los que se causen hasta la cancelación de la deuda» (art. 421). NO BASTA NEGAR: hay que exponer RAZONES CONCRETAS. Una contestación genérica equivale a no contestar. RIESGO DE OPONERSE SIN FUNDAMENTO, que hay que advertirle al cliente antes de redactar: si se opone y resulta condenado, paga MULTA DEL DIEZ POR CIENTO (10%) del valor de la deuda; y si es absuelto, esa multa la paga el acreedor. QUÉ SIGUE AL SILENCIO: la ejecución continúa en el mismo expediente por el trámite del art. 306, sin necesidad de demanda ejecutiva nueva.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del requerimiento de pago y de la fecha de su notificación personal",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 421"
+        },
+        {
+          "n": 2,
+          "name": "Razones concretas por las que se niega total o parcialmente la deuda",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 421"
+        },
+        {
+          "n": 3,
+          "name": "Pruebas que sustentan cada razón invocada",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 421"
+        },
+        {
+          "n": 4,
+          "name": "Constancia de presentación dentro de los diez (10) días",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 421"
+        },
+        {
+          "n": 5,
+          "name": "Advertencia al cliente del riesgo de multa del diez por ciento (10%) si la oposición no prospera",
+          "mandatory": true,
+          "basis": "Código General del Proceso, art. 421"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr014.html"
     }
   ]
 }

@@ -2307,6 +2307,47 @@
         }
       ],
       "source_url": "https://www.alcaldiabogota.gov.co/sisjur/normas/Norma1.jsp?i=188561"
+    },
+    {
+      "exact_name": "Solicitud de conciliación extrajudicial en derecho en materia de familia",
+      "area": "FAMILIA",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 2220 de 2022 (Estatuto de Conciliación), arts. 67, 69 y 70",
+      "competent_authority": "Defensor o comisario de familia, centro de conciliación autorizado, conciliador inscrito o notario. No es autoridad judicial",
+      "term": "NO TIENE PLAZO PARA PRESENTARSE, PERO SIN SU CONSTANCIA LA DEMANDA SE RECHAZA: ES REQUISITO DE PROCEDIBILIDAD. La lista del art. 69 es cerrada y hay que confrontarla antes de radicar, porque intentar la conciliacion donde no se exige pierde meses y omitirla donde si se exige pierde la demanda. Son requisito: «1. Controversias sobre la CUSTODIA y el REGIMEN DE VISITAS sobre menores y personas en condicion de discapacidad de conformidad con la Ley 1996 de 2019 […] 2. Asuntos relacionados con las OBLIGACIONES ALIMENTARIAS. 3. Declaracion de la UNION MARITAL DE HECHO, su disolucion y la liquidacion de la sociedad patrimonial. 4. RESCISION DE LA PARTICION en las sucesiones y en las liquidaciones de sociedad conyugal o de sociedad patrimonial entre companeros permanentes. 5. Conflictos sobre CAPITULACIONES MATRIMONIALES. 6. Controversias entre conyuges sobre la direccion conjunta del hogar y entre padres sobre el ejercicio de la AUTORIDAD PATERNA O LA PATRIA POTESTAD. 7. SEPARACION DE BIENES Y DE CUERPOS. 8. En todos aquellos que no esten expresamente exceptuados por la ley.» EL RELOJ QUE DESBLOQUEA AL CLIENTE ES DE TRES (3) MESES Y CORRE CONTRA EL CENTRO, NO CONTRA EL: el requisito se entiende cumplido «Cuando vencido el termino de TRES (3) MESES a partir de la presentacion de la solicitud de conciliacion extrajudicial o su prorroga, la audiencia no se hubiere celebrado por cualquier causa; en este ultimo evento se podra acudir directamente a la Jurisdiccion Ordinaria CON LA SOLA PRESENTACION DE LA SOLICITUD» (art. 70). Tambien se cumple si hubo audiencia sin acuerdo, o si una parte no comparecio, evento en el cual «deberan indicarse expresamente las excusas presentadas por la inasistencia, si las hubiere». EXCEPCION QUE MAS SIRVE Y MENOS SE USA, del par. 3 del art. 67: «En todo proceso y ante cualquier jurisdiccion, CUANDO SE SOLICITE LA PRACTICA DE MEDIDAS CAUTELARES SE PODRA ACUDIR DIRECTAMENTE AL JUEZ, sin necesidad de agotar la conciliacion prejudicial» — en un caso de alimentos con riesgo de insolvencia, eso permite cautelar primero y conciliar despues. ADVERTENCIA DE VIGENCIA: esta ley derogo integramente la Ley 640 de 2001; citarla hoy es citar norma muerta. EFECTO QUE AHORRA UNA AUDIENCIA POSTERIOR: celebrada la audiencia sin acuerdo, «se prescindira de la conciliacion prevista en el articulo 37 del Codigo General del Proceso».",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificacion de las partes, de los menores o personas con discapacidad involucrados y de los canales de notificacion",
+          "mandatory": true,
+          "basis": "Ley 2220 de 2022, art. 67"
+        },
+        {
+          "n": 2,
+          "name": "Confrontacion del asunto contra la lista cerrada del art. 69, para verificar que si es requisito de procedibilidad",
+          "mandatory": true,
+          "basis": "Ley 2220 de 2022, art. 69"
+        },
+        {
+          "n": 3,
+          "name": "Hechos y formula de arreglo que se propone",
+          "mandatory": true,
+          "basis": "Ley 2220 de 2022, art. 67"
+        },
+        {
+          "n": 4,
+          "name": "Pruebas que se aportan, incluidos registros civiles y prueba de la capacidad economica en asuntos de alimentos",
+          "mandatory": true,
+          "basis": "Ley 2220 de 2022, art. 67"
+        },
+        {
+          "n": 5,
+          "name": "Constancia de presentacion, de la que corren los tres (3) meses que habilitan acudir al juez",
+          "mandatory": true,
+          "basis": "Ley 2220 de 2022, art. 70"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_2220_2022_pr001.html"
     }
   ]
 }
