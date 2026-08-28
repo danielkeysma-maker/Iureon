@@ -1,6 +1,7 @@
 import { Document, Packer, Paragraph, TextRun, AlignmentType, Header as DocxHeader, Footer as DocxFooter, PageNumber } from 'docx';
 import { saveAs } from 'file-saver';
 import { jsPDF } from 'jspdf';
+import { drawRuns, type PdfRun } from './pdfTextLayout';
 
 export interface FirmBrandingConfig {
   firmName: string;
@@ -276,11 +277,30 @@ export class DocumentExportService {
       format: 'letter'
     });
 
-    const pageMarginLeft = 25;
-    const pageMarginTop = 30;
-    const pageMarginRight = 20;
+    /*
+     * MARGENES DEL 14a: 3 cm izquierdo (encuadernacion judicial), 2,5 cm los
+     * demas. La placa del artboard los declara — «Carta · márgenes 3/2,5 cm ·
+     * Times 12 pt · 1,5» — y son la referencia, no una preferencia.
+     */
+    const pageMarginLeft = 30;
+    const pageMarginTop = 25;
+    const pageMarginRight = 25;
+    const pageMarginBottom = 25;
+    const pageHeight = 279.4;
+    const pageBottomLimit = pageHeight - pageMarginBottom;
     const contentWidth = 215.9 - pageMarginLeft - pageMarginRight;
     let currentY = pageMarginTop;
+
+    /*
+     * La trazabilidad del 14a viaja en las propiedades del archivo, no en el
+     * papel: un juzgado recibe un documento de la firma, y quien inspeccione
+     * los metadatos encuentra el origen.
+     */
+    doc.setProperties({
+      title: documentTitle,
+      author: branding.firmName || undefined,
+      creator: 'Iureon'
+    });
 
     /*
      * ─── MEMBRETE (14a): el documento es DE LA FIRMA, no de Iureon ─────────
@@ -291,7 +311,7 @@ export class DocumentExportService {
      * una linea de metadatos, y la fecha larga del dia — que es la del
      * documento que se radica.
      */
-    let membreteBase = 15;
+    let membreteBase = pageMarginTop;
     if (opciones.conMembrete) {
       let xTexto = pageMarginLeft;
 
@@ -306,12 +326,12 @@ export class DocumentExportService {
 
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(11);
-      doc.setTextColor(15, 23, 42);
+      doc.setTextColor(16, 24, 34);
       doc.text((branding.firmName || '').toUpperCase(), xTexto, 15);
 
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(7.5);
-      doc.setTextColor(100, 116, 139);
+      doc.setTextColor(102, 116, 135);
       doc.text(
         [branding.firmNit && `NIT ${branding.firmNit}`, branding.firmAddress, branding.firmPhone]
           .filter(Boolean)
@@ -320,18 +340,22 @@ export class DocumentExportService {
         19.5
       );
 
-      doc.setDrawColor(203, 213, 225);
-      doc.line(pageMarginLeft, 23, 215.9 - pageMarginRight, 23);
-
-      // La fecha del documento, en el idioma del documento.
+      // La fecha del documento, a la derecha del membrete como el 14a.
       doc.setFontSize(9);
-      doc.setTextColor(15, 23, 42);
+      doc.setTextColor(102, 116, 135);
       doc.text(
         new Date().toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' }),
-        pageMarginLeft,
-        29
+        215.9 - pageMarginRight,
+        15,
+        { align: 'right' }
       );
-      membreteBase = 34;
+
+      /* El filete del membrete del 14a es OSCURO (1,5 px #101822), no gris. */
+      doc.setDrawColor(16, 24, 34);
+      doc.setLineWidth(0.5);
+      doc.line(pageMarginLeft, 23, 215.9 - pageMarginRight, 23);
+      doc.setLineWidth(0.2);
+      membreteBase = 31;
     }
     currentY = Math.max(currentY, membreteBase);
 
@@ -343,12 +367,38 @@ export class DocumentExportService {
     const fuentePdf = branding.fontFamily === 'Times New Roman' ? 'times' : 'helvetica';
     doc.setFont(fuentePdf, 'normal');
 
-    // Formatear líneas del texto jurídico
-    /* El tamano y el salto vienen de la marca de la firma (3d/6b). */
-    const tamanoPdf = ((branding.fontSizePt ?? 12) * 10.5) / 12;
-    const saltoLinea = 5.5 * (Number(branding.lineSpacing ?? '1.5') / 1.5);
-    doc.setFontSize(tamanoPdf);
-    doc.setTextColor(15, 23, 42);
+    /*
+     * EL TAMANO ES EL DE LA MARCA, EN PUNTOS REALES. La version anterior
+     * reescalaba 12 pt a 10,5 y el «Times 12» de la placa del 14a nunca
+     * llegaba al papel. El interlineado tambien es el declarado: 1,5 lineas de
+     * un cuerpo de 12 pt son 18 pt = 6,35 mm entre renglones, no 5,5.
+     */
+    const tamanoPdf = branding.fontSizePt ?? 12;
+    const saltoLinea = tamanoPdf * 0.3528 * Number(branding.lineSpacing ?? '1.5');
+    const TINTA: [number, number, number] = [16, 24, 34];
+
+    const nuevaPagina = (): void => {
+      doc.addPage();
+      currentY = pageMarginTop;
+      if (opciones.conMembrete) {
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9);
+        doc.setTextColor(102, 116, 135);
+        doc.text(branding.firmName, pageMarginLeft, 15);
+        doc.setDrawColor(16, 24, 34);
+        doc.setLineWidth(0.5);
+        doc.line(pageMarginLeft, 17.5, 215.9 - pageMarginRight, 17.5);
+        doc.setLineWidth(0.2);
+      }
+    };
+
+    const asegurarLinea = (y: number): number => {
+      if (y > pageBottomLimit) {
+        nuevaPagina();
+        return currentY;
+      }
+      return y;
+    };
 
     const lines = legalContentText.split('\n');
 
@@ -356,98 +406,42 @@ export class DocumentExportService {
       const line = cleanMarkdownLine(rawLine);
 
       if (line.trim() === '') {
-        currentY += 4;
+        currentY += 3;
         continue;
       }
 
       const isHeader = line.startsWith('SEÑOR JUEZ') || line.startsWith('REFERENCIA:') || line.startsWith('DEMANDANTE:') || line.startsWith('DEMANDADO:');
       const isSectionTitle = /^[IVX]+\.\s/.test(line) || /^(PRIMERO|SEGUNDO|TERCERO|CUARTO|QUINTO|SEXTO|SÉPTIMO|OCTAVO|NOVENO|DÉCIMO)[\.:]/i.test(line);
 
-      // Para PDF: parsear segmentos bold/normal dentro de cada línea
-      const segments = parseMarkdownBold(line);
-      const hasInlineBold = segments.some(s => s.bold);
+      /* Un titulo de seccion respira antes de su bloque, como el 14a. */
+      if (isSectionTitle) currentY += 2.5;
 
-      if (!hasInlineBold) {
-        // Línea simple sin negritas inline — renderizar toda de una
-        doc.setFont(fuentePdf, (isSectionTitle || isHeader) ? 'bold' : 'normal');
-        const splitLines = doc.splitTextToSize(line, contentWidth);
+      const runs: PdfRun[] = parseMarkdownBold(line).map((seg) => ({
+        text: seg.text,
+        style: seg.bold || isHeader || isSectionTitle ? 'bold' : 'normal'
+      }));
 
-        for (const sl of splitLines) {
-          if (currentY > 250) {
-            doc.addPage();
-            currentY = 25;
-            if (opciones.conMembrete) {
-              doc.setFont(fuentePdf, 'bold');
-              doc.setFontSize(9);
-              doc.setTextColor(100, 116, 139);
-              doc.text(branding.firmName, pageMarginLeft, 15);
-              doc.setDrawColor(203, 213, 225);
-              doc.line(pageMarginLeft, 17, 215.9 - pageMarginRight, 17);
-            }
-            doc.setFont(fuentePdf, 'normal');
-            doc.setFontSize(tamanoPdf);
-            doc.setTextColor(15, 23, 42);
-          }
-          doc.text(sl, pageMarginLeft, currentY);
-          currentY += saltoLinea;
-        }
-      } else {
-        // Línea con negritas inline — renderizar segmento por segmento
-        // Primero calcular el texto plano para word-wrap
-        const plainText = segments.map(s => s.text).join('');
-        const wrappedLines = doc.splitTextToSize(plainText, contentWidth);
+      currentY = asegurarLinea(currentY);
 
-        for (const wrappedLine of wrappedLines) {
-          if (currentY > 250) {
-            doc.addPage();
-            currentY = 25;
-            if (opciones.conMembrete) {
-              doc.setFont(fuentePdf, 'bold');
-              doc.setFontSize(9);
-              doc.setTextColor(100, 116, 139);
-              doc.text(branding.firmName, pageMarginLeft, 15);
-              doc.setDrawColor(203, 213, 225);
-              doc.line(pageMarginLeft, 17, 215.9 - pageMarginRight, 17);
-            }
-            doc.setFontSize(tamanoPdf);
-            doc.setTextColor(15, 23, 42);
-          }
+      /*
+       * TODO PARRAFO DEL CUERPO VA JUSTIFICADO — es la forma de un escrito
+       * judicial y la del artboard (`text-align:justify`). Encabezados y
+       * titulos de seccion quedan a la izquierda, tambien como el artboard.
+       */
+      currentY = drawRuns(doc, runs, {
+        x: pageMarginLeft,
+        y: currentY,
+        width: contentWidth,
+        lineMm: saltoLinea,
+        font: fuentePdf,
+        sizePt: tamanoPdf,
+        color: TINTA,
+        justify: !isHeader && !isSectionTitle,
+        ensure: asegurarLinea
+      });
 
-          // Para cada línea wrapped, renderizar segmentos bold/normal
-          let xPos = pageMarginLeft;
-          let remaining = wrappedLine;
-
-          for (const seg of segments) {
-            if (remaining.length === 0) break;
-
-            // Encontrar cuánto del segmento cabe en esta línea
-            const segText = seg.text;
-            if (remaining.startsWith(segText)) {
-              doc.setFont(fuentePdf, (seg.bold || isSectionTitle || isHeader) ? 'bold' : 'normal');
-              doc.text(segText, xPos, currentY);
-              xPos += doc.getTextWidth(segText);
-              remaining = remaining.slice(segText.length);
-            } else if (remaining.includes(segText.substring(0, Math.min(5, segText.length)))) {
-              // Partial match — simplified rendering
-              doc.setFont(fuentePdf, (seg.bold || isSectionTitle || isHeader) ? 'bold' : 'normal');
-              const partLen = Math.min(segText.length, remaining.length);
-              const part = remaining.substring(0, partLen);
-              doc.text(part, xPos, currentY);
-              xPos += doc.getTextWidth(part);
-              remaining = remaining.slice(partLen);
-            }
-          }
-
-          // Fallback: si quedó texto sin renderizar
-          if (remaining.length > 0) {
-            doc.setFont(fuentePdf, 'normal');
-            doc.text(remaining, xPos, currentY);
-          }
-
-          currentY += saltoLinea;
-        }
-      }
-      currentY += 2;
+      /* Espacio entre parrafos (8 px del artboard ≈ 2,5 mm). */
+      currentY += isSectionTitle ? 0.5 : 2.5;
     }
 
     /*
@@ -460,7 +454,7 @@ export class DocumentExportService {
 
       doc.setFont(fuentePdf, 'bold');
       doc.setFontSize(11);
-      doc.setTextColor(15, 23, 42);
+      doc.setTextColor(16, 24, 34);
       doc.text('FUENTES CITADAS', pageMarginLeft, currentY);
       currentY += 8;
 
@@ -469,9 +463,9 @@ export class DocumentExportService {
       for (const fuente of opciones.fuentes) {
         const envueltas = doc.splitTextToSize(`- ${fuente}`, contentWidth);
         for (const linea of envueltas) {
-          if (currentY > 250) {
+          if (currentY > pageBottomLimit) {
             doc.addPage();
-            currentY = 25;
+            currentY = pageMarginTop;
           }
           doc.text(linea, pageMarginLeft, currentY);
           currentY += 5.5;
@@ -496,8 +490,8 @@ export class DocumentExportService {
       doc.setTextColor(148, 163, 184);
 
       const pieIzq = [branding.firmName, branding.firmEmail].filter(Boolean).join(' · ');
-      if (opciones.conMembrete && pieIzq) doc.text(pieIzq, pageMarginLeft, 272);
-      doc.text(`Página ${pagina} de ${totalPaginas}`, 215.9 - pageMarginRight, 272, { align: 'right' });
+      if (opciones.conMembrete && pieIzq) doc.text(pieIzq, pageMarginLeft, 267);
+      doc.text(`Página ${pagina} de ${totalPaginas}`, 215.9 - pageMarginRight, 267, { align: 'right' });
     }
 
     doc.save(documentTitle.endsWith('.pdf') ? documentTitle : `${documentTitle}.pdf`);
