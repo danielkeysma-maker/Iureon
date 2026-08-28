@@ -202,6 +202,30 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
                   : 'La orientación no está disponible'}
               </p>
               <p>{result.reason}</p>
+
+              {/*
+                LO QUE PUEDE FALTAR PRECISAR: las preguntas vienen del motor y
+                se presentan como lo que son — datos cuya respuesta cambiaria
+                la via procesal. No es un error del abogado: es la conversacion
+                que un colega tendria.
+              */}
+              {result.status === 'SIN_COINCIDENCIA' && (result.preguntas?.length ?? 0) > 0 && (
+                <div className="mt-2.5">
+                  <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-ink-400">
+                    Puede que falte precisar
+                  </p>
+                  <ol className="mt-1 space-y-1">
+                    {result.preguntas!.map((q, i) => (
+                      <li key={i} className="flex gap-2 text-[12px] text-ink-900">
+                        <span className="shrink-0 font-mono text-[10.5px] text-ink-400">
+                          {String(i + 1).padStart(2, '0')}
+                        </span>
+                        {q}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
               {result.status === 'SIN_COINCIDENCIA' && (
                 <button
                   onClick={() => setMainView('search')}
@@ -216,6 +240,36 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
 
         {result?.status === 'OK' && (
           <div className="space-y-3">
+            {/*
+              LO QUE EL CATALOGO LEYO. La lectura del modelo que produjo las
+              sugerencias, como chips: si dice LABORAL y el caso es de familia,
+              el abogado corrige el rumbo aqui — antes de abrir fichas
+              equivocadas. Se etiqueta como lectura, no como hecho.
+            */}
+            {result.senales && (result.senales.rama || result.senales.elementos.length > 0) && (
+              <div className="rounded-card border border-line-200 bg-surface px-4 py-3">
+                <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
+                  Lo que el catálogo leyó
+                </p>
+                <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                  {result.senales.rama && (
+                    <span className="rounded-control bg-brand-700 px-2 py-0.5 text-[11px] font-semibold text-white">
+                      {result.senales.rama}
+                    </span>
+                  )}
+                  {result.senales.elementos.map((e) => (
+                    <span key={e} className="chip-neutral">
+                      {e}
+                    </span>
+                  ))}
+                </div>
+                <p className="mt-1.5 text-[11px] text-ink-400">
+                  Lectura del motor, no un hecho: si algo no corresponde, corrija los hechos y
+                  vuelva a orientar.
+                </p>
+              </div>
+            )}
+
             <p className="text-[11px] text-ink-500 px-1">
               {result.suggestions.length} actuación{result.suggestions.length === 1 ? '' : 'es'} del
               catálogo que podrían aplicar. Cada una con su término verificado — decide tú cuál

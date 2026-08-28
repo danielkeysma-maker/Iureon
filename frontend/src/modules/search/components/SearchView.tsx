@@ -79,6 +79,10 @@ const emptyMessage = (status: CorpusStatus, reason: string | undefined, query: s
 export const SearchView: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCorp, setSelectedCorp] = useState('TODAS');
+  const [anio, setAnio] = useState('TODOS');
+  const [soloCuradas, setSoloCuradas] = useState(false);
+  /* Cuánto tardó la última búsqueda, medido aquí — no un adorno inventado. */
+  const [duracionMs, setDuracionMs] = useState<number | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const [results, setResults] = useState<CorpusPrecedent[]>([]);
@@ -120,6 +124,7 @@ export const SearchView: React.FC = () => {
     if (!query) return;
 
     setIsLoading(true);
+    const inicioConsulta = performance.now();
     setRuling(null);
     setRulingError('');
     setDiscovery(null);
@@ -197,15 +202,37 @@ export const SearchView: React.FC = () => {
       setStatus('FAILED');
       setReason(error instanceof Error ? error.message : 'La búsqueda no pudo completarse.');
     } finally {
+      setDuracionMs(performance.now() - inicioConsulta);
       setIsLoading(false);
     }
   };
 
+  /*
+   * El año se LEE de la providencia («T-317 de 2024», «SL2586-2020») en vez de
+   * pedirse a un campo que el corpus no tiene. Si el nombre no trae año, la
+   * entrada no se descarta bajo un filtro de año — se muestra: esconderla la
+   * volvería invisible por un defecto de metadatos, no por su contenido.
+   */
+  const anioDe = (providencia: string | null): string | null => {
+    const m = providencia?.match(/(19|20)\d{2}/);
+    return m ? m[0] : null;
+  };
+
   // Filtering happens on provenance the server actually sent. An entry with no
   // recorded corporación is not silently assigned one.
-  const visible = results.filter(
-    (item) => selectedCorp === 'TODAS' || item.corporacion === selectedCorp
-  );
+  const visible = results.filter((item) => {
+    if (selectedCorp !== 'TODAS' && item.corporacion !== selectedCorp) return false;
+    if (soloCuradas && item.curado === false) return false;
+    if (anio !== 'TODOS') {
+      const a = anioDe(item.providencia ?? null);
+      if (a !== null && a !== anio) return false;
+    }
+    return true;
+  });
+
+  const aniosDisponibles = Array.from(
+    new Set(results.map((r) => anioDe(r.providencia ?? null)).filter(Boolean) as string[])
+  ).sort((a, b) => b.localeCompare(a));
 
   const handleCopyCitation = (item: CorpusPrecedent) => {
     // Only what the record holds. No composed citation string: a citation is
@@ -272,6 +299,37 @@ export const SearchView: React.FC = () => {
                 {corp.label}
               </button>
             ))}
+
+            {/* El año, leído de las providencias que la búsqueda trajo. */}
+            {aniosDisponibles.length > 1 && (
+              <select
+                value={anio}
+                onChange={(e) => setAnio(e.target.value)}
+                className="field max-w-[120px] py-1 text-[11px]"
+              >
+                <option value="TODOS">Año: todos</option>
+                {aniosDisponibles.map((a) => (
+                  <option key={a} value={a}>{a}</option>
+                ))}
+              </select>
+            )}
+
+            <label className="inline-flex cursor-pointer items-center gap-1.5 text-[11.5px] text-ink-700">
+              <input
+                type="checkbox"
+                checked={soloCuradas}
+                onChange={(e) => setSoloCuradas(e.target.checked)}
+              />
+              Solo curadas
+            </label>
+
+            {/* El conteo y el tiempo REAL de la consulta, medido y no adornado. */}
+            {status !== null && duracionMs !== null && (
+              <span className="ml-auto font-mono text-[11px] text-ink-400">
+                {visible.length} resultado{visible.length === 1 ? '' : 's'} ·{' '}
+                {(duracionMs / 1000).toLocaleString('es-CO', { maximumFractionDigits: 1 })} s
+              </span>
+            )}
           </div>
         </div>
 

@@ -48,6 +48,14 @@ export interface TriageResult {
   /** Names the model returned that do not exist in the catalogue. */
   descartadas: string[];
   reason?: string;
+  /**
+   * Lo que el catalogo LEYO de los hechos: la rama dominante y los elementos
+   * facticos que produjeron las sugerencias. Es lectura del modelo y se
+   * presenta como tal — su valor es dejar corregir el rumbo temprano.
+   */
+  senales?: { rama: string | null; elementos: string[] };
+  /** Solo con SIN_COINCIDENCIA: los datos que faltan y definirian la via. */
+  preguntas?: string[];
 }
 
 /** More than this and the answer stops being a shortlist and becomes a menu. */
@@ -61,21 +69,43 @@ No expliques derecho, no cites normas y no afirmes plazos: el sistema ya tiene e
 
 Si los hechos no corresponden a ninguna actuación de la lista, devuelve una lista vacía. Es una respuesta correcta y útil: es preferible a proponer algo que no aplica.
 
+Ademas de las actuaciones, di QUE LEISTE: la rama que dominan los hechos y los elementos facticos que te llevaron a las sugerencias (3 a 6, en dos o tres palabras cada uno, tomados de los hechos y no inventados).
+
+Si devuelves la lista vacia, incluye "preguntas": 2 a 4 datos que faltan y definirian la via procesal (ej. "¿Contra quien se dirige: entidad publica o particular?"). Solo preguntas cuya respuesta cambiaria la actuacion.
+
 Responde SOLO con JSON válido, sin texto alrededor:
-{"actuaciones":[{"nombre":"<nombre exacto de la lista>","rama":"<RAMA>","razon":"<una frase>"}]}`;
+{"actuaciones":[{"nombre":"<nombre exacto de la lista>","rama":"<RAMA>","razon":"<una frase>"}],"senales":{"rama":"<RAMA dominante>","elementos":["<hecho clave>"]},"preguntas":["<solo si actuaciones quedo vacia>"]}`;
 
 /** The closed list the model must choose from: every catalogued name, by branch. */
-const catalogueMenu = (): string =>
-  catalogService
+const catalogueMenu = (): string => {
+  /*
+   * Las transversales van UNA vez, en su propia seccion. list(branch) ahora
+   * las incluye en toda rama (derecho de peticion visible para el laboralista),
+   * pero repetir 18 nombres en 22 ramas inflaria el prompt y le sugeriria al
+   * modelo que son 396 actuaciones distintas.
+   */
+  const porRama = catalogService
     .listBranches()
     .map((branch) => {
       const nombres = catalogService
         .list(branch)
+        .filter((a) => a.branch === branch)
         .map((a) => `  - ${a.exactName}`)
         .join('\n');
       return `${branch}:\n${nombres}`;
     })
     .join('\n\n');
+
+  const transversales = catalogService
+    .list()
+    .filter((a) => a.transversal)
+    .map((a) => `  - ${a.exactName}`)
+    .join('\n');
+
+  return transversales
+    ? `${porRama}\n\nTRANSVERSAL (aplican en cualquier rama):\n${transversales}`
+    : porRama;
+};
 
 interface ModelPick {
   nombre?: string;
@@ -90,14 +120,46 @@ interface ModelPick {
  * failure rather than as "no match" — a model that answered badly and a
  * catalogue that has nothing to offer are different facts about the case.
  */
-const parsePicks = (text: string): ModelPick[] | null => {
+interface ParsedTriage {
+  picks: ModelPick[];
+  senales: { rama: string | null; elementos: string[] };
+  preguntas: string[];
+}
+
+const parsePicks = (text: string): ParsedTriage | null => {
   const start = text.indexOf('{');
   const end = text.lastIndexOf('}');
   if (start < 0 || end <= start) return null;
 
   try {
-    const parsed = JSON.parse(text.slice(start, end + 1)) as { actuaciones?: ModelPick[] };
-    return Array.isArray(parsed.actuaciones) ? parsed.actuaciones : null;
+    const parsed = JSON.parse(text.slice(start, end + 1)) as {
+      actuaciones?: ModelPick[];
+      senales?: { rama?: unknown; elementos?: unknown };
+      preguntas?: unknown;
+    };
+    if (!Array.isArray(parsed.actuaciones)) return null;
+
+    return {
+      picks: parsed.actuaciones,
+      /*
+       * Lo que el modelo LEYO, saneado: solo strings cortas, maximo 6. Es la
+       * lectura que produjo las sugerencias — mostrarla deja corregir el rumbo
+       * ("no, no es laboral") antes de perder tiempo en fichas equivocadas.
+       */
+      senales: {
+        rama: typeof parsed.senales?.rama === 'string' ? parsed.senales.rama : null,
+        elementos: Array.isArray(parsed.senales?.elementos)
+          ? (parsed.senales!.elementos as unknown[])
+              .filter((e): e is string => typeof e === 'string' && e.length > 1 && e.length < 60)
+              .slice(0, 6)
+          : []
+      },
+      preguntas: Array.isArray(parsed.preguntas)
+        ? (parsed.preguntas as unknown[])
+            .filter((q): q is string => typeof q === 'string' && q.length > 5 && q.length < 160)
+            .slice(0, 4)
+        : []
+    };
   } catch {
     return null;
   }
@@ -166,9 +228,9 @@ export const triageFacts = async (facts: string): Promise<TriageResult> => {
     };
   }
 
-  const picks = parsePicks(raw);
+  const parsed = parsePicks(raw);
 
-  if (picks === null) {
+  if (parsed === null) {
     return {
       status: 'FAILED',
       suggestions: [],
@@ -181,7 +243,7 @@ export const triageFacts = async (facts: string): Promise<TriageResult> => {
   const descartadas: string[] = [];
   const vistas = new Set<string>();
 
-  for (const pick of picks) {
+  for (const pick of parsed.picks) {
     const nombre = (pick.nombre ?? '').trim();
     if (!nombre || vistas.has(nombre)) continue;
     vistas.add(nombre);
@@ -208,10 +270,12 @@ export const triageFacts = async (facts: string): Promise<TriageResult> => {
       status: 'SIN_COINCIDENCIA',
       suggestions: [],
       descartadas,
+      senales: parsed.senales,
+      preguntas: parsed.preguntas,
       reason:
         'El catálogo no reconoce una actuación para estos hechos. Puede ser una materia que aún no está catalogada, o que los hechos necesiten más detalle.'
     };
   }
 
-  return { status: 'OK', suggestions, descartadas };
+  return { status: 'OK', suggestions, descartadas, senales: parsed.senales };
 };

@@ -116,6 +116,10 @@ export interface TriageResponse {
   reason?: string;
   suggestions: TriageSuggestion[];
   descartadas: string[];
+  /** Lo que el catálogo leyó: rama dominante y elementos fácticos. Lectura del modelo. */
+  senales?: { rama: string | null; elementos: string[] };
+  /** Solo sin coincidencia: los datos que faltan y definirían la vía. */
+  preguntas?: string[];
   /** Orientaciones gratuitas que le quedan hoy a la firma. */
   cupoRestante?: number;
   /** Lo que costó ESTA consulta. 0 mientras haya cupo gratuito. */

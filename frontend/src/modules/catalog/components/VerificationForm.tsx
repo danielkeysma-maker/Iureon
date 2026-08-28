@@ -109,9 +109,70 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({
         </button>
       </header>
 
+      {/*
+        ─── LOS TRES DATOS QUE DEFINEN LA ACTUACIÓN, cada uno con SU estado ───
+
+        Término, norma y autoridad en tres bloques iguales. La ficha puede
+        estar verificada en el término y coja en la autoridad, y eso tiene que
+        VERSE — un solo chip global promediaría tres verdades distintas en una
+        mentira cómoda.
+      */}
+      <div className="grid shrink-0 grid-cols-3 gap-px border-b border-line-200 bg-line-100">
+        <div className="bg-surface px-3 py-2.5">
+          <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
+            Término
+          </p>
+          <p className="mt-0.5 text-[11.5px] font-medium leading-snug text-ink-900">
+            {actuacion.term.status === 'NO_CADUCA'
+              ? 'No caduca'
+              : actuacion.term.description
+              ? actuacion.term.description.length > 60
+                ? `${actuacion.term.description.slice(0, 60)}…`
+                : actuacion.term.description
+              : 'Sin término registrado'}
+          </p>
+          <span className={`mt-1 inline-block ${actuacion.term.status === 'NO_VERIFICADO' ? 'chip-unverified' : 'chip-verified'}`}>
+            {actuacion.term.status === 'NO_VERIFICADO' ? 'Sin verificar' : 'Verificado'}
+          </span>
+        </div>
+
+        <div className="bg-surface px-3 py-2.5">
+          <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
+            Norma
+          </p>
+          <p className="mt-0.5 text-[11.5px] font-medium leading-snug text-ink-900">
+            {actuacion.legalBasis || 'Sin artículo'}
+          </p>
+          {actuacion.sourceUrl ? (
+            <a
+              href={actuacion.sourceUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-1 inline-block text-[10.5px] font-semibold text-brand-700 hover:underline"
+            >
+              Texto oficial
+            </a>
+          ) : (
+            <span className="mt-1 inline-block chip-unverified">Sin fuente</span>
+          )}
+        </div>
+
+        <div className="bg-surface px-3 py-2.5">
+          <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
+            Autoridad
+          </p>
+          <p className="mt-0.5 text-[11.5px] font-medium leading-snug text-ink-900">
+            {actuacion.competentAuthority ?? 'No registrada'}
+          </p>
+          <span className={`mt-1 inline-block ${actuacion.competentAuthority ? 'chip-neutral' : 'chip-unverified'}`}>
+            {actuacion.competentAuthority ? 'Del catálogo' : 'Falta'}
+          </span>
+        </div>
+      </div>
+
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
         {actuacion.verification && (
-          <div className="rounded-control border border-blue-200 bg-brand-50 px-3 py-2.5 text-[11px] text-brand-700 leading-snug">
+          <div className="rounded-control border border-line-200 bg-brand-50 px-3 py-2.5 text-[11px] text-brand-700 leading-snug">
             Verificada por <strong>{actuacion.verification.verifiedBy}</strong> el{' '}
             {new Date(actuacion.verification.verifiedAt).toLocaleDateString('es-CO')}. El catálogo base
             decía: <em>{actuacion.verification.replaced.description ?? 'término no verificado'}</em>.
