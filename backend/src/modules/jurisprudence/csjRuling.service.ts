@@ -30,6 +30,21 @@ import type { OfficialRuling, RulingOutcome } from './officialRuling.service';
  */
 
 /** The Court's search backend. Public, no key, read from its own client. */
+/**
+ * EL AGENTE DE USUARIO NO ES ADORNO, Y HOY COSTÓ UN DIAGNÓSTICO EQUIVOCADO.
+ *
+ * Los WAF de los dominios judiciales colombianos responden 403 al agente por
+ * defecto de una librería. Sin esta cabecera un servicio en pie parece caído, y
+ * eso fue exactamente lo que llevó a declarar muerta esta API durante un día:
+ * `curl` fallaba por otra razón —verificación de revocación de certificado— y
+ * la conclusión fue que la Corte había bloqueado el tráfico. No lo había hecho.
+ *
+ * Identificarse como un cliente que lee páginas públicas no es evadir nada: es
+ * decir lo que se es, en vez de el nombre por defecto de una dependencia.
+ */
+const AGENTE =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
+
 const API = 'https://consultaprovidenciasbk.cortesuprema.gov.co/api';
 const DOWNLOAD = 'https://consultaprovidenciasbk.cortesuprema.gov.co/downloadFile';
 
@@ -118,7 +133,7 @@ interface SearchRow {
 const gql = async (query: string, timeoutMs: number): Promise<any> => {
   const res = await fetch(API, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', Referer: ORIGIN, Origin: ORIGIN },
+    headers: { 'Content-Type': 'application/json', 'User-Agent': AGENTE, Referer: ORIGIN, Origin: ORIGIN },
     body: JSON.stringify({ query }),
     signal: AbortSignal.timeout(timeoutMs)
   });
@@ -176,7 +191,7 @@ const descargar = async (path: string, timeoutMs: number): Promise<string> => {
     try {
       const res = await fetch(DOWNLOAD, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Referer: ORIGIN, Origin: ORIGIN },
+        headers: { 'Content-Type': 'application/json', 'User-Agent': AGENTE, Referer: ORIGIN, Origin: ORIGIN },
         body: JSON.stringify({ path: candidato }),
         signal: AbortSignal.timeout(timeoutMs)
       });
