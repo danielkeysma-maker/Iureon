@@ -1,181 +1,182 @@
 import React, { useState } from 'react';
-import { X, Calendar, Clock, AlertTriangle, CheckCircle2, Scale } from 'lucide-react';
-import { termsApi } from '../services/terms.api';
+import { Check, Copy } from 'lucide-react';
+import { Dialog } from '../../../design/Dialog';
+import { termsApi, type TermsCalculationResult } from '../services/terms.api';
 
 interface ProceduralTermsModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export const ProceduralTermsModal: React.FC<ProceduralTermsModalProps> = ({
-  isOpen,
-  onClose
-}) => {
-  const [notifiedDate, setNotifiedDate] = useState<string>('2026-07-28');
-  const [termInDays, setTermInDays] = useState<number>(10);
+/**
+ * Contador de términos. Diálogo tipo 3 —calculadora— en tamaño M.
+ *
+ * ─── EL RESULTADO MUESTRA QUÉ DESCONTÓ Y POR QUÉ ────────────────────────────
+ *
+ * Un número solo no es defendible ante un juez: el abogado va a verificar el
+ * cómputo de todos modos, y la lista de días excluidos —cada sábado, domingo y
+ * festivo, con su razón— es lo que le permite hacerlo en un minuto en vez de
+ * rehacerlo a mano.
+ *
+ * ─── LO QUE ESTA CALCULADORA YA NO HACE ─────────────────────────────────────
+ *
+ * Tenía un «fallback»: si la API fallaba, mostraba una fecha de vencimiento
+ * escrita en el código —la misma para cualquier entrada— con la cara de un
+ * cálculo hecho. Un plazo inventado es la única cosa que este producto no
+ * puede emitir. Ahora, si el servidor no puede calcular, el error se muestra
+ * con su razón — incluida la más importante: que el término pise un periodo
+ * cuyo calendario de festivos no está cargado, porque contarlo sin festivos
+ * daría una fecha equivocada.
+ */
+export const ProceduralTermsModal: React.FC<ProceduralTermsModalProps> = ({ isOpen, onClose }) => {
+  const [notifiedDate, setNotifiedDate] = useState('');
+  const [termInDays, setTermInDays] = useState(10);
   const [jurisdictionType, setJurisdictionType] = useState<'LABORAL' | 'CIVIL' | 'CONSTITUCIONAL'>('LABORAL');
-  const [calculationResult, setCalculationResult] = useState<any>(null);
-  const [isCalculating, setIsCalculating] = useState<boolean>(false);
+  const [resultado, setResultado] = useState<TermsCalculationResult | null>(null);
+  const [error, setError] = useState('');
+  const [calculando, setCalculando] = useState(false);
+  const [copiado, setCopiado] = useState(false);
 
-  if (!isOpen) return null;
-
-  const handleCalculate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsCalculating(true);
+  const calcular = async () => {
+    if (!notifiedDate || termInDays <= 0) return;
+    setCalculando(true);
+    setError('');
 
     try {
-      const result = await termsApi.calculate({ notifiedDate, termInDays, jurisdictionType });
-      if (result) {
-        setCalculationResult(result);
-        return;
-      }
-      throw new Error('terms API unavailable');
-    } catch (err) {
-      console.warn('Fallback terms calculation:', err);
-      setCalculationResult({
-        notifiedDate,
-        startDate: '2026-07-29',
-        dueDate: '2026-08-11',
-        dueTime: '17:00 (5:00 PM - Cierre de Barandilla Virtual)',
-        totalBusinessDays: termInDays,
-        excludedDays: [
-          { date: '2026-08-01', reason: 'Sábado (Día no hábil judicial)' },
-          { date: '2026-08-02', reason: 'Domingo (Día no hábil)' },
-          { date: '2026-08-07', reason: 'Festivo Oficial en Colombia (Batalla de Boyacá)' },
-          { date: '2026-08-08', reason: 'Sábado (Día no hábil judicial)' },
-          { date: '2026-08-09', reason: 'Domingo (Día no hábil)' }
-        ],
-        normativeReference: 'Art. 118 Código General del Proceso (CGP) & Art. 151 CPTSS'
-      });
+      setResultado(await termsApi.calculate({ notifiedDate, termInDays, jurisdictionType }));
+    } catch (e) {
+      setResultado(null);
+      setError(e instanceof Error ? e.message : 'No se pudo calcular el término.');
     } finally {
-      setIsCalculating(false);
+      setCalculando(false);
     }
   };
 
+  const fechaLarga = (iso: string): string =>
+    new Date(`${iso}T12:00:00`).toLocaleDateString('es-CO', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+
+  const copiar = async () => {
+    if (!resultado) return;
+    await navigator.clipboard.writeText(
+      `Notificado el ${resultado.notifiedDate}; término de ${resultado.totalBusinessDays} días hábiles ` +
+        `contados desde el ${resultado.startDate} (${resultado.normativeReference}); vence el ${resultado.dueDate}.`
+    );
+    setCopiado(true);
+    setTimeout(() => setCopiado(false), 2000);
+  };
+
   return (
-    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 font-sans">
-      <div className="bg-white border border-slate-200 rounded-xl w-full max-w-xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
-        {/* Header */}
-        <div className="px-5 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-blue-900 border border-blue-950 flex items-center justify-center text-white">
-              <Calendar className="w-4 h-4" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-slate-900">
-                Calculadora de Términos Procesales Judiciales (Colombia)
-              </h3>
-              <p className="text-[11px] text-slate-500 font-body">
-                Conteo en días hábiles conforme al Art. 118 del CGP y CPTSS.
-              </p>
-            </div>
-          </div>
-          <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-900 rounded hover:bg-slate-100 transition-colors">
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="p-5 overflow-y-auto space-y-5 text-xs font-body flex-1">
-          <form onSubmit={handleCalculate} className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div>
-                <label className="text-[11px] font-semibold text-slate-700 block mb-1">Fecha de Notificación:</label>
-                <input
-                  type="date"
-                  value={notifiedDate}
-                  onChange={(e) => setNotifiedDate(e.target.value)}
-                  className="w-full bg-white border border-slate-200 rounded p-2 text-slate-900 text-xs font-mono focus:outline-none focus:border-blue-900"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="text-[11px] font-semibold text-slate-700 block mb-1">Término Legales (Días):</label>
-                <input
-                  type="number"
-                  value={termInDays}
-                  onChange={(e) => setTermInDays(Number(e.target.value))}
-                  min={1}
-                  max={90}
-                  className="w-full bg-white border border-slate-200 rounded p-2 text-slate-900 text-xs font-mono focus:outline-none focus:border-blue-900"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="text-[11px] font-semibold text-slate-700 block mb-1">Especialidad Judicial:</label>
-                <select
-                  value={jurisdictionType}
-                  onChange={(e) => setJurisdictionType(e.target.value as any)}
-                  className="w-full bg-white border border-slate-200 rounded p-2 text-slate-900 text-xs font-sans focus:outline-none focus:border-blue-900"
-                >
-                  <option value="LABORAL">Laboral Ordinario</option>
-                  <option value="CIVIL">Civil &amp; Comercial</option>
-                  <option value="CONSTITUCIONAL">Acción de Tutela</option>
-                </select>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={isCalculating}
-              className="w-full py-2 bg-blue-900 hover:bg-blue-950 text-white font-semibold rounded-md text-xs flex items-center justify-center gap-1.5 transition-colors shadow-xs"
-            >
-              <Clock className="w-3.5 h-3.5" />
-              <span>Calcular Vencimiento Judicial</span>
+    <Dialog
+      abierto={isOpen}
+      onCerrar={onClose}
+      tamano="M"
+      titulo="Contador de términos"
+      subtitulo="Días hábiles con los festivos de Colombia. El cómputo muestra qué descontó."
+      acciones={
+        <>
+          {resultado && (
+            <button onClick={() => void copiar()} className="btn-neutral btn-sm">
+              {copiado ? <Check className="h-3.5 w-3.5 text-verified" /> : <Copy className="h-3.5 w-3.5" />}
+              {copiado ? 'Copiado' : 'Copiar'}
             </button>
-          </form>
+          )}
+          <button
+            onClick={() => void calcular()}
+            disabled={calculando || !notifiedDate || termInDays <= 0}
+            className="btn-primary btn-sm"
+          >
+            {calculando ? 'Calculando…' : 'Calcular'}
+          </button>
+        </>
+      }
+    >
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <label className="block">
+            <span className="field-label">Fecha de notificación</span>
+            <input
+              type="date"
+              value={notifiedDate}
+              onChange={(e) => setNotifiedDate(e.target.value)}
+              className="field mt-1 w-full"
+            />
+          </label>
 
-          {calculationResult && (
-            <div className="space-y-4">
-              <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl space-y-2">
-                <div className="flex items-center justify-between border-b border-emerald-200 pb-2">
-                  <span className="text-[11px] text-emerald-800 font-mono flex items-center gap-1.5 font-bold">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    FECHA LÍMITE DE VENCIMIENTO
-                  </span>
-                  <span className="text-xs font-mono text-emerald-900 font-bold bg-emerald-100 px-2 py-0.5 rounded border border-emerald-300">
-                    {calculationResult.dueTime}
-                  </span>
-                </div>
+          <label className="block">
+            <span className="field-label">Días hábiles</span>
+            <input
+              type="number"
+              min={1}
+              value={termInDays}
+              onChange={(e) => setTermInDays(Number(e.target.value))}
+              className="field mt-1 w-full font-mono"
+            />
+          </label>
 
-                <div className="text-center py-2">
-                  <span className="text-2xl font-bold font-mono text-slate-900 tracking-tight">
-                    {calculationResult.dueDate}
-                  </span>
-                  <p className="text-[11px] text-slate-600 mt-1 font-medium">
-                    El término de {calculationResult.totalBusinessDays} días hábiles empezó a correr el{' '}
-                    <span className="font-mono text-slate-900 font-bold">{calculationResult.startDate}</span>.
-                  </p>
-                </div>
-              </div>
+          <label className="block">
+            <span className="field-label">Jurisdicción</span>
+            <select
+              value={jurisdictionType}
+              onChange={(e) => setJurisdictionType(e.target.value as typeof jurisdictionType)}
+              className="field mt-1 w-full"
+            >
+              <option value="LABORAL">Laboral</option>
+              <option value="CIVIL">Civil</option>
+              <option value="CONSTITUCIONAL">Constitucional</option>
+            </select>
+          </label>
+        </div>
 
-              {calculationResult.excludedDays && calculationResult.excludedDays.length > 0 && (
-                <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-                  <span className="text-[11px] font-mono text-slate-700 font-semibold flex items-center gap-1">
-                    <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
-                    Días Inhabiles Descontados del Conteo ({calculationResult.excludedDays.length}):
-                  </span>
-                  <div className="max-h-28 overflow-y-auto space-y-1 pr-1 font-mono text-[11px]">
-                    {calculationResult.excludedDays.map((d: any, idx: number) => (
-                      <div key={idx} className="flex justify-between text-slate-600 bg-white border border-slate-200 px-2.5 py-1 rounded">
-                        <span>{d.date}</span>
-                        <span className="text-amber-800 font-semibold">{d.reason}</span>
-                      </div>
-                    ))}
+        {/* El término empieza al día siguiente de la notificación: se dice antes. */}
+        <p className="text-meta text-ink-500">
+          Cuenta desde el día siguiente a la notificación (Art. 118 CGP).
+        </p>
+
+        {error && <p className="notice-unverified">{error}</p>}
+
+        {resultado && (
+          <div className="space-y-3">
+            {/* ─── EL VENCIMIENTO, GRANDE Y CON SU DÍA ─────────────────────── */}
+            <div className="rounded-card border border-line-200 bg-canvas p-4 text-center">
+              <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
+                Vence
+              </p>
+              <p className="mt-1 font-mono text-[24px] font-semibold text-ink-900">
+                {resultado.dueDate}
+              </p>
+              <p className="mt-0.5 text-ui capitalize text-ink-700">{fechaLarga(resultado.dueDate)}</p>
+              <p className="mt-1 text-meta text-ink-500">{resultado.dueTime}</p>
+            </div>
+
+            {/* ─── QUÉ DESCONTÓ Y POR QUÉ ──────────────────────────────────── */}
+            <div className="overflow-hidden rounded-card border border-line-200 bg-surface">
+              <p className="t-head">
+                Se descontaron {resultado.excludedDays.length} días no hábiles
+              </p>
+              <div className="max-h-[180px] overflow-y-auto">
+                {resultado.excludedDays.map((d) => (
+                  <div key={d.date} className="t-row flex items-center gap-3">
+                    <span className="w-[92px] shrink-0 font-mono text-[12px] text-ink-900">
+                      {d.date}
+                    </span>
+                    <span className="min-w-0 flex-1 text-meta text-ink-500">{d.reason}</span>
                   </div>
-                </div>
-              )}
-
-              <div className="text-[10px] font-mono text-slate-500 flex items-center gap-1 justify-center pt-1 font-medium">
-                <Scale className="w-3 h-3 text-blue-900" />
-                <span>Normativa: {calculationResult.normativeReference}</span>
+                ))}
               </div>
             </div>
-          )}
-        </div>
+
+            <p className="text-meta text-ink-500">
+              Empieza a contar el <span className="font-mono text-ink-700">{resultado.startDate}</span> ·{' '}
+              {resultado.normativeReference}
+            </p>
+          </div>
+        )}
       </div>
-    </div>
+    </Dialog>
   );
 };

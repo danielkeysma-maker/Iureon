@@ -51,6 +51,19 @@ export class ProceduralTermsService {
     let businessDaysCounted = 0;
     const excludedDays: { date: string; reason: string }[] = [];
 
+    /*
+     * LA COBERTURA DEL CALENDARIO ES PARTE DEL CALCULO.
+     *
+     * La tabla cubre 2026. Un termino notificado en diciembre que cruce a 2027
+     * contaria los festivos de enero como dias habiles — un plazo ERRADO con la
+     * cara de un calculo hecho, que es el peor resultado posible de esta
+     * herramienta. Por eso, si el computo pisa una fecha fuera de la
+     * cobertura, se RECHAZA con la razon en espanol: no hay respuesta antes
+     * que respuesta equivocada. Ampliar la cobertura = agregar el ano
+     * VERIFICADO contra el calendario oficial, nunca de memoria.
+     */
+    const COBERTURA = { desde: '2026-01-01', hasta: '2026-12-31' };
+
     // Festivos oficiales y suspensiones judiciales en Colombia 2026
     const holidays2026 = [
       '2026-01-01', '2026-01-12', '2026-03-23', '2026-04-02', '2026-04-03',
@@ -61,6 +74,13 @@ export class ProceduralTermsService {
 
     while (businessDaysCounted < req.termInDays) {
       const dateStr = currentDate.toISOString().split('T')[0];
+
+      if (dateStr < COBERTURA.desde || dateStr > COBERTURA.hasta) {
+        throw new Error(
+          `El calendario de festivos cargado cubre del ${COBERTURA.desde} al ${COBERTURA.hasta}, y este término pisa el ${dateStr}. ` +
+            'Calcularlo sin los festivos de ese periodo daría una fecha equivocada; cuente ese tramo contra el calendario oficial.'
+        );
+      }
       const dayOfWeek = currentDate.getUTCDay(); // 0: Dom, 6: Sáb — UTC, igual que dateStr
 
       if (dayOfWeek === 0) {

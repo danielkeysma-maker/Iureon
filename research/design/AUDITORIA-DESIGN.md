@@ -73,4 +73,5 @@ VIEJA (diseño anterior intacto) · NO EXISTE (Design la inventó; no hay nada).
 2. **PARCIALES a fiel** (layout): 1i Catálogo (tres bloques + No aplica) · 1h Buscador (filtros + conteos) · 1f Orientación · 1g Audiencia detalle (tres columnas + reproductor anclado) · 6b Ajustes.
 3. **Backend que habilita lo omitido**: historia de curaduría · revisión por intervención · autorizaciones de entrevista persistidas · glosario derivado del catálogo · curaduría de jurisprudencia por firma.
 4. **Nuevas grandes**: 7a/7b consola de operación · 8a acceso de soporte · 9a/9b.
-5. **Móvil**, todo junto, al final.
+5. **Facturación electrónica** (pedido expreso): emitir factura a nombre de la firma por cada recarga, al correo de facturación. Exige integración con un proveedor tecnológico autorizado DIAN — es obra de backend con proveedor externo, no una pantalla. Cuando exista, el checkout de Saldo anuncia la factura (la línea ya quedó escrita en el artboard 1k y hoy se omite a propósito).
+6. **Móvil**, todo junto, al final.
