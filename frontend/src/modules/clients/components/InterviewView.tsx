@@ -3,6 +3,7 @@ import { AlertTriangle, ArrowLeft, Copy, CheckCircle2, FileText, PenLine, Upload
 import { useTranscription } from '../../transcription/hooks/useTranscription';
 import { TranscriptSegments } from '../../transcription/components/TranscriptSegments';
 import { EntrevistasList } from './EntrevistasList';
+import { CerrarEntrevistaDialog } from './CerrarEntrevistaDialog';
 import { NotPersistedWarning } from '../../transcription/components/RoleProposals';
 import { exportTranscriptToPdf, exportTranscriptToWord } from '../../transcription/transcriptExport';
 import { buildSpeakerNames } from '../../transcription/speakerNames';
@@ -102,6 +103,16 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
   const [clientId, setClientId] = React.useState<string | null>(null);
   const [copiado, setCopiado] = React.useState(false);
   const [titulo, setTitulo] = React.useState('');
+  /*
+   * LA AUTORIZACION DE GRABACION ES BLOQUEANTE. La voz es un dato biometrico
+   * (Ley 1581 de 2012): sin la casilla marcada, ni el grabador ni la subida se
+   * habilitan — el audio no se envia a transcribir. Es un cerrojo de interfaz,
+   * no un registro: guardar la hora de la autorizacion necesita su columna, y
+   * prometer "queda registrado" sin ella seria mentir. Se construye cuando
+   * exista el registro.
+   */
+  const [autorizado, setAutorizado] = React.useState(false);
+  const [cerrarAbierto, setCerrarAbierto] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
@@ -235,10 +246,16 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
               algo — sin turnos de relato el boton prometeria un puente que no
               existe.
             */}
-            {onDraft && relatoDelCliente().length > 0 && (
-              <button onClick={() => onDraft(relatoDelCliente())} className="btn-primary btn-sm">
+            {/*
+              El cierre del flujo: la entrevista termina en una decision, y las
+              tres salidas viven en el dialogo — tomar, decidir despues,
+              declinar con motivo. Solo con la entrevista guardada: sin id no
+              hay donde registrar la decision.
+            */}
+            {transcriptionId && (
+              <button onClick={() => setCerrarAbierto(true)} className="btn-primary btn-sm">
                 <PenLine className="h-3 w-3" />
-                Tomar el caso y redactar
+                Cerrar la entrevista
               </button>
             )}
           </>
@@ -282,7 +299,30 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
               </div>
             ) : (
               <div className="space-y-3">
-                <AudioRecorder onRecorded={empezar} disabled={!hasFirm} />
+                {/* Sin esto no se graba. Va ANTES del grabador, porque es antes. */}
+                <label
+                  className={`flex cursor-pointer items-start gap-2.5 rounded-card border px-3 py-2.5 ${
+                    autorizado ? 'border-line-200 bg-canvas' : 'border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))]'
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={autorizado}
+                    onChange={(e) => setAutorizado(e.target.checked)}
+                    className="mt-0.5"
+                  />
+                  <span className="min-w-0">
+                    <span className="block text-ui font-medium text-ink-900">
+                      Le informé que la entrevista se graba y lo autorizó
+                    </span>
+                    <span className="block text-meta leading-[1.5] text-ink-500">
+                      La voz es un dato biométrico (Ley 1581 de 2012): sin esta autorización, la
+                      grabación no se envía a transcribir.
+                    </span>
+                  </span>
+                </label>
+
+                <AudioRecorder onRecorded={empezar} disabled={!hasFirm || !autorizado} />
 
                 {/*
                   Uploading stays, second. Not every interview happens at the
@@ -303,7 +343,8 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
                   <button
                     type="button"
                     onClick={() => inputRef.current?.click()}
-                    disabled={!hasFirm}
+                    disabled={!hasFirm || !autorizado}
+                    title={!autorizado ? 'Primero la autorización de grabación' : undefined}
                     className="text-[11px] font-semibold text-ink-500 hover:text-brand-700 flex items-center gap-1.5 mx-auto disabled:opacity-50"
                   >
                     <Upload className="w-3 h-3" />
@@ -377,6 +418,21 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
       )}
         </div>
       </div>
+
+      {transcriptionId && (
+        <CerrarEntrevistaDialog
+          abierto={cerrarAbierto}
+          onCerrar={() => setCerrarAbierto(false)}
+          transcriptionId={transcriptionId}
+          titulo={titulo || 'Entrevista'}
+          onDecidido={() => void loadStored()}
+          onTomarYRedactar={
+            onDraft && relatoDelCliente().length > 0
+              ? () => onDraft(relatoDelCliente())
+              : undefined
+          }
+        />
+      )}
     </div>
   );
 };

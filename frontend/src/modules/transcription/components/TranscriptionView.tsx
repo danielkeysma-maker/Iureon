@@ -1,21 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Upload, FileAudio, AlertTriangle, Cpu, Copy, CheckCircle2, RotateCcw, FileText } from 'lucide-react';
+import { Upload, AlertTriangle, Copy, CheckCircle2, RotateCcw, FileText } from 'lucide-react';
 import { useTranscription } from '../hooks/useTranscription';
 import { TranscriptSegments } from './TranscriptSegments';
 import { TranscriptSummary } from './TranscriptSummary';
 import { AudioPreview } from './AudioPreview';
 import { NotPersistedWarning, RoleProposals } from './RoleProposals';
 import { AudienciasList } from './AudienciasList';
+import { SubirAudienciaDialog } from './SubirAudienciaDialog';
 import { transcriptionApi } from '../services/transcription.api';
 import { exportTranscriptToPdf, exportTranscriptToWord } from '../transcriptExport';
 import { buildSpeakerNames } from '../speakerNames';
 import { toPlainText } from '../toPlainText';
-import {
-  ROLE_LABELS,
-  SUPPORTED_AUDIO_EXTENSIONS,
-  type SpeakerRole,
-  type TranscriptionKind
-} from '../types';
+import { ROLE_LABELS, type SpeakerRole, type TranscriptionKind } from '../types';
 
 interface TranscriptionViewProps {
   kind?: TranscriptionKind;
@@ -28,8 +24,6 @@ interface TranscriptionViewProps {
    */
   onUsarEnRedaccion?: (texto: string) => void;
 }
-
-const megabytes = (bytes: number): string => (bytes / (1024 * 1024)).toFixed(1);
 
 /**
  * Hearing transcription.
@@ -56,7 +50,7 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
    * accepted so the panel shows only what still needs a decision.
    */
   const [confirmed, setConfirmed] = useState<Record<string, SpeakerRole>>({});
-  const [contextPrompt, setContextPrompt] = useState('');
+  const [, setContextPrompt] = useState('');
   /*
    * Loaded on entry, because the whole point is that the lawyer does not have
    * to be told their hearings are stored — they see them.
@@ -66,6 +60,7 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
   }, [loadStored]);
 
   const [copied, setCopied] = useState(false);
+  const [subirAbierto, setSubirAbierto] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   /*
@@ -109,6 +104,18 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
               : 'La grabación, separada por interlocutor y con cada voz nombrada.'}
           </p>
         </div>
+
+        {!result && (
+          /*
+            El primario del modulo: la audiencia es un archivo que LLEGA — el
+            juzgado la publica y el abogado la trae — no un evento que se
+            inicia. Por eso aqui se sube, y en Entrevistas se graba.
+          */
+          <button onClick={() => setSubirAbierto(true)} className="btn-primary btn-sm">
+            <Upload className="h-3.5 w-3.5" />
+            Subir audio
+          </button>
+        )}
 
         {result && (
           <>
@@ -213,115 +220,19 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
           />
         )}
 
-        {!result && (
-          <div className="bg-surface border border-line-200 rounded-card p-5 space-y-4">
-            <div className="border-2 border-dashed border-line-200 hover:border-brand-700 rounded-card p-6 flex flex-col items-center text-center bg-canvas transition-colors relative">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept={SUPPORTED_AUDIO_EXTENSIONS.map((e) => `.${e}`).join(',')}
-                onChange={(e) => setSelectedFile(e.target.files?.[0] ?? null)}
-                disabled={isTranscribing}
-                className="absolute inset-0 opacity-0 cursor-pointer disabled:cursor-not-allowed"
-              />
-              <div className="w-12 h-12 rounded-card bg-surface border border-line-200 flex items-center justify-center text-brand-700 mb-3 shadow-e1">
-                <FileAudio className="w-6 h-6" />
-              </div>
-              {selectedFile ? (
-                <div className="space-y-1">
-                  <span className="font-bold text-ink-900 font-mono block text-xs">
-                    {selectedFile.name}
-                  </span>
-                  <span className="text-[10px] text-verified font-mono font-semibold">
-                    {megabytes(selectedFile.size)} MB
-                  </span>
-                </div>
-              ) : (
-                <div>
-                  <span className="font-semibold text-ink-900 block text-xs">
-                    Arrastra la grabación aquí
-                  </span>
-                  <span className="text-[11px] text-ink-500">
-                    {/* From the server, because the ceiling is the configured
-                        provider's. Typed as a literal "25 MB" here, it kept
-                        announcing OpenAI's limit after the switch to Deepgram
-                        raised it eightfold — telling lawyers to split hearings
-                        the product could already accept whole. */}
-                    {SUPPORTED_AUDIO_EXTENSIONS.join(', ')} · máximo {megabytes(maxAudioBytes)} MB
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/*
-              SAID BEFORE, NOT DISCOVERED AFTER.
-              
-              The transcript is stored the moment the provider answers, which is
-              what keeps a two-hour hearing from being lost by closing a tab —
-              but nothing said so, and a user found out only by being told
-              weeks later. Retention of privileged material is not something to
-              learn afterwards, and the sentence is here rather than in a
-              settings page because this is the moment the material arrives.
-            */}
-            <p className="text-[11px] text-ink-500 bg-canvas border border-line-200 rounded-control p-2.5">
-              <b className="text-ink-700">Qué se guarda:</b> el texto de la transcripción queda
-              guardado en tu firma para que no lo pierdas al cerrar la pestaña, y puedes borrarlo
-              cuando quieras desde la lista de arriba. <b className="text-ink-700">La grabación no
-              se guarda</b>: se borra del almacenamiento apenas termina de transcribirse.
-            </p>
-
-            <div>
-              <label className="text-[11px] font-semibold text-ink-700 block mb-1">
-                Contexto del caso (opcional, mejora la precisión):
-              </label>
-              <input
-                type="text"
-                value={contextPrompt}
-                onChange={(e) => setContextPrompt(e.target.value)}
-                placeholder="Ej. Juzgado 18 Laboral de Bogotá, demandante Mario Pérez, radicado 2026-00904"
-                disabled={isTranscribing}
-                className="w-full bg-canvas border border-line-200 rounded-control p-2 text-xs text-ink-900 focus:outline-none focus:border-brand-700"
-              />
-              <p className="text-[10px] text-ink-400 mt-1">
-                Nombres de las partes, juzgado y radicado. Ayuda a que los términos jurídicos se
-                transcriban bien.
-              </p>
-            </div>
-
-            {error && (
-              <div className="p-3 bg-[rgb(var(--danger)/0.06)] border border-[rgb(var(--danger)/0.35)] rounded-control text-danger text-xs flex items-start gap-2">
-                <AlertTriangle className="w-4 h-4 text-danger shrink-0 mt-0.5" />
-                <span>{error}</span>
-              </div>
-            )}
-
-            <button
-              onClick={() => selectedFile && transcribe(selectedFile, contextPrompt)}
-              disabled={!selectedFile || isTranscribing}
-              className="w-full py-2.5 bg-brand-700 hover:bg-brand-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-card text-xs flex items-center justify-center gap-2 transition-colors shadow-e1"
-            >
-              {/* Two phases, named separately: a two-hour hearing spends real
-                  minutes travelling to storage before anything is transcribed,
-                  and one label for both would look stalled. */}
-              {isUploading ? (
-                <>
-                  <Upload className="w-4 h-4 animate-pulse" />
-                  <span>Enviando la grabación...</span>
-                </>
-              ) : isTranscribing ? (
-                <>
-                  <Cpu className="w-4 h-4 animate-spin" />
-                  <span>Transcribiendo y separando interlocutores...</span>
-                </>
-              ) : (
-                <>
-                  <Upload className="w-4 h-4" />
-                  <span>Transcribir grabación</span>
-                </>
-              )}
-            </button>
-          </div>
-        )}
+        <SubirAudienciaDialog
+          abierto={subirAbierto}
+          onCerrar={() => setSubirAbierto(false)}
+          maxAudioBytes={maxAudioBytes}
+          isUploading={isUploading}
+          isTranscribing={isTranscribing}
+          error={error}
+          onTranscribir={(archivo, contexto) => {
+            setSelectedFile(archivo);
+            setContextPrompt(contexto);
+            void transcribe(archivo, contexto).then(() => setSubirAbierto(false));
+          }}
+        />
 
         {result && (
           <>
