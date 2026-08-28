@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Health Home — Hero 1c · El hero pregunta</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500&display=swap" rel="stylesheet">
+<style>
+/* ── Tokens (misma paleta cerrada que 1a / 1b) ── */
+:root{
+  --ink:#07293D; --blue:#0A4D82; --cyan:#1F8AC9; --green:#5EA843; --lime:#7EC265;
+  --paper:#F3F7FA; --muted:#5C6B78; --body:#1A2530;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --pad:clamp(16px,3.4vw,40px);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--paper);color:var(--body);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--blue);text-decoration:none}
+a:hover{color:var(--cyan)}
+:focus-visible{outline:2.5px solid var(--cyan);outline-offset:3px}
+
+.hero{position:relative;min-height:100svh;display:flex;flex-direction:column;overflow:hidden;padding:18px var(--pad) clamp(28px,4vh,40px)}
+.hero__glow{position:absolute;top:-140px;right:-120px;width:560px;height:560px;border-radius:50%;
+  background:radial-gradient(closest-side,rgba(31,138,201,.16),transparent);pointer-events:none}
+.hero>*{position:relative}
+
+/* ── Nav ── */
+.nav{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-bottom:clamp(18px,3vh,26px)}
+.brand{display:flex;align-items:center;gap:10px}
+.brand__mark{width:26px;height:26px;border-radius:8px;background:var(--blue);position:relative;flex:none}
+.brand__mark::after{content:"";position:absolute;left:7px;top:7px;width:12px;height:12px;border-radius:50%;background:var(--lime)}
+.brand__name{font:900 12.5px/1 Satoshi,Inter,sans-serif;letter-spacing:.02em;color:var(--ink)}
+.nav__links{display:flex;gap:22px;font:600 13px/1 Inter,sans-serif;color:var(--body)}
+.btn{display:inline-flex;align-items:center;gap:10px;background:var(--green);color:#fff;font:700 13px/1 Inter,sans-serif;
+  padding:12px 17px;border-radius:99px;border:none;cursor:pointer;transition:all .3s var(--ease);
+  box-shadow:0 2px 0 rgba(7,41,61,.18),0 10px 24px -12px rgba(94,168,67,.9)}
+.btn:hover{background:#4d9137;color:#fff;transform:translateY(-2px)}
+.btn--lg{font-size:clamp(15px,1.8vw,16.5px);padding:18px 20px 18px 26px;
+  box-shadow:0 2px 0 rgba(7,41,61,.2),0 16px 32px -16px rgba(94,168,67,1)}
+.btn__arrow{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;
+  background:rgba(7,41,61,.22);font-weight:400}
+
+/* ── Layout ── */
+.hero__body{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:.92fr 1.08fr;
+  gap:clamp(24px,3.6vw,44px);align-items:center}
+.eyebrow{font:600 11px/1 Inter,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--blue)}
+.h1{margin:18px 0 0;font:900 clamp(40px,6.6vw,80px)/0.87 Satoshi,Inter,sans-serif;letter-spacing:-0.05em;color:var(--ink)}
+.lede{margin:20px 0 0;font:400 clamp(15.5px,1.35vw,18px)/1.55 Inter,sans-serif;color:var(--muted);max-width:34ch;text-wrap:pretty}
+
+/* ── Marcador (cambia de estado a partir de 3 señales) ── */
+.score{margin-top:clamp(22px,3.4vh,30px);padding:22px;border-radius:20px;background:#fff;
+  border:1px solid rgba(10,77,130,.14);transition:background .5s var(--ease),border-color .5s var(--ease)}
+.score.is-hot{background:var(--ink);border-color:rgba(126,194,101,.5)}
+.score__row{display:flex;align-items:center;gap:18px}
+.score__num{font:900 clamp(42px,4.4vw,56px)/0.85 Satoshi,Inter,sans-serif;letter-spacing:-0.05em;color:var(--blue);transition:color .5s var(--ease)}
+.score.is-hot .score__num{color:var(--lime)}
+.score__num small{font-size:.4em;color:rgba(92,107,120,.45)}
+.score.is-hot .score__num small{color:rgba(243,247,250,.45)}
+.score__msg{font:600 clamp(14px,1.15vw,15.5px)/1.35 Inter,sans-serif;color:var(--muted);transition:color .5s var(--ease);text-wrap:pretty}
+.score.is-hot .score__msg{color:rgba(243,247,250,.82)}
+.score .btn--lg{margin-top:20px}
+
+/* ── Tarjetas de señal ── */
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.tile{text-align:left;cursor:pointer;min-width:0;padding:20px;border-radius:18px;background:#fff;
+  border:1px solid rgba(10,77,130,.14);transition:all .4s var(--ease);font:inherit;color:inherit}
+.tile:hover{border-color:var(--cyan);transform:translateY(-2px)}
+.tile[aria-pressed="true"]{background:var(--lime);border-color:var(--lime);transform:translateY(-3px);
+  box-shadow:0 24px 44px -26px rgba(94,168,67,.95)}
+.tile__head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.tile__n{font:700 10.5px/1 Inter,sans-serif;letter-spacing:.2em;color:var(--cyan);transition:color .3s}
+.tile[aria-pressed="true"] .tile__n{color:var(--ink)}
+.tile__box{flex:none;display:inline-flex;align-items:center;justify-content:center;width:25px;height:25px;border-radius:8px;
+  border:1.5px solid rgba(10,77,130,.24);color:transparent;font:700 13px/1 Inter,sans-serif;transition:all .3s var(--ease)}
+.tile[aria-pressed="true"] .tile__box{background:var(--ink);border-color:var(--ink);color:var(--lime)}
+.tile__t{display:block;margin-top:16px;font:700 clamp(16px,1.35vw,18px)/1.22 Inter,sans-serif;letter-spacing:-0.018em;color:var(--ink)}
+.tile__d{display:block;margin-top:7px;font:400 13.5px/1.5 Inter,sans-serif;color:var(--muted);transition:color .3s}
+.tile[aria-pressed="true"] .tile__d{color:rgba(7,41,61,.7)}
+
+@media (max-width:1020px){
+  .hero{min-height:auto;padding-bottom:48px}
+  .hero__body{grid-template-columns:1fr;gap:32px}
+  .nav__links{display:none}
+}
+@media (max-width:560px){
+  .tiles{grid-template-columns:1fr}
+  .score .btn--lg{width:100%;justify-content:space-between}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     HERO 1c · "El hero pregunta"
+     Idea: la checklist de síntomas sube al primer pantallazo.
+     El marcador cambia de copy, color y CTA al llegar a 3 señales.
+     Enviar las señales marcadas al lead (campo oculto / analytics).
+     ═══════════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero__glow" aria-hidden="true"></div>
+
+  <header class="nav">
+    <a class="brand" href="#top">
+      <span class="brand__mark" aria-hidden="true"></span>
+      <span class="brand__name">HEALTH HOME</span>
+    </a>
+    <nav class="nav__links" aria-label="Principal">
+      <a href="#agua">Agua</a><a href="#solar">Soltice</a><a href="#hogar">Hogar</a><a href="#catalogo">Catálogo</a>
+    </nav>
+    <a class="btn" href="#evaluacion">Evaluación gratis</a>
+  </header>
+
+  <div class="hero__body">
+    <div>
+      <span class="eyebrow">Empieza por tu casa</span>
+      <h1 class="h1">¿Cuál de estas te suena?</h1>
+      <p class="lede">Marca lo que pasa en tu casa. Con tres o más, medir el agua deja de ser opcional.</p>
+
+      <div class="score" data-score>
+        <div class="score__row">
+          <span class="score__num"><span data-count>0</span><small>/6</small></span>
+          <span class="score__msg" data-msg>Toca las que reconozcas y te decimos si toca medir.</span>
+        </div>
+        <a class="btn btn--lg" href="#evaluacion" data-cta>Solicita tu evaluación gratis <span class="btn__arrow" aria-hidden="true">→</span></a>
+      </div>
+    </div>
+
+    <div class="tiles" data-tiles>
+      <button class="tile" type="button" aria-pressed="false">
+        <span class="tile__head"><span class="tile__n">01</span><span class="tile__box" aria-hidden="true">✓</span></span>
+        <span class="tile__t">Compras agua embotellada</span>
+        <span class="tile__d">Cajas y garrafones cada semana.</span>
+      </button>
+      <button class="tile" type="button" aria-pressed="false">
+        <span class="tile__head"><span class="tile__n">02</span><span class="tile__box" aria-hidden="true">✓</span></span>
+        <span class="tile__t">Sarro blanco en las llaves</span>
+        <span class="tile__d">Vuelve días después de limpiar.</span>
+      </button>
+      <button class="tile" type="button" aria-pressed="false">
+        <span class="tile__head"><span class="tile__n">03</span><span class="tile__box" aria-hidden="true">✓</span></span>
+        <span class="tile__t">El agua sabe a cloro</span>
+        <span class="tile__d">Se nota en el café y el hielo.</span>
+      </button>
+      <button class="tile" type="button" aria-pressed="false">
+        <span class="tile__head"><span class="tile__n">04</span><span class="tile__box" aria-hidden="true">✓</span></span>
+        <span class="tile__t">El jabón no rinde</span>
+        <span class="tile__d">Más detergente, ropa áspera.</span>
+      </button>
+      <button class="tile" type="button" aria-pressed="false">
+        <span class="tile__head"><span class="tile__n">05</span><span class="tile__box" aria-hidden="true">✓</span></span>
+        <span class="tile__t">Manchas en ducha y cristales</span>
+        <span class="tile__d">Marcas que siempre regresan.</span>
+      </button>
+      <button class="tile" type="button" aria-pressed="false">
+        <span class="tile__head"><span class="tile__n">06</span><span class="tile__box" aria-hidden="true">✓</span></span>
+        <span class="tile__t">Equipos que duran menos</span>
+        <span class="tile__d">Calentador y lavadora forzados.</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  var tiles = Array.prototype.slice.call(document.querySelectorAll('.tile')),
+      score = document.querySelector('[data-score]'),
+      count = document.querySelector('[data-count]'),
+      msg = document.querySelector('[data-msg]'),
+      cta = document.querySelector('[data-cta]');
+
+  var COPY = {
+    zero: 'Toca las que reconozcas y te decimos si toca medir.',
+    few: 'Aun con una o dos, la medición es gratis y te deja un número concreto.',
+    hot: 'Casi siempre es dureza y cloro del agua que entra. Toca medirlo.'
+  };
+
+  function render() {
+    var picked = tiles.filter(function (t) { return t.getAttribute('aria-pressed') === 'true'; });
+    var n = picked.length, hot = n >= 3;
+    count.textContent = n;
+    msg.textContent = n === 0 ? COPY.zero : hot ? COPY.hot : COPY.few;
+    score.classList.toggle('is-hot', hot);
+    cta.firstChild.nodeValue = (hot ? 'Que midan mi agua' : 'Solicita tu evaluación gratis') + ' ';
+    /* Señales marcadas para adjuntar al lead:
+       picked.map(t => t.querySelector('.tile__t').textContent) */
+  }
+
+  tiles.forEach(function (t) {
+    t.addEventListener('click', function () {
+      t.setAttribute('aria-pressed', t.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+      render();
+    });
+  });
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1442,6 +1442,141 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
       { n: 5, name: 'Restablecimiento que se pide, incluido el levantamiento de las medidas cautelares', mandatory: true, basis: 'Ley 1437 de 2011, art. 138' }
     ],
     sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1437_2011_pr002.html'
+  },
+  {
+    id: 'administrativo/notificacion-personal-por-medios-electronicos-en-el-proceso-contencioso-administrativo',
+    exactName: 'Notificación personal por medios electrónicos en el proceso contencioso administrativo',
+    branch: 'ADMINISTRATIVO',
+    role: 'SECRETARIA',
+    legalBasis: 'Ley 1437 de 2011, arts. 197, 198, 199 (modificado por el art. 48 de la Ley 2080 de 2021) y 205 (modificado por el art. 52 de la misma ley); Ley 2213 de 2022, art. 8',
+    competentAuthority: 'El secretario del juzgado, tribunal o Consejo de Estado, que remite la providencia y deja la constancia en el expediente',
+    term: { status: 'VERIFICADO', description: 'DOS (2) DÍAS HÁBILES, Y ESTE ES EL FUSIBLE DEL QUE ARRANCA TODO TÉRMINO EN LA RAMA MÁS GRANDE DEL CATÁLOGO: no correr desde la fecha correcta desplaza el vencimiento de la contestación, de los recursos y de todo lo demás. «El traslado o los términos que conceda el auto notificado SOLO SE EMPEZARÁN A CONTABILIZAR A LOS DOS (2) DÍAS HÁBILES SIGUIENTES AL DEL ENVÍO DEL MENSAJE y el término respectivo empezará a correr a partir del día siguiente» (art. 199). El art. 205 num. 2 lo dice como notificación: «La notificación de la providencia se entenderá realizada una vez transcurridos DOS (2) DÍAS HÁBILES siguientes al envío del mensaje y los términos empezarán a correr a partir del día siguiente al de la notificación.» ATENCIÓN A UNA DIFERENCIA DE REDACCIÓN QUE PUEDE COSTAR DÍAS: el art. 8 de la Ley 2213 de 2022 fija los mismos dos días hábiles pero ata el arranque del término al acuse — «los términos empezarán a contarse CUANDO EL INICIADOR RECEPCIONE ACUSE DE RECIBO o se pueda por otro medio constatar el acceso del destinatario al mensaje». Ante la duda, se cuenta por el escenario más corto y se guarda la evidencia del envío. LA CONSTANCIA NO TIENE PLAZO PROPIO PERO FIJA EL HECHO DEL QUE PENDEN ESOS DOS DÍAS: «Se presumirá que el destinatario ha recibido la notificación cuando el iniciador recepcione acuse de recibo o se pueda constatar por otro medio el acceso […] EL SECRETARIO HARÁ CONSTAR ESTE HECHO EN EL EXPEDIENTE». A QUIÉN SE NOTIFICA PERSONALMENTE (art. 198): al demandado el auto admisorio; a los terceros la primera providencia que los toque; AL MINISTERIO PÚBLICO el auto admisorio salvo que sea demandante, y también el admisorio del recurso en segunda instancia o del extraordinario, «y al Ministerio Público deberá anexársele copia de la demanda y sus anexos». BUZÓN OBLIGATORIO: las entidades públicas, las privadas con funciones públicas y el Ministerio Público deben tener un correo exclusivo para notificaciones judiciales, y «se entenderán como personales las notificaciones surtidas a través del buzón» (art. 197). A PARTICULARES SIN CANAL DIGITAL se notifica conforme al art. 291 del CGP, por remisión del art. 200. COMUNICACIÓN A LA ANDJE QUE NO ES NOTIFICACIÓN, y confundirla lleva a esperar un traslado que no existe: cuando hay intereses litigiosos de la Nación se remite copia electrónica del auto admisorio con la demanda y anexos al buzón de la Agencia Nacional de Defensa Jurídica del Estado, y «ESTA COMUNICACIÓN NO GENERA SU VINCULACIÓN COMO SUJETO PROCESAL».' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del proceso y de la providencia que se notifica', mandatory: true, basis: 'Ley 1437 de 2011, art. 205' },
+      { n: 2, name: 'Buzón de correo electrónico del destinatario, o canal digital informado en la demanda o inscrito en registro público', mandatory: true, basis: 'Ley 1437 de 2011, arts. 197 y 199' },
+      { n: 3, name: 'Copia de la demanda y sus anexos, cuando se notifica al Ministerio Público', mandatory: true, basis: 'Ley 1437 de 2011, art. 199' },
+      { n: 4, name: 'Constancia en el expediente del acuse de recibo o de la constatación del acceso', mandatory: true, basis: 'Ley 1437 de 2011, arts. 199 y 205' },
+      { n: 5, name: 'Cómputo expreso de los dos (2) días hábiles y de la fecha en que empiezan a correr los términos', mandatory: true, basis: 'Ley 1437 de 2011, arts. 199 y 205' },
+      { n: 6, name: 'Remisión de copia electrónica a la Agencia Nacional de Defensa Jurídica del Estado, cuando hay intereses litigiosos de la Nación', mandatory: false, basis: 'Ley 1437 de 2011, art. 199' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1437_2011_pr004.html'
+  },
+  {
+    id: 'administrativo/notificacion-por-estado-electronico-en-el-proceso-contencioso-administrativo',
+    exactName: 'Notificación por estado electrónico en el proceso contencioso administrativo',
+    branch: 'ADMINISTRATIVO',
+    role: 'SECRETARIA',
+    legalBasis: 'Ley 1437 de 2011, art. 201 (inciso modificado por el art. 50 de la Ley 2080 de 2021) y art. 201A (adicionado por el art. 51 de la misma ley); Ley 2213 de 2022, art. 9',
+    competentAuthority: 'El secretario del despacho, bajo cuya responsabilidad se elabora el estado electrónico',
+    term: { status: 'VERIFICADO', description: 'EL ESTADO SE INSERTA AL DÍA SIGUIENTE DEL AUTO Y DURA ESE DÍA, PERO EL RELOJ QUE DISPARA NO ES EL DEL CGP: EN LO CONTENCIOSO LA REPOSICIÓN Y LA SÚPLICA SON DE TRES DÍAS Y LOS RECURSOS ADMINISTRATIVOS DE DIEZ — trasladar la costumbre civil aquí pierde el recurso. «Los autos no sujetos al requisito de la notificación personal se notificarán por medio de anotación en estados ELECTRÓNICOS para consulta en línea BAJO LA RESPONSABILIDAD DEL SECRETARIO. La inserción en el estado se hará el día siguiente al de la fecha del auto […] El estado se insertará en los medios informáticos de la Rama Judicial y permanecerá en ellos EN CALIDAD DE MEDIO NOTIFICADOR DURANTE EL RESPECTIVO DÍA» (art. 201). EL ESTADO ES VIRTUAL Y YA NO SE FIRMA: por el art. 50 de la Ley 2080 y el art. 9 de la Ley 2213 de 2022 los estados se fijan virtualmente CON INSERCIÓN DE LA PROVIDENCIA, «no será necesario imprimirlos, ni firmarlos por el secretario, ni dejar constancia con firma al pie de la providencia», y se envía un mensaje de datos al canal digital de los sujetos procesales. TRES CLASES DE PROVIDENCIA NO SE INSERTAN, y hay que ir al expediente a buscarlas: las que decretan medidas cautelares, las que mencionan menores y las sujetas a reserva legal. LOS TRASLADOS CORREN IGUAL QUE EL ESTADO, Y ESTE ARTÍCULO ES NUEVO: «Los traslados deberán hacerse de la misma forma en que se fijan los estados» (art. 201A). Y se pueden ahorrar: si una parte acredita haber enviado el escrito por canal digital a los demás, SE PRESCINDE DEL TRASLADO POR SECRETARÍA y se entiende realizado a los DOS (2) DÍAS HÁBILES siguientes al envío, corriendo el término desde el día siguiente. CONSERVACIÓN: el archivo en línea de los estados se mantiene por un mínimo de DIEZ (10) AÑOS.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del proceso, nombres del demandante y del demandado, y cuaderno', mandatory: true, basis: 'Ley 1437 de 2011, art. 201' },
+      { n: 2, name: 'Fecha del auto y fecha del estado', mandatory: true, basis: 'Ley 1437 de 2011, art. 201' },
+      { n: 3, name: 'Inserción de la providencia en el estado virtual', mandatory: true, basis: 'Ley 2213 de 2022, art. 9' },
+      { n: 4, name: 'Verificación de que la providencia no es de las excluidas: cautelares, menores o reserva legal', mandatory: true, basis: 'Ley 2213 de 2022, art. 9' },
+      { n: 5, name: 'Envío del mensaje de datos al canal digital de los sujetos procesales', mandatory: true, basis: 'Ley 1437 de 2011, art. 201' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1437_2011_pr004.html'
+  },
+  {
+    id: 'administrativo/notificacion-de-la-sentencia-en-el-proceso-contencioso-administrativo',
+    exactName: 'Notificación de la sentencia en el proceso contencioso administrativo',
+    branch: 'ADMINISTRATIVO',
+    role: 'SECRETARIA',
+    legalBasis: 'Ley 1437 de 2011, art. 203; art. 247 num. 1 (modificado por el art. 67 de la Ley 2080 de 2021)',
+    competentAuthority: 'El secretario del despacho que profirió la sentencia',
+    term: { status: 'VERIFICADO', description: 'TRES (3) DÍAS PARA NOTIFICARLA, Y ESE RELOJ ES DEL DESPACHO, NO DE LA PARTE. Las sentencias «se notificarán DENTRO DE LOS TRES (3) DÍAS SIGUIENTES A SU FECHA» mediante el envío del texto al buzón electrónico. LA CONSTANCIA NO ES UN TRÁMITE: FIJA LA FECHA MISMA DE LA NOTIFICACIÓN, y de ella cuelga todo lo demás — «al expediente se anexará LA CONSTANCIA DE RECIBO GENERADA POR EL SISTEMA DE INFORMACIÓN, y SE ENTENDERÁ SURTIDA LA NOTIFICACIÓN EN TAL FECHA». DE AHÍ ARRANCA EL RELOJ DEL CLIENTE, que es de DIEZ (10) DÍAS: la apelación de sentencia se interpone y sustenta ante el juez de primera instancia dentro de los diez días siguientes a su notificación (art. 247 num. 1), incluidas las dictadas en audiencia. EL EDICTO SIGUE EN EL TEXTO VIGENTE, aunque suene anacrónico: «A quienes no se les deba o pueda notificar por vía electrónica, se les notificará POR MEDIO DE EDICTO en la forma prevista en el artículo 323 del Código de Procedimiento Civil.» Ambos incisos del artículo llevan la marca «Ver Notas del Editor» en la compilación oficial, y esas notas no se abrieron al verificar esta ficha: antes de apoyarse en el edicto conviene leerlas, porque probablemente tratan su vigencia frente a la Ley 2213 de 2022. EN FIRME LA SENTENCIA, el mismo artículo ordena comunicarla al obligado con copia íntegra para su ejecución y cumplimiento.' },
+    requiredSections: [
+      { n: 1, name: 'Envío del texto de la sentencia al buzón electrónico de cada sujeto procesal', mandatory: true, basis: 'Ley 1437 de 2011, art. 203' },
+      { n: 2, name: 'Constancia de recibo generada por el sistema de información, anexada al expediente', mandatory: true, basis: 'Ley 1437 de 2011, art. 203' },
+      { n: 3, name: 'Constancia de que se practicó dentro de los tres (3) días siguientes a la fecha de la sentencia', mandatory: true, basis: 'Ley 1437 de 2011, art. 203' },
+      { n: 4, name: 'Notificación por edicto a quien no pueda ser notificado por vía electrónica', mandatory: false, basis: 'Ley 1437 de 2011, art. 203' },
+      { n: 5, name: 'Comunicación al obligado con copia íntegra, una vez en firme', mandatory: true, basis: 'Ley 1437 de 2011, art. 203' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1437_2011_pr004.html'
+  },
+  {
+    id: 'administrativo/solicitud-de-constancia-de-firmeza-del-acto-administrativo',
+    exactName: 'Solicitud de constancia de firmeza del acto administrativo',
+    branch: 'ADMINISTRATIVO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1437 de 2011, art. 87; art. 89 (ejecutoriedad); art. 76 (oportunidad de los recursos); art. 164 num. 2 (caducidad)',
+    competentAuthority: 'La autoridad que expidió el acto. No es un despacho judicial: la firmeza se produce sola y la entidad se limita a certificarla',
+    term: { status: 'VERIFICADO', description: 'LA FIRMEZA NO TIENE PLAZO PROPIO — SE PRODUCE SOLA — Y ES EL DISPARADOR DEL RELOJ QUE MÁS DERECHOS EXTINGUE EN ESTA RAMA: LOS CUATRO (4) MESES DE CADUCIDAD DEL MEDIO DE CONTROL DE NULIDAD Y RESTABLECIMIENTO (art. 164 num. 2). Por eso importa fecharla bien: no es un trámite, es el punto cero de la cuenta regresiva del cliente. CINCO FORMAS DE QUEDAR EN FIRME (art. 87), y hay que identificar cuál aplica antes de contar: «1. Cuando contra ellos no proceda ningún recurso, desde el día siguiente al de su notificación, comunicación o publicación […] 2. Desde el día siguiente a la publicación, comunicación o notificación de la decisión sobre los recursos interpuestos. 3. Desde el día siguiente al del vencimiento del término para interponer los recursos, si estos no fueron interpuestos, o se hubiere renunciado expresamente a ellos. 4. Desde el día siguiente al de la notificación de la aceptación del desistimiento de los recursos. 5. Desde el día siguiente al de la protocolización a que alude el artículo 85 para el silencio administrativo positivo.» EL RELOJ QUE CORRE ANTES ES DEL CIUDADANO Y SU VENCIMIENTO PRODUCE LA FIRMEZA: los recursos de reposición y apelación van dentro de los DIEZ (10) DÍAS siguientes a la notificación personal, a la notificación por aviso o al vencimiento de la publicación (art. 76). Contra actos presuntos se puede recurrir en cualquier tiempo, salvo que ya se haya acudido al juez. Y la apelación es obligatoria para acceder a la jurisdicción; la reposición y la queja no. LO QUE LA FIRMEZA HABILITA DEL OTRO LADO, y conviene advertírselo al cliente: «Los actos en firme serán suficientes para que las autoridades, por sí mismas, puedan ejecutarlos DE INMEDIATO, sin mediación de otra autoridad» (art. 89).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del acto administrativo y de la fecha de su notificación, comunicación o publicación', mandatory: true, basis: 'Ley 1437 de 2011, art. 87' },
+      { n: 2, name: 'Determinación de cuál de los cinco supuestos del art. 87 produjo la firmeza', mandatory: true, basis: 'Ley 1437 de 2011, art. 87' },
+      { n: 3, name: 'Constancia de los recursos interpuestos y de su resolución, o de que no se interpusieron', mandatory: true, basis: 'Ley 1437 de 2011, arts. 76 y 87' },
+      { n: 4, name: 'Cómputo de los cuatro (4) meses de caducidad que corren desde la firmeza', mandatory: true, basis: 'Ley 1437 de 2011, art. 164 num. 2' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1437_2011_pr002.html'
+  },
+  {
+    id: 'administrativo/remision-del-expediente-al-superior-en-el-proceso-contencioso-administrativo',
+    exactName: 'Remisión del expediente al superior en el proceso contencioso administrativo',
+    branch: 'ADMINISTRATIVO',
+    role: 'SECRETARIA',
+    legalBasis: 'Ley 1437 de 2011, art. 244 num. 3 y 4 y art. 247 num. 3 (modificados por los arts. 64 y 67 de la Ley 2080 de 2021); art. 292 (nulidad electoral); art. 293',
+    competentAuthority: 'El secretario del despacho de primera instancia, que remite al tribunal o al Consejo de Estado',
+    term: { status: 'VERIFICADO', description: 'EN EL PROCESO ORDINARIO NO HAY TÉRMINO LEGAL PARA REMITIR, Y CONVIENE DECIRLO ASÍ EN VEZ DE INVENTARLO: concedido el recurso «SE REMITIRÁ EL EXPEDIENTE AL SUPERIOR PARA QUE LO DECIDA DE PLANO» (art. 244 num. 4), sin plazo. En apelación de sentencia, el auto que la concede «dispondrá remitir el expediente al superior» (art. 247 num. 3). EN LO ELECTORAL SÍ HAY PLAZO Y ADEMÁS RESPONSABILIDAD PERSONAL DEL SECRETARIO: «Sustentado el recurso, se enviará al superior A MÁS TARDAR AL DÍA SIGUIENTE», y el parágrafo lo remacha — «LOS SECRETARIOS SERÁN RESPONSABLES DE LAS DEMORAS QUE OCURRAN EN EL ENVÍO DE LOS EXPEDIENTES» (art. 292). Recibido, el reparto se hace «a más tardar dentro del segundo día» y el expediente permanece en secretaría TRES (3) DÍAS (art. 293). LO QUE SÍ ES RELOJ DEL CLIENTE Y OCURRE ANTES, porque sin ello no hay nada que remitir: la apelación de AUTOS se interpone y sustenta en TRES (3) DÍAS desde la notificación por estado —dos en electoral— o verbalmente en audiencia; de la sustentación se corre traslado por secretaría a los demás por igual término y SIN NECESIDAD DE AUTO, y surtido, el secretario pasa el expediente a despacho (art. 244 num. 3). La apelación de SENTENCIAS se interpone y sustenta ante el juez de primera instancia dentro de los DIEZ (10) DÍAS siguientes a su notificación. EXCEPCIÓN AL TRASLADO que conviene tener presente: no procede cuando se apela el auto que rechaza la demanda o el que niega el mandamiento ejecutivo. NO EXISTE EL GRADO JURISDICCIONAL DE CONSULTA EN LO CONTENCIOSO ADMINISTRATIVO: se verificó por barrido de todo el CPACA y las apariciones de la palabra corresponden a la Sala de Consulta y Servicio Civil, a la consulta previa administrativa y a la consulta de expedientes, no a una segunda instancia automática. Esperarla es esperar algo que no llega.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del recurso concedido y del efecto en que se concedió', mandatory: true, basis: 'Ley 1437 de 2011, art. 243 par. 1' },
+      { n: 2, name: 'Constancia de que se surtió el traslado de la sustentación a los demás sujetos procesales', mandatory: true, basis: 'Ley 1437 de 2011, art. 244 num. 3' },
+      { n: 3, name: 'Expediente o sus copias, según el efecto del recurso', mandatory: true, basis: 'Ley 1437 de 2011, arts. 244 y 247' },
+      { n: 4, name: 'Constancia de envío dentro del día siguiente, en los procesos de nulidad electoral', mandatory: false, basis: 'Ley 1437 de 2011, art. 292' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1437_2011_pr005.html'
+  },
+  {
+    id: 'administrativo/descargos-en-el-procedimiento-administrativo-sancionatorio',
+    exactName: 'Descargos en el procedimiento administrativo sancionatorio',
+    branch: 'ADMINISTRATIVO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1437 de 2011, art. 47, con su parágrafo 2 adicionado por el art. 3 de la Ley 2080 de 2021',
+    competentAuthority: 'La autoridad administrativa que formuló los cargos. No es un juez: es la misma entidad que investiga y que sancionará',
+    term: { status: 'VERIFICADO', description: 'QUINCE (15) DÍAS, RELOJ DEL INVESTIGADO Y PRECLUSIVO — SALVO EN LO FISCAL, DONDE SON CINCO. «Los investigados podrán, DENTRO DE LOS QUINCE (15) DÍAS SIGUIENTES A LA NOTIFICACIÓN DE LA FORMULACIÓN DE CARGOS, PRESENTAR LOS DESCARGOS y solicitar o aportar las pruebas que pretendan hacer valer» (art. 47). Y el parágrafo 2, adicionado por la Ley 2080 de 2021: «En los procedimientos administrativos sancionatorios FISCALES el término para presentar descargos y solicitar o aportar pruebas SERÁ DE CINCO (5) DÍAS.» POR QUÉ ESTA FICHA CUBRE MÁS DE LO QUE PARECE: el art. 47 es la norma residual de TODO el sancionatorio administrativo colombiano — «Los procedimientos administrativos de carácter sancionatorio NO REGULADOS POR LEYES ESPECIALES o por el Código Disciplinario Único se sujetarán a las disposiciones de esta Parte Primera del Código. Los preceptos de este Código se aplicarán TAMBIÉN EN LO NO PREVISTO por dichas leyes.» Antes de usarla hay que verificar si existe ley especial —ambiental, aduanera, tributaria, de tránsito, de contratación—, porque esas tienen sus propios términos y ya están catalogadas aparte. LO QUE SE PIERDE AL DEJARLO VENCER es la única oportunidad de pedir pruebas: la entidad rechaza motivadamente «las inconducentes, las impertinentes y las superfluas» y no atiende «las practicadas ilegalmente», pero solo entra a esa discusión quien pidió a tiempo. EL RELOJ QUE JUEGA A FAVOR DEL CLIENTE Y HAY QUE ALEGAR AQUÍ: la facultad sancionatoria caduca a los tres (3) años (art. 52) — ver la ficha de caducidad.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del acto de formulación de cargos y de la fecha de su notificación', mandatory: true, basis: 'Ley 1437 de 2011, art. 47' },
+      { n: 2, name: 'Verificación de si existe ley especial que fije un término distinto al de los quince (15) días', mandatory: true, basis: 'Ley 1437 de 2011, art. 47' },
+      { n: 3, name: 'Pronunciamiento sobre cada cargo formulado y sobre las normas que se dicen infringidas', mandatory: true, basis: 'Ley 1437 de 2011, art. 47' },
+      { n: 4, name: 'Pruebas que se aportan y las que se solicitan, con su conducencia y pertinencia', mandatory: true, basis: 'Ley 1437 de 2011, art. 47' },
+      { n: 5, name: 'Alegación de la caducidad de la facultad sancionatoria, cuando hayan pasado tres (3) años del hecho', mandatory: false, basis: 'Ley 1437 de 2011, art. 52' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1437_2011_pr001.html'
+  },
+  {
+    id: 'administrativo/alegatos-de-conclusion-en-el-procedimiento-administrativo-sancionatorio',
+    exactName: 'Alegatos de conclusión en el procedimiento administrativo sancionatorio',
+    branch: 'ADMINISTRATIVO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1437 de 2011, art. 48, con su parágrafo adicionado por el art. 5 de la Ley 2080 de 2021',
+    competentAuthority: 'La autoridad administrativa que adelanta el procedimiento sancionatorio',
+    term: { status: 'VERIFICADO', description: 'DIEZ (10) DÍAS DE TRASLADO, RELOJ DEL INVESTIGADO, Y CINCO EN LO FISCAL. «VENCIDO EL PERÍODO PROBATORIO SE DARÁ TRASLADO AL INVESTIGADO POR DIEZ (10) DÍAS PARA QUE PRESENTE LOS ALEGATOS RESPECTIVOS» (art. 48). El parágrafo adicionado por la Ley 2080 de 2021 lo reduce en lo fiscal: «El traslado al investigado será por cinco (5) días.» EL PLAZO PROBATORIO ANTERIOR ES DE LA ENTIDAD, NO DEL CLIENTE, y no hay que confundirlos: «Cuando deban practicarse pruebas se señalará un término NO MAYOR A TREINTA (30) DÍAS. Cuando sean tres (3) o más investigados o se deban practicar en el exterior el término probatorio podrá ser HASTA DE SESENTA (60) DÍAS» — y en lo fiscal, diez días, o treinta con tres o más investigados o pruebas en el exterior. ES LA ÚLTIMA OPORTUNIDAD DE HABLAR ANTES DE LA SANCIÓN, y de ahí su valor: después del traslado solo vienen el acto sancionatorio y los recursos, que se discuten sobre lo ya dicho. Aquí se pesa la prueba practicada, se ataca la que se practicó mal y se alega la caducidad si el trienio del art. 52 corrió durante el trámite.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del auto que corrió traslado y de la fecha en que venció el período probatorio', mandatory: true, basis: 'Ley 1437 de 2011, art. 48' },
+      { n: 2, name: 'Valoración de cada prueba practicada y señalamiento de las practicadas irregularmente', mandatory: true, basis: 'Ley 1437 de 2011, art. 48' },
+      { n: 3, name: 'Refutación de cada cargo con el respaldo probatorio del expediente', mandatory: true, basis: 'Ley 1437 de 2011, art. 47' },
+      { n: 4, name: 'Alegación de la caducidad de la facultad sancionatoria si se cumplieron los tres (3) años', mandatory: false, basis: 'Ley 1437 de 2011, art. 52' },
+      { n: 5, name: 'Constancia de presentación dentro de los diez (10) días, o de los cinco (5) en lo fiscal', mandatory: true, basis: 'Ley 1437 de 2011, art. 48' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1437_2011_pr001.html'
+  },
+  {
+    id: 'administrativo/alegacion-de-la-caducidad-de-la-facultad-sancionatoria',
+    exactName: 'Alegación de la caducidad de la facultad sancionatoria',
+    branch: 'ADMINISTRATIVO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1437 de 2011, art. 52',
+    competentAuthority: 'La autoridad administrativa que adelanta el procedimiento, y la jurisdicción de lo contencioso administrativo al controlar el acto',
+    term: { status: 'VERIFICADO', description: 'TRES (3) AÑOS, Y ESTE RELOJ ES DE LA AUTORIDAD Y CORRE A FAVOR DEL CLIENTE — ES LA EXCEPCIÓN QUE MÁS SANCIONES TUMBA. «Salvo lo dispuesto en leyes especiales, la facultad que tienen las autoridades para imponer sanciones CADUCA A LOS TRES (3) AÑOS de ocurrido el hecho, la conducta u omisión que pudiere ocasionarlas, TÉRMINO DENTRO DEL CUAL EL ACTO ADMINISTRATIVO QUE IMPONE LA SANCIÓN DEBE HABER SIDO EXPEDIDO Y NOTIFICADO» (art. 52). NO BASTA CON QUE LO FIRMEN A TIEMPO: dentro de los tres años tiene que estar expedido Y NOTIFICADO, y esa segunda mitad es la que suelen incumplir. SEGUNDO RELOJ, DISTINTO Y CON PREMIO AUTOMÁTICO PARA EL RECURRENTE: «Dicho acto sancionatorio es DIFERENTE de los actos que resuelven los recursos, los cuales deberán ser decididos, SO PENA DE PÉRDIDA DE COMPETENCIA, en un término de UN (1) AÑO contado a partir de su debida y oportuna interposición. SI LOS RECURSOS NO SE DECIDEN EN EL TÉRMINO FIJADO EN ESTA DISPOSICIÓN, SE ENTENDERÁN FALLADOS A FAVOR DEL RECURRENTE, sin perjuicio de la responsabilidad patrimonial y disciplinaria que tal abstención genere para el funcionario encargado de resolver.» Es un silencio administrativo positivo específico y poco invocado: al año de interpuesto el recurso sin decisión, el cliente ganó. LA CONDICIÓN QUE HAY QUE VERIFICAR: la interposición debe haber sido «debida y oportuna» — un recurso mal presentado no hace correr el año. Y todo cede ante ley especial, así que primero se comprueba si el régimen sectorial tiene su propio plazo.' },
+    requiredSections: [
+      { n: 1, name: 'Fecha exacta del hecho, conducta u omisión, de la que corren los tres (3) años', mandatory: true, basis: 'Ley 1437 de 2011, art. 52' },
+      { n: 2, name: 'Fecha de expedición Y de notificación del acto sancionatorio, que deben caber ambas en el trienio', mandatory: true, basis: 'Ley 1437 de 2011, art. 52' },
+      { n: 3, name: 'Verificación de que no existe ley especial con término propio', mandatory: true, basis: 'Ley 1437 de 2011, art. 52' },
+      { n: 4, name: 'Cómputo del año para resolver los recursos, con la fecha de su interposición debida y oportuna', mandatory: false, basis: 'Ley 1437 de 2011, art. 52' },
+      { n: 5, name: 'Petición de que el recurso se entienda fallado a favor del recurrente, si pasó el año', mandatory: false, basis: 'Ley 1437 de 2011, art. 52' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1437_2011_pr001.html'
   }
   ]
 };

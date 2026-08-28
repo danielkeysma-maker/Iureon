@@ -478,3 +478,334 @@ no está comprobado es la producción**: sin una petición autenticada no se pue
 distinguir si la llave quedó en el proyecto `iureon` (backend) o en `iureon-app`
 (frontend), que nunca la lee. El 401 de la raíz no sirve como prueba: el
 middleware de sesión responde igual para una ruta real y una inexistente.
+
+---
+
+## 9. LOS CUATRO VERIFICADORES NORMATIVOS (28 ago 2026) — material listo para catalogar
+
+Cuatro agentes leyeron sobre texto oficial del Senado, en crudo, y devolvieron
+articulado verificado. **Esto no es un censo: es materia prima ya comprobada.**
+Todo lo de abajo está leído verbatim salvo donde diga NO VERIFICADO.
+
+### 9.1 CORRECCIONES QUE TOCAN FICHAS EXISTENTES — hacer primero
+
+1. **NOTARIAL no debe tener rol SECRETARIA, y hay artículo para sostenerlo.** Se
+   buscó la raíz «secretari» en todo el Decreto 960 de 1970 y en el Título 6 de
+   la Parte 2 del Decreto 1069 de 2015: **ningún resultado es una secretaría
+   notarial** — son la Secretaría de la Superintendencia, el Secretario Técnico
+   del Consejo Superior de la Carrera Notarial y secretarías de hacienda. El
+   emisor de todo acto es **el notario, con firma autógrafa**: D960 art. 3 (sus
+   catorce funciones, todas suyas), art. 6 («Corresponde al Notario la redacción
+   de los instrumentos»), art. 8 (autonomía), art. 9 (responde de la regularidad
+   formal), art. 85 («Terminará con la firma autógrafa del Notario»), art. 86 (la
+   corrección «volverá a firmarse por el Notario, sin lo cual ésta no tendrá
+   ningún valor») y D1069 art. 2.2.6.1.2.5.1 («Las diligencias de autenticación
+   serán suscritas por el notario con firma autógrafa en último lugar»). Los
+   dependientes existen como personal (D960 art. 14 num. 14 y art. 217), no como
+   órgano con actos propios. **El catálogo ya lo resolvió bien: sus 30 fichas
+   notariales están bajo DESPACHO. No crear SECRETARIA aquí.**
+2. **POLICIVO tampoco.** Misma búsqueda en las cinco particiones de la Ley 1801:
+   ningún resultado es secretaría del inspector. La razón es estructural — el
+   art. 223 num. 3 lit. d) cierra con «La decisión quedará notificada en
+   estrados» y los recursos «se solicitarán, concederán y sustentarán dentro de
+   la misma audiencia». Sin notificación posterior no hay secretaría que la
+   practique.
+3. **NO CITAR EL DECRETO 2148 DE 1983.** Está derogado por el art. 3.1.1 del
+   Decreto 1069 de 2015 («Derogatoria Integral») y **compilado** en el Libro 2,
+   Parte 2, Título 6. Y antes de citar un artículo compilado hay que verificar si
+   el **Decreto 541 de 2023** lo suprimió: al menos 2.2.6.1.1.1, 2.2.6.1.1.6 y
+   2.2.6.1.2.1.8 lo fueron. El **Decreto 960 de 1970 sí sigue vigente**: es
+   decreto-ley, no norma reglamentaria, y queda fuera de esa derogatoria.
+4. **Tutela — el plazo de dos días NO es de remisión a la Corte.** Son tres
+   relojes distintos y confundirlos es el error típico: **1 día** para enviar a
+   la Corte el fallo **no impugnado** (art. 31 inc. 2); **2 días** para remitir
+   **al superior** cuando sí se impugnó (art. 32 inc. 1); **10 días desde la
+   ejecutoria de segunda instancia** para remitir a la Corte (art. 32 inc. 2). El
+   art. 33 **no tiene plazo de remisión**: tiene los de la Corte (30 días de
+   selección, 3 meses de decisión).
+5. **Tutela — reparto:** no citar el Decreto 306 de 1992 art. 8, derogado por el
+   art. 6 del Decreto 1382 de 2000. Va el **D1069 art. 2.2.3.1.2.1 y ss.**, con
+   las modificaciones de los Decretos 1983 de 2017, 333 de 2021 y 799 de 2025.
+6. **Arbitraje — artículos mal atribuidos.** Los arts. 7, 17, 22, 23 y 33 de la
+   Ley 1563 **no** regulan al secretario. Los que sí: 8 inc. 2, 9, 10 inc. 3, 15,
+   16, 19, 20 inc. 4, 26/27, 28 y 40. Y el art. 47 no regula una «entrega del
+   expediente por el secretario»: **el laudo ordena el archivo en el centro**, y
+   las copias y desgloses posteriores son actos **del centro**, no del secretario,
+   que ya cesó (art. 35).
+7. **PENAL — tres fichas de DESPACHO son actos de la FISCALÍA**, no del juez:
+   «Escrito de acusación», «Formulación de imputación» y «Solicitud de medida de
+   aseguramiento». El fiscal es parte. Un defensor que hoy pida «Formulación de
+   imputación» recibe el escrito de su contraparte. O se crea rol FISCALIA o van
+   a LITIGANTE. **Y el «archivo de las diligencias» del art. 79 tampoco es auto
+   del despacho: lo dispone la Fiscalía.**
+8. **PENAL — no existe notificación por estado, ni edicto de sentencia, ni
+   artículo de ejecutoria en la Ley 906.** Barrido completo de los 13 bloques.
+   Esos tres son **Ley 600 de 2000** (arts. 179, 180 y 187). La ejecutoria en
+   acusatorio se integra por el **art. 25** (remisión al CPC, hoy CGP). Si el
+   catálogo tiene «estado» o «ejecutoria a los 3 días» en penal acusatorio, está
+   mal. **No inventar un artículo de ejecutoria en la Ley 906.**
+9. **PENAL — no existe «auto que decreta pruebas de refutación».** El art. 362
+   solo fija el orden de presentación. El auto de pruebas es el **357**; la
+   exclusión, el **359**; y el **361 prohíbe la prueba de oficio**.
+10. **PENAL — art. 317 vigente = art. 6 de la Ley 2477 de 2025** (60/120/150
+    días), y el art. 332 num. 1 y su parágrafo = art. 10 de la misma ley.
+    Verificar qué texto está cargado.
+11. **Contradicción normativa real que hay que declarar, no resolver:** el art.
+    318 dice que contra la decisión sobre revocatoria o sustitución de la medida
+    de aseguramiento «no procede recurso alguno», y el art. 177 la lista como
+    apelable en efecto devolutivo.
+12. **INSOLVENCIA — el régimen es CGP, no CPACA** (Ley 1116 art. 124 + CGP art.
+    24 par. 3: «Las providencias que profieran las autoridades administrativas en
+    ejercicio de funciones jurisdiccionales NO son impugnables ante la
+    jurisdicción contencioso administrativa»). La misma Superintendencia opera
+    bajo dos regímenes según el sombrero: administrativo o jurisdiccional.
+
+### 9.2 CGP — actos de secretaría, verificados uno a uno
+
+**Hallazgo negativo que vale una ficha:** el CGP **no tiene artículo de
+«funciones del secretario»** y la expresión **«informe secretarial» no aparece ni
+una vez** en sus 627 artículos. El art. 42 num. 11 la desincentiva: deber del
+juez de «**abstenerse de solicitarle por auto informe** sobre hechos que consten
+en el expediente». Esa figura vive en la Ley 270 de 1996, NO VERIFICADA.
+
+| Art. | Acto | Plazo y reloj |
+|---|---|---|
+| 89 | Recibe la demanda y deja **constancia de fecha** | secretaría |
+| 109 | Constancia de fecha y hora de memoriales; **con término común debe esperar a que venza para todas las partes** | secretaría |
+| 110 | **Traslado en secretaría: 3 días, «no requerirá auto ni constancia»**; la lista se mantiene **1 día** y corre desde el siguiente | **parte** |
+| 111 | «Los oficios y despachos serán firmados **únicamente por el secretario**» | secretaría |
+| 114 num. 1 | Copias **a petición verbal, sin auto** | secretaría |
+| 114 num. 4 | Pago de la reproducción: **5 días so pena de declarar desierto el recurso** | **parte — extingue el derecho** |
+| 115 | **Certificaciones sin auto**: existencia, estado y **ejecutoria** | secretaría |
+| 116 | Desgloses por orden del juez; las **constancias** las pone el secretario | mixto |
+| 118 inc. 5 | Mientras corre término no ingresa el expediente al despacho, salvo urgencia **previa consulta verbal con constancia** | secretaría |
+| 122 | Anotación de fecha y hora del mensaje de datos | secretaría |
+| 107 num. 6 | **El acta la firma el JUEZ**; el **duplicado de las grabaciones queda bajo custodia del secretario** | — |
+| 120 | **Lista visible** de procesos al despacho para sentencia | secretaría |
+| 120 | Fuera de audiencia: **autos 10 días, sentencias 40 días** | **juez** |
+| 121 | **1 año** primera instancia, **6 meses** segunda; vencido, **pierde competencia automáticamente** | **juez, con sanción** |
+| 324 | **«El secretario deberá remitir el expediente al superior dentro del término máximo de cinco (5) días» — «El incumplimiento de este deber se considerará falta gravísima»** | **secretaría, con sanción** |
+| 323 inc. final | Si no hubo apelación, «el secretario comunicará **inmediatamente** este hecho al superior **sin necesidad de auto**» | secretaría |
+| 108 | Emplazamiento: surtido **15 días después** de publicada la información en el Registro Nacional de Personas Emplazadas | **emplazado** |
+| 146 | Impedimentos y recusaciones **de los secretarios**: mismas causales salvo nums. 2 y 12 del art. 141; **no suspende el proceso** | — |
+
+**Ejecutoria del art. 302 dispara, comprobado:** los **30 días** del art. 306 para
+pedir la ejecución con notificación por estado; los **6 meses** del art. 317 lit.
+f) para volver a demandar tras desistimiento tácito, **con ineficacia de la
+interrupción de la prescripción**; los **30 días** del art. 384 num. 7 antes de
+que se levanten las cautelares; los **20 días** del art. 444 num. 1 para el
+avalúo. Y el **estado** dispara los 3 días de reposición y apelación.
+
+**Ley 2213 de 2022 — art. 11:** «Los **secretarios** … remitirán las
+comunicaciones … **mediante mensaje de datos** … las cuales **se presumen
+auténticas** siempre que provengan del correo electrónico oficial».
+
+**NO VERIFICADO y declarado:** «Banco Agrario» tiene **cero ocurrencias** en el
+CGP; la custodia y entrega material de títulos judiciales no está en este código
+(está en la Ley 270 y acuerdos del CSJ). El **préstamo de expediente no existe**:
+el art. 124 **prohíbe el retiro** mientras el proceso está en trámite.
+
+### 9.3 CPACA — lo que falta y su verbatim
+
+Ya se catalogaron cinco fichas (notificación electrónica, estado electrónico,
+notificación de sentencia, constancia de firmeza y remisión al superior). Queda:
+
+- **Art. 201A, artículo NUEVO** (art. 51 de la Ley 2080): «Los traslados deberán
+  hacerse de la misma forma en que se fijan los estados», y se **prescinde del
+  traslado por secretaría** si la parte acreditó el envío digital, entendiéndose
+  realizado a los **2 días hábiles**.
+- **Traslados con su plazo y dueño:** demanda **30 días** (art. 172); excepciones
+  **3 días** (art. 175 par. 2); medida cautelar **5 días independientes del de
+  contestación** (art. 233) — la trampa clásica; sustentación de apelación de
+  autos **3 días** (2 en electoral) con traslado **sin auto** (art. 244 num. 3);
+  súplica **3 días** (art. 246 lit. c); alegatos de primera instancia **10 días**
+  (art. 181); alegatos de segunda **10 días solo si hubo pruebas** (art. 247 num.
+  5); traslado al Procurador **10 días improrrogables sin auto** (art. 184 num. 6).
+- **Autos que faltan, con artículo:** inadmisorio (170, **10 días de corrección,
+  susceptible de reposición**); rechazo (169, apelable, sin traslado); decreta
+  pruebas (180 num. 10 y 212-213, **audiencia de pruebas dentro de 40 días**; el
+  que niega pruebas es apelable por 243 num. 7, el que las decreta de oficio no);
+  excepciones previas (175 par. 2 y 180 num. 6, por remisión a CGP 100-102); fija
+  audiencia inicial (180 num. 1, **dentro del mes**, aplazamiento a 10 días y
+  **en ningún caso otro aplazamiento**, «**se notificará por estado y NO será
+  susceptible de recursos**»); medida cautelar de urgencia (234, **sin previa
+  notificación**); medidas cautelares ordinarias (233, **10 días para decidir**,
+  y **la medida solo se hace efectiva desde la ejecutoria del auto que acepta la
+  caución**); suspensión provisional (230 num. 3, 231, **232: no requiere
+  caución**); súplica (246); nulidad (207-210, **control de legalidad que
+  precluye la alegación en etapas siguientes**).
+- **Art. 243A** — catálogo de **17 providencias sin recursos ordinarios**. Pieza
+  clave para no ofrecerle al cliente un recurso improcedente.
+- **NO EXISTE el grado jurisdiccional de consulta en lo contencioso
+  administrativo.** Barrido completo: las apariciones de «consulta» son la Sala
+  de Consulta y Servicio Civil, la consulta previa administrativa, la consulta de
+  expedientes, y el **art. 47A** (consulta de la suspensión provisional del
+  servidor en el sancionatorio fiscal: **3 días** del ciudadano para alegar, **10
+  días** del superior para decidir, y **en sede de consulta no puede agravarse**).
+- **Procedimiento administrativo, arts. 66-73:** citación **5 días** desde la
+  expedición (68); aviso si no se logra la personal a los **5 días**, surtido «al
+  finalizar el día siguiente al de la entrega» (69); actos de registro
+  notificados **el día de la anotación** (70); art. 72 — sin los requisitos «**no
+  se tiene por hecha la notificación ni produce efectos legales la decisión**»,
+  salvo conducta concluyente; silencio negativo **3 meses** (83).
+- **El CPACA no nombra funcionario para notificar en sede administrativa.** Habla
+  de «las autoridades» o «la autoridad que expidió el acto». La atribución a la
+  Secretaría General es reparto interno por manual de funciones, **no norma del
+  CPACA** — modelarlo como cargo delegado, no como rol legal.
+
+### 9.4 LABORAL — Ley 2452 de 2025, y el problema de las dos numeraciones
+
+**El catálogo necesita las dos numeraciones conviviendo, no una sustitución**:
+el art. 330 mantiene el CPTSS para los procesos iniciados antes del 2 de abril de
+2026.
+
+- **Art. 208 — el estado ya NO lo firma el secretario:** «Las notificaciones por
+  estado se fijarán **virtualmente**, con inserción de la providencia, y **no será
+  necesario imprimirlos, ni firmarlos por el secretario, ni dejar constancia con
+  firma al pie**». No se insertan cautelares, menores ni reserva legal.
+  **Cualquier plantilla de «estado firmado por el secretario» es de la ley
+  derogada.**
+- **Art. 82 — el traslado fuera de audiencia es de 3 días, corre por estado y
+  «no requerirá auto ni constancia en el expediente».** Si el catálogo tiene
+  «auto que corre traslado» como actuación laboral genérica, sobra.
+- **Art. 84 — aquí SÍ hay norma expresa de constancia de ejecutoria**, a
+  diferencia del penal: el secretario la expide «**sin necesidad de auto que las
+  ordene**», y el art. 83.2 la exige para usar la copia como título ejecutivo.
+- **Art. 214 — ejecutoria:** inmediata en audiencia; **3 días** fuera de
+  audiencia; y **suspendida mientras no se resuelva la aclaración o adición**.
+- **Art. 230 — remisión al superior: «El secretario deberá remitir la actuación
+  al superior dentro del término máximo de cinco (5) días contados a partir de la
+  ejecutoria del auto que concede el recurso.»** No existe equivalente en la Ley
+  906.
+- **Art. 231 — la consulta laboral ya no es solo a favor del trabajador:** son
+  **siete supuestos**, incluidas las sentencias meramente declarativas, las que
+  niegan honorarios y los fallos inhibitorios. Y su parágrafo: «**Mientras no se
+  surta el grado jurisdiccional de consulta, la providencia NO QUEDARÁ
+  EJECUTORIADA.**» Omitirla es **causal de nulidad** (art. 92.8).
+- **VACÍO VERIFICADO: la Ley 2452 no fija plazo de remisión al superior en el
+  grado de consulta.** Los 5 días del art. 230 cuelgan de «la ejecutoria del auto
+  que **concede el recurso**», y en consulta no hay recurso ni auto que lo
+  conceda. **Registrarlo como vacío, no rellenarlo por analogía.**
+- **Art. 258 A — inasistencia a la audiencia inicial:** se presumen ciertos los
+  hechos susceptibles de confesión de la contraparte; si no admiten confesión,
+  **indicio grave**; apoderado ausente sin justificación, **multa de 1 SMLMV**.
+
+### 9.5 TUTELA, POPULAR Y CUMPLIMIENTO — relojes verificados
+
+- **D2591 art. 30:** el fallo se notifica «**a más tardar al día siguiente** de
+  haber sido proferido» — reloj del despacho. **Art. 31: 3 días para impugnar,
+  reloj del ciudadano y preclusivo**, y el art. 15 recuerda que «los plazos son
+  perentorios o improrrogables». La **constancia de notificación del fallo es el
+  disparador más importante de la rama**: sin ella el término no es computable.
+- **Art. 27 — cumplimiento en cascada:** **48 horas** sin cumplir y el juez se
+  dirige al superior; «**pasadas otras cuarenta y ocho horas**» abre proceso
+  contra el superior y adopta las medidas directamente. **Art. 29 num. 5:** el
+  plazo de cumplimiento que fije el fallo «**en ningún caso podrá exceder de 48
+  horas**» — reloj del accionado.
+- **Art. 52 — desacato:** arresto hasta **6 meses** y multa hasta **20 SMLMV**;
+  consulta al superior que decide en **3 días, en efecto DEVOLUTIVO** (en acción
+  de cumplimiento, art. 29 de la Ley 393, la consulta es **subsidiaria de la
+  apelación y en efecto SUSPENSIVO** — no confundirlas).
+- **Tutelas masivas (D1069 art. 2.2.3.1.3.2):** recibido el informe de
+  contestación que revela tutelas anteriores, el juez remite **dentro de las 24
+  horas**.
+- **Ley 472 art. 21 — el aviso a la comunidad es FACULTATIVO y sin plazo:** «a
+  los miembros de la comunidad **se les podrá informar** a través de un medio
+  masivo … o de cualquier mecanismo eficaz». No es edicto obligatorio.
+- **Ley 472 art. 37:** la apelación se resuelve «dentro de los **20 días**
+  contados a partir de la radicación del expediente en la **SECRETARÍA** del
+  Tribunal» — la ley sí nombra a la secretaría, y la radicación es la constancia
+  que dispara el plazo del superior.
+- **Ley 472 art. 80:** todo juez «**deberá enviar una copia de la demanda, del
+  auto admisorio y del fallo definitivo**» al Registro Público de la Defensoría.
+- **Acción de grupo:** **20 días desde la publicación de la sentencia** para
+  acogerse (art. 55) y **5 días desde el vencimiento del traslado** para
+  excluirse (art. 56) — vencido, queda vinculado. Publicación del extracto
+  «**dentro del mes siguiente a su ejecutoria**» (art. 65 num. 4).
+- **Ley 393 art. 27:** remisión al superior «**a más tardar al día siguiente**»
+  — 1 día, contra los 2 de tutela. El superior falla en **10 días** (en tutela,
+  20).
+
+### 9.6 ARBITRAJE — el secretario del tribunal
+
+- **Art. 9:** debe ser **abogado**, sin parentesco ni relación con los árbitros, y
+  **escogido de la lista del centro**. **Art. 8 inc. 2:** no puede estar en más de
+  **cinco** tribunales con entidad pública.
+- **Art. 20 inc. 4:** acepta por escrito **dentro de 5 días** — reloj suyo, y el
+  silencio equivale a declinación (art. 14 num. 1).
+- **Art. 15:** informa coincidencias de los **dos últimos años**; las partes
+  tienen **5 días** para dudas; **si se establece que no reveló, «por ese solo
+  hecho quedará impedido»**; deber de revelación continuo «sin demora».
+- **Art. 10 inc. 3 — acto propio y obligatorio:** «**Al comenzar cada audiencia
+  el secretario informará el término transcurrido del proceso.**»
+- **Art. 40 — dos actos de secretaría:** «**Por secretaría del tribunal se
+  correrá traslado a la otra parte por quince (15) días sin necesidad de auto que
+  lo ordene**», y vencido, «**dentro de los cinco (5) días siguientes, el
+  secretario del tribunal enviará los escritos … a la autoridad judicial
+  competente**».
+- **Art. 41 — carga previa que extingue causales:** las causales 1, 2 y 3 de
+  anulación **solo pueden invocarse si se hicieron valer por reposición contra el
+  auto de asunción de competencia**; y la 6 no puede alegarla quien no la hizo
+  valer oportunamente.
+- **Art. 44:** anulado por causales 3 a 7, hay **3 meses desde la ejecutoria**
+  para reconvocar, so pena de que **opere la caducidad**.
+
+### 9.7 INSOLVENCIA — la categoría legal que sustituye a la secretaría
+
+**Ley 1116 art. 8 inc. 2**, y es la norma más útil de la rama: los actos de
+trámite que no deben controvertirse — «expedición de copias, archivo y desglose
+de documentos, comunicación al promotor o liquidador de su designación» — «**no
+requerirán la expedición de providencia judicial** … y para su perfeccionamiento
+**bastará con el hecho de dejar constancia en el expediente de lo actuado, lo
+cual tampoco requerirá notificación**».
+
+- **Art. 19 num. 3 y 4:** el promotor presenta el proyecto en **20 días a 2
+  meses** so pena de remoción; traslado de **10 días** a los acreedores para
+  objetar, disparado por el vencimiento anterior.
+- **Art. 26 — sanción que no extingue pero posterga:** el acreedor que no objetó
+  «**solo podrá hacer[las] efectivas persiguiendo los bienes que queden una vez
+  cumplido el acuerdo**». Salvedad: las acreencias omitidas **a sabiendas** dan
+  acción solidaria **en cualquier momento** contra administradores, contadores y
+  revisores.
+- **Art. 29 — cuatro relojes encadenados:** traslado **5 días** para objetar;
+  «de manera inmediata» traslado de **3 días** al acreedor objetado; **10 días**
+  para conciliar; lo no conciliado va a audiencia. «**La única prueba admisible
+  para el trámite de objeciones será la documental.**» **El deudor no puede
+  objetar** lo que él mismo incluyó.
+- **Art. 19 num. 11:** fijación en las oficinas del juez del concurso, **5 días**,
+  del aviso de inicio — el único acto de publicidad con plazo numérico.
+- **Art. 20:** para alegar la nulidad de lo actuado en contravención «**bastará
+  aportar copia del certificado de la Cámara de Comercio en el que conste la
+  inscripción del aviso de inicio**».
+- **Persona natural no comerciante — Ley 2445 de 2025 reformó el título:** el
+  emisor es el **CONCILIADOR**, no un secretario ni un juez (CGP art. 533). Art.
+  548: **1 día** desde que recibe la información actualizada para comunicar a
+  todos los acreedores. Art. 545: basta «copia de la **certificación que expida
+  el conciliador**» para alegar la nulidad.
+
+### 9.8 POLICIVO — todos los plazos del art. 223
+
+**5 días** para citar a audiencia (autoridad) · **20 minutos** de argumentos por
+parte · **5 días** de pruebas · **24 horas** de antelación del aviso de inspección
+· **recursos dentro de la misma audiencia — el plazo más preclusivo de la rama**
+· **2 días** para remitir al superior (autoridad) · **2 días** para sustentar ante
+el superior (ciudadano, **extingue la apelación**) · **8 días** para resolver
+(superior) · **5 días** para cumplir desde la ejecutoria (infractor).
+Apelación **devolutiva**, salvo **suspensiva en infracciones urbanísticas**.
+
+**Art. 223A (Ley 2197 de 2022) — regla contraintuitiva:** hay **3 días hábiles**
+para objetar el comparendo, y vencidos «**no podrá iniciarse el proceso verbal
+abreviado, por cuanto se pierde la oportunidad legal**» — el vencimiento **cierra**
+el proceso en vez de abrirlo. A los **5 días** de expedida la orden la multa
+queda en firme y puede cobrarse coactivamente.
+
+### 9.9 NO VERIFICADO, declarado por los agentes
+
+Ley 2080 de 2021 en su articulado autónomo (las atribuciones vienen de las marcas
+del propio CPACA) · las «Notas del Editor» del art. 203 del CPACA · CGP arts.
+291-301 y 110 en detalle · art. 612 del CGP (plazo de la ANDJE) · art. 323 del
+CPC (forma del edicto) · Decisión Andina 486 art. 170 (funcionpublica devolvió
+403) · el CPTSS derogado, que sigue rigiendo los procesos abiertos antes del 2 de
+abril de 2026 · Ley 270 de 1996 · estructura interna de la Supersociedades ·
+trámite y término del recurso de revisión arbitral · Ley 1801 arts. 205-222 ·
+procedimiento penal abreviado de la Ley 1826 de 2017.

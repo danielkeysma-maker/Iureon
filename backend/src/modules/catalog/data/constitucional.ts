@@ -689,6 +689,41 @@ export const CONSTITUCIONAL_CATALOG: BranchCatalog = {
       { n: 7, name: 'Comunicaciones a las autoridades e invitaciones a intervenir', mandatory: false, basis: null }
     ],
     sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=30150'
+  },
+  {
+    id: 'constitucional/contestacion-de-la-accion-de-tutela-por-el-accionado',
+    exactName: 'Contestación de la acción de tutela por el accionado',
+    branch: 'CONSTITUCIONAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Decreto 2591 de 1991, arts. 19 (informes) y 20 (presunción de veracidad); art. 13 (coadyuvancia)',
+    competentAuthority: 'El juez de tutela que requirió el informe. Puede ser cualquier juez de la República',
+    term: { status: 'VERIFICADO', description: 'EL PLAZO NO ESTÁ EN LA LEY: LO FIJA EL JUEZ EN EL AUTO ADMISORIO, Y EN LA PRÁCTICA ES DE UNO A TRES DÍAS. Por eso esta ficha es de emergencia y no de agenda: cuando llega la notificación, el término ya está corriendo. «El juez PODRÁ REQUERIR INFORMES al órgano o a la autoridad contra quien se hubiere hecho la solicitud y pedir el expediente administrativo o la documentación donde consten los antecedentes del asunto. La omisión injustificada de enviar esas pruebas al juez ACARREARÁ RESPONSABILIDAD» (art. 19). LO QUE CUESTA CALLAR ES EL CASO ENTERO, Y ESTÁ ESCRITO SIN MATICES: «SI EL INFORME NO FUERE RENDIDO DENTRO DEL PLAZO CORRESPONDIENTE, SE TENDRÁN POR CIERTOS LOS HECHOS Y SE ENTRARÁ A RESOLVER DE PLANO, salvo que el juez estime necesaria otra averiguación previa» (art. 20). No hay contestación tardía que valga, ni audiencia donde explicarse después: se falla con la versión del accionante por verdadera. ES EL RELOJ MÁS CORTO Y MÁS CARO DEL CATÁLOGO. QUÉ HACER SI EL ACCIONADO NO ES EL RESPONSABLE: la contestación debe pedir la desvinculación por falta de legitimación en la causa por pasiva e indicar quién sí lo es, porque el juez puede vincular de oficio pero no adivina. COADYUVANCIA, que se pasa por alto y sirve cuando el fallo puede afectar a un tercero: el art. 13 permite intervenir «como coadyuvante del actor O DE LA PERSONA O AUTORIDAD PÚBLICA CONTRA QUIEN SE HUBIERE HECHO LA SOLICITUD». LO QUE VIENE DESPUÉS SI SE PIERDE: «Proferido el fallo que conceda la tutela, la autoridad responsable del agravio DEBERÁ CUMPLIRLA SIN DEMORA» (art. 27), y su incumplimiento abre el desacato.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del accionado y de la fecha exacta en que fue notificado, de la que corre el plazo del juez', mandatory: true, basis: 'Decreto 2591 de 1991, art. 19' },
+      { n: 2, name: 'Pronunciamiento sobre CADA hecho de la tutela, aceptándolo o negándolo', mandatory: true, basis: 'Decreto 2591 de 1991, art. 20' },
+      { n: 3, name: 'Expediente administrativo o documentación de los antecedentes que el juez pidió', mandatory: true, basis: 'Decreto 2591 de 1991, art. 19' },
+      { n: 4, name: 'Razones de improcedencia: subsidiariedad, hecho superado, carencia actual de objeto o inexistencia de perjuicio irremediable', mandatory: true, basis: 'Decreto 2591 de 1991, art. 6' },
+      { n: 5, name: 'Solicitud de desvinculación por falta de legitimación en la causa por pasiva, indicando quién es el responsable', mandatory: false, basis: 'Decreto 2591 de 1991, art. 13' },
+      { n: 6, name: 'Pruebas que se aportan con el informe', mandatory: true, basis: 'Decreto 2591 de 1991, art. 19' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/decreto_2591_1991.html'
+  },
+  {
+    id: 'constitucional/respuesta-al-incidente-de-desacato',
+    exactName: 'Respuesta al incidente de desacato',
+    branch: 'CONSTITUCIONAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Decreto 2591 de 1991, arts. 52 (desacato) y 27 (cumplimiento del fallo)',
+    competentAuthority: 'El juez que profirió el fallo de tutela de primera instancia. La sanción se consulta ante el superior',
+    term: { status: 'VERIFICADO', description: 'EL ARTÍCULO 52 NO FIJA TÉRMINO PARA CONTESTAR: REMITE AL TRÁMITE INCIDENTAL, ASÍ QUE EL PLAZO LO SEÑALA EL AUTO QUE ABRE EL INCIDENTE Y HAY QUE LEERLO EN CADA CASO. Publicar aquí un número fijo sería inventarlo. LO QUE SÍ ESTÁ FIJADO ES LO QUE SE ARRIESGA, y por eso esta actuación no se delega: arresto hasta de seis (6) meses y multa hasta de veinte (20) salarios mínimos mensuales, a cargo de la persona natural responsable — no de la entidad. LA DEFENSA REAL NO ES PROCESAL SINO DE CUMPLIMIENTO: el desacato se desactiva acreditando que la orden se cumplió, o demostrando imposibilidad material o jurídica de cumplirla, o que se cumplió en lo posible y qué falta. La obligación es inmediata: «Proferido el fallo que conceda la tutela, la autoridad responsable del agravio DEBERÁ CUMPLIRLA SIN DEMORA» (art. 27). QUIÉN RESPONDE, y suele identificarse mal: la sanción recae en el funcionario a quien correspondía cumplir y en su superior, de modo que la respuesta debe precisar el reparto interno de competencias. LOS TRES DÍAS DE LA CONSULTA AL SUPERIOR SON RELOJ DEL JUZGADO, NO DEL SANCIONADO: la sanción se consulta de oficio, así que no hay que interponer recurso para que suba, pero tampoco sirve esperar sentado — conviene aportar ante el superior la prueba del cumplimiento sobreviniente.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del fallo de tutela, de la orden concreta impartida y de su plazo de cumplimiento', mandatory: true, basis: 'Decreto 2591 de 1991, art. 27' },
+      { n: 2, name: 'Prueba de los actos de cumplimiento ejecutados, con sus fechas', mandatory: true, basis: 'Decreto 2591 de 1991, art. 52' },
+      { n: 3, name: 'Explicación de la imposibilidad material o jurídica, si el cumplimiento total no fue posible', mandatory: false, basis: 'Decreto 2591 de 1991, art. 52' },
+      { n: 4, name: 'Precisión de a quién correspondía cumplir según el reparto interno de competencias', mandatory: true, basis: 'Decreto 2591 de 1991, art. 52' },
+      { n: 5, name: 'Constancia de presentación dentro del término que señaló el auto que abrió el incidente', mandatory: true, basis: 'Decreto 2591 de 1991, art. 52' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/decreto_2591_1991.html'
   }
   ]
 };

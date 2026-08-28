@@ -41,7 +41,17 @@ const CASES: Case[] = [
   // derived from an acción de cumplimiento template with a string replace.
   { label: 'Redacción de Acción de Tutela', expect: 'MATCH', exactMatch: 'Acción de tutela' },
   { label: 'Acción de cumplimiento', expect: 'MATCH', exactMatch: 'Acción de cumplimiento' },
-  { label: 'Incidente de desacato', expect: 'MATCH', exactMatch: 'Solicitud de apertura de incidente de desacato' },
+  // El desacato dejo de ser una sola cosa el dia en que se catalogo la
+  // RESPUESTA del sancionado. Ahora «Incidente de desacato» a secas cubre dos
+  // posiciones opuestas —quien lo pide y quien se defiende de el— con relojes y
+  // riesgos distintos: al accionante no le pasa nada por tardarse, y al
+  // sancionado lo espera arresto de hasta seis meses. Que el resolutor SE
+  // NIEGUE es la conducta correcta: adivinar cual de las dos es, en este caso,
+  // escoger bando por el abogado. Antes acertaba solo porque no habia con quien
+  // confundirse.
+  { label: 'Incidente de desacato', expect: 'NO_MATCH' },
+  { label: 'Solicitud de apertura de incidente de desacato', expect: 'MATCH', exactMatch: 'Solicitud de apertura de incidente de desacato' },
+  { label: 'Respuesta al incidente de desacato', expect: 'MATCH', exactMatch: 'Respuesta al incidente de desacato' },
   { label: 'Impugnación del fallo de tutela', expect: 'MATCH' },
 
   // Civil (CGP). The verbal / verbal sumario pair is the dangerous one: the
