@@ -144,11 +144,11 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecorded, disabl
 
   if (listo) {
     return (
-      <div className="border border-slate-200 rounded-xl p-4 space-y-3">
+      <div className="border border-line-200 rounded-card p-4 space-y-3">
         <div className="flex items-center justify-between gap-2">
           <div className="min-w-0">
-            <p className="text-xs font-bold text-slate-900">Grabación lista</p>
-            <p className="text-[11px] text-slate-500">
+            <p className="text-xs font-bold text-ink-900">Grabación lista</p>
+            <p className="text-[11px] text-ink-500">
               {formatElapsed(segundos)} · escúchala antes de transcribir
             </p>
           </div>
@@ -156,7 +156,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecorded, disabl
           <button
             type="button"
             onClick={descartar}
-            className="text-[11px] text-slate-500 hover:text-rose-700 flex items-center gap-1 shrink-0"
+            className="text-[11px] text-ink-500 hover:text-danger flex items-center gap-1 shrink-0"
           >
             <Trash2 className="w-3 h-3" />
             Descartar
@@ -169,7 +169,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecorded, disabl
           type="button"
           onClick={() => onRecorded(listo.file)}
           disabled={disabled}
-          className="w-full py-2 bg-blue-950 hover:bg-blue-900 disabled:bg-slate-400 text-white rounded-lg text-[11px] font-semibold"
+          className="w-full py-2 bg-brand-700 hover:bg-brand-800 disabled:opacity-50 text-white rounded-control text-[11px] font-semibold"
         >
           Transcribir esta entrevista
         </button>
@@ -178,30 +178,30 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecorded, disabl
   }
 
   return (
-    <div className="border border-slate-200 rounded-xl p-4 space-y-3">
+    <div className="border border-line-200 rounded-card p-4 space-y-3">
       {error && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-2 flex items-start gap-2">
-          <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
-          <p className="text-[11px] text-amber-900">{error}</p>
+        <div className="bg-[rgb(var(--unverified-surf))] border border-[rgb(var(--unverified-line))] rounded-control p-2 flex items-start gap-2">
+          <AlertTriangle className="w-3.5 h-3.5 text-unverified shrink-0 mt-0.5" />
+          <p className="text-[11px] text-ink-900">{error}</p>
         </div>
       )}
 
       {grabando ? (
         <div className="flex items-center gap-3">
           <span className="relative flex h-3 w-3 shrink-0">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-75" />
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-600" />
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[rgb(var(--danger)/0.06)]0 opacity-75" />
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-danger" />
           </span>
 
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-slate-900 font-mono">{formatElapsed(segundos)}</p>
-            <p className="text-[11px] text-slate-500">Grabando la entrevista…</p>
+            <p className="text-xs font-bold text-ink-900 font-mono">{formatElapsed(segundos)}</p>
+            <p className="text-[11px] text-ink-500">Grabando la entrevista…</p>
           </div>
 
           <button
             type="button"
             onClick={detener}
-            className="px-3 py-1.5 bg-rose-700 hover:bg-rose-800 text-white rounded-lg text-[11px] font-semibold flex items-center gap-1.5 shrink-0"
+            className="px-3 py-1.5 bg-danger hover:brightness-110 text-white rounded-control text-[11px] font-semibold flex items-center gap-1.5 shrink-0"
           >
             <Square className="w-3 h-3 fill-current" />
             Detener
@@ -212,14 +212,14 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecorded, disabl
           type="button"
           onClick={() => void empezar()}
           disabled={disabled}
-          className="w-full py-3 bg-blue-950 hover:bg-blue-900 disabled:bg-slate-400 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2"
+          className="w-full py-3 bg-brand-700 hover:bg-brand-800 disabled:opacity-50 text-white rounded-card text-xs font-bold flex items-center justify-center gap-2"
         >
-          <Mic className="w-4 h-4 text-blue-200" />
+          <Mic className="w-4 h-4 text-on-brand" />
           Grabar la entrevista
         </button>
       )}
 
-      <p className="text-[11px] text-slate-500">
+      <p className="text-[11px] text-ink-500">
         Se graba en este navegador y no sale de aquí hasta que pulses transcribir. Avisa al cliente
         antes de empezar.
       </p>

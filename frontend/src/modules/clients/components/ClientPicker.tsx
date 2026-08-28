@@ -79,14 +79,14 @@ export const ClientPicker: React.FC<ClientPickerProps> = ({ value, onChange }) =
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2">
-        <p className="text-[11px] text-slate-500">
+        <p className="text-[11px] text-ink-500">
           Para encontrar esta conversación por la persona, no por el nombre del archivo.
         </p>
 
         <button
           type="button"
           onClick={() => setCreando((v) => !v)}
-          className="px-2.5 py-1 bg-blue-950 hover:bg-blue-900 text-white rounded-lg text-[11px] font-semibold flex items-center gap-1.5 shrink-0"
+          className="px-2.5 py-1 bg-brand-700 hover:bg-brand-800 text-white rounded-control text-[11px] font-semibold flex items-center gap-1.5 shrink-0"
         >
           <Plus className="w-3 h-3" />
           <span>Nuevo cliente</span>
@@ -94,27 +94,27 @@ export const ClientPicker: React.FC<ClientPickerProps> = ({ value, onChange }) =
       </div>
 
       {error && (
-        <div className="bg-rose-50 border border-rose-200 rounded-lg p-2 flex items-start gap-2">
-          <AlertCircle className="w-3.5 h-3.5 text-rose-600 shrink-0 mt-0.5" />
-          <p className="text-[11px] text-rose-800">{error}</p>
+        <div className="bg-[rgb(var(--danger)/0.06)] border border-[rgb(var(--danger)/0.35)] rounded-control p-2 flex items-start gap-2">
+          <AlertCircle className="w-3.5 h-3.5 text-danger shrink-0 mt-0.5" />
+          <p className="text-[11px] text-danger">{error}</p>
         </div>
       )}
 
       {creando && (
-        <form onSubmit={crear} className="space-y-2 border-t border-slate-100 pt-3">
+        <form onSubmit={crear} className="space-y-2 border-t border-line-100 pt-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             <input
               value={nuevo.fullName}
               onChange={(e) => setNuevo({ ...nuevo, fullName: e.target.value })}
               placeholder="Nombre completo"
-              className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] focus:outline-none focus:border-blue-900"
+              className="bg-canvas border border-line-200 rounded-control px-2.5 py-1.5 text-[11px] focus:outline-none focus:border-brand-700"
               required
             />
             <input
               value={nuevo.documentId}
               onChange={(e) => setNuevo({ ...nuevo, documentId: e.target.value })}
               placeholder="Cédula"
-              className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] font-mono focus:outline-none focus:border-blue-900"
+              className="bg-canvas border border-line-200 rounded-control px-2.5 py-1.5 text-[11px] font-mono focus:outline-none focus:border-brand-700"
               required
             />
             <input
@@ -122,27 +122,27 @@ export const ClientPicker: React.FC<ClientPickerProps> = ({ value, onChange }) =
               value={nuevo.email}
               onChange={(e) => setNuevo({ ...nuevo, email: e.target.value })}
               placeholder="Correo (opcional)"
-              className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] focus:outline-none focus:border-blue-900"
+              className="bg-canvas border border-line-200 rounded-control px-2.5 py-1.5 text-[11px] focus:outline-none focus:border-brand-700"
             />
             <input
               value={nuevo.phone}
               onChange={(e) => setNuevo({ ...nuevo, phone: e.target.value })}
               placeholder="Celular (opcional)"
-              className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] font-mono focus:outline-none focus:border-blue-900"
+              className="bg-canvas border border-line-200 rounded-control px-2.5 py-1.5 text-[11px] font-mono focus:outline-none focus:border-brand-700"
             />
           </div>
 
           <div className="flex items-center gap-2">
             <button
               type="submit"
-              className="px-2.5 py-1 bg-blue-950 hover:bg-blue-900 text-white rounded-lg text-[11px] font-semibold"
+              className="px-2.5 py-1 bg-brand-700 hover:bg-brand-800 text-white rounded-control text-[11px] font-semibold"
             >
               Registrar y usar
             </button>
             <button
               type="button"
               onClick={() => setCreando(false)}
-              className="text-[11px] text-slate-500 hover:text-slate-700"
+              className="text-[11px] text-ink-500 hover:text-ink-700"
             >
               Cancelar
             </button>
@@ -151,15 +151,15 @@ export const ClientPicker: React.FC<ClientPickerProps> = ({ value, onChange }) =
       )}
 
       <div className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center shrink-0">
-          <UserRound className="w-4 h-4 text-slate-500" />
+        <div className="w-8 h-8 rounded-full bg-line-100 flex items-center justify-center shrink-0">
+          <UserRound className="w-4 h-4 text-ink-500" />
         </div>
 
         <select
           value={value ?? ''}
           onChange={(e) => onChange(e.target.value || null)}
           disabled={cargando}
-          className="flex-1 min-w-0 bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 text-[11px] text-slate-900 focus:outline-none focus:border-blue-900 disabled:opacity-60"
+          className="flex-1 min-w-0 bg-canvas border border-line-200 rounded-control px-2 py-1.5 text-[11px] text-ink-900 focus:outline-none focus:border-brand-700 disabled:opacity-60"
         >
           <option value="">{cargando ? 'Cargando clientes…' : 'Sin cliente asignado'}</option>
           {clients.map((client) => (
@@ -171,14 +171,14 @@ export const ClientPicker: React.FC<ClientPickerProps> = ({ value, onChange }) =
       </div>
 
       {seleccionado && (
-        <p className="text-[11px] text-slate-500 flex flex-wrap items-center gap-x-3 gap-y-1 pl-10">
+        <p className="text-[11px] text-ink-500 flex flex-wrap items-center gap-x-3 gap-y-1 pl-10">
           <span className="flex items-center gap-1">
-            <IdCard className="w-3 h-3 text-slate-400" />
+            <IdCard className="w-3 h-3 text-ink-400" />
             {seleccionado.documentId}
           </span>
           {seleccionado.phone && <span>{seleccionado.phone}</span>}
           {seleccionado.email && <span className="truncate">{seleccionado.email}</span>}
-          <span className="text-slate-400">
+          <span className="text-ink-400">
             {seleccionado.interviews}{' '}
             {seleccionado.interviews === 1 ? 'entrevista' : 'entrevistas'}
           </span>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, ArrowLeft, Copy, CheckCircle2, FileDown, FileText, PenLine, Upload, UserRound } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, Copy, CheckCircle2, FileText, PenLine, Upload } from 'lucide-react';
 import { useTranscription } from '../../transcription/hooks/useTranscription';
 import { TranscriptSegments } from '../../transcription/components/TranscriptSegments';
 import { StoredTranscriptions } from '../../transcription/components/StoredTranscriptions';
@@ -47,12 +47,12 @@ const Paso: React.FC<{ numero: number; titulo: string; children: React.ReactNode
   titulo,
   children
 }) => (
-  <section className="bg-white border border-slate-200 rounded-xl overflow-hidden">
-    <header className="flex items-center gap-2 px-4 py-2.5 border-b border-slate-100 bg-slate-50/60">
-      <span className="w-5 h-5 rounded-full bg-blue-950 text-white text-[10px] font-bold flex items-center justify-center shrink-0">
+  <section className="overflow-hidden rounded-card border border-line-200 bg-surface">
+    <header className="flex items-center gap-2 border-b border-line-100 bg-canvas px-4 py-2.5">
+      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-700 font-mono text-[10px] font-bold text-on-brand">
         {numero}
       </span>
-      <h3 className="text-xs font-bold text-slate-900">{titulo}</h3>
+      <h3 className="text-ui font-semibold text-ink-900">{titulo}</h3>
     </header>
     <div className="p-4">{children}</div>
   </section>
@@ -170,9 +170,9 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
    */
   if (isAvailable === false) {
     return (
-      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-2 m-6">
-        <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-        <p className="text-[11px] text-amber-900">
+      <div className="bg-[rgb(var(--unverified-surf))] border border-[rgb(var(--unverified-line))] rounded-card p-4 flex items-start gap-2 m-6">
+        <AlertTriangle className="w-4 h-4 text-unverified shrink-0 mt-0.5" />
+        <p className="text-[11px] text-ink-900">
           El motor de transcripción no está configurado en el servidor.
         </p>
       </div>
@@ -180,33 +180,86 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
   }
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 bg-slate-100">
-      <div className="max-w-4xl mx-auto space-y-4 font-sans">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-blue-950 flex items-center justify-center shrink-0">
-          <UserRound className="w-5 h-5 text-blue-200" />
-        </div>
-        <div>
-          <h2 className="text-lg font-black text-slate-900 tracking-tight">Entrevista de cliente</h2>
-          <p className="text-[11px] text-slate-500">
-            Graba la conversación, identifica quién habla y mira qué dice la jurisprudencia.
+    <div className="flex h-full min-h-0 flex-1 flex-col bg-canvas font-sans">
+      {/*
+        La cabecera del modulo: quien es y que sale de aqui. La audiencia
+        empieza por la grabacion que llega; la entrevista empieza por la
+        persona, y por eso el paso 1 es el cliente y no el microfono.
+      */}
+      <header className="flex shrink-0 flex-wrap items-end gap-3 border-b border-line-200 bg-surface px-5 py-3.5">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-title text-ink-900">Entrevistas</h1>
+          <p className="mt-0.5 text-meta text-ink-500">
+            {result
+              ? `${result.segments.length} intervenciones · ${result.speakerLabels.length} voces`
+              : 'Empieza por quién está al frente; termina en una decisión.'}
           </p>
         </div>
-      </div>
+
+        {result && (
+          <>
+            <button onClick={() => void copiar()} className="btn-neutral btn-sm">
+              {copiado ? (
+                <CheckCircle2 className="h-3.5 w-3.5 text-verified" />
+              ) : (
+                <Copy className="h-3.5 w-3.5" />
+              )}
+              {copiado ? 'Copiado' : 'Copiar'}
+            </button>
+
+            {/* El acta, en dos formatos del mismo peso: el .docx se edita, el PDF se anexa. */}
+            <div className="flex">
+              <button
+                onClick={() => void exportTranscriptToWord(result, titulo || 'entrevista')}
+                className="btn-secondary btn-sm rounded-r-none"
+              >
+                <FileText className="h-3 w-3" />
+                Word
+              </button>
+              <button
+                onClick={() => exportTranscriptToPdf(result, titulo || 'entrevista')}
+                className="btn-secondary btn-sm -ml-px rounded-l-none"
+              >
+                PDF
+              </button>
+            </div>
+
+            <button onClick={reset} className="btn-neutral btn-sm">
+              <ArrowLeft className="h-3.5 w-3.5" />
+              Otra entrevista
+            </button>
+
+            {/*
+              EL PRIMARIO: tomar el caso y redactar. Solo cuando alguien narro
+              algo — sin turnos de relato el boton prometeria un puente que no
+              existe.
+            */}
+            {onDraft && relatoDelCliente().length > 0 && (
+              <button onClick={() => onDraft(relatoDelCliente())} className="btn-primary btn-sm">
+                <PenLine className="h-3 w-3" />
+                Tomar el caso y redactar
+              </button>
+            )}
+          </>
+        )}
+      </header>
+
+      <div className="min-h-0 flex-1 overflow-y-auto p-5">
+        <div className="mx-auto max-w-4xl space-y-4">
 
       {!hasFirm && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start gap-2">
-          <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-          <p className="text-[11px] text-amber-900">
+        <div className="bg-[rgb(var(--unverified-surf))] border border-[rgb(var(--unverified-line))] rounded-card p-3 flex items-start gap-2">
+          <AlertTriangle className="w-4 h-4 text-unverified shrink-0 mt-0.5" />
+          <p className="text-[11px] text-ink-900">
             Sin una firma no se puede guardar la entrevista.
           </p>
         </div>
       )}
 
       {error && (
-        <div className="bg-rose-50 border border-rose-200 rounded-xl p-3 flex items-start gap-2">
-          <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-          <p className="text-[11px] text-rose-800">{error}</p>
+        <div className="bg-[rgb(var(--danger)/0.06)] border border-[rgb(var(--danger)/0.35)] rounded-card p-3 flex items-start gap-2">
+          <AlertTriangle className="w-4 h-4 text-danger shrink-0 mt-0.5" />
+          <p className="text-[11px] text-danger">{error}</p>
         </div>
       )}
 
@@ -219,10 +272,10 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
           <Paso numero={2} titulo="Captura la conversación">
             {trabajando ? (
               <div className="py-6 text-center">
-                <p className="text-xs font-bold text-slate-900">
+                <p className="text-xs font-bold text-ink-900">
                   {isUploading ? 'Enviando la grabación…' : 'Transcribiendo…'}
                 </p>
-                <p className="text-[11px] text-slate-500 mt-1">
+                <p className="text-[11px] text-ink-500 mt-1">
                   Separando las voces y ordenando la conversación.
                 </p>
               </div>
@@ -235,7 +288,7 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
                   desk — a call recorded on a phone is still an interview — but
                   recording is the ordinary case and gets the ordinary place.
                 */}
-                <div className="text-center border-t border-slate-100 pt-3">
+                <div className="text-center border-t border-line-100 pt-3">
                   <input
                     ref={inputRef}
                     type="file"
@@ -250,7 +303,7 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
                     type="button"
                     onClick={() => inputRef.current?.click()}
                     disabled={!hasFirm}
-                    className="text-[11px] font-semibold text-slate-600 hover:text-blue-900 flex items-center gap-1.5 mx-auto disabled:opacity-50"
+                    className="text-[11px] font-semibold text-ink-500 hover:text-brand-700 flex items-center gap-1.5 mx-auto disabled:opacity-50"
                   >
                     <Upload className="w-3 h-3" />
                     O sube una grabación que ya tengas
@@ -263,15 +316,15 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
                     guessing which of the two rules they broke. The ceiling is
                     the server's own: it depends on the host and the provider.
                   */}
-                  <p className="text-[10px] text-slate-400 mt-1">
+                  <p className="text-[10px] text-ink-400 mt-1">
                     {SUPPORTED_AUDIO_EXTENSIONS.join(', ')} · máximo {megabytes(maxAudioBytes)} MB
                   </p>
                 </div>
 
-                <p className="text-[11px] text-slate-500 bg-slate-50 border border-slate-200 rounded-lg p-2.5">
-                  <b className="text-slate-700">Qué se guarda:</b> el texto queda guardado en tu firma
+                <p className="text-[11px] text-ink-500 bg-canvas border border-line-200 rounded-control p-2.5">
+                  <b className="text-ink-700">Qué se guarda:</b> el texto queda guardado en tu firma
                   y puedes borrarlo cuando quieras.{' '}
-                  <b className="text-slate-700">La grabación no se guarda</b>: se borra del
+                  <b className="text-ink-700">La grabación no se guarda</b>: se borra del
                   almacenamiento apenas termina de transcribirse.
                 </p>
               </div>
@@ -296,73 +349,8 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
         </>
       ) : (
         <>
-          <div className="flex flex-wrap items-center justify-between gap-2 bg-white border border-slate-200 rounded-xl px-4 py-2.5">
-            <span className="text-[11px] text-slate-600">
-              <b className="text-slate-900">{result.segments.length}</b> intervenciones ·{' '}
-              <b className="text-slate-900">{result.speakerLabels.length}</b> voces
-            </span>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => void copiar()}
-                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg text-[11px] font-semibold flex items-center gap-1.5"
-              >
-                {copiado ? (
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                ) : (
-                  <Copy className="w-3.5 h-3.5" />
-                )}
-                <span>{copiado ? 'Copiado' : 'Copiar texto'}</span>
-              </button>
-
-              {/*
-                El puente que faltaba entre escuchar y escribir.
-
-                Los hechos ya están dichos y transcritos; volver a teclearlos en
-                el panel de redacción es transcribir dos veces la misma historia,
-                y la segunda siempre sale más corta que la primera.
-
-                Solo aparece si hay algo que llevarse: si nadie tiene un rol de
-                los que narran, el botón no promete un puente que no existe.
-              */}
-              {onDraft && relatoDelCliente().length > 0 && (
-                <button
-                  onClick={() => onDraft(relatoDelCliente())}
-                  className="px-3 py-1.5 bg-blue-950 hover:bg-blue-900 text-white rounded-lg text-[11px] font-semibold flex items-center gap-1.5"
-                >
-                  <PenLine className="w-3.5 h-3.5" />
-                  <span>Redactar con estos hechos</span>
-                </button>
-              )}
-
-              <button
-                onClick={() => void exportTranscriptToWord(result, titulo || 'entrevista')}
-                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg text-[11px] font-semibold flex items-center gap-1.5"
-              >
-                <FileText className="w-3.5 h-3.5" />
-                <span>Word</span>
-              </button>
-
-              <button
-                onClick={() => exportTranscriptToPdf(result, titulo || 'entrevista')}
-                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg text-[11px] font-semibold flex items-center gap-1.5"
-              >
-                <FileDown className="w-3.5 h-3.5" />
-                <span>PDF</span>
-              </button>
-
-              <button
-                onClick={reset}
-                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg text-[11px] font-semibold flex items-center gap-1.5"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Otra entrevista</span>
-              </button>
-            </div>
-          </div>
-
-          <div className="bg-white border border-slate-200 rounded-xl p-4">
-            <h3 className="text-xs font-bold text-slate-900 mb-2">Cliente de la entrevista</h3>
+          <div className="bg-surface border border-line-200 rounded-card p-4">
+            <h3 className="text-xs font-bold text-ink-900 mb-2">Cliente de la entrevista</h3>
             <ClientPicker value={clientId} onChange={setClientId} />
           </div>
 
@@ -383,6 +371,7 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
           />
         </>
       )}
+        </div>
       </div>
     </div>
   );
