@@ -137,16 +137,26 @@ Comprobado contando sobre `backend/src/modules/catalog/data/*.ts`, no de memoria
 
 ## 5. Pendientes anteriores que siguen abiertos
 
-- **La API de la Corte Suprema no responde.** `cortesuprema.gov.co` da 200, pero
-  `consultaprovidenciasbk.cortesuprema.gov.co/api` se queda 60 s sin conectar y
-  `npm run check:csj` salta su parte de red por tiempo agotado. Falta saber si es
-  caída pasajera o bloqueo a tráfico que no venga de un navegador.
+- ~~La API de la Corte Suprema no responde~~ **— FALSO, corregido el 28 ago.**
+  Funciona: `POST /api` responde en 0,17 s y `npm run check:csj` pasa entero,
+  descargando una providencia real de 15.553 caracteres con su ponente y su sala.
+  Lo que fallaba era la herramienta de diagnóstico: **`curl` en este Windows
+  falla contra `.gov.co` con `CRYPT_E_REVOKED` y necesita `--ssl-no-revoke`**, y
+  el WAF de `ramajudicial.gov.co` rechaza el User-Agent por defecto de
+  `python-urllib` con 403. Ver `research/fuentes-jurisprudencia.md`.
 - **Consejo de Estado aparece en el selector del Buscador sin fuente detrás.**
   Su API pide llave que no es de autoservicio. Hay un derecho de petición
   redactado y sin enviar (Ley 1755, 15 días hábiles). Mientras tanto, la opción
   promete algo que no da.
-- **Consejo Superior de la Judicatura y Tribunales Superiores**: no existen en el
-  código. Ni servicio, ni tipo, ni selector.
+- **Consejo Superior de la Judicatura y Tribunales**: investigado el 28 ago, ver
+  `research/fuentes-jurisprudencia.md`. Resumen: la **Comisión Nacional de
+  Disciplina Judicial** (que reemplazó a la Sala Disciplinaria del CSJ en 2021)
+  tiene **API JSON sin llave con ≥17.733 providencias y PDF directo** — es la
+  fuente que vale la pena construir. El CSJ Sala Disciplinaria pre-2021 es
+  raspable pero frágil. **Los Tribunales, Superiores y Administrativos, NO tienen
+  fuente pública de providencias**: el buscador de Tribunales Administrativos
+  responde `rowCount:0` a las siete búsquedas probadas, y la API de procesos da
+  expedientes sin documento (0 de 112 actuaciones con texto).
 - **Una ficha con el reloj por revisar**: FAMILIA_ADMINISTRATIVA, «Solicitud de
   restablecimiento de derechos ante el defensor o comisario de familia» abre con
   los seis meses que tiene la autoridad. Falta leer la Ley 1098 para saber si
