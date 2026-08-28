@@ -1360,6 +1360,88 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
       { n: 6, name: 'Disponibilidad de copias para quienes las soliciten', mandatory: true, basis: 'Ley 1755 de 2015, art. 22 inc. 2' }
     ],
     sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=65334'
+  },
+  {
+    id: 'administrativo/pago-o-excepciones-contra-el-mandamiento-de-pago-en-cobro-coactivo',
+    exactName: 'Pago o excepciones contra el mandamiento de pago en cobro coactivo',
+    branch: 'ADMINISTRATIVO',
+    role: 'LITIGANTE',
+    legalBasis: 'Estatuto Tributario, arts. 826, 830 y 831, aplicables a toda entidad pública por el art. 100 de la Ley 1437 de 2011 y el art. 5 de la Ley 1066 de 2006',
+    competentAuthority: 'El funcionario ejecutor de la entidad pública acreedora — un municipio, el ICBF, una universidad pública, una entidad territorial, Colpensiones. NO es un juez: la entidad cobra su propio crédito',
+    term: { status: 'VERIFICADO', description: 'QUINCE (15) DÍAS, RELOJ DEL DEUDOR, PRECLUSIVO, Y VENCERLO NO ABRE UN RECURSO SINO QUE CIERRA EL PROCESO. «DENTRO DE LOS QUINCE (15) DÍAS SIGUIENTES A LA NOTIFICACIÓN DEL MANDAMIENTO DE PAGO, el deudor deberá cancelar el monto de la deuda con sus respectivos intereses. Dentro del mismo término, podrán proponerse mediante escrito las excepciones contempladas en el artículo siguiente» (art. 830). LO QUE PASA AL DEJARLO VENCER ESTÁ ESCRITO Y NO TIENE VUELTA: «Si vencido el término para excepcionar no se hubieren propuesto excepciones, o el deudor no hubiere pagado, el funcionario competente proferirá resolución ordenando la ejecución y el remate de los bienes embargados y secuestrados. CONTRA ESTA RESOLUCIÓN NO PROCEDE RECURSO ALGUNO» (art. 836). LOS DIEZ DÍAS ANTERIORES SON OTRA COSA Y NO HAY QUE CONFUNDIRLOS: el mandamiento «se notificará personalmente al deudor, PREVIA CITACIÓN PARA QUE COMPAREZCA EN UN TÉRMINO DE DIEZ (10) DÍAS. Si vencido el término no comparece, el mandamiento ejecutivo SE NOTIFICARÁ POR CORREO» (art. 826) — no comparecer no impide la notificación, solo la cambia de forma. LAS EXCEPCIONES SON TAXATIVAS, y alegar fuera de esa lista equivale a no excepcionar (art. 831): «1. El pago efectivo. 2. La existencia de acuerdo de pago. 3. La de falta de ejecutoria del título. 4. La pérdida de ejecutoria del título por revocación o suspensión provisional del acto administrativo, hecha por autoridad competente. 5. La interposición de demandas de restablecimiento del derecho o de proceso de revisión de impuestos, ante la jurisdicción de lo contencioso administrativo. 6. LA PRESCRIPCIÓN DE LA ACCIÓN DE COBRO, y 7. La falta de título ejecutivo o incompetencia del funcionario que lo profirió.» Contra el mandamiento que vincula deudores solidarios proceden además la calidad de deudor solidario y la indebida tasación del monto.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del mandamiento de pago y de la fecha de su notificación', mandatory: true, basis: 'Estatuto Tributario, arts. 826 y 830' },
+      { n: 2, name: 'Excepción o excepciones propuestas, tomadas de la lista taxativa del art. 831', mandatory: true, basis: 'Estatuto Tributario, art. 831' },
+      { n: 3, name: 'Pruebas de cada excepción, aportadas con el escrito', mandatory: true, basis: 'Estatuto Tributario, art. 831' },
+      { n: 4, name: 'Cómputo de la prescripción de la acción de cobro, cuando se invoca el numeral 6', mandatory: false, basis: 'Estatuto Tributario, arts. 817 y 831 num. 6' },
+      { n: 5, name: 'Constancia de presentación dentro de los quince (15) días', mandatory: true, basis: 'Estatuto Tributario, art. 830' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/estatuto_tributario_pr033.html'
+  },
+  {
+    id: 'administrativo/recurso-de-reposicion-contra-la-resolucion-que-rechaza-las-excepciones-en-cobro-coactivo',
+    exactName: 'Recurso de reposición contra la resolución que rechaza las excepciones en cobro coactivo',
+    branch: 'ADMINISTRATIVO',
+    role: 'LITIGANTE',
+    legalBasis: 'Estatuto Tributario, art. 834, modificado por el art. 80 de la Ley 6 de 1992',
+    competentAuthority: 'El jefe de la dependencia de cobranzas de la entidad pública acreedora — en la DIAN, el Jefe de la División de Cobranzas; en otra entidad, el funcionario que haga sus veces',
+    term: { status: 'VERIFICADO', description: 'UN (1) MES DESDE LA NOTIFICACIÓN, RELOJ DEL PARTICULAR, Y ES EL ÚNICO RECURSO QUE EXISTE: NO HAY APELACIÓN. «En la resolución que rechace las excepciones propuestas, se ordenará adelantar la ejecución y remate de los bienes embargados y secuestrados. Contra dicha resolución PROCEDE ÚNICAMENTE EL RECURSO DE REPOSICIÓN ante el Jefe de la División de Cobranzas, DENTRO DEL MES SIGUIENTE A SU NOTIFICACIÓN, quien tendrá para resolver un mes, contado a partir de su interposición en debida forma» (art. 834). DOS MESES QUE PARECEN UNO Y SON DE DUEÑOS DISTINTOS: el primero es del particular para interponer y es preclusivo; el segundo es de la entidad para resolver y su incumplimiento no produce silencio positivo alguno — el Estatuto Tributario no lo prevé. «EN DEBIDA FORMA» NO ES ADORNO: el mes de la entidad solo empieza a correr si el recurso está bien interpuesto, de modo que un recurso mal presentado no obliga a nadie a resolver. LO QUE SIGUE SI SE PIERDE: la ejecución y el remate avanzan, y el control judicial se reduce a los tres actos del art. 101 del CPACA.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación de la resolución que rechazó las excepciones y de su notificación', mandatory: true, basis: 'Estatuto Tributario, art. 834' },
+      { n: 2, name: 'Razones concretas por las que la excepción sí debía prosperar', mandatory: true, basis: 'Estatuto Tributario, art. 834' },
+      { n: 3, name: 'Pruebas que sustentan cada razón', mandatory: true, basis: 'Estatuto Tributario, art. 834' },
+      { n: 4, name: 'Constancia de interposición dentro del mes siguiente a la notificación', mandatory: true, basis: 'Estatuto Tributario, art. 834' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/estatuto_tributario_pr034.html'
+  },
+  {
+    id: 'administrativo/solicitud-de-declaratoria-de-prescripcion-de-la-accion-de-cobro',
+    exactName: 'Solicitud de declaratoria de prescripción de la acción de cobro',
+    branch: 'ADMINISTRATIVO',
+    role: 'LITIGANTE',
+    legalBasis: 'Estatuto Tributario, arts. 817 (modificado por el art. 53 de la Ley 1739 de 2014), 818 y 831 num. 6',
+    competentAuthority: 'El funcionario ejecutor de la entidad pública acreedora, que puede declararla de oficio o a petición de parte',
+    term: { status: 'VERIFICADO', description: 'CINCO (5) AÑOS, Y ESTE RELOJ CORRE CONTRA LA ENTIDAD, A FAVOR DEL DEUDOR: NO HAY PLAZO PARA PEDIRLO. «La acción de cobro de las obligaciones fiscales PRESCRIBE EN EL TÉRMINO DE CINCO (5) AÑOS» (art. 817). Se puede alegar de dos maneras y conviene usar ambas: como excepción contra el mandamiento de pago dentro de los quince días (art. 831 num. 6), y como solicitud autónoma, que la entidad debe resolver de oficio o a petición de parte sin plazo que ate al particular. LO QUE INTERRUMPE EL PLAZO Y HAY QUE VERIFICAR ANTES DE ALEGARLO: «El término de la prescripción de la acción de cobro SE INTERRUMPE POR LA NOTIFICACIÓN DEL MANDAMIENTO DE PAGO, POR EL OTORGAMIENTO DE FACILIDADES PARA EL PAGO, por la admisión de la solicitud del concordato y por la declaratoria oficial de la liquidación forzosa administrativa. Interrumpida la prescripción […] EL TÉRMINO EMPEZARÁ A CORRER DE NUEVO desde el día siguiente a la notificación del mandamiento de pago, desde la terminación del concordato o desde la terminación de la liquidación forzosa administrativa» (art. 818). El plazo también se suspende desde el auto que suspende la diligencia de remate. LA TRAMPA QUE MÁS PRESCRIPCIONES DESTRUYE: pedir una facilidad de pago INTERRUMPE la prescripción y le devuelve cinco años completos a la administración. Antes de firmar un acuerdo de pago hay que contar cuánto le falta a la deuda para prescribir; a veces esperar vale más que negociar. PLAZO QUE NO EXISTE Y CONVIENE DECLARARLO: ninguna norma fija término a la entidad para INICIAR el cobro coactivo — el art. 842 del Estatuto fue derogado por el art. 140 de la Ley 6ª de 1992, y el único límite es esta prescripción.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del título ejecutivo y de la fecha desde la que corre la prescripción', mandatory: true, basis: 'Estatuto Tributario, art. 817' },
+      { n: 2, name: 'Verificación de que no operó ninguna causal de interrupción del art. 818', mandatory: true, basis: 'Estatuto Tributario, art. 818' },
+      { n: 3, name: 'Cómputo detallado de los cinco (5) años, descontando las suspensiones', mandatory: true, basis: 'Estatuto Tributario, arts. 817 y 818' },
+      { n: 4, name: 'Petición de que se declare la prescripción y se levanten las medidas cautelares', mandatory: true, basis: 'Estatuto Tributario, art. 817' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/estatuto_tributario_pr033.html'
+  },
+  {
+    id: 'administrativo/solicitud-de-facilidad-de-pago-ante-la-entidad-publica-acreedora',
+    exactName: 'Solicitud de facilidad de pago ante la entidad pública acreedora',
+    branch: 'ADMINISTRATIVO',
+    role: 'LITIGANTE',
+    legalBasis: 'Estatuto Tributario, art. 814, modificado por el art. 91 de la Ley 6 de 1992, con sus incisos 1 y 2 modificados por el art. 81 de la Ley 2277 de 2022; art. 818',
+    competentAuthority: 'El funcionario ejecutor de la entidad pública acreedora',
+    term: { status: 'VERIFICADO', description: 'SIN PLAZO PARA PEDIRLA, PERO CON UNA CONSECUENCIA QUE HAY QUE ADVERTIRLE AL CLIENTE ANTES DE FIRMAR: PEDIRLA INTERRUMPE LA PRESCRIPCIÓN Y LE DEVUELVE CINCO AÑOS COMPLETOS A LA ADMINISTRACIÓN. «El término de la prescripción de la acción de cobro se interrumpe […] POR EL OTORGAMIENTO DE FACILIDADES PARA EL PAGO» (art. 818). Un deudor al que le faltaban ocho meses para que su deuda prescribiera, y que firma un acuerdo para respirar, acaba de comprarse cinco años de cobro. La ficha existe tanto para tramitarla como para que nadie la tramite sin hacer esa cuenta primero. También es excepción contra el mandamiento de pago: «La existencia de acuerdo de pago» (art. 831 num. 2), de modo que un acuerdo vigente detiene la ejecución mientras se cumpla. LO QUE HAY QUE VERIFICAR AL ARMARLA: el art. 814 condiciona el plazo a la garantía que se ofrezca, y su incumplimiento reactiva la ejecución sobre el saldo.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación de las obligaciones que se pretenden incluir y de su estado de cobro', mandatory: true, basis: 'Estatuto Tributario, art. 814' },
+      { n: 2, name: 'Cómputo de cuánto le falta a cada obligación para prescribir, ANTES de solicitar', mandatory: true, basis: 'Estatuto Tributario, art. 818' },
+      { n: 3, name: 'Plazo solicitado y garantía que se ofrece', mandatory: true, basis: 'Estatuto Tributario, art. 814' },
+      { n: 4, name: 'Constancia de haber advertido al deudor que la solicitud interrumpe la prescripción', mandatory: true, basis: 'Estatuto Tributario, art. 818' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/estatuto_tributario_pr033.html'
+  },
+  {
+    id: 'administrativo/demanda-de-nulidad-y-restablecimiento-del-derecho-contra-actos-del-cobro-coactivo',
+    exactName: 'Demanda de nulidad y restablecimiento del derecho contra actos del cobro coactivo',
+    branch: 'ADMINISTRATIVO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1437 de 2011 (CPACA), arts. 98, 100 y 101',
+    competentAuthority: 'La Jurisdicción de lo Contencioso Administrativo',
+    term: { status: 'VERIFICADO', description: 'NO TODO ACTO DEL COACTIVO ES DEMANDABLE, Y ESTA ES LA REGLA QUE MÁS DEMANDAS SE LLEVA POR DELANTE: SON TRES Y NADA MÁS. «SÓLO SERÁN DEMANDABLES ante la Jurisdicción de lo Contencioso Administrativo, en los términos de la Parte Segunda de este Código, los actos administrativos que DECIDEN LAS EXCEPCIONES A FAVOR DEL DEUDOR, los que ORDENAN LLEVAR ADELANTE LA EJECUCIÓN y los que LIQUIDEN EL CRÉDITO» (art. 101). El mandamiento de pago no es demandable, ni el auto que decreta medidas, ni el que niega una facilidad. Demandar cualquiera de esos produce un rechazo por improcedencia y consume el tiempo de caducidad de lo que sí lo era. EL RELOJ DEL CLIENTE ES ENTONCES EL DE LA CADUCIDAD del medio de control de nulidad y restablecimiento, que corre desde la notificación de uno de esos tres actos — ver la ficha del medio de control. PRERROGATIVA QUE EXPLICA POR QUÉ ES TAN ESTRECHO: «Las entidades públicas […] deberán recaudar las obligaciones creadas en su favor, que consten en documentos que presten mérito ejecutivo […] Para tal efecto, ESTÁN REVESTIDAS DE LA PRERROGATIVA DE COBRO COACTIVO o podrán acudir ante los jueces competentes» (art. 98). La entidad ejecuta su propio título, y el juez entra solo al final.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del acto demandado y verificación de que es uno de los tres del art. 101', mandatory: true, basis: 'Ley 1437 de 2011, art. 101' },
+      { n: 2, name: 'Fecha de notificación del acto, de la que corre la caducidad del medio de control', mandatory: true, basis: 'Ley 1437 de 2011, art. 164' },
+      { n: 3, name: 'Constancia de haber agotado la reposición del art. 834 del Estatuto Tributario', mandatory: true, basis: 'Estatuto Tributario, art. 834' },
+      { n: 4, name: 'Normas violadas y concepto de la violación', mandatory: true, basis: 'Ley 1437 de 2011, art. 162' },
+      { n: 5, name: 'Restablecimiento que se pide, incluido el levantamiento de las medidas cautelares', mandatory: true, basis: 'Ley 1437 de 2011, art. 138' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1437_2011_pr002.html'
   }
   ]
 };
