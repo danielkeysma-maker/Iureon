@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Building2, Plus, Edit, Trash2 } from 'lucide-react';
-import type { LawFirmTenant } from '../Header';
+import type { LawFirmTenant } from '../../types';
 import type { ConfirmationRequest } from '../../hooks/useActionConfirmation';
 
 const DEFAULT_BALANCE_COP = 500000;

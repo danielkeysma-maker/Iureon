@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { UserPlus, Edit, Trash2, AlertTriangle, User, Users } from 'lucide-react';
-import type { LawFirmTenant } from '../Header';
+import type { LawFirmTenant } from '../../types';
 import type { FirmUser, FirmUserRole } from '../../types';
 import { NO_FIRM, resolveFirmId, roleRequiresFirm } from '../../types';
 import type { ConfirmationRequest } from '../../hooks/useActionConfirmation';

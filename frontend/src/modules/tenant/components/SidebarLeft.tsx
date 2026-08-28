@@ -10,7 +10,7 @@ import {
   Shield,
   User
 } from 'lucide-react';
-import type { LawFirmTenant } from './Header';
+import type { LawFirmTenant } from '../types';
 import type { MainView } from '../types';
 import { NAV_GROUPS, NAV_MODULES, navModule } from '../navigation';
 import { IureonMark } from './IureonMark';

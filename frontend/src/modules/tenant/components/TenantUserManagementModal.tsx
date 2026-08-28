@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, Building2, Users, Key, Shield } from 'lucide-react';
-import type { LawFirmTenant } from './Header';
+import type { LawFirmTenant } from '../types';
 import { ActionConfirmationModal } from './ActionConfirmationModal';
 import { FirmsTab } from './tabs/FirmsTab';
 import { OperatorConsole } from '../../admin/components/OperatorConsole';
