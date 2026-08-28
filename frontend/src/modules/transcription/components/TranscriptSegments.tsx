@@ -2,7 +2,7 @@ import React from 'react';
 import { AlertTriangle, Check, Scissors, UserCog } from 'lucide-react';
 import { buildSpeakerNames } from '../speakerNames';
 import { colorForSpeaker } from '../speakerColors';
-import { initials } from '../speakerNames';
+
 import {
   ROLE_LABELS,
   ROLE_OPTIONS,
@@ -158,9 +158,9 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
   return (
     <div className="space-y-4">
       {/* Speaker role assignment */}
-      <div className="bg-white border border-slate-200 rounded-xl p-4">
-        <h4 className="font-bold text-slate-900 text-xs mb-1">Identifica a los interlocutores</h4>
-        <p className="text-[11px] text-slate-500 mb-3">
+      <div className="bg-surface border border-line-200 rounded-card p-4">
+        <h4 className="font-bold text-ink-900 text-xs mb-1">Identifica a los interlocutores</h4>
+        <p className="text-[11px] text-ink-500 mb-3">
           El motor detectó {result.speakerLabels.length} voces distintas pero no sabe quién es
           quién. Asigna el rol procesal de cada una.
         </p>
@@ -178,12 +178,16 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
             <div key={label} className="space-y-1">
             <div className="flex items-center gap-2">
               <div
-                className={`w-8 h-8 rounded-full ${colorFor(label)} flex items-center justify-center shrink-0`}
+                /*
+                  Un cuadrado de 8px, no un avatar con iniciales. El circulo
+                  con iniciales sugeria personas con foto — gente ficticia en
+                  una audiencia real. El color identifica la voz; el nombre ya
+                  esta escrito al lado.
+                */
+                className={`h-2 w-2 shrink-0 rounded-[2px] ${colorFor(label)}`}
                 title={speakerNames[label]}
               >
-                <span className="text-[10px] font-bold text-white tracking-tight">
-                  {initials(speakerNames[label] ?? label)}
-                </span>
+
               </div>
               {/*
                 THE NAME, WHICH IS WHAT MAKES A TRANSCRIPT CITABLE.
@@ -208,7 +212,7 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                     if (e.key === 'Enter') e.currentTarget.blur();
                   }}
                   placeholder={proposalFor(label)?.name ?? 'Nombre (opcional)'}
-                  className="flex-1 min-w-0 bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 text-[11px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-900"
+                  className="flex-1 min-w-0 bg-canvas border border-line-200 rounded-control px-2 py-1.5 text-[11px] text-ink-900 placeholder:text-ink-400 focus:outline-none focus:border-brand-700"
                   title={
                     proposalFor(label)
                       ? `Se presentó así: «${proposalFor(label)!.phrase}»`
@@ -216,7 +220,7 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                   }
                 />
               ) : (
-                <span className="text-[11px] font-semibold text-slate-700 flex-1 min-w-0 truncate">
+                <span className="text-[11px] font-semibold text-ink-700 flex-1 min-w-0 truncate">
                   {speakerNames[label] ?? label}
                 </span>
               )}
@@ -224,7 +228,7 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
               <select
                 value={roleOf(label)}
                 onChange={(e) => onAssignRole(label, e.target.value as SpeakerRole)}
-                className="w-44 shrink-0 bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-[11px] text-slate-900 focus:outline-none focus:border-blue-900"
+                className="w-44 shrink-0 bg-canvas border border-line-200 rounded-control p-1.5 text-[11px] text-ink-900 focus:outline-none focus:border-brand-700"
               >
                 {ROLE_OPTIONS[kind].map((role) => (
                   <option key={role} value={role}>
@@ -241,21 +245,21 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
             */}
             {onAssignSpeakerName && !nameOf(label) && proposalFor(label) && (
               <div className="flex items-start gap-2 pl-10">
-                <p className="text-[10px] text-slate-500 flex-1">
+                <p className="text-[10px] text-ink-500 flex-1">
                   Se presentó como{' '}
-                  <span className="font-semibold text-slate-700">{proposalFor(label)!.name}</span>
+                  <span className="font-semibold text-ink-700">{proposalFor(label)!.name}</span>
                   {proposalFor(label)!.atSeconds !== null && (
-                    <span className="font-mono text-slate-400">
+                    <span className="font-mono text-ink-400">
                       {' '}
                       · {formatTimestamp(proposalFor(label)!.atSeconds)}
                     </span>
                   )}
-                  <span className="text-slate-400"> — «{proposalFor(label)!.phrase}»</span>
+                  <span className="text-ink-400"> — «{proposalFor(label)!.phrase}»</span>
                 </p>
                 <button
                   type="button"
                   onClick={() => onAssignSpeakerName(label, proposalFor(label)!.name)}
-                  className="text-[10px] font-semibold text-blue-900 hover:underline shrink-0"
+                  className="text-[10px] font-semibold text-brand-700 hover:underline shrink-0"
                 >
                   Usar este nombre
                 </button>
@@ -279,27 +283,27 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
       {voiceConflicts.map((conflict) => (
         <div
           key={conflict.speakerLabel}
-          className="bg-amber-50 border border-amber-300 rounded-xl p-4"
+          className="bg-[rgb(var(--unverified-surf))] border border-[rgb(var(--unverified-line))] rounded-card p-4"
         >
           <div className="flex items-center gap-2 mb-2">
-            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-            <h4 className="font-bold text-amber-900 text-xs">
+            <AlertTriangle className="w-4 h-4 text-unverified shrink-0" />
+            <h4 className="font-bold text-ink-900 text-xs">
               La voz {speakerNames[conflict.speakerLabel] ?? conflict.speakerLabel} parece contener a{' '}
               {conflict.identities.length} personas distintas
             </h4>
           </div>
           <ul className="space-y-1 mb-2">
             {conflict.identities.map((identity) => (
-              <li key={`${identity.segmentIndex}-${identity.name}`} className="text-[11px] text-amber-900">
+              <li key={`${identity.segmentIndex}-${identity.name}`} className="text-[11px] text-ink-900">
                 <span className="font-semibold">{identity.name}</span>
                 {identity.atSeconds !== null && (
-                  <span className="font-mono text-amber-700"> · {formatTimestamp(identity.atSeconds)}</span>
+                  <span className="font-mono text-unverified"> · {formatTimestamp(identity.atSeconds)}</span>
                 )}
-                <span className="text-amber-800"> — «{identity.phrase}»</span>
+                <span className="text-ink-700"> — «{identity.phrase}»</span>
               </li>
             ))}
           </ul>
-          <p className="text-[11px] text-amber-800">
+          <p className="text-[11px] text-ink-700">
             Cada quien se presentó con su propio nombre. Busca la intervención que no corresponde y
             usa <span className="font-semibold">«Otra voz»</span> para dársela a la persona correcta,
             o corrige el nombre si la transcripción lo oyó mal. Si esta voz es un intérprete que
@@ -309,7 +313,7 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
       ))}
 
       {/* Transcript */}
-      <div className="bg-white border border-slate-200 rounded-xl divide-y divide-slate-100/80 overflow-hidden">
+      <div className="bg-surface border border-line-200 rounded-card divide-y divide-line-100 overflow-hidden">
         {result.segments.map((segment, index) => (
           <div
             key={`${segment.speakerLabel}-${index}`}
@@ -320,22 +324,18 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
               paragraph of a two-hour transcript — the page read like a form
               instead of like a record of what was said.
             */
-            className="group flex gap-3 px-4 py-3 hover:bg-slate-50/70 transition-colors"
+            className="group flex gap-3 px-4 py-3 hover:bg-canvas transition-colors"
           >
             <div
-              className={`w-8 h-8 rounded-full ${colorFor(segment.speakerLabel)} flex items-center justify-center shrink-0 mt-0.5`}
+              className={`mt-[7px] h-2 w-2 shrink-0 rounded-[2px] ${colorFor(segment.speakerLabel)}`}
               title={speakerNames[segment.speakerLabel]}
-            >
-              <span className="text-[10px] font-bold text-white tracking-tight">
-                {initials(speakerNames[segment.speakerLabel] ?? ROLE_LABELS[segment.role])}
-              </span>
-            </div>
+            />
 
             <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 mb-0.5 min-h-[18px]">
               {/* The disambiguated name, not the bare role: with three
                   witnesses "Testigo" three times tells the reader nothing. */}
-              <span className="text-xs font-bold text-slate-900">
+              <span className="text-xs font-bold text-ink-900">
                 {speakerNames[segment.speakerLabel] ?? ROLE_LABELS[segment.role]}
               </span>
 
@@ -352,13 +352,13 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                 the role, and "Juez (Juez)" says the same thing twice.
               */}
               {segment.speakerName && segment.role !== 'DESCONOCIDO' && (
-                <span className="text-[11px] font-normal text-slate-500">
+                <span className="text-[11px] font-normal text-ink-500">
                   ({ROLE_LABELS[segment.role]})
                 </span>
               )}
 
               {segment.startSeconds !== null && (
-                <span className="text-[10px] font-mono text-slate-400">
+                <span className="text-[10px] font-mono text-ink-400">
                   {formatTimestamp(segment.startSeconds)}
                 </span>
               )}
@@ -400,7 +400,7 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                         setCutting({ index, offset: caret.offset });
                       }}
                       className={`text-[10px] font-semibold flex items-center gap-1 ${
-                        armado ? 'text-blue-900' : 'text-slate-400 hover:text-slate-600'
+                        armado ? 'text-brand-700' : 'text-ink-400 hover:text-ink-500'
                       }`}
                       title={
                         armado
@@ -434,7 +434,7 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                     setCutting(null);
                     setAviso(null);
                   }}
-                  className="text-[10px] font-semibold text-slate-400 hover:text-blue-900 flex items-center gap-1"
+                  className="text-[10px] font-semibold text-ink-400 hover:text-brand-700 flex items-center gap-1"
                   title="Esta intervención es de otra persona"
                 >
                   <UserCog className="w-3 h-3" />
@@ -463,7 +463,7 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
               with no way to tell a refused cut from a broken button.
             */}
             {aviso === index && (
-              <p className="mt-2 text-[11px] text-amber-900 bg-amber-50 border border-amber-200 rounded-lg p-2">
+              <p className="mt-2 text-[11px] text-ink-900 bg-[rgb(var(--unverified-surf))] border border-[rgb(var(--unverified-line))] rounded-control p-2">
                 Haz clic dentro del texto, justo donde empieza a hablar la otra persona, y vuelve a
                 pulsar Dividir.
               </p>
@@ -478,8 +478,8 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
               common case — most often whoever was interrupted.
             */}
             {moving === index && (
-              <div className="mt-2 flex flex-wrap items-center gap-2 bg-blue-50/70 border border-blue-200 rounded-lg p-2">
-                <span className="text-[11px] text-slate-700">Esta intervención la dice:</span>
+              <div className="mt-2 flex flex-wrap items-center gap-2 bg-brand-50/70 border border-blue-200 rounded-control p-2">
+                <span className="text-[11px] text-ink-700">Esta intervención la dice:</span>
 
                 <select
                   defaultValue=""
@@ -487,7 +487,7 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                     onReassignSpeaker?.(index, e.target.value);
                     setMoving(null);
                   }}
-                  className="bg-white border border-slate-200 rounded-lg p-1.5 text-[11px] text-slate-900 focus:outline-none focus:border-blue-900"
+                  className="bg-surface border border-line-200 rounded-control p-1.5 text-[11px] text-ink-900 focus:outline-none focus:border-brand-700"
                 >
                   <option value="" disabled>
                     Elige quién…
@@ -507,7 +507,7 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                 <button
                   type="button"
                   onClick={() => setMoving(null)}
-                  className="text-[11px] text-slate-500 hover:text-slate-700"
+                  className="text-[11px] text-ink-500 hover:text-ink-700"
                 >
                   Cancelar
                 </button>
@@ -515,8 +515,8 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
             )}
 
             {cutting?.index === index && (
-              <div className="mt-2 flex flex-wrap items-center gap-2 bg-amber-50/70 border border-amber-200 rounded-lg p-2">
-                <span className="text-[11px] text-slate-700">Lo que sigue lo dice:</span>
+              <div className="mt-2 flex flex-wrap items-center gap-2 bg-[rgb(var(--unverified-surf))]/70 border border-[rgb(var(--unverified-line))] rounded-control p-2">
+                <span className="text-[11px] text-ink-700">Lo que sigue lo dice:</span>
 
                 <select
                   defaultValue=""
@@ -528,7 +528,7 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                     // position no longer means what it did.
                     setCaret(null);
                   }}
-                  className="bg-white border border-slate-200 rounded-lg p-1.5 text-[11px] text-slate-900 focus:outline-none focus:border-blue-900"
+                  className="bg-surface border border-line-200 rounded-control p-1.5 text-[11px] text-ink-900 focus:outline-none focus:border-brand-700"
                 >
                   <option value="" disabled>
                     Elige quién…
@@ -544,7 +544,7 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                 <button
                   type="button"
                   onClick={() => setCutting(null)}
-                  className="text-[11px] text-slate-500 hover:text-slate-700"
+                  className="text-[11px] text-ink-500 hover:text-ink-700"
                 >
                   Cancelar
                 </button>
@@ -628,9 +628,9 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                 document a lawyer reads for an hour and quotes in a filing. The
                 controls around it can stay small; the words cannot.
               */
-              className={`text-[13px] text-slate-700 leading-[1.65] ${
+              className={`text-[13px] text-ink-700 leading-[1.65] ${
                 onEditSegment
-                  ? 'outline-none focus:bg-amber-50/60 focus:ring-1 focus:ring-amber-300 rounded px-1 -mx-1 cursor-text'
+                  ? 'outline-none focus:bg-[rgb(var(--unverified-surf))]/60 focus:ring-1 focus:ring-[rgb(var(--unverified-line))] rounded px-1 -mx-1 cursor-text'
                   : ''
               }`}
               title={
@@ -650,7 +650,7 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
               worst outcome this screen can produce.
             */}
             {editing === index && (
-              <p className="mt-1 text-[10px] text-slate-500">
+              <p className="mt-1 text-[10px] text-ink-500">
                 <span className="font-semibold">Enter</span> guarda ·{' '}
                 <span className="font-semibold">Esc</span> descarta · también se guarda al hacer
                 clic fuera
@@ -658,7 +658,7 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
             )}
 
             {justSaved === index && (
-              <p className="mt-1 text-[10px] font-semibold text-emerald-700 flex items-center gap-1">
+              <p className="mt-1 text-[10px] font-semibold text-verified flex items-center gap-1">
                 <Check className="w-3 h-3" />
                 Corrección guardada
               </p>

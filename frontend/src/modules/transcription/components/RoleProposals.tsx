@@ -38,12 +38,12 @@ export const RoleProposals: React.FC<RoleProposalsProps> = ({ proposals, assigne
   if (pending.length === 0) return null;
 
   return (
-    <div className="bg-amber-50/50 border border-amber-200/70 rounded-xl p-4 space-y-3">
+    <div className="bg-[rgb(var(--unverified-surf))]/50 border border-[rgb(var(--unverified-line))]/70 rounded-card p-4 space-y-3">
       <div className="flex items-start gap-2">
-        <Lightbulb className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+        <Lightbulb className="w-4 h-4 text-unverified flex-shrink-0 mt-0.5" />
         <div>
-          <p className="text-[12px] font-semibold text-slate-900">Roles sugeridos</p>
-          <p className="text-[11px] text-slate-600 leading-snug mt-0.5">
+          <p className="text-[12px] font-semibold text-ink-900">Roles sugeridos</p>
+          <p className="text-[11px] text-ink-500 leading-snug mt-0.5">
             Deducidos de lo que dijo cada voz. Revise la frase antes de aceptar: la aplicación no
             estuvo en la audiencia.
           </p>
@@ -54,18 +54,18 @@ export const RoleProposals: React.FC<RoleProposalsProps> = ({ proposals, assigne
         {pending.map((proposal) => (
           <div
             key={proposal.speakerLabel}
-            className="bg-white border border-slate-200/80 rounded-lg p-3 space-y-2"
+            className="bg-surface border border-line-200 rounded-control p-3 space-y-2"
           >
             <div className="flex items-center justify-between gap-3">
-              <span className="text-[12px] text-slate-700">
-                <span className="font-mono text-[11px] text-slate-500">{proposal.speakerLabel}</span>
-                <span className="mx-1.5 text-slate-300">→</span>
-                <b className="text-slate-900">{ROLE_LABELS[proposal.proposedRole]}</b>
+              <span className="text-[12px] text-ink-700">
+                <span className="font-mono text-[11px] text-ink-500">{proposal.speakerLabel}</span>
+                <span className="mx-1.5 text-ink-400">→</span>
+                <b className="text-ink-900">{ROLE_LABELS[proposal.proposedRole]}</b>
               </span>
 
               <button
                 onClick={() => onAccept(proposal.speakerLabel, proposal.proposedRole)}
-                className="px-2.5 py-1 bg-blue-950 hover:bg-blue-900 text-white rounded-md text-[11px] font-semibold flex-shrink-0"
+                className="px-2.5 py-1 bg-brand-700 hover:bg-brand-800 text-white rounded-md text-[11px] font-semibold flex-shrink-0"
               >
                 Confirmar
               </button>
@@ -74,12 +74,12 @@ export const RoleProposals: React.FC<RoleProposalsProps> = ({ proposals, assigne
             {proposal.evidence.map((evidence, index) => (
               <p
                 key={index}
-                className="text-[11px] text-slate-600 leading-snug flex items-start gap-1.5 bg-slate-50 rounded p-2"
+                className="text-[11px] text-ink-500 leading-snug flex items-start gap-1.5 bg-canvas rounded p-2"
               >
-                <Quote className="w-3 h-3 text-slate-400 flex-shrink-0 mt-0.5" />
+                <Quote className="w-3 h-3 text-ink-400 flex-shrink-0 mt-0.5" />
                 <span>
                   {evidence.phrase}
-                  <span className="text-slate-400">{atMinute(evidence.atSeconds)}</span>
+                  <span className="text-ink-400">{atMinute(evidence.atSeconds)}</span>
                 </span>
               </p>
             ))}
@@ -92,9 +92,9 @@ export const RoleProposals: React.FC<RoleProposalsProps> = ({ proposals, assigne
 
 /** Warns that a transcript exists only in this tab. */
 export const NotPersistedWarning: React.FC = () => (
-  <div className="bg-rose-50 border border-rose-200 rounded-xl p-3 flex items-start gap-2">
-    <ShieldAlert className="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5" />
-    <p className="text-[11.5px] text-rose-800 leading-snug">
+  <div className="bg-[rgb(var(--danger)/0.06)] border border-[rgb(var(--danger)/0.35)] rounded-card p-3 flex items-start gap-2">
+    <ShieldAlert className="w-4 h-4 text-danger flex-shrink-0 mt-0.5" />
+    <p className="text-[11.5px] text-danger leading-snug">
       <b>Este transcrito no se guardó.</b> La transcripción se completó, pero no pudo almacenarse:
       si cierra esta pestaña lo pierde. Copie el texto ahora.
     </p>

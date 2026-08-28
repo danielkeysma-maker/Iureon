@@ -532,7 +532,20 @@ export function App() {
             />
           )}
 
-          {mainView === 'audiencias' && <TranscriptionView kind="AUDIENCIA" />}
+          {mainView === 'audiencias' && (
+            <TranscriptionView
+              kind="AUDIENCIA"
+              /*
+                La transcripcion viaja como HECHOS al panel de redaccion — el
+                mismo camino que ya recorren los hechos de Orientacion. Lo dicho
+                en audiencia es el material del proximo escrito.
+              */
+              onUsarEnRedaccion={(texto) => {
+                workflow.setLegalPrompt(texto);
+                setMainView('workspace');
+              }}
+            />
+          )}
           {mainView === 'entrevistas' && (
             <InterviewView
               /*

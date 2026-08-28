@@ -40,15 +40,15 @@ export const AudioPreview: React.FC<AudioPreviewProps> = ({ file }) => {
   if (!url) return null;
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-3 space-y-2">
+    <div className="bg-surface border border-line-200 rounded-card p-3 space-y-2">
       <div className="flex items-center gap-2">
-        <Headphones className="w-3.5 h-3.5 text-slate-400" />
-        <span className="text-[11px] font-semibold text-slate-700">Escuchar la grabación</span>
+        <Headphones className="w-3.5 h-3.5 text-ink-400" />
+        <span className="text-[11px] font-semibold text-ink-700">Escuchar la grabación</span>
       </div>
 
       <audio controls src={url} className="w-full h-9" preload="metadata" />
 
-      <p className="text-[10.5px] text-slate-500 leading-snug">
+      <p className="text-[10.5px] text-ink-500 leading-snug">
         Se reproduce desde este navegador, no desde el servidor: la grabación se borra del
         almacenamiento al terminar de transcribirse. Estará disponible mientras no cierres esta
         pestaña.
