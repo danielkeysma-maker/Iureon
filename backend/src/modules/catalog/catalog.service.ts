@@ -89,7 +89,10 @@ export class CatalogService {
 
   list(branch?: LegalBranch, role?: ActuacionRole): Actuacion[] {
     return this.actuaciones.filter(
-      (a) => (!branch || a.branch === branch) && (!role || a.role === role)
+      // Lo transversal aparece en TODA rama: el derecho de peticion se ejerce
+      // ante cualquier autoridad, y esconderlo fuera de administrativo dejaba
+      // al laboralista sin la actuacion que mas radica.
+      (a) => (!branch || a.branch === branch || a.transversal === true) && (!role || a.role === role)
     );
   }
 
@@ -112,7 +115,9 @@ export class CatalogService {
 
     if (!target) return null;
 
-    const pool = branch ? this.actuaciones.filter((a) => a.branch === branch) : this.actuaciones;
+    const pool = branch
+      ? this.actuaciones.filter((a) => a.branch === branch || a.transversal === true)
+      : this.actuaciones;
 
     const exact = pool.filter((a) => normalize(a.exactName) === target);
     if (exact.length === 1) return exact[0];

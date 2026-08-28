@@ -23,6 +23,7 @@
     "check:stored": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/transcription/__checks__/storedList.check.ts",
     "check:names": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/transcription/__checks__/speakerNames.check.ts",
     "check:conflicts": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/transcription/__checks__/voiceConflicts.check.ts",
+    "check:rutas": "npx ts-node -P tsconfig.check.json --transpile-only src/__checks__/rutas.check.ts",
     "check:estados": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/transcription/__checks__/estados.check.ts",
     "check:resumen": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/transcription/__checks__/resumen.check.ts",
     "check:retrieval": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/search/__checks__/retrieval.check.ts",

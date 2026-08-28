@@ -35,7 +35,7 @@ interface SettlementResponse {
  */
 export const settlementsApi = {
   async calculate(body: SettlementCalculationRequest): Promise<SettlementResult> {
-    const data = await httpClient.post<SettlementResponse>('/api/settlements/calculate', { body });
+    const data = await httpClient.post<SettlementResponse>('/api/settlement/calculate', { body });
     if (data.success && data.result) return data.result;
     throw new Error(data.message ?? 'No se pudo calcular la liquidación.');
   }

@@ -996,6 +996,8 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     id: 'administrativo/peticion-de-interes-general',
     exactName: 'Petición de interés general',
     branch: 'ADMINISTRATIVO',
+    // Art. 23 C.P.: se ejerce ante cualquier autoridad. Visible en toda rama.
+    transversal: true,
     role: 'LITIGANTE',
     legalBasis: 'Constitución Política, art. 23; Ley 1755 de 2015, arts. 13, 14 y 16 (sustitutivos de los arts. 13, 14 y 16 de la Ley 1437 de 2011)',
     competentAuthority: 'La autoridad a la que se dirige la petición (Ley 1755 de 2015, art. 16 num. 1)',
@@ -1014,6 +1016,8 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     id: 'administrativo/peticion-de-interes-particular',
     exactName: 'Petición de interés particular',
     branch: 'ADMINISTRATIVO',
+    // Art. 23 C.P.: se ejerce ante cualquier autoridad. Visible en toda rama.
+    transversal: true,
     role: 'LITIGANTE',
     legalBasis: 'Constitución Política, art. 23; Ley 1755 de 2015, arts. 13, 14 y 16',
     competentAuthority: 'La autoridad a la que se dirige la petición (Ley 1755 de 2015, art. 16 num. 1)',
@@ -1034,6 +1038,8 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     id: 'administrativo/peticion-de-informacion',
     exactName: 'Petición de información',
     branch: 'ADMINISTRATIVO',
+    // Art. 23 C.P.: se ejerce ante cualquier autoridad. Visible en toda rama.
+    transversal: true,
     role: 'LITIGANTE',
     legalBasis: 'Ley 1755 de 2015, arts. 13, 14 num. 1, 16 y 24',
     competentAuthority: 'La autoridad que posee la información solicitada',
@@ -1055,6 +1061,8 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     id: 'administrativo/peticion-de-copias-o-de-examen-de-documentos',
     exactName: 'Petición de copias o de examen de documentos',
     branch: 'ADMINISTRATIVO',
+    // Art. 23 C.P.: se ejerce ante cualquier autoridad. Visible en toda rama.
+    transversal: true,
     role: 'LITIGANTE',
     legalBasis: 'Ley 1755 de 2015, arts. 13, 14 num. 1, 16, 24 y 29',
     competentAuthority: 'La autoridad en cuyos archivos reposan los documentos',
@@ -1076,6 +1084,8 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     id: 'administrativo/peticion-de-consulta',
     exactName: 'Petición de consulta',
     branch: 'ADMINISTRATIVO',
+    // Art. 23 C.P.: se ejerce ante cualquier autoridad. Visible en toda rama.
+    transversal: true,
     role: 'LITIGANTE',
     legalBasis: 'Ley 1755 de 2015, arts. 13, 14 num. 2, 16 y 28',
     competentAuthority: 'La autoridad competente en la materia objeto de consulta',
@@ -1097,6 +1107,8 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     id: 'administrativo/peticion-ante-organizaciones-e-instituciones-privadas-y-ante-particulares',
     exactName: 'Petición ante organizaciones e instituciones privadas y ante particulares',
     branch: 'ADMINISTRATIVO',
+    // Art. 23 C.P.: se ejerce ante cualquier autoridad. Visible en toda rama.
+    transversal: true,
     role: 'LITIGANTE',
     legalBasis: 'Ley 1755 de 2015, arts. 32 y 33 (Capítulo III); Sentencia C-951 de 2014',
     competentAuthority: 'Organizaciones privadas con o sin personería jurídica —sociedades, corporaciones, fundaciones, asociaciones, organizaciones religiosas, cooperativas, instituciones financieras o clubes— (art. 32); Cajas de Compensación Familiar, instituciones del Sistema de Seguridad Social Integral, entidades del sistema financiero y bursátil y empresas que prestan servicios públicos y servicios públicos domiciliarios regidas por el derecho privado (art. 33); y personas naturales frente a las cuales el solicitante se encuentre en situación de indefensión o subordinación, o que ejerzan posición dominante (art. 32 par. 1)',
@@ -1119,6 +1131,8 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     id: 'administrativo/solicitud-de-atencion-prioritaria-de-la-peticion',
     exactName: 'Solicitud de atención prioritaria de la petición',
     branch: 'ADMINISTRATIVO',
+    // Art. 23 C.P.: se ejerce ante cualquier autoridad. Visible en toda rama.
+    transversal: true,
     role: 'LITIGANTE',
     legalBasis: 'Ley 1755 de 2015, art. 20 (atención prioritaria); art. 14 y su parágrafo (términos de fondo y prórroga que no puede exceder del doble del inicialmente previsto); Ley 1437 de 2011, art. 83 (silencio negativo a los tres meses)',
     competentAuthority: 'La autoridad ante la que cursa la petición',
@@ -1142,6 +1156,8 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     id: 'administrativo/desistimiento-expreso-de-la-peticion',
     exactName: 'Desistimiento expreso de la petición',
     branch: 'ADMINISTRATIVO',
+    // Art. 23 C.P.: se ejerce ante cualquier autoridad. Visible en toda rama.
+    transversal: true,
     role: 'LITIGANTE',
     legalBasis: 'Ley 1755 de 2015, art. 18',
     competentAuthority: 'La autoridad ante la que cursa la petición',
@@ -1160,6 +1176,8 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     id: 'administrativo/respuesta-al-requerimiento-por-peticion-incompleta-y-solicitud-de-prorroga',
     exactName: 'Respuesta al requerimiento por petición incompleta y solicitud de prórroga',
     branch: 'ADMINISTRATIVO',
+    // Art. 23 C.P.: se ejerce ante cualquier autoridad. Visible en toda rama.
+    transversal: true,
     role: 'LITIGANTE',
     legalBasis: 'Ley 1755 de 2015, art. 17',
     competentAuthority: 'La autoridad que formuló el requerimiento',
@@ -1178,6 +1196,8 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     id: 'administrativo/correccion-o-aclaracion-de-peticion-oscura',
     exactName: 'Corrección o aclaración de petición oscura',
     branch: 'ADMINISTRATIVO',
+    // Art. 23 C.P.: se ejerce ante cualquier autoridad. Visible en toda rama.
+    transversal: true,
     role: 'LITIGANTE',
     legalBasis: 'Ley 1755 de 2015, art. 19',
     competentAuthority: 'La autoridad que devolvió la petición',
@@ -1196,6 +1216,8 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     id: 'administrativo/recurso-de-insistencia-por-reserva-de-la-informacion-o-de-los-documentos',
     exactName: 'Recurso de insistencia por reserva de la información o de los documentos',
     branch: 'ADMINISTRATIVO',
+    // Art. 23 C.P.: se ejerce ante cualquier autoridad. Visible en toda rama.
+    transversal: true,
     role: 'LITIGANTE',
     legalBasis: 'Ley 1755 de 2015, arts. 25 y 26; Sentencia C-951 de 2014',
     competentAuthority: 'Se interpone ante la autoridad que invoca la reserva; decide en única instancia el Tribunal Administrativo con jurisdicción en el lugar donde se encuentren los documentos —autoridades nacionales, departamentales o del Distrito Capital de Bogotá— o el juez administrativo —autoridades distritales y municipales—; en los municipios en los que no exista juez administrativo, cualquier juez del lugar (C-951 de 2014, numeral noveno)',
@@ -1216,6 +1238,8 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     id: 'administrativo/respuesta-de-fondo-a-la-peticion',
     exactName: 'Respuesta de fondo a la petición',
     branch: 'ADMINISTRATIVO',
+    // Art. 23 C.P.: se ejerce ante cualquier autoridad. Visible en toda rama.
+    transversal: true,
     role: 'DESPACHO',
     legalBasis: 'Ley 1755 de 2015, arts. 13, 14, 16 par. 1 y 31',
     competentAuthority: 'La autoridad destinataria de la petición',
@@ -1236,6 +1260,8 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     id: 'administrativo/comunicacion-de-ampliacion-del-plazo-para-resolver-la-peticion',
     exactName: 'Comunicación de ampliación del plazo para resolver la petición',
     branch: 'ADMINISTRATIVO',
+    // Art. 23 C.P.: se ejerce ante cualquier autoridad. Visible en toda rama.
+    transversal: true,
     role: 'DESPACHO',
     legalBasis: 'Ley 1755 de 2015, art. 14 par.',
     competentAuthority: 'La autoridad que tramita la petición',
@@ -1253,6 +1279,8 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     id: 'administrativo/peticion-entre-autoridades',
     exactName: 'Petición entre autoridades',
     branch: 'ADMINISTRATIVO',
+    // Art. 23 C.P.: se ejerce ante cualquier autoridad. Visible en toda rama.
+    transversal: true,
     role: 'DESPACHO',
     legalBasis: 'Ley 1755 de 2015, arts. 27 y 30',
     competentAuthority: 'La autoridad requerida',
@@ -1272,6 +1300,8 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     id: 'administrativo/requerimiento-por-peticion-incompleta-y-acto-que-decreta-el-desistimiento-tacito',
     exactName: 'Requerimiento por petición incompleta y acto que decreta el desistimiento tácito',
     branch: 'ADMINISTRATIVO',
+    // Art. 23 C.P.: se ejerce ante cualquier autoridad. Visible en toda rama.
+    transversal: true,
     role: 'DESPACHO',
     legalBasis: 'Ley 1755 de 2015, art. 17',
     competentAuthority: 'La autoridad ante la que se radicó la petición',
@@ -1292,6 +1322,8 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     id: 'administrativo/remision-de-la-peticion-por-falta-de-competencia',
     exactName: 'Remisión de la petición por falta de competencia',
     branch: 'ADMINISTRATIVO',
+    // Art. 23 C.P.: se ejerce ante cualquier autoridad. Visible en toda rama.
+    transversal: true,
     role: 'DESPACHO',
     legalBasis: 'Ley 1755 de 2015, art. 21',
     competentAuthority: 'La autoridad que recibió la petición sin ser competente',
@@ -1310,6 +1342,8 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     id: 'administrativo/decision-que-rechaza-la-peticion-de-informacion-o-de-documentos-por-reserva-legal',
     exactName: 'Decisión que rechaza la petición de información o de documentos por reserva legal',
     branch: 'ADMINISTRATIVO',
+    // Art. 23 C.P.: se ejerce ante cualquier autoridad. Visible en toda rama.
+    transversal: true,
     role: 'DESPACHO',
     legalBasis: 'Ley 1755 de 2015, arts. 24, 25 y 26',
     competentAuthority: 'La autoridad que custodia la información o los documentos',
@@ -1329,6 +1363,8 @@ export const ADMINISTRATIVO_CATALOG: BranchCatalog = {
     id: 'administrativo/respuesta-unica-a-peticiones-analogas-de-mas-de-diez-personas',
     exactName: 'Respuesta única a peticiones análogas de más de diez personas',
     branch: 'ADMINISTRATIVO',
+    // Art. 23 C.P.: se ejerce ante cualquier autoridad. Visible en toda rama.
+    transversal: true,
     role: 'DESPACHO',
     legalBasis: 'Ley 1755 de 2015, art. 22; Sentencia C-951 de 2014',
     competentAuthority: 'La autoridad destinataria de las peticiones',

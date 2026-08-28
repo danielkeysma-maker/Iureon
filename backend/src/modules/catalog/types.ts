@@ -100,6 +100,20 @@ export interface Actuacion {
   sourceUrl: string | null;
   /** Present only when this firm curated the entry in-product. */
   verification?: ActuacionVerification;
+  /*
+   * TRANSVERSAL: la actuacion aplica en TODA rama, no solo en la suya.
+   *
+   * El derecho de peticion (art. 23 C.P., Ley 1755 de 2015) se ejerce ante
+   * cualquier autoridad — un laboralista lo radica ante la UGPP y un penalista
+   * ante el INPEC — pero sus fichas viven en ADMINISTRATIVO porque la Ley 1755
+   * es su fuente. Sin esta marca, elegir cualquier otra rama las escondia:
+   * existian, estaban verificadas, y nadie fuera de administrativo las veia.
+   *
+   * Marca y no duplicacion, a proposito: cada copia exigiria verificar su
+   * termino por separado, y dieciocho copias por rama son dieciocho lugares
+   * donde un termino corregido puede quedar viejo.
+   */
+  transversal?: boolean;
 }
 
 /**
