@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { catalogService } from './catalog.service';
 import { validateVerificationInput } from './verification.validate';
+import { auditService } from '../audit/audit.service';
 import { verificationStore, VerificationStoreError } from './verification.store';
 import type { ActuacionRole, LegalBranch } from './types';
 
@@ -164,6 +165,18 @@ export const saveVerificationController = async (req: Request, res: Response): P
   try {
     const saved = await verificationStore.save(firmId, validation.value);
     const { actuacion } = await catalogService.getByIdForFirm(firmId, base.id);
+
+    /*
+     * El acto que hace confiable el catalogo, con nombre en el registro. Un
+     * termino verificado sin rastro de quien lo verifico no es auditable — y
+     * "651 actuaciones no valen sin la firma de quien las reviso".
+     */
+    await auditService.record({
+      firmId,
+      userEmail: req.user?.email ?? 'desconocido',
+      action: 'CATALOG_TERM_VERIFIED',
+      resource: `Verificó actuación · ${base.exactName}`
+    });
 
     res.json({ success: true, verification: saved, actuacion });
   } catch (error) {

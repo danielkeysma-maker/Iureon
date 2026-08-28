@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { auditService } from '../audit/audit.service';
 import { randomUUID } from 'node:crypto';
 import { OpenRouterMultiEngineService, AgentExecutionStep } from './openrouter.service';
 import {
@@ -107,6 +108,17 @@ export const streamAgentDraftController = async (req: Request, res: Response): P
       operationId,
       description: `Borrador: ${result.title}`,
       reserved
+    });
+
+    /*
+     * A la auditoria ANTES de responder: una funcion serverless se congela al
+     * responder, y un registro dejado "para despues" no se escribe nunca.
+     */
+    await auditService.record({
+      firmId: firmId as string,
+      userEmail: req.user?.email ?? 'desconocido',
+      action: 'DRAFT_GENERATED',
+      resource: `Generó escrito · ${result.title}`
     });
 
     sendEvent('COMPLETED', {

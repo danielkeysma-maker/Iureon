@@ -8,6 +8,7 @@ import { proposeRoles } from './roleProposer';
 import { detectVoiceConflicts, proposeSpeakerNames } from './voiceConflicts';
 import { BackblazeB2TenantStorageService } from '../documents/b2.service';
 import { transcriptionStore } from './transcriptionStore.service';
+import { auditService } from '../audit/audit.service';
 import { generarResumen, type ResumenDeTranscripcion } from './resumen.service';
 import type { SpeakerRole, TranscriptionKind } from './types';
 
@@ -104,6 +105,15 @@ export const transcribeAudioController = async (req: Request, res: Response): Pr
       file.originalname,
       result
     );
+
+    if (stored) {
+      await auditService.record({
+        firmId: req.firmId as string,
+        userEmail: req.user?.email ?? 'desconocido',
+        action: 'TRANSCRIPTION_CREATED',
+        resource: `Transcribió ${kind === 'ENTREVISTA' ? 'entrevista' : 'audiencia'} · ${stored.title}`
+      });
+    }
 
     /*
      * Proposals, not assignments. The roles are NOT written into the stored
@@ -219,6 +229,15 @@ export const marcarRevisionController = async (req: Request, res: Response): Pro
     res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'No se encontró esa transcripción.' });
     return;
   }
+
+  // El acto que convierte la transcripcion en acta merece rastro con nombre.
+  await auditService.record({
+    firmId: req.firmId as string,
+    userEmail: req.user?.email ?? 'desconocido',
+    action: 'ACTA_LISTA',
+    resource: `${estado === 'ACTA_LISTA' ? 'Marcó acta lista' : 'Devolvió a revisión'} · ${item.title}`
+  });
+
   res.json({ success: true, item });
 };
 
@@ -245,6 +264,19 @@ export const decidirEntrevistaController = async (req: Request, res: Response): 
       res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'No se encontró esa entrevista.' });
       return;
     }
+
+    await auditService.record({
+      firmId: req.firmId as string,
+      userEmail: req.user?.email ?? 'desconocido',
+      action: 'INTERVIEW_DECIDED',
+      resource:
+        decision === 'TOMADO'
+          ? `Tomó el caso · ${item.title}`
+          : decision === 'DECLINADO'
+          ? `Declinó el caso (${motivo}) · ${item.title}`
+          : `Reabrió la decisión · ${item.title}`
+    });
+
     res.json({ success: true, item });
   } catch (err) {
     // El unico throw del servicio: declinar sin motivo. Mensaje en espanol tal cual.
@@ -331,7 +363,18 @@ export const assignTranscriptionRolesController = async (
  * DELETE /api/transcription/:id — The firm disposes of its own privileged material.
  */
 export const deleteTranscriptionController = async (req: Request, res: Response): Promise<void> => {
+  // Se lee ANTES de borrar: despues ya no hay titulo que registrar.
+  const existente = await transcriptionStore.get(req.firmId as string, String(req.params.id));
   const removed = await transcriptionStore.remove(req.firmId as string, String(req.params.id));
+
+  if (removed) {
+    await auditService.record({
+      firmId: req.firmId as string,
+      userEmail: req.user?.email ?? 'desconocido',
+      action: 'TRANSCRIPTION_DELETED',
+      resource: `Eliminó transcripción · ${existente?.title ?? String(req.params.id)}`
+    });
+  }
 
   if (!removed) {
     res.status(404).json({ error: 'NOT_FOUND', message: 'No se encontró el transcrito.' });

@@ -29,7 +29,10 @@ export type AuditAction =
   | 'SUPERADMIN_LISTED_FIRMS'
   | 'DRAFT_GENERATED'
   | 'TRANSCRIPTION_CREATED'
-  | 'TRANSCRIPTION_DELETED';
+  | 'TRANSCRIPTION_DELETED'
+  | 'CATALOG_TERM_VERIFIED'
+  | 'INTERVIEW_DECIDED'
+  | 'ACTA_LISTA';
 
 export interface AuditLogEntry {
   id: string;
