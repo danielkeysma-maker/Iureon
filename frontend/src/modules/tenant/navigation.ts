@@ -1,4 +1,4 @@
-import { Sparkles, Mic, BookOpen, Library, Wrench, Shield, UserRound, ShieldCheck, Compass, SlidersHorizontal, FileClock } from 'lucide-react';
+import { Sparkles, Mic, BookOpen, BookMarked, LifeBuoy, Library, Wrench, Shield, UserRound, ShieldCheck, Compass, SlidersHorizontal, FileClock } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { MainView } from './types';
 
@@ -76,6 +76,15 @@ export const NAV_MODULES: NavModule[] = [
     description: 'Quién procesa tus datos',
     icon: ShieldCheck
   },
+  /*
+   * "Aprender" es su propio grupo y no un pie de página.
+   *
+   * El manual y el soporte se buscan cuando algo ya salió mal, que es el peor
+   * momento para tener que encontrarlos. Van en la barra, con el mismo peso que
+   * lo demás, en vez de detrás de un signo de interrogación en una esquina.
+   */
+  { id: 'manual', label: 'Manual de uso', description: 'Cómo se usa, por tarea', icon: BookMarked },
+  { id: 'soporte', label: 'Soporte', description: 'Cómo pedir ayuda', icon: LifeBuoy },
   { id: 'ajustes', label: 'Ajustes', description: 'Apariencia y firma', icon: SlidersHorizontal }
 ];
 
@@ -110,6 +119,7 @@ export const NAV_GROUPS: NavGroup[] = [
   { titulo: 'Producir', modulos: ['workspace', 'borradores', 'orientacion'] },
   { titulo: 'Registrar', modulos: ['audiencias', 'entrevistas'] },
   { titulo: 'Consultar', modulos: ['search', 'catalogo', 'tools'] },
+  { titulo: 'Aprender', modulos: ['manual', 'soporte'] },
   { titulo: 'Administrar', modulos: ['audit', 'privacidad', 'ajustes'], plegable: true }
 ];
 

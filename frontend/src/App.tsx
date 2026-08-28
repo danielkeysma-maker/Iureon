@@ -16,6 +16,8 @@ import { CatalogCurationView } from './modules/catalog/components/CatalogCuratio
 import { ToolsView } from './modules/tools/components/ToolsView';
 import { AuditView } from './modules/audit/components/AuditView';
 import { SubprocessorsView } from './modules/privacy/components/SubprocessorsView';
+import { ManualView } from './modules/help/components/ManualView';
+import { SupportView } from './modules/help/components/SupportView';
 import { TriageView } from './modules/catalog/components/TriageView';
 import { SettingsView } from './modules/settings/components/SettingsView';
 import { WorkshopConfigBar } from './modules/workspace/components/WorkshopConfigBar';
@@ -37,19 +39,24 @@ import { TenantUserManagementModal } from './modules/tenant/components/TenantUse
 import { FirmUsersDialog } from './modules/tenant/components/FirmUsersDialog';
 import { LoginPortalView } from './modules/tenant/components/LoginPortalView';
 import type { MainView } from './modules/tenant/types';
+import { NAV_MODULES } from './modules/tenant/navigation';
 
-/** Every module the shell can show, for validating what was stored. */
-const MAIN_VIEWS: MainView[] = [
-  'workspace',
-  'audiencias',
-  'entrevistas',
-  'search',
-  'catalogo',
-  'tools',
-  'audit',
-  'privacidad',
-  'orientacion'
-];
+/**
+ * Los módulos que la aplicación puede mostrar, para validar el que quedó
+ * guardado. SE DERIVA DEL REGISTRO, no se escribe a mano.
+ *
+ * Era una lista literal y ya se había desincronizado: tenía once de los trece
+ * módulos: faltaban `borradores` y `ajustes`. Como esta lista es la que decide
+ * si se restaura el módulo guardado en `sessionStorage`, quien recargaba la
+ * página estando en Borradores o en Ajustes era devuelto en silencio al taller
+ * de redacción — y recargar es justo el reflejo de alguien a quien la pantalla
+ * le falló.
+ *
+ * Derivarla de `NAV_MODULES` hace imposible que vuelva a pasar: un módulo nuevo
+ * entra al registro para poder pintarse en la barra lateral, así que ya no hay
+ * un segundo sitio del que alguien pueda olvidarse.
+ */
+const MAIN_VIEWS: MainView[] = NAV_MODULES.map((m) => m.id);
 
 
 const EMPTY_FIRM_PLACEHOLDER: LawFirmTenant = {
@@ -120,6 +127,12 @@ export function App() {
       return 'workspace';
     }
   });
+
+  /*
+   * The manual article Soporte handed over, so the reader lands on the answer
+   * instead of on the index and a second search.
+   */
+  const [manualArticulo, setManualArticulo] = useState<string | undefined>(undefined);
 
   const setMainView = (view: MainView): void => {
     setMainViewState(view);
@@ -635,6 +648,22 @@ export function App() {
           {mainView === 'tools' && <ToolsView />}
           {mainView === 'audit' && <AuditView />}
           {mainView === 'privacidad' && <SubprocessorsView />}
+          {mainView === 'manual' && (
+            <ManualView
+              articuloInicial={manualArticulo}
+              onSoporte={() => setMainView('soporte')}
+            />
+          )}
+          {mainView === 'soporte' && (
+            <SupportView
+              firma={activeFirm.name}
+              correo={currentUserEmail}
+              onManual={(id) => {
+                setManualArticulo(id);
+                setMainView('manual');
+              }}
+            />
+          )}
           {mainView === 'ajustes' && <SettingsView />}
           {mainView === 'orientacion' && (
             <TriageView

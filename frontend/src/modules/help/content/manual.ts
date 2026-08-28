@@ -1,0 +1,530 @@
+import type { ManualArticle, ManualEntry, ManualGroup } from '../types';
+
+/**
+ * The manual, written once, in the code.
+ *
+ * ─── EVERY SENTENCE HERE IS CHECKED AGAINST THE PRODUCT ─────────────────────
+ *
+ * A manual is the one place where a plausible sentence is more dangerous than
+ * a missing one: the reader has no way to tell an accurate instruction from an
+ * invented one, and they will follow both. So nothing below describes a screen,
+ * a button or a guarantee that does not exist today. Where the design asked for
+ * something the product cannot do yet, the article SAYS SO — that is the
+ * `todavia-no` block, and it is content, not an apology.
+ *
+ * ─── WHAT THE 9a ARTBOARD ASKED FOR AND IS NOT HERE ─────────────────────────
+ *
+ * · Reading state (the ✓ per article, the "6/13" progress bar, "Marcar leído").
+ *   The artboard's own note explains why it matters — a partner needs to know
+ *   whether the new lawyer read the verification article before being given
+ *   curation rights. That is a per-user record on the server, and there is no
+ *   table, no endpoint and no route for it. Faking it in localStorage would
+ *   answer the partner's question with something only that browser knows, on
+ *   the one screen whose entire subject is not trusting unverified claims.
+ *   The index declares the gap instead.
+ *
+ * · "¿Le resolvió la duda?" (Sí / No) at the foot of each article. Two buttons
+ *   that record nothing are a survey nobody reads.
+ *
+ * · Article 07, "Reformular con la jerga de su firma". There is no rewrite
+ *   feature. What DOES exist is the firm's format travelling into the drafting
+ *   prompt, and that is article 13. The slot is used for something real and
+ *   daily instead: saving a draft and watching its deadline.
+ *
+ * Reading time is computed from the words actually written below, so it cannot
+ * drift away from the text the way a hand-typed "3 min" does.
+ */
+
+const A_QUE_HACE: ManualArticle = {
+  id: 'que-hace',
+  titulo: 'Qué hace y qué no hace Iureon',
+  entradilla:
+    'Lo primero que conviene tener claro, porque decide cuándo puede confiar en la pantalla y cuándo tiene que abrir la norma.',
+  bloques: [
+    {
+      kind: 'parrafo',
+      texto:
+        'Iureon redacta el primer borrador de un escrito, transcribe grabaciones de audiencia y entrevista, y guarda el catálogo de actuaciones con sus términos y sus fuentes. El trabajo que le ahorra es el de armar la estructura y de recordar el plazo; el que no le quita es el de decidir.'
+    },
+    {
+      kind: 'parrafo',
+      texto:
+        'La aplicación guarda el conocimiento procesal para que usted no tenga que volver a comprobar cada documento. Esa promesa solo se sostiene si lo que está guardado fue comprobado alguna vez por alguien: por eso cada término aparece con su estado a la vista, y por eso hay una pantalla entera dedicada a curarlos.'
+    },
+    { kind: 'subtitulo', texto: 'Lo que sí hace' },
+    {
+      kind: 'lista',
+      items: [
+        'Redacta un escrito completo a partir de los hechos que usted describa, con la estructura de la actuación que elija del catálogo.',
+        'Resuelve el nombre de la actuación contra el catálogo verificado y le dice qué término rige, con el artículo que lo fija.',
+        'Transcribe una grabación separando quién habla, y le deja corregir el texto, dividir una intervención y reasignar una voz.',
+        'Busca jurisprudencia en el corpus curado y, cuando ese corpus calla, consulta los buscadores oficiales de la Corte Constitucional y de la Corte Suprema.',
+        'Exporta a Word y a PDF con el membrete, la tipografía y la numeración que su firma haya configurado.'
+      ]
+    },
+    { kind: 'subtitulo', texto: 'Lo que no hace' },
+    {
+      kind: 'lista',
+      items: [
+        'No radica nada. Ningún escrito sale de Iureon hacia un juzgado.',
+        'No decide la estrategia del caso ni escoge las pretensiones por usted.',
+        'No garantiza que un dato que nadie verificó sea correcto. Cuando no lo está, lo dice en la propia línea del escrito.',
+        'No lee los archivos que usted adjunta en el taller de redacción: por ahora solo se listan, y la pantalla lo advierte donde se adjuntan.',
+        'No conserva el audio de sus grabaciones. Se borra del almacenamiento en la misma petición que devuelve el transcrito.'
+      ]
+    },
+    {
+      kind: 'nota',
+      titulo: 'La regla que resume todo',
+      texto:
+        'Un escrito de Iureon es un borrador hasta que un abogado lo lee. La aplicación existe para que esa lectura sea corta, no para que no ocurra.'
+    }
+  ]
+};
+
+const A_PRIMER_ESCRITO: ManualArticle = {
+  id: 'primer-escrito',
+  titulo: 'Su primer escrito, paso a paso',
+  entradilla: 'De la pantalla en blanco a un documento exportado, sin pasos de más.',
+  bloques: [
+    {
+      kind: 'pasos',
+      pasos: [
+        'Abra Redacción en la barra de la izquierda. Si todavía no sabe qué actuación necesita, entre primero por Orientación y describa los hechos: allí el catálogo le propone actuaciones y de una de ellas puede saltar directo al taller.',
+        'Escoja la rama del derecho y luego la actuación. La lista de actuaciones se arma desde el catálogo de la rama que escogió, así que cambiar de rama cambia la lista.',
+        'En «Qué debe hacer este escrito» describa los hechos y la pretensión en lenguaje corriente. No hace falta redactar: hace falta contar.',
+        'Genere. Puede hacerlo con el botón o con ⌘↵ (Ctrl+↵ en Windows). El escrito aparece a la derecha a medida que se produce.',
+        'Lea el escrito con la barra de estado a la vista: ahí está el contador de afirmaciones sin verificar.',
+        'Guarde el borrador si va a seguir mañana, o expórtelo a Word o a PDF si va a radicar.'
+      ]
+    },
+    {
+      kind: 'aviso',
+      texto:
+        'Elegir la actuación del catálogo no es un formalismo. El nombre catalogado es lo que conecta el escrito con un artículo y un término comprobados; cualquier otro texto produce una estructura genérica sin norma detrás.'
+    },
+    {
+      kind: 'nota',
+      titulo: 'Si la rama no está catalogada',
+      texto:
+        'Algunas ramas todavía no tienen actuaciones catalogadas y ofrecen una lista antigua de tipos de documento. La pantalla lo advierte: en esos casos ninguna norma verificada respalda la estructura, y el término lo tiene que comprobar usted.'
+    }
+  ]
+};
+
+const A_TRES_ESTADOS: ManualArticle = {
+  id: 'tres-estados',
+  titulo: 'Los tres estados de una afirmación',
+  entradilla:
+    'Todo término, artículo y autoridad que aparece en un escrito está en uno de tres estados. Distinguirlos de un vistazo es lo único imprescindible para usar Iureon con seguridad.',
+  bloques: [
+    { kind: 'estados' },
+    { kind: 'subtitulo', texto: 'Cómo se ve en el escrito' },
+    { kind: 'ejemplo' },
+    {
+      kind: 'nota',
+      titulo: 'Regla práctica',
+      texto:
+        'Si va a radicar hoy, mire primero el contador de «sin verificar» en la barra del escrito. Si dice 0, no hay nada que comprobar.'
+    },
+    {
+      kind: 'parrafo',
+      texto:
+        'La diferencia entre «no caduca» y «sin verificar» es la que más se confunde y la que más cuesta. La primera es un hecho comprobado sin cifra: la norma no fija término, como ocurre con la acción de tutela. La segunda es la ausencia de comprobación. Las dos se ven distintas a propósito, y ninguna de las dos es un dato faltante que la aplicación se haya olvidado de traer.'
+    }
+  ]
+};
+
+const A_VERIFICAR: ManualArticle = {
+  id: 'verificar',
+  titulo: 'Verificar contra la norma',
+  entradilla:
+    'Qué significa exactamente verificar una ficha, y por qué se hace una sola vez para toda la firma.',
+  bloques: [
+    {
+      kind: 'parrafo',
+      texto:
+        'Verificar es abrir el texto oficial de la norma, comprobar que el término y la autoridad que la ficha publica son los que ese artículo fija, y firmar esa comprobación con su nombre y la fecha. Queda guardado para la firma entera: el siguiente escrito de cualquier compañero ya sale con el término verificado.'
+    },
+    {
+      kind: 'pasos',
+      pasos: [
+        'Entre a Catálogo y busque la actuación por su nombre, o llegue a ella desde el escrito donde apareció sin verificar.',
+        'Abra la fuente oficial que la ficha cita y localice el artículo.',
+        'Compruebe tres cosas por separado: el término, el artículo que lo fija y la autoridad ante la que se surte.',
+        'Si las tres coinciden, registre la verificación. Si alguna no coincide, corríjala en el mismo formulario antes de firmar.'
+      ]
+    },
+    {
+      kind: 'aviso',
+      texto:
+        'Pregúntese siempre de quién es el reloj. El error más frecuente y más caro de este oficio no es un plazo mal copiado: es publicar el plazo de la contraparte o del juzgado y callar el que extingue el derecho de su cliente. La ficha se ve exacta y la cita es real.'
+    },
+    {
+      kind: 'lista',
+      items: [
+        'Que una norma esté vigente no significa que esté resuelta: un decreto de emergencia obliga hoy y puede caer con efectos hacia atrás.',
+        'Una fuente oficial también puede estar desactualizada. Confirme que el artículo que está leyendo trae la reforma que espera, en vez de confiar en el dominio.',
+        'Un resultado de buscador no es fuente de derecho. Mezcla proyectos de ley, normas extranjeras y derecho vigente en una sola lista.'
+      ]
+    }
+  ]
+};
+
+const A_INSTRUCCION: ManualArticle = {
+  id: 'instruccion',
+  titulo: 'Escribir la instrucción',
+  entradilla: 'Qué conviene poner en el cuadro de texto, y qué no vale la pena escribir ahí.',
+  bloques: [
+    {
+      kind: 'parrafo',
+      texto:
+        'El cuadro «Qué debe hacer este escrito» espera hechos, no redacción. Escriba lo que pasó, en qué orden, quién es quién, qué pide y contra quién. La estructura del escrito no sale de ahí: sale de la actuación que usted escogió en el catálogo.'
+    },
+    { kind: 'subtitulo', texto: 'Lo que sí cambia el resultado' },
+    {
+      kind: 'lista',
+      items: [
+        'Fechas concretas. Son las que sostienen el cómputo del término y las que el escrito va a citar.',
+        'Nombres y calidades de las partes, y el radicado si el proceso ya existe.',
+        'La pretensión, dicha como pretensión: qué quiere que el juez ordene.',
+        'Los hechos que le incomodan. Un borrador que no los conoce los omite, y esa omisión la descubre la contraparte.'
+      ]
+    },
+    { kind: 'subtitulo', texto: 'Lo que no hace falta' },
+    {
+      kind: 'lista',
+      items: [
+        'Fórmulas de encabezado, invocaciones y despedidas: las pone el escrito.',
+        'Pedir un tono o un formato. La tipografía, el membrete y la numeración vienen de la configuración de su firma.',
+        'Citar la norma de memoria. Si el catálogo la tiene verificada, entra por sí sola; si no la tiene, citarla de memoria es exactamente lo que hay que evitar.'
+      ]
+    },
+    {
+      kind: 'aviso',
+      texto:
+        'Los archivos que adjunte en el taller todavía no se leen: se listan y nada más. Si un hecho está en un anexo y no en el cuadro de texto, el escrito no lo va a conocer.'
+    },
+    {
+      kind: 'nota',
+      titulo: 'Continuar un borrador',
+      texto:
+        'Si carga un borrador guardado, el cuadro deja de pedir hechos y pasa a pedir qué corregir, continuar o ampliar. La pantalla se lo dice arriba del cuadro, con el tamaño del borrador que está continuando.'
+    }
+  ]
+};
+
+const A_EXPORTAR: ManualArticle = {
+  id: 'exportar',
+  titulo: 'Revisar y exportar a Word o PDF',
+  entradilla: 'Qué mirar antes de exportar, y qué diferencia hay entre los dos formatos.',
+  bloques: [
+    {
+      kind: 'pasos',
+      pasos: [
+        'Lea el escrito completo. Es un borrador, y la lectura es corta precisamente porque el estado de cada afirmación está marcado.',
+        'Revise el contador de afirmaciones sin verificar. Cada una es una decisión suya: verificarla, cambiarla o asumirla.',
+        'Compruebe los datos que solo usted conoce: nombres, radicado, cuantía, direcciones de notificación.',
+        'Exporte. El Word sirve para seguir editando; el PDF, para radicar o para archivar como quedó.'
+      ]
+    },
+    {
+      kind: 'parrafo',
+      texto:
+        'Los dos formatos salen con el membrete, la tipografía, el interlineado y la numeración de hechos y de títulos que su firma tenga configurados, y el PDF numera las páginas con el total real. El documento no lleva ninguna marca de Iureon: lo que se radica es de su firma.'
+    },
+    {
+      kind: 'aviso',
+      texto:
+        'El archivo se fabrica dentro de la pestaña que usted tiene abierta, con el código que esa pestaña cargó. Si lleva días sin recargar, compare el sello de versión del pie de la barra lateral con el que espera antes de dar por bueno un export raro.'
+    }
+  ]
+};
+
+const A_BORRADORES: ManualArticle = {
+  id: 'borradores',
+  titulo: 'Guardar un borrador y vigilar su término',
+  entradilla:
+    'Un borrador jurídico no es un archivo que espera: es un plazo que corre. Por eso tiene puerta propia.',
+  bloques: [
+    {
+      kind: 'parrafo',
+      texto:
+        'Desde el taller puede guardar el escrito en curso. Borradores, en la barra de la izquierda, los reúne todos con el término de la actuación a la que pertenecen, para que saber qué vence esta semana no obligue a entrar a redactar.'
+    },
+    {
+      kind: 'lista',
+      items: [
+        'Un borrador guardado se puede volver a abrir en el taller y continuar: el cuadro de instrucción pasa a pedir qué corregir o ampliar.',
+        'El término que se muestra es el de la actuación catalogada. Si esa ficha no está verificada, el borrador lo hereda y lo dice.',
+        'Cada borrador queda a nombre de quien lo creó, que sale de su sesión y no de un campo que se pueda escribir.'
+      ]
+    },
+    {
+      kind: 'nota',
+      titulo: 'El escrito guarda el estado del momento',
+      texto:
+        'Un escrito generado antes de que alguien verificara la ficha conserva el estado que tenía ese día. Si después se verifica el término y usted quiere verlo verificado en el documento, hay que volver a generarlo.'
+    }
+  ]
+};
+
+const A_ENTREVISTA: ManualArticle = {
+  id: 'entrevista',
+  titulo: 'Entrevistar a un cliente',
+  entradilla:
+    'Cómo queda registrada una entrevista, qué se le pregunta antes de grabar y qué se hace con lo grabado.',
+  bloques: [
+    {
+      kind: 'parrafo',
+      texto:
+        'Una entrevista es una transcripción atada a un cliente. El cliente se identifica por su cédula, que es única dentro de su firma y no se puede cambiar después: es la llave por la que la firma vuelve a encontrar a esa persona.'
+    },
+    {
+      kind: 'pasos',
+      pasos: [
+        'Registre al cliente o búsquelo por su cédula.',
+        'Antes de subir el audio, la pantalla le pide constancia de que el cliente autorizó la grabación. Es un paso bloqueante y está ahí a propósito.',
+        'Suba la grabación. El audio va del navegador al almacenamiento sin pasar por nuestros servidores, y se borra apenas se devuelve el transcrito.',
+        'Corrija el transcrito: edite palabras mal oídas, divida una intervención donde hablan dos personas, reasigne una intervención a otra voz e identifique cada voz con su rol.',
+        'Cierre la entrevista con una decisión. Si declina el caso, la decisión exige un motivo.'
+      ]
+    },
+    {
+      kind: 'parrafo',
+      texto:
+        'A partir de lo que dijo el cliente —no de la entrevista entera, que es en su mayoría el abogado— la pantalla sugiere jurisprudencia del corpus. Si el corpus no cubre el tema, calla y lo explica en vez de ofrecer providencias apenas parecidas. No hay doctrina: son providencias, y la pantalla también lo dice.'
+    }
+  ]
+};
+
+const A_AUDIENCIA: ManualArticle = {
+  id: 'audiencia',
+  titulo: 'Subir el audio de una audiencia',
+  entradilla: 'Las cuatro herramientas de corrección, y cuál usar según qué salió mal.',
+  bloques: [
+    {
+      kind: 'parrafo',
+      texto:
+        'Suba la grabación desde Audiencias. La transcripción separa a los interlocutores y le propone un rol para cada voz cuando encuentra en el propio audio la frase que lo justifica —quien reparte la palabra es el juez, el juramento marca al testigo—, siempre citando el minuto y la frase. Nunca asigna sola: si no hay señal clara, la voz queda como desconocida.'
+    },
+    { kind: 'subtitulo', texto: 'Qué herramienta usar' },
+    {
+      kind: 'lista',
+      items: [
+        'Editar — una palabra mal transcrita. Corrija el texto en pantalla; la corrección se guarda.',
+        'Dividir — dos personas quedaron en un mismo renglón. Parte la intervención en el cursor y le pregunta de quién es la mitad cortada.',
+        'Otra voz — la intervención completa está atribuida a quien no es. Se la entrega a otra voz, y el rol viaja con el destino.',
+        'Asignar rol — la voz está bien separada pero mal identificada. Nombra al interlocutor en todas sus intervenciones.'
+      ]
+    },
+    {
+      kind: 'aviso',
+      texto:
+        'Cuando dos personas hablan encima, la separación de voces no las distingue y ambas caen en un mismo bloque. No es una configuración: hay que cortar primero con Dividir y después asignar. Si la aplicación le avisa que bajo una misma voz aparecen dos nombres, es exactamente este caso.'
+    },
+    {
+      kind: 'parrafo',
+      texto:
+        'El transcrito se guarda apenas responde el proveedor, así que cerrar la pestaña no pierde nada ni obliga a repetir el gasto. El audio no se guarda: puede escucharlo mientras corrige desde la copia que quedó en su navegador, y esa copia dura lo que dure la pestaña.'
+    },
+    {
+      kind: 'nota',
+      titulo: 'Vocabulario jurídico',
+      texto:
+        'El modelo va preparado para oír términos del oficio, y aun así se equivoca. Los errores peligrosos son los que suenan bien: «desembarco» por desembargo, «con recámaras» por Confecámaras. Por eso el transcrito se edita y la grabación se puede volver a oír.'
+    }
+  ]
+};
+
+const A_CURADURIA: ManualArticle = {
+  id: 'curaduria',
+  titulo: 'Curar el catálogo de la firma',
+  entradilla: 'Cómo una comprobación hecha una vez deja de repetirse en cada escrito.',
+  bloques: [
+    {
+      kind: 'parrafo',
+      texto:
+        'El catálogo llega con las actuaciones y los términos que trae el producto. Encima de eso, cada firma guarda su propia curaduría: cuando un abogado verifica un término, esa verificación vale para su firma y para todos los escritos que vengan después.'
+    },
+    {
+      kind: 'parrafo',
+      texto:
+        'La curaduría se hace dentro del producto, no editando código. Esa es la diferencia entre validar cada documento —el trabajo que la aplicación existe para eliminar— y validar el conocimiento una sola vez.'
+    },
+    {
+      kind: 'lista',
+      items: [
+        'Un mismo nombre de actuación puede existir en dos ramas con términos distintos. Por eso la rama siempre viaja con la búsqueda, y una etiqueta ambigua se rechaza en vez de resolverse a la primera coincidencia.',
+        'Hay actuaciones transversales, como el derecho de petición, que aparecen en todas las ramas siendo una sola ficha. Corregirla la corrige en todas partes.',
+        'Verificar exige la fuente. Un término sin fuente no se puede registrar como verificado.'
+      ]
+    },
+    {
+      kind: 'todavia-no',
+      texto:
+        'La historia de curaduría por actuación —quién verificó qué y cuándo, en una línea de tiempo— todavía no existe. Hoy se ve el estado actual y quién firmó la última verificación, no el recorrido completo.'
+    }
+  ]
+};
+
+const A_ROLES_SALDO: ManualArticle = {
+  id: 'roles-saldo',
+  titulo: 'Roles y saldo',
+  entradilla: 'Quién puede hacer qué dentro de la firma, y cómo se consume y se recarga el saldo.',
+  bloques: [
+    { kind: 'subtitulo', texto: 'Roles' },
+    {
+      kind: 'parrafo',
+      texto:
+        'Un rol no es una etiqueta: se impone en el servidor, en cada petición. La administración de la firma —dar de alta compañeros, cambiar roles, recargar— corresponde al administrador; redactar, transcribir y consultar, a todos.'
+    },
+    { kind: 'subtitulo', texto: 'Saldo' },
+    {
+      kind: 'parrafo',
+      texto:
+        'Cada escrito generado y cada transcripción consumen saldo de la firma. El saldo se reserva antes de llamar al modelo, no se cobra después: si no alcanza, se lo dicen antes de empezar, y si el trabajo falla, la reserva se devuelve. El saldo también fija cuánto puede extenderse un escrito, para que nunca reciba uno cortado por una regla que no conocía.'
+    },
+    {
+      kind: 'parrafo',
+      texto:
+        'La pantalla de Saldo muestra el disponible y, con el consumo real de su firma, aproximadamente cuántos escritos alcanza. Las recargas se hacen desde ahí.'
+    },
+    {
+      kind: 'todavia-no',
+      texto:
+        'Los topes de gasto por usuario no existen todavía. Un tope que la interfaz muestre pero el servidor no imponga no es un tope, así que hasta que se imponga en cada petición, el control es el saldo de la firma.'
+    }
+  ]
+};
+
+const A_DATOS_CLIENTE: ManualArticle = {
+  id: 'datos-cliente',
+  titulo: 'Qué responder si su cliente pregunta por sus datos',
+  entradilla: 'La posición jurídica de cada quien, dicha en el orden en que se pregunta.',
+  bloques: [
+    {
+      kind: 'parrafo',
+      texto:
+        'Su firma es la responsable del tratamiento de los datos de su cliente. Iureon es su encargado. Los proveedores que Iureon usa para prestar el servicio son, por eso, subencargados de su firma, y usted tiene derecho a saber cuáles son y qué recibe cada uno.'
+    },
+    {
+      kind: 'parrafo',
+      texto:
+        'Esa lista está en la pantalla de Privacidad, y no la mantiene nadie a mano: se deriva de la configuración que está corriendo. Por cada proveedor responde las cuatro preguntas que un abogado hace, en el mismo orden: qué recibe, dónde se procesa, con qué base sale del país y cuánto lo conserva.'
+    },
+    {
+      kind: 'lista',
+      items: [
+        'El audio de una audiencia no se conserva: se borra del almacenamiento en la misma petición que devuelve el transcrito.',
+        'El transcrito sí se guarda, dentro de su firma, y solo su firma lo ve.',
+        'La consola de operación de Iureon gestiona firmas, planes y saldos, y no puede abrir un transcrito, un borrador ni un expediente.'
+      ]
+    },
+    {
+      kind: 'aviso',
+      texto:
+        'WhatsApp queda fuera de ese acuerdo. No envíe por ahí datos de sus clientes ni documentos del caso, aunque escriba a soporte.'
+    }
+  ]
+};
+
+const A_FORMATO: ManualArticle = {
+  id: 'formato',
+  titulo: 'Formato, membrete y tipografía',
+  entradilla: 'Cómo se configura la marca de la firma y hasta dónde llega su efecto.',
+  bloques: [
+    {
+      kind: 'parrafo',
+      texto:
+        'En la configuración de la firma se guardan el nombre, el NIT, la dirección, el teléfono, el correo, la tarjeta profesional, el logo y la imagen de firma, además de la tipografía, el tamaño, el interlineado y la forma de numerar hechos y títulos.'
+    },
+    {
+      kind: 'parrafo',
+      texto:
+        'Ese formato no se aplica solo al exportar: viaja al motor de redacción como instrucción, así que el escrito nace ya con la numeración y los títulos que su firma usa, en vez de quedar maquillado al final.'
+    },
+    {
+      kind: 'lista',
+      items: [
+        'El membrete con el logo, la tipografía elegida, la fecha y la paginación real salen en el PDF del escrito.',
+        'El acta de audiencia usa su propio formato de acta y también sale en Word y en PDF.',
+        'Ni el Word ni el PDF llevan marca de Iureon.'
+      ]
+    },
+    {
+      kind: 'nota',
+      titulo: 'Si el documento no sale con su membrete',
+      texto:
+        'Compruebe primero que la marca esté guardada, y después el sello de versión del pie de la barra lateral: una pestaña que lleva días abierta exporta con el código que cargó ese día.'
+    }
+  ]
+};
+
+/** The index, grouped by task and by role — not by module. */
+export const MANUAL: readonly ManualGroup[] = [
+  {
+    titulo: 'Primeros 20 minutos',
+    articulos: [A_QUE_HACE, A_PRIMER_ESCRITO, A_TRES_ESTADOS, A_VERIFICAR]
+  },
+  { titulo: 'Redactar', articulos: [A_INSTRUCCION, A_EXPORTAR, A_BORRADORES] },
+  { titulo: 'Grabar', articulos: [A_ENTREVISTA, A_AUDIENCIA] },
+  {
+    titulo: 'Para socios',
+    articulos: [A_CURADURIA, A_ROLES_SALDO, A_DATOS_CLIENTE, A_FORMATO]
+  }
+];
+
+/** Flat reading order, with the position each article shows in its header. */
+export const ENTRADAS: readonly ManualEntry[] = MANUAL.flatMap((grupo) =>
+  grupo.articulos.map((articulo) => ({ articulo, grupo: grupo.titulo, numero: 0 }))
+).map((e, i) => ({ ...e, numero: i + 1 }));
+
+export const TOTAL_ARTICULOS = ENTRADAS.length;
+
+/** Every word an article renders, for search and for the reading estimate. */
+export const textoPlano = (articulo: ManualArticle): string => {
+  const partes: string[] = [articulo.titulo, articulo.entradilla];
+
+  for (const b of articulo.bloques) {
+    if (b.kind === 'parrafo' || b.kind === 'subtitulo' || b.kind === 'aviso') partes.push(b.texto);
+    else if (b.kind === 'todavia-no') partes.push(b.texto);
+    else if (b.kind === 'nota') partes.push(b.titulo, b.texto);
+    else if (b.kind === 'pasos') partes.push(...b.pasos);
+    else if (b.kind === 'lista') partes.push(...b.items);
+  }
+
+  return partes.join(' ');
+};
+
+/**
+ * Minutes to read, from the words actually written — never below one.
+ *
+ * Two hundred words a minute is the conventional figure for careful prose. It
+ * is an estimate and it is labelled as one; what matters is that it cannot
+ * drift away from the text the way a hand-typed "3 min" does the first time
+ * someone edits the article and forgets the header.
+ */
+export const minutosDeLectura = (articulo: ManualArticle): number =>
+  Math.max(1, Math.round(textoPlano(articulo).split(/\s+/).length / 200));
+
+export const MINUTOS_TOTALES = ENTRADAS.reduce(
+  (suma, e) => suma + minutosDeLectura(e.articulo),
+  0
+);
+
+/** Case- and accent-insensitive match over the article's whole text. */
+const normalizar = (s: string): string =>
+  s
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '');
+
+export const buscar = (consulta: string): readonly ManualEntry[] => {
+  const q = normalizar(consulta.trim());
+  if (!q) return ENTRADAS;
+  return ENTRADAS.filter((e) => normalizar(textoPlano(e.articulo)).includes(q));
+};
+
+export const entradaPorId = (id: string): ManualEntry | undefined =>
+  ENTRADAS.find((e) => e.articulo.id === id);
