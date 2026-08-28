@@ -15,7 +15,7 @@ const aiService = new OpenRouterMultiEngineService();
 
 export const streamAgentDraftController = async (req: Request, res: Response): Promise<void> => {
   const firmId = req.firmId;
-  const { documentType, legalPrompt, expedienteId, existingDraft } = req.body;
+  const { documentType, legalPrompt, expedienteId, existingDraft, customFormatInstruction } = req.body;
 
   if (!legalPrompt) {
     res.status(400).json({ error: 'MISSING_PROMPT', message: 'Se requiere la instrucción jurídica en legalPrompt' });
@@ -87,7 +87,14 @@ export const streamAgentDraftController = async (req: Request, res: Response): P
         documentType: documentType || 'Contestación de Demanda',
         legalPrompt,
         expedienteId,
-        existingDraft
+        existingDraft,
+        /*
+         * El formato de la firma (numeracion de hechos, titulos, bloque de
+         * firma) viaja hasta el prompt del modelo que escribe. El pipeline lo
+         * aceptaba desde el principio — customFormat en buildClaudeDraftPrompt —
+         * y nadie se lo enviaba: era un ajuste que se guardaba y no hacia nada.
+         */
+        customFormatInstruction
       },
       (step: AgentExecutionStep) => {
         sendEvent('AGENT_LOG', step);

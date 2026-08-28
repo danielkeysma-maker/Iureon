@@ -4,7 +4,12 @@ import type { AgentLog } from '../../agent/types';
 import type { GeneratedDraft } from '../../documents/types';
 
 /** The firm is no longer a parameter: the session carries it. */
-export function useLegalAgentWorkflow() {
+/**
+ * @param formatoDeFirma La instruccion de formato de la marca de la firma
+ * (numeracion de hechos, titulos, bloque de firma). Viaja al prompt del motor
+ * que escribe — el pipeline la aceptaba desde el principio y nadie la enviaba.
+ */
+export function useLegalAgentWorkflow(formatoDeFirma?: string) {
 
   const [rightView, setRightView] = useState<'pdf' | 'draft'>('pdf');
   const [legalPrompt, setLegalPrompt] = useState('');
@@ -85,7 +90,8 @@ Por favor espere unos segundos mientras se finaliza la redacción solemne.`,
         legalBranch,
         legalPrompt,
         expedienteId: 'EXP-2026-904',
-        existingDraft: activeDraftText || undefined
+        existingDraft: activeDraftText || undefined,
+        customFormatInstruction: formatoDeFirma || undefined
       });
 
       if (response.ok && response.body) {

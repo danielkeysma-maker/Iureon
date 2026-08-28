@@ -1,212 +1,364 @@
-import React, { useState } from 'react';
-import { X, Check, Settings, Upload, Image as ImageIcon } from 'lucide-react';
-import type { FirmBrandingConfig } from '../../documents/services/documentExport.service';
+import React, { useEffect, useState } from 'react';
+import { Upload, X as XIcon } from 'lucide-react';
+import { Dialog } from '../../../design/Dialog';
+import { brandingApi, type FirmBranding } from '../services/branding.api';
 
 interface FirmBrandingModalProps {
   isOpen: boolean;
   onClose: () => void;
-  branding: FirmBrandingConfig;
-  onSaveBranding: (updated: FirmBrandingConfig) => void;
+  /** Se llama con la marca guardada, para que la exportación la use al momento. */
+  onSaved?: (branding: FirmBranding) => void;
 }
 
-export const FirmBrandingModal: React.FC<FirmBrandingModalProps> = ({
-  isOpen,
-  onClose,
-  branding,
-  onSaveBranding
-}) => {
-  const [formState, setFormState] = useState<FirmBrandingConfig>(branding);
-  const [savedSuccess, setSavedSuccess] = useState(false);
+/**
+ * Marca y formato de la firma. Diálogo tipo 2 —formulario— en tamaño L.
+ *
+ * ─── FORMULARIO A LA IZQUIERDA, ESCRITO REAL A LA DERECHA ───────────────────
+ *
+ * Nadie puede juzgar un membrete en abstracto. La previsualización es un
+ * escrito de verdad —membrete, juzgado, pretensiones, hechos, bloque de
+ * firma— que reacciona a cada opción: cambiar el interlineado se ve en el
+ * párrafo, no en una etiqueta.
+ *
+ * ─── LAS OPCIONES SON LAS QUE UN DESPACHO DISCUTE ───────────────────────────
+ *
+ * Romanos contra arábigos, «PRIMERO.» contra «1.», la T.P. en el bloque de
+ * firma, el correo de notificaciones judiciales. No es un panel de estilos
+ * genérico. La numeración y los títulos se aplican AL GENERAR el escrito —el
+ * texto ya escrito no se renumera— y viajan como instrucción al motor.
+ *
+ * ─── EL VELO NO CIERRA CON CAMBIOS SIN GUARDAR ──────────────────────────────
+ *
+ * Regla del tipo 2 en 3a: es el único caso del sistema donde el clic afuera
+ * pregunta en vez de cerrar. Y el primario dice el verbo real —«Guardar y
+ * aplicar»— porque guardar sin aplicar no es lo que nadie espera aquí.
+ */
+export const FirmBrandingModal: React.FC<FirmBrandingModalProps> = ({ isOpen, onClose, onSaved }) => {
+  const [marca, setMarca] = useState<FirmBranding | null>(null);
+  const [original, setOriginal] = useState<string>('');
+  const [error, setError] = useState('');
+  const [guardando, setGuardando] = useState(false);
+  const [avisoVelo, setAvisoVelo] = useState(false);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (!isOpen) return;
+    setError('');
+    brandingApi
+      .get()
+      .then(({ branding }) => {
+        setMarca(branding);
+        setOriginal(JSON.stringify(branding));
+      })
+      .catch((e) => setError(e instanceof Error ? e.message : 'No se pudo leer la marca.'));
+  }, [isOpen]);
 
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (uploadEvent) => {
-        const result = uploadEvent.target?.result as string;
-        setFormState((prev) => ({ ...prev, logoUrl: result }));
-      };
-      reader.readAsDataURL(file);
+  const hayCambios = marca !== null && JSON.stringify(marca) !== original;
+
+  const poner = <K extends keyof FirmBranding>(campo: K, valor: FirmBranding[K]) =>
+    setMarca((m) => (m ? { ...m, [campo]: valor } : m));
+
+  const subirImagen = (campo: 'logoUrl' | 'signatureImageUrl') => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const archivo = e.target.files?.[0];
+    if (!archivo) return;
+    const lector = new FileReader();
+    lector.onload = (ev) => poner(campo, (ev.target?.result as string) ?? null);
+    lector.readAsDataURL(archivo);
+    e.target.value = '';
+  };
+
+  const guardar = async () => {
+    if (!marca) return;
+    setGuardando(true);
+    setError('');
+
+    try {
+      const guardada = await brandingApi.put(marca);
+      setMarca(guardada);
+      setOriginal(JSON.stringify(guardada));
+      onSaved?.(guardada);
+      onClose();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'No se pudo guardar la marca.');
+    } finally {
+      setGuardando(false);
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSaveBranding(formState);
-    setSavedSuccess(true);
-    setTimeout(() => {
-      setSavedSuccess(false);
-      onClose();
-    }, 1200);
-  };
+  const m = marca;
 
   return (
-    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 font-sans">
-      <div className="bg-white border border-slate-200 rounded-xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col">
-        {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-blue-900 border border-blue-950 flex items-center justify-center text-white">
-              <Settings className="w-4 h-4" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-slate-900">
-                Membrete Oficial de la Firma Cliente
-              </h3>
-              <p className="text-[11px] text-slate-500 font-body">
-                Configura los logos, encabezados y fuentes para la exportación de documentos.
-              </p>
-            </div>
-          </div>
-          <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-slate-900 rounded-md hover:bg-slate-100 transition-colors">
-            <X className="w-4 h-4" />
+    <Dialog
+      abierto={isOpen}
+      onCerrar={onClose}
+      tamano="L"
+      titulo="Marca y formato de la firma"
+      subtitulo="Se aplica a todo escrito nuevo y a los exportados. Sustituye el formato por defecto de Iureon."
+      hayCambiosSinGuardar={hayCambios}
+      onIntentoDeCerrarConCambios={() => setAvisoVelo(true)}
+      pieIzquierda={
+        hayCambios ? (
+          <span className="text-unverified">Cambios sin guardar</span>
+        ) : (
+          <span className="font-mono text-[11px]">Esc cierra</span>
+        )
+      }
+      acciones={
+        <>
+          <button
+            onClick={() => {
+              if (m) setMarca(JSON.parse(original || 'null'));
+              setAvisoVelo(false);
+              onClose();
+            }}
+            className="btn-neutral btn-sm"
+            disabled={guardando}
+          >
+            Descartar
           </button>
-        </div>
+          <button
+            onClick={() => void guardar()}
+            className="btn-primary btn-sm"
+            disabled={!hayCambios || guardando}
+          >
+            {guardando ? 'Guardando…' : 'Guardar y aplicar'}
+          </button>
+        </>
+      }
+    >
+      {error && <p className="notice-unverified mb-3">{error}</p>}
+      {avisoVelo && hayCambios && (
+        <p className="notice mb-3">
+          Hay cambios sin guardar. Use «Guardar y aplicar» o «Descartar» — el clic afuera no
+          decide por usted.
+        </p>
+      )}
 
-        {/* Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs font-body">
-          {/* Logo Upload Section */}
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2">
-            <label className="text-[11px] font-bold text-slate-800 block flex items-center justify-between">
-              <span>Logo Oficial de la Firma (.PNG, .JPG, .SVG):</span>
-              {formState.logoUrl && <span className="text-emerald-700 text-[10px]">✓ Logo Cargado</span>}
-            </label>
+      {!m ? (
+        <p className="text-meta text-ink-500">Leyendo la marca de la firma…</p>
+      ) : (
+        <div className="flex h-full min-h-0 flex-col gap-4 lg:flex-row">
+          {/* ─── EL FORMULARIO ─────────────────────────────────────────────── */}
+          <div className="flex w-full min-w-0 flex-col gap-4 overflow-y-auto lg:w-[360px] lg:shrink-0">
+            <section>
+              <h3 className="mb-2 font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
+                Membrete
+              </h3>
 
-            <div className="flex items-center gap-3">
-              {formState.logoUrl ? (
-                <img
-                  src={formState.logoUrl}
-                  alt="Logo Firma"
-                  className="w-12 h-12 object-contain bg-white border border-slate-200 rounded-lg p-1"
-                />
-              ) : (
-                <div className="w-12 h-12 rounded-lg bg-slate-200/70 border border-dashed border-slate-300 flex items-center justify-center text-slate-400">
-                  <ImageIcon className="w-5 h-5" />
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-2">
+                  {m.logoUrl ? (
+                    <img src={m.logoUrl} alt="Logo" className="h-[38px] max-w-[120px] rounded border border-line-200 bg-white object-contain px-1" />
+                  ) : (
+                    <span className="flex h-[38px] w-[90px] items-center justify-center rounded border border-dashed border-line-200 text-[10px] text-ink-400">
+                      Sin logo
+                    </span>
+                  )}
+                  <label className="btn-neutral btn-sm cursor-pointer">
+                    <Upload className="h-3 w-3" />
+                    {m.logoUrl ? 'Reemplazar' : 'Subir logo'}
+                    <input type="file" accept="image/png,image/svg+xml,image/jpeg" className="hidden" onChange={subirImagen('logoUrl')} />
+                  </label>
+                  {m.logoUrl && (
+                    <button onClick={() => poner('logoUrl', null)} className="btn-neutral btn-sm">
+                      <XIcon className="h-3 w-3" />
+                      Quitar
+                    </button>
+                  )}
                 </div>
-              )}
+                <p className="text-meta text-ink-400">PNG o SVG con fondo transparente · alto útil 60px en el escrito.</p>
 
-              <div className="flex-1">
-                <label className="cursor-pointer px-3 py-1.5 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 transition-colors">
-                  <Upload className="w-3.5 h-3.5 text-blue-900" />
-                  <span>{formState.logoUrl ? 'Cambiar Logo' : 'Subir Imagen del Logo'}</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleLogoUpload}
-                    className="hidden"
-                  />
+                <label className="block">
+                  <span className="field-label">Razón social</span>
+                  <input value={m.firmName} onChange={(e) => poner('firmName', e.target.value)} className="field mt-1 w-full" placeholder="Restrepo & Cárdenas Abogados" />
                 </label>
-                <p className="text-[10px] text-slate-400 mt-1">Se incluirá automáticamente en el encabezado de los PDF/Word exportados.</p>
+                <label className="block">
+                  <span className="field-label">NIT</span>
+                  <input value={m.firmNit} onChange={(e) => poner('firmNit', e.target.value)} className="field mt-1 w-full font-mono" placeholder="900.482.117-3" />
+                </label>
+                <label className="block">
+                  <span className="field-label">Pie de página</span>
+                  <input value={m.firmAddress} onChange={(e) => poner('firmAddress', e.target.value)} className="field mt-1 w-full" placeholder="Cra. 11 # 93-46, of. 302 · Bogotá" />
+                </label>
+                <label className="block">
+                  <span className="field-label">Teléfono</span>
+                  <input value={m.firmPhone} onChange={(e) => poner('firmPhone', e.target.value)} className="field mt-1 w-full" placeholder="(601) 742 18 90" />
+                </label>
               </div>
-            </div>
+            </section>
+
+            <section>
+              <h3 className="mb-2 font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
+                Formato del escrito
+              </h3>
+
+              <div className="space-y-2.5">
+                <div className="grid grid-cols-2 gap-2">
+                  <label className="block">
+                    <span className="field-label">Tipografía</span>
+                    <select value={m.fontFamily} onChange={(e) => poner('fontFamily', e.target.value as FirmBranding['fontFamily'])} className="field mt-1 w-full">
+                      <option>Times New Roman</option>
+                      <option>Arial</option>
+                      <option>Calibri</option>
+                      <option>Inter</option>
+                    </select>
+                  </label>
+                  <label className="block">
+                    <span className="field-label">Tamaño</span>
+                    <select value={m.fontSizePt} onChange={(e) => poner('fontSizePt', Number(e.target.value))} className="field mt-1 w-full">
+                      {[10, 11, 12, 13, 14].map((n) => (
+                        <option key={n} value={n}>{n} pt</option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+
+                <Radios etiqueta="Interlineado" valor={m.lineSpacing} opciones={[['1.0', '1,0'], ['1.5', '1,5'], ['2.0', '2,0']]} onChange={(v) => poner('lineSpacing', v as FirmBranding['lineSpacing'])} />
+                <Radios etiqueta="Numeración de hechos" valor={m.factNumbering} opciones={[['ARABIGA', '1. 2. 3.'], ['ORDINAL', 'PRIMERO.']]} onChange={(v) => poner('factNumbering', v as FirmBranding['factNumbering'])} />
+                <Radios etiqueta="Títulos de sección" valor={m.sectionTitles} opciones={[['ROMANOS', 'I. Romanos'], ['ARABIGOS', '1. Arábigos'], ['SIN_NUMERAR', 'Sin numerar']]} onChange={(v) => poner('sectionTitles', v as FirmBranding['sectionTitles'])} />
+
+                {/* La numeración se impone al GENERAR: el texto ya escrito no se renumera. */}
+                <p className="text-meta text-ink-400">
+                  Numeración y títulos se aplican a los escritos que se generen desde ahora.
+                </p>
+              </div>
+            </section>
+
+            <section>
+              <h3 className="mb-2 font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
+                Bloque de firma
+              </h3>
+
+              <div className="space-y-2.5">
+                <label className="block">
+                  <span className="field-label">T.P. del abogado que firma</span>
+                  <input value={m.tpNumber} onChange={(e) => poner('tpNumber', e.target.value)} className="field mt-1 w-full font-mono" placeholder="214.882 del C.S.J." />
+                </label>
+                <label className="block">
+                  <span className="field-label">Correo de notificaciones judiciales</span>
+                  <input value={m.firmEmail} onChange={(e) => poner('firmEmail', e.target.value)} className="field mt-1 w-full" placeholder="notificaciones@rcabogados.co" />
+                </label>
+
+                <div className="flex items-center gap-2">
+                  {m.signatureImageUrl ? (
+                    <img src={m.signatureImageUrl} alt="Firma" className="h-[34px] rounded border border-line-200 bg-white object-contain px-1" />
+                  ) : (
+                    <span className="text-meta text-ink-400">Sin imagen de firma</span>
+                  )}
+                  <label className="btn-neutral btn-sm cursor-pointer">
+                    <Upload className="h-3 w-3" />
+                    {m.signatureImageUrl ? 'Reemplazar' : 'Firma escaneada'}
+                    <input type="file" accept="image/png,image/jpeg" className="hidden" onChange={subirImagen('signatureImageUrl')} />
+                  </label>
+                  {m.signatureImageUrl && (
+                    <button onClick={() => poner('signatureImageUrl', null)} className="btn-neutral btn-sm">
+                      <XIcon className="h-3 w-3" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            </section>
           </div>
 
-          <div>
-            <label className="text-[11px] font-semibold text-slate-700 block mb-1">Nombre Oficial de la Firma:</label>
-            <input
-              type="text"
-              value={formState.firmName}
-              onChange={(e) => setFormState({ ...formState, firmName: e.target.value })}
-              className="w-full bg-slate-50 border border-slate-200 rounded-md p-2.5 text-slate-900 text-xs font-sans focus:outline-none focus:border-blue-900"
-              required
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-[11px] font-semibold text-slate-700 block mb-1">NIT / Identificación Fiscal:</label>
-              <input
-                type="text"
-                value={formState.firmNit}
-                onChange={(e) => setFormState({ ...formState, firmNit: e.target.value })}
-                className="w-full bg-slate-50 border border-slate-200 rounded-md p-2.5 text-slate-900 text-xs font-mono focus:outline-none focus:border-blue-900"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="text-[11px] font-semibold text-slate-700 block mb-1">Tipografía Preferida:</label>
-              <select
-                value={formState.fontFamily}
-                onChange={(e) => setFormState({ ...formState, fontFamily: e.target.value as any })}
-                className="w-full bg-slate-50 border border-slate-200 rounded-md p-2.5 text-slate-900 text-xs font-sans focus:outline-none focus:border-blue-900"
-              >
-                <option value="Inter">Inter (Limpio Corporativo)</option>
-                <option value="Times New Roman">Times New Roman (Tradicional Judicial)</option>
-                <option value="Arial">Arial (Estándar)</option>
-                <option value="Calibri">Calibri</option>
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label className="text-[11px] font-semibold text-slate-700 block mb-1">Dirección &amp; Teléfono PBX:</label>
-            <input
-              type="text"
-              value={formState.firmAddress}
-              onChange={(e) => setFormState({ ...formState, firmAddress: e.target.value })}
-              className="w-full bg-slate-50 border border-slate-200 rounded-md p-2.5 text-slate-900 text-xs font-sans focus:outline-none focus:border-blue-900"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="text-[11px] font-semibold text-slate-700 block mb-1">Buzón Judicial de Notificaciones:</label>
-            <input
-              type="email"
-              value={formState.firmEmail}
-              onChange={(e) => setFormState({ ...formState, firmEmail: e.target.value })}
-              className="w-full bg-slate-50 border border-slate-200 rounded-md p-2.5 text-slate-900 text-xs font-mono focus:outline-none focus:border-blue-900"
-              required
-            />
-          </div>
-
-          {/* Firm Writing Style & Section Ordering */}
-          <div className="bg-blue-50/60 border border-blue-200/80 rounded-xl p-3.5 space-y-2">
-            <label className="text-[11px] font-bold text-blue-950 block">
-              ✍️ Orden Preferido de Secciones y Estilo de Redacción de la Firma:
-            </label>
-            <p className="text-[10px] text-blue-800">
-              Indica qué escribe tu despacho primero y qué después (ej. Encabezado ➔ Hechos ➔ Pretensiones ➔ Precedente ➔ Pruebas ➔ Notificaciones). La IA imitará este orden exacto al redactar.
-            </p>
-            <textarea
-              rows={3}
-              value={formState.customFormatInstruction || ''}
-              onChange={(e) => setFormState({ ...formState, customFormatInstruction: e.target.value })}
-              placeholder="Ingrese el orden de secciones e instrucciones de estilo de la firma..."
-              className="w-full bg-white border border-blue-200 rounded-lg p-2.5 text-slate-900 text-xs font-sans focus:outline-none focus:border-blue-900"
-            />
-          </div>
-
-          <div className="flex items-center justify-between pt-3 border-t border-slate-200">
-            {savedSuccess ? (
-              <span className="text-emerald-700 text-xs font-semibold flex items-center gap-1">
-                <Check className="w-4 h-4" />
-                Membrete actualizado correctamente.
+          {/* ─── LA PREVISUALIZACIÓN · un escrito real ─────────────────────── */}
+          <div className="min-w-0 flex-1 overflow-y-auto">
+            <div className="mb-1.5 flex items-center justify-between">
+              <span className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
+                Previsualización · escrito real
               </span>
-            ) : <span />}
-
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md font-semibold text-xs transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 bg-blue-900 hover:bg-blue-950 text-white rounded-md font-semibold text-xs flex items-center gap-1.5 transition-colors shadow-xs"
-              >
-                <Check className="w-3.5 h-3.5" />
-                <span>Guardar Membrete</span>
-              </button>
+              <span className="chip-neutral">Manda sobre el defecto</span>
             </div>
+
+            <div
+              className="rounded-card border border-line-200 bg-white px-8 py-7 text-black shadow-e1"
+              style={{
+                fontFamily: `'${m.fontFamily}', serif`,
+                fontSize: `${m.fontSizePt}px`,
+                lineHeight: m.lineSpacing === '1.0' ? 1.35 : m.lineSpacing === '1.5' ? 1.7 : 2.1
+              }}
+            >
+              {/* Membrete */}
+              <div className="mb-4 flex items-center gap-3 border-b border-black/20 pb-2">
+                {m.logoUrl && <img src={m.logoUrl} alt="" className="h-[42px] object-contain" />}
+                <div className="min-w-0">
+                  <p className="font-bold uppercase tracking-wide">{m.firmName || 'RAZÓN SOCIAL DE LA FIRMA'}</p>
+                  <p style={{ fontSize: `${m.fontSizePt - 2}px` }}>NIT {m.firmNit || '—'}</p>
+                </div>
+              </div>
+
+              <p className="font-bold">JUZGADO TREINTA Y CUATRO (34) ADMINISTRATIVO DEL CIRCUITO DE BOGOTÁ</p>
+              <p className="mt-2">Referencia: Nulidad y restablecimiento del derecho</p>
+              <p>Demandante: Jorge Elías Mosquera Rentería</p>
+
+              <p className="mt-4 font-bold">
+                {m.sectionTitles === 'ROMANOS' ? 'I. PRETENSIONES' : m.sectionTitles === 'ARABIGOS' ? '1. PRETENSIONES' : 'PRETENSIONES'}
+              </p>
+              <p className="mt-1 text-justify">
+                Solicito al despacho declarar la nulidad de la Resolución 8842 del 12 de noviembre
+                de 2024, expedida por Colpensiones, y, a título de restablecimiento del derecho,
+                ordenar el reconocimiento y pago retroactivo de la prestación.
+              </p>
+
+              <p className="mt-4 font-bold">
+                {m.sectionTitles === 'ROMANOS' ? 'II. HECHOS' : m.sectionTitles === 'ARABIGOS' ? '2. HECHOS' : 'HECHOS'}
+              </p>
+              <p className="mt-1 text-justify">
+                {m.factNumbering === 'ORDINAL' ? 'PRIMERO.' : '1.'} La Junta Regional de
+                Calificación de Invalidez dictaminó una pérdida de capacidad laboral del 62,3%.
+              </p>
+
+              {/* Bloque de firma */}
+              <p className="mt-5">Atentamente,</p>
+              {m.signatureImageUrl && <img src={m.signatureImageUrl} alt="" className="mt-1 h-[38px] object-contain" />}
+              <p className="mt-1 font-bold">Camila Restrepo Vélez</p>
+              <p style={{ fontSize: `${m.fontSizePt - 2}px` }}>
+                C.C. 52.418.907{m.tpNumber ? ` · T.P. ${m.tpNumber}` : ''}
+              </p>
+              {m.firmEmail && <p style={{ fontSize: `${m.fontSizePt - 2}px` }}>{m.firmEmail}</p>}
+
+              {/* Pie */}
+              {(m.firmAddress || m.firmPhone) && (
+                <p className="mt-5 border-t border-black/20 pt-1.5 text-center" style={{ fontSize: `${m.fontSizePt - 3}px` }}>
+                  {[m.firmAddress, m.firmPhone].filter(Boolean).join(' · ')}
+                </p>
+              )}
+            </div>
+
+            {/* La previsualización es SIEMPRE en papel blanco: es lo que se exporta. */}
+            <p className="mt-1.5 text-center text-meta text-ink-400">
+              Sobre papel blanco a propósito: así sale el .docx y el PDF, esté la aplicación en el
+              tema que esté.
+            </p>
           </div>
-        </form>
-      </div>
-    </div>
+        </div>
+      )}
+    </Dialog>
   );
 };
+
+/** Radio en línea: etiqueta a la izquierda, opciones como pastillas. */
+const Radios: React.FC<{
+  etiqueta: string;
+  valor: string;
+  opciones: Array<[string, string]>;
+  onChange: (v: string) => void;
+}> = ({ etiqueta, valor, opciones, onChange }) => (
+  <div>
+    <span className="field-label">{etiqueta}</span>
+    <div className="mt-1 flex flex-wrap gap-1.5">
+      {opciones.map(([v, texto]) => (
+        <button
+          key={v}
+          type="button"
+          onClick={() => onChange(v)}
+          className={`rounded-control border px-2.5 py-1 text-[12px] font-medium ${
+            valor === v
+              ? 'border-brand-700 bg-brand-50 text-brand-700'
+              : 'border-line-200 bg-canvas text-ink-700 hover:border-brand-700'
+          }`}
+        >
+          {texto}
+        </button>
+      ))}
+    </div>
+  </div>
+);

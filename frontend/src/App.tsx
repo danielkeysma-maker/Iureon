@@ -21,6 +21,7 @@ import { SettingsView } from './modules/settings/components/SettingsView';
 import { WorkshopConfigBar } from './modules/workspace/components/WorkshopConfigBar';
 import type { ActuacionRole } from './modules/catalog/types';
 import { FirmBrandingModal } from './modules/tenant/components/FirmBrandingModal';
+import { brandingApi, formatoComoInstruccion, type FirmBranding } from './modules/tenant/services/branding.api';
 import { FirmSubscriptionModal } from './modules/subscriptions/components/FirmSubscriptionModal';
 import type { FirmSubscriptionInfo } from './modules/subscriptions/types';
 import { DEFAULT_FIRM_BRANDING, DocumentExportService } from './modules/documents/services/documentExport.service';
@@ -184,7 +185,41 @@ export function App() {
   const [isSavedDraftsModalOpen, setIsSavedDraftsModalOpen] = useState(false);
 
   const [firmBranding, setFirmBranding] = useState<FirmBrandingConfig>(DEFAULT_FIRM_BRANDING);
-  const workflow = useLegalAgentWorkflow();
+  /*
+   * La marca DE LA FIRMA, del servidor. Vivia solo en el estado de React: se
+   * perdia al recargar y cada abogado veia una marca distinta. Se carga al
+   * autenticar y el modal la guarda en la firma para todos.
+   */
+  const [marcaDeFirma, setMarcaDeFirma] = useState<FirmBranding | null>(null);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    brandingApi
+      .get()
+      .then(({ branding, configurada }) => {
+        if (configurada) aplicarMarca(branding);
+      })
+      .catch(() => {
+        /* Sin marca guardada se exporta con el formato por defecto: nada se rompe. */
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated]);
+
+  /* La marca nueva alimenta a la vieja estructura de exportacion sin romperla. */
+  const aplicarMarca = (b: FirmBranding) => {
+    setMarcaDeFirma(b);
+    setFirmBranding((prev) => ({
+      ...prev,
+      firmName: b.firmName || prev.firmName,
+      firmNit: b.firmNit || prev.firmNit,
+      firmAddress: b.firmAddress || prev.firmAddress,
+      firmPhone: b.firmPhone || prev.firmPhone,
+      firmEmail: b.firmEmail || prev.firmEmail,
+      fontFamily: b.fontFamily as FirmBrandingConfig['fontFamily'],
+      logoUrl: b.logoUrl ?? undefined
+    }));
+  };
+  const workflow = useLegalAgentWorkflow(marcaDeFirma ? formatoComoInstruccion(marcaDeFirma) : undefined);
 
   /*
    * Quién firma el escrito.
@@ -359,8 +394,7 @@ export function App() {
       <FirmBrandingModal
         isOpen={isBrandingModalOpen}
         onClose={() => setIsBrandingModalOpen(false)}
-        branding={firmBranding}
-        onSaveBranding={(updated) => setFirmBranding(updated)}
+        onSaved={aplicarMarca}
       />
       <FirmSubscriptionModal
         isOpen={isSubscriptionModalOpen}
