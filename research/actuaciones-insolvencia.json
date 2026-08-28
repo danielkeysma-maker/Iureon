@@ -1303,6 +1303,111 @@
         }
       ],
       "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr019.html"
+    },
+    {
+      "exact_name": "Solicitud de exclusión de bienes en garantía mobiliaria en la liquidación judicial",
+      "area": "INSOLVENCIA",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1676 de 2013, art. 52 (exclusión y sanción por no comparecer); Ley 1116 de 2006, arts. 37 y 56; Decreto 1074 de 2015, art. 2.2.2.4.2.47",
+      "competent_authority": "El juez del concurso: la Superintendencia de Sociedades o el juez civil del circuito, según a quién corresponda el proceso de liquidación",
+      "term": "SEIS (6) MESES, Y EL RELOJ ES DEL ACREEDOR GARANTIZADO. «A partir de la apertura del proceso de liquidación judicial y dentro de los SEIS (6) MESES siguientes al inicio del proceso o dentro del plazo previsto en el artículo 37 de la Ley 1116 de 2006, el acreedor garantizado podrá solicitar al juez del concurso la exclusión de los bienes en garantía» (art. 52). CALLAR EQUIVALE A CONSENTIR, y eso está escrito: el parágrafo del mismo artículo dispone que no concurrir, o concurrir fuera del término del art. 56 de la Ley 1116, «se entenderá en el sentido de que accede a que su bien se trate» dentro de la masa. Es decir, el acreedor que no pide la exclusión a tiempo pierde el bien como garantía y entra a la fila con los demás. ADVERTENCIA DE VIGENCIA: el art. 21 de la Ley 2437 de 2024 DEROGÓ los arts. 37 y 38 de la Ley 1116 de 2006 — «En todos los casos en que resultaría aplicable la liquidación por adjudicación procederá la liquidación judicial o la liquidación judicial simplificada según corresponda»—, de modo que la remisión al art. 37 debe leerse contra el régimen vigente. LÍMITE CONSTITUCIONAL: C-145 de 2018 declaró condicionalmente exequibles los arts. 50 y 51, de manera que el derecho del acreedor garantizado opera «siempre que los demás bienes del deudor sean suficientes para asegurar el pago de las obligaciones alimentarias de los niños y las salariales y prestacionales».",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del proceso de liquidación judicial y de su fecha de apertura",
+          "mandatory": true,
+          "basis": "Ley 1676 de 2013, art. 52"
+        },
+        {
+          "n": 2,
+          "name": "Prueba de la inscripción de la garantía mobiliaria ANTES de la inscripción del concurso",
+          "mandatory": true,
+          "basis": "Decreto 1074 de 2015, art. 2.2.2.4.2.58"
+        },
+        {
+          "n": 3,
+          "name": "Individualización de los bienes cuya exclusión de la masa se solicita",
+          "mandatory": true,
+          "basis": "Ley 1676 de 2013, art. 52"
+        },
+        {
+          "n": 4,
+          "name": "Constancia de presentación dentro de los seis (6) meses siguientes al inicio del proceso",
+          "mandatory": true,
+          "basis": "Ley 1676 de 2013, art. 52"
+        },
+        {
+          "n": 5,
+          "name": "Pronunciamiento sobre la suficiencia de los demás bienes para las acreencias alimentarias y laborales",
+          "mandatory": false,
+          "basis": "Corte Constitucional, C-145 de 2018"
+        }
+      ],
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=54297"
+    },
+    {
+      "exact_name": "Solicitud de autorización para ejecutar la garantía mobiliaria en reorganización",
+      "area": "INSOLVENCIA",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1676 de 2013, art. 50 (condicionalmente exequible, C-145 de 2018); Decreto 1074 de 2015, art. 2.2.2.4.2.33; Ley 1116 de 2006",
+      "competent_authority": "El juez del concurso: la Superintendencia de Sociedades o el juez civil del circuito",
+      "term": "SIN PLAZO EN DÍAS: EL RELOJ ESTÁ ATADO A UN HITO DEL PROCESO Y NO A UN CALENDARIO, así que se vigila el expediente, no la agenda. El juez «resolverá la solicitud de ejecución una vez en firme la aprobación del inventario valorado y la providencia de calificación y graduación de créditos» (art. 50). Pedirla antes no la adelanta. LÍMITE CONSTITUCIONAL VIGENTE: C-145 de 2018 condicionó los arts. 50 y 51 a que «los demás bienes del deudor sean suficientes para asegurar el pago de las obligaciones alimentarias de los niños y las salariales y prestacionales». C-483 de 2024 volvió a examinarlos y se declaró INHIBIDA, de modo que el condicionamiento sigue en pie. ADVERTENCIA DE VIGENCIA: el último inciso del art. 50 remite a la «liquidación por adjudicación», figura suprimida por el art. 21 de la Ley 2437 de 2024; hoy se lee como liquidación judicial o judicial simplificada.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del proceso de reorganización y del crédito garantizado",
+          "mandatory": true,
+          "basis": "Ley 1676 de 2013, art. 50"
+        },
+        {
+          "n": 2,
+          "name": "Prueba de la inscripción de la garantía y de su prelación",
+          "mandatory": true,
+          "basis": "Ley 1676 de 2013, arts. 21 y 48"
+        },
+        {
+          "n": 3,
+          "name": "Demostración de que el bien no es necesario para la actividad económica del deudor",
+          "mandatory": true,
+          "basis": "Ley 1676 de 2013, art. 50"
+        },
+        {
+          "n": 4,
+          "name": "Constancia de que están en firme el inventario valorado y la calificación y graduación de créditos",
+          "mandatory": true,
+          "basis": "Ley 1676 de 2013, art. 50"
+        }
+      ],
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=54297"
+    },
+    {
+      "exact_name": "Solicitud de medidas de protección del acreedor garantizado por depreciación del bien",
+      "area": "INSOLVENCIA",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1676 de 2013, art. 50 inciso 4 (condicionalmente exequible, C-145 de 2018); Ley 1116 de 2006",
+      "competent_authority": "El juez del concurso: la Superintendencia de Sociedades o el juez civil del circuito",
+      "term": "SIN PLAZO LEGAL, PERO ES LA ÚNICA DEFENSA MIENTRAS EL BIEN SE DETERIORA DENTRO DEL CONCURSO. Cuando el bien en garantía queda afecto al proceso y pierde valor, el acreedor puede pedir su sustitución, la constitución de reservas o pagos periódicos que compensen la depreciación (art. 50 inc. 4). Se pide en cualquier momento del proceso, y su utilidad depende de pedirla temprano: la depreciación no se recupera hacia atrás.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del proceso de insolvencia y del bien dado en garantía",
+          "mandatory": true,
+          "basis": "Ley 1676 de 2013, art. 50"
+        },
+        {
+          "n": 2,
+          "name": "Demostración de la depreciación o del riesgo de pérdida de valor del bien",
+          "mandatory": true,
+          "basis": "Ley 1676 de 2013, art. 50 inc. 4"
+        },
+        {
+          "n": 3,
+          "name": "Medida concreta que se solicita: sustitución del bien, reservas o pagos periódicos",
+          "mandatory": true,
+          "basis": "Ley 1676 de 2013, art. 50 inc. 4"
+        }
+      ],
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=54297"
     }
   ]
 }

@@ -1069,6 +1069,102 @@ export const CIVIL_CATALOG: BranchCatalog = {
       { n: 4, name: 'Orden de inscripción en el registro de instrumentos públicos', mandatory: true, basis: 'Art. 375' }
     ],
     sourceUrl: 'https://www.alcaldiabogota.gov.co/sisjur/normas/Norma1.jsp?i=48425'
+  },
+  {
+    id: 'civil/oposicion-a-la-ejecucion-especial-de-la-garantia-mobiliaria',
+    exactName: 'Oposición a la ejecución especial de la garantía mobiliaria',
+    branch: 'CIVIL',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1676 de 2013, arts. 66 (causales taxativas) y 67 (trámite); Decreto 1074 de 2015, arts. 2.2.2.4.2.11, 2.2.2.4.2.12 y 2.2.2.4.2.13',
+    competentAuthority: 'Se radica ante el notario o la cámara de comercio que adelanta la ejecución, pero la resuelve la autoridad jurisdiccional: el juez civil competente o la Superintendencia de Sociedades cuando el garante sea sociedad sometida a su vigilancia (Ley 1676 de 2013, art. 57), o el árbitro si hay pacto arbitral',
+    term: { status: 'VERIFICADO', description: 'DIEZ (10) DÍAS, RELOJ DEL DEUDOR, Y ES EL ÚNICO QUE LE DESTRUYE EL DERECHO. «La oposición se deberá formular por escrito en un plazo máximo de diez (10) días contados a partir del día siguiente al recibo de la comunicación, ante el notario o la Cámara de Comercio según corresponda, ACOMPAÑANDO LA TOTALIDAD DE LAS PRUEBAS que pretenda hacer valer» (art. 67 num. 1). No basta oponerse: hay que llegar con toda la prueba. LAS CAUSALES SON TAXATIVAS (art. 66): extinción de la garantía acreditada con certificación del registro; extinción de la obligación, o que no sea exigible por plazo o condición suspensiva; falsedad de la firma o alteración del texto; y error en la determinación de la cantidad exigible. CUALQUIER OTRA DEFENSA LLEGA TARDE AUNQUE SE GANE, y esto es lo que hay que explicarle al cliente antes de decidir: las demás se ventilan en un declarativo posterior, y el parágrafo del art. 66 advierte que «La adjudicación o realización del bien en el proceso de ejecución especial de la garantía NO SE VERÁN AFECTADAS por el resultado de este trámite posterior». Se gana el pleito y el bien ya no está. LOS DEMÁS RELOJES DEL INCIDENTE, que no son del deudor: el acreedor tiene cinco (5) días para pronunciarse sobre la oposición (art. 2.2.2.4.2.11), la entidad tres (3) para remitir el expediente (art. 2.2.2.4.2.12), y el juez cita en tres (3) días y celebra audiencia en cinco (5) (art. 67 num. 1). Y VUELVE A CORRER CONTRA EL EJECUTADO AL FINAL: «Si los ejecutados no concurren y no justifican su inasistencia dentro de los tres (3) días siguientes», se ordena continuar la ejecución.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación de la ejecución especial a la que se opone y de la comunicación recibida, con su fecha', mandatory: true, basis: 'Ley 1676 de 2013, art. 67 num. 1' },
+      { n: 2, name: 'Constancia de presentación dentro de los diez (10) días siguientes al recibo de la comunicación', mandatory: true, basis: 'Ley 1676 de 2013, art. 67 num. 1' },
+      { n: 3, name: 'Invocación expresa de una de las cuatro causales del artículo 66, que son taxativas', mandatory: true, basis: 'Ley 1676 de 2013, art. 66' },
+      { n: 4, name: 'Aporte de la TOTALIDAD de las pruebas que se pretende hacer valer', mandatory: true, basis: 'Ley 1676 de 2013, art. 67 num. 1' },
+      { n: 5, name: 'Certificación del registro que acredite la extinción de la garantía, cuando esa sea la causal', mandatory: false, basis: 'Ley 1676 de 2013, art. 66' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=54297'
+  },
+  {
+    id: 'civil/demanda-de-ejecucion-judicial-de-la-garantia-mobiliaria',
+    exactName: 'Demanda de ejecución judicial de la garantía mobiliaria',
+    branch: 'CIVIL',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1676 de 2013, arts. 57 (autoridad competente), 58, 61 (trámite y excepciones) y 12 (título ejecutivo); Código General del Proceso, arts. 467 y 468',
+    competentAuthority: 'El juez civil competente, y a prevención la Superintendencia de Sociedades «solo en el evento en que el garante sea una sociedad sometida a su vigilancia» (Ley 1676 de 2013, art. 57)',
+    term: { status: 'VERIFICADO', description: 'EL REQUISITO PREVIO QUE HUNDE LA DEMANDA SI FALTA, Y NO ES UN ANEXO SINO UNA INSCRIPCIÓN: «Deberá inscribirse el formulario registral de ejecución en el registro de garantías mobiliarias […] COMO EXIGENCIA PREVIA PARA EL TRÁMITE DEL PROCESO» (art. 61 num. 1). Y EL TÍTULO EJECUTIVO ES ESE FORMULARIO, NO EL CONTRATO (art. 12) — presentar el contrato como título es el error de forma más caro de este régimen. RELOJ DEL EJECUTADO: diez (10) días para las defensas, «El ejecutado podrá, en el término de diez (10) días, plantear las siguientes defensas» (CGP art. 467 num. 3); por la vía del art. 61 num. 2 las excepciones son las cuatro tasadas, no las del ejecutivo común. RELOJ DEL ACREEDOR: «el acreedor deberá consignar la diferencia a órdenes del juzgado respectivo dentro de los tres (3) días siguientes al vencimiento del plazo para presentar oposición» (CGP art. 467 num. 5). RELOJ DE AMBOS SOBRE EL AVALÚO DESACTUALIZADO: tres (3) días para objetarlo «so pena de ser rechazada de plano» (art. 61 num. 7). CADUCIDAD DE LOS ANEXOS: los certificados deben tener «una fecha de expedición no superior a un (1) mes» (CGP art. 467). ADVERTENCIA DE VIGENCIA: el último inciso del art. 50 de la Ley 1676 remite a la «liquidación por adjudicación», figura DEROGADA por el art. 21 de la Ley 2437 de 2024, que suprimió los arts. 37 y 38 de la Ley 1116 de 2006; hoy se lee como liquidación judicial o liquidación judicial simplificada.' },
+    requiredSections: [
+      { n: 1, name: 'Constancia de la inscripción previa del formulario registral de ejecución', mandatory: true, basis: 'Ley 1676 de 2013, art. 61 num. 1' },
+      { n: 2, name: 'El formulario registral de ejecución como título ejecutivo, no el contrato de garantía', mandatory: true, basis: 'Ley 1676 de 2013, art. 12' },
+      { n: 3, name: 'Identificación del garante, del acreedor y de la obligación incumplida', mandatory: true, basis: 'Ley 1676 de 2013, art. 61' },
+      { n: 4, name: 'Descripción de los bienes en garantía y su avalúo', mandatory: true, basis: 'Ley 1676 de 2013, art. 61 num. 7' },
+      { n: 5, name: 'Certificados del registro con fecha de expedición no superior a un (1) mes', mandatory: true, basis: 'Código General del Proceso, art. 467' },
+      { n: 6, name: 'Petición de adjudicación o de realización especial del bien', mandatory: true, basis: 'Código General del Proceso, arts. 467 y 468' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=54297'
+  },
+  {
+    id: 'civil/requerimiento-al-deudor-para-acordar-la-ejecucion-especial-de-la-garantia-mobiliaria',
+    exactName: 'Requerimiento al deudor para acordar la ejecución especial de la garantía mobiliaria',
+    branch: 'CIVIL',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1676 de 2013, art. 58 parágrafo; Decreto 1074 de 2015, art. 2.2.2.4.2.7',
+    competentAuthority: 'No se radica ante autoridad: es una comunicación escrita directa del acreedor al deudor',
+    term: { status: 'VERIFICADO', description: 'DIEZ (10) DÍAS, Y EL RELOJ ES DEL DEUDOR, PERO SU VENCIMIENTO NO LO PERJUDICA — LO MANDA AL JUEZ. «El acreedor a quien se le haya incumplido cualquiera de las obligaciones garantizadas, podrá hacer requerimiento escrito al deudor, para que dentro del término de diez (10) días acuerde con él la procedencia de la ejecución especial de la garantía mobiliaria. DE NO HACERLO OPERARÁ EL MECANISMO DE EJECUCIÓN JUDICIAL» (art. 58 par.). Es el paso previo obligado cuando la ejecución especial no se pactó en el contrato: sin este requerimiento no se puede acudir al notario ni a la cámara de comercio.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación de la obligación garantizada y de su incumplimiento', mandatory: true, basis: 'Ley 1676 de 2013, art. 58' },
+      { n: 2, name: 'Propuesta expresa de acudir a la ejecución especial de la garantía', mandatory: true, basis: 'Ley 1676 de 2013, art. 58 par.' },
+      { n: 3, name: 'Concesión del término de diez (10) días para que el deudor acuerde', mandatory: true, basis: 'Ley 1676 de 2013, art. 58 par.' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=54297'
+  },
+  {
+    id: 'civil/solicitud-de-aprehension-y-entrega-del-bien-dado-en-garantia-mobiliaria',
+    exactName: 'Solicitud de aprehensión y entrega del bien dado en garantía mobiliaria',
+    branch: 'CIVIL',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1676 de 2013, arts. 60 parágrafo 2, 68 y 75; Decreto 1074 de 2015, arts. 2.2.2.4.2.3 num. 2 y 2.2.2.4.2.70',
+    competentAuthority: 'La autoridad jurisdiccional competente la ordena; la practica el funcionario comisionado o la autoridad de policía, «quien no podrá admitir oposición» (Ley 1676 de 2013, art. 68)',
+    term: { status: 'VERIFICADO', description: 'SIN PLAZO PARA PEDIRLA, PERO CON UN PREVIO QUE HAY QUE DEJAR CORRER: CINCO (5) DÍAS DEL GARANTE. «Si pasados cinco (5) días contados a partir de la solicitud el garante no hace entrega voluntaria del bien […] este último podrá solicitar a la autoridad jurisdiccional competente la aprehensión y entrega» (Decreto 1074 de 2015, art. 2.2.2.4.2.3 num. 2). Se libra «con la simple petición del acreedor garantizado» y la diligencia NO admite oposición: quien quiera oponerse debía hacerlo en la ejecución, dentro de sus diez días.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación de la garantía inscrita y de la ejecución en curso', mandatory: true, basis: 'Ley 1676 de 2013, art. 68' },
+      { n: 2, name: 'Constancia de la solicitud de entrega voluntaria y del transcurso de los cinco (5) días', mandatory: true, basis: 'Decreto 1074 de 2015, art. 2.2.2.4.2.3 num. 2' },
+      { n: 3, name: 'Descripción e individualización del bien cuya aprehensión se pide', mandatory: true, basis: 'Ley 1676 de 2013, art. 68' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=54297'
+  },
+  {
+    id: 'civil/solicitud-de-terminacion-de-la-ejecucion-de-la-garantia-mobiliaria-por-pago',
+    exactName: 'Solicitud de terminación de la ejecución de la garantía mobiliaria por pago',
+    branch: 'CIVIL',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1676 de 2013, art. 72',
+    competentAuthority: 'La autoridad que adelanta la ejecución: el notario, la cámara de comercio o el juez, según la vía por la que se tramite',
+    term: { status: 'VERIFICADO', description: 'NO HAY PLAZO EN DÍAS: EL RELOJ ES UN HECHO, Y POR ESO HAY QUE VIGILARLO Y NO CONTARLO. «En cualquier momento ANTES DE QUE EL ACREEDOR GARANTIZADO DISPONGA DE LOS BIENES dados en garantía, el garante o deudor, así como cualquier otra persona interesada, tendrá derecho a solicitar la terminación de la ejecución, pagando el monto total adeudado al acreedor garantizado, así como los gastos incurridos en el procedimiento de ejecución» (art. 72). La puerta no se cierra en una fecha sino cuando el bien se dispone, así que el aviso al cliente no es «le quedan tantos días» sino «esto se acaba el día que rematen o adjudiquen». LEGITIMACIÓN AMPLIA: la puede pedir el deudor, el garante o cualquier interesado, lo que permite que un tercero pague para salvar el bien.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación de la ejecución en curso y de los bienes comprometidos', mandatory: true, basis: 'Ley 1676 de 2013, art. 72' },
+      { n: 2, name: 'Prueba del pago del monto total adeudado al acreedor garantizado', mandatory: true, basis: 'Ley 1676 de 2013, art. 72' },
+      { n: 3, name: 'Prueba del pago de los gastos incurridos en el procedimiento de ejecución', mandatory: true, basis: 'Ley 1676 de 2013, art. 72' },
+      { n: 4, name: 'Acreditación del interés, cuando quien paga no es el deudor ni el garante', mandatory: false, basis: 'Ley 1676 de 2013, art. 72' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=54297'
+  },
+  {
+    id: 'civil/demanda-por-ejercicio-abusivo-de-los-derechos-del-acreedor-garantizado',
+    exactName: 'Demanda por ejercicio abusivo de los derechos del acreedor garantizado',
+    branch: 'CIVIL',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1676 de 2013, art. 73; Decreto 1074 de 2015, art. 2.2.2.4.2.18',
+    competentAuthority: 'El juez civil competente',
+    term: { status: 'VERIFICADO', description: 'SIN PLAZO ESPECIAL EN LA LEY 1676. Es la vía del deudor cuando el acreedor ejecuta de forma abusiva —por bienes que exceden la deuda, o sin respetar el procedimiento—, y no está sujeta a las causales taxativas de la oposición del art. 66. ADVERTENCIA QUE HAY QUE DAR ANTES DE ELEGIR ESTA VÍA: no suspende ni revierte la ejecución. Si el bien ya se adjudicó o realizó, esta demanda persigue la indemnización, no la restitución.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación de la garantía y del procedimiento de ejecución adelantado', mandatory: true, basis: 'Ley 1676 de 2013, art. 73' },
+      { n: 2, name: 'Hechos que configuran el ejercicio abusivo del derecho del acreedor', mandatory: true, basis: 'Ley 1676 de 2013, art. 73' },
+      { n: 3, name: 'Pretensión indemnizatoria con la estimación razonada del perjuicio', mandatory: true, basis: 'Ley 1676 de 2013, art. 73' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=54297'
   }
   ]
 };

@@ -408,6 +408,142 @@ export const SOCIETARIO_CATALOG: BranchCatalog = {
       { n: 4, name: 'Liquidación de los perjuicios causados', mandatory: true, basis: 'Art. 42' }
     ],
     sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=34130'
+  },
+  {
+    id: 'societario/formulario-de-inscripcion-inicial-de-garantia-mobiliaria',
+    exactName: 'Formulario de inscripción inicial de garantía mobiliaria',
+    branch: 'SOCIETARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1676 de 2013, arts. 21 (oponibilidad por inscripción), 38 a 43 (registro), 48 (prelación) y 44 (tarifas); Decreto 1074 de 2015, arts. 2.2.2.4.1.6 (requisitos previos), 2.2.2.4.1.10, 2.2.2.4.1.12 (inscripción antes del contrato) y 2.2.2.4.1.17',
+    competentAuthority: 'Registro de Garantías Mobiliarias, llevado de manera centralizada por Confecámaras (Ley 1676 de 2013, art. 39 num. 3). NO es autoridad judicial: sus actos «constituyen actos de trámite y en consecuencia no podrán ser objeto de recurso alguno» (Decreto 1074 de 2015, art. 2.2.2.4.1.40). Se tramita por internet, con cuenta de usuario creada previa verificación de identidad.',
+    term: { status: 'VERIFICADO', description: 'NO HAY PLAZO PARA INSCRIBIR, PERO EL RELOJ DEL ACREEDOR CORRE CONTRA OTROS ACREEDORES, NO CONTRA UN FUNCIONARIO. La inscripción no tiene término legal, y sin embargo cada día que pasa sin inscribir es prelación que se cede: «La prelación de una garantía mobiliaria sin tenencia del acreedor garantizado sobre bienes en garantía se determina por el momento de su inscripción en el registro» (art. 48). Es decir, el orden lo fija la hora de inscripción, no la fecha del contrato. SE PUEDE INSCRIBIR ANTES DE FIRMAR: el art. 2.2.2.4.1.12 del Decreto 1074 permite la inscripción anticipada al contrato de garantía, que es la forma de asegurar el puesto en la fila mientras se negocia. LA INSCRIPCIÓN VENCE: su vigencia es la que se indique en el documento de garantía y, si no se indica, CINCO (5) AÑOS (art. 42) — ver la ficha de prórroga, porque nadie avisa. COSTO: la tarifa la fija el MinCIT por resolución a favor de Confecámaras (art. 44); en 2026, $56.000 antes de IVA para la inscripción inicial. Las consultas al archivo son gratuitas.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del garante y del acreedor garantizado, con su documento de identidad', mandatory: true, basis: 'Ley 1676 de 2013, art. 14 num. 1' },
+      { n: 2, name: 'Monto máximo cubierto por la garantía mobiliaria', mandatory: true, basis: 'Ley 1676 de 2013, art. 14 num. 2' },
+      { n: 3, name: 'Descripción genérica o específica de los bienes dados en garantía', mandatory: true, basis: 'Ley 1676 de 2013, art. 14 num. 3' },
+      { n: 4, name: 'Descripción de las obligaciones garantizadas', mandatory: true, basis: 'Ley 1676 de 2013, art. 14 num. 4' },
+      { n: 5, name: 'Vigencia que se le da a la inscripción; a falta de indicación son cinco (5) años', mandatory: false, basis: 'Ley 1676 de 2013, art. 42' },
+      { n: 6, name: 'Comprobante del pago de los derechos de registro', mandatory: true, basis: 'Decreto 1074 de 2015, art. 2.2.2.4.1.6' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=54297'
+  },
+  {
+    id: 'societario/formulario-de-prorroga-de-la-inscripcion-de-la-garantia-mobiliaria',
+    exactName: 'Formulario de prórroga de la inscripción de la garantía mobiliaria',
+    branch: 'SOCIETARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1676 de 2013, arts. 42 (vigencia y prórroga) y 48 (prelación por el momento de la inscripción); Decreto 1074 de 2015, art. 2.2.2.4.1.11 num. 2',
+    competentAuthority: 'Registro de Garantías Mobiliarias, llevado por Confecámaras (Ley 1676 de 2013, art. 39 num. 3)',
+    term: { status: 'VERIFICADO', description: 'EL RELOJ DEL CLIENTE, Y EL PEOR DE TODO ESTE RÉGIMEN PORQUE NADIE LO NOTIFICA: HAY QUE PRORROGAR ANTES DE QUE VENZA LA VIGENCIA INSCRITA. El art. 42 fija la duración: «La inscripción en el registro tendrá vigencia por el plazo que se indique en el documento de garantía, prorrogable por periodos de tres años. En el evento de no especificarse al momento de constituir la garantía este será de cinco (5) años». Y el reglamento fija el cuándo, que es lo que la ley calla: «esta prórroga deberá especificarse en un formulario de modificación EN CUALQUIER MOMENTO ANTES DE LA EXPIRACIÓN DE LA VIGENCIA establecida en el formulario de inscripción inicial, por periodos de hasta tres (3) años» (Decreto 1074 de 2015, art. 2.2.2.4.1.11 num. 2). QUÉ SE PIERDE SI SE DEJA VENCER: no hay requerimiento, ni auto, ni traslado que avise. Vencida la inscripción se pierde la oponibilidad frente a terceros, y con ella la prelación del art. 48, que se determina «por el momento de su inscripción en el registro»: una inscripción nueva entra con fecha nueva, detrás de todo acreedor que se haya inscrito entre tanto. Con el plazo supletivo de cinco años, la garantía suele vencer en el mandato de un abogado distinto del que la constituyó. COSTO: la prórroga NO tiene formulario tarifado propio; se tramita con el formulario de modificación, $15.000 antes de IVA en 2026.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del formulario de inscripción inicial que se prorroga', mandatory: true, basis: 'Decreto 1074 de 2015, art. 2.2.2.4.1.11' },
+      { n: 2, name: 'Periodo de prórroga solicitado, que no puede exceder de tres (3) años', mandatory: true, basis: 'Ley 1676 de 2013, art. 42; Decreto 1074 de 2015, art. 2.2.2.4.1.11 num. 2' },
+      { n: 3, name: 'Constancia de presentación antes de la expiración de la vigencia inscrita', mandatory: true, basis: 'Decreto 1074 de 2015, art. 2.2.2.4.1.11 num. 2' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=54297'
+  },
+  {
+    id: 'societario/formulario-de-modificacion-de-la-inscripcion-de-la-garantia-mobiliaria',
+    exactName: 'Formulario de modificación de la inscripción de la garantía mobiliaria',
+    branch: 'SOCIETARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1676 de 2013, art. 40; Decreto 1074 de 2015, art. 2.2.2.4.1.23',
+    competentAuthority: 'Registro de Garantías Mobiliarias, llevado por Confecámaras (Ley 1676 de 2013, art. 39 num. 3)',
+    term: { status: 'VERIFICADO', description: 'NO HAY PLAZO LEGAL, PERO LO AÑADIDO NO RETROACTÚA Y ESO ES LO QUE HAY QUE SABER ANTES DE DEMORARLO. Cuando la modificación agrega bienes en garantía o un garante nuevo, «será válida respecto de los nuevos bienes en garantía y el garante adicionado, SOLAMENTE A PARTIR DE LA HORA Y FECHA DE INSCRIPCIÓN del formulario de registro de modificación» (Decreto 1074 de 2015, art. 2.2.2.4.1.23). Es decir: lo agregado no hereda la prelación de la inscripción inicial, entra en la fila el día que se inscribe. COSTO: $15.000 antes de IVA en 2026.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del formulario de inscripción inicial que se modifica', mandatory: true, basis: 'Decreto 1074 de 2015, art. 2.2.2.4.1.23' },
+      { n: 2, name: 'Descripción precisa de la modificación: bienes, garante, monto u obligaciones', mandatory: true, basis: 'Ley 1676 de 2013, art. 40' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=54297'
+  },
+  {
+    id: 'societario/formulario-de-cancelacion-de-la-inscripcion-de-la-garantia-mobiliaria',
+    exactName: 'Formulario de cancelación de la inscripción de la garantía mobiliaria',
+    branch: 'SOCIETARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1676 de 2013, arts. 19 num. 5 lit. d), 40 inc. 2 y 76; Decreto 1074 de 2015, arts. 2.2.2.4.1.25 y 2.2.2.4.1.26',
+    competentAuthority: 'Registro de Garantías Mobiliarias, llevado por Confecámaras. La puede presentar indistintamente el acreedor garantizado o el garante (Ley 1676 de 2013, art. 40 inc. 2).',
+    term: { status: 'VERIFICADO', description: 'SIN PLAZO LEGAL PARA PRESENTARLA. Lo que sí tiene reloj es la vía para forzarla cuando el acreedor no cancela: pagada la obligación, si el acreedor garantizado no atiende la solicitud «dentro de los quince (15) días siguientes a la petición», el garante puede acudir al notario (art. 76) — ver la ficha «Solicitud de cancelación de la garantía mobiliaria ante notario por renuencia del acreedor», que es la del deudor. COSTO: $15.000 antes de IVA en 2026.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del formulario de inscripción inicial que se cancela', mandatory: true, basis: 'Decreto 1074 de 2015, art. 2.2.2.4.1.25' },
+      { n: 2, name: 'Causal de la cancelación, incluida la extinción de la obligación garantizada', mandatory: true, basis: 'Ley 1676 de 2013, art. 19 num. 5 lit. d)' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=54297'
+  },
+  {
+    id: 'societario/formulario-de-transferencia-o-cesion-de-la-garantia-mobiliaria',
+    exactName: 'Formulario de transferencia o cesión de la garantía mobiliaria',
+    branch: 'SOCIETARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1676 de 2013, art. 38; Decreto 1074 de 2015, art. 2.2.2.4.2.53',
+    competentAuthority: 'Registro de Garantías Mobiliarias, llevado por Confecámaras (Ley 1676 de 2013, art. 39 num. 3)',
+    term: { status: 'VERIFICADO', description: 'SIN PLAZO LEGAL. La cesión de la obligación garantizada arrastra la garantía, y su inscripción es lo que la hace oponible frente a terceros en los mismos términos del art. 21. Mientras no se inscriba, el cesionario no puede hacer valer la prelación frente a quien consulte el registro. COSTO: $15.000 antes de IVA en 2026.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del acreedor garantizado cedente y del cesionario', mandatory: true, basis: 'Ley 1676 de 2013, art. 38' },
+      { n: 2, name: 'Identificación del formulario de inscripción inicial cuya titularidad se transfiere', mandatory: true, basis: 'Decreto 1074 de 2015, art. 2.2.2.4.2.53' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=54297'
+  },
+  {
+    id: 'societario/formulario-de-terminacion-de-la-ejecucion-de-la-garantia-mobiliaria',
+    exactName: 'Formulario de terminación de la ejecución de la garantía mobiliaria',
+    branch: 'SOCIETARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Decreto 1074 de 2015, art. 2.2.2.4.1.31; Ley 1676 de 2013, arts. 61 y 72',
+    competentAuthority: 'Registro de Garantías Mobiliarias, llevado por Confecámaras (Ley 1676 de 2013, art. 39 num. 3)',
+    term: { status: 'VERIFICADO', description: 'DOS RELOJES, LOS DOS DEL ACREEDOR GARANTIZADO. EL PRIMERO ES UN DEBER SUYO: «En los eventos previstos en los numerales 1, 2, 3 y 4 el acreedor garantizado deberá efectuar la inscripción de la terminación de la ejecución DENTRO DE LOS QUINCE (15) DÍAS siguientes a la fecha del pago del saldo adeudado o de la suscripción del acuerdo de pago» (art. 2.2.2.4.1.31). EL SEGUNDO MATA LA EJECUCIÓN SOLO, SIN QUE NADIE LO PIDA: el numeral 5 del mismo artículo da por terminada la ejecución cuando «No se inicie el procedimiento de ejecución dentro de los TREINTA (30) DÍAS siguientes a la inscripción del formulario de ejecución». Inscribir la ejecución y no arrancarla dentro del mes la deja sin efecto, y hay que volver a empezar. COSTO: $15.000 antes de IVA en 2026.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del formulario de ejecución cuya terminación se inscribe', mandatory: true, basis: 'Decreto 1074 de 2015, art. 2.2.2.4.1.31' },
+      { n: 2, name: 'Causal de terminación: pago del saldo, acuerdo de pago u otra de las previstas', mandatory: true, basis: 'Decreto 1074 de 2015, art. 2.2.2.4.1.31' },
+      { n: 3, name: 'Constancia de presentación dentro de los quince (15) días siguientes al pago o al acuerdo', mandatory: true, basis: 'Decreto 1074 de 2015, art. 2.2.2.4.1.31' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=54297'
+  },
+  {
+    id: 'societario/contrato-de-garantia-mobiliaria',
+    exactName: 'Contrato de garantía mobiliaria',
+    branch: 'SOCIETARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1676 de 2013, arts. 9 (constitución), 10, 13, 14 (requisitos del contrato), 15 y 17',
+    competentAuthority: 'No se radica ante autoridad: es contrato entre el garante y el acreedor garantizado (Ley 1676 de 2013, art. 9). Su oponibilidad frente a terceros nace de la inscripción en el Registro de Garantías Mobiliarias, no de la firma.',
+    term: { status: 'VERIFICADO', description: 'NO HAY PLAZO: ES UN CONTRATO Y NO UNA ACTUACIÓN ANTE AUTORIDAD. El término que importa es el de la INSCRIPCIÓN, que es lo que lo hace oponible y fija la prelación (arts. 21 y 48) — ver la ficha del formulario de inscripción inicial. FORMA OBLIGATORIA, y su ausencia es lo que más contratos tumba: «El contrato de garantía debe otorgarse por escrito y debe contener cuando menos: 1. Nombres, identificación y firmas de los contratantes. 2. El monto máximo cubierto por la garantía mobiliaria. 3. La descripción genérica o específica de los bienes dados en garantía. 4. Una descripción de las obligaciones garantizadas» (art. 14).' },
+    requiredSections: [
+      { n: 1, name: 'Nombres, identificación y firmas de los contratantes', mandatory: true, basis: 'Ley 1676 de 2013, art. 14 num. 1' },
+      { n: 2, name: 'Monto máximo cubierto por la garantía mobiliaria', mandatory: true, basis: 'Ley 1676 de 2013, art. 14 num. 2' },
+      { n: 3, name: 'Descripción genérica o específica de los bienes dados en garantía', mandatory: true, basis: 'Ley 1676 de 2013, art. 14 num. 3' },
+      { n: 4, name: 'Descripción de las obligaciones garantizadas', mandatory: true, basis: 'Ley 1676 de 2013, art. 14 num. 4' },
+      { n: 5, name: 'Cláusula sobre la tenencia de los bienes y las obligaciones del garante que los conserva', mandatory: false, basis: 'Ley 1676 de 2013, art. 17' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=54297'
+  },
+  {
+    id: 'societario/contrato-de-garantia-mobiliaria-prioritaria-de-adquisicion',
+    exactName: 'Contrato de garantía mobiliaria prioritaria de adquisición',
+    branch: 'SOCIETARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Ley 1676 de 2013, arts. 22 (constitución y deber de notificar), 43 y 54 (prelación excepcional); Decreto 1074 de 2015, art. 2.2.2.4.1.18',
+    competentAuthority: 'Contrato entre garante y acreedor, con inscripción en el Registro de Garantías Mobiliarias (Confecámaras) y notificación privada a los acreedores precedentes',
+    term: { status: 'VERIFICADO', description: 'SIN PLAZO EN DÍAS, PERO CON UNA CARGA QUE DECIDE LA PRELACIÓN Y ES DEL ACREEDOR NUEVO. Esta garantía existe para ganarle el puesto a acreedores ya inscritos, y ese privilegio se pierde si no se avisa: «Cuando se otorgue esta garantía sobre bienes del inventario, el acreedor beneficiario de la garantía DEBERÁ NOTIFICAR a los acreedores precedentes con las garantías mobiliarias registradas anteriormente que puedan verse perjudicados por su prelación excepcional» (art. 22 inc. 2). Sin esa notificación no se gana la prelación excepcional del art. 54, y la garantía queda como una ordinaria, en la fila por fecha de inscripción.' },
+    requiredSections: [
+      { n: 1, name: 'Los cuatro requisitos del contrato de garantía', mandatory: true, basis: 'Ley 1676 de 2013, art. 14' },
+      { n: 2, name: 'Constancia de que el crédito se destinó a adquirir el bien dado en garantía', mandatory: true, basis: 'Ley 1676 de 2013, art. 22' },
+      { n: 3, name: 'Notificación a los acreedores precedentes inscritos, cuando la garantía recae sobre inventario', mandatory: true, basis: 'Ley 1676 de 2013, art. 22 inc. 2' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=54297'
+  },
+  {
+    id: 'societario/inscripcion-del-formulario-de-ejecucion-concursal-de-la-garantia-mobiliaria',
+    exactName: 'Inscripción del formulario de ejecución concursal de la garantía mobiliaria',
+    branch: 'SOCIETARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Decreto 1074 de 2015, art. 2.2.2.4.2.58; Ley 1676 de 2013, arts. 21 y 48; Ley 1116 de 2006',
+    competentAuthority: 'Registro de Garantías Mobiliarias, llevado por Confecámaras. Lo inscribe el representante legal del deudor o el liquidador al iniciarse el proceso de insolvencia, no el acreedor.',
+    term: { status: 'VERIFICADO', description: 'EL RELOJ MÁS BRUTAL DEL RÉGIMEN, PORQUE ES DEL ACREEDOR GARANTIZADO Y LO DISPARA UN TERCERO SIN AVISARLE. Quien tenía garantía constituida y NO la había inscrito la pierde como garantía en cuanto el concurso se inscribe: «Los acreedores garantizados con garantías mobiliarias constituidas con anterioridad al inicio del proceso de insolvencia que, teniendo la obligación de inscribir la garantía para efectos de oponibilidad y prelación, la inscriban con posterioridad a la inscripción del proceso de insolvencia, TENDRÁN EL TRATAMIENTO DE ACREEDORES QUIROGRAFARIOS en dicho proceso» (art. 2.2.2.4.2.58). No hay plazo que cumplir: hay una carrera que se pierde el día que el deudor o el liquidador inscriben el concurso. CONSECUENCIA PRÁCTICA: una garantía sin inscribir vale lo mismo que ninguna frente a la masa. COSTO: $56.000 antes de IVA en 2026.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del deudor y del proceso de insolvencia que se inicia', mandatory: true, basis: 'Decreto 1074 de 2015, art. 2.2.2.4.2.58' },
+      { n: 2, name: 'Identificación de las garantías mobiliarias inscritas sobre bienes del deudor', mandatory: true, basis: 'Decreto 1074 de 2015, art. 2.2.2.4.2.58' }
+    ],
+    sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=54297'
   }
   ]
 };

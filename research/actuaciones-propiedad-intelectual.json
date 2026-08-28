@@ -1292,6 +1292,41 @@
         }
       ],
       "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=87419"
+    },
+    {
+      "exact_name": "Inscripcion de garantia mobiliaria sobre derechos de propiedad industrial",
+      "area": "PROPIEDAD_INTELECTUAL",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1676 de 2013, art. 11 paragrafo (garantias sobre propiedad intelectual) y art. 36 (registros especiales); Decreto 1074 de 2015, art. 2.2.2.4.2.24",
+      "competent_authority": "Superintendencia de Industria y Comercio, en el registro de la propiedad industrial. La Ley 1676 remite al registro especial cuando el bien esta sujeto a uno propio (art. 36), de modo que la inscripcion NO se agota en el Registro de Garantias Mobiliarias de Confecamaras.",
+      "term": "SIN PLAZO LEGAL PARA INSCRIBIR, Y EL RELOJ ES EL MISMO DE TODA GARANTIA: LA PRELACION SE FIJA POR EL MOMENTO DE LA INSCRIPCION. La regla general del art. 48 -«La prelacion de una garantia mobiliaria sin tenencia del acreedor garantizado sobre bienes en garantia se determina por el momento de su inscripcion en el registro»- opera aqui contra el registro especial de la SIC. LO QUE HAY QUE VERIFICAR ANTES DE RADICAR: el art. 36 somete estas garantias al registro propio del bien, asi que inscribir solo en Confecamaras deja la garantia sin oponibilidad frente a quien consulte el registro de propiedad industrial. La vigencia de la garantia no puede exceder la del derecho gravado: una marca vence y con ella lo que la garantiza.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificacion del titular del derecho de propiedad industrial y del acreedor garantizado",
+          "mandatory": true,
+          "basis": "Ley 1676 de 2013, art. 14 num. 1"
+        },
+        {
+          "n": 2,
+          "name": "Identificacion del registro gravado con su numero de certificado y su vigencia",
+          "mandatory": true,
+          "basis": "Ley 1676 de 2013, art. 36"
+        },
+        {
+          "n": 3,
+          "name": "Monto maximo cubierto por la garantia y descripcion de las obligaciones garantizadas",
+          "mandatory": true,
+          "basis": "Ley 1676 de 2013, art. 14 nums. 2 y 4"
+        },
+        {
+          "n": 4,
+          "name": "Contrato de garantia por escrito, con las firmas de los contratantes",
+          "mandatory": true,
+          "basis": "Ley 1676 de 2013, art. 14"
+        }
+      ],
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=54297"
     }
   ]
 }

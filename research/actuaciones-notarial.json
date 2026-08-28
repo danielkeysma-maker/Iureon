@@ -2239,6 +2239,123 @@
         }
       ],
       "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=74174"
+    },
+    {
+      "exact_name": "Solicitud de ejecución especial de la garantía mobiliaria ante notario o cámara de comercio",
+      "area": "NOTARIAL",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1676 de 2013, arts. 62, 63, 64 (entidades habilitadas) y 65 (trámite); Decreto 1074 de 2015, arts. 2.2.2.4.2.5, 2.2.2.4.2.6, 2.2.2.4.2.9 y 2.2.2.4.2.23 (tarifas y expensas)",
+      "competent_authority": "A elección del acreedor: un notario, o el centro de conciliación de una cámara de comercio del domicilio del deudor garante. «El trámite de ejecución especial de la garantía podrá adelantarse ante los notarios, y las Cámaras de Comercio» (Ley 1676 de 2013, art. 64), y el Decreto 1074 precisa que en las cámaras corresponde a sus centros de conciliación (art. 2.2.2.4.2.5). Es la MISMA solicitud ante dos autoridades alternativas, no dos actuaciones distintas.",
+      "term": "SIN PLAZO PARA PRESENTARLA, PERO CON UN RELOJ DEL ACREEDOR QUE ES PRECLUSIVO: CINCO (5) DÍAS PARA SUBSANAR. La entidad tiene cinco (5) días para iniciar — «Dentro de los cinco (5) días siguientes a la presentación de la solicitud, la entidad autorizada […] dará inicio al procedimiento»— y si requiere subsanación, «Si dentro del plazo otorgado el acreedor garantizado no subsana los defectos de la solicitud, ESTA SE ENTENDERÁ DESISTIDA». Perder ese plazo obliga a empezar de nuevo. RELOJ DE LOS DEMÁS ACREEDORES, y su silencio los vincula: «los demás acreedores garantizados contarán con un plazo máximo de cinco (5) días, contados a partir del día siguiente al del recibo de la comunicación. VENCIDO ESTE PLAZO, SE ENTENDERÁ QUE LOS ACREEDORES QUE NO COMPARECIERON NO TIENEN OBJECIONES A LA EJECUCIÓN» (art. 65 num. 2). RELOJ DEL DEUDOR: diez (10) días para oponerse — ver la ficha de oposición en CIVIL, porque la resuelve el juez. COSTO: la tarifa de notarios y cámaras es «un valor fijo y razonable […] que en ningún caso será ad valórem», y «Las expensas causadas a lo largo del procedimiento deberán ser asumidas por el acreedor garantizado» (art. 2.2.2.4.2.23).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del acreedor garantizado, del garante y del deudor",
+          "mandatory": true,
+          "basis": "Ley 1676 de 2013, art. 65"
+        },
+        {
+          "n": 2,
+          "name": "Prueba de la inscripción de la garantía y del formulario de ejecución en el registro",
+          "mandatory": true,
+          "basis": "Ley 1676 de 2013, art. 61 num. 1"
+        },
+        {
+          "n": 3,
+          "name": "Constancia del pacto de ejecución especial, o del requerimiento previo de diez (10) días",
+          "mandatory": true,
+          "basis": "Ley 1676 de 2013, art. 58 par."
+        },
+        {
+          "n": 4,
+          "name": "Descripción de los bienes en garantía, con su avalúo",
+          "mandatory": true,
+          "basis": "Ley 1676 de 2013, art. 65"
+        },
+        {
+          "n": 5,
+          "name": "Relación de los demás acreedores garantizados inscritos, para su comunicación",
+          "mandatory": true,
+          "basis": "Ley 1676 de 2013, art. 65 num. 2"
+        },
+        {
+          "n": 6,
+          "name": "Liquidación del monto adeudado y de los gastos de la ejecución",
+          "mandatory": true,
+          "basis": "Ley 1676 de 2013, art. 65"
+        }
+      ],
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=54297"
+    },
+    {
+      "exact_name": "Solicitud de cancelación de la garantía mobiliaria ante notario por renuencia del acreedor",
+      "area": "NOTARIAL",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1676 de 2013, art. 76; Decreto 1074 de 2015, art. 2.2.2.4.2.57 (tarifa modificada a UVT por el art. 34 del Decreto 2642 de 2022)",
+      "competent_authority": "Notario. Si el acreedor niega la cancelación o guarda silencio, «el notario remitirá las diligencias a la autoridad jurisdiccional competente» y el asunto se resuelve por proceso verbal sumario (Ley 1676 de 2013, art. 76)",
+      "term": "DOS RELOJES DE QUINCE (15) DÍAS, Y LOS DOS SON DEL ACREEDOR: EL DEUDOR NO TIENE PLAZO, TIENE UNA LLAVE QUE SE ABRE CON EL SILENCIO AJENO. Primero hay que pedirle al acreedor que cancele: «Si el acreedor garantizado no cumple con dicha solicitud dentro de los quince (15) días siguientes a la petición, podrá presentar la solicitud de cancelación de la inscripción ante un notario». Y radicada ante el notario corre el segundo: «En caso de que el acreedor garantizado dentro de los quince (15) días siguientes a la comunicación de la solicitud niegue la cancelación de la garantía mobiliaria, o guarde silencio, el notario remitirá las diligencias a la autoridad jurisdiccional competente […] Este trámite se adelantará por proceso verbal sumario». ESTA ES LA ACTUACIÓN DEL GARANTE, no del acreedor: es lo que hace un deudor que ya pagó y tiene el registro en contra. RESPONSABILIDAD DEL NOTARIO: «El notario responderá de los daños y perjuicios que sus actuaciones irregulares causen».",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la garantía inscrita cuya cancelación se pide, con su número de registro",
+          "mandatory": true,
+          "basis": "Ley 1676 de 2013, art. 76"
+        },
+        {
+          "n": 2,
+          "name": "Prueba de la extinción de la obligación garantizada",
+          "mandatory": true,
+          "basis": "Ley 1676 de 2013, art. 76"
+        },
+        {
+          "n": 3,
+          "name": "Prueba de la solicitud previa al acreedor y del transcurso de los quince (15) días",
+          "mandatory": true,
+          "basis": "Ley 1676 de 2013, art. 76"
+        },
+        {
+          "n": 4,
+          "name": "Dirección del acreedor garantizado para su comunicación por el notario",
+          "mandatory": true,
+          "basis": "Ley 1676 de 2013, art. 76"
+        }
+      ],
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=54297"
+    },
+    {
+      "exact_name": "Solicitud de restitución de la tenencia del bien por mora en la garantía mobiliaria",
+      "area": "NOTARIAL",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1676 de 2013, art. 77 (por remisión al art. 64); Decreto 1074 de 2015, arts. 2.2.2.4.1.32 y 2.2.2.4.2.71",
+      "competent_authority": "Notario o cámara de comercio, por la remisión del art. 77 al art. 64. La aprehensión material la practica la inspección de policía (Decreto 1074 de 2015, art. 2.2.2.4.2.71)",
+      "term": "DIEZ (10) DÍAS, PERO EL RELOJ ES DE LA ENTIDAD, NO DEL CLIENTE: «Recibida la solicitud, se señalará fecha para audiencia, LA CUAL DEBERÁ REALIZARSE DENTRO DE LOS DIEZ (10) DÍAS SIGUIENTES». LO QUE SÍ CORRE CONTRA EL CONVOCADO son dos plazos de tres días: si no comparece, «se dejará constancia en el acta, y se le concederá un término de tres (3) días para justificarse»; y si accede a restituir, la entrega «no podrá exceder de los tres (3) días siguientes». Aplica a la tenencia derivada de fiducia en garantía y figuras asimiladas al comodato precario.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del contrato de garantía y del título de la tenencia del bien",
+          "mandatory": true,
+          "basis": "Ley 1676 de 2013, art. 77"
+        },
+        {
+          "n": 2,
+          "name": "Prueba de la mora en la obligación garantizada",
+          "mandatory": true,
+          "basis": "Ley 1676 de 2013, art. 77"
+        },
+        {
+          "n": 3,
+          "name": "Individualización del bien cuya restitución se pide y del lugar donde se encuentra",
+          "mandatory": true,
+          "basis": "Decreto 1074 de 2015, art. 2.2.2.4.2.71"
+        },
+        {
+          "n": 4,
+          "name": "Dirección del convocado para la citación a la audiencia",
+          "mandatory": true,
+          "basis": "Ley 1676 de 2013, art. 77"
+        }
+      ],
+      "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=54297"
     }
   ]
 }
