@@ -56,6 +56,8 @@ export interface StoredTranscription {
   transcribed_at: string;
   /** Quien la subio. Dato de la fila, no filtro: la lista es de la firma. */
   user_email?: string;
+  /** Hora real en que se autorizó la grabación, si quedó registrada. */
+  autorizo_grabacion_el?: string | null;
   /** Una audiencia se revisa; "ACTA_LISTA" solo lo da una persona. */
   estado_revision?: 'POR_REVISAR' | 'ACTA_LISTA';
   revisada_por?: string | null;
@@ -121,6 +123,21 @@ export interface TranscribeInput {
  * of those in Spanish, so the message is surfaced as-is.
  */
 export const transcriptionApi = {
+  /** El resumen guardado (o recién generado) de una transcripción. */
+  async resumen(
+    id: string
+  ): Promise<{ hechos: Array<{ t: number | null; quien: string; hecho: string }> } | null> {
+    try {
+      const r = await httpClient.post<{
+        success: boolean;
+        resumen?: { hechos: Array<{ t: number | null; quien: string; hecho: string }> };
+      }>(`/api/transcription/${id}/resumen`, {});
+      return r.success && r.resumen ? r.resumen : null;
+    } catch {
+      return null;
+    }
+  },
+
   /** La marca fina de lectura humana: una intervención revisada. */
   async marcarSegmentoRevisado(
     id: string,

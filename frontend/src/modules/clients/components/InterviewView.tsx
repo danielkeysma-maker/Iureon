@@ -3,6 +3,7 @@ import { AlertTriangle, ArrowLeft, Copy, CheckCircle2, FileText, PenLine, Upload
 import { useTranscription } from '../../transcription/hooks/useTranscription';
 import { TranscriptSegments } from '../../transcription/components/TranscriptSegments';
 import { EntrevistasList } from './EntrevistasList';
+import { transcriptionApi } from '../../transcription/services/transcription.api';
 import { CerrarEntrevistaDialog } from './CerrarEntrevistaDialog';
 import { NotPersistedWarning } from '../../transcription/components/RoleProposals';
 import { exportTranscriptToPdf, exportTranscriptToWord } from '../../transcription/transcriptExport';
@@ -136,6 +137,25 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
     void transcribe(file, undefined, autorizadoEl ?? undefined);
   };
 
+
+  /*
+   * El ACTA con datos reales: la hora de autorizacion y la revision salen de
+   * la fila guardada; los hechos clave, del resumen del motor (cacheado — si
+   * nunca se pidio, esta llamada lo genera y lo deja guardado). Nada se
+   * inventa: lo que no exista simplemente no aparece en el documento.
+   */
+  const armarActa = async () => {
+    if (!transcriptionId) return undefined;
+    const fila = stored.find((i) => i.id === transcriptionId);
+    const resumen = await transcriptionApi.resumen(transcriptionId);
+    return {
+      autorizadoEl: fila?.autorizo_grabacion_el ?? null,
+      revisadaPor: fila?.revisada_por ?? null,
+      actaLista: fila?.estado_revision === 'ACTA_LISTA',
+      hechosClave: resumen?.hechos
+    };
+  };
+
   const copiar = async () => {
     if (!result) return;
 
@@ -224,14 +244,14 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
             {/* El acta, en dos formatos del mismo peso: el .docx se edita, el PDF se anexa. */}
             <div className="flex">
               <button
-                onClick={() => void exportTranscriptToWord(result, titulo || 'entrevista')}
+                onClick={() => void armarActa().then((a) => exportTranscriptToWord(result, titulo || 'entrevista', a))}
                 className="btn-secondary btn-sm rounded-r-none"
               >
                 <FileText className="h-3 w-3" />
                 Word
               </button>
               <button
-                onClick={() => exportTranscriptToPdf(result, titulo || 'entrevista')}
+                onClick={() => void armarActa().then((a) => exportTranscriptToPdf(result, titulo || 'entrevista', a))}
                 className="btn-secondary btn-sm -ml-px rounded-l-none"
               >
                 PDF

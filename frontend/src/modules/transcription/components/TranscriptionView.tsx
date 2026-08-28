@@ -73,6 +73,25 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
   const [openedTitle, setOpenedTitle] = useState('');
   const exportTitle = selectedFile?.name || openedTitle || 'transcripcion';
 
+
+  /*
+   * El ACTA con datos reales: la hora de autorizacion y la revision salen de
+   * la fila guardada; los hechos clave, del resumen del motor (cacheado — si
+   * nunca se pidio, esta llamada lo genera y lo deja guardado). Nada se
+   * inventa: lo que no exista simplemente no aparece en el documento.
+   */
+  const armarActa = async () => {
+    if (!transcriptionId) return undefined;
+    const fila = stored.find((i) => i.id === transcriptionId);
+    const resumen = await transcriptionApi.resumen(transcriptionId);
+    return {
+      autorizadoEl: fila?.autorizo_grabacion_el ?? null,
+      revisadaPor: fila?.revisada_por ?? null,
+      actaLista: fila?.estado_revision === 'ACTA_LISTA',
+      hechosClave: resumen?.hechos
+    };
+  };
+
   const handleCopy = async () => {
     if (!result) return;
 
@@ -132,7 +151,7 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
             {/* Word y PDF unidos, como en el taller: un formato, no dos decisiones. */}
             <div className="flex">
               <button
-                onClick={() => result && void exportTranscriptToWord(result, exportTitle)}
+                onClick={() => result && void armarActa().then((a) => exportTranscriptToWord(result, exportTitle, a))}
                 className="btn-secondary btn-sm rounded-r-none"
                 title="El .docx es el que se edita para el acta"
               >
@@ -140,7 +159,7 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
                 Word
               </button>
               <button
-                onClick={() => result && exportTranscriptToPdf(result, exportTitle)}
+                onClick={() => result && void armarActa().then((a) => exportTranscriptToPdf(result, exportTitle, a))}
                 className="btn-secondary btn-sm -ml-px rounded-l-none"
                 title="El PDF es el que se anexa al expediente"
               >

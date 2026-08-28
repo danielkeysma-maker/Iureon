@@ -112,19 +112,66 @@ const encabezado = (result: TranscriptionResult, titulo: string): string[] => {
 };
 
 /**
+ * Lo que convierte una transcripcion exportada en un ACTA (14b): metadatos
+ * reales de la fila guardada. Todo opcional — un transcrito recien creado no
+ * tiene revision todavia, y el acta dice lo que hay, no lo que quisiera haber.
+ */
+export interface ActaInfo {
+  /** Hora REAL en que se autorizo la grabacion (transcriptions.autorizo_grabacion_el). */
+  autorizadoEl?: string | null;
+  /** Quien marco el acta lista, si alguien lo hizo. */
+  revisadaPor?: string | null;
+  actaLista?: boolean;
+  /** Los hechos relevantes del resumen del motor, cada uno con su minuto. */
+  hechosClave?: Array<{ t: number | null; quien: string; hecho: string }>;
+}
+
+const fraccionRevisada = (segments: TranscriptionResult['segments']): { n: number; total: number } => ({
+  n: segments.filter((seg) => seg.revisada).length,
+  total: segments.length
+});
+
+const minutoDe = (t: number | null): string => {
+  if (t === null) return '--:--';
+  const m = Math.floor(t / 60);
+  const sec = Math.floor(t % 60);
+  return `${m}:${String(sec).padStart(2, '0')}`;
+};
+
+/**
  * The provenance note.
  *
  * Says plainly that a machine produced this and a person reviewed it. A
  * transcript quoted in a filing without that sentence invites being read as a
  * certified record, which it is not — the official one is the court's own.
  */
-const NOTA =
-  'Transcripción generada automáticamente y revisada por el profesional que la suscribe. ' +
-  'No sustituye el registro oficial de la diligencia.';
+const nota = (result: TranscriptionResult, acta?: ActaInfo): string => {
+  const f = fraccionRevisada(result.segments);
+  /*
+   * LA NATURALEZA DEL DOCUMENTO, con la fraccion contada y no supuesta:
+   * "revisada por el profesional" solo se afirma cuando la revision existe.
+   */
+  const revision =
+    f.total > 0 && f.n === f.total
+      ? `Las ${f.total} intervenciones fueron revisadas por un profesional de la firma.`
+      : f.n > 0
+      ? `${f.n} de ${f.total} intervenciones han sido revisadas; el resto es transcripción automática sin leer.`
+      : 'Ninguna intervención ha sido revisada todavía: es transcripción automática sin leer.';
+
+  const autorizacion = acta?.autorizadoEl
+    ? ` Grabación autorizada el ${new Date(acta.autorizadoEl).toLocaleString('es-CO', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}.`
+    : '';
+
+  return (
+    `Naturaleza de este documento: transcripción automática de una grabación. ${revision}` +
+    `${autorizacion} No sustituye el registro oficial de la diligencia.`
+  );
+};
 
 export const exportTranscriptToWord = async (
   result: TranscriptionResult,
-  titulo: string
+  titulo: string,
+  acta?: ActaInfo
 ): Promise<void> => {
   const cuerpo: Paragraph[] = [];
 
@@ -142,9 +189,38 @@ export const exportTranscriptToWord = async (
     new Paragraph({
       alignment: AlignmentType.CENTER,
       spacing: { before: 120, after: 320 },
-      children: [new TextRun({ text: NOTA, font: 'Calibri', size: 16, italics: true, color: '64748B' })]
+      children: [new TextRun({ text: nota(result, acta), font: 'Calibri', size: 16, italics: true, color: '64748B' })]
     })
   );
+
+  /*
+   * I. HECHOS RELEVANTES, del resumen del motor y CON SU MINUTO: es lo que un
+   * socio lee primero, y el ancla es lo que permite comprobar cada hecho
+   * contra la grabacion antes de usarlo.
+   */
+  if (acta?.hechosClave && acta.hechosClave.length > 0) {
+    cuerpo.push(
+      new Paragraph({
+        spacing: { before: 120, after: 120 },
+        children: [new TextRun({ text: 'I. HECHOS RELEVANTES MANIFESTADOS', bold: true, font: 'Calibri', size: 22 })]
+      }),
+      ...acta.hechosClave.map(
+        (h) =>
+          new Paragraph({
+            spacing: { after: 80 },
+            children: [
+              new TextRun({ text: `${minutoDe(h.t)}  `, font: 'Consolas', size: 18, color: '64748B' }),
+              new TextRun({ text: h.hecho, font: 'Calibri', size: 20 }),
+              new TextRun({ text: `  — ${h.quien}`, font: 'Calibri', size: 18, italics: true, color: '64748B' })
+            ]
+          })
+      ),
+      new Paragraph({
+        spacing: { before: 120, after: 160 },
+        children: [new TextRun({ text: 'II. TRANSCRIPCIÓN', bold: true, font: 'Calibri', size: 22 })]
+      })
+    );
+  }
 
   for (const linea of lineas(result)) {
     cuerpo.push(
@@ -189,6 +265,22 @@ export const exportTranscriptToWord = async (
     );
   }
 
+  /*
+   * QUIEN REVISO, al pie y solo si es verdad: el acta lista la dio una persona
+   * con nombre, y ese nombre es lo que la vuelve citable dentro de la firma.
+   */
+  if (acta?.actaLista && acta.revisadaPor) {
+    cuerpo.push(
+      new Paragraph({
+        spacing: { before: 320, after: 40 },
+        children: [new TextRun({ text: acta.revisadaPor, bold: true, font: 'Calibri', size: 20 })]
+      }),
+      new Paragraph({
+        children: [new TextRun({ text: 'Revisó la transcripción y marcó el acta como lista.', font: 'Calibri', size: 16, color: '64748B' })]
+      })
+    );
+  }
+
   const doc = new Document({
     sections: [
       {
@@ -214,7 +306,7 @@ export const exportTranscriptToWord = async (
   saveAs(await Packer.toBlob(doc), nombreArchivo(titulo, 'docx'));
 };
 
-export const exportTranscriptToPdf = (result: TranscriptionResult, titulo: string): void => {
+export const exportTranscriptToPdf = (result: TranscriptionResult, titulo: string, acta?: ActaInfo): void => {
   const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'letter' });
 
   const margenIzq = 20;
@@ -264,7 +356,7 @@ export const exportTranscriptToPdf = (result: TranscriptionResult, titulo: strin
 
   y += 3;
   doc.setTextColor(100, 116, 139);
-  for (const trozo of trozos(NOTA, 'italic', 8)) {
+  for (const trozo of trozos(nota(result, acta), 'italic', 8)) {
     doc.text(trozo, 215.9 / 2, y, { align: 'center' });
     y += 4;
   }
