@@ -100,7 +100,14 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
    * El tipo solo cambia cuando alguien lo elige (aqui u Orientacion): esa es
    * la unica senal que justifica mover el rol.
    */
-  const rolSincronizadoPara = React.useRef<string | null>(null);
+  /*
+   * Nace con el tipo INICIAL, no en null — segunda vuelta de la misma
+   * regresion: con null, el tipo por defecto ("Contestacion de Demanda") no
+   * resuelve en la rama inicial, y al cambiar a una rama donde SI existe
+   * resolvia "por primera vez" y disparaba el sync — devolviendo el rol que
+   * el abogado acababa de elegir. Solo un CAMBIO de tipo es intencion.
+   */
+  const rolSincronizadoPara = React.useRef<string | null>(documentType);
 
   useEffect(() => {
     if (lookup.estado !== 'ENCONTRADA' || !actuacion) return;
