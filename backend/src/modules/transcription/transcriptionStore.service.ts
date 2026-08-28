@@ -55,31 +55,51 @@ export class TranscriptionStore {
     userEmail: string,
     title: string,
     sourceFileName: string,
-    result: TranscriptionResult
+    result: TranscriptionResult,
+    /** Hora en que el entrevistado autorizo la grabacion, si el cliente la mando. */
+    autorizoGrabacionEl?: string | null
   ): Promise<StoredTranscription | null> {
     if (!supabase) {
       console.warn('[TRANSCRIPTION] Supabase no configurado: el transcrito no se guarda.');
       return null;
     }
 
-    const { data, error } = await supabase
-      .from('transcriptions')
-      .insert({
-        firm_id: firmId,
-        user_email: userEmail,
-        kind: result.kind,
-        title,
-        source_file_name: sourceFileName,
-        full_text: result.fullText,
-        segments: result.segments,
-        speaker_labels: result.speakerLabels,
-        language: result.language,
-        duration_seconds: result.durationSeconds,
-        model: result.model,
-        transcribed_at: result.transcribedAt
-      })
-      .select()
-      .single();
+    const fila: Record<string, unknown> = {
+      firm_id: firmId,
+      user_email: userEmail,
+      kind: result.kind,
+      title,
+      source_file_name: sourceFileName,
+      full_text: result.fullText,
+      segments: result.segments,
+      speaker_labels: result.speakerLabels,
+      language: result.language,
+      duration_seconds: result.durationSeconds,
+      model: result.model,
+      transcribed_at: result.transcribedAt
+    };
+    /*
+     * Solo cuando hay valor. Mandar la llave con null rompe TODO guardado en la
+     * ventana entre el deploy y la migracion ("column not found in schema
+     * cache") — y una audiencia sin autorizacion que registrar no necesita la
+     * columna para guardarse.
+     */
+    if (autorizoGrabacionEl) fila.autorizo_grabacion_el = autorizoGrabacionEl;
+
+    let { data, error } = await supabase.from('transcriptions').insert(fila).select().single();
+
+    if (error && autorizoGrabacionEl && /autorizo_grabacion_el/.test(error.message)) {
+      /*
+       * La columna aun no existe. Se reintenta SIN la constancia y se grita en
+       * el log: perder la hora de autorizacion es malo; perder la transcripcion
+       * entera de una entrevista de 40 minutos es peor. Corran la migracion.
+       */
+      console.error(
+        '[TRANSCRIPTION] La columna autorizo_grabacion_el no existe todavia: la constancia de esta entrevista NO quedo guardada. Corra migration-revision-y-autorizacion.sql.'
+      );
+      delete fila.autorizo_grabacion_el;
+      ({ data, error } = await supabase.from('transcriptions').insert(fila).select().single());
+    }
 
     if (error) {
       // Surfaced, not swallowed: a transcript the lawyer believes is saved and
@@ -294,6 +314,45 @@ export class TranscriptionStore {
    * every visit. Speaker, role and timestamps are untouched: this edits what was
    * said, never who said it or when.
    */
+  /**
+   * Marca una intervencion como revisada (o le quita la marca). Es el grano
+   * fino de la regla "una transcripcion no es un acta hasta que un humano la
+   * lee": la fraccion 32/58 sale de contar estas marcas, no de estimarla.
+   */
+  async marcarSegmentoRevisado(
+    firmId: string,
+    id: string,
+    segmentIndex: number,
+    revisada: boolean
+  ): Promise<StoredTranscription | null> {
+    if (!supabase) return null;
+
+    const { data: existing, error: readError } = await supabase
+      .from('transcriptions')
+      .select('*')
+      .eq('firm_id', firmId)
+      .eq('id', id)
+      .single();
+
+    if (readError || !existing) return null;
+
+    const segments = [...(((existing as StoredTranscription).segments ?? []) as TranscriptSegment[])];
+    if (segmentIndex < 0 || segmentIndex >= segments.length) return null;
+
+    segments[segmentIndex] = { ...segments[segmentIndex], revisada };
+
+    const { data, error } = await supabase
+      .from('transcriptions')
+      .update({ segments, updated_at: new Date().toISOString() })
+      .eq('firm_id', firmId)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error || !data) return null;
+    return data as StoredTranscription;
+  }
+
   async editSegment(
     firmId: string,
     id: string,

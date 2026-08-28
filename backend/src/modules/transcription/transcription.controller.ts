@@ -98,12 +98,21 @@ export const transcribeAudioController = async (req: Request, res: Response): Pr
      * outcome. It is reported instead, so the UI can warn that this one has to
      * be copied out now.
      */
+    /*
+     * La hora de la autorizacion viene del CLIENTE porque el clic ocurrio alli,
+     * antes de subir. Se registra tal cual: es la constancia que la Ley 1581
+     * exige poder mostrar, y una casilla sin hora no es demostrable.
+     */
+    const autorizoEl =
+      typeof req.body.autorizoGrabacionEl === 'string' ? req.body.autorizoGrabacionEl : null;
+
     const stored = await transcriptionStore.save(
       req.firmId as string,
       req.user?.email ?? 'desconocido',
       (req.body.title as string) || file.originalname,
       file.originalname,
-      result
+      result,
+      autorizoEl
     );
 
     if (stored) {
@@ -207,6 +216,30 @@ export const transcriptionResumenController = async (req: Request, res: Response
 
   await transcriptionStore.saveResumen(firmId, id, resumen);
   res.json({ success: true, resumen, desdeCache: false });
+};
+
+/** PATCH /transcription/:id/segmento-revisado — la marca fina de lectura humana. */
+export const marcarSegmentoRevisadoController = async (req: Request, res: Response): Promise<void> => {
+  const segmentIndex = Number(req.body?.segmentIndex);
+  const revisada = req.body?.revisada;
+
+  if (!Number.isInteger(segmentIndex) || segmentIndex < 0 || typeof revisada !== 'boolean') {
+    res.status(400).json({ success: false, error: 'BAD_REQUEST', message: 'Se requieren segmentIndex (entero) y revisada (booleano).' });
+    return;
+  }
+
+  const item = await transcriptionStore.marcarSegmentoRevisado(
+    req.firmId as string,
+    String(req.params.id),
+    segmentIndex,
+    revisada
+  );
+
+  if (!item) {
+    res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'No se encontró esa intervención.' });
+    return;
+  }
+  res.json({ success: true, item });
 };
 
 /** PATCH /transcription/:id/revision — el acto humano que da o quita "Acta lista". */
@@ -478,7 +511,8 @@ export const transcribeFromStorageController = async (
       req.user?.email ?? 'desconocido',
       (req.body.title as string) || fileKey.split('/').pop() || 'Transcripción',
       fileKey,
-      result
+      result,
+      typeof req.body.autorizoGrabacionEl === 'string' ? req.body.autorizoGrabacionEl : null
     );
 
     const audioDeleted = await discardAudio();

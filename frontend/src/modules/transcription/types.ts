@@ -36,6 +36,8 @@ export interface TranscriptSegment {
   endSeconds: number | null;
   /** Who this voice is, once a human has said so. Absent until then. */
   speakerName?: string;
+  /** Un humano leyó esta intervención. La fracción revisadas/total hace el acta. */
+  revisada?: boolean;
 }
 
 export type TranscriptionKind = 'AUDIENCIA' | 'ENTREVISTA';

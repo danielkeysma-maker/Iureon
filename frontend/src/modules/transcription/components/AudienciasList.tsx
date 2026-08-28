@@ -84,6 +84,28 @@ export const AudienciasList: React.FC<AudienciasListProps> = ({
         {item.speaker_labels.length} {item.speaker_labels.length === 1 ? 'voz' : 'voces'}
       </span>
 
+      {/*
+        LA FRACCIÓN EXACTA (32/58), contada de las marcas de revisión reales —
+        la única cifra accionable de la pantalla: dice cuánto trabajo humano
+        queda antes de que esto sea un acta.
+      */}
+      <span className="w-[64px] shrink-0 text-center">
+        {(() => {
+          const total = item.segments.length;
+          const revisadas = item.segments.filter((seg) => seg.revisada).length;
+          return (
+            <span
+              className={`font-mono text-[12px] ${
+                total > 0 && revisadas === total ? 'text-verified' : 'text-ink-700'
+              }`}
+              title={`${revisadas} de ${total} intervenciones revisadas`}
+            >
+              {revisadas}/{total}
+            </span>
+          );
+        })()}
+      </span>
+
       <span className="hidden w-[130px] shrink-0 truncate text-meta text-ink-500 md:block">
         {quien(item.user_email)}
       </span>

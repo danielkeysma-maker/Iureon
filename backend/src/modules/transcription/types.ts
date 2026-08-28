@@ -57,6 +57,12 @@ export interface TranscriptSegment {
    * change to exist.
    */
   speakerName?: string;
+  /*
+   * Un humano leyo ESTA intervencion. Vive en el segmento y no en una columna:
+   * es atributo de la intervencion y viaja con ella al editarla o cortarla.
+   * La fraccion revisadas/total es lo que separa una transcripcion de un acta.
+   */
+  revisada?: boolean;
   text: string;
   /** Seconds from the start of the recording. */
   startSeconds: number | null;

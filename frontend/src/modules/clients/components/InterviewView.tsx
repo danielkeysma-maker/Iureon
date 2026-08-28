@@ -90,6 +90,7 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
     openStored,
     deleteStored,
     transcribe,
+    marcarRevisada,
     assignRole,
     assignSpeakerName,
     editSegment,
@@ -106,12 +107,13 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
   /*
    * LA AUTORIZACION DE GRABACION ES BLOQUEANTE. La voz es un dato biometrico
    * (Ley 1581 de 2012): sin la casilla marcada, ni el grabador ni la subida se
-   * habilitan — el audio no se envia a transcribir. Es un cerrojo de interfaz,
-   * no un registro: guardar la hora de la autorizacion necesita su columna, y
-   * prometer "queda registrado" sin ella seria mentir. Se construye cuando
-   * exista el registro.
+   * habilitan — el audio no se envia a transcribir. Y desde la migracion
+   * migration-revision-y-autorizacion.sql ES un registro: la hora del clic
+   * viaja con la transcripcion a transcriptions.autorizo_grabacion_el — la
+   * constancia demostrable que la Ley 1581 exige.
    */
   const [autorizado, setAutorizado] = React.useState(false);
+  const [autorizadoEl, setAutorizadoEl] = React.useState<string | null>(null);
   const [cerrarAbierto, setCerrarAbierto] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
 
@@ -131,7 +133,7 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
 
   const empezar = (file: File) => {
     setTitulo(file.name);
-    void transcribe(file);
+    void transcribe(file, undefined, autorizadoEl ?? undefined);
   };
 
   const copiar = async () => {
@@ -308,7 +310,11 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
                   <input
                     type="checkbox"
                     checked={autorizado}
-                    onChange={(e) => setAutorizado(e.target.checked)}
+                    onChange={(e) => {
+                      setAutorizado(e.target.checked);
+                      // La hora del CLIC: el consentimiento ocurrio aqui, no al subir.
+                      setAutorizadoEl(e.target.checked ? new Date().toISOString() : null);
+                    }}
                     className="mt-0.5"
                   />
                   <span className="min-w-0">
@@ -317,7 +323,7 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
                     </span>
                     <span className="block text-meta leading-[1.5] text-ink-500">
                       La voz es un dato biométrico (Ley 1581 de 2012): sin esta autorización, la
-                      grabación no se envía a transcribir.
+                      grabación no se envía a transcribir. Queda registrada con la hora.
                     </span>
                   </span>
                 </label>
@@ -410,6 +416,7 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
             onEditSegment={canEdit ? editSegment : undefined}
             onSplitSegment={canEdit ? splitSegment : undefined}
             onReassignSpeaker={canEdit ? reassignSpeaker : undefined}
+            onMarcarRevisada={canEdit ? marcarRevisada : undefined}
             onAssignSpeakerName={canEdit ? assignSpeakerName : undefined}
             voiceConflicts={voiceConflicts}
             nameProposals={nameProposals}

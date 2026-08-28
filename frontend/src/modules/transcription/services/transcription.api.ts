@@ -107,6 +107,8 @@ export interface TranscribeInput {
   kind: TranscriptionKind;
   /** Party names, court and radicado — improves recognition of legal terms. */
   contextPrompt?: string;
+  /** Hora en que el entrevistado autorizó la grabación. La constancia de la Ley 1581. */
+  autorizoGrabacionEl?: string;
 }
 
 /**
@@ -119,6 +121,23 @@ export interface TranscribeInput {
  * of those in Spanish, so the message is surfaced as-is.
  */
 export const transcriptionApi = {
+  /** La marca fina de lectura humana: una intervención revisada. */
+  async marcarSegmentoRevisado(
+    id: string,
+    segmentIndex: number,
+    revisada: boolean
+  ): Promise<StoredTranscription | null> {
+    try {
+      const r = await httpClient.patch<{ success: boolean; item?: StoredTranscription }>(
+        `/api/transcription/${id}/segmento-revisado`,
+        { body: { segmentIndex, revisada } }
+      );
+      return r.success && r.item ? r.item : null;
+    } catch {
+      return null;
+    }
+  },
+
   /** El acto humano que da o quita "Acta lista" a una audiencia. */
   async marcarRevision(
     id: string,
@@ -184,6 +203,9 @@ export const transcriptionApi = {
 
     if (input.contextPrompt?.trim()) {
       form.append('contextPrompt', input.contextPrompt.trim());
+    }
+    if (input.autorizoGrabacionEl) {
+      form.append('autorizoGrabacionEl', input.autorizoGrabacionEl);
     }
 
     const data = await httpClient.postForm<TranscribeResponse>('/api/transcription', form, {
@@ -256,7 +278,8 @@ export const transcriptionApi = {
       body: {
         fileKey,
         kind: input.kind,
-        contextPrompt: input.contextPrompt?.trim() || undefined
+        contextPrompt: input.contextPrompt?.trim() || undefined,
+        autorizoGrabacionEl: input.autorizoGrabacionEl || undefined
       }
     });
 

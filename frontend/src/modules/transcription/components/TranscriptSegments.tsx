@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, Check, Scissors, UserCog } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, Check, Scissors, UserCog } from 'lucide-react';
 import { buildSpeakerNames } from '../speakerNames';
 import { colorForSpeaker } from '../speakerColors';
 
@@ -28,6 +28,8 @@ interface TranscriptSegmentsProps {
    * intervention, this solves two people the engine filed under one label.
    */
   onReassignSpeaker?: (segmentIndex: number, speakerLabel: string) => void;
+  /** Marca una intervención como leída por un humano. La fracción hace el acta. */
+  onMarcarRevisada?: (segmentIndex: number, revisada: boolean) => void;
   /** Labels whose own words claim two different people. Server-computed. */
   voiceConflicts?: VoiceConflict[];
   /** The name each voice gave for itself, read out of the transcript. */
@@ -66,6 +68,7 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
   onEditSegment,
   onSplitSegment,
   onReassignSpeaker,
+  onMarcarRevisada,
   voiceConflicts = [],
   nameProposals = [],
   onAssignSpeakerName
@@ -373,7 +376,7 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                 under one label, and no role assignment can fix that. Only a cut
                 can.
               */}
-              <span className="ml-auto flex items-center gap-3 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+              <span className={`ml-auto flex items-center gap-3 transition-opacity ${segment.revisada ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 focus-within:opacity-100'}`}>
               {onSplitSegment &&
                 (() => {
                   // Armed only when the caret is inside THIS intervention and
@@ -443,6 +446,25 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                 >
                   <UserCog className="w-3 h-3" />
                   Otra voz
+                </button>
+              )}
+
+              {/*
+                LA MARCA DE LECTURA. Es el grano fino de "una transcripcion no
+                es un acta hasta que un humano la lee": revisada por revisada,
+                la fraccion sube, y el acta deja de ser una promesa.
+              */}
+              {onMarcarRevisada && (
+                <button
+                  type="button"
+                  onClick={() => onMarcarRevisada(index, !segment.revisada)}
+                  className={`flex items-center gap-1 text-[10px] font-semibold ${
+                    segment.revisada ? 'text-verified' : 'text-ink-400 hover:text-verified'
+                  }`}
+                  title={segment.revisada ? 'Quitar la marca de revisada' : 'Leída y correcta'}
+                >
+                  <CheckCircle2 className="w-3 h-3" />
+                  {segment.revisada ? 'Revisada' : 'Marcar revisada'}
                 </button>
               )}
               </span>
@@ -632,7 +654,13 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                 document a lawyer reads for an hour and quotes in a filing. The
                 controls around it can stay small; the words cannot.
               */
-              className={`text-[13px] text-ink-700 leading-[1.65] ${
+              /*
+                JUSTIFICADO: los parrafos de una intervencion se leen como
+                declaracion, no como chat — el borde derecho dentado hacia ver
+                desordenada la columna de texto que las tres columnas fijas
+                acababan de alinear.
+              */
+              className={`text-[13px] text-ink-700 leading-[1.65] text-justify [text-wrap:pretty] ${
                 onEditSegment
                   ? 'outline-none focus:bg-[rgb(var(--unverified-surf))]/60 focus:ring-1 focus:ring-[rgb(var(--unverified-line))] rounded px-1 -mx-1 cursor-text'
                   : ''

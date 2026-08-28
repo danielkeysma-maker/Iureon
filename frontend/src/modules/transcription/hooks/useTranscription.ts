@@ -136,7 +136,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
   }, [firmId]);
 
   const transcribe = useCallback(
-    async (file: File, contextPrompt?: string) => {
+    async (file: File, contextPrompt?: string, autorizoGrabacionEl?: string) => {
       const validationError = validate(file, maxAudioBytes);
 
       if (validationError) {
@@ -160,12 +160,16 @@ export const useTranscription = (kind: TranscriptionKind) => {
           setIsUploading(true);
           try {
             const fileKey = await transcriptionApi.uploadAudioToStorage(file);
-            outcome = await transcriptionApi.transcribeFromStorage(fileKey, { kind, contextPrompt });
+            outcome = await transcriptionApi.transcribeFromStorage(fileKey, {
+              kind,
+              contextPrompt,
+              autorizoGrabacionEl
+            });
           } finally {
             setIsUploading(false);
           }
         } else {
-          outcome = await transcriptionApi.transcribe({ file, kind, contextPrompt });
+          outcome = await transcriptionApi.transcribe({ file, kind, contextPrompt, autorizoGrabacionEl });
         }
 
         setResult(outcome.result);
@@ -248,6 +252,44 @@ export const useTranscription = (kind: TranscriptionKind) => {
    * a word they just typed, and persisted because the alternative is retyping
    * "desembargo" every time the transcript is opened.
    */
+  /*
+   * La marca de revision se refleja al instante y el servidor confirma detras;
+   * si el servidor no pudo, la marca se revierte — una fila que se ve revisada
+   * sin estarlo en la base es exactamente la mentira que la fraccion evita.
+   */
+  const marcarRevisada = useCallback(
+    async (segmentIndex: number, revisada: boolean) => {
+      setResult((current) =>
+        current
+          ? {
+              ...current,
+              segments: current.segments.map((segment, i) =>
+                i === segmentIndex ? { ...segment, revisada } : segment
+              )
+            }
+          : current
+      );
+
+      if (!transcriptionId) return;
+
+      const item = await transcriptionApi.marcarSegmentoRevisado(transcriptionId, segmentIndex, revisada);
+      if (!item) {
+        setResult((current) =>
+          current
+            ? {
+                ...current,
+                segments: current.segments.map((segment, i) =>
+                  i === segmentIndex ? { ...segment, revisada: !revisada } : segment
+                )
+              }
+            : current
+        );
+        setError('No se pudo guardar la marca de revisión. La pantalla volvió a lo guardado.');
+      }
+    },
+    [transcriptionId]
+  );
+
   const editSegment = useCallback(
     async (segmentIndex: number, text: string) => {
       const before = result?.segments;
@@ -511,6 +553,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
     persisted,
     maxAudioBytes,
     transcribe,
+    marcarRevisada,
     assignRole,
     assignSpeakerName,
     editSegment,
