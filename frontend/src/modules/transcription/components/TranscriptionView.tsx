@@ -269,8 +269,6 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
             {/* The recording plays from the browser's own copy of the file, so
                 a doubtful word can be checked against what was actually said —
                 the audio itself is deleted from storage once transcribed. */}
-            <AudioPreview file={selectedFile} />
-
             {/* Lo esencial sin releer dos horas: mismo componente que en Entrevistas. */}
             {transcriptionId && (
               <TranscriptSummary transcriptionId={transcriptionId} kind="AUDIENCIA" />
@@ -290,6 +288,16 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
           </>
         )}
         </div>
+
+        {/*
+          EL REPRODUCTOR, ANCLADO ABAJO. No se mueve con el scroll: comprobar
+          la palabra dudosa del minuto 44 exige oir y leer a la vez.
+        */}
+        {result && selectedFile && (
+          <div className="sticky bottom-0 z-20 mx-auto max-w-4xl px-0 pb-2 pt-1">
+            <AudioPreview file={selectedFile} anclado />
+          </div>
+        )}
       </div>
     </div>
   );

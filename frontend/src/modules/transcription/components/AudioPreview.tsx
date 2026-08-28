@@ -4,6 +4,12 @@ import { Headphones } from 'lucide-react';
 interface AudioPreviewProps {
   /** The file the lawyer selected. Never re-downloaded from storage. */
   file: File | null;
+  /**
+   * Anclado: barra delgada para vivir fija al pie del transcript. El abogado
+   * comprueba una palabra dudosa contra el audio SIN perder la fila que lee —
+   * un reproductor que se va con el scroll obliga a elegir entre oir y leer.
+   */
+  anclado?: boolean;
 }
 
 /**
@@ -20,7 +26,7 @@ interface AudioPreviewProps {
  * the transcript — and the component says so rather than letting someone
  * discover it after a reload.
  */
-export const AudioPreview: React.FC<AudioPreviewProps> = ({ file }) => {
+export const AudioPreview: React.FC<AudioPreviewProps> = ({ file, anclado = false }) => {
   const [url, setUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -38,6 +44,18 @@ export const AudioPreview: React.FC<AudioPreviewProps> = ({ file }) => {
   }, [file]);
 
   if (!url) return null;
+
+  if (anclado) {
+    return (
+      <div
+        className="flex items-center gap-2.5 rounded-card border border-line-200 bg-surface px-3 py-2 shadow-e2"
+        title="Se reproduce desde este navegador; la grabación se borra del servidor al transcribirse y dura lo que esta pestaña."
+      >
+        <Headphones className="h-3.5 w-3.5 shrink-0 text-ink-400" />
+        <audio controls src={url} className="h-8 w-full" preload="metadata" />
+      </div>
+    );
+  }
 
   return (
     <div className="bg-surface border border-line-200 rounded-card p-3 space-y-2">

@@ -324,20 +324,29 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
               paragraph of a two-hour transcript — the page read like a form
               instead of like a record of what was said.
             */
-            className="group flex gap-3 px-4 py-3 hover:bg-canvas transition-colors"
+            className="group flex gap-3 px-4 py-2.5 hover:bg-canvas transition-colors"
           >
-            <div
-              className={`mt-[7px] h-2 w-2 shrink-0 rounded-[2px] ${colorFor(segment.speakerLabel)}`}
-              title={speakerNames[segment.speakerLabel]}
-            />
+            {/*
+              TRES COLUMNAS FIJAS: tiempo · voz · texto. El abogado corrige
+              leyendo en vertical y necesita que el texto empiece siempre en la
+              misma x — burbujas de ancho variable obligan al ojo a re-anclarse
+              en cada intervencion.
+            */}
+            <span className="w-[46px] shrink-0 pt-[2px] text-right font-mono text-[11px] text-ink-400">
+              {segment.startSeconds !== null ? formatTimestamp(segment.startSeconds) : ''}
+            </span>
+
+            <span className="flex w-[128px] shrink-0 items-start gap-1.5 pt-[2px]">
+              <span
+                className={`mt-[4px] h-2 w-2 shrink-0 rounded-[2px] ${colorFor(segment.speakerLabel)}`}
+              />
+              <span className="min-w-0 truncate text-[12px] font-semibold leading-snug text-ink-900">
+                {speakerNames[segment.speakerLabel] ?? ROLE_LABELS[segment.role]}
+              </span>
+            </span>
 
             <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 mb-0.5 min-h-[18px]">
-              {/* The disambiguated name, not the bare role: with three
-                  witnesses "Testigo" three times tells the reader nothing. */}
-              <span className="text-xs font-bold text-ink-900">
-                {speakerNames[segment.speakerLabel] ?? ROLE_LABELS[segment.role]}
-              </span>
 
               {/*
                 The procedural role beside the name, quieter than it.
@@ -357,11 +366,6 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                 </span>
               )}
 
-              {segment.startSeconds !== null && (
-                <span className="text-[10px] font-mono text-ink-400">
-                  {formatTimestamp(segment.startSeconds)}
-                </span>
-              )}
               {/*
                 Cuts where the caret sits. Diarization cannot separate people
                 who talk over each other — the judge greets counsel and counsel
