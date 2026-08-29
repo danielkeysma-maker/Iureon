@@ -80,6 +80,15 @@ export interface TranscriptSegment {
    * «poco clara»: es «no se midio».
    */
   confianza?: number;
+  /**
+   * Un humano marco esta intervencion como decisiva. Artboard 2a.
+   *
+   * Distinto de los «hechos» del resumen, que los extrae un modelo: esto es la
+   * marca de quien estuvo en la sala. Las dos conviven, y su diferencia es
+   * informacion — el acta puede decir que el modelo vio una cosa y el abogado
+   * marco otra.
+   */
+  hechoClave?: boolean;
   text: string;
   /** Seconds from the start of the recording. */
   startSeconds: number | null;

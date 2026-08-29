@@ -98,6 +98,7 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft, onPrivaci
     deleteStored,
     transcribe,
     marcarRevisada,
+    marcarHechoClave,
     assignRole,
     assignSpeakerName,
     editSegment,
@@ -264,6 +265,54 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft, onPrivaci
               : 'Empieza por quién está al frente; termina en una decisión.'}
           </p>
         </div>
+
+        {/*
+          EL ACTA SE EXPORTA AUNQUE NO HAYA TRANSCRITO TODAVÍA (2a).
+          
+          La nota del artboard lo razona: «el abogado que declina el caso igual
+          necesita dejar constancia de lo conversado». Antes esto estaba detrás
+          de `result`, así que durante la grabación —justo cuando alguien decide
+          no tomar el caso— no había forma de sacar nada.
+          
+          Lo que sale entonces NO es una transcripción: es la constancia de la
+          reunión —quién, cuándo, y que autorizó la grabación— y así se rotula.
+          Un acta que promete un transcrito que no existe sería peor que no
+          poder exportarla.
+        */}
+        {!result && cliente && (
+          <div className="flex">
+            <button
+              onClick={() =>
+                void import('../../transcription/transcriptExport').then((m) =>
+                  m.exportTranscriptToWord(
+                    {
+                      /*
+                        UN RESULTADO VACIO Y DECLARADO COMO TAL: `model` dice
+                        que todavia no hubo transcripcion, para que nadie lea el
+                        acta creyendo que un motor la produjo.
+                      */
+                      kind: 'ENTREVISTA',
+                      fullText: '',
+                      segments: [],
+                      speakerLabels: [],
+                      language: 'es',
+                      durationSeconds: null,
+                      model: 'sin transcribir',
+                      transcribedAt: new Date().toISOString()
+                    },
+                    `constancia-${cliente.fullName}`,
+                    armarActa()
+                  )
+                )
+              }
+              className="btn-neutral btn-sm"
+              title="Constancia de la reunión, sin transcrito todavía"
+            >
+              <FileText className="h-3.5 w-3.5" />
+              Constancia
+            </button>
+          </div>
+        )}
 
         {result && (
           <>
@@ -595,6 +644,7 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft, onPrivaci
             onSplitSegment={canEdit ? splitSegment : undefined}
             onReassignSpeaker={canEdit ? reassignSpeaker : undefined}
             onMarcarRevisada={canEdit ? marcarRevisada : undefined}
+            onMarcarHechoClave={marcarHechoClave}
             onAssignSpeakerName={canEdit ? assignSpeakerName : undefined}
             voiceConflicts={voiceConflicts}
             nameProposals={nameProposals}

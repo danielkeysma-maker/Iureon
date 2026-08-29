@@ -162,6 +162,23 @@ export const transcriptionApi = {
     }
   },
 
+  /** La marca del abogado sobre una intervención decisiva (2a). */
+  async marcarHechoClave(
+    id: string,
+    segmentIndex: number,
+    hechoClave: boolean
+  ): Promise<StoredTranscription | null> {
+    try {
+      const r = await httpClient.patch<{ success: boolean; item?: StoredTranscription }>(
+        `/api/transcription/${id}/hecho-clave`,
+        { body: { segmentIndex, hechoClave } }
+      );
+      return r.success && r.item ? r.item : null;
+    } catch {
+      return null;
+    }
+  },
+
   /** El acto humano que da o quita "Acta lista" a una audiencia. */
   async marcarRevision(
     id: string,

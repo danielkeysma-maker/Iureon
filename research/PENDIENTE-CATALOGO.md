@@ -1361,7 +1361,31 @@ nunca volví sobre ellas. Medido ahora, de ocho elementos de 2a **cero** estaban
 - **Ausente ≠ poco clara.** Los transcritos anteriores no traen confianza, y
   advertirlos sería inventarles un problema.
 
-### 2a Entrevista — lo que falta, con el porqué del artboard
+### 2a Entrevista — CERRADA el 29 de agosto
+
+Todo lo de abajo se construyó **sin quitar nada** de lo que ya funcionaba: el
+detector de voces fusionadas, las propuestas de nombre, dividir y reasignar, la
+lista de guardadas y el diálogo de decisión siguen intactos.
+
+| 2a pedía | Cómo quedó |
+|---|---|
+| «1 · Quién está al frente» | **HECHO**, con la ficha del cliente: contacto, correo y relación. «Cliente nuevo» es un hecho CONTADO, no una etiqueta |
+| Tratamiento de datos en la ficha, no en un modal | **HECHO**, con enlace a subencargados: *«la pregunta ¿quién más ve esto? aparece en la sala, no después»* |
+| **Guion sugerido** que tacha lo cubierto en vivo | **HECHO**, con `check:guion` — la prueba atrapó que «día» y «dia» contaban dos, que es el error caro |
+| **«Marcar como hecho clave»** | **HECHO.** Distinto de los «hechos» del resumen: esos los extrae un modelo, este lo marca quien estuvo en la sala |
+| Acta exportable **mientras se graba** | **HECHO.** Estaba tras `result`, así que justo cuando alguien declina el caso no había nada que sacar |
+| Estado del micrófono y los cinco estados del grabador | **PENDIENTE** |
+
+**La distinción que obligó a tomar «hecho clave»:** revisada dice «la leí y está
+bien transcrita»; clave dice «esto decide el caso». Se puede revisar una frase
+intrascendente y marcar como clave una que todavía haya que corregir. Por eso usa
+la estrella y el ámbar — **no es un estado de verificación**, y pintarla en verde
+la confundiría con lo comprobado.
+
+**Y la constancia sin transcrito lleva `model: 'sin transcribir'`**, para que
+nadie lea el acta creyendo que un motor la produjo.
+
+### 2a — el detalle original de la brecha
 
 - Los pasos son **«1 · Quién está al frente»** y **«2 · Voces en la sala»**; hoy
   dicen otra cosa.

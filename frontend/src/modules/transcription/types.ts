@@ -44,6 +44,15 @@ export interface TranscriptSegment {
    * advertirlos sería inventarles un problema.
    */
   confianza?: number;
+  /**
+   * Un humano marcó esta intervención como decisiva. Artboard 2a.
+   *
+   * Distinta de `revisada`, y la diferencia importa: revisada dice «la leí y
+   * está bien transcrita»; hecho clave dice «esto decide el caso». Se puede
+   * revisar una frase intrascendente y marcar como clave una que todavía haya
+   * que corregir.
+   */
+  hechoClave?: boolean;
 }
 
 export type TranscriptionKind = 'AUDIENCIA' | 'ENTREVISTA';

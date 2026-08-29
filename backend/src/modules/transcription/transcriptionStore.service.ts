@@ -325,6 +325,50 @@ export class TranscriptionStore {
     segmentIndex: number,
     revisada: boolean
   ): Promise<StoredTranscription | null> {
+    return this.actualizarSegmento(firmId, id, segmentIndex, { revisada });
+  }
+
+  /**
+   * Marca una intervencion como HECHO CLAVE, o le quita la marca. Artboard 2a.
+   *
+   * ─── NO ES LO MISMO QUE LOS «HECHOS» DEL RESUMEN ──────────────────────────
+   *
+   * El resumen ya extrae hechos relevantes, pero los extrae UN MODELO. Esto es
+   * la marca de un humano que estuvo en la sala y sabe cual frase decide el
+   * caso — a veces una que el modelo no destaco, y a veces justo la que
+   * destaco y no era. Las dos conviven: el acta puede decir «el modelo vio
+   * esto, el abogado marco aquello», y esa diferencia es informacion.
+   *
+   * ─── POR QUE EL MISMO GRANO QUE `revisada` ────────────────────────────────
+   *
+   * Comparten el leer-modificar-escribir sobre el arreglo de segmentos, que es
+   * la parte delicada: dos copias de esa maniobra se desincronizan el dia que
+   * una gane una comprobacion que la otra no. Se generalizo en
+   * `actualizarSegmento` en vez de duplicarla.
+   */
+  async marcarHechoClave(
+    firmId: string,
+    id: string,
+    segmentIndex: number,
+    hechoClave: boolean
+  ): Promise<StoredTranscription | null> {
+    return this.actualizarSegmento(firmId, id, segmentIndex, { hechoClave });
+  }
+
+  /**
+   * Cambia campos de UNA intervencion, conservando todo lo demas.
+   *
+   * El indice se valida contra la longitud real: un indice fuera de rango
+   * devuelve null en vez de crear un hueco en el arreglo, que es como una
+   * transcripcion acaba con intervenciones vacias que nadie sabe de donde
+   * salieron.
+   */
+  private async actualizarSegmento(
+    firmId: string,
+    id: string,
+    segmentIndex: number,
+    cambios: Partial<TranscriptSegment>
+  ): Promise<StoredTranscription | null> {
     if (!supabase) return null;
 
     const { data: existing, error: readError } = await supabase
@@ -339,7 +383,7 @@ export class TranscriptionStore {
     const segments = [...(((existing as StoredTranscription).segments ?? []) as TranscriptSegment[])];
     if (segmentIndex < 0 || segmentIndex >= segments.length) return null;
 
-    segments[segmentIndex] = { ...segments[segmentIndex], revisada };
+    segments[segmentIndex] = { ...segments[segmentIndex], ...cambios };
 
     const { data, error } = await supabase
       .from('transcriptions')

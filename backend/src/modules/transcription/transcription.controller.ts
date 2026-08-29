@@ -752,3 +752,37 @@ export const splitTranscriptionSegmentController = async (
     nameProposals: proposeSpeakerNames(updated.segments)
   });
 };
+
+/**
+ * PATCH /transcription/:id/hecho-clave — la marca del abogado, no la del modelo.
+ *
+ * Misma forma que la de revisión a propósito: son dos marcas del mismo grano
+ * sobre la misma intervención, y darles cuerpos distintos solo obligaría a
+ * recordar cuál es cuál.
+ */
+export const marcarHechoClaveController = async (req: Request, res: Response): Promise<void> => {
+  const segmentIndex = Number(req.body?.segmentIndex);
+  const hechoClave = req.body?.hechoClave;
+
+  if (!Number.isInteger(segmentIndex) || segmentIndex < 0 || typeof hechoClave !== 'boolean') {
+    res.status(400).json({
+      success: false,
+      error: 'BAD_REQUEST',
+      message: 'Se requieren segmentIndex (entero) y hechoClave (booleano).'
+    });
+    return;
+  }
+
+  const item = await transcriptionStore.marcarHechoClave(
+    req.firmId as string,
+    String(req.params.id),
+    segmentIndex,
+    hechoClave
+  );
+
+  if (!item) {
+    res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'No se encontró esa intervención.' });
+    return;
+  }
+  res.json({ success: true, item });
+};

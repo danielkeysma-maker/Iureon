@@ -257,6 +257,46 @@ export const useTranscription = (kind: TranscriptionKind) => {
    * si el servidor no pudo, la marca se revierte — una fila que se ve revisada
    * sin estarlo en la base es exactamente la mentira que la fraccion evita.
    */
+  /**
+   * La marca del abogado sobre una intervención decisiva. Artboard 2a.
+   *
+   * Optimista con reversión, igual que `marcarRevisada`: se pinta al instante
+   * y si el servidor no pudo se deshace. Una marca que se queda puesta sin
+   * guardarse haría que el acta prometa un hecho clave que no está en ninguna
+   * parte — y quien lo descubriría es quien lea el acta, no quien la marcó.
+   */
+  const marcarHechoClave = useCallback(
+    async (segmentIndex: number, hechoClave: boolean) => {
+      setResult((current) =>
+        current
+          ? {
+              ...current,
+              segments: current.segments.map((segment, i) =>
+                i === segmentIndex ? { ...segment, hechoClave } : segment
+              )
+            }
+          : current
+      );
+
+      if (!transcriptionId) return;
+
+      const item = await transcriptionApi.marcarHechoClave(transcriptionId, segmentIndex, hechoClave);
+      if (!item) {
+        setResult((current) =>
+          current
+            ? {
+                ...current,
+                segments: current.segments.map((segment, i) =>
+                  i === segmentIndex ? { ...segment, hechoClave: !hechoClave } : segment
+                )
+              }
+            : current
+        );
+      }
+    },
+    [transcriptionId]
+  );
+
   const marcarRevisada = useCallback(
     async (segmentIndex: number, revisada: boolean) => {
       setResult((current) =>
@@ -554,6 +594,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
     maxAudioBytes,
     transcribe,
     marcarRevisada,
+    marcarHechoClave,
     assignRole,
     assignSpeakerName,
     editSegment,

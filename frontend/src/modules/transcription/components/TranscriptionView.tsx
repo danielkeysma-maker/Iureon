@@ -42,7 +42,8 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
   onUsarEnRedaccion
 }) => {
   const { hasFirm, isAvailable, isUploading, isTranscribing, result, error, roleProposals, persisted, maxAudioBytes, transcribe,
-    marcarRevisada, assignRole, editSegment, splitSegment, reassignSpeaker, voiceConflicts, nameProposals, assignSpeakerName, stored, isLoadingStored, loadStored, openStored, deleteStored, canEdit, reset, transcriptionId } =
+    marcarRevisada,
+    marcarHechoClave, assignRole, editSegment, splitSegment, reassignSpeaker, voiceConflicts, nameProposals, assignSpeakerName, stored, isLoadingStored, loadStored, openStored, deleteStored, canEdit, reset, transcriptionId } =
     useTranscription(kind);
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -304,6 +305,7 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
               onSplitSegment={canEdit ? splitSegment : undefined}
               onReassignSpeaker={canEdit ? reassignSpeaker : undefined}
               onMarcarRevisada={canEdit ? marcarRevisada : undefined}
+              onMarcarHechoClave={marcarHechoClave}
               voiceConflicts={voiceConflicts}
               nameProposals={nameProposals}
               onAssignSpeakerName={canEdit ? assignSpeakerName : undefined}

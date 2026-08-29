@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle2, AlertTriangle, Check, Scissors, UserCog } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, Check, Scissors, Star, UserCog } from 'lucide-react';
 import { buildSpeakerNames } from '../speakerNames';
 import { colorForSpeaker } from '../speakerColors';
 
@@ -30,6 +30,16 @@ interface TranscriptSegmentsProps {
   onReassignSpeaker?: (segmentIndex: number, speakerLabel: string) => void;
   /** Marca una intervención como leída por un humano. La fracción hace el acta. */
   onMarcarRevisada?: (segmentIndex: number, revisada: boolean) => void;
+  /**
+   * Marca una intervención como DECISIVA. Artboard 2a, «Marcar como hecho
+   * clave».
+   *
+   * Distinta de la de revisión, y la diferencia importa: revisada dice «la leí
+   * y está bien transcrita», hecho clave dice «esto decide el caso». Se puede
+   * revisar una frase intrascendente y se puede marcar como clave una que
+   * todavía haya que corregir.
+   */
+  onMarcarHechoClave?: (segmentIndex: number, hechoClave: boolean) => void;
   /** Labels whose own words claim two different people. Server-computed. */
   voiceConflicts?: VoiceConflict[];
   /** The name each voice gave for itself, read out of the transcript. */
@@ -69,6 +79,7 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
   onSplitSegment,
   onReassignSpeaker,
   onMarcarRevisada,
+  onMarcarHechoClave,
   voiceConflicts = [],
   nameProposals = [],
   onAssignSpeakerName
@@ -536,6 +547,35 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                 >
                   <CheckCircle2 className="w-3 h-3" />
                   {segment.revisada ? 'Revisada' : 'Marcar revisada'}
+                </button>
+              )}
+
+              {/*
+                HECHO CLAVE (2a). Junto a la marca de lectura porque se deciden
+                en el mismo momento —leyendo la intervención— pero dicen cosas
+                distintas: revisada es «está bien transcrita», clave es «esto
+                decide el caso». Usa la estrella y el ámbar del sistema: no es
+                un estado de verificación, es una señal de importancia, y
+                pintarla en verde la confundiría con lo comprobado.
+              */}
+              {onMarcarHechoClave && (
+                <button
+                  type="button"
+                  onClick={() => onMarcarHechoClave(index, !segment.hechoClave)}
+                  className={`flex items-center gap-1 text-[10px] font-semibold ${
+                    segment.hechoClave ? 'text-unverified' : 'text-ink-400 hover:text-unverified'
+                  }`}
+                  title={
+                    segment.hechoClave
+                      ? 'Quitar la marca de hecho clave'
+                      : 'Esto decide el caso: márquelo para el acta'
+                  }
+                >
+                  <Star
+                    className="h-3 w-3"
+                    fill={segment.hechoClave ? 'currentColor' : 'none'}
+                  />
+                  {segment.hechoClave ? 'Hecho clave' : 'Marcar hecho clave'}
                 </button>
               )}
               </span>
