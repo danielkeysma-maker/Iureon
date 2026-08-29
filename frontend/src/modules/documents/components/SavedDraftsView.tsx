@@ -2,6 +2,14 @@ import React, { useMemo, useState } from 'react';
 import { Copy, Download, FileClock, Lock, MoreHorizontal, Pencil, Stamp, Trash2 } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import type { EstadoBorrador, SavedDraftEntry } from '../types';
+import {
+  ETIQUETA_ESTADO,
+  agruparPorTermino,
+  cuantoFalta,
+  diasHasta,
+  esRadicado,
+  fechaLarga
+} from '../draftTerms';
 
 /**
  * Borradores guardados. La pantalla, no el diálogo.
@@ -54,39 +62,6 @@ interface SavedDraftsViewProps {
   onRedactar: () => void;
 }
 
-const aFechaLocal = (iso: string): Date => {
-  const [a, m, d] = iso.split('-').map(Number);
-  return new Date(a, (m ?? 1) - 1, d ?? 1);
-};
-
-const diasHasta = (iso: string | null | undefined): number | null => {
-  if (!iso) return null;
-  const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0);
-  return Math.round((aFechaLocal(iso).getTime() - hoy.getTime()) / 86400000);
-};
-
-const fechaLarga = (iso: string): string =>
-  aFechaLocal(iso).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' });
-
-/** «en 2 días», «vence hoy», «vencido hace 3 días». */
-const cuantoFalta = (dias: number): string => {
-  if (dias < 0) return `vencido hace ${Math.abs(dias)} ${Math.abs(dias) === 1 ? 'día' : 'días'}`;
-  if (dias === 0) return 'vence hoy';
-  if (dias === 1) return 'en 1 día';
-  if (dias > 400) return `en ${Math.round(dias / 365)} años`;
-  return `en ${dias} días`;
-};
-
-const ETIQUETA_ESTADO: Record<EstadoBorrador, string> = {
-  BORRADOR: 'Borrador',
-  REVISAR: 'Revisar',
-  LISTO: 'Listo',
-  RADICADO: 'Radicado'
-};
-
-const esRadicado = (e: SavedDraftEntry): boolean =>
-  e.estado === 'RADICADO' || Boolean(e.radicadoEl);
 
 /** Escapa un campo para CSV. Sin esto, un despacho con coma parte la fila. */
 const csv = (valor: string | null | undefined): string =>
@@ -126,38 +101,7 @@ export const SavedDraftsView: React.FC<SavedDraftsViewProps> = ({
     });
   }, [savedDrafts, busqueda, soloSinRadicar, rama]);
 
-  const grupos = useMemo(() => {
-    const semana: SavedDraftEntry[] = [];
-    const adelante: SavedDraftEntry[] = [];
-    const radicados: SavedDraftEntry[] = [];
-
-    for (const e of visibles) {
-      if (esRadicado(e)) radicados.push(e);
-      else {
-        const d = diasHasta(e.venceEl);
-        if (d !== null && d <= 7) semana.push(e);
-        else adelante.push(e);
-      }
-    }
-
-    const porTermino = (a: SavedDraftEntry, b: SavedDraftEntry) => {
-      const da = diasHasta(a.venceEl);
-      const db = diasHasta(b.venceEl);
-      if (da === null && db === null) return 0;
-      if (da === null) return 1; // Sin fecha al final: no caduca.
-      if (db === null) return -1;
-      return da - db;
-    };
-
-    semana.sort(porTermino);
-    adelante.sort(porTermino);
-
-    return [
-      { titulo: 'Vence esta semana', entradas: semana, urgente: true },
-      { titulo: 'Más adelante', entradas: adelante, urgente: false },
-      { titulo: 'Radicados', entradas: radicados, urgente: false }
-    ].filter((g) => g.entradas.length > 0);
-  }, [visibles]);
+  const grupos = useMemo(() => agruparPorTermino(visibles), [visibles]);
 
   const sinRadicar = savedDrafts.filter((e) => !esRadicado(e));
   const estaSemana = sinRadicar.filter((e) => {

@@ -39,6 +39,7 @@ import { useLegalAgentWorkflow } from './modules/workspace/hooks/useLegalAgentWo
 
 import { SavedDraftsModal } from './modules/documents/components/SavedDraftsModal';
 import { SavedDraftsView } from './modules/documents/components/SavedDraftsView';
+import { SavedDraftsMobileView } from './modules/documents/components/SavedDraftsMobileView';
 import type { SavedDraftEntry } from './modules/documents/types';
 import { useSavedDrafts } from './modules/documents/hooks/useSavedDrafts';
 
@@ -669,7 +670,29 @@ export function App() {
             </div>
           )}
 
+          {/*
+            10c es otra pantalla, no la tabla estrechada: sus cinco columnas
+            suman mas de 500px y en 375 quedan cinco datos sueltos sin rotulo.
+            La movil pone el termino y cuanto falta arriba a la derecha —lo que
+            decide si hay que abrir el escrito ahora— y baja version y estado a
+            una linea gris. El agrupamiento y el calculo de dias son COMPARTIDOS
+            (`draftTerms`): la forma cambia, el reloj no.
+          */}
           {mainView === 'borradores' && (
+            <div className="flex min-h-0 flex-1 lg:hidden">
+              <SavedDraftsMobileView
+                savedDrafts={savedDrafts}
+                onAbrir={(entrada) => {
+                  handleLoadDraft(entrada);
+                  setMainView('workspace');
+                }}
+                onRedactar={() => setMainView('workspace')}
+              />
+            </div>
+          )}
+
+          {mainView === 'borradores' && (
+            <div className="hidden min-h-0 flex-1 lg:flex">
             <SavedDraftsView
               savedDrafts={savedDrafts}
               onAbrir={(entrada) => {
@@ -698,6 +721,7 @@ export function App() {
               onGuardarDatos={updateMetadata}
               onRedactar={() => setMainView('workspace')}
             />
+            </div>
           )}
 
           {mainView === 'audiencias' && (
