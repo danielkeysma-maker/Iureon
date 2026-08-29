@@ -9,7 +9,9 @@ import {
 } from '../useAutorizacionDeGrabacion';
 import { useTranscription } from '../../transcription/hooks/useTranscription';
 import { clientsApi } from '../clients.api';
-import { IconoSinVerificar } from '../../../design/ArtboardIcons';
+import { CerrarEntrevistaDialog } from './CerrarEntrevistaDialog';
+import { IconoDocumento, IconoSinVerificar } from '../../../design/ArtboardIcons';
+
 
 /**
  * La entrevista en móvil. Artboard 4d, tercera pantalla.
@@ -66,7 +68,8 @@ export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
     result,
     error,
     transcribe,
-    transcriptionId
+    transcriptionId,
+    stored
   } = useTranscription('ENTREVISTA');
   const { autorizado, autorizadoEl, marcar } = useAutorizacionDeGrabacion();
 
@@ -106,7 +109,37 @@ export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
     void clientsApi.linkInterview(transcriptionId, clienteId).catch(() => {});
   }, [transcriptionId, clienteId]);
 
+  const [cerrarAbierto, setCerrarAbierto] = React.useState(false);
   const trabajando = isUploading || isTranscribing;
+
+  /*
+   * EL ACTA CON DATOS REALES Y SIN RED, igual que en escritorio: todo sale de
+   * la fila que la lista ya tiene en memoria — la hora de autorizacion, quien
+   * reviso, el resumen y el consultante—. Exportar no debe pagar el arranque en
+   * frio de una funcion por datos que ya estan aqui.
+   */
+  const armarActa = () => {
+    if (!transcriptionId) return undefined;
+    const fila = stored.find((i) => i.id === transcriptionId);
+    return {
+      autorizadoEl: fila?.autorizo_grabacion_el ?? null,
+      revisadaPor: fila?.revisada_por ?? null,
+      actaLista: fila?.estado_revision === 'ACTA_LISTA',
+      hechosClave: fila?.resumen?.hechos,
+      decision: fila?.decision,
+      decisionMotivo: fila?.decision_motivo ?? null,
+      consultante: cliente ? { nombre: cliente.fullName, documento: cliente.documentId } : null
+    };
+  };
+
+  const exportar = (formato: 'word' | 'pdf') => {
+    if (!result) return;
+    void import('../../transcription/transcriptExport').then((m) =>
+      formato === 'word'
+        ? m.exportTranscriptToWord(result, cliente?.fullName || 'entrevista', armarActa())
+        : m.exportTranscriptToPdf(result, cliente?.fullName || 'entrevista', armarActa())
+    );
+  };
 
   if (!isAvailable) {
     return (
@@ -246,8 +279,15 @@ export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
           texto debajo, ancho completo. La de escritorio usa tres columnas y en
           375px eso deja el texto en una franja de cuatro palabras por renglon.
         */}
+        {/*
+          SIN TARJETA. La nota de 4d es explicita: «la unica fila con tarjeta y
+          borde es la que se esta editando». Encuadrar todas las intervenciones
+          convierte la transcripcion en una lista de fichas y le quita al borde
+          su significado — si todo esta enmarcado, el marco no señala nada. Aqui
+          no hay edicion en curso, asi que ninguna la lleva.
+        */}
         {result?.segments?.map((s, i) => (
-          <div key={i} className="rounded-[8px] border border-line-200 bg-surface px-3 py-2.5">
+          <div key={i}>
             <div className="flex items-center gap-1.5">
               <span className="h-2 w-2 shrink-0 rounded-[2px] bg-brand-700" />
               <span className="text-[12px] font-semibold text-ink-900">
@@ -279,6 +319,63 @@ export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
           </p>
         )}
       </div>
+
+      {/*
+        EL PIE DE 4d, TRASPLANTADO: `background:#fff; border-top:1px solid
+        #E3E7EC; padding:12px 16px`. Primero la fila del ACTA —rótulo en mono
+        versales y los dos formatos como botones de 44px del mismo peso, porque
+        el .docx se sigue editando y el PDF se anexa—, y debajo «Cerrar y usar»
+        de 52px.
+
+        Solo aparece CUANDO HAY TRANSCRITO. Un pie fijo con Word, PDF y «cerrar»
+        sobre una pantalla que todavía no ha grabado nada son tres botones que
+        no pueden hacer nada — y ocupando el borde inferior, que es el sitio más
+        alcanzable de la pantalla.
+      */}
+      {result && (
+        <div className="shrink-0 border-t border-line-200 bg-surface px-4 pb-3.5 pt-3">
+          <div className="mb-2.5 flex items-center gap-2">
+            <span className="shrink-0 font-mono text-[9.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
+              Acta
+            </span>
+            <button
+              type="button"
+              onClick={() => exportar('word')}
+              className="flex h-11 flex-1 items-center justify-center gap-[7px] rounded-[6px] border border-brand-line bg-surface text-[13px] font-medium text-brand-700"
+            >
+              <IconoDocumento className="h-3.5 w-3.5" />
+              Word
+            </button>
+            <button
+              type="button"
+              onClick={() => exportar('pdf')}
+              className="flex h-11 flex-1 items-center justify-center gap-[7px] rounded-[6px] border border-brand-line bg-surface text-[13px] font-medium text-brand-700"
+            >
+              <IconoDocumento className="h-3.5 w-3.5" />
+              PDF
+            </button>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setCerrarAbierto(true)}
+            disabled={!transcriptionId}
+            className="h-[52px] w-full rounded-[8px] bg-brand-700 text-[13.5px] font-semibold text-white disabled:opacity-50"
+          >
+            Cerrar y usar
+          </button>
+        </div>
+      )}
+
+      {transcriptionId && (
+        <CerrarEntrevistaDialog
+          abierto={cerrarAbierto}
+          onCerrar={() => setCerrarAbierto(false)}
+          transcriptionId={transcriptionId}
+          titulo={cliente?.fullName ?? 'Entrevista'}
+          onDecidido={() => setCerrarAbierto(false)}
+        />
+      )}
     </div>
   );
 };
