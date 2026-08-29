@@ -23,6 +23,7 @@ import { TranscriptionView } from './modules/transcription/components/Transcript
 import { InterviewView } from './modules/clients/components/InterviewView';
 import { CatalogCurationView } from './modules/catalog/components/CatalogCurationView';
 import { CatalogMobileView } from './modules/catalog/components/CatalogMobileView';
+import { TriageMobileView } from './modules/catalog/components/TriageMobileView';
 import { ToolsView } from './modules/tools/components/ToolsView';
 import { AuditView } from './modules/audit/components/AuditView';
 import { SubprocessorsView } from './modules/privacy/components/SubprocessorsView';
@@ -135,6 +136,26 @@ export function App() {
    * decision NO afecta al escritorio: las clases son `hidden lg:flex`.
    */
   const [vistaTaller, setVistaTaller] = useState<VistaTaller>('instruccion');
+
+  /*
+   * De una sugerencia al taller, con los hechos ya escritos. LO USAN LAS DOS
+   * ORIENTACIONES —la de escritorio y la de movil— y por eso vive aqui: dos
+   * copias de esta funcion se desincronizarian el dia que cambie que se lleva
+   * al taller, y el sintoma seria que en el telefono el escrito sale sin los
+   * hechos. El nombre viaja TAL CUAL vino del catalogo: es el contrato con el
+   * motor de redaccion.
+   *
+   * VACIO SIGNIFICA «NO LO SE», Y SE RESPETA. La salida «Redactar sin catalogo»
+   * del 1f' llega sin nombre ni rama porque el catalogo no reconocio nada;
+   * pisar la rama con una cadena vacia dejaria el selector sin valor y la lista
+   * de actuaciones sin poder cargarse. Se conserva la que haya.
+   */
+  const irARedactar = (nombre: string, rama: string, hechos: string) => {
+    if (rama) workflow.setLegalBranch(rama);
+    workflow.setDocumentType(nombre);
+    if (hechos) workflow.setLegalPrompt(hechos);
+    setMainView('workspace');
+  };
   const [refrescoSoporte, setRefrescoSoporte] = useState(0);
 
   /*
@@ -873,6 +894,19 @@ export function App() {
           )}
           {mainView === 'ajustes' && <SettingsView />}
           {mainView === 'orientacion' && (
+            <>
+            {/*
+              4d rehace Orientacion para el telefono: las tarjetas pierden la
+              reticula, ganan altura, el estado se repite como ICONO junto al
+              titulo y como BORDE IZQUIERDO de 3px —en 375px un filete de color
+              solo no se lee—, y solo la primera verificada lleva el primario.
+              El historial se queda en escritorio: de pie se orienta el caso que
+              se tiene delante, no se revisa lo de la semana pasada.
+            */}
+            <div className="flex min-h-0 flex-1 lg:hidden">
+              <TriageMobileView onDraft={irARedactar} />
+            </div>
+            <div className="hidden min-h-0 flex-1 lg:flex">
             <TriageView
               setMainView={setMainView}
               /*
@@ -881,23 +915,10 @@ export function App() {
                * redacción: cualquier otra cadena resuelve a una plantilla
                * genérica, así que se pasa tal cual vino del catálogo.
                */
-              onDraft={(nombre, rama, hechos) => {
-                /*
-                 * VACÍO SIGNIFICA «NO LO SÉ», Y SE RESPETA.
-                 *
-                 * La salida «Redactar sin catálogo» del 1f′ llega aquí sin
-                 * nombre ni rama, porque el catálogo no reconoció nada. Pisar
-                 * la rama con una cadena vacía dejaría el selector sin valor y
-                 * la lista de actuaciones sin poder cargarse; se conserva la
-                 * que haya, y el taller pedirá la actuación.
-                 */
-                if (rama) workflow.setLegalBranch(rama);
-                workflow.setDocumentType(nombre);
-                // Los hechos que ya escribió, para que no los escriba dos veces.
-                if (hechos) workflow.setLegalPrompt(hechos);
-                setMainView('workspace');
-              }}
+              onDraft={irARedactar}
             />
+            </div>
+            </>
           )}
         </main>
 
