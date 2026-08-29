@@ -19,6 +19,7 @@ import { TenantProvider } from './modules/tenant/TenantContext';
 import { AgentPanelLeft } from './modules/workspace/components/AgentPanelLeft';
 import { DocumentCanvasRight } from './modules/workspace/components/DocumentCanvasRight';
 import { SearchView } from './modules/search/components/SearchView';
+import { SearchMobileView } from './modules/search/components/SearchMobileView';
 import { TranscriptionView } from './modules/transcription/components/TranscriptionView';
 import { InterviewView } from './modules/clients/components/InterviewView';
 import { InterviewMobileView } from './modules/clients/components/InterviewMobileView';
@@ -637,6 +638,9 @@ export function App() {
               ? workflow.generatedDraft?.title || borradorAbierto?.cliente || workflow.documentType
               : mainView === 'borradores'
               ? `${savedDrafts.length} ${savedDrafts.length === 1 ? 'escrito' : 'escritos'}`
+              /* 8d pone la SECCION abierta bajo el nombre del modulo. */
+              : mainView === 'ajustes'
+              ? 'Apariencia · lo suyo, no de la firma'
               : null
           }
           enTaller={mainView === 'workspace'}
@@ -873,7 +877,24 @@ export function App() {
             />
             </div>
           )}
-          {mainView === 'search' && <SearchView />}
+          {/*
+            5c rehace el buscador para el telefono, y conserva lo que 1h decide:
+            curado y automatico como DOS BLOQUES con encabezado propio, el
+            segundo mas apagado, con filete de cita PUNTEADO y SIN boton de
+            citar. En 390px esa diferencia importa mas, no menos — hay menos
+            espacio para matices y mas tentacion de tocar el primer boton que
+            aparezca. Los filtros se recogen en una hoja con su contador.
+          */}
+          {mainView === 'search' && (
+            <>
+              <div className="flex min-h-0 flex-1 lg:hidden">
+                <SearchMobileView />
+              </div>
+              <div className="hidden min-h-0 flex-1 lg:flex">
+                <SearchView />
+              </div>
+            </>
+          )}
           {/*
             DOS PANTALLAS DISTINTAS, NO UNA RESPONSIVA. Claude Design penso el
             catalogo movil (5c) desde cero: la tarjeta lleva el termino en

@@ -24,6 +24,7 @@ import { wompiPublicRoutes, wompiRoutes } from './modules/billing/wompi/wompi.ro
 import { privacyRoutes } from './modules/privacy/privacy.routes';
 import { jurisprudenceRoutes } from './modules/jurisprudence/jurisprudence.routes';
 import { supportAccessRoutes } from './modules/support/supportAccess.routes';
+import { manualReadsRoutes } from './modules/help/manualReads.routes';
 import { embeddingsService } from './modules/embeddings/embeddings.service';
 import { EMBEDDING_DIMENSIONS } from './modules/embeddings/types';
 
@@ -112,6 +113,7 @@ app.use('/api', proceduralTermsRoutes);
 app.use('/api', settlementRoutes);
 app.use('/api', auditRoutes);
 app.use('/api', supportAccessRoutes);
+app.use('/api', manualReadsRoutes);
 app.use('/api', brandingRoutes);
 app.use('/api', searchRoutes);
 app.use('/api', draftsRoutes);

@@ -19,6 +19,7 @@ import {
   minutosDeLectura
 } from '../content/manual';
 import type { ManualBlock, ManualEntry } from '../types';
+import { useManualReads } from '../useManualReads';
 
 /**
  * The manual, read the way it was written: by task, not by module.
@@ -376,6 +377,8 @@ const Indice: React.FC<{
 /* ─── THE VIEW ─────────────────────────────────────────────────────────────── */
 
 export const ManualView: React.FC<ManualViewProps> = ({ articuloInicial, onSoporte }) => {
+  /* El MISMO registro que la pantalla movil: una marca, no dos. */
+  const lectura = useManualReads();
   const inicial = (articuloInicial && entradaPorId(articuloInicial)) || ENTRADAS[0];
   const [activo, setActivo] = React.useState<string>(inicial.articulo.id);
   const [consulta, setConsulta] = React.useState('');
@@ -426,7 +429,31 @@ export const ManualView: React.FC<ManualViewProps> = ({ articuloInicial, onSopor
               <Bloque key={`${bloque.kind}-${i}`} bloque={bloque} />
             ))}
 
-            <nav className="mt-6 flex items-center gap-3 border-t border-line-200 pt-4">
+            {/*
+              MARCAR AL FINAL, no en el indice: la marca dice «lo lei», y
+              ofrecerla junto al titulo invita a marcarlo sin abrirlo. Aqui hay
+              que haber bajado hasta el final del articulo.
+            */}
+            <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-line-200 pt-4">
+              <button
+                type="button"
+                onClick={() => lectura.alternar(articulo.id)}
+                className={`btn btn-sm ${
+                  lectura.leidos.has(articulo.id)
+                    ? 'border border-[rgb(var(--verified-line))] bg-[rgb(var(--verified-surf))] text-verified'
+                    : 'btn-secondary'
+                }`}
+              >
+                <CheckCircle2 size={13} strokeWidth={2.4} />
+                {lectura.leidos.has(articulo.id) ? 'Marcado como leído' : 'Marcar como leído'}
+              </button>
+              <p className="text-meta text-ink-400">
+                Queda registrado con su cuenta. Dice que usted lo leyó — no que el sistema haya
+                comprobado que lo entendió.
+              </p>
+            </div>
+
+            <nav className="mt-4 flex items-center gap-3 border-t border-line-200 pt-4">
               {anterior && (
                 <button type="button" className="btn-neutral" onClick={() => abrir(anterior.articulo.id)}>
                   <ChevronLeft size={13} strokeWidth={2.2} />

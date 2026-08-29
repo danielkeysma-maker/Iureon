@@ -109,7 +109,13 @@ export const SettingsView: React.FC = () => {
       */}
       <div className="mx-auto flex max-w-[1180px] flex-col gap-6 p-4 sm:p-6 lg:flex-row lg:gap-8">
         <nav className="w-full shrink-0 lg:w-[212px]">
-          <h1 className="mb-4 px-2 text-title text-ink-900">Ajustes</h1>
+          {/*
+            EL TITULO SOLO EN ESCRITORIO: en movil lo pone `MobileHeader`, y
+            8d ademas usa esa cabecera para la SECCION ABIERTA —«Apariencia»—,
+            no para el nombre del modulo. Repetir «Ajustes» dos veces gastaba
+            dos renglones en decir lo mismo.
+          */}
+          <h1 className="mb-4 hidden px-2 text-title text-ink-900 lg:block">Ajustes</h1>
           <Grupo titulo="Suyos" entradas={SUYOS} />
           <Grupo titulo="De la firma" entradas={DE_LA_FIRMA} />
 

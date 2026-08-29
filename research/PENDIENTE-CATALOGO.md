@@ -1259,3 +1259,57 @@ en vez de copiarse en hexadecimal. Se corrigieron cuatro `text-white` sobre
 marca por `text-on-brand` —el token que sí se invierte—: dos nuevos y dos que
 estaban desde antes en `AudioRecorder`, fuera de la regla que `.btn-primary` ya
 aplicaba.
+
+---
+
+## 19. 5c buscador, 8d ajustes y el estado de lectura de 9a/9d — 29 de agosto
+
+### Buscador móvil (5c)
+
+`SearchMobileView`, con las medidas del HTML. Conserva lo que decide 1h y que en
+390px pesa **más**, no menos: curado y automático son **dos bloques con
+encabezado propio** —rótulo y filete en azul de marca el primero, en gris el
+segundo—, la cita va en serif con **filete sólido** cuando alguien la leyó y
+**punteado** cuando la trajo el registro, y el bloque automático **no tiene botón
+de citar**. Hay menos espacio para matices y más tentación de tocar el primer
+botón que aparezca.
+
+Los filtros se recogen en una hoja con su contador, y **el contador cuenta
+filtros reales aplicados**, no el «· 2» fijo de la maqueta.
+
+Declarado y no hecho, con la razón: «Anotada por D. Cárdenas» —`CorpusPrecedent`
+no tiene campo de anotador; **es construible**, una tabla de anotaciones por
+firma— y «podría ir en contra de su tesis», que exige comparar la providencia con
+la tesis del escrito, y ni el corpus ni la búsqueda saben cuál es.
+
+### Ajustes (8d)
+
+`AppearanceSection` **ya cumplía** la estructura de 8d: filas apiladas en móvil,
+borde de 1.5px al elegir, el radio de 19px y la muestra «Ag 0123 Il1». Solo hacía
+falta retirar el título duplicado —la cabecera móvil ya lo pone— y usar el
+subtítulo para la SECCIÓN abierta, que es lo que hace la maqueta.
+
+### El estado de lectura del manual (9a/9d) — CONSTRUIDO
+
+Estaba declarado ausente con la razón correcta —«es un dato por usuario en el
+servidor y no existe»—, pero eso describía el estado, no un límite.
+
+- `supabase/migration-lectura-del-manual.sql`: tabla `manual_reads` con llave
+  `(firm_id, user_email, article_id)` y RLS por firma.
+- **Sin columna `leido`.** La fila existe o no existe: un booleano permitiría
+  `leido = false`, que es un estado sin significado — nadie marca un artículo
+  como no leído, lo desmarca, y eso es borrar la fila.
+- La firma va en la llave aunque el correo ya sea único: es lo que permite al
+  socio preguntar «qué ha leído MI gente» sin ver la de otra firma.
+- `useManualReads` lo comparte entre las dos pantallas. Es **optimista pero no
+  mentiroso**: la marca se pinta al instante y **se revierte si el envío falla**,
+  porque una marca que se queda puesta sin guardarse es la afirmación falsa que
+  este registro existe para evitar — y la descubriría el socio, no quien la puso.
+- **Marcar va al FINAL del artículo**, no en el índice: ofrecerla junto al título
+  invita a marcarlo sin abrirlo.
+- La pantalla dice, con esas palabras, que **marca que usted lo leyó — no que el
+  sistema haya comprobado que lo entendió**. El producto no mide comprensión y no
+  debe insinuar que lo hace: un socio que confunda «marcado» con «sabe» tomaría
+  la decisión de curaduría sobre una garantía que nadie dio.
+
+**REQUIERE CORRER `supabase/migration-lectura-del-manual.sql`.**

@@ -9,6 +9,8 @@ import {
 } from '../content/manual';
 import type { ManualEntry } from '../types';
 import { Bloque } from './ManualView';
+import { useManualReads } from '../useManualReads';
+import { IconoVerificado } from '../../../design/ArtboardIcons';
 
 /**
  * El manual en móvil. Artboard 9d, con las medidas copiadas de su HTML.
@@ -58,6 +60,7 @@ const porGrupo = (entradas: readonly ManualEntry[]) => {
 export const ManualMobileView: React.FC<ManualMobileViewProps> = ({ onSoporte }) => {
   const [consulta, setConsulta] = React.useState('');
   const [abierto, setAbierto] = React.useState<ManualEntry | null>(null);
+  const lectura = useManualReads();
 
   const visibles = consulta.trim() ? buscar(consulta) : ENTRADAS;
   const grupos = porGrupo(visibles);
@@ -99,10 +102,33 @@ export const ManualMobileView: React.FC<ManualMobileViewProps> = ({ onSoporte })
             ))}
           </div>
 
+          {/*
+            MARCAR AL FINAL DEL ARTICULO, no en el indice: la marca dice «lo
+            lei», y ofrecerla junto al titulo invita a marcarlo sin abrirlo.
+            Aqui hay que haber bajado hasta el final para llegar al boton.
+          */}
+          <button
+            type="button"
+            onClick={() => lectura.alternar(abierto.articulo.id)}
+            className={`mt-5 flex h-11 w-full items-center justify-center gap-2 rounded-control border text-[13px] font-semibold ${
+              lectura.leidos.has(abierto.articulo.id)
+                ? 'border-[rgb(var(--verified-line))] bg-[rgb(var(--verified-surf))] text-verified'
+                : 'border-line-200 bg-surface text-ink-700'
+            }`}
+          >
+            <IconoVerificado className="h-4 w-4" />
+            {lectura.leidos.has(abierto.articulo.id) ? 'Marcado como leído' : 'Marcar como leído'}
+          </button>
+
+          <p className="mt-1.5 text-justify text-[11px] leading-snug text-ink-400 [text-wrap:pretty]">
+            Queda registrado con su cuenta. Dice que usted lo leyó — no que el sistema haya
+            comprobado que lo entendió.
+          </p>
+
           <button
             type="button"
             onClick={onSoporte}
-            className="btn-secondary mt-5 h-11 w-full"
+            className="btn-secondary mt-3 h-11 w-full"
           >
             ¿Sigue con la duda? Escriba a soporte
           </button>
@@ -148,14 +174,28 @@ export const ManualMobileView: React.FC<ManualMobileViewProps> = ({ onSoporte })
                       onClick={() => setAbierto(e)}
                       className="flex w-full items-center gap-2.5 rounded-[8px] border border-line-200 bg-surface px-3 py-3 text-left"
                     >
-                      <span className="w-4 shrink-0 text-center font-mono text-[11.5px] font-semibold text-ink-400">
-                        {String(e.numero).padStart(2, '0')}
+                      {/* 9d: la palomita ocupa el sitio del numero cuando esta leido. */}
+                      <span className="flex w-4 shrink-0 justify-center">
+                        {lectura.leidos.has(e.articulo.id) ? (
+                          <IconoVerificado className="h-3.5 w-3.5 text-verified" />
+                        ) : (
+                          <span className="text-center font-mono text-[11.5px] font-semibold text-ink-400">
+                            {String(e.numero).padStart(2, '0')}
+                          </span>
+                        )}
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block text-[13.5px] font-medium leading-tight text-ink-900">
+                        <span
+                          className={`block text-[13.5px] leading-tight ${
+                            lectura.leidos.has(e.articulo.id)
+                              ? 'font-normal text-ink-500'
+                              : 'font-medium text-ink-900'
+                          }`}
+                        >
                           {e.articulo.titulo}
                         </span>
                         <span className="mt-0.5 block font-mono text-[11px] text-ink-400">
+                          {lectura.leidos.has(e.articulo.id) ? 'Leído · ' : ''}
                           {minutosDeLectura(e.articulo)} min
                         </span>
                       </span>
@@ -168,9 +208,9 @@ export const ManualMobileView: React.FC<ManualMobileViewProps> = ({ onSoporte })
         )}
 
         <p className="mt-4 text-justify text-[11px] leading-snug text-ink-400 [text-wrap:pretty]">
-          {TOTAL_ARTICULOS} artículos · {MINUTOS_TOTALES} minutos en total. No se lleva registro
-          de lo leído: eso es un dato por usuario en el servidor y no existe, y marcarlo aquí solo
-          lo sabría este teléfono.
+          {lectura.leidos.size} de {TOTAL_ARTICULOS} leídos · {MINUTOS_TOTALES} minutos en total.
+          El registro va con su cuenta y su firma lo puede consultar: es lo que permite saber si
+          alguien leyó el artículo de verificación antes de recibir permisos de curaduría.
         </p>
       </div>
     </div>
