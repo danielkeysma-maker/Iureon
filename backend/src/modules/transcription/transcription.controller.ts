@@ -407,8 +407,15 @@ export const assignTranscriptionRolesController = async (
  * DELETE /api/transcription/:id — The firm disposes of its own privileged material.
  */
 export const deleteTranscriptionController = async (req: Request, res: Response): Promise<void> => {
-  // Se lee ANTES de borrar: despues ya no hay titulo que registrar.
-  const existente = await transcriptionStore.get(req.firmId as string, String(req.params.id));
+  /*
+   * Se lee ANTES de borrar: despues ya no hay titulo que registrar. Pero SOLO
+   * el titulo — esto llamaba a `get()`, que es `select('*')`, y descargaba la
+   * audiencia entera (texto, intervenciones y resumen) desde Postgres hasta
+   * esta funcion para quedarse con una cadena. Borrar tardaba en proporcion a
+   * lo que duraba la audiencia, que es exactamente al reves de lo que se
+   * espera.
+   */
+  const titulo = await transcriptionStore.titleOf(req.firmId as string, String(req.params.id));
   const removed = await transcriptionStore.remove(req.firmId as string, String(req.params.id));
 
   if (removed) {
@@ -416,7 +423,7 @@ export const deleteTranscriptionController = async (req: Request, res: Response)
       firmId: req.firmId as string,
       userEmail: req.user?.email ?? 'desconocido',
       action: 'TRANSCRIPTION_DELETED',
-      resource: `Eliminó transcripción · ${existente?.title ?? String(req.params.id)}`
+      resource: `Eliminó transcripción · ${titulo ?? String(req.params.id)}`
     });
   }
 

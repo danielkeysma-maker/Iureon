@@ -29,6 +29,8 @@ interface SubirAudienciaDialogProps {
   onCerrar: () => void;
   maxAudioBytes: number;
   isUploading: boolean;
+  /** De 0 a 99. La espera no se acorta, pero deja de parecer un cuelgue. */
+  uploadProgress?: number;
   isTranscribing: boolean;
   error: string | null;
   onTranscribir: (archivo: File, contexto: string) => void;
@@ -41,6 +43,7 @@ export const SubirAudienciaDialog: React.FC<SubirAudienciaDialogProps> = ({
   onCerrar,
   maxAudioBytes,
   isUploading,
+  uploadProgress = 0,
   isTranscribing,
   error,
   onTranscribir
@@ -92,7 +95,13 @@ export const SubirAudienciaDialog: React.FC<SubirAudienciaDialogProps> = ({
             {isUploading ? (
               <>
                 <Upload className="h-3.5 w-3.5 animate-pulse" />
-                Enviando la grabación…
+                {/*
+                  * La cifra solo aparece cuando de verdad la hay. Con el
+                  * porcentaje en cero no se sabe si es que va en cero o si el
+                  * navegador no puede medirlo, y un contador clavado en 0% dice
+                  * menos que no poner ninguno.
+                  */}
+                {uploadProgress > 0 ? `Enviando · ${uploadProgress}%` : 'Enviando la grabación…'}
               </>
             ) : isTranscribing ? (
               <>

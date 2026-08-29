@@ -42,12 +42,28 @@ interface TranscribeResponse {
 }
 
 /** A transcript as the database holds it. */
+/**
+ * El texto corrido de una fila, venga o no `full_text`.
+ *
+ * Las intervenciones SON el texto: `full_text` no es otra cosa que su
+ * concatenacion. Buscar «lo que se dijo» sobre `segments` encuentra lo mismo, y
+ * ahorra mandar cada audiencia dos veces por la red en cada refresco.
+ */
+export const textoDe = (item: { full_text?: string; segments?: { text: string }[] }): string =>
+  item.full_text ?? (item.segments ?? []).map((s) => s.text).join('\n');
+
 export interface StoredTranscription {
   id: string;
   kind: TranscriptionKind;
   title: string;
   source_file_name: string;
-  full_text: string;
+  /**
+   * NO VIAJA EN LA LISTA, a proposito: es la concatenacion de `segments`, asi
+   * que traerlo duplicaba el transcrito entero en cada fila. Solo llega al
+   * abrir una transcripcion. Quien necesite el texto de una fila de lista lo
+   * arma con `textoDe()`.
+   */
+  full_text?: string;
   segments: TranscriptSegment[];
   speaker_labels: string[];
   language: string | null;
@@ -275,7 +291,7 @@ export const transcriptionApi = {
    * caller can "show its simulated result instead of an error" — which is how a
    * firm ends up believing a file was stored when it went nowhere.
    */
-  async uploadAudioToStorage(file: File): Promise<string> {
+  async uploadAudioToStorage(file: File, onProgress?: (porcentaje: number) => void): Promise<string> {
     const data = await httpClient.post<UploadUrlResponse>('/api/documents/upload-url', {
       body: { caseId: 'audiencias', fileName: file.name }
     });
@@ -287,24 +303,67 @@ export const transcriptionApi = {
     }
 
     const buffer = await file.arrayBuffer();
+    const sha1 = await sha1Hex(buffer);
 
-    const response = await fetch(target.uploadUrl, {
-      method: 'POST',
-      headers: {
-        Authorization: target.authorizationToken,
-        // Encoded because a hearing's filename carries accents and spaces, and
-        // B2 reads this header literally.
-        'X-Bz-File-Name': encodeURIComponent(target.fileKey),
-        'Content-Type': file.type || 'application/octet-stream',
-        'X-Bz-Content-Sha1': await sha1Hex(buffer)
-      },
-      body: buffer
+    /*
+     * XHR Y NO `fetch`, POR UNA SOLA RAZON: EL PROGRESO.
+     *
+     * `fetch` no informa cuanto lleva subido — la promesa se resuelve o falla, y
+     * en medio no dice nada. Con una audiencia de 10 MB por el enlace de subida
+     * de una oficina, eso son decenas de segundos con un boton que dice
+     * «Enviando la grabacion...» y no cambia. Es indistinguible de estar
+     * colgado, y asi se reporto: «se queda mucho tiempo».
+     *
+     * El tamaño no se puede bajar —el audio es el que es— asi que lo que se
+     * arregla no es la espera sino la incertidumbre. `upload.onprogress` de
+     * XMLHttpRequest da los bytes enviados; es la unica API del navegador que
+     * los da, y es la razon entera de no usar `fetch` aqui.
+     */
+    await new Promise<void>((resolver, rechazar) => {
+      const peticion = new XMLHttpRequest();
+      peticion.open('POST', target.uploadUrl, true);
+      peticion.setRequestHeader('Authorization', target.authorizationToken);
+      // Encoded because a hearing's filename carries accents and spaces, and
+      // B2 reads this header literally.
+      peticion.setRequestHeader('X-Bz-File-Name', encodeURIComponent(target.fileKey));
+      peticion.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
+      peticion.setRequestHeader('X-Bz-Content-Sha1', sha1);
+
+      peticion.upload.onprogress = (evento) => {
+        /*
+         * `lengthComputable` es falso cuando el navegador no sabe el total. Sin
+         * esa guarda el porcentaje seria Infinity o NaN, y un contador que
+         * marca NaN asusta mas que no tener contador.
+         */
+        if (!evento.lengthComputable || !onProgress) return;
+        onProgress(Math.min(99, Math.round((evento.loaded / evento.total) * 100)));
+      };
+
+      /*
+       * El 100% NO se anuncia al terminar de enviar: los bytes salieron, pero
+       * B2 todavia esta verificando el SHA-1 y no ha respondido. Decir «100%»
+       * ahi deja la pantalla clavada en cien mientras algo sigue pasando, que
+       * es el mismo defecto en el ultimo tramo. Por eso el progreso se detiene
+       * en 99 y el paso siguiente lo releva.
+       */
+      peticion.onload = () => {
+        if (peticion.status >= 200 && peticion.status < 300) {
+          resolver();
+          return;
+        }
+        rechazar(
+          new Error(
+            `El almacenamiento rechazó la grabación (${peticion.status}). ${String(peticion.responseText ?? '').slice(0, 200)}`
+          )
+        );
+      };
+
+      peticion.onerror = () =>
+        rechazar(new Error('Se perdió la conexión mientras se enviaba la grabación. Vuelva a intentarlo.'));
+      peticion.onabort = () => rechazar(new Error('El envío de la grabación se canceló.'));
+
+      peticion.send(buffer);
     });
-
-    if (!response.ok) {
-      const detail = await response.text().catch(() => '');
-      throw new Error(`El almacenamiento rechazó la grabación (${response.status}). ${detail.slice(0, 200)}`);
-    }
 
     return target.fileKey;
   },

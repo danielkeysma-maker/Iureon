@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { CheckCircle2, FileAudio, Lock, MoreHorizontal, RefreshCw, Search, Trash2, Undo2 } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
-import type { StoredTranscription } from '../services/transcription.api';
+import { textoDe, type StoredTranscription } from '../services/transcription.api';
 
 /**
  * La lista de audiencias. Se ordena por lo que FALTA REVISAR, no por fecha.
@@ -62,7 +62,7 @@ export const AudienciasList: React.FC<AudienciasListProps> = ({
     return items.filter(
       (i) =>
         i.title.toLowerCase().includes(q) ||
-        i.full_text.toLowerCase().includes(q) ||
+        textoDe(i).toLowerCase().includes(q) ||
         quien(i.user_email).toLowerCase().includes(q)
     );
   }, [items, busqueda]);

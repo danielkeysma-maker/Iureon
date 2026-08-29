@@ -67,6 +67,41 @@ const check = (n: string, ok: boolean, d = ''): void => {
   check('y NO ve el de la otra firma', !titulosA.includes('AUDIENCIA DE B'), titulosA.join(', '));
 
   /*
+   * LA LISTA NO MANDA EL TRANSCRITO DOS VECES.
+   *
+   * `full_text` es la concatenacion de `segments`, asi que traerlo duplicaba el
+   * texto de cada audiencia en cada fila — y la lista se recarga al abrir la
+   * pantalla, al refrescar y despues de cada borrado. Con audiencias de una
+   * hora eso es lo que se sentia como lentitud.
+   *
+   * Las dos aserciones van juntas a proposito: quitar el texto sin dejar las
+   * intervenciones dejaria la lista rapida y el buscador de «lo que se dijo»
+   * mudo, que es peor que la lentitud que arreglaba.
+   */
+  const filaA = (listaA.body?.items ?? []).find((t: { title: string }) => t.title === 'AUDIENCIA DE A');
+
+  /*
+   * `resumen` es la ultima columna que se agrego a esta tabla, asi que sirve de
+   * senal de si la base esta migrada. Sin ella la lista cae al `select('*')` de
+   * respaldo —que si trae `full_text`— y exigir su ausencia seria acusar al
+   * codigo de un defecto que es una migracion pendiente.
+   */
+  const baseMigrada = filaA !== undefined && 'resumen' in filaA;
+
+  check(
+    baseMigrada
+      ? 'la lista no trae full_text: seria el transcrito repetido'
+      : 'base sin migrar: la lista cae al respaldo completo, y eso esta bien',
+    filaA !== undefined && (baseMigrada ? filaA.full_text === undefined : true),
+    `full_text = ${JSON.stringify(filaA?.full_text)}`
+  );
+  check(
+    'la lista trae segments, que es sobre lo que busca el abogado',
+    Array.isArray(filaA?.segments),
+    JSON.stringify(filaA?.segments)
+  );
+
+  /*
    * 2. Reabrir un transcrito debe mostrar lo que mostraría uno recién hecho.
    *
    * Las propuestas viajaban solo en la respuesta que CREABA el transcrito, así

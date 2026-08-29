@@ -72,6 +72,7 @@ export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
     hasFirm,
     isAvailable,
     isUploading,
+    uploadProgress,
     isTranscribing,
     result,
     error,
@@ -272,7 +273,11 @@ export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
 
         {trabajando && (
           <p className="rounded-[8px] border border-line-200 bg-surface px-3.5 py-3 text-[12.5px] text-ink-700">
-            {isUploading ? 'Subiendo la grabación…' : 'Transcribiendo…'} No cierre la aplicación.
+            {isUploading
+                    ? uploadProgress > 0
+                      ? `Subiendo la grabación · ${uploadProgress}%`
+                      : 'Subiendo la grabación…'
+                    : 'Transcribiendo…'} No cierre la aplicación.
           </p>
         )}
 

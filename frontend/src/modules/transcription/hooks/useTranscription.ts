@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTenant } from '../../tenant/TenantContext';
-import { transcriptionApi, type StoredTranscription } from '../services/transcription.api';
+import { textoDe, transcriptionApi, type StoredTranscription } from '../services/transcription.api';
 import {
   FALLBACK_MAX_AUDIO_BYTES,
   SUPPORTED_AUDIO_EXTENSIONS,
@@ -114,6 +114,17 @@ export const useTranscription = (kind: TranscriptionKind) => {
   const [viaStorage, setViaStorage] = useState(false);
   /** Shown while the recording travels to storage, which is the slow part. */
   const [isUploading, setIsUploading] = useState(false);
+  /**
+   * Cuanto de la grabacion va enviado, de 0 a 99.
+   *
+   * EL TAMAÑO NO SE PUEDE BAJAR; LA INCERTIDUMBRE SI. Una audiencia de 10 MB
+   * por el enlace de subida de una oficina son decenas de segundos, y hasta
+   * ahora el boton decia «Enviando la grabacion...» sin moverse — indistinguible
+   * de estar colgado. Se queda en 99 a proposito: los bytes salieron pero B2
+   * aun verifica el SHA-1, y clavarse en 100 repite el defecto en el ultimo
+   * tramo.
+   */
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -158,8 +169,9 @@ export const useTranscription = (kind: TranscriptionKind) => {
 
         if (viaStorage) {
           setIsUploading(true);
+          setUploadProgress(0);
           try {
-            const fileKey = await transcriptionApi.uploadAudioToStorage(file);
+            const fileKey = await transcriptionApi.uploadAudioToStorage(file, setUploadProgress);
             outcome = await transcriptionApi.transcribeFromStorage(fileKey, {
               kind,
               contextPrompt,
@@ -488,7 +500,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
     setPersisted(true);
     setResult({
       kind: item.kind,
-      fullText: item.full_text,
+      fullText: textoDe(item),
       segments: item.segments,
       speakerLabels: item.speaker_labels,
       language: item.language,
@@ -592,6 +604,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
     deleteStored,
     persisted,
     maxAudioBytes,
+    uploadProgress,
     transcribe,
     marcarRevisada,
     marcarHechoClave,

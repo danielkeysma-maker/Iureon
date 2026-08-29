@@ -1,6 +1,19 @@
 import { supabase } from '../../config/supabase.config';
 import type { TranscriptSegment, TranscriptionResult, SpeakerRole } from './types';
 
+/**
+ * Una fila como la devuelve la LISTA: sin el transcrito completo.
+ *
+ * El tipo existe para que la omision sea visible en el compilador. Devolver
+ * `StoredTranscription` desde una consulta que no trae `full_text` seria una
+ * mentira de tipos: el primero que lo leyera recibiria `undefined` donde el
+ * tipo promete una cadena, y `.toLowerCase()` sobre eso revienta en pantalla.
+ */
+export type TranscriptionListItem = Omit<
+  StoredTranscription,
+  'full_text' | 'saved_at' | 'updated_at'
+>;
+
 export interface StoredTranscription {
   id: string;
   firm_id: string;
@@ -131,24 +144,66 @@ export class TranscriptionStore {
   async list(
     firmId: string,
     kind?: TranscriptionResult['kind']
-  ): Promise<StoredTranscription[]> {
+  ): Promise<TranscriptionListItem[]> {
     if (!supabase) return [];
 
-    let query = supabase
-      .from('transcriptions')
-      .select('*')
-      .eq('firm_id', firmId);
+    /*
+     * TODO MENOS `full_text`, Y ESO NO ES UNA MICRO-OPTIMIZACION.
+     *
+     * `full_text` es la concatenacion de lo que ya viene en `segments`: la
+     * lista traia el transcrito de cada audiencia DOS VECES. Con audiencias de
+     * una hora eso son cientos de kilobytes por fila, y la lista se recarga al
+     * abrir la pantalla, al refrescar y despues de cada borrado — que es
+     * exactamente la lentitud que se reporto.
+     *
+     * Se pudo quitar sin perder nada porque en el navegador `full_text` tenia
+     * UN solo lector: el buscador de la lista, que busca «lo que se dijo». Esa
+     * busqueda pasa a correr sobre `segments`, que son las mismas palabras. El
+     * `fullText` del resultado no lo lee ningun componente. Al ABRIR una
+     * transcripcion se sigue leyendo la fila entera por `get()`.
+     */
+    const COLUMNAS_DE_LISTA =
+      'id, firm_id, user_email, kind, title, source_file_name, segments, speaker_labels, ' +
+      'language, duration_seconds, model, transcribed_at, resumen, estado_revision, ' +
+      'revisada_por, revisada_el, decision, decision_motivo, decidido_por, decidido_el, ' +
+      'autorizo_grabacion_el, client_id';
 
-    if (kind) query = query.eq('kind', kind);
+    const pedir = (columnas: string) => {
+      let q = supabase!.from('transcriptions').select(columnas).eq('firm_id', firmId);
+      if (kind) q = q.eq('kind', kind);
+      return q.order('transcribed_at', { ascending: false });
+    };
 
-    const { data, error } = await query.order('transcribed_at', { ascending: false });
+    let { data, error } = await pedir(COLUMNAS_DE_LISTA);
+
+    /*
+     * SI FALTA UNA COLUMNA, LA LISTA NO SE VACIA: SE PIDE COMPLETA.
+     *
+     * Nombrar columnas convierte una migracion pendiente en una lista vacia.
+     * Postgres responde «column transcriptions.X does not exist», el servicio
+     * registra el error y devuelve `[]` — y el abogado ve una pantalla que dice
+     * que no tiene audiencias cuando las tiene todas. Eso paso de verdad en la
+     * primera version de este cambio, y lo destapo `check:stored` contra una
+     * base sin `resumen`.
+     *
+     * Una pantalla vacia por una migracion pendiente es mentira sobre el
+     * trabajo de la firma, y eso pesa mas que el ahorro. Asi que ante ese error
+     * se reintenta con `*`: se pierde la velocidad, nunca el contenido.
+     */
+    if (error && /column .* does not exist/i.test(error.message)) {
+      console.warn(
+        `[TRANSCRIPTION] La lista rapida no pudo usarse (${error.message}). ` +
+          'Se pide la fila completa: mas lenta, pero nunca vacia. Corra las migraciones pendientes.'
+      );
+      ({ data, error } = await pedir('*'));
+    }
 
     if (error) {
       console.error('[TRANSCRIPTION] Error al listar transcritos:', error.message);
       return [];
     }
 
-    return (data ?? []) as StoredTranscription[];
+    return (data ?? []) as unknown as TranscriptionListItem[];
   }
 
   /** Una transcripcion de la firma, completa. Para el resumen y para releer. */
@@ -705,6 +760,33 @@ export class TranscriptionStore {
     }
 
     return data as StoredTranscription;
+  }
+
+  /**
+   * Solo el titulo de una transcripcion.
+   *
+   * EXISTE PORQUE BORRAR DESCARGABA LA AUDIENCIA ENTERA PARA LEER UNA CADENA.
+   * El controlador llamaba a `get()` —que es `select('*')`— antes de borrar,
+   * unicamente para escribir el titulo en la auditoria. Eso trae `full_text`,
+   * `segments` y `resumen` de una audiencia de dos horas desde Postgres hasta
+   * la funcion serverless, para descartarlos en la linea siguiente.
+   *
+   * El abogado lo veia como lentitud al eliminar, y crecia con la duracion de
+   * la audiencia: cuanto mas larga la grabacion, mas tardaba en borrarse — que
+   * es justo al reves de lo que cualquiera espera de un borrado.
+   */
+  async titleOf(firmId: string, id: string): Promise<string | null> {
+    if (!supabase) return null;
+
+    const { data, error } = await supabase
+      .from('transcriptions')
+      .select('title')
+      .eq('firm_id', firmId)
+      .eq('id', id)
+      .single();
+
+    if (error || !data) return null;
+    return (data as { title: string }).title;
   }
 
   /**

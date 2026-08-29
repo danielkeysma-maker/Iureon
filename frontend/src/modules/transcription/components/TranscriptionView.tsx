@@ -41,7 +41,7 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
   kind = 'AUDIENCIA',
   onUsarEnRedaccion
 }) => {
-  const { hasFirm, isAvailable, isUploading, isTranscribing, result, error, roleProposals, persisted, maxAudioBytes, transcribe,
+  const { hasFirm, isAvailable, isUploading, uploadProgress, isTranscribing, result, error, roleProposals, persisted, maxAudioBytes, transcribe,
     marcarRevisada,
     marcarHechoClave, assignRole, editSegment, splitSegment, reassignSpeaker, voiceConflicts, nameProposals, assignSpeakerName, stored, isLoadingStored, loadStored, openStored, deleteStored, canEdit, reset, transcriptionId } =
     useTranscription(kind);
@@ -309,6 +309,7 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
           onCerrar={() => setSubirAbierto(false)}
           maxAudioBytes={maxAudioBytes}
           isUploading={isUploading}
+          uploadProgress={uploadProgress}
           isTranscribing={isTranscribing}
           error={error}
           onTranscribir={(archivo, contexto) => {

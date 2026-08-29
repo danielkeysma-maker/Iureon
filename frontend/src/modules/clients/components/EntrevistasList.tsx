@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { MoreHorizontal, RefreshCw, Search, Trash2, Undo2, UserRound } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
-import { transcriptionApi, type StoredTranscription } from '../../transcription/services/transcription.api';
+import { textoDe, transcriptionApi, type StoredTranscription } from '../../transcription/services/transcription.api';
 
 /**
  * La lista de entrevistas. Se ordena por la DECISIÓN PENDIENTE, no por fecha.
@@ -92,7 +92,7 @@ export const EntrevistasList: React.FC<EntrevistasListProps> = ({
     return items.filter(
       (i) =>
         i.title.toLowerCase().includes(q) ||
-        i.full_text.toLowerCase().includes(q) ||
+        textoDe(i).toLowerCase().includes(q) ||
         quien(i.user_email).toLowerCase().includes(q)
     );
   }, [items, busqueda]);

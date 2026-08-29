@@ -84,6 +84,7 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft, onPrivaci
     hasFirm,
     isAvailable,
     isUploading,
+    uploadProgress,
     isTranscribing,
     result,
     error,
@@ -523,7 +524,11 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft, onPrivaci
             {trabajando ? (
               <div className="py-6 text-center">
                 <p className="text-xs font-bold text-ink-900">
-                  {isUploading ? 'Enviando la grabación…' : 'Transcribiendo…'}
+                  {isUploading
+                    ? uploadProgress > 0
+                      ? `Enviando la grabación · ${uploadProgress}%`
+                      : 'Enviando la grabación…'
+                    : 'Transcribiendo…'}
                 </p>
                 <p className="text-[11px] text-ink-500 mt-1">
                   Separando las voces y ordenando la conversación.
