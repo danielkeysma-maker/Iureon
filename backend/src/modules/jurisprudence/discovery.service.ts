@@ -1,5 +1,6 @@
 import { config } from '../../config/env.config';
 import { fetchOfficialRuling, parseCitation } from './officialRuling.service';
+import { discoverCsjRulings } from './csjRuling.service';
 import type { OfficialRuling } from './officialRuling.service';
 
 /**
@@ -123,29 +124,108 @@ const citationsIn = (hit: SearchHit): string[] => {
   return found;
 };
 
+/**
+ * La Corte Suprema, por su propio buscador y sin pasar por el motor web.
+ *
+ * ─── POR QUÉ ESTO NO EXISTÍA Y SE NOTABA ────────────────────────────────────
+ *
+ * El descubrimiento consultaba UNA sola relatoría —la constitucional— y su
+ * propio aviso lo confesaba: «si el asunto es de casación civil, laboral o
+ * penal, es probable que no viva en esa relatoría». Se comprobó en producción
+ * con «servidumbre de tránsito»: el buscador propuso seis candidatas, el
+ * registro las descartó todas correctamente, y el abogado se quedó sin nada —
+ * porque ese asunto es casación civil y nunca se le preguntó a la Suprema.
+ *
+ * `discoverCsjRulings` YA EXISTÍA, con sus cuatro colecciones y su lectura
+ * oficial. Solo faltaba llamarlo.
+ *
+ * ─── NO PASA POR EL MOTOR WEB, Y ESO ES MEJOR ───────────────────────────────
+ *
+ * La constitucional necesita un buscador externo porque su índice no expone
+ * consulta por tema. La Suprema sí: su propio buscador responde, así que aquí
+ * no hay candidatas que confirmar — lo que vuelve ya viene de la corporación.
+ * Se busca en las dos EN PARALELO: son independientes, y esperarlas en fila
+ * sumaría al abogado el peor de los dos tiempos por nada.
+ */
+const descubrirEnLaSuprema = async (topic: string) => {
+  try {
+    return await discoverCsjRulings(topic);
+  } catch {
+    /*
+     * Una corporación que falla no tumba a la otra. El resultado se presenta
+     * con lo que sí respondió, que es mejor que un error para todo: el abogado
+     * prefiere dos sentencias de la constitucional a una pantalla vacía porque
+     * el servidor de la Suprema estaba caído.
+     */
+    return [];
+  }
+};
+
 export const discoverRulings = async (topic: string): Promise<DiscoveryResult> => {
   if (!config.search.enabled) {
+    /*
+     * SIN MOTOR WEB TODAVÍA SE PUEDE PREGUNTAR A LA SUPREMA, porque ella tiene
+     * buscador propio. Antes esto devolvía «no configurado» y se acababa la
+     * consulta: el descubrimiento entero dependía de una llave que solo hace
+     * falta para la constitucional.
+     */
+    const suprema = await descubrirEnLaSuprema(topic);
+
     return {
-      status: 'NO_PROVIDER',
-      found: [],
+      status: suprema.length > 0 ? 'OK' : 'NO_PROVIDER',
+      found: suprema.map((d) => ({
+        ruling: d.ruling,
+        motivo: `Corte Suprema · Sala ${d.corpus}`
+      })),
       descartadas: [],
       reason:
-        'El descubrimiento por tema no está configurado. La búsqueda sigue funcionando sobre el corpus indexado y sobre las sentencias que se nombren por su número.'
+        suprema.length > 0
+          ? undefined
+          : 'El descubrimiento en la relatoría de la Corte Constitucional no está configurado, y la Corte Suprema no devolvió nada para este tema.'
     };
   }
 
-  let hits: SearchHit[];
+  /*
+   * LAS DOS CORPORACIONES A LA VEZ. `Promise.all` y no una tras otra: son
+   * consultas independientes a servidores distintos.
+   */
+  const [hitsResultado, suprema] = await Promise.all([
+    searchOfficialDomain(topic).then(
+      (h) => ({ ok: true as const, hits: h }),
+      (error: Error) => ({ ok: false as const, error })
+    ),
+    descubrirEnLaSuprema(topic)
+  ]);
 
-  try {
-    hits = await searchOfficialDomain(topic);
-  } catch (error) {
+  const deLaSuprema: DiscoveredRuling[] = suprema.map((d) => ({
+    ruling: d.ruling,
+    motivo: `Corte Suprema · Sala ${d.corpus}`
+  }));
+
+  if (!hitsResultado.ok) {
+    /*
+     * Si el motor web falla pero la Suprema respondió, se entrega lo que hay.
+     * Devolver FAILED con las manos vacías tirando dos sentencias reales seria
+     * castigar al abogado por una avería que no es suya.
+     */
+    if (deLaSuprema.length > 0) {
+      return {
+        status: 'OK',
+        found: deLaSuprema,
+        descartadas: [],
+        reason: `El buscador de la relatoría constitucional no respondió (${hitsResultado.error.message}); esto viene de la Corte Suprema.`
+      };
+    }
+
     return {
       status: 'FAILED',
       found: [],
       descartadas: [],
-      reason: `No se pudo consultar el buscador: ${(error as Error).message}`
+      reason: `No se pudo consultar el buscador: ${hitsResultado.error.message}`
     };
   }
+
+  const hits = hitsResultado.hits;
 
   const candidatos: Array<{ cita: string; motivo: string }> = [];
   const vistas = new Set<string>();
@@ -182,5 +262,11 @@ export const discoverRulings = async (topic: string): Promise<DiscoveryResult> =
     }
   }
 
-  return { status: 'OK', found, descartadas };
+  /*
+   * LO CONSTITUCIONAL PRIMERO, LUEGO LO DE LA SUPREMA. No es jerarquia entre
+   * cortes: es que lo primero paso por la confirmacion contra el registro del
+   * Estado y lo segundo viene directo de la corporacion. Ambas son oficiales;
+   * el orden refleja por cuantas puertas paso cada una.
+   */
+  return { status: 'OK', found: [...found, ...deLaSuprema], descartadas };
 };

@@ -846,7 +846,25 @@ así que no se pintó nada.
 
 ---
 
-## 11. EN COLA — el descubrimiento solo verifica UNA relatoría
+## 11. ~~EN COLA~~ RESUELTO el 29 de agosto — el descubrimiento pregunta a dos cortes
+
+> **Cerrado.** `discoverCsjRulings` **ya existía** —con sus cuatro colecciones y
+> su lectura oficial— y el descubrimiento simplemente no lo llamaba. Se conectó.
+> Probado contra la consulta que lo destapó: «servidumbre de tránsito» devuelve
+> hoy `STL429-2023` de la Corte Suprema, donde antes devolvía cero.
+>
+> Las dos corporaciones se consultan **en paralelo** —son servidores
+> independientes—, **una que falle no tumba a la otra**, y **sin llave de Brave
+> todavía se puede preguntar a la Suprema**, porque tiene buscador propio: antes
+> el descubrimiento entero dependía de una llave que solo hace falta para la
+> constitucional.
+>
+> **Sigue fuera lo contencioso administrativo**: el Consejo de Estado no tiene
+> lector oficial en este producto. El aviso de la pantalla ya lo dice con esas
+> palabras, en vez de la frase vieja —«probablemente no vive en esa relatoría»—
+> que dejó de ser cierta al conectar la segunda corte.
+
+### Lo que se diagnosticó en su momento
 
 Verificado en producción el 28 de agosto con la consulta «servidumbre de
 tránsito»: **Brave funciona** —devolvió 6 candidatas— y el verificador oficial

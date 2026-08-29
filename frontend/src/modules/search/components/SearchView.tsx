@@ -589,8 +589,9 @@ export const SearchView: React.FC = () => {
                 El registro oficial tampoco tiene nada para esta consulta
               </p>
               <p className="mt-0.5 text-justify [text-wrap:pretty]">
-                Se buscó en la relatoría de la Corte Constitucional y ninguna candidata pasó la
-                verificación contra el registro del Estado
+                Se buscó en la relatoría de la Corte Constitucional y en el buscador de la
+                Corte Suprema —sus salas Civil, Laboral, Penal y de Tutelas— y ninguna
+                candidata pasó la verificación contra el registro oficial
                 {discovery.descartadas.length > 0
                   ? `: ${discovery.descartadas.length} propuesta${
                       discovery.descartadas.length === 1 ? '' : 's'
@@ -598,8 +599,15 @@ export const SearchView: React.FC = () => {
                       discovery.descartadas.length === 1 ? '' : 's'
                     }.`
                   : '.'}{' '}
-                Si el asunto es de casación civil, laboral o penal, o de lo contencioso
-                administrativo, es probable que no viva en esa relatoría.
+                {/*
+                  ESTE AVISO DECIA ANTES QUE EL ASUNTO «probablemente no vive en esa
+                  relatoria» PORQUE SOLO SE CONSULTABA UNA. Era cierto y ya no lo es: la
+                  Suprema se pregunta aparte, por su propio buscador. Lo que queda fuera
+                  es lo CONTENCIOSO ADMINISTRATIVO — el Consejo de Estado no tiene aun
+                  lector oficial en este producto, y decirlo es mas util que callarlo.
+                */}
+                Lo contencioso administrativo queda fuera: el Consejo de Estado todavía no
+                tiene lector oficial aquí.
               </p>
             </div>
           )}
