@@ -28,7 +28,9 @@ import { ToolsView } from './modules/tools/components/ToolsView';
 import { AuditView } from './modules/audit/components/AuditView';
 import { SubprocessorsView } from './modules/privacy/components/SubprocessorsView';
 import { ManualView } from './modules/help/components/ManualView';
+import { ManualMobileView } from './modules/help/components/ManualMobileView';
 import { SupportView } from './modules/help/components/SupportView';
+import { SupportMobileView } from './modules/help/components/SupportMobileView';
 import { TriageView } from './modules/catalog/components/TriageView';
 import { SettingsView } from './modules/settings/components/SettingsView';
 import { WorkshopConfigBar } from './modules/workspace/components/WorkshopConfigBar';
@@ -876,13 +878,47 @@ export function App() {
           {mainView === 'tools' && <ToolsView />}
           {mainView === 'audit' && <AuditView />}
           {mainView === 'privacidad' && <SubprocessorsView />}
+          {/*
+            9d rehace el manual para el telefono: indice agrupado con filete,
+            tarjeta por articulo con su numero y sus minutos, y el articulo como
+            pantalla propia. Los BLOQUES los pinta el mismo `Bloque` de la vista
+            grande — un manual que en el telefono pierda sus pasos numerados
+            seria el mismo texto diciendo dos cosas segun el aparato.
+          */}
           {mainView === 'manual' && (
+            <div className="flex min-h-0 flex-1 lg:hidden">
+              <ManualMobileView onSoporte={() => setMainView('soporte')} />
+            </div>
+          )}
+
+          {mainView === 'manual' && (
+            <div className="hidden min-h-0 flex-1 lg:flex">
             <ManualView
               articuloInicial={manualArticulo}
               onSoporte={() => setMainView('soporte')}
             />
+            </div>
           )}
+          {/*
+            9d llama a esto «dos vias con expectativas distintas, no dos botones
+            iguales»: cada canal con su tiempo de respuesta y su filete de
+            color. Con una diferencia que la maqueta no podia prever — el chat
+            en la app NO EXISTE, asi que su tarjeta se pinta como declaracion y
+            no como boton. En el telefono importa mas: un boton grande y comodo
+            que no responde se pulsa dos veces antes de sospechar.
+          */}
           {mainView === 'soporte' && (
+            <div className="flex min-h-0 flex-1 lg:hidden">
+              <SupportMobileView
+                firma={activeFirm.name}
+                correo={currentUserEmail}
+                onManual={() => setMainView('manual')}
+              />
+            </div>
+          )}
+
+          {mainView === 'soporte' && (
+            <div className="hidden min-h-0 flex-1 lg:flex">
             <SupportView
               firma={activeFirm.name}
               correo={currentUserEmail}
@@ -891,6 +927,7 @@ export function App() {
                 setMainView('manual');
               }}
             />
+            </div>
           )}
           {mainView === 'ajustes' && <SettingsView />}
           {mainView === 'orientacion' && (

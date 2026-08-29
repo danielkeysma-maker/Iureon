@@ -182,7 +182,13 @@ const BloqueEjemplo: React.FC = () => (
   </div>
 );
 
-const Bloque: React.FC<{ bloque: ManualBlock }> = ({ bloque }) => {
+/**
+ * Se exporta para que la pantalla móvil (9d) renderice los bloques con ESTA
+ * función y no con una copia. Un artículo que en el teléfono pierda sus pasos
+ * numerados —o los pinte como párrafos— sería el mismo manual diciendo dos
+ * cosas distintas según el aparato.
+ */
+export const Bloque: React.FC<{ bloque: ManualBlock }> = ({ bloque }) => {
   switch (bloque.kind) {
     case 'parrafo':
       return (
