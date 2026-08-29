@@ -36,7 +36,13 @@ import { auditApi, type AuditLogEntry } from '../services/audit.api';
  * servicio.
  */
 
-const ACCIONES: Record<string, string> = {
+/**
+ * Se exporta para que la pantalla móvil (4e) nombre las acciones con ESTE mapa.
+ * Una copia acabaría mostrando el código crudo —`DRAFT_GENERATED`— el día que
+ * se añada una acción y solo se actualice una de las dos listas, y el registro
+ * de auditoría es justo donde eso no puede pasar.
+ */
+export const ACCIONES: Record<string, string> = {
   DRAFT_GENERATED: 'Generó escrito',
   TRANSCRIPTION_CREATED: 'Transcribió',
   TRANSCRIPTION_DELETED: 'Eliminó transcripción',

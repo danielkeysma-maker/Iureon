@@ -28,6 +28,7 @@ import { CatalogMobileView } from './modules/catalog/components/CatalogMobileVie
 import { TriageMobileView } from './modules/catalog/components/TriageMobileView';
 import { ToolsView } from './modules/tools/components/ToolsView';
 import { AuditView } from './modules/audit/components/AuditView';
+import { AuditMobileView } from './modules/audit/components/AuditMobileView';
 import { SubprocessorsView } from './modules/privacy/components/SubprocessorsView';
 import { ManualView } from './modules/help/components/ManualView';
 import { ManualMobileView } from './modules/help/components/ManualMobileView';
@@ -914,7 +915,22 @@ export function App() {
             </>
           )}
           {mainView === 'tools' && <ToolsView />}
-          {mainView === 'audit' && <AuditView />}
+          {/*
+            4e lo dice sin rodeos: «la tabla densa de auditoria no cabe en 390px
+            y NO SE INTENTA: se convierte en lista de eventos agrupada por dia».
+            Las columnas de escritorio suman 464px antes del recurso.
+          */}
+          {mainView === 'audit' && (
+            <div className="flex min-h-0 flex-1 lg:hidden">
+              <AuditMobileView />
+            </div>
+          )}
+
+          {mainView === 'audit' && (
+            <div className="hidden min-h-0 flex-1 lg:flex">
+              <AuditView />
+            </div>
+          )}
           {mainView === 'privacidad' && <SubprocessorsView />}
           {/*
             9d rehace el manual para el telefono: indice agrupado con filete,
