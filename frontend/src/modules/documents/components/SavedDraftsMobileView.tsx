@@ -1,5 +1,6 @@
 import React from 'react';
-import { PenLine, Search } from 'lucide-react';
+import { PenLine } from 'lucide-react';
+import { IconoBuscar } from '../../../design/ArtboardIcons';
 import {
   ETIQUETA_ESTADO,
   agruparPorTermino,
@@ -78,7 +79,7 @@ export const SavedDraftsMobileView: React.FC<SavedDraftsMobileViewProps> = ({
       */}
       <header className="shrink-0 border-b border-line-200 bg-surface px-4 py-3">
         <div className="relative">
-          <Search className="absolute left-3 top-[11px] h-3.5 w-3.5 text-ink-400" />
+          <IconoBuscar className="pointer-events-none absolute left-3 top-[11px] h-3.5 w-3.5 text-ink-400" />
           <input
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}

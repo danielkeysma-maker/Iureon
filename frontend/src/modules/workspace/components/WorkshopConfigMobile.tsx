@@ -1,5 +1,10 @@
 import React from 'react';
-import { AlertTriangle, CalendarClock, CheckCircle2, ChevronDown, MinusCircle } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
+import {
+  IconoNoAplica,
+  IconoSinVerificar,
+  IconoVerificado
+} from '../../../design/ArtboardIcons';
 import { useBranchActuacionesState } from '../../catalog/hooks/useBranchActuaciones';
 import { useCatalogBranchesState } from '../../catalog/hooks/useCatalogBranches';
 import { BRANCH_LABELS } from '../../catalog/branchLabels';
@@ -67,9 +72,9 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
 
   const termino = elegida
     ? elegida.term.status === 'NO_CADUCA'
-      ? { texto: 'No caduca', Icono: MinusCircle, clase: 'text-ink-500' }
+      ? { texto: 'No caduca', Icono: IconoNoAplica, clase: 'text-ink-500' }
       : elegida.term.status === 'NO_VERIFICADO'
-      ? { texto: 'Término sin verificar', Icono: AlertTriangle, clase: 'text-unverified' }
+      ? { texto: 'Término sin verificar', Icono: IconoSinVerificar, clase: 'text-unverified' }
       : {
           /*
            * La primera frase del término y no el párrafo: varios son cuatro
@@ -77,7 +82,7 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
            * campo de instrucción fuera de la pantalla.
            */
           texto: (elegida.term.description ?? '').split(/(?<=\.)\s/)[0],
-          Icono: CalendarClock,
+          Icono: IconoVerificado,
           clase: 'text-ink-900'
         }
     : null;
@@ -191,7 +196,7 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
           </label>
 
           <p className="flex items-start gap-1.5 pt-1 text-[11px] leading-snug text-ink-500">
-            <CheckCircle2 className="mt-0.5 h-3 w-3 shrink-0 text-verified" />
+            <IconoVerificado className="mt-0.5 h-3 w-3 shrink-0 text-verified" />
             <span className="text-justify [text-wrap:pretty]">
               La actuación es la que trae el artículo y el término verificados. Sin ella el
               escrito se redacta sin respaldo del catálogo.

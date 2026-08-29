@@ -1,5 +1,6 @@
 import React from 'react';
-import { Check, Copy, FileDown, FileText, LogOut, Menu, ShieldCheck, X } from 'lucide-react';
+import { Copy, FileDown, FileText, LogOut, ShieldCheck, X } from 'lucide-react';
+import { IconoMenu, IconoPalomita } from '../../../design/ArtboardIcons';
 import { navModule } from '../navigation';
 import type { MainView } from '../types';
 import type { EstadoBorrador } from '../../documents/types';
@@ -117,7 +118,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
           aria-label="Acciones"
           className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[8px] border border-line-200 text-ink-700"
         >
-          <Menu className="h-4 w-4" />
+          <IconoMenu className="h-4 w-4" />
         </button>
       </header>
 
@@ -154,7 +155,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
                   */}
                   {onMarcarListo && estadoDelBorrador && estadoDelBorrador !== 'LISTO' && (
                     <Accion
-                      icono={<Check className="h-4 w-4" />}
+                      icono={<IconoPalomita className="h-4 w-4" />}
                       onClick={cerrarY(onMarcarListo)}
                       destacada
                     >

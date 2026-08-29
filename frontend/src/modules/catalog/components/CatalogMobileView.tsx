@@ -1,5 +1,11 @@
 import React from 'react';
-import { AlertTriangle, ArrowLeft, BadgeCheck, Loader2, Search } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import {
+  IconoBuscar,
+  IconoSinVerificar,
+  IconoVerificado,
+  IconoVolver
+} from '../../../design/ArtboardIcons';
 import { useCatalogCuration } from '../hooks/useCatalogCuration';
 import { VerificationForm } from './VerificationForm';
 import { ActuacionDetail } from './ActuacionDetail';
@@ -76,7 +82,7 @@ export const CatalogMobileView: React.FC = () => {
           onClick={() => setAbierta(null)}
           className="sticky top-0 z-10 flex min-h-[44px] shrink-0 items-center gap-2 border-b border-line-200 bg-surface px-4 text-[13px] font-semibold text-ink-700"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <IconoVolver className="h-4 w-4" />
           Catálogo
         </button>
 
@@ -110,7 +116,7 @@ export const CatalogMobileView: React.FC = () => {
       {/* El titulo y el censo los pone `MobileHeader`: una sola cabecera (4d). */}
       <header className="shrink-0 border-b border-line-200 bg-surface px-4 py-3">
         <div className="relative">
-          <Search className="absolute left-3 top-[11px] h-3.5 w-3.5 text-ink-400" />
+          <IconoBuscar className="pointer-events-none absolute left-3 top-[11px] h-3.5 w-3.5 text-ink-400" />
           <input
             value={curation.query}
             onChange={(e) => curation.setQuery(e.target.value)}
@@ -203,13 +209,13 @@ export const CatalogMobileView: React.FC = () => {
 
                       {a.verification ? (
                         <p className="mt-1.5 flex items-center gap-1 text-[11px] text-verified">
-                          <BadgeCheck className="h-3 w-3 shrink-0" />
+                          <IconoVerificado className="h-3 w-3 shrink-0" />
                           Verificada por {a.verification.verifiedBy}
                         </p>
                       ) : (
                         sinVerificar && (
                           <p className="mt-1.5 flex items-center gap-1 text-[11px] font-semibold text-unverified">
-                            <AlertTriangle className="h-3 w-3 shrink-0" />
+                            <IconoSinVerificar className="h-3 w-3 shrink-0" />
                             Verificar contra la norma
                           </p>
                         )

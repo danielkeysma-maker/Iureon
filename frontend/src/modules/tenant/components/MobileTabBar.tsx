@@ -1,5 +1,11 @@
 import React from 'react';
-import { Compass, FileText, MoreHorizontal, Mic } from 'lucide-react';
+import {
+  IconoDocumento,
+  IconoMas,
+  IconoMicrofono,
+  IconoOrientar,
+  type IconoProps
+} from '../../../design/ArtboardIcons';
 import { NAV_MODULES } from '../navigation';
 import type { MainView } from '../types';
 
@@ -36,22 +42,25 @@ import type { MainView } from '../types';
  *
  * ─── LOS ÍCONOS SON LOS DE LA MAQUETA ───────────────────────────────────────
  *
- * Documento, brújula, micrófono y TRES PUNTOS. El cuarto no es una cuadrícula:
- * en el HTML son tres círculos en fila. Parece un detalle y no lo es — la
- * cuadrícula promete una parrilla de aplicaciones y los puntos prometen «hay
- * más de lo mismo», que es lo que de verdad hay detrás.
+ * NO son equivalentes «parecidos» de una libreria: son los trazos del HTML,
+ * en `design/ArtboardIcons.tsx`. La diferencia cambia el significado — la
+ * maqueta pone una BOMBILLA en «Orientar» y aqui habia una brujula. Una brujula
+ * dice «ubiquese»; una bombilla dice «aqui se le ocurre que hacer», que es lo
+ * que hace Orientacion. Y el cuarto son TRES CIRCULOS en fila, no una
+ * cuadricula: la cuadricula promete una parrilla de aplicaciones.
  */
 
 interface Destino {
   id: MainView;
   etiqueta: string;
-  Icono: typeof FileText;
+  Icono: React.FC<IconoProps>;
 }
 
 const DESTINOS: readonly Destino[] = [
-  { id: 'workspace', etiqueta: 'Redactar', Icono: FileText },
-  { id: 'orientacion', etiqueta: 'Orientar', Icono: Compass },
-  { id: 'entrevistas', etiqueta: 'Grabar', Icono: Mic }
+  { id: 'workspace', etiqueta: 'Redactar', Icono: IconoDocumento },
+  /* BOMBILLA, no brujula: es el trazo del artboard y dice otra cosa. */
+  { id: 'orientacion', etiqueta: 'Orientar', Icono: IconoOrientar },
+  { id: 'entrevistas', etiqueta: 'Grabar', Icono: IconoMicrofono }
 ];
 
 /** Lo que queda, en el orden de la barra lateral. Audiencias primero. */
@@ -68,7 +77,7 @@ interface MobileTabBarProps {
 
 /** 62px de alto con `padding:0 4px 8px`, más el área segura del sistema. */
 const Destino: React.FC<{
-  Icono: typeof FileText;
+  Icono: React.FC<IconoProps>;
   etiqueta: string;
   activo: boolean;
   onClick: () => void;
@@ -125,7 +134,7 @@ export const MobileTabBar: React.FC<MobileTabBarProps> = ({
       ))}
 
       <Destino
-        Icono={MoreHorizontal}
+        Icono={IconoMas}
         etiqueta="Más"
         activo={masAbierto || enMas}
         onClick={onAbrirMas}
