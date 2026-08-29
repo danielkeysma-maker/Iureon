@@ -122,7 +122,7 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({
           <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
             Término
           </p>
-          <p className="mt-0.5 text-[11.5px] font-medium leading-snug text-ink-900">
+          <p className="mt-0.5 text-justify text-[11.5px] font-medium leading-snug text-ink-900 [text-wrap:pretty]">
             {actuacion.term.status === 'NO_CADUCA'
               ? 'No caduca'
               : actuacion.term.description
@@ -140,7 +140,7 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({
           <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
             Norma
           </p>
-          <p className="mt-0.5 text-[11.5px] font-medium leading-snug text-ink-900">
+          <p className="mt-0.5 text-justify text-[11.5px] font-medium leading-snug text-ink-900 [text-wrap:pretty]">
             {actuacion.legalBasis || 'Sin artículo'}
           </p>
           {actuacion.sourceUrl ? (
@@ -161,7 +161,7 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({
           <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
             Autoridad
           </p>
-          <p className="mt-0.5 text-[11.5px] font-medium leading-snug text-ink-900">
+          <p className="mt-0.5 text-justify text-[11.5px] font-medium leading-snug text-ink-900 [text-wrap:pretty]">
             {actuacion.competentAuthority ?? 'No registrada'}
           </p>
           <span className={`mt-1 inline-block ${actuacion.competentAuthority ? 'chip-neutral' : 'chip-unverified'}`}>
@@ -172,7 +172,7 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({
 
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
         {actuacion.verification && (
-          <div className="rounded-control border border-line-200 bg-brand-50 px-3 py-2.5 text-[11px] text-brand-700 leading-snug">
+          <div className="rounded-control border border-line-200 bg-brand-50 px-3 py-2.5 text-justify text-[11px] leading-snug text-brand-700 [text-wrap:pretty]">
             Verificada por <strong>{actuacion.verification.verifiedBy}</strong> el{' '}
             {new Date(actuacion.verification.verifiedAt).toLocaleDateString('es-CO')}. El catálogo base
             decía: <em>{actuacion.verification.replaced.description ?? 'término no verificado'}</em>.
@@ -209,7 +209,7 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({
                   />
                   <span className="min-w-0">
                     <span className="block text-[12px] font-semibold text-ink-900">{option.label}</span>
-                    <span className="block text-[11px] text-ink-500 leading-snug">{option.help}</span>
+                    <span className="block text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">{option.help}</span>
                   </span>
                 </label>
               );
@@ -243,7 +243,7 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({
                 placeholder="https://www.suin-juriscol.gov.co/..."
                 className="w-full text-[12px] border border-line-200 rounded-control px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-700/20 focus:border-brand-700"
               />
-              <p className="text-[10px] text-ink-500 mt-1 leading-snug">
+              <p className="mt-1 text-justify text-[10px] leading-snug text-ink-500 [text-wrap:pretty]">
                 Obligatoria. Sin fuente no es una verificación, es una afirmación.
               </p>
             </div>
@@ -273,7 +273,7 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({
             onChange={(e) => setVerifiedBy(e.target.value)}
             className="w-full text-[12px] border border-line-200 rounded-control px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-700/20 focus:border-brand-700"
           />
-          <p className="text-[10px] text-ink-500 mt-1 leading-snug">
+          <p className="mt-1 text-justify text-[10px] leading-snug text-ink-500 [text-wrap:pretty]">
             Queda registrado: toda afirmación sobre un término es atribuible.
           </p>
         </div>

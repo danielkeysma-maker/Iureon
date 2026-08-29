@@ -74,7 +74,7 @@ export const CatalogCurationView: React.FC = () => {
               </span>
             </p>
           </div>
-          <p className="text-[11px] text-ink-500 mt-1 leading-snug max-w-2xl">
+          <p className="mt-1 max-w-2xl text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
             Lo que verifiques aquí queda para toda la firma y la aplicación lo usará en cada
             redacción. Se verifica una vez, no documento por documento.
           </p>
@@ -204,11 +204,11 @@ export const CatalogCurationView: React.FC = () => {
                         <p className="text-[12px] font-semibold text-ink-900 leading-tight">
                           {actuacion.exactName}
                         </p>
-                        <p className="text-[11px] text-ink-500 mt-0.5 leading-tight">
+                        <p className="mt-0.5 text-justify text-[11px] leading-tight text-ink-500 [text-wrap:pretty]">
                           {actuacion.legalBasis}
                         </p>
                         {actuacion.term.description && (
-                          <p className="text-[11px] text-ink-500 mt-1 leading-snug">
+                          <p className="mt-1 text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
                             {actuacion.term.description}
                           </p>
                         )}

@@ -119,7 +119,7 @@ export const LegalSearchGlossaryModal: React.FC<LegalSearchGlossaryModalProps> =
           {!isLoading && items.length === 0 && (
             <div className="bg-amber-50/60 border border-amber-200/70 rounded-card p-5 flex items-start gap-3">
               <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-              <p className="text-[13px] text-amber-900 leading-relaxed">
+              <p className="text-justify text-[13px] leading-relaxed text-amber-900 [text-wrap:pretty]">
                 {reason ?? 'No hay términos verificados que coincidan con la búsqueda.'}
               </p>
             </div>
@@ -135,7 +135,7 @@ export const LegalSearchGlossaryModal: React.FC<LegalSearchGlossaryModalProps> =
                   </span>
                 </div>
 
-                <p className="text-[12px] text-ink-500 leading-relaxed">{item.definition}</p>
+                <p className="text-justify text-[12px] leading-relaxed text-ink-500 [text-wrap:pretty]">{item.definition}</p>
 
                 <div className="flex items-center justify-between pt-1.5 border-t border-line-100">
                   <span className="text-[11px] text-ink-500 font-medium truncate pr-2">
