@@ -1,6 +1,7 @@
 import { config } from '../../config/env.config';
 import { fetchOfficialRuling, parseCitation } from './officialRuling.service';
 import { discoverCsjRulings } from './csjRuling.service';
+import { discoverConsejoEstadoRulings } from './consejoEstadoRuling.service';
 import type { OfficialRuling } from './officialRuling.service';
 
 /**
@@ -147,6 +148,22 @@ const citationsIn = (hit: SearchHit): string[] => {
  * Se busca en las dos EN PARALELO: son independientes, y esperarlas en fila
  * sumaría al abogado el peor de los dos tiempos por nada.
  */
+/**
+ * El Consejo de Estado, por el enlace permanente de SAMAI.
+ *
+ * Cierra el hueco que el aviso de la pantalla venía declarando: hasta ahora lo
+ * CONTENCIOSO ADMINISTRATIVO —nulidad y restablecimiento, contractual,
+ * reparación directa, electoral— quedaba fuera del descubrimiento por tema.
+ */
+const descubrirEnElConsejo = async (topic: string) => {
+  try {
+    return await discoverConsejoEstadoRulings(topic);
+  } catch {
+    /* Igual que la Suprema: una corporación caída no tumba a las otras dos. */
+    return [];
+  }
+};
+
 const descubrirEnLaSuprema = async (topic: string) => {
   try {
     return await discoverCsjRulings(topic);
@@ -169,19 +186,24 @@ export const discoverRulings = async (topic: string): Promise<DiscoveryResult> =
      * consulta: el descubrimiento entero dependía de una llave que solo hace
      * falta para la constitucional.
      */
-    const suprema = await descubrirEnLaSuprema(topic);
+    const [suprema, consejo] = await Promise.all([
+      descubrirEnLaSuprema(topic),
+      descubrirEnElConsejo(topic)
+    ]);
+
+    const sinLlave = [
+      ...suprema.map((d) => ({ ruling: d.ruling, motivo: `Corte Suprema · Sala ${d.corpus}` })),
+      ...consejo.map((d) => ({ ruling: d.ruling, motivo: `Consejo de Estado · ${d.seccion}` }))
+    ];
 
     return {
-      status: suprema.length > 0 ? 'OK' : 'NO_PROVIDER',
-      found: suprema.map((d) => ({
-        ruling: d.ruling,
-        motivo: `Corte Suprema · Sala ${d.corpus}`
-      })),
+      status: sinLlave.length > 0 ? 'OK' : 'NO_PROVIDER',
+      found: sinLlave,
       descartadas: [],
       reason:
-        suprema.length > 0
+        sinLlave.length > 0
           ? undefined
-          : 'El descubrimiento en la relatoría de la Corte Constitucional no está configurado, y la Corte Suprema no devolvió nada para este tema.'
+          : 'El descubrimiento en la relatoría de la Corte Constitucional no está configurado, y ni la Corte Suprema ni el Consejo de Estado devolvieron nada para este tema.'
     };
   }
 
@@ -189,18 +211,23 @@ export const discoverRulings = async (topic: string): Promise<DiscoveryResult> =
    * LAS DOS CORPORACIONES A LA VEZ. `Promise.all` y no una tras otra: son
    * consultas independientes a servidores distintos.
    */
-  const [hitsResultado, suprema] = await Promise.all([
+  /*
+   * LAS TRES CORPORACIONES A LA VEZ. Cada una es un servidor distinto; en fila
+   * el abogado esperaria la suma de las tres y no la mas lenta.
+   */
+  const [hitsResultado, suprema, consejo] = await Promise.all([
     searchOfficialDomain(topic).then(
       (h) => ({ ok: true as const, hits: h }),
       (error: Error) => ({ ok: false as const, error })
     ),
-    descubrirEnLaSuprema(topic)
+    descubrirEnLaSuprema(topic),
+    descubrirEnElConsejo(topic)
   ]);
 
-  const deLaSuprema: DiscoveredRuling[] = suprema.map((d) => ({
-    ruling: d.ruling,
-    motivo: `Corte Suprema · Sala ${d.corpus}`
-  }));
+  const deLasOtras: DiscoveredRuling[] = [
+    ...suprema.map((d) => ({ ruling: d.ruling, motivo: `Corte Suprema · Sala ${d.corpus}` })),
+    ...consejo.map((d) => ({ ruling: d.ruling, motivo: `Consejo de Estado · ${d.seccion}` }))
+  ];
 
   if (!hitsResultado.ok) {
     /*
@@ -208,12 +235,12 @@ export const discoverRulings = async (topic: string): Promise<DiscoveryResult> =
      * Devolver FAILED con las manos vacías tirando dos sentencias reales seria
      * castigar al abogado por una avería que no es suya.
      */
-    if (deLaSuprema.length > 0) {
+    if (deLasOtras.length > 0) {
       return {
         status: 'OK',
-        found: deLaSuprema,
+        found: deLasOtras,
         descartadas: [],
-        reason: `El buscador de la relatoría constitucional no respondió (${hitsResultado.error.message}); esto viene de la Corte Suprema.`
+        reason: `El buscador de la relatoría constitucional no respondió (${hitsResultado.error.message}); esto viene de la Corte Suprema y del Consejo de Estado.`
       };
     }
 
@@ -268,5 +295,5 @@ export const discoverRulings = async (topic: string): Promise<DiscoveryResult> =
    * Estado y lo segundo viene directo de la corporacion. Ambas son oficiales;
    * el orden refleja por cuantas puertas paso cada una.
    */
-  return { status: 'OK', found: [...found, ...deLaSuprema], descartadas };
+  return { status: 'OK', found: [...found, ...deLasOtras], descartadas };
 };

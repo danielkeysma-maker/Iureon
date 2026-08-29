@@ -28,7 +28,7 @@ import { readFileSync } from 'node:fs';
  * lado peligroso: un check de red tratado como determinista pone el gate rojo
  * por causas ajenas.
  */
-const CON_RED = new Set(['csj', 'discovery', 'ruling', 'triage', 'retrieval', 'conceptos', 'precedent']);
+const CON_RED = new Set(['csj', 'consejo', 'discovery', 'ruling', 'triage', 'retrieval', 'conceptos', 'precedent']);
 
 /** Descarga ~600 MB de ONNX. Nunca en un run ordinario. */
 const NUNCA = new Set(['embeddings']);

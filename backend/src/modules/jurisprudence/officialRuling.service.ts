@@ -39,7 +39,17 @@ export interface Citation {
 }
 
 /** Las corporaciones que este módulo sabe leer, cada una con su lector. */
-export type Corporacion = 'CORTE_CONSTITUCIONAL' | 'CORTE_SUPREMA' | 'COMISION_DISCIPLINA';
+export type Corporacion =
+  | 'CORTE_CONSTITUCIONAL'
+  | 'CORTE_SUPREMA'
+  /*
+   * SIN «DE», y no es un descuido: el corpus ya archiva bajo `CONSEJO_ESTADO`
+   * (`ingestion/types.ts`). Escribir `CONSEJO_DE_ESTADO` aqui partiria la misma
+   * corporacion en dos etiquetas, y el filtro del buscador mostraria la mitad
+   * de sus providencias segun de donde hubieran entrado.
+   */
+  | 'CONSEJO_ESTADO'
+  | 'COMISION_DISCIPLINA';
 
 export interface OfficialRuling {
   /*

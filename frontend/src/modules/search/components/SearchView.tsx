@@ -589,9 +589,9 @@ export const SearchView: React.FC = () => {
                 El registro oficial tampoco tiene nada para esta consulta
               </p>
               <p className="mt-0.5 text-justify [text-wrap:pretty]">
-                Se buscó en la relatoría de la Corte Constitucional y en el buscador de la
-                Corte Suprema —sus salas Civil, Laboral, Penal y de Tutelas— y ninguna
-                candidata pasó la verificación contra el registro oficial
+                Se buscó en la relatoría de la Corte Constitucional, en el buscador de la
+                Corte Suprema —Civil, Laboral, Penal y Tutelas— y en la relatoría del
+                Consejo de Estado, y ninguna candidata pasó la verificación
                 {discovery.descartadas.length > 0
                   ? `: ${discovery.descartadas.length} propuesta${
                       discovery.descartadas.length === 1 ? '' : 's'
@@ -600,14 +600,14 @@ export const SearchView: React.FC = () => {
                     }.`
                   : '.'}{' '}
                 {/*
-                  ESTE AVISO DECIA ANTES QUE EL ASUNTO «probablemente no vive en esa
-                  relatoria» PORQUE SOLO SE CONSULTABA UNA. Era cierto y ya no lo es: la
-                  Suprema se pregunta aparte, por su propio buscador. Lo que queda fuera
-                  es lo CONTENCIOSO ADMINISTRATIVO — el Consejo de Estado no tiene aun
-                  lector oficial en este producto, y decirlo es mas util que callarlo.
+                  ESTE AVISO HA CAMBIADO DOS VECES, y las dos por lo mismo: declaraba un
+                  hueco que se fue cerrando. Primero decia que el asunto «probablemente no
+                  vive en esa relatoria» porque solo se consultaba la constitucional;
+                  luego que lo contencioso administrativo quedaba fuera. Hoy las tres
+                  altas corporaciones responden.
                 */}
-                Lo contencioso administrativo queda fuera: el Consejo de Estado todavía no
-                tiene lector oficial aquí.
+                Las tres altas corporaciones respondieron. Si el asunto es de un tribunal o
+                un juzgado, no vive en ninguna de sus relatorías.
               </p>
             </div>
           )}

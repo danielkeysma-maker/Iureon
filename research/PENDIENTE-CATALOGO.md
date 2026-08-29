@@ -1420,3 +1420,61 @@ hasta ir a redactar, y para entonces el término lleva días corriendo.
 cuentan, **el guion de la segunda debería saber qué se respondió en la primera**.
 Preguntar dos veces la misma fecha no es solo torpe: le dice al cliente que no se
 le prestó atención. No existe hoy.
+
+
+---
+
+## 21. El Consejo de Estado, y el descubrimiento cerrado — 29 de agosto
+
+Las tres altas corporaciones responden ya al descubrimiento por tema. El aviso
+de la pantalla ha cambiado **dos veces**, y las dos porque declaraba un hueco que
+se fue cerrando: primero «probablemente no vive en esa relatoría», luego «lo
+contencioso administrativo queda fuera».
+
+### La puerta buena no era el formulario
+
+SAMAI es ASP.NET WebForms: su buscador exige `__VIEWSTATE` y `__EVENTVALIDATION`
+**validados contra la cookie de sesión** — el primer intento devolvió
+`Validation of viewstate MAC failed`. Mantener una secuencia GET-tokens + POST se
+rompería en cada despliegue del Consejo.
+
+Pero la página de resultados publica un **enlace permanente** con la consulta en
+la URL, pensado para compartir búsquedas:
+
+    ResultadoBuscadorProvidenciasTituladas.aspx?BusquedaDictionary={…json…}
+
+GET, sin cookies ni tokens, mismos 40 radicados que el formulario, **y es el que
+el Consejo mismo ofrece copiar** — la interfaz con menos razones para cambiar.
+
+### El defecto que destapó VERIFICAR, no leer
+
+Al comprobar que los enlaces resolvieran:
+
+    cita publicada:  20001-23-39-003-2014-00294-01
+    proceso real:    05001233100020090151903
+
+Se tomaba **el primer radicado que apareciera en el bloque**, y el extracto de la
+relatoría **cita otras providencias — es su oficio**. La ficha salía con la cita
+de una y el enlace de otra. **Una cita que apunta a otra sentencia es
+indistinguible de una correcta hasta que alguien la abre**, y para entonces está
+en un escrito radicado.
+
+Se lee del campo `Núm. del proceso`, y `check:consejo` lo cruza contra el `guid`
+de su propia URL — el único cruce que no se satisface por casualidad.
+
+### Otras tres decisiones
+
+- **Orden por relevancia, no por fecha.** Con `FechaProvidencia desc` —lo que
+  copia la página— «servidumbre de tránsito» devolvía una nulidad electoral: la
+  más reciente que mencionaba las palabras, no la que trata del asunto.
+- **El texto es el EXTRACTO de la relatoría, no la providencia entera**, y así se
+  rotula: entregarlo como texto íntegro invitaría a citar «la sentencia dice»
+  sobre un resumen. El fallo completo está a un salto, en la página del proceso.
+- **`CONSEJO_ESTADO`, sin «DE»**, porque es la etiqueta que el corpus ya usa.
+  Otro nombre partiría la misma corporación en dos y el filtro mostraría la
+  mitad de sus providencias según de dónde hubieran entrado.
+
+### Lo que sigue fuera, y ahora sí es todo
+
+Tribunales y juzgados: sus providencias no viven en ninguna de las tres
+relatorías. El aviso lo dice con esas palabras.
