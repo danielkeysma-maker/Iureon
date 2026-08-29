@@ -21,6 +21,7 @@ import { DocumentCanvasRight } from './modules/workspace/components/DocumentCanv
 import { SearchView } from './modules/search/components/SearchView';
 import { TranscriptionView } from './modules/transcription/components/TranscriptionView';
 import { InterviewView } from './modules/clients/components/InterviewView';
+import { InterviewMobileView } from './modules/clients/components/InterviewMobileView';
 import { CatalogCurationView } from './modules/catalog/components/CatalogCurationView';
 import { CatalogMobileView } from './modules/catalog/components/CatalogMobileView';
 import { TriageMobileView } from './modules/catalog/components/TriageMobileView';
@@ -837,7 +838,22 @@ export function App() {
               }}
             />
           )}
+          {/*
+            EL MODULO QUE MAS GANA EN MOVIL, y lo dice el artboard: «el telefono
+            es la grabadora real». Una audiencia llega como archivo de 50 MB que
+            alguien sube despues; una entrevista ocurre con el cliente enfrente,
+            y el aparato sobre la mesa es este. Por eso el cronometro es el
+            elemento mas grande y por eso se avisa que sigue grabando con la
+            pantalla apagada. La grabadora y el consentimiento son COMPARTIDOS.
+          */}
           {mainView === 'entrevistas' && (
+            <div className="flex min-h-0 flex-1 lg:hidden">
+              <InterviewMobileView />
+            </div>
+          )}
+
+          {mainView === 'entrevistas' && (
+            <div className="hidden min-h-0 flex-1 lg:flex">
             <InterviewView
               /*
                * De escuchar a escribir sin volver a teclear.
@@ -855,6 +871,7 @@ export function App() {
                 setMainView('workspace');
               }}
             />
+            </div>
           )}
           {mainView === 'search' && <SearchView />}
           {/*

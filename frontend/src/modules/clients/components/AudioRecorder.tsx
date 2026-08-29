@@ -5,6 +5,17 @@ interface AudioRecorderProps {
   /** Called with the finished recording, ready to transcribe. */
   onRecorded: (file: File) => void;
   disabled?: boolean;
+  /**
+   * La piel. UNA sola grabadora con dos presentaciones, nunca dos grabadoras.
+   *
+   * `MediaRecorder`, los permisos del micrófono, el formato y el cronómetro son
+   * la parte delicada de este módulo: una segunda copia para el teléfono
+   * significaría dos sitios donde arreglar el día que un navegador cambie de
+   * códec. La móvil (4d) solo cambia el TAMAÑO y la disposición — el
+   * cronómetro pasa a ser el elemento más grande de la pantalla, porque el
+   * teléfono es la grabadora real y de pie eso es lo único que se mira.
+   */
+  variante?: 'escritorio' | 'movil';
 }
 
 /**
@@ -41,7 +52,11 @@ const pickMimeType = (): string | undefined => {
   return candidates.find((type) => MediaRecorder.isTypeSupported(type));
 };
 
-export const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecorded, disabled }) => {
+export const AudioRecorder: React.FC<AudioRecorderProps> = ({
+  onRecorded,
+  disabled,
+  variante = 'escritorio'
+}) => {
   const [grabando, setGrabando] = React.useState(false);
   const [segundos, setSegundos] = React.useState(0);
   const [error, setError] = React.useState('');
@@ -186,7 +201,48 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecorded, disabl
         </div>
       )}
 
-      {grabando ? (
+      {grabando && variante === 'movil' ? (
+        /*
+          LA BANDA DE 4d, CITADA: padding 10px 12px, fondo #FBEDEB —el rojo del
+          sistema al 8%—, borde #E5C6C2, radio 8; punto de 9px, «GRABANDO» en
+          mono versales con tracking .07em, y el cronómetro en `600 16px MONO`
+          alineado a la derecha. Es el dato más grande de la pantalla.
+        */
+        <div className="space-y-2.5">
+          <div className="flex items-center gap-2 rounded-[8px] border border-[rgb(var(--danger-line))] bg-[rgb(var(--danger)/0.08)] px-3 py-2.5">
+            <span className="h-[9px] w-[9px] shrink-0 rounded-full bg-danger" />
+            <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.07em] text-danger">
+              Grabando
+            </span>
+            <span className="ml-auto font-mono text-[16px] font-semibold text-ink-900">
+              {formatElapsed(segundos)}
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={detener}
+            className="flex h-[52px] w-full items-center justify-center gap-2 rounded-[8px] bg-danger text-[13.5px] font-semibold text-white"
+          >
+            <Square className="h-4 w-4 fill-current" />
+            Detener y transcribir
+          </button>
+
+          <p className="text-center font-mono text-[11px] text-ink-400">
+            Sigue grabando con la pantalla apagada
+          </p>
+        </div>
+      ) : !grabando && variante === 'movil' ? (
+        <button
+          type="button"
+          onClick={() => void empezar()}
+          disabled={disabled}
+          className="flex h-[52px] w-full items-center justify-center gap-2 rounded-[8px] bg-brand-700 text-[13.5px] font-semibold text-white disabled:opacity-50"
+        >
+          <Mic className="h-4 w-4 text-on-brand" />
+          Grabar la entrevista
+        </button>
+      ) : grabando ? (
         <div className="flex items-center gap-3">
           <span className="relative flex h-3 w-3 shrink-0">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[rgb(var(--danger)/0.06)]0 opacity-75" />

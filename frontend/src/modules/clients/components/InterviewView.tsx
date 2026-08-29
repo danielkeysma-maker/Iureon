@@ -1,6 +1,7 @@
 import React from 'react';
 import { AlertTriangle, ArrowLeft, Copy, CheckCircle2, FileText, PenLine, Upload } from 'lucide-react';
 import { useTranscription } from '../../transcription/hooks/useTranscription';
+import { useAutorizacionDeGrabacion } from '../useAutorizacionDeGrabacion';
 import { TranscriptSegments } from '../../transcription/components/TranscriptSegments';
 import { EntrevistasList } from './EntrevistasList';
 import { CerrarEntrevistaDialog } from './CerrarEntrevistaDialog';
@@ -123,8 +124,13 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
    * viaja con la transcripcion a transcriptions.autorizo_grabacion_el — la
    * constancia demostrable que la Ley 1581 exige.
    */
-  const [autorizado, setAutorizado] = React.useState(false);
-  const [autorizadoEl, setAutorizadoEl] = React.useState<string | null>(null);
+  /*
+   * LA AUTORIZACION VIVE EN SU PROPIO GANCHO, compartida con la pantalla movil
+   * (4d). Dos copias de un consentimiento se desincronizan sin hacer ruido: una
+   * guarda la hora y la otra la olvida, y el dia que alguien pida la constancia
+   * solo existe para la mitad de las entrevistas.
+   */
+  const { autorizado, autorizadoEl, marcar: marcarAutorizacion } = useAutorizacionDeGrabacion();
   const [cerrarAbierto, setCerrarAbierto] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
 
@@ -343,11 +349,8 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
                   <input
                     type="checkbox"
                     checked={autorizado}
-                    onChange={(e) => {
-                      setAutorizado(e.target.checked);
-                      // La hora del CLIC: el consentimiento ocurrio aqui, no al subir.
-                      setAutorizadoEl(e.target.checked ? new Date().toISOString() : null);
-                    }}
+                    /* La hora del CLIC la sella el gancho, no esta pantalla. */
+                    onChange={(e) => marcarAutorizacion(e.target.checked)}
                     className="mt-0.5"
                   />
                   <span className="min-w-0">
