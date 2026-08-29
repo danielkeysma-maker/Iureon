@@ -137,7 +137,7 @@ export const CatalogMobileView: React.FC = () => {
           onClick={() => curation.setBranchFilter('TODAS')}
           className={`min-h-[32px] shrink-0 rounded-full px-3 text-[11.5px] font-semibold ${
             curation.branchFilter === 'TODAS'
-              ? 'bg-brand-700 text-white'
+              ? 'bg-brand-700 text-on-brand'
               : 'bg-canvas text-ink-500'
           }`}
         >
@@ -149,7 +149,7 @@ export const CatalogMobileView: React.FC = () => {
             type="button"
             onClick={() => curation.setBranchFilter(b)}
             className={`min-h-[32px] shrink-0 rounded-full px-3 text-[11.5px] font-semibold ${
-              curation.branchFilter === b ? 'bg-brand-700 text-white' : 'bg-canvas text-ink-500'
+              curation.branchFilter === b ? 'bg-brand-700 text-on-brand' : 'bg-canvas text-ink-500'
             }`}
           >
             {BRANCH_LABELS[b] ?? b}

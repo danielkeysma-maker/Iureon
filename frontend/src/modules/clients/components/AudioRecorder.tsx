@@ -61,10 +61,24 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
   const [segundos, setSegundos] = React.useState(0);
   const [error, setError] = React.useState('');
   const [listo, setListo] = React.useState<{ file: File; url: string } | null>(null);
+  const [pausado, setPausado] = React.useState(false);
+  /*
+   * NIVELES MEDIDOS DE VERDAD, no una animacion.
+   *
+   * Se dijo antes que la onda de 4d no se podia pintar porque `MediaRecorder`
+   * entrega trozos de audio y no amplitud. Eso es cierto de `MediaRecorder` y
+   * FALSO del navegador: el mismo `MediaStream` se conecta a un `AnalyserNode`
+   * de Web Audio, que devuelve el dominio del tiempo y de ahi sale el volumen
+   * real (RMS). La onda mide; no adorna.
+   */
+  const [niveles, setNiveles] = React.useState<number[]>([]);
 
   const recorderRef = React.useRef<MediaRecorder | null>(null);
   const chunksRef = React.useRef<Blob[]>([]);
   const streamRef = React.useRef<MediaStream | null>(null);
+  const audioCtxRef = React.useRef<AudioContext | null>(null);
+  const analyserRef = React.useRef<AnalyserNode | null>(null);
+  const rafRef = React.useRef<number | null>(null);
 
   /*
    * The microphone is released when this unmounts, and the preview URL revoked.
@@ -81,12 +95,18 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     [listo]
   );
 
+  /*
+   * EL CRONOMETRO SE DETIENE EN PAUSA. Si siguiera corriendo, el numero dejaria
+   * de ser la duracion de la grabacion y pasaria a ser el tiempo transcurrido
+   * desde que se empezo — dos cosas distintas, y la que importa para un acta es
+   * la primera.
+   */
   React.useEffect(() => {
-    if (!grabando) return;
+    if (!grabando || pausado) return;
 
     const id = window.setInterval(() => setSegundos((s) => s + 1), 1000);
     return () => window.clearInterval(id);
-  }, [grabando]);
+  }, [grabando, pausado]);
 
   const empezar = async () => {
     setError('');
@@ -110,6 +130,47 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
       streamRef.current = stream;
       chunksRef.current = [];
 
+      /*
+       * EL MEDIDOR DE NIVEL, sobre el MISMO stream que graba. `AnalyserNode`
+       * con `fftSize` pequeño basta: no hace falta espectro, solo el volumen
+       * instantaneo. Se guardan las ultimas 25 muestras porque son las que
+       * caben en los 26px de alto que pide 4d, y se toma una cada 100ms — mas
+       * seguido no se distingue y gasta bateria en un telefono que ademas esta
+       * grabando.
+       */
+      const AudioCtx =
+        window.AudioContext ??
+        (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+
+      if (AudioCtx) {
+        const ctx = new AudioCtx();
+        const fuente = ctx.createMediaStreamSource(stream);
+        const analizador = ctx.createAnalyser();
+        analizador.fftSize = 256;
+        fuente.connect(analizador);
+        audioCtxRef.current = ctx;
+        analyserRef.current = analizador;
+
+        const datos = new Uint8Array(analizador.frequencyBinCount);
+        let ultima = 0;
+
+        const medir = (t: number) => {
+          rafRef.current = requestAnimationFrame(medir);
+          if (t - ultima < 100) return;
+          ultima = t;
+
+          analizador.getByteTimeDomainData(datos);
+          /* RMS sobre la onda centrada en 128: la desviacion ES el volumen. */
+          let suma = 0;
+          for (const v of datos) suma += (v - 128) ** 2;
+          const rms = Math.sqrt(suma / datos.length) / 128;
+
+          setNiveles((previos) => [...previos, Math.min(1, rms * 3)].slice(-25));
+        };
+
+        rafRef.current = requestAnimationFrame(medir);
+      }
+
       const mimeType = pickMimeType();
       const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
 
@@ -128,6 +189,14 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
         setListo({ file, url: URL.createObjectURL(blob) });
         streamRef.current?.getTracks().forEach((track) => track.stop());
         streamRef.current = null;
+        /* El medidor se suelta con el microfono: un `AudioContext` vivo sigue
+           consumiendo, y en un telefono eso es bateria por nada. */
+        if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+        void audioCtxRef.current?.close();
+        audioCtxRef.current = null;
+        analyserRef.current = null;
+        setNiveles([]);
       };
 
       // A timeslice so a long interview does not sit as one growing buffer the
@@ -149,6 +218,33 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     recorderRef.current?.stop();
     recorderRef.current = null;
     setGrabando(false);
+    setPausado(false);
+  };
+
+  /*
+   * PAUSAR Y REANUDAR PRODUCEN UN SOLO ARCHIVO.
+   *
+   * Se dijo antes que no se podia porque «detener y reanudar produce dos
+   * archivos que nadie une». Eso describe `stop()` + `start()`, no `pause()`:
+   * `MediaRecorder.pause()` SUSPENDE la misma grabacion y `resume()` la
+   * continua sobre los mismos trozos, asi que `onstop` sigue armando un unico
+   * blob. La entrevista no se parte.
+   *
+   * El microfono se deja ABIERTO durante la pausa a proposito: cerrarlo pediria
+   * permiso otra vez al reanudar en algunos navegadores, y una entrevista que
+   * se interrumpe para pedir permiso ya no es una pausa.
+   */
+  const alternarPausa = () => {
+    const r = recorderRef.current;
+    if (!r) return;
+
+    if (r.state === 'recording') {
+      r.pause();
+      setPausado(true);
+    } else if (r.state === 'paused') {
+      r.resume();
+      setPausado(false);
+    }
   };
 
   const descartar = () => {
@@ -184,7 +280,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
           type="button"
           onClick={() => onRecorded(listo.file)}
           disabled={disabled}
-          className="w-full py-2 bg-brand-700 hover:bg-brand-800 disabled:opacity-50 text-white rounded-control text-[11px] font-semibold"
+          className="w-full py-2 bg-brand-700 hover:bg-brand-800 disabled:opacity-50 text-on-brand rounded-control text-[11px] font-semibold"
         >
           Transcribir esta entrevista
         </button>
@@ -210,23 +306,69 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
         */
         <div className="space-y-2.5">
           <div className="flex items-center gap-2 rounded-[8px] border border-[rgb(var(--danger-line))] bg-[rgb(var(--danger)/0.08)] px-3 py-2.5">
-            <span className="h-[9px] w-[9px] shrink-0 rounded-full bg-danger" />
-            <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.07em] text-danger">
-              Grabando
+            <span
+              className={`h-[9px] w-[9px] shrink-0 rounded-full ${
+                pausado ? 'bg-ink-400' : 'bg-danger'
+              }`}
+            />
+            <span
+              className={`font-mono text-[11px] font-semibold uppercase tracking-[0.07em] ${
+                pausado ? 'text-ink-500' : 'text-danger'
+              }`}
+            >
+              {pausado ? 'En pausa' : 'Grabando'}
             </span>
             <span className="ml-auto font-mono text-[16px] font-semibold text-ink-900">
               {formatElapsed(segundos)}
             </span>
           </div>
 
-          <button
-            type="button"
-            onClick={detener}
-            className="flex h-[52px] w-full items-center justify-center gap-2 rounded-[8px] bg-danger text-[13.5px] font-semibold text-white"
-          >
-            <Square className="h-4 w-4 fill-current" />
-            Detener y transcribir
-          </button>
+          {/*
+            LA ONDA DE 4d: `height:26px`, barras de 3px con 2px de separacion,
+            las pasadas en gris `#CFD6E0` —el token `neutral-line`— y las
+            recientes en rojo. Cada barra es una medida REAL de volumen (RMS del
+            `AnalyserNode`), tomada cada 100ms.
+
+            EN PAUSA SE QUEDA QUIETA Y EN GRIS, que es lo unico honesto: una onda
+            moviendose mientras no se graba diria que sigue capturando.
+          */}
+          <div className="flex h-[26px] items-center gap-[2px]" aria-hidden="true">
+            {niveles.map((nivel, i) => (
+              <span
+                key={i}
+                className={`w-[3px] shrink-0 rounded-[1px] ${
+                  pausado || i < niveles.length - 14 ? 'bg-neutral-line' : 'bg-danger'
+                }`}
+                style={{ height: `${Math.max(4, Math.round(nivel * 24))}px` }}
+              />
+            ))}
+            {niveles.length === 0 && (
+              <span className="font-mono text-[11px] text-ink-400">Escuchando…</span>
+            )}
+          </div>
+
+          {/*
+            LOS TRES CONTROLES DE 4d: el circulo rojo de 52px que detiene,
+            «Pausar» y «Cerrar y usar». Aqui los dos primeros — cerrar pertenece
+            a la pantalla, que es la que sabe si hay transcrito.
+          */}
+          <div className="flex gap-[9px]">
+            <button
+              type="button"
+              onClick={detener}
+              aria-label="Detener y transcribir"
+              className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full bg-danger text-white"
+            >
+              <Square className="h-[18px] w-[18px] fill-current" />
+            </button>
+            <button
+              type="button"
+              onClick={alternarPausa}
+              className="h-[52px] flex-1 rounded-[8px] border border-line-200 bg-canvas text-[13.5px] font-medium text-ink-700"
+            >
+              {pausado ? 'Reanudar' : 'Pausar'}
+            </button>
+          </div>
 
           <p className="text-center font-mono text-[11px] text-ink-400">
             Sigue grabando con la pantalla apagada
@@ -237,7 +379,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
           type="button"
           onClick={() => void empezar()}
           disabled={disabled}
-          className="flex h-[52px] w-full items-center justify-center gap-2 rounded-[8px] bg-brand-700 text-[13.5px] font-semibold text-white disabled:opacity-50"
+          className="flex h-[52px] w-full items-center justify-center gap-2 rounded-[8px] bg-brand-700 text-[13.5px] font-semibold text-on-brand disabled:opacity-50"
         >
           <Mic className="h-4 w-4 text-on-brand" />
           Grabar la entrevista
@@ -268,7 +410,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
           type="button"
           onClick={() => void empezar()}
           disabled={disabled}
-          className="w-full py-3 bg-brand-700 hover:bg-brand-800 disabled:opacity-50 text-white rounded-card text-xs font-bold flex items-center justify-center gap-2"
+          className="w-full py-3 bg-brand-700 hover:bg-brand-800 disabled:opacity-50 text-on-brand rounded-card text-xs font-bold flex items-center justify-center gap-2"
         >
           <Mic className="w-4 h-4 text-on-brand" />
           Grabar la entrevista

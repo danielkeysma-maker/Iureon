@@ -286,7 +286,7 @@ export const TriageMobileView: React.FC<TriageMobileViewProps> = ({ onDraft }) =
                       onClick={() => onDraft(a.exactName, a.branch, hechos.trim())}
                       className={`mt-[11px] h-11 w-full rounded-[6px] text-[13.5px] ${
                         esPrimario
-                          ? 'bg-brand-700 font-semibold text-white'
+                          ? 'bg-brand-700 font-semibold text-on-brand'
                           : 'border border-brand-line bg-surface font-medium text-brand-700'
                       }`}
                     >

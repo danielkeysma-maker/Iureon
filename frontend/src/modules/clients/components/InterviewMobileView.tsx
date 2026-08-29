@@ -40,19 +40,27 @@ import { IconoDocumento, IconoSinVerificar } from '../../../design/ArtboardIcons
  *
  * ─── LO QUE EL ARTBOARD PIDE Y AQUÍ NO ESTÁ, con la razón ───────────────────
  *
- * · La ONDA DE SONIDO (barras de 3px, gris lo pasado y rojo lo actual). Es un
- *   medidor de nivel, y este grabador no expone el volumen: `MediaRecorder`
- *   entrega trozos de audio, no amplitud. Pintar barras animadas al azar sería
- *   un adorno que finge medir algo — en la pantalla donde lo que importa es
- *   saber si de verdad está grabando. El punto rojo y el cronómetro corriendo
- *   dicen la verdad; una onda inventada diría más y sabría menos.
- * · «Pausar». `MediaRecorder` tiene `pause()`, pero el resto del canal no:
- *   detener y reanudar produce dos archivos que hoy nadie une, y el segundo
- *   llegaría sin la primera mitad de la entrevista.
  * · «Asignar Voz 3 → familiar» sobre la intervención en curso. La asignación de
  *   roles existe y funciona, pero DESPUÉS de transcribir: durante la grabación
  *   no hay intervenciones todavía, porque la transcripción ocurre al terminar.
  *   La maqueta dibuja un producto que transcribe en vivo, y este no lo hace.
+ *
+ * ─── DOS AUSENCIAS QUE SE DECLARARON Y ERAN FALSAS ──────────────────────────
+ *
+ * Aquí se dijo que la ONDA no se podía pintar «porque `MediaRecorder` entrega
+ * trozos de audio, no amplitud», y que PAUSAR partiría la entrevista en dos
+ * archivos. Las dos afirmaciones eran mías y las dos eran incorrectas:
+ *
+ * · La amplitud no la da `MediaRecorder`, la da el navegador. El mismo
+ *   `MediaStream` se conecta a un `AnalyserNode` de Web Audio y el RMS del
+ *   dominio del tiempo ES el volumen. La onda ahora mide de verdad.
+ * · `pause()` no es `stop()`. Suspende la MISMA grabación y `resume()` la
+ *   continúa sobre los mismos trozos, así que `onstop` sigue armando un único
+ *   blob. La entrevista no se parte.
+ *
+ * Queda escrito porque el error tiene forma reconocible: **confundir el límite
+ * de una API con el límite de la plataforma**. Antes de declarar que algo no se
+ * puede, hay que preguntarse si lo que no puede es esa pieza o el navegador.
  */
 
 interface InterviewMobileViewProps {
@@ -360,7 +368,7 @@ export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
             type="button"
             onClick={() => setCerrarAbierto(true)}
             disabled={!transcriptionId}
-            className="h-[52px] w-full rounded-[8px] bg-brand-700 text-[13.5px] font-semibold text-white disabled:opacity-50"
+            className="h-[52px] w-full rounded-[8px] bg-brand-700 text-[13.5px] font-semibold text-on-brand disabled:opacity-50"
           >
             Cerrar y usar
           </button>
