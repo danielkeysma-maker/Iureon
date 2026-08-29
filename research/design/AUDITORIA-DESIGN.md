@@ -86,3 +86,46 @@ pantallas marcadas VIEJA**: se comprobó que `AuditView`, `ToolsView` y `FirmBra
 el mismo vocabulario de tokens que las pantallas fieles (`bg-canvas`, `border-line`, `text-ink-*`).
 Lo que falta en ellas es **layout y funciones**, que es justo lo que enumeran sus columnas.
 Leer «VIEJA» como «hay que repintarla» llevaría a rehacer lo que ya está bien.
+
+---
+
+## ⚠ CORRECCIÓN DE FONDO — 28 de agosto de 2026
+
+**Este documento quedó obsoleto en todo su primer bloque de trabajo, y llegó a
+inducir a error.** El 28 de agosto se verificó componente por componente, y
+TODAS las pantallas que la tabla marcaba VIEJA con datos existentes ya estaban
+reconstruidas:
+
+| Fila que decía VIEJA | Realidad medida |
+|---|---|
+| 1k Saldo y recarga | `BalancePanel.tsx` — diálogo L, traduce el saldo a «≈N escritos» con el costo medio REAL de la firma, y declara sus omisiones (IVA, factura electrónica). |
+| 2b Auditoría | `AuditView.tsx` — cita el artboard y declara por qué omite «accesos fallidos» y la columna «Resultado». |
+| 2c Privacidad | `SubprocessorsView.tsx` — con el encabezado oscuro razonado: es la única pantalla pensada para leerse frente a un cliente. |
+| 2d Herramientas | `ToolsView.tsx` — cita el artboard y explica que cada herramienta faltante exige una fuente oficial conectada. |
+| 3d Marca de la firma | `FirmBrandingModal.tsx` — formulario L con previsualización sobre un escrito real, que es exactamente lo que pedía la fila. |
+| 5b Liquidación laboral | `LaborSettlementModal.tsx` — diálogo tipo 3, con el fundamento de cada concepto. |
+| 6c Gestión de la firma | `FirmUsersDialog.tsx` — corregido arriba. |
+| 7a Consola de operación | `OperatorConsoleDialog.tsx` — corregido arriba. |
+| 9a Manual · 9b Soporte | `ManualView.tsx` y `SupportView.tsx` existen. |
+
+**CÓMO RECONOCER UNA PANTALLA RECONSTRUIDA SIN CONFIAR EN ESTA TABLA**, que es
+la lección: las fieles citan su artboard en el docblock y traen una sección
+«LO QUE EL ARTBOARD PIDE Y AQUÍ NO ESTÁ, con la razón». Ese encabezado es la
+firma del método — nadie escribe las razones de sus omisiones sin haber
+comparado contra el artboard. Buscarlo con `grep -i artboard` dice la verdad;
+esta tabla, no necesariamente.
+
+### Lo que SÍ falta, medido el 28 de agosto
+
+- **7b Ficha de la firma** — no existe componente. Backend listo.
+- **8a Acceso de soporte** — no existe. Exige permisos temporales auditados.
+- **8b Catálogo maestro** — no existe.
+- **Móvil** (4d/4e/5c/5d/8d/9d/10c/11c/12c) — pendiente, y por diseño va al final.
+- Las **PARCIALES** (1f, 1g, 1h, 1i, 5a, 6b) siguen siendo parciales: les falta
+  layout o backend concreto, no reconstrucción entera. Sus columnas lo detallan.
+- **Facturación electrónica** — no es pantalla: integración con proveedor
+  autorizado por la DIAN.
+
+**Regla para la próxima vez: antes de planear sobre esta tabla, verificar contra
+el código.** Una auditoría con fecha envejece más rápido que el código que
+audita, y planear sobre ella cuesta rehacer lo que ya está hecho.
