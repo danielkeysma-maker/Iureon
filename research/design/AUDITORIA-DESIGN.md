@@ -129,3 +129,32 @@ esta tabla, no necesariamente.
 **Regla para la próxima vez: antes de planear sobre esta tabla, verificar contra
 el código.** Una auditoría con fecha envejece más rápido que el código que
 audita, y planear sobre ella cuesta rehacer lo que ya está hecho.
+
+---
+
+# ⚠ SEGUNDA CORRECCIÓN DE FONDO — 28 de agosto de 2026, tarde
+
+**Este documento volvió a desviarme, y esta vez cinco veces seguidas.**
+
+Su lista de «pantallas parciales» —1f Orientación, 1g Audiencia detalle,
+1h Buscador, 5a Visor, 6b Ajustes— se midió hoy contra el código, una por una.
+**Cuatro de las cinco ya estaban hechas**, y varias con exactamente el mismo
+razonamiento que yo habría aplicado:
+
+| Pantalla | Estado real medido |
+|---|---|
+| **1f Orientación** | **COMPLETA.** `TriageView` ordena por término más corto (no por confianza del modelo), limita a seis, tiene un solo primario, la tarjeta sin verificar cambia de textura y su acción principal es «Verificar y catalogar», y el vacío trae sus tres preguntas y sus tres salidas. **Declara además por qué no pinta el «Vence &lt;fecha&gt;»**: calcularlo exige saber desde cuándo corre el término, y eso no está en unos hechos en prosa. |
+| **1h Buscador** | **COMPLETA.** Dos bloques con encabezado propio, el automático en menor contraste, filete de cita punteado y sin botón de citar. |
+| **5a Visor** | Era la única con hueco real, y **no estaba en la pantalla sino en el motor**: resolvía la ficha del catálogo y la descartaba al responder. Cerrado hoy (sección 14 de `PENDIENTE-CATALOGO.md`). |
+| **6b Ajustes** | **EXISTE.** `SettingsView` con sus cuatro entradas; «Documento y formato» es la sección de formato del mismo diálogo de marca, y la única marcada pendiente es «Plan y facturación», que depende de la facturación electrónica. |
+| **1g Audiencia** | **EXISTE**, repartida en `TranscriptSegments`, `AudioPreview` y `RoleProposals`. |
+
+## La regla, ahora sin excusa
+
+**No planear sobre este documento. Abrir el artboard y medir el componente.**
+
+Y una corrección a la señal que yo mismo escribí esta mañana: dije que «las
+pantallas fieles citan su artboard en el docblock». Es **asimétrica**. Que lo
+citen sí prueba que alguien comparó; **que no lo citen no prueba nada** —
+`SearchView` es fiel y no lo menciona, porque se construyó antes de la
+convención. Un `grep` no sustituye la lectura.
