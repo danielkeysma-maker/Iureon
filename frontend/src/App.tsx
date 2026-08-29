@@ -466,7 +466,23 @@ export function App() {
       pueda dejar fuera de su campo de vision. Empuja el contenido en vez de
       flotar sobre el — lo que tapa se aprende a ignorar.
     */}
-    <div className="flex h-screen flex-col bg-slate-100 font-sans overflow-hidden">
+    {/*
+      ALTURA: `h-screen` ES 100vh, Y EN UN TELEFONO 100vh NO ES LA PANTALLA.
+      Los navegadores moviles miden 100vh contra la ventana SIN la barra de
+      direcciones, asi que la aplicacion queda mas alta que el area visible y
+      todo lo anclado abajo —la barra de navegacion— cae fuera de la pantalla.
+      Ese es el defecto que se reporto como «no se ve ningun menu»: la barra
+      existia, se pintaba, y estaba debajo del borde inferior.
+
+      `100dvh` mide el viewport DINAMICO, el que de verdad se ve en cada momento.
+
+      Y VA SOLO, SIN `h-screen` DE RESPALDO. Se intento dejar los dos y se midio
+      el CSS compilado: Tailwind emite `.h-screen` DESPUES de `.h-[100dvh]`, asi
+      que el respaldo ganaba la cascada y anulaba el arreglo — el orden dentro
+      del atributo no decide nada. Un respaldo que pisa a lo que respalda es
+      peor que ninguno, porque parece que el defecto sigue sin causa.
+    */}
+    <div className="flex h-[100dvh] flex-col overflow-hidden bg-slate-100 font-sans">
       {isAuthenticated && (
         <SupportAccessBanner
           key={refrescoSoporte}

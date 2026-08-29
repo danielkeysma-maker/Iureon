@@ -171,7 +171,18 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
       La solución es que los controles se ENCOJAN: cada uno trunca su texto y el
       nombre completo vive en su `title` y en la lista.
     */
-    <div className="flex h-[42px] shrink-0 items-center gap-2 border-b border-line-200 bg-surface px-5">
+    /*
+      EN MOVIL LA FILA SE DESPLAZA DENTRO DE SI MISMA, no ensancha la pagina.
+      Son selectores de ancho fijo —170, 150, 110px— que a 375px suman mas que
+      la pantalla; sin contenerlos, el desbordamiento se lo comia el documento y
+      la aplicacion entera se leia «como en PC y cortada».
+
+      PENDIENTE DECLARADO: 4d no quiere esta barra desplazandose sino COMPRIMIDA
+      EN DOS CHIPS con el termino y la fecha de vencimiento visibles en 390px.
+      Eso es rehacer la barra, no contenerla; mientras tanto esto evita que rompa
+      el resto, que es un defecto distinto y peor.
+    */
+    <div className="flex h-[42px] shrink-0 items-center gap-2 overflow-x-auto border-b border-line-200 bg-surface px-5 lg:overflow-x-visible">
       <span className="shrink-0 font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
         Este escrito
       </span>
