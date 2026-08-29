@@ -52,13 +52,14 @@ VIEJA (diseño anterior intacto) · NO EXISTE (Design la inventó; no hay nada).
 | 3d Marca de la firma | **VIEJA** | rediseñar como formulario L con previsualización sobre papel real. Los campos ya existen. |
 | 6a Apariencia | **FIEL** | tema / fuente / densidad con vista previa, prefs en backend. |
 | 6b Ajustes · Documento y formato | **PARCIAL** | falta la estructura «Suyos / De la firma» y la sección de tipografía del escrito sobre papel. |
-| 6c Gestión de la firma | **VIEJA (modal)** | Design la hace pantalla: usuarios, invitaciones, roles (quién cura, quién gasta saldo). Backend de roles existe en parte. |
+| 6c Gestión de la firma | **FIEL (diálogo L)** | `FirmUsersDialog`: usuarios reales de Supabase Auth, consumo del mes por usuario, roles con imposición en el servidor. Las omisiones —roles «Dependiente judicial» y «Contabilidad», tope de gasto, segundo factor, invitaciones con expiración— están declaradas en el propio componente: cada una es backend propio y no se pintan interruptores muertos. **28 ago: se descubrió que el superusuario NO la veía** — un `if` sobre un correo literal en `App.tsx` lo mandaba al cascarón viejo. Corregido: la bifurcación es por el rol de la sesión. |
 
 ## Lo que Design inventó y no existe (evaluación)
 
 | Artboard | Qué es | Veredicto propuesto |
 |---|---|---|
-| 7a/7b Consola de operación | Firmas con salud de catálogo y saldo como columnas; ficha con lo que operación **no** puede ver | **TOMAR** — es la pantalla del superusuario; runway y billing ya existen en backend. |
+| 7a Consola de operación | Firmas con salud de catálogo y saldo como columnas | **HECHA (28 ago).** `OperatorConsole` ya existía con tokens y datos reales de `adminApi`, pero vivía **escondida como una pestaña** dentro del modal obsoleto. Ahora tiene puerta propia: `OperatorConsoleDialog`. Con el cascarón se fueron `TenantUserManagementModal`, `FirmsTab`, `UsersTab`, `LoginTab` y dos hooks huérfanos. |
+| 7b Ficha de la firma | Acciones de operación sobre UNA firma, y lo que operación no puede ver ni hacer | **PENDIENTE, y es la siguiente de este frente.** El backend existe; falta la pantalla. |
 | 8a Acceso de soporte | Autorización explícita, alcance, 1 hora, aviso permanente, revocación | **TOMAR con calma** — excelente práctica y argumento de venta, pero exige backend serio (permisos temporales auditados). No improvisar. |
 | 8b Catálogo maestro | Publicación a las firmas sin pisar lo curado | El **modelo** ya es real (catálogo compartido + curaduría por firma). La pantalla de operación: EVALUAR después de 7a. |
 | 9a Manual de uso | Por tarea real, con estado de lectura | **EVALUAR** — valioso, pero es contenido más que software; puede empezar como estático. |
@@ -75,3 +76,13 @@ VIEJA (diseño anterior intacto) · NO EXISTE (Design la inventó; no hay nada).
 4. **Nuevas grandes**: 7a/7b consola de operación · 8a acceso de soporte · 9a/9b.
 5. **Facturación electrónica** (pedido expreso): emitir factura a nombre de la firma por cada recarga, al correo de facturación. Exige integración con un proveedor tecnológico autorizado DIAN — es obra de backend con proveedor externo, no una pantalla. Cuando exista, el checkout de Saldo anuncia la factura (la línea ya quedó escrita en el artboard 1k y hoy se omite a propósito).
 6. **Móvil**, todo junto, al final.
+
+---
+
+## Nota de actualización — 28 de agosto de 2026
+
+Las filas de 6c y 7a/7b se corrigieron ese día. **La paleta no es el problema en ninguna de las
+pantallas marcadas VIEJA**: se comprobó que `AuditView`, `ToolsView` y `FirmBrandingModal` ya usan
+el mismo vocabulario de tokens que las pantallas fieles (`bg-canvas`, `border-line`, `text-ink-*`).
+Lo que falta en ellas es **layout y funciones**, que es justo lo que enumeran sus columnas.
+Leer «VIEJA» como «hay que repintarla» llevaría a rehacer lo que ya está bien.
