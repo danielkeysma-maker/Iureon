@@ -1,4 +1,9 @@
 import { httpClient } from '../../config/httpClient';
+import type {
+  EstadoDeAcceso,
+  SupportAccess,
+  SupportAccessView
+} from '../support/support.api';
 
 /**
  * The operator console's client.
@@ -68,6 +73,27 @@ export const adminApi = {
    * Una firma, entera. El endpoint existia desde hace tiempo y NADIE lo
    * llamaba, que es por lo que la ficha 7b no podia existir.
    */
+  /*
+   * Acceso de soporte (8a), lado operacion. `solicitarSoporte` NO abre nada:
+   * crea una pregunta que solo un socio de la firma puede responder, y el
+   * servidor rechaza una segunda solicitud mientras la primera siga sin
+   * respuesta. Por eso el nombre dice «solicitar» y no «acceder».
+   */
+  solicitarSoporte: (
+    firmId: string,
+    input: { motive: string; scope: string; durationMinutes: number }
+  ) =>
+    httpClient
+      .post<{ acceso: SupportAccess }>(`/api/admin/firms/${firmId}/support-access`, { body: input })
+      .then((r) => r.acceso),
+
+  soporteDeFirma: (firmId: string) =>
+    httpClient.get<{
+      estado: EstadoDeAcceso;
+      historial: SupportAccess[];
+      lecturas: SupportAccessView[];
+    }>(`/api/admin/firms/${firmId}/support-access`),
+
   firmDetail: (firmId: string) =>
     httpClient.get<{ firm: FirmDetail }>(`/api/admin/firms/${firmId}`).then((r) => r.firm),
 

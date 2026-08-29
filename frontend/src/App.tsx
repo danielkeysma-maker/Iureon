@@ -4,6 +4,9 @@ import { billingApi } from './modules/billing/billing.api';
 import { BalancePanel } from './modules/billing/components/BalancePanel';
 import { clearSession, readSession, saveSession, type Session } from './modules/auth/session';
 import { SidebarLeft } from './modules/tenant/components/SidebarLeft';
+import { SupportAccessBanner } from './modules/support/components/SupportAccessBanner';
+import { SupportAccessDecisionDialog } from './modules/support/components/SupportAccessDecisionDialog';
+import type { SupportAccess } from './modules/support/support.api';
 import { HeaderTop } from './modules/tenant/components/HeaderTop';
 import type { LawFirmTenant } from './modules/tenant/types';
 import { TenantProvider } from './modules/tenant/TenantContext';
@@ -102,6 +105,15 @@ export function App() {
    * bundle no concede ningun poder — solo cambia lo que se pinta.
    */
   const esSuperusuario = session?.user.role === 'SUPER_ADMIN';
+  const esSocio = session?.user.role === 'FIRM_ADMIN';
+  /*
+   * La solicitud que el socio esta leyendo. La guarda `App` y no la franja
+   * porque el dialogo tiene que sobrevivir a que la franja cambie de estado:
+   * al autorizar, la solicitud deja de estar pendiente y la franja se repinta,
+   * y un dialogo montado dentro de ella desapareceria a media transicion.
+   */
+  const [solicitudAbierta, setSolicitudAbierta] = useState<SupportAccess | null>(null);
+  const [refrescoSoporte, setRefrescoSoporte] = useState(0);
 
   /*
    * The module survives a RELOAD, and only a reload.
@@ -424,7 +436,22 @@ export function App() {
 
   return (
     <TenantProvider activeFirm={activeFirm} currentUserEmail={currentUserEmail}>
-    <div className="flex h-screen bg-slate-100 font-sans overflow-hidden">
+    {/*
+      LA FRANJA DE SOPORTE CRUZA TODA LA APLICACION, y por eso la raiz pasa a
+      ser una columna: dentro del contenedor horizontal quedaria a un lado del
+      menu o encima del area de trabajo, y el artboard pide una banda que nadie
+      pueda dejar fuera de su campo de vision. Empuja el contenido en vez de
+      flotar sobre el — lo que tapa se aprende a ignorar.
+    */}
+    <div className="flex h-screen flex-col bg-slate-100 font-sans overflow-hidden">
+      {isAuthenticated && (
+        <SupportAccessBanner
+          key={refrescoSoporte}
+          puedeDecidir={Boolean(esSocio)}
+          onAbrirSolicitud={setSolicitudAbierta}
+        />
+      )}
+      <div className="flex min-h-0 flex-1 overflow-hidden">
       <FirmBrandingModal
         isOpen={isBrandingModalOpen}
         onClose={() => setIsBrandingModalOpen(false)}
@@ -698,6 +725,13 @@ export function App() {
           )}
         </main>
       </div>
+      </div>
+
+      <SupportAccessDecisionDialog
+        solicitud={solicitudAbierta}
+        onCerrar={() => setSolicitudAbierta(null)}
+        onDecidido={() => setRefrescoSoporte((n) => n + 1)}
+      />
     </div>
     </TenantProvider>
   );

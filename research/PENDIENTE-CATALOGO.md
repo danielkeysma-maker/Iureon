@@ -809,3 +809,64 @@ CPC (forma del edicto) · Decisión Andina 486 art. 170 (funcionpublica devolvi�
 abril de 2026 · Ley 270 de 1996 · estructura interna de la Supersociedades ·
 trámite y término del recurso de revisión arbitral · Ley 1801 arts. 205-222 ·
 procedimiento penal abreviado de la Ley 1826 de 2017.
+
+---
+
+## 10. Acceso de soporte (8a) — lo entregado y lo declarado — 28 de agosto de 2026
+
+**Entregado.** `supabase/migration-acceso-de-soporte.sql`, el servicio, el
+controlador y las rutas de ambos lados; en el frontend la franja permanente, el
+diálogo de decisión del socio y el formulario de solicitud de operación, con su
+botón en la ficha de firma (7b′, que hasta hoy figuraba como omisión razonada).
+
+**Lo que el artboard pide y NO está, con la razón:**
+
+> «El resumen final por correo llega siempre, incluso si la firma nunca abrió el
+> panel: la garantía no puede depender de que alguien estuviera mirando.»
+
+**No hay infraestructura de correo saliente en este backend.** No hay proveedor
+configurado, ni plantillas, ni cola. Ese correo NO se envía, y decirlo importa
+más que la ausencia misma: una garantía que se supone entregada es peor que una
+declarada pendiente, porque nadie la echa de menos.
+
+Lo que sí queda hoy, y es su equivalente consultable:
+
+- las cinco acciones (`SUPPORT_ACCESS_REQUESTED`, `AUTHORIZED`, `DENIED`,
+  `REVOKED`, `VIEWED`) en la auditoría **de la firma**, no en la de operación;
+- cada pantalla abierta, con su hora, escrita **por el servidor** en
+  `support_access_views` — el cliente de operación no puede omitirla;
+- todo ello sobrevive a la sesión, que es justo lo que el panel en vivo no hace.
+
+Cerrar el hueco de verdad exige un proveedor de correo transaccional. Es trabajo
+de infraestructura, no de esta pantalla.
+
+**Segunda omisión, menor:** el artboard menciona una vista de incidencias
+asociada a la sesión de soporte. No existe modelo de incidencias en el producto,
+así que no se pintó nada.
+
+---
+
+## 11. EN COLA — el descubrimiento solo verifica UNA relatoría
+
+Verificado en producción el 28 de agosto con la consulta «servidumbre de
+tránsito»: **Brave funciona** —devolvió 6 candidatas— y el verificador oficial
+las descartó todas, correctamente, porque ninguna existe en la relatoría de la
+Corte Constitucional.
+
+El límite está en tres capas de `backend/src/modules/jurisprudence/discovery.service.ts`:
+
+| Línea | Qué fija |
+|---|---|
+| 51 | `OFFICIAL_HOST = 'corteconstitucional.gov.co'` |
+| 69 | la consulta se restringe a `site:<ese host>/relatoria` |
+| 108 | el regex de citas solo reconoce `SU`, `C` y `T` |
+
+Consecuencia: **casación civil, laboral y penal, y todo lo contencioso
+administrativo, quedan fuera del descubrimiento.** El aviso de la pantalla ya lo
+confiesa; el hueco es real y no es un defecto de implementación — el módulo se
+construyó contra una sola corporación porque `fetchOfficialRuling` solo sabe
+confirmar contra ese registro.
+
+Ampliarlo significa **un verificador por corporación**. La pieza difícil ya
+existe para la Corte Suprema: su API GraphQL funciona y la usa `check:csj`. El
+Consejo de Estado está sin probar.

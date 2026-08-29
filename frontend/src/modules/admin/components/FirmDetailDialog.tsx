@@ -1,7 +1,8 @@
 import React from 'react';
-import { AlertCircle, RefreshCw, ShieldOff } from 'lucide-react';
+import { AlertCircle, KeyRound, RefreshCw, ShieldOff } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import { adminApi, type FirmDetail } from '../admin.api';
+import { RequestSupportAccessDialog } from './RequestSupportAccessDialog';
 
 /**
  * Ficha de la firma. Artboard 7b.
@@ -31,10 +32,11 @@ import { adminApi, type FirmDetail } from '../admin.api';
  *   tienen endpoint, y el artboard exige que CADA acción lleve motivo escrito.
  *   Pintar el botón antes que su motivo y su registro sería ofrecer un poder
  *   que no queda auditado.
- * · «Solicitar acceso de soporte» (7b′): es la 8a entera —autorización de un
- *   socio, alcance, duración máxima, aviso permanente y revocación—, y exige
- *   permisos temporales auditados en el backend. Un botón que hoy no pide
- *   permiso a nadie sería lo contrario de lo que la pantalla promete.
+ * · «Solicitar acceso de soporte» (7b′) YA ESTÁ, y llegó cuando existía lo que
+ *   le da sentido: la 8a entera —autorización de un socio, alcance, duración
+ *   del catálogo, franja permanente, registro de cada pantalla y revocación—.
+ *   Antes de eso el botón habría sido lo contrario de lo que promete: una
+ *   entrada que no le pide permiso a nadie.
  * · Pestañas «Plan y facturación», «Uso y consumo», «Incidencias»: no hay
  *   incidencias en el modelo, y lo de plan y consumo cabe entero en el resumen.
  */
@@ -94,6 +96,7 @@ export const FirmDetailDialog: React.FC<FirmDetailDialogProps> = ({ firmId, onCl
   const [firma, setFirma] = React.useState<FirmDetail | null>(null);
   const [cargando, setCargando] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [pidiendoAcceso, setPidiendoAcceso] = React.useState(false);
 
   React.useEffect(() => {
     if (!firmId) {
@@ -266,9 +269,29 @@ export const FirmDetailDialog: React.FC<FirmDetailDialogProps> = ({ firmId, onCl
               material, así que la pantalla no tendría qué mostrar aunque alguien lo pidiera. Es la
               misma promesa que Privacidad le hace al cliente de la firma.
             </p>
+
+            {/*
+              La única puerta, y está aquí a propósito: al final de la lista de
+              lo que operación NO puede ver. Quien llega a este botón acaba de
+              leer por qué existe el límite que va a pedir levantar.
+            */}
+            <button
+              type="button"
+              onClick={() => setPidiendoAcceso(true)}
+              className="btn-secondary mt-3 flex items-center gap-2"
+            >
+              <KeyRound className="h-4 w-4" />
+              Solicitar acceso de soporte
+            </button>
           </section>
         </div>
       )}
+
+      <RequestSupportAccessDialog
+        firmId={pidiendoAcceso ? firmId : null}
+        firmName={firma?.name ?? 'la firma'}
+        onCerrar={() => setPidiendoAcceso(false)}
+      />
     </Dialog>
   );
 };
