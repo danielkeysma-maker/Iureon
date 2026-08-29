@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   AlertTriangle,
-  ArrowLeft,
   BadgeCheck,
   CalendarClock,
   Infinity as InfinityIcon,
@@ -66,22 +65,13 @@ export const CatalogCurationView: React.FC = () => {
   return (
     <div className="flex-1 flex overflow-hidden bg-canvas">
       {/*
-        EN MOVIL SON DOS PANTALLAS, NO DOS COLUMNAS (5c). La lista y la ficha
-        conviven a partir de `lg`; por debajo, abrir una actuacion REEMPLAZA la
-        lista. Ponerlas lado a lado en 375px dejaba la lista en una franja de
-        texto cortado y la ficha fuera del borde derecho — que es exactamente lo
-        que se reporto como «pantallas recortadas».
-
-        No hay estado nuevo: `openActuacion` ya decide si hay ficha, y es la
-        misma condicion que en escritorio abre el panel. Un segundo estado para
-        lo mismo se desincronizaria el dia que algo cierre la ficha sin pasar
-        por aqui.
+        ESTA VISTA ES SOLO DE ESCRITORIO. El movil tiene la suya, `CatalogMobileView`
+        (artboard 5c), pensada desde cero y no derivada de esta: alli la tarjeta
+        lleva el termino y el articulo porque no hay panel lateral donde
+        mostrarlos. `App` monta una u otra; aqui no hay clases `lg:` que
+        mantener.
       */}
-      <section
-        className={`flex-1 flex-col overflow-hidden ${
-          openActuacion ? 'hidden lg:flex' : 'flex'
-        }`}
-      >
+      <section className="flex flex-1 flex-col overflow-hidden">
         <header className="px-6 py-4 border-b border-line-200 bg-surface">
           <div className="flex items-baseline gap-3 flex-wrap">
             <h1 className="text-base font-bold text-ink-900">Catálogo procesal</h1>
@@ -268,21 +258,7 @@ export const CatalogCurationView: React.FC = () => {
         pide y hoy no tiene donde guardarse.
       */}
       {openActuacion && (
-        <aside className="flex w-full shrink-0 flex-col overflow-y-auto border-line-200 bg-canvas lg:w-[460px] lg:border-l">
-          {/*
-            LA VUELTA A LA LISTA, solo en movil. En escritorio la lista sigue
-            visible al lado y este boton seria ruido; aqui es la unica salida,
-            porque la ficha ocupa la pantalla entera.
-          */}
-          <button
-            type="button"
-            onClick={() => setSelected(null)}
-            className="flex min-h-[44px] items-center gap-2 border-b border-line-200 px-4 text-[13px] font-semibold text-ink-700 lg:hidden"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Volver al catálogo
-          </button>
-
+        <aside className="flex w-[460px] shrink-0 flex-col overflow-y-auto border-l border-line-200 bg-canvas">
           <div className="border-b border-line-200 p-4">
             <ActuacionDetail actuacion={openActuacion} />
           </div>

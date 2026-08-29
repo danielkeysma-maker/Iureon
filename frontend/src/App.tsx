@@ -19,6 +19,7 @@ import { SearchView } from './modules/search/components/SearchView';
 import { TranscriptionView } from './modules/transcription/components/TranscriptionView';
 import { InterviewView } from './modules/clients/components/InterviewView';
 import { CatalogCurationView } from './modules/catalog/components/CatalogCurationView';
+import { CatalogMobileView } from './modules/catalog/components/CatalogMobileView';
 import { ToolsView } from './modules/tools/components/ToolsView';
 import { AuditView } from './modules/audit/components/AuditView';
 import { SubprocessorsView } from './modules/privacy/components/SubprocessorsView';
@@ -733,7 +734,24 @@ export function App() {
             />
           )}
           {mainView === 'search' && <SearchView />}
-          {mainView === 'catalogo' && <CatalogCurationView />}
+          {/*
+            DOS PANTALLAS DISTINTAS, NO UNA RESPONSIVA. Claude Design penso el
+            catalogo movil (5c) desde cero: la tarjeta lleva el termino en
+            grande y el articulo debajo, porque en el telefono no existe el
+            panel lateral donde el escritorio los muestra. Encoger la 1i habria
+            dado una lista de nombres sin plazo — lo contrario de lo que se
+            viene a consultar.
+          */}
+          {mainView === 'catalogo' && (
+            <>
+              <div className="hidden min-h-0 flex-1 lg:flex">
+                <CatalogCurationView />
+              </div>
+              <div className="flex min-h-0 flex-1 lg:hidden">
+                <CatalogMobileView />
+              </div>
+            </>
+          )}
           {mainView === 'tools' && <ToolsView />}
           {mainView === 'audit' && <AuditView />}
           {mainView === 'privacidad' && <SubprocessorsView />}
