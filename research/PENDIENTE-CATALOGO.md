@@ -870,3 +870,52 @@ confirmar contra ese registro.
 Ampliarlo significa **un verificador por corporación**. La pieza difícil ya
 existe para la Corte Suprema: su API GraphQL funciona y la usa `check:csj`. El
 Consejo de Estado está sin probar.
+
+---
+
+## 12. Catálogo maestro (8b) — lo entregado y las tres omisiones razonadas
+
+**Entregado.** `GET /api/admin/catalog-master` (bajo `requireSuperAdmin`) y
+`CatalogMasterDialog`, abierto desde la cabecera de la consola de operación —
+no desde una ficha de firma, porque el maestro no es un dato DE una firma.
+
+Muestra el censo real del maestro (total, ramas, transversales, verificadas, no
+caducan, sin verificar), el reparto por rama y por rol, y **el alcance de la
+curaduría de las firmas en CUENTAS**: cuántas firmas corrigieron algo, cuántas
+verificaciones hay, y las doce actuaciones que más firmas han corregido — que es
+una señal sobre el maestro, no sobre las firmas.
+
+**La línea de 2c se impone por la forma de la consulta, no por un aviso.** El
+servicio selecciona exactamente dos columnas de `catalog_verifications`:
+`firm_id` y `actuacion_id`. Ni `term_description`, ni `legal_basis`, ni `note`.
+Operación puede saber CUÁNTAS firmas tocaron una actuación; nunca QUÉ
+escribieron. Lo que no se lee no se puede filtrar por descuido.
+
+### Lo que el artboard pide y NO está, con la razón
+
+1. **«Norma derogada · 38».** El tipo `Actuacion` **no tiene campo de
+   derogatoria**. Ninguna ficha declara si su norma sigue viva, así que la cifra
+   no se puede calcular. Estimarla leyendo el texto del `legalBasis` daría un
+   número que se lee igual que uno medido. Se devuelve `null` y la pantalla dice
+   que no se sabe.
+2. **«Publicar cambios» y la propagación a las firmas.** El maestro es un
+   **artefacto de compilación**: `research/actuaciones-*.json` → `build-catalog.py`
+   → `data/*.ts` → paquete. No hay tabla que escribir en caliente, así que un
+   botón «Publicar» no propagaría nada — y el propio artboard llama a esa acción
+   la más peligrosa de toda la consola. Un botón peligroso que no hace nada
+   enseña a pulsarlo. **Cerrarlo de verdad es mover el maestro a base de datos**,
+   no añadir un endpoint.
+3. **«Propuestas de las firmas · 27».** No hay tabla ni flujo: hoy una firma no
+   puede ofrecer una actuación al maestro. La lista está **vacía por inexistente,
+   no por estar en cero**, y la diferencia importa.
+
+### La regla que gobernará la publicación cuando exista
+
+Queda escrita en el componente para que quien la construya no la redescubra:
+
+- Una derogatoria **no borra** la verificación de la firma: la reetiqueta como
+  «verificada contra norma derogada» y muestra el artículo equivalente al lado.
+  Es la misma solución del glosario (3b), aplicada al por mayor.
+- Su recíproca: publicar **nunca** marca como verificada una ficha que la firma
+  no verificó. Si el maestro pudiera conceder verificaciones, el sello dejaría de
+  significar «alguien de esta firma lo leyó».

@@ -1,7 +1,8 @@
 import React from 'react';
-import { AlertCircle, Building2, CreditCard, Plus, RefreshCw, ShieldCheck, Users } from 'lucide-react';
+import { AlertCircle, Building2, CreditCard, Plus, RefreshCw, ShieldCheck, Users, Library } from 'lucide-react';
 import { adminApi, type FirmSummary } from '../admin.api';
 import { FirmDetailDialog } from './FirmDetailDialog';
+import { CatalogMasterDialog } from './CatalogMasterDialog';
 
 /**
  * Running the platform: the firms on it, their plans, their balances.
@@ -34,6 +35,7 @@ const ESTADO_ESTILO: Record<string, string> = {
 export const OperatorConsole: React.FC = () => {
   const [firms, setFirms] = React.useState<FirmSummary[]>([]);
   const [fichaAbierta, setFichaAbierta] = React.useState<string | null>(null);
+  const [maestroAbierto, setMaestroAbierto] = React.useState(false);
   const [cargando, setCargando] = React.useState(true);
   const [error, setError] = React.useState('');
   const [creando, setCreando] = React.useState(false);
@@ -199,6 +201,18 @@ export const OperatorConsole: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
+          {/*
+            El maestro va en la cabecera de la lista de firmas y no dentro de
+            una ficha: no es un dato DE una firma, es la base que reciben todas.
+            Colgarlo de una firma sugeriria que se puede publicar desde ella.
+          */}
+          <button
+            onClick={() => setMaestroAbierto(true)}
+            className="px-3 py-1.5 bg-canvas hover:bg-line-100 text-ink-700 border border-line-200 rounded-control text-[11px] font-semibold flex items-center gap-1.5"
+          >
+            <Library className="w-3.5 h-3.5" />
+            Catálogo maestro
+          </button>
           <button
             onClick={() => void cargar()}
             className="px-3 py-1.5 bg-canvas hover:bg-line-100 text-ink-700 border border-line-200 rounded-control text-[11px] font-semibold flex items-center gap-1.5"
@@ -402,6 +416,7 @@ export const OperatorConsole: React.FC = () => {
       </p>
 
       <FirmDetailDialog firmId={fichaAbierta} onClose={() => setFichaAbierta(null)} />
+      <CatalogMasterDialog isOpen={maestroAbierto} onClose={() => setMaestroAbierto(false)} />
     </div>
   );
 };

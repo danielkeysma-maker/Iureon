@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { requireSuperAdmin } from './admin.middleware';
+import { catalogMasterController } from './catalogMaster.controller';
 import {
   anotarLecturaController,
   historialAccesoController,
@@ -35,6 +36,7 @@ const router = Router();
 
 router.use(requireSuperAdmin);
 
+router.get('/catalog-master', catalogMasterController as any);
 router.get('/runway', runwayController as any);
 router.get('/firms', listFirmsController as any);
 /*

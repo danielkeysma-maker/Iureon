@@ -31,6 +31,33 @@ export interface FirmSummary {
 }
 
 /** Una cuenta de la firma: quien es y cuanto gasto, nunca en que. */
+export interface ActuacionMasCurada {
+  actuacionId: string;
+  /** `null` cuando la firma curo algo que este paquete ya no trae. */
+  exactName: string | null;
+  firmas: number;
+}
+
+export interface CatalogoMaestro {
+  actuacionesBase: number;
+  conTerminoVerificado: number;
+  sinVerificar: number;
+  noCaduca: number;
+  transversales: number;
+  ramas: number;
+  reparticion: {
+    porRama: Array<{ branch: string; total: number }>;
+    porRol: Array<{ role: string; total: number }>;
+  };
+  /** Siempre `null`: el modelo no registra derogatorias. No se adivina. */
+  conNormaDerogada: null;
+  firmasQueCuraron: number;
+  verificacionesDeFirmas: number;
+  masCuradas: ActuacionMasCurada[];
+  propuestasDeFirmas: [];
+  cambiosPorPublicar: [];
+}
+
 export interface FirmUserDetail {
   id: string;
   email: string;
@@ -93,6 +120,16 @@ export const adminApi = {
       historial: SupportAccess[];
       lecturas: SupportAccessView[];
     }>(`/api/admin/firms/${firmId}/support-access`),
+
+  /*
+   * El catalogo maestro (8b). Lo que vuelve de la curaduria de las firmas son
+   * CUENTAS, nunca contenido: el servidor no selecciona una sola columna de
+   * texto escrito por un abogado de otra firma. Ver `catalogMaster.service.ts`.
+   */
+  catalogMaster: () =>
+    httpClient
+      .get<{ maestro: CatalogoMaestro }>('/api/admin/catalog-master')
+      .then((r) => r.maestro),
 
   firmDetail: (firmId: string) =>
     httpClient.get<{ firm: FirmDetail }>(`/api/admin/firms/${firmId}`).then((r) => r.firm),
