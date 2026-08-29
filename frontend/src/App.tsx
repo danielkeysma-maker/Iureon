@@ -3,9 +3,11 @@ import { httpClient, setSessionLostHandler } from './config/httpClient';
 import { billingApi } from './modules/billing/billing.api';
 import { BalancePanel } from './modules/billing/components/BalancePanel';
 import { clearSession, readSession, saveSession, type Session } from './modules/auth/session';
+import { sesionDeVistaPreviaLocal } from './modules/auth/vistaPreviaLocal';
 import { SidebarLeft } from './modules/tenant/components/SidebarLeft';
 import { MobileTabBar } from './modules/tenant/components/MobileTabBar';
 import { MobileWorkshopTabs, type VistaTaller } from './modules/workspace/components/MobileWorkshopTabs';
+import { WorkshopConfigMobile } from './modules/workspace/components/WorkshopConfigMobile';
 import { MobileMoreSheet } from './modules/tenant/components/MobileMoreSheet';
 import { SupportAccessBanner } from './modules/support/components/SupportAccessBanner';
 import { SupportAccessDecisionDialog } from './modules/support/components/SupportAccessDecisionDialog';
@@ -100,7 +102,12 @@ export function App() {
    * Now the browser holds a token it cannot forge. Everything below reads the
    * firm out of it.
    */
-  const [session, setSession] = useState(() => readSession());
+  /*
+   * `?vista=1` en desarrollo entra sin credenciales para MIRAR EL DISEÑO. Vite
+   * sustituye `import.meta.env.DEV` por `false` al compilar, asi que en el
+   * paquete publicado esa rama no existe. Ver `vistaPreviaLocal.ts`.
+   */
+  const [session, setSession] = useState(() => sesionDeVistaPreviaLocal() ?? readSession());
   const isAuthenticated = Boolean(session);
   const currentUserEmail = session?.user.email ?? '';
   /*
@@ -575,7 +582,17 @@ export function App() {
       )}
 
       {/* RIGHT MAIN WORKSPACE AREA */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden">
+      {/*
+        `min-w-0` NO ES DECORACION: es lo que impide que esta columna herede el
+        ancho de su contenido. Un item flex tiene `min-width: auto` por defecto,
+        asi que se niega a bajar del ancho minimo de sus hijos — la cabecera y
+        la barra de configuracion del taller piden 533px, y la columna se hacia
+        de 533 dentro de una pantalla de 375. La pagina NO desbordaba
+        (`scrollWidth` seguia en 375): el `overflow-hidden` de la raiz cortaba
+        los 158px sobrantes, y eso es lo que se veia como «se corta».
+        Medido en el navegador a 375x812, no deducido.
+      */}
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden h-full">
         <HeaderTop
           mainView={mainView}
           // El nombre del escrito, no una miga de pan. Sin borrador todavía se
@@ -601,7 +618,7 @@ export function App() {
           onLogout={handleLogout}
         />
 
-        <main className="flex-1 flex overflow-hidden">
+        <main className="flex min-w-0 flex-1 overflow-hidden">
           {mainView === 'workspace' && (
             /*
               LA BARRA ABARCA EL ANCHO COMPLETO, sobre el panel y sobre el
@@ -609,15 +626,35 @@ export function App() {
               contenedor se llevaba todo el ancho disponible y dejaba el lienzo
               del documento reducido a una franja en blanco.
             */
-            <div className="flex min-h-0 flex-1 flex-col">
-              <WorkshopConfigBar
-                userRole={userRole}
-                setUserRole={setUserRole}
-                legalBranch={workflow.legalBranch}
-                setLegalBranch={workflow.setLegalBranch}
-                documentType={workflow.documentType}
-                setDocumentType={workflow.setDocumentType}
-              />
+            <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+              {/*
+                DOS BARRAS DE CONFIGURACION, UNA POR TAMAÑO. La de escritorio son
+                tres selectores en fila; en 375px quedaban en «Fi… > … > El…» y
+                configurar dejaba de ser posible sin adivinar. 4d comprime la
+                configuracion en dos chips y pone en su lugar LA CONSECUENCIA:
+                la actuacion elegida con su termino, que es lo unico que hay que
+                poder leer antes de escribir.
+              */}
+              <div className="hidden lg:block">
+                <WorkshopConfigBar
+                  userRole={userRole}
+                  setUserRole={setUserRole}
+                  legalBranch={workflow.legalBranch}
+                  setLegalBranch={workflow.setLegalBranch}
+                  documentType={workflow.documentType}
+                  setDocumentType={workflow.setDocumentType}
+                />
+              </div>
+              <div className="lg:hidden">
+                <WorkshopConfigMobile
+                  userRole={userRole}
+                  setUserRole={setUserRole}
+                  legalBranch={workflow.legalBranch}
+                  setLegalBranch={workflow.setLegalBranch}
+                  documentType={workflow.documentType}
+                  setDocumentType={workflow.setDocumentType}
+                />
+              </div>
 
               {!workflow.isFocusMode && (
                 <MobileWorkshopTabs
@@ -627,7 +664,7 @@ export function App() {
                 />
               )}
 
-              <div className="flex min-h-0 flex-1">
+              <div className="flex min-h-0 min-w-0 flex-1">
               {!workflow.isFocusMode && (
                 <AgentPanelLeft
                   ocultoEnMovil={vistaTaller !== 'instruccion'}

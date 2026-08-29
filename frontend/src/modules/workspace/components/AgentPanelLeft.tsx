@@ -180,7 +180,7 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
       ancho en cada tamaño.
     */
     <section
-      className={`min-h-0 w-full shrink-0 flex-col border-r border-line-200 bg-surface lg:w-[364px] xl:w-[400px] ${
+      className={`min-h-0 w-full min-w-0 shrink-0 flex-col border-r border-line-200 bg-surface lg:w-[364px] xl:w-[400px] ${
         ocultoEnMovil ? 'hidden lg:flex' : 'flex'
       }`}
     >
@@ -192,7 +192,10 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
         <form onSubmit={generar} className="flex min-h-0 flex-1 flex-col overflow-y-auto p-4">
           <div className="flex items-baseline gap-2">
             <h2 className="text-subtitle text-ink-900">Qué debe hacer este escrito</h2>
-            <span className="ml-auto shrink-0 font-mono text-[11px] text-ink-400">⌘↵ generar</span>
+            {/* Un atajo de teclado en un telefono es ruido: no hay teclado que lo tenga. */}
+            <span className="ml-auto hidden shrink-0 font-mono text-[11px] text-ink-400 lg:inline">
+              ⌘↵ generar
+            </span>
           </div>
           <p className="mt-1 text-meta leading-[1.5] text-ink-500">
             Hechos, pretensiones, lo que quiere que sostenga. En lenguaje corriente.
@@ -453,7 +456,15 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
             </p>
           )}
 
-          <div className="mt-3 flex items-center gap-3 border-t border-line-100 pt-3">
+          {/*
+            EN MOVIL EL PRIMARIO VA PRIMERO, DE 48px Y A TODO EL ANCHO, con la
+            nota DEBAJO (4d). En escritorio la nota va a la izquierda y el boton
+            a la derecha, que es el orden de lectura de una fila. Invertirlo por
+            tamaño no es capricho: en un telefono el pulgar llega al borde
+            inferior, y una nota de dos renglones empujando el boton hacia abajo
+            lo saca del alcance.
+          */}
+          <div className="mt-3 flex flex-col-reverse gap-2 border-t border-line-100 pt-3 lg:flex-row lg:items-center lg:gap-3">
             <p className="text-meta leading-[1.4] text-ink-500">
               {faltaActuacion
                 ? 'Elija la actuación arriba: es la que trae el artículo y el término verificados.'
@@ -463,7 +474,7 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
               type="submit"
               disabled={!legalPrompt.trim() || isProcessing || faltaActuacion}
               title={faltaActuacion ? 'Elija la actuación en la barra de arriba' : undefined}
-              className="btn-primary ml-auto shrink-0"
+              className="btn-primary h-12 w-full shrink-0 lg:ml-auto lg:h-auto lg:w-auto"
             >
               {isProcessing
                 ? 'Generando…'
