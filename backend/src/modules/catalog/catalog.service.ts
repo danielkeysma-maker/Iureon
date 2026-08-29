@@ -161,6 +161,44 @@ export class CatalogService {
 
       if (overlap === 0) continue;
 
+      /*
+       * UN LADO TIENE QUE CONTENER AL OTRO. Si la ficha trae palabras que el
+       * solicitante nunca dijo Y el solicitante trae palabras que la ficha no
+       * tiene, no son la misma actuación con adorno: son DOS actuaciones
+       * distintas que comparten vocabulario.
+       *
+       * Lo destapó el catálogo al crecer de 651 a 794 fichas. «Demanda de
+       * saneamiento por vicios ocultos ANTICIPADA DEL ARRENDADOR» —un nombre
+       * inventado, de arrendamiento— aterrizaba en «Demanda de saneamiento por
+       * vicios redhibitorios», que es de COMPRAVENTA: arts. 1914 a 1926 del
+       * Código Civil, con plazos que corren desde la ENTREGA REAL del bien
+       * vendido. El motor le habría entregado al modelo esa ficha con su
+       * término verificado, y el escrito habría afirmado un plazo que no
+       * aplica. Publicar el reloj de otro, con sello de verificado.
+       *
+       * Compartían tres palabras —demanda, saneamiento, vicios— y eso bastaba,
+       * porque el puntaje solo penalizaba lo que sobra EN LA FICHA y jamás lo
+       * que sobra EN LA PETICIÓN. «Arrendador» es precisamente la palabra que
+       * cambia el caso, y no costaba nada.
+       *
+       * LA REGLA NO ENDURECE EL EMPAREJADOR PARA TODOS, que era la tentación
+       * que este módulo ya tenía advertida por escrito. Deja intactos los dos
+       * casos buenos, porque en ambos la petición nombra la ficha ENTERA y le
+       * añade adorno: «Demanda de reconvención anticipada» y «Acción de tutela
+       * urgente prioritaria» no dejan ninguna palabra de la ficha fuera. Y deja
+       * pasar la consulta corta —«tutela contra providencia judicial» contra
+       * «Acción de tutela contra providencia judicial»—, donde la ficha
+       * contiene todo lo que se pidió.
+       *
+       * Cuando ninguna de las dos contenciones se cumple, no se elige: se
+       * devuelve nada y el motor cae a su estructura genérica sin término. Es
+       * la dirección segura, y es la doctrina que este módulo ya declara — un
+       * plazo equivocado con confianza es peor que una ausencia reconocida.
+       */
+      const sobranEnLaFicha = words.size - overlap;
+      const faltanEnLaFicha = targetWords.size - overlap;
+      if (sobranEnLaFicha > 0 && faltanEnLaFicha > 0) continue;
+
       // Every extra word the catalogue entry carries is a term the caller did
       // not ask for, so a more specific filing is penalised unless the caller
       // named that specificity.

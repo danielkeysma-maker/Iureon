@@ -1080,3 +1080,70 @@ El cascarón no es el móvil. Cada artboard móvil pide una estructura propia:
 7. **9d** manual, elección de vía y chat.
 8. **10c** borradores.
 9. **4e / 5d / 8d / 9d / 10c** en tema oscuro.
+
+---
+
+## 16. CI llevaba doce commits en rojo, y no era el CI — 29 de agosto de 2026
+
+**Lo que se vio:** `npm run check` en local decía 22/22 en verde en cada commit,
+y GitHub Actions fallaba en todos. Doce seguidos, desde el 28 de agosto por la
+noche. Siempre el mismo paso: `Facts triage cannot invent an actuación`.
+
+**Lo que era:** un defecto real, determinista y reproducible en local. Nada de
+red, nada de infraestructura.
+
+### El defecto
+
+`findByDocumentType` es la puerta por la que pasa cada nombre que el modelo
+propone. Empezó a resolver una actuación **inventada**:
+
+| | |
+|---|---|
+| pedido (inventado) | «Demanda de saneamiento por vicios ocultos **anticipada del arrendador**» |
+| resolvía a | «Demanda de saneamiento por vicios redhibitorios» |
+| que es | **CIVIL · compraventa**, Código Civil arts. 1914 a 1926 |
+| con término | VERIFICADO — 6 meses/1 año para rescindir, 1 año/18 meses para rebajar, **desde la ENTREGA REAL** |
+
+Un nombre de **arrendamiento** aterrizando en una ficha de **compraventa**, con
+su término verificado. El motor le habría entregado esa ficha al modelo como
+derecho aplicable y el escrito habría afirmado un plazo que no aplica al caso.
+**Publicar el reloj de otro, con sello de verificado** — el defecto que este
+proyecto lleva documentado como el peor de todos.
+
+### La causa
+
+El puntaje penalizaba `0.5` por cada palabra que **sobra en la ficha** y **nada**
+por las que sobran en la petición. Compartían tres palabras —demanda,
+saneamiento, vicios— y eso bastaba. «Arrendador», que es justo la palabra que
+cambia el caso, no costaba nada. Apareció al crecer el catálogo de 651 a 794.
+
+### El arreglo: un lado tiene que contener al otro
+
+Se rechaza el candidato cuando la ficha trae palabras que el solicitante nunca
+dijo **Y** el solicitante trae palabras que la ficha no tiene. No son la misma
+actuación con adorno: son dos actuaciones que comparten vocabulario.
+
+**No endurece el emparejador para todos**, que era la tentación que este módulo
+ya tenía advertida por escrito. Los dos casos buenos siguen pasando porque en
+ambos la petición nombra la ficha ENTERA y le añade adorno («Demanda de
+reconvención anticipada», «Acción de tutela urgente prioritaria»), y la consulta
+corta sigue pasando porque la ficha contiene todo lo pedido.
+
+**Medido:** 794/794 nombres exactos siguen resolviendo; las consultas sueltas de
+la interfaz aterrizan igual.
+
+### Por qué estuvo doce commits escondido
+
+`triage.check.ts` mezclaba **cuatro garantías deterministas** con
+**observaciones que llaman al modelo**. Como su segunda mitad sale a la red, el
+archivo entero está declarado en `CON_RED` de `run-all-checks.mjs`, y la suite
+local omite los de red por defecto. Así que omitía también las garantías —las
+que no llaman a nadie— y en local siempre se veía 22/22.
+
+**Un archivo que mezcla una garantía determinista con una observación de red
+hereda la clasificación de la parte más frágil, y la garantía deja de correr
+donde más falta hace: antes de empujar.**
+
+Se separó en `resolucion.check.ts` (`npm run check:resolucion`), sin red, que
+corre en la suite ordinaria. `triage.check.ts` conserva lo que sí depende de que
+un proveedor conteste.

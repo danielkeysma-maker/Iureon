@@ -43,7 +43,8 @@
     "check:drafts": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/drafts/__checks__/drafts.check.ts",
     "check:relojes": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/catalog/__checks__/relojes.check.ts",
     "check:prosa": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/catalog/__checks__/prosa.check.ts",
-    "check:cndj": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/jurisprudence/__checks__/cndjRuling.check.ts"
+    "check:cndj": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/jurisprudence/__checks__/cndjRuling.check.ts",
+    "check:resolucion": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/catalog/__checks__/resolucion.check.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
