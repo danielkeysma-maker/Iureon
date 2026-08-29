@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useCatalogCuration } from '../hooks/useCatalogCuration';
 import { VerificationForm } from './VerificationForm';
+import { ActuacionDetail } from './ActuacionDetail';
 import type { Actuacion, TermStatus } from '../types';
 
 /*
@@ -240,8 +241,20 @@ export const CatalogCurationView: React.FC = () => {
         </div>
       </section>
 
+      {/*
+        EL PANEL PASA DE 380 A 460 Y SE VUELVE DESPLAZABLE, porque ahora carga
+        la ficha entera: los tres bloques —termino, norma, autoridad, cada uno
+        con SU estado— y las secciones obligatorias, que el catalogo siempre
+        trajo y esta pantalla nunca mostro. Un requisito que la aplicacion le
+        exige al escrito y el abogado no puede leer es un requisito que no puede
+        discutir. Ver `ActuacionDetail`, que declara ademas lo que el artboard
+        pide y hoy no tiene donde guardarse.
+      */}
       {openActuacion && (
-        <aside className="w-[380px] shrink-0 border-l border-line-200 overflow-hidden">
+        <aside className="flex w-[460px] shrink-0 flex-col overflow-y-auto border-l border-line-200 bg-canvas">
+          <div className="border-b border-line-200 p-4">
+            <ActuacionDetail actuacion={openActuacion} />
+          </div>
           <VerificationForm
             actuacion={openActuacion}
             isSaving={curation.isSaving}

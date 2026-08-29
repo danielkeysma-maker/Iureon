@@ -919,3 +919,52 @@ Queda escrita en el componente para que quien la construya no la redescubra:
 - Su recíproca: publicar **nunca** marca como verificada una ficha que la firma
   no verificó. Si el maestro pudiera conceder verificaciones, el sello dejaría de
   significar «alguien de esta firma lo leyó».
+
+---
+
+## 13. Catálogo / curaduría (1i) — las secciones que existían y nadie veía
+
+**El hallazgo.** Las 794 fichas traen sus **secciones obligatorias**: 4.685 en
+total, **4.352 con artículo confirmado y 333 sin él**. El motor SÍ las usa —son
+las que le exige al escrito al redactarlo— y la pantalla de curaduría **no
+mostraba ninguna**. Un requisito que la aplicación impone y el abogado no puede
+leer es un requisito que no puede discutir, y las 333 sin artículo son
+justamente las que convendría discutir.
+
+**Entregado.** `ActuacionDetail.tsx`, montado en el panel de la 1i (que pasa de
+380 a 460 px y se vuelve desplazable):
+
+- **Los tres bloques del artboard, cada uno con SU estado**: término, norma y
+  autoridad. Una ficha puede estar verificada en el término y coja en la
+  autoridad, y un único sello arriba escondía justo la mitad que falta — y la
+  autoridad es la que manda al abogado a radicar ante quien no es.
+- **La tabla de secciones**, con número, nombre, fundamento y estado
+  (`CON ARTÍCULO` / `SIN ARTÍCULO`), y el aviso de que a la sección sin artículo
+  se le sigue exigiendo el requisito: lo que falta es la cita, no la exigencia.
+- El enlace al texto oficial de la norma y la curación de la firma con su autor
+  y su fecha.
+
+### Lo que el artboard pide y NO está, con la razón
+
+1. **Verificar una sección concreta** («Verificar sección 04», con casilla y
+   «No aplica»). `catalog_verifications` guarda **una fila por firma y
+   actuación** —es su llave primaria— y **no tiene columnas por sección**. El
+   panel se podría pintar hoy y no habría dónde guardar el resultado: el curador
+   leería el artículo, marcaría la casilla, y al recargar seguiría sin
+   verificar. Eso es peor que no ofrecerlo. **Exige columnas nuevas, no un
+   componente.**
+2. **Historia de curaduría** con varias entradas. Por la misma llave primaria
+   solo sobrevive la ÚLTIMA curación: no hay historia que listar. Se muestra el
+   estado actual y se dice que una curación reemplaza a la anterior.
+3. **«Usada en 11 escritos»** y **«Actuación 214 de 651»**. La primera exige
+   relacionar borradores con actuaciones, cosa que hoy no se guarda; la segunda,
+   un índice estable dentro del filtro. Ninguna cambia lo que el abogado puede
+   verificar.
+4. **«Texto oficial recuperado»** de la norma. La recuperación oficial existe
+   para JURISPRUDENCIA, no para normas — traer el artículo de una ley exige otro
+   verificador. El enlace a la fuente sí está, que es lo comprobable hoy.
+
+**Nota sobre «No aplica».** El artboard lo quiere al mismo nivel que «Marcar
+verificada» para que no se registre como sin verificar por comodidad. Eso **ya
+se cumplía**: `VerificationForm` ofrece `NO_CADUCA` como una de tres opciones
+del mismo peso, no como un enlace al margen. No se tocó.
