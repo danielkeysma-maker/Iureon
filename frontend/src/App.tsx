@@ -4,6 +4,8 @@ import { billingApi } from './modules/billing/billing.api';
 import { BalancePanel } from './modules/billing/components/BalancePanel';
 import { clearSession, readSession, saveSession, type Session } from './modules/auth/session';
 import { SidebarLeft } from './modules/tenant/components/SidebarLeft';
+import { MobileTabBar } from './modules/tenant/components/MobileTabBar';
+import { MobileMoreSheet } from './modules/tenant/components/MobileMoreSheet';
 import { SupportAccessBanner } from './modules/support/components/SupportAccessBanner';
 import { SupportAccessDecisionDialog } from './modules/support/components/SupportAccessDecisionDialog';
 import type { SupportAccess } from './modules/support/support.api';
@@ -113,6 +115,7 @@ export function App() {
    * y un dialogo montado dentro de ella desapareceria a media transicion.
    */
   const [solicitudAbierta, setSolicitudAbierta] = useState<SupportAccess | null>(null);
+  const [masAbierto, setMasAbierto] = useState(false);
   const [refrescoSoporte, setRefrescoSoporte] = useState(0);
 
   /*
@@ -507,7 +510,15 @@ export function App() {
       )}
 
       {/* ENTERPRISE LEFT SIDEBAR — hidden in focus mode so the editor owns the screen */}
+      {/*
+        LA BARRA LATERAL ES DE ESCRITORIO. En 390px, 224px de menu se comen mas
+        de la mitad del ancho, asi que bajo `lg` desaparece y la navegacion pasa
+        a la barra inferior — cuatro destinos y «Mas», segun 4d. No se encoge:
+        se reemplaza. `hidden lg:flex` y no `lg:block` porque el <aside> es un
+        contenedor flex en columna; con `block` sus hijos perderian la columna.
+      */}
       {!workflow.isFocusMode && (
+      <div className="hidden lg:flex">
       <SidebarLeft
         mainView={mainView}
         setMainView={setMainView}
@@ -522,6 +533,7 @@ export function App() {
         onOpenRechargeModal={() => setIsRechargeModalOpen(true)}
         isSuperUser={esSuperusuario}
       />
+      </div>
       )}
 
       {/* RIGHT MAIN WORKSPACE AREA */}
@@ -724,8 +736,33 @@ export function App() {
             />
           )}
         </main>
+
+        {/*
+          LA BARRA INFERIOR VIVE EN LA COLUMNA DE TRABAJO, no en la raiz: asi
+          queda debajo del contenido y encima del area segura del sistema, sin
+          flotar sobre el escrito. En modo concentracion desaparece, igual que
+          la barra lateral — el documento se queda con la pantalla.
+        */}
+        {!workflow.isFocusMode && (
+          <MobileTabBar
+            mainView={mainView}
+            setMainView={(v) => {
+              setMasAbierto(false);
+              setMainView(v);
+            }}
+            onAbrirMas={() => setMasAbierto((v) => !v)}
+            masAbierto={masAbierto}
+          />
+        )}
       </div>
       </div>
+
+      <MobileMoreSheet
+        abierto={masAbierto}
+        mainView={mainView}
+        onElegir={setMainView}
+        onCerrar={() => setMasAbierto(false)}
+      />
 
       <SupportAccessDecisionDialog
         solicitud={solicitudAbierta}

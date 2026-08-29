@@ -109,8 +109,17 @@ export const HeaderTop: React.FC<HeaderTopProps> = ({
         {enTaller ? tituloDelEscrito || 'Escrito sin título' : modulo.label}
       </h1>
 
+      {/*
+        EL RADICADO SE VA EN MOVIL. Son veintitres digitos que no se encogen y
+        el bloque de la derecha tampoco, asi que a 375px empujaban la cabecera
+        fuera de la pantalla. El titulo del escrito es lo que orienta al volver
+        a una pestaña; el radicado se lee en la configuracion del taller, que en
+        movil es donde 4d lo pone.
+      */}
       {radicado && enTaller && (
-        <span className="shrink-0 font-mono text-[11.5px] text-ink-400">{radicado}</span>
+        <span className="hidden shrink-0 font-mono text-[11.5px] text-ink-400 sm:inline">
+          {radicado}
+        </span>
       )}
 
       <div className="ml-auto flex shrink-0 items-center gap-1.5">

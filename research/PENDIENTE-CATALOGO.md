@@ -1025,3 +1025,58 @@ advierte**: no sabemos que le falte respaldo, sabemos que no lo registramos.
 3. **Casillas de exportación** (membrete, anotar el margen, hoja de fuentes).
    La exportación no acepta variantes hoy; ofrecerlas sería pintar interruptores
    que no mueven nada.
+
+---
+
+## 15. Móvil (4d) — el cascarón, y lo que falta por módulo
+
+**El punto de partida medido:** 44 utilidades responsivas en toda la aplicación.
+Era de escritorio, y la barra lateral son 224px fijos — más de la mitad del
+ancho de un teléfono de 390px.
+
+**Entregado: el cascarón.** El artboard lo pide en su título —«la estructura
+repensada, no encogida»— y eso empieza por la navegación:
+
+- Bajo `lg`, la barra lateral **desaparece** (`hidden lg:flex`; con `lg:block`
+  el `<aside>` perdería su columna) y la reemplaza `MobileTabBar`: cuatro
+  destinos —**Redactar, Orientar, Grabar, Más**— de 44px mínimo, con el área
+  segura del sistema reservada para no quedar bajo la franja del gesto.
+- `MobileMoreSheet` es una hoja inferior con los diez módulos restantes,
+  **agrupados con los mismos verbos del escritorio** — reagruparlos crearía dos
+  mapas mentales del mismo producto. No hereda el pliegue de «Administrar»: un
+  pliegue dentro de un cajón cerrado son dos toques para llegar a Ajustes.
+- **«Grabar» es Entrevistas, no Audiencias**, y la razón la da el artboard: «la
+  entrevista es el módulo que más gana en móvil: el teléfono es la grabadora
+  real». La mecánica lo confirma — una audiencia se SUBE como archivo de 50 MB,
+  cosa que nadie hace desde un juzgado; una entrevista se graba con el cliente
+  enfrente. Audiencias queda primera en «Más».
+- **El radicado se oculta bajo `sm`**: veintitrés dígitos que no se encogen,
+  junto a un bloque de acciones que tampoco, empujaban la cabecera fuera de la
+  pantalla a 375px.
+
+**Verificado:** compila; el login renderiza correctamente a 375×812 sin desborde
+horizontal. **NO verificado visualmente:** todo lo que hay detrás del login —no
+se introducen credenciales—, así que el cascarón necesita una mirada humana en
+un teléfono real.
+
+### Lo que falta, por módulo
+
+El cascarón no es el móvil. Cada artboard móvil pide una estructura propia:
+
+1. **4d · el taller de dos columnas se parte.** «En móvil la instrucción es la
+   pantalla, y el documento generado se abre después como pantalla propia», con
+   la configuración comprimida en dos chips que muestran término y fecha de
+   vencimiento en 390px, y el primario de 48px fijo sobre la barra con el costo
+   debajo.
+2. **4d · orientación** pierde la retícula de dos columnas y gana altura; el
+   estado se repite como ícono junto al título, porque en pantalla pequeña el
+   filete de 3px se pierde.
+3. **4d · entrevista**: el cronómetro como elemento más grande de la pantalla y
+   el aviso de que sigue grabando con la pantalla apagada.
+4. **4d · transcripción**: abandona las tres columnas — interlocutor y hora
+   arriba, texto debajo, ancho completo; solo la fila en edición lleva tarjeta.
+5. **5c / 5d** catálogo, búsqueda y saldo, con el glosario como hoja inferior.
+6. **8d** ajustes, gestión de usuarios y consola de operación.
+7. **9d** manual, elección de vía y chat.
+8. **10c** borradores.
+9. **4e / 5d / 8d / 9d / 10c** en tema oscuro.
