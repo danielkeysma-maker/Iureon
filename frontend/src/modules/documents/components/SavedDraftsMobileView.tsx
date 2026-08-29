@@ -7,6 +7,7 @@ import {
   cuantoFalta,
   diasHasta,
   esRadicado,
+  faltaDeRespaldo,
   fechaCorta
 } from '../draftTerms';
 import type { SavedDraftEntry } from '../types';
@@ -163,6 +164,18 @@ export const SavedDraftsMobileView: React.FC<SavedDraftsMobileViewProps> = ({
                             </>
                           ) : (
                             <span className="block text-[11.5px] text-ink-500">Sin término</span>
+                          )}
+
+                          {/*
+                            «2 sin verificar» de 10c, ahora con dato real: sale
+                            de la procedencia congelada al redactar. Solo aparece
+                            cuando hay algo que decir — un borrador con respaldo
+                            completo no necesita una linea que lo diga.
+                          */}
+                          {faltaDeRespaldo(e) && (
+                            <span className="mt-1 block text-[11px] leading-tight text-unverified">
+                              {faltaDeRespaldo(e)}
+                            </span>
                           )}
                         </span>
                       </button>

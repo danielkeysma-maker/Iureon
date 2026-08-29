@@ -42,6 +42,7 @@ export const createDraftController = async (req: Request, res: Response): Promis
     excepcionesFormuladas,
     tokensConsumed,
     legalBranch,
+    procedencia,
     venceEl,
     cliente,
     despacho,
@@ -65,6 +66,13 @@ export const createDraftController = async (req: Request, res: Response): Promis
     excepciones_formuladas: excepcionesFormuladas || [],
     tokens_consumed: tokensConsumed || 0,
     legal_branch: legalBranch ?? null,
+    /*
+     * La ficha con la que se redacto, congelada tal como llego. No se valida su
+     * forma a proposito: es una foto para leer, no un contrato con el motor, y
+     * rechazar un borrador entero porque cambio un campo de la foto seria
+     * perder el escrito por perder la etiqueta.
+     */
+    procedencia: procedencia ?? null,
     /*
      * La fecha de vencimiento la pone quien lleva el caso, no el sistema. El
      * catálogo tiene el término como TEXTO —«dentro de los diez (10) días

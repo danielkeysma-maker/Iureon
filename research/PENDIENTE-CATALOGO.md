@@ -1203,3 +1203,59 @@ segundo. Sigue pendiente lo listado en la sección 15, y con prioridad:
 4. **10c · borradores**: hoy las columnas envuelven sin rótulo; el artboard
    quiere filas pensadas para el pulgar.
 5. Los temas oscuros móviles (4e, 5d, 8d, 9d, 10c).
+
+---
+
+## 18. Revisión de lo declarado: qué era construible y qué no — 29 de agosto
+
+El usuario fijó el criterio: **lo que falta se construye y se conecta**, no se
+declara ausente. Al aplicarlo a todo lo que yo había declarado, tres cosas
+resultaron construibles y **dos de mis razones eran directamente falsas**.
+
+### Construido
+
+| Declarado como ausente | Qué era en realidad |
+|---|---|
+| **La onda de sonido** (4d) | «`MediaRecorder` no expone amplitud» es cierto de `MediaRecorder` y **falso del navegador**: el mismo `MediaStream` va a un `AnalyserNode` y el RMS del dominio del tiempo ES el volumen. **Ahora mide.** |
+| **«Pausar»** (4d) | «Produce dos archivos que nadie une» describe `stop()`+`start()`, **no `pause()`**: suspende la misma grabación y `resume()` la continúa. **Un solo blob.** |
+| **«2 sin verificar» por borrador** (10c) | Existía desde 5a pero **se perdía al guardar**: la tabla mapea columnas explícitas y `procedencia` se caía. Nueva columna `jsonb`. |
+
+**El error de las dos primeras tiene forma reconocible y conviene recordarla:
+confundir el límite de una API con el límite de la plataforma.** Antes de
+declarar que algo no se puede, preguntarse si lo que no puede es esa pieza o el
+navegador.
+
+### La procedencia congelada
+
+`saved_drafts.procedencia` es una **foto**, no una referencia viva. Si la firma
+corrige mañana el término de esa actuación, el escrito ya redactado siguió
+afirmando lo que afirmó: guardar el `actuacion_id` y releer el catálogo
+mostraría un plazo que ese texto nunca dijo.
+
+**`NULL` significa «no se registró», NO «sin respaldo».** Los borradores
+anteriores a la columna quedan así y la interfaz **no los advierte**: no sabemos
+que les falte respaldo, sabemos que no lo anotamos. Confundirlo llenaría la
+lista de alarmas falsas sobre escritos que quizá estaban perfectamente bien.
+
+### Sigue sin poderse, y ahora con la razón examinada
+
+- **«VENCE · 3 may 2025»** en Orientación y en la barra del taller. No es un
+  límite de API: falta el DATO de cuándo empezó a correr el término, y solo lo
+  sabe quien lleva el caso. Construirlo significaría pedírselo — un campo más
+  antes de orientar, que es lo contrario de lo que 1f quiere.
+- **«6 de 13 leídos»** en el manual. Es una tabla por usuario en el servidor.
+  **Sí es construible**, y queda como trabajo con nombre propio: migración,
+  endpoint y marca por artículo.
+- **La barra de progreso del saldo.** Falta el denominador: el saldo no tiene
+  techo ni cupo declarado. Habría que definir qué mide antes de dibujarla.
+- **El chat en la app** (9d) y **la transcripción en vivo** (4d): infraestructura
+  de mensajería y de streaming que este producto no tiene.
+
+### Tema oscuro
+
+Comprobado en el navegador a 375×812 con `prefers-color-scheme: dark`:
+**funciona**, y funciona porque los colores de las maquetas se mapearon a tokens
+en vez de copiarse en hexadecimal. Se corrigieron cuatro `text-white` sobre
+marca por `text-on-brand` —el token que sí se invierte—: dos nuevos y dos que
+estaban desde antes en `AudioRecorder`, fuera de la regla que `.btn-primary` ya
+aplicaba.

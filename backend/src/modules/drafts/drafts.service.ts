@@ -33,6 +33,20 @@ export interface SavedDraftRow {
   /** Con fecha, el texto ya no se puede modificar. Lo impone la base. */
   radicado_el: string | null;
   version: number;
+
+  /*
+   * LA FICHA CON LA QUE SE REDACTO, congelada.
+   *
+   * Es una FOTO, no una referencia viva: si la firma corrige mañana el término
+   * de esa actuación, el escrito ya redactado siguió afirmando lo que afirmó.
+   * Guardar el id y releer el catálogo mostraría un plazo que ese texto nunca
+   * dijo.
+   *
+   * NULL significa «no se registró», NO «sin respaldo». Los borradores
+   * anteriores a la columna quedan así y no se advierten: no sabemos que les
+   * falte respaldo, sabemos que no lo anotamos.
+   */
+  procedencia: unknown | null;
 }
 
 /** Los campos que el cliente puede escribir. `version` y fechas las pone el servidor. */
@@ -122,6 +136,7 @@ export class DraftsService {
         excepciones_formuladas: draft.excepciones_formuladas,
         tokens_consumed: draft.tokens_consumed,
         legal_branch: draft.legal_branch ?? null,
+        procedencia: draft.procedencia ?? null,
         vence_el: draft.vence_el ?? null,
         cliente: draft.cliente ?? null,
         despacho: draft.despacho ?? null,

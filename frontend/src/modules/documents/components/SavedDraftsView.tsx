@@ -8,6 +8,7 @@ import {
   cuantoFalta,
   diasHasta,
   esRadicado,
+  faltaDeRespaldo,
   fechaLarga
 } from '../draftTerms';
 
@@ -310,6 +311,21 @@ export const SavedDraftsView: React.FC<SavedDraftsViewProps> = ({
                             : [e.cliente, e.despacho].filter(Boolean).join(' · ') ||
                               'Sin proceso asociado'}
                         </span>
+
+                        {/*
+                          LO QUE LE FALTA DE RESPALDO, desde la procedencia
+                          congelada al redactar. 10a la pide como columna «Sin
+                          verificar»; aqui va bajo el titulo, que es donde ya se
+                          lee el contexto del escrito. Solo aparece cuando hay
+                          algo que decir: un borrador respaldado no necesita una
+                          linea que lo diga, y uno anterior a la columna tampoco
+                          — no sabemos que le falte, sabemos que no lo anotamos.
+                        */}
+                        {faltaDeRespaldo(e) && (
+                          <span className="mt-0.5 block truncate text-meta text-unverified">
+                            {faltaDeRespaldo(e)}
+                          </span>
+                        )}
                       </button>
 
                       {/*

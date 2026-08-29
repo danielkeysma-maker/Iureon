@@ -17,6 +17,8 @@ interface SavedDraftRow {
   legal_text: string;
   jurisprudencia_citada?: string[];
   excepciones_formuladas?: string[];
+  /** La ficha con la que se redactó, congelada. Ausente en filas anteriores. */
+  procedencia?: unknown;
   tokens_consumed?: number;
   saved_at: string;
   updated_at?: string;
@@ -59,7 +61,14 @@ const toEntry = (row: SavedDraftRow): SavedDraftEntry => ({
     legalText: row.legal_text,
     jurisprudenciaCitada: row.jurisprudencia_citada || [],
     excepcionesFormuladas: row.excepciones_formuladas || [],
-    tokensConsumed: row.tokens_consumed || 0
+    tokensConsumed: row.tokens_consumed || 0,
+    /*
+     * `?? null` y no `|| null`: `null` significa «no se registro», que NO es lo
+     * mismo que «sin respaldo». Los borradores anteriores a la columna quedan
+     * asi y la interfaz no los advierte — no sabemos que les falte respaldo,
+     * sabemos que no lo anotamos.
+     */
+    procedencia: (row.procedencia as GeneratedDraft['procedencia']) ?? null
   },
 
   /*
@@ -119,7 +128,9 @@ export const draftsApi = {
           legalText: draft.legalText,
           jurisprudenciaCitada: draft.jurisprudenciaCitada,
           excepcionesFormuladas: draft.excepcionesFormuladas,
-          tokensConsumed: draft.tokensConsumed
+          tokensConsumed: draft.tokensConsumed,
+          /* La ficha con la que se redacto, para que el borrador la recuerde. */
+          procedencia: draft.procedencia ?? null
         }
       });
       return Boolean(json.success && json.draft);

@@ -111,3 +111,31 @@ export const agruparPorTermino = (entradas: SavedDraftEntry[]): GrupoDeBorradore
     { titulo: 'Radicados', entradas: radicados, urgente: false }
   ].filter((g) => g.entradas.length > 0);
 };
+
+/**
+ * Lo que le falta de respaldo a un borrador guardado, en una frase.
+ *
+ * Sale de la PROCEDENCIA congelada al redactar, no de releer el catálogo: si la
+ * firma corrige mañana el término de esa actuación, este escrito siguió
+ * afirmando lo que afirmó. La foto es lo que hay que revisar, no lo que la
+ * ficha dice ahora.
+ *
+ * Devuelve `null` en dos casos MUY distintos que aquí se colapsan a propósito
+ * porque ninguno merece una advertencia: el borrador tiene su respaldo completo,
+ * o es anterior a que se registrara la procedencia. **No sabemos que le falte
+ * respaldo; sabemos que no lo anotamos**, y llenar la lista de alarmas sobre
+ * escritos que quizá estaban bien es la falsa alarma que esta casa tiene
+ * prohibida.
+ */
+export const faltaDeRespaldo = (e: SavedDraftEntry): string | null => {
+  const p = e.draft.procedencia;
+  if (!p) return null;
+
+  if (p.termStatus === 'NO_VERIFICADO') return 'término sin verificar';
+  if (p.seccionesSinArticulo > 0) {
+    return `${p.seccionesSinArticulo} ${
+      p.seccionesSinArticulo === 1 ? 'sección sin artículo' : 'secciones sin artículo'
+    }`;
+  }
+  return null;
+};
