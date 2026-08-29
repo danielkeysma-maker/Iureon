@@ -860,6 +860,7 @@ export function App() {
           {mainView === 'entrevistas' && (
             <div className="hidden min-h-0 flex-1 lg:flex">
             <InterviewView
+              onPrivacidad={() => setMainView('privacidad')}
               /*
                * De escuchar a escribir sin volver a teclear.
                *

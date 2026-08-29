@@ -11,6 +11,7 @@ import { buildSpeakerNames } from '../../transcription/speakerNames';
 import { ROLE_LABELS, ROLES_DEL_RELATO, SUPPORTED_AUDIO_EXTENSIONS } from '../../transcription/types';
 import { toPlainText } from '../../transcription/toPlainText';
 import { ClientPicker } from './ClientPicker';
+import { GUION_BASE, preguntasCubiertas } from '../guionDeEntrevista';
 import { InterviewInsights } from './InterviewInsights';
 import { TranscriptSummary } from '../../transcription/components/TranscriptSummary';
 import { AudioRecorder } from './AudioRecorder';
@@ -71,9 +72,14 @@ interface InterviewViewProps {
    * ahogados en la voz de quien pregunta.
    */
   onDraft?: (hechos: string) => void;
+  /*
+   * Lleva al registro de subencargados (2c). 2a lo quiere enlazado DESDE la
+   * ficha del cliente: la pregunta «¿quién más ve esto?» se hace en la sala.
+   */
+  onPrivacidad?: () => void;
 }
 
-export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
+export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft, onPrivacidad }) => {
   const {
     hasFirm,
     isAvailable,
@@ -197,6 +203,16 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
 
 
   const trabajando = isUploading || isTranscribing;
+
+  /*
+   * EL GUION SUGERIDO (2a). Se tacha por lo que se DIJO, no por lo que alguien
+   * marco: nadie va marcando casillas con el cliente enfrente. Mientras no hay
+   * transcrito no hay nada cubierto, que es correcto — la lista arranca entera.
+   */
+  const cubiertas = React.useMemo(
+    () => preguntasCubiertas(result?.segments ?? []),
+    [result]
+  );
 
   /*
    * THE SCROLL CONTAINER, WHICH THIS VIEW SHIPPED WITHOUT.
@@ -324,11 +340,137 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft }) => {
 
       {!result ? (
         <>
-          <Paso numero={1} titulo="¿Con quién es la entrevista?">
+          {/*
+            EL NOMBRE DEL PASO ES EL DE 2a. «¿Con quién es la entrevista?» pedía
+            una respuesta; «Quién está al frente» describe lo que hay en la sala,
+            que es lo que el abogado está mirando mientras lo llena.
+          */}
+          <Paso numero={1} titulo="Quién está al frente">
             <ClientPicker value={clientId} onChange={elegirCliente} />
+
+            {/*
+              LA FICHA, cuando ya hay cliente. 2a la pone completa —contacto,
+              ciudad, relación— y no es adorno: son los datos que el acta
+              imprime y los que permiten reconocer a la persona en una lista de
+              treinta. Se muestra lo que la ficha TIENE; lo vacío no se pinta,
+              porque un rótulo con una raya al lado no informa de nada.
+            */}
+            {cliente && (
+              <div className="mt-3 rounded-card border border-line-200 bg-canvas p-3">
+                <dl className="grid grid-cols-1 gap-x-4 gap-y-2 sm:grid-cols-3">
+                  {cliente.phone && (
+                    <div>
+                      <dt className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-ink-400">
+                        Contacto
+                      </dt>
+                      <dd className="mt-0.5 text-[12.5px] text-ink-900">{cliente.phone}</dd>
+                    </div>
+                  )}
+                  {cliente.email && (
+                    <div>
+                      <dt className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-ink-400">
+                        Correo
+                      </dt>
+                      <dd className="mt-0.5 truncate text-[12.5px] text-ink-900">
+                        {cliente.email}
+                      </dd>
+                    </div>
+                  )}
+                  <div>
+                    <dt className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-ink-400">
+                      Relación
+                    </dt>
+                    {/*
+                      «Cliente nuevo» es un HECHO contado, no una etiqueta: sale
+                      de cuántas entrevistas lleva esa persona. Y sí puede haber
+                      una segunda —el modelo las cuenta—; lo que cambia es que la
+                      pantalla lo dice en vez de tratar cada una como la primera.
+                    */}
+                    <dd className="mt-0.5 text-[12.5px] text-ink-900">
+                      {cliente.interviews === 0
+                        ? 'Cliente nuevo'
+                        : `${cliente.interviews} ${
+                            cliente.interviews === 1 ? 'entrevista previa' : 'entrevistas previas'
+                          }`}
+                    </dd>
+                  </div>
+                </dl>
+
+                {/*
+                  EL TRATAMIENTO DE DATOS VIVE AQUÍ, NO EN UN MODAL PREVIO, y la
+                  nota de 2a dice por qué: «la pregunta ¿quién más ve esto?
+                  aparece en la sala, no después». El enlace va al registro de
+                  subencargados (2c), que es la respuesta real y no una promesa.
+                */}
+                <p className="mt-3 border-t border-line-200 pt-2.5 text-justify text-[11.5px] leading-snug text-ink-500 [text-wrap:pretty]">
+                  Si el consultante pregunta quién más ve esto, la respuesta está en{' '}
+                  <button
+                    type="button"
+                    onClick={onPrivacidad}
+                    className="font-semibold text-brand-700 underline underline-offset-2"
+                  >
+                    el registro de subencargados
+                  </button>
+                  : quién procesa sus datos, para qué y dónde.
+                </p>
+              </div>
+            )}
           </Paso>
 
-          <Paso numero={2} titulo="Captura la conversación">
+          {/*
+            EL GUION SUGERIDO, EN SU PROPIO PASO (2a). Va DESPUES del cliente y
+            ANTES de grabar, porque es lo que hay que tener delante durante la
+            conversacion — no un resumen para leer al final.
+          */}
+          <Paso numero={2} titulo="Lo que no puede quedarse sin preguntar">
+            <ul className="space-y-2">
+              {GUION_BASE.map((p) => {
+                const cubierta = cubiertas.has(p.id);
+                return (
+                  <li key={p.id} className="flex items-start gap-2.5">
+                    <span
+                      className={`mt-[3px] flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-[3px] border ${
+                        cubierta
+                          ? 'border-verified bg-[rgb(var(--verified-surf))]'
+                          : 'border-line-200'
+                      }`}
+                    >
+                      {cubierta && <CheckCircle2 className="h-2.5 w-2.5 text-verified" strokeWidth={3} />}
+                    </span>
+                    <span className="min-w-0">
+                      <span
+                        className={`block text-[12.5px] leading-snug ${
+                          cubierta ? 'text-ink-400 line-through' : 'text-ink-900'
+                        }`}
+                      >
+                        {p.texto}
+                      </span>
+                      {/*
+                        LO QUE CUESTA NO PREGUNTARLO, y solo mientras no se haya
+                        cubierto. Repetirlo tachado convertiria la advertencia en
+                        decorado — y no todas las preguntas lo llevan, porque
+                        decir que todo urge es la forma mas rapida de que no
+                        urja nada.
+                      */}
+                      {!cubierta && p.loQueCuesta && (
+                        <span className="mt-0.5 block text-[11px] leading-snug text-ink-500">
+                          {p.loQueCuesta}
+                        </span>
+                      )}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+
+            <p className="mt-3 border-t border-line-200 pt-2.5 text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
+              Se tachan solas con lo que se va diciendo, leyendo el transcrito. Es una ayuda de
+              memoria, no una comprobación: que una quede tachada no garantiza que la respuesta
+              sirva, y que quede sin tachar no significa que no se habló del tema.
+            </p>
+          </Paso>
+
+          <Paso numero={3} titulo="Captura la conversación">
             {trabajando ? (
               <div className="py-6 text-center">
                 <p className="text-xs font-bold text-ink-900">

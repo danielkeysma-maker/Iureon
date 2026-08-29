@@ -11,7 +11,8 @@
     "brand": "node scripts/build-brand.mjs && node scripts/build-brand-illustration.mjs",
     "brand:letras": "python scripts/wordmark-to-paths.py",
     "check:tokens": "npx tsx src/design/__checks__/tokens.check.ts",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check:guion": "npx esbuild src/modules/clients/__checks__/guion.check.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/guion.check.mjs --log-level=error && node node_modules/.cache/guion.check.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",
