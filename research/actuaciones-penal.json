@@ -1104,6 +1104,129 @@
         }
       ],
       "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr008.html"
+    },
+    {
+      "exact_name": "Auto que resuelve la libertad por vencimiento de términos",
+      "area": "PENAL",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 906 de 2004, art. 317, en el texto del art. 6 de la Ley 2477 de 2025; art. 294; art. 307 par. 1",
+      "competent_authority": "El juez de control de garantías, o el de conocimiento según la etapa en que se pida",
+      "term": "TRES PLAZOS QUE CORREN CONTRA EL ESTADO Y A FAVOR DEL PROCESADO, Y NINGUNO EXTINGUE LA ACCIÓN PENAL: lo que producen es una libertad, y el proceso sigue. «La libertad del imputado o acusado SE CUMPLIRÁ DE INMEDIATO y solo procederá en los siguientes eventos: […] 4. Cuando transcurridos SESENTA (60) DÍAS contados a partir de la fecha de imputación NO SE HUBIERE PRESENTADO EL ESCRITO DE ACUSACIÓN o solicitado la preclusión […] 5. Cuando transcurridos CIENTO VEINTE (120) DÍAS contados a partir de la fecha de presentación del escrito de acusación, NO SE HAYA DADO INICIO A LA AUDIENCIA DE JUICIO. 6. Cuando transcurridos CIENTO CINCUENTA (150) DÍAS contados a partir de la fecha de inicio de la audiencia de juicio, NO SE HAYA CELEBRADO LA AUDIENCIA DE LECTURA DE FALLO o su equivalente» (art. 317).\n\nDE QUIÉN ES CADA UNO: los sesenta días son de la FISCALÍA; los ciento veinte y los ciento cincuenta son del DESPACHO de conocimiento, que es quien agenda. Publicar cualquiera de ellos como carga del defensor sería invertir el reloj.\n\nSE DUPLICAN EN SEIS SUPUESTOS, y verificarlo antes de pedir la libertad evita una negativa: se incrementan «por el mismo término inicial» ante la justicia penal especializada, con tres (3) o más imputados o acusados, en actos de corrupción de la Ley 1474 de 2011, en las conductas del Título IV del Libro Segundo del Código Penal, y en los delitos de los arts. 103A y 104A —feminicidio— (par. 1).\n\nDOS DESCUENTOS QUE JUEGAN CONTRA EL PROCESADO: no se contabilizan los días empleados en MANIOBRAS DILATORIAS del acusado o su defensor (par. 3); y por fuerza mayor externa y objetiva ajena al juez, la audiencia se reanuda «a más tardar en un plazo no superior a LA MITAD del término» de los numerales 5 y 6. Además, en los numerales 4 y 5 los términos SE RESTABLECEN si hubo improbación de la aceptación de cargos, de los preacuerdos o del principio de oportunidad (par. 2).\n\nLAS OTRAS TRES CAUSALES, que no dependen del calendario: pena cumplida según determinación anticipada, preclusión o absolución; aplicación del principio de oportunidad; y las cláusulas del acuerdo aceptado por el juez de conocimiento.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la causal invocada de las seis del art. 317",
+          "mandatory": true,
+          "basis": "Ley 906 de 2004, art. 317"
+        },
+        {
+          "n": 2,
+          "name": "Cómputo desde el hito exacto: imputación, escrito de acusación o inicio del juicio",
+          "mandatory": true,
+          "basis": "Ley 906 de 2004, art. 317 nums. 4, 5 y 6"
+        },
+        {
+          "n": 3,
+          "name": "Verificación de si aplica la duplicación del parágrafo 1",
+          "mandatory": true,
+          "basis": "Ley 906 de 2004, art. 317 par. 1"
+        },
+        {
+          "n": 4,
+          "name": "Descuento de los días de maniobras dilatorias y del restablecimiento por improbación",
+          "mandatory": true,
+          "basis": "Ley 906 de 2004, art. 317 par. 2 y 3"
+        },
+        {
+          "n": 5,
+          "name": "Orden de libertad de cumplimiento inmediato, con la constancia de que la actuación continúa",
+          "mandatory": true,
+          "basis": "Ley 906 de 2004, art. 317"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr007.html"
+    },
+    {
+      "exact_name": "Auto que aprueba o imprueba el preacuerdo",
+      "area": "PENAL",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 906 de 2004, arts. 350, 351 y 352, todos declarados condicionalmente exequibles; art. 317 par. 2",
+      "competent_authority": "El juez de conocimiento",
+      "term": "EL DESCUENTO DEPENDE DEL MOMENTO, Y ESA ES LA DECISIÓN QUE HAY QUE TOMAR TEMPRANO PORQUE NO SE RECUPERA: la aceptación de cargos en la audiencia de FORMULACIÓN DE LA IMPUTACIÓN «comporta una rebaja HASTA DE LA MITAD de la pena imponible» (art. 351); si el preacuerdo se hace después de presentada la acusación y hasta que el acusado sea interrogado al inicio del juicio, «la pena imponible SE REDUCIRÁ EN UNA TERCERA PARTE» (art. 352). Esperar cuesta un sexto de la pena.\n\nUNA SOLA REBAJA, NO VARIAS: «Si hubiere un cambio favorable para el imputado con relación a la pena por imponer, esto constituirá LA ÚNICA REBAJA COMPENSATORIA POR EL ACUERDO» (art. 351).\n\nEL LÍMITE DEL JUEZ, QUE ES LO QUE ESTE AUTO DECIDE: «Los preacuerdos celebrados entre Fiscalía y acusado OBLIGAN AL JUEZ DE CONOCIMIENTO, SALVO QUE ELLOS DESCONOZCAN O QUEBRANTEN LAS GARANTÍAS FUNDAMENTALES.» El juez no negocia la conveniencia: verifica garantías. «Aprobados los preacuerdos por el juez, procederá a convocar la audiencia para dictar la sentencia correspondiente.»\n\nSI SE FORMULAN CARGOS MÁS GRAVOSOS: cuando la Fiscalía, por nuevos elementos cognoscitivos, proyecte formular cargos distintos y más gravosos que los de la imputación, «los preacuerdos DEBEN REFERIRSE A ESTA NUEVA Y POSIBLE IMPUTACIÓN» (art. 351).\n\nLA VÍCTIMA NO QUEDA ATADA: «Las reparaciones efectivas a la víctima que puedan resultar de los preacuerdos […] PUEDEN ACEPTARSE POR LA VÍCTIMA. EN CASO DE REHUSARLOS, ESTA PODRÁ ACUDIR A LAS VÍAS JUDICIALES PERTINENTES.»\n\nCONSECUENCIA DE IMPROBAR, que es reloj y hay que anticiparla: improbada la aceptación de cargos, el preacuerdo o el principio de oportunidad, SE RESTABLECEN los términos de los numerales 4 y 5 del art. 317 (par. 2) — la cuenta para la libertad por vencimiento vuelve a empezar.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del momento procesal, que determina si la rebaja es de la mitad o de una tercera parte",
+          "mandatory": true,
+          "basis": "Ley 906 de 2004, arts. 351 y 352"
+        },
+        {
+          "n": 2,
+          "name": "Verificación de que el preacuerdo no desconoce ni quebranta garantías fundamentales",
+          "mandatory": true,
+          "basis": "Ley 906 de 2004, art. 351"
+        },
+        {
+          "n": 3,
+          "name": "Constancia de que la rebaja pactada es la única compensatoria por el acuerdo",
+          "mandatory": true,
+          "basis": "Ley 906 de 2004, art. 351"
+        },
+        {
+          "n": 4,
+          "name": "Pronunciamiento sobre las reparaciones a la víctima y sobre su aceptación o rechazo",
+          "mandatory": true,
+          "basis": "Ley 906 de 2004, art. 351"
+        },
+        {
+          "n": 5,
+          "name": "Convocatoria a la audiencia para dictar sentencia, si se aprueba",
+          "mandatory": true,
+          "basis": "Ley 906 de 2004, art. 351"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr008.html"
+    },
+    {
+      "exact_name": "Auto que decreta la nulidad en el proceso penal",
+      "area": "PENAL",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 906 de 2004, arts. 455 (nulidad derivada de la prueba ilícita), 456 (incompetencia), 457 (violación de garantías fundamentales) y 458 (principio de taxatividad); art. 23; art. 177 (efecto suspensivo)",
+      "competent_authority": "El juez de control de garantías o el de conocimiento, según la etapa",
+      "term": "LAS CAUSALES SON TAXATIVAS Y ESA ES LA PRIMERA DEFENSA CONTRA UNA NULIDAD PEDIDA A LA LIGERA: «NO PODRÁ DECRETARSE NINGUNA NULIDAD POR CAUSAL DIFERENTE A LAS SEÑALADAS EN ESTE TÍTULO» (art. 458). Son tres — la derivada de la prueba ilícita (art. 455), la incompetencia (art. 456) y la violación de garantías fundamentales (art. 457).\n\nQUÉ ES VIOLACIÓN DE GARANTÍAS, y el adjetivo final es el que decide: «Es causal de nulidad la violación del derecho de defensa o del debido proceso EN ASPECTOS SUSTANCIALES» (art. 457). La irregularidad que no incide en la decisión no anula.\n\nLA PRUEBA ILÍCITA NO ANULA SOLA: el art. 455 remite al art. 23 y obliga a valorar «el VÍNCULO ATENUADO, la FUENTE INDEPENDIENTE, el DESCUBRIMIENTO INEVITABLE y los demás que establezca la ley». Esos cuatro criterios son la discusión real: excluida la prueba, hay que mostrar que el resto de la actuación depende de ella.\n\nLA LEY 906 NO TIENE ARTÍCULO DE TRÁMITE de la nulidad: solo causales. Lo demás se integra por el art. 25, que remite al Código de Procedimiento Civil —hoy el Código General del Proceso— «cuando no se opongan a la naturaleza del procedimiento penal».\n\nEL RECURSO Y SU EFECTO: el auto que decide la nulidad es APELABLE EN EL EFECTO SUSPENSIVO (art. 177), a diferencia de los que resuelven sobre medida de aseguramiento o legalización de captura, que van en devolutivo.\n\nOPORTUNIDAD QUE PRECLUYE: las causales de incompetencia, los impedimentos, las recusaciones y las nulidades se alegan al abrirse la audiencia de formulación de acusación (art. 339), y esa oportunidad es única y oral.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de cuál de las tres causales taxativas se invoca",
+          "mandatory": true,
+          "basis": "Ley 906 de 2004, art. 458"
+        },
+        {
+          "n": 2,
+          "name": "Demostración de que la violación recae en aspectos sustanciales del derecho de defensa o del debido proceso",
+          "mandatory": true,
+          "basis": "Ley 906 de 2004, art. 457"
+        },
+        {
+          "n": 3,
+          "name": "Valoración del vínculo atenuado, la fuente independiente y el descubrimiento inevitable, si es prueba ilícita",
+          "mandatory": true,
+          "basis": "Ley 906 de 2004, art. 455"
+        },
+        {
+          "n": 4,
+          "name": "Determinación del alcance: qué actuación se invalida y desde qué momento",
+          "mandatory": true,
+          "basis": "Ley 906 de 2004, art. 457"
+        },
+        {
+          "n": 5,
+          "name": "Indicación de que la apelación procede en el efecto suspensivo",
+          "mandatory": true,
+          "basis": "Ley 906 de 2004, art. 177"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_0906_2004_pr011.html"
     }
   ]
 }

@@ -318,6 +318,40 @@ export const INTERNACIONAL_CATALOG: BranchCatalog = {
       { n: 6, name: 'Advertencia: si la sede fue Colombia, el laudo es nacional y se ejecuta sin reconocimiento previo', mandatory: true, basis: 'Art. 111' }
     ],
     sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/ley_1563_2012_pr002.html'
+  },
+  {
+    id: 'internacional/auto-que-rechaza-la-demanda-de-exequatur',
+    exactName: 'Auto que rechaza la demanda de exequátur',
+    branch: 'INTERNACIONAL',
+    role: 'DESPACHO',
+    legalBasis: 'Código General del Proceso, arts. 606 nums. 1 a 4 y 607 num. 2',
+    competentAuthority: 'La Sala de Casación Civil de la Corte Suprema de Justicia, salvo que conforme a los tratados internacionales corresponda a otro juez',
+    term: { status: 'VERIFICADO', description: 'SE RECHAZA DE ENTRADA POR CUATRO DE LOS SIETE REQUISITOS, Y ESA ASIMETRÍA ES LO QUE HAY QUE MIRAR ANTES DE RADICAR: «La Corte RECHAZARÁ LA DEMANDA SI FALTARE ALGUNO DE LOS REQUISITOS EXIGIDOS EN LOS NUMERALES 1 A 4 del artículo precedente» (art. 607 num. 2). Los otros tres se discuten en el proceso; estos cuatro lo cierran antes de empezar. LOS CUATRO QUE MATAN LA DEMANDA (art. 606): que la sentencia NO verse sobre DERECHOS REALES constituidos en bienes que estaban en territorio colombiano al iniciarse el proceso extranjero; que NO se oponga a leyes u otras disposiciones colombianas de ORDEN PÚBLICO —«exceptuadas las de procedimiento», salvedad que salva muchos casos—; que esté EJECUTORIADA conforme a la ley del país de origen y se presente en COPIA DEBIDAMENTE LEGALIZADA; y que el asunto NO sea de COMPETENCIA EXCLUSIVA de los jueces colombianos. LOS TRES QUE SE DISCUTEN ADENTRO: que en Colombia no exista proceso en curso ni sentencia ejecutoriada sobre el mismo asunto; que si fue proceso contencioso se haya cumplido la debida citación y contradicción del demandado conforme a la ley de origen —«LO QUE SE PRESUME POR LA EJECUTORIA», presunción que hay que desvirtuar si se quiere atacar—; y el exequátur mismo. EXIGENCIA DE FORMA QUE PROVOCA RECHAZOS EVITABLES: cuando la sentencia o cualquier documento no estén en castellano, «se presentará con la copia del original SU TRADUCCIÓN EN LEGAL FORMA» (art. 607). QUÉ EFECTO SE RECONOCE, y es reciprocidad en dos escalones: el que le concedan los tratados existentes con ese país «y en su defecto la que allí se reconozca a las proferidas en Colombia» (art. 605).' },
+    requiredSections: [
+      { n: 1, name: 'Verificación de los cuatro requisitos de rechazo inmediato del art. 606 nums. 1 a 4', mandatory: true, basis: 'Código General del Proceso, art. 607 num. 2' },
+      { n: 2, name: 'Constancia de si la sentencia versa sobre derechos reales sobre bienes situados en Colombia', mandatory: true, basis: 'Código General del Proceso, art. 606 num. 1' },
+      { n: 3, name: 'Pronunciamiento sobre el orden público, exceptuadas las disposiciones de procedimiento', mandatory: true, basis: 'Código General del Proceso, art. 606 num. 2' },
+      { n: 4, name: 'Verificación de la ejecutoria en el país de origen y de la legalización de la copia', mandatory: true, basis: 'Código General del Proceso, art. 606 num. 3' },
+      { n: 5, name: 'Verificación de que el asunto no es de competencia exclusiva de los jueces colombianos', mandatory: true, basis: 'Código General del Proceso, art. 606 num. 4' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr021.html'
+  },
+  {
+    id: 'internacional/oposicion-a-la-demanda-de-exequatur',
+    exactName: 'Oposición a la demanda de exequátur',
+    branch: 'INTERNACIONAL',
+    role: 'LITIGANTE',
+    legalBasis: 'Código General del Proceso, arts. 606 y 607 nums. 1, 3 y 4; art. 91',
+    competentAuthority: 'La Sala de Casación Civil de la Corte Suprema de Justicia. Se cita también al procurador delegado que corresponda por la naturaleza del asunto',
+    term: { status: 'VERIFICADO', description: 'CINCO (5) DÍAS DE TRASLADO, RELOJ DE LA PARTE AFECTADA Y ÚNICO MOMENTO PARA DEFENDERSE: «De la demanda se dará traslado a la parte afectada con la sentencia Y AL PROCURADOR DELEGADO que corresponda en razón de la naturaleza del asunto, en la forma señalada en el artículo 91, POR EL TÉRMINO DE CINCO (5) DÍAS» (art. 607 num. 3). Vencido, «se decretarán las pruebas y se fijará audiencia para practicarlas, oír los alegatos de las partes y dictar la sentencia». QUÉ SE ATACA, Y NO ES EL FONDO DE LA SENTENCIA EXTRANJERA: el exequátur no revisa el acierto de lo decidido afuera, sino los requisitos del art. 606. Los cuatro primeros ya debieron filtrarse en el rechazo; la oposición vive de los TRES RESTANTES — que en Colombia exista proceso en curso o sentencia ejecutoriada sobre el mismo asunto (num. 5), y la falta de debida citación y contradicción del demandado conforme a la ley de origen (num. 6). LA CARGA PROBATORIA SOBRE LA CITACIÓN ESTÁ INVERTIDA, y es el punto que decide la oposición: el cumplimiento de la citación y contradicción «SE PRESUME POR LA EJECUTORIA» (art. 606 num. 6). Quien alegue que no fue notificado en el extranjero debe desvirtuar esa presunción con prueba, no con afirmación. LAS PRUEBAS SE PIDEN EN EL ESCRITO: el num. 1 exige que en la demanda se pidan las pruebas pertinentes, y lo mismo vale para quien se opone — el traslado de cinco días es la oportunidad, y después viene la audiencia. SI EL EXEQUÁTUR SE CONCEDE, LA PELEA NO TERMINA AHÍ Y CONVIENE ADVERTIRLO: «Si la Corte concede el exequátur y la sentencia extranjera REQUIERE EJECUCIÓN, conocerá de esta EL JUEZ COMPETENTE CONFORME A LAS REGLAS GENERALES» (num. 5). El exequátur reconoce; no ejecuta.' },
+    requiredSections: [
+      { n: 1, name: 'Identificación de la sentencia extranjera y de la fecha del traslado', mandatory: true, basis: 'Código General del Proceso, art. 607 num. 3' },
+      { n: 2, name: 'Acreditación de proceso en curso o sentencia ejecutoriada en Colombia sobre el mismo asunto', mandatory: false, basis: 'Código General del Proceso, art. 606 num. 5' },
+      { n: 3, name: 'Prueba que desvirtúe la presunción de debida citación y contradicción en el país de origen', mandatory: false, basis: 'Código General del Proceso, art. 606 num. 6' },
+      { n: 4, name: 'Pruebas que se solicitan, pedidas dentro del traslado', mandatory: true, basis: 'Código General del Proceso, art. 607 num. 1' },
+      { n: 5, name: 'Constancia de presentación dentro de los cinco (5) días', mandatory: true, basis: 'Código General del Proceso, art. 607 num. 3' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012_pr021.html'
   }
   ]
 };
