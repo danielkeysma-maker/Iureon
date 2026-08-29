@@ -61,6 +61,13 @@ interface DeepgramResponse {
  * that two voices differ, never that one of them is the judge. A human maps
  * them, and until then the transcript says so.
  */
+/**
+ * Por debajo de esto, el proveedor se equivoca lo bastante como para que citar
+ * sin volver a escuchar sea imprudente. Es una ELECCION declarada, no un
+ * hallazgo: Deepgram no publica un corte, y este se puede mover.
+ */
+export const UMBRAL_CONFIANZA = 0.75;
+
 const toSegments = (utterances: DeepgramUtterance[]): TranscriptSegment[] =>
   utterances.map((utterance) => ({
     speakerLabel: utterance.speaker === undefined ? 'speaker_unknown' : `speaker_${utterance.speaker}`,
@@ -68,7 +75,22 @@ const toSegments = (utterances: DeepgramUtterance[]): TranscriptSegment[] =>
     text: (utterance.transcript ?? '').trim(),
     startSeconds: utterance.start ?? null,
     endSeconds: utterance.end ?? null,
-    confianza: utterance.confidence
+    confianza: utterance.confidence,
+    /*
+     * Un enunciado flojo nace marcado de punta a punta de SU texto. Al unirse
+     * con otros, esas posiciones se desplazan y siguen señalando el mismo
+     * trozo — que es lo que permite marcar solo lo dudoso y no el parrafo.
+     */
+    fragmentosDudosos:
+      utterance.confidence !== undefined && utterance.confidence < UMBRAL_CONFIANZA
+        ? [
+            {
+              desde: 0,
+              hasta: (utterance.transcript ?? '').trim().length,
+              confianza: utterance.confidence
+            }
+          ]
+        : undefined
   }));
 
 /**
@@ -91,6 +113,25 @@ export const mergeConsecutive = (segments: TranscriptSegment[]): TranscriptSegme
     const previous = merged[merged.length - 1];
 
     if (previous && previous.speakerLabel === segment.speakerLabel) {
+      /*
+       * EL DESPLAZAMIENTO SE CALCULA ANTES DE CONCATENAR. El texto que entra
+       * empieza donde acaba el anterior mas el espacio que los separa; si se
+       * midiera despues, `previous.text` ya seria el unido y las posiciones
+       * señalarian el trozo equivocado — un error que se ve como subrayados
+       * corridos media frase.
+       */
+      const desplazamiento = previous.text.length > 0 ? previous.text.length + 1 : 0;
+      if (segment.fragmentosDudosos?.length) {
+        previous.fragmentosDudosos = [
+          ...(previous.fragmentosDudosos ?? []),
+          ...segment.fragmentosDudosos.map((f) => ({
+            desde: f.desde + desplazamiento,
+            hasta: f.hasta + desplazamiento,
+            confianza: f.confianza
+          }))
+        ];
+      }
+
       previous.text = `${previous.text} ${segment.text}`.trim();
       previous.endSeconds = segment.endSeconds ?? previous.endSeconds;
       /*

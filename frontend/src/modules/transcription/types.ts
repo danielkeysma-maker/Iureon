@@ -53,6 +53,12 @@ export interface TranscriptSegment {
    * que corregir.
    */
   hechoClave?: boolean;
+  /**
+   * Los trozos que el proveedor oyó mal, por posición en el texto. 1g pide
+   * marcar SOLO el fragmento afectado: colorear la intervención entera manda a
+   * releer trescientas palabras para encontrar las cuatro dudosas.
+   */
+  fragmentosDudosos?: { desde: number; hasta: number; confianza: number }[];
 }
 
 export type TranscriptionKind = 'AUDIENCIA' | 'ENTREVISTA';

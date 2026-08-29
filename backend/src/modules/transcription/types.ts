@@ -89,6 +89,21 @@ export interface TranscriptSegment {
    * marco otra.
    */
   hechoClave?: boolean;
+  /**
+   * Los TROZOS de esta intervencion que el proveedor oyo mal, por posicion en
+   * el texto. Artboard 1g.
+   *
+   * La nota del artboard es explicita y corrige lo que se habia hecho: «la baja
+   * confianza se marca SOLO EN EL FRAGMENTO AFECTADO; no se colorea toda la
+   * intervencion, porque el 95% del texto si es fiable». Marcar el parrafo
+   * entero manda a releer trescientas palabras para encontrar las cuatro
+   * dudosas — y quien lo haga dos veces deja de hacerlo.
+   *
+   * Se puede porque Deepgram da confianza POR ENUNCIADO y aqui varios se unen
+   * en una intervencion: al unirlos se anota donde empieza y acaba cada trozo
+   * flojo dentro del texto ya concatenado.
+   */
+  fragmentosDudosos?: { desde: number; hasta: number; confianza: number }[];
   text: string;
   /** Seconds from the start of the recording. */
   startSeconds: number | null;

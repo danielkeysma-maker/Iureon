@@ -74,6 +74,17 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
   const [openedTitle, setOpenedTitle] = useState('');
   const exportTitle = selectedFile?.name || openedTitle || 'transcripcion';
 
+  /*
+   * LAS VARIANTES DEL ACTA (1g). Por defecto CON minutos: el minuto es lo que
+   * hace citable una intervencion —«a partir del 14:02»— y quitarlo produce un
+   * texto mas comodo de leer y mas dificil de verificar. Se puede quitar; no se
+   * quita solo.
+   */
+  const [conMarcasDeTiempo, setConMarcasDeTiempo] = React.useState(true);
+  const [soloClave, setSoloClave] = React.useState(false);
+  const hayClaves = (result?.segments ?? []).some((s) => s.hechoClave);
+  const variante = { conMarcasDeTiempo, soloClave: soloClave && hayClaves };
+
 
   /*
    * El ACTA con datos reales — y SIN RED. Todo sale de la fila que la lista ya
@@ -151,10 +162,55 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
               {copied ? 'Copiado' : 'Copiar'}
             </button>
 
+            {/*
+              LAS VARIANTES DEL ACTA (1g). Van ANTES de los formatos porque
+              deciden QUE se lleva; el formato decide en qué papel. Elegir el
+              papel primero y el contenido después es el orden inverso al que
+              tiene el abogado en la cabeza.
+
+              «Solo las marcadas» queda DESHABILITADA mientras nadie haya
+              marcado nada: un acta «solo clave» de un transcrito sin marcas
+              saldría vacía, y quien la abriera pensaría que se perdió la
+              audiencia.
+            */}
+            <div className="flex items-center gap-2">
+              <label className="inline-flex cursor-pointer items-center gap-1.5 text-[11px] text-ink-700">
+                <input
+                  type="checkbox"
+                  checked={conMarcasDeTiempo}
+                  onChange={(e) => setConMarcasDeTiempo(e.target.checked)}
+                />
+                Con minutos
+              </label>
+              <label
+                className={`inline-flex items-center gap-1.5 text-[11px] ${
+                  hayClaves ? 'cursor-pointer text-ink-700' : 'text-ink-400'
+                }`}
+                title={
+                  hayClaves
+                    ? 'Solo las intervenciones que alguien marcó como decisivas'
+                    : 'Marque alguna intervención como hecho clave para poder exportar solo esas'
+                }
+              >
+                <input
+                  type="checkbox"
+                  checked={soloClave && hayClaves}
+                  disabled={!hayClaves}
+                  onChange={(e) => setSoloClave(e.target.checked)}
+                />
+                Solo las marcadas
+              </label>
+            </div>
+
             {/* Word y PDF unidos, como en el taller: un formato, no dos decisiones. */}
             <div className="flex">
               <button
-                onClick={() => result && void import('../transcriptExport').then((m) => m.exportTranscriptToWord(result, exportTitle, armarActa()))}
+                onClick={() =>
+                  result &&
+                  void import('../transcriptExport').then((m) =>
+                    m.exportTranscriptToWord(result, exportTitle, armarActa(), variante)
+                  )
+                }
                 className="btn-secondary btn-sm rounded-r-none"
                 title="El .docx es el que se edita para el acta"
               >
@@ -162,7 +218,12 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
                 Word
               </button>
               <button
-                onClick={() => result && void import('../transcriptExport').then((m) => m.exportTranscriptToPdf(result, exportTitle, armarActa()))}
+                onClick={() =>
+                  result &&
+                  void import('../transcriptExport').then((m) =>
+                    m.exportTranscriptToPdf(result, exportTitle, armarActa(), variante)
+                  )
+                }
                 className="btn-secondary btn-sm -ml-px rounded-l-none"
                 title="El PDF es el que se anexa al expediente"
               >

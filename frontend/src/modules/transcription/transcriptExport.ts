@@ -80,10 +80,46 @@ interface Linea {
  * said what — the same reason the screen and the clipboard already share
  * `buildSpeakerNames`.
  */
-const lineas = (result: TranscriptionResult): Linea[] => {
+/**
+ * Qué se lleva el acta. Artboard 1g: «desplegable para las variantes del acta
+ * (con o sin marcas de tiempo, solo intervenciones marcadas como clave, o
+ * transcripción completa)».
+ *
+ * ─── «SOLO LAS CLAVE» NO ES UN FILTRO DE COMODIDAD ──────────────────────────
+ *
+ * Es el acta que el abogado lleva a una reunión o anexa a un memorial: cuatro
+ * intervenciones que deciden, no cincuenta y ocho. Existe porque ahora hay algo
+ * que filtrar — la marca humana de `hechoClave`—, y por eso el desplegable la
+ * ofrece DESHABILITADA mientras nadie haya marcado nada: un acta «solo clave»
+ * de un transcrito sin marcas saldría vacía, y quien la abriera pensaría que se
+ * perdió la audiencia.
+ *
+ * ─── SIN MARCAS DE TIEMPO ES PARA LEER, NO PARA CITAR ───────────────────────
+ *
+ * El minuto es lo que hace citable una intervención —«a partir del 14:02»— y
+ * quitarlo produce un texto corrido más cómodo de leer y más difícil de
+ * verificar. Se ofrece porque el artboard lo pide y porque hay usos donde
+ * estorba, pero el valor por defecto los CONSERVA.
+ */
+export interface VarianteDeActa {
+  /** `false` produce texto corrido, sin el minuto de cada intervención. */
+  conMarcasDeTiempo?: boolean;
+  /** `true` lleva solo lo que un humano marcó como decisivo. */
+  soloClave?: boolean;
+}
+
+const lineas = (result: TranscriptionResult, variante?: VarianteDeActa): Linea[] => {
   const nombres = buildSpeakerNames(result.segments, ROLE_LABELS);
 
-  return result.segments.map((segment) => {
+  /*
+   * El filtro se aplica ANTES de numerar y colorear: si se hiciera después, los
+   * colores de interlocutor saltarían y el acta parecería tener huecos.
+   */
+  const visibles = variante?.soloClave
+    ? result.segments.filter((s) => s.hechoClave)
+    : result.segments;
+
+  return visibles.map((segment) => {
     const nombre = nombres[segment.speakerLabel] ?? ROLE_LABELS[segment.role];
     // The role only when a name was set: without one the heading already IS the
     // role, and "Juez (Juez)" says the same thing twice.
@@ -92,7 +128,7 @@ const lineas = (result: TranscriptionResult): Linea[] => {
     return {
       quien: nombre,
       rol,
-      minuto: formatTimestamp(segment.startSeconds),
+      minuto: variante?.conMarcasDeTiempo === false ? '' : formatTimestamp(segment.startSeconds),
       texto: segment.text,
       color: colorForSpeaker(segment.speakerLabel, result.speakerLabels),
       iniciales: initials(nombre)
@@ -184,7 +220,8 @@ const nota = (result: TranscriptionResult, acta?: ActaInfo): string => {
 export const exportTranscriptToWord = async (
   result: TranscriptionResult,
   titulo: string,
-  acta?: ActaInfo
+  acta?: ActaInfo,
+  variante?: VarianteDeActa
 ): Promise<void> => {
   const cuerpo: Paragraph[] = [];
 
@@ -235,7 +272,7 @@ export const exportTranscriptToWord = async (
     );
   }
 
-  for (const linea of lineas(result)) {
+  for (const linea of lineas(result, variante)) {
     cuerpo.push(
       new Paragraph({
         spacing: { before: 160, after: 40 },
@@ -729,7 +766,7 @@ const partesDelPie = (result: TranscriptionResult, f: { n: number; total: number
 };
 
 /** El acta de ENTREVISTA: intervinientes en los metadatos y dos firmas. */
-const actaDeEntrevista = (result: TranscriptionResult, titulo: string, acta?: ActaInfo): jsPDF => {
+const actaDeEntrevista = (result: TranscriptionResult, titulo: string, acta?: ActaInfo, variante?: VarianteDeActa): jsPDF => {
   const marca = getMarcaActual();
   const L = nuevoLienzo(nombreArchivo(titulo, 'pdf'), marca?.firmName);
   const f = fraccionRevisada(result.segments);
@@ -801,7 +838,7 @@ const actaDeEntrevista = (result: TranscriptionResult, titulo: string, acta?: Ac
     seccion(L, 'TRANSCRIPCIÓN');
   }
 
-  for (const linea of lineas(result)) turno(L, linea);
+  for (const linea of lineas(result, variante)) turno(L, linea);
 
   cajaDeTramos(L, result);
 
@@ -862,7 +899,7 @@ const actaDeEntrevista = (result: TranscriptionResult, titulo: string, acta?: Ac
 };
 
 /** El acta de AUDIENCIA: INTERVINIENTES con colores, DESARROLLO y una firma. */
-const actaDeAudiencia = (result: TranscriptionResult, titulo: string, acta?: ActaInfo): jsPDF => {
+const actaDeAudiencia = (result: TranscriptionResult, titulo: string, acta?: ActaInfo, variante?: VarianteDeActa): jsPDF => {
   const marca = getMarcaActual();
   const L = nuevoLienzo(nombreArchivo(titulo, 'pdf'), marca?.firmName);
   const f = fraccionRevisada(result.segments);
@@ -952,7 +989,7 @@ const actaDeAudiencia = (result: TranscriptionResult, titulo: string, acta?: Act
   }
 
   seccion(L, 'DESARROLLO');
-  for (const linea of lineas(result)) turno(L, linea);
+  for (const linea of lineas(result, variante)) turno(L, linea);
 
   cajaDeTramos(L, result);
 
@@ -979,12 +1016,13 @@ const actaDeAudiencia = (result: TranscriptionResult, titulo: string, acta?: Act
 export const exportTranscriptToPdf = (
   result: TranscriptionResult,
   titulo: string,
-  acta?: ActaInfo
+  acta?: ActaInfo,
+  variante?: VarianteDeActa
 ): void => {
   const doc =
     result.kind === 'ENTREVISTA'
-      ? actaDeEntrevista(result, titulo, acta)
-      : actaDeAudiencia(result, titulo, acta);
+      ? actaDeEntrevista(result, titulo, acta, variante)
+      : actaDeAudiencia(result, titulo, acta, variante);
 
   doc.save(nombreArchivo(titulo, 'pdf'));
 };

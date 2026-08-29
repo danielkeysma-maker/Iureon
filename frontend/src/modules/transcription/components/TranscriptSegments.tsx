@@ -9,6 +9,7 @@ import {
   type SpeakerRole,
   type TranscriptionKind,
   type TranscriptionResult,
+  type TranscriptSegment,
   type SpeakerNameProposal,
   type VoiceConflict
 } from '../types';
@@ -71,6 +72,42 @@ const formatTimestamp = (seconds: number | null): string => {
  * The mapping is the step that makes a transcript citable: "speaker_1 dijo" is
  * useless in a filing, "el Juez dijo" is not.
  */
+/**
+ * Parte el texto de una intervención en trozos, subrayando los dudosos.
+ *
+ * Devuelve el texto tal cual cuando no hay ninguno, que es el caso normal: sin
+ * esa salida temprana, cada intervención fiable pagaría un recorrido y un
+ * arreglo de nodos por nada.
+ */
+const partirPorDudosos = (segment: TranscriptSegment): React.ReactNode => {
+  const dudosos = [...(segment.fragmentosDudosos ?? [])].sort((a, b) => a.desde - b.desde);
+  if (dudosos.length === 0) return segment.text;
+
+  const piezas: React.ReactNode[] = [];
+  let cursor = 0;
+
+  dudosos.forEach((f, i) => {
+    /* Un fragmento que empieza antes del cursor solaparía: se salta entero. */
+    if (f.desde < cursor) return;
+
+    if (f.desde > cursor) piezas.push(segment.text.slice(cursor, f.desde));
+
+    piezas.push(
+      <span
+        key={`dudoso-${i}`}
+        className="underline decoration-[rgb(var(--unverified-line))] decoration-dotted decoration-2 underline-offset-4"
+        title={`El motor entendió esto con ${Math.round(f.confianza * 100)}% de certeza: vuelva a escuchar antes de citarlo.`}
+      >
+        {segment.text.slice(f.desde, f.hasta)}
+      </span>
+    );
+    cursor = f.hasta;
+  });
+
+  if (cursor < segment.text.length) piezas.push(segment.text.slice(cursor));
+  return piezas;
+};
+
 export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
   result,
   kind,
@@ -771,18 +808,7 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                 desordenada la columna de texto que las tres columnas fijas
                 acababan de alinear.
               */
-              className={`text-[13px] leading-[1.65] text-justify [text-wrap:pretty] ${
-                /*
-                  LO POCO CLARO SE SUBRAYA, NO SE TIÑE. Teñir el texto de ámbar
-                  lo volvería difícil de leer justamente donde hay que leerlo con
-                  más cuidado; un subrayado punteado dice «de esto no me fío»
-                  sin estorbar la lectura. Y va con `title`, porque la señal
-                  visual sola no explica qué hacer con ella.
-                */
-                segment.confianza !== undefined && segment.confianza < UMBRAL_CONFIANZA
-                  ? 'decoration-[rgb(var(--unverified-line))] underline decoration-dotted decoration-2 underline-offset-4 text-ink-700'
-                  : 'text-ink-700'
-              } ${
+              className={`text-[13px] leading-[1.65] text-justify text-ink-700 [text-wrap:pretty] ${
                 /*
                   LA FILA EN EDICION VA EN AZUL DE MARCA CON HALO, no en ambar.
                   Lo dicen los dos artboards con el mismo valor —`border:1px
@@ -798,14 +824,24 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                   : ''
               }`}
               title={
-                segment.confianza !== undefined && segment.confianza < UMBRAL_CONFIANZA
-                  ? `El motor entendió esto con ${Math.round(segment.confianza * 100)}% de certeza: vuelva a escuchar antes de citarlo.`
-                  : onEditSegment
+                onEditSegment
                   ? 'Haz clic para corregir el texto. Enter guarda, Esc descarta.'
                   : undefined
               }
             >
-              {segment.text}
+              {/*
+                SOLO EL TROZO DUDOSO VA SUBRAYADO, no la intervención entera.
+                La nota de 1g lo dice y tiene razón: «no se colorea toda la
+                intervención, porque el 95% del texto sí es fiable». Marcarla
+                completa manda a releer trescientas palabras para encontrar las
+                cuatro dudosas, y quien lo haga dos veces deja de hacerlo.
+
+                Se subraya, no se tiñe: teñir vuelve difícil de leer justo lo
+                que hay que leer con más cuidado. Y el subrayado es punteado —
+                la misma trama de «sin verificar»— porque es lo mismo: algo que
+                nadie ha comprobado todavía.
+              */}
+              {partirPorDudosos(segment)}
             </p>
 
             {/*
