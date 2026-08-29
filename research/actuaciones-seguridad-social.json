@@ -608,6 +608,88 @@
         }
       ],
       "source_url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=62506"
+    },
+    {
+      "exact_name": "Acto de la administradora de riesgos laborales que reconoce o niega la prestación",
+      "area": "SEGURIDAD_SOCIAL",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 776 de 2002, art. 1 par. 2, y arts. 3, 5, 7 y 18",
+      "competent_authority": "La administradora de riesgos laborales — entidad privada. No es autoridad judicial ni administrativa: es la aseguradora del riesgo, y el control posterior corresponde al juez laboral",
+      "term": "DOS (2) MESES PARA RECONOCER Y PAGAR, Y VENCERLOS TIENE PRECIO CIERTO — INTERESES MORATORIOS AUTOMÁTICOS. El plazo corre «desde la fecha en la cual SE ALLEGUEN O ACREDITEN LOS REQUISITOS exigidos para su reconocimiento. VENCIDO ESTE TÉRMINO, la administradora de riesgos profesionales DEBERÁ RECONOCER Y PAGAR, EN ADICIÓN A LA PRESTACIÓN ECONÓMICA, UN INTERÉS MORATORIO igual al que rige para el impuesto de renta y complementarios EN PROPORCIÓN A LA DURACIÓN DE LA MORA. Lo anterior, sin perjuicio de las sanciones a que haya lugar» (art. 1 par. 2). El disparador no es la radicación sino la fecha en que se completan los requisitos: por eso conviene dejar constancia de cuándo se allegó el último documento.\n\nDATO QUE CIERRA UNA EXCUSA FRECUENTE: «Las acciones de recobro que adelanten las administradoras SON INDEPENDIENTES a su obligación de reconocimiento del pago» — que la ARL discuta con la EPS o con el empleador no suspende su deber de pagar.\n\nEL RELOJ DEL CLIENTE ES OTRO Y ES LA TRAMPA DEL RÉGIMEN: UN (1) AÑO, no tres. «Las prestaciones establecidas en el Decreto-ley 1295 de 1994 y en esta ley prescriben: a) LAS MESADAS PENSIONALES en el término de TRES (3) AÑOS; b) LAS DEMÁS PRESTACIONES en el término de UN (1) AÑO. LA PRESCRIPCIÓN SE CUENTA DESDE EL MOMENTO EN QUE SE LE DEFINE EL DERECHO AL TRABAJADOR» (art. 18). El subsidio por incapacidad temporal y la indemnización por incapacidad permanente parcial caen en el literal b). El punto de partida es defensivo y hay que alegarlo: no corre desde el accidente, sino desde la firmeza del dictamen.\n\nQUÉ DEBE RECONOCER SEGÚN EL GRADO: incapacidad temporal, subsidio del cien por ciento (100%) del salario base «hasta por ciento ochenta (180) días, que podrán ser prorrogados hasta por períodos que no superen otros ciento ochenta (180) días continuos adicionales» (art. 3); pérdida entre el cinco por ciento (5%) y menos del cincuenta por ciento (50%), indemnización «no inferior a dos (2) salarios base de liquidación, ni superior a veinticuatro (24) veces» (arts. 5 y 7).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Fecha en que se allegaron o acreditaron los requisitos, de la que corren los dos (2) meses",
+          "mandatory": true,
+          "basis": "Ley 776 de 2002, art. 1 par. 2"
+        },
+        {
+          "n": 2,
+          "name": "Calificación del origen y del grado de pérdida de capacidad laboral en que se funda",
+          "mandatory": true,
+          "basis": "Ley 776 de 2002, art. 5"
+        },
+        {
+          "n": 3,
+          "name": "Liquidación de la prestación según el grado, con el salario base de liquidación",
+          "mandatory": true,
+          "basis": "Ley 776 de 2002, arts. 3 y 7"
+        },
+        {
+          "n": 4,
+          "name": "Motivación de la negativa, cuando se niega, con la norma aplicada",
+          "mandatory": true,
+          "basis": "Ley 776 de 2002, art. 1"
+        },
+        {
+          "n": 5,
+          "name": "Reconocimiento de intereses moratorios si se superaron los dos (2) meses",
+          "mandatory": false,
+          "basis": "Ley 776 de 2002, art. 1 par. 2"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_0776_2002.html"
+    },
+    {
+      "exact_name": "Dictamen de la Junta Nacional de Calificación de Invalidez",
+      "area": "SEGURIDAD_SOCIAL",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 100 de 1993, art. 41, modificado por el art. 142 del Decreto-ley 019 de 2012; Decreto 1072 de 2015, arts. 2.2.5.1.41 (recursos) y 2.2.5.1.43 (firmeza)",
+      "competent_authority": "La Junta Nacional de Calificación de Invalidez, que resuelve la apelación contra el dictamen de la Junta Regional. Es un particular que ejerce función pública: su dictamen NO es acto administrativo y no se demanda ante lo contencioso",
+      "term": "CINCO (5) DÍAS PARA DECIDIR LA APELACIÓN, Y ESE RELOJ ES DE LA JUNTA, NO DEL AFILIADO: el art. 41 dispone que la decisión de la Junta Regional «será apelable ante la Junta Nacional de Calificación de Invalidez, LA CUAL DECIDIRÁ EN UN TÉRMINO DE CINCO (5) DÍAS».\n\nEL RELOJ DEL AFILIADO YA CORRIÓ ANTES Y ES EL QUE DECIDE SI ESTE DICTAMEN EXISTE: diez (10) días desde la notificación del dictamen regional para interponer reposición o apelación ANTE LA JUNTA REGIONAL QUE LO PROFIRIÓ —no ante la Nacional—, «acreditando las pruebas que se pretendan hacer valer y LA RESPECTIVA CONSIGNACIÓN DE LOS HONORARIOS DE LA JUNTA NACIONAL si se presenta en subsidio el de apelación» (Decreto 1072 de 2015, art. 2.2.5.1.41). Sin esa consignación la apelación no se surte, y es la omisión de forma que más apelaciones frustra.\n\nCON ESTE DICTAMEN SE AGOTA LA VÍA Y QUEDA EN FIRME: por el art. 2.2.5.1.43 los dictámenes adquieren firmeza cuando no se interpuso recurso en los diez días o cuando se resolvieron los interpuestos. Lo que sigue es el juez laboral — «Contra dichas decisiones proceden las acciones legales» (Ley 100, art. 41).\n\nQUÉ DEBE CONTENER PARA PODER ATACARSE, y su ausencia es lo que sostiene la demanda posterior: el porcentaje discriminado conforme al manual del Decreto 1507 de 2014, el ORIGEN —común o laboral, que decide quién paga— y la FECHA DE ESTRUCTURACIÓN, de la que dependen las cincuenta semanas en los tres años anteriores.\n\nADVERTENCIA DE CÓMPUTO: los «diez (10) días» del recurso no se califican como hábiles o calendario en la norma, aunque en otros incisos del mismo artículo sí se distingue. Ante esa ambigüedad se cuenta en el escenario más corto.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del dictamen apelado y de la fecha de su notificación",
+          "mandatory": true,
+          "basis": "Decreto 1072 de 2015, art. 2.2.5.1.41"
+        },
+        {
+          "n": 2,
+          "name": "Porcentaje de pérdida de capacidad laboral discriminado conforme al manual vigente",
+          "mandatory": true,
+          "basis": "Decreto 1507 de 2014"
+        },
+        {
+          "n": 3,
+          "name": "Origen de la contingencia y fecha de estructuración, con su fundamentación clínica",
+          "mandatory": true,
+          "basis": "Ley 100 de 1993, art. 41"
+        },
+        {
+          "n": 4,
+          "name": "Pronunciamiento sobre los motivos de inconformidad expuestos en la apelación",
+          "mandatory": true,
+          "basis": "Decreto 1072 de 2015, art. 2.2.5.1.41"
+        },
+        {
+          "n": 5,
+          "name": "Constancia de que con él queda en firme el dictamen y de que proceden las acciones legales",
+          "mandatory": true,
+          "basis": "Decreto 1072 de 2015, art. 2.2.5.1.43"
+        }
+      ],
+      "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_0776_2002.html"
     }
   ]
 }

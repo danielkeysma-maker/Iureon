@@ -256,6 +256,39 @@ export const AGRARIO_CATALOG: BranchCatalog = {
       { n: 5, name: 'Advertencia de que contra el acto no proceden recursos ni acción de nulidad', mandatory: true, basis: 'art. 76 inc. 3' }
     ],
     sourceUrl: 'http://www.secretariasenado.gov.co/senado/basedoc/decreto_0902_2017_pr001.html'
+  },
+  {
+    id: 'agrario/oposicion-en-el-procedimiento-unico-de-ordenamiento-social-de-la-propiedad',
+    exactName: 'Oposición en el Procedimiento Único de ordenamiento social de la propiedad',
+    branch: 'AGRARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Decreto Ley 902 de 2017, art. 46 (declarado condicionalmente exequible); art. 47; art. 75',
+    competentAuthority: 'La Agencia Nacional de Tierras en la fase administrativa; el juez competente cuando el cierre ordena pasar a fase judicial',
+    term: { status: 'VERIFICADO', description: 'LA VENTANA ES LARGA PERO TIENE UN CORTE INTERNO QUE CAMBIA EL VALOR DE LA PRUEBA: se puede oponer «A PARTIR DE LA EXPEDICIÓN DEL ACTO ADMINISTRATIVO que acepta o promueve alguno de los procedimientos […] Y HASTA LA DECISIÓN DE CIERRE EN FASE ADMINISTRATIVA» (art. 46). No hay días que contar: hay dos hitos. EL CORTE QUE IMPORTA ES LA ETAPA PROBATORIA, y oponerse tarde no invalida la oposición pero le quita fuerza: «Si el opositor se constituye como tal CERRADA LA ETAPA PROBATORIA del Procedimiento Único, las pruebas que aporte SERÁN VALORADAS POR LA AGENCIA NACIONAL DE TIERRAS EN LA DECISIÓN DE CIERRE» — es decir, ya no se practican ni se contradicen: se valoran al final, con lo que llegue. QUIÉN PUEDE OPONERSE, y la lista es más amplia de lo que suele creerse: «quien creyere que el predio objeto de la respectiva actuación es de SU PROPIEDAD, total o parcialmente, fuere POSEEDOR de aquel o considerare tener MEJOR DERECHO, TITULARES DE DERECHOS REALES o RAZÓN FUNDADA que impida el trámite y resolución del asunto». No hace falta título inscrito. FORMA MÍNIMA, PERO CON UNA CARGA QUE NO SE PUEDE OMITIR: la oposición se formula «POR ESCRITO O DE MANERA VERBAL, ACOMPAÑANDO PRUEBA SUMARIA en la cual funde su oposición». Sin prueba sumaria no hay oposición, por informal que sea el medio. QUÉ DESENCADENA OPONERSE: en los asuntos de los numerales 3, 4 y 8 del art. 58 con oposición, y en los de los numerales 5, 6, 7 y 10, «EL ACTO ADMINISTRATIVO DE CIERRE DISPONDRÁ LA PRESENTACIÓN DE LA DEMANDA ANTE EL JUEZ COMPETENTE» (art. 75) — la oposición no cierra el asunto: lo judicializa. Y si la conciliación resulta fallida, es la propia ANT la que formula la solicitud de formalización ante el juez (art. 47).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del predio y del procedimiento en curso, con el acto que lo promueve', mandatory: true, basis: 'Decreto Ley 902 de 2017, art. 46' },
+      { n: 2, name: 'Calidad en que se opone: propietario, poseedor, titular de derecho real o mejor derecho', mandatory: true, basis: 'Decreto Ley 902 de 2017, art. 46' },
+      { n: 3, name: 'Prueba sumaria que funda la oposición, aportada con ella', mandatory: true, basis: 'Decreto Ley 902 de 2017, art. 46' },
+      { n: 4, name: 'Constancia de si la etapa probatoria sigue abierta, que determina cómo se valorarán las pruebas', mandatory: true, basis: 'Decreto Ley 902 de 2017, art. 46' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/decreto_0902_2017_pr001.html'
+  },
+  {
+    id: 'agrario/acto-administrativo-de-cierre-del-procedimiento-unico',
+    exactName: 'Acto administrativo de cierre del Procedimiento Único',
+    branch: 'AGRARIO',
+    role: 'DESPACHO',
+    legalBasis: 'Decreto Ley 902 de 2017, art. 75 (declarado condicionalmente exequible); arts. 46, 47, 58, 60 y 61',
+    competentAuthority: 'La Agencia Nacional de Tierras',
+    term: { status: 'VERIFICADO', description: 'SIN PLAZO EN DÍAS: EL DECRETO LEY NO FIJA TÉRMINO PARA EXPEDIRLO. Lo que sí fija es qué decide, y de eso depende si el asunto termina o empieza otra vez ante un juez. CUÁNDO OBLIGA A DEMANDAR: «Con relación a los asuntos indicados en los numerales 3, 4 y 8 del artículo 58 EN LOS QUE SE PRESENTARON OPOSICIONES, así como los establecidos en los numerales 5, 6, 7 y 10, EL ACTO ADMINISTRATIVO DE CIERRE DISPONDRÁ LA PRESENTACIÓN DE LA DEMANDA ANTE EL JUEZ COMPETENTE» (art. 75). Los numerales 5, 6, 7 y 10 pasan a fase judicial AUNQUE NADIE SE HAYA OPUESTO. LA EXCEPCIÓN QUE EVITA EL PLEITO, y es la razón para conciliar temprano: esos asuntos «siempre pasarán a etapa judicial […] con independencia de que se hubieren presentado o no oposiciones en el trámite administrativo, SALVO QUE durante el desarrollo del proceso administrativo EXISTA UN ACUERDO O CONCILIACIÓN entre las partes procesales» (art. 61). QUÉ VALORA AL CERRAR: las pruebas del opositor que se constituyó después de cerrada la etapa probatoria se valoran precisamente aquí (art. 46), de modo que el acto de cierre es el único momento en que esa prueba pesa. ADVERTENCIA DE COMPETENCIA QUE HAY QUE VERIFICAR ANTES DE RADICAR LA DEMANDA QUE ESTE ACTO ORDENA: el art. 78, que designaba al juez del Procedimiento Único, fue declarado INEXEQUIBLE por la Sentencia C-073 de 2018, y la C-099 de 2026 precisó que la competencia «continuará siendo ejercida por las autoridades judiciales establecidas en la Sentencia C-073 de 2018 hasta que la justicia agraria y rural asuma las competencias que le corresponden conforme al Acto Legislativo 03 de 2023». Hay que comprobar si esa jurisdicción ya entró en funcionamiento. QUIÉN MÁS PUEDE ESTAR EN EL EXPEDIENTE: a los Procuradores Ambientales y Agrarios se les comunica la actuación para que se hagan parte «EN CUALQUIER ETAPA», y su intervención «NO IMPEDIRÁ ADELANTAR NI SUSPENDERÁ el procedimiento» (art. 48).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del asunto por su numeral del art. 58, que determina si pasa a fase judicial', mandatory: true, basis: 'Decreto Ley 902 de 2017, art. 75' },
+      { n: 2, name: 'Relación de las oposiciones presentadas y valoración de sus pruebas', mandatory: true, basis: 'Decreto Ley 902 de 2017, art. 46' },
+      { n: 3, name: 'Constancia de si hubo acuerdo o conciliación que evite la etapa judicial', mandatory: true, basis: 'Decreto Ley 902 de 2017, art. 61' },
+      { n: 4, name: 'Orden de presentar la demanda ante el juez competente, cuando corresponda', mandatory: true, basis: 'Decreto Ley 902 de 2017, art. 75' },
+      { n: 5, name: 'Constancia de comunicación a los Procuradores Ambientales y Agrarios', mandatory: false, basis: 'Decreto Ley 902 de 2017, art. 48' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/decreto_0902_2017_pr001.html'
   }
   ]
 };
