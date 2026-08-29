@@ -25,9 +25,51 @@ export interface FirmSummary {
   catalogoTotal: number;
 }
 
+/** Una cuenta de la firma: quien es y cuanto gasto, nunca en que. */
+export interface FirmUserDetail {
+  id: string;
+  email: string;
+  role: string;
+  /** Cobrado este mes calendario. Cero significa que no redacto nada. */
+  consumoMesCop: number;
+  /** `null` en una cuenta que nunca entro — no es un cero, es una ausencia. */
+  ultimoAcceso: string | null;
+  creadoEl: string;
+  desactivado: boolean;
+}
+
+/** Una entrada del registro de operacion, que los socios de la firma tambien ven. */
+export interface OperationLogEntry {
+  id: string;
+  userEmail: string;
+  action: string;
+  resource: string;
+  timestamp: string;
+}
+
+export interface FirmDetail extends FirmSummary {
+  /**
+   * Dias que dura el saldo al ritmo de los ultimos 30 dias.
+   *
+   * `null` cuando no se consumio nada en esos 30 dias: no hay ritmo, luego no
+   * hay dias, e inventarlos seria justo lo que este codigo rechaza.
+   */
+  diasDeSaldo: number | null;
+  usuariosActivos14d: number;
+  usuarios: FirmUserDetail[];
+  registroDeOperacion: OperationLogEntry[];
+}
+
 export const adminApi = {
   listFirms: () =>
     httpClient.get<{ firms: FirmSummary[] }>('/api/admin/firms').then((r) => r.firms),
+
+  /**
+   * Una firma, entera. El endpoint existia desde hace tiempo y NADIE lo
+   * llamaba, que es por lo que la ficha 7b no podia existir.
+   */
+  firmDetail: (firmId: string) =>
+    httpClient.get<{ firm: FirmDetail }>(`/api/admin/firms/${firmId}`).then((r) => r.firm),
 
   createFirm: (input: {
     firmName: string;

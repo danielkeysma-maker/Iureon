@@ -1,6 +1,7 @@
 import React from 'react';
 import { AlertCircle, Building2, CreditCard, Plus, RefreshCw, ShieldCheck, Users } from 'lucide-react';
 import { adminApi, type FirmSummary } from '../admin.api';
+import { FirmDetailDialog } from './FirmDetailDialog';
 
 /**
  * Running the platform: the firms on it, their plans, their balances.
@@ -32,6 +33,7 @@ const ESTADO_ESTILO: Record<string, string> = {
 
 export const OperatorConsole: React.FC = () => {
   const [firms, setFirms] = React.useState<FirmSummary[]>([]);
+  const [fichaAbierta, setFichaAbierta] = React.useState<string | null>(null);
   const [cargando, setCargando] = React.useState(true);
   const [error, setError] = React.useState('');
   const [creando, setCreando] = React.useState(false);
@@ -302,7 +304,14 @@ export const OperatorConsole: React.FC = () => {
             <div key={firm.id} className="p-4 space-y-2">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="font-bold text-ink-900 text-xs truncate">{firm.name}</p>
+                  <button
+                    type="button"
+                    onClick={() => setFichaAbierta(firm.id)}
+                    className="block max-w-full truncate text-left text-xs font-bold text-ink-900 hover:underline"
+                    title="Abrir la ficha de la firma"
+                  >
+                    {firm.name}
+                  </button>
                   <p className="text-[11px] text-ink-500 font-mono">NIT {firm.nit}</p>
                 </div>
 
@@ -391,6 +400,8 @@ export const OperatorConsole: React.FC = () => {
         a sus audiencias, borradores ni expedientes — eso es material amparado por el secreto
         profesional. Cada cambio queda registrado en la auditoría de la firma afectada, con tu correo.
       </p>
+
+      <FirmDetailDialog firmId={fichaAbierta} onClose={() => setFichaAbierta(null)} />
     </div>
   );
 };
