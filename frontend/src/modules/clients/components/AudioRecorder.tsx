@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, Mic, Square, Trash2 } from 'lucide-react';
+import { AlertTriangle, Mic, Pause, Play, Square, Trash2 } from 'lucide-react';
 
 interface AudioRecorderProps {
   /** Called with the finished recording, ready to transcribe. */
@@ -51,6 +51,9 @@ const pickMimeType = (): string | undefined => {
   const candidates = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'];
   return candidates.find((type) => MediaRecorder.isTypeSupported(type));
 };
+
+import { OndaDeAudio } from '../../../design/OndaDeAudio';
+import { AudioPreview } from '../../transcription/components/AudioPreview';
 
 export const AudioRecorder: React.FC<AudioRecorderProps> = ({
   onRecorded,
@@ -274,7 +277,15 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
           </button>
         </div>
 
-        <audio src={listo.url} controls className="w-full h-9" />
+        {/*
+          ESCUCHAR ANTES DE MANDAR A TRANSCRIBIR, con la misma onda de la
+          grabacion. Aqui importa mas que en ningun otro sitio: es el ULTIMO
+          momento en que se puede repetir la entrevista sin volver a citar al
+          cliente. Una pista muda se reproduce igual que una buena y la barra
+          avanza en las dos — la onda es lo unico que distingue las dos cosas
+          antes de gastar la transcripcion.
+        */}
+        <AudioPreview file={listo.file} />
 
         <button
           type="button"
@@ -332,20 +343,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             EN PAUSA SE QUEDA QUIETA Y EN GRIS, que es lo unico honesto: una onda
             moviendose mientras no se graba diria que sigue capturando.
           */}
-          <div className="flex h-[26px] items-center gap-[2px]" aria-hidden="true">
-            {niveles.map((nivel, i) => (
-              <span
-                key={i}
-                className={`w-[3px] shrink-0 rounded-[1px] ${
-                  pausado || i < niveles.length - 14 ? 'bg-neutral-line' : 'bg-danger'
-                }`}
-                style={{ height: `${Math.max(4, Math.round(nivel * 24))}px` }}
-              />
-            ))}
-            {niveles.length === 0 && (
-              <span className="font-mono text-[11px] text-ink-400">Escuchando…</span>
-            )}
-          </div>
+          <OndaDeAudio niveles={niveles} activa={!pausado} tono="grabando" alto={26} />
 
           {/*
             LOS TRES CONTROLES DE 4d: el circulo rojo de 52px que detiene,
@@ -385,25 +383,49 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
           Grabar la entrevista
         </button>
       ) : grabando ? (
-        <div className="flex items-center gap-3">
-          <span className="relative flex h-3 w-3 shrink-0">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[rgb(var(--danger)/0.06)]0 opacity-75" />
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-danger" />
-          </span>
+        /*
+          LA ONDA Y LA PAUSA TAMBIEN EN ESCRITORIO. Estaban solo en la piel
+          movil, y no habia razon: el abogado que graba desde el portatil
+          necesita las mismas dos cosas — ver si el microfono esta captando algo
+          antes de confiarle dos horas, y poder parar cuando el cliente atiende
+          el telefono. El punto que parpadeaba decia «esto esta corriendo», no
+          «esto esta oyendo», que es otra cosa.
+        */
+        <div className="space-y-2.5">
+          <div className="flex items-center gap-3">
+            <span
+              className={`h-[9px] w-[9px] shrink-0 rounded-full ${
+                pausado ? 'bg-ink-400' : 'bg-danger'
+              }`}
+            />
 
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-ink-900 font-mono">{formatElapsed(segundos)}</p>
-            <p className="text-[11px] text-ink-500">Grabando la entrevista…</p>
+            <div className="min-w-0 flex-1">
+              <p className="font-mono text-xs font-bold text-ink-900">{formatElapsed(segundos)}</p>
+              <p className="text-[11px] text-ink-500">
+                {pausado ? 'En pausa · el tiempo no corre' : 'Grabando la entrevista…'}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={alternarPausa}
+              className="btn-neutral btn-sm shrink-0"
+            >
+              {pausado ? <Play className="h-3 w-3" /> : <Pause className="h-3 w-3" />}
+              {pausado ? 'Reanudar' : 'Pausar'}
+            </button>
+
+            <button
+              type="button"
+              onClick={detener}
+              className="flex shrink-0 items-center gap-1.5 rounded-control bg-danger px-3 py-1.5 text-[11px] font-semibold text-white hover:brightness-110"
+            >
+              <Square className="h-3 w-3 fill-current" />
+              Detener
+            </button>
           </div>
 
-          <button
-            type="button"
-            onClick={detener}
-            className="px-3 py-1.5 bg-danger hover:brightness-110 text-white rounded-control text-[11px] font-semibold flex items-center gap-1.5 shrink-0"
-          >
-            <Square className="w-3 h-3 fill-current" />
-            Detener
-          </button>
+          <OndaDeAudio niveles={niveles} activa={!pausado} tono="grabando" alto={22} />
         </div>
       ) : (
         <button

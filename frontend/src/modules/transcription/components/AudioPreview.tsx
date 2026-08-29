@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Headphones } from 'lucide-react';
+import { Headphones, Pause, Play, Square } from 'lucide-react';
+import { OndaDeAudio, useNivelesDeAudio } from '../../../design/OndaDeAudio';
 
 interface AudioPreviewProps {
   /** The file the lawyer selected. Never re-downloaded from storage. */
@@ -43,6 +44,54 @@ export const AudioPreview: React.FC<AudioPreviewProps> = ({ file, anclado = fals
     return () => URL.revokeObjectURL(objectUrl);
   }, [file]);
 
+  /*
+   * LA ONDA TAMBIEN AL ESCUCHAR (1g y 2a). El navegador ya trae controles, pero
+   * no dicen si HAY SONIDO: una pista muda se reproduce igual que una buena, y
+   * la barra avanza en las dos. Quien vuelve a escuchar una audiencia lo hace
+   * porque duda de una palabra — necesita ver dónde el micrófono captó algo.
+   *
+   * Se mide sobre el propio `<audio>` con `createMediaElementSource`, la misma
+   * técnica que el grabador usa sobre el micrófono. Al enrutarlo por el
+   * analizador hay que RECONECTAR la salida al destino: sin eso se ve la onda y
+   * no se oye nada — lo hace `useNivelesDeAudio`.
+   */
+  const audioRef = React.useRef<HTMLAudioElement>(null);
+  const [sonando, setSonando] = React.useState(false);
+  const { niveles, conectar, soltar } = useNivelesDeAudio();
+  const conectadoRef = React.useRef(false);
+
+  const alternar = () => {
+    const el = audioRef.current;
+    if (!el) return;
+
+    if (el.paused) {
+      /*
+       * `createMediaElementSource` solo se puede llamar UNA VEZ por elemento:
+       * la segunda lanza. Por eso el guardia — y por eso se conecta al primer
+       * play y no al montar, cuando el navegador todavía puede bloquear el
+       * contexto por falta de gesto del usuario.
+       */
+      if (!conectadoRef.current) {
+        conectar(el);
+        conectadoRef.current = true;
+      }
+      void el.play();
+    } else {
+      el.pause();
+    }
+  };
+
+  const detener = () => {
+    const el = audioRef.current;
+    if (!el) return;
+    el.pause();
+    el.currentTime = 0;
+    setSonando(false);
+    soltar();
+    /* El contexto se cerró: el elemento necesita uno nuevo la próxima vez. */
+    conectadoRef.current = false;
+  };
+
   if (!url) return null;
 
   if (anclado) {
@@ -52,7 +101,41 @@ export const AudioPreview: React.FC<AudioPreviewProps> = ({ file, anclado = fals
         title="Se reproduce desde este navegador; la grabación se borra del servidor al transcribirse y dura lo que esta pestaña."
       >
         <Headphones className="h-3.5 w-3.5 shrink-0 text-ink-400" />
-        <audio controls src={url} className="h-8 w-full" preload="metadata" />
+
+        <button type="button" onClick={alternar} className="btn-neutral btn-sm shrink-0">
+          {sonando ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+          {sonando ? 'Pausar' : 'Escuchar'}
+        </button>
+        <button type="button" onClick={detener} className="btn-ghost btn-sm shrink-0">
+          <Square className="h-3 w-3" />
+          Detener
+        </button>
+
+        <OndaDeAudio
+          niveles={niveles}
+          activa={sonando}
+          tono="reproduciendo"
+          alto={22}
+          vacio="Sin reproducir"
+        />
+
+        {/*
+          EL REPRODUCTOR NATIVO SE QUEDA, con su barra de posición: los botones
+          de arriba resuelven escuchar, pausar y detener, pero saltar al minuto
+          14 sigue siendo suyo. Sustituirlo entero obligaría a reconstruir la
+          barra, el volumen y la velocidad — y la velocidad es justo lo que usa
+          quien transcribe a mano.
+        */}
+        <audio
+          ref={audioRef}
+          controls
+          src={url}
+          className="h-8 min-w-0 flex-1"
+          preload="metadata"
+          onPlay={() => setSonando(true)}
+          onPause={() => setSonando(false)}
+          onEnded={() => setSonando(false)}
+        />
       </div>
     );
   }
@@ -64,7 +147,34 @@ export const AudioPreview: React.FC<AudioPreviewProps> = ({ file, anclado = fals
         <span className="text-[11px] font-semibold text-ink-700">Escuchar la grabación</span>
       </div>
 
-      <audio controls src={url} className="w-full h-9" preload="metadata" />
+      <div className="flex items-center gap-2">
+        <button type="button" onClick={alternar} className="btn-neutral btn-sm shrink-0">
+          {sonando ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+          {sonando ? 'Pausar' : 'Escuchar'}
+        </button>
+        <button type="button" onClick={detener} className="btn-ghost btn-sm shrink-0">
+          <Square className="h-3 w-3" />
+          Detener
+        </button>
+        <OndaDeAudio
+          niveles={niveles}
+          activa={sonando}
+          tono="reproduciendo"
+          alto={22}
+          vacio="Sin reproducir"
+        />
+      </div>
+
+      <audio
+        ref={audioRef}
+        controls
+        src={url}
+        className="h-9 w-full"
+        preload="metadata"
+        onPlay={() => setSonando(true)}
+        onPause={() => setSonando(false)}
+        onEnded={() => setSonando(false)}
+      />
 
       <p className="text-[10.5px] text-ink-500 leading-snug">
         Se reproduce desde este navegador, no desde el servidor: la grabación se borra del
