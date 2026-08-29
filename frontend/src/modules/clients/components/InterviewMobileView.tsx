@@ -1,11 +1,14 @@
 import React from 'react';
 import { AudioRecorder } from './AudioRecorder';
+import { ClientPicker } from './ClientPicker';
+import type { Client } from '../clients.api';
 import {
   RAZON_AUTORIZACION,
   TEXTO_AUTORIZACION,
   useAutorizacionDeGrabacion
 } from '../useAutorizacionDeGrabacion';
 import { useTranscription } from '../../transcription/hooks/useTranscription';
+import { clientsApi } from '../clients.api';
 import { IconoSinVerificar } from '../../../design/ArtboardIcons';
 
 /**
@@ -55,13 +58,53 @@ interface InterviewMobileViewProps {
 }
 
 export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
-  const { hasFirm, isAvailable, isUploading, isTranscribing, result, error, transcribe } =
-    useTranscription('ENTREVISTA');
+  const {
+    hasFirm,
+    isAvailable,
+    isUploading,
+    isTranscribing,
+    result,
+    error,
+    transcribe,
+    transcriptionId
+  } = useTranscription('ENTREVISTA');
   const { autorizado, autorizadoEl, marcar } = useAutorizacionDeGrabacion();
 
+  /*
+   * CON QUIEN ES LA ENTREVISTA. Faltaba, y no era un detalle: 4d pone la ficha
+   * del consultante como CABECERA de la pantalla —avatar con iniciales, nombre
+   * y cedula—, y el acta (14b) imprime «Consultante: nombre — C.C. documento»
+   * con su linea de firma. Una entrevista sin consultante se archiva sin poder
+   * encontrarla despues por la persona, que es como se busca.
+   *
+   * Se guarda la FICHA y no solo el id, por la misma razon que en escritorio:
+   * el acta necesita el nombre y el documento, y volver a pedirlos por id seria
+   * un viaje de red por algo que ya esta en memoria.
+   */
+  const [clienteId, setClienteId] = React.useState<string | null>(null);
+  const [cliente, setCliente] = React.useState<Client | null>(null);
+
   const empezar = (file: File) => {
+    /*
+     * El segundo parametro es `contextPrompt`, NO el cliente. Se paso el id por
+     * ahi durante un momento y habria viajado al proveedor como contexto de
+     * transcripcion — vocabulario inventado que empeora el transcrito. El
+     * cliente se asocia como en escritorio, despues de transcribir.
+     */
     void transcribe(file, undefined, autorizadoEl ?? undefined);
   };
+
+  /*
+   * SE ATA EL CLIENTE EN CUANTO HAY TRANSCRITO AL QUE ATARLO. La eleccion se
+   * hace ANTES de grabar y el transcrito nace despues; sin este efecto, lo que
+   * el abogado escogio se perderia entre los dos momentos. Es el mismo enlace
+   * que hace la pantalla de escritorio, y falla en silencio a proposito: el
+   * transcrito ya esta a salvo y el vinculo se puede rehacer.
+   */
+  React.useEffect(() => {
+    if (!transcriptionId || !clienteId) return;
+    void clientsApi.linkInterview(transcriptionId, clienteId).catch(() => {});
+  }, [transcriptionId, clienteId]);
 
   const trabajando = isUploading || isTranscribing;
 
@@ -78,6 +121,63 @@ export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
 
   return (
     <div className="flex h-full min-h-0 flex-1 flex-col overflow-y-auto bg-canvas">
+      {/*
+        LA CABECERA DE 4d, CITADA: `padding:10px 16px 12px`, avatar de 34px
+        circular sobre `#EAF0F5` con las iniciales en mono 600 12px `#17456B`,
+        nombre `600 14px` y cedula `400 11px` MONO `#667487`. Todos esos colores
+        son tokens: brand-50, brand-700, ink-900, ink-500.
+      */}
+      <header className="shrink-0 border-b border-line-200 bg-surface px-4 pb-3 pt-2.5">
+        {cliente ? (
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full bg-brand-50 font-mono text-[12px] font-semibold text-brand-700">
+              {cliente.fullName
+                .split(/\s+/)
+                .slice(0, 2)
+                .map((p) => p[0])
+                .join('')
+                .toUpperCase()}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-[14px] font-semibold leading-tight text-ink-900">
+                {cliente.fullName}
+              </p>
+              <p className="truncate font-mono text-[11px] leading-tight text-ink-500">
+                C.C. {cliente.documentId}
+                {cliente.interviews === 0 ? ' · cliente nuevo' : ` · ${cliente.interviews} entrevistas`}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setClienteId(null);
+                setCliente(null);
+              }}
+              className="shrink-0 text-[12px] font-medium text-brand-700"
+            >
+              Cambiar
+            </button>
+          </div>
+        ) : (
+          <>
+            <p className="mb-2 text-[13px] font-semibold text-ink-900">
+              ¿Con quién es la entrevista?
+            </p>
+            <ClientPicker
+              value={clienteId}
+              onChange={(id, ficha) => {
+                setClienteId(id);
+                setCliente(ficha);
+              }}
+            />
+            <p className="mt-2 text-justify text-[11.5px] leading-snug text-ink-500 [text-wrap:pretty]">
+              Para encontrar esta conversación por la persona, no por el nombre del archivo. El
+              acta imprime su nombre y su cédula.
+            </p>
+          </>
+        )}
+      </header>
+
       <div className="flex flex-col gap-2.5 px-4 py-3.5">
         {/*
           LA AUTORIZACION VA PRIMERO Y BLOQUEA. No es una casilla de tramite: sin
@@ -120,7 +220,7 @@ export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
         <AudioRecorder
           variante="movil"
           onRecorded={empezar}
-          disabled={!hasFirm || !autorizado || trabajando}
+          disabled={!hasFirm || !autorizado || !clienteId || trabajando}
         />
 
         {!hasFirm && (

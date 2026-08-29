@@ -674,8 +674,18 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                 acababan de alinear.
               */
               className={`text-[13px] text-ink-700 leading-[1.65] text-justify [text-wrap:pretty] ${
+                /*
+                  LA FILA EN EDICION VA EN AZUL DE MARCA CON HALO, no en ambar.
+                  Lo dicen los dos artboards con el mismo valor —`border:1px
+                  solid #17456B` con `box-shadow:0 0 0 3px rgba(23,69,107,.10)`,
+                  1g y 4d— y ademas es lo correcto en este sistema: el ambar
+                  significa «sin verificar», y una intervencion que se esta
+                  corrigiendo no esta sin verificar, esta bajo la mano de
+                  alguien. Usar el mismo color para las dos cosas le enseña al
+                  ojo que el ambar no quiere decir nada en particular.
+                */
                 onEditSegment
-                  ? 'outline-none focus:bg-[rgb(var(--unverified-surf))]/60 focus:ring-1 focus:ring-[rgb(var(--unverified-line))] rounded px-1 -mx-1 cursor-text'
+                  ? 'outline-none focus:bg-surface focus:ring-1 focus:ring-brand-700 focus:shadow-[0_0_0_3px_rgb(var(--brand-700)/0.10)] rounded px-1 -mx-1 cursor-text'
                   : ''
               }`}
               title={
