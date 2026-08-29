@@ -35,7 +35,7 @@ import { SavedDraftsView } from './modules/documents/components/SavedDraftsView'
 import type { SavedDraftEntry } from './modules/documents/types';
 import { useSavedDrafts } from './modules/documents/hooks/useSavedDrafts';
 
-import { TenantUserManagementModal } from './modules/tenant/components/TenantUserManagementModal';
+import { OperatorConsoleDialog } from './modules/admin/components/OperatorConsoleDialog';
 import { FirmUsersDialog } from './modules/tenant/components/FirmUsersDialog';
 import { LoginPortalView } from './modules/tenant/components/LoginPortalView';
 import type { MainView } from './modules/tenant/types';
@@ -95,6 +95,13 @@ export function App() {
   const [session, setSession] = useState(() => readSession());
   const isAuthenticated = Boolean(session);
   const currentUserEmail = session?.user.email ?? '';
+  /*
+   * Quien opera la plataforma se decide por el ROL que impone el servidor,
+   * no por un correo escrito aqui. Esta comprobacion es solo de interfaz:
+   * el backend vuelve a imponer el rol en cada endpoint, asi que editar el
+   * bundle no concede ningun poder — solo cambia lo que se pinta.
+   */
+  const esSuperusuario = session?.user.role === 'SUPER_ADMIN';
 
   /*
    * The module survives a RELOAD, and only a reload.
@@ -251,18 +258,16 @@ export function App() {
 
   /*
    * A firm is created from the OPERATOR CONSOLE, which issues its first account
-   * at the same time. Self-registration was removed: it let anyone open a
-   * tenant and use the product without becoming a client. These three handlers used to
-   * create, edit and delete tenants in localStorage, which is why the registry
-   * table was empty and why a firm vanished with the browser.
+   * at the same time. Self-registration was removed: it let anyone open a tenant
+   * and use the product without becoming a client. Three handlers here used to
+   * create, edit and delete tenants IN LOCALSTORAGE, which is why the registry
+   * table stayed empty and why a firm vanished with the browser.
    *
-   * Editing the firm on screen still works, and stays local until there is an
-   * endpoint to persist it; deleting a tenant a session is bound to would only
-   * strand that session, so it is no longer offered here.
+   * The last of the three —the local edit— went with the obsolete shell that
+   * was its only caller. It never persisted anything, so keeping it would have
+   * meant showing an edit that the next reload undoes. Editing a firm returns
+   * when there is an endpoint that writes it.
    */
-  const handleUpdateFirm = (updatedFirm: LawFirmTenant) => {
-    if (activeFirm.id === updatedFirm.id) setActiveFirm(updatedFirm);
-  };
 
   /*
    * THE DEDUCTION IS THE SERVER'S, AND IT USED TO BE A LIE HERE.
@@ -453,18 +458,17 @@ export function App() {
       />
 
       {/*
-        Dos gestiones distintas: la del SOCIO administra SU firma (usuarios
-        reales de Supabase Auth, consumo del mes, roles con imposicion en el
-        servidor); la del superusuario conserva su consola de operacion.
+        Dos gestiones distintas, y quien las separa es EL ROL DE LA SESION, no
+        un correo escrito en el bundle. El SOCIO administra SU firma (6c:
+        usuarios reales de Supabase Auth, consumo del mes, roles con imposicion
+        en el servidor). El SUPERUSUARIO recibe la consola de operacion (7a:
+        las firmas de la plataforma, sus planes y sus saldos), que antes vivia
+        escondida como una pestana dentro de un cascaron obsoleto.
       */}
-      {currentUserEmail === 'ingdanielma@gmail.com' ? (
-        <TenantUserManagementModal
+      {esSuperusuario ? (
+        <OperatorConsoleDialog
           isOpen={isUserManagementModalOpen}
           onClose={() => setIsUserManagementModalOpen(false)}
-          firms={registeredFirms}
-          activeFirm={activeFirm}
-          onSelectFirm={(f) => setActiveFirm(f)}
-          onUpdateFirm={handleUpdateFirm}
         />
       ) : (
         <FirmUsersDialog
@@ -489,7 +493,7 @@ export function App() {
         onOpenSubscriptionModal={() => setIsSubscriptionModalOpen(true)}
         onOpenUserManagementModal={() => setIsUserManagementModalOpen(true)}
         onOpenRechargeModal={() => setIsRechargeModalOpen(true)}
-        isSuperUser={currentUserEmail === 'ingdanielma@gmail.com'}
+        isSuperUser={esSuperusuario}
       />
       )}
 
