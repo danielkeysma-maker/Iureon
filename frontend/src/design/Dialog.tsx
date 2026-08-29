@@ -148,12 +148,12 @@ export const Dialog: React.FC<DialogProps> = ({
         /*
           En movil: ancho completo, esquinas redondeadas SOLO arriba y sin borde
           —se apoya en el borde de la pantalla, como una hoja que sigue mas
-          alla del recorte—, con alto maximo del 88% para que siempre se vea
+          alla del recorte—, con alto maximo del 76% para que siempre se vea
           algo de lo que hay detras y se entienda que es una capa, no una
           pantalla nueva. Y `pb-[env(safe-area-inset-bottom)]` para no quedar
           bajo la franja del gesto de inicio.
         */
-        className={`relative flex max-h-[88vh] w-full flex-col overflow-hidden rounded-t-[16px] border-line-200 bg-surface pb-[env(safe-area-inset-bottom)] shadow-[0_16px_40px_-12px_rgb(16_24_34/0.3)] focus:outline-none sm:max-h-none sm:rounded-card sm:border sm:pb-0 ${ANCHO[tamano]}`}
+        className={`relative flex max-h-[76vh] w-full flex-col overflow-hidden rounded-t-[16px] border-line-200 bg-surface pb-[env(safe-area-inset-bottom)] shadow-[0_16px_40px_-12px_rgb(16_24_34/0.3)] focus:outline-none sm:max-h-none sm:rounded-card sm:border sm:pb-0 ${ANCHO[tamano]}`}
       >
         {/* ─── CABECERA · fija, nunca lleva controles ni pestañas ────────── */}
         {/*

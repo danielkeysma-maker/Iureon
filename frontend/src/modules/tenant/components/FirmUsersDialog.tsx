@@ -157,7 +157,16 @@ export const FirmUsersDialog: React.FC<FirmUsersDialogProps> = ({
             {visibles.map((u) => (
               <div
                 key={u.id}
-                className={`t-row flex flex-wrap items-center gap-3 ${u.desactivado ? 'opacity-60' : ''}`}
+                /*
+                  TARJETA EN MOVIL, FILA EN ESCRITORIO (8d). Las cuatro columnas
+                  suman 540px antes del correo; en 375 quedaban cuatro datos
+                  sueltos sin rotulo. 8d lo resuelve como tarjeta: identidad
+                  arriba, y debajo —tras un filete— el permiso y el consumo, que
+                  son los dos datos por los que se abre esta pantalla.
+                */
+                className={`t-row flex flex-col items-stretch gap-2 md:flex-row md:flex-wrap md:items-center md:gap-3 ${
+                  u.desactivado ? 'opacity-60' : ''
+                }`}
               >
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-ui text-ink-900">{u.email}</span>
@@ -168,7 +177,14 @@ export const FirmUsersDialog: React.FC<FirmUsersDialogProps> = ({
                   )}
                 </span>
 
-                <span className="w-[160px] shrink-0">
+                {/*
+                  EN MOVIL EL ROL, EL CONSUMO Y LA ACTIVIDAD VAN EN UNA FILA
+                  BAJO EL FILETE, como en la maqueta. En escritorio siguen
+                  siendo tres columnas, que es lo que permite comparar doce
+                  personas de un vistazo.
+                */}
+                <span className="flex items-center gap-2 border-t border-line-100 pt-2 md:contents md:border-0 md:pt-0">
+                <span className="min-w-0 flex-1 md:w-[160px] md:flex-none md:shrink-0">
                   <span className="block text-[12.5px] text-ink-900">{ROL[u.role] ?? u.role}</span>
                   {/* La frontera real: verificar el catálogo es de socios, y el servidor lo impone. */}
                   <span className={`text-[11px] ${u.role === 'FIRM_ADMIN' ? 'text-verified' : 'text-ink-400'}`}>
@@ -176,13 +192,16 @@ export const FirmUsersDialog: React.FC<FirmUsersDialogProps> = ({
                   </span>
                 </span>
 
-                <span className="w-[100px] shrink-0 text-right font-mono text-[12px] text-ink-900">
+                <span className="shrink-0 text-right font-mono text-[12px] text-ink-900 md:w-[100px]">
                   {u.consumoMesCop > 0 ? pesos(u.consumoMesCop) : '—'}
                 </span>
 
-                <span className="w-[110px] shrink-0 text-meta text-ink-500">{hace(u.ultimoAcceso)}</span>
+                <span className="shrink-0 text-meta text-ink-500 md:w-[110px]">
+                  {hace(u.ultimoAcceso)}
+                </span>
+                </span>
 
-                <span className="flex w-[170px] shrink-0 justify-end gap-1.5">
+                <span className="flex shrink-0 justify-end gap-1.5 md:w-[170px]">
                   {u.role !== 'SUPER_ADMIN' && (
                     <>
                       <button

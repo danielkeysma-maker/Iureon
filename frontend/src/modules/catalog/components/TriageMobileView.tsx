@@ -89,14 +89,22 @@ const Tarjeta: React.FC<{ estado: Estado; children: React.ReactNode; rayada?: bo
     style={{
       borderLeft: `3px solid ${BORDE[estado]}`,
       /*
-       * EL RAYADO DE LA MAQUETA: `repeating-linear-gradient(135deg,#FDFAF3 0 6px,
-       * #FBF3E4 6px 12px)`. Se reconstruye con el token ámbar a dos opacidades
-       * en vez de fijar los dos hexadecimales, para que siga al tema.
+       * EL RAYADO DE LA MAQUETA, CON DOS TONOS OPACOS Y NO CON ALFA.
+       *
+       * 5d es explícito: «la trama diagonal del sin verificar se rehace con los
+       * dos tonos oscuros en vez de aclararse — la textura se conserva, el
+       * brillo no». Con transparencia el resultado depende de lo que haya
+       * detrás, así que la misma tarjeta se veía distinta sobre el lienzo que
+       * sobre una superficie, y en oscuro se aclaraba justo lo que debía
+       * oscurecerse.
+       *
+       * `color-mix` da el tono claro MEZCLANDO el ámbar con la superficie del
+       * tema: opaco, y sigue al modo oscuro sin fijar hexadecimales.
        */
       ...(rayada
         ? {
             background:
-              'repeating-linear-gradient(135deg, rgb(var(--unverified-surf) / 0.45) 0 6px, rgb(var(--unverified-surf)) 6px 12px)'
+              'repeating-linear-gradient(135deg, color-mix(in srgb, rgb(var(--unverified-surf)) 50%, rgb(var(--surface))) 0 6px, rgb(var(--unverified-surf)) 6px 12px)'
           }
         : {})
     }}
