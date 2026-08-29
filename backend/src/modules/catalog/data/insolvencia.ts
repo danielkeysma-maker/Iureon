@@ -542,6 +542,55 @@ export const INSOLVENCIA_CATALOG: BranchCatalog = {
       { n: 3, name: 'Medida concreta que se solicita: sustitución del bien, reservas o pagos periódicos', mandatory: true, basis: 'Ley 1676 de 2013, art. 50 inc. 4' }
     ],
     sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=54297'
+  },
+  {
+    id: 'insolvencia/providencia-que-reconoce-creditos-y-fija-derechos-de-voto-sin-objeciones',
+    exactName: 'Providencia que reconoce créditos y fija derechos de voto sin objeciones',
+    branch: 'INSOLVENCIA',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 1116 de 2006, art. 29, en el texto del art. 36 de la Ley 1429 de 2010; art. 19 num. 3 y 4; art. 26',
+    competentAuthority: 'El juez del concurso: la Superintendencia de Sociedades, o el juez civil del circuito según a quién corresponda',
+    term: { status: 'VERIFICADO', description: 'SE DICTA CUANDO NADIE OBJETA, Y NO ADMITE RECURSO ALGUNO: «No presentadas objeciones, el juez del concurso reconocerá los créditos, establecerá los derechos de voto y fijará el plazo para la presentación del acuerdo POR PROVIDENCIA QUE NO TENDRÁ RECURSO ALGUNO» (art. 29). Es de las pocas del ordenamiento que nace en firme. POR ESO EL RELOJ ANTERIOR ES EL QUE IMPORTA, Y ES DE LOS ACREEDORES: del proyecto del promotor «se correrá traslado en las oficinas del juez del concurso POR EL TÉRMINO DE CINCO (5) DÍAS» (art. 29). Antes de eso, el auto de inicio dispone el traslado de DIEZ (10) DÍAS del inventario valorado y del proyecto de calificación «a partir del vencimiento del término anterior», que es el que tiene el promotor para presentarlos —entre veinte (20) días y dos (2) meses, so pena de remoción— (art. 19 nums. 3 y 4). LO QUE LE PASA AL ACREEDOR QUE NO OBJETÓ NO ES PERDER EL CRÉDITO SINO QUEDAR DE ÚLTIMO, y hay que advertírselo antes de que venza: quien no fue relacionado y no objetó oportunamente «SOLO PODRÁ HACER[LAS] EFECTIVAS PERSIGUIENDO LOS BIENES DEL DEUDOR QUE QUEDEN UNA VEZ CUMPLIDO EL ACUERDO […] o cuando sea incumplido este» (art. 26). Salvedad que no prescribe: las acreencias omitidas A SABIENDAS y no registradas en contabilidad dan acción solidaria EN CUALQUIER MOMENTO contra administradores, contadores y revisores fiscales. DOS SUJETOS QUE NO PUEDEN OBJETAR, y conviene saberlo antes de intentarlo: «El deudor NO PODRÁ OBJETAR las acreencias incluidas en la relación de pasivos presentada por él con la solicitud de inicio […] los administradores NO PODRÁN OBJETAR las obligaciones de acreedores externos que estén incluidas dentro de la relación efectuada por el deudor» (art. 29). CÓMO SE CALCULAN LOS VOTOS: un voto por peso de acreencia cierta, sea o no exigible, sin intereses, multas ni sanciones, actualizada por el IPC (art. 24), con identificación obligatoria de los ACREEDORES VINCULADOS.' },
+    requiredSections: [
+      { n: 1, name: 'Constancia de que venció el traslado de cinco (5) días sin objeciones', mandatory: true, basis: 'Ley 1116 de 2006, art. 29' },
+      { n: 2, name: 'Reconocimiento y graduación de cada crédito conforme al proyecto del promotor', mandatory: true, basis: 'Ley 1116 de 2006, art. 29' },
+      { n: 3, name: 'Asignación de derechos de voto, con identificación de los acreedores vinculados', mandatory: true, basis: 'Ley 1116 de 2006, art. 24' },
+      { n: 4, name: 'Fijación del plazo para la presentación del acuerdo', mandatory: true, basis: 'Ley 1116 de 2006, art. 29' },
+      { n: 5, name: 'Advertencia de que la providencia no admite recurso alguno', mandatory: true, basis: 'Ley 1116 de 2006, art. 29' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1116_2006.html'
+  },
+  {
+    id: 'insolvencia/providencia-que-decide-las-objeciones-al-proyecto-de-calificacion-y-graduacion-de-creditos',
+    exactName: 'Providencia que decide las objeciones al proyecto de calificación y graduación de créditos',
+    branch: 'INSOLVENCIA',
+    role: 'DESPACHO',
+    legalBasis: 'Ley 1116 de 2006, art. 30, en el texto del art. 37 de la Ley 1429 de 2010; art. 29',
+    competentAuthority: 'El juez del concurso, en audiencia',
+    term: { status: 'VERIFICADO', description: 'CINCO (5) DÍAS PARA LA AUDIENCIA DESDE QUE QUEDA EN FIRME EL DECRETO DE PRUEBAS, Y ESA AUDIENCIA NO SE PUEDE APLAZAR: «En firme la providencia de decreto de pruebas convocará a audiencia para resolver las objeciones, la cual se llevará a cabo DENTRO DE LOS CINCO DÍAS SIGUIENTES», y «EN NINGÚN CASO LA AUDIENCIA PODRÁ SER SUSPENDIDA» (art. 30). Quien no llegue preparado no tendrá otra fecha. EL RECURSO SE PIERDE SI NO SE INTERPONE ALLÍ MISMO: «Contra esta providencia SOLO PROCEDERÁ EL RECURSO DE REPOSICIÓN QUE DEBERÁ PRESENTARSE EN LA MISMA AUDIENCIA» (art. 30 num. 3). No hay tres días después ni escrito posterior: es reloj del acreedor y se agota en el acto. LA ÚNICA PRUEBA ES DOCUMENTAL Y SE APORTA ANTES, no en la audiencia: «La única prueba admisible para el trámite de objeciones será la DOCUMENTAL, la cual DEBERÁ APORTARSE CON EL ESCRITO DE OBJECIONES O CON EL DE RESPUESTA a las mismas» (art. 29). Llegar a la audiencia con un documento nuevo es llegar con nada. LOS RELOJES QUE CORREN ANTES, encadenados y sin pausa entre ellos: cinco (5) días de traslado para objetar; «DE MANERA INMEDIATA al vencimiento del término anterior» el juez corre traslado de las objeciones por TRES (3) DÍAS para que los acreedores objetados se pronuncien; y vencido, DIEZ (10) DÍAS para provocar la conciliación. Lo no conciliado va a la audiencia. QUÉ RESUELVE LA PROVIDENCIA: reconoce los créditos, asigna los derechos de voto y fija plazo para la celebración del acuerdo (num. 3).' },
+    requiredSections: [
+      { n: 1, name: 'Relación de las objeciones presentadas y de las conciliadas en los diez (10) días', mandatory: true, basis: 'Ley 1116 de 2006, arts. 29 y 30' },
+      { n: 2, name: 'Valoración de la prueba documental aportada con las objeciones y con su respuesta', mandatory: true, basis: 'Ley 1116 de 2006, arts. 29 y 30 num. 1' },
+      { n: 3, name: 'Reconocimiento de los créditos y asignación de los derechos de voto', mandatory: true, basis: 'Ley 1116 de 2006, art. 30 num. 3' },
+      { n: 4, name: 'Fijación del plazo para la celebración del acuerdo', mandatory: true, basis: 'Ley 1116 de 2006, art. 30 num. 3' },
+      { n: 5, name: 'Advertencia de que solo procede reposición y debe presentarse en la misma audiencia', mandatory: true, basis: 'Ley 1116 de 2006, art. 30 num. 3' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1116_2006.html'
+  },
+  {
+    id: 'insolvencia/constancia-de-acto-de-tramite-en-el-proceso-de-insolvencia',
+    exactName: 'Constancia de acto de trámite en el proceso de insolvencia',
+    branch: 'INSOLVENCIA',
+    role: 'SECRETARIA',
+    legalBasis: 'Ley 1116 de 2006, art. 8, inciso 2; art. 124 (remisión al Código General del Proceso)',
+    competentAuthority: 'El juez del concurso — la Superintendencia de Sociedades o el juez civil del circuito—, cuya dependencia deja la constancia. La Ley 1116 no crea una secretaría propia: define la figura por su FORMA, no por el órgano',
+    term: { status: 'VERIFICADO', description: 'SIN PLAZO, Y SIN PROVIDENCIA NI NOTIFICACIÓN — ESA ES LA REGLA QUE DEFINE LA FIGURA Y AHORRA MESES EN UN CONCURSO: «Los ACTOS DE TRÁMITE que deban surtirse dentro del proceso de insolvencia y que correspondan a actuaciones que NO DEBEN SER CONTROVERTIDAS por las demás partes del proceso, tales como EXPEDICIÓN DE COPIAS, ARCHIVO Y DESGLOSE DE DOCUMENTOS, COMUNICACIÓN AL PROMOTOR O LIQUIDADOR DE SU DESIGNACIÓN como tal, entre otros, NO REQUERIRÁN LA EXPEDICIÓN DE PROVIDENCIA JUDICIAL que así lo ordene o decrete y PARA SU PERFECCIONAMIENTO BASTARÁ CON EL HECHO DE DEJAR CONSTANCIA EN EL EXPEDIENTE DE LO ACTUADO, LO CUAL TAMPOCO REQUERIRÁ NOTIFICACIÓN» (art. 8 inc. 2). EL LÍMITE ESTÁ EN LA MISMA FRASE Y ES EL QUE HAY QUE VERIFICAR ANTES DE USAR LA VÍA: solo cabe para lo que NO DEBE SER CONTROVERTIDO. Un acto que afecte derechos de una parte no se puede perfeccionar con una constancia; necesita providencia y notificación, y hacerlo al revés vicia la actuación. LO QUE SÍ SE CONTROVIERTE VA POR INCIDENTE: el inciso 1 del mismo artículo remite las cuestiones accesorias al trámite incidental. QUÉ RÉGIMEN SUPLE LOS VACÍOS, y no es el que suele suponerse: «En los casos NO REGULADOS EXPRESAMENTE en esta ley, se aplicarán las disposiciones del Código de Procedimiento Civil» (art. 124), hoy el Código General del Proceso. NO rige el CPACA aunque el juez del concurso sea una superintendencia, porque actúa en función jurisdiccional y sus providencias «NO SON IMPUGNABLES ANTE LA JURISDICCIÓN CONTENCIOSO ADMINISTRATIVA» (CGP art. 24 par. 3).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación del proceso y del acto de trámite que se perfecciona', mandatory: true, basis: 'Ley 1116 de 2006, art. 8' },
+      { n: 2, name: 'Verificación de que el acto NO debe ser controvertido por las demás partes', mandatory: true, basis: 'Ley 1116 de 2006, art. 8 inc. 2' },
+      { n: 3, name: 'Constancia en el expediente de lo actuado, con su fecha', mandatory: true, basis: 'Ley 1116 de 2006, art. 8 inc. 2' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1116_2006.html'
   }
   ]
 };

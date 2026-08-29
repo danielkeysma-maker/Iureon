@@ -544,6 +544,40 @@ export const SOCIETARIO_CATALOG: BranchCatalog = {
       { n: 2, name: 'Identificación de las garantías mobiliarias inscritas sobre bienes del deudor', mandatory: true, basis: 'Decreto 1074 de 2015, art. 2.2.2.4.2.58' }
     ],
     sourceUrl: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=54297'
+  },
+  {
+    id: 'societario/sentencia-de-la-superintendencia-de-sociedades-en-funcion-jurisdiccional',
+    exactName: 'Sentencia de la Superintendencia de Sociedades en función jurisdiccional',
+    branch: 'SOCIETARIO',
+    role: 'DESPACHO',
+    legalBasis: 'Código General del Proceso, art. 24 num. 5 y parágrafos 1, 3, 4 y 5; art. 121 y su parágrafo',
+    competentAuthority: 'La Superintendencia de Sociedades en ejercicio de funciones jurisdiccionales, a prevención con los jueces civiles',
+    term: { status: 'VERIFICADO', description: 'NO TIENE PLAZO PROPIO PORQUE NO TIENE PROCEDIMIENTO PROPIO: «Las autoridades administrativas TRAMITARÁN LOS PROCESOS A TRAVÉS DE LAS MISMAS VÍAS PROCESALES PREVISTAS EN LA LEY PARA LOS JUECES» (art. 24 par. 3). Según la cuantía y la naturaleza será verbal —traslado de veinte (20) días— o verbal sumario de única instancia —diez (10) días—. LA REGLA QUE DECIDE DÓNDE DEMANDAR, Y SE DECIDE ANTES DE RADICAR PORQUE DESPUÉS NO HAY VUELTA: la competencia es A PREVENCIÓN con los jueces (par. 1), así que la elección es del demandante. Y estas dos consecuencias la condicionan — primera, las providencias que la Superintendencia dicta en función jurisdiccional NO SON IMPUGNABLES ANTE LA JURISDICCIÓN CONTENCIOSO ADMINISTRATIVA; segunda, las apelaciones las resuelve el SUPERIOR FUNCIONAL DEL JUEZ QUE HABRÍA SIDO COMPETENTE, y SI ESE JUEZ HABRÍA CONOCIDO EN ÚNICA INSTANCIA, el asunto ante la Superintendencia TAMBIÉN SERÁ DE ÚNICA INSTANCIA, es decir, sin apelación (par. 3). QUÉ PUEDE FALLAR Y QUÉ NO (num. 5): a) los conflictos societarios y las diferencias sobre acuerdos de accionistas; c) LA IMPUGNACIÓN DE ACTOS DE ASAMBLEAS, juntas directivas, juntas de socios o de cualquier otro órgano directivo de personas sometidas a su supervisión —«CON TODO, LA ACCIÓN INDEMNIZATORIA a que haya lugar por los posibles perjuicios que se deriven del acto o decisión que se declaren nulos SERÁ COMPETENCIA EXCLUSIVA DEL JUEZ», y ese corte es el que más pretensiones deja mal radicadas—; d) la nulidad de los ACTOS DEFRAUDATORIOS y la DESESTIMACIÓN DE LA PERSONALIDAD JURÍDICA cuando se usa la sociedad en fraude a la ley o en perjuicio de terceros, con responsabilidad SOLIDARIA de accionistas y administradores que los realizaron, participaron o facilitaron; e) la nulidad absoluta de la determinación adoptada EN ABUSO DEL DERECHO por ilicitud del objeto y la indemnización, en abuso de MAYORÍA, de MINORÍA y de PARIDAD; y f) las GARANTÍAS MOBILIARIAS, por el art. 91 de la Ley 1676 de 2013. POSTULACIÓN: las partes pueden concurrir SIN ABOGADO solo en los casos en que tampoco habría sido necesario ante el juez (par. 4). RELOJ DE LA AUTORIDAD QUE JUEGA A FAVOR DEL DEMANDANTE: el plazo máximo de duración del proceso del art. 121 se aplica a las autoridades administrativas cuando ejercen funciones jurisdiccionales, y al perder competencia deben REMITIR EL EXPEDIENTE INMEDIATAMENTE a la autoridad judicial desplazada (art. 121 par.).' },
+    requiredSections: [
+      { n: 1, name: 'Verificación de que el asunto está en el listado del art. 24 num. 5', mandatory: true, basis: 'Código General del Proceso, art. 24 num. 5' },
+      { n: 2, name: 'Constancia de que la sociedad está sometida a la supervisión de la Superintendencia', mandatory: true, basis: 'Código General del Proceso, art. 24 num. 5 lit. c y d' },
+      { n: 3, name: 'Separación de la pretensión indemnizatoria, que es competencia exclusiva del juez', mandatory: true, basis: 'Código General del Proceso, art. 24 num. 5 lit. c' },
+      { n: 4, name: 'Indicación de la vía procesal seguida y de si el asunto es de única o de primera instancia', mandatory: true, basis: 'Código General del Proceso, art. 24 par. 3' },
+      { n: 5, name: 'Declaración de responsabilidad solidaria de accionistas y administradores, en los actos defraudatorios', mandatory: false, basis: 'Código General del Proceso, art. 24 num. 5 lit. d' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012.html'
+  },
+  {
+    id: 'societario/demanda-de-nulidad-de-decision-adoptada-en-abuso-del-derecho-de-voto',
+    exactName: 'Demanda de nulidad de decisión adoptada en abuso del derecho de voto',
+    branch: 'SOCIETARIO',
+    role: 'LITIGANTE',
+    legalBasis: 'Código General del Proceso, art. 24 num. 5 lit. e) y par. 1 y 3; Código de Comercio, art. 193',
+    competentAuthority: 'La Superintendencia de Sociedades en función jurisdiccional, a prevención con el juez civil',
+    term: { status: 'VERIFICADO', description: 'SIN PLAZO EN LA NORMA DE COMPETENCIA, PERO CON UN RELOJ POSTERIOR QUE EXTINGUE EL DINERO: si la decisión se anula, la acción de indemnización del art. 193 del Código de Comercio «SÓLO PODRÁ SER PROPUESTA DENTRO DEL AÑO SIGUIENTE A LA FECHA DE LA EJECUTORIA DE LA SENTENCIA que declare nula la decisión impugnada». Ganar la nulidad y dejar pasar el año es quedarse con la declaración y sin la reparación. LAS TRES MODALIDADES QUE CUBRE, y la segunda y la tercera son las que casi nadie invoca: «la declaratoria de NULIDAD ABSOLUTA de la determinación adoptada EN ABUSO DEL DERECHO POR ILICITUD DEL OBJETO y la de indemnización de perjuicios, en los casos de ABUSO DE MAYORÍA, COMO EN LOS DE MINORÍA Y DE PARIDAD» (art. 24 num. 5 lit. e). El abuso no es solo del que manda: una minoría que bloquea sistemáticamente también abusa. QUÉ HAY QUE PROBAR: que los accionistas «NO EJERZAN SU DERECHO A VOTO EN INTERÉS DE LA COMPAÑÍA, con el propósito de causar daño a la compañía o a otros accionistas, o de obtener para sí o para un tercero una ventaja injustificada». Es un elemento subjetivo, así que el escrito vive de los hechos que lo revelan: el patrón de votaciones, la ausencia de justificación empresarial, el beneficio obtenido. LA ELECCIÓN DEL FORO CONDICIONA LA SEGUNDA INSTANCIA, igual que en toda la función jurisdiccional de la Superintendencia: si el juez que habría conocido lo habría hecho en única instancia, ante ella también será de única instancia (art. 24 par. 3).' },
+    requiredSections: [
+      { n: 1, name: 'Identificación de la decisión atacada, del órgano que la adoptó y de su fecha', mandatory: true, basis: 'Código General del Proceso, art. 24 num. 5 lit. e' },
+      { n: 2, name: 'Modalidad de abuso invocada: de mayoría, de minoría o de paridad', mandatory: true, basis: 'Código General del Proceso, art. 24 num. 5 lit. e' },
+      { n: 3, name: 'Hechos que revelan que el voto no se ejerció en interés de la compañía', mandatory: true, basis: 'Código General del Proceso, art. 24 num. 5 lit. e' },
+      { n: 4, name: 'Daño causado a la compañía o a los accionistas, o ventaja injustificada obtenida', mandatory: true, basis: 'Código General del Proceso, art. 24 num. 5 lit. e' },
+      { n: 5, name: 'Advertencia del año siguiente a la ejecutoria para la acción de indemnización', mandatory: true, basis: 'Código de Comercio, art. 193' }
+    ],
+    sourceUrl: 'https://www.secretariasenado.gov.co/senado/basedoc/ley_1564_2012.html'
   }
   ]
 };
