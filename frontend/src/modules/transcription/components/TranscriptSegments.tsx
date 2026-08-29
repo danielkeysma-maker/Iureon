@@ -158,12 +158,59 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
     return hastaElCursor.toString().length;
   };
 
+  /*
+   * LA REVISION, QUE ES LO QUE SEPARA UNA TRANSCRIPCION DE UN ACTA (1g).
+   *
+   * El dato existia —`revisada` por segmento, con su endpoint y su reversion si
+   * el servidor no pudo— y no habia panel que lo mostrara: se podia marcar una
+   * fila y no saber cuantas llevaba. La fraccion es lo que le dice al abogado
+   * si el acta esta lista para firmarse.
+   */
+  const revisadas = result.segments.filter((s) => s.revisada).length;
+
+  /*
+   * FRAGMENTOS CON AUDIO POCO CLARO. El umbral es 0.75 y es una eleccion, no un
+   * hallazgo: por debajo de ahi Deepgram se equivoca lo bastante como para que
+   * citar sin volver a escuchar sea imprudente. Se cuentan solo los que TIENEN
+   * medida — un transcrito anterior a esta columna no trae confianza, y
+   * advertirlo seria inventarle un problema.
+   */
+  const UMBRAL_CONFIANZA = 0.75;
+  const pocoClaras = result.segments.filter(
+    (s) => s.confianza !== undefined && s.confianza < UMBRAL_CONFIANZA
+  ).length;
+
   return (
     <div className="space-y-4">
       {/* Speaker role assignment */}
       <div className="bg-surface border border-line-200 rounded-card p-4">
-        <h4 className="font-bold text-ink-900 text-xs mb-1">Identifica a los interlocutores</h4>
-        <p className="text-[11px] text-ink-500 mb-3">
+        {/*
+          LA REVISION VA ARRIBA DEL TODO, como en 1g: es el estado del acta, y
+          quien abre esta pantalla lo primero que quiere saber es cuanto le
+          falta. Los «fragmentos con audio poco claro» van al lado porque son lo
+          que hara que la revision tarde.
+        */}
+        <div className="mb-3 flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b border-line-100 pb-3">
+          <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-ink-400">
+            Revisión
+          </span>
+          <span className="text-[12.5px] text-ink-900">
+            <b className="font-mono font-semibold">{revisadas}</b> de{' '}
+            <b className="font-mono font-semibold">{result.segments.length}</b> intervenciones
+            revisadas
+          </span>
+          {pocoClaras > 0 && (
+            <span className="text-[12px] text-unverified">
+              · {pocoClaras}{' '}
+              {pocoClaras === 1
+                ? 'fragmento con audio poco claro'
+                : 'fragmentos con audio poco claro'}
+            </span>
+          )}
+        </div>
+
+        <h4 className="mb-1 text-xs font-bold text-ink-900">Interlocutores</h4>
+        <p className="mb-3 text-[11px] text-ink-500">
           El motor detectó {result.speakerLabels.length} voces distintas pero no sabe quién es
           quién. Asigna el rol procesal de cada una.
         </p>
@@ -192,6 +239,17 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
               >
 
               </div>
+              {/*
+                CUANTAS VECES HABLO CADA UNO. 1g lo pone junto al nombre —«Juez
+                ponente 18»— y no es estadistica: en una audiencia de cuatro
+                actores, la voz con dos intervenciones casi siempre es el
+                secretario o un testigo puntual, y la de veintitres es quien
+                preside. El numero ORIENTA la asignacion de roles, que es
+                justamente lo que se esta haciendo en este panel.
+              */}
+              <span className="shrink-0 font-mono text-[10.5px] tabular-nums text-ink-400">
+                {result.segments.filter((s) => s.speakerLabel === label).length}
+              </span>
               {/*
                 THE NAME, WHICH IS WHAT MAKES A TRANSCRIPT CITABLE.
 
@@ -673,7 +731,18 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                 desordenada la columna de texto que las tres columnas fijas
                 acababan de alinear.
               */
-              className={`text-[13px] text-ink-700 leading-[1.65] text-justify [text-wrap:pretty] ${
+              className={`text-[13px] leading-[1.65] text-justify [text-wrap:pretty] ${
+                /*
+                  LO POCO CLARO SE SUBRAYA, NO SE TIÑE. Teñir el texto de ámbar
+                  lo volvería difícil de leer justamente donde hay que leerlo con
+                  más cuidado; un subrayado punteado dice «de esto no me fío»
+                  sin estorbar la lectura. Y va con `title`, porque la señal
+                  visual sola no explica qué hacer con ella.
+                */
+                segment.confianza !== undefined && segment.confianza < UMBRAL_CONFIANZA
+                  ? 'decoration-[rgb(var(--unverified-line))] underline decoration-dotted decoration-2 underline-offset-4 text-ink-700'
+                  : 'text-ink-700'
+              } ${
                 /*
                   LA FILA EN EDICION VA EN AZUL DE MARCA CON HALO, no en ambar.
                   Lo dicen los dos artboards con el mismo valor —`border:1px
@@ -689,7 +758,9 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                   : ''
               }`}
               title={
-                onEditSegment
+                segment.confianza !== undefined && segment.confianza < UMBRAL_CONFIANZA
+                  ? `El motor entendió esto con ${Math.round(segment.confianza * 100)}% de certeza: vuelva a escuchar antes de citarlo.`
+                  : onEditSegment
                   ? 'Haz clic para corregir el texto. Enter guarda, Esc descarta.'
                   : undefined
               }

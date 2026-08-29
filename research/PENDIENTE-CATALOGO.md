@@ -1331,3 +1331,68 @@ servidor y no existe»—, pero eso describía el estado, no un límite.
   la decisión de curaduría sobre una garantía que nadie dio.
 
 **REQUIERE CORRER `supabase/migration-lectura-del-manual.sql`.**
+
+---
+
+## 20. Entrevista (2a) y Audiencia (1g) en ESCRITORIO — la brecha, medida
+
+El usuario preguntó por qué esas dos pantallas no calcan su artboard. **No las
+verifiqué nunca**: se construyeron antes de adoptar el método de abrir el HTML, y
+nunca volví sobre ellas. Medido ahora, de ocho elementos de 2a **cero** estaban.
+
+### 1g Audiencia — lo cerrado en esta pasada
+
+| 1g pide | Estado |
+|---|---|
+| Panel **«Interlocutores»** con conteo por voz | **HECHO.** El número orienta la asignación de roles: en una audiencia de cuatro actores, la voz con dos intervenciones suele ser el secretario y la de veintitrés quien preside |
+| **«32 de 58 intervenciones revisadas»** | **HECHO.** El dato existía —`revisada` con su endpoint y su reversión— y no había panel que lo mostrara: se podía marcar una fila y no saber cuántas llevaba |
+| **«6 fragmentos con audio poco claro»** e `[ininteligible]` | **HECHO, y el dato no había que inventarlo**: Deepgram devuelve `confidence` por intervención y se descartaba — ni siquiera estaba declarada en el tipo de su respuesta |
+| Reproductor anclado | **PENDIENTE** |
+
+**Decisiones que la implementación obligó a tomar:**
+
+- **Al unir turnos, la confianza se queda con la PEOR.** Promediar escondería el
+  trozo que no se entendió detrás de dos que sí: una intervención unida es tan
+  fiable como su parte más dudosa, porque es esa la que hay que volver a
+  escuchar antes de citarla.
+- **El umbral es 0,75 y es una elección, no un hallazgo.**
+- **Lo poco claro se SUBRAYA, no se tiñe.** Teñir de ámbar volvería difícil de
+  leer justo lo que hay que leer con más cuidado.
+- **Ausente ≠ poco clara.** Los transcritos anteriores no traen confianza, y
+  advertirlos sería inventarles un problema.
+
+### 2a Entrevista — lo que falta, con el porqué del artboard
+
+- Los pasos son **«1 · Quién está al frente»** y **«2 · Voces en la sala»**; hoy
+  dicen otra cosa.
+- **Ficha del cliente** con contacto, ciudad y relación —«cliente nuevo · sin
+  caso abierto»—, más **«Firmó tratamiento de datos»** con enlace a
+  subencargados. La nota lo razona: *«la pregunta ¿quién más ve esto? aparece en
+  la sala, no después»*.
+- **Guion sugerido** que tacha lo cubierto en vivo. Su nota es la más fuerte del
+  artboard: *«es la única forma de que el abogado no salga de la reunión sin la
+  fecha que define el término»*.
+- **«Marcar como hecho clave»** por intervención.
+- **Acta exportable desde el encabezado mientras se graba**: *«el abogado que
+  declina el caso igual necesita dejar constancia de lo conversado»*.
+- **Pie con tres salidas, y declinar es una de ellas** — existe como
+  `CerrarEntrevistaDialog`, falta contrastarlo.
+- Estado del micrófono y los cinco estados del grabador declarados.
+
+### Nota sobre la segunda entrevista
+
+Al explicar el guion escribí que «evita una segunda entrevista». **Está mal
+dicho, y el producto lo desmiente**: `Client.interviews` CUENTA cuántas lleva
+cada persona y el servidor las agrupa por `client_id`. Varias entrevistas al
+mismo cliente no solo son posibles: están contadas y a la vista.
+
+Lo que dice el artboard es otra cosa, y es la que importa: *«que el abogado no
+salga de la reunión SIN LA FECHA QUE DEFINE EL TÉRMINO»*. El problema no es
+volver a hablar con el cliente —eso pasa siempre— sino **cuál dato falta**. Si
+falta el teléfono, se llama. Si falta la fecha de notificación, nadie se entera
+hasta ir a redactar, y para entonces el término lleva días corriendo.
+
+**Pendiente que esto destapa:** si las entrevistas de un mismo cliente ya se
+cuentan, **el guion de la segunda debería saber qué se respondió en la primera**.
+Preguntar dos veces la misma fecha no es solo torpe: le dice al cliente que no se
+le prestó atención. No existe hoy.

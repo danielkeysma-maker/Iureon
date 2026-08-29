@@ -38,6 +38,12 @@ export interface TranscriptSegment {
   speakerName?: string;
   /** Un humano leyó esta intervención. La fracción revisadas/total hace el acta. */
   revisada?: boolean;
+  /**
+   * Confianza del proveedor, de 0 a 1. Ausente NO es «poco clara»: es «no se
+   * midió» — los transcritos anteriores a esta columna no la traen, y
+   * advertirlos sería inventarles un problema.
+   */
+  confianza?: number;
 }
 
 export type TranscriptionKind = 'AUDIENCIA' | 'ENTREVISTA';

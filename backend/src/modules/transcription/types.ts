@@ -63,6 +63,23 @@ export interface TranscriptSegment {
    * La fraccion revisadas/total es lo que separa una transcripcion de un acta.
    */
   revisada?: boolean;
+  /**
+   * Que tan seguro estuvo el proveedor de lo que oyo, de 0 a 1.
+   *
+   * 1g pide marcar los «fragmentos con audio poco claro» y poner
+   * `[ininteligible 13:09]` donde no se entendio. Ese dato NO habia que
+   * inventarlo: Deepgram lo devuelve por intervencion y aqui se descartaba —
+   * ni siquiera estaba declarado en el tipo de su respuesta.
+   *
+   * Importa mas que en una transcripcion cualquiera: una audiencia se CITA en
+   * un escrito, y citar mal lo que dijo un juez es un problema del abogado, no
+   * del proveedor. Marcar donde el microfono fallo es decirle exactamente que
+   * volver a escuchar.
+   *
+   * Opcional porque los transcritos anteriores no la traen. Ausente NO es
+   * «poco clara»: es «no se midio».
+   */
+  confianza?: number;
   text: string;
   /** Seconds from the start of the recording. */
   startSeconds: number | null;

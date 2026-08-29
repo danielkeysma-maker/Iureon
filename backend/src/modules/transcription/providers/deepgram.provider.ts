@@ -43,6 +43,8 @@ interface DeepgramUtterance {
   transcript?: string;
   /** Diarization returns an integer per voice, not a name. */
   speaker?: number;
+  /** Cuán seguro estuvo el modelo, de 0 a 1. Deepgram siempre la manda. */
+  confidence?: number;
 }
 
 interface DeepgramResponse {
@@ -65,7 +67,8 @@ const toSegments = (utterances: DeepgramUtterance[]): TranscriptSegment[] =>
     role: 'DESCONOCIDO' as const,
     text: (utterance.transcript ?? '').trim(),
     startSeconds: utterance.start ?? null,
-    endSeconds: utterance.end ?? null
+    endSeconds: utterance.end ?? null,
+    confianza: utterance.confidence
   }));
 
 /**
@@ -90,6 +93,18 @@ export const mergeConsecutive = (segments: TranscriptSegment[]): TranscriptSegme
     if (previous && previous.speakerLabel === segment.speakerLabel) {
       previous.text = `${previous.text} ${segment.text}`.trim();
       previous.endSeconds = segment.endSeconds ?? previous.endSeconds;
+      /*
+       * AL UNIR, LA CONFIANZA SE QUEDA CON LA PEOR. Promediar escondería el
+       * trozo que no se entendió detrás de dos que sí: una intervención unida
+       * es tan fiable como su parte más dudosa, porque es esa la que el abogado
+       * tiene que volver a escuchar antes de citarla.
+       */
+      if (segment.confianza !== undefined) {
+        previous.confianza =
+          previous.confianza === undefined
+            ? segment.confianza
+            : Math.min(previous.confianza, segment.confianza);
+      }
       return merged;
     }
 
