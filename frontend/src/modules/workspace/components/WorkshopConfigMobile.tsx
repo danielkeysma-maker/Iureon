@@ -84,18 +84,22 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
 
   return (
     <div className="shrink-0 border-b border-line-200 bg-surface">
-      <div className="flex items-center gap-2 px-4 py-2">
-        <span className="rounded-full bg-canvas px-2.5 py-1 text-[11.5px] font-semibold text-ink-700">
+      <div className="flex items-center gap-[7px] px-4 pt-2.5">
+        {/* `Config.` en mono, 9.5px, versales y tracking .1em — del HTML. */}
+        <span className="shrink-0 font-mono text-[9.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
+          Config.
+        </span>
+        <span className="max-w-[96px] truncate rounded-[6px] border border-line-200 bg-canvas px-2 py-1 text-[12px] font-medium text-ink-900">
           {ROL_CORTO[userRole]}
         </span>
-        <span className="min-w-0 truncate rounded-full bg-canvas px-2.5 py-1 text-[11.5px] font-semibold text-ink-700">
+        <span className="max-w-[96px] truncate rounded-[6px] border border-line-200 bg-canvas px-2 py-1 text-[12px] font-medium text-ink-900">
           {BRANCH_LABELS[legalBranch] ?? legalBranch}
         </span>
         <button
           type="button"
           onClick={() => setAbierto((v) => !v)}
           aria-expanded={abierto}
-          className="ml-auto flex min-h-[32px] shrink-0 items-center gap-1 text-[12px] font-semibold text-brand-700"
+          className="ml-auto flex min-h-[32px] shrink-0 items-center gap-1 px-0.5 py-1 text-[12px] font-medium text-brand-700"
         >
           {abierto ? 'Listo' : 'Cambiar'}
           <ChevronDown
@@ -110,11 +114,23 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
         instruccion sin saber contra que ficha se va a redactar.
       */}
       {elegida && termino && !abierto && (
-        <div className="flex items-start gap-2 border-t border-line-100 px-4 py-2">
-          <termino.Icono className={`mt-0.5 h-3.5 w-3.5 shrink-0 ${termino.clase}`} />
-          <p className="min-w-0 flex-1 text-[12px] leading-snug text-ink-900">
-            <span className="font-semibold">{elegida.exactName}</span>
-            <span className={`block ${termino.clase}`}>{termino.texto}</span>
+        <div className="mx-4 mt-2 flex items-center gap-1.5 border-t border-line-100 pb-2.5 pt-2">
+          <termino.Icono
+            className={`h-[13px] w-[13px] shrink-0 ${termino.clase}`}
+            strokeWidth={2.4}
+          />
+          {/*
+            UNA SOLA LINEA, como en el HTML: «Nulidad y restablecimiento ·
+            4 meses», con el nombre en 12px regular y el TERMINO en mono
+            semibold. Partirlo en dos renglones —como estaba— le quitaba a la
+            fila su cualidad de resumen: 4d la quiere de un vistazo.
+          */}
+          <p className="min-w-0 flex-1 truncate text-[12px] text-ink-700">
+            {elegida.exactName}
+            {' · '}
+            <b className={`font-mono text-[12px] font-semibold ${termino.clase}`}>
+              {termino.texto}
+            </b>
           </p>
         </div>
       )}

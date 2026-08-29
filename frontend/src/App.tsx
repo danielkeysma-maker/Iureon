@@ -6,6 +6,7 @@ import { clearSession, readSession, saveSession, type Session } from './modules/
 import { sesionDeVistaPreviaLocal } from './modules/auth/vistaPreviaLocal';
 import { SidebarLeft } from './modules/tenant/components/SidebarLeft';
 import { MobileTabBar } from './modules/tenant/components/MobileTabBar';
+import { MobileHeader } from './modules/tenant/components/MobileHeader';
 import { MobileWorkshopTabs, type VistaTaller } from './modules/workspace/components/MobileWorkshopTabs';
 import { WorkshopConfigMobile } from './modules/workspace/components/WorkshopConfigMobile';
 import { MobileMoreSheet } from './modules/tenant/components/MobileMoreSheet';
@@ -593,6 +594,43 @@ export function App() {
         Medido en el navegador a 375x812, no deducido.
       */}
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden h-full">
+        {/*
+          DOS CABECERAS, UNA POR TAMAÑO. La de escritorio pone el titulo del
+          escrito y ocho acciones en fila; 4d pone el NOMBRE DEL MODULO con el
+          caso debajo y un solo boton de menu, porque en el telefono no hay
+          barra lateral que diga donde esta uno. Sus acciones viven en una hoja,
+          que ademas cierra la regresion del desplegable recortado.
+        */}
+        <MobileHeader
+          mainView={mainView}
+          /*
+            EL SUBTITULO ES EL CONTEXTO DE CADA MODULO, como en 4d: «Mosquera
+            vs. Colpensiones» bajo Redactar, «4 actuaciones posibles» bajo
+            Orientacion. Lo que la pantalla ya no repite abajo.
+          */
+          subtitulo={
+            mainView === 'workspace'
+              ? workflow.generatedDraft?.title || borradorAbierto?.cliente || workflow.documentType
+              : mainView === 'borradores'
+              ? `${savedDrafts.length} ${savedDrafts.length === 1 ? 'escrito' : 'escritos'}`
+              : null
+          }
+          enTaller={mainView === 'workspace'}
+          copied={workflow.copied}
+          onCopyText={workflow.handleCopyText}
+          onExportWord={handleExportWord}
+          onExportPdf={handleExportPdf}
+          estadoDelBorrador={borradorAbierto?.estado ?? null}
+          onMarcarListo={
+            borradorAbierto
+              ? () => void updateMetadata(borradorAbierto.id, { estado: 'LISTO' })
+              : undefined
+          }
+          onAbrirGestion={() => setIsUserManagementModalOpen(true)}
+          onLogout={handleLogout}
+        />
+
+        <div className="hidden lg:block">
         <HeaderTop
           mainView={mainView}
           // El nombre del escrito, no una miga de pan. Sin borrador todavía se
@@ -617,6 +655,7 @@ export function App() {
           onOpenUserManagementModal={() => setIsUserManagementModalOpen(true)}
           onLogout={handleLogout}
         />
+        </div>
 
         <main className="flex min-w-0 flex-1 overflow-hidden">
           {mainView === 'workspace' && (

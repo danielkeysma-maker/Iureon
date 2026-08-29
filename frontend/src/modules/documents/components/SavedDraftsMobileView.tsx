@@ -68,17 +68,16 @@ export const SavedDraftsMobileView: React.FC<SavedDraftsMobileViewProps> = ({
   }, [savedDrafts, busqueda]);
 
   const grupos = React.useMemo(() => agruparPorTermino(visibles), [visibles]);
-  const sinRadicar = savedDrafts.filter((e) => !esRadicado(e)).length;
 
   return (
     <div className="flex h-full min-h-0 flex-1 flex-col bg-canvas">
+      {/*
+        SIN TITULO PROPIO. `MobileHeader` ya pone «Borradores» con su contexto
+        debajo, que es como 4d arma la cabecera —una sola—. Repetirlo aqui
+        gastaba dos renglones de los 844 en decir dos veces lo mismo.
+      */}
       <header className="shrink-0 border-b border-line-200 bg-surface px-4 py-3">
-        <h1 className="text-[15px] font-semibold text-ink-900">Borradores</h1>
-        <p className="mt-0.5 text-[11.5px] text-ink-500">
-          {sinRadicar} sin radicar
-        </p>
-
-        <div className="relative mt-2.5">
+        <div className="relative">
           <Search className="absolute left-3 top-[11px] h-3.5 w-3.5 text-ink-400" />
           <input
             value={busqueda}
