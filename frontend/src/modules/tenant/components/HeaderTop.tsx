@@ -122,7 +122,27 @@ export const HeaderTop: React.FC<HeaderTopProps> = ({
         </span>
       )}
 
-      <div className="ml-auto flex shrink-0 items-center gap-1.5">
+      {/*
+        ESTE BLOQUE ERA EL QUE RECORTABA TODA LA APLICACION EN MOVIL.
+
+        Son ocho controles `shrink-0` en una fila que no envuelve: a 375px miden
+        mas que la pantalla, empujaban la cabecera fuera del ancho y, como la
+        raiz es `overflow-hidden`, TODO quedaba cortado. Se reporto como «las
+        pantallas se ven recortadas» y no era de cada vista: era la unica pieza
+        que todas comparten. El login se veia bien porque es la unica pantalla
+        que no monta esta cabecera.
+
+        `min-w-0` le permite ceder ancho —sin el, `shrink-0` en los hijos hace
+        que el contenedor imponga su tamaño al padre— y `overflow-x-auto`
+        contiene el sobrante DENTRO del bloque en vez de repartirlo por la
+        pagina. Ninguna accion se esconde: se desplazan entre ellas.
+
+        PENDIENTE DECLARADO: 4d no quiere estas acciones en la cabecera movil.
+        Quiere el primario de 48px fijo sobre la barra de pestañas con el costo
+        debajo, y la exportacion en la pantalla del documento. Eso es rehacer la
+        cabecera por tamaño; esto evita que rompa el resto mientras tanto.
+      */}
+      <div className="ml-auto flex min-w-0 shrink items-center gap-1.5 overflow-x-auto lg:shrink-0 lg:overflow-x-visible">
         {enTaller && (
           <>
             {/*

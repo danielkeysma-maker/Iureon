@@ -101,8 +101,14 @@ export const SettingsView: React.FC = () => {
 
   return (
     <div className="flex-1 overflow-y-auto bg-canvas">
-      <div className="mx-auto flex max-w-[1180px] gap-8 p-6">
-        <nav className="w-[212px] shrink-0">
+      {/*
+        EN MOVIL AJUSTES SE APILA (8d). Las dos columnas son 212px de indice mas
+        el contenido: en 375 el indice se lleva mas de la mitad y la seccion
+        queda en una franja. Apilado, el indice es lo primero que se lee —que es
+        el orden natural: se escoge que ajustar y luego se ajusta.
+      */}
+      <div className="mx-auto flex max-w-[1180px] flex-col gap-6 p-4 sm:p-6 lg:flex-row lg:gap-8">
+        <nav className="w-full shrink-0 lg:w-[212px]">
           <h1 className="mb-4 px-2 text-title text-ink-900">Ajustes</h1>
           <Grupo titulo="Suyos" entradas={SUYOS} />
           <Grupo titulo="De la firma" entradas={DE_LA_FIRMA} />

@@ -1147,3 +1147,59 @@ donde más falta hace: antes de empujar.**
 Se separó en `resolucion.check.ts` (`npm run check:resolucion`), sin red, que
 corre en la suite ordinaria. `triage.check.ts` conserva lo que sí depende de que
 un proveedor conteste.
+
+---
+
+## 17. «Las pantallas se ven recortadas» — la causa era una sola pieza compartida
+
+**El síntoma reportado:** en el teléfono, el login se ve bien y **todas las
+demás pantallas salen recortadas**.
+
+**La causa NO estaba en cada vista.** Estaba en `HeaderTop`, la única pieza que
+todas montan y el login no: su bloque derecho son **ocho controles `shrink-0`**
+—pestañas, Word, PDF, copiar, concentración, marcar listo, firmas, salir— en una
+fila que no envuelve. A 375px mide más que la pantalla, empujaba la cabecera
+fuera del ancho, y como la raíz es `overflow-hidden`, **todo quedaba cortado**.
+
+Que el login se viera bien era la pista: es la única pantalla sin cabecera.
+
+**El arreglo:** `min-w-0 shrink overflow-x-auto` en el bloque, con
+`lg:shrink-0 lg:overflow-x-visible` para no tocar el escritorio. `min-w-0` es
+lo que permite ceder ancho —sin él, `shrink-0` en los hijos hace que el
+contenedor imponga su tamaño al padre— y `overflow-x-auto` contiene el sobrante
+DENTRO del bloque en vez de repartirlo por la página. Ninguna acción se esconde.
+
+**Limitación conocida de ese arreglo:** el menú de exportación es un desplegable
+`absolute` dentro de ese bloque, y un contenedor con `overflow-x-auto` recorta
+lo que se sale de él. En móvil ese menú quedará cortado hasta que las acciones
+se muden a donde 4d las quiere. Se prefiere eso a que la aplicación entera siga
+recortada, pero es una regresión real y por eso queda escrita.
+
+### Lo demás que se ajustó en esta pasada
+
+| Vista | Qué rompía | Qué se hizo |
+|---|---|---|
+| **Catálogo (1i/5c)** | panel de ficha de 460px al lado de la lista | en móvil son **dos pantallas**: abrir una actuación reemplaza la lista, con «Volver al catálogo». Sin estado nuevo — usa el mismo `openActuacion` que abre el panel en escritorio |
+| **Ajustes (8d)** | índice de 212px + contenido en dos columnas | se apila bajo `lg`; el índice va primero, que es el orden natural |
+| **Orientación (1f/4d)** | `p-6` (48px de los 375), cabecera con `ml-auto`, columna de 190px en el historial | margen 16 en móvil, cabecera que envuelve, la sugerencia baja a su propio renglón |
+
+**Medido y NO tocado por estar ya bien:** `SearchView` (caja `flex-col md:flex-row`,
+filtros con `flex-wrap`), `SavedDraftsView` (cabecera de columnas ya
+`hidden md:flex`, filas con `flex-wrap`), `ToolsView`, `TranscriptionView`,
+`InterviewView` (todas con `flex-wrap` en su cabecera).
+
+### Lo que sigue faltando: la estructura propia de cada módulo
+
+Contener el desborde **no es rediseñar para móvil**, y el artboard pide lo
+segundo. Sigue pendiente lo listado en la sección 15, y con prioridad:
+
+1. **4d · redacción**: el primario de 48px fijo sobre la barra de pestañas con
+   el costo debajo, y la configuración comprimida en **dos chips** con término y
+   fecha de vencimiento — no la barra desplazándose que hay hoy.
+2. **4d · transcripción**: abandonar las tres columnas — interlocutor y hora
+   arriba, texto debajo, ancho completo; solo la fila en edición con tarjeta.
+3. **4d · entrevista**: el cronómetro como elemento más grande de la pantalla y
+   el aviso de que sigue grabando con la pantalla apagada.
+4. **10c · borradores**: hoy las columnas envuelven sin rótulo; el artboard
+   quiere filas pensadas para el pulgar.
+5. Los temas oscuros móviles (4e, 5d, 8d, 9d, 10c).

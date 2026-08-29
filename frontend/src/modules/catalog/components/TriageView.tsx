@@ -180,11 +180,16 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
 
   const campoHechos = React.useRef<HTMLTextAreaElement>(null);
 
+  /*
+   * MARGEN DE 16 EN MOVIL, 24 DESDE `sm`. Veinticuatro por lado se comen 48 de
+   * los 375, y esta pantalla es texto largo: cada pixel de ancho es una palabra
+   * menos por renglon.
+   */
   return (
-    <div className="flex-1 overflow-y-auto bg-canvas p-6">
+    <div className="flex-1 overflow-y-auto bg-canvas p-4 sm:p-6">
       <div className="mx-auto max-w-4xl space-y-4 font-sans">
         {/* ─── ENCABEZADO (1f) ─────────────────────────────────────────────── */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-card bg-brand-700">
             <Compass className="h-5 w-5 text-on-brand" />
           </div>
@@ -195,7 +200,7 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
             </p>
           </div>
           {censo && (
-            <span className="ml-auto shrink-0 font-mono text-[11px] text-ink-400">
+            <span className="font-mono text-[11px] text-ink-400 sm:ml-auto sm:shrink-0">
               {censo.total} actuaciones · {censo.verificadas} verificadas
             </span>
           )}
@@ -654,7 +659,12 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
                     </span>
                   </span>
 
-                  <span className="w-[190px] shrink-0">
+                  {/*
+                    EN MOVIL LA SUGERENCIA BAJA A SU PROPIO RENGLON. 190px fijos
+                    junto a la fecha y la rama no caben en 375 y empujaban la
+                    fila fuera del borde.
+                  */}
+                  <span className="w-full sm:w-[190px] sm:shrink-0">
                     {h.status === 'OK' ? (
                       <span className="block truncate text-ui text-ink-900">
                         {h.sugerencias[0]?.nombre ?? ''}
