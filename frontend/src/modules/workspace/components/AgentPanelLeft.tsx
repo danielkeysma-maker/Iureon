@@ -63,6 +63,8 @@ interface AgentPanelLeftProps {
   logs: AgentLog[];
   activeDraftText?: string | null;
   onClearActiveDraft?: () => void;
+  /** Lo decide App: en movil solo se ve un panel a la vez. */
+  ocultoEnMovil?: boolean;
 }
 
 export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
@@ -76,7 +78,8 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
   handleSendPrompt,
   logs,
   activeDraftText,
-  onClearActiveDraft
+  onClearActiveDraft,
+  ocultoEnMovil = false
 }) => {
   const [importedFiles, setImportedFiles] = useState<ArchivoAdjunto[]>([]);
 
@@ -168,7 +171,19 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
   };
 
   return (
-    <section className="flex min-h-0 w-full shrink-0 flex-col border-r border-line-200 bg-surface lg:w-[364px] xl:w-[400px]">
+    /*
+      EL TALLER SE PARTE EN MOVIL (4d): «la instruccion es la pantalla, y el
+      documento generado se abre despues como pantalla propia». Aqui esa
+      decision solo se OBEDECE — quien la toma es App, que sabe si ya hay
+      borrador. El `hidden lg:flex` va en la propia seccion y no en un
+      envoltorio para no perder `w-full lg:w-[364px]`, que es lo que le da su
+      ancho en cada tamaño.
+    */
+    <section
+      className={`min-h-0 w-full shrink-0 flex-col border-r border-line-200 bg-surface lg:w-[364px] xl:w-[400px] ${
+        ocultoEnMovil ? 'hidden lg:flex' : 'flex'
+      }`}
+    >
         {/*
           `overflow-y-auto`: en una pantalla baja el formulario se desplaza en
           vez de derramarse sobre la consola. Antes ambos eran `flex-1` y se

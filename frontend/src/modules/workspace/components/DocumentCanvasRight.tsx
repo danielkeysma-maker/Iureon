@@ -9,6 +9,8 @@ interface DocumentCanvasRightProps {
   rightView: 'pdf' | 'draft';
   setRightView: (view: 'pdf' | 'draft') => void;
   generatedDraft: GeneratedDraft | null;
+  /** Lo decide App: en movil solo se ve un panel a la vez. */
+  ocultoEnMovil?: boolean;
   copied: boolean;
   onOpenBrandingModal: () => void;
   onCopyText: () => void;
@@ -46,7 +48,8 @@ export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
   onSaveDraft,
   onOpenSavedDraftsModal,
   documentType = '',
-  legalBranch = ''
+  legalBranch = '',
+  ocultoEnMovil = false
 }) => {
   const lookup = useActuacionLookup(documentType, legalBranch);
   const actuacion = lookup.actuacion;
@@ -107,7 +110,11 @@ export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
   );
 
   return (
-    <section className="flex h-full min-w-0 flex-1 flex-col overflow-hidden bg-canvas font-sans">
+    <section
+      className={`h-full min-w-0 flex-1 flex-col overflow-hidden bg-canvas font-sans ${
+        ocultoEnMovil ? 'hidden lg:flex' : 'flex'
+      }`}
+    >
       {/* ─── BARRA DE CONTADORES · 38px ────────────────────────────────────*/}
       <div className="flex h-[38px] shrink-0 items-center gap-4 border-b border-line-200 bg-surface px-5">
         <Pestana valor="draft">Documento</Pestana>

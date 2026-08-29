@@ -5,6 +5,7 @@ import { BalancePanel } from './modules/billing/components/BalancePanel';
 import { clearSession, readSession, saveSession, type Session } from './modules/auth/session';
 import { SidebarLeft } from './modules/tenant/components/SidebarLeft';
 import { MobileTabBar } from './modules/tenant/components/MobileTabBar';
+import { MobileWorkshopTabs, type VistaTaller } from './modules/workspace/components/MobileWorkshopTabs';
 import { MobileMoreSheet } from './modules/tenant/components/MobileMoreSheet';
 import { SupportAccessBanner } from './modules/support/components/SupportAccessBanner';
 import { SupportAccessDecisionDialog } from './modules/support/components/SupportAccessDecisionDialog';
@@ -116,6 +117,14 @@ export function App() {
    */
   const [solicitudAbierta, setSolicitudAbierta] = useState<SupportAccess | null>(null);
   const [masAbierto, setMasAbierto] = useState(false);
+
+  /*
+   * EL TALLER PARTIDO EN MOVIL (4d). En escritorio los dos paneles conviven;
+   * en 390px conviven mal —el de instruccion ya ocupa `w-full`, asi que el
+   * lienzo se quedaba sin ancho—. Aqui se elige cual de los dos se ve, y esta
+   * decision NO afecta al escritorio: las clases son `hidden lg:flex`.
+   */
+  const [vistaTaller, setVistaTaller] = useState<VistaTaller>('instruccion');
   const [refrescoSoporte, setRefrescoSoporte] = useState(0);
 
   /*
@@ -331,6 +340,17 @@ export function App() {
     deleteDraft,
     updateMetadata
   } = useSavedDrafts(activeFirm.id, currentUserEmail, isAuthenticated);
+
+  /*
+   * «El documento generado se abre despues como pantalla propia» (4d). Salta al
+   * aparecer un borrador, no en cada render: la dependencia es el TITULO y no
+   * el objeto, porque el objeto se recrea al editar el texto y devolveria al
+   * abogado al documento cada vez que corrige la instruccion.
+   */
+  const tituloGenerado = workflow.generatedDraft?.title ?? null;
+  useEffect(() => {
+    if (tituloGenerado) setVistaTaller('documento');
+  }, [tituloGenerado]);
 
   const handleSaveDraft = async (updatedText: string) => {
     if (!workflow.generatedDraft) return;
@@ -581,9 +601,18 @@ export function App() {
                 setDocumentType={workflow.setDocumentType}
               />
 
+              {!workflow.isFocusMode && (
+                <MobileWorkshopTabs
+                  vista={vistaTaller}
+                  onCambiar={setVistaTaller}
+                  hayBorrador={Boolean(workflow.generatedDraft)}
+                />
+              )}
+
               <div className="flex min-h-0 flex-1">
               {!workflow.isFocusMode && (
                 <AgentPanelLeft
+                  ocultoEnMovil={vistaTaller !== 'instruccion'}
                   userRole={userRole}
                   setUserRole={setUserRole}
                   documentType={workflow.documentType}
@@ -603,6 +632,7 @@ export function App() {
               )}
 
               <DocumentCanvasRight
+                ocultoEnMovil={!workflow.isFocusMode && vistaTaller !== 'documento'}
                 documentType={workflow.documentType}
                 legalBranch={workflow.legalBranch}
                 rightView={workflow.rightView}
