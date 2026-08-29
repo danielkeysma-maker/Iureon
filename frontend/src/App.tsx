@@ -1022,6 +1022,7 @@ export function App() {
         mainView={mainView}
         onElegir={setMainView}
         onCerrar={() => setMasAbierto(false)}
+        onSaldo={() => setIsRechargeModalOpen(true)}
       />
 
       <SupportAccessDecisionDialog

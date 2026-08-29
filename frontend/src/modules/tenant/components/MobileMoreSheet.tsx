@@ -1,5 +1,5 @@
 import React from 'react';
-import { X } from 'lucide-react';
+import { Wallet, X } from 'lucide-react';
 import { NAV_GROUPS, navModule } from '../navigation';
 import { MODULOS_EN_MAS } from './MobileTabBar';
 import type { MainView } from '../types';
@@ -34,13 +34,23 @@ interface MobileMoreSheetProps {
   mainView: MainView;
   onElegir: (view: MainView) => void;
   onCerrar: () => void;
+  /*
+   * EL SALDO NO ES UN MODULO, Y EN MOVIL SE QUEDABA SIN PUERTA.
+   *
+   * En escritorio se abre desde el pie de la barra lateral. Al reemplazarla por
+   * la barra inferior, ese acceso desaparecio y el saldo dejo de ser alcanzable
+   * — un defecto que introdujo el propio cascaron movil. 5c le da pantalla
+   * propia bajo «Mas», y aqui esta esa puerta.
+   */
+  onSaldo?: () => void;
 }
 
 export const MobileMoreSheet: React.FC<MobileMoreSheetProps> = ({
   abierto,
   mainView,
   onElegir,
-  onCerrar
+  onCerrar,
+  onSaldo
 }) => {
   React.useEffect(() => {
     if (!abierto) return;
@@ -82,6 +92,32 @@ export const MobileMoreSheet: React.FC<MobileMoreSheetProps> = ({
         </header>
 
         <div className="px-2 py-2">
+          {onSaldo && (
+            <section className="mb-3">
+              <p className="px-2 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-ink-400">
+                Cuenta
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  onSaldo();
+                  onCerrar();
+                }}
+                className="flex min-h-[52px] w-full items-center gap-3 rounded-control px-2 text-left text-ink-900"
+              >
+                <Wallet className="h-[18px] w-[18px] shrink-0 text-ink-400" />
+                <span className="min-w-0">
+                  <span className="block text-[13.5px] font-medium leading-tight">
+                    Saldo y recarga
+                  </span>
+                  <span className="mt-0.5 block text-[11.5px] leading-tight text-ink-500">
+                    Lo disponible, el consumo y los movimientos
+                  </span>
+                </span>
+              </button>
+            </section>
+          )}
+
           {grupos.map((grupo) => (
             <section key={grupo.titulo} className="mb-3 last:mb-0">
               <p className="px-2 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-ink-400">

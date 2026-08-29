@@ -120,7 +120,17 @@ export const Dialog: React.FC<DialogProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      /*
+        CENTRADO EN ESCRITORIO, ANCLADO ABAJO EN MOVIL. Regla del artboard 4e,
+        y vale para los ONCE dialogos de 3a: «se convierten en movil en hojas
+        ancladas al borde inferior».
+
+        No es estetica. Un dialogo centrado en un telefono deja el contenido
+        bajo el teclado cuando hay un campo, y sus acciones quedan en el tercio
+        superior — la parte de la pantalla que el pulgar no alcanza sin cambiar
+        de mano. La hoja sube desde donde esta el pulgar.
+      */
+      className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-label={titulo}
@@ -135,9 +145,28 @@ export const Dialog: React.FC<DialogProps> = ({
       <div
         ref={panel}
         tabIndex={-1}
-        className={`relative flex w-full ${ANCHO[tamano]} flex-col overflow-hidden rounded-card border border-line-200 bg-surface shadow-[0_16px_40px_-12px_rgb(16_24_34/0.3)] focus:outline-none`}
+        /*
+          En movil: ancho completo, esquinas redondeadas SOLO arriba y sin borde
+          —se apoya en el borde de la pantalla, como una hoja que sigue mas
+          alla del recorte—, con alto maximo del 88% para que siempre se vea
+          algo de lo que hay detras y se entienda que es una capa, no una
+          pantalla nueva. Y `pb-[env(safe-area-inset-bottom)]` para no quedar
+          bajo la franja del gesto de inicio.
+        */
+        className={`relative flex max-h-[88vh] w-full flex-col overflow-hidden rounded-t-[16px] border-line-200 bg-surface pb-[env(safe-area-inset-bottom)] shadow-[0_16px_40px_-12px_rgb(16_24_34/0.3)] focus:outline-none sm:max-h-none sm:rounded-card sm:border sm:pb-0 ${ANCHO[tamano]}`}
       >
         {/* ─── CABECERA · fija, nunca lleva controles ni pestañas ────────── */}
+        {/*
+          EL ASIDERO DE LA MAQUETA: 38x4 con radio completo sobre
+          `neutral-line`, centrado. No arrastra —no hay gesto todavia— y por eso
+          es `aria-hidden`: es la señal visual de que esto es una hoja y no una
+          pantalla, que es lo que le dice a alguien que puede tocar el velo para
+          cerrarla.
+        */}
+        <div className="flex justify-center pb-0.5 pt-2 sm:hidden" aria-hidden="true">
+          <span className="h-1 w-[38px] rounded-full bg-neutral-line" />
+        </div>
+
         <header className="flex shrink-0 items-start gap-3 border-b border-line-200 px-[18px] py-3.5">
           <div className="min-w-0 flex-1">
             <h2 className="truncate text-subtitle text-ink-900">{titulo}</h2>
