@@ -7,6 +7,27 @@
  */
 
 /** A draft as produced by the three-engine pipeline. */
+/**
+ * Contra qué ficha del catálogo se redactó el escrito.
+ *
+ * `null` cuando la actuación no está catalogada — que es una respuesta, no un
+ * fallo: el motor lo dice y el visor lo dice, en vez de callar y dejar que el
+ * escrito parezca respaldado.
+ */
+export interface ProcedenciaDelBorrador {
+  actuacionId: string;
+  exactName: string;
+  legalBasis: string;
+  sourceUrl: string | null;
+  competentAuthority: string | null;
+  termStatus: 'VERIFICADO' | 'NO_CADUCA' | 'NO_VERIFICADO';
+  termDescription: string | null;
+  curadaPorLaFirma: boolean;
+  curadaPor: string | null;
+  seccionesSinArticulo: number;
+  seccionesTotales: number;
+}
+
 export interface GeneratedDraft {
   title: string;
   documentType: string;
@@ -14,6 +35,8 @@ export interface GeneratedDraft {
   excepcionesFormuladas: string[];
   legalText: string;
   tokensConsumed: number;
+  /** Ausente en borradores guardados antes de que esto existiera. */
+  procedencia?: ProcedenciaDelBorrador | null;
 }
 
 /** BORRADOR | REVISAR | LISTO | RADICADO. The same set the database checks. */

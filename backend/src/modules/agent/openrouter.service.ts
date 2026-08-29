@@ -11,7 +11,7 @@ import {
   buildClaudeUserMessage,
   renderJurisprudencia
 } from './claudeDraft.prompt';
-import { buildCatalogGuidanceForFirm } from './catalogGuidance';
+import { buildCatalogGuidanceForFirm, resolverProcedencia } from './catalogGuidance';
 import type { LegalBranch } from '../catalog/types';
 import { buildSolemnColombianDraft } from './solemnDraft.fallback';
 
@@ -160,6 +160,20 @@ export class OpenRouterService {
       timestamp: new Date().toISOString()
     });
 
+    /*
+     * LA PROCEDENCIA VIAJA CON EL BORRADOR. `runDrafting` ya resolvió esta misma
+     * ficha para instruir al modelo y la descartó; se resuelve otra vez aquí en
+     * vez de arrastrarla por la firma de tres funciones. Es el catálogo en
+     * memoria más una lectura de curaduría por firma — y a cambio, el visor
+     * puede decir contra qué ficha se redactó y si su término está comprobado,
+     * que es lo que 5a necesita revisar ANTES de exportar.
+     */
+    const procedencia = await resolverProcedencia(
+      req.firmId,
+      req.documentType,
+      req.legalBranch as LegalBranch | undefined
+    );
+
     const isTutela = detectLegalTopic(req.documentType, req.legalPrompt) === 'TUTELA';
 
     return {
@@ -179,6 +193,7 @@ export class OpenRouterService {
        * per model call, so this field has nothing true to say and says nothing.
        */
       tokensConsumed: 0,
+      procedencia,
       isContinuation
     };
   }

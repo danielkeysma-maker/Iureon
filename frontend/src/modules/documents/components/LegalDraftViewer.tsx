@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { BrainCircuit, Check, Eye, FolderOpen, Pencil, Save, Scale, Sparkles } from 'lucide-react';
 import DOMPurify from 'dompurify';
 import { JargonSuggestionModal } from './JargonSuggestionModal';
+import { DraftProvenanceBar } from './DraftProvenanceBar';
 import { markdownBoldToHtml } from '../services/documentExport.service';
 import { learningApi } from '../../agent/services/learning.api';
 
@@ -101,6 +102,16 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
         completa el escrito se revisa como papel, y el papel tiene un ancho.
       */}
       <div className={`mx-auto w-full ${isFocusMode ? 'max-w-[816px]' : 'max-w-[684px]'}`}>
+        {/*
+          LA BARRA DE REVISION VA ARRIBA DEL PAPEL, no al pie: el visor es donde
+          se revisa ANTES de firmar, y una advertencia bajo seis paginas de
+          escrito la lee quien ya decidio. Se calla cuando no hay nada que
+          advertir — una barra que casi siempre dice «todo bien» se vuelve marco
+          y deja de leerse el dia que dice otra cosa.
+        */}
+        <div className="mb-3 empty:mb-0">
+          <DraftProvenanceBar procedencia={draft.procedencia} />
+        </div>
         {/*
           EL PAPEL. Sin borde inferior ni radio abajo: se apoya en el fondo del
           lienzo, como una hoja que sigue más allá del recorte. Un rectángulo

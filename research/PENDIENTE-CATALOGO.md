@@ -968,3 +968,60 @@ justamente las que convendría discutir.
 verificada» para que no se registre como sin verificar por comodidad. Eso **ya
 se cumplía**: `VerificationForm` ofrece `NO_CADUCA` como una de tres opciones
 del mismo peso, no como un enlace al margen. No se tocó.
+
+---
+
+## 14. Visor (5a) y Buscador (1h) — lo medido el 28 de agosto
+
+### 1h Buscador: YA ERA FIEL. La llamé parcial leyendo el documento viejo.
+
+`SearchView.tsx` ya cumple lo esencial del artboard: curado y automático son
+**dos bloques con encabezado propio**, el segundo en menor contraste, con filete
+de cita punteado y **sin botón de citar** —citar algo que nadie leyó cuesta un
+clic más—; la providencia va en mono y de primero; el fragmento en serif con
+filete izquierdo. **Cuarta vez que `AUDITORIA-DESIGN.md` me hace planear sobre
+una pantalla que ya estaba hecha.**
+
+Corrección a una señal que yo mismo anoté en el skill: «las pantallas fieles
+citan su artboard en el docblock» es **más débil de lo que dije** —`SearchView`
+es fiel y no lo cita—. La ausencia de la cita no prueba nada; solo su presencia
+es informativa.
+
+Lo que a 1h le falta de verdad, y no se puede pintar hoy: la anotación humana
+(«anotada por D. Cárdenas · su nota») y «citada en 4 escritos» — `CorpusPrecedent`
+no tiene campo de anotador ni relación con borradores; y la etiqueta «podría ir
+en contra de su tesis», que exige comparar la providencia con la tesis del
+escrito.
+
+### 5a Visor: entregada la barra de revisión, con la verdad que sí existe
+
+**El hueco de fondo.** El motor resolvía la ficha del catálogo para instruir al
+modelo y **la descartaba al responder**. El abogado recibía un escrito que
+afirma un plazo sin poder saber de dónde salió, si alguien lo verificó, o si su
+propia firma lo corrigió.
+
+**Entregado.** `resolverProcedencia` en `catalogGuidance.ts` adjunta al borrador
+la ficha contra la que se redactó —artículo, fuente, autoridad, estado del
+término, si la firma la curó y cuántas secciones obligatorias carecen de
+artículo—, y `DraftProvenanceBar` la muestra **arriba del papel**, porque una
+advertencia bajo seis páginas la lee quien ya decidió.
+
+Tres estados, y **el silencio es uno**: ámbar si el término no está comprobado,
+si faltan artículos de sección o si la actuación no está catalogada; verde
+discreto si la firma la curó; **nada** cuando no hay qué advertir — una barra que
+casi siempre dice «todo bien» se vuelve marco y deja de leerse el día que dice
+otra cosa. Un borrador guardado antes de esto trae `undefined` y **tampoco
+advierte**: no sabemos que le falte respaldo, sabemos que no lo registramos.
+
+### Lo que 5a pide y NO está, con la razón
+
+1. **«Este borrador contiene 2 afirmaciones sin verificar»** con salto «1/2».
+   **Ese conteo no existe**: nadie analiza el texto generado frase por frase
+   para clasificar afirmaciones. Una cifra inventada en la pantalla donde se
+   decide firmar sería la peor falsa alarma — la que enseña a ignorar todas las
+   demás. Se dice lo que sí se sabe: contra qué ficha se redactó y cómo está.
+2. **Miniaturas con barra ámbar en el margen** de la página con problemas.
+   Mismo dato faltante: sin afirmaciones localizadas, no hay página que marcar.
+3. **Casillas de exportación** (membrete, anotar el margen, hoja de fuentes).
+   La exportación no acepta variantes hoy; ofrecerlas sería pintar interruptores
+   que no mueven nada.

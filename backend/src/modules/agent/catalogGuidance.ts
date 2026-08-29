@@ -86,3 +86,58 @@ export const buildCatalogGuidanceForFirm = async (
 
 export const findCatalogedActuacion = (documentType: string): Actuacion | null =>
   catalogService.findByDocumentType(documentType);
+
+/**
+ * La procedencia del borrador: contra qué ficha del catálogo se redactó.
+ *
+ * ─── POR QUÉ VIAJA CON EL BORRADOR Y NO SE QUEDA EN EL PROMPT ───────────────
+ *
+ * El motor ya resolvía la actuación para instruir al modelo y la DESCARTABA al
+ * responder. El abogado recibía un escrito que afirma un plazo sin poder saber
+ * de dónde salió, ni si alguien lo verificó, ni si su firma lo corrigió. El
+ * artboard 5a pide revisar «lo sin verificar» ANTES de exportar, y esto es lo
+ * único que el producto sabe de verdad sobre ese punto: no cuántas frases del
+ * texto están sin respaldo —eso no se mide—, sino si la ficha que gobierna el
+ * escrito tiene su término comprobado y su fuente.
+ *
+ * Decir eso es exacto. Contar «2 afirmaciones sin verificar» sobre un texto que
+ * nadie analizó sería una cifra inventada en la pantalla donde se decide firmar.
+ */
+export interface ProcedenciaDelBorrador {
+  actuacionId: string;
+  exactName: string;
+  legalBasis: string;
+  sourceUrl: string | null;
+  competentAuthority: string | null;
+  termStatus: Actuacion['term']['status'];
+  termDescription: string | null;
+  /** La firma corrigió o confirmó esta ficha en su pantalla de curaduría. */
+  curadaPorLaFirma: boolean;
+  curadaPor: string | null;
+  /** Secciones que el escrito debe traer y cuyo artículo no está confirmado. */
+  seccionesSinArticulo: number;
+  seccionesTotales: number;
+}
+
+export const resolverProcedencia = async (
+  firmId: string | null | undefined,
+  documentType: string,
+  branch?: LegalBranch
+): Promise<ProcedenciaDelBorrador | null> => {
+  const { actuacion } = await catalogService.resolveForFirm(firmId, documentType, branch);
+  if (!actuacion) return null;
+
+  return {
+    actuacionId: actuacion.id,
+    exactName: actuacion.exactName,
+    legalBasis: actuacion.legalBasis,
+    sourceUrl: actuacion.sourceUrl,
+    competentAuthority: actuacion.competentAuthority,
+    termStatus: actuacion.term.status,
+    termDescription: actuacion.term.description,
+    curadaPorLaFirma: Boolean(actuacion.verification),
+    curadaPor: actuacion.verification?.verifiedBy ?? null,
+    seccionesSinArticulo: actuacion.requiredSections.filter((s) => !s.basis).length,
+    seccionesTotales: actuacion.requiredSections.length
+  };
+};
