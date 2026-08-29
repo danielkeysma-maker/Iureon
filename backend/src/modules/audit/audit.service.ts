@@ -32,7 +32,18 @@ export type AuditAction =
   | 'TRANSCRIPTION_DELETED'
   | 'CATALOG_TERM_VERIFIED'
   | 'INTERVIEW_DECIDED'
-  | 'ACTA_LISTA';
+  | 'ACTA_LISTA'
+  /*
+   * Acceso de soporte (8a). Las cinco van al rastro DE LA FIRMA, no al de
+   * operación: es su material el que alguien quiere leer. `VIEWED` se escribe
+   * desde el servidor en cada lectura autorizada, y es lo que sobrevive a la
+   * sesión: el panel «qué ha abierto» se apaga con ella, la auditoría no.
+   */
+  | 'SUPPORT_ACCESS_REQUESTED'
+  | 'SUPPORT_ACCESS_AUTHORIZED'
+  | 'SUPPORT_ACCESS_DENIED'
+  | 'SUPPORT_ACCESS_REVOKED'
+  | 'SUPPORT_ACCESS_VIEWED';
 
 export interface AuditLogEntry {
   id: string;

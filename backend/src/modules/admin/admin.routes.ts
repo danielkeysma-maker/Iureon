@@ -1,6 +1,11 @@
 import { Router } from 'express';
 import { requireSuperAdmin } from './admin.middleware';
 import {
+  anotarLecturaController,
+  historialAccesoController,
+  solicitarAccesoController
+} from '../support/supportAccess.controller';
+import {
   addCreditsController,
   addUserController,
   createFirmController,
@@ -42,5 +47,19 @@ router.post('/firms', createFirmController as any);
 router.patch('/firms/:firmId', updateFirmController as any);
 router.post('/firms/:firmId/credits', addCreditsController as any);
 router.post('/firms/:firmId/users', addUserController as any);
+
+/*
+ * Acceso de soporte (8a), lado operacion. Cuelgan de aqui y no de su propio
+ * modulo por una razon de seguridad, no de orden: `requireSuperAdmin` ya esta
+ * aplicado a este router, asi que una ruta que cruza la frontera del inquilino
+ * queda protegida por existir aqui. Montarlas aparte obligaria a recordar el
+ * guardian, y lo que se recuerda se olvida.
+ *
+ * Pedir no concede: la respuesta es una solicitud PENDIENTE que solo un socio
+ * de la firma puede convertir en acceso, desde `supportAccessRoutes`.
+ */
+router.post('/firms/:firmId/support-access', solicitarAccesoController as any);
+router.get('/firms/:firmId/support-access', historialAccesoController as any);
+router.post('/firms/:firmId/support-access/view', anotarLecturaController as any);
 
 export const adminRoutes = router;
