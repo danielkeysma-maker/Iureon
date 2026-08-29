@@ -327,26 +327,39 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
               paragraph of a two-hour transcript — the page read like a form
               instead of like a record of what was said.
             */
-            className="group flex gap-3 px-4 py-2.5 hover:bg-canvas transition-colors"
+            className="group flex flex-col gap-1 px-4 py-2.5 transition-colors hover:bg-canvas lg:flex-row lg:gap-3"
           >
             {/*
-              TRES COLUMNAS FIJAS: tiempo · voz · texto. El abogado corrige
-              leyendo en vertical y necesita que el texto empiece siempre en la
-              misma x — burbujas de ancho variable obligan al ojo a re-anclarse
-              en cada intervencion.
-            */}
-            <span className="w-[46px] shrink-0 pt-[2px] text-right font-mono text-[11px] text-ink-400">
-              {segment.startSeconds !== null ? formatTimestamp(segment.startSeconds) : ''}
-            </span>
+              TRES COLUMNAS FIJAS EN ESCRITORIO: tiempo · voz · texto. El abogado
+              corrige leyendo en vertical y necesita que el texto empiece siempre
+              en la misma x — burbujas de ancho variable obligan al ojo a
+              re-anclarse en cada intervencion.
 
-            <span className="flex w-[128px] shrink-0 items-start gap-1.5 pt-[2px]">
-              <span
-                className={`mt-[4px] h-2 w-2 shrink-0 rounded-[2px] ${colorFor(segment.speakerLabel)}`}
-              />
-              <span className="min-w-0 truncate text-[12px] font-semibold leading-snug text-ink-900">
-                {speakerNames[segment.speakerLabel] ?? ROLE_LABELS[segment.role]}
+              EN MOVIL LAS TRES COLUMNAS SE ABANDONAN (4d): interlocutor y hora
+              ARRIBA, texto debajo, ancho completo. Los 46px del tiempo mas los
+              128 de la voz dejaban al texto 180px de los 375 — cuatro palabras
+              por renglon, que no es una transcripcion sino una columna de
+              periodico rota.
+
+              `lg:contents` devuelve a estos dos hijos su condicion de columnas
+              directas de la fila en escritorio, sin duplicar el marcado: sin
+              eso, el envoltorio de movil se volveria una cuarta columna y
+              rompería la reticula que el escritorio necesita.
+            */}
+            <div className="flex items-center gap-1.5 lg:contents">
+              <span className="order-2 ml-auto shrink-0 font-mono text-[11px] text-ink-400 lg:order-none lg:ml-0 lg:w-[46px] lg:pt-[2px] lg:text-right">
+                {segment.startSeconds !== null ? formatTimestamp(segment.startSeconds) : ''}
               </span>
-            </span>
+
+              <span className="order-1 flex min-w-0 items-start gap-1.5 lg:order-none lg:w-[128px] lg:shrink-0 lg:pt-[2px]">
+                <span
+                  className={`mt-[4px] h-2 w-2 shrink-0 rounded-[2px] ${colorFor(segment.speakerLabel)}`}
+                />
+                <span className="min-w-0 truncate text-[12px] font-semibold leading-snug text-ink-900">
+                  {speakerNames[segment.speakerLabel] ?? ROLE_LABELS[segment.role]}
+                </span>
+              </span>
+            </div>
 
             <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 mb-0.5 min-h-[18px]">

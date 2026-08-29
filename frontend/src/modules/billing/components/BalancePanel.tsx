@@ -199,12 +199,24 @@ export const BalancePanel: React.FC<BalancePanelProps> = ({
 
         {/* ─── LAS TRES CIFRAS ────────────────────────────────────────────── */}
         {summary && (
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-            <div className="rounded-card border border-line-200 bg-surface p-3.5">
+          /*
+            LA JERARQUIA DE 5c EN MOVIL: el saldo ocupa el ancho entero y su
+            cifra sube a 32px; el consumo del mes y el costo por escrito quedan
+            en pareja debajo. En escritorio siguen siendo tres tarjetas iguales,
+            que es lo correcto ahi — con ancho de sobra, comparar tres cifras
+            del mismo tamaño es mas rapido que jerarquizarlas.
+
+            NO SE PINTA LA BARRA DE PROGRESO DE LA MAQUETA. Marca un 41%, y no
+            hay contra que medirlo: el saldo no tiene techo ni cupo declarado en
+            los datos. Una barra necesita un denominador, y el unico disponible
+            seria inventado — en la pantalla del dinero.
+          */
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            <div className="col-span-2 rounded-card border border-line-200 bg-surface p-3.5 sm:col-span-1">
               <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
                 Saldo disponible
               </p>
-              <p className="mt-1 font-mono text-[22px] font-semibold text-ink-900">
+              <p className="mt-1.5 font-mono text-[32px] font-semibold leading-[1.1] text-ink-900 sm:mt-1 sm:text-[22px]">
                 {pesos(summary.balance)}
               </p>
               {mes && (
