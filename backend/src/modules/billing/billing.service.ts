@@ -23,7 +23,7 @@ import type { CallUsage } from '../agent/openrouter.client';
  * cannot answer a client asking why their balance moved.
  */
 
-export type Operation = 'BORRADOR' | 'TRANSCRIPCION' | 'BUSQUEDA' | 'ORIENTACION';
+export type Operation = 'BORRADOR' | 'TRANSCRIPCION' | 'BUSQUEDA' | 'ORIENTACION' | 'RESUMEN';
 
 export class BillingError extends Error {
   readonly code: string;
@@ -70,14 +70,30 @@ export const PRICE_COP: Record<Operation, number> = {
    * ya devuelven sin cobrar cuando el piso es cero, asi que apagar el precio
    * apaga el cobro entero sin tocar la ruta.
    *
-   * La operacion SIGUE existiendo como tipo, y eso es a proposito: el motor de
-   * resumen de audiencias si consume modelo, y ese consumo se registra bajo
-   * esta operacion en `ai_usage`. Cobrar cero no es lo mismo que no medir —
-   * sin la medida no se puede responder si el precio cubre el costo, que es la
-   * pregunta que decide si el negocio existe.
+   * La operacion sigue existiendo como tipo para el historial: las filas que ya
+   * la nombran y el contador del panel siguen leyendose.
    */
   TRANSCRIPCION: 0,
   BUSQUEDA: 0,
+  /*
+   * EL RESUMEN SI SE DESCUENTA. Decision del usuario, 29/08/2026: «aunque no se
+   * muestre un valor, si se debe descontar del saldo principal si se usa el
+   * resumen de Gemini».
+   *
+   * Es la unica llamada a modelo del modulo de transcripcion — transcribir es
+   * Deepgram, que no pasa por OpenRouter — y hasta hoy su costo se calculaba y
+   * se botaba: la plataforma pagaba a Gemini por cada audiencia resumida sin
+   * verlo en ninguna parte. Va con piso, como todo lo demas, para que
+   * `reserveForOperation` niegue el servicio a una firma sin saldo ANTES de
+   * llamar al modelo: un piso de cero no reserva nada y no comprueba nada.
+   *
+   * LA CIFRA ES PROVISIONAL Y ES DEL DESARROLLADOR, NO DEL USUARIO. Se copia
+   * el razonamiento de ORIENTACION: la llamada cuesta centavos (unos $1,50 COP
+   * medidos), $50 conserva el margen de un borrador y sigue siendo trivial para
+   * una firma que esta trabajando. Regenerar cobra otra vez, a proposito: es
+   * otra llamada, y el abogado la pide con un boton que lo dice.
+   */
+  RESUMEN: 50,
   /*
    * Lo que cuesta una orientación PASADO el cupo diario gratuito.
    *

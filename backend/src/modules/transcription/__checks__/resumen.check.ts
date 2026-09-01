@@ -86,34 +86,48 @@ check(
 );
 
 /*
- * NO SE COBRA, PERO SI SE MIDE — y son dos aserciones porque son dos defectos
- * distintos.
+ * SE COBRA, SE MIDE, Y SE DEVUELVE SI NO HUBO RESUMEN — cinco aserciones porque
+ * son cinco formas distintas de equivocarse con el dinero de una firma.
  *
- * La de arriba vigilaba `debitForUsage`, un simbolo que no existe en el
- * proyecto: pasaba siempre. Ahora nombra lo que de verdad cobra
- * (`reserveForOperation` / `settleOperation`), que es lo unico capaz de mover
- * el saldo de una firma.
- *
- * La de abajo es la contraria y hace falta igual: transcribir es gratis por
- * decision, y el resumen es la UNICA llamada a modelo del modulo — transcribir
- * es Deepgram, que no pasa por OpenRouter. Su costo se calculaba y se botaba,
- * asi que la plataforma pagaba a Gemini por cada audiencia resumida sin verlo
- * en `ai_usage`. Regalar algo es legitimo; no saber cuanto cuesta lo regalado
- * no lo es.
+ * La version anterior de este bloque vigilaba `debitForUsage`, un simbolo que
+ * no existe en el proyecto: pasaba siempre. Y afirmaba que el resumen no se
+ * cobraba «porque la transcripcion ya se pago», que era falso por partida
+ * doble. Decision del usuario (29/08/2026): el resumen de Gemini se descuenta
+ * del saldo principal aunque la pantalla no anuncie precio.
  */
 const DEL_RESUMEN =
   CONTROLADOR.split('transcriptionResumenController')[1]?.split('export const')[0] ?? '';
 
 check(
-  'el resumen no mueve el saldo de la firma',
-  !DEL_RESUMEN.includes('reserveForOperation') && !DEL_RESUMEN.includes('settleOperation'),
-  DEL_RESUMEN.includes('reserveForOperation') ? 'reserva saldo' : 'liquida saldo'
+  'el resumen reserva saldo ANTES de llamar al modelo',
+  DEL_RESUMEN.includes('reserveForOperation') &&
+    DEL_RESUMEN.indexOf('reserveForOperation') < DEL_RESUMEN.indexOf('generarResumen('),
+  'sin reserva previa una firma sin saldo obtendria resumenes gratis'
 );
 
 check(
-  'pero si registra lo que le costo al modelo',
-  DEL_RESUMEN.includes('recordUsage'),
-  'sin recordUsage el consumo de Gemini no llega a ai_usage'
+  'un motor sin respuesta devuelve la reserva',
+  DEL_RESUMEN.includes('refundReservation') &&
+    DEL_RESUMEN.indexOf('refundReservation') < DEL_RESUMEN.indexOf("error: 'SIN_RESUMEN'"),
+  'nadie paga por un resumen que no recibio'
+);
+
+check(
+  'y uno que si respondio se liquida y registra su consumo',
+  DEL_RESUMEN.includes('settleOperation') && DEL_RESUMEN.includes('recordUsage'),
+  'sin settle no hay movimiento en el libro; sin recordUsage el costo de Gemini no llega a ai_usage'
+);
+
+check(
+  'cada generacion tiene su propia operacion: regenerar no re-cobra las anteriores',
+  DEL_RESUMEN.includes('randomUUID()'),
+  'settleOperation suma ai_usage por operation_id'
+);
+
+check(
+  'lo guardado se devuelve sin tocar el saldo',
+  DEL_RESUMEN.indexOf('desdeCache: true') < DEL_RESUMEN.indexOf('reserveForOperation'),
+  'reabrir una audiencia no puede costar'
 );
 
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);

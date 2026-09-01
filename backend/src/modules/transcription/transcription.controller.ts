@@ -9,7 +9,15 @@ import { detectVoiceConflicts, proposeSpeakerNames } from './voiceConflicts';
 import { BackblazeB2TenantStorageService } from '../documents/b2.service';
 import { transcriptionStore } from './transcriptionStore.service';
 import { auditService } from '../audit/audit.service';
-import { recordUsage } from '../billing/billing.service';
+import {
+  BillingError,
+  PRICE_COP,
+  recordUsage,
+  refundReservation,
+  reserveForOperation,
+  settleOperation
+} from '../billing/billing.service';
+import { randomUUID } from 'crypto';
 import { generarResumen, type ResumenDeTranscripcion } from './resumen.service';
 import type { SpeakerRole, TranscriptionKind } from './types';
 
@@ -180,20 +188,23 @@ export const transcribeAudioController = async (req: Request, res: Response): Pr
  * correcto despues de corregir intervenciones, porque el resumen viejo resume
  * un texto que ya no existe.
  *
- * NO SE COBRA, Y AHORA POR OTRA RAZON. El argumento era «la transcripcion ya
- * se pago ($3.000)», y resulto falso: ese precio estaba declarado y ningun
- * controlador lo cobraba. Desde el 29/08/2026 transcribir es gratis por
- * decision, no por descuido, y este resumen tampoco se cobra.
+ * SE DESCUENTA DEL SALDO. Decision del usuario, 29/08/2026. La historia
+ * importa porque explica la forma del codigo: este resumen decia «no se cobra
+ * aparte, la transcripcion ya se pago ($3.000)», y eso era falso — ese precio
+ * estaba declarado y ningun controlador lo cobraba. Transcribir es hoy gratis
+ * por decision; el resumen, que es la UNICA llamada a modelo del modulo
+ * (transcribir es Deepgram, no OpenRouter), se cobra como cualquier otra
+ * operacion: se reserva el piso ANTES de llamar al modelo, se registra lo que
+ * consumio, y se liquida o se devuelve segun haya producido algo.
  *
- * PERO SI SE MIDE. Esta es la unica llamada A MODELO de todo el modulo —
- * transcribir es Deepgram, que no pasa por OpenRouter— y su costo se estaba
- * calculando y botando: `generarResumen` devolvia `costUsd` y el controlador
- * desestructuraba solo `resumen`. La plataforma pagaba a Gemini por cada
- * audiencia resumida y no lo veia en ninguna parte, asi que `ai_usage`
- * subestimaba el costo real y con el los dias de saldo del panel.
+ * LO GUARDADO NO SE COBRA. Reabrir manana devuelve el resumen almacenado sin
+ * tocar el modelo ni el saldo; solo `?regenerar=1` vuelve a pagar, y lo pide un
+ * boton que lo dice. `?soloCache=1` nunca cobra: es el modo de la exportacion.
  *
- * Regalar algo es una decision legitima; no saber cuanto cuesta lo que se
- * regala no lo es.
+ * CADA GENERACION ES SU PROPIA OPERACION. `settleOperation` suma `ai_usage` por
+ * `operation_id`; si el id fuera el de la transcripcion, regenerar sumaria el
+ * costo de todas las veces anteriores y las cobraria de nuevo. Un uuid por
+ * llamada mantiene cada cobro pegado a su consumo.
  */
 export const transcriptionResumenController = async (req: Request, res: Response): Promise<void> => {
   const firmId = req.firmId as string;
@@ -224,6 +235,27 @@ export const transcriptionResumenController = async (req: Request, res: Response
     return;
   }
 
+  const userEmail = req.user?.email ?? 'desconocido';
+  const operationId = randomUUID();
+
+  let reservado = 0;
+  try {
+    ({ reserved: reservado } = await reserveForOperation({ firmId, userEmail, operation: 'RESUMEN' }));
+  } catch (error) {
+    if (error instanceof BillingError) {
+      // 402 y no 500: es una puerta con precio, no una puerta rota.
+      res.status(402).json({
+        success: false,
+        error: 'SALDO_INSUFICIENTE',
+        message:
+          `El resumen cuesta $${PRICE_COP.RESUMEN.toLocaleString('es-CO')} COP y la firma no tiene saldo. ` +
+          'Recargue para generarlo; la transcripcion sigue disponible completa.'
+      });
+      return;
+    }
+    throw error;
+  }
+
   const { resumen, usage } = await generarResumen(transcripcion.segments ?? [], transcripcion.kind);
 
   /*
@@ -231,26 +263,43 @@ export const transcriptionResumenController = async (req: Request, res: Response
    * ilegible se pago igual. Contar solo los aciertos subestimaria el costo justo
    * en los dias en que el motor anda mal, que es cuando mas importa verlo.
    */
-  await recordUsage({
-    firmId,
-    userEmail: req.user?.email ?? 'desconocido',
-    operation: 'TRANSCRIPCION',
-    operationId: id,
-    usage
-  });
+  await recordUsage({ firmId, userEmail, operation: 'RESUMEN', operationId, usage });
 
   if (!resumen) {
+    // Nadie paga por un resumen que no recibio. El consumo queda registrado
+    // igual: eso lo pago la plataforma, y debe verlo.
+    await refundReservation({
+      firmId,
+      userEmail,
+      operation: 'RESUMEN',
+      reason: 'el motor no produjo resumen'
+    });
+
     // El motor no respondio o respondio ilegible. Se dice tal cual: un resumen
     // inventado por el servidor seria peor que ninguno.
     res.status(502).json({
       success: false,
       error: 'SIN_RESUMEN',
-      message: 'El motor no pudo generar el resumen en este momento. Intente de nuevo.'
+      message: 'El motor no pudo generar el resumen en este momento. Intente de nuevo. No se le cobro.'
     });
     return;
   }
 
   await transcriptionStore.saveResumen(firmId, id, resumen);
+
+  /*
+   * Al libro ANTES de responder: serverless se congela al responder y un cobro
+   * «para despues» no ocurre. Es la misma regla que el guardado del transcrito.
+   */
+  await settleOperation({
+    firmId,
+    userEmail,
+    operation: 'RESUMEN',
+    operationId,
+    reserved: reservado,
+    description: `Resumen de ${transcripcion.kind === 'ENTREVISTA' ? 'entrevista' : 'audiencia'} · ${transcripcion.title}`
+  });
+
   res.json({ success: true, resumen, desdeCache: false });
 };
 
