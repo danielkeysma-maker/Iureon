@@ -9,6 +9,7 @@ import { detectVoiceConflicts, proposeSpeakerNames } from './voiceConflicts';
 import { BackblazeB2TenantStorageService } from '../documents/b2.service';
 import { transcriptionStore } from './transcriptionStore.service';
 import { auditService } from '../audit/audit.service';
+import { recordUsage } from '../billing/billing.service';
 import { generarResumen, type ResumenDeTranscripcion } from './resumen.service';
 import type { SpeakerRole, TranscriptionKind } from './types';
 
@@ -179,9 +180,20 @@ export const transcribeAudioController = async (req: Request, res: Response): Pr
  * correcto despues de corregir intervenciones, porque el resumen viejo resume
  * un texto que ya no existe.
  *
- * NO SE COBRA APARTE. La transcripcion ya se pago ($3.000) y este resumen es
- * parte de su valor; la llamada a Gemini sobre texto ya transcrito cuesta
- * centavos y la absorbe el margen, igual que el triage de redaccion.
+ * NO SE COBRA, Y AHORA POR OTRA RAZON. El argumento era «la transcripcion ya
+ * se pago ($3.000)», y resulto falso: ese precio estaba declarado y ningun
+ * controlador lo cobraba. Desde el 29/08/2026 transcribir es gratis por
+ * decision, no por descuido, y este resumen tampoco se cobra.
+ *
+ * PERO SI SE MIDE. Esta es la unica llamada A MODELO de todo el modulo —
+ * transcribir es Deepgram, que no pasa por OpenRouter— y su costo se estaba
+ * calculando y botando: `generarResumen` devolvia `costUsd` y el controlador
+ * desestructuraba solo `resumen`. La plataforma pagaba a Gemini por cada
+ * audiencia resumida y no lo veia en ninguna parte, asi que `ai_usage`
+ * subestimaba el costo real y con el los dias de saldo del panel.
+ *
+ * Regalar algo es una decision legitima; no saber cuanto cuesta lo que se
+ * regala no lo es.
  */
 export const transcriptionResumenController = async (req: Request, res: Response): Promise<void> => {
   const firmId = req.firmId as string;
@@ -212,7 +224,20 @@ export const transcriptionResumenController = async (req: Request, res: Response
     return;
   }
 
-  const { resumen } = await generarResumen(transcripcion.segments ?? [], transcripcion.kind);
+  const { resumen, usage } = await generarResumen(transcripcion.segments ?? [], transcripcion.kind);
+
+  /*
+   * Se registra ANTES de mirar si el resumen sirve: una llamada que respondio
+   * ilegible se pago igual. Contar solo los aciertos subestimaria el costo justo
+   * en los dias en que el motor anda mal, que es cuando mas importa verlo.
+   */
+  await recordUsage({
+    firmId,
+    userEmail: req.user?.email ?? 'desconocido',
+    operation: 'TRANSCRIPCION',
+    operationId: id,
+    usage
+  });
 
   if (!resumen) {
     // El motor no respondio o respondio ilegible. Se dice tal cual: un resumen

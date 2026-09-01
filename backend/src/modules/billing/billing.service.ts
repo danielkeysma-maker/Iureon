@@ -56,7 +56,27 @@ export class BillingError extends Error {
  */
 export const PRICE_COP: Record<Operation, number> = {
   BORRADOR: 2000,
-  TRANSCRIPCION: 3000,
+  /*
+   * LA TRANSCRIPCION NO SE COBRA. Decision del 29 de agosto de 2026.
+   *
+   * Estuvo en $3.000 y NUNCA se cobro: ningun controlador reservaba saldo por
+   * transcribir. Pero el dialogo de subida SI publicaba la cifra —«Costo:
+   * $3.000 · mas si el audio es muy largo»—, asi que el producto le prometia al
+   * abogado un cobro medido que no tenia una linea de codigo detras. Un precio
+   * anunciado y no aplicado es una promesa a medias en el sentido contrario al
+   * habitual, y la que se corrige es la que se dijo.
+   *
+   * Queda en cero y el rotulo desaparece: `reserveForOperation` y `priceFor`
+   * ya devuelven sin cobrar cuando el piso es cero, asi que apagar el precio
+   * apaga el cobro entero sin tocar la ruta.
+   *
+   * La operacion SIGUE existiendo como tipo, y eso es a proposito: el motor de
+   * resumen de audiencias si consume modelo, y ese consumo se registra bajo
+   * esta operacion en `ai_usage`. Cobrar cero no es lo mismo que no medir —
+   * sin la medida no se puede responder si el precio cubre el costo, que es la
+   * pregunta que decide si el negocio existe.
+   */
+  TRANSCRIPCION: 0,
   BUSQUEDA: 0,
   /*
    * Lo que cuesta una orientación PASADO el cupo diario gratuito.
@@ -493,6 +513,27 @@ export const usageSummary = async (firmId: string): Promise<UsageSummary> => {
     new Set(filasMes.filter((f) => f.operation === op).map((f) => f.operation_id)).size;
 
   const escritosDelMes = contar('BORRADOR');
+
+  /*
+   * LAS TRANSCRIPCIONES SE CUENTAN DONDE VIVEN, NO EN EL LIBRO DE CONSUMO.
+   *
+   * Salian de `contar('TRANSCRIPCION')` sobre `ai_usage`, y ahi la cifra era
+   * SIEMPRE CERO porque transcribir no llama a ningun modelo de OpenRouter: usa
+   * Deepgram. La unica fila que ese contador podia ver es la del RESUMEN de la
+   * audiencia —la sola llamada a modelo del modulo—, asi que apenas se empezo a
+   * registrar ese consumo el contador habria pasado a contar resumenes con el
+   * nombre de transcripciones. Una audiencia transcrita y nunca resumida no
+   * habria aparecido, y una resumida dos veces tampoco habria contado doble,
+   * pero el rotulo seguiria mintiendo sobre QUE se cuenta.
+   *
+   * La tabla `transcriptions` tiene una fila por transcripcion hecha. Es la
+   * respuesta exacta a la pregunta que hace la pantalla.
+   */
+  const { count: transcripcionesDelMes } = await db
+    .from('transcriptions')
+    .select('id', { count: 'exact', head: true })
+    .eq('firm_id', firmId)
+    .gte('transcribed_at', inicioDeMes.toISOString());
   const cobradoEscritosMes = filasMes
     .filter((f) => f.operation === 'BORRADOR')
     .reduce((t, f) => t + Number(f.charged_cop ?? 0), 0);
@@ -511,7 +552,7 @@ export const usageSummary = async (firmId: string): Promise<UsageSummary> => {
     operations: filasCobro.length,
     mes: {
       escritos: escritosDelMes,
-      transcripciones: contar('TRANSCRIPCION'),
+      transcripciones: transcripcionesDelMes ?? 0,
       orientaciones: contar('ORIENTACION'),
       cobradoCop: filasMes.reduce((t, f) => t + Number(f.charged_cop ?? 0), 0),
       costoMedioEscritoCop: costoMedioEscrito,

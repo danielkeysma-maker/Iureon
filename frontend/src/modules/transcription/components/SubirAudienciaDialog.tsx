@@ -54,12 +54,20 @@ export const SubirAudienciaDialog: React.FC<SubirAudienciaDialogProps> = ({
 
   const trabajando = isUploading || isTranscribing;
 
-  /* El precio, del servidor y solo cuando el diálogo se abre. */
+  /*
+   * El precio, del servidor y solo cuando el diálogo se abre.
+   *
+   * CERO SE TRATA COMO «SIN PRECIO», NO COMO «$0». Transcribir dejó de
+   * cobrarse, y pintar «Costo: $0» dejaría en pantalla un renglón de cobro para
+   * decir que no hay cobro — ruido donde antes hubo una promesa. Si algún día
+   * vuelve a tener precio, el servidor lo manda y el rótulo reaparece solo: la
+   * pantalla sigue al servidor, no al revés.
+   */
   useEffect(() => {
     if (!abierto || precio !== null) return;
     billingApi
       .summary()
-      .then((r) => setPrecio(r.prices?.TRANSCRIPCION ?? null))
+      .then((r) => setPrecio(r.prices?.TRANSCRIPCION || null))
       .catch(() => setPrecio(null));
   }, [abierto, precio]);
 
@@ -86,7 +94,7 @@ export const SubirAudienciaDialog: React.FC<SubirAudienciaDialogProps> = ({
           <button onClick={onCerrar} className="btn-neutral btn-sm" disabled={trabajando}>
             Cancelar
           </button>
-          {/* El primario lleva la cifra: la sorpresa del costo es la que genera reclamos. */}
+          {/* Lleva la cifra solo si la hay: transcribir no se cobra desde el 29/08/2026. */}
           <button
             onClick={() => archivo && onTranscribir(archivo, contexto)}
             disabled={!archivo || trabajando}

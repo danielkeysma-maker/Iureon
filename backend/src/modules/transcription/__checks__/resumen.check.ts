@@ -85,11 +85,35 @@ check(
   ''
 );
 
+/*
+ * NO SE COBRA, PERO SI SE MIDE — y son dos aserciones porque son dos defectos
+ * distintos.
+ *
+ * La de arriba vigilaba `debitForUsage`, un simbolo que no existe en el
+ * proyecto: pasaba siempre. Ahora nombra lo que de verdad cobra
+ * (`reserveForOperation` / `settleOperation`), que es lo unico capaz de mover
+ * el saldo de una firma.
+ *
+ * La de abajo es la contraria y hace falta igual: transcribir es gratis por
+ * decision, y el resumen es la UNICA llamada a modelo del modulo — transcribir
+ * es Deepgram, que no pasa por OpenRouter. Su costo se calculaba y se botaba,
+ * asi que la plataforma pagaba a Gemini por cada audiencia resumida sin verlo
+ * en `ai_usage`. Regalar algo es legitimo; no saber cuanto cuesta lo regalado
+ * no lo es.
+ */
+const DEL_RESUMEN =
+  CONTROLADOR.split('transcriptionResumenController')[1]?.split('export const')[0] ?? '';
+
 check(
-  'el resumen no se cobra aparte: la transcripcion ya se pago',
-  !CONTROLADOR.includes("debitForUsage") ||
-    !CONTROLADOR.split('transcriptionResumenController')[1]?.split('export const')[0]?.includes('debitForUsage'),
-  ''
+  'el resumen no mueve el saldo de la firma',
+  !DEL_RESUMEN.includes('reserveForOperation') && !DEL_RESUMEN.includes('settleOperation'),
+  DEL_RESUMEN.includes('reserveForOperation') ? 'reserva saldo' : 'liquida saldo'
+);
+
+check(
+  'pero si registra lo que le costo al modelo',
+  DEL_RESUMEN.includes('recordUsage'),
+  'sin recordUsage el consumo de Gemini no llega a ai_usage'
 );
 
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);

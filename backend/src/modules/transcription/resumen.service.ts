@@ -1,4 +1,4 @@
-import { ENGINE, callOpenRouterWithUsage } from '../agent/openrouter.client';
+import { ENGINE, callOpenRouterWithUsage, type CallUsage } from '../agent/openrouter.client';
 import type { TranscriptSegment } from './types';
 
 /*
@@ -55,10 +55,17 @@ export interface ResumenDeTranscripcion {
   generadoEl: string;
 }
 
-/** Lo que costó la llamada, para el registro de consumo del llamador. */
+/**
+ * Lo que costó la llamada, para el registro de consumo del llamador.
+ *
+ * VIAJA EL CONSUMO ENTERO, no solo el dólar. El controlador lo escribe en
+ * `ai_usage`, que necesita modelo y tokens además del costo — con la cifra sola
+ * el registro quedaría sin poder decir QUÉ la produjo.
+ */
 export interface ResumenConCosto {
   resumen: ResumenDeTranscripcion | null;
   costUsd: number;
+  usage: CallUsage | null;
 }
 
 const SYSTEM_PROMPT = `Eres un asistente de un despacho jurídico colombiano. Recibes la transcripción de una AUDIENCIA JUDICIAL o una ENTREVISTA CON CLIENTE, con marcas de tiempo e interlocutores.
@@ -157,7 +164,7 @@ export const generarResumen = async (
   segments: TranscriptSegment[],
   kind: string
 ): Promise<ResumenConCosto> => {
-  if (segments.length === 0) return { resumen: null, costUsd: 0 };
+  if (segments.length === 0) return { resumen: null, costUsd: 0, usage: null };
 
   const { texto, truncado } = formatear(segments);
 
@@ -170,7 +177,7 @@ ${texto}`;
   const costUsd = llamada.usage?.costUsd ?? 0;
   const parseado = parsear(llamada.text);
 
-  if (!parseado) return { resumen: null, costUsd };
+  if (!parseado) return { resumen: null, costUsd, usage: llamada.usage ?? null };
 
   return {
     resumen: {
@@ -178,6 +185,7 @@ ${texto}`;
       modelo: ENGINE.GEMINI,
       generadoEl: new Date().toISOString()
     },
-    costUsd
+    costUsd,
+    usage: llamada.usage ?? null
   };
 };
