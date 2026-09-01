@@ -418,6 +418,18 @@ jurisdicción agraria como tal no produjo ni una ficha.
 
 ### Lo que SÍ queda: 20 fichas publicadas como NO_VERIFICADO
 
+> **Actualización del 29 de agosto: quedan 2, y las dos por ausencia real de
+> norma.** ADUANERO cerró entero: tres fichas estaban leídas verbatim en
+> `normograma.dian.gov.co` y declaradas sin verificar SOLO por el dominio —el
+> código ya lo aceptaba, la doctrina no lo listaba; el usuario decidió y la
+> doctrina se alineó—; la cuarta remitía al art. 164 del CPACA, que se leyó en
+> el Senado: cuatro meses (num. 2 lit. d). Siguen abiertas POLICIVO (el art.
+> 203 de la Ley 1801 remite a un reglamento que no existe) y PROPIEDAD_INTELECTUAL
+> (ninguna de las cuatro normas de derecho de autor fija la prescripción de la
+> acción civil). Ninguna de las dos se cierra leyendo más: se cierran cuando
+> exista la norma.
+
+
 Se publican con la advertencia visible, que es lo correcto, pero son el saldo
 real. Están concentradas y por eso son cerrables:
 

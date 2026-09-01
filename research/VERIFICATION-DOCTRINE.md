@@ -18,6 +18,18 @@ Solo oficiales, en este orden:
 4. `corteconstitucional.gov.co` (sentencias)
 5. Diario Oficial o Presidencia, para normas recientes
 6. El depositario del tratado (`oas.org`, `hcch.net`, `tribunalandino.org.ec`)
+7. El normograma de la entidad que ADMINISTRA la norma, cuando ningún otro
+   sitio oficial la sirve: `normograma.dian.gov.co` para el Estatuto Aduanero
+   (Decreto 1165 de 2019 — el Senado devuelve 404 y Función Pública no lo
+   tiene). Decidido el 29 de agosto de 2026. Igual para los conceptos que una
+   entidad emite: la entidad es su propia fuente (`supersociedades`, `sic`,
+   `colombiacompra`, `mintrabajo`, `consejodeestado`).
+
+**La lista de arriba y la de `catalog.check.ts` deben coincidir, y no
+coincidían.** El código tenía `dian.gov.co` desde antes; esta doctrina no. Un
+agente que verificó ADUANERO leyendo la doctrina declaró cuatro fichas sin
+verificar cuyo texto SÍ había leído verbatim, por un dominio que el check ya
+aceptaba. Cuando abras un dominio, ábrelo en los dos sitios.
 
 Prohibido como fuente: leyes.co, actualicese.com, blogs, páginas de despachos,
 resúmenes de IA, y cualquier sitio que no publique el texto de la norma.
