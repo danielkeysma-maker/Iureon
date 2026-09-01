@@ -396,7 +396,21 @@ después de notificado el poderdante.
    la apelación de la sentencia (seis días, art. 67) y la devolución de bienes
    (tres y cinco años, art. 109). Declarado en `gaps`: control de garantías de
    actos de investigación, exequátur, administración por la SAE.
-5. **Ejecución de penas** — puede vivir dentro de PENAL.
+5. ~~**Ejecución de penas**~~ **CATALOGADA el 29 de agosto dentro de PENAL:
+   10 fichas (8 LITIGANTE, 2 DESPACHO)** — libertad condicional (3/5 con las
+   redenciones abonadas, art. 472; el 68A NO la excluye, par. 1), prisión
+   domiciliaria por las dos puertas (38B sin tiempo cumplido pero pena mínima
+   ≤ 8 años; 38G a la mitad de la condena, Ley 2356 de 2024, con SU lista de
+   exclusiones distinta de la del 68A), redención (1×2 trabajo, 1×2 estudio con
+   6 h = 1 día, 4 h de enseñanza = 1 día; domingos sin actividad no cuentan;
+   evaluación negativa la niega), acumulación jurídica (460: la fecha de los
+   hechos frente a la primera sentencia decide), permisos administrativos
+   (1/3 o 70 % para 72 h; 4/5 para 15 días, fines de semana y preparatoria;
+   aprobación previa del JEPMS, 38 num. 5), explicaciones en TRES días ante la
+   revocatoria (477), rehabilitación (92: de derecho al vencer; anticipada a
+   los 2 años con la mitad), prescripción de la sanción (89: nunca menos de 5
+   años desde la ejecutoria; se interrumpe con la aprehensión). El 38A
+   (vigilancia electrónica autónoma) está DEROGADO por la Ley 1709.
 6. **Urbanismo y licencias** (curadores urbanos, Decreto 1077 de 2015). *No
    verificado.*
 7. **Sanitaria / INVIMA.**
