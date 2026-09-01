@@ -33,7 +33,8 @@ export type LegalBranch =
   | 'SEGURIDAD_SOCIAL'
   | 'RESPONSABILIDAD_FISCAL'
   | 'CONTRATOS'
-  | 'EXTINCION_DOMINIO';
+  | 'EXTINCION_DOMINIO'
+  | 'RESTITUCION_TIERRAS';
 
 /** Who authors the document. */
 /**

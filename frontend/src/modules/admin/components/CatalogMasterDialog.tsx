@@ -54,6 +54,7 @@ const RAMA: Record<string, string> = {
   RESPONSABILIDAD_FISCAL: 'Responsabilidad fiscal',
   CONTRATOS: 'Contratos privados',
   EXTINCION_DOMINIO: 'Extinción de dominio',
+  RESTITUCION_TIERRAS: 'Restitución de tierras',
   DISCIPLINARIO: 'Disciplinario',
   PENAL: 'Penal',
   AMBIENTAL: 'Ambiental',

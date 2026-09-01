@@ -368,8 +368,20 @@ después de notificado el poderdante.
    Cada ficha separa lo imperativo de lo pactable. Segunda tanda declarada en
    `gaps`: comodato, depósito, mandato comercial, agencia, suministro,
    franquicia, consumo (Ley 1480).
-3. **Restitución de tierras y víctimas** (Ley 1448 de 2011, prorrogada por la Ley
-   2078 de 2021) — jurisdicción propia. *Vigencia no reverificada.*
+3. ~~**Restitución de tierras y víctimas**~~ **CATALOGADA el 29 de agosto: rama
+   `RESTITUCION_TIERRAS`, 9 fichas (7 LITIGANTE, 2 DESPACHO). Vigencia
+   VERIFICADA en el texto: hasta el 10 de junio de 2031 (art. 208, Ley 2078 de
+   2021), titulares desde el 1 de enero de 1991 (art. 75).** Lo que define la
+   rama: registro de la URT como requisito de procedibilidad (art. 76, con la
+   Ley 2421 de 2024: 60 días prorrogables por 30 desde que la URT acomete el
+   estudio, no desde la solicitud), inversión de la carga con prueba sumaria
+   (art. 78), presunciones de derecho y legales (art. 77), única instancia con
+   revisión ante la Corte (arts. 79 y 92), consulta de la sentencia que niega.
+   Relojes: quince días para oponerse (art. 88), tres días para la entrega y
+   cinco para el desalojo (art. 100), y dos años de intransferibilidad del
+   predio restituido con ineficacia de pleno derecho (art. 101). En `gaps`: los
+   decretos-ley étnicos, el trámite interno de la URT y el término de la
+   revisión, que remite al CGP.
 4. ~~**Extinción de dominio** (Ley 1708 de 2014)~~ **CATALOGADA el 29 de
    agosto: rama `EXTINCION_DOMINIO`, 12 fichas (10 LITIGANTE, 2 DESPACHO).**
    Leída con la Ley 1849 de 2017 —que derogó la fijación provisional, el

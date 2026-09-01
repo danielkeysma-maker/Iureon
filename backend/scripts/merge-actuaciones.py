@@ -63,6 +63,7 @@ FILE_FOR_BRANCH = {
     'RESPONSABILIDAD_FISCAL': 'actuaciones-responsabilidad-fiscal.json',
     'CONTRATOS': 'actuaciones-contratos.json',
     'EXTINCION_DOMINIO': 'actuaciones-extincion-dominio.json',
+    'RESTITUCION_TIERRAS': 'actuaciones-restitucion-tierras.json',
 }
 
 # Mirrors the allowlist in catalog.check.ts. Duplicated on purpose: a merge that

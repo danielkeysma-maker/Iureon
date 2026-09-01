@@ -58,7 +58,11 @@ export const BRANCH_LABELS: Record<string, string> = {
   // fase inicial, accion imprescriptible y carga dinamica de la prueba. No es
   // PENAL —la accion es autonoma de la responsabilidad penal (art. 18)— ni
   // CIVIL, aunque discuta la propiedad.
-  EXTINCION_DOMINIO: 'Extinción de Dominio (Ley 1708)'
+  EXTINCION_DOMINIO: 'Extinción de Dominio (Ley 1708)',
+  // Jurisdiccion transicional propia: jueces y magistrados especializados,
+  // requisito de procedibilidad ante la URT, carga de la prueba invertida y
+  // unica instancia. Vigente hasta el 10 de junio de 2031 (Ley 2078 de 2021).
+  RESTITUCION_TIERRAS: 'Restitución de Tierras (Ley 1448)'
   /*
    * Aqui vivia 'PEQUEÑAS_CAUSAS', conservada —decia su comentario— «para que
    * sus tipos de documento heredados sigan alcanzables». Esos tipos heredados

@@ -1,0 +1,440 @@
+{
+  "_meta": {
+    "branch": "RESTITUCION_TIERRAS",
+    "verified_at": "2026-08-29",
+    "source_of_truth": "Ley 1448 de 2011, arts. 3, 72 a 102 y 208, leidos en secretariasenado.gov.co el 29 de agosto de 2026 con las reformas incorporadas: Ley 2078 de 2021 (art. 208: vigencia hasta el 10 de junio de 2031), Ley 2421 de 2024 (arts. 3 y 76) y Ley 2294 de 2023 (art. 97 lit. e). VIGENCIA COMPROBADA: la ley no vencio en 2021; rige hasta el 10 de junio de 2031, y son titulares los despojados entre el 1 de enero de 1991 y ese termino (art. 75). LO QUE DEFINE LA RAMA: jurisdiccion propia (jueces civiles del circuito y magistrados especializados, arts. 79-80), requisito de procedibilidad (registro de la URT, art. 76), inversion de la carga de la prueba con prueba sumaria (art. 78), presunciones de derecho y legales sobre los negocios (art. 77), unica instancia con revision ante la Corte (arts. 79 y 92) y consulta de la sentencia que niega. El reloj del opositor son quince dias (art. 88); el del comprador de un predio restituido, dos anos (art. 101).",
+    "gaps": [
+      "RESTITUCION_TIERRAS: el computo exacto de los quince dias de oposicion (art. 88) figura en el Senado como aparte condicionalmente exequible; la sentencia de constitucionalidad no se leyo y la ficha lo declara.",
+      "RESTITUCION_TIERRAS: el termino y las causales del recurso de revision (art. 92) remiten al estatuto procesal civil (CPC arts. 379 ss., hoy CGP); no se releyeron aqui y la ficha remite a la de CIVIL.",
+      "RESTITUCION_TIERRAS: los decretos-ley etnicos 4633, 4634 y 4635 de 2011 (restitucion de derechos territoriales de pueblos indigenas, rrom y comunidades negras) no se catalogaron: tienen procedimiento propio.",
+      "RESTITUCION_TIERRAS: el tramite administrativo interno de la URT (Decreto 1071 de 2015, antes 4829 de 2011) para la inscripcion —microfocalizacion, estudio, recursos contra la negativa— no se leyo; la ficha del registro cita solo lo que la ley dice.",
+      "RESTITUCION_TIERRAS: el art. 91 par. 1 se leyo hasta «hasta tanto esten completament[e]»; el resto del paragrafo y los pars. 2 y siguientes no se citan."
+    ],
+    "unverified": []
+  },
+  "actuaciones": [
+    {
+      "exact_name": "Solicitud de inscripción en el Registro de Tierras Despojadas y Abandonadas Forzosamente",
+      "area": "RESTITUCION_TIERRAS",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1448 de 2011, art. 76 (modificado por el art. 29 de la Ley 2421 de 2024: registro, microfocalización, comunicación al ocupante, sesenta días prorrogables por treinta, requisito de procedibilidad), art. 75 (titulares: despojo o abandono entre el 1 de enero de 1991 y la vigencia de la ley), art. 74 (despojo y abandono forzado), art. 81 (legitimación), art. 3 (víctimas, modificado por el art. 3 de la Ley 2421 de 2024) y art. 208 (modificado por el art. 2 de la Ley 2078 de 2021: vigencia hasta el 10 de junio de 2031)",
+      "competent_authority": "Unidad Administrativa Especial de Gestión de Restitución de Tierras Despojadas (URT), que conforma y administra el registro; la inscripción procede de oficio o a solicitud del interesado (art. 76)",
+      "term": "EL RELOJ LARGO ES LA VIGENCIA DE LA LEY: 10 DE JUNIO DE 2031. La ley «tendrá una vigencia hasta el 10 de junio de 2031» (art. 208, Ley 2078 de 2021) y son titulares quienes fueron despojados u obligados a abandonar «entre el 1o de enero de 1991 y el término de vigencia de la Ley» (art. 75). SIN INSCRIPCIÓN NO HAY DEMANDA: «La inscripción de un predio en el registro de tierras despojadas será requisito de procedibilidad para iniciar la acción de restitución» (art. 76). EL RELOJ DE LA URT: «Esta Unidad tiene un término de sesenta (60) días, contados a partir del momento en que acometa el estudio conforme con el inciso segundo de este artículo, para decidir sobre su inclusión en el Registro. Este término podrá ser prorrogado hasta por treinta (30) días, cuando existan o sobrevengan circunstancias que lo justifiquen» (art. 76) — y corre desde que la URT acomete el estudio, no desde la solicitud: el registro «se implementará en forma gradual y progresiva a partir de la microfocalización de zonas […] teniendo en cuenta la situación de seguridad, la densidad histórica del despojo y la existencia de condiciones para el retorno», así que un predio en zona no microfocalizada espera sin que el reloj arranque. QUIÉN PUEDE PEDIRLA: propietarios, poseedores «o explotadoras de baldíos cuya propiedad se pretenda adquirir por adjudicación» (art. 75); «su cónyuge o compañero o compañera permanente con quien se conviva al momento en que ocurrieron los hechos»; y si fallecieron o están desaparecidos, «los llamados a sucederlos, de conformidad con el Código Civil» (art. 81). QUÉ SE INSCRIBE: «el predio objeto del despojo o abandono forzado, la persona y el núcleo familiar del despojado», «el periodo durante el cual se ejerció influencia armada en relación con el predio, los terceros ocupantes o propietarios», con georreferenciación (art. 76). LA URT COMUNICA AL OCUPANTE ACTUAL «a fin de que pueda aportar las pruebas documentales que acrediten la propiedad, posesión u ocupación de dicho predio de buena fe» (art. 76) — la defensa del tercero empieza aquí, no en el juzgado. Los efectos de la inscripción son las presunciones del art. 77 y la inversión de la carga del art. 78, y «se presumen fidedignas las pruebas provenientes de la Unidad» (art. 89).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del solicitante y de su núcleo familiar, y de la relación jurídica con el predio (propietario, poseedor u ocupante de baldío)",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, arts. 75, 76 y 81"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del predio: ubicación, matrícula inmobiliaria, cédula catastral y linderos o georreferenciación",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 76"
+        },
+        {
+          "n": 3,
+          "name": "Relato del despojo o abandono forzado, con el período y los hechos de violencia que lo causaron, entre el 1 de enero de 1991 y la vigencia de la ley",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, arts. 74 y 75"
+        },
+        {
+          "n": 4,
+          "name": "Pruebas sumarias de la propiedad, posesión u ocupación y del desplazamiento o despojo",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 78"
+        },
+        {
+          "n": 5,
+          "name": "Identificación de los terceros que hoy ocupan o figuran como titulares del predio",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 76"
+        },
+        {
+          "n": 6,
+          "name": "Solicitud de acompañamiento de la Defensoría del Pueblo",
+          "mandatory": false,
+          "basis": "Ley 1448 de 2011, art. 76"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1448_2011_pr001.html"
+    },
+    {
+      "exact_name": "Solicitud de restitución o formalización de tierras despojadas o abandonadas forzosamente",
+      "area": "RESTITUCION_TIERRAS",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1448 de 2011, art. 83 (solicitud directa de la víctima, escrita u oral), art. 84 (contenido y gratuidad), art. 82 (solicitud por la URT y trámite colectivo), art. 76 (requisito de procedibilidad), arts. 79 y 80 (competencia), art. 72 (acciones: restitución, equivalente, compensación), art. 77 (presunciones), art. 78 (inversión de la carga de la prueba), art. 94 (trámites inadmisibles), art. 97 (pretensión subsidiaria) y art. 86 (efectos de la admisión)",
+      "competent_authority": "Juez Civil del Circuito especializado en restitución de tierras del lugar donde se hallen los bienes, en única instancia si no se reconocen opositores; si los hay, tramita hasta antes del fallo y remite a los Magistrados de la Sala Civil del Tribunal Superior especializados en restitución de tierras (Ley 1448 de 2011, arts. 79 y 80)",
+      "term": "NO HAY PLAZO DISTINTO DE LA VIGENCIA DE LA LEY, PERO HAY UN REQUISITO SIN EL CUAL SE RECHAZA: «Cumplido el requisito de procedibilidad a que se refiere el artículo 76, el despojado podrá dirigirse directamente al Juez o Magistrado […] mediante la presentación de demanda escrita u oral, por sí misma o a través de apoderado» (art. 83). CONTENIDO OBLIGATORIO: «a) La identificación del predio […] la ubicación, el departamento, municipio, corregimiento o vereda, la identificación registral, número de la matrícula inmobiliaria e identificación catastral, número de la cédula catastral. b) La constancia de inscripción del predio en el registro de tierras despojadas. c) Los fundamentos de hecho y de derecho de la solicitud. d) Nombre, edad, identificación y domicilio del despojado y de su núcleo familiar, o del grupo de personas solicitantes, según el caso. e) El certificado de tradición y libertad de matrícula inmobiliaria que identifique registralmente el predio. f) La certificación del valor del avalúo catastral del predio» (art. 84); los literales e) y f) «se podrán acreditar por cualquiera de los medios de prueba admisibles» cuando no sea posible allegarlos (par. 2), y el trámite es gratuito y exento de arancel judicial (par. 1). LO QUE LA LEY YA PRUEBA POR EL SOLICITANTE: «Bastará con la prueba sumaria de la propiedad, posesión u ocupación y el reconocimiento como desplazado en el proceso judicial, o en su defecto, la prueba sumaria del despojo, para trasladar la carga de la prueba al demandado o a quienes se opongan» (art. 78); y sobre los predios inscritos operan las presunciones del art. 77 — de derecho, la ausencia de consentimiento en negocios con condenados por grupos armados o narcotráfico; legales, en zonas de violencia generalizada, con concentración de la tierra o cambio de usos, con extraditados, o «en los casos en los que el valor formalmente consagrado en el contrato, o el valor efectivamente pagado, sean inferiores al cincuenta por ciento del valor real». EL ORDEN DE LAS PRETENSIONES lo fija la ley: «la restitución jurídica y material del inmueble despojado. En subsidio, procederá, en su orden, la restitución por equivalente o el reconocimiento de una compensación» (art. 72); la subsidiaria de compensación en especie o reubicación se pide en la misma solicitud (art. 97). LO QUE NO SE PUEDE HACER: «no son admisibles la demanda de reconvención, la intervención excluyente o coadyuvante, incidentes por hechos que configuren excepciones previas, ni la conciliación» (art. 94). CON LA ADMISIÓN el predio queda «sustraído provisionalmente del comercio» y se suspenden los procesos declarativos, sucesorios, ejecutivos y administrativos sobre él, salvo expropiación (art. 86). QUIÉN DECIDE: única instancia; con opositores reconocidos, el Tribunal (art. 79).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del predio con ubicación, matrícula inmobiliaria y cédula catastral",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 84 lit. a"
+        },
+        {
+          "n": 2,
+          "name": "Constancia de inscripción del predio en el Registro de Tierras Despojadas",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, arts. 76 y 84 lit. b"
+        },
+        {
+          "n": 3,
+          "name": "Fundamentos de hecho y de derecho: despojo o abandono, período, hechos de violencia y presunciones del art. 77 que aplican",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, arts. 74, 77 y 84 lit. c"
+        },
+        {
+          "n": 4,
+          "name": "Nombre, edad, identificación y domicilio del despojado y de su núcleo familiar",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 84 lit. d"
+        },
+        {
+          "n": 5,
+          "name": "Certificado de tradición y libertad y certificación del avalúo catastral, o prueba supletoria",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 84 lits. e y f y par. 2"
+        },
+        {
+          "n": 6,
+          "name": "Pretensión principal de restitución jurídica y material, y subsidiarias de restitución por equivalente o compensación",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, arts. 72 y 97"
+        },
+        {
+          "n": 7,
+          "name": "Prueba sumaria de la propiedad, posesión u ocupación y del desplazamiento o despojo",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 78"
+        },
+        {
+          "n": 8,
+          "name": "Solicitud de las medidas del auto admisorio y de las cautelares para prevenir daño al inmueble",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 86"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1448_2011_pr001.html"
+    },
+    {
+      "exact_name": "Oposición a la solicitud de restitución de tierras",
+      "area": "RESTITUCION_TIERRAS",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1448 de 2011, art. 88 (oposiciones: quince días, bajo juramento, documentos que deben acompañarse), art. 87 (traslado a titulares inscritos y a indeterminados por la publicación; representante judicial en cinco días), art. 78 (inversión de la carga de la prueba), art. 77 (presunciones que debe desvirtuar), art. 89 (avalúo por Lonja), art. 90 (período probatorio de treinta días), art. 91 (compensación al opositor de buena fe exenta de culpa), art. 98 (pago por el Fondo de la URT) y art. 99 (contratos de uso sobre proyectos productivos)",
+      "competent_authority": "Juez Civil del Circuito especializado en restitución de tierras del lugar donde se hallen los bienes, en única instancia si no se reconocen opositores; si los hay, tramita hasta antes del fallo y remite a los Magistrados de la Sala Civil del Tribunal Superior especializados en restitución de tierras (Ley 1448 de 2011, arts. 79 y 80)",
+      "term": "QUINCE (15) DÍAS, RELOJ DEL OPOSITOR, Y LO QUE NO SE PRUEBA EN ESE ESCRITO NO SE PRESUME A SU FAVOR. «Las oposiciones se deberán presentar ante el juez dentro de los quince (15) días siguientes a la solicitud» (art. 88; el aparte figura como condicionalmente exequible en el Senado, y el cómputo exacto debe confrontarse con la sentencia de constitucionalidad, que no se leyó en esta pasada). El traslado se surte «a quienes figuren como titulares inscritos de derechos en el certificado de tradición y libertad», y a los indeterminados «con la publicación» del auto admisorio (art. 87); si los terceros determinados no se presentan, «se les designará un representante judicial para el proceso en el término de cinco (5) días». FORMA Y CONTENIDO: «Las oposiciones a la solicitud efectuadas por particulares se presentarán bajo la gravedad del juramento y se admitirán, si son pertinentes. […] Al escrito de oposición se acompañarán los documentos que se quieran hacer valer como prueba de la calidad de despojado del respectivo predio, de la buena fe exenta de culpa, del justo título del derecho y las demás pruebas que pretenda hacer valer el opositor en el proceso, referentes al valor del derecho, o la tacha de la calidad de despojado de la persona o grupo en cuyo favor se presentó la solicitud» (art. 88). LA CARGA ES DEL OPOSITOR: la prueba sumaria del solicitante basta «para trasladar la carga de la prueba al demandado o a quienes se opongan a la pretensión de la víctima» (art. 78), y contra los predios inscritos operan presunciones de derecho y legales de ausencia de consentimiento (art. 77): la oposición tiene que desvirtuarlas con prueba, no negarlas. LO QUE SE GANA PROBANDO LA BUENA FE EXENTA DE CULPA: la sentencia «decretará las compensaciones a que hubiera lugar, a favor de los opositores que probaron buena fe exenta de culpa» (art. 91), pagadas por el Fondo de la URT y «en ningún caso […] excederá el valor del predio acreditado en el proceso» (art. 98); «el valor del predio lo podrá acreditar el opositor mediante el avalúo comercial del predio elaborado por una Lonja de Propiedad Raíz», y sin controversia rige el avalúo catastral (art. 89). Si hay un proyecto agroindustrial, el opositor de buena fe exenta de culpa puede obtener autorización para un contrato de uso con el restituido (art. 99); sin esa prueba, el proyecto pasa a la URT. EL PROCESO ES CORTO: período probatorio de treinta (30) días (art. 90), y el juez «tan pronto […] llegue al convencimiento […] podrá proferir el fallo sin necesidad de decretar o practicar las pruebas solicitadas» (art. 89). Con opositor reconocido, la competencia para fallar pasa a los Magistrados del Tribunal (art. 79).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del opositor, del proceso y del derecho que alega sobre el predio, bajo la gravedad del juramento",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 88"
+        },
+        {
+          "n": 2,
+          "name": "Justo título y cadena de tradición, con los documentos que lo prueban",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 88"
+        },
+        {
+          "n": 3,
+          "name": "Prueba de la buena fe exenta de culpa en la adquisición y en la tenencia, dirigida a desvirtuar las presunciones del art. 77",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, arts. 77, 78 y 88"
+        },
+        {
+          "n": 4,
+          "name": "Avalúo comercial del predio elaborado por Lonja de Propiedad Raíz y prueba de las mejoras",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, arts. 89 y 91 lit. j"
+        },
+        {
+          "n": 5,
+          "name": "Tacha de la calidad de despojado del solicitante, si hay fundamento y prueba",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 88"
+        },
+        {
+          "n": 6,
+          "name": "Pretensión subsidiaria de compensación o de contrato de uso sobre el proyecto productivo",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, arts. 91, 98 y 99"
+        },
+        {
+          "n": 7,
+          "name": "Constancia de presentación dentro de los quince días",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 88"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1448_2011_pr001.html"
+    },
+    {
+      "exact_name": "Solicitud de compensación por equivalente o reubicación en el proceso de restitución de tierras",
+      "area": "RESTITUCION_TIERRAS",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1448 de 2011, art. 97 (pretensión subsidiaria y sus causales; lit. e adicionado por el art. 22 de la Ley 2294 de 2023), art. 72 (orden de las acciones), art. 98 (pago de compensaciones por el Fondo de la URT) y art. 91 lits. j y k (órdenes de la sentencia sobre compensaciones y transferencia del bien al Fondo)",
+      "competent_authority": "Juez Civil del Circuito especializado en restitución de tierras del lugar donde se hallen los bienes, en única instancia si no se reconocen opositores; si los hay, tramita hasta antes del fallo y remite a los Magistrados de la Sala Civil del Tribunal Superior especializados en restitución de tierras (Ley 1448 de 2011, arts. 79 y 80); cuando no proceda el proceso, la propia URT «tendrá competencia para acordar y pagar la compensación económica» con cargo al Fondo (art. 98)",
+      "term": "SE PIDE COMO SUBSIDIARIA EN LA MISMA SOLICITUD DE RESTITUCIÓN, Y SOLO PROCEDE POR LAS CAUSALES QUE LA LEY ENUMERA. El orden es imperativo: restitución jurídica y material; «en subsidio, procederá, en su orden, la restitución por equivalente o el reconocimiento de una compensación» (art. 72). «Como pretensión subsidiaria, el solicitante podrá pedir al Juez o Magistrado que como compensación y con cargo a los recursos del Fondo de la Unidad Administrativa Especial de Gestión de Tierras Despojadas, le entregue un bien inmueble de similares características al despojado, en aquellos casos en que la restitución material del bien sea imposible por alguna de las siguientes razones: a. Por tratarse de un inmueble ubicado en una zona de alto riesgo o amenaza de inundación, derrumbe, u otro desastre natural […]; b. Por tratarse de un inmueble sobre el cual se presentaron despojos sucesivos, y este hubiese sido restituido a otra víctima despojada de ese mismo bien; c. Cuando dentro del proceso repose prueba que acredite que la restitución jurídica y/o material del bien implicaría un riesgo para la vida o la integridad personal del despojado o restituido, o de su familia. d. Cuando se trate de un bien inmueble que haya sido destruido parcial o totalmente y sea imposible su reconstrucción […]. e. Por tratarse de un inmueble baldío inadjudicable, excepto cuando sea viable el otorgamiento del derecho de uso» (art. 97). QUIÉN PAGA Y CUÁNTO: «El valor de las compensaciones […] será pagado por el Fondo de la Unidad», «en ningún caso […] excederá el valor del predio acreditado en el proceso», y «el valor de las compensaciones monetarias deberá ser pagado en dinero» (art. 98). LA CONTRAPARTIDA: la sentencia da «las órdenes necesarias para que la persona compensada transfiera al Fondo de la Unidad Administrativa el bien que le fue despojado y que fue imposible restituirle» (art. 91 lit. k). Fuera del proceso, «en los casos en que no sea procedente adelantar el proceso», la URT «tendrá competencia para acordar y pagar la compensación económica correspondiente» (art. 98).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Formulación como pretensión subsidiaria de la restitución, en el orden del art. 72",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, arts. 72 y 97"
+        },
+        {
+          "n": 2,
+          "name": "Causal de imposibilidad de la restitución material invocada entre las del art. 97 y su prueba",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 97"
+        },
+        {
+          "n": 3,
+          "name": "Características del predio despojado (extensión, uso, avalúo) para determinar el bien equivalente",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, arts. 84 y 97"
+        },
+        {
+          "n": 4,
+          "name": "Petición de entrega de inmueble de similares características o, en subsidio, de compensación en dinero por el valor acreditado",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, arts. 97 y 98"
+        },
+        {
+          "n": 5,
+          "name": "Aceptación de transferir al Fondo de la URT el derecho sobre el predio no restituible",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 91 lit. k"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1448_2011_pr002.html"
+    },
+    {
+      "exact_name": "Solicitud de autorización judicial para enajenar el predio restituido dentro de los dos años siguientes",
+      "area": "RESTITUCION_TIERRAS",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1448 de 2011, art. 101 (protección de la restitución: intransferibilidad por dos años, ineficacia de pleno derecho y autorización previa, expresa y motivada; parágrafo sobre créditos), art. 102 (mantenimiento de la competencia del juez después del fallo) y art. 91 par. 1",
+      "competent_authority": "El Juez o Tribunal que ordenó la restitución, que conserva la competencia después del fallo (arts. 101 y 102)",
+      "term": "DOS (2) AÑOS DESDE LA EJECUTORIA O LA ENTREGA, LO QUE SEA POSTERIOR, Y SIN AUTORIZACIÓN EL NEGOCIO ES INEFICAZ SIN NECESIDAD DE DECLARACIÓN. «El derecho a obtener la restitución no será transferible por acto entre vivos a ningún título durante los siguientes dos años contados a partir de la entrega del predio, salvo que se trate de un acto entre el despojado y el Estado. Asimismo, una vez obtenida la restitución, cualquier negociación entre vivos de las tierras restituidas al despojado dentro de los dos (2) años siguientes a la fecha de ejecutoria de la decisión de restitución, o de entrega, si esta fuera posterior, será ineficaz de pleno derecho, sin necesidad de declaración judicial, a menos que se obtenga la autorización previa, expresa y motivada del Juez o Tribunal que ordenó la restitución» (art. 101). Es el reloj que el comprador de un predio restituido debe contar antes de firmar: la escritura otorgada dentro de los dos años sin la autorización no transfiere nada. LA EXCEPCIÓN: «La autorización […] no será necesaria cuando se trate de respaldar créditos a nombre del restituido otorgados por entidades vigiladas por la Superintendencia» (art. 101 par.) — la hipoteca a favor de un banco vigilado sí procede. QUIÉN AUTORIZA: el mismo juez o tribunal, que «después de dictar sentencia […] mantendrá su competencia sobre el proceso para dictar todas aquellas medidas que […] garanticen el uso, goce y disposición de los bienes por parte de los despojados» (art. 102) y prosigue «dentro del mismo expediente las medidas de ejecución de la sentencia» (art. 91 par. 1). La autorización debe ser «previa, expresa y motivada»: una autorización posterior no sanea la ineficacia.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la sentencia de restitución, de su fecha de ejecutoria y de la fecha de entrega del predio",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, arts. 100 y 101"
+        },
+        {
+          "n": 2,
+          "name": "Descripción del negocio que se pretende celebrar, la contraparte y el precio",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 101"
+        },
+        {
+          "n": 3,
+          "name": "Razones que justifican la enajenación antes de los dos años y prueba de que no hay presión ni aprovechamiento de la vulnerabilidad del restituido",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, arts. 73 y 101"
+        },
+        {
+          "n": 4,
+          "name": "Solicitud expresa de autorización previa y motivada, o manifestación de que se trata de un crédito con entidad vigilada que no la requiere",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 101 y par."
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1448_2011_pr002.html"
+    },
+    {
+      "exact_name": "Solicitud de medidas de cumplimiento y protección posteriores a la sentencia de restitución de tierras",
+      "area": "RESTITUCION_TIERRAS",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1448 de 2011, art. 102 (mantenimiento de competencia después del fallo), art. 91 par. 1 (cumplimiento inmediato y medidas de ejecución en el mismo expediente), art. 100 (entrega del predio en tres días y diligencia de desalojo en cinco), art. 91 lits. e, o y p (protección de la Ley 387 de 1997, acompañamiento de la fuerza pública y órdenes para la estabilidad del goce) y art. 73 (principios de estabilización y seguridad jurídica)",
+      "competent_authority": "El Juez o Magistrado que dictó la sentencia, que conserva la competencia sobre el proceso (art. 102)",
+      "term": "LA ENTREGA TIENE TRES DÍAS Y EL DESALOJO CINCO, Y LA COMPETENCIA DEL JUEZ NO SE ACABA CON LA SENTENCIA. «La entrega del predio objeto de restitución se hará al despojado en forma directa cuando este sea el solicitante, o a la Unidad […] dentro de los tres días siguientes al pago de las compensaciones ordenadas por el Juez o Magistrado, cuando hubiera lugar a ello, o dentro de los tres días siguientes a la ejecutoria de la sentencia. Para la entrega del inmueble el Juez o Magistrado de conocimiento practicará la respectiva diligencia de desalojo en un término perentorio de cinco (5) días y para ello podrá comisionar al Juez Municipal, quien tendrá el mismo término […]. Las autoridades de policía prestarán su concurso inmediato para el desalojo del predio. De la diligencia se levantará un acta y en ella no procederá op[osición]» (art. 100). «Una vez ejecutoriada la sentencia, su cumplimiento se hará de inmediato. En todo caso, el Juez o Magistrado mantendrá la competencia para garantizar el goce efectivo de los derechos del reivindicado en el proceso, prosiguiéndose dentro del mismo expediente las medidas de ejecución de la sentencia» (art. 91 par. 1), y «mantendrá su competencia sobre el proceso para dictar todas aquellas medidas que, según fuere el caso, garanticen el uso, goce y disposición de los bienes por parte de los despojados […] y la seguridad para sus vidas, su integridad personal, y la de sus familias» (art. 102). Por eso, ante una nueva perturbación, una amenaza o un incumplimiento de una entidad, la vía no es un proceso nuevo sino un escrito en el mismo expediente. LAS ÓRDENES QUE LA SENTENCIA YA TRAE Y QUE SE PIDE HACER CUMPLIR: la protección del predio «en los términos de la Ley 387 de 1997» si el restituido está de acuerdo (art. 91 lit. e), «que la fuerza pública acompañe y colabore en la diligencia de entrega material» (lit. o) y «las órdenes que sean necesarias para garantizar la efectividad de la restitución jurídica y material del bien inmueble y la estabilidad en el ejercicio y goce efectivo de los derechos» (lit. p).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la sentencia, de su ejecutoria y de las órdenes cuyo cumplimiento se pide",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, arts. 91 y 102"
+        },
+        {
+          "n": 2,
+          "name": "Hechos posteriores al fallo: falta de entrega, nueva perturbación, amenaza o incumplimiento de una entidad",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, arts. 100 y 102"
+        },
+        {
+          "n": 3,
+          "name": "Medida concreta que se solicita: diligencia de entrega y desalojo, acompañamiento de la fuerza pública, protección, requerimiento a la entidad",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, arts. 91 lits. e, o y p, 100 y 102"
+        },
+        {
+          "n": 4,
+          "name": "Pruebas de los hechos posteriores",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 89"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1448_2011_pr002.html"
+    },
+    {
+      "exact_name": "Recurso de revisión contra la sentencia de restitución de tierras",
+      "area": "RESTITUCION_TIERRAS",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1448 de 2011, art. 92 (revisión ante la Sala de Casación Civil de la Corte Suprema de Justicia, por remisión a los arts. 379 y siguientes del Código de Procedimiento Civil, hoy el recurso extraordinario de revisión del Código General del Proceso; autos en diez días y decisión en dos meses) y art. 79 (única instancia y consulta)",
+      "competent_authority": "Sala de Casación Civil de la Corte Suprema de Justicia (art. 92)",
+      "term": "ES EL ÚNICO RECURSO CONTRA LA SENTENCIA, PORQUE EL PROCESO ES DE ÚNICA INSTANCIA. Los jueces y magistrados «decidirán en única instancia» (art. 79); no hay apelación. «Contra la sentencia se podrá interponer el recurso de revisión ante la Sala de Casación Civil de la Corte Suprema de Justicia, en los términos de los artículos 379 y siguientes del Código de Procedimiento Civil. La Corte Suprema de Justicia proferirá los autos interlocutorios en un término no mayor de diez (10) días y decisión en un término máximo de dos (2) meses» (art. 92). LAS CAUSALES Y EL PLAZO SON LOS DEL RECURSO EXTRAORDINARIO DE REVISIÓN DEL ESTATUTO PROCESAL CIVIL AL QUE REMITE — hoy el Código General del Proceso, que reemplazó al de Procedimiento Civil—; ese articulado no se releyó en esta pasada, así que el término concreto para interponerlo debe tomarse de la ficha del recurso extraordinario de revisión en CIVIL y no de esta. LO QUE ESTA FICHA SÍ AFIRMA: la competencia es de la Corte y los relojes de la Corte son diez días para los autos y dos meses para decidir. LA CONSULTA NO ES UN RECURSO DE LA VÍCTIMA: «Las sentencias proferidas por los Jueces Civiles del Circuito especializados en restitución de tierras que no decreten la restitución a favor del despojado serán objeto de cons[ulta]» ante el Tribunal (art. 79) — opera de oficio cuando el juez niega.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la sentencia de restitución y constancia de su ejecutoria",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, arts. 79 y 92"
+        },
+        {
+          "n": 2,
+          "name": "Causal de revisión invocada, conforme al estatuto procesal civil al que remite el art. 92",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 92"
+        },
+        {
+          "n": 3,
+          "name": "Hechos y pruebas que la sustentan, con la prueba nueva o la decisión en firme que la causal exija",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 92"
+        },
+        {
+          "n": 4,
+          "name": "Acreditación de la legitimación del recurrente como parte del proceso de restitución",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, arts. 81 y 88"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1448_2011_pr002.html"
+    },
+    {
+      "exact_name": "Auto admisorio de la solicitud de restitución de tierras",
+      "area": "RESTITUCION_TIERRAS",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 1448 de 2011, art. 86 (contenido del auto admisorio y medidas cautelares), art. 85 (reparto el mismo día o el siguiente hábil y trámite preferente), art. 87 (traslado y representante judicial), art. 84 (requisitos que verifica), art. 76 (requisito de procedibilidad) y art. 80 (competencia territorial)",
+      "competent_authority": "Juez Civil del Circuito especializado en restitución de tierras del lugar donde se hallen los bienes, en única instancia si no se reconocen opositores; si los hay, tramita hasta antes del fallo y remite a los Magistrados de la Sala Civil del Tribunal Superior especializados en restitución de tierras (Ley 1448 de 2011, arts. 79 y 80)",
+      "term": "EL REPARTO ES EL MISMO DÍA O EL SIGUIENTE HÁBIL, Y EL AUTO TRAE CINCO ÓRDENES OBLIGATORIAS. «La sustanciación de la solicitud estará a cargo del Juez o Magistrado según el caso, a quien corresponderá por reparto que será efectuado por el Presidente de la Sala el mismo día, o a más tardar el siguiente día hábil. El Juez o Magistrado tendrá en consideración la situación de vulnerabilidad manifiesta de las víctimas para considerar la tramitación preferente» (art. 85). «El auto que admita la solicitud deberá disponer: a) La inscripción de la solicitud en la Oficina de Registro de Instrumentos Públicos indicando el folio de matrícula inmobiliaria y la orden de remisión del oficio de inscripción por el registrador al Magistrado, junto con el certificado sobre la situación jurídica del bien, dentro de los cinco (5) días siguientes al recibo de la orden de inscripción. b) La sustracción provisional del comercio del predio o de los predios cuya restitución se solicita, hasta la ejecutoria de la sentencia. c) La suspensión de los procesos declarativos de derechos reales sobre el predio […], los procesos sucesorios, de embargo, divisorios, de deslinde y amojonamiento, de servidumbres, posesorios de cualquier naturaleza, de restitución de tenencia, de declaración de pertenencia y de bienes vacantes y mostrencos […], así como los procesos ejecutivos, judiciales, notariales y administrativos que afecten el predio, con excepción de los procesos de expropiación. d) La notificación del inicio del proceso al representante legal del municipio a donde esté ubicado el predio, y al Ministerio Público. e) La publicación de la admisión de la solicitud, en un diario de amplia circulación nacional, con inclusión de la identificación del predio y los nombres e identificación de la persona y el núcleo familiar del despojado» para que comparezcan quienes tengan derechos, los acreedores y los afectados por la suspensión (art. 86). CAUTELARES: «en este auto o en cualquier estado del proceso podrá decretar las medidas cautelares que considere pertinentes para prevenir un daño inminente o para hacer cesar el que se estuviere causando sobre el inmueble» (art. 86 par.). TRASLADO: a los titulares inscritos y a la URT si no intervino; a los indeterminados, con la publicación; y a los determinados que no comparezcan se les designa «un representante judicial para el proceso en el término de cinco (5) días» (art. 87). Desde el traslado corren los quince días de oposición del art. 88.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Verificación del requisito de procedibilidad y de los requisitos del art. 84",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, arts. 76 y 84"
+        },
+        {
+          "n": 2,
+          "name": "Orden de inscripción de la solicitud en la Oficina de Registro y de remisión del certificado en cinco días",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 86 lit. a"
+        },
+        {
+          "n": 3,
+          "name": "Sustracción provisional del comercio del predio hasta la ejecutoria de la sentencia",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 86 lit. b"
+        },
+        {
+          "n": 4,
+          "name": "Suspensión de los procesos judiciales, notariales y administrativos que afecten el predio, salvo expropiación",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 86 lit. c"
+        },
+        {
+          "n": 5,
+          "name": "Notificación al municipio y al Ministerio Público",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 86 lit. d"
+        },
+        {
+          "n": 6,
+          "name": "Orden de publicación en diario de amplia circulación nacional con la identificación del predio y del núcleo familiar",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 86 lit. e"
+        },
+        {
+          "n": 7,
+          "name": "Traslado a los titulares inscritos y a la URT, y designación de representante judicial a los que no comparezcan",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 87"
+        },
+        {
+          "n": 8,
+          "name": "Medidas cautelares para prevenir o hacer cesar daños sobre el inmueble",
+          "mandatory": false,
+          "basis": "Ley 1448 de 2011, art. 86 par."
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1448_2011_pr001.html"
+    },
+    {
+      "exact_name": "Sentencia de restitución de tierras",
+      "area": "RESTITUCION_TIERRAS",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 1448 de 2011, art. 91 (contenido del fallo, título de propiedad suficiente, cumplimiento inmediato y competencia posterior), art. 79 (única instancia y consulta de la que niega), art. 89 (fallo anticipado al llegar al convencimiento), art. 90 (período probatorio de treinta días), art. 92 (revisión), art. 100 (entrega en tres días), art. 101 (protección por dos años) y art. 77 num. 3 (nulidad de actos administrativos)",
+      "competent_authority": "Juez Civil del Circuito especializado si no hubo opositores reconocidos; Magistrados de la Sala Civil del Tribunal Superior especializados si los hubo (art. 79)",
+      "term": "PUEDE DICTARSE EN CUANTO EL JUEZ LLEGUE AL CONVENCIMIENTO, Y ES TÍTULO DE PROPIEDAD SUFICIENTE. «Tan pronto el Juez o Magistrado llegue al convencimiento respecto de la situación litigiosa, podrá proferir el fallo sin necesidad de decretar o practicar las pruebas solicitadas» (art. 89); si decreta pruebas, «el período probatorio será de treinta (30) días» (art. 90); y si la solicitud la presentó la URT y no hay opositores, «procederá a dictar sentencia con base en el acervo probatorio presentado con la solicitud» (art. 88). «La sentencia se pronunciará de manera definitiva sobre la propiedad, posesión del bien u ocupación del baldío objeto de la demanda y decretará las compensaciones a que hubiera lugar, a favor de los opositores que probaron buena fe exenta de culpa dentro del proceso. Por lo tanto, la sentencia constituye título de propiedad suficiente» (art. 91). CONTENIDO, «de manera explícita y suficientemente motivada»: todas las pretensiones, excepciones y solicitudes de terceros (lit. a); identificación, linderos, coordenadas, catastro y matrícula de los inmuebles (b); órdenes de inscripción al registro (c) y de cancelación de «todo antecedente registral sobre gravámenes y limitaciones de dominio, títulos de tenencia, arrendamientos, de la denominada falsa tradición y las medidas cautelares registradas con posterioridad al despojo o abandono» (d); protección de la Ley 387 de 1997 si el restituido lo acepta (e); declaración de pertenencia si se sumó el término de usucapión (f); adjudicación de baldíos (g); restitución al poseedor (h); desenglobe o englobe (i); compensaciones y mejoras (j); transferencia al Fondo del bien no restituible (k); nulidad de decisiones judiciales (l) y de actos administrativos, «incluyendo los permisos, concesiones y autorizaciones para el aprovechamiento de los recursos naturales» (m); cancelación de derechos reales de terceros (n); acompañamiento de la fuerza pública (o); efectividad y estabilidad del goce (p); condenas a llamados en garantía (q); compensación a los de buena fe exenta de culpa vencidos (r); costas «cuando se acredite su dolo, temeridad o mala fe» (s); y oficios a la Fiscalía (t). EJECUCIÓN: «Una vez ejecutoriada la sentencia, su cumplimiento se hará de inmediato», y el juez mantiene la competencia (art. 91 par. 1); entrega dentro de los tres días siguientes (art. 100). ÚNICA INSTANCIA: solo revisión ante la Corte (art. 92); la del juez «que no decrete la restitución a favor del despojado» va a consulta (art. 79). Las tierras restituidas quedan protegidas de negociación por dos años (art. 101).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Pronunciamiento definitivo sobre la propiedad, posesión u ocupación, sobre cada pretensión, excepción y solicitud de terceros",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 91 lit. a"
+        },
+        {
+          "n": 2,
+          "name": "Identificación, individualización y deslinde del inmueble con coordenadas, catastro y matrícula",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 91 lit. b"
+        },
+        {
+          "n": 3,
+          "name": "Órdenes a la Oficina de Registro: inscripción de la sentencia y cancelación de gravámenes, falsa tradición y cautelares posteriores al despojo",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 91 lits. c, d y n"
+        },
+        {
+          "n": 4,
+          "name": "Compensaciones a opositores de buena fe exenta de culpa y órdenes sobre mejoras y transferencia al Fondo",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, arts. 91 lits. j, k y r y 98"
+        },
+        {
+          "n": 5,
+          "name": "Nulidad de decisiones judiciales y actos administrativos incompatibles, incluidos permisos y concesiones",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, arts. 77 num. 3 y 91 lits. l y m"
+        },
+        {
+          "n": 6,
+          "name": "Órdenes de entrega con acompañamiento de la fuerza pública y de protección y estabilidad del goce",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, arts. 91 lits. e, o y p y 100"
+        },
+        {
+          "n": 7,
+          "name": "Costas si hay dolo, temeridad o mala fe, y oficios a la Fiscalía",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 91 lits. s y t"
+        },
+        {
+          "n": 8,
+          "name": "Advertencia de la protección de dos años del art. 101 y de la competencia que el despacho conserva",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, arts. 91 par. 1, 101 y 102"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1448_2011_pr002.html"
+    }
+  ]
+}

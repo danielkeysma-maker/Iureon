@@ -200,6 +200,13 @@ BRANCHES = [
         'EXTINCION_DOMINIO',
         'extincion_dominio',
     ),
+    (
+        'actuaciones-restitucion-tierras.json',
+        'restitucion-tierras.ts',
+        'RESTITUCION_TIERRAS_CATALOG',
+        'RESTITUCION_TIERRAS',
+        'restitucion_tierras',
+    ),
 ]
 
 
