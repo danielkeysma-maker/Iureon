@@ -53,7 +53,12 @@ export const BRANCH_LABELS: Record<string, string> = {
   // La mitad no litigiosa del oficio. Distinta de CONTRATACION, que es
   // contratacion ESTATAL: aqui no hay entidad publica ni Ley 80, hay dos
   // particulares y el Codigo Civil, el de Comercio o el Sustantivo del Trabajo.
-  CONTRATOS: 'Contratos & Minutas de Derecho Privado'
+  CONTRATOS: 'Contratos & Minutas de Derecho Privado',
+  // Jurisdiccion propia: jueces del circuito especializados, Fiscalia en la
+  // fase inicial, accion imprescriptible y carga dinamica de la prueba. No es
+  // PENAL —la accion es autonoma de la responsabilidad penal (art. 18)— ni
+  // CIVIL, aunque discuta la propiedad.
+  EXTINCION_DOMINIO: 'Extinción de Dominio (Ley 1708)'
   /*
    * Aqui vivia 'PEQUEÑAS_CAUSAS', conservada —decia su comentario— «para que
    * sus tipos de documento heredados sigan alcanzables». Esos tipos heredados

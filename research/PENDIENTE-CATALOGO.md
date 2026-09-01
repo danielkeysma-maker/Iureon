@@ -370,7 +370,20 @@ después de notificado el poderdante.
    franquicia, consumo (Ley 1480).
 3. **Restitución de tierras y víctimas** (Ley 1448 de 2011, prorrogada por la Ley
    2078 de 2021) — jurisdicción propia. *Vigencia no reverificada.*
-4. **Extinción de dominio** (Ley 1708 de 2014). *Articulado no verificado.*
+4. ~~**Extinción de dominio** (Ley 1708 de 2014)~~ **CATALOGADA el 29 de
+   agosto: rama `EXTINCION_DOMINIO`, 12 fichas (10 LITIGANTE, 2 DESPACHO).**
+   Leída con la Ley 1849 de 2017 —que derogó la fijación provisional, el
+   requerimiento y las oposiciones (arts. 126-131) y reescribió traslado,
+   notificación y apelación— y la Ley 2195 de 2022 (emplazamiento). Lo que
+   gobierna la rama: acción imprescriptible (art. 21), autónoma de la penal
+   (art. 18), carga dinámica de la prueba (art. 152). El reloj del cliente es
+   uno: **diez días desde el auto admisorio (art. 141)**, y ahí caben la
+   oposición, las pruebas, las nulidades y la decisión de acogerse a sentencia
+   anticipada (art. 133, hasta que termine ese mismo traslado). Fuera de él: el
+   control de legalidad de las cautelares (única vía, sin recursos, art. 111),
+   la apelación de la sentencia (seis días, art. 67) y la devolución de bienes
+   (tres y cinco años, art. 109). Declarado en `gaps`: control de garantías de
+   actos de investigación, exequátur, administración por la SAE.
 5. **Ejecución de penas** — puede vivir dentro de PENAL.
 6. **Urbanismo y licencias** (curadores urbanos, Decreto 1077 de 2015). *No
    verificado.*

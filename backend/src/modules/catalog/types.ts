@@ -32,7 +32,8 @@ export type LegalBranch =
   | 'FAMILIA_ADMINISTRATIVA'
   | 'SEGURIDAD_SOCIAL'
   | 'RESPONSABILIDAD_FISCAL'
-  | 'CONTRATOS';
+  | 'CONTRATOS'
+  | 'EXTINCION_DOMINIO';
 
 /** Who authors the document. */
 /**

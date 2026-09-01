@@ -193,6 +193,13 @@ BRANCHES = [
         'CONTRATOS',
         'contratos',
     ),
+    (
+        'actuaciones-extincion-dominio.json',
+        'extincion-dominio.ts',
+        'EXTINCION_DOMINIO_CATALOG',
+        'EXTINCION_DOMINIO',
+        'extincion_dominio',
+    ),
 ]
 
 

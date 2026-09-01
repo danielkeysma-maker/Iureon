@@ -1,0 +1,550 @@
+{
+  "_meta": {
+    "branch": "EXTINCION_DOMINIO",
+    "verified_at": "2026-08-29",
+    "source_of_truth": "Ley 1708 de 2014, Codigo de Extincion de Dominio, con las reformas de la Ley 1849 de 2017 (que derogo la fijacion provisional de la pretension, el requerimiento y las oposiciones de los arts. 126, 127, 129 y 131, y reescribio la notificacion, el traslado, la sentencia anticipada y la apelacion), la Ley 2195 de 2022 (art. 140, emplazamiento) y la Ley 2197 de 2022 (art. 217), leida articulo por articulo en secretariasenado.gov.co el 29 de agosto de 2026. LO QUE DEFINE ESTA RAMA: la accion es imprescriptible (art. 21), autonoma de la penal (art. 18), de caracter real, y la carga de la prueba es dinamica (art. 152): el afectado que no prueba el origen licito pierde el bien con la sola prueba de la Fiscalia. El reloj del cliente es uno y corto —diez dias desde la notificacion del auto admisorio (art. 141)— y en el caben la oposicion, las pruebas, las nulidades y la decision de acogerse a sentencia anticipada. Fuera de el quedan el control de legalidad de las cautelares (sin plazo, unica via), la apelacion de la sentencia (seis dias) y la devolucion de bienes (tres y cinco anos). El art. 115 (control de legalidad de actos de investigacion) es INEXEQUIBLE; el paragrafo del art. 21 anadido por la Ley 2294 de 2023 fue declarado inexequible con efectos diferidos al 20 de junio de 2025.",
+    "gaps": [
+      "EXTINCION_DOMINIO: el reparto exacto de competencias de la Sala de Casacion Penal y de las Salas de los Tribunales para la accion de revision (arts. 37 y 38) no se transcribio; la ficha de revision remite a ellos sin afirmar cual.",
+      "EXTINCION_DOMINIO: no se catalogo la solicitud de control de garantias sobre actos de investigacion (allanamientos, interceptaciones, arts. 163 a 173) porque el art. 33 par. 1 la asigna a los jueces de control de garantias y su tramite no se leyo en esta pasada.",
+      "EXTINCION_DOMINIO: el exequatur de sentencias extranjeras de decomiso (arts. 209 a 213) y la destinacion provisional y enajenacion temprana de bienes por la SAE (arts. 91 a 105) quedan fuera: son tramite del administrador, no del abogado del afectado.",
+      "EXTINCION_DOMINIO: la retribucion al denunciante de bienes ilicitos (art. 120) se cita dentro de las fichas de sentencia anticipada y negociacion; no tiene ficha propia porque el que la pide no es parte del proceso."
+    ],
+    "unverified": []
+  },
+  "actuaciones": [
+    {
+      "exact_name": "Oposición del afectado a la demanda de extinción de dominio",
+      "area": "EXTINCION_DOMINIO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1708 de 2014, art. 141 (modificado por el art. 43 de la Ley 1849 de 2017: traslado de diez días y lo que puede hacerse en él), art. 13 (derechos del afectado, modificado por el art. 3 de la Ley 1849), art. 16 (causales), art. 130 (sin excepciones previas ni incidentes), art. 152 (carga dinámica de la prueba, modificado por el art. 47 de la Ley 1849), art. 7 (presunción de buena fe), arts. 53, 55A y 140 (notificación personal, aviso y emplazamiento), art. 142 (decreto de pruebas)",
+      "competent_authority": "Juez del Circuito Especializado en Extinción de Dominio del distrito judicial donde se encuentren los bienes (Ley 1708 de 2014, art. 35); si hay bienes en varios distritos, el del distrito con más jueces de extinción de dominio",
+      "term": "DIEZ (10) DÍAS DESDE LA NOTIFICACIÓN DEL AUTO ADMISORIO, RELOJ DEL AFECTADO, Y ES LA ÚNICA VENTANA PARA PEDIR PRUEBAS. «Dentro de los diez (10) días siguientes a la notificación del auto admisorio de la demanda, los sujetos e intervinientes podrán: 1. Solicitar la declaratoria de incompetencia y presentar impedimentos, recusaciones o nulidades. 2. Aportar pruebas. 3. Solicitar la práctica de pruebas. 4. Formular observaciones sobre la demanda de extinción del derecho de dominio presentada por la Fiscalía si no reúne los requisitos» (art. 141). Después el juez «decretará la práctica de las pruebas que no hayan sido recaudadas en la fase inicial, siempre y cuando resulten necesarias, conducentes, pertinentes y hayan sido solicitadas oportunamente» (art. 142): la prueba que no se pidió en los diez días no entra. NO HAY EXCEPCIONES PREVIAS NI INCIDENTES: «Todos esos asuntos serán decididos en la sentencia definitiva» (art. 130), así que la oposición es un solo escrito y tiene que traerlo todo. DESDE CUÁNDO CORRE: el auto admisorio se notifica personalmente (arts. 137 y 138); si el afectado «no comparezca al juzgado, dentro de los cinco (5) días siguientes al recibo de la citación, se procederá a la notificación por aviso» (art. 53), que «se considerará surtida al finalizar el día siguiente a la entrega del aviso» (art. 55A); si tampoco, emplazamiento por edicto de cinco días hábiles y, «si el emplazado o los emplazados no se presentaren dentro de los tres (3) días hábiles siguientes al vencimiento del término de fijación del edicto, el proceso continuará con la intervención del Ministerio Público» (art. 140, Ley 2195 de 2022). LA CARGA ES DEL AFECTADO, Y ESO CAMBIA CÓMO SE ESCRIBE LA OPOSICIÓN: «opera la carga dinámica de la prueba. Corresponde al afectado probar los hechos que sustenten la improcedencia de la causal», y «cuando el afectado no allegue los medios de prueba requeridos para demostrar el fundamento de su oposición, el juez podrá declarar extinguido el derecho de dominio con base en los medios de prueba presentados por la Fiscalía» (art. 152). Negar no basta: hay que probar «el origen legítimo de su patrimonio y de los bienes cuyo título se discute, así como la licitud de su destinación» (art. 13 num. 5) o la buena fe exenta de culpa, que la ley presume «siempre y cuando el titular del derecho proceda de manera diligente y prudente» (art. 7). LO QUE NO SIRVE ALEGAR: la prescripción, porque «La acción de extinción de dominio es imprescriptible» (art. 21), ni la absolución penal, porque la acción «es distinta y autónoma de la penal […] e independiente de toda declaratoria de responsabilidad» (art. 18).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del afectado y del derecho que alega sobre cada bien, con los títulos y certificados de registro",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 30 y 141"
+        },
+        {
+          "n": 2,
+          "name": "Pronunciamiento sobre cada causal invocada en la demanda y sobre cada bien",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 16 y 141"
+        },
+        {
+          "n": 3,
+          "name": "Prueba del origen lícito del patrimonio y de los bienes, y de la licitud de su destinación",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 13 num. 5 y 152"
+        },
+        {
+          "n": 4,
+          "name": "Alegación y prueba de la buena fe exenta de culpa, cuando el afectado adquirió de un tercero",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 7 y 152"
+        },
+        {
+          "n": 5,
+          "name": "Aporte de pruebas y solicitud de las que deban practicarse, con su conducencia y pertinencia",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 141 nums. 2 y 3 y 142"
+        },
+        {
+          "n": 6,
+          "name": "Nulidades, incompetencia, impedimentos y recusaciones que se propongan",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 83, 85 y 141 num. 1"
+        },
+        {
+          "n": 7,
+          "name": "Observaciones sobre los requisitos de la demanda del art. 132",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 132 y 141 num. 4"
+        },
+        {
+          "n": 8,
+          "name": "Constancia de presentación dentro de los diez días siguientes a la notificación",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, art. 141"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1708_2014_pr003.html"
+    },
+    {
+      "exact_name": "Solicitud de control de legalidad de las medidas cautelares decretadas por la Fiscalía en extinción de dominio",
+      "area": "EXTINCION_DOMINIO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1708 de 2014, art. 111 (sin reposición ni apelación; control de legalidad posterior), art. 112 (las cuatro causales de ilegalidad), art. 113 (procedimiento: traslado y decisión de cinco días, apelable, no suspende), art. 87 (fines, modificado por el art. 1 de la Ley 1849 de 2017), art. 88 (suspensión del poder dispositivo, embargo, secuestro y toma de posesión), art. 89 (cautelares antes de la demanda, máximo seis meses), art. 33 par. 2 (competencia del juez especializado) y art. 13 num. 1 (acceso al proceso desde la materialización de la medida)",
+      "competent_authority": "Se presenta ante el Fiscal que decretó la medida, quien remite copia de la carpeta al Juez del Circuito Especializado en Extinción de Dominio que corresponda por reparto (arts. 33 par. 2 y 113)",
+      "term": "NO HAY PLAZO PARA PEDIRLO, PERO ES LA ÚNICA PUERTA: «Las medidas cautelares proferidas por el Fiscal General de la Nación o su delegado no serán susceptibles de los recursos de reposición ni apelación. Sin embargo, previa solicitud motivada del afectado […] estas decisiones podrán ser sometidas a un control de legalidad posterior ante los jueces de extinción de dominio competentes» (art. 111). Durante la fase inicial el afectado solo tiene acceso al proceso «desde la materialización de las medidas cautelares, únicamente en lo relacionado con ellas» (art. 13 num. 1): este escrito es lo primero que puede presentar. SOLO CUATRO CAUSALES, Y HAY QUE PROBAR OBJETIVAMENTE UNA: «1. Cuando no existan los elementos mínimos de juicio suficientes para considerar que probablemente los bienes afectados con la medida tengan vínculo con alguna causal de extinción de dominio. 2. Cuando la materialización de la medida cautelar no se muestre como necesaria, razonable y proporcional para el cumplimiento de sus fines. 3. Cuando la decisión de imponer la medida cautelar no haya sido motivada. 4. Cuando la decisión de imponer la medida cautelar esté fundamentada en pruebas ilícitamente obtenidas» (art. 112). «El afectado que solicite el control de legalidad debe señalar claramente los hechos en que se funda y demostrar que concurre objetivamente a alguna de las circunstancias», y «si el juez encontrare infundada la solicitud la desechará de plano» (art. 113). EL TRÁMITE, SI SE ADMITE: traslado común de cinco (5) días y decisión en los cinco (5) siguientes; «las decisiones que tome el juez […] serán susceptibles del recurso de apelación» (art. 113), en efecto devolutivo cuando niegan el control (art. 65 num. 4). NO SUSPENDE NADA: «La presentación de la solicitud y su trámite no suspenden el cumplimiento de la providencia ni el curso de la actuación procesal» (art. 113), y las cautelares «se cumplirán de inmediato» (art. 62). EL RELOJ QUE SÍ TIENE LA FISCALÍA: las cautelares decretadas antes de la demanda «no podrán extenderse por más de seis (6) meses, término dentro del cual el Fiscal deberá definir si la acción debe archivarse o si por el contrario resulta procedente presentar demanda» (art. 89) — vencidos, el argumento de desproporción se vuelve de ilegalidad. La medida base es la «suspensión del poder dispositivo», que se inscribe de inmediato «sin ser sometidas a turno […] y sin consideración a la persona que alega ser titular del bien» (art. 88).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la medida cautelar, de la resolución que la decretó y de los bienes afectados",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 88 y 113"
+        },
+        {
+          "n": 2,
+          "name": "Acreditación de la calidad de afectado y del derecho sobre los bienes",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 13 num. 1 y 30"
+        },
+        {
+          "n": 3,
+          "name": "Causal de ilegalidad invocada, precisada entre las cuatro del art. 112, con los hechos y la prueba objetiva que la sustentan",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 112 y 113"
+        },
+        {
+          "n": 4,
+          "name": "Cuando la medida es anterior a la demanda, cómputo de los seis meses del art. 89",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, art. 89"
+        },
+        {
+          "n": 5,
+          "name": "Petición concreta: levantamiento total o parcial, o sustitución por una medida menos gravosa",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 87 y 112 num. 2"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1708_2014_pr002.html"
+    },
+    {
+      "exact_name": "Solicitud de desarchivo y control de legalidad sobre la resolución de archivo en extinción de dominio",
+      "area": "EXTINCION_DOMINIO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1708 de 2014, art. 124 (causales de archivo; num. 6 adicionado por el art. 33 de la Ley 1849 de 2017), art. 125 (desarchivo y control de legalidad dentro de los diez días), art. 114 (procedimiento del control de legalidad sobre el archivo) y art. 65 num. 4 (apelación de la decisión que niega el control)",
+      "competent_authority": "La solicitud de desarchivo, ante el Fiscal que archivó; el control de legalidad, ante el Juez del Circuito Especializado en Extinción de Dominio por reparto, a través del Fiscal (arts. 114 y 125)",
+      "term": "DIEZ (10) DÍAS DESDE LA COMUNICACIÓN DE LA NEGATIVA, RELOJ DEL INTERESADO. El archivo lo dicta el Fiscal «en cualquier momento» por seis causales —no se identifican bienes, no están en causal, sus titulares no tienen nexo, están a nombre de terceros de buena fe exenta de culpa sin bienes por valor equivalente, cualquier circunstancia que impida fijar la pretensión, o bienes improductivos cuyo costo de administración supere el beneficio— y «no hará tránsito a cosa juzgada» (art. 124). QUIÉN PUEDE PEDIR EL DESARCHIVO: «el Ministerio Público, el Ministerio de Justicia y del Derecho, el denunciante o cualquier persona o entidad que acredite interés», siempre que «surjan nuevos elementos de juicio que permitan desvirtuar de manera fundada, razonada y coherente los argumentos fácticos, jurídicos o probatorios planteados en la resolución de archivo provisional» (art. 125). EL RELOJ: «En los eventos donde medie solicitud de desarchivo y el Fiscal decida mantener vigente la resolución de archivo provisional, el interesado podrá, dentro de los 10 días siguientes a la comunicación de la decisión que niega su petición, solicitar al Juez Especializado en Extinción de Dominio que ejerza un control de legalidad» (art. 125). LO QUE HAY QUE DEMOSTRAR ANTE EL JUEZ: «señalar claramente los hechos en que se funda y demostrar objetivamente que la circunstancia aducida por la Fiscalía para mantener vigente la orden de archivo no concurre»; si el juez la halla infundada «la desechará de plano»; si la admite, traslado común de cinco (5) días y decisión en los cinco (5) siguientes, apelable (art. 114). Es la herramienta de la víctima o del denunciante que ve archivada la persecución del patrimonio que la dañó.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la resolución de archivo, su causal y la fecha de su comunicación",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, art. 124"
+        },
+        {
+          "n": 2,
+          "name": "Acreditación del interés del solicitante (denunciante, víctima, entidad)",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 114 y 125"
+        },
+        {
+          "n": 3,
+          "name": "Nuevos elementos de juicio que desvirtúan de manera fundada los argumentos del archivo",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, art. 125"
+        },
+        {
+          "n": 4,
+          "name": "Para el control de legalidad: demostración objetiva de que la circunstancia aducida por la Fiscalía no concurre",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, art. 114"
+        },
+        {
+          "n": 5,
+          "name": "Constancia de presentación dentro de los diez días siguientes a la comunicación de la negativa",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, art. 125"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1708_2014_pr002.html"
+    },
+    {
+      "exact_name": "Recurso de apelación contra la sentencia de extinción de dominio",
+      "area": "EXTINCION_DOMINIO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1708 de 2014, art. 147 (solo apelación, efecto suspensivo, y consulta de la sentencia que niega), art. 67 (modificado por el art. 18 de la Ley 1849 de 2017: seis días desde la notificación, traslado a no recurrentes y adhesión), art. 65 num. 1 y num. 5 (procedencia; reposición y queja contra el auto que la niega), art. 146 (notificación personal o por edicto), art. 55 (edicto de tres días), art. 68 (queja) y art. 49 (contenido de la sentencia que se ataca)",
+      "competent_authority": "Se interpone ante el Juez del Circuito Especializado en Extinción de Dominio que dictó la sentencia; la resuelve la Sala de Extinción de Dominio del Tribunal Superior del Distrito Judicial",
+      "term": "SEIS (6) DÍAS DESDE LA NOTIFICACIÓN, RELOJ DEL AFECTADO, Y HAY QUE SUSTENTAR EN EL MISMO ESCRITO. Regla general: los recursos «se interpondrán y sustentarán por escrito» (art. 59) «dentro del término de ejecutoria de la providencia» (art. 67), que es de tres (3) días (art. 61); pero para la sentencia la ley amplía: «La sentencia proferida en primera instancia podrá apelarse y sustentarse dentro de los seis días siguientes a su notificación» (art. 67). DESDE CUÁNDO: «La sentencia se notificará personalmente a los sujetos procesales e intervinientes. De no ser posible la notificación personal dentro de los tres (3) días siguientes al envío de la comunicación, la sentencia se notificará por edicto» (art. 146), fijado «por tres (3) días» y surtido «al vencimiento del término de fijación» (art. 55). ES EL ÚNICO RECURSO: «Contra la sentencia sólo procederá el recurso de apelación […] en el efecto suspensivo. Este será resuelto por el superior dentro de los treinta (30) días siguientes» (art. 147). SI SE NIEGA LA APELACIÓN: «procederá el recurso de reposición y en subsidio el de queja» (art. 65 num. 5), la queja «dentro del término de ejecutoria de la decisión que deniega el recurso» (art. 68). QUIEN NO APELÓ TODAVÍA PUEDE: «La parte que no apeló la sentencia de primera instancia podrá adherir al recurso interpuesto por otra de las partes, en lo que la providencia apelada le fuere desfavorable. El escrito de adhesión podrá presentarse ante el juez que profirió el fallo antes de que sea concedida la apelación», y «quedará sin efecto si se produce el desistimiento del apelante principal» (art. 67 par.). LOS NO RECURRENTES tienen «cuatro (4) días» con el expediente a disposición (art. 67). SI LA SENTENCIA NIEGA LA EXTINCIÓN Y LA FISCALÍA NO APELA, «se someterá en todo caso a grado jurisdiccional de consulta» (art. 147): ganar en primera instancia no cierra el caso. QUÉ ATACAR: la sentencia debe contener la valoración de las pruebas «y de la causal invocada» (art. 49 num. 5); una sentencia que extingue sin analizar la buena fe exenta de culpa alegada omite el num. 4 del mismo artículo.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la sentencia, de los bienes y de la fecha y forma de su notificación",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 146 y 147"
+        },
+        {
+          "n": 2,
+          "name": "Interposición y sustentación en el mismo escrito, dentro de los seis días",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 59 y 67"
+        },
+        {
+          "n": 3,
+          "name": "Reparos concretos a la valoración probatoria y a la causal declarada, y a la omisión de analizar la oposición",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, art. 49 nums. 4 y 5"
+        },
+        {
+          "n": 4,
+          "name": "Pronunciamiento sobre la buena fe exenta de culpa y el origen lícito, con las pruebas que obran",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 7, 13 y 152"
+        },
+        {
+          "n": 5,
+          "name": "Petición: revocar y declarar la improcedencia, o modificar respecto de bienes determinados",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, art. 147"
+        },
+        {
+          "n": 6,
+          "name": "Reposición y en subsidio queja, si el juez niega la apelación",
+          "mandatory": false,
+          "basis": "Ley 1708 de 2014, arts. 65 num. 5 y 68"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1708_2014_pr001.html"
+    },
+    {
+      "exact_name": "Recursos de reposición y apelación contra autos en el juicio de extinción de dominio",
+      "area": "EXTINCION_DOMINIO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1708 de 2014, art. 59 (clases, por escrito), art. 60 (oportunidad: hasta tres días desde la última notificación), art. 61 (ejecutoria de tres días), art. 63 (reposición: en la ejecutoria, traslado de dos días, decisión en tres), art. 64 (inimpugnabilidad), art. 65 nums. 2 a 5 (apelación taxativa: auto que niega pruebas en suspensivo, interlocutorios en devolutivo, negativa de controles de legalidad), art. 67 (interponer y sustentar en la ejecutoria), art. 68 (queja), art. 54 (notificación por estado de un día) y art. 58 (autos que se notifican)",
+      "competent_authority": "Reposición ante el mismo Juez del Circuito Especializado en Extinción de Dominio; apelación ante la Sala de Extinción de Dominio del Tribunal Superior",
+      "term": "TRES (3) DÍAS DESDE LA ÚLTIMA NOTIFICACIÓN, Y LA NOTIFICACIÓN ES UN ESTADO DE UN SOLO DÍA. «Los recursos ordinarios podrán interponerse por quien tenga interés jurídico, desde la fecha en que se haya proferido la providencia, hasta cuando hayan transcurrido tres (3) días contados a partir de la última notificación» (art. 60); «Las providencias quedan ejecutoriadas tres (3) días después de notificadas si no se han interpuesto los recursos» (art. 61). Y salvo el auto admisorio, el que admite la revisión y la sentencia, «todas las providencias se notificarán por estado que se fijará por el término de un (1) día en la Secretaría» (art. 54): quien no revisa el estado cada día pierde el recurso sin saberlo. REPOSICIÓN: «procede contra los autos de sustanciación que deban notificarse y contra los interlocutorios de primera instancia. El recurso de reposición deberá interponerse y sustentarse por escrito dentro del término de ejecutoria» (art. 63); lo que la decide «no es susceptible de recurso alguno» salvo por puntos nuevos (art. 64). APELACIÓN, SOLO CONTRA LO QUE LA LEY ENUMERA: «únicamente procede el recurso de apelación contra las siguientes providencias: […] 2. El auto que niega pruebas en la fase del juicio, en el efecto suspensivo. 3. Los demás autos interlocutorios proferidos durante la fase de juicio, en efecto devolutivo. 4. Las decisiones judiciales que denieguen cualquiera de los controles de legalidad establecidos en esta ley, en el efecto devolutivo» (art. 65); «deberá interponerse y sustentarse por escrito dentro del término de ejecutoria» (art. 67). LA QUE MÁS IMPORTA ES LA DEL AUTO QUE NIEGA PRUEBAS: es la única en efecto suspensivo (arts. 65 num. 2 y 142) y sin ella el juicio sigue sin la prueba del origen lícito. LOS AUTOS DE SUSTANCIACIÓN QUE SE NOTIFICAN son solo el admisorio, el que ordena pruebas, el que deniega la apelación, el que corre traslado para alegatos y el que admite la revisión; «los autos de sustanciación no enunciados […] serán de cumplimiento inmediato y contra ellos no procede recurso alguno» (art. 58). QUEJA: contra el auto que deniega la apelación de un auto solo cabe reposición (art. 65 num. 5); la queja se reserva para la sentencia.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del auto recurrido y de la fecha de fijación del estado",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 54 y 60"
+        },
+        {
+          "n": 2,
+          "name": "Determinación del recurso procedente: reposición, o apelación si el auto está en la lista del art. 65",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 63 y 65"
+        },
+        {
+          "n": 3,
+          "name": "Sustentación en el mismo escrito, dentro de los tres días de ejecutoria",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 59, 61 y 67"
+        },
+        {
+          "n": 4,
+          "name": "Cuando se niegan pruebas: conducencia, pertinencia y necesidad de cada una, y su relación con la carga del afectado",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 142 y 152"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1708_2014_pr001.html"
+    },
+    {
+      "exact_name": "Solicitud de sentencia anticipada de extinción de dominio con beneficio por colaboración",
+      "area": "EXTINCION_DOMINIO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1708 de 2014, art. 133 (modificado por el art. 39 de la Ley 1849 de 2017: oportunidad, renuncia a la oposición y los dos beneficios), art. 13 num. 9 (derecho a optar por la sentencia anticipada), art. 120 (retribución de hasta el 5%, modificado por el art. 29 de la Ley 1849), art. 135 (requerimiento del Fiscal al juez) y art. 141 (el traslado que cierra la oportunidad)",
+      "competent_authority": "Se manifiesta ante el Fiscal, quien presenta al Juez del Circuito Especializado en Extinción de Dominio el requerimiento de sentencia anticipada (art. 135)",
+      "term": "HASTA QUE TERMINE EL TRASLADO DE DIEZ DÍAS DEL ART. 141, Y DESPUÉS YA NO: «En cualquier etapa del proceso hasta la finalización del traslado previsto en el artículo 141 de la presente ley, el afectado podrá reconocer de manera expresa que concurren sobre el bien los presupuestos de una o varias de las causales de extinción de dominio y renunciar a presentar oposición, evento en el cual se tendrá que lo actuado es suficiente para sustentar ante el juez de extinción de dominio la pretensión extintiva y se remitirán las carpetas al juez para que emita la correspondiente sentencia por vía anticipada» (art. 133). El mismo plazo de la oposición es el plazo para decidir no oponerse: el abogado que lo deja vencer sin escoger pierde las dos cosas. LOS DOS BENEFICIOS, EXCLUYENTES: «1. Conservar el derecho de propiedad sobre uno o algunos de los bienes cuyo origen sea consecuencia de una actividad ilícita, siempre y cuando el Fiscal lo considere procedente, según la eficacia de la colaboración y el valor comercial de los mismos no supere el tres (3%) del total de los bienes objeto de colaboración […] 2. […] la retribución de que trata el artículo 120 de la presente ley, la cual será de hasta un cinco (5%) del valor de los bienes que sean objeto de colaboración, sin exceder los dos mil quinientos (2.500) smlmv», más «otro (5%) del valor de los bienes que se encuentren en causal de extinción de dominio, sin exceder los dos mil quinientos (2.500) smlmv, sobre los cuales informe a la Fiscalía» con aporte de prueba eficaz para víctimas, desarticulación de organizaciones, corrupción o identificación de otros bienes (art. 133). El beneficio lo califica el Fiscal «según la eficacia de la colaboración»: no es un derecho automático, es una negociación con un tope. DESPUÉS DEL TRASLADO queda otra puerta distinta, la negociación patrimonial por colaboración efectiva del art. 142A, con ficha propia.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del afectado, de los bienes y del proceso, y constancia de que el traslado del art. 141 no ha vencido",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 133 y 141"
+        },
+        {
+          "n": 2,
+          "name": "Reconocimiento expreso de la concurrencia de la causal o causales sobre bienes determinados",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, art. 133"
+        },
+        {
+          "n": 3,
+          "name": "Renuncia expresa a presentar oposición y al debate probatorio",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 13 num. 9 y 133"
+        },
+        {
+          "n": 4,
+          "name": "Beneficio que se solicita: conservación de bienes hasta el 3% o retribución hasta el 5%, con la colaboración que lo sustenta",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 120 y 133"
+        },
+        {
+          "n": 5,
+          "name": "Información y pruebas que se aportan sobre otros bienes o hechos, cuando se pide la retribución adicional",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, art. 133"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1708_2014_pr003.html"
+    },
+    {
+      "exact_name": "Propuesta de negociación patrimonial por colaboración efectiva en extinción de dominio",
+      "area": "EXTINCION_DOMINIO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1708 de 2014, art. 142A (adicionado por el art. 44 de la Ley 1849 de 2017: oportunidad, escrito al Fiscal, suspensión de hasta treinta días) en concordancia con el art. 141 (fin del traslado) y el art. 120 (retribución)",
+      "competent_authority": "Se presenta ante el Fiscal investigador, quien informa al Juez del Circuito Especializado en Extinción de Dominio para la suspensión del juicio (art. 142A)",
+      "term": "DESPUÉS DEL TRASLADO DEL ART. 141 Y ANTES DE LA SENTENCIA, CON UNA SUSPENSIÓN MÁXIMA DE TREINTA DÍAS. «La negociación patrimonial por colaboración efectiva en extinción de dominio deberá ser propuesta por el afectado una vez finalizado el término de traslado a los sujetos procesales e intervinientes previsto en el artículo 141 de esta ley y hasta antes de dictar sentencia. El afectado podrá solicitar la suspensión del proceso mediante escrito en el que manifieste al Fiscal investigador un plan de colaboración con la justicia y las condiciones que estaría dispuesto a cumplir. La suspensión del proceso no podrá extenderse por más de 30 días» (art. 142A). Es la puerta que queda cuando ya pasó la de la sentencia anticipada del art. 133: aquella exige renunciar a oponerse antes de que venza el traslado; esta se abre justo cuando aquel termina. QUÉ HACE EL FISCAL: «evalúa la propuesta del afectado, informará al juez de conocimiento para la respectiva suspensión del juicio. Una vez se determine la viabilidad de adelantar la negociación patrimonial por colaboración efectiva, el Fiscal solicitará la extinción del bien objeto de proceso y estimará el porcentaje de retribución» (art. 142A). LO QUE SE NEGOCIA es la retribución del art. 120 —hasta el cinco por ciento del producto de la enajenación— contra un plan de colaboración concreto; la extinción del bien se acepta. La justicia premial «deberá hacerse con sujeción a la política criminal del Estado» (art. 142A), así que el Fiscal puede rechazar la propuesta.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del proceso, de los bienes y constancia de que venció el traslado del art. 141 y no hay sentencia",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 141 y 142A"
+        },
+        {
+          "n": 2,
+          "name": "Plan de colaboración con la justicia: información, pruebas y actos que el afectado ofrece",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, art. 142A"
+        },
+        {
+          "n": 3,
+          "name": "Condiciones que el afectado está dispuesto a cumplir y aceptación de la extinción de los bienes",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, art. 142A"
+        },
+        {
+          "n": 4,
+          "name": "Solicitud de suspensión del proceso hasta por treinta días",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, art. 142A"
+        },
+        {
+          "n": 5,
+          "name": "Retribución que se pretende, dentro del tope del art. 120",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 120 y 142A"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1708_2014_pr003.html"
+    },
+    {
+      "exact_name": "Solicitud de nulidad en el proceso de extinción de dominio",
+      "area": "EXTINCION_DOMINIO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1708 de 2014, art. 82 (nulidades y facultad de resolverlas en la sentencia), art. 83 (causales: competencia, notificación, debido proceso), art. 85 (legitimación y carga de probarla; una sola vez por causal), art. 86 (reglas de convalidación) y art. 141 num. 1 (oportunidad en el traslado)",
+      "competent_authority": "Juez del Circuito Especializado en Extinción de Dominio del distrito judicial donde se encuentren los bienes (Ley 1708 de 2014, art. 35); si hay bienes en varios distritos, el del distrito con más jueces de extinción de dominio",
+      "term": "EN EL TRASLADO DE DIEZ DÍAS O DESPUÉS, PERO CON LA CARGA DE PROBARLA Y UNA SOLA VEZ POR CAUSAL. El traslado del art. 141 es el momento previsto para «presentar impedimentos, recusaciones o nulidades» (num. 1), y el juez puede «disponer que las solicitudes de nulidad presentadas por las partes sean resueltas en la sentencia» (art. 82). TRES CAUSALES: «1. Falta de competencia. 2. Falta de notificación. 3. Violación al debido proceso, siempre y cuando las garantías vulneradas resulten compatibles con la naturaleza jurídica y el carácter real de la acción de extinción de dominio» (art. 83) — el último inciso descarta las garantías propias del proceso penal contra la persona. QUIÉN Y CÓMO: «Solo podrá solicitar la declaración de nulidad el sujeto procesal que resulte perjudicado por la concurrencia de la causal, siempre y cuando no hubiere contribuido a causarlo […] La persona que alegue una nulidad deberá probar la causal que invoca, las razones en que se funda y no podrá formular una nueva, sino por causal diferente o por hechos posteriores» (art. 85). LAS REGLAS QUE LA HACEN FRACASAR SI SE PIDE MAL: no se anula el acto «cuando cumpla la finalidad para la cual estaba destinado, siempre que no se viole el derecho a la contradicción»; «quien alegue la nulidad debe demostrar que la irregularidad sustancial afecta garantías»; «no puede invocar la nulidad la persona que haya coadyuvado con su conducta»; los actos «pueden convalidarse por el consentimiento del perjudicado»; y «solo puede decretarse cuando no exista otro medio procesal para subsanar la irregularidad» (art. 86). LA CAUSAL TÍPICA es la falta de notificación del auto admisorio a un titular inscrito que no fue emplazado conforme al art. 140: la declaratoria «no conlleva necesariamente la orden de retrotraer el procedimiento a etapas anteriores, a menos que resulte indispensable» (art. 82).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Causal invocada entre las tres del art. 83 y actuación desde la que se pide la nulidad",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 82 y 83"
+        },
+        {
+          "n": 2,
+          "name": "Prueba de la causal y del perjuicio concreto a las garantías del solicitante",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 85 y 86 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "Manifestación de no haber contribuido a la irregularidad ni haberla convalidado",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 85 y 86 nums. 3 y 4"
+        },
+        {
+          "n": 4,
+          "name": "Razón por la cual no existe otro medio procesal para subsanarla",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, art. 86 num. 5"
+        },
+        {
+          "n": 5,
+          "name": "Constancia de que no se ha propuesto antes la misma causal, o hechos posteriores que la reabren",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, art. 85"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1708_2014_pr002.html"
+    },
+    {
+      "exact_name": "Demanda de revisión contra sentencia de extinción de dominio",
+      "area": "EXTINCION_DOMINIO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1708 de 2014, art. 73 (tres causales), art. 74 (titularidad), art. 75 (requisitos del escrito y anexos), art. 76 (admisión en cinco días y notificación), art. 77 (pruebas: ocho días para pedirlas, treinta para practicarlas), art. 78 (alegatos de quince días), art. 79 (decisión) y art. 80 (efectos)",
+      "competent_authority": "La Sala competente según el juez que profirió la sentencia revisada (Ley 1708 de 2014, arts. 37 y 38, cuyo reparto no se transcribió en esta pasada); ningún magistrado que haya intervenido en el proceso revisado puede conocerla (art. 81)",
+      "term": "LOS ARTÍCULOS 73 A 81 NO FIJAN UN TÉRMINO PARA PROMOVERLA; LO QUE FIJAN SON TRES CAUSALES CERRADAS Y UN ESCRITO CON REQUISITOS. Procede «contra las sentencias ejecutoriadas» cuando: «1. […] después de la sentencia aparezcan hechos nuevos o surjan pruebas, no conocidas al tiempo del proceso, que lleven a considerar razonablemente que la decisión finalmente adoptada pudo haber sido diferente. 2. Cuando con posterioridad a la sentencia se demuestre, mediante decisión en firme, que el fallo fue determinado por una conducta delictiva del juez, el fiscal, un sujeto procesal, un interviniente o de un tercero. 3. Cuando se demuestre, por sentencia en firme, que el fallo objeto de pedimento de revisión se fundamentó en prueba falsa» (art. 73). Las causales 2 y 3 exigen una decisión penal en firme previa: sin ella la demanda se inadmite. QUIÉN: «cualquiera de los sujetos procesales que tengan interés jurídico y hayan sido legalmente reconocidos dentro de la actuación procesal», el Ministerio Público o el Ministerio de Justicia (art. 74) — quien nunca compareció al proceso no está legitimado. EL ESCRITO: «a) La determinación de la actuación procesal cuya revisión se demanda con la identificación del despacho que produjo el fallo; b) Los hechos y causales que motivaron la actuación procesal y la decisión; c) La causal de revisión que invoca y los fundamentos de hecho y de derecho en que se apoya la solicitud; d) La relación de las pruebas que se aportan para demostrar los hechos básicos de la petición. Se acompañará copia o fotocopia de la decisión de primera y segunda instancia y constancia de su ejecutoria» (art. 75). EL TRÁMITE, CON SUS RELOJES DE LA SALA: admisión «dentro de los cinco (5) días siguientes» (art. 76); recibido el proceso, «ocho (8) días» comunes para pedir pruebas y «treinta (30) días» para practicarlas (art. 77); «traslado común de quince (15) días a las partes para que aleguen» (art. 78); proyecto en diez días y decisión en veinte (art. 79). SI PROSPERA: «se declarará sin valor la sentencia motivo de la acción y se devolverá la actuación a primera instancia» (art. 80). Y el reloj que sí corre en contra aunque la ley no lo nombre aquí: la prescripción especial de tres y cinco años del art. 109 sobre los bienes ya devueltos a otros, y la enajenación por el administrador.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Determinación de la sentencia revisada y del despacho que la profirió, con copia de las decisiones de instancia y constancia de ejecutoria",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, art. 75 lit. a y anexos"
+        },
+        {
+          "n": 2,
+          "name": "Hechos y causales que motivaron la actuación y la decisión",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, art. 75 lit. b"
+        },
+        {
+          "n": 3,
+          "name": "Causal de revisión invocada entre las tres del art. 73, con fundamentos de hecho y de derecho",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 73 y 75 lit. c"
+        },
+        {
+          "n": 4,
+          "name": "Relación de las pruebas que se aportan; para las causales 2 y 3, la decisión penal en firme",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 73 y 75 lit. d"
+        },
+        {
+          "n": 5,
+          "name": "Acreditación de la legitimación: sujeto procesal reconocido en la actuación",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, art. 74"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1708_2014_pr001.html"
+    },
+    {
+      "exact_name": "Solicitud de devolución de bienes tras sentencia que niega la extinción de dominio",
+      "area": "EXTINCION_DOMINIO",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1708 de 2014, art. 106 (comunicación del administrador, frutos y mejoras), art. 107 (devolución de dineros), art. 108 (bienes no reclamados: enajenación), art. 109 (prescripción especial de tres y cinco años), art. 110 (obligaciones de bienes improductivos, modificado por el art. 27 de la Ley 1849 de 2017) y art. 147 (consulta de la sentencia que niega)",
+      "competent_authority": "El administrador de los bienes: la Sociedad de Activos Especiales S.A.S. (SAE), administradora del Frisco (art. 90), una vez ejecutoriada la decisión del juez que ordena la entrega",
+      "term": "TRES (3) AÑOS PARA MUEBLES Y CINCO (5) PARA INMUEBLES DESDE LA EJECUTORIA, RELOJ DEL AFECTADO, Y AL VENCERSE EL ESTADO SE QUEDA CON EL BIEN QUE EL JUEZ MANDÓ DEVOLVER. «Pasados tres (3) años para bienes muebles y cinco (5) años para inmuebles, contados a partir de la ejecutoria de la providencia que ordena la devolución de bienes o recursos, sin que hayan sido reclamados, el administrador deberá instaurar la acción civil para que se reconozca la prescripción adquisitiva de dominio especial» (art. 109). Y antes de eso, «vencido el término para recibir los bienes objeto de devolución sin que los afectados comparezcan a reclamarlos, el administrador quedará facultado para enajenar los bienes» (art. 108). CUÁNDO EMPIEZA: la sentencia que niega la extinción y no se apela «se someterá en todo caso a grado jurisdiccional de consulta» (art. 147), así que la ejecutoria llega solo cuando el superior la confirma. CÓMO SE ENTERA EL AFECTADO: «el administrador le comunicará al interesado a la dirección que figure en el expediente […] que los bienes se encuentran a su disposición y le informará del procedimiento para su devolución», y publicará «en un diario de amplia circulación nacional, el primer sábado de cada mes, un aviso que enliste las sentencias que ordenan la devolución» y en su página web (art. 106) — la dirección del expediente tiene que estar vigente. CON QUÉ SE DEVUELVE: «En el caso de bienes productivos, al momento de la devolución deberá hacerse entrega del bien afectado junto con sus frutos o productos, previo descuento de los costos y gastos en que haya incurrido el administrador»; «si el administrador introdujo mejoras necesarias para el mantenimiento del bien, el propietario deberá cancelar el valor de las mejoras para obtener su devolución» (art. 106 pars. 1 y 2). Si el bien se enajenó durante el proceso, se devuelven los dineros producto de la venta (art. 107). LAS DEUDAS DEL BIEN IMPRODUCTIVO (expensas, servicios) quedaron suspendidas sin intereses hasta la generación de ingresos o la enajenación y entrega (art. 110).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de la sentencia que ordena la devolución y constancia de su ejecutoria, incluida la consulta",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 106 y 147"
+        },
+        {
+          "n": 2,
+          "name": "Identificación de los bienes o dineros y del derecho del solicitante reconocido en la sentencia",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 106 y 107"
+        },
+        {
+          "n": 3,
+          "name": "Solicitud de entrega con los frutos y productos, y liquidación de costos, gastos y mejoras que el administrador descuenta o cobra",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, art. 106 pars. 1 y 2"
+        },
+        {
+          "n": 4,
+          "name": "Pronunciamiento sobre las obligaciones suspendidas del bien improductivo",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, art. 110"
+        },
+        {
+          "n": 5,
+          "name": "Constancia de presentación antes de los tres o cinco años del art. 109",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 108 y 109"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1708_2014_pr002.html"
+    },
+    {
+      "exact_name": "Demanda de extinción de dominio",
+      "area": "EXTINCION_DOMINIO",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 1708 de 2014, art. 132 (requisitos, modificado por el art. 38 de la Ley 1849 de 2017), art. 123 (conclusión de la fase inicial), art. 116 (etapas), art. 117 (fundamento serio y razonable), art. 118 (fines de la fase inicial), art. 87 (cautelares con la demanda), art. 89 (cautelares previas: seis meses), art. 21 (imprescriptibilidad), art. 16 (causales) y art. 35 (competencia territorial)",
+      "competent_authority": "La presenta el Fiscal General de la Nación o su delegado ante el Juez del Circuito Especializado en Extinción de Dominio del distrito judicial donde se encuentren los bienes (Ley 1708 de 2014, art. 35); si hay bienes en varios distritos, el del distrito con más jueces de extinción de dominio",
+      "term": "NO TIENE CADUCIDAD —«La acción de extinción de dominio es imprescriptible» (art. 21)— PERO SÍ UN RELOJ CUANDO HUBO CAUTELARES ANTICIPADAS: «Estas medidas cautelares no podrán extenderse por más de seis (6) meses, término dentro del cual el Fiscal deberá definir si la acción debe archivarse o si por el contrario resulta procedente presentar demanda de extinción de dominio ante el juez de conocimiento» (art. 89). CUÁNDO SE PRESENTA: «Concluidas las labores de investigación ordenadas durante la fase inicial se proferirá resolución de archivo o demanda de extinción de dominio. En este último evento, en cuaderno aparte el Fiscal también podrá dictar medidas cautelares si no lo ha hecho antes o existen nuevos bienes» (art. 123); si no las había, «al momento de la presentación de la demanda […] el Fiscal, mediante providencia independiente y motivada, ordenará las mismas» (art. 87). REQUISITOS MÍNIMOS: «1. Los fundamentos de hecho y de derecho en que se sustenta la solicitud. 2. La identificación, ubicación y descripción de los bienes que se persiguen. 3. Las pruebas en que se funda. 4. Las medidas cautelares adoptadas hasta el momento sobre los bienes. 5. Identificación y lugar de notificación de los afectados reconocidos en el trámite» (art. 132); la que no los cumpla el juez la devuelve «para que lo subsane en un plazo de cinco (5) días» (art. 141). QUÉ DEBE HABER PROBADO ANTES la fase inicial: identificar y ubicar los bienes, recolectar la prueba de la causal, identificar a los titulares y su lugar de notificación, «acreditar el vínculo entre los posibles titulares de derechos sobre los bienes y las causales» y «recolectar las pruebas que permitan inferir razonablemente la ausencia de buena fe exenta de culpa» (art. 118). «Es un acto de parte» y «la contradicción de la demanda presentada por la Fiscalía tendrá lugar durante la etapa del juicio» (art. 132): la fase inicial es reservada incluso para los afectados (art. 10), salvo en lo relativo a las cautelares.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Fundamentos de hecho y de derecho, con la causal o causales del art. 16 invocadas por cada bien",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 16 y 132 num. 1"
+        },
+        {
+          "n": 2,
+          "name": "Identificación, ubicación y descripción de los bienes perseguidos, con folios y registros",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, art. 132 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "Pruebas en que se funda, incluidas las del vínculo de los titulares con la causal y de la ausencia de buena fe exenta de culpa",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 118 y 132 num. 3"
+        },
+        {
+          "n": 4,
+          "name": "Medidas cautelares adoptadas y providencia independiente que las decreta si no existían",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 87, 123 y 132 num. 4"
+        },
+        {
+          "n": 5,
+          "name": "Identificación y lugar de notificación de los afectados reconocidos",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, art. 132 num. 5"
+        },
+        {
+          "n": 6,
+          "name": "Competencia territorial del juez según la ubicación de los bienes",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, art. 35"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1708_2014_pr003.html"
+    },
+    {
+      "exact_name": "Sentencia de extinción de dominio",
+      "area": "EXTINCION_DOMINIO",
+      "role": "DESPACHO",
+      "legal_basis": "Ley 1708 de 2014, art. 145 (treinta días tras los alegatos; efectos erga omnes), art. 49 (contenido), art. 22 (nulidad ab initio de los negocios sobre los bienes), art. 15 (sin contraprestación), art. 152 (carga dinámica), art. 146 (notificación), art. 147 (apelación en suspensivo y consulta), art. 144 (alegatos de cinco días) y art. 143 (treinta días de pruebas)",
+      "competent_authority": "Juez del Circuito Especializado en Extinción de Dominio del distrito judicial donde se encuentren los bienes (Ley 1708 de 2014, art. 35); si hay bienes en varios distritos, el del distrito con más jueces de extinción de dominio",
+      "term": "TREINTA (30) DÍAS DESDE QUE VENCE EL TRASLADO PARA ALEGAR, RELOJ DEL JUEZ: «Vencido el término del traslado para alegatos, el juez dictará sentencia dentro de los treinta (30) días siguientes declarando la extinción de dominio o su improcedencia. La sentencia que se profiera tendrá efectos erga omnes» (art. 145). Antes corrieron los treinta días de práctica de pruebas (art. 143) y el «traslado por el término común de cinco (5) días para alegar de conclusión» (art. 144). CONTENIDO OBLIGATORIO: «1. Un resumen de los hechos investigados. 2. La identidad o individualización de los bienes objeto del proceso. 3. Indicación de la pretensión formulada por la Fiscalía General de la Nación. 4. Análisis de los alegatos presentados por los sujetos procesales. 5. Los argumentos fácticos y jurídicos de la decisión, haciendo expresa referencia a la valoración de las pruebas practicadas y de la causal invocada. 6. La decisión tomada por el juez. 7. Los recursos que proceden contra ella», precedida de «Administrando justicia en nombre de la República y por autoridad de la ley» (art. 49). EL ESTÁNDAR: «No se podrá dictar sentencia sin que obre en el proceso prueba que conduzca a demostrar la procedencia o improcedencia de la extinción» (art. 148), con la carga dinámica del art. 152: si el afectado no probó su oposición, «el juez podrá declarar extinguido el derecho de dominio con base en los medios de prueba presentados por la Fiscalía». EFECTOS: la extinción es «sin contraprestación ni compensación de naturaleza alguna para el afectado» (art. 15), y «los actos y contratos que versen sobre dichos bienes en ningún caso constituyen justo título y se considerarán nulos ab initio. Lo anterior, sin perjuicio de los derechos de los terceros de buena fe exenta de culpa» (art. 22). NOTIFICACIÓN Y RECURSOS: personal, o por edicto si no fue posible «dentro de los tres (3) días siguientes al envío de la comunicación» (art. 146); «sólo procederá el recurso de apelación […] en el efecto suspensivo», resuelto en treinta días, y «la sentencia de primera instancia que niegue la extinción de dominio y que no sea apelada, se someterá en todo caso a grado jurisdiccional de consulta» (art. 147).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Resumen de los hechos investigados",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, art. 49 num. 1"
+        },
+        {
+          "n": 2,
+          "name": "Identidad o individualización de los bienes objeto del proceso",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, art. 49 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "Pretensión formulada por la Fiscalía y causal o causales invocadas",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 16 y 49 num. 3"
+        },
+        {
+          "n": 4,
+          "name": "Análisis de los alegatos de los sujetos procesales, incluida la buena fe exenta de culpa alegada",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 7, 49 num. 4 y 152"
+        },
+        {
+          "n": 5,
+          "name": "Argumentos fácticos y jurídicos con valoración expresa de las pruebas y de la causal",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 49 num. 5 y 148"
+        },
+        {
+          "n": 6,
+          "name": "Decisión: extinción a favor del Estado o improcedencia, y orden de devolución o de entrega al Frisco",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 15, 49 num. 6 y 106"
+        },
+        {
+          "n": 7,
+          "name": "Recursos que proceden y advertencia de la consulta cuando niega la extinción",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, arts. 49 num. 7 y 147"
+        },
+        {
+          "n": 8,
+          "name": "Fórmula «Administrando justicia en nombre de la República y por autoridad de la ley»",
+          "mandatory": true,
+          "basis": "Ley 1708 de 2014, art. 49"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1708_2014_pr003.html"
+    }
+  ]
+}
