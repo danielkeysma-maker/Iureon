@@ -179,6 +179,13 @@ BRANCHES = [
         'SEGURIDAD_SOCIAL',
         'seguridad_social',
     ),
+    (
+        'actuaciones-responsabilidad-fiscal.json',
+        'responsabilidad-fiscal.ts',
+        'RESPONSABILIDAD_FISCAL_CATALOG',
+        'RESPONSABILIDAD_FISCAL',
+        'responsabilidad_fiscal',
+    ),
 ]
 
 

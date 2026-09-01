@@ -51,6 +51,7 @@ const RAMA: Record<string, string> = {
   CONSTITUCIONAL: 'Constitucional',
   LABORAL: 'Laboral',
   SEGURIDAD_SOCIAL: 'Seguridad social',
+  RESPONSABILIDAD_FISCAL: 'Responsabilidad fiscal',
   DISCIPLINARIO: 'Disciplinario',
   PENAL: 'Penal',
   AMBIENTAL: 'Ambiental',

@@ -341,11 +341,20 @@ después de notificado el poderdante.
 
 ### 7.3 Ramas que faltan enteras, por costo de no tenerlas
 
-1. **Responsabilidad fiscal (Contraloría)** — Ley 610 de 2000 + Ley 1474 de 2011.
-   Normas verificadas. **Reloj del presunto responsable: 10 días** desde la
-   notificación del auto de imputación (art. 50). Y ojo: la caducidad de 5 años
-   del art. 9 es **el reloj de la Contraloría**, no del cliente — el defecto que
-   este proyecto ya conoce, esperando a ser cometido otra vez.
+1. ~~**Responsabilidad fiscal (Contraloría)**~~ **CATALOGADA el 29 de agosto:
+   rama `RESPONSABILIDAD_FISCAL`, 16 fichas (10 LITIGANTE, 6 DESPACHO).** Lo que
+   destapó leerla: el Decreto Ley 403 de 2020 reescribió el procedimiento
+   —caducidad de diez años, segunda instancia de sesenta días, versión libre por
+   escrito, exclusión por costo-beneficio— y **todo eso (arts. 124-148) es
+   INEXEQUIBLE por la C-090 de 2022**. Rige la Ley 610 original: cinco años,
+   diez días, veinte días hábiles, consulta de un mes. Primera pista: el Senado
+   marca los artículos pero no publica la sentencia; la trajo Función Pública.
+   Segunda: C-140/20, que la memoria proponía como la sentencia, versa sobre el
+   Acto Legislativo, no sobre el decreto — se descartó leyendo su resuelve. Y la
+   C-619 de 2002 tachó la «culpa leve»: el estándar es dolo o culpa grave. Queda
+   fuera y declarado en `gaps`: cobro coactivo (vive en ADMINISTRATIVO), la
+   conciliación como requisito de procedibilidad contra el fallo (no verificada)
+   y los beneficios por colaboración (inexequibles).
 2. **Contratos y minutas de derecho privado** — el catálogo tiene exactamente
    tres contratos. Es la mitad no litigiosa del oficio.
 3. **Restitución de tierras y víctimas** (Ley 1448 de 2011, prorrogada por la Ley

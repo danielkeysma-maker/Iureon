@@ -22,6 +22,7 @@ import { INSOLVENCIA_CATALOG } from './insolvencia';
 import { AMBIENTAL_CATALOG } from './ambiental';
 import { FAMILIA_ADMINISTRATIVA_CATALOG } from './familia-administrativa';
 import { SEGURIDAD_SOCIAL_CATALOG } from './seguridad-social';
+import { RESPONSABILIDAD_FISCAL_CATALOG } from './responsabilidad-fiscal';
 
 /**
  * Every branch catalogue the product ships with.
@@ -53,5 +54,6 @@ export const ALL_CATALOGS: BranchCatalog[] = [
   INSOLVENCIA_CATALOG,
   AMBIENTAL_CATALOG,
   FAMILIA_ADMINISTRATIVA_CATALOG,
-  SEGURIDAD_SOCIAL_CATALOG
+  SEGURIDAD_SOCIAL_CATALOG,
+  RESPONSABILIDAD_FISCAL_CATALOG
 ];

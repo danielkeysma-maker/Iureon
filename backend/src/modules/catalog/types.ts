@@ -30,7 +30,8 @@ export type LegalBranch =
   | 'INSOLVENCIA'
   | 'AMBIENTAL'
   | 'FAMILIA_ADMINISTRATIVA'
-  | 'SEGURIDAD_SOCIAL';
+  | 'SEGURIDAD_SOCIAL'
+  | 'RESPONSABILIDAD_FISCAL';
 
 /** Who authors the document. */
 /**

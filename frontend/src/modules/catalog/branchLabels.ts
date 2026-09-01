@@ -43,7 +43,13 @@ export const BRANCH_LABELS: Record<string, string> = {
   // Junta de Calificacion. Meterlas en LABORAL mentiria sobre la autoridad, y
   // en ADMINISTRATIVO mentiria sobre el reloj, porque su control judicial no
   // va al contencioso sino al juez laboral.
-  SEGURIDAD_SOCIAL: 'Seguridad Social (Colpensiones, AFP, ARL & Juntas)'
+  SEGURIDAD_SOCIAL: 'Seguridad Social (Colpensiones, AFP, ARL & Juntas)',
+  // Rama aparte de ADMINISTRATIVO porque el reloj y la autoridad son otros: el
+  // proceso lo adelanta la contraloria con la Ley 610 de 2000, no un juez con
+  // el CPACA, y sus plazos (diez dias de descargos, cinco anos de caducidad)
+  // no se parecen a los del procedimiento administrativo general. Solo el
+  // ultimo tramo —la demanda contra el fallo— vuelve al contencioso.
+  RESPONSABILIDAD_FISCAL: 'Responsabilidad Fiscal (Contralorías)'
   /*
    * Aqui vivia 'PEQUEÑAS_CAUSAS', conservada —decia su comentario— «para que
    * sus tipos de documento heredados sigan alcanzables». Esos tipos heredados
