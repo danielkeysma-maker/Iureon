@@ -31,7 +31,8 @@ export type LegalBranch =
   | 'AMBIENTAL'
   | 'FAMILIA_ADMINISTRATIVA'
   | 'SEGURIDAD_SOCIAL'
-  | 'RESPONSABILIDAD_FISCAL';
+  | 'RESPONSABILIDAD_FISCAL'
+  | 'CONTRATOS';
 
 /** Who authors the document. */
 /**

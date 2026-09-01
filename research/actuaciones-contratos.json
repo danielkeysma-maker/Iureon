@@ -1,0 +1,675 @@
+{
+  "_meta": {
+    "branch": "CONTRATOS",
+    "verified_at": "2026-08-29",
+    "source_of_truth": "Codigo Civil (arts. 1611, 1849-1861, 1923-1926, 1946-1954, 1959-1965, 2053-2069, 2221-2235, 2361-2392, 2469-2486), Codigo de Comercio (arts. 518-524 y 884), Codigo Sustantivo del Trabajo (arts. 22-24, 37-39, 43, 45-47, 61, 64, 76-78, 127-128, 132, con las reformas de la Ley 2466 de 2025 a los arts. 23, 46 y 47), Ley 820 de 2003 (arts. 3-26) y Codigo Penal art. 305, leidos articulo por articulo en secretariasenado.gov.co el 29 de agosto de 2026. LA RAMA EXISTE PORQUE LA MITAD NO LITIGIOSA DEL OFICIO NO TENIA FICHAS: el catalogo sabia demandar el incumplimiento de un contrato y no sabia redactar el contrato. Cada ficha separa lo que la ley impone (imperativo, no pactable) de lo que la minuta decide, y nombra el reloj que la firma dispara o pierde al firmar. Los documentos de ejecucion del contrato que ya existian en otras ramas (preavisos y reajuste del arrendamiento en CIVIL, escrituras de compraventa e hipoteca en NOTARIAL, carta de terminacion y descargos en LABORAL, poder en CIVIL) no se duplican: se remiten.",
+    "gaps": [
+      "CONTRATOS: no se catalogaron todavia comodato, deposito, mandato comercial y agencia, suministro, franquicia, sociedad de hecho, contrato de cuentas en participacion ni los contratos de consumo con la Ley 1480 de 2011. Son la segunda tanda.",
+      "CONTRATOS: la compraventa de INMUEBLE y la hipoteca viven en NOTARIAL como escrituras; aqui solo la compraventa de mueble, que es consensual. La promesa de compraventa vive en CIVIL.",
+      "CONTRATOS: el contrato de trabajo remite al art. 62 del CST para las justas causas sin transcribirlas; su texto completo no se releyo en esta pasada mas alla del encabezado y las primeras causales del empleador.",
+      "CONTRATOS: el art. 72 de la Ley 45 de 1990 (sancion por intereses en exceso) no se localizo en el Senado con el nombre de archivo esperado; el techo penal se cito del art. 305 del Codigo Penal, que si se leyo."
+    ],
+    "unverified": []
+  },
+  "actuaciones": [
+    {
+      "exact_name": "Contrato de arrendamiento de vivienda urbana",
+      "area": "CONTRATOS",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 820 de 2003, art. 3 (contenido mínimo), art. 5 (término supletivo de un año), art. 6 (prórroga), art. 8 num. 3 (copia con firmas en diez días), art. 12 (dirección para notificaciones), art. 15 num. 3 (garantías de servicios públicos en quince días hábiles), art. 16 (prohibición de depósitos y cauciones reales), art. 17 (subarriendo y cesión), art. 18 (tope del canon), art. 20 (reajuste), arts. 22 a 25 (terminación) y art. 14 (mérito ejecutivo)",
+      "competent_authority": "No se radica ante autoridad: es un contrato entre particulares. La autoridad aparece solo si se incumple (juez civil, o laboral en el contrato de trabajo)",
+      "term": "NO HAY PLAZO PARA CELEBRARLO; LO QUE HAY SON RELOJES QUE EL CONTRATO DISPARA O DESACTIVA SEGÚN CÓMO SE ESCRIBA. DURACIÓN: «El término del contrato de arrendamiento será el que acuerden las partes. A falta de estipulación expresa, se entenderá por el término de un (1) año» (art. 5), y «se entenderá prorrogado en iguales condiciones y por el mismo término inicial, siempre que cada una de las partes haya cumplido con las obligaciones a su cargo y, que el arrendatario, se avenga a los reajustes» (art. 6): un contrato de seis meses se renueva de a seis meses; uno de un año, de a un año, y cada renovación exige tres meses de preaviso para salir (arts. 22 num. 8 y 24 num. 5). CONTENIDO MÍNIMO, verbal o escrito: «a) Nombre e identificación de los contratantes; b) Identificación del inmueble; c) Identificación de la parte del inmueble que se arrienda […]; d) Precio y forma de pago; e) Relación de los servicios, cosas o usos conexos y adicionales; f) Término de duración del contrato; g) Designación de la parte contratante a cuyo cargo esté el pago de los servicios públicos» (art. 3). DOS RELOJES CORTOS QUE NACEN CON LA FIRMA: el arrendador «deberá suministrar tanto al arrendatario como al codeudor […] copia del mismo con firmas originales […] en el plazo máximo de diez (10) días contados a partir de la fecha de celebración» (art. 8 num. 3); y si los servicios públicos van a cargo del arrendatario, el arrendador «podrá dar por terminado de pleno derecho el contrato de arrendamiento, si el arrendatario no cumple» con entregar las garantías a favor de las empresas «dentro de un plazo de quince (15) días hábiles contados a partir de la fecha de celebración del contrato» (art. 15 num. 3). LO QUE NO SE PUEDE PACTAR, y se pacta todos los días: «no se podrán exigir depósitos en dinero efectivo u otra clase de cauciones reales […] Tales garantías tampoco podrán estipularse indirectamente ni por interpuesta persona o pactarse en documentos distintos» (art. 16); el canon «no podrá exceder el uno por ciento (1%) del valor comercial del inmueble», y ese valor «no podrá exceder el equivalente a dos (2) veces el avalúo catastral vigente» (art. 18); el reajuste solo cada doce meses y hasta el IPC del año anterior (art. 20). LA DIRECCIÓN ES CLÁUSULA OBLIGATORIA: «arrendadores, arrendatarios, codeudores y fiadores, deberán indicar en el contrato, la dirección en donde recibirán las notificaciones judiciales y extrajudiciales» y «conservará plena validez para todos los efectos legales, hasta tanto no sea informado a la otra parte del contrato, el cambio» por servicio postal autorizado (art. 12) — es la dirección a la que llegará la demanda de restitución. SUBARRIENDO Y CESIÓN solo con «autorización expresa del arrendador» (art. 17). MÉRITO EJECUTIVO: «Las obligaciones de pagar sumas en dinero a cargo de cualquiera de las partes serán exigibles ejecutivamente con base en el contrato» (art. 14). Los preavisos, el reajuste y la consignación tienen ficha propia en CIVIL.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Nombre e identificación de arrendador, arrendatario, codeudores y fiadores",
+          "mandatory": true,
+          "basis": "Ley 820 de 2003, art. 3 lit. a"
+        },
+        {
+          "n": 2,
+          "name": "Identificación del inmueble y, si aplica, de la parte arrendada y de las zonas y servicios compartidos",
+          "mandatory": true,
+          "basis": "Ley 820 de 2003, art. 3 lits. b y c"
+        },
+        {
+          "n": 3,
+          "name": "Precio mensual dentro del tope del 1% del valor comercial, y forma de pago",
+          "mandatory": true,
+          "basis": "Ley 820 de 2003, arts. 3 lit. d y 18"
+        },
+        {
+          "n": 4,
+          "name": "Relación de servicios, cosas y usos conexos y adicionales",
+          "mandatory": true,
+          "basis": "Ley 820 de 2003, art. 3 lit. e"
+        },
+        {
+          "n": 5,
+          "name": "Término de duración y regla de prórroga",
+          "mandatory": true,
+          "basis": "Ley 820 de 2003, arts. 3 lit. f, 5 y 6"
+        },
+        {
+          "n": 6,
+          "name": "Parte a cargo de los servicios públicos y garantías a favor de las empresas",
+          "mandatory": true,
+          "basis": "Ley 820 de 2003, arts. 3 lit. g y 15"
+        },
+        {
+          "n": 7,
+          "name": "Dirección de cada parte para notificaciones judiciales y extrajudiciales",
+          "mandatory": true,
+          "basis": "Ley 820 de 2003, art. 12"
+        },
+        {
+          "n": 8,
+          "name": "Prohibición de subarriendo y cesión sin autorización expresa",
+          "mandatory": true,
+          "basis": "Ley 820 de 2003, art. 17"
+        },
+        {
+          "n": 9,
+          "name": "Cláusula de reajuste anual conforme al IPC y mecanismo de notificación del incremento",
+          "mandatory": true,
+          "basis": "Ley 820 de 2003, art. 20"
+        },
+        {
+          "n": 10,
+          "name": "Ausencia de depósitos en efectivo o cauciones reales",
+          "mandatory": true,
+          "basis": "Ley 820 de 2003, art. 16"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0820_2003.html"
+    },
+    {
+      "exact_name": "Contrato de arrendamiento de local comercial",
+      "area": "CONTRATOS",
+      "role": "LITIGANTE",
+      "legal_basis": "Código de Comercio, art. 518 (derecho a la renovación tras dos años), art. 519 (diferencias por proceso verbal con peritos), art. 520 (desahucio de seis meses), art. 521 (preferencia en locales reconstruidos), art. 522 (indemnización), art. 523 (subarriendo hasta la mitad y cesión) y art. 524 (carácter imperativo)",
+      "competent_authority": "No se radica ante autoridad: es un contrato entre particulares. La autoridad aparece solo si se incumple (juez civil, o laboral en el contrato de trabajo)",
+      "term": "EL RELOJ LO PONE LA LEY Y EL CONTRATO NO PUEDE QUITARLO: «Contra las normas previstas en los artículos 518 a 523, inclusive, de este Capítulo, no producirá efectos ninguna estipulación de las partes» (art. 524). Las cláusulas de renuncia a la renovación, de desahucio corto o de prohibición absoluta de subarriendo se escriben y no valen. DOS AÑOS PARA EL ARRENDATARIO: «El empresario que a título de arrendamiento haya ocupado no menos de dos años consecutivos un inmueble con un mismo establecimiento de comercio, tendrá derecho a la renovación del contrato al vencimiento del mismo», salvo incumplimiento, necesidad del propietario para su habitación o para una empresa sustancialmente distinta, o reconstrucción, reparación o demolición (art. 518). SEIS MESES PARA EL ARRENDADOR: en las causales 2 y 3 «el propietario desahuciará al arrendatario con no menos de seis meses de anticipación a la fecha de terminación del contrato, so pena de que éste se considere renovado o prorrogado en las mismas condiciones y por el mismo término del contrato inicial» (art. 520) — un contrato de cinco años mal desahuciado se renueva por cinco. LAS DIFERENCIAS EN LA RENOVACIÓN (canon, plazo) «se decidirán por el procedimiento verbal, con intervención de peritos» (art. 519): la renovación no es prórroga en las mismas condiciones, es un contrato nuevo cuyo precio fija el mercado. SI SE DESOCUPA PARA OBRAS: preferencia del arrendatario en los locales reconstruidos, con aviso del propietario de sesenta días y respuesta del comerciante de treinta (art. 521); y si el propietario «no da a los locales el destino indicado o no da principio a las obras dentro de los tres meses siguientes a la fecha de la entrega, deberá indemnizar al arrendatario los perjuicios causados», incluidos lucro cesante, gastos de instalación, indemnizaciones de trabajadores despedidos y mejoras, con el inmueble «especialmente afecto al pago» (art. 522). SUBARRIENDO: sin autorización no se puede subarrendar totalmente ni cambiar la destinación, pero «el arrendatario podría subarrendar hasta la mitad los inmuebles» (art. 523); la cesión vale con autorización del arrendador. Lo que sí se puede pactar libremente: canon, reajuste, plazo inicial, destinación, garantías — nada de eso está en los arts. 518 a 523.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de las partes y del inmueble, con la destinación comercial y el establecimiento que lo ocupará",
+          "mandatory": true,
+          "basis": "Código de Comercio, art. 518"
+        },
+        {
+          "n": 2,
+          "name": "Plazo inicial, canon, forma de pago y reajuste",
+          "mandatory": true,
+          "basis": "Código de Comercio, arts. 518 a 524 (materias no imperativas)"
+        },
+        {
+          "n": 3,
+          "name": "Reconocimiento del derecho a la renovación tras dos años y de las causales legales que lo excluyen",
+          "mandatory": true,
+          "basis": "Código de Comercio, art. 518"
+        },
+        {
+          "n": 4,
+          "name": "Regla de desahucio de seis meses para las causales 2 y 3 del art. 518",
+          "mandatory": true,
+          "basis": "Código de Comercio, art. 520"
+        },
+        {
+          "n": 5,
+          "name": "Régimen de subarriendo parcial y de cesión",
+          "mandatory": true,
+          "basis": "Código de Comercio, art. 523"
+        },
+        {
+          "n": 6,
+          "name": "Advertencia de que ninguna cláusula puede contrariar los arts. 518 a 523",
+          "mandatory": true,
+          "basis": "Código de Comercio, art. 524"
+        },
+        {
+          "n": 7,
+          "name": "Direcciones y correos para comunicaciones, incluido el desahucio",
+          "mandatory": false,
+          "basis": "Código de Comercio, art. 520"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/codigo_comercio_pr016.html"
+    },
+    {
+      "exact_name": "Desahucio al arrendatario de local comercial",
+      "area": "CONTRATOS",
+      "role": "LITIGANTE",
+      "legal_basis": "Código de Comercio, art. 520 (desahucio con seis meses de anticipación) en concordancia con el art. 518 nums. 2 y 3 (causales que lo exigen), art. 521 (preferencia y avisos de sesenta y treinta días), art. 522 (indemnización si no se cumple la causal) y art. 524 (carácter imperativo)",
+      "competent_authority": "Se dirige al arrendatario, no a una autoridad. Si el arrendatario no entrega, la restitución se pide al juez civil",
+      "term": "SEIS (6) MESES ANTES DE LA FECHA DE TERMINACIÓN, RELOJ DEL ARRENDADOR, Y PERDERLO RENUEVA EL CONTRATO ENTERO. «En los casos previstos en los ordinales 2o. y 3o. del artículo 518, el propietario desahuciará al arrendatario con no menos de seis meses de anticipación a la fecha de terminación del contrato, so pena de que éste se considere renovado o prorrogado en las mismas condiciones y por el mismo término del contrato inicial» (art. 520). SOLO SIRVE PARA DOS CAUSALES: que el propietario necesite el inmueble «para su propia habitación o para un establecimiento suyo destinado a una empresa sustancialmente distinta de la que tuviere el arrendatario», o que «deba ser reconstruido, o reparado con obras necesarias que no puedan ejecutarse sin la entrega o desocupación, o demolido por su estado de ruina o para la construcción de una obra nueva» (art. 518 nums. 2 y 3). El incumplimiento del arrendatario (num. 1) no se desahucia: se demanda. EXCEPCIÓN: «los casos en que el inmueble sea ocupado o demolido por orden de autoridad competente» (art. 520). LO QUE COMPROMETE EL DESAHUCIO: si el propietario «no da a los locales el destino indicado o no da principio a las obras dentro de los tres meses siguientes a la fecha de la entrega, deberá indemnizar al arrendatario los perjuicios causados, según estimación de peritos», y lo mismo «si en esos mismos casos arrienda los locales, o los utiliza para establecimientos de comercio en que se desarrollen actividades similares» (art. 522); el inmueble queda afecto al pago y la demanda se inscribe. SI SE RECONSTRUYE, el propietario «deberá informar al comerciante, por lo menos con sesenta días de anticipación, la fecha en que pueda entregar los locales, y este deberá dar aviso a aquél, con no menos de treinta días de anterioridad a dicha fecha, si ejercita o no el derecho de preferencia» (art. 521). NO SE PUEDE PACTAR UN DESAHUCIO MÁS CORTO (art. 524).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del contrato, del inmueble y de la fecha de terminación",
+          "mandatory": true,
+          "basis": "Código de Comercio, art. 520"
+        },
+        {
+          "n": 2,
+          "name": "Causal invocada, precisada entre las de los numerales 2 y 3 del art. 518",
+          "mandatory": true,
+          "basis": "Código de Comercio, arts. 518 y 520"
+        },
+        {
+          "n": 3,
+          "name": "Fecha de terminación y constancia de que el aviso se comunica con no menos de seis meses de anticipación",
+          "mandatory": true,
+          "basis": "Código de Comercio, art. 520"
+        },
+        {
+          "n": 4,
+          "name": "Aviso sobre el derecho de preferencia y la fecha estimada de entrega de los locales reconstruidos, cuando aplique",
+          "mandatory": true,
+          "basis": "Código de Comercio, art. 521"
+        },
+        {
+          "n": 5,
+          "name": "Constancia de entrega o envío que pruebe la fecha del desahucio",
+          "mandatory": true,
+          "basis": "Código de Comercio, art. 520"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/codigo_comercio_pr016.html"
+    },
+    {
+      "exact_name": "Contrato de trabajo a término indefinido",
+      "area": "CONTRATOS",
+      "role": "LITIGANTE",
+      "legal_basis": "Código Sustantivo del Trabajo, art. 22 (definición), art. 23 (elementos esenciales; lit. b modificado por el art. 16 de la Ley 2466 de 2025), art. 37 (forma libre), art. 39 (contenido del contrato escrito), art. 43 (cláusulas ineficaces), art. 47 (modificado por el art. 5 de la Ley 2466 de 2025: regla general y preaviso del trabajador), arts. 76 a 78 (período de prueba), arts. 127 y 128 (salario y pagos no salariales), art. 132 (salario integral) y art. 64 (indemnización)",
+      "competent_authority": "No se radica ante autoridad: es un contrato entre particulares. La autoridad aparece solo si se incumple (juez civil, o laboral en el contrato de trabajo); la vigilancia es del Ministerio del Trabajo",
+      "term": "ES LA REGLA GENERAL DESDE LA LEY 2466 DE 2025: «Los trabajadores y las trabajadoras serán vinculados mediante contrato de trabajo a término indefinido. Sin perjuicio de lo anterior, podrán celebrarse contratos de trabajo, ya sea a término fijo, por el tiempo que dure la realización de una obra o labor determinada o para ejecutar un trabajo ocasional» (art. 47). NO EXIGE ESCRITO —«para su validez no requiere forma especial alguna» (art. 37)— pero lo que sí exige escrito se pierde si no se escribe: el período de prueba «debe ser estipulado por escrito, y en caso contrario los servicios se entienden regulados por las normas generales» (art. 77), «no puede exceder de dos (2) meses» y «cuando entre un mismo empleador y trabajador se celebren contratos de trabajo sucesivos, no es válida la estipulación del período de prueba, salvo para el primer contrato» (art. 78); los pagos no salariales solo lo son «cuando las partes hayan dispuesto expresamente que no constituyen salario» (art. 128); y el salario integral exige «la estipulación escrita» y un salario ordinario «superior a diez (10) salarios mínimos legales mensuales» que compense prestaciones y recargos «excepto las vacaciones» (art. 132 num. 2). CONTENIDO DEL ESCRITO: «la identificación y domicilio de las partes; el lugar y la fecha de su celebración; el lugar en donde se haya contratado el trabajador y en donde haya de prestar el servicio; la naturaleza del trabajo; la cuantía de la remuneración, su forma y periodos de pago; la estimación de su valor, en caso de que haya suministros de habitación y alimentación como parte del salario; y la duración del contrato, su desahucio y terminación» (art. 39). EL PREAVISO ES DEL TRABAJADOR Y NO SE PUEDE SANCIONAR: «podrá darlo por terminado mediante preaviso de treinta (30) días calendario para que el empleador provea su reemplazo. En ningún caso se podrá pactar sanción para el empleado que omita el preaviso» (art. 47), y no aplica cuando la causa es imputable al empleador (par.). LO QUE SE ESCRIBE Y NO VALE: «no producen ningún efecto las estipulaciones o condiciones que desmejoren la situación del trabajador en relación con lo que establezcan la legislación del trabajo, los respectivos fallos arbitrales, pactos, convenciones colectivas y reglamentos» (art. 43). LO QUE CUESTA TERMINARLO SIN JUSTA CAUSA: treinta días de salario el primer año y veinte adicionales por cada año siguiente si gana menos de diez salarios mínimos; veinte y quince si gana diez o más (art. 64).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación y domicilio de las partes, lugar y fecha de celebración",
+          "mandatory": true,
+          "basis": "CST, art. 39"
+        },
+        {
+          "n": 2,
+          "name": "Lugar de contratación y lugar de prestación del servicio",
+          "mandatory": true,
+          "basis": "CST, art. 39"
+        },
+        {
+          "n": 3,
+          "name": "Naturaleza del trabajo y cargo",
+          "mandatory": true,
+          "basis": "CST, art. 39"
+        },
+        {
+          "n": 4,
+          "name": "Cuantía de la remuneración, forma y períodos de pago, con estimación de suministros en especie",
+          "mandatory": true,
+          "basis": "CST, arts. 39 y 127"
+        },
+        {
+          "n": 5,
+          "name": "Pactos expresos de pagos no constitutivos de salario, o estipulación escrita de salario integral cuando proceda",
+          "mandatory": true,
+          "basis": "CST, arts. 128 y 132"
+        },
+        {
+          "n": 6,
+          "name": "Período de prueba por escrito, no mayor de dos meses, solo en el primer contrato",
+          "mandatory": true,
+          "basis": "CST, arts. 77 y 78"
+        },
+        {
+          "n": 7,
+          "name": "Duración indefinida, preaviso de treinta días del trabajador sin sanción, y causales de terminación",
+          "mandatory": true,
+          "basis": "CST, arts. 39, 47, 61 y 62"
+        },
+        {
+          "n": 8,
+          "name": "Ausencia de cláusulas que desmejoren la ley, la convención o el reglamento",
+          "mandatory": true,
+          "basis": "CST, art. 43"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/codigo_sustantivo_trabajo_pr001.html"
+    },
+    {
+      "exact_name": "Contrato de trabajo a término fijo",
+      "area": "CONTRATOS",
+      "role": "LITIGANTE",
+      "legal_basis": "Código Sustantivo del Trabajo, art. 46 num. 1 y par. 1, modificado por el art. 6 de la Ley 2466 de 2025 (forma escrita, máximo cuatro años, prórrogas pactada y automática); art. 39 (contenido del escrito); art. 78 (período de prueba de hasta la quinta parte); art. 64 (indemnización por los salarios que falten); art. 47 (regla general del término indefinido)",
+      "competent_authority": "No se radica ante autoridad: es un contrato entre particulares. La autoridad aparece solo si se incumple (juez civil, o laboral en el contrato de trabajo); la vigilancia es del Ministerio del Trabajo",
+      "term": "POR ESCRITO Y POR MÁXIMO CUATRO AÑOS, O ES INDEFINIDO DESDE EL PRIMER DÍA. «Podrán celebrarse contratos de trabajo a término fijo por un término no mayor a cuatro (4) años. El contrato de trabajo a término fijo deberá celebrarse por escrito. Cuando el contrato de trabajo a término fijo no cumpla las condiciones y requisitos previamente mencionados, se entenderá celebrado a término indefinido desde el inicio de la relación laboral» (art. 46 num. 1, Ley 2466 de 2025). EL RELOJ QUE DECIDE SI SE RENUEVA SOLO: «Si con treinta (30) días de antelación al vencimiento del plazo pactado o su prórroga, ninguna de las partes manifestare su intención de terminar el contrato, este se entenderá renovado por un término igual al inicialmente pactado o al de su prórroga» (prórroga automática). El preaviso de no renovación es escrito, treinta días antes del vencimiento, y quien lo deja pasar tiene contrato por otro período. LOS CONTRATOS CORTOS SE ALARGAN SOLOS: «Cuando el contrato de trabajo se celebre por un término inferior a un (1) año, las partes, mediante acuerdo escrito, podrán prorrogar el número de veces que estimen conveniente; sin embargo, después de la cuarta prórroga, el contrato no podrá renovarse por un período inferior a un (1) año», y en la prórroga automática «la cuarta prórroga automática será por un período de un (1) año». TOPE ABSOLUTO: «En ningún caso podrá superarse el término máximo de cuatro (4) años», y para los contratos vigentes el límite «se contabilizará a partir de la entrada en vigencia de esta ley». PERÍODO DE PRUEBA: en los de menos de un año «no podrá ser superior a la quinta parte del término inicialmente pactado […] sin que pueda exceder de dos meses» (art. 78). PRESTACIONES: «el trabajador y la trabajadora tendrán derecho al pago de vacaciones y prestaciones sociales en proporción al tiempo laborado cualquiera que este sea» (art. 46 par. 1). LO QUE CUESTA TERMINARLO ANTES: «el valor de los salarios correspondientes al tiempo que faltare para cumplir el plazo estipulado del contrato» (art. 64) — a mayor plazo pactado, mayor indemnización si se rompe.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Constancia de que el contrato consta por escrito, con identificación de las partes, lugar y fecha",
+          "mandatory": true,
+          "basis": "CST, arts. 39 y 46 num. 1"
+        },
+        {
+          "n": 2,
+          "name": "Término fijo pactado, no mayor de cuatro años, con fecha de inicio y de vencimiento",
+          "mandatory": true,
+          "basis": "CST, art. 46 num. 1"
+        },
+        {
+          "n": 3,
+          "name": "Regla de prórroga: automática a falta de preaviso de treinta días, y cuarta prórroga mínima de un año en contratos menores de un año",
+          "mandatory": true,
+          "basis": "CST, art. 46 num. 1"
+        },
+        {
+          "n": 4,
+          "name": "Naturaleza del trabajo, lugar de prestación y remuneración con forma y períodos de pago",
+          "mandatory": true,
+          "basis": "CST, art. 39"
+        },
+        {
+          "n": 5,
+          "name": "Período de prueba por escrito, no superior a la quinta parte del término ni a dos meses",
+          "mandatory": true,
+          "basis": "CST, arts. 77 y 78"
+        },
+        {
+          "n": 6,
+          "name": "Reconocimiento de vacaciones y prestaciones proporcionales al tiempo laborado",
+          "mandatory": true,
+          "basis": "CST, art. 46 par. 1"
+        },
+        {
+          "n": 7,
+          "name": "Direcciones y correos de las partes para el preaviso de no renovación",
+          "mandatory": false,
+          "basis": "CST, art. 46 num. 1"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/codigo_sustantivo_trabajo_pr001.html"
+    },
+    {
+      "exact_name": "Contrato de trabajo por duración de la obra o labor determinada",
+      "area": "CONTRATOS",
+      "role": "LITIGANTE",
+      "legal_basis": "Código Sustantivo del Trabajo, art. 46 num. 2 y par. 1, modificado por el art. 6 de la Ley 2466 de 2025 (forma escrita y descripción precisa de la obra); art. 45 (modalidades); art. 39 (contenido); art. 61 num. 1 lit. d (terminación por terminación de la obra); art. 64 (indemnización no inferior a quince días)",
+      "competent_authority": "No se radica ante autoridad: es un contrato entre particulares. La autoridad aparece solo si se incumple (juez civil, o laboral en el contrato de trabajo); la vigilancia es del Ministerio del Trabajo",
+      "term": "EL PLAZO ES LA OBRA, Y SI LA OBRA NO ESTÁ DESCRITA CON PRECISIÓN EL CONTRATO ES INDEFINIDO DESDE EL PRIMER DÍA. «Podrán celebrarse contratos de trabajo por el tiempo que dure la realización de una obra o labor determinada. El contrato de trabajo por la duración de obra o labor determinada deberá celebrarse por escrito y en él deberá indicarse, de forma precisa y detallada, la obra o labor contratada que se requiere atender» (art. 46 num. 2, Ley 2466 de 2025). LAS DOS FORMAS DE PERDERLO: «Cuando no se cumplan las condiciones señaladas en el presente artículo, o cuando una vez finalice la obra o labor contratada, el trabajador continúe prestando sus servicios, el contrato se entenderá celebrado a término indefinido desde el inicio de la relación laboral». Un día de trabajo después de terminada la obra convierte todo el vínculo en indefinido, con la indemnización del art. 64 calculada desde el inicio. LA SALIDA QUE LA LEY DEJA: «a menos que se trate de una nueva y diferente obra o labor, caso en el que se podrá continuar el contrato adicionando por escrito el acuerdo en el que se especifique la nueva obra o labor o se liquidará el contrato anterior y se iniciará un nuevo contrato por la nueva necesidad, especificando en cualesquiera de los dos casos de forma clara y precisa la nueva obra o labor contratada». TERMINA «por terminación de la obra o labor contratada» (art. 61 num. 1 lit. d), sin preaviso, pero la terminación tiene que coincidir con el fin real de la obra descrita — no con el fin del contrato comercial del empleador. PRESTACIONES «en proporción al tiempo laborado cualquiera que este sea» (art. 46 par. 1). LO QUE CUESTA ROMPERLO ANTES: los salarios «del lapso determinado por la duración de la obra o la labor contratada, caso en el cual la indemnización no será inferior a quince (15) días» (art. 64).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Constancia escrita e identificación de las partes, lugar y fecha",
+          "mandatory": true,
+          "basis": "CST, arts. 39 y 46 num. 2"
+        },
+        {
+          "n": 2,
+          "name": "Descripción precisa y detallada de la obra o labor contratada, con su alcance y el hito que la termina",
+          "mandatory": true,
+          "basis": "CST, art. 46 num. 2"
+        },
+        {
+          "n": 3,
+          "name": "Naturaleza del trabajo, lugar y remuneración con forma y períodos de pago",
+          "mandatory": true,
+          "basis": "CST, art. 39"
+        },
+        {
+          "n": 4,
+          "name": "Regla de adición escrita para una obra nueva y diferente, o liquidación y nuevo contrato",
+          "mandatory": true,
+          "basis": "CST, art. 46 num. 2"
+        },
+        {
+          "n": 5,
+          "name": "Reconocimiento de vacaciones y prestaciones proporcionales",
+          "mandatory": true,
+          "basis": "CST, art. 46 par. 1"
+        },
+        {
+          "n": 6,
+          "name": "Período de prueba por escrito, si se pacta",
+          "mandatory": false,
+          "basis": "CST, arts. 77 y 78"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/codigo_sustantivo_trabajo_pr001.html"
+    },
+    {
+      "exact_name": "Contrato de prestación de servicios con persona natural",
+      "area": "CONTRATOS",
+      "role": "LITIGANTE",
+      "legal_basis": "Código Civil, art. 2063 (obras inmateriales), art. 2064 (servicios inmateriales de larga serie de actos), art. 2066 (terminación libre o con desahucio; medio período si hay pensiones periódicas), art. 2068 (retiro intempestivo) y art. 2069 (remisión al mandato); Código Sustantivo del Trabajo, art. 23 (elementos del contrato de trabajo; lit. b modificado por el art. 16 de la Ley 2466 de 2025) y art. 24 (presunción de contrato de trabajo)",
+      "competent_authority": "No se radica ante autoridad: es un contrato entre particulares. La autoridad aparece solo si se incumple (juez civil, o laboral en el contrato de trabajo). Si hubo subordinación, el juez competente es el laboral, no el civil",
+      "term": "EL RIESGO DE ESTE CONTRATO NO ESTÁ EN SU TEXTO SINO EN SU EJECUCIÓN: «Se presume que toda relación de trabajo personal está regida por un contrato de trabajo» (CST, art. 24), y basta que en los hechos aparezca «la continuada subordinación o dependencia del trabajador o trabajadora respecto del empleador, que faculta a este para exigirle el cumplimiento de órdenes, en cualquier momento, en cuanto al modo, tiempo o cantidad de trabajo, e imponer reglamentos» (CST, art. 23 num. 1 lit. b) para que la minuta civil ceda ante el contrato de trabajo con salarios, prestaciones e indemnizaciones desde el primer día. Lo que la minuta debe hacer es describir un resultado, no una jornada, y lo que el cliente debe hacer es no dar órdenes. EL RELOJ DE LA TERMINACIÓN: «Cualquiera de las dos partes podrá poner fin al servicio cuando quiera, o con el desahucio que se hubiere estipulado. Si la retribución consiste en pensiones periódicas, cualquiera de las dos partes deberá dar noticia a la otra de su intención de poner fin al contrato, aunque en éste no se haya estipulado desahucio, y la anticipación será de medio período a lo menos» (CC, art. 2066): con honorarios mensuales y sin cláusula de preaviso, la ley pone quince días. SI QUIEN PRESTA EL SERVICIO SE RETIRA INTEMPESTIVAMENTE «o su mala conducta da motivo para despedirle, no podrá reclamar cosa alguna en razón de desahucio o de gastos de viaje» (art. 2068). Los servicios «en que predomina la inteligencia sobre la obra de mano» se rigen por las reglas del precio (art. 2054: a falta de pacto, el que ordinariamente se paga, o el que fijen peritos), de la indemnización por incumplimiento (art. 2056) y de la aprobación (art. 2063), y los que «se sujetan a las reglas del mandato» por estas mismas en lo que no las contraríen (art. 2069).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de las partes y objeto descrito como resultado o entregables, no como cargo ni horario",
+          "mandatory": true,
+          "basis": "CC, arts. 2063 y 2064; CST, art. 23"
+        },
+        {
+          "n": 2,
+          "name": "Honorarios, forma de pago y períodos, con la retención y aportes a cargo del contratista",
+          "mandatory": true,
+          "basis": "CC, art. 2054"
+        },
+        {
+          "n": 3,
+          "name": "Autonomía técnica y administrativa del contratista y ausencia de subordinación",
+          "mandatory": true,
+          "basis": "CST, arts. 23 y 24"
+        },
+        {
+          "n": 4,
+          "name": "Plazo o duración y cláusula de desahucio; a falta de ella, medio período de anticipación",
+          "mandatory": true,
+          "basis": "CC, art. 2066"
+        },
+        {
+          "n": 5,
+          "name": "Consecuencias del retiro intempestivo o de la mala conducta",
+          "mandatory": true,
+          "basis": "CC, art. 2068"
+        },
+        {
+          "n": 6,
+          "name": "Afiliación del contratista al sistema de seguridad social como independiente",
+          "mandatory": false,
+          "basis": "CST, art. 23"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr064.html"
+    },
+    {
+      "exact_name": "Contrato de obra a precio único para construcción",
+      "area": "CONTRATOS",
+      "role": "LITIGANTE",
+      "legal_basis": "Código Civil, art. 2053 (naturaleza según quién pone la materia), art. 2054 (precio a falta de pacto), art. 2056 (indemnización y desistimiento del que encargó la obra), art. 2057 (riesgo de la materia) y art. 2060 (reglas de la construcción de edificios por precio único: sin aumento de precio, vicios del suelo, responsabilidad decenal)",
+      "competent_authority": "No se radica ante autoridad: es un contrato entre particulares. La autoridad aparece solo si se incumple (juez civil, o laboral en el contrato de trabajo)",
+      "term": "EL RELOJ LARGO ES DE DIEZ AÑOS Y NO SE PACTA: «Si el edificio perece o amenaza ruina, en todo o parte, en los diez años subsiguientes a su entrega, por vicio de la construcción, o por vicio del suelo que el empresario o las personas empleadas por él hayan debido conocer en razón de su oficio, o por vicio de los materiales, será responsable el empresario» (art. 2060 num. 3). EL PRECIO ES ÚNICO Y CERRADO: «El empresario no podrá pedir aumento de precio, a pretexto de haber encarecido los jornales o los materiales, o de haberse hecho agregaciones o modificaciones en el plan primitivo; salvo que se haya ajustado un precio particular por dichas agregaciones o modificaciones» (num. 1) — cada cambio de alcance necesita su precio escrito o no se cobra. LO IMPREVISTO SE AUTORIZA ANTES, NO SE FACTURA DESPUÉS: «Si circunstancias desconocidas, como un vicio oculto del suelo, ocasionaren costos que no pudieron preverse, deberá el empresario hacerse autorizar para ellos por el dueño; y si éste rehusa, podrá ocurrir al juez […] para que decida si ha debido o no preverse el recargo de obra, y fije el aumento de precio» (num. 2). QUIÉN PONE LA MATERIA DECIDE QUÉ CONTRATO ES: «Si el artífice suministra la materia para la confección de una obra material, el contrato es de venta; pero no se perfecciona sino por la aprobación del que ordenó la obra […] Si la materia es suministrada por la persona que encargó la obra, el contrato es de arrendamiento» (art. 2053), y en la venta «el peligro de la cosa no pertenece al que ordenó la obra sino desde su aprobación». EL DUEÑO PUEDE DESISTIR PAGANDO: «el que encargó la obra, aún en el caso de haberse estipulado un precio único y total por ella, podrá hacerla cesar, reembolsando al artífice todos los costos, y dándole lo que valga el trabajo hecho, y lo que hubiera podido ganar en la obra» (art. 2056). SIN PRECIO PACTADO «se presumirá que las partes han convenido en el que ordinariamente se paga por la misma especie de obra, y a falta de éste, por el que se estimare equitativo a juicio de peritos» (art. 2054).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de las partes, del inmueble y de la obra con planos, especificaciones y alcance",
+          "mandatory": true,
+          "basis": "CC, arts. 2053 y 2060"
+        },
+        {
+          "n": 2,
+          "name": "Precio único y total, forma de pago por hitos y regla de que no admite aumento salvo precio particular por modificaciones",
+          "mandatory": true,
+          "basis": "CC, art. 2060 num. 1"
+        },
+        {
+          "n": 3,
+          "name": "Procedimiento de autorización previa para costos imprevistos",
+          "mandatory": true,
+          "basis": "CC, art. 2060 num. 2"
+        },
+        {
+          "n": 4,
+          "name": "Quién suministra la materia y en qué momento se transfiere el riesgo",
+          "mandatory": true,
+          "basis": "CC, arts. 2053 y 2057"
+        },
+        {
+          "n": 5,
+          "name": "Plazo de entrega, acta de recibo y aprobación de la obra",
+          "mandatory": true,
+          "basis": "CC, arts. 2053 y 2057"
+        },
+        {
+          "n": 6,
+          "name": "Responsabilidad decenal por ruina y garantías o pólizas que la respalden",
+          "mandatory": true,
+          "basis": "CC, art. 2060 num. 3"
+        },
+        {
+          "n": 7,
+          "name": "Facultad del dueño de hacer cesar la obra y liquidación que ello impone",
+          "mandatory": true,
+          "basis": "CC, art. 2056"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr063.html"
+    },
+    {
+      "exact_name": "Contrato de mutuo de dinero con intereses",
+      "area": "CONTRATOS",
+      "role": "LITIGANTE",
+      "legal_basis": "Código Civil, art. 2221 (definición), art. 2222 (se perfecciona por la tradición), art. 2225 (diez días si no hay plazo), art. 2229 (pago anticipado salvo intereses; aparte condicionalmente exequible), arts. 2230 a 2232 (intereses convencionales, exceso y interés legal del 6%), art. 2235 (anatocismo); Código de Comercio, art. 884 (modificado por el art. 111 de la Ley 510 de 1999: interés bancario corriente, moratorio de una y media veces y pérdida de todos los intereses por exceso); Código Penal, art. 305 (usura)",
+      "competent_authority": "No se radica ante autoridad: es un contrato entre particulares. La autoridad aparece solo si se incumple (juez civil, o laboral en el contrato de trabajo)",
+      "term": "EL CONTRATO NO NACE CON LA FIRMA SINO CON LA ENTREGA: «No se perfecciona el contrato de mutuo sino por la tradición, y la tradición transfiere el dominio» (CC, art. 2222) — la minuta firmada sin desembolso no obliga a nada, y el desembolso sin minuta obliga igual. SIN PLAZO, DIEZ DÍAS: «Si no se hubiere fijado término para el pago no habrá derecho de exigirlo dentro de los diez días subsiguientes a la entrega» (art. 2225). EL TECHO DE LOS INTERESES DEPENDE DE SI ES CIVIL O MERCANTIL, Y LA SANCIÓN ES DISTINTA. Civil: «El interés convencional que exceda de una mitad al que se probare haber sido interés corriente al tiempo de la convención, será reducido por el juez a dicho interés corriente, si lo solicitare el deudor» (art. 2231); si se pactan intereses sin cuota «se entenderán fijados los intereses legales», que son «un seis por ciento anual» (art. 2232). Mercantil: sin pacto rige «el bancario corriente; si las partes no han estipulado el interés moratorio, será equivalente a una y media veces del bancario corriente y en cuanto sobrepase cualquiera de estos montos el acreedor perderá todos los intereses» (C.Co., art. 884), probado «con certificado expedido por la Superintendencia». Y ARRIBA DE ESO ES DELITO: recibir o cobrar «utilidad o ventaja que exceda en la mitad del interés bancario corriente que para el período correspondiente estén cobrando los bancos» es usura, con prisión de 32 a 90 meses (CP, art. 305). ANATOCISMO: «Se prohibe estipular intereses de intereses» (CC, art. 2235); en materia mercantil solo desde la demanda o por acuerdo posterior al vencimiento sobre intereses de un año (C.Co., art. 886). PAGO ANTICIPADO: «Podrá el mutuario pagar toda la suma prestada, aún antes del término estipulado, salvo que se hayan pactado intereses» (art. 2229) — cláusula que conviene regular expresamente. Si el mutuante da carta de pago por el capital sin reservar los intereses, «se presumirán pagados» (art. 2234).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de mutuante y mutuario y constancia de la entrega del dinero, con fecha y medio",
+          "mandatory": true,
+          "basis": "CC, arts. 2221 y 2222"
+        },
+        {
+          "n": 2,
+          "name": "Suma prestada, plazo y forma de restitución",
+          "mandatory": true,
+          "basis": "CC, arts. 2224 y 2225"
+        },
+        {
+          "n": 3,
+          "name": "Tasa de interés remuneratorio y moratorio, dentro del límite legal aplicable según sea civil o mercantil",
+          "mandatory": true,
+          "basis": "CC, arts. 2231 y 2232; C.Co., art. 884; CP, art. 305"
+        },
+        {
+          "n": 4,
+          "name": "Regla sobre pago anticipado y sobre imputación de pagos",
+          "mandatory": true,
+          "basis": "CC, arts. 2229 y 2234"
+        },
+        {
+          "n": 5,
+          "name": "Prohibición de capitalizar intereses, o su regulación mercantil",
+          "mandatory": true,
+          "basis": "CC, art. 2235; C.Co., art. 886"
+        },
+        {
+          "n": 6,
+          "name": "Garantías del crédito (pagaré, fianza, hipoteca) y cláusula aceleratoria",
+          "mandatory": false,
+          "basis": "CC, art. 2221"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr069.html"
+    },
+    {
+      "exact_name": "Contrato de cesión de crédito y notificación al deudor cedido",
+      "area": "CONTRATOS",
+      "role": "LITIGANTE",
+      "legal_basis": "Código Civil, art. 1959 (subrogado por el art. 33 de la Ley 57 de 1887: la cesión se hace por la entrega del título), art. 1960 (sin notificación o aceptación no produce efecto contra el deudor ni terceros), art. 1961 (forma de la notificación), art. 1962 (aceptación), art. 1963 (efectos de la falta de notificación), art. 1964 (comprende fianzas, privilegios e hipotecas) y art. 1965 (responsabilidad del cedente)",
+      "competent_authority": "Ninguna: la notificación la hace el cesionario al deudor. Si el crédito consta en título valor, la transferencia se rige por el endoso del Código de Comercio y no por estas reglas",
+      "term": "LA CESIÓN VALE ENTRE CEDENTE Y CESIONARIO DESDE LA ENTREGA DEL TÍTULO, Y CONTRA EL DEUDOR SOLO DESDE QUE SE LE NOTIFICA — Y EN MEDIO EL DEUDOR PUEDE PAGARLE AL QUE YA NO ES SU ACREEDOR. «La cesión de un crédito, a cualquier título que se haga, no tendrá efecto entre el cedente y el cesionario sino en virtud de la entrega del título. Pero si el crédito que se cede no consta en documento, la cesión puede hacerse otorgándose uno por el cedente al cesionario» (art. 1959). «La cesión no produce efecto contra el deudor ni contra terceros, mientras no ha sido notificada por el cesionario al deudor o aceptada por éste» (art. 1960). LA FORMA DE LA NOTIFICACIÓN NO ES UNA CARTA CUALQUIERA: «debe hacerse con exhibición del título, que llevará anotado el traspaso del derecho con la designación del cesionario y bajo la firma del cedente» (art. 1961); la aceptación «consistirá en un hecho que la suponga, como la litis contestación con el cesionario, un principio de pago al cesionario» (art. 1962). LO QUE PASA MIENTRAS NO SE NOTIFICA: «podrá el deudor pagar al cedente, o embargarse el crédito por acreedores del cedente; y en general, se considerará existir el crédito en manos del cedente respecto del deudor y terceros» (art. 1963). QUÉ SE LLEVA EL CESIONARIO: «sus fianzas, privilegios e hipotecas; pero no traspasa las excepciones personales del cedente» (art. 1964). DE QUÉ RESPONDE EL CEDENTE: «se hace responsable de su existencia al tiempo de la cesión, esto es, de que verdaderamente le pertenecía en ese tiempo; pero no se hace responsable de la solvencia del deudor, si no se compromete expresamente a ello» (art. 1965).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de cedente, cesionario y deudor cedido, y del crédito con su título, monto y vencimiento",
+          "mandatory": true,
+          "basis": "CC, art. 1959"
+        },
+        {
+          "n": 2,
+          "name": "Precio o causa de la cesión y constancia de la entrega del título",
+          "mandatory": true,
+          "basis": "CC, art. 1959"
+        },
+        {
+          "n": 3,
+          "name": "Nota de traspaso sobre el título, con designación del cesionario y firma del cedente",
+          "mandatory": true,
+          "basis": "CC, art. 1961"
+        },
+        {
+          "n": 4,
+          "name": "Notificación al deudor con exhibición del título, o constancia de su aceptación",
+          "mandatory": true,
+          "basis": "CC, arts. 1960 a 1962"
+        },
+        {
+          "n": 5,
+          "name": "Garantías, privilegios e hipotecas que acceden al crédito cedido",
+          "mandatory": true,
+          "basis": "CC, art. 1964"
+        },
+        {
+          "n": 6,
+          "name": "Alcance de la responsabilidad del cedente: existencia del crédito y, solo si se pacta, solvencia del deudor",
+          "mandatory": true,
+          "basis": "CC, art. 1965"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr060.html"
+    },
+    {
+      "exact_name": "Contrato de transacción",
+      "area": "CONTRATOS",
+      "role": "LITIGANTE",
+      "legal_basis": "Código Civil, art. 2469 (definición), art. 2470 (capacidad de disponer), art. 2471 (poder especial con especificación de bienes, derechos y acciones), art. 2473 (no sobre estado civil), art. 2474 (alimentos futuros solo con aprobación judicial), arts. 2476 y 2478 (nulidad por dolo, violencia, títulos falsos o litigio ya fallado), art. 2483 (efecto de cosa juzgada), art. 2484 (efecto relativo), art. 2485 (la renuncia general se limita al objeto) y art. 2486 (cláusula penal)",
+      "competent_authority": "Ninguna: es un contrato. Si el litigio ya está en curso, se presenta al juez para que lo termine; la ficha procesal de la transacción judicial vive en CIVIL",
+      "term": "NO TIENE PLAZO, PERO TIENE UNA DEFINICIÓN QUE EXCLUYE LO QUE MÁS SE FIRMA CON ESE NOMBRE: «La transacción es un contrato en que las partes terminan extrajudicialmente un litigio pendiente o precaven un litigio eventual. No es transacción el acto que sólo consiste en la renuncia de un derecho que no se disputa» (art. 2469). Sin concesiones recíprocas sobre una disputa real no hay transacción, y sin transacción no hay cosa juzgada. EL EFECTO QUE LA HACE VALIOSA: «produce el efecto de cosa juzgada en última instancia; pero podrá impetrarse la declaración de nulidad o la rescisión» (art. 2483), y «no surte efecto sino entre los contratantes» (art. 2484). QUIÉN PUEDE FIRMARLA: «No puede transigir sino la persona capaz de disponer de los objetos comprendidos en la transacción» (art. 2470), y «Todo mandatario necesita de poder especial para transigir. En este poder se especificarán los bienes, derechos y acciones sobre que se quiera transigir» (art. 2471) — el poder general del proceso no alcanza. SOBRE QUÉ NO: «No se puede transigir sobre el estado civil de las personas» (art. 2473); la de «alimentos futuros de las personas a quienes se deba por ley, no valdrá sin aprobación judicial» (art. 2474); la acción civil del delito sí, «sin perjuicio de la acción criminal» (art. 2472). CUÁNDO ES NULA: «obtenida por títulos falsificados, y en general por dolo o violencia» (art. 2476), o «si, al tiempo de celebrarse, estuviere ya terminado el litigio por sentencia pasada en autoridad de cosa juzgada, y de que las partes o alguna de ellas no haya tenido conocimiento» (art. 2478). LA RENUNCIA GENERAL NO ES GENERAL: «Si la transacción recae sobre uno o más objetos específicos, la renuncia general de todo derecho, acción o pretensión, deberá sólo entenderse de los derechos, acciones o pretensiones relativas al objeto u objetos sobre que se transige» (art. 2485). CLÁUSULA PENAL: «habrá lugar a la pena, sin perjuicio de llevarse a efecto la transacción en todas sus partes» (art. 2486).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de las partes y acreditación de su capacidad de disponer, con poder especial si actúan por apoderado",
+          "mandatory": true,
+          "basis": "CC, arts. 2470 y 2471"
+        },
+        {
+          "n": 2,
+          "name": "Descripción del litigio pendiente o eventual: hechos, pretensiones y proceso si existe",
+          "mandatory": true,
+          "basis": "CC, art. 2469"
+        },
+        {
+          "n": 3,
+          "name": "Concesiones recíprocas de cada parte",
+          "mandatory": true,
+          "basis": "CC, art. 2469"
+        },
+        {
+          "n": 4,
+          "name": "Objeto preciso sobre el que recae, para delimitar el alcance de la renuncia",
+          "mandatory": true,
+          "basis": "CC, art. 2485"
+        },
+        {
+          "n": 5,
+          "name": "Declaración de que no versa sobre estado civil ni alimentos futuros sin aprobación judicial",
+          "mandatory": true,
+          "basis": "CC, arts. 2473 y 2474"
+        },
+        {
+          "n": 6,
+          "name": "Cláusula penal por incumplimiento, sin perjuicio del cumplimiento",
+          "mandatory": false,
+          "basis": "CC, art. 2486"
+        },
+        {
+          "n": 7,
+          "name": "Efecto de cosa juzgada y, si hay proceso, compromiso de presentarla al juez",
+          "mandatory": true,
+          "basis": "CC, art. 2483"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr076.html"
+    },
+    {
+      "exact_name": "Contrato de fianza",
+      "area": "CONTRATOS",
+      "role": "LITIGANTE",
+      "legal_basis": "Código Civil, art. 2361 (obligación accesoria), art. 2362 (convencional, legal o judicial), art. 2383 (beneficio de excusión), art. 2384 (requisitos para gozar de él: no renuncia, no solidaridad, oponerlo al ser requerido) y art. 2392 (pluralidad de fiadores, beneficio de división y limitación a una suma)",
+      "competent_authority": "No se radica ante autoridad: es un contrato entre particulares. La autoridad aparece solo si se incumple (juez civil, o laboral en el contrato de trabajo)",
+      "term": "NO TIENE PLAZO PROPIO: SIGUE EL DE LA OBLIGACIÓN QUE GARANTIZA. «La fianza es una obligación accesoria, en virtud de la cual una o más personas responden de una obligación ajena, comprometiéndose para con el acreedor a cumplirla en todo o parte, si el deudor principal no la cumple» (art. 2361). LO QUE DECIDE CUÁNTO VALE LA FIANZA ES SI EL FIADOR CONSERVA O RENUNCIA DOS BENEFICIOS. EXCUSIÓN: «El fiador reconvenido goza del beneficio de excusión, en virtud del cual podrá exigir que antes de proceder contra él se persiga la deuda en los bienes de deudor principal, y en las hipotecas o prendas prestadas por éste» (art. 2383), pero solo si «no se haya renunciado expresamente», «el fiador no se haya obligado como deudor solidario», «la fianza no haya sido ordenada por el juez» y «se oponga el beneficio luego que sea requerido el fiador» (art. 2384) — la cláusula «fiador solidario» que trae toda minuta bancaria lo borra. DIVISIÓN: «Si hubiere dos o más fiadores de una misma deuda que no se hayan obligado solidariamente al pago, se entenderá dividida la deuda entre ellos, por partes iguales, y no podrá el acreedor exigir a ninguno sino la cuota que le quepa. La insolvencia de un fiador gravará a los otros» (art. 2392). LÍMITE: «El fiador que inequívocamente haya limitado su responsabilidad a una suma o cuota determinada, no será responsable sino hasta concurrencia de dicha suma o cuota» (art. 2392) — sin ese tope, responde por el total. SUSTITUCIÓN: «El obligado a rendir una fianza no puede sustituir a ella una hipoteca o prenda, o recíprocamente, contra la voluntad del acreedor» (art. 2363). Quien redacta para el fiador escribe el tope y calla la solidaridad; quien redacta para el acreedor escribe la solidaridad y la renuncia expresa a la excusión.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de acreedor, deudor principal y fiador, y de la obligación afianzada",
+          "mandatory": true,
+          "basis": "CC, art. 2361"
+        },
+        {
+          "n": 2,
+          "name": "Alcance de la fianza: total o parcial, y suma o cuota máxima si se limita",
+          "mandatory": true,
+          "basis": "CC, arts. 2361 y 2392"
+        },
+        {
+          "n": 3,
+          "name": "Estipulación expresa sobre solidaridad y sobre renuncia o conservación del beneficio de excusión",
+          "mandatory": true,
+          "basis": "CC, arts. 2383 y 2384"
+        },
+        {
+          "n": 4,
+          "name": "Regla de división entre varios fiadores",
+          "mandatory": true,
+          "basis": "CC, art. 2392"
+        },
+        {
+          "n": 5,
+          "name": "Vigencia de la fianza atada a la obligación principal y a sus prórrogas",
+          "mandatory": true,
+          "basis": "CC, art. 2361"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr074.html"
+    },
+    {
+      "exact_name": "Contrato de compraventa de bien mueble",
+      "area": "CONTRATOS",
+      "role": "LITIGANTE",
+      "legal_basis": "Código Civil, art. 1849 (definición), art. 1857 (consensual salvo inmuebles, servidumbres y sucesiones), art. 1858 (retractación pactada), arts. 1859 a 1861 (arras de retractación y confirmatorias; dos meses del art. 1860), art. 1923 (acción redhibitoria: seis meses muebles, un año raíces, desde la entrega real), art. 1926 (rebaja del precio: un año muebles, dieciocho meses raíces), arts. 1946, 1947 y 1954 (lesión enorme, cuatro años desde el contrato)",
+      "competent_authority": "No se radica ante autoridad: es un contrato entre particulares. La autoridad aparece solo si se incumple (juez civil, o laboral en el contrato de trabajo). Vehículos: el traspaso se inscribe además ante el organismo de tránsito, ficha en TRANSITO",
+      "term": "SE PERFECCIONA CON EL ACUERDO, Y DESDE AHÍ CORREN RELOJES CORTOS QUE EL COMPRADOR CASI NUNCA CONOCE. «La venta se reputa perfecta desde que las partes han convenido en la cosa y en el precio, salvo las excepciones siguientes: La venta de los bienes raíces y servidumbres y la de una sucesión hereditaria, no se reputan perfectas ante la ley, mientras no se ha otorgado escritura pública» (art. 1857): para el mueble el escrito es prueba, no solemnidad. VICIOS OCULTOS: «La acción redhibitoria durará seis meses respecto de las cosas muebles y un año respecto de los bienes raíces […] El tiempo se contará desde la entrega real» (art. 1923); prescrita esa, queda la rebaja del precio, que «prescribe en un año para los bienes muebles y en diez y ocho meses para los bienes raíces» (art. 1926). Las partes pueden ampliar o restringir esos plazos en el contrato (art. 1923), y esa es la cláusula que vale escribir. ARRAS: si se dan «en prenda de la celebración o ejecución del contrato, se entiende que cada uno de los contratantes podrá retractarse; el que ha dado las arras, perdiéndoles, y el que las ha recibido, restituyéndolas dobladas» (art. 1859), y sin plazo pactado «no habrá lugar a la retractación después de los dos meses subsiguientes a la convención» (art. 1860); si se dan «como parte del precio, o como señal de quedar convenidos los contratantes, quedará perfecta la venta» (art. 1861) — la palabra que se use decide si hay derecho a arrepentirse. LESIÓN ENORME: «El vendedor sufre lesión enorme cuando el precio que recibe es inferior a la mitad del justo precio de la cosa que vende; y el comprador a su vez […] cuando el justo precio de la cosa que compra es inferior a la mitad del precio que paga» (art. 1947), y la acción «expira en cuatro años, contados desde la fecha de contrato» (art. 1954). RETRACTACIÓN PACTADA: si se estipula que la venta no se repute perfecta hasta la escritura o el documento, «podrá cualquiera de las partes retractarse mientras no se otorgue la escritura o no haya principiado la entrega» (art. 1858).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación de vendedor y comprador y de la cosa vendida, con sus señas, serie o placa",
+          "mandatory": true,
+          "basis": "CC, arts. 1849 y 1857"
+        },
+        {
+          "n": 2,
+          "name": "Precio, forma de pago y momento de la entrega real",
+          "mandatory": true,
+          "basis": "CC, arts. 1849 y 1923"
+        },
+        {
+          "n": 3,
+          "name": "Naturaleza de las arras si se pactan: de retractación o confirmatorias, y su plazo",
+          "mandatory": true,
+          "basis": "CC, arts. 1859 a 1861"
+        },
+        {
+          "n": 4,
+          "name": "Declaración sobre el estado de la cosa, garantía por vicios ocultos y plazo pactado para reclamarlos",
+          "mandatory": true,
+          "basis": "CC, art. 1923"
+        },
+        {
+          "n": 5,
+          "name": "Saneamiento por evicción y declaración de que la cosa está libre de gravámenes y embargos",
+          "mandatory": true,
+          "basis": "CC, art. 1849"
+        },
+        {
+          "n": 6,
+          "name": "Trámites de traspaso o registro cuando la cosa lo exija (vehículos, naves, aeronaves)",
+          "mandatory": false,
+          "basis": "CC, art. 1857"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr059.html"
+    }
+  ]
+}

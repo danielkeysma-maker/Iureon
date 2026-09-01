@@ -355,8 +355,19 @@ después de notificado el poderdante.
    fuera y declarado en `gaps`: cobro coactivo (vive en ADMINISTRATIVO), la
    conciliación como requisito de procedibilidad contra el fallo (no verificada)
    y los beneficios por colaboración (inexequibles).
-2. **Contratos y minutas de derecho privado** — el catálogo tiene exactamente
-   tres contratos. Es la mitad no litigiosa del oficio.
+2. ~~**Contratos y minutas de derecho privado**~~ **CATALOGADA el 29 de agosto:
+   rama `CONTRATOS`, 13 fichas.** Arrendamiento de vivienda (Ley 820) y de local
+   comercial (C.Co. 518-524, imperativos por el 524) con su desahucio de seis
+   meses; los tres contratos de trabajo con la Ley 2466 de 2025 ya leída en el
+   CST (fijo máximo cuatro años y prórroga automática a los treinta días; obra o
+   labor «precisa y detallada» o es indefinido desde el día uno; indefinido como
+   regla general con preaviso del trabajador sin sanción); prestación de
+   servicios con la presunción del art. 24; obra a precio único con la decenal;
+   mutuo con los tres techos de interés (civil, mercantil, penal); cesión de
+   crédito; transacción; fianza; compraventa de mueble con sus relojes cortos.
+   Cada ficha separa lo imperativo de lo pactable. Segunda tanda declarada en
+   `gaps`: comodato, depósito, mandato comercial, agencia, suministro,
+   franquicia, consumo (Ley 1480).
 3. **Restitución de tierras y víctimas** (Ley 1448 de 2011, prorrogada por la Ley
    2078 de 2021) — jurisdicción propia. *Vigencia no reverificada.*
 4. **Extinción de dominio** (Ley 1708 de 2014). *Articulado no verificado.*

@@ -49,7 +49,11 @@ export const BRANCH_LABELS: Record<string, string> = {
   // el CPACA, y sus plazos (diez dias de descargos, cinco anos de caducidad)
   // no se parecen a los del procedimiento administrativo general. Solo el
   // ultimo tramo —la demanda contra el fallo— vuelve al contencioso.
-  RESPONSABILIDAD_FISCAL: 'Responsabilidad Fiscal (Contralorías)'
+  RESPONSABILIDAD_FISCAL: 'Responsabilidad Fiscal (Contralorías)',
+  // La mitad no litigiosa del oficio. Distinta de CONTRATACION, que es
+  // contratacion ESTATAL: aqui no hay entidad publica ni Ley 80, hay dos
+  // particulares y el Codigo Civil, el de Comercio o el Sustantivo del Trabajo.
+  CONTRATOS: 'Contratos & Minutas de Derecho Privado'
   /*
    * Aqui vivia 'PEQUEÑAS_CAUSAS', conservada —decia su comentario— «para que
    * sus tipos de documento heredados sigan alcanzables». Esos tipos heredados

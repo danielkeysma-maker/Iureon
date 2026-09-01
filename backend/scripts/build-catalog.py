@@ -186,6 +186,13 @@ BRANCHES = [
         'RESPONSABILIDAD_FISCAL',
         'responsabilidad_fiscal',
     ),
+    (
+        'actuaciones-contratos.json',
+        'contratos.ts',
+        'CONTRATOS_CATALOG',
+        'CONTRATOS',
+        'contratos',
+    ),
 ]
 
 
