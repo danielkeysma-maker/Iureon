@@ -514,9 +514,10 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft, onPrivaci
             </ul>
 
             <p className="mt-3 border-t border-line-200 pt-2.5 text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
-              Se tachan solas con lo que se va diciendo, leyendo el transcrito. Es una ayuda de
-              memoria, no una comprobación: que una quede tachada no garantiza que la respuesta
-              sirva, y que quede sin tachar no significa que no se habló del tema.
+              Se tachan solas una vez transcrita la conversación, leyendo el transcrito — no en
+              vivo mientras se graba. Es una ayuda de memoria, no una comprobación: que una quede
+              tachada no garantiza que la respuesta sirva, y que quede sin tachar no significa que
+              no se habló del tema.
             </p>
           </Paso>
 
