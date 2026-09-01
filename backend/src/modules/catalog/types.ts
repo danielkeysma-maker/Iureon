@@ -34,7 +34,8 @@ export type LegalBranch =
   | 'RESPONSABILIDAD_FISCAL'
   | 'CONTRATOS'
   | 'EXTINCION_DOMINIO'
-  | 'RESTITUCION_TIERRAS';
+  | 'RESTITUCION_TIERRAS'
+  | 'URBANISMO';
 
 /** Who authors the document. */
 /**

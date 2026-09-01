@@ -207,6 +207,13 @@ BRANCHES = [
         'RESTITUCION_TIERRAS',
         'restitucion_tierras',
     ),
+    (
+        'actuaciones-urbanismo.json',
+        'urbanismo.ts',
+        'URBANISMO_CATALOG',
+        'URBANISMO',
+        'urbanismo',
+    ),
 ]
 
 

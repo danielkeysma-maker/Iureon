@@ -62,7 +62,11 @@ export const BRANCH_LABELS: Record<string, string> = {
   // Jurisdiccion transicional propia: jueces y magistrados especializados,
   // requisito de procedibilidad ante la URT, carga de la prueba invertida y
   // unica instancia. Vigente hasta el 10 de junio de 2031 (Ley 2078 de 2021).
-  RESTITUCION_TIERRAS: 'Restitución de Tierras (Ley 1448)'
+  RESTITUCION_TIERRAS: 'Restitución de Tierras (Ley 1448)',
+  // Un particular que ejerce funcion publica (el curador), plazo de 45 dias
+  // habiles con silencio POSITIVO y relojes del solicitante que hacen perder la
+  // licencia sin que nadie la niegue. El sancionatorio es policivo desde 2017.
+  URBANISMO: 'Urbanismo & Licencias (Curadurías)'
   /*
    * Aqui vivia 'PEQUEÑAS_CAUSAS', conservada —decia su comentario— «para que
    * sus tipos de documento heredados sigan alcanzables». Esos tipos heredados

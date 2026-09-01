@@ -411,8 +411,23 @@ después de notificado el poderdante.
    los 2 años con la mitad), prescripción de la sanción (89: nunca menos de 5
    años desde la ejecutoria; se interrumpe con la aprehensión). El 38A
    (vigilancia electrónica autónoma) está DEROGADO por la Ley 1709.
-6. **Urbanismo y licencias** (curadores urbanos, Decreto 1077 de 2015). *No
-   verificado.*
+6. ~~**Urbanismo y licencias**~~ **CATALOGADA el 29 de agosto: rama
+   `URBANISMO`, 6 fichas (5 LITIGANTE, 1 DESPACHO).** Ley 388 art. 99 (45 días
+   hábiles, silencio POSITIVO, prórroga por una vez hasta la mitad) y art. 101;
+   DUR 1077 leído en Función Pública con el Decreto 1783 de 2021 incorporado:
+   radicación «en legal y debida forma» arranca el reloj (2.2.6.1.2.1.1), valla
+   desde el día siguiente (2.2.6.1.2.2.1), terceros se hacen parte hasta antes
+   del acto y el curador no decide antes de 5 días hábiles desde la citación
+   (2.2.6.1.2.2.2), acto de trámite con 30 días hábiles para aportar documentos
+   o se entiende DESISTIDA (2.2.6.1.2.3.1), recursos por el CPACA con silencio
+   negativo a los 2 meses (2.2.6.1.2.3.9), vigencias 36+12 / 24+12 / 12
+   improrrogable con prórroga 30 días hábiles ANTES y revalidación hasta 2
+   meses DESPUÉS con el 50 % ejecutado (2.2.6.1.2.4.1 y 4.3). El sancionatorio
+   es policivo: Ley 1801 arts. 135-138 (caducidad 3 años solo en terrenos
+   aptos; restablecer antes de la firmeza evita la multa); los arts. 103 y 108
+   de la Ley 388 están DEROGADOS por el 242 de la Ley 1801. En `gaps`:
+   reconocimiento de edificaciones y autorización de ocupación (no aparecieron
+   con encabezado en la compilación), expensas, protección al comprador.
 7. **Sanitaria / INVIMA.**
 
 Descartadas por frecuencia baja frente al costo: JEP, minero-energético,

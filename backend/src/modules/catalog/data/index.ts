@@ -26,6 +26,7 @@ import { RESPONSABILIDAD_FISCAL_CATALOG } from './responsabilidad-fiscal';
 import { CONTRATOS_CATALOG } from './contratos';
 import { EXTINCION_DOMINIO_CATALOG } from './extincion-dominio';
 import { RESTITUCION_TIERRAS_CATALOG } from './restitucion-tierras';
+import { URBANISMO_CATALOG } from './urbanismo';
 
 /**
  * Every branch catalogue the product ships with.
@@ -61,5 +62,6 @@ export const ALL_CATALOGS: BranchCatalog[] = [
   RESPONSABILIDAD_FISCAL_CATALOG,
   CONTRATOS_CATALOG,
   EXTINCION_DOMINIO_CATALOG,
-  RESTITUCION_TIERRAS_CATALOG
+  RESTITUCION_TIERRAS_CATALOG,
+  URBANISMO_CATALOG
 ];

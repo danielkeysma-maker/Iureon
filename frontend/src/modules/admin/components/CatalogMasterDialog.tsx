@@ -55,6 +55,7 @@ const RAMA: Record<string, string> = {
   CONTRATOS: 'Contratos privados',
   EXTINCION_DOMINIO: 'Extinción de dominio',
   RESTITUCION_TIERRAS: 'Restitución de tierras',
+  URBANISMO: 'Urbanismo y licencias',
   DISCIPLINARIO: 'Disciplinario',
   PENAL: 'Penal',
   AMBIENTAL: 'Ambiental',
