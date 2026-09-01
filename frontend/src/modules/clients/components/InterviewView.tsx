@@ -11,7 +11,7 @@ import { buildSpeakerNames } from '../../transcription/speakerNames';
 import { ROLE_LABELS, ROLES_DEL_RELATO, SUPPORTED_AUDIO_EXTENSIONS } from '../../transcription/types';
 import { toPlainText } from '../../transcription/toPlainText';
 import { ClientPicker } from './ClientPicker';
-import { GUION_BASE, preguntasCubiertas } from '../guionDeEntrevista';
+import { GUION_BASE, cubiertasEnEntrevistasPrevias, estadoDelGuion, preguntasCubiertas } from '../guionDeEntrevista';
 import { InterviewInsights } from './InterviewInsights';
 import { TranscriptSummary } from '../../transcription/components/TranscriptSummary';
 import { AudioRecorder } from './AudioRecorder';
@@ -215,6 +215,33 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft, onPrivaci
     () => preguntasCubiertas(result?.segments ?? []),
     [result]
   );
+
+  /*
+   * LA SEGUNDA ENTREVISTA SABE QUE RESPONDIO LA PRIMERA.
+   *
+   * Las entrevistas anteriores del mismo cliente ya estan en `stored` con su
+   * `client_id` y sus intervenciones: no hace falta una llamada nueva. Se
+   * excluye la que se esta viendo, porque lo que ella cubre es «hoy», no
+   * «antes». Sin cliente elegido no hay «antes» posible: la lista arranca
+   * entera, como siempre.
+   */
+  const previas = React.useMemo(
+    () =>
+      clientId
+        ? stored
+            .filter((i) => i.client_id === clientId && i.id !== transcriptionId)
+            .map((i) => ({ id: i.id, transcribedAt: i.transcribed_at ?? null, segments: i.segments ?? [] }))
+        : [],
+    [stored, clientId, transcriptionId]
+  );
+  const cubiertasAntes = React.useMemo(() => cubiertasEnEntrevistasPrevias(previas), [previas]);
+  const estados = React.useMemo(() => estadoDelGuion(cubiertas, cubiertasAntes), [cubiertas, cubiertasAntes]);
+  const respondidasAntes = [...estados.values()].filter((e) => e.estado === 'antes').length;
+
+  const fechaCorta = (iso: string | null): string =>
+    iso
+      ? new Date(iso).toLocaleDateString('es-CO', { day: 'numeric', month: 'long' })
+      : 'una entrevista anterior';
 
   /*
    * THE SCROLL CONTAINER, WHICH THIS VIEW SHIPPED WITHOUT.
@@ -473,28 +500,56 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft, onPrivaci
             conversacion — no un resumen para leer al final.
           */}
           <Paso numero={2} titulo="Lo que no puede quedarse sin preguntar">
+            {/*
+              LO QUE YA QUEDO DICHO EN OTRA ENTREVISTA se anuncia arriba, una
+              sola vez, y se marca abajo pregunta por pregunta con la fecha.
+              Distinto del tachado de hoy a proposito: una respuesta de hace
+              tres semanas se relee, no se da por hecha.
+            */}
+            {previas.length > 0 && (
+              <p className="mb-3 rounded-control border border-brand-line bg-brand-50 px-3 py-2 text-[11.5px] leading-snug text-brand-700">
+                {previas.length === 1 ? 'Hay una entrevista anterior' : `Hay ${previas.length} entrevistas anteriores`} con
+                este cliente.{' '}
+                {respondidasAntes === 0
+                  ? 'Ninguna de estas preguntas quedó respondida en ellas.'
+                  : respondidasAntes === 1
+                    ? 'Una de estas preguntas ya quedó respondida allí; abajo dice cuándo.'
+                    : `${respondidasAntes} de estas preguntas ya quedaron respondidas allí; abajo dice cuándo.`}
+              </p>
+            )}
             <ul className="space-y-2">
               {GUION_BASE.map((p) => {
-                const cubierta = cubiertas.has(p.id);
+                const estado = estados.get(p.id) ?? { estado: 'pendiente' as const };
+                const cubierta = estado.estado === 'hoy';
+                const antes = estado.estado === 'antes';
                 return (
                   <li key={p.id} className="flex items-start gap-2.5">
                     <span
                       className={`mt-[3px] flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-[3px] border ${
                         cubierta
                           ? 'border-verified bg-[rgb(var(--verified-surf))]'
-                          : 'border-line-200'
+                          : antes
+                            ? 'border-brand-line bg-brand-50'
+                            : 'border-line-200'
                       }`}
                     >
                       {cubierta && <CheckCircle2 className="h-2.5 w-2.5 text-verified" strokeWidth={3} />}
+                      {antes && <CheckCircle2 className="h-2.5 w-2.5 text-brand-700" strokeWidth={2} />}
                     </span>
                     <span className="min-w-0">
                       <span
                         className={`block text-[12.5px] leading-snug ${
-                          cubierta ? 'text-ink-400 line-through' : 'text-ink-900'
+                          cubierta ? 'text-ink-400 line-through' : antes ? 'text-ink-500' : 'text-ink-900'
                         }`}
                       >
                         {p.texto}
                       </span>
+                      {estado.estado === 'antes' && (
+                        <span className="mt-0.5 block text-[11px] leading-snug text-brand-700">
+                          Ya se habló de esto en la entrevista del {fechaCorta(estado.origen.transcribedAt)}. Confírmelo, no lo
+                          vuelva a preguntar desde cero.
+                        </span>
+                      )}
                       {/*
                         LO QUE CUESTA NO PREGUNTARLO, y solo mientras no se haya
                         cubierto. Repetirlo tachado convertiria la advertencia en
@@ -502,7 +557,7 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft, onPrivaci
                         decir que todo urge es la forma mas rapida de que no
                         urja nada.
                       */}
-                      {!cubierta && p.loQueCuesta && (
+                      {!cubierta && !antes && p.loQueCuesta && (
                         <span className="mt-0.5 block text-[11px] leading-snug text-ink-500">
                           {p.loQueCuesta}
                         </span>

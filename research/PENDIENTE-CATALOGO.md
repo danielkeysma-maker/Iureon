@@ -1491,6 +1491,17 @@ nadie lea el acta creyendo que un motor la produjo.
 
 ### Nota sobre la segunda entrevista
 
+> **CONSTRUIDO el 29 de agosto.** La segunda entrevista sabe qué respondió la
+> primera. Sin una llamada nueva: la lista de la firma ya trae `client_id` y
+> las intervenciones de cada entrevista, así que la vista filtra las anteriores
+> del mismo cliente, calcula qué preguntas del guion cubrieron y las marca en
+> un tercer estado —«ya se habló de esto en la entrevista del 5 de agosto;
+> confírmelo, no lo vuelva a preguntar desde cero»— distinto del tachado de hoy
+> a propósito: una respuesta de hace tres semanas se relee, no se da por hecha.
+> Se atribuye a la PRIMERA entrevista que la cubrió, y lo dicho hoy gana a lo
+> dicho antes. `check:guion` pasó de 6 a 14 aserciones. Móvil no tiene guion
+> todavía: es lo que falta de este frente.
+
 Al explicar el guion escribí que «evita una segunda entrevista». **Está mal
 dicho, y el producto lo desmiente**: `Client.interviews` CUENTA cuántas lleva
 cada persona y el servidor las agrupa por `client_id`. Varias entrevistas al

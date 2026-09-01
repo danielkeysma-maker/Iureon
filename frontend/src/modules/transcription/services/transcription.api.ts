@@ -76,6 +76,12 @@ export interface StoredTranscription {
   resumen?: { hechos: Array<{ t: number | null; quien: string; hecho: string }> } | null;
   /** Hora real en que se autorizó la grabación, si quedó registrada. */
   autorizo_grabacion_el?: string | null;
+  /**
+   * El cliente al que se vinculó la entrevista. Viaja en la lista porque es
+   * lo que permite saber, sin otra llamada, qué entrevistas anteriores son del
+   * mismo cliente — y con ellas, qué preguntas del guion ya quedaron dichas.
+   */
+  client_id?: string | null;
   /** Una audiencia se revisa; "ACTA_LISTA" solo lo da una persona. */
   estado_revision?: 'POR_REVISAR' | 'ACTA_LISTA';
   revisada_por?: string | null;
