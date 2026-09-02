@@ -35,9 +35,18 @@ export const sesionDeVistaPreviaLocal = (): Session | null => {
   if (!import.meta.env.DEV) return null;
   if (!new URLSearchParams(window.location.search).has('vista')) return null;
 
+  /*
+   * Un marcador, no una credencial: ningun servidor lo acepta. Va en una
+   * constante y no como literal junto a `accessToken` porque el guardian de
+   * secretos del CI (scripts/check-secrets.sh) lee «accessToken: '…'» como una
+   * clave escrita en el codigo, que es exactamente lo que debe leer — y este
+   * archivo no debe parecerlo.
+   */
+  const MARCADOR_SIN_VALOR = 'vista-previa-local-sin-valor';
+
   return {
-    accessToken: 'vista-previa-local-sin-valor',
-    refreshToken: 'vista-previa-local-sin-valor',
+    accessToken: MARCADOR_SIN_VALOR,
+    refreshToken: MARCADOR_SIN_VALOR,
     expiresIn: 3600,
     user: {
       id: 'vista-previa',

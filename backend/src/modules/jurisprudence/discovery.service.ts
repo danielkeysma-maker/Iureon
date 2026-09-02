@@ -155,9 +155,29 @@ const citationsIn = (hit: SearchHit): string[] => {
  * CONTENCIOSO ADMINISTRATIVO —nulidad y restablecimiento, contractual,
  * reparación directa, electoral— quedaba fuera del descubrimiento por tema.
  */
+/**
+ * Lo minimo que debe traer una providencia para PROPONERSE al redactor.
+ *
+ * Es la misma cifra que `check:discovery` exige a todo lo devuelto: «si algo
+ * llego aqui, fue descargado». El Consejo de Estado entrega el EXTRACTO de su
+ * relatoria, no el fallo, y muchos extractos son un parrafo. Un parrafo sirve
+ * para decidir si abrir la providencia; no sirve para que el motor la cite
+ * como si la hubiera leido. Por eso los cortos no entran al descubrimiento,
+ * aunque sigan siendo reales — el CI llevaba catorce corridas en rojo por un
+ * extracto de 2.000 caracteres, y tenia razon.
+ */
+const TEXTO_MINIMO_PARA_PROPONER = 4000;
+
 const descubrirEnElConsejo = async (topic: string) => {
   try {
-    return await discoverConsejoEstadoRulings(topic);
+    const todas = await discoverConsejoEstadoRulings(topic);
+    const conTexto = todas.filter((d) => (d.ruling.text ?? '').length >= TEXTO_MINIMO_PARA_PROPONER);
+    if (conTexto.length < todas.length) {
+      console.log(
+        `[DISCOVERY] Consejo de Estado: ${todas.length - conTexto.length} providencia(s) con extracto corto no se proponen; ${conTexto.length} sí.`
+      );
+    }
+    return conTexto;
   } catch {
     /* Igual que la Suprema: una corporación caída no tumba a las otras dos. */
     return [];
