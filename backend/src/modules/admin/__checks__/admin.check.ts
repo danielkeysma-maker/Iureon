@@ -331,7 +331,15 @@ const PRIVILEGIADO = 'material privilegiado';
   check('SUPER_ADMIN no se puede otorgar por un endpoint', rolColado === 'LAWYER', `${pidiendoRol.status} · rol=${rolColado}`);
 
   // ─── Limpieza ─────────────────────────────────────────────────────────────
-  const ids = [op.user.firmId, cliente.user.firmId];
+  /*
+   * TODO LO QUE ESTE CHECK CREA, ESTE CHECK LO BORRA. Las dos firmas sin NIT
+   * quedaron una vez en la base de produccion porque no estaban en esta lista,
+   * y el operador las vio en su consola junto a sus clientes reales. Un check
+   * que deja rastro en la base del usuario no es un check: es un incidente.
+   */
+  const ids = [op.user.firmId, cliente.user.firmId, sinNit1.body?.firm?.id, sinNit2.body?.firm?.id].filter(
+    (id): id is string => typeof id === 'string' && id.length > 0
+  );
   await c.from('transcriptions').delete().in('firm_id', ids);
   await c.from('audit_logs').delete().in('firm_id', ids);
   const { data: finales } = await c.auth.admin.listUsers();
