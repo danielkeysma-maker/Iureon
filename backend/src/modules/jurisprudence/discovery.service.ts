@@ -168,6 +168,32 @@ const citationsIn = (hit: SearchHit): string[] => {
  */
 const TEXTO_MINIMO_PARA_PROPONER = 4000;
 
+/**
+ * Impone el contrato en la SALIDA, para las tres cortes y no solo para el
+ * Consejo: nada de lo que este modulo devuelve como «encontrado» tiene menos
+ * texto que el minimo. Lo que no llega se anota en `descartadas` con su razon,
+ * porque una providencia real que no se propone no es un error silencioso: es
+ * una decision que el abogado puede leer. El CI fallo una vez mas despues del
+ * filtro del Consejo —otra corporacion, otro texto corto— y la leccion es que
+ * el contrato se sostiene donde se entrega, no corporacion por corporacion.
+ */
+const conTextoSuficiente = (
+  lista: DiscoveredRuling[],
+  descartadas?: Array<{ cita: string; razon: string }>
+): DiscoveredRuling[] => {
+  const dentro: DiscoveredRuling[] = [];
+  for (const d of lista) {
+    const largo = (d.ruling.text ?? '').length;
+    if (largo >= TEXTO_MINIMO_PARA_PROPONER) dentro.push(d);
+    else
+      descartadas?.push({
+        cita: d.ruling.citation,
+        razon: `texto insuficiente para citarla (${largo} caracteres; se exigen ${TEXTO_MINIMO_PARA_PROPONER})`
+      });
+  }
+  return dentro;
+};
+
 const descubrirEnElConsejo = async (topic: string) => {
   try {
     const todas = await discoverConsejoEstadoRulings(topic);
@@ -211,15 +237,19 @@ export const discoverRulings = async (topic: string): Promise<DiscoveryResult> =
       descubrirEnElConsejo(topic)
     ]);
 
-    const sinLlave = [
-      ...suprema.map((d) => ({ ruling: d.ruling, motivo: `Corte Suprema · Sala ${d.corpus}` })),
-      ...consejo.map((d) => ({ ruling: d.ruling, motivo: `Consejo de Estado · ${d.seccion}` }))
-    ];
+    const descartadasSinLlave: Array<{ cita: string; razon: string }> = [];
+    const sinLlave = conTextoSuficiente(
+      [
+        ...suprema.map((d) => ({ ruling: d.ruling, motivo: `Corte Suprema · Sala ${d.corpus}` })),
+        ...consejo.map((d) => ({ ruling: d.ruling, motivo: `Consejo de Estado · ${d.seccion}` }))
+      ],
+      descartadasSinLlave
+    );
 
     return {
       status: sinLlave.length > 0 ? 'OK' : 'NO_PROVIDER',
       found: sinLlave,
-      descartadas: [],
+      descartadas: descartadasSinLlave,
       reason:
         sinLlave.length > 0
           ? undefined
@@ -244,10 +274,14 @@ export const discoverRulings = async (topic: string): Promise<DiscoveryResult> =
     descubrirEnElConsejo(topic)
   ]);
 
-  const deLasOtras: DiscoveredRuling[] = [
-    ...suprema.map((d) => ({ ruling: d.ruling, motivo: `Corte Suprema · Sala ${d.corpus}` })),
-    ...consejo.map((d) => ({ ruling: d.ruling, motivo: `Consejo de Estado · ${d.seccion}` }))
-  ];
+  const descartadasDeLasOtras: Array<{ cita: string; razon: string }> = [];
+  const deLasOtras: DiscoveredRuling[] = conTextoSuficiente(
+    [
+      ...suprema.map((d) => ({ ruling: d.ruling, motivo: `Corte Suprema · Sala ${d.corpus}` })),
+      ...consejo.map((d) => ({ ruling: d.ruling, motivo: `Consejo de Estado · ${d.seccion}` }))
+    ],
+    descartadasDeLasOtras
+  );
 
   if (!hitsResultado.ok) {
     /*
@@ -315,5 +349,9 @@ export const discoverRulings = async (topic: string): Promise<DiscoveryResult> =
    * Estado y lo segundo viene directo de la corporacion. Ambas son oficiales;
    * el orden refleja por cuantas puertas paso cada una.
    */
-  return { status: 'OK', found: [...found, ...deLasOtras], descartadas };
+  return {
+    status: 'OK',
+    found: conTextoSuficiente([...found, ...deLasOtras], descartadas),
+    descartadas: [...descartadas, ...descartadasDeLasOtras]
+  };
 };

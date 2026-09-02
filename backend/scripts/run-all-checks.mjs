@@ -72,6 +72,36 @@ try {
 }
 console.log('');
 
+/*
+ * LAS CONVENCIONES DEL REPOSITORIO TAMBIEN, porque el CI las corre y esta
+ * suite no lo hacia. El guardian de secretos marco durante catorce corridas
+ * un marcador de la vista previa local que aqui nadie vio, porque aqui nadie
+ * lo ejecutaba. Si el CI y la suite local no miran lo mismo, la suite local
+ * miente por omision.
+ *
+ * Son scripts de bash. En Windows corren con el bash de Git; si no hay bash,
+ * se dice y se sigue — pero se dice, para que el «en verde» no lo esconda.
+ */
+const CONVENCIONES = ['scripts/check-secrets.sh', 'scripts/check-module-boundaries.sh'];
+const raiz = new URL('../../', import.meta.url);
+const convencionesFallidas = [];
+for (const script of CONVENCIONES) {
+  try {
+    execSync(`bash ${script}`, { cwd: raiz, encoding: 'utf8', stdio: 'pipe' });
+    console.log(`  ok    ${script}`);
+  } catch (error) {
+    const texto = `${error.stdout ?? ''}${error.stderr ?? ''}`.trim();
+    if (/not found|no se reconoce|ENOENT/i.test(texto) && !/Possible|Environment file|boundary/i.test(texto)) {
+      console.log(`  AVISO ${script} no se pudo correr (sin bash): el CI si lo corre.`);
+    } else {
+      console.log(`  FALLA ${script}`);
+      console.log(texto.split(String.fromCharCode(10)).map((l) => '        ' + l).join(String.fromCharCode(10)));
+      convencionesFallidas.push(script);
+    }
+  }
+}
+console.log('');
+
 const fallidos = [];
 const rotos = [];
 
@@ -109,12 +139,13 @@ for (const nombre of aCorrer) {
 
 console.log('');
 
-if (fallidos.length === 0 && rotos.length === 0) {
-  console.log(`${aCorrer.length}/${aCorrer.length} en verde.`);
+if (fallidos.length === 0 && rotos.length === 0 && convencionesFallidas.length === 0) {
+  console.log(`${aCorrer.length}/${aCorrer.length} en verde, y las convenciones del repositorio tambien.`);
   process.exitCode = 0;
 } else {
+  if (convencionesFallidas.length) console.log(`FALLAN LAS CONVENCIONES: ${convencionesFallidas.join(', ')}`);
   if (fallidos.length) console.log(`FALLAN: ${fallidos.join(', ')}`);
   if (rotos.length) console.log(`SE CONTRADICEN (texto contra código de salida): ${rotos.join(', ')}`);
-  console.log(`\nCorre el que falle solo para ver el detalle: npm run check:${(fallidos[0] ?? rotos[0])}`);
+  if (fallidos[0] ?? rotos[0]) console.log(`\nCorre el que falle solo para ver el detalle: npm run check:${(fallidos[0] ?? rotos[0])}`);
   process.exitCode = 1;
 }
