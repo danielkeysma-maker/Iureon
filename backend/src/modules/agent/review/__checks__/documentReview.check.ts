@@ -20,7 +20,8 @@ import {
   buildReviewSystemPrompt,
   buildReviewUserPrompt,
   parsearInforme,
-  prepararTexto
+  prepararTexto,
+  repararJsonCortado
 } from '../documentReview';
 
 let fallos = 0;
@@ -71,6 +72,7 @@ const system = buildReviewSystemPrompt();
 check('el sistema prohíbe citar providencias', /NO cites|no cites/i.test(system) && /providencia|sentencia/i.test(system));
 check('el sistema separa lo objetivo (norma) de lo valorativo', /norma/i.test(system) && /criterio|valorativ/i.test(system));
 check('el sistema pide JSON', /JSON/.test(system));
+check('y pide brevedad, porque la salida tiene presupuesto fijo y un JSON cortado no sirve', /seis elementos|BREVE/i.test(system));
 
 /* ─── LA RESPUESTA SE LEE A LA DEFENSIVA ───────────────────────────────────── */
 const crudo = '```json\n' + JSON.stringify({
@@ -88,6 +90,22 @@ check('conserva los errores de aplicación con sus tres campos', informe?.errore
 
 const parcial = parsearInforme('{"resumen":"Solo esto"}');
 check('un JSON parcial rellena las listas vacías, no undefined', parcial !== null && Array.isArray(parcial.fortalezas) && parcial.fortalezas.length === 0);
+
+/* ─── UN JSON CORTADO POR EL PRESUPUESTO SE REPARA, NO SE TIRA ─────────────── */
+// Exactamente lo que devolvió el modelo al agotar 1.800 tokens: la cadena a medias.
+const cortado = '{"resumen":"Escrito sólido en hechos.","fortalezas":["Hechos numerados","Petición clara"],"debilidades":["Falta el juramento","La subsidiariedad no se desarr';
+const salvado = parsearInforme(cortado);
+check('un JSON cortado a mitad de cadena se lee', salvado !== null, String(repararJsonCortado(cortado)));
+check('conserva todo lo que estaba completo', salvado?.fortalezas.length === 2 && salvado?.debilidades[0] === 'Falta el juramento');
+check('y descarta solo el elemento a medias', salvado?.debilidades.length === 1);
+
+const cortadoEnClave = '{"resumen":"Bien.","fortalezas":["Una"],"debilidades":';
+const salvado2 = parsearInforme(cortadoEnClave);
+check('cortado justo tras una clave, la clave huérfana se descarta', salvado2 !== null && salvado2.fortalezas[0] === 'Una' && salvado2.debilidades.length === 0, String(repararJsonCortado(cortadoEnClave)));
+
+const cortadoEnObjeto = '{"resumen":"Bien.","erroresDeAplicacion":[{"donde":"Fundamentos","problema":"Invoca el art. 86 sin';
+const salvado3 = parsearInforme(cortadoEnObjeto);
+check('cortado dentro de un objeto de la lista, se conserva lo que ese objeto ya tenía', salvado3 !== null && salvado3.erroresDeAplicacion[0]?.donde === 'Fundamentos', String(repararJsonCortado(cortadoEnObjeto)));
 
 const basura = parsearInforme('El escrito está bien en general, pero…');
 check('prosa sin JSON devuelve null (el controlador la entrega como texto libre)', basura === null);

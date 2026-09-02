@@ -27,8 +27,16 @@
  * Pure: no network, no database. The controller reads the file and pays.
  */
 
-/** About 15 pages of dense legal prose. Enough for a tutela; not for an expediente. */
-export const MAX_CARACTERES_REVISION = 60_000;
+/*
+ * 300.000 caracteres: unas 75 páginas de prosa jurídica densa, o una tutela
+ * con sus anexos de texto. Antes eran 60.000 y el usuario tenía razón en que
+ * un revisor que no lee el documento entero no es un revisor. El techo no lo
+ * pone el modelo (1M de contexto) sino la función serverless: la lectura de
+ * 75.000 tokens más una respuesta de 1.800 tarda ~45 s medidos, y Vercel
+ * corta a los 60. Más allá, el corte se declara; la salida de verdad es una
+ * revisión asíncrona, que es otra pieza.
+ */
+export const MAX_CARACTERES_REVISION = 300_000;
 
 export const PREGUNTA_POR_DEFECTO =
   'Señale las debilidades y las fortalezas de este escrito, qué está mal aplicado y qué está bien aplicado, y qué corregiría antes de presentarlo.';
@@ -69,7 +77,9 @@ RESPONDE ÚNICAMENTE CON UN OBJETO JSON, sin texto antes ni después, con esta f
   "erroresDeAplicacion": [{"donde": "sección o párrafo", "problema": "qué está mal aplicado y por qué", "correccion": "cómo debería quedar"}],
   "recomendaciones": ["qué haría antes de presentarlo, en orden de importancia"]
 }
-Escribe en español jurídico colombiano, neutro y preciso. Cada elemento de las listas es una frase completa y autónoma.`;
+Escribe en español jurídico colombiano, neutro y preciso. Cada elemento de las listas es una frase completa y autónoma.
+
+SÉ BREVE Y DENSO, porque el informe tiene un presupuesto de salida fijo y un JSON cortado a la mitad no le sirve a nadie: como máximo CUATRO elementos por lista, cada uno de hasta 25 palabras; el resumen, dos frases; sin repetir en una lista lo dicho en otra. Prefiere el hallazgo grave al menor: si hay más de cuatro, quédate con los cuatro que más daño harían ante el juez. JSON compacto, en una sola línea, sin comentarios ni texto fuera del objeto.`;
 
 export const buildReviewUserPrompt = (input: {
   documentType: string;
@@ -132,20 +142,106 @@ const errores = (v: unknown): ErrorDeAplicacion[] => {
 };
 
 /**
+ * Repairs a JSON object the model left unfinished: a review measured against
+ * OpenRouter filled its whole output budget and stopped mid-string, and the
+ * whole report — including the parts that were complete — was thrown away as
+ * unreadable. What can be saved is saved: the text is cut back to the last
+ * complete element, then every open string, array and object is closed.
+ * Returns null when there is nothing whole to keep.
+ */
+export const repararJsonCortado = (texto: string): string | null => {
+  const inicio = texto.indexOf('{');
+  if (inicio === -1) return null;
+  const s = texto.slice(inicio);
+
+  // Walk once, tracking string state and the bracket stack, and remember the
+  // last position at which an element ended cleanly (after a value, before a
+  // comma or closer).
+  const pila: string[] = [];
+  let enCadena = false;
+  let escape = false;
+  let ultimoLimpio = -1;
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (enCadena) {
+      if (escape) escape = false;
+      else if (c === '\\') escape = true;
+      else if (c === '"') {
+        enCadena = false;
+        ultimoLimpio = i + 1;
+      }
+      continue;
+    }
+    if (c === '"') enCadena = true;
+    else if (c === '{' || c === '[') pila.push(c === '{' ? '}' : ']');
+    else if (c === '}' || c === ']') {
+      pila.pop();
+      ultimoLimpio = i + 1;
+    } else if (/[0-9el]/.test(c)) ultimoLimpio = i + 1; // numbers, true/false/null end cleanly too
+  }
+  if (ultimoLimpio <= 0) return null;
+
+  // What is still open at a given cut, innermost last.
+  const abiertosEn = (fragmento: string): string[] => {
+    const abiertos: string[] = [];
+    let dentro = false;
+    let esc = false;
+    for (const c of fragmento) {
+      if (dentro) {
+        if (esc) esc = false;
+        else if (c === '\\') esc = true;
+        else if (c === '"') dentro = false;
+        continue;
+      }
+      if (c === '"') dentro = true;
+      else if (c === '{' || c === '[') abiertos.push(c === '{' ? '}' : ']');
+      else if (c === '}' || c === ']') abiertos.pop();
+    }
+    return abiertos;
+  };
+
+  // Cut at the last clean point, then peel off whatever cannot stand on its
+  // own at the tail: a trailing comma, a `"clave":` whose value never started,
+  // and — inside an object — a bare `"clave"` with no colon yet (inside an
+  // array the same bare string is a complete element and stays).
+  let corte = s.slice(0, ultimoLimpio);
+  for (let vuelta = 0; vuelta < 4; vuelta++) {
+    const antes = corte;
+    corte = corte.replace(/,\s*$/, '').replace(/,?\s*"(?:[^"\\]|\\.)*"\s*:\s*$/, '');
+    const abiertos = abiertosEn(corte);
+    if (abiertos[abiertos.length - 1] === '}') {
+      corte = corte.replace(/([{,])\s*"(?:[^"\\]|\\.)*"\s*$/, '$1').replace(/,\s*$/, '');
+    }
+    if (corte === antes) break;
+  }
+  if (!corte.trim() || corte.trim() === '{') return null;
+  return corte + abiertosEn(corte).reverse().join('');
+};
+
+/**
  * The model's JSON, or null. Never throws: a report that cannot be read is
- * handed over as free text by the controller, not lost.
+ * handed over as free text by the controller, not lost. A cut-off JSON is
+ * repaired first, so the complete findings survive the missing tail.
  */
 export const parsearInforme = (crudo: string): InformeDeRevision | null => {
   const sinCerca = crudo.replace(/```(?:json)?/gi, '').trim();
   const inicio = sinCerca.indexOf('{');
-  const fin = sinCerca.lastIndexOf('}');
-  if (inicio === -1 || fin <= inicio) return null;
+  if (inicio === -1) return null;
 
-  let objeto: Record<string, unknown>;
-  try {
-    objeto = JSON.parse(sinCerca.slice(inicio, fin + 1)) as Record<string, unknown>;
-  } catch {
-    return null;
+  const intentos: string[] = [];
+  const fin = sinCerca.lastIndexOf('}');
+  if (fin > inicio) intentos.push(sinCerca.slice(inicio, fin + 1));
+  const reparado = repararJsonCortado(sinCerca);
+  if (reparado) intentos.push(reparado);
+
+  let objeto: Record<string, unknown> | null = null;
+  for (const intento of intentos) {
+    try {
+      objeto = JSON.parse(intento) as Record<string, unknown>;
+      break;
+    } catch {
+      objeto = null;
+    }
   }
   if (!objeto || typeof objeto !== 'object' || Array.isArray(objeto)) return null;
 

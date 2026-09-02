@@ -471,7 +471,7 @@ const A_REVISAR: ManualArticle = {
     {
       kind: 'aviso',
       texto:
-        'Un PDF escaneado es una imagen y no trae texto: la aplicación se lo dirá y tendrá que pegar el texto. Se revisan hasta 60.000 caracteres; si el escrito es más largo, el informe declara que fue recortado.'
+        'Un PDF escaneado es una imagen y no trae texto: la aplicación se lo dirá y tendrá que pegar el texto. Se lee el documento completo hasta 300.000 caracteres, unas 75 páginas; solo si el escrito es más largo el informe declara que fue recortado.'
     }
   ]
 };

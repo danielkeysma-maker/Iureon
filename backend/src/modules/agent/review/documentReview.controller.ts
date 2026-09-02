@@ -55,6 +55,38 @@ const TEXTO_MINIMO = 200;
  */
 const MAX_BYTES_ALMACEN = 15 * 1024 * 1024;
 
+/*
+ * EL RELOJ DE LA FUNCIÓN, medido y no supuesto. Una revisión de 40.000
+ * caracteres con 2.000 tokens de salida tardó 33 s contra OpenRouter, y la
+ * función tenía 30 s: Vercel la mataba, y como la reserva del saldo se hace
+ * antes de llamar al modelo, la firma pagaba $2.000 por un informe que nunca
+ * llegó y nadie devolvía. De ahí tres decisiones: la función sube a 60 s
+ * (vercel.json), la respuesta pide brevedad (cuatro hallazgos por lista) con
+ * un presupuesto de 3.000 tokens que no debería agotar — y si lo agota, el
+ * JSON cortado se repara en vez de tirarse —, y la llamada tiene su propio límite de 50 s POR DEBAJO del de la
+ * función, para que sea este código —y no la plataforma— quien corte, devuelva
+ * la reserva y lo diga.
+ */
+const MAX_TOKENS_INFORME = 3_000;
+const LIMITE_LLAMADA_MS = 50_000;
+
+class TiempoAgotado extends Error {}
+
+const conLimite = <T>(promesa: Promise<T>, ms: number): Promise<T> =>
+  new Promise<T>((resolve, reject) => {
+    const t = setTimeout(() => reject(new TiempoAgotado('la revisión tardó más de lo que la plataforma permite')), ms);
+    promesa.then(
+      (v) => {
+        clearTimeout(t);
+        resolve(v);
+      },
+      (e) => {
+        clearTimeout(t);
+        reject(e);
+      }
+    );
+  });
+
 const leerDelAlmacen = async (
   firmId: string,
   storageKey: string
@@ -197,11 +229,14 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
   const operationId = randomUUID();
   try {
     const guidance = buildCatalogGuidance(documentType, legalBranch);
-    const llamada = await callOpenRouterWithUsage(
-      ENGINE.OPUS,
-      buildReviewSystemPrompt(),
-      buildReviewUserPrompt({ documentType, guidance, pregunta, texto: preparado.texto, truncado: preparado.truncado }),
-      4096
+    const llamada = await conLimite(
+      callOpenRouterWithUsage(
+        ENGINE.OPUS,
+        buildReviewSystemPrompt(),
+        buildReviewUserPrompt({ documentType, guidance, pregunta, texto: preparado.texto, truncado: preparado.truncado }),
+        MAX_TOKENS_INFORME
+      ),
+      LIMITE_LLAMADA_MS
     );
 
     await recordUsage({ firmId, userEmail, operation: 'REVISION', operationId, usage: llamada.usage ?? null });
@@ -244,6 +279,15 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
       saldoCop: cobro.balance
     });
   } catch (err) {
+    if (err instanceof TiempoAgotado) {
+      await refundReservation({ firmId, userEmail, operation: 'REVISION', reason: 'la revisión superó el tiempo de la plataforma' });
+      res.status(504).json({
+        success: false,
+        error: 'REVIEW_TIMEOUT',
+        message: 'La revisión tardó más de lo que la plataforma permite. No se descontó saldo. Pruebe con un escrito más corto o sin anexos.'
+      });
+      return;
+    }
     console.error('[REVIEW] Error revisando el escrito:', err);
     await refundReservation({ firmId, userEmail, operation: 'REVISION', reason: 'la revisión falló' });
     res.status(500).json({ success: false, error: 'REVIEW_FAILED', message: 'No se pudo revisar el escrito. No se descontó saldo.' });

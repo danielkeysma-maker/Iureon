@@ -234,7 +234,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
               </>
             )}
             <p className="mt-1.5 text-[11px] leading-snug text-ink-500">
-              Un PDF escaneado no trae texto: si el archivo es una imagen, pegue el texto. Se revisan hasta 60.000 caracteres;
+              Un PDF escaneado no trae texto: si el archivo es una imagen, pegue el texto. Se revisan hasta 300.000 caracteres, unas 75 páginas;
               lo que pase de ahí se declara recortado.
             </p>
           </div>
@@ -330,7 +330,7 @@ const Informe: React.FC<{ respuesta: RespuestaDeRevision; documentType: string }
         <span className={`rounded-control border px-2 py-0.5 ${respuesta.conFicha ? 'border-line-200 text-verified' : 'border-line-200 text-ink-500'}`}>
           {respuesta.conFicha ? `Revisado contra la ficha de «${documentType}»` : 'Sin ficha verificada: lo objetivo va con menos respaldo'}
         </span>
-        <span>{respuesta.caracteres.toLocaleString('es-CO')} caracteres{respuesta.truncado ? ' · recortado a 60.000' : ''}</span>
+        <span>{respuesta.caracteres.toLocaleString('es-CO')} caracteres{respuesta.truncado ? ' · recortado a 300.000' : ''}</span>
       </div>
 
       {!i ? (
