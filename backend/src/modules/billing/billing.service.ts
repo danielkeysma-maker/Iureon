@@ -23,7 +23,7 @@ import type { CallUsage } from '../agent/openrouter.client';
  * cannot answer a client asking why their balance moved.
  */
 
-export type Operation = 'BORRADOR' | 'TRANSCRIPCION' | 'BUSQUEDA' | 'ORIENTACION' | 'RESUMEN';
+export type Operation = 'BORRADOR' | 'TRANSCRIPCION' | 'BUSQUEDA' | 'ORIENTACION' | 'RESUMEN' | 'REVISION';
 
 export class BillingError extends Error {
   readonly code: string;
@@ -110,7 +110,15 @@ export const PRICE_COP: Record<Operation, number> = {
    * Cuesta unos $13 arriba; a $50 el margen es parecido al de un borrador y el
    * precio sigue siendo trivial para una firma que está trabajando.
    */
-  ORIENTACION: 50
+  ORIENTACION: 50,
+  /*
+   * Revisar un escrito ya redactado. Cuesta lo mismo que un borrador porque
+   * lee lo mismo o mas (el escrito entero, la ficha) y lo revisa el mismo
+   * modelo de redaccion; y porque un informe que evita presentar una tutela
+   * con la peticion mal formulada vale, cuando menos, lo que el borrador. Piso
+   * provisional del desarrollador, como los demas: se ajusta con datos.
+   */
+  REVISION: 2000
 };
 
 /**

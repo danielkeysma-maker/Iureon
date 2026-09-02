@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   BookOpen,
+  ClipboardCheck,
   ExternalLink,
   FileText,
   Landmark,
@@ -14,6 +15,7 @@ import { AgentConsoleStream } from '../../agent/components/AgentConsoleStream';
 import { useActuacionLookup } from '../../catalog/hooks/useActuacion';
 import type { AgentLog } from '../../agent/types';
 import type { ActuacionRole } from '../../catalog/types';
+import { RevisarEscritoDialog } from './RevisarEscritoDialog';
 
 /**
  * "Qué debe hacer este escrito" — la columna izquierda, ya sin la configuración.
@@ -82,6 +84,8 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
   ocultoEnMovil = false
 }) => {
   const [importedFiles, setImportedFiles] = useState<ArchivoAdjunto[]>([]);
+  /** «Revisar un escrito»: el tercer uso del módulo, junto a redactar y corregir. */
+  const [revisarAbierto, setRevisarAbierto] = useState(false);
 
   const lookup = useActuacionLookup(documentType, legalBranch);
   const actuacion = lookup.actuacion;
@@ -297,6 +301,32 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
               </ul>
             )}
           </div>
+
+          {/* ─── REVISAR UN ESCRITO YA REDACTADO ─────────────────────────────
+              Lo que los adjuntos de arriba NO hacen, esto sí: el archivo se lee.
+              Pero no para redactar, sino para revisar: el abogado trae su
+              tutela y pregunta qué falla. Es un informe contra la ficha de la
+              actuación elegida arriba, y el documento no se guarda. */}
+          <button
+            type="button"
+            onClick={() => setRevisarAbierto(true)}
+            className="mt-3 flex w-full items-center gap-2.5 rounded-control border border-line-200 bg-surface px-3 py-2.5 text-left hover:border-brand-700 hover:bg-brand-50"
+          >
+            <ClipboardCheck className="h-4 w-4 shrink-0 text-brand-700" />
+            <span className="min-w-0 flex-1">
+              <span className="block text-ui font-medium text-ink-900">Revisar un escrito ya redactado</span>
+              <span className="block text-[11px] leading-snug text-ink-500">
+                Suba su tutela, demanda o recurso y pregunte qué está bien, qué está mal y qué corregir. Informe, no borrador.
+              </span>
+            </span>
+          </button>
+          <RevisarEscritoDialog
+            abierto={revisarAbierto}
+            onCerrar={() => setRevisarAbierto(false)}
+            documentType={documentType}
+            legalBranch={legalBranch}
+            precioCop={2000}
+          />
 
           {/* ─── FUNDAMENTOS QUE VA A USAR ─────────────────────────────────
               LO QUE HAY DETRÁS DEL ESCRITO, CON DATOS Y NO CON FRASES.

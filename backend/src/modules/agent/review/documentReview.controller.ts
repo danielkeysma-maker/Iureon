@@ -1,0 +1,211 @@
+import { Request, Response } from 'express';
+import { randomUUID } from 'node:crypto';
+import { auditService } from '../../audit/audit.service';
+import {
+  BillingError,
+  PRICE_COP,
+  recordUsage,
+  refundReservation,
+  reserveForOperation,
+  settleOperation
+} from '../../billing/billing.service';
+import { decodeDocument } from '../../ingestion/documentFetch';
+import type { LegalBranch } from '../../catalog/types';
+import { buildCatalogGuidance } from '../catalogGuidance';
+import { ENGINE, callOpenRouterWithUsage } from '../openrouter.client';
+import {
+  buildReviewSystemPrompt,
+  buildReviewUserPrompt,
+  parsearInforme,
+  prepararTexto
+} from './documentReview';
+
+/**
+ * POST /api/agent/review-document
+ *
+ * Body: { documentType, legalBranch?, pregunta?, fileName?, contentBase64? | texto? }
+ *
+ * ─── THE FILE COMES IN THE BODY, ON PURPOSE ─────────────────────────────────
+ *
+ * Audio goes to B2 because a hearing weighs 50 MB. A brief weighs kilobytes:
+ * a 30-page tutela in PDF is under 2 MB, and Vercel accepts bodies up to
+ * 4.5 MB. Sending it base64 inside the JSON keeps one round trip and no
+ * storage — the text is extracted, reviewed and discarded in the same request.
+ * Nothing of the document is persisted: not the file, not the text, not the
+ * report. It is the lawyer's work product, read once.
+ *
+ * ─── PAID LIKE A DRAFT ──────────────────────────────────────────────────────
+ *
+ * Reserve before the model, settle after, refund on failure — the same three
+ * moves as the draft and the summary. A review the model could not produce
+ * costs nothing.
+ */
+
+/** Text below this is not a brief; it is a title or a botched extraction. */
+const TEXTO_MINIMO = 200;
+/** Base64 of ~4 MB. Above it Vercel would refuse the body anyway; here it fails with a reason. */
+const MAX_BASE64 = 5_600_000;
+
+const tipoPorNombre = (fileName: string): string => {
+  const ext = fileName.toLowerCase().split('.').pop() ?? '';
+  if (ext === 'pdf') return 'application/pdf';
+  if (ext === 'docx') return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+  if (ext === 'doc') return 'application/msword';
+  return 'text/plain';
+};
+
+/**
+ * .docx is a zip of XML; the corpus reader never needed it because courts
+ * publish .doc and PDF. Here lawyers do send .docx, so it gets a minimal
+ * reader: unzip word/document.xml and strip the tags. Paragraph and break
+ * tags become spaces so words do not glue together.
+ */
+const textoDeDocx = async (buffer: Buffer): Promise<string | null> => {
+  try {
+    const { default: AdmZip } = await import('adm-zip');
+    const zip = new AdmZip(buffer);
+    const entry = zip.getEntry('word/document.xml');
+    if (!entry) return null;
+    const xml = entry.getData().toString('utf8');
+    return xml
+      .replace(/<\/w:p>|<w:br\/>|<w:tab\/>/g, ' ')
+      .replace(/<[^>]+>/g, '')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&apos;/g, "'");
+  } catch {
+    return null;
+  }
+};
+
+const extraerTexto = async (
+  fileName: string,
+  contentBase64: string
+): Promise<{ ok: true; texto: string } | { ok: false; reason: string }> => {
+  const buffer = Buffer.from(contentBase64, 'base64');
+  const contentType = tipoPorNombre(fileName);
+
+  if (contentType.includes('wordprocessingml') || buffer.subarray(0, 2).toString() === 'PK') {
+    const texto = await textoDeDocx(buffer);
+    if (texto !== null) return { ok: true, texto };
+  }
+
+  const doc = await decodeDocument(buffer, contentType, TEXTO_MINIMO);
+  if (!doc.ok) return { ok: false, reason: doc.reason };
+  return { ok: true, texto: doc.text };
+};
+
+export const reviewDocumentController = async (req: Request, res: Response): Promise<void> => {
+  const firmId = req.firmId as string;
+  const userEmail = req.user?.email ?? 'desconocido';
+  const documentType = String(req.body.documentType ?? '').trim();
+  const legalBranch = typeof req.body.legalBranch === 'string' ? (req.body.legalBranch as LegalBranch) : undefined;
+  const pregunta = String(req.body.pregunta ?? '');
+  const fileName = String(req.body.fileName ?? 'escrito.txt');
+
+  if (!documentType) {
+    res.status(400).json({ success: false, error: 'MISSING_DOCUMENT_TYPE', message: 'Indique la actuación del escrito.' });
+    return;
+  }
+
+  // ─── The text: pasted, or extracted from the file ─────────────────────────
+  let bruto: string;
+  if (typeof req.body.texto === 'string' && req.body.texto.trim()) {
+    bruto = req.body.texto;
+  } else if (typeof req.body.contentBase64 === 'string' && req.body.contentBase64) {
+    if (req.body.contentBase64.length > MAX_BASE64) {
+      res.status(413).json({ success: false, error: 'FILE_TOO_LARGE', message: 'El archivo supera 4 MB. Pegue el texto en su lugar.' });
+      return;
+    }
+    const extraido = await extraerTexto(fileName, req.body.contentBase64);
+    if (!extraido.ok) {
+      res.status(422).json({ success: false, error: 'UNREADABLE_FILE', message: `No se pudo leer el archivo: ${extraido.reason}. Pegue el texto en su lugar.` });
+      return;
+    }
+    bruto = extraido.texto;
+  } else {
+    res.status(400).json({ success: false, error: 'MISSING_TEXT', message: 'Adjunte el escrito o pegue su texto.' });
+    return;
+  }
+
+  const preparado = prepararTexto(bruto);
+  if (preparado.caracteres < TEXTO_MINIMO) {
+    res.status(422).json({
+      success: false,
+      error: 'TEXT_TOO_SHORT',
+      message: `El texto tiene ${preparado.caracteres} caracteres; un escrito revisable tiene al menos ${TEXTO_MINIMO}. Si es un PDF escaneado, no trae texto: péguelo.`
+    });
+    return;
+  }
+
+  // ─── Reserve, review, settle ──────────────────────────────────────────────
+  let reservado = 0;
+  try {
+    ({ reserved: reservado } = await reserveForOperation({ firmId, userEmail, operation: 'REVISION' }));
+  } catch (err) {
+    if (err instanceof BillingError) {
+      res.status(err.status).json({ success: false, error: err.code, message: err.message });
+      return;
+    }
+    throw err;
+  }
+
+  const operationId = randomUUID();
+  try {
+    const guidance = buildCatalogGuidance(documentType, legalBranch);
+    const llamada = await callOpenRouterWithUsage(
+      ENGINE.OPUS,
+      buildReviewSystemPrompt(),
+      buildReviewUserPrompt({ documentType, guidance, pregunta, texto: preparado.texto, truncado: preparado.truncado }),
+      4096
+    );
+
+    await recordUsage({ firmId, userEmail, operation: 'REVISION', operationId, usage: llamada.usage ?? null });
+
+    if (!llamada.text || !llamada.text.trim()) {
+      await refundReservation({ firmId, userEmail, operation: 'REVISION', reason: 'la revisión no produjo resultado' });
+      res.status(502).json({ success: false, error: 'REVIEW_FAILED', message: 'El revisor no respondió. No se descontó saldo.' });
+      return;
+    }
+
+    const informe = parsearInforme(llamada.text);
+
+    const cobro = await settleOperation({
+      firmId,
+      userEmail,
+      operation: 'REVISION',
+      operationId,
+      reserved: reservado,
+      description: `Revisión: ${documentType} · ${fileName}`
+    });
+
+    // To the audit BEFORE responding: serverless freezes on response. The
+    // resource names the actuación and the file, never the content.
+    await auditService.record({
+      firmId,
+      userEmail,
+      action: 'DOCUMENT_REVIEWED',
+      resource: `${documentType} · ${fileName} · ${preparado.caracteres.toLocaleString('es-CO')} caracteres${preparado.truncado ? ' (recortado)' : ''}`,
+      ipAddress: (req.headers['x-forwarded-for'] as string | undefined)?.split(',')[0]?.trim() ?? req.ip ?? ''
+    });
+
+    res.json({
+      success: true,
+      informe,
+      informeLibre: informe ? null : llamada.text,
+      conFicha: guidance !== null,
+      truncado: preparado.truncado,
+      caracteres: preparado.caracteres,
+      cobradoCop: cobro.charged,
+      saldoCop: cobro.balance
+    });
+  } catch (err) {
+    console.error('[REVIEW] Error revisando el escrito:', err);
+    await refundReservation({ firmId, userEmail, operation: 'REVISION', reason: 'la revisión falló' });
+    res.status(500).json({ success: false, error: 'REVIEW_FAILED', message: 'No se pudo revisar el escrito. No se descontó saldo.' });
+  }
+};
+
+export const REVIEW_PRICE_COP = PRICE_COP.REVISION;

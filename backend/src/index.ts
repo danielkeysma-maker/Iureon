@@ -32,7 +32,13 @@ const app: Express = express();
 
 // Middlewares Globales
 app.use(cors());
-app.use(express.json());
+/*
+ * 4,5 MB es lo que Vercel acepta por cuerpo; el limite de Express por defecto
+ * es 100 KB. La revision de escritos manda el PDF o el Word en base64 dentro
+ * del JSON (un escrito pesa kilobytes, no megas), y con el limite por defecto
+ * cualquier PDF real era rechazado antes de llegar al controlador.
+ */
+app.use(express.json({ limit: '4.5mb' }));
 
 // Public Ping
 app.get('/ping', (_req: Request, res: Response) => {

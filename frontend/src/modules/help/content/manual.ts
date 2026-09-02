@@ -447,6 +447,35 @@ const A_ROLES_SALDO: ManualArticle = {
   ]
 };
 
+const A_REVISAR: ManualArticle = {
+  id: 'revisar-escrito',
+  titulo: 'Revisar un escrito ya redactado',
+  entradilla: 'Suba la tutela, la demanda o el recurso que ya escribió y pregunte qué está bien, qué está mal y qué corregir.',
+  bloques: [
+    {
+      kind: 'parrafo',
+      texto:
+        'En Redacción, debajo de los adjuntos, está «Revisar un escrito ya redactado». Elija primero la actuación arriba —la revisión objetiva se hace contra su ficha verificada—, suba el archivo en PDF, Word o texto, o pegue el texto, y escriba lo que quiere saber. La respuesta es un informe: juicio global, secciones que la norma exige y faltan, fortalezas, debilidades, errores de aplicación con su corrección y recomendaciones. No reescribe su escrito.'
+    },
+    {
+      kind: 'parrafo',
+      texto:
+        'El informe separa dos planos y lo dice en cada punto: lo que exige la norma, que sale de la ficha del catálogo y se cita con artículo, y lo que es criterio profesional del revisor, que usted pesa. No cita sentencias: cuando un punto necesite precedente, lo señala para que usted lo verifique. Cuesta lo mismo que un borrador y se descuenta del saldo de la firma; si el revisor no responde, no se cobra.'
+    },
+    {
+      kind: 'nota',
+      titulo: 'El documento no se guarda',
+      texto:
+        'Ni el archivo, ni el texto, ni el informe quedan en el servidor: se leen, se revisan y se descartan en la misma petición. Si quiere conservar el informe, use «Copiar informe». En la auditoría de la firma queda que se revisó un escrito de tal actuación, nunca su contenido.'
+    },
+    {
+      kind: 'aviso',
+      texto:
+        'Un PDF escaneado es una imagen y no trae texto: la aplicación se lo dirá y tendrá que pegar el texto. Se revisan hasta 60.000 caracteres; si el escrito es más largo, el informe declara que fue recortado.'
+    }
+  ]
+};
+
 const A_DATOS_CLIENTE: ManualArticle = {
   id: 'datos-cliente',
   titulo: 'Qué responder si su cliente pregunta por sus datos',
@@ -545,7 +574,7 @@ export const MANUAL: readonly ManualGroup[] = [
     titulo: 'Primeros 20 minutos',
     articulos: [A_QUE_HACE, A_PRIMER_ESCRITO, A_TRES_ESTADOS, A_VERIFICAR, A_MOVIL]
   },
-  { titulo: 'Redactar', articulos: [A_INSTRUCCION, A_EXPORTAR, A_BORRADORES] },
+  { titulo: 'Redactar', articulos: [A_INSTRUCCION, A_REVISAR, A_EXPORTAR, A_BORRADORES] },
   { titulo: 'Grabar', articulos: [A_ENTREVISTA, A_AUDIENCIA] },
   {
     titulo: 'Para socios',
