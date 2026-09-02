@@ -142,9 +142,15 @@ export const adminApi = {
     initialCredits?: number;
   }) => httpClient.post<{ firm: FirmSummary }>('/api/admin/firms', { body: input }),
 
-  addCredits: (firmId: string, amount: number) =>
+  /*
+   * `reason` NO ES OPCIONAL EN EL SERVIDOR: `requireReason` rechaza la recarga
+   * sin motivo antes de tocar dinero. Este cliente lo omitia, asi que la
+   * recarga desde la consola fallaba siempre con el error del servidor. El
+   * motivo va a la auditoria de la firma con el correo del operador.
+   */
+  addCredits: (firmId: string, amount: number, reason: string) =>
     httpClient.post<{ creditsBalance: number }>(`/api/admin/firms/${firmId}/credits`, {
-      body: { amount }
+      body: { amount, reason }
     }),
 
   updateFirm: (firmId: string, changes: { planTier?: string; status?: string; name?: string }) =>

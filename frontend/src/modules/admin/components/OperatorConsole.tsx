@@ -3,6 +3,7 @@ import { AlertCircle, Building2, CreditCard, Plus, RefreshCw, ShieldCheck, Users
 import { adminApi, type FirmSummary } from '../admin.api';
 import { FirmDetailDialog } from './FirmDetailDialog';
 import { CatalogMasterDialog } from './CatalogMasterDialog';
+import { RechargeFirmDialog } from './RechargeFirmDialog';
 
 /**
  * Running the platform: the firms on it, their plans, their balances.
@@ -40,6 +41,8 @@ export const OperatorConsole: React.FC = () => {
   const [error, setError] = React.useState('');
   const [creando, setCreando] = React.useState(false);
   const [recargando, setRecargando] = React.useState<string | null>(null);
+  /** La firma cuyo dialogo de recarga esta abierto; null cuando ninguno. */
+  const [firmARecargar, setFirmARecargar] = React.useState<FirmSummary | null>(null);
 
   const [nueva, setNueva] = React.useState({
     firmName: '',
@@ -92,26 +95,25 @@ export const OperatorConsole: React.FC = () => {
    * So the minimum is the default in the box, where it belongs — a nudge toward
    * the amount that is usually right — and not a rule that rejects the operator.
    */
-  const recargar = async (firm: FirmSummary) => {
-    const texto = window.prompt(`Recargar saldo de ${firm.name}. Monto en COP:`, '100000');
-    if (!texto) return;
-
-    const monto = Number(texto.replace(/[^\d]/g, ''));
-    if (!monto) {
-      setError('El monto debe ser un número mayor que cero.');
-      return;
-    }
-
+  /*
+   * YA NO ES UN `window.prompt`. Era la caja gris del navegador —«iureon-app
+   * .vercel.app dice»— y ademas escondia un defecto: el servidor exige motivo
+   * (`requireReason`) y el prompt solo pedia monto, asi que la recarga fallaba
+   * siempre. `RechargeFirmDialog` pide las dos cosas y este metodo recibe las
+   * dos ya validadas.
+   */
+  const recargar = async (firm: FirmSummary, monto: number, motivo: string) => {
     setRecargando(firm.id);
     setError('');
 
     try {
-      const { creditsBalance } = await adminApi.addCredits(firm.id, monto);
+      const { creditsBalance } = await adminApi.addCredits(firm.id, monto, motivo);
       // Applied locally from the SERVER's figure, not by adding on screen: the
       // balance that matters is the one the database ended up with.
       setFirms((actuales) =>
         actuales.map((f) => (f.id === firm.id ? { ...f, creditsBalance } : f))
       );
+      setFirmARecargar(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo aplicar la recarga.');
     } finally {
@@ -382,7 +384,7 @@ export const OperatorConsole: React.FC = () => {
 
               <div className="flex flex-wrap items-center gap-2 pt-1">
                 <button
-                  onClick={() => void recargar(firm)}
+                  onClick={() => setFirmARecargar(firm)}
                   disabled={recargando === firm.id}
                   className="px-2.5 py-1 bg-[rgb(var(--verified-surf))] hover:bg-[rgb(var(--verified-surf))] text-verified border border-[rgb(var(--verified-line))] rounded-control text-[11px] font-semibold disabled:opacity-50"
                 >
@@ -416,6 +418,13 @@ export const OperatorConsole: React.FC = () => {
       </p>
 
       <FirmDetailDialog firmId={fichaAbierta} onClose={() => setFichaAbierta(null)} />
+      <RechargeFirmDialog
+        firm={firmARecargar}
+        ocupado={firmARecargar !== null && recargando === firmARecargar.id}
+        onCerrar={() => setFirmARecargar(null)}
+        onConfirmar={recargar}
+      />
+
       <CatalogMasterDialog isOpen={maestroAbierto} onClose={() => setMaestroAbierto(false)} />
     </div>
   );
