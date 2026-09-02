@@ -71,7 +71,7 @@ const sumar = (s: Suma, monto: number): void => {
 const conceptoDe = (description: string): 'borradores' | 'resumenes' | 'orientaciones' | 'revisiones' | 'otros' => {
   if (/^Borrador\b/i.test(description)) return 'borradores';
   if (/^Resumen de\b/i.test(description)) return 'resumenes';
-  if (/^Revisi[óo]n/i.test(description)) return 'revisiones';
+  if (/^Revisi[óo]n\b/i.test(description)) return 'revisiones';
   if (/orientaci[óo]n/i.test(description)) return 'orientaciones';
   return 'otros';
 };
