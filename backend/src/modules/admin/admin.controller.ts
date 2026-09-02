@@ -87,18 +87,19 @@ export const addCreditsController = async (req: Request, res: Response): Promise
   const amount = Number(req.body.amount);
 
   try {
-    const { balance, reason } = await addCredits(firmId, amount, req.body.reason);
+    const { balance, reason } = await addCredits(firmId, amount, req.body.reason, req.user!.email);
 
     await auditService.record({
       firmId,
       userEmail: req.user!.email,
-      action: 'FIRM_CREDITS_ADDED',
+      // Dos acciones distintas: acreditar y descontar no se buscan igual en un registro.
+      action: amount > 0 ? 'FIRM_CREDITS_ADDED' : 'FIRM_CREDITS_ADJUSTED',
       /*
        * Las dos cifras Y EL MOTIVO. «Recargado» a secas no resuelve una
        * disputa, y sin el porqué el socio de la firma lee un movimiento de
        * dinero que nadie le explicó.
        */
-      resource: `+$${amount.toLocaleString('es-CO')} COP · saldo resultante $${balance.toLocaleString('es-CO')} COP · motivo: ${reason}`,
+      resource: `${amount > 0 ? '+' : '−'}$${Math.abs(amount).toLocaleString('es-CO')} COP · saldo resultante $${balance.toLocaleString('es-CO')} COP · motivo: ${reason}`,
       ipAddress: callerIp(req)
     });
 

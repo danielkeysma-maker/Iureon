@@ -49,6 +49,13 @@ export const RechargeFirmDialog: React.FC<RechargeFirmDialogProps> = ({
   const [montoTexto, setMontoTexto] = React.useState(String(MONTO_SUGERIDO));
   const [motivo, setMotivo] = React.useState('');
   const [error, setError] = React.useState('');
+  /*
+   * ACREDITAR O DESCONTAR, POR LA MISMA PUERTA. El descuento existe porque una
+   * compensacion dada por error —dos toques de prueba y $200.000 que nadie
+   * pago— tenia que revertirse a mano en la base. El servidor no deja el saldo
+   * bajo cero; aqui se dice antes de intentarlo.
+   */
+  const [modo, setModo] = React.useState<'acreditar' | 'descontar'>('acreditar');
 
   // Cada firma arranca limpia: el motivo de la anterior no es el de esta.
   React.useEffect(() => {
@@ -56,11 +63,13 @@ export const RechargeFirmDialog: React.FC<RechargeFirmDialogProps> = ({
     setMontoTexto(String(MONTO_SUGERIDO));
     setMotivo('');
     setError('');
+    setModo('acreditar');
   }, [firm?.id]);
 
   const monto = Number(montoTexto.replace(/[^\d]/g, ''));
   const motivoLimpio = motivo.trim();
-  const listo = monto > 0 && motivoLimpio.length >= MIN_MOTIVO && !ocupado;
+  const excedeSaldo = modo === 'descontar' && firm !== null && monto > firm.creditsBalance;
+  const listo = monto > 0 && motivoLimpio.length >= MIN_MOTIVO && !ocupado && !excedeSaldo;
 
   const confirmar = async () => {
     if (!firm) return;
@@ -72,8 +81,12 @@ export const RechargeFirmDialog: React.FC<RechargeFirmDialogProps> = ({
       setError('Escriba el motivo, al menos diez caracteres: queda en la auditoría de la firma y lo leerán sus socios.');
       return;
     }
+    if (excedeSaldo) {
+      setError(`La firma tiene ${pesos(firm.creditsBalance)}: no se puede descontar más que eso.`);
+      return;
+    }
     setError('');
-    await onConfirmar(firm, monto, motivoLimpio);
+    await onConfirmar(firm, modo === 'descontar' ? -monto : monto, motivoLimpio);
   };
 
   return (
@@ -81,7 +94,7 @@ export const RechargeFirmDialog: React.FC<RechargeFirmDialogProps> = ({
       abierto={firm !== null}
       onCerrar={ocupado ? () => undefined : onCerrar}
       tamano="S"
-      titulo="Recargar saldo"
+      titulo={modo === 'descontar' ? 'Descontar saldo' : 'Recargar saldo'}
       subtitulo={firm ? `${firm.name} · saldo actual ${pesos(firm.creditsBalance)}` : undefined}
       hayCambiosSinGuardar={motivoLimpio.length > 0 || ocupado}
       onIntentoDeCerrarConCambios={() => undefined}
@@ -99,12 +112,37 @@ export const RechargeFirmDialog: React.FC<RechargeFirmDialogProps> = ({
             disabled={!listo}
             className="btn-primary btn-sm disabled:opacity-50"
           >
-            {ocupado ? 'Recargando…' : monto > 0 ? `Recargar ${pesos(monto)}` : 'Recargar'}
+            {ocupado
+              ? 'Aplicando…'
+              : monto > 0
+                ? `${modo === 'descontar' ? 'Descontar' : 'Recargar'} ${pesos(monto)}`
+                : modo === 'descontar'
+                  ? 'Descontar'
+                  : 'Recargar'}
           </button>
         </>
       }
     >
       <div className="space-y-4">
+        <div className="flex gap-1.5" role="radiogroup" aria-label="Sentido del ajuste">
+          {(['acreditar', 'descontar'] as const).map((m) => (
+            <button
+              key={m}
+              type="button"
+              role="radio"
+              aria-checked={modo === m}
+              onClick={() => setModo(m)}
+              className={`rounded-control border px-3 py-1.5 text-[12.5px] font-medium ${
+                modo === m
+                  ? 'border-brand-700 bg-brand-50 text-brand-700'
+                  : 'border-line-200 bg-canvas text-ink-700 hover:border-brand-700'
+              }`}
+            >
+              {m === 'acreditar' ? 'Acreditar' : 'Descontar'}
+            </button>
+          ))}
+        </div>
+
         <div>
           <label
             htmlFor="monto-recarga"
@@ -122,8 +160,9 @@ export const RechargeFirmDialog: React.FC<RechargeFirmDialogProps> = ({
             autoFocus
           />
           <p className="mt-1 text-[11px] leading-snug text-ink-500">
-            {pesos(MONTO_SUGERIDO)} es el mínimo que paga una firma por pasarela. Aquí puede ser menor:
-            compensar un borrador fallido no obliga a regalar el resto.
+            {modo === 'descontar'
+              ? `Se descuenta del saldo actual (${firm ? pesos(firm.creditsBalance) : '—'}); nunca puede quedar negativo.`
+              : `${pesos(MONTO_SUGERIDO)} es el mínimo que paga una firma por pasarela. Aquí puede ser menor: compensar un borrador fallido no obliga a regalar el resto.`}
           </p>
         </div>
 
@@ -139,7 +178,11 @@ export const RechargeFirmDialog: React.FC<RechargeFirmDialogProps> = ({
             value={motivo}
             onChange={(e) => setMotivo(e.target.value)}
             rows={2}
-            placeholder="Compensación por borrador fallido del 28 de agosto"
+            placeholder={
+              modo === 'descontar'
+                ? 'Reversión de la recarga de prueba del 1 de septiembre'
+                : 'Compensación por borrador fallido del 28 de agosto'
+            }
             className="field mt-1 w-full resize-none"
           />
         </div>

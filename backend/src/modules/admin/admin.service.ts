@@ -413,10 +413,29 @@ export const requireReason = (raw: unknown): string => {
  * resulting balance can both be recorded: an audit line saying "recharged" with
  * no figures explains nothing when a client disputes it.
  */
+/**
+ * Acredita o descuenta saldo de una firma desde la consola del operador.
+ *
+ * EL MONTO PUEDE SER NEGATIVO, Y ESO ES UNA CAPACIDAD, NO UN DESCUIDO. Una
+ * compensacion dada por error —el usuario toco «Recargar» dos veces probando
+ * el boton y le quedaron $200.000 que nadie pago— tenia que revertirse a mano
+ * en la base, sin motivo y sin rastro. Ahora se descuenta por la misma puerta,
+ * con el mismo motivo obligatorio y la misma auditoria. Lo que no se puede es
+ * dejar el saldo bajo cero: un saldo negativo es una deuda que este producto
+ * no cobra.
+ *
+ * Y ESCRIBE EN `credit_movements`. Antes solo tocaba `firms.credit_balance_cop`,
+ * asi que el socio abria su panel de Saldo, veia $200.000 mas y el libro de
+ * movimientos —que es lo que el panel muestra— no decia de donde salieron. La
+ * auditoria lo sabia; la pantalla del saldo no. El libro es la plata
+ * autoritativa (asi lo declara `billing.service`), y un credito que no esta en
+ * el no existe para quien lo mira.
+ */
 export const addCredits = async (
   firmId: string,
   amount: number,
-  reason: unknown
+  reason: unknown,
+  actorEmail = 'operador'
 ): Promise<{ balance: number; reason: string }> => {
   const client = requireClient();
 
@@ -424,8 +443,8 @@ export const addCredits = async (
   // all, not happen and then fail to be explained.
   const motivo = requireReason(reason);
 
-  if (!Number.isFinite(amount) || amount <= 0) {
-    throw new AuthError('INVALID_AMOUNT', 'El monto de la recarga debe ser mayor que cero.');
+  if (!Number.isFinite(amount) || !Number.isInteger(amount) || amount === 0) {
+    throw new AuthError('INVALID_AMOUNT', 'El monto debe ser un número entero de pesos distinto de cero.');
   }
 
   const { data: firm } = await client
@@ -438,7 +457,16 @@ export const addCredits = async (
     throw new AuthError('FIRM_NOT_FOUND', 'No existe esa firma.', 404);
   }
 
-  const nuevo = Number((firm as { credit_balance_cop: number | string }).credit_balance_cop ?? 0) + amount;
+  const actual = Number((firm as { credit_balance_cop: number | string }).credit_balance_cop ?? 0);
+  const nuevo = actual + amount;
+
+  if (nuevo < 0) {
+    throw new AuthError(
+      'INSUFFICIENT_BALANCE',
+      `No se puede descontar $${Math.abs(amount).toLocaleString('es-CO')}: la firma tiene $${actual.toLocaleString('es-CO')} y el saldo no puede quedar negativo.`,
+      400
+    );
+  }
 
   const { error } = await client
     .from('firms')
@@ -448,6 +476,21 @@ export const addCredits = async (
   if (error) {
     console.error('[ADMIN] No se pudo recargar:', error.message);
     throw new AuthError('RECHARGE_FAILED', 'No se pudo aplicar la recarga.', 502);
+  }
+
+  // Al libro, con el motivo: es lo que el socio ve en su panel de Saldo.
+  const { error: errorLibro } = await client.from('credit_movements').insert({
+    firm_id: firmId,
+    kind: amount > 0 ? 'RECARGA' : 'AJUSTE',
+    amount_cop: amount,
+    balance_after_cop: nuevo,
+    description: `${amount > 0 ? 'Recarga' : 'Ajuste'} del operador · ${motivo}`,
+    actor_email: actorEmail
+  });
+  if (errorLibro) {
+    // El saldo ya cambio; un libro incompleto es visible en el log, no un
+    // motivo para revertir el dinero a medias.
+    console.error('[ADMIN] El ajuste se aplico pero no quedo en credit_movements:', errorLibro.message);
   }
 
   return { balance: nuevo, reason: motivo };

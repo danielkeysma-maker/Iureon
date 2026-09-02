@@ -173,6 +173,52 @@ const PRIVILEGIADO = 'material privilegiado';
   );
 
   /*
+   * ─── EL AJUSTE EN CONTRA, Y EL LIBRO ──────────────────────────────────────
+   *
+   * Una compensacion dada por error tiene que poder deshacerse por la misma
+   * puerta y con el mismo rastro. Y lo que se acredita tiene que aparecer en
+   * el libro de movimientos que el socio ve en su panel de Saldo: antes solo
+   * cambiaba la cifra de la firma y el libro callaba.
+   */
+  const descuento = await pedir(`/admin/firms/${cliente.user.firmId}/credits`, opToken, {
+    method: 'POST',
+    body: JSON.stringify({ amount: -20000, reason: 'Reversion parcial de la compensacion de prueba' })
+  });
+  check(
+    'puede descontar saldo con motivo, y el saldo baja',
+    descuento.status === 200 && descuento.body?.creditsBalance === 30000,
+    JSON.stringify(descuento.body)
+  );
+
+  const enRojo = await pedir(`/admin/firms/${cliente.user.firmId}/credits`, opToken, {
+    method: 'POST',
+    body: JSON.stringify({ amount: -100000, reason: 'Intento de dejar el saldo negativo' })
+  });
+  check(
+    'pero nunca deja el saldo bajo cero',
+    enRojo.status === 400 && enRojo.body?.error === 'INSUFFICIENT_BALANCE',
+    `${enRojo.status} · ${enRojo.body?.error}`
+  );
+
+  const { data: libro } = await supabase!
+    .from('credit_movements')
+    .select('kind, amount_cop, balance_after_cop, description, actor_email')
+    .eq('firm_id', cliente.user.firmId)
+    .order('created_at', { ascending: true });
+  const filas = (libro ?? []) as Array<{ kind: string; amount_cop: number; description: string; actor_email: string }>;
+  check(
+    'la recarga y el ajuste quedan en el libro de movimientos que el socio ve',
+    filas.some((f) => f.kind === 'RECARGA' && Number(f.amount_cop) === 50000) &&
+      filas.some((f) => f.kind === 'AJUSTE' && Number(f.amount_cop) === -20000),
+    filas.map((f) => `${f.kind}:${f.amount_cop}`).join(' | ') || 'libro vacio'
+  );
+  check(
+    'cada fila del libro lleva el motivo y el correo del operador',
+    filas.every((f) => f.description.includes(' · ') && f.actor_email === correoOperador),
+    filas.map((f) => f.actor_email).join(',')
+  );
+
+  /*
    * ─── LA FICHA DE LA FIRMA (7b) ────────────────────────────────────────────
    *
    * Trae lo que se necesita para gestionar el negocio del inquilino y NADA de
