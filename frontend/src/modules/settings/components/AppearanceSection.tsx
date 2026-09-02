@@ -37,7 +37,7 @@ const TEMAS: { valor: Theme; titulo: string }[] = [
 ];
 
 /**
- * Las seis familias, cada una descrita por lo que hace bien.
+ * Las siete familias, cada una descrita por lo que hace bien.
  *
  * La muestra "Ag 0123 Il1" está para comparar lo único que importa aquí: si los
  * dígitos y las letras ambiguas se distinguen. Un abogado que confunde un 1 con
@@ -73,6 +73,12 @@ const FUENTES: { valor: UiFont; nombre: string; nota: string; css: string }[] = 
     nombre: 'Public Sans',
     nota: 'De uso oficial · la más institucional',
     css: "'Public Sans', system-ui, sans-serif"
+  },
+  {
+    valor: 'satoshi',
+    nombre: 'Satoshi',
+    nota: 'Geométrica y limpia · de Indian Type Foundry, vía Fontshare',
+    css: "'Satoshi', system-ui, sans-serif"
   },
   {
     valor: 'system',
@@ -174,7 +180,7 @@ export const AppearanceSection: React.FC<AppearanceSectionProps> = ({ prefs, cam
       </Bloque>
 
       {/* ─── TIPOGRAFÍA DE LA INTERFAZ ─────────────────────────────────────*/}
-      <Bloque titulo="Tipografía de la interfaz" nota="seis familias probadas con datos densos">
+      <Bloque titulo="Tipografía de la interfaz" nota="siete familias probadas con datos densos">
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
           {FUENTES.map((f) => (
             <button

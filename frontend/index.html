@@ -24,9 +24,11 @@
     <!-- IBM Plex Sans (UI) · Source Serif 4 (lienzo del escrito) · IBM Plex Mono (dato citable) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://api.fontshare.com">
+    <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
     <!--
-      Las otras cinco familias de interfaz van APARTE y con `media="print"`
+      Las otras seis familias de interfaz van APARTE y con `media="print"`
       cambiado por JS al cargar: son alternativas de Ajustes, y descargarlas
       todas de entrada le cuesta a cada abogado un peso que solo uno de cada
       seis va a usar. La de por defecto —IBM Plex Sans— va arriba, bloqueante,
@@ -35,6 +37,20 @@
     <link
       id="fuentes-alternas"
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600;700&family=Public+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
+    />
+    <!--
+      Satoshi no esta en Google Fonts: la sirve Fontshare (Indian Type Foundry)
+      por su API de CSS, gratis para uso comercial bajo su licencia. `@1` pide
+      la fuente VARIABLE (300-900) en un solo archivo: cubre el 600 de los
+      titulos, que las estaticas de Fontshare no traen. Diferida igual que las
+      otras: solo la paga quien la elige.
+    -->
+    <link
+      id="fuente-satoshi"
+      href="https://api.fontshare.com/v2/css?f[]=satoshi@1&display=swap"
       rel="stylesheet"
       media="print"
       onload="this.media='all'"

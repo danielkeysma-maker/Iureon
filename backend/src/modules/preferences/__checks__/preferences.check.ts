@@ -26,6 +26,10 @@ check(
 );
 
 /* ─── LO INVÁLIDO CAE AL DEFECTO, SIN LANZAR ─────────────────────────────── */
+// Satoshi (Fontshare, ITF) entro despues de las seis primeras: debe pasar entera.
+const satoshi = sanear({ theme: 'light', uiFont: 'satoshi', density: 'normal' });
+check('Satoshi es una fuente aceptada', satoshi.uiFont === 'satoshi', String(satoshi.uiFont));
+
 const basura = sanear({ theme: 'neon', uiFont: 'comic-sans', density: 'gigante' });
 check(
   'un valor inventado cae al por defecto en vez de colarse',

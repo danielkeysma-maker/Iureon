@@ -307,6 +307,16 @@
   --font-ui: 'Public Sans', system-ui, sans-serif;
 }
 
+/*
+ * Satoshi (Indian Type Foundry, servida por Fontshare). Es la unica familia que
+ * no viene de Google Fonts: se carga como fuente variable 300-900 desde
+ * api.fontshare.com (index.html), asi que el 600 de los titulos existe de
+ * verdad y no lo sintetiza el navegador.
+ */
+:root[data-font='satoshi'] {
+  --font-ui: 'Satoshi', system-ui, sans-serif;
+}
+
 /* "La del sistema": no descarga nada y se ve como el resto de su equipo. */
 :root[data-font='system'] {
   --font-ui: system-ui, -apple-system, 'Segoe UI', sans-serif;
