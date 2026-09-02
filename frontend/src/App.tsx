@@ -367,6 +367,39 @@ export function App() {
     void refreshBalance();
   }, [refreshBalance]);
 
+  /*
+   * Y EN VIVO, SIN IMPORTAR QUIEN GASTO. El saldo es de la firma, no de la
+   * sesion: si un socio revisa un escrito en su PC, el telefono del otro tenia
+   * la cifra vieja hasta que hiciera algo. El usuario quiere mirar la barra y
+   * saber si puede usar la app; para eso la cifra tiene que moverse sola.
+   *
+   * Se relee cada 20 segundos mientras la pestana este visible, y en el acto
+   * al volver a ella (foco o visibilidad). Una pestana oculta no pregunta: no
+   * hay nadie mirando y el servidor no tiene por que pagar la consulta. Es el
+   * mismo mecanismo que el aviso de acceso de soporte, no un canal en vivo:
+   * una suscripcion en tiempo real exigiria abrir la base al navegador y una
+   * regla de lectura por firma, y para una cifra que cambia unas veces al dia
+   * un sondeo corto da el mismo resultado sin esa superficie.
+   *
+   * La cifra es informativa: la puerta de verdad la pone el servidor, que
+   * rechaza la operacion sin saldo aunque la pantalla diga otra cosa.
+   */
+  useEffect(() => {
+    if (!session) return;
+    const CADA_MS = 20_000;
+    const siVisible = () => {
+      if (document.visibilityState === 'visible') void refreshBalance();
+    };
+    const intervalo = window.setInterval(siVisible, CADA_MS);
+    document.addEventListener('visibilitychange', siVisible);
+    window.addEventListener('focus', siVisible);
+    return () => {
+      window.clearInterval(intervalo);
+      document.removeEventListener('visibilitychange', siVisible);
+      window.removeEventListener('focus', siVisible);
+    };
+  }, [session, refreshBalance]);
+
   // ═══ Clave de localStorage scoped por firma+usuario ═══
   const {
     savedDrafts,
