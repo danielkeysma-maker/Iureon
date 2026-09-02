@@ -8,6 +8,8 @@ import {
   enlaceWhatsapp,
   whatsappLegible
 } from '../content/support';
+import { entradaPorId } from '../content/manual';
+import { ChevronRight } from 'lucide-react';
 import type { SupportChannel } from '../types';
 
 /**
@@ -50,7 +52,8 @@ import type { SupportChannel } from '../types';
 interface SupportMobileViewProps {
   firma: string;
   correo: string;
-  onManual: () => void;
+  /** Con id abre ese artículo del manual; sin id, el índice. Igual que en escritorio. */
+  onManual: (id?: string) => void;
 }
 
 const FILETE: Record<SupportChannel['id'], string> = {
@@ -145,18 +148,27 @@ export const SupportMobileView: React.FC<SupportMobileViewProps> = ({
 
       <section className="rounded-[10px] border border-line-200 bg-surface px-[15px] py-3.5">
         <h2 className="text-[13px] font-semibold text-ink-900">Antes de escribir</h2>
-        <ul className="mt-2 space-y-1.5">
-          {ANTES_DE_ESCRIBIR.map((p) => (
-            <li
+        {/*
+          CADA PREGUNTA LLEVA A SU ARTICULO, como en escritorio. Antes eran tres
+          renglones de texto y un boton generico al indice del manual: la
+          pregunta se leia y luego habia que buscarla otra vez. En el telefono,
+          que es donde se pide ayuda con prisa, el atajo tiene que ser el toque.
+        */}
+        <div className="mt-2 flex flex-col gap-2">
+          {ANTES_DE_ESCRIBIR.filter((p) => entradaPorId(p.id)).map((p) => (
+            <button
               key={p.id}
-              className="text-justify text-[12.5px] leading-[1.55] text-ink-700 [text-wrap:pretty]"
+              type="button"
+              onClick={() => onManual(p.id)}
+              className="flex min-h-11 items-center gap-2.5 rounded-control border border-line-200 bg-canvas px-3 py-2.5 text-left"
             >
-              {p.pregunta}
-            </li>
+              <span className="min-w-0 flex-1 text-[12.5px] leading-[1.45] text-ink-900">{p.pregunta}</span>
+              <ChevronRight size={14} strokeWidth={2.2} className="shrink-0 text-ink-400" />
+            </button>
           ))}
-        </ul>
-        <button type="button" onClick={onManual} className="btn-secondary mt-3 h-11 w-full">
-          Buscar en el manual
+        </div>
+        <button type="button" onClick={() => onManual()} className="btn-secondary mt-3 h-11 w-full">
+          Abrir el manual completo
         </button>
       </section>
 

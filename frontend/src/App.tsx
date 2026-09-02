@@ -967,7 +967,10 @@ export function App() {
               <SupportMobileView
                 firma={activeFirm.name}
                 correo={currentUserEmail}
-                onManual={() => setMainView('manual')}
+                onManual={(id) => {
+                  if (id) setManualArticulo(id);
+                  setMainView('manual');
+                }}
               />
             </div>
           )}
