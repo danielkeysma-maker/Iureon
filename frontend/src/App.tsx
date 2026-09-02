@@ -749,6 +749,7 @@ export function App() {
                     setLoadedDraftId(null);
                   }}
                   logs={workflow.logs}
+                  onSaldoCambiado={() => void refreshBalance()}
                   activeDraftText={workflow.activeDraftText}
                   onClearActiveDraft={() => workflow.setActiveDraftText(null)}
                 />

@@ -32,6 +32,8 @@ interface RevisarEscritoDialogProps {
   documentType: string;
   legalBranch: string;
   precioCop: number;
+  /** Avisa a quien pinta el saldo que hubo un cobro: el saldo se reporta, nunca se deriva. */
+  onSaldoCambiado?: () => void;
 }
 
 const MAX_BYTES = 4 * 1024 * 1024;
@@ -48,7 +50,8 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
   onCerrar,
   documentType,
   legalBranch,
-  precioCop
+  precioCop,
+  onSaldoCambiado
 }) => {
   const [archivo, setArchivo] = React.useState<File | null>(null);
   const [texto, setTexto] = React.useState('');
@@ -93,6 +96,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
         ? { fileName: archivo.name, contentBase64: await archivoABase64(archivo) }
         : { fileName: 'texto-pegado.txt', texto };
       setRespuesta(await reviewApi.revisar({ documentType, legalBranch, pregunta, ...cuerpo }));
+      onSaldoCambiado?.();
     } catch (err) {
       setError(err instanceof ApiError || err instanceof Error ? err.message : 'No se pudo revisar el escrito.');
     } finally {

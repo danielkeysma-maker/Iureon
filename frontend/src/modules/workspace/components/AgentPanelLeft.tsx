@@ -67,6 +67,8 @@ interface AgentPanelLeftProps {
   onClearActiveDraft?: () => void;
   /** Lo decide App: en movil solo se ve un panel a la vez. */
   ocultoEnMovil?: boolean;
+  /** Tras una operacion que cobra (la revision), para que la barra lateral relea el saldo. */
+  onSaldoCambiado?: () => void;
 }
 
 export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
@@ -81,7 +83,8 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
   logs,
   activeDraftText,
   onClearActiveDraft,
-  ocultoEnMovil = false
+  ocultoEnMovil = false,
+  onSaldoCambiado
 }) => {
   const [importedFiles, setImportedFiles] = useState<ArchivoAdjunto[]>([]);
   /** «Revisar un escrito»: el tercer uso del módulo, junto a redactar y corregir. */
@@ -326,6 +329,7 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
             documentType={documentType}
             legalBranch={legalBranch}
             precioCop={2000}
+            onSaldoCambiado={onSaldoCambiado}
           />
 
           {/* ─── FUNDAMENTOS QUE VA A USAR ─────────────────────────────────
