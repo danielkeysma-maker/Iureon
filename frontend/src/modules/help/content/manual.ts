@@ -58,7 +58,7 @@ const A_QUE_HACE: ManualArticle = {
         'Redacta un escrito completo a partir de los hechos que usted describa, con la estructura de la actuación que elija del catálogo.',
         'Resuelve el nombre de la actuación contra el catálogo verificado y le dice qué término rige, con el artículo que lo fija.',
         'Transcribe una grabación separando quién habla, y le deja corregir el texto, dividir una intervención y reasignar una voz.',
-        'Busca jurisprudencia en el corpus curado y, cuando ese corpus calla, consulta los buscadores oficiales de la Corte Constitucional y de la Corte Suprema.',
+        'Busca jurisprudencia en el corpus curado y, cuando ese corpus calla, consulta las relatorías oficiales de la Corte Constitucional, la Corte Suprema, el Consejo de Estado y la Comisión Nacional de Disciplina Judicial. Si el asunto es de un tribunal o un juzgado, no vive en ninguna de ellas y el escrito lo dice.',
         'Exporta a Word y a PDF con el membrete, la tipografía y la numeración que su firma haya configurado.'
       ]
     },
@@ -284,16 +284,29 @@ const A_ENTREVISTA: ManualArticle = {
       kind: 'pasos',
       pasos: [
         'Registre al cliente o búsquelo por su cédula.',
-        'Antes de subir el audio, la pantalla le pide constancia de que el cliente autorizó la grabación. Es un paso bloqueante y está ahí a propósito.',
-        'Suba la grabación. El audio va del navegador al almacenamiento sin pasar por nuestros servidores, y se borra apenas se devuelve el transcrito.',
+        'Tenga a la vista «Lo que no puede quedarse sin preguntar»: cuatro preguntas cuya respuesta define un término o cierra una prueba —la fecha exacta del hecho, cuándo lo notificaron, si hubo recurso o reclamación antes, y qué documentos tiene hoy—. Debajo de cada una dice qué se pierde si no se pregunta.',
+        'Antes de grabar, la pantalla le pide constancia de que el cliente autorizó la grabación. Es un paso bloqueante y está ahí a propósito: la voz es un dato biométrico y la hora del clic queda registrada.',
+        'Grabe desde el navegador —con pausa y con la onda del micrófono a la vista— o suba un archivo. El audio va del navegador al almacenamiento sin pasar por nuestros servidores, y se borra apenas se devuelve el transcrito.',
         'Corrija el transcrito: edite palabras mal oídas, divida una intervención donde hablan dos personas, reasigne una intervención a otra voz e identifique cada voz con su rol.',
+        'Al terminar de transcribir, las cuatro preguntas se tachan solas con lo que quedó dicho. Es una ayuda de memoria, no una comprobación: que una quede tachada no garantiza que la respuesta sirva, y que quede sin tachar no significa que no se habló del tema.',
         'Cierre la entrevista con una decisión. Si declina el caso, la decisión exige un motivo.'
       ]
+    },
+    {
+      kind: 'nota',
+      titulo: 'La segunda entrevista con el mismo cliente',
+      texto:
+        'Si el cliente ya tuvo una entrevista, el guion marca aparte —en azul y con la fecha— lo que quedó respondido en ella: «ya se habló de esto en la entrevista del 5 de agosto». Es distinto del tachado de hoy a propósito: una respuesta de hace tres semanas se relee, no se da por hecha. Lo que el cliente vuelva a decir hoy se tacha como de hoy.'
     },
     {
       kind: 'parrafo',
       texto:
         'A partir de lo que dijo el cliente —no de la entrevista entera, que es en su mayoría el abogado— la pantalla sugiere jurisprudencia del corpus. Si el corpus no cubre el tema, calla y lo explica en vez de ofrecer providencias apenas parecidas. No hay doctrina: son providencias, y la pantalla también lo dice.'
+    },
+    {
+      kind: 'parrafo',
+      texto:
+        'En el teléfono la entrevista se graba con la misma grabadora y el mismo consentimiento; el cronómetro es lo más grande de la pantalla y la grabación sigue con la pantalla apagada. El guion aparece al terminar de transcribir, no mientras se graba: el teléfono es la grabadora, y nadie lee una lista en el aparato que está grabando.'
     }
   ]
 };
@@ -306,7 +319,12 @@ const A_AUDIENCIA: ManualArticle = {
     {
       kind: 'parrafo',
       texto:
-        'Suba la grabación desde Audiencias. La transcripción separa a los interlocutores y le propone un rol para cada voz cuando encuentra en el propio audio la frase que lo justifica —quien reparte la palabra es el juez, el juramento marca al testigo—, siempre citando el minuto y la frase. Nunca asigna sola: si no hay señal clara, la voz queda como desconocida.'
+        'Suba la grabación desde Audiencias. Mientras el archivo viaja al almacenamiento el botón muestra el porcentaje enviado, y después dice «Transcribiendo»: son dos esperas distintas y las dos se ven. La transcripción separa a los interlocutores y le propone un rol para cada voz cuando encuentra en el propio audio la frase que lo justifica —quien reparte la palabra es el juez, el juramento marca al testigo—, siempre citando el minuto y la frase. Nunca asigna sola: si no hay señal clara, la voz queda como desconocida.'
+    },
+    {
+      kind: 'parrafo',
+      texto:
+        'Los fragmentos que el motor oyó con poca seguridad quedan marcados en el propio texto, solo en el tramo afectado: el resto de la intervención sí es fiable y no se marca. Una audiencia queda «Por revisar» hasta que alguien la lea y la marque como acta lista; esa marca es de una persona, no del motor.'
     },
     { kind: 'subtitulo', texto: 'Qué herramienta usar' },
     {
@@ -333,6 +351,15 @@ const A_AUDIENCIA: ManualArticle = {
       titulo: 'Vocabulario jurídico',
       texto:
         'El modelo va preparado para oír términos del oficio, y aun así se equivoca. Los errores peligrosos son los que suenan bien: «desembarco» por desembargo, «con recámaras» por Confecámaras. Por eso el transcrito se edita y la grabación se puede volver a oír.'
+    },
+    {
+      kind: 'subtitulo',
+      texto: 'El resumen y los hechos relevantes'
+    },
+    {
+      kind: 'parrafo',
+      texto:
+        'Sobre una audiencia o una entrevista transcrita puede pedir el resumen: unas frases sobre qué se trató y una lista de hechos dichos, cada uno con el minuto y quién lo dijo. Extrae lo que se dijo, no conclusiones jurídicas, y si el transcrito no trae hechos relevantes lo dice en vez de inventarlos. Se genera una vez y queda guardado; reabrirla mañana no lo vuelve a generar. Cuesta $50 del saldo cada vez que se genera o se regenera; transcribir no cuesta.'
     }
   ]
 };
@@ -383,12 +410,18 @@ const A_ROLES_SALDO: ManualArticle = {
     {
       kind: 'parrafo',
       texto:
-        'Cada escrito generado y cada transcripción consumen saldo de la firma. El saldo se reserva antes de llamar al modelo, no se cobra después: si no alcanza, se lo dicen antes de empezar, y si el trabajo falla, la reserva se devuelve. El saldo también fija cuánto puede extenderse un escrito, para que nunca reciba uno cortado por una regla que no conocía.'
+        'Consumen saldo los escritos generados, las orientaciones que pasen del cupo diario gratuito y el resumen de una audiencia o entrevista ($50 por resumen). Transcribir no consume saldo. El saldo se reserva antes de llamar al modelo, no se cobra después: si no alcanza, se lo dicen antes de empezar, y si el trabajo falla, la reserva se devuelve. El saldo también fija cuánto puede extenderse un escrito, para que nunca reciba uno cortado por una regla que no conocía.'
     },
     {
       kind: 'parrafo',
       texto:
-        'La pantalla de Saldo muestra el disponible y, con el consumo real de su firma, aproximadamente cuántos escritos alcanza. Las recargas se hacen desde ahí.'
+        'La pantalla de Saldo muestra el disponible, el consumo del mes —escritos, transcripciones y orientaciones— y, con el consumo real de su firma, aproximadamente cuántos escritos alcanza. Las recargas se hacen desde ahí: elija el monto y «Pagar» lo lleva a la pasarela de Wompi, donde paga con PSE, tarjeta o los medios que ofrezca; el saldo se acredita cuando la pasarela confirma y el movimiento queda en la misma pantalla. En el teléfono, Saldo está en «Más», abajo a la derecha.'
+    },
+    {
+      kind: 'nota',
+      titulo: 'Recargas que no pasan por la pasarela',
+      texto:
+        'Si Iureon le acredita saldo directamente —una compensación por un borrador fallido, por ejemplo—, esa recarga la hace el operador desde su consola, con un motivo escrito que queda en la auditoría de su firma con el correo de quien la hizo. Es la única forma en que el saldo se mueve sin que su firma pague.'
     },
     {
       kind: 'todavia-no',
@@ -461,11 +494,40 @@ const A_FORMATO: ManualArticle = {
   ]
 };
 
+const A_MOVIL: ManualArticle = {
+  id: 'movil',
+  titulo: 'Iureon en el teléfono',
+  entradilla:
+    'Cada módulo tiene su pantalla pensada para el teléfono. No es la de computador apretada: es otra, con lo que se hace de pie.',
+  bloques: [
+    {
+      kind: 'parrafo',
+      texto:
+        'Abajo hay una barra con cuatro puertas: Redactar, Audiencias, Entrevistas y Más. Arriba, el nombre del módulo y sus acciones. Todo lo demás —Buscador, Catálogo, Borradores, Manual, Soporte, Ajustes y Saldo— está en «Más», agrupado con los mismos verbos de la barra lateral del computador, para que no haya que aprender dos mapas del mismo producto.'
+    },
+    {
+      kind: 'lista',
+      items: [
+        'Redactar: el taller en pestañas —instrucción, configuración y escrito— y el visor con la barra de revisión. La orientación por hechos también está, con el mismo salto al taller.',
+        'Entrevistas: la grabadora ocupa la pantalla, con pausa y con la onda. El guion de las cuatro preguntas aparece al terminar de transcribir.',
+        'Audiencias: se sube el archivo, se ve el porcentaje mientras viaja, y el transcrito se lee con cada intervención a ancho completo. Asignar roles, dividir y corregir se hacen en el computador: de pie se revisa, no se edita.',
+        'Catálogo: se busca por nombre y cada ficha se abre completa, con su término, su fuente y su estado.',
+        'Los diálogos suben desde abajo, como una hoja, y se cierran deslizando o con el velo.'
+      ]
+    },
+    {
+      kind: 'aviso',
+      texto:
+        'Grabar una entrevista con la pantalla apagada funciona, pero cerrar la aplicación no: la grabación vive en la pestaña. Si va a grabar más de unos minutos, deje el teléfono con la aplicación al frente.'
+    }
+  ]
+};
+
 /** The index, grouped by task and by role — not by module. */
 export const MANUAL: readonly ManualGroup[] = [
   {
     titulo: 'Primeros 20 minutos',
-    articulos: [A_QUE_HACE, A_PRIMER_ESCRITO, A_TRES_ESTADOS, A_VERIFICAR]
+    articulos: [A_QUE_HACE, A_PRIMER_ESCRITO, A_TRES_ESTADOS, A_VERIFICAR, A_MOVIL]
   },
   { titulo: 'Redactar', articulos: [A_INSTRUCCION, A_EXPORTAR, A_BORRADORES] },
   { titulo: 'Grabar', articulos: [A_ENTREVISTA, A_AUDIENCIA] },
