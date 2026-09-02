@@ -52,3 +52,20 @@
 ::-webkit-scrollbar-thumb:hover {
   background-color: rgb(var(--ink-400));
 }
+
+/*
+ * AL IMPRIMIR, SOLO EL COMPROBANTE. La hoja del extracto se monta al final del
+ * <body> (portal) y esta oculta en pantalla; aqui se apaga todo lo demas. Es la
+ * alternativa a una ventana emergente, que el telefono bloquea.
+ */
+@media print {
+  body > *:not(#extracto-imprimible) {
+    display: none !important;
+  }
+  #extracto-imprimible {
+    display: block !important;
+  }
+  @page {
+    margin: 12mm;
+  }
+}

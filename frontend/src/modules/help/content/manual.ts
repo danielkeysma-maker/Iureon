@@ -418,10 +418,26 @@ const A_ROLES_SALDO: ManualArticle = {
         'La pantalla de Saldo muestra el disponible, el consumo del mes —escritos, transcripciones y orientaciones— y, con el consumo real de su firma, aproximadamente cuántos escritos alcanza. Las recargas se hacen desde ahí: elija el monto y «Pagar» lo lleva a la pasarela de Wompi, donde paga con PSE, tarjeta o los medios que ofrezca; el saldo se acredita cuando la pasarela confirma y el movimiento queda en la misma pantalla. En el teléfono, Saldo está en «Más», abajo a la derecha.'
     },
     {
+      kind: 'parrafo',
+      texto:
+        'Debajo de la recarga está el extracto del período: elija el mes y verá el saldo inicial, las entradas, las salidas por concepto —escritos, resúmenes, orientaciones— y el saldo final, sumados por el servidor sobre el mismo libro que la tabla de movimientos. «Imprimir comprobante» abre la impresión del navegador; en el teléfono, elija «Guardar como PDF». El comprobante lleva el nombre y el NIT de la firma, el período y el detalle línea por línea. Cada consumo aparece con el título del escrito o de la grabación que lo causó y con el correo de quien lo pidió.'
+    },
+    {
+      kind: 'nota',
+      titulo: 'El comprobante no es una factura',
+      texto:
+        'En Colombia la factura de venta es un documento que la DIAN valida antes de entregarse. El comprobante del extracto es informativo y lo dice en su pie: sirve para saber en qué se fue el saldo y para conciliar con contabilidad, pero no sustituye la factura electrónica de la recarga, que se emite por separado.'
+    },
+    {
       kind: 'nota',
       titulo: 'Recargas que no pasan por la pasarela',
       texto:
         'Si Iureon le acredita saldo directamente —una compensación por un borrador fallido, por ejemplo—, esa recarga la hace el operador desde su consola, con un motivo escrito que queda en la auditoría de su firma con el correo de quien la hizo. Es la única forma en que el saldo se mueve sin que su firma pague.'
+    },
+    {
+      kind: 'todavia-no',
+      texto:
+        'La factura electrónica de cada recarga no se emite todavía desde la aplicación. Cuando se emita, saldrá por un proveedor tecnológico autorizado por la DIAN y llegará al correo de facturación de la firma; hasta entonces, el comprobante del extracto es el único documento que la aplicación produce, y no es factura.'
     },
     {
       kind: 'todavia-no',

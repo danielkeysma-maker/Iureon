@@ -16,6 +16,7 @@
     "superadmin": "npx ts-node -P tsconfig.check.json --transpile-only src/scripts/createSuperAdmin.ts",
     "adopt": "npx ts-node -P tsconfig.check.json --transpile-only src/scripts/adoptOrphanData.ts",
     "check:admin": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/admin/__checks__/admin.check.ts",
+    "check:extracto": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/billing/__checks__/extracto.check.ts",
     "check:billing": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/billing/__checks__/billing.check.ts",
     "check:clients": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/clients/__checks__/clients.check.ts",
     "check:auth": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/auth/__checks__/auth.check.ts",

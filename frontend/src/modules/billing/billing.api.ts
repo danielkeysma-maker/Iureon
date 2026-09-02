@@ -37,6 +37,38 @@ export interface Movement {
   createdAt: string;
 }
 
+export interface Suma {
+  cantidad: number;
+  total: number;
+}
+
+/** The month's arithmetic, added up by the server over the same ledger the table shows. */
+export interface ResumenDelPeriodo {
+  saldoInicial: number;
+  saldoFinal: number;
+  recargas: Suma;
+  devoluciones: Suma;
+  ajustes: Suma;
+  consumo: {
+    borradores: Suma;
+    resumenes: Suma;
+    orientaciones: Suma;
+    otros: Suma;
+    total: number;
+  };
+  entradas: number;
+  salidas: number;
+}
+
+export interface Extracto {
+  periodo: string;
+  desde: string;
+  hasta: string;
+  truncado: boolean;
+  movimientos: Movement[];
+  resumen: ResumenDelPeriodo;
+}
+
 /** What the Wompi checkout needs, all of it decided by the server. */
 export interface CheckoutIntent {
   reference: string;
@@ -67,6 +99,10 @@ export const billingApi = {
 
   movements: () =>
     httpClient.get<{ movements: Movement[] }>('/api/billing/movements').then((r) => r.movements),
+
+  /** The month's ledger and its totals. `periodo` is AAAA-MM; the server cuts it in Bogotá time. */
+  statement: (periodo: string) =>
+    httpClient.get<Extracto>(`/api/billing/statement?periodo=${encodeURIComponent(periodo)}`),
 
   /*
    * The amount is sent, but not trusted: the server bounds it by the minimum

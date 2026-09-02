@@ -6,6 +6,7 @@ import {
   movements,
   usageSummary
 } from './billing.service';
+import { limitesDelPeriodo, resumirPeriodo } from './extracto';
 
 /**
  * What the firm has, what it spent, and why.
@@ -36,6 +37,48 @@ export const billingSummaryController = async (req: Request, res: Response): Pro
       // Same reason: the screen tells a firm the smallest recharge it can buy,
       // and the rule that will reject a smaller one is this same constant.
       minRecharge: MIN_RECHARGE_COP
+    });
+  } catch (err) {
+    fail(res, err);
+  }
+};
+
+/**
+ * GET /api/billing/statement?periodo=YYYY-MM
+ *
+ * The month's ledger and its arithmetic, for the comprobante the firm prints.
+ * The period defaults to the current month in Bogotá. It is a statement, not
+ * an invoice — see `extracto.ts` for why that word matters here.
+ */
+const MAXIMO_MOVIMIENTOS_DEL_PERIODO = 2000;
+
+const periodoActualEnBogota = (): string => {
+  const bogota = new Date(Date.now() - 5 * 60 * 60 * 1000);
+  return `${bogota.getUTCFullYear()}-${String(bogota.getUTCMonth() + 1).padStart(2, '0')}`;
+};
+
+export const billingStatementController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const periodo = typeof req.query.periodo === 'string' ? req.query.periodo : periodoActualEnBogota();
+    const limites = limitesDelPeriodo(periodo);
+    if (!limites) {
+      res.status(400).json({
+        success: false,
+        error: 'INVALID_PERIOD',
+        message: 'El período debe tener la forma AAAA-MM, por ejemplo 2026-09.'
+      });
+      return;
+    }
+
+    const movimientos = await movements(req.firmId as string, MAXIMO_MOVIMIENTOS_DEL_PERIODO, limites);
+    res.json({
+      success: true,
+      periodo,
+      desde: limites.desde,
+      hasta: limites.hasta,
+      truncado: movimientos.length >= MAXIMO_MOVIMIENTOS_DEL_PERIODO,
+      movimientos,
+      resumen: resumirPeriodo(movimientos)
     });
   } catch (err) {
     fail(res, err);

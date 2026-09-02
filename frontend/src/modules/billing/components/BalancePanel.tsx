@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowDownRight, ArrowUpRight, Download, RefreshCw } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import { billingApi, type BillingSummary, type CheckoutIntent, type Movement } from '../billing.api';
+import { ExtractoDelPeriodo } from './ExtractoDelPeriodo';
 
 interface BalancePanelProps {
   isOpen: boolean;
@@ -27,8 +28,10 @@ interface BalancePanelProps {
  * · El desglose de IVA (19%) sobre la recarga: el servidor firma el monto tal
  *   cual y la comisión de la pasarela la absorbe la plataforma — mostrar un
  *   IVA que no se cobra sería inventar un impuesto.
- * · «Factura electrónica al correo de facturación»: la facturación no existe
- *   todavía; anunciarla sería prometer un documento que no va a llegar.
+ * · «Factura electrónica al correo de facturación»: la factura electrónica no
+ *   existe todavía; anunciarla sería prometer un documento que no va a llegar.
+ *   Lo que SÍ hay es el extracto del período con su comprobante imprimible,
+ *   que dice en su pie que no es factura (ExtractoDelPeriodo.tsx).
  * · «Avisar a los socios bajo $120.000»: no hay sistema de avisos. La regla
  *   que SÍ es real se declara abajo: el cobro se reserva al INICIAR el
  *   escrito, así que la generación nunca se corta a mitad de uno.
@@ -379,6 +382,9 @@ export const BalancePanel: React.FC<BalancePanelProps> = ({
             saldo se acredita cuando la pasarela confirma el pago, y el movimiento queda abajo.
           </p>
         </div>
+
+        {/* ─── EXTRACTO DEL PERÍODO · sumado por el servidor, imprimible ──── */}
+        <ExtractoDelPeriodo activo={isOpen} firmName={firmName} firmNit={firmNit} />
 
         {/* ─── MOVIMIENTOS · Fecha Concepto Usuario Valor Saldo ──────────── */}
         <div className="overflow-hidden rounded-card border border-line-200 bg-surface">

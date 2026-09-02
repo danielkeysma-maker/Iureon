@@ -613,16 +613,25 @@ export interface Movement {
   createdAt: string;
 }
 
-/** Why the balance is what it is, newest first. */
-export const movements = async (firmId: string, limit = 50): Promise<Movement[]> => {
+/**
+ * Why the balance is what it is, newest first.
+ *
+ * With a range it becomes the raw material of a period statement: every row
+ * between `desde` (inclusive) and `hasta` (exclusive), capped high enough that
+ * a month of a busy firm fits whole — a statement over a truncated ledger is
+ * wrong money, so the cap is generous and the caller knows it exists.
+ */
+export const movements = async (
+  firmId: string,
+  limit = 50,
+  rango?: { desde: string; hasta: string }
+): Promise<Movement[]> => {
   const db = requireDb();
 
-  const { data } = await db
-    .from('credit_movements')
-    .select('*')
-    .eq('firm_id', firmId)
-    .order('created_at', { ascending: false })
-    .limit(limit);
+  let consulta = db.from('credit_movements').select('*').eq('firm_id', firmId);
+  if (rango) consulta = consulta.gte('created_at', rango.desde).lt('created_at', rango.hasta);
+
+  const { data } = await consulta.order('created_at', { ascending: false }).limit(limit);
 
   return ((data ?? []) as Record<string, unknown>[]).map((row) => ({
     kind: String(row.kind),
