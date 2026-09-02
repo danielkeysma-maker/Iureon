@@ -10,6 +10,7 @@ import {
   settleOperation
 } from '../../billing/billing.service';
 import { decodeDocument } from '../../ingestion/documentFetch';
+import { BackblazeB2TenantStorageService } from '../../documents/b2.service';
 import type { LegalBranch } from '../../catalog/types';
 import { buildCatalogGuidance } from '../catalogGuidance';
 import { ENGINE, callOpenRouterWithUsage } from '../openrouter.client';
@@ -41,8 +42,38 @@ import {
  * costs nothing.
  */
 
+const b2 = new BackblazeB2TenantStorageService();
+
 /** Text below this is not a brief; it is a title or a botched extraction. */
 const TEXTO_MINIMO = 200;
+/*
+ * Above the body limit the file comes through storage, like hearing audio:
+ * the browser uploaded it to B2 under the firm's prefix and sends the key.
+ * 15 MB covers a tutela with scanned annexes. The object is deleted BEFORE
+ * responding, succeed or fail — a serverless function freezes on reply, and
+ * a brief nobody can account for must not sit in a bucket.
+ */
+const MAX_BYTES_ALMACEN = 15 * 1024 * 1024;
+
+const leerDelAlmacen = async (
+  firmId: string,
+  storageKey: string
+): Promise<{ ok: true; buffer: Buffer } | { ok: false; status: number; message: string }> => {
+  try {
+    const url = await b2.generateDownloadPresignedUrl(firmId, storageKey);
+    const r = await fetch(url, { signal: AbortSignal.timeout(30_000) });
+    if (!r.ok) return { ok: false, status: 502, message: `El almacenamiento no entregó el archivo (${r.status}).` };
+    const declarado = Number(r.headers.get('content-length') ?? 0);
+    if (declarado > MAX_BYTES_ALMACEN) return { ok: false, status: 413, message: 'El archivo supera 15 MB.' };
+    const buffer = Buffer.from(await r.arrayBuffer());
+    if (buffer.length > MAX_BYTES_ALMACEN) return { ok: false, status: 413, message: 'El archivo supera 15 MB.' };
+    return { ok: true, buffer };
+  } catch (err) {
+    return { ok: false, status: 502, message: `No se pudo leer el archivo del almacenamiento: ${(err as Error).message}` };
+  } finally {
+    await b2.deleteObject(firmId, storageKey).catch(() => false);
+  }
+};
 /** Base64 of ~4 MB. Above it Vercel would refuse the body anyway; here it fails with a reason. */
 const MAX_BASE64 = 5_600_000;
 
@@ -82,9 +113,8 @@ const textoDeDocx = async (buffer: Buffer): Promise<string | null> => {
 
 const extraerTexto = async (
   fileName: string,
-  contentBase64: string
+  buffer: Buffer
 ): Promise<{ ok: true; texto: string } | { ok: false; reason: string }> => {
-  const buffer = Buffer.from(contentBase64, 'base64');
   const contentType = tipoPorNombre(fileName);
 
   if (contentType.includes('wordprocessingml') || buffer.subarray(0, 2).toString() === 'PK') {
@@ -116,10 +146,22 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
     bruto = req.body.texto;
   } else if (typeof req.body.contentBase64 === 'string' && req.body.contentBase64) {
     if (req.body.contentBase64.length > MAX_BASE64) {
-      res.status(413).json({ success: false, error: 'FILE_TOO_LARGE', message: 'El archivo supera 4 MB. Pegue el texto en su lugar.' });
+      res.status(413).json({ success: false, error: 'FILE_TOO_LARGE', message: 'El archivo supera el tamaño que cabe en la petición; el navegador debió subirlo al almacenamiento.' });
       return;
     }
-    const extraido = await extraerTexto(fileName, req.body.contentBase64);
+    const extraido = await extraerTexto(fileName, Buffer.from(req.body.contentBase64, 'base64'));
+    if (!extraido.ok) {
+      res.status(422).json({ success: false, error: 'UNREADABLE_FILE', message: `No se pudo leer el archivo: ${extraido.reason}. Pegue el texto en su lugar.` });
+      return;
+    }
+    bruto = extraido.texto;
+  } else if (typeof req.body.storageKey === 'string' && req.body.storageKey) {
+    const leido = await leerDelAlmacen(firmId, req.body.storageKey);
+    if (!leido.ok) {
+      res.status(leido.status).json({ success: false, error: 'STORAGE_READ_FAILED', message: leido.message });
+      return;
+    }
+    const extraido = await extraerTexto(fileName, leido.buffer);
     if (!extraido.ok) {
       res.status(422).json({ success: false, error: 'UNREADABLE_FILE', message: `No se pudo leer el archivo: ${extraido.reason}. Pegue el texto en su lugar.` });
       return;

@@ -40,7 +40,10 @@ export interface PeticionDeRevision {
   legalBranch?: string;
   pregunta: string;
   fileName?: string;
+  /** Hasta ~3,5 MB: el archivo viaja dentro del JSON. */
   contentBase64?: string;
+  /** Más grande: se subió directo al almacenamiento y viaja solo la clave. */
+  storageKey?: string;
   texto?: string;
 }
 

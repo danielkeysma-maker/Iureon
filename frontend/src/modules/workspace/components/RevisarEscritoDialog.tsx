@@ -3,6 +3,7 @@ import { AlertTriangle, CheckCircle2, ClipboardCheck, Copy, FileText, UploadClou
 import { Dialog } from '../../../design/Dialog';
 import { ApiError } from '../../../config/httpClient';
 import { archivoABase64, reviewApi, type RespuestaDeRevision } from '../services/review.api';
+import { uploadFileToStorage } from '../../documents/services/storageUpload';
 
 /**
  * Revisar un escrito ya redactado.
@@ -36,7 +37,14 @@ interface RevisarEscritoDialogProps {
   onSaldoCambiado?: () => void;
 }
 
-const MAX_BYTES = 4 * 1024 * 1024;
+/*
+ * 15 MB: una tutela con sus anexos escaneados. Hasta EN_CUERPO el archivo viaja
+ * dentro del JSON (un viaje, sin almacenamiento); por encima, Vercel no acepta
+ * el cuerpo y el archivo sube directo a B2 como el audio de las audiencias: el
+ * servidor lo lee desde ahi y lo borra antes de responder.
+ */
+const MAX_BYTES = 15 * 1024 * 1024;
+const EN_CUERPO = 3_500_000;
 const pesos = (n: number): string => `$${Math.round(n).toLocaleString('es-CO')}`;
 
 const SUGERENCIAS = [
@@ -60,6 +68,8 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
   const [error, setError] = React.useState('');
   const [respuesta, setRespuesta] = React.useState<RespuestaDeRevision | null>(null);
   const [copiado, setCopiado] = React.useState(false);
+  /** Porcentaje de subida cuando el archivo va por almacenamiento; null si no aplica. */
+  const [subiendo, setSubiendo] = React.useState<number | null>(null);
 
   React.useEffect(() => {
     if (abierto) return;
@@ -79,7 +89,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
     e.target.value = '';
     if (!f) return;
     if (f.size > MAX_BYTES) {
-      setError('El archivo supera 4 MB. Pegue el texto en su lugar.');
+      setError('El archivo supera 15 MB. Quite los anexos o pegue el texto del escrito.');
       return;
     }
     setError('');
@@ -92,15 +102,24 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
     setError('');
     setRespuesta(null);
     try {
-      const cuerpo = archivo
-        ? { fileName: archivo.name, contentBase64: await archivoABase64(archivo) }
-        : { fileName: 'texto-pegado.txt', texto };
+      let cuerpo: { fileName: string; contentBase64?: string; storageKey?: string; texto?: string };
+      if (!archivo) {
+        cuerpo = { fileName: 'texto-pegado.txt', texto };
+      } else if (archivo.size <= EN_CUERPO) {
+        cuerpo = { fileName: archivo.name, contentBase64: await archivoABase64(archivo) };
+      } else {
+        setSubiendo(0);
+        const storageKey = await uploadFileToStorage(archivo, 'revisiones', setSubiendo, 'el escrito');
+        setSubiendo(null);
+        cuerpo = { fileName: archivo.name, storageKey };
+      }
       setRespuesta(await reviewApi.revisar({ documentType, legalBranch, pregunta, ...cuerpo }));
       onSaldoCambiado?.();
     } catch (err) {
       setError(err instanceof ApiError || err instanceof Error ? err.message : 'No se pudo revisar el escrito.');
     } finally {
       setOcupado(false);
+      setSubiendo(null);
     }
   };
 
@@ -177,7 +196,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
               className="btn-primary btn-sm disabled:opacity-50"
             >
               <ClipboardCheck className="h-3.5 w-3.5" />
-              {ocupado ? 'Revisando…' : `Revisar · ${pesos(precioCop)}`}
+              {ocupado ? (subiendo !== null ? `Enviando · ${subiendo}%` : 'Revisando…') : `Revisar · ${pesos(precioCop)}`}
             </button>
           </>
         )
@@ -202,7 +221,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
                 <label className="mt-1.5 flex cursor-pointer items-center justify-center gap-2 rounded-control border border-dashed border-line-200 bg-canvas py-3 hover:bg-brand-50">
                   <input type="file" accept=".pdf,.docx,.doc,.txt" onChange={elegirArchivo} className="hidden" />
                   <UploadCloud className="h-4 w-4 text-ink-400" />
-                  <span className="text-meta font-medium text-ink-500">Subir PDF, Word o texto (hasta 4 MB)</span>
+                  <span className="text-meta font-medium text-ink-500">Subir PDF, Word o texto (hasta 15 MB, con anexos)</span>
                 </label>
                 <p className="mt-2 text-center font-mono text-[10px] uppercase tracking-[0.08em] text-ink-400">o pegue el texto</p>
                 <textarea
@@ -248,6 +267,23 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
             </div>
           </div>
 
+          {/*
+            POR QUE EL BOTON ESTA APAGADO, escrito junto a lo que falta. El
+            usuario adjunto el PDF, escribio la pregunta y el boton siguio gris:
+            faltaba la actuacion, que se elige ARRIBA, fuera del dialogo, y el
+            subtitulo que lo decia paso inadvertido. Un boton mudo se lee como
+            un defecto; un boton que dice que le falta se obedece.
+          */}
+          {!error && sinActuacion && (
+            <p className="rounded-control border border-line-200 bg-canvas px-3 py-2 text-[12px] leading-snug text-ink-900">
+              <span className="font-semibold">Falta elegir la actuación.</span> Está en la barra de arriba, en «Elegir
+              actuación…», después de la rama. La revisión objetiva se hace contra la ficha verificada de esa actuación; sin
+              ella no hay contra qué revisar.
+            </p>
+          )}
+          {!error && !sinActuacion && !hayEscrito && (
+            <p className="text-[12px] leading-snug text-ink-500">Suba el archivo o pegue el texto para habilitar el botón.</p>
+          )}
           {error && <p className="text-[12px] leading-snug text-danger">{error}</p>}
 
           <p className="text-meta text-ink-400">
