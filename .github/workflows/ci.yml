@@ -48,6 +48,8 @@ jobs:
         run: npm run check:triage
       - name: Period statement arithmetic is exact
         run: npm run check:extracto
+      - name: PDF reader works without the optional native canvas
+        run: npm run check:pdf
 
       - name: Build
         run: npm run build

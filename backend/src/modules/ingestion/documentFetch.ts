@@ -38,6 +38,7 @@
  *     rulings first anyway. Only a lawyer pasting `c�rceles` into a brief would
  *     have found it.
  */
+import { asegurarDOMMatrix } from './domMatrixPolyfill';
 
 /**
  * OLE compound-file signature — the container Word 97 `.doc` files live in.
@@ -144,6 +145,9 @@ export const decodeDocument = async (
 
   if (isPdf) {
     try {
+      // pdf.js builds a DOMMatrix at load; in Node it comes from an OPTIONAL native
+      // package that production lacks. Ours goes in first (see domMatrixPolyfill.ts).
+      asegurarDOMMatrix();
       const { PDFParse } = await import('pdf-parse');
       const parser = new PDFParse({ data: buffer });
       try {
