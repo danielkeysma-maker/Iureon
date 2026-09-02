@@ -134,7 +134,7 @@ export const FirmDetailDialog: React.FC<FirmDetailDialogProps> = ({ firmId, onCl
       titulo={firma?.name ?? 'Ficha de la firma'}
       subtitulo={
         firma
-          ? `NIT ${firma.nit} · cliente desde ${new Date(firma.createdAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' })} · id ${firma.id}`
+          ? `${firma.nit ? `NIT ${firma.nit}` : 'Sin NIT'} · cliente desde ${new Date(firma.createdAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' })} · id ${firma.id}`
           : 'Acciones de operación, y lo que operación no puede ver ni hacer.'
       }
       tamano="L"

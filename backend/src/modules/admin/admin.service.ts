@@ -25,7 +25,8 @@ import { auditService, type AuditLogEntry } from '../audit/audit.service';
 export interface FirmSummary {
   id: string;
   name: string;
-  nit: string;
+  /** Opcional: hay litigantes y despachos sin NIT. NULL en la base, nunca ''. */
+  nit: string | null;
   planTier: string;
   status: string;
   creditsBalance: number;
@@ -51,7 +52,8 @@ const requireClient = () => {
 interface FirmRow {
   firm_id: string;
   name: string;
-  nit: string;
+  /** Opcional: hay litigantes y despachos sin NIT. NULL en la base, nunca ''. */
+  nit: string | null;
   plan_tier: string;
   subscription_status: string;
   credit_balance_cop: number | string;
@@ -310,7 +312,8 @@ export const getFirmDetail = async (firmId: string): Promise<FirmDetail> => {
  */
 export const createFirm = async (input: {
   firmName: string;
-  nit: string;
+  /** Opcional. Se guarda NULL cuando viene vacio: la columna es UNIQUE y '' repetido chocaria. */
+  nit?: string;
   adminEmail: string;
   adminPassword: string;
   initialCredits?: number;
@@ -318,20 +321,29 @@ export const createFirm = async (input: {
   const client = requireClient();
 
   const firmName = input.firmName.trim();
-  const nit = input.nit.trim();
+  /*
+   * EL NIT ES OPCIONAL. Un abogado litigante que factura como persona natural
+   * no tiene NIT, y tampoco lo tiene un despacho pequeno que aun no lo tramita;
+   * exigirlo dejaba fuera a clientes reales. Cuando viene, sigue siendo unico.
+   * Vacio se guarda como NULL: la columna es UNIQUE y dos '' chocarian, dos
+   * NULL no.
+   */
+  const nit = (input.nit ?? '').trim() || null;
 
-  if (!firmName || !nit) {
-    throw new AuthError('INVALID_FIRM', 'Se requieren el nombre y el NIT de la firma.');
+  if (!firmName) {
+    throw new AuthError('INVALID_FIRM', 'Se requiere el nombre de la firma.');
   }
 
-  const { data: existing } = await client
-    .from('firms')
-    .select('firm_id')
-    .eq('nit', nit)
-    .maybeSingle();
+  if (nit) {
+    const { data: existing } = await client
+      .from('firms')
+      .select('firm_id')
+      .eq('nit', nit)
+      .maybeSingle();
 
-  if (existing) {
-    throw new AuthError('FIRM_EXISTS', 'Ya hay una firma registrada con ese NIT.', 409);
+    if (existing) {
+      throw new AuthError('FIRM_EXISTS', 'Ya hay una firma registrada con ese NIT.', 409);
+    }
   }
 
   const firmId = `firm-${Date.now()}`;

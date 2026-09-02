@@ -61,7 +61,7 @@ export const createFirmController = async (req: Request, res: Response): Promise
   try {
     const firm = await createFirm({
       firmName: String(req.body.firmName ?? ''),
-      nit: String(req.body.nit ?? ''),
+      nit: typeof req.body.nit === 'string' ? req.body.nit : '',
       adminEmail: String(req.body.adminEmail ?? ''),
       adminPassword: String(req.body.adminPassword ?? ''),
       initialCredits: Number(req.body.initialCredits ?? 0)
@@ -71,7 +71,7 @@ export const createFirmController = async (req: Request, res: Response): Promise
       firmId: firm.id,
       userEmail: req.user!.email,
       action: 'FIRM_CREATED',
-      resource: `${firm.name} (NIT ${firm.nit}) · administrador ${req.body.adminEmail}`,
+      resource: `${firm.name} (${firm.nit ? `NIT ${firm.nit}` : 'sin NIT'}) · administrador ${req.body.adminEmail}`,
       ipAddress: callerIp(req)
     });
 

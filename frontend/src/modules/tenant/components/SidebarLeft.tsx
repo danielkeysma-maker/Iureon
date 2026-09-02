@@ -68,7 +68,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
     ? { nombre: 'SuperUsuario', detalle: 'Acceso total · sin firma', Icono: Shield }
     : isParticularUser
     ? { nombre: 'Abogado particular', detalle: 'Uso personal · sin firma', Icono: User }
-    : { nombre: activeFirm.name, detalle: activeFirm.nit, Icono: Building2 };
+    : { nombre: activeFirm.name, detalle: activeFirm.nit || 'Sin NIT', Icono: Building2 };
 
   /** Un módulo de la barra. El mismo en riel y expandida. */
   const Item = ({ id }: { id: MainView }) => {

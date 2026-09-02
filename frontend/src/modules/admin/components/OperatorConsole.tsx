@@ -258,9 +258,8 @@ export const OperatorConsole: React.FC = () => {
             <input
               value={nueva.nit}
               onChange={(e) => setNueva({ ...nueva, nit: e.target.value })}
-              placeholder="NIT"
+              placeholder="NIT (opcional: un litigante persona natural no tiene)"
               className="bg-canvas border border-line-200 rounded-control px-3 py-2 text-[11px] font-mono focus:outline-none focus:border-brand-700"
-              required
             />
             <input
               type="email"
@@ -328,7 +327,7 @@ export const OperatorConsole: React.FC = () => {
                   >
                     {firm.name}
                   </button>
-                  <p className="text-[11px] text-ink-500 font-mono">NIT {firm.nit}</p>
+                  <p className="text-[11px] text-ink-500 font-mono">{firm.nit ? `NIT ${firm.nit}` : 'Sin NIT'}</p>
                 </div>
 
                 <span

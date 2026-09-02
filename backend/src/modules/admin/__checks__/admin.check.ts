@@ -141,6 +141,41 @@ const PRIVILEGIADO = 'material privilegiado';
    * garantia: un poder que cruza el limite del inquilino solo es aceptable si
    * el inquilino puede leer que se hizo Y POR QUE.
    */
+  /*
+   * SIN NIT TAMBIEN SE PUEDE. Hay litigantes —personas naturales— y despachos
+   * pequenos que no tienen NIT, y el alta los rechazaba con «se requieren el
+   * nombre y el NIT». El NIT es opcional; si viene, sigue siendo unico. Dos
+   * firmas sin NIT deben convivir: la columna es UNIQUE y Postgres admite
+   * varios NULL, pero no varios '' — asi que el servidor guarda NULL.
+   */
+  const sinNit1 = await pedir('/admin/firms', opToken, {
+    method: 'POST',
+    body: JSON.stringify({
+      firmName: `Litigante sin NIT ${m}`,
+      adminEmail: `sinnit1-${m}@iureon.test`,
+      adminPassword: clavePrueba()
+    })
+  });
+  check('una firma sin NIT se crea', sinNit1.status === 201, `${sinNit1.status} ${JSON.stringify(sinNit1.body)}`);
+  check('y su NIT queda vacio, no inventado', sinNit1.body?.firm?.nit === null, String(sinNit1.body?.firm?.nit));
+
+  const sinNit2 = await pedir('/admin/firms', opToken, {
+    method: 'POST',
+    body: JSON.stringify({
+      firmName: `Otro litigante sin NIT ${m}`,
+      nit: '   ',
+      adminEmail: `sinnit2-${m}@iureon.test`,
+      adminPassword: clavePrueba()
+    })
+  });
+  check('una segunda firma sin NIT tambien (NULL, no cadena vacia)', sinNit2.status === 201, `${sinNit2.status} ${JSON.stringify(sinNit2.body)}`);
+
+  const sinNombre = await pedir('/admin/firms', opToken, {
+    method: 'POST',
+    body: JSON.stringify({ firmName: '  ', adminEmail: `sinnombre-${m}@iureon.test`, adminPassword: clavePrueba() })
+  });
+  check('el nombre si sigue siendo obligatorio', sinNombre.status === 400, String(sinNombre.status));
+
   const sinMotivo = await pedir(`/admin/firms/${cliente.user.firmId}/credits`, opToken, {
     method: 'POST',
     body: JSON.stringify({ amount: 50000 })

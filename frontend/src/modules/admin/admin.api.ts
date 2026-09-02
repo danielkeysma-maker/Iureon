@@ -16,7 +16,8 @@ import type {
 export interface FirmSummary {
   id: string;
   name: string;
-  nit: string;
+  /** Opcional: hay litigantes y despachos sin NIT. */
+  nit: string | null;
   planTier: string;
   status: string;
   creditsBalance: number;
