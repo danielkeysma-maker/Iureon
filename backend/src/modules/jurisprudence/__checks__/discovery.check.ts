@@ -31,36 +31,56 @@ const check = (n: string, ok: boolean, d = ''): void => {
    */
   const resultado = await discoverRulings('desembargo de salario mínimo');
 
+  /*
+   * SIN LLAVE YA NO ES «APAGADO»: la llave solo hace falta para la relatoría de
+   * la Corte Constitucional. La Suprema y el Consejo de Estado tienen buscador
+   * propio y responden igual. Así que sin llave hay dos salidas honestas:
+   *   - OK, si alguna de las dos devolvió providencias con texto;
+   *   - NO_PROVIDER, si ninguna devolvió nada, y la razón dice cuál falta.
+   * Este check exigía NO_PROVIDER siempre y una frase que el servicio ya no
+   * dice. El CI —que no tiene la llave— falló durante veinte corridas por un
+   * check desactualizado, no por el módulo: el módulo hacía lo correcto y el
+   * guardián describía la versión anterior. Un check es un contrato; cuando el
+   * contrato cambia a propósito, el check cambia con él, o miente.
+   */
   if (!config.search.enabled) {
     check(
-      'sin llave, el descubrimiento se declara NO_PROVIDER y no falla',
-      resultado.status === 'NO_PROVIDER',
+      'sin llave, el descubrimiento responde (OK por las otras cortes) o se declara NO_PROVIDER, nunca FAILED',
+      resultado.status === 'OK' || resultado.status === 'NO_PROVIDER',
       resultado.status
     );
-    check(
-      'y lo explica sin dar a entender que la búsqueda entera está rota',
-      /corpus indexado/.test(resultado.reason ?? ''),
-      resultado.reason ?? ''
-    );
+    if (resultado.status === 'NO_PROVIDER') {
+      check(
+        'y explica que lo no configurado es la Constitucional, sin dar a entender que la búsqueda entera está rota',
+        /Corte Constitucional/.test(resultado.reason ?? '') && /no está configurado/.test(resultado.reason ?? ''),
+        resultado.reason ?? ''
+      );
+    } else {
+      console.log(`     sin llave, ${resultado.found.length} providencia(s) de las otras cortes`);
+    }
   } else {
     check('con llave, el descubrimiento responde', resultado.status === 'OK', resultado.status);
-
-    // Todo lo devuelto trae texto real: si algo llegó aquí, fue descargado.
-    const sinTexto = resultado.found.filter((f) => (f.ruling.text ?? '').length < 4000);
-    check(
-      'toda sentencia propuesta viene con su texto descargado',
-      sinTexto.length === 0,
-      sinTexto.map((f) => f.ruling.citation).join(', ')
-    );
-
-    // Y con procedencia del registro, no del buscador.
-    const sinProcedencia = resultado.found.filter((f) => !f.ruling.magistrado || !f.ruling.fecha);
-    check(
-      'y con su ponente y fecha del registro oficial',
-      sinProcedencia.length === 0,
-      sinProcedencia.map((f) => f.ruling.citation).join(', ')
-    );
   }
+
+  // Con llave o sin ella: todo lo devuelto trae texto real. Si algo llegó aquí, fue descargado.
+  const sinTexto = resultado.found.filter((f) => (f.ruling.text ?? '').length < 4000);
+  check(
+    'toda sentencia propuesta viene con su texto descargado',
+    sinTexto.length === 0,
+    sinTexto.map((f) => f.ruling.citation).join(', ')
+  );
+
+  // Y con procedencia del registro, no del buscador.
+  const sinProcedencia = resultado.found.filter((f) => !f.ruling.magistrado || !f.ruling.fecha);
+  check(
+    'y con su ponente y fecha del registro oficial',
+    sinProcedencia.length === 0,
+    sinProcedencia.map((f) => f.ruling.citation).join(', ')
+  );
+
+  // Lo que se dejó fuera se explica: una providencia real que no se propone no es un silencio.
+  const descartesMudos = resultado.descartadas.filter((d) => !d.razon);
+  check('y cada providencia descartada trae su razón', descartesMudos.length === 0, String(descartesMudos.length));
 
   /*
    * ─── LA FRONTERA, COMPROBADA CONTRA LA REALIDAD ──────────────────────────
