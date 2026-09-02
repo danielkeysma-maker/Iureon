@@ -46,6 +46,8 @@ jobs:
         run: npm run check:discovery
       - name: Facts triage cannot invent an actuación
         run: npm run check:triage
+      - name: Period statement arithmetic is exact
+        run: npm run check:extracto
 
       - name: Build
         run: npm run build

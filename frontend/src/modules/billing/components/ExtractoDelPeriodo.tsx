@@ -46,14 +46,19 @@ const pesos = (valor: number): string => {
 const fechaHora = (iso: string): string =>
   new Date(iso).toLocaleString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 
-/** «septiembre de 2026», desde «2026-09». */
+/**
+ * «Septiembre de 2026», desde «2026-09». Solo la primera letra en mayúscula:
+ * `text-transform: capitalize` daba «Septiembre De 2026», que en español es
+ * un error de ortografía impreso en un comprobante.
+ */
 const nombreDelPeriodo = (periodo: string): string => {
   const [a, m] = periodo.split('-').map(Number);
-  return new Date(Date.UTC(a, m - 1, 15)).toLocaleDateString('es-CO', {
+  const nombre = new Date(Date.UTC(a, m - 1, 15)).toLocaleDateString('es-CO', {
     month: 'long',
     year: 'numeric',
     timeZone: 'UTC'
   });
+  return nombre.charAt(0).toUpperCase() + nombre.slice(1);
 };
 
 /** El mes en curso en Bogotá, con la misma regla que el servidor (UTC-5, sin horario de verano). */
@@ -124,7 +129,7 @@ export const ExtractoDelPeriodo: React.FC<ExtractoDelPeriodoProps> = ({ activo, 
             id="periodo-extracto"
             value={periodo}
             onChange={(e) => setPeriodo(e.target.value)}
-            className="field h-8 w-auto py-0 text-[12.5px] capitalize"
+            className="field h-8 w-auto py-0 text-[12.5px]"
           >
             {periodos.map((p) => (
               <option key={p} value={p}>
@@ -213,7 +218,7 @@ const HojaImprimible: React.FC<{ extracto: Extracto; firmName: string; firmNit?:
             <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Comprobante de movimientos de saldo</div>
           </div>
           <div style={{ textAlign: 'right', fontSize: 11 }}>
-            <div style={{ textTransform: 'capitalize' }}>{nombreDelPeriodo(extracto.periodo)}</div>
+            <div>{nombreDelPeriodo(extracto.periodo)}</div>
             <div>Generado el {generado}</div>
           </div>
         </div>
