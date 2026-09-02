@@ -10,6 +10,12 @@ import {
 import { useTranscription } from '../../transcription/hooks/useTranscription';
 import { clientsApi } from '../clients.api';
 import { CerrarEntrevistaDialog } from './CerrarEntrevistaDialog';
+import {
+  GUION_BASE,
+  cubiertasEnEntrevistasPrevias,
+  estadoDelGuion,
+  preguntasCubiertas
+} from '../guionDeEntrevista';
 import { IconoDocumento, IconoSinVerificar } from '../../../design/ArtboardIcons';
 
 
@@ -120,6 +126,31 @@ export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
 
   const [cerrarAbierto, setCerrarAbierto] = React.useState(false);
   const trabajando = isUploading || isTranscribing;
+
+  /*
+   * EL GUION, SOLO DESPUES DE TRANSCRIBIR. El artboard 4d no lo dibuja en la
+   * pantalla de grabacion y tiene razon: el telefono ES la grabadora, sobre la
+   * mesa, y nadie lee una lista mientras graba. Lo que si se perdia era la
+   * comprobacion al terminar — el abogado que entrevisto con el telefono no
+   * veia que falto la fecha del hecho hasta ir a redactar. Misma funcion pura
+   * que en escritorio, mismos tres estados, sin tocar nada de la grabacion.
+   */
+  const cubiertasHoy = React.useMemo(() => preguntasCubiertas(result?.segments ?? []), [result]);
+  const previas = React.useMemo(
+    () =>
+      clienteId
+        ? stored
+            .filter((i) => i.client_id === clienteId && i.id !== transcriptionId)
+            .map((i) => ({ id: i.id, transcribedAt: i.transcribed_at ?? null, segments: i.segments ?? [] }))
+        : [],
+    [stored, clienteId, transcriptionId]
+  );
+  const estadosGuion = React.useMemo(
+    () => estadoDelGuion(cubiertasHoy, cubiertasEnEntrevistasPrevias(previas)),
+    [cubiertasHoy, previas]
+  );
+  const fechaCorta = (iso: string | null): string =>
+    iso ? new Date(iso).toLocaleDateString('es-CO', { day: 'numeric', month: 'long' }) : 'una entrevista anterior';
 
   /*
    * EL ACTA CON DATOS REALES Y SIN RED, igual que en escritorio: todo sale de
@@ -323,6 +354,58 @@ export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
             </p>
           </div>
         ))}
+
+        {/*
+          LO QUE NO PUEDE QUEDARSE SIN PREGUNTAR, como comprobacion y no como
+          guion: aparece cuando ya hay transcrito, en el idioma del pie de 4d
+          (rotulo en mono versales, sin tarjeta). Tres estados: dicho hoy, dicho
+          en una entrevista anterior con este cliente, y pendiente — que es el
+          que importa ver ANTES de que el cliente se levante de la mesa.
+        */}
+        {result && (
+          <div className="border-t border-line-200 pt-3">
+            <p className="mb-2 font-mono text-[9.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
+              Lo que no puede quedarse sin preguntar
+            </p>
+            <ul className="space-y-2">
+              {GUION_BASE.map((p) => {
+                const estado = estadosGuion.get(p.id) ?? { estado: 'pendiente' as const };
+                const hoy = estado.estado === 'hoy';
+                const antes = estado.estado === 'antes';
+                return (
+                  <li key={p.id} className="flex items-start gap-2.5">
+                    <span
+                      className={`mt-[3px] h-3.5 w-3.5 shrink-0 rounded-[3px] border ${
+                        hoy
+                          ? 'border-verified bg-[rgb(var(--verified-surf))]'
+                          : antes
+                            ? 'border-brand-line bg-brand-50'
+                            : 'border-line-200'
+                      }`}
+                    />
+                    <span className="min-w-0">
+                      <span
+                        className={`block text-[13px] leading-snug ${
+                          hoy ? 'text-ink-400 line-through' : antes ? 'text-ink-500' : 'text-ink-900'
+                        }`}
+                      >
+                        {p.texto}
+                      </span>
+                      {estado.estado === 'antes' && (
+                        <span className="mt-0.5 block text-[11px] leading-snug text-brand-700">
+                          Ya se habló de esto en la entrevista del {fechaCorta(estado.origen.transcribedAt)}.
+                        </span>
+                      )}
+                      {estado.estado === 'pendiente' && p.loQueCuesta && (
+                        <span className="mt-0.5 block text-[11px] leading-snug text-ink-500">{p.loQueCuesta}</span>
+                      )}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
 
         {result && (
           <p className="text-justify text-[11.5px] leading-snug text-ink-500 [text-wrap:pretty]">
