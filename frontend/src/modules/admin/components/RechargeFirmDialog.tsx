@@ -187,6 +187,27 @@ export const RechargeFirmDialog: React.FC<RechargeFirmDialogProps> = ({
           />
         </div>
 
+        {/*
+          POR QUE EL BOTON ESTA APAGADO, escrito, y no un boton gris mudo. El
+          usuario quiso descontar $100.000 sobre $100.000 —permitido: cero no
+          es negativo— con el motivo «Error», y el boton no se encendia sin
+          decir que faltaban cinco caracteres. Un boton deshabilitado sin razon
+          se lee como un defecto del producto, no como un requisito.
+        */}
+        {!error && monto > 0 && motivoLimpio.length > 0 && motivoLimpio.length < MIN_MOTIVO && (
+          <p className="text-[12px] leading-snug text-ink-500">
+            Al motivo le faltan {MIN_MOTIVO - motivoLimpio.length} caracteres: el mínimo es {MIN_MOTIVO}, porque
+            lo leerán los socios de la firma.
+          </p>
+        )}
+        {!error && monto > 0 && motivoLimpio.length === 0 && (
+          <p className="text-[12px] leading-snug text-ink-500">Escriba el motivo para habilitar el botón.</p>
+        )}
+        {!error && excedeSaldo && firm && (
+          <p className="text-[12px] leading-snug text-ink-500">
+            La firma tiene {pesos(firm.creditsBalance)}: se puede descontar hasta esa cifra, que deja el saldo en cero.
+          </p>
+        )}
         {error && <p className="text-[12px] leading-snug text-danger">{error}</p>}
       </div>
     </Dialog>
