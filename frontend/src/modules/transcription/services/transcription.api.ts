@@ -107,23 +107,6 @@ export interface TranscriptionOutcome {
   nameProposals: SpeakerNameProposal[];
 }
 
-interface UploadTarget {
-  uploadUrl: string;
-  authorizationToken: string;
-  fileKey: string;
-}
-
-/**
- * B2 verifies the SHA-1 of every upload, so the browser has to compute it.
- *
- * `crypto.subtle` needs a secure context, which https and localhost both are —
- * so this works in development without a certificate.
- */
-const sha1Hex = async (buffer: ArrayBuffer): Promise<string> => {
-  const digest = await crypto.subtle.digest('SHA-1', buffer);
-  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
-};
-
 export interface TranscribeInput {
   file: File;
   kind: TranscriptionKind;
