@@ -53,6 +53,7 @@ export interface ResumenDelPeriodo {
     borradores: Suma;
     resumenes: Suma;
     orientaciones: Suma;
+    revisiones: Suma;
     otros: Suma;
     total: number;
   };

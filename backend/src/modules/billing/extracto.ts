@@ -49,6 +49,8 @@ export interface ResumenDelPeriodo {
     borradores: Suma;
     resumenes: Suma;
     orientaciones: Suma;
+    /** Revisiones de escritos ya redactados («Revisión: …»). */
+    revisiones: Suma;
     otros: Suma;
     total: number;
   };
@@ -66,9 +68,10 @@ const sumar = (s: Suma, monto: number): void => {
 };
 
 /** Which concept a consumption row belongs to, read from what the lawyer asked for. */
-const conceptoDe = (description: string): 'borradores' | 'resumenes' | 'orientaciones' | 'otros' => {
+const conceptoDe = (description: string): 'borradores' | 'resumenes' | 'orientaciones' | 'revisiones' | 'otros' => {
   if (/^Borrador\b/i.test(description)) return 'borradores';
   if (/^Resumen de\b/i.test(description)) return 'resumenes';
+  if (/^Revisi[óo]n/i.test(description)) return 'revisiones';
   if (/orientaci[óo]n/i.test(description)) return 'orientaciones';
   return 'otros';
 };
@@ -81,7 +84,7 @@ export const resumirPeriodo = (movimientos: MovimientoDelLibro[]): ResumenDelPer
     recargas: cero(),
     devoluciones: cero(),
     ajustes: cero(),
-    consumo: { borradores: cero(), resumenes: cero(), orientaciones: cero(), otros: cero(), total: 0 },
+    consumo: { borradores: cero(), resumenes: cero(), orientaciones: cero(), revisiones: cero(), otros: cero(), total: 0 },
     entradas: 0,
     salidas: 0
   };

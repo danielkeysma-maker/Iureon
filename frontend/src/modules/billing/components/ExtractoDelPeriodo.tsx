@@ -76,10 +76,11 @@ const ultimosPeriodos = (cuantos = 12): string[] => {
   });
 };
 
-const CONCEPTOS: Array<{ clave: 'borradores' | 'resumenes' | 'orientaciones' | 'otros'; singular: string; plural: string }> = [
+const CONCEPTOS: Array<{ clave: 'borradores' | 'resumenes' | 'orientaciones' | 'revisiones' | 'otros'; singular: string; plural: string }> = [
   { clave: 'borradores', singular: 'escrito', plural: 'escritos' },
   { clave: 'resumenes', singular: 'resumen', plural: 'resúmenes' },
   { clave: 'orientaciones', singular: 'orientación', plural: 'orientaciones' },
+  { clave: 'revisiones', singular: 'revisión de escrito', plural: 'revisiones de escritos' },
   { clave: 'otros', singular: 'otro consumo', plural: 'otros consumos' }
 ];
 
