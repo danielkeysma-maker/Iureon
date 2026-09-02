@@ -67,6 +67,11 @@ export const BalancePanel: React.FC<BalancePanelProps> = ({
   const [monto, setMonto] = React.useState('');
   const [otroAbierto, setOtroAbierto] = React.useState(false);
   const [abriendo, setAbriendo] = React.useState(false);
+  /**
+   * La URL del checkout ya firmada, para ofrecerla como enlace si el salto
+   * automatico no ocurrio. Se limpia al cerrar el panel.
+   */
+  const [enlaceCheckout, setEnlaceCheckout] = React.useState<string | null>(null);
 
   const cargar = React.useCallback(async () => {
     setCargando(true);
@@ -96,33 +101,46 @@ export const BalancePanel: React.FC<BalancePanelProps> = ({
    * signature, which is what makes editing any of them produce a checkout Wompi
    * refuses.
    */
-  const irAlCheckout = (intent: CheckoutIntent): void => {
-    const form = document.createElement('form');
-    form.method = 'GET';
-    form.action = 'https://checkout.wompi.co/p/';
-
-    const campos: Record<string, string> = {
+  /**
+   * La URL del checkout: los mismos campos que Wompi documenta para su web
+   * checkout, en la query. Es un GET, asi que la URL ES el checkout — sirve
+   * igual para navegar y para ofrecerla como enlace.
+   */
+  const urlDelCheckout = (intent: CheckoutIntent): string => {
+    const campos = new URLSearchParams({
       'public-key': intent.publicKey,
       currency: intent.currency,
       'amount-in-cents': String(intent.amountInCents),
       reference: intent.reference,
       'signature:integrity': intent.signature
-    };
-
+    });
     // Only when configured: an empty redirect-url sends the client to a blank
     // page after paying, which reads as a failed payment.
-    if (intent.redirectUrl) campos['redirect-url'] = intent.redirectUrl;
+    if (intent.redirectUrl) campos.set('redirect-url', intent.redirectUrl);
+    return `https://checkout.wompi.co/p/?${campos.toString()}`;
+  };
 
-    Object.entries(campos).forEach(([nombre, valor]) => {
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = nombre;
-      input.value = valor;
-      form.appendChild(input);
-    });
-
-    document.body.appendChild(form);
-    form.submit();
+  /*
+   * EL SALTO SE HACE NAVEGANDO, Y SI NO OCURRE SE OFRECE EL ENLACE.
+   *
+   * Antes se fabricaba un <form method="GET"> oculto y se llamaba a
+   * `form.submit()`. En el escritorio funciona; en el telefono el usuario
+   * toco «Pagar», la intencion quedo registrada en el servidor (se ve en
+   * `payment_intents`, con su hora) y la pantalla no se movio. Un envio
+   * programatico despues de un `await` es exactamente la clase de navegacion
+   * que algunos navegadores moviles frenan en silencio, y un formulario
+   * invisible no deja nada que el usuario pueda tocar.
+   *
+   * `location.assign` con la URL del checkout es el mismo GET sin el
+   * formulario intermedio. Y por si tampoco ocurre, la URL se muestra como
+   * enlace de respaldo: un toque del usuario es una navegacion que ningun
+   * navegador bloquea. La intencion es la misma —misma referencia, misma
+   * firma— asi que abrirla por el enlace no crea un segundo intento.
+   */
+  const irAlCheckout = (intent: CheckoutIntent): void => {
+    const url = urlDelCheckout(intent);
+    setEnlaceCheckout(url);
+    window.location.assign(url);
   };
 
   const recargar = async () => {
@@ -134,6 +152,12 @@ export const BalancePanel: React.FC<BalancePanelProps> = ({
 
     try {
       irAlCheckout(await billingApi.startRecharge(valor));
+      /*
+       * Si en tres segundos seguimos aqui, la navegacion no ocurrio: se suelta
+       * el boton y el enlace de respaldo queda a la vista. Si si ocurrio, esta
+       * pestaña ya no existe y el temporizador muere con ella.
+       */
+      window.setTimeout(() => setAbriendo(false), 3000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo iniciar la recarga.');
       setAbriendo(false);
@@ -159,6 +183,7 @@ export const BalancePanel: React.FC<BalancePanelProps> = ({
 
   React.useEffect(() => {
     if (isOpen) void cargar();
+    else setEnlaceCheckout(null);
   }, [isOpen, cargar]);
 
   const valorElegido = Number(monto);
@@ -332,6 +357,21 @@ export const BalancePanel: React.FC<BalancePanelProps> = ({
           {/* Says why the button is disabled, instead of leaving it dead. */}
           {monto !== '' && valorElegido < minRecharge && (
             <p className="mt-1.5 text-meta text-ink-500">El mínimo es {pesos(minRecharge)}.</p>
+          )}
+
+          {/*
+            EL RESPALDO. Solo existe despues de que el servidor devolvio el
+            checkout, y dice lo que pasa: si la pasarela no se abrio sola, un
+            toque aqui la abre. Es la misma intencion firmada, no otra.
+          */}
+          {enlaceCheckout && !abriendo && (
+            <p className="mt-2 rounded-control border border-brand-line bg-brand-50 px-3 py-2 text-[12px] leading-snug text-brand-700">
+              Si la pasarela no se abrió sola,{' '}
+              <a href={enlaceCheckout} className="font-semibold underline underline-offset-2">
+                tóquelo aquí para abrir Wompi
+              </a>
+              . Es el mismo pago: no se crea otro intento.
+            </p>
           )}
 
           <p className="mt-2 text-meta text-ink-400">
