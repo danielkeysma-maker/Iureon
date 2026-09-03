@@ -25,6 +25,8 @@ export interface RevisionGuardada {
   documentType: string;
   legalBranch: string | null;
   fileName: string;
+  /** Cliente o proceso al que pertenece el escrito; texto libre de quien pidió la revisión. */
+  cliente: string;
   pregunta: string;
   caracteres: number;
   truncado: boolean;
@@ -42,6 +44,7 @@ export interface NuevaRevision {
   documentType: string;
   legalBranch?: string | null;
   fileName: string;
+  cliente: string;
   pregunta: string;
   caracteres: number;
   truncado: boolean;
@@ -57,6 +60,7 @@ export const aRevisionGuardada = (row: Record<string, unknown>): RevisionGuardad
   documentType: String(row.document_type ?? ''),
   legalBranch: row.legal_branch ? String(row.legal_branch) : null,
   fileName: String(row.file_name ?? ''),
+  cliente: String(row.cliente ?? ''),
   pregunta: String(row.pregunta ?? ''),
   caracteres: Number(row.caracteres ?? 0),
   truncado: Boolean(row.truncado),
@@ -70,7 +74,7 @@ export const aRevisionGuardada = (row: Record<string, unknown>): RevisionGuardad
 
 /** Columns for the list: everything but the report bodies, which can be long. */
 const COLUMNAS_DE_LISTA =
-  'id, document_type, legal_branch, file_name, pregunta, caracteres, truncado, con_ficha, cobrado_cop, user_email, created_at';
+  'id, document_type, legal_branch, file_name, cliente, pregunta, caracteres, truncado, con_ficha, cobrado_cop, user_email, created_at';
 
 export const documentReviewStore = {
   /** Returns the saved id, or null when it could not be saved (and logs why). */
@@ -84,6 +88,7 @@ export const documentReviewStore = {
         document_type: n.documentType,
         legal_branch: n.legalBranch ?? null,
         file_name: n.fileName,
+        cliente: n.cliente,
         pregunta: n.pregunta,
         caracteres: n.caracteres,
         truncado: n.truncado,

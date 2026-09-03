@@ -42,6 +42,8 @@ export interface PeticionDeRevision {
   documentType: string;
   legalBranch?: string;
   pregunta: string;
+  /** Cliente o proceso del escrito, texto libre; queda en la lista de revisiones. */
+  cliente?: string;
   fileName?: string;
   /** Hasta ~3,5 MB: el archivo viaja dentro del JSON. */
   contentBase64?: string;
@@ -55,6 +57,7 @@ export interface RevisionGuardada {
   documentType: string;
   legalBranch: string | null;
   fileName: string;
+  cliente: string;
   pregunta: string;
   caracteres: number;
   truncado: boolean;

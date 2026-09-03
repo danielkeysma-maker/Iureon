@@ -167,6 +167,8 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
   const legalBranch = typeof req.body.legalBranch === 'string' ? (req.body.legalBranch as LegalBranch) : undefined;
   const pregunta = String(req.body.pregunta ?? '');
   const fileName = String(req.body.fileName ?? 'escrito.txt');
+  /* De qué cliente o proceso es el escrito: lo dice quien pide la revisión, y queda en la lista. */
+  const cliente = String(req.body.cliente ?? '').trim().slice(0, 160);
 
   if (!documentType) {
     res.status(400).json({ success: false, error: 'MISSING_DOCUMENT_TYPE', message: 'Indique la actuación del escrito.' });
@@ -288,6 +290,7 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
       documentType,
       legalBranch: legalBranch ?? null,
       fileName,
+      cliente,
       pregunta: pregunta.trim(),
       caracteres: preparado.caracteres,
       truncado: preparado.truncado,

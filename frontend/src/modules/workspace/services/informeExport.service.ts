@@ -32,10 +32,12 @@ export const exportarInformeAWord = async (d: DatosDelInforme): Promise<void> =>
   const font = marca?.fontFamily === 'Inter' ? 'Calibri' : (marca?.fontFamily ?? 'Times New Roman');
   const base = (marca?.fontSizePt ?? 11) * 2; // docx mide en medios puntos
   const gris = '555555';
+  const titulos = '2D2D2D';
 
-  const p = (text: string, o: { bold?: boolean; italics?: boolean; size?: number; color?: string; after?: number; indent?: number } = {}) =>
+  const p = (text: string, o: { bold?: boolean; italics?: boolean; size?: number; color?: string; after?: number; indent?: number; justificar?: boolean } = {}) =>
     new Paragraph({
       spacing: { after: o.after ?? 120, line: 300 },
+      alignment: o.justificar === false ? AlignmentType.LEFT : AlignmentType.JUSTIFIED,
       indent: o.indent ? { left: o.indent } : undefined,
       children: [new TextRun({ text, font, bold: o.bold, italics: o.italics, size: o.size ?? base, color: o.color ?? '111111' })]
     });
@@ -43,29 +45,31 @@ export const exportarInformeAWord = async (d: DatosDelInforme): Promise<void> =>
     new Paragraph({
       spacing: { before: 240, after: 80 },
       border: { bottom: { color: 'C8C8C8', size: 6, style: 'single', space: 2 } },
-      children: [new TextRun({ text: t.toUpperCase(), font, bold: true, size: base - 3, color: gris })]
+      children: [new TextRun({ text: t.toUpperCase(), font, bold: true, size: base - 2, color: titulos })]
     });
   const vineta = (t: string) =>
-    new Paragraph({ bullet: { level: 0 }, spacing: { after: 80, line: 300 }, children: [new TextRun({ text: t, font, size: base })] });
+    new Paragraph({ bullet: { level: 0 }, alignment: AlignmentType.JUSTIFIED, spacing: { after: 80, line: 300 }, children: [new TextRun({ text: t, font, size: base })] });
 
   const i = d.informe;
   const hijos: Paragraph[] = [];
   const firma = d.firmName ?? marca?.firmName;
-  if (firma) hijos.push(p(firma, { size: base - 4, color: gris, after: 40 }));
-  hijos.push(p(`Revisión del escrito · ${d.documentType}`, { bold: true, size: base + 8, after: 60 }));
+  if (firma) hijos.push(p(firma, { size: base - 4, color: gris, after: 40, justificar: false }));
+  hijos.push(p(`Revisión del escrito · ${d.documentType}`, { bold: true, size: base + 8, after: 60, justificar: false }));
+  if (d.cliente) hijos.push(p(`Cliente o proceso: ${d.cliente}`, { bold: true, size: base - 2, color: titulos, after: 40, justificar: false }));
   hijos.push(
-    p(`${d.fileName} · ${d.fecha} · ${d.caracteres.toLocaleString('es-CO')} caracteres${d.truncado ? ' (recortado a 300.000)' : ''}`, {
-      size: base - 4,
-      color: gris,
-      after: 40
-    })
+    p(
+      [d.fileName, d.fecha, d.revisadoPor && `revisión pedida por ${d.revisadoPor}`].filter(Boolean).join(' · ') +
+        (d.truncado ? ' · el escrito fue recortado a 300.000 caracteres' : ''),
+      { size: base - 4, color: gris, after: 40, justificar: false }
+    )
   );
   hijos.push(
     p(d.conFicha ? `Revisado contra la ficha verificada de «${d.documentType}».` : 'Sin ficha verificada de la actuación: lo objetivo va con menos respaldo.', {
       italics: true,
       size: base - 4,
       color: gris,
-      after: 200
+      after: 200,
+      justificar: false
     })
   );
   if (i.resumen) hijos.push(p(i.resumen, { size: base + 1, after: 160 }));
@@ -81,7 +85,7 @@ export const exportarInformeAWord = async (d: DatosDelInforme): Promise<void> =>
   if (i.erroresDeAplicacion.length) {
     hijos.push(titulo('Errores de aplicación'));
     for (const e of i.erroresDeAplicacion) {
-      if (e.donde) hijos.push(p(e.donde, { bold: true, size: base - 2, color: gris, after: 40 }));
+      if (e.donde) hijos.push(p(e.donde, { bold: true, size: base - 2, color: titulos, after: 40, justificar: false }));
       if (e.problema) hijos.push(p(e.problema, { after: 40 }));
       if (e.correccion) hijos.push(p(`Corrección: ${e.correccion}`, { italics: true, indent: 360, after: 160 }));
     }

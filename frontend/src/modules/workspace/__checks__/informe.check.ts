@@ -29,6 +29,8 @@ const base: DatosDelInforme = {
   truncado: false,
   conFicha: true,
   firmName: 'Anibal Diaz Contreras',
+  cliente: 'Joel Ayus - EPS Sanitas',
+  revisadoPor: 'anibal@correo.co',
   informe: {
     resumen: 'El escrito cumple lo esencial del artículo 14 del Decreto 2591 de 1991.',
     fortalezas: ['Hechos cronológicos y verificables.'],
@@ -44,6 +46,8 @@ dibujarInformeEnPdf(doc, 'helvetica', base, 11);
 check('un informe corto cabe en una página', doc.getNumberOfPages() === 1, String(doc.getNumberOfPages()));
 const salida = textoDe(doc);
 check('el PDF se genera con contenido', salida.length > 2000, String(salida.length));
+check('el PDF no imprime el conteo de caracteres: es dato de pantalla', !/4912|4\.912/.test(salida));
+check('el PDF lleva el cliente o proceso y quien pidio la revision', /Joel Ayus/.test(salida) && /anibal@correo\.co/.test(salida));
 
 /* Un informe largo pagina: 40 recomendaciones de tres líneas cada una. */
 const largo: DatosDelInforme = {

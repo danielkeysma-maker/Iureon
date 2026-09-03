@@ -66,6 +66,8 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
   const [archivo, setArchivo] = React.useState<File | null>(null);
   const [texto, setTexto] = React.useState('');
   const [pregunta, setPregunta] = React.useState(SUGERENCIAS[0]);
+  /** De qué cliente o proceso es el escrito. Queda en la lista y en el PDF/Word. */
+  const [cliente, setCliente] = React.useState('');
   const [ocupado, setOcupado] = React.useState(false);
   const [error, setError] = React.useState('');
   const [respuesta, setRespuesta] = React.useState<RespuestaDeRevision | null>(null);
@@ -81,7 +83,12 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
   const [abriendo, setAbriendo] = React.useState<string | null>(null);
   const [tituloDelInforme, setTituloDelInforme] = React.useState(documentType);
   /** El archivo y la fecha del informe en pantalla, para nombrar y fechar la exportación. */
-  const [origenDelInforme, setOrigenDelInforme] = React.useState<{ fileName: string; fecha: string }>({ fileName: '', fecha: '' });
+  const [origenDelInforme, setOrigenDelInforme] = React.useState<{ fileName: string; fecha: string; cliente: string; revisadoPor: string }>({
+    fileName: '',
+    fecha: '',
+    cliente: '',
+    revisadoPor: ''
+  });
   const [exportando, setExportando] = React.useState<'pdf' | 'word' | null>(null);
 
   const cargarAnteriores = React.useCallback(() => {
@@ -101,7 +108,12 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
     try {
       const completa = await reviewApi.obtener(r.id);
       setTituloDelInforme(completa.documentType);
-      setOrigenDelInforme({ fileName: completa.fileName, fecha: new Date(completa.createdAt).toLocaleDateString('es-CO', { dateStyle: 'long' }) });
+      setOrigenDelInforme({
+        fileName: completa.fileName,
+        fecha: new Date(completa.createdAt).toLocaleString('es-CO', { dateStyle: 'long', timeStyle: 'short' }),
+        cliente: completa.cliente,
+        revisadoPor: completa.userEmail
+      });
       setRespuesta({
         id: completa.id,
         guardada: true,
@@ -135,6 +147,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
     setArchivo(null);
     setTexto('');
     setPregunta(SUGERENCIAS[0]);
+    setCliente('');
     setError('');
     setRespuesta(null);
     setOcupado(false);
@@ -173,8 +186,13 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
         cuerpo = { fileName: archivo.name, storageKey };
       }
       setTituloDelInforme(documentType);
-      setOrigenDelInforme({ fileName: cuerpo.fileName, fecha: new Date().toLocaleDateString('es-CO', { dateStyle: 'long' }) });
-      setRespuesta(await reviewApi.revisar({ documentType, legalBranch, pregunta, ...cuerpo }));
+      setOrigenDelInforme({
+        fileName: cuerpo.fileName,
+        fecha: new Date().toLocaleString('es-CO', { dateStyle: 'long', timeStyle: 'short' }),
+        cliente: cliente.trim(),
+        revisadoPor: ''
+      });
+      setRespuesta(await reviewApi.revisar({ documentType, legalBranch, pregunta, cliente: cliente.trim(), ...cuerpo }));
       onSaldoCambiado?.();
       cargarAnteriores();
     } catch (err) {
@@ -223,6 +241,8 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
       caracteres: respuesta.caracteres,
       truncado: respuesta.truncado,
       conFicha: respuesta.conFicha,
+      cliente: origenDelInforme.cliente || undefined,
+      revisadoPor: origenDelInforme.revisadoPor || undefined,
       informe: respuesta.informe
     };
   };
@@ -358,6 +378,24 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
             </p>
           </div>
 
+          {/* ─── DE QUIÉN ES EL ESCRITO ───────────────────────────────────── */}
+          <div>
+            <label htmlFor="cliente-revision" className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
+              Cliente o proceso
+            </label>
+            <input
+              id="cliente-revision"
+              value={cliente}
+              onChange={(e) => setCliente(e.target.value)}
+              maxLength={160}
+              placeholder="Joel Ayús · tutela contra EPS Sanitas · rad. 2026-00345"
+              className="field mt-1.5 w-full"
+            />
+            <p className="mt-1 text-[11px] leading-snug text-ink-500">
+              Para saber de qué asunto es cuando vuelva a la lista. Queda también en el PDF y el Word del informe.
+            </p>
+          </div>
+
           {/* ─── LA PREGUNTA ─────────────────────────────────────────────── */}
           <div>
             <label htmlFor="pregunta-revision" className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
@@ -427,11 +465,12 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
                       title="Abrir el informe"
                     >
                       <span className="block truncate text-ui text-ink-900">
-                        {r.fileName} <span className="text-ink-400">· {r.documentType}</span>
+                        {r.cliente ? <span className="font-medium">{r.cliente}</span> : <span className="text-ink-400">Sin cliente indicado</span>}
+                        <span className="text-ink-400"> · {r.documentType}</span>
                       </span>
-                      <span className="block text-[11px] text-ink-500">
-                        {new Date(r.createdAt).toLocaleString('es-CO', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} ·{' '}
-                        {r.userEmail.split('@')[0]}
+                      <span className="block truncate text-[11px] text-ink-500">
+                        {r.fileName} · {new Date(r.createdAt).toLocaleString('es-CO', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })} ·
+                        revisión pedida por {r.userEmail}
                         {abriendo === r.id ? ' · abriendo…' : ''}
                       </span>
                     </button>

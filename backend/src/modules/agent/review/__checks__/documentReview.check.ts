@@ -133,14 +133,14 @@ check('y los errores de aplicacion conservan donde y correccion', extraido?.erro
 
 /* ─── LA FILA GUARDADA VUELVE ENTERA Y TOLERA NULOS ─────────────────────────── */
 const fila = aRevisionGuardada({
-  id: 'abc', document_type: 'Acción de tutela', legal_branch: null, file_name: 'tutela.pdf', pregunta: '',
+  id: 'abc', document_type: 'Acción de tutela', legal_branch: null, file_name: 'tutela.pdf', cliente: 'Joel Ayús · EPS Sanitas', pregunta: '',
   caracteres: '4912', truncado: false, con_ficha: true, informe: { resumen: 'Bien.', fortalezas: ['A'] },
   informe_libre: null, cobrado_cop: '2000.00', user_email: 'a@b.co', created_at: '2026-09-02T20:00:00Z'
 });
-check('la fila guardada se lee con sus tipos', fila.caracteres === 4912 && fila.cobradoCop === 2000 && fila.conFicha === true && fila.legalBranch === null);
+check('la fila guardada se lee con sus tipos', fila.caracteres === 4912 && fila.cobradoCop === 2000 && fila.conFicha === true && fila.legalBranch === null && fila.cliente === 'Joel Ayús · EPS Sanitas');
 check('y el informe JSON vuelve como objeto', fila.informe?.resumen === 'Bien.');
 const filaDeLista = aRevisionGuardada({ id: 'x', document_type: 'Demanda', file_name: 'd.docx', created_at: '2026-09-01T10:00:00Z' });
-check('una fila de lista, sin cuerpos, no revienta', filaDeLista.informe === null && filaDeLista.informeLibre === null && filaDeLista.caracteres === 0);
+check('una fila de lista, sin cuerpos, no revienta', filaDeLista.informe === null && filaDeLista.informeLibre === null && filaDeLista.caracteres === 0 && filaDeLista.cliente === '');
 
 const basura = parsearInforme('El escrito está bien en general, pero…');
 check('prosa sin JSON devuelve null (el controlador la entrega como texto libre)', basura === null);

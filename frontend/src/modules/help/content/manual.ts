@@ -466,7 +466,7 @@ const A_REVISAR: ManualArticle = {
       kind: 'nota',
       titulo: 'El informe se guarda; el escrito no',
       texto:
-        'El informe queda guardado para su firma y aparece en «Revisiones anteriores» dentro del mismo diálogo, con el nombre del archivo, la actuación, la fecha y quién lo pidió; ábralo cuando vuelva a corregir el escrito o elimínelo. Cada informe se puede descargar en PDF y en Word con la misma estructura de la pantalla y la letra de la firma, o copiar como texto. El escrito revisado no se conserva: se lee, se revisa y se descarta en la misma petición. En la auditoría de la firma queda que se revisó un escrito de tal actuación, nunca su contenido.'
+        'El informe queda guardado para su firma y aparece en «Revisiones anteriores» dentro del mismo diálogo, con el cliente o proceso que usted indique al pedirla, la actuación, el archivo, la fecha y hora y el abogado que la pidió; ábralo cuando vuelva a corregir el escrito o elimínelo. Cada informe se puede descargar en PDF y en Word con la misma estructura de la pantalla y la letra de la firma, o copiar como texto. El escrito revisado no se conserva: se lee, se revisa y se descarta en la misma petición. En la auditoría de la firma queda que se revisó un escrito de tal actuación, nunca su contenido.'
     },
     {
       kind: 'aviso',

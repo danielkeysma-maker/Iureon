@@ -133,6 +133,7 @@ export class DocumentExportService {
     branding: FirmBrandingConfig = DEFAULT_FIRM_BRANDING,
     opciones: OpcionesDeExportacion = OPCIONES_POR_DEFECTO
   ): Promise<void> {
+    const membrete = lineasDeMembrete(branding);
     const paragraphs = legalContentText.split('\n').map((rawLine) => {
       const line = cleanMarkdownLine(rawLine);
       if (line.trim() === '') {
@@ -151,7 +152,6 @@ export class DocumentExportService {
        * en 240avos de linea (1,5 = 360). Antes estaban quemados en 11pt/1,5 y
        * el ajuste de la marca era decorativo en el documento exportado.
        */
-      const membrete = lineasDeMembrete(branding);
       const tamanoBase = (branding.fontSizePt ?? 12) * 2;
       const lineaDocx = Math.round(240 * Number(branding.lineSpacing ?? '1.5'));
 
