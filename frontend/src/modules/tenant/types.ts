@@ -12,7 +12,8 @@ export type MainView =
   | 'orientacion'
   | 'manual'
   | 'soporte'
-  | 'ajustes';
+  | 'ajustes'
+  | 'taller';
 
 /** A client law firm: the tenant every request and record is scoped to. */
 export interface LawFirmTenant {

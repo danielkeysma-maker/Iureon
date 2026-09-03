@@ -1,5 +1,6 @@
 import { supabase } from '../../../config/supabase.config';
 import type { InformeDeRevision } from './documentReview';
+import type { TurnoDelTaller } from './taller';
 
 /**
  * Where a review's report lives after the request ends.
@@ -36,6 +37,16 @@ export interface RevisionGuardada {
   cobradoCop: number;
   userEmail: string;
   createdAt: string;
+  /** El taller: solo cuando la firma autorizó conservar escritos; si no, null y []. */
+  textoOriginal: string | null;
+  textoTrabajo: string | null;
+  conversacion: TurnoDelTaller[];
+}
+
+export interface ConsentimientoDeGuardado {
+  guarda: boolean;
+  por: string | null;
+  el: string | null;
 }
 
 export interface NuevaRevision {
@@ -52,6 +63,8 @@ export interface NuevaRevision {
   informe: InformeDeRevision | null;
   informeLibre: string | null;
   cobradoCop: number;
+  /** El texto revisado, solo si la firma autorizó conservarlo. */
+  textoOriginal?: string | null;
 }
 
 /** A row as Supabase returns it → what the API hands out. Pure; tolerant to nulls. */
@@ -69,7 +82,10 @@ export const aRevisionGuardada = (row: Record<string, unknown>): RevisionGuardad
   informeLibre: row.informe_libre ? String(row.informe_libre) : null,
   cobradoCop: Number(row.cobrado_cop ?? 0),
   userEmail: String(row.user_email ?? ''),
-  createdAt: String(row.created_at ?? '')
+  createdAt: String(row.created_at ?? ''),
+  textoOriginal: row.texto_original ? String(row.texto_original) : null,
+  textoTrabajo: row.texto_trabajo ? String(row.texto_trabajo) : null,
+  conversacion: Array.isArray(row.conversacion) ? (row.conversacion as TurnoDelTaller[]) : []
 });
 
 /** Columns for the list: everything but the report bodies, which can be long. */
@@ -95,7 +111,9 @@ export const documentReviewStore = {
         con_ficha: n.conFicha,
         informe: n.informe,
         informe_libre: n.informeLibre,
-        cobrado_cop: n.cobradoCop
+        cobrado_cop: n.cobradoCop,
+        texto_original: n.textoOriginal ?? null,
+        texto_trabajo: n.textoOriginal ?? null
       })
       .select('id')
       .single();
@@ -136,6 +154,85 @@ export const documentReviewStore = {
   async eliminar(firmId: string, id: string): Promise<boolean> {
     if (!supabase) return false;
     const { error } = await supabase.from('document_reviews').delete().eq('firm_id', firmId).eq('id', id);
+    return !error;
+  },
+
+  /* ─── El taller ──────────────────────────────────────────────────────────── */
+
+  async actualizarTextoTrabajo(firmId: string, id: string, texto: string): Promise<boolean> {
+    if (!supabase) return false;
+    const { error } = await supabase
+      .from('document_reviews')
+      .update({ texto_trabajo: texto, updated_at: new Date().toISOString() })
+      .eq('firm_id', firmId)
+      .eq('id', id);
+    if (error) console.error('[REVIEW] No se pudo guardar el texto de trabajo:', error.message);
+    return !error;
+  },
+
+  /** Añade turnos al final de la conversación guardada. Lee y escribe; el taller es de una persona a la vez. */
+  async agregarTurnos(firmId: string, id: string, turnos: TurnoDelTaller[], textoTrabajo?: string): Promise<boolean> {
+    if (!supabase) return false;
+    const actual = await this.obtener(firmId, id);
+    if (!actual) return false;
+    const cambios: Record<string, unknown> = {
+      conversacion: [...actual.conversacion, ...turnos],
+      updated_at: new Date().toISOString()
+    };
+    if (typeof textoTrabajo === 'string') cambios.texto_trabajo = textoTrabajo;
+    const { error } = await supabase.from('document_reviews').update(cambios).eq('firm_id', firmId).eq('id', id);
+    if (error) console.error('[REVIEW] No se pudo guardar la conversación:', error.message);
+    return !error;
+  },
+
+  /** Una nueva revisión sobre el texto corregido reemplaza el informe; el anterior queda en la conversación. */
+  async actualizarInforme(
+    firmId: string,
+    id: string,
+    informe: InformeDeRevision | null,
+    informeLibre: string | null,
+    textoTrabajo: string
+  ): Promise<boolean> {
+    if (!supabase) return false;
+    const { error } = await supabase
+      .from('document_reviews')
+      .update({ informe, informe_libre: informeLibre, texto_trabajo: textoTrabajo, updated_at: new Date().toISOString() })
+      .eq('firm_id', firmId)
+      .eq('id', id);
+    if (error) console.error('[REVIEW] No se pudo guardar la nueva revisión:', error.message);
+    return !error;
+  },
+
+  /* ─── La autorización de la firma ────────────────────────────────────────── */
+
+  async consentimiento(firmId: string): Promise<ConsentimientoDeGuardado> {
+    if (!supabase) return { guarda: false, por: null, el: null };
+    const { data, error } = await supabase
+      .from('firms')
+      .select('guarda_escritos_revisados, guarda_escritos_por, guarda_escritos_el')
+      .eq('firm_id', firmId)
+      .maybeSingle();
+    if (error || !data) {
+      // Sin la migración la columna no existe: se trata como no autorizado y se dice en consola.
+      if (error) console.warn('[REVIEW] No se pudo leer la autorización de guardado:', error.message);
+      return { guarda: false, por: null, el: null };
+    }
+    const fila = data as { guarda_escritos_revisados?: boolean; guarda_escritos_por?: string | null; guarda_escritos_el?: string | null };
+    return { guarda: Boolean(fila.guarda_escritos_revisados), por: fila.guarda_escritos_por ?? null, el: fila.guarda_escritos_el ?? null };
+  },
+
+  async autorizarGuardado(firmId: string, email: string, autorizar: boolean): Promise<boolean> {
+    if (!supabase) return false;
+    const { error } = await supabase
+      .from('firms')
+      .update({
+        guarda_escritos_revisados: autorizar,
+        guarda_escritos_por: email,
+        guarda_escritos_el: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .eq('firm_id', firmId);
+    if (error) console.error('[REVIEW] No se pudo guardar la autorización:', error.message);
     return !error;
   }
 };

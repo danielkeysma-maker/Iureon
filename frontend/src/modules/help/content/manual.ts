@@ -463,10 +463,25 @@ const A_REVISAR: ManualArticle = {
         'El informe separa dos planos y lo dice en cada punto: lo que exige la norma, que sale de la ficha del catálogo y se cita con artículo, y lo que es criterio profesional del revisor, que usted pesa. No cita sentencias: cuando un punto necesite precedente, lo señala para que usted lo verifique. Cuesta lo mismo que un borrador y se descuenta del saldo de la firma; si el revisor no responde, no se cobra.'
     },
     {
-      kind: 'nota',
-      titulo: 'El informe se guarda; el escrito no',
+      kind: 'subtitulo',
+      texto: 'El taller: corregir el escrito con el revisor al lado'
+    },
+    {
+      kind: 'parrafo',
       texto:
-        'El informe queda guardado para su firma y aparece en «Revisiones anteriores» dentro del mismo diálogo, con el cliente o proceso que usted indique al pedirla, la actuación, el archivo, la fecha y hora y el abogado que la pidió; ábralo cuando vuelva a corregir el escrito o elimínelo. Cada informe se puede descargar en PDF y en Word con la misma estructura de la pantalla y la letra de la firma, o copiar como texto. El escrito revisado no se conserva: se lee, se revisa y se descarta en la misma petición. En la auditoría de la firma queda que se revisó un escrito de tal actuación, nunca su contenido.'
+        'Con el informe en pantalla, «Abrir en el taller» muestra el escrito con los pasajes citados tachados: toque uno y verá por qué falla y el reemplazo propuesto, con un botón «Aplicar». En «Editar» corrige el texto a mano. A la derecha está el revisor: pregúntele o pídale redacciones —«reescribe la pretensión tercera como subsidiaria», «¿cómo va después de mis cambios?»—; cada mensaje lleva el texto tal como está en ese momento, cuesta $300 y, si propone cambiar un pasaje, trae su botón «Aplicar». «Volver a revisar» emite un informe nuevo sobre el texto corregido ($2.000). El texto corregido se descarga en Word o PDF con el membrete de la firma. También se llega al taller desde el módulo «Revisiones» de la barra lateral.'
+    },
+    {
+      kind: 'nota',
+      titulo: 'Retomar otro día requiere autorización de la firma',
+      texto:
+        'El texto de trabajo y la conversación se conservan en el servidor solo si un socio administrador lo autoriza, una vez, para toda la firma; queda en la auditoría con su correo. Sin esa autorización el taller funciona igual, pero al cerrar la pestaña se pierden el texto y la conversación —el informe sí queda— y la cinta de arriba lo advierte. La autorización se da desde esa misma cinta.'
+    },
+    {
+      kind: 'nota',
+      titulo: 'El informe se guarda; el escrito, si la firma lo autoriza',
+      texto:
+        'El informe queda guardado para su firma y aparece en «Revisiones anteriores» dentro del mismo diálogo, con el cliente o proceso que usted indique al pedirla, la actuación, el archivo, la fecha y hora y el abogado que la pidió; ábralo cuando vuelva a corregir el escrito o elimínelo. Cada informe se puede descargar en PDF y en Word con la misma estructura de la pantalla y la letra de la firma, o copiar como texto. El escrito revisado se conserva únicamente si la firma autorizó el taller; si no, se lee, se revisa y se descarta en la misma petición. En la auditoría de la firma queda que se revisó un escrito de tal actuación, nunca su contenido.'
     },
     {
       kind: 'aviso',

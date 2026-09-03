@@ -21,6 +21,7 @@ import {
   prepararTexto
 } from './documentReview';
 import { documentReviewStore } from './documentReview.store';
+import { MAX_CARACTERES_MENSAJE, buildTallerSystemPrompt, buildTallerUserPrompt, parsearRespuestaDelTaller, type TurnoDelTaller } from './taller';
 
 /**
  * POST /api/agent/review-document
@@ -284,6 +285,7 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
      * corrige. Se guarda el informe y el nombre del archivo; el texto del
      * escrito no. Si la tabla no existe todavia, la respuesta lo dice.
      */
+    const consentimiento = await documentReviewStore.consentimiento(firmId);
     const guardadaId = await documentReviewStore.guardar({
       firmId,
       userEmail,
@@ -297,13 +299,21 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
       conFicha: guidance !== null,
       informe,
       informeLibre: informe ? null : llamada.text,
-      cobradoCop: cobro.charged
+      cobradoCop: cobro.charged,
+      textoOriginal: consentimiento.guarda ? preparado.texto : null
     });
 
     res.json({
       success: true,
       id: guardadaId,
       guardada: guardadaId !== null,
+      /*
+       * EL TEXTO VUELVE AL NAVEGADOR SIEMPRE: el taller lo necesita para tachar
+       * los pasajes y dejar editar. Que ademas se CONSERVE en el servidor
+       * depende de la autorizacion de la firma, y la respuesta lo dice.
+       */
+      texto: preparado.texto,
+      guardaTexto: consentimiento.guarda,
       informe,
       informeLibre: informe ? null : llamada.text,
       conFicha: guidance !== null,
@@ -343,6 +353,251 @@ export const getReviewController = async (req: Request, res: Response): Promise<
     return;
   }
   res.json({ success: true, revision });
+};
+
+/* ─── EL TALLER ──────────────────────────────────────────────────────────────── */
+
+/** GET /api/agent/reviews/settings/guardado — si la firma autorizó conservar escritos. */
+export const getStorageConsentController = async (req: Request, res: Response): Promise<void> => {
+  res.json({ success: true, ...(await documentReviewStore.consentimiento(req.firmId as string)) });
+};
+
+/**
+ * POST /api/agent/reviews/settings/guardado { autorizar: boolean }
+ *
+ * Solo un socio administrador: conservar los escritos de la firma es una
+ * decision de la firma, no de quien revisa. Queda en la auditoria con correo.
+ */
+export const setStorageConsentController = async (req: Request, res: Response): Promise<void> => {
+  if (req.user?.role !== 'FIRM_ADMIN') {
+    res.status(403).json({ success: false, error: 'ONLY_FIRM_ADMIN', message: 'Solo un socio administrador puede autorizar que se conserven los escritos.' });
+    return;
+  }
+  const autorizar = req.body.autorizar !== false;
+  const ok = await documentReviewStore.autorizarGuardado(req.firmId as string, req.user.email, autorizar);
+  if (!ok) {
+    res.status(502).json({ success: false, error: 'CONSENT_NOT_SAVED', message: 'No se pudo guardar la autorización. Si la migración del taller no se ha ejecutado, ejecútela primero.' });
+    return;
+  }
+  await auditService.record({
+    firmId: req.firmId as string,
+    userEmail: req.user.email,
+    action: 'REVIEW_TEXT_STORAGE_AUTHORIZED',
+    resource: autorizar ? 'La firma autoriza conservar los escritos revisados y su conversación' : 'La firma retira la autorización de conservar escritos revisados',
+    ipAddress: (req.headers['x-forwarded-for'] as string | undefined)?.split(',')[0]?.trim() ?? req.ip ?? ''
+  });
+  res.json({ success: true, ...(await documentReviewStore.consentimiento(req.firmId as string)) });
+};
+
+/** PUT /api/agent/reviews/:id/texto { texto } — autoguardado del texto de trabajo, si la firma lo autorizó. */
+export const saveWorkingTextController = async (req: Request, res: Response): Promise<void> => {
+  const firmId = req.firmId as string;
+  const texto = typeof req.body.texto === 'string' ? req.body.texto : '';
+  if (texto.length > 400_000) {
+    res.status(413).json({ success: false, error: 'TEXT_TOO_LONG', message: 'El texto de trabajo supera lo que se guarda.' });
+    return;
+  }
+  const consentimiento = await documentReviewStore.consentimiento(firmId);
+  if (!consentimiento.guarda) {
+    res.json({ success: true, guardado: false, motivo: 'La firma no ha autorizado conservar escritos: el texto vive solo en esta sesión.' });
+    return;
+  }
+  const ok = await documentReviewStore.actualizarTextoTrabajo(firmId, String(req.params.id), texto);
+  res.json({ success: true, guardado: ok });
+};
+
+const ipDe = (req: Request): string => (req.headers['x-forwarded-for'] as string | undefined)?.split(',')[0]?.trim() ?? req.ip ?? '';
+
+/**
+ * POST /api/agent/reviews/:id/chat { mensaje, textoActual, historial? }
+ *
+ * Un turno con el revisor sobre el texto ACTUAL. El historial lo manda el
+ * navegador (es quien lo tiene completo aunque la firma no guarde); si la
+ * firma guarda, se persiste junto con el texto de trabajo.
+ */
+export const reviewChatController = async (req: Request, res: Response): Promise<void> => {
+  const firmId = req.firmId as string;
+  const userEmail = req.user?.email ?? 'desconocido';
+  const id = String(req.params.id);
+  const mensaje = String(req.body.mensaje ?? '').trim();
+  const textoActual = typeof req.body.textoActual === 'string' ? req.body.textoActual : '';
+  const historialCliente: TurnoDelTaller[] = Array.isArray(req.body.historial) ? (req.body.historial as TurnoDelTaller[]) : [];
+
+  if (!mensaje) {
+    res.status(400).json({ success: false, error: 'MISSING_MESSAGE', message: 'Escriba qué quiere preguntar o pedir.' });
+    return;
+  }
+  if (mensaje.length > MAX_CARACTERES_MENSAJE) {
+    res.status(413).json({ success: false, error: 'MESSAGE_TOO_LONG', message: `El mensaje supera ${MAX_CARACTERES_MENSAJE.toLocaleString('es-CO')} caracteres. Si quiere revisar un texto largo, péguelo en el escrito y pida una nueva revisión.` });
+    return;
+  }
+  const revision = await documentReviewStore.obtener(firmId, id);
+  if (!revision) {
+    res.status(404).json({ success: false, error: 'REVIEW_NOT_FOUND', message: 'Esa revisión no existe o no es de su firma.' });
+    return;
+  }
+  const texto = prepararTexto(textoActual || revision.textoTrabajo || '');
+  if (texto.caracteres < 50) {
+    res.status(422).json({ success: false, error: 'TEXT_MISSING', message: 'No hay texto del escrito para conversar sobre él. Ábralo de nuevo desde el archivo.' });
+    return;
+  }
+
+  let reservado = 0;
+  try {
+    ({ reserved: reservado } = await reserveForOperation({ firmId, userEmail, operation: 'CONSULTA_REVISION' }));
+  } catch (err) {
+    if (err instanceof BillingError) {
+      res.status(err.status).json({ success: false, error: err.code, message: err.message });
+      return;
+    }
+    throw err;
+  }
+
+  const operationId = randomUUID();
+  try {
+    const guidance = buildCatalogGuidance(revision.documentType, (revision.legalBranch ?? undefined) as LegalBranch | undefined);
+    const historial = historialCliente.length ? historialCliente : revision.conversacion;
+    const llamada = await conLimite(
+      callOpenRouterWithUsage(
+        ENGINE.OPUS,
+        buildTallerSystemPrompt(),
+        buildTallerUserPrompt({ documentType: revision.documentType, guidance, informe: revision.informe, textoActual: texto.texto, historial, mensaje }),
+        1500
+      ),
+      LIMITE_LLAMADA_MS
+    );
+    await recordUsage({ firmId, userEmail, operation: 'CONSULTA_REVISION', operationId, usage: llamada.usage ?? null });
+    if (!llamada.text || !llamada.text.trim()) {
+      await refundReservation({ firmId, userEmail, operation: 'CONSULTA_REVISION', reason: 'el revisor no respondió' });
+      res.status(502).json({ success: false, error: 'CHAT_FAILED', message: 'El revisor no respondió. No se descontó saldo.' });
+      return;
+    }
+    const respuesta = parsearRespuestaDelTaller(llamada.text);
+    const cobro = await settleOperation({
+      firmId,
+      userEmail,
+      operation: 'CONSULTA_REVISION',
+      operationId,
+      reserved: reservado,
+      description: `Consulta de revisión: ${revision.documentType} · ${revision.fileName}`
+    });
+
+    const ahora = new Date().toISOString();
+    const turnos: TurnoDelTaller[] = [
+      { rol: 'abogado', texto: mensaje, fecha: ahora },
+      { rol: 'revisor', texto: respuesta.respuesta, ediciones: respuesta.ediciones, fecha: ahora }
+    ];
+    const consentimiento = await documentReviewStore.consentimiento(firmId);
+    const guardado = consentimiento.guarda ? await documentReviewStore.agregarTurnos(firmId, id, turnos, texto.texto) : false;
+
+    await auditService.record({ firmId, userEmail, action: 'REVIEW_CHAT', resource: `${revision.documentType} · ${revision.fileName}`, ipAddress: ipDe(req) });
+
+    res.json({ success: true, ...respuesta, turnos, guardado, cobradoCop: cobro.charged, saldoCop: cobro.balance });
+  } catch (err) {
+    if (err instanceof TiempoAgotado) {
+      await refundReservation({ firmId, userEmail, operation: 'CONSULTA_REVISION', reason: 'la consulta superó el tiempo de la plataforma' });
+      res.status(504).json({ success: false, error: 'CHAT_TIMEOUT', message: 'El revisor tardó más de lo que la plataforma permite. No se descontó saldo.' });
+      return;
+    }
+    console.error('[REVIEW] Error en el taller:', err);
+    await refundReservation({ firmId, userEmail, operation: 'CONSULTA_REVISION', reason: 'la consulta falló' });
+    res.status(500).json({ success: false, error: 'CHAT_FAILED', message: 'No se pudo consultar al revisor. No se descontó saldo.' });
+  }
+};
+
+/**
+ * POST /api/agent/reviews/:id/rerevisar { textoActual }
+ *
+ * Una revisión completa nueva sobre el texto corregido. Cobra como REVISION.
+ * Reemplaza el informe guardado; el anterior queda en la conversación como
+ * un turno, para que se vea qué cambió.
+ */
+export const reReviewController = async (req: Request, res: Response): Promise<void> => {
+  const firmId = req.firmId as string;
+  const userEmail = req.user?.email ?? 'desconocido';
+  const id = String(req.params.id);
+  const revision = await documentReviewStore.obtener(firmId, id);
+  if (!revision) {
+    res.status(404).json({ success: false, error: 'REVIEW_NOT_FOUND', message: 'Esa revisión no existe o no es de su firma.' });
+    return;
+  }
+  const preparado = prepararTexto(typeof req.body.textoActual === 'string' ? req.body.textoActual : revision.textoTrabajo || '');
+  if (preparado.caracteres < TEXTO_MINIMO) {
+    res.status(422).json({ success: false, error: 'TEXT_TOO_SHORT', message: `El texto tiene ${preparado.caracteres} caracteres; un escrito revisable tiene al menos ${TEXTO_MINIMO}.` });
+    return;
+  }
+
+  let reservado = 0;
+  try {
+    ({ reserved: reservado } = await reserveForOperation({ firmId, userEmail, operation: 'REVISION' }));
+  } catch (err) {
+    if (err instanceof BillingError) {
+      res.status(err.status).json({ success: false, error: err.code, message: err.message });
+      return;
+    }
+    throw err;
+  }
+
+  const operationId = randomUUID();
+  try {
+    const guidance = buildCatalogGuidance(revision.documentType, (revision.legalBranch ?? undefined) as LegalBranch | undefined);
+    const llamada = await conLimite(
+      callOpenRouterWithUsage(
+        ENGINE.OPUS,
+        buildReviewSystemPrompt(),
+        buildReviewUserPrompt({ documentType: revision.documentType, guidance, pregunta: revision.pregunta, texto: preparado.texto, truncado: preparado.truncado }),
+        MAX_TOKENS_INFORME
+      ),
+      LIMITE_LLAMADA_MS
+    );
+    await recordUsage({ firmId, userEmail, operation: 'REVISION', operationId, usage: llamada.usage ?? null });
+    if (!llamada.text || !llamada.text.trim()) {
+      await refundReservation({ firmId, userEmail, operation: 'REVISION', reason: 'la nueva revisión no produjo resultado' });
+      res.status(502).json({ success: false, error: 'REVIEW_FAILED', message: 'El revisor no respondió. No se descontó saldo.' });
+      return;
+    }
+    const informe = parsearInforme(llamada.text);
+    const cobro = await settleOperation({
+      firmId,
+      userEmail,
+      operation: 'REVISION',
+      operationId,
+      reserved: reservado,
+      description: `Revisión: ${revision.documentType} · ${revision.fileName} (nueva revisión)`
+    });
+
+    const consentimiento = await documentReviewStore.consentimiento(firmId);
+    let guardado = false;
+    if (consentimiento.guarda) {
+      const anterior = revision.informe?.resumen ? `Informe anterior: ${revision.informe.resumen}` : 'Informe anterior sin resumen legible.';
+      await documentReviewStore.agregarTurnos(firmId, id, [
+        { rol: 'revisor', texto: `Nueva revisión emitida sobre el texto corregido. ${anterior}`, fecha: new Date().toISOString() }
+      ]);
+      guardado = await documentReviewStore.actualizarInforme(firmId, id, informe, informe ? null : llamada.text, preparado.texto);
+    }
+    await auditService.record({ firmId, userEmail, action: 'DOCUMENT_REREVIEWED', resource: `${revision.documentType} · ${revision.fileName}`, ipAddress: ipDe(req) });
+
+    res.json({
+      success: true,
+      informe,
+      informeLibre: informe ? null : llamada.text,
+      conFicha: guidance !== null,
+      truncado: preparado.truncado,
+      caracteres: preparado.caracteres,
+      guardado,
+      cobradoCop: cobro.charged,
+      saldoCop: cobro.balance
+    });
+  } catch (err) {
+    if (err instanceof TiempoAgotado) {
+      await refundReservation({ firmId, userEmail, operation: 'REVISION', reason: 'la nueva revisión superó el tiempo de la plataforma' });
+      res.status(504).json({ success: false, error: 'REVIEW_TIMEOUT', message: 'La revisión tardó más de lo que la plataforma permite. No se descontó saldo.' });
+      return;
+    }
+    console.error('[REVIEW] Error en la nueva revisión:', err);
+    await refundReservation({ firmId, userEmail, operation: 'REVISION', reason: 'la nueva revisión falló' });
+    res.status(500).json({ success: false, error: 'REVIEW_FAILED', message: 'No se pudo revisar de nuevo. No se descontó saldo.' });
+  }
 };
 
 /** DELETE /api/agent/reviews/:id */

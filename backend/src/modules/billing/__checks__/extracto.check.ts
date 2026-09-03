@@ -27,8 +27,9 @@ const mov = (
 
 /* ─── UNA SEMANA REAL, del más nuevo al más viejo, como la entrega el servidor ─── */
 const semana: MovimientoDelLibro[] = [
-  mov('AJUSTE', -93_950, 0, 'Ajuste del operador · Cierre de la prueba', '2026-09-05T20:00:00Z'),
+  mov('AJUSTE', -93_650, 0, 'Ajuste del operador · Cierre de la prueba', '2026-09-05T20:00:00Z'),
   mov('CONSUMO', -2_000, 93_950, 'Revisión: Acción de tutela · tutela-anibal.pdf', '2026-09-04T16:00:00Z'),
+  mov('CONSUMO', -300, 93_650, 'Consulta de revisión: Acción de tutela · tutela-anibal.pdf', '2026-09-04T17:00:00Z'),
   mov('CONSUMO', -50, 95_950, 'Resumen de audiencia · Audiencia inicial 2026-001', '2026-09-04T15:00:00Z'),
   mov('CONSUMO', -2_000, 96_000, 'Borrador: Recurso de reposición (documento extenso)', '2026-09-03T15:00:00Z'),
   mov('DEVOLUCION', 2_000, 98_000, 'el escrito no se generó', '2026-09-02T16:00:00Z'),
@@ -43,7 +44,7 @@ const r = resumirPeriodo(semana);
 check('el saldo inicial es el anterior al movimiento más viejo', r.saldoInicial === 0, String(r.saldoInicial));
 check('el saldo final es el que dejó el movimiento más nuevo', r.saldoFinal === 0, String(r.saldoFinal));
 check('las recargas se suman aparte', r.recargas.cantidad === 1 && r.recargas.total === 100_000);
-check('los ajustes del operador se suman aparte, con su signo', r.ajustes.cantidad === 1 && r.ajustes.total === -93_950);
+check('los ajustes del operador se suman aparte, con su signo', r.ajustes.cantidad === 1 && r.ajustes.total === -93_650);
 check('las devoluciones se suman aparte', r.devoluciones.cantidad === 1 && r.devoluciones.total === 2_000);
 
 // Consumption is grouped by what the lawyer asked for, read from the concept.
@@ -51,9 +52,9 @@ check('tres borradores, contados aunque uno sea extenso', r.consumo.borradores.c
 check('y su total suma el extenso al precio que se cobró', r.consumo.borradores.total === -5_950, String(r.consumo.borradores.total));
 check('un resumen', r.consumo.resumenes.cantidad === 1 && r.consumo.resumenes.total === -50);
 check('una orientación', r.consumo.orientaciones.cantidad === 1 && r.consumo.orientaciones.total === -50);
-check('una revisión de escrito, con categoría propia', r.consumo.revisiones.cantidad === 1 && r.consumo.revisiones.total === -2_000);
+check('una revisión y una consulta del taller, en la misma categoría', r.consumo.revisiones.cantidad === 2 && r.consumo.revisiones.total === -2_300);
 check('nada queda sin clasificar en esta semana', r.consumo.otros.cantidad === 0);
-check('el consumo total es la suma de sus partes', r.consumo.total === -8_050, String(r.consumo.total));
+check('el consumo total es la suma de sus partes', r.consumo.total === -8_350, String(r.consumo.total));
 
 // The identity that makes the document a statement and not a list:
 // inicial + entradas + salidas = final. If this ever breaks, a row is being

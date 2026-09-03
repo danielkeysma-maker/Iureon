@@ -17,6 +17,8 @@ import { HeaderTop } from './modules/tenant/components/HeaderTop';
 import type { LawFirmTenant } from './modules/tenant/types';
 import { TenantProvider } from './modules/tenant/TenantContext';
 import { AgentPanelLeft } from './modules/workspace/components/AgentPanelLeft';
+import { TallerDeRevision, type DatosDelTaller } from './modules/workspace/components/TallerDeRevision';
+import { RevisionesView } from './modules/workspace/components/RevisionesView';
 import { DocumentCanvasRight } from './modules/workspace/components/DocumentCanvasRight';
 import { SearchView } from './modules/search/components/SearchView';
 import { SearchMobileView } from './modules/search/components/SearchMobileView';
@@ -200,6 +202,8 @@ export function App() {
    * instead of on the index and a second search.
    */
   const [manualArticulo, setManualArticulo] = useState<string | undefined>(undefined);
+  /* El taller de revision abierto: la revision y su texto. null = la lista de revisiones. */
+  const [tallerActivo, setTallerActivo] = useState<DatosDelTaller | null>(null);
 
   const setMainView = (view: MainView): void => {
     setMainViewState(view);
@@ -796,6 +800,10 @@ export function App() {
                   }}
                   logs={workflow.logs}
                   onSaldoCambiado={() => void refreshBalance()}
+                  onAbrirTaller={(datos) => {
+                    setTallerActivo(datos);
+                    setMainView('taller');
+                  }}
                   activeDraftText={workflow.activeDraftText}
                   onClearActiveDraft={() => workflow.setActiveDraftText(null)}
                 />
@@ -1036,6 +1044,27 @@ export function App() {
             </div>
           )}
           {mainView === 'ajustes' && <SettingsView />}
+          {mainView === 'taller' &&
+            (tallerActivo ? (
+              <TallerDeRevision
+                key={tallerActivo.revisionId ?? 'sesion'}
+                datos={tallerActivo}
+                esAdminDeFirma={session?.user.role === 'FIRM_ADMIN'}
+                precioConsultaCop={300}
+                precioRevisionCop={2000}
+                onCerrar={() => setTallerActivo(null)}
+                onSaldoCambiado={() => void refreshBalance()}
+                onExportarTexto={(formato, titulo, texto) => {
+                  if (formato === 'word') DocumentExportService.exportToWordDocx(titulo, texto, marcaParaExportar(), opcionesDeExportacion());
+                  else void DocumentExportService.exportToPdf(titulo, texto, marcaParaExportar(), opcionesDeExportacion());
+                }}
+              />
+            ) : (
+              <RevisionesView
+                onAbrirTaller={(datos) => setTallerActivo(datos)}
+                onIrARedaccion={() => setMainView('workspace')}
+              />
+            ))}
           {mainView === 'orientacion' && (
             <>
             {/*

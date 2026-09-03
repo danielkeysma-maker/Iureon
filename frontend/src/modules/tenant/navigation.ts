@@ -1,4 +1,4 @@
-import { Sparkles, Mic, BookOpen, BookMarked, LifeBuoy, Library, Wrench, Shield, UserRound, ShieldCheck, Compass, SlidersHorizontal, FileClock } from 'lucide-react';
+import { Sparkles, ClipboardCheck, Mic, BookOpen, BookMarked, LifeBuoy, Library, Wrench, Shield, UserRound, ShieldCheck, Compass, SlidersHorizontal, FileClock } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { MainView } from './types';
 
@@ -59,6 +59,12 @@ export const NAV_MODULES: NavModule[] = [
     description: 'Escritos por terminar y sus términos',
     icon: FileClock
   },
+  {
+    id: 'taller',
+    label: 'Revisiones',
+    description: 'Corregir un escrito con el revisor',
+    icon: ClipboardCheck
+  },
   { id: 'audiencias', label: 'Audiencias', description: 'Transcripción de grabaciones', icon: Mic },
   {
     id: 'entrevistas',
@@ -116,7 +122,7 @@ export interface NavGroup {
 }
 
 export const NAV_GROUPS: NavGroup[] = [
-  { titulo: 'Producir', modulos: ['workspace', 'borradores', 'orientacion'] },
+  { titulo: 'Producir', modulos: ['workspace', 'borradores', 'taller', 'orientacion'] },
   { titulo: 'Registrar', modulos: ['audiencias', 'entrevistas'] },
   { titulo: 'Consultar', modulos: ['search', 'catalogo', 'tools'] },
   { titulo: 'Aprender', modulos: ['manual', 'soporte'] },

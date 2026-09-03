@@ -6,6 +6,7 @@ import { archivoABase64, reviewApi, type RespuestaDeRevision, type RevisionGuard
 import { uploadFileToStorage } from '../../documents/services/storageUpload';
 import { exportarInformeAPdf, exportarInformeAWord } from '../services/informeExport.service';
 import type { DatosDelInforme } from '../services/informeLayout';
+import type { DatosDelTaller } from './TallerDeRevision';
 
 /**
  * Revisar un escrito ya redactado.
@@ -37,6 +38,8 @@ interface RevisarEscritoDialogProps {
   precioCop: number;
   /** Avisa a quien pinta el saldo que hubo un cobro: el saldo se reporta, nunca se deriva. */
   onSaldoCambiado?: () => void;
+  /** Abre el taller: el escrito con los pasajes marcados, edicion y chat con el revisor. */
+  onAbrirTaller?: (datos: DatosDelTaller) => void;
 }
 
 /*
@@ -61,7 +64,8 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
   documentType,
   legalBranch,
   precioCop,
-  onSaldoCambiado
+  onSaldoCambiado,
+  onAbrirTaller
 }) => {
   const [archivo, setArchivo] = React.useState<File | null>(null);
   const [texto, setTexto] = React.useState('');
@@ -90,6 +94,8 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
     revisadoPor: ''
   });
   const [exportando, setExportando] = React.useState<'pdf' | 'word' | null>(null);
+  /** El texto del escrito y la conversacion de la revision en pantalla, para abrir el taller. */
+  const [paraElTaller, setParaElTaller] = React.useState<{ texto: string | null; conversacion: DatosDelTaller['conversacion']; guardaTexto: boolean; revisionId: string | null }>({ texto: null, conversacion: [], guardaTexto: false, revisionId: null });
 
   const cargarAnteriores = React.useCallback(() => {
     reviewApi
@@ -114,6 +120,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
         cliente: completa.cliente,
         revisadoPor: completa.userEmail
       });
+      setParaElTaller({ texto: completa.textoTrabajo ?? completa.textoOriginal, conversacion: completa.conversacion, guardaTexto: Boolean(completa.textoOriginal), revisionId: completa.id });
       setRespuesta({
         id: completa.id,
         guardada: true,
@@ -192,7 +199,9 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
         cliente: cliente.trim(),
         revisadoPor: ''
       });
-      setRespuesta(await reviewApi.revisar({ documentType, legalBranch, pregunta, cliente: cliente.trim(), ...cuerpo }));
+      const r = await reviewApi.revisar({ documentType, legalBranch, pregunta, cliente: cliente.trim(), ...cuerpo });
+      setParaElTaller({ texto: r.texto ?? null, conversacion: [], guardaTexto: Boolean(r.guardaTexto), revisionId: r.id ?? null });
+      setRespuesta(r);
       onSaldoCambiado?.();
       cargarAnteriores();
     } catch (err) {
@@ -301,6 +310,31 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
             <button type="button" onClick={() => setRespuesta(null)} className="btn-neutral btn-sm">
               Revisar otro
             </button>
+            {onAbrirTaller && paraElTaller.texto && (
+              <button
+                type="button"
+                onClick={() => {
+                  onAbrirTaller({
+                    revisionId: paraElTaller.revisionId,
+                    documentType: tituloDelInforme,
+                    fileName: origenDelInforme.fileName || 'escrito',
+                    cliente: origenDelInforme.cliente,
+                    texto: paraElTaller.texto as string,
+                    informe: respuesta.informe,
+                    informeLibre: respuesta.informeLibre,
+                    conFicha: respuesta.conFicha,
+                    guardaTexto: paraElTaller.guardaTexto,
+                    conversacion: paraElTaller.conversacion
+                  });
+                  onCerrar();
+                }}
+                className="btn-secondary btn-sm"
+                title="El escrito con los pasajes marcados, para editarlo y seguir con el revisor"
+              >
+                <ClipboardCheck className="h-3.5 w-3.5" />
+                Abrir en el taller
+              </button>
+            )}
             <button
               type="button"
               onClick={() => void exportar('word')}

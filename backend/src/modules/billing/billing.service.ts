@@ -23,7 +23,7 @@ import type { CallUsage } from '../agent/openrouter.client';
  * cannot answer a client asking why their balance moved.
  */
 
-export type Operation = 'BORRADOR' | 'TRANSCRIPCION' | 'BUSQUEDA' | 'ORIENTACION' | 'RESUMEN' | 'REVISION';
+export type Operation = 'BORRADOR' | 'TRANSCRIPCION' | 'BUSQUEDA' | 'ORIENTACION' | 'RESUMEN' | 'REVISION' | 'CONSULTA_REVISION';
 
 export class BillingError extends Error {
   readonly code: string;
@@ -118,7 +118,15 @@ export const PRICE_COP: Record<Operation, number> = {
    * con la peticion mal formulada vale, cuando menos, lo que el borrador. Piso
    * provisional del desarrollador, como los demas: se ajusta con datos.
    */
-  REVISION: 2000
+  REVISION: 2000,
+  /*
+   * Un turno del taller de revision: el revisor relee el escrito ACTUAL entero
+   * y contesta. Cuesta al proveedor entre US$0,05 y US$0,15 segun el largo;
+   * el piso de $300 cubre los cortos y el margen medido cubre los largos,
+   * porque el precio sube con el costo real (priceFor). Una revision completa
+   * nueva sigue siendo REVISION.
+   */
+  CONSULTA_REVISION: 300
 };
 
 /**

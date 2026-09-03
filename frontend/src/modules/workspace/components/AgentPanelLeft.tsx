@@ -16,6 +16,7 @@ import { useActuacionLookup } from '../../catalog/hooks/useActuacion';
 import type { AgentLog } from '../../agent/types';
 import type { ActuacionRole } from '../../catalog/types';
 import { RevisarEscritoDialog } from './RevisarEscritoDialog';
+import type { DatosDelTaller } from './TallerDeRevision';
 
 /**
  * "Qué debe hacer este escrito" — la columna izquierda, ya sin la configuración.
@@ -69,6 +70,8 @@ interface AgentPanelLeftProps {
   ocultoEnMovil?: boolean;
   /** Tras una operacion que cobra (la revision), para que la barra lateral relea el saldo. */
   onSaldoCambiado?: () => void;
+  /** Abrir el taller de revision con el escrito y su informe. */
+  onAbrirTaller?: (datos: DatosDelTaller) => void;
 }
 
 export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
@@ -84,7 +87,8 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
   activeDraftText,
   onClearActiveDraft,
   ocultoEnMovil = false,
-  onSaldoCambiado
+  onSaldoCambiado,
+  onAbrirTaller
 }) => {
   const [importedFiles, setImportedFiles] = useState<ArchivoAdjunto[]>([]);
   /** «Revisar un escrito»: el tercer uso del módulo, junto a redactar y corregir. */
@@ -330,6 +334,7 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
             legalBranch={legalBranch}
             precioCop={2000}
             onSaldoCambiado={onSaldoCambiado}
+            onAbrirTaller={onAbrirTaller}
           />
 
           {/* ─── FUNDAMENTOS QUE VA A USAR ─────────────────────────────────

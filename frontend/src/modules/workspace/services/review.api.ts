@@ -37,6 +37,10 @@ export interface RespuestaDeRevision {
   /** Id del informe guardado; null si no se pudo guardar. */
   id?: string | null;
   guardada?: boolean;
+  /** El texto del escrito tal como se revisó: el taller lo necesita para tachar y editar. */
+  texto?: string;
+  /** Si la firma autorizó conservar el texto y la conversación en el servidor. */
+  guardaTexto?: boolean;
   informe: InformeDeRevision | null;
   /** Cuando el revisor no devolvió JSON legible: su texto tal cual. */
   informeLibre: string | null;
@@ -77,6 +81,48 @@ export interface RevisionGuardada {
   cobradoCop: number;
   userEmail: string;
   createdAt: string;
+  /** El taller: solo si la firma autorizó conservar escritos. */
+  textoOriginal: string | null;
+  textoTrabajo: string | null;
+  conversacion: TurnoDelTaller[];
+}
+
+export interface EdicionPropuesta {
+  cita: string;
+  reemplazo: string;
+}
+
+export interface TurnoDelTaller {
+  rol: 'abogado' | 'revisor';
+  texto: string;
+  ediciones?: EdicionPropuesta[];
+  fecha: string;
+}
+
+export interface RespuestaDelChat {
+  respuesta: string;
+  ediciones: EdicionPropuesta[];
+  turnos: TurnoDelTaller[];
+  guardado: boolean;
+  cobradoCop: number;
+  saldoCop: number;
+}
+
+export interface RespuestaDeNuevaRevision {
+  informe: InformeDeRevision | null;
+  informeLibre: string | null;
+  conFicha: boolean;
+  truncado: boolean;
+  caracteres: number;
+  guardado: boolean;
+  cobradoCop: number;
+  saldoCop: number;
+}
+
+export interface ConsentimientoDeGuardado {
+  guarda: boolean;
+  por: string | null;
+  el: string | null;
 }
 
 export const reviewApi = {
@@ -89,7 +135,23 @@ export const reviewApi = {
   obtener: (id: string) =>
     httpClient.get<{ revision: RevisionGuardada }>(`/api/agent/reviews/${encodeURIComponent(id)}`).then((r) => r.revision),
 
-  eliminar: (id: string) => httpClient.delete<{ success: boolean }>(`/api/agent/reviews/${encodeURIComponent(id)}`)
+  eliminar: (id: string) => httpClient.delete<{ success: boolean }>(`/api/agent/reviews/${encodeURIComponent(id)}`),
+
+  /* ─── El taller ─────────────────────────────────────────────────────────── */
+
+  guardarTexto: (id: string, texto: string) =>
+    httpClient.put<{ guardado: boolean; motivo?: string }>(`/api/agent/reviews/${encodeURIComponent(id)}/texto`, { body: { texto } }),
+
+  chat: (id: string, body: { mensaje: string; textoActual: string; historial: TurnoDelTaller[] }) =>
+    httpClient.post<RespuestaDelChat>(`/api/agent/reviews/${encodeURIComponent(id)}/chat`, { body }),
+
+  rerevisar: (id: string, textoActual: string) =>
+    httpClient.post<RespuestaDeNuevaRevision>(`/api/agent/reviews/${encodeURIComponent(id)}/rerevisar`, { body: { textoActual } }),
+
+  consentimiento: () => httpClient.get<ConsentimientoDeGuardado>('/api/agent/reviews/settings/guardado'),
+
+  autorizarGuardado: (autorizar: boolean) =>
+    httpClient.post<ConsentimientoDeGuardado>('/api/agent/reviews/settings/guardado', { body: { autorizar } })
 };
 
 /** El archivo como base64 puro, sin el prefijo data:. */
