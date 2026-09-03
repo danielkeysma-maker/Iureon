@@ -248,6 +248,12 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
     }
 
     const informe = parsearInforme(llamada.text);
+    if (!informe) {
+      // Shape only, never content: the brief and the report are the lawyer's.
+      console.warn(
+        `[REVIEW] Informe no estructurable: ${llamada.text.length} caracteres, empieza con «${llamada.text.trimStart().slice(0, 1)}», termina con «${llamada.text.trimEnd().slice(-1)}», tokens de salida ${llamada.usage?.completionTokens ?? '?'}.`
+      );
+    }
 
     const cobro = await settleOperation({
       firmId,

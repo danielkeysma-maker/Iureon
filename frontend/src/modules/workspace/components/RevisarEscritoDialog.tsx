@@ -334,7 +334,13 @@ const Informe: React.FC<{ respuesta: RespuestaDeRevision; documentType: string }
       </div>
 
       {!i ? (
-        <pre className="whitespace-pre-wrap font-sans text-ui leading-relaxed text-ink-900">{respuesta.informeLibre}</pre>
+        <>
+          <p className="rounded-control border border-line-200 bg-canvas px-3 py-2 text-[12px] leading-snug text-ink-700">
+            El revisor respondió en un formato que no se pudo ordenar por secciones; abajo está su texto completo. El cobro
+            es el mismo y el contenido también.
+          </p>
+          <pre className="whitespace-pre-wrap font-sans text-ui leading-relaxed text-ink-900">{respuesta.informeLibre}</pre>
+        </>
       ) : (
         <>
           <p className="text-[14px] leading-relaxed text-ink-900">{i.resumen}</p>

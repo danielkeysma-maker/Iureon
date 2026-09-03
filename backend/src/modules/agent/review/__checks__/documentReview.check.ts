@@ -107,6 +107,29 @@ const cortadoEnObjeto = '{"resumen":"Bien.","erroresDeAplicacion":[{"donde":"Fun
 const salvado3 = parsearInforme(cortadoEnObjeto);
 check('cortado dentro de un objeto de la lista, se conserva lo que ese objeto ya tenía', salvado3 !== null && salvado3.erroresDeAplicacion[0]?.donde === 'Fundamentos', String(repararJsonCortado(cortadoEnObjeto)));
 
+/* ─── LO QUE UN MODELO HACE MAL CON EL JSON, Y AUN ASI SE LEE ──────────────── */
+// Saltos de linea crudos dentro de las cadenas (JSON invalido, muy comun).
+const NL = String.fromCharCode(10);
+const TAB = String.fromCharCode(9);
+const conSaltos = '{"resumen":"Primera frase.' + NL + 'Segunda frase.","fortalezas":["Uno' + NL + TAB + 'dos"],"debilidades":[]}';
+const leidoConSaltos = parsearInforme(conSaltos);
+check('saltos de linea crudos dentro de una cadena no lo tumban', leidoConSaltos !== null && /Primera frase\. Segunda frase\./.test(leidoConSaltos.resumen), leidoConSaltos?.resumen);
+
+// Texto antes y despues del objeto.
+const conProsa = 'Claro, aqui esta el informe:' + NL + '{"resumen":"Bien.","fortalezas":["A"]}' + NL + 'Espero que sirva.';
+check('prosa antes y despues del objeto se ignora', parsearInforme(conProsa)?.fortalezas[0] === 'A');
+
+// Coma final antes de cerrar (JSON invalido, comun).
+const comaFinal = '{"resumen":"Bien.","fortalezas":["A","B",],"debilidades":["C"],}';
+check('una coma final antes del cierre se tolera', parsearInforme(comaFinal)?.debilidades[0] === 'C', String(parsearInforme(comaFinal)));
+
+// Comillas tipograficas o dobles sin escapar dentro de una cadena: el JSON es
+// irrecuperable como JSON, pero los campos se pueden extraer por patron.
+const irrecuperable = '{"resumen":"El escrito cita la "sentencia" sin verificar.","fortalezas":["Hechos claros"],"debilidades":["Cita sin verificar"],"seccionesFaltantes":[],"erroresDeAplicacion":[{"donde":"Fundamentos","problema":"Cita una "sentencia"","correccion":"Suprimirla"}],"recomendaciones":["Verificar"]}';
+const extraido = parsearInforme(irrecuperable);
+check('si el JSON es irrecuperable, los campos se extraen por patron', extraido !== null && extraido.fortalezas[0] === 'Hechos claros' && extraido.recomendaciones[0] === 'Verificar', JSON.stringify(extraido));
+check('y los errores de aplicacion conservan donde y correccion', extraido?.erroresDeAplicacion[0]?.donde === 'Fundamentos' && extraido?.erroresDeAplicacion[0]?.correccion === 'Suprimirla');
+
 const basura = parsearInforme('El escrito está bien en general, pero…');
 check('prosa sin JSON devuelve null (el controlador la entrega como texto libre)', basura === null);
 

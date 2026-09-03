@@ -223,6 +223,106 @@ export const repararJsonCortado = (texto: string): string | null => {
  * handed over as free text by the controller, not lost. A cut-off JSON is
  * repaired first, so the complete findings survive the missing tail.
  */
+/**
+ * Control characters inside strings (raw newlines, tabs) are the commonest
+ * way a model breaks its own JSON. They become spaces; outside strings they
+ * are left alone. Trailing commas before a closer go too.
+ */
+const sanearJson = (s: string): string => {
+  let out = '';
+  let enCadena = false;
+  let escape = false;
+  for (const c of s) {
+    if (enCadena) {
+      if (escape) escape = false;
+      else if (c === '\\') escape = true;
+      else if (c === '"') enCadena = false;
+      else if (c === '\n' || c === '\r' || c === '\t') {
+        out += ' ';
+        continue;
+      }
+    } else if (c === '"') enCadena = true;
+    out += c;
+  }
+  return out.replace(/,(\s*[}\]])/g, '$1');
+};
+
+const desescapar = (s: string): string =>
+  s.replace(/\\n/g, ' ').replace(/\\t/g, ' ').replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+
+/**
+ * Last resort when the text is not JSON at all any more — unescaped quotes
+ * inside a value, for instance. The fields are pulled out by pattern: each
+ * list is the run between its key and the next known key, and each item is a
+ * quoted run. Loses nothing that was whole; never throws.
+ */
+const CLAVES = ['resumen', 'fortalezas', 'debilidades', 'seccionesFaltantes', 'erroresDeAplicacion', 'recomendaciones'];
+
+const extraerCampos = (s: string): InformeDeRevision | null => {
+  const tramo = (clave: string): string | null => {
+    const m = new RegExp(`"${clave}"\\s*:\\s*`).exec(s);
+    if (!m) return null;
+    const desde = m.index + m[0].length;
+    let hasta = s.length;
+    for (const otra of CLAVES) {
+      if (otra === clave) continue;
+      const o = s.indexOf(`"${otra}"`, desde);
+      if (o !== -1 && o < hasta) hasta = o;
+    }
+    return s.slice(desde, hasta);
+  };
+  const cadenaDe = (clave: string): string => {
+    const t = tramo(clave);
+    if (!t) return '';
+    const m = /^\s*"([\s\S]*?)"\s*(?:,\s*)?$/.exec(t.replace(/,\s*$/, ''));
+    return desescapar((m ? m[1] : t.replace(/^\s*"|"\s*,?\s*$/g, '')).trim());
+  };
+  const listaDe = (clave: string): string[] => {
+    const t = tramo(clave);
+    if (!t) return [];
+    const cuerpo = t.replace(/^\s*\[/, '').replace(/\]\s*,?\s*}?\s*$/, '');
+    // Items are separated by `","` (the only reliable boundary once quotes inside values are suspect).
+    return cuerpo
+      .split(/"\s*,\s*"/)
+      .map((x) => desescapar(x.replace(/^\s*"|"\s*$/g, '').trim()))
+      .filter(Boolean);
+  };
+  const erroresDe = (): ErrorDeAplicacion[] => {
+    const t = tramo('erroresDeAplicacion');
+    if (!t) return [];
+    const salida: ErrorDeAplicacion[] = [];
+    const objetos = t.split(/}\s*,\s*{/);
+    for (const o of objetos) {
+      const campo = (k: string): string => {
+        const m = new RegExp(`"${k}"\\s*:\\s*"([\\s\\S]*?)"\\s*(?=,\\s*"(?:donde|problema|correccion)"|\\s*}|\\s*$)`).exec(o);
+        return m ? desescapar(m[1].trim()) : '';
+      };
+      const e = { donde: campo('donde'), problema: campo('problema'), correccion: campo('correccion') };
+      if (e.donde || e.problema || e.correccion) salida.push(e);
+    }
+    return salida;
+  };
+
+  const informe: InformeDeRevision = {
+    resumen: cadenaDe('resumen'),
+    fortalezas: listaDe('fortalezas'),
+    debilidades: listaDe('debilidades'),
+    seccionesFaltantes: listaDe('seccionesFaltantes'),
+    erroresDeAplicacion: erroresDe(),
+    recomendaciones: listaDe('recomendaciones')
+  };
+  const algo =
+    informe.resumen || informe.fortalezas.length || informe.debilidades.length || informe.recomendaciones.length;
+  return algo ? informe : null;
+};
+
+/**
+ * The model's JSON, or null. Never throws. Reads in order of confidence:
+ * clean JSON; JSON with control characters or trailing commas sanitised; a
+ * cut-off JSON repaired; and, last, the fields pulled out by pattern from a
+ * text that is no longer JSON at all. The report the lawyer paid for is not
+ * thrown away because the model forgot to escape a quote.
+ */
 export const parsearInforme = (crudo: string): InformeDeRevision | null => {
   const sinCerca = crudo.replace(/```(?:json)?/gi, '').trim();
   const inicio = sinCerca.indexOf('{');
@@ -230,20 +330,28 @@ export const parsearInforme = (crudo: string): InformeDeRevision | null => {
 
   const intentos: string[] = [];
   const fin = sinCerca.lastIndexOf('}');
-  if (fin > inicio) intentos.push(sinCerca.slice(inicio, fin + 1));
-  const reparado = repararJsonCortado(sinCerca);
+  if (fin > inicio) {
+    const bruto = sinCerca.slice(inicio, fin + 1);
+    intentos.push(bruto, sanearJson(bruto));
+  }
+  const saneado = sanearJson(sinCerca.slice(inicio));
+  const reparado = repararJsonCortado(saneado);
   if (reparado) intentos.push(reparado);
 
   let objeto: Record<string, unknown> | null = null;
   for (const intento of intentos) {
     try {
-      objeto = JSON.parse(intento) as Record<string, unknown>;
-      break;
+      const o = JSON.parse(intento) as unknown;
+      if (o && typeof o === 'object' && !Array.isArray(o)) {
+        objeto = o as Record<string, unknown>;
+        break;
+      }
     } catch {
       objeto = null;
     }
   }
-  if (!objeto || typeof objeto !== 'object' || Array.isArray(objeto)) return null;
+
+  if (!objeto) return extraerCampos(sinCerca.slice(inicio));
 
   return {
     resumen: cadena(objeto.resumen),
