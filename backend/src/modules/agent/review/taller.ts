@@ -42,7 +42,10 @@ export interface EdicionPropuesta {
 /** Un resaltado o tachado del abogado, anclado al texto citado. */
 export interface AnotacionDelAbogado {
   cita: string;
+  /** amarillo | verde | azul | rosa | tachado | comentario */
   color: string;
+  /** Solo en comentarios: lo que el abogado escribió sobre ese pasaje. */
+  nota?: string;
 }
 
 export interface RespuestaDelTaller {
@@ -62,6 +65,8 @@ export const buildTallerSystemPrompt = (): string => `Eres el mismo revisor seni
 QUÉ HACES: responder lo que te pregunten con criterio profesional franco; cuando te pidan redactar o reformular un pasaje, lo redactas concreto y listo para pegar; cuando te pregunten «cómo va», dices qué mejoró, qué sigue fallando y qué falta, sin repetir hallazgos ya corregidos.
 
 LAS MARCAS DEL ABOGADO: si el mensaje trae «MARCAS DEL ABOGADO», son pasajes que él resaltó a mano en un color o tachó. Cuando te hable de «lo amarillo», «lo que resalté en verde», «lo tachado», se refiere a esos pasajes exactos: úsalos como el objeto de la pregunta. Si tachó algo, entiende que propone quitarlo salvo que diga otra cosa.
+
+LOS COMENTARIOS DEL ABOGADO: si el mensaje trae «COMENTARIOS DEL ABOGADO», son notas que él dejó sobre pasajes concretos —observaciones, dudas, correcciones a lo que tú dijiste—. Léelos antes de responder y, cuando te pregunte por «mi comentario» o «lo que anoté», responde a esa nota sobre ese pasaje. Si un comentario te corrige (por ejemplo, que una norma o un criterio no es como dijiste), acéptalo si tiene razón y ajusta tu respuesta; si crees que no la tiene, explica por qué con la norma en la mano, sin inventar providencias.
 
 QUÉ NO HACES: no reescribes el escrito entero salvo que te lo pidan expresamente; no inventas hechos que el escrito no traiga; NO citas sentencias, autos ni providencias ni radicados —si un punto necesita precedente, dilo y describe qué debería sostener—; no contradigas la ficha verificada de la actuación ni le añadas requisitos que no estén en ella.
 
@@ -121,6 +126,10 @@ export const buildTallerUserPrompt = (input: {
         .map((a) => `- ${NOMBRES[a.color]}: «${a.cita}»`)
         .join('\n')}`
     : 'El abogado no ha resaltado ni tachado nada a mano.';
+  const comentarios = (input.anotaciones ?? []).filter((a) => a.color === 'comentario' && a.cita && (a.nota ?? '').trim());
+  const notas = comentarios.length
+    ? `COMENTARIOS DEL ABOGADO (notas sobre pasajes concretos):\n${comentarios.map((c) => `- Sobre «${c.cita}»: ${(c.nota ?? '').trim()}`).join('\n')}`
+    : 'El abogado no ha dejado comentarios sobre pasajes.';
 
   return `ACTUACIÓN: "${input.documentType}".
 
@@ -131,6 +140,8 @@ ${informe}
 ${conversacion}
 
 ${marcas}
+
+${notas}
 
 TEXTO ACTUAL DEL ESCRITO (con los cambios que el abogado ya hizo):
 """

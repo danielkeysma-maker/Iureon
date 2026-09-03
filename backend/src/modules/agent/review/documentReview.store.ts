@@ -57,6 +57,9 @@ export interface VersionDelTexto {
 export interface Anotacion {
   cita: string;
   color: string;
+  /** Solo en comentarios. */
+  nota?: string;
+  fecha?: string;
 }
 
 export interface ConsentimientoDeGuardado {

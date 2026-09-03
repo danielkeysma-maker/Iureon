@@ -10,6 +10,8 @@ import {
   History,
   Highlighter,
   Maximize2,
+  MessageSquare,
+  MessageSquarePlus,
   Minimize2,
   PanelRightClose,
   PanelRightOpen,
@@ -103,6 +105,7 @@ const claseDeCapas = (capas: MarcaEnCapa[], abierta: number | null): string => {
   for (const c of capas) {
     if (c.capa === 'cita') clases.push(`line-through decoration-danger decoration-2 ${abierta === c.indice ? 'bg-amber-200' : 'bg-amber-50'}`);
     else if (c.capa === 'referencia') clases.push('underline decoration-sky-500 decoration-2 underline-offset-4');
+    else if (c.capa === 'comentario') clases.push('border-b-2 border-dotted border-brand-700 bg-brand-50/70');
     else {
       const color = COLORES.find((x) => x.id === c.capa);
       if (color) clases.push(color.clase);
@@ -132,7 +135,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   const [versiones, setVersiones] = React.useState<VersionDelTexto[]>(datos.versiones);
   const [referencias, setReferencias] = React.useState<string[]>([]);
   const [modo, setModo] = React.useState<'marcas' | 'editar'>('marcas');
-  const [panel, setPanel] = React.useState<'chat' | 'informe' | 'versiones'>('chat');
+  const [panel, setPanel] = React.useState<'chat' | 'informe' | 'versiones' | 'comentarios'>('chat');
   const [citaAbierta, setCitaAbierta] = React.useState<number | null>(null);
   const [versionAbierta, setVersionAbierta] = React.useState<number | null>(null);
   const [mensaje, setMensaje] = React.useState('');
@@ -144,6 +147,8 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   const [pantallaCompleta, setPantallaCompleta] = React.useState(false);
   const [guiaVisible, setGuiaVisible] = React.useState(true);
   const [seleccion, setSeleccion] = React.useState<{ texto: string; x: number; y: number } | null>(null);
+  /** Un comentario que se está escribiendo (nuevo, sobre la selección) o abriendo (índice en anotaciones). */
+  const [comentario, setComentario] = React.useState<{ indice: number | null; cita: string; nota: string } | null>(null);
   const finDelChat = React.useRef<HTMLDivElement | null>(null);
   const lienzo = React.useRef<HTMLParagraphElement | null>(null);
   const contenedor = React.useRef<HTMLDivElement | null>(null);
@@ -244,8 +249,46 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
     window.getSelection()?.removeAllRanges();
   };
 
+  const comentarios = anotaciones.map((a, indice) => ({ a, indice })).filter(({ a }) => a.color === 'comentario');
+
+  const abrirComentarioNuevo = () => {
+    if (!seleccion) return;
+    setComentario({ indice: null, cita: seleccion.texto, nota: '' });
+    setSeleccion(null);
+    window.getSelection()?.removeAllRanges();
+  };
+
+  const guardarComentario = () => {
+    if (!comentario || !comentario.nota.trim()) return;
+    const nuevo = { cita: comentario.cita, color: 'comentario' as const, nota: comentario.nota.trim(), fecha: new Date().toISOString() };
+    setAnotaciones((xs) => (comentario.indice === null ? [...xs, nuevo] : xs.map((a, k) => (k === comentario.indice ? { ...a, nota: nuevo.nota } : a))));
+    setComentario(null);
+  };
+
+  const resolverComentario = (indice: number) => {
+    setAnotaciones((xs) => xs.filter((_, k) => k !== indice));
+    setComentario(null);
+  };
+
+  const preguntarSobreComentario = (a: Anotacion) => {
+    setPanel('chat');
+    setVistaMovil('revisor');
+    setMensaje(`Sobre mi comentario en «${a.cita}» (${a.nota ?? ''}): `);
+    setComentario(null);
+  };
+
+  const irAlPasaje = (cita: string) => {
+    setModo('marcas');
+    setVersionAbierta(null);
+    setVistaMovil('escrito');
+    window.setTimeout(() => {
+      const objetivo = lienzo.current?.querySelector<HTMLElement>(`[data-cita="${CSS.escape(cita.slice(0, 80))}"]`);
+      objetivo?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }, 50);
+  };
+
   const quitarMarcaEn = (segmentoCapas: MarcaEnCapa[]) => {
-    const propias = segmentoCapas.filter((c) => c.capa !== 'cita' && c.capa !== 'referencia');
+    const propias = segmentoCapas.filter((c) => c.capa !== 'cita' && c.capa !== 'referencia' && c.capa !== 'comentario');
     if (!propias.length) return;
     setAnotaciones((xs) => xs.filter((_, k) => !propias.some((p) => p.indice === k)));
   };
@@ -345,9 +388,46 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
               {c.id === 'tachado' ? <span className="line-through">abc</span> : ''}
             </button>
           ))}
+          <button type="button" onClick={abrirComentarioNuevo} className="flex h-7 items-center gap-1 rounded-control border border-brand-700 px-2 font-sans text-[11px] text-brand-700" title="Dejar un comentario sobre este pasaje">
+            <MessageSquarePlus className="h-3.5 w-3.5" />
+            Comentar
+          </button>
           <button type="button" onClick={() => setSeleccion(null)} className="h-7 rounded-control px-1.5 font-sans text-[11px] text-ink-500" title="Cancelar">
             ✕
           </button>
+        </div>
+      )}
+      {comentario && (
+        <div className="absolute inset-x-3 top-3 z-20 mx-auto max-w-[560px] rounded-card border border-line-200 bg-surface p-3 font-sans shadow-lg sm:inset-x-6">
+          <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-400">{comentario.indice === null ? 'Nuevo comentario' : 'Comentario'}</p>
+          <p className="mt-0.5 text-[12px] italic leading-snug text-ink-500">«{comentario.cita}»</p>
+          <textarea
+            value={comentario.nota}
+            onChange={(e) => setComentario({ ...comentario, nota: e.target.value })}
+            rows={3}
+            autoFocus
+            placeholder="Su nota sobre este pasaje: una duda, algo para revisar después, una corrección a la guía…"
+            className="field-area mt-2 w-full resize-none"
+          />
+          <div className="mt-2 flex flex-wrap gap-2">
+            <button type="button" onClick={guardarComentario} disabled={!comentario.nota.trim()} className="btn-primary btn-sm disabled:opacity-50">
+              {comentario.indice === null ? 'Guardar comentario' : 'Guardar cambios'}
+            </button>
+            {comentario.indice !== null && (
+              <>
+                <button type="button" onClick={() => preguntarSobreComentario(anotaciones[comentario.indice as number])} className="btn-secondary btn-sm">
+                  <MessageSquare className="h-3.5 w-3.5" />
+                  Preguntar a la guía
+                </button>
+                <button type="button" onClick={() => resolverComentario(comentario.indice as number)} className="btn-neutral btn-sm">
+                  Resolver
+                </button>
+              </>
+            )}
+            <button type="button" onClick={() => setComentario(null)} className="btn-neutral btn-sm ml-auto">
+              Cancelar
+            </button>
+          </div>
         </div>
       )}
       <div className="mx-auto w-full max-w-[760px] rounded-card border border-line-200 bg-paper px-8 py-8 shadow-sm sm:px-12 sm:py-10">{children}</div>
@@ -382,7 +462,8 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
               <Highlighter className="mr-1 inline h-3 w-3" />
               Seleccione texto para resaltar o tachar
               {marcasDeCitas.marcas.length > 0 && ` · ${marcasDeCitas.marcas.length} ${marcasDeCitas.marcas.length === 1 ? 'pasaje citado' : 'pasajes citados'}`}
-              {anotaciones.length > 0 && ` · ${anotaciones.length} ${anotaciones.length === 1 ? 'marca suya' : 'marcas suyas'}`}
+              {anotaciones.filter((a) => a.color !== 'comentario').length > 0 && ` · ${anotaciones.filter((a) => a.color !== 'comentario').length} ${anotaciones.filter((a) => a.color !== 'comentario').length === 1 ? 'marca suya' : 'marcas suyas'}`}
+              {comentarios.length > 0 && ` · ${comentarios.length} ${comentarios.length === 1 ? 'comentario' : 'comentarios'}`}
             </>
           ) : (
             'Las marcas se reubican solas al volver a «Con marcas».'
@@ -393,8 +474,8 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
             <Save className="h-3.5 w-3.5" />
             Guardar versión
           </button>
-          {anotaciones.length > 0 && modo === 'marcas' && (
-            <button type="button" onClick={() => setAnotaciones([])} className="btn-neutral btn-sm" title="Quitar todos sus resaltados y tachados">
+          {anotaciones.some((a) => a.color !== 'comentario') && modo === 'marcas' && (
+            <button type="button" onClick={() => setAnotaciones((xs) => xs.filter((a) => a.color === 'comentario'))} className="btn-neutral btn-sm" title="Quitar todos sus resaltados y tachados (los comentarios se conservan)">
               <Eraser className="h-3.5 w-3.5" />
               Limpiar
             </button>
@@ -468,18 +549,26 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
               {segmentos.map((s, k) => {
                 if (s.capas.length === 0) return <React.Fragment key={k}>{s.texto}</React.Fragment>;
                 const cita = s.capas.find((c) => c.capa === 'cita');
-                const propias = s.capas.some((c) => c.capa !== 'cita' && c.capa !== 'referencia');
+                const conComentario = s.capas.find((c) => c.capa === 'comentario');
+                const propias = s.capas.some((c) => c.capa !== 'cita' && c.capa !== 'referencia' && c.capa !== 'comentario');
+                const anclaje = s.capas.map((c) => (c.capa === 'comentario' ? anotaciones[c.indice]?.cita : null)).find(Boolean);
                 return (
                   <span
                     key={k}
-                    role={cita || propias ? 'button' : undefined}
-                    tabIndex={cita || propias ? 0 : undefined}
+                    data-cita={anclaje ? anclaje.slice(0, 80) : undefined}
+                    role={cita || propias || conComentario ? 'button' : undefined}
+                    tabIndex={cita || propias || conComentario ? 0 : undefined}
                     onClick={() => {
+                      if (conComentario) {
+                        const a = anotaciones[conComentario.indice];
+                        setComentario({ indice: conComentario.indice, cita: a.cita, nota: a.nota ?? '' });
+                        return;
+                      }
                       if (cita) setCitaAbierta(citaAbierta === cita.indice ? null : cita.indice);
                     }}
                     onDoubleClick={() => quitarMarcaEn(s.capas)}
-                    className={`rounded-sm ${claseDeCapas(s.capas, citaAbierta)} ${cita ? 'cursor-pointer' : propias ? 'cursor-text' : ''}`}
-                    title={cita ? 'Pasaje citado por la guía: toque para ver el reemplazo' : propias ? 'Su marca · doble clic para quitarla' : 'La guía se refiere a este pasaje'}
+                    className={`rounded-sm ${claseDeCapas(s.capas, citaAbierta)} ${cita || conComentario ? 'cursor-pointer' : propias ? 'cursor-text' : ''}`}
+                    title={conComentario ? `Comentario: ${anotaciones[conComentario.indice]?.nota ?? ''}` : cita ? 'Pasaje citado por la guía: toque para ver el reemplazo' : propias ? 'Su marca · doble clic para quitarla' : 'La guía se refiere a este pasaje'}
                   >
                     {s.texto}
                   </span>
@@ -533,7 +622,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
         {conversacion.length === 0 && (
           <p className="text-[12.5px] leading-snug text-ink-500">
             Pregúntele a la guía sobre el escrito o pídale redacciones: «reescribe la pretensión tercera como subsidiaria», «revisa lo que resalté en
-            amarillo», «¿cómo va después de mis cambios?». Cada mensaje lleva el texto tal como está ahora y sus marcas de colores, y cuesta{' '}
+            amarillo», «mira mi comentario sobre la jurisprudencia», «¿cómo va después de mis cambios?». Cada mensaje lleva el texto tal como está ahora, sus marcas de colores y sus comentarios, y cuesta{' '}
             {pesos(precioConsultaCop)}. Los pasajes de los que hable se subrayan en azul.
           </p>
         )}
@@ -622,6 +711,41 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
             </section>
           )}
         </>
+      )}
+    </div>
+  );
+
+  const ComentariosPanel = () => (
+    <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3 text-[12.5px]">
+      {comentarios.length === 0 ? (
+        <p className="text-ink-500">
+          Seleccione un pasaje del escrito y elija «Comentar» para dejar una nota: algo que revisar después, una duda, o una corrección a la guía. Los
+          comentarios viajan con cada mensaje, así que puede pedirle «mira mi comentario sobre la jurisprudencia».
+        </p>
+      ) : (
+        <ul className="space-y-2">
+          {comentarios.map(({ a, indice }) => (
+            <li key={indice} className="rounded-control border border-line-200 bg-canvas px-3 py-2">
+              <button type="button" onClick={() => irAlPasaje(a.cita)} className="block w-full text-left text-[11px] italic leading-snug text-ink-500 hover:text-brand-700" title="Ir al pasaje">
+                «{a.cita.length > 140 ? `${a.cita.slice(0, 140)}…` : a.cita}»
+              </button>
+              <p className="mt-1 whitespace-pre-wrap leading-snug text-ink-900">{a.nota}</p>
+              <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                {a.fecha && <span className="font-mono text-[10px] text-ink-400">{fechaCorta(a.fecha)}</span>}
+                <button type="button" onClick={() => setComentario({ indice, cita: a.cita, nota: a.nota ?? '' })} className="btn-neutral btn-sm ml-auto">
+                  Editar
+                </button>
+                <button type="button" onClick={() => preguntarSobreComentario(a)} className="btn-secondary btn-sm">
+                  <MessageSquare className="h-3 w-3" />
+                  Preguntar a la guía
+                </button>
+                <button type="button" onClick={() => resolverComentario(indice)} className="btn-neutral btn-sm">
+                  Resolver
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );
@@ -730,13 +854,19 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
         <div className={`min-h-0 flex-1 flex-col lg:flex ${guiaVisible ? 'lg:w-[58%] lg:flex-none' : 'lg:w-full'} ${vistaMovil === 'escrito' ? 'flex' : 'hidden'}`}>{Escrito()}</div>
         <div className={`min-h-0 flex-1 flex-col border-l border-line-200 bg-surface ${guiaVisible ? 'lg:flex' : 'lg:hidden'} ${vistaMovil === 'revisor' ? 'flex' : 'hidden'}`}>
           <div className="flex border-b border-line-100">
-            {(['chat', 'informe', 'versiones'] as const).map((p) => (
+            {(['chat', 'comentarios', 'informe', 'versiones'] as const).map((p) => (
               <button key={p} type="button" onClick={() => setPanel(p)} className={`px-3 py-2 text-[12.5px] ${panel === p ? 'border-b-2 border-brand-700 font-semibold text-brand-700' : 'text-ink-500'}`}>
-                {p === 'chat' ? 'Guía' : p === 'informe' ? 'Informe' : `Versiones${versiones.length ? ` (${versiones.length})` : ''}`}
+                {p === 'chat'
+                  ? 'Guía'
+                  : p === 'comentarios'
+                    ? `Comentarios${comentarios.length ? ` (${comentarios.length})` : ''}`
+                    : p === 'informe'
+                      ? 'Informe'
+                      : `Versiones${versiones.length ? ` (${versiones.length})` : ''}`}
               </button>
             ))}
           </div>
-          {panel === 'chat' ? Chat() : panel === 'informe' ? InformePanel() : VersionesPanel()}
+          {panel === 'chat' ? Chat() : panel === 'comentarios' ? ComentariosPanel() : panel === 'informe' ? InformePanel() : VersionesPanel()}
         </div>
       </div>
     </div>

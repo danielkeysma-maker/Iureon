@@ -57,6 +57,9 @@ check(`solo viajan los últimos ${MAX_TURNOS_EN_CONTEXTO} turnos y se declara la
 check('recortarHistorial conserva el orden y los más recientes', recortarHistorial(historial).map((t) => t.texto)[0] === 'turno 4');
 
 const conMarcas = buildTallerUserPrompt({ documentType: 'Demanda', guidance: null, informe: null, textoActual: 'x', historial: [], mensaje: '¿qué opinas de lo amarillo?', anotaciones: [{ cita: 'solicito se ordene', color: 'amarillo' }, { cita: 'en costas', color: 'tachado' }, { cita: 'x', color: 'morado' }] });
+const conComentario = buildTallerUserPrompt({ documentType: 'Demanda', guidance: null, informe: null, textoActual: 'x', historial: [], mensaje: 'mira mi comentario', anotaciones: [{ cita: 'según la sentencia T-760', color: 'comentario', nota: 'Te equivocaste: esa sentencia no dice eso.' }, { cita: 'otro', color: 'comentario', nota: '  ' }] });
+check('los comentarios del abogado viajan con su pasaje y su nota; los vacíos se omiten', /COMENTARIOS DEL ABOGADO/.test(conComentario) && /Sobre «según la sentencia T-760»: Te equivocaste/.test(conComentario) && !/«otro»/.test(conComentario));
+check('el sistema sabe qué hacer con un comentario que lo corrige', /COMENTARIOS DEL ABOGADO/.test(system) && /corrige/i.test(system));
 check('las marcas del abogado viajan con su color y las de color desconocido se omiten', /AMARILLO: «solicito se ordene»/.test(conMarcas) && /TACHADO por el abogado: «en costas»/.test(conMarcas) && !/morado/i.test(conMarcas));
 
 const sinHistorial = buildTallerUserPrompt({ documentType: 'Demanda', guidance: null, informe: null, textoActual: 'x', historial: [], mensaje: 'hola' });

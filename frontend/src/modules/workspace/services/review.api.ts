@@ -111,10 +111,13 @@ export interface VersionDelTexto {
   resumen?: string;
 }
 
-/** Un resaltado o tachado del abogado, anclado al texto citado. */
+/** Un resaltado, tachado o comentario del abogado, anclado al texto citado. */
 export interface Anotacion {
   cita: string;
-  color: 'amarillo' | 'verde' | 'azul' | 'rosa' | 'tachado';
+  color: 'amarillo' | 'verde' | 'azul' | 'rosa' | 'tachado' | 'comentario';
+  /** Solo en comentarios: la nota sobre ese pasaje. Viaja a la guía con cada mensaje. */
+  nota?: string;
+  fecha?: string;
 }
 
 export interface RespuestaDelChat {

@@ -413,9 +413,9 @@ export const saveWorkingTextController = async (req: Request, res: Response): Pr
     ? (req.body.anotaciones as unknown[])
         .map((a) => {
           const o = (a ?? {}) as Record<string, unknown>;
-          return { cita: String(o.cita ?? '').slice(0, 2000), color: String(o.color ?? '') };
+          return { cita: String(o.cita ?? '').slice(0, 2000), color: String(o.color ?? ''), nota: o.nota ? String(o.nota).slice(0, 1000) : undefined, fecha: o.fecha ? String(o.fecha).slice(0, 40) : undefined };
         })
-        .filter((a) => a.cita && /^(amarillo|verde|azul|rosa|tachado)$/.test(a.color))
+        .filter((a) => a.cita && /^(amarillo|verde|azul|rosa|tachado|comentario)$/.test(a.color))
         .slice(0, 500)
     : undefined;
   const versiones = Array.isArray(req.body.versiones)
@@ -450,7 +450,7 @@ export const reviewChatController = async (req: Request, res: Response): Promise
   const anotacionesDelAbogado = Array.isArray(req.body.anotaciones)
     ? (req.body.anotaciones as unknown[]).map((a) => {
         const o = (a ?? {}) as Record<string, unknown>;
-        return { cita: String(o.cita ?? '').slice(0, 2000), color: String(o.color ?? '') };
+        return { cita: String(o.cita ?? '').slice(0, 2000), color: String(o.color ?? ''), nota: o.nota ? String(o.nota).slice(0, 1000) : undefined };
       })
     : [];
 

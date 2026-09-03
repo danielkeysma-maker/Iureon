@@ -34,7 +34,7 @@ export const escritoChatController = async (req: Request, res: Response): Promis
   const anotacionesDelAbogado = Array.isArray(req.body.anotaciones)
     ? (req.body.anotaciones as unknown[]).map((a) => {
         const o = (a ?? {}) as Record<string, unknown>;
-        return { cita: String(o.cita ?? '').slice(0, 2000), color: String(o.color ?? '') };
+        return { cita: String(o.cita ?? '').slice(0, 2000), color: String(o.color ?? ''), nota: o.nota ? String(o.nota).slice(0, 1000) : undefined };
       })
     : [];
 
