@@ -369,7 +369,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   );
 
   const Papel = (children: React.ReactNode) => (
-    <div ref={contenedor} className="relative min-h-0 flex-1 overflow-y-auto bg-canvas px-3 py-4 sm:px-6" onMouseUp={capturarSeleccion} onTouchEnd={capturarSeleccion}>
+    <div ref={contenedor} className="scroll-documento relative min-h-0 flex-1 overflow-y-auto bg-canvas px-3 py-4 sm:px-6" onMouseUp={capturarSeleccion} onTouchEnd={capturarSeleccion}>
       {seleccion && modo === 'marcas' && (
         <div
           className="absolute z-10 flex -translate-x-1/2 -translate-y-full items-center gap-1 rounded-card border border-line-200 bg-surface p-1 shadow-lg"

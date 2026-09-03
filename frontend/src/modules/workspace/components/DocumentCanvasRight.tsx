@@ -156,7 +156,7 @@ export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
       </div>
 
       {/* ─── EL DOCUMENTO ──────────────────────────────────────────────────*/}
-      <div className="flex-1 overflow-y-auto px-4 pt-5">
+      <div className="scroll-documento flex-1 overflow-y-auto px-4 pt-5">
         {rightView === 'draft' ? (
           generatedDraft ? (
             <LegalDraftViewer

@@ -132,15 +132,25 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
           cerrado con sombra alrededor se lee como tarjeta, no como documento.
         */}
         <div className="paper-canvas relative rounded-t-card border border-b-0 border-line-200 px-8 py-8 shadow-e1 sm:px-14">
-          {/* Editar / ver: actúa sobre el TEXTO, así que vive con el texto. */}
-          <button
-            onClick={() => setIsEditMode(!isEditMode)}
-            className="btn-neutral btn-sm absolute right-3 top-3"
-            title={isEditMode ? 'Ver con formato' : 'Editar el texto'}
-          >
-            {isEditMode ? <Eye className="h-3 w-3" /> : <Pencil className="h-3 w-3" />}
-            {isEditMode ? 'Ver' : 'Editar'}
-          </button>
+          {/* Editar / ver y Taller actúan sobre el TEXTO, así que viven con el
+              texto, arriba: el Taller también está en el pie, pero el pie queda
+              seis páginas abajo y no se encontraba. */}
+          <div className="absolute right-3 top-3 flex items-center gap-1.5">
+            {onAbrirTaller && (
+              <button onClick={() => onAbrirTaller(editableText)} className="btn-secondary btn-sm" title="Resaltar, comentar y conversar con la guía sobre este escrito">
+                <ClipboardCheck className="h-3 w-3" />
+                Taller
+              </button>
+            )}
+            <button
+              onClick={() => setIsEditMode(!isEditMode)}
+              className="btn-neutral btn-sm"
+              title={isEditMode ? 'Ver con formato' : 'Editar el texto'}
+            >
+              {isEditMode ? <Eye className="h-3 w-3" /> : <Pencil className="h-3 w-3" />}
+              {isEditMode ? 'Ver' : 'Editar'}
+            </button>
+          </div>
 
           {isEditMode ? (
             <textarea
