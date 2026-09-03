@@ -515,7 +515,7 @@ const A_FORMATO: ManualArticle = {
     {
       kind: 'parrafo',
       texto:
-        'En la configuración de la firma —«Membrete», en la barra lateral— se guardan el nombre, el NIT, la dirección, el teléfono, el correo, la tarjeta profesional, el logo y la imagen de firma, además de la tipografía, el tamaño, el interlineado y la forma de numerar hechos y títulos. Lo que se elija ahí se ve en el escrito en pantalla y sale igual en el Word y el PDF: la letra no se cambia escrito por escrito, porque es de la firma, no del documento.'
+        'En la configuración de la firma —«Membrete», en la barra lateral— se guardan el nombre, el NIT, la dirección, el teléfono, el correo, la tarjeta profesional, el logo y la imagen de firma, además de la tipografía, el tamaño, el interlineado y la forma de numerar hechos y títulos. Lo que se elija ahí se ve en el escrito en pantalla y sale igual en el Word y el PDF: la letra no se cambia escrito por escrito, porque es de la firma, no del documento. Hay nueve letras: las clásicas de juzgado —Times New Roman, Arial, Calibri, Tahoma— y cuatro libres —Plus Jakarta Sans, Manrope, Public Sans y Satoshi—. Las libres van incrustadas en el PDF y se ven igual en todas partes; en Word dependen de que quien abra el archivo las tenga instaladas. Las clásicas están en todo equipo con Office, y en el PDF salen con su equivalente estándar, Times o Helvetica, porque no se pueden incrustar sin licencia.'
     },
     {
       kind: 'parrafo',

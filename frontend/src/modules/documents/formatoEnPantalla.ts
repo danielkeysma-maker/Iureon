@@ -18,7 +18,16 @@
  * el interlineado elegido. Puro: sin React, sin DOM.
  */
 
-export type FuenteDelEscrito = 'Inter' | 'Times New Roman' | 'Arial' | 'Calibri';
+export type FuenteDelEscrito =
+  | 'Times New Roman'
+  | 'Arial'
+  | 'Calibri'
+  | 'Tahoma'
+  | 'Inter'
+  | 'Plus Jakarta Sans'
+  | 'Manrope'
+  | 'Public Sans'
+  | 'Satoshi';
 export type Interlineado = '1.0' | '1.5' | '2.0';
 
 export interface FormatoDelEscrito {
@@ -37,7 +46,14 @@ const FAMILIAS: Record<FuenteDelEscrito, string> = {
   'Times New Roman': "'Times New Roman', Times, 'Liberation Serif', serif",
   Arial: "Arial, Helvetica, 'Liberation Sans', sans-serif",
   Calibri: "Calibri, Carlito, 'Segoe UI', sans-serif",
-  Inter: "Inter, system-ui, -apple-system, 'Segoe UI', sans-serif"
+  Inter: "Inter, system-ui, -apple-system, 'Segoe UI', sans-serif",
+  Tahoma: 'Tahoma, Verdana, Geneva, sans-serif',
+  // Las cuatro libres ya se cargan para la interfaz (index.html), asi que en
+  // pantalla se ven de verdad; en el PDF van incrustadas (pdfFonts.ts).
+  'Plus Jakarta Sans': "'Plus Jakarta Sans', system-ui, sans-serif",
+  Manrope: 'Manrope, system-ui, sans-serif',
+  'Public Sans': "'Public Sans', system-ui, sans-serif",
+  Satoshi: 'Satoshi, system-ui, sans-serif'
 };
 
 /** 1 pt = 4/3 px a 96 ppp: 12 pt son 16 px, como en el papel. */

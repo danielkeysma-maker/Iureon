@@ -199,8 +199,27 @@ export const FirmBrandingModal: React.FC<FirmBrandingModalProps> = ({ isOpen, on
                       <option>Times New Roman</option>
                       <option>Arial</option>
                       <option>Calibri</option>
+                      <option>Tahoma</option>
+                      <option>Plus Jakarta Sans</option>
+                      <option>Manrope</option>
+                      <option>Public Sans</option>
+                      <option>Satoshi</option>
                       <option>Inter</option>
                     </select>
+                    {/*
+                      LO QUE PASA CON CADA LETRA AL SALIR, dicho antes de elegir. Un PDF
+                      solo se ve igual en todas partes si la letra va dentro del archivo;
+                      las libres se incrustan, las propietarias no se pueden y el PDF usa
+                      la equivalente estandar. En Word manda lo que tenga instalado quien
+                      abre el archivo.
+                    */}
+                    <p className="mt-1 text-[11px] leading-snug text-ink-500">
+                      {['Plus Jakarta Sans', 'Manrope', 'Public Sans', 'Satoshi'].includes(m.fontFamily)
+                        ? 'Letra libre: el PDF la lleva incrustada y se ve igual en todas partes. En Word solo se ve así si quien lo abre la tiene instalada; si no, Word la sustituye.'
+                        : m.fontFamily === 'Times New Roman'
+                          ? 'Clásica: en Word está en todo equipo. El PDF usa Times, su equivalente estándar.'
+                          : 'En Word está en todo equipo con Office. El PDF usa Helvetica, la equivalente estándar, porque esta letra no se puede incrustar sin licencia.'}
+                    </p>
                   </label>
                   <label className="block">
                     <span className="field-label">Tamaño</span>

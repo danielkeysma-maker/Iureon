@@ -2,7 +2,7 @@ import { Document, Packer, Paragraph, TextRun, AlignmentType, Header as DocxHead
 import { saveAs } from 'file-saver';
 import { jsPDF } from 'jspdf';
 import { drawRuns } from './pdfTextLayout';
-import { registrarJakarta } from './pdfFonts';
+import { registrarFuenteDelEscrito } from './pdfFonts';
 
 export interface FirmBrandingConfig {
   firmName: string;
@@ -10,7 +10,7 @@ export interface FirmBrandingConfig {
   firmAddress: string;
   firmPhone: string;
   firmEmail: string;
-  fontFamily: 'Inter' | 'Times New Roman' | 'Arial' | 'Calibri';
+  fontFamily: 'Times New Roman' | 'Arial' | 'Calibri' | 'Tahoma' | 'Inter' | 'Plus Jakarta Sans' | 'Manrope' | 'Public Sans' | 'Satoshi';
   primaryColorHex: string;
   logoUrl?: string;
   /** Tamaño del escrito en puntos. Lo fija la marca de la firma; 12 por defecto. */
@@ -148,6 +148,8 @@ export class DocumentExportService {
 
       const children = segments.map((seg) => new TextRun({
         text: seg.text,
+        // Word recibe el NOMBRE: si el lector no tiene la letra instalada, Word la
+        // sustituye. Las cuatro clasicas siempre estan; las libres, solo si se instalan.
         font: branding.fontFamily === 'Inter' ? 'Calibri' : branding.fontFamily,
         bold: seg.bold || isHeader || isSectionTitle,
         size: isSectionTitle ? tamanoBase + 2 : tamanoBase,
@@ -291,7 +293,12 @@ export class DocumentExportService {
     opciones: OpcionesDeExportacion = OPCIONES_POR_DEFECTO
   ): Promise<void> {
     const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'letter' });
-    const F = registrarJakarta(doc);
+    /*
+     * LA LETRA DE LA FIRMA, no siempre Jakarta. El Word obedecia a Membrete y el
+     * PDF no, y el mismo escrito se veia distinto segun el boton. Las libres se
+     * incrustan; las propietarias van con su equivalente estandar (pdfFonts.ts).
+     */
+    const F = await registrarFuenteDelEscrito(doc, branding.fontFamily);
 
     /* ─── Geometría: carta con los márgenes que declara el artboard ──────── */
     const ANCHO_PAGINA = 215.9;

@@ -25,6 +25,11 @@ check('el «sencillo» de Word no es 1.0 de CSS', calibri?.lineHeight === 1.35, 
 const arial = estiloDelLienzo({ fontFamily: 'Arial' });
 check('sin tamaño ni interlineado, 12 pt y 1,5 por defecto', arial?.fontSize === '16px' && arial?.lineHeight === 1.75);
 
+for (const f of ['Tahoma', 'Plus Jakarta Sans', 'Manrope', 'Public Sans', 'Satoshi'] as const) {
+  const e = estiloDelLienzo({ fontFamily: f, fontSizePt: 12 });
+  check(`${f} llega al lienzo con su propia familia`, !!e && e.fontFamily.includes(f), e?.fontFamily);
+}
+
 const raro = estiloDelLienzo({ fontFamily: 'Comic Sans', fontSizePt: 12 });
 check('una familia desconocida no se inventa: el lienzo conserva su serif', raro === null);
 

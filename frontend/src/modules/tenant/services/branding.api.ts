@@ -10,7 +10,7 @@ export interface FirmBranding {
   firmAddress: string;
   firmPhone: string;
   firmEmail: string;
-  fontFamily: 'Times New Roman' | 'Arial' | 'Calibri' | 'Inter';
+  fontFamily: 'Times New Roman' | 'Arial' | 'Calibri' | 'Tahoma' | 'Inter' | 'Plus Jakarta Sans' | 'Manrope' | 'Public Sans' | 'Satoshi';
   fontSizePt: number;
   lineSpacing: '1.0' | '1.5' | '2.0';
   factNumbering: 'ARABIGA' | 'ORDINAL';
