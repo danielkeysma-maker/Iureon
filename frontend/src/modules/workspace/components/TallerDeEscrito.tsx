@@ -22,7 +22,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import type { Anotacion, EdicionPropuesta, InformeDeRevision, RespuestaDelChat, TurnoDelTaller, VersionDelTexto } from '../services/review.api';
-import { aplicarReemplazo, localizarCitas, marcasDeAnotaciones, segmentarCapas, type MarcaEnCapa } from '../services/marcas';
+import { aplicarReemplazo, capasTipograficas, esCapaTipografica, localizarCitas, marcasDeAnotaciones, segmentarCapas, type MarcaEnCapa } from '../services/marcas';
 import { diferencias, resumenDeCambios } from '../services/diff';
 import { ApiError } from '../../../config/httpClient';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
@@ -106,6 +106,8 @@ const claseDeCapas = (capas: MarcaEnCapa[], abierta: number | null): string => {
     if (c.capa === 'cita') clases.push(`line-through decoration-danger decoration-2 ${abierta === c.indice ? 'bg-amber-200' : 'bg-amber-50'}`);
     else if (c.capa === 'referencia') clases.push('underline decoration-sky-500 decoration-2 underline-offset-4');
     else if (c.capa === 'comentario') clases.push('border-b-2 border-dotted border-brand-700 bg-brand-50/70');
+    else if (c.capa === 'negrita') clases.push('font-bold');
+    else if (c.capa === 'marcador') clases.push('font-normal opacity-30');
     else {
       const color = COLORES.find((x) => x.id === c.capa);
       if (color) clases.push(color.clase);
@@ -161,7 +163,8 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
     () => [
       ...marcasDeCitas.marcas.map((m) => ({ ...m, capa: 'cita' })),
       ...localizarCitas(texto, referencias).marcas.map((m) => ({ ...m, capa: 'referencia' })),
-      ...marcasDeAnotaciones(texto, anotaciones)
+      ...marcasDeAnotaciones(texto, anotaciones),
+      ...capasTipograficas(texto)
     ],
     [texto, marcasDeCitas, referencias, anotaciones]
   );
@@ -288,7 +291,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   };
 
   const quitarMarcaEn = (segmentoCapas: MarcaEnCapa[]) => {
-    const propias = segmentoCapas.filter((c) => c.capa !== 'cita' && c.capa !== 'referencia' && c.capa !== 'comentario');
+    const propias = segmentoCapas.filter((c) => c.capa !== 'cita' && c.capa !== 'referencia' && c.capa !== 'comentario' && !esCapaTipografica(c.capa));
     if (!propias.length) return;
     setAnotaciones((xs) => xs.filter((_, k) => !propias.some((p) => p.indice === k)));
   };
@@ -548,9 +551,16 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
             <p ref={lienzo} className="whitespace-pre-wrap text-justify font-legal text-[14px] leading-[1.8] text-paper-ink [text-wrap:pretty]">
               {segmentos.map((s, k) => {
                 if (s.capas.length === 0) return <React.Fragment key={k}>{s.texto}</React.Fragment>;
+                if (s.capas.every((c) => esCapaTipografica(c.capa))) {
+                  return (
+                    <span key={k} className={claseDeCapas(s.capas, citaAbierta)}>
+                      {s.texto}
+                    </span>
+                  );
+                }
                 const cita = s.capas.find((c) => c.capa === 'cita');
                 const conComentario = s.capas.find((c) => c.capa === 'comentario');
-                const propias = s.capas.some((c) => c.capa !== 'cita' && c.capa !== 'referencia' && c.capa !== 'comentario');
+                const propias = s.capas.some((c) => c.capa !== 'cita' && c.capa !== 'referencia' && c.capa !== 'comentario' && !esCapaTipografica(c.capa));
                 const anclaje = s.capas.map((c) => (c.capa === 'comentario' ? anotaciones[c.indice]?.cita : null)).find(Boolean);
                 return (
                   <span

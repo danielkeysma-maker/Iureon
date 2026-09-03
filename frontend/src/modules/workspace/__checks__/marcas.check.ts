@@ -1,7 +1,7 @@
 /**
  * Guards the quote marking in the review workshop. Run with: npm run check:marcas
  */
-import { aplicarReemplazo, localizarCitas, marcasDeAnotaciones, segmentar, segmentarCapas } from '../services/marcas';
+import { aplicarReemplazo, localizarCitas, marcasDeAnotaciones, segmentar, segmentarCapas, capasTipograficas, esCapaTipografica } from '../services/marcas';
 
 let fallos = 0;
 const check = (n: string, ok: boolean, d = ''): void => {
@@ -57,6 +57,16 @@ check('el texto llano no lleva capas', capas.find((s) => s.texto === 'AB')?.capa
 
 const anot = marcasDeAnotaciones(texto, [{ cita: 'HECHOS: el día 3 de marzo', color: 'amarillo' }, { cita: 'no existe', color: 'rosa' }]);
 check('las anotaciones se localizan con su color y las ausentes se omiten', anot.length === 1 && anot[0].capa === 'amarillo' && texto.slice(anot[0].inicio, anot[0].fin) === 'HECHOS: el día 3 de marzo');
+
+{
+  const doc = 'Señor\nJUEZ (REPARTO) — CON JURISDICCIÓN EN EL LUGAR\nE. S. D.\n\nHECHOS:\n1. El día 3 de marzo la EPS negó el servicio,\nPRETENSIONES\n**REFERENCIA:** ACCIÓN DE TUTELA';
+  const capas = capasTipograficas(doc);
+  const negritas = capas.filter((c) => c.capa === 'negrita').map((c) => doc.slice(c.inicio, c.fin));
+  check('los títulos en mayúscula sostenida van en negrita y los párrafos no', negritas.includes('JUEZ (REPARTO) — CON JURISDICCIÓN EN EL LUGAR') && negritas.includes('HECHOS:') && negritas.includes('PRETENSIONES') && !negritas.some((n) => n.startsWith('1. El día')) && !negritas.includes('Señor'));
+  check('las negritas de Markdown se pintan enteras y sus asteriscos quedan como marcador', negritas.includes('**REFERENCIA:**') && capas.filter((c) => c.capa === 'marcador').every((c) => doc.slice(c.inicio, c.fin) === '**'));
+  check('«E. S. D.» no es título: no tiene una palabra de tres letras seguidas', !negritas.includes('E. S. D.'));
+  check('las capas tipográficas se reconocen y las demás no', esCapaTipografica('negrita') && esCapaTipografica('marcador') && !esCapaTipografica('amarillo') && !esCapaTipografica('cita'));
+}
 
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);
 process.exitCode = fallos === 0 ? 0 : 1;

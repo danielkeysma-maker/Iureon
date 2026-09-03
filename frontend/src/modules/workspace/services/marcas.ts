@@ -155,6 +155,47 @@ export const segmentarCapas = (texto: string, marcas: MarcaEnCapa[]): SegmentoEn
   return salida;
 };
 
+/* ─── Capas tipográficas ───────────────────────────────────────────────────
+ * No son marcas de nadie: solo pintan. Un documento subido llega como texto
+ * llano y se veía todo de un mismo color, sin distinguir «PRETENSIONES» del
+ * párrafo que le sigue; y un borrador de Redacción trae sus negritas como
+ * «**así**», que en el papel del taller se leían con los asteriscos. */
+
+/** 'negrita' pinta en negrita; 'marcador' atenúa los asteriscos de Markdown, que siguen en el texto para que las citas coincidan. */
+export const esCapaTipografica = (capa: string): boolean => capa === 'negrita' || capa === 'marcador';
+
+/**
+ * Una línea es título si es corta, tiene letras y casi todas van en mayúscula:
+ * «HECHOS», «I. PRETENSIONES», «JUEZ (REPARTO) — CON JURISDICCIÓN…». Una
+ * numeración sola («1.») o una línea que termina en coma no lo es.
+ */
+export const esLineaDeTitulo = (linea: string): boolean => {
+  const t = linea.trim();
+  if (t.length < 2 || t.length > 110 || /[,;]$/.test(t)) return false;
+  const letras = t.match(/\p{L}/gu) ?? [];
+  if (letras.length < 3 || !/\p{L}{3}/u.test(t)) return false;
+  const mayusculas = letras.filter((l) => l === l.toUpperCase() && l !== l.toLowerCase()).length;
+  return mayusculas / letras.length >= 0.85;
+};
+
+/** Títulos en mayúscula sostenida y negritas «**…**» del texto, como capas para pintar. */
+export const capasTipograficas = (texto: string): MarcaEnCapa[] => {
+  const salida: MarcaEnCapa[] = [];
+  const lineas = /[^\n]+/g;
+  let l: RegExpExecArray | null;
+  while ((l = lineas.exec(texto)) !== null) {
+    if (esLineaDeTitulo(l[0])) salida.push({ inicio: l.index, fin: l.index + l[0].length, indice: -1, capa: 'negrita' });
+  }
+  const negritas = /\*\*(?=\S)[^*\n]+?(?<=\S)\*\*/g;
+  let m: RegExpExecArray | null;
+  while ((m = negritas.exec(texto)) !== null) {
+    salida.push({ inicio: m.index, fin: m.index + m[0].length, indice: -1, capa: 'negrita' });
+    salida.push({ inicio: m.index, fin: m.index + 2, indice: -1, capa: 'marcador' });
+    salida.push({ inicio: m.index + m[0].length - 2, fin: m.index + m[0].length, indice: -1, capa: 'marcador' });
+  }
+  return salida;
+};
+
 /** Localiza cada anotación (cita + color) y la devuelve como marca de su capa. Las que no están, se omiten. */
 export const marcasDeAnotaciones = (texto: string, anotaciones: { cita: string; color: string }[]): MarcaEnCapa[] => {
   const salida: MarcaEnCapa[] = [];
