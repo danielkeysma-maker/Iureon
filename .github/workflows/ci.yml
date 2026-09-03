@@ -70,6 +70,8 @@ jobs:
       - run: npm ci
       - name: Lint
         run: npm run lint
+      - name: Design tokens, interview guide and document format checks
+        run: npm run check:tokens && npm run check:guion && npm run check:formato
       - name: Build
         run: npm run build
 

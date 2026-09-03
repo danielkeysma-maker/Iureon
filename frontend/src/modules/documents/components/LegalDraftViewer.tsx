@@ -1,3 +1,4 @@
+import { estiloDelLienzo, type FormatoDelEscrito } from '../formatoEnPantalla';
 import React, { useEffect, useMemo, useState } from 'react';
 import { BrainCircuit, Check, Eye, FolderOpen, Pencil, Save, Scale, Sparkles } from 'lucide-react';
 import DOMPurify from 'dompurify';
@@ -17,6 +18,8 @@ interface LegalDraftViewerProps {
   onToggleFocusMode?: () => void;
   onSaveDraft?: (updatedText: string) => void;
   onOpenSavedDraftsModal?: () => void;
+  /** Tipografía, tamaño e interlineado de la firma (Membrete · Formato del escrito). Sin él, la serif por defecto. */
+  formato?: FormatoDelEscrito | null;
 }
 
 /**
@@ -43,7 +46,8 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
   draft,
   isFocusMode,
   onSaveDraft,
-  onOpenSavedDraftsModal
+  onOpenSavedDraftsModal,
+  formato
 }) => {
   const [editableText, setEditableText] = useState(draft.legalText);
   const [selectedText, setSelectedText] = useState('');
@@ -87,6 +91,13 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
       setTimeout(() => setIsStyleSaved(false), 3000);
     }
   };
+
+  /*
+   * EN PANTALLA LO MISMO QUE EN EL PAPEL. La firma elige la letra en Membrete y
+   * el lienzo pintaba siempre Source Serif: el abogado cambiaba a Times y no
+   * veia nada, y concluia que la app no dejaba cambiar la tipografia.
+   */
+  const estiloFormato = estiloDelLienzo(formato) ?? undefined;
 
   return (
     <>
@@ -135,10 +146,12 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
               onMouseUp={handleSelection}
               onKeyUp={handleSelection}
               className="min-h-[540px] w-full resize-y break-words border-0 bg-transparent font-legal text-[14.5px] leading-[1.8] text-paper-ink focus:outline-none"
+              style={estiloFormato}
             />
           ) : (
             <div
               className="min-h-[540px] break-words font-legal text-[14.5px] leading-[1.8] text-paper-ink [text-wrap:pretty]"
+              style={estiloFormato}
               onMouseUp={handleSelection}
               dangerouslySetInnerHTML={{ __html: renderedHtml }}
             />

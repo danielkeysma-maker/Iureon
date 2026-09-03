@@ -804,6 +804,7 @@ export function App() {
                 onToggleFocusMode={() => workflow.setIsFocusMode(!workflow.isFocusMode)}
                 onSaveDraft={handleSaveDraft}
                 onOpenSavedDraftsModal={() => setIsSavedDraftsModalOpen(true)}
+                formato={firmBranding}
               />
               </div>
             </div>

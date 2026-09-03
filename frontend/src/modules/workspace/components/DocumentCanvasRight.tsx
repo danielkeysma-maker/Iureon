@@ -1,3 +1,4 @@
+import type { FormatoDelEscrito } from '../../documents/formatoEnPantalla';
 import React from 'react';
 import { FileText, FolderOpen, TriangleAlert } from 'lucide-react';
 import { PdfViewerCanvas } from '../../documents/components/PdfViewerCanvas';
@@ -23,6 +24,8 @@ interface DocumentCanvasRightProps {
   /** Para poder contar secciones obligatorias contra la ficha del catálogo. */
   documentType?: string;
   legalBranch?: string;
+  /** Formato del escrito de la firma, para que el lienzo se vea como el papel. */
+  formato?: FormatoDelEscrito | null;
 }
 
 /**
@@ -49,7 +52,8 @@ export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
   onOpenSavedDraftsModal,
   documentType = '',
   legalBranch = '',
-  ocultoEnMovil = false
+  ocultoEnMovil = false,
+  formato = null
 }) => {
   const lookup = useActuacionLookup(documentType, legalBranch);
   const actuacion = lookup.actuacion;
@@ -161,6 +165,7 @@ export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
               onToggleFocusMode={onToggleFocusMode}
               onSaveDraft={onSaveDraft}
               onOpenSavedDraftsModal={onOpenSavedDraftsModal}
+              formato={formato}
             />
           ) : (
             /*

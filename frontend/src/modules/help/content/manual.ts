@@ -515,7 +515,7 @@ const A_FORMATO: ManualArticle = {
     {
       kind: 'parrafo',
       texto:
-        'En la configuración de la firma se guardan el nombre, el NIT, la dirección, el teléfono, el correo, la tarjeta profesional, el logo y la imagen de firma, además de la tipografía, el tamaño, el interlineado y la forma de numerar hechos y títulos.'
+        'En la configuración de la firma —«Membrete», en la barra lateral— se guardan el nombre, el NIT, la dirección, el teléfono, el correo, la tarjeta profesional, el logo y la imagen de firma, además de la tipografía, el tamaño, el interlineado y la forma de numerar hechos y títulos. Lo que se elija ahí se ve en el escrito en pantalla y sale igual en el Word y el PDF: la letra no se cambia escrito por escrito, porque es de la firma, no del documento.'
     },
     {
       kind: 'parrafo',
