@@ -9,6 +9,7 @@ import {
 } from '../services/review.api';
 import { aplicarReemplazo, localizarCitas, segmentar } from '../services/marcas';
 import { ApiError } from '../../../config/httpClient';
+import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 
 /**
  * El taller de revisión: el escrito a la izquierda, el revisor a la derecha.
@@ -86,6 +87,8 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
   const [autorizando, setAutorizando] = React.useState(false);
   const [vistaMovil, setVistaMovil] = React.useState<'escrito' | 'revisor'>('escrito');
   const finDelChat = React.useRef<HTMLDivElement | null>(null);
+  /** La confirmación abierta, si hay: reemplaza al window.confirm del navegador. */
+  const [confirmacion, setConfirmacion] = React.useState<Confirmacion | null>(null);
 
   const citas = React.useMemo(() => (informe?.correccionesTextuales ?? []).map((c) => c.cita), [informe]);
   const { marcas, noLocalizadas } = React.useMemo(() => localizarCitas(texto, citas), [texto, citas]);
@@ -144,7 +147,6 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
 
   const volverARevisar = async () => {
     if (ocupado || !datos.revisionId) return;
-    if (!window.confirm(`Se emitirá un informe nuevo sobre el texto tal como está ahora. Cuesta ${pesos(precioRevisionCop)}. ¿Continuar?`)) return;
     setOcupado('revision');
     setError('');
     try {
@@ -165,7 +167,6 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
   };
 
   const autorizar = async () => {
-    if (!window.confirm('Al autorizar, Iureon conservará el texto de los escritos que su firma revise y la conversación con el revisor, para retomar el trabajo otro día. Aplica a toda la firma y queda en la auditoría con su correo. ¿Autorizar?')) return;
     setAutorizando(true);
     setError('');
     try {
@@ -211,7 +212,25 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
             <span className="font-semibold">Solo en esta sesión.</span> Su firma no ha autorizado conservar escritos: al cerrar se pierden el texto y la conversación; el informe sí queda.
           </span>
           {esAdminDeFirma && datos.revisionId && (
-            <button type="button" onClick={() => void autorizar()} disabled={autorizando} className="btn-secondary btn-sm">
+            <button
+              type="button"
+              onClick={() =>
+                setConfirmacion({
+                  titulo: 'Autorizar que la firma conserve sus escritos',
+                  texto: (
+                    <>
+                      Iureon conservará el texto de los escritos que su firma revise y la conversación con el revisor, para retomar el trabajo otro
+                      día. Aplica a <span className="font-semibold">toda la firma</span> y queda en la auditoría con su correo. Puede retirarla
+                      después.
+                    </>
+                  ),
+                  etiqueta: 'Autorizar',
+                  onConfirmar: autorizar
+                })
+              }
+              disabled={autorizando}
+              className="btn-secondary btn-sm"
+            >
               {autorizando ? 'Autorizando…' : 'Autorizar guardado para la firma'}
             </button>
           )}
@@ -439,12 +458,30 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
             {datos.fileName}
           </p>
         </div>
-        <button type="button" onClick={() => void volverARevisar()} disabled={ocupado !== null || !datos.revisionId} className="btn-secondary btn-sm">
+        <button
+          type="button"
+          onClick={() =>
+            setConfirmacion({
+              titulo: 'Volver a revisar el escrito',
+              texto: (
+                <>
+                  El revisor emitirá un informe nuevo sobre el texto <span className="font-semibold">tal como está ahora</span>, con sus cambios. El
+                  informe anterior queda en la conversación. Se descuentan {pesos(precioRevisionCop)} del saldo de la firma.
+                </>
+              ),
+              etiqueta: `Revisar de nuevo · ${pesos(precioRevisionCop)}`,
+              onConfirmar: volverARevisar
+            })
+          }
+          disabled={ocupado !== null || !datos.revisionId}
+          className="btn-secondary btn-sm"
+        >
           <RefreshCw className={`h-3.5 w-3.5 ${ocupado === 'revision' ? 'animate-spin' : ''}`} />
           {ocupado === 'revision' ? 'Revisando…' : `Volver a revisar · ${pesos(precioRevisionCop)}`}
         </button>
       </div>
       {Cinta()}
+      <ConfirmarDialog confirmacion={confirmacion} onCerrar={() => setConfirmacion(null)} />
       {error && <p className="border-b border-line-100 bg-surface px-4 py-1.5 text-[12px] text-danger">{error}</p>}
 
       {/* ─── En el teléfono, dos pestañas; en escritorio, dos columnas ──── */}

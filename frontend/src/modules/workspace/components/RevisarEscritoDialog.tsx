@@ -7,6 +7,7 @@ import { uploadFileToStorage } from '../../documents/services/storageUpload';
 import { exportarInformeAPdf, exportarInformeAWord } from '../services/informeExport.service';
 import type { DatosDelInforme } from '../services/informeLayout';
 import type { DatosDelTaller } from './TallerDeRevision';
+import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 
 /**
  * Revisar un escrito ya redactado.
@@ -94,6 +95,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
     revisadoPor: ''
   });
   const [exportando, setExportando] = React.useState<'pdf' | 'word' | null>(null);
+  const [confirmacion, setConfirmacion] = React.useState<Confirmacion | null>(null);
   /** El texto del escrito y la conversacion de la revision en pantalla, para abrir el taller. */
   const [paraElTaller, setParaElTaller] = React.useState<{ texto: string | null; conversacion: DatosDelTaller['conversacion']; guardaTexto: boolean; revisionId: string | null }>({ texto: null, conversacion: [], guardaTexto: false, revisionId: null });
 
@@ -140,7 +142,6 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
   };
 
   const eliminarAnterior = async (r: RevisionGuardada) => {
-    if (!window.confirm(`¿Eliminar el informe de «${r.fileName}»? No se puede recuperar.`)) return;
     try {
       await reviewApi.eliminar(r.id);
       setAnteriores((xs) => xs.filter((x) => x.id !== r.id));
@@ -513,7 +514,15 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
                     </button>
                     <button
                       type="button"
-                      onClick={() => void eliminarAnterior(r)}
+                      onClick={() =>
+                        setConfirmacion({
+                          titulo: 'Eliminar la revisión',
+                          texto: <>Se elimina el informe de «{r.fileName}» y, si se guardó, su texto de trabajo y su conversación. No se puede recuperar.</>,
+                          etiqueta: 'Eliminar',
+                          peligro: true,
+                          onConfirmar: () => eliminarAnterior(r)
+                        })
+                      }
                       className="shrink-0 text-ink-400 hover:text-danger"
                       aria-label={`Eliminar el informe de ${r.fileName}`}
                     >
@@ -528,6 +537,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
       ) : (
         <Informe respuesta={respuesta} documentType={tituloDelInforme} />
       )}
+      <ConfirmarDialog confirmacion={confirmacion} onCerrar={() => setConfirmacion(null)} />
     </Dialog>
   );
 };

@@ -2,6 +2,7 @@ import React from 'react';
 import { ClipboardCheck, RefreshCw, Trash2 } from 'lucide-react';
 import { reviewApi, type RevisionGuardada } from '../services/review.api';
 import type { DatosDelTaller } from './TallerDeRevision';
+import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 
 /**
  * Revisiones: la lista de escritos revisados de la firma, para abrir cada uno
@@ -22,6 +23,7 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({ onAbrirTaller, o
   const [cargando, setCargando] = React.useState(true);
   const [abriendo, setAbriendo] = React.useState<string | null>(null);
   const [error, setError] = React.useState('');
+  const [confirmacion, setConfirmacion] = React.useState<Confirmacion | null>(null);
 
   const cargar = React.useCallback(() => {
     setCargando(true);
@@ -69,7 +71,6 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({ onAbrirTaller, o
   };
 
   const eliminar = async (r: RevisionGuardada) => {
-    if (!window.confirm(`¿Eliminar la revisión de «${r.fileName}»? Se pierden el informe, el texto de trabajo y la conversación.`)) return;
     try {
       await reviewApi.eliminar(r.id);
       setLista((xs) => xs.filter((x) => x.id !== r.id));
@@ -122,13 +123,31 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({ onAbrirTaller, o
                   {abriendo === r.id ? ' · abriendo…' : ''}
                 </span>
               </button>
-              <button type="button" onClick={() => void eliminar(r)} className="shrink-0 text-ink-400 hover:text-danger" aria-label={`Eliminar la revisión de ${r.fileName}`}>
+              <button
+                type="button"
+                onClick={() =>
+                  setConfirmacion({
+                    titulo: 'Eliminar la revisión',
+                    texto: (
+                      <>
+                        Se eliminan el informe de «{r.fileName}», el texto de trabajo y la conversación con el revisor. No se puede recuperar.
+                      </>
+                    ),
+                    etiqueta: 'Eliminar',
+                    peligro: true,
+                    onConfirmar: () => eliminar(r)
+                  })
+                }
+                className="shrink-0 text-ink-400 hover:text-danger"
+                aria-label={`Eliminar la revisión de ${r.fileName}`}
+              >
                 <Trash2 className="h-4 w-4" />
               </button>
             </li>
           ))}
         </ul>
       </div>
+      <ConfirmarDialog confirmacion={confirmacion} onCerrar={() => setConfirmacion(null)} />
     </div>
   );
 };
