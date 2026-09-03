@@ -517,7 +517,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
                       Volver al actual
                     </button>
                   </div>
-                  <p className="whitespace-pre-wrap font-legal text-[14px] leading-[1.8] text-paper-ink [text-wrap:pretty]">
+                  <p className="whitespace-pre-wrap text-justify font-legal text-[14px] leading-[1.8] text-paper-ink [text-wrap:pretty]">
                     {tramos.map((t, k) =>
                       t.tipo === 'igual' ? (
                         <React.Fragment key={k}>{t.texto}</React.Fragment>
@@ -545,7 +545,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
       ) : (
         Papel(
           <>
-            <p ref={lienzo} className="whitespace-pre-wrap font-legal text-[14px] leading-[1.8] text-paper-ink [text-wrap:pretty]">
+            <p ref={lienzo} className="whitespace-pre-wrap text-justify font-legal text-[14px] leading-[1.8] text-paper-ink [text-wrap:pretty]">
               {segmentos.map((s, k) => {
                 if (s.capas.length === 0) return <React.Fragment key={k}>{s.texto}</React.Fragment>;
                 const cita = s.capas.find((c) => c.capa === 'cita');
