@@ -69,6 +69,7 @@ export interface SavedDraftEntry {
   /** El taller sobre este borrador: la conversación con la guía y los resaltados. Ausentes en filas viejas. */
   conversacion?: unknown[];
   anotaciones?: unknown[];
+  versiones?: unknown[];
 
   /** "Mosquera · Juzgado 12 Laboral" — how a lawyer recognises it among thirty. */
   cliente?: string | null;

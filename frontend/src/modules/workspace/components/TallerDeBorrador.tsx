@@ -1,5 +1,5 @@
 import React from 'react';
-import { reviewApi, type Anotacion, type TurnoDelTaller } from '../services/review.api';
+import { reviewApi, type Anotacion, type TurnoDelTaller, type VersionDelTexto } from '../services/review.api';
 import { TallerDeEscrito } from './TallerDeEscrito';
 
 /**
@@ -21,6 +21,7 @@ export interface DatosDelBorrador {
   texto: string;
   conversacion: TurnoDelTaller[];
   anotaciones: Anotacion[];
+  versiones: VersionDelTexto[];
   /** Id del borrador guardado; null si todavía no se guardó. */
   draftId: string | null;
 }
@@ -29,7 +30,7 @@ interface TallerDeBorradorProps {
   datos: DatosDelBorrador;
   precioConsultaCop: number;
   precioRevisionCop: number;
-  onGuardar: (texto: string, conversacion: TurnoDelTaller[], anotaciones: Anotacion[]) => Promise<boolean>;
+  onGuardar: (texto: string, conversacion: TurnoDelTaller[], anotaciones: Anotacion[], versiones: VersionDelTexto[]) => Promise<boolean>;
   /** Guardar el borrador por primera vez, para que el taller tenga dónde vivir. */
   onGuardarBorradorNuevo: () => Promise<void>;
   onCerrar: (textoFinal: string) => void;
@@ -54,7 +55,8 @@ export const TallerDeBorrador: React.FC<TallerDeBorradorProps> = ({
       texto: datos.texto,
       informe: null,
       conversacion: datos.conversacion,
-      anotaciones: datos.anotaciones
+      anotaciones: datos.anotaciones,
+      versiones: datos.versiones
     }}
     precioConsultaCop={precioConsultaCop}
     precioRevisionCop={precioRevisionCop}
@@ -72,8 +74,8 @@ export const TallerDeBorrador: React.FC<TallerDeBorradorProps> = ({
       accion: datos.draftId === null ? { etiqueta: 'Guardar el borrador', onClick: onGuardarBorradorNuevo } : undefined
     }}
     onGuardar={onGuardar}
-    onChat={(mensaje, textoActual, historial) =>
-      reviewApi.chatSobreEscrito({ documentType: datos.documentType, legalBranch: datos.legalBranch || undefined, titulo: datos.titulo, mensaje, textoActual, historial })
+    onChat={(mensaje, textoActual, historial, anotaciones) =>
+      reviewApi.chatSobreEscrito({ documentType: datos.documentType, legalBranch: datos.legalBranch || undefined, titulo: datos.titulo, mensaje, textoActual, historial, anotaciones })
     }
     onRerevisar={async (textoActual) => {
       const r = await reviewApi.revisar({

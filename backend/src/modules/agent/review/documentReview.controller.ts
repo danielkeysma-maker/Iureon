@@ -418,7 +418,16 @@ export const saveWorkingTextController = async (req: Request, res: Response): Pr
         .filter((a) => a.cita && /^(amarillo|verde|azul|rosa|tachado)$/.test(a.color))
         .slice(0, 500)
     : undefined;
-  const ok = await documentReviewStore.actualizarTextoTrabajo(firmId, String(req.params.id), texto, anotaciones);
+  const versiones = Array.isArray(req.body.versiones)
+    ? (req.body.versiones as unknown[])
+        .map((v) => {
+          const o = (v ?? {}) as Record<string, unknown>;
+          return { fecha: String(o.fecha ?? ''), motivo: String(o.motivo ?? '').slice(0, 80), texto: String(o.texto ?? '').slice(0, 200_000), resumen: o.resumen ? String(o.resumen).slice(0, 400) : undefined };
+        })
+        .filter((v) => v.fecha && v.texto)
+        .slice(-15)
+    : undefined;
+  const ok = await documentReviewStore.actualizarTextoTrabajo(firmId, String(req.params.id), texto, anotaciones, versiones);
   res.json({ success: true, guardado: ok });
 };
 
@@ -438,6 +447,12 @@ export const reviewChatController = async (req: Request, res: Response): Promise
   const mensaje = String(req.body.mensaje ?? '').trim();
   const textoActual = typeof req.body.textoActual === 'string' ? req.body.textoActual : '';
   const historialCliente: TurnoDelTaller[] = Array.isArray(req.body.historial) ? (req.body.historial as TurnoDelTaller[]) : [];
+  const anotacionesDelAbogado = Array.isArray(req.body.anotaciones)
+    ? (req.body.anotaciones as unknown[]).map((a) => {
+        const o = (a ?? {}) as Record<string, unknown>;
+        return { cita: String(o.cita ?? '').slice(0, 2000), color: String(o.color ?? '') };
+      })
+    : [];
 
   if (!mensaje) {
     res.status(400).json({ success: false, error: 'MISSING_MESSAGE', message: 'Escriba qué quiere preguntar o pedir.' });
@@ -477,7 +492,7 @@ export const reviewChatController = async (req: Request, res: Response): Promise
       callOpenRouterWithUsage(
         ENGINE.OPUS,
         buildTallerSystemPrompt(),
-        buildTallerUserPrompt({ documentType: revision.documentType, guidance, informe: revision.informe, textoActual: texto.texto, historial, mensaje }),
+        buildTallerUserPrompt({ documentType: revision.documentType, guidance, informe: revision.informe, textoActual: texto.texto, historial, mensaje, anotaciones: anotacionesDelAbogado }),
         1500
       ),
       LIMITE_LLAMADA_MS

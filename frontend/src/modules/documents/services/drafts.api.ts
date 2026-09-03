@@ -21,6 +21,7 @@ interface SavedDraftRow {
   procedencia?: unknown;
   conversacion?: unknown;
   anotaciones?: unknown;
+  versiones?: unknown;
   tokens_consumed?: number;
   saved_at: string;
   updated_at?: string;
@@ -82,6 +83,7 @@ const toEntry = (row: SavedDraftRow): SavedDraftEntry => ({
   legalBranch: row.legal_branch ?? null,
   conversacion: Array.isArray(row.conversacion) ? (row.conversacion as unknown[]) : [],
   anotaciones: Array.isArray(row.anotaciones) ? (row.anotaciones as unknown[]) : [],
+  versiones: Array.isArray(row.versiones) ? (row.versiones as unknown[]) : [],
   cliente: row.cliente ?? null,
   despacho: row.despacho ?? null,
   radicado: row.radicado ?? null,
@@ -184,6 +186,7 @@ export const draftsApi = {
       legalText?: string;
       conversacion?: unknown[];
       anotaciones?: unknown[];
+      versiones?: unknown[];
     }
   ): Promise<boolean> {
     try {

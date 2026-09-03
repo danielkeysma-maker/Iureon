@@ -1,5 +1,5 @@
 import React from 'react';
-import { reviewApi, type Anotacion, type ConsentimientoDeGuardado, type InformeDeRevision, type TurnoDelTaller } from '../services/review.api';
+import { reviewApi, type Anotacion, type ConsentimientoDeGuardado, type InformeDeRevision, type TurnoDelTaller, type VersionDelTexto } from '../services/review.api';
 import { TallerDeEscrito } from './TallerDeEscrito';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 
@@ -29,6 +29,7 @@ export interface DatosDelTaller {
   guardaTexto: boolean;
   conversacion: TurnoDelTaller[];
   anotaciones?: Anotacion[];
+  versiones?: VersionDelTexto[];
 }
 
 interface TallerDeRevisionProps {
@@ -54,7 +55,7 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
   const [confirmacion, setConfirmacion] = React.useState<Confirmacion | null>(null);
   const [errorAutorizacion, setErrorAutorizacion] = React.useState('');
   /** Lo último que el taller tenía, para guardarlo en el acto cuando la firma autoriza. */
-  const ultimoEstado = React.useRef<{ texto: string; anotaciones: Anotacion[] }>({ texto: datos.texto, anotaciones: datos.anotaciones ?? [] });
+  const ultimoEstado = React.useRef<{ texto: string; anotaciones: Anotacion[]; versiones: VersionDelTexto[] }>({ texto: datos.texto, anotaciones: datos.anotaciones ?? [], versiones: datos.versiones ?? [] });
 
   const guardaEnServidor = consentimiento.guarda && datos.revisionId !== null;
 
@@ -63,7 +64,7 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
     try {
       const c = await reviewApi.autorizarGuardado(true);
       setConsentimiento(c);
-      if (c.guarda && datos.revisionId) await reviewApi.guardarTexto(datos.revisionId, ultimoEstado.current.texto, ultimoEstado.current.anotaciones);
+      if (c.guarda && datos.revisionId) await reviewApi.guardarTexto(datos.revisionId, ultimoEstado.current.texto, ultimoEstado.current.anotaciones, ultimoEstado.current.versiones);
     } catch (err) {
       setErrorAutorizacion(err instanceof Error ? err.message : 'No se pudo guardar la autorización.');
     }
@@ -91,7 +92,8 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
           texto: datos.texto,
           informe: datos.informe,
           conversacion: datos.conversacion,
-          anotaciones: datos.anotaciones ?? []
+          anotaciones: datos.anotaciones ?? [],
+          versiones: datos.versiones ?? []
         }}
         precioConsultaCop={precioConsultaCop}
         precioRevisionCop={datos.revisionId ? precioRevisionCop : undefined}
@@ -113,16 +115,16 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
         }}
         onGuardar={
           datos.revisionId
-            ? async (texto, _conversacion, anotaciones) => {
-                ultimoEstado.current = { texto, anotaciones };
-                const r = await reviewApi.guardarTexto(datos.revisionId as string, texto, anotaciones);
+            ? async (texto, _conversacion, anotaciones, versiones) => {
+                ultimoEstado.current = { texto, anotaciones, versiones };
+                const r = await reviewApi.guardarTexto(datos.revisionId as string, texto, anotaciones, versiones);
                 return r.guardado;
               }
             : undefined
         }
-        onChat={async (mensaje, textoActual, historial) => {
+        onChat={async (mensaje, textoActual, historial, anotaciones) => {
           if (!datos.revisionId) throw new Error('El chat necesita una revisión guardada.');
-          return reviewApi.chat(datos.revisionId, { mensaje, textoActual, historial });
+          return reviewApi.chat(datos.revisionId, { mensaje, textoActual, historial, anotaciones });
         }}
         onRerevisar={datos.revisionId ? (textoActual) => reviewApi.rerevisar(datos.revisionId as string, textoActual) : undefined}
         onExportarTexto={(formato, texto) => onExportarTexto(formato, `${datos.documentType} corregido`, texto)}

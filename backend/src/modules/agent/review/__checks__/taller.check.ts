@@ -23,6 +23,7 @@ check('el sistema pide ediciones con cita literal y reemplazo', /"ediciones"/.te
 check('el sistema contesta sobre el texto ACTUAL', /TEXTO ACTUAL/.test(system));
 check('el sistema pide referencias literales a los pasajes de los que habla', /"referencias"/.test(system) && /resalte/.test(system));
 check('el sistema no reescribe el escrito entero por su cuenta', /no reescribes el escrito entero/i.test(system));
+check('el sistema sabe leer las marcas de colores del abogado', /MARCAS DEL ABOGADO/.test(system) && /amarillo/i.test(system) && /tach/i.test(system));
 
 const informe = {
   resumen: 'Sólido en hechos, flojo en petición.',
@@ -55,8 +56,12 @@ check('lleva el mensaje del abogado', /¿Así queda bien la petición\?/.test(pr
 check(`solo viajan los últimos ${MAX_TURNOS_EN_CONTEXTO} turnos y se declara la omisión`, /se omiten 3 turnos/.test(prompt) && !/turno 3\b/.test(prompt) && /turno 15/.test(prompt));
 check('recortarHistorial conserva el orden y los más recientes', recortarHistorial(historial).map((t) => t.texto)[0] === 'turno 4');
 
+const conMarcas = buildTallerUserPrompt({ documentType: 'Demanda', guidance: null, informe: null, textoActual: 'x', historial: [], mensaje: '¿qué opinas de lo amarillo?', anotaciones: [{ cita: 'solicito se ordene', color: 'amarillo' }, { cita: 'en costas', color: 'tachado' }, { cita: 'x', color: 'morado' }] });
+check('las marcas del abogado viajan con su color y las de color desconocido se omiten', /AMARILLO: «solicito se ordene»/.test(conMarcas) && /TACHADO por el abogado: «en costas»/.test(conMarcas) && !/morado/i.test(conMarcas));
+
 const sinHistorial = buildTallerUserPrompt({ documentType: 'Demanda', guidance: null, informe: null, textoActual: 'x', historial: [], mensaje: 'hola' });
 check('sin historial ni informe lo dice, no inventa', /primer mensaje/.test(sinHistorial) && /No hay informe previo/.test(sinHistorial) && /no hay ficha/.test(sinHistorial));
+check('sin marcas, lo dice', /no ha resaltado ni tachado/.test(sinHistorial));
 
 /* ─── LA RESPUESTA ──────────────────────────────────────────────────────────── */
 const buena = parsearRespuestaDelTaller('```json\n{"respuesta":"Mejor así.\\nFalta el juramento.","ediciones":[{"cita":"solicito se ordene lo pertinente","reemplazo":"solicito ORDENAR a la EPS autorizar"},{"cita":"","reemplazo":"x"}]}\n```');

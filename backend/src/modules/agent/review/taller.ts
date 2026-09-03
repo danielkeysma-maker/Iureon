@@ -39,6 +39,12 @@ export interface EdicionPropuesta {
   reemplazo: string;
 }
 
+/** Un resaltado o tachado del abogado, anclado al texto citado. */
+export interface AnotacionDelAbogado {
+  cita: string;
+  color: string;
+}
+
 export interface RespuestaDelTaller {
   respuesta: string;
   ediciones: EdicionPropuesta[];
@@ -54,6 +60,8 @@ export const MAX_CARACTERES_MENSAJE = 4_000;
 export const buildTallerSystemPrompt = (): string => `Eres el mismo revisor senior que emitió el informe sobre este escrito, y ahora acompañas al abogado mientras lo corrige. Contestas sobre el TEXTO ACTUAL del escrito, que te llega completo en cada turno con los cambios que el abogado ya hizo; no sobre la versión anterior.
 
 QUÉ HACES: responder lo que te pregunten con criterio profesional franco; cuando te pidan redactar o reformular un pasaje, lo redactas concreto y listo para pegar; cuando te pregunten «cómo va», dices qué mejoró, qué sigue fallando y qué falta, sin repetir hallazgos ya corregidos.
+
+LAS MARCAS DEL ABOGADO: si el mensaje trae «MARCAS DEL ABOGADO», son pasajes que él resaltó a mano en un color o tachó. Cuando te hable de «lo amarillo», «lo que resalté en verde», «lo tachado», se refiere a esos pasajes exactos: úsalos como el objeto de la pregunta. Si tachó algo, entiende que propone quitarlo salvo que diga otra cosa.
 
 QUÉ NO HACES: no reescribes el escrito entero salvo que te lo pidan expresamente; no inventas hechos que el escrito no traiga; NO citas sentencias, autos ni providencias ni radicados —si un punto necesita precedente, dilo y describe qué debería sostener—; no contradigas la ficha verificada de la actuación ni le añadas requisitos que no estén en ella.
 
@@ -91,6 +99,8 @@ export const buildTallerUserPrompt = (input: {
   textoActual: string;
   historial: TurnoDelTaller[];
   mensaje: string;
+  /** Resaltados y tachados del abogado, para que «lo amarillo» signifique algo. */
+  anotaciones?: AnotacionDelAbogado[];
 }): string => {
   const ficha = input.guidance
     ? `FICHA VERIFICADA DE LA ACTUACIÓN:\n${input.guidance}`
@@ -104,6 +114,14 @@ export const buildTallerUserPrompt = (input: {
         .join('\n')}`
     : 'Es el primer mensaje después del informe.';
 
+  const NOMBRES: Record<string, string> = { amarillo: 'AMARILLO', verde: 'VERDE', azul: 'AZUL', rosa: 'ROSA', tachado: 'TACHADO por el abogado' };
+  const anotaciones = (input.anotaciones ?? []).filter((a) => a.cita && NOMBRES[a.color]);
+  const marcas = anotaciones.length
+    ? `MARCAS DEL ABOGADO (resaltados y tachados hechos a mano sobre el texto actual):\n${anotaciones
+        .map((a) => `- ${NOMBRES[a.color]}: «${a.cita}»`)
+        .join('\n')}`
+    : 'El abogado no ha resaltado ni tachado nada a mano.';
+
   return `ACTUACIÓN: "${input.documentType}".
 
 ${ficha}
@@ -111,6 +129,8 @@ ${ficha}
 ${informe}
 
 ${conversacion}
+
+${marcas}
 
 TEXTO ACTUAL DEL ESCRITO (con los cambios que el abogado ya hizo):
 """

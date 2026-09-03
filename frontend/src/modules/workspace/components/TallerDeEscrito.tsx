@@ -1,7 +1,27 @@
 import React from 'react';
-import { AlertTriangle, ArrowLeft, Check, ClipboardCheck, Download, Eraser, Eye, Highlighter, PenLine, RefreshCw, Send, ShieldCheck } from 'lucide-react';
-import type { Anotacion, EdicionPropuesta, InformeDeRevision, RespuestaDelChat, TurnoDelTaller } from '../services/review.api';
+import {
+  AlertTriangle,
+  ArrowLeft,
+  Check,
+  ClipboardCheck,
+  Download,
+  Eraser,
+  Eye,
+  History,
+  Highlighter,
+  Maximize2,
+  Minimize2,
+  PanelRightClose,
+  PanelRightOpen,
+  PenLine,
+  RefreshCw,
+  Save,
+  Send,
+  ShieldCheck
+} from 'lucide-react';
+import type { Anotacion, EdicionPropuesta, InformeDeRevision, RespuestaDelChat, TurnoDelTaller, VersionDelTexto } from '../services/review.api';
 import { aplicarReemplazo, localizarCitas, marcasDeAnotaciones, segmentarCapas, type MarcaEnCapa } from '../services/marcas';
+import { diferencias, resumenDeCambios } from '../services/diff';
 import { ApiError } from '../../../config/httpClient';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 
@@ -11,16 +31,30 @@ import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDia
  * (sin informe): quien lo monta le pasa cómo conversar, cómo guardar y qué
  * decir sobre dónde vive el texto.
  *
+ * ─── EL PAPEL, COMO EN REDACCIÓN ────────────────────────────────────────────
+ *
+ * El escrito se lee sobre una hoja centrada de ancho fijo, con la serif del
+ * lienzo de Redacción; hay pantalla completa (tapa la barra lateral) y se
+ * puede plegar la guía para leer a todo lo ancho. Es la misma decisión que el
+ * lienzo: lo que se firma se lee como documento, no como pantalla.
+ *
  * ─── TRES CAPAS DE MARCAS SOBRE EL MISMO TEXTO ──────────────────────────────
  *
  * · Citas del informe: tachado rojo sobre ámbar; al tocar, el reemplazo con
  *   «Aplicar».
- * · Referencias de la última respuesta de la guía: subrayado azul. Cuando la
- *   guía dice «el párrafo de hechos está bien», ese párrafo se ilumina; la
- *   siguiente respuesta las sustituye.
- * · Resaltador del abogado: cuatro colores y tachado, a mano, seleccionando
- *   texto en la vista con marcas. Se anclan al texto citado, no a posiciones,
- *   así sobreviven a las ediciones; si el pasaje desaparece, la marca también.
+ * · Referencias de la última respuesta de la guía: subrayado azul.
+ * · Resaltador del abogado: cuatro colores y tachado, a mano. Se anclan al
+ *   texto citado, no a posiciones, así sobreviven a las ediciones. Y VIAJAN
+ *   CON CADA MENSAJE: la guía sabe qué está en amarillo y qué está tachado,
+ *   así que «revisa lo que resalté en verde» significa algo.
+ *
+ * ─── VERSIONES ──────────────────────────────────────────────────────────────
+ *
+ * Una instantánea del texto se toma sola antes de una revisión nueva y antes
+ * de cada consulta a la guía si el texto cambió desde la anterior; y a mano
+ * con «Guardar versión». La pestaña Versiones las lista, muestra qué cambió
+ * palabra por palabra frente al texto actual y permite restaurar cualquiera
+ * (restaurar también deja versión). Se conservan las últimas quince.
  *
  * ─── LAS PIEZAS SON FUNCIONES, NO COMPONENTES ───────────────────────────────
  *
@@ -31,24 +65,22 @@ import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDia
 export type ColorDeResaltado = Anotacion['color'];
 
 export interface DatosDelEscrito {
-  /** Título de la cabecera: «Acción de tutela», «Derecho de petición corregido»… */
   titulo: string;
   subtitulo: string;
   texto: string;
   informe: InformeDeRevision | null;
   conversacion: TurnoDelTaller[];
   anotaciones: Anotacion[];
+  versiones: VersionDelTexto[];
 }
 
 export interface TallerDeEscritoProps {
   datos: DatosDelEscrito;
   precioConsultaCop: number;
-  /** Si existe, aparece «Volver a revisar» con este precio. */
   precioRevisionCop?: number;
-  /** Qué dice la cinta sobre dónde vive el texto, y si se guarda solo. */
   guardado: { activo: boolean; aviso: React.ReactNode; accion?: { etiqueta: string; onClick: () => Promise<void> | void } };
-  onGuardar?: (texto: string, conversacion: TurnoDelTaller[], anotaciones: Anotacion[]) => Promise<boolean>;
-  onChat: (mensaje: string, textoActual: string, historial: TurnoDelTaller[]) => Promise<RespuestaDelChat>;
+  onGuardar?: (texto: string, conversacion: TurnoDelTaller[], anotaciones: Anotacion[], versiones: VersionDelTexto[]) => Promise<boolean>;
+  onChat: (mensaje: string, textoActual: string, historial: TurnoDelTaller[], anotaciones: Anotacion[]) => Promise<RespuestaDelChat>;
   onRerevisar?: (textoActual: string) => Promise<{ informe: InformeDeRevision | null; informeLibre: string | null }>;
   onExportarTexto: (formato: 'pdf' | 'word', texto: string) => void;
   onCerrar: (textoFinal: string) => void;
@@ -56,13 +88,14 @@ export interface TallerDeEscritoProps {
 }
 
 const pesos = (n: number): string => `$${Math.round(n).toLocaleString('es-CO')}`;
+const MAX_VERSIONES = 15;
 
-const COLORES: { id: ColorDeResaltado; nombre: string; clase: string }[] = [
-  { id: 'amarillo', nombre: 'Amarillo', clase: 'bg-yellow-200/80' },
-  { id: 'verde', nombre: 'Verde', clase: 'bg-green-200/80' },
-  { id: 'azul', nombre: 'Azul', clase: 'bg-sky-200/80' },
-  { id: 'rosa', nombre: 'Rosa', clase: 'bg-pink-200/80' },
-  { id: 'tachado', nombre: 'Tachar', clase: 'line-through decoration-ink-700 decoration-2' }
+const COLORES: { id: ColorDeResaltado; nombre: string; clase: string; muestra: string }[] = [
+  { id: 'amarillo', nombre: 'Amarillo', clase: 'bg-yellow-200/80', muestra: 'bg-yellow-300' },
+  { id: 'verde', nombre: 'Verde', clase: 'bg-green-200/80', muestra: 'bg-green-300' },
+  { id: 'azul', nombre: 'Azul', clase: 'bg-sky-200/80', muestra: 'bg-sky-300' },
+  { id: 'rosa', nombre: 'Rosa', clase: 'bg-pink-200/80', muestra: 'bg-pink-300' },
+  { id: 'tachado', nombre: 'Tachar', clase: 'line-through decoration-ink-700 decoration-2', muestra: '' }
 ];
 
 const claseDeCapas = (capas: MarcaEnCapa[], abierta: number | null): string => {
@@ -77,6 +110,8 @@ const claseDeCapas = (capas: MarcaEnCapa[], abierta: number | null): string => {
   }
   return clases.join(' ');
 };
+
+const fechaCorta = (iso: string): string => new Date(iso).toLocaleString('es-CO', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 
 export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   datos,
@@ -94,19 +129,25 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   const [informe, setInforme] = React.useState<InformeDeRevision | null>(datos.informe);
   const [conversacion, setConversacion] = React.useState<TurnoDelTaller[]>(datos.conversacion);
   const [anotaciones, setAnotaciones] = React.useState<Anotacion[]>(datos.anotaciones);
+  const [versiones, setVersiones] = React.useState<VersionDelTexto[]>(datos.versiones);
   const [referencias, setReferencias] = React.useState<string[]>([]);
   const [modo, setModo] = React.useState<'marcas' | 'editar'>('marcas');
-  const [panel, setPanel] = React.useState<'chat' | 'informe'>(datos.informe ? 'chat' : 'chat');
+  const [panel, setPanel] = React.useState<'chat' | 'informe' | 'versiones'>('chat');
   const [citaAbierta, setCitaAbierta] = React.useState<number | null>(null);
+  const [versionAbierta, setVersionAbierta] = React.useState<number | null>(null);
   const [mensaje, setMensaje] = React.useState('');
   const [ocupado, setOcupado] = React.useState<'chat' | 'revision' | null>(null);
   const [error, setError] = React.useState('');
   const [estadoGuardado, setEstadoGuardado] = React.useState<'quieto' | 'guardando' | 'guardado' | 'fallo'>('quieto');
   const [confirmacion, setConfirmacion] = React.useState<Confirmacion | null>(null);
   const [vistaMovil, setVistaMovil] = React.useState<'escrito' | 'revisor'>('escrito');
+  const [pantallaCompleta, setPantallaCompleta] = React.useState(false);
+  const [guiaVisible, setGuiaVisible] = React.useState(true);
   const [seleccion, setSeleccion] = React.useState<{ texto: string; x: number; y: number } | null>(null);
   const finDelChat = React.useRef<HTMLDivElement | null>(null);
   const lienzo = React.useRef<HTMLParagraphElement | null>(null);
+  const contenedor = React.useRef<HTMLDivElement | null>(null);
+  const textoDeUltimaVersion = React.useRef<string>(datos.versiones.length ? datos.versiones[datos.versiones.length - 1].texto : datos.texto);
 
   /* ─── Las marcas, en sus capas ───────────────────────────────────────────── */
   const citas = React.useMemo(() => (informe?.correccionesTextuales ?? []).map((c) => c.cita), [informe]);
@@ -131,21 +172,48 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
     if (!onGuardar || !guardado.activo) return;
     setEstadoGuardado('guardando');
     const t = window.setTimeout(() => {
-      onGuardar(texto, conversacion, anotaciones)
+      onGuardar(texto, conversacion, anotaciones, versiones)
         .then((ok) => setEstadoGuardado(ok ? 'guardado' : 'fallo'))
         .catch(() => setEstadoGuardado('fallo'));
     }, 1500);
     return () => window.clearTimeout(t);
-  }, [texto, conversacion, anotaciones, onGuardar, guardado.activo]);
+  }, [texto, conversacion, anotaciones, versiones, onGuardar, guardado.activo]);
 
   React.useEffect(() => {
     finDelChat.current?.scrollIntoView({ block: 'end' });
   }, [conversacion.length, ocupado]);
 
+  React.useEffect(() => {
+    if (!pantallaCompleta) return;
+    const salir = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setPantallaCompleta(false);
+    };
+    window.addEventListener('keydown', salir);
+    return () => window.removeEventListener('keydown', salir);
+  }, [pantallaCompleta]);
+
+  /* ─── Versiones ──────────────────────────────────────────────────────────── */
+  const tomarVersion = (motivo: string, resumen?: string): boolean => {
+    if (texto === textoDeUltimaVersion.current) return false;
+    const nueva: VersionDelTexto = { fecha: new Date().toISOString(), motivo, texto, resumen };
+    setVersiones((v) => [...v, nueva].slice(-MAX_VERSIONES));
+    textoDeUltimaVersion.current = texto;
+    return true;
+  };
+
+  const restaurar = (v: VersionDelTexto) => {
+    tomarVersion('antes de restaurar');
+    setTexto(v.texto);
+    textoDeUltimaVersion.current = v.texto;
+    setVersiones((xs) => [...xs, { fecha: new Date().toISOString(), motivo: `restaurada la versión de ${fechaCorta(v.fecha)}`, texto: v.texto }].slice(-MAX_VERSIONES));
+    setVersionAbierta(null);
+    setModo('marcas');
+  };
+
   /* ─── Selección para el resaltador ───────────────────────────────────────── */
   const capturarSeleccion = () => {
     const sel = window.getSelection();
-    if (!sel || sel.isCollapsed || !lienzo.current || !sel.anchorNode || !lienzo.current.contains(sel.anchorNode)) {
+    if (!sel || sel.isCollapsed || !lienzo.current || !contenedor.current || !sel.anchorNode || !lienzo.current.contains(sel.anchorNode)) {
       setSeleccion(null);
       return;
     }
@@ -155,8 +223,18 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
       return;
     }
     const r = sel.getRangeAt(0).getBoundingClientRect();
-    const caja = lienzo.current.getBoundingClientRect();
-    setSeleccion({ texto: t, x: r.left - caja.left + r.width / 2, y: r.top - caja.top });
+    const caja = contenedor.current.getBoundingClientRect();
+    /*
+     * La barra se centra sobre la selección, pero NUNCA se sale del contenedor:
+     * cerca del margen izquierdo se cortaba. Mitad de la barra (~150 px) de
+     * holgura a cada lado, y si la selección está pegada arriba, la barra va
+     * debajo en vez de encima.
+     */
+    const mitad = 150;
+    const x = Math.min(Math.max(r.left - caja.left + r.width / 2, mitad + 8), caja.width - mitad - 8);
+    const arriba = r.top - caja.top + contenedor.current.scrollTop;
+    const y = arriba < 56 ? arriba + r.height + 44 : arriba - 8;
+    setSeleccion({ texto: t, x, y });
   };
 
   const resaltar = (color: ColorDeResaltado) => {
@@ -189,11 +267,12 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
     if (!m || ocupado) return;
     setOcupado('chat');
     setError('');
+    tomarVersion('antes de consultar a la guía');
     const turnoAbogado: TurnoDelTaller = { rol: 'abogado', texto: m, fecha: new Date().toISOString() };
     setConversacion((c) => [...c, turnoAbogado]);
     setMensaje('');
     try {
-      const r = await onChat(m, texto, conversacion);
+      const r = await onChat(m, texto, conversacion, anotaciones);
       setConversacion((c) => [...c, { rol: 'revisor', texto: r.respuesta, ediciones: r.ediciones, referencias: r.referencias, fecha: new Date().toISOString() }]);
       setReferencias(r.referencias ?? []);
       onSaldoCambiado();
@@ -210,6 +289,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
     if (!onRerevisar || ocupado) return;
     setOcupado('revision');
     setError('');
+    tomarVersion('antes de una revisión nueva', informe?.resumen);
     try {
       const r = await onRerevisar(texto);
       setInforme(r.informe);
@@ -245,9 +325,38 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
     </div>
   );
 
+  const Papel = (children: React.ReactNode) => (
+    <div ref={contenedor} className="relative min-h-0 flex-1 overflow-y-auto bg-canvas px-3 py-4 sm:px-6" onMouseUp={capturarSeleccion} onTouchEnd={capturarSeleccion}>
+      {seleccion && modo === 'marcas' && (
+        <div
+          className="absolute z-10 flex -translate-x-1/2 -translate-y-full items-center gap-1 rounded-card border border-line-200 bg-surface p-1 shadow-lg"
+          style={{ left: seleccion.x, top: seleccion.y }}
+          onMouseDown={(e) => e.preventDefault()}
+        >
+          <span className="px-1 font-sans text-[10px] uppercase tracking-[0.08em] text-ink-400">Marcar</span>
+          {COLORES.map((c) => (
+            <button
+              key={c.id}
+              type="button"
+              onClick={() => resaltar(c.id)}
+              className={`h-7 min-w-7 rounded-control border border-line-200 px-1.5 font-sans text-[11px] text-ink-900 ${c.id === 'tachado' ? 'bg-surface' : c.muestra}`}
+              title={c.nombre}
+            >
+              {c.id === 'tachado' ? <span className="line-through">abc</span> : ''}
+            </button>
+          ))}
+          <button type="button" onClick={() => setSeleccion(null)} className="h-7 rounded-control px-1.5 font-sans text-[11px] text-ink-500" title="Cancelar">
+            ✕
+          </button>
+        </div>
+      )}
+      <div className="mx-auto w-full max-w-[760px] rounded-card border border-line-200 bg-paper px-8 py-8 shadow-sm sm:px-12 sm:py-10">{children}</div>
+    </div>
+  );
+
   const Escrito = () => (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex flex-wrap items-center gap-2 border-b border-line-100 px-4 py-2">
+      <div className="flex flex-wrap items-center gap-2 border-b border-line-100 bg-surface px-4 py-2">
         <div className="flex rounded-control border border-line-200 p-0.5">
           {(['marcas', 'editar'] as const).map((m) => (
             <button
@@ -256,16 +365,19 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
               onClick={() => {
                 setModo(m);
                 setSeleccion(null);
+                setVersionAbierta(null);
               }}
-              className={`flex items-center gap-1 rounded-control px-2.5 py-1 text-[12px] ${modo === m ? 'bg-brand-50 font-semibold text-brand-700' : 'text-ink-600 hover:text-ink-900'}`}
+              className={`flex items-center gap-1 rounded-control px-2.5 py-1 text-[12px] ${modo === m && versionAbierta === null ? 'bg-brand-50 font-semibold text-brand-700' : 'text-ink-600 hover:text-ink-900'}`}
             >
               {m === 'marcas' ? <Eye className="h-3.5 w-3.5" /> : <PenLine className="h-3.5 w-3.5" />}
               {m === 'marcas' ? 'Con marcas' : 'Editar'}
             </button>
           ))}
         </div>
-        <span className="text-[11px] text-ink-500">
-          {modo === 'marcas' ? (
+        <span className="hidden text-[11px] text-ink-500 md:inline">
+          {versionAbierta !== null ? (
+            'Viendo una versión anterior: lo quitado en rojo, lo añadido en verde.'
+          ) : modo === 'marcas' ? (
             <>
               <Highlighter className="mr-1 inline h-3 w-3" />
               Seleccione texto para resaltar o tachar
@@ -273,14 +385,18 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
               {anotaciones.length > 0 && ` · ${anotaciones.length} ${anotaciones.length === 1 ? 'marca suya' : 'marcas suyas'}`}
             </>
           ) : (
-            'Edite el texto; las marcas se reubican solas al volver a «Con marcas».'
+            'Las marcas se reubican solas al volver a «Con marcas».'
           )}
         </span>
-        <div className="ml-auto flex items-center gap-1.5">
+        <div className="ml-auto flex flex-wrap items-center gap-1.5">
+          <button type="button" onClick={() => tomarVersion('guardada a mano') || setError('El texto no cambió desde la última versión.')} className="btn-neutral btn-sm" title="Guardar una versión del texto tal como está">
+            <Save className="h-3.5 w-3.5" />
+            Guardar versión
+          </button>
           {anotaciones.length > 0 && modo === 'marcas' && (
             <button type="button" onClick={() => setAnotaciones([])} className="btn-neutral btn-sm" title="Quitar todos sus resaltados y tachados">
               <Eraser className="h-3.5 w-3.5" />
-              Limpiar marcas
+              Limpiar
             </button>
           )}
           <button type="button" onClick={() => onExportarTexto('word', texto)} className="btn-neutral btn-sm" title="Descargar el texto en Word">
@@ -294,77 +410,101 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
         </div>
       </div>
 
-      {modo === 'editar' ? (
-        <textarea
-          value={texto}
-          onChange={(e) => setTexto(e.target.value)}
-          className="min-h-0 flex-1 resize-none border-0 bg-paper px-6 py-5 font-legal text-[14px] leading-[1.8] text-paper-ink focus:outline-none"
-          spellCheck
-        />
-      ) : (
-        <div className="relative min-h-0 flex-1 overflow-y-auto bg-paper px-6 py-5 font-legal text-[14px] leading-[1.8] text-paper-ink" onMouseUp={capturarSeleccion} onTouchEnd={capturarSeleccion}>
-          {seleccion && (
-            <div
-              className="absolute z-10 flex -translate-x-1/2 -translate-y-full items-center gap-1 rounded-card border border-line-200 bg-surface p-1 shadow-lg"
-              style={{ left: Math.max(90, seleccion.x + 24), top: Math.max(0, seleccion.y + 12) }}
-              onMouseDown={(e) => e.preventDefault()}
-            >
-              {COLORES.map((c) => (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => resaltar(c.id)}
-                  className={`h-7 min-w-7 rounded-control border border-line-200 px-1.5 font-sans text-[11px] text-ink-900 ${c.id === 'tachado' ? '' : c.clase}`}
-                  title={c.nombre}
-                >
-                  {c.id === 'tachado' ? <span className="line-through">abc</span> : ''}
-                </button>
-              ))}
-              <button type="button" onClick={() => setSeleccion(null)} className="h-7 rounded-control px-1.5 font-sans text-[11px] text-ink-500" title="Cancelar">
-                ✕
-              </button>
-            </div>
-          )}
-          <p ref={lienzo} className="whitespace-pre-wrap [text-wrap:pretty]">
-            {segmentos.map((s, k) => {
-              if (s.capas.length === 0) return <React.Fragment key={k}>{s.texto}</React.Fragment>;
-              const cita = s.capas.find((c) => c.capa === 'cita');
-              const propias = s.capas.some((c) => c.capa !== 'cita' && c.capa !== 'referencia');
+      {versionAbierta !== null && versiones[versionAbierta] ? (
+        Papel(
+          <>
+            {(() => {
+              const v = versiones[versionAbierta];
+              const { tramos, fino } = diferencias(v.texto, texto);
+              const r = resumenDeCambios(tramos);
               return (
-                <span
-                  key={k}
-                  role={cita || propias ? 'button' : undefined}
-                  tabIndex={cita || propias ? 0 : undefined}
-                  onClick={() => {
-                    if (cita) setCitaAbierta(citaAbierta === cita.indice ? null : cita.indice);
-                  }}
-                  onDoubleClick={() => quitarMarcaEn(s.capas)}
-                  className={`rounded-sm ${claseDeCapas(s.capas, citaAbierta)} ${cita ? 'cursor-pointer' : propias ? 'cursor-text' : ''}`}
-                  title={cita ? 'Pasaje citado por la guía: toque para ver el reemplazo' : propias ? 'Su marca · doble clic para quitarla' : 'La guía se refiere a este pasaje'}
-                >
-                  {s.texto}
-                </span>
+                <>
+                  <div className="mb-4 flex flex-wrap items-center gap-2 border-b border-line-100 pb-3 font-sans text-[12px] text-ink-600">
+                    <History className="h-3.5 w-3.5" />
+                    <span>
+                      Versión de {fechaCorta(v.fecha)} · {v.motivo}
+                      {v.resumen ? ` · ${v.resumen}` : ''}
+                    </span>
+                    <span className="text-ink-400">
+                      · frente al texto actual: <span className="text-green-700">+{r.anadidas}</span> / <span className="text-danger">−{r.quitadas}</span> palabras
+                      {!fino ? ' (comparado por párrafos)' : ''}
+                    </span>
+                    <button type="button" onClick={() => restaurar(v)} className="btn-secondary btn-sm ml-auto">
+                      Restaurar esta versión
+                    </button>
+                    <button type="button" onClick={() => setVersionAbierta(null)} className="btn-neutral btn-sm">
+                      Volver al actual
+                    </button>
+                  </div>
+                  <p className="whitespace-pre-wrap font-legal text-[14px] leading-[1.8] text-paper-ink [text-wrap:pretty]">
+                    {tramos.map((t, k) =>
+                      t.tipo === 'igual' ? (
+                        <React.Fragment key={k}>{t.texto}</React.Fragment>
+                      ) : (
+                        <span key={k} className={t.tipo === 'quitado' ? 'bg-red-100 text-red-800 line-through decoration-red-500' : 'bg-green-100 text-green-900'}>
+                          {t.texto}
+                        </span>
+                      )
+                    )}
+                  </p>
+                </>
               );
-            })}
-          </p>
-          {citaAbierta !== null && informe?.correccionesTextuales?.[citaAbierta] && (
-            <div className="sticky bottom-0 mt-4 rounded-card border border-line-200 bg-surface p-3 font-sans shadow-lg">
-              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-400">Por qué</p>
-              <p className="mt-0.5 text-[12.5px] leading-snug text-ink-700">{informe.correccionesTextuales[citaAbierta].problema}</p>
-              <p className="mt-2 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-brand-700">Reemplazo propuesto</p>
-              <p className="mt-0.5 text-[13px] leading-snug text-ink-900">«{informe.correccionesTextuales[citaAbierta].reemplazo}»</p>
-              <div className="mt-2 flex gap-2">
-                <button type="button" onClick={() => aplicar(informe.correccionesTextuales![citaAbierta].cita, informe.correccionesTextuales![citaAbierta].reemplazo)} className="btn-primary btn-sm">
-                  <Check className="h-3.5 w-3.5" />
-                  Aplicar reemplazo
-                </button>
-                <button type="button" onClick={() => setCitaAbierta(null)} className="btn-neutral btn-sm">
-                  Cerrar
-                </button>
+            })()}
+          </>
+        )
+      ) : modo === 'editar' ? (
+        Papel(
+          <textarea
+            value={texto}
+            onChange={(e) => setTexto(e.target.value)}
+            className="min-h-[70vh] w-full resize-y border-0 bg-transparent p-0 font-legal text-[14px] leading-[1.8] text-paper-ink focus:outline-none"
+            spellCheck
+          />
+        )
+      ) : (
+        Papel(
+          <>
+            <p ref={lienzo} className="whitespace-pre-wrap font-legal text-[14px] leading-[1.8] text-paper-ink [text-wrap:pretty]">
+              {segmentos.map((s, k) => {
+                if (s.capas.length === 0) return <React.Fragment key={k}>{s.texto}</React.Fragment>;
+                const cita = s.capas.find((c) => c.capa === 'cita');
+                const propias = s.capas.some((c) => c.capa !== 'cita' && c.capa !== 'referencia');
+                return (
+                  <span
+                    key={k}
+                    role={cita || propias ? 'button' : undefined}
+                    tabIndex={cita || propias ? 0 : undefined}
+                    onClick={() => {
+                      if (cita) setCitaAbierta(citaAbierta === cita.indice ? null : cita.indice);
+                    }}
+                    onDoubleClick={() => quitarMarcaEn(s.capas)}
+                    className={`rounded-sm ${claseDeCapas(s.capas, citaAbierta)} ${cita ? 'cursor-pointer' : propias ? 'cursor-text' : ''}`}
+                    title={cita ? 'Pasaje citado por la guía: toque para ver el reemplazo' : propias ? 'Su marca · doble clic para quitarla' : 'La guía se refiere a este pasaje'}
+                  >
+                    {s.texto}
+                  </span>
+                );
+              })}
+            </p>
+            {citaAbierta !== null && informe?.correccionesTextuales?.[citaAbierta] && (
+              <div className="sticky bottom-0 mt-4 rounded-card border border-line-200 bg-surface p-3 font-sans shadow-lg">
+                <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-400">Por qué</p>
+                <p className="mt-0.5 text-[12.5px] leading-snug text-ink-700">{informe.correccionesTextuales[citaAbierta].problema}</p>
+                <p className="mt-2 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-brand-700">Reemplazo propuesto</p>
+                <p className="mt-0.5 text-[13px] leading-snug text-ink-900">«{informe.correccionesTextuales[citaAbierta].reemplazo}»</p>
+                <div className="mt-2 flex gap-2">
+                  <button type="button" onClick={() => aplicar(informe.correccionesTextuales![citaAbierta].cita, informe.correccionesTextuales![citaAbierta].reemplazo)} className="btn-primary btn-sm">
+                    <Check className="h-3.5 w-3.5" />
+                    Aplicar reemplazo
+                  </button>
+                  <button type="button" onClick={() => setCitaAbierta(null)} className="btn-neutral btn-sm">
+                    Cerrar
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </>
+        )
       )}
     </div>
   );
@@ -392,9 +532,9 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
       <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-3">
         {conversacion.length === 0 && (
           <p className="text-[12.5px] leading-snug text-ink-500">
-            Pregúntele a la guía sobre el escrito o pídale redacciones: «reescribe la pretensión tercera como subsidiaria», «¿está bien el juramento?»,
-            «¿cómo va después de mis cambios?». Cada mensaje lleva el texto tal como está ahora y cuesta {pesos(precioConsultaCop)}. Los pasajes de los que
-            hable se subrayan en azul en el escrito.
+            Pregúntele a la guía sobre el escrito o pídale redacciones: «reescribe la pretensión tercera como subsidiaria», «revisa lo que resalté en
+            amarillo», «¿cómo va después de mis cambios?». Cada mensaje lleva el texto tal como está ahora y sus marcas de colores, y cuesta{' '}
+            {pesos(precioConsultaCop)}. Los pasajes de los que hable se subrayan en azul.
           </p>
         )}
         {conversacion.map((t, k) => (
@@ -444,7 +584,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   const InformePanel = () => (
     <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-3 text-[12.5px]">
       {!informe ? (
-        <p className="text-ink-500">Este escrito no tiene informe de revisión. Puede pedir uno con «Volver a revisar» o conversar con la guía.</p>
+        <p className="text-ink-500">Este escrito no tiene informe de revisión. Puede pedir uno con «Revisión completa» o conversar con la guía.</p>
       ) : (
         <>
           <p className="leading-relaxed text-ink-900">{informe.resumen}</p>
@@ -486,8 +626,43 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
     </div>
   );
 
+  const VersionesPanel = () => (
+    <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3 text-[12.5px]">
+      {versiones.length === 0 ? (
+        <p className="text-ink-500">
+          Todavía no hay versiones. Se guarda una sola antes de cada revisión nueva y antes de cada consulta a la guía si el texto cambió; también con
+          «Guardar versión». Se conservan las últimas {MAX_VERSIONES}.
+        </p>
+      ) : (
+        <ul className="space-y-1.5">
+          {[...versiones]
+            .map((v, k) => ({ v, k }))
+            .reverse()
+            .map(({ v, k }) => (
+              <li key={k}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setVersionAbierta(k);
+                    setVistaMovil('escrito');
+                  }}
+                  className={`w-full rounded-control border px-3 py-2 text-left ${versionAbierta === k ? 'border-brand-700 bg-brand-50' : 'border-line-200 bg-canvas hover:border-brand-700'}`}
+                >
+                  <span className="block text-ink-900">{fechaCorta(v.fecha)}</span>
+                  <span className="block text-[11px] text-ink-500">
+                    {v.motivo}
+                    {v.resumen ? ` · ${v.resumen}` : ''} · {(v.texto.match(/\S+/g) ?? []).length.toLocaleString('es-CO')} palabras
+                  </span>
+                </button>
+              </li>
+            ))}
+        </ul>
+      )}
+    </div>
+  );
+
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-canvas">
+    <div className={`flex min-h-0 flex-1 flex-col bg-canvas ${pantallaCompleta ? 'fixed inset-0 z-50' : ''}`}>
       <div className="flex flex-wrap items-center gap-2 border-b border-line-200 bg-surface px-4 py-2">
         <button type="button" onClick={() => onCerrar(texto)} className="btn-neutral btn-sm">
           <ArrowLeft className="h-3.5 w-3.5" />
@@ -500,6 +675,14 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
           </p>
           <p className="truncate text-[11px] text-ink-500">{datos.subtitulo}</p>
         </div>
+        <button type="button" onClick={() => setGuiaVisible((v) => !v)} className="btn-neutral btn-sm hidden lg:inline-flex" title={guiaVisible ? 'Ocultar la guía para leer a todo lo ancho' : 'Mostrar la guía'}>
+          {guiaVisible ? <PanelRightClose className="h-3.5 w-3.5" /> : <PanelRightOpen className="h-3.5 w-3.5" />}
+          {guiaVisible ? 'Ocultar guía' : 'Mostrar guía'}
+        </button>
+        <button type="button" onClick={() => setPantallaCompleta((v) => !v)} className="btn-neutral btn-sm" title={pantallaCompleta ? 'Salir de pantalla completa (Esc)' : 'Pantalla completa'}>
+          {pantallaCompleta ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
+          <span className="hidden sm:inline">{pantallaCompleta ? 'Salir' : 'Pantalla completa'}</span>
+        </button>
         {onRerevisar && precioRevisionCop !== undefined && (
           <button
             type="button"
@@ -509,7 +692,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
                 texto: (
                   <>
                     La guía emitirá un informe {informe ? 'nuevo ' : ''}sobre el texto <span className="font-semibold">tal como está ahora</span>, con sus cambios.
-                    {informe ? ' El informe anterior queda en la conversación.' : ''} Se descuentan {pesos(precioRevisionCop)} del saldo de la firma.
+                    {informe ? ' El informe anterior queda en la conversación y el texto de ahora, en Versiones.' : ''} Se descuentan {pesos(precioRevisionCop)} del saldo de la firma.
                   </>
                 ),
                 etiqueta: `${informe ? 'Revisar de nuevo' : 'Revisar'} · ${pesos(precioRevisionCop)}`,
@@ -526,7 +709,14 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
       </div>
       {Cinta()}
       <ConfirmarDialog confirmacion={confirmacion} onCerrar={() => setConfirmacion(null)} />
-      {error && <p className="border-b border-line-100 bg-surface px-4 py-1.5 text-[12px] text-danger">{error}</p>}
+      {error && (
+        <p className="border-b border-line-100 bg-surface px-4 py-1.5 text-[12px] text-danger">
+          {error}{' '}
+          <button type="button" onClick={() => setError('')} className="underline">
+            cerrar
+          </button>
+        </p>
+      )}
 
       <div className="flex border-b border-line-100 bg-surface lg:hidden">
         {(['escrito', 'revisor'] as const).map((v) => (
@@ -537,16 +727,16 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
       </div>
 
       <div className="flex min-h-0 flex-1">
-        <div className={`min-h-0 flex-1 flex-col lg:flex lg:w-[58%] lg:flex-none ${vistaMovil === 'escrito' ? 'flex' : 'hidden'}`}>{Escrito()}</div>
-        <div className={`min-h-0 flex-1 flex-col border-l border-line-200 bg-surface lg:flex ${vistaMovil === 'revisor' ? 'flex' : 'hidden'}`}>
+        <div className={`min-h-0 flex-1 flex-col lg:flex ${guiaVisible ? 'lg:w-[58%] lg:flex-none' : 'lg:w-full'} ${vistaMovil === 'escrito' ? 'flex' : 'hidden'}`}>{Escrito()}</div>
+        <div className={`min-h-0 flex-1 flex-col border-l border-line-200 bg-surface ${guiaVisible ? 'lg:flex' : 'lg:hidden'} ${vistaMovil === 'revisor' ? 'flex' : 'hidden'}`}>
           <div className="flex border-b border-line-100">
-            {(['chat', 'informe'] as const).map((p) => (
-              <button key={p} type="button" onClick={() => setPanel(p)} className={`px-4 py-2 text-[12.5px] ${panel === p ? 'border-b-2 border-brand-700 font-semibold text-brand-700' : 'text-ink-500'}`}>
-                {p === 'chat' ? 'Guía' : 'Informe'}
+            {(['chat', 'informe', 'versiones'] as const).map((p) => (
+              <button key={p} type="button" onClick={() => setPanel(p)} className={`px-3 py-2 text-[12.5px] ${panel === p ? 'border-b-2 border-brand-700 font-semibold text-brand-700' : 'text-ink-500'}`}>
+                {p === 'chat' ? 'Guía' : p === 'informe' ? 'Informe' : `Versiones${versiones.length ? ` (${versiones.length})` : ''}`}
               </button>
             ))}
           </div>
-          {panel === 'chat' ? Chat() : InformePanel()}
+          {panel === 'chat' ? Chat() : panel === 'informe' ? InformePanel() : VersionesPanel()}
         </div>
       </div>
     </div>

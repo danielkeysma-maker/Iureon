@@ -43,6 +43,15 @@ export interface RevisionGuardada {
   conversacion: TurnoDelTaller[];
   /** Resaltados y tachados del abogado: [{cita, color}]. */
   anotaciones: Anotacion[];
+  /** Instantáneas del texto, las últimas quince. */
+  versiones: VersionDelTexto[];
+}
+
+export interface VersionDelTexto {
+  fecha: string;
+  motivo: string;
+  texto: string;
+  resumen?: string;
 }
 
 export interface Anotacion {
@@ -93,7 +102,8 @@ export const aRevisionGuardada = (row: Record<string, unknown>): RevisionGuardad
   textoOriginal: row.texto_original ? String(row.texto_original) : null,
   textoTrabajo: row.texto_trabajo ? String(row.texto_trabajo) : null,
   conversacion: Array.isArray(row.conversacion) ? (row.conversacion as TurnoDelTaller[]) : [],
-  anotaciones: Array.isArray(row.anotaciones) ? (row.anotaciones as Anotacion[]) : []
+  anotaciones: Array.isArray(row.anotaciones) ? (row.anotaciones as Anotacion[]) : [],
+  versiones: Array.isArray(row.versiones) ? (row.versiones as VersionDelTexto[]) : []
 });
 
 /** Columns for the list: everything but the report bodies, which can be long. */
@@ -167,10 +177,11 @@ export const documentReviewStore = {
 
   /* ─── El taller ──────────────────────────────────────────────────────────── */
 
-  async actualizarTextoTrabajo(firmId: string, id: string, texto: string, anotaciones?: Anotacion[]): Promise<boolean> {
+  async actualizarTextoTrabajo(firmId: string, id: string, texto: string, anotaciones?: Anotacion[], versiones?: VersionDelTexto[]): Promise<boolean> {
     if (!supabase) return false;
     const cambios: Record<string, unknown> = { texto_trabajo: texto, updated_at: new Date().toISOString() };
     if (anotaciones) cambios.anotaciones = anotaciones;
+    if (versiones) cambios.versiones = versiones;
     const { error } = await supabase
       .from('document_reviews')
       .update(cambios)

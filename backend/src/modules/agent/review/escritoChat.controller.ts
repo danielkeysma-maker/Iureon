@@ -31,6 +31,12 @@ export const escritoChatController = async (req: Request, res: Response): Promis
   const mensaje = String(req.body.mensaje ?? '').trim();
   const historial: TurnoDelTaller[] = Array.isArray(req.body.historial) ? (req.body.historial as TurnoDelTaller[]) : [];
   const texto = prepararTexto(typeof req.body.textoActual === 'string' ? req.body.textoActual : '');
+  const anotacionesDelAbogado = Array.isArray(req.body.anotaciones)
+    ? (req.body.anotaciones as unknown[]).map((a) => {
+        const o = (a ?? {}) as Record<string, unknown>;
+        return { cita: String(o.cita ?? '').slice(0, 2000), color: String(o.color ?? '') };
+      })
+    : [];
 
   if (!mensaje) {
     res.status(400).json({ success: false, error: 'MISSING_MESSAGE', message: 'Escriba qué quiere preguntar o pedir.' });
@@ -63,7 +69,7 @@ export const escritoChatController = async (req: Request, res: Response): Promis
       callOpenRouterWithUsage(
         ENGINE.OPUS,
         buildTallerSystemPrompt(),
-        buildTallerUserPrompt({ documentType, guidance, informe: null, textoActual: texto.texto, historial, mensaje }),
+        buildTallerUserPrompt({ documentType, guidance, informe: null, textoActual: texto.texto, historial, mensaje, anotaciones: anotacionesDelAbogado }),
         1500
       ),
       LIMITE_LLAMADA_MS

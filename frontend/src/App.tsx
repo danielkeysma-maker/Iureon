@@ -21,7 +21,7 @@ import { TallerDeRevision, type DatosDelTaller } from './modules/workspace/compo
 import { RevisionesView } from './modules/workspace/components/RevisionesView';
 import { draftsApi } from './modules/documents/services/drafts.api';
 import { TallerDeBorrador, type DatosDelBorrador } from './modules/workspace/components/TallerDeBorrador';
-import type { Anotacion, TurnoDelTaller } from './modules/workspace/services/review.api';
+import type { Anotacion, TurnoDelTaller, VersionDelTexto } from './modules/workspace/services/review.api';
 import { DocumentCanvasRight } from './modules/workspace/components/DocumentCanvasRight';
 import { SearchView } from './modules/search/components/SearchView';
 import { SearchMobileView } from './modules/search/components/SearchMobileView';
@@ -841,6 +841,7 @@ export function App() {
                     texto: textoActual,
                     conversacion: (entrada?.conversacion as TurnoDelTaller[] | undefined) ?? [],
                     anotaciones: (entrada?.anotaciones as Anotacion[] | undefined) ?? [],
+                    versiones: (entrada?.versiones as VersionDelTexto[] | undefined) ?? [],
                     draftId: loadedDraftId
                   });
                   setMainView('taller');
@@ -1069,9 +1070,9 @@ export function App() {
               datos={tallerBorrador}
               precioConsultaCop={300}
               precioRevisionCop={2000}
-              onGuardar={async (texto, conversacion, anotaciones) => {
+              onGuardar={async (texto, conversacion, anotaciones, versiones) => {
                 if (!tallerBorrador.draftId) return false;
-                const ok = await draftsApi.patch(tallerBorrador.draftId, { legalText: texto, conversacion, anotaciones });
+                const ok = await draftsApi.patch(tallerBorrador.draftId, { legalText: texto, conversacion, anotaciones, versiones });
                 if (ok && workflow.generatedDraft) workflow.setGeneratedDraft({ ...workflow.generatedDraft, legalText: texto });
                 return ok;
               }}

@@ -85,7 +85,8 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({ esAdminDeFirma, 
         conFicha: c.conFicha,
         guardaTexto: consentimiento.guarda,
         conversacion: c.conversacion,
-        anotaciones: c.anotaciones ?? []
+        anotaciones: c.anotaciones ?? [],
+        versiones: c.versiones ?? []
       });
     } catch (e) {
       setError(e instanceof Error ? e.message : 'No se pudo abrir la revisión.');

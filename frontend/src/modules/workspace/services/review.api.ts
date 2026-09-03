@@ -86,6 +86,7 @@ export interface RevisionGuardada {
   textoTrabajo: string | null;
   conversacion: TurnoDelTaller[];
   anotaciones: Anotacion[];
+  versiones: VersionDelTexto[];
 }
 
 export interface EdicionPropuesta {
@@ -100,6 +101,14 @@ export interface TurnoDelTaller {
   /** Pasajes del texto de los que habla la respuesta, para resaltarlos. */
   referencias?: string[];
   fecha: string;
+}
+
+/** Una instantánea del texto en el taller. */
+export interface VersionDelTexto {
+  fecha: string;
+  motivo: string;
+  texto: string;
+  resumen?: string;
 }
 
 /** Un resaltado o tachado del abogado, anclado al texto citado. */
@@ -149,14 +158,14 @@ export const reviewApi = {
 
   /* ─── El taller ─────────────────────────────────────────────────────────── */
 
-  guardarTexto: (id: string, texto: string, anotaciones?: Anotacion[]) =>
-    httpClient.put<{ guardado: boolean; motivo?: string }>(`/api/agent/reviews/${encodeURIComponent(id)}/texto`, { body: { texto, anotaciones } }),
+  guardarTexto: (id: string, texto: string, anotaciones?: Anotacion[], versiones?: VersionDelTexto[]) =>
+    httpClient.put<{ guardado: boolean; motivo?: string }>(`/api/agent/reviews/${encodeURIComponent(id)}/texto`, { body: { texto, anotaciones, versiones } }),
 
   /** La guía conversa sobre un escrito de Redacción: sin informe ni id. */
-  chatSobreEscrito: (body: { documentType: string; legalBranch?: string; titulo: string; mensaje: string; textoActual: string; historial: TurnoDelTaller[] }) =>
+  chatSobreEscrito: (body: { documentType: string; legalBranch?: string; titulo: string; mensaje: string; textoActual: string; historial: TurnoDelTaller[]; anotaciones?: Anotacion[] }) =>
     httpClient.post<RespuestaDelChat>('/api/agent/escrito/chat', { body }),
 
-  chat: (id: string, body: { mensaje: string; textoActual: string; historial: TurnoDelTaller[] }) =>
+  chat: (id: string, body: { mensaje: string; textoActual: string; historial: TurnoDelTaller[]; anotaciones?: Anotacion[] }) =>
     httpClient.post<RespuestaDelChat>(`/api/agent/reviews/${encodeURIComponent(id)}/chat`, { body }),
 
   rerevisar: (id: string, textoActual: string) =>
