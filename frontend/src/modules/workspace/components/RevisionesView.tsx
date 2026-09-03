@@ -1,6 +1,6 @@
 import React from 'react';
-import { ClipboardCheck, RefreshCw, Trash2 } from 'lucide-react';
-import { reviewApi, type RevisionGuardada } from '../services/review.api';
+import { ClipboardCheck, RefreshCw, ShieldCheck, Trash2 } from 'lucide-react';
+import { reviewApi, type ConsentimientoDeGuardado, type RevisionGuardada } from '../services/review.api';
 import type { DatosDelTaller } from './TallerDeRevision';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 
@@ -14,16 +14,26 @@ import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDia
  */
 
 interface RevisionesViewProps {
+  /** Socio administrador de la firma (o superusuario): puede autorizar que se conserven los escritos. */
+  esAdminDeFirma: boolean;
   onAbrirTaller: (datos: DatosDelTaller) => void;
   onIrARedaccion: () => void;
 }
 
-export const RevisionesView: React.FC<RevisionesViewProps> = ({ onAbrirTaller, onIrARedaccion }) => {
+export const RevisionesView: React.FC<RevisionesViewProps> = ({ esAdminDeFirma, onAbrirTaller, onIrARedaccion }) => {
   const [lista, setLista] = React.useState<RevisionGuardada[]>([]);
   const [cargando, setCargando] = React.useState(true);
   const [abriendo, setAbriendo] = React.useState<string | null>(null);
   const [error, setError] = React.useState('');
   const [confirmacion, setConfirmacion] = React.useState<Confirmacion | null>(null);
+  /*
+   * LA AUTORIZACION, A LA VISTA. El usuario vio el aviso ambar en el taller y
+   * no encontro donde autorizar: el boton solo aparecia dentro del taller y
+   * solo al socio administrador. Aqui, en la cabecera del modulo, se ve el
+   * estado siempre y el boton para quien puede darla.
+   */
+  const [consentimiento, setConsentimiento] = React.useState<ConsentimientoDeGuardado | null>(null);
+  const [errorConsentimiento, setErrorConsentimiento] = React.useState('');
 
   const cargar = React.useCallback(() => {
     setCargando(true);
@@ -36,7 +46,20 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({ onAbrirTaller, o
 
   React.useEffect(() => {
     cargar();
+    reviewApi
+      .consentimiento()
+      .then(setConsentimiento)
+      .catch(() => setConsentimiento({ guarda: false, por: null, el: null }));
   }, [cargar]);
+
+  const cambiarAutorizacion = async (autorizar: boolean) => {
+    setErrorConsentimiento('');
+    try {
+      setConsentimiento(await reviewApi.autorizarGuardado(autorizar));
+    } catch (e) {
+      setErrorConsentimiento(e instanceof Error ? e.message : 'No se pudo guardar la autorización.');
+    }
+  };
 
   const abrir = async (r: RevisionGuardada) => {
     setAbriendo(r.id);
@@ -102,6 +125,64 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({ onAbrirTaller, o
             </button>
           </div>
         </div>
+
+        {consentimiento && (
+          <div
+            className={`mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-card border px-3 py-2 text-[12.5px] leading-snug ${
+              consentimiento.guarda ? 'border-line-200 bg-surface text-ink-700' : 'border-amber-200 bg-amber-50 text-amber-900'
+            }`}
+          >
+            <ShieldCheck className={`h-4 w-4 shrink-0 ${consentimiento.guarda ? 'text-verified' : 'text-amber-700'}`} />
+            <span className="min-w-0 flex-1">
+              {consentimiento.guarda ? (
+                <>
+                  <span className="font-semibold">La firma conserva los escritos revisados</span>, sus marcas y la conversación con la guía
+                  {consentimiento.por ? `, autorizado por ${consentimiento.por}` : ''}
+                  {consentimiento.el ? ` el ${new Date(consentimiento.el).toLocaleDateString('es-CO', { dateStyle: 'long' })}` : ''}.
+                </>
+              ) : (
+                <>
+                  <span className="font-semibold">La firma no ha autorizado conservar los escritos revisados.</span> Sin esa autorización, el texto, las
+                  marcas y la conversación viven solo en la pestaña; el informe sí se guarda.{' '}
+                  {esAdminDeFirma ? 'Como socio administrador, puede autorizarlo aquí para toda la firma.' : 'Solo un socio administrador de la firma puede autorizarlo.'}
+                </>
+              )}
+              {errorConsentimiento && <span className="text-danger"> {errorConsentimiento}</span>}
+            </span>
+            {esAdminDeFirma && (
+              <button
+                type="button"
+                onClick={() =>
+                  setConfirmacion(
+                    consentimiento.guarda
+                      ? {
+                          titulo: 'Retirar la autorización',
+                          texto: <>Desde ahora los escritos nuevos no se conservarán. Los ya guardados no se borran.</>,
+                          etiqueta: 'Retirar',
+                          peligro: true,
+                          onConfirmar: () => cambiarAutorizacion(false)
+                        }
+                      : {
+                          titulo: 'Autorizar que la firma conserve sus escritos',
+                          texto: (
+                            <>
+                              Iureon conservará el texto de los escritos que su firma revise, sus marcas y la conversación con la guía, para retomar el
+                              trabajo otro día. Aplica a <span className="font-semibold">toda la firma</span> y queda en la auditoría con su correo. Puede
+                              retirarla después.
+                            </>
+                          ),
+                          etiqueta: 'Autorizar',
+                          onConfirmar: () => cambiarAutorizacion(true)
+                        }
+                  )
+                }
+                className={consentimiento.guarda ? 'btn-neutral btn-sm' : 'btn-primary btn-sm'}
+              >
+                {consentimiento.guarda ? 'Retirar autorización' : 'Autorizar guardado'}
+              </button>
+            )}
+          </div>
+        )}
 
         {error && <p className="mt-4 rounded-control border border-line-200 bg-surface px-3 py-2 text-[12.5px] leading-snug text-danger">{error}</p>}
 

@@ -475,7 +475,7 @@ const A_REVISAR: ManualArticle = {
       kind: 'nota',
       titulo: 'Retomar otro día requiere autorización de la firma',
       texto:
-        'El texto de trabajo y la conversación se conservan en el servidor solo si un socio administrador lo autoriza, una vez, para toda la firma; queda en la auditoría con su correo. Sin esa autorización el taller funciona igual, pero al cerrar la pestaña se pierden el texto y la conversación —el informe sí queda— y la cinta de arriba lo advierte. La autorización se da desde esa misma cinta.'
+        'El texto de trabajo y la conversación se conservan en el servidor solo si un socio administrador lo autoriza, una vez, para toda la firma; queda en la auditoría con su correo. Sin esa autorización el taller funciona igual, pero al cerrar la pestaña se pierden el texto y la conversación —el informe sí queda— y la cinta de arriba lo advierte. La autorización se da desde esa misma cinta o desde la cabecera del módulo «Revisiones», donde siempre se ve si está dada, quién la dio y cuándo, y donde también se puede retirar.'
     },
     {
       kind: 'nota',

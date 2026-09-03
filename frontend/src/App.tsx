@@ -1107,7 +1107,7 @@ export function App() {
               <TallerDeRevision
                 key={tallerActivo.revisionId ?? 'sesion'}
                 datos={tallerActivo}
-                esAdminDeFirma={session?.user.role === 'FIRM_ADMIN'}
+                esAdminDeFirma={session?.user.role === 'FIRM_ADMIN' || session?.user.role === 'SUPER_ADMIN'}
                 precioConsultaCop={300}
                 precioRevisionCop={2000}
                 onCerrar={() => setTallerActivo(null)}
@@ -1119,6 +1119,7 @@ export function App() {
               />
             ) : (
               <RevisionesView
+                esAdminDeFirma={session?.user.role === 'FIRM_ADMIN' || session?.user.role === 'SUPER_ADMIN'}
                 onAbrirTaller={(datos) => setTallerActivo(datos)}
                 onIrARedaccion={() => setMainView('workspace')}
               />

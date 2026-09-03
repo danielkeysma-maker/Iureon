@@ -369,8 +369,15 @@ export const getStorageConsentController = async (req: Request, res: Response): 
  * decision de la firma, no de quien revisa. Queda en la auditoria con correo.
  */
 export const setStorageConsentController = async (req: Request, res: Response): Promise<void> => {
-  if (req.user?.role !== 'FIRM_ADMIN') {
-    res.status(403).json({ success: false, error: 'ONLY_FIRM_ADMIN', message: 'Solo un socio administrador puede autorizar que se conserven los escritos.' });
+  /*
+   * Un socio administrador de la firma, o el superusuario para la firma en la
+   * que esta trabajando: el operador probo el taller con su propia cuenta y no
+   * encontro donde autorizar, porque solo se aceptaba FIRM_ADMIN. La
+   * autorizacion sigue siendo por firma (req.firmId) y queda en la auditoria
+   * con el correo de quien la dio.
+   */
+  if (req.user?.role !== 'FIRM_ADMIN' && req.user?.role !== 'SUPER_ADMIN') {
+    res.status(403).json({ success: false, error: 'ONLY_FIRM_ADMIN', message: 'Solo un socio administrador de la firma puede autorizar que se conserven los escritos.' });
     return;
   }
   const autorizar = req.body.autorizar !== false;

@@ -102,7 +102,11 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
           ) : (
             <>
               <span className="font-semibold">Solo en esta sesión.</span> Su firma no ha autorizado conservar escritos: al cerrar se pierden el texto, las
-              marcas y la conversación; el informe sí queda.{errorAutorizacion ? ` ${errorAutorizacion}` : ''}
+              marcas y la conversación; el informe sí queda.{' '}
+              {esAdminDeFirma
+                ? 'Puede autorizarlo aquí, una vez, para toda la firma.'
+                : 'Puede autorizarlo un socio administrador de su firma, desde este mismo aviso o desde el módulo Revisiones.'}
+              {errorAutorizacion ? ` ${errorAutorizacion}` : ''}
             </>
           ),
           accion: !guardaEnServidor && esAdminDeFirma && datos.revisionId ? { etiqueta: 'Autorizar guardado para la firma', onClick: pedirAutorizacion } : undefined
