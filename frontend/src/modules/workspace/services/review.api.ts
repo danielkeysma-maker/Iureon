@@ -14,12 +14,22 @@ export interface ErrorDeAplicacion {
   correccion: string;
 }
 
+export interface CorreccionTextual {
+  /** Palabras exactas del escrito, para encontrarlas con buscar. */
+  cita: string;
+  problema: string;
+  /** La redacción propuesta, lista para pegar. */
+  reemplazo: string;
+}
+
 export interface InformeDeRevision {
   resumen: string;
   fortalezas: string[];
   debilidades: string[];
   seccionesFaltantes: string[];
   erroresDeAplicacion: ErrorDeAplicacion[];
+  /** Puede faltar en informes guardados antes de que existiera. */
+  correccionesTextuales?: CorreccionTextual[];
   recomendaciones: string[];
 }
 

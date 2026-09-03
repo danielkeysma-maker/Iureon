@@ -219,6 +219,9 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
       i.erroresDeAplicacion.length
         ? `ERRORES DE APLICACIÓN\n${i.erroresDeAplicacion.map((e) => `- ${e.donde}: ${e.problema} → ${e.correccion}`).join('\n')}\n`
         : '',
+      (i.correccionesTextuales ?? []).length
+        ? `CITAS DEL ESCRITO Y REEMPLAZO PROPUESTO\n${(i.correccionesTextuales ?? []).map((c) => `- Dice: «${c.cita}»\n  Problema: ${c.problema}\n  Reemplazo: «${c.reemplazo}»`).join('\n')}\n`
+        : '',
       bloque('RECOMENDACIONES', i.recomendaciones)
     ]
       .filter((s) => s !== '')
@@ -553,6 +556,36 @@ const Informe: React.FC<{ respuesta: RespuestaDeRevision; documentType: string }
                     <p className="font-mono text-[10.5px] font-semibold text-ink-500">{e.donde}</p>
                     <p className="mt-0.5 text-ui leading-snug text-ink-900">{e.problema}</p>
                     {e.correccion && <p className="mt-1 text-ui leading-snug text-brand-700">Corrección: {e.correccion}</p>}
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+          {(i.correccionesTextuales ?? []).length > 0 && (
+            <section>
+              {/*
+                LO QUE DICE Y LO QUE DEBERIA DECIR, palabra por palabra. Un informe
+                que dice «la peticion no es concreta» obliga a buscar la frase; este
+                la copia tal cual y pone al lado la redaccion propuesta, lista para
+                pegar. Es lo que el usuario echo de menos del primer informe.
+              */}
+              <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
+                Citas del escrito y reemplazo propuesto
+              </h4>
+              <div className="mt-1.5 space-y-2.5">
+                {(i.correccionesTextuales ?? []).map((c, k) => (
+                  <div key={k} className="rounded-control border border-line-200 bg-canvas px-3 py-2.5">
+                    <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-400">Dice</p>
+                    <blockquote className="mt-0.5 border-l-2 border-line-200 pl-2.5 text-ui italic leading-snug text-ink-700">
+                      «{c.cita}»
+                    </blockquote>
+                    {c.problema && <p className="mt-1.5 text-[12px] leading-snug text-ink-500">{c.problema}</p>}
+                    {c.reemplazo && (
+                      <>
+                        <p className="mt-2 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-brand-700">Reemplazo propuesto</p>
+                        <p className="mt-0.5 text-ui leading-snug text-ink-900">«{c.reemplazo}»</p>
+                      </>
+                    )}
                   </div>
                 ))}
               </div>

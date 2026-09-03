@@ -73,6 +73,7 @@ const system = buildReviewSystemPrompt();
 check('el sistema prohíbe citar providencias', /NO cites|no cites/i.test(system) && /providencia|sentencia/i.test(system));
 check('el sistema separa lo objetivo (norma) de lo valorativo', /norma/i.test(system) && /criterio|valorativ/i.test(system));
 check('el sistema pide JSON', /JSON/.test(system));
+check('el sistema pide citas textuales del escrito con su reemplazo', /correccionesTextuales/.test(system) && /textual|literal/i.test(system));
 check('y pide brevedad, porque la salida tiene presupuesto fijo y un JSON cortado no sirve', /seis elementos|BREVE/i.test(system));
 
 /* ─── LA RESPUESTA SE LEE A LA DEFENSIVA ───────────────────────────────────── */
@@ -89,8 +90,18 @@ check('lee el JSON aunque venga con cerca de código', informe !== null && infor
 check('conserva las secciones faltantes', informe?.seccionesFaltantes[0] === 'Juramento de no haber presentado otra tutela');
 check('conserva los errores de aplicación con sus tres campos', informe?.erroresDeAplicacion[0]?.correccion === 'Explicar por qué no hay otro medio idóneo');
 
+const conCitas = parsearInforme(JSON.stringify({
+  resumen: 'Bien.',
+  correccionesTextuales: [
+    { cita: 'solicito se ordene lo pertinente', problema: 'La petición no es concreta.', reemplazo: 'solicito ORDENAR a la EPS autorizar el procedimiento dentro de las cuarenta y ocho (48) horas siguientes' },
+    { cita: 5, problema: null }
+  ]
+}));
+check('las citas textuales se leen con cita, problema y reemplazo', conCitas?.correccionesTextuales[0]?.reemplazo?.startsWith('solicito ORDENAR') === true);
+check('una cita a medias se conserva con lo que tenga, sin reventar', conCitas?.correccionesTextuales.length === 2 && conCitas?.correccionesTextuales[1]?.cita === '5');
+
 const parcial = parsearInforme('{"resumen":"Solo esto"}');
-check('un JSON parcial rellena las listas vacías, no undefined', parcial !== null && Array.isArray(parcial.fortalezas) && parcial.fortalezas.length === 0);
+check('un JSON parcial rellena las listas vacías, no undefined', parcial !== null && Array.isArray(parcial.fortalezas) && parcial.fortalezas.length === 0 && Array.isArray(parcial.correccionesTextuales) && parcial.correccionesTextuales.length === 0);
 
 /* ─── UN JSON CORTADO POR EL PRESUPUESTO SE REPARA, NO SE TIRA ─────────────── */
 // Exactamente lo que devolvió el modelo al agotar 1.800 tokens: la cadena a medias.

@@ -455,7 +455,7 @@ const A_REVISAR: ManualArticle = {
     {
       kind: 'parrafo',
       texto:
-        'En Redacción, debajo de los adjuntos, está «Revisar un escrito ya redactado». Elija primero la actuación arriba —la revisión objetiva se hace contra su ficha verificada—, suba el archivo en PDF, Word o texto —hasta 15 MB, con anexos—, o pegue el texto, y escriba lo que quiere saber. La respuesta es un informe: juicio global, secciones que la norma exige y faltan, fortalezas, debilidades, errores de aplicación con su corrección y recomendaciones. No reescribe su escrito.'
+        'En Redacción, debajo de los adjuntos, está «Revisar un escrito ya redactado». Elija primero la actuación arriba —la revisión objetiva se hace contra su ficha verificada—, suba el archivo en PDF, Word o texto —hasta 15 MB, con anexos—, o pegue el texto, y escriba lo que quiere saber. La respuesta es un informe: juicio global, secciones que la norma exige y faltan, fortalezas, debilidades, errores de aplicación con su corrección, citas textuales del escrito con la frase que las reemplazaría —copiadas tal cual, para encontrarlas con buscar, y con el reemplazo listo para pegar— y recomendaciones. No reescribe su escrito completo.'
     },
     {
       kind: 'parrafo',

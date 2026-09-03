@@ -37,6 +37,7 @@ const base: DatosDelInforme = {
     debilidades: ['La tercera pretensión es subsidiaria mal redactada.'],
     seccionesFaltantes: ['Residencia del solicitante (art. 14).'],
     erroresDeAplicacion: [{ donde: 'Fundamentos', problema: 'Cita una sentencia sin verificar.', correccion: 'Suprimir la cita.' }],
+    correccionesTextuales: [{ cita: 'solicito se ordene lo pertinente', problema: 'No es concreta.', reemplazo: 'solicito ORDENAR a la EPS autorizar el procedimiento' }],
     recomendaciones: ['Formular la petición como orden concreta.']
   }
 };
@@ -48,6 +49,7 @@ const salida = textoDe(doc);
 check('el PDF se genera con contenido', salida.length > 2000, String(salida.length));
 check('el PDF no imprime el conteo de caracteres: es dato de pantalla', !/4912|4\.912/.test(salida));
 check('el PDF lleva el cliente o proceso y quien pidio la revision', /Joel Ayus/.test(salida) && /anibal@correo\.co/.test(salida));
+check('el PDF lleva la cita textual y su reemplazo', /solicito se ordene lo pertinente/.test(salida) && /solicito ORDENAR a la EPS/.test(salida));
 
 /* Un informe largo pagina: 40 recomendaciones de tres líneas cada una. */
 const largo: DatosDelInforme = {

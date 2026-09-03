@@ -90,6 +90,19 @@ export const exportarInformeAWord = async (d: DatosDelInforme): Promise<void> =>
       if (e.correccion) hijos.push(p(`Corrección: ${e.correccion}`, { italics: true, indent: 360, after: 160 }));
     }
   }
+  const citas = i.correccionesTextuales ?? [];
+  if (citas.length) {
+    hijos.push(titulo('Citas del escrito y reemplazo propuesto'));
+    for (const c of citas) {
+      hijos.push(p('Dice:', { bold: true, size: base - 3, color: gris, after: 20, justificar: false }));
+      hijos.push(p(`«${c.cita}»`, { italics: true, indent: 360, after: 40 }));
+      if (c.problema) hijos.push(p(c.problema, { size: base - 2, color: gris, indent: 360, after: 40 }));
+      if (c.reemplazo) {
+        hijos.push(p('Reemplazo propuesto:', { bold: true, size: base - 3, color: titulos, after: 20, justificar: false }));
+        hijos.push(p(`«${c.reemplazo}»`, { indent: 360, after: 160 }));
+      }
+    }
+  }
   seccion('Recomendaciones', i.recomendaciones);
   hijos.push(
     new Paragraph({

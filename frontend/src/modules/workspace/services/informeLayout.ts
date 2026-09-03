@@ -163,6 +163,20 @@ export const dibujarInformeEnPdf = (doc: jsPDF, F: string, d: DatosDelInforme, c
       y += 1.5;
     }
   }
+  const citas = i.correccionesTextuales ?? [];
+  if (citas.length > 0) {
+    titulo('Citas del escrito y reemplazo propuesto');
+    for (const c of citas) {
+      bloque('Dice:', cuerpoPt - 1.5, 'bold', 0, NOTA, false);
+      bloque(`«${c.cita}»`, cuerpoPt, 'italic', 4, TINTA);
+      if (c.problema) bloque(c.problema, cuerpoPt - 1, 'normal', 4, NOTA);
+      if (c.reemplazo) {
+        bloque('Reemplazo propuesto:', cuerpoPt - 1.5, 'bold', 0, TITULO, false);
+        bloque(`«${c.reemplazo}»`, cuerpoPt, 'normal', 4, TINTA);
+      }
+      y += 2;
+    }
+  }
   seccion('Recomendaciones', i.recomendaciones);
 
   /* ─── Pie ──────────────────────────────────────────────────────────────── */

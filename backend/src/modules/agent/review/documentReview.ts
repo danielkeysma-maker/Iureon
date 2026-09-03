@@ -75,8 +75,10 @@ RESPONDE ÚNICAMENTE CON UN OBJETO JSON, sin texto antes ni después, con esta f
   "debilidades": ["…"],
   "seccionesFaltantes": ["secciones que la norma exige y el escrito no trae; vacío si no falta ninguna"],
   "erroresDeAplicacion": [{"donde": "sección o párrafo", "problema": "qué está mal aplicado y por qué", "correccion": "cómo debería quedar"}],
+  "correccionesTextuales": [{"cita": "frase copiada LITERAL del escrito, tal cual está, sin corregirla", "problema": "por qué esa frase falla", "reemplazo": "la frase con la que la sustituiría, lista para pegar"}],
   "recomendaciones": ["qué haría antes de presentarlo, en orden de importancia"]
 }
+EN "correccionesTextuales" LA CITA ES TEXTUAL: copia las palabras exactas del escrito (entre 5 y 40 palabras), sin parafrasear ni corregir ortografía, para que el abogado la encuentre con buscar. El reemplazo es la redacción concreta que propones, no una instrucción. Elige los pasajes que más daño harían ante el juez; como máximo cuatro.
 Escribe en español jurídico colombiano, neutro y preciso. Cada elemento de las listas es una frase completa y autónoma.
 
 SÉ BREVE Y DENSO, porque el informe tiene un presupuesto de salida fijo y un JSON cortado a la mitad no le sirve a nadie: como máximo CUATRO elementos por lista, cada uno de hasta 25 palabras; el resumen, dos frases; sin repetir en una lista lo dicho en otra. Prefiere el hallazgo grave al menor: si hay más de cuatro, quédate con los cuatro que más daño harían ante el juez. JSON compacto, en una sola línea, sin comentarios ni texto fuera del objeto.`;
@@ -114,12 +116,21 @@ export interface ErrorDeAplicacion {
   correccion: string;
 }
 
+export interface CorreccionTextual {
+  /** Palabras exactas del escrito, para encontrarlas con buscar. */
+  cita: string;
+  problema: string;
+  /** La redacción propuesta, lista para pegar. */
+  reemplazo: string;
+}
+
 export interface InformeDeRevision {
   resumen: string;
   fortalezas: string[];
   debilidades: string[];
   seccionesFaltantes: string[];
   erroresDeAplicacion: ErrorDeAplicacion[];
+  correccionesTextuales: CorreccionTextual[];
   recomendaciones: string[];
 }
 
@@ -129,6 +140,16 @@ const lista = (v: unknown): string[] => {
   if (Array.isArray(v)) return v.map(cadena).filter(Boolean);
   const una = cadena(v);
   return una ? [una] : [];
+};
+
+const citas = (v: unknown): CorreccionTextual[] => {
+  if (!Array.isArray(v)) return [];
+  return v
+    .map((e) => {
+      const o = (e ?? {}) as Record<string, unknown>;
+      return { cita: cadena(o.cita), problema: cadena(o.problema), reemplazo: cadena(o.reemplazo) };
+    })
+    .filter((e) => e.cita || e.reemplazo);
 };
 
 const errores = (v: unknown): ErrorDeAplicacion[] => {
@@ -256,7 +277,7 @@ const desescapar = (s: string): string =>
  * list is the run between its key and the next known key, and each item is a
  * quoted run. Loses nothing that was whole; never throws.
  */
-const CLAVES = ['resumen', 'fortalezas', 'debilidades', 'seccionesFaltantes', 'erroresDeAplicacion', 'recomendaciones'];
+const CLAVES = ['resumen', 'fortalezas', 'debilidades', 'seccionesFaltantes', 'erroresDeAplicacion', 'correccionesTextuales', 'recomendaciones'];
 
 const extraerCampos = (s: string): InformeDeRevision | null => {
   const tramo = (clave: string): string | null => {
@@ -303,12 +324,28 @@ const extraerCampos = (s: string): InformeDeRevision | null => {
     return salida;
   };
 
+  const citasDe = (): CorreccionTextual[] => {
+    const t = tramo('correccionesTextuales');
+    if (!t) return [];
+    const salida: CorreccionTextual[] = [];
+    for (const o of t.split(/}\s*,\s*{/)) {
+      const campo = (k: string): string => {
+        const m = new RegExp(`"${k}"\\s*:\\s*"([\\s\\S]*?)"\\s*(?=,\\s*"(?:cita|problema|reemplazo)"|\\s*}|\\s*$)`).exec(o);
+        return m ? desescapar(m[1].trim()) : '';
+      };
+      const e = { cita: campo('cita'), problema: campo('problema'), reemplazo: campo('reemplazo') };
+      if (e.cita || e.reemplazo) salida.push(e);
+    }
+    return salida;
+  };
+
   const informe: InformeDeRevision = {
     resumen: cadenaDe('resumen'),
     fortalezas: listaDe('fortalezas'),
     debilidades: listaDe('debilidades'),
     seccionesFaltantes: listaDe('seccionesFaltantes'),
     erroresDeAplicacion: erroresDe(),
+    correccionesTextuales: citasDe(),
     recomendaciones: listaDe('recomendaciones')
   };
   const algo =
@@ -359,6 +396,7 @@ export const parsearInforme = (crudo: string): InformeDeRevision | null => {
     debilidades: lista(objeto.debilidades),
     seccionesFaltantes: lista(objeto.seccionesFaltantes),
     erroresDeAplicacion: errores(objeto.erroresDeAplicacion),
+    correccionesTextuales: citas(objeto.correccionesTextuales),
     recomendaciones: lista(objeto.recomendaciones)
   };
 };
