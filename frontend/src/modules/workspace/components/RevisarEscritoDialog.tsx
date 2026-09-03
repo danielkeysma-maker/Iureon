@@ -1,9 +1,11 @@
 import React from 'react';
-import { AlertTriangle, CheckCircle2, ClipboardCheck, Copy, FileText, History, Trash2, UploadCloud, X } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, ClipboardCheck, Copy, Download, FileText, History, Trash2, UploadCloud, X } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import { ApiError } from '../../../config/httpClient';
 import { archivoABase64, reviewApi, type RespuestaDeRevision, type RevisionGuardada } from '../services/review.api';
 import { uploadFileToStorage } from '../../documents/services/storageUpload';
+import { exportarInformeAPdf, exportarInformeAWord } from '../services/informeExport.service';
+import type { DatosDelInforme } from '../services/informeLayout';
 
 /**
  * Revisar un escrito ya redactado.
@@ -78,6 +80,9 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
   const [anteriores, setAnteriores] = React.useState<RevisionGuardada[]>([]);
   const [abriendo, setAbriendo] = React.useState<string | null>(null);
   const [tituloDelInforme, setTituloDelInforme] = React.useState(documentType);
+  /** El archivo y la fecha del informe en pantalla, para nombrar y fechar la exportación. */
+  const [origenDelInforme, setOrigenDelInforme] = React.useState<{ fileName: string; fecha: string }>({ fileName: '', fecha: '' });
+  const [exportando, setExportando] = React.useState<'pdf' | 'word' | null>(null);
 
   const cargarAnteriores = React.useCallback(() => {
     reviewApi
@@ -96,6 +101,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
     try {
       const completa = await reviewApi.obtener(r.id);
       setTituloDelInforme(completa.documentType);
+      setOrigenDelInforme({ fileName: completa.fileName, fecha: new Date(completa.createdAt).toLocaleDateString('es-CO', { dateStyle: 'long' }) });
       setRespuesta({
         id: completa.id,
         guardada: true,
@@ -167,6 +173,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
         cuerpo = { fileName: archivo.name, storageKey };
       }
       setTituloDelInforme(documentType);
+      setOrigenDelInforme({ fileName: cuerpo.fileName, fecha: new Date().toLocaleDateString('es-CO', { dateStyle: 'long' }) });
       setRespuesta(await reviewApi.revisar({ documentType, legalBranch, pregunta, ...cuerpo }));
       onSaldoCambiado?.();
       cargarAnteriores();
@@ -198,6 +205,41 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
     ]
       .filter((s) => s !== '')
       .join('\n');
+  };
+
+  /*
+   * A PDF Y A WORD, CON LA ESTRUCTURA DEL DIALOGO. Copiar el texto no basta:
+   * el abogado guarda el informe junto al expediente o se lo manda a quien
+   * redacto el escrito, y ahi tiene que verse como aqui: por secciones, con
+   * la letra de la firma. Solo cuando el informe se pudo ordenar; un informe
+   * libre no tiene secciones que exportar y se copia.
+   */
+  const datosParaExportar = (): DatosDelInforme | null => {
+    if (!respuesta?.informe) return null;
+    return {
+      documentType: tituloDelInforme,
+      fileName: origenDelInforme.fileName || 'escrito',
+      fecha: origenDelInforme.fecha || new Date().toLocaleDateString('es-CO', { dateStyle: 'long' }),
+      caracteres: respuesta.caracteres,
+      truncado: respuesta.truncado,
+      conFicha: respuesta.conFicha,
+      informe: respuesta.informe
+    };
+  };
+
+  const exportar = async (formato: 'pdf' | 'word') => {
+    const datos = datosParaExportar();
+    if (!datos || exportando) return;
+    setExportando(formato);
+    setError('');
+    try {
+      if (formato === 'pdf') await exportarInformeAPdf(datos);
+      else await exportarInformeAWord(datos);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudo exportar el informe.');
+    } finally {
+      setExportando(null);
+    }
   };
 
   const copiar = async () => {
@@ -235,6 +277,26 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
           <>
             <button type="button" onClick={() => setRespuesta(null)} className="btn-neutral btn-sm">
               Revisar otro
+            </button>
+            <button
+              type="button"
+              onClick={() => void exportar('word')}
+              disabled={!respuesta.informe || exportando !== null}
+              className="btn-neutral btn-sm disabled:opacity-50"
+              title={respuesta.informe ? 'Descargar el informe en Word, con la letra de la firma' : 'Este informe no tiene secciones: cópielo'}
+            >
+              <Download className="h-3.5 w-3.5" />
+              {exportando === 'word' ? 'Word…' : 'Word'}
+            </button>
+            <button
+              type="button"
+              onClick={() => void exportar('pdf')}
+              disabled={!respuesta.informe || exportando !== null}
+              className="btn-neutral btn-sm disabled:opacity-50"
+              title={respuesta.informe ? 'Descargar el informe en PDF, con la letra de la firma' : 'Este informe no tiene secciones: cópielo'}
+            >
+              <Download className="h-3.5 w-3.5" />
+              {exportando === 'pdf' ? 'PDF…' : 'PDF'}
             </button>
             <button type="button" onClick={() => void copiar()} className="btn-primary btn-sm">
               <Copy className="h-3.5 w-3.5" />

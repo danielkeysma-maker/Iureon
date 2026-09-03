@@ -12,6 +12,7 @@
     "brand:letras": "python scripts/wordmark-to-paths.py",
     "check:tokens": "npx tsx src/design/__checks__/tokens.check.ts",
     "preview": "vite preview",
+    "check:informe": "npx esbuild src/modules/workspace/__checks__/informe.check.ts --bundle --platform=node --format=cjs --outfile=node_modules/.cache/informe.check.cjs --log-level=error && node node_modules/.cache/informe.check.cjs",
     "check:formato": "npx esbuild src/modules/documents/__checks__/formato.check.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/formato.check.mjs --log-level=error && node node_modules/.cache/formato.check.mjs",
     "check:guion": "npx esbuild src/modules/clients/__checks__/guion.check.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/guion.check.mjs --log-level=error && node node_modules/.cache/guion.check.mjs"
   },
