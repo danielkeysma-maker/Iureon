@@ -10,7 +10,13 @@ export const ENGINE = {
    * because Gemini runs the fact-extraction stage, the one that consumes the
    * most input in the pipeline.
    */
-  GEMINI: 'google/gemini-3.7-flash',
+  /*
+   * 3.8 Flash, cambiado el 3 de septiembre de 2026. Verificado en el catalogo
+   * de OpenRouter ese dia: mismo contexto (1M) y mismo precio que 3.7 —
+   * US$0,75/M de entrada y US$3,75/M de salida en linea; la mitad en lote—,
+   * asi que el cambio no mueve el costo por operacion.
+   */
+  GEMINI: 'google/gemini-3.8-flash',
   GPT: 'openai/gpt-5.6-sol',
   OPUS: 'anthropic/claude-opus-5'
 } as const;

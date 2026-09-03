@@ -84,7 +84,7 @@ const MARKUP_ESPERADO = 2.3;
     userEmail: A.user.email,
     operation: 'BORRADOR',
     operationId: operacion1,
-    usage: { model: 'google/gemini-3.7-flash', promptTokens: 1200, completionTokens: 800, costUsd: 0.00037125 }
+    usage: { model: 'google/gemini-3.8-flash', promptTokens: 1200, completionTokens: 800, costUsd: 0.00037125 }
   });
 
   const { data: filas } = await c.from('ai_usage').select('*').eq('operation_id', operacion1);
