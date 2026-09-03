@@ -47,6 +47,9 @@ export interface SavedDraftRow {
    * falte respaldo, sabemos que no lo anotamos.
    */
   procedencia: unknown | null;
+  /** El taller sobre el borrador: turnos con la guia y resaltados del abogado. Vacios si la columna no existe aun. */
+  conversacion?: unknown[] | null;
+  anotaciones?: unknown[] | null;
 }
 
 /** Los campos que el cliente puede escribir. `version` y fechas las pone el servidor. */
@@ -63,6 +66,8 @@ export type CamposEditables = Partial<
     | 'despacho'
     | 'radicado'
     | 'estado'
+    | 'conversacion'
+    | 'anotaciones'
   >
 >;
 

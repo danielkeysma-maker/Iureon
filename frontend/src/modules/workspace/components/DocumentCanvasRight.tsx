@@ -26,6 +26,7 @@ interface DocumentCanvasRightProps {
   legalBranch?: string;
   /** Formato del escrito de la firma, para que el lienzo se vea como el papel. */
   formato?: FormatoDelEscrito | null;
+  onAbrirTaller?: (textoActual: string) => void;
 }
 
 /**
@@ -53,7 +54,8 @@ export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
   documentType = '',
   legalBranch = '',
   ocultoEnMovil = false,
-  formato = null
+  formato = null,
+  onAbrirTaller
 }) => {
   const lookup = useActuacionLookup(documentType, legalBranch);
   const actuacion = lookup.actuacion;
@@ -166,6 +168,7 @@ export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
               onSaveDraft={onSaveDraft}
               onOpenSavedDraftsModal={onOpenSavedDraftsModal}
               formato={formato}
+              onAbrirTaller={onAbrirTaller}
             />
           ) : (
             /*

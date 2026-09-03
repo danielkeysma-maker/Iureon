@@ -113,7 +113,9 @@ export const updateDraftController = async (req: Request, res: Response): Promis
     cliente,
     despacho,
     radicado,
-    estado
+    estado,
+    conversacion,
+    anotaciones
   } = req.body;
 
   /*
@@ -138,6 +140,9 @@ export const updateDraftController = async (req: Request, res: Response): Promis
   if (despacho !== undefined) cambios.despacho = despacho;
   if (radicado !== undefined) cambios.radicado = radicado;
   if (estado !== undefined) cambios.estado = estado;
+  // El taller: solo listas; cualquier otra cosa se ignora en vez de guardarse.
+  if (Array.isArray(conversacion)) cambios.conversacion = conversacion;
+  if (Array.isArray(anotaciones)) cambios.anotaciones = anotaciones;
 
   try {
     const updated = await draftsService.updateDraft(draftId, firmId, cambios);

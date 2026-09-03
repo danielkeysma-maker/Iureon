@@ -41,6 +41,13 @@ export interface RevisionGuardada {
   textoOriginal: string | null;
   textoTrabajo: string | null;
   conversacion: TurnoDelTaller[];
+  /** Resaltados y tachados del abogado: [{cita, color}]. */
+  anotaciones: Anotacion[];
+}
+
+export interface Anotacion {
+  cita: string;
+  color: string;
 }
 
 export interface ConsentimientoDeGuardado {
@@ -85,7 +92,8 @@ export const aRevisionGuardada = (row: Record<string, unknown>): RevisionGuardad
   createdAt: String(row.created_at ?? ''),
   textoOriginal: row.texto_original ? String(row.texto_original) : null,
   textoTrabajo: row.texto_trabajo ? String(row.texto_trabajo) : null,
-  conversacion: Array.isArray(row.conversacion) ? (row.conversacion as TurnoDelTaller[]) : []
+  conversacion: Array.isArray(row.conversacion) ? (row.conversacion as TurnoDelTaller[]) : [],
+  anotaciones: Array.isArray(row.anotaciones) ? (row.anotaciones as Anotacion[]) : []
 });
 
 /** Columns for the list: everything but the report bodies, which can be long. */
@@ -159,11 +167,13 @@ export const documentReviewStore = {
 
   /* ─── El taller ──────────────────────────────────────────────────────────── */
 
-  async actualizarTextoTrabajo(firmId: string, id: string, texto: string): Promise<boolean> {
+  async actualizarTextoTrabajo(firmId: string, id: string, texto: string, anotaciones?: Anotacion[]): Promise<boolean> {
     if (!supabase) return false;
+    const cambios: Record<string, unknown> = { texto_trabajo: texto, updated_at: new Date().toISOString() };
+    if (anotaciones) cambios.anotaciones = anotaciones;
     const { error } = await supabase
       .from('document_reviews')
-      .update({ texto_trabajo: texto, updated_at: new Date().toISOString() })
+      .update(cambios)
       .eq('firm_id', firmId)
       .eq('id', id);
     if (error) console.error('[REVIEW] No se pudo guardar el texto de trabajo:', error.message);

@@ -85,6 +85,7 @@ export interface RevisionGuardada {
   textoOriginal: string | null;
   textoTrabajo: string | null;
   conversacion: TurnoDelTaller[];
+  anotaciones: Anotacion[];
 }
 
 export interface EdicionPropuesta {
@@ -96,12 +97,21 @@ export interface TurnoDelTaller {
   rol: 'abogado' | 'revisor';
   texto: string;
   ediciones?: EdicionPropuesta[];
+  /** Pasajes del texto de los que habla la respuesta, para resaltarlos. */
+  referencias?: string[];
   fecha: string;
+}
+
+/** Un resaltado o tachado del abogado, anclado al texto citado. */
+export interface Anotacion {
+  cita: string;
+  color: 'amarillo' | 'verde' | 'azul' | 'rosa' | 'tachado';
 }
 
 export interface RespuestaDelChat {
   respuesta: string;
   ediciones: EdicionPropuesta[];
+  referencias: string[];
   turnos: TurnoDelTaller[];
   guardado: boolean;
   cobradoCop: number;
@@ -139,8 +149,12 @@ export const reviewApi = {
 
   /* ─── El taller ─────────────────────────────────────────────────────────── */
 
-  guardarTexto: (id: string, texto: string) =>
-    httpClient.put<{ guardado: boolean; motivo?: string }>(`/api/agent/reviews/${encodeURIComponent(id)}/texto`, { body: { texto } }),
+  guardarTexto: (id: string, texto: string, anotaciones?: Anotacion[]) =>
+    httpClient.put<{ guardado: boolean; motivo?: string }>(`/api/agent/reviews/${encodeURIComponent(id)}/texto`, { body: { texto, anotaciones } }),
+
+  /** La guía conversa sobre un escrito de Redacción: sin informe ni id. */
+  chatSobreEscrito: (body: { documentType: string; legalBranch?: string; titulo: string; mensaje: string; textoActual: string; historial: TurnoDelTaller[] }) =>
+    httpClient.post<RespuestaDelChat>('/api/agent/escrito/chat', { body }),
 
   chat: (id: string, body: { mensaje: string; textoActual: string; historial: TurnoDelTaller[] }) =>
     httpClient.post<RespuestaDelChat>(`/api/agent/reviews/${encodeURIComponent(id)}/chat`, { body }),

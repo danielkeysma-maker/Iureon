@@ -1,7 +1,7 @@
 /**
  * Guards the quote marking in the review workshop. Run with: npm run check:marcas
  */
-import { aplicarReemplazo, localizarCitas, segmentar } from '../services/marcas';
+import { aplicarReemplazo, localizarCitas, marcasDeAnotaciones, segmentar, segmentarCapas } from '../services/marcas';
 
 let fallos = 0;
 const check = (n: string, ok: boolean, d = ''): void => {
@@ -43,6 +43,20 @@ check('reemplazar una cita que no está devuelve null', aplicarReemplazo(texto, 
 const multi = 'HECHOS\n\nPRIMERO. El accionante\nsolicitó   la autorización\ndel procedimiento.';
 const r5 = localizarCitas(multi, ['El accionante solicitó la autorización del procedimiento']);
 check('una cita que en el texto cruza saltos de línea se localiza', r5.marcas.length === 1 && multi.slice(r5.marcas[0].inicio, r5.marcas[0].fin).startsWith('El accionante\nsolicitó'));
+
+/* ─── Capas superpuestas ─────────────────────────────────────────────────────── */
+const base = 'ABCDEFGHIJ';
+const capas = segmentarCapas(base, [
+  { indice: 0, inicio: 2, fin: 6, capa: 'cita' },
+  { indice: 0, inicio: 4, fin: 8, capa: 'verde' }
+]);
+check('las capas reconstruyen el texto entero', capas.map((s) => s.texto).join('') === base);
+check('el tramo compartido lleva las dos marcas', capas.find((s) => s.texto === 'EF')?.capas.map((c) => c.capa).join('+') === 'cita+verde');
+check('los tramos exclusivos llevan solo la suya', capas.find((s) => s.texto === 'CD')?.capas.length === 1 && capas.find((s) => s.texto === 'GH')?.capas[0].capa === 'verde');
+check('el texto llano no lleva capas', capas.find((s) => s.texto === 'AB')?.capas.length === 0 && capas.find((s) => s.texto === 'IJ')?.capas.length === 0);
+
+const anot = marcasDeAnotaciones(texto, [{ cita: 'HECHOS: el día 3 de marzo', color: 'amarillo' }, { cita: 'no existe', color: 'rosa' }]);
+check('las anotaciones se localizan con su color y las ausentes se omiten', anot.length === 1 && anot[0].capa === 'amarillo' && texto.slice(anot[0].inicio, anot[0].fin) === 'HECHOS: el día 3 de marzo');
 
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);
 process.exitCode = fallos === 0 ? 0 : 1;

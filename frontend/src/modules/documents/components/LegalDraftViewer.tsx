@@ -1,6 +1,6 @@
 import { estiloDelLienzo, type FormatoDelEscrito } from '../formatoEnPantalla';
 import React, { useEffect, useMemo, useState } from 'react';
-import { BrainCircuit, Check, Eye, FolderOpen, Pencil, Save, Scale, Sparkles } from 'lucide-react';
+import { BrainCircuit, Check, ClipboardCheck, Eye, FolderOpen, Pencil, Save, Scale, Sparkles } from 'lucide-react';
 import DOMPurify from 'dompurify';
 import { JargonSuggestionModal } from './JargonSuggestionModal';
 import { DraftProvenanceBar } from './DraftProvenanceBar';
@@ -20,6 +20,8 @@ interface LegalDraftViewerProps {
   onOpenSavedDraftsModal?: () => void;
   /** Tipografía, tamaño e interlineado de la firma (Membrete · Formato del escrito). Sin él, la serif por defecto. */
   formato?: FormatoDelEscrito | null;
+  /** Abre el taller sobre este escrito: marcas, resaltador y chat con la guía. Recibe el texto tal como está en el lienzo. */
+  onAbrirTaller?: (textoActual: string) => void;
 }
 
 /**
@@ -47,7 +49,8 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
   isFocusMode,
   onSaveDraft,
   onOpenSavedDraftsModal,
-  formato
+  formato,
+  onAbrirTaller
 }) => {
   const [editableText, setEditableText] = useState(draft.legalText);
   const [selectedText, setSelectedText] = useState('');
@@ -167,6 +170,13 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
             <Sparkles className="h-3 w-3 text-ink-400" />
             Sugerir jerga
           </button>
+
+          {onAbrirTaller && (
+            <button onClick={() => onAbrirTaller(editableText)} className="btn-secondary btn-sm" title="Resaltar, tachar y conversar con la guía sobre este escrito">
+              <ClipboardCheck className="h-3 w-3" />
+              Taller
+            </button>
+          )}
 
           <button onClick={handleSaveAndTeachStyle} className="btn-neutral btn-sm">
             {isStyleSaved ? (

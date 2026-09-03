@@ -19,6 +19,8 @@ interface SavedDraftRow {
   excepciones_formuladas?: string[];
   /** La ficha con la que se redactó, congelada. Ausente en filas anteriores. */
   procedencia?: unknown;
+  conversacion?: unknown;
+  anotaciones?: unknown;
   tokens_consumed?: number;
   saved_at: string;
   updated_at?: string;
@@ -78,6 +80,8 @@ const toEntry = (row: SavedDraftRow): SavedDraftEntry => ({
    */
   venceEl: row.vence_el ?? null,
   legalBranch: row.legal_branch ?? null,
+  conversacion: Array.isArray(row.conversacion) ? (row.conversacion as unknown[]) : [],
+  anotaciones: Array.isArray(row.anotaciones) ? (row.anotaciones as unknown[]) : [],
   cliente: row.cliente ?? null,
   despacho: row.despacho ?? null,
   radicado: row.radicado ?? null,
@@ -177,6 +181,9 @@ export const draftsApi = {
       radicado?: string | null;
       legalBranch?: string | null;
       estado?: EstadoBorrador;
+      legalText?: string;
+      conversacion?: unknown[];
+      anotaciones?: unknown[];
     }
   ): Promise<boolean> {
     try {

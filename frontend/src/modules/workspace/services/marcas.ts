@@ -115,3 +115,52 @@ export const aplicarReemplazo = (texto: string, cita: string, reemplazo: string)
   const m = marcas[0];
   return texto.slice(0, m.inicio) + reemplazo + texto.slice(m.fin);
 };
+
+/* ─── CAPAS: citas del revisor, resaltados del abogado y referencias a la vez ─── */
+
+export interface MarcaEnCapa extends Marca {
+  /** 'cita' (informe), 'referencia' (última respuesta), o un color del resaltador: amarillo|verde|azul|rosa|tachado. */
+  capa: string;
+}
+
+export interface SegmentoEnCapas {
+  texto: string;
+  /** Las marcas que cubren este tramo, en el orden en que se pasaron. Vacío = texto llano. */
+  capas: MarcaEnCapa[];
+}
+
+/**
+ * Parte el texto en tramos donde el conjunto de marcas que lo cubren es
+ * constante. Las marcas pueden solaparse entre capas (un pasaje citado por el
+ * revisor y resaltado en verde por el abogado a la vez): cada tramo lleva
+ * todas las que lo cubren y la pantalla las pinta superpuestas. Reconstruye el
+ * texto entero; nunca pierde un carácter.
+ */
+export const segmentarCapas = (texto: string, marcas: MarcaEnCapa[]): SegmentoEnCapas[] => {
+  const cortes = new Set<number>([0, texto.length]);
+  for (const m of marcas) {
+    if (m.inicio < m.fin) {
+      cortes.add(Math.max(0, m.inicio));
+      cortes.add(Math.min(texto.length, m.fin));
+    }
+  }
+  const puntos = [...cortes].sort((a, b) => a - b);
+  const salida: SegmentoEnCapas[] = [];
+  for (let k = 0; k < puntos.length - 1; k++) {
+    const ini = puntos[k];
+    const fin = puntos[k + 1];
+    if (fin <= ini) continue;
+    salida.push({ texto: texto.slice(ini, fin), capas: marcas.filter((m) => m.inicio <= ini && m.fin >= fin && m.inicio < m.fin) });
+  }
+  return salida;
+};
+
+/** Localiza cada anotación (cita + color) y la devuelve como marca de su capa. Las que no están, se omiten. */
+export const marcasDeAnotaciones = (texto: string, anotaciones: { cita: string; color: string }[]): MarcaEnCapa[] => {
+  const salida: MarcaEnCapa[] = [];
+  anotaciones.forEach((a, indice) => {
+    const { marcas } = localizarCitas(texto, [a.cita]);
+    if (marcas.length) salida.push({ ...marcas[0], indice, capa: a.color });
+  });
+  return salida;
+};

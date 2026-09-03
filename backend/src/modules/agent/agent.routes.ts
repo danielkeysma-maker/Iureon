@@ -11,6 +11,7 @@ import {
   saveWorkingTextController,
   setStorageConsentController
 } from './review/documentReview.controller';
+import { escritoChatController } from './review/escritoChat.controller';
 import {
   getStyleProfileController,
   saveLawyerEditsController,
@@ -34,6 +35,8 @@ router.delete('/agent/reviews/:id', deleteReviewController as any);
 router.put('/agent/reviews/:id/texto', saveWorkingTextController as any);
 router.post('/agent/reviews/:id/chat', reviewChatController as any);
 router.post('/agent/reviews/:id/rerevisar', reReviewController as any);
+/* La guia conversa sobre un escrito generado en Redaccion: sin informe ni id; el navegador manda texto e historial. */
+router.post('/agent/escrito/chat', escritoChatController as any);
 
 // Aprendizaje de Jerga y Sugerencia Inteligente de Vocabulario
 router.get('/agent/style-profile', getStyleProfileController);

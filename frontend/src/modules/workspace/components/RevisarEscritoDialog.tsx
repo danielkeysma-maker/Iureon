@@ -97,7 +97,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
   const [exportando, setExportando] = React.useState<'pdf' | 'word' | null>(null);
   const [confirmacion, setConfirmacion] = React.useState<Confirmacion | null>(null);
   /** El texto del escrito y la conversacion de la revision en pantalla, para abrir el taller. */
-  const [paraElTaller, setParaElTaller] = React.useState<{ texto: string | null; conversacion: DatosDelTaller['conversacion']; guardaTexto: boolean; revisionId: string | null }>({ texto: null, conversacion: [], guardaTexto: false, revisionId: null });
+  const [paraElTaller, setParaElTaller] = React.useState<{ texto: string | null; conversacion: DatosDelTaller['conversacion']; anotaciones: NonNullable<DatosDelTaller['anotaciones']>; guardaTexto: boolean; revisionId: string | null }>({ texto: null, conversacion: [], anotaciones: [], guardaTexto: false, revisionId: null });
 
   const cargarAnteriores = React.useCallback(() => {
     reviewApi
@@ -122,7 +122,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
         cliente: completa.cliente,
         revisadoPor: completa.userEmail
       });
-      setParaElTaller({ texto: completa.textoTrabajo ?? completa.textoOriginal, conversacion: completa.conversacion, guardaTexto: Boolean(completa.textoOriginal), revisionId: completa.id });
+      setParaElTaller({ texto: completa.textoTrabajo ?? completa.textoOriginal, conversacion: completa.conversacion, anotaciones: completa.anotaciones ?? [], guardaTexto: Boolean(completa.textoOriginal), revisionId: completa.id });
       setRespuesta({
         id: completa.id,
         guardada: true,
@@ -201,7 +201,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
         revisadoPor: ''
       });
       const r = await reviewApi.revisar({ documentType, legalBranch, pregunta, cliente: cliente.trim(), ...cuerpo });
-      setParaElTaller({ texto: r.texto ?? null, conversacion: [], guardaTexto: Boolean(r.guardaTexto), revisionId: r.id ?? null });
+      setParaElTaller({ texto: r.texto ?? null, conversacion: [], anotaciones: [], guardaTexto: Boolean(r.guardaTexto), revisionId: r.id ?? null });
       setRespuesta(r);
       onSaldoCambiado?.();
       cargarAnteriores();
@@ -325,7 +325,8 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
                     informeLibre: respuesta.informeLibre,
                     conFicha: respuesta.conFicha,
                     guardaTexto: paraElTaller.guardaTexto,
-                    conversacion: paraElTaller.conversacion
+                    conversacion: paraElTaller.conversacion,
+                    anotaciones: paraElTaller.anotaciones
                   });
                   onCerrar();
                 }}

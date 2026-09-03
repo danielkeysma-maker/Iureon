@@ -28,6 +28,8 @@ export interface TurnoDelTaller {
   texto: string;
   /** Solo en turnos del revisor: ediciones que la pantalla puede aplicar. */
   ediciones?: EdicionPropuesta[];
+  /** Solo en turnos del revisor: pasajes del texto de los que habla. */
+  referencias?: string[];
   fecha: string;
 }
 
@@ -40,6 +42,8 @@ export interface EdicionPropuesta {
 export interface RespuestaDelTaller {
   respuesta: string;
   ediciones: EdicionPropuesta[];
+  /** Pasajes del texto a los que la respuesta se refiere, para resaltarlos. */
+  referencias: string[];
 }
 
 /** Turnos que viajan al modelo. Los más viejos se resumen en una línea; el texto actual siempre va completo. */
@@ -56,9 +60,10 @@ QUÉ NO HACES: no reescribes el escrito entero salvo que te lo pidan expresament
 RESPONDE ÚNICAMENTE CON UN OBJETO JSON, sin texto antes ni después:
 {
   "respuesta": "tu respuesta al abogado, en prosa clara; puedes usar saltos de línea",
-  "ediciones": [{"cita": "pasaje LITERAL del texto actual que propones cambiar (5 a 60 palabras, tal cual está)", "reemplazo": "el texto nuevo, listo para pegar"}]
+  "ediciones": [{"cita": "pasaje LITERAL del texto actual que propones cambiar (5 a 60 palabras, tal cual está)", "reemplazo": "el texto nuevo, listo para pegar"}],
+  "referencias": ["pasaje LITERAL del texto actual al que tu respuesta se refiere, para que la pantalla lo resalte; 3 a 40 palabras cada uno"]
 }
-"ediciones" va vacío si no propones cambiar ningún pasaje concreto. La cita debe copiarse exacta del texto actual para que se pueda localizar; si el pasaje no existe todavía (por ejemplo una sección que falta), no lo pongas como edición: descríbelo en la respuesta y ofrece la redacción ahí. Máximo cuatro ediciones por turno. Español jurídico colombiano, neutro y preciso.`;
+"referencias" son los lugares del texto de los que hablas en la respuesta —el párrafo que comentas, la frase que elogias, la sección que falta si existe un encabezado—, copiados exactos; máximo seis; vacío si tu respuesta no se refiere a ningún pasaje concreto. "ediciones" va vacío si no propones cambiar ningún pasaje concreto. La cita debe copiarse exacta del texto actual para que se pueda localizar; si el pasaje no existe todavía (por ejemplo una sección que falta), no lo pongas como edición: descríbelo en la respuesta y ofrece la redacción ahí. Máximo cuatro ediciones por turno. Español jurídico colombiano, neutro y preciso.`;
 
 const resumirInforme = (i: InformeDeRevision): string =>
   [
@@ -137,11 +142,12 @@ export const parsearRespuestaDelTaller = (crudo: string): RespuestaDelTaller => 
             })
             .filter((e) => e.cita && e.reemplazo)
         : [];
+      const referencias = Array.isArray(o.referencias) ? (o.referencias as unknown[]).map(cadena).filter((r) => r.length >= 4).slice(0, 6) : [];
       const respuesta = cadena(o.respuesta);
-      if (respuesta) return { respuesta, ediciones };
+      if (respuesta) return { respuesta, ediciones, referencias };
     } catch {
       /* cae a la prosa */
     }
   }
-  return { respuesta: sinCerca, ediciones: [] };
+  return { respuesta: sinCerca, ediciones: [], referencias: [] };
 };

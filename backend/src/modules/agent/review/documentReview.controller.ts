@@ -70,11 +70,11 @@ const MAX_BYTES_ALMACEN = 15 * 1024 * 1024;
  * la reserva y lo diga.
  */
 const MAX_TOKENS_INFORME = 3_000;
-const LIMITE_LLAMADA_MS = 50_000;
+export const LIMITE_LLAMADA_MS = 50_000;
 
-class TiempoAgotado extends Error {}
+export class TiempoAgotado extends Error {}
 
-const conLimite = <T>(promesa: Promise<T>, ms: number): Promise<T> =>
+export const conLimite = <T>(promesa: Promise<T>, ms: number): Promise<T> =>
   new Promise<T>((resolve, reject) => {
     const t = setTimeout(() => reject(new TiempoAgotado('la revisión tardó más de lo que la plataforma permite')), ms);
     promesa.then(
@@ -402,7 +402,16 @@ export const saveWorkingTextController = async (req: Request, res: Response): Pr
     res.json({ success: true, guardado: false, motivo: 'La firma no ha autorizado conservar escritos: el texto vive solo en esta sesión.' });
     return;
   }
-  const ok = await documentReviewStore.actualizarTextoTrabajo(firmId, String(req.params.id), texto);
+  const anotaciones = Array.isArray(req.body.anotaciones)
+    ? (req.body.anotaciones as unknown[])
+        .map((a) => {
+          const o = (a ?? {}) as Record<string, unknown>;
+          return { cita: String(o.cita ?? '').slice(0, 2000), color: String(o.color ?? '') };
+        })
+        .filter((a) => a.cita && /^(amarillo|verde|azul|rosa|tachado)$/.test(a.color))
+        .slice(0, 500)
+    : undefined;
+  const ok = await documentReviewStore.actualizarTextoTrabajo(firmId, String(req.params.id), texto, anotaciones);
   res.json({ success: true, guardado: ok });
 };
 
@@ -485,7 +494,7 @@ export const reviewChatController = async (req: Request, res: Response): Promise
     const ahora = new Date().toISOString();
     const turnos: TurnoDelTaller[] = [
       { rol: 'abogado', texto: mensaje, fecha: ahora },
-      { rol: 'revisor', texto: respuesta.respuesta, ediciones: respuesta.ediciones, fecha: ahora }
+      { rol: 'revisor', texto: respuesta.respuesta, ediciones: respuesta.ediciones, referencias: respuesta.referencias, fecha: ahora }
     ];
     const consentimiento = await documentReviewStore.consentimiento(firmId);
     const guardado = consentimiento.guarda ? await documentReviewStore.agregarTurnos(firmId, id, turnos, texto.texto) : false;

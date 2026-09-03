@@ -19,6 +19,9 @@ import { TenantProvider } from './modules/tenant/TenantContext';
 import { AgentPanelLeft } from './modules/workspace/components/AgentPanelLeft';
 import { TallerDeRevision, type DatosDelTaller } from './modules/workspace/components/TallerDeRevision';
 import { RevisionesView } from './modules/workspace/components/RevisionesView';
+import { draftsApi } from './modules/documents/services/drafts.api';
+import { TallerDeBorrador, type DatosDelBorrador } from './modules/workspace/components/TallerDeBorrador';
+import type { Anotacion, TurnoDelTaller } from './modules/workspace/services/review.api';
 import { DocumentCanvasRight } from './modules/workspace/components/DocumentCanvasRight';
 import { SearchView } from './modules/search/components/SearchView';
 import { SearchMobileView } from './modules/search/components/SearchMobileView';
@@ -204,6 +207,8 @@ export function App() {
   const [manualArticulo, setManualArticulo] = useState<string | undefined>(undefined);
   /* El taller de revision abierto: la revision y su texto. null = la lista de revisiones. */
   const [tallerActivo, setTallerActivo] = useState<DatosDelTaller | null>(null);
+  /* El taller sobre el borrador de Redaccion: mismo taller, sin informe, guardado con el borrador. */
+  const [tallerBorrador, setTallerBorrador] = useState<DatosDelBorrador | null>(null);
 
   const setMainView = (view: MainView): void => {
     setMainViewState(view);
@@ -826,6 +831,20 @@ export function App() {
                 onSaveDraft={handleSaveDraft}
                 onOpenSavedDraftsModal={() => setIsSavedDraftsModalOpen(true)}
                 formato={firmBranding}
+                onAbrirTaller={(textoActual) => {
+                  if (!workflow.generatedDraft) return;
+                  const entrada = savedDrafts.find((d) => d.id === loadedDraftId) ?? null;
+                  setTallerBorrador({
+                    titulo: workflow.generatedDraft.title,
+                    documentType: workflow.documentType,
+                    legalBranch: workflow.legalBranch,
+                    texto: textoActual,
+                    conversacion: (entrada?.conversacion as TurnoDelTaller[] | undefined) ?? [],
+                    anotaciones: (entrada?.anotaciones as Anotacion[] | undefined) ?? [],
+                    draftId: loadedDraftId
+                  });
+                  setMainView('taller');
+                }}
               />
               </div>
             </div>
@@ -1044,7 +1063,46 @@ export function App() {
             </div>
           )}
           {mainView === 'ajustes' && <SettingsView />}
+          {mainView === 'taller' && tallerBorrador && (
+            <TallerDeBorrador
+              key={tallerBorrador.draftId ?? 'borrador-sesion'}
+              datos={tallerBorrador}
+              precioConsultaCop={300}
+              precioRevisionCop={2000}
+              onGuardar={async (texto, conversacion, anotaciones) => {
+                if (!tallerBorrador.draftId) return false;
+                const ok = await draftsApi.patch(tallerBorrador.draftId, { legalText: texto, conversacion, anotaciones });
+                if (ok && workflow.generatedDraft) workflow.setGeneratedDraft({ ...workflow.generatedDraft, legalText: texto });
+                return ok;
+              }}
+              onGuardarBorradorNuevo={async () => {
+                if (!workflow.generatedDraft) return;
+                await saveDraft({ ...workflow.generatedDraft, legalText: tallerBorrador.texto });
+                /*
+                 * saveDraft recarga la lista; el id nuevo es el mas reciente. Se toma
+                 * de ahi y el taller pasa a guardar con el borrador desde ese momento.
+                 */
+                const lista = await draftsApi.list();
+                const nuevo = lista?.find((d) => d.draft.title === workflow.generatedDraft?.title) ?? lista?.[0] ?? null;
+                if (nuevo) {
+                  setLoadedDraftId(nuevo.id);
+                  setTallerBorrador((t) => (t ? { ...t, draftId: nuevo.id } : t));
+                }
+              }}
+              onCerrar={(textoFinal) => {
+                if (workflow.generatedDraft) workflow.setGeneratedDraft({ ...workflow.generatedDraft, legalText: textoFinal });
+                setTallerBorrador(null);
+                setMainView('workspace');
+              }}
+              onSaldoCambiado={() => void refreshBalance()}
+              onExportarTexto={(formato, titulo, texto) => {
+                if (formato === 'word') DocumentExportService.exportToWordDocx(titulo, texto, marcaParaExportar(), opcionesDeExportacion());
+                else void DocumentExportService.exportToPdf(titulo, texto, marcaParaExportar(), opcionesDeExportacion());
+              }}
+            />
+          )}
           {mainView === 'taller' &&
+            !tallerBorrador &&
             (tallerActivo ? (
               <TallerDeRevision
                 key={tallerActivo.revisionId ?? 'sesion'}
