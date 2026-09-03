@@ -148,6 +148,19 @@ export const decodeDocument = async (
       // pdf.js builds a DOMMatrix at load; in Node it comes from an OPTIONAL native
       // package that production lacks. Ours goes in first (see domMatrixPolyfill.ts).
       asegurarDOMMatrix();
+      /*
+       * pdf.js carga su «worker» con un import dinamico que el empaquetador de
+       * Vercel no rastrea, asi que el archivo no viajaba con la funcion y la
+       * primera revision en produccion murio con «Cannot find module
+       * pdf.worker.mjs». Resolverlo aqui con una ruta literal lo pone en el
+       * rastro del empaquetador (y vercel.json lo incluye ademas por glob);
+       * no lo ejecuta. Si no existe, que falle pdf.js con su propio mensaje.
+       */
+      try {
+        require.resolve('pdfjs-dist/legacy/build/pdf.worker.mjs');
+      } catch {
+        /* pdf-parse dira que no encuentra el worker */
+      }
       const { PDFParse } = await import('pdf-parse');
       const parser = new PDFParse({ data: buffer });
       try {
