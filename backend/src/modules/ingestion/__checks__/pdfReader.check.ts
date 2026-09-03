@@ -10,6 +10,9 @@
  * but our own polyfill. No network, no native binary.
  */
 import { asegurarDOMMatrix, DOMMatrixMinima } from '../domMatrixPolyfill';
+// Static import is safe: documentFetch loads pdf.js lazily, inside decodeDocument,
+// so the global can still be removed before pdf.js ever runs.
+import { decodeDocument } from '../documentFetch';
 
 let fallos = 0;
 const check = (n: string, ok: boolean, d = ''): void => {
@@ -52,8 +55,6 @@ pdf += `trailer\n<< /Size ${objetos.length + 1} /Root 1 0 R >>\nstartxref\n${xre
   check('sin la global, el polyfill se instala', asegurarDOMMatrix() === true);
   check('y una segunda vez no hace nada', asegurarDOMMatrix() === false);
 
-  // Imported AFTER the global is set, as documentFetch does on its own.
-  const { decodeDocument } = await import('../documentFetch');
   const r = await decodeDocument(Buffer.from(pdf, 'latin1'), 'application/pdf', 20);
   check('un PDF se lee con el polyfill solo, sin @napi-rs/canvas', r.ok === true, r.ok ? '' : r.reason);
   check('y el texto es el del documento', r.ok && /HECHOS PRIMERO El accionante/.test(r.text), r.ok ? r.text.slice(0, 80) : '');
