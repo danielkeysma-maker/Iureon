@@ -290,13 +290,15 @@ export function App() {
   const aplicarMarca = (b: FirmBranding) => {
     setMarcaDeFirma(b);
     setMarcaActual(b);
+    // Tal cual: un campo vacio en Membrete es vacio, no «lo que hubiera antes».
+    // Heredar del anterior es como el relleno de maqueta llego a imprimirse.
     setFirmBranding((prev) => ({
       ...prev,
-      firmName: b.firmName || prev.firmName,
-      firmNit: b.firmNit || prev.firmNit,
-      firmAddress: b.firmAddress || prev.firmAddress,
-      firmPhone: b.firmPhone || prev.firmPhone,
-      firmEmail: b.firmEmail || prev.firmEmail,
+      firmName: b.firmName ?? '',
+      firmNit: b.firmNit ?? '',
+      firmAddress: b.firmAddress ?? '',
+      firmPhone: b.firmPhone ?? '',
+      firmEmail: b.firmEmail ?? '',
       fontFamily: b.fontFamily as FirmBrandingConfig['fontFamily'],
       logoUrl: b.logoUrl ?? undefined,
       // El documento exportado obedece a la marca: tamano e interlineado ya no
@@ -459,12 +461,23 @@ export function App() {
         : undefined
   });
 
+  /*
+   * SIN MEMBRETE CONFIGURADO, EL ESCRITO LLEVA AL MENOS EL NOMBRE DE LA FIRMA
+   * y su NIT si lo tiene: son datos ciertos que ya conocemos. Nada mas se
+   * inventa; lo demas queda vacio hasta que la firma lo escriba en Membrete.
+   */
+  const marcaParaExportar = (): FirmBrandingConfig => ({
+    ...firmBranding,
+    firmName: firmBranding.firmName || activeFirm.name,
+    firmNit: firmBranding.firmNit || activeFirm.nit || ''
+  });
+
   const handleExportWord = (opts?: { conMembrete: boolean; conFuentes: boolean }) => {
     if (workflow.generatedDraft) {
       DocumentExportService.exportToWordDocx(
         workflow.generatedDraft.title,
         workflow.generatedDraft.legalText,
-        firmBranding,
+        marcaParaExportar(),
         opcionesDeExportacion(opts)
       );
     }
@@ -475,7 +488,7 @@ export function App() {
       DocumentExportService.exportToPdf(
         workflow.generatedDraft.title,
         workflow.generatedDraft.legalText,
-        firmBranding,
+        marcaParaExportar(),
         opcionesDeExportacion(opts)
       );
     }

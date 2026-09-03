@@ -231,7 +231,7 @@ const A_EXPORTAR: ManualArticle = {
     {
       kind: 'parrafo',
       texto:
-        'Los dos formatos salen con el membrete, la tipografía, el interlineado y la numeración de hechos y de títulos que su firma tenga configurados, y el PDF numera las páginas con el total real. El documento no lleva ninguna marca de Iureon: lo que se radica es de su firma.'
+        'Los dos formatos salen con el membrete, la tipografía, el interlineado y la numeración de hechos y de títulos que su firma tenga configurados, y el PDF numera las páginas con el total real. El membrete imprime solo lo que su firma escribió en Membrete: sin NIT no aparece la palabra NIT, sin correo no hay correo. Si no ha configurado nada, el escrito lleva únicamente el nombre de la firma y su NIT si lo tiene. El documento no lleva ninguna marca de Iureon: lo que se radica es de su firma.'
     },
     {
       kind: 'aviso',

@@ -3,6 +3,7 @@ import { saveAs } from 'file-saver';
 import { jsPDF } from 'jspdf';
 import { drawRuns } from './pdfTextLayout';
 import { registrarFuenteDelEscrito } from './pdfFonts';
+import { lineasDeMembrete } from './membrete';
 
 export interface FirmBrandingConfig {
   firmName: string;
@@ -21,13 +22,20 @@ export interface FirmBrandingConfig {
   customSampleTemplate?: string;   // Modelo o minuta de referencia de la firma
 }
 
+/*
+ * SIN RELLENO. Traía «REPÚBLICA DE COLOMBIA - RAMA JUDICIAL», «SIN NIT FISCAL
+ * REGISTRADO», «Dirección Corporativa» y «notificaciones@tufirma.co», y todo
+ * eso se IMPRIMÍA en el escrito de cualquier firma que no hubiera llenado
+ * Membrete: la tutela de un litigante salía con la cabecera de un juzgado en
+ * el pie. Lo que no está configurado no se imprime (ver membrete.ts).
+ */
 export const DEFAULT_FIRM_BRANDING: FirmBrandingConfig = {
-  firmName: 'REPÚBLICA DE COLOMBIA - RAMA JUDICIAL',
-  firmNit: 'SIN NIT FISCAL REGISTRADO',
-  firmAddress: 'Dirección Corporativa',
-  firmPhone: 'Teléfono Notificaciones',
-  firmEmail: 'notificaciones@tufirma.co',
-  fontFamily: 'Inter',
+  firmName: '',
+  firmNit: '',
+  firmAddress: '',
+  firmPhone: '',
+  firmEmail: '',
+  fontFamily: 'Times New Roman',
   primaryColorHex: '#1E293B',
   customFormatInstruction: '1. Señores Juez / Tribunal\n2. Referencia y Partes\n3. Hechos Cronológicos\n4. Pretensiones\n5. Fundamentos de Derecho y Precedente\n6. Pruebas\n7. Notificaciones',
   customSampleTemplate: ''
@@ -143,6 +151,7 @@ export class DocumentExportService {
        * en 240avos de linea (1,5 = 360). Antes estaban quemados en 11pt/1,5 y
        * el ajuste de la marca era decorativo en el documento exportado.
        */
+      const membrete = lineasDeMembrete(branding);
       const tamanoBase = (branding.fontSizePt ?? 12) * 2;
       const lineaDocx = Math.round(240 * Number(branding.lineSpacing ?? '1.5'));
 
@@ -205,7 +214,7 @@ export class DocumentExportService {
            * numeracion: "Pagina 2 de 6" no es identidad de la firma, es lo que
            * evita que un juzgado reciba hojas sueltas sin orden.
            */
-          headers: opciones.conMembrete
+          headers: opciones.conMembrete && membrete.encabezado
             ? {
                 default: new DocxHeader({
               children: [
@@ -213,18 +222,22 @@ export class DocumentExportService {
                   alignment: AlignmentType.RIGHT,
                   children: [
                     new TextRun({
-                      text: branding.firmName,
+                      text: membrete.encabezado,
                       bold: true,
                       size: 18,
                       font: 'Calibri',
                       color: '475569'
                     }),
-                    new TextRun({
-                      text: ` | ${branding.firmNit}`,
-                      size: 16,
-                      font: 'Calibri',
-                      color: '64748B'
-                    })
+                    ...(branding.firmNit
+                      ? [
+                          new TextRun({
+                            text: ` | NIT ${branding.firmNit}`,
+                            size: 16,
+                            font: 'Calibri',
+                            color: '64748B'
+                          })
+                        ]
+                      : [])
                   ]
                 })
               ]
@@ -237,10 +250,10 @@ export class DocumentExportService {
                 new Paragraph({
                   alignment: AlignmentType.CENTER,
                   children: [
-                    ...(opciones.conMembrete
+                    ...(opciones.conMembrete && membrete.pieContacto
                       ? [
                           new TextRun({
-                            text: `${branding.firmAddress} - ${branding.firmPhone} - `,
+                            text: `${membrete.pieContacto} · `,
                             size: 14,
                             color: '64748B'
                           })
@@ -292,6 +305,7 @@ export class DocumentExportService {
     branding: FirmBrandingConfig = DEFAULT_FIRM_BRANDING,
     opciones: OpcionesDeExportacion = OPCIONES_POR_DEFECTO
   ): Promise<void> {
+    const membrete = lineasDeMembrete(branding);
     const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'letter' });
     /*
      * LA LETRA DE LA FIRMA, no siempre Jakarta. El Word obedecia a Membrete y el
@@ -371,23 +385,21 @@ export class DocumentExportService {
         }
       }
 
-      doc.setFont(F, 'bold');
-      doc.setFontSize(pt(11.5));
-      doc.setTextColor(...TINTA);
-      doc.setCharSpace(pt(11.5) * 0.02);
-      doc.text((branding.firmName || '').toUpperCase(), xTexto, y);
-      doc.setCharSpace(0);
+      if (membrete.encabezado) {
+        doc.setFont(F, 'bold');
+        doc.setFontSize(pt(11.5));
+        doc.setTextColor(...TINTA);
+        doc.setCharSpace(pt(11.5) * 0.02);
+        doc.text(membrete.encabezado, xTexto, y);
+        doc.setCharSpace(0);
+      }
 
-      doc.setFont(F, 'normal');
-      doc.setFontSize(pt(9.5));
-      doc.setTextColor(...GRIS);
-      doc.text(
-        [branding.firmNit && `NIT ${branding.firmNit}`, branding.firmAddress]
-          .filter(Boolean)
-          .join(' · '),
-        xTexto,
-        y + mm(15)
-      );
+      if (membrete.identificacion) {
+        doc.setFont(F, 'normal');
+        doc.setFontSize(pt(9.5));
+        doc.setTextColor(...GRIS);
+        doc.text(membrete.identificacion, xTexto, y + mm(15));
+      }
 
       /*
        * La fecha del documento a la derecha, como el artboard. La ciudad que
@@ -579,7 +591,7 @@ export class DocumentExportService {
      * paginación REAL a la derecha, como el artboard. Sin marca de Iureon.
      */
     const totalPaginas = doc.getNumberOfPages();
-    const pieIzquierda = [branding.firmName, branding.firmEmail].filter(Boolean).join(' · ');
+    const pieIzquierda = membrete.pieIzquierda;
 
     for (let pagina = 1; pagina <= totalPaginas; pagina += 1) {
       doc.setPage(pagina);
