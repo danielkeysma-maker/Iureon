@@ -20,6 +20,7 @@ import {
   parsearInforme,
   prepararTexto
 } from './documentReview';
+import { documentReviewStore } from './documentReview.store';
 
 /**
  * POST /api/agent/review-document
@@ -274,8 +275,32 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
       ipAddress: (req.headers['x-forwarded-for'] as string | undefined)?.split(',')[0]?.trim() ?? req.ip ?? ''
     });
 
+    /*
+     * EL INFORME SE GUARDA SOLO, sin boton. Un escrito que costo saldo no
+     * deberia depender de un clic para conservarse — los borradores ensenaron
+     * eso —, y aqui menos: el abogado vuelve al informe dias despues, cuando
+     * corrige. Se guarda el informe y el nombre del archivo; el texto del
+     * escrito no. Si la tabla no existe todavia, la respuesta lo dice.
+     */
+    const guardadaId = await documentReviewStore.guardar({
+      firmId,
+      userEmail,
+      documentType,
+      legalBranch: legalBranch ?? null,
+      fileName,
+      pregunta: pregunta.trim(),
+      caracteres: preparado.caracteres,
+      truncado: preparado.truncado,
+      conFicha: guidance !== null,
+      informe,
+      informeLibre: informe ? null : llamada.text,
+      cobradoCop: cobro.charged
+    });
+
     res.json({
       success: true,
+      id: guardadaId,
+      guardada: guardadaId !== null,
       informe,
       informeLibre: informe ? null : llamada.text,
       conFicha: guidance !== null,
@@ -301,3 +326,24 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
 };
 
 export const REVIEW_PRICE_COP = PRICE_COP.REVISION;
+
+/** GET /api/agent/reviews — the firm's saved reports, newest first, without bodies. */
+export const listReviewsController = async (req: Request, res: Response): Promise<void> => {
+  res.json({ success: true, revisiones: await documentReviewStore.listar(req.firmId as string) });
+};
+
+/** GET /api/agent/reviews/:id — one report, complete. */
+export const getReviewController = async (req: Request, res: Response): Promise<void> => {
+  const revision = await documentReviewStore.obtener(req.firmId as string, String(req.params.id));
+  if (!revision) {
+    res.status(404).json({ success: false, error: 'REVIEW_NOT_FOUND', message: 'Esa revisión no existe o no es de su firma.' });
+    return;
+  }
+  res.json({ success: true, revision });
+};
+
+/** DELETE /api/agent/reviews/:id */
+export const deleteReviewController = async (req: Request, res: Response): Promise<void> => {
+  const ok = await documentReviewStore.eliminar(req.firmId as string, String(req.params.id));
+  res.status(ok ? 200 : 404).json({ success: ok });
+};

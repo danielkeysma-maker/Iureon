@@ -464,9 +464,9 @@ const A_REVISAR: ManualArticle = {
     },
     {
       kind: 'nota',
-      titulo: 'El documento no se guarda',
+      titulo: 'El informe se guarda; el escrito no',
       texto:
-        'Ni el archivo, ni el texto, ni el informe quedan en el servidor: se leen, se revisan y se descartan en la misma petición. Si quiere conservar el informe, use «Copiar informe». En la auditoría de la firma queda que se revisó un escrito de tal actuación, nunca su contenido.'
+        'El informe queda guardado para su firma y aparece en «Revisiones anteriores» dentro del mismo diálogo, con el nombre del archivo, la actuación, la fecha y quién lo pidió; ábralo cuando vuelva a corregir el escrito o elimínelo. El escrito revisado no se conserva: se lee, se revisa y se descarta en la misma petición. En la auditoría de la firma queda que se revisó un escrito de tal actuación, nunca su contenido.'
     },
     {
       kind: 'aviso',

@@ -24,6 +24,9 @@ export interface InformeDeRevision {
 }
 
 export interface RespuestaDeRevision {
+  /** Id del informe guardado; null si no se pudo guardar. */
+  id?: string | null;
+  guardada?: boolean;
   informe: InformeDeRevision | null;
   /** Cuando el revisor no devolvió JSON legible: su texto tal cual. */
   informeLibre: string | null;
@@ -47,9 +50,33 @@ export interface PeticionDeRevision {
   texto?: string;
 }
 
+export interface RevisionGuardada {
+  id: string;
+  documentType: string;
+  legalBranch: string | null;
+  fileName: string;
+  pregunta: string;
+  caracteres: number;
+  truncado: boolean;
+  conFicha: boolean;
+  informe: InformeDeRevision | null;
+  informeLibre: string | null;
+  cobradoCop: number;
+  userEmail: string;
+  createdAt: string;
+}
+
 export const reviewApi = {
   revisar: (body: PeticionDeRevision) =>
-    httpClient.post<RespuestaDeRevision>('/api/agent/review-document', { body })
+    httpClient.post<RespuestaDeRevision>('/api/agent/review-document', { body }),
+
+  /** Los informes guardados de la firma, sin cuerpos. */
+  listar: () => httpClient.get<{ revisiones: RevisionGuardada[] }>('/api/agent/reviews').then((r) => r.revisiones),
+
+  obtener: (id: string) =>
+    httpClient.get<{ revision: RevisionGuardada }>(`/api/agent/reviews/${encodeURIComponent(id)}`).then((r) => r.revision),
+
+  eliminar: (id: string) => httpClient.delete<{ success: boolean }>(`/api/agent/reviews/${encodeURIComponent(id)}`)
 };
 
 /** El archivo como base64 puro, sin el prefijo data:. */

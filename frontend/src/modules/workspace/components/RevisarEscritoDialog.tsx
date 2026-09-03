@@ -1,8 +1,8 @@
 import React from 'react';
-import { AlertTriangle, CheckCircle2, ClipboardCheck, Copy, FileText, UploadCloud, X } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, ClipboardCheck, Copy, FileText, History, Trash2, UploadCloud, X } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import { ApiError } from '../../../config/httpClient';
-import { archivoABase64, reviewApi, type RespuestaDeRevision } from '../services/review.api';
+import { archivoABase64, reviewApi, type RespuestaDeRevision, type RevisionGuardada } from '../services/review.api';
 import { uploadFileToStorage } from '../../documents/services/storageUpload';
 
 /**
@@ -70,6 +70,59 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
   const [copiado, setCopiado] = React.useState(false);
   /** Porcentaje de subida cuando el archivo va por almacenamiento; null si no aplica. */
   const [subiendo, setSubiendo] = React.useState<number | null>(null);
+  /*
+   * LAS REVISIONES ANTERIORES, para volver al informe dias despues. Se listan
+   * sin cuerpos y se abren una a una. Es la misma pantalla del informe, con
+   * la actuacion y el archivo de aquella vez.
+   */
+  const [anteriores, setAnteriores] = React.useState<RevisionGuardada[]>([]);
+  const [abriendo, setAbriendo] = React.useState<string | null>(null);
+  const [tituloDelInforme, setTituloDelInforme] = React.useState(documentType);
+
+  const cargarAnteriores = React.useCallback(() => {
+    reviewApi
+      .listar()
+      .then(setAnteriores)
+      .catch(() => setAnteriores([]));
+  }, []);
+
+  React.useEffect(() => {
+    if (abierto) cargarAnteriores();
+  }, [abierto, cargarAnteriores]);
+
+  const abrirAnterior = async (r: RevisionGuardada) => {
+    setAbriendo(r.id);
+    setError('');
+    try {
+      const completa = await reviewApi.obtener(r.id);
+      setTituloDelInforme(completa.documentType);
+      setRespuesta({
+        id: completa.id,
+        guardada: true,
+        informe: completa.informe,
+        informeLibre: completa.informeLibre,
+        conFicha: completa.conFicha,
+        truncado: completa.truncado,
+        caracteres: completa.caracteres,
+        cobradoCop: completa.cobradoCop,
+        saldoCop: NaN
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudo abrir esa revisión.');
+    } finally {
+      setAbriendo(null);
+    }
+  };
+
+  const eliminarAnterior = async (r: RevisionGuardada) => {
+    if (!window.confirm(`¿Eliminar el informe de «${r.fileName}»? No se puede recuperar.`)) return;
+    try {
+      await reviewApi.eliminar(r.id);
+      setAnteriores((xs) => xs.filter((x) => x.id !== r.id));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudo eliminar.');
+    }
+  };
 
   React.useEffect(() => {
     if (abierto) return;
@@ -113,8 +166,10 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
         setSubiendo(null);
         cuerpo = { fileName: archivo.name, storageKey };
       }
+      setTituloDelInforme(documentType);
       setRespuesta(await reviewApi.revisar({ documentType, legalBranch, pregunta, ...cuerpo }));
       onSaldoCambiado?.();
+      cargarAnteriores();
     } catch (err) {
       setError(err instanceof ApiError || err instanceof Error ? err.message : 'No se pudo revisar el escrito.');
     } finally {
@@ -170,7 +225,9 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
       onIntentoDeCerrarConCambios={() => undefined}
       pieIzquierda={
         <span className="font-mono text-[11px] text-ink-400">
-          {respuesta ? `Cobrado ${pesos(respuesta.cobradoCop)} · saldo ${pesos(respuesta.saldoCop)}` : `Cuesta ${pesos(precioCop)}`}
+          {respuesta
+            ? `Cobrado ${pesos(respuesta.cobradoCop)}${Number.isFinite(respuesta.saldoCop) ? ` · saldo ${pesos(respuesta.saldoCop)}` : ''}${respuesta.guardada === false ? ' · no se pudo guardar' : ''}`
+            : `Cuesta ${pesos(precioCop)}`}
         </span>
       }
       acciones={
@@ -288,11 +345,50 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
 
           <p className="text-meta text-ink-400">
             El informe no cita sentencias: cuando un punto necesite precedente, lo dirá y usted lo verifica. No reescribe el escrito;
-            señala y propone la corrección.
+            señala y propone la corrección. El informe se guarda para su firma; el escrito no.
           </p>
+
+          {anteriores.length > 0 && (
+            <div className="border-t border-line-100 pt-3">
+              <p className="flex items-center gap-1.5 font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
+                <History className="h-3 w-3" />
+                Revisiones anteriores de la firma
+              </p>
+              <ul className="mt-1.5 max-h-56 space-y-1 overflow-y-auto">
+                {anteriores.map((r) => (
+                  <li key={r.id} className="flex items-center gap-2 rounded-control border border-line-100 bg-canvas px-2.5 py-1.5">
+                    <button
+                      type="button"
+                      onClick={() => void abrirAnterior(r)}
+                      disabled={abriendo !== null}
+                      className="min-w-0 flex-1 text-left"
+                      title="Abrir el informe"
+                    >
+                      <span className="block truncate text-ui text-ink-900">
+                        {r.fileName} <span className="text-ink-400">· {r.documentType}</span>
+                      </span>
+                      <span className="block text-[11px] text-ink-500">
+                        {new Date(r.createdAt).toLocaleString('es-CO', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} ·{' '}
+                        {r.userEmail.split('@')[0]}
+                        {abriendo === r.id ? ' · abriendo…' : ''}
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void eliminarAnterior(r)}
+                      className="shrink-0 text-ink-400 hover:text-danger"
+                      aria-label={`Eliminar el informe de ${r.fileName}`}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       ) : (
-        <Informe respuesta={respuesta} documentType={documentType} />
+        <Informe respuesta={respuesta} documentType={tituloDelInforme} />
       )}
     </Dialog>
   );
@@ -367,7 +463,7 @@ const Informe: React.FC<{ respuesta: RespuestaDeRevision; documentType: string }
 
       <p className="border-t border-line-100 pt-3 text-meta text-ink-400">
         Lo marcado como exigencia de la norma sale de la ficha verificada; lo demás es criterio profesional del revisor y usted decide.
-        Este informe no se guarda: cópielo si quiere conservarlo.
+        El informe queda guardado para su firma en «Revisiones anteriores»; el escrito revisado no se conserva.
       </p>
     </div>
   );

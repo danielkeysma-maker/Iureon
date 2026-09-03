@@ -1,6 +1,11 @@
 import { Router } from 'express';
 import { streamAgentDraftController } from './agent.controller';
-import { reviewDocumentController } from './review/documentReview.controller';
+import {
+  deleteReviewController,
+  getReviewController,
+  listReviewsController,
+  reviewDocumentController
+} from './review/documentReview.controller';
 import {
   getStyleProfileController,
   saveLawyerEditsController,
@@ -13,6 +18,10 @@ const router = Router();
 router.post('/agent/stream-draft', streamAgentDraftController);
 /* Revisar un escrito ya redactado: informe, no borrador. Cobra como REVISION. */
 router.post('/agent/review-document', reviewDocumentController as any);
+/* Los informes guardados de la firma: se releen dias despues, cuando se corrige el escrito. */
+router.get('/agent/reviews', listReviewsController as any);
+router.get('/agent/reviews/:id', getReviewController as any);
+router.delete('/agent/reviews/:id', deleteReviewController as any);
 
 // Aprendizaje de Jerga y Sugerencia Inteligente de Vocabulario
 router.get('/agent/style-profile', getStyleProfileController);
