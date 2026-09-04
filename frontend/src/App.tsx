@@ -1202,7 +1202,7 @@ export function App() {
             />
             </div>
           )}
-          {mainView === 'ajustes' && <SettingsView />}
+          {mainView === 'ajustes' && <SettingsView onLogout={handleLogout} />}
           {mainView === 'taller' && tallerBorrador && (
             <TallerDeBorrador
               key={tallerBorrador.draftId ?? 'borrador-sesion'}

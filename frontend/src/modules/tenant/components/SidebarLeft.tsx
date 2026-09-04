@@ -204,8 +204,27 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
           )}
         </div>
       ) : (
-        <div className="flex justify-center pb-3" title={contexto.nombre}>
-          <contexto.Icono className="h-4 w-4 text-nav-muted" />
+        /*
+          EN EL RIEL COMPRIMIDO LA FIRMA SIGUE SIENDO UN BOTÓN. Antes era solo un
+          icono: el superusuario plegaba la barra y perdía la única entrada a
+          «Firmas y usuarios» del menú lateral hasta volver a expandirla.
+        */
+        <div className="flex justify-center pb-3">
+          {onOpenUserManagementModal ? (
+            <button
+              type="button"
+              onClick={onOpenUserManagementModal}
+              title={`${contexto.nombre} · Firmas y usuarios`}
+              aria-label="Firmas y usuarios"
+              className="flex h-8 w-8 items-center justify-center rounded-control text-nav-muted hover:bg-white/5 hover:text-nav-ink"
+            >
+              <Shield className="h-4 w-4" />
+            </button>
+          ) : (
+            <span title={contexto.nombre}>
+              <contexto.Icono className="h-4 w-4 text-nav-muted" />
+            </span>
+          )}
         </div>
       )}
 

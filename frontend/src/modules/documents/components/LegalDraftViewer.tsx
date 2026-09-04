@@ -123,7 +123,13 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
         816px EN PANTALLA COMPLETA: el ancho de una carta a 96dpi. En pantalla
         completa el escrito se revisa como papel, y el papel tiene un ancho.
       */}
-      <div className={`mx-auto w-full ${isFocusMode ? 'max-w-[816px]' : 'max-w-[684px]'}`}>
+      {/*
+        EN PANTALLA COMPLETA EL PAPEL SE ENSANCHA HASTA 1100px: con la barra
+        lateral tapada, 816px dejaba un tercio de la pantalla vacío a cada
+        lado. El tamaño de letra sigue siendo el de lectura, así que caben más
+        palabras por línea, no letras más pequeñas.
+      */}
+      <div className={`mx-auto w-full ${isFocusMode ? 'max-w-[1100px]' : 'max-w-[684px]'}`}>
         {/*
           LA BARRA DE REVISION VA ARRIBA DEL PAPEL, no al pie: el visor es donde
           se revisa ANTES de firmar, y una advertencia bajo seis paginas de

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Building2, Palette, User } from 'lucide-react';
+import { Bell, Building2, CreditCard, Keyboard, Palette, User } from 'lucide-react';
 import { usePreferences } from '../preferences';
 import { AppearanceSection } from './AppearanceSection';
+import { AtajosSection, AvisosSection, CuentaSection, PlanSection } from './SeccionesSuyas';
 import { FirmBrandingModal } from '../../tenant/components/FirmBrandingModal';
 import { FirmUsersDialog } from '../../tenant/components/FirmUsersDialog';
 import { useTenant } from '../../tenant/TenantContext';
@@ -14,56 +15,52 @@ import { useTenant } from '../../tenant/TenantContext';
  * que se cambiaba el propio, y la única defensa que funciona es que la pantalla
  * lo afirme antes de que alguien toque algo.
  *
- * LO QUE NO ESTÁ CONSTRUIDO SE MARCA, NO SE DIBUJA. Design entregó también
- * Documento y formato, Marca y membrete, Usuarios y roles, y Plan y facturación.
- * Esas cuatro necesitan backend que todavía no existe, y una pantalla dibujada
- * sin nada detrás es una maqueta que parece producto: el abogado la toca, no
- * pasa nada, y a partir de ahí desconfía también de lo que sí funciona.
+ * YA NO HAY ENTRADAS «PRONTO». Las ocho abren algo real: la marca vive en la
+ * firma, el formato viaja al motor que escribe, los usuarios salen de Supabase
+ * Auth, el plan lo sirve el backend de suscripciones, los avisos son el Web
+ * Push de este dispositivo y los atajos son los que los componentes escuchan.
+ * Lo único que sigue sin existir —cambiar la contraseña desde aquí— lo dice la
+ * propia sección de la cuenta.
  */
 
-type Seccion = 'apariencia';
+type Seccion = 'apariencia' | 'atajos' | 'avisos' | 'cuenta' | 'plan';
 
 interface Entrada {
-  id: Seccion | string;
+  id: Seccion | 'documento' | 'membrete' | 'usuarios';
   label: string;
   icono: React.ComponentType<{ className?: string }>;
-  /** Sin backend todavía. Se lista para que se sepa que viene, y no se abre. */
-  pendiente?: boolean;
 }
 
 const SUYOS: Entrada[] = [
   { id: 'apariencia', label: 'Apariencia', icono: Palette },
-  { id: 'atajos', label: 'Atajos de teclado', icono: User, pendiente: true },
-  { id: 'avisos', label: 'Avisos', icono: User, pendiente: true },
-  { id: 'cuenta', label: 'Su cuenta', icono: User, pendiente: true }
+  { id: 'atajos', label: 'Atajos de teclado', icono: Keyboard },
+  { id: 'avisos', label: 'Avisos', icono: Bell },
+  { id: 'cuenta', label: 'Su cuenta', icono: User }
 ];
 
-/*
- * Tres de las cuatro dejaron de ser "pronto": la marca vive en la firma
- * (firms.branding), el formato viaja al motor que escribe, y los usuarios
- * salen de Supabase Auth con su consumo del mes. Documento y formato ES la
- * seccion de formato del mismo dialogo de marca — separarlos duplicaria el
- * formulario que decide una sola cosa. Plan y facturacion sigue pendiente:
- * la facturacion electronica esta en cola con nombre propio.
- */
 const DE_LA_FIRMA: Entrada[] = [
   { id: 'documento', label: 'Documento y formato', icono: Building2 },
   { id: 'membrete', label: 'Marca y membrete', icono: Building2 },
   { id: 'usuarios', label: 'Usuarios y roles', icono: Building2 },
-  { id: 'plan', label: 'Plan y facturación', icono: Building2, pendiente: true }
+  { id: 'plan', label: 'Plan y facturación', icono: CreditCard }
 ];
 
-export const SettingsView: React.FC = () => {
+interface SettingsViewProps {
+  /** Cerrar la sesión de este dispositivo, desde «Su cuenta». */
+  onLogout?: () => void;
+}
+
+export const SettingsView: React.FC<SettingsViewProps> = ({ onLogout }) => {
   const [seccion, setSeccion] = useState<Seccion>('apariencia');
   const { prefs, cambiar } = usePreferences();
   const { activeFirm } = useTenant();
   const [marcaAbierta, setMarcaAbierta] = useState(false);
   const [usuariosAbierto, setUsuariosAbierto] = useState(false);
 
-  const abrirEntrada = (id: string) => {
+  const abrirEntrada = (id: Entrada['id']) => {
     if (id === 'documento' || id === 'membrete') setMarcaAbierta(true);
     else if (id === 'usuarios') setUsuariosAbierto(true);
-    else setSeccion(id as Seccion);
+    else setSeccion(id);
   };
 
   const Grupo: React.FC<{ titulo: string; entradas: Entrada[] }> = ({ titulo, entradas }) => (
@@ -76,23 +73,12 @@ export const SettingsView: React.FC = () => {
         return (
           <button
             key={e.id}
-            disabled={e.pendiente}
-            onClick={() => !e.pendiente && abrirEntrada(e.id)}
-            title={e.pendiente ? 'Todavía no está construido' : undefined}
+            onClick={() => abrirEntrada(e.id)}
             className={`flex w-full items-center gap-2 rounded-control px-2 py-[7px] text-left text-ui transition-colors ${
-              activa
-                ? 'bg-brand-50 font-medium text-brand-700'
-                : e.pendiente
-                ? 'cursor-not-allowed text-ink-400'
-                : 'text-ink-700 hover:bg-canvas'
+              activa ? 'bg-brand-50 font-medium text-brand-700' : 'text-ink-700 hover:bg-canvas'
             }`}
           >
             <span className="truncate">{e.label}</span>
-            {e.pendiente && (
-              <span className="ml-auto shrink-0 font-mono text-[10px] uppercase tracking-[0.08em] text-ink-400">
-                pronto
-              </span>
-            )}
           </button>
         );
       })}
@@ -109,12 +95,6 @@ export const SettingsView: React.FC = () => {
       */}
       <div className="mx-auto flex max-w-[1180px] flex-col gap-6 p-4 sm:p-6 lg:flex-row lg:gap-8">
         <nav className="w-full shrink-0 lg:w-[212px]">
-          {/*
-            EL TITULO SOLO EN ESCRITORIO: en movil lo pone `MobileHeader`, y
-            8d ademas usa esa cabecera para la SECCION ABIERTA —«Apariencia»—,
-            no para el nombre del modulo. Repetir «Ajustes» dos veces gastaba
-            dos renglones en decir lo mismo.
-          */}
           <h1 className="mb-4 hidden px-2 text-title text-ink-900 lg:block">Ajustes</h1>
           <Grupo titulo="Suyos" entradas={SUYOS} />
           <Grupo titulo="De la firma" entradas={DE_LA_FIRMA} />
@@ -127,6 +107,10 @@ export const SettingsView: React.FC = () => {
 
         <main className="min-w-0 flex-1">
           {seccion === 'apariencia' && <AppearanceSection prefs={prefs} cambiar={cambiar} />}
+          {seccion === 'atajos' && <AtajosSection />}
+          {seccion === 'avisos' && <AvisosSection />}
+          {seccion === 'cuenta' && <CuentaSection onLogout={onLogout} />}
+          {seccion === 'plan' && <PlanSection />}
         </main>
 
         <FirmBrandingModal isOpen={marcaAbierta} onClose={() => setMarcaAbierta(false)} />

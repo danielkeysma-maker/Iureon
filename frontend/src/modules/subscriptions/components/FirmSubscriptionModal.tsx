@@ -3,6 +3,8 @@ import { AlertCircle, ArrowRight, Check, ExternalLink, Lock, Minus, RefreshCw, S
 import { Dialog } from '../../../design/Dialog';
 import { urlDelCheckout } from '../../billing/wompiCheckout';
 import { subscriptionApi } from '../subscription.api';
+import { generarCuentaDeCobro } from '../cuentaDeCobro.pdf';
+import { useTenant } from '../../tenant/TenantContext';
 import {
   ETIQUETA_DE_ESTADO,
   ETIQUETA_DE_PERIODO,
@@ -94,6 +96,7 @@ export const FirmSubscriptionModal: React.FC<FirmSubscriptionModalProps> = ({
   puedePagar,
   onPlanLeido
 }) => {
+  const { activeFirm } = useTenant();
   const [plan, setPlan] = React.useState<PlanDeFirma | null>(null);
   const [planes, setPlanes] = React.useState<Record<Plan, PlanDefinition> | null>(null);
   const [pagos, setPagos] = React.useState<PagoDePlan[]>([]);
@@ -408,6 +411,7 @@ export const FirmSubscriptionModal: React.FC<FirmSubscriptionModalProps> = ({
                       <th className="px-4 py-2 font-medium">Periodo cubierto</th>
                       <th className="px-4 py-2 text-right font-medium">Valor</th>
                       <th className="px-4 py-2 font-medium">Pagó</th>
+                      <th className="px-4 py-2 font-medium">Soporte</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -422,6 +426,16 @@ export const FirmSubscriptionModal: React.FC<FirmSubscriptionModalProps> = ({
                         </td>
                         <td className="px-4 py-2.5 text-right tabular-nums text-ink-900">{pesos(p.amountCop)}</td>
                         <td className="px-4 py-2.5 text-ink-500">{p.userEmail}</td>
+                        <td className="px-4 py-2.5">
+                          <button
+                            type="button"
+                            onClick={() => generarCuentaDeCobro(p, { nombre: activeFirm.name, nit: activeFirm.nit, correo: p.userEmail })}
+                            className="btn-neutral btn-sm whitespace-nowrap"
+                            title="Descargar la cuenta de cobro de este pago en PDF"
+                          >
+                            Cuenta de cobro
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
