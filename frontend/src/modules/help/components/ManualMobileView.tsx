@@ -5,10 +5,11 @@ import {
   MINUTOS_TOTALES,
   TOTAL_ARTICULOS,
   buscar,
-  minutosDeLectura
+  minutosDeLectura,
+  separarRuta
 } from '../content/manual';
 import type { ManualEntry } from '../types';
-import { Bloque } from './ManualView';
+import { Bloque, Ruta } from './ManualView';
 import { useManualReads } from '../useManualReads';
 import { IconoVerificado } from '../../../design/ArtboardIcons';
 
@@ -66,6 +67,7 @@ export const ManualMobileView: React.FC<ManualMobileViewProps> = ({ onSoporte })
   const grupos = porGrupo(visibles);
 
   if (abierto) {
+    const { ruta, cuerpo } = separarRuta(abierto.articulo);
     return (
       <div className="flex h-full min-h-0 flex-1 flex-col overflow-y-auto bg-canvas">
         <button
@@ -88,6 +90,8 @@ export const ManualMobileView: React.FC<ManualMobileViewProps> = ({ onSoporte })
           <p className="mt-1.5 text-justify text-[13px] leading-snug text-ink-500 [text-wrap:pretty]">
             {abierto.articulo.entradilla}
           </p>
+          {/* La ruta va en la cabecera, como en el computador: dónde antes que qué. */}
+          {ruta && <Ruta camino={ruta} compacta />}
 
           {/*
             LOS BLOQUES LOS PINTA `Bloque`, EL MISMO DE LA VISTA DE ESCRITORIO.
@@ -97,8 +101,8 @@ export const ManualMobileView: React.FC<ManualMobileViewProps> = ({ onSoporte })
             aparato es peor que no tenerlo en el telefono.
           */}
           <div className="mt-3">
-            {abierto.articulo.bloques.map((b, i) => (
-              <Bloque key={i} bloque={b} />
+            {cuerpo.map((b, i) => (
+              <Bloque key={`${b.kind}-${i}`} bloque={b} />
             ))}
           </div>
 

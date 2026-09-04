@@ -1,11 +1,14 @@
 import React from 'react';
 import {
   AlertTriangle,
+  Check,
   ChevronLeft,
   ChevronRight,
   CheckCircle2,
   Info,
   LifeBuoy,
+  Lightbulb,
+  MapPin,
   Minus,
   Search
 } from 'lucide-react';
@@ -16,7 +19,8 @@ import {
   TOTAL_ARTICULOS,
   buscar,
   entradaPorId,
-  minutosDeLectura
+  minutosDeLectura,
+  separarRuta
 } from '../content/manual';
 import type { ManualBlock, ManualEntry } from '../types';
 import { useManualReads } from '../useManualReads';
@@ -183,6 +187,66 @@ const BloqueEjemplo: React.FC = () => (
   </div>
 );
 
+/* ─── CALLOUTS: ONE SHAPE, FOUR COLOURS ─────────────────────────────────────
+ *
+ * Every aside shares the same anatomy — icon, small uppercase label, text —
+ * and differs only in colour and border, so the reader learns the grammar
+ * once: blue is a rule of thumb, green is a shortcut, amber can cost a
+ * deadline, dashed grey is a gap the product still has. The colours are the
+ * product's own state tokens, never literals, so dark mode falls out on its own.
+ */
+const Callout: React.FC<{
+  etiqueta: string;
+  icono: React.ElementType;
+  /** Tailwind classes for the container; tokens only. */
+  caja: string;
+  /** Colour of icon and label. */
+  tinta: string;
+  titulo?: string;
+  children: React.ReactNode;
+}> = ({ etiqueta, icono: Icono, caja, tinta, titulo, children }) => (
+  <div className={`mt-4 flex items-start gap-2.5 rounded-card px-3.5 py-3 ${caja}`}>
+    <Icono size={15} strokeWidth={2.2} className={`mt-[3px] shrink-0 ${tinta}`} />
+    <div className="min-w-0">
+      <p className={`font-mono text-[10.5px] font-semibold uppercase tracking-[0.09em] ${tinta}`}>
+        {etiqueta}
+      </p>
+      {titulo && <p className="mt-0.5 text-ui font-semibold text-ink-900">{titulo}</p>}
+      <p className="mt-1 text-ui leading-[1.65] text-ink-700 [text-wrap:pretty]">{children}</p>
+    </div>
+  </div>
+);
+
+/**
+ * The breadcrumb of UI locations: small chips joined by ›.
+ *
+ * Exported because the article header draws the article's opening route in
+ * the same shape — the reader should see WHERE before reading WHAT.
+ */
+export const Ruta: React.FC<{ camino: readonly string[]; compacta?: boolean }> = ({
+  camino,
+  compacta
+}) => (
+  <div
+    className={`flex flex-wrap items-center gap-y-1.5 ${compacta ? 'mt-3' : 'mt-4'}`}
+    aria-label="Dónde se hace esto en la aplicación"
+  >
+    <MapPin size={13} strokeWidth={2.4} className="mr-1.5 shrink-0 text-brand-700" />
+    {camino.map((tramo, i) => (
+      <React.Fragment key={`${tramo}-${i}`}>
+        {i > 0 && (
+          <span className="mx-1.5 font-mono text-[12px] text-ink-400" aria-hidden>
+            ›
+          </span>
+        )}
+        <span className="inline-flex items-center rounded-full border border-[rgb(var(--brand-line))] bg-brand-50 px-2.5 py-[3px] font-mono text-[11px] font-semibold text-brand-700">
+          {tramo}
+        </span>
+      </React.Fragment>
+    ))}
+  </div>
+);
+
 /**
  * Se exporta para que la pantalla móvil (9d) renderice los bloques con ESTA
  * función y no con una copia. Un artículo que en el teléfono pierda sus pasos
@@ -199,19 +263,43 @@ export const Bloque: React.FC<{ bloque: ManualBlock }> = ({ bloque }) => {
       );
 
     case 'subtitulo':
-      return <h2 className="mt-6 text-subtitle text-ink-900">{bloque.texto}</h2>;
+      return (
+        <h2 className="mt-7 text-subtitle text-ink-900">
+          {bloque.texto}
+          {/* A short brand rule, not a full-width line: it marks, it does not divide. */}
+          <span className="mt-1.5 block h-[2px] w-9 rounded-full bg-brand-700" aria-hidden />
+        </h2>
+      );
 
+    /*
+     * STEPS ARE CARDS ON A RAIL. The number lives in a solid brand badge so it
+     * is the first thing the eye lands on, and a thin vertical rail joins one
+     * badge to the next: the reader can see at a glance that these happen in
+     * order and how many are left. One column always — a second column would
+     * break the rail exactly where the reader is counting.
+     */
     case 'pasos':
       return (
-        <ol className="mt-4 flex flex-col gap-2.5">
-          {bloque.pasos.map((paso, i) => (
-            <li key={paso} className="flex gap-3">
-              <span className="mt-[3px] w-5 shrink-0 font-mono text-meta font-semibold text-brand-700">
-                {String(i + 1).padStart(2, '0')}
-              </span>
-              <span className="text-body leading-[1.7] text-ink-700 [text-wrap:pretty]">{paso}</span>
-            </li>
-          ))}
+        <ol className="mt-4 flex flex-col">
+          {bloque.pasos.map((paso, i) => {
+            const ultimo = i === bloque.pasos.length - 1;
+            return (
+              <li key={`${i}-${paso.slice(0, 24)}`} className="relative flex gap-3.5 pb-3 last:pb-0">
+                {!ultimo && (
+                  <span
+                    className="absolute bottom-0 left-[13px] top-7 w-px bg-line-200"
+                    aria-hidden
+                  />
+                )}
+                <span className="relative z-[1] mt-1.5 flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full bg-brand-700 font-mono text-[11px] font-semibold text-on-brand">
+                  {i + 1}
+                </span>
+                <div className="min-w-0 flex-1 rounded-card border border-line-200 bg-surface px-3.5 py-2.5">
+                  <p className="text-body leading-[1.7] text-ink-700 [text-wrap:pretty]">{paso}</p>
+                </div>
+              </li>
+            );
+          })}
         </ol>
       );
 
@@ -219,8 +307,10 @@ export const Bloque: React.FC<{ bloque: ManualBlock }> = ({ bloque }) => {
       return (
         <ul className="mt-4 flex flex-col gap-2">
           {bloque.items.map((item) => (
-            <li key={item} className="flex gap-3">
-              <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-ink-400" />
+            <li key={item} className="flex gap-2.5">
+              <span className="mt-[5px] flex h-[15px] w-[15px] shrink-0 items-center justify-center rounded-full bg-brand-50">
+                <Check size={10} strokeWidth={3} className="text-brand-700" />
+              </span>
               <span className="text-body leading-[1.7] text-ink-700 [text-wrap:pretty]">{item}</span>
             </li>
           ))}
@@ -229,24 +319,43 @@ export const Bloque: React.FC<{ bloque: ManualBlock }> = ({ bloque }) => {
 
     case 'nota':
       return (
-        <div className="notice mt-4">
-          <Info size={15} strokeWidth={2.2} className="mt-0.5 shrink-0 text-brand-700" />
-          <div className="min-w-0">
-            <p className="text-ui font-semibold text-ink-900">{bloque.titulo}</p>
-            <p className="mt-1 text-ui leading-[1.6] text-ink-700 [text-wrap:pretty]">
-              {bloque.texto}
-            </p>
-          </div>
-        </div>
+        <Callout
+          etiqueta="Para tener en cuenta"
+          icono={Info}
+          caja="border border-[rgb(var(--brand-line))] bg-brand-50 shadow-[inset_3px_0_0_rgb(var(--brand-700))]"
+          tinta="text-brand-700"
+          titulo={bloque.titulo}
+        >
+          {bloque.texto}
+        </Callout>
       );
 
     case 'aviso':
       return (
-        <div className="notice-unverified mt-4">
-          <AlertTriangle size={15} strokeWidth={2.2} className="mt-0.5 shrink-0 text-unverified" />
-          <p className="text-ui leading-[1.6] text-ink-700 [text-wrap:pretty]">{bloque.texto}</p>
-        </div>
+        <Callout
+          etiqueta="Atención"
+          icono={AlertTriangle}
+          caja="border border-dashed border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))] shadow-[inset_3px_0_0_rgb(var(--unverified))]"
+          tinta="text-unverified"
+        >
+          {bloque.texto}
+        </Callout>
       );
+
+    case 'consejo':
+      return (
+        <Callout
+          etiqueta="Consejo"
+          icono={Lightbulb}
+          caja="border border-[rgb(var(--verified-line))] bg-[rgb(var(--verified-surf))] shadow-[inset_3px_0_0_rgb(var(--verified))]"
+          tinta="text-verified"
+        >
+          {bloque.texto}
+        </Callout>
+      );
+
+    case 'ruta':
+      return <Ruta camino={bloque.camino} />;
 
     case 'estados':
       return <BloqueEstados />;
@@ -256,17 +365,14 @@ export const Bloque: React.FC<{ bloque: ManualBlock }> = ({ bloque }) => {
 
     case 'todavia-no':
       return (
-        <div className="mt-4 flex items-start gap-2 rounded-card border border-line-200 bg-canvas px-3 py-2.5">
-          <Minus size={15} strokeWidth={2.4} className="mt-0.5 shrink-0 text-ink-400" />
-          <div className="min-w-0">
-            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.09em] text-ink-400">
-              Todavía no existe
-            </p>
-            <p className="mt-1 text-ui leading-[1.6] text-ink-700 [text-wrap:pretty]">
-              {bloque.texto}
-            </p>
-          </div>
-        </div>
+        <Callout
+          etiqueta="Todavía no existe"
+          icono={Minus}
+          caja="border border-dashed border-line-200 bg-canvas"
+          tinta="text-ink-400"
+        >
+          {bloque.texto}
+        </Callout>
       );
 
     default:
@@ -391,6 +497,7 @@ export const ManualView: React.FC<ManualViewProps> = ({ articuloInicial, onSopor
 
   const entrada: ManualEntry = entradaPorId(activo) ?? ENTRADAS[0];
   const { articulo, grupo, numero } = entrada;
+  const { ruta: rutaInicial, cuerpo: bloquesCuerpo } = separarRuta(articulo);
   const anterior = numero > 1 ? ENTRADAS[numero - 2] : undefined;
   const siguiente = numero < TOTAL_ARTICULOS ? ENTRADAS[numero] : undefined;
 
@@ -424,8 +531,10 @@ export const ManualView: React.FC<ManualViewProps> = ({ articuloInicial, onSopor
             <p className="mt-2.5 text-[15px] leading-[1.7] text-ink-700 [text-wrap:pretty]">
               {articulo.entradilla}
             </p>
+            {/* WHERE, before WHAT: the opening route is part of the header. */}
+            {rutaInicial && <Ruta camino={rutaInicial} />}
 
-            {articulo.bloques.map((bloque, i) => (
+            {bloquesCuerpo.map((bloque, i) => (
               <Bloque key={`${bloque.kind}-${i}`} bloque={bloque} />
             ))}
 

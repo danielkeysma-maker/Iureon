@@ -27,6 +27,15 @@ export type ManualBlock =
   | { readonly kind: 'nota'; readonly titulo: string; readonly texto: string }
   /** An amber aside: something that can cost the reader a deadline. */
   | { readonly kind: 'aviso'; readonly texto: string }
+  /** A green aside: a habit that makes the task shorter, never a warning. */
+  | { readonly kind: 'consejo'; readonly texto: string }
+  /**
+   * Where in the app the article happens, as a breadcrumb of UI locations:
+   * ['Redacción', 'Taller', '«Comentar»']. Every article opens with one so the
+   * reader knows what to click before reading a single step. Each chip names
+   * a REAL screen, tab or button, checked against the component that draws it.
+   */
+  | { readonly kind: 'ruta'; readonly camino: readonly string[] }
   /**
    * The three states of a claim, drawn with the SAME components the reader
    * meets in the app — chip borders, hatch and icons included. A manual that
