@@ -12,7 +12,7 @@ export const EMISOR = {
   nombreComercial: 'Iureon',
   titular: 'Daniel David Madera Arroyo',
   documento: 'C.C. 1102811692 de Sincelejo, Sucre',
-  nit: '118116928',
+  nit: '1102811692-8',
   ciudad: 'Sincelejo, Sucre',
   correo: 'ingdanielma@gmail.com'
 } as const;
