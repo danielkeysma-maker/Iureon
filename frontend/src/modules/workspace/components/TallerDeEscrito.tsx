@@ -27,6 +27,7 @@ import { diferencias, resumenDeCambios } from '../services/diff';
 import { ApiError } from '../../../config/httpClient';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 import { ControlDeLetra, useTamanoDeLetra } from '../../../design/TamanoDeLetra';
+import { estiloDelLienzo, type FormatoDelEscrito } from '../../documents/formatoEnPantalla';
 
 /**
  * El taller: el escrito a la izquierda, la guía a la derecha. Sirve igual para
@@ -88,6 +89,8 @@ export interface TallerDeEscritoProps {
   onExportarTexto: (formato: 'pdf' | 'word', texto: string) => void;
   onCerrar: (textoFinal: string) => void;
   onSaldoCambiado: () => void;
+  /** Formato de la firma (Membrete): familia, cuerpo e interlineado. El papel del taller se lee con la misma letra que el visor y el PDF. */
+  formato?: FormatoDelEscrito | null;
 }
 
 const pesos = (n: number): string => `$${Math.round(n).toLocaleString('es-CO')}`;
@@ -148,7 +151,8 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   onRerevisar,
   onExportarTexto,
   onCerrar,
-  onSaldoCambiado
+  onSaldoCambiado,
+  formato
 }) => {
   const [texto, setTexto] = React.useState(datos.texto);
   const [informe, setInforme] = React.useState<InformeDeRevision | null>(datos.informe);
@@ -159,6 +163,10 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   const [modo, setModo] = React.useState<'marcas' | 'editar'>('marcas');
   /** Tamaño de lectura en pantalla; no toca el documento exportado. */
   const letra = useTamanoDeLetra('taller');
+  /* La letra de la firma manda; el control de lectura solo la escala. Sin formato, la serif del lienzo a 14 px. */
+  const estiloDeFirma = estiloDelLienzo(formato);
+  const baseDeLetra = estiloDeFirma ? parseFloat(estiloDeFirma.fontSize) : 14;
+  const estiloDelPapel: React.CSSProperties = { ...estiloDeFirma, fontSize: letra.px(baseDeLetra) };
   const [panel, setPanel] = React.useState<'chat' | 'informe' | 'versiones' | 'comentarios'>('chat');
   const [citaAbierta, setCitaAbierta] = React.useState<number | null>(null);
   const [versionAbierta, setVersionAbierta] = React.useState<number | null>(null);
@@ -543,7 +551,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
                       Volver al actual
                     </button>
                   </div>
-                  <p className="whitespace-pre-wrap text-justify font-legal leading-[1.8] text-paper-ink [text-wrap:pretty]" style={{ fontSize: letra.px(14) }}>
+                  <p className="whitespace-pre-wrap text-justify font-legal leading-[1.8] text-paper-ink [text-wrap:pretty]" style={estiloDelPapel}>
                     {tramos.map((t, k) =>
                       t.tipo === 'igual' ? (
                         <React.Fragment key={k}>{t.texto}</React.Fragment>
@@ -565,14 +573,14 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
             value={texto}
             onChange={(e) => setTexto(e.target.value)}
             className="min-h-[70vh] w-full resize-y border-0 bg-transparent p-0 font-legal leading-[1.8] text-paper-ink focus:outline-none"
-            style={{ fontSize: letra.px(14) }}
+            style={estiloDelPapel}
             spellCheck
           />
         )
       ) : (
         Papel(
           <>
-            <p ref={lienzo} className="whitespace-pre-wrap text-justify font-legal leading-[1.8] text-paper-ink [text-wrap:pretty]" style={{ fontSize: letra.px(14) }}>
+            <p ref={lienzo} className="whitespace-pre-wrap text-justify font-legal leading-[1.8] text-paper-ink [text-wrap:pretty]" style={estiloDelPapel}>
               {segmentos.map((s, k) => {
                 if (s.capas.length === 0) return <React.Fragment key={k}>{s.texto}</React.Fragment>;
                 if (s.capas.every((c) => esCapaTipografica(c.capa))) {

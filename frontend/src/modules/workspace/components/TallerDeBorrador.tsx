@@ -1,4 +1,5 @@
 import React from 'react';
+import type { FormatoDelEscrito } from '../../documents/formatoEnPantalla';
 import { reviewApi, type Anotacion, type TurnoDelTaller, type VersionDelTexto } from '../services/review.api';
 import { TallerDeEscrito } from './TallerDeEscrito';
 
@@ -36,6 +37,7 @@ interface TallerDeBorradorProps {
   onCerrar: (textoFinal: string) => void;
   onSaldoCambiado: () => void;
   onExportarTexto: (formato: 'pdf' | 'word', titulo: string, texto: string) => void;
+  formatoDeFirma?: FormatoDelEscrito | null;
 }
 
 export const TallerDeBorrador: React.FC<TallerDeBorradorProps> = ({
@@ -46,7 +48,8 @@ export const TallerDeBorrador: React.FC<TallerDeBorradorProps> = ({
   onGuardarBorradorNuevo,
   onCerrar,
   onSaldoCambiado,
-  onExportarTexto
+  onExportarTexto,
+  formatoDeFirma
 }) => (
   <TallerDeEscrito
     datos={{
@@ -91,5 +94,6 @@ export const TallerDeBorrador: React.FC<TallerDeBorradorProps> = ({
     onExportarTexto={(formato, texto) => onExportarTexto(formato, datos.titulo, texto)}
     onCerrar={onCerrar}
     onSaldoCambiado={onSaldoCambiado}
+    formato={formatoDeFirma}
   />
 );

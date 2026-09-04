@@ -1207,6 +1207,7 @@ export function App() {
             <TallerDeBorrador
               key={tallerBorrador.draftId ?? 'borrador-sesion'}
               datos={tallerBorrador}
+              formatoDeFirma={firmBranding}
               precioConsultaCop={300}
               precioRevisionCop={2000}
               onGuardar={async (texto, conversacion, anotaciones, versiones) => {
@@ -1247,6 +1248,7 @@ export function App() {
               <TallerDeRevision
                 key={tallerActivo.revisionId ?? 'sesion'}
                 datos={tallerActivo}
+                formatoDeFirma={firmBranding}
                 esAdminDeFirma={session?.user.role === 'FIRM_ADMIN' || session?.user.role === 'SUPER_ADMIN'}
                 precioConsultaCop={300}
                 precioRevisionCop={2000}

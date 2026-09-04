@@ -1,4 +1,5 @@
 import React from 'react';
+import type { FormatoDelEscrito } from '../../documents/formatoEnPantalla';
 import { reviewApi, type Anotacion, type ConsentimientoDeGuardado, type InformeDeRevision, type TurnoDelTaller, type VersionDelTexto } from '../services/review.api';
 import { TallerDeEscrito } from './TallerDeEscrito';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
@@ -40,6 +41,7 @@ interface TallerDeRevisionProps {
   onCerrar: () => void;
   onSaldoCambiado: () => void;
   onExportarTexto: (formato: 'pdf' | 'word', titulo: string, texto: string) => void;
+  formatoDeFirma?: FormatoDelEscrito | null;
 }
 
 export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
@@ -49,7 +51,8 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
   precioRevisionCop,
   onCerrar,
   onSaldoCambiado,
-  onExportarTexto
+  onExportarTexto,
+  formatoDeFirma
 }) => {
   const [consentimiento, setConsentimiento] = React.useState<ConsentimientoDeGuardado>({ guarda: datos.guardaTexto, por: null, el: null });
   const [confirmacion, setConfirmacion] = React.useState<Confirmacion | null>(null);
@@ -130,6 +133,7 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
         onExportarTexto={(formato, texto) => onExportarTexto(formato, `${datos.documentType} corregido`, texto)}
         onCerrar={() => onCerrar()}
         onSaldoCambiado={onSaldoCambiado}
+    formato={formatoDeFirma}
       />
       <ConfirmarDialog confirmacion={confirmacion} onCerrar={() => setConfirmacion(null)} />
     </>
