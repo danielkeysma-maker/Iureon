@@ -138,9 +138,9 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
           type="button"
           onClick={() => setMainView('workspace')}
           title="Ir a Redacción"
-          className="flex items-center gap-2.5 rounded-control transition-opacity hover:opacity-80"
+          className="flex items-center gap-1.5 rounded-control transition-opacity hover:opacity-80"
         >
-          <IureonMark size={22} mono className="shrink-0 text-nav-accent" />
+          <IureonMark size={26} onDark className="shrink-0" />
           {!isCollapsed && (
             <span className="text-subtitle tracking-[0.02em] text-white">Iureon</span>
           )}

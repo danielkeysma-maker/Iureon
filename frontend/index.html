@@ -15,7 +15,8 @@
       PWA. El manifest da nombre, color e iconos para «Instalar»; iOS no lee el
       manifest para el icono de inicio y exige un PNG en `apple-touch-icon`
       (el SVG que había aquí lo ignoraba y ponía una captura de la página).
-      Los PNG son provisionales: `scripts/generar-iconos-pwa.py`.
+      Los PNG salen del icono oficial (brand/app-icon-1024.svg) con
+      `scripts/generar-iconos-pwa.mjs`; se regeneran solo cuando cambie el logo.
     -->
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

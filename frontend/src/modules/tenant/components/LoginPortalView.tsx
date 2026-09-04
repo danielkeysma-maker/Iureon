@@ -101,7 +101,7 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({ onLoginSuccess
       */}
       <aside className="hidden w-[46%] max-w-[596px] flex-col bg-nav p-8 lg:flex">
         <div className="flex items-center gap-2.5">
-          <IureonMark size={28} mono className="text-white/80" />
+          <IureonMark size={28} onDark />
           <span className="text-subtitle tracking-[0.02em] text-white">Iureon</span>
         </div>
 

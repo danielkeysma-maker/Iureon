@@ -663,7 +663,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
         {conversacion.map((t, k) => (
           <div key={k} className={`max-w-[92%] ${t.rol === 'abogado' ? 'ml-auto' : ''}`}>
             <div className={`rounded-card px-3 py-2 text-[13px] leading-relaxed ${t.rol === 'abogado' ? 'bg-brand-700 text-white' : 'border border-line-200 bg-canvas text-ink-900'}`}>
-              <p className="whitespace-pre-wrap">{textoLegible(t.texto)}</p>
+              <p className="whitespace-pre-wrap text-justify [text-wrap:pretty]">{textoLegible(t.texto)}</p>
               {t.rol === 'revisor' && t.ediciones && t.ediciones.length > 0 && Ediciones(t.ediciones)}
               {t.rol === 'revisor' && t.referencias && t.referencias.length > 0 && (
                 <button type="button" onClick={() => setReferencias(t.referencias ?? [])} className="mt-1.5 text-[11px] text-sky-700 underline underline-offset-2">
