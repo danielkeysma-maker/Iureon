@@ -100,7 +100,7 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({ onLoginSuccess
         de marca, y en oscuro apenas se oscurece un paso.
       */}
       <aside className="hidden w-[46%] max-w-[596px] flex-col bg-nav p-8 lg:flex">
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-1">
           <IureonMark size={28} onDark />
           <span className="text-subtitle tracking-[0.02em] text-white">Iureon</span>
         </div>

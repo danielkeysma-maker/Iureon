@@ -94,7 +94,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
         onClick={() => setMainView(id)}
         title={isCollapsed ? label : undefined}
         aria-current={activo ? 'page' : undefined}
-        className={`flex w-full items-center gap-2.5 rounded-control px-2 py-[7px] text-left transition-colors ${
+        className={`flex w-full items-center gap-2.5 rounded-control px-2 py-[5px] text-left transition-colors ${
           isCollapsed ? 'justify-center' : ''
         } ${
           activo
@@ -133,12 +133,12 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
       {/* ─── MARCA ─────────────────────────────────────────────────────────
           El logo va a casa. Ahora que una recarga deja al abogado en el módulo
           que estaba leyendo, salir de uno tiene que ser algo que pueda pedir. */}
-      <div className={`flex items-center gap-2.5 px-3 pb-3 pt-3.5 ${isCollapsed ? 'justify-center' : ''}`}>
+      <div className={`flex items-center gap-2.5 px-3 pb-2 pt-3 ${isCollapsed ? 'justify-center' : ''}`}>
         <button
           type="button"
           onClick={() => setMainView('workspace')}
           title="Ir a Redacción"
-          className="flex items-center gap-1.5 rounded-control transition-opacity hover:opacity-80"
+          className="flex items-center gap-1 rounded-control transition-opacity hover:opacity-80"
         >
           <IureonMark size={26} onDark className="shrink-0" />
           {!isCollapsed && (
@@ -229,12 +229,12 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
       )}
 
       {/* ─── LOS CUATRO GRUPOS ─────────────────────────────────────────────*/}
-      <nav className="flex-1 overflow-y-auto px-3">
+      <nav className="flex-1 overflow-y-auto px-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {NAV_GROUPS.map((grupo, i) => {
           const abierto = !grupo.plegable || administrarAbierto;
 
           return (
-            <div key={grupo.titulo} className={i > 0 ? 'mt-4' : ''}>
+            <div key={grupo.titulo} className={i > 0 ? 'mt-2.5' : ''}>
               {!isCollapsed &&
                 (grupo.plegable ? (
                   <button
