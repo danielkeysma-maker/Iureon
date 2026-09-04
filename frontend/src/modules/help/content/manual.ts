@@ -524,6 +524,12 @@ const A_DATOS_CLIENTE: ManualArticle = {
       kind: 'aviso',
       texto:
         'WhatsApp queda fuera de ese acuerdo. No envíe por ahí datos de sus clientes ni documentos del caso, aunque escriba a soporte.'
+    },
+    {
+      kind: 'nota',
+      titulo: 'El chat de soporte dentro de la aplicación',
+      texto:
+        'En «Soporte» puede abrir una conversación que queda guardada en su cuenta y que responde el operador de la plataforma en horario laboral, sin tiempo de respuesta garantizado. Lo ven todos los abogados de su firma y cada mensaje queda en su auditoría. La regla es la misma que para WhatsApp: describa el problema, no pegue datos de clientes ni documentos del caso. El operador no ve su material por escribirle; si necesita verlo, se lo pedirá por el acceso de soporte, que autoriza un socio.'
     }
   ]
 };

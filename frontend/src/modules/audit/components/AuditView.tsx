@@ -54,7 +54,8 @@ export const ACCIONES: Record<string, string> = {
   FIRM_CREDITS_ADDED: 'Acreditó saldo',
   FIRM_STATUS_CHANGED: 'Cambió estado de la firma',
   USER_CREATED: 'Creó usuario',
-  SUPERADMIN_LISTED_FIRMS: 'Operación listó firmas'
+  SUPERADMIN_LISTED_FIRMS: 'Operación listó firmas',
+  SUPPORT_CHAT_MESSAGE: 'Chat de soporte'
 };
 
 /** Las preguntas reales que estos datos pueden responder hoy. */

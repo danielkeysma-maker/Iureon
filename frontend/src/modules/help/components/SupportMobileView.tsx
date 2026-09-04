@@ -10,6 +10,7 @@ import {
 } from '../content/support';
 import { entradaPorId } from '../content/manual';
 import { ChevronRight } from 'lucide-react';
+import { ChatDeSoporte } from './ChatDeSoporte';
 import type { SupportChannel } from '../types';
 
 /**
@@ -28,18 +29,17 @@ import type { SupportChannel } from '../types';
  * ─── LA DIFERENCIA QUE 9d QUIERE MARCAR, Y QUE AQUÍ SE RESPETA ──────────────
  *
  * El artboard llama a esto «dos vías con expectativas distintas, no dos botones
- * iguales», y por eso cada tarjeta lleva su tiempo de respuesta y su filete de
- * color propio. Pero hay una diferencia MÁS grande que la maqueta no podía
- * saber: **el chat en la app no existe**. No hay servidor de conversación, ni
- * cola, ni nadie al otro lado.
+ * iguales», y por eso cada tarjeta lleva su filete de color propio. Los tiempos
+ * de respuesta de la maqueta no se pintan: nadie los mide.
  *
- * Así que su tarjeta se pinta como DECLARACIÓN y no como botón. Es la regla que
- * el módulo ya tenía escrita —«un canal que no se puede usar se renderiza como
- * declaración, nunca como un botón que no hace nada»— y en el teléfono importa
- * más: un botón grande y cómodo que no responde nada se pulsa dos veces antes
- * de que alguien sospeche que no existe.
+ * El chat en la app existe y lo responde el operador de la plataforma. En el
+ * teléfono su tarjeta lleva un botón «Abrir el chat» que sustituye la pantalla
+ * entera por el chat: la lista de hilos y el hilo abierto necesitan el ancho
+ * completo, y meterlos dentro de una tarjeta de 15px de margen dejaría los
+ * globos de conversación a tres palabras por línea.
  *
- * Lo mismo con WhatsApp: solo es enlace cuando hay número configurado.
+ * La regla vieja sigue para lo que no se puede usar: WhatsApp solo es enlace
+ * cuando hay número configurado; sin él se pinta como declaración.
  *
  * ─── LA ADVERTENCIA VIAJA CON EL CANAL, NO AL PIE ───────────────────────────
  *
@@ -66,7 +66,27 @@ export const SupportMobileView: React.FC<SupportMobileViewProps> = ({
   firma,
   correo,
   onManual
-}) => (
+}) => {
+  const [chatAbierto, setChatAbierto] = React.useState(false);
+
+  if (chatAbierto) {
+    return (
+      <div className="flex h-full min-h-0 flex-1 flex-col overflow-y-auto bg-canvas">
+        <div className="flex flex-col gap-2 px-3 py-3">
+          <button
+            type="button"
+            onClick={() => setChatAbierto(false)}
+            className="btn-ghost btn-sm self-start"
+          >
+            ← Soporte
+          </button>
+          <ChatDeSoporte firma={firma} correo={correo} />
+        </div>
+      </div>
+    );
+  }
+
+  return (
   <div className="flex h-full min-h-0 flex-1 flex-col overflow-y-auto bg-canvas">
     <div className="flex flex-col gap-[11px] px-4 py-3.5">
       {CANALES.map((canal) => {
@@ -132,6 +152,14 @@ export const SupportMobileView: React.FC<SupportMobileViewProps> = ({
                   Sale de Iureon · {whatsappLegible()}
                 </p>
               </>
+            ) : canal.id === 'chat' && usable ? (
+              <button
+                type="button"
+                onClick={() => setChatAbierto(true)}
+                className="btn-primary mt-3 flex h-11 w-full items-center justify-center"
+              >
+                Abrir el chat
+              </button>
             ) : (
               /*
                * NI BOTON NI ENLACE. El canal no se puede usar, y el artboard no
@@ -188,4 +216,5 @@ export const SupportMobileView: React.FC<SupportMobileViewProps> = ({
       </section>
     </div>
   </div>
-);
+  );
+};

@@ -48,7 +48,14 @@ export type AuditAction =
   | 'SUPPORT_ACCESS_AUTHORIZED'
   | 'SUPPORT_ACCESS_DENIED'
   | 'SUPPORT_ACCESS_REVOKED'
-  | 'SUPPORT_ACCESS_VIEWED';
+  | 'SUPPORT_ACCESS_VIEWED'
+  /*
+   * Chat de soporte. Una sola acción para abrir, escribir, responder y
+   * cerrar: lo que distingue cada hecho va en `resource`, y todas quedan en
+   * el rastro DE LA FIRMA, también las que escribe el operador. Una firma
+   * tiene que poder leer que operación le respondió, y cuándo.
+   */
+  | 'SUPPORT_CHAT_MESSAGE';
 
 export interface AuditLogEntry {
   id: string;

@@ -7,6 +7,12 @@ import {
   solicitarAccesoController
 } from '../support/supportAccess.controller';
 import {
+  bandejaOperadorController,
+  cerrarOperadorController,
+  conversacionOperadorController,
+  responderOperadorController
+} from '../support/supportChat.controller';
+import {
   addCreditsController,
   addUserController,
   createFirmController,
@@ -63,5 +69,16 @@ router.post('/firms/:firmId/users', addUserController as any);
 router.post('/firms/:firmId/support-access', solicitarAccesoController as any);
 router.get('/firms/:firmId/support-access', historialAccesoController as any);
 router.post('/firms/:firmId/support-access/view', anotarLecturaController as any);
+
+/*
+ * Chat de soporte, lado operador. Misma razon que arriba: la bandeja cruza
+ * todas las firmas, asi que vive detras del guardian del router y no en su
+ * propio modulo. Ninguna de estas usa `req.firmId`: el operador lee cualquier
+ * hilo por su id, y la firma de cada uno sale de la fila.
+ */
+router.get('/support-chat', bandejaOperadorController as any);
+router.get('/support-chat/:id', conversacionOperadorController as any);
+router.post('/support-chat/:id/messages', responderOperadorController as any);
+router.post('/support-chat/:id/close', cerrarOperadorController as any);
 
 export const adminRoutes = router;

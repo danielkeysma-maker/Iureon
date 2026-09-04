@@ -13,6 +13,7 @@ import { MobileMoreSheet } from './modules/tenant/components/MobileMoreSheet';
 import { SupportAccessBanner } from './modules/support/components/SupportAccessBanner';
 import { SupportAccessDecisionDialog } from './modules/support/components/SupportAccessDecisionDialog';
 import type { SupportAccess } from './modules/support/support.api';
+import { supportChatApi } from './modules/support/supportChat.api';
 import { HeaderTop } from './modules/tenant/components/HeaderTop';
 import type { LawFirmTenant } from './modules/tenant/types';
 import { TenantProvider } from './modules/tenant/TenantContext';
@@ -411,6 +412,38 @@ export function App() {
     };
   }, [session, refreshBalance]);
 
+  /*
+   * RESPUESTAS DE SOPORTE SIN LEER, para el contador del módulo «Soporte» en
+   * la barra. Mismo sondeo que el saldo, a 30 s: una respuesta de soporte
+   * llega en minutos u horas y medio minuto de retraso no se nota. La cifra
+   * es de la FIRMA —abrir el hilo desde cualquier cuenta la pone a cero— y
+   * el operador no la consulta: su bandeja vive en la consola.
+   */
+  const [sinLeerSoporte, setSinLeerSoporte] = useState(0);
+  useEffect(() => {
+    if (!session || esSuperusuario) return;
+    const CADA_MS = 30_000;
+    const leer = async () => {
+      try {
+        setSinLeerSoporte(await supportChatApi.sinLeer());
+      } catch {
+        /* La cifra se queda como estaba; nunca se inventa. */
+      }
+    };
+    const siVisible = () => {
+      if (document.visibilityState === 'visible') void leer();
+    };
+    void leer();
+    const intervalo = window.setInterval(siVisible, CADA_MS);
+    document.addEventListener('visibilitychange', siVisible);
+    window.addEventListener('focus', siVisible);
+    return () => {
+      window.clearInterval(intervalo);
+      document.removeEventListener('visibilitychange', siVisible);
+      window.removeEventListener('focus', siVisible);
+    };
+  }, [session, esSuperusuario]);
+
   // ═══ Clave de localStorage scoped por firma+usuario ═══
   const {
     savedDrafts,
@@ -659,6 +692,7 @@ export function App() {
         onOpenUserManagementModal={() => setIsUserManagementModalOpen(true)}
         onOpenRechargeModal={() => setIsRechargeModalOpen(true)}
         isSuperUser={esSuperusuario}
+        pendientes={{ soporte: sinLeerSoporte }}
       />
       </div>
       )}
@@ -1032,11 +1066,10 @@ export function App() {
           )}
           {/*
             9d llama a esto «dos vias con expectativas distintas, no dos botones
-            iguales»: cada canal con su tiempo de respuesta y su filete de
-            color. Con una diferencia que la maqueta no podia prever — el chat
-            en la app NO EXISTE, asi que su tarjeta se pinta como declaracion y
-            no como boton. En el telefono importa mas: un boton grande y comodo
-            que no responde se pulsa dos veces antes de sospechar.
+            iguales»: cada canal con su filete de color. El chat en la app
+            existe y lo responde el operador; en el telefono se abre a pantalla
+            completa desde su tarjeta, porque los globos de conversacion no
+            caben dentro de ella.
           */}
           {mainView === 'soporte' && (
             <div className="flex min-h-0 flex-1 lg:hidden">

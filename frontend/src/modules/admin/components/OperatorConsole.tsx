@@ -4,6 +4,7 @@ import { adminApi, type FirmSummary } from '../admin.api';
 import { FirmDetailDialog } from './FirmDetailDialog';
 import { CatalogMasterDialog } from './CatalogMasterDialog';
 import { RechargeFirmDialog } from './RechargeFirmDialog';
+import { BandejaDeSoporte } from './BandejaDeSoporte';
 
 /**
  * Running the platform: the firms on it, their plans, their balances.
@@ -164,6 +165,13 @@ export const OperatorConsole: React.FC = () => {
 
   return (
     <div className="space-y-4">
+      {/*
+        LA BANDEJA DE SOPORTE VA ARRIBA: es lo único de esta consola que tiene a
+        alguien esperando al otro lado. Las cifras de saldo se consultan; una
+        pregunta de una firma se responde.
+      */}
+      <BandejaDeSoporte />
+
       {/* ─── LAS CIFRAS AGREGADAS (7a): la salud de la casa de un vistazo ── */}
       {firms.length > 0 && (
         <div className="grid grid-cols-2 gap-px overflow-hidden rounded-card border border-line-200 bg-line-100 sm:grid-cols-4">

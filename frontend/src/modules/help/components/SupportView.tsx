@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, BookOpen, Check, ChevronRight, MessageSquare, Minus } from 'lucide-react';
+import { AlertTriangle, BookOpen, Check, ChevronRight, MessageSquare } from 'lucide-react';
 import {
   ANTES_DE_ESCRIBIR,
   CANALES,
@@ -9,6 +9,7 @@ import {
   whatsappLegible
 } from '../content/support';
 import { entradaPorId } from '../content/manual';
+import { ChatDeSoporte } from './ChatDeSoporte';
 import type { SupportChannel } from '../types';
 
 /**
@@ -20,8 +21,9 @@ import type { SupportChannel } from '../types';
  * twelve. Nobody measures either number, and this is the one screen a reader
  * reaches after something already went wrong, so a reassuring invention here is
  * worse than silence. What actually separates them today is simpler and true:
- * WhatsApp is a link and works the moment a number is configured; the in-app
- * chat does not exist. Each card says which it is.
+ * WhatsApp is a link that leaves Iureon and works the moment a number is
+ * configured; the in-app chat stays inside the firm's account, is answered by
+ * the platform operator and keeps its history here. Each card says which it is.
  *
  * ─── THE WARNING IS THE POINT OF THE WHATSAPP CARD ──────────────────────────
  *
@@ -140,15 +142,21 @@ export const SupportView: React.FC<SupportViewProps> = ({ firma, correo, onManua
             <TarjetaCanal
               canal={chat}
               accion={
-                <div className="flex items-start gap-2 rounded-control border border-line-200 bg-canvas px-3 py-2.5">
-                  <Minus size={14} strokeWidth={2.4} className="mt-0.5 shrink-0 text-ink-400" />
-                  <p className="font-mono text-[11px] leading-[1.5] text-ink-400 [text-wrap:pretty]">
-                    No hay botón aquí a propósito: no existe conversación que abrir.
-                  </p>
-                </div>
+                <p className="font-mono text-[11px] leading-[1.5] text-ink-400 [text-wrap:pretty]">
+                  Sus conversaciones están más abajo, en esta misma pantalla.
+                </p>
               }
             />
           )}
+        </div>
+
+        {/*
+          EL CHAT Y SU HISTORIAL, en la misma tarjeta: la lista de hilos ES el
+          historial del artboard, y separarlos obligaría a explicar dos veces
+          quién responde y qué no se pega aquí.
+        */}
+        <div className="mt-4">
+          <ChatDeSoporte firma={firma} correo={correo} />
         </div>
 
         <div className="mt-4 flex flex-col gap-4 lg:flex-row">
@@ -194,14 +202,13 @@ export const SupportView: React.FC<SupportViewProps> = ({ firma, correo, onManua
         </div>
 
         {/*
-          EL HISTORIAL DE CONVERSACIONES del artboard. Vive en el mismo backend
-          de mensajería que el chat, así que se declara aquí en una línea en vez
-          de dibujar dos tiquetes de ejemplo que nadie podría abrir.
+          Lo que escriba por WhatsApp sigue sin quedar registrado aquí: es un
+          canal externo, y decirlo evita que alguien busque en el chat una
+          conversación que tuvo por teléfono.
         */}
         <p className="mt-4 rounded-card border border-line-200 bg-surface px-5 py-3.5 text-meta leading-[1.6] text-ink-500 [text-wrap:pretty]">
-          El historial de sus conversaciones con soporte —abiertas y resueltas— se agregará junto
-          con el chat. Hoy no queda registro dentro de la aplicación de lo que escriba por
-          WhatsApp.
+          El historial de arriba recoge solo lo escrito por el chat de la aplicación. De lo que
+          escriba por WhatsApp no queda registro dentro de Iureon.
         </p>
       </div>
     </div>

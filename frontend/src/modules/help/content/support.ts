@@ -11,18 +11,25 @@ import type { SupportChannel } from '../types';
  * configured the card says the channel is not open yet instead of drawing a
  * button that opens a chat with nobody.
  *
- * ─── WHAT THE 9b ARTBOARD ASKS FOR AND IS NOT PROMISED HERE ─────────────────
+ * ─── WHAT THE 9b ARTBOARD ASKS FOR, AND WHAT OF IT EXISTS TODAY ─────────────
  *
- * · The in-app chat. It needs a messaging backend — conversations, agents,
- *   attachments, presence — and none of it exists. It is declared, not drawn:
- *   a chat box that sends nothing is the worst thing this screen could ship.
- * · "≈ 4 min" / "≈ 12 min" first-response times, and the "En línea" badge. No
- *   one measures either, so both would be numbers invented to look reassuring
- *   on the screen a reader reaches when something already went wrong.
- * · The attention schedule. It is a service commitment nobody has made yet.
- * · "Sus conversaciones" (open / resolved tickets). Same missing backend.
- * · "Urgencias de término: esas conversaciones se atienden primero." A promise
- *   of priority with no queue behind it. What survives is the part that is
+ * · The in-app chat EXISTS: conversations and messages stored per firm
+ *   (`support_conversations`, `support_messages`), written by any lawyer of the
+ *   firm and answered by the platform operator from the operator console. It
+ *   is a polled inbox refreshed every 30 s, not a live socket. No attachments:
+ *   the same rule as WhatsApp applies — client data and case documents do not
+ *   travel through it — and an upload box would invite exactly that.
+ * · "Sus conversaciones" (open / closed threads) EXISTS, as the list inside
+ *   the chat card. Closing is the operator's act; a firm that writes again
+ *   reopens the thread.
+ * · NOT promised, still: "≈ 4 min" / "≈ 12 min" first-response times and the
+ *   "En línea" badge. Nobody measures response time and nobody tracks
+ *   presence, so both would be numbers invented to look reassuring on the
+ *   screen a reader reaches when something already went wrong.
+ * · NOT promised: the attention schedule as a commitment. The card says
+ *   "horario laboral" as a description of who answers, not as an SLA.
+ * · NOT promised: "Urgencias de término: esas conversaciones se atienden
+ *   primero." There is no priority queue. What survives is the part that is
  *   advice and costs nothing to keep: say the deadline in the first line.
  */
 
@@ -89,18 +96,23 @@ export const CANALES: readonly SupportChannel[] = [
     id: 'chat',
     nombre: 'Chat dentro de la aplicación',
     paraQue: 'Para dudas sobre un escrito o una ficha, sin salir de la pantalla',
-    disponible: false,
-    razon:
-      'Todavía no existe. Un chat de soporte necesita infraestructura de mensajería —conversaciones guardadas, agentes en línea, adjuntos— y esta instalación no la tiene. Se agregará cuando esa infraestructura exista; mientras tanto no hay un cuadro de chat que parezca enviar y no envíe.',
+    disponible: true,
+    razon: '',
     puntos: [
       {
         tono: 'hecho',
         texto:
-          'Cuando exista, adjuntará solo el contexto de la pantalla —borrador y actuación— y nunca los datos de su cliente.'
+          'La conversación queda registrada en su cuenta y en su auditoría, no en un canal externo. La ve cualquier abogado de su firma.'
       },
       {
         tono: 'hecho',
-        texto: 'La conversación quedará registrada en su cuenta, no en un canal externo.'
+        texto:
+          'Responde el operador de la plataforma en horario laboral. No hay tiempo de respuesta garantizado ni cola de prioridad: si tiene un término encima, dígalo en la primera línea.'
+      },
+      {
+        tono: 'advertencia',
+        texto:
+          'No pegue aquí datos de sus clientes ni documentos del caso. Soporte no ve su material por escribirle; si hace falta verlo, se pide por el acceso de soporte, que autoriza un socio.'
       }
     ]
   }
