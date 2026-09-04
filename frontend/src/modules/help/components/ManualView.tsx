@@ -10,7 +10,8 @@ import {
   Lightbulb,
   MapPin,
   Minus,
-  Search
+  Search,
+  Sparkles
 } from 'lucide-react';
 import {
   ENTRADAS,
@@ -22,8 +23,11 @@ import {
   minutosDeLectura,
   separarRuta
 } from '../content/manual';
+import { NOVEDADES_ID } from '../content/novedades';
 import type { ManualBlock, ManualEntry } from '../types';
 import { useManualReads } from '../useManualReads';
+import { useAperturaNovedades, useNovedadesNuevas } from '../useNovedades';
+import { NovedadesPanel } from './NovedadesPanel';
 
 /**
  * The manual, read the way it was written: by task, not by module.
@@ -395,6 +399,9 @@ const Indice: React.FC<{
     () => new Map(ENTRADAS.map((e) => [e.articulo.id, e.numero])),
     []
   );
+  const nuevas = useNovedadesNuevas();
+  const buscando = consulta.trim().length > 0;
+  const novedadesActivas = activo === NOVEDADES_ID;
 
   return (
     <aside className="flex w-[268px] shrink-0 flex-col border-r border-line-200 bg-surface">
@@ -413,6 +420,40 @@ const Indice: React.FC<{
       </div>
 
       <nav className="min-h-0 flex-1 overflow-y-auto px-2 py-3">
+        {/*
+          NOVEDADES ARRIBA DEL ÍNDICE, fuera de los grupos: no es un artículo
+          que se lea una vez sino una lista que crece. Se oculta al buscar,
+          porque la búsqueda es sobre los artículos.
+        */}
+        {!buscando && (
+          <button
+            type="button"
+            onClick={() => onAbrir(NOVEDADES_ID)}
+            className={`mb-4 flex w-full items-center gap-2.5 rounded-control px-2.5 py-2 text-left ${
+              novedadesActivas
+                ? 'bg-brand-50 text-ink-900 shadow-[inset_2px_0_0_rgb(var(--brand-700))]'
+                : 'text-ink-700 hover:bg-canvas'
+            }`}
+          >
+            <Sparkles
+              size={14}
+              strokeWidth={2.2}
+              className={`shrink-0 ${novedadesActivas ? 'text-brand-700' : 'text-ink-400'}`}
+            />
+            <span className={`text-ui leading-[1.4] ${novedadesActivas ? 'font-semibold' : ''}`}>
+              Novedades
+            </span>
+            {nuevas > 0 && (
+              <span
+                className="ml-auto inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-700 px-1.5 font-mono text-[10px] font-semibold text-on-brand"
+                title={`${nuevas} ${nuevas === 1 ? 'cambio nuevo' : 'cambios nuevos'} desde su última visita`}
+              >
+                {nuevas}
+              </span>
+            )}
+          </button>
+        )}
+
         {MANUAL.map((grupo) => {
           const visibles = grupo.articulos.filter((a) => encontradas.has(a.id));
           if (visibles.length === 0) return null;
@@ -506,21 +547,33 @@ export const ManualView: React.FC<ManualViewProps> = ({ articuloInicial, onSopor
     cuerpo.current?.scrollTo({ top: 0 });
   }, []);
 
+  /* El sello de versión de la barra lateral abre Manual → Novedades por aquí. */
+  const abrirNovedades = React.useCallback(() => abrir(NOVEDADES_ID), [abrir]);
+  useAperturaNovedades(abrirNovedades);
+  const enNovedades = activo === NOVEDADES_ID;
+
   return (
     <div className="flex h-full min-h-0 flex-1 bg-canvas font-sans">
       <Indice consulta={consulta} onConsulta={setConsulta} activo={activo} onAbrir={abrir} />
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex h-11 shrink-0 items-center gap-2.5 border-b border-line-200 bg-surface px-6">
-          <span className="shrink-0 text-meta text-ink-500">{grupo}</span>
+          <span className="shrink-0 text-meta text-ink-500">{enNovedades ? 'Aprender' : grupo}</span>
           <ChevronRight size={12} strokeWidth={2.4} className="shrink-0 text-ink-400" />
-          <span className="truncate text-meta font-semibold text-ink-900">{articulo.titulo}</span>
-          <span className="ml-auto shrink-0 font-mono text-meta text-ink-400">
-            ≈ {minutosDeLectura(articulo)} min de lectura
+          <span className="truncate text-meta font-semibold text-ink-900">
+            {enNovedades ? 'Novedades' : articulo.titulo}
           </span>
+          {!enNovedades && (
+            <span className="ml-auto shrink-0 font-mono text-meta text-ink-400">
+              ≈ {minutosDeLectura(articulo)} min de lectura
+            </span>
+          )}
         </header>
 
         <div ref={cuerpo} className="min-h-0 flex-1 overflow-y-auto px-6 py-6">
+          {enNovedades ? (
+            <NovedadesPanel />
+          ) : (
           <article className="mx-auto w-full max-w-[704px] pb-10">
             <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-ink-400">
               Artículo {String(numero).padStart(2, '0')} de {TOTAL_ARTICULOS}
@@ -597,6 +650,7 @@ export const ManualView: React.FC<ManualViewProps> = ({ articuloInicial, onSopor
               </button>
             </div>
           </article>
+          )}
         </div>
       </div>
     </div>

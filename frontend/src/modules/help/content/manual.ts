@@ -74,7 +74,7 @@ const A_QUE_HACE: ManualArticle = {
         'Producir: «Redacción» (el taller donde se genera un escrito), «Borradores» (los escritos guardados con su término), «Revisiones» (los escritos ya redactados que un revisor corrigió con usted) y «Orientación» (de los hechos a la actuación).',
         'Registrar: «Audiencias» y «Entrevistas», las dos pantallas que transcriben una grabación.',
         'Consultar: «Buscador» de jurisprudencia, «Catálogo» de actuaciones y «Herramientas» de cálculo.',
-        'Aprender: este «Manual de uso» y «Soporte».',
+        'Aprender: este «Manual de uso» y «Soporte». Al inicio del índice del manual, «Novedades» lista qué cambió en la aplicación y cuándo.',
         'Administrar (plegado por defecto): «Seguridad», con la auditoría de la firma; «Privacidad», con los proveedores que tocan sus datos; y «Ajustes».',
         'En el pie de la barra están «Saldo», «Plan», «Membrete» y «Avisos»: son ajustes de la firma y del aparato, no módulos.'
       ]

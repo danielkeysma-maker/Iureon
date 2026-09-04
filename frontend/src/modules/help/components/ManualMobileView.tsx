@@ -10,7 +10,9 @@ import {
 } from '../content/manual';
 import type { ManualEntry } from '../types';
 import { Bloque, Ruta } from './ManualView';
+import { NovedadesPanel } from './NovedadesPanel';
 import { useManualReads } from '../useManualReads';
+import { useAperturaNovedades, useNovedadesNuevas } from '../useNovedades';
 import { IconoVerificado } from '../../../design/ArtboardIcons';
 
 /**
@@ -61,10 +63,40 @@ const porGrupo = (entradas: readonly ManualEntry[]) => {
 export const ManualMobileView: React.FC<ManualMobileViewProps> = ({ onSoporte }) => {
   const [consulta, setConsulta] = React.useState('');
   const [abierto, setAbierto] = React.useState<ManualEntry | null>(null);
+  const [novedades, setNovedades] = React.useState(false);
   const lectura = useManualReads();
+  const nuevas = useNovedadesNuevas();
 
-  const visibles = consulta.trim() ? buscar(consulta) : ENTRADAS;
+  /* La misma puerta que en escritorio: el sello de versión abre Novedades. */
+  const abrirNovedades = React.useCallback(() => {
+    setAbierto(null);
+    setNovedades(true);
+  }, []);
+  useAperturaNovedades(abrirNovedades);
+
+  const buscando = consulta.trim().length > 0;
+  const visibles = buscando ? buscar(consulta) : ENTRADAS;
   const grupos = porGrupo(visibles);
+
+  if (novedades) {
+    return (
+      <div className="flex h-full min-h-0 flex-1 flex-col overflow-y-auto bg-canvas">
+        <button
+          type="button"
+          onClick={() => setNovedades(false)}
+          className="sticky top-0 z-10 flex min-h-[44px] shrink-0 items-center gap-2 border-b border-line-200 bg-surface px-4 text-[13px] font-semibold text-ink-700"
+        >
+          <IconoVolver className="h-4 w-4" />
+          Manual
+        </button>
+        <section className="px-4 py-4">
+          <p className="font-mono text-[11px] text-ink-400">Historial de actualizaciones</p>
+          <h1 className="mt-1 text-[17px] font-semibold leading-tight text-ink-900">Novedades</h1>
+          <NovedadesPanel compacto />
+        </section>
+      </div>
+    );
+  }
 
   if (abierto) {
     const { ruta, cuerpo } = separarRuta(abierto.articulo);
@@ -156,6 +188,29 @@ export const ManualMobileView: React.FC<ManualMobileViewProps> = ({ onSoporte })
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
+        {/* Novedades arriba del índice, como en escritorio; se oculta al buscar. */}
+        {!buscando && (
+          <button
+            type="button"
+            onClick={() => setNovedades(true)}
+            className="mb-3 flex w-full items-center gap-2.5 rounded-[8px] border border-[rgb(var(--brand-line))] bg-brand-50 px-3 py-3 text-left"
+          >
+            <span className="min-w-0 flex-1">
+              <span className="block text-[13.5px] font-medium leading-tight text-ink-900">
+                Novedades
+              </span>
+              <span className="mt-0.5 block font-mono text-[11px] text-ink-500">
+                Qué cambió en la aplicación y cuándo
+              </span>
+            </span>
+            {nuevas > 0 && (
+              <span className="inline-flex h-[18px] min-w-[18px] shrink-0 items-center justify-center rounded-full bg-brand-700 px-1.5 font-mono text-[10px] font-semibold text-on-brand">
+                {nuevas}
+              </span>
+            )}
+          </button>
+        )}
+
         {grupos.length === 0 ? (
           <p className="py-16 text-center text-[12.5px] text-ink-500">
             Nada en el manual coincide con «{consulta.trim()}».

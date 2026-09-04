@@ -15,6 +15,7 @@ import type { LawFirmTenant } from '../types';
 import type { MainView } from '../types';
 import { NAV_GROUPS, NAV_MODULES, navModule } from '../navigation';
 import { IureonMark } from './IureonMark';
+import { solicitarAbrirNovedades, useNovedadesNuevas } from '../../help/useNovedades';
 
 interface SidebarLeftProps {
   mainView: MainView;
@@ -73,6 +74,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [administrarAbierto, setAdministrarAbierto] = useState(false);
+  const novedadesNuevas = useNovedadesNuevas();
 
   const contexto = isSuperUser
     ? { nombre: 'SuperUsuario', detalle: 'Acceso total · sin firma', Icono: Shield }
@@ -318,9 +320,21 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
         responde en un segundo comparando dos hashes — sin adivinar cachés.
       */}
       {!isCollapsed && (
-        <p className="px-4 pb-1 text-center font-mono text-[9px] tracking-wider text-nav-muted/60">
+        <button
+          type="button"
+          onClick={() => {
+            solicitarAbrirNovedades();
+            setMainView('manual');
+          }}
+          title="Ver qué cambió en esta versión"
+          className="mx-auto flex items-center gap-1.5 px-4 pb-1 font-mono text-[9px] tracking-wider text-nav-muted/60 hover:text-nav-muted"
+        >
+          {/* El punto dice que hay cambios que este navegador no ha visto en Novedades. */}
+          {novedadesNuevas > 0 && (
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-nav-accent" aria-hidden />
+          )}
           v. {__COMMIT__}
-        </p>
+        </button>
       )}
 
       {/* ─── PIE: MEMBRETE Y RIEL ──────────────────────────────────────────*/}
