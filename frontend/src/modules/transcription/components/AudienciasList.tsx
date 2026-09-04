@@ -71,8 +71,14 @@ export const AudienciasList: React.FC<AudienciasListProps> = ({
   const revisadas = visibles.filter((i) => i.estado_revision === 'ACTA_LISTA');
 
   const Fila: React.FC<{ item: StoredTranscription; lista: boolean }> = ({ item, lista }) => (
-    <div className="t-row flex items-center gap-3">
-      <button onClick={() => onOpen(item)} className="min-w-0 flex-1 text-left" title="Abrir y revisar">
+    /*
+      EN EL TELÉFONO LA FILA SE PARTE EN DOS RENGLONES: el nombre y el menú
+      arriba, las cifras y el estado abajo. En una sola línea, las columnas de
+      ancho fijo (voces, fracción, estado, menú) suman más que la pantalla, el
+      nombre se encogía a cero y el resto se salía por la derecha, cortado.
+    */
+    <div className="t-row flex flex-wrap items-center gap-x-3 gap-y-1 sm:flex-nowrap">
+      <button onClick={() => onOpen(item)} className="min-w-0 basis-[calc(100%-40px)] text-left sm:flex-1 sm:basis-auto" title="Abrir y revisar">
         <span className="block truncate text-ui text-ink-900">{nombreLegible(item.title)}</span>
         <span className="mt-0.5 block truncate font-mono text-[11px] text-ink-500">
           {[fecha(item.transcribed_at), duracion(item.duration_seconds)].filter(Boolean).join(' · ')}
@@ -80,7 +86,7 @@ export const AudienciasList: React.FC<AudienciasListProps> = ({
       </button>
 
       {/* Las voces, como número. Los cuadrados de color viven en el detalle. */}
-      <span className="w-[52px] shrink-0 text-center font-mono text-[12px] text-ink-700">
+      <span className="order-2 w-[52px] shrink-0 text-center font-mono text-[12px] text-ink-700 sm:order-none">
         {item.speaker_labels.length} {item.speaker_labels.length === 1 ? 'voz' : 'voces'}
       </span>
 
@@ -89,7 +95,7 @@ export const AudienciasList: React.FC<AudienciasListProps> = ({
         la única cifra accionable de la pantalla: dice cuánto trabajo humano
         queda antes de que esto sea un acta.
       */}
-      <span className="w-[64px] shrink-0 text-center">
+      <span className="order-2 w-[64px] shrink-0 text-center sm:order-none">
         {(() => {
           const total = item.segments.length;
           const revisadas = item.segments.filter((seg) => seg.revisada).length;
@@ -110,7 +116,7 @@ export const AudienciasList: React.FC<AudienciasListProps> = ({
         {quien(item.user_email)}
       </span>
 
-      <span className="w-[110px] shrink-0">
+      <span className="order-2 w-[110px] shrink-0 sm:order-none">
         {lista ? (
           <span className="chip-verified" title={item.revisada_por ? `Revisada por ${quien(item.revisada_por)}` : undefined}>
             Acta lista
@@ -120,7 +126,7 @@ export const AudienciasList: React.FC<AudienciasListProps> = ({
         )}
       </span>
 
-      <span className="relative w-[28px] shrink-0">
+      <span className="relative order-1 w-[28px] shrink-0 sm:order-none">
         <button
           onClick={() => setMenuAbierto(menuAbierto === item.id ? null : item.id)}
           aria-label="Acciones"
