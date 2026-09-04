@@ -496,7 +496,7 @@ export const reviewChatController = async (req: Request, res: Response): Promise
         ENGINE.OPUS,
         buildTallerSystemPrompt(),
         buildTallerUserPrompt({ documentType: revision.documentType, guidance, informe: revision.informe, textoActual: texto.texto, historial, mensaje, anotaciones: anotacionesDelAbogado, verificaciones }),
-        1500
+        2500
       ),
       LIMITE_LLAMADA_MS
     );

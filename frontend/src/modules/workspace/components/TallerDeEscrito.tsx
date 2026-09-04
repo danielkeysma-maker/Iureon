@@ -119,6 +119,25 @@ const claseDeCapas = (capas: MarcaEnCapa[], abierta: number | null): string => {
 
 const fechaCorta = (iso: string): string => new Date(iso).toLocaleString('es-CO', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 
+/**
+ * Turnos guardados ANTES de que el servidor reparara el JSON cortado: quedaron
+ * en la conversación como `{"respuesta":"…\n…` y así se leerían para siempre.
+ * Se rescata el valor de «respuesta» al pintar; los nuevos ya llegan limpios.
+ */
+const textoLegible = (texto: string): string => {
+  const m = /^\s*\{\s*"respuesta"\s*:\s*"/.exec(texto);
+  if (!m) return texto;
+  let cuerpo = texto.slice(m[0].length);
+  const corte = cuerpo.search(/"\s*,\s*"(ediciones|referencias)"\s*:/);
+  cuerpo = corte !== -1 ? cuerpo.slice(0, corte) : cuerpo.replace(/"\s*\}?\s*$/, '');
+  cuerpo = cuerpo.replace(/\\+$/, '');
+  try {
+    return (JSON.parse(`"${cuerpo}"`) as string).trim() || texto;
+  } catch {
+    return cuerpo.replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\').trim() || texto;
+  }
+};
+
 export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   datos,
   precioConsultaCop,
@@ -644,7 +663,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
         {conversacion.map((t, k) => (
           <div key={k} className={`max-w-[92%] ${t.rol === 'abogado' ? 'ml-auto' : ''}`}>
             <div className={`rounded-card px-3 py-2 text-[13px] leading-relaxed ${t.rol === 'abogado' ? 'bg-brand-700 text-white' : 'border border-line-200 bg-canvas text-ink-900'}`}>
-              <p className="whitespace-pre-wrap">{t.texto}</p>
+              <p className="whitespace-pre-wrap">{textoLegible(t.texto)}</p>
               {t.rol === 'revisor' && t.ediciones && t.ediciones.length > 0 && Ediciones(t.ediciones)}
               {t.rol === 'revisor' && t.referencias && t.referencias.length > 0 && (
                 <button type="button" onClick={() => setReferencias(t.referencias ?? [])} className="mt-1.5 text-[11px] text-sky-700 underline underline-offset-2">

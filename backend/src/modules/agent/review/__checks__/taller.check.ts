@@ -97,5 +97,13 @@ check('un JSON con respuesta vacía cae a la prosa cruda, nunca a nada', vacia.r
   check('el sistema sabe que la verificación manda sobre su memoria y qué decir en cada caso', /VERIFICACIÓN DE PROVIDENCIAS/.test(system) && /manda sobre tu memoria/.test(system) && /NO SE PUDO VERIFICAR/.test(system) && /Corte Suprema/.test(system));
 }
 
+{
+  const cortado = '{"respuesta":"Le respondo en tres planos.\\n\\n1) HECHOS: aquí sí hay congruencia, y dijo \\"funcionario de hecho\\".\\n\\nDos desajustes reales:\\n- El cargo se constru';
+  const r = parsearRespuestaDelTaller(cortado);
+  check('un JSON cortado a mitad de la respuesta se rescata como prosa legible, sin barras ni comillas escapadas', r.respuesta.startsWith('Le respondo en tres planos.') && r.respuesta.includes('\n\n1) HECHOS') && r.respuesta.includes('"funcionario de hecho"') && !r.respuesta.includes('\\n') && r.ediciones.length === 0);
+  const cortadoEnEdiciones = '{"respuesta":"Texto completo.","ediciones":[{"cita":"a","reempl';
+  check('si el corte cae en las ediciones, la respuesta se conserva entera y las ediciones se pierden', parsearRespuestaDelTaller(cortadoEnEdiciones).respuesta === 'Texto completo.');
+}
+
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);
 process.exitCode = fallos === 0 ? 0 : 1;

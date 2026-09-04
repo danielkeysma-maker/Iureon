@@ -186,5 +186,28 @@ export const parsearRespuestaDelTaller = (crudo: string): RespuestaDelTaller => 
       /* cae a la prosa */
     }
   }
+  /*
+   * JSON CORTADO A MITAD DE LA RESPUESTA. Pasó en producción: una respuesta
+   * larga agotó los tokens antes de cerrar el objeto y el abogado vio
+   * `{"respuesta":"Le respondo…\n\n1) …` con las barras y todo. Si el texto
+   * empieza como nuestro JSON, se rescata el valor de «respuesta» hasta donde
+   * llegó y se decodifican sus escapes; las ediciones y referencias se pierden,
+   * que es mejor que perder la respuesta entera.
+   */
+  const m = /^\s*\{\s*"respuesta"\s*:\s*"/.exec(sinCerca);
+  if (m) {
+    let cuerpo = sinCerca.slice(m[0].length);
+    const corte = cuerpo.search(/"\s*,\s*"(ediciones|referencias)"\s*:/);
+    if (corte !== -1) cuerpo = cuerpo.slice(0, corte);
+    else cuerpo = cuerpo.replace(/"\s*\}?\s*$/, '');
+    cuerpo = cuerpo.replace(/\\+$/, '');
+    try {
+      const texto = JSON.parse(`"${cuerpo}"`) as string;
+      if (texto.trim()) return { respuesta: texto.trim(), ediciones: [], referencias: [] };
+    } catch {
+      const texto = cuerpo.replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+      if (texto.trim()) return { respuesta: texto.trim(), ediciones: [], referencias: [] };
+    }
+  }
   return { respuesta: sinCerca, ediciones: [], referencias: [] };
 };

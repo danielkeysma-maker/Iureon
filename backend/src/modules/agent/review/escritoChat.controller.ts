@@ -73,7 +73,7 @@ export const escritoChatController = async (req: Request, res: Response): Promis
         ENGINE.OPUS,
         buildTallerSystemPrompt(),
         buildTallerUserPrompt({ documentType, guidance, informe: null, textoActual: texto.texto, historial, mensaje, anotaciones: anotacionesDelAbogado, verificaciones }),
-        1500
+        2500
       ),
       LIMITE_LLAMADA_MS
     );
