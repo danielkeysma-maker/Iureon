@@ -31,9 +31,11 @@ interface LoginPortalViewProps {
  * garantiza, a la derecha entrar. Es la primera impresión, y un abogado que no
  * conoce Iureon merece saber a qué está entrando antes de escribir su contraseña.
  *
- * Las cifras de la izquierda son las reales, no adorno: 651 actuaciones y los
- * dos registros que se consultan en vivo. Si alguna deja de ser cierta hay que
- * cambiarla aquí, y por eso viven en una constante y no sueltas en el marcado.
+ * Las cifras de la izquierda son las reales, no adorno: las actuaciones
+ * verificadas del catálogo y los registros que se consultan en vivo. Si alguna
+ * deja de ser cierta hay que cambiarla aquí, y por eso viven en una constante y
+ * no sueltas en el marcado. Ya pasó una vez: decía 651 y 2 cuando el catálogo
+ * iba en 858 y los registros eran 4.
  */
 
 /**
@@ -46,12 +48,13 @@ interface LoginPortalViewProps {
  */
 const PRUEBAS = [
   {
-    cifra: '651',
-    texto: 'actuaciones procesales catalogadas, verificadas contra el texto oficial de la norma'
+    /* 858 de 860 catalogadas: las dos restantes están marcadas NO_VERIFICADO y no se cuentan. Contado el 4 de septiembre de 2026 sobre catalog/data. */
+    cifra: '858',
+    texto: 'actuaciones procesales en 28 ramas, verificadas contra el texto oficial de la norma'
   },
   {
-    cifra: '2',
-    texto: 'registros consultados en vivo: Corte Constitucional y Corte Suprema de Justicia'
+    cifra: '4',
+    texto: 'registros consultados en vivo: Corte Constitucional, Corte Suprema, Consejo de Estado y Comisión Nacional de Disciplina Judicial'
   }
 ] as const;
 
