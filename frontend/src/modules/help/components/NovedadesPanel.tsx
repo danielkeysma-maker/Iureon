@@ -55,7 +55,7 @@ export const NovedadesPanel: React.FC<NovedadesPanelProps> = ({ compacto = false
   const ultima = NOVEDADES[0]?.fecha;
 
   return (
-    <div className={compacto ? '' : 'mx-auto w-full max-w-[704px] pb-10'}>
+    <div className={compacto ? '' : 'mx-auto w-full max-w-[780px] pb-10'}>
       {!compacto && (
         <>
           <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-ink-400">

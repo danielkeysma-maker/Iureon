@@ -436,7 +436,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
           </div>
         </div>
       )}
-      <div className="mx-auto w-full max-w-[760px] rounded-card border border-line-200 bg-paper px-8 py-8 shadow-sm sm:px-12 sm:py-10">{children}</div>
+      <div className="mx-auto w-full max-w-[816px] rounded-card border border-line-200 bg-paper px-8 py-8 shadow-sm sm:px-12 sm:py-10">{children}</div>
     </div>
   );
 

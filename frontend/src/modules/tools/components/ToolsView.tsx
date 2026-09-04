@@ -189,7 +189,7 @@ export const ToolsView: React.FC = () => {
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto p-5">
-        <div className="mx-auto max-w-3xl space-y-4">
+        <div className="mx-auto max-w-5xl space-y-4">
           {visibles.length === 0 && (
             <p className="card py-8 text-center text-meta text-ink-500">
               Ninguna utilidad coincide con esa búsqueda.

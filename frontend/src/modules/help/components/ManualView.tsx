@@ -574,7 +574,7 @@ export const ManualView: React.FC<ManualViewProps> = ({ articuloInicial, onSopor
           {enNovedades ? (
             <NovedadesPanel />
           ) : (
-          <article className="mx-auto w-full max-w-[704px] pb-10">
+          <article className="mx-auto w-full max-w-[780px] pb-10">
             <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-ink-400">
               Artículo {String(numero).padStart(2, '0')} de {TOTAL_ARTICULOS}
             </p>
