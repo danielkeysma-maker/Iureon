@@ -682,6 +682,52 @@ const A_MOVIL: ManualArticle = {
   ]
 };
 
+const A_HERRAMIENTAS: ManualArticle = {
+  id: 'herramientas',
+  titulo: 'Herramientas de cálculo',
+  entradilla:
+    'Qué calcula cada herramienta, de dónde salen sus cifras y cuáles tiene que escribir usted porque ninguna fuente oficial las entrega de forma estable.',
+  bloques: [
+    {
+      kind: 'parrafo',
+      texto:
+        'Herramientas reúne siete utilidades que no generan un escrito: contador de términos, calendario judicial, liquidación de prestaciones, competencia por cuantía, intereses de mora, indexación por IPC y el glosario. Todas obedecen la misma regla que el catálogo: ninguna constante entra al cálculo sin su norma, la dirección oficial donde se leyó y la fecha en que se leyó. Esa lista se imprime debajo de cada resultado, en el recuadro «Fuentes», y viaja en la hoja «Fuentes» del archivo de Excel que cada herramienta exporta.'
+    },
+    { kind: 'subtitulo', texto: 'Lo que el servidor sabe' },
+    {
+      kind: 'lista',
+      items: [
+        'Los festivos se calculan de la Ley 51 de 1983 para cualquier año desde 1984 —fechas fijas, las que se trasladan al lunes y las que dependen de la Pascua— y desde 2026 incluyen el 9 de julio de la Ley 2578 de 2026. Cada fila del calendario dice qué regla la produjo.',
+        'La vacancia judicial del 20 de diciembre al 10 de enero y la Semana Santa se descuentan porque el Decreto 1660 de 1978 las declara vacancia y el artículo 118 del CGP ordena no contarlas. Los despachos penales atienden de lunes a miércoles santos: elija «Penal» en el contador, o apague la casilla en el calendario.',
+        'El salario mínimo y el auxilio de transporte de 2020 a 2026 están cargados con el decreto de cada año. La competencia por cuantía solo ofrece esos años; para otro año la herramienta se niega en vez de suponer un valor.',
+        'La tasa de interés bancario corriente cambia cada mes. El servidor trae únicamente la última certificación verificada, con su mes y su resolución, y la prellena etiquetada.'
+      ]
+    },
+    { kind: 'subtitulo', texto: 'Lo que usted escribe' },
+    {
+      kind: 'parrafo',
+      texto:
+        'El índice IPC no se carga solo: el DANE lo publica en un archivo cuya dirección cambia cada mes y que un servidor no puede leer con garantías. Tome el índice inicial y el final de la página oficial enlazada en la herramienta —el total nacional, base diciembre de 2018 igual a 100— y escríbalos; la fórmula que se aplica se muestra con sus números. Lo mismo ocurre con el interés bancario corriente de cualquier mes distinto del prellenado: tómelo de la certificación de la Superintendencia Financiera y consérvela como soporte.'
+    },
+    {
+      kind: 'nota',
+      titulo: 'Los intereses se liquidan de forma simple',
+      texto:
+        'Interés simple sobre los días calendario entre las dos fechas, año de 365 días, sin capitalizar. En el modo comercial la tasa es 1,5 veces el bancario corriente (art. 884 del Código de Comercio); en el civil, el 6 % anual del artículo 1617 del Código Civil; en el pactado, la que usted indique, contrastada con el tope de usura del artículo 305 del Código Penal. Si un periodo cruza varios meses, la herramienta advierte que una liquidación exacta aplica la tasa certificada de cada mes.'
+    },
+    {
+      kind: 'aviso',
+      texto:
+        'El salario mínimo de 2026 está fijado por el Decreto 1469 de 2025, suspendido provisionalmente por el Consejo de Estado, y por el Decreto 0159 de 2026, que fija el mismo valor de forma transitoria. La cifra es la misma bajo los dos; el resultado lo advierte para que verifique si hay decisión de fondo posterior.'
+    },
+    {
+      kind: 'todavia-no',
+      texto:
+        'El cómputo de ejecutoria con traslados no está construido: exige modelar cada recurso con su término y su forma de notificación. La competencia laboral por cuantía se calcula solo con la Ley 2452 de 2025, vigente desde el 2 de abril de 2026; para demandas anteriores la herramienta se niega porque el código anterior no está verificado en ella.'
+    }
+  ]
+};
+
 /** The index, grouped by task and by role — not by module. */
 export const MANUAL: readonly ManualGroup[] = [
   {
@@ -689,6 +735,7 @@ export const MANUAL: readonly ManualGroup[] = [
     articulos: [A_QUE_HACE, A_PRIMER_ESCRITO, A_TRES_ESTADOS, A_VERIFICAR, A_MOVIL]
   },
   { titulo: 'Redactar', articulos: [A_INSTRUCCION, A_REVISAR, A_EXPORTAR, A_BORRADORES] },
+  { titulo: 'Calcular', articulos: [A_HERRAMIENTAS] },
   { titulo: 'Grabar', articulos: [A_ENTREVISTA, A_AUDIENCIA] },
   {
     titulo: 'Para socios',

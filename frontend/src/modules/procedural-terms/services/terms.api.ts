@@ -3,7 +3,7 @@ import { httpClient } from '../../../config/httpClient';
 export interface TermsCalculationRequest {
   notifiedDate: string;
   termInDays: number;
-  jurisdictionType: 'LABORAL' | 'CIVIL' | 'CONSTITUCIONAL';
+  jurisdictionType: 'LABORAL' | 'CIVIL' | 'CONSTITUCIONAL' | 'PENAL';
 }
 
 export interface TermsCalculationResult {
@@ -14,6 +14,8 @@ export interface TermsCalculationResult {
   totalBusinessDays: number;
   excludedDays: { date: string; reason: string }[];
   normativeReference: string;
+  /** Official sources behind the calendar (Ley 51 de 1983, CGP art. 118). */
+  fuentes?: Array<{ nombre: string; norma: string; url: string; consultadoEl: string }>;
 }
 
 interface TermsResponse {

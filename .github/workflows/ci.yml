@@ -50,6 +50,8 @@ jobs:
         run: npm run check:triage
       - name: Period statement arithmetic is exact
         run: npm run check:extracto
+      - name: Herramientas calculators (holidays from statute, 1.5 x IBC, cuantia tiers, indexation)
+        run: npm run check:tools
       - name: PDF reader works without the optional native canvas
         run: npm run check:pdf
 

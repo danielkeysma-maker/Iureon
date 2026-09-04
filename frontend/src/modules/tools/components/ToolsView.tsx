@@ -3,6 +3,10 @@ import { BookOpen, CalendarClock, Coins, Search } from 'lucide-react';
 import { ProceduralTermsModal } from '../../procedural-terms/components/ProceduralTermsModal';
 import { LaborSettlementModal } from '../../settlements/components/LaborSettlementModal';
 import { LegalSearchGlossaryModal } from '../../search/components/LegalSearchGlossaryModal';
+import { IndexacionModal } from './IndexacionModal';
+import { InteresesModal } from './InteresesModal';
+import { CuantiaModal } from './CuantiaModal';
+import { CalendarioModal } from './CalendarioModal';
 
 /**
  * Herramientas. Lista por tarea, no cuadrícula de tarjetas.
@@ -23,11 +27,19 @@ import { LegalSearchGlossaryModal } from '../../search/components/LegalSearchGlo
  *
  * ─── LO QUE EL ARTBOARD 2d LISTA Y AQUÍ NO ESTÁ ─────────────────────────────
  *
- * Indexación con IPC (necesita el índice del DANE), competencia por cuantía
- * (SMLMV del año), intereses moratorios (tasa de usura por trimestre),
- * calendario judicial y ejecutoria con traslados: cada una exige una fuente
- * oficial conectada y verificada. Pintarlas como filas muertas sería un menú
- * de promesas. Se agregan cuando su fuente exista.
+ * Ejecutoria con traslados: exige modelar cada recurso con su término y su
+ * forma de notificación, y no está construida. Pintarla como fila muerta sería
+ * una promesa. Se agrega cuando exista.
+ *
+ * ─── LO QUE SÍ ESTÁ, Y CON QUÉ FUENTE ───────────────────────────────────────
+ *
+ * Indexación por IPC, intereses de mora, competencia por cuantía y calendario
+ * judicial llegaron con la regla del catálogo: cada constante (SMLMV por año,
+ * tasa certificada, festivos) viaja desde el servidor con su norma, su URL
+ * oficial y su fecha de consulta, y se imprime junto al resultado. Lo que no
+ * tiene fuente estable que un servidor pueda leer —el índice IPC del DANE, la
+ * tasa bancaria corriente de cada mes— lo ESCRIBE el abogado desde la página
+ * oficial enlazada, y la pantalla lo dice antes de calcular.
  *
  * «Usadas por usted esta semana» tampoco está: exige registro de uso por
  * usuario, que hoy no se guarda.
@@ -45,6 +57,10 @@ export const ToolsView: React.FC = () => {
   const [terminosAbierto, setTerminosAbierto] = useState(false);
   const [liquidacionAbierta, setLiquidacionAbierta] = useState(false);
   const [glosarioAbierto, setGlosarioAbierto] = useState(false);
+  const [indexacionAbierta, setIndexacionAbierta] = useState(false);
+  const [interesesAbiertos, setInteresesAbiertos] = useState(false);
+  const [cuantiaAbierta, setCuantiaAbierta] = useState(false);
+  const [calendarioAbierto, setCalendarioAbierto] = useState(false);
   const [busqueda, setBusqueda] = useState('');
 
   const grupos: Array<{ titulo: string; icono: typeof CalendarClock; utilidades: Utilidad[] }> = [
@@ -57,12 +73,19 @@ export const ToolsView: React.FC = () => {
           nombre: 'Contador de términos',
           queHace: 'Días hábiles con festivos de Colombia; muestra qué descontó y por qué.',
           /*
-           * La cobertura, dicha donde se elige la herramienta. El servidor
-           * RECHAZA un término que pise fuera de ella — mejor sin respuesta
-           * que con la fecha equivocada.
+           * Los festivos ya no son una tabla de un año: se calculan de la
+           * Ley 51 de 1983 (fechas fijas, traslado al lunes, Pascua), así que
+           * cualquier año desde 1984 tiene calendario, y la fuente es la ley.
            */
-          fuente: { texto: 'Festivos 2026 cargados · fuera de 2026 el cálculo se niega', verificada: true },
+          fuente: { texto: 'Festivos calculados de la Ley 51 de 1983 · vacancia judicial (CGP art. 118)', verificada: true },
           abrir: () => setTerminosAbierto(true)
+        },
+        {
+          id: 'calendario',
+          nombre: 'Calendario judicial',
+          queHace: 'Los 18 festivos del año con su regla, la vacancia judicial y la Semana Santa.',
+          fuente: { texto: 'Ley 51 de 1983 · CGP art. 118 · Semana Santa completa solo si el acuerdo del año lo dice', verificada: true },
+          abrir: () => setCalendarioAbierto(true)
         }
       ]
     },
@@ -76,6 +99,31 @@ export const ToolsView: React.FC = () => {
           queHace: 'Cesantías, intereses, prima, vacaciones e indemnización, cada una con su norma.',
           fuente: { texto: 'Fórmula general del CST · salario fijo', verificada: true },
           abrir: () => setLiquidacionAbierta(true)
+        },
+        {
+          id: 'cuantia',
+          nombre: 'Competencia por cuantía',
+          queHace: 'Mínima, menor o mayor cuantía y el juez competente, con el SMLMV del año de presentación.',
+          fuente: { texto: 'CGP arts. 17, 18, 20, 25 y 26 · SMLMV 2020–2026 por decreto · laboral Ley 2452 de 2025 art. 13', verificada: true },
+          abrir: () => setCuantiaAbierta(true)
+        },
+        {
+          id: 'intereses',
+          nombre: 'Intereses de mora',
+          queHace: 'Mora comercial (1,5 × IBC), legal civil (6 %) o pactada, con control de usura.',
+          /*
+           * La tasa certificada cambia cada mes: se prellena solo la última
+           * verificada, con su mes, y el resto la escribe el abogado.
+           */
+          fuente: { texto: 'C.Co. art. 884 · C.C. art. 1617 · C.P. art. 305 · IBC certificado que usted ingresa (Superfinanciera)', verificada: true },
+          abrir: () => setInteresesAbiertos(true)
+        },
+        {
+          id: 'indexacion',
+          nombre: 'Indexación por IPC',
+          queHace: 'Actualiza un valor histórico con la fórmula valor × (IPC final ÷ IPC inicial).',
+          fuente: { texto: 'Índices que usted toma de la página del IPC del DANE · sin tabla propia', verificada: true },
+          abrir: () => setIndexacionAbierta(true)
         }
       ]
     },
@@ -116,6 +164,10 @@ export const ToolsView: React.FC = () => {
       <ProceduralTermsModal isOpen={terminosAbierto} onClose={() => setTerminosAbierto(false)} />
       <LaborSettlementModal isOpen={liquidacionAbierta} onClose={() => setLiquidacionAbierta(false)} />
       <LegalSearchGlossaryModal isOpen={glosarioAbierto} onClose={() => setGlosarioAbierto(false)} />
+      <IndexacionModal isOpen={indexacionAbierta} onClose={() => setIndexacionAbierta(false)} />
+      <InteresesModal isOpen={interesesAbiertos} onClose={() => setInteresesAbiertos(false)} />
+      <CuantiaModal isOpen={cuantiaAbierta} onClose={() => setCuantiaAbierta(false)} />
+      <CalendarioModal isOpen={calendarioAbierto} onClose={() => setCalendarioAbierto(false)} />
 
       <header className="flex shrink-0 flex-wrap items-end gap-3 border-b border-line-200 bg-surface px-5 py-3.5">
         <div className="min-w-0 flex-1">
@@ -181,15 +233,12 @@ export const ToolsView: React.FC = () => {
           ))}
 
           {/*
-            LO QUE FALTA, DICHO EN LA PANTALLA. El artboard lista catorce
-            utilidades; aquí hay tres porque cada una de las otras exige su
-            fuente oficial conectada (IPC del DANE, SMLMV, tasa de usura,
-            calendario judicial). Un menú de filas muertas prometería
-            calculadoras que no calculan.
+            LO QUE FALTA, DICHO EN LA PANTALLA. Una fila muerta prometería una
+            calculadora que no calcula; la ausencia se declara en su lugar.
           */}
           <p className="px-1 text-meta leading-[1.6] text-ink-400">
-            Indexación con IPC, competencia por cuantía, intereses moratorios y calendario
-            judicial se agregan cuando su fuente oficial esté conectada y verificada — no antes.
+            El cómputo de ejecutoria con traslados se agrega cuando esté construido y verificado — no antes.
+            Cada resultado de estas herramientas se exporta a Excel con una hoja de fuentes.
           </p>
         </div>
       </div>

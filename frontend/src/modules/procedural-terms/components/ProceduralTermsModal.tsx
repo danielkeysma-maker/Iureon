@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Check, Copy } from 'lucide-react';
+import { Check, Copy, FileSpreadsheet } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import { termsApi, type TermsCalculationResult } from '../services/terms.api';
+import { exportarExcel } from '../../tools/exportarExcel';
 
 interface ProceduralTermsModalProps {
   isOpen: boolean;
@@ -31,7 +32,7 @@ interface ProceduralTermsModalProps {
 export const ProceduralTermsModal: React.FC<ProceduralTermsModalProps> = ({ isOpen, onClose }) => {
   const [notifiedDate, setNotifiedDate] = useState('');
   const [termInDays, setTermInDays] = useState(10);
-  const [jurisdictionType, setJurisdictionType] = useState<'LABORAL' | 'CIVIL' | 'CONSTITUCIONAL'>('LABORAL');
+  const [jurisdictionType, setJurisdictionType] = useState<'LABORAL' | 'CIVIL' | 'CONSTITUCIONAL' | 'PENAL'>('LABORAL');
   const [resultado, setResultado] = useState<TermsCalculationResult | null>(null);
   const [error, setError] = useState('');
   const [calculando, setCalculando] = useState(false);
@@ -60,6 +61,30 @@ export const ProceduralTermsModal: React.FC<ProceduralTermsModalProps> = ({ isOp
       year: 'numeric'
     });
 
+  /*
+   * The workbook carries the excluded days AND the sources the server used
+   * (Ley 51 de 1983, CGP art. 118), so the computation leaves with its evidence.
+   */
+  const exportar = () => {
+    if (!resultado) return;
+    exportarExcel({
+      archivo: 'contador-de-terminos',
+      resultado: [
+        ['Fecha de notificación', resultado.notifiedDate],
+        ['Empieza a contar', resultado.startDate],
+        ['Días hábiles', resultado.totalBusinessDays],
+        ['Vence', resultado.dueDate],
+        ['Hora límite', resultado.dueTime],
+        ['Fundamento', resultado.normativeReference]
+      ],
+      detalle: {
+        columnas: ['Fecha excluida', 'Motivo'],
+        filas: resultado.excludedDays.map((d) => [d.date, d.reason])
+      },
+      fuentes: resultado.fuentes ?? []
+    });
+  };
+
   const copiar = async () => {
     if (!resultado) return;
     await navigator.clipboard.writeText(
@@ -80,10 +105,16 @@ export const ProceduralTermsModal: React.FC<ProceduralTermsModalProps> = ({ isOp
       acciones={
         <>
           {resultado && (
-            <button onClick={() => void copiar()} className="btn-neutral btn-sm">
-              {copiado ? <Check className="h-3.5 w-3.5 text-verified" /> : <Copy className="h-3.5 w-3.5" />}
-              {copiado ? 'Copiado' : 'Copiar'}
-            </button>
+            <>
+              <button onClick={exportar} className="btn-neutral btn-sm">
+                <FileSpreadsheet className="h-3.5 w-3.5" />
+                Exportar a Excel
+              </button>
+              <button onClick={() => void copiar()} className="btn-neutral btn-sm">
+                {copiado ? <Check className="h-3.5 w-3.5 text-verified" /> : <Copy className="h-3.5 w-3.5" />}
+                {copiado ? 'Copiado' : 'Copiar'}
+              </button>
+            </>
           )}
           <button
             onClick={() => void calcular()}
@@ -128,13 +159,15 @@ export const ProceduralTermsModal: React.FC<ProceduralTermsModalProps> = ({ isOp
               <option value="LABORAL">Laboral</option>
               <option value="CIVIL">Civil</option>
               <option value="CONSTITUCIONAL">Constitucional</option>
+              <option value="PENAL">Penal (atiende lunes a miércoles santos)</option>
             </select>
           </label>
         </div>
 
         {/* El término empieza al día siguiente de la notificación: se dice antes. */}
         <p className="text-meta text-ink-500">
-          Cuenta desde el día siguiente a la notificación (Art. 118 CGP).
+          Cuenta desde el día siguiente a la notificación (Art. 118 CGP). Descuenta sábados, domingos, los festivos de la
+          Ley 51 de 1983 y la vacancia judicial (20 de diciembre a 10 de enero y Semana Santa, salvo penal).
         </p>
 
         {error && <p className="notice-unverified">{error}</p>}

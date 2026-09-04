@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Check, Copy } from 'lucide-react';
+import { Check, Copy, FileSpreadsheet } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import { settlementsApi, type SettlementResult } from '../services/settlements.api';
+import { exportarExcel } from '../../tools/exportarExcel';
 
 interface LaborSettlementModalProps {
   isOpen: boolean;
@@ -72,6 +73,53 @@ export const LaborSettlementModal: React.FC<LaborSettlementModalProps> = ({ isOp
     }
   };
 
+  /*
+   * The «Fuentes» sheet lists the norm behind each formula, the same ones the
+   * table shows. There is no external constant here (no SMLMV, no rate), so
+   * the sources are the articles themselves.
+   */
+  const exportar = () => {
+    if (!resultado) return;
+    exportarExcel({
+      archivo: 'liquidacion-prestaciones',
+      resultado: [
+        ['Salario mensual', salario],
+        ['Fecha de ingreso', startDate],
+        ['Fecha de retiro', endDate],
+        ['Días laborados', resultado.daysWorked],
+        ...CONCEPTOS.map((c) => [c.nombre, Number(resultado[c.clave])] as [string, number]),
+        ['Total', resultado.totalSettlement],
+        ['Agencias en derecho estimadas (10 %)', resultado.agenciasEnDerechoEstimadas]
+      ],
+      detalle: {
+        columnas: ['Concepto', 'Valor', 'Fundamento'],
+        filas: CONCEPTOS.map((c) => [c.nombre, Number(resultado[c.clave]), c.fundamento])
+      },
+      /*
+       * Dates are the day the URL was actually opened, not `today()`: a
+       * consultation date that advances by itself certifies nothing.
+       */
+      fuentes: [
+        {
+          nombre: 'Código Sustantivo del Trabajo (arts. 64, 186, 189, 249, 306)',
+          norma: 'Decreto Ley 2663 de 1950 y reformas',
+          url: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=199983',
+          consultadoEl: '2026-09-04'
+        },
+        {
+          nombre: 'Intereses sobre cesantías · 12 % anual',
+          norma: 'Ley 52 de 1975, art. 1 (texto reproducido en el Decreto 116 de 1976, que la reglamenta)',
+          url: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=3285',
+          consultadoEl: '2026-09-04'
+        }
+      ],
+      notas: [
+        'Fórmula general del CST sobre salario fijo. Salario variable, auxilio de transporte o cortes anuales de cesantías cambian el resultado.',
+        'Las agencias en derecho son una estimación, no un valor tasado.'
+      ]
+    });
+  };
+
   const copiar = async () => {
     if (!resultado) return;
     const lineas = CONCEPTOS.filter((c) => Number(resultado[c.clave]) > 0).map(
@@ -94,10 +142,16 @@ export const LaborSettlementModal: React.FC<LaborSettlementModalProps> = ({ isOp
       acciones={
         <>
           {resultado && (
-            <button onClick={() => void copiar()} className="btn-neutral btn-sm">
-              {copiado ? <Check className="h-3.5 w-3.5 text-verified" /> : <Copy className="h-3.5 w-3.5" />}
-              {copiado ? 'Copiada' : 'Copiar'}
-            </button>
+            <>
+              <button onClick={exportar} className="btn-neutral btn-sm">
+                <FileSpreadsheet className="h-3.5 w-3.5" />
+                Exportar a Excel
+              </button>
+              <button onClick={() => void copiar()} className="btn-neutral btn-sm">
+                {copiado ? <Check className="h-3.5 w-3.5 text-verified" /> : <Copy className="h-3.5 w-3.5" />}
+                {copiado ? 'Copiada' : 'Copiar'}
+              </button>
+            </>
           )}
           <button
             onClick={() => void calcular()}

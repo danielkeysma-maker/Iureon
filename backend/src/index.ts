@@ -13,6 +13,7 @@ import { subscriptionRoutes } from './modules/subscriptions/subscription.routes'
 import { ingestionRoutes } from './modules/ingestion/ingestion.routes';
 import { proceduralTermsRoutes } from './modules/procedural-terms/terms.routes';
 import { settlementRoutes } from './modules/settlements/settlement.routes';
+import { toolsRoutes } from './modules/tools/tools.routes';
 import { auditRoutes } from './modules/audit/audit.routes';
 import { brandingRoutes } from './modules/branding/branding.routes';
 import { searchPublicRoutes, searchRoutes } from './modules/search/search.routes';
@@ -119,6 +120,7 @@ app.use('/api', subscriptionRoutes);
 app.use('/api', ingestionRoutes);
 app.use('/api', proceduralTermsRoutes);
 app.use('/api', settlementRoutes);
+app.use('/api', toolsRoutes);
 app.use('/api', auditRoutes);
 app.use('/api', supportAccessRoutes);
 app.use('/api', supportChatRoutes);
