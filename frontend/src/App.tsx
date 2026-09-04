@@ -14,6 +14,10 @@ import { SupportAccessBanner } from './modules/support/components/SupportAccessB
 import { SupportAccessDecisionDialog } from './modules/support/components/SupportAccessDecisionDialog';
 import type { SupportAccess } from './modules/support/support.api';
 import { supportChatApi } from './modules/support/supportChat.api';
+import { AvisosEnEsteDispositivo } from './modules/push/components/AvisosEnEsteDispositivo';
+import { InstalarApp } from './modules/pwa/InstalarApp';
+import { renovarSuscripcionSiExiste } from './modules/push/pushCliente';
+import { Dialog } from './design/Dialog';
 import { HeaderTop } from './modules/tenant/components/HeaderTop';
 import type { LawFirmTenant } from './modules/tenant/types';
 import { TenantProvider } from './modules/tenant/TenantContext';
@@ -489,6 +493,67 @@ export function App() {
     };
   }, [session, esSuperusuario]);
 
+  /* Avisos en este dispositivo (Web Push): el diálogo del pie de la barra lateral. */
+  const [avisosAbiertos, setAvisosAbiertos] = useState(false);
+
+  /*
+   * LA SUSCRIPCIÓN SE RENUEVA AL ENTRAR. Una llamada por sesión con lo que el
+   * navegador ya tiene: cubre la fila perdida y el rol cambiado. Sin
+   * suscripción local no hace nada, y nunca pide permiso por su cuenta.
+   */
+  useEffect(() => {
+    if (!session) return;
+    void renovarSuscripcionSiExiste();
+  }, [session]);
+
+  /*
+   * ADÓNDE LLEVA UN AVISO. Dos caminos y un solo destino:
+   *  · `?ir=<vista>` en la URL, cuando el aviso abre una pestaña nueva;
+   *  · el mensaje {type:'abrir', url} del service worker, cuando ya había una
+   *    pestaña y se prefirió enfocarla a abrir otra.
+   * Se usa `ir` y no `vista`: `?vista=1` ya es la vista previa sin sesión.
+   * `administrar` abre la consola de operación y solo para el superusuario;
+   * para cualquier otro no hace nada, porque no tiene esa pantalla.
+   */
+  useEffect(() => {
+    if (!session) return;
+
+    const irA = (destino: string | null) => {
+      if (destino === 'soporte' || destino === 'borradores') {
+        setMainView(destino);
+      } else if (destino === 'administrar' && esSuperusuario) {
+        setIsUserManagementModalOpen(true);
+      }
+    };
+
+    const desdeUrl = () => {
+      const params = new URLSearchParams(window.location.search);
+      const destino = params.get('ir');
+      if (!destino) return;
+      irA(destino);
+      // Se limpia para que recargar no vuelva a saltar.
+      params.delete('ir');
+      const resto = params.toString();
+      window.history.replaceState(null, '', `${window.location.pathname}${resto ? `?${resto}` : ''}`);
+    };
+    desdeUrl();
+
+    if (!('serviceWorker' in navigator)) return;
+    const alMensaje = (evento: MessageEvent) => {
+      const datos = evento.data as { type?: string; url?: string } | null;
+      if (!datos || datos.type !== 'abrir' || !datos.url) return;
+      try {
+        irA(new URL(datos.url, window.location.origin).searchParams.get('ir'));
+      } catch {
+        /* Una URL malformada no navega a ninguna parte. */
+      }
+    };
+    navigator.serviceWorker.addEventListener('message', alMensaje);
+    return () => navigator.serviceWorker.removeEventListener('message', alMensaje);
+    // setMainView es estable en la práctica (setState + sessionStorage); no se lista para no re-suscribir en cada render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session, esSuperusuario]);
+
   // ═══ Clave de localStorage scoped por firma+usuario ═══
   const {
     savedDrafts,
@@ -728,6 +793,7 @@ export function App() {
         setIsFirmDropdownOpen={setIsFirmDropdownOpen}
         onOpenBrandingModal={() => setIsBrandingModalOpen(true)}
         onOpenSubscriptionModal={() => setIsSubscriptionModalOpen(true)}
+        onOpenAvisos={() => setAvisosAbiertos(true)}
         onOpenUserManagementModal={() => setIsUserManagementModalOpen(true)}
         onOpenRechargeModal={() => setIsRechargeModalOpen(true)}
         isSuperUser={esSuperusuario}
@@ -1257,6 +1323,19 @@ export function App() {
         onPlan={() => setIsSubscriptionModalOpen(true)}
         ocultas={vistasOcultas}
       />
+
+      <Dialog
+        abierto={avisosAbiertos}
+        onCerrar={() => setAvisosAbiertos(false)}
+        titulo="Avisos en este dispositivo"
+        subtitulo="Llegan aunque la pestaña esté cerrada. Se activan aparato por aparato."
+        tamano="S"
+      >
+        <div className="flex flex-col gap-4">
+          <InstalarApp />
+          <AvisosEnEsteDispositivo />
+        </div>
+      </Dialog>
 
       <SupportAccessDecisionDialog
         solicitud={solicitudAbierta}

@@ -142,6 +142,24 @@ const wompiEnabled = requireGroup('Wompi (recargas)', [
   'WOMPI_INTEGRITY_SECRET'
 ]);
 
+/**
+ * Web Push (avisos al teléfono y al escritorio).
+ *
+ * Tres valores o ninguno: la llave pública sola deja al navegador suscribirse
+ * a avisos que el servidor nunca podrá firmar, y la privada sola no sirve
+ * para nada. El `subject` es un `mailto:` o una URL que los servicios de push
+ * exigen para saber a quién escribir si un remitente se porta mal.
+ *
+ * Sin llaves la aplicación funciona igual: las rutas de avisos responden
+ * 503 PUSH_DISABLED y los disparadores (soporte, borradores) no envían nada.
+ * Se generan una vez con `npx web-push generate-vapid-keys` y no caducan.
+ */
+const pushEnabled = requireGroup('Web Push (avisos)', ['VAPID_PUBLIC_KEY', 'VAPID_PRIVATE_KEY', 'VAPID_SUBJECT']);
+
+if (pushEnabled && !/^(mailto:|https:\/\/)/.test(read('VAPID_SUBJECT'))) {
+  errors.push('VAPID_SUBJECT must be a mailto: address or an https:// URL.');
+}
+
 /*
  * Test keys are prefixed pub_test_ / prv_test_ and production ones pub_prod_ /
  * prv_prod_. Deriving the environment from the key itself rather than from a
@@ -269,6 +287,12 @@ export const config = {
     integritySecret: read('WOMPI_INTEGRITY_SECRET'),
     /** Where the checkout sends the client back once the card is charged. */
     redirectUrl: read('WOMPI_REDIRECT_URL')
+  },
+  push: {
+    enabled: pushEnabled,
+    publicKey: read('VAPID_PUBLIC_KEY'),
+    privateKey: read('VAPID_PRIVATE_KEY'),
+    subject: read('VAPID_SUBJECT')
   },
   backblaze: {
     enabled: backblazeEnabled,

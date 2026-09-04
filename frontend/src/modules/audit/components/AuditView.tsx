@@ -56,6 +56,8 @@ export const ACCIONES: Record<string, string> = {
   USER_CREATED: 'Creó usuario',
   SUPERADMIN_LISTED_FIRMS: 'Operación listó firmas',
   SUPPORT_CHAT_MESSAGE: 'Chat de soporte',
+  PUSH_SUBSCRIBED: 'Avisos activados en un dispositivo',
+  PUSH_UNSUBSCRIBED: 'Avisos desactivados en un dispositivo',
   PLAN_PAGADO: 'Pagó el plan',
   PLAN_ACTUALIZADO: 'Operación fijó el plan'
 };

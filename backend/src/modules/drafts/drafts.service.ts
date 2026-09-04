@@ -1,4 +1,5 @@
 import { supabase } from '../../config/supabase.config';
+import { enviarAFirma } from '../push/push.service';
 
 /** BORRADOR | REVISAR | LISTO | RADICADO. Lo mismo que la base comprueba. */
 export type EstadoBorrador = 'BORRADOR' | 'REVISAR' | 'LISTO' | 'RADICADO';
@@ -51,7 +52,26 @@ export interface SavedDraftRow {
   conversacion?: unknown[] | null;
   anotaciones?: unknown[] | null;
   versiones?: unknown[] | null;
+  /** Quien guardó la última edición. `user_email` es el creador y no cambia. Ausente antes de la migración. */
+  updated_by_email?: string | null;
+  /** Último aviso enviado a la firma por este borrador: sostiene el tope de uno cada 10 minutos. */
+  notified_at?: string | null;
 }
+
+/**
+ * Entre un aviso y el siguiente del MISMO borrador. El taller guarda en cada
+ * cambio de texto; sin tope, media hora de edición serían treinta avisos
+ * iguales en el teléfono de cada colega.
+ */
+const AVISO_CADA_MS = 10 * 60 * 1000;
+
+/**
+ * La columna puede no existir todavía (ventana entre despliegue y migración):
+ * Supabase responde «column ... not found in schema cache» y el insert entero
+ * falla. Se reconoce para reintentar sin ella, gritando la migración.
+ */
+const faltaColumna = (mensaje: string | undefined): boolean =>
+  typeof mensaje === 'string' && mensaje.includes('schema cache');
 
 /** Los campos que el cliente puede escribir. `version` y fechas las pone el servidor. */
 export type CamposEditables = Partial<
@@ -158,7 +178,20 @@ export class DraftsService {
       return null;
     }
 
-    return data as SavedDraftRow;
+    const creado = data as SavedDraftRow;
+    // Antes de devolver: la función serverless se congela al responder.
+    await enviarAFirma({
+      firmId: creado.firm_id,
+      exceptoEmail: creado.user_email,
+      aviso: {
+        title: `${creado.user_email} creó un borrador`,
+        body: creado.title,
+        url: '/?ir=borradores',
+        tag: `borrador-${creado.id}`
+      }
+    });
+
+    return creado;
   }
 
   /**
@@ -167,7 +200,9 @@ export class DraftsService {
   async updateDraft(
     draftId: string,
     firmId: string,
-    updates: CamposEditables
+    updates: CamposEditables,
+    /** Quien guarda. Del token; se anota en `updated_by_email` y se excluye del aviso. */
+    actorEmail: string | null = null
   ): Promise<SavedDraftRow | null> {
     if (!supabase) {
       console.warn('[DRAFTS] Supabase no configurado — fallback localStorage.');
@@ -183,14 +218,23 @@ export class DraftsService {
     const cambiaElTexto = typeof updates.legal_text === 'string';
 
     let version: number | undefined;
+    /*
+     * Un aviso a la firma cuando cambia el TEXTO, y como mucho uno cada diez
+     * minutos por borrador. `notified_at` se escribe en la misma actualización
+     * que el texto, así que dos guardados seguidos no avisan dos veces.
+     */
+    let avisar = false;
     if (cambiaElTexto) {
       const { data: actual } = await supabase
         .from('saved_drafts')
-        .select('version')
+        .select('*')
         .eq('id', draftId)
         .eq('firm_id', firmId)
         .maybeSingle();
-      version = ((actual as { version?: number } | null)?.version ?? 1) + 1;
+      const fila = actual as SavedDraftRow | null;
+      version = (fila?.version ?? 1) + 1;
+      const ultimo = fila?.notified_at ? Date.parse(fila.notified_at) : 0;
+      avisar = Boolean(actorEmail) && (!ultimo || Date.now() - ultimo > AVISO_CADA_MS);
     }
 
     // Marcar como radicado sella el escrito: la base impide editar su texto
@@ -198,18 +242,37 @@ export class DraftsService {
     const radicado_el =
       updates.estado === 'RADICADO' ? new Date().toISOString() : undefined;
 
-    const { data, error } = await supabase
-      .from('saved_drafts')
-      .update({
-        ...updates,
-        ...(version !== undefined ? { version } : {}),
-        ...(radicado_el ? { radicado_el } : {}),
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', draftId)
-      .eq('firm_id', firmId)
-      .select()
-      .single();
+    const ahora = new Date().toISOString();
+    const cambios = {
+      ...updates,
+      ...(version !== undefined ? { version } : {}),
+      ...(radicado_el ? { radicado_el } : {}),
+      updated_at: ahora
+    };
+    // Las columnas de la migración de avisos viajan aparte para poder reintentar sin ellas.
+    const autoria = {
+      ...(actorEmail ? { updated_by_email: actorEmail } : {}),
+      ...(avisar ? { notified_at: ahora } : {})
+    };
+
+    const actualizar = (campos: Record<string, unknown>) =>
+      supabase!
+        .from('saved_drafts')
+        .update(campos)
+        .eq('id', draftId)
+        .eq('firm_id', firmId)
+        .select()
+        .single();
+
+    let { data, error } = await actualizar({ ...cambios, ...autoria });
+    if (error && Object.keys(autoria).length > 0 && faltaColumna(error.message)) {
+      console.error(
+        '[DRAFTS] Faltan columnas updated_by_email/notified_at: corra supabase/migration-notificaciones-push.sql. ' +
+          'Se guarda sin autoría de la edición.'
+      );
+      ({ data, error } = await actualizar(cambios));
+      avisar = false;
+    }
 
     if (error) {
       /*
@@ -222,7 +285,22 @@ export class DraftsService {
       throw new Error(error.message);
     }
 
-    return data as SavedDraftRow;
+    const actualizado = data as SavedDraftRow;
+    if (avisar && actorEmail) {
+      // Antes de devolver: la función serverless se congela al responder.
+      await enviarAFirma({
+        firmId,
+        exceptoEmail: actorEmail,
+        aviso: {
+          title: `${actorEmail} editó un borrador`,
+          body: actualizado.title,
+          url: '/?ir=borradores',
+          tag: `borrador-${actualizado.id}`
+        }
+      });
+    }
+
+    return actualizado;
   }
 
   /**

@@ -63,7 +63,14 @@ export type AuditAction =
    * a mano, con el motivo. Ambos van al rastro DE LA FIRMA.
    */
   | 'PLAN_PAGADO'
-  | 'PLAN_ACTUALIZADO';
+  | 'PLAN_ACTUALIZADO'
+  /*
+   * Avisos por Web Push. Activar o desactivar los avisos en un dispositivo
+   * queda en el rastro de la firma: es una decisión sobre por dónde sale
+   * información de la firma (títulos de borradores, asuntos de soporte).
+   */
+  | 'PUSH_SUBSCRIBED'
+  | 'PUSH_UNSUBSCRIBED';
 
 export interface AuditLogEntry {
   id: string;

@@ -369,8 +369,18 @@ export const SavedDraftsView: React.FC<SavedDraftsViewProps> = ({
                         </span>
                       </span>
 
-                      <span className="w-[170px] shrink-0 truncate text-meta text-ink-500">
-                        {[e.autor, e.savedAt].filter(Boolean).join(' · ')}
+                      <span
+                        className="w-[170px] shrink-0 truncate text-meta text-ink-500"
+                        title={e.editadoPor && e.editadoPor !== e.autor ? `Creado por ${e.autor ?? '—'} · editado por ${e.editadoPor}` : undefined}
+                      >
+                        {/* «editado por X» solo cuando X no es quien lo creó: es la información nueva. */}
+                        {[
+                          e.autor,
+                          e.editadoPor && e.editadoPor !== e.autor ? `editado por ${e.editadoPor}` : null,
+                          e.savedAt
+                        ]
+                          .filter(Boolean)
+                          .join(' · ')}
                       </span>
 
                       {/* ─── MENÚ DE FILA ─────────────────────────────── */}

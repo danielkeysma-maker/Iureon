@@ -44,6 +44,8 @@ interface SavedDraftRow {
   radicado_el?: string | null;
   version?: number;
   user_email?: string | null;
+  /** Quien guardó la última edición. Ausente en filas anteriores a la migración de avisos. */
+  updated_by_email?: string | null;
 }
 
 const formatSavedAt = (value: string): string =>
@@ -90,7 +92,8 @@ const toEntry = (row: SavedDraftRow): SavedDraftEntry => ({
   estado: row.estado ?? 'BORRADOR',
   radicadoEl: row.radicado_el ?? null,
   version: row.version ?? 1,
-  autor: row.user_email ?? null
+  autor: row.user_email ?? null,
+  editadoPor: row.updated_by_email ?? null
 });
 
 /*

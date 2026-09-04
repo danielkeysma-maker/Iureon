@@ -147,7 +147,8 @@ export const updateDraftController = async (req: Request, res: Response): Promis
   if (Array.isArray(versiones)) cambios.versiones = (versiones as unknown[]).slice(-15);
 
   try {
-    const updated = await draftsService.updateDraft(draftId, firmId, cambios);
+    // Quien edita sale del token: queda en `updated_by_email` y no recibe su propio aviso.
+    const updated = await draftsService.updateDraft(draftId, firmId, cambios, req.user?.email ?? null);
 
     if (!updated) {
       res.json({ success: false, useLocalFallback: true });

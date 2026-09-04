@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+  Bell,
   Building2,
   Check,
   ChevronDown,
@@ -25,6 +26,8 @@ interface SidebarLeftProps {
   setIsFirmDropdownOpen: (open: boolean) => void;
   onOpenBrandingModal: () => void;
   onOpenSubscriptionModal: () => void;
+  /** Avisos en este dispositivo (Web Push). Vive en el pie, junto a Membrete: es ajuste, no módulo. */
+  onOpenAvisos?: () => void;
   onOpenUserManagementModal?: () => void;
   onOpenRechargeModal?: () => void;
   isSuperUser?: boolean;
@@ -60,6 +63,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
   setIsFirmDropdownOpen,
   onOpenBrandingModal,
   onOpenSubscriptionModal,
+  onOpenAvisos,
   onOpenUserManagementModal,
   onOpenRechargeModal,
   isSuperUser = false,
@@ -331,6 +335,18 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
           <Settings className="h-3.5 w-3.5 shrink-0 text-nav-muted" />
           {!isCollapsed && <span>Membrete</span>}
         </button>
+
+        {onOpenAvisos && (
+          <button
+            onClick={onOpenAvisos}
+            title="Avisos en este dispositivo"
+            aria-label="Avisos en este dispositivo"
+            className="flex items-center gap-2 rounded-control px-2 py-1.5 text-meta text-nav-ink hover:bg-white/5"
+          >
+            <Bell className="h-3.5 w-3.5 shrink-0 text-nav-muted" />
+            {!isCollapsed && <span>Avisos</span>}
+          </button>
+        )}
 
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}

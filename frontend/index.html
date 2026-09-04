@@ -11,7 +11,18 @@
       gaussianos, que no era una marca de Iureon sino un icono prestado.
     -->
     <link rel="icon" type="image/svg+xml" href="/brand/favicon.svg" />
-    <link rel="apple-touch-icon" href="/brand/app-icon-1024.svg" />
+    <!--
+      PWA. El manifest da nombre, color e iconos para «Instalar»; iOS no lee el
+      manifest para el icono de inicio y exige un PNG en `apple-touch-icon`
+      (el SVG que había aquí lo ignoraba y ponía una captura de la página).
+      Los PNG son provisionales: `scripts/generar-iconos-pwa.py`.
+    -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Iureon" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <!--
       Dos `theme-color`: el navegador móvil pinta su barra con el que
       corresponda al tema del dispositivo. Con uno solo, la barra del teléfono

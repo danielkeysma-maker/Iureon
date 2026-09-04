@@ -80,6 +80,8 @@ export interface SavedDraftEntry {
   /** Once set, the text can no longer change. The database enforces it. */
   radicadoEl?: string | null;
   version?: number;
-  /** Who last saved it. Comes from the token, never from the client. */
+  /** Who created it. Comes from the token, never from the client. */
   autor?: string | null;
+  /** Who saved the last edit, when the database recorded it. Shown only when it differs from the creator. */
+  editadoPor?: string | null;
 }

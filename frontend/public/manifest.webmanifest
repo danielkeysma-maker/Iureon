@@ -1,0 +1,19 @@
+{
+  "name": "Iureon",
+  "short_name": "Iureon",
+  "description": "Redacción de escritos, transcripción de audiencias y catálogo de actuaciones para firmas de abogados.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "lang": "es",
+  "dir": "ltr",
+  "theme_color": "#17456B",
+  "background_color": "#F7F8FA",
+  "icons": [
+    { "src": "/pwa/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/pwa/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/pwa/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

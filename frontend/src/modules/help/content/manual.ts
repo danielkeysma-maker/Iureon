@@ -639,6 +639,45 @@ const A_MOVIL: ManualArticle = {
       kind: 'aviso',
       texto:
         'Grabar una entrevista con la pantalla apagada funciona, pero cerrar la aplicación no: la grabación vive en la pestaña. Si va a grabar más de unos minutos, deje el teléfono con la aplicación al frente.'
+    },
+    { kind: 'subtitulo', texto: 'Instalarla como aplicación' },
+    {
+      kind: 'parrafo',
+      texto:
+        'Iureon se puede añadir a la pantalla de inicio y abrirse como una aplicación, sin barra de direcciones. No se descarga nada de una tienda: es la misma página, con icono propio. Es requisito para recibir avisos en iPhone y iPad.'
+    },
+    {
+      kind: 'pasos',
+      pasos: [
+        'Android con Chrome: abra «Más» abajo a la derecha y toque «Instalar Iureon en este dispositivo»; si el botón no aparece, use el menú de Chrome (⋮) → «Instalar aplicación» o «Añadir a pantalla de inicio».',
+        'iPhone o iPad con Safari: toque «Compartir» (el cuadrado con la flecha) y luego «Añadir a pantalla de inicio». Abra Iureon desde el icono nuevo, no desde Safari.',
+        'Computador con Chrome o Edge: el icono de instalar aparece a la derecha de la barra de direcciones; también está en «Avisos», en el pie de la barra lateral.'
+      ]
+    },
+    { kind: 'subtitulo', texto: 'Avisos en el teléfono y en el computador' },
+    {
+      kind: 'parrafo',
+      texto:
+        'Los avisos llegan como notificaciones del sistema aunque la pestaña esté cerrada, y se activan aparato por aparato: activarlos en el teléfono no los activa en el portátil. En el teléfono, abra «Más» y, bajo «En este dispositivo», toque «Activar avisos»; en el computador, «Avisos» en el pie de la barra lateral. El navegador le pedirá permiso una vez. «Enviar una prueba» comprueba el camino entero; «Desactivar» lo cierra en ese aparato.'
+    },
+    {
+      kind: 'lista',
+      items: [
+        'Cuando soporte responde a una conversación de su firma.',
+        'Cuando otro abogado de su firma crea un borrador.',
+        'Cuando otro abogado de su firma edita el texto de un borrador: como mucho un aviso cada diez minutos por escrito, para que una sesión de edición no sean treinta avisos.'
+      ]
+    },
+    {
+      kind: 'nota',
+      titulo: 'Lo que usted hace no le avisa a usted',
+      texto:
+        'Su propio borrador y su propio mensaje a soporte no le llegan a sus dispositivos. Y nada más avisa por ahora: ni vencimientos, ni transcripciones terminadas, ni saldo. Cuando algo de eso se añada, aparecerá en esta lista.'
+    },
+    {
+      kind: 'aviso',
+      texto:
+        'En iPhone y iPad, los avisos solo funcionan si Iureon está añadida a la pantalla de inicio y se abre desde ahí. Desde una pestaña de Safari no llegan, y la pantalla de avisos lo dice.'
     }
   ]
 };

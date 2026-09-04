@@ -432,7 +432,11 @@ export const SavedDraftsModal: React.FC<SavedDraftsModalProps> = ({
                     </p>
                     <p className="mt-1 text-meta text-ink-900">
                       v{activo.version ?? 1}
-                      {activo.autor ? ` · ${activo.autor}` : ''} · {activo.savedAt}
+                      {activo.autor ? ` · ${activo.autor}` : ''}
+                      {activo.editadoPor && activo.editadoPor !== activo.autor
+                        ? ` · editado por ${activo.editadoPor}`
+                        : ''}{' '}
+                      · {activo.savedAt}
                     </p>
                     {/*
                       NO SE LISTAN LAS ANTERIORES PORQUE NO SE GUARDAN.

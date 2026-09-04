@@ -3,6 +3,8 @@ import { CalendarClock, Wallet, X } from 'lucide-react';
 import { NAV_GROUPS, navModule } from '../navigation';
 import { MODULOS_EN_MAS } from './MobileTabBar';
 import type { MainView } from '../types';
+import { AvisosEnEsteDispositivo } from '../../push/components/AvisosEnEsteDispositivo';
+import { InstalarApp } from '../../pwa/InstalarApp';
 
 /**
  * «Más»: los módulos que no caben en la barra inferior. Artboard 4d.
@@ -143,6 +145,22 @@ export const MobileMoreSheet: React.FC<MobileMoreSheetProps> = ({
               )}
             </section>
           )}
+
+          {/*
+            ESTE DISPOSITIVO: instalar y avisos. Van aquí y no en Ajustes porque
+            no son de la cuenta sino del teléfono que se tiene en la mano —en
+            otro aparato la respuesta es otra—. Es donde el usuario del
+            teléfono los busca: la única «configuración» que ve de pie.
+          */}
+          <section className="mb-3">
+            <p className="px-2 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-ink-400">
+              En este dispositivo
+            </p>
+            <div className="flex flex-col gap-3 px-2 py-2">
+              <InstalarApp />
+              <AvisosEnEsteDispositivo />
+            </div>
+          </section>
 
           {grupos.map((grupo) => (
             <section key={grupo.titulo} className="mb-3 last:mb-0">

@@ -1,5 +1,6 @@
 import { supabase } from '../../config/supabase.config';
 import { auditService } from '../audit/audit.service';
+import { enviarAFirma, enviarAlOperador } from '../push/push.service';
 
 /**
  * Chat de soporte dentro de la aplicación.
@@ -78,6 +79,44 @@ export class SupportChatError extends Error {
     this.name = 'SupportChatError';
   }
 }
+
+/**
+ * El nombre de la firma para el aviso al operador: «Pérez & Asociados: nuevo
+ * mensaje de soporte» se entiende en la pantalla bloqueada; el NIT no. Si la
+ * lectura falla, va el id: un aviso con id es mejor que ninguno.
+ */
+const nombreDeFirma = async (firmId: string): Promise<string> => {
+  if (!supabase) return firmId;
+  const { data } = await supabase.from('firms').select('name').eq('firm_id', firmId).maybeSingle();
+  return (data as { name?: string } | null)?.name?.trim() || firmId;
+};
+
+/*
+ * AVISOS. Se esperan ANTES de devolver, porque la función serverless se
+ * congela al responder y un envío lanzado sin `await` no ocurre en
+ * producción. Nunca lanzan: un aviso perdido no puede perder el mensaje.
+ */
+const avisarAlOperador = async (firmId: string, subject: string, body: string, conversationId: string): Promise<void> => {
+  const firma = await nombreDeFirma(firmId);
+  await enviarAlOperador({
+    title: `${firma}: nuevo mensaje de soporte`,
+    body: body || subject,
+    url: '/?ir=administrar',
+    tag: `soporte-${conversationId}`
+  });
+};
+
+const avisarALaFirma = async (firmId: string, body: string, conversationId: string): Promise<void> => {
+  await enviarAFirma({
+    firmId,
+    aviso: {
+      title: 'Soporte de Iureon respondió',
+      body,
+      url: '/?ir=soporte',
+      tag: `soporte-${conversationId}`
+    }
+  });
+};
 
 const requireClient = () => {
   if (!supabase) {
@@ -294,6 +333,8 @@ export const abrirConversacion = async (input: {
     ipAddress: input.ipAddress ?? null
   });
 
+  await avisarAlOperador(input.firmId, asunto, cuerpo, fila.id);
+
   return { conversacion: aConversacion(fila), mensaje: aMensaje(msg as MensajeRow) };
 };
 
@@ -404,6 +445,12 @@ export const enviarMensaje = async (input: {
     resource: `${input.side === 'OPERADOR' ? 'Soporte respondió' : reabre ? 'Soporte reabierta' : 'Soporte'}: ${fila.subject}`,
     ipAddress: input.ipAddress ?? null
   });
+
+  if (input.side === 'OPERADOR') {
+    await avisarALaFirma(fila.firm_id, cuerpo, fila.id);
+  } else {
+    await avisarAlOperador(fila.firm_id, fila.subject, cuerpo, fila.id);
+  }
 
   return { conversacion: aConversacion(conv as ConversacionRow), mensaje: aMensaje(msg as MensajeRow) };
 };
