@@ -6,6 +6,7 @@ import { JargonSuggestionModal } from './JargonSuggestionModal';
 import { DraftProvenanceBar } from './DraftProvenanceBar';
 import { markdownBoldToHtml } from '../services/documentExport.service';
 import { learningApi } from '../../agent/services/learning.api';
+import { ControlDeLetra, useTamanoDeLetra } from '../../../design/TamanoDeLetra';
 
 export type { GeneratedDraft } from '../types';
 import type { GeneratedDraft } from '../types';
@@ -101,6 +102,13 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
    * veia nada, y concluia que la app no dejaba cambiar la tipografia.
    */
   const estiloFormato = estiloDelLienzo(formato) ?? undefined;
+  /*
+    TAMAÑO DE LECTURA, no de documento: el de Membrete sigue mandando en el
+    PDF y el Word; aquí solo se multiplica para leer en pantalla.
+  */
+  const letra = useTamanoDeLetra('borrador');
+  const baseDeLetra = estiloFormato?.fontSize ? parseFloat(estiloFormato.fontSize) : 14.5;
+  const estiloLectura: React.CSSProperties = { ...estiloFormato, fontSize: `${letra.px(baseDeLetra)}px` };
 
   return (
     <>
@@ -136,6 +144,7 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
               texto, arriba: el Taller también está en el pie, pero el pie queda
               seis páginas abajo y no se encontraba. */}
           <div className="absolute right-3 top-3 flex items-center gap-1.5">
+            <ControlDeLetra letra={letra} />
             {onAbrirTaller && (
               <button onClick={() => onAbrirTaller(editableText)} className="btn-secondary btn-sm" title="Resaltar, comentar y conversar con la guía sobre este escrito">
                 <ClipboardCheck className="h-3 w-3" />
@@ -158,13 +167,13 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
               onChange={(e) => setEditableText(e.target.value)}
               onMouseUp={handleSelection}
               onKeyUp={handleSelection}
-              className="min-h-[540px] w-full resize-y break-words border-0 bg-transparent font-legal text-[14.5px] leading-[1.8] text-paper-ink focus:outline-none"
-              style={estiloFormato}
+              className="min-h-[540px] w-full resize-y break-words border-0 bg-transparent font-legal leading-[1.8] text-paper-ink focus:outline-none"
+              style={estiloLectura}
             />
           ) : (
             <div
-              className="min-h-[540px] break-words font-legal text-[14.5px] leading-[1.8] text-paper-ink [text-wrap:pretty]"
-              style={estiloFormato}
+              className="min-h-[540px] break-words font-legal leading-[1.8] text-paper-ink [text-wrap:pretty]"
+              style={estiloLectura}
               onMouseUp={handleSelection}
               dangerouslySetInnerHTML={{ __html: renderedHtml }}
             />

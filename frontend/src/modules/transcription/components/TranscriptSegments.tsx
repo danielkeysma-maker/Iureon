@@ -1,6 +1,7 @@
 import React from 'react';
 import { CheckCircle2, AlertTriangle, Check, Scissors, Star, UserCog } from 'lucide-react';
 import { buildSpeakerNames } from '../speakerNames';
+import { ControlDeLetra, useTamanoDeLetra } from '../../../design/TamanoDeLetra';
 import { colorForSpeaker } from '../speakerColors';
 
 import {
@@ -142,6 +143,8 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
    * a position nobody chose.
    */
   const [caret, setCaret] = React.useState<{ index: number; offset: number } | null>(null);
+  /** Tamaño de lectura del transcrito, por pantalla: una audiencia se lee una hora seguida. */
+  const letra = useTamanoDeLetra(kind === 'AUDIENCIA' ? 'audiencia' : 'entrevista');
 
   /**
    * What is typed in each name box before it is saved.
@@ -255,6 +258,7 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                 : 'fragmentos con audio poco claro'}
             </span>
           )}
+          <ControlDeLetra letra={letra} className="ml-auto" />
         </div>
 
         <h4 className="mb-1 text-xs font-bold text-ink-900">Interlocutores</h4>
@@ -808,7 +812,8 @@ export const TranscriptSegments: React.FC<TranscriptSegmentsProps> = ({
                 desordenada la columna de texto que las tres columnas fijas
                 acababan de alinear.
               */
-              className={`text-[13px] leading-[1.65] text-justify text-ink-700 [text-wrap:pretty] ${
+              style={{ fontSize: letra.px(13) }}
+              className={`leading-[1.65] text-justify text-ink-700 [text-wrap:pretty] ${
                 /*
                   LA FILA EN EDICION VA EN AZUL DE MARCA CON HALO, no en ambar.
                   Lo dicen los dos artboards con el mismo valor —`border:1px

@@ -26,6 +26,7 @@ import { aplicarReemplazo, capasTipograficas, esCapaTipografica, localizarCitas,
 import { diferencias, resumenDeCambios } from '../services/diff';
 import { ApiError } from '../../../config/httpClient';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
+import { ControlDeLetra, useTamanoDeLetra } from '../../../design/TamanoDeLetra';
 
 /**
  * El taller: el escrito a la izquierda, la guía a la derecha. Sirve igual para
@@ -137,6 +138,8 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   const [versiones, setVersiones] = React.useState<VersionDelTexto[]>(datos.versiones);
   const [referencias, setReferencias] = React.useState<string[]>([]);
   const [modo, setModo] = React.useState<'marcas' | 'editar'>('marcas');
+  /** Tamaño de lectura en pantalla; no toca el documento exportado. */
+  const letra = useTamanoDeLetra('taller');
   const [panel, setPanel] = React.useState<'chat' | 'informe' | 'versiones' | 'comentarios'>('chat');
   const [citaAbierta, setCitaAbierta] = React.useState<number | null>(null);
   const [versionAbierta, setVersionAbierta] = React.useState<number | null>(null);
@@ -457,6 +460,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
             </button>
           ))}
         </div>
+        <ControlDeLetra letra={letra} />
         <span className="hidden text-[11px] text-ink-500 md:inline">
           {versionAbierta !== null ? (
             'Viendo una versión anterior: lo quitado en rojo, lo añadido en verde.'
@@ -520,7 +524,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
                       Volver al actual
                     </button>
                   </div>
-                  <p className="whitespace-pre-wrap text-justify font-legal text-[14px] leading-[1.8] text-paper-ink [text-wrap:pretty]">
+                  <p className="whitespace-pre-wrap text-justify font-legal leading-[1.8] text-paper-ink [text-wrap:pretty]" style={{ fontSize: letra.px(14) }}>
                     {tramos.map((t, k) =>
                       t.tipo === 'igual' ? (
                         <React.Fragment key={k}>{t.texto}</React.Fragment>
@@ -541,14 +545,15 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
           <textarea
             value={texto}
             onChange={(e) => setTexto(e.target.value)}
-            className="min-h-[70vh] w-full resize-y border-0 bg-transparent p-0 font-legal text-[14px] leading-[1.8] text-paper-ink focus:outline-none"
+            className="min-h-[70vh] w-full resize-y border-0 bg-transparent p-0 font-legal leading-[1.8] text-paper-ink focus:outline-none"
+            style={{ fontSize: letra.px(14) }}
             spellCheck
           />
         )
       ) : (
         Papel(
           <>
-            <p ref={lienzo} className="whitespace-pre-wrap text-justify font-legal text-[14px] leading-[1.8] text-paper-ink [text-wrap:pretty]">
+            <p ref={lienzo} className="whitespace-pre-wrap text-justify font-legal leading-[1.8] text-paper-ink [text-wrap:pretty]" style={{ fontSize: letra.px(14) }}>
               {segmentos.map((s, k) => {
                 if (s.capas.length === 0) return <React.Fragment key={k}>{s.texto}</React.Fragment>;
                 if (s.capas.every((c) => esCapaTipografica(c.capa))) {
