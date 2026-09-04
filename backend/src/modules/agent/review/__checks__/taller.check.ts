@@ -10,6 +10,7 @@ import {
   recortarHistorial,
   type TurnoDelTaller
 } from '../taller';
+import { citasEnTexto, renderVerificaciones } from '../verificarProvidencias';
 
 let fallos = 0;
 const check = (n: string, ok: boolean, d = ''): void => {
@@ -79,6 +80,22 @@ check('prosa sin JSON se entrega tal cual, sin ediciones', prosa.respuesta.inclu
 
 const vacia = parsearRespuestaDelTaller('{"respuesta":"","ediciones":[]}');
 check('un JSON con respuesta vacía cae a la prosa cruda, nunca a nada', vacia.respuesta.length > 0);
+
+{
+  const citas = citasEnTexto('Te equivocaste: la sentencia T-760 de 2008 sí existe, igual que la SU 075/18 y la C-355 del 2006; la t-760 de 2008 la repito. El auto A-123 de 2020 no cuenta.');
+  check('las citas constitucionales del mensaje se extraen normalizadas, sin repetir y sin autos', JSON.stringify(citas) === JSON.stringify(['T-760/2008', 'SU-75/2018', 'C-355/2006']), JSON.stringify(citas));
+  check('un mensaje sin citas no produce verificaciones ni bloque', citasEnTexto('¿cómo va la pretensión tercera?').length === 0 && renderVerificaciones([]) === '');
+  const bloque = renderVerificaciones([
+    { cita: 'T-760/2008', estado: 'EXISTE', detalle: 'Sentencia de tutela · 31 de julio de 2008', url: 'https://www.corteconstitucional.gov.co/relatoria/2008/T-760-08.htm', extracto: 'La Sala Segunda de Revisión...' },
+    { cita: 'C-1/1999', estado: 'NO_ESTA_EN_EL_INDICE', detalle: 'el índice de la Corte no la tiene' },
+    { cita: 'SU-2/2020', estado: 'NO_VERIFICABLE', detalle: 'no respondió' }
+  ]);
+  check('el bloque de verificación distingue existe, no está y no verificable, con fuente y extracto', /VERIFICACIÓN DE PROVIDENCIAS/.test(bloque) && /T-760\/2008: EXISTE/.test(bloque) && /relatoria\/2008/.test(bloque) && /Extracto oficial/.test(bloque) && /C-1\/1999: NO ESTÁ/.test(bloque) && /SU-2\/2020: NO SE PUDO VERIFICAR/.test(bloque));
+  const conVerificacion = buildTallerUserPrompt({ documentType: 'Acción de tutela', guidance: null, informe: null, textoActual: 'x', historial: [], mensaje: 'mira', anotaciones: [], verificaciones: [{ cita: 'T-760/2008', estado: 'EXISTE', detalle: 'd', url: 'u' }] });
+  const sinVerificacion = buildTallerUserPrompt({ documentType: 'Acción de tutela', guidance: null, informe: null, textoActual: 'x', historial: [], mensaje: 'mira', anotaciones: [] });
+  check('la verificación entra al prompt solo cuando hubo citas', /VERIFICACIÓN DE PROVIDENCIAS/.test(conVerificacion) && !/VERIFICACIÓN DE PROVIDENCIAS/.test(sinVerificacion));
+  check('el sistema sabe que la verificación manda sobre su memoria y qué decir en cada caso', /VERIFICACIÓN DE PROVIDENCIAS/.test(system) && /manda sobre tu memoria/.test(system) && /NO SE PUDO VERIFICAR/.test(system) && /Corte Suprema/.test(system));
+}
 
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);
 process.exitCode = fallos === 0 ? 0 : 1;

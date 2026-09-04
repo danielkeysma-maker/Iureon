@@ -22,6 +22,7 @@ import {
 } from './documentReview';
 import { documentReviewStore } from './documentReview.store';
 import { MAX_CARACTERES_MENSAJE, buildTallerSystemPrompt, buildTallerUserPrompt, parsearRespuestaDelTaller, type TurnoDelTaller } from './taller';
+import { verificarProvidencias } from './verificarProvidencias';
 
 /**
  * POST /api/agent/review-document
@@ -488,11 +489,13 @@ export const reviewChatController = async (req: Request, res: Response): Promise
   try {
     const guidance = buildCatalogGuidance(revision.documentType, (revision.legalBranch ?? undefined) as LegalBranch | undefined);
     const historial = historialCliente.length ? historialCliente : revision.conversacion;
+    // Las sentencias que el abogado nombra se consultan en el índice oficial ANTES de preguntar: la guía responde con la fuente, no de memoria.
+    const verificaciones = await verificarProvidencias([mensaje, ...anotacionesDelAbogado.map((a) => a.nota ?? '')]);
     const llamada = await conLimite(
       callOpenRouterWithUsage(
         ENGINE.OPUS,
         buildTallerSystemPrompt(),
-        buildTallerUserPrompt({ documentType: revision.documentType, guidance, informe: revision.informe, textoActual: texto.texto, historial, mensaje, anotaciones: anotacionesDelAbogado }),
+        buildTallerUserPrompt({ documentType: revision.documentType, guidance, informe: revision.informe, textoActual: texto.texto, historial, mensaje, anotaciones: anotacionesDelAbogado, verificaciones }),
         1500
       ),
       LIMITE_LLAMADA_MS

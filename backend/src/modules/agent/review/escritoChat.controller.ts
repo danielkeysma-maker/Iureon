@@ -8,6 +8,7 @@ import { ENGINE, callOpenRouterWithUsage } from '../openrouter.client';
 import { prepararTexto } from './documentReview';
 import { LIMITE_LLAMADA_MS, TiempoAgotado, conLimite } from './documentReview.controller';
 import { MAX_CARACTERES_MENSAJE, buildTallerSystemPrompt, buildTallerUserPrompt, parsearRespuestaDelTaller, type TurnoDelTaller } from './taller';
+import { verificarProvidencias } from './verificarProvidencias';
 
 /**
  * POST /api/agent/escrito/chat
@@ -65,11 +66,13 @@ export const escritoChatController = async (req: Request, res: Response): Promis
   const operationId = randomUUID();
   try {
     const guidance = buildCatalogGuidance(documentType, legalBranch);
+    // Las sentencias que el abogado nombra se consultan en el índice oficial ANTES de preguntar: la guía responde con la fuente, no de memoria.
+    const verificaciones = await verificarProvidencias([mensaje, ...anotacionesDelAbogado.map((a) => a.nota ?? '')]);
     const llamada = await conLimite(
       callOpenRouterWithUsage(
         ENGINE.OPUS,
         buildTallerSystemPrompt(),
-        buildTallerUserPrompt({ documentType, guidance, informe: null, textoActual: texto.texto, historial, mensaje, anotaciones: anotacionesDelAbogado }),
+        buildTallerUserPrompt({ documentType, guidance, informe: null, textoActual: texto.texto, historial, mensaje, anotaciones: anotacionesDelAbogado, verificaciones }),
         1500
       ),
       LIMITE_LLAMADA_MS

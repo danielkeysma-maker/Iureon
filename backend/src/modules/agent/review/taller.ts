@@ -22,6 +22,7 @@
  * la norma sale de la ficha; el resto es criterio y se dice.
  */
 import type { InformeDeRevision } from './documentReview';
+import { renderVerificaciones, type ProvidenciaVerificada } from './verificarProvidencias';
 
 export interface TurnoDelTaller {
   rol: 'abogado' | 'revisor';
@@ -66,6 +67,8 @@ QUÉ HACES: responder lo que te pregunten con criterio profesional franco; cuand
 
 LAS MARCAS DEL ABOGADO: si el mensaje trae «MARCAS DEL ABOGADO», son pasajes que él resaltó a mano en un color o tachó. Cuando te hable de «lo amarillo», «lo que resalté en verde», «lo tachado», se refiere a esos pasajes exactos: úsalos como el objeto de la pregunta. Si tachó algo, entiende que propone quitarlo salvo que diga otra cosa.
 
+LA VERIFICACIÓN DE PROVIDENCIAS: cuando el abogado nombra una sentencia de la Corte Constitucional en su mensaje o en un comentario, el sistema la consulta en el índice oficial de la Corte antes de que respondas y te trae el resultado en «VERIFICACIÓN DE PROVIDENCIAS». Ese resultado manda sobre tu memoria. Si dice EXISTE y tú habías dicho que no existía o dudaste de ella, reconoce el error sin rodeos, cita la fuente y corrige lo que dijiste leyendo el extracto oficial, no lo que recuerdes. Si dice NO ESTÁ en el índice, dilo con esas palabras y con la fuente, sin acusar al abogado de otra cosa: puede ser un error de número o de año, y conviene sugerirle que lo revise. Si dice NO SE PUDO VERIFICAR, dilo y no la des por existente ni por inexistente. Las providencias de otras corporaciones (Corte Suprema, Consejo de Estado, tribunales) no se verifican aquí: dilo y pide la fuente o el radicado en vez de afirmar o negar su existencia.
+
 LOS COMENTARIOS DEL ABOGADO: si el mensaje trae «COMENTARIOS DEL ABOGADO», son notas que él dejó sobre pasajes concretos —observaciones, dudas, correcciones a lo que tú dijiste—. Léelos antes de responder y, cuando te pregunte por «mi comentario» o «lo que anoté», responde a esa nota sobre ese pasaje. Si un comentario te corrige (por ejemplo, que una norma o un criterio no es como dijiste), acéptalo si tiene razón y ajusta tu respuesta; si crees que no la tiene, explica por qué con la norma en la mano, sin inventar providencias.
 
 QUÉ NO HACES: no reescribes el escrito entero salvo que te lo pidan expresamente; no inventas hechos que el escrito no traiga; NO citas sentencias, autos ni providencias ni radicados —si un punto necesita precedente, dilo y describe qué debería sostener—; no contradigas la ficha verificada de la actuación ni le añadas requisitos que no estén en ella.
@@ -106,6 +109,8 @@ export const buildTallerUserPrompt = (input: {
   mensaje: string;
   /** Resaltados y tachados del abogado, para que «lo amarillo» signifique algo. */
   anotaciones?: AnotacionDelAbogado[];
+  /** Sentencias que el abogado nombró, ya consultadas en el índice oficial. */
+  verificaciones?: ProvidenciaVerificada[];
 }): string => {
   const ficha = input.guidance
     ? `FICHA VERIFICADA DE LA ACTUACIÓN:\n${input.guidance}`
@@ -127,6 +132,7 @@ export const buildTallerUserPrompt = (input: {
         .join('\n')}`
     : 'El abogado no ha resaltado ni tachado nada a mano.';
   const comentarios = (input.anotaciones ?? []).filter((a) => a.color === 'comentario' && a.cita && (a.nota ?? '').trim());
+  const verificacion = renderVerificaciones(input.verificaciones ?? []);
   const notas = comentarios.length
     ? `COMENTARIOS DEL ABOGADO (notas sobre pasajes concretos):\n${comentarios.map((c) => `- Sobre «${c.cita}»: ${(c.nota ?? '').trim()}`).join('\n')}`
     : 'El abogado no ha dejado comentarios sobre pasajes.';
@@ -141,7 +147,7 @@ ${conversacion}
 
 ${marcas}
 
-${notas}
+${notas}${verificacion ? `\n\n${verificacion}` : ''}
 
 TEXTO ACTUAL DEL ESCRITO (con los cambios que el abogado ya hizo):
 """
