@@ -1,5 +1,6 @@
 import { supabase } from '../../config/supabase.config';
 import type { CallUsage } from '../agent/openrouter.client';
+import { PlanError, exigirPlanVigente } from '../subscriptions/plan.service';
 
 /**
  * What a firm consumed, what it cost, and what it was charged.
@@ -279,6 +280,24 @@ export const reserveForOperation = async (input: {
   const precio = PRICE_COP[input.operation];
 
   if (precio <= 0) return { reserved: 0, balance: await balanceOf(input.firmId) };
+
+  /*
+   * AN EXPIRED PLAN REFUSES EVERY PAID OPERATION, HERE AND NOWHERE ELSE.
+   *
+   * Every AI operation that costs money reserves through this function, so
+   * this is the one place where "the firm is read-only" can be enforced
+   * without seven controllers each remembering to ask. Free operations
+   * returned above are reading — search — and reading is never blocked.
+   * Checked BEFORE the debit so an expired firm's balance is not touched.
+   */
+  try {
+    await exigirPlanVigente(input.firmId);
+  } catch (err) {
+    if (err instanceof PlanError) {
+      throw new BillingError(err.code, err.message, 402, await balanceOf(input.firmId));
+    }
+    throw err;
+  }
 
   const { data: nuevoSaldo, error } = await db.rpc('debit_firm_credits', {
     p_firm_id: input.firmId,

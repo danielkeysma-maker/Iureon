@@ -20,6 +20,7 @@ import {
 import { randomUUID } from 'crypto';
 import { generarResumen, type ResumenDeTranscripcion } from './resumen.service';
 import type { SpeakerRole, TranscriptionKind } from './types';
+import { exigirModulo, responderPlanError } from '../subscriptions/plan.service';
 
 export const transcriptionService = new TranscriptionService();
 
@@ -77,6 +78,19 @@ export const transcribeAudioController = async (req: Request, res: Response): Pr
       message: `El campo "kind" debe ser uno de: ${VALID_KINDS.join(', ')}.`
     });
     return;
+  }
+
+  /*
+   * THE PLAN IS ASKED BEFORE THE AUDIO IS TOUCHED. Audiencias and Entrevistas
+   * are not in ESENCIAL, and an expired plan creates no new transcript; both
+   * answer 403 with the upgrade path in the message. Nothing has been uploaded
+   * to a provider or written yet, so refusing here costs nothing.
+   */
+  try {
+    await exigirModulo(req.firmId as string, kind === 'ENTREVISTA' ? 'ENTREVISTAS' : 'AUDIENCIAS');
+  } catch (err) {
+    if (responderPlanError(res, err)) return;
+    throw err;
   }
 
   try {
@@ -557,6 +571,19 @@ export const transcribeFromStorageController = async (
       message: 'Ese archivo no pertenece a la firma autenticada.'
     });
     return;
+  }
+
+  // Same gate as the direct upload: plan module and validity, before Deepgram
+  // is called and before anything is stored. The audio already sits in B2 and
+  // is discarded by the same path a failed transcription takes.
+  try {
+    await exigirModulo(firmId, kind === 'ENTREVISTA' ? 'ENTREVISTAS' : 'AUDIENCIAS');
+  } catch (err) {
+    if (responderPlanError(res, err)) {
+      await b2StorageService.deleteObject(firmId, fileKey).catch(() => false);
+      return;
+    }
+    throw err;
   }
 
   /*

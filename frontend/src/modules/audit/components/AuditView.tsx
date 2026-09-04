@@ -55,7 +55,9 @@ export const ACCIONES: Record<string, string> = {
   FIRM_STATUS_CHANGED: 'Cambió estado de la firma',
   USER_CREATED: 'Creó usuario',
   SUPERADMIN_LISTED_FIRMS: 'Operación listó firmas',
-  SUPPORT_CHAT_MESSAGE: 'Chat de soporte'
+  SUPPORT_CHAT_MESSAGE: 'Chat de soporte',
+  PLAN_PAGADO: 'Pagó el plan',
+  PLAN_ACTUALIZADO: 'Operación fijó el plan'
 };
 
 /** Las preguntas reales que estos datos pueden responder hoy. */
@@ -64,7 +66,7 @@ const VISTAS: Array<{ etiqueta: string; acciones: string[] }> = [
   { etiqueta: 'Cambios en el catálogo', acciones: ['CATALOG_TERM_VERIFIED'] },
   { etiqueta: 'Transcripciones', acciones: ['TRANSCRIPTION_CREATED', 'TRANSCRIPTION_DELETED', 'ACTA_LISTA'] },
   { etiqueta: 'Decisiones de entrevista', acciones: ['INTERVIEW_DECIDED'] },
-  { etiqueta: 'Saldo y firma', acciones: ['FIRM_CREDITS_ADDED', 'FIRM_UPDATED', 'FIRM_STATUS_CHANGED'] }
+  { etiqueta: 'Saldo y firma', acciones: ['FIRM_CREDITS_ADDED', 'FIRM_UPDATED', 'FIRM_STATUS_CHANGED', 'PLAN_PAGADO', 'PLAN_ACTUALIZADO'] }
 ];
 
 const fechaHora = (iso: string): { fecha: string; hora: string } => {

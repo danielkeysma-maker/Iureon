@@ -8,7 +8,9 @@ import {
   createFirm,
   getFirmDetail,
   listFirms,
-  updateFirm
+  updateFirm,
+  updateFirmPlan,
+  describirCambioDePlan
 } from './admin.service';
 import { calcularRunway } from './runway.service';
 
@@ -138,6 +140,37 @@ export const updateFirmController = async (req: Request, res: Response): Promise
     res.json({ success: true });
   } catch (err) {
     fail(res, err, 'No se pudo actualizar la firma.');
+  }
+};
+
+/**
+ * PATCH /api/admin/firms/:firmId/plan — sets plan, period and expiry by hand.
+ *
+ * Audited as PLAN_ACTUALIZADO in the firm's own trail with the reason: a firm
+ * whose trial was extended, or whose plan was changed after a phone call, must
+ * be able to read who did it and why.
+ */
+export const updateFirmPlanController = async (req: Request, res: Response): Promise<void> => {
+  const firmId = String(req.params.firmId);
+
+  try {
+    const cambio = await updateFirmPlan(
+      firmId,
+      { plan: req.body.plan, period: req.body.period, validUntil: req.body.validUntil },
+      req.body.motivo ?? req.body.reason
+    );
+
+    await auditService.record({
+      firmId,
+      userEmail: req.user!.email,
+      action: 'PLAN_ACTUALIZADO',
+      resource: `${describirCambioDePlan(cambio)} · motivo: ${cambio.reason}`,
+      ipAddress: callerIp(req)
+    });
+
+    res.json({ success: true, plan: cambio });
+  } catch (err) {
+    fail(res, err, 'No se pudo fijar el plan de la firma.');
   }
 };
 

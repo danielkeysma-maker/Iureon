@@ -39,6 +39,11 @@ interface SidebarLeftProps {
    * verde de "Cifrado" que ya se quitó de aquí por afirmar lo que nadie medía.
    */
   pendientes?: Partial<Record<MainView, number>>;
+  /**
+   * Módulos que el plan de la firma no incluye. No se pintan: una puerta que
+   * abre sobre un 403 es peor que ninguna. Vacío = se ven todos.
+   */
+  ocultas?: readonly MainView[];
 }
 
 /** Ancho expandido y ancho del riel. El riel es el mismo componente. */
@@ -59,7 +64,8 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
   onOpenRechargeModal,
   isSuperUser = false,
   isParticularUser = false,
-  pendientes = {}
+  pendientes = {},
+  ocultas = []
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [administrarAbierto, setAdministrarAbierto] = useState(false);
@@ -232,9 +238,11 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
               */}
               {(abierto || isCollapsed) && (
                 <div className="space-y-0.5">
-                  {grupo.modulos.map((id) => (
-                    <Item key={id} id={id} />
-                  ))}
+                  {grupo.modulos
+                    .filter((id) => !ocultas.includes(id))
+                    .map((id) => (
+                      <Item key={id} id={id} />
+                    ))}
                 </div>
               )}
             </div>
@@ -264,9 +272,20 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
                 <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-nav-muted">
                   Saldo
                 </span>
+                {/*
+                  Dos puertas, dos cosas distintas: «Recargar» compra saldo de
+                  consumo; «Plan» paga el derecho a usar la aplicación. Juntas
+                  aquí porque las dos son dinero y las dos las decide un socio.
+                */}
+                <button
+                  onClick={onOpenSubscriptionModal}
+                  className="ml-auto text-[11px] font-medium text-nav-accent hover:underline"
+                >
+                  Plan
+                </button>
                 <button
                   onClick={onOpenRechargeModal || onOpenSubscriptionModal}
-                  className="ml-auto text-[11px] font-medium text-nav-accent hover:underline"
+                  className="text-[11px] font-medium text-nav-accent hover:underline"
                 >
                   Recargar
                 </button>

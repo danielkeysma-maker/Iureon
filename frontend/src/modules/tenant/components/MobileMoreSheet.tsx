@@ -1,5 +1,5 @@
 import React from 'react';
-import { Wallet, X } from 'lucide-react';
+import { CalendarClock, Wallet, X } from 'lucide-react';
 import { NAV_GROUPS, navModule } from '../navigation';
 import { MODULOS_EN_MAS } from './MobileTabBar';
 import type { MainView } from '../types';
@@ -43,6 +43,10 @@ interface MobileMoreSheetProps {
    * propia bajo «Mas», y aqui esta esa puerta.
    */
   onSaldo?: () => void;
+  /** El plan de la firma: vive junto al saldo, bajo «Cuenta». */
+  onPlan?: () => void;
+  /** Módulos que el plan no incluye. */
+  ocultas?: readonly MainView[];
 }
 
 export const MobileMoreSheet: React.FC<MobileMoreSheetProps> = ({
@@ -50,7 +54,9 @@ export const MobileMoreSheet: React.FC<MobileMoreSheetProps> = ({
   mainView,
   onElegir,
   onCerrar,
-  onSaldo
+  onSaldo,
+  onPlan,
+  ocultas
 }) => {
   React.useEffect(() => {
     if (!abierto) return;
@@ -65,7 +71,7 @@ export const MobileMoreSheet: React.FC<MobileMoreSheetProps> = ({
 
   const grupos = NAV_GROUPS.map((g) => ({
     titulo: g.titulo,
-    modulos: g.modulos.filter((id) => MODULOS_EN_MAS.includes(id))
+    modulos: g.modulos.filter((id) => MODULOS_EN_MAS.includes(id) && !(ocultas ?? []).includes(id))
   })).filter((g) => g.modulos.length > 0);
 
   return (
@@ -115,6 +121,26 @@ export const MobileMoreSheet: React.FC<MobileMoreSheetProps> = ({
                   </span>
                 </span>
               </button>
+              {onPlan && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onPlan();
+                    onCerrar();
+                  }}
+                  className="flex min-h-[52px] w-full items-center gap-3 rounded-control px-2 text-left text-ink-900"
+                >
+                  <CalendarClock className="h-[18px] w-[18px] shrink-0 text-ink-400" />
+                  <span className="min-w-0">
+                    <span className="block text-[13.5px] font-medium leading-tight">
+                      Plan de la firma
+                    </span>
+                    <span className="mt-0.5 block text-[11.5px] leading-tight text-ink-500">
+                      Qué incluye, cuándo vence y cómo se paga
+                    </span>
+                  </span>
+                </button>
+              )}
             </section>
           )}
 

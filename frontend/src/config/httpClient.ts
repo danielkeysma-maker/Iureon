@@ -25,12 +25,20 @@ import { clearSession, needsRenewal, readSession, saveSession } from '../modules
 export class ApiError extends Error {
   readonly status: number;
   readonly url: string;
+  /**
+   * The API's own code (`PLAN_VENCIDO`, `INSUFFICIENT_CREDITS`…), when it sent
+   * one. Screens decide by code what to offer next — a link to pay the plan is
+   * not the same button as a link to recharge — and the message stays the
+   * server's, in Spanish, for the lawyer.
+   */
+  readonly code: string | null;
 
-  constructor(message: string, status: number, url: string) {
+  constructor(message: string, status: number, url: string, code: string | null = null) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
     this.url = url;
+    this.code = code;
   }
 }
 
@@ -115,7 +123,8 @@ const request = async <T>(
     throw new ApiError(
       payload?.message || `${method} ${path} failed with ${response.status}`,
       response.status,
-      url
+      url,
+      typeof payload?.error === 'string' ? payload.error : null
     );
   }
 
@@ -157,7 +166,8 @@ const postForm = async <T>(
     throw new ApiError(
       payload?.message || `POST ${path} failed with ${response.status}`,
       response.status,
-      url
+      url,
+      typeof payload?.error === 'string' ? payload.error : null
     );
   }
 

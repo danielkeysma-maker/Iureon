@@ -22,6 +22,29 @@ import { BandejaDeSoporte } from './BandejaDeSoporte';
 
 const pesos = (valor: number): string => `$${valor.toLocaleString('es-CO')}`;
 
+const NOMBRE_PLAN: Record<string, string> = { ESENCIAL: 'Esencial', PREMIUM: 'Premium' };
+const NOMBRE_PERIODO: Record<string, string> = {
+  MENSUAL: 'mensual',
+  ANUAL: 'anual',
+  PRUEBA: 'prueba',
+  CORTESIA: 'cortesía'
+};
+
+/** «Premium · prueba · vence 18/09/2026», o «Cortesía» para la firma sin plan. */
+const describirPlan = (f: FirmSummary): string => {
+  if (!f.plan && !f.planValidUntil) return 'Cortesía';
+  const partes = [NOMBRE_PLAN[f.plan ?? ''] ?? 'Sin plan'];
+  if (f.planPeriod && f.planPeriod !== 'CORTESIA') partes.push(NOMBRE_PERIODO[f.planPeriod]);
+  if (f.planValidUntil) {
+    const vence = new Date(f.planValidUntil);
+    const vencido = vence.getTime() < Date.now();
+    partes.push(`${vencido ? 'venció' : 'vence'} ${vence.toLocaleDateString('es-CO')}`);
+  } else {
+    partes.push('sin vencimiento');
+  }
+  return partes.join(' · ');
+};
+
 const ESTADO_ETIQUETA: Record<string, string> = {
   active: 'Activa',
   past_due: 'En mora',
@@ -386,7 +409,12 @@ export const OperatorConsole: React.FC = () => {
                   {firm.transcriptions}{' '}
                   {firm.transcriptions === 1 ? 'transcripción' : 'transcripciones'}
                 </span>
-                <span className="font-mono text-ink-400">{firm.planTier}</span>
+                {/*
+                  El plan y su vencimiento, no el `planTier` heredado: lo que
+                  decide si la firma trabaja mañana es la fecha. Se edita en la
+                  ficha, con motivo.
+                */}
+                <span>{describirPlan(firm)}</span>
               </div>
 
               <div className="flex flex-wrap items-center gap-2 pt-1">

@@ -11,6 +11,7 @@ import {
   signIn,
   type FirmUserRole
 } from './auth.service';
+import { exigirCupoDeUsuario, responderPlanError } from '../subscriptions/plan.service';
 
 /** Turns a thrown AuthError into its own status; anything else is a 500. */
 const fail = (res: Response, err: unknown, fallback: string): void => {
@@ -175,9 +176,20 @@ export const addUserController = async (req: Request, res: Response): Promise<vo
   }
 
   try {
+    /*
+     * THE PLAN'S USER CAP, enforced where accounts are actually created.
+     * ESENCIAL admits one account and PREMIUM five; the 409 says which plan
+     * lifts the limit. The platform's own firm is exempt: the operator's
+     * accounts are not a client's seats.
+     */
+    if (req.user?.role !== 'SUPER_ADMIN') {
+      await exigirCupoDeUsuario(req.firmId as string);
+    }
+
     const user = await addUserToFirm(req.firmId as string, { email, password, role });
     res.status(201).json({ success: true, user: { ...user, role } });
   } catch (err) {
+    if (responderPlanError(res, err)) return;
     fail(res, err, 'No se pudo crear la cuenta.');
   }
 };

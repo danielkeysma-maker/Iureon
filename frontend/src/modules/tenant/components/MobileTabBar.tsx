@@ -73,6 +73,8 @@ interface MobileTabBarProps {
   setMainView: (view: MainView) => void;
   onAbrirMas: () => void;
   masAbierto: boolean;
+  /** Módulos que el plan no incluye. Un destino oculto deja su celda vacía. */
+  ocultas?: readonly MainView[];
 }
 
 /** 62px de alto con `padding:0 4px 8px`, más el área segura del sistema. */
@@ -108,7 +110,8 @@ export const MobileTabBar: React.FC<MobileTabBarProps> = ({
   mainView,
   setMainView,
   onAbrirMas,
-  masAbierto
+  masAbierto,
+  ocultas = []
 }) => {
   /*
    * «Más» se marca activo cuando la pantalla actual vive dentro de él: sin eso,
@@ -123,7 +126,7 @@ export const MobileTabBar: React.FC<MobileTabBarProps> = ({
       className="grid h-[62px] shrink-0 grid-cols-4 items-center border-t border-line-200 bg-surface px-1 pb-2 lg:hidden"
       style={{ paddingBottom: 'calc(8px + env(safe-area-inset-bottom))' }}
     >
-      {DESTINOS.map(({ id, etiqueta, Icono }) => (
+      {DESTINOS.filter(({ id }) => !ocultas.includes(id)).map(({ id, etiqueta, Icono }) => (
         <Destino
           key={id}
           Icono={Icono}

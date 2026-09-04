@@ -30,6 +30,8 @@ jobs:
         run: npx tsc --noEmit
       - name: Payment gateway guard (no forgeable webhook)
         run: npm run check:wompi
+      - name: Plan rules (prices, extension from a future expiry, expiry states, module gating)
+        run: npm run check:plan
       - name: Catalogue correctness checks
         run: npm run check:catalog
       - name: Embeddings guard (no fabricated vectors)

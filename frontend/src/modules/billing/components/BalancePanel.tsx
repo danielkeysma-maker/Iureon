@@ -3,6 +3,7 @@ import { ArrowDownRight, ArrowUpRight, Download, RefreshCw } from 'lucide-react'
 import { Dialog } from '../../../design/Dialog';
 import { billingApi, type BillingSummary, type CheckoutIntent, type Movement } from '../billing.api';
 import { ExtractoDelPeriodo } from './ExtractoDelPeriodo';
+import { urlDelCheckout } from '../wompiCheckout';
 
 interface BalancePanelProps {
   isOpen: boolean;
@@ -104,24 +105,10 @@ export const BalancePanel: React.FC<BalancePanelProps> = ({
    * signature, which is what makes editing any of them produce a checkout Wompi
    * refuses.
    */
-  /**
-   * La URL del checkout: los mismos campos que Wompi documenta para su web
-   * checkout, en la query. Es un GET, asi que la URL ES el checkout — sirve
-   * igual para navegar y para ofrecerla como enlace.
+  /*
+   * La URL del checkout vive en `wompiCheckout.ts`: la comparte el pago del
+   * plan, y dos copias de los campos que Wompi exige se separarian en silencio.
    */
-  const urlDelCheckout = (intent: CheckoutIntent): string => {
-    const campos = new URLSearchParams({
-      'public-key': intent.publicKey,
-      currency: intent.currency,
-      'amount-in-cents': String(intent.amountInCents),
-      reference: intent.reference,
-      'signature:integrity': intent.signature
-    });
-    // Only when configured: an empty redirect-url sends the client to a blank
-    // page after paying, which reads as a failed payment.
-    if (intent.redirectUrl) campos.set('redirect-url', intent.redirectUrl);
-    return `https://checkout.wompi.co/p/?${campos.toString()}`;
-  };
 
   /*
    * EL SALTO SE HACE NAVEGANDO, Y SI NO OCURRE SE OFRECE EL ENLACE.

@@ -3,6 +3,7 @@ import { AlertCircle, KeyRound, RefreshCw, ShieldOff } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import { adminApi, type FirmDetail } from '../admin.api';
 import { RequestSupportAccessDialog } from './RequestSupportAccessDialog';
+import { FirmPlanSection } from './FirmPlanSection';
 
 /**
  * Ficha de la firma. Artboard 7b.
@@ -25,13 +26,14 @@ import { RequestSupportAccessDialog } from './RequestSupportAccessDialog';
  *
  * ─── LO QUE EL ARTBOARD PIDE Y AQUÍ NO ESTÁ, con la razón ──────────────────
  *
- * · Las seis acciones de operación —cambiar plan, abonar cortesía, extender
- *   prueba, reenviar invitaciones, exportar datos, suspender por mora— y la
- *   transferencia de titularidad: la consola ya ejerce las que el servidor
- *   soporta (`updateFirm`, `addCredits`). Reenviar invitaciones y exportar no
- *   tienen endpoint, y el artboard exige que CADA acción lleve motivo escrito.
- *   Pintar el botón antes que su motivo y su registro sería ofrecer un poder
- *   que no queda auditado.
+ * · De las seis acciones de operación, «cambiar plan», «extender prueba» y
+ *   «abonar cortesía» YA ESTÁN, en la sección Plan (`FirmPlanSection`): fijan
+ *   plan, periodo y vencimiento con motivo, auditadas como PLAN_ACTUALIZADO.
+ *   «Suspender por mora» no hace falta como botón: la mora se deriva de la
+ *   fecha y la firma queda en solo lectura sola. Reenviar invitaciones y
+ *   exportar datos no tienen endpoint, y el artboard exige que CADA acción
+ *   lleve motivo escrito: pintar el botón antes que su motivo y su registro
+ *   sería ofrecer un poder que no queda auditado.
  * · «Solicitar acceso de soporte» (7b′) YA ESTÁ, y llegó cuando existía lo que
  *   le da sentido: la 8a entera —autorización de un socio, alcance, duración
  *   del catálogo, franja permanente, registro de cada pantalla y revocación—.
@@ -97,6 +99,8 @@ export const FirmDetailDialog: React.FC<FirmDetailDialogProps> = ({ firmId, onCl
   const [cargando, setCargando] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [pidiendoAcceso, setPidiendoAcceso] = React.useState(false);
+  /* Sube cuando operación cambia algo: la ficha se relee, no se parchea a mano. */
+  const [recarga, setRecarga] = React.useState(0);
 
   React.useEffect(() => {
     if (!firmId) {
@@ -120,7 +124,7 @@ export const FirmDetailDialog: React.FC<FirmDetailDialogProps> = ({ firmId, onCl
     return () => {
       vigente = false;
     };
-  }, [firmId]);
+  }, [firmId, recarga]);
 
   const curado =
     firma && firma.catalogoTotal > 0
@@ -184,6 +188,12 @@ export const FirmDetailDialog: React.FC<FirmDetailDialogProps> = ({ firmId, onCl
               nota={`${firma.catalogoCuradas} de ${firma.catalogoTotal} verificadas por la firma`}
             />
           </section>
+
+          <FirmPlanSection
+            key={`${firma.id}-${recarga}`}
+            firma={firma}
+            onGuardado={() => setRecarga((n) => n + 1)}
+          />
 
           <section className="rounded-card border border-line-200 bg-surface">
             <header className="border-b border-line-200 px-4 py-3">

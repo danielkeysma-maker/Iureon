@@ -142,6 +142,28 @@ export const modulosSinGrupo = (): MainView[] => {
 };
 
 /**
+ * The views a plan can close, by the module name the server uses.
+ *
+ * ONLY THREE MODULES ARE PLAN-GATED — Audiencias, Entrevistas, Orientación —
+ * and the server enforces the gate (403 PLAN_INSUFICIENTE); hiding them here
+ * spares an ESENCIAL firm a door that opens onto a refusal. Everything else is
+ * in every plan and never disappears, so a module with no entry in this map is
+ * a module that is always shown. A NULL plan (cortesía) permits everything.
+ */
+const VISTA_POR_MODULO: Partial<Record<string, MainView>> = {
+  AUDIENCIAS: 'audiencias',
+  ENTREVISTAS: 'entrevistas',
+  ORIENTACION: 'orientacion'
+};
+
+export const vistasOcultasPorPlan = (modulosPermitidos: readonly string[] | null): MainView[] => {
+  if (!modulosPermitidos) return [];
+  return Object.entries(VISTA_POR_MODULO)
+    .filter(([modulo]) => !modulosPermitidos.includes(modulo))
+    .map(([, vista]) => vista as MainView);
+};
+
+/**
  * Falls back instead of throwing: reading `.icon` off an unknown view is what
  * took the header down before. An unnamed module is a bug, but a blank header
  * bar hides every other module too.

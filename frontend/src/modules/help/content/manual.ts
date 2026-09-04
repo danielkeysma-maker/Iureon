@@ -395,6 +395,54 @@ const A_CURADURIA: ManualArticle = {
   ]
 };
 
+const A_PLANES: ManualArticle = {
+  id: 'planes-y-pago',
+  titulo: 'Planes y pago de la suscripción',
+  entradilla: 'Qué incluye cada plan, cuánto cuesta, cómo se paga y qué pasa cuando vence.',
+  bloques: [
+    { kind: 'subtitulo', texto: 'Dos planes' },
+    {
+      kind: 'lista',
+      items: [
+        'Esencial: $70.000 al mes o $700.000 al año. Un usuario. Incluye Redacción, Borradores, Revisiones, Buscador, Catálogo, Herramientas, Manual, Soporte y Membrete. No incluye Audiencias, Entrevistas ni Orientación.',
+        'Premium: $100.000 al mes o $1.000.000 al año. Hasta cinco usuarios. Incluye todos los módulos.'
+      ]
+    },
+    {
+      kind: 'parrafo',
+      texto:
+        'Los precios incluyen IVA. El plan anual son doce meses por el precio de diez. El consumo de inteligencia artificial —escritos, revisiones, resúmenes, orientaciones pasado el cupo gratuito— no está incluido en el plan: se descuenta del saldo de recargas, como se explica en «Roles y saldo». Son dos cosas distintas: el plan es el derecho a usar la aplicación; el saldo, lo que cada operación consume.'
+    },
+    { kind: 'subtitulo', texto: 'Cómo se paga' },
+    {
+      kind: 'pasos',
+      pasos: [
+        'Abra «Plan de la firma» desde la barra lateral (junto a Saldo) o, en el teléfono, desde «Más».',
+        'Elija el plan y el periodo: «Pagar · 1 mes» o «Pagar · 12 meses».',
+        'La aplicación lo lleva a la pasarela de Wompi con el valor ya fijado; pague con PSE, tarjeta o los medios que ofrezca.',
+        'Cuando la pasarela confirma, el plan se extiende solo y el pago queda en la tabla «Pagos del plan».'
+      ]
+    },
+    {
+      kind: 'nota',
+      titulo: 'Pagar antes de vencer no pierde días',
+      texto:
+        'Cada pago suma su periodo a la fecha vigente. Si el plan vence el 20 y paga un mes el 10, queda vigente hasta el 20 del mes siguiente. Si cambia de plan al pagar, el plan nuevo rige desde ese pago; no hay prorrateo. No se guarda tarjeta ni se cobra automáticamente: cada periodo se paga con un checkout nuevo, y solo un administrador de la firma puede hacerlo.'
+    },
+    { kind: 'subtitulo', texto: 'Qué pasa al vencer' },
+    {
+      kind: 'parrafo',
+      texto:
+        'Siete días antes, los administradores ven una franja arriba de la aplicación con la fecha. Al vencer, la firma queda en solo lectura: todos pueden entrar, leer, exportar y pagar; ninguna operación de inteligencia artificial se ejecuta y no se crean transcripciones nuevas. El saldo de recargas no se pierde. Al pagar, todo vuelve en el acto.'
+    },
+    {
+      kind: 'aviso',
+      texto:
+        'En el plan Esencial, Audiencias, Entrevistas y Orientación no aparecen en la barra, y crear una segunda cuenta responde que el plan admite una sola. Pasar a Premium habilita las tres pantallas y hasta cinco cuentas desde el momento del pago.'
+    }
+  ]
+};
+
 const A_ROLES_SALDO: ManualArticle = {
   id: 'roles-saldo',
   titulo: 'Roles y saldo',
@@ -605,7 +653,7 @@ export const MANUAL: readonly ManualGroup[] = [
   { titulo: 'Grabar', articulos: [A_ENTREVISTA, A_AUDIENCIA] },
   {
     titulo: 'Para socios',
-    articulos: [A_CURADURIA, A_ROLES_SALDO, A_DATOS_CLIENTE, A_FORMATO]
+    articulos: [A_CURADURIA, A_ROLES_SALDO, A_PLANES, A_DATOS_CLIENTE, A_FORMATO]
   }
 ];
 

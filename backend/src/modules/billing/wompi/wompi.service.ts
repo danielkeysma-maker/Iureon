@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import { config } from '../../../config/env.config';
 import { supabase } from '../../../config/supabase.config';
 import { BillingError, MIN_RECHARGE_COP } from '../billing.service';
+import { auditService } from '../../audit/audit.service';
 
 /**
  * Recharging through Wompi.
@@ -93,9 +94,19 @@ export const crearIntencion = async (input: {
   firmId: string;
   userEmail: string;
   amountCop: number;
+  /**
+   * RECARGA credits balance (the default, and every caller before plans
+   * existed). SUSCRIPCION extends the firm's plan instead; `plan` and `period`
+   * are then written with the intent so the webhook applies what was bought and
+   * not what the confirmation happens to say.
+   */
+  purpose?: 'RECARGA' | 'SUSCRIPCION';
+  plan?: 'ESENCIAL' | 'PREMIUM';
+  period?: 'MENSUAL' | 'ANUAL';
 }): Promise<CheckoutIntent> => {
   const gateway = requireGateway();
   const db = requireDb();
+  const purpose = input.purpose ?? 'RECARGA';
 
   if (!Number.isFinite(input.amountCop) || !Number.isInteger(input.amountCop)) {
     throw new BillingError('INVALID_AMOUNT', 'El monto debe ser un número entero de pesos.', 400);
@@ -107,8 +118,12 @@ export const crearIntencion = async (input: {
    * The panel states it before the firm picks an amount, which is where a rule
    * belongs for the person following it. But a rule that lives only in the page
    * is a suggestion: this endpoint is reachable without the page.
+   *
+   * Only for recharges: the minimum exists because Wompi's fixed fee makes a
+   * small top-up expensive to collect, and a plan's price is not chosen by the
+   * client — it is the catalogue's, and the monthly ESENCIAL sits below it.
    */
-  if (input.amountCop < MIN_RECHARGE_COP) {
+  if (purpose === 'RECARGA' && input.amountCop < MIN_RECHARGE_COP) {
     throw new BillingError(
       'BELOW_MINIMUM',
       `La recarga mínima es $${MIN_RECHARGE_COP.toLocaleString('es-CO')} COP.`,
@@ -116,16 +131,33 @@ export const crearIntencion = async (input: {
     );
   }
 
+  if (purpose === 'SUSCRIPCION' && (!input.plan || !input.period)) {
+    throw new BillingError('INVALID_PLAN', 'Un pago de plan debe decir qué plan y qué periodo.', 400);
+  }
+
   const reference = nuevaReferencia(input.firmId);
   const amountInCents = centavos(input.amountCop);
 
-  const { error } = await db.from('payment_intents').insert({
+  /*
+   * The plan columns travel only on a plan intent. A recharge inserts the same
+   * row it always did, so recharging keeps working on a database where
+   * migration-suscripciones.sql has not run yet — a key the schema cache does
+   * not know fails the whole insert.
+   */
+  const fila: Record<string, unknown> = {
     reference,
     firm_id: input.firmId,
     user_email: input.userEmail,
     amount_cop: input.amountCop,
     status: 'PENDING'
-  });
+  };
+  if (purpose === 'SUSCRIPCION') {
+    fila.purpose = purpose;
+    fila.plan = input.plan;
+    fila.plan_period = input.period;
+  }
+
+  const { error } = await db.from('payment_intents').insert(fila);
 
   if (error) {
     console.error('[WOMPI] No se pudo registrar la intención:', error.message);
@@ -204,6 +236,7 @@ export const eventoEsAutentico = (evento: WompiEvent, secreto: string): boolean 
 
 export type EventOutcome =
   | { handled: 'CREDITED'; balance: number }
+  | { handled: 'PLAN_EXTENDED'; firmId: string; plan: string; validUntil: string }
   | { handled: 'ALREADY_CREDITED' }
   | { handled: 'NOT_APPROVED'; status: string }
   | { handled: 'IGNORED'; reason: string };
@@ -247,6 +280,23 @@ export const aplicarEvento = async (evento: WompiEvent): Promise<EventOutcome> =
     return { handled: 'NOT_APPROVED', status: estado };
   }
 
+  /*
+   * WHAT AN APPROVED PAYMENT BUYS IS WRITTEN ON THE INTENT, NOT ON THE EVENT.
+   * A recharge and a plan payment arrive through the same webhook and look the
+   * same; the intent's `purpose` — fixed before the client paid — decides which
+   * database function applies it. Before the migration the column does not
+   * exist and the read fails: every intent is then a recharge, which is the
+   * only kind that could have been created.
+   */
+  const { data: intencion } = await db
+    .from('payment_intents')
+    .select('purpose')
+    .eq('reference', referencia)
+    .maybeSingle();
+  const purpose = String((intencion as { purpose?: string } | null)?.purpose ?? 'RECARGA');
+
+  if (purpose === 'SUSCRIPCION') return aplicarPagoDePlan(db, referencia, idTransaccion);
+
   const { data, error } = await db.rpc('credit_payment_intent', {
     p_reference: referencia,
     p_transaction_id: idTransaccion
@@ -263,6 +313,51 @@ export const aplicarEvento = async (evento: WompiEvent): Promise<EventOutcome> =
   if (data === null) return { handled: 'ALREADY_CREDITED' };
 
   return { handled: 'CREDITED', balance: Number(data) };
+};
+
+/**
+ * Extends the firm's plan for a paid intent, at most once.
+ *
+ * The period arithmetic (extend from the current expiry, never lose days)
+ * lives in `apply_subscription_payment`, next to the row lock that makes two
+ * simultaneous retries produce one period. The audit line is written here,
+ * to the paying firm's own trail, naming who started the payment.
+ */
+const aplicarPagoDePlan = async (
+  db: NonNullable<typeof supabase>,
+  referencia: string,
+  idTransaccion: string
+): Promise<EventOutcome> => {
+  const { data, error } = await db.rpc('apply_subscription_payment', {
+    p_reference: referencia,
+    p_transaction_id: idTransaccion
+  });
+
+  if (error) {
+    console.error('[WOMPI] No se pudo aplicar el pago del plan:', error.message);
+    throw new BillingError('PLAN_PAYMENT_FAILED', 'No se pudo aplicar el pago del plan.', 502);
+  }
+
+  if (data === null || data === undefined) return { handled: 'ALREADY_CREDITED' };
+
+  const pago = data as Record<string, unknown>;
+  const firmId = String(pago.firm_id);
+  const plan = String(pago.plan);
+  const period = String(pago.plan_period);
+  const validUntil = String(pago.valid_until);
+  const monto = Number(pago.amount_cop);
+
+  await auditService.record({
+    firmId,
+    userEmail: String(pago.user_email ?? 'desconocido'),
+    action: 'PLAN_PAGADO',
+    resource:
+      `Plan ${plan === 'PREMIUM' ? 'Premium' : 'Esencial'} · ${period === 'ANUAL' ? 'anual' : 'mensual'} · ` +
+      `$${monto.toLocaleString('es-CO')} COP · vigente hasta ${new Date(validUntil).toLocaleDateString('es-CO')} · ${referencia}`,
+    ipAddress: null
+  });
+
+  return { handled: 'PLAN_EXTENDED', firmId, plan, validUntil };
 };
 
 export interface IntentSummary {

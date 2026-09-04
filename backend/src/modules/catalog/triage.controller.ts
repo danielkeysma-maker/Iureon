@@ -3,6 +3,7 @@ import { triageFacts } from './triage.service';
 import { guardarOrientacion, listarOrientaciones, huecosDelCatalogo } from './orientacionHistory.service';
 import { consumirCupo, TOPE_DIARIO } from './orientacionQuota.service';
 import { reserveForOperation, refundReservation, BillingError, PRICE_COP } from '../billing/billing.service';
+import { exigirModulo, responderPlanError } from '../subscriptions/plan.service';
 
 /**
  * POST /api/catalog/triage   { hechos: string }
@@ -45,6 +46,18 @@ export const triageController = async (req: Request, res: Response): Promise<voi
   if (!firmId) {
     res.status(401).json({ error: 'UNAUTHORIZED', message: 'Se requiere una sesión.' });
     return;
+  }
+
+  /*
+   * Orientación is not in ESENCIAL, and an expired plan does not orient. Asked
+   * BEFORE the daily quota is consumed: a refused request must not spend one of
+   * the thirty free ones.
+   */
+  try {
+    await exigirModulo(firmId, 'ORIENTACION');
+  } catch (err) {
+    if (responderPlanError(res, err)) return;
+    throw err;
   }
 
   const cupo = await consumirCupo(firmId);

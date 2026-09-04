@@ -55,7 +55,15 @@ export type AuditAction =
    * el rastro DE LA FIRMA, también las que escribe el operador. Una firma
    * tiene que poder leer que operación le respondió, y cuándo.
    */
-  | 'SUPPORT_CHAT_MESSAGE';
+  | 'SUPPORT_CHAT_MESSAGE'
+  /*
+   * Plan de la firma. `PLAN_PAGADO` lo escribe el webhook de Wompi al aplicar
+   * un pago aprobado, con el correo de quien inició el pago; `PLAN_ACTUALIZADO`
+   * lo escribe la consola de operación cuando fija plan, periodo o vencimiento
+   * a mano, con el motivo. Ambos van al rastro DE LA FIRMA.
+   */
+  | 'PLAN_PAGADO'
+  | 'PLAN_ACTUALIZADO';
 
 export interface AuditLogEntry {
   id: string;

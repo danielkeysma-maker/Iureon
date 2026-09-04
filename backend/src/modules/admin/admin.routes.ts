@@ -18,9 +18,10 @@ import {
   createFirmController,
   firmDetailController,
   listFirmsController,
-  updateFirmController
-,
-  runwayController} from './admin.controller';
+  updateFirmController,
+  updateFirmPlanController,
+  runwayController
+} from './admin.controller';
 
 /**
  * The operator console, gated as a whole.
@@ -53,6 +54,7 @@ router.get('/firms', listFirmsController as any);
 router.get('/firms/:firmId', firmDetailController as any);
 router.post('/firms', createFirmController as any);
 router.patch('/firms/:firmId', updateFirmController as any);
+router.patch('/firms/:firmId/plan', updateFirmPlanController as any);
 router.post('/firms/:firmId/credits', addCreditsController as any);
 router.post('/firms/:firmId/users', addUserController as any);
 

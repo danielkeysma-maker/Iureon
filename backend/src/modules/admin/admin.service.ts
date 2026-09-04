@@ -8,6 +8,15 @@ import {
 } from '../auth/auth.service';
 import { consumoDelMesPorUsuario } from '../billing/billing.service';
 import { auditService, type AuditLogEntry } from '../audit/audit.service';
+import {
+  DIAS_DE_PRUEBA,
+  PLANES,
+  esPeriodo,
+  esPlan,
+  etiquetaDePeriodo,
+  type Plan,
+  type PlanPeriod
+} from '../subscriptions/plan.catalog';
 
 /**
  * Running the platform: the firms on it, their plans, their balances.
@@ -28,6 +37,14 @@ export interface FirmSummary {
   /** Opcional: hay litigantes y despachos sin NIT. NULL en la base, nunca ''. */
   nit: string | null;
   planTier: string;
+  /**
+   * The subscription. All three NULL = cortesía legacy: a firm from before the
+   * plans existed, unrestricted until the operator assigns one.
+   */
+  plan: Plan | null;
+  planPeriod: PlanPeriod | null;
+  planValidUntil: string | null;
+  planMaxUsers: number | null;
   status: string;
   creditsBalance: number;
   createdAt: string;
@@ -55,13 +72,54 @@ interface FirmRow {
   /** Opcional: hay litigantes y despachos sin NIT. NULL en la base, nunca ''. */
   nit: string | null;
   plan_tier: string;
+  plan?: string | null;
+  plan_period?: string | null;
+  plan_valid_until?: string | null;
+  plan_max_users?: number | null;
   subscription_status: string;
   credit_balance_cop: number | string;
   created_at: string;
 }
 
-const FIRM_COLUMNS =
+const FIRM_COLUMNS_LEGACY =
   'firm_id, name, nit, plan_tier, subscription_status, credit_balance_cop, created_at';
+
+const FIRM_COLUMNS = `${FIRM_COLUMNS_LEGACY}, plan, plan_period, plan_valid_until, plan_max_users`;
+
+/**
+ * Reads firms with the plan columns, and without them if the database does
+ * not have them yet.
+ *
+ * DEPLOY AND MIGRATION ARE TWO MOMENTS. `migration-suscripciones.sql` adds the
+ * plan columns; until it runs, selecting them fails and the whole console
+ * would go blank over four columns that are NULL anyway. The retry reads what
+ * exists and the log names the migration, loudly, once per process.
+ */
+let columnasAvisadas = false;
+const seleccionarFirmas = async (
+  filtro?: (q: any) => any
+): Promise<{ data: FirmRow[] | null; error: { message: string } | null }> => {
+  const client = requireClient();
+  const consulta = (columnas: string) => {
+    let q: any = client.from('firms').select(columnas);
+    if (filtro) q = filtro(q);
+    return q;
+  };
+
+  const primera = await consulta(FIRM_COLUMNS);
+  if (!primera.error) return { data: primera.data as FirmRow[] | null, error: null };
+
+  if (!columnasAvisadas) {
+    columnasAvisadas = true;
+    console.error(
+      '[ADMIN] Las columnas de plan no existen todavía; falta correr ' +
+        `supabase/migration-suscripciones.sql. Detalle: ${primera.error.message}`
+    );
+  }
+
+  const segunda = await consulta(FIRM_COLUMNS_LEGACY);
+  return { data: segunda.data as FirmRow[] | null, error: segunda.error };
+};
 
 /** The volume figures a firm is judged by. Counts, never contents. */
 interface FirmVolumes {
@@ -157,6 +215,10 @@ const toSummary = (row: FirmRow, volumes: FirmVolumes, catalogoTotal: number): F
   name: row.name,
   nit: row.nit,
   planTier: row.plan_tier,
+  plan: esPlan(row.plan) ? row.plan : null,
+  planPeriod: esPeriodo(row.plan_period) ? row.plan_period : null,
+  planValidUntil: row.plan_valid_until ?? null,
+  planMaxUsers: typeof row.plan_max_users === 'number' ? row.plan_max_users : null,
   status: row.subscription_status,
   creditsBalance: Number(row.credit_balance_cop ?? 0),
   createdAt: row.created_at,
@@ -176,10 +238,9 @@ const toSummary = (row: FirmRow, volumes: FirmVolumes, catalogoTotal: number): F
 export const listFirms = async (): Promise<FirmSummary[]> => {
   const client = requireClient();
 
-  const { data: firms, error } = await client
-    .from('firms')
-    .select(FIRM_COLUMNS)
-    .order('created_at', { ascending: false });
+  const { data: firms, error } = await seleccionarFirmas((q) =>
+    q.order('created_at', { ascending: false })
+  );
 
   if (error) {
     console.error('[ADMIN] No se pudieron listar las firmas:', error.message);
@@ -207,7 +268,8 @@ const OPERATION_ACTIONS = new Set([
   'FIRM_UPDATED',
   'FIRM_CREDITS_ADDED',
   'FIRM_STATUS_CHANGED',
-  'USER_CREATED'
+  'USER_CREATED',
+  'PLAN_ACTUALIZADO'
 ]);
 
 export interface FirmUserDetail {
@@ -248,11 +310,8 @@ export interface FirmDetail extends FirmSummary {
 export const getFirmDetail = async (firmId: string): Promise<FirmDetail> => {
   const client = requireClient();
 
-  const { data: firm, error } = await client
-    .from('firms')
-    .select(FIRM_COLUMNS)
-    .eq('firm_id', firmId)
-    .maybeSingle();
+  const { data: firms, error } = await seleccionarFirmas((q) => q.eq('firm_id', firmId).limit(1));
+  const firm = firms?.[0] ?? null;
 
   if (error) {
     console.error('[ADMIN] No se pudo leer la firma:', error.message);
@@ -349,14 +408,40 @@ export const createFirm = async (input: {
   const firmId = `firm-${Date.now()}`;
   const credits = Number.isFinite(input.initialCredits) ? Number(input.initialCredits) : 0;
 
-  const { error: firmError } = await client.from('firms').insert({
+  /*
+   * A NEW FIRM STARTS ON PREMIUM, ON TRIAL, FOR FOURTEEN DAYS. Premium so the
+   * trial shows everything the product does; a date so the trial ends without
+   * anyone remembering to end it. The operator can stretch or change it from
+   * the ficha, with a written reason.
+   */
+  const pruebaHasta = new Date(Date.now() + DIAS_DE_PRUEBA * 24 * 60 * 60 * 1000).toISOString();
+  const filaBase = {
     firm_id: firmId,
     name: firmName,
     nit,
     plan_tier: 'PRO_FIRM',
     subscription_status: 'active',
     credit_balance_cop: credits
+  };
+
+  let { error: firmError } = await client.from('firms').insert({
+    ...filaBase,
+    plan: 'PREMIUM',
+    plan_period: 'PRUEBA',
+    plan_valid_until: pruebaHasta,
+    plan_max_users: PLANES.PREMIUM.maxUsuarios
   });
+
+  // Before migration-suscripciones.sql the plan columns do not exist. The firm
+  // is still created — as cortesía, like every firm before plans — and the log
+  // says what is missing, so onboarding a client never waits on a migration.
+  if (firmError) {
+    console.error(
+      '[ADMIN] No se pudo crear la firma con plan; se reintenta sin plan. ' +
+        `Falta correr supabase/migration-suscripciones.sql. Detalle: ${firmError.message}`
+    );
+    ({ error: firmError } = await client.from('firms').insert(filaBase));
+  }
 
   if (firmError) {
     console.error('[ADMIN] No se pudo crear la firma:', firmError.message);
@@ -377,6 +462,10 @@ export const createFirm = async (input: {
     name: firmName,
     nit,
     planTier: 'PRO_FIRM',
+    plan: 'PREMIUM',
+    planPeriod: 'PRUEBA',
+    planValidUntil: pruebaHasta,
+    planMaxUsers: PLANES.PREMIUM.maxUsuarios,
     status: 'active',
     creditsBalance: credits,
     createdAt: new Date().toISOString(),
@@ -508,7 +597,7 @@ export const addCredits = async (
   return { balance: nuevo, reason: motivo };
 };
 
-const PLANES = new Set(['PRO_FIRM', 'INDEPENDIENTE', 'ENTERPRISE']);
+const PLAN_TIERS_LEGACY = new Set(['PRO_FIRM', 'INDEPENDIENTE', 'ENTERPRISE']);
 const ESTADOS = new Set(['active', 'past_due', 'canceled']);
 
 /** Changes a firm's plan or subscription status. */
@@ -526,7 +615,7 @@ export const updateFirm = async (
   if (changes.name?.trim()) patch.name = changes.name.trim();
 
   if (changes.planTier) {
-    if (!PLANES.has(changes.planTier)) {
+    if (!PLAN_TIERS_LEGACY.has(changes.planTier)) {
       throw new AuthError('INVALID_PLAN', 'Ese plan no existe.');
     }
     patch.plan_tier = changes.planTier;
@@ -554,6 +643,77 @@ export const updateFirm = async (
 
   return motivo;
 };
+
+/**
+ * Sets a firm's plan by hand: plan, period and expiry, with a written reason.
+ *
+ * This is how a trial is extended, a courtesy granted, a firm moved to
+ * ESENCIAL after a phone call. CORTESIA is the one period without a date;
+ * every other period needs one, because a dated plan is what the guards
+ * read — a MENSUAL plan with no expiry would be a courtesy wearing a price.
+ * Returns what was written, for the audit line.
+ */
+export const updateFirmPlan = async (
+  firmId: string,
+  changes: { plan?: unknown; period?: unknown; validUntil?: unknown },
+  reason: unknown
+): Promise<{ plan: Plan; period: PlanPeriod; validUntil: string | null; reason: string }> => {
+  const client = requireClient();
+  const motivo = requireReason(reason);
+
+  if (!esPlan(changes.plan)) {
+    throw new AuthError('INVALID_PLAN', 'El plan debe ser ESENCIAL o PREMIUM.');
+  }
+  if (!esPeriodo(changes.period)) {
+    throw new AuthError('INVALID_PERIOD', 'El periodo debe ser MENSUAL, ANUAL, PRUEBA o CORTESIA.');
+  }
+
+  let validUntil: string | null = null;
+  const fechaDada = typeof changes.validUntil === 'string' && changes.validUntil.trim()
+    ? new Date(changes.validUntil)
+    : null;
+
+  if (fechaDada && Number.isNaN(fechaDada.getTime())) {
+    throw new AuthError('INVALID_DATE', 'La fecha de vencimiento no es válida.');
+  }
+  if (changes.period !== 'CORTESIA' && !fechaDada) {
+    throw new AuthError('INVALID_DATE', 'Ese periodo necesita una fecha de vencimiento.');
+  }
+  // A dated courtesy is allowed: "free until March" is a real arrangement.
+  if (fechaDada) validUntil = fechaDada.toISOString();
+
+  const { error } = await client
+    .from('firms')
+    .update({
+      plan: changes.plan,
+      plan_period: changes.period,
+      plan_valid_until: validUntil,
+      plan_max_users: PLANES[changes.plan].maxUsuarios,
+      // A plan set by hand is a plan in good standing; mora is for the guards
+      // to derive from the date, not for this column to remember.
+      subscription_status: 'active',
+      updated_at: new Date().toISOString()
+    })
+    .eq('firm_id', firmId);
+
+  if (error) {
+    console.error('[ADMIN] No se pudo fijar el plan:', error.message);
+    throw new AuthError('UPDATE_FAILED', 'No se pudo fijar el plan de la firma.', 502);
+  }
+
+  return { plan: changes.plan, period: changes.period, validUntil, reason: motivo };
+};
+
+/** The audit wording for a plan set by hand. */
+export const describirCambioDePlan = (cambio: {
+  plan: Plan;
+  period: PlanPeriod;
+  validUntil: string | null;
+}): string =>
+  `Plan ${PLANES[cambio.plan].nombre} · ${etiquetaDePeriodo(cambio.period)} · ` +
+  (cambio.validUntil
+    ? `vence el ${new Date(cambio.validUntil).toLocaleDateString('es-CO')}`
+    : 'sin vencimiento');
 
 /** Adds an account to any firm, for onboarding and support. */
 export const addUserToAnyFirm = async (

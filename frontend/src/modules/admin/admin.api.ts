@@ -19,6 +19,11 @@ export interface FirmSummary {
   /** Opcional: hay litigantes y despachos sin NIT. */
   nit: string | null;
   planTier: string;
+  /** El plan. Los cuatro en null = cortesía legacy: sin plan asignado, sin restricción. */
+  plan: 'ESENCIAL' | 'PREMIUM' | null;
+  planPeriod: 'MENSUAL' | 'ANUAL' | 'PRUEBA' | 'CORTESIA' | null;
+  planValidUntil: string | null;
+  planMaxUsers: number | null;
   status: string;
   creditsBalance: number;
   createdAt: string;
@@ -156,6 +161,22 @@ export const adminApi = {
 
   updateFirm: (firmId: string, changes: { planTier?: string; status?: string; name?: string }) =>
     httpClient.patch<{ success: boolean }>(`/api/admin/firms/${firmId}`, { body: changes }),
+
+  /*
+   * Fija plan, periodo y vencimiento a mano, con motivo escrito. Así se
+   * extiende una prueba, se concede una cortesía o se mueve una firma de plan
+   * tras una llamada. Queda en la auditoría de la firma como PLAN_ACTUALIZADO.
+   */
+  updateFirmPlan: (
+    firmId: string,
+    input: {
+      plan: 'ESENCIAL' | 'PREMIUM';
+      period: 'MENSUAL' | 'ANUAL' | 'PRUEBA' | 'CORTESIA';
+      validUntil: string | null;
+      motivo: string;
+    }
+  ) =>
+    httpClient.patch<{ success: boolean }>(`/api/admin/firms/${firmId}/plan`, { body: input }),
 
   addUser: (firmId: string, input: { email: string; password: string; role: 'FIRM_ADMIN' | 'LAWYER' }) =>
     httpClient.post<{ user: { id: string; email: string } }>(`/api/admin/firms/${firmId}/users`, {

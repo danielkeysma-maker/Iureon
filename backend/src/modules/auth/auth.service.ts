@@ -1,4 +1,5 @@
 import { supabase, supabaseAuth } from '../../config/supabase.config';
+import { describirPlan, leerPlan } from '../subscriptions/plan.service';
 
 /**
  * Real identity for Iureon: who the user is, and which firm they belong to.
@@ -333,12 +334,29 @@ export const firmProfile = async (firmId: string) => {
 
   if (error || !data) return null;
 
+  /*
+   * The plan travels with the session so the shell can hide the modules an
+   * ESENCIAL firm does not have and show the expiry banner without a second
+   * round trip. Read separately and cheaply (no user count): the count belongs
+   * to the plan screen, which asks /api/subscription/plan.
+   */
+  const plan = describirPlan(await leerPlan(firmId), 0);
+
   return {
     id: data.firm_id,
     name: data.name,
     nit: data.nit,
     planTier: data.plan_tier,
     status: data.subscription_status,
-    creditsBalance: Number(data.credit_balance_cop ?? 0)
+    creditsBalance: Number(data.credit_balance_cop ?? 0),
+    plan: {
+      plan: plan.plan,
+      period: plan.period,
+      validUntil: plan.validUntil,
+      maxUsers: plan.maxUsers,
+      estado: plan.estado,
+      diasRestantes: plan.diasRestantes,
+      modulosPermitidos: plan.modulosPermitidos
+    }
   };
 };

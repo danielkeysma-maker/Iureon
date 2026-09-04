@@ -47,7 +47,9 @@ import type { ActuacionRole } from './modules/catalog/types';
 import { FirmBrandingModal } from './modules/tenant/components/FirmBrandingModal';
 import { brandingApi, formatoComoInstruccion, setMarcaActual, type FirmBranding } from './modules/tenant/services/branding.api';
 import { FirmSubscriptionModal } from './modules/subscriptions/components/FirmSubscriptionModal';
-import type { FirmSubscriptionInfo } from './modules/subscriptions/types';
+import { PlanExpiryBanner } from './modules/subscriptions/components/PlanExpiryBanner';
+import { subscriptionApi } from './modules/subscriptions/subscription.api';
+import type { PlanDeFirma } from './modules/subscriptions/types';
 import { DEFAULT_FIRM_BRANDING, DocumentExportService } from './modules/documents/services/documentExport.service';
 import type { FirmBrandingConfig } from './modules/documents/services/documentExport.service';
 import { useLegalAgentWorkflow } from './modules/workspace/hooks/useLegalAgentWorkflow';
@@ -62,7 +64,7 @@ import { OperatorConsoleDialog } from './modules/admin/components/OperatorConsol
 import { FirmUsersDialog } from './modules/tenant/components/FirmUsersDialog';
 import { LoginPortalView } from './modules/tenant/components/LoginPortalView';
 import type { MainView } from './modules/tenant/types';
-import { NAV_MODULES } from './modules/tenant/navigation';
+import { NAV_MODULES, vistasOcultasPorPlan } from './modules/tenant/navigation';
 
 /**
  * Los módulos que la aplicación puede mostrar, para validar el que quedó
@@ -270,6 +272,17 @@ export function App() {
   const [isFirmDropdownOpen, setIsFirmDropdownOpen] = useState(false);
   const [isBrandingModalOpen, setIsBrandingModalOpen] = useState(false);
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
+  /*
+   * EL PLAN DE LA FIRMA, del servidor. Decide dos cosas del cascarón: qué
+   * módulos se pintan (una firma ESENCIAL no ve Audiencias, Entrevistas ni
+   * Orientación) y si arriba va la franja de vencimiento. Se lee al entrar y
+   * cada vez que la pantalla del plan lo relee; nunca se deriva aquí.
+   */
+  const [planDeFirma, setPlanDeFirma] = useState<PlanDeFirma | null>(null);
+  const vistasOcultas = useMemo(
+    () => vistasOcultasPorPlan(planDeFirma?.modulosPermitidos ?? null),
+    [planDeFirma]
+  );
   const [isUserManagementModalOpen, setIsUserManagementModalOpen] = useState(false);
   const [isRechargeModalOpen, setIsRechargeModalOpen] = useState(false);
 
@@ -378,6 +391,38 @@ export function App() {
   useEffect(() => {
     void refreshBalance();
   }, [refreshBalance]);
+
+  /*
+   * El plan se lee una vez por sesión: cambia unas veces al año, y la pantalla
+   * del plan lo relee al abrirse. Si falla, no se oculta ningún módulo y no se
+   * pinta ninguna franja: la puerta de verdad la pone el servidor, que rechaza
+   * la operación aunque la pantalla la ofrezca.
+   */
+  useEffect(() => {
+    if (!session) return;
+    let cancelado = false;
+    subscriptionApi
+      .plan()
+      .then(({ plan }) => {
+        if (!cancelado) setPlanDeFirma(plan);
+      })
+      .catch(() => {
+        /* Sin plan leído se muestra todo; el servidor sigue mandando. */
+      });
+    return () => {
+      cancelado = true;
+    };
+  }, [session]);
+
+  /*
+   * Una vista guardada en la sesión que el plan ya no incluye (la pestaña
+   * recordaba «audiencias» y la firma pasó a Esencial) volvería a una pantalla
+   * sin puerta en la barra. Se devuelve a Redacción.
+   */
+  useEffect(() => {
+    if (vistasOcultas.includes(mainView)) setMainView('workspace');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vistasOcultas, mainView]);
 
   /*
    * Y EN VIVO, SIN IMPORTAR QUIEN GASTO. El saldo es de la firma, no de la
@@ -539,20 +584,6 @@ export function App() {
   /* El borrador guardado que esta abierto en el panel, si hay uno. */
   const borradorAbierto = savedDrafts.find((d) => d.id === loadedDraftId) ?? null;
 
-  const sampleSubscriptionInfo: FirmSubscriptionInfo = {
-    firmName: activeFirm.name,
-    planTier: 'SALDO_RECARGA' as any,
-    subscriptionStatus: 'active',
-    monthlyTokensUsed: 1420500,
-    monthlyTokensLimit: 5000000,
-    activeUsersCount: 1,
-    maxUsersAllowed: 10,
-    renewalDate: '2026-08-20',
-    usersList: [
-      { id: 'usr-001', name: 'Administrador de Firma', email: currentUserEmail, role: 'SOCIO_ADMIN', status: 'active' }
-    ]
-  };
-
   const handleLoginSuccess = (fresh: Session) => {
     setSession(saveSession(fresh));
     setActiveFirm(firmFromSession(fresh));
@@ -614,6 +645,13 @@ export function App() {
           onAbrirSolicitud={setSolicitudAbierta}
         />
       )}
+      {isAuthenticated && (
+        <PlanExpiryBanner
+          plan={planDeFirma}
+          puedeVer={Boolean(esSocio || esSuperusuario)}
+          onAbrirPlan={() => setIsSubscriptionModalOpen(true)}
+        />
+      )}
       <div className="flex min-h-0 flex-1 overflow-hidden">
       <FirmBrandingModal
         isOpen={isBrandingModalOpen}
@@ -623,7 +661,8 @@ export function App() {
       <FirmSubscriptionModal
         isOpen={isSubscriptionModalOpen}
         onClose={() => setIsSubscriptionModalOpen(false)}
-        info={sampleSubscriptionInfo}
+        puedePagar={Boolean(esSocio || esSuperusuario)}
+        onPlanLeido={setPlanDeFirma}
       />
       {/*
         `procesoActual` sale del borrador abierto en el panel, no de un campo
@@ -693,6 +732,7 @@ export function App() {
         onOpenRechargeModal={() => setIsRechargeModalOpen(true)}
         isSuperUser={esSuperusuario}
         pendientes={{ soporte: sinLeerSoporte }}
+        ocultas={vistasOcultas}
       />
       </div>
       )}
@@ -1202,6 +1242,7 @@ export function App() {
             }}
             onAbrirMas={() => setMasAbierto((v) => !v)}
             masAbierto={masAbierto}
+            ocultas={vistasOcultas}
           />
         )}
       </div>
@@ -1213,6 +1254,8 @@ export function App() {
         onElegir={setMainView}
         onCerrar={() => setMasAbierto(false)}
         onSaldo={() => setIsRechargeModalOpen(true)}
+        onPlan={() => setIsSubscriptionModalOpen(true)}
+        ocultas={vistasOcultas}
       />
 
       <SupportAccessDecisionDialog

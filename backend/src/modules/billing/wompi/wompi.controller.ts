@@ -83,6 +83,9 @@ export const wompiEventsController = async (req: Request, res: Response): Promis
     if (resultado.handled === 'CREDITED') {
       console.log('[WOMPI] Recarga acreditada. Saldo resultante:', resultado.balance);
     }
+    if (resultado.handled === 'PLAN_EXTENDED') {
+      console.log(`[WOMPI] Plan ${resultado.plan} de ${resultado.firmId} vigente hasta ${resultado.validUntil}.`);
+    }
 
     res.json({ success: true, handled: resultado.handled });
   } catch (err) {
