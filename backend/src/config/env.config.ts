@@ -160,6 +160,44 @@ if (pushEnabled && !/^(mailto:|https:\/\/)/.test(read('VAPID_SUBJECT'))) {
   errors.push('VAPID_SUBJECT must be a mailto: address or an https:// URL.');
 }
 
+/**
+ * Correo saliente (confirmaciones de pago).
+ *
+ * Gmail con contraseña de aplicación, y no un proveedor transaccional, porque
+ * el operador no tiene dominio propio: SES, Resend o Postmark exigen verificar
+ * uno y la aplicación vive en vercel.app. Gmail envía desde la cuenta del
+ * titular sin verificar nada, con un tope de unos 500 correos al día que
+ * sobra para confirmar pagos. `MAIL_FROM_NAME` es opcional y solo cambia el
+ * nombre que ve el destinatario junto a la dirección.
+ *
+ * Los dos o ninguno: el usuario sin contraseña no autentica, y la contraseña
+ * sin usuario no dice de quién es. Sin correo la aplicación funciona igual:
+ * los pagos se aplican y solo se omite la confirmación, avisándolo una vez en
+ * el registro.
+ */
+const gmailEnabled = requireGroup('Correo saliente (Gmail)', ['GMAIL_USER', 'GMAIL_APP_PASSWORD']);
+
+if (gmailEnabled && !read('GMAIL_USER').includes('@')) {
+  errors.push('GMAIL_USER must be a full email address (the Gmail account that sends).');
+}
+
+/*
+ * RESEND, SI HAY LLAVE, MANDA SOBRE GMAIL. El titular tiene una llave de
+ * Resend; con ella el envío es HTTP (sin SMTP desde una función serverless) y
+ * con registro de entregas. La dirección remitente debe ser de un dominio
+ * verificado en Resend; sin dominio propio, Resend solo entrega al correo del
+ * dueño de la cuenta desde `onboarding@resend.dev`, y eso sirve para probar,
+ * no para clientes. Por eso `MAIL_FROM` es obligatoria junto con la llave.
+ */
+const resendEnabled = requireGroup('Correo saliente (Resend)', ['RESEND_API_KEY', 'MAIL_FROM']);
+
+if (resendEnabled && !read('MAIL_FROM').includes('@')) {
+  errors.push('MAIL_FROM must be a full email address on a domain verified in Resend.');
+}
+
+const mailProvider: 'resend' | 'gmail' | null = resendEnabled ? 'resend' : gmailEnabled ? 'gmail' : null;
+const mailEnabled = mailProvider !== null;
+
 /*
  * Test keys are prefixed pub_test_ / prv_test_ and production ones pub_prod_ /
  * prv_prod_. Deriving the environment from the key itself rather than from a
@@ -287,6 +325,14 @@ export const config = {
     integritySecret: read('WOMPI_INTEGRITY_SECRET'),
     /** Where the checkout sends the client back once the card is charged. */
     redirectUrl: read('WOMPI_REDIRECT_URL')
+  },
+  mail: {
+    enabled: mailEnabled,
+    provider: mailProvider,
+    user: mailProvider === 'resend' ? read('MAIL_FROM') : read('GMAIL_USER'),
+    appPassword: read('GMAIL_APP_PASSWORD'),
+    resendApiKey: read('RESEND_API_KEY'),
+    fromName: read('MAIL_FROM_NAME') || 'Iureon'
   },
   push: {
     enabled: pushEnabled,

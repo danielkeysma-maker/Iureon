@@ -22,6 +22,7 @@ import {
   updateFirmPlanController,
   runwayController
 } from './admin.controller';
+import { mailStatusController, mailTestController } from '../mail/mail.controller';
 
 /**
  * The operator console, gated as a whole.
@@ -82,5 +83,13 @@ router.get('/support-chat', bandejaOperadorController as any);
 router.get('/support-chat/:id', conversacionOperadorController as any);
 router.post('/support-chat/:id/messages', responderOperadorController as any);
 router.post('/support-chat/:id/close', cerrarOperadorController as any);
+
+/*
+ * Correo saliente. Detras del mismo guardian: `test` manda un mensaje desde la
+ * cuenta del titular (al propio operador, nunca a una direccion del cuerpo) y
+ * `status` dice si el correo esta configurado y desde que cuenta, enmascarada.
+ */
+router.get('/mail/status', mailStatusController as any);
+router.post('/mail/test', mailTestController as any);
 
 export const adminRoutes = router;

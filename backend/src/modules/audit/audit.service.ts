@@ -70,7 +70,14 @@ export type AuditAction =
    * información de la firma (títulos de borradores, asuntos de soporte).
    */
   | 'PUSH_SUBSCRIBED'
-  | 'PUSH_UNSUBSCRIBED';
+  | 'PUSH_UNSUBSCRIBED'
+  /*
+   * Correo saliente. Se escribe SOLO cuando el envío fue aceptado por el
+   * servidor de correo, nunca al intentarlo: una firma que pregunta «¿me
+   * mandaron la confirmación?» tiene que poder leer la respuesta verdadera en
+   * su propio rastro. `resource` dice qué se confirmó y con qué referencia.
+   */
+  | 'EMAIL_SENT';
 
 export interface AuditLogEntry {
   id: string;

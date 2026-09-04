@@ -3,6 +3,8 @@ import { config } from '../../../config/env.config';
 import { supabase } from '../../../config/supabase.config';
 import { BillingError, MIN_RECHARGE_COP } from '../billing.service';
 import { auditService } from '../../audit/audit.service';
+import { correoDeRecarga, correoDeSuscripcion } from '../../mail/mail.service';
+import type { PeriodoPagado, PlanPagado } from '../../mail/cuentaDeCobro.pdf';
 
 /**
  * Recharging through Wompi.
@@ -288,12 +290,8 @@ export const aplicarEvento = async (evento: WompiEvent): Promise<EventOutcome> =
    * exist and the read fails: every intent is then a recharge, which is the
    * only kind that could have been created.
    */
-  const { data: intencion } = await db
-    .from('payment_intents')
-    .select('purpose')
-    .eq('reference', referencia)
-    .maybeSingle();
-  const purpose = String((intencion as { purpose?: string } | null)?.purpose ?? 'RECARGA');
+  const intencion = await leerIntencion(db, referencia);
+  const purpose = String(intencion?.purpose ?? 'RECARGA');
 
   if (purpose === 'SUSCRIPCION') return aplicarPagoDePlan(db, referencia, idTransaccion);
 
@@ -312,7 +310,102 @@ export const aplicarEvento = async (evento: WompiEvent): Promise<EventOutcome> =
   // Wompi retry for ever.
   if (data === null) return { handled: 'ALREADY_CREDITED' };
 
-  return { handled: 'CREDITED', balance: Number(data) };
+  const balance = Number(data);
+
+  /*
+   * AWAITED, AND INSIDE THIS CALL, ON PURPOSE. The webhook controller awaits
+   * `aplicarEvento` and then responds; a serverless function freezes the moment
+   * the response leaves, so a send started after it would never finish. The
+   * mail service never throws: a failed confirmation logs and leaves the credit
+   * — already committed above — exactly where it is.
+   */
+  if (intencion?.user_email) {
+    await confirmarRecargaPorCorreo(db, {
+      firmId: String(intencion.firm_id ?? ''),
+      userEmail: String(intencion.user_email),
+      amountCop: Number(intencion.amount_cop ?? 0),
+      referencia,
+      balance
+    });
+  }
+
+  return { handled: 'CREDITED', balance };
+};
+
+interface IntencionLeida {
+  firm_id?: string;
+  user_email?: string;
+  amount_cop?: number;
+  purpose?: string;
+}
+
+/**
+ * The intent row as written before the client paid: whose firm, who started
+ * it, how much. `purpose` only exists after migration-suscripciones.sql; on a
+ * database without it the whole select fails, so the base columns are read
+ * again without it — every intent there is a recharge, the only kind that
+ * could have been created.
+ */
+const leerIntencion = async (
+  db: NonNullable<typeof supabase>,
+  referencia: string
+): Promise<IntencionLeida | null> => {
+  const conPurpose = await db
+    .from('payment_intents')
+    .select('firm_id, user_email, amount_cop, purpose')
+    .eq('reference', referencia)
+    .maybeSingle();
+  if (!conPurpose.error) return (conPurpose.data as IntencionLeida | null) ?? null;
+
+  const sinPurpose = await db
+    .from('payment_intents')
+    .select('firm_id, user_email, amount_cop')
+    .eq('reference', referencia)
+    .maybeSingle();
+  return (sinPurpose.data as IntencionLeida | null) ?? null;
+};
+
+interface FirmaParaCorreo {
+  nombre: string;
+  nit: string | null;
+}
+
+/** The firm's display name for the email; the id is the honest fallback, never an invented name. */
+const firmaParaCorreo = async (db: NonNullable<typeof supabase>, firmId: string): Promise<FirmaParaCorreo> => {
+  const { data } = await db.from('firms').select('name, nit').eq('firm_id', firmId).maybeSingle();
+  const fila = data as { name?: string; nit?: string | null } | null;
+  return { nombre: fila?.name?.trim() || firmId, nit: fila?.nit ?? null };
+};
+
+/**
+ * Confirms a credited recharge by email and, ONLY if the mail server accepted
+ * it, writes EMAIL_SENT to the firm's trail. An attempt is not a delivery, and
+ * the trail is where the firm will look when it asks whether anything was sent.
+ */
+const confirmarRecargaPorCorreo = async (
+  db: NonNullable<typeof supabase>,
+  input: { firmId: string; userEmail: string; amountCop: number; referencia: string; balance: number }
+): Promise<void> => {
+  const firma = await firmaParaCorreo(db, input.firmId);
+
+  const resultado = await correoDeRecarga({
+    para: input.userEmail,
+    firma: firma.nombre,
+    montoCop: input.amountCop,
+    referencia: input.referencia,
+    saldoCop: input.balance,
+    fecha: new Date().toISOString()
+  });
+
+  if (resultado.enviado) {
+    await auditService.record({
+      firmId: input.firmId,
+      userEmail: input.userEmail,
+      action: 'EMAIL_SENT',
+      resource: `Recarga ${input.referencia}`,
+      ipAddress: null
+    });
+  }
 };
 
 /**
@@ -356,6 +449,48 @@ const aplicarPagoDePlan = async (
       `$${monto.toLocaleString('es-CO')} COP · vigente hasta ${new Date(validUntil).toLocaleDateString('es-CO')} · ${referencia}`,
     ipAddress: null
   });
+
+  /*
+   * Same rule as the recharge: awaited here, before the webhook answers, and
+   * never able to throw. The cuenta de cobro travels attached, generated from
+   * the row the database function returned — the same figures the firm would
+   * see downloading it from the app.
+   */
+  const userEmail = String(pago.user_email ?? '');
+  if (userEmail) {
+    const firma = await firmaParaCorreo(db, firmId);
+    const resultado = await correoDeSuscripcion({
+      para: userEmail,
+      firma: firma.nombre,
+      nitDeLaFirma: firma.nit,
+      plan: plan as PlanPagado,
+      periodo: period as PeriodoPagado,
+      montoCop: monto,
+      validoDesde: String(pago.valid_from),
+      validoHasta: validUntil,
+      referencia,
+      pago: {
+        reference: referencia,
+        plan: plan as PlanPagado,
+        period: period as PeriodoPagado,
+        amountCop: monto,
+        validFrom: String(pago.valid_from),
+        validUntil,
+        userEmail,
+        createdAt: String(pago.created_at ?? new Date().toISOString())
+      }
+    });
+
+    if (resultado.enviado) {
+      await auditService.record({
+        firmId,
+        userEmail,
+        action: 'EMAIL_SENT',
+        resource: `Suscripción ${referencia}`,
+        ipAddress: null
+      });
+    }
+  }
 
   return { handled: 'PLAN_EXTENDED', firmId, plan, validUntil };
 };

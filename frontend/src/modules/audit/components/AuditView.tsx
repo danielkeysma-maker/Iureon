@@ -59,7 +59,8 @@ export const ACCIONES: Record<string, string> = {
   PUSH_SUBSCRIBED: 'Avisos activados en un dispositivo',
   PUSH_UNSUBSCRIBED: 'Avisos desactivados en un dispositivo',
   PLAN_PAGADO: 'Pagó el plan',
-  PLAN_ACTUALIZADO: 'Operación fijó el plan'
+  PLAN_ACTUALIZADO: 'Operación fijó el plan',
+  EMAIL_SENT: 'Correo enviado'
 };
 
 /** Las preguntas reales que estos datos pueden responder hoy. */
@@ -68,7 +69,7 @@ const VISTAS: Array<{ etiqueta: string; acciones: string[] }> = [
   { etiqueta: 'Cambios en el catálogo', acciones: ['CATALOG_TERM_VERIFIED'] },
   { etiqueta: 'Transcripciones', acciones: ['TRANSCRIPTION_CREATED', 'TRANSCRIPTION_DELETED', 'ACTA_LISTA'] },
   { etiqueta: 'Decisiones de entrevista', acciones: ['INTERVIEW_DECIDED'] },
-  { etiqueta: 'Saldo y firma', acciones: ['FIRM_CREDITS_ADDED', 'FIRM_UPDATED', 'FIRM_STATUS_CHANGED', 'PLAN_PAGADO', 'PLAN_ACTUALIZADO'] }
+  { etiqueta: 'Saldo y firma', acciones: ['FIRM_CREDITS_ADDED', 'FIRM_UPDATED', 'FIRM_STATUS_CHANGED', 'PLAN_PAGADO', 'PLAN_ACTUALIZADO', 'EMAIL_SENT'] }
 ];
 
 const fechaHora = (iso: string): { fecha: string; hora: string } => {

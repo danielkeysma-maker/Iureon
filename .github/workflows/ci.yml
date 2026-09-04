@@ -32,6 +32,8 @@ jobs:
         run: npm run check:wompi
       - name: Plan rules (prices, extension from a future expiry, expiry states, module gating)
         run: npm run check:plan
+      - name: Transactional mail (templates, subjects, cuenta de cobro PDF)
+        run: npm run check:mail
       - name: Catalogue correctness checks
         run: npm run check:catalog
       - name: Embeddings guard (no fabricated vectors)
