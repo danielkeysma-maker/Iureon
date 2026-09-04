@@ -257,7 +257,7 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto p-5">
-        <div className="mx-auto max-w-4xl space-y-4">
+        <div className="mx-auto max-w-6xl space-y-4">
 
         {/*
           Two different problems, two different messages. One banner used to
@@ -381,7 +381,7 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
           la palabra dudosa del minuto 44 exige oir y leer a la vez.
         */}
         {result && selectedFile && (
-          <div className="sticky bottom-0 z-20 mx-auto max-w-4xl px-0 pb-2 pt-1">
+          <div className="sticky bottom-0 z-20 mx-auto max-w-6xl px-0 pb-2 pt-1">
             <AudioPreview file={selectedFile} anclado />
           </div>
         )}

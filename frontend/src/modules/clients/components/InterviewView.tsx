@@ -397,7 +397,7 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft, onPrivaci
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto p-5">
-        <div className="mx-auto max-w-4xl space-y-4">
+        <div className="mx-auto max-w-6xl space-y-4">
 
       {!hasFirm && (
         <div className="bg-[rgb(var(--unverified-surf))] border border-[rgb(var(--unverified-line))] rounded-card p-3 flex items-start gap-2">
