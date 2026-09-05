@@ -332,10 +332,12 @@ export const HeaderTop: React.FC<HeaderTopProps> = ({
 
       <ActionConfirmationModal
         isOpen={isLogoutConfirmOpen}
-        title="¿Cerrar sesión?"
-        message="Sus borradores y configuraciones quedan guardados. Puede volver a entrar cuando quiera."
+        title="¿Cerrar la sesión en este dispositivo?"
+        message="Su trabajo queda guardado en la nube de su firma: borradores, revisiones, transcritos y ajustes. Al volver a entrar, retomará donde quedó."
+        detail="Solo se cierra la sesión de este navegador. Los demás dispositivos siguen conectados."
         confirmText="Cerrar sesión"
-        confirmVariant="danger"
+        cancelText="Seguir trabajando"
+        confirmVariant="primary"
         onConfirm={() => {
           setIsLogoutConfirmOpen(false);
           if (onLogout) onLogout();
