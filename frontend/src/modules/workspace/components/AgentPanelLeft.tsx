@@ -317,7 +317,7 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
           <button
             type="button"
             onClick={() => setRevisarAbierto(true)}
-            className="mt-3 flex w-full items-center gap-2.5 rounded-control border border-line-200 bg-surface px-3 py-2.5 text-left hover:border-brand-700 hover:bg-brand-50"
+            className="mt-3 flex w-full items-center gap-2.5 rounded-control border border-[rgb(var(--brand-line))] bg-brand-50 px-3 py-2.5 text-left shadow-[inset_3px_0_0_rgb(var(--brand-700))] hover:border-brand-700 hover:bg-brand-50/70"
           >
             <ClipboardCheck className="h-4 w-4 shrink-0 text-brand-700" />
             <span className="min-w-0 flex-1">

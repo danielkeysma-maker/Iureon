@@ -6,6 +6,12 @@
  * The list is derived from the repository history, not from a roadmap. An
  * entry describes what changed FOR THE LAWYER — what they can do now that
  * they could not, or what stopped going wrong — never how it was built.
+ * ONLY WHAT A LAWYER SEES. This list is for the people who use the app, not
+ * for the people who build it: no deploys, no CI, no guards, no operator-only
+ * consoles, no internal data fixes. If an entry cannot be understood from the
+ * screen, it does not belong here — the owner asked for exactly this on
+ * 2026-09-05 after reading entries about "producción".
+ *
  * Same-day fix-ups a user would not notice (wording of a commit, CI guards,
  * build markers) are left out, and several commits on one feature become a
  * single entry. Nothing below describes a capability that does not exist.
@@ -244,14 +250,6 @@ export const NOVEDADES: readonly Novedad[] = [
   },
   {
     fecha: '2026-09-01',
-    titulo: 'El operador puede descontar saldo, nunca dejarlo en rojo',
-    detalle:
-      'El ajuste de saldo admite valores negativos con motivo obligatorio, queda escrito en el libro de movimientos y en la auditoría, y el diálogo explica por qué el botón está apagado cuando falta algo.',
-    modulo: 'Operación',
-    tipo: 'mejora'
-  },
-  {
-    fecha: '2026-09-01',
     titulo: 'Rama de Urbanismo en el catálogo',
     detalle:
       'Seis actuaciones nuevas, y con ellas ninguna rama del catálogo queda vacía.',
@@ -308,22 +306,6 @@ export const NOVEDADES: readonly Novedad[] = [
     modulo: 'Entrevistas',
     tipo: 'nuevo'
   },
-  {
-    fecha: '2026-08-29',
-    titulo: 'La procedencia del borrador se conservaba mal al guardar',
-    detalle:
-      'Al guardar un borrador se perdía qué ficha y qué fuentes lo produjeron, y con eso la única forma de revisarlo después. Ya se guarda completa.',
-    modulo: 'Borradores',
-    tipo: 'correccion'
-  },
-  {
-    fecha: '2026-08-29',
-    titulo: 'El emparejador ya no resuelve una actuación inventada contra una ficha verificada',
-    detalle:
-      'Un nombre de actuación que no existe se declara como tal en vez de emparejarse con la ficha más parecida.',
-    modulo: 'Catálogo',
-    tipo: 'correccion'
-  },
 
   /* ── 28 de agosto de 2026 ────────────────────────────────────────────── */
   {
@@ -341,14 +323,6 @@ export const NOVEDADES: readonly Novedad[] = [
       'Entran garantías mobiliarias, embargos y remate, promesa, propiedad horizontal, arrendamiento, cobro coactivo, títulos valores, poder, conciliación previa, costas, desistimiento tácito, monitorio, providencias penales e internacionales, insolvencia y societario, ARL y Junta Nacional, entre otras.',
     modulo: 'Catálogo',
     tipo: 'nuevo'
-  },
-  {
-    fecha: '2026-08-28',
-    titulo: 'Fichas verificadas que seguían publicándose como no verificadas',
-    detalle:
-      'Catorce fichas se corrigieron: algunas anunciaban «sin verificar» con el término ya comprobado, y otras entregaban al modelo notas de auditoría como si fueran derecho. El derecho de petición vuelve a ser transversal.',
-    modulo: 'Catálogo',
-    tipo: 'correccion'
   },
   {
     fecha: '2026-08-28',
@@ -380,22 +354,6 @@ export const NOVEDADES: readonly Novedad[] = [
     detalle:
       'El escrito sale con membrete y logo, tipografía, interlineado y paginación reales; las actas de entrevista y de audiencia tienen cada una su papel, con intervinientes, advertencia y desarrollo por minuto. Exportar no llama al modelo ni a la red.',
     modulo: 'Exportar',
-    tipo: 'mejora'
-  },
-  {
-    fecha: '2026-08-28',
-    titulo: 'Consola del operador: ficha de la firma, catálogo maestro y acceso de soporte',
-    detalle:
-      'El operador ve la ficha de cada firma con motivo obligatorio en toda acción que cruce el límite de un inquilino, el catálogo maestro con lo que todavía no puede hacer escrito en pantalla, y el acceso de soporte se pide a la firma, no se toma.',
-    modulo: 'Operación',
-    tipo: 'nuevo'
-  },
-  {
-    fecha: '2026-08-28',
-    titulo: 'La versión que corre en su navegador se ve al pie de la barra lateral',
-    detalle:
-      'Una pestaña abierta desde ayer sirve la versión de ayer. Con el sello a la vista, «no veo los cambios» se responde comparando dos códigos.',
-    modulo: 'Ajustes',
     tipo: 'mejora'
   },
   {
@@ -500,14 +458,6 @@ export const NOVEDADES: readonly Novedad[] = [
   },
   {
     fecha: '2026-08-26',
-    titulo: 'Fichas con fuentes no oficiales, revisadas una por una',
-    detalle:
-      '76 de 103 fichas apoyadas en fuentes no oficiales tenían defectos y se corrigieron; dos afirmaban un término verificado que nadie había verificado; la de protección por violencia enviaba al juzgado equivocado y no mencionaba la apelación.',
-    modulo: 'Catálogo',
-    tipo: 'correccion'
-  },
-  {
-    fecha: '2026-08-26',
     titulo: 'Recarga de saldo por Wompi',
     detalle:
       'La firma recarga desde el panel de Saldo con un mínimo de $100.000, y el saldo se acredita cuando Wompi confirma el pago.',
@@ -542,14 +492,6 @@ export const NOVEDADES: readonly Novedad[] = [
   },
   {
     fecha: '2026-08-25',
-    titulo: 'Las firmas las abre el operador, y existe un rol de operador',
-    detalle:
-      'Ya no se crean firmas desde la página de acceso. El operador de la plataforma administra el negocio sin leer los casos de nadie.',
-    modulo: 'Operación',
-    tipo: 'nuevo'
-  },
-  {
-    fecha: '2026-08-25',
     titulo: 'Cada pestaña recuerda su módulo',
     detalle:
       'Una visita nueva empieza al principio; recargar una pestaña la deja donde estaba.',
@@ -574,32 +516,8 @@ export const NOVEDADES: readonly Novedad[] = [
     modulo: 'Audiencias',
     tipo: 'mejora'
   },
-  {
-    fecha: '2026-08-18',
-    titulo: 'El buscador vuelve a funcionar en producción',
-    detalle:
-      'La búsqueda semántica dependía de un servicio que no estaba disponible fuera del entorno de desarrollo. Ya responde en la aplicación desplegada.',
-    modulo: 'Buscador',
-    tipo: 'correccion'
-  },
 
   /* ── 15 de agosto de 2026 ────────────────────────────────────────────── */
-  {
-    fecha: '2026-08-15',
-    titulo: 'El término procesal se calcula en una sola zona horaria',
-    detalle:
-      'Según la hora del computador, el vencimiento podía moverse un día. Ahora se computa siempre en hora de Colombia.',
-    modulo: 'Herramientas',
-    tipo: 'correccion'
-  },
-  {
-    fecha: '2026-08-15',
-    titulo: 'Las providencias adjuntas ya no se etiquetan por el nombre del archivo',
-    detalle:
-      'Un archivo llamado de cualquier forma se leía como si su nombre fuera la cita. La etiqueta sale ahora del contenido.',
-    modulo: 'Redacción',
-    tipo: 'correccion'
-  }
 ];
 
 /** The ISO date of the newest entry: what a reader "has seen" once they open the list. */
