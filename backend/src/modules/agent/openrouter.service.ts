@@ -57,6 +57,15 @@ export interface WorkflowRequest {
   expedienteId?: string;
   customFormatInstruction?: string;
   existingDraft?: string;
+  /**
+   * What was read from the files the lawyer attached, already rendered as the
+   * «DATOS DE LOS ADJUNTOS» block (see `adjuntos/renderBloqueAdjuntos`).
+   * Appended to the material EVERY stage receives: Gemini extracts facts from
+   * it, GPT structures with it, Opus writes from it. Passing it to one stage
+   * only was the tempting shortcut, and it is how a plate number read by
+   * Gemini would still come out as [•] from Opus. Empty when nothing was read.
+   */
+  bloqueAdjuntos?: string;
 }
 
 export interface AgentExecutionStep {
@@ -76,9 +85,21 @@ export interface AgentExecutionStep {
 const MAX_TOKENS = {
   GEMINI_NEW: 1024,
   GEMINI_CONTINUATION: 768,
+  /** Facts from the prompt AND from the attached files: a comparendo alone is thirty data points. */
+  GEMINI_CON_ADJUNTOS: 2048,
   GPT_NEW: 1536,
   GPT_CONTINUATION: 1024
 } as const;
+
+/**
+ * Appends the attachments block to the material a stage receives.
+ *
+ * One helper so the three stages cannot disagree about where the block goes
+ * or whether an empty block leaves a dangling header — it never does: with
+ * nothing read the material is returned untouched.
+ */
+const conAdjuntos = (material: string, bloque?: string): string =>
+  bloque && bloque.trim() ? `${material}\n\n${bloque}` : material;
 
 /** Below this length Claude's answer is treated as a failed generation. */
 const MIN_DRAFT_LENGTH = 200;
@@ -215,15 +236,27 @@ export class OpenRouterService {
       ? `Eres un analista judicial. Ya existe un borrador de "${req.documentType}". El usuario quiere CONTINUARLO o CORREGIRLO. Tu tarea es identificar SOLO:\n1. QUÉ PIDE EL USUARIO que se cambie/agregue/corrija (máximo 5 puntos)\n2. SECCIONES AFECTADAS del borrador existente\n3. DATOS FÁCTICOS NUEVOS si los hay\n\nNO repitas los hechos que ya están en el borrador. Solo identifica los cambios solicitados. Máximo 300 palabras.`
       : `Eres un procesador fáctico judicial. Tu ÚNICA tarea es extraer en formato de lista concisa:\n1. HECHOS RELEVANTES (máximo 8 puntos)\n2. PARTES PROCESALES (demandante/accionante, demandado/accionado)\n3. PRETENSIONES (lo que se pide)\n4. TIPO DE PROCESO: ${req.documentType}\n\nResponde SOLO con la extracción. Sin comentarios, sin redacción, sin encabezados solemnes. Máximo 500 palabras.`;
 
-    const userPrompt = req.existingDraft
+    const base = req.existingDraft
       ? `${req.legalPrompt}\n\n--- BORRADOR EXISTENTE (primeros ${DRAFT_CONTEXT_CHARS} caracteres) ---\n${req.existingDraft.substring(0, DRAFT_CONTEXT_CHARS)}`
       : req.legalPrompt;
+    const userPrompt = conAdjuntos(base, req.bloqueAdjuntos);
+
+    /*
+     * With attachments the extraction has more to carry — every number, date,
+     * name and place read from the files must survive into the fact list, or
+     * the next two stages never see them — so the budget grows with them.
+     */
+    const maxTokens = req.bloqueAdjuntos
+      ? MAX_TOKENS.GEMINI_CON_ADJUNTOS
+      : req.existingDraft
+        ? MAX_TOKENS.GEMINI_CONTINUATION
+        : MAX_TOKENS.GEMINI_NEW;
 
     const { text: extraction, usage } = await callOpenRouterWithUsage(
       ENGINE.GEMINI,
       systemPrompt,
       userPrompt,
-      req.existingDraft ? MAX_TOKENS.GEMINI_CONTINUATION : MAX_TOKENS.GEMINI_NEW
+      maxTokens
     );
 
     // Recorded per stage, charged once for the document: three engines produce
@@ -450,9 +483,12 @@ export class OpenRouterService {
       : `Eres un estructurador procesal senior de Colombia. Tu ÚNICA tarea es producir un ESQUEMA CONCISO con:\n1. PROBLEMA JURÍDICO (1-2 oraciones)\n2. EXCEPCIONES O DEFENSAS APLICABLES (lista)\n3. NORMAS CLAVE (artículos específicos)\n4. ESTRATEGIA DE SUSTENTACIÓN (enfoque argumentativo)\n\nNO redactes el documento final. Solo entrega el esquema estructurado. Máximo 600 palabras.`;
 
     const facts = geminiExtraction || req.legalPrompt;
-    const userPrompt = req.existingDraft
-      ? `CAMBIOS IDENTIFICADOS POR GEMINI:\n${facts}\n\n${renderJurisprudencia(jurisprudencia)}\n\nINSTRUCCIÓN DEL USUARIO: ${req.legalPrompt}\n\nTIPO DE DOCUMENTO: ${req.documentType}`
-      : `HECHOS EXTRAÍDOS POR GEMINI:\n${facts}\n\n${renderJurisprudencia(jurisprudencia)}\n\nTIPO DE DOCUMENTO: ${req.documentType}`;
+    const userPrompt = conAdjuntos(
+      req.existingDraft
+        ? `CAMBIOS IDENTIFICADOS POR GEMINI:\n${facts}\n\n${renderJurisprudencia(jurisprudencia)}\n\nINSTRUCCIÓN DEL USUARIO: ${req.legalPrompt}\n\nTIPO DE DOCUMENTO: ${req.documentType}`
+        : `HECHOS EXTRAÍDOS POR GEMINI:\n${facts}\n\n${renderJurisprudencia(jurisprudencia)}\n\nTIPO DE DOCUMENTO: ${req.documentType}`,
+      req.bloqueAdjuntos
+    );
 
     const { text: structure, usage } = await callOpenRouterWithUsage(
       ENGINE.GPT,
@@ -518,7 +554,8 @@ export class OpenRouterService {
       citations: jurisprudencia,
       customFormat: req.customFormatInstruction,
       existingDraft: req.existingDraft,
-      catalogGuidance
+      catalogGuidance,
+      adjuntos: req.bloqueAdjuntos
     });
 
     const userMessage = buildClaudeUserMessage({
@@ -527,7 +564,8 @@ export class OpenRouterService {
       facts: geminiExtraction,
       citations: jurisprudencia,
       gptSchemaOutput: gptStructure,
-      existingDraft: req.existingDraft
+      existingDraft: req.existingDraft,
+      adjuntos: req.bloqueAdjuntos
     });
 
     const { text: draft, usage } = await callOpenRouterWithUsage(

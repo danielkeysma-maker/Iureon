@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { auditService } from '../audit/audit.service';
 import { randomUUID } from 'node:crypto';
 import { OpenRouterMultiEngineService, AgentExecutionStep } from './openrouter.service';
+import { mensajeInicioLectura, renderBloqueAdjuntos, resumenDeLectura, validarAdjuntos } from './adjuntos/adjuntos';
+import { leerAdjuntos } from './adjuntos/leerAdjuntos';
 import {
   BillingError,
   balanceOf,
@@ -43,6 +45,19 @@ export const streamAgentDraftController = async (req: Request, res: Response): P
     res.status(400).json({ error: 'MISSING_PROMPT', message: 'Se requiere la instrucción jurídica en legalPrompt' });
     return;
   }
+
+  /*
+   * Validated BEFORE the reservation: a malformed attachment list is a client
+   * bug, and a client bug must not cost a reservation-and-refund round trip.
+   * The files themselves are read after the stream opens, so the lawyer sees
+   * «Leyendo 2 adjuntos…» instead of a mute button while a PDF is decoded.
+   */
+  const adjuntosValidados = validarAdjuntos(req.body.adjuntos);
+  if (!adjuntosValidados.ok) {
+    res.status(400).json({ error: 'INVALID_ATTACHMENTS', message: adjuntosValidados.motivo });
+    return;
+  }
+  const adjuntos = adjuntosValidados.adjuntos;
 
   /*
    * The balance is checked BEFORE the stream opens, and before a peso is spent
@@ -100,6 +115,39 @@ export const streamAgentDraftController = async (req: Request, res: Response): P
   try {
     sendEvent('CONNECTED', { firmId, status: 'STARTING_MULTI_ENGINE_PIPELINE' });
 
+    /*
+     * Stage 0 — the attached files, before any engine runs.
+     *
+     * Read here and not inside the pipeline because this is where the B2
+     * objects are deleted (before responding, as always) and where the ledger
+     * context lives: an image costs a Gemini call, charged as part of BORRADOR
+     * under the same operationId. Both lines reach the «Ejecución» console
+     * through the same AGENT_LOG event the stages use.
+     */
+    let bloqueAdjuntos: string | undefined;
+    if (adjuntos.length > 0) {
+      sendEvent('AGENT_LOG', {
+        stage: 'STAGE_0_ADJUNTOS',
+        engine: 'GEMINI',
+        message: mensajeInicioLectura(adjuntos.length),
+        timestamp: new Date().toISOString()
+      } satisfies AgentExecutionStep);
+
+      const leidos = await leerAdjuntos(
+        { firmId: firmId as string, userEmail: req.user?.email ?? 'desconocido', operationId },
+        adjuntos
+      );
+      bloqueAdjuntos = renderBloqueAdjuntos(leidos) || undefined;
+
+      sendEvent('AGENT_LOG', {
+        stage: 'STAGE_0_ADJUNTOS',
+        engine: 'GEMINI',
+        message: resumenDeLectura(leidos),
+        timestamp: new Date().toISOString(),
+        data: { adjuntos: leidos.map(({ nombre, ok, caracteres, motivo }) => ({ nombre, ok, caracteres, motivo })) }
+      } satisfies AgentExecutionStep);
+    }
+
     const result = await aiService.executeMultiEnginePipeline(
       {
         firmId: firmId || 'unknown-firm',
@@ -117,7 +165,8 @@ export const streamAgentDraftController = async (req: Request, res: Response): P
          * aceptaba desde el principio — customFormat en buildClaudeDraftPrompt —
          * y nadie se lo enviaba: era un ajuste que se guardaba y no hacia nada.
          */
-        customFormatInstruction
+        customFormatInstruction,
+        bloqueAdjuntos
       },
       (step: AgentExecutionStep) => {
         sendEvent('AGENT_LOG', step);

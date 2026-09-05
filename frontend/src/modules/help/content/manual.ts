@@ -97,7 +97,7 @@ const A_QUE_HACE: ManualArticle = {
         'No radica nada. Ningún escrito sale de Iureon hacia un juzgado.',
         'No decide la estrategia del caso ni escoge las pretensiones por usted.',
         'No garantiza que un dato que nadie verificó sea correcto. Cuando no lo está, lo dice en la propia línea del escrito.',
-        'No lee los archivos que usted adjunta en el taller de redacción: por ahora solo se listan, y la pantalla lo advierte donde se adjuntan.',
+        'No lee un adjunto que no pueda decodificar: un PDF escaneado sin capa de texto, un Word protegido o una foto borrosa quedan marcados como «no leído» en la consola de ejecución, con el motivo, y el escrito sale con lo demás. Lo que sí lee está descrito en «Redactar un escrito».',
         'No conserva el audio de sus grabaciones. Se borra del almacenamiento en la misma petición que devuelve el transcrito.'
       ]
     },
@@ -269,9 +269,10 @@ const A_INSTRUCCION: ManualArticle = {
         'No vuelva a teclear lo que ya está transcrito: en una audiencia, el botón «Usar en redacción» copia el transcrito a este cuadro; en una entrevista, «Tomar el caso y redactar» lo trae aquí con los hechos del cliente. Lo dicho en la sala es el material del siguiente escrito.'
     },
     {
-      kind: 'aviso',
+      kind: 'nota',
+      titulo: 'Los adjuntos se leen',
       texto:
-        'Los archivos que adjunte con «Adjuntar sentencias o pruebas» todavía no se leen: se listan y nada más, y el propio panel lo dice. Si un hecho está en un anexo y no en el cuadro de texto, el escrito no lo va a conocer.'
+        'Con «Adjuntar sentencias, pruebas o fotos» puede subir PDF, Word (.doc y .docx), texto e imágenes JPG, PNG o WEBP: la foto de un comparendo, un oficio, una cédula. Al generar, cada archivo se lee antes de redactar y sus datos —números, placas, radicados, fechas, lugares, nombres, valores— entran al escrito tal cual; lo que el adjunto no trae sigue saliendo como [•]. Si un dato del adjunto contradice lo que usted escribió, prevalece lo suyo y la discrepancia queda anotada entre corchetes. Límites: hasta 8 archivos y 20 MB por escrito; 15 MB por documento; las fotos se reducen en su navegador a 2000 px antes de enviarse (máximo 6 MB reducidas); de cada archivo se leen hasta 40.000 caracteres y 120.000 entre todos. La consola de ejecución dice qué se leyó de cada uno y qué no, con el motivo. Los archivos no se guardan: los que pasan por el almacenamiento se borran en la misma petición.'
     },
     {
       kind: 'nota',
@@ -570,6 +571,12 @@ const A_PLANES: ManualArticle = {
       kind: 'aviso',
       texto:
         'En el plan Esencial, Audiencias, Entrevistas y Orientación no aparecen en la barra, y crear una segunda cuenta responde que el plan admite una sola. Pasar a Premium habilita las tres pantallas y hasta cinco cuentas desde el momento del pago; Firma, las mismas pantallas y hasta quince cuentas.'
+    },
+    {
+      kind: 'nota',
+      titulo: 'Prueba gratuita de Esencial',
+      texto:
+        'Desde la página pública o desde el enlace bajo el formulario de entrada, una firma puede abrir por su cuenta una prueba de Esencial de siete días: un usuario, sin tarjeta y sin cobro al terminar. Entra directo a la aplicación con todos los módulos de Esencial. El saldo de inteligencia artificial es aparte y empieza en cero: para probar la redacción hay que recargar desde «Saldo»; el Catálogo, el Buscador, las Herramientas y el Manual no consumen saldo. La pantalla del plan la muestra como «Prueba» con la fecha de vencimiento y la franja de aviso cuenta los días. Al cumplirse los siete días la aplicación pasa a solo lectura, igual que un plan vencido, y «Contratar» en la pantalla del plan la reactiva en el acto con Esencial o con otro plan. Una prueba por correo; el servidor limita las altas desde una misma conexión.'
     },
     {
       kind: 'nota',

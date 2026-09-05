@@ -32,6 +32,8 @@ jobs:
         run: npm run check:wompi
       - name: Plan rules (prices, extension from a future expiry, expiry states, module gating)
         run: npm run check:plan
+      - name: Free trial rules (7 days, one seat, honeypot, per-address window)
+        run: npm run check:trial
       - name: Transactional mail (templates, subjects, cuenta de cobro PDF)
         run: npm run check:mail
       - name: Catalogue correctness checks
@@ -56,6 +58,8 @@ jobs:
         run: npm run check:tools
       - name: PDF reader works without the optional native canvas
         run: npm run check:pdf
+      - name: Draft attachments (limits, block rendering, vision answer parsing)
+        run: npm run check:adjuntos
 
       - name: Build
         run: npm run build

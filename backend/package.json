@@ -18,6 +18,7 @@
     "check:admin": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/admin/__checks__/admin.check.ts",
     "check:pdf": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/ingestion/__checks__/pdfReader.check.ts",
     "check:plan": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/subscriptions/__checks__/plan.check.ts",
+    "check:trial": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/trial/__checks__/trial.check.ts",
     "check:taller": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/taller.check.ts",
     "check:revision": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/documentReview.check.ts",
     "check:extracto": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/billing/__checks__/extracto.check.ts",
@@ -53,7 +54,8 @@
     "check:cndj": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/jurisprudence/__checks__/cndjRuling.check.ts",
     "check:resolucion": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/catalog/__checks__/resolucion.check.ts",
     "check:fragmentos": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/transcription/__checks__/fragmentos.check.ts",
-    "check:consejo": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/jurisprudence/__checks__/consejoEstado.check.ts"
+    "check:consejo": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/jurisprudence/__checks__/consejoEstado.check.ts",
+    "check:adjuntos": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/adjuntos/__checks__/adjuntos.check.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

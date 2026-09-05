@@ -90,6 +90,41 @@ export const callOpenRouterWithUsage = async (
   maxTokens?: number,
   /** Overrides the usable-length floor for a caller whose short answer means something. */
   minUsableLength: number = MIN_USABLE_LENGTH
+): Promise<CallResult> => callOpenRouter(model, systemPrompt, userPrompt, maxTokens, minUsableLength);
+
+/**
+ * One part of a multimodal user message, in OpenRouter's chat format.
+ *
+ * `image_url.url` carries a data URI (`data:image/jpeg;base64,...`): the
+ * image never leaves the request, so nothing has to be hosted for the model
+ * to fetch, and a photo of a comparendo is gone when the call returns.
+ */
+export type ContentPart =
+  | { type: 'text'; text: string }
+  | { type: 'image_url'; image_url: { url: string } };
+
+/**
+ * Same call, with a user message made of parts (text + images).
+ *
+ * Exists for reading the images a lawyer attaches to a draft — a photo of a
+ * comparendo, an oficio, a cédula. The text-only variant stays the default
+ * because every other caller sends a string, and the two share one request
+ * builder so a header, a timeout or the usage flag cannot drift between them.
+ */
+export const callOpenRouterMultimodal = async (
+  model: EngineModel | string,
+  systemPrompt: string,
+  parts: ContentPart[],
+  maxTokens?: number,
+  minUsableLength: number = MIN_USABLE_LENGTH
+): Promise<CallResult> => callOpenRouter(model, systemPrompt, parts, maxTokens, minUsableLength);
+
+const callOpenRouter = async (
+  model: EngineModel | string,
+  systemPrompt: string,
+  userContent: string | ContentPart[],
+  maxTokens: number | undefined,
+  minUsableLength: number
 ): Promise<CallResult> => {
   const apiKey = config.openRouter.apiKey;
 
@@ -134,7 +169,7 @@ export const callOpenRouterWithUsage = async (
         ...(isOpus ? { reasoning_effort: 'medium' } : {}),
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
+          { role: 'user', content: userContent }
         ],
         temperature: 0.2,
         max_tokens: resolvedMaxTokens,

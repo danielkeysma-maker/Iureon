@@ -4,6 +4,7 @@ import {
   ClipboardCheck,
   ExternalLink,
   FileText,
+  Image as ImageIcon,
   Landmark,
   Paperclip,
   RefreshCw,
@@ -17,6 +18,18 @@ import type { AgentLog } from '../../agent/types';
 import type { ActuacionRole } from '../../catalog/types';
 import { RevisarEscritoDialog } from './RevisarEscritoDialog';
 import type { DatosDelTaller } from './TallerDeRevision';
+import {
+  EXTENSIONES_ACEPTADAS,
+  MAX_ADJUNTOS,
+  MAX_BYTES_TOTAL,
+  admitirArchivo,
+  adjuntosPendientes,
+  esArchivoImagen,
+  formatoMb,
+  prepararAdjuntos,
+  type ArchivoAdjunto,
+  type EstadoDeAdjunto
+} from '../services/adjuntos';
 
 /**
  * "Qué debe hacer este escrito" — la columna izquierda, ya sin la configuración.
@@ -39,12 +52,13 @@ const SUBMIT_LABEL: Record<ActuacionRole, string> = {
   SECRETARIA: 'Generar acto'
 };
 
-/** Un archivo que el abogado adjuntó. Se lista; su contenido no viaja. */
-interface ArchivoAdjunto {
-  id: string;
-  name: string;
-  size: string;
-}
+/** Qué se le dice al abogado por cada estado de un adjunto. */
+const ETIQUETA_ESTADO: Record<EstadoDeAdjunto, string> = {
+  listo: 'se leerá al generar',
+  leyendo: 'leyendo…',
+  enviado: 'enviado',
+  error: 'no se pudo leer'
+};
 
 interface AgentPanelLeftProps {
   /* Solo de lectura: quien los CAMBIA es la barra de configuración de arriba. */
@@ -62,7 +76,8 @@ interface AgentPanelLeftProps {
   legalPrompt: string;
   setLegalPrompt: (prompt: string) => void;
   isProcessing: boolean;
-  handleSendPrompt: (e: React.FormEvent) => void;
+  /** Async para poder esperar la generación y limpiar los adjuntos al terminar. */
+  handleSendPrompt: (e: React.FormEvent) => void | Promise<void>;
   logs: AgentLog[];
   activeDraftText?: string | null;
   onClearActiveDraft?: () => void;
@@ -91,6 +106,10 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
   onAbrirTaller
 }) => {
   const [importedFiles, setImportedFiles] = useState<ArchivoAdjunto[]>([]);
+  /** Por qué el último archivo elegido no entró a la lista; se borra al elegir otro. */
+  const [avisoAdjuntos, setAvisoAdjuntos] = useState<string | null>(null);
+  /** Mientras se reducen fotos, se leen y se suben: el botón espera. */
+  const [preparandoAdjuntos, setPreparandoAdjuntos] = useState(false);
   /** «Revisar un escrito»: el tercer uso del módulo, junto a redactar y corregir. */
   const [revisarAbierto, setRevisarAbierto] = useState(false);
 
@@ -133,10 +152,15 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
   /**
    * Adjuntar archivos.
    *
-   * LO QUE ESTO NO HACE, DICHO EN LA PANTALLA. Los archivos se listan y su
-   * contenido NO llega al redactor: `importedFiles` es estado local y el cuerpo
-   * de la petición lleva tipo, rama y prompt. Un abogado que adjunta las
-   * sentencias en que se apoya su escrito las veía listadas y ninguna llegaba.
+   * AHORA SÍ SE LEEN. Durante meses los archivos se listaban y su contenido no
+   * llegaba al redactor — `importedFiles` era estado local y la petición
+   * llevaba solo tipo, rama y prompt —, así que un comparendo adjunto salía en
+   * el escrito como [•]. Hoy, al generar, cada archivo se convierte en base64
+   * o sube a B2 (`prepararAdjuntos`) y el servidor lo lee antes de llamar a
+   * los motores. El estado por archivo se ve en la lista.
+   *
+   * Los límites se aplican AL ELEGIR: enterarse al pulsar «Generar», con la
+   * instrucción ya escrita, es el peor momento.
    *
    * Antes, además, cada ficha mostraba "Concedido" o "Negado" según si el NOMBRE
    * del archivo contenía "conced" o "nega": llamar a un archivo
@@ -145,18 +169,35 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
   const handleFileSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
-
-    setImportedFiles((prev) => [
-      ...prev,
-      ...Array.from(files).map((f, idx) => ({
+    // Fuera del actualizador de estado: un aviso es efecto, y el actualizador
+    // puede correr dos veces en desarrollo.
+    let aviso: string | null = null;
+    const lista = [...importedFiles];
+    for (const [idx, f] of Array.from(files).entries()) {
+      const admision = admitirArchivo(f, lista);
+      if (!admision.ok) {
+        aviso = `${f.name}: ${admision.motivo}`;
+        continue;
+      }
+      lista.push({
         id: `file-${Date.now()}-${idx}`,
+        file: f,
         name: f.name,
-        size: `${(f.size / (1024 * 1024)).toFixed(1)} MB`
-      }))
-    ]);
+        size: formatoMb(f.size),
+        esImagen: esArchivoImagen(f),
+        estado: 'listo'
+      });
+    }
+    setAvisoAdjuntos(aviso);
+    setImportedFiles(lista);
+    // Permite volver a elegir el mismo archivo tras quitarlo.
+    e.target.value = '';
   };
 
   const removeFile = (id: string) => setImportedFiles((prev) => prev.filter((f) => f.id !== id));
+
+  const marcarEstado = (id: string, estado: EstadoDeAdjunto, detalle?: string) =>
+    setImportedFiles((prev) => prev.map((f) => (f.id === id ? { ...f, estado, detalle } : f)));
 
   /*
    * Solo las OBLIGATORIAS. El catálogo distingue las que la norma exige de las
@@ -176,9 +217,34 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
    */
   const faltaActuacion = !documentType;
 
-  const generar = (e: React.FormEvent) => {
-    if (!legalPrompt.trim() || isProcessing || faltaActuacion) return;
-    handleSendPrompt(e);
+  /*
+   * Generar: primero los adjuntos, después la petición.
+   *
+   * `preventDefault` va ANTES de la espera: el hook también lo llama, pero
+   * para cuando las fotos estén reducidas y subidas el formulario ya habría
+   * recargado la página. Los que fallan al prepararse se quedan en la lista
+   * marcados con su motivo; los enviados se retiran al terminar, para que la
+   * siguiente generación no los repita sin que el abogado lo pida.
+   */
+  const generar = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!legalPrompt.trim() || isProcessing || preparandoAdjuntos || faltaActuacion) return;
+
+    const pendientes = importedFiles.filter((f) => f.estado !== 'error');
+    if (pendientes.length > 0) {
+      setPreparandoAdjuntos(true);
+      try {
+        adjuntosPendientes.set(await prepararAdjuntos(pendientes, marcarEstado));
+      } finally {
+        setPreparandoAdjuntos(false);
+      }
+    }
+
+    try {
+      await handleSendPrompt(e);
+    } finally {
+      setImportedFiles((prev) => prev.filter((f) => f.estado === 'error'));
+    }
   };
 
   return (
@@ -238,7 +304,7 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
             onChange={(e) => setLegalPrompt(e.target.value)}
             onKeyDown={(e) => {
               // ⌘↵ / Ctrl+↵ genera. Se anuncia arriba, así que tiene que existir.
-              if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') generar(e);
+              if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') void generar(e);
             }}
             placeholder={
               activeDraftText
@@ -260,36 +326,64 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
               <input
                 type="file"
                 multiple
-                accept=".pdf,.docx,.doc,.txt"
+                accept={EXTENSIONES_ACEPTADAS}
                 onChange={handleFileSelection}
+                disabled={preparandoAdjuntos || isProcessing}
                 className="hidden"
               />
               <UploadCloud className="h-4 w-4 text-ink-400" />
               <span className="flex items-center gap-1 text-meta font-medium text-ink-500">
                 <Paperclip className="h-3 w-3" />
-                Adjuntar sentencias o pruebas
+                Adjuntar sentencias, pruebas o fotos
               </span>
             </label>
 
             {/*
-              Dice lo que la función hace de verdad. Listaba archivos dando a
-              entender que el borrador los usaría, que es la forma más silenciosa
-              de estar equivocado.
+              Dice lo que la función hace de verdad, igual que antes decía lo
+              que NO hacía. Un aviso que promete de más es la forma más
+              silenciosa de estar equivocado; uno que promete de menos, la más
+              cara: el abogado teclea lo que ya está en el adjunto.
             */}
-            <p className="notice-unverified mt-1.5">
-              Por ahora solo se listan: su contenido todavía no se envía al redactor.
+            <p className="mt-1.5 text-[11px] leading-[1.45] text-ink-500 [text-wrap:pretty]">
+              Se leen PDF, Word, texto e imágenes (fotos de comparendos, oficios, cédulas). Lo que se
+              extraiga se usa en el escrito y queda marcado como dato del adjunto. Hasta {MAX_ADJUNTOS}{' '}
+              archivos y {formatoMb(MAX_BYTES_TOTAL).replace('.0', '')} en total.
             </p>
 
+            {avisoAdjuntos && <p className="notice-unverified mt-1.5">{avisoAdjuntos}</p>}
+
             {importedFiles.length > 0 && (
-              <ul className="mt-1.5 max-h-24 space-y-1 overflow-y-auto">
+              <ul className="mt-1.5 max-h-32 space-y-1 overflow-y-auto">
                 {importedFiles.map((file) => (
                   <li
                     key={file.id}
                     className="flex items-center gap-2 rounded-control bg-canvas px-2 py-1.5 text-meta"
+                    title={file.detalle}
                   >
-                    <FileText className="h-3 w-3 shrink-0 text-ink-400" />
+                    {file.esImagen ? (
+                      <ImageIcon className="h-3 w-3 shrink-0 text-ink-400" />
+                    ) : (
+                      <FileText className="h-3 w-3 shrink-0 text-ink-400" />
+                    )}
                     <span className="min-w-0 flex-1 truncate text-ink-700">{file.name}</span>
-                    <span className="shrink-0 font-mono text-[10px] text-ink-400">{file.size}</span>
+                    {/*
+                      El estado, por archivo: «leyendo…» mientras se reduce o
+                      sube, «enviado» cuando viaja, «no se pudo leer» con el
+                      motivo en el title. Sin esto, tres fotos de 8 MB son un
+                      botón mudo durante veinte segundos.
+                    */}
+                    <span
+                      className={`shrink-0 font-mono text-[10px] ${
+                        file.estado === 'error'
+                          ? 'text-danger'
+                          : file.estado === 'enviado'
+                          ? 'text-verified'
+                          : 'text-ink-400'
+                      }`}
+                    >
+                      {file.estado === 'leyendo' && file.detalle ? file.detalle : ETIQUETA_ESTADO[file.estado]}
+                      {file.estado === 'listo' ? ` · ${file.size}` : ''}
+                    </span>
                     {/*
                       Las etiquetas "Concedido"/"Negado" no están. Nada aquí ha
                       leído la sentencia, así que nada aquí puede decir cómo se
@@ -298,6 +392,7 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
                     <button
                       type="button"
                       onClick={() => removeFile(file.id)}
+                      disabled={preparandoAdjuntos}
                       className="shrink-0 text-ink-400 hover:text-danger"
                       aria-label={`Quitar ${file.name}`}
                     >
@@ -310,8 +405,8 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
           </div>
 
           {/* ─── REVISAR UN ESCRITO YA REDACTADO ─────────────────────────────
-              Lo que los adjuntos de arriba NO hacen, esto sí: el archivo se lee.
-              Pero no para redactar, sino para revisar: el abogado trae su
+              Aquí el archivo también se lee, pero no para redactar sino para
+              revisar: el abogado trae su
               tutela y pregunta qué falla. Es un informe contra la ficha de la
               actuación elegida arriba, y el documento no se guarda. */}
           <button
@@ -511,11 +606,13 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
             </p>
             <button
               type="submit"
-              disabled={!legalPrompt.trim() || isProcessing || faltaActuacion}
+              disabled={!legalPrompt.trim() || isProcessing || preparandoAdjuntos || faltaActuacion}
               title={faltaActuacion ? 'Elija la actuación en la barra de arriba' : undefined}
               className="btn-primary h-12 w-full shrink-0 lg:ml-auto lg:h-auto lg:w-auto"
             >
-              {isProcessing
+              {preparandoAdjuntos
+                ? 'Preparando adjuntos…'
+                : isProcessing
                 ? 'Generando…'
                 : activeDraftText
                 ? 'Continuar el borrador'

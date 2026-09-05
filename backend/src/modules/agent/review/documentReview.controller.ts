@@ -10,6 +10,7 @@ import {
   settleOperation
 } from '../../billing/billing.service';
 import { decodeDocument } from '../../ingestion/documentFetch';
+import { textoDeDocx } from '../../ingestion/docxText';
 import { BackblazeB2TenantStorageService } from '../../documents/b2.service';
 import type { LegalBranch } from '../../catalog/types';
 import { buildCatalogGuidance } from '../catalogGuidance';
@@ -118,35 +119,6 @@ const tipoPorNombre = (fileName: string): string => {
   if (ext === 'docx') return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
   if (ext === 'doc') return 'application/msword';
   return 'text/plain';
-};
-
-/**
- * .docx is a zip of XML; the corpus reader never needed it because courts
- * publish .doc and PDF. Here lawyers do send .docx, so it gets a minimal
- * reader: unzip word/document.xml and strip the tags. Paragraph and break
- * tags become spaces so words do not glue together.
- */
-const textoDeDocx = async (buffer: Buffer): Promise<string | null> => {
-  try {
-    const { default: AdmZip } = await import('adm-zip');
-    const zip = new AdmZip(buffer);
-    const entry = zip.getEntry('word/document.xml');
-    if (!entry) return null;
-    const xml = entry.getData().toString('utf8');
-    return xml
-      // Fin de párrafo y salto de línea son SALTOS, no espacios: de ellos depende
-      // que hechos, pretensiones y fundamentos lleguen separados al revisor.
-      .replace(/<\/w:p>|<w:br\/>/g, '\n')
-      .replace(/<w:tab\/>/g, ' ')
-      .replace(/<[^>]+>/g, '')
-      .replace(/&amp;/g, '&')
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&quot;/g, '"')
-      .replace(/&apos;/g, "'");
-  } catch {
-    return null;
-  }
 };
 
 const extraerTexto = async (

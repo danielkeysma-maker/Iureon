@@ -13,6 +13,11 @@ interface ClaudePromptInput {
    * shipped catalogue.
    */
   catalogGuidance?: string | null;
+  /**
+   * The block rendered from the files the lawyer attached (see
+   * `adjuntos/renderBloqueAdjuntos`). Empty or absent when nothing was read.
+   */
+  adjuntos?: string;
 }
 
 interface ClaudeUserMessageInput {
@@ -22,6 +27,7 @@ interface ClaudeUserMessageInput {
   citations: string[];
   gptSchemaOutput?: string;
   existingDraft?: string;
+  adjuntos?: string;
 }
 
 /**
@@ -65,7 +71,8 @@ export const buildClaudeDraftPrompt = ({
   citations,
   customFormat,
   existingDraft,
-  catalogGuidance
+  catalogGuidance,
+  adjuntos
 }: ClaudePromptInput): string => {
   // A catalogued actuación supplies the article, the deadline and the
   // norm-mandated sections. Only when the actuación is not catalogued yet does
@@ -75,6 +82,17 @@ export const buildClaudeDraftPrompt = ({
   const estructuraObligatoria = guidance ?? resolveDocumentStructure(documentType);
   const continuationBlock = existingDraft
     ? `\nMODO CONTINUACIÓN/CORRECCIÓN: El usuario tiene un borrador previo que quiere que continúes, corrijas o proyectes. Tu tarea es tomar ese borrador como base y aplicar las instrucciones del usuario. Entrega el documento COMPLETO resultante (no solo la parte modificada).\n\nBORRADOR EXISTENTE:\n"""\n${existingDraft}\n"""\n`
+    : '';
+  /*
+   * Only when something was read. The rule names the attachments as a source,
+   * and naming a source that does not exist invites the model to imagine it.
+   * When present it settles the two cases that matter: a datum from the file
+   * is used verbatim — never turned back into a [•] marker, which is the exact
+   * defect this block exists to end — and a conflict between the file and the
+   * lawyer is resolved for the lawyer, visibly.
+   */
+  const reglaAdjuntos = adjuntos
+    ? `\nREGLA DE LOS ADJUNTOS: Los datos que vienen de los adjuntos se usan tal cual y no se reemplazan por marcadores; si el adjunto y el abogado se contradicen, prevalece lo que escribió el abogado y se anota entre corchetes la discrepancia.\n`
     : '';
   return `
 REGLA ABSOLUTA: Responde EXCLUSIVAMENTE con el texto del documento jurídico. Sin comentarios, advertencias, explicaciones ni meta-texto. Comienza directamente con el encabezado del escrito.
@@ -88,7 +106,7 @@ ${continuationBlock}
 TAREA: ${existingDraft ? 'Continuar, corregir o proyectar a partir del borrador existente según la indicación del usuario' : 'Redactar ÍNTEGRAMENTE, COMPLETO y listo para firmar'}: "${documentType}".
 
 INDICACIÓN DEL USUARIO: "${prompt}".
-
+${reglaAdjuntos}
 NORMATIVIDAD: Cita artículos pertinentes de CGP, CST, CPACA, CP, C. Civil, C. Penal, Ley 1755/2015, Decreto 2591/1991, Ley 906/2004, Ley 472/1998 o la que corresponda.
 
 ${renderJurisprudencia(citations)}
@@ -105,19 +123,23 @@ export const buildClaudeUserMessage = ({
   facts,
   citations,
   gptSchemaOutput,
-  existingDraft
+  existingDraft,
+  adjuntos
 }: ClaudeUserMessageInput): string => {
   const schemaBlock = gptSchemaOutput
     ? `\nESQUEMA DOGMÁTICO (generado por GPT-5.6 Sol — úsalo como guía de estructura):\n${gptSchemaOutput}\n`
     : '';
+  // After the facts and before the citations: the writer reads the file data
+  // next to Gemini's extraction, which already leaned on the same block.
+  const adjuntosBlock = adjuntos ? `\n\n${adjuntos}\n` : '';
 
   return existingDraft
-    ? `Instrucción del usuario: "${prompt}".${schemaBlock}Insumos fácticos de Gemini: ${facts}.
+    ? `Instrucción del usuario: "${prompt}".${schemaBlock}Insumos fácticos de Gemini: ${facts}.${adjuntosBlock}
 
 ${renderJurisprudencia(citations)}
 
 Toma el borrador existente como base y aplica las correcciones. Entrega el documento COMPLETO resultante.`
-    : `Genera el documento jurídico "${documentType}" COMPLETO hasta la firma.${schemaBlock}Hechos extraídos por Gemini: ${facts}.
+    : `Genera el documento jurídico "${documentType}" COMPLETO hasta la firma.${schemaBlock}Hechos extraídos por Gemini: ${facts}.${adjuntosBlock}
 
 ${renderJurisprudencia(citations)}
 

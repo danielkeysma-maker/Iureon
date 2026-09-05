@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { streamRequest } from '../../../config/httpClient';
 import type { AgentLog } from '../../agent/types';
 import type { GeneratedDraft } from '../../documents/types';
+import { adjuntosPendientes } from '../services/adjuntos';
 
 /** The firm is no longer a parameter: the session carries it. */
 /**
@@ -94,13 +95,21 @@ Por favor espere unos segundos mientras se finaliza la redacción solemne.`,
        * central act, so it was also the most valuable thing that string could
        * have reached.
        */
+      /*
+       * Los adjuntos ya preparados por el panel (base64 o clave de B2). Se
+       * recogen aquí y no llegan por parámetro porque App envuelve esta
+       * función con un solo argumento; ver `adjuntosPendientes` en services.
+       */
+      const adjuntos = adjuntosPendientes.take();
+
       const response = await streamRequest('/api/agent/stream-draft', {
         documentType,
         legalBranch,
         legalPrompt,
         expedienteId: 'EXP-2026-904',
         existingDraft: activeDraftText || undefined,
-        customFormatInstruction: formatoDeFirma || undefined
+        customFormatInstruction: formatoDeFirma || undefined,
+        adjuntos: adjuntos.length > 0 ? adjuntos : undefined
       });
 
       if (response.ok && response.body) {

@@ -36,6 +36,22 @@ export const NOVEDADES_ID = 'novedades';
 export const NOVEDADES: readonly Novedad[] = [
   {
     fecha: '2026-09-05',
+    titulo: 'Los adjuntos ya se leen y sus datos entran al escrito',
+    detalle:
+      'Los PDF, Word, textos e imágenes que adjunte en Redacción —la foto de un comparendo, un oficio, una cédula— se leen antes de redactar, y sus números, fechas, lugares, nombres y valores entran al escrito en vez de quedar como [•]. La consola de ejecución dice qué se leyó de cada archivo; si un dato del adjunto contradice lo que usted escribió, prevalece lo suyo y la diferencia queda anotada. Hasta 8 archivos y 20 MB por escrito.',
+    modulo: 'Redacción',
+    tipo: 'nuevo'
+  },
+  {
+    fecha: '2026-09-05',
+    titulo: 'Prueba gratuita de Esencial por siete días',
+    detalle:
+      'Desde la página pública o desde el formulario de entrada, una firma puede abrir por su cuenta una prueba de Esencial: siete días, un usuario, sin tarjeta. Entra directo a la aplicación; el saldo de inteligencia artificial es aparte y empieza en cero. Al terminar, «Contratar» en la pantalla del plan la reactiva.',
+    modulo: 'Planes',
+    tipo: 'nuevo'
+  },
+  {
+    fecha: '2026-09-05',
     titulo: 'Página pública de Iureon antes del inicio de sesión',
     detalle:
       'Quien llega a la dirección de Iureon sin sesión ve ahora una página que explica los módulos, los planes con su precio y la seguridad de los datos; desde allí se entra a la aplicación o se contrata un plan.',
