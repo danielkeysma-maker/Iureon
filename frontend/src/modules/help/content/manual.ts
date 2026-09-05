@@ -76,7 +76,7 @@ const A_QUE_HACE: ManualArticle = {
         'Consultar: «Buscador» de jurisprudencia, «Catálogo» de actuaciones y «Herramientas» de cálculo.',
         'Aprender: este «Manual de uso» y «Soporte». Al inicio del índice del manual, «Novedades» lista qué cambió en la aplicación y cuándo.',
         'Administrar (plegado por defecto): «Seguridad», con la auditoría de la firma; «Privacidad», con los proveedores que tocan sus datos; y «Ajustes».',
-        'En el pie de la barra están «Saldo», «Plan», «Membrete» y «Avisos»: son ajustes de la firma y del aparato, no módulos.'
+        'En el pie de la barra están «Saldo», «Plan», «Membrete» y «Avisos»: son ajustes de la firma y del aparato, no módulos. En «Ajustes», dentro de Administrar, están además «Atajos de teclado», con los que la aplicación escucha; «Avisos», para activar las notificaciones de este dispositivo e instalar la app; «Su cuenta», con su correo, rol y firma y el cierre de sesión; y «Plan y facturación», con el plan vigente y el acceso a la pantalla de planes.'
       ]
     },
     { kind: 'subtitulo', texto: 'Lo que sí hace' },
@@ -528,8 +528,8 @@ const A_PLANES: ManualArticle = {
     {
       kind: 'lista',
       items: [
-        'Esencial: $70.000 al mes o $700.000 al año. Un usuario. Incluye Redacción, Borradores, Revisiones, Buscador, Catálogo, Herramientas, Manual, Soporte y Membrete. No incluye Audiencias, Entrevistas ni Orientación.',
-        'Premium: $100.000 al mes o $1.000.000 al año. Hasta cinco usuarios. Incluye todos los módulos.'
+        'Esencial: $85.000 al mes o $850.000 al año. Un usuario. Incluye Redacción, Borradores, Revisiones, Buscador, Catálogo, Herramientas, Manual, Soporte y Membrete. No incluye Audiencias, Entrevistas ni Orientación.',
+        'Premium: $120.000 al mes o $1.200.000 al año. Hasta cinco usuarios. Incluye todos los módulos.'
       ]
     },
     {
@@ -569,6 +569,12 @@ const A_PLANES: ManualArticle = {
       kind: 'aviso',
       texto:
         'En el plan Esencial, Audiencias, Entrevistas y Orientación no aparecen en la barra, y crear una segunda cuenta responde que el plan admite una sola. Pasar a Premium habilita las tres pantallas y hasta cinco cuentas desde el momento del pago.'
+    },
+    {
+      kind: 'nota',
+      titulo: 'Cuenta de cobro y correo de confirmación',
+      texto:
+        'Cada pago del plan queda en «Pagos del plan», dentro de la misma pantalla, con el botón «Cuenta de cobro» que descarga el soporte en PDF: emisor, firma, concepto, periodo cubierto, valor y referencia de Wompi, sin discriminar IVA. No es factura electrónica de la DIAN, y el documento lo dice. Si la plataforma tiene el correo configurado, quien pagó recibe además un correo de confirmación con la cuenta de cobro adjunta; las recargas de saldo también se confirman por correo.'
     }
   ]
 };

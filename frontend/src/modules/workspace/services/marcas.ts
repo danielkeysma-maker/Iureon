@@ -199,6 +199,23 @@ const NUMERADO_CORTO = /^\s*(?:\d{1,2}(?:\.\d{1,2})*|[IVXLC]{1,6})[.)]\s+\p{Lu}[
  */
 const NOMBRE_EN_MAYUSCULA = /(?<!\p{L})(?:[A-ZÁÉÍÓÚÜÑ]{2,}\.?)(?:\s+(?:[A-ZÁÉÍÓÚÜÑ]\.|[A-ZÁÉÍÓÚÜÑ]{2,}\.?)){1,7}(?!\p{L})/gu;
 
+/**
+ * Encabezados de sección que en un escrito colombiano van siempre en negrita,
+ * aunque aparezcan como una sola palabra: «HECHOS», «PRETENSIONES», «ANEXOS».
+ * Se aceptan seguidos de dos puntos, punto o fin de línea, para no marcar la
+ * palabra «pruebas» en medio de una frase en minúscula (la lista exige
+ * mayúscula sostenida).
+ */
+const ENCABEZADO_SUELTO =
+  /(?<!\p{L})(?:HECHOS|ANTECEDENTES|PRETENSI[ÓO]N(?:ES)?|PETICI[ÓO]N(?:ES)?|SOLICITUD(?:ES)?|FUNDAMENTOS(?:\s+DE\s+DERECHO)?|FUNDAMENTOS\s+JUR[ÍI]DICOS|DERECHOS?\s+(?:FUNDAMENTALES\s+)?(?:VULNERADOS?|INVOCADOS?|AMENAZADOS?)|PRUEBAS|ANEXOS|NOTIFICACIONES|COMPETENCIA|PROCEDENCIA|PROCEDIBILIDAD|JURAMENTO|MEDIDA\s+PROVISIONAL|CONSIDERACIONES|CUANT[ÍI]A|OPORTUNIDAD|LEGITIMACI[ÓO]N(?:\s+EN\s+LA\s+CAUSA)?|INMEDIATEZ|SUBSIDIARIEDAD|CONCLUSI[ÓO]N(?:ES)?|REFERENCIA|ASUNTO|ACCIONANTE|ACCIONADO|DEMANDANTE|DEMANDADO|ACCIONADOS|VINCULADOS?)(?=\s*[:.\n]|\s*$)/gu;
+
+/** Números de identificación y radicados: «C.C. No. 6.815.567», «cédula de ciudadanía 1.102.811.692», «NIT 900.123.456-7», «radicado 2024-00003». */
+const NUMERO_DE_IDENTIFICACION =
+  /(?:\bC\.?\s?C\.?|\bc[ée]dula(?:\s+de\s+ciudadan[ií]a)?|\bNIT|\bT\.?\s?P\.?|\bradicad[oa](?:\s+No\.?|\s+n[úu]mero|\s+N[°º]\.?)?|\bexpediente)\s*(?:No\.?|N[°º]\.?|n[úu]mero|#)?\s*[\d][\d.\-–/]{4,}\d/giu;
+
+/** Fechas en letras: «15 de octubre de 2025». */
+const FECHA_LARGA = /\b\d{1,2}\s+de\s+(?:enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)\s+(?:de\s+|del\s+)?\d{4}\b/giu;
+
 const negrita = (inicio: number, fin: number): MarcaEnCapa => ({ inicio, fin, indice: -1, capa: 'negrita' });
 
 /** Títulos, etiquetas, ordinales, nombres en mayúscula y negritas «**…**» del texto, como capas para pintar. */
@@ -224,6 +241,17 @@ export const capasTipograficas = (texto: string): MarcaEnCapa[] => {
       if (!/[A-ZÁÉÍÓÚÜÑ]{3,}/u.test(n[0])) continue; // «C. C.» o «E. U.» no son nombres
       salida.push(negrita(base + n.index, base + n.index + n[0].length));
     }
+    for (const re of [ENCABEZADO_SUELTO, NUMERO_DE_IDENTIFICACION, FECHA_LARGA]) {
+      re.lastIndex = 0;
+      let x: RegExpExecArray | null;
+      while ((x = re.exec(linea)) !== null) {
+        if (x[0].length === 0) {
+          re.lastIndex++;
+          continue;
+        }
+        salida.push(negrita(base + x.index, base + x.index + x[0].length));
+      }
+    }
   }
   const negritas = /\*\*(?=\S)[^*\n]+?(?<=\S)\*\*/g;
   let m: RegExpExecArray | null;
@@ -242,5 +270,50 @@ export const marcasDeAnotaciones = (texto: string, anotaciones: { cita: string; 
     const { marcas } = localizarCitas(texto, [a.cita]);
     if (marcas.length) salida.push({ ...marcas[0], indice, capa: a.color });
   });
+  return salida;
+};
+
+/* ─── Reflujo de secciones ────────────────────────────────────────────────── */
+
+/** Encabezados de sección propiamente dichos (sin las etiquetas del encabezado, que llevan dos puntos y valor). */
+const CABEZA_DE_SECCION =
+  '(?:HECHOS|ANTECEDENTES|PRETENSI[ÓO]N(?:ES)?|PETICI[ÓO]N(?:ES)?|SOLICITUD(?:ES)?|FUNDAMENTOS(?:\\s+DE\\s+DERECHO)?|FUNDAMENTOS\\s+JUR[ÍI]DICOS|DERECHOS?\\s+(?:FUNDAMENTALES\\s+)?(?:VULNERADOS?|INVOCADOS?|AMENAZADOS?)|PRUEBAS|ANEXOS|NOTIFICACIONES|COMPETENCIA|PROCEDENCIA|PROCEDIBILIDAD|JURAMENTO|MEDIDA\\s+PROVISIONAL|CONSIDERACIONES|CUANT[ÍI]A|OPORTUNIDAD|LEGITIMACI[ÓO]N(?:\\s+EN\\s+LA\\s+CAUSA)?|INMEDIATEZ|SUBSIDIARIEDAD|CONCLUSI[ÓO]N(?:ES)?)';
+
+/** Etiquetas del encabezado del escrito: van seguidas de dos puntos y su valor en la misma línea. */
+const ETIQUETA_DE_ENCABEZADO = '(?:REFERENCIA|ASUNTO|ACCIONANTE|ACCIONADOS?|DEMANDANTE|DEMANDADOS?|VINCULADOS?|CONVOCANTE|CONVOCADO|RADICADO|RADICACI[ÓO]N|PROCESO|EXPEDIENTE)';
+
+const ORDINAL_DE_PARRAFO =
+  '(?:PRIMER|SEGUND|TERCER|CUART|QUINT|SEXT|S[ÉE]PTIM|OCTAV|NOVEN|D[ÉE]CIM|UND[ÉE]CIM|DUOD[ÉE]CIM|VIG[ÉE]SIM)[OA]S?(?:\\s+(?:PRIMER|SEGUND|TERCER|CUART|QUINT|SEXT|S[ÉE]PTIM|OCTAV|NOVEN)[OA]S?)?\\s*[.:)\\-–—]';
+
+/**
+ * Devuelve la estructura a un escrito que llegó como un solo bloque.
+ *
+ * Solo actúa si el texto casi no tiene saltos (menos de uno cada 600
+ * caracteres): los documentos preparados desde el 5 de septiembre de 2026
+ * conservan sus párrafos y no se tocan. Cuando actúa, abre párrafo antes de
+ * las etiquetas del encabezado (REFERENCIA:, ACCIONANTE:…), pone cada
+ * encabezado de sección (HECHOS, PRETENSIONES, ANEXOS…) en su propia línea,
+ * separa el arranque del cuerpo («FULANO DE TAL, mayor de edad…») y abre
+ * párrafo ante cada ordinal que numera hechos y pretensiones. No inventa
+ * texto: solo cambia espacios por saltos, y las citas de la guía se siguen
+ * localizando porque la búsqueda colapsa el espacio.
+ */
+export const reflujoDeSecciones = (texto: string): string => {
+  const saltos = (texto.match(/\n/g) ?? []).length;
+  if (texto.length < 600 || saltos >= texto.length / 600) return texto;
+  let salida = texto
+    .replace(/\s+(?=Señor(?:es|a)?\s)/g, '\n\n')
+    .replace(/\s+(?=E\.\s?S\.\s?D\.)/g, '\n')
+    .replace(new RegExp(`\\s+(?=${ETIQUETA_DE_ENCABEZADO}\\s*:)`, 'gu'), '\n\n')
+    .replace(new RegExp(`(?<!\\p{L})(${CABEZA_DE_SECCION})(:?)(?=\\s*$|\\s+(?:\\p{Lu}|\\d))`, 'gu'), '\n\n$1$2\n')
+    /*
+     * Arranque del cuerpo: «FULANO DE TAL, mayor de edad…». El nombre se toma
+     * como hasta cuatro palabras en mayúscula (más iniciales) antes de la coma;
+     * si el encabezado venía pegado, una palabra del renglón anterior puede
+     * quedar en este párrafo. Es el precio de reconstruir sin el original.
+     */
+    .replace(/(?<!\b(?:DE|DEL|LA|LAS|LOS|EL|Y|E))\s+((?:[A-ZÁÉÍÓÚÜÑ]{2,}\s+(?:[A-ZÁÉÍÓÚÜÑ]\.\s+)?){1,3}[A-ZÁÉÍÓÚÜÑ]{2,},\s+(?:mayor|identificad|domiciliad|abogad|actuando|obrando|en\s+mi\s+calidad))/gu, '\n\n$1')
+    .replace(new RegExp(`(?<=[.;:]\\s|\\n)(${ORDINAL_DE_PARRAFO})`, 'gu'), '\n\n$1');
+  salida = salida.replace(/[ \t]*\n[ \t]*/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
   return salida;
 };

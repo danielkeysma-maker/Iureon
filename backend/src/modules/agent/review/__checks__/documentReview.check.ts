@@ -33,7 +33,8 @@ const check = (n: string, ok: boolean, d = ''): void => {
 
 /* ─── EL TEXTO SE NORMALIZA Y SE CORTA DONDE SE DICE ───────────────────────── */
 const corto = prepararTexto('  HECHOS\n\n1.   El día   3 de marzo…  ');
-check('el texto se normaliza en espacios', corto.texto === 'HECHOS 1. El día 3 de marzo…', corto.texto);
+check('el texto se normaliza en espacios y CONSERVA los saltos de párrafo', corto.texto === 'HECHOS\n\n1. El día 3 de marzo…', JSON.stringify(corto.texto));
+check('los saltos de tres o más se limitan a dos y el retorno de carro se unifica', prepararTexto('A\r\n\r\n\r\n\r\nB\r\nC').texto === 'A\n\nB\nC');
 check('y no se marca truncado si cabe', corto.truncado === false && corto.caracteres === corto.texto.length);
 
 const largo = prepararTexto('a'.repeat(MAX_CARACTERES_REVISION + 500));

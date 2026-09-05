@@ -73,16 +73,16 @@ export const PLANES: Record<Plan, PlanDefinition> = {
   ESENCIAL: {
     plan: 'ESENCIAL',
     nombre: 'Esencial',
-    precioMensualCop: 70_000,
-    precioAnualCop: 700_000,
+    precioMensualCop: 85_000,
+    precioAnualCop: 850_000,
     maxUsuarios: 1,
     modulos: MODULOS_ESENCIAL
   },
   PREMIUM: {
     plan: 'PREMIUM',
     nombre: 'Premium',
-    precioMensualCop: 100_000,
-    precioAnualCop: 1_000_000,
+    precioMensualCop: 120_000,
+    precioAnualCop: 1_200_000,
     maxUsuarios: 5,
     modulos: TODOS_LOS_MODULOS
   }

@@ -134,7 +134,10 @@ const textoDeDocx = async (buffer: Buffer): Promise<string | null> => {
     if (!entry) return null;
     const xml = entry.getData().toString('utf8');
     return xml
-      .replace(/<\/w:p>|<w:br\/>|<w:tab\/>/g, ' ')
+      // Fin de párrafo y salto de línea son SALTOS, no espacios: de ellos depende
+      // que hechos, pretensiones y fundamentos lleguen separados al revisor.
+      .replace(/<\/w:p>|<w:br\/>/g, '\n')
+      .replace(/<w:tab\/>/g, ' ')
       .replace(/<[^>]+>/g, '')
       .replace(/&amp;/g, '&')
       .replace(/&lt;/g, '<')

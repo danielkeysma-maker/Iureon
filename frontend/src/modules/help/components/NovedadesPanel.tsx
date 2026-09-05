@@ -140,7 +140,7 @@ export const NovedadesPanel: React.FC<NovedadesPanelProps> = ({ compacto = false
                 </p>
                 <p
                   className={`text-ink-700 [text-wrap:pretty] ${
-                    compacto ? 'mt-1 text-[12.5px] leading-snug' : 'mt-1 text-body leading-[1.65]'
+                    compacto ? 'mt-1 text-justify text-[12.5px] leading-snug [text-wrap:pretty]' : 'mt-1 text-justify text-body leading-[1.65] [text-wrap:pretty]'
                   }`}
                 >
                   {n.detalle}

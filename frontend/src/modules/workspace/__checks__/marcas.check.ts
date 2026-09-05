@@ -1,7 +1,7 @@
 /**
  * Guards the quote marking in the review workshop. Run with: npm run check:marcas
  */
-import { aplicarReemplazo, localizarCitas, marcasDeAnotaciones, segmentar, segmentarCapas, capasTipograficas, esCapaTipografica } from '../services/marcas';
+import { aplicarReemplazo, localizarCitas, marcasDeAnotaciones, reflujoDeSecciones, segmentar, segmentarCapas, capasTipograficas, esCapaTipografica } from '../services/marcas';
 
 let fallos = 0;
 const check = (n: string, ok: boolean, d = ''): void => {
@@ -80,6 +80,19 @@ check('las anotaciones se localizan con su color y las ausentes se omiten', anot
   check('la etiqueta inicial va en negrita aunque el resto no', capas2.includes('Asunto:') === false && capas2.includes('PRIMERO.') && capas2.some((t) => t === 'ANIBAL G. DIAZ CONTRERAS'));
   check('los nombres en mayúscula dentro del párrafo van en negrita; las siglas sueltas no', capas2.includes('ALFONSO MONTERROZA AVILA') && !capas2.includes('EPS') && !capas2.some((t) => /^C\.C\.$/.test(t)));
   check('un título numerado corto va en negrita y un párrafo numerado largo no', capas2.includes('1. Hechos') && !capas2.some((t) => t.startsWith('Que se ordene')));
+
+  const plano =
+    'Señor JUEZ DE TUTELA E. S. D. REFERENCIA: ACCIÓN DE TUTELA ACCIONANTE: ALFONSO MONTERROZA AVILA ACCIONADO: JUZGADO TERCERO ADMINISTRATIVO DE SINCELEJO ' +
+    'ANIBAL G. DIAZ CONTRERAS, mayor de edad, identificado con C.C. No. 6.815.567 de Sincelejo, presento acción de tutela contra la sentencia del 15 de octubre de 2025 proferida por el Juzgado. ' +
+    'HECHOS PRIMERO. El día 3 de marzo la EPS negó el servicio y el usuario radicó las pruebas del caso. SEGUNDO. La entidad no respondió en el término legal. ' +
+    'PRETENSIONES PRIMERA: Que se tutele el derecho fundamental. FUNDAMENTOS DE DERECHO Artículo 86 de la Constitución. ANEXOS Copia de la historia clínica. NOTIFICACIONES Recibo en la carrera 20 número 22-30 de Sincelejo. '.repeat(2);
+  const reflujo = reflujoDeSecciones(plano);
+  check('un escrito sin saltos recupera párrafos ante encabezados y ordinales', /\n\nHECHOS\n+PRIMERO\./.test(reflujo) && /\n\nPRETENSIONES\n+PRIMERA:/.test(reflujo) && /\n\nANIBAL G\. DIAZ CONTRERAS, mayor/.test(reflujo) && /\n\nFUNDAMENTOS DE DERECHO/.test(reflujo) && /\n\nANEXOS/.test(reflujo) && /\n\nNOTIFICACIONES/.test(reflujo));
+  check('el reflujo no toca un texto que ya tiene sus saltos', reflujoDeSecciones('HECHOS\n\n1. Uno.\n\n2. Dos.\n\nPRETENSIONES\n\nPRIMERA: x.') === 'HECHOS\n\n1. Uno.\n\n2. Dos.\n\nPRETENSIONES\n\nPRIMERA: x.');
+  const negras = capasTipograficas(reflujo).filter((c) => c.capa === 'negrita').map((c) => reflujo.slice(c.inicio, c.fin));
+  check('tras el reflujo, HECHOS, PRETENSIONES, FUNDAMENTOS DE DERECHO, ANEXOS y NOTIFICACIONES van en negrita', ['HECHOS', 'PRETENSIONES', 'FUNDAMENTOS DE DERECHO', 'ANEXOS', 'NOTIFICACIONES'].every((h) => negras.includes(h)));
+  check('la cédula y la fecha en letras van en negrita', negras.some((t) => /^C\.C\. No\. 6\.815\.567$/.test(t)) && negras.includes('15 de octubre de 2025'));
+  check('el reflujo conserva todas las palabras', reflujo.replace(/\s+/g, ' ') === plano.replace(/\s+/g, ' ').trim());
 }
 
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);

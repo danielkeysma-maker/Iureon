@@ -48,8 +48,22 @@ export interface TextoPreparado {
   caracteres: number;
 }
 
+/*
+ * LOS SALTOS DE PÁRRAFO SE CONSERVAN. Antes se colapsaba TODO el espacio en
+ * blanco a un espacio, y un escrito de treinta páginas llegaba al revisor —y al
+ * papel del taller— como un solo bloque: hechos, pretensiones y fundamentos
+ * revueltos sin un salto. El abogado lo vio y preguntó por qué su tutela
+ * estaba «desordenada». Ahora se normalizan los espacios DENTRO de cada línea
+ * y se limitan los saltos seguidos a dos; la estructura del documento es del
+ * documento, no nuestra.
+ */
 export const prepararTexto = (bruto: string): TextoPreparado => {
-  const limpio = bruto.replace(/\s+/g, ' ').trim();
+  const limpio = bruto
+    .replace(/\r\n?/g, '\n')
+    .replace(/[ \t\f\v ]+/g, ' ')
+    .replace(/ *\n */g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
   const truncado = limpio.length > MAX_CARACTERES_REVISION;
   return {
     texto: truncado ? limpio.slice(0, MAX_CARACTERES_REVISION) : limpio,

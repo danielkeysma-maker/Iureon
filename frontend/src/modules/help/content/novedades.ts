@@ -34,6 +34,47 @@ export interface Novedad {
 export const NOVEDADES_ID = 'novedades';
 
 export const NOVEDADES: readonly Novedad[] = [
+  /* ── 5 de septiembre de 2026 ─────────────────────────────────────────── */
+  {
+    fecha: '2026-09-05',
+    titulo: 'El escrito revisado conserva sus párrafos y sus títulos van en negrita',
+    detalle:
+      'Los escritos que se suben a revisión llegan ahora con sus saltos de párrafo, así que hechos, pretensiones y fundamentos se leen separados en el taller y en el informe. Los ya revisados recuperan su estructura al abrirse. Van en negrita los encabezados de sección, las etiquetas como «ACCIONANTE:», los ordinales, los nombres en mayúscula, las cédulas y las fechas en letras.',
+    modulo: 'Revisiones',
+    tipo: 'mejora'
+  },
+  {
+    fecha: '2026-09-05',
+    titulo: 'Nuevos precios de los planes',
+    detalle:
+      'Esencial pasa a $85.000 al mes o $850.000 al año; Premium a $120.000 al mes o $1.200.000 al año. El anual sigue siendo doce meses por el precio de diez. Los planes ya pagados conservan su vigencia.',
+    modulo: 'Planes',
+    tipo: 'mejora'
+  },
+  {
+    fecha: '2026-09-04',
+    titulo: 'Cuenta de cobro en PDF y confirmación por correo de cada pago',
+    detalle:
+      'En «Pagos del plan», cada pago tiene el botón «Cuenta de cobro» que descarga el soporte en PDF. Quien paga una recarga o un plan recibe además un correo de confirmación, con la cuenta de cobro adjunta en el caso del plan.',
+    modulo: 'Planes',
+    tipo: 'nuevo'
+  },
+  {
+    fecha: '2026-09-04',
+    titulo: 'Ajustes completo: atajos, avisos, su cuenta y plan',
+    detalle:
+      'Las cuatro entradas que decían «pronto» ya abren algo real: la lista de atajos de teclado, la activación de avisos e instalación de la app en este dispositivo, los datos de su cuenta con el cierre de sesión, y el plan vigente de la firma.',
+    modulo: 'Ajustes',
+    tipo: 'nuevo'
+  },
+  {
+    fecha: '2026-09-04',
+    titulo: 'El taller usa la letra del membrete y el menú lateral cabe sin desplazarse',
+    detalle:
+      'El papel del taller de revisiones y de borradores se lee con la tipografía, el cuerpo y el interlineado configurados en Membrete, igual que el visor y el PDF. El menú lateral se compactó para caber completo en pantallas bajas, y el logo se ve nítido sobre el azul.',
+    modulo: 'Taller',
+    tipo: 'mejora'
+  },
   /* ── 4 de septiembre de 2026 ─────────────────────────────────────────── */
   {
     fecha: '2026-09-04',

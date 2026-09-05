@@ -35,10 +35,10 @@ const iso = (d: Date): string => d.toISOString();
 const dia = (s: string): Date => new Date(s);
 
 // ─── Precios ────────────────────────────────────────────────────────────────
-check('ESENCIAL mensual cuesta $70.000', precioDe('ESENCIAL', 'MENSUAL') === 70_000);
-check('ESENCIAL anual cuesta $700.000', precioDe('ESENCIAL', 'ANUAL') === 700_000);
-check('PREMIUM mensual cuesta $100.000', precioDe('PREMIUM', 'MENSUAL') === 100_000);
-check('PREMIUM anual cuesta $1.000.000', precioDe('PREMIUM', 'ANUAL') === 1_000_000);
+check('ESENCIAL mensual cuesta $85.000', precioDe('ESENCIAL', 'MENSUAL') === 85_000);
+check('ESENCIAL anual cuesta $850.000', precioDe('ESENCIAL', 'ANUAL') === 850_000);
+check('PREMIUM mensual cuesta $120.000', precioDe('PREMIUM', 'MENSUAL') === 120_000);
+check('PREMIUM anual cuesta $1.200.000', precioDe('PREMIUM', 'ANUAL') === 1_200_000);
 check(
   'el año son 12 meses por el precio de 10, en ambos planes',
   PLANES.ESENCIAL.precioAnualCop === PLANES.ESENCIAL.precioMensualCop * 10 &&

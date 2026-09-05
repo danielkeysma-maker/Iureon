@@ -22,7 +22,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import type { Anotacion, EdicionPropuesta, InformeDeRevision, RespuestaDelChat, TurnoDelTaller, VersionDelTexto } from '../services/review.api';
-import { aplicarReemplazo, capasTipograficas, esCapaTipografica, localizarCitas, marcasDeAnotaciones, segmentarCapas, type MarcaEnCapa } from '../services/marcas';
+import { aplicarReemplazo, capasTipograficas, esCapaTipografica, localizarCitas, marcasDeAnotaciones, reflujoDeSecciones, segmentarCapas, type MarcaEnCapa } from '../services/marcas';
 import { diferencias, resumenDeCambios } from '../services/diff';
 import { ApiError } from '../../../config/httpClient';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
@@ -154,7 +154,13 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   onSaldoCambiado,
   formato
 }) => {
-  const [texto, setTexto] = React.useState(datos.texto);
+  /*
+   * Los escritos revisados antes del 5 de septiembre de 2026 se guardaron sin
+   * saltos de párrafo (la preparación del texto los colapsaba). Se les devuelve
+   * la estructura por sus encabezados y ordinales al abrirlos; los nuevos ya
+   * llegan con sus saltos y el reflujo no los toca.
+   */
+  const [texto, setTexto] = React.useState(() => reflujoDeSecciones(datos.texto));
   const [informe, setInforme] = React.useState<InformeDeRevision | null>(datos.informe);
   const [conversacion, setConversacion] = React.useState<TurnoDelTaller[]>(datos.conversacion);
   const [anotaciones, setAnotaciones] = React.useState<Anotacion[]>(datos.anotaciones);
