@@ -1,9 +1,11 @@
 import { Request, Response } from 'express';
 import { BillingError } from '../billing/billing.service';
 import { AuthError, listFirmUsers } from '../auth/auth.service';
+import { callerIp } from '../admin/admin.middleware';
 import { PLANES } from './plan.catalog';
 import { planDeFirma, responderPlanError } from './plan.service';
 import { crearCheckoutDePlan, historialDePagos } from './planCheckout.service';
+import { activarPruebaGratuita, pruebaDisponibleParaFirma } from './pruebaGratuita.service';
 
 /**
  * The firm's plan: what it has, what it can buy, what it has paid.
@@ -38,16 +40,53 @@ const soloAdmin = (req: Request, res: Response): boolean => {
   return true;
 };
 
-/** GET /api/subscription/plan — the firm's plan and the catalogue to choose from. */
+/**
+ * GET /api/subscription/plan — the firm's plan and the catalogue to choose from.
+ *
+ * `plan.pruebaDisponible` says whether THIS caller may open the 7-day trial
+ * from the plan screen: a firm born expired through «Contratar», never paid,
+ * never tried, one seat, and a person who has not used a trial anywhere.
+ */
 export const planController = async (req: Request, res: Response): Promise<void> => {
   try {
+    const firmId = req.firmId as string;
+    const plan = await planDeFirma(firmId);
+    const prueba = await pruebaDisponibleParaFirma(firmId, req.user!.email, callerIp(req), {
+      period: plan.period,
+      usuarios: plan.usuarios
+    });
     res.json({
       success: true,
-      plan: await planDeFirma(req.firmId as string),
+      plan: { ...plan, pruebaDisponible: prueba.disponible },
       planes: PLANES
     });
   } catch (err) {
     fail(res, err, 'No se pudo leer el plan de la firma.');
+  }
+};
+
+/**
+ * POST /api/subscription/prueba-gratuita — opens the 7-day trial of Esencial
+ * for a firm that qualifies (see `pruebaGratuita.rules.ts`). Empty body.
+ *
+ * Answers 200 with the same shape as GET /plan · 409 TRIAL_ALREADY_USED (the
+ * person already had a trial) | TRIAL_NOT_AVAILABLE (the firm does not
+ * qualify) · 503 TRIAL_UNAVAILABLE · 500 TRIAL_FAILED. Registered WITHOUT
+ * `bloquearSiPlanVencido`: the firm that needs it is expired by definition.
+ */
+export const pruebaGratuitaFirmaController = async (req: Request, res: Response): Promise<void> => {
+  if (!soloAdmin(req, res)) return;
+
+  try {
+    const plan = await activarPruebaGratuita({
+      firmId: req.firmId as string,
+      correo: req.user!.email,
+      ip: callerIp(req)
+    });
+    // Just opened: by construction the firm now has its trial, so no second one.
+    res.json({ success: true, plan: { ...plan, pruebaDisponible: false }, planes: PLANES });
+  } catch (err) {
+    fail(res, err, 'No se pudo activar la prueba gratuita.');
   }
 };
 

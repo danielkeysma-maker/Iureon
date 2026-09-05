@@ -20,6 +20,13 @@ export interface Confirmacion {
   etiqueta: string;
   /** Borrar o retirar algo: el botón se pinta de peligro. */
   peligro?: boolean;
+  /**
+   * El botón de confirmar no responde hasta que el cuerpo tenga lo que exige:
+   * el nombre de la firma tecleado, una contraseña con largo suficiente. Para
+   * una acción que no se deshace, «gris hasta que esté bien» dice más que un
+   * error después de pulsar.
+   */
+  deshabilitado?: boolean;
   onConfirmar: () => void | Promise<void>;
 }
 
@@ -56,7 +63,7 @@ export const ConfirmarDialog: React.FC<ConfirmarDialogProps> = ({ confirmacion, 
           <button
             type="button"
             onClick={() => void confirmar()}
-            disabled={ocupado}
+            disabled={ocupado || confirmacion?.deshabilitado === true}
             className={`btn-sm ${confirmacion?.peligro ? 'btn-danger' : 'btn-primary'} disabled:opacity-50`}
           >
             {ocupado ? 'Un momento…' : confirmacion?.etiqueta}

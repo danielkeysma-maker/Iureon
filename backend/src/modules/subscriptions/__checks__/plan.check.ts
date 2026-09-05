@@ -25,6 +25,7 @@ import {
   sumarMeses,
   type PlanRow
 } from '../plan.catalog';
+import { MAX_USUARIOS_PARA_PRUEBA, decidirPrueba, type SenalesDePrueba } from '../pruebaGratuita.rules';
 
 let fallos = 0;
 const check = (n: string, ok: boolean, d = ''): void => {
@@ -167,6 +168,45 @@ check('sin tope (cortesía) siempre cabe otro', cabeOtroUsuario(null, 40));
 check('ESENCIAL con 1 usuario no admite otro', !cabeOtroUsuario(1, 1));
 check('PREMIUM con 4 admite el quinto, con 5 no', cabeOtroUsuario(5, 4) && !cabeOtroUsuario(5, 5));
 check('FIRMA con 14 admite el decimoquinto, con 15 no', cabeOtroUsuario(15, 14) && !cabeOtroUsuario(15, 15));
+
+// ─── Prueba gratuita desde «Plan de la firma» ───────────────────────────────
+const MENSAJE_PERSONA = 'Ya usó su prueba gratuita. Puede contratar un plan o iniciar sesión.';
+const senales = (parcial: Partial<SenalesDePrueba>): SenalesDePrueba => ({
+  firmaYaProbo: false,
+  firmaYaPago: false,
+  personaYaProbo: false,
+  usuarios: 1,
+  ...parcial
+});
+const decide = (parcial: Partial<SenalesDePrueba>) => decidirPrueba(senales(parcial), MENSAJE_PERSONA);
+
+check('la prueba desde el plan es de un usuario', MAX_USUARIOS_PARA_PRUEBA === 1);
+check('firma nueva, sin pagos, sin prueba, un usuario, persona sin prueba: disponible', decide({}).disponible === true);
+check('una firma sin ninguna cuenta todavía también puede', decide({ usuarios: 0 }).disponible === true);
+{
+  const d = decide({ firmaYaPago: true });
+  check('la firma que ya pagó no tiene prueba', !d.disponible && d.codigo === 'TRIAL_NOT_AVAILABLE' && d.motivo.includes('ya pagó'));
+}
+{
+  const d = decide({ firmaYaProbo: true });
+  check('la firma que ya probó no repite', !d.disponible && d.codigo === 'TRIAL_NOT_AVAILABLE' && d.motivo.includes('ya tuvo su prueba'));
+}
+{
+  const d = decide({ usuarios: 2 });
+  check('con dos usuarios no hay prueba: es de un solo puesto', !d.disponible && d.codigo === 'TRIAL_NOT_AVAILABLE' && d.motivo.includes('ya tiene 2'));
+}
+{
+  const d = decide({ personaYaProbo: true });
+  check(
+    'la persona que ya probó recibe TRIAL_ALREADY_USED con la frase exacta del formulario público',
+    !d.disponible && d.codigo === 'TRIAL_ALREADY_USED' && d.motivo === MENSAJE_PERSONA
+  );
+}
+{
+  const d = decide({ firmaYaPago: true, personaYaProbo: true });
+  check('cuando la firma pagó y la persona ya probó, manda la razón de la firma', !d.disponible && d.codigo === 'TRIAL_NOT_AVAILABLE');
+}
+check('cualquier señal en contra basta', !decide({ firmaYaProbo: true, usuarios: 3, personaYaProbo: true }).disponible);
 
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);
 process.exitCode = fallos === 0 ? 0 : 1;

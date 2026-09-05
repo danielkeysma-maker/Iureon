@@ -21,6 +21,8 @@ import {
   updateFirmController,
   updateFirmPlanController,
   suspenderFirmaController,
+  eliminarFirmaController,
+  restablecerContrasenaController,
   runwayController
 } from './admin.controller';
 import { mailStatusController, mailTestController } from '../mail/mail.controller';
@@ -60,6 +62,15 @@ router.patch('/firms/:firmId/plan', updateFirmPlanController as any);
 router.post('/firms/:firmId/suspender', suspenderFirmaController as any);
 router.post('/firms/:firmId/credits', addCreditsController as any);
 router.post('/firms/:firmId/users', addUserController as any);
+/*
+ * Acciones de soporte que la firma autoriza por fuera: restablecer una
+ * contraseña a mano (no hay correo de recuperación) y borrar la firma entera.
+ * El borrado exige motivo y el nombre exacto de la firma en el cuerpo, rechaza
+ * la firma del propio operador, y queda en la auditoría DEL OPERADOR: la de la
+ * firma se va con ella.
+ */
+router.post('/firms/:firmId/users/:userId/password', restablecerContrasenaController as any);
+router.delete('/firms/:firmId', eliminarFirmaController as any);
 
 /*
  * Acceso de soporte (8a), lado operacion. Cuelgan de aqui y no de su propio

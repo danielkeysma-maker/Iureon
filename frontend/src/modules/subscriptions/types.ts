@@ -40,6 +40,12 @@ export interface PlanDeFirma {
   diasRestantes: number | null;
   usuarios: number;
   modulosPermitidos: readonly Modulo[];
+  /**
+   * Whether THIS session may open the 7-day trial of Esencial from the plan
+   * screen: the firm never paid nor tried, has one seat, and the person has
+   * not used a trial anywhere. Decided by the server on every read.
+   */
+  pruebaDisponible: boolean;
 }
 
 export interface PlanDefinition {

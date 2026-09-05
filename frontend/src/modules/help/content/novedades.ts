@@ -36,6 +36,14 @@ export const NOVEDADES_ID = 'novedades';
 export const NOVEDADES: readonly Novedad[] = [
   {
     fecha: '2026-09-05',
+    titulo: 'La prueba gratuita también se pide desde «Plan de la firma»',
+    detalle:
+      'Una firma que creó su cuenta con «Contratar» y todavía no ha pagado ni probado ve en la tarjeta Esencial de «Plan de la firma» el botón «Probar Esencial gratis 7 días»: un usuario, sin tarjeta y sin cobro al terminar. Al confirmar, la aplicación sale de solo lectura en el acto. Es la misma prueba de la página pública: una por firma y por persona.',
+    modulo: 'Planes',
+    tipo: 'nuevo'
+  },
+  {
+    fecha: '2026-09-05',
     titulo: 'Contratar desde la página pública: cree su cuenta y pague el plan',
     detalle:
       'En la página principal, «Contratar Esencial», «Contratar Premium» o «Contratar Firma» crea la cuenta de la firma y abre la pantalla del plan con ese plan destacado para pagar por Wompi. Hasta que el pago se confirma la aplicación está en solo lectura; al confirmarse, todo queda habilitado en el acto.',

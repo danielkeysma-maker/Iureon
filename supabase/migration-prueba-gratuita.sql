@@ -45,14 +45,39 @@ CREATE TABLE IF NOT EXISTS public.trial_signups (
 );
 
 -- ==============================================================================
--- Índices: el conteo por dirección en la ventana de 24 horas y la búsqueda
--- por correo cuando un visitante dice que «ya tiene cuenta».
+-- Tablas creadas con una versión anterior de esta migración (sin `modo`):
+-- la columna y su restricción se añaden si faltan. Las filas viejas son todas
+-- pruebas, que es lo que dice el DEFAULT.
+-- ==============================================================================
+ALTER TABLE public.trial_signups
+    ADD COLUMN IF NOT EXISTS modo TEXT NOT NULL DEFAULT 'PRUEBA';
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+        WHERE conname = 'trial_signups_modo_check'
+          AND conrelid = 'public.trial_signups'::regclass
+    ) THEN
+        ALTER TABLE public.trial_signups
+            ADD CONSTRAINT trial_signups_modo_check CHECK (modo IN ('PRUEBA', 'COMPRA'));
+    END IF;
+END
+$$;
+
+-- ==============================================================================
+-- Índices: el conteo por dirección en la ventana de 24 horas, la búsqueda
+-- por correo cuando un visitante dice que «ya tiene cuenta», y la pregunta
+-- «¿esta firma ya tuvo su prueba?» que hace «Plan de la firma».
 -- ==============================================================================
 CREATE INDEX IF NOT EXISTS idx_trial_signups_ip_created
     ON public.trial_signups(ip, created_at DESC);
 
 CREATE INDEX IF NOT EXISTS idx_trial_signups_email
     ON public.trial_signups(email);
+
+CREATE INDEX IF NOT EXISTS idx_trial_signups_firm
+    ON public.trial_signups(firm_id);
 
 -- ==============================================================================
 -- RLS: solo el rol de servicio.

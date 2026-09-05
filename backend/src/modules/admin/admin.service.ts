@@ -4,8 +4,11 @@ import {
   AuthError,
   addUserToFirm,
   listFirmUsers,
+  usuarioDeLaFirma,
   type FirmUserRole
 } from '../auth/auth.service';
+import { BackblazeB2TenantStorageService } from '../documents/b2.service';
+import { validarBorradoDeFirma, validarContrasenaDeOperador } from './admin.rules';
 import { consumoDelMesPorUsuario } from '../billing/billing.service';
 import { auditService, type AuditLogEntry } from '../audit/audit.service';
 import {
@@ -269,7 +272,9 @@ const OPERATION_ACTIONS = new Set([
   'FIRM_CREDITS_ADDED',
   'FIRM_STATUS_CHANGED',
   'USER_CREATED',
-  'PLAN_ACTUALIZADO'
+  'PLAN_ACTUALIZADO',
+  'PLAN_SUSPENDIDO',
+  'PASSWORD_RESET_BY_OPERATOR'
 ]);
 
 export interface FirmUserDetail {
@@ -847,4 +852,151 @@ export const addUserToAnyFirm = async (
   const user = await addUserToFirm(firmId, { email: input.email, password: input.password, role });
 
   return { user, role, reason: motivo };
+};
+
+/**
+ * Sets a user's password by hand, for support.
+ *
+ * The account must belong to the firm named in the URL: `usuarioDeLaFirma`
+ * answers 404 otherwise, so an id from another tenant cannot be reset through
+ * a firm the operator happened to open. No e-mail is sent — the project has no
+ * reset mail — which is why this exists: the operator hands the password over
+ * by a channel the firm chose, and the firm's trail records that it happened.
+ */
+export const restablecerContrasenaDeUsuario = async (
+  firmId: string,
+  userId: string,
+  contrasena: unknown
+): Promise<{ email: string }> => {
+  const client = requireClient();
+  const nueva = validarContrasenaDeOperador(contrasena);
+  const objetivo = await usuarioDeLaFirma(firmId, userId);
+
+  const { error } = await client.auth.admin.updateUserById(userId, { password: nueva });
+  if (error) {
+    console.error('[ADMIN] No se pudo restablecer la contraseña:', error.message);
+    throw new AuthError('USER_UPDATE_FAILED', 'No se pudo restablecer la contraseña.', 502);
+  }
+
+  return { email: objetivo.email ?? '' };
+};
+
+export interface FirmaEliminada {
+  nombre: string;
+  /** What the database function removed, table by table. */
+  tablas: Array<{ tabla: string; filas: number }>;
+  usuariosEliminados: number;
+  /** Every step that did not complete and needs a hand: B2 objects, accounts. */
+  advertencias: string[];
+}
+
+/** How many listing rounds the B2 sweep tolerates before it calls itself stuck. */
+const MAX_RONDAS_B2 = 50;
+
+/**
+ * Deletes a firm with everything it owns, in this order and awaited whole:
+ *
+ *  1. Its accounts are LISTED (not yet deleted) while the firm still exists.
+ *  2. Its B2 objects are deleted; a failure is a warning, never a stop —
+ *     files in a bucket are recoverable by hand, a half-deleted tenant is not.
+ *  3. `borrar_firma_completa` removes every row in one transaction (see
+ *     supabase/migration-borrar-firma.sql for the table list and why
+ *     trial_signups survives).
+ *  4. The accounts are deleted LAST: had they gone first and step 3 failed,
+ *     the firm would keep its data with nobody able to sign in.
+ *
+ * The caller audits it under the OPERATOR's firm: the deleted firm's own
+ * trail went with it.
+ */
+export const eliminarFirmaCompleta = async (input: {
+  firmId: string;
+  firmIdDelOperador: string;
+  motivo: unknown;
+  confirmacion: unknown;
+}): Promise<FirmaEliminada & { motivo: string }> => {
+  const client = requireClient();
+  const advertencias: string[] = [];
+
+  const { data: fila } = await client
+    .from('firms')
+    .select('firm_id, name')
+    .eq('firm_id', input.firmId)
+    .maybeSingle();
+  if (!fila) {
+    throw new AuthError('FIRM_NOT_FOUND', 'No existe esa firma.', 404);
+  }
+  const nombre = String((fila as { name: string }).name ?? '');
+
+  const motivo = validarBorradoDeFirma({
+    firmId: input.firmId,
+    firmIdDelOperador: input.firmIdDelOperador,
+    nombreDeLaFirma: nombre,
+    confirmacion: input.confirmacion,
+    motivo: input.motivo
+  });
+
+  // 1. Accounts, listed now: after step 3 nothing says which users were hers.
+  const cuentas = await listFirmUsers(input.firmId);
+
+  // 2. B2. Unconfigured or failing storage is reported, not fatal.
+  const b2 = new BackblazeB2TenantStorageService();
+  try {
+    let ronda = 0;
+    let borradosEnRonda = -1;
+    while (ronda < MAX_RONDAS_B2 && borradosEnRonda !== 0) {
+      const objetos = await b2.listFirmDocuments(input.firmId);
+      if (objetos.length === 0) break;
+      borradosEnRonda = 0;
+      for (const objeto of objetos) {
+        const borrado = await b2.deleteObject(input.firmId, objeto.fileKey);
+        if (borrado) borradosEnRonda += 1;
+        else advertencias.push(`Archivo en B2 no borrado: ${objeto.fileKey}`);
+      }
+      // A round that deleted nothing would list the same objects forever.
+      ronda += 1;
+    }
+  } catch (err) {
+    advertencias.push(
+      `No se pudieron listar ni borrar los archivos de la firma en B2: ${(err as Error).message}`
+    );
+  }
+
+  // 3. The database, in one transaction.
+  const { data: tablas, error } = await client.rpc('borrar_firma_completa', {
+    p_firm_id: input.firmId
+  });
+  if (error) {
+    // PostgREST answers PGRST202 when the function does not exist: the
+    // migration has not run. Named, so the operator knows what to do.
+    const sinFuncion =
+      error.code === 'PGRST202' || /could not find the function|does not exist/i.test(error.message);
+    if (sinFuncion) {
+      throw new AuthError(
+        'MIGRATION_REQUIRED',
+        'Falta ejecutar supabase/migration-borrar-firma.sql en la base de datos antes de poder eliminar una firma.',
+        503
+      );
+    }
+    console.error('[ADMIN] borrar_firma_completa falló:', error.message);
+    throw new AuthError('DELETE_FAILED', 'No se pudo eliminar la firma; no se borró nada.', 502);
+  }
+
+  // 4. Accounts, last.
+  let usuariosEliminados = 0;
+  for (const cuenta of cuentas) {
+    const { error: errorCuenta } = await client.auth.admin.deleteUser(cuenta.id);
+    if (errorCuenta) advertencias.push(`Cuenta no eliminada: ${cuenta.email} (${errorCuenta.message})`);
+    else usuariosEliminados += 1;
+  }
+
+  return {
+    nombre,
+    tablas: ((tablas ?? []) as Array<{ tabla: string; filas: number | string }>).map((t) => ({
+      tabla: t.tabla,
+      filas: Number(t.filas ?? 0)
+    })),
+    usuariosEliminados,
+    advertencias,
+    motivo
+  };
 };

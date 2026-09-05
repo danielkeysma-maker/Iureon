@@ -185,5 +185,29 @@ export const adminApi = {
   addUser: (firmId: string, input: { email: string; password: string; role: 'FIRM_ADMIN' | 'LAWYER' }) =>
     httpClient.post<{ user: { id: string; email: string } }>(`/api/admin/firms/${firmId}/users`, {
       body: input
-    })
+    }),
+
+  /*
+   * Contraseña puesta a mano, para soporte: no hay correo de recuperación. El
+   * servidor comprueba que la cuenta sea de esa firma, y lo anota en la
+   * auditoría de la firma nombrando la cuenta, nunca la contraseña.
+   */
+  restablecerContrasena: (firmId: string, userId: string, contrasena: string) =>
+    httpClient.post<{ email: string }>(`/api/admin/firms/${firmId}/users/${userId}/password`, {
+      body: { contrasena }
+    }),
+
+  /*
+   * Borra la firma con TODO lo suyo. `confirmacion` es el nombre exacto de la
+   * firma, tecleado; el servidor rechaza el nombre distinto, la firma del
+   * propio operador y el motivo corto. Las `advertencias` son pasos que no se
+   * completaron (archivos en B2, alguna cuenta) y piden una mano.
+   */
+  eliminarFirma: (firmId: string, input: { motivo: string; confirmacion: string }) =>
+    httpClient.delete<{
+      eliminada: boolean;
+      tablas: Array<{ tabla: string; filas: number }>;
+      usuariosEliminados: number;
+      advertencias: string[];
+    }>(`/api/admin/firms/${firmId}`, { body: input })
 };

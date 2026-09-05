@@ -75,7 +75,7 @@ const altasRecientesDesde = async (ip: string | null, ahora: Date): Promise<numb
  * es que dos colegas detrás de la misma salida de red comparten una sola
  * prueba; el segundo puede contratar, y la compra no se limita por esta regla.
  */
-const pruebaYaUsada = async (correo: string, ip: string | null): Promise<boolean> => {
+export const pruebaYaUsada = async (correo: string, ip: string | null): Promise<boolean> => {
   const client = requireClient();
   const consulta = client.from('trial_signups').select('id', { count: 'exact', head: true }).eq('modo', 'PRUEBA');
   const { count, error } = await (ip ? consulta.or(`email.eq.${correo},ip.eq.${ip}`) : consulta.eq('email', correo));

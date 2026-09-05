@@ -1,9 +1,11 @@
 import React from 'react';
 import { AlertCircle, KeyRound, RefreshCw, ShieldOff } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
-import { adminApi, type FirmDetail } from '../admin.api';
+import { adminApi, type FirmDetail, type FirmUserDetail } from '../admin.api';
 import { RequestSupportAccessDialog } from './RequestSupportAccessDialog';
 import { FirmPlanSection } from './FirmPlanSection';
+import { FirmDangerZone } from './FirmDangerZone';
+import { ResetPasswordDialog } from './ResetPasswordDialog';
 
 /**
  * Ficha de la firma. Artboard 7b.
@@ -76,6 +78,8 @@ const FUERA_DE_ALCANCE: readonly string[] = [
 interface FirmDetailDialogProps {
   firmId: string | null;
   onClose: () => void;
+  /** La firma ya no existe: quien abrió la ficha la cierra, recarga la lista y avisa. */
+  onEliminada: (resultado: { nombre: string; usuariosEliminados: number; advertencias: string[] }) => void;
 }
 
 const Metrica: React.FC<{ rotulo: string; valor: string; nota: string }> = ({
@@ -94,11 +98,13 @@ const Metrica: React.FC<{ rotulo: string; valor: string; nota: string }> = ({
   </div>
 );
 
-export const FirmDetailDialog: React.FC<FirmDetailDialogProps> = ({ firmId, onClose }) => {
+export const FirmDetailDialog: React.FC<FirmDetailDialogProps> = ({ firmId, onClose, onEliminada }) => {
   const [firma, setFirma] = React.useState<FirmDetail | null>(null);
   const [cargando, setCargando] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [pidiendoAcceso, setPidiendoAcceso] = React.useState(false);
+  /** La cuenta a la que se le está fijando una contraseña nueva. */
+  const [cuentaAReiniciar, setCuentaAReiniciar] = React.useState<FirmUserDetail | null>(null);
   /* Sube cuando operación cambia algo: la ficha se relee, no se parchea a mano. */
   const [recarga, setRecarga] = React.useState(0);
 
@@ -200,7 +206,8 @@ export const FirmDetailDialog: React.FC<FirmDetailDialogProps> = ({ firmId, onCl
               <h3 className="text-[13px] font-semibold text-ink-900">Usuarios</h3>
               <p className="mt-0.5 text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
                 Nombre, rol y actividad. Sin acceso a sus casos. La firma los administra en su
-                propia pantalla de gestión; operación solo los lee.
+                propia pantalla de gestión; operación solo los lee, y puede fijar una contraseña
+                nueva cuando la firma lo pide: no hay correo de recuperación.
               </p>
             </header>
             <table className="w-full text-[12px]">
@@ -210,6 +217,9 @@ export const FirmDetailDialog: React.FC<FirmDetailDialogProps> = ({ firmId, onCl
                   <th className="px-4 py-2 font-medium">Rol</th>
                   <th className="px-4 py-2 text-right font-medium">Consumo mes</th>
                   <th className="px-4 py-2 text-right font-medium">Últ. sesión</th>
+                  <th className="px-4 py-2 text-right font-medium">
+                    <span className="sr-only">Acciones</span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -228,6 +238,17 @@ export const FirmDetailDialog: React.FC<FirmDetailDialogProps> = ({ firmId, onCl
                       {pesos(u.consumoMesCop)}
                     </td>
                     <td className="px-4 py-2.5 text-right text-ink-500">{hace(u.ultimoAcceso)}</td>
+                    <td className="px-4 py-2.5 text-right">
+                      <button
+                        type="button"
+                        onClick={() => setCuentaAReiniciar(u)}
+                        className="inline-flex items-center gap-1 whitespace-nowrap text-[11px] font-medium text-brand-700 hover:underline"
+                        title="Fijar una contraseña nueva; se entrega por canal seguro"
+                      >
+                        <KeyRound className="h-3 w-3" />
+                        Nueva contraseña
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -294,6 +315,9 @@ export const FirmDetailDialog: React.FC<FirmDetailDialogProps> = ({ firmId, onCl
               Solicitar acceso de soporte
             </button>
           </section>
+
+          {/* Al final, separada y en rojo: es lo único de la ficha que no se deshace. */}
+          <FirmDangerZone firma={firma} onEliminada={onEliminada} />
         </div>
       )}
 
@@ -302,6 +326,14 @@ export const FirmDetailDialog: React.FC<FirmDetailDialogProps> = ({ firmId, onCl
         firmName={firma?.name ?? 'la firma'}
         onCerrar={() => setPidiendoAcceso(false)}
       />
+      {firmId && (
+        <ResetPasswordDialog
+          firmId={firmId}
+          usuario={cuentaAReiniciar}
+          onCerrar={() => setCuentaAReiniciar(null)}
+          onHecho={() => setRecarga((n) => n + 1)}
+        />
+      )}
     </Dialog>
   );
 };

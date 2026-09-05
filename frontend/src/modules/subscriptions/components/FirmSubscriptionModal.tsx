@@ -1,6 +1,7 @@
 import React from 'react';
-import { AlertCircle, ArrowRight, Check, ExternalLink, Lock, Minus, RefreshCw, ShieldCheck, Sparkles, Users } from 'lucide-react';
+import { AlertCircle, ArrowRight, Check, ExternalLink, Gift, Lock, Minus, RefreshCw, ShieldCheck, Sparkles, Users } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
+import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 import { urlDelCheckout } from '../../billing/wompiCheckout';
 import { subscriptionApi } from '../subscription.api';
 import { generarCuentaDeCobro } from '../cuentaDeCobro.pdf';
@@ -38,6 +39,13 @@ import {
  * SOLO LOS ADMINISTRADORES PAGAN. Un abogado ve planes y precios, no los
  * botones: comprometer a la firma por un año es decisión de un socio, y el
  * servidor rechaza el checkout a cualquier otro.
+ *
+ * LA PRUEBA GRATUITA TAMBIÉN SE PIDE DESDE AQUÍ. La firma que nació con
+ * «Contratar» en la portada abre vencida y nunca vio la prueba que la portada
+ * ofrece al lado; cuando el servidor dice `pruebaDisponible` —firma sin
+ * pagos ni prueba, un usuario, persona que no ha probado— la tarjeta Esencial
+ * ofrece los siete días. El servidor vuelve a decidir al pedirla y responde
+ * con la misma frase del formulario público si la persona ya probó.
  */
 
 interface FirmSubscriptionModalProps {
@@ -122,6 +130,8 @@ export const FirmSubscriptionModal: React.FC<FirmSubscriptionModalProps> = ({
    * así que abrirla por el enlace no crea un segundo intento.
    */
   const [enlaceCheckout, setEnlaceCheckout] = React.useState<string | null>(null);
+  const [confirmacion, setConfirmacion] = React.useState<Confirmacion | null>(null);
+  const [activandoPrueba, setActivandoPrueba] = React.useState(false);
 
   const cargar = React.useCallback(async () => {
     setCargando(true);
@@ -163,6 +173,41 @@ export const FirmSubscriptionModal: React.FC<FirmSubscriptionModalProps> = ({
       setPagando(null);
     }
   };
+
+  /*
+   * Al terminar, el plan nuevo sube a la cáscara por `onPlanLeido`: es lo que
+   * alimenta el PlanContext, y con estado PRUEBA la franja de solo lectura se
+   * apaga sin recargar. Un 409 trae la frase del servidor y se muestra en el
+   * mismo sitio que cualquier otro error de esta pantalla.
+   */
+  const solicitarPrueba = async () => {
+    setActivandoPrueba(true);
+    setError(null);
+    try {
+      const { plan: nuevo, planes: catalogo } = await subscriptionApi.solicitarPruebaGratuita();
+      setPlan(nuevo);
+      setPlanes(catalogo);
+      onPlanLeido?.(nuevo);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'No se pudo activar la prueba gratuita.');
+    } finally {
+      setActivandoPrueba(false);
+    }
+  };
+
+  const ofrecerPrueba = () =>
+    setConfirmacion({
+      titulo: 'Probar Esencial gratis 7 días',
+      texto: (
+        <p>
+          La firma queda en el plan Esencial durante siete días, con un usuario y todos sus módulos. No se pide tarjeta
+          y al terminar no se cobra nada: la aplicación vuelve a solo lectura y desde esta pantalla se contrata el plan
+          que prefiera. La prueba es una sola por firma y por persona.
+        </p>
+      ),
+      etiqueta: 'Empezar la prueba',
+      onConfirmar: solicitarPrueba
+    });
 
   const precioDe = (def: PlanDefinition): number => (periodo === 'ANUAL' ? def.precioAnualCop : def.precioMensualCop);
   const mensualEquivalente = (def: PlanDefinition): number => (periodo === 'ANUAL' ? def.precioAnualCop / 12 : def.precioMensualCop);
@@ -345,7 +390,7 @@ export const FirmSubscriptionModal: React.FC<FirmSubscriptionModalProps> = ({
                       {puedePagar ? (
                         <button
                           type="button"
-                          disabled={pagando !== null}
+                          disabled={pagando !== null || activandoPrueba}
                           onClick={() => void pagar(clave)}
                           className={`mt-5 inline-flex h-11 w-full items-center justify-center gap-2 rounded-control text-[13px] font-semibold transition-colors disabled:opacity-50 ${
                             destacado ? 'bg-brand-700 text-white hover:bg-ink-900' : 'border border-brand-700 bg-surface text-brand-700 hover:bg-brand-50'
@@ -368,6 +413,23 @@ export const FirmSubscriptionModal: React.FC<FirmSubscriptionModalProps> = ({
                           <Lock className="h-3.5 w-3.5" />
                           Solo un administrador de la firma puede pagar el plan.
                         </p>
+                      )}
+
+                      {clave === 'ESENCIAL' && plan.pruebaDisponible && puedePagar && (
+                        <div className="mt-3 rounded-control border border-dashed border-[rgb(var(--brand-line))] bg-brand-50/60 px-3 py-2.5">
+                          <button
+                            type="button"
+                            disabled={pagando !== null || activandoPrueba}
+                            onClick={ofrecerPrueba}
+                            className="inline-flex w-full items-center justify-center gap-2 text-[13px] font-semibold text-brand-700 hover:underline disabled:opacity-50"
+                          >
+                            {activandoPrueba ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Gift className="h-4 w-4" />}
+                            {activandoPrueba ? 'Activando la prueba…' : 'Probar Esencial gratis 7 días'}
+                          </button>
+                          <p className="mt-1 text-center text-[11.5px] leading-snug text-ink-600">
+                            Un usuario, sin tarjeta y sin cobro al terminar.
+                          </p>
+                        </div>
                       )}
                     </article>
                   );
@@ -453,6 +515,8 @@ export const FirmSubscriptionModal: React.FC<FirmSubscriptionModalProps> = ({
           </section>
         </div>
       )}
+
+      <ConfirmarDialog confirmacion={confirmacion} onCerrar={() => setConfirmacion(null)} />
     </Dialog>
   );
 };

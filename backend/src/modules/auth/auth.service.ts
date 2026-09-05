@@ -258,7 +258,7 @@ export const listFirmUsers = async (firmId: string): Promise<UsuarioDeFirma[]> =
 };
 
 /** El usuario, solo si pertenece a la firma del que pregunta. */
-const usuarioDeLaFirma = async (firmId: string, userId: string) => {
+export const usuarioDeLaFirma = async (firmId: string, userId: string) => {
   const client = requireSupabase();
   const { data, error } = await client.auth.admin.getUserById(userId);
 

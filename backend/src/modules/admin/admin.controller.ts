@@ -11,7 +11,9 @@ import {
   updateFirm,
   updateFirmPlan,
   suspenderAccesoDeFirma,
-  describirCambioDePlan
+  describirCambioDePlan,
+  eliminarFirmaCompleta,
+  restablecerContrasenaDeUsuario
 } from './admin.service';
 import { calcularRunway } from './runway.service';
 
@@ -229,6 +231,74 @@ export const addUserController = async (req: Request, res: Response): Promise<vo
     res.status(201).json({ success: true, user });
   } catch (err) {
     fail(res, err, 'No se pudo crear la cuenta.');
+  }
+};
+
+/**
+ * POST /api/admin/firms/:firmId/users/:userId/password — sets a password by hand.
+ *
+ * Audited in the FIRM's trail naming the account, never the password: the
+ * partners must be able to read that operation touched a credential of theirs.
+ */
+export const restablecerContrasenaController = async (req: Request, res: Response): Promise<void> => {
+  const firmId = String(req.params.firmId);
+  const userId = String(req.params.userId);
+
+  try {
+    const { email } = await restablecerContrasenaDeUsuario(firmId, userId, req.body?.contrasena);
+
+    await auditService.record({
+      firmId,
+      userEmail: req.user!.email,
+      action: 'PASSWORD_RESET_BY_OPERATOR',
+      resource: `Contraseña de ${email} restablecida por operación; entregada por canal seguro, sin correo`,
+      ipAddress: callerIp(req)
+    });
+
+    res.json({ success: true, email });
+  } catch (err) {
+    fail(res, err, 'No se pudo restablecer la contraseña.');
+  }
+};
+
+/**
+ * DELETE /api/admin/firms/:firmId — the firm and everything it owns.
+ *
+ * Body: `{ motivo, confirmacion }`, where `confirmacion` must be the firm's
+ * exact name. Audited under the OPERATOR's firm (`req.firmId`): the deleted
+ * firm's own trail is gone with it, and this is the one record that says who
+ * did it, when, and on whose authority.
+ */
+export const eliminarFirmaController = async (req: Request, res: Response): Promise<void> => {
+  const firmId = String(req.params.firmId);
+
+  try {
+    const resultado = await eliminarFirmaCompleta({
+      firmId,
+      firmIdDelOperador: req.firmId ?? req.user!.firmId,
+      motivo: req.body?.motivo,
+      confirmacion: req.body?.confirmacion
+    });
+
+    await auditService.record({
+      firmId: req.firmId ?? req.user!.firmId,
+      userEmail: req.user!.email,
+      action: 'FIRMA_ELIMINADA',
+      resource:
+        `Firma «${resultado.nombre}» (${firmId}) eliminada con todos sus datos · ` +
+        `${resultado.usuariosEliminados} usuarios · motivo: ${resultado.motivo}`,
+      ipAddress: callerIp(req)
+    });
+
+    res.json({
+      success: true,
+      eliminada: true,
+      tablas: resultado.tablas,
+      usuariosEliminados: resultado.usuariosEliminados,
+      advertencias: resultado.advertencias
+    });
+  } catch (err) {
+    fail(res, err, 'No se pudo eliminar la firma.');
   }
 };
 

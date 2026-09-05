@@ -26,5 +26,15 @@ export const subscriptionApi = {
       .then((r) => r.intent),
 
   payments: () =>
-    httpClient.get<{ payments: PagoDePlan[] }>('/api/subscription/payments').then((r) => r.payments)
+    httpClient.get<{ payments: PagoDePlan[] }>('/api/subscription/payments').then((r) => r.payments),
+
+  /**
+   * Opens the 7-day trial of Esencial for a firm that qualifies. The server
+   * re-decides; a 409 carries the sentence to show («Ya usó su prueba…»).
+   */
+  solicitarPruebaGratuita: () =>
+    httpClient.post<{ plan: PlanDeFirma; planes: Record<Plan, PlanDefinition> }>(
+      '/api/subscription/prueba-gratuita',
+      { body: {} }
+    )
 };

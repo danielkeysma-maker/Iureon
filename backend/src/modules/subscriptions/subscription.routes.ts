@@ -3,7 +3,8 @@ import {
   checkoutController,
   firmUsersController,
   paymentsController,
-  planController
+  planController,
+  pruebaGratuitaFirmaController
 } from './subscription.controller';
 
 /*
@@ -15,6 +16,11 @@ const router = Router();
 
 router.get('/subscription/plan', planController as any);
 router.post('/subscription/checkout', checkoutController as any);
+/*
+ * No `bloquearSiPlanVencido` here, nor on checkout: both exist for a firm
+ * whose plan is expired — the one born through «Contratar» that has not paid.
+ */
+router.post('/subscription/prueba-gratuita', pruebaGratuitaFirmaController as any);
 router.get('/subscription/payments', paymentsController as any);
 router.get('/subscription/firm-users', firmUsersController as any);
 

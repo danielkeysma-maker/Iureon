@@ -34,6 +34,8 @@ jobs:
         run: npm run check:plan
       - name: Free trial rules (7 days, one seat, honeypot, per-address window)
         run: npm run check:trial
+      - name: Operator support rules (firm deletion confirmation, self-delete, password floor)
+        run: npm run check:admin-reglas
       - name: Transactional mail (templates, subjects, cuenta de cobro PDF)
         run: npm run check:mail
       - name: Catalogue correctness checks

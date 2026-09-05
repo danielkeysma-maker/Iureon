@@ -89,6 +89,16 @@ export const OperatorConsole: React.FC = () => {
   const [recargando, setRecargando] = React.useState<string | null>(null);
   /** La firma cuyo dialogo de recarga esta abierto; null cuando ninguno. */
   const [firmARecargar, setFirmARecargar] = React.useState<FirmSummary | null>(null);
+  /**
+   * Aviso no bloqueante tras eliminar una firma: qué se borró y, si algo no
+   * se completó (archivos en B2, alguna cuenta), qué queda por hacer a mano.
+   * Un `alert` del navegador taparía la lista que acaba de recargarse.
+   */
+  const [avisoDeBorrado, setAvisoDeBorrado] = React.useState<{
+    nombre: string;
+    usuariosEliminados: number;
+    advertencias: string[];
+  } | null>(null);
 
   const [nueva, setNueva] = React.useState({
     firmName: '',
@@ -292,6 +302,49 @@ export const OperatorConsole: React.FC = () => {
         </div>
       )}
 
+      {avisoDeBorrado && (
+        <div
+          className={`rounded-card border p-3 flex items-start gap-2 ${
+            avisoDeBorrado.advertencias.length > 0
+              ? 'bg-[rgb(var(--unverified-surf))] border-[rgb(var(--unverified-line))]'
+              : 'bg-[rgb(var(--verified-surf))] border-[rgb(var(--verified-line))]'
+          }`}
+        >
+          {avisoDeBorrado.advertencias.length > 0 ? (
+            <AlertCircle className="w-4 h-4 text-unverified shrink-0 mt-0.5" />
+          ) : (
+            <ShieldCheck className="w-4 h-4 text-verified shrink-0 mt-0.5" />
+          )}
+          <div className="min-w-0 flex-1 text-[11px] text-ink-900">
+            <p>
+              La firma <b>{avisoDeBorrado.nombre}</b> fue eliminada con todos sus datos ·{' '}
+              {avisoDeBorrado.usuariosEliminados}{' '}
+              {avisoDeBorrado.usuariosEliminados === 1 ? 'cuenta eliminada' : 'cuentas eliminadas'}.
+              Quedó en su auditoría de operación.
+            </p>
+            {avisoDeBorrado.advertencias.length > 0 && (
+              <>
+                <p className="mt-1.5 font-semibold text-unverified">
+                  Quedó pendiente, por hacer a mano:
+                </p>
+                <ul className="mt-0.5 list-disc space-y-0.5 pl-4 text-ink-700">
+                  {avisoDeBorrado.advertencias.map((a) => (
+                    <li key={a} className="break-all">{a}</li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={() => setAvisoDeBorrado(null)}
+            className="shrink-0 text-[11px] text-ink-500 hover:text-ink-700"
+          >
+            Cerrar
+          </button>
+        </div>
+      )}
+
       {creando && (
         <form onSubmit={crear} className="bg-surface border border-line-200 rounded-card p-4 space-y-3">
           <h4 className="font-bold text-ink-900 text-xs">Registrar una firma cliente</h4>
@@ -484,7 +537,15 @@ export const OperatorConsole: React.FC = () => {
         profesional. Cada cambio queda registrado en la auditoría de la firma afectada, con tu correo.
       </p>
 
-      <FirmDetailDialog firmId={fichaAbierta} onClose={() => setFichaAbierta(null)} />
+      <FirmDetailDialog
+        firmId={fichaAbierta}
+        onClose={() => setFichaAbierta(null)}
+        onEliminada={(resultado) => {
+          setFichaAbierta(null);
+          setAvisoDeBorrado(resultado);
+          void cargar();
+        }}
+      />
       <RechargeFirmDialog
         firm={firmARecargar}
         ocupado={firmARecargar !== null && recargando === firmARecargar.id}
