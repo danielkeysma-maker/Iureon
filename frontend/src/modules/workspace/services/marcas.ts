@@ -165,31 +165,70 @@ export const segmentarCapas = (texto: string, marcas: MarcaEnCapa[]): SegmentoEn
 export const esCapaTipografica = (capa: string): boolean => capa === 'negrita' || capa === 'marcador';
 
 /**
- * Una línea es título si es corta, tiene letras y casi todas van en mayúscula:
- * «HECHOS», «I. PRETENSIONES», «JUEZ (REPARTO) — CON JURISDICCIÓN…». Una
- * numeración sola («1.») o una línea que termina en coma no lo es.
+ * Una línea es título si tiene letras y casi todas van en mayúscula:
+ * «HECHOS», «I. PRETENSIONES», «ACCIONADO: JUZGADO TERCERO ADMINISTRATIVO ORAL
+ * DEL CIRCUITO DE SINCELEJO - SALA QUINTA…». El tope de largo es generoso
+ * (260) porque en un escrito real la línea del accionado o la referencia
+ * ocupa dos renglones y sigue siendo encabezado. Una numeración sola («1.») o
+ * una línea que termina en coma o punto y coma no lo es.
  */
 export const esLineaDeTitulo = (linea: string): boolean => {
   const t = linea.trim();
-  if (t.length < 2 || t.length > 110 || /[,;]$/.test(t)) return false;
+  if (t.length < 2 || t.length > 260 || /[,;]$/.test(t)) return false;
   const letras = t.match(/\p{L}/gu) ?? [];
   if (letras.length < 3 || !/\p{L}{3}/u.test(t)) return false;
   const mayusculas = letras.filter((l) => l === l.toUpperCase() && l !== l.toLowerCase()).length;
   return mayusculas / letras.length >= 0.85;
 };
 
-/** Títulos en mayúscula sostenida y negritas «**…**» del texto, como capas para pintar. */
+/** «ACCIONANTE:», «ASUNTO:», «REFERENCIA:» al inicio de la línea: la etiqueta va en negrita aunque el resto no. */
+const ETIQUETA_INICIAL = /^\s*([A-ZÁÉÍÓÚÜÑ][A-ZÁÉÍÓÚÜÑ .()/]{1,60}?):/u;
+
+/** «PRIMERO.», «SEGUNDA:», «DÉCIMO PRIMERO -» al inicio de un párrafo: el ordinal que ordena hechos y pretensiones. */
+const ORDINAL_INICIAL =
+  /^\s*((?:PRIMER|SEGUND|TERCER|CUART|QUINT|SEXT|S[ÉE]PTIM|OCTAV|NOVEN|D[ÉE]CIM|UND[ÉE]CIM|DUOD[ÉE]CIM|VIG[ÉE]SIM)[OA]S?(?:\s+(?:PRIMER|SEGUND|TERCER|CUART|QUINT|SEXT|S[ÉE]PTIM|OCTAV|NOVEN)[OA]S?)?)\s*[.:)\-–—]/u;
+
+/** «1. Hechos», «2.3. Pretensiones»: numeración corta seguida de un título breve sin coma final. */
+const NUMERADO_CORTO = /^\s*(?:\d{1,2}(?:\.\d{1,2})*|[IVXLC]{1,6})[.)]\s+\p{Lu}[^\n,;]{2,45}$/u;
+
+/**
+ * Nombres y entidades en mayúscula sostenida dentro del párrafo: «señor ALFONSO
+ * MONTERROZA AVILA, identificado…», «ante el JUZGADO TERCERO ADMINISTRATIVO».
+ * Se exigen al menos dos palabras seguidas, una de ellas de tres letras o más,
+ * para no tocar siglas sueltas como «EPS» o «C.C.».
+ */
+const NOMBRE_EN_MAYUSCULA = /(?<!\p{L})(?:[A-ZÁÉÍÓÚÜÑ]{2,}\.?)(?:\s+(?:[A-ZÁÉÍÓÚÜÑ]\.|[A-ZÁÉÍÓÚÜÑ]{2,}\.?)){1,7}(?!\p{L})/gu;
+
+const negrita = (inicio: number, fin: number): MarcaEnCapa => ({ inicio, fin, indice: -1, capa: 'negrita' });
+
+/** Títulos, etiquetas, ordinales, nombres en mayúscula y negritas «**…**» del texto, como capas para pintar. */
 export const capasTipograficas = (texto: string): MarcaEnCapa[] => {
   const salida: MarcaEnCapa[] = [];
   const lineas = /[^\n]+/g;
   let l: RegExpExecArray | null;
   while ((l = lineas.exec(texto)) !== null) {
-    if (esLineaDeTitulo(l[0])) salida.push({ inicio: l.index, fin: l.index + l[0].length, indice: -1, capa: 'negrita' });
+    const linea = l[0];
+    const base = l.index;
+    if (esLineaDeTitulo(linea)) {
+      salida.push(negrita(base, base + linea.length));
+      continue; // la línea entera ya va en negrita: no hace falta buscar dentro
+    }
+    const etiqueta = ETIQUETA_INICIAL.exec(linea);
+    if (etiqueta) salida.push(negrita(base + etiqueta.index, base + etiqueta.index + etiqueta[0].length));
+    const ordinal = ORDINAL_INICIAL.exec(linea);
+    if (ordinal) salida.push(negrita(base + ordinal.index, base + ordinal.index + ordinal[0].length));
+    if (NUMERADO_CORTO.test(linea)) salida.push(negrita(base, base + linea.length));
+    let n: RegExpExecArray | null;
+    NOMBRE_EN_MAYUSCULA.lastIndex = 0;
+    while ((n = NOMBRE_EN_MAYUSCULA.exec(linea)) !== null) {
+      if (!/[A-ZÁÉÍÓÚÜÑ]{3,}/u.test(n[0])) continue; // «C. C.» o «E. U.» no son nombres
+      salida.push(negrita(base + n.index, base + n.index + n[0].length));
+    }
   }
   const negritas = /\*\*(?=\S)[^*\n]+?(?<=\S)\*\*/g;
   let m: RegExpExecArray | null;
   while ((m = negritas.exec(texto)) !== null) {
-    salida.push({ inicio: m.index, fin: m.index + m[0].length, indice: -1, capa: 'negrita' });
+    salida.push(negrita(m.index, m.index + m[0].length));
     salida.push({ inicio: m.index, fin: m.index + 2, indice: -1, capa: 'marcador' });
     salida.push({ inicio: m.index + m[0].length - 2, fin: m.index + m[0].length, indice: -1, capa: 'marcador' });
   }

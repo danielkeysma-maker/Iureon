@@ -66,6 +66,20 @@ check('las anotaciones se localizan con su color y las ausentes se omiten', anot
   check('las negritas de Markdown se pintan enteras y sus asteriscos quedan como marcador', negritas.includes('**REFERENCIA:**') && capas.filter((c) => c.capa === 'marcador').every((c) => doc.slice(c.inicio, c.fin) === '**'));
   check('«E. S. D.» no es título: no tiene una palabra de tres letras seguidas', !negritas.includes('E. S. D.'));
   check('las capas tipográficas se reconocen y las demás no', esCapaTipografica('negrita') && esCapaTipografica('marcador') && !esCapaTipografica('amarillo') && !esCapaTipografica('cita'));
+
+  const escrito = [
+    'ACCIONADO: JUZGADO TERCERO ADMINISTRATIVO ORAL DEL CIRCUITO DE SINCELEJO - SALA QUINTA DE DECISION DEL TRIBUNAL ADMINISTRATIVO DE SUCRE.',
+    'Asunto: Solicitud de amparo con medida provisional',
+    'ANIBAL G. DIAZ CONTRERAS, mayor de edad, actuando como apoderado del señor ALFONSO MONTERROZA AVILA, identificado con C.C. No. 6.815.567, ante la EPS presentó queja.',
+    'PRIMERO. El día 3 de marzo se negó el servicio, según consta en el expediente.',
+    '1. Hechos',
+    'Que se ordene a la accionada, en el término de 48 horas, expedir la resolución.'
+  ].join('\n');
+  const capas2 = capasTipograficas(escrito).filter((c) => c.capa === 'negrita').map((c) => escrito.slice(c.inicio, c.fin));
+  check('una línea larga de encabezado en mayúscula sostenida va entera en negrita', capas2.some((t) => t.startsWith('ACCIONADO: JUZGADO') && t.endsWith('DE SUCRE.')));
+  check('la etiqueta inicial va en negrita aunque el resto no', capas2.includes('Asunto:') === false && capas2.includes('PRIMERO.') && capas2.some((t) => t === 'ANIBAL G. DIAZ CONTRERAS'));
+  check('los nombres en mayúscula dentro del párrafo van en negrita; las siglas sueltas no', capas2.includes('ALFONSO MONTERROZA AVILA') && !capas2.includes('EPS') && !capas2.some((t) => /^C\.C\.$/.test(t)));
+  check('un título numerado corto va en negrita y un párrafo numerado largo no', capas2.includes('1. Hechos') && !capas2.some((t) => t.startsWith('Que se ordene')));
 }
 
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);
