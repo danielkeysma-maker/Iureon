@@ -216,6 +216,9 @@ const NUMERO_DE_IDENTIFICACION =
 /** Fechas en letras: «15 de octubre de 2025». */
 const FECHA_LARGA = /\b\d{1,2}\s+de\s+(?:enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)\s+(?:de\s+|del\s+)?\d{4}\b/giu;
 
+/** Una palabra suelta en mayúscula sostenida de cinco letras o más: «AMPARAR», «ORDENAR», «DECLARAR», «SENTENCIA». Las siglas cortas («EPS», «DIAN») quedan fuera. */
+const PALABRA_EN_MAYUSCULA = /(?<!\p{L})[A-ZÁÉÍÓÚÜÑ]{5,}(?!\p{L})/gu;
+
 const negrita = (inicio: number, fin: number): MarcaEnCapa => ({ inicio, fin, indice: -1, capa: 'negrita' });
 
 /** Títulos, etiquetas, ordinales, nombres en mayúscula y negritas «**…**» del texto, como capas para pintar. */
@@ -241,7 +244,7 @@ export const capasTipograficas = (texto: string): MarcaEnCapa[] => {
       if (!/[A-ZÁÉÍÓÚÜÑ]{3,}/u.test(n[0])) continue; // «C. C.» o «E. U.» no son nombres
       salida.push(negrita(base + n.index, base + n.index + n[0].length));
     }
-    for (const re of [ENCABEZADO_SUELTO, NUMERO_DE_IDENTIFICACION, FECHA_LARGA]) {
+    for (const re of [ENCABEZADO_SUELTO, NUMERO_DE_IDENTIFICACION, FECHA_LARGA, PALABRA_EN_MAYUSCULA]) {
       re.lastIndex = 0;
       let x: RegExpExecArray | null;
       while ((x = re.exec(linea)) !== null) {
@@ -300,12 +303,26 @@ const ORDINAL_DE_PARRAFO =
  */
 export const reflujoDeSecciones = (texto: string): string => {
   const saltos = (texto.match(/\n/g) ?? []).length;
-  if (texto.length < 600 || saltos >= texto.length / 600) return texto;
+  /*
+   * Un texto que ya trae sus párrafos no se reparte de nuevo, pero sí pasa por
+   * la unión de títulos partidos: un salto de página del PDF parte un
+   * encabezado también en los documentos bien preparados.
+   */
+  if (texto.length < 600 || saltos >= texto.length / 600) return unirTitulosPartidos(texto);
   let salida = texto
     .replace(/\s+(?=Señor(?:es|a)?\s)/g, '\n\n')
     .replace(/\s+(?=E\.\s?S\.\s?D\.)/g, '\n')
     .replace(new RegExp(`\\s+(?=${ETIQUETA_DE_ENCABEZADO}\\s*:)`, 'gu'), '\n\n')
-    .replace(new RegExp(`(?<!\\p{L})(${CABEZA_DE_SECCION})(:?)(?=\\s*$|\\s+(?:\\p{Lu}|\\d))`, 'gu'), '\n\n$1$2\n')
+    /*
+     * Un encabezado de sección abre línea propia, salvo que venga en medio de
+     * una tirada en mayúscula: «CRITERIOS ESPECÍFICOS DE LA PROCEDENCIA DE LA
+     * ACCIÓN…» es UN título, y partirlo en «PROCEDENCIA» lo destrozaba.
+     */
+    .replace(new RegExp(`(?<!\\p{L})(?<![A-ZÁÉÍÓÚÜÑ]{2,}\\s)(${CABEZA_DE_SECCION})(:?)(?=\\s*$|\\s+(?:\\p{Lu}|\\d))`, 'gu'), '\n\n$1$2\n')
+    /* Un título en mayúscula pegado al final de un párrafo («…ordinario. CRITERIOS GENERALES DE LA…») abre párrafo. */
+    .replace(/([.;:!?])\s+(?=(?:[A-ZÁÉÍÓÚÜÑ]{2,}\s+){2,}[A-ZÁÉÍÓÚÜÑ]{2,})/gu, '$1\n\n')
+    /* Hechos y pretensiones numerados en cifras («1. », «2) ») tras un punto abren párrafo; no se inventa numeración, se respeta la que trae. */
+    .replace(/(?<=[.;:]\s)(\d{1,2}[.)]\s+)(?=\p{Lu})/gu, '\n\n$1')
     /*
      * Arranque del cuerpo: «FULANO DE TAL, mayor de edad…». El nombre se toma
      * como hasta cuatro palabras en mayúscula (más iniciales) antes de la coma;
@@ -315,5 +332,36 @@ export const reflujoDeSecciones = (texto: string): string => {
     .replace(/(?<!\b(?:DE|DEL|LA|LAS|LOS|EL|Y|E))\s+((?:[A-ZÁÉÍÓÚÜÑ]{2,}\s+(?:[A-ZÁÉÍÓÚÜÑ]\.\s+)?){1,3}[A-ZÁÉÍÓÚÜÑ]{2,},\s+(?:mayor|identificad|domiciliad|abogad|actuando|obrando|en\s+mi\s+calidad))/gu, '\n\n$1')
     .replace(new RegExp(`(?<=[.;:]\\s|\\n)(${ORDINAL_DE_PARRAFO})`, 'gu'), '\n\n$1');
   salida = salida.replace(/[ \t]*\n[ \t]*/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
-  return salida;
+  return unirTitulosPartidos(salida);
+};
+
+/**
+ * Títulos partidos por un salto de página del PDF: «CRITERIOS GENERALES DE LA»
+ * en una línea y «PROCEDENCIA DE LA ACCIÓN DE TUTELA…» en la siguiente. Dos
+ * líneas seguidas en mayúscula sostenida son un mismo título y se vuelven a
+ * unir, salvo que la primera cierre con dos puntos (ahí sí termina). Y si el
+ * título largo termina en dos puntos con el cuerpo pegado, el cuerpo baja de
+ * línea. Sirve para textos aplanados y para textos con sus párrafos.
+ */
+export const unirTitulosPartidos = (texto: string): string => {
+  if (!texto.includes('\n')) return texto;
+  /* Un título en mayúscula pegado al final de un párrafo («…ordinario. CRITERIOS GENERALES DE LA») abre línea propia antes de unirse con su continuación. */
+  const salida = texto.replace(/([.;:!?])[ \t]+(?=(?:[A-ZÁÉÍÓÚÜÑ]{2,}\s+){2,}[A-ZÁÉÍÓÚÜÑ]{2,})/gu, '$1\n\n');
+  const unidas: string[] = [];
+  for (const linea of salida.split('\n')) {
+    const previa = unidas.length ? unidas[unidas.length - 1] : null;
+    const continuaEnMayuscula = /^(?:[A-ZÁÉÍÓÚÜÑ]{2,}\s+){1,}[A-ZÁÉÍÓÚÜÑ]{2,}/u.test(linea.trim());
+    if (previa && previa.trim() && linea.trim() && esLineaDeTitulo(previa) && (esLineaDeTitulo(linea) || continuaEnMayuscula) && !/:$/.test(previa.trim())) {
+      unidas[unidas.length - 1] = `${previa.trim()} ${linea.trim()}`;
+    } else {
+      unidas.push(linea);
+    }
+  }
+  return (
+    unidas
+      .join('\n')
+      /* Un título largo que termina en dos puntos y sigue con el cuerpo en la misma línea: el cuerpo baja a la siguiente. */
+      .replace(/^((?:[A-ZÁÉÍÓÚÜÑ]{2,}[\s:]+){3,}[A-ZÁÉÍÓÚÜÑ]{2,}:)[ \t]+(?=\p{L})/gmu, '$1\n')
+      .replace(/\n{3,}/g, '\n\n')
+  );
 };

@@ -141,6 +141,62 @@ const textoLegible = (texto: string): string => {
   }
 };
 
+/**
+ * La respuesta de la guía viene como texto plano con su propia estructura:
+ * «2) SOBRE LA FORMA DE LA CITA. Aquí…», «a) La misma sentencia…», y a veces
+ * «**negrita**». Se pinta esa estructura en vez de mostrarla cruda: el
+ * marcador y el encabezado de cada punto van en negrita, y los asteriscos de
+ * Markdown se convierten en negrita real. Nada más se toca.
+ */
+const MARCADOR_DE_PUNTO = /^(\d{1,2}[.)]|[a-z][.)]|[ivx]{1,4}[.)]|[A-Z][.)]|[-•–])\s+/;
+
+const conNegritasMarkdown = (texto: string, clave: string): React.ReactNode[] => {
+  const partes = texto.split(/(\*\*[^*\n]+\*\*)/g);
+  return partes.map((p, i) =>
+    /^\*\*[^*\n]+\*\*$/.test(p) ? (
+      <strong key={`${clave}-b${i}`} className="font-semibold">
+        {p.slice(2, -2)}
+      </strong>
+    ) : (
+      <React.Fragment key={`${clave}-t${i}`}>{p}</React.Fragment>
+    )
+  );
+};
+
+const formatoDelChat = (texto: string): React.ReactNode[] => {
+  const lineas = texto.split('\n');
+  return lineas.flatMap((linea, i) => {
+    const nodos: React.ReactNode[] = [];
+    const m = MARCADOR_DE_PUNTO.exec(linea);
+    if (m) {
+      const resto = linea.slice(m[0].length);
+      /* El encabezado del punto: hasta el primer «.» o «:» si empieza en mayúscula y es corto; si no, solo el marcador. */
+      const enc = /^([^.:\n]{2,80}[.:])(\s|$)/.exec(resto);
+      const esTitulo = enc && /^[\p{Lu}«"]/u.test(resto) && (/^[^a-záéíóúñ]{0,3}[\p{Lu}\s«»"'\d.,;:()-]+$/u.test(enc[1]) || enc[1].length <= 60);
+      if (esTitulo && enc) {
+        nodos.push(
+          <strong key={`l${i}-m`} className="font-semibold">
+            {m[0]}
+            {enc[1]}
+          </strong>
+        );
+        nodos.push(...conNegritasMarkdown(resto.slice(enc[1].length), `l${i}`));
+      } else {
+        nodos.push(
+          <strong key={`l${i}-m`} className="font-semibold">
+            {m[0]}
+          </strong>
+        );
+        nodos.push(...conNegritasMarkdown(resto, `l${i}`));
+      }
+    } else {
+      nodos.push(...conNegritasMarkdown(linea, `l${i}`));
+    }
+    if (i < lineas.length - 1) nodos.push(<React.Fragment key={`l${i}-n`}>{'\n'}</React.Fragment>);
+    return nodos;
+  });
+};
+
 export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   datos,
   precioConsultaCop,
@@ -677,7 +733,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
         {conversacion.map((t, k) => (
           <div key={k} className={`max-w-[92%] ${t.rol === 'abogado' ? 'ml-auto' : ''}`}>
             <div className={`rounded-card px-3 py-2 text-[13px] leading-relaxed ${t.rol === 'abogado' ? 'bg-brand-700 text-white' : 'border border-line-200 bg-canvas text-ink-900'}`}>
-              <p className="whitespace-pre-wrap text-justify [text-wrap:pretty]">{textoLegible(t.texto)}</p>
+              <p className="whitespace-pre-wrap text-justify [text-wrap:pretty]">{formatoDelChat(textoLegible(t.texto))}</p>
               {t.rol === 'revisor' && t.ediciones && t.ediciones.length > 0 && Ediciones(t.ediciones)}
               {t.rol === 'revisor' && t.referencias && t.referencias.length > 0 && (
                 <button type="button" onClick={() => setReferencias(t.referencias ?? [])} className="mt-1.5 text-[11px] text-sky-700 underline underline-offset-2">

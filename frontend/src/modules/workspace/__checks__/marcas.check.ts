@@ -93,6 +93,14 @@ check('las anotaciones se localizan con su color y las ausentes se omiten', anot
   check('tras el reflujo, HECHOS, PRETENSIONES, FUNDAMENTOS DE DERECHO, ANEXOS y NOTIFICACIONES van en negrita', ['HECHOS', 'PRETENSIONES', 'FUNDAMENTOS DE DERECHO', 'ANEXOS', 'NOTIFICACIONES'].every((h) => negras.includes(h)));
   check('la cédula y la fecha en letras van en negrita', negras.some((t) => /^C\.C\. No\. 6\.815\.567$/.test(t)) && negras.includes('15 de octubre de 2025'));
   check('el reflujo conserva todas las palabras', reflujo.replace(/\s+/g, ' ') === plano.replace(/\s+/g, ' ').trim());
+
+  const partido =
+    'dentro del proceso ordinario. CRITERIOS ESPECIFICOS DE LA\nPROCEDENCIA\nDE LA ACCION DE TUTELA CONTRA PROVIDENCIAS JUDICIALES DEFECTO FACTICO: El defecto fáctico constituye una de las causales. PETICIONES PRIMERO: AMPARAR los derechos fundamentales del señor Alfonso. 1. El día 3 de marzo ocurrió el hecho. 2. El día 4 de marzo se notificó. ' + 'texto de relleno del escrito para que el bloque sea largo y casi sin saltos, como llega un PDF aplanado. '.repeat(30);
+  const r2 = reflujoDeSecciones(partido);
+  check('un título partido por salto de página se vuelve a unir y no se corta en «PROCEDENCIA»', /\n\nCRITERIOS ESPECIFICOS DE LA PROCEDENCIA DE LA ACCION DE TUTELA CONTRA PROVIDENCIAS JUDICIALES DEFECTO FACTICO:/.test(r2), JSON.stringify(r2.slice(0, 200)));
+  check('los hechos numerados en cifras abren párrafo', /\n\n1\. El día 3 de marzo/.test(r2) && /\n\n2\. El día 4 de marzo/.test(r2));
+  const negras2 = capasTipograficas(r2).filter((c) => c.capa === 'negrita').map((c) => r2.slice(c.inicio, c.fin));
+  check('una palabra suelta en mayúscula como AMPARAR va en negrita', negras2.includes('AMPARAR'));
 }
 
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);

@@ -45,6 +45,22 @@ export const NOVEDADES: readonly Novedad[] = [
   },
   {
     fecha: '2026-09-05',
+    titulo: 'Plan Firma: todos los módulos para hasta quince usuarios',
+    detalle:
+      'Se suma un tercer plan para firmas medianas: Firma, a $250.000 al mes o $2.500.000 al año, con todos los módulos y hasta quince personas. Se contrata desde la misma pantalla de planes.',
+    modulo: 'Planes',
+    tipo: 'nuevo'
+  },
+  {
+    fecha: '2026-09-05',
+    titulo: 'La respuesta de la guía muestra sus puntos con títulos en negrita',
+    detalle:
+      'Cuando la guía responde por puntos numerados o con letras, el número y el título de cada punto van en negrita, y las negritas que ella marca se ven como tales. Los párrafos van justificados.',
+    modulo: 'Taller',
+    tipo: 'mejora'
+  },
+  {
+    fecha: '2026-09-05',
     titulo: 'Nuevos precios de los planes',
     detalle:
       'Esencial pasa a $85.000 al mes o $850.000 al año; Premium a $120.000 al mes o $1.200.000 al año. El anual sigue siendo doce meses por el precio de diez. Los planes ya pagados conservan su vigencia.',
