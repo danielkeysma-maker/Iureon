@@ -231,6 +231,12 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({ onLoginSuccess
             ¿Su firma aún no tiene cuenta? El acceso a Iureon es por contratación: escríbanos y
             abrimos la suya.
           </p>
+          <a
+            href="/landing/index.html"
+            className="mt-4 inline-block text-meta text-ink-500 underline underline-offset-4 hover:text-ink-900"
+          >
+            ← Volver a la página principal
+          </a>
         </div>
       </main>
     </div>

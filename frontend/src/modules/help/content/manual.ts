@@ -564,7 +564,7 @@ const A_PLANES: ManualArticle = {
     {
       kind: 'parrafo',
       texto:
-        'Siete días antes, los administradores ven una franja arriba de la aplicación con la fecha. Al vencer, todos los roles ven una franja roja de «solo lectura» y la aplicación deja de crear o modificar trabajo: Redacción, Orientación, Buscador, Catálogo y Herramientas quedan cubiertos con un aviso, y en Borradores, Revisiones, Audiencias y Entrevistas desaparecen los botones de redactar, revisar, subir audio y grabar. El servidor rechaza cualquier guardado, edición o eliminación con el mismo mensaje. Sigue abierto todo lo que ya tiene: entrar, abrir y leer borradores, informes y transcritos, exportarlos a Word y PDF, el Manual, Soporte, Ajustes y la pantalla del plan para pagar. El saldo de recargas no se pierde. Al pagar, todo vuelve en el acto.'
+        'Siete días antes, los administradores ven una franja arriba de la aplicación con la fecha. Al vencer, todos los roles ven una franja roja de «solo lectura» y la aplicación deja de crear o modificar trabajo: Redacción, Orientación, Buscador, Catálogo, Herramientas, Audiencias y Entrevistas quedan cubiertos con un aviso, y en Borradores y Revisiones desaparecen los botones de redactar y revisar. El servidor rechaza cualquier guardado, edición o eliminación con el mismo mensaje. Sigue abierto todo lo que ya tiene: entrar, abrir y leer borradores e informes, exportarlos a Word y PDF, el Manual, Soporte, Ajustes y la pantalla del plan para pagar. El saldo de recargas no se pierde. Al pagar, todo vuelve en el acto.'
     },
     {
       kind: 'aviso',

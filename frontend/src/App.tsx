@@ -105,6 +105,9 @@ const EMPTY_FIRM_PLACEHOLDER: LawFirmTenant = {
  * Enough to render the shell without waiting on a round trip, and honest about
  * what it does not know yet: the name and NIT arrive from /api/auth/me.
  */
+/** sessionStorage key: the plan chosen on the public landing, opened once after login. */
+const PLAN_ELEGIDO_KEY = 'iureon.plan-elegido';
+
 const firmFromSession = (session: { user: { firmId: string } } | null): LawFirmTenant =>
   session
     ? { id: session.user.firmId, name: 'Cargando…', nit: '', creditsBalance: 0, status: 'active' }
@@ -131,6 +134,26 @@ export function App() {
    */
   const [session, setSession] = useState(() => sesionDeVistaPreviaLocal() ?? readSession());
   const isAuthenticated = Boolean(session);
+  /*
+   * PORTADA PÚBLICA. Quien llega a la raíz SIN sesión y sin decir a qué viene
+   * (`?entrar=1`, `?ir=…` o `?vista=1`) va a `/landing/`, la página pública que
+   * vive en `public/landing/` y que Vercel sirve como archivo antes de la
+   * reescritura a `index.html`. Se decide una sola vez, al montar: la sesión
+   * que se cierra dentro de la aplicación no debe expulsar a la portada.
+   * `?plan=` viaja desde los botones «Contratar …» de la portada y se guarda
+   * para abrir la pantalla de planes en cuanto la sesión exista.
+   */
+  const [debeIrALaPortada] = useState(() => {
+    if (session || typeof window === 'undefined') return false;
+    const params = new URLSearchParams(window.location.search);
+    const plan = params.get('plan');
+    if (plan) sessionStorage.setItem(PLAN_ELEGIDO_KEY, plan.toUpperCase());
+    if (params.has('entrar') || params.has('ir') || params.has('vista')) return false;
+    return window.location.pathname === '/';
+  });
+  useEffect(() => {
+    if (debeIrALaPortada) window.location.replace('/landing/index.html');
+  }, [debeIrALaPortada]);
   const currentUserEmail = session?.user.email ?? '';
   /*
    * Quien opera la plataforma se decide por el ROL que impone el servidor,
@@ -284,6 +307,17 @@ export function App() {
    * modulos cubiertos y el contexto, que lo memoriza por identidad.
    */
   const abrirPlan = React.useCallback(() => setIsSubscriptionModalOpen(true), []);
+  /*
+   * El plan elegido en la portada abre la pantalla de planes UNA vez, la
+   * primera vez que hay sesión; la clave se borra para que recargar no la
+   * vuelva a abrir.
+   */
+  useEffect(() => {
+    if (!session) return;
+    if (!sessionStorage.getItem(PLAN_ELEGIDO_KEY)) return;
+    sessionStorage.removeItem(PLAN_ELEGIDO_KEY);
+    setIsSubscriptionModalOpen(true);
+  }, [session]);
   /*
    * EL PLAN DE LA FIRMA, del servidor. Decide dos cosas del cascarón: qué
    * módulos se pintan (una firma ESENCIAL no ve Audiencias, Entrevistas ni
@@ -527,7 +561,12 @@ export function App() {
     if (!session) return;
 
     const irA = (destino: string | null) => {
-      if (destino === 'soporte' || destino === 'borradores') {
+      if (
+        destino === 'soporte' ||
+        destino === 'borradores' ||
+        destino === 'manual' ||
+        destino === 'privacidad'
+      ) {
         setMainView(destino);
       } else if (destino === 'administrar' && esSuperusuario) {
         setIsUserManagementModalOpen(true);
@@ -663,6 +702,7 @@ export function App() {
   };
 
   if (!isAuthenticated) {
+    if (debeIrALaPortada) return null;
     return <LoginPortalView onLoginSuccess={handleLoginSuccess} />;
   }
 
@@ -1070,6 +1110,7 @@ export function App() {
           )}
 
           {mainView === 'audiencias' && (
+            <ModuloBloqueado quePuede="Las actas ya exportadas siguen en sus archivos; las audiencias transcritas vuelven a estar disponibles en cuanto renueve.">
             <TranscriptionView
               kind="AUDIENCIA"
               /*
@@ -1082,6 +1123,7 @@ export function App() {
                 setMainView('workspace');
               }}
             />
+            </ModuloBloqueado>
           )}
           {/*
             EL MODULO QUE MAS GANA EN MOVIL, y lo dice el artboard: «el telefono
@@ -1093,12 +1135,15 @@ export function App() {
           */}
           {mainView === 'entrevistas' && (
             <div className="flex min-h-0 flex-1 lg:hidden">
-              <InterviewMobileView />
+              <ModuloBloqueado quePuede="Las entrevistas ya transcritas se conservan y vuelven a estar disponibles en cuanto renueve.">
+                <InterviewMobileView />
+              </ModuloBloqueado>
             </div>
           )}
 
           {mainView === 'entrevistas' && (
             <div className="hidden min-h-0 flex-1 lg:flex">
+            <ModuloBloqueado quePuede="Las entrevistas ya transcritas se conservan y vuelven a estar disponibles en cuanto renueve.">
             <InterviewView
               onPrivacidad={() => setMainView('privacidad')}
               /*
@@ -1117,6 +1162,7 @@ export function App() {
                 setMainView('workspace');
               }}
             />
+            </ModuloBloqueado>
             </div>
           )}
           {/*

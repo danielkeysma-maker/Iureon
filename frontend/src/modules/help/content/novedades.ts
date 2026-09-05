@@ -36,9 +36,17 @@ export const NOVEDADES_ID = 'novedades';
 export const NOVEDADES: readonly Novedad[] = [
   {
     fecha: '2026-09-05',
+    titulo: 'Página pública de Iureon antes del inicio de sesión',
+    detalle:
+      'Quien llega a la dirección de Iureon sin sesión ve ahora una página que explica los módulos, los planes con su precio y la seguridad de los datos; desde allí se entra a la aplicación o se contrata un plan.',
+    modulo: 'Acceso',
+    tipo: 'nuevo'
+  },
+  {
+    fecha: '2026-09-05',
     titulo: 'Con el plan vencido la aplicación queda en solo lectura',
     detalle:
-      'Todos ven una franja roja arriba; Redacción, Orientación, Buscador, Catálogo y Herramientas se cubren con un aviso, y las listas de borradores, revisiones, audiencias y entrevistas siguen abiertas para leer y exportar, sin botones de crear. Al renovar, todo vuelve en el acto.',
+      'Todos ven una franja roja arriba; Redacción, Orientación, Buscador, Catálogo, Herramientas, Audiencias y Entrevistas se cubren con un aviso, y las listas de borradores y revisiones siguen abiertas para leer y exportar, sin botones de crear. Al renovar, todo vuelve en el acto.',
     modulo: 'Planes',
     tipo: 'mejora'
   },

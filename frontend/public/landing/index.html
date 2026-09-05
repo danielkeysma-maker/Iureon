@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Iureon — Inteligencia jurídica para firmas</title>
+<meta name="description" content="Iureon redacta el primer borrador, revisa el escrito que usted ya hizo, transcribe audiencias separando quién habla y guarda un catálogo de actuaciones con sus términos y su fuente oficial.">
+<meta name="theme-color" content="#14294A">
+<link rel="icon" type="image/svg+xml" href="/brand/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="canonical" href="https://iureon-app.vercel.app/landing/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_CO">
+<meta property="og:site_name" content="Iureon">
+<meta property="og:title" content="Iureon — Inteligencia jurídica para firmas">
+<meta property="og:description" content="El conocimiento procesal, ya verificado. Usted decide. Redacción, revisión de escritos, audiencias, entrevistas, catálogo de actuaciones y herramientas para firmas en Colombia.">
+<meta property="og:url" content="https://iureon-app.vercel.app/landing/">
+<meta property="og:image" content="https://iureon-app.vercel.app/pwa/icon-512.png">
+<meta property="og:image:width" content="512">
+<meta property="og:image:height" content="512">
+<meta name="twitter:card" content="summary">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+/* ── Tokens (SPEC.md) ─────────────────────────────────────────────────── */
+:root{
+  --navy:#14294A; --navy-900:#0e1f3a; --halo:#1f4372; --halo-2:#24508a;
+  --action:#17456B;
+  --gold:#C8A046; --gold-hover:#d6b05a; --gold-text:#7a5f1c;
+  --cream:#F4F1EA; --page:#F7F8FA; --white:#fff;
+  --ink:#101822; --ink-2:#4a5563; --ink-off:#98a1ac;
+  --line:rgba(16,24,34,.08); --line-strong:rgba(16,24,34,.12);
+  --line-dark:rgba(244,241,234,.12); --line-dark-2:rgba(244,241,234,.25);
+  --ok-bg:#E6F4EA; --ok-text:#1E6B3A; --ok-line:#2E8B57;
+  --nc-bg:#E7EEF5; --nc-text:#17456B;
+  --sv-bg:#FDF3DC; --sv-text:#7A4E00; --sv-line:#C8850A; --sv-surf:#FFFBF2;
+  --ui:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --serif:'Source Serif 4',Georgia,'Times New Roman',serif;
+  --shadow-card:0 24px 48px -24px rgba(20,41,74,.25);
+  --gutter:64px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--page);color:var(--ink);font-family:var(--ui);font-size:16px;line-height:1.5;overflow-x:hidden}
+img,svg{display:block;max-width:100%}
+a{color:var(--action)}
+a:hover{color:var(--navy)}
+h1,h2,h3{margin:0;font-weight:800;letter-spacing:-.03em}
+p{margin:0}
+button{font:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:6px}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.skip{position:absolute;left:16px;top:-60px;z-index:200;padding:10px 16px;border-radius:999px;background:var(--gold);color:var(--navy);font-weight:700;text-decoration:none}
+.skip:focus{top:16px}
+.contenedor{padding-left:var(--gutter);padding-right:var(--gutter)}
+.kicker{font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--gold);margin-bottom:12px;text-transform:uppercase}
+.kicker--oro{color:var(--gold-text)}
+h2{font-size:40px;line-height:1.1}
+.serif{font-family:var(--serif)}
+
+/* ── Botones ─────────────────────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:48px;padding:0 24px;border-radius:999px;font-size:15px;font-weight:700;text-decoration:none;transition:background .2s,color .2s,border-color .2s,transform .2s,box-shadow .2s;cursor:pointer;border:1px solid transparent;white-space:nowrap}
+.btn:hover{transform:translateY(-1px)}
+.btn--oro{background:var(--gold);color:var(--navy);box-shadow:0 8px 24px -8px rgba(200,160,70,.6)}
+.btn--oro:hover{background:var(--gold-hover);color:var(--navy)}
+.btn--fantasma{border-color:var(--line-dark-2);color:var(--cream);font-weight:600}
+.btn--fantasma:hover{background:rgba(244,241,234,.08);color:var(--cream)}
+.btn--crema{background:var(--cream);color:var(--navy)}
+.btn--crema:hover{background:#fff;color:var(--navy)}
+.btn--primario{background:var(--action);color:#fff}
+.btn--primario:hover{background:var(--navy);color:#fff}
+.btn--secundario{border:1.5px solid var(--action);color:var(--action)}
+.btn--secundario:hover{background:var(--action);color:#fff}
+.btn--sm{height:40px;padding:0 18px;font-size:14px}
+.btn--lg{height:50px;padding:0 28px}
+
+/* ── Nav (píldora de la Dirección B) ─────────────────────────────────── */
+.nav{position:fixed;top:16px;left:var(--gutter);right:var(--gutter);z-index:100;display:flex;align-items:center;justify-content:space-between;height:76px;padding:0 8px 0 18px;border:1px solid var(--line-dark);border-radius:999px;background:rgba(14,31,58,.55);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);color:var(--cream);transition:background .25s,box-shadow .25s}
+.nav.is-scrolled{background:rgba(14,31,58,.9);box-shadow:0 12px 32px -16px rgba(0,0,0,.45)}
+.marca{display:inline-flex;align-items:center;gap:10px;color:inherit;text-decoration:none}
+.marca svg{width:32px;height:32px}
+.marca img{height:22px;width:auto}
+.nav__links{display:flex;gap:6px;font-size:14px;font-weight:500}
+.nav__links a{padding:9px 14px;border-radius:999px;color:rgba(244,241,234,.8);text-decoration:none;transition:background .2s,color .2s}
+.nav__links a:hover{background:rgba(244,241,234,.1);color:var(--cream)}
+.nav__acciones{display:flex;gap:8px;align-items:center}
+.nav__acciones .btn--fantasma{border-color:transparent}
+.hamburguesa{display:none;width:44px;height:44px;border:0;background:transparent;border-radius:999px;place-items:center;cursor:pointer;color:var(--cream)}
+.hamburguesa span{display:block;width:20px;height:2px;background:currentColor;margin:5px auto;transition:transform .2s,opacity .2s}
+.hamburguesa[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.hamburguesa[aria-expanded="true"] span:nth-child(2){opacity:0}
+.hamburguesa[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.menu{position:fixed;top:84px;left:16px;right:16px;z-index:99;padding:16px;border-radius:20px;background:var(--navy-900);border:1px solid var(--line-dark);box-shadow:0 24px 48px -16px rgba(0,0,0,.5);color:var(--cream)}
+.menu[hidden]{display:none}
+.menu nav{display:grid}
+.menu nav a{padding:14px 12px;border-radius:12px;color:var(--cream);text-decoration:none;font-weight:600;font-size:16px;min-height:48px;display:flex;align-items:center}
+.menu nav a:hover{background:rgba(244,241,234,.08)}
+.menu__acciones{display:grid;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line-dark)}
+.menu__acciones .btn{width:100%}
+
+/* ── Hero (Dirección A) ──────────────────────────────────────────────── */
+.hero{position:relative;background:var(--navy);background-image:radial-gradient(1100px 600px at 78% 10%,var(--halo) 0%,rgba(31,67,114,0) 60%),radial-gradient(700px 500px at 5% 100%,#0b1a33 0%,rgba(11,26,51,0) 60%);color:var(--cream);overflow:hidden}
+.hero__grid{display:grid;grid-template-columns:520px 1fr;gap:56px;align-items:center;padding:172px var(--gutter) 104px}
+.hero__pastilla{display:inline-flex;align-items:center;gap:8px;padding:6px 12px 6px 8px;border-radius:999px;border:1px solid rgba(200,160,70,.35);font-size:12px;font-weight:600;color:var(--gold);margin-bottom:28px}
+.hero__pastilla i{width:6px;height:6px;border-radius:50%;background:var(--gold)}
+.hero h1{font-size:58px;line-height:1.04;letter-spacing:-.035em;margin-bottom:24px;text-wrap:balance}
+.hero h1 em{font-style:normal;color:var(--gold)}
+.hero__lead{font-size:17px;line-height:1.6;color:rgba(244,241,234,.78);margin-bottom:36px;text-wrap:pretty}
+.hero__cta{display:flex;gap:12px;flex-wrap:wrap}
+.escena{position:relative;perspective:1600px}
+.escena__halo{position:absolute;inset:-30px -10px;background:radial-gradient(closest-side,rgba(200,160,70,.18),rgba(200,160,70,0));filter:blur(20px)}
+.app{position:relative;display:flex;height:400px;border-radius:14px;overflow:hidden;background:var(--page);border:1px solid rgba(244,241,234,.14);box-shadow:0 40px 80px -30px rgba(0,0,0,.6);transform:rotateY(-7deg) rotateX(3deg);transition:transform .5s}
+.escena:hover .app{transform:rotateY(0) rotateX(0)}
+.app__menu{width:150px;background:var(--navy);padding:16px 12px;display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:rgba(244,241,234,.7)}
+.app__logo{display:flex;align-items:center;gap:6px;margin:0 4px 14px;font-weight:700;font-size:13px;color:var(--cream)}
+.app__logo svg{width:18px;height:18px}
+.app__menu div{padding:7px 8px}
+.app__menu .on{border-radius:7px;background:rgba(244,241,234,.12);color:var(--cream);font-weight:600}
+.app__saldo{margin-top:auto;font-size:10px;color:rgba(244,241,234,.45)}
+.app__cuerpo{flex:1;padding:22px 26px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.app__barra{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11px;color:#5b6675}
+.app__barra > span:last-child{display:inline-flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.pill{padding:3px 8px;border-radius:999px;font-weight:600;white-space:nowrap}
+.pill--ok{background:var(--ok-bg);color:var(--ok-text)}
+.pill--sv{background:var(--sv-bg);color:var(--sv-text);border:1px dashed var(--sv-line)}
+.papel{flex:1;background:#fff;border:1px solid var(--line);border-radius:8px;padding:26px 30px;font-family:var(--serif);font-size:12.5px;line-height:1.75;color:var(--ink);box-shadow:0 1px 2px rgba(16,24,34,.05);overflow:hidden}
+.papel__titulo{text-align:center;font-weight:600;letter-spacing:.06em;font-size:11px;margin-bottom:14px}
+.papel p{margin:0 0 10px}
+.papel p:last-child{margin:0}
+.marca-sv{background:var(--sv-bg);border-bottom:2px dashed var(--sv-line);padding:0 3px}
+.marca-ok{background:var(--ok-bg);border-bottom:2px solid var(--ok-line);padding:0 3px}
+.etiqueta{display:inline-block;vertical-align:middle;font-family:var(--ui);font-size:9.5px;font-weight:700;border-radius:999px;padding:1px 7px;margin-left:2px;white-space:nowrap}
+.etiqueta--sv{color:var(--sv-text);background:var(--sv-bg);border:1px dashed var(--sv-line)}
+.etiqueta--ok{color:var(--ok-text);background:var(--ok-bg)}
+
+/* ── Cifras en cinta (Dirección B) ───────────────────────────────────── */
+.cinta{background:#fff;border-bottom:1px solid var(--line);padding:28px var(--gutter)}
+.cinta__fila{display:flex;align-items:center;justify-content:space-between;gap:24px;font-size:14px;color:var(--ink-2)}
+.cifra{display:flex;align-items:baseline;gap:10px}
+.cifra b{font-size:28px;font-weight:800;letter-spacing:-.03em;color:var(--navy)}
+.cifra--larga{max-width:420px}
+.cifra--larga span{line-height:1.35}
+.cinta__sep{width:1px;height:28px;background:var(--gold);opacity:.6;flex:none}
+.cinta__iva{display:flex;align-items:center;gap:8px;font-weight:600;color:var(--navy);white-space:nowrap}
+.cinta__iva i{width:8px;height:8px;border-radius:50%;background:var(--gold)}
+
+/* ── Qué hace: bento (Dirección B) ───────────────────────────────────── */
+.que-hace{padding:96px var(--gutter)}
+.que-hace__cab{display:flex;justify-content:space-between;align-items:end;gap:40px;margin-bottom:40px}
+.que-hace__cab h2{max-width:640px}
+.que-hace__cab p{max-width:360px;font-size:15px;line-height:1.55;color:var(--ink-2)}
+.bento{display:grid;grid-template-columns:repeat(6,1fr);grid-auto-rows:minmax(200px,auto);gap:16px}
+.celda{position:relative;overflow:hidden;background:#fff;border:1px solid var(--line);border-radius:20px;padding:32px;display:flex;flex-direction:column;justify-content:space-between;gap:20px;transition:transform .25s,box-shadow .25s,border-color .25s}
+.celda:hover{transform:translateY(-4px);box-shadow:var(--shadow-card);border-color:rgba(200,160,70,.45)}
+.celda h3{font-size:24px;font-weight:700;letter-spacing:-.02em;margin-bottom:8px}
+.celda p{font-size:15px;line-height:1.6;color:var(--ink-2)}
+.celda svg{width:26px;height:26px;flex:none}
+.celda--3{grid-column:span 3}
+.celda--2{grid-column:span 2;padding:28px}
+.celda--2 h3{font-size:19px}
+.celda--2 p{font-size:14px;line-height:1.55}
+.celda--2 svg{width:24px;height:24px}
+.celda--6{grid-column:span 6;display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center}
+.celda--navy{background:var(--navy);color:var(--cream);border-color:transparent}
+.celda--navy p{color:rgba(244,241,234,.75);max-width:440px}
+.celda--navy::before,.celda--navy::after{content:"";position:absolute;border-radius:50%;border:1px solid rgba(200,160,70,.35);pointer-events:none}
+.celda--navy::before{right:-40px;top:-40px;width:200px;height:200px}
+.celda--navy::after{right:-10px;top:-10px;width:120px;height:120px;border-color:rgba(200,160,70,.25)}
+.celda--crema{background:var(--cream);border-color:rgba(200,160,70,.3)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:9px 14px;border-radius:999px;border:1px solid var(--line-strong);font-size:13px;font-weight:600}
+.chip--oro{background:var(--cream);color:var(--gold-text);border-color:transparent;font-weight:700}
+
+/* ── Tres motores ────────────────────────────────────────────────────── */
+.motores{background:var(--cream);border-top:1px solid rgba(200,160,70,.25);border-bottom:1px solid rgba(200,160,70,.25);padding:96px var(--gutter)}
+.motores__cab{display:grid;grid-template-columns:1fr 1fr;gap:64px;margin-bottom:48px;align-items:start}
+.motores__cab h2{line-height:1.08;letter-spacing:-.035em}
+.motores__cab p{font-size:15.5px;line-height:1.6;color:var(--ink-2);text-wrap:pretty}
+.cadena{display:grid;grid-template-columns:1fr 40px 1fr 40px 1fr;gap:12px;align-items:center}
+.motor{position:relative;background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:18px;padding:28px;transition:transform .25s,box-shadow .25s,border-color .25s}
+.motor:hover{transform:translateY(-4px);box-shadow:var(--shadow-card);border-color:rgba(200,160,70,.45)}
+.motor__cab{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
+.motor__n{width:32px;height:32px;border-radius:50%;background:var(--cream);color:var(--gold-text);display:grid;place-items:center;font-weight:800;font-size:13px}
+.motor h3{font-size:20px;font-weight:700;letter-spacing:-.02em;margin-bottom:6px}
+.motor h3 span{color:var(--gold-text);font-weight:500}
+.motor p{font-size:14px;line-height:1.55;color:var(--ink-2)}
+.motor--navy{background:var(--navy);color:var(--cream);border-color:rgba(200,160,70,.4)}
+.motor--navy .motor__n{background:var(--gold);color:var(--navy)}
+.motor--navy h3 span{color:var(--gold)}
+.motor--navy p{color:rgba(244,241,234,.75)}
+.flecha{display:grid;place-items:center;color:var(--gold)}
+.motores__pie{display:flex;justify-content:space-between;align-items:center;gap:32px;margin-top:32px;padding-top:20px;border-top:1px solid rgba(200,160,70,.3);font-size:13.5px;line-height:1.55;color:var(--ink-2)}
+.motores__pie span:first-child{max-width:560px}
+.motores__pie span:last-child{max-width:520px;text-align:right}
+.motores__pie b{color:var(--ink)}
+
+/* ── Tres estados ────────────────────────────────────────────────────── */
+.estados{background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:96px var(--gutter)}
+.estados__grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.estados h2{margin-bottom:20px}
+.cita{font-family:var(--serif);font-size:22px;line-height:1.5;color:var(--navy);text-wrap:pretty}
+.estados__lista{display:flex;flex-direction:column;gap:14px}
+.estado{display:flex;gap:18px;align-items:flex-start;padding:22px 24px;border-radius:14px;border:1px solid var(--line);background:var(--page);transition:transform .25s,box-shadow .25s}
+.estado:hover{transform:translateY(-4px);box-shadow:var(--shadow-card)}
+.estado--sv{border:1px dashed var(--sv-line);background:var(--sv-surf)}
+.chip-estado{flex:none;margin-top:2px;padding:5px 12px;border-radius:999px;font-size:12.5px;font-weight:700}
+.chip-estado--ok{background:var(--ok-bg);color:var(--ok-text)}
+.chip-estado--nc{background:var(--nc-bg);color:var(--nc-text)}
+.chip-estado--sv{background:var(--sv-bg);color:var(--sv-text);border:1px dashed var(--sv-line)}
+.estado strong{display:block;font-weight:700;font-size:15px;margin-bottom:4px}
+.estado span{font-size:14px;line-height:1.55;color:var(--ink-2)}
+
+/* ── Planes ──────────────────────────────────────────────────────────── */
+.planes{padding:96px var(--gutter)}
+.planes__cab{text-align:center;max-width:640px;margin:0 auto 40px}
+.planes__cab h2{margin-bottom:14px}
+.conmutador{display:flex;justify-content:center;align-items:center;gap:12px;margin-bottom:44px;flex-wrap:wrap}
+.segs{display:inline-flex;padding:4px;border-radius:999px;background:#fff;border:1px solid rgba(16,24,34,.1)}
+.seg{height:40px;padding:0 18px;border-radius:999px;border:none;font:700 14px var(--ui);cursor:pointer;background:transparent;color:var(--ink-2);transition:background .2s,color .2s}
+.seg.on{background:var(--navy);color:var(--cream)}
+.ahorro{padding:5px 10px;border-radius:999px;background:var(--sv-bg);color:var(--sv-text);font-size:12px;font-weight:700}
+.planes__grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;align-items:end}
+.plan{position:relative;background:#fff;border:1px solid var(--line);border-radius:20px;padding:32px;transition:transform .25s,box-shadow .25s,border-color .25s}
+.plan:hover{transform:translateY(-4px);box-shadow:var(--shadow-card);border-color:rgba(200,160,70,.45)}
+.plan__nombre{font-size:14px;font-weight:700;color:var(--ink-2)}
+.plan__precio{display:flex;align-items:baseline;gap:4px;margin:12px 0 4px}
+.plan__precio b{font-size:40px;font-weight:800;letter-spacing:-.03em}
+.plan__precio span{font-size:15px;color:var(--ink-2)}
+.plan__usuarios{font-size:14px;color:var(--ink-2);margin-bottom:24px}
+.plan .btn{width:100%;height:46px;font-size:14.5px;margin-bottom:24px}
+.plan ul{list-style:none;margin:0;padding:0;display:grid;gap:10px;font-size:14px;line-height:1.4}
+.plan li.no{color:var(--ink-off);text-decoration:line-through}
+.plan li.cab{font-weight:600}
+.plan--premium{border:1.5px solid var(--gold);padding:40px 32px;box-shadow:0 32px 64px -32px rgba(20,41,74,.35)}
+.plan--premium:hover{border-color:var(--gold)}
+.plan--premium .plan__nombre{color:var(--navy)}
+.plan--premium .plan__precio b{font-size:44px;color:var(--navy)}
+.plan--premium .btn{height:48px;font-size:15px}
+.recomendado{position:absolute;top:-14px;left:50%;transform:translateX(-50%);padding:6px 14px;border-radius:999px;background:var(--navy);color:var(--gold);font-size:12px;font-weight:700;letter-spacing:.04em;white-space:nowrap}
+.planes__nota{margin:32px auto 0;max-width:900px;text-align:center;font-size:13.5px;line-height:1.6;color:var(--ink-2);text-wrap:pretty}
+
+/* ── Seguridad + Cómo empieza ────────────────────────────────────────── */
+.dos{background:#fff;border-top:1px solid var(--line);padding:96px var(--gutter)}
+.dos__grid{display:grid;grid-template-columns:1fr 1fr;gap:80px}
+.dos h2{font-size:34px;line-height:1.12;margin-bottom:32px}
+.puntos{display:grid}
+.punto{display:flex;gap:16px;padding:20px 0;border-top:1px solid var(--line)}
+.punto:last-child{border-bottom:1px solid var(--line)}
+.punto i{flex:none;width:8px;height:8px;border-radius:50%;background:var(--gold);margin-top:8px}
+.punto p{font-size:15.5px;line-height:1.55}
+.pasos{display:grid;gap:14px}
+.paso{display:flex;gap:18px;align-items:flex-start;padding:20px 22px;border-radius:14px;background:var(--page);border:1px solid rgba(16,24,34,.06)}
+.paso b{flex:none;width:32px;height:32px;border-radius:50%;background:var(--navy);color:var(--gold);display:grid;place-items:center;font-weight:800;font-size:14px}
+.paso p{font-size:15px;line-height:1.55;padding-top:5px}
+.prueba{margin-top:20px;font-size:14px;color:var(--ink-2);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.prueba b{padding:4px 10px;border-radius:999px;background:var(--cream);color:var(--gold-text);font-weight:700;font-size:12px}
+
+/* ── Se instala como app ─────────────────────────────────────────────── */
+.instala{padding:96px var(--gutter);background:var(--page)}
+.instala__caja{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:24px;padding:56px 64px;overflow:hidden}
+.instala h2{font-size:34px;line-height:1.12;margin-bottom:16px}
+.instala p{font-size:16px;line-height:1.6;color:var(--ink-2);text-wrap:pretty}
+.dispositivos{position:relative;height:280px}
+.pc{position:absolute;right:0;top:20px;width:360px;max-width:100%;height:240px;border-radius:12px;background:var(--page);border:1px solid rgba(16,24,34,.1);box-shadow:0 24px 48px -24px rgba(20,41,74,.3);display:flex;overflow:hidden}
+.pc__menu{width:90px;background:var(--navy);padding:14px 10px;display:grid;gap:8px;align-content:start}
+.pc__menu i{height:8px;border-radius:4px;background:rgba(244,241,234,.2)}
+.pc__menu i:first-child{background:rgba(244,241,234,.5)}
+.pc__cuerpo{flex:1;padding:16px}
+.pc__titulo{height:10px;width:60%;border-radius:4px;background:rgba(16,24,34,.12);margin-bottom:12px}
+.pc__hoja{background:#fff;border:1px solid var(--line);border-radius:6px;height:150px}
+.telefono{position:absolute;left:10px;bottom:0;width:130px;height:260px;border-radius:24px;background:var(--ink);padding:8px;box-shadow:0 24px 48px -24px rgba(0,0,0,.5)}
+.telefono__pantalla{height:100%;border-radius:18px;background:var(--page);overflow:hidden;display:flex;flex-direction:column}
+.telefono__barra{height:44px;background:var(--navy)}
+.telefono__avisos{padding:10px;display:grid;gap:8px}
+.telefono__linea{height:8px;width:70%;border-radius:4px;background:rgba(16,24,34,.15)}
+.aviso{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px;font-size:9px;line-height:1.4;color:var(--ink)}
+
+/* ── CTA final + pie ─────────────────────────────────────────────────── */
+.cta{background:var(--navy);background-image:radial-gradient(800px 400px at 50% 120%,var(--halo) 0%,rgba(31,67,114,0) 70%);color:var(--cream);text-align:center;padding:104px var(--gutter) 96px}
+.cta h2{font-size:52px;line-height:1.05;letter-spacing:-.035em;margin-bottom:32px}
+.cta__botones{display:flex;justify-content:center;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+.cta__soporte{font-size:14px;color:rgba(244,241,234,.7);text-decoration:underline;text-underline-offset:4px}
+.cta__soporte:hover{color:var(--cream)}
+.pie{background:var(--navy-900);color:rgba(244,241,234,.65);padding:40px var(--gutter);display:flex;justify-content:space-between;align-items:flex-start;gap:40px;font-size:13px;line-height:1.6}
+.pie .marca{margin-bottom:8px;color:var(--cream)}
+.pie .marca svg{width:24px;height:24px}
+.pie .marca img{height:18px}
+.pie__links{display:flex;gap:28px;flex-wrap:wrap}
+.pie__links a{color:inherit;text-decoration:none}
+.pie__links a:hover{color:var(--cream)}
+.pie__nota{max-width:360px;text-align:right}
+
+/* ── Aparición al hacer scroll ───────────────────────────────────────── */
+.js .reveal{opacity:0;transform:translateY(16px);transition:opacity .4s ease,transform .4s ease}
+.js .reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  .js .reveal{opacity:1;transform:none;transition:none}
+  .btn,.celda,.motor,.estado,.plan,.app,.seg,.nav{transition:none}
+  .btn:hover,.celda:hover,.motor:hover,.estado:hover,.plan:hover{transform:none}
+}
+
+/* ── Tablet ──────────────────────────────────────────────────────────── */
+@media (max-width:1100px){
+  :root{--gutter:32px}
+  .hero__grid{grid-template-columns:1fr 1fr;gap:40px}
+  .hero h1{font-size:48px}
+  .cinta__fila{flex-wrap:wrap;justify-content:flex-start}
+  .cinta__sep{display:none}
+  .celda--3{grid-column:span 6}
+  .celda--2{grid-column:span 3}
+  .dos__grid{gap:48px}
+}
+
+/* ── Móvil (artboard 375) ────────────────────────────────────────────── */
+@media (max-width:768px){
+  :root{--gutter:20px}
+  body{font-size:15px}
+  h2{font-size:28px;line-height:1.12}
+  .kicker{font-size:11px;margin-bottom:10px}
+  .nav{top:8px;left:12px;right:12px;height:60px;padding:0 6px 0 14px}
+  .nav__links{display:none}
+  .nav__acciones .btn--fantasma{display:none}
+  .nav__acciones .btn{height:44px;padding:0 14px;font-size:13px}
+  .hamburguesa{display:grid}
+  .menu{top:76px;left:12px;right:12px}
+  .hero{background-image:radial-gradient(500px 400px at 90% 0%,var(--halo) 0%,rgba(31,67,114,0) 60%)}
+  .hero__grid{grid-template-columns:1fr;gap:0;padding:96px var(--gutter) 40px}
+  .hero__pastilla{margin-bottom:20px}
+  .hero h1{font-size:36px;line-height:1.06;letter-spacing:-.03em;margin-bottom:16px}
+  .hero__lead{font-size:15px;margin-bottom:24px}
+  .hero__cta{display:grid;gap:10px}
+  .hero__cta .btn{width:100%;height:48px}
+  .escena{margin-top:32px;perspective:none}
+  .escena__halo{display:none}
+  .app{height:230px;border-radius:12px;transform:none}
+  .app__menu{width:92px;padding:12px 8px;font-size:10px}
+  .app__logo{display:none}
+  .app__menu div{padding:6px}
+  .app__saldo{display:none}
+  .app__cuerpo{padding:12px}
+  .app__barra{display:none}
+  .papel{padding:14px;font-size:10px;line-height:1.7;border-radius:6px}
+  .papel__titulo{display:none}
+  .papel p{margin:0 0 8px}
+  .etiqueta{font-size:8px;padding:0 6px}
+  .cinta{padding:22px var(--gutter)}
+  .cinta__fila{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .cifra{display:block}
+  .cifra b{display:block;font-size:30px}
+  .cifra span{font-size:12.5px;line-height:1.4}
+  .cifra--larga{grid-column:span 2;max-width:none}
+  .cinta__iva{grid-column:span 2;white-space:normal}
+  .que-hace,.motores,.estados,.planes,.dos,.instala{padding:56px var(--gutter)}
+  .que-hace__cab{display:block;margin-bottom:24px}
+  .que-hace__cab p{margin-top:12px;max-width:none}
+  .bento{grid-template-columns:1fr 1fr;grid-auto-rows:auto;gap:12px}
+  .celda{padding:24px;border-radius:16px;gap:14px}
+  .celda h3{font-size:20px;margin-bottom:6px}
+  .celda p{font-size:14px;line-height:1.55}
+  .celda--3,.celda--6{grid-column:span 2}
+  .celda--2{grid-column:span 1;padding:18px}
+  .celda--2 h3{font-size:16px}
+  .celda--2 p{font-size:13px;line-height:1.5}
+  .celda--2 svg{display:none}
+  .celda--crema{grid-column:span 2}
+  .celda--6{display:flex}
+  .chip{padding:7px 11px;font-size:12px}
+  .motores__cab{display:block;margin-bottom:24px}
+  .motores__cab h2{margin-bottom:14px}
+  .motores__cab p{font-size:14px}
+  .cadena{grid-template-columns:1fr;gap:4px}
+  .flecha{height:24px}
+  .flecha svg{transform:rotate(90deg)}
+  .motores__pie{display:block;margin-top:20px;padding-top:14px;font-size:13px}
+  .motores__pie span{display:block;max-width:none}
+  .motores__pie span:last-child{text-align:left;margin-top:10px;font-size:12.5px}
+  .estados__grid{grid-template-columns:1fr;gap:24px}
+  .estados h2{margin-bottom:16px}
+  .cita{font-size:18px}
+  .estados__lista{gap:10px}
+  .estado{display:block;padding:16px;border-radius:12px}
+  .chip-estado{display:inline-block;margin:0 0 8px;font-size:12px;padding:4px 10px}
+  .estado strong{display:none}
+  .estado span{font-size:13.5px}
+  .planes__cab{text-align:left;margin-bottom:20px}
+  .conmutador{justify-content:flex-start;gap:10px;margin-bottom:24px}
+  .ahorro{font-size:11.5px}
+  .planes__grid{grid-template-columns:1fr;gap:14px;align-items:stretch}
+  .plan{padding:24px 22px;border-radius:18px}
+  .plan--premium{order:-1;padding:32px 22px 24px}
+  .recomendado{left:22px;transform:none;top:-13px;font-size:11.5px;padding:5px 12px}
+  .plan__precio{margin:8px 0 2px}
+  .plan__precio b{font-size:32px}
+  .plan--premium .plan__precio b{font-size:36px}
+  .plan__usuarios{margin-bottom:18px}
+  .plan .btn{margin-bottom:18px;height:48px}
+  .plan ul{gap:8px}
+  .planes__nota{margin-top:20px;text-align:left;font-size:12.5px}
+  .dos__grid{grid-template-columns:1fr;gap:48px}
+  .dos h2{font-size:26px;margin-bottom:16px}
+  .punto{gap:12px;padding:14px 0}
+  .punto p{font-size:14.5px}
+  .pasos{gap:10px}
+  .paso{gap:14px;padding:16px;border-radius:12px}
+  .paso b{width:30px;height:30px;font-size:13px}
+  .paso p{font-size:14.5px;padding-top:4px}
+  .prueba{font-size:13.5px}
+  .instala__caja{grid-template-columns:1fr;gap:24px;padding:28px 22px;border-radius:20px}
+  .instala h2{font-size:26px;margin-bottom:12px}
+  .instala p{font-size:14.5px}
+  .dispositivos{height:auto;display:flex;gap:12px;align-items:flex-end;justify-content:center}
+  .telefono{position:static;width:96px;height:190px;border-radius:20px;padding:6px}
+  .telefono__pantalla{border-radius:15px}
+  .telefono__barra{height:32px}
+  .telefono__avisos{padding:8px;gap:6px}
+  .telefono__linea{display:none}
+  .aviso{font-size:7.5px;padding:6px;border-radius:6px}
+  .aviso small{display:none}
+  .pc{position:static;width:200px;height:140px;border-radius:10px;box-shadow:none}
+  .pc__menu{width:52px;padding:0}
+  .pc__menu i{display:none}
+  .pc__cuerpo{padding:10px}
+  .pc__titulo{display:none}
+  .pc__hoja{height:100%;border-radius:5px}
+  .cta{padding:64px var(--gutter) 56px}
+  .cta h2{font-size:36px;margin-bottom:24px}
+  .cta__botones{display:grid;gap:10px;margin-bottom:20px}
+  .cta__botones .btn{width:100%;height:50px}
+  .pie{display:grid;gap:16px;padding:32px var(--gutter)}
+  .pie__links{gap:16px}
+  .pie__nota{max-width:none;text-align:left}
+}
+@media (max-width:380px){
+  .cinta__fila{grid-template-columns:1fr}
+  .cifra--larga,.cinta__iva{grid-column:span 1}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#contenido">Ir al contenido</a>
+
+<header class="nav" id="nav">
+  <a class="marca" href="#top" aria-label="Iureon, inicio">
+    <svg viewBox="0 0 64 64" aria-hidden="true"><g fill="none" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M39 57C39 48 25 44 25 34C25 27 30 23 32 21" stroke="#C8A046"/><path d="M25 57C25 48 39 44 39 34C39 27 34 23 32 21" stroke="#F4F1EA"/></g><path d="M32 6L40 19H24Z" fill="#F4F1EA"/></svg>
+    <img src="/brand/wordmark-dark.svg" alt="Iureon" width="208" height="56">
+  </a>
+  <nav class="nav__links" aria-label="Secciones">
+    <a href="#que-hace">Qué hace</a>
+    <a href="#planes">Planes</a>
+    <a href="#seguridad">Seguridad</a>
+    <a href="/?entrar=1&amp;ir=manual">Manual</a>
+  </nav>
+  <div class="nav__acciones">
+    <a class="btn btn--fantasma btn--sm" href="/?entrar=1">Iniciar sesión</a>
+    <a class="btn btn--oro btn--sm" href="#planes">Contratar</a>
+    <button class="hamburguesa" type="button" aria-controls="menu" aria-expanded="false" aria-label="Abrir el menú"><span></span><span></span><span></span></button>
+  </div>
+</header>
+<div class="menu" id="menu" hidden>
+  <nav aria-label="Secciones">
+    <a href="#que-hace">Qué hace</a>
+    <a href="#motores">Tres motores</a>
+    <a href="#planes">Planes</a>
+    <a href="#seguridad">Seguridad</a>
+    <a href="/?entrar=1&amp;ir=manual">Manual</a>
+  </nav>
+  <div class="menu__acciones">
+    <a class="btn btn--crema" href="/?entrar=1">Iniciar sesión</a>
+    <a class="btn btn--oro" href="#planes">Ver planes</a>
+  </div>
+</div>
+
+<main id="contenido">
+<span id="top"></span>
+
+<!-- ── Hero ─────────────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero__grid">
+    <div>
+      <div class="hero__pastilla"><i aria-hidden="true"></i>Inteligencia jurídica para firmas en Colombia</div>
+      <h1>El conocimiento procesal, ya verificado. <em>Usted decide.</em></h1>
+      <p class="hero__lead">Iureon redacta el primer borrador, revisa el escrito que usted ya hizo, transcribe audiencias separando quién habla y guarda un catálogo de actuaciones con sus términos y su fuente oficial. Lo que no está verificado, la pantalla lo dice.</p>
+      <div class="hero__cta">
+        <a class="btn btn--oro" href="#planes">Ver planes</a>
+        <a class="btn btn--fantasma" href="/?entrar=1">Iniciar sesión</a>
+      </div>
+    </div>
+    <div class="escena" aria-hidden="true">
+      <div class="escena__halo"></div>
+      <div class="app">
+        <div class="app__menu">
+          <div class="app__logo"><svg viewBox="0 0 64 64"><g fill="none" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><path d="M39 57C39 48 25 44 25 34C25 27 30 23 32 21" stroke="#C8A046"/><path d="M25 57C25 48 39 44 39 34C39 27 34 23 32 21" stroke="#F4F1EA"/></g><path d="M32 6L40 19H24Z" fill="#F4F1EA"/></svg>Iureon</div>
+          <div class="on">Redacción</div>
+          <div>Revisión</div>
+          <div>Audiencias</div>
+          <div>Entrevistas</div>
+          <div>Catálogo</div>
+          <div>Orientación</div>
+          <div>Herramientas</div>
+          <div class="app__saldo">Saldo · $46.000</div>
+        </div>
+        <div class="app__cuerpo">
+          <div class="app__barra">
+            <span>Borrador · Acción de tutela</span>
+            <span><span class="pill pill--ok">3 verificados</span><span class="pill pill--sv">1 sin verificar</span></span>
+          </div>
+          <div class="papel">
+            <div class="papel__titulo">ACCIÓN DE TUTELA</div>
+            <p>Señor Juez: con fundamento en el artículo 86 de la Constitución Política y el Decreto 2591 de 1991, interpongo acción de tutela contra la EPS accionada por la vulneración del derecho fundamental a la salud.</p>
+            <p>La presente acción se presenta dentro del término <span class="marca-sv">de seis meses desde el hecho vulnerador</span> <span class="etiqueta etiqueta--sv">Término sin verificar</span></p>
+            <p>El juez deberá resolver <span class="marca-ok">dentro de los diez días siguientes a la solicitud</span> <span class="etiqueta etiqueta--ok">Verificado · art. 86</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Cifras en cinta ──────────────────────────────────────────────── -->
+<section class="cinta" aria-label="Cifras">
+  <div class="cinta__fila">
+    <div class="cifra"><b>858</b><span>actuaciones verificadas contra el texto oficial</span></div>
+    <span class="cinta__sep" aria-hidden="true"></span>
+    <div class="cifra"><b>28</b><span>ramas del derecho</span></div>
+    <span class="cinta__sep" aria-hidden="true"></span>
+    <div class="cifra cifra--larga"><b>4</b><span>registros en vivo: Corte Constitucional, Corte Suprema, Consejo de Estado y Comisión Nacional de Disciplina Judicial</span></div>
+    <span class="cinta__sep" aria-hidden="true"></span>
+    <div class="cinta__iva"><i aria-hidden="true"></i>Precios con IVA incluido</div>
+  </div>
+</section>
+
+<!-- ── Qué hace: bento ──────────────────────────────────────────────── -->
+<section class="que-hace" id="que-hace">
+  <div class="que-hace__cab">
+    <div>
+      <div class="kicker">Qué hace</div>
+      <h2>Seis módulos, una sola regla: cada término con su artículo.</h2>
+    </div>
+    <p>Nada se radica desde Iureon y nada reemplaza al abogado: la plataforma guarda el conocimiento procesal verificado y usted decide.</p>
+  </div>
+  <div class="bento">
+    <article class="celda celda--3 celda--navy reveal">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#C8A046" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="12" y2="16"/></svg>
+      <div><h3>Redacción</h3><p>Un borrador completo desde los hechos, con la estructura de la actuación elegida del catálogo y cada término con su artículo.</p></div>
+    </article>
+    <article class="celda celda--3 reveal">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#14294A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><polyline points="8 12 11 15 16 9"/></svg>
+      <div><h3>Revisión de escritos</h3><p>Suba su tutela, demanda o recurso y reciba un informe con lo que la norma exige, lo que falla y la corrección textual; luego un taller para corregirlo con una guía al lado, con resaltador, comentarios y versiones.</p></div>
+    </article>
+    <article class="celda celda--2 reveal">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#14294A" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="10" x2="4" y2="14"/><line x1="8" y1="6" x2="8" y2="18"/><line x1="12" y1="9" x2="12" y2="15"/><line x1="16" y1="4" x2="16" y2="20"/><line x1="20" y1="10" x2="20" y2="14"/></svg>
+      <div><h3>Audiencias</h3><p>Transcripción que separa quién habla, con roles procesales, hechos clave por minuto y acta exportable.</p></div>
+    </article>
+    <article class="celda celda--2 reveal">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#14294A" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      <div><h3>Entrevistas</h3><p>Grabe al cliente, obtenga el guion de lo que no puede quedar sin preguntar y decida si toma el caso.</p></div>
+    </article>
+    <article class="celda celda--2 celda--crema reveal">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#14294A" stroke-width="1.6" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>
+      <div><h3>Catálogo y Orientación</h3><p>858 actuaciones con término, autoridad competente y fuente oficial; describa los hechos y la plataforma le propone la actuación.</p></div>
+    </article>
+    <article class="celda celda--6 reveal">
+      <div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="#14294A" stroke-width="1.6" stroke-linecap="round" style="margin-bottom:20px" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="12" x2="10" y2="12"/><line x1="12" y1="12" x2="14" y2="12"/><line x1="8" y1="16" x2="10" y2="16"/><line x1="12" y1="16" x2="14" y2="16"/></svg>
+        <h3>Herramientas</h3>
+        <p>Términos procesales con festivos calculados desde la ley, liquidación de prestaciones, indexación por IPC, intereses de mora, competencia por cuantía y calendario judicial, todo con su fuente y exportable a Excel.</p>
+      </div>
+      <div class="chips" aria-label="Herramientas incluidas">
+        <span class="chip">Términos con festivos</span>
+        <span class="chip">Liquidación de prestaciones</span>
+        <span class="chip">Indexación IPC</span>
+        <span class="chip">Intereses de mora</span>
+        <span class="chip">Competencia por cuantía</span>
+        <span class="chip">Calendario judicial</span>
+        <span class="chip chip--oro">Exportable a Excel</span>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ── Tres motores ─────────────────────────────────────────────────── -->
+<section class="motores" id="motores">
+  <div class="motores__cab">
+    <div>
+      <div class="kicker kicker--oro">Tres motores, un solo escrito</div>
+      <h2>Tres motores de inteligencia artificial trabajan en cadena.</h2>
+    </div>
+    <p>Cada escrito pasa por tres modelos distintos, cada uno en lo que mejor hace: Gemini de Google ordena los hechos y las pruebas que usted entrega; GPT de OpenAI arma la estructura procesal según la actuación elegida del catálogo; y Claude de Anthropic redacta el texto final, revisa los escritos que usted sube y conversa con usted en el taller. Iureon trabaja con las versiones vigentes de cada proveedor y las actualiza cuando ellos publican una nueva, sin que la firma tenga que cambiar nada.</p>
+  </div>
+  <div class="cadena">
+    <article class="motor reveal">
+      <div class="motor__cab"><span class="motor__n">1</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#14294A" stroke-width="1.6" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="3"/><rect x="10" y="10" width="4" height="4" rx="1"/></svg></div>
+      <h3>Gemini <span>· ordena</span></h3>
+      <p>Ordena los hechos y las pruebas que usted entrega.</p>
+    </article>
+    <div class="flecha" aria-hidden="true"><svg width="40" height="16" viewBox="0 0 40 16" fill="none" stroke="#C8A046" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="8" x2="36" y2="8"/><polyline points="30 2 36 8 30 14"/></svg></div>
+    <article class="motor reveal">
+      <div class="motor__cab"><span class="motor__n">2</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#14294A" stroke-width="1.6" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="3"/><rect x="10" y="10" width="4" height="4" rx="1"/></svg></div>
+      <h3>GPT <span>· estructura</span></h3>
+      <p>Arma la estructura procesal según la actuación elegida del catálogo.</p>
+    </article>
+    <div class="flecha" aria-hidden="true"><svg width="40" height="16" viewBox="0 0 40 16" fill="none" stroke="#C8A046" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="8" x2="36" y2="8"/><polyline points="30 2 36 8 30 14"/></svg></div>
+    <article class="motor motor--navy reveal">
+      <div class="motor__cab"><span class="motor__n">3</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C8A046" stroke-width="1.6" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="3"/><rect x="10" y="10" width="4" height="4" rx="1"/></svg></div>
+      <h3>Claude <span>· redacta y revisa</span></h3>
+      <p>Redacta el texto final, revisa los escritos que usted sube y conversa con usted en el taller.</p>
+    </article>
+  </div>
+  <div class="motores__pie">
+    <span><b>Enseñar estilo</b> guarda el formato y la jerga de la firma para los próximos borradores. Iureon no entrena modelos ni aprende de los escritos de la firma.</span>
+    <span>El uso de los motores se paga por consumo dentro de la aplicación, con saldo recargable, aparte del plan: un escrito o una revisión cuesta $2.000 y una consulta a la guía del taller $300.</span>
+  </div>
+</section>
+
+<!-- ── Tres estados ─────────────────────────────────────────────────── -->
+<section class="estados">
+  <div class="estados__grid">
+    <div>
+      <div class="kicker">Tres estados de una afirmación</div>
+      <h2>Cada afirmación dice de dónde viene.</h2>
+      <p class="cita">«Un escrito de Iureon es un borrador hasta que un abogado lo lee. La aplicación existe para que esa lectura sea corta.»</p>
+    </div>
+    <div class="estados__lista">
+      <div class="estado reveal">
+        <span class="chip-estado chip-estado--ok">Verificado</span>
+        <div><strong>Cotejado con el texto oficial</strong><span>El término coincide con el artículo citado y con el registro consultado en vivo.</span></div>
+      </div>
+      <div class="estado reveal">
+        <span class="chip-estado chip-estado--nc">No caduca</span>
+        <div><strong>La norma no fija término</strong><span>La actuación puede presentarse en cualquier tiempo; la pantalla lo indica con su fuente.</span></div>
+      </div>
+      <div class="estado estado--sv reveal">
+        <span class="chip-estado chip-estado--sv">Sin verificar</span>
+        <div><strong>Requiere lectura del abogado</strong><span>No se pudo cotejar con una fuente oficial. Se marca en ámbar y con borde punteado hasta que usted lo confirme.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Planes ───────────────────────────────────────────────────────── -->
+<section class="planes" id="planes">
+  <div class="planes__cab">
+    <div class="kicker">Planes</div>
+    <h2>Un plan por firma. Sin tarjeta guardada.</h2>
+  </div>
+  <div class="conmutador">
+    <div class="segs" role="group" aria-label="Periodo de pago">
+      <button type="button" data-billing="monthly" class="seg on" aria-pressed="true">Mensual</button>
+      <button type="button" data-billing="annual" class="seg" aria-pressed="false">Anual</button>
+    </div>
+    <span class="ahorro">2 meses gratis</span>
+  </div>
+  <div class="planes__grid">
+    <article class="plan reveal">
+      <div class="plan__nombre">Esencial</div>
+      <div class="plan__precio"><b><span data-price="es">$85.000</span></b><span data-per>/mes</span></div>
+      <div class="plan__usuarios">1 usuario</div>
+      <a class="btn btn--secundario" href="/?entrar=1&amp;plan=ESENCIAL">Contratar Esencial</a>
+      <ul>
+        <li>✓ Redacción</li>
+        <li>✓ Borradores</li>
+        <li>✓ Revisiones</li>
+        <li>✓ Buscador</li>
+        <li>✓ Catálogo</li>
+        <li>✓ Herramientas</li>
+        <li>✓ Manual y Soporte</li>
+        <li>✓ Membrete</li>
+        <li class="no">Audiencias</li>
+        <li class="no">Entrevistas</li>
+        <li class="no">Orientación</li>
+      </ul>
+    </article>
+    <article class="plan plan--premium reveal">
+      <div class="recomendado">Recomendado</div>
+      <div class="plan__nombre">Premium</div>
+      <div class="plan__precio"><b><span data-price="pr">$120.000</span></b><span data-per>/mes</span></div>
+      <div class="plan__usuarios">Hasta 5 usuarios</div>
+      <a class="btn btn--primario" href="/?entrar=1&amp;plan=PREMIUM">Contratar Premium</a>
+      <ul>
+        <li class="cab">Todos los módulos de Esencial, además:</li>
+        <li>✓ Audiencias</li>
+        <li>✓ Entrevistas</li>
+        <li>✓ Orientación</li>
+      </ul>
+    </article>
+    <article class="plan reveal">
+      <div class="plan__nombre">Firma</div>
+      <div class="plan__precio"><b><span data-price="fi">$250.000</span></b><span data-per>/mes</span></div>
+      <div class="plan__usuarios">Hasta 15 usuarios</div>
+      <a class="btn btn--secundario" href="/?entrar=1&amp;plan=FIRMA">Contratar Firma</a>
+      <ul>
+        <li class="cab">Todos los módulos</li>
+        <li>✓ Redacción, Revisiones, Catálogo</li>
+        <li>✓ Audiencias y Entrevistas</li>
+        <li>✓ Orientación y Herramientas</li>
+        <li>✓ Manual, Soporte y Membrete</li>
+      </ul>
+    </article>
+  </div>
+  <p class="planes__nota">Precios con IVA incluido. El uso de inteligencia artificial se paga aparte, por recargas de saldo dentro de la aplicación: un escrito o una revisión cuesta $2.000 y una consulta a la guía $300. Pago seguro por Wompi; no se guarda tarjeta ni se cobra automáticamente. Al pagar antes del vencimiento se suma el periodo, nunca se pierden días.</p>
+</section>
+
+<!-- ── Seguridad + Cómo empieza ─────────────────────────────────────── -->
+<section class="dos" id="seguridad">
+  <div class="dos__grid">
+    <div>
+      <div class="kicker">Seguridad y datos</div>
+      <h2>Lo de su firma es de su firma.</h2>
+      <div class="puntos">
+        <div class="punto"><i aria-hidden="true"></i><p>Los datos de cada firma están aislados por firma.</p></div>
+        <div class="punto"><i aria-hidden="true"></i><p>El audio de una grabación se borra del almacenamiento apenas se transcribe.</p></div>
+        <div class="punto"><i aria-hidden="true"></i><p>Hay auditoría inmutable de los actos de la firma y el operador solo accede a los datos con autorización expresa y temporal de un socio.</p></div>
+      </div>
+    </div>
+    <div>
+      <div class="kicker">Cómo empieza una firma</div>
+      <h2>Tres pasos, sin instalación en servidor.</h2>
+      <div class="pasos">
+        <div class="paso reveal"><b>1</b><p>El operador de Iureon crea la firma y su socio administrador.</p></div>
+        <div class="paso reveal"><b>2</b><p>El socio elige el plan y recarga saldo.</p></div>
+        <div class="paso reveal"><b>3</b><p>Invita a sus abogados y empiezan por Redacción u Orientación.</p></div>
+      </div>
+      <p class="prueba"><b>14 días</b>Las firmas nuevas empiezan con 14 días de prueba del plan Premium.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── Se instala como app ──────────────────────────────────────────── -->
+<section class="instala">
+  <div class="instala__caja">
+    <div>
+      <div class="kicker">Se instala como app</div>
+      <h2>En el bolsillo y en el escritorio.</h2>
+      <p>Instálela en Android, iPhone y PC, y reciba avisos cuando soporte responda o cuando otro abogado de su firma cree o edite un escrito.</p>
+    </div>
+    <div class="dispositivos" aria-hidden="true">
+      <div class="pc">
+        <div class="pc__menu"><i></i><i></i><i></i><i></i></div>
+        <div class="pc__cuerpo"><div class="pc__titulo"></div><div class="pc__hoja"></div></div>
+      </div>
+      <div class="telefono">
+        <div class="telefono__pantalla">
+          <div class="telefono__barra"></div>
+          <div class="telefono__avisos">
+            <div class="telefono__linea"></div>
+            <div class="aviso"><b>Soporte respondió</b><small><br>Su consulta sobre el membrete.</small></div>
+            <div class="aviso"><b>Nuevo escrito</b><small><br>M. Pérez creó «Recurso de apelación».</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA final ────────────────────────────────────────────────────── -->
+<section class="cta">
+  <h2>Empiece con su firma</h2>
+  <div class="cta__botones">
+    <a class="btn btn--oro btn--lg" href="#planes">Contratar</a>
+    <a class="btn btn--fantasma btn--lg" href="/?entrar=1">Iniciar sesión</a>
+  </div>
+  <a class="cta__soporte" href="https://wa.me/573011750316" target="_blank" rel="noopener">Escríbanos a soporte (WhatsApp)</a>
+</section>
+</main>
+
+<footer class="pie">
+  <div>
+    <a class="marca" href="#top" aria-label="Iureon, inicio">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><g fill="none" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M39 57C39 48 25 44 25 34C25 27 30 23 32 21" stroke="#C8A046"/><path d="M25 57C25 48 39 44 39 34C39 27 34 23 32 21" stroke="#F4F1EA"/></g><path d="M32 6L40 19H24Z" fill="#F4F1EA"/></svg>
+      <img src="/brand/wordmark-dark.svg" alt="Iureon" width="208" height="56">
+    </a>
+    Iureon · Sincelejo, Sucre, Colombia
+  </div>
+  <nav class="pie__links" aria-label="Enlaces del pie">
+    <a href="/?entrar=1&amp;ir=manual">Manual</a>
+    <a href="#planes">Planes</a>
+    <a href="/?entrar=1&amp;ir=privacidad">Política de tratamiento de datos</a>
+  </nav>
+  <div class="pie__nota">Los precios incluyen IVA. Las cuentas de cobro se emiten a nombre del titular de la plataforma.</div>
+</footer>
+
+<script>
+(function () {
+  document.documentElement.classList.add('js');
+
+  /* Mensual / Anual: cambia los precios de toda la página. */
+  var P = {
+    monthly: { es: '$85.000', pr: '$120.000', fi: '$250.000', per: '/mes' },
+    annual: { es: '$850.000', pr: '$1.200.000', fi: '$2.500.000', per: '/año' }
+  };
+  document.querySelectorAll('.seg').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var k = b.dataset.billing;
+      document.querySelectorAll('.seg').forEach(function (x) {
+        var on = x.dataset.billing === k;
+        x.classList.toggle('on', on);
+        x.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+      document.querySelectorAll('[data-price]').forEach(function (e) { e.textContent = P[k][e.dataset.price]; });
+      document.querySelectorAll('[data-per]').forEach(function (e) { e.textContent = P[k].per; });
+    });
+  });
+
+  /* Nav: se oscurece al hacer scroll. */
+  var nav = document.getElementById('nav');
+  var alScroll = function () { nav.classList.toggle('is-scrolled', window.scrollY > 24); };
+  alScroll();
+  window.addEventListener('scroll', alScroll, { passive: true });
+
+  /* Menú móvil. */
+  var boton = document.querySelector('.hamburguesa');
+  var menu = document.getElementById('menu');
+  var cerrar = function () {
+    menu.hidden = true;
+    boton.setAttribute('aria-expanded', 'false');
+    boton.setAttribute('aria-label', 'Abrir el menú');
+  };
+  boton.addEventListener('click', function () {
+    var abierto = !menu.hidden;
+    if (abierto) { cerrar(); return; }
+    menu.hidden = false;
+    boton.setAttribute('aria-expanded', 'true');
+    boton.setAttribute('aria-label', 'Cerrar el menú');
+  });
+  menu.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', cerrar); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !menu.hidden) { cerrar(); boton.focus(); } });
+  window.addEventListener('resize', function () { if (window.innerWidth > 768 && !menu.hidden) cerrar(); });
+
+  /* Aparición suave al hacer scroll; sin animación si el sistema lo pide. */
+  var reveals = document.querySelectorAll('.reveal');
+  var reducido = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reducido || !('IntersectionObserver' in window)) {
+    reveals.forEach(function (el) { el.classList.add('in'); });
+    return;
+  }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+    });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.1 });
+  reveals.forEach(function (el) { io.observe(el); });
+  /*
+   * Red de seguridad: una landing que deja secciones invisibles porque un
+   * observador no disparó (vista embebida, extensión, navegador raro) es peor
+   * que una sin animación. Pasados 2,5 s, lo que no haya aparecido aparece.
+   */
+  setTimeout(function () {
+    reveals.forEach(function (el) { el.classList.add('in'); });
+  }, 2500);
+})();
+</script>
+</body>
+</html>
