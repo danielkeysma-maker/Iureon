@@ -9,7 +9,7 @@
  * partner reads is the number the card is charged.
  */
 
-export type Plan = 'ESENCIAL' | 'PREMIUM';
+export type Plan = 'ESENCIAL' | 'PREMIUM' | 'FIRMA';
 
 /**
  * MENSUAL and ANUAL are bought. PRUEBA is what a firm the operator onboards
@@ -85,10 +85,21 @@ export const PLANES: Record<Plan, PlanDefinition> = {
     precioAnualCop: 1_200_000,
     maxUsuarios: 5,
     modulos: TODOS_LOS_MODULOS
+  },
+  // FIRMA opens nothing PREMIUM does not: it is Premium with three times the
+  // seats, for the office that outgrew five accounts. Same 12-for-10 rule.
+  FIRMA: {
+    plan: 'FIRMA',
+    nombre: 'Firma',
+    precioMensualCop: 250_000,
+    precioAnualCop: 2_500_000,
+    maxUsuarios: 15,
+    modulos: TODOS_LOS_MODULOS
   }
 };
 
-export const esPlan = (valor: unknown): valor is Plan => valor === 'ESENCIAL' || valor === 'PREMIUM';
+export const esPlan = (valor: unknown): valor is Plan =>
+  valor === 'ESENCIAL' || valor === 'PREMIUM' || valor === 'FIRMA';
 
 export const esPeriodoPagable = (valor: unknown): valor is PaidPeriod =>
   valor === 'MENSUAL' || valor === 'ANUAL';

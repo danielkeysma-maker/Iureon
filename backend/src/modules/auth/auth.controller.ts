@@ -178,7 +178,7 @@ export const addUserController = async (req: Request, res: Response): Promise<vo
   try {
     /*
      * THE PLAN'S USER CAP, enforced where accounts are actually created.
-     * ESENCIAL admits one account and PREMIUM five; the 409 says which plan
+     * ESENCIAL admits one account, PREMIUM five and FIRMA fifteen; the 409 says which plan
      * lifts the limit. The platform's own firm is exempt: the operator's
      * accounts are not a client's seats.
      */

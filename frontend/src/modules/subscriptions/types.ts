@@ -6,7 +6,7 @@
  * screen only lays them out.
  */
 
-export type Plan = 'ESENCIAL' | 'PREMIUM';
+export type Plan = 'ESENCIAL' | 'PREMIUM' | 'FIRMA';
 
 /** MENSUAL and ANUAL are bought; PRUEBA and CORTESIA are granted by the operator. */
 export type PlanPeriod = 'MENSUAL' | 'ANUAL' | 'PRUEBA' | 'CORTESIA';
@@ -78,6 +78,9 @@ export const NOMBRE_DE_MODULO: Record<Modulo, string> = {
   ENTREVISTAS: 'Entrevistas',
   ORIENTACION: 'Orientación'
 };
+
+/** El nombre que ve el usuario. Un mapa y no un ternario: al llegar un plan nuevo, se añade una línea. */
+export const NOMBRE_DE_PLAN: Record<Plan, string> = { ESENCIAL: 'Esencial', PREMIUM: 'Premium', FIRMA: 'Firma' };
 
 export const ETIQUETA_DE_PERIODO: Record<PlanPeriod, string> = {
   MENSUAL: 'Mensual',

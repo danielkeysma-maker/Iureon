@@ -29,7 +29,7 @@ export interface ClienteDeLaCuenta {
   correo?: string;
 }
 
-const NOMBRE_DE_PLAN: Record<Plan, string> = { ESENCIAL: 'Esencial', PREMIUM: 'Premium' };
+const NOMBRE_DE_PLAN: Record<Plan, string> = { ESENCIAL: 'Esencial', PREMIUM: 'Premium', FIRMA: 'Firma' };
 const NOMBRE_DE_PERIODO = { MENSUAL: 'mensual (1 mes)', ANUAL: 'anual (12 meses)' } as const;
 
 /** Número legible y estable: la referencia de Wompi ya es única por pago. */

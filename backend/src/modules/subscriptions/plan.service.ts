@@ -7,6 +7,7 @@ import {
   esPlan,
   modulosPermitidos,
   permiteModulo,
+  PLANES,
   planBloquea,
   type EstadoDelPlan,
   type Modulo,
@@ -199,7 +200,7 @@ export const exigirModulo = async (firmId: string, modulo: Modulo): Promise<void
     throw new PlanError(
       'PLAN_INSUFICIENTE',
       `${NOMBRE_DE_MODULO[modulo]} no está incluido en el plan Esencial. ` +
-        'Para usarlo, pase la firma a Premium desde «Plan de la firma».',
+        'Para usarlo, pase la firma a Premium o a Firma desde «Plan de la firma».',
       403
     );
   }
@@ -218,11 +219,15 @@ export const exigirCupoDeUsuario = async (firmId: string): Promise<void> => {
   if (!cabeOtroUsuario(row.maxUsers, usuarios)) {
     throw new PlanError(
       'LIMITE_DE_USUARIOS',
-      `El plan ${row.plan === 'PREMIUM' ? 'Premium' : 'Esencial'} admite hasta ${row.maxUsers} ` +
+      `El plan ${row.plan ? PLANES[row.plan].nombre : 'actual'} admite hasta ${row.maxUsers} ` +
         `${row.maxUsers === 1 ? 'usuario' : 'usuarios'} y la firma ya tiene ${usuarios}. ` +
-        (row.plan === 'PREMIUM'
+        // The message names the next plan up, not a fixed one: Esencial is sent
+        // to Premium, Premium to Firma, and Firma to support.
+        (row.plan === 'FIRMA'
           ? 'Escríbanos a soporte si necesita más cuentas.'
-          : 'Pase a Premium para tener hasta 5 cuentas.'),
+          : row.plan === 'PREMIUM'
+            ? `Pase a Firma para tener hasta ${PLANES.FIRMA.maxUsuarios} cuentas.`
+            : `Pase a Premium para tener hasta ${PLANES.PREMIUM.maxUsuarios} cuentas.`),
       409
     );
   }

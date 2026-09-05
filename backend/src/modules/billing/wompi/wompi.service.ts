@@ -5,6 +5,7 @@ import { BillingError, MIN_RECHARGE_COP } from '../billing.service';
 import { auditService } from '../../audit/audit.service';
 import { correoDeRecarga, correoDeSuscripcion } from '../../mail/mail.service';
 import type { PeriodoPagado, PlanPagado } from '../../mail/cuentaDeCobro.pdf';
+import { esPlan, PLANES, type Plan } from '../../subscriptions/plan.catalog';
 
 /**
  * Recharging through Wompi.
@@ -103,7 +104,7 @@ export const crearIntencion = async (input: {
    * not what the confirmation happens to say.
    */
   purpose?: 'RECARGA' | 'SUSCRIPCION';
-  plan?: 'ESENCIAL' | 'PREMIUM';
+  plan?: Plan;
   period?: 'MENSUAL' | 'ANUAL';
 }): Promise<CheckoutIntent> => {
   const gateway = requireGateway();
@@ -445,7 +446,7 @@ const aplicarPagoDePlan = async (
     userEmail: String(pago.user_email ?? 'desconocido'),
     action: 'PLAN_PAGADO',
     resource:
-      `Plan ${plan === 'PREMIUM' ? 'Premium' : 'Esencial'} · ${period === 'ANUAL' ? 'anual' : 'mensual'} · ` +
+      `Plan ${esPlan(plan) ? PLANES[plan].nombre : plan} · ${period === 'ANUAL' ? 'anual' : 'mensual'} · ` +
       `$${monto.toLocaleString('es-CO')} COP · vigente hasta ${new Date(validUntil).toLocaleDateString('es-CO')} · ${referencia}`,
     ipAddress: null
   });

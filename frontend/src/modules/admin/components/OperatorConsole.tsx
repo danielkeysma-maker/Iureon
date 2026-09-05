@@ -22,7 +22,7 @@ import { BandejaDeSoporte } from './BandejaDeSoporte';
 
 const pesos = (valor: number): string => `$${valor.toLocaleString('es-CO')}`;
 
-const NOMBRE_PLAN: Record<string, string> = { ESENCIAL: 'Esencial', PREMIUM: 'Premium' };
+const NOMBRE_PLAN: Record<string, string> = { ESENCIAL: 'Esencial', PREMIUM: 'Premium', FIRMA: 'Firma' };
 const NOMBRE_PERIODO: Record<string, string> = {
   MENSUAL: 'mensual',
   ANUAL: 'anual',

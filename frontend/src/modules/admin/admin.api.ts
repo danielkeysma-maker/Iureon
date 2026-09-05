@@ -20,7 +20,7 @@ export interface FirmSummary {
   nit: string | null;
   planTier: string;
   /** El plan. Los cuatro en null = cortesía legacy: sin plan asignado, sin restricción. */
-  plan: 'ESENCIAL' | 'PREMIUM' | null;
+  plan: 'ESENCIAL' | 'PREMIUM' | 'FIRMA' | null;
   planPeriod: 'MENSUAL' | 'ANUAL' | 'PRUEBA' | 'CORTESIA' | null;
   planValidUntil: string | null;
   planMaxUsers: number | null;
@@ -170,7 +170,7 @@ export const adminApi = {
   updateFirmPlan: (
     firmId: string,
     input: {
-      plan: 'ESENCIAL' | 'PREMIUM';
+      plan: 'ESENCIAL' | 'PREMIUM' | 'FIRMA';
       period: 'MENSUAL' | 'ANUAL' | 'PRUEBA' | 'CORTESIA';
       validUntil: string | null;
       motivo: string;

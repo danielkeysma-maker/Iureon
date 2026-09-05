@@ -39,12 +39,18 @@ check('ESENCIAL mensual cuesta $85.000', precioDe('ESENCIAL', 'MENSUAL') === 85_
 check('ESENCIAL anual cuesta $850.000', precioDe('ESENCIAL', 'ANUAL') === 850_000);
 check('PREMIUM mensual cuesta $120.000', precioDe('PREMIUM', 'MENSUAL') === 120_000);
 check('PREMIUM anual cuesta $1.200.000', precioDe('PREMIUM', 'ANUAL') === 1_200_000);
+check('FIRMA mensual cuesta $250.000', precioDe('FIRMA', 'MENSUAL') === 250_000);
+check('FIRMA anual cuesta $2.500.000', precioDe('FIRMA', 'ANUAL') === 2_500_000);
 check(
-  'el año son 12 meses por el precio de 10, en ambos planes',
-  PLANES.ESENCIAL.precioAnualCop === PLANES.ESENCIAL.precioMensualCop * 10 &&
-    PLANES.PREMIUM.precioAnualCop === PLANES.PREMIUM.precioMensualCop * 10
+  'el año son 12 meses por el precio de 10, en los tres planes',
+  (Object.keys(PLANES) as Array<keyof typeof PLANES>).every(
+    (p) => PLANES[p].precioAnualCop === PLANES[p].precioMensualCop * 10
+  ) && Object.keys(PLANES).length === 3
 );
-check('ESENCIAL admite 1 usuario y PREMIUM 5', PLANES.ESENCIAL.maxUsuarios === 1 && PLANES.PREMIUM.maxUsuarios === 5);
+check(
+  'ESENCIAL admite 1 usuario, PREMIUM 5 y FIRMA 15',
+  PLANES.ESENCIAL.maxUsuarios === 1 && PLANES.PREMIUM.maxUsuarios === 5 && PLANES.FIRMA.maxUsuarios === 15
+);
 
 // ─── Módulos ────────────────────────────────────────────────────────────────
 check(
@@ -60,6 +66,7 @@ check(
   ) && PLANES.ESENCIAL.modulos.length === 9
 );
 check('PREMIUM incluye todos los módulos', TODOS_LOS_MODULOS.every((m) => permiteModulo('PREMIUM', m)) && TODOS_LOS_MODULOS.length === 12);
+check('FIRMA incluye exactamente los mismos módulos que PREMIUM', PLANES.FIRMA.modulos === PLANES.PREMIUM.modulos);
 check(
   'una firma sin plan (cortesía legacy) ve todos los módulos',
   modulosPermitidos(null).length === TODOS_LOS_MODULOS.length && permiteModulo(null, 'ORIENTACION')
@@ -146,6 +153,7 @@ check('vencido hace dos días da -2', diasRestantes(dia('2026-09-02T12:00:00Z'),
 check('sin tope (cortesía) siempre cabe otro', cabeOtroUsuario(null, 40));
 check('ESENCIAL con 1 usuario no admite otro', !cabeOtroUsuario(1, 1));
 check('PREMIUM con 4 admite el quinto, con 5 no', cabeOtroUsuario(5, 4) && !cabeOtroUsuario(5, 5));
+check('FIRMA con 14 admite el decimoquinto, con 15 no', cabeOtroUsuario(15, 14) && !cabeOtroUsuario(15, 15));
 
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);
 process.exitCode = fallos === 0 ? 0 : 1;

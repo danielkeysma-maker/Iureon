@@ -6,7 +6,7 @@ import { AvisosEnEsteDispositivo } from '../../push/components/AvisosEnEsteDispo
 import { InstalarApp } from '../../pwa/InstalarApp';
 import { subscriptionApi } from '../../subscriptions/subscription.api';
 import { FirmSubscriptionModal } from '../../subscriptions/components/FirmSubscriptionModal';
-import { ETIQUETA_DE_ESTADO, ETIQUETA_DE_PERIODO, NOMBRE_DE_MODULO, type PlanDeFirma } from '../../subscriptions/types';
+import { ETIQUETA_DE_ESTADO, ETIQUETA_DE_PERIODO, NOMBRE_DE_MODULO, NOMBRE_DE_PLAN, type PlanDeFirma } from '../../subscriptions/types';
 
 /**
  * Las secciones de Ajustes que faltaban. Cada una reúne algo que YA existe en
@@ -187,7 +187,7 @@ export const PlanSection: React.FC = () => {
             <div>
               <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-400">Plan activo</p>
               <p className="mt-1 text-[20px] font-semibold leading-none text-ink-900">
-                {plan.plan ? (plan.plan === 'PREMIUM' ? 'Premium' : 'Esencial') : 'Cortesía'}
+                {plan.plan ? NOMBRE_DE_PLAN[plan.plan] : 'Cortesía'}
                 {plan.period && plan.period !== 'CORTESIA' && <span className="ml-2 text-[13px] font-normal text-ink-500">{ETIQUETA_DE_PERIODO[plan.period]}</span>}
               </p>
             </div>

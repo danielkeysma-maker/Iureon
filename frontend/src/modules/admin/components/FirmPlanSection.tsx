@@ -16,10 +16,10 @@ import { adminApi, type FirmDetail } from '../admin.api';
  * por Wompi; operación no puede marcar un periodo como pagado.
  */
 
-type Plan = 'ESENCIAL' | 'PREMIUM';
+type Plan = 'ESENCIAL' | 'PREMIUM' | 'FIRMA';
 type Periodo = 'MENSUAL' | 'ANUAL' | 'PRUEBA' | 'CORTESIA';
 
-const NOMBRE_PLAN: Record<Plan, string> = { ESENCIAL: 'Esencial', PREMIUM: 'Premium' };
+const NOMBRE_PLAN: Record<Plan, string> = { ESENCIAL: 'Esencial', PREMIUM: 'Premium', FIRMA: 'Firma' };
 const NOMBRE_PERIODO: Record<Periodo, string> = {
   MENSUAL: 'Mensual',
   ANUAL: 'Anual',
@@ -166,6 +166,7 @@ export const FirmPlanSection: React.FC<FirmPlanSectionProps> = ({ firma, onGuard
               >
                 <option value="ESENCIAL">Esencial · 1 usuario</option>
                 <option value="PREMIUM">Premium · hasta 5 usuarios</option>
+                <option value="FIRMA">Firma · hasta 15 usuarios</option>
               </select>
             </label>
             <label className="block text-[11px] text-ink-500">

@@ -524,12 +524,13 @@ const A_PLANES: ManualArticle = {
   entradilla: 'Qué incluye cada plan, cuánto cuesta, cómo se paga y qué pasa cuando vence.',
   bloques: [
     { kind: 'ruta', camino: ['Barra lateral', '«Plan»', '«Plan de la firma»', '«Contratar»'] },
-    { kind: 'subtitulo', texto: 'Dos planes' },
+    { kind: 'subtitulo', texto: 'Tres planes' },
     {
       kind: 'lista',
       items: [
         'Esencial: $85.000 al mes o $850.000 al año. Un usuario. Incluye Redacción, Borradores, Revisiones, Buscador, Catálogo, Herramientas, Manual, Soporte y Membrete. No incluye Audiencias, Entrevistas ni Orientación.',
-        'Premium: $120.000 al mes o $1.200.000 al año. Hasta cinco usuarios. Incluye todos los módulos.'
+        'Premium: $120.000 al mes o $1.200.000 al año. Hasta cinco usuarios. Incluye todos los módulos.',
+        'Firma: $250.000 al mes o $2.500.000 al año. Hasta quince usuarios. Incluye todos los módulos.'
       ]
     },
     {
@@ -568,7 +569,7 @@ const A_PLANES: ManualArticle = {
     {
       kind: 'aviso',
       texto:
-        'En el plan Esencial, Audiencias, Entrevistas y Orientación no aparecen en la barra, y crear una segunda cuenta responde que el plan admite una sola. Pasar a Premium habilita las tres pantallas y hasta cinco cuentas desde el momento del pago.'
+        'En el plan Esencial, Audiencias, Entrevistas y Orientación no aparecen en la barra, y crear una segunda cuenta responde que el plan admite una sola. Pasar a Premium habilita las tres pantallas y hasta cinco cuentas desde el momento del pago; Firma, las mismas pantallas y hasta quince cuentas.'
     },
     {
       kind: 'nota',

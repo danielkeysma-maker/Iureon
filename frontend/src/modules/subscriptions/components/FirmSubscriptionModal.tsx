@@ -68,7 +68,8 @@ const ESTILO_DE_ESTADO: Record<EstadoDelPlan, string> = {
 /** Una frase por plan: lo que el precio compra, antes de la lista. */
 const LEMA: Record<Plan, string> = {
   ESENCIAL: 'Para el abogado que redacta y revisa solo.',
-  PREMIUM: 'Para la firma: audiencias, entrevistas, orientación y hasta cinco personas.'
+  PREMIUM: 'Para la firma: audiencias, entrevistas, orientación y hasta cinco personas.',
+  FIRMA: 'Para la firma que crece: todos los módulos y hasta quince personas.'
 };
 
 /** Orden fijo para que la tarjeta Esencial muestre en gris lo que no incluye. */
@@ -270,9 +271,9 @@ export const FirmSubscriptionModal: React.FC<FirmSubscriptionModalProps> = ({
                 </div>
               </div>
 
-              {/* ─── Las dos tarjetas ────────────────────────────────────── */}
-              <section className="grid gap-4 md:grid-cols-2">
-                {(['ESENCIAL', 'PREMIUM'] as const).map((clave) => {
+              {/* ─── Las tres tarjetas ───────────────────────────────────── */}
+              <section className="grid gap-4 md:grid-cols-3">
+                {(['ESENCIAL', 'PREMIUM', 'FIRMA'] as const).map((clave) => {
                   const def = planes[clave];
                   const esElActual = plan.plan === clave;
                   const destacado = clave === 'PREMIUM';

@@ -26,7 +26,7 @@ import { EMISOR } from './emisor';
  * unos pocos KB y el correo no se rechaza por tamaño.
  */
 
-export type PlanPagado = 'ESENCIAL' | 'PREMIUM';
+export type PlanPagado = 'ESENCIAL' | 'PREMIUM' | 'FIRMA';
 export type PeriodoPagado = 'MENSUAL' | 'ANUAL';
 
 /** Lo que el servidor sabe de un pago aplicado (la fila de `subscription_payments`). */
@@ -62,7 +62,7 @@ const fecha = (iso: string): string =>
     timeZone: 'America/Bogota'
   });
 
-const NOMBRE_DE_PLAN: Record<PlanPagado, string> = { ESENCIAL: 'Esencial', PREMIUM: 'Premium' };
+const NOMBRE_DE_PLAN: Record<PlanPagado, string> = { ESENCIAL: 'Esencial', PREMIUM: 'Premium', FIRMA: 'Firma' };
 const NOMBRE_DE_PERIODO: Record<PeriodoPagado, string> = {
   MENSUAL: 'mensual (1 mes)',
   ANUAL: 'anual (12 meses)'

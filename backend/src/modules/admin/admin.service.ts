@@ -662,7 +662,7 @@ export const updateFirmPlan = async (
   const motivo = requireReason(reason);
 
   if (!esPlan(changes.plan)) {
-    throw new AuthError('INVALID_PLAN', 'El plan debe ser ESENCIAL o PREMIUM.');
+    throw new AuthError('INVALID_PLAN', 'El plan debe ser ESENCIAL, PREMIUM o FIRMA.');
   }
   if (!esPeriodo(changes.period)) {
     throw new AuthError('INVALID_PERIOD', 'El periodo debe ser MENSUAL, ANUAL, PRUEBA o CORTESIA.');
