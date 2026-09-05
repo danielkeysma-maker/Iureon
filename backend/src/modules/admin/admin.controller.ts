@@ -250,7 +250,7 @@ export const restablecerContrasenaController = async (req: Request, res: Respons
     await auditService.record({
       firmId,
       userEmail: req.user!.email,
-      action: 'PASSWORD_RESET_BY_OPERATOR',
+      action: 'CLAVE_RESTABLECIDA_POR_OPERADOR',
       resource: `Contraseña de ${email} restablecida por operación; entregada por canal seguro, sin correo`,
       ipAddress: callerIp(req)
     });

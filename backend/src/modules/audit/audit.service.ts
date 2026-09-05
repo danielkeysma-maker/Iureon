@@ -72,11 +72,11 @@ export type AuditAction =
   | 'PLAN_SUSPENDIDO'
   /*
    * Consola de operación, acciones de soporte. `FIRMA_ELIMINADA` va al rastro
-   * DEL OPERADOR: el de la firma se fue con ella. `PASSWORD_RESET_BY_OPERATOR`
+   * DEL OPERADOR: el de la firma se fue con ella. `CLAVE_RESTABLECIDA_POR_OPERADOR`
    * va al rastro de la firma, nombrando la cuenta y nunca la contraseña.
    */
   | 'FIRMA_ELIMINADA'
-  | 'PASSWORD_RESET_BY_OPERATOR'
+  | 'CLAVE_RESTABLECIDA_POR_OPERADOR'
   /*
    * Avisos por Web Push. Activar o desactivar los avisos en un dispositivo
    * queda en el rastro de la firma: es una decisión sobre por dónde sale

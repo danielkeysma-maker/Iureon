@@ -63,7 +63,7 @@ export const ACCIONES: Record<string, string> = {
   PLAN_PAGADO: 'Pagó el plan',
   PLAN_ACTUALIZADO: 'Operación fijó el plan',
   PLAN_SUSPENDIDO: 'Operación suspendió el acceso',
-  PASSWORD_RESET_BY_OPERATOR: 'Operación restableció una contraseña',
+  CLAVE_RESTABLECIDA_POR_OPERADOR: 'Operación restableció una contraseña',
   FIRMA_ELIMINADA: 'Operación eliminó una firma',
   EMAIL_SENT: 'Correo enviado'
 };
