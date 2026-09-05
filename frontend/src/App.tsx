@@ -52,6 +52,9 @@ import { FirmBrandingModal } from './modules/tenant/components/FirmBrandingModal
 import { brandingApi, formatoComoInstruccion, setMarcaActual, type FirmBranding } from './modules/tenant/services/branding.api';
 import { FirmSubscriptionModal } from './modules/subscriptions/components/FirmSubscriptionModal';
 import { PlanExpiryBanner } from './modules/subscriptions/components/PlanExpiryBanner';
+import { PlanVencidoBar } from './modules/subscriptions/components/PlanVencidoBar';
+import { ModuloBloqueado } from './modules/subscriptions/components/ModuloBloqueado';
+import { PlanProvider } from './modules/subscriptions/PlanContext';
 import { subscriptionApi } from './modules/subscriptions/subscription.api';
 import type { PlanDeFirma } from './modules/subscriptions/types';
 import { DEFAULT_FIRM_BRANDING, DocumentExportService } from './modules/documents/services/documentExport.service';
@@ -276,6 +279,11 @@ export function App() {
   const [isFirmDropdownOpen, setIsFirmDropdownOpen] = useState(false);
   const [isBrandingModalOpen, setIsBrandingModalOpen] = useState(false);
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
+  /*
+   * Un solo abridor del plan, estable entre renders: lo usan la franja, los
+   * modulos cubiertos y el contexto, que lo memoriza por identidad.
+   */
+  const abrirPlan = React.useCallback(() => setIsSubscriptionModalOpen(true), []);
   /*
    * EL PLAN DE LA FIRMA, del servidor. Decide dos cosas del cascarón: qué
    * módulos se pintan (una firma ESENCIAL no ve Audiencias, Entrevistas ni
@@ -680,6 +688,18 @@ export function App() {
   return (
     <TenantProvider activeFirm={activeFirm} currentUserEmail={currentUserEmail}>
     {/*
+      EL PLAN VIAJA POR CONTEXTO: con el plan VENCIDO la aplicacion queda en
+      solo lectura, y quien lo decide en cada pantalla es una hoja —el boton
+      «Redactar escrito», el «Subir audio», la grabadora— que pregunta al
+      contexto en vez de recibir un prop por cuatro niveles. El servidor sigue
+      siendo la puerta real: rechaza cada escritura con 402.
+    */}
+    <PlanProvider
+      plan={planDeFirma}
+      puedePagar={Boolean(esSocio || esSuperusuario)}
+      abrirPlan={abrirPlan}
+    >
+    {/*
       LA FRANJA DE SOPORTE CRUZA TODA LA APLICACION, y por eso la raiz pasa a
       ser una columna: dentro del contenedor horizontal quedaria a un lado del
       menu o encima del area de trabajo, y el artboard pide una banda que nadie
@@ -714,9 +734,11 @@ export function App() {
         <PlanExpiryBanner
           plan={planDeFirma}
           puedeVer={Boolean(esSocio || esSuperusuario)}
-          onAbrirPlan={() => setIsSubscriptionModalOpen(true)}
+          onAbrirPlan={abrirPlan}
         />
       )}
+      {/* Con el plan VENCIDO, la franja de solo lectura la ven todos los roles; el contexto decide si aparece. */}
+      {isAuthenticated && <PlanVencidoBar />}
       <div className="flex min-h-0 flex-1 overflow-hidden">
       <FirmBrandingModal
         isOpen={isBrandingModalOpen}
@@ -889,6 +911,7 @@ export function App() {
               contenedor se llevaba todo el ancho disponible y dejaba el lienzo
               del documento reducido a una franja en blanco.
             */
+            <ModuloBloqueado quePuede="Los escritos ya guardados siguen en Borradores: puede abrirlos, leerlos y exportarlos a Word o PDF.">
             <div className="flex min-h-0 min-w-0 flex-1 flex-col">
               {/*
                 DOS BARRAS DE CONFIGURACION, UNA POR TAMAÑO. La de escritorio son
@@ -989,6 +1012,7 @@ export function App() {
               />
               </div>
             </div>
+            </ModuloBloqueado>
           )}
 
           {/*
@@ -1104,14 +1128,14 @@ export function App() {
             aparezca. Los filtros se recogen en una hoja con su contador.
           */}
           {mainView === 'search' && (
-            <>
+            <ModuloBloqueado quePuede="La jurisprudencia ya citada en sus escritos sigue en cada borrador guardado.">
               <div className="flex min-h-0 flex-1 lg:hidden">
                 <SearchMobileView />
               </div>
               <div className="hidden min-h-0 flex-1 lg:flex">
                 <SearchView />
               </div>
-            </>
+            </ModuloBloqueado>
           )}
           {/*
             DOS PANTALLAS DISTINTAS, NO UNA RESPONSIVA. Claude Design penso el
@@ -1122,16 +1146,20 @@ export function App() {
             viene a consultar.
           */}
           {mainView === 'catalogo' && (
-            <>
+            <ModuloBloqueado quePuede="Los términos que su firma ya verificó se conservan y vuelven a aplicarse en cuanto renueve.">
               <div className="hidden min-h-0 flex-1 lg:flex">
                 <CatalogCurationView />
               </div>
               <div className="flex min-h-0 flex-1 lg:hidden">
                 <CatalogMobileView />
               </div>
-            </>
+            </ModuloBloqueado>
           )}
-          {mainView === 'tools' && <ToolsView />}
+          {mainView === 'tools' && (
+            <ModuloBloqueado quePuede="Los cálculos que ya exportó siguen en sus archivos; las calculadoras vuelven en cuanto renueve.">
+              <ToolsView />
+            </ModuloBloqueado>
+          )}
           {/*
             4e lo dice sin rodeos: «la tabla densa de auditoria no cabe en 390px
             y NO SE INTENTA: se convierte en lista de eventos agrupada por dia».
@@ -1267,7 +1295,7 @@ export function App() {
               />
             ))}
           {mainView === 'orientacion' && (
-            <>
+            <ModuloBloqueado quePuede="Sus orientaciones anteriores quedan guardadas y podrá consultarlas en cuanto renueve.">
             {/*
               4d rehace Orientacion para el telefono: las tarjetas pierden la
               reticula, ganan altura, el estado se repite como ICONO junto al
@@ -1291,7 +1319,7 @@ export function App() {
               onDraft={irARedactar}
             />
             </div>
-            </>
+            </ModuloBloqueado>
           )}
         </main>
 
@@ -1345,6 +1373,7 @@ export function App() {
         onDecidido={() => setRefrescoSoporte((n) => n + 1)}
       />
     </div>
+    </PlanProvider>
     </TenantProvider>
   );
 }

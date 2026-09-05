@@ -1,5 +1,6 @@
 import React from 'react';
 import { ClipboardCheck, RefreshCw, ShieldCheck, Trash2 } from 'lucide-react';
+import { usePlanSoloLectura } from '../../subscriptions/PlanContext';
 import { reviewApi, type ConsentimientoDeGuardado, type RevisionGuardada } from '../services/review.api';
 import type { DatosDelTaller } from './TallerDeRevision';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
@@ -21,6 +22,8 @@ interface RevisionesViewProps {
 }
 
 export const RevisionesView: React.FC<RevisionesViewProps> = ({ esAdminDeFirma, onAbrirTaller, onIrARedaccion }) => {
+  /* Con el plan vencido los informes se abren y se leen; revisar uno nuevo no se ofrece. */
+  const soloLectura = usePlanSoloLectura();
   const [lista, setLista] = React.useState<RevisionGuardada[]>([]);
   const [cargando, setCargando] = React.useState(true);
   const [abriendo, setAbriendo] = React.useState<string | null>(null);
@@ -120,10 +123,12 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({ esAdminDeFirma, 
               <RefreshCw className={`h-3.5 w-3.5 ${cargando ? 'animate-spin' : ''}`} />
               Actualizar
             </button>
+            {!soloLectura && (
             <button type="button" onClick={onIrARedaccion} className="btn-primary btn-sm">
               <ClipboardCheck className="h-3.5 w-3.5" />
               Revisar un escrito nuevo
             </button>
+            )}
           </div>
         </div>
 

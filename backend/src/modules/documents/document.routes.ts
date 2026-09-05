@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { bloquearSiPlanVencido } from '../subscriptions/planVigente.middleware';
 import {
   getUploadUrlController,
   getDownloadUrlController,
@@ -7,7 +8,7 @@ import {
 
 const router = Router();
 
-router.post('/documents/upload-url', getUploadUrlController);
+router.post('/documents/upload-url', bloquearSiPlanVencido, getUploadUrlController);
 router.get('/documents/download-url', getDownloadUrlController);
 router.get('/documents/list', listDocumentsController);
 

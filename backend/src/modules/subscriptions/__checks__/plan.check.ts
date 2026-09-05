@@ -16,6 +16,7 @@ import {
   cabeOtroUsuario,
   diasRestantes,
   estadoDelPlan,
+  esVigente,
   modulosPermitidos,
   periodoQueCompra,
   permiteModulo,
@@ -143,6 +144,18 @@ check(
   estadoDelPlan(fila({ plan: 'PREMIUM', period: 'CORTESIA', validUntil: dia('2026-01-01T00:00:00Z') }), ahora) === 'VENCIDO'
 );
 check('DIAS_DE_AVISO es 7', DIAS_DE_AVISO === 7);
+
+// ─── Solo lectura: quién puede escribir ─────────────────────────────────────
+check(
+  'ACTIVO, POR_VENCER, PRUEBA y CORTESIA siguen escribiendo; solo VENCIDO queda en solo lectura',
+  esVigente('ACTIVO') && esVigente('POR_VENCER') && esVigente('PRUEBA') && esVigente('CORTESIA') && !esVigente('VENCIDO')
+);
+check(
+  'planBloquea es exactamente la negacion de esVigente sobre el estado calculado',
+  planBloquea(fila({ plan: 'PREMIUM', period: 'ANUAL', validUntil: dia('2026-09-04T11:59:00Z') }), ahora) ===
+    !esVigente(estadoDelPlan(fila({ plan: 'PREMIUM', period: 'ANUAL', validUntil: dia('2026-09-04T11:59:00Z') }), ahora)) &&
+    planBloquea(fila({}), ahora) === !esVigente(estadoDelPlan(fila({}), ahora))
+);
 
 // ─── Días restantes ─────────────────────────────────────────────────────────
 check('sin vencimiento no hay días restantes', diasRestantes(null, ahora) === null);

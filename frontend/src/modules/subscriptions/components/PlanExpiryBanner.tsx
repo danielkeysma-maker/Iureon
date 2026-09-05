@@ -28,25 +28,22 @@ const fechaLarga = (iso: string): string =>
 
 export const PlanExpiryBanner: React.FC<PlanExpiryBannerProps> = ({ plan, puedeVer, onAbrirPlan }) => {
   if (!puedeVer || !plan || !plan.validUntil) return null;
-  if (plan.estado !== 'POR_VENCER' && plan.estado !== 'VENCIDO') return null;
+  /*
+   * Once expired, `PlanVencidoBar` takes over for every role; painting both
+   * would stack two red bars saying the same thing to the partner.
+   */
+  if (plan.estado !== 'POR_VENCER') return null;
 
-  const vencido = plan.estado === 'VENCIDO';
   const dias = plan.diasRestantes ?? 0;
 
-  const texto = vencido
-    ? `El plan de la firma venció el ${fechaLarga(plan.validUntil)}. Puede leer y exportar; para volver a generar, revisar o transcribir, pague un periodo.`
-    : `Su plan vence el ${fechaLarga(plan.validUntil)}${
-        dias === 1 ? ' (mañana)' : dias > 1 ? ` (en ${dias} días)` : ''
-      }. Pagar antes suma el periodo a la fecha vigente: no se pierde ningún día.`;
+  const texto = `Su plan vence el ${fechaLarga(plan.validUntil)}${
+    dias === 1 ? ' (mañana)' : dias > 1 ? ` (en ${dias} días)` : ''
+  }. Pagar antes suma el periodo a la fecha vigente: no se pierde ningún día.`;
 
   return (
     <div
       role="status"
-      className={`flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2 border-b px-4 py-2 text-[12.5px] ${
-        vencido
-          ? 'border-[rgb(var(--danger)/0.35)] bg-[rgb(var(--danger)/0.06)] text-danger'
-          : 'border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))] text-unverified'
-      }`}
+      className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2 border-b border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))] px-4 py-2 text-[12.5px] text-unverified"
     >
       <CalendarClock className="h-4 w-4 shrink-0" />
       <p className="min-w-0 flex-1 text-justify leading-snug [text-wrap:pretty]">{texto}</p>
@@ -55,7 +52,7 @@ export const PlanExpiryBanner: React.FC<PlanExpiryBannerProps> = ({ plan, puedeV
         onClick={onAbrirPlan}
         className="shrink-0 rounded-control border border-current px-2.5 py-1 text-[12px] font-semibold hover:bg-white/40"
       >
-        {vencido ? 'Pagar el plan' : 'Ver el plan'}
+        Ver el plan
       </button>
     </div>
   );

@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { bloquearSiPlanVencido } from '../subscriptions/planVigente.middleware';
 import {
   createClientController,
   deleteClientController,
@@ -18,10 +19,10 @@ import {
 const router = Router();
 
 router.get('/clients', listClientsController as any);
-router.post('/clients', createClientController as any);
-router.patch('/clients/link', linkTranscriptionController as any);
-router.patch('/clients/:id', updateClientController as any);
-router.delete('/clients/:id', deleteClientController as any);
+router.post('/clients', bloquearSiPlanVencido, createClientController as any);
+router.patch('/clients/link', bloquearSiPlanVencido, linkTranscriptionController as any);
+router.patch('/clients/:id', bloquearSiPlanVencido, updateClientController as any);
+router.delete('/clients/:id', bloquearSiPlanVencido, deleteClientController as any);
 router.get('/clients/interviews/:transcriptionId/insights', interviewInsightsController as any);
 
 export const clientsRoutes = router;

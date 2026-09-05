@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { bloquearSiPlanVencido } from '../subscriptions/planVigente.middleware';
 import { triageController, listarOrientacionesController } from './triage.controller';
 import {
   deleteVerificationController,
@@ -36,12 +37,12 @@ const tenantRouter = Router();
  * declarada ANTES de "/catalog/:branch", que si no se traga "triage" como si
  * fuera el nombre de una rama.
  */
-tenantRouter.post('/catalog/triage', triageController as any);
+tenantRouter.post('/catalog/triage', bloquearSiPlanVencido, triageController as any);
 tenantRouter.get('/catalog/orientaciones', listarOrientacionesController as any);
 
 tenantRouter.get('/catalog/verifications', listVerificationsController as any);
-tenantRouter.put('/catalog/verifications', saveVerificationController as any);
-tenantRouter.delete('/catalog/verifications', deleteVerificationController as any);
+tenantRouter.put('/catalog/verifications', bloquearSiPlanVencido, saveVerificationController as any);
+tenantRouter.delete('/catalog/verifications', bloquearSiPlanVencido, deleteVerificationController as any);
 
 /** Declared last: ":branch" would otherwise swallow "verifications". */
 publicRouter.get('/catalog/:branch', getBranchCatalogController as any);

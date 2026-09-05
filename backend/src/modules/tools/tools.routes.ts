@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { bloquearSiPlanVencido } from '../subscriptions/planVigente.middleware';
 import {
   calendarioController,
   cuantiaController,
@@ -11,9 +12,9 @@ import {
 const router = Router();
 
 router.get('/tools/parametros', parametrosController);
-router.post('/tools/indexacion', indexacionController);
-router.post('/tools/intereses', interesesController);
-router.post('/tools/cuantia', cuantiaController);
+router.post('/tools/indexacion', bloquearSiPlanVencido, indexacionController);
+router.post('/tools/intereses', bloquearSiPlanVencido, interesesController);
+router.post('/tools/cuantia', bloquearSiPlanVencido, cuantiaController);
 router.get('/tools/calendario', calendarioController);
 
 export const toolsRoutes = router;

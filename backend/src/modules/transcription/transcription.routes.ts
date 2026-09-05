@@ -1,3 +1,4 @@
+import { bloquearSiPlanVencido } from '../subscriptions/planVigente.middleware';
 import { NextFunction, Request, Response, Router } from 'express';
 import multer, { MulterError } from 'multer';
 import {
@@ -80,21 +81,22 @@ export const transcriptionPublicRoutes = publicRouter;
 const router = Router();
 router.get('/transcription', listTranscriptionsController as any);
 // El resumen es POST: puede disparar una llamada al modelo, no es una lectura pura.
-router.post('/transcription/:id/resumen', transcriptionResumenController as any);
-router.patch('/transcription/:id/segmento-revisado', marcarSegmentoRevisadoController as any);
+router.post('/transcription/:id/resumen', bloquearSiPlanVencido, transcriptionResumenController as any);
+router.patch('/transcription/:id/segmento-revisado', bloquearSiPlanVencido, marcarSegmentoRevisadoController as any);
 /* La marca del abogado sobre una intervencion decisiva (2a). */
-router.patch('/transcription/:id/hecho-clave', marcarHechoClaveController as any);
-router.patch('/transcription/:id/revision', marcarRevisionController as any);
-router.patch('/transcription/:id/decision', decidirEntrevistaController as any);
-router.post('/transcription/from-storage', transcribeFromStorageController as any);
-router.patch('/transcription/:id/roles', assignTranscriptionRolesController as any);
-router.patch('/transcription/:id/segment', editTranscriptionSegmentController as any);
-router.patch('/transcription/:id/split', splitTranscriptionSegmentController as any);
-router.patch('/transcription/:id/speaker', reassignTranscriptionSpeakerController as any);
-router.patch('/transcription/:id/speaker-name', assignSpeakerNameController as any);
-router.delete('/transcription/:id', deleteTranscriptionController as any);
+router.patch('/transcription/:id/hecho-clave', bloquearSiPlanVencido, marcarHechoClaveController as any);
+router.patch('/transcription/:id/revision', bloquearSiPlanVencido, marcarRevisionController as any);
+router.patch('/transcription/:id/decision', bloquearSiPlanVencido, decidirEntrevistaController as any);
+router.post('/transcription/from-storage', bloquearSiPlanVencido, transcribeFromStorageController as any);
+router.patch('/transcription/:id/roles', bloquearSiPlanVencido, assignTranscriptionRolesController as any);
+router.patch('/transcription/:id/segment', bloquearSiPlanVencido, editTranscriptionSegmentController as any);
+router.patch('/transcription/:id/split', bloquearSiPlanVencido, splitTranscriptionSegmentController as any);
+router.patch('/transcription/:id/speaker', bloquearSiPlanVencido, reassignTranscriptionSpeakerController as any);
+router.patch('/transcription/:id/speaker-name', bloquearSiPlanVencido, assignSpeakerNameController as any);
+router.delete('/transcription/:id', bloquearSiPlanVencido, deleteTranscriptionController as any);
 router.post(
   '/transcription',
+  bloquearSiPlanVencido,
   upload.single('audio'),
   handleUploadErrors,
   transcribeAudioController as any

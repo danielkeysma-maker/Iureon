@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { bloquearSiPlanVencido } from '../subscriptions/planVigente.middleware';
 import {
   addUserController,
   listUsersController,
@@ -33,7 +34,7 @@ const router = Router();
 
 router.get('/auth/me', meController as any);
 router.get('/auth/users', listUsersController as any);
-router.post('/auth/users', addUserController as any);
+router.post('/auth/users', bloquearSiPlanVencido, addUserController as any);
 router.patch('/auth/users/:id/estado', setUserActiveController as any);
 router.patch('/auth/users/:id/rol', setUserRoleController as any);
 

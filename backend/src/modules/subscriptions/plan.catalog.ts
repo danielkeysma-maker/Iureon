@@ -212,9 +212,19 @@ export const periodoQueCompra = (input: {
   };
 };
 
+/**
+ * Whether a firm in this state may still WRITE: create or edit its work.
+ *
+ * Only VENCIDO is read-only. ACTIVO and POR_VENCER are paid time; PRUEBA is
+ * granted time; CORTESIA has no clock at all. A function of the state and not
+ * of the row, so the middleware, the checks and the billing reserve apply one
+ * rule — a second `=== 'VENCIDO'` elsewhere would drift.
+ */
+export const esVigente = (estado: EstadoDelPlan): boolean => estado !== 'VENCIDO';
+
 /** Whether paid operations must be refused. Only an expired dated plan blocks. */
 export const planBloquea = (row: PlanRow, ahora: Date): boolean =>
-  estadoDelPlan(row, ahora) === 'VENCIDO';
+  !esVigente(estadoDelPlan(row, ahora));
 
 /**
  * Whether one more account fits. A NULL cap (cortesía) never refuses; the

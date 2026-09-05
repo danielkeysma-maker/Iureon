@@ -34,6 +34,14 @@ export interface Novedad {
 export const NOVEDADES_ID = 'novedades';
 
 export const NOVEDADES: readonly Novedad[] = [
+  {
+    fecha: '2026-09-05',
+    titulo: 'Con el plan vencido la aplicación queda en solo lectura',
+    detalle:
+      'Todos ven una franja roja arriba; Redacción, Orientación, Buscador, Catálogo y Herramientas se cubren con un aviso, y las listas de borradores, revisiones, audiencias y entrevistas siguen abiertas para leer y exportar, sin botones de crear. Al renovar, todo vuelve en el acto.',
+    modulo: 'Planes',
+    tipo: 'mejora'
+  },
   /* ── 5 de septiembre de 2026 ─────────────────────────────────────────── */
   {
     fecha: '2026-09-05',

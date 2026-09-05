@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Copy, Download, FileClock, Lock, MoreHorizontal, Pencil, Stamp, Trash2 } from 'lucide-react';
+import { usePlanSoloLectura } from '../../subscriptions/PlanContext';
 import { Dialog } from '../../../design/Dialog';
 import type { EstadoBorrador, SavedDraftEntry } from '../types';
 import {
@@ -76,6 +77,8 @@ export const SavedDraftsView: React.FC<SavedDraftsViewProps> = ({
   onGuardarDatos,
   onRedactar
 }) => {
+  /* Con el plan vencido la lista sigue: abrir, leer y exportar. Redactar uno nuevo, no. */
+  const soloLectura = usePlanSoloLectura();
   const [busqueda, setBusqueda] = useState('');
   const [soloSinRadicar, setSoloSinRadicar] = useState(true);
   const [rama, setRama] = useState<string>('TODAS');
@@ -178,9 +181,11 @@ export const SavedDraftsView: React.FC<SavedDraftsViewProps> = ({
           <Download className="h-3.5 w-3.5" />
           Exportar lista
         </button>
+        {!soloLectura && (
         <button onClick={onRedactar} className="btn-primary btn-sm">
           Redactar escrito
         </button>
+        )}
       </header>
 
       {/* ─── FILTROS ─────────────────────────────────────────────────────── */}
@@ -249,9 +254,11 @@ export const SavedDraftsView: React.FC<SavedDraftsViewProps> = ({
               Cuando redacte un escrito y lo guarde, aparece aquí con su proceso y su término, y
               esta lista lo ordena por lo que vence primero.
             </p>
+            {!soloLectura && (
             <button onClick={onRedactar} className="btn-primary btn-sm mt-2">
               Redactar escrito
             </button>
+            )}
           </div>
         ) : visibles.length === 0 ? (
           <p className="card py-8 text-center text-meta text-ink-500">

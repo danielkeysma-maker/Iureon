@@ -1,5 +1,6 @@
 import React from 'react';
 import { PenLine } from 'lucide-react';
+import { usePlanSoloLectura } from '../../subscriptions/PlanContext';
 import { IconoBuscar } from '../../../design/ArtboardIcons';
 import {
   ETIQUETA_ESTADO,
@@ -57,6 +58,8 @@ export const SavedDraftsMobileView: React.FC<SavedDraftsMobileViewProps> = ({
   onAbrir,
   onRedactar
 }) => {
+  /* Con el plan vencido se abre y se lee; redactar uno nuevo no se ofrece. */
+  const soloLectura = usePlanSoloLectura();
   const [busqueda, setBusqueda] = React.useState('');
 
   const visibles = React.useMemo(() => {
@@ -193,6 +196,7 @@ export const SavedDraftsMobileView: React.FC<SavedDraftsMobileViewProps> = ({
         fácil de acertar con el pulgar, y arriba competiría con el buscador —
         que es lo que de verdad se usa al entrar con treinta y cuatro escritos.
       */}
+      {!soloLectura && (
       <div className="shrink-0 border-t border-line-200 bg-surface px-3 py-2.5">
         <button
           type="button"
@@ -203,6 +207,7 @@ export const SavedDraftsMobileView: React.FC<SavedDraftsMobileViewProps> = ({
           Redactar escrito
         </button>
       </div>
+      )}
     </div>
   );
 };

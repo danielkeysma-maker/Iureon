@@ -150,10 +150,16 @@ export const planDeFirma = async (firmId: string): Promise<PlanDeFirma> => {
 const fechaLarga = (fecha: Date): string =>
   fecha.toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
 
-const mensajeVencido = (row: PlanRow): string =>
-  `El plan de la firma venció${row.validUntil ? ` el ${fechaLarga(row.validUntil)}` : ''}. ` +
-  'Puede seguir leyendo y exportando; para volver a generar, revisar o transcribir, ' +
-  'un administrador debe pagar el plan desde «Plan de la firma».';
+/**
+ * The one sentence every refused write carries. Exported so the route guard
+ * and the billing reserve say the same thing: two wordings for one state read
+ * as two different problems.
+ */
+export const mensajeDePlanVencido = (validUntil: Date | null): string =>
+  `El plan de la firma venció${validUntil ? ` el ${fechaLarga(validUntil)}` : ''}. ` +
+  'Puede leer y descargar lo que ya tiene; para seguir trabajando, renueve el plan en «Plan».';
+
+const mensajeVencido = (row: PlanRow): string => mensajeDePlanVencido(row.validUntil);
 
 /**
  * Refuses when the plan has expired. Reading and exporting never pass through

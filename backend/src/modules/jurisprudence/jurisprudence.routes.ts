@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { bloquearSiPlanVencido } from '../subscriptions/planVigente.middleware';
 import {
   disciplinariaController,
   discoverController,
@@ -11,5 +12,5 @@ const router = Router();
 router.get('/jurisprudence/ruling', rulingController as any);
 router.get('/jurisprudence/discover', discoverController as any);
 router.get('/jurisprudence/disciplinaria', disciplinariaController as any);
-router.post('/jurisprudence/index', indexRulingsController as any);
+router.post('/jurisprudence/index', bloquearSiPlanVencido, indexRulingsController as any);
 export const jurisprudenceRoutes = router;

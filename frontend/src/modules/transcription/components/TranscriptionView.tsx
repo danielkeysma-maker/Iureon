@@ -7,6 +7,7 @@ import { AudioPreview } from './AudioPreview';
 import { NotPersistedWarning, RoleProposals } from './RoleProposals';
 import { AudienciasList } from './AudienciasList';
 import { SubirAudienciaDialog } from './SubirAudienciaDialog';
+import { usePlanSoloLectura } from '../../subscriptions/PlanContext';
 import { transcriptionApi } from '../services/transcription.api';
 // Carga diferida: el acta embebe Plus Jakarta Sans (~500 KB) y solo la paga quien exporta.
 import { buildSpeakerNames } from '../speakerNames';
@@ -61,6 +62,8 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
     void loadStored();
   }, [loadStored]);
 
+  /* Con el plan vencido la lista se lee y se exporta; subir audio nuevo no se ofrece. */
+  const soloLectura = usePlanSoloLectura();
   const [copied, setCopied] = useState(false);
   const [subirAbierto, setSubirAbierto] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -139,7 +142,7 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
           </p>
         </div>
 
-        {!result && (
+        {!result && !soloLectura && (
           /*
             El primario del modulo: la audiencia es un archivo que LLEGA — el
             juzgado la publica y el abogado la trae — no un evento que se

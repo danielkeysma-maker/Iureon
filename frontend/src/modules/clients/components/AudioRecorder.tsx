@@ -1,6 +1,7 @@
 import React from 'react';
 import { AlertTriangle, Mic, Pause, Play, Square, Trash2 } from 'lucide-react';
 
+import { usePlanSoloLectura } from '../../subscriptions/PlanContext';
 interface AudioRecorderProps {
   /** Called with the finished recording, ready to transcribe. */
   onRecorded: (file: File) => void;
@@ -60,6 +61,12 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
   disabled,
   variante = 'escritorio'
 }) => {
+  /*
+   * Con el plan vencido no se graba: el transcrito nuevo lo rechazaria el
+   * servidor (402) DESPUES de una hora de entrevista, que es el peor momento.
+   */
+  const soloLectura = usePlanSoloLectura();
+  const deshabilitado = Boolean(disabled) || soloLectura;
   const [grabando, setGrabando] = React.useState(false);
   const [segundos, setSegundos] = React.useState(0);
   const [error, setError] = React.useState('');
@@ -290,7 +297,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
         <button
           type="button"
           onClick={() => onRecorded(listo.file)}
-          disabled={disabled}
+          disabled={deshabilitado}
           className="w-full py-2 bg-brand-700 hover:bg-brand-800 disabled:opacity-50 text-on-brand rounded-control text-[11px] font-semibold"
         >
           Transcribir esta entrevista
@@ -376,7 +383,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
         <button
           type="button"
           onClick={() => void empezar()}
-          disabled={disabled}
+          disabled={deshabilitado}
           className="flex h-[52px] w-full items-center justify-center gap-2 rounded-[8px] bg-brand-700 text-[13.5px] font-semibold text-on-brand disabled:opacity-50"
         >
           <Mic className="h-4 w-4 text-on-brand" />
@@ -431,7 +438,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
         <button
           type="button"
           onClick={() => void empezar()}
-          disabled={disabled}
+          disabled={deshabilitado}
           className="w-full py-3 bg-brand-700 hover:bg-brand-800 disabled:opacity-50 text-on-brand rounded-card text-xs font-bold flex items-center justify-center gap-2"
         >
           <Mic className="w-4 h-4 text-on-brand" />
