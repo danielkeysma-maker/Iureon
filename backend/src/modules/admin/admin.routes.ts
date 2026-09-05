@@ -20,6 +20,7 @@ import {
   listFirmsController,
   updateFirmController,
   updateFirmPlanController,
+  suspenderFirmaController,
   runwayController
 } from './admin.controller';
 import { mailStatusController, mailTestController } from '../mail/mail.controller';
@@ -56,6 +57,7 @@ router.get('/firms/:firmId', firmDetailController as any);
 router.post('/firms', createFirmController as any);
 router.patch('/firms/:firmId', updateFirmController as any);
 router.patch('/firms/:firmId/plan', updateFirmPlanController as any);
+router.post('/firms/:firmId/suspender', suspenderFirmaController as any);
 router.post('/firms/:firmId/credits', addCreditsController as any);
 router.post('/firms/:firmId/users', addUserController as any);
 

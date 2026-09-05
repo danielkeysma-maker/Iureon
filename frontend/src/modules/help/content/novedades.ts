@@ -36,6 +36,14 @@ export const NOVEDADES_ID = 'novedades';
 export const NOVEDADES: readonly Novedad[] = [
   {
     fecha: '2026-09-05',
+    titulo: 'Contratar desde la página pública: cree su cuenta y pague el plan',
+    detalle:
+      'En la página principal, «Contratar Esencial», «Contratar Premium» o «Contratar Firma» crea la cuenta de la firma y abre la pantalla del plan con ese plan destacado para pagar por Wompi. Hasta que el pago se confirma la aplicación está en solo lectura; al confirmarse, todo queda habilitado en el acto.',
+    modulo: 'Planes',
+    tipo: 'nuevo'
+  },
+  {
+    fecha: '2026-09-05',
     titulo: 'Los adjuntos ya se leen y sus datos entran al escrito',
     detalle:
       'Los PDF, Word, textos e imágenes que adjunte en Redacción —la foto de un comparendo, un oficio, una cédula— se leen antes de redactar, y sus números, fechas, lugares, nombres y valores entran al escrito en vez de quedar como [•]. La consola de ejecución dice qué se leyó de cada archivo; si un dato del adjunto contradice lo que usted escribió, prevalece lo suyo y la diferencia queda anotada. Hasta 8 archivos y 20 MB por escrito.',

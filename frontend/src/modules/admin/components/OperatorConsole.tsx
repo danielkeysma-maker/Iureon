@@ -45,6 +45,28 @@ const describirPlan = (f: FirmSummary): string => {
   return partes.join(' · ');
 };
 
+/**
+ * El estado del PLAN, derivado de la fecha como lo hace el servidor. Es el que
+ * decide si la firma trabaja o lee: la columna `status` (activa/en mora) no
+ * gobierna nada desde que existen los planes, y una firma suspendida por
+ * operación o una compra sin pagar deben verse «Vencido» en la lista sin
+ * abrir la ficha.
+ */
+const estadoDelPlanDe = (f: FirmSummary): { etiqueta: string; clase: string } | null => {
+  if (!f.planValidUntil) return null;
+  const dias = Math.ceil((new Date(f.planValidUntil).getTime() - Date.now()) / 86_400_000);
+  if (dias <= 0)
+    return { etiqueta: 'Vencido', clase: 'bg-[rgb(var(--danger)/0.06)] text-danger border-[rgb(var(--danger)/0.35)]' };
+  if (dias <= 7)
+    return {
+      etiqueta: `Vence en ${dias} ${dias === 1 ? 'día' : 'días'}`,
+      clase: 'bg-[rgb(var(--unverified-surf))] text-unverified border-[rgb(var(--unverified-line))]'
+    };
+  if (f.planPeriod === 'PRUEBA')
+    return { etiqueta: 'Prueba', clase: 'bg-brand-50 text-brand-700 border-[rgb(var(--brand-line))]' };
+  return { etiqueta: 'Activo', clase: 'bg-[rgb(var(--verified-surf))] text-verified border-[rgb(var(--verified-line))]' };
+};
+
 const ESTADO_ETIQUETA: Record<string, string> = {
   active: 'Activa',
   past_due: 'En mora',
@@ -361,13 +383,23 @@ export const OperatorConsole: React.FC = () => {
                   <p className="text-[11px] text-ink-500 font-mono">{firm.nit ? `NIT ${firm.nit}` : 'Sin NIT'}</p>
                 </div>
 
-                <span
-                  className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border shrink-0 ${
-                    ESTADO_ESTILO[firm.status] ?? 'bg-canvas text-ink-700 border-line-200'
-                  }`}
-                >
-                  {ESTADO_ETIQUETA[firm.status] ?? firm.status}
-                </span>
+                <div className="flex shrink-0 items-center gap-1.5">
+                  {(() => {
+                    const ep = estadoDelPlanDe(firm);
+                    return ep ? (
+                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${ep.clase}`}>
+                        {ep.etiqueta}
+                      </span>
+                    ) : null;
+                  })()}
+                  <span
+                    className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
+                      ESTADO_ESTILO[firm.status] ?? 'bg-canvas text-ink-700 border-line-200'
+                    }`}
+                  >
+                    {ESTADO_ETIQUETA[firm.status] ?? firm.status}
+                  </span>
+                </div>
               </div>
 
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-ink-500">

@@ -22,6 +22,7 @@ import { transcriptionPublicRoutes, transcriptionRoutes } from './modules/transc
 import { catalogPublicRoutes, catalogRoutes } from './modules/catalog/catalog.routes';
 import { preferencesRoutes } from './modules/preferences/preferences.routes';
 import { wompiPublicRoutes, wompiRoutes } from './modules/billing/wompi/wompi.routes';
+import { trialPublicRoutes } from './modules/trial/trial.routes';
 import { privacyRoutes } from './modules/privacy/privacy.routes';
 import { jurisprudenceRoutes } from './modules/jurisprudence/jurisprudence.routes';
 import { supportAccessRoutes } from './modules/support/supportAccess.routes';
@@ -84,6 +85,14 @@ app.use('/api', authPublicRoutes);
  * unauthenticated and no recharge would ever be credited.
  */
 app.use('/api', wompiPublicRoutes);
+
+/*
+ * The self-service 7-day trial of Esencial creates the account the caller
+ * does not have yet, so it cannot sit behind the session middleware either.
+ * Its own limits live in modules/trial (honeypot, 3 per IP per day, one per
+ * e-mail) and it returns the same session shape as /auth/login.
+ */
+app.use('/api', trialPublicRoutes);
 
 /*
  * THE TENANT NOW COMES FROM THE TOKEN, NOT FROM A HEADER.

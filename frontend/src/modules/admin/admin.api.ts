@@ -178,6 +178,10 @@ export const adminApi = {
   ) =>
     httpClient.patch<{ success: boolean }>(`/api/admin/firms/${firmId}/plan`, { body: input }),
 
+  /** Cuts the firm's access now (plan_valid_until = now); the plan form reactivates it. */
+  suspenderFirma: (firmId: string, motivo: string) =>
+    httpClient.post<{ success: boolean }>(`/api/admin/firms/${firmId}/suspender`, { body: { motivo } }),
+
   addUser: (firmId: string, input: { email: string; password: string; role: 'FIRM_ADMIN' | 'LAWYER' }) =>
     httpClient.post<{ user: { id: string; email: string } }>(`/api/admin/firms/${firmId}/users`, {
       body: input

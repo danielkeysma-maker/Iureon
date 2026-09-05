@@ -41,10 +41,42 @@ const post = async <T>(path: string, body: unknown): Promise<T> => {
   return payload as T;
 };
 
+export type ModoDeRegistro = 'PRUEBA' | 'COMPRA';
+export type PlanDeRegistro = 'ESENCIAL' | 'PREMIUM' | 'FIRMA';
+
+/**
+ * What the public sign-up form sends. `modo` PRUEBA opens the 7-day Esencial
+ * trial; COMPRA creates the firm with the chosen plan born expired, so the
+ * first payment activates it. `empresa` is the honeypot: always ''.
+ */
+export interface SolicitudDeRegistro {
+  modo: ModoDeRegistro;
+  plan: PlanDeRegistro;
+  firma: string;
+  nit: string;
+  nombre: string;
+  correo: string;
+  contrasena: string;
+  acepta: true;
+  empresa: string;
+}
+
 export const authApi = {
   login: (email: string, password: string) =>
     post<{ session: Session }>('/api/auth/login', { email, password }),
 
   refresh: (refreshToken: string) =>
-    post<{ session: Session }>('/api/auth/refresh', { refreshToken })
+    post<{ session: Session }>('/api/auth/refresh', { refreshToken }),
+
+  /*
+   * Self-service sign-up: the 7-day trial of Esencial or the purchase of any
+   * plan. Answers with the same session shape as login, so the app opens
+   * directly; the server enforces the limits (one per e-mail, three per
+   * address per day, honeypot, trial only for Esencial).
+   */
+  registro: (solicitud: SolicitudDeRegistro) =>
+    post<{ session: Session; venceEl: string; modo: ModoDeRegistro; plan: PlanDeRegistro }>(
+      '/api/public/registro',
+      solicitud
+    )
 };

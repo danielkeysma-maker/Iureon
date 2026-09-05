@@ -31,6 +31,10 @@ export type AuditAction =
   | 'REVIEW_TEXT_STORAGE_AUTHORIZED'
   | 'FIRM_STATUS_CHANGED'
   | 'USER_CREATED'
+  /** A firm opened itself through the public 7-day trial of Esencial. */
+  | 'TRIAL_STARTED'
+  /** A firm created itself from the public page to BUY a plan; born expired until the first payment. */
+  | 'REGISTRO_PARA_COMPRA'
   | 'SUPERADMIN_LISTED_FIRMS'
   | 'DRAFT_GENERATED'
   | 'TRANSCRIPTION_CREATED'
@@ -64,6 +68,8 @@ export type AuditAction =
    */
   | 'PLAN_PAGADO'
   | 'PLAN_ACTUALIZADO'
+  /** The operator cut access now: `plan_valid_until = now`, so the firm reads VENCIDO from this second. */
+  | 'PLAN_SUSPENDIDO'
   /*
    * Avisos por Web Push. Activar o desactivar los avisos en un dispositivo
    * queda en el rastro de la firma: es una decisión sobre por dónde sale

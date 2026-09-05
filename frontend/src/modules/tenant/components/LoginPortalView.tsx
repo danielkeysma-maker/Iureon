@@ -231,6 +231,17 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({ onLoginSuccess
             ¿Su firma aún no tiene cuenta? El acceso a Iureon es por contratación: escríbanos y
             abrimos la suya.
           </p>
+          {/*
+            La única puerta de autoservicio, y solo para Esencial: siete días con
+            saldo de IA en cero, así que probar no le cuesta modelos a nadie.
+          */}
+          <p className="mt-2 text-meta leading-[1.6] text-ink-500">
+            ¿Sin cuenta?{' '}
+            <a href="/?prueba=1" className="font-medium text-brand-700 underline underline-offset-4 hover:text-ink-900">
+              Pruebe Esencial gratis por 7 días
+            </a>
+            , sin tarjeta.
+          </p>
           <a
             href="/landing/index.html"
             className="mt-4 inline-block text-meta text-ink-500 underline underline-offset-4 hover:text-ink-900"

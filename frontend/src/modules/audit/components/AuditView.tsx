@@ -54,12 +54,15 @@ export const ACCIONES: Record<string, string> = {
   FIRM_CREDITS_ADDED: 'Acreditó saldo',
   FIRM_STATUS_CHANGED: 'Cambió estado de la firma',
   USER_CREATED: 'Creó usuario',
+  TRIAL_STARTED: 'Abrió la prueba gratuita',
+  REGISTRO_PARA_COMPRA: 'Creó la cuenta para contratar',
   SUPERADMIN_LISTED_FIRMS: 'Operación listó firmas',
   SUPPORT_CHAT_MESSAGE: 'Chat de soporte',
   PUSH_SUBSCRIBED: 'Avisos activados en un dispositivo',
   PUSH_UNSUBSCRIBED: 'Avisos desactivados en un dispositivo',
   PLAN_PAGADO: 'Pagó el plan',
   PLAN_ACTUALIZADO: 'Operación fijó el plan',
+  PLAN_SUSPENDIDO: 'Operación suspendió el acceso',
   EMAIL_SENT: 'Correo enviado'
 };
 
@@ -69,7 +72,7 @@ const VISTAS: Array<{ etiqueta: string; acciones: string[] }> = [
   { etiqueta: 'Cambios en el catálogo', acciones: ['CATALOG_TERM_VERIFIED'] },
   { etiqueta: 'Transcripciones', acciones: ['TRANSCRIPTION_CREATED', 'TRANSCRIPTION_DELETED', 'ACTA_LISTA'] },
   { etiqueta: 'Decisiones de entrevista', acciones: ['INTERVIEW_DECIDED'] },
-  { etiqueta: 'Saldo y firma', acciones: ['FIRM_CREDITS_ADDED', 'FIRM_UPDATED', 'FIRM_STATUS_CHANGED', 'PLAN_PAGADO', 'PLAN_ACTUALIZADO', 'EMAIL_SENT'] }
+  { etiqueta: 'Saldo y firma', acciones: ['FIRM_CREDITS_ADDED', 'FIRM_UPDATED', 'FIRM_STATUS_CHANGED', 'PLAN_PAGADO', 'PLAN_ACTUALIZADO', 'PLAN_SUSPENDIDO', 'TRIAL_STARTED', 'REGISTRO_PARA_COMPRA', 'EMAIL_SENT'] }
 ];
 
 const fechaHora = (iso: string): { fecha: string; hora: string } => {

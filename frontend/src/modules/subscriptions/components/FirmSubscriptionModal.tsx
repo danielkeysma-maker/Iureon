@@ -47,6 +47,12 @@ interface FirmSubscriptionModalProps {
   puedePagar: boolean;
   /** La cáscara guarda una copia del plan para la navegación y el aviso. */
   onPlanLeido?: (plan: PlanDeFirma) => void;
+  /**
+   * El plan que el socio ya eligió afuera (portada o registro para
+   * contratar). Esa tarjeta se destaca en lugar de Premium: quien acaba de
+   * pedir Firma no debe ver «Recomendado» sobre otro plan.
+   */
+  planSugerido?: Plan | null;
 }
 
 const pesos = (valor: number): string => `$${Math.round(valor).toLocaleString('es-CO')}`;
@@ -95,7 +101,8 @@ export const FirmSubscriptionModal: React.FC<FirmSubscriptionModalProps> = ({
   isOpen,
   onClose,
   puedePagar,
-  onPlanLeido
+  onPlanLeido,
+  planSugerido = null
 }) => {
   const { activeFirm } = useTenant();
   const [plan, setPlan] = React.useState<PlanDeFirma | null>(null);
@@ -276,7 +283,7 @@ export const FirmSubscriptionModal: React.FC<FirmSubscriptionModalProps> = ({
                 {(['ESENCIAL', 'PREMIUM', 'FIRMA'] as const).map((clave) => {
                   const def = planes[clave];
                   const esElActual = plan.plan === clave;
-                  const destacado = clave === 'PREMIUM';
+                  const destacado = planSugerido ? clave === planSugerido : clave === 'PREMIUM';
                   const incluidos = new Set<Modulo>(def.modulos);
                   return (
                     <article
@@ -288,7 +295,7 @@ export const FirmSubscriptionModal: React.FC<FirmSubscriptionModalProps> = ({
                       {destacado && (
                         <span className="absolute -top-3 left-5 inline-flex items-center gap-1 rounded-full bg-brand-700 px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-wide text-white shadow-e1">
                           <Sparkles className="h-3 w-3" />
-                          Recomendado
+                          {planSugerido ? 'Su elección' : 'Recomendado'}
                         </span>
                       )}
                       {esElActual && (

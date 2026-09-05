@@ -369,14 +369,36 @@ export const getFirmDetail = async (firmId: string): Promise<FirmDetail> => {
  * exist. The difference is who asks — a firm that signs itself up, or an
  * operator onboarding a client who called on the phone.
  */
-export const createFirm = async (input: {
+/**
+ * The one routine that brings a firm and its first administrator into being.
+ *
+ * WHY IT IS SHARED. Two doors open a tenant: the operator console (Premium on
+ * a 14-day trial, five seats) and the public 7-day trial of Esencial (one
+ * seat, no credit). Both must write the same row shape, retry without plan
+ * columns the same way and stamp the administrator with the same metadata; a
+ * second copy of this in the trial module would drift the day one of them is
+ * touched. The caller decides the plan, the period, the days and the seats —
+ * this function knows nothing about who is asking.
+ *
+ * `siFallaLaCuenta` decides what happens to the firm row when the account
+ * cannot be created (almost always: the e-mail already exists). The operator
+ * keeps it — a retry with a corrected e-mail reuses it, and an empty firm is
+ * inert. The public trial deletes it: an anonymous visitor who types an
+ * existing address must not leave a tenant behind on every attempt.
+ */
+export const crearFirmaConAdministrador = async (input: {
   firmName: string;
-  /** Opcional. Se guarda NULL cuando viene vacio: la columna es UNIQUE y '' repetido chocaria. */
   nit?: string;
   adminEmail: string;
   adminPassword: string;
   initialCredits?: number;
-}): Promise<FirmSummary> => {
+  plan: Plan;
+  period: PlanPeriod;
+  /** Days until `plan_valid_until`, counted from now. */
+  diasDeVigencia: number;
+  maxUsers: number;
+  siFallaLaCuenta: 'CONSERVAR_FIRMA' | 'BORRAR_FIRMA';
+}): Promise<{ firmId: string; firmName: string; nit: string | null; credits: number; validUntil: string }> => {
   const client = requireClient();
 
   const firmName = input.firmName.trim();
@@ -407,14 +429,7 @@ export const createFirm = async (input: {
 
   const firmId = `firm-${Date.now()}`;
   const credits = Number.isFinite(input.initialCredits) ? Number(input.initialCredits) : 0;
-
-  /*
-   * A NEW FIRM STARTS ON PREMIUM, ON TRIAL, FOR FOURTEEN DAYS. Premium so the
-   * trial shows everything the product does; a date so the trial ends without
-   * anyone remembering to end it. The operator can stretch or change it from
-   * the ficha, with a written reason.
-   */
-  const pruebaHasta = new Date(Date.now() + DIAS_DE_PRUEBA * 24 * 60 * 60 * 1000).toISOString();
+  const validUntil = new Date(Date.now() + input.diasDeVigencia * 24 * 60 * 60 * 1000).toISOString();
   const filaBase = {
     firm_id: firmId,
     name: firmName,
@@ -426,10 +441,10 @@ export const createFirm = async (input: {
 
   let { error: firmError } = await client.from('firms').insert({
     ...filaBase,
-    plan: 'PREMIUM',
-    plan_period: 'PRUEBA',
-    plan_valid_until: pruebaHasta,
-    plan_max_users: PLANES.PREMIUM.maxUsuarios
+    plan: input.plan,
+    plan_period: input.period,
+    plan_valid_until: validUntil,
+    plan_max_users: input.maxUsers
   });
 
   // Before migration-suscripciones.sql the plan columns do not exist. The firm
@@ -448,26 +463,61 @@ export const createFirm = async (input: {
     throw new AuthError('FIRM_NOT_CREATED', 'No se pudo crear la firma.', 502);
   }
 
-  // Throws on a duplicate e-mail, leaving the firm row behind for a retry to
-  // reuse — the same trade the self-registration path makes, and for the same
-  // reason: an empty firm is inert, an account pointing at nothing is not.
-  await addUserToFirm(firmId, {
-    email: input.adminEmail,
-    password: input.adminPassword,
-    role: 'FIRM_ADMIN'
+  try {
+    await addUserToFirm(firmId, {
+      email: input.adminEmail,
+      password: input.adminPassword,
+      role: 'FIRM_ADMIN'
+    });
+  } catch (err) {
+    if (input.siFallaLaCuenta === 'BORRAR_FIRMA') {
+      // Best effort: a row that survives this delete is inert, and the caller's
+      // error (EMAIL_EXISTS, almost always) is the one the visitor must see.
+      await client.from('firms').delete().eq('firm_id', firmId);
+    }
+    throw err;
+  }
+
+  return { firmId, firmName, nit, credits, validUntil };
+};
+
+export const createFirm = async (input: {
+  firmName: string;
+  /** Opcional. Se guarda NULL cuando viene vacio: la columna es UNIQUE y '' repetido chocaria. */
+  nit?: string;
+  adminEmail: string;
+  adminPassword: string;
+  initialCredits?: number;
+}): Promise<FirmSummary> => {
+  /*
+   * A NEW FIRM STARTS ON PREMIUM, ON TRIAL, FOR FOURTEEN DAYS. Premium so the
+   * trial shows everything the product does; a date so the trial ends without
+   * anyone remembering to end it. The operator can stretch or change it from
+   * the ficha, with a written reason.
+   *
+   * Throws on a duplicate e-mail, leaving the firm row behind for a retry to
+   * reuse — an empty firm is inert, an account pointing at nothing is not.
+   */
+  const creada = await crearFirmaConAdministrador({
+    ...input,
+    plan: 'PREMIUM',
+    period: 'PRUEBA',
+    diasDeVigencia: DIAS_DE_PRUEBA,
+    maxUsers: PLANES.PREMIUM.maxUsuarios,
+    siFallaLaCuenta: 'CONSERVAR_FIRMA'
   });
 
   return {
-    id: firmId,
-    name: firmName,
-    nit,
+    id: creada.firmId,
+    name: creada.firmName,
+    nit: creada.nit,
     planTier: 'PRO_FIRM',
     plan: 'PREMIUM',
     planPeriod: 'PRUEBA',
-    planValidUntil: pruebaHasta,
+    planValidUntil: creada.validUntil,
     planMaxUsers: PLANES.PREMIUM.maxUsuarios,
     status: 'active',
-    creditsBalance: credits,
+    creditsBalance: creada.credits,
     createdAt: new Date().toISOString(),
     users: 1,
     transcriptions: 0,
@@ -702,6 +752,61 @@ export const updateFirmPlan = async (
   }
 
   return { plan: changes.plan, period: changes.period, validUntil, reason: motivo };
+};
+
+/**
+ * Cuts a firm's access NOW: `plan_valid_until = now`, plan and period kept.
+ *
+ * Nothing else is touched on purpose. The guards derive VENCIDO from the date
+ * alone, so this is enough to turn the firm read-only this second, and it
+ * leaves the plan the firm had visible in the console and in the plan screen
+ * — "Renovar plan" is what the firm sees, and paying reactivates it exactly as
+ * an ordinary expiry would (the payment starts the new period at now).
+ * Reactivating by hand is the existing plan form; there is no second path.
+ *
+ * A firm with no plan at all (legacy cortesía, plan NULL) is given ESENCIAL as
+ * the label of its suspended plan: `estadoDelPlan` needs only the date, but
+ * the screens that name the plan must not read "Cortesía · vencido".
+ */
+export const suspenderAccesoDeFirma = async (
+  firmId: string,
+  reason: unknown
+): Promise<{ plan: Plan; period: PlanPeriod; validUntil: string; reason: string }> => {
+  const client = requireClient();
+  const motivo = requireReason(reason);
+
+  const { data: fila, error: lectura } = await client
+    .from('firms')
+    .select('plan, plan_period')
+    .eq('firm_id', firmId)
+    .maybeSingle();
+
+  if (lectura || !fila) {
+    throw new AuthError('FIRM_NOT_FOUND', 'No se encontró la firma.', 404);
+  }
+
+  const plan: Plan = esPlan(fila.plan) ? fila.plan : 'ESENCIAL';
+  const period: PlanPeriod =
+    esPeriodo(fila.plan_period) && fila.plan_period !== 'CORTESIA' ? fila.plan_period : 'MENSUAL';
+  const validUntil = new Date().toISOString();
+
+  const { error } = await client
+    .from('firms')
+    .update({
+      plan,
+      plan_period: period,
+      plan_valid_until: validUntil,
+      plan_max_users: PLANES[plan].maxUsuarios,
+      updated_at: validUntil
+    })
+    .eq('firm_id', firmId);
+
+  if (error) {
+    console.error('[ADMIN] No se pudo suspender el acceso:', error.message);
+    throw new AuthError('UPDATE_FAILED', 'No se pudo suspender el acceso de la firma.', 502);
+  }
+
+  return { plan, period, validUntil, reason: motivo };
 };
 
 /** The audit wording for a plan set by hand. */

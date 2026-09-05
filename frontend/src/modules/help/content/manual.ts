@@ -539,6 +539,22 @@ const A_PLANES: ManualArticle = {
       texto:
         'Los precios incluyen IVA. El plan anual son doce meses por el precio de diez. El consumo de inteligencia artificial —escritos, revisiones, resúmenes, orientaciones pasado el cupo gratuito— no está incluido en el plan: se descuenta del saldo de recargas, como se explica en «Roles y saldo». Son dos cosas distintas: el plan es el derecho a usar la aplicación; el saldo, lo que cada operación consume.'
     },
+    { kind: 'subtitulo', texto: 'Contratar desde la página pública' },
+    {
+      kind: 'pasos',
+      pasos: [
+        'En la página principal, bajo «Planes», pulse «Contratar Esencial», «Contratar Premium» o «Contratar Firma». Si su firma ya tiene cuenta, use «Iniciar sesión»: la cuenta se crea una sola vez.',
+        'Escriba el nombre de la firma, su nombre, su correo y una contraseña de al menos diez caracteres, acepte el tratamiento de datos y pulse «Crear cuenta y pagar» con el nombre del plan. La cuenta queda creada en ese momento y usted es su administrador.',
+        'La aplicación abre en solo lectura, con la franja roja y la pantalla «Plan de la firma» ya abierta y su plan destacado como «Su elección». Elija «Mensual» o «Anual» y pulse «Contratar»: se abre Wompi con el valor fijado.',
+        'Al confirmarse el pago, el plan queda activo hasta la fecha de vencimiento que muestra la pantalla y todos los módulos del plan se habilitan en el acto. No hay renovación automática: antes de vencer, la franja le avisa y vuelve a pagar desde «Plan».'
+      ]
+    },
+    {
+      kind: 'nota',
+      titulo: 'Suspensión por operación',
+      texto:
+        'Operación puede suspender el acceso de una firma con motivo escrito; la aplicación pasa a solo lectura en el acto, con la franja «Renovar plan», y el hecho queda en la auditoría de la firma como «Operación suspendió el acceso». Pagar desde «Plan» reactiva la firma; también puede hacerlo operación al fijar de nuevo el plan.'
+    },
     { kind: 'subtitulo', texto: 'Cómo se paga' },
     {
       kind: 'pasos',
@@ -576,7 +592,7 @@ const A_PLANES: ManualArticle = {
       kind: 'nota',
       titulo: 'Prueba gratuita de Esencial',
       texto:
-        'Desde la página pública o desde el enlace bajo el formulario de entrada, una firma puede abrir por su cuenta una prueba de Esencial de siete días: un usuario, sin tarjeta y sin cobro al terminar. Entra directo a la aplicación con todos los módulos de Esencial. El saldo de inteligencia artificial es aparte y empieza en cero: para probar la redacción hay que recargar desde «Saldo»; el Catálogo, el Buscador, las Herramientas y el Manual no consumen saldo. La pantalla del plan la muestra como «Prueba» con la fecha de vencimiento y la franja de aviso cuenta los días. Al cumplirse los siete días la aplicación pasa a solo lectura, igual que un plan vencido, y «Contratar» en la pantalla del plan la reactiva en el acto con Esencial o con otro plan. Una prueba por correo; el servidor limita las altas desde una misma conexión.'
+        'Desde la página pública o desde el enlace bajo el formulario de entrada, una firma puede abrir por su cuenta una prueba de Esencial de siete días: un usuario, sin tarjeta y sin cobro al terminar. La prueba es una sola por persona: si el correo o la conexión ya la usaron, la aplicación responde «Ya usó su prueba gratuita» y ofrece contratar o iniciar sesión. Entra directo a la aplicación con todos los módulos de Esencial. El saldo de inteligencia artificial es aparte y empieza en cero: para probar la redacción hay que recargar desde «Saldo»; el Catálogo, el Buscador, las Herramientas y el Manual no consumen saldo. La pantalla del plan la muestra como «Prueba» con la fecha de vencimiento y la franja de aviso cuenta los días. Al cumplirse los siete días la aplicación pasa a solo lectura, igual que un plan vencido, y «Contratar» en la pantalla del plan la reactiva en el acto con Esencial o con otro plan. Una prueba por correo; el servidor limita las altas desde una misma conexión.'
     },
     {
       kind: 'nota',

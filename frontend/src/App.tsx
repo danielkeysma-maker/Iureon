@@ -56,7 +56,7 @@ import { PlanVencidoBar } from './modules/subscriptions/components/PlanVencidoBa
 import { ModuloBloqueado } from './modules/subscriptions/components/ModuloBloqueado';
 import { PlanProvider } from './modules/subscriptions/PlanContext';
 import { subscriptionApi } from './modules/subscriptions/subscription.api';
-import type { PlanDeFirma } from './modules/subscriptions/types';
+import type { Plan, PlanDeFirma } from './modules/subscriptions/types';
 import { DEFAULT_FIRM_BRANDING, DocumentExportService } from './modules/documents/services/documentExport.service';
 import type { FirmBrandingConfig } from './modules/documents/services/documentExport.service';
 import { useLegalAgentWorkflow } from './modules/workspace/hooks/useLegalAgentWorkflow';
@@ -70,6 +70,7 @@ import { useSavedDrafts } from './modules/documents/hooks/useSavedDrafts';
 import { OperatorConsoleDialog } from './modules/admin/components/OperatorConsoleDialog';
 import { FirmUsersDialog } from './modules/tenant/components/FirmUsersDialog';
 import { LoginPortalView } from './modules/tenant/components/LoginPortalView';
+import { RegistroView } from './modules/tenant/components/RegistroView';
 import type { MainView } from './modules/tenant/types';
 import { NAV_MODULES, vistasOcultasPorPlan } from './modules/tenant/navigation';
 
@@ -136,7 +137,7 @@ export function App() {
   const isAuthenticated = Boolean(session);
   /*
    * PORTADA PÚBLICA. Quien llega a la raíz SIN sesión y sin decir a qué viene
-   * (`?entrar=1`, `?ir=…` o `?vista=1`) va a `/landing/`, la página pública que
+   * (`?entrar=1`, `?prueba=1`, `?registro=PLAN`, `?ir=…` o `?vista=1`) va a `/landing/`, la página pública que
    * vive en `public/landing/` y que Vercel sirve como archivo antes de la
    * reescritura a `index.html`. Se decide una sola vez, al montar: la sesión
    * que se cierra dentro de la aplicación no debe expulsar a la portada.
@@ -148,7 +149,14 @@ export function App() {
     const params = new URLSearchParams(window.location.search);
     const plan = params.get('plan');
     if (plan) sessionStorage.setItem(PLAN_ELEGIDO_KEY, plan.toUpperCase());
-    if (params.has('entrar') || params.has('ir') || params.has('vista')) return false;
+    if (
+      params.has('entrar') ||
+      params.has('prueba') ||
+      params.has('registro') ||
+      params.has('ir') ||
+      params.has('vista')
+    )
+      return false;
     return window.location.pathname === '/';
   });
   useEffect(() => {
@@ -308,14 +316,19 @@ export function App() {
    */
   const abrirPlan = React.useCallback(() => setIsSubscriptionModalOpen(true), []);
   /*
-   * El plan elegido en la portada abre la pantalla de planes UNA vez, la
-   * primera vez que hay sesión; la clave se borra para que recargar no la
-   * vuelva a abrir.
+   * El plan elegido en la portada —o en el registro para contratar— abre la
+   * pantalla de planes UNA vez, la primera vez que hay sesión, con esa
+   * tarjeta destacada; la clave se borra para que recargar no la vuelva a
+   * abrir. El plan sugerido vive en estado mientras dure la pestaña: la
+   * pantalla puede cerrarse y reabrirse antes de pagar.
    */
+  const [planSugerido, setPlanSugerido] = useState<Plan | null>(null);
   useEffect(() => {
     if (!session) return;
-    if (!sessionStorage.getItem(PLAN_ELEGIDO_KEY)) return;
+    const elegido = sessionStorage.getItem(PLAN_ELEGIDO_KEY);
+    if (!elegido) return;
     sessionStorage.removeItem(PLAN_ELEGIDO_KEY);
+    if (elegido === 'ESENCIAL' || elegido === 'PREMIUM' || elegido === 'FIRMA') setPlanSugerido(elegido);
     setIsSubscriptionModalOpen(true);
   }, [session]);
   /*
@@ -703,6 +716,23 @@ export function App() {
 
   if (!isAuthenticated) {
     if (debeIrALaPortada) return null;
+    /*
+     * `?prueba=1` viene de la portada y del enlace bajo el formulario de
+     * entrada: abre la prueba gratuita de Esencial. `?registro=PREMIUM` viene
+     * de «Contratar» en la portada: crea la cuenta para pagar ese plan. El
+     * servidor devuelve la misma sesión que el login, así que la cuenta
+     * recién creada entra por el mismo camino y sin segunda pantalla. Un
+     * plan desconocido en la URL cae a Esencial, nunca a un error en blanco.
+     */
+    const parametros = new URLSearchParams(window.location.search);
+    if (parametros.has('prueba')) {
+      return <RegistroView modo="PRUEBA" plan="ESENCIAL" onLoginSuccess={handleLoginSuccess} />;
+    }
+    if (parametros.has('registro')) {
+      const pedido = (parametros.get('registro') ?? '').toUpperCase();
+      const plan = pedido === 'PREMIUM' || pedido === 'FIRMA' ? pedido : 'ESENCIAL';
+      return <RegistroView modo="COMPRA" plan={plan} onLoginSuccess={handleLoginSuccess} />;
+    }
     return <LoginPortalView onLoginSuccess={handleLoginSuccess} />;
   }
 
@@ -790,6 +820,7 @@ export function App() {
         onClose={() => setIsSubscriptionModalOpen(false)}
         puedePagar={Boolean(esSocio || esSuperusuario)}
         onPlanLeido={setPlanDeFirma}
+        planSugerido={planSugerido}
       />
       {/*
         `procesoActual` sale del borrador abierto en el panel, no de un campo

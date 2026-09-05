@@ -1,5 +1,6 @@
 import React from 'react';
-import { CalendarClock } from 'lucide-react';
+import { Ban, CalendarClock } from 'lucide-react';
+import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 import { adminApi, type FirmDetail } from '../admin.api';
 
 /**
@@ -11,6 +12,13 @@ import { adminApi, type FirmDetail } from '../admin.api';
  * firma como PLAN_ACTUALIZADO, que sus socios también leen. Es la acción
  * «cambiar plan / extender prueba» que la cabecera de la ficha declaraba
  * ausente por falta de endpoint; ahora el endpoint existe.
+ *
+ * SUSPENDER ES PONER EL VENCIMIENTO EN AHORA. No hay un interruptor aparte:
+ * la firma queda VENCIDA en el acto —solo lectura, franja «Renovar plan»— por
+ * la misma regla que cierra una prueba cumplida, y la reactiva un pago de la
+ * firma o este mismo formulario. Un segundo estado «suspendida» habría que
+ * enseñárselo a cada guardia; la fecha ya se la saben todos. Exige motivo:
+ * queda en la auditoría de la firma como PLAN_SUSPENDIDO y los socios lo leen.
  *
  * LO QUE NO HACE: cobrar. Un pago lo hace la firma desde su propia pantalla,
  * por Wompi; operación no puede marcar un periodo como pagado.
@@ -68,9 +76,57 @@ export const FirmPlanSection: React.FC<FirmPlanSectionProps> = ({ firma, onGuard
   const [motivo, setMotivo] = React.useState('');
   const [guardando, setGuardando] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [confirmacion, setConfirmacion] = React.useState<Confirmacion | null>(null);
+  const [motivoSuspension, setMotivoSuspension] = React.useState('');
+  const [errorSuspension, setErrorSuspension] = React.useState<string | null>(null);
 
   const estado = estadoDe(firma);
   const necesitaFecha = periodo !== 'CORTESIA';
+  const yaVencida = estado.etiqueta === 'Vencido';
+
+  /*
+   * El motivo se escribe dentro del diálogo y se valida al confirmar: el
+   * servidor exige diez caracteres y aquí se pide lo mismo antes de viajar.
+   * Un motivo corto no cierra el diálogo; explica qué falta.
+   */
+  const motivoRef = React.useRef('');
+  /*
+   * `ConfirmarDialog` cierra al terminar `onConfirmar`, sin distinguir éxito de
+   * fallo. Cuando el motivo falta o el servidor rechaza, el diálogo debe
+   * quedarse abierto mostrando por qué: esta bandera le pide al cierre que
+   * no cierre, una sola vez.
+   */
+  const mantenerAbiertoRef = React.useRef(false);
+  const suspender = async () => {
+    const motivo = motivoRef.current.replace(/\s+/g, ' ').trim();
+    if (motivo.length < 10) {
+      setErrorSuspension('Escriba el motivo (al menos 10 caracteres): queda en la auditoría de la firma.');
+      mantenerAbiertoRef.current = true;
+      return;
+    }
+    setErrorSuspension(null);
+    try {
+      await adminApi.suspenderFirma(firma.id, motivo);
+    } catch (err) {
+      setErrorSuspension(err instanceof Error ? err.message : 'No se pudo suspender el acceso.');
+      mantenerAbiertoRef.current = true;
+      return;
+    }
+    setMotivoSuspension('');
+    motivoRef.current = '';
+    onGuardado();
+  };
+
+  const abrirSuspension = () => {
+    setErrorSuspension(null);
+    setConfirmacion({
+      titulo: 'Suspender el acceso ahora',
+      texto: '',
+      etiqueta: 'Suspender acceso',
+      peligro: true,
+      onConfirmar: suspender
+    });
+  };
 
   const guardar = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -148,11 +204,22 @@ export const FirmPlanSection: React.FC<FirmPlanSectionProps> = ({ firma, onGuard
       </dl>
 
       {!editando ? (
-        <div className="border-t border-line-200 px-4 py-3">
+        <div className="flex flex-wrap items-center gap-3 border-t border-line-200 px-4 py-3">
           <button type="button" onClick={() => setEditando(true)} className="btn-secondary flex items-center gap-2">
             <CalendarClock className="h-4 w-4" />
-            Fijar plan o vencimiento
+            {yaVencida ? 'Reactivar: fijar plan o vencimiento' : 'Fijar plan o vencimiento'}
           </button>
+          {/* Una firma ya vencida no tiene nada que suspender: el botón sobraría y confundiría. */}
+          {!yaVencida && (
+            <button
+              type="button"
+              onClick={abrirSuspension}
+              className="flex items-center gap-2 text-[12px] font-medium text-danger hover:underline"
+            >
+              <Ban className="h-4 w-4" />
+              Suspender acceso ahora
+            </button>
+          )}
         </div>
       ) : (
         <form onSubmit={(e) => void guardar(e)} className="space-y-3 border-t border-line-200 px-4 py-3">
@@ -223,6 +290,46 @@ export const FirmPlanSection: React.FC<FirmPlanSectionProps> = ({ firma, onGuard
           </div>
         </form>
       )}
+
+      <ConfirmarDialog
+        confirmacion={
+          confirmacion && {
+            ...confirmacion,
+            texto: (
+              <div className="space-y-3">
+                <p>
+                  La firma <b>{firma.name}</b> queda en solo lectura en el acto: sus usuarios ven la
+                  franja «Renovar plan» y ninguna pantalla crea ni modifica trabajo. Conserva todo lo que
+                  tiene. La reactiva un pago de la firma por Wompi o usted, con «Fijar plan o vencimiento».
+                </p>
+                <label className="block text-[11px] text-ink-500">
+                  Motivo · queda en la auditoría de la firma con su correo
+                  <input
+                    type="text"
+                    value={motivoSuspension}
+                    onChange={(e) => {
+                      setMotivoSuspension(e.target.value);
+                      motivoRef.current = e.target.value;
+                    }}
+                    placeholder="Pago rechazado dos veces; acordado con el socio por teléfono"
+                    className="mt-1 w-full rounded-control border border-line-200 bg-canvas px-2 py-1.5 text-[12px] text-ink-900 focus:border-brand-700 focus:outline-none"
+                    autoFocus
+                  />
+                </label>
+                {errorSuspension && <p className="text-[12px] text-danger">{errorSuspension}</p>}
+              </div>
+            )
+          }
+        }
+        onCerrar={() => {
+          if (mantenerAbiertoRef.current) {
+            mantenerAbiertoRef.current = false;
+            return;
+          }
+          setConfirmacion(null);
+          setErrorSuspension(null);
+        }}
+      />
     </section>
   );
 };

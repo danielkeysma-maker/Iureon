@@ -36,9 +36,17 @@ export const PlanExpiryBanner: React.FC<PlanExpiryBannerProps> = ({ plan, puedeV
 
   const dias = plan.diasRestantes ?? 0;
 
-  const texto = `Su plan vence el ${fechaLarga(plan.validUntil)}${
-    dias === 1 ? ' (mañana)' : dias > 1 ? ` (en ${dias} días)` : ''
-  }. Pagar antes suma el periodo a la fecha vigente: no se pierde ningún día.`;
+  const cuando = dias === 1 ? ' (mañana)' : dias > 1 ? ` (en ${dias} días)` : '';
+  /*
+   * A 7-day trial is POR_VENCER from its first day (DIAS_DE_AVISO is seven),
+   * so this banner IS the trial's countdown. "Pagar antes suma el periodo" is
+   * true for a trial too, but the partner has not paid anything yet: what
+   * they need to hear is that nothing is charged and what happens at the end.
+   */
+  const texto =
+    plan.period === 'PRUEBA'
+      ? `Su prueba gratuita termina el ${fechaLarga(plan.validUntil)}${cuando}. No se cobra nada al terminar: la aplicación pasa a solo lectura y conserva su trabajo. Para continuar, contrate un plan.`
+      : `Su plan vence el ${fechaLarga(plan.validUntil)}${cuando}. Pagar antes suma el periodo a la fecha vigente: no se pierde ningún día.`;
 
   return (
     <div

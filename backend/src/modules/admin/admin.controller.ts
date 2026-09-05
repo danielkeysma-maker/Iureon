@@ -10,6 +10,7 @@ import {
   listFirms,
   updateFirm,
   updateFirmPlan,
+  suspenderAccesoDeFirma,
   describirCambioDePlan
 } from './admin.service';
 import { calcularRunway } from './runway.service';
@@ -171,6 +172,32 @@ export const updateFirmPlanController = async (req: Request, res: Response): Pro
     res.json({ success: true, plan: cambio });
   } catch (err) {
     fail(res, err, 'No se pudo fijar el plan de la firma.');
+  }
+};
+
+/**
+ * POST /api/admin/firms/:firmId/suspender — cuts access now, with a reason.
+ *
+ * Audited as PLAN_SUSPENDIDO in the firm's own trail: its partners must be
+ * able to read who closed the door and why, next to the payment that reopens it.
+ */
+export const suspenderFirmaController = async (req: Request, res: Response): Promise<void> => {
+  const firmId = String(req.params.firmId);
+
+  try {
+    const cambio = await suspenderAccesoDeFirma(firmId, req.body.motivo ?? req.body.reason);
+
+    await auditService.record({
+      firmId,
+      userEmail: req.user!.email,
+      action: 'PLAN_SUSPENDIDO',
+      resource: `Acceso suspendido por operación · ${describirCambioDePlan(cambio)} · motivo: ${cambio.reason}`,
+      ipAddress: callerIp(req)
+    });
+
+    res.json({ success: true, plan: cambio });
+  } catch (err) {
+    fail(res, err, 'No se pudo suspender el acceso de la firma.');
   }
 };
 
