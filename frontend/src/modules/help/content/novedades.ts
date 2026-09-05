@@ -11,6 +11,10 @@
  * consoles, no internal data fixes. If an entry cannot be understood from the
  * screen, it does not belong here — the owner asked for exactly this on
  * 2026-09-05 after reading entries about "producción".
+ * NOR ANYTHING COMMERCIAL OR ABOUT GETTING IN: no prices, no new plan tiers,
+ * no free trials, no sign-up or landing page, no registration rules. Whoever
+ * reads this list is already inside and already pays; only improvements to
+ * how the application works belong here (owner, 2026-09-05, second pass).
  *
  * Same-day fix-ups a user would not notice (wording of a commit, CI guards,
  * build markers) are left out, and several commits on one feature become a
@@ -36,42 +40,10 @@ export const NOVEDADES_ID = 'novedades';
 export const NOVEDADES: readonly Novedad[] = [
   {
     fecha: '2026-09-05',
-    titulo: 'La prueba gratuita también se pide desde «Plan de la firma»',
-    detalle:
-      'Una firma que creó su cuenta con «Contratar» y todavía no ha pagado ni probado ve en la tarjeta Esencial de «Plan de la firma» el botón «Probar Esencial gratis 7 días»: un usuario, sin tarjeta y sin cobro al terminar. Al confirmar, la aplicación sale de solo lectura en el acto. Es la misma prueba de la página pública: una por firma y por persona.',
-    modulo: 'Planes',
-    tipo: 'nuevo'
-  },
-  {
-    fecha: '2026-09-05',
-    titulo: 'Contratar desde la página pública: cree su cuenta y pague el plan',
-    detalle:
-      'En la página principal, «Contratar Esencial», «Contratar Premium» o «Contratar Firma» crea la cuenta de la firma y abre la pantalla del plan con ese plan destacado para pagar por Wompi. Hasta que el pago se confirma la aplicación está en solo lectura; al confirmarse, todo queda habilitado en el acto.',
-    modulo: 'Planes',
-    tipo: 'nuevo'
-  },
-  {
-    fecha: '2026-09-05',
     titulo: 'Los adjuntos ya se leen y sus datos entran al escrito',
     detalle:
       'Los PDF, Word, textos e imágenes que adjunte en Redacción —la foto de un comparendo, un oficio, una cédula— se leen antes de redactar, y sus números, fechas, lugares, nombres y valores entran al escrito en vez de quedar como [•]. La consola de ejecución dice qué se leyó de cada archivo; si un dato del adjunto contradice lo que usted escribió, prevalece lo suyo y la diferencia queda anotada. Hasta 8 archivos y 20 MB por escrito.',
     modulo: 'Redacción',
-    tipo: 'nuevo'
-  },
-  {
-    fecha: '2026-09-05',
-    titulo: 'Prueba gratuita de Esencial por siete días',
-    detalle:
-      'Desde la página pública o desde el formulario de entrada, una firma puede abrir por su cuenta una prueba de Esencial: siete días, un usuario, sin tarjeta. Entra directo a la aplicación; el saldo de inteligencia artificial es aparte y empieza en cero. Al terminar, «Contratar» en la pantalla del plan la reactiva.',
-    modulo: 'Planes',
-    tipo: 'nuevo'
-  },
-  {
-    fecha: '2026-09-05',
-    titulo: 'Página pública de Iureon antes del inicio de sesión',
-    detalle:
-      'Quien llega a la dirección de Iureon sin sesión ve ahora una página que explica los módulos, los planes con su precio y la seguridad de los datos; desde allí se entra a la aplicación o se contrata un plan.',
-    modulo: 'Acceso',
     tipo: 'nuevo'
   },
   {
@@ -93,26 +65,10 @@ export const NOVEDADES: readonly Novedad[] = [
   },
   {
     fecha: '2026-09-05',
-    titulo: 'Plan Firma: todos los módulos para hasta quince usuarios',
-    detalle:
-      'Se suma un tercer plan para firmas medianas: Firma, a $250.000 al mes o $2.500.000 al año, con todos los módulos y hasta quince personas. Se contrata desde la misma pantalla de planes.',
-    modulo: 'Planes',
-    tipo: 'nuevo'
-  },
-  {
-    fecha: '2026-09-05',
     titulo: 'La respuesta de la guía muestra sus puntos con títulos en negrita',
     detalle:
       'Cuando la guía responde por puntos numerados o con letras, el número y el título de cada punto van en negrita, y las negritas que ella marca se ven como tales. Los párrafos van justificados.',
     modulo: 'Taller',
-    tipo: 'mejora'
-  },
-  {
-    fecha: '2026-09-05',
-    titulo: 'Nuevos precios de los planes',
-    detalle:
-      'Esencial pasa a $85.000 al mes o $850.000 al año; Premium a $120.000 al mes o $1.200.000 al año. El anual sigue siendo doce meses por el precio de diez. Los planes ya pagados conservan su vigencia.',
-    modulo: 'Planes',
     tipo: 'mejora'
   },
   {
@@ -318,14 +274,6 @@ export const NOVEDADES: readonly Novedad[] = [
     detalle: 'Se elige en Ajustes, como las demás, y solo la descarga quien la selecciona.',
     modulo: 'Ajustes',
     tipo: 'nuevo'
-  },
-  {
-    fecha: '2026-09-02',
-    titulo: 'El NIT es opcional al registrar una firma',
-    detalle:
-      'Un litigante que factura como persona natural o un despacho que aún no lo tramita ya se puede dar de alta. Solo el nombre es obligatorio; si el NIT viene, sigue siendo único.',
-    modulo: 'Operación',
-    tipo: 'mejora'
   },
   {
     fecha: '2026-09-02',
