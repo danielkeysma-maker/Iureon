@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { bloquearSiPlanVencido } from '../subscriptions/planVigente.middleware';
 import {
   addUserController,
+  eliminarMiUsuarioController,
   listUsersController,
   loginController,
   meController,
@@ -33,6 +34,8 @@ export const authPublicRoutes = publicRouter;
 const router = Router();
 
 router.get('/auth/me', meController as any);
+// Without bloquearSiPlanVencido: leaving must work exactly when the plan ran out.
+router.delete('/auth/me', eliminarMiUsuarioController as any);
 router.get('/auth/users', listUsersController as any);
 router.post('/auth/users', bloquearSiPlanVencido, addUserController as any);
 router.patch('/auth/users/:id/estado', setUserActiveController as any);

@@ -7,7 +7,7 @@ import {
   usuarioDeLaFirma,
   type FirmUserRole
 } from '../auth/auth.service';
-import { BackblazeB2TenantStorageService } from '../documents/b2.service';
+import { borrarFirmaConTodo, nombreDeLaFirma, type FirmaEliminada } from '../firms/borradoDeFirma.service';
 import { validarBorradoDeFirma, validarContrasenaDeOperador } from './admin.rules';
 import { consumoDelMesPorUsuario } from '../billing/billing.service';
 import { auditService, type AuditLogEntry } from '../audit/audit.service';
@@ -881,29 +881,14 @@ export const restablecerContrasenaDeUsuario = async (
   return { email: objetivo.email ?? '' };
 };
 
-export interface FirmaEliminada {
-  nombre: string;
-  /** What the database function removed, table by table. */
-  tablas: Array<{ tabla: string; filas: number }>;
-  usuariosEliminados: number;
-  /** Every step that did not complete and needs a hand: B2 objects, accounts. */
-  advertencias: string[];
-}
-
-/** How many listing rounds the B2 sweep tolerates before it calls itself stuck. */
-const MAX_RONDAS_B2 = 50;
+export type { FirmaEliminada } from '../firms/borradoDeFirma.service';
 
 /**
- * Deletes a firm with everything it owns, in this order and awaited whole:
- *
- *  1. Its accounts are LISTED (not yet deleted) while the firm still exists.
- *  2. Its B2 objects are deleted; a failure is a warning, never a stop —
- *     files in a bucket are recoverable by hand, a half-deleted tenant is not.
- *  3. `borrar_firma_completa` removes every row in one transaction (see
- *     supabase/migration-borrar-firma.sql for the table list and why
- *     trial_signups survives).
- *  4. The accounts are deleted LAST: had they gone first and step 3 failed,
- *     the firm would keep its data with nobody able to sign in.
+ * Deletes a firm with everything it owns. The pipeline itself (accounts
+ * listed, B2 swept, `borrar_firma_completa`, accounts deleted last) lives in
+ * `firms/borradoDeFirma.service.ts`, shared with the firm's own administrator;
+ * what is decided HERE is the operator's part: the reason, the typed name,
+ * never the operator's own firm.
  *
  * The caller audits it under the OPERATOR's firm: the deleted firm's own
  * trail went with it.
@@ -914,18 +899,7 @@ export const eliminarFirmaCompleta = async (input: {
   motivo: unknown;
   confirmacion: unknown;
 }): Promise<FirmaEliminada & { motivo: string }> => {
-  const client = requireClient();
-  const advertencias: string[] = [];
-
-  const { data: fila } = await client
-    .from('firms')
-    .select('firm_id, name')
-    .eq('firm_id', input.firmId)
-    .maybeSingle();
-  if (!fila) {
-    throw new AuthError('FIRM_NOT_FOUND', 'No existe esa firma.', 404);
-  }
-  const nombre = String((fila as { name: string }).name ?? '');
+  const nombre = await nombreDeLaFirma(input.firmId);
 
   const motivo = validarBorradoDeFirma({
     firmId: input.firmId,
@@ -935,68 +909,6 @@ export const eliminarFirmaCompleta = async (input: {
     motivo: input.motivo
   });
 
-  // 1. Accounts, listed now: after step 3 nothing says which users were hers.
-  const cuentas = await listFirmUsers(input.firmId);
-
-  // 2. B2. Unconfigured or failing storage is reported, not fatal.
-  const b2 = new BackblazeB2TenantStorageService();
-  try {
-    let ronda = 0;
-    let borradosEnRonda = -1;
-    while (ronda < MAX_RONDAS_B2 && borradosEnRonda !== 0) {
-      const objetos = await b2.listFirmDocuments(input.firmId);
-      if (objetos.length === 0) break;
-      borradosEnRonda = 0;
-      for (const objeto of objetos) {
-        const borrado = await b2.deleteObject(input.firmId, objeto.fileKey);
-        if (borrado) borradosEnRonda += 1;
-        else advertencias.push(`Archivo en B2 no borrado: ${objeto.fileKey}`);
-      }
-      // A round that deleted nothing would list the same objects forever.
-      ronda += 1;
-    }
-  } catch (err) {
-    advertencias.push(
-      `No se pudieron listar ni borrar los archivos de la firma en B2: ${(err as Error).message}`
-    );
-  }
-
-  // 3. The database, in one transaction.
-  const { data: tablas, error } = await client.rpc('borrar_firma_completa', {
-    p_firm_id: input.firmId
-  });
-  if (error) {
-    // PostgREST answers PGRST202 when the function does not exist: the
-    // migration has not run. Named, so the operator knows what to do.
-    const sinFuncion =
-      error.code === 'PGRST202' || /could not find the function|does not exist/i.test(error.message);
-    if (sinFuncion) {
-      throw new AuthError(
-        'MIGRATION_REQUIRED',
-        'Falta ejecutar supabase/migration-borrar-firma.sql en la base de datos antes de poder eliminar una firma.',
-        503
-      );
-    }
-    console.error('[ADMIN] borrar_firma_completa falló:', error.message);
-    throw new AuthError('DELETE_FAILED', 'No se pudo eliminar la firma; no se borró nada.', 502);
-  }
-
-  // 4. Accounts, last.
-  let usuariosEliminados = 0;
-  for (const cuenta of cuentas) {
-    const { error: errorCuenta } = await client.auth.admin.deleteUser(cuenta.id);
-    if (errorCuenta) advertencias.push(`Cuenta no eliminada: ${cuenta.email} (${errorCuenta.message})`);
-    else usuariosEliminados += 1;
-  }
-
-  return {
-    nombre,
-    tablas: ((tablas ?? []) as Array<{ tabla: string; filas: number | string }>).map((t) => ({
-      tabla: t.tabla,
-      filas: Number(t.filas ?? 0)
-    })),
-    usuariosEliminados,
-    advertencias,
-    motivo
-  };
+  const resultado = await borrarFirmaConTodo({ firmId: input.firmId, nombre });
+  return { ...resultado, motivo };
 };

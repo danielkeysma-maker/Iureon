@@ -36,6 +36,8 @@ jobs:
         run: npm run check:trial
       - name: Operator support rules (firm deletion confirmation, self-delete, password floor)
         run: npm run check:admin-reglas
+      - name: Self-service deletion rules (last user, last administrator, operator, typed firm name)
+        run: npm run check:borrado
       - name: Transactional mail (templates, subjects, cuenta de cobro PDF)
         run: npm run check:mail
       - name: Catalogue correctness checks

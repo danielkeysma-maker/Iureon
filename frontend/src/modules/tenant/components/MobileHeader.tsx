@@ -2,6 +2,7 @@ import React from 'react';
 import { Copy, FileDown, FileText, LogOut, ShieldCheck, X } from 'lucide-react';
 import { IconoMenu, IconoPalomita } from '../../../design/ArtboardIcons';
 import { navModule } from '../navigation';
+import { IureonMark } from './IureonMark';
 import type { MainView } from '../types';
 import type { EstadoBorrador } from '../../documents/types';
 
@@ -58,6 +59,8 @@ interface MobileHeaderProps {
   onMarcarListo?: () => void;
   onAbrirGestion?: () => void;
   onLogout: () => void;
+  /** Home: Redacción with every remembered inner screen forgotten. */
+  onInicio?: () => void;
 }
 
 const Accion: React.FC<{
@@ -89,7 +92,8 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
   estadoDelBorrador,
   onMarcarListo,
   onAbrirGestion,
-  onLogout
+  onLogout,
+  onInicio
 }) => {
   const [menu, setMenu] = React.useState(false);
   const modulo = navModule(mainView);
@@ -103,6 +107,16 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
   return (
     <>
       <header className="flex h-[52px] shrink-0 items-center gap-2.5 border-b border-line-200 bg-surface px-4 lg:hidden">
+        {/* La marca lleva al inicio, igual que en la barra lateral de escritorio. */}
+        <button
+          type="button"
+          onClick={onInicio}
+          title="Ir al inicio"
+          aria-label="Ir al inicio"
+          className="flex h-[34px] w-[34px] shrink-0 cursor-pointer items-center justify-center rounded-[8px]"
+        >
+          <IureonMark size={24} />
+        </button>
         <div className="min-w-0 flex-1">
           <h1 className="truncate text-[15px] font-semibold leading-tight text-ink-900">
             {modulo.label}

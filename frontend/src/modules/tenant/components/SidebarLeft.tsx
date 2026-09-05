@@ -20,6 +20,8 @@ import { solicitarAbrirNovedades, useNovedadesNuevas } from '../../help/useNoved
 interface SidebarLeftProps {
   mainView: MainView;
   setMainView: (view: MainView) => void;
+  /** Home: Redacción with every remembered inner screen forgotten. */
+  onInicio?: () => void;
   activeFirm: LawFirmTenant;
   setActiveFirm: (firm: LawFirmTenant) => void;
   sampleFirms: LawFirmTenant[];
@@ -57,6 +59,7 @@ const RIEL = 'w-[56px]';
 export const SidebarLeft: React.FC<SidebarLeftProps> = ({
   mainView,
   setMainView,
+  onInicio,
   activeFirm,
   setActiveFirm,
   sampleFirms,
@@ -136,9 +139,10 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
       <div className={`flex items-center gap-2.5 px-3 pb-2 pt-3 ${isCollapsed ? 'justify-center' : ''}`}>
         <button
           type="button"
-          onClick={() => setMainView('workspace')}
-          title="Ir a Redacción"
-          className="flex items-center gap-1 rounded-control transition-opacity hover:opacity-80"
+          onClick={onInicio ?? (() => setMainView('workspace'))}
+          title="Ir al inicio"
+          aria-label="Ir al inicio"
+          className="flex cursor-pointer items-center gap-1 rounded-control transition-opacity hover:opacity-80"
         >
           <IureonMark size={26} onDark className="shrink-0" />
           {!isCollapsed && (

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTenant } from '../../tenant/TenantContext';
+import { PANTALLAS, recordar } from '../../tenant/pantallaRecordada';
 import { textoDe, transcriptionApi, type StoredTranscription } from '../services/transcription.api';
 import {
   FALLBACK_MAX_AUDIO_BYTES,
@@ -190,6 +191,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
         setNameProposals(outcome.nameProposals);
         setPersisted(outcome.persisted);
         setTranscriptionId(outcome.id);
+        recordar(PANTALLAS.transcripcion(kind), outcome.id);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'No se pudo transcribir el audio.');
       } finally {
@@ -497,6 +499,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
   /** Reopens a stored transcript into the working view. */
   const openStored = useCallback((item: StoredTranscription) => {
     setTranscriptionId(item.id);
+    recordar(PANTALLAS.transcripcion(kind), item.id);
     setPersisted(true);
     setResult({
       kind: item.kind,
@@ -524,7 +527,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
     setRoleProposals([]);
     setVoiceConflicts(item.voiceConflicts ?? []);
     setNameProposals(item.nameProposals ?? []);
-  }, []);
+  }, [kind]);
 
   const deleteStored = useCallback(
     async (id: string) => {
@@ -539,6 +542,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
          * on something the database has already forgotten.
          */
         if (transcriptionId === id) {
+          recordar(PANTALLAS.transcripcion(kind), null);
           setTranscriptionId(null);
           setResult(null);
           setRoleProposals([]);
@@ -549,7 +553,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
         setError(err instanceof Error ? err.message : 'No se pudo borrar el transcrito.');
       }
     },
-    [transcriptionId]
+    [transcriptionId, kind]
   );
 
   /** Sets who a voice is, on screen and in the database. */
@@ -577,6 +581,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
   );
 
   const reset = useCallback(() => {
+    recordar(PANTALLAS.transcripcion(kind), null);
     setResult(null);
     setTranscriptionId(null);
     setError(null);
@@ -584,7 +589,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
     setVoiceConflicts([]);
     setNameProposals([]);
     setPersisted(true);
-  }, []);
+  }, [kind]);
 
   return {
     /** False while no firm is registered: the transcript could not be saved. */

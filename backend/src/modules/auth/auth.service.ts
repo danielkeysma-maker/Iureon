@@ -1,4 +1,5 @@
 import { supabase, supabaseAuth } from '../../config/supabase.config';
+import { validarBorradoDePropioUsuario } from './borrado.rules';
 import { describirPlan, leerPlan } from '../subscriptions/plan.service';
 
 /**
@@ -320,6 +321,55 @@ export const setUserRole = async (
   });
 
   if (error) throw new AuthError('USER_UPDATE_FAILED', 'No se pudo cambiar el rol.', 502);
+};
+
+/**
+ * A lawyer deleting THEIR OWN account, from Ajustes → «Su cuenta».
+ *
+ * The password is checked by signing in again: no separate verify endpoint,
+ * no second source of truth about what the password is. The rules (last user,
+ * last administrator, never the operator) are in `borrado.rules.ts`.
+ *
+ * WHAT GOES: the account, its push subscriptions and its interface
+ * preferences. WHAT STAYS: drafts, reviews and transcripts, which are the
+ * firm's work product and keep the author's e-mail as text. The caller
+ * audits it under the firm: the firm is still there to read it.
+ */
+export const eliminarMiUsuario = async (input: {
+  user: AuthenticatedUser;
+  contrasena: string;
+}): Promise<void> => {
+  const client = requireSupabase();
+
+  const usuarios = await listFirmUsers(input.user.firmId);
+  validarBorradoDePropioUsuario({
+    role: input.user.role,
+    totalUsuarios: usuarios.length,
+    totalAdministradores: usuarios.filter((u) => u.role === 'FIRM_ADMIN').length
+  });
+
+  try {
+    await signIn(input.user.email, input.contrasena);
+  } catch {
+    throw new AuthError('WRONG_PASSWORD', 'La contraseña no es correcta.', 401);
+  }
+
+  // Their device rows first: after the account is gone nothing else names them.
+  await client
+    .from('push_subscriptions')
+    .delete()
+    .eq('firm_id', input.user.firmId)
+    .eq('user_email', input.user.email);
+  await client
+    .from('user_preferences')
+    .delete()
+    .eq('firm_id', input.user.firmId)
+    .eq('user_email', input.user.email);
+
+  const { error } = await client.auth.admin.deleteUser(input.user.id);
+  if (error) {
+    throw new AuthError('USER_DELETE_FAILED', 'No se pudo eliminar su usuario.', 502);
+  }
 };
 
 /** The firm's own registry row, for the header and the subscription screen. */

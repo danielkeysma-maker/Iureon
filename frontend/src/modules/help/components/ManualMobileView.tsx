@@ -5,9 +5,12 @@ import {
   MINUTOS_TOTALES,
   TOTAL_ARTICULOS,
   buscar,
+  entradaPorId,
   minutosDeLectura,
   separarRuta
 } from '../content/manual';
+import { NOVEDADES_ID } from '../content/novedades';
+import { PANTALLAS, recordado, recordar } from '../../tenant/pantallaRecordada';
 import type { ManualEntry } from '../types';
 import { Bloque, Ruta } from './ManualView';
 import { NovedadesPanel } from './NovedadesPanel';
@@ -62,8 +65,15 @@ const porGrupo = (entradas: readonly ManualEntry[]) => {
 
 export const ManualMobileView: React.FC<ManualMobileViewProps> = ({ onSoporte }) => {
   const [consulta, setConsulta] = React.useState('');
-  const [abierto, setAbierto] = React.useState<ManualEntry | null>(null);
-  const [novedades, setNovedades] = React.useState(false);
+  /* The article (or Novedades) that was open before a reload comes back; an unknown id shows the index. */
+  const [recordadoAlEntrar] = React.useState(() => recordado(PANTALLAS.manual));
+  const [abierto, setAbierto] = React.useState<ManualEntry | null>(() =>
+    recordadoAlEntrar && recordadoAlEntrar !== NOVEDADES_ID ? entradaPorId(recordadoAlEntrar) ?? null : null
+  );
+  const [novedades, setNovedades] = React.useState(recordadoAlEntrar === NOVEDADES_ID);
+  React.useEffect(() => {
+    recordar(PANTALLAS.manual, novedades ? NOVEDADES_ID : abierto?.articulo.id ?? null);
+  }, [abierto, novedades]);
   const lectura = useManualReads();
   const nuevas = useNovedadesNuevas();
 

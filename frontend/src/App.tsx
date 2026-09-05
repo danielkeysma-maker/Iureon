@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { httpClient, setSessionLostHandler } from './config/httpClient';
 import { billingApi } from './modules/billing/billing.api';
 import { BalancePanel } from './modules/billing/components/BalancePanel';
@@ -16,6 +16,8 @@ import type { SupportAccess } from './modules/support/support.api';
 import { supportChatApi } from './modules/support/supportChat.api';
 import { AvisosEnEsteDispositivo } from './modules/push/components/AvisosEnEsteDispositivo';
 import { InstalarApp } from './modules/pwa/InstalarApp';
+import { TirarParaActualizar } from './modules/pwa/TirarParaActualizar';
+import { olvidarTodo, PANTALLAS, recordado, recordar } from './modules/tenant/pantallaRecordada';
 import { renovarSuscripcionSiExiste } from './modules/push/pushCliente';
 import { Dialog } from './design/Dialog';
 import { HeaderTop } from './modules/tenant/components/HeaderTop';
@@ -258,6 +260,44 @@ export function App() {
     } catch {
       /* The module still changes for this session; only the memory is lost. */
     }
+  };
+
+  /*
+   * The taller of a saved review, remembered by id. It is re-opened by
+   * `RevisionesView` through the same path the list uses, so what is kept
+   * here is only which one; closing it forgets it, or the list would open it
+   * again the moment it came back.
+   */
+  const abrirTallerDeRevision = (datos: DatosDelTaller): void => {
+    setTallerActivo(datos);
+    recordar(PANTALLAS.tallerRevision, datos.revisionId);
+  };
+  const cerrarTallerDeRevision = (): void => {
+    recordar(PANTALLAS.tallerRevision, null);
+    setTallerActivo(null);
+  };
+
+  /*
+   * HOME. The brand mark takes the lawyer to Redacción and forgets every
+   * remembered inner screen — the open transcript, the article, the taller —
+   * so that «inicio» means the beginning and not «the module I left open,
+   * still open». What is loaded in memory is left alone: a draft being edited
+   * is not thrown away by a click on the logo. Already on Redacción, the mark
+   * only scrolls back to the top.
+   */
+  const irAlInicio = (): void => {
+    olvidarTodo();
+    setTallerActivo(null);
+    setTallerBorrador(null);
+    setManualArticulo(undefined);
+    if (mainView === 'workspace') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.querySelectorAll<HTMLElement>('main *').forEach((el) => {
+        if (el.scrollTop > 0) el.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+      return;
+    }
+    setMainView('workspace');
   };
 
   /*
@@ -657,6 +697,7 @@ export function App() {
     workflow.setDocumentType(entry.draft.documentType);
     workflow.setRightView('draft');
     setLoadedDraftId(entry.id);
+    recordar(PANTALLAS.borrador, entry.id || null);
     setIsSavedDraftsModalOpen(false);
   };
 
@@ -708,6 +749,46 @@ export function App() {
 
   /* El borrador guardado que esta abierto en el panel, si hay uno. */
   const borradorAbierto = savedDrafts.find((d) => d.id === loadedDraftId) ?? null;
+
+  /*
+   * After a reload, the draft that was open comes back — and, if the lawyer
+   * was inside its taller, the taller too. Only once the list has loaded,
+   * only once per tab, and only if the id is still in the list: a draft
+   * deleted from another tab falls back silently to Redacción as it is. The
+   * taller is rebuilt from the saved row exactly as «Abrir taller» builds it,
+   * with the saved text where the on-screen text would have been.
+   */
+  const restauroBorrador = useRef(false);
+  useEffect(() => {
+    if (restauroBorrador.current || savedDrafts.length === 0) return;
+    restauroBorrador.current = true;
+    if (loadedDraftId || workflow.generatedDraft) return;
+    const idBorrador = recordado(PANTALLAS.borrador);
+    const idTaller = recordado(PANTALLAS.tallerBorrador);
+    const entrada = savedDrafts.find((d) => d.id === (idTaller ?? idBorrador));
+    if (!entrada) {
+      recordar(PANTALLAS.borrador, null);
+      recordar(PANTALLAS.tallerBorrador, null);
+      return;
+    }
+    handleLoadDraft(entrada);
+    if (idTaller && entrada.id === idTaller) {
+      setTallerBorrador({
+        titulo: entrada.draft.title,
+        documentType: entrada.draft.documentType,
+        legalBranch: entrada.legalBranch ?? workflow.legalBranch,
+        texto: entrada.draft.legalText,
+        conversacion: (entrada.conversacion as TurnoDelTaller[] | undefined) ?? [],
+        anotaciones: (entrada.anotaciones as Anotacion[] | undefined) ?? [],
+        versiones: (entrada.versiones as VersionDelTexto[] | undefined) ?? [],
+        draftId: entrada.id
+      });
+    } else {
+      recordar(PANTALLAS.tallerBorrador, null);
+    }
+    // handleLoadDraft and the workflow setters are stable enough for a once-per-tab restore.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [savedDrafts]);
 
   const handleLoginSuccess = (fresh: Session) => {
     setSession(saveSession(fresh));
@@ -879,6 +960,7 @@ export function App() {
       <SidebarLeft
         mainView={mainView}
         setMainView={setMainView}
+        onInicio={irAlInicio}
         activeFirm={activeFirm}
         setActiveFirm={setActiveFirm}
         sampleFirms={registeredFirms}
@@ -917,6 +999,7 @@ export function App() {
         */}
         <MobileHeader
           mainView={mainView}
+          onInicio={irAlInicio}
           /*
             EL SUBTITULO ES EL CONTEXTO DE CADA MODULO, como en 4d: «Mosquera
             vs. Colpensiones» bajo Redactar, «4 actuaciones posibles» bajo
@@ -1036,11 +1119,12 @@ export function App() {
                     await workflow.handleSendPrompt(e);
                     void refreshBalance();
                     setLoadedDraftId(null);
+                    recordar(PANTALLAS.borrador, null);
                   }}
                   logs={workflow.logs}
                   onSaldoCambiado={() => void refreshBalance()}
                   onAbrirTaller={(datos) => {
-                    setTallerActivo(datos);
+                    abrirTallerDeRevision(datos);
                     setMainView('taller');
                   }}
                   activeDraftText={workflow.activeDraftText}
@@ -1078,6 +1162,7 @@ export function App() {
                     versiones: (entrada?.versiones as VersionDelTexto[] | undefined) ?? [],
                     draftId: loadedDraftId
                   });
+                  recordar(PANTALLAS.tallerBorrador, loadedDraftId);
                   setMainView('taller');
                 }}
               />
@@ -1332,12 +1417,15 @@ export function App() {
                 const nuevo = lista?.find((d) => d.draft.title === workflow.generatedDraft?.title) ?? lista?.[0] ?? null;
                 if (nuevo) {
                   setLoadedDraftId(nuevo.id);
+                  recordar(PANTALLAS.borrador, nuevo.id);
+                  recordar(PANTALLAS.tallerBorrador, nuevo.id);
                   setTallerBorrador((t) => (t ? { ...t, draftId: nuevo.id } : t));
                 }
               }}
               onCerrar={(textoFinal) => {
                 if (workflow.generatedDraft) workflow.setGeneratedDraft({ ...workflow.generatedDraft, legalText: textoFinal });
                 setTallerBorrador(null);
+                recordar(PANTALLAS.tallerBorrador, null);
                 setMainView('workspace');
               }}
               onSaldoCambiado={() => void refreshBalance()}
@@ -1357,7 +1445,7 @@ export function App() {
                 esAdminDeFirma={session?.user.role === 'FIRM_ADMIN' || session?.user.role === 'SUPER_ADMIN'}
                 precioConsultaCop={300}
                 precioRevisionCop={2000}
-                onCerrar={() => setTallerActivo(null)}
+                onCerrar={cerrarTallerDeRevision}
                 onSaldoCambiado={() => void refreshBalance()}
                 onExportarTexto={(formato, titulo, texto) => {
                   if (formato === 'word') DocumentExportService.exportToWordDocx(titulo, texto, marcaParaExportar(), opcionesDeExportacion());
@@ -1367,7 +1455,7 @@ export function App() {
             ) : (
               <RevisionesView
                 esAdminDeFirma={session?.user.role === 'FIRM_ADMIN' || session?.user.role === 'SUPER_ADMIN'}
-                onAbrirTaller={(datos) => setTallerActivo(datos)}
+                onAbrirTaller={abrirTallerDeRevision}
                 onIrARedaccion={() => setMainView('workspace')}
               />
             ))}
@@ -1420,6 +1508,13 @@ export function App() {
         )}
       </div>
       </div>
+
+      {/*
+        Pull-to-refresh on the phone and in the installed app, where the browser
+        has no reload button. Safe to refresh because the module and the screen
+        inside it come back from sessionStorage.
+      */}
+      <TirarParaActualizar />
 
       <MobileMoreSheet
         abierto={masAbierto}

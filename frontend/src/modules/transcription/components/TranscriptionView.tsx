@@ -9,6 +9,7 @@ import { AudienciasList } from './AudienciasList';
 import { SubirAudienciaDialog } from './SubirAudienciaDialog';
 import { usePlanSoloLectura } from '../../subscriptions/PlanContext';
 import { transcriptionApi } from '../services/transcription.api';
+import { PANTALLAS, recordado, recordar } from '../../tenant/pantallaRecordada';
 // Carga diferida: el acta embebe Plus Jakarta Sans (~500 KB) y solo la paga quien exporta.
 import { buildSpeakerNames } from '../speakerNames';
 import { toPlainText } from '../toPlainText';
@@ -76,6 +77,27 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
    */
   const [openedTitle, setOpenedTitle] = useState('');
   const exportTitle = selectedFile?.name || openedTitle || 'transcripcion';
+
+  /*
+   * After a reload the hearing that was open comes back, through the same
+   * path as a click on its row — once the list is here, once per mount, and
+   * only if it is still in the list; otherwise the list is what stays.
+   */
+  const restaurada = useRef(false);
+  useEffect(() => {
+    if (restaurada.current || stored.length === 0) return;
+    restaurada.current = true;
+    if (result) return;
+    const id = recordado(PANTALLAS.transcripcion(kind));
+    if (!id) return;
+    const item = stored.find((i) => i.id === id);
+    if (!item) {
+      recordar(PANTALLAS.transcripcion(kind), null);
+      return;
+    }
+    setOpenedTitle(item.title);
+    openStored(item);
+  }, [stored, result, kind, openStored]);
 
   /*
    * LAS VARIANTES DEL ACTA (1g). Por defecto CON minutos: el minuto es lo que

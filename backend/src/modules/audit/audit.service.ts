@@ -78,6 +78,12 @@ export type AuditAction =
   | 'FIRMA_ELIMINADA'
   | 'CLAVE_RESTABLECIDA_POR_OPERADOR'
   /*
+   * Un abogado borró su propia cuenta desde Ajustes → «Su cuenta». Va al
+   * rastro DE LA FIRMA, que sigue existiendo; sus escritos, revisiones y
+   * transcripciones se quedan con ella.
+   */
+  | 'USUARIO_ELIMINADO_POR_SI_MISMO'
+  /*
    * Avisos por Web Push. Activar o desactivar los avisos en un dispositivo
    * queda en el rastro de la firma: es una decisión sobre por dónde sale
    * información de la firma (títulos de borradores, asuntos de soporte).

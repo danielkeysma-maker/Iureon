@@ -29,6 +29,7 @@ import { supportAccessRoutes } from './modules/support/supportAccess.routes';
 import { supportChatRoutes } from './modules/support/supportChat.routes';
 import { manualReadsRoutes } from './modules/help/manualReads.routes';
 import { pushRoutes } from './modules/push/push.routes';
+import { firmsRoutes } from './modules/firms/firms.routes';
 import { embeddingsService } from './modules/embeddings/embeddings.service';
 import { EMBEDDING_DIMENSIONS } from './modules/embeddings/types';
 
@@ -113,6 +114,7 @@ app.use('/api', authMiddleware);
 
 // Carga Modular de Rutas de la API
 app.use('/api', authRoutes);
+app.use('/api', firmsRoutes);
 /*
  * Mounted at its own prefix, not at /api.
  *

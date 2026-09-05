@@ -24,6 +24,7 @@ import {
   separarRuta
 } from '../content/manual';
 import { NOVEDADES_ID } from '../content/novedades';
+import { PANTALLAS, recordado, recordar } from '../../tenant/pantallaRecordada';
 import type { ManualBlock, ManualEntry } from '../types';
 import { useManualReads } from '../useManualReads';
 import { useAperturaNovedades, useNovedadesNuevas } from '../useNovedades';
@@ -526,14 +527,33 @@ const Indice: React.FC<{
 export const ManualView: React.FC<ManualViewProps> = ({ articuloInicial, onSoporte }) => {
   /* El MISMO registro que la pantalla movil: una marca, no dos. */
   const lectura = useManualReads();
-  const inicial = (articuloInicial && entradaPorId(articuloInicial)) || ENTRADAS[0];
-  const [activo, setActivo] = React.useState<string>(inicial.articulo.id);
+  /*
+   * What Soporte handed over wins; otherwise the article that was open before
+   * the reload; otherwise the first. Novedades is a pseudo-article and is
+   * remembered like the others. An id no longer in the manual falls back to
+   * the first article, never to an empty pane.
+   */
+  const [activo, setActivo] = React.useState<string>(() => {
+    if (articuloInicial && entradaPorId(articuloInicial)) return articuloInicial;
+    const guardado = recordado(PANTALLAS.manual);
+    if (guardado && (guardado === NOVEDADES_ID || entradaPorId(guardado))) return guardado;
+    return ENTRADAS[0].articulo.id;
+  });
+  /*
+   * Recorded on NAVIGATION, never on mount: the desktop and the phone views
+   * are both mounted (one hidden by CSS), and a desktop view that wrote its
+   * default article on mount would make the phone's index reopen as that
+   * article after a reload.
+   */
   const [consulta, setConsulta] = React.useState('');
   const cuerpo = React.useRef<HTMLDivElement>(null);
 
   /* Soporte can hand over a different article while this view is already up. */
   React.useEffect(() => {
-    if (articuloInicial && entradaPorId(articuloInicial)) setActivo(articuloInicial);
+    if (articuloInicial && entradaPorId(articuloInicial)) {
+      setActivo(articuloInicial);
+      recordar(PANTALLAS.manual, articuloInicial);
+    }
   }, [articuloInicial]);
 
   const entrada: ManualEntry = entradaPorId(activo) ?? ENTRADAS[0];
@@ -544,6 +564,7 @@ export const ManualView: React.FC<ManualViewProps> = ({ articuloInicial, onSopor
 
   const abrir = React.useCallback((id: string) => {
     setActivo(id);
+    recordar(PANTALLAS.manual, id);
     cuerpo.current?.scrollTo({ top: 0 });
   }, []);
 

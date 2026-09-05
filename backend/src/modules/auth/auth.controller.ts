@@ -6,12 +6,15 @@ import {
   listFirmUsers,
   setUserActive,
   setUserRole,
+  eliminarMiUsuario,
   firmProfile,
   refreshSession,
   signIn,
   type FirmUserRole
 } from './auth.service';
 import { exigirCupoDeUsuario, responderPlanError } from '../subscriptions/plan.service';
+import { auditService } from '../audit/audit.service';
+import { leerContrasena } from './borrado.rules';
 
 /** Turns a thrown AuthError into its own status; anything else is a 500. */
 const fail = (res: Response, err: unknown, fallback: string): void => {
@@ -78,6 +81,31 @@ export const meController = async (req: Request, res: Response): Promise<void> =
   });
 };
 
+
+/**
+ * DELETE /api/auth/me — the caller deletes their own account.
+ *
+ * Body: `{ contrasena }`. Works with an expired plan on purpose: leaving must
+ * never depend on paying. Audited under the firm, which stays.
+ */
+export const eliminarMiUsuarioController = async (req: Request, res: Response): Promise<void> => {
+  const user = req.user!;
+  try {
+    const contrasena = leerContrasena(req.body?.contrasena);
+    await eliminarMiUsuario({ user, contrasena });
+
+    await auditService.record({
+      firmId: req.firmId ?? user.firmId,
+      userEmail: user.email,
+      action: 'USUARIO_ELIMINADO_POR_SI_MISMO',
+      resource: `Usuario ${user.email} eliminó su propia cuenta; sus escritos, revisiones y transcripciones quedan en la firma`
+    });
+
+    res.json({ success: true });
+  } catch (err) {
+    fail(res, err, 'No se pudo eliminar su usuario.');
+  }
+};
 
 /** Solo administradores: la gestion de usuarios es de socios. */
 const soloAdmin = (req: Request, res: Response): boolean => {

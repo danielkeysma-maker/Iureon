@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '../../config/api.config';
-import type { Session } from './session';
+import { readSession, type Session } from './session';
 
 /**
  * The sign-in calls, which deliberately do NOT go through `httpClient`.
@@ -35,6 +35,32 @@ const post = async <T>(path: string, body: unknown): Promise<T> => {
   if (!response.ok) {
     // The API explains rejections in Spanish for the lawyer — "Correo o
     // contraseña incorrectos", not "failed with 401".
+    throw new Error(payload?.message || `La petición falló (${response.status}).`);
+  }
+
+  return payload as T;
+};
+
+/*
+ * An authenticated DELETE that does NOT go through `httpClient` either, for a
+ * different reason: that client treats every 401 as a lost session and sends
+ * the app back to login. Here a 401 is «La contraseña no es correcta», and the
+ * lawyer must stay on the dialog, read it, and try again.
+ */
+const deleteConSesion = async <T>(path: string, body: unknown): Promise<T> => {
+  const sesion = readSession();
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(sesion ? { Authorization: `Bearer ${sesion.accessToken}` } : {})
+    },
+    body: JSON.stringify(body)
+  });
+
+  const payload = await response.json().catch(() => null);
+
+  if (!response.ok) {
     throw new Error(payload?.message || `La petición falló (${response.status}).`);
   }
 
@@ -78,5 +104,17 @@ export const authApi = {
     post<{ session: Session; venceEl: string; modo: ModoDeRegistro; plan: PlanDeRegistro }>(
       '/api/public/registro',
       solicitud
-    )
+    ),
+
+  /*
+   * Ajustes → «Su cuenta» → Zona de riesgo. Both need the password typed
+   * again; the firm also needs its exact name. Both work with an expired
+   * plan. The server's refusal (wrong password, last user, last
+   * administrator, name mismatch) arrives as the Error message, verbatim.
+   */
+  eliminarMiUsuario: (contrasena: string) =>
+    deleteConSesion<{ success: true }>('/api/auth/me', { contrasena }),
+
+  eliminarMiFirma: (contrasena: string, confirmacion: string) =>
+    deleteConSesion<{ success: true; advertencias: string[] }>('/api/firms/me', { contrasena, confirmacion })
 };

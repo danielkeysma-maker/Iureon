@@ -2,6 +2,7 @@ import React from 'react';
 import { AlertTriangle, ArrowLeft, Copy, CheckCircle2, FileText, PenLine, Upload } from 'lucide-react';
 import { useTranscription } from '../../transcription/hooks/useTranscription';
 import { useAutorizacionDeGrabacion } from '../useAutorizacionDeGrabacion';
+import { PANTALLAS, recordado, recordar } from '../../tenant/pantallaRecordada';
 import { TranscriptSegments } from '../../transcription/components/TranscriptSegments';
 import { EntrevistasList } from './EntrevistasList';
 import { CerrarEntrevistaDialog } from './CerrarEntrevistaDialog';
@@ -145,6 +146,27 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft, onPrivaci
   React.useEffect(() => {
     void loadStored();
   }, [loadStored]);
+
+  /*
+   * After a reload the interview that was open comes back, through the same
+   * path as a click on its row — once the list is here, once per mount, and
+   * only if it is still in the list; otherwise the list is what stays.
+   */
+  const restaurada = React.useRef(false);
+  React.useEffect(() => {
+    if (restaurada.current || stored.length === 0) return;
+    restaurada.current = true;
+    if (result) return;
+    const id = recordado(PANTALLAS.transcripcion('ENTREVISTA'));
+    if (!id) return;
+    const item = stored.find((i) => i.id === id);
+    if (!item) {
+      recordar(PANTALLAS.transcripcion('ENTREVISTA'), null);
+      return;
+    }
+    setTitulo(item.title);
+    openStored(item);
+  }, [stored, result, openStored]);
 
   // Written as soon as there is a transcript to attach it to, so the choice
   // made before recording is never lost between the two moments.

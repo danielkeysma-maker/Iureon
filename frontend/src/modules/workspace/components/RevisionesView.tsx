@@ -4,6 +4,7 @@ import { usePlanSoloLectura } from '../../subscriptions/PlanContext';
 import { reviewApi, type ConsentimientoDeGuardado, type RevisionGuardada } from '../services/review.api';
 import type { DatosDelTaller } from './TallerDeRevision';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
+import { PANTALLAS, recordado, recordar } from '../../tenant/pantallaRecordada';
 
 /**
  * Revisiones: la lista de escritos revisados de la firma, para abrir cada uno
@@ -64,13 +65,22 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({ esAdminDeFirma, 
     }
   };
 
-  const abrir = async (r: RevisionGuardada) => {
+  /*
+   * `silencioso` is the reload path: the review that was open comes back
+   * without a word, and if it cannot (text not kept, row gone) the list stays,
+   * with no error for something the lawyer did not just click.
+   */
+  const abrir = async (r: RevisionGuardada, silencioso = false) => {
     setAbriendo(r.id);
     setError('');
     try {
       const c = await reviewApi.obtener(r.id);
       const texto = c.textoTrabajo ?? c.textoOriginal;
       if (!texto) {
+        if (silencioso) {
+          recordar(PANTALLAS.tallerRevision, null);
+          return;
+        }
         setError(
           `El texto de «${c.fileName}» no se conservó porque la firma no había autorizado guardar escritos cuando se revisó. El informe sigue disponible en Redacción → Revisar un escrito → Revisiones anteriores. Para trabajarlo en el taller, vuelva a subir el archivo.`
         );
@@ -92,11 +102,31 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({ esAdminDeFirma, 
         versiones: c.versiones ?? []
       });
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'No se pudo abrir la revisión.');
+      if (silencioso) recordar(PANTALLAS.tallerRevision, null);
+      else setError(e instanceof Error ? e.message : 'No se pudo abrir la revisión.');
     } finally {
       setAbriendo(null);
     }
   };
+
+  /*
+   * After a reload, the review whose taller was open is opened again — once
+   * the list is here, once per mount, and only if it is still in the list.
+   * Closing the taller forgets the id before this view comes back, so it does
+   * not reopen what was just closed.
+   */
+  const restaurada = React.useRef(false);
+  React.useEffect(() => {
+    if (restaurada.current || lista.length === 0) return;
+    restaurada.current = true;
+    const id = recordado(PANTALLAS.tallerRevision);
+    if (!id) return;
+    const r = lista.find((x) => x.id === id);
+    if (r) void abrir(r, true);
+    else recordar(PANTALLAS.tallerRevision, null);
+    // `abrir` closes over props that do not change between list loads.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lista]);
 
   const eliminar = async (r: RevisionGuardada) => {
     try {

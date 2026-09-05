@@ -615,6 +615,16 @@ const A_ROLES_SALDO: ManualArticle = {
       texto:
         'Un rol no es una etiqueta: se impone en el servidor, en cada petición. La administración de la firma —dar de alta compañeros, cambiar roles, recargar, pagar el plan, autorizar el guardado del taller— corresponde al administrador; redactar, transcribir y consultar, a todos.'
     },
+    { kind: 'subtitulo', texto: 'Eliminar su usuario o su firma' },
+    {
+      kind: 'pasos',
+      pasos: [
+        'Abra «Ajustes», dentro de Administrar, y entre en «Su cuenta». Al final está la «Zona de riesgo». Funciona también con el plan vencido.',
+        'Para irse solo usted, pulse «Eliminar mi usuario», escriba su contraseña y confirme. Su acceso desaparece; sus escritos, revisiones y transcritos son trabajo de la firma y se quedan en ella con su correo como autor. Si es el único usuario, la aplicación le pedirá usar la otra puerta; si es el único administrador y hay más usuarios, nombre otro antes.',
+        'Para borrar la firma entera, el socio administrador pulsa «Eliminar la firma y todos sus datos», escribe su contraseña y el nombre exacto de la firma tal como aparece, y confirma. Se borran escritos, revisiones, transcripciones, clientes, pagos, usuarios y saldo, y ninguna cuenta de la firma vuelve a entrar.',
+        'Ninguna de las dos se deshace. Antes de borrar, exporte a Word o PDF lo que quiera conservar: después no habrá de dónde sacarlo. Lo único que se conserva es el registro de que su correo ya usó la prueba gratuita.'
+      ]
+    },
     { kind: 'subtitulo', texto: 'Qué consume saldo' },
     {
       kind: 'lista',

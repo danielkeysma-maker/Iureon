@@ -7,6 +7,7 @@ import { InstalarApp } from '../../pwa/InstalarApp';
 import { subscriptionApi } from '../../subscriptions/subscription.api';
 import { FirmSubscriptionModal } from '../../subscriptions/components/FirmSubscriptionModal';
 import { ETIQUETA_DE_ESTADO, ETIQUETA_DE_PERIODO, NOMBRE_DE_MODULO, NOMBRE_DE_PLAN, type PlanDeFirma } from '../../subscriptions/types';
+import { ZonaDeRiesgoDeCuenta } from './ZonaDeRiesgoDeCuenta';
 
 /**
  * Las secciones de Ajustes que faltaban. Cada una reúne algo que YA existe en
@@ -144,6 +145,18 @@ export const CuentaSection: React.FC<{ onLogout?: () => void }> = ({ onLogout })
           Para cambiar la contraseña, pídalo por Soporte: todavía no se cambia desde aquí.
         </span>
       </div>
+      {/*
+        La cuenta de operación no se borra desde la aplicación: el servidor lo
+        rechaza, y aquí ni se ofrece. Tras el borrado la sesión ya no vale, así
+        que se cierra con el mismo gesto que «Cerrar sesión».
+      */}
+      {sesion && sesion.user.role !== 'SUPER_ADMIN' && (
+        <ZonaDeRiesgoDeCuenta
+          nombreDeLaFirma={activeFirm.name}
+          esAdministrador={sesion.user.role === 'FIRM_ADMIN'}
+          onEliminado={() => onLogout?.()}
+        />
+      )}
     </section>
   );
 };

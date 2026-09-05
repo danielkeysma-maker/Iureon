@@ -40,6 +40,22 @@ export const NOVEDADES_ID = 'novedades';
 export const NOVEDADES: readonly Novedad[] = [
   {
     fecha: '2026-09-05',
+    titulo: 'Recargar deja la pantalla exactamente donde estaba, y el logo lleva al inicio',
+    detalle:
+      'Al recargar la página vuelve el borrador que tenía abierto, el taller de la revisión, la audiencia o entrevista que estaba leyendo, la calculadora y el artículo del manual —no solo el módulo—. El logo de Iureon, en la barra lateral y en la cabecera del teléfono, lleva a Redacción y cierra lo que estuviera abierto en los demás módulos. En el teléfono y en la aplicación instalada, tirar hacia abajo desde el borde superior recarga la pantalla.',
+    modulo: 'Móvil',
+    tipo: 'mejora'
+  },
+  {
+    fecha: '2026-09-05',
+    titulo: 'Puede eliminar su usuario o su firma desde Ajustes',
+    detalle:
+      'En Ajustes → «Su cuenta», al final, está la «Zona de riesgo». «Eliminar mi usuario» borra su acceso y deja sus escritos, revisiones y transcritos en la firma; el socio administrador tiene además «Eliminar la firma y todos sus datos», que borra escritos, revisiones, transcripciones, clientes, pagos, usuarios y saldo. Las dos piden la contraseña, la segunda también el nombre exacto de la firma, y ninguna se deshace. Funcionan aunque el plan esté vencido.',
+    modulo: 'Ajustes',
+    tipo: 'nuevo'
+  },
+  {
+    fecha: '2026-09-05',
     titulo: 'Los adjuntos ya se leen y sus datos entran al escrito',
     detalle:
       'Los PDF, Word, textos e imágenes que adjunte en Redacción —la foto de un comparendo, un oficio, una cédula— se leen antes de redactar, y sus números, fechas, lugares, nombres y valores entran al escrito en vez de quedar como [•]. La consola de ejecución dice qué se leyó de cada archivo; si un dato del adjunto contradice lo que usted escribió, prevalece lo suyo y la diferencia queda anotada. Hasta 8 archivos y 20 MB por escrito.',

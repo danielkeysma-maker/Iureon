@@ -7,6 +7,7 @@ import { IndexacionModal } from './IndexacionModal';
 import { InteresesModal } from './InteresesModal';
 import { CuantiaModal } from './CuantiaModal';
 import { CalendarioModal } from './CalendarioModal';
+import { PANTALLAS, recordado, recordar } from '../../tenant/pantallaRecordada';
 
 /**
  * Herramientas. Lista por tarea, no cuadrícula de tarjetas.
@@ -54,13 +55,27 @@ interface Utilidad {
 }
 
 export const ToolsView: React.FC = () => {
-  const [terminosAbierto, setTerminosAbierto] = useState(false);
-  const [liquidacionAbierta, setLiquidacionAbierta] = useState(false);
-  const [glosarioAbierto, setGlosarioAbierto] = useState(false);
-  const [indexacionAbierta, setIndexacionAbierta] = useState(false);
-  const [interesesAbiertos, setInteresesAbiertos] = useState(false);
-  const [cuantiaAbierta, setCuantiaAbierta] = useState(false);
-  const [calendarioAbierto, setCalendarioAbierto] = useState(false);
+  /*
+   * The calculator that was open survives a reload: its id is remembered when
+   * it opens and forgotten when it closes. An id that matches no calculator
+   * (an old one, a typo) opens nothing and the list is what shows.
+   */
+  const [recordada] = useState(() => recordado(PANTALLAS.herramienta));
+  const [terminosAbierto, setTerminosAbierto] = useState(recordada === 'terminos');
+  const [liquidacionAbierta, setLiquidacionAbierta] = useState(recordada === 'liquidacion');
+  const [glosarioAbierto, setGlosarioAbierto] = useState(recordada === 'glosario');
+  const [indexacionAbierta, setIndexacionAbierta] = useState(recordada === 'indexacion');
+  const [interesesAbiertos, setInteresesAbiertos] = useState(recordada === 'intereses');
+  const [cuantiaAbierta, setCuantiaAbierta] = useState(recordada === 'cuantia');
+  const [calendarioAbierto, setCalendarioAbierto] = useState(recordada === 'calendario');
+  const abrir = (id: string, set: (v: boolean) => void) => () => {
+    set(true);
+    recordar(PANTALLAS.herramienta, id);
+  };
+  const cerrar = (set: (v: boolean) => void) => () => {
+    set(false);
+    recordar(PANTALLAS.herramienta, null);
+  };
   const [busqueda, setBusqueda] = useState('');
 
   const grupos: Array<{ titulo: string; icono: typeof CalendarClock; utilidades: Utilidad[] }> = [
@@ -78,14 +93,14 @@ export const ToolsView: React.FC = () => {
            * cualquier año desde 1984 tiene calendario, y la fuente es la ley.
            */
           fuente: { texto: 'Festivos calculados de la Ley 51 de 1983 · vacancia judicial (CGP art. 118)', verificada: true },
-          abrir: () => setTerminosAbierto(true)
+          abrir: abrir('terminos', setTerminosAbierto)
         },
         {
           id: 'calendario',
           nombre: 'Calendario judicial',
           queHace: 'Los 18 festivos del año con su regla, la vacancia judicial y la Semana Santa.',
           fuente: { texto: 'Ley 51 de 1983 · CGP art. 118 · Semana Santa completa solo si el acuerdo del año lo dice', verificada: true },
-          abrir: () => setCalendarioAbierto(true)
+          abrir: abrir('calendario', setCalendarioAbierto)
         }
       ]
     },
@@ -98,14 +113,14 @@ export const ToolsView: React.FC = () => {
           nombre: 'Liquidación de prestaciones',
           queHace: 'Cesantías, intereses, prima, vacaciones e indemnización, cada una con su norma.',
           fuente: { texto: 'Fórmula general del CST · salario fijo', verificada: true },
-          abrir: () => setLiquidacionAbierta(true)
+          abrir: abrir('liquidacion', setLiquidacionAbierta)
         },
         {
           id: 'cuantia',
           nombre: 'Competencia por cuantía',
           queHace: 'Mínima, menor o mayor cuantía y el juez competente, con el SMLMV del año de presentación.',
           fuente: { texto: 'CGP arts. 17, 18, 20, 25 y 26 · SMLMV 2020–2026 por decreto · laboral Ley 2452 de 2025 art. 13', verificada: true },
-          abrir: () => setCuantiaAbierta(true)
+          abrir: abrir('cuantia', setCuantiaAbierta)
         },
         {
           id: 'intereses',
@@ -116,14 +131,14 @@ export const ToolsView: React.FC = () => {
            * verificada, con su mes, y el resto la escribe el abogado.
            */
           fuente: { texto: 'C.Co. art. 884 · C.C. art. 1617 · C.P. art. 305 · IBC certificado que usted ingresa (Superfinanciera)', verificada: true },
-          abrir: () => setInteresesAbiertos(true)
+          abrir: abrir('intereses', setInteresesAbiertos)
         },
         {
           id: 'indexacion',
           nombre: 'Indexación por IPC',
           queHace: 'Actualiza un valor histórico con la fórmula valor × (IPC final ÷ IPC inicial).',
           fuente: { texto: 'Índices que usted toma de la página del IPC del DANE · sin tabla propia', verificada: true },
-          abrir: () => setIndexacionAbierta(true)
+          abrir: abrir('indexacion', setIndexacionAbierta)
         }
       ]
     },
@@ -141,7 +156,7 @@ export const ToolsView: React.FC = () => {
            * propio historial registra una ficha que citaba un código derogado.
            */
           fuente: { texto: 'Derivado del catálogo verificado, con la URL de cada norma', verificada: true },
-          abrir: () => setGlosarioAbierto(true)
+          abrir: abrir('glosario', setGlosarioAbierto)
         }
       ]
     }
@@ -161,13 +176,13 @@ export const ToolsView: React.FC = () => {
 
   return (
     <div className="flex h-full min-h-0 flex-1 flex-col bg-canvas font-sans">
-      <ProceduralTermsModal isOpen={terminosAbierto} onClose={() => setTerminosAbierto(false)} />
-      <LaborSettlementModal isOpen={liquidacionAbierta} onClose={() => setLiquidacionAbierta(false)} />
-      <LegalSearchGlossaryModal isOpen={glosarioAbierto} onClose={() => setGlosarioAbierto(false)} />
-      <IndexacionModal isOpen={indexacionAbierta} onClose={() => setIndexacionAbierta(false)} />
-      <InteresesModal isOpen={interesesAbiertos} onClose={() => setInteresesAbiertos(false)} />
-      <CuantiaModal isOpen={cuantiaAbierta} onClose={() => setCuantiaAbierta(false)} />
-      <CalendarioModal isOpen={calendarioAbierto} onClose={() => setCalendarioAbierto(false)} />
+      <ProceduralTermsModal isOpen={terminosAbierto} onClose={cerrar(setTerminosAbierto)} />
+      <LaborSettlementModal isOpen={liquidacionAbierta} onClose={cerrar(setLiquidacionAbierta)} />
+      <LegalSearchGlossaryModal isOpen={glosarioAbierto} onClose={cerrar(setGlosarioAbierto)} />
+      <IndexacionModal isOpen={indexacionAbierta} onClose={cerrar(setIndexacionAbierta)} />
+      <InteresesModal isOpen={interesesAbiertos} onClose={cerrar(setInteresesAbiertos)} />
+      <CuantiaModal isOpen={cuantiaAbierta} onClose={cerrar(setCuantiaAbierta)} />
+      <CalendarioModal isOpen={calendarioAbierto} onClose={cerrar(setCalendarioAbierto)} />
 
       <header className="flex shrink-0 flex-wrap items-end gap-3 border-b border-line-200 bg-surface px-5 py-3.5">
         <div className="min-w-0 flex-1">
