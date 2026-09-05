@@ -77,7 +77,7 @@ jobs:
       - name: Lint
         run: npm run lint
       - name: Design tokens, interview guide and document format checks
-        run: npm run check:tokens && npm run check:guion && npm run check:formato && npm run check:informe && npm run check:membrete && npm run check:marcas && npm run check:diff
+        run: npm run check:tokens && npm run check:guion && npm run check:formato && npm run check:informe && npm run check:membrete && npm run check:marcas && npm run check:estructura && npm run check:diff
       - name: Build
         run: npm run build
 

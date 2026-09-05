@@ -14,6 +14,7 @@
     "preview": "vite preview",
     "check:diff": "npx esbuild src/modules/workspace/__checks__/diff.check.ts --bundle --platform=node --format=cjs --outfile=node_modules/.cache/diff.check.cjs --log-level=error && node node_modules/.cache/diff.check.cjs",
     "check:marcas": "npx esbuild src/modules/workspace/__checks__/marcas.check.ts --bundle --platform=node --format=cjs --outfile=node_modules/.cache/marcas.check.cjs --log-level=error && node node_modules/.cache/marcas.check.cjs",
+    "check:estructura": "npx esbuild src/modules/workspace/__checks__/estructura.check.ts --bundle --platform=node --format=cjs --outfile=node_modules/.cache/estructura.check.cjs --log-level=error && node node_modules/.cache/estructura.check.cjs",
     "check:membrete": "npx esbuild src/modules/documents/__checks__/membrete.check.ts --bundle --platform=node --format=cjs --outfile=node_modules/.cache/membrete.check.cjs --log-level=error && node node_modules/.cache/membrete.check.cjs",
     "check:informe": "npx esbuild src/modules/workspace/__checks__/informe.check.ts --bundle --platform=node --format=cjs --outfile=node_modules/.cache/informe.check.cjs --log-level=error && node node_modules/.cache/informe.check.cjs",
     "check:formato": "npx esbuild src/modules/documents/__checks__/formato.check.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/formato.check.mjs --log-level=error && node node_modules/.cache/formato.check.mjs",

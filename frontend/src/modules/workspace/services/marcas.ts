@@ -13,6 +13,11 @@
  * tachar.
  */
 
+import { FUENTE_DE_ENCABEZADOS, FUENTE_DE_ETIQUETAS, esLineaDeTitulo, reflujoDeSecciones, unirTitulosPartidos } from './estructuraDelEscrito';
+
+/* La estructura del escrito vive en estructuraDelEscrito.ts; se reexporta para que quien pintaba no cambie de importación. */
+export { esLineaDeTitulo, reflujoDeSecciones, unirTitulosPartidos };
+
 export interface Marca {
   /** Índice del pasaje en la lista de citas que se pasó. */
   indice: number;
@@ -164,23 +169,6 @@ export const segmentarCapas = (texto: string, marcas: MarcaEnCapa[]): SegmentoEn
 /** 'negrita' pinta en negrita; 'marcador' atenúa los asteriscos de Markdown, que siguen en el texto para que las citas coincidan. */
 export const esCapaTipografica = (capa: string): boolean => capa === 'negrita' || capa === 'marcador';
 
-/**
- * Una línea es título si tiene letras y casi todas van en mayúscula:
- * «HECHOS», «I. PRETENSIONES», «ACCIONADO: JUZGADO TERCERO ADMINISTRATIVO ORAL
- * DEL CIRCUITO DE SINCELEJO - SALA QUINTA…». El tope de largo es generoso
- * (260) porque en un escrito real la línea del accionado o la referencia
- * ocupa dos renglones y sigue siendo encabezado. Una numeración sola («1.») o
- * una línea que termina en coma o punto y coma no lo es.
- */
-export const esLineaDeTitulo = (linea: string): boolean => {
-  const t = linea.trim();
-  if (t.length < 2 || t.length > 260 || /[,;]$/.test(t)) return false;
-  const letras = t.match(/\p{L}/gu) ?? [];
-  if (letras.length < 3 || !/\p{L}{3}/u.test(t)) return false;
-  const mayusculas = letras.filter((l) => l === l.toUpperCase() && l !== l.toLowerCase()).length;
-  return mayusculas / letras.length >= 0.85;
-};
-
 /** «ACCIONANTE:», «ASUNTO:», «REFERENCIA:» al inicio de la línea: la etiqueta va en negrita aunque el resto no. */
 const ETIQUETA_INICIAL = /^\s*([A-ZÁÉÍÓÚÜÑ][A-ZÁÉÍÓÚÜÑ .()/]{1,60}?):/u;
 
@@ -200,14 +188,15 @@ const NUMERADO_CORTO = /^\s*(?:\d{1,2}(?:\.\d{1,2})*|[IVXLC]{1,6})[.)]\s+\p{Lu}[
 const NOMBRE_EN_MAYUSCULA = /(?<!\p{L})(?:[A-ZÁÉÍÓÚÜÑ]{2,}\.?)(?:\s+(?:[A-ZÁÉÍÓÚÜÑ]\.|[A-ZÁÉÍÓÚÜÑ]{2,}\.?)){1,7}(?!\p{L})/gu;
 
 /**
- * Encabezados de sección que en un escrito colombiano van siempre en negrita,
- * aunque aparezcan como una sola palabra: «HECHOS», «PRETENSIONES», «ANEXOS».
- * Se aceptan seguidos de dos puntos, punto o fin de línea, para no marcar la
- * palabra «pruebas» en medio de una frase en minúscula (la lista exige
- * mayúscula sostenida).
+ * Encabezados de sección y etiquetas de referencia que en un escrito
+ * colombiano van siempre en negrita, aunque aparezcan como una sola palabra:
+ * «HECHOS», «PRETENSIONES», «ANEXOS», «ACCIONANTE:». Es el mismo catálogo con
+ * el que estructuraDelEscrito.ts abre líneas, para que negrita y estructura
+ * coincidan. Se aceptan seguidos de dos puntos, punto o fin de línea, para no
+ * marcar la palabra «pruebas» en medio de una frase en minúscula (la lista
+ * exige mayúscula sostenida).
  */
-const ENCABEZADO_SUELTO =
-  /(?<!\p{L})(?:HECHOS|ANTECEDENTES|PRETENSI[ÓO]N(?:ES)?|PETICI[ÓO]N(?:ES)?|SOLICITUD(?:ES)?|FUNDAMENTOS(?:\s+DE\s+DERECHO)?|FUNDAMENTOS\s+JUR[ÍI]DICOS|DERECHOS?\s+(?:FUNDAMENTALES\s+)?(?:VULNERADOS?|INVOCADOS?|AMENAZADOS?)|PRUEBAS|ANEXOS|NOTIFICACIONES|COMPETENCIA|PROCEDENCIA|PROCEDIBILIDAD|JURAMENTO|MEDIDA\s+PROVISIONAL|CONSIDERACIONES|CUANT[ÍI]A|OPORTUNIDAD|LEGITIMACI[ÓO]N(?:\s+EN\s+LA\s+CAUSA)?|INMEDIATEZ|SUBSIDIARIEDAD|CONCLUSI[ÓO]N(?:ES)?|REFERENCIA|ASUNTO|ACCIONANTE|ACCIONADO|DEMANDANTE|DEMANDADO|ACCIONADOS|VINCULADOS?)(?=\s*[:.\n]|\s*$)/gu;
+const ENCABEZADO_SUELTO = new RegExp(`(?<!\\p{L})(?:${FUENTE_DE_ENCABEZADOS}|${FUENTE_DE_ETIQUETAS})(?=\\s*[:.\\n]|\\s*$)`, 'gu');
 
 /** Números de identificación y radicados: «C.C. No. 6.815.567», «cédula de ciudadanía 1.102.811.692», «NIT 900.123.456-7», «radicado 2024-00003». */
 const NUMERO_DE_IDENTIFICACION =
@@ -274,94 +263,4 @@ export const marcasDeAnotaciones = (texto: string, anotaciones: { cita: string; 
     if (marcas.length) salida.push({ ...marcas[0], indice, capa: a.color });
   });
   return salida;
-};
-
-/* ─── Reflujo de secciones ────────────────────────────────────────────────── */
-
-/** Encabezados de sección propiamente dichos (sin las etiquetas del encabezado, que llevan dos puntos y valor). */
-const CABEZA_DE_SECCION =
-  '(?:HECHOS|ANTECEDENTES|PRETENSI[ÓO]N(?:ES)?|PETICI[ÓO]N(?:ES)?|SOLICITUD(?:ES)?|FUNDAMENTOS(?:\\s+DE\\s+DERECHO)?|FUNDAMENTOS\\s+JUR[ÍI]DICOS|DERECHOS?\\s+(?:FUNDAMENTALES\\s+)?(?:VULNERADOS?|INVOCADOS?|AMENAZADOS?)|PRUEBAS|ANEXOS|NOTIFICACIONES|COMPETENCIA|PROCEDENCIA|PROCEDIBILIDAD|JURAMENTO|MEDIDA\\s+PROVISIONAL|CONSIDERACIONES|CUANT[ÍI]A|OPORTUNIDAD|LEGITIMACI[ÓO]N(?:\\s+EN\\s+LA\\s+CAUSA)?|INMEDIATEZ|SUBSIDIARIEDAD|CONCLUSI[ÓO]N(?:ES)?)';
-
-/** Etiquetas del encabezado del escrito: van seguidas de dos puntos y su valor en la misma línea. */
-const ETIQUETA_DE_ENCABEZADO = '(?:REFERENCIA|ASUNTO|ACCIONANTE|ACCIONADOS?|DEMANDANTE|DEMANDADOS?|VINCULADOS?|CONVOCANTE|CONVOCADO|RADICADO|RADICACI[ÓO]N|PROCESO|EXPEDIENTE)';
-
-const ORDINAL_DE_PARRAFO =
-  '(?:PRIMER|SEGUND|TERCER|CUART|QUINT|SEXT|S[ÉE]PTIM|OCTAV|NOVEN|D[ÉE]CIM|UND[ÉE]CIM|DUOD[ÉE]CIM|VIG[ÉE]SIM)[OA]S?(?:\\s+(?:PRIMER|SEGUND|TERCER|CUART|QUINT|SEXT|S[ÉE]PTIM|OCTAV|NOVEN)[OA]S?)?\\s*[.:)\\-–—]';
-
-/**
- * Devuelve la estructura a un escrito que llegó como un solo bloque.
- *
- * Solo actúa si el texto casi no tiene saltos (menos de uno cada 600
- * caracteres): los documentos preparados desde el 5 de septiembre de 2026
- * conservan sus párrafos y no se tocan. Cuando actúa, abre párrafo antes de
- * las etiquetas del encabezado (REFERENCIA:, ACCIONANTE:…), pone cada
- * encabezado de sección (HECHOS, PRETENSIONES, ANEXOS…) en su propia línea,
- * separa el arranque del cuerpo («FULANO DE TAL, mayor de edad…») y abre
- * párrafo ante cada ordinal que numera hechos y pretensiones. No inventa
- * texto: solo cambia espacios por saltos, y las citas de la guía se siguen
- * localizando porque la búsqueda colapsa el espacio.
- */
-export const reflujoDeSecciones = (texto: string): string => {
-  const saltos = (texto.match(/\n/g) ?? []).length;
-  /*
-   * Un texto que ya trae sus párrafos no se reparte de nuevo, pero sí pasa por
-   * la unión de títulos partidos: un salto de página del PDF parte un
-   * encabezado también en los documentos bien preparados.
-   */
-  if (texto.length < 600 || saltos >= texto.length / 600) return unirTitulosPartidos(texto);
-  let salida = texto
-    .replace(/\s+(?=Señor(?:es|a)?\s)/g, '\n\n')
-    .replace(/\s+(?=E\.\s?S\.\s?D\.)/g, '\n')
-    .replace(new RegExp(`\\s+(?=${ETIQUETA_DE_ENCABEZADO}\\s*:)`, 'gu'), '\n\n')
-    /*
-     * Un encabezado de sección abre línea propia, salvo que venga en medio de
-     * una tirada en mayúscula: «CRITERIOS ESPECÍFICOS DE LA PROCEDENCIA DE LA
-     * ACCIÓN…» es UN título, y partirlo en «PROCEDENCIA» lo destrozaba.
-     */
-    .replace(new RegExp(`(?<!\\p{L})(?<![A-ZÁÉÍÓÚÜÑ]{2,}\\s)(${CABEZA_DE_SECCION})(:?)(?=\\s*$|\\s+(?:\\p{Lu}|\\d))`, 'gu'), '\n\n$1$2\n')
-    /* Un título en mayúscula pegado al final de un párrafo («…ordinario. CRITERIOS GENERALES DE LA…») abre párrafo. */
-    .replace(/([.;:!?])\s+(?=(?:[A-ZÁÉÍÓÚÜÑ]{2,}\s+){2,}[A-ZÁÉÍÓÚÜÑ]{2,})/gu, '$1\n\n')
-    /* Hechos y pretensiones numerados en cifras («1. », «2) ») tras un punto abren párrafo; no se inventa numeración, se respeta la que trae. */
-    .replace(/(?<=[.;:]\s)(\d{1,2}[.)]\s+)(?=\p{Lu})/gu, '\n\n$1')
-    /*
-     * Arranque del cuerpo: «FULANO DE TAL, mayor de edad…». El nombre se toma
-     * como hasta cuatro palabras en mayúscula (más iniciales) antes de la coma;
-     * si el encabezado venía pegado, una palabra del renglón anterior puede
-     * quedar en este párrafo. Es el precio de reconstruir sin el original.
-     */
-    .replace(/(?<!\b(?:DE|DEL|LA|LAS|LOS|EL|Y|E))\s+((?:[A-ZÁÉÍÓÚÜÑ]{2,}\s+(?:[A-ZÁÉÍÓÚÜÑ]\.\s+)?){1,3}[A-ZÁÉÍÓÚÜÑ]{2,},\s+(?:mayor|identificad|domiciliad|abogad|actuando|obrando|en\s+mi\s+calidad))/gu, '\n\n$1')
-    .replace(new RegExp(`(?<=[.;:]\\s|\\n)(${ORDINAL_DE_PARRAFO})`, 'gu'), '\n\n$1');
-  salida = salida.replace(/[ \t]*\n[ \t]*/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
-  return unirTitulosPartidos(salida);
-};
-
-/**
- * Títulos partidos por un salto de página del PDF: «CRITERIOS GENERALES DE LA»
- * en una línea y «PROCEDENCIA DE LA ACCIÓN DE TUTELA…» en la siguiente. Dos
- * líneas seguidas en mayúscula sostenida son un mismo título y se vuelven a
- * unir, salvo que la primera cierre con dos puntos (ahí sí termina). Y si el
- * título largo termina en dos puntos con el cuerpo pegado, el cuerpo baja de
- * línea. Sirve para textos aplanados y para textos con sus párrafos.
- */
-export const unirTitulosPartidos = (texto: string): string => {
-  if (!texto.includes('\n')) return texto;
-  /* Un título en mayúscula pegado al final de un párrafo («…ordinario. CRITERIOS GENERALES DE LA») abre línea propia antes de unirse con su continuación. */
-  const salida = texto.replace(/([.;:!?])[ \t]+(?=(?:[A-ZÁÉÍÓÚÜÑ]{2,}\s+){2,}[A-ZÁÉÍÓÚÜÑ]{2,})/gu, '$1\n\n');
-  const unidas: string[] = [];
-  for (const linea of salida.split('\n')) {
-    const previa = unidas.length ? unidas[unidas.length - 1] : null;
-    const continuaEnMayuscula = /^(?:[A-ZÁÉÍÓÚÜÑ]{2,}\s+){1,}[A-ZÁÉÍÓÚÜÑ]{2,}/u.test(linea.trim());
-    if (previa && previa.trim() && linea.trim() && esLineaDeTitulo(previa) && (esLineaDeTitulo(linea) || continuaEnMayuscula) && !/:$/.test(previa.trim())) {
-      unidas[unidas.length - 1] = `${previa.trim()} ${linea.trim()}`;
-    } else {
-      unidas.push(linea);
-    }
-  }
-  return (
-    unidas
-      .join('\n')
-      /* Un título largo que termina en dos puntos y sigue con el cuerpo en la misma línea: el cuerpo baja a la siguiente. */
-      .replace(/^((?:[A-ZÁÉÍÓÚÜÑ]{2,}[\s:]+){3,}[A-ZÁÉÍÓÚÜÑ]{2,}:)[ \t]+(?=\p{L})/gmu, '$1\n')
-      .replace(/\n{3,}/g, '\n\n')
-  );
 };
