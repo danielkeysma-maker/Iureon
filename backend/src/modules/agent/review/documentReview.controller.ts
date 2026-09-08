@@ -372,7 +372,15 @@ export const setStorageConsentController = async (req: Request, res: Response): 
   res.json({ success: true, ...(await documentReviewStore.consentimiento(req.firmId as string)) });
 };
 
-/** PUT /api/agent/reviews/:id/texto { texto } — autoguardado del texto de trabajo, si la firma lo autorizó. */
+/**
+ * PUT /api/agent/reviews/:id/texto { texto, anotaciones?, versiones?, conversacion? }
+ *
+ * Autoguardado del taller, si la firma lo autorizó. El navegador lo llama con
+ * retardo tras cada cambio y al ocultarse o cerrarse la pestaña (keepalive),
+ * para que el último cambio no dependa de que la pestaña siga viva. La
+ * conversación viene entera y reemplaza la guardada: es lo que permite que la
+ * firma autorice a mitad del taller sin perder los turnos anteriores.
+ */
 export const saveWorkingTextController = async (req: Request, res: Response): Promise<void> => {
   const firmId = req.firmId as string;
   const texto = typeof req.body.texto === 'string' ? req.body.texto : '';
@@ -403,7 +411,22 @@ export const saveWorkingTextController = async (req: Request, res: Response): Pr
         .filter((v) => v.fecha && v.texto)
         .slice(-15)
     : undefined;
-  const ok = await documentReviewStore.actualizarTextoTrabajo(firmId, String(req.params.id), texto, anotaciones, versiones);
+  const conversacion = Array.isArray(req.body.conversacion)
+    ? (req.body.conversacion as unknown[])
+        .map((t) => {
+          const o = (t ?? {}) as Record<string, unknown>;
+          return {
+            rol: o.rol === 'revisor' ? ('revisor' as const) : ('abogado' as const),
+            texto: String(o.texto ?? '').slice(0, 60_000),
+            ediciones: Array.isArray(o.ediciones) ? (o.ediciones as TurnoDelTaller['ediciones']) : undefined,
+            referencias: Array.isArray(o.referencias) ? (o.referencias as string[]).map(String).slice(0, 50) : undefined,
+            fecha: String(o.fecha ?? '').slice(0, 40)
+          };
+        })
+        .filter((t) => t.texto)
+        .slice(-400)
+    : undefined;
+  const ok = await documentReviewStore.actualizarTextoTrabajo(firmId, String(req.params.id), texto, anotaciones, versiones, conversacion);
   res.json({ success: true, guardado: ok });
 };
 

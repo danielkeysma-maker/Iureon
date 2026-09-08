@@ -93,13 +93,37 @@ export const useSavedDrafts = (firmId: string, userEmail: string, enabled: boole
     if (enabled) void reload();
   }, [enabled, reload]);
 
-  /** Returns the message to show the user, mirroring the previous alerts. */
+  /**
+   * EL BORRADOR SE GUARDA AL GENERARSE, sin botón. Antes solo existía en la
+   * pestaña hasta que alguien pulsaba «Guardar»: recargar o cambiar de módulo
+   * perdía un escrito que ya se había cobrado. Devuelve el id del borrador
+   * creado —en la nube o, sin API, en este navegador— para que los guardados
+   * siguientes lo ACTUALICEN y nunca dupliquen.
+   */
+  const guardarAlGenerar = useCallback(
+    async (draft: GeneratedDraft): Promise<string | null> => {
+      if (!userEmail) return null;
+      const id = firmId ? await draftsApi.create(draft) : null;
+      if (id) {
+        await reload();
+        return id;
+      }
+      const entry: SavedDraftEntry = { id: `draft-${Date.now()}`, savedAt: now(), draft };
+      const updated = [entry, ...savedDrafts];
+      setSavedDrafts(updated);
+      writeLocal(storageKey, updated);
+      return entry.id;
+    },
+    [userEmail, firmId, savedDrafts, storageKey, reload]
+  );
+
+  /** Returns the message to show the user in the app's notice. */
   const saveDraft = useCallback(
     async (draft: GeneratedDraft): Promise<string> => {
       if (loadedDraftId) {
         if (await draftsApi.update(loadedDraftId, draft)) {
           await reload();
-          return '✅ Borrador actualizado exitosamente.';
+          return 'Borrador actualizado en la nube de su firma.';
         }
 
         const updated = savedDrafts.map((d) =>
@@ -107,19 +131,19 @@ export const useSavedDrafts = (firmId: string, userEmail: string, enabled: boole
         );
         setSavedDrafts(updated);
         writeLocal(storageKey, updated);
-        return '✅ Borrador actualizado (almacenamiento local).';
+        return 'Borrador actualizado en este navegador; la nube no respondió.';
       }
 
       if (await draftsApi.create(draft)) {
         await reload();
-        return '✅ Borrador guardado en la nube. Podrás abrirlo y editarlo en cualquier momento.';
+        return 'Borrador guardado en la nube de su firma. Puede abrirlo y editarlo cuando quiera desde «Borradores».';
       }
 
       const entry: SavedDraftEntry = { id: `draft-${Date.now()}`, savedAt: now(), draft };
       const updated = [entry, ...savedDrafts];
       setSavedDrafts(updated);
       writeLocal(storageKey, updated);
-      return '✅ Borrador guardado (almacenamiento local). Podrás abrirlo y editarlo en cualquier momento.';
+      return 'Borrador guardado en este navegador; la nube no respondió. Podrá abrirlo desde «Borradores» en este equipo.';
     },
     [userEmail, loadedDraftId, savedDrafts, storageKey, reload]
   );
@@ -175,6 +199,7 @@ export const useSavedDrafts = (firmId: string, userEmail: string, enabled: boole
     setLoadedDraftId,
     reload,
     saveDraft,
+    guardarAlGenerar,
     deleteDraft,
     updateMetadata
   };

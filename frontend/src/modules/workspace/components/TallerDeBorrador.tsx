@@ -32,6 +32,8 @@ interface TallerDeBorradorProps {
   precioConsultaCop: number;
   precioRevisionCop: number;
   onGuardar: (texto: string, conversacion: TurnoDelTaller[], anotaciones: Anotacion[], versiones: VersionDelTexto[]) => Promise<boolean>;
+  /** El último guardado al ocultar o cerrar la pestaña, con keepalive. */
+  onGuardarAlSalir?: (texto: string, conversacion: TurnoDelTaller[], anotaciones: Anotacion[], versiones: VersionDelTexto[]) => void;
   /** Guardar el borrador por primera vez, para que el taller tenga dónde vivir. */
   onGuardarBorradorNuevo: () => Promise<void>;
   onCerrar: (textoFinal: string) => void;
@@ -45,6 +47,7 @@ export const TallerDeBorrador: React.FC<TallerDeBorradorProps> = ({
   precioConsultaCop,
   precioRevisionCop,
   onGuardar,
+  onGuardarAlSalir,
   onGuardarBorradorNuevo,
   onCerrar,
   onSaldoCambiado,
@@ -67,7 +70,7 @@ export const TallerDeBorrador: React.FC<TallerDeBorradorProps> = ({
       activo: datos.draftId !== null,
       aviso:
         datos.draftId !== null ? (
-          'Guardado con el borrador, en la nube de su firma: texto, marcas y conversación.'
+          'Se guarda solo con el borrador, en la nube de su firma: texto, conversación, marcas y versiones.'
         ) : (
           <>
             <span className="font-semibold">Borrador sin guardar.</span> Los cambios, las marcas y la conversación viven solo en esta pestaña hasta que lo
@@ -77,6 +80,7 @@ export const TallerDeBorrador: React.FC<TallerDeBorradorProps> = ({
       accion: datos.draftId === null ? { etiqueta: 'Guardar el borrador', onClick: onGuardarBorradorNuevo } : undefined
     }}
     onGuardar={onGuardar}
+    onGuardarAlSalir={onGuardarAlSalir}
     onChat={(mensaje, textoActual, historial, anotaciones) =>
       reviewApi.chatSobreEscrito({ documentType: datos.documentType, legalBranch: datos.legalBranch || undefined, titulo: datos.titulo, mensaje, textoActual, historial, anotaciones })
     }

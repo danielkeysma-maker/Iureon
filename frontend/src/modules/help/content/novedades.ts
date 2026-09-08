@@ -40,6 +40,22 @@ export const NOVEDADES_ID = 'novedades';
 export const NOVEDADES: readonly Novedad[] = [
   {
     fecha: '2026-09-08',
+    titulo: 'Preguntas para la audiencia a partir del escrito revisado',
+    detalle:
+      'En el taller de una revisión, la pestaña «Audiencia» pide a la guía tres listas de preguntas sobre el escrito tal como está: a la contraparte, a sus testigos y a los testigos de la contraparte. Usted indica su posición —Demandante, Demandado u otra— y, si quiere, qué busca probar y el tipo de audiencia. Cada pregunta trae para qué sirve y el pasaje del escrito del que nace; se copian o se descargan en Word, y el último juego queda con la revisión.',
+    modulo: 'Taller',
+    tipo: 'nuevo'
+  },
+  {
+    fecha: '2026-09-08',
+    titulo: 'El taller guarda solo: texto, conversación, comentarios y versiones',
+    detalle:
+      'Con la autorización de la firma, todo lo que hace en el taller se guarda dos segundos después de cada cambio y también al cerrar u ocultar la pestaña; la cinta dice «Guardando…» o «Guardado hace un momento». Al volver a abrir la revisión está todo como lo dejó. La primera vez que un socio administrador revisa un escrito, la aplicación pregunta antes si conservar el escrito y su trabajo o solo el informe. En Redacción, el escrito generado queda guardado como borrador en el acto, y «Guardar» avisa en la misma pantalla en vez de con un cuadro del navegador.',
+    modulo: 'Taller',
+    tipo: 'mejora'
+  },
+  {
+    fecha: '2026-09-08',
     titulo: 'Pantalla de Inicio y visita guiada por la plataforma',
     detalle:
       'Al entrar, y al pulsar el logo, aparece «Inicio»: el saludo con la fecha, tres accesos a redactar, revisar y transcribir, sus últimos borradores y revisiones para continuar donde iba, el plan con su vencimiento y el saldo, y las tres novedades más recientes. Desde ahí, y desde el índice del manual, «Visita guiada» recorre cada módulo en dos minutos señalándolo en pantalla y diciendo para qué sirve; la primera vez en este navegador, Inicio la ofrece. También en el teléfono, donde «Inicio» es la primera pestaña de la barra inferior.',

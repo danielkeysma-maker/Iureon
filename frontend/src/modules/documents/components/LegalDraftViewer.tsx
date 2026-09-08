@@ -17,7 +17,13 @@ interface LegalDraftViewerProps {
   onExportWord?: () => void;
   isFocusMode?: boolean;
   onToggleFocusMode?: () => void;
-  onSaveDraft?: (updatedText: string) => void;
+  /** Guarda el texto tal como está. Si devuelve un mensaje, se muestra bajo los botones como aviso, nunca como diálogo del navegador. */
+  onSaveDraft?: (updatedText: string) => void | string | Promise<string | void>;
+  /**
+   * El texto editado en el lienzo, cuando la pestaña se oculta o se cierra con
+   * cambios que aún no se guardaron. Debe salir con keepalive.
+   */
+  onSalirConCambios?: (texto: string) => void;
   onOpenSavedDraftsModal?: () => void;
   /** Tipografía, tamaño e interlineado de la firma (Membrete · Formato del escrito). Sin él, la serif por defecto. */
   formato?: FormatoDelEscrito | null;
@@ -49,11 +55,50 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
   draft,
   isFocusMode,
   onSaveDraft,
+  onSalirConCambios,
   onOpenSavedDraftsModal,
   formato,
   onAbrirTaller
 }) => {
   const [editableText, setEditableText] = useState(draft.legalText);
+  const [avisoDeGuardado, setAvisoDeGuardado] = useState('');
+
+  const guardar = async () => {
+    if (!onSaveDraft) return;
+    const mensaje = await onSaveDraft(editableText);
+    if (typeof mensaje === 'string' && mensaje) {
+      setAvisoDeGuardado(mensaje);
+      window.setTimeout(() => setAvisoDeGuardado(''), 5000);
+    }
+  };
+
+  /*
+   * LO EDITADO EN EL LIENZO NO SE PIERDE AL CERRAR. El texto vive aquí hasta
+   * que se pulsa «Guardar»; si la pestaña se oculta o se cierra con cambios
+   * respecto de lo guardado, salen en el acto con keepalive.
+   */
+  const ultimoTexto = React.useRef({ editado: editableText, guardado: draft.legalText });
+  ultimoTexto.current = { editado: editableText, guardado: draft.legalText };
+  /* En ref: App la pasa como flecha nueva en cada render y no debe re-suscribir el oyente. */
+  const salirConCambios = React.useRef(onSalirConCambios);
+  salirConCambios.current = onSalirConCambios;
+  const haySalida = Boolean(onSalirConCambios);
+  useEffect(() => {
+    if (!haySalida) return;
+    const vaciar = () => {
+      const { editado, guardado } = ultimoTexto.current;
+      if (editado !== guardado) salirConCambios.current?.(editado);
+    };
+    const alCambiarVisibilidad = () => {
+      if (document.visibilityState === 'hidden') vaciar();
+    };
+    document.addEventListener('visibilitychange', alCambiarVisibilidad);
+    window.addEventListener('pagehide', vaciar);
+    return () => {
+      document.removeEventListener('visibilitychange', alCambiarVisibilidad);
+      window.removeEventListener('pagehide', vaciar);
+    };
+  }, [haySalida]);
   const [selectedText, setSelectedText] = useState('');
   const [isJargonModalOpen, setIsJargonModalOpen] = useState(false);
   const [isStyleSaved, setIsStyleSaved] = useState(false);
@@ -228,7 +273,7 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
 
           {onSaveDraft && (
             <button
-              onClick={() => onSaveDraft(editableText)}
+              onClick={() => void guardar()}
               className="btn-secondary btn-sm ml-auto"
               title="Guardar en el historial de la firma"
             >
@@ -237,6 +282,13 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
             </button>
           )}
         </div>
+
+        {avisoDeGuardado && (
+          <p role="status" className="notice mt-2">
+            <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-verified" />
+            <span>{avisoDeGuardado}</span>
+          </p>
+        )}
 
         {/*
           LA EXPORTACIÓN SALE SIEMPRE EN PAPEL BLANCO, y se dice aquí porque es

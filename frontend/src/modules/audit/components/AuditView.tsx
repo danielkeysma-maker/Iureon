@@ -49,6 +49,7 @@ export const ACCIONES: Record<string, string> = {
   CATALOG_TERM_VERIFIED: 'Verificó actuación',
   INTERVIEW_DECIDED: 'Decidió entrevista',
   ACTA_LISTA: 'Revisión de acta',
+  HEARING_QUESTIONS_GENERATED: 'Preguntas para la audiencia',
   FIRM_CREATED: 'Creó la firma',
   FIRM_UPDATED: 'Actualizó la firma',
   FIRM_CREDITS_ADDED: 'Acreditó saldo',

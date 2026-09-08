@@ -87,6 +87,44 @@ export interface RevisionGuardada {
   conversacion: TurnoDelTaller[];
   anotaciones: Anotacion[];
   versiones: VersionDelTexto[];
+  /** El último juego de preguntas para la audiencia; null si nunca se pidió. Falta en la lista sin cuerpos. */
+  preguntasAudiencia?: PreguntasAudienciaGuardadas | null;
+}
+
+/* ─── Preguntas para la audiencia ──────────────────────────────────────────── */
+
+export interface PreguntaDeAudiencia {
+  pregunta: string;
+  /** Una línea: qué busca establecer o desvirtuar. */
+  paraQue: string;
+  /** Pasaje literal del escrito del que nace, si lo hay. */
+  delEscrito?: string;
+}
+
+export interface PreguntasParaLaAudiencia {
+  contraparte: PreguntaDeAudiencia[];
+  misTestigos: PreguntaDeAudiencia[];
+  testigosContraparte: PreguntaDeAudiencia[];
+}
+
+export interface ParametrosDePreguntas {
+  /** «Demandante», «Demandado» o texto libre: «Ministerio Público», «tercero». */
+  posicion: string;
+  quiereProbar?: string;
+  audiencia?: string;
+}
+
+export interface PreguntasAudienciaGuardadas {
+  parametros: ParametrosDePreguntas;
+  preguntas: PreguntasParaLaAudiencia;
+  generadoEl: string;
+  por: string;
+}
+
+export interface RespuestaDePreguntas extends PreguntasAudienciaGuardadas {
+  guardado: boolean;
+  cobradoCop: number;
+  saldoCop: number;
 }
 
 export interface EdicionPropuesta {
@@ -161,8 +199,23 @@ export const reviewApi = {
 
   /* ─── El taller ─────────────────────────────────────────────────────────── */
 
-  guardarTexto: (id: string, texto: string, anotaciones?: Anotacion[], versiones?: VersionDelTexto[]) =>
-    httpClient.put<{ guardado: boolean; motivo?: string }>(`/api/agent/reviews/${encodeURIComponent(id)}/texto`, { body: { texto, anotaciones, versiones } }),
+  /** Autoguardado del taller: texto, marcas, versiones y la conversación entera. */
+  guardarTexto: (id: string, texto: string, anotaciones?: Anotacion[], versiones?: VersionDelTexto[], conversacion?: TurnoDelTaller[]) =>
+    httpClient.put<{ guardado: boolean; motivo?: string }>(`/api/agent/reviews/${encodeURIComponent(id)}/texto`, { body: { texto, anotaciones, versiones, conversacion } }),
+
+  /**
+   * El último guardado, cuando la pestaña se oculta o se cierra. Sale con
+   * keepalive para sobrevivir a la página; como el navegador limita ese cuerpo
+   * a unos 64 KB, las versiones se dejan fuera si no caben — ya viajaron en el
+   * guardado con retardo — y el texto y la conversación van siempre.
+   */
+  guardarTextoAlSalir: (id: string, texto: string, anotaciones: Anotacion[], versiones: VersionDelTexto[], conversacion: TurnoDelTaller[]) => {
+    const cuerpo = cuerpoQueCabeEnKeepalive({ texto, anotaciones, versiones, conversacion });
+    return httpClient
+      .put<{ guardado: boolean }>(`/api/agent/reviews/${encodeURIComponent(id)}/texto`, { body: cuerpo, keepalive: true })
+      .then((r) => r.guardado)
+      .catch(() => false);
+  },
 
   /** La guía conversa sobre un escrito de Redacción: sin informe ni id. */
   chatSobreEscrito: (body: { documentType: string; legalBranch?: string; titulo: string; mensaje: string; textoActual: string; historial: TurnoDelTaller[]; anotaciones?: Anotacion[] }) =>
@@ -171,6 +224,10 @@ export const reviewApi = {
   chat: (id: string, body: { mensaje: string; textoActual: string; historial: TurnoDelTaller[]; anotaciones?: Anotacion[] }) =>
     httpClient.post<RespuestaDelChat>(`/api/agent/reviews/${encodeURIComponent(id)}/chat`, { body }),
 
+  /** Tres listas de preguntas para la audiencia a partir del escrito. Cobra como una consulta. */
+  preguntasParaAudiencia: (id: string, body: ParametrosDePreguntas & { textoActual: string }) =>
+    httpClient.post<RespuestaDePreguntas>(`/api/agent/reviews/${encodeURIComponent(id)}/preguntas`, { body }),
+
   rerevisar: (id: string, textoActual: string) =>
     httpClient.post<RespuestaDeNuevaRevision>(`/api/agent/reviews/${encodeURIComponent(id)}/rerevisar`, { body: { textoActual } }),
 
@@ -178,6 +235,17 @@ export const reviewApi = {
 
   autorizarGuardado: (autorizar: boolean) =>
     httpClient.post<ConsentimientoDeGuardado>('/api/agent/reviews/settings/guardado', { body: { autorizar } })
+};
+
+/** Bytes aproximados de un cuerpo JSON; el límite keepalive del navegador es 64 KB. */
+const LIMITE_KEEPALIVE = 60_000;
+export const cuerpoQueCabeEnKeepalive = <T extends { versiones?: unknown; anotaciones?: unknown; conversacion?: unknown }>(cuerpo: T): T => {
+  const pesa = (c: unknown) => new Blob([JSON.stringify(c)]).size;
+  if (pesa(cuerpo) <= LIMITE_KEEPALIVE) return cuerpo;
+  const sinVersiones = { ...cuerpo, versiones: undefined };
+  if (pesa(sinVersiones) <= LIMITE_KEEPALIVE) return sinVersiones;
+  /* La conversación ya la guardó el servidor turno a turno; el texto es lo que no puede faltar. */
+  return { ...sinVersiones, conversacion: undefined };
 };
 
 /** El archivo como base64 puro, sin el prefijo data:. */

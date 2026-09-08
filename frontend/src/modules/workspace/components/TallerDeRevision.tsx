@@ -1,6 +1,7 @@
 import React from 'react';
 import type { FormatoDelEscrito } from '../../documents/formatoEnPantalla';
-import { reviewApi, type Anotacion, type ConsentimientoDeGuardado, type InformeDeRevision, type TurnoDelTaller, type VersionDelTexto } from '../services/review.api';
+import { reviewApi, type Anotacion, type ConsentimientoDeGuardado, type InformeDeRevision, type PreguntasAudienciaGuardadas, type TurnoDelTaller, type VersionDelTexto } from '../services/review.api';
+import { exportarPreguntasAWord } from '../services/preguntasExport.service';
 import { TallerDeEscrito } from './TallerDeEscrito';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 
@@ -31,6 +32,8 @@ export interface DatosDelTaller {
   conversacion: TurnoDelTaller[];
   anotaciones?: Anotacion[];
   versiones?: VersionDelTexto[];
+  /** Si quien abre el taller ya las tiene; si falta, el taller las pide al servidor. */
+  preguntasAudiencia?: PreguntasAudienciaGuardadas | null;
 }
 
 interface TallerDeRevisionProps {
@@ -58,16 +61,45 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
   const [confirmacion, setConfirmacion] = React.useState<Confirmacion | null>(null);
   const [errorAutorizacion, setErrorAutorizacion] = React.useState('');
   /** Lo último que el taller tenía, para guardarlo en el acto cuando la firma autoriza. */
-  const ultimoEstado = React.useRef<{ texto: string; anotaciones: Anotacion[]; versiones: VersionDelTexto[] }>({ texto: datos.texto, anotaciones: datos.anotaciones ?? [], versiones: datos.versiones ?? [] });
+  const ultimoEstado = React.useRef<{ texto: string; conversacion: TurnoDelTaller[]; anotaciones: Anotacion[]; versiones: VersionDelTexto[] }>({
+    texto: datos.texto,
+    conversacion: datos.conversacion,
+    anotaciones: datos.anotaciones ?? [],
+    versiones: datos.versiones ?? []
+  });
 
   const guardaEnServidor = consentimiento.guarda && datos.revisionId !== null;
+
+  /*
+   * Las preguntas para la audiencia guardadas con la revisión. Quien abre el
+   * taller arma los datos desde la lista (sin cuerpos), así que se piden aquí
+   * una vez; un fallo de red deja la pestaña vacía y no bloquea nada.
+   */
+  const [preguntasGuardadas, setPreguntasGuardadas] = React.useState<PreguntasAudienciaGuardadas | null>(datos.preguntasAudiencia ?? null);
+  React.useEffect(() => {
+    if (datos.preguntasAudiencia !== undefined || !datos.revisionId) return;
+    let vigente = true;
+    reviewApi
+      .obtener(datos.revisionId)
+      .then((r) => {
+        if (vigente && r.preguntasAudiencia) setPreguntasGuardadas(r.preguntasAudiencia);
+      })
+      .catch(() => undefined);
+    return () => {
+      vigente = false;
+    };
+  }, [datos.revisionId, datos.preguntasAudiencia]);
 
   const autorizar = async () => {
     setErrorAutorizacion('');
     try {
       const c = await reviewApi.autorizarGuardado(true);
       setConsentimiento(c);
-      if (c.guarda && datos.revisionId) await reviewApi.guardarTexto(datos.revisionId, ultimoEstado.current.texto, ultimoEstado.current.anotaciones, ultimoEstado.current.versiones);
+      /* Con la conversación: los turnos de antes de autorizar solo existían en esta pestaña. */
+      if (c.guarda && datos.revisionId) {
+        const u = ultimoEstado.current;
+        await reviewApi.guardarTexto(datos.revisionId, u.texto, u.anotaciones, u.versiones, u.conversacion);
+      }
     } catch (err) {
       setErrorAutorizacion(err instanceof Error ? err.message : 'No se pudo guardar la autorización.');
     }
@@ -103,11 +135,11 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
         guardado={{
           activo: guardaEnServidor,
           aviso: guardaEnServidor ? (
-            'Guardado en la nube de su firma: texto, marcas y conversación. Puede cerrar y retomar otro día.'
+            'Se guarda solo, en la nube de su firma: texto, conversación, marcas y versiones. Puede cerrar y retomar otro día.'
           ) : (
             <>
               <span className="font-semibold">Solo en esta sesión.</span> Su firma no ha autorizado conservar escritos: al cerrar se pierden el texto, las
-              marcas y la conversación; el informe sí queda.{' '}
+              marcas, la conversación y las versiones; el informe sí queda.{' '}
               {esAdminDeFirma
                 ? 'Puede autorizarlo aquí, una vez, para toda la firma.'
                 : 'Puede autorizarlo un socio administrador de su firma, desde este mismo aviso o desde el módulo Revisiones.'}
@@ -118,10 +150,18 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
         }}
         onGuardar={
           datos.revisionId
-            ? async (texto, _conversacion, anotaciones, versiones) => {
-                ultimoEstado.current = { texto, anotaciones, versiones };
-                const r = await reviewApi.guardarTexto(datos.revisionId as string, texto, anotaciones, versiones);
+            ? async (texto, conversacion, anotaciones, versiones) => {
+                ultimoEstado.current = { texto, conversacion, anotaciones, versiones };
+                const r = await reviewApi.guardarTexto(datos.revisionId as string, texto, anotaciones, versiones, conversacion);
                 return r.guardado;
+              }
+            : undefined
+        }
+        onGuardarAlSalir={
+          datos.revisionId
+            ? (texto, conversacion, anotaciones, versiones) => {
+                ultimoEstado.current = { texto, conversacion, anotaciones, versiones };
+                void reviewApi.guardarTextoAlSalir(datos.revisionId as string, texto, anotaciones, versiones, conversacion);
               }
             : undefined
         }
@@ -133,7 +173,17 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
         onExportarTexto={(formato, texto) => onExportarTexto(formato, `${datos.documentType} corregido`, texto)}
         onCerrar={() => onCerrar()}
         onSaldoCambiado={onSaldoCambiado}
-    formato={formatoDeFirma}
+        formato={formatoDeFirma}
+        preguntas={
+          datos.revisionId
+            ? {
+                precioCop: precioConsultaCop,
+                guardadas: preguntasGuardadas,
+                onGenerar: (parametros, textoActual) => reviewApi.preguntasParaAudiencia(datos.revisionId as string, { ...parametros, textoActual }),
+                onExportarWord: (generadas) => exportarPreguntasAWord(datos.documentType, generadas)
+              }
+            : undefined
+        }
       />
       <ConfirmarDialog confirmacion={confirmacion} onCerrar={() => setConfirmacion(null)} />
     </>

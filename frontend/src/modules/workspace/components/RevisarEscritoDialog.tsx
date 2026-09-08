@@ -2,7 +2,8 @@ import React from 'react';
 import { AlertTriangle, CheckCircle2, ClipboardCheck, Copy, Download, FileText, History, Trash2, UploadCloud, X } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import { ApiError } from '../../../config/httpClient';
-import { archivoABase64, reviewApi, type RespuestaDeRevision, type RevisionGuardada } from '../services/review.api';
+import { archivoABase64, reviewApi, type ConsentimientoDeGuardado, type RespuestaDeRevision, type RevisionGuardada } from '../services/review.api';
+import { readSession } from '../../auth/session';
 import { uploadFileToStorage } from '../../documents/services/storageUpload';
 import { exportarInformeAPdf, exportarInformeAWord } from '../services/informeExport.service';
 import type { DatosDelInforme } from '../services/informeLayout';
@@ -25,10 +26,16 @@ import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDia
  * catálogo; lo valorativo, del modelo. El informe los separa, y la cabecera
  * dice si hubo ficha o no, porque sin ficha lo objetivo pierde respaldo.
  *
- * ─── EL DOCUMENTO NO SE GUARDA ──────────────────────────────────────────────
+ * ─── QUÉ SE GUARDA ──────────────────────────────────────────────────────────
  *
- * Ni el archivo, ni el texto, ni el informe quedan en el servidor. Si el
- * abogado quiere conservar el informe, lo copia. Es su trabajo, leído una vez.
+ * El informe, siempre. El texto del escrito y el trabajo del taller —la
+ * conversación, los comentarios, las versiones— solo si la firma lo autorizó.
+ * Esa autorización se pregunta AQUÍ, antes de la primera revisión de un socio
+ * administrador que aún no ha decidido: los abogados olvidaban guardar y
+ * perdían saldo y lo ya consultado, y la pregunta en el taller llegaba tarde,
+ * cuando el trabajo ya estaba en riesgo. Un abogado sin autoridad no se
+ * bloquea nunca: revisa igual y al terminar se le dice qué no se conserva y a
+ * quién pedirlo.
  */
 
 interface RevisarEscritoDialogProps {
@@ -98,6 +105,24 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
   const [confirmacion, setConfirmacion] = React.useState<Confirmacion | null>(null);
   /** El texto del escrito y la conversacion de la revision en pantalla, para abrir el taller. */
   const [paraElTaller, setParaElTaller] = React.useState<{ texto: string | null; conversacion: DatosDelTaller['conversacion']; anotaciones: NonNullable<DatosDelTaller['anotaciones']>; versiones: NonNullable<DatosDelTaller['versiones']>; guardaTexto: boolean; revisionId: string | null }>({ texto: null, conversacion: [], anotaciones: [], versiones: [], guardaTexto: false, revisionId: null });
+
+  /*
+   * La autorización de la firma, leída al abrir. `el === null` significa que
+   * nadie ha decidido todavía: ni sí ni no. Solo entonces se pregunta.
+   */
+  const [consentimiento, setConsentimiento] = React.useState<ConsentimientoDeGuardado | null>(null);
+  const [preguntaDeGuardado, setPreguntaDeGuardado] = React.useState(false);
+  const rol = readSession()?.user.role;
+  const puedeAutorizar = rol === 'FIRM_ADMIN' || rol === 'SUPER_ADMIN';
+  const firmaSinDecidir = consentimiento !== null && consentimiento.el === null && !consentimiento.guarda;
+
+  React.useEffect(() => {
+    if (!abierto) return;
+    reviewApi
+      .consentimiento()
+      .then(setConsentimiento)
+      .catch(() => setConsentimiento(null));
+  }, [abierto]);
 
   const cargarAnteriores = React.useCallback(() => {
     reviewApi
@@ -174,6 +199,31 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
     }
     setError('');
     setArchivo(f);
+  };
+
+  /*
+   * Antes de generar, la pregunta que evita perder el trabajo: al socio
+   * administrador de una firma que no ha decidido se le pide decidir; a los
+   * demás se les revisa sin más.
+   */
+  const pedirRevision = () => {
+    if (!hayEscrito || ocupado) return;
+    if (puedeAutorizar && firmaSinDecidir) {
+      setPreguntaDeGuardado(true);
+      return;
+    }
+    void revisar();
+  };
+
+  const decidirGuardado = async (conservar: boolean) => {
+    setPreguntaDeGuardado(false);
+    try {
+      setConsentimiento(await reviewApi.autorizarGuardado(conservar));
+    } catch (err) {
+      /* La decisión no se pudo guardar; la revisión sigue y se dice por qué el taller queda solo en la sesión. */
+      setError(err instanceof Error ? `${err.message} La revisión continúa; podrá autorizar el guardado desde «Revisiones».` : 'No se pudo guardar la decisión.');
+    }
+    await revisar();
   };
 
   const revisar = async () => {
@@ -294,7 +344,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
       subtitulo={
         sinActuacion
           ? 'Elija primero la actuación arriba: la revisión objetiva se hace contra su ficha.'
-          : `Contra la ficha de «${documentType}» · el documento no se guarda`
+          : `Contra la ficha de «${documentType}» · ${consentimiento?.guarda ? 'el escrito y su trabajo se conservan para la firma' : 'el documento no se guarda'}`
       }
       hayCambiosSinGuardar={ocupado}
       onIntentoDeCerrarConCambios={() => undefined}
@@ -370,7 +420,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
             </button>
             <button
               type="button"
-              onClick={() => void revisar()}
+              onClick={pedirRevision}
               disabled={!hayEscrito || ocupado || sinActuacion}
               className="btn-primary btn-sm disabled:opacity-50"
             >
@@ -537,8 +587,52 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
           )}
         </div>
       ) : (
-        <Informe respuesta={respuesta} documentType={tituloDelInforme} />
+        <>
+          {/* Al abogado sin autoridad se le dice qué no se conserva y a quién pedirlo; nunca se le impide revisar. */}
+          {!paraElTaller.guardaTexto && !puedeAutorizar && firmaSinDecidir && (
+            <div className="notice-unverified mb-3" role="status">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-unverified" />
+              <span>
+                Su trabajo en el taller no se conserva porque la firma aún no ha autorizado guardar escritos. Pida a su administrador activarlo en
+                Revisiones.
+              </span>
+            </div>
+          )}
+          <Informe respuesta={respuesta} documentType={tituloDelInforme} />
+        </>
       )}
+      <Dialog
+        abierto={preguntaDeGuardado}
+        onCerrar={() => {
+          /* Cerrar sin decidir no bloquea: se revisa igual y la pregunta vuelve la próxima vez. */
+          setPreguntaDeGuardado(false);
+          void revisar();
+        }}
+        tamano="S"
+        titulo="¿Conservar el escrito y su trabajo?"
+        subtitulo="Se decide una vez, para toda la firma; puede cambiarlo en «Revisiones»."
+        acciones={
+          <>
+            <button type="button" onClick={() => void decidirGuardado(false)} className="btn-neutral btn-sm">
+              Solo el informe
+            </button>
+            <button type="button" onClick={() => void decidirGuardado(true)} className="btn-primary btn-sm">
+              Sí, conservar
+            </button>
+          </>
+        }
+      >
+        <div className="space-y-2 text-ui leading-relaxed text-ink-900">
+          <p>
+            Con <span className="font-semibold">«Sí, conservar»</span> (recomendado) la firma guarda el texto del escrito, la conversación con la guía,
+            los comentarios y las versiones: nada se pierde al cerrar y no hay que volver a subir el archivo.
+          </p>
+          <p>
+            Con <span className="font-semibold">«Solo el informe»</span> se conserva únicamente el informe, y el trabajo del taller desaparece al cerrar
+            la pestaña.
+          </p>
+        </div>
+      </Dialog>
       <ConfirmarDialog confirmacion={confirmacion} onCerrar={() => setConfirmacion(null)} />
     </Dialog>
   );
@@ -643,7 +737,7 @@ const Informe: React.FC<{ respuesta: RespuestaDeRevision; documentType: string }
 
       <p className="border-t border-line-100 pt-3 text-meta text-ink-400">
         Lo marcado como exigencia de la norma sale de la ficha verificada; lo demás es criterio profesional del revisor y usted decide.
-        El informe queda guardado para su firma en «Revisiones anteriores»; el escrito revisado no se conserva.
+        El informe queda guardado para su firma en «Revisiones anteriores»; el escrito y el trabajo del taller, solo si la firma autorizó conservarlos.
       </p>
     </div>
   );

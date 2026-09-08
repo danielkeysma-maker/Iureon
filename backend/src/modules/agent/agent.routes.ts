@@ -13,6 +13,7 @@ import {
   setStorageConsentController
 } from './review/documentReview.controller';
 import { escritoChatController } from './review/escritoChat.controller';
+import { preguntasAudienciaController } from './review/preguntasAudiencia.controller';
 import {
   getStyleProfileController,
   saveLawyerEditsController,
@@ -36,6 +37,8 @@ router.delete('/agent/reviews/:id', bloquearSiPlanVencido, deleteReviewControlle
 router.put('/agent/reviews/:id/texto', bloquearSiPlanVencido, saveWorkingTextController as any);
 router.post('/agent/reviews/:id/chat', bloquearSiPlanVencido, reviewChatController as any);
 router.post('/agent/reviews/:id/rerevisar', bloquearSiPlanVencido, reReviewController as any);
+/* Preguntas para la audiencia a partir del escrito revisado: tres listas, cobra como consulta. */
+router.post('/agent/reviews/:id/preguntas', bloquearSiPlanVencido, preguntasAudienciaController as any);
 /* La guia conversa sobre un escrito generado en Redaccion: sin informe ni id; el navegador manda texto e historial. */
 router.post('/agent/escrito/chat', bloquearSiPlanVencido, escritoChatController as any);
 

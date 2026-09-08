@@ -737,7 +737,7 @@ const A_REVISAR: ManualArticle = {
         'En «Redacción», elija arriba la actuación en «Tipo de documento»: la revisión objetiva se hace contra su ficha verificada. Sin actuación, el diálogo dice «Falta elegir la actuación».',
         'Debajo de los adjuntos pulse «Revisar un escrito ya redactado».',
         'Use «Subir PDF, Word o texto (hasta 15 MB, con anexos)» o pegue el texto en el cuadro. Indique el cliente o proceso en el campo de referencia y escriba en «Qué quiere saber» lo que le preocupa.',
-        'Pulse «Revisar», que muestra el precio. Cuesta lo mismo que un borrador y se descuenta del saldo de la firma; si el revisor no responde, no se cobra.',
+        'Pulse «Revisar», que muestra el precio. Cuesta lo mismo que un borrador y se descuenta del saldo de la firma; si el revisor no responde, no se cobra. La primera vez que un socio administrador revisa, antes de generar el informe la aplicación pregunta «¿Conservar el escrito y su trabajo?»: con «Sí, conservar» la firma guarda el texto, la conversación con la guía, los comentarios y las versiones; con «Solo el informe» el trabajo del taller desaparece al cerrar la pestaña. Se decide una vez para toda la firma y se puede cambiar en «Revisiones».',
         'Lea el informe. Puede descargarlo en «Word» o «PDF» con la letra de la firma, o «Copiar informe» como texto. Queda en «Revisiones anteriores», dentro del mismo diálogo, con el cliente, la actuación, el archivo, la fecha y quién lo pidió.'
       ]
     },
@@ -750,6 +750,7 @@ const A_REVISAR: ManualArticle = {
         'A la derecha, en la pestaña «Guía», pregunte o pida redacciones —«reescribe la pretensión tercera como subsidiaria», «¿cómo va después de mis cambios?»—. Cada mensaje lleva el texto tal como está en ese momento, cuesta $300 y, si propone cambiar un pasaje, trae su propio «Aplicar».',
         'Seleccione texto para marcarlo: aparecen Amarillo, Verde, Azul, Rosa y Tachar, y el botón «Comentar» para dejar una nota sobre el pasaje. Las marcas se anclan a las palabras y sobreviven a las ediciones; doble clic las quita, y «Limpiar» quita todas las suyas sin tocar los comentarios.',
         'Pulse «Guardar versión» cuando quiera un punto de retorno. La pestaña «Versiones» compara cualquiera con el texto actual —lo quitado en rojo, lo añadido en verde— y la restaura si la de antes era mejor. Se conservan las últimas quince; también se guarda una sola antes de cada revisión nueva y de cada consulta si el texto cambió.',
+        'No hay botón de guardar el taller: con la autorización de la firma, el texto, la conversación, los comentarios, las marcas y las versiones se guardan solos dos segundos después de cada cambio y también al cerrar u ocultar la pestaña. La cinta de arriba dice «Guardando…», «Guardado hace un momento» o, si algo falló, «No se pudo guardar el último cambio». Al volver a abrir la revisión, desde «Revisiones» o tras recargar, todo está como lo dejó.',
         'Cuando el texto esté corregido, «Volver a revisar» emite un informe nuevo ($2.000) sobre el texto tal como está. Descargue el resultado con «Word» o «PDF»: sale con el membrete de la firma.'
       ]
     },
@@ -775,13 +776,50 @@ const A_REVISAR: ManualArticle = {
     {
       kind: 'aviso',
       texto:
-        'Retomar otro día requiere autorización de la firma. El texto de trabajo y la conversación se conservan en el servidor solo si un socio administrador pulsa «Autorizar guardado para la firma», una vez, para toda la firma; queda en la auditoría con su correo. Sin esa autorización el taller funciona igual, pero al cerrar la pestaña se pierden el texto y la conversación —el informe sí queda— y la cinta de arriba lo advierte. La autorización se da desde esa cinta o desde la cabecera de «Revisiones», donde siempre se ve si está dada, quién la dio y cuándo, y donde «Retirar autorización» la revoca.'
+        'Retomar otro día requiere autorización de la firma. El texto de trabajo, la conversación, los comentarios y las versiones se conservan en el servidor solo si un socio administrador lo autorizó, una vez, para toda la firma; queda en la auditoría con su correo. La pregunta aparece sola la primera vez que un administrador revisa un escrito, y también se responde desde la cinta del taller o desde la cabecera de «Revisiones», donde siempre se ve si está dada, quién la dio y cuándo, y donde «Retirar autorización» la revoca. Sin esa autorización el taller funciona igual, pero al cerrar la pestaña se pierden el texto, la conversación y las marcas —el informe sí queda—; la cinta de arriba lo advierte y, si usted no es administrador, el diálogo de revisión se lo dice al terminar para que pida activarlo. A un abogado nunca se le impide revisar por esto.'
     },
     {
       kind: 'nota',
       titulo: 'Qué queda guardado y qué no',
       texto:
         'El informe queda guardado para su firma. El escrito revisado se conserva únicamente si la firma autorizó el taller; si no, se lee, se revisa y se descarta en la misma petición. En la auditoría de la firma queda que se revisó un escrito de tal actuación, nunca su contenido. Un PDF escaneado es una imagen y no trae texto: la aplicación se lo dirá y tendrá que pegar el texto. Se lee el documento completo hasta 300.000 caracteres, unas 75 páginas; solo si el escrito es más largo el informe declara que fue recortado.'
+    }
+  ]
+};
+
+const A_PREGUNTAS_AUDIENCIA: ManualArticle = {
+  id: 'preguntas-audiencia',
+  titulo: 'Preguntas para la audiencia',
+  entradilla:
+    'Con el escrito en el taller, pida a la guía tres listas de preguntas para la audiencia: a la contraparte, a sus testigos y a los testigos de la contraparte, cada una con para qué sirve y el pasaje del escrito del que nace.',
+  bloques: [
+    { kind: 'ruta', camino: ['Revisiones', 'El taller', 'Pestaña «Audiencia»', '«Sugerir preguntas»'] },
+    {
+      kind: 'parrafo',
+      texto:
+        'La guía lee el escrito tal como está en el taller —una demanda, una contestación, un dictamen, una declaración— y sugiere preguntas con tres técnicas distintas. A la contraparte, preguntas de interrogatorio de parte cuya respuesta favorece a su cliente, sacadas de los hechos, las contradicciones, las omisiones y las admisiones del propio escrito. A sus testigos, preguntas abiertas y no sugestivas, ordenadas como un relato: quién es, cuándo, dónde, qué vio, cómo le consta. A los testigos de la contraparte, preguntas cerradas de contrainterrogatorio que ponen a prueba la credibilidad, las contradicciones con el escrito, la razón del conocimiento y el interés.'
+    },
+    {
+      kind: 'pasos',
+      pasos: [
+        'Abra la revisión en el taller, desde «Revisiones» o desde «Abrir en el taller» en el diálogo de revisión. A la derecha, elija la pestaña «Audiencia»; también llega con el botón «Preguntas para la audiencia» que está sobre el cuadro de la guía.',
+        'Indique su posición en el proceso: «Demandante», «Demandado» u «Otro», y en ese caso escríbala —Ministerio Público, tercero, apoderado de la víctima—. Las tres listas se orientan a lo que le conviene a esa posición.',
+        'Si quiere, escriba en «¿Qué quiere probar?» lo que busca establecer en la audiencia y en «Tipo de audiencia» cuál es. Sin eso, la guía lo deduce del escrito y de la posición.',
+        'Pulse «Sugerir preguntas», que muestra el precio: cuesta lo mismo que un mensaje a la guía y se descuenta del saldo de la firma; si la guía no responde, no se cobra.',
+        'Lea las tres listas. Cada pregunta viene numerada, con «Para qué» —lo que busca establecer o desvirtuar— y, cuando nace de un pasaje concreto, la cita «Del escrito»; tocar la cita subraya ese pasaje en el papel.',
+        'Use «Copiar» para llevarse las tres listas como texto, o «Word» para descargarlas con la letra de la firma. «Volver a generar» pide un juego nuevo, con otros parámetros o sobre el texto ya corregido.'
+      ]
+    },
+    {
+      kind: 'consejo',
+      texto:
+        'Corrija primero el escrito y pida las preguntas después: la guía trabaja sobre el texto tal como está en ese momento, y un hecho que usted quitó del escrito ya no produce preguntas.'
+    },
+    {
+      kind: 'nota',
+      titulo: 'Son sugerencias, y la guía no conoce el caso',
+      texto:
+        'La guía solo conoce el escrito: no el expediente, las pruebas, a las partes ni a los testigos. Por eso no afirma hechos que el escrito no traiga ni cita normas o sentencias, y por eso cada lista puede quedar corta o vacía cuando el texto no da sustento. Las preguntas son material de trabajo que usted pesa, ordena y descarta con su conocimiento del caso; formularlas es decisión suya. El último juego generado queda guardado con la revisión y vuelve a aparecer al abrir el taller; en la auditoría de la firma consta que se pidieron preguntas para tal escrito, nunca su contenido.'
     }
   ]
 };
@@ -1056,7 +1094,7 @@ export const MANUAL: readonly ManualGroup[] = [
     titulo: 'Primeros 20 minutos',
     articulos: [A_INICIO, A_QUE_HACE, A_PRIMER_ESCRITO, A_TRES_ESTADOS, A_VERIFICAR, A_MOVIL]
   },
-  { titulo: 'Redactar', articulos: [A_INSTRUCCION, A_REVISAR, A_EXPORTAR, A_BORRADORES] },
+  { titulo: 'Redactar', articulos: [A_INSTRUCCION, A_REVISAR, A_PREGUNTAS_AUDIENCIA, A_EXPORTAR, A_BORRADORES] },
   { titulo: 'Calcular', articulos: [A_HERRAMIENTAS] },
   { titulo: 'Grabar', articulos: [A_ENTREVISTA, A_AUDIENCIA] },
   {

@@ -29,6 +29,7 @@ import { RevisionesView } from './modules/workspace/components/RevisionesView';
 import { draftsApi } from './modules/documents/services/drafts.api';
 import { TallerDeBorrador, type DatosDelBorrador } from './modules/workspace/components/TallerDeBorrador';
 import type { Anotacion, TurnoDelTaller, VersionDelTexto } from './modules/workspace/services/review.api';
+import { cuerpoQueCabeEnKeepalive } from './modules/workspace/services/review.api';
 import { DocumentCanvasRight } from './modules/workspace/components/DocumentCanvasRight';
 import { SearchView } from './modules/search/components/SearchView';
 import { SearchMobileView } from './modules/search/components/SearchMobileView';
@@ -675,6 +676,7 @@ export function App() {
     loadedDraftId,
     setLoadedDraftId,
     saveDraft,
+    guardarAlGenerar,
     deleteDraft,
     updateMetadata
   } = useSavedDrafts(activeFirm.id, currentUserEmail, isAuthenticated);
@@ -690,9 +692,10 @@ export function App() {
     if (tituloGenerado) setVistaTaller('documento');
   }, [tituloGenerado]);
 
-  const handleSaveDraft = async (updatedText: string) => {
-    if (!workflow.generatedDraft) return;
-    alert(await saveDraft({ ...workflow.generatedDraft, legalText: updatedText }));
+  /* El mensaje vuelve al lienzo, que lo pinta como aviso; nada de diálogos del navegador. */
+  const handleSaveDraft = async (updatedText: string): Promise<string> => {
+    if (!workflow.generatedDraft) return '';
+    return saveDraft({ ...workflow.generatedDraft, legalText: updatedText });
   };
 
   // ═══ Cargar borrador para edición ═══
@@ -805,7 +808,19 @@ export function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [savedDrafts]);
 
+  /*
+   * ENTRAR ABRE INICIO. La pestaña recuerda su módulo para sobrevivir a una
+   * recarga, no para que quien entra con otra cuenta —o vuelve tras cerrar
+   * sesión— aterrice en la pantalla que dejó otro. Iniciar sesión es empezar,
+   * y empezar es Inicio; los enlaces con `?ir=` corren después y siguen
+   * mandando a donde apuntan.
+   */
   const handleLoginSuccess = (fresh: Session) => {
+    olvidarTodo();
+    setTallerActivo(null);
+    setTallerBorrador(null);
+    setManualArticulo(undefined);
+    setMainView('inicio');
     setSession(saveSession(fresh));
     setActiveFirm(firmFromSession(fresh));
   };
@@ -1162,10 +1177,23 @@ export function App() {
                   setLegalPrompt={workflow.setLegalPrompt}
                   isProcessing={workflow.isProcessing}
                   handleSendPrompt={async (e) => {
-                    await workflow.handleSendPrompt(e);
+                    const generado = await workflow.handleSendPrompt(e);
                     void refreshBalance();
                     setLoadedDraftId(null);
                     recordar(PANTALLAS.borrador, null);
+                    /*
+                     * GUARDADO AL GENERAR. El escrito recién cobrado queda como
+                     * borrador de la firma en el acto y pasa a ser el «cargado»:
+                     * «Guardar» y el taller lo actualizan, nunca lo duplican, y
+                     * recargar la página lo vuelve a abrir.
+                     */
+                    if (generado) {
+                      const id = await guardarAlGenerar(generado);
+                      if (id) {
+                        setLoadedDraftId(id);
+                        recordar(PANTALLAS.borrador, id);
+                      }
+                    }
                   }}
                   logs={workflow.logs}
                   onSaldoCambiado={() => void refreshBalance()}
@@ -1193,6 +1221,9 @@ export function App() {
                 isFocusMode={workflow.isFocusMode}
                 onToggleFocusMode={() => workflow.setIsFocusMode(!workflow.isFocusMode)}
                 onSaveDraft={handleSaveDraft}
+                onSalirConCambios={(texto) => {
+                  if (loadedDraftId) void draftsApi.patch(loadedDraftId, { legalText: texto }, { keepalive: true });
+                }}
                 onOpenSavedDraftsModal={() => setIsSavedDraftsModalOpen(true)}
                 formato={firmBranding}
                 onAbrirTaller={(textoActual) => {
@@ -1452,6 +1483,10 @@ export function App() {
                 const ok = await draftsApi.patch(tallerBorrador.draftId, { legalText: texto, conversacion, anotaciones, versiones });
                 if (ok && workflow.generatedDraft) workflow.setGeneratedDraft({ ...workflow.generatedDraft, legalText: texto });
                 return ok;
+              }}
+              onGuardarAlSalir={(texto, conversacion, anotaciones, versiones) => {
+                if (!tallerBorrador.draftId) return;
+                void draftsApi.patch(tallerBorrador.draftId, cuerpoQueCabeEnKeepalive({ legalText: texto, conversacion, anotaciones, versiones }), { keepalive: true });
               }}
               onGuardarBorradorNuevo={async () => {
                 if (!workflow.generatedDraft) return;

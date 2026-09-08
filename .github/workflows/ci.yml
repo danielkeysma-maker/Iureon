@@ -64,6 +64,8 @@ jobs:
         run: npm run check:pdf
       - name: Draft attachments (limits, block rendering, vision answer parsing)
         run: npm run check:adjuntos
+      - name: Hearing questions (prompt sections, truncated JSON rescue, parameter validation)
+        run: npm run check:preguntas
 
       - name: Build
         run: npm run build

@@ -45,6 +45,14 @@ export class ApiError extends Error {
 interface RequestOptions {
   body?: unknown;
   signal?: AbortSignal;
+  /**
+   * The request outlives the page. Used for the last save when a tab is hidden
+   * or closed: a plain fetch started in `pagehide` is cancelled with the page,
+   * so the lawyer's final edit never reaches the server. `sendBeacon` cannot
+   * carry the Authorization header; `fetch` with keepalive can. Browsers cap
+   * keepalive bodies at about 64 KB in flight — callers trim what they send.
+   */
+  keepalive?: boolean;
 }
 
 /** Called when the session cannot be renewed, so the app can return to login. */
@@ -95,7 +103,7 @@ const authHeaders = async (): Promise<Record<string, string>> => {
 const request = async <T>(
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
   path: string,
-  { body, signal }: RequestOptions = {}
+  { body, signal, keepalive }: RequestOptions = {}
 ): Promise<T> => {
   const url = `${API_BASE_URL}${path}`;
 
@@ -106,6 +114,7 @@ const request = async <T>(
     method,
     headers,
     signal,
+    keepalive: keepalive === true,
     body: body === undefined ? undefined : JSON.stringify(body)
   });
 

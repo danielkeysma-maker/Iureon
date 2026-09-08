@@ -38,9 +38,15 @@ export function useLegalAgentWorkflow(formatoDeFirma?: string) {
 
   const [logs, setLogs] = useState<AgentLog[]>([]);
 
-  const handleSendPrompt = async (e: React.FormEvent) => {
+  /**
+   * Resuelve con el borrador generado, o null si no hubo. App lo usa para
+   * guardarlo como borrador en el acto: un escrito que costó saldo no puede
+   * depender de un clic en «Guardar» para sobrevivir a una recarga.
+   */
+  const handleSendPrompt = async (e: React.FormEvent): Promise<GeneratedDraft | null> => {
     e.preventDefault();
-    if (!legalPrompt.trim() || isProcessing) return;
+    if (!legalPrompt.trim() || isProcessing) return null;
+    let generado: GeneratedDraft | null = null;
 
     // Generar título limpio temporal: TipoActuacion_Fecha
     const cleanType = documentType
@@ -142,6 +148,7 @@ Por favor espere unos segundos mientras se finaliza la redacción solemne.`,
                     }
                   ]);
                 } else if (payload.legalText) {
+                  generado = payload as GeneratedDraft;
                   setGeneratedDraft(payload);
                   setRightView('draft');
                 }
@@ -194,6 +201,7 @@ Por favor espere unos segundos mientras se finaliza la redacción solemne.`,
       setLegalPrompt('');
       setActiveDraftText(null);
     }
+    return generado;
   };
 
   const handleCopyText = () => {

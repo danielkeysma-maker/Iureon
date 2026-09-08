@@ -128,9 +128,10 @@ export const draftsApi = {
     return null;
   },
 
-  async create(draft: GeneratedDraft): Promise<boolean> {
+  /** Returns the new draft's id, or null when the API could not create it. */
+  async create(draft: GeneratedDraft): Promise<string | null> {
     try {
-      const json = await httpClient.post<{ success: boolean; draft?: unknown }>('/api/drafts', {
+      const json = await httpClient.post<{ success: boolean; draft?: { id?: string } }>('/api/drafts', {
         body: {
           title: draft.title,
           documentType: draft.documentType,
@@ -142,9 +143,9 @@ export const draftsApi = {
           procedencia: draft.procedencia ?? null
         }
       });
-      return Boolean(json.success && json.draft);
+      return json.success && json.draft?.id ? String(json.draft.id) : null;
     } catch {
-      return false;
+      return null;
     }
   },
 
@@ -190,11 +191,14 @@ export const draftsApi = {
       conversacion?: unknown[];
       anotaciones?: unknown[];
       versiones?: unknown[];
-    }
+    },
+    /** `keepalive`: el último guardado al ocultar o cerrar la pestaña; sobrevive a la página. */
+    opciones: { keepalive?: boolean } = {}
   ): Promise<boolean> {
     try {
       const json = await httpClient.put<{ success: boolean }>(`/api/drafts/${draftId}`, {
-        body: campos
+        body: campos,
+        keepalive: opciones.keepalive
       });
       return Boolean(json.success);
     } catch {

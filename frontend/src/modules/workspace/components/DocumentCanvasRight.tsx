@@ -19,7 +19,9 @@ interface DocumentCanvasRightProps {
   onExportPdf: () => void;
   isFocusMode?: boolean;
   onToggleFocusMode?: () => void;
-  onSaveDraft?: (updatedText: string) => void;
+  onSaveDraft?: (updatedText: string) => void | string | Promise<string | void>;
+  /** El texto editado, cuando la pestaña se oculta o se cierra con cambios sin guardar. */
+  onSalirConCambios?: (texto: string) => void;
   onOpenSavedDraftsModal?: () => void;
   /** Para poder contar secciones obligatorias contra la ficha del catálogo. */
   documentType?: string;
@@ -50,6 +52,7 @@ export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
   isFocusMode,
   onToggleFocusMode,
   onSaveDraft,
+  onSalirConCambios,
   onOpenSavedDraftsModal,
   documentType = '',
   legalBranch = '',
@@ -166,6 +169,7 @@ export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
               isFocusMode={isFocusMode}
               onToggleFocusMode={onToggleFocusMode}
               onSaveDraft={onSaveDraft}
+              onSalirConCambios={onSalirConCambios}
               onOpenSavedDraftsModal={onOpenSavedDraftsModal}
               formato={formato}
               onAbrirTaller={onAbrirTaller}
