@@ -86,7 +86,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onLogout }) => {
   );
 
   return (
-    <div className="flex-1 overflow-y-auto bg-canvas">
+    <div data-visita="vista-ajustes" className="flex-1 overflow-y-auto bg-canvas">
       {/*
         EN MOVIL AJUSTES SE APILA (8d). Las dos columnas son 212px de indice mas
         el contenido: en 375 el indice se lleva mas de la mitad y la seccion

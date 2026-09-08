@@ -50,6 +50,36 @@ import type { ManualArticle, ManualBlock, ManualEntry, ManualGroup } from '../ty
  * drift away from the text the way a hand-typed "3 min" does.
  */
 
+const A_INICIO: ManualArticle = {
+  id: 'inicio',
+  titulo: 'La pantalla de Inicio',
+  entradilla:
+    'Dónde se entra, qué hay en ella y cómo se vuelve a ella desde cualquier módulo.',
+  bloques: [
+    { kind: 'ruta', camino: ['Inicio', 'El logo de Iureon', '«Iniciar la visita guiada»'] },
+    {
+      kind: 'parrafo',
+      texto:
+        'Inicio es la primera pantalla al entrar y la que abre el logo de Iureon, en la barra lateral y en la cabecera del teléfono. Reúne lo que se hace a diario y lo que conviene tener a la vista antes de empezar: lo que dejó abierto, el estado del plan y el saldo de la firma, y qué cambió en la aplicación.'
+    },
+    {
+      kind: 'pasos',
+      pasos: [
+        'Arriba está el saludo con su nombre, la firma y la fecha. Debajo, tres accesos: «Redactar un escrito» abre Redacción, «Revisar un escrito» abre Revisiones y «Transcribir una audiencia» abre Audiencias. Si su plan no incluye un módulo, su tarjeta aparece atenuada con «No incluido en su plan» en vez de desaparecer.',
+        '«Continuar donde iba» lista sus cinco borradores y sus cinco revisiones más recientes. Un borrador se abre en Redacción, tal como desde «Borradores»; una revisión se abre en su taller, tal como desde «Revisiones».',
+        '«Plan y saldo» muestra el plan de la firma con su estado —activo, por vencer con los días que faltan, vencido, o en prueba con los días que quedan— y el saldo disponible en pesos. «Ver plan» abre la pantalla de planes; «Recargar saldo» abre la recarga, la misma del pie de la barra lateral.',
+        '«Novedades» trae los tres cambios más recientes de la aplicación; «Ver todas» abre la lista completa en el manual.',
+        '«¿Primera vez aquí?» tiene «Iniciar la visita guiada», que recorre cada módulo señalándolo en pantalla con una tarjeta que dice para qué sirve —«Anterior», «Siguiente» y «Salir», o las flechas del teclado y Esc—, y «Abrir el manual». La primera vez que entra desde un navegador, Inicio le ofrece la visita en una franja; «Ahora no» la guarda para cuando quiera, desde esta pantalla o desde el índice del manual.'
+      ]
+    },
+    {
+      kind: 'consejo',
+      texto:
+        'Pulse el logo cuando se haya perdido: vuelve a Inicio y cierra lo que estuviera abierto en los demás módulos, sin descartar el escrito que tenga en pantalla en Redacción.'
+    }
+  ]
+};
+
 const A_QUE_HACE: ManualArticle = {
   id: 'que-hace',
   titulo: 'Qué hace y qué no hace Iureon',
@@ -71,6 +101,7 @@ const A_QUE_HACE: ManualArticle = {
     {
       kind: 'pasos',
       pasos: [
+        '«Inicio», arriba de todo: la pantalla de entrada, con los accesos del día, lo que dejó abierto, el plan y el saldo.',
         'Producir: «Redacción» (el taller donde se genera un escrito), «Borradores» (los escritos guardados con su término), «Revisiones» (los escritos ya redactados que un revisor corrigió con usted) y «Orientación» (de los hechos a la actuación).',
         'Registrar: «Audiencias» y «Entrevistas», las dos pantallas que transcriben una grabación.',
         'Consultar: «Buscador» de jurisprudencia, «Catálogo» de actuaciones y «Herramientas» de cálculo.',
@@ -119,7 +150,7 @@ const A_PRIMER_ESCRITO: ManualArticle = {
     {
       kind: 'parrafo',
       texto:
-        'Redacción tiene dos mitades: a la izquierda, lo que usted le pide; a la derecha, el papel donde aparece el escrito. Arriba, una barra fija con tres selectores decide qué clase de documento se va a producir.'
+        'Redacción tiene dos mitades: a la izquierda, lo que usted le pide; a la derecha, el papel donde aparece el escrito. Arriba, una barra fija con tres selectores decide qué clase de documento se va a producir. Si prefiere ver antes cada módulo en su sitio, en «Inicio» está «Iniciar la visita guiada»: dos minutos, una parada por módulo.'
     },
     {
       kind: 'pasos',
@@ -1023,7 +1054,7 @@ const A_HERRAMIENTAS: ManualArticle = {
 export const MANUAL: readonly ManualGroup[] = [
   {
     titulo: 'Primeros 20 minutos',
-    articulos: [A_QUE_HACE, A_PRIMER_ESCRITO, A_TRES_ESTADOS, A_VERIFICAR, A_MOVIL]
+    articulos: [A_INICIO, A_QUE_HACE, A_PRIMER_ESCRITO, A_TRES_ESTADOS, A_VERIFICAR, A_MOVIL]
   },
   { titulo: 'Redactar', articulos: [A_INSTRUCCION, A_REVISAR, A_EXPORTAR, A_BORRADORES] },
   { titulo: 'Calcular', articulos: [A_HERRAMIENTAS] },

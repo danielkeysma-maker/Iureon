@@ -20,7 +20,7 @@ import { solicitarAbrirNovedades, useNovedadesNuevas } from '../../help/useNoved
 interface SidebarLeftProps {
   mainView: MainView;
   setMainView: (view: MainView) => void;
-  /** Home: Redacción with every remembered inner screen forgotten. */
+  /** Home: Inicio with every remembered inner screen forgotten. */
   onInicio?: () => void;
   activeFirm: LawFirmTenant;
   setActiveFirm: (firm: LawFirmTenant) => void;
@@ -94,6 +94,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
     return (
       <button
         type="button"
+        data-visita={`nav-${id}`}
         onClick={() => setMainView(id)}
         title={isCollapsed ? label : undefined}
         aria-current={activo ? 'page' : undefined}
@@ -139,7 +140,8 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
       <div className={`flex items-center gap-2.5 px-3 pb-2 pt-3 ${isCollapsed ? 'justify-center' : ''}`}>
         <button
           type="button"
-          onClick={onInicio ?? (() => setMainView('workspace'))}
+          onClick={onInicio ?? (() => setMainView('inicio'))}
+          data-visita="marca"
           title="Ir al inicio"
           aria-label="Ir al inicio"
           className="flex cursor-pointer items-center gap-1 rounded-control transition-opacity hover:opacity-80"
@@ -240,6 +242,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
           return (
             <div key={grupo.titulo} className={i > 0 ? 'mt-2.5' : ''}>
               {!isCollapsed &&
+                !grupo.sinTitulo &&
                 (grupo.plegable ? (
                   <button
                     type="button"
@@ -293,7 +296,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
       {/* ─── SALDO ─────────────────────────────────────────────────────────
           Vive en la barra y no en un menú: es lo único que puede detener el
           trabajo a mitad de un término. */}
-      <div className="mt-auto px-3 pt-3">
+      <div className="mt-auto px-3 pt-3" data-visita="saldo">
         <div className="border-t border-white/10 pt-3">
           {!isCollapsed ? (
             <>

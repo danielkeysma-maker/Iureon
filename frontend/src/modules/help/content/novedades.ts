@@ -39,10 +39,18 @@ export const NOVEDADES_ID = 'novedades';
 
 export const NOVEDADES: readonly Novedad[] = [
   {
+    fecha: '2026-09-08',
+    titulo: 'Pantalla de Inicio y visita guiada por la plataforma',
+    detalle:
+      'Al entrar, y al pulsar el logo, aparece «Inicio»: el saludo con la fecha, tres accesos a redactar, revisar y transcribir, sus últimos borradores y revisiones para continuar donde iba, el plan con su vencimiento y el saldo, y las tres novedades más recientes. Desde ahí, y desde el índice del manual, «Visita guiada» recorre cada módulo en dos minutos señalándolo en pantalla y diciendo para qué sirve; la primera vez en este navegador, Inicio la ofrece. También en el teléfono, donde «Inicio» es la primera pestaña de la barra inferior.',
+    modulo: 'Inicio',
+    tipo: 'nuevo'
+  },
+  {
     fecha: '2026-09-05',
     titulo: 'Recargar deja la pantalla exactamente donde estaba, y el logo lleva al inicio',
     detalle:
-      'Al recargar la página vuelve el borrador que tenía abierto, el taller de la revisión, la audiencia o entrevista que estaba leyendo, la calculadora y el artículo del manual —no solo el módulo—. El logo de Iureon, en la barra lateral y en la cabecera del teléfono, lleva a Redacción y cierra lo que estuviera abierto en los demás módulos. En el teléfono y en la aplicación instalada, tirar hacia abajo desde el borde superior recarga la pantalla.',
+      'Al recargar la página vuelve el borrador que tenía abierto, el taller de la revisión, la audiencia o entrevista que estaba leyendo, la calculadora y el artículo del manual —no solo el módulo—. El logo de Iureon, en la barra lateral y en la cabecera del teléfono, lleva al inicio y cierra lo que estuviera abierto en los demás módulos. En el teléfono y en la aplicación instalada, tirar hacia abajo desde el borde superior recarga la pantalla.',
     modulo: 'Móvil',
     tipo: 'mejora'
   },

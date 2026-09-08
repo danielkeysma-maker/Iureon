@@ -1,4 +1,4 @@
-import { Sparkles, ClipboardCheck, Mic, BookOpen, BookMarked, LifeBuoy, Library, Wrench, Shield, UserRound, ShieldCheck, Compass, SlidersHorizontal, FileClock } from 'lucide-react';
+import { Home, Sparkles, ClipboardCheck, Mic, BookOpen, BookMarked, LifeBuoy, Library, Wrench, Shield, UserRound, ShieldCheck, Compass, SlidersHorizontal, FileClock } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { MainView } from './types';
 
@@ -30,6 +30,13 @@ export interface NavModule {
 }
 
 export const NAV_MODULES: NavModule[] = [
+  /*
+   * INICIO, antes que todo. Es la pantalla a la que se llega al entrar y a la
+   * que lleva el logo: los accesos a lo que se hace a diario, lo ultimo que se
+   * dejo abierto, el plan y el saldo, y las novedades. Visible para todo plan
+   * y todo rol; no depende de ningun modulo del servidor.
+   */
+  { id: 'inicio', label: 'Inicio', description: 'Su punto de partida', icon: Home },
   /*
    * Primero en la lista a propósito.
    *
@@ -119,9 +126,15 @@ export interface NavGroup {
    * una vez al mes y no debe competir con el trabajo diario.
    */
   plegable?: boolean;
+  /**
+   * Sin rotulo en la barra: el grupo de «Inicio» tiene un solo modulo y un
+   * rotulo «INICIO» sobre un item «Inicio» diria lo mismo dos veces.
+   */
+  sinTitulo?: boolean;
 }
 
 export const NAV_GROUPS: NavGroup[] = [
+  { titulo: 'Inicio', modulos: ['inicio'], sinTitulo: true },
   { titulo: 'Producir', modulos: ['workspace', 'borradores', 'taller', 'orientacion'] },
   { titulo: 'Registrar', modulos: ['audiencias', 'entrevistas'] },
   { titulo: 'Consultar', modulos: ['search', 'catalogo', 'tools'] },

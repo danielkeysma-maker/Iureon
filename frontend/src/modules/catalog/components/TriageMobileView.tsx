@@ -149,7 +149,7 @@ export const TriageMobileView: React.FC<TriageMobileViewProps> = ({ onDraft }) =
   const faltan = Math.max(0, MINIMO - hechos.trim().length);
 
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col overflow-y-auto bg-canvas">
+    <div data-visita="vista-orientacion" className="flex h-full min-h-0 flex-1 flex-col overflow-y-auto bg-canvas">
       <div className="flex flex-col gap-2.5 px-4 py-3.5">
         {/* La tarjeta de los hechos: 12px 14px, rótulo 600 12px, prosa 13/1.6. */}
         <section className="rounded-[8px] border border-line-200 bg-surface px-3.5 py-3">

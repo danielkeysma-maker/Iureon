@@ -59,7 +59,7 @@ interface MobileHeaderProps {
   onMarcarListo?: () => void;
   onAbrirGestion?: () => void;
   onLogout: () => void;
-  /** Home: Redacción with every remembered inner screen forgotten. */
+  /** Home: Inicio with every remembered inner screen forgotten. */
   onInicio?: () => void;
 }
 
@@ -111,6 +111,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
         <button
           type="button"
           onClick={onInicio}
+          data-visita="marca"
           title="Ir al inicio"
           aria-label="Ir al inicio"
           className="flex h-[34px] w-[34px] shrink-0 cursor-pointer items-center justify-center rounded-[8px]"

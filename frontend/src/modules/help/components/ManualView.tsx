@@ -11,6 +11,7 @@ import {
   MapPin,
   Minus,
   Search,
+  Route,
   Sparkles
 } from 'lucide-react';
 import {
@@ -67,6 +68,8 @@ interface ManualViewProps {
   /** Article to open on mount — how Soporte hands a reader to the manual. */
   articuloInicial?: string;
   onSoporte: () => void;
+  /** Launches the guided tour from the top of the index. Absent = no button. */
+  onVisitaGuiada?: () => void;
 }
 
 /* ─── THE THREE STATES, DRAWN WITH THE SAME SHAPES AS THE APP ──────────────── */
@@ -392,7 +395,8 @@ const Indice: React.FC<{
   onConsulta: (valor: string) => void;
   activo: string;
   onAbrir: (id: string) => void;
-}> = ({ consulta, onConsulta, activo, onAbrir }) => {
+  onVisitaGuiada?: () => void;
+}> = ({ consulta, onConsulta, activo, onAbrir, onVisitaGuiada }) => {
   const encontradas = React.useMemo(() => new Set(buscar(consulta).map((e) => e.articulo.id)), [
     consulta
   ]);
@@ -452,6 +456,18 @@ const Indice: React.FC<{
                 {nuevas}
               </span>
             )}
+          </button>
+        )}
+
+        {/* La visita guiada, junto a Novedades: la otra forma de conocer la aplicacion sin leerla. */}
+        {!buscando && onVisitaGuiada && (
+          <button
+            type="button"
+            onClick={onVisitaGuiada}
+            className="-mt-3 mb-4 flex w-full items-center gap-2.5 rounded-control px-2.5 py-2 text-left text-ink-700 hover:bg-canvas"
+          >
+            <Route size={14} strokeWidth={2.2} className="shrink-0 text-ink-400" />
+            <span className="text-ui leading-[1.4]">Visita guiada</span>
           </button>
         )}
 
@@ -524,7 +540,7 @@ const Indice: React.FC<{
 
 /* ─── THE VIEW ─────────────────────────────────────────────────────────────── */
 
-export const ManualView: React.FC<ManualViewProps> = ({ articuloInicial, onSoporte }) => {
+export const ManualView: React.FC<ManualViewProps> = ({ articuloInicial, onSoporte, onVisitaGuiada }) => {
   /* El MISMO registro que la pantalla movil: una marca, no dos. */
   const lectura = useManualReads();
   /*
@@ -574,8 +590,14 @@ export const ManualView: React.FC<ManualViewProps> = ({ articuloInicial, onSopor
   const enNovedades = activo === NOVEDADES_ID;
 
   return (
-    <div className="flex h-full min-h-0 flex-1 bg-canvas font-sans">
-      <Indice consulta={consulta} onConsulta={setConsulta} activo={activo} onAbrir={abrir} />
+    <div data-visita="vista-manual" className="flex h-full min-h-0 flex-1 bg-canvas font-sans">
+      <Indice
+        consulta={consulta}
+        onConsulta={setConsulta}
+        activo={activo}
+        onAbrir={abrir}
+        onVisitaGuiada={onVisitaGuiada}
+      />
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex h-11 shrink-0 items-center gap-2.5 border-b border-line-200 bg-surface px-6">

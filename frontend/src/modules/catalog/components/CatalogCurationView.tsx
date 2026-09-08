@@ -63,7 +63,7 @@ export const CatalogCurationView: React.FC = () => {
     : null;
 
   return (
-    <div className="flex-1 flex overflow-hidden bg-canvas">
+    <div data-visita="vista-catalogo" className="flex-1 flex overflow-hidden bg-canvas">
       {/*
         ESTA VISTA ES SOLO DE ESCRITORIO. El movil tiene la suya, `CatalogMobileView`
         (artboard 5c), pensada desde cero y no derivada de esta: alli la tarjeta

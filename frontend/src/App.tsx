@@ -75,6 +75,10 @@ import { LoginPortalView } from './modules/tenant/components/LoginPortalView';
 import { RegistroView } from './modules/tenant/components/RegistroView';
 import type { MainView } from './modules/tenant/types';
 import { NAV_MODULES, vistasOcultasPorPlan } from './modules/tenant/navigation';
+import { InicioView } from './modules/inicio/components/InicioView';
+import { useVisitaGuiada } from './modules/inicio/visitaGuiada/useVisitaGuiada';
+import { VisitaGuiada } from './modules/inicio/visitaGuiada/VisitaGuiada';
+import { solicitarAbrirNovedades } from './modules/help/useNovedades';
 
 /**
  * Los módulos que la aplicación puede mostrar, para validar el que quedó
@@ -237,9 +241,9 @@ export function App() {
       const guardado = sessionStorage.getItem('iureon_main_view');
       return guardado && MAIN_VIEWS.includes(guardado as MainView)
         ? (guardado as MainView)
-        : 'workspace';
+        : 'inicio';
     } catch {
-      return 'workspace';
+      return 'inicio';
     }
   });
 
@@ -278,11 +282,11 @@ export function App() {
   };
 
   /*
-   * HOME. The brand mark takes the lawyer to Redacción and forgets every
+   * HOME. The brand mark takes the lawyer to Inicio and forgets every
    * remembered inner screen — the open transcript, the article, the taller —
    * so that «inicio» means the beginning and not «the module I left open,
    * still open». What is loaded in memory is left alone: a draft being edited
-   * is not thrown away by a click on the logo. Already on Redacción, the mark
+   * is not thrown away by a click on the logo. Already on Inicio, the mark
    * only scrolls back to the top.
    */
   const irAlInicio = (): void => {
@@ -290,14 +294,14 @@ export function App() {
     setTallerActivo(null);
     setTallerBorrador(null);
     setManualArticulo(undefined);
-    if (mainView === 'workspace') {
+    if (mainView === 'inicio') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       document.querySelectorAll<HTMLElement>('main *').forEach((el) => {
         if (el.scrollTop > 0) el.scrollTo({ top: 0, behavior: 'smooth' });
       });
       return;
     }
-    setMainView('workspace');
+    setMainView('inicio');
   };
 
   /*
@@ -384,6 +388,17 @@ export function App() {
   );
   const [isUserManagementModalOpen, setIsUserManagementModalOpen] = useState(false);
   const [isRechargeModalOpen, setIsRechargeModalOpen] = useState(false);
+
+  /*
+   * LA VISITA GUIADA vive aqui porque cada parada abre primero su modulo, y
+   * abrir un modulo es `setMainView`. Al terminar vuelve a Inicio, que es de
+   * donde se lanza. Las paradas de los modulos que el plan oculta se omiten.
+   */
+  const visita = useVisitaGuiada({
+    setMainView,
+    ocultas: vistasOcultas,
+    alTerminar: () => setMainView('inicio')
+  });
 
   const [isSavedDraftsModalOpen, setIsSavedDraftsModalOpen] = useState(false);
 
@@ -516,10 +531,10 @@ export function App() {
   /*
    * Una vista guardada en la sesión que el plan ya no incluye (la pestaña
    * recordaba «audiencias» y la firma pasó a Esencial) volvería a una pantalla
-   * sin puerta en la barra. Se devuelve a Redacción.
+   * sin puerta en la barra. Se devuelve a Inicio.
    */
   useEffect(() => {
-    if (vistasOcultas.includes(mainView)) setMainView('workspace');
+    if (vistasOcultas.includes(mainView)) setMainView('inicio');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vistasOcultas, mainView]);
 
@@ -1058,6 +1073,37 @@ export function App() {
         </div>
 
         <main className="flex min-w-0 flex-1 overflow-hidden">
+          {mainView === 'inicio' && (
+            <InicioView
+              correo={currentUserEmail}
+              firma={activeFirm.name}
+              saldoCop={activeFirm.creditsBalance ?? 0}
+              savedDrafts={savedDrafts}
+              ocultas={vistasOcultas}
+              onIr={setMainView}
+              onAbrirBorrador={(entrada) => {
+                handleLoadDraft(entrada);
+                setMainView('workspace');
+              }}
+              /*
+                Una revision se abre por el MISMO camino que la lista: se
+                recuerda su id y Revisiones la abre al cargar, igual que tras
+                una recarga. Asi el texto se pide una sola vez y con las mismas
+                comprobaciones (texto conservado, fila viva).
+              */
+              onAbrirRevision={(id) => {
+                recordar(PANTALLAS.tallerRevision, id);
+                setTallerActivo(null);
+                setMainView('taller');
+              }}
+              onRecargar={() => setIsRechargeModalOpen(true)}
+              onVerNovedades={() => {
+                solicitarAbrirNovedades();
+                setMainView('manual');
+              }}
+              visita={visita}
+            />
+          )}
           {mainView === 'workspace' && (
             /*
               LA BARRA ABARCA EL ANCHO COMPLETO, sobre el panel y sobre el
@@ -1066,7 +1112,7 @@ export function App() {
               del documento reducido a una franja en blanco.
             */
             <ModuloBloqueado quePuede="Los escritos ya guardados siguen en Borradores: puede abrirlos, leerlos y exportarlos a Word o PDF.">
-            <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+            <div data-visita="vista-workspace" className="flex min-h-0 min-w-0 flex-1 flex-col">
               {/*
                 DOS BARRAS DE CONFIGURACION, UNA POR TAMAÑO. La de escritorio son
                 tres selectores en fila; en 375px quedaban en «Fi… > … > El…» y
@@ -1357,6 +1403,7 @@ export function App() {
             <ManualView
               articuloInicial={manualArticulo}
               onSoporte={() => setMainView('soporte')}
+              onVisitaGuiada={visita.iniciar}
             />
             </div>
           )}
@@ -1515,6 +1562,9 @@ export function App() {
         inside it come back from sessionStorage.
       */}
       <TirarParaActualizar />
+
+      {/* La visita guiada: por encima de todo, en ambos tamaños. */}
+      <VisitaGuiada visita={visita} />
 
       <MobileMoreSheet
         abierto={masAbierto}

@@ -213,7 +213,7 @@ export const SearchMobileView: React.FC = () => {
   };
 
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col bg-canvas">
+    <div data-visita="vista-search" className="flex h-full min-h-0 flex-1 flex-col bg-canvas">
       <header className="shrink-0 border-b border-line-200 bg-surface px-4 pb-3 pt-2">
         <div className="relative">
           <IconoBuscar className="pointer-events-none absolute left-3 top-[13px] h-3.5 w-3.5 text-ink-400" />

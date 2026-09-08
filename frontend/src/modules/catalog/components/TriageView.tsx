@@ -186,7 +186,7 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
    * menos por renglon.
    */
   return (
-    <div className="flex-1 overflow-y-auto bg-canvas p-4 sm:p-6">
+    <div data-visita="vista-orientacion" className="flex-1 overflow-y-auto bg-canvas p-4 sm:p-6">
       <div className="mx-auto max-w-5xl space-y-4 font-sans">
         {/* ─── ENCABEZADO (1f) ─────────────────────────────────────────────── */}
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">

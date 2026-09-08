@@ -175,7 +175,7 @@ export const ToolsView: React.FC = () => {
   const total = grupos.reduce((n, g) => n + g.utilidades.length, 0);
 
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col bg-canvas font-sans">
+    <div data-visita="vista-tools" className="flex h-full min-h-0 flex-1 flex-col bg-canvas font-sans">
       <ProceduralTermsModal isOpen={terminosAbierto} onClose={cerrar(setTerminosAbierto)} />
       <LaborSettlementModal isOpen={liquidacionAbierta} onClose={cerrar(setLiquidacionAbierta)} />
       <LegalSearchGlossaryModal isOpen={glosarioAbierto} onClose={cerrar(setGlosarioAbierto)} />

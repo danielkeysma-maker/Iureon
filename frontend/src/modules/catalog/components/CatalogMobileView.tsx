@@ -112,7 +112,7 @@ export const CatalogMobileView: React.FC = () => {
   const hayBusqueda = curation.query.trim().length > 0;
 
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col bg-canvas">
+    <div data-visita="vista-catalogo" className="flex h-full min-h-0 flex-1 flex-col bg-canvas">
       {/* El titulo y el censo los pone `MobileHeader`: una sola cabecera (4d). */}
       <header className="shrink-0 border-b border-line-200 bg-surface px-4 py-3">
         <div className="relative">

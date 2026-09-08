@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   IconoDocumento,
+  IconoInicio,
   IconoMas,
   IconoMicrofono,
   IconoOrientar,
@@ -57,6 +58,8 @@ interface Destino {
 }
 
 const DESTINOS: readonly Destino[] = [
+  /* Inicio primero: es donde se entra y adonde lleva el logo. Cinco columnas desde entonces. */
+  { id: 'inicio', etiqueta: 'Inicio', Icono: IconoInicio },
   { id: 'workspace', etiqueta: 'Redactar', Icono: IconoDocumento },
   /* BOMBILLA, no brujula: es el trazo del artboard y dice otra cosa. */
   { id: 'orientacion', etiqueta: 'Orientar', Icono: IconoOrientar },
@@ -84,9 +87,11 @@ const Destino: React.FC<{
   activo: boolean;
   onClick: () => void;
   expandido?: boolean;
-}> = ({ Icono, etiqueta, activo, onClick, expandido }) => (
+  visita?: string;
+}> = ({ Icono, etiqueta, activo, onClick, expandido, visita }) => (
   <button
     type="button"
+    data-visita={visita}
     onClick={onClick}
     aria-current={activo ? 'page' : undefined}
     aria-expanded={expandido}
@@ -123,7 +128,7 @@ export const MobileTabBar: React.FC<MobileTabBarProps> = ({
   return (
     <nav
       aria-label="Navegación principal"
-      className="grid h-[62px] shrink-0 grid-cols-4 items-center border-t border-line-200 bg-surface px-1 pb-2 lg:hidden"
+      className="grid h-[62px] shrink-0 grid-cols-5 items-center border-t border-line-200 bg-surface px-1 pb-2 lg:hidden"
       style={{ paddingBottom: 'calc(8px + env(safe-area-inset-bottom))' }}
     >
       {DESTINOS.filter(({ id }) => !ocultas.includes(id)).map(({ id, etiqueta, Icono }) => (
@@ -133,6 +138,7 @@ export const MobileTabBar: React.FC<MobileTabBarProps> = ({
           etiqueta={etiqueta}
           activo={mainView === id && !masAbierto}
           onClick={() => setMainView(id)}
+          visita={`nav-${id}`}
         />
       ))}
 

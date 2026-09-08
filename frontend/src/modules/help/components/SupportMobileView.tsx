@@ -87,7 +87,7 @@ export const SupportMobileView: React.FC<SupportMobileViewProps> = ({
   }
 
   return (
-  <div className="flex h-full min-h-0 flex-1 flex-col overflow-y-auto bg-canvas">
+  <div data-visita="vista-soporte" className="flex h-full min-h-0 flex-1 flex-col overflow-y-auto bg-canvas">
     <div className="flex flex-col gap-[11px] px-4 py-3.5">
       {CANALES.map((canal) => {
         const usable = canal.id === 'whatsapp' ? WHATSAPP_CONFIGURADO : canal.disponible;

@@ -50,6 +50,13 @@ const Svg: React.FC<IconoProps & { children: React.ReactNode }> = ({
   </svg>
 );
 
+/** Casa. «Inicio» en la barra inferior: el mismo trazo que `Home` en la barra lateral. */
+export const IconoInicio: React.FC<IconoProps> = (p) => (
+  <Svg {...p}>
+    <path d="M3 10.5 12 3l9 7.5V20a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z" />
+  </Svg>
+);
+
 /** Documento con esquina doblada. «Redactar» en la barra inferior. */
 export const IconoDocumento: React.FC<IconoProps> = (p) => (
   <Svg {...p}>

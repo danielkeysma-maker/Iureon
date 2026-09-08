@@ -75,7 +75,7 @@ export const SavedDraftsMobileView: React.FC<SavedDraftsMobileViewProps> = ({
   const grupos = React.useMemo(() => agruparPorTermino(visibles), [visibles]);
 
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col bg-canvas">
+    <div data-visita="vista-borradores" className="flex h-full min-h-0 flex-1 flex-col bg-canvas">
       {/*
         SIN TITULO PROPIO. `MobileHeader` ya pone «Borradores» con su contexto
         debajo, que es como 4d arma la cabecera —una sola—. Repetirlo aqui

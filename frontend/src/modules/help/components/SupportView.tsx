@@ -100,7 +100,7 @@ export const SupportView: React.FC<SupportViewProps> = ({ firma, correo, onManua
   const chat = CANALES.find((c) => c.id === 'chat');
 
   return (
-    <div className="h-full min-h-0 flex-1 overflow-y-auto bg-canvas font-sans">
+    <div data-visita="vista-soporte" className="h-full min-h-0 flex-1 overflow-y-auto bg-canvas font-sans">
       <div className="mx-auto w-full max-w-5xl px-6 py-6">
         <header>
           <h1 className="text-title text-ink-900">Soporte</h1>

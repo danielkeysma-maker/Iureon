@@ -193,7 +193,7 @@ export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col overflow-y-auto bg-canvas">
+    <div data-visita="vista-entrevistas" className="flex h-full min-h-0 flex-1 flex-col overflow-y-auto bg-canvas">
       {/*
         LA CABECERA DE 4d, CITADA: `padding:10px 16px 12px`, avatar de 34px
         circular sobre `#EAF0F5` con las iniciales en mono 600 12px `#17456B`,

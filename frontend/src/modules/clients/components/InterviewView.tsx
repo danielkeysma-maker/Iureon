@@ -300,7 +300,7 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft, onPrivaci
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col bg-canvas font-sans">
+    <div data-visita="vista-entrevistas" className="flex h-full min-h-0 flex-1 flex-col bg-canvas font-sans">
       {/*
         La cabecera del modulo: quien es y que sale de aqui. La audiencia
         empieza por la grabacion que llega; la entrevista empieza por la

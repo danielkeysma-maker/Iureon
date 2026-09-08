@@ -320,7 +320,7 @@ export const SearchView: React.FC = () => {
   };
 
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col bg-canvas font-sans">
+    <div data-visita="vista-search" className="flex h-full min-h-0 flex-1 flex-col bg-canvas font-sans">
       <header className="flex shrink-0 flex-wrap items-end gap-3 border-b border-line-200 bg-surface px-5 py-3.5">
         <div className="min-w-0 flex-1">
           <h1 className="text-title text-ink-900">Buscador</h1>
