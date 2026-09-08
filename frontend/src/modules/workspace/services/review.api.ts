@@ -117,6 +117,8 @@ export interface ParametrosDePreguntas {
   posicion: string;
   quiereProbar?: string;
   audiencia?: string;
+  /** A quién se le pregunta; ausente = a los tres. */
+  publicos?: SeccionDePreguntas[];
 }
 
 export interface PreguntasAudienciaGuardadas {

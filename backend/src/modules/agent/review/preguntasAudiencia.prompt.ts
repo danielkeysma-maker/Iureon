@@ -58,11 +58,22 @@ export interface ParametrosDePreguntas {
   posicion: string;
   quiereProbar?: string;
   audiencia?: string;
+  /**
+   * A quién quiere preguntar el colega. Sin este campo, a los tres. El titular
+   * lo pidió así: «a la contraparte, a los testigos míos, a los testigos de la
+   * contraparte, o incluso solo a la contraparte» — se elige, no se impone.
+   */
+  publicos?: SeccionDePreguntas[];
 }
 
 /** Las tres listas: las claves del JSON que llevan preguntas (el «enfoque» es texto y no entra aquí). */
 export type SeccionDePreguntas = 'contraparte' | 'misTestigos' | 'testigosContraparte';
 export const SECCIONES: ReadonlyArray<SeccionDePreguntas> = ['contraparte', 'misTestigos', 'testigosContraparte'];
+export const NOMBRE_DE_SECCION: Record<SeccionDePreguntas, string> = {
+  contraparte: 'a la contraparte (interrogatorio de parte)',
+  misTestigos: 'a mis testigos (interrogatorio directo)',
+  testigosContraparte: 'a los testigos de la contraparte (contrainterrogatorio)'
+};
 
 export const MIN_PREGUNTAS_POR_LISTA = 6;
 export const MAX_PREGUNTAS_POR_LISTA = 12;
@@ -89,6 +100,7 @@ REGLAS PARA TODAS:
 - NO cites normas, artículos, sentencias, autos ni radicados. NO afirmes hechos que el escrito no traiga. NO des consejos fuera de las preguntas.
 - Entre ${MIN_PREGUNTAS_POR_LISTA} y ${MAX_PREGUNTAS_POR_LISTA} preguntas por lista, de la más importante a la menos. Si el escrito da para menos en alguna lista, entrega las que tengan sustento y ninguna de relleno.
 - Adapta las tres listas a la POSICIÓN del colega: lo que conviene probar es lo que le conviene a su cliente, y «la contraparte» es la parte contraria a ESA posición.
+- Si el colega pide solo ALGUNAS listas, entrega esas con todas las preguntas que el escrito sostenga y deja las demás claves como arreglos vacíos []. Nunca omitas una clave.
 
 RESPONDE ÚNICAMENTE CON UN OBJETO JSON, sin texto antes ni después, sin cercas de código. "enfoque" va PRIMERO: una o dos frases con lo que esta actuación exige probar y la audiencia en la que se preguntará, sin citar normas:
 {
@@ -111,6 +123,9 @@ export const buildPreguntasUserPrompt = (input: {
     ? `FICHA VERIFICADA DE LA ACTUACIÓN (de aquí sale QUÉ se debe probar y CÓMO se llaman las partes; no la cites en las preguntas):\n${input.guidance}`
     : 'La actuación no está catalogada: deduce del propio escrito qué se debe probar y dilo en «enfoque».';
   const rama = (input.legalBranch ?? '').trim();
+  const publicos = input.parametros.publicos && input.parametros.publicos.length ? input.parametros.publicos : [...SECCIONES];
+  const listasPedidas = publicos.map((p) => NOMBRE_DE_SECCION[p]).join(', ');
+  const listasVacias = SECCIONES.filter((s) => !publicos.includes(s)).map((p) => `"${p}"`).join(', ');
   const quiereProbar = (input.parametros.quiereProbar ?? '').trim();
   const audiencia = (input.parametros.audiencia ?? '').trim();
   return `ESCRITO: "${input.documentType}"${rama ? ` · RAMA: ${rama}` : ''}.
@@ -120,13 +135,14 @@ ${ficha}
 POSICIÓN DEL COLEGA EN EL PROCESO: ${input.parametros.posicion.trim()}.
 ${quiereProbar ? `QUÉ QUIERE PROBAR EN LA AUDIENCIA: ${quiereProbar}` : 'El colega no indicó qué quiere probar: dedúcelo de la posición y del escrito.'}
 ${audiencia ? `TIPO DE AUDIENCIA: ${audiencia}` : 'El colega no indicó el tipo de audiencia.'}
+LISTAS QUE PIDE: ${listasPedidas}.${listasVacias ? ` Deja ${listasVacias} como []: no las pidió.` : ''}
 
 TEXTO DEL ESCRITO${input.truncado ? ' (recortado por extensión; trabaja con lo que hay)' : ''}:
 """
 ${input.texto}
 """
 
-Entrega las tres listas en el JSON indicado.`;
+Entrega las listas pedidas en el JSON indicado.`;
 };
 
 const cadena = (v: unknown): string => (v === null || v === undefined ? '' : String(v)).trim();
@@ -244,5 +260,17 @@ export const normalizarParametros = (body: Record<string, unknown>): { ok: true;
   if (!posicion) return { ok: false, message: 'Indique su posición en el proceso: Demandante, Demandado u otra.' };
   const quiereProbar = cadena(body.quiereProbar).slice(0, MAX_QUIERE_PROBAR);
   const audiencia = cadena(body.audiencia).slice(0, MAX_AUDIENCIA);
-  return { ok: true, parametros: { posicion, ...(quiereProbar ? { quiereProbar } : {}), ...(audiencia ? { audiencia } : {}) } };
+  const publicos = Array.isArray(body.publicos)
+    ? SECCIONES.filter((s) => (body.publicos as unknown[]).includes(s))
+    : [];
+  return {
+    ok: true,
+    parametros: {
+      posicion,
+      ...(quiereProbar ? { quiereProbar } : {}),
+      ...(audiencia ? { audiencia } : {}),
+      // Los tres = sin restricción; se omite para que los guardados viejos y los nuevos se lean igual.
+      ...(publicos.length > 0 && publicos.length < SECCIONES.length ? { publicos } : {})
+    }
+  };
 };

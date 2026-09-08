@@ -793,7 +793,7 @@ const A_PREGUNTAS_AUDIENCIA: ManualArticle = {
   entradilla:
     'Con el escrito en el taller, pida a la guía tres listas de preguntas para la audiencia: a la contraparte, a sus testigos y a los testigos de la contraparte, cada una con para qué sirve y el pasaje del escrito del que nace.',
   bloques: [
-    { kind: 'ruta', camino: ['Revisiones', 'El taller', 'Pestaña «Audiencia»', '«Sugerir preguntas»'] },
+    { kind: 'ruta', camino: ['Revisiones', 'El taller', 'Pestaña «Audiencia»', '«Pedir las preguntas»'] },
     {
       kind: 'parrafo',
       texto:
@@ -803,10 +803,11 @@ const A_PREGUNTAS_AUDIENCIA: ManualArticle = {
       kind: 'pasos',
       pasos: [
         'Abra la revisión en el taller, desde «Revisiones» o desde «Abrir en el taller» en el diálogo de revisión. A la derecha, elija la pestaña «Audiencia»; también llega con el botón «Preguntas para la audiencia» que está sobre el cuadro de la guía.',
-        'Indique su posición en el proceso: «Demandante», «Demandado» u «Otro», y en ese caso escríbala —Ministerio Público, tercero, apoderado de la víctima—. Las tres listas se orientan a lo que le conviene a esa posición.',
+        'Marque a quién quiere preguntar: a la contraparte, a sus testigos, a los testigos de la contraparte, o cualquier combinación; por defecto están los tres. Solo se generan las listas marcadas.',
+        'Indique su posición en el proceso: «Demandante», «Demandado» u «Otro», y en ese caso escríbala —Ministerio Público, tercero, apoderado de la víctima—. Las listas se orientan a lo que le conviene a esa posición.',
         'Si quiere, escriba en «¿Qué quiere probar?» lo que busca establecer en la audiencia y en «Tipo de audiencia» cuál es. Sin eso, la guía lo deduce del escrito y de la posición.',
-        'Pulse «Sugerir preguntas», que muestra el precio: cuesta lo mismo que un mensaje a la guía y se descuenta del saldo de la firma; si la guía no responde, no se cobra.',
-        'Lea las tres listas. Cada pregunta viene numerada, con «Para qué» —lo que busca establecer o desvirtuar— y, cuando nace de un pasaje concreto, la cita «Del escrito»; tocar la cita subraya ese pasaje en el papel.',
+        'Pulse «Pedir las preguntas», que muestra el precio: cuesta lo mismo que un mensaje a la guía y se descuenta del saldo de la firma; si la guía no responde, no se cobra.',
+        'Lea las listas. Arriba aparece el «Enfoque»: lo que esa actuación exige probar y la audiencia en la que se pregunta. Cada pregunta viene numerada, con «Para qué» —lo que busca establecer o desvirtuar— y, cuando nace de un pasaje concreto, la cita «Del escrito»; tocar la cita subraya ese pasaje en el papel.',
         'Use «Copiar» para llevarse las tres listas como texto, o «Word» para descargarlas con la letra de la firma. «Volver a generar» pide un juego nuevo, con otros parámetros o sobre el texto ya corregido.'
       ]
     },

@@ -23,8 +23,8 @@ import {
   Send,
   ShieldCheck
 } from 'lucide-react';
-import type { Anotacion, EdicionPropuesta, InformeDeRevision, ParametrosDePreguntas, PreguntasAudienciaGuardadas, RespuestaDePreguntas, RespuestaDelChat, TurnoDelTaller, VersionDelTexto } from '../services/review.api';
-import { TITULOS as SECCIONES_DE_PREGUNTAS, preguntasComoTexto } from '../services/preguntasExport.service';
+import type { Anotacion, EdicionPropuesta, InformeDeRevision, ParametrosDePreguntas, PreguntasAudienciaGuardadas, RespuestaDePreguntas, RespuestaDelChat, SeccionDePreguntas, TurnoDelTaller, VersionDelTexto } from '../services/review.api';
+import { TITULOS as SECCIONES_DE_PREGUNTAS, preguntasComoTexto, seccionesPedidas } from '../services/preguntasExport.service';
 import { aplicarReemplazo, capasTipograficas, esCapaTipografica, localizarCitas, marcasDeAnotaciones, reflujoDeSecciones, segmentarCapas, type MarcaEnCapa } from '../services/marcas';
 import { diferencias, resumenDeCambios } from '../services/diff';
 import { ApiError } from '../../../config/httpClient';
@@ -269,6 +269,12 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   const [posicionOtra, setPosicionOtra] = React.useState(() => posicionInicial(preguntas?.guardadas ?? null).otra);
   const [quiereProbar, setQuiereProbar] = React.useState(preguntas?.guardadas?.parametros.quiereProbar ?? '');
   const [tipoDeAudiencia, setTipoDeAudiencia] = React.useState(preguntas?.guardadas?.parametros.audiencia ?? '');
+  /* A quién preguntar. Por defecto a los tres; el abogado quita los que no le interesan. */
+  const [publicos, setPublicos] = React.useState<SeccionDePreguntas[]>(
+    () => preguntas?.guardadas?.parametros.publicos?.length ? preguntas.guardadas.parametros.publicos : SECCIONES_DE_PREGUNTAS.map((s) => s.clave)
+  );
+  const alternarPublico = (clave: SeccionDePreguntas) =>
+    setPublicos((prev) => (prev.includes(clave) ? prev.filter((p) => p !== clave) : [...prev, clave]));
   const [copiadas, setCopiadas] = React.useState(false);
   const [error, setError] = React.useState('');
   const [estadoGuardado, setEstadoGuardado] = React.useState<'quieto' | 'guardando' | 'guardado' | 'fallo'>('quieto');
@@ -403,11 +409,20 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
       setError('Indique su posición en el proceso: Demandante, Demandado u otra.');
       return;
     }
+    if (publicos.length === 0) {
+      setError('Marque al menos a quién quiere preguntar.');
+      return;
+    }
     setOcupado('preguntas');
     setError('');
     try {
       const r = await preguntas.onGenerar(
-        { posicion: posicionElegida, ...(quiereProbar.trim() ? { quiereProbar: quiereProbar.trim() } : {}), ...(tipoDeAudiencia.trim() ? { audiencia: tipoDeAudiencia.trim() } : {}) },
+        {
+          posicion: posicionElegida,
+          ...(quiereProbar.trim() ? { quiereProbar: quiereProbar.trim() } : {}),
+          ...(tipoDeAudiencia.trim() ? { audiencia: tipoDeAudiencia.trim() } : {}),
+          ...(publicos.length > 0 && publicos.length < SECCIONES_DE_PREGUNTAS.length ? { publicos } : {})
+        },
         texto
       );
       setPreguntasGeneradas({ parametros: r.parametros, preguntas: r.preguntas, generadoEl: r.generadoEl, por: r.por });
@@ -1015,12 +1030,34 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
       <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-3 text-[12.5px]">
         {formularioDePreguntas || !g ? (
           <>
-            <p className="leading-snug text-ink-600">
-              La guía lee el escrito tal como está ahora y sugiere tres listas: preguntas <span className="font-semibold">a la contraparte</span>, <span className="font-semibold">a sus testigos</span> y{' '}
-              <span className="font-semibold">a los testigos de la contraparte</span>, cada una con para qué sirve y el pasaje del escrito del que nace. Son sugerencias: usted decide cuáles formula. Cuesta {pesos(preguntas.precioCop)}.
+            <p className="leading-snug text-ink-700">
+              <span className="font-semibold text-ink-900">¿Qué preguntas hacer en la audiencia?</span> La guía lee este escrito y le propone las preguntas, numeradas y listas para leer en voz alta, cada una con para qué sirve y el pasaje del escrito del que sale. Marque a quién quiere preguntar, diga de qué lado está y pida las preguntas.
             </p>
             <div>
-              <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">Su posición en el proceso</p>
+              <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">1 · ¿A quién quiere preguntar?</p>
+              <div className="mt-1 flex flex-wrap gap-1.5">
+                {SECCIONES_DE_PREGUNTAS.map((s) => {
+                  const activo = publicos.includes(s.clave);
+                  return (
+                    <button
+                      key={s.clave}
+                      type="button"
+                      onClick={() => alternarPublico(s.clave)}
+                      aria-pressed={activo}
+                      title={s.nota}
+                      className={`inline-flex items-center gap-1.5 rounded-control border px-2.5 py-1 text-[12px] ${activo ? 'border-brand-300 bg-brand-50 font-semibold text-brand-700' : 'border-line-200 text-ink-600 hover:text-ink-900'}`}
+                    >
+                      <span className={`flex h-3.5 w-3.5 items-center justify-center rounded-[3px] border ${activo ? 'border-brand-600 bg-brand-600 text-white' : 'border-line-300'}`}>
+                        {activo && <Check className="h-2.5 w-2.5" />}
+                      </span>
+                      {s.titulo}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            <div>
+              <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">2 · ¿De qué lado está usted?</p>
               <div className="mt-1 flex flex-wrap items-center gap-1.5">
                 <div className="flex rounded-control border border-line-200 p-0.5">
                   {(['Demandante', 'Demandado', 'Otro'] as const).map((t) => (
@@ -1043,18 +1080,19 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
               </div>
             </div>
             <div>
-              <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">¿Qué quiere probar? (opcional)</p>
+              <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">3 · ¿Qué quiere probar? (opcional)</p>
               <textarea value={quiereProbar} onChange={(e) => setQuiereProbar(e.target.value)} rows={3} maxLength={1000} placeholder="Por ejemplo: que el pago se hizo antes del plazo y la contraparte lo recibió." className="field-area mt-1 w-full resize-none" />
             </div>
             <div>
-              <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">Tipo de audiencia (opcional)</p>
+              <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">4 · Tipo de audiencia (opcional)</p>
               <input type="text" value={tipoDeAudiencia} onChange={(e) => setTipoDeAudiencia(e.target.value)} maxLength={120} placeholder="Audiencia inicial, de instrucción y juzgamiento, de juicio oral…" className="field mt-1 w-full" />
             </div>
             <div className="flex flex-wrap gap-2">
-              <button type="button" onClick={() => void generarPreguntas()} disabled={ocupado !== null || !posicionElegida} className="btn-primary btn-sm disabled:opacity-50">
+              <button type="button" onClick={() => void generarPreguntas()} disabled={ocupado !== null || !posicionElegida || publicos.length === 0} className="btn-primary btn-sm disabled:opacity-50" title="La guía lee el escrito y devuelve las preguntas; se descuenta del saldo solo si responde">
                 <RefreshCw className={`h-3.5 w-3.5 ${ocupado === 'preguntas' ? 'animate-spin' : ''}`} />
-                {ocupado === 'preguntas' ? 'La guía está leyendo el escrito…' : `Sugerir preguntas · ${pesos(preguntas.precioCop)}`}
+                {ocupado === 'preguntas' ? 'La guía está leyendo el escrito…' : `Pedir las preguntas · ${pesos(preguntas.precioCop)}`}
               </button>
+              <span className="self-center text-[11px] text-ink-500">Se descuenta del saldo de la firma; si la guía no responde, no se cobra.</span>
               {g && (
                 <button type="button" onClick={() => setFormularioDePreguntas(false)} disabled={ocupado !== null} className="btn-neutral btn-sm">
                   Ver las anteriores
@@ -1090,7 +1128,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
               </button>
             </div>
             {g.parametros.quiereProbar && <p className="text-[11.5px] italic leading-snug text-ink-600">Quiere probar: {g.parametros.quiereProbar}</p>}
-            {SECCIONES_DE_PREGUNTAS.map((s) => {
+            {seccionesPedidas(g).map((s) => {
               const lista = g.preguntas[s.clave];
               return (
                 <section key={s.clave}>

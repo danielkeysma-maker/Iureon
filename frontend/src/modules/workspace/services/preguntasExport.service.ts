@@ -24,10 +24,14 @@ const encabezado = (g: PreguntasAudienciaGuardadas): string[] =>
   ].filter(Boolean);
 
 /** Texto plano con encabezados y numeración, para copiar. Puro. */
+/** Las secciones que el abogado pidió; sin restricción, las tres. */
+export const seccionesPedidas = (g: PreguntasAudienciaGuardadas): typeof TITULOS =>
+  g.parametros.publicos && g.parametros.publicos.length ? TITULOS.filter((t) => g.parametros.publicos!.includes(t.clave)) : TITULOS;
+
 export const preguntasComoTexto = (titulo: string, g: PreguntasAudienciaGuardadas): string => {
   const lineas: string[] = [`PREGUNTAS PARA LA AUDIENCIA · ${titulo}`, ...encabezado(g), ''];
   if (g.preguntas.enfoque) lineas.push(`Enfoque: ${g.preguntas.enfoque}`, '');
-  for (const s of TITULOS) {
+  for (const s of seccionesPedidas(g)) {
     const lista = g.preguntas[s.clave];
     if (!lista.length) continue;
     lineas.push(s.titulo.toUpperCase(), '');
@@ -70,7 +74,7 @@ export const exportarPreguntasAWord = async (titulo: string, g: PreguntasAudienc
   hijos.push(p(`Preguntas para la audiencia · ${titulo}`, { bold: true, size: base + 8, after: 60, justificar: false }));
   hijos.push(p(encabezado(g).join(' · '), { size: base - 4, color: gris, after: 200, justificar: false }));
 
-  for (const s of TITULOS) {
+  for (const s of seccionesPedidas(g)) {
     const lista = g.preguntas[s.clave];
     if (!lista.length) continue;
     hijos.push(seccion(s.titulo));

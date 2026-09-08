@@ -48,6 +48,13 @@ check('el prompt lleva el texto del escrito completo', /recibió la consignació
 check('el prompt lleva la ficha como contexto, no para citarla', /ESTRUCTURA EXIGIDA/.test(prompt) && /no la cites/.test(prompt));
 check('la ficha se presenta como la fuente de qué se prueba', /QUÉ se debe probar/.test(prompt));
 check('el prompt lleva la rama', /RAMA: CIVIL/.test(prompt));
+check('sin públicos elegidos pide las tres listas', /LISTAS QUE PIDE: a la contraparte.*a mis testigos.*a los testigos de la contraparte\./.test(prompt) && !/como \[\]/.test(prompt));
+const soloContraparte = buildPreguntasUserPrompt({ documentType: 'Demanda', guidance: null, parametros: { posicion: 'Demandante', publicos: ['contraparte'] }, texto: 'y'.repeat(50), truncado: false });
+check('con un solo público, pide esa lista y manda vaciar las otras dos', /LISTAS QUE PIDE: a la contraparte \(interrogatorio de parte\)\./.test(soloContraparte) && /Deja "misTestigos", "testigosContraparte" como \[\]/.test(soloContraparte));
+const conPublicos = normalizarParametros({ posicion: 'Demandado', publicos: ['misTestigos', 'basura', 'misTestigos'] });
+check('los públicos se filtran a las claves válidas', conPublicos.ok && JSON.stringify(conPublicos.parametros.publicos) === '["misTestigos"]');
+const todos = normalizarParametros({ posicion: 'Demandado', publicos: ['contraparte', 'misTestigos', 'testigosContraparte'] });
+check('pedir los tres equivale a no restringir', todos.ok && todos.parametros.publicos === undefined);
 
 const sinOpcionales = buildPreguntasUserPrompt({ documentType: 'Demanda', guidance: null, parametros: { posicion: 'Ministerio Público' }, texto: 'x'.repeat(50), truncado: true });
 check('sin qué probar ni audiencia, lo declara en vez de dejar huecos', /no indicó qué quiere probar/.test(sinOpcionales) && /no indicó el tipo de audiencia/.test(sinOpcionales));
