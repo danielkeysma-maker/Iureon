@@ -41,6 +41,13 @@ export interface PreguntaDeAudiencia {
 }
 
 export interface PreguntasParaLaAudiencia {
+  /**
+   * Una o dos frases del modelo: qué exige probar ESTA actuación según su ficha
+   * y en qué audiencia se formulan estas preguntas. Es lo que hace que un
+   * juego de preguntas para una tutela no se parezca al de una demanda
+   * ejecutiva; el abogado lo lee antes que las listas.
+   */
+  enfoque?: string;
   contraparte: PreguntaDeAudiencia[];
   misTestigos: PreguntaDeAudiencia[];
   testigosContraparte: PreguntaDeAudiencia[];
@@ -53,7 +60,9 @@ export interface ParametrosDePreguntas {
   audiencia?: string;
 }
 
-export const SECCIONES: ReadonlyArray<keyof PreguntasParaLaAudiencia> = ['contraparte', 'misTestigos', 'testigosContraparte'];
+/** Las tres listas: las claves del JSON que llevan preguntas (el «enfoque» es texto y no entra aquí). */
+export type SeccionDePreguntas = 'contraparte' | 'misTestigos' | 'testigosContraparte';
+export const SECCIONES: ReadonlyArray<SeccionDePreguntas> = ['contraparte', 'misTestigos', 'testigosContraparte'];
 
 export const MIN_PREGUNTAS_POR_LISTA = 6;
 export const MAX_PREGUNTAS_POR_LISTA = 12;
@@ -71,6 +80,8 @@ TRES LISTAS, TRES TÉCNICAS DISTINTAS:
 
 3. A LOS TESTIGOS DE LA CONTRAPARTE (contrainterrogatorio): preguntas cerradas, una afirmación por pregunta, que se responden con sí o no, y que ponen a prueba la credibilidad, las contradicciones con el escrito, la razón del conocimiento, la distancia o el interés del testigo. Nunca una pregunta abierta cuya respuesta no se controle.
 
+LA ACTUACIÓN MANDA. Antes de escribir una sola pregunta, lee la FICHA VERIFICADA DE LA ACTUACIÓN que acompaña al escrito y deduce de ella tres cosas: (a) qué hechos deben quedar probados para que esa actuación prospere o fracase —las secciones que la norma exige son el mapa de lo que se prueba o se ataca—; (b) quiénes son las partes con el nombre propio de esa rama y esa actuación (accionante y accionado, demandante y demandado, trabajador y empleador, ejecutante y ejecutado, fiscal, defensa y procesado, contratista y entidad, entre otros), y úsalos en lugar de una «contraparte» genérica cuando la ficha lo permita; (c) en qué audiencia de ese proceso se formulan estas preguntas, si el colega no lo dijo. Las tres listas cambian con la actuación: en una acción de tutela se pregunta por la vulneración, la inmediatez y la subsidiariedad; en un proceso ejecutivo, por la existencia y la exigibilidad de la obligación y las excepciones; en uno laboral, por el vínculo, sus extremos y el salario; en uno penal, por la teoría del caso de cada lado. No inventes lo que la ficha no trae: si no hay ficha, deduce lo que se debe probar del propio escrito y dilo en «enfoque».
+
 REGLAS PARA TODAS:
 - Español, trato de usted, sobrio y preciso. Cada pregunta lista para leerse en voz alta.
 - Cada pregunta trae "paraQue": una sola línea con lo que busca establecer o desvirtuar.
@@ -79,8 +90,9 @@ REGLAS PARA TODAS:
 - Entre ${MIN_PREGUNTAS_POR_LISTA} y ${MAX_PREGUNTAS_POR_LISTA} preguntas por lista, de la más importante a la menos. Si el escrito da para menos en alguna lista, entrega las que tengan sustento y ninguna de relleno.
 - Adapta las tres listas a la POSICIÓN del colega: lo que conviene probar es lo que le conviene a su cliente, y «la contraparte» es la parte contraria a ESA posición.
 
-RESPONDE ÚNICAMENTE CON UN OBJETO JSON, sin texto antes ni después, sin cercas de código:
+RESPONDE ÚNICAMENTE CON UN OBJETO JSON, sin texto antes ni después, sin cercas de código. "enfoque" va PRIMERO: una o dos frases con lo que esta actuación exige probar y la audiencia en la que se preguntará, sin citar normas:
 {
+  "enfoque": "…",
   "contraparte": [{"pregunta": "…", "paraQue": "…", "delEscrito": "…"}],
   "misTestigos": [{"pregunta": "…", "paraQue": "…", "delEscrito": "…"}],
   "testigosContraparte": [{"pregunta": "…", "paraQue": "…", "delEscrito": "…"}]
@@ -88,17 +100,20 @@ RESPONDE ÚNICAMENTE CON UN OBJETO JSON, sin texto antes ni después, sin cercas
 
 export const buildPreguntasUserPrompt = (input: {
   documentType: string;
+  /** La rama del catálogo, para que el modelo nombre a las partes como se nombran en ella. */
+  legalBranch?: string | null;
   guidance: string | null;
   parametros: ParametrosDePreguntas;
   texto: string;
   truncado: boolean;
 }): string => {
   const ficha = input.guidance
-    ? `FICHA VERIFICADA DE LA ACTUACIÓN (contexto de qué es este escrito; no la cites en las preguntas):\n${input.guidance}`
-    : 'La actuación no está catalogada: no hay ficha de contexto.';
+    ? `FICHA VERIFICADA DE LA ACTUACIÓN (de aquí sale QUÉ se debe probar y CÓMO se llaman las partes; no la cites en las preguntas):\n${input.guidance}`
+    : 'La actuación no está catalogada: deduce del propio escrito qué se debe probar y dilo en «enfoque».';
+  const rama = (input.legalBranch ?? '').trim();
   const quiereProbar = (input.parametros.quiereProbar ?? '').trim();
   const audiencia = (input.parametros.audiencia ?? '').trim();
-  return `ESCRITO: "${input.documentType}".
+  return `ESCRITO: "${input.documentType}"${rama ? ` · RAMA: ${rama}` : ''}.
 
 ${ficha}
 
@@ -125,9 +140,10 @@ const aPregunta = (v: unknown): PreguntaDeAudiencia | null => {
 };
 
 const limpiarListas = (o: Record<string, unknown>): PreguntasParaLaAudiencia => {
-  const lista = (k: keyof PreguntasParaLaAudiencia): PreguntaDeAudiencia[] =>
+  const lista = (k: SeccionDePreguntas): PreguntaDeAudiencia[] =>
     Array.isArray(o[k]) ? (o[k] as unknown[]).map(aPregunta).filter((p): p is PreguntaDeAudiencia => p !== null).slice(0, MAX_PREGUNTAS_POR_LISTA) : [];
-  return { contraparte: lista('contraparte'), misTestigos: lista('misTestigos'), testigosContraparte: lista('testigosContraparte') };
+  const enfoque = cadena(o.enfoque).slice(0, 600);
+  return { ...(enfoque ? { enfoque } : {}), contraparte: lista('contraparte'), misTestigos: lista('misTestigos'), testigosContraparte: lista('testigosContraparte') };
 };
 
 export const totalDePreguntas = (p: PreguntasParaLaAudiencia): number => p.contraparte.length + p.misTestigos.length + p.testigosContraparte.length;
@@ -140,7 +156,7 @@ export const totalDePreguntas = (p: PreguntasParaLaAudiencia): number => p.contr
  */
 const rescatarCortado = (texto: string): PreguntasParaLaAudiencia => {
   const salida: PreguntasParaLaAudiencia = { contraparte: [], misTestigos: [], testigosContraparte: [] };
-  let seccion: keyof PreguntasParaLaAudiencia | null = null;
+  let seccion: SeccionDePreguntas | null = null;
   let i = 0;
   while (i < texto.length) {
     const c = texto[i];
@@ -149,7 +165,7 @@ const rescatarCortado = (texto: string): PreguntasParaLaAudiencia => {
       const fin = finDeCadena(texto, i);
       const contenido = texto.slice(i + 1, fin);
       if ((SECCIONES as readonly string[]).includes(contenido) && /^\s*:\s*\[/.test(texto.slice(fin + 1, fin + 12))) {
-        seccion = contenido as keyof PreguntasParaLaAudiencia;
+        seccion = contenido as SeccionDePreguntas;
       }
       i = fin + 1;
       continue;

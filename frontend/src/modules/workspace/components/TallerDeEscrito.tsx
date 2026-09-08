@@ -1064,6 +1064,12 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
           </>
         ) : (
           <>
+            {g.preguntas.enfoque && (
+              <p className="notice text-ui leading-[1.5] [text-wrap:pretty]" title="Lo que esta actuación exige probar, según su ficha, y la audiencia en la que se pregunta">
+                <span className="font-semibold text-ink-900">Enfoque · </span>
+                {g.preguntas.enfoque}
+              </p>
+            )}
             <div className="flex flex-wrap items-center gap-1.5">
               <p className="min-w-0 flex-1 text-[11px] leading-snug text-ink-500">
                 {total} preguntas · posición: <span className="text-ink-800">{g.parametros.posicion}</span>

@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { auditService } from '../../audit/audit.service';
 import { BillingError, recordUsage, refundReservation, reserveForOperation, settleOperation } from '../../billing/billing.service';
 import type { LegalBranch } from '../../catalog/types';
-import { buildCatalogGuidance } from '../catalogGuidance';
+import { buildCatalogGuidanceForFirm } from '../catalogGuidance';
 import { ENGINE, callOpenRouterWithUsage } from '../openrouter.client';
 import { LIMITE_LLAMADA_MS, TiempoAgotado, conLimite } from './documentReview.controller';
 import { prepararTexto } from './documentReview';
@@ -64,12 +64,14 @@ export const preguntasAudienciaController = async (req: Request, res: Response):
 
   const operationId = randomUUID();
   try {
-    const guidance = buildCatalogGuidance(revision.documentType, (revision.legalBranch ?? undefined) as LegalBranch | undefined);
+    // La ficha CON la curaduría de la firma: un término o una sección que la
+    // firma verificó en el Catálogo debe moldear también estas preguntas.
+    const guidance = await buildCatalogGuidanceForFirm(firmId, revision.documentType, (revision.legalBranch ?? undefined) as LegalBranch | undefined);
     const llamada = await conLimite(
       callOpenRouterWithUsage(
         ENGINE.OPUS,
         buildPreguntasSystemPrompt(),
-        buildPreguntasUserPrompt({ documentType: revision.documentType, guidance, parametros: parametros.parametros, texto: texto.texto, truncado: texto.truncado }),
+        buildPreguntasUserPrompt({ documentType: revision.documentType, legalBranch: revision.legalBranch, guidance, parametros: parametros.parametros, texto: texto.texto, truncado: texto.truncado }),
         MAX_TOKENS_PREGUNTAS
       ),
       LIMITE_LLAMADA_MS

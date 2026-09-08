@@ -101,7 +101,12 @@ export interface PreguntaDeAudiencia {
   delEscrito?: string;
 }
 
+/** Las tres listas del JSON; el «enfoque» es texto y no entra aquí. */
+export type SeccionDePreguntas = 'contraparte' | 'misTestigos' | 'testigosContraparte';
+
 export interface PreguntasParaLaAudiencia {
+  /** Qué exige probar esta actuación y en qué audiencia se pregunta; una o dos frases del modelo. */
+  enfoque?: string;
   contraparte: PreguntaDeAudiencia[];
   misTestigos: PreguntaDeAudiencia[];
   testigosContraparte: PreguntaDeAudiencia[];

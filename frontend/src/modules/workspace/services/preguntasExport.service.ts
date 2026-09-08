@@ -1,7 +1,7 @@
 import { AlignmentType, Document, Packer, Paragraph, TextRun } from 'docx';
 import { saveAs } from 'file-saver';
 import { getMarcaActual } from '../../tenant/services/branding.api';
-import type { PreguntaDeAudiencia, PreguntasAudienciaGuardadas, PreguntasParaLaAudiencia } from './review.api';
+import type { PreguntaDeAudiencia, PreguntasAudienciaGuardadas, SeccionDePreguntas } from './review.api';
 
 /**
  * Las preguntas para la audiencia, fuera de la pantalla: como texto plano
@@ -10,7 +10,7 @@ import type { PreguntaDeAudiencia, PreguntasAudienciaGuardadas, PreguntasParaLaA
  * bloque de firma, como el informe.
  */
 
-export const TITULOS: ReadonlyArray<{ clave: keyof PreguntasParaLaAudiencia; titulo: string; nota: string }> = [
+export const TITULOS: ReadonlyArray<{ clave: SeccionDePreguntas; titulo: string; nota: string }> = [
   { clave: 'contraparte', titulo: 'A la contraparte', nota: 'Interrogatorio de parte: respuestas que favorecen a su cliente.' },
   { clave: 'misTestigos', titulo: 'A mis testigos', nota: 'Abiertas y no sugestivas, en el orden del relato.' },
   { clave: 'testigosContraparte', titulo: 'A los testigos de la contraparte', nota: 'Contrainterrogatorio: cerradas, una afirmación por pregunta.' }
@@ -26,6 +26,7 @@ const encabezado = (g: PreguntasAudienciaGuardadas): string[] =>
 /** Texto plano con encabezados y numeración, para copiar. Puro. */
 export const preguntasComoTexto = (titulo: string, g: PreguntasAudienciaGuardadas): string => {
   const lineas: string[] = [`PREGUNTAS PARA LA AUDIENCIA · ${titulo}`, ...encabezado(g), ''];
+  if (g.preguntas.enfoque) lineas.push(`Enfoque: ${g.preguntas.enfoque}`, '');
   for (const s of TITULOS) {
     const lista = g.preguntas[s.clave];
     if (!lista.length) continue;

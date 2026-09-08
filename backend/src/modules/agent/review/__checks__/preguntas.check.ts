@@ -29,10 +29,13 @@ check('los testigos propios van con preguntas abiertas y no sugestivas', /NO sug
 check('el contrainterrogatorio va con preguntas cerradas', /cerradas/.test(system) && /sí o no/.test(system));
 check(`pide entre ${MIN_PREGUNTAS_POR_LISTA} y ${MAX_PREGUNTAS_POR_LISTA} por lista`, system.includes(`Entre ${MIN_PREGUNTAS_POR_LISTA} y ${MAX_PREGUNTAS_POR_LISTA} preguntas por lista`));
 check('trato de usted', /trato de usted/.test(system));
+check('la actuación manda: la ficha dice qué se prueba y cómo se llaman las partes', /LA ACTUACIÓN MANDA/.test(system) && /accionante y accionado/.test(system) && /audiencia de ese proceso/.test(system));
+check('el JSON abre con el enfoque de la actuación', /"enfoque": "…"/.test(system) && /"enfoque" va PRIMERO/.test(system));
 
 /* ─── El prompt de usuario ───────────────────────────────────────────────── */
 const prompt = buildPreguntasUserPrompt({
   documentType: 'Contestación de la demanda',
+  legalBranch: 'CIVIL',
   guidance: 'ESTRUCTURA EXIGIDA: excepciones [OBLIGATORIA]',
   parametros: { posicion: 'Demandado', quiereProbar: 'Que el pago se hizo a tiempo', audiencia: 'Audiencia inicial' },
   texto: 'HECHOS 1. El demandado pagó el 3 de marzo. 2. El demandante recibió la consignación.',
@@ -43,11 +46,14 @@ check('el prompt lleva qué quiere probar', /QUÉ QUIERE PROBAR EN LA AUDIENCIA:
 check('el prompt lleva el tipo de audiencia', /TIPO DE AUDIENCIA: Audiencia inicial/.test(prompt));
 check('el prompt lleva el texto del escrito completo', /recibió la consignación/.test(prompt));
 check('el prompt lleva la ficha como contexto, no para citarla', /ESTRUCTURA EXIGIDA/.test(prompt) && /no la cites/.test(prompt));
+check('la ficha se presenta como la fuente de qué se prueba', /QUÉ se debe probar/.test(prompt));
+check('el prompt lleva la rama', /RAMA: CIVIL/.test(prompt));
 
 const sinOpcionales = buildPreguntasUserPrompt({ documentType: 'Demanda', guidance: null, parametros: { posicion: 'Ministerio Público' }, texto: 'x'.repeat(50), truncado: true });
 check('sin qué probar ni audiencia, lo declara en vez de dejar huecos', /no indicó qué quiere probar/.test(sinOpcionales) && /no indicó el tipo de audiencia/.test(sinOpcionales));
 check('la posición libre («Ministerio Público») viaja tal cual', /Ministerio Público/.test(sinOpcionales));
 check('el recorte del texto se declara', /recortado por extensión/.test(sinOpcionales));
+check('sin ficha, pide deducir el enfoque del escrito', /deduce del propio escrito/.test(sinOpcionales) && !/RAMA:/.test(sinOpcionales));
 
 /* ─── El parser: entero ──────────────────────────────────────────────────── */
 const entero = JSON.stringify({
