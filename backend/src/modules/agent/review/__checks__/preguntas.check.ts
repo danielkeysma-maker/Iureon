@@ -48,7 +48,7 @@ check('el prompt lleva el texto del escrito completo', /recibió la consignació
 check('el prompt lleva la ficha como contexto, no para citarla', /ESTRUCTURA EXIGIDA/.test(prompt) && /no la cites/.test(prompt));
 check('la ficha se presenta como la fuente de qué se prueba', /QUÉ se debe probar/.test(prompt));
 check('el prompt lleva la rama', /RAMA: CIVIL/.test(prompt));
-check('sin públicos elegidos pide las tres listas', /LISTAS QUE PIDE: a la contraparte.*a mis testigos.*a los testigos de la contraparte\./.test(prompt) && !/como \[\]/.test(prompt));
+check('sin públicos elegidos pide las tres listas', /LISTAS QUE PIDE: a la contraparte \(interrogatorio de parte\), a mis testigos \(interrogatorio directo\), a los testigos de la contraparte \(contrainterrogatorio\)\./.test(prompt) && !/como \[\]/.test(prompt));
 const soloContraparte = buildPreguntasUserPrompt({ documentType: 'Demanda', guidance: null, parametros: { posicion: 'Demandante', publicos: ['contraparte'] }, texto: 'y'.repeat(50), truncado: false });
 check('con un solo público, pide esa lista y manda vaciar las otras dos', /LISTAS QUE PIDE: a la contraparte \(interrogatorio de parte\)\./.test(soloContraparte) && /Deja "misTestigos", "testigosContraparte" como \[\]/.test(soloContraparte));
 const conPublicos = normalizarParametros({ posicion: 'Demandado', publicos: ['misTestigos', 'basura', 'misTestigos'] });
