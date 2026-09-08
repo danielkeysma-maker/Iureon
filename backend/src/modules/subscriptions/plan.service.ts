@@ -4,8 +4,10 @@ import {
   diasRestantes,
   estadoDelPlan,
   esPeriodo,
+  esModulo,
   esPlan,
-  modulosPermitidos,
+  moduloDisponible,
+  modulosDisponibles,
   permiteModulo,
   PLANES,
   planBloquea,
@@ -59,7 +61,15 @@ export interface PlanDeFirma {
   diasRestantes: number | null;
   /** Accounts the firm has today. */
   usuarios: number;
+  /** In the plan AND not subtracted by the operator: what this firm can use. */
   modulosPermitidos: readonly Modulo[];
+  /**
+   * What the operator subtracted from this firm. Sent apart from the list
+   * above so a screen can say «desactivado para su firma» instead of «no
+   * incluido en el plan» — the second would be false, and would send the
+   * partner to buy a plan that changes nothing.
+   */
+  modulosDesactivados: readonly Modulo[];
 }
 
 const requireDb = () => {
@@ -69,7 +79,13 @@ const requireDb = () => {
   return supabase;
 };
 
-const CORTESIA_LEGACY: PlanRow = { plan: null, period: null, validUntil: null, maxUsers: null };
+const CORTESIA_LEGACY: PlanRow = {
+  plan: null,
+  period: null,
+  validUntil: null,
+  maxUsers: null,
+  modulosDesactivados: []
+};
 
 let migracionAvisada = false;
 
@@ -83,6 +99,30 @@ const avisarMigracion = (detalle: string): void => {
 };
 
 /**
+ * `modulos_desactivados` arrives with `migration-modulos-por-firma.sql`, later
+ * than the plan columns. Until it runs the select with it fails; retrying
+ * without it keeps the plan readable and treats the subtraction as empty —
+ * nothing was ever subtracted on a database that cannot hold it. Said once.
+ */
+export const MIGRACION_MODULOS = 'supabase/migration-modulos-por-firma.sql';
+let columnaDeModulosAvisada = false;
+
+const avisarColumnaDeModulos = (detalle: string): void => {
+  if (columnaDeModulosAvisada) return;
+  columnaDeModulosAvisada = true;
+  console.error(
+    '[PLAN] La columna firms.modulos_desactivados no existe; se lee como vacía. ' +
+      `Falta correr ${MIGRACION_MODULOS}. Detalle: ${detalle}`
+  );
+};
+
+const COLUMNAS_DE_PLAN = 'plan, plan_period, plan_valid_until, plan_max_users';
+
+/** Only catalogue ids survive: a stale id left in the column cannot hide a module that no longer exists. */
+const leerModulosDesactivados = (valor: unknown): Modulo[] =>
+  Array.isArray(valor) ? valor.filter(esModulo) : [];
+
+/**
  * The plan row, cheap enough to read on every paid operation.
  *
  * Exported for `firmProfile` and the guards. Does not count users: that is a
@@ -92,11 +132,15 @@ const avisarMigracion = (detalle: string): void => {
 export const leerPlan = async (firmId: string): Promise<PlanRow> => {
   const db = requireDb();
 
-  const { data, error } = await db
-    .from('firms')
-    .select('plan, plan_period, plan_valid_until, plan_max_users')
-    .eq('firm_id', firmId)
-    .maybeSingle();
+  const leer = (columnas: string) =>
+    db.from('firms').select(columnas).eq('firm_id', firmId).maybeSingle();
+
+  let { data, error } = await leer(`${COLUMNAS_DE_PLAN}, modulos_desactivados`);
+
+  if (error) {
+    avisarColumnaDeModulos(error.message);
+    ({ data, error } = await leer(COLUMNAS_DE_PLAN));
+  }
 
   if (error) {
     avisarMigracion(error.message);
@@ -105,13 +149,14 @@ export const leerPlan = async (firmId: string): Promise<PlanRow> => {
 
   if (!data) return CORTESIA_LEGACY;
 
-  const fila = data as Record<string, unknown>;
+  const fila = data as unknown as Record<string, unknown>;
 
   return {
     plan: esPlan(fila.plan) ? fila.plan : null,
     period: esPeriodo(fila.plan_period) ? fila.plan_period : null,
     validUntil: typeof fila.plan_valid_until === 'string' ? new Date(fila.plan_valid_until) : null,
-    maxUsers: typeof fila.plan_max_users === 'number' ? fila.plan_max_users : null
+    maxUsers: typeof fila.plan_max_users === 'number' ? fila.plan_max_users : null,
+    modulosDesactivados: leerModulosDesactivados(fila.modulos_desactivados)
   };
 };
 
@@ -138,7 +183,8 @@ export const describirPlan = (row: PlanRow, usuarios: number, ahora = new Date()
   estado: estadoDelPlan(row, ahora),
   diasRestantes: diasRestantes(row.validUntil, ahora),
   usuarios,
-  modulosPermitidos: modulosPermitidos(row.plan)
+  modulosPermitidos: modulosDisponibles(row.plan, row.modulosDesactivados),
+  modulosDesactivados: row.modulosDesactivados
 });
 
 /** The plan as the firm's own screen and the operator's ficha show it. */
@@ -172,7 +218,7 @@ export const exigirPlanVigente = async (firmId: string): Promise<void> => {
   }
 };
 
-const NOMBRE_DE_MODULO: Record<Modulo, string> = {
+export const NOMBRE_DE_MODULO: Record<Modulo, string> = {
   REDACCION: 'Redacción',
   BORRADORES: 'Borradores',
   REVISIONES: 'Revisiones',
@@ -187,12 +233,19 @@ const NOMBRE_DE_MODULO: Record<Modulo, string> = {
   ORIENTACION: 'Orientación'
 };
 
+/** The refusal for a module the operator switched off for this firm. */
+export const mensajeDeModuloDesactivado = (modulo: Modulo): string =>
+  `${NOMBRE_DE_MODULO[modulo]} no está habilitado para su firma. Escríbanos por Soporte para activarlo.`;
+
 /**
- * Refuses when the module is not in the plan, or the plan has expired.
+ * Refuses when the module is not in the plan, was switched off for this firm
+ * by the operator, or the plan has expired.
  *
- * Both answer 403 and not 402: the screen hides the module for ESENCIAL, so a
- * request that reaches here came from outside the page, and the honest answer
- * is "not allowed", with the upgrade path in the message.
+ * All answer 403 and not 402: the screen hides the module, so a request that
+ * reaches here came from outside the page, and the honest answer is "not
+ * allowed" — with the upgrade path when the plan is the reason, and with
+ * Soporte when the operator is: buying Premium would not reopen a module the
+ * operator closed, and the message must not suggest it would.
  */
 export const exigirModulo = async (firmId: string, modulo: Modulo): Promise<void> => {
   const row = await leerPlan(firmId);
@@ -200,6 +253,10 @@ export const exigirModulo = async (firmId: string, modulo: Modulo): Promise<void
 
   if (planBloquea(row, ahora)) {
     throw new PlanError('PLAN_VENCIDO', mensajeVencido(row), 403);
+  }
+
+  if (permiteModulo(row.plan, modulo) && !moduloDisponible(row, modulo)) {
+    throw new PlanError('PLAN_INSUFICIENTE', mensajeDeModuloDesactivado(modulo), 403);
   }
 
   if (!permiteModulo(row.plan, modulo)) {

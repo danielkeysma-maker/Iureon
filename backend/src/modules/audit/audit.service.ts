@@ -71,6 +71,12 @@ export type AuditAction =
   | 'PLAN_ACTUALIZADO'
   /** The operator cut access now: `plan_valid_until = now`, so the firm reads VENCIDO from this second. */
   | 'PLAN_SUSPENDIDO'
+  /**
+   * The operator switched modules on or off for one firm, above its plan.
+   * Goes to the FIRM's trail with the resulting list and the reason: a partner
+   * who finds Audiencias gone must be able to read who closed it and why.
+   */
+  | 'MODULOS_AJUSTADOS'
   /*
    * Consola de operación, acciones de soporte. `FIRMA_ELIMINADA` va al rastro
    * DEL OPERADOR: el de la firma se fue con ella. `CLAVE_RESTABLECIDA_POR_OPERADOR`

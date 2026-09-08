@@ -14,12 +14,18 @@ import { auditService, type AuditLogEntry } from '../audit/audit.service';
 import {
   DIAS_DE_PRUEBA,
   PLANES,
+  TODOS_LOS_MODULOS,
+  esModulo,
   esPeriodo,
   esPlan,
   etiquetaDePeriodo,
+  modulosDisponibles,
+  validarModulosDesactivados,
+  type Modulo,
   type Plan,
   type PlanPeriod
 } from '../subscriptions/plan.catalog';
+import { MIGRACION_MODULOS, NOMBRE_DE_MODULO } from '../subscriptions/plan.service';
 
 /**
  * Running the platform: the firms on it, their plans, their balances.
@@ -48,6 +54,10 @@ export interface FirmSummary {
   planPeriod: PlanPeriod | null;
   planValidUntil: string | null;
   planMaxUsers: number | null;
+  /** What the operator subtracted from this firm above its plan. Empty = the plan rules whole. */
+  modulosDesactivados: readonly Modulo[];
+  /** In the plan AND not subtracted: what the firm actually sees. */
+  modulosPermitidos: readonly Modulo[];
   status: string;
   creditsBalance: number;
   createdAt: string;
@@ -79,6 +89,7 @@ interface FirmRow {
   plan_period?: string | null;
   plan_valid_until?: string | null;
   plan_max_users?: number | null;
+  modulos_desactivados?: unknown;
   subscription_status: string;
   credit_balance_cop: number | string;
   created_at: string;
@@ -89,16 +100,26 @@ const FIRM_COLUMNS_LEGACY =
 
 const FIRM_COLUMNS = `${FIRM_COLUMNS_LEGACY}, plan, plan_period, plan_valid_until, plan_max_users`;
 
+const FIRM_COLUMNS_CON_MODULOS = `${FIRM_COLUMNS}, modulos_desactivados`;
+
 /**
- * Reads firms with the plan columns, and without them if the database does
- * not have them yet.
+ * Reads firms with every column the console knows, falling back one
+ * migration at a time when the database does not have them yet.
  *
  * DEPLOY AND MIGRATION ARE TWO MOMENTS. `migration-suscripciones.sql` adds the
- * plan columns; until it runs, selecting them fails and the whole console
- * would go blank over four columns that are NULL anyway. The retry reads what
- * exists and the log names the migration, loudly, once per process.
+ * plan columns and `migration-modulos-por-firma.sql` adds the per-firm module
+ * subtraction; until each runs, selecting its column fails and the whole
+ * console would go blank over a column that is NULL or empty anyway. Each
+ * retry drops the newest migration's columns and the log names it, loudly,
+ * once per process — so the operator reads which file to run, not a blank.
  */
-let columnasAvisadas = false;
+const INTENTOS_DE_COLUMNAS: ReadonlyArray<{ columnas: string; migracion: string }> = [
+  { columnas: FIRM_COLUMNS_CON_MODULOS, migracion: MIGRACION_MODULOS },
+  { columnas: FIRM_COLUMNS, migracion: 'supabase/migration-suscripciones.sql' },
+  { columnas: FIRM_COLUMNS_LEGACY, migracion: '' }
+];
+const migracionesAvisadas = new Set<string>();
+
 const seleccionarFirmas = async (
   filtro?: (q: any) => any
 ): Promise<{ data: FirmRow[] | null; error: { message: string } | null }> => {
@@ -109,20 +130,24 @@ const seleccionarFirmas = async (
     return q;
   };
 
-  const primera = await consulta(FIRM_COLUMNS);
-  if (!primera.error) return { data: primera.data as FirmRow[] | null, error: null };
-
-  if (!columnasAvisadas) {
-    columnasAvisadas = true;
-    console.error(
-      '[ADMIN] Las columnas de plan no existen todavía; falta correr ' +
-        `supabase/migration-suscripciones.sql. Detalle: ${primera.error.message}`
-    );
+  let ultimo: { data: FirmRow[] | null; error: { message: string } | null } = { data: null, error: null };
+  for (const intento of INTENTOS_DE_COLUMNAS) {
+    const r = await consulta(intento.columnas);
+    ultimo = { data: r.data as FirmRow[] | null, error: r.error };
+    if (!r.error) return ultimo;
+    if (intento.migracion && !migracionesAvisadas.has(intento.migracion)) {
+      migracionesAvisadas.add(intento.migracion);
+      console.error(
+        `[ADMIN] Faltan columnas en firms; falta correr ${intento.migracion}. Detalle: ${r.error.message}`
+      );
+    }
   }
-
-  const segunda = await consulta(FIRM_COLUMNS_LEGACY);
-  return { data: segunda.data as FirmRow[] | null, error: segunda.error };
+  return ultimo;
 };
+
+/** Only catalogue ids survive: a stale id in the column cannot hide a module that no longer exists. */
+const modulosDesactivadosDe = (row: FirmRow): Modulo[] =>
+  Array.isArray(row.modulos_desactivados) ? row.modulos_desactivados.filter(esModulo) : [];
 
 /** The volume figures a firm is judged by. Counts, never contents. */
 interface FirmVolumes {
@@ -213,24 +238,30 @@ const EMPTY_VOLUMES: FirmVolumes = {
   catalogoCuradas: 0
 };
 
-const toSummary = (row: FirmRow, volumes: FirmVolumes, catalogoTotal: number): FirmSummary => ({
-  id: row.firm_id,
-  name: row.name,
-  nit: row.nit,
-  planTier: row.plan_tier,
-  plan: esPlan(row.plan) ? row.plan : null,
-  planPeriod: esPeriodo(row.plan_period) ? row.plan_period : null,
-  planValidUntil: row.plan_valid_until ?? null,
-  planMaxUsers: typeof row.plan_max_users === 'number' ? row.plan_max_users : null,
-  status: row.subscription_status,
-  creditsBalance: Number(row.credit_balance_cop ?? 0),
-  createdAt: row.created_at,
-  users: volumes.users,
-  transcriptions: volumes.transcriptions,
-  consumo30dCop: volumes.consumo30dCop,
-  catalogoCuradas: volumes.catalogoCuradas,
-  catalogoTotal
-});
+const toSummary = (row: FirmRow, volumes: FirmVolumes, catalogoTotal: number): FirmSummary => {
+  const plan = esPlan(row.plan) ? row.plan : null;
+  const modulosDesactivados = modulosDesactivadosDe(row);
+  return {
+    id: row.firm_id,
+    name: row.name,
+    nit: row.nit,
+    planTier: row.plan_tier,
+    plan,
+    planPeriod: esPeriodo(row.plan_period) ? row.plan_period : null,
+    planValidUntil: row.plan_valid_until ?? null,
+    planMaxUsers: typeof row.plan_max_users === 'number' ? row.plan_max_users : null,
+    modulosDesactivados,
+    modulosPermitidos: modulosDisponibles(plan, modulosDesactivados),
+    status: row.subscription_status,
+    creditsBalance: Number(row.credit_balance_cop ?? 0),
+    createdAt: row.created_at,
+    users: volumes.users,
+    transcriptions: volumes.transcriptions,
+    consumo30dCop: volumes.consumo30dCop,
+    catalogoCuradas: volumes.catalogoCuradas,
+    catalogoTotal
+  };
+};
 
 /**
  * Every firm, with the numbers needed to run the business.
@@ -274,6 +305,7 @@ const OPERATION_ACTIONS = new Set([
   'USER_CREATED',
   'PLAN_ACTUALIZADO',
   'PLAN_SUSPENDIDO',
+  'MODULOS_AJUSTADOS',
   'CLAVE_RESTABLECIDA_POR_OPERADOR'
 ]);
 
@@ -521,6 +553,8 @@ export const createFirm = async (input: {
     planPeriod: 'PRUEBA',
     planValidUntil: creada.validUntil,
     planMaxUsers: PLANES.PREMIUM.maxUsuarios,
+    modulosDesactivados: [],
+    modulosPermitidos: PLANES.PREMIUM.modulos,
     status: 'active',
     creditsBalance: creada.credits,
     createdAt: new Date().toISOString(),
@@ -813,6 +847,68 @@ export const suspenderAccesoDeFirma = async (
 
   return { plan, period, validUntil, reason: motivo };
 };
+
+/**
+ * Switches modules on or off for ONE firm, above its plan.
+ *
+ * The body is the complete list of what stays off, not a delta: the screen
+ * shows switches, and «the state you see is the state you send» cannot race
+ * with itself the way «turn X off» then «turn X on» from two tabs can. Every
+ * id must be in the catalogue — a typo would be stored, hide nothing, and
+ * read as an override that never applied. The reason is optional here: a
+ * re-enable after payment has nothing to explain, and forcing ten characters
+ * would produce «asdfasdfasdf» in the firm's own audit trail.
+ *
+ * Refuses with MIGRATION_REQUIRED, naming the file, when the column does not
+ * exist yet: a write that PostgREST rejects over a missing column must not
+ * surface as a generic failure the operator cannot act on.
+ */
+export const ajustarModulosDeFirma = async (
+  firmId: string,
+  desactivados: unknown,
+  reason: unknown
+): Promise<{ desactivados: Modulo[]; reason: string }> => {
+  const client = requireClient();
+
+  const validacion = validarModulosDesactivados(desactivados);
+  if (!validacion.ok) {
+    throw new AuthError(
+      'INVALID_MODULE',
+      `«${validacion.invalido}» no es un módulo del catálogo. Válidos: ${TODOS_LOS_MODULOS.join(', ')}.`,
+      400
+    );
+  }
+  const motivo = typeof reason === 'string' ? reason.replace(/\s+/g, ' ').trim() : '';
+
+  const { data, error } = await client
+    .from('firms')
+    .update({ modulos_desactivados: validacion.modulos, updated_at: new Date().toISOString() })
+    .eq('firm_id', firmId)
+    .select('firm_id');
+
+  if (error) {
+    if (/modulos_desactivados/i.test(error.message)) {
+      throw new AuthError(
+        'MIGRATION_REQUIRED',
+        `Falta ejecutar ${MIGRACION_MODULOS} en la base de datos antes de ajustar módulos por firma.`,
+        503
+      );
+    }
+    console.error('[ADMIN] No se pudieron ajustar los módulos:', error.message);
+    throw new AuthError('UPDATE_FAILED', 'No se pudieron ajustar los módulos de la firma.', 502);
+  }
+  if (!data || data.length === 0) {
+    throw new AuthError('FIRM_NOT_FOUND', 'No existe esa firma.', 404);
+  }
+
+  return { desactivados: validacion.modulos, reason: motivo };
+};
+
+/** The audit wording for a module adjustment: the resulting list, never a delta. */
+export const describirAjusteDeModulos = (cambio: { desactivados: Modulo[]; reason: string }): string =>
+  `Módulos desactivados para la firma: ${
+    cambio.desactivados.length ? cambio.desactivados.map((m) => NOMBRE_DE_MODULO[m]).join(', ') : 'ninguno'
+  } · motivo: ${cambio.reason || 'sin motivo'}`;
 
 /** The audit wording for a plan set by hand. */
 export const describirCambioDePlan = (cambio: {

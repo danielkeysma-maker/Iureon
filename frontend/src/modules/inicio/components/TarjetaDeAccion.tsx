@@ -16,8 +16,14 @@ interface TarjetaDeAccionProps {
   titulo: string;
   queHace: string;
   onClick: () => void;
-  /** Present when the plan does not include the module. */
+  /** Present when the firm cannot use the module. */
   noIncluida?: boolean;
+  /**
+   * Why: «No incluido en su plan» (default) or «No disponible para su firma»
+   * when the operator switched it off. Two different remedies — one is a
+   * bigger plan, the other is Soporte — so the chip must not merge them.
+   */
+  motivoNoIncluida?: string;
   visita?: string;
 }
 
@@ -27,6 +33,7 @@ export const TarjetaDeAccion: React.FC<TarjetaDeAccionProps> = ({
   queHace,
   onClick,
   noIncluida = false,
+  motivoNoIncluida = 'No incluido en su plan',
   visita
 }) => (
   <button
@@ -50,6 +57,6 @@ export const TarjetaDeAccion: React.FC<TarjetaDeAccionProps> = ({
       )}
     </span>
     <span className="text-ui leading-[1.5] text-ink-500">{queHace}</span>
-    {noIncluida && <span className="chip-neutral mt-1">No incluido en su plan</span>}
+    {noIncluida && <span className="chip-neutral mt-1">{motivoNoIncluida}</span>}
   </button>
 );

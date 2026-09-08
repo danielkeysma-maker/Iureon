@@ -126,13 +126,54 @@ export const modulosPermitidos = (plan: Plan | null): readonly Modulo[] =>
 export const permiteModulo = (plan: Plan | null, modulo: Modulo): boolean =>
   modulosPermitidos(plan).includes(modulo);
 
+export const esModulo = (valor: unknown): valor is Modulo =>
+  typeof valor === 'string' && (TODOS_LOS_MODULOS as readonly string[]).includes(valor);
+
+/**
+ * THE PLAN IS THE BASELINE; THE OPERATOR SUBTRACTS FROM IT PER FIRM.
+ *
+ * `firms.modulos_desactivados` holds what operation took away from one firm
+ * — «Audiencias off until they pay» — without touching the plan. Only a
+ * subtraction is stored, never the full list: a plan change (a payment, a
+ * courtesy) must keep ruling what is included, and the override must survive
+ * it. Re-enabling is removing the id from the list, which restores exactly
+ * what the plan gives.
+ */
+export const modulosDisponibles = (
+  plan: Plan | null,
+  desactivados: readonly Modulo[]
+): readonly Modulo[] => modulosPermitidos(plan).filter((m) => !desactivados.includes(m));
+
+/**
+ * Validates the operator's list. Returns the bad id so the 400 can name it:
+ * «INVALID_MODULE» without the offending value sends the operator guessing.
+ * Duplicates collapse; order follows the catalogue so the audit line reads
+ * the same whatever order the screen sent.
+ */
+export const validarModulosDesactivados = (
+  valores: unknown
+): { ok: true; modulos: Modulo[] } | { ok: false; invalido: string } => {
+  if (!Array.isArray(valores)) return { ok: false, invalido: String(valores) };
+  for (const v of valores) {
+    if (!esModulo(v)) return { ok: false, invalido: String(v) };
+  }
+  const pedidos = new Set(valores as Modulo[]);
+  return { ok: true, modulos: TODOS_LOS_MODULOS.filter((m) => pedidos.has(m)) };
+};
+
 /** What the firms table holds, as read. */
 export interface PlanRow {
   plan: Plan | null;
   period: PlanPeriod | null;
   validUntil: Date | null;
   maxUsers: number | null;
+  /** The operator's per-firm subtraction. Empty when the column is missing. */
+  modulosDesactivados: readonly Modulo[];
 }
+
+/** Whether THIS firm may use the module: in the plan and not subtracted. */
+export const moduloDisponible = (row: PlanRow, modulo: Modulo): boolean =>
+  modulosDisponibles(row.plan, row.modulosDesactivados).includes(modulo);
 
 export type EstadoDelPlan = 'ACTIVO' | 'POR_VENCER' | 'VENCIDO' | 'CORTESIA' | 'PRUEBA';
 

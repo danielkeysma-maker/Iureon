@@ -17,8 +17,11 @@ import {
   diasRestantes,
   estadoDelPlan,
   esVigente,
+  moduloDisponible,
+  modulosDisponibles,
   modulosPermitidos,
   periodoQueCompra,
+  validarModulosDesactivados,
   permiteModulo,
   planBloquea,
   precioDe,
@@ -74,6 +77,57 @@ check(
   modulosPermitidos(null).length === TODOS_LOS_MODULOS.length && permiteModulo(null, 'ORIENTACION')
 );
 
+// ─── Módulos por firma: el plan es la base, el operador resta ───────────────
+check(
+  'PREMIUM menos AUDIENCIAS no incluye Audiencias y conserva los otros once',
+  !modulosDisponibles('PREMIUM', ['AUDIENCIAS']).includes('AUDIENCIAS') &&
+    modulosDisponibles('PREMIUM', ['AUDIENCIAS']).length === TODOS_LOS_MODULOS.length - 1
+);
+check(
+  'la resta no añade: ESENCIAL menos ORIENTACION sigue siendo los nueve básicos',
+  modulosDisponibles('ESENCIAL', ['ORIENTACION']).length === 9 &&
+    modulosDisponibles('ESENCIAL', ['ORIENTACION']).every((m) => PLANES.ESENCIAL.modulos.includes(m))
+);
+check(
+  'reactivar (lista vacía) devuelve exactamente lo del plan',
+  modulosDisponibles('PREMIUM', []).length === TODOS_LOS_MODULOS.length &&
+    modulosDisponibles('PREMIUM', []).every((m) => modulosPermitidos('PREMIUM').includes(m))
+);
+check(
+  'una cortesía legacy (plan NULL) también se puede restar',
+  !modulosDisponibles(null, ['ENTREVISTAS']).includes('ENTREVISTAS') &&
+    modulosDisponibles(null, ['ENTREVISTAS']).length === TODOS_LOS_MODULOS.length - 1
+);
+check(
+  'un módulo desconocido se rechaza nombrándolo',
+  (() => {
+    const r = validarModulosDesactivados(['AUDIENCIAS', 'FACTURACION']);
+    return !r.ok && r.invalido === 'FACTURACION';
+  })()
+);
+check(
+  'algo que no es lista se rechaza',
+  !validarModulosDesactivados('AUDIENCIAS').ok && !validarModulosDesactivados(undefined).ok
+);
+check(
+  'la lista válida colapsa duplicados y sale en el orden del catálogo',
+  (() => {
+    const r = validarModulosDesactivados(['ORIENTACION', 'AUDIENCIAS', 'AUDIENCIAS']);
+    return r.ok && r.modulos.length === 2 && r.modulos[0] === 'AUDIENCIAS' && r.modulos[1] === 'ORIENTACION';
+  })()
+);
+check(
+  'moduloDisponible sobre la fila: PREMIUM con AUDIENCIAS restado no la tiene; sin restar, sí',
+  !moduloDisponible(
+    { plan: 'PREMIUM', period: 'MENSUAL', validUntil: null, maxUsers: 5, modulosDesactivados: ['AUDIENCIAS'] },
+    'AUDIENCIAS'
+  ) &&
+    moduloDisponible(
+      { plan: 'PREMIUM', period: 'MENSUAL', validUntil: null, maxUsers: 5, modulosDesactivados: [] },
+      'AUDIENCIAS'
+    )
+);
+
 // ─── Meses como Postgres ────────────────────────────────────────────────────
 check('31 de enero + 1 mes = 28 de febrero (no 3 de marzo)', iso(sumarMeses(dia('2027-01-31T10:00:00Z'), 1)) === '2027-02-28T10:00:00.000Z');
 check('29 de febrero bisiesto + 12 meses = 28 de febrero', iso(sumarMeses(dia('2028-02-29T00:00:00Z'), 12)) === '2029-02-28T00:00:00.000Z');
@@ -114,6 +168,7 @@ const fila = (parcial: Partial<PlanRow>): PlanRow => ({
   period: null,
   validUntil: null,
   maxUsers: null,
+  modulosDesactivados: [],
   ...parcial
 });
 

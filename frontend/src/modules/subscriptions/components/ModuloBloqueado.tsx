@@ -1,6 +1,7 @@
 import React from 'react';
 import { Lock } from 'lucide-react';
 import { usePlan } from '../PlanContext';
+import type { Modulo } from '../types';
 
 /**
  * Covers a whole module while the plan is expired.
@@ -24,13 +25,49 @@ import { usePlan } from '../PlanContext';
 interface ModuloBloqueadoProps {
   /** One sentence on what the lawyer can still do instead, in this module's terms. */
   quePuede: string;
+  /**
+   * The server-side module behind this screen. When given, the cover also
+   * closes a module the firm cannot use — not in the plan, or switched off for
+   * this firm by the operator — should the view be reached anyway (a stale
+   * tab, a deep link). The sidebar already hides it; this is the honest wall
+   * behind the hidden door, with the right remedy on it.
+   */
+  modulo?: Modulo;
   children: React.ReactNode;
 }
 
-export const ModuloBloqueado: React.FC<ModuloBloqueadoProps> = ({ quePuede, children }) => {
-  const { soloLectura, abrirPlan, puedePagar } = usePlan();
+type Cierre = 'VENCIDO' | 'DESACTIVADO' | 'NO_EN_PLAN' | null;
 
-  if (!soloLectura) return <>{children}</>;
+export const ModuloBloqueado: React.FC<ModuloBloqueadoProps> = ({ quePuede, modulo, children }) => {
+  const { plan, soloLectura, abrirPlan, puedePagar } = usePlan();
+
+  const cierre: Cierre = soloLectura
+    ? 'VENCIDO'
+    : modulo && plan && !plan.modulosPermitidos.includes(modulo)
+      ? plan.modulosDesactivados.includes(modulo)
+        ? 'DESACTIVADO'
+        : 'NO_EN_PLAN'
+      : null;
+
+  if (!cierre) return <>{children}</>;
+
+  /*
+   * Three closures, three remedies. A module the OPERATOR switched off is not
+   * reopened by any payment, so that wall must not offer «Renovar plan»: it
+   * says Soporte and nothing else, or the partner buys Premium for nothing.
+   */
+  const titulo =
+    cierre === 'VENCIDO'
+      ? 'Este módulo requiere un plan vigente'
+      : cierre === 'DESACTIVADO'
+        ? 'Este módulo no está habilitado para su firma'
+        : 'Este módulo no está incluido en su plan';
+  const texto =
+    cierre === 'VENCIDO'
+      ? quePuede
+      : cierre === 'DESACTIVADO'
+        ? 'Escríbanos por Soporte para activarlo.'
+        : 'Para usarlo, pase la firma a Premium o a Firma desde «Plan de la firma».';
 
   return (
     <div className="relative flex min-h-0 min-w-0 flex-1">
@@ -47,13 +84,15 @@ export const ModuloBloqueado: React.FC<ModuloBloqueadoProps> = ({ quePuede, chil
             <Lock className="h-5 w-5" />
           </span>
           <h2 id="modulo-bloqueado-titulo" className="text-[15px] font-semibold text-ink-900">
-            Este módulo requiere un plan vigente
+            {titulo}
           </h2>
-          <p className="text-[12.5px] leading-snug text-ink-500 [text-wrap:pretty]">{quePuede}</p>
-          <button type="button" onClick={abrirPlan} className="btn-primary btn-sm mt-1">
-            {puedePagar ? 'Renovar plan' : 'Ver plan'}
-          </button>
-          {!puedePagar && (
+          <p className="text-[12.5px] leading-snug text-ink-500 [text-wrap:pretty]">{texto}</p>
+          {cierre !== 'DESACTIVADO' && (
+            <button type="button" onClick={abrirPlan} className="btn-primary btn-sm mt-1">
+              {cierre === 'VENCIDO' ? (puedePagar ? 'Renovar plan' : 'Ver plan') : 'Ver planes'}
+            </button>
+          )}
+          {cierre === 'VENCIDO' && !puedePagar && (
             <p className="text-[11.5px] leading-snug text-ink-400">
               Solo un administrador de su firma puede renovarlo.
             </p>

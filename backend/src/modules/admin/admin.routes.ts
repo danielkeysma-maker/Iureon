@@ -20,6 +20,7 @@ import {
   listFirmsController,
   updateFirmController,
   updateFirmPlanController,
+  ajustarModulosController,
   suspenderFirmaController,
   eliminarFirmaController,
   restablecerContrasenaController,
@@ -59,6 +60,11 @@ router.get('/firms/:firmId', firmDetailController as any);
 router.post('/firms', createFirmController as any);
 router.patch('/firms/:firmId', updateFirmController as any);
 router.patch('/firms/:firmId/plan', updateFirmPlanController as any);
+/*
+ * Módulos por firma: el plan es la base y aquí se resta. El cuerpo trae la
+ * lista COMPLETA de lo que queda apagado, no un delta.
+ */
+router.patch('/firms/:firmId/modulos', ajustarModulosController as any);
 router.post('/firms/:firmId/suspender', suspenderFirmaController as any);
 router.post('/firms/:firmId/credits', addCreditsController as any);
 router.post('/firms/:firmId/users', addUserController as any);

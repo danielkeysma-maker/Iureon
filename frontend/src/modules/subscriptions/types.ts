@@ -39,7 +39,14 @@ export interface PlanDeFirma {
   /** Negative once expired; null when there is no expiry. */
   diasRestantes: number | null;
   usuarios: number;
+  /** In the plan AND not switched off for this firm by the operator. */
   modulosPermitidos: readonly Modulo[];
+  /**
+   * What the operator switched off for THIS firm above its plan. Kept apart
+   * so a closed door can say «no disponible para su firma» instead of «no
+   * incluido en su plan»: buying a bigger plan would not reopen it.
+   */
+  modulosDesactivados: readonly Modulo[];
   /**
    * Whether THIS session may open the 7-day trial of Esencial from the plan
    * screen: the firm never paid nor tried, has one seat, and the person has

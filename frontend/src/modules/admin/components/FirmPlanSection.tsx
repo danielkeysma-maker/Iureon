@@ -2,6 +2,7 @@ import React from 'react';
 import { Ban, CalendarClock } from 'lucide-react';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 import { adminApi, type FirmDetail } from '../admin.api';
+import { VISTA_POR_MODULO, navModule } from '../../tenant/navigation';
 
 /**
  * La sección «Plan» de la ficha de la firma (7b), con su formulario.
@@ -22,6 +23,18 @@ import { adminApi, type FirmDetail } from '../admin.api';
  *
  * LO QUE NO HACE: cobrar. Un pago lo hace la firma desde su propia pantalla,
  * por Wompi; operación no puede marcar un periodo como pagado.
+ *
+ * MÓDULOS DE ESTA FIRMA. El plan es la base y aquí se RESTA: un interruptor
+ * por módulo, apagado = «desactivado por el operador», y la firma lo ve como
+ * no disponible (no como «no incluido en el plan», que sería falso y la
+ * mandaría a comprar un plan que no cambia nada). Lo que el plan no incluye se
+ * muestra deshabilitado con su chip: para abrirlo se cambia el plan, no este
+ * interruptor. La lista de módulos y sus nombres salen de `VISTA_POR_MODULO`
+ * y `NAV_MODULES` —lo mismo que pinta la barra lateral—, nunca de una lista
+ * escrita aquí: un módulo nuevo aparece solo. Cada cambio manda la lista
+ * COMPLETA de lo apagado y queda en la auditoría de la firma como
+ * MODULOS_AJUSTADOS; el motivo es opcional (reactivar tras un pago no tiene
+ * nada que explicar).
  */
 
 type Plan = 'ESENCIAL' | 'PREMIUM' | 'FIRMA';
@@ -67,6 +80,180 @@ interface FirmPlanSectionProps {
   /** Tras guardar, la ficha se relee entera: el estado sale del servidor. */
   onGuardado: () => void;
 }
+
+/** Los módulos que la aplicación puede cerrar, con el nombre que usa la barra lateral. */
+const MODULOS_CONMUTABLES: ReadonlyArray<{ id: string; nombre: string }> = Object.entries(VISTA_POR_MODULO).map(
+  ([id, vista]) => ({ id, nombre: navModule(vista as NonNullable<typeof vista>).label })
+);
+
+type EstadoDeModulo = 'ACTIVO' | 'DESACTIVADO' | 'NO_EN_PLAN';
+
+/**
+ * Del servidor salen dos listas: lo permitido (plan menos resta) y la resta.
+ * Un módulo que no está en ninguna de las dos no lo trae el plan.
+ */
+const estadoDeModulo = (firma: FirmDetail, id: string): EstadoDeModulo =>
+  firma.modulosDesactivados.includes(id)
+    ? 'DESACTIVADO'
+    : firma.modulosPermitidos.includes(id)
+      ? 'ACTIVO'
+      : 'NO_EN_PLAN';
+
+interface ModulosDeLaFirmaProps {
+  firma: FirmDetail;
+  onGuardado: () => void;
+}
+
+const ModulosDeLaFirma: React.FC<ModulosDeLaFirmaProps> = ({ firma, onGuardado }) => {
+  const [confirmacion, setConfirmacion] = React.useState<Confirmacion | null>(null);
+  const [motivo, setMotivo] = React.useState('');
+  const [error, setError] = React.useState<string | null>(null);
+  const motivoRef = React.useRef('');
+  const mantenerAbiertoRef = React.useRef(false);
+
+  const nombrePlan = firma.plan ? NOMBRE_PLAN[firma.plan] : 'Cortesía';
+
+  const aplicar = async (id: string, apagar: boolean) => {
+    const actuales = new Set(firma.modulosDesactivados);
+    if (apagar) actuales.add(id);
+    else actuales.delete(id);
+    setError(null);
+    try {
+      await adminApi.ajustarModulos(firma.id, {
+        desactivados: [...actuales],
+        motivo: motivoRef.current.replace(/\s+/g, ' ').trim() || undefined
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudieron ajustar los módulos.');
+      mantenerAbiertoRef.current = true;
+      return;
+    }
+    setMotivo('');
+    motivoRef.current = '';
+    onGuardado();
+  };
+
+  const pedirConfirmacion = (id: string, nombre: string, apagar: boolean) => {
+    setError(null);
+    setMotivo('');
+    motivoRef.current = '';
+    setConfirmacion({
+      titulo: apagar ? `Desactivar ${nombre} para esta firma` : `Reactivar ${nombre} para esta firma`,
+      texto: '',
+      etiqueta: apagar ? 'Desactivar' : 'Reactivar',
+      peligro: apagar,
+      onConfirmar: () => aplicar(id, apagar)
+    });
+  };
+
+  return (
+    <div className="border-t border-line-200 px-4 py-3">
+      <h4 className="text-[12.5px] font-semibold text-ink-900">Módulos de esta firma</h4>
+      <p className="mt-0.5 text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
+        El plan es la base; aquí se resta para esta firma. La firma verá el módulo como no disponible.
+      </p>
+
+      <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+        {MODULOS_CONMUTABLES.map(({ id, nombre }) => {
+          const estado = estadoDeModulo(firma, id);
+          const encendido = estado === 'ACTIVO';
+          const enPlan = estado !== 'NO_EN_PLAN';
+          return (
+            <li
+              key={id}
+              className={`flex items-center justify-between gap-3 rounded-control border border-line-200 px-3 py-2 ${
+                enPlan ? 'bg-canvas' : 'bg-surface opacity-70'
+              }`}
+            >
+              <div className="min-w-0">
+                <p className="truncate text-[12px] font-medium text-ink-900">{nombre}</p>
+                {estado === 'DESACTIVADO' && (
+                  <span className="chip-unverified mt-1 inline-block">Desactivado por el operador</span>
+                )}
+                {estado === 'NO_EN_PLAN' && (
+                  <span className="chip-neutral mt-1 inline-block">No incluido en el plan {nombrePlan}</span>
+                )}
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={encendido}
+                aria-label={`${nombre}: ${encendido ? 'activo' : 'inactivo'} para esta firma`}
+                disabled={!enPlan}
+                title={enPlan ? undefined : `Para abrirlo, cambie el plan de la firma: ${nombrePlan} no lo incluye.`}
+                onClick={() => pedirConfirmacion(id, nombre, encendido)}
+                className={`relative h-5 w-9 shrink-0 rounded-full border transition-colors disabled:cursor-not-allowed ${
+                  encendido
+                    ? 'border-brand-700 bg-brand-700'
+                    : 'border-line-200 bg-line-100'
+                }`}
+              >
+                <span
+                  className={`absolute top-0.5 h-3.5 w-3.5 rounded-full bg-surface shadow transition-transform ${
+                    encendido ? 'left-0.5 translate-x-4' : 'left-0.5'
+                  }`}
+                />
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+
+      <ConfirmarDialog
+        confirmacion={
+          confirmacion && {
+            ...confirmacion,
+            texto: (
+              <div className="space-y-3">
+                <p>
+                  {confirmacion.peligro ? (
+                    <>
+                      La firma <b>{firma.name}</b> deja de ver este módulo en el acto: desaparece de su
+                      barra y su portada lo muestra como «No disponible para su firma». El plan no cambia y
+                      lo ya creado se conserva; usted lo reactiva desde aquí cuando corresponda.
+                    </>
+                  ) : (
+                    <>
+                      La firma <b>{firma.name}</b> vuelve a ver este módulo en el acto, tal como lo incluye su
+                      plan {nombrePlan}.
+                    </>
+                  )}
+                </p>
+                <label className="block text-[11px] text-ink-500">
+                  Motivo (opcional) · queda en la auditoría de la firma con su correo
+                  <input
+                    type="text"
+                    value={motivo}
+                    onChange={(e) => {
+                      setMotivo(e.target.value);
+                      motivoRef.current = e.target.value;
+                    }}
+                    placeholder={
+                      confirmacion.peligro
+                        ? 'Pago de Audiencias pendiente; acordado con el socio'
+                        : 'Pago recibido'
+                    }
+                    className="mt-1 w-full rounded-control border border-line-200 bg-canvas px-2 py-1.5 text-[12px] text-ink-900 focus:border-brand-700 focus:outline-none"
+                    autoFocus
+                  />
+                </label>
+                {error && <p className="text-[12px] text-danger">{error}</p>}
+              </div>
+            )
+          }
+        }
+        onCerrar={() => {
+          if (mantenerAbiertoRef.current) {
+            mantenerAbiertoRef.current = false;
+            return;
+          }
+          setConfirmacion(null);
+          setError(null);
+        }}
+      />
+    </div>
+  );
+};
 
 export const FirmPlanSection: React.FC<FirmPlanSectionProps> = ({ firma, onGuardado }) => {
   const [editando, setEditando] = React.useState(false);
@@ -290,6 +477,8 @@ export const FirmPlanSection: React.FC<FirmPlanSectionProps> = ({ firma, onGuard
           </div>
         </form>
       )}
+
+      <ModulosDeLaFirma firma={firma} onGuardado={onGuardado} />
 
       <ConfirmarDialog
         confirmacion={

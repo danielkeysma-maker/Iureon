@@ -155,18 +155,28 @@ export const modulosSinGrupo = (): MainView[] => {
 };
 
 /**
- * The views a plan can close, by the module name the server uses.
+ * The views a module closes, by the module name the server uses.
  *
- * ONLY THREE MODULES ARE PLAN-GATED — Audiencias, Entrevistas, Orientación —
- * and the server enforces the gate (403 PLAN_INSUFICIENTE); hiding them here
- * spares an ESENCIAL firm a door that opens onto a refusal. Everything else is
- * in every plan and never disappears, so a module with no entry in this map is
- * a module that is always shown. A NULL plan (cortesía) permits everything.
+ * The plan gates three of them — Audiencias, Entrevistas, Orientación — and the
+ * server enforces that gate (403 PLAN_INSUFICIENTE); hiding them spares an
+ * ESENCIAL firm a door that opens onto a refusal. The operator can ALSO switch
+ * any module off for one firm above its plan (`modulosDesactivados`), so every
+ * module with a view of its own is mapped here: the server already sends the
+ * list with the subtraction applied, and this map only turns module ids into
+ * doors. Manual, Soporte and Membrete are not here on purpose: the first two
+ * are how a firm asks for help, and Membrete is a section of Ajustes, not a
+ * view. A NULL list (server not answered) hides nothing.
  */
-const VISTA_POR_MODULO: Partial<Record<string, MainView>> = {
+export const VISTA_POR_MODULO: Partial<Record<string, MainView>> = {
+  REDACCION: 'workspace',
+  BORRADORES: 'borradores',
+  REVISIONES: 'taller',
+  ORIENTACION: 'orientacion',
   AUDIENCIAS: 'audiencias',
   ENTREVISTAS: 'entrevistas',
-  ORIENTACION: 'orientacion'
+  BUSCADOR: 'search',
+  CATALOGO: 'catalogo',
+  HERRAMIENTAS: 'tools'
 };
 
 export const vistasOcultasPorPlan = (modulosPermitidos: readonly string[] | null): MainView[] => {
@@ -175,6 +185,10 @@ export const vistasOcultasPorPlan = (modulosPermitidos: readonly string[] | null
     .filter(([modulo]) => !modulosPermitidos.includes(modulo))
     .map(([, vista]) => vista as MainView);
 };
+
+/** The server-side module id behind a view, or null for views no module gates. */
+export const moduloDeVista = (vista: MainView): string | null =>
+  Object.entries(VISTA_POR_MODULO).find(([, v]) => v === vista)?.[0] ?? null;
 
 /**
  * Falls back instead of throwing: reading `.icon` off an unknown view is what

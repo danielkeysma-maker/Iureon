@@ -24,6 +24,10 @@ export interface FirmSummary {
   planPeriod: 'MENSUAL' | 'ANUAL' | 'PRUEBA' | 'CORTESIA' | null;
   planValidUntil: string | null;
   planMaxUsers: number | null;
+  /** Lo que operación le restó a esta firma por encima del plan. Vacío = el plan manda entero. */
+  modulosDesactivados: readonly string[];
+  /** En el plan Y no restado: lo que la firma ve de verdad. */
+  modulosPermitidos: readonly string[];
   status: string;
   creditsBalance: number;
   createdAt: string;
@@ -177,6 +181,17 @@ export const adminApi = {
     }
   ) =>
     httpClient.patch<{ success: boolean }>(`/api/admin/firms/${firmId}/plan`, { body: input }),
+
+  /*
+   * Módulos por firma: el plan es la base y aquí se resta. Se manda la lista
+   * COMPLETA de lo que queda apagado, no un delta; el servidor rechaza un id
+   * que no esté en el catálogo (INVALID_MODULE) y devuelve la ficha releída.
+   */
+  ajustarModulos: (firmId: string, input: { desactivados: string[]; motivo?: string }) =>
+    httpClient.patch<{ success: boolean; modulosDesactivados: string[]; firm: FirmDetail }>(
+      `/api/admin/firms/${firmId}/modulos`,
+      { body: input }
+    ),
 
   /** Cuts the firm's access now (plan_valid_until = now); the plan form reactivates it. */
   suspenderFirma: (firmId: string, motivo: string) =>

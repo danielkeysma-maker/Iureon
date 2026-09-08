@@ -9,10 +9,11 @@ import {
   Wallet
 } from 'lucide-react';
 import type { MainView } from '../../tenant/types';
+import { moduloDeVista } from '../../tenant/navigation';
 import type { SavedDraftEntry } from '../../documents/types';
 import { reviewApi, type RevisionGuardada } from '../../workspace/services/review.api';
 import { usePlan } from '../../subscriptions/PlanContext';
-import { ETIQUETA_DE_PERIODO, NOMBRE_DE_PLAN } from '../../subscriptions/types';
+import { ETIQUETA_DE_PERIODO, NOMBRE_DE_PLAN, type Modulo } from '../../subscriptions/types';
 import { NOVEDADES } from '../../help/content/novedades';
 import { TarjetaDeAccion } from './TarjetaDeAccion';
 import { fechaCorta, fechaLarga, nombreParaSaludar, saludoSegunHora } from '../saludo';
@@ -101,6 +102,18 @@ export const InicioView: React.FC<InicioViewProps> = ({
   const { plan, abrirPlan } = usePlan();
   const ahora = React.useMemo(() => new Date(), []);
 
+  /*
+   * A closed door says why. The sidebar hides the view either way; here the
+   * chip must distinguish «the plan does not include it» from «the operator
+   * switched it off for this firm», because the remedies differ.
+   */
+  const motivoDePuertaCerrada = (vista: MainView): string => {
+    const modulo = moduloDeVista(vista);
+    return modulo && plan?.modulosDesactivados.includes(modulo as Modulo)
+      ? 'No disponible para su firma'
+      : 'No incluido en su plan';
+  };
+
   /* The latest reviews, with the same call the Revisiones module makes. */
   const [revisiones, setRevisiones] = React.useState<RevisionGuardada[] | null>(null);
   const [revisionesFallaron, setRevisionesFallaron] = React.useState(false);
@@ -179,6 +192,7 @@ export const InicioView: React.FC<InicioViewProps> = ({
             queHace="El primer borrador de una actuación del catálogo, con su término y su fuente."
             onClick={() => onIr('workspace')}
             noIncluida={ocultas.includes('workspace')}
+            motivoNoIncluida={motivoDePuertaCerrada('workspace')}
           />
           <TarjetaDeAccion
             icono={ClipboardCheck}
@@ -186,6 +200,7 @@ export const InicioView: React.FC<InicioViewProps> = ({
             queHace="Un informe sobre un escrito ya redactado, y el taller para corregirlo."
             onClick={() => onIr('taller')}
             noIncluida={ocultas.includes('taller')}
+            motivoNoIncluida={motivoDePuertaCerrada('taller')}
           />
           <TarjetaDeAccion
             icono={Mic}
@@ -193,6 +208,7 @@ export const InicioView: React.FC<InicioViewProps> = ({
             queHace="El transcrito de una grabación, con cada interlocutor separado, y su acta."
             onClick={() => onIr('audiencias')}
             noIncluida={ocultas.includes('audiencias')}
+            motivoNoIncluida={motivoDePuertaCerrada('audiencias')}
           />
         </div>
 

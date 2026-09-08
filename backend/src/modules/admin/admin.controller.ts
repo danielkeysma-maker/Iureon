@@ -11,6 +11,8 @@ import {
   updateFirm,
   updateFirmPlan,
   suspenderAccesoDeFirma,
+  ajustarModulosDeFirma,
+  describirAjusteDeModulos,
   describirCambioDePlan,
   eliminarFirmaCompleta,
   restablecerContrasenaDeUsuario
@@ -200,6 +202,34 @@ export const suspenderFirmaController = async (req: Request, res: Response): Pro
     res.json({ success: true, plan: cambio });
   } catch (err) {
     fail(res, err, 'No se pudo suspender el acceso de la firma.');
+  }
+};
+
+/**
+ * PATCH /api/admin/firms/:firmId/modulos — switches modules off/on for one firm.
+ *
+ * Body `{ desactivados: string[], motivo?: string }`: the complete list of what
+ * stays off. Audited as MODULOS_AJUSTADOS in the firm's own trail with the
+ * resulting list. Answers the refreshed ficha: the switches redraw from what
+ * the server holds, never from what the screen assumed it sent.
+ */
+export const ajustarModulosController = async (req: Request, res: Response): Promise<void> => {
+  const firmId = String(req.params.firmId);
+
+  try {
+    const cambio = await ajustarModulosDeFirma(firmId, req.body?.desactivados, req.body?.motivo ?? req.body?.reason);
+
+    await auditService.record({
+      firmId,
+      userEmail: req.user!.email,
+      action: 'MODULOS_AJUSTADOS',
+      resource: describirAjusteDeModulos(cambio),
+      ipAddress: callerIp(req)
+    });
+
+    res.json({ success: true, modulosDesactivados: cambio.desactivados, firm: await getFirmDetail(firmId) });
+  } catch (err) {
+    fail(res, err, 'No se pudieron ajustar los módulos de la firma.');
   }
 };
 

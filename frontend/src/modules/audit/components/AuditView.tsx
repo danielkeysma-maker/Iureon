@@ -64,6 +64,7 @@ export const ACCIONES: Record<string, string> = {
   PLAN_PAGADO: 'Pagó el plan',
   PLAN_ACTUALIZADO: 'Operación fijó el plan',
   PLAN_SUSPENDIDO: 'Operación suspendió el acceso',
+  MODULOS_AJUSTADOS: 'Operación ajustó los módulos de la firma',
   CLAVE_RESTABLECIDA_POR_OPERADOR: 'Operación restableció una contraseña',
   FIRMA_ELIMINADA: 'Operación eliminó una firma',
   USUARIO_ELIMINADO_POR_SI_MISMO: 'Eliminó su propio usuario',
@@ -76,7 +77,7 @@ const VISTAS: Array<{ etiqueta: string; acciones: string[] }> = [
   { etiqueta: 'Cambios en el catálogo', acciones: ['CATALOG_TERM_VERIFIED'] },
   { etiqueta: 'Transcripciones', acciones: ['TRANSCRIPTION_CREATED', 'TRANSCRIPTION_DELETED', 'ACTA_LISTA'] },
   { etiqueta: 'Decisiones de entrevista', acciones: ['INTERVIEW_DECIDED'] },
-  { etiqueta: 'Saldo y firma', acciones: ['FIRM_CREDITS_ADDED', 'FIRM_UPDATED', 'FIRM_STATUS_CHANGED', 'PLAN_PAGADO', 'PLAN_ACTUALIZADO', 'PLAN_SUSPENDIDO', 'TRIAL_STARTED', 'REGISTRO_PARA_COMPRA', 'EMAIL_SENT'] }
+  { etiqueta: 'Saldo y firma', acciones: ['FIRM_CREDITS_ADDED', 'FIRM_UPDATED', 'FIRM_STATUS_CHANGED', 'PLAN_PAGADO', 'PLAN_ACTUALIZADO', 'PLAN_SUSPENDIDO', 'MODULOS_AJUSTADOS', 'TRIAL_STARTED', 'REGISTRO_PARA_COMPRA', 'EMAIL_SENT'] }
 ];
 
 const fechaHora = (iso: string): { fecha: string; hora: string } => {

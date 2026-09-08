@@ -54,11 +54,11 @@ const vence = vencimientoDePrueba(ahora);
 check('vence exactamente 7 días después, a la misma hora', vence.toISOString() === '2026-09-12T15:00:00.000Z');
 check(
   'la firma de prueba entra POR_VENCER desde el primer día (la franja cuenta regresiva)',
-  estadoDelPlan({ plan: 'ESENCIAL', period: 'PRUEBA', validUntil: vence, maxUsers: 1 }, ahora) === 'POR_VENCER'
+  estadoDelPlan({ plan: 'ESENCIAL', period: 'PRUEBA', validUntil: vence, maxUsers: 1, modulosDesactivados: [] }, ahora) === 'POR_VENCER'
 );
 check(
   'y queda VENCIDO al cumplirse el plazo',
-  estadoDelPlan({ plan: 'ESENCIAL', period: 'PRUEBA', validUntil: vence, maxUsers: 1 }, vence) === 'VENCIDO'
+  estadoDelPlan({ plan: 'ESENCIAL', period: 'PRUEBA', validUntil: vence, maxUsers: 1, modulosDesactivados: [] }, vence) === 'VENCIDO'
 );
 check('la ventana por dirección empieza 24 h atrás', inicioDeVentana(ahora).toISOString() === '2026-09-04T15:00:00.000Z');
 check('con 2 altas cabe la tercera; con 3 no', cabeOtraPruebaDesdeIp(2) && !cabeOtraPruebaDesdeIp(3));
@@ -129,7 +129,7 @@ check('el honeypot gana al plan: se rechaza antes de mirar modo o plan', (() => 
 // y el pago la activa desde ahora (periodoQueCompra parte de GREATEST).
 check(
   'una firma comprada nace VENCIDA (solo lectura hasta el primer pago)',
-  estadoDelPlan({ plan: 'PREMIUM', period: 'MENSUAL', validUntil: ahora, maxUsers: 5 }, ahora) === 'VENCIDO'
+  estadoDelPlan({ plan: 'PREMIUM', period: 'MENSUAL', validUntil: ahora, maxUsers: 5, modulosDesactivados: [] }, ahora) === 'VENCIDO'
 );
 check('cada plan comprado trae su tope de usuarios del catálogo', PLANES.ESENCIAL.maxUsuarios === 1 && PLANES.PREMIUM.maxUsuarios === 5 && PLANES.FIRMA.maxUsuarios === 15);
 

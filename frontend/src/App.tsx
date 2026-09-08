@@ -1126,7 +1126,7 @@ export function App() {
               contenedor se llevaba todo el ancho disponible y dejaba el lienzo
               del documento reducido a una franja en blanco.
             */
-            <ModuloBloqueado quePuede="Los escritos ya guardados siguen en Borradores: puede abrirlos, leerlos y exportarlos a Word o PDF.">
+            <ModuloBloqueado modulo="REDACCION" quePuede="Los escritos ya guardados siguen en Borradores: puede abrirlos, leerlos y exportarlos a Word o PDF.">
             <div data-visita="vista-workspace" className="flex min-h-0 min-w-0 flex-1 flex-col">
               {/*
                 DOS BARRAS DE CONFIGURACION, UNA POR TAMAÑO. La de escritorio son
@@ -1303,7 +1303,7 @@ export function App() {
           )}
 
           {mainView === 'audiencias' && (
-            <ModuloBloqueado quePuede="Las actas ya exportadas siguen en sus archivos; las audiencias transcritas vuelven a estar disponibles en cuanto renueve.">
+            <ModuloBloqueado modulo="AUDIENCIAS" quePuede="Las actas ya exportadas siguen en sus archivos; las audiencias transcritas vuelven a estar disponibles en cuanto renueve.">
             <TranscriptionView
               kind="AUDIENCIA"
               /*
@@ -1328,7 +1328,7 @@ export function App() {
           */}
           {mainView === 'entrevistas' && (
             <div className="flex min-h-0 flex-1 lg:hidden">
-              <ModuloBloqueado quePuede="Las entrevistas ya transcritas se conservan y vuelven a estar disponibles en cuanto renueve.">
+              <ModuloBloqueado modulo="ENTREVISTAS" quePuede="Las entrevistas ya transcritas se conservan y vuelven a estar disponibles en cuanto renueve.">
                 <InterviewMobileView />
               </ModuloBloqueado>
             </div>
@@ -1336,7 +1336,7 @@ export function App() {
 
           {mainView === 'entrevistas' && (
             <div className="hidden min-h-0 flex-1 lg:flex">
-            <ModuloBloqueado quePuede="Las entrevistas ya transcritas se conservan y vuelven a estar disponibles en cuanto renueve.">
+            <ModuloBloqueado modulo="ENTREVISTAS" quePuede="Las entrevistas ya transcritas se conservan y vuelven a estar disponibles en cuanto renueve.">
             <InterviewView
               onPrivacidad={() => setMainView('privacidad')}
               /*
@@ -1367,7 +1367,7 @@ export function App() {
             aparezca. Los filtros se recogen en una hoja con su contador.
           */}
           {mainView === 'search' && (
-            <ModuloBloqueado quePuede="La jurisprudencia ya citada en sus escritos sigue en cada borrador guardado.">
+            <ModuloBloqueado modulo="BUSCADOR" quePuede="La jurisprudencia ya citada en sus escritos sigue en cada borrador guardado.">
               <div className="flex min-h-0 flex-1 lg:hidden">
                 <SearchMobileView />
               </div>
