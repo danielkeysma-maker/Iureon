@@ -13,6 +13,7 @@ import { moduloDeVista } from '../../tenant/navigation';
 import type { SavedDraftEntry } from '../../documents/types';
 import { reviewApi, type RevisionGuardada } from '../../workspace/services/review.api';
 import { usePlan } from '../../subscriptions/PlanContext';
+import { useTenant } from '../../tenant/TenantContext';
 import { ETIQUETA_DE_PERIODO, NOMBRE_DE_PLAN, type Modulo } from '../../subscriptions/types';
 import { NOVEDADES } from '../../help/content/novedades';
 import { TarjetaDeAccion } from './TarjetaDeAccion';
@@ -100,6 +101,9 @@ export const InicioView: React.FC<InicioViewProps> = ({
   visita
 }) => {
   const { plan, abrirPlan } = usePlan();
+  // El nombre guardado, para el saludo. Vacío deja el derivado del correo de
+  // siempre: mejor un saludo aproximado que un saludo sin nadie.
+  const { currentUserName } = useTenant();
   const ahora = React.useMemo(() => new Date(), []);
 
   /*
@@ -158,7 +162,7 @@ export const InicioView: React.FC<InicioViewProps> = ({
         {/* ─── SALUDO ─────────────────────────────────────────────────────── */}
         <header>
           <h1 className="text-title text-ink-900">
-            {saludoSegunHora(ahora)}, {nombreParaSaludar(correo)}
+            {saludoSegunHora(ahora)}, {nombreParaSaludar(correo, currentUserName)}
           </h1>
           <p className="mt-1 text-meta text-ink-500">
             {firma ? `${firma} · ` : ''}

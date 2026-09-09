@@ -4,6 +4,8 @@ import { httpClient } from '../../../config/httpClient';
 export interface UsuarioDeFirma {
   id: string;
   email: string;
+  /** Su nombre, si lo puso. null mientras no lo ponga: la lista muestra el correo. */
+  nombre: string | null;
   role: 'FIRM_ADMIN' | 'LAWYER' | 'SUPER_ADMIN';
   creadoEl: string;
   /** null si nunca ha entrado — información, no un hueco. */
@@ -27,10 +29,20 @@ export const firmUsersApi = {
     return r.users;
   },
 
-  /** Crea la cuenta de verdad, con contraseña. El rol nunca puede ser SUPER_ADMIN. */
-  async crear(email: string, password: string, role: 'FIRM_ADMIN' | 'LAWYER'): Promise<void> {
+  /**
+   * Crea la cuenta de verdad, con contraseña. El rol nunca puede ser SUPER_ADMIN.
+   *
+   * `nombre` es OPCIONAL a propósito: un socio no siempre sabe cómo escribe su
+   * colega el propio nombre, y la persona lo pone después desde Ajustes.
+   */
+  async crear(
+    email: string,
+    password: string,
+    role: 'FIRM_ADMIN' | 'LAWYER',
+    nombre?: string
+  ): Promise<void> {
     const r = await httpClient.post<{ success: boolean; message?: string }>('/api/auth/users', {
-      body: { email, password, role }
+      body: { email, password, role, nombre: nombre?.trim() || undefined }
     });
     if (!r.success) throw new Error(r.message ?? 'No se pudo crear la cuenta.');
   },

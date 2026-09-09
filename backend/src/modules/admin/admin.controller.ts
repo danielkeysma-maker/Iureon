@@ -71,6 +71,7 @@ export const createFirmController = async (req: Request, res: Response): Promise
       nit: typeof req.body.nit === 'string' ? req.body.nit : '',
       adminEmail: String(req.body.adminEmail ?? ''),
       adminPassword: String(req.body.adminPassword ?? ''),
+      adminNombre: typeof req.body.adminNombre === 'string' ? req.body.adminNombre : undefined,
       initialCredits: Number(req.body.initialCredits ?? 0)
     });
 
@@ -242,6 +243,7 @@ export const addUserController = async (req: Request, res: Response): Promise<vo
       email: String(req.body.email ?? ''),
       password: String(req.body.password ?? ''),
       role: req.body.role === 'FIRM_ADMIN' ? 'FIRM_ADMIN' : 'LAWYER',
+      nombre: typeof req.body.nombre === 'string' ? req.body.nombre : undefined,
       reason: req.body.reason
     });
 

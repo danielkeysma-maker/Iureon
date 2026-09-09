@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { bloquearSiPlanVencido } from '../subscriptions/planVigente.middleware';
 import {
+  actualizarMiNombreController,
   addUserController,
   eliminarMiUsuarioController,
   listUsersController,
@@ -34,6 +35,9 @@ export const authPublicRoutes = publicRouter;
 const router = Router();
 
 router.get('/auth/me', meController as any);
+// Sin bloquearSiPlanVencido: poner su nombre no es usar el producto, y una
+// firma con el plan vencido sigue teniendo derecho a corregir quién es quién.
+router.patch('/auth/me', actualizarMiNombreController as any);
 // Without bloquearSiPlanVencido: leaving must work exactly when the plan ran out.
 router.delete('/auth/me', eliminarMiUsuarioController as any);
 router.get('/auth/users', listUsersController as any);

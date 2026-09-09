@@ -38,6 +38,8 @@ jobs:
         run: npm run check:admin-reglas
       - name: Self-service deletion rules (last user, last administrator, operator, typed firm name)
         run: npm run check:borrado
+      - name: Person name rules (2-80 characters, trimmed, never empty)
+        run: npm run check:nombre
       - name: Firm-defined actuaciones (slug, shadowing the catalogue, no term without source)
         run: npm run check:actuaciones-firma
       - name: Transactional mail (templates, subjects, cuenta de cobro PDF)

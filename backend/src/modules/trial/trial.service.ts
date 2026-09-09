@@ -143,6 +143,10 @@ export const registrarFirma = async (
     nit: datos.nit,
     adminEmail: datos.correo,
     adminPassword: datos.contrasena,
+    // El nombre que el visitante ya escribió en el formulario público. Hasta
+    // ahora solo llegaba a la auditoría y al correo de bienvenida: la cuenta
+    // nacía sin nombre y la aplicación tenía que adivinarlo del correo.
+    adminNombre: datos.nombre,
     initialCredits: 0,
     plan,
     period: esCompra ? 'MENSUAL' : 'PRUEBA',

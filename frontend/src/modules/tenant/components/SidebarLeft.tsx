@@ -94,18 +94,6 @@ const guardarColapsado = (colapsado: boolean): void => {
   }
 };
 
-/**
- * Las iniciales del chip de usuario, sacadas del correo: «daniel.ma@…» → «DM»,
- * «ana@…» → «AN». La sesión no trae nombre, solo correo; «US» si tampoco hay correo.
- */
-const inicialesDe = (correo: string): string => {
-  const local = correo.split('@')[0] ?? '';
-  const partes = local.split(/[._\-+]+/).filter(Boolean);
-  const letras =
-    partes.length >= 2 ? partes[0][0] + partes[1][0] : (partes[0] ?? '').slice(0, 2);
-  return letras ? letras.toUpperCase() : 'US';
-};
-
 /** «$14k» para la ficha del riel: caben cuatro caracteres, no «$14.000». */
 const saldoCompacto = (n: number): string => {
   if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`;
@@ -197,11 +185,18 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
   const [isCollapsed, setIsCollapsed] = useState<boolean>(leerColapsado);
   const [administrarAbierto, setAdministrarAbierto] = useState(false);
   const novedadesNuevas = useNovedadesNuevas();
-  const { currentUserEmail } = useTenant();
+  const { currentUserEmail, currentUserName } = useTenant();
   const { plan } = usePlan();
 
   const indices = useMemo(() => indicesDeNavegacion(ocultas), [ocultas]);
-  const iniciales = inicialesDe(currentUserEmail);
+  /*
+   * QUIÉN ESTÁ TRABAJANDO, bajo la marca. Antes aquí iba un chip con dos
+   * iniciales SACADAS DEL CORREO, porque la aplicación no guardaba un nombre;
+   * ahora sí lo guarda y se escribe entero. Mientras una cuenta no tenga
+   * nombre se muestra su correo, que es verdad y no lo inventa nadie —jamás
+   * un nombre deducido de la parte local, que es como salía «Ingdanielma».
+   */
+  const quienTrabaja = currentUserName || currentUserEmail;
   const saldo = activeFirm.creditsBalance ?? 0;
   const saldoTexto = `$${saldo.toLocaleString('es-CO')}`;
   const nota = notaDelPlan(plan);
@@ -350,28 +345,34 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
           type="button"
           onClick={onInicio ?? (() => setMainView('inicio'))}
           data-visita="marca"
-          title="Ir al inicio"
+          title={currentUserEmail ? `Ir al inicio · ${currentUserEmail}` : 'Ir al inicio'}
           aria-label="Ir al inicio"
           className={`flex min-w-0 cursor-pointer items-center gap-[11px] rounded-control transition-opacity hover:opacity-80 ${
             isCollapsed ? 'justify-center' : 'flex-1'
           }`}
         >
           <IureonMark size={30} className="shrink-0" />
+          {/*
+            APILADO, NO EN FILA. En el riel de 258px la cabecera ya gasta 77
+            entre márgenes, logo y separación: «Iureon» y un nombre corriente
+            uno al lado del otro no caben sin cortar el segundo. Apilados,
+            el nombre dispone de la línea entera y «Iureon» conserva su
+            tamaño. El correo va en el título, que es donde se mira cuando
+            hace falta comprobar con qué cuenta se entró.
+          */}
           {!isCollapsed && (
-            <span className="whitespace-nowrap text-[19px] font-semibold tracking-[-0.02em] text-rail-ink">
-              Iureon
+            <span className="flex min-w-0 flex-col items-start leading-none">
+              <span className="whitespace-nowrap text-[19px] font-semibold tracking-[-0.02em] text-rail-ink">
+                Iureon
+              </span>
+              {quienTrabaja && (
+                <span className="mt-[3px] max-w-full truncate text-[11.5px] text-rail-muted">
+                  {quienTrabaja}
+                </span>
+              )}
             </span>
           )}
         </button>
-        {!isCollapsed && (
-          <span
-            title={currentUserEmail || 'Sesión'}
-            aria-label={currentUserEmail ? `Sesión de ${currentUserEmail}` : 'Sesión'}
-            className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-[11px] border border-rail-ink/10 bg-rail-surface text-[11px] font-semibold text-rail-ink-soft"
-          >
-            {iniciales}
-          </span>
-        )}
       </div>
 
       {/* ─── CONTEXTO: LA FIRMA ────────────────────────────────────────────

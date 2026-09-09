@@ -26,10 +26,21 @@ export const fechaLarga = (ahora: Date): string => {
 };
 
 /**
- * Who to greet. The session carries only the email, so the part before the
- * «@» is used when it reads like a name; a bare address is greeted as is.
+ * A quién saludar.
+ *
+ * EL NOMBRE GUARDADO MANDA. La cuenta ya puede tener uno —lo pone la persona
+ * en Ajustes → «Su cuenta», o llega del formulario público de registro—, y ese
+ * es el único que alguien eligió de verdad.
+ *
+ * Sin nombre se conserva lo de siempre: la parte anterior a la «@» cuando se
+ * lee como un nombre, y la dirección entera cuando no. No es exacto —de
+ * «ingdanielma@…» sale «Ingdanielma»— pero un saludo vacío es peor, y ahora
+ * hay dónde corregirlo.
  */
-export const nombreParaSaludar = (correo: string): string => {
+export const nombreParaSaludar = (correo: string, nombre?: string | null): string => {
+  const guardado = (nombre ?? '').trim();
+  if (guardado) return guardado;
+
   const local = correo.split('@')[0] ?? '';
   if (!local || /\d{3,}/.test(local)) return correo;
   return local

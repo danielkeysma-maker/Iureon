@@ -5,6 +5,16 @@ interface TenantContextValue {
   activeFirm: LawFirmTenant;
   currentUserEmail: string;
   /**
+   * El nombre que la persona guardó, o '' si todavía no puso ninguno.
+   *
+   * Vacío NO se rellena con nada derivado del correo: quien lo necesite para
+   * saludar decide qué hacer con el hueco, y la barra prefiere no escribir un
+   * nombre que nadie eligió.
+   */
+  currentUserName: string;
+  /** Lo llama Ajustes tras guardar, para que la barra y el saludo cambien ya. */
+  setCurrentUserName: (nombre: string) => void;
+  /**
    * The firm this session belongs to.
    *
    * It no longer travels to the server — the token carries it — so this is for
@@ -20,6 +30,8 @@ const TenantContext = createContext<TenantContextValue | null>(null);
 interface TenantProviderProps {
   activeFirm: LawFirmTenant;
   currentUserEmail: string;
+  currentUserName: string;
+  setCurrentUserName: (nombre: string) => void;
   children: React.ReactNode;
 }
 
@@ -31,11 +43,13 @@ interface TenantProviderProps {
 export const TenantProvider: React.FC<TenantProviderProps> = ({
   activeFirm,
   currentUserEmail,
+  currentUserName,
+  setCurrentUserName,
   children
 }) => {
   const value = useMemo(
-    () => ({ activeFirm, currentUserEmail, firmId: activeFirm.id }),
-    [activeFirm, currentUserEmail]
+    () => ({ activeFirm, currentUserEmail, currentUserName, setCurrentUserName, firmId: activeFirm.id }),
+    [activeFirm, currentUserEmail, currentUserName, setCurrentUserName]
   );
 
   return <TenantContext.Provider value={value}>{children}</TenantContext.Provider>;

@@ -209,7 +209,11 @@ export const adminApi = {
   suspenderFirma: (firmId: string, motivo: string) =>
     httpClient.post<{ success: boolean }>(`/api/admin/firms/${firmId}/suspender`, { body: { motivo } }),
 
-  addUser: (firmId: string, input: { email: string; password: string; role: 'FIRM_ADMIN' | 'LAWYER' }) =>
+  /** `nombre` es opcional: quien da de alta no siempre sabe cómo lo escribe la persona. */
+  addUser: (
+    firmId: string,
+    input: { email: string; password: string; role: 'FIRM_ADMIN' | 'LAWYER'; nombre?: string }
+  ) =>
     httpClient.post<{ user: { id: string; email: string } }>(`/api/admin/firms/${firmId}/users`, {
       body: input
     }),

@@ -1,5 +1,6 @@
 import { supabase, supabaseAuth } from '../../config/supabase.config';
 import { validarBorradoDePropioUsuario } from './borrado.rules';
+import { validarNombre, validarNombreOpcional } from './nombre.rules';
 import { describirPlan, leerPlan } from '../subscriptions/plan.service';
 
 /**
@@ -35,6 +36,13 @@ export interface AuthenticatedUser {
   email: string;
   firmId: string;
   role: FirmUserRole;
+  /**
+   * El nombre de la persona, tal como ella lo escribió, o null si todavía no
+   * lo ha puesto. Vive en `user_metadata` —la mitad que el propio usuario
+   * edita con su sesión—, nunca en `app_metadata`: un nombre es una etiqueta,
+   * no un permiso, y no debe compartir vivienda con la firma y el rol.
+   */
+  nombre: string | null;
 }
 
 export interface Session {
@@ -111,7 +119,10 @@ export const userFromToken = async (accessToken: string): Promise<AuthenticatedU
 
   const role = (metadata.role as FirmUserRole) ?? 'LAWYER';
 
-  return { id: data.user.id, email: data.user.email ?? '', firmId, role };
+  const propios = (data.user.user_metadata ?? {}) as Record<string, unknown>;
+  const nombre = typeof propios.nombre === 'string' && propios.nombre.trim() ? propios.nombre.trim() : null;
+
+  return { id: data.user.id, email: data.user.email ?? '', firmId, role, nombre };
 };
 
 /** Exchanges e-mail and password for a session. */
@@ -189,8 +200,8 @@ export const refreshSession = async (refreshToken: string): Promise<Session> => 
  */
 export const addUserToFirm = async (
   firmId: string,
-  input: { email: string; password: string; role: FirmUserRole }
-): Promise<{ id: string; email: string }> => {
+  input: { email: string; password: string; role: FirmUserRole; nombre?: string }
+): Promise<{ id: string; email: string; nombre: string | null }> => {
   const client = requireSupabase();
   const email = input.email.trim().toLowerCase();
 
@@ -198,11 +209,19 @@ export const addUserToFirm = async (
     throw new AuthError('WEAK_PASSWORD', 'La contraseña debe tener al menos 8 caracteres.');
   }
 
+  /*
+   * El nombre es OPCIONAL aquí y va en `user_metadata`. Una cuenta puede nacer
+   * sin él —el socio que da de alta a un colega no siempre sabe cómo escribe
+   * esa persona su propio nombre— y la persona lo pone después desde Ajustes.
+   */
+  const nombre = validarNombreOpcional(input.nombre);
+
   const { data: created, error } = await client.auth.admin.createUser({
     email,
     password: input.password,
     email_confirm: true,
-    app_metadata: { firm_id: firmId, role: input.role }
+    app_metadata: { firm_id: firmId, role: input.role },
+    user_metadata: nombre ? { nombre } : {}
   });
 
   if (error || !created.user) {
@@ -214,13 +233,52 @@ export const addUserToFirm = async (
     );
   }
 
-  return { id: created.user.id, email: created.user.email ?? email };
+  return { id: created.user.id, email: created.user.email ?? email, nombre: nombre ?? null };
+};
+
+/**
+ * PATCH /api/auth/me — la persona fija su propio nombre.
+ *
+ * Se escribe con la API admin y no con la sesión del usuario por una razón de
+ * arquitectura, no de poder: este backend no sostiene un cliente de Supabase
+ * por petición, y `updateUser` sobre el cliente compartido lo haría cambiar de
+ * identidad, que es el defecto que separó `supabaseAuth` de `supabase`. El
+ * alcance sigue siendo el de la sesión: SOLO el `userId` del token, que el
+ * controlador toma de `req.user` y nunca del cuerpo.
+ *
+ * Se preserva el resto de `user_metadata`: `updateUserById` reemplaza el
+ * objeto entero, así que escribir `{ nombre }` a secas borraría cualquier otra
+ * preferencia que viva ahí.
+ */
+export const actualizarMiNombre = async (
+  user: AuthenticatedUser,
+  raw: unknown
+): Promise<string> => {
+  const client = requireSupabase();
+  const nombre = validarNombre(raw);
+
+  const { data: actual, error: lecturaError } = await client.auth.admin.getUserById(user.id);
+  if (lecturaError || !actual.user) {
+    throw new AuthError('USER_NOT_FOUND', 'No se encontró su cuenta.', 404);
+  }
+
+  const { error } = await client.auth.admin.updateUserById(user.id, {
+    user_metadata: { ...((actual.user.user_metadata ?? {}) as Record<string, unknown>), nombre }
+  });
+
+  if (error) {
+    throw new AuthError('USER_UPDATE_FAILED', 'No se pudo guardar su nombre.', 502);
+  }
+
+  return nombre;
 };
 
 /** Un usuario de la firma, como lo administra un socio. */
 export interface UsuarioDeFirma {
   id: string;
   email: string;
+  /** Su nombre, si lo puso; null si todavía no. La lista muestra el correo igual. */
+  nombre: string | null;
   role: FirmUserRole;
   creadoEl: string;
   /** null si nunca ha entrado — que es informacion, no un hueco. */
@@ -246,6 +304,11 @@ export const listFirmUsers = async (firmId: string): Promise<UsuarioDeFirma[]> =
     .map((u) => ({
       id: u.id,
       email: u.email ?? '',
+      nombre:
+        typeof (u.user_metadata as Record<string, unknown>)?.nombre === 'string' &&
+        String((u.user_metadata as Record<string, unknown>).nombre).trim()
+          ? String((u.user_metadata as Record<string, unknown>).nombre).trim()
+          : null,
       role: ((u.app_metadata as Record<string, unknown>)?.role as FirmUserRole) ?? 'LAWYER',
       creadoEl: u.created_at,
       ultimoAcceso: u.last_sign_in_at ?? null,

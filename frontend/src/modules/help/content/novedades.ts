@@ -40,6 +40,14 @@ export const NOVEDADES_ID = 'novedades';
 export const NOVEDADES: readonly Novedad[] = [
   {
     fecha: '2026-09-08',
+    titulo: 'Su nombre, escrito por usted y no deducido de su correo',
+    detalle:
+      'En «Ajustes · Su cuenta» hay un campo «Su nombre»: escríbalo y quedará guardado en su cuenta. Aparece bajo la palabra «Iureon» en la barra lateral, en el saludo de Inicio y junto a su correo en la lista de usuarios de la firma. Hasta ahora la aplicación lo deducía de la parte anterior a la arroba, que rara vez acertaba; el correo sigue siendo con lo que entra y no se sustituye en ninguna parte.',
+    modulo: 'Ajustes',
+    tipo: 'nuevo'
+  },
+  {
+    fecha: '2026-09-08',
     titulo: 'En Redacción, la guía puede proponerle la actuación —y si ninguna sirve, usted la escribe',
     detalle:
       'El desplegable «Tipo de documento» abre ahora con «Que la guía proponga la actuación»: sobre los hechos que ya escribió, le propone actuaciones de la rama elegida con la razón de cada una y su término, artículo y autoridad a la vista, para que decida usted. Y al final de la lista, «Ninguna de estas: escribir el nombre…» le deja añadir la actuación que le falta: queda elegida en el acto y disponible en esa rama para toda su firma, marcada «sin norma verificada» hasta que alguien escriba su término y su fuente en «Catálogo».',

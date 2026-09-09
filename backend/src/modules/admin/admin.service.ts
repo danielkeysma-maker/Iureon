@@ -446,6 +446,8 @@ export const crearFirmaConAdministrador = async (input: {
   nit?: string;
   adminEmail: string;
   adminPassword: string;
+  /** El nombre del administrador, si quien crea la firma lo conoce. Opcional. */
+  adminNombre?: string;
   initialCredits?: number;
   plan: Plan;
   period: PlanPeriod;
@@ -522,7 +524,8 @@ export const crearFirmaConAdministrador = async (input: {
     await addUserToFirm(firmId, {
       email: input.adminEmail,
       password: input.adminPassword,
-      role: 'FIRM_ADMIN'
+      role: 'FIRM_ADMIN',
+      nombre: input.adminNombre
     });
   } catch (err) {
     if (input.siFallaLaCuenta === 'BORRAR_FIRMA') {
@@ -542,6 +545,8 @@ export const createFirm = async (input: {
   nit?: string;
   adminEmail: string;
   adminPassword: string;
+  /** El nombre del administrador. Opcional: la persona lo pone luego desde Ajustes. */
+  adminNombre?: string;
   initialCredits?: number;
 }): Promise<FirmSummary> => {
   /*
@@ -949,7 +954,7 @@ export const describirCambioDePlan = (cambio: {
 /** Adds an account to any firm, for onboarding and support. */
 export const addUserToAnyFirm = async (
   firmId: string,
-  input: { email: string; password: string; role: FirmUserRole; reason: unknown }
+  input: { email: string; password: string; role: FirmUserRole; nombre?: string; reason: unknown }
 ) => {
   const client = requireClient();
 
@@ -970,7 +975,12 @@ export const addUserToAnyFirm = async (
   // something reachable over the network.
   const role: FirmUserRole = input.role === 'FIRM_ADMIN' ? 'FIRM_ADMIN' : 'LAWYER';
 
-  const user = await addUserToFirm(firmId, { email: input.email, password: input.password, role });
+  const user = await addUserToFirm(firmId, {
+    email: input.email,
+    password: input.password,
+    role,
+    nombre: input.nombre
+  });
 
   return { user, role, reason: motivo };
 };

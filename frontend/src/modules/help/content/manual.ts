@@ -109,7 +109,7 @@ const A_QUE_HACE: ManualArticle = {
         'Aprender: este «Manual de uso» y «Soporte». Al inicio del índice del manual, «Novedades» lista qué cambió en la aplicación y cuándo.',
         'Administrar (plegado por defecto): «Seguridad», con la auditoría de la firma; «Privacidad», con los proveedores que tocan sus datos; y «Ajustes».',
         'La barra es un índice numerado: cada módulo lleva su número y el que está abierto se marca en azul. Arriba, el logo de Iureon lleva a Inicio. Abajo del todo, «Colapsar» deja la barra en una franja de iconos —el módulo abierto sigue en azul— y la vuelve a desplegar; su navegador recuerda cómo la dejó.',
-        'En el pie está la tarjeta del saldo: la cifra disponible con «Recargar», que compra saldo de consumo, y debajo, en su propia fila, el plan de la firma con su vencimiento, que abre la pantalla de planes. Son dos dineros distintos: el saldo se gasta escribiendo, el plan es el derecho a entrar. Al lado están «Membrete» y «Avisos», que son ajustes del aparato y de la firma, no módulos. En «Ajustes», dentro de Administrar, están además «Atajos de teclado», con los que la aplicación escucha; «Avisos», para activar las notificaciones de este dispositivo e instalar la app; «Su cuenta», con su correo, rol y firma, el cierre de sesión y la eliminación de su usuario o de la firma; y «Plan y facturación», con el plan vigente y el acceso a la pantalla de planes.'
+        'En el pie está la tarjeta del saldo: la cifra disponible con «Recargar», que compra saldo de consumo, y debajo, en su propia fila, el plan de la firma con su vencimiento, que abre la pantalla de planes. Son dos dineros distintos: el saldo se gasta escribiendo, el plan es el derecho a entrar. Al lado están «Membrete» y «Avisos», que son ajustes del aparato y de la firma, no módulos. En «Ajustes», dentro de Administrar, están además «Atajos de teclado», con los que la aplicación escucha; «Avisos», para activar las notificaciones de este dispositivo e instalar la app; «Su cuenta», con su nombre —que usted fija y se ve en la barra, en el saludo y en la lista de usuarios—, su correo, su rol y su firma, el cierre de sesión y la eliminación de su usuario o de la firma; y «Plan y facturación», con el plan vigente y el acceso a la pantalla de planes.'
       ]
     },
     { kind: 'subtitulo', texto: 'Lo que sí hace' },
@@ -661,6 +661,16 @@ const A_ROLES_SALDO: ManualArticle = {
       kind: 'parrafo',
       texto:
         'Un rol no es una etiqueta: se impone en el servidor, en cada petición. La administración de la firma —dar de alta compañeros, cambiar roles, recargar, pagar el plan, autorizar el guardado del taller— corresponde al administrador; redactar, transcribir y consultar, a todos.'
+    },
+    { kind: 'subtitulo', texto: 'Su nombre' },
+    {
+      kind: 'pasos',
+      pasos: [
+        'Abra «Ajustes», dentro de Administrar, y entre en «Su cuenta». Arriba están su nombre, su correo, su rol y su firma.',
+        'Escriba su nombre en el campo «Su nombre» y pulse «Guardar». Si todavía no tiene ninguno, el campo aparece vacío y en gris se ve lo que la aplicación deduce de su correo: eso es solo una sugerencia, no queda guardado hasta que usted escriba el suyo.',
+        'Desde ese momento su nombre aparece bajo la palabra «Iureon» en la barra lateral, en el saludo de «Inicio» y junto a su correo en la lista de «Usuarios y roles» de la firma. El correo no se sustituye en ninguna parte: sigue siendo con lo que entra.',
+        'Puede cambiarlo cuando quiera, y también con el plan vencido. Un socio administrador puede escribirlo al dar de alta a un compañero, pero es opcional: cada quien puede ponerlo después.'
+      ]
     },
     { kind: 'subtitulo', texto: 'Eliminar su usuario o su firma' },
     {

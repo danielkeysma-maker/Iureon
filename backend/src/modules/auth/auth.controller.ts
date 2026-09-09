@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { consumoDelMesPorUsuario } from '../billing/billing.service';
 import {
   AuthError,
+  actualizarMiNombre,
   addUserToFirm,
   listFirmUsers,
   setUserActive,
@@ -81,6 +82,32 @@ export const meController = async (req: Request, res: Response): Promise<void> =
   });
 };
 
+
+/**
+ * PATCH /api/auth/me — la persona fija su propio nombre.
+ *
+ * Cuerpo: `{ nombre }`. El usuario es SIEMPRE el del token: el cuerpo no
+ * nombra a nadie, así que nadie puede rebautizar a un colega desde aquí.
+ * Un nombre vacío, muy corto o muy largo se rechaza con su mensaje, no se
+ * recorta en silencio a algo que la persona no escribió.
+ */
+export const actualizarMiNombreController = async (req: Request, res: Response): Promise<void> => {
+  const user = req.user!;
+  try {
+    const nombre = await actualizarMiNombre(user, req.body?.nombre);
+
+    await auditService.record({
+      firmId: req.firmId ?? user.firmId,
+      userEmail: user.email,
+      action: 'NOMBRE_ACTUALIZADO',
+      resource: `${user.email} fijó su nombre: «${nombre}»`
+    });
+
+    res.json({ success: true, nombre });
+  } catch (err) {
+    fail(res, err, 'No se pudo guardar su nombre.');
+  }
+};
 
 /**
  * DELETE /api/auth/me — the caller deletes their own account.
@@ -189,6 +216,7 @@ export const addUserController = async (req: Request, res: Response): Promise<vo
   }
 
   const { email, password } = readCredentials(req);
+  const nombre = typeof req.body.nombre === 'string' ? req.body.nombre : undefined;
   const requested = req.body.role;
   // Never SUPER_ADMIN from a request body: that role exists to cross firms, and
   // handing it out through an endpoint would make the boundary optional again.
@@ -214,7 +242,7 @@ export const addUserController = async (req: Request, res: Response): Promise<vo
       await exigirCupoDeUsuario(req.firmId as string);
     }
 
-    const user = await addUserToFirm(req.firmId as string, { email, password, role });
+    const user = await addUserToFirm(req.firmId as string, { email, password, role, nombre });
     res.status(201).json({ success: true, user: { ...user, role } });
   } catch (err) {
     if (responderPlanError(res, err)) return;

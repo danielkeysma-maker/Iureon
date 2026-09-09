@@ -99,6 +99,13 @@ export type AuditAction =
    */
   | 'USUARIO_ELIMINADO_POR_SI_MISMO'
   /*
+   * Una persona fijó su propio nombre en Ajustes → «Su cuenta». Queda en el
+   * rastro de la firma porque ese nombre es lo que la firma verá de ahí en
+   * adelante en su lista de usuarios: quién es quién en un despacho no es un
+   * ajuste privado de apariencia.
+   */
+  | 'NOMBRE_ACTUALIZADO'
+  /*
    * Avisos por Web Push. Activar o desactivar los avisos en un dispositivo
    * queda en el rastro de la firma: es una decisión sobre por dónde sale
    * información de la firma (títulos de borradores, asuntos de soporte).

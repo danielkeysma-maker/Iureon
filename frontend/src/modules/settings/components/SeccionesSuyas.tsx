@@ -1,6 +1,8 @@
 import React from 'react';
 import { BellRing, CreditCard, KeyRound, LogOut, RefreshCw, User } from 'lucide-react';
-import { readSession } from '../../auth/session';
+import { guardarNombreEnSesion, readSession } from '../../auth/session';
+import { authApi } from '../../auth/auth.api';
+import { nombreParaSaludar } from '../../inicio/saludo';
 import { useTenant } from '../../tenant/TenantContext';
 import { AvisosEnEsteDispositivo } from '../../push/components/AvisosEnEsteDispositivo';
 import { InstalarApp } from '../../pwa/InstalarApp';
@@ -115,9 +117,88 @@ export const AvisosSection: React.FC = () => (
 
 const ROL: Record<string, string> = { SUPER_ADMIN: 'Superusuario de la plataforma', FIRM_ADMIN: 'Socio administrador', LAWYER: 'Abogado' };
 
+/**
+ * «Su nombre» — el campo por el que una cuenta que YA existe se pone nombre.
+ *
+ * EL MARCADOR DE POSICIÓN NO ES UN VALOR. Mientras la persona no haya puesto
+ * nada, el campo arranca VACÍO con el derivado del correo detrás, en gris: si
+ * se precargara, «Ingdanielma» quedaría guardado como si alguien lo hubiera
+ * elegido en cuanto pulsara «Guardar» sin mirar. El servidor devuelve el
+ * nombre ya recortado y ese es el que se pinta y se guarda en la sesión.
+ */
+const NombreDeUsuario: React.FC = () => {
+  const { currentUserName, setCurrentUserName, currentUserEmail } = useTenant();
+  const [borrador, setBorrador] = React.useState(currentUserName);
+  const [guardando, setGuardando] = React.useState(false);
+  const [error, setError] = React.useState('');
+  const [guardado, setGuardado] = React.useState(false);
+
+  React.useEffect(() => {
+    setBorrador(currentUserName);
+  }, [currentUserName]);
+
+  const cambiado = borrador.trim() !== currentUserName.trim();
+
+  const guardar = async () => {
+    setGuardando(true);
+    setError('');
+    setGuardado(false);
+    try {
+      const nombre = await authApi.fijarMiNombre(borrador);
+      setCurrentUserName(nombre);
+      guardarNombreEnSesion(nombre);
+      setBorrador(nombre);
+      setGuardado(true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'No se pudo guardar su nombre.');
+    } finally {
+      setGuardando(false);
+    }
+  };
+
+  return (
+    <div className="mt-4 rounded-card border border-line-200 bg-surface p-4">
+      <label className="block">
+        <span className="field-label">Su nombre</span>
+        <p className="mt-1 text-meta text-ink-500">
+          Aparece en la barra lateral, en el saludo de Inicio y en la lista de usuarios de la firma.
+        </p>
+        <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+          <input
+            value={borrador}
+            onChange={(e) => {
+              setBorrador(e.target.value);
+              setGuardado(false);
+            }}
+            placeholder={currentUserEmail ? nombreParaSaludar(currentUserEmail) : 'Su nombre'}
+            maxLength={80}
+            className="field w-full sm:flex-1"
+          />
+          <button
+            type="button"
+            onClick={() => void guardar()}
+            disabled={guardando || !cambiado || !borrador.trim()}
+            className="btn-primary btn-sm shrink-0"
+          >
+            {guardando ? 'Guardando…' : 'Guardar'}
+          </button>
+        </div>
+      </label>
+      {!currentUserName && !error && (
+        <p className="mt-2 text-meta text-ink-400">
+          Todavía no tiene nombre guardado. Lo que se ve en gris es lo que la aplicación deduce de
+          su correo mientras tanto; escriba el suyo para reemplazarlo.
+        </p>
+      )}
+      {error && <p className="mt-2 notice-unverified">{error}</p>}
+      {guardado && !error && <p className="mt-2 text-meta text-verified">Su nombre quedó guardado.</p>}
+    </div>
+  );
+};
+
 export const CuentaSection: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
   const sesion = readSession();
-  const { activeFirm } = useTenant();
+  const { activeFirm, currentUserName } = useTenant();
   const Dato: React.FC<{ etiqueta: string; valor: React.ReactNode }> = ({ etiqueta, valor }) => (
     <div className="flex flex-col gap-0.5 border-b border-line-100 px-4 py-3 last:border-0 sm:flex-row sm:items-center">
       <span className="w-[160px] shrink-0 text-meta text-ink-500">{etiqueta}</span>
@@ -126,13 +207,15 @@ export const CuentaSection: React.FC<{ onLogout?: () => void }> = ({ onLogout })
   );
   return (
     <section>
-      <Cabecera titulo="Su cuenta" texto="Con qué correo entra, qué puede hacer y a qué firma pertenece." />
+      <Cabecera titulo="Su cuenta" texto="Cómo se llama, con qué correo entra, qué puede hacer y a qué firma pertenece." />
       <div className="rounded-card border border-line-200 bg-surface">
+        <Dato etiqueta="Nombre" valor={currentUserName || 'Sin nombre todavía'} />
         <Dato etiqueta="Correo" valor={sesion?.user.email ?? '—'} />
         <Dato etiqueta="Rol" valor={sesion ? ROL[sesion.user.role] ?? sesion.user.role : '—'} />
         <Dato etiqueta="Firma" valor={activeFirm.name} />
         <Dato etiqueta="NIT de la firma" valor={activeFirm.nit ? activeFirm.nit : 'Sin NIT registrado'} />
       </div>
+      <NombreDeUsuario />
       <div className="mt-4 flex flex-wrap items-center gap-3">
         {onLogout && (
           <button type="button" onClick={onLogout} className="btn-neutral">

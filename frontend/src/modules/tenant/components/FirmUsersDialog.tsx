@@ -91,7 +91,9 @@ export const FirmUsersDialog: React.FC<FirmUsersDialogProps> = ({
   const visibles = useMemo(() => {
     const q = busqueda.trim().toLowerCase();
     if (!q) return usuarios;
-    return usuarios.filter((u) => u.email.toLowerCase().includes(q));
+    return usuarios.filter(
+      (u) => u.email.toLowerCase().includes(q) || (u.nombre ?? '').toLowerCase().includes(q)
+    );
   }, [usuarios, busqueda]);
 
   const accion = async (fn: () => Promise<void>) => {
@@ -169,7 +171,14 @@ export const FirmUsersDialog: React.FC<FirmUsersDialogProps> = ({
                 }`}
               >
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-ui text-ink-900">{u.email}</span>
+                  {/*
+                    «Nombre · correo» cuando la persona ya puso su nombre. El
+                    correo NO se sustituye: es con lo que se entra y por lo que
+                    esta lista se busca; el nombre solo lo precede.
+                  */}
+                  <span className="block truncate text-ui text-ink-900">
+                    {u.nombre ? `${u.nombre} · ${u.email}` : u.email}
+                  </span>
                   {u.desactivado && (
                     <span className="text-[11px] text-ink-400">
                       desactivado · conserva su rastro en Auditoría
@@ -289,6 +298,7 @@ const CrearUsuarioDialog: React.FC<{
   onCreado: () => void;
 }> = ({ abierto, onCerrar, onCreado }) => {
   const [email, setEmail] = useState('');
+  const [nombre, setNombre] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<'FIRM_ADMIN' | 'LAWYER'>('LAWYER');
   const [error, setError] = useState('');
@@ -301,8 +311,9 @@ const CrearUsuarioDialog: React.FC<{
     setCreando(true);
     setError('');
     try {
-      await firmUsersApi.crear(email.trim(), password, role);
+      await firmUsersApi.crear(email.trim(), password, role, nombre);
       setEmail('');
+      setNombre('');
       setPassword('');
       setRole('LAWYER');
       onCreado();
@@ -331,7 +342,7 @@ const CrearUsuarioDialog: React.FC<{
       tamano="M"
       titulo="Crear usuario"
       subtitulo="La cuenta queda activa de inmediato, con la contraseña que usted entregue."
-      hayCambiosSinGuardar={Boolean(email || password)}
+      hayCambiosSinGuardar={Boolean(email || nombre || password)}
       onIntentoDeCerrarConCambios={() => undefined}
       acciones={
         <>
@@ -353,6 +364,20 @@ const CrearUsuarioDialog: React.FC<{
             placeholder="valentina.orozco@sufirma.co"
             className="field mt-1 w-full"
           />
+        </label>
+
+        <label className="block">
+          <span className="field-label">Nombre (opcional)</span>
+          <input
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
+            placeholder="Valentina Orozco"
+            className="field mt-1 w-full"
+          />
+          <span className="mt-1 block text-meta text-ink-400">
+            Aparecerá en esta lista junto al correo. Si lo deja vacío, la persona lo pone desde
+            Ajustes → «Su cuenta».
+          </span>
         </label>
 
         <label className="block">

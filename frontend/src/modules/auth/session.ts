@@ -19,6 +19,14 @@ export interface SessionUser {
   email: string;
   firmId: string;
   role: 'SUPER_ADMIN' | 'FIRM_ADMIN' | 'LAWYER';
+  /**
+   * El nombre que la persona escribió, o null si todavía no lo puso.
+   *
+   * Opcional en el tipo porque una sesión guardada ANTES de que existiera el
+   * nombre no lo trae: leerla no debe fallar, y el nombre llega en cuanto
+   * `/api/auth/me` responde.
+   */
+  nombre?: string | null;
 }
 
 export interface Session {
@@ -83,6 +91,23 @@ export const clearSession = (): void => {
     localStorage.removeItem(KEY);
   } catch {
     /* Nothing to do: the in-memory session is dropped by the caller regardless. */
+  }
+};
+
+/**
+ * Deja el nombre recién guardado dentro de la sesión almacenada.
+ *
+ * Sin esto, poner el nombre en Ajustes lo pintaría en pantalla y una recarga
+ * lo borraría: la barra lee la sesión, y la sesión seguiría diciendo lo de
+ * antes. No toca los tokens.
+ */
+export const guardarNombreEnSesion = (nombre: string | null): void => {
+  const actual = readSession();
+  if (!actual) return;
+  try {
+    localStorage.setItem(KEY, JSON.stringify({ ...actual, user: { ...actual.user, nombre } }));
+  } catch {
+    /* Sin almacenamiento el nombre vive lo que dure la pestaña, como la sesión. */
   }
 };
 

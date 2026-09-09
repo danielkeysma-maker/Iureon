@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '../../config/api.config';
+import { httpClient } from '../../config/httpClient';
 import { readSession, type Session } from './session';
 
 /**
@@ -114,6 +115,21 @@ export const authApi = {
    */
   eliminarMiUsuario: (contrasena: string) =>
     deleteConSesion<{ success: true }>('/api/auth/me', { contrasena }),
+
+  /**
+   * Ajustes → «Su cuenta» → «Su nombre». Va por `httpClient` y no por los dos
+   * de arriba: aquí un 401 SÍ es una sesión perdida, y el cliente compartido es
+   * el que sabe volver al ingreso. El servidor devuelve el nombre ya recortado,
+   * que es el que se guarda: la pantalla nunca inventa una versión propia.
+   */
+  fijarMiNombre: async (nombre: string): Promise<string> => {
+    const r = await httpClient.patch<{ success: boolean; nombre?: string; message?: string }>(
+      '/api/auth/me',
+      { body: { nombre } }
+    );
+    if (!r.success || !r.nombre) throw new Error(r.message ?? 'No se pudo guardar su nombre.');
+    return r.nombre;
+  },
 
   eliminarMiFirma: (contrasena: string, confirmacion: string) =>
     deleteConSesion<{ success: true; advertencias: string[] }>('/api/firms/me', { contrasena, confirmacion })

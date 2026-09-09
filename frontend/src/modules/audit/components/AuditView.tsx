@@ -68,6 +68,7 @@ export const ACCIONES: Record<string, string> = {
   CLAVE_RESTABLECIDA_POR_OPERADOR: 'Operación restableció una contraseña',
   FIRMA_ELIMINADA: 'Operación eliminó una firma',
   USUARIO_ELIMINADO_POR_SI_MISMO: 'Eliminó su propio usuario',
+  NOMBRE_ACTUALIZADO: 'Fijó su nombre',
   EMAIL_SENT: 'Correo enviado'
 };
 
