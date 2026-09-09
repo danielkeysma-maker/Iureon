@@ -169,7 +169,15 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({ esAdminDeFirma, 
             }`}
           >
             <ShieldCheck className={`h-4 w-4 shrink-0 ${consentimiento.guarda ? 'text-verified' : 'text-amber-700'}`} />
-            <span className="min-w-0 flex-1">
+            {/*
+              EN EL TELÉFONO EL AVISO SE QUEDABA CON 66px. La fila envuelve,
+              pero este párrafo es `flex-1` con base 0: no reclama ancho, así
+              que el botón «Autorizar guardado» —que no encoge— se llevaba la
+              línea entera y el texto se pintaba en una columna de 66px que se
+              salía por la derecha. En el teléfono ocupa el ancho completo y el
+              botón baja solo; desde `sm:` vuelve a compartir la línea.
+            */}
+            <span className="w-full [overflow-wrap:anywhere] sm:w-auto sm:min-w-0 sm:flex-1">
               {consentimiento.guarda ? (
                 <>
                   <span className="font-semibold">La firma conserva los escritos revisados</span>, sus marcas y la conversación con la guía

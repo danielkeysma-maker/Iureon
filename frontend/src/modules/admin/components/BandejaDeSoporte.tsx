@@ -200,7 +200,7 @@ export const BandejaDeSoporte: React.FC = () => {
                 >
                   <p className="whitespace-pre-wrap [overflow-wrap:anywhere]">{m.body}</p>
                 </div>
-                <p className={`mt-0.5 font-mono text-[10px] text-ink-400 ${mio ? 'text-right' : ''}`}>
+                <p className={`mt-0.5 font-mono text-[10px] text-ink-400 [overflow-wrap:anywhere] ${mio ? 'text-right' : ''}`}>
                   {mio ? 'Usted (soporte)' : m.authorEmail} · {hora(m.createdAt)}
                 </p>
               </div>

@@ -125,12 +125,21 @@ export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
       }`}
     >
       {/* ─── BARRA DE CONTADORES · 38px ────────────────────────────────────*/}
-      <div className="flex h-[38px] shrink-0 items-center gap-4 border-b border-line-200 bg-surface px-5">
+      {/*
+        LA BARRA DEL LIENZO NO CABE EN UN TELÉFONO DE 320, y lo que se pierde
+        es lo de la derecha: el conteo de palabras quedaba seis píxeles fuera
+        del borde, cortado por el recorte de la columna. Son cinco cosas en una
+        fila que no envuelve —dos pestañas, las secciones exigidas, el aviso de
+        sin verificar y el conteo—, así que se estrechan el relleno y la
+        separación en el teléfono y la fila lleva desplazamiento propio; en
+        `sm:` vuelven las medidas de siempre y el escritorio no cambia.
+      */}
+      <div className="flex h-[38px] shrink-0 items-center gap-3 overflow-x-auto border-b border-line-200 bg-surface px-3 sm:gap-4 sm:px-5">
         <Pestana valor="draft">Documento</Pestana>
         <Pestana valor="pdf">Expediente</Pestana>
 
         {generatedDraft && exigidas.length > 0 && (
-          <span className="text-[12.5px] font-medium text-ink-500">
+          <span className="shrink-0 whitespace-nowrap text-[12.5px] font-medium text-ink-500">
             Secciones exigidas{' '}
             <span
               className={`font-mono text-[11px] ${
@@ -143,7 +152,7 @@ export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
           </span>
         )}
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex shrink-0 items-center gap-2">
           {sinVerificar && (
             <span className="chip-unverified" title={sinVerificar}>
               <TriangleAlert className="h-3 w-3" strokeWidth={2.4} />

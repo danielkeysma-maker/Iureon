@@ -206,8 +206,16 @@ export const PdfViewerCanvas: React.FC<PdfViewerCanvasProps> = ({ draftText, dra
         exportación; inventarlos aquí cortando por caracteres hacía citar
         páginas que no existen en lo radicado.
       */}
+      {/*
+        EL PAPEL EN UN TELEFONO DE 320. Con `px-10` quedaban 208px de texto, y el
+        escrito trae palabras que no se parten solas —un radicado de 23 digitos,
+        un correo, la URL de la fuente—: el renglon se pintaba 274px mas alla del
+        borde. Se estrecha el margen solo por debajo de `sm:` (el escritorio
+        conserva `sm:px-14`) y se permite cortar dentro de la palabra, que es lo
+        unico que salva a un token sin espacios.
+      */}
       <div
-        className="paper-canvas rounded-card border border-line-200 px-10 py-10 font-legal text-paper-ink shadow-e1 sm:px-14"
+        className="paper-canvas rounded-card border border-line-200 px-5 py-10 font-legal text-paper-ink shadow-e1 [overflow-wrap:anywhere] sm:px-14"
         style={{ fontSize: `${Math.round(14.5 * (zoom / 100))}px`, lineHeight: 1.8 }}
         dangerouslySetInnerHTML={{ __html: html }}
       />

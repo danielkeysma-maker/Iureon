@@ -264,9 +264,16 @@ export const SavedDraftsModal: React.FC<SavedDraftsModalProps> = ({
             </p>
           </div>
         ) : (
-          <div className="flex h-full min-h-0 gap-4">
+          /*
+            DOS COLUMNAS NO CABEN EN UN TELÉFONO. La lista tenía 340px fijos y
+            `shrink-0` dentro de una hoja de 320: se salía por la derecha con el
+            buscador, las fechas y los rótulos de grupo cortados. En el teléfono
+            las dos columnas se apilan y la lista ocupa el ancho que haya; desde
+            `sm:` vuelven la fila y los 340px de siempre.
+          */
+          <div className="flex h-full min-h-0 flex-col gap-4 sm:flex-row">
             {/* ─── LISTA ─────────────────────────────────────────────────── */}
-            <div className="flex w-[340px] min-w-0 shrink-0 flex-col gap-2">
+            <div className="flex w-full min-w-0 shrink-0 flex-col gap-2 sm:w-[340px]">
               <div className="relative">
                 <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-400" />
                 <input

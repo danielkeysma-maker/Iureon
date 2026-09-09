@@ -144,7 +144,17 @@ export const AuditMobileView: React.FC = () => {
                     </div>
 
                     {e.resource && (
-                      <p className="mt-1 text-justify text-[12.5px] leading-[1.55] text-ink-700 [text-wrap:pretty]">
+                      /*
+                        EL RECURSO TAMBIEN PUEDE SER UNA SOLA PALABRA LARGA: un
+                        radicado de 23 digitos, una URL, o el nombre de un
+                        archivo escrito sin espacios. Sin `overflow-wrap:
+                        anywhere` el navegador no encuentra donde partirlo y el
+                        renglon se pinta hasta 742px en una pantalla de 320 —el
+                        corte a la derecha que se reporto en Seguridad—. La caja
+                        medi­a bien; lo que se salia era el texto, que es por
+                        que medir solo `getBoundingClientRect()` no lo veia.
+                      */
+                      <p className="mt-1 text-justify text-[12.5px] leading-[1.55] text-ink-700 [overflow-wrap:anywhere] [text-wrap:pretty]">
                         {e.resource}
                       </p>
                     )}

@@ -121,13 +121,20 @@ export const JargonSuggestionModal: React.FC<JargonSuggestionModalProps> = ({
           {/* Custom Term Addition */}
           <div className="pt-2 border-t border-slate-200 space-y-2">
             <label className="text-[11px] font-bold text-slate-700 block">Escribir Jerga o Frase Personalizada:</label>
-            <div className="flex gap-2">
+            {/*
+              EN UN TELEFONO EL BOTON NO CABE AL LADO DEL CAMPO. El campo pide
+              unos 170px de ancho minimo y el boton, que no encoge, otros 170:
+              juntos se salen del dialogo en 320 y «Sustituir & Ensenar a la IA»
+              quedaba cortado. La fila envuelve y el campo puede encogerse; en
+              el escritorio caben los dos en una linea y nada cambia.
+            */}
+            <div className="flex flex-wrap gap-2">
               <input
                 type="text"
                 value={customWord}
                 onChange={(e) => setCustomWord(e.target.value)}
                 placeholder="Ej: Desestimar por falta de legitimación en la causa"
-                className="flex-1 bg-slate-50 border border-slate-200 rounded p-2 text-slate-900 text-xs font-sans focus:outline-none focus:border-blue-900"
+                className="min-w-0 flex-1 bg-slate-50 border border-slate-200 rounded p-2 text-slate-900 text-xs font-sans focus:outline-none focus:border-blue-900"
               />
               <button
                 type="button"

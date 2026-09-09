@@ -696,7 +696,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   );
 
   const Escrito = () => (
-    <div className="flex min-h-0 flex-1 flex-col">
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col">
       <div className="flex flex-wrap items-center gap-2 border-b border-line-100 bg-surface px-4 py-2">
         <div className="flex rounded-control border border-line-200 p-0.5">
           {(['marcas', 'editar'] as const).map((m) => (
@@ -887,7 +887,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   );
 
   const Chat = () => (
-    <div className="flex min-h-0 flex-1 flex-col">
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col">
       <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-3">
         {conversacion.length === 0 && (
           <p className="text-[12.5px] leading-snug text-ink-500">
@@ -958,7 +958,14 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   );
 
   const InformePanel = () => (
-    <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-3 text-[12.5px]">
+    /*
+      `[overflow-wrap:anywhere]` EN LA RAÍZ DEL PANEL, no en cada párrafo: el
+      informe cita artículos, correos y URLs de fuentes oficiales, y una URL es
+      una sola palabra que el navegador no parte. Sin esto el renglón se pinta
+      121px más allá del borde en un teléfono de 320. La propiedad se hereda,
+      así que una sola declaración cubre resúmenes, listas y correcciones.
+    */
+    <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-3 text-[12.5px] [overflow-wrap:anywhere]">
       {!informe ? (
         <p className="text-ink-500">Este escrito no tiene informe de revisión. Puede pedir uno con «Revisión completa» o conversar con la guía.</p>
       ) : (
@@ -1224,7 +1231,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   );
 
   return (
-    <div className={`flex min-h-0 flex-1 flex-col bg-canvas ${pantallaCompleta ? 'fixed inset-0 z-50' : ''}`}>
+    <div className={`flex min-h-0 min-w-0 flex-1 flex-col bg-canvas ${pantallaCompleta ? 'fixed inset-0 z-50' : ''}`}>
       <div className="flex flex-wrap items-center gap-2 border-b border-line-200 bg-surface px-4 py-2">
         <button type="button" onClick={() => onCerrar(texto)} className="btn-neutral btn-sm">
           <ArrowLeft className="h-3.5 w-3.5" />
@@ -1289,12 +1296,20 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
         ))}
       </div>
 
-      <div className="flex min-h-0 flex-1">
-        <div className={`min-h-0 flex-1 flex-col lg:flex ${guiaVisible ? 'lg:w-[58%] lg:flex-none' : 'lg:w-full'} ${vistaMovil === 'escrito' ? 'flex' : 'hidden'}`}>{Escrito()}</div>
-        <div className={`min-h-0 flex-1 flex-col border-l border-line-200 bg-surface ${guiaVisible ? 'lg:flex' : 'lg:hidden'} ${vistaMovil === 'revisor' ? 'flex' : 'hidden'}`}>
-          <div className="flex border-b border-line-100">
+      <div className="flex min-h-0 min-w-0 flex-1">
+        <div className={`min-h-0 min-w-0 flex-1 flex-col lg:flex ${guiaVisible ? 'lg:w-[58%] lg:flex-none' : 'lg:w-full'} ${vistaMovil === 'escrito' ? 'flex' : 'hidden'}`}>{Escrito()}</div>
+        <div className={`min-h-0 min-w-0 flex-1 flex-col border-l border-line-200 bg-surface ${guiaVisible ? 'lg:flex' : 'lg:hidden'} ${vistaMovil === 'revisor' ? 'flex' : 'hidden'}`}>
+          {/*
+            CINCO PESTAÑAS NO CABEN EN UN TELÉFONO, Y LA QUE SOBRA ES LA ÚLTIMA.
+            Sumadas con su relleno miden 390px, así que en 360 «Audiencia»
+            quedaba fuera del borde y en 320 también «Versiones»: no estaban
+            estrechas, estaban invisibles. La fila lleva desplazamiento propio y
+            cada pestaña se niega a encogerse, que es como se conserva el rótulo
+            entero; el escritorio no cambia porque ahí caben las cinco.
+          */}
+          <div className="flex overflow-x-auto border-b border-line-100">
             {(['chat', 'comentarios', 'informe', 'versiones', ...(preguntas ? (['preguntas'] as const) : [])] as const).map((p) => (
-              <button key={p} type="button" onClick={() => setPanel(p)} className={`px-3 py-2 text-[12.5px] ${panel === p ? 'border-b-2 border-brand-700 font-semibold text-brand-700' : 'text-ink-500'}`} title={p === 'preguntas' ? 'Preguntas para la audiencia' : undefined}>
+              <button key={p} type="button" onClick={() => setPanel(p)} className={`shrink-0 whitespace-nowrap px-3 py-2 text-[12.5px] ${panel === p ? 'border-b-2 border-brand-700 font-semibold text-brand-700' : 'text-ink-500'}`} title={p === 'preguntas' ? 'Preguntas para la audiencia' : undefined}>
                 {p === 'chat'
                   ? 'Guía'
                   : p === 'comentarios'

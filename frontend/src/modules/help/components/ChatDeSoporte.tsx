@@ -226,7 +226,7 @@ export const ChatDeSoporte: React.FC<ChatDeSoporteProps> = ({ firma, correo }) =
                 >
                   <p className="whitespace-pre-wrap [overflow-wrap:anywhere]">{m.body}</p>
                 </div>
-                <p className={`mt-0.5 font-mono text-[10px] text-ink-400 ${mio ? 'text-right' : ''}`}>
+                <p className={`mt-0.5 font-mono text-[10px] text-ink-400 [overflow-wrap:anywhere] ${mio ? 'text-right' : ''}`}>
                   {mio ? (m.authorEmail === correo ? 'Usted' : m.authorEmail) : 'Soporte de Iureon'} ·{' '}
                   {hora(m.createdAt)}
                 </p>
@@ -327,8 +327,15 @@ export const ChatDeSoporte: React.FC<ChatDeSoporteProps> = ({ firma, correo }) =
   // ─── La lista ──────────────────────────────────────────────────────────────
   return (
     <section className="flex flex-col gap-3 rounded-card border border-line-200 bg-surface px-4 py-3">
-      <header className="flex items-center gap-3">
-        <div className="min-w-0 flex-1">
+      {/*
+        LA CABECERA ENVUELVE EN EL TELÉFONO. El bloque de texto es `flex-1` con
+        base 0, así que no reclama ancho: el botón «Nueva conversación», que no
+        encoge, se llevaba la línea y el título quedaba en una columna de 69px
+        que se salía por la derecha. En el teléfono ocupa el ancho completo y el
+        botón baja solo; desde `sm:` comparten la línea como siempre.
+      */}
+      <header className="flex flex-wrap items-center gap-3">
+        <div className="w-full sm:w-auto sm:min-w-0 sm:flex-1">
           <h3 className="text-subtitle text-ink-900">Sus conversaciones con soporte</h3>
           <p className="text-meta text-ink-500">
             Las ve cualquier abogado de {firma}. Quedan registradas en su cuenta, no en un canal

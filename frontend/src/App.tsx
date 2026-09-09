@@ -1038,6 +1038,11 @@ export function App() {
         (`scrollWidth` seguia en 375): el `overflow-hidden` de la raiz cortaba
         los 158px sobrantes, y eso es lo que se veia como «se corta».
         Medido en el navegador a 375x812, no deducido.
+
+        LA REGLA COMPLETA —las cinco causas de este corte, el barrido que las
+        encuentra a 320, 360 y 393, y los cuatro remedios— esta escrita en
+        `src/design/ANCHO-EN-MOVIL.md`. Leerla antes de escribir una pantalla
+        movil nueva: este defecto ya volvio tres veces.
       */}
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden h-full">
         {/*
