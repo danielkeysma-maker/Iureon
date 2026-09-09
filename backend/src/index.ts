@@ -29,6 +29,7 @@ import { supportAccessRoutes } from './modules/support/supportAccess.routes';
 import { supportChatRoutes } from './modules/support/supportChat.routes';
 import { manualReadsRoutes } from './modules/help/manualReads.routes';
 import { pushRoutes } from './modules/push/push.routes';
+import { agendaPublicRoutes, agendaRoutes } from './modules/agenda/agenda.routes';
 import { firmsRoutes } from './modules/firms/firms.routes';
 import { embeddingsService } from './modules/embeddings/embeddings.service';
 import { EMBEDDING_DIMENSIONS } from './modules/embeddings/types';
@@ -88,6 +89,16 @@ app.use('/api', authPublicRoutes);
 app.use('/api', wompiPublicRoutes);
 
 /*
+ * El trabajo diario de la agenda de terminos lo invoca Vercel, que no tiene
+ * sesion de Supabase con la que hacerlo — igual que el webhook de Wompi. Va
+ * antes del middleware de sesion y se autentica con la cabecera
+ * `Authorization: Bearer <CRON_SECRET>`, comprobada en su controlador. Detras
+ * del middleware, cada pasada recibiria 401 y los avisos dejarian de salir sin
+ * que nada fallara a la vista.
+ */
+app.use('/api', agendaPublicRoutes);
+
+/*
  * The self-service 7-day trial of Esencial creates the account the caller
  * does not have yet, so it cannot sit behind the session middleware either.
  * Its own limits live in modules/trial (honeypot, 3 per IP per day, one per
@@ -137,6 +148,7 @@ app.use('/api', supportAccessRoutes);
 app.use('/api', supportChatRoutes);
 app.use('/api', manualReadsRoutes);
 app.use('/api', pushRoutes);
+app.use('/api', agendaRoutes);
 app.use('/api', brandingRoutes);
 app.use('/api', searchRoutes);
 app.use('/api', draftsRoutes);

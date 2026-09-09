@@ -1,8 +1,9 @@
 import React, { useMemo, useState } from 'react';
-import { Copy, Download, FileClock, Lock, MoreHorizontal, Pencil, Stamp, Trash2 } from 'lucide-react';
+import { CalendarClock, Copy, Download, FileClock, Lock, MoreHorizontal, Pencil, Stamp, Trash2 } from 'lucide-react';
 import { usePlanSoloLectura } from '../../subscriptions/PlanContext';
 import { Dialog } from '../../../design/Dialog';
 import type { EstadoBorrador, SavedDraftEntry } from '../types';
+import { dejarPendiente } from '../../agenda/pendiente';
 import {
   ETIQUETA_ESTADO,
   agruparPorTermino,
@@ -62,6 +63,12 @@ interface SavedDraftsViewProps {
   ) => Promise<boolean>;
   /** Para «Redactar escrito», el único botón primario de la pantalla. */
   onRedactar: () => void;
+  /**
+   * «Poner en la agenda» deja el caso preparado y lleva a Herramientas, donde
+   * vive la agenda de términos. El borrador no sabe donde vive: solo pide que
+   * se vaya alli.
+   */
+  onIrAHerramientas: () => void;
 }
 
 
@@ -74,6 +81,7 @@ export const SavedDraftsView: React.FC<SavedDraftsViewProps> = ({
   onAbrir,
   onEliminar,
   onDuplicar,
+  onIrAHerramientas,
   onGuardarDatos,
   onRedactar
 }) => {
@@ -428,6 +436,39 @@ export const SavedDraftsView: React.FC<SavedDraftsViewProps> = ({
                               >
                                 <Pencil className="h-3.5 w-3.5 text-ink-400" />
                                 Datos del proceso
+                              </button>
+                              {/*
+                                A LA AGENDA CON LA ACTUACION YA ELEGIDA. El
+                                borrador ya sabe contra que ficha se redacto
+                                —la procedencia que pinta la barra del visor—,
+                                asi que llevar ese id evita que el abogado
+                                vuelva a buscarla en un catalogo de 881 fichas
+                                y, sobre todo, evita que elija otra parecida:
+                                el termino que se vigilaria seria el de otra
+                                actuacion. No viaja ningun plazo ni ninguna
+                                fecha: eso lo lee el servidor de la ficha.
+                              */}
+                              <button
+                                onClick={() => {
+                                  setMenuAbierto(null);
+                                  dejarPendiente({
+                                    origen: 'BORRADOR',
+                                    asunto:
+                                      [e.cliente, e.despacho].filter(Boolean).join(' · ') ||
+                                      e.draft.title,
+                                    cliente: e.cliente ?? null,
+                                    radicado: e.radicado ?? null,
+                                    actuacionId: e.draft.procedencia?.actuacionId ?? null,
+                                    actuacionNombre:
+                                      e.draft.procedencia?.exactName ?? e.draft.documentType,
+                                    rama: e.legalBranch ?? null
+                                  });
+                                  onIrAHerramientas();
+                                }}
+                                className="flex items-center gap-2 px-3 py-1.5 text-left text-ui text-ink-900 hover:bg-canvas"
+                              >
+                                <CalendarClock className="h-3.5 w-3.5 text-ink-400" />
+                                Poner en la agenda
                               </button>
                               <button
                                 onClick={() => {

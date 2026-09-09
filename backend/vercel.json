@@ -15,5 +15,11 @@
       "src": "/(.*)",
       "dest": "src/index.ts"
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/agenda/avisos-del-dia",
+      "schedule": "0 12 * * *"
+    }
   ]
 }

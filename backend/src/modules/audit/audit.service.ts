@@ -49,6 +49,16 @@ export type AuditAction =
    */
   | 'FIRM_ACTUACION_CREATED'
   | 'FIRM_ACTUACION_DELETED'
+  /*
+   * Agenda de terminos. Solo el alta y la baja: son los dos hechos que cambian
+   * lo que la firma va a recibir en el telefono. Marcar cumplida no va al
+   * rastro — es trabajo ordinario y su repeticion diaria ahogaria lo demas.
+   * El alta anota si el termino venia verificado, porque quien lea el rastro
+   * meses despues tiene derecho a saber si el plazo lo comprobo el catalogo o
+   * lo escribio un colega.
+   */
+  | 'AGENDA_TERM_CREATED'
+  | 'AGENDA_TERM_DELETED'
   | 'INTERVIEW_DECIDED'
   | 'ACTA_LISTA'
   /*

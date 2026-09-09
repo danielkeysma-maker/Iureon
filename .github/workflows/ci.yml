@@ -72,6 +72,8 @@ jobs:
         run: npm run check:adjuntos
       - name: Hearing questions (prompt sections, truncated JSON rescue, parameter validation)
         run: npm run check:preguntas
+      - name: Agenda de terminos (when it warns, no repeats, refuses an ambiguous ficha)
+        run: npm run check:agenda
 
       - name: Build
         run: npm run build
@@ -93,7 +95,7 @@ jobs:
       - name: Lint
         run: npm run lint
       - name: Design tokens, interview guide and document format checks
-        run: npm run check:tokens && npm run check:guion && npm run check:formato && npm run check:informe && npm run check:membrete && npm run check:marcas && npm run check:estructura && npm run check:diff
+        run: npm run check:tokens && npm run check:guion && npm run check:formato && npm run check:informe && npm run check:membrete && npm run check:marcas && npm run check:estructura && npm run check:diff && npm run check:calculadoras
       - name: Build
         run: npm run build
 

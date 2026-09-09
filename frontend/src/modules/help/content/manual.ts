@@ -1086,20 +1086,43 @@ const A_HERRAMIENTAS: ManualArticle = {
   entradilla:
     'Qué calcula cada herramienta, de dónde salen sus cifras y cuáles tiene que escribir usted porque ninguna fuente oficial las entrega de forma estable.',
   bloques: [
-    { kind: 'ruta', camino: ['Herramientas', 'La herramienta', '«Fuentes»', '«Exportar a Excel»'] },
+    { kind: 'ruta', camino: ['Herramientas', 'La herramienta', '«Fuentes»', '«Exportar a Excel» o «Exportar a PDF»'] },
     {
       kind: 'parrafo',
       texto:
-        'Herramientas reúne siete utilidades que no generan un escrito: «Contador de términos», «Calendario judicial», «Liquidación de prestaciones», «Competencia por cuantía», «Intereses de mora», «Indexación por IPC» y el «Glosario jurídico». Todas obedecen la misma regla que el catálogo: ninguna constante entra al cálculo sin su norma, la dirección oficial donde se leyó y la fecha en que se leyó.'
+        'Herramientas reúne siete utilidades que no generan un escrito: «Contador de términos», la «Agenda de términos» de su firma, «Liquidación de prestaciones», «Competencia por cuantía», «Intereses de mora», «Indexación por IPC» y el «Glosario jurídico». Todas obedecen la misma regla que el catálogo: ninguna constante entra al cálculo sin su norma, la dirección oficial donde se leyó y la fecha en que se leyó.'
     },
     {
       kind: 'pasos',
       pasos: [
-        'Abra «Herramientas»: las siete utilidades están numeradas en una retícula de tarjetas, cada una con un dibujo que anticipa lo que calcula. Filtre con «Todas», «Términos», «Dinero» o «Referencia», o busque en «Por nombre o por lo que necesita calcular». Al pie de cada tarjeta está la fuente de ese cálculo —la norma de la que sale su cifra—, el estado «Fuente declarada» o «Sin verificar», y la insignia «Excel» solo donde la exportación existe. En el teléfono la primera tarjeta va completa y las demás quedan como filas con su miniatura.',
+        'Abra «Herramientas»: las siete utilidades están numeradas en una retícula de tarjetas, cada una con un dibujo que anticipa lo que calcula. Filtre con «Todas», «Términos», «Dinero» o «Referencia», o busque en «Por nombre o por lo que necesita calcular». Al pie de cada tarjeta está la fuente de ese cálculo —la norma de la que sale su cifra—, el estado «Fuente declarada» o «Sin verificar», y la insignia «Excel · PDF» solo donde la exportación existe. En el teléfono la primera tarjeta va completa y las demás quedan como filas con su miniatura.',
         'Abra la herramienta y complete los campos. En el contador de términos escriba la fecha de partida, el número de «Días hábiles» y la jurisdicción —«Civil» o «Penal (atiende lunes a miércoles santos)»— y pulse «Calcular».',
         'Lea el resultado y, debajo, el recuadro «Fuentes»: es la lista de cada norma, cada dirección oficial y cada fecha de lectura que sostiene la cifra.',
-        'Si necesita soporte para el expediente o para contabilidad, pulse «Exportar a Excel»: el archivo trae el cálculo y una hoja «Fuentes» con la misma lista. Lo tienen las seis calculadoras; el glosario no, porque no calcula nada.'
+        'Si necesita soporte para el expediente o para contabilidad, pulse «Exportar a Excel» o «Exportar a PDF». Los dos archivos salen del mismo cálculo, así que dicen lo mismo: las cifras, el detalle y las fuentes con su norma, su dirección y la fecha en que se consultaron. El Excel sirve para seguir trabajando la cifra; el PDF, para imprimirlo y anexarlo, y sale con la letra de su membrete. Los tienen las cinco calculadoras y el detalle de festivos del año; el glosario y la agenda no, porque no calculan nada.'
       ]
+    },
+    { kind: 'subtitulo', texto: 'La agenda de términos de su firma' },
+    {
+      kind: 'parrafo',
+      texto:
+        'La tarjeta «Agenda de términos» reúne lo que se le vence a la firma: el calendario del año con sus vencimientos encima, la lista de lo que viene con los días que faltan, y el formulario para añadir uno. La fecha límite no se escribe: la calcula el mismo motor del contador de términos a partir de la fecha de notificación y del plazo, y el cálculo se hace en el servidor, no en su navegador.'
+    },
+    {
+      kind: 'pasos',
+      pasos: [
+        'Abra «Agenda de términos» y pase a «Añadir». Escriba el asunto o el proceso —y, si quiere, el cliente y el radicado—, elija la rama y la actuación del catálogo, y ponga la fecha de notificación.',
+        'Si la ficha del catálogo fija su término sin ambigüedad, la aplicación lo dice en verde con su artículo y la frase de la que sale, y no hay nada más que escribir: debajo aparece la fecha de vencimiento y, desplegando, qué días se descontaron y por qué.',
+        'Si la ficha describe más de un plazo, no dice si los días son hábiles o de calendario, o nadie ha comprobado su término, la aplicación lo advierte en ámbar, le muestra el término TAL COMO lo escribe la ficha y le pide el número de días. La fecha se sigue calculando, y la entrada queda marcada «Plazo sin verificar» porque esa lectura la hizo usted.',
+        'Cuando el término no se cuenta en días —meses, años o «en cualquier tiempo»— o la actuación no está catalogada, escriba la fecha límite. Queda marcada «Fecha escrita a mano»: la aplicación la vigila, pero no la calculó.',
+        'Elija a quién se le avisa: a toda la firma, solo a usted, o a otra persona por su correo. Con un responsable, el aviso es solo suyo.',
+        'En «Lo que viene», cada entrada dice cuántos días faltan, contra qué actuación corre y a quién se avisa. «Cumplida» la retira de la lista y de los avisos; «Borrar» la elimina. En «El año» verá los doce meses con los días que no cuentan en gris y sus vencimientos en oro.',
+        'Desde «Borradores», en el menú de un escrito, «Poner en la agenda» abre el formulario con el caso y la actuación ya elegidas. Desde «Revisiones», el mismo icono de calendario al final de cada fila.'
+      ]
+    },
+    {
+      kind: 'aviso',
+      texto:
+        'Los avisos llegan al teléfono y al computador cinco días antes, dos días antes y el día del vencimiento, y solo a los dispositivos donde haya activado los avisos en «Ajustes». No hay correo: si no activa los avisos en al menos un dispositivo, la agenda le sirve para consultar, no para que le recuerden. La aplicación jamás deduce un plazo que la ficha no fija: cuando no puede leerlo, se lo dice y se lo pregunta.'
     },
     { kind: 'subtitulo', texto: 'Lo que el servidor sabe' },
     {
@@ -1120,7 +1143,7 @@ const A_HERRAMIENTAS: ManualArticle = {
     {
       kind: 'consejo',
       texto:
-        'Guarde el Excel exportado junto al escrito que usa la cifra. La hoja «Fuentes» es la respuesta lista a la pregunta «¿de dónde sacó ese número?», con norma, dirección y fecha, sin tener que reconstruirla meses después.'
+        'Guarde el archivo exportado junto al escrito que usa la cifra. La hoja «Fuentes» es la respuesta lista a la pregunta «¿de dónde sacó ese número?», con norma, dirección y fecha, sin tener que reconstruirla meses después.'
     },
     {
       kind: 'nota',

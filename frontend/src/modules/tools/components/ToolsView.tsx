@@ -7,6 +7,8 @@ import { IndexacionModal } from './IndexacionModal';
 import { InteresesModal } from './InteresesModal';
 import { CuantiaModal } from './CuantiaModal';
 import { CalendarioModal } from './CalendarioModal';
+import { AgendaModal } from '../../agenda/components/AgendaModal';
+import { hayPendiente } from '../../agenda/pendiente';
 import { PANTALLAS, recordado, recordar } from '../../tenant/pantallaRecordada';
 
 /**
@@ -18,7 +20,7 @@ import { PANTALLAS, recordado, recordar } from '../../tenant/pantallaRecordada';
  * Se toma la forma: cejilla, título grande, control segmentado de filtros,
  * retícula de siete tarjetas —la primera ancha, la segunda en tinta, la sexta
  * destacada—, número en oro, lámina dibujada con cajas, y el pie de cada
- * tarjeta con la fuente, la insignia «Excel» y «Abrir». En el teléfono, la
+ * tarjeta con la fuente, la insignia «Excel · PDF» y «Abrir». En el teléfono, la
  * primera tarjeta completa y las demás como filas con miniatura de 88px.
  *
  * NO se toma el papel crema (#F7F5EF). El titular pidió expresamente que el
@@ -55,8 +57,10 @@ import { PANTALLAS, recordado, recordar } from '../../tenant/pantallaRecordada';
  *
  * ─── LA INSIGNIA «EXCEL» SOLO DONDE LA EXPORTACIÓN EXISTE ───────────────────
  *
- * Seis calculadoras llaman a `exportarExcel`; el glosario no exporta nada
- * porque no calcula nada. Su tarjeta no lleva la insignia.
+ * Cinco calculadoras llaman a `exportarExcel`; el glosario no exporta nada
+ * porque no calcula nada, y la agenda de términos tampoco: lo que exporta es el
+ * detalle de festivos del año, que se abre desde su pie. Ninguna de las dos
+ * lleva la insignia.
  *
  * ─── LO QUE EL ARTBOARD 2d LISTA Y AQUÍ NO ESTÁ ─────────────────────────────
  *
@@ -334,6 +338,15 @@ export const ToolsView: React.FC = () => {
   const [interesesAbiertos, setInteresesAbiertos] = useState(recordada === 'intereses');
   const [cuantiaAbierta, setCuantiaAbierta] = useState(recordada === 'cuantia');
   const [calendarioAbierto, setCalendarioAbierto] = useState(recordada === 'calendario');
+  /*
+   * LA AGENDA SE ABRE SOLA CUANDO VIENE DE UN BORRADOR O DE UNA REVISION.
+   *
+   * «Poner en la agenda» deja el caso preparado y trae al abogado a
+   * Herramientas. Si aqui hubiera que pulsar ademas la tarjeta del calendario,
+   * el boton habria cambiado de modulo sin hacer lo que promete, y lo dejado
+   * preparado se descartaria al abrir cualquier otra cosa.
+   */
+  const [agendaAbierta, setAgendaAbierta] = useState(recordada === 'agenda' || hayPendiente());
   const abrir = (id: string, set: (v: boolean) => void) => () => {
     set(true);
     recordar(PANTALLAS.herramienta, id);
@@ -434,21 +447,34 @@ export const ToolsView: React.FC = () => {
       abrir: abrir('cuantia', setCuantiaAbierta)
     },
     {
-      id: 'calendario',
+      id: 'agenda',
       numero: '06',
-      nombre: 'Calendario judicial',
+      nombre: 'Agenda de términos',
+      /*
+       * LA TARJETA YA PROMETIA ESTO Y ENTREGABA LA MITAD. Decia «el calendario
+       * judicial con los terminos de la firma encima» y solo pintaba festivos,
+       * vacancia y dias habiles — el calendario del pais, igual para todos. La
+       * otra mitad no existia en ninguna tabla del producto. Ahora abre la
+       * agenda, y el detalle de festivos sigue a un clic desde su pie.
+       */
       queHace:
-        'Los 18 festivos del año con su regla, la vacancia judicial y la Semana Santa, año por año.',
+        'El calendario del año con los vencimientos de su firma encima, lo que viene con los días que faltan, y el aviso al teléfono cinco días antes, dos días antes y el día del vencimiento.',
       fuente: {
         texto:
-          'Ley 51 de 1983 · CGP art. 118 · Semana Santa completa solo si el acuerdo del año lo dice',
+          'El vencimiento lo calcula el motor de términos: Ley 51 de 1983 · CGP art. 118 · vacancia del Decreto 1660 de 1978',
         verificada: true
       },
-      excel: true,
+      /*
+       * SIN INSIGNIA DE EXCEL, y no por olvido: la agenda no exporta. Quien
+       * exporta es el detalle de festivos del año, que se abre desde su pie y
+       * conserva sus dos descargas. Poner la insignia aqui prometeria una
+       * descarga de los vencimientos que no existe.
+       */
+      excel: false,
       grupo: 'terminos',
       variante: 'destacada',
       lamina: <LaminaAno />,
-      abrir: abrir('calendario', setCalendarioAbierto)
+      abrir: abrir('agenda', setAgendaAbierta)
     },
     {
       id: 'glosario',
@@ -504,6 +530,16 @@ export const ToolsView: React.FC = () => {
       <InteresesModal isOpen={interesesAbiertos} onClose={cerrar(setInteresesAbiertos)} />
       <CuantiaModal isOpen={cuantiaAbierta} onClose={cerrar(setCuantiaAbierta)} />
       <CalendarioModal isOpen={calendarioAbierto} onClose={cerrar(setCalendarioAbierto)} />
+      <AgendaModal
+        isOpen={agendaAbierta}
+        onClose={cerrar(setAgendaAbierta)}
+        onVerFestivos={() => {
+          /* Un dialogo encima de otro deja dos velos y dos trampas de foco: la
+             agenda se cierra y el detalle de festivos ocupa su lugar. */
+          setAgendaAbierta(false);
+          abrir('calendario', setCalendarioAbierto)();
+        }}
+      />
 
       {/*
         LA CABECERA DE LA MAQUETA, CON LOS CONTROLES QUE SON VERDAD. Cejilla,
@@ -524,8 +560,9 @@ export const ToolsView: React.FC = () => {
           </div>
           <h1 className="text-title text-ink-900">Cálculos con su fuente, listos para el expediente.</h1>
           <p className="mt-1 max-w-[62ch] text-meta text-ink-500 text-justify">
-            Seis calculadoras y un glosario. Cada una dice de qué norma sale su cifra antes de
-            abrirla, y las seis que calculan se exportan a Excel con su hoja de fuentes.
+            Cinco calculadoras, la agenda de términos de la firma y un glosario. Cada una dice de
+            qué norma sale su cifra antes de abrirla, y las cinco que calculan se descargan en
+            Excel y en PDF, las dos con su hoja de fuentes.
           </p>
         </div>
 
@@ -742,7 +779,7 @@ const TarjetaUtilidad: React.FC<{ u: Utilidad }> = ({ u }) => {
                     : 'bg-[rgb(var(--rail-gold)/0.16)] text-[rgb(var(--rail-gold-ink))]'
                 }`}
               >
-                Excel
+                Excel · PDF
               </span>
             )}
             <span

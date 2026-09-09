@@ -225,6 +225,8 @@ export function App() {
     setMainView('workspace');
   };
   const [refrescoSoporte, setRefrescoSoporte] = useState(0);
+  /* Cambia para volver a montar Herramientas cuando un aviso pide abrir la agenda. */
+  const [herramientasEpoca, setHerramientasEpoca] = useState(0);
 
   /*
    * The module survives a RELOAD, and only a reload.
@@ -652,6 +654,19 @@ export function App() {
         destino === 'privacidad'
       ) {
         setMainView(destino);
+      } else if (destino === 'agenda') {
+        /*
+         * EL AVISO DE UN TERMINO ABRE LA AGENDA, no solo Herramientas.
+         *
+         * La agenda es un dialogo dentro de Herramientas y decide si abrirse al
+         * montarse, leyendo la pantalla recordada del modulo. Por eso hace falta
+         * el remonte: quien ya estaba en Herramientas cuando toco el aviso
+         * habria visto la reticula de tarjetas y nada mas — un aviso que se toca
+         * y no lleva a ninguna parte es peor que ningun aviso.
+         */
+        recordar(PANTALLAS.herramienta, 'agenda');
+        setHerramientasEpoca((n) => n + 1);
+        setMainView('tools');
       } else if (destino === 'administrar' && esSuperusuario) {
         setIsUserManagementModalOpen(true);
       }
@@ -1333,6 +1348,9 @@ export function App() {
               }}
               onGuardarDatos={updateMetadata}
               onRedactar={() => setMainView('workspace')}
+              /* La agenda de terminos vive dentro de Herramientas, que la abre
+                 sola al encontrar el caso que este boton dejo listo. */
+              onIrAHerramientas={() => setMainView('tools')}
             />
             </div>
           )}
@@ -1441,7 +1459,7 @@ export function App() {
           )}
           {mainView === 'tools' && (
             <ModuloBloqueado quePuede="Los cálculos que ya exportó siguen en sus archivos; las calculadoras vuelven en cuanto renueve.">
-              <ToolsView />
+              <ToolsView key={herramientasEpoca} />
             </ModuloBloqueado>
           )}
           {/*
@@ -1584,6 +1602,7 @@ export function App() {
                 esAdminDeFirma={session?.user.role === 'FIRM_ADMIN' || session?.user.role === 'SUPER_ADMIN'}
                 onAbrirTaller={abrirTallerDeRevision}
                 onIrARedaccion={() => setMainView('workspace')}
+                onIrAHerramientas={() => setMainView('tools')}
               />
             ))}
           {mainView === 'orientacion' && (

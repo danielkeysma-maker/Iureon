@@ -1,10 +1,11 @@
 import React from 'react';
-import { ClipboardCheck, RefreshCw, ShieldCheck, Trash2 } from 'lucide-react';
+import { CalendarClock, ClipboardCheck, RefreshCw, ShieldCheck, Trash2 } from 'lucide-react';
 import { usePlanSoloLectura } from '../../subscriptions/PlanContext';
 import { reviewApi, type ConsentimientoDeGuardado, type RevisionGuardada } from '../services/review.api';
 import type { DatosDelTaller } from './TallerDeRevision';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 import { PANTALLAS, recordado, recordar } from '../../tenant/pantallaRecordada';
+import { dejarPendiente } from '../../agenda/pendiente';
 
 /**
  * Revisiones: la lista de escritos revisados de la firma, para abrir cada uno
@@ -20,9 +21,17 @@ interface RevisionesViewProps {
   esAdminDeFirma: boolean;
   onAbrirTaller: (datos: DatosDelTaller) => void;
   onIrARedaccion: () => void;
+  /**
+   * «Poner en la agenda» prepara el caso y lleva a Herramientas, donde vive la
+   * agenda de terminos. Una revision guarda el NOMBRE de la actuacion y su
+   * rama, no el id de la ficha, asi que la agenda la resuelve por nombre dentro
+   * de esa rama — el mismo contrato del catalogo — y si no la encuentra deja
+   * que el abogado la elija en vez de suponerla.
+   */
+  onIrAHerramientas: () => void;
 }
 
-export const RevisionesView: React.FC<RevisionesViewProps> = ({ esAdminDeFirma, onAbrirTaller, onIrARedaccion }) => {
+export const RevisionesView: React.FC<RevisionesViewProps> = ({ esAdminDeFirma, onAbrirTaller, onIrARedaccion, onIrAHerramientas }) => {
   /* Con el plan vencido los informes se abren y se leen; revisar uno nuevo no se ofrece. */
   const soloLectura = usePlanSoloLectura();
   const [lista, setLista] = React.useState<RevisionGuardada[]>([]);
@@ -248,6 +257,26 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({ esAdminDeFirma, 
                   revisión pedida por {r.userEmail}
                   {abriendo === r.id ? ' · abriendo…' : ''}
                 </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  dejarPendiente({
+                    origen: 'REVISION',
+                    asunto: r.cliente || r.fileName,
+                    cliente: r.cliente || null,
+                    radicado: null,
+                    actuacionId: null,
+                    actuacionNombre: r.documentType,
+                    rama: r.legalBranch
+                  });
+                  onIrAHerramientas();
+                }}
+                className="shrink-0 text-ink-400 hover:text-ink-900"
+                title="Poner en la agenda de términos"
+                aria-label={`Poner en la agenda el término de ${r.fileName}`}
+              >
+                <CalendarClock className="h-4 w-4" />
               </button>
               <button
                 type="button"

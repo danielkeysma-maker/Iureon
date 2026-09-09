@@ -69,7 +69,9 @@ export const ACCIONES: Record<string, string> = {
   FIRMA_ELIMINADA: 'Operación eliminó una firma',
   USUARIO_ELIMINADO_POR_SI_MISMO: 'Eliminó su propio usuario',
   NOMBRE_ACTUALIZADO: 'Fijó su nombre',
-  EMAIL_SENT: 'Correo enviado'
+  EMAIL_SENT: 'Correo enviado',
+  AGENDA_TERM_CREATED: 'Puso un término en la agenda',
+  AGENDA_TERM_DELETED: 'Retiró un término de la agenda'
 };
 
 /** Las preguntas reales que estos datos pueden responder hoy. */
@@ -78,6 +80,7 @@ const VISTAS: Array<{ etiqueta: string; acciones: string[] }> = [
   { etiqueta: 'Cambios en el catálogo', acciones: ['CATALOG_TERM_VERIFIED'] },
   { etiqueta: 'Transcripciones', acciones: ['TRANSCRIPTION_CREATED', 'TRANSCRIPTION_DELETED', 'ACTA_LISTA'] },
   { etiqueta: 'Decisiones de entrevista', acciones: ['INTERVIEW_DECIDED'] },
+  { etiqueta: 'Agenda de términos', acciones: ['AGENDA_TERM_CREATED', 'AGENDA_TERM_DELETED'] },
   { etiqueta: 'Saldo y firma', acciones: ['FIRM_CREDITS_ADDED', 'FIRM_UPDATED', 'FIRM_STATUS_CHANGED', 'PLAN_PAGADO', 'PLAN_ACTUALIZADO', 'PLAN_SUSPENDIDO', 'MODULOS_AJUSTADOS', 'TRIAL_STARTED', 'REGISTRO_PARA_COMPRA', 'EMAIL_SENT'] }
 ];
 

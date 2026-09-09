@@ -348,6 +348,30 @@ export const enviarAFirma = async (input: {
   }
 };
 
+/**
+ * A los navegadores de UNA persona de la firma.
+ *
+ * Existe porque la agenda de términos permite poner un responsable, y entonces
+ * el aviso es suyo y de nadie más: mandarlo a toda la firma convertiría el
+ * recordatorio en ruido para los demás, y el ruido se aprende a ignorar. Filtra
+ * también por firma, para que un correo repetido en dos inquilinos —el mismo
+ * abogado con dos cuentas— no reciba el vencimiento del otro.
+ */
+export const enviarAUsuario = async (input: {
+  firmId: string;
+  userEmail: string;
+  aviso: Aviso;
+}): Promise<ResultadoDeEnvio> => {
+  if (!config.push.enabled) return SIN_ENVIO;
+  try {
+    const filas = await leerSuscripciones((q) => q.eq('firm_id', input.firmId).eq('user_email', input.userEmail));
+    return await enviarA(filas, input.aviso);
+  } catch (error) {
+    console.error('[PUSH] enviarAUsuario falló:', error instanceof Error ? error.message : error);
+    return SIN_ENVIO;
+  }
+};
+
 /** A quien opera la plataforma, esté donde esté: se le encuentra por el rol, no por la firma. */
 export const enviarAlOperador = async (aviso: Aviso): Promise<ResultadoDeEnvio> => {
   if (!config.push.enabled) return SIN_ENVIO;

@@ -161,6 +161,34 @@ if (pushEnabled && !/^(mailto:|https:\/\/)/.test(read('VAPID_SUBJECT'))) {
 }
 
 /**
+ * EL SECRETO DEL TRABAJO PROGRAMADO. `CRON_SECRET`.
+ *
+ * No había convención en el proyecto: esta es la primera ruta que no la invoca
+ * una persona sino la plataforma. Se adopta la de Vercel, que es la única que
+ * el propio proveedor sabe cumplir: cuando existe una variable `CRON_SECRET`,
+ * Vercel llama a los caminos declarados en `crons` con la cabecera
+ * `Authorization: Bearer <CRON_SECRET>`. La ruta comprueba esa cabecera y
+ * nada más.
+ *
+ * SIN SECRETO LA RUTA NO CORRE, y esa es la parte importante. La alternativa
+ * —dejarla abierta cuando falta la variable— convertiría un olvido de
+ * configuración en un endpoint público capaz de mandarle avisos al teléfono de
+ * todas las firmas, y sin ruido: respondería 200. Se prefiere que el trabajo no
+ * ocurra y lo diga a que ocurra para cualquiera. La comprobación es en tiempo
+ * constante, porque comparar dos cadenas con `===` filtra por cuánto tardan en
+ * diferir.
+ *
+ * Se pone en las Environment Variables del proyecto `iureon` de Vercel, con
+ * cualquier cadena larga y aleatoria (`openssl rand -hex 32`). En local, en
+ * `backend/.env`; sin ella el trabajo diario responde 503 y el resto de la
+ * aplicación funciona igual.
+ */
+const cronSecret = read('CRON_SECRET');
+if (cronSecret && cronSecret.length < 16) {
+  errors.push('CRON_SECRET must be at least 16 characters: a short one is guessable and the job it protects sends notifications to every firm.');
+}
+
+/**
  * Correo saliente (confirmaciones de pago).
  *
  * Gmail con contraseña de aplicación, y no un proveedor transaccional, porque
@@ -333,6 +361,11 @@ export const config = {
     appPassword: read('GMAIL_APP_PASSWORD'),
     resendApiKey: read('RESEND_API_KEY'),
     fromName: read('MAIL_FROM_NAME') || 'Iureon'
+  },
+  cron: {
+    /** Sin secreto no hay trabajo programado: la ruta responde 503. */
+    enabled: Boolean(cronSecret),
+    secret: cronSecret
   },
   push: {
     enabled: pushEnabled,

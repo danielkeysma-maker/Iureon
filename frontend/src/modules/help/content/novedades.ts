@@ -40,6 +40,22 @@ export const NOVEDADES_ID = 'novedades';
 export const NOVEDADES: readonly Novedad[] = [
   {
     fecha: '2026-09-09',
+    titulo: 'Los cálculos también se descargan en PDF, para imprimirlos',
+    detalle:
+      'Junto a «Exportar a Excel», cada calculadora tiene ahora «Exportar a PDF». Los dos archivos salen del mismo cálculo, así que dicen lo mismo: las cifras, el detalle fila por fila y las fuentes con su norma, su dirección y la fecha en que se consultaron. El Excel sirve para seguir trabajando el número; el PDF, para imprimirlo y anexarlo al expediente, y sale con la letra y el tamaño de su membrete, en carta y con los márgenes de siempre. Si la tabla del detalle pasa de una hoja, la cabecera se repite arriba y ninguna fila queda partida a la mitad.',
+    modulo: 'Herramientas',
+    tipo: 'mejora'
+  },
+  {
+    fecha: '2026-09-09',
+    titulo: 'La agenda de términos de su firma, con aviso al teléfono',
+    detalle:
+      'En Herramientas, la tarjeta «Agenda de términos» reúne lo que se le vence: el calendario del año con sus vencimientos encima, la lista de lo que viene con los días que faltan, y el formulario para añadir uno. Usted registra el asunto, elige la actuación del catálogo y pone la fecha de notificación; la fecha límite la calcula la aplicación con el mismo motor del contador de términos, descontando festivos y vacancia, y le muestra qué descontó. Cuando la ficha describe más de un plazo o nadie ha comprobado su término, se lo dice, le enseña el término tal como lo escribe la ficha y le pide el número de días; la entrada queda marcada «sin verificar» en vez de dar por buena una fecha que nadie comprobó. Los avisos llegan cinco días antes, dos días antes y el día del vencimiento, a toda la firma o solo al responsable que usted indique. Desde «Borradores» y «Revisiones», «Poner en la agenda» abre el formulario con el caso y la actuación ya elegidas.',
+    modulo: 'Herramientas',
+    tipo: 'nuevo'
+  },
+  {
+    fecha: '2026-09-09',
     titulo: 'Herramientas se ve como una retícula de tarjetas, con filtros y la fuente de cada cálculo a la vista',
     detalle:
       'Las siete utilidades dejan de ser renglones de una lista: cada una tiene su tarjeta numerada, con un dibujo que anticipa lo que calcula, la frase de qué hace y, al pie, la norma de la que sale su cifra, el estado de esa fuente y la insignia «Excel» donde la exportación existe —el glosario no la lleva porque no calcula nada—. Arriba puede filtrar entre «Términos», «Dinero» y «Referencia», o seguir buscando por nombre o por lo que necesita calcular. En el teléfono la primera tarjeta va completa y las demás quedan como filas con su miniatura.',
