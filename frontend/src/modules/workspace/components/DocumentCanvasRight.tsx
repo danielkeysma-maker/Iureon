@@ -20,6 +20,8 @@ interface DocumentCanvasRightProps {
   isFocusMode?: boolean;
   onToggleFocusMode?: () => void;
   onSaveDraft?: (updatedText: string) => void | string | Promise<string | void>;
+  /** Un aviso que llega de fuera —el borrador recién traído del taller—; se pinta donde el de «Guardar». */
+  avisoExterno?: { texto: string; clave: number } | null;
   /** El texto editado, cuando la pestaña se oculta o se cierra con cambios sin guardar. */
   onSalirConCambios?: (texto: string) => void;
   onOpenSavedDraftsModal?: () => void;
@@ -52,6 +54,7 @@ export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
   isFocusMode,
   onToggleFocusMode,
   onSaveDraft,
+  avisoExterno = null,
   onSalirConCambios,
   onOpenSavedDraftsModal,
   documentType = '',
@@ -178,6 +181,7 @@ export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
               isFocusMode={isFocusMode}
               onToggleFocusMode={onToggleFocusMode}
               onSaveDraft={onSaveDraft}
+              avisoExterno={avisoExterno}
               onSalirConCambios={onSalirConCambios}
               onOpenSavedDraftsModal={onOpenSavedDraftsModal}
               formato={formato}

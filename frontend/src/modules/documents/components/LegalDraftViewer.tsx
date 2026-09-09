@@ -21,6 +21,8 @@ interface LegalDraftViewerProps {
   onToggleFocusMode?: () => void;
   /** Guarda el texto tal como está. Si devuelve un mensaje, se muestra bajo los botones como aviso, nunca como diálogo del navegador. */
   onSaveDraft?: (updatedText: string) => void | string | Promise<string | void>;
+  /** Un aviso que viene de fuera (el borrador traído del taller de revisión). Mismo sitio y misma duración que el de «Guardar». */
+  avisoExterno?: { texto: string; clave: number } | null;
   /**
    * El texto editado en el lienzo, cuando la pestaña se oculta o se cierra con
    * cambios que aún no se guardaron. Debe salir con keepalive.
@@ -57,6 +59,7 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
   draft,
   isFocusMode,
   onSaveDraft,
+  avisoExterno = null,
   onSalirConCambios,
   onOpenSavedDraftsModal,
   formato,
@@ -64,6 +67,12 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
 }) => {
   const [editableText, setEditableText] = useState(draft.legalText);
   const [avisoDeGuardado, setAvisoDeGuardado] = useState('');
+  useEffect(() => {
+    if (!avisoExterno) return;
+    setAvisoDeGuardado(avisoExterno.texto);
+    const t = window.setTimeout(() => setAvisoDeGuardado(''), 8000);
+    return () => window.clearTimeout(t);
+  }, [avisoExterno]);
   /* El taller del borrador es una función de Redacción que el operador puede apagar: el botón queda gris con el aviso. */
   const tallerHabilitado = useFuncionHabilitada('REDACCION.TALLER_BORRADOR');
 

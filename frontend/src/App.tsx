@@ -27,6 +27,8 @@ import { AgentPanelLeft } from './modules/workspace/components/AgentPanelLeft';
 import { TallerDeRevision, type DatosDelTaller } from './modules/workspace/components/TallerDeRevision';
 import { RevisionesView } from './modules/workspace/components/RevisionesView';
 import { draftsApi } from './modules/documents/services/drafts.api';
+import { catalogApi } from './modules/catalog/services/catalog.api';
+import { procedenciaDesdeActuacion, tituloParaElBorrador } from './modules/documents/procedenciaDesdeCatalogo';
 import { TallerDeBorrador, type DatosDelBorrador } from './modules/workspace/components/TallerDeBorrador';
 import type { Anotacion, TurnoDelTaller, VersionDelTexto } from './modules/workspace/services/review.api';
 import { cuerpoQueCabeEnKeepalive } from './modules/workspace/services/review.api';
@@ -67,7 +69,7 @@ import { useLegalAgentWorkflow } from './modules/workspace/hooks/useLegalAgentWo
 import { SavedDraftsModal } from './modules/documents/components/SavedDraftsModal';
 import { SavedDraftsView } from './modules/documents/components/SavedDraftsView';
 import { SavedDraftsMobileView } from './modules/documents/components/SavedDraftsMobileView';
-import type { SavedDraftEntry } from './modules/documents/types';
+import type { GeneratedDraft, SavedDraftEntry } from './modules/documents/types';
 import { useSavedDrafts } from './modules/documents/hooks/useSavedDrafts';
 
 import { OperatorConsoleDialog } from './modules/admin/components/OperatorConsoleDialog';
@@ -267,6 +269,8 @@ export function App() {
   const [manualArticulo, setManualArticulo] = useState<string | undefined>(undefined);
   /* El taller de revision abierto: la revision y su texto. null = la lista de revisiones. */
   const [tallerActivo, setTallerActivo] = useState<DatosDelTaller | null>(null);
+  /* El aviso que Redacción muestra al llegar desde el taller de revisión; la clave lo repinta aunque el texto se repita. */
+  const [avisoDeRedaccion, setAvisoDeRedaccion] = useState<{ texto: string; clave: number } | null>(null);
   /* El taller sobre el borrador de Redaccion: mismo taller, sin informe, guardado con el borrador. */
   const [tallerBorrador, setTallerBorrador] = useState<DatosDelBorrador | null>(null);
 
@@ -747,6 +751,45 @@ export function App() {
     setLoadedDraftId(entry.id);
     recordar(PANTALLAS.borrador, entry.id || null);
     setIsSavedDraftsModalOpen(false);
+  };
+
+  /*
+   * «LLEVAR A REDACCIÓN»: del taller de revisión al borrador.
+   *
+   * Antes no había camino: quien corregía su escrito en el taller tenía que
+   * copiarlo y pegarlo en Redacción. Aquí el texto tal como está en el taller
+   * se guarda como borrador de la firma —por la misma tubería que un escrito
+   * recién generado— y se abre por el mismo camino que «Borradores». Lo que
+   * viaja es una COPIA: la revisión, su informe y su conversación no se tocan.
+   *
+   * La procedencia se toma del catálogo con la actuación y la rama de la
+   * revisión, igual que hace el motor al redactar: si la revisión ya sabía que
+   * no había ficha (`conFicha` en falso), el borrador nace «sin catalogar» y la
+   * franja lo dice; si la había pero el catálogo no respondió, queda sin
+   * registrar, que es distinto de «sin respaldo» y la franja calla.
+   */
+  const llevarRevisionARedaccion = async (datos: DatosDelTaller, texto: string): Promise<void> => {
+    const actuacion = datos.conFicha ? await catalogApi.resolve(datos.documentType, datos.legalBranch ?? undefined) : null;
+    const procedencia = datos.conFicha ? (actuacion ? procedenciaDesdeActuacion(actuacion) : undefined) : null;
+    const draft: GeneratedDraft = {
+      title: tituloParaElBorrador(datos.fileName, datos.documentType),
+      documentType: datos.documentType,
+      legalText: texto,
+      jurisprudenciaCitada: [],
+      excepcionesFormuladas: [],
+      tokensConsumed: 0,
+      procedencia
+    };
+    const id = await guardarAlGenerar(draft, { legalBranch: datos.legalBranch, cliente: datos.cliente || null });
+    if (!id) throw new Error('No se pudo guardar el borrador; el escrito sigue aquí, en el taller. Inténtelo de nuevo.');
+    handleLoadDraft({ id, savedAt: '', draft, legalBranch: datos.legalBranch, cliente: datos.cliente || null });
+    setAvisoDeRedaccion({
+      texto: `Guardado como borrador de la firma: «${draft.title}». La revisión sigue intacta en Revisiones; aquí trabaja sobre una copia.`,
+      clave: Date.now()
+    });
+    setVistaTaller('documento');
+    cerrarTallerDeRevision();
+    setMainView('workspace');
   };
 
   /*
@@ -1271,6 +1314,7 @@ export function App() {
                 isFocusMode={workflow.isFocusMode}
                 onToggleFocusMode={() => workflow.setIsFocusMode(!workflow.isFocusMode)}
                 onSaveDraft={handleSaveDraft}
+                avisoExterno={avisoDeRedaccion}
                 onSalirConCambios={(texto) => {
                   if (loadedDraftId) void draftsApi.patch(loadedDraftId, { legalText: texto }, { keepalive: true });
                 }}
@@ -1592,6 +1636,7 @@ export function App() {
                 precioRevisionCop={2000}
                 onCerrar={cerrarTallerDeRevision}
                 onSaldoCambiado={() => void refreshBalance()}
+                onLlevarARedaccion={(texto) => llevarRevisionARedaccion(tallerActivo, texto)}
                 onExportarTexto={(formato, titulo, texto) => {
                   if (formato === 'word') DocumentExportService.exportToWordDocx(titulo, texto, marcaParaExportar(), opcionesDeExportacion());
                   else void DocumentExportService.exportToPdf(titulo, texto, marcaParaExportar(), opcionesDeExportacion());

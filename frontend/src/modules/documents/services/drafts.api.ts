@@ -48,6 +48,12 @@ interface SavedDraftRow {
   updated_by_email?: string | null;
 }
 
+/** Lo que del expediente se sabe al crear el borrador; cada clave viaja solo si viene. */
+export interface DatosDeExpedienteAlCrear {
+  legalBranch?: string | null;
+  cliente?: string | null;
+}
+
 const formatSavedAt = (value: string): string =>
   new Date(value).toLocaleDateString('es-CO', {
     year: 'numeric',
@@ -128,8 +134,15 @@ export const draftsApi = {
     return null;
   },
 
-  /** Returns the new draft's id, or null when the API could not create it. */
-  async create(draft: GeneratedDraft): Promise<string | null> {
+  /**
+   * Returns the new draft's id, or null when the API could not create it.
+   *
+   * `extras` son los datos del EXPEDIENTE que ya se conocen al crear —la rama y
+   * el cliente—. Van en la misma llamada porque el servidor los acepta ahí y
+   * porque un borrador que nace sin rama abre luego con la rama que hubiera
+   * elegida, que es el defecto que `handleLoadDraft` ya tuvo que corregir.
+   */
+  async create(draft: GeneratedDraft, extras: DatosDeExpedienteAlCrear = {}): Promise<string | null> {
     try {
       const json = await httpClient.post<{ success: boolean; draft?: { id?: string } }>('/api/drafts', {
         body: {
@@ -140,7 +153,9 @@ export const draftsApi = {
           excepcionesFormuladas: draft.excepcionesFormuladas,
           tokensConsumed: draft.tokensConsumed,
           /* La ficha con la que se redacto, para que el borrador la recuerde. */
-          procedencia: draft.procedencia ?? null
+          procedencia: draft.procedencia ?? null,
+          ...(extras.legalBranch !== undefined ? { legalBranch: extras.legalBranch } : {}),
+          ...(extras.cliente !== undefined ? { cliente: extras.cliente } : {})
         }
       });
       return json.success && json.draft?.id ? String(json.draft.id) : null;

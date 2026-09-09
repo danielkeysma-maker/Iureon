@@ -4,7 +4,7 @@ import { reviewApi, type Anotacion, type ConsentimientoDeGuardado, type InformeD
 import { exportarPreguntasAPdf, exportarPreguntasAWord } from '../services/preguntasExport.service';
 import { TallerDeEscrito } from './TallerDeEscrito';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
-import { usePlan } from '../../subscriptions/PlanContext';
+import { usePlan, usePlanSoloLectura } from '../../subscriptions/PlanContext';
 
 /**
  * El taller sobre un escrito REVISADO: el genérico (TallerDeEscrito) con lo
@@ -23,6 +23,8 @@ import { usePlan } from '../../subscriptions/PlanContext';
 export interface DatosDelTaller {
   revisionId: string | null;
   documentType: string;
+  /** La rama con que se revisó; viaja al borrador cuando el escrito se lleva a Redacción. */
+  legalBranch: string | null;
   fileName: string;
   cliente: string;
   texto: string;
@@ -45,6 +47,12 @@ interface TallerDeRevisionProps {
   onCerrar: () => void;
   onSaldoCambiado: () => void;
   onExportarTexto: (formato: 'pdf' | 'word', titulo: string, texto: string) => void;
+  /**
+   * Guarda el texto del taller como borrador de la firma y abre Redacción con
+   * él. Recibe el texto tal como está; el título, la rama y la actuación los
+   * pone quien lo implementa a partir de `datos`.
+   */
+  onLlevarARedaccion: (texto: string) => Promise<void>;
   formatoDeFirma?: FormatoDelEscrito | null;
 }
 
@@ -56,8 +64,11 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
   onCerrar,
   onSaldoCambiado,
   onExportarTexto,
+  onLlevarARedaccion,
   formatoDeFirma
 }) => {
+  /* Con el plan vencido el servidor rechaza crear borradores; el botón lo dice en vez de fallar al pulsarlo. */
+  const soloLectura = usePlanSoloLectura();
   const [consentimiento, setConsentimiento] = React.useState<ConsentimientoDeGuardado>({ guarda: datos.guardaTexto, por: null, el: null });
   const [confirmacion, setConfirmacion] = React.useState<Confirmacion | null>(null);
   const [errorAutorizacion, setErrorAutorizacion] = React.useState('');
@@ -175,6 +186,10 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
         }}
         onRerevisar={datos.revisionId ? (textoActual) => reviewApi.rerevisar(datos.revisionId as string, textoActual) : undefined}
         onExportarTexto={(formato, texto) => onExportarTexto(formato, `${datos.documentType} corregido`, texto)}
+        llevarARedaccion={{
+          onClick: onLlevarARedaccion,
+          deshabilitado: soloLectura ? 'Con el plan vencido no se crean borradores. Renueve el plan para llevar el escrito a Redacción.' : null
+        }}
         onCerrar={() => onCerrar()}
         onSaldoCambiado={onSaldoCambiado}
         formato={formatoDeFirma}

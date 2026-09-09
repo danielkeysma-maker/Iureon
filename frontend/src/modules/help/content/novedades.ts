@@ -40,6 +40,14 @@ export const NOVEDADES_ID = 'novedades';
 export const NOVEDADES: readonly Novedad[] = [
   {
     fecha: '2026-09-09',
+    titulo: 'Del taller de revisión a Redacción, sin copiar y pegar',
+    detalle:
+      'En el taller de una revisión, junto a «Word» y «PDF», hay ahora «Llevar a Redacción». Guarda el texto tal como lo tiene en el taller como un borrador nuevo de la firma —con la actuación y la rama de la revisión y el nombre del archivo como título— y abre Redacción con él cargado, como si lo hubiera abierto desde «Borradores». Es una copia: la revisión, su informe y su conversación quedan intactos en «Revisiones». Hasta ahora, para seguir trabajando un escrito revisado como borrador había que copiar el texto y pegarlo a mano.',
+    modulo: 'Revisiones',
+    tipo: 'nuevo'
+  },
+  {
+    fecha: '2026-09-09',
     titulo: 'Los cálculos también se descargan en PDF, para imprimirlos',
     detalle:
       'Junto a «Exportar a Excel», cada calculadora tiene ahora «Exportar a PDF». Los dos archivos salen del mismo cálculo, así que dicen lo mismo: las cifras, el detalle fila por fila y las fuentes con su norma, su dirección y la fecha en que se consultaron. El Excel sirve para seguir trabajando el número; el PDF, para imprimirlo y anexarlo al expediente, y sale con la letra y el tamaño de su membrete, en carta y con los márgenes de siempre. Si la tabla del detalle pasa de una hoja, la cabecera se repite arriba y ninguna fila queda partida a la mitad.',

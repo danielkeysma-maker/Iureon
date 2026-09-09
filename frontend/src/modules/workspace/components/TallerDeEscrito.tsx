@@ -9,6 +9,7 @@ import {
   Gavel,
   Eraser,
   Eye,
+  FileOutput,
   History,
   Highlighter,
   Maximize2,
@@ -97,6 +98,13 @@ export interface TallerDeEscritoProps {
   onChat: (mensaje: string, textoActual: string, historial: TurnoDelTaller[], anotaciones: Anotacion[]) => Promise<RespuestaDelChat>;
   onRerevisar?: (textoActual: string) => Promise<{ informe: InformeDeRevision | null; informeLibre: string | null }>;
   onExportarTexto: (formato: 'pdf' | 'word', texto: string) => void;
+  /**
+   * «Llevar a Redacción»: guarda el texto tal como está como borrador de la
+   * firma y abre Redacción con él. Solo el taller de una revisión lo ofrece;
+   * el taller de un borrador ya está en Redacción. `deshabilitado` trae el
+   * motivo (plan vencido) y el botón lo muestra en vez de esconderse.
+   */
+  llevarARedaccion?: { onClick: (texto: string) => Promise<void>; deshabilitado?: string | null };
   onCerrar: (textoFinal: string) => void;
   onSaldoCambiado: () => void;
   /** Formato de la firma (Membrete): familia, cuerpo e interlineado. El papel del taller se lee con la misma letra que el visor y el PDF. */
@@ -251,6 +259,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   onChat,
   onRerevisar,
   onExportarTexto,
+  llevarARedaccion,
   onCerrar,
   onSaldoCambiado,
   formato,
@@ -281,6 +290,20 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   const [versionAbierta, setVersionAbierta] = React.useState<number | null>(null);
   const [mensaje, setMensaje] = React.useState('');
   const [ocupado, setOcupado] = React.useState<'chat' | 'revision' | 'preguntas' | null>(null);
+  /* «Llevar a Redacción» en vuelo: crea un borrador y cambia de módulo; dos pulsaciones serían dos borradores. */
+  const [llevando, setLlevando] = React.useState(false);
+  const llevar = async () => {
+    if (!llevarARedaccion || llevando) return;
+    setLlevando(true);
+    setError('');
+    try {
+      await llevarARedaccion.onClick(texto);
+    } catch (err) {
+      setError(err instanceof ApiError || err instanceof Error ? err.message : 'No se pudo llevar el escrito a Redacción.');
+    } finally {
+      setLlevando(false);
+    }
+  };
   /* ─── Preguntas para la audiencia: el formulario vive aquí, no en la pieza, para que el área de texto no pierda el foco. */
   const [preguntasGeneradas, setPreguntasGeneradas] = React.useState<PreguntasAudienciaGuardadas | null>(preguntas?.guardadas ?? null);
   const [formularioDePreguntas, setFormularioDePreguntas] = React.useState<boolean>(!preguntas?.guardadas);
@@ -833,6 +856,18 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
             <Download className="h-3.5 w-3.5" />
             PDF
           </button>
+          {llevarARedaccion && (
+            <button
+              type="button"
+              onClick={() => void llevar()}
+              disabled={llevando || Boolean(llevarARedaccion.deshabilitado)}
+              title={llevarARedaccion.deshabilitado ?? 'Guardar este texto como borrador de la firma y abrirlo en Redacción. La revisión no se toca.'}
+              className="btn-secondary btn-sm disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <FileOutput className={`h-3.5 w-3.5 ${llevando ? 'animate-pulse' : ''}`} />
+              {llevando ? 'Llevando…' : 'Llevar a Redacción'}
+            </button>
+          )}
         </div>
       </div>
 

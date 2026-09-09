@@ -99,6 +99,7 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({ esAdminDeFirma, 
       onAbrirTaller({
         revisionId: c.id,
         documentType: c.documentType,
+        legalBranch: c.legalBranch,
         fileName: c.fileName,
         cliente: c.cliente,
         texto,
@@ -154,7 +155,8 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({ esAdminDeFirma, 
             <h1 className="text-[20px] font-semibold text-ink-900">Revisiones</h1>
             <p className="mt-0.5 max-w-[60ch] text-[13px] leading-snug text-ink-500">
               Los escritos que su firma ha revisado. Abra uno para seguir corrigiéndolo en el taller, con los pasajes marcados y el revisor al
-              lado. Para revisar un escrito nuevo, vaya a Redacción, elija la actuación y use «Revisar un escrito ya redactado».
+              lado; cuando el texto esté como lo quiere, «Llevar a Redacción» lo guarda como borrador de la firma y lo abre allí, sin tocar la
+              revisión. Para revisar un escrito nuevo, vaya a Redacción, elija la actuación y use «Revisar un escrito ya redactado».
             </p>
           </div>
           <div className="flex gap-2">

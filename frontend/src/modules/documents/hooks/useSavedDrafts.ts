@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { draftsApi } from '../services/drafts.api';
+import { draftsApi, type DatosDeExpedienteAlCrear } from '../services/drafts.api';
 import type { GeneratedDraft, SavedDraftEntry } from '../types';
 
 const LEGACY_GLOBAL_KEY = 'iureon_saved_drafts';
@@ -101,14 +101,20 @@ export const useSavedDrafts = (firmId: string, userEmail: string, enabled: boole
    * siguientes lo ACTUALICEN y nunca dupliquen.
    */
   const guardarAlGenerar = useCallback(
-    async (draft: GeneratedDraft): Promise<string | null> => {
+    async (draft: GeneratedDraft, extras: DatosDeExpedienteAlCrear = {}): Promise<string | null> => {
       if (!userEmail) return null;
-      const id = firmId ? await draftsApi.create(draft) : null;
+      const id = firmId ? await draftsApi.create(draft, extras) : null;
       if (id) {
         await reload();
         return id;
       }
-      const entry: SavedDraftEntry = { id: `draft-${Date.now()}`, savedAt: now(), draft };
+      const entry: SavedDraftEntry = {
+        id: `draft-${Date.now()}`,
+        savedAt: now(),
+        draft,
+        legalBranch: extras.legalBranch ?? null,
+        cliente: extras.cliente ?? null
+      };
       const updated = [entry, ...savedDrafts];
       setSavedDrafts(updated);
       writeLocal(storageKey, updated);

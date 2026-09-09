@@ -368,6 +368,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
                   onAbrirTaller({
                     revisionId: paraElTaller.revisionId,
                     documentType: tituloDelInforme,
+                    legalBranch: legalBranch || null,
                     fileName: origenDelInforme.fileName || 'escrito',
                     cliente: origenDelInforme.cliente,
                     texto: paraElTaller.texto as string,
