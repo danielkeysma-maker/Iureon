@@ -94,6 +94,18 @@ const MAX_BYTES_ALMACEN = 15 * 1024 * 1024;
  * la reserva y lo diga.
  */
 const MAX_TOKENS_INFORME = 3_000;
+/*
+ * EL MODO RECIBIDO PIDE MÁS, Y SE LE DA. Su informe dejó de ser solo la lectura
+ * del papel: ahora remata con «por dónde se ataca», y cada punto de ataque
+ * carga DOS citas textuales —la del documento y la de la norma que el propio
+ * documento transcribe— porque sin ellas el punto no se pinta. Tres puntos así
+ * son unas 300 palabras que antes no estaban, y con 3.000 el JSON llegaba
+ * rozando el techo: lo que se corta primero es justamente la sección nueva, que
+ * va al final. 4.000 es el mismo presupuesto con el que el taller responde hoy
+ * por debajo de LIMITE_LLAMADA_MS, así que no acerca la llamada al reloj de la
+ * función; y si aun así se corta, `repararJsonCortado` salva lo completo.
+ */
+const MAX_TOKENS_INFORME_RECIBIDO = 4_000;
 export const LIMITE_LLAMADA_MS = 50_000;
 
 export class TiempoAgotado extends Error {}
@@ -302,9 +314,10 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
      */
     const guidance = esRecibido ? null : buildCatalogGuidance(documentType, legalBranch);
     /*
-     * El mismo motor, el mismo presupuesto de salida y el mismo límite de
-     * llamada que el modo propio: el modo nuevo no puede tardar más que el que
-     * ya cabía por debajo del reloj de la función.
+     * El mismo motor y el mismo límite de llamada que el modo propio: ninguno
+     * de los dos puede tardar más de lo que cabe por debajo del reloj de la
+     * función. Lo que cambia es el presupuesto de salida, porque el informe del
+     * documento recibido escribe más (ver MAX_TOKENS_INFORME_RECIBIDO).
      */
     const llamada = await conLimite(
       callOpenRouterWithUsage(
@@ -313,7 +326,7 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
         esRecibido
           ? buildRecibidoUserPrompt({ pregunta, texto: preparado.texto, truncado: preparado.truncado })
           : buildReviewUserPrompt({ documentType, guidance, pregunta, texto: preparado.texto, truncado: preparado.truncado }),
-        MAX_TOKENS_INFORME
+        esRecibido ? MAX_TOKENS_INFORME_RECIBIDO : MAX_TOKENS_INFORME
       ),
       LIMITE_LLAMADA_MS
     );

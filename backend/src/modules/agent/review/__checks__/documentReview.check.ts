@@ -15,6 +15,7 @@
  *   · the answer is parsed defensively: fences, missing arrays, garbage.
  */
 import {
+  CLASES_DE_ATAQUE,
   ETIQUETA_DOCUMENTO_RECIBIDO,
   MAX_CARACTERES_REVISION,
   PREGUNTA_POR_DEFECTO,
@@ -217,6 +218,59 @@ const filaRecibidaDeLista = aRevisionGuardada({ id: 'r2', document_type: ETIQUET
 check('en la lista, que no trae informe, lo rotula la etiqueta', filaRecibidaDeLista.modo === 'DOCUMENTO_RECIBIDO');
 check('una revisión de escrito propio sigue siendo del modo propio', fila.modo === 'ESCRITO_PROPIO' && fila.informeRecibido === null);
 check('y una guardada antes de que el modo existiera también', filaDeLista.modo === 'ESCRITO_PROPIO');
+
+/* ─── POR DÓNDE SE ATACA ────────────────────────────────────────────────────
+ *
+ * Entender el auto es la mitad; la otra es atacarlo. Y aquí, donde NO HAY FICHA
+ * detrás de nada, el único anclaje posible es el propio documento. Lo que estas
+ * comprobaciones fijan es exactamente eso: un punto de ataque sin cita del
+ * documento se descarta, y el informe nunca afirma el contenido de una norma
+ * que el documento no transcribe.
+ */
+check('el prompt exige que cada punto de ataque vaya anclado en una cita', /CADA PUNTO VA ANCLADO EN UNA CITA/.test(sistemaRecibido) && /NO ESCRIBAS EL PUNTO/.test(sistemaRecibido));
+check('y prohíbe afirmar el contenido de una norma que el documento no transcribe', /PROHIBIDO afirmar el contenido de un artículo que el documento no transcribe/.test(sistemaRecibido));
+check('y prohíbe concluir en derecho: nada de «es nulo», «es ilegal» ni «procede tal recurso»', /NO CONCLUYAS EN DERECHO/.test(sistemaRecibido) && /es nulo/.test(sistemaRecibido) && /procede tal recurso/.test(sistemaRecibido));
+check('y separa la cita del documento de la lectura del revisor', /SEPARA LA CITA DE TU OPINIÓN/.test(sistemaRecibido) && /porDondeSeAtaca/.test(sistemaRecibido));
+check('y admite que la sección vaya vacía si no hay flanco anclable', /«porDondeSeAtaca» va vacío/.test(sistemaRecibido));
+
+const conAtaque = parsearInformeRecibido(
+  '{"queEs":"Auto que inadmite la demanda.","decide":["Inadmite."],"cargas":[],"loQueSigue":[],"noLoDiceElDocumento":[],"porDondeSeAtaca":[' +
+    '{"clase":"TENSION_CON_LA_NORMA","cita":"inadmítese la demanda por no aportarse el poder","norma":"artículo 90 del Código General del Proceso","citaDeLaNorma":"el juez señalará los defectos para que se subsanen en el término de cinco días","lectura":"El auto transcribe una norma que manda conceder término para subsanar y sin embargo no lo concede."},' +
+    '{"clase":"NO_RESUELVE","cita":"no se hace pronunciamiento sobre lo demás","lectura":"La solicitud de medida cautelar quedó sin resolver."}' +
+    ']}'
+);
+check('un punto de ataque se lee con su clase, su cita y su lectura', conAtaque?.porDondeSeAtaca.length === 2 && conAtaque?.porDondeSeAtaca[0]?.clase === 'TENSION_CON_LA_NORMA');
+check('la cita del documento y la de la norma se conservan por separado de la opinión', conAtaque?.porDondeSeAtaca[0]?.cita.startsWith('inadmítese') === true && conAtaque?.porDondeSeAtaca[0]?.citaDeLaNorma.includes('cinco días') === true && conAtaque?.porDondeSeAtaca[0]?.lectura.startsWith('El auto transcribe') === true);
+check('un punto que no se apoya en ninguna norma no necesita una: viaja con la norma vacía', conAtaque?.porDondeSeAtaca[1]?.norma === '' && conAtaque?.porDondeSeAtaca[1]?.citaDeLaNorma === '');
+
+/* EL DESCARTE QUE MANDA: sin cita del documento no hay punto. */
+const sinCita = parsearInformeRecibido(
+  '{"queEs":"Auto.","porDondeSeAtaca":[{"clase":"NO_SE_SOSTIENE","cita":"","lectura":"El juez se equivocó al valorar la prueba."},{"clase":"SIN_APOYO_CITADO","cita":"se declara probada la excepción","lectura":"No dice de qué prueba lo deduce."}]}'
+);
+check('un punto de ataque SIN CITA del documento se descarta, no se pinta', sinCita?.porDondeSeAtaca.length === 1 && sinCita?.porDondeSeAtaca[0]?.clase === 'SIN_APOYO_CITADO', JSON.stringify(sinCita?.porDondeSeAtaca));
+
+/* EL OTRO DESCARTE: una norma sin su texto no se nombra, y la tensión con ella desaparece. */
+const normaSinTexto = parsearInformeRecibido(
+  '{"queEs":"Auto.","porDondeSeAtaca":[{"clase":"TENSION_CON_LA_NORMA","cita":"con fundamento en el artículo 121","norma":"artículo 121 del Código General del Proceso","citaDeLaNorma":"","lectura":"Ese artículo exige que el término se cuente desde la notificación."}]}'
+);
+check('una tensión con una norma que el documento NO transcribe se descarta entera', normaSinTexto?.porDondeSeAtaca.length === 0, JSON.stringify(normaSinTexto?.porDondeSeAtaca));
+
+const normaSoloNombrada = parsearInformeRecibido(
+  '{"queEs":"Auto.","porDondeSeAtaca":[{"clase":"NO_SE_SOSTIENE","cita":"conforme al artículo 121 se rechaza","norma":"artículo 121 del Código General del Proceso","citaDeLaNorma":"","lectura":"El auto no dice qué ordena ese artículo."}]}'
+);
+check('y en cualquier otra clase la norma nombrada sin su texto se vacía: nunca se completa de memoria', normaSoloNombrada?.porDondeSeAtaca[0]?.norma === '' && normaSoloNombrada?.porDondeSeAtaca[0]?.cita.includes('artículo 121') === true);
+
+const claseRara = parsearInformeRecibido('{"queEs":"Auto.","porDondeSeAtaca":[{"clase":"ES_NULO","cita":"se rechaza de plano","lectura":"No explica por qué."}]}');
+check('una clase que no existe cae en la que menos afirma, no revienta ni inventa una', claseRara?.porDondeSeAtaca[0]?.clase === 'NO_SE_SOSTIENE');
+
+const ataqueBasura = parsearInformeRecibido('{"queEs":"Auto.","porDondeSeAtaca":"no es una lista"}');
+check('si la sección no viene como lista, queda vacía y el informe se lee igual', ataqueBasura?.porDondeSeAtaca.length === 0 && ataqueBasura?.queEs === 'Auto.');
+
+check('un informe anterior a la sección se lee con la lista vacía, no undefined', Array.isArray(recibido?.porDondeSeAtaca) && recibido?.porDondeSeAtaca.length === 0);
+check('la clase de ataque se declara entera y sin repetidos', CLASES_DE_ATAQUE.length === 4 && new Set(CLASES_DE_ATAQUE).size === 4);
+
+/* Un informe que SOLO trae flancos sigue siendo un informe: se pagó por él. */
+check('un informe cuyo único contenido son los puntos de ataque no se descarta', parsearInformeRecibido('{"queEs":"","decide":[],"cargas":[],"loQueSigue":[],"porDondeSeAtaca":[{"clase":"NO_RESUELVE","cita":"nada se dijo de la nulidad alegada","lectura":"Quedó sin resolver."}]}') !== null);
 
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);
 process.exitCode = fallos === 0 ? 0 : 1;

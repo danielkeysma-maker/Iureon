@@ -2,6 +2,7 @@ import { Document, Packer, Paragraph, TextRun, AlignmentType } from 'docx';
 import { saveAs } from 'file-saver';
 import { jsPDF } from 'jspdf';
 import { registrarFuenteDelEscrito } from '../../documents/services/pdfFonts';
+import { etiquetaDeAtaque } from './ataque';
 import { getMarcaActual } from '../../tenant/services/branding.api';
 import { dibujarInformeEnPdf, type DatosDeExportacion } from './informeLayout';
 
@@ -143,13 +144,39 @@ export const exportarInformeAWord = async (d: DatosDeExportacion): Promise<void>
 
     seccion('Qué queda pendiente, según el documento', r.loQueSigue);
     seccion('Lo que el documento no dice', r.noLoDiceElDocumento);
+
+    /* Por dónde se ataca, con la cita y la opinión separadas también en el papel. */
+    const flancos = r.porDondeSeAtaca ?? [];
+    if (flancos.length) {
+      hijos.push(titulo('Por dónde se ataca'));
+      hijos.push(
+        p(
+          'Cada punto se apoya en las palabras del propio documento, que van citadas. Lo que sigue a «Lectura del revisor» es criterio, no texto del documento: aquí se señala el flanco y concluye usted.',
+          { italics: true, size: base - 4, color: gris, after: 160 }
+        )
+      );
+      for (const punto of flancos) {
+        hijos.push(p(etiquetaDeAtaque(punto.clase), { bold: true, size: base - 2, color: titulos, after: 40, justificar: false }));
+        hijos.push(p('Dice el documento:', { bold: true, size: base - 3, color: gris, after: 20, justificar: false }));
+        hijos.push(p(`«${punto.cita}»`, { italics: true, indent: 360, after: 40 }));
+        if (punto.norma && punto.citaDeLaNorma) {
+          hijos.push(p(`Norma en que el propio documento se apoya: ${punto.norma}`, { bold: true, size: base - 3, color: gris, after: 20, justificar: false }));
+          hijos.push(p(`El documento la transcribe así: «${punto.citaDeLaNorma}»`, { italics: true, indent: 360, after: 40 }));
+        }
+        if (punto.lectura) {
+          hijos.push(p('Lectura del revisor:', { bold: true, size: base - 3, color: titulos, after: 20, justificar: false }));
+          hijos.push(p(punto.lectura, { indent: 360, after: 160 }));
+        }
+      }
+    }
+
     hijos.push(
       new Paragraph({
         spacing: { before: 320 },
         alignment: AlignmentType.LEFT,
         children: [
           new TextRun({
-            text: 'Este informe solo afirma lo que está escrito en el documento, citándolo. No hay ficha verificada del catálogo detrás de ninguna de sus líneas: ningún artículo, plazo, autoridad ni recurso se ha completado de memoria. Para saber qué actuación procede, con su término, su artículo y su autoridad verificados, lleve los hechos a la guía de actuaciones; y ponga el vencimiento en la agenda de términos.',
+            text: 'Este informe solo afirma lo que está escrito en el documento, citándolo. No hay ficha verificada del catálogo detrás de ninguna de sus líneas: ningún artículo, plazo, autoridad ni recurso se ha completado de memoria; los flancos que se señalan salen de las citas y no declaran ilegalidad ni nulidad alguna. Para saber qué actuación procede para atacarlos, con su término, su artículo y su autoridad verificados, lleve los hechos a la guía de actuaciones; y ponga el vencimiento en la agenda de términos.',
             font,
             size: base - 5,
             color: '6E6E6E'

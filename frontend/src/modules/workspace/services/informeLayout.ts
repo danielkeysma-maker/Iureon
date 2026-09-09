@@ -1,4 +1,5 @@
 import type { jsPDF } from 'jspdf';
+import { etiquetaDeAtaque } from './ataque';
 import type { InformeDeDocumentoRecibido, InformeDeRevision } from './review.api';
 
 /**
@@ -229,9 +230,43 @@ export const dibujarInformeEnPdf = (doc: jsPDF, F: string, d: DatosDeExportacion
     seccion('Qué queda pendiente, según el documento', r.loQueSigue);
     seccion('Lo que el documento no dice', r.noLoDiceElDocumento);
 
+    /*
+     * POR DÓNDE SE ATACA. Va al papel como va a la pantalla, y con la misma
+     * separación a la vista: primero las palabras del documento, en cursiva y
+     * entre comillas; después, rotulada, la lectura del revisor. Un informe
+     * impreso que mezclara las dos se leería en el expediente como si el auto
+     * hubiera dicho lo que dijo quien lo revisó.
+     */
+    const flancos = r.porDondeSeAtaca ?? [];
+    if (flancos.length > 0) {
+      titulo('Por dónde se ataca');
+      bloque(
+        'Cada punto se apoya en las palabras del propio documento, que van citadas. Lo que sigue a «Lectura del revisor» es criterio, no texto del documento: aquí se señala el flanco y concluye usted.',
+        cuerpoPt - 2,
+        'italic',
+        0,
+        NOTA
+      );
+      y += 1;
+      for (const p of flancos) {
+        bloque(etiquetaDeAtaque(p.clase), cuerpoPt - 1, 'bold', 0, TITULO, false);
+        bloque('Dice el documento:', cuerpoPt - 1.5, 'bold', 0, NOTA, false);
+        bloque(`«${p.cita}»`, cuerpoPt, 'italic', 4, TINTA);
+        if (p.norma && p.citaDeLaNorma) {
+          bloque(`Norma en que el propio documento se apoya: ${p.norma}`, cuerpoPt - 1, 'bold', 0, NOTA, false);
+          bloque(`El documento la transcribe así: «${p.citaDeLaNorma}»`, cuerpoPt, 'italic', 4, TINTA);
+        }
+        if (p.lectura) {
+          bloque('Lectura del revisor:', cuerpoPt - 1.5, 'bold', 0, TITULO, false);
+          bloque(p.lectura, cuerpoPt, 'normal', 4);
+        }
+        y += 2;
+      }
+    }
+
     y += 4;
     bloque(
-      'Este informe solo afirma lo que está escrito en el documento, citándolo. No hay ficha verificada del catálogo detrás de ninguna de sus líneas: ningún artículo, plazo, autoridad ni recurso se ha completado de memoria. Para saber qué actuación procede, con su término, su artículo y su autoridad verificados, lleve los hechos a la guía de actuaciones; y ponga el vencimiento en la agenda de términos.',
+      'Este informe solo afirma lo que está escrito en el documento, citándolo. No hay ficha verificada del catálogo detrás de ninguna de sus líneas: ningún artículo, plazo, autoridad ni recurso se ha completado de memoria; los flancos que se señalan salen de las citas y no declaran ilegalidad ni nulidad alguna. Para saber qué actuación procede para atacarlos, con su término, su artículo y su autoridad verificados, lleve los hechos a la guía de actuaciones; y ponga el vencimiento en la agenda de términos.',
       cuerpoPt - 2.5,
       'normal',
       0,

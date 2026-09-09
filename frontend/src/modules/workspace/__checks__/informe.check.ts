@@ -7,7 +7,7 @@
  * not drawn.
  */
 import { jsPDF } from 'jspdf';
-import { dibujarInformeEnPdf, type DatosDelInforme } from '../services/informeLayout';
+import { dibujarInformeEnPdf, type DatosDelInforme, type DatosDelInformeRecibido } from '../services/informeLayout';
 
 let fallos = 0;
 const check = (n: string, ok: boolean, d = ''): void => {
@@ -73,6 +73,60 @@ check('con secciones vacías el PDF es más corto, no igual', textoDe(doc3).leng
 const doc4 = new jsPDF({ unit: 'mm', format: 'letter' });
 dibujarInformeEnPdf(doc4, 'helvetica', { ...base, conFicha: false }, 11);
 check('sin ficha, el PDF se genera igual', doc4.getNumberOfPages() === 1);
+
+/* ─── EL DOCUMENTO RECIBIDO Y SUS FLANCOS ───────────────────────────────────
+ *
+ * El papel que se archiva con el expediente tiene que separar la cita de la
+ * opinión igual que la pantalla: primero las palabras del documento, después la
+ * lectura del revisor, rotulada. Y la norma solo se nombra cuando el documento
+ * la transcribe — un artículo suelto en el papel se completa de memoria.
+ */
+const recibido: DatosDelInformeRecibido = {
+  documentType: 'Documento recibido',
+  fileName: 'auto.pdf',
+  fecha: '9 de septiembre de 2026',
+  caracteres: 3100,
+  truncado: false,
+  conFicha: false,
+  modo: 'DOCUMENTO_RECIBIDO',
+  informe: {
+    queEs: 'Auto que inadmite la demanda.',
+    quienLoProfirio: 'Juzgado Tercero Civil Municipal',
+    radicado: '2026-00345',
+    fecha: '3 de septiembre de 2026',
+    decide: ['Inadmite la demanda.'],
+    cargas: [{ carga: 'Subsanar la demanda.', plazo: 'cinco (5) dias', cita: 'concedese el termino de cinco (5) dias' }],
+    loQueSigue: ['Vencido el termino se resolvera sobre la admision.'],
+    noLoDiceElDocumento: ['No indica desde cuando se cuenta el termino.'],
+    porDondeSeAtaca: [
+      {
+        clase: 'TENSION_CON_LA_NORMA',
+        cita: 'rechazase de plano la demanda',
+        norma: 'articulo 90 del Codigo General del Proceso',
+        citaDeLaNorma: 'el juez senalara los defectos para que se subsanen',
+        lectura: 'El auto transcribe una norma que manda conceder termino y sin embargo rechaza.'
+      },
+      { clase: 'NO_RESUELVE', cita: 'no se hace pronunciamiento sobre lo demas', norma: '', citaDeLaNorma: '', lectura: 'La medida cautelar quedo sin resolver.' }
+    ]
+  }
+};
+const doc5 = new jsPDF({ unit: 'mm', format: 'letter' });
+dibujarInformeEnPdf(doc5, 'helvetica', recibido, 11);
+const salidaRecibido = textoDe(doc5);
+check('el PDF del documento recibido trae la seccion por donde se ataca', /POR D.{1,6}NDE SE ATACA/.test(salidaRecibido), salidaRecibido.slice(salidaRecibido.indexOf('POR D'), salidaRecibido.indexOf('POR D') + 30));
+check('y trae la cita del documento y la de la norma, separadas de la lectura del revisor', /rechazase de plano la demanda/.test(salidaRecibido) && /senalara los defectos/.test(salidaRecibido) && /Lectura del revisor/.test(salidaRecibido));
+
+/* Sin flancos, la sección no se dibuja: el papel es más corto, no igual. */
+const sinFlancos: DatosDelInformeRecibido = { ...recibido, informe: { ...recibido.informe, porDondeSeAtaca: [] } };
+const doc6 = new jsPDF({ unit: 'mm', format: 'letter' });
+dibujarInformeEnPdf(doc6, 'helvetica', sinFlancos, 11);
+check('sin flancos la seccion no se dibuja', textoDe(doc6).length < salidaRecibido.length, `${textoDe(doc6).length} < ${salidaRecibido.length}`);
+
+/* Un informe guardado antes de que la sección existiera no revienta. */
+const anterior = { ...recibido, informe: { ...recibido.informe, porDondeSeAtaca: undefined } } as DatosDelInformeRecibido;
+const doc7 = new jsPDF({ unit: 'mm', format: 'letter' });
+dibujarInformeEnPdf(doc7, 'helvetica', anterior, 11);
+check('un informe anterior a la seccion se dibuja igual, sin ella', doc7.getNumberOfPages() >= 1 && !/Lectura del revisor/.test(textoDe(doc7)));
 
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);
 process.exitCode = fallos === 0 ? 0 : 1;

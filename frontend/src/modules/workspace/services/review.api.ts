@@ -61,6 +61,30 @@ export interface CargaDelDocumento {
   cita: string;
 }
 
+/* ─── POR DÓNDE SE ATACA ────────────────────────────────────────────────────
+ *
+ * Entender el auto es la mitad; la otra es atacarlo. Como aquí NO HAY FICHA
+ * detrás de nada, el único anclaje posible es el propio documento: cada punto
+ * llega con las palabras del papel al lado, y el servidor descarta los que no
+ * las traen. Por eso la pantalla no tiene que decidir en qué creer — lo que
+ * llega, se pinta — pero sí tiene que SEPARAR A LA VISTA la cita de la lectura
+ * del revisor, igual que el informe del escrito propio separa lo que exige la
+ * norma de lo que opina quien revisa.
+ */
+export type ClaseDeAtaque = 'NO_SE_SOSTIENE' | 'TENSION_CON_LA_NORMA' | 'NO_RESUELVE' | 'SIN_APOYO_CITADO';
+
+export interface PuntoDeAtaque {
+  clase: ClaseDeAtaque;
+  /** Palabras exactas del documento. Sin ellas el punto no habría llegado hasta aquí. */
+  cita: string;
+  /** El artículo tal como el documento lo nombra. Vacío si el documento no transcribe qué ordena. */
+  norma: string;
+  /** Lo que el DOCUMENTO dice que esa norma ordena, copiado de él. Vacío si no lo transcribe. */
+  citaDeLaNorma: string;
+  /** La lectura del revisor. No es del documento y se pinta como lo que es. */
+  lectura: string;
+}
+
 export interface InformeDeDocumentoRecibido {
   queEs: string;
   quienLoProfirio: string;
@@ -71,6 +95,8 @@ export interface InformeDeDocumentoRecibido {
   loQueSigue: string[];
   /** Lo que el documento calla y el abogado esperaría: se declara, no se rellena. */
   noLoDiceElDocumento: string[];
+  /** Falta en los informes guardados antes de que la sección existiera. */
+  porDondeSeAtaca?: PuntoDeAtaque[];
 }
 
 /** El archivo tal como se subió, cuando se conservó en el almacenamiento de la firma. */

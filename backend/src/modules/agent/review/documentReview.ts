@@ -180,7 +180,73 @@ export const esModoDeRevision = (v: unknown): v is ModoDeRevision =>
 export const ETIQUETA_DOCUMENTO_RECIBIDO = 'Documento recibido';
 
 export const PREGUNTA_POR_DEFECTO_RECIBIDO =
-  'Dígame qué es este documento, qué decide, qué me exige y para cuándo, y qué queda pendiente.';
+  'Dígame qué es este documento, qué decide, qué me exige y para cuándo, qué queda pendiente y por dónde se ataca.';
+
+/* ─── POR DÓNDE SE ATACA: EL FLANCO, NO LA CONCLUSIÓN ────────────────────────
+ *
+ * Entender el auto es la mitad. La otra mitad —la que el abogado pidió con
+ * estas palabras: «también puedo solicitar a revisión qué dijo el juez que no
+ * está en base a la norma o que aplicó mal, para atacarlo por ahí»— es señalar
+ * el flanco.
+ *
+ * Y aquí la regla dura de esta casa aprieta más que en ninguna otra pantalla,
+ * porque NO HAY FICHA que respalde nada. El anclaje es el propio documento:
+ *
+ *   · La providencia cita normas. Ésas, y solo ésas, son el terreno. El informe
+ *     puede decir «el auto se apoya en tal artículo, que transcribe así» y
+ *     señalar la tensión con lo que concluye, CITANDO los dos textos del
+ *     documento. Si el documento no transcribe qué ordena la norma, no se
+ *     nombra la norma: nombrarla sin su texto es invitar al lector a
+ *     completarla de memoria, que es justo lo prohibido.
+ *   · Lo que sí se puede señalar sin ficha alguna es lo que el documento NO
+ *     resolvió aunque se le pidió, y las afirmaciones que hace sin apoyo
+ *     citado. Eso se LEE en el papel; no se deduce de memoria.
+ *   · Lo que nunca: afirmar el contenido de una norma ausente del documento,
+ *     citar jurisprudencia de memoria, o declarar que algo «es ilegal» o «es
+ *     nulo». Se señala el flanco con la cita; concluye el abogado.
+ *
+ * Y CITA Y OPINIÓN VAN SEPARADAS, visiblemente, igual que el informe del modo
+ * propio separa lo objetivo de lo valorativo: `cita` y `citaDeLaNorma` son
+ * palabras del documento; `lectura` es del revisor. Un punto que no se puede
+ * anclar en una cita del documento no se pinta: `puntosDeAtaque` lo descarta
+ * aquí, antes de que llegue a la pantalla, al PDF o al Word.
+ */
+
+export type ClaseDeAtaque =
+  /** Afirmó algo que, leído contra su propio texto, no se sostiene. */
+  | 'NO_SE_SOSTIENE'
+  /** El documento transcribe qué ordena una norma y concluye otra cosa. */
+  | 'TENSION_CON_LA_NORMA'
+  /** Se le pidió y no lo resolvió. */
+  | 'NO_RESUELVE'
+  /** Afirma sin citar apoyo alguno. */
+  | 'SIN_APOYO_CITADO';
+
+export const CLASES_DE_ATAQUE: ClaseDeAtaque[] = [
+  'NO_SE_SOSTIENE',
+  'TENSION_CON_LA_NORMA',
+  'NO_RESUELVE',
+  'SIN_APOYO_CITADO'
+];
+
+export interface PuntoDeAtaque {
+  clase: ClaseDeAtaque;
+  /**
+   * OBJETIVO. Las palabras exactas del documento sobre las que se apoya el
+   * punto. SIN ESTO EL PUNTO NO EXISTE: se descarta al leer la respuesta.
+   */
+  cita: string;
+  /**
+   * OBJETIVO. Cómo NOMBRA el documento la norma en que se apoya. Viaja siempre
+   * junto a `citaDeLaNorma`: sin el texto transcrito se vacía, porque una norma
+   * nombrada a secas se completa de memoria.
+   */
+  norma: string;
+  /** OBJETIVO. Lo que el DOCUMENTO dice que esa norma ordena, copiado de él. */
+  citaDeLaNorma: string;
+  /** VALORATIVO. La lectura del revisor sobre esas citas. No es del documento. */
+  lectura: string;
+}
 
 export const buildRecibidoSystemPrompt = (): string => `Eres un abogado litigante senior en Colombia. Un colega te pasa un documento que RECIBIÓ —un auto, una sentencia, un oficio, una notificación, una resolución, un requerimiento— y te pregunta qué dice y qué tiene que hacer. No lo va a presentar: le llegó.
 
@@ -194,6 +260,13 @@ NO ACONSEJES QUÉ ACTUACIÓN PRESENTAR ni qué recurso interponer, salvo que el 
 
 NO CITES NINGUNA SENTENCIA, auto ni providencia por su radicado, magistrado o año, salvo que el documento mismo la nombre; entonces la reproduces tal como aparece en él.
 
+POR DÓNDE SE ATACA: SEÑALA EL FLANCO, NO LO CONCLUYAS. Además de leer el documento, marca en «porDondeSeAtaca» los puntos por los que podría atacarse lo que resolvió: qué afirmó y no se sostiene, qué tensión hay entre la norma que el propio documento transcribe y lo que concluye, qué se le pidió y no resolvió, y qué afirma sin apoyo citado. Cuatro reglas que mandan sobre todo lo demás:
+1. CADA PUNTO VA ANCLADO EN UNA CITA. Copia en «cita» las palabras exactas del documento sobre las que se apoya el punto. Si no puedes anclarlo en una cita del documento, NO ESCRIBAS EL PUNTO. Un flanco sin cita es una opinión suelta y aquí no vale nada.
+2. LA NORMA SOLO EXISTE SI EL DOCUMENTO LA TRANSCRIBE. Si señalas tensión con una norma, copia en «citaDeLaNorma» las palabras con que el DOCUMENTO dice qué ordena esa norma, y en «norma» el nombre con que él la llama. ESTÁ PROHIBIDO afirmar el contenido de un artículo que el documento no transcribe: si el documento solo lo menciona sin decir qué ordena, deja «citaDeLaNorma» y «norma» vacías y no hables de esa norma.
+3. SEPARA LA CITA DE TU OPINIÓN. «cita» y «citaDeLaNorma» son palabras del documento, literales. «lectura» es tu lectura como revisor, y se lee como tal: una frase que explique la tensión o el vacío.
+4. NO CONCLUYAS EN DERECHO. No escribas que algo «es ilegal», «es nulo», «vulnera el debido proceso» ni que «procede tal recurso»; no invoques jurisprudencia de memoria. Señalas el flanco con la cita; concluye el abogado.
+Si el documento no cita ninguna norma, los puntos de las otras tres clases siguen siendo posibles. Si no hay ningún flanco anclable en una cita, «porDondeSeAtaca» va vacío: un informe honesto que no encontró por dónde atacar vale más que uno que se lo inventa.
+
 RESPONDE ÚNICAMENTE CON UN OBJETO JSON, sin texto antes ni después, con esta forma exacta:
 {
   "queEs": "qué clase de documento es, según su propio encabezado y su parte resolutiva",
@@ -203,11 +276,12 @@ RESPONDE ÚNICAMENTE CON UN OBJETO JSON, sin texto antes ni después, con esta f
   "decide": ["qué decide u ordena, en concreto, una frase por punto"],
   "cargas": [{"carga": "qué le exige a usted, en concreto", "plazo": "el término tal como lo anuncia el documento, o vacío si no lo anuncia", "cita": "las palabras exactas del documento que imponen esa carga y ese plazo"}],
   "loQueSigue": ["qué queda pendiente o cuál es el paso siguiente del trámite, SEGÚN LO QUE EL PROPIO DOCUMENTO DIGA"],
-  "noLoDiceElDocumento": ["lo que un abogado esperaría encontrar aquí y este documento no dice: el plazo, la autoridad ante quien se acude, el recurso procedente, la fecha de notificación"]
+  "noLoDiceElDocumento": ["lo que un abogado esperaría encontrar aquí y este documento no dice: el plazo, la autoridad ante quien se acude, el recurso procedente, la fecha de notificación"],
+  "porDondeSeAtaca": [{"clase": "NO_SE_SOSTIENE | TENSION_CON_LA_NORMA | NO_RESUELVE | SIN_APOYO_CITADO", "cita": "las palabras exactas del documento en que se apoya el punto", "norma": "el artículo tal como el documento lo nombra, o vacío", "citaDeLaNorma": "lo que el DOCUMENTO dice que esa norma ordena, copiado de él, o vacío", "lectura": "tu lectura de esa tensión o de ese vacío, en una frase, sin concluir en derecho"}]
 }
 Si el documento no impone ninguna carga, "cargas" va vacío y lo dices en "loQueSigue". Escribe en español jurídico colombiano, neutro y preciso.
 
-SÉ BREVE Y DENSO, porque el informe tiene un presupuesto de salida fijo y un JSON cortado a la mitad no le sirve a nadie: como máximo CUATRO elementos por lista, cada uno de hasta 25 palabras; las citas, de hasta 40 palabras. JSON compacto, en una sola línea, sin comentarios ni texto fuera del objeto.`;
+SÉ BREVE Y DENSO, porque el informe tiene un presupuesto de salida fijo y un JSON cortado a la mitad no le sirve a nadie: como máximo CUATRO elementos por lista, cada uno de hasta 25 palabras; TRES puntos en "porDondeSeAtaca", los que más daño hagan; las citas, de hasta 40 palabras. JSON compacto, en una sola línea, sin comentarios ni texto fuera del objeto.`;
 
 export const buildRecibidoUserPrompt = (input: {
   pregunta: string;
@@ -248,6 +322,15 @@ export interface InformeDeDocumentoRecibido {
   loQueSigue: string[];
   /** Lo que el documento calla y el abogado esperaría: se declara, no se rellena. */
   noLoDiceElDocumento: string[];
+  /**
+   * Por dónde se ataca. Cada punto viene anclado en una cita del documento;
+   * los que no lo estén se descartan al leer la respuesta, así que esta lista
+   * solo contiene flancos que se pueden mostrar con el papel en la mano.
+   *
+   * Puede faltar en informes guardados antes de que existiera: quien la lea
+   * debe tolerar `undefined`.
+   */
+  porDondeSeAtaca: PuntoDeAtaque[];
 }
 
 export interface ErrorDeAplicacion {
@@ -584,6 +667,44 @@ const cargas = (v: unknown): CargaDelDocumento[] => {
     .filter((e) => e.carga || e.cita);
 };
 
+/**
+ * Los puntos de ataque, con la regla dura aplicada aquí y no en la pantalla.
+ *
+ * DOS DESCARTES, Y LOS DOS SON DELIBERADOS:
+ *
+ *   · SIN CITA DEL DOCUMENTO NO HAY PUNTO. El anclaje es lo único que separa
+ *     «el auto afirma esto y aquí está la frase» de una opinión sobre un
+ *     documento que el lector ya no tiene delante. Un punto sin cita se cae
+ *     aquí, no se pinta en gris ni se marca con una advertencia.
+ *   · SIN EL TEXTO DE LA NORMA NO SE NOMBRA LA NORMA. `norma` y `citaDeLaNorma`
+ *     viajan juntas: si el documento no transcribe qué ordena el artículo, el
+ *     nombre solo del artículo invita a completarlo de memoria, y el punto de
+ *     clase TENSION_CON_LA_NORMA —que ES la afirmación sobre lo que la norma
+ *     ordena— desaparece entero.
+ *
+ * Una clase que no se reconoce cae en NO_SE_SOSTIENE, que es la que menos
+ * afirma: no se apoya en ninguna norma y se sostiene sola con su cita.
+ */
+const puntosDeAtaque = (v: unknown): PuntoDeAtaque[] => {
+  if (!Array.isArray(v)) return [];
+  return v
+    .map((e) => {
+      const o = (e ?? {}) as Record<string, unknown>;
+      const bruta = cadena(o.clase).toUpperCase().replace(/[^A-Z_]/g, '');
+      const clase = (CLASES_DE_ATAQUE as string[]).includes(bruta) ? (bruta as ClaseDeAtaque) : 'NO_SE_SOSTIENE';
+      const citaDeLaNorma = cadena(o.citaDeLaNorma);
+      return {
+        clase,
+        cita: cadena(o.cita),
+        /* La norma sin su texto no se nombra: se completaría de memoria. */
+        norma: citaDeLaNorma ? cadena(o.norma) : '',
+        citaDeLaNorma,
+        lectura: cadena(o.lectura)
+      };
+    })
+    .filter((p) => Boolean(p.cita) && (p.clase !== 'TENSION_CON_LA_NORMA' || Boolean(p.citaDeLaNorma)));
+};
+
 export const parsearInformeRecibido = (crudo: string): InformeDeDocumentoRecibido | null => {
   const objeto = objetoDelModelo(crudo);
   if (!objeto) return null;
@@ -596,7 +717,8 @@ export const parsearInformeRecibido = (crudo: string): InformeDeDocumentoRecibid
     decide: lista(objeto.decide),
     cargas: cargas(objeto.cargas),
     loQueSigue: lista(objeto.loQueSigue),
-    noLoDiceElDocumento: lista(objeto.noLoDiceElDocumento)
+    noLoDiceElDocumento: lista(objeto.noLoDiceElDocumento),
+    porDondeSeAtaca: puntosDeAtaque(objeto.porDondeSeAtaca)
   };
 
   /*
@@ -605,6 +727,11 @@ export const parsearInformeRecibido = (crudo: string): InformeDeDocumentoRecibid
    * devuelve null y el abogado ve el texto del modelo, que al menos es honesto
    * sobre lo poco que dijo.
    */
-  const algo = informe.queEs || informe.decide.length || informe.cargas.length || informe.loQueSigue.length;
+  const algo =
+    informe.queEs ||
+    informe.decide.length ||
+    informe.cargas.length ||
+    informe.loQueSigue.length ||
+    informe.porDondeSeAtaca.length;
   return algo ? informe : null;
 };
