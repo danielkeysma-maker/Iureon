@@ -1,0 +1,194 @@
+{
+  "_meta": {
+    "que_es": "Qué ramas del catálogo alcanzan las actuaciones genéricas del Código General del Proceso por remisión, y cuáles no. Se declara por RAMA, no por ficha: lo que hace que el recurso de reposición exista en un proceso de familia es el art. 1 del CGP, no una línea escrita en la ficha del recurso.",
+    "lo_aplica": "backend/src/modules/catalog/remisiones.ts",
+    "verificado_por": "Agente de catálogo",
+    "verificado_el": "2026-09-09",
+    "doctrina": "research/VERIFICATION-DOCTRINE.md",
+    "termino_no_se_afirma": "Una ficha que llega por remisión viaja con term.status degradado a NO_VERIFICADO para esa rama. Se declara la REMISIÓN, que sí se leyó; nunca el plazo, que no se leyó para esa rama. El propio catálogo demuestra por qué: «Recurso de reposición» son tres días ante el juez civil (CGP art. 318) y diez ante la administración (CPACA art. 76).",
+    "sobre_las_fuentes": "El 9 de septiembre de 2026 secretariasenado.gov.co no respondía: la conexión vencía a los 21 segundos, tanto por descarga directa como desde el navegador. Todo lo de abajo se leyó en el Gestor Normativo del Departamento Administrativo de la Función Pública, que es la segunda fuente de la lista blanca de la doctrina.",
+    "una_fuente_oficial_puede_estar_desactualizada": "El PDF del CGP del Gestor Normativo se rotula «ACTUALIZACIÓN: 27 DE AGOSTO DE 2025 (Modificada por la Ley 2541 de 2025)» y aun así sirve el Título IV en su texto ANTERIOR a la Ley 2445 de 2025: su art. 531 todavía dice «la persona natural no comerciante» y no menciona a la pequeña comerciante, que es justo lo que esa ley añadió. Por eso NINGUNA de las citas de abajo sobre el Título IV se apoya en ese PDF: para INSOLVENCIA solo se citan los arts. 1 y 318, que ambas fuentes sirven idénticos, y la advertencia sobre los autos sin recurso del Título IV se declara como advertencia y no como cita."
+  },
+
+  "normas_leidas": [
+    {
+      "norma": "Ley 1564 de 2012 (Código General del Proceso)",
+      "fuente": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=48425",
+      "formato": "PDF, 151 páginas, 747.423 caracteres de texto extraído",
+      "consultado_el": "2026-09-09",
+      "articulos_leidos": [1, 24, 318, 531, 542, 607],
+      "advertencia": "El Título IV (insolvencia de la persona natural) viene en su texto anterior a la Ley 2445 de 2025."
+    },
+    {
+      "norma": "Ley 1437 de 2011 (CPACA)",
+      "fuente": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=41249",
+      "formato": "PDF, 128 páginas",
+      "consultado_el": "2026-09-09",
+      "articulos_leidos": [34, 74]
+    },
+    {
+      "norma": "Ley 472 de 1998 (acciones populares y de grupo)",
+      "fuente": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=188",
+      "consultado_el": "2026-09-09",
+      "articulos_leidos": [36, 44, 67]
+    },
+    {
+      "norma": "Decreto 2591 de 1991 (acción de tutela)",
+      "fuente": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=5304",
+      "consultado_el": "2026-09-09",
+      "articulos_leidos": [9, 31, 32]
+    }
+  ],
+
+  "remiten": [
+    {
+      "rama": "FAMILIA",
+      "estatuto": "CGP",
+      "base": "Ley 1564 de 2012, art. 1",
+      "citas_verbatim": [
+        "Este código regula la actividad procesal en los asuntos civiles, comerciales, de familia y agrarios."
+      ],
+      "rama_fuente": "CIVIL",
+      "alcance": null,
+      "nota": "No es siquiera una remisión: el CGP se aplica directamente. No existe un código procesal de familia separado, como ya declara el encabezado de la rama.",
+      "fuente": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=48425",
+      "consultado_el": "2026-09-09"
+    },
+    {
+      "rama": "CONTRATOS",
+      "estatuto": "CGP",
+      "base": "Ley 1564 de 2012, art. 1",
+      "citas_verbatim": [
+        "Este código regula la actividad procesal en los asuntos civiles, comerciales, de familia y agrarios."
+      ],
+      "rama_fuente": "CIVIL",
+      "alcance": "La rama documenta sobre todo la redacción del contrato, que no es un proceso. Estas fichas sirven cuando el contrato ya se litiga.",
+      "nota": "El encabezado de la rama ya declara que no duplica lo que vive en otra: «se remiten». Esto es esa remisión, hecha alcanzable.",
+      "fuente": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=48425",
+      "consultado_el": "2026-09-09"
+    },
+    {
+      "rama": "SOCIETARIO",
+      "estatuto": "CGP",
+      "base": "Ley 1564 de 2012, arts. 1 y 24 par. 3",
+      "citas_verbatim": [
+        "Este código regula la actividad procesal en los asuntos civiles, comerciales, de familia y agrarios.",
+        "Las autoridades administrativas tramitarán los procesos a través de las mismas vías procesales previstas en la ley para los jueces."
+      ],
+      "rama_fuente": "CIVIL",
+      "alcance": "Los procesos concursales y de reorganización son de única instancia por texto expreso (art. 24 par. 5), así que allí no hay apelación.",
+      "nota": "Dos caminos, y los dos se leyeron: ante el juez por ser asunto comercial (art. 1), y ante la Superintendencia de Sociedades en funciones jurisdiccionales por el parágrafo 3 del art. 24. El propio encabezado de la rama ya cita el art. 24 del CGP como fuente de esa competencia.",
+      "fuente": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=48425",
+      "consultado_el": "2026-09-09"
+    },
+    {
+      "rama": "PROPIEDAD_INTELECTUAL",
+      "estatuto": "CGP",
+      "base": "Ley 1564 de 2012, arts. 1 y 24 par. 3",
+      "citas_verbatim": [
+        "Las autoridades administrativas tramitarán los procesos a través de las mismas vías procesales previstas en la ley para los jueces.",
+        "Se aplica, además, a todos los asuntos de cualquier jurisdicción o especialidad y a las actuaciones de particulares y autoridades administrativas, cuando ejerzan funciones jurisdiccionales, en cuanto no estén regulados expresamente en otras leyes."
+      ],
+      "rama_fuente": "CIVIL",
+      "alcance": "Cubre lo jurisdiccional ante la SIC y la Dirección Nacional de Derecho de Autor. Lo administrativo ante la SIC —registro, oposición, cancelación— se rige por la Decisión Andina 486 y el CPACA, no por el CGP.",
+      "nota": "El encabezado de la rama ya declara que la competencia jurisdiccional de la SIC y de la DNDA viene del art. 24 del CGP; ese mismo artículo dice con qué vías procesales tramitan.",
+      "fuente": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=48425",
+      "consultado_el": "2026-09-09"
+    },
+    {
+      "rama": "INSOLVENCIA",
+      "estatuto": "CGP",
+      "base": "Ley 1564 de 2012, arts. 1 y 318",
+      "citas_verbatim": [
+        "Este código regula la actividad procesal en los asuntos civiles, comerciales, de familia y agrarios.",
+        "Salvo norma en contrario, el recurso de reposición procede contra los autos que dicte el juez, contra los del magistrado sustanciador no susceptibles de súplica y contra los de la Sala de Casación Civil de la Corte Suprema de Justicia, para que se reformen o revoquen."
+      ],
+      "rama_fuente": "CIVIL",
+      "alcance": "El Título IV del propio CGP trae normas en contrario: hay autos que la ley declara sin recurso y una reposición que se interpone ante el conciliador. Compruebe el artículo del trámite antes de recurrir.",
+      "nota": "Es el caso más directo y el que más cuidado pide: esta rama ES el CGP, su procedimiento vive en el Título IV del mismo código (arts. 531 a 576A). No hay remisión que hacer; el art. 318 se aplica por sí mismo, pero se aplica «Salvo norma en contrario» y el Título IV trae varias. La advertencia del alcance NO se apoya en el PDF del Gestor Normativo, que sirve ese título en su texto anterior a la Ley 2445 de 2025.",
+      "hueco_declarado": "El Título IV con la reforma de la Ley 2445 de 2025 no se pudo releer en fuente oficial el 9 de septiembre de 2026 porque secretariasenado no respondía. Releerlo es lo que permitiría catalogar fichas propias de la rama y retirar la remisión.",
+      "fuente": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=48425",
+      "consultado_el": "2026-09-09"
+    },
+    {
+      "rama": "CONSTITUCIONAL",
+      "estatuto": "CGP",
+      "base": "Ley 472 de 1998, arts. 36 y 44",
+      "citas_verbatim": [
+        "Contra los autos dictados durante el trámite de la Acción Popular procede el recurso de reposición, el cual será interpuesto en los términos del Código de Procedimiento Civil.",
+        "En los procesos por acciones populares se aplicarán las disposiciones del Código de Procedimiento Civil y del Código Contencioso Administrativo dependiendo de la jurisdicción que le corresponda, en los aspectos no regulados en la presente ley, mientras no se opongan a la naturaleza y la finalidad de tales acciones."
+      ],
+      "rama_fuente": "CIVIL",
+      "alcance": "Solo para las acciones populares y de grupo. En la tutela el recurso contra el fallo es la impugnación de tres días del art. 31 del Decreto 2591 de 1991, no la reposición.",
+      "nota": "AQUÍ EL ENCARGO PEDÍA EXCLUIR Y EL TEXTO DIJO OTRA COSA. El encargo decía «excluye CONSTITUCIONAL (tutela, Decreto 2591 de 1991: impugnación, no reposición)», y para la tutela es exacto: contra el fallo el recurso es la impugnación del art. 31, y «reposición» solo aparece en el decreto para decir que no hay que agotarla antes de tutelar (art. 9). Pero la rama también trae las acciones populares y de grupo de la Ley 472 de 1998, cuyo art. 36 se titula «RECURSO DE REPOSICIÓN» y la remite al estatuto procesal civil por texto expreso. Excluir la rama entera dejaría al abogado de una acción popular sin ninguna reposición alcanzable, que es la queja que originó este trabajo. Entra con el alcance declarado, y el alcance nombra la tutela para que nadie confunda las dos cosas.",
+      "citas_de_la_tutela": [
+        "Dentro de los tres días siguientes a su notificación el fallo podrá ser impugnado por el Defensor del Pueblo, el solicitante, la autoridad pública o el representante del órgano correspondiente, sin perjuicio de su cumplimiento inmediato.",
+        "No será necesario interponer previamente la reposición u otro recurso administrativo para presentar la solicitud de tutela."
+      ],
+      "fuente": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=188",
+      "consultado_el": "2026-09-09"
+    }
+  ],
+
+  "no_remiten": [
+    {
+      "rama": "TRIBUTARIO",
+      "base": "Ley 1437 de 2011, arts. 34 y 74",
+      "citas_verbatim": [
+        "Las actuaciones administrativas se sujetarán al procedimiento administrativo común y principal que se establece en este Código, sin perjuicio de los procedimientos administrativos regulados por leyes especiales. En lo no previsto en dichas leyes se aplicarán las disposiciones de esta Parte Primera del Código.",
+        "Por regla general, contra los actos definitivos procederán los siguientes recursos:",
+        "1. El de reposición, ante quien expidió la decisión para que la aclare, modifique, adicione o revoque."
+      ],
+      "razon": "La rama cubre el procedimiento ante la DIAN, que es administrativo y no judicial. El Estatuto Tributario trae sus propios recursos —reposición y reconsideración, ya catalogados en esta rama— y lo no previsto lo llena el CPACA, no el CGP. La etapa judicial de esta materia ya vive en la rama ADMINISTRATIVO.",
+      "fuente": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=41249",
+      "consultado_el": "2026-09-09"
+    },
+    {
+      "rama": "INTERNACIONAL",
+      "base": "Ley 1564 de 2012, art. 607",
+      "citas_verbatim": [
+        "La demanda sobre exequátur de una sentencia extranjera, con el fin de que produzca efectos en Colombia, se presentará por el interesado a la Sala de Casación Civil de la Corte Suprema de Justicia, salvo que conforme a los tratados internacionales corresponda a otro juez, y ante ella deberá citarse a la parte afectada por la sentencia, si hubiere sido dictado en proceso contencioso."
+      ],
+      "razon": "El único trámite de la rama que el CGP gobierna es el exequátur, y allí la ficha genérica de CIVIL nombraría la autoridad equivocada: no se presenta ante «el mismo juez o magistrado que dictó el auto» sino ante la Sala de Casación Civil de la Corte Suprema. La autoridad competente es parte del plazo (doctrina, regla 7). El resto de la rama —extradición de la Ley 906 de 2004, arbitraje internacional de la Ley 1563 de 2012, trámites ante la CIDH— corre por normas cuyo régimen de recursos no se releyó en esta pasada.",
+      "hueco_declarado": "Queda por leer el régimen de recursos de la Ley 906 (extradición), de la Ley 1563 (arbitraje internacional) y del Reglamento de la CIDH, y por decidir si el exequátur merece ficha propia de recursos ante la Sala de Casación Civil. Una remisión que no se leyó no se declara.",
+      "fuente": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=48425",
+      "consultado_el": "2026-09-09"
+    }
+  ],
+
+  "se_prestan": {
+    "por_que_acotado": "Prestar «todo CIVIL» metería la demanda de pertenencia y el remate de inmuebles en la rama de familia. Una lista larga de actuaciones ajenas es peor que ninguna: el abogado deja de leerla. Solo entran fichas GENÉRICAS, que describen el acto procesal y no un acto concreto del proceso civil.",
+    "ids": [
+      "civil/recurso-de-reposicion",
+      "civil/recurso-de-apelacion",
+      "civil/recurso-de-queja",
+      "civil/recurso-de-suplica",
+      "civil/solicitud-de-nulidad-procesal",
+      "civil/desistimiento-de-las-pretensiones",
+      "civil/solicitud-de-aclaracion-de-providencia",
+      "civil/solicitud-de-adicion-de-providencia",
+      "civil/solicitud-de-correccion-de-errores-aritmeticos",
+      "civil/solicitud-de-amparo-de-pobreza",
+      "civil/solicitud-de-acumulacion-de-procesos",
+      "civil/poder-especial-para-actuacion-judicial",
+      "civil/sustitucion-revocacion-o-renuncia-del-poder"
+    ]
+  },
+
+  "medicion_previa": {
+    "fecha": "2026-09-09",
+    "hallazgo": "Ocho ramas no tenían NINGUNA ficha con «reposición» en el nombre y dependían de la genérica de CIVIL, que el selector no alcanza porque filtra por rama.",
+    "ramas": [
+      "CONSTITUCIONAL",
+      "CONTRATOS",
+      "FAMILIA",
+      "INSOLVENCIA",
+      "INTERNACIONAL",
+      "PROPIEDAD_INTELECTUAL",
+      "SOCIETARIO",
+      "TRIBUTARIO"
+    ]
+  },
+
+  "por_que_no_se_marca_transversal": "Decidido el 9 y el 10 de septiembre de 2026. Una ficha del CGP no se marca transversal porque su plazo puede ser distinto en otra jurisdicción: el CPACA regula la nulidad procesal con un reloj más estrecho, y la Ley 2452 de 2025 el desistimiento laboral. «transversal» afirma «es la misma en todas partes»; «por remisión» afirma «llega hasta aquí, y su plazo está por comprobar». Son afirmaciones distintas y no deben colapsarse. Cuando una rama sí tiene regla propia, lo correcto sigue siendo la ficha propia: así se hizo con la reposición y la súplica en restitución de tierras."
+}

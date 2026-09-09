@@ -48,6 +48,21 @@ export interface RevisionGuardada {
   versiones: VersionDelTexto[];
   /** El último juego de preguntas para la audiencia, con los parámetros con que se pidió. null si nunca se pidió (o la columna no existe). */
   preguntasAudiencia: PreguntasAudienciaGuardadas | null;
+  /**
+   * El archivo tal como se subió, si se conservó. null cuando la firma no
+   * autorizó guardar escritos, cuando el escrito llegó pegado como texto, o
+   * cuando la revisión es anterior a `migration-revision-archivo-original.sql`.
+   * El binario vive en B2 bajo el prefijo de la firma; aquí solo su clave.
+   */
+  archivoOriginal: ArchivoOriginalGuardado | null;
+}
+
+export interface ArchivoOriginalGuardado {
+  /** Clave en B2. Siempre empieza por `<firmId>/`; el servicio de almacenamiento lo exige. */
+  clave: string;
+  /** MIME declarado al subirlo: decide el visor. */
+  tipo: string;
+  bytes: number;
 }
 
 export interface PreguntasAudienciaGuardadas {
@@ -117,7 +132,14 @@ export const aRevisionGuardada = (row: Record<string, unknown>): RevisionGuardad
   conversacion: Array.isArray(row.conversacion) ? (row.conversacion as TurnoDelTaller[]) : [],
   anotaciones: Array.isArray(row.anotaciones) ? (row.anotaciones as Anotacion[]) : [],
   versiones: Array.isArray(row.versiones) ? (row.versiones as VersionDelTexto[]) : [],
-  preguntasAudiencia: aPreguntasGuardadas(row.preguntas_audiencia)
+  preguntasAudiencia: aPreguntasGuardadas(row.preguntas_audiencia),
+  archivoOriginal: row.archivo_original_clave
+    ? {
+        clave: String(row.archivo_original_clave),
+        tipo: String(row.archivo_original_tipo ?? 'application/octet-stream'),
+        bytes: Number(row.archivo_original_bytes ?? 0)
+      }
+    : null
 });
 
 /** Tolerante: la columna puede faltar (migración sin correr) o traer una forma vieja. */
@@ -285,6 +307,46 @@ export const documentReviewStore = {
       .eq('firm_id', firmId)
       .eq('id', id);
     if (error) console.warn('[REVIEW] No se pudieron guardar las preguntas para la audiencia (¿falta supabase/migration-preguntas-audiencia.sql?):', error.message);
+    return !error;
+  },
+
+  /* ─── El archivo original ─────────────────────────────────────────────────── */
+
+  /**
+   * Ata a la revisión el archivo tal como se subió. Se escribe APARTE del
+   * insert a propósito: si la migración no ha corrido, PostgREST rechaza el
+   * insert ENTERO por una columna que no está en su caché de esquema, y con él
+   * se perdería el informe que la firma ya pagó. Aquí, en cambio, un fallo se
+   * declara en consola y la revisión queda intacta sin su original.
+   */
+  async adjuntarOriginal(firmId: string, id: string, archivo: ArchivoOriginalGuardado): Promise<boolean> {
+    if (!supabase) return false;
+    const { error } = await supabase
+      .from('document_reviews')
+      .update({
+        archivo_original_clave: archivo.clave,
+        archivo_original_tipo: archivo.tipo,
+        archivo_original_bytes: archivo.bytes,
+        updated_at: new Date().toISOString()
+      })
+      .eq('firm_id', firmId)
+      .eq('id', id);
+    if (error) {
+      console.warn('[REVIEW] No se pudo guardar el archivo original (¿falta supabase/migration-revision-archivo-original.sql?):', error.message);
+      return false;
+    }
+    return true;
+  },
+
+  /** Suelta la referencia al archivo. Quien llama borra el objeto de B2: la fila no sabe borrar archivos. */
+  async olvidarOriginal(firmId: string, id: string): Promise<boolean> {
+    if (!supabase) return false;
+    const { error } = await supabase
+      .from('document_reviews')
+      .update({ archivo_original_clave: null, archivo_original_tipo: null, archivo_original_bytes: null, updated_at: new Date().toISOString() })
+      .eq('firm_id', firmId)
+      .eq('id', id);
+    if (error) console.warn('[REVIEW] No se pudo soltar el archivo original:', error.message);
     return !error;
   },
 

@@ -91,12 +91,18 @@ export const catalogApi = {
     return data.actuacion;
   },
 
-  /** Drops the firm's override so the shipped catalogue applies again. */
-  async deleteVerification(actuacionId: string): Promise<void> {
-    await httpClient.delete(
-      `/api/catalog/verifications?actuacionId=${encodeURIComponent(actuacionId)}`,
-      {}
-    );
+  /**
+   * Drops the firm's override so the shipped catalogue applies again.
+   *
+   * @param rama la rama en la que se había verificado. Sin ella se retira la
+   * curaduría de la rama propia de la ficha: quitar la de familia no puede
+   * tumbar la civil.
+   */
+  async deleteVerification(actuacionId: string, rama?: LegalBranch | null): Promise<void> {
+    const params = new URLSearchParams({ actuacionId });
+    if (rama) params.set('rama', rama);
+
+    await httpClient.delete(`/api/catalog/verifications?${params.toString()}`, {});
   }
 };
 

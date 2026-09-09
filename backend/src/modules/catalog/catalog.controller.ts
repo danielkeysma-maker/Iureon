@@ -224,7 +224,11 @@ export const saveVerificationController = async (req: Request, res: Response): P
 
 
   const body = (req.body ?? {}) as Record<string, unknown>;
-  const validation = validateVerificationInput(body, String(body.actuacionId ?? ''));
+  const validation = validateVerificationInput(
+    body,
+    String(body.actuacionId ?? ''),
+    catalogService.listBranches()
+  );
 
   if (!validation.ok) {
     res.status(400).json({ error: validation.error.code, message: validation.error.message });
@@ -235,6 +239,23 @@ export const saveVerificationController = async (req: Request, res: Response): P
   // unknown id is rejected rather than stored as an orphan row that would never
   // surface anywhere.
   const base = catalogService.getById(validation.value.actuacionId);
+
+  /*
+   * VERIFICAR EN UNA RAMA QUE NO ALCANZA ESA FICHA NO ES VERIFICAR NADA.
+   *
+   * La rama solo viaja cuando la ficha llega alli por remision. Si no llega, la
+   * fila se guardaria contra una clave que ninguna pantalla consulta: la firma
+   * habria escrito un termino, veria el mensaje de guardado, y la ficha
+   * seguiria sin verificar. Se rechaza antes de escribir.
+   */
+  const rama = validation.value.rama ?? null;
+  if (base && rama && !catalogService.alcanzaPorRemision(base.id, rama)) {
+    res.status(400).json({
+      error: 'RAMA_SIN_REMISION',
+      message: `La rama "${rama}" no alcanza la actuación "${base.exactName}" por remisión, así que la verificación no se mostraría en ninguna parte.`
+    });
+    return;
+  }
 
   if (!base) {
     /*
@@ -259,7 +280,7 @@ export const saveVerificationController = async (req: Request, res: Response): P
 
   try {
     const saved = await verificationStore.save(firmId, validation.value);
-    const { actuacion } = await catalogService.getByIdForFirm(firmId, base.id);
+    const { actuacion } = await catalogService.getByIdForFirm(firmId, base.id, rama ?? undefined);
 
     /*
      * El acto que hace confiable el catalogo, con nombre en el registro. Un
@@ -270,7 +291,9 @@ export const saveVerificationController = async (req: Request, res: Response): P
       firmId,
       userEmail: req.user?.email ?? 'desconocido',
       action: 'CATALOG_TERM_VERIFIED',
-      resource: `Verificó actuación · ${base.exactName}`
+      resource: rama
+        ? `Verificó actuación · ${base.exactName} · en ${rama} por remisión`
+        : `Verificó actuación · ${base.exactName}`
     });
 
     res.json({ success: true, verification: saved, actuacion });
@@ -306,6 +329,12 @@ export const deleteVerificationController = async (req: Request, res: Response):
 
 
   const actuacionId = String(req.query.actuacionId ?? '').trim();
+  /*
+   * La misma clave con la que se guardo. Sin `rama`, se retira la curaduria de
+   * la rama propia de la ficha: quitar la de familia no puede tumbar la civil.
+   */
+  const ramaCruda = String(req.query.rama ?? '').trim().toUpperCase();
+  const rama = ramaCruda ? (ramaCruda as LegalBranch) : null;
 
   if (!actuacionId) {
     res.status(400).json({
@@ -341,8 +370,8 @@ export const deleteVerificationController = async (req: Request, res: Response):
       }
     }
 
-    await verificationStore.remove(firmId, actuacionId);
-    res.json({ success: true, actuacionId });
+    await verificationStore.remove(firmId, actuacionId, rama);
+    res.json({ success: true, actuacionId, rama });
   } catch (error) {
     if (error instanceof VerificationStoreError) {
       respondStoreError(res, error);

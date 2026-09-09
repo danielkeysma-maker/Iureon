@@ -3,11 +3,13 @@ import { applyVerification, applyVerifications } from './verification.merge';
 import { verificationStore, type VerificationLoad } from './verification.store';
 import { firmActuacionStore } from './firmActuaciones.store';
 import { actuacionPropiaComoCatalogo, normalizarNombre } from './firmActuaciones.validate';
+import { fichasPorRemision, remisionDe } from './remisiones';
 import type {
   Actuacion,
   ActuacionRole,
   BranchCatalog,
   CatalogMeta,
+  CatalogVerification,
   LegalBranch
 } from './types';
 
@@ -114,7 +116,56 @@ export class CatalogService {
 
     const propias = encontradas.filter((a) => a.branch === branch);
     const prestadas = encontradas.filter((a) => a.branch !== branch);
-    return [...propias, ...prestadas];
+
+    /*
+     * Y AL FINAL DE TODO, LO QUE LLEGA POR REMISION.
+     *
+     * Ocho ramas no tenian ninguna ficha de reposicion y dependian de la
+     * generica de CIVIL, que este mismo filtro escondia. La actuacion existe
+     * en esas ramas —el CGP las gobierna— y no poder alcanzarla dejaba al
+     * abogado sin saber contra que ficha revisar un escrito.
+     *
+     * Van detras de lo transversal, que a su vez va detras de lo propio, y con
+     * el termino degradado. El orden no es estetico: lo primero que se ofrece
+     * es lo que esta verificado PARA ESTA RAMA, y lo prestado se lee al final,
+     * sabiendo que se presto.
+     */
+    const remitidas = this.porRemision(branch, role);
+
+    return [...propias, ...prestadas, ...remitidas];
+  }
+
+  /**
+   * Las fichas que otra rama le presta a esta, ya envueltas.
+   *
+   * Se excluye lo que la rama YA tiene con ese mismo nombre: si alguien
+   * cataloga manana «Recurso de reposicion en el proceso de familia» con su
+   * norma leida, la propia gana y la prestada desaparece sin que nadie tenga
+   * que acordarse de borrarla de la lista. Es la misma regla que hizo que la
+   * restitucion de tierras dejara de necesitar la remision el dia que se le
+   * escribieron sus fichas.
+   */
+  private porRemision(branch: LegalBranch, role?: ActuacionRole): Actuacion[] {
+    if (!remisionDe(branch)) return [];
+
+    const yaTiene = new Set(
+      this.actuaciones.filter((a) => a.branch === branch).map((a) => normalize(a.exactName))
+    );
+
+    return fichasPorRemision(branch, this.actuaciones).filter(
+      (a) => (!role || a.role === role) && !yaTiene.has(normalize(a.exactName))
+    );
+  }
+
+  /**
+   * True cuando esa rama alcanza esa ficha POR REMISION.
+   *
+   * La curaduria la usa para no dejar clavar una verificacion a una rama que no
+   * presta esa ficha: la fila quedaria escrita, la firma creeria haber
+   * verificado un plazo, y no aparecería en ninguna pantalla.
+   */
+  alcanzaPorRemision(id: string, rama: LegalBranch): boolean {
+    return this.porRemision(rama).some((a) => a.id === id);
   }
 
   getById(id: string): Actuacion | null {
@@ -136,8 +187,18 @@ export class CatalogService {
 
     if (!target) return null;
 
+    /*
+     * EL MISMO CONJUNTO QUE VE EL SELECTOR. Si la rama alcanza una ficha por
+     * remision, el nombre tiene que resolver desde esa rama y llegar CON EL
+     * SOBRE puesto: resolverlo contra la ficha desnuda de CIVIL le entregaria
+     * al motor el termino civil como si fuera el de familia, que es justo lo
+     * que la remision existe para evitar.
+     */
     const pool = branch
-      ? this.actuaciones.filter((a) => a.branch === branch || a.transversal === true)
+      ? [
+          ...this.actuaciones.filter((a) => a.branch === branch || a.transversal === true),
+          ...this.porRemision(branch)
+        ]
       : this.actuaciones;
 
     const exact = pool.filter((a) => normalize(a.exactName) === target);
@@ -351,7 +412,7 @@ export class CatalogService {
 
     if (!base) return { actuacion: null, curation: load.status };
 
-    const found = load.verifications.find((v) => v.actuacionId === base.id);
+    const found = this.curaduriaDe(load.verifications, base);
 
     return {
       actuacion: found ? applyVerification(base, found) : base,
@@ -359,11 +420,36 @@ export class CatalogService {
     };
   }
 
+  /**
+   * La curaduria que corresponde a ESTA ficha en ESTA rama.
+   *
+   * Una ficha prestada y la misma ficha en su rama de origen comparten el id y
+   * no comparten reloj, asi que tampoco pueden compartir curaduria: buscar solo
+   * por id haria que el plazo que la firma verifico para familia sustituyera al
+   * que ya esta verificado para lo civil.
+   */
+  private curaduriaDe(
+    verifications: CatalogVerification[],
+    actuacion: Actuacion
+  ): CatalogVerification | undefined {
+    const rama = actuacion.porRemision?.paraRama ?? null;
+    return verifications.find((v) => v.actuacionId === actuacion.id && (v.rama ?? null) === rama);
+  }
+
+  /**
+   * @param rama la rama desde la que se abrio la ficha. Importa solo cuando esa
+   * rama la alcanza POR REMISION: entonces lo que se devuelve es el sobre —con
+   * el termino degradado y la curaduria de esa rama— y no la ficha desnuda de
+   * la rama de origen.
+   */
   async getByIdForFirm(
     firmId: string,
-    id: string
+    id: string,
+    rama?: LegalBranch
   ): Promise<{ actuacion: Actuacion | null; curation: CurationStatus }> {
-    const base = this.getById(id);
+    const base = rama
+      ? this.porRemision(rama).find((a) => a.id === id) ?? this.getById(id)
+      : this.getById(id);
     const load = await verificationStore.listForFirm(firmId);
 
     if (!base) {
@@ -372,7 +458,7 @@ export class CatalogService {
       return { actuacion: propia ?? null, curation: load.status };
     }
 
-    const found = load.verifications.find((v) => v.actuacionId === base.id);
+    const found = this.curaduriaDe(load.verifications, base);
 
     return {
       actuacion: found ? applyVerification(base, found) : base,

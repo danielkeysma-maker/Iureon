@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AlertTriangle, CalendarClock, CircleDashed, Landmark, Loader2, MinusCircle } from 'lucide-react';
+import { AlertTriangle, CalendarClock, CircleDashed, Landmark, Link2, Loader2, MinusCircle } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import { triageApi, type TriageResponse } from '../../catalog/services/catalog.api';
 import { BRANCH_LABELS } from '../../catalog/branchLabels';
@@ -189,6 +189,22 @@ export const GuiaEligeActuacionDialog: React.FC<Props> = ({
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <p className="text-ui font-semibold text-ink-900">{actuacion.exactName}</p>
+
+                    {/*
+                      ESTE DIALOGO ESTA ACOTADO A LA RAMA que el abogado ya
+                      eligio —lo dice su propio subtitulo— y no pinta la rama de
+                      cada candidata. Sin esta linea, una ficha que llega
+                      prestada se leeria como propia de su rama, con su articulo
+                      del CGP al lado, y el «nadie ha comprobado el termino» de
+                      mas abajo parecería un hueco del catalogo en vez de lo que
+                      es: un plazo verificado en otra rama.
+                    */}
+                    {actuacion.porRemision && (
+                      <p className="mt-1 flex items-start gap-1.5 text-justify text-meta leading-snug text-ink-500 [text-wrap:pretty]">
+                        <Link2 className="mt-0.5 h-3 w-3 shrink-0" />
+                        {actuacion.porRemision.marca}
+                      </p>
+                    )}
 
                     {razon && (
                       <p className="mt-1 text-justify text-meta leading-snug text-ink-500 [text-wrap:pretty]">

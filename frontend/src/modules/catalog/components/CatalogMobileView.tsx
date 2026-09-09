@@ -1,5 +1,5 @@
 import React from 'react';
-import { Loader2 } from 'lucide-react';
+import { Link2, Loader2 } from 'lucide-react';
 import {
   IconoBuscar,
   IconoSinVerificar,
@@ -272,6 +272,20 @@ export const CatalogMobileView: React.FC = () => {
                       <p className="text-[13px] font-medium leading-tight text-ink-900 text-justify">
                         {a.exactName}
                       </p>
+
+                      {/*
+                        LA MARCA VA ANTES DEL TERMINO, no después. En el
+                        teléfono el término se pinta grande y es lo primero que
+                        el ojo coge; si dijera «sin verificar» sin que antes se
+                        haya dicho que la ficha es prestada, se leería como un
+                        hueco del catálogo en esta rama.
+                      */}
+                      {a.porRemision && (
+                        <p className="mt-1 flex items-start gap-1 text-[11px] leading-snug text-ink-500 text-justify">
+                          <Link2 className="mt-0.5 h-3 w-3 shrink-0" />
+                          {a.porRemision.marca}
+                        </p>
+                      )}
 
                       <p className={`mt-1.5 ${TERMINO_GRANDE} ${t.clase}`}>{t.texto}</p>
 

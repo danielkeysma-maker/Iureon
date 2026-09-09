@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { AlertTriangle, CalendarClock, Check, Infinity as InfinityIcon, Loader2, RotateCcw, X } from 'lucide-react';
 import { useTenant } from '../../tenant/TenantContext';
-import type { Actuacion, TermStatus, VerificationInput } from '../types';
+import type { Actuacion, LegalBranch, TermStatus, VerificationInput } from '../types';
 
 interface VerificationFormProps {
   actuacion: Actuacion;
   isSaving: boolean;
   error: string | null;
   onSave: (input: VerificationInput) => Promise<boolean>;
-  onRevert: (actuacionId: string) => Promise<boolean>;
+  onRevert: (actuacionId: string, rama?: LegalBranch | null) => Promise<boolean>;
   onClose: () => void;
   /** La franja que repite término, norma y autoridad. Se apaga donde ya se muestra la ficha completa. */
   conResumen?: boolean;
@@ -84,6 +84,13 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({
 
     const saved = await onSave({
       actuacionId: actuacion.id,
+      /*
+       * LA RAMA EN LA QUE SE VERIFICA, y solo cuando la ficha llegó aquí
+       * prestada. Sin ella, el término que el socio acaba de leer para familia
+       * se guardaría contra la ficha civil y reemplazaría su plazo, que es otro
+       * y ya está verificado.
+       */
+      rama: actuacion.porRemision?.paraRama ?? null,
       termStatus,
       termDescription: claimsTerm ? termDescription.trim() : null,
       legalBasis: legalBasis.trim() || null,
@@ -324,7 +331,7 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({
           <button
             type="button"
             disabled={isSaving}
-            onClick={() => void onRevert(actuacion.id)}
+            onClick={() => void onRevert(actuacion.id, actuacion.porRemision?.paraRama ?? null)}
             title="Descartar la verificación de la firma y volver al catálogo base"
             className="inline-flex items-center gap-1.5 rounded-control border border-line-200 px-3 py-2 text-[12px] font-semibold text-ink-700 transition-colors hover:bg-canvas disabled:opacity-40"
           >

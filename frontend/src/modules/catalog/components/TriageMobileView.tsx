@@ -263,6 +263,16 @@ export const TriageMobileView: React.FC<TriageMobileViewProps> = ({ onDraft }) =
                     />
                   </div>
 
+                  {/*
+                    Aquí la tarjeta no pinta la rama, así que sin esta línea la
+                    ficha prestada se leería como propia de la rama elegida.
+                  */}
+                  {a.porRemision && (
+                    <p className="mt-1.5 text-[11px] leading-snug text-ink-500 text-justify">
+                      {a.porRemision.marca}
+                    </p>
+                  )}
+
                   {estado === 'NO_VERIFICADO' ? (
                     <p className="mt-1.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.07em] text-unverified">
                       Sin verificar · el término no está comprobado

@@ -92,10 +92,27 @@ export const conLimite = <T>(promesa: Promise<T>, ms: number): Promise<T> =>
     );
   });
 
+/**
+ * Lee el archivo que el navegador subió a B2 y, salvo que se pida conservarlo,
+ * lo borra antes de devolver nada.
+ *
+ * `conservar` es la única puerta por la que un escrito sobrevive en el
+ * almacenamiento, y solo se abre cuando la firma autorizó guardar escritos:
+ * el visor del original necesita el archivo tal como está constituido, porque
+ * el texto extraído pierde la diagramación, las negritas, las tablas y las
+ * notas al pie —justo lo que un litigante lee primero—. Sin esa autorización
+ * se sigue borrando aquí mismo, como el audio de las audiencias, y el original
+ * vive solo en la pestaña abierta.
+ *
+ * El borrado va DENTRO de la petición y no en un `finally` posterior a la
+ * respuesta: una función serverless se congela al contestar.
+ */
 const leerDelAlmacen = async (
   firmId: string,
-  storageKey: string
+  storageKey: string,
+  conservar: boolean
 ): Promise<{ ok: true; buffer: Buffer } | { ok: false; status: number; message: string }> => {
+  let leido = false;
   try {
     const url = await b2.generateDownloadPresignedUrl(firmId, storageKey);
     const r = await fetch(url, { signal: AbortSignal.timeout(30_000) });
@@ -104,11 +121,13 @@ const leerDelAlmacen = async (
     if (declarado > MAX_BYTES_ALMACEN) return { ok: false, status: 413, message: 'El archivo supera 15 MB.' };
     const buffer = Buffer.from(await r.arrayBuffer());
     if (buffer.length > MAX_BYTES_ALMACEN) return { ok: false, status: 413, message: 'El archivo supera 15 MB.' };
+    leido = true;
     return { ok: true, buffer };
   } catch (err) {
     return { ok: false, status: 502, message: `No se pudo leer el archivo del almacenamiento: ${(err as Error).message}` };
   } finally {
-    await b2.deleteObject(firmId, storageKey).catch(() => false);
+    // Un archivo que no se pudo leer no se conserva: nadie podría abrirlo.
+    if (!conservar || !leido) await b2.deleteObject(firmId, storageKey).catch(() => false);
   }
 };
 /** Base64 of ~4 MB. Above it Vercel would refuse the body anyway; here it fails with a reason. */
@@ -153,6 +172,28 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
     return;
   }
 
+  /*
+   * ─── EL ORIGINAL SE CONSERVA CUANDO LA FIRMA LO AUTORIZÓ ──────────────────
+   *
+   * La misma autorización que gobierna el texto (`guarda_escritos_revisados`),
+   * porque conservar el archivo cambia lo que Iureon guarda de la firma
+   * exactamente igual. El navegador lo pide con `conservarOriginal` y solo lo
+   * hace cuando ya subió el archivo al almacenamiento: lo que llega en el
+   * cuerpo no se conserva, porque devolverlo a B2 desde aquí gastaría el reloj
+   * de la función en una subida que el navegador ya sabe hacer.
+   */
+  const consentimiento = await documentReviewStore.consentimiento(firmId);
+  const conservarOriginal = consentimiento.guarda && req.body.conservarOriginal === true;
+  /** Tipo declarado por el navegador; si calla, el que dice la extensión. */
+  const tipoDelArchivo = String(req.body.contentType ?? '').trim() || tipoPorNombre(fileName);
+  /** El objeto que quedó vivo en B2 y todavía no tiene fila que lo reclame. */
+  let original: { clave: string; tipo: string; bytes: number } | null = null;
+  const soltarOriginalHuerfano = async (): Promise<void> => {
+    if (!original) return;
+    await b2.deleteObject(firmId, original.clave).catch(() => false);
+    original = null;
+  };
+
   // ─── The text: pasted, or extracted from the file ─────────────────────────
   let bruto: string;
   if (typeof req.body.texto === 'string' && req.body.texto.trim()) {
@@ -169,13 +210,15 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
     }
     bruto = extraido.texto;
   } else if (typeof req.body.storageKey === 'string' && req.body.storageKey) {
-    const leido = await leerDelAlmacen(firmId, req.body.storageKey);
+    const leido = await leerDelAlmacen(firmId, req.body.storageKey, conservarOriginal);
     if (!leido.ok) {
       res.status(leido.status).json({ success: false, error: 'STORAGE_READ_FAILED', message: leido.message });
       return;
     }
+    if (conservarOriginal) original = { clave: req.body.storageKey, tipo: tipoDelArchivo, bytes: leido.buffer.length };
     const extraido = await extraerTexto(fileName, leido.buffer);
     if (!extraido.ok) {
+      await soltarOriginalHuerfano();
       res.status(422).json({ success: false, error: 'UNREADABLE_FILE', message: `No se pudo leer el archivo: ${extraido.reason}. Pegue el texto en su lugar.` });
       return;
     }
@@ -187,6 +230,7 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
 
   const preparado = prepararTexto(bruto);
   if (preparado.caracteres < TEXTO_MINIMO) {
+    await soltarOriginalHuerfano();
     res.status(422).json({
       success: false,
       error: 'TEXT_TOO_SHORT',
@@ -200,6 +244,7 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
   try {
     ({ reserved: reservado } = await reserveForOperation({ firmId, userEmail, operation: 'REVISION' }));
   } catch (err) {
+    await soltarOriginalHuerfano();
     if (err instanceof BillingError) {
       res.status(err.status).json({ success: false, error: err.code, message: err.message });
       return;
@@ -223,6 +268,7 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
     await recordUsage({ firmId, userEmail, operation: 'REVISION', operationId, usage: llamada.usage ?? null });
 
     if (!llamada.text || !llamada.text.trim()) {
+      await soltarOriginalHuerfano();
       await refundReservation({ firmId, userEmail, operation: 'REVISION', reason: 'la revisión no produjo resultado' });
       res.status(502).json({ success: false, error: 'REVIEW_FAILED', message: 'El revisor no respondió. No se descontó saldo.' });
       return;
@@ -262,7 +308,6 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
      * corrige. Se guarda el informe y el nombre del archivo; el texto del
      * escrito no. Si la tabla no existe todavia, la respuesta lo dice.
      */
-    const consentimiento = await documentReviewStore.consentimiento(firmId);
     const guardadaId = await documentReviewStore.guardar({
       firmId,
       userEmail,
@@ -280,10 +325,27 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
       textoOriginal: consentimiento.guarda ? preparado.texto : null
     });
 
+    /*
+     * El archivo se ata a la fila DESPUÉS de crearla, en su propia sentencia:
+     * si la migración del original no ha corrido, PostgREST rechazaría el
+     * insert entero por una columna que no conoce y se perdería el informe que
+     * la firma acaba de pagar. Si no se pudo atar —o no hubo fila— el objeto
+     * se borra: un archivo en el bucket que ninguna revisión reclama es
+     * material privilegiado sin dueño.
+     */
+    let archivoOriginal: { clave: string; tipo: string; bytes: number } | null = null;
+    if (original) {
+      const atado = guardadaId !== null && (await documentReviewStore.adjuntarOriginal(firmId, guardadaId, original));
+      if (atado) archivoOriginal = original;
+      else await soltarOriginalHuerfano();
+    }
+
     res.json({
       success: true,
       id: guardadaId,
       guardada: guardadaId !== null,
+      /** El archivo tal como se subió, cuando se conservó: el visor del original lo pide por su cuenta. */
+      archivoOriginal,
       /*
        * EL TEXTO VUELVE AL NAVEGADOR SIEMPRE: el taller lo necesita para tachar
        * los pasajes y dejar editar. Que ademas se CONSERVE en el servidor
@@ -300,6 +362,7 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
       saldoCop: cobro.balance
     });
   } catch (err) {
+    await soltarOriginalHuerfano();
     if (err instanceof TiempoAgotado) {
       await refundReservation({ firmId, userEmail, operation: 'REVISION', reason: 'la revisión superó el tiempo de la plataforma' });
       res.status(504).json({
@@ -660,8 +723,23 @@ export const reReviewController = async (req: Request, res: Response): Promise<v
   }
 };
 
-/** DELETE /api/agent/reviews/:id */
+/**
+ * DELETE /api/agent/reviews/:id
+ *
+ * El archivo original se borra ANTES que la fila: la fila es lo único que sabe
+ * dónde está el objeto, así que borrarla primero dejaría el escrito en el
+ * bucket sin nada que lo nombre. Un fallo del almacenamiento no impide borrar
+ * la revisión —se anota en consola—, porque un archivo suelto se puede barrer
+ * a mano y una revisión a medias no.
+ */
 export const deleteReviewController = async (req: Request, res: Response): Promise<void> => {
-  const ok = await documentReviewStore.eliminar(req.firmId as string, String(req.params.id));
+  const firmId = req.firmId as string;
+  const id = String(req.params.id);
+  const revision = await documentReviewStore.obtener(firmId, id);
+  if (revision?.archivoOriginal) {
+    const borrado = await b2.deleteObject(firmId, revision.archivoOriginal.clave).catch(() => false);
+    if (!borrado) console.warn(`[REVIEW] El archivo original ${revision.archivoOriginal.clave} no se pudo borrar de B2 al eliminar la revisión ${id}.`);
+  }
+  const ok = await documentReviewStore.eliminar(firmId, id);
   res.status(ok ? 200 : 404).json({ success: ok });
 };

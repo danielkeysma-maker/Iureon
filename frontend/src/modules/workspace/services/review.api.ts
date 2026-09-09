@@ -33,10 +33,21 @@ export interface InformeDeRevision {
   recomendaciones: string[];
 }
 
+/** El archivo tal como se subió, cuando se conservó en el almacenamiento de la firma. */
+export interface ArchivoOriginalGuardado {
+  /** Clave en B2, bajo el prefijo de la firma. Sola no abre nada: hace falta una URL firmada. */
+  clave: string;
+  /** MIME con que se subió: decide con qué visor se abre. */
+  tipo: string;
+  bytes: number;
+}
+
 export interface RespuestaDeRevision {
   /** Id del informe guardado; null si no se pudo guardar. */
   id?: string | null;
   guardada?: boolean;
+  /** El archivo original, si se conservó; null cuando no. */
+  archivoOriginal?: ArchivoOriginalGuardado | null;
   /** El texto del escrito tal como se revisó: el taller lo necesita para tachar y editar. */
   texto?: string;
   /** Si la firma autorizó conservar el texto y la conversación en el servidor. */
@@ -64,6 +75,14 @@ export interface PeticionDeRevision {
   /** Más grande: se subió directo al almacenamiento y viaja solo la clave. */
   storageKey?: string;
   texto?: string;
+  /**
+   * Conservar el archivo tal como se subió para verlo después con su
+   * diagramación. Solo tiene efecto con `storageKey` y con la autorización de
+   * la firma: el servidor comprueba las dos cosas.
+   */
+  conservarOriginal?: boolean;
+  /** MIME que declaró el navegador; decide con qué visor se abre el original. */
+  contentType?: string;
 }
 
 export interface RevisionGuardada {
@@ -89,6 +108,8 @@ export interface RevisionGuardada {
   versiones: VersionDelTexto[];
   /** El último juego de preguntas para la audiencia; null si nunca se pidió. Falta en la lista sin cuerpos. */
   preguntasAudiencia?: PreguntasAudienciaGuardadas | null;
+  /** El archivo tal como se subió, si se conservó. Falta en la lista sin cuerpos. */
+  archivoOriginal?: ArchivoOriginalGuardado | null;
 }
 
 /* ─── Preguntas para la audiencia ──────────────────────────────────────────── */
@@ -192,6 +213,27 @@ export interface ConsentimientoDeGuardado {
   el: string | null;
 }
 
+/**
+ * Lo que el servidor dice del archivo original de una revisión. Las dos formas
+ * son respuestas correctas: que el archivo no se conservara no es un fallo.
+ */
+export type RespuestaDelOriginal =
+  | {
+      disponible: true;
+      /** URL firmada de quince minutos contra el almacenamiento. No se guarda. */
+      url: string;
+      nombre: string;
+      tipo: string;
+      bytes: number;
+      expiraEnSegundos: number;
+    }
+  | {
+      disponible: false;
+      /** Si la firma autorizó conservar escritos: decide si volver a subirlo lo guarda o solo lo abre. */
+      puedeConservarlo: boolean;
+      motivo: string;
+    };
+
 export const reviewApi = {
   revisar: (body: PeticionDeRevision) =>
     httpClient.post<RespuestaDeRevision>('/api/agent/review-document', { body }),
@@ -237,6 +279,27 @@ export const reviewApi = {
 
   rerevisar: (id: string, textoActual: string) =>
     httpClient.post<RespuestaDeNuevaRevision>(`/api/agent/reviews/${encodeURIComponent(id)}/rerevisar`, { body: { textoActual } }),
+
+  /* ─── El archivo original ───────────────────────────────────────────────── */
+
+  /**
+   * Dónde está el archivo tal como se subió, para el visor fiel.
+   *
+   * Responde igual cuando NO está: `disponible: false` con el motivo escrito,
+   * porque «no se conservó» es un estado del producto y la pestaña tiene que
+   * explicarlo. La URL viene firmada y caduca a los quince minutos, así que se
+   * pide cada vez que se abre el visor y nunca se guarda.
+   */
+  originalDeRevision: (id: string) =>
+    httpClient.get<RespuestaDelOriginal>(`/api/documents/revisiones/${encodeURIComponent(id)}/original`),
+
+  /** Ata a la revisión un archivo que el navegador ya subió al almacenamiento. */
+  adjuntarOriginal: (id: string, body: { storageKey: string; tipo: string; bytes: number }) =>
+    httpClient.put<{ tipo: string; bytes: number }>(`/api/documents/revisiones/${encodeURIComponent(id)}/original`, { body }),
+
+  /** Retira el archivo del almacenamiento sin tocar el informe ni el taller. */
+  retirarOriginal: (id: string) =>
+    httpClient.delete<{ borrado: boolean }>(`/api/documents/revisiones/${encodeURIComponent(id)}/original`),
 
   consentimiento: () => httpClient.get<ConsentimientoDeGuardado>('/api/agent/reviews/settings/guardado'),
 

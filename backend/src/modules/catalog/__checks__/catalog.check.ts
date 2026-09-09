@@ -885,6 +885,8 @@ if (!baseForMerge) {
 } else {
   const verification: CatalogVerification = {
     actuacionId: baseForMerge.id,
+    // null = la rama propia de la ficha. Ver `remisiones.ts`.
+    rama: null,
     term: { status: 'VERIFICADO', description: '10 días hábiles (norma verificada por la firma)' },
     legalBasis: null,
     sourceUrl: 'https://www.suin-juriscol.gov.co/norma',

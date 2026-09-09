@@ -16,6 +16,7 @@ import {
   MessageSquare,
   MessageSquarePlus,
   Minimize2,
+  FileText,
   PanelRightClose,
   PanelRightOpen,
   PenLine,
@@ -32,6 +33,9 @@ import { ApiError } from '../../../config/httpClient';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 import { ControlDeLetra, useTamanoDeLetra } from '../../../design/TamanoDeLetra';
 import { estiloDelLienzo, type FormatoDelEscrito } from '../../documents/formatoEnPantalla';
+import type { FuenteDelOriginal } from '../services/originalDelEscrito';
+import type { CapaDeResaltado } from '../services/resaltadoNativo';
+import { VisorDelOriginal, type SuperficieDeSeleccion } from './VisorDelOriginal';
 import { AVISO_FUNCION_DESHABILITADA } from '../../subscriptions/types';
 
 /**
@@ -72,6 +76,31 @@ import { AVISO_FUNCION_DESHABILITADA } from '../../subscriptions/types';
  */
 
 export type ColorDeResaltado = Anotacion['color'];
+
+/**
+ * Las tres formas de mirar el mismo escrito.
+ *
+ * `marcas` es el papel con las capas encima; `editar` es el texto en bruto;
+ * `original` es el archivo TAL COMO SE SUBIÓ —su diagramación, sus negritas,
+ * sus tablas, su numeración—. La tercera no reemplaza a la primera: el papel
+ * es donde se corrige, y el original es donde se comprueba cómo lo verá el
+ * juez. Se seleccionan igual en las dos, porque las marcas se anclan por texto.
+ */
+export type ModoDelEscrito = 'marcas' | 'editar' | 'original';
+
+const MODOS: readonly ModoDelEscrito[] = ['marcas', 'editar', 'original'];
+
+/** De dónde sale el archivo original y qué se puede hacer con él. */
+export interface OriginalDelTaller {
+  /** El archivo en memoria, o la revisión a la que preguntarle al servidor. `null` = no hay ninguno. */
+  fuente: FuenteDelOriginal | null;
+  /** Sin revisión guardada no hay dónde atar un archivo que se vuelva a subir. */
+  revisionId: string | null;
+  /** Si la firma autorizó conservar escritos. */
+  puedeConservar: boolean;
+  /** El abogado subió otro archivo: quien abrió el taller lo recuerda para no volver a pedirlo. */
+  onArchivoCambiado?: (file: File) => void;
+}
 
 export interface DatosDelEscrito {
   titulo: string;
@@ -118,6 +147,12 @@ export interface TallerDeEscritoProps {
    * igual con 403 si la petición llega por fuera de la pantalla.
    */
   cerradas?: { chat?: boolean; rerevisar?: boolean };
+  /**
+   * El archivo original, para la pestaña «Original». Cuando falta, la pestaña
+   * no se ofrece: un botón que solo sirve para decir «aquí no hay nada» enseña
+   * a no pulsarlo.
+   */
+  original?: OriginalDelTaller;
 }
 
 export interface PreguntasDelTaller {
@@ -264,7 +299,8 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   onSaldoCambiado,
   formato,
   preguntas,
-  cerradas
+  cerradas,
+  original
 }) => {
   /*
    * Los escritos revisados antes del 5 de septiembre de 2026 se guardaron sin
@@ -278,7 +314,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   const [anotaciones, setAnotaciones] = React.useState<Anotacion[]>(datos.anotaciones);
   const [versiones, setVersiones] = React.useState<VersionDelTexto[]>(datos.versiones);
   const [referencias, setReferencias] = React.useState<string[]>([]);
-  const [modo, setModo] = React.useState<'marcas' | 'editar'>('marcas');
+  const [modo, setModo] = React.useState<ModoDelEscrito>('marcas');
   /** Tamaño de lectura en pantalla; no toca el documento exportado. */
   const letra = useTamanoDeLetra('taller');
   /* La letra de la firma manda; el control de lectura solo la escala. Sin formato, la serif del lienzo a 14 px. */
@@ -345,6 +381,29 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
     [texto, marcasDeCitas, referencias, anotaciones]
   );
   const segmentos = React.useMemo(() => segmentarCapas(texto, marcas), [texto, marcas]);
+
+  /*
+   * LAS MISMAS CAPAS, SOBRE EL ORIGINAL. Van por su cita —no por posición—
+   * porque el original y el texto extraído no comparten índices: una tabla que
+   * la extracción aplanó desplaza todo lo que viene detrás. Las tipográficas
+   * (negritas y marcadores que el papel deduce del texto) NO viajan: en el
+   * original la negrita es la del documento, y repintarla encima sería afirmar
+   * como del archivo algo que dedujimos nosotros.
+   */
+  const capasDelOriginal: CapaDeResaltado[] = React.useMemo(() => {
+    const porColor = new Map<string, string[]>();
+    for (const a of anotaciones) {
+      const lista = porColor.get(a.color) ?? [];
+      lista.push(a.cita);
+      porColor.set(a.color, lista);
+    }
+    return [
+      { nombre: 'cita', citas },
+      { nombre: 'referencia', citas: referencias },
+      ...[...porColor.entries()].map(([color, xs]) => ({ nombre: color, citas: xs }))
+    ];
+  }, [anotaciones, citas, referencias]);
+  const totalDeMarcas = anotaciones.length + citas.length + referencias.length;
 
   /* ─── Guardado con retardo ───────────────────────────────────────────────── */
   /*
@@ -528,10 +587,30 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   const relojDeSeleccion = React.useRef(0);
   const arrastrandoConRaton = React.useRef(false);
 
+  /*
+   * DOS SUPERFICIES, UNA SOLA BARRA. Se puede seleccionar en el papel del
+   * taller o encima del original —la capa de texto de un PDF, el HTML de un
+   * Word—, y la barra de marcar es la misma en las dos: una anotación se ancla
+   * por TEXTO, así que da igual de qué superficie salga. Lo único que cambia
+   * es contra qué contenedor se coloca la barra flotante, y por eso cada
+   * superficie viaja con su propia caja.
+   */
+  const superficieDelOriginal = React.useRef<SuperficieDeSeleccion>({ lienzo: null, caja: null });
+  const recibirSuperficie = React.useCallback((s: SuperficieDeSeleccion) => {
+    superficieDelOriginal.current = s;
+  }, []);
+
   const capturarSeleccion = (descartarSiVacia: boolean) => {
     const sel = window.getSelection();
-    const caja = contenedor.current;
-    const dentro = Boolean(sel && !sel.isCollapsed && lienzo.current && caja && sel.anchorNode && lienzo.current.contains(sel.anchorNode));
+    const superficies = [
+      { lienzo: lienzo.current as HTMLElement | null, caja: contenedor.current as HTMLElement | null },
+      superficieDelOriginal.current
+    ];
+    const activa = sel && !sel.isCollapsed && sel.anchorNode
+      ? superficies.find((sup) => sup.lienzo && sup.caja && sup.lienzo.contains(sel.anchorNode))
+      : undefined;
+    const caja = activa?.caja ?? null;
+    const dentro = Boolean(activa);
     const t = dentro && sel ? sel.toString().replace(/\s+/g, ' ').trim() : '';
     if (!sel || !caja || !dentro || t.length < 2) {
       if (descartarSiVacia) setSeleccion(null);
@@ -720,35 +799,47 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
     </div>
   );
 
+  /*
+   * LA BARRA FLOTANTE DEL COMPUTADOR, UNA SOLA VEZ.
+   *
+   * Vive dentro del contenedor con desplazamiento contra el que se midió la
+   * selección, y ese contenedor cambia según se esté leyendo el papel o el
+   * original. Por eso es una función que se pinta en los dos sitios en vez de
+   * dos copias que se separarían: el día que se añada un color, se añade una
+   * vez.
+   */
+  const BarraFlotante = () =>
+    seleccion && (modo === 'marcas' || modo === 'original') ? (
+      <div
+        className="absolute z-10 hidden -translate-x-1/2 -translate-y-full items-center gap-1 rounded-card border border-line-200 bg-surface p-1 shadow-lg lg:flex"
+        style={{ left: seleccion.x, top: seleccion.y }}
+        onMouseDown={(e) => e.preventDefault()}
+      >
+        <span className="px-1 font-sans text-[10px] uppercase tracking-[0.08em] text-ink-400">Marcar</span>
+        {COLORES.map((c) => (
+          <button
+            key={c.id}
+            type="button"
+            onClick={() => resaltar(c.id)}
+            className={`h-7 min-w-7 rounded-control border border-line-200 px-1.5 font-sans text-[11px] text-ink-900 ${c.id === 'tachado' ? 'bg-surface' : c.muestra}`}
+            title={c.nombre}
+          >
+            {c.id === 'tachado' ? <span className="line-through">abc</span> : ''}
+          </button>
+        ))}
+        <button type="button" onClick={abrirComentarioNuevo} className="flex h-7 items-center gap-1 rounded-control border border-brand-700 px-2 font-sans text-[11px] text-brand-700" title="Dejar un comentario sobre este pasaje">
+          <MessageSquarePlus className="h-3.5 w-3.5" />
+          Comentar
+        </button>
+        <button type="button" onClick={olvidarSeleccion} className="h-7 rounded-control px-1.5 font-sans text-[11px] text-ink-500" title="Cancelar">
+          ✕
+        </button>
+      </div>
+    ) : null;
+
   const Papel = (children: React.ReactNode) => (
     <div ref={contenedor} className="scroll-documento relative min-h-0 flex-1 overflow-y-auto bg-canvas px-3 py-4 sm:px-6" onMouseUp={() => capturarSeleccion(true)} onTouchEnd={() => capturarSeleccion(false)}>
-      {seleccion && modo === 'marcas' && (
-        <div
-          className="absolute z-10 hidden -translate-x-1/2 -translate-y-full items-center gap-1 rounded-card border border-line-200 bg-surface p-1 shadow-lg lg:flex"
-          style={{ left: seleccion.x, top: seleccion.y }}
-          onMouseDown={(e) => e.preventDefault()}
-        >
-          <span className="px-1 font-sans text-[10px] uppercase tracking-[0.08em] text-ink-400">Marcar</span>
-          {COLORES.map((c) => (
-            <button
-              key={c.id}
-              type="button"
-              onClick={() => resaltar(c.id)}
-              className={`h-7 min-w-7 rounded-control border border-line-200 px-1.5 font-sans text-[11px] text-ink-900 ${c.id === 'tachado' ? 'bg-surface' : c.muestra}`}
-              title={c.nombre}
-            >
-              {c.id === 'tachado' ? <span className="line-through">abc</span> : ''}
-            </button>
-          ))}
-          <button type="button" onClick={abrirComentarioNuevo} className="flex h-7 items-center gap-1 rounded-control border border-brand-700 px-2 font-sans text-[11px] text-brand-700" title="Dejar un comentario sobre este pasaje">
-            <MessageSquarePlus className="h-3.5 w-3.5" />
-            Comentar
-          </button>
-          <button type="button" onClick={olvidarSeleccion} className="h-7 rounded-control px-1.5 font-sans text-[11px] text-ink-500" title="Cancelar">
-            ✕
-          </button>
-        </div>
-      )}
+      {BarraFlotante()}
       {comentario && (
         <div
           /*
@@ -803,9 +894,15 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
 
   const Escrito = () => (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-      <div className="flex flex-wrap items-center gap-2 border-b border-line-100 bg-surface px-4 py-2">
-        <div className="flex rounded-control border border-line-200 p-0.5">
-          {(['marcas', 'editar'] as const).map((m) => (
+      <div className="flex min-w-0 flex-wrap items-center gap-2 border-b border-line-100 bg-surface px-4 py-2">
+        {/*
+          TRES MODOS EN UNA FILA QUE PUEDE DESLIZARSE. Con «Original» son tres
+          rótulos que en 320 px no caben junto al control de letra: la fila
+          lleva desplazamiento propio y cada botón se niega a encoger, porque
+          un rótulo medio borrado es peor que uno al que hay que deslizarse.
+        */}
+        <div className="flex max-w-full overflow-x-auto rounded-control border border-line-200 p-0.5">
+          {MODOS.filter((m) => m !== 'original' || Boolean(original)).map((m) => (
             <button
               key={m}
               type="button"
@@ -814,10 +911,11 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
                 olvidarSeleccion();
                 setVersionAbierta(null);
               }}
-              className={`flex items-center gap-1 rounded-control px-2.5 py-1 text-[12px] ${modo === m && versionAbierta === null ? 'bg-brand-50 font-semibold text-brand-700' : 'text-ink-600 hover:text-ink-900'}`}
+              title={m === 'original' ? 'El archivo tal como se subió: su diagramación, sus negritas, sus tablas' : undefined}
+              className={`flex shrink-0 items-center gap-1 whitespace-nowrap rounded-control px-2.5 py-1 text-[12px] ${modo === m && versionAbierta === null ? 'bg-brand-50 font-semibold text-brand-700' : 'text-ink-600 hover:text-ink-900'}`}
             >
-              {m === 'marcas' ? <Eye className="h-3.5 w-3.5" /> : <PenLine className="h-3.5 w-3.5" />}
-              {m === 'marcas' ? 'Con marcas' : 'Editar'}
+              {m === 'marcas' ? <Eye className="h-3.5 w-3.5" /> : m === 'editar' ? <PenLine className="h-3.5 w-3.5" /> : <FileText className="h-3.5 w-3.5" />}
+              {m === 'marcas' ? 'Con marcas' : m === 'editar' ? 'Editar' : 'Original'}
             </button>
           ))}
         </div>
@@ -832,6 +930,11 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
               {marcasDeCitas.marcas.length > 0 && ` · ${marcasDeCitas.marcas.length} ${marcasDeCitas.marcas.length === 1 ? 'pasaje citado' : 'pasajes citados'}`}
               {anotaciones.filter((a) => a.color !== 'comentario').length > 0 && ` · ${anotaciones.filter((a) => a.color !== 'comentario').length} ${anotaciones.filter((a) => a.color !== 'comentario').length === 1 ? 'marca suya' : 'marcas suyas'}`}
               {comentarios.length > 0 && ` · ${comentarios.length} ${comentarios.length === 1 ? 'comentario' : 'comentarios'}`}
+            </>
+          ) : modo === 'original' ? (
+            <>
+              <Highlighter className="mr-1 inline h-3 w-3" />
+              El archivo tal como se subió. Seleccione texto para resaltar o comentar; la marca queda sobre el escrito.
             </>
           ) : (
             'Las marcas se reubican solas al volver a «Con marcas».'
@@ -913,6 +1016,21 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
             })()}
           </>
         )
+      ) : modo === 'original' && original ? (
+        <VisorDelOriginal
+          fuente={original.fuente}
+          revisionId={original.revisionId}
+          puedeConservar={original.puedeConservar}
+          capas={capasDelOriginal}
+          totalDeMarcas={totalDeMarcas}
+          onIrAlPapel={() => {
+            setModo('marcas');
+            olvidarSeleccion();
+          }}
+          barraDeMarcado={BarraFlotante()}
+          onSuperficie={recibirSuperficie}
+          onOriginalCambiado={original.onArchivoCambiado}
+        />
       ) : modo === 'editar' ? (
         Papel(
           <textarea
@@ -1456,7 +1574,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
         —el sistema puede haberla borrado ya—, de modo que sin las primeras
         palabras escritas se marcaría a ciegas.
       */}
-      {seleccion && modo === 'marcas' && versionAbierta === null && vistaMovil === 'escrito' && (
+      {seleccion && (modo === 'marcas' || modo === 'original') && versionAbierta === null && vistaMovil === 'escrito' && (
         <div className="shrink-0 border-t border-line-200 bg-surface px-3 pt-2 lg:hidden" style={{ paddingBottom: 'calc(8px + env(safe-area-inset-bottom))' }}>
           <div className="flex min-w-0 items-center gap-2">
             <p className="min-w-0 flex-1 truncate font-sans text-[11.5px] italic leading-snug text-ink-500">«{primerasPalabras(seleccion.texto)}»</p>

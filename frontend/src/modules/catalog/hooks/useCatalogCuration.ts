@@ -21,6 +21,19 @@ export const useCatalogCuration = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   const [branchFilter, setBranchFilter] = useState<LegalBranch | 'TODAS'>('TODAS');
+  /*
+   * LO QUE ESTA RAMA ALCANZA POR REMISION, y por que va en un estado aparte.
+   *
+   * La lista grande se pide UNA vez y sin rama, y sin rama el servidor no
+   * presta nada: una ficha prestada solo existe en el contexto de la rama que
+   * la toma. Asi que cuando el socio filtra por una rama concreta se pide esa
+   * rama, y de la respuesta se toma solo lo que trae sobre.
+   *
+   * No se sustituye la lista grande por la de la rama porque las dos cifras del
+   * encabezado —cuantas actuaciones hay y cuantas faltan por verificar— son del
+   * catalogo entero, y cambiarlas al filtrar diria que el catalogo encogio.
+   */
+  const [remitidas, setRemitidas] = useState<Actuacion[]>([]);
   const [query, setQuery] = useState('');
   const [onlyUnverified, setOnlyUnverified] = useState(false);
 
@@ -45,6 +58,35 @@ export const useCatalogCuration = () => {
     void load();
   }, [load]);
 
+  useEffect(() => {
+    if (branchFilter === 'TODAS') {
+      setRemitidas([]);
+      return;
+    }
+
+    let vigente = true;
+
+    void catalogApi
+      .list({ branch: branchFilter })
+      .then((result) => {
+        if (vigente) setRemitidas(result.actuaciones.filter((a) => a.porRemision));
+      })
+      /*
+       * Un fallo aqui no tumba la pantalla ni se anuncia: lo prestado es lo
+       * ultimo de la lista, y quedarse sin ello deja el catalogo de la rama
+       * exactamente como estaba antes de que esto existiera. Anunciar un error
+       * sobre el apendice de la lista haria dudar de las fichas propias, que si
+       * se cargaron.
+       */
+      .catch(() => {
+        if (vigente) setRemitidas([]);
+      });
+
+    return () => {
+      vigente = false;
+    };
+  }, [branchFilter, actuaciones]);
+
   const save = useCallback(
     async (input: VerificationInput): Promise<boolean> => {
       setIsSaving(true);
@@ -53,6 +95,15 @@ export const useCatalogCuration = () => {
       try {
         await catalogApi.saveVerification(input);
         await load();
+        /*
+         * Y se relee lo prestado, que la lista grande no trae: sin esto, el
+         * socio verificaria el plazo de la reposicion para familia y la fila
+         * seguiria diciendo «sin verificar» hasta que cambiara de rama.
+         */
+        if (branchFilter !== 'TODAS') {
+          const result = await catalogApi.list({ branch: branchFilter });
+          setRemitidas(result.actuaciones.filter((a) => a.porRemision));
+        }
         return true;
       } catch (error) {
         setSaveError(error instanceof Error ? error.message : 'La verificación no pudo guardarse.');
@@ -61,17 +112,21 @@ export const useCatalogCuration = () => {
         setIsSaving(false);
       }
     },
-    [load]
+    [branchFilter, load]
   );
 
   const revert = useCallback(
-    async (actuacionId: string): Promise<boolean> => {
+    async (actuacionId: string, rama?: LegalBranch | null): Promise<boolean> => {
       setIsSaving(true);
       setSaveError(null);
 
       try {
-        await catalogApi.deleteVerification(actuacionId);
+        await catalogApi.deleteVerification(actuacionId, rama);
         await load();
+        if (branchFilter !== 'TODAS') {
+          const result = await catalogApi.list({ branch: branchFilter });
+          setRemitidas(result.actuaciones.filter((a) => a.porRemision));
+        }
         return true;
       } catch (error) {
         setSaveError(error instanceof Error ? error.message : 'No se pudo revertir la verificación.');
@@ -80,7 +135,7 @@ export const useCatalogCuration = () => {
         setIsSaving(false);
       }
     },
-    [load]
+    [branchFilter, load]
   );
 
   const visible = useMemo(() => {
@@ -90,8 +145,7 @@ export const useCatalogCuration = () => {
       .replace(/[̀-ͯ]/g, '')
       .trim();
 
-    return actuaciones.filter((a) => {
-      if (branchFilter !== 'TODAS' && a.branch !== branchFilter) return false;
+    const pasa = (a: Actuacion): boolean => {
       if (onlyUnverified && a.term.status !== 'NO_VERIFICADO') return false;
       if (!needle) return true;
 
@@ -101,8 +155,19 @@ export const useCatalogCuration = () => {
         .replace(/[̀-ͯ]/g, '');
 
       return haystack.includes(needle);
-    });
-  }, [actuaciones, branchFilter, onlyUnverified, query]);
+    };
+
+    const propias = actuaciones.filter(
+      (a) => (branchFilter === 'TODAS' || a.branch === branchFilter) && pasa(a)
+    );
+
+    /*
+     * LO PRESTADO VA AL FINAL, igual que en el selector y por lo mismo: lo
+     * primero que se ofrece tiene que ser lo que esta verificado PARA ESTA
+     * RAMA.
+     */
+    return [...propias, ...remitidas.filter(pasa)];
+  }, [actuaciones, branchFilter, onlyUnverified, query, remitidas]);
 
   // The headline the screen leads with: how much of the catalogue still needs a
   // human to open the norm.

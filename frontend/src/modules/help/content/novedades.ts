@@ -40,6 +40,14 @@ export const NOVEDADES_ID = 'novedades';
 export const NOVEDADES: readonly Novedad[] = [
   {
     fecha: '2026-09-09',
+    titulo: 'Los recursos del CGP ya se ven en las ramas que el CGP gobierna',
+    detalle:
+      'En familia, societario, insolvencia, propiedad intelectual, contratos y constitucional aparecen ahora, al final de la lista de actuaciones, la reposición, la apelación, la queja, la súplica, la nulidad procesal, el desistimiento, la aclaración, la corrección, la adición, el amparo de pobreza, la acumulación y el poder. Hasta hoy solo eran alcanzables desde la rama civil, así que al revisar un escrito de esas ramas no había ficha contra la cual revisarlo. Llegan marcadas «por remisión del CGP · plazo sin verificar en esta rama» y sin afirmar plazo: su término está comprobado en lo civil y nadie lo ha comprobado para la rama de usted. En «Catálogo», quien cura puede verificarlo para su rama sin que eso cambie la ficha civil.',
+    modulo: 'Catálogo',
+    tipo: 'nuevo'
+  },
+  {
+    fecha: '2026-09-09',
     titulo: 'Del taller de revisión a Redacción, sin copiar y pegar',
     detalle:
       'En el taller de una revisión, junto a «Word» y «PDF», hay ahora «Llevar a Redacción». Guarda el texto tal como lo tiene en el taller como un borrador nuevo de la firma —con la actuación y la rama de la revisión y el nombre del archivo como título— y abre Redacción con él cargado, como si lo hubiera abierto desde «Borradores». Es una copia: la revisión, su informe y su conversación quedan intactos en «Revisiones». Hasta ahora, para seguir trabajando un escrito revisado como borrador había que copiar el texto y pegarlo a mano.',

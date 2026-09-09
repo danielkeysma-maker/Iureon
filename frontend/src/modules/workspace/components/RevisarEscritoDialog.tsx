@@ -104,7 +104,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
   const [exportando, setExportando] = React.useState<'pdf' | 'word' | null>(null);
   const [confirmacion, setConfirmacion] = React.useState<Confirmacion | null>(null);
   /** El texto del escrito y la conversacion de la revision en pantalla, para abrir el taller. */
-  const [paraElTaller, setParaElTaller] = React.useState<{ texto: string | null; conversacion: DatosDelTaller['conversacion']; anotaciones: NonNullable<DatosDelTaller['anotaciones']>; versiones: NonNullable<DatosDelTaller['versiones']>; guardaTexto: boolean; revisionId: string | null }>({ texto: null, conversacion: [], anotaciones: [], versiones: [], guardaTexto: false, revisionId: null });
+  const [paraElTaller, setParaElTaller] = React.useState<{ texto: string | null; conversacion: DatosDelTaller['conversacion']; anotaciones: NonNullable<DatosDelTaller['anotaciones']>; versiones: NonNullable<DatosDelTaller['versiones']>; guardaTexto: boolean; revisionId: string | null; archivo: File | null }>({ texto: null, conversacion: [], anotaciones: [], versiones: [], guardaTexto: false, revisionId: null, archivo: null });
 
   /*
    * La autorización de la firma, leída al abrir. `el === null` significa que
@@ -147,7 +147,8 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
         cliente: completa.cliente,
         revisadoPor: completa.userEmail
       });
-      setParaElTaller({ texto: completa.textoTrabajo ?? completa.textoOriginal, conversacion: completa.conversacion, anotaciones: completa.anotaciones ?? [], versiones: completa.versiones ?? [], guardaTexto: Boolean(completa.textoOriginal), revisionId: completa.id });
+      /* De una revisión anterior no hay archivo en esta pestaña: el visor se lo pide al servidor por su id. */
+      setParaElTaller({ texto: completa.textoTrabajo ?? completa.textoOriginal, conversacion: completa.conversacion, anotaciones: completa.anotaciones ?? [], versiones: completa.versiones ?? [], guardaTexto: Boolean(completa.textoOriginal), revisionId: completa.id, archivo: null });
       setRespuesta({
         id: completa.id,
         guardada: true,
@@ -232,16 +233,27 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
     setError('');
     setRespuesta(null);
     try {
-      let cuerpo: { fileName: string; contentBase64?: string; storageKey?: string; texto?: string };
+      /*
+       * ─── POR DÓNDE VIAJA EL ARCHIVO ───────────────────────────────────────
+       *
+       * Pequeño y sin conservar: dentro del cuerpo, un viaje y sin
+       * almacenamiento, como siempre. En cuanto la firma autorizó conservar
+       * escritos va SIEMPRE por el almacenamiento, aunque quepa: el visor del
+       * original necesita el archivo tal como está constituido, y devolverlo a
+       * B2 desde la función gastaría su reloj en una subida que el navegador
+       * ya sabe hacer. Sin autorización se sigue borrando al leerlo.
+       */
+      const conservarOriginal = Boolean(consentimiento?.guarda);
+      let cuerpo: { fileName: string; contentBase64?: string; storageKey?: string; texto?: string; conservarOriginal?: boolean; contentType?: string };
       if (!archivo) {
         cuerpo = { fileName: 'texto-pegado.txt', texto };
-      } else if (archivo.size <= EN_CUERPO) {
+      } else if (archivo.size <= EN_CUERPO && !conservarOriginal) {
         cuerpo = { fileName: archivo.name, contentBase64: await archivoABase64(archivo) };
       } else {
         setSubiendo(0);
         const storageKey = await uploadFileToStorage(archivo, 'revisiones', setSubiendo, 'el escrito');
         setSubiendo(null);
-        cuerpo = { fileName: archivo.name, storageKey };
+        cuerpo = { fileName: archivo.name, storageKey, conservarOriginal, contentType: archivo.type || undefined };
       }
       setTituloDelInforme(documentType);
       setOrigenDelInforme({
@@ -251,7 +263,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
         revisadoPor: ''
       });
       const r = await reviewApi.revisar({ documentType, legalBranch, pregunta, cliente: cliente.trim(), ...cuerpo });
-      setParaElTaller({ texto: r.texto ?? null, conversacion: [], anotaciones: [], versiones: [], guardaTexto: Boolean(r.guardaTexto), revisionId: r.id ?? null });
+      setParaElTaller({ texto: r.texto ?? null, conversacion: [], anotaciones: [], versiones: [], guardaTexto: Boolean(r.guardaTexto), revisionId: r.id ?? null, archivo });
       setRespuesta(r);
       onSaldoCambiado?.();
       cargarAnteriores();
@@ -378,7 +390,9 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
                     guardaTexto: paraElTaller.guardaTexto,
                     conversacion: paraElTaller.conversacion,
                     anotaciones: paraElTaller.anotaciones,
-                    versiones: paraElTaller.versiones
+                    versiones: paraElTaller.versiones,
+                    /* Ya está en esta pestaña: el visor del original lo abre sin volver a bajarlo. */
+                    archivoEnSesion: paraElTaller.archivo
                   });
                   onCerrar();
                 }}

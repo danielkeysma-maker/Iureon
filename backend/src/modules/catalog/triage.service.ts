@@ -97,9 +97,15 @@ const catalogueMenu = (branch?: LegalBranch): string => {
      * misma lista y no en sección aparte: no hay 22 ramas de las que
      * distinguirlas, y separarlas sugeriría que son de otro catálogo.
      */
+    /*
+     * LO PRESTADO SE NOMBRA COMO PRESTADO, tambien para el modelo. Si el menu
+     * dijera «Recurso de reposicion» a secas dentro de FAMILIA, el modelo
+     * tendria motivos para creer que familia tiene ficha propia con plazo
+     * propio, y lo repetiria en la razon que le entrega al abogado.
+     */
     const nombres = catalogService
       .list(branch)
-      .map((a) => `  - ${a.exactName}`)
+      .map((a) => (a.porRemision ? `  - ${a.exactName} (${a.porRemision.marca})` : `  - ${a.exactName}`))
       .join('\n');
 
     return `${branch}:\n${nombres}`;
@@ -347,7 +353,12 @@ export const triageFacts = async (facts: string, branch?: LegalBranch): Promise<
      * cambiaría el escrito por debajo sin decirlo. Se descarta, y se ve en
      * `descartadas`.
      */
-    if (branch && actuacion.branch !== branch && actuacion.transversal !== true) {
+    if (
+      branch &&
+      actuacion.branch !== branch &&
+      actuacion.transversal !== true &&
+      actuacion.porRemision?.paraRama !== branch
+    ) {
       descartadas.push(nombre);
       continue;
     }

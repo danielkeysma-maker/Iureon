@@ -223,12 +223,39 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
             >
               <option value="">Elija la actuación…</option>
               <option value={OPCION_GUIA}>Que la guía proponga la actuación…</option>
-              {catalogo.actuaciones.map((a) => (
-                <option key={a.id} value={a.exactName}>
-                  {a.exactName}
-                  {a.firmDefined ? ' · de su firma, sin norma verificada' : a.term.status === 'NO_VERIFICADO' ? ' · sin verificar' : ''}
-                </option>
-              ))}
+              {catalogo.actuaciones
+                .filter((a) => !a.porRemision)
+                .map((a) => (
+                  <option key={a.id} value={a.exactName}>
+                    {a.exactName}
+                    {a.firmDefined ? ' · de su firma, sin norma verificada' : a.term.status === 'NO_VERIFICADO' ? ' · sin verificar' : ''}
+                  </option>
+                ))}
+              {/*
+                AQUI SI SE AGRUPA, y en el escritorio no.
+                El <select> nativo trae <optgroup> de fabrica, asi que el
+                telefono puede poner el aviso UNA vez encima del bloque en vez
+                de repetirlo en cada renglon; en el escritorio el Combobox no
+                tiene cabeceras y el aviso va en el detalle de cada opcion. Dos
+                pantallas, dos formas de decir lo mismo, y la frase es la que
+                manda el servidor para que no diverja.
+              */}
+              {catalogo.actuaciones.some((a) => a.porRemision) && (
+                <optgroup
+                  label={
+                    catalogo.actuaciones.find((a) => a.porRemision)?.porRemision?.marca ??
+                    'por remisión del CGP'
+                  }
+                >
+                  {catalogo.actuaciones
+                    .filter((a) => a.porRemision)
+                    .map((a) => (
+                      <option key={a.id} value={a.exactName}>
+                        {a.exactName}
+                      </option>
+                    ))}
+                </optgroup>
+              )}
               <option value={OPCION_PROPIA}>Ninguna de estas: escribir el nombre…</option>
             </select>
           </label>

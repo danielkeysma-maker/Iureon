@@ -448,6 +448,19 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
                           {BRANCH_LABELS[a.branch] ?? a.branch}
                         </span>
                         <h3 className="text-subtitle text-ink-900">{a.exactName}</h3>
+                        {/*
+                          LA LÍNEA DE ARRIBA DICE LA RAMA DE LA FICHA, y cuando
+                          la ficha llega prestada esa rama NO es la que el
+                          abogado eligió: la tarjeta diría «Civil» dentro de una
+                          orientación de familia sin explicar por qué. Esto lo
+                          explica, y de paso dice que el plazo no está
+                          comprobado para su rama.
+                        */}
+                        {a.porRemision && (
+                          <p className="mt-0.5 text-meta leading-snug text-ink-500 [text-wrap:pretty]">
+                            {a.porRemision.marca}
+                          </p>
+                        )}
                       </div>
                       <span
                         className={`shrink-0 ${

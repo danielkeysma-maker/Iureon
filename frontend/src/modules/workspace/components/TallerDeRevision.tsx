@@ -37,6 +37,12 @@ export interface DatosDelTaller {
   versiones?: VersionDelTexto[];
   /** Si quien abre el taller ya las tiene; si falta, el taller las pide al servidor. */
   preguntasAudiencia?: PreguntasAudienciaGuardadas | null;
+  /**
+   * El archivo tal como se subió, cuando todavía está en esta pestaña: quien
+   * acaba de pedir la revisión lo tiene en memoria y el visor lo abre sin
+   * volver a bajarlo. Si falta, se le pregunta al servidor por la revisión.
+   */
+  archivoEnSesion?: File | null;
 }
 
 interface TallerDeRevisionProps {
@@ -71,6 +77,12 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
   const soloLectura = usePlanSoloLectura();
   const [consentimiento, setConsentimiento] = React.useState<ConsentimientoDeGuardado>({ guarda: datos.guardaTexto, por: null, el: null });
   const [confirmacion, setConfirmacion] = React.useState<Confirmacion | null>(null);
+  /*
+   * El archivo en esta pestaña. Empieza siendo el que se acaba de subir y se
+   * reemplaza si el abogado abre otro desde el visor: se guarda aquí para que
+   * cambiar de pestaña y volver no obligue a bajarlo de nuevo.
+   */
+  const [archivoDeLaSesion, setArchivoDeLaSesion] = React.useState<File | null>(datos.archivoEnSesion ?? null);
   const [errorAutorizacion, setErrorAutorizacion] = React.useState('');
   /** Lo último que el taller tenía, para guardarlo en el acto cuando la firma autoriza. */
   const ultimoEstado = React.useRef<{ texto: string; conversacion: TurnoDelTaller[]; anotaciones: Anotacion[]; versiones: VersionDelTexto[] }>({
@@ -136,6 +148,17 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
   return (
     <>
       <TallerDeEscrito
+        original={{
+          /*
+           * De la pestaña si el archivo sigue aquí; del almacenamiento si no.
+           * Sin revisión guardada tampoco hay a quién preguntarle, y el visor
+           * lo dice y ofrece subirlo.
+           */
+          fuente: archivoDeLaSesion ? { de: 'sesion', file: archivoDeLaSesion } : datos.revisionId ? { de: 'servidor', revisionId: datos.revisionId } : null,
+          revisionId: datos.revisionId,
+          puedeConservar: consentimiento.guarda,
+          onArchivoCambiado: setArchivoDeLaSesion
+        }}
         datos={{
           titulo: datos.documentType,
           subtitulo: [datos.cliente, datos.fileName].filter(Boolean).join(' · '),

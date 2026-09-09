@@ -1,6 +1,7 @@
 import React from 'react';
-import { AlertTriangle, CalendarClock, Gavel, Infinity as InfinityIcon, Scale } from 'lucide-react';
+import { AlertTriangle, CalendarClock, Gavel, Infinity as InfinityIcon, Link2, Scale } from 'lucide-react';
 import type { Actuacion, RequiredSection } from '../types';
+import { branchLabel } from '../branchLabels';
 
 /**
  * La ficha de la actuación: los tres datos y las secciones. Artboard 1i.
@@ -143,6 +144,25 @@ export const ActuacionDetail: React.FC<ActuacionDetailProps> = ({ actuacion }) =
 
   return (
     <div className="space-y-3">
+      {/*
+        EL SOBRE VA PRIMERO, ANTES DE LOS TRES DATOS. Quien abre esta ficha
+        desde una rama que la alcanza por remisión tiene que saberlo ANTES de
+        leer el término: el bloque de «Término» dirá «sin verificar», y sin esta
+        línea eso se leería como un hueco del catálogo en su rama y no como lo
+        que es — un plazo verificado en otra rama que nadie comprobó para esta.
+      */}
+      {actuacion.porRemision && (
+        <p className="flex items-start gap-1.5 rounded-card border border-line-200 bg-canvas px-3 py-2 text-[11px] leading-snug text-ink-500">
+          <Link2 className="mt-0.5 h-3 w-3 shrink-0" />
+          <span className="text-justify [text-wrap:pretty]">
+            Esta ficha es de {branchLabel(actuacion.porRemision.ramaFuente)} y llega a{' '}
+            {branchLabel(actuacion.porRemision.paraRama)} por remisión (
+            {actuacion.porRemision.base}). {actuacion.porRemision.aviso}
+            {actuacion.porRemision.alcance ? ` ${actuacion.porRemision.alcance}` : ''}
+          </span>
+        </p>
+      )}
+
       <div className="grid gap-2">
         <Bloque
           icono={<CalendarClock className="h-3 w-3" />}

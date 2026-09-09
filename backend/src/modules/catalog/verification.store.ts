@@ -1,5 +1,10 @@
 import { supabase } from '../../config/supabase.config';
-import type { CatalogVerification, CatalogVerificationInput, TermStatus } from './types';
+import type {
+  CatalogVerification,
+  CatalogVerificationInput,
+  LegalBranch,
+  TermStatus
+} from './types';
 
 /**
  * Persistence for firm-curated catalogue entries.
@@ -13,6 +18,18 @@ import type { CatalogVerification, CatalogVerificationInput, TermStatus } from '
 
 interface VerificationRow {
   actuacion_id: string;
+  /*
+   * LA RAMA EN LA QUE SE VERIFICO, y cadena vacia para la rama propia.
+   *
+   * Vacia y no NULL porque forma parte de la llave primaria, y en Postgres dos
+   * filas con NULL en una columna de un indice unico NO chocan: la firma podria
+   * acabar con dos curadurias de la misma ficha y ninguna regla que dijera cual
+   * gana. La cadena vacia si choca, que es lo que se quiere.
+   *
+   * Las filas escritas antes de esta columna quedan con '' por el DEFAULT de la
+   * migracion, que es exactamente lo que significaban: la rama propia.
+   */
+  rama: string | null;
   term_status: TermStatus;
   term_description: string | null;
   legal_basis: string | null;
@@ -45,6 +62,7 @@ export class VerificationStoreError extends Error {
 
 const toDomain = (row: VerificationRow): CatalogVerification => ({
   actuacionId: row.actuacion_id,
+  rama: row.rama ? (row.rama as LegalBranch) : null,
   term: {
     status: row.term_status,
     description: row.term_status === 'NO_VERIFICADO' ? null : row.term_description
@@ -90,6 +108,7 @@ export class VerificationStore {
         {
           firm_id: firmId,
           actuacion_id: input.actuacionId,
+          rama: input.rama ?? '',
           term_status: input.termStatus,
           term_description: input.termDescription ?? null,
           legal_basis: input.legalBasis ?? null,
@@ -98,7 +117,7 @@ export class VerificationStore {
           verified_by: input.verifiedBy,
           verified_at: new Date().toISOString()
         },
-        { onConflict: 'firm_id,actuacion_id' }
+        { onConflict: 'firm_id,actuacion_id,rama' }
       )
       .select()
       .single();
@@ -113,8 +132,14 @@ export class VerificationStore {
     return toDomain(data as VerificationRow);
   }
 
-  /** Drops the firm's curation so the shipped catalogue applies again. */
-  async remove(firmId: string, actuacionId: string): Promise<void> {
+  /**
+   * Drops the firm's curation so the shipped catalogue applies again.
+   *
+   * @param rama la rama en la que se habia verificado. Sin ella se borra la de
+   * la rama propia de la ficha, que es la unica que existia antes de que las
+   * fichas empezaran a viajar por remision.
+   */
+  async remove(firmId: string, actuacionId: string, rama?: LegalBranch | null): Promise<void> {
     if (!supabase) {
       throw new VerificationStoreError(
         'La curaduría del catálogo requiere Supabase configurado.',
@@ -126,7 +151,8 @@ export class VerificationStore {
       .from('catalog_verifications')
       .delete()
       .eq('firm_id', firmId)
-      .eq('actuacion_id', actuacionId);
+      .eq('actuacion_id', actuacionId)
+      .eq('rama', rama ?? '');
 
     if (error) {
       throw new VerificationStoreError(error.message, 'STORE_DELETE_FAILED');

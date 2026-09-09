@@ -105,6 +105,45 @@ export interface Actuacion {
    * se apoya en nada que alguien haya leído.
    */
   firmDefined?: boolean;
+  /**
+   * La actuación se ejerce en TODA rama y su ficha vive en la suya.
+   *
+   * El derecho de petición se radica lo mismo ante la UGPP que ante el INPEC, y
+   * su plazo es el mismo, así que se muestra tal cual. El backend ya la marcaba
+   * y la enviaba; el tipo del frontend no la declaraba.
+   */
+  transversal?: boolean;
+  /**
+   * LA FICHA ES DE OTRA RAMA Y ESTA LA ALCANZA, sin que su plazo se afirme aquí.
+   *
+   * No es lo mismo que `transversal`. Lo transversal es la misma actuación en
+   * todas partes; esto es una ficha PRESTADA: existe en esta rama porque el
+   * Código General del Proceso la gobierna, y nadie leyó si su plazo es el
+   * mismo. Por eso llega con el término en NO_VERIFICADO y con este sobre, que
+   * la pantalla tiene que pintar — mezclarla como propia sería afirmar en esta
+   * rama un plazo que solo se comprobó en otra.
+   */
+  porRemision?: SobreDeRemision;
+}
+
+/** El sobre con el que una ficha prestada llega a una rama. */
+export interface SobreDeRemision {
+  /** De dónde viene la ficha. Hoy siempre CIVIL. */
+  ramaFuente: LegalBranch;
+  /** A qué rama llegó. Es la rama en la que la firma puede verificar su plazo. */
+  paraRama: LegalBranch;
+  estatuto: string;
+  /** Norma y artículo por los que llega, p. ej. "Ley 1564 de 2012, art. 1". */
+  base: string;
+  /** Lo que se pinta junto al nombre. Viene del servidor para no divergir. */
+  marca: string;
+  /** La frase larga, para el aviso de la ficha. */
+  aviso: string;
+  /** Hasta dónde llega la remisión dentro de la rama, cuando no cubre todo. */
+  alcance: string | null;
+  /** Lo que la ficha afirma en su rama de origen. Referencia, nunca afirmación. */
+  terminoEnLaRamaFuente: ActuacionTerm;
+  legalBasisEnLaRamaFuente: string;
 }
 
 /**
@@ -154,6 +193,13 @@ export interface CatalogMeta {
 /** What the firm submits when it verifies an actuación against the norm. */
 export interface VerificationInput {
   actuacionId: string;
+  /**
+   * La rama en la que se verifica, cuando la ficha llegó a ella por remisión.
+   *
+   * Sin ella, el término que el socio acaba de leer para familia sustituiría al
+   * del proceso civil, que es otro y ya está verificado.
+   */
+  rama?: LegalBranch | null;
   termStatus: TermStatus;
   termDescription: string | null;
   legalBasis: string | null;

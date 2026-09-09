@@ -191,14 +191,15 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({ esAdminDeFirma, 
             <span className="w-full [overflow-wrap:anywhere] sm:w-auto sm:min-w-0 sm:flex-1">
               {consentimiento.guarda ? (
                 <>
-                  <span className="font-semibold">La firma conserva los escritos revisados</span>, sus marcas y la conversación con la guía
+                  <span className="font-semibold">La firma conserva los escritos revisados</span>, el archivo tal como se subió, sus marcas y la
+                  conversación con la guía
                   {consentimiento.por ? `, autorizado por ${consentimiento.por}` : ''}
                   {consentimiento.el ? ` el ${new Date(consentimiento.el).toLocaleDateString('es-CO', { dateStyle: 'long' })}` : ''}.
                 </>
               ) : (
                 <>
-                  <span className="font-semibold">La firma no ha autorizado conservar los escritos revisados.</span> Sin esa autorización, el texto, las
-                  marcas y la conversación viven solo en la pestaña; el informe sí se guarda.{' '}
+                  <span className="font-semibold">La firma no ha autorizado conservar los escritos revisados.</span> Sin esa autorización, el texto, el
+                  archivo original, las marcas y la conversación viven solo en la pestaña; el informe sí se guarda.{' '}
                   {esAdminDeFirma ? 'Como socio administrador, puede autorizarlo aquí para toda la firma.' : 'Solo un socio administrador de la firma puede autorizarlo.'}
                 </>
               )}
@@ -212,7 +213,7 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({ esAdminDeFirma, 
                     consentimiento.guarda
                       ? {
                           titulo: 'Retirar la autorización',
-                          texto: <>Desde ahora los escritos nuevos no se conservarán. Los ya guardados no se borran.</>,
+                          texto: <>Desde ahora los escritos nuevos no se conservarán, ni su archivo original. Los ya guardados no se borran.</>,
                           etiqueta: 'Retirar',
                           peligro: true,
                           onConfirmar: () => cambiarAutorizacion(false)
@@ -221,9 +222,9 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({ esAdminDeFirma, 
                           titulo: 'Autorizar que la firma conserve sus escritos',
                           texto: (
                             <>
-                              Iureon conservará el texto de los escritos que su firma revise, sus marcas y la conversación con la guía, para retomar el
-                              trabajo otro día. Aplica a <span className="font-semibold">toda la firma</span> y queda en la auditoría con su correo. Puede
-                              retirarla después.
+                              Iureon conservará el texto de los escritos que su firma revise, el archivo tal como se subió —para verlo con su
+                              diagramación—, sus marcas y la conversación con la guía, para retomar el trabajo otro día. Aplica a{' '}
+                              <span className="font-semibold">toda la firma</span> y queda en la auditoría con su correo. Puede retirarla después.
                             </>
                           ),
                           etiqueta: 'Autorizar',
@@ -287,7 +288,8 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({ esAdminDeFirma, 
                     titulo: 'Eliminar la revisión',
                     texto: (
                       <>
-                        Se eliminan el informe de «{r.fileName}», el texto de trabajo y la conversación con el revisor. No se puede recuperar.
+                        Se eliminan el informe de «{r.fileName}», el texto de trabajo, la conversación con el revisor y el archivo original, si se
+                        conservó. No se puede recuperar.
                       </>
                     ),
                     etiqueta: 'Eliminar',

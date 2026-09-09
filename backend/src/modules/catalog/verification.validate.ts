@@ -1,4 +1,4 @@
-import type { CatalogVerificationInput, TermStatus } from './types';
+import type { CatalogVerificationInput, LegalBranch, TermStatus } from './types';
 
 /**
  * Validation for in-product curation of the catalogue.
@@ -59,7 +59,21 @@ const cleanUrl = (value: unknown): string | null => {
   }
 };
 
-export const validateVerificationInput = (body: unknown, actuacionId: string): ValidationResult => {
+/**
+ * @param ramasConocidas las ramas del catalogo, para admitir `rama`.
+ *
+ * Va como parametro y no como constante importada por la misma razon que en
+ * las actuaciones propias de la firma: la lista de ramas la sabe el catalogo,
+ * y este modulo no debe aprenderla ni quedarse con una copia que envejezca.
+ * Sin la lista, `rama` se rechaza — que es lo correcto: una curaduria clavada a
+ * una rama inexistente no aparecería en ninguna pantalla, y el abogado creería
+ * haber verificado algo.
+ */
+export const validateVerificationInput = (
+  body: unknown,
+  actuacionId: string,
+  ramasConocidas: readonly string[] = []
+): ValidationResult => {
   if (!body || typeof body !== 'object') {
     return fail('INVALID_BODY', 'Se requiere un cuerpo JSON con la verificación.');
   }
@@ -88,6 +102,19 @@ export const validateVerificationInput = (body: unknown, actuacionId: string): V
   }
   if (verifiedBy.length > MAX_NAME) {
     return fail('VERIFIED_BY_TOO_LONG', `verifiedBy no puede superar ${MAX_NAME} caracteres.`);
+  }
+
+  /*
+   * LA RAMA EN LA QUE SE VERIFICA. Ausente significa «la rama propia de la
+   * ficha», que es como se guardo todo hasta que las fichas empezaron a viajar
+   * por remision.
+   */
+  const ramaCruda = clean(raw.rama)?.toUpperCase() ?? null;
+  if (ramaCruda && !ramasConocidas.includes(ramaCruda)) {
+    return fail(
+      'INVALID_RAMA',
+      `La rama "${ramaCruda}" no existe en el catálogo, así que la verificación no aparecería en ninguna pantalla.`
+    );
   }
 
   const termDescription = clean(raw.termDescription);
@@ -133,6 +160,7 @@ export const validateVerificationInput = (body: unknown, actuacionId: string): V
     ok: true,
     value: {
       actuacionId: id,
+      rama: ramaCruda ? (ramaCruda as LegalBranch) : null,
       termStatus,
       termDescription: termStatus === 'NO_VERIFICADO' ? null : termDescription,
       legalBasis,

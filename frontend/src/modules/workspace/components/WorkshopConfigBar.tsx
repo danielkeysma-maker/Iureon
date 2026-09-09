@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { CheckCircle2, ChevronRight, CircleDashed, MinusCircle, PenLine, Sparkles } from 'lucide-react';
+import { CheckCircle2, ChevronRight, CircleDashed, Link2, MinusCircle, PenLine, Sparkles } from 'lucide-react';
 import { Combobox, type OpcionCombobox } from './Combobox';
 import { useActuacionLookup } from '../../catalog/hooks/useActuacion';
 import { useBranchActuacionesState } from '../../catalog/hooks/useBranchActuaciones';
@@ -140,17 +140,36 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
         detalle: 'a partir de los hechos que usted escribió',
         icono: <Sparkles className="h-3.5 w-3.5 shrink-0 text-brand-700" strokeWidth={2.4} />
       },
+      /*
+       * LO PRESTADO SE DICE EN EL RENGLÓN, no en un grupo aparte.
+       *
+       * El `Combobox` no tiene cabeceras de sección, y ponerle una opción falsa
+       * que hiciera de título se filtraría mal en cuanto el abogado escribiera
+       * en el buscador. El renglón sí lleva su propio detalle, y ahí cabe la
+       * frase entera — que además es la que hay que leer justo antes de elegir,
+       * no una etiqueta de grupo que se quedó cinco renglones más arriba.
+       *
+       * El servidor manda el texto (`a.porRemision.marca`) para que la pantalla
+       * y el motor digan lo mismo. Y ya vienen al final de la lista: el orden lo
+       * fija `catalog.service.ts`, no esta pantalla.
+       */
       ...catalogo.actuaciones.map((a) => ({
         valor: a.exactName,
         etiqueta: a.exactName,
-        detalle: a.firmDefined
+        detalle: a.porRemision
+          ? a.porRemision.marca
+          : a.firmDefined
           ? 'de su firma · sin norma verificada'
           : a.term.status === 'NO_CADUCA'
           ? 'No caduca'
           : a.term.status === 'NO_VERIFICADO'
           ? 'sin dato'
           : a.term.description ?? '',
-        icono: <IconoEstado actuacion={a} />
+        icono: a.porRemision ? (
+          <Link2 className="h-3.5 w-3.5 shrink-0 text-ink-400" strokeWidth={2.4} />
+        ) : (
+          <IconoEstado actuacion={a} />
+        )
       })),
       {
         valor: OPCION_PROPIA,

@@ -4,6 +4,7 @@ import {
   BadgeCheck,
   CalendarClock,
   Infinity as InfinityIcon,
+  Link2,
   Loader2,
   PenLine,
   Search,
@@ -15,6 +16,7 @@ import { firmActuacionesApi } from '../services/catalog.api';
 import { useCatalogCuration } from '../hooks/useCatalogCuration';
 import { VerificationForm } from './VerificationForm';
 import { ActuacionDetail } from './ActuacionDetail';
+import { BRANCH_LABELS } from '../branchLabels';
 import type { Actuacion, TermStatus } from '../types';
 
 /*
@@ -66,7 +68,13 @@ export const CatalogCurationView: React.FC = () => {
   // The list is reloaded after each write, so the open actuación is re-read
   // from the fresh data rather than kept as a stale snapshot.
   const openActuacion = selected
-    ? curation.actuaciones.find((a) => a.id === selected.id) ?? selected
+    ? curation.actuaciones.find(
+        (a) =>
+          a.id === selected.id &&
+          // La misma ficha puede estar dos veces en la lista: como propia de su
+          // rama y como prestada a otra. Son dos curadurías distintas.
+          (a.porRemision?.paraRama ?? null) === (selected.porRemision?.paraRama ?? null)
+      ) ?? selected
     : null;
 
   return (
@@ -257,6 +265,23 @@ export const CatalogCurationView: React.FC = () => {
                             De su firma
                           </span>
                         )}
+                        {/*
+                          LA FICHA ES DE OTRA RAMA Y ESTA LA ALCANZA. Se dice en
+                          la lista y no solo en la ficha por lo mismo que lo de
+                          arriba: al lado va el sello «Sin verificar», y sin esta
+                          marca el socio leería que el catálogo dejó un hueco en
+                          su rama, cuando lo que pasa es que el plazo está
+                          verificado en otra y nadie lo comprobó para esta.
+                        */}
+                        {actuacion.porRemision && (
+                          <span
+                            className="inline-flex items-center gap-1 rounded-full border border-line-200 bg-canvas px-2 py-0.5 text-[10px] font-bold text-ink-500"
+                            title={actuacion.porRemision.marca}
+                          >
+                            <Link2 className="w-3 h-3" />
+                            Por remisión
+                          </span>
+                        )}
                       </div>
                     </div>
                   </button>
@@ -302,6 +327,46 @@ export const CatalogCurationView: React.FC = () => {
               escrito la advertencia desaparece de la lista y del selector de
               Redacción.
             */}
+            {/*
+              LO QUE ESTA PANTALLA LE APORTA A UNA FICHA PRESTADA: la firma
+              puede verificar su plazo PARA SU RAMA, y eso no toca el de la rama
+              de origen. Es la única forma honesta de cerrar el hueco: la ficha
+              existe aquí porque el Código General del Proceso gobierna estos
+              asuntos, y su plazo aquí lo tiene que leer alguien.
+            */}
+            {openActuacion.porRemision && (
+              <div className="mt-3 space-y-2">
+                <p className="notice">
+                  <Link2 className="mt-0.5 h-4 w-4 shrink-0 text-brand-700" />
+                  <span className="text-justify [text-wrap:pretty]">
+                    Esta ficha es de {BRANCH_LABELS[openActuacion.porRemision.ramaFuente] ??
+                      openActuacion.porRemision.ramaFuente}{' '}
+                    y llega a {BRANCH_LABELS[openActuacion.porRemision.paraRama] ??
+                      openActuacion.porRemision.paraRama}{' '}
+                    por remisión ({openActuacion.porRemision.base}).{' '}
+                    {openActuacion.porRemision.aviso}
+                    {openActuacion.porRemision.alcance
+                      ? ` ${openActuacion.porRemision.alcance}`
+                      : ''}{' '}
+                    {openActuacion.term.status === 'NO_VERIFICADO'
+                      ? 'Si lo comprueba abajo, quedará verificado solo para esta rama y no cambiará el del proceso civil.'
+                      : 'El término que lleva lo verificó su firma para esta rama.'}
+                  </span>
+                </p>
+                {openActuacion.porRemision.terminoEnLaRamaFuente.description && (
+                  <p className="rounded-control border border-line-200 bg-canvas px-3 py-2 text-[11px] leading-snug text-ink-500 text-justify [text-wrap:pretty]">
+                    <span className="font-semibold text-ink-700">
+                      Lo que dice en{' '}
+                      {BRANCH_LABELS[openActuacion.porRemision.ramaFuente] ??
+                        openActuacion.porRemision.ramaFuente}
+                      , como referencia:
+                    </span>{' '}
+                    {openActuacion.porRemision.terminoEnLaRamaFuente.description}
+                  </p>
+                )}
+              </div>
+            )}
+
             {openActuacion.firmDefined && (
               <div className="mt-3 space-y-2">
                 <p className="notice-unverified">
@@ -362,8 +427,8 @@ export const CatalogCurationView: React.FC = () => {
               isSaving={curation.isSaving}
               error={curation.saveError}
               onSave={curation.save}
-              onRevert={async (id) => {
-                const done = await curation.revert(id);
+              onRevert={async (id, rama) => {
+                const done = await curation.revert(id, rama);
                 if (done) setSelected(null);
                 return done;
               }}

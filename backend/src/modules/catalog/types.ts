@@ -91,6 +91,70 @@ export interface ActuacionVerification {
   replaced: ActuacionTerm;
 }
 
+/**
+ * La remision de una RAMA al Codigo General del Proceso, declarada una vez.
+ *
+ * Se declara por rama y no por ficha porque la remision es un hecho de la
+ * rama: la Ley 1116 no dice nada del recurso de reposicion, y lo que hace que
+ * el recurso exista alli es el art. 1 del CGP, no una linea de la ficha.
+ *
+ * `citas` son las frases literales que sostienen la afirmacion. Sin ellas la
+ * remision no se declara: es la misma regla que gobierna un termino.
+ */
+export interface RemisionDeRama {
+  /** Hoy solo el CGP. El campo existe para que anadir otro no sea un rediseno. */
+  estatuto: 'CGP';
+  /** Norma y articulo, p. ej. "Ley 1564 de 2012, art. 1". */
+  base: string;
+  /** Frases literales del articulo, transcritas caracter por caracter. */
+  citas: string[];
+  /** De donde viajan las fichas. Hoy siempre CIVIL. */
+  ramaFuente: LegalBranch;
+  /**
+   * Hasta donde llega la remision DENTRO de la rama, cuando no cubre todo.
+   * En CONSTITUCIONAL la reposicion existe para las acciones populares y de
+   * grupo y NO para la tutela, y callarlo seria peor que no ofrecerla.
+   */
+  alcance: string | null;
+  /** URL oficial donde se leyo. */
+  fuente: string;
+  /** Fecha de consulta, YYYY-MM-DD. */
+  consultadoEl: string;
+}
+
+/**
+ * El sobre con el que una ficha prestada llega a una rama.
+ *
+ * Viaja con la ficha —no dentro del catalogo— y es lo unico que la pantalla y
+ * el motor necesitan para no confundirla con una actuacion propia de la rama.
+ */
+export interface SobreDeRemision {
+  ramaFuente: LegalBranch;
+  paraRama: LegalBranch;
+  estatuto: string;
+  base: string;
+  /** Lo que se pinta junto al nombre, en el selector y en la ficha. */
+  marca: string;
+  /** La frase larga, para el aviso de la ficha y para el motor. */
+  aviso: string;
+  alcance: string | null;
+  /**
+   * Lo que la ficha afirma EN SU RAMA DE ORIGEN. Se conserva como referencia
+   * —el abogado quiere saber cuanto es en lo civil— y jamas como el termino de
+   * esta rama: el que viaja en `term` esta degradado a NO_VERIFICADO.
+   */
+  terminoEnLaRamaFuente: ActuacionTerm;
+  /**
+   * El fundamento tal como lo trae la ficha, sin la coletilla de la remision.
+   *
+   * Se conserva porque la coletilla dice «no afirme que este plazo es el de
+   * esta rama», y eso deja de ser cierto en el momento en que la firma lo
+   * verifica PARA esta rama. Sin el original habria que reconstruirlo cortando
+   * una cadena, que es como se pierden los artículos.
+   */
+  legalBasisEnLaRamaFuente: string;
+}
+
 export interface Actuacion {
   /** Stable lookup key, e.g. "administrativo/demanda-de-nulidad-simple". */
   id: string;
@@ -130,6 +194,25 @@ export interface Actuacion {
    * donde un termino corregido puede quedar viejo.
    */
   transversal?: boolean;
+  /*
+   * POR REMISION: la ficha vive en otra rama y esta rama la ALCANZA, sin que
+   * su plazo se afirme aqui.
+   *
+   * No es lo mismo que `transversal`. Lo transversal es una actuacion que se
+   * ejerce ante cualquier autoridad y cuyo termino es el mismo en todas —el
+   * derecho de peticion son quince dias lo mismo ante la UGPP que ante el
+   * INPEC—, asi que la ficha se muestra tal cual. Aqui es al reves: el recurso
+   * de reposicion EXISTE en familia, en societario y en insolvencia porque el
+   * Codigo General del Proceso las gobierna, pero nadie leyo si su plazo es el
+   * mismo, y el CPACA ya demostro que puede no serlo (diez dias en vez de
+   * tres). Por eso el sobre llega con el termino degradado a NO_VERIFICADO.
+   *
+   * El sobre lo pone el servicio al listar, no el dato: la ficha del catalogo
+   * es UNA sola y no se copia. Duplicarla obligaria a verificar cada copia por
+   * separado, que es exactamente lo que el comentario de `transversal` ya
+   * declara como el defecto a evitar.
+   */
+  porRemision?: SobreDeRemision;
 }
 
 /**
@@ -141,6 +224,17 @@ export interface Actuacion {
  */
 export interface CatalogVerification {
   actuacionId: string;
+  /*
+   * LA RAMA EN LA QUE SE VERIFICO, y null cuando es la rama propia de la ficha.
+   *
+   * Hizo falta el dia en que una ficha empezo a aparecer en varias ramas por
+   * remision. `civil/recurso-de-reposicion` es UNA ficha; si la firma verifica
+   * su plazo para FAMILIA y eso se guardara solo contra el id, el termino que
+   * acaba de escribir para familia sustituiria al del proceso civil, que es
+   * otro y esta verificado. Verificar en una rama no puede mover el reloj de
+   * otra: la clave es rama + id.
+   */
+  rama: LegalBranch | null;
   term: ActuacionTerm;
   legalBasis: string | null;
   sourceUrl: string | null;
@@ -152,6 +246,8 @@ export interface CatalogVerification {
 /** What a curation request may carry. Validated before it is persisted. */
 export interface CatalogVerificationInput {
   actuacionId: string;
+  /** Rama en la que se verifica. null o ausente = la rama propia de la ficha. */
+  rama?: LegalBranch | null;
   termStatus: TermStatus;
   termDescription?: string | null;
   legalBasis?: string | null;
