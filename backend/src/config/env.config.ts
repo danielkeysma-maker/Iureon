@@ -351,8 +351,27 @@ export const config = {
     eventsSecret: read('WOMPI_EVENTS_SECRET'),
     /** Signs the amount so the browser cannot change what it is paying. */
     integritySecret: read('WOMPI_INTEGRITY_SECRET'),
-    /** Where the checkout sends the client back once the card is charged. */
-    redirectUrl: read('WOMPI_REDIRECT_URL')
+    /**
+     * A dónde vuelve el cliente cuando ya pagó.
+     *
+     * ─── ES UNA LISTA, SEPARADA POR COMAS, Y POR QUÉ ────────────────────────
+     *
+     * Wompi no guarda una lista de retornos autorizados: la dirección viaja en
+     * cada transacción, así que quien la elige somos nosotros. Con un solo
+     * valor fijo, el abogado que entró por el dominio propio pagaba y aterrizaba
+     * en el otro dominio —sesión distinta, pantalla desconocida, pago que
+     * parece perdido—. Ahora se declaran todos los sitios desde los que se
+     * puede pagar y se devuelve al MISMO por el que entró.
+     *
+     * Se acepta solo lo que esté en esta lista. Devolver al `Origin` que diga
+     * el navegador, sin comprobarlo, sería una redirección abierta con la
+     * confirmación de un pago encima. El primero de la lista es el que se usa
+     * cuando el origen no se reconoce o no viene.
+     */
+    redirectUrls: read('WOMPI_REDIRECT_URL')
+      .split(',')
+      .map((u) => u.trim())
+      .filter(Boolean)
   },
   mail: {
     enabled: mailEnabled,

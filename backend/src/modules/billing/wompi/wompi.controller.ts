@@ -27,7 +27,15 @@ export const startRechargeController = async (req: Request, res: Response): Prom
     const intent = await crearIntencion({
       firmId: req.firmId as string,
       userEmail: req.user!.email,
-      amountCop: Number(req.body.amount)
+      amountCop: Number(req.body.amount),
+      /*
+       * Se vuelve al sitio por el que se entró. Con la aplicación en dos
+       * direcciones —el dominio propio y el de Vercel—, un retorno fijo dejaba
+       * al abogado en la otra, con otra sesión y una pantalla que no reconoce,
+       * creyendo que el pago se perdió. El servidor solo acepta los sitios que
+       * estén declarados.
+       */
+      origen: req.get('origin') ?? undefined
     });
 
     res.json({ success: true, intent });

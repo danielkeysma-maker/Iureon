@@ -124,7 +124,23 @@ for (const nombre of aCorrer) {
    * en Windows. CI creía el código y la persona leía el texto. Cuando los dos se
    * contradicen, lo honesto es reportarlo como roto y no elegir a cuál creerle.
    */
-  const dicePaso = /ALL CHECKS PASSED/.test(salida);
+  /*
+   * TRES BANNERS, NO UNO, Y ESO NO ES LAXITUD.
+   *
+   * `preguntas` y `nombre` terminan con «Todo en orden.» y `plazos` con «TODO
+   * BIEN»; ninguno imprime ALL CHECKS PASSED. Con un solo patrón, los tres
+   * salían marcados ROTO en cada corrida y el ejecutor terminaba en 1 estando
+   * todo verde. Eso es peor que no tener ejecutor: un rojo permanente enseña a
+   * leer por encima, y así fue como se empujaron tres veces con CI en rojo el
+   * 9 de septiembre de 2026 sin que nadie lo notara.
+   *
+   * La contradicción que este código existe para cazar —texto que dice que pasó
+   * con código de salida que dice que no— se sigue cazando igual: lo que cambia
+   * es que ahora se reconocen las tres formas en que un check de esta casa dice
+   * que pasó. Un check nuevo que invente una cuarta se marcará ROTO, que es lo
+   * correcto: o usa una de estas o la añade aquí a conciencia.
+   */
+  const dicePaso = /ALL CHECKS PASSED|TODO BIEN|Todo en orden\./.test(salida);
 
   if (ok && dicePaso) {
     console.log(`  ok    ${nombre}`);

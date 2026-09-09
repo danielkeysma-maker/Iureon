@@ -99,7 +99,9 @@ export const checkoutController = async (req: Request, res: Response): Promise<v
       firmId: req.firmId as string,
       userEmail: req.user!.email,
       plan: req.body?.plan,
-      period: req.body?.period
+      period: req.body?.period,
+      /* Se vuelve al sitio por el que se entró, igual que en la recarga. */
+      origen: req.get('origin') ?? undefined
     });
 
     res.json({ success: true, intent });

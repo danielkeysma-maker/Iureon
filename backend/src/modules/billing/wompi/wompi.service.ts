@@ -93,10 +93,43 @@ export interface CheckoutIntent {
  * both is whatever the browser claims — and a browser that names its own credit
  * is not a payment system.
  */
+/**
+ * De dónde salió el pago, y por tanto a dónde debe volver.
+ *
+ * Se compara por ORIGEN (esquema + host + puerto), no por cadena: el navegador
+ * manda `https://www.iureoncolombia.com` y la lista puede traer una barra final
+ * o el mismo sitio escrito de otra forma, y una comparación literal fallaría
+ * mandando al abogado al dominio equivocado justo después de cobrarle.
+ *
+ * Lo que no está en la lista NO se usa. La dirección de retorno la propone el
+ * navegador, y obedecerla sin comprobarla sería una redirección abierta con la
+ * confirmación de un pago encima.
+ */
+const elegirRetorno = (permitidas: string[], origen?: string): string => {
+  const porDefecto = permitidas[0] ?? '';
+  if (!origen) return porDefecto;
+  let deQuienPide: string;
+  try {
+    deQuienPide = new URL(origen).origin;
+  } catch {
+    return porDefecto;
+  }
+  const hallada = permitidas.find((u) => {
+    try {
+      return new URL(u).origin === deQuienPide;
+    } catch {
+      return false;
+    }
+  });
+  return hallada ?? porDefecto;
+};
+
 export const crearIntencion = async (input: {
   firmId: string;
   userEmail: string;
   amountCop: number;
+  /** La cabecera `Origin` de quien pide pagar; decide a cuál de los sitios permitidos vuelve. */
+  origen?: string;
   /**
    * RECARGA credits balance (the default, and every caller before plans
    * existed). SUSCRIPCION extends the firm's plan instead; `plan` and `period`
@@ -173,7 +206,7 @@ export const crearIntencion = async (input: {
     currency: 'COP',
     publicKey: gateway.publicKey,
     signature: firmaDeIntegridad(reference, amountInCents, 'COP', gateway.integritySecret),
-    redirectUrl: gateway.redirectUrl,
+    redirectUrl: elegirRetorno(gateway.redirectUrls, input.origen),
     sandbox: gateway.sandbox
   };
 };

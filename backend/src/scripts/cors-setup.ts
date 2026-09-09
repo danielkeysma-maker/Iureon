@@ -18,7 +18,19 @@ const BUCKET_ID = process.env.B2_BUCKET_ID;
 
 const REGLA = {
   corsRuleName: 'allowBrowserUploads',
-  allowedOrigins: ['https://iureon-app.vercel.app', 'http://localhost:5173'],
+  /*
+   * LOS DOS DOMINIOS, y el de Vercel se queda. La aplicación vive ahora en
+   * www.iureoncolombia.com, pero iureon-app.vercel.app sigue sirviéndola y es
+   * la dirección con la que se prueba un despliegue antes de que el dominio
+   * apunte a él. Si un origen no está aquí, el navegador ni siquiera intenta la
+   * subida: el archivo simplemente no sube, sin error visible en la aplicación.
+   */
+  allowedOrigins: [
+    'https://www.iureoncolombia.com',
+    'https://iureoncolombia.com',
+    'https://iureon-app.vercel.app',
+    'http://localhost:5173'
+  ],
   allowedOperations: [
     'b2_upload_file',
     'b2_upload_part',

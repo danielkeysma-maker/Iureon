@@ -21,6 +21,8 @@ export const crearCheckoutDePlan = async (input: {
   userEmail: string;
   plan: unknown;
   period: unknown;
+  /** El sitio desde el que se paga, para volver a ese y no al otro dominio. */
+  origen?: string;
 }): Promise<CheckoutIntent & { plan: Plan; period: PaidPeriod; amountCop: number }> => {
   if (!esPlan(input.plan)) {
     throw new PlanError('PLAN_UNAVAILABLE', 'Ese plan no existe.', 400);
@@ -37,7 +39,8 @@ export const crearCheckoutDePlan = async (input: {
     amountCop,
     purpose: 'SUSCRIPCION',
     plan: input.plan,
-    period: input.period
+    period: input.period,
+    origen: input.origen
   });
 
   return { ...intent, plan: input.plan, period: input.period, amountCop };
