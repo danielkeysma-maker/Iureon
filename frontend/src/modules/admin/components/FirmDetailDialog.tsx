@@ -210,7 +210,13 @@ export const FirmDetailDialog: React.FC<FirmDetailDialogProps> = ({ firmId, onCl
           <FirmPlanSection
             key={`${firma.id}-${recarga}`}
             firma={firma}
-            onGuardado={() => setRecarga((n) => n + 1)}
+            /*
+              Con la ficha ya releída por el servidor se aplica directamente:
+              ni segunda petición, ni «Leyendo la firma…» tapando la ficha, ni
+              remontar la sección por el `key`. Sin ella —suspender, cambiar
+              plan: esos endpoints no la devuelven— se relee como siempre.
+            */
+            onGuardado={(yaLeida) => (yaLeida ? setFirma(yaLeida) : setRecarga((n) => n + 1))}
           />
 
           <section className="rounded-card border border-line-200 bg-surface">

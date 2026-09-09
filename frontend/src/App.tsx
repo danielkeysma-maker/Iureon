@@ -526,7 +526,18 @@ export function App() {
 
     try {
       const { summary } = await billingApi.summary();
-      setActiveFirm((actual) => ({ ...actual, creditsBalance: summary.balance }));
+      /*
+       * SI EL SALDO NO CAMBIÓ, NO SE TOCA EL OBJETO. Se devolvía siempre uno
+       * nuevo, así que el sondeo de cada 20 segundos repintaba la aplicación
+       * ENTERA aunque la cifra fuera la misma —que es lo normal: el saldo
+       * cambia unas pocas veces al día—. Ese repintado gratuito era el que
+       * arrastraba a los diálogos abiertos y le quitaba el foco a quien
+       * estuviera escribiendo. React descarta la actualización cuando se le
+       * devuelve el mismo objeto.
+       */
+      setActiveFirm((actual) =>
+        actual.creditsBalance === summary.balance ? actual : { ...actual, creditsBalance: summary.balance }
+      );
     } catch {
       /* The balance simply does not update; it is never invented. */
     }

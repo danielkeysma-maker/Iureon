@@ -77,8 +77,14 @@ const estadoDe = (f: FirmDetail): { etiqueta: string; clase: string } => {
 
 interface FirmPlanSectionProps {
   firma: FirmDetail;
-  /** Tras guardar, la ficha se relee entera: el estado sale del servidor. */
-  onGuardado: () => void;
+  /**
+   * Tras guardar, la ficha se relee entera: el estado sale del servidor.
+   *
+   * SALVO CUANDO EL SERVIDOR YA LA DEVOLVIÓ. `PATCH /modulos` responde con la
+   * ficha releída, así que pasarla aquí ahorra la segunda vuelta y su espera
+   * en blanco. Sin argumento, el comportamiento de siempre.
+   */
+  onGuardado: (yaLeida?: FirmDetail) => void;
 }
 
 /** Los módulos que la aplicación puede cerrar, con el nombre que usa la barra lateral. */
@@ -107,7 +113,7 @@ const estadoDeModulo = (firma: FirmDetail, id: string): EstadoDeModulo =>
 
 interface ModulosDeLaFirmaProps {
   firma: FirmDetail;
-  onGuardado: () => void;
+  onGuardado: (yaLeida?: FirmDetail) => void;
 }
 
 const ModulosDeLaFirma: React.FC<ModulosDeLaFirmaProps> = ({ firma, onGuardado }) => {
@@ -131,8 +137,23 @@ const ModulosDeLaFirma: React.FC<ModulosDeLaFirmaProps> = ({ firma, onGuardado }
     if (apagar) actuales.add(id);
     else actuales.delete(id);
     setError(null);
+    /*
+     * ─── UNA SOLA VUELTA AL SERVIDOR, Y LA FICHA NO DESAPARECE ──────────────
+     *
+     * DEFECTO QUE ESTO CORRIGE: cada interruptor tardaba y «no respondía
+     * bien». No era el interruptor: eran DOS peticiones seguidas. Esta, que
+     * guarda, y otra que releía la ficha completa; y mientras la segunda
+     * viajaba, toda la ficha se sustituía por «Leyendo la firma…» y la sección
+     * se remontaba, así que apagar una función parpadeaba la pantalla entera.
+     *
+     * `PATCH /modulos` YA devuelve la ficha releída —el servidor la manda
+     * desde el principio— y se estaba tirando. Ahora se entrega tal cual: un
+     * viaje, sin espera en blanco y sin remontar nada. El estado lo sigue
+     * decidiendo el servidor; aquí no se adivina el resultado.
+     */
+    let respuesta: Awaited<ReturnType<typeof adminApi.ajustarModulos>>;
     try {
-      await adminApi.ajustarModulos(firma.id, {
+      respuesta = await adminApi.ajustarModulos(firma.id, {
         desactivados: [...actuales],
         motivo: motivoRef.current.replace(/\s+/g, ' ').trim() || undefined
       });
@@ -143,7 +164,7 @@ const ModulosDeLaFirma: React.FC<ModulosDeLaFirmaProps> = ({ firma, onGuardado }
     }
     setMotivo('');
     motivoRef.current = '';
-    onGuardado();
+    onGuardado(respuesta.firm);
   };
 
   const pedirConfirmacion = (id: string, nombre: string, apagar: boolean, tipo: 'modulo' | 'funcion' = 'modulo') => {

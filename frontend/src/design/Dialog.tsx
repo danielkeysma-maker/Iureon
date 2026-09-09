@@ -80,6 +80,33 @@ export const Dialog: React.FC<DialogProps> = ({
   const panel = useRef<HTMLDivElement>(null);
   const invocador = useRef<Element | null>(null);
 
+  /*
+   * ─── POR QUÉ `onCerrar` VIVE EN UNA REF Y NO EN LAS DEPENDENCIAS ──────────
+   *
+   * DEFECTO QUE ESTO CORRIGE: escribiendo en «Qué quiere saber» del diálogo de
+   * revisión, el cursor se salía del cuadro y las teclas dejaban de entrar.
+   *
+   * Los once diálogos reciben `onCerrar` como una flecha escrita en el JSX del
+   * padre —`onCerrar={() => setRevisarAbierto(false)}`—, así que CADA render
+   * del padre la crea de nuevo. Con `onCerrar` en las dependencias, ese cambio
+   * de identidad —que no cambia nada de lo que el efecto hace— volvía a
+   * ejecutar el efecto entero: la limpieza devolvía el foco al botón que abrió
+   * el diálogo y el efecto lo llevaba después al panel. Quien estuviera
+   * escribiendo perdía el campo a media palabra, sin haber tocado nada.
+   *
+   * Y el padre se repinta solo: la barra relee el saldo de la firma cada 20
+   * segundos. Por eso el defecto se sentía aleatorio y no se podía reproducir
+   * a voluntad.
+   *
+   * La ref guarda SIEMPRE la última función, así que `Esc` cierra con la
+   * versión de este render; lo que ya no depende de ella es CUÁNDO se mueve el
+   * foco, que es lo único que tenía que atarse a `abierto`.
+   */
+  const alCerrarRef = useRef(onCerrar);
+  useEffect(() => {
+    alCerrarRef.current = onCerrar;
+  });
+
   useEffect(() => {
     if (!abierto) return;
 
@@ -92,7 +119,7 @@ export const Dialog: React.FC<DialogProps> = ({
     panel.current?.focus();
 
     const alPulsar = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onCerrar();
+      if (e.key === 'Escape') alCerrarRef.current();
     };
 
     document.addEventListener('keydown', alPulsar);
@@ -106,7 +133,10 @@ export const Dialog: React.FC<DialogProps> = ({
       document.body.style.overflow = overflowPrevio;
       (invocador.current as HTMLElement | null)?.focus?.();
     };
-  }, [abierto, onCerrar]);
+    // `onCerrar` va por ref a propósito: ver el comentario de arriba. Meterla
+    // aquí devuelve el defecto del foco que se pierde a media escritura.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [abierto]);
 
   if (!abierto) return null;
 
