@@ -133,11 +133,16 @@ export const FirmUsersDialog: React.FC<FirmUsersDialogProps> = ({
           </>
         }
       >
-        /*
-          `[overflow-wrap:anywhere]` en la raiz: los correos de firma son la
+        {/*
+          `[overflow-wrap:anywhere]` en la raíz: los correos de firma son la
           materia de esta pantalla, y un correo de sesenta caracteres se pinta
           fuera de su caja sin agrandarla.
-        */
+
+          LAS LLAVES NO SON ADORNO. Sin ellas esto no es un comentario sino un
+          hijo del JSX, y React lo imprime: el diálogo mostró el texto del
+          comentario en pantalla. Un comentario entre etiquetas va siempre
+          entre llaves; entre paréntesis de una expresión, no hacen falta.
+        */}
         <div className="min-w-0 space-y-4 [overflow-wrap:anywhere]">
           {error && <p className="notice-unverified text-justify [text-wrap:pretty]">{error}</p>}
 

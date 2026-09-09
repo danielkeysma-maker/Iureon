@@ -636,7 +636,19 @@ const TarjetaUtilidad: React.FC<{ u: Utilidad }> = ({ u }) => {
       onClick={u.abrir}
       className={[
         'min-w-0 overflow-hidden rounded-card border text-left [overflow-wrap:anywhere]',
-        'transition-colors hover:border-[rgb(var(--rail-gold)/0.55)]',
+        /*
+          LA TARJETA FLOTA AL PASAR EL CURSOR, que es lo que pedia la maqueta y
+          se habia quedado en un simple cambio de borde: sube tres pixeles, la
+          sombra se abre muy difusa por debajo —de ahi la sensacion de que esta
+          por delante del papel— y las esquinas se redondean un poco mas. Solo
+          de `md` en adelante: en el telefono no hay cursor, y un `:hover`
+          tactil se queda pegado despues de tocar. Se respeta a quien pidio
+          menos movimiento en su sistema.
+        */
+        'transition-[transform,box-shadow,border-color,border-radius] duration-300 ease-[cubic-bezier(.4,0,.2,1)]',
+        'hover:border-[rgb(var(--rail-gold)/0.55)]',
+        'md:hover:-translate-y-[3px] md:hover:rounded-[22px] md:hover:shadow-[0_26px_50px_-30px_rgb(var(--rail-ink)/0.4)]',
+        'motion-reduce:transition-none motion-reduce:hover:translate-y-0',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700/40',
         fondo,
         ancha
