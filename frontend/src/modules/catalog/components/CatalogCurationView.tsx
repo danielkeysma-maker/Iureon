@@ -358,6 +358,7 @@ export const CatalogCurationView: React.FC = () => {
           <div className="min-h-0 flex-1">
             <VerificationForm
               actuacion={openActuacion}
+              conResumen={false}
               isSaving={curation.isSaving}
               error={curation.saveError}
               onSave={curation.save}

@@ -10,6 +10,8 @@ interface VerificationFormProps {
   onSave: (input: VerificationInput) => Promise<boolean>;
   onRevert: (actuacionId: string) => Promise<boolean>;
   onClose: () => void;
+  /** La franja que repite término, norma y autoridad. Se apaga donde ya se muestra la ficha completa. */
+  conResumen?: boolean;
 }
 
 const STATUS_OPTIONS: { value: TermStatus; label: string; help: string; icon: typeof CalendarClock }[] = [
@@ -49,7 +51,8 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({
   error,
   onSave,
   onRevert,
-  onClose
+  onClose,
+  conResumen = true
 }) => {
   const { currentUserEmail } = useTenant();
 
@@ -117,58 +120,68 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({
         VERSE — un solo chip global promediaría tres verdades distintas en una
         mentira cómoda.
       */}
-      <div className="grid shrink-0 grid-cols-3 gap-px border-b border-line-200 bg-line-100">
-        <div className="bg-surface px-3 py-2.5">
-          <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
-            Término
-          </p>
-          <p className="mt-0.5 text-justify text-[11.5px] font-medium leading-snug text-ink-900 [text-wrap:pretty]">
-            {actuacion.term.status === 'NO_CADUCA'
-              ? 'No caduca'
-              : actuacion.term.description
-              ? actuacion.term.description.length > 60
-                ? `${actuacion.term.description.slice(0, 60)}…`
+      {/*
+        EL RESUMEN SE APAGA DONDE YA ESTÁ LA FICHA. Esta franja repite término,
+        norma y autoridad, y en la pantalla de curaduría vive justo debajo de
+        `ActuacionDetail`, que trae lo mismo y mejor: los tres bloques con su
+        estado y las secciones que la norma exige. Duplicado, empujaba los
+        campos de verificación fuera de la pantalla y el abogado veía dos veces
+        lo que ya sabía y ni una el formulario que venía a llenar.
+      */}
+      {conResumen && (
+        <div className="grid shrink-0 grid-cols-3 gap-px border-b border-line-200 bg-line-100">
+          <div className="bg-surface px-3 py-2.5">
+            <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
+              Término
+            </p>
+            <p className="mt-0.5 text-justify text-[11.5px] font-medium leading-snug text-ink-900 [text-wrap:pretty]">
+              {actuacion.term.status === 'NO_CADUCA'
+                ? 'No caduca'
                 : actuacion.term.description
-              : 'Sin término registrado'}
-          </p>
-          <span className={`mt-1 inline-block ${actuacion.term.status === 'NO_VERIFICADO' ? 'chip-unverified' : 'chip-verified'}`}>
-            {actuacion.term.status === 'NO_VERIFICADO' ? 'Sin verificar' : 'Verificado'}
-          </span>
-        </div>
+                ? actuacion.term.description.length > 60
+                  ? `${actuacion.term.description.slice(0, 60)}…`
+                  : actuacion.term.description
+                : 'Sin término registrado'}
+            </p>
+            <span className={`mt-1 inline-block ${actuacion.term.status === 'NO_VERIFICADO' ? 'chip-unverified' : 'chip-verified'}`}>
+              {actuacion.term.status === 'NO_VERIFICADO' ? 'Sin verificar' : 'Verificado'}
+            </span>
+          </div>
 
-        <div className="bg-surface px-3 py-2.5">
-          <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
-            Norma
-          </p>
-          <p className="mt-0.5 text-justify text-[11.5px] font-medium leading-snug text-ink-900 [text-wrap:pretty]">
-            {actuacion.legalBasis || 'Sin artículo'}
-          </p>
-          {actuacion.sourceUrl ? (
-            <a
-              href={actuacion.sourceUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-1 inline-block text-[10.5px] font-semibold text-brand-700 hover:underline"
-            >
-              Texto oficial
-            </a>
-          ) : (
-            <span className="mt-1 inline-block chip-unverified">Sin fuente</span>
-          )}
-        </div>
+          <div className="bg-surface px-3 py-2.5">
+            <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
+              Norma
+            </p>
+            <p className="mt-0.5 text-justify text-[11.5px] font-medium leading-snug text-ink-900 [text-wrap:pretty]">
+              {actuacion.legalBasis || 'Sin artículo'}
+            </p>
+            {actuacion.sourceUrl ? (
+              <a
+                href={actuacion.sourceUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-1 inline-block text-[10.5px] font-semibold text-brand-700 hover:underline"
+              >
+                Texto oficial
+              </a>
+            ) : (
+              <span className="mt-1 inline-block chip-unverified">Sin fuente</span>
+            )}
+          </div>
 
-        <div className="bg-surface px-3 py-2.5">
-          <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
-            Autoridad
-          </p>
-          <p className="mt-0.5 text-justify text-[11.5px] font-medium leading-snug text-ink-900 [text-wrap:pretty]">
-            {actuacion.competentAuthority ?? 'No registrada'}
-          </p>
-          <span className={`mt-1 inline-block ${actuacion.competentAuthority ? 'chip-neutral' : 'chip-unverified'}`}>
-            {actuacion.competentAuthority ? 'Del catálogo' : 'Falta'}
-          </span>
+          <div className="bg-surface px-3 py-2.5">
+            <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
+              Autoridad
+            </p>
+            <p className="mt-0.5 text-justify text-[11.5px] font-medium leading-snug text-ink-900 [text-wrap:pretty]">
+              {actuacion.competentAuthority ?? 'No registrada'}
+            </p>
+            <span className={`mt-1 inline-block ${actuacion.competentAuthority ? 'chip-neutral' : 'chip-unverified'}`}>
+              {actuacion.competentAuthority ? 'Del catálogo' : 'Falta'}
+            </span>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
         {actuacion.verification && (

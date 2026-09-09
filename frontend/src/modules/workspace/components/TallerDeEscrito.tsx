@@ -777,7 +777,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
                       Volver al actual
                     </button>
                   </div>
-                  <p className="whitespace-pre-wrap text-justify font-legal leading-[1.8] text-paper-ink [text-wrap:pretty]" style={estiloDelPapel}>
+                  <p className="whitespace-pre-wrap break-words text-justify font-legal leading-[1.8] text-paper-ink [text-wrap:pretty]" style={estiloDelPapel}>
                     {tramos.map((t, k) =>
                       t.tipo === 'igual' ? (
                         <React.Fragment key={k}>{t.texto}</React.Fragment>
@@ -806,7 +806,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
       ) : (
         Papel(
           <>
-            <p ref={lienzo} className="whitespace-pre-wrap text-justify font-legal leading-[1.8] text-paper-ink [text-wrap:pretty]" style={estiloDelPapel}>
+            <p ref={lienzo} className="whitespace-pre-wrap break-words text-justify font-legal leading-[1.8] text-paper-ink [text-wrap:pretty]" style={estiloDelPapel}>
               {segmentos.map((s, k) => {
                 if (s.capas.length === 0) return <React.Fragment key={k}>{s.texto}</React.Fragment>;
                 if (s.capas.every((c) => esCapaTipografica(c.capa))) {
@@ -897,7 +897,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
         {conversacion.map((t, k) => (
           <div key={k} className={`max-w-[92%] ${t.rol === 'abogado' ? 'ml-auto' : ''}`}>
             <div className={`rounded-card px-3 py-2 text-[13px] leading-relaxed ${t.rol === 'abogado' ? 'bg-brand-700 text-white' : 'border border-line-200 bg-canvas text-ink-900'}`}>
-              <p className="whitespace-pre-wrap text-justify [text-wrap:pretty]">{formatoDelChat(textoLegible(t.texto))}</p>
+              <p className="whitespace-pre-wrap break-words text-justify [text-wrap:pretty]">{formatoDelChat(textoLegible(t.texto))}</p>
               {t.rol === 'revisor' && t.ediciones && t.ediciones.length > 0 && Ediciones(t.ediciones)}
               {t.rol === 'revisor' && t.referencias && t.referencias.length > 0 && (
                 <button type="button" onClick={() => setReferencias(t.referencias ?? [])} className="mt-1.5 text-[11px] text-sky-700 underline underline-offset-2">
@@ -1014,7 +1014,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
               <button type="button" onClick={() => irAlPasaje(a.cita)} className="block w-full text-left text-[11px] italic leading-snug text-ink-500 hover:text-brand-700" title="Ir al pasaje">
                 «{a.cita.length > 140 ? `${a.cita.slice(0, 140)}…` : a.cita}»
               </button>
-              <p className="mt-1 whitespace-pre-wrap leading-snug text-ink-900">{a.nota}</p>
+              <p className="mt-1 whitespace-pre-wrap break-words leading-snug text-ink-900">{a.nota}</p>
               <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                 {a.fecha && <span className="font-mono text-[10px] text-ink-400">{fechaCorta(a.fecha)}</span>}
                 <button type="button" onClick={() => setComentario({ indice, cita: a.cita, nota: a.nota ?? '' })} className="btn-neutral btn-sm ml-auto">
