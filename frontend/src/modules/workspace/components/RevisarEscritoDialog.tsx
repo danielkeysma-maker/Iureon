@@ -1020,11 +1020,26 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
             </p>
           </div>
 
-          {/* ─── LA PREGUNTA ─────────────────────────────────────────────── */}
+          {/* ─── LA PREGUNTA ─────────────────────────────────────────────────
+              «QUE QUIERE SABER» SE LEIA COMO UN REQUISITO, y no lo es. El
+              rotulo, a secas y sobre un cuadro grande, sugiere que si uno no
+              escribe nada no se revisa nada; un abogado lo pregunto con esas
+              palabras. La verdad es la contraria: el informe trae SIEMPRE sus
+              secciones —que es, que decide, que le exige, que queda pendiente,
+              por donde se ataca— y este cuadro solo dirige el enfasis. Vacio,
+              el servidor pone su propia pregunta y el informe sale igual.
+
+              Asi que el rotulo dice que es opcional y la linea de abajo dice
+              que hace, en vez de dejar que cada quien lo adivine. */}
           <div>
             <label htmlFor="pregunta-revision" className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
-              Qué quiere saber
+              Qué quiere saber <span className="font-normal normal-case tracking-normal text-ink-400">· opcional</span>
             </label>
+            <p className="mt-1 text-[11px] leading-snug text-ink-500 text-justify">
+              {esRecibido
+                ? 'El informe trae siempre lo mismo: qué es el documento, qué decide, qué le exige y para cuándo, qué queda pendiente y por dónde se ataca. Esto solo dirige el énfasis; si lo deja vacío, se revisa el documento completo igual.'
+                : 'El informe trae siempre lo mismo: qué exige la ficha de la actuación, qué falta y qué corregiría. Esto solo dirige el énfasis; si lo deja vacío, se revisa el escrito completo igual.'}
+            </p>
             <textarea
               id="pregunta-revision"
               value={pregunta}
