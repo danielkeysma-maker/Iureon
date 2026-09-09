@@ -96,8 +96,22 @@ export const callOpenRouterWithUsage = async (
   userPrompt: string,
   maxTokens?: number,
   /** Overrides the usable-length floor for a caller whose short answer means something. */
-  minUsableLength: number = MIN_USABLE_LENGTH
-): Promise<CallResult> => callOpenRouter(model, systemPrompt, userPrompt, maxTokens, minUsableLength);
+  minUsableLength: number = MIN_USABLE_LENGTH,
+  opciones?: OpcionesDeLlamada
+): Promise<CallResult> => callOpenRouter(model, systemPrompt, userPrompt, maxTokens, minUsableLength, opciones);
+
+/**
+ * `json: true` pide al proveedor modo JSON (`response_format: json_object`).
+ *
+ * POR QUÉ EXISTE. El 9 de septiembre de 2026 la propuesta de actuación falló
+ * en CIVIL de forma reproducible: el motor barato gastaba sus 2.000 tokens
+ * razonando EN EL TEXTO («Wait, let's look at the instruction…») y el JSON
+ * nunca llegaba; el proveedor cortaba por longitud a los 300 caracteres. El
+ * modo JSON le prohíbe la prosa; el tope más alto le deja terminar.
+ */
+export interface OpcionesDeLlamada {
+  json?: boolean;
+}
 
 /**
  * One part of a multimodal user message, in OpenRouter's chat format.
@@ -131,7 +145,8 @@ const callOpenRouter = async (
   systemPrompt: string,
   userContent: string | ContentPart[],
   maxTokens: number | undefined,
-  minUsableLength: number
+  minUsableLength: number,
+  opciones?: OpcionesDeLlamada
 ): Promise<CallResult> => {
   const apiKey = config.openRouter.apiKey;
 
@@ -174,6 +189,8 @@ const callOpenRouter = async (
          * without paying for the re-derivation.
          */
         ...(isOpus ? { reasoning_effort: 'medium' } : {}),
+        // Modo JSON solo para quien lo pide: al que redacta prosa le estorbaría.
+        ...(opciones?.json ? { response_format: { type: 'json_object' } } : {}),
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userContent }

@@ -275,10 +275,18 @@ export const triageFacts = async (facts: string, branch?: LegalBranch): Promise<
       ENGINE.GEMINI,
       SYSTEM_PROMPT,
       `HECHOS:\n${clean}\n\nACTUACIONES DISPONIBLES:\n${catalogueMenu(branch)}`,
-      2000,
+      /*
+       * 6.000 y modo JSON, no 2.000 y texto libre. Con CIVIL —121 nombres en
+       * el menú— el motor gastaba los 2.000 razonando en el texto y el
+       * proveedor cortaba a los 300 caracteres: la propuesta fallaba SIEMPRE
+       * en la rama más usada. El modo JSON le quita la prosa y el tope le
+       * deja terminar la lista.
+       */
+      6000,
       // Una lista vacía son 18 caracteres y es la respuesta correcta cuando
       // el catálogo no reconoce nada. El piso por defecto la tiraría.
-      0
+      0,
+      { json: true }
     );
     raw = result.text;
   } catch (error) {
