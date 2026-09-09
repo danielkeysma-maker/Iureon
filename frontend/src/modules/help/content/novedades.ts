@@ -40,6 +40,14 @@ export const NOVEDADES_ID = 'novedades';
 export const NOVEDADES: readonly Novedad[] = [
   {
     fecha: '2026-09-09',
+    titulo: 'Herramientas se ve como una retícula de tarjetas, con filtros y la fuente de cada cálculo a la vista',
+    detalle:
+      'Las siete utilidades dejan de ser renglones de una lista: cada una tiene su tarjeta numerada, con un dibujo que anticipa lo que calcula, la frase de qué hace y, al pie, la norma de la que sale su cifra, el estado de esa fuente y la insignia «Excel» donde la exportación existe —el glosario no la lleva porque no calcula nada—. Arriba puede filtrar entre «Términos», «Dinero» y «Referencia», o seguir buscando por nombre o por lo que necesita calcular. En el teléfono la primera tarjeta va completa y las demás quedan como filas con su miniatura.',
+    modulo: 'Herramientas',
+    tipo: 'mejora'
+  },
+  {
+    fecha: '2026-09-09',
     titulo: 'Al cambiar de plan, la pantalla le dice antes de pagar desde cuándo corre el nuevo',
     detalle:
       'En «Plan de la firma», si elige un plan distinto del que tiene y todavía le quedan días, la tarjeta lo advierte debajo del botón: el plan nuevo empieza su ciclo el día del pago y los días que le quedan del actual no se acreditan. Ahí mismo se le recuerda que, si prefiere conservar su fecha de vencimiento, puede escribirnos por Soporte antes de pagar. Renovar el plan que ya tiene —también al pasar de mensual a anual— sigue sumando el periodo a la fecha vigente, sin perder un día.',

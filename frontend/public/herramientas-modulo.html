@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IUREON — Módulo Herramientas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ─── Tokens ─────────────────────────────────────────────── */
+:root{
+  --ink:#0B1220; --ink-soft:#3b4453; --muted:#5b6675; --faint:#8b94a1;
+  --paper:#F7F5EF; --surface:#fff; --canvas:#F7F8FA;
+  --gold:#C8A046;            /* solo sobre tinta */
+  --gold-light:#E4C97E;      /* solo sobre tinta */
+  --gold-on-white:#8a6d1f;   /* numerales sobre blanco  ≈4,9:1 */
+  --gold-on-paper:#7a5f1c;   /* numerales sobre crema   ≈5,5:1 */
+  --line:rgba(11,18,32,.09);
+  --mono:500 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  --ease:cubic-bezier(.4,0,.2,1);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Work Sans',system-ui,-apple-system,sans-serif;color:var(--ink);background:var(--surface);-webkit-font-smoothing:antialiased}
+h1,h2{margin:0;letter-spacing:-.03em;font-weight:600}
+p{margin:0}
+button{font-family:inherit;cursor:pointer}
+
+/* ─── Cabecera ───────────────────────────────────────────── */
+.mod{max-width:1180px;margin:0 auto}
+.mod-head{display:flex;align-items:flex-end;justify-content:space-between;gap:32px;padding:36px 36px 24px;border-bottom:1px solid rgba(11,18,32,.08)}
+.eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.eyebrow-num{font:var(--mono);color:var(--gold-on-white)}
+.eyebrow-txt{font-size:9.5px;font-weight:600;letter-spacing:.18em;color:rgba(11,18,32,.35)}
+.mod-head h1{font-size:34px;margin-bottom:8px;max-width:20ch}
+.mod-head p{max-width:620px;font-size:14.5px;line-height:1.55;color:var(--muted)}
+.head-actions{display:flex;gap:8px;flex:none;align-items:center}
+.segmented{display:flex;gap:4px;padding:4px;background:var(--paper);border-radius:12px}
+.segmented span{padding:8px 14px;border-radius:9px;font-size:13px;font-weight:400;color:var(--muted)}
+.segmented span[aria-current]{background:var(--surface);box-shadow:0 1px 2px rgba(11,18,32,.1);font-weight:600;color:var(--ink)}
+.btn{height:40px;padding:0 16px;border-radius:12px;background:var(--ink);border:none;color:var(--paper);font-size:13.5px;font-weight:600;transition:opacity .2s}
+.btn:hover{opacity:.85}
+.chips-scroll{display:none}
+
+/* ─── Retícula ───────────────────────────────────────────── */
+.grid{padding:28px 36px 8px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:stretch}
+.mod-foot{padding:0 36px 36px}
+.mod-foot p{padding-top:18px;border-top:1px solid rgba(11,18,32,.08);font-size:12.5px;line-height:1.55;color:var(--faint)}
+
+/* ─── Tarjeta ────────────────────────────────────────────── */
+.tool{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:20px;overflow:hidden;transition:transform .25s var(--ease),box-shadow .25s var(--ease),border-color .25s var(--ease)}
+.tool:hover{transform:translateY(-3px);box-shadow:0 26px 50px -30px rgba(11,18,32,.4);border-color:rgba(200,160,70,.55)}
+.tool-body{padding:22px;display:flex;flex-direction:column;gap:12px;flex:1}
+.tool-title{display:flex;align-items:baseline;gap:12px}
+.tool-num{font:var(--mono);color:var(--gold-on-white)}
+.tool-title h2{font-size:19px;letter-spacing:-.02em}
+.tool-desc{font-size:14px;line-height:1.55;color:var(--muted)}
+.tool-meta{margin-top:auto;padding-top:14px;border-top:1px solid rgba(11,18,32,.08);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px}
+.tool-src{font-size:12px;color:var(--faint)}
+.badge{padding:5px 10px;border-radius:999px;background:rgba(200,160,70,.16);color:var(--gold-on-white);font-size:11.5px;font-weight:600;white-space:nowrap}
+.tool-open{font-size:13.5px;font-weight:600}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tags span{padding:6px 11px;border-radius:9px;background:var(--paper);font-size:12.5px;font-weight:500}
+
+/* Tarjeta ancha (01) */
+.tool--wide{grid-column:span 2;display:grid;grid-template-columns:minmax(240px,38%) minmax(0,1fr)}
+.tool--wide .tool-body{padding:26px 28px;gap:14px}
+.tool--wide .tool-title h2{font-size:23px;letter-spacing:-.025em}
+.tool--wide .tool-desc{font-size:14.5px;line-height:1.6;max-width:520px}
+.tool--wide .tool-meta{padding-top:16px}
+
+/* Tarjeta en tinta (02) — el oro claro solo aquí */
+.tool--ink{background:var(--ink);border-color:transparent}
+.tool--ink:hover{border-color:transparent;box-shadow:0 26px 50px -30px rgba(11,18,32,.6)}
+.tool--ink .tool-title h2{color:var(--paper)}
+.tool--ink .tool-num{color:var(--gold-light)}
+.tool--ink .tool-desc{color:rgba(247,245,239,.68)}
+.tool--ink .tool-meta{border-top-color:rgba(247,245,239,.12)}
+.tool--ink .tool-src{color:rgba(247,245,239,.5)}
+.tool--ink .badge{background:rgba(200,160,70,.22);color:var(--gold-light)}
+
+/* Tarjeta en crema (06) */
+.tool--paper{background:var(--paper);border-color:rgba(200,160,70,.35)}
+.tool--paper .tool-num{color:var(--gold-on-paper)}
+.tool--paper .tool-meta{border-top-color:rgba(11,18,32,.1)}
+.tool--paper .badge{background:rgba(200,160,70,.22);color:var(--gold-on-paper)}
+
+/* ─── Láminas generadas (gráficos de marca, sin fotografía) ─ */
+.lamina{height:172px;flex:none;background:var(--paper);padding:22px;display:flex;flex-direction:column;justify-content:center;gap:12px;overflow:hidden}
+.tool--wide .lamina{height:auto;padding:26px;justify-content:space-between;gap:18px}
+.tool--ink .lamina{background:linear-gradient(160deg,rgba(200,160,70,.14),rgba(200,160,70,0) 60%);justify-content:flex-end}
+.tool--paper .lamina{background:var(--surface)}
+/* Leyendas: 11px y tinta media — el atenuado por alfa no es legible a 9px */
+.legend{display:flex;align-items:center;gap:14px;font:var(--mono);color:var(--muted);flex-wrap:wrap}
+.legend i{display:inline-flex;align-items:center;gap:6px;font-style:normal}
+.legend b{width:10px;height:10px;border-radius:3px;display:inline-block}
+.tool--ink .legend{color:rgba(247,245,239,.82)}
+
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.days span{height:26px;border-radius:6px;background:rgba(11,18,32,.07)}
+.days .off{background:rgba(200,160,70,.28)}
+.days .notif{background:var(--ink)}
+.days .due{background:var(--gold);box-shadow:0 0 0 3px rgba(200,160,70,.25)}
+
+.bars{display:grid;gap:9px}
+.bars div{display:flex;align-items:center;gap:9px}
+.bars label{font:var(--mono);color:rgba(247,245,239,.82);width:60px;flex:none}
+.bars span{height:12px;border-radius:99px;background:rgba(247,245,239,.22)}
+
+.steps{display:flex;align-items:flex-end;gap:7px;height:100%}
+.steps span{flex:1;border-radius:5px 5px 0 0;background:rgba(11,18,32,.12)}
+.steps .mid{background:rgba(200,160,70,.4)}
+.steps .high{background:var(--gold)}
+.steps .top{background:var(--ink)}
+
+.tranches{display:flex;gap:4px;align-items:center}
+.tranches span{height:14px;background:rgba(200,160,70,.3)}
+.tranches span:first-child{border-radius:99px 0 0 99px;background:rgba(11,18,32,.1)}
+.tranches span:last-child{border-radius:0 99px 99px 0;background:var(--gold)}
+.rowspread{display:flex;justify-content:space-between;font:var(--mono);color:var(--muted)}
+.hair{height:1px;background:rgba(11,18,32,.1)}
+.total{display:flex;align-items:baseline;gap:8px;font:var(--mono);color:var(--muted)}
+.total i{flex:1;border-bottom:1px dashed rgba(11,18,32,.2)}
+.total b{color:var(--ink)}
+
+.thresholds{display:grid;gap:8px}
+.thresholds div{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;background:rgba(11,18,32,.05);font:var(--mono);color:var(--muted)}
+.thresholds div b{width:6px;height:6px;border-radius:50%;background:rgba(11,18,32,.25);display:inline-block}
+.thresholds div span{margin-left:auto}
+.thresholds .is-on{padding:11px 12px;background:var(--ink);color:var(--paper);box-shadow:0 0 0 3px rgba(200,160,70,.22)}
+.thresholds .is-on b{background:var(--gold)}
+.thresholds .is-on span{color:var(--gold-light)}
+
+.year{display:grid;grid-template-columns:repeat(12,1fr);gap:5px}
+.year span{height:16px;border-radius:4px;background:rgba(11,18,32,.09)}
+.year .dim{background:rgba(11,18,32,.05)}
+.year .off{background:rgba(200,160,70,.35)}
+.year .mark{background:var(--ink)}
+.months{display:flex;justify-content:space-between;font:var(--mono);color:var(--muted)}
+
+.alpha{display:flex;gap:8px;font:var(--mono);color:var(--muted)}
+.alpha .is-on{color:var(--ink);font-weight:700;border-bottom:2px solid var(--gold);padding-bottom:2px}
+.entries{display:grid;gap:10px}
+.entries div{display:grid;gap:5px}
+.entries .term{height:9px;border-radius:99px;background:var(--ink)}
+.entries .term--gold{background:var(--gold)}
+.entries .term--soft{background:rgba(11,18,32,.35)}
+.entries .def{height:6px;border-radius:99px;background:rgba(11,18,32,.14)}
+
+/* ─── Intermedio: dos columnas y la tarjeta ancha apilada ── */
+@media (max-width:1100px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tool--wide{grid-column:span 2;grid-template-columns:minmax(0,1fr)}
+  .tool--wide .lamina{height:auto;padding:22px}
+}
+
+/* ─── Móvil: primera tarjeta con lámina completa, resto en filas ── */
+@media (max-width:760px){
+  .mod-head{flex-direction:column;align-items:stretch;gap:0;padding:22px 18px 16px}
+  .mod-head h1{font-size:26px}
+  .mod-head p{font-size:14px}
+  .head-actions{display:none}
+  .chips-scroll{display:flex;gap:6px;padding:14px 18px 4px;overflow-x:auto;scrollbar-width:none}
+  .chips-scroll span{padding:9px 14px;border-radius:999px;background:var(--paper);font-size:13px;font-weight:500;white-space:nowrap}
+  .chips-scroll span[aria-current]{background:var(--ink);color:var(--paper);font-weight:600}
+
+  .grid{padding:8px 18px 0;grid-template-columns:minmax(0,1fr);gap:12px}
+  .mod-foot{padding:16px 18px 24px}
+  .mod-foot p{border-top:none;padding-top:0}
+
+  .tool{border-radius:16px}
+  .tool:hover{transform:none;box-shadow:none}
+  .tool--wide{grid-column:auto;grid-template-columns:minmax(0,1fr);border-radius:18px}
+  .tool--wide .lamina{height:auto;padding:18px}
+  .tool--wide .tool-body{padding:18px}
+  .tool--wide .tool-title h2{font-size:19px}
+  .tool--wide .tags{display:none}
+  .tool--wide .tool-open{display:inline-flex;align-items:center;height:44px;padding:0 18px;border-radius:12px;background:var(--ink);color:var(--paper)}
+
+  /* Filas compactas: miniatura 88px + texto */
+  .tool:not(.tool--wide){display:grid;grid-template-columns:88px minmax(0,1fr);gap:14px;align-items:center;padding:12px}
+  .tool:not(.tool--wide) .lamina{height:88px;padding:12px;border-radius:12px;gap:8px}
+  .tool:not(.tool--wide) .tool-body{padding:0;gap:5px}
+  .tool:not(.tool--wide) .tool-title h2{font-size:16px}
+  .tool:not(.tool--wide) .tool-desc{font-size:13.5px;line-height:1.5}
+  .tool:not(.tool--wide) .tool-desc .long{display:none}
+  .tool:not(.tool--wide) .tool-meta{margin-top:3px;padding-top:0;border-top:none;justify-content:flex-start;gap:8px}
+  .tool:not(.tool--wide) .tool-src{font-size:11.5px}
+  .tool:not(.tool--wide) .tool-open{display:none}
+  .tool:not(.tool--wide) .tags{display:none}
+  /* Motivos que no caben en 88px se simplifican */
+  .tool:not(.tool--wide) .legend,
+  .tool:not(.tool--wide) .rowspread,
+  .tool:not(.tool--wide) .months,
+  .tool:not(.tool--wide) .hair,
+  .tool:not(.tool--wide) .total,
+  .tool:not(.tool--wide) .alpha,
+  .tool:not(.tool--wide) .entries div:nth-child(3),
+  .tool:not(.tool--wide) .days span:nth-child(n+15),
+  .tool:not(.tool--wide) .year span:nth-child(n+13),
+  .tool:not(.tool--wide) .steps span:nth-child(n+7),
+  .tool:not(.tool--wide) .thresholds div span{display:none}
+  .tool:not(.tool--wide) .days span{height:14px}
+  .tool:not(.tool--wide) .year{grid-template-columns:repeat(6,1fr);gap:4px}
+  .tool:not(.tool--wide) .year span{height:12px}
+  .tool:not(.tool--wide) .bars label{display:none}
+  .tool:not(.tool--wide) .bars span{height:8px}
+  .tool:not(.tool--wide) .entries .term{height:7px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="mod">
+
+  <header class="mod-head">
+    <div>
+      <div class="eyebrow"><span class="eyebrow-num">09</span><span class="eyebrow-txt">HERRAMIENTAS</span></div>
+      <h1>Cálculos con su fuente, listos para el expediente.</h1>
+      <p>Seis calculadoras y un glosario, todos con la norma vigente y los festivos de ley. Cada resultado muestra el artículo del que sale y se exporta a Excel.</p>
+    </div>
+    <div class="head-actions">
+      <div class="segmented"><span aria-current="true">Todas</span><span>Términos</span><span>Dinero</span></div>
+      <button class="btn">Nueva liquidación</button>
+    </div>
+  </header>
+  <div class="chips-scroll"><span aria-current="true">Todas</span><span>Términos</span><span>Dinero</span></div>
+
+  <div class="grid">
+
+    <!-- 01 · Términos procesales -->
+    <article class="tool tool--wide">
+      <div class="lamina">
+        <div class="days">
+          <span></span><span></span><span></span><span class="notif"></span><span></span><span class="off"></span><span class="off"></span>
+          <span></span><span></span><span></span><span></span><span></span><span class="off"></span><span class="off"></span>
+          <span></span><span></span><span class="due"></span><span></span><span></span><span class="off"></span><span class="off"></span>
+        </div>
+        <div class="legend">
+          <i><b style="background:#0B1220"></b>NOTIFICACIÓN</i>
+          <i><b style="background:rgba(200,160,70,.28)"></b>NO HÁBIL</i>
+          <i><b style="background:#C8A046"></b>VENCE</i>
+        </div>
+      </div>
+      <div class="tool-body">
+        <div class="tool-title"><span class="tool-num">01</span><h2>Términos procesales</h2></div>
+        <p class="tool-desc">Cuenta el término desde la fecha de notificación descontando los festivos calculados desde la ley, y distingue días hábiles de calendario según la actuación.</p>
+        <div class="tags"><span>Fecha de notificación</span><span>Hábiles o calendario</span><span>Festivos de ley</span></div>
+        <div class="tool-meta"><span class="tool-src">Ley 51 de 1983 · CGP art. 118</span><span class="badge">Excel</span><span class="tool-open">Abrir</span></div>
+      </div>
+    </article>
+
+    <!-- 02 · Liquidación de prestaciones -->
+    <article class="tool tool--ink">
+      <div class="lamina">
+        <div class="bars">
+          <div><label>CESANT.</label><span style="width:78%;background:#C8A046"></span></div>
+          <div><label>INTERES.</label><span style="width:34%;background:rgba(247,245,239,.55)"></span></div>
+          <div><label>PRIMA</label><span style="width:58%;background:rgba(247,245,239,.35)"></span></div>
+          <div><label>VACAC.</label><span style="width:44%"></span></div>
+        </div>
+      </div>
+      <div class="tool-body">
+        <div class="tool-title"><span class="tool-num">02</span><h2>Liquidación de prestaciones</h2></div>
+        <p class="tool-desc">Cesantías, intereses, prima y vacaciones desde el salario y las fechas del contrato.</p>
+        <div class="tool-meta"><span class="tool-src">CST art. 249 y ss.</span><span class="badge">Excel</span></div>
+      </div>
+    </article>
+
+    <!-- 03 · Indexación por IPC -->
+    <article class="tool">
+      <div class="lamina" style="justify-content:flex-end">
+        <div class="steps">
+          <span style="height:24%"></span><span style="height:33%"></span><span style="height:30%"></span><span style="height:46%"></span>
+          <span class="mid" style="height:57%"></span><span class="mid" style="height:52%"></span><span class="high" style="height:72%"></span><span class="top" style="height:88%"></span>
+        </div>
+      </div>
+      <div class="tool-body">
+        <div class="tool-title"><span class="tool-num">03</span><h2>Indexación por IPC</h2></div>
+        <p class="tool-desc">Actualiza un valor histórico a pesos de hoy con la serie oficial del índice.</p>
+        <div class="tool-meta"><span class="tool-src">Serie oficial del DANE</span><span class="badge">Excel</span></div>
+      </div>
+    </article>
+
+    <!-- 04 · Intereses de mora -->
+    <article class="tool">
+      <div class="lamina">
+        <div class="tranches"><span style="flex:2"></span><span style="flex:2"></span><span style="flex:3;background:rgba(200,160,70,.55)"></span><span style="flex:4"></span></div>
+        <div class="rowspread"><span>TRAMO 1</span><span>2</span><span>3</span><span>TASA VIGENTE</span></div>
+        <div class="hair"></div>
+        <div class="total"><span>MORA ACUMULADA</span><i></i><b>$ —</b></div>
+      </div>
+      <div class="tool-body">
+        <div class="tool-title"><span class="tool-num">04</span><h2>Intereses de mora</h2></div>
+        <p class="tool-desc">Calcula el interés por tramos con la tasa certificada vigente en cada periodo.</p>
+        <div class="tool-meta"><span class="tool-src">Tasa certificada por la Superintendencia Financiera</span><span class="badge">Excel</span></div>
+      </div>
+    </article>
+
+    <!-- 05 · Competencia por cuantía -->
+    <article class="tool">
+      <div class="lamina">
+        <div class="thresholds">
+          <div><b></b>MÍNIMA<span>MUNICIPAL</span></div>
+          <div><b></b>MENOR<span>MUNICIPAL</span></div>
+          <div class="is-on"><b></b>MAYOR<span>CIRCUITO</span></div>
+        </div>
+      </div>
+      <div class="tool-body">
+        <div class="tool-title"><span class="tool-num">05</span><h2>Competencia por cuantía</h2></div>
+        <p class="tool-desc">Indica ante qué juez se presenta según la cuantía y la naturaleza del asunto.</p>
+        <div class="tool-meta"><span class="tool-src">CGP arts. 25 y 26</span><span class="badge">Excel</span></div>
+      </div>
+    </article>
+
+    <!-- 06 · Calendario judicial -->
+    <article class="tool tool--paper">
+      <div class="lamina">
+        <div class="year">
+          <span></span><span></span><span></span><span class="off"></span><span></span><span></span><span class="mark"></span><span></span><span></span><span></span><span></span><span class="off"></span>
+          <span class="dim"></span><span class="dim"></span><span class="dim"></span><span class="dim"></span><span class="dim"></span><span class="dim"></span><span class="off"></span><span class="dim"></span><span class="dim"></span><span class="dim"></span><span class="dim"></span><span class="dim"></span>
+        </div>
+        <div class="months"><span>ENE</span><span>ABR</span><span>JUL</span><span>OCT</span><span>DIC</span></div>
+      </div>
+      <div class="tool-body">
+        <div class="tool-title"><span class="tool-num">06</span><h2>Calendario judicial</h2></div>
+        <p class="tool-desc">Días hábiles, festivos y vacancia judicial del año, con los términos de la firma encima.</p>
+        <div class="tool-meta"><span class="tool-src">Acuerdos del Consejo Superior de la Judicatura</span><span class="badge">Excel</span></div>
+      </div>
+    </article>
+
+    <!-- 07 · Glosario -->
+    <article class="tool">
+      <div class="lamina">
+        <div class="alpha"><span>A</span><span>B</span><span class="is-on">C</span><span>D</span><span>E</span><span>F</span><span>…</span><span>Z</span></div>
+        <div class="entries">
+          <div><span class="term" style="width:44%"></span><span class="def" style="width:88%"></span></div>
+          <div><span class="term term--gold" style="width:32%"></span><span class="def" style="width:74%"></span></div>
+          <div><span class="term term--soft" style="width:38%"></span><span class="def" style="width:60%"></span></div>
+        </div>
+      </div>
+      <div class="tool-body">
+        <div class="tool-title"><span class="tool-num">07</span><h2>Glosario</h2></div>
+        <p class="tool-desc">Términos y latinismos del oficio, cada uno con su definición y la norma o sentencia de donde sale.<span class="long"> Se consulta desde cualquier escrito.</span></p>
+        <div class="tool-meta"><span class="tool-src">Norma o sentencia citada</span><span class="badge">Excel</span></div>
+      </div>
+    </article>
+
+  </div>
+
+  <div class="mod-foot">
+    <p>Las herramientas no consumen saldo: van incluidas en todos los planes. Un resultado es un cálculo, no un dictamen; revíselo antes de radicar.</p>
+  </div>
+
+</main>
+</body>
+</html>

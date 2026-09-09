@@ -1089,7 +1089,7 @@ const A_HERRAMIENTAS: ManualArticle = {
     {
       kind: 'pasos',
       pasos: [
-        'Abra «Herramientas» y busque «Por nombre o por lo que necesita calcular», o recorra las tarjetas agrupadas por tarea. Cada tarjeta dice si trae «Fuente declarada» o si algún dato está «Sin verificar».',
+        'Abra «Herramientas»: las siete utilidades están numeradas en una retícula de tarjetas, cada una con un dibujo que anticipa lo que calcula. Filtre con «Todas», «Términos», «Dinero» o «Referencia», o busque en «Por nombre o por lo que necesita calcular». Al pie de cada tarjeta está la fuente de ese cálculo —la norma de la que sale su cifra—, el estado «Fuente declarada» o «Sin verificar», y la insignia «Excel» solo donde la exportación existe. En el teléfono la primera tarjeta va completa y las demás quedan como filas con su miniatura.',
         'Abra la herramienta y complete los campos. En el contador de términos escriba la fecha de partida, el número de «Días hábiles» y la jurisdicción —«Civil» o «Penal (atiende lunes a miércoles santos)»— y pulse «Calcular».',
         'Lea el resultado y, debajo, el recuadro «Fuentes»: es la lista de cada norma, cada dirección oficial y cada fecha de lectura que sostiene la cifra.',
         'Si necesita soporte para el expediente o para contabilidad, pulse «Exportar a Excel»: el archivo trae el cálculo y una hoja «Fuentes» con la misma lista. Lo tienen las seis calculadoras; el glosario no, porque no calcula nada.'
