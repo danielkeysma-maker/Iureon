@@ -31,7 +31,11 @@ import {
  * PAGAR ES UN CHECKOUT DE WOMPI POR PERIODO. El servidor firma el precio del
  * catálogo y el navegador salta a la pasarela con esa firma; nada se cobra
  * automáticamente ni se guarda tarjeta. La confirmación extiende el plan desde
- * la fecha vigente, así que pagar antes nunca pierde días. El consumo de
+ * la fecha vigente cuando se RENUEVA el mismo plan, así que pagar antes nunca
+ * pierde días; al CAMBIAR de plan el ciclo empieza el día del pago y los días
+ * que quedaban no se acreditan, y por eso la tarjeta lo advierte debajo del
+ * botón antes de pagar y ofrece la otra vía —Soporte, conservando la fecha—.
+ * Advertir después del pago sería una explicación, no una elección. El consumo de
  * inteligencia artificial va aparte, por recargas de saldo, y se dice en la
  * misma pantalla porque quien acaba de pagar un plan espera que los escritos
  * vayan incluidos.
@@ -212,6 +216,20 @@ export const FirmSubscriptionModal: React.FC<FirmSubscriptionModalProps> = ({
   const precioDe = (def: PlanDefinition): number => (periodo === 'ANUAL' ? def.precioAnualCop : def.precioMensualCop);
   const mensualEquivalente = (def: PlanDefinition): number => (periodo === 'ANUAL' ? def.precioAnualCop / 12 : def.precioMensualCop);
   const ahorroAnual = (def: PlanDefinition): number => def.precioMensualCop * 12 - def.precioAnualCop;
+
+  /*
+   * Espejo de `debeAdvertirCambio` del backend (subscriptions/cambioDePlan.rules):
+   * hay algo que advertir solo cuando la firma se mueve a OTRO plan y todavía
+   * le queda tiempo pagado, que es exactamente lo que va a entregar. Sin plan,
+   * sin fecha o ya vencida no pierde nada, así que no se le dice nada.
+   */
+  const advertirCambio = (elegido: Plan): boolean =>
+    plan !== null &&
+    plan.plan !== null &&
+    plan.plan !== elegido &&
+    plan.validUntil !== null &&
+    plan.diasRestantes !== null &&
+    plan.diasRestantes > 0;
 
   return (
     <Dialog
@@ -415,6 +433,30 @@ export const FirmSubscriptionModal: React.FC<FirmSubscriptionModalProps> = ({
                         </p>
                       )}
 
+                      {/*
+                        LO QUE CUESTA CAMBIAR DE PLAN SE DICE ANTES DE PAGAR.
+                        Cambiar de plan se paga completo y el ciclo empieza el
+                        día del pago, así que los días que le quedan del plan
+                        actual se pierden. Solo aparece cuando hay algo que
+                        perder —plan distinto, con fecha y todavía al día—:
+                        advertirle a una firma vencida de unos días que ya no
+                        tiene sería una falsa alarma, y una advertencia que casi
+                        siempre está deja de leerse el día que importa.
+                      */}
+                      {puedePagar && advertirCambio(clave) && (
+                        <div className="mt-3 space-y-1.5 rounded-control border border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))] px-3 py-2.5">
+                          <p className="text-justify text-[11.5px] leading-snug text-unverified [text-wrap:pretty]">
+                            Va a cambiar de plan: {def.nombre} se paga completo y su ciclo empieza el día del pago. Los{' '}
+                            {plan.diasRestantes} {plan.diasRestantes === 1 ? 'día' : 'días'} que le quedan de{' '}
+                            {nombreDelPlan(plan.plan, planes)} no se acreditan ni se devuelven, y su vencimiento pasa a
+                            contarse desde hoy.
+                          </p>
+                          <p className="text-justify text-[11.5px] leading-snug text-ink-700 [text-wrap:pretty]">
+                            Si prefiere conservar su fecha de vencimiento, escríbanos por Soporte antes de pagar.
+                          </p>
+                        </div>
+                      )}
+
                       {clave === 'ESENCIAL' && plan.pruebaDisponible && puedePagar && (
                         <div className="mt-3 rounded-control border border-dashed border-[rgb(var(--brand-line))] bg-brand-50/60 px-3 py-2.5">
                           <button
@@ -450,7 +492,7 @@ export const FirmSubscriptionModal: React.FC<FirmSubscriptionModalProps> = ({
               </div>
 
               <p className="px-1 text-justify text-[11.5px] leading-snug text-ink-500 [text-wrap:pretty]">
-                Pagar antes de vencer suma el periodo a la fecha vigente, nunca se pierden días. Al cambiar de plan, el nuevo rige desde ese pago. Los escritos, las revisiones y los resúmenes se descuentan del saldo de recargas, aparte del plan.
+                Renovar el plan que ya tiene —también al pasar de mensual a anual— suma el periodo a la fecha vigente: pagar antes nunca pierde días. Cambiar a otro plan se paga completo y su ciclo empieza el día del pago, sin acreditar lo que quedaba del anterior; si prefiere conservar su fecha de vencimiento, escríbanos por Soporte antes de pagar. Los escritos, las revisiones y los resúmenes se descuentan del saldo de recargas, aparte del plan.
               </p>
             </>
           )}

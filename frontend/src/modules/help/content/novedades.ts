@@ -39,6 +39,14 @@ export const NOVEDADES_ID = 'novedades';
 
 export const NOVEDADES: readonly Novedad[] = [
   {
+    fecha: '2026-09-09',
+    titulo: 'Al cambiar de plan, la pantalla le dice antes de pagar desde cuándo corre el nuevo',
+    detalle:
+      'En «Plan de la firma», si elige un plan distinto del que tiene y todavía le quedan días, la tarjeta lo advierte debajo del botón: el plan nuevo empieza su ciclo el día del pago y los días que le quedan del actual no se acreditan. Ahí mismo se le recuerda que, si prefiere conservar su fecha de vencimiento, puede escribirnos por Soporte antes de pagar. Renovar el plan que ya tiene —también al pasar de mensual a anual— sigue sumando el periodo a la fecha vigente, sin perder un día.',
+    modulo: 'Plan',
+    tipo: 'mejora'
+  },
+  {
     fecha: '2026-09-08',
     titulo: 'Su nombre, escrito por usted y no deducido de su correo',
     detalle:

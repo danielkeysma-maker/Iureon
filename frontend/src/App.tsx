@@ -1182,6 +1182,8 @@ export function App() {
                   setLegalBranch={workflow.setLegalBranch}
                   documentType={workflow.documentType}
                   setDocumentType={workflow.setDocumentType}
+                  hechos={workflow.legalPrompt}
+                  setHechos={workflow.setLegalPrompt}
                 />
               </div>
 
@@ -1285,7 +1287,7 @@ export function App() {
             (`draftTerms`): la forma cambia, el reloj no.
           */}
           {mainView === 'borradores' && (
-            <div className="flex min-h-0 flex-1 lg:hidden">
+            <div className="flex min-h-0 min-w-0 flex-1 lg:hidden">
               <SavedDraftsMobileView
                 savedDrafts={savedDrafts}
                 onAbrir={(entrada) => {
@@ -1355,7 +1357,7 @@ export function App() {
             pantalla apagada. La grabadora y el consentimiento son COMPARTIDOS.
           */}
           {mainView === 'entrevistas' && (
-            <div className="flex min-h-0 flex-1 lg:hidden">
+            <div className="flex min-h-0 min-w-0 flex-1 lg:hidden">
               <ModuloBloqueado modulo="ENTREVISTAS" quePuede="Las entrevistas ya transcritas se conservan y vuelven a estar disponibles en cuanto renueve.">
                 <InterviewMobileView />
               </ModuloBloqueado>
@@ -1396,7 +1398,7 @@ export function App() {
           */}
           {mainView === 'search' && (
             <ModuloBloqueado modulo="BUSCADOR" quePuede="La jurisprudencia ya citada en sus escritos sigue en cada borrador guardado.">
-              <div className="flex min-h-0 flex-1 lg:hidden">
+              <div className="flex min-h-0 min-w-0 flex-1 lg:hidden">
                 <SearchMobileView />
               </div>
               <div className="hidden min-h-0 flex-1 lg:flex">
@@ -1443,7 +1445,7 @@ export function App() {
             Las columnas de escritorio suman 464px antes del recurso.
           */}
           {mainView === 'audit' && (
-            <div className="flex min-h-0 flex-1 lg:hidden">
+            <div className="flex min-h-0 min-w-0 flex-1 lg:hidden">
               <AuditMobileView />
             </div>
           )}
@@ -1462,7 +1464,7 @@ export function App() {
             seria el mismo texto diciendo dos cosas segun el aparato.
           */}
           {mainView === 'manual' && (
-            <div className="flex min-h-0 flex-1 lg:hidden">
+            <div className="flex min-h-0 min-w-0 flex-1 lg:hidden">
               <ManualMobileView onSoporte={() => setMainView('soporte')} />
             </div>
           )}
@@ -1484,7 +1486,7 @@ export function App() {
             caben dentro de ella.
           */}
           {mainView === 'soporte' && (
-            <div className="flex min-h-0 flex-1 lg:hidden">
+            <div className="flex min-h-0 min-w-0 flex-1 lg:hidden">
               <SupportMobileView
                 firma={activeFirm.name}
                 correo={currentUserEmail}
@@ -1589,7 +1591,7 @@ export function App() {
               El historial se queda en escritorio: de pie se orienta el caso que
               se tiene delante, no se revisa lo de la semana pasada.
             */}
-            <div className="flex min-h-0 flex-1 lg:hidden">
+            <div className="flex min-h-0 min-w-0 flex-1 lg:hidden">
               <TriageMobileView onDraft={irARedactar} />
             </div>
             <div className="hidden min-h-0 flex-1 lg:flex">

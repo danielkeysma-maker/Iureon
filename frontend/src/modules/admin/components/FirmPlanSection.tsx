@@ -482,6 +482,21 @@ export const FirmPlanSection: React.FC<FirmPlanSectionProps> = ({ firma, onGuard
         </div>
       ) : (
         <form onSubmit={(e) => void guardar(e)} className="space-y-3 border-t border-line-200 px-4 py-3">
+          {/*
+            PARA QUÉ SIRVE ESTA VÍA, ESCRITO AL LADO DEL FORMULARIO. Dentro de
+            la aplicación, cambiar de plan se paga completo y el ciclo empieza
+            el día del pago: la firma pierde los días que le quedaban. La otra
+            vía es esta — la firma escribe, envía la diferencia por fuera, sin
+            comisión de pasarela, y aquí se le sube el plan RESPETANDO su fecha.
+            El campo «Vence» abre con la fecha que la firma ya tiene justamente
+            para eso: cambiar solo el plan no debe mover el vencimiento.
+          */}
+          <p className="text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
+            Esta es la vía de la petición interna: la firma pidió cambiar de plan, envió la diferencia por fuera de la
+            pasarela y se le respeta su fecha de vencimiento. El campo «Vence» abre con la que ya tiene: cambie el plan
+            y déjela como está. Si en cambio la firma paga desde la aplicación, el ciclo del plan nuevo empieza el día
+            del pago y los días que le quedaban no se acreditan.
+          </p>
           <div className="grid gap-3 sm:grid-cols-3">
             <label className="block text-[11px] text-ink-500">
               Plan

@@ -6,6 +6,8 @@ import {
   IconoVerificado
 } from '../../../design/ArtboardIcons';
 import { useBranchActuacionesState } from '../../catalog/hooks/useBranchActuaciones';
+import { GuiaEligeActuacionDialog } from './GuiaEligeActuacionDialog';
+import { ActuacionPropiaDialog } from './ActuacionPropiaDialog';
 import { useCatalogBranchesState } from '../../catalog/hooks/useCatalogBranches';
 import { BRANCH_LABELS } from '../../catalog/branchLabels';
 import type { ActuacionRole } from '../../catalog/types';
@@ -48,7 +50,23 @@ interface WorkshopConfigMobileProps {
   setLegalBranch: (branch: string) => void;
   documentType: string;
   setDocumentType: (type: string) => void;
+  /** Los hechos del cuadro de instrucción: la guía orienta sobre ESOS y no sobre otros. */
+  hechos: string;
+  setHechos: (texto: string) => void;
 }
+
+/*
+ * LAS DOS PUERTAS DE SERVICIO TAMBIÉN AQUÍ. Nacieron solo en la barra de
+ * escritorio y el teléfono se quedó con la lista pelada: quien redacta desde el
+ * teléfono no podía pedirle a la guía que propusiera la actuación ni escribir
+ * una que el catálogo no tiene. Son la misma función y los mismos diálogos; lo
+ * único distinto es que aquí la lista es un `<select>` del sistema, así que
+ * viajan como dos opciones con un valor centinela que `elegirTipo` intercepta.
+ * Un centinela NUNCA se guarda como tipo de documento: iría al motor como el
+ * nombre de un escrito y el catálogo no resolvería nada.
+ */
+const OPCION_GUIA = '__QUE_LA_GUIA_ELIJA__';
+const OPCION_PROPIA = '__ESCRIBIR_EL_NOMBRE__';
 
 const ROL_CORTO: Record<ActuacionRole, string> = {
   LITIGANTE: 'Litigante',
@@ -62,10 +80,28 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
   legalBranch,
   setLegalBranch,
   documentType,
-  setDocumentType
+  setDocumentType,
+  hechos,
+  setHechos
 }) => {
   const [abierto, setAbierto] = React.useState(false);
-  const catalogo = useBranchActuacionesState(legalBranch, userRole);
+  const [guiaAbierta, setGuiaAbierta] = React.useState(false);
+  const [propiaAbierta, setPropiaAbierta] = React.useState(false);
+  /** Sube al crear una actuación propia: obliga a releer la lista de la rama. */
+  const [recarga, setRecarga] = React.useState(0);
+  const catalogo = useBranchActuacionesState(legalBranch, userRole, recarga);
+
+  const elegirTipo = (valor: string) => {
+    if (valor === OPCION_GUIA) {
+      setGuiaAbierta(true);
+      return;
+    }
+    if (valor === OPCION_PROPIA) {
+      setPropiaAbierta(true);
+      return;
+    }
+    setDocumentType(valor);
+  };
   const ramasEstado = useCatalogBranchesState();
 
   const elegida = catalogo.actuaciones.find((a) => a.exactName === documentType) ?? null;
@@ -182,16 +218,18 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
             <span className="field-label">Actuación</span>
             <select
               value={documentType}
-              onChange={(e) => setDocumentType(e.target.value)}
+              onChange={(e) => elegirTipo(e.target.value)}
               className="field w-full"
             >
               <option value="">Elija la actuación…</option>
+              <option value={OPCION_GUIA}>Que la guía proponga la actuación…</option>
               {catalogo.actuaciones.map((a) => (
                 <option key={a.id} value={a.exactName}>
                   {a.exactName}
-                  {a.term.status === 'NO_VERIFICADO' ? ' · sin verificar' : ''}
+                  {a.firmDefined ? ' · de su firma, sin norma verificada' : a.term.status === 'NO_VERIFICADO' ? ' · sin verificar' : ''}
                 </option>
               ))}
+              <option value={OPCION_PROPIA}>Ninguna de estas: escribir el nombre…</option>
             </select>
           </label>
 
@@ -204,6 +242,40 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
           </p>
         </div>
       )}
+
+      {/*
+        Los mismos diálogos del escritorio, montados aquí: elegir en cualquiera
+        de los dos deja la actuación puesta y cierra el panel, para que el
+        abogado vuelva al escrito y no a la configuración.
+      */}
+      <GuiaEligeActuacionDialog
+        abierto={guiaAbierta}
+        onCerrar={() => setGuiaAbierta(false)}
+        legalBranch={legalBranch}
+        hechos={hechos}
+        setHechos={setHechos}
+        onElegir={(exactName) => {
+          setDocumentType(exactName);
+          setGuiaAbierta(false);
+          setAbierto(false);
+        }}
+        onEscribirNombre={() => {
+          setGuiaAbierta(false);
+          setPropiaAbierta(true);
+        }}
+      />
+      <ActuacionPropiaDialog
+        abierto={propiaAbierta}
+        onCerrar={() => setPropiaAbierta(false)}
+        legalBranch={legalBranch}
+        userRole={userRole}
+        onCreada={(exactName) => {
+          setRecarga((n) => n + 1);
+          setDocumentType(exactName);
+          setPropiaAbierta(false);
+          setAbierto(false);
+        }}
+      />
     </div>
   );
 };

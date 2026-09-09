@@ -610,13 +610,32 @@ const A_PLANES: ManualArticle = {
     {
       kind: 'consejo',
       texto:
-        'Pague antes de la fecha de vencimiento, no después: cada pago suma su periodo a la fecha vigente, así que pagar el 10 un plan que vence el 20 deja el plan hasta el 20 del mes siguiente. No se pierde ni un día.'
+        'Pague antes de la fecha de vencimiento, no después: renovar el plan que ya tiene suma el periodo a la fecha vigente, así que pagar el 10 un plan que vence el 20 lo deja hasta el 20 del mes siguiente. No se pierde ni un día. Cambiar a otro plan sigue otra regla, explicada más abajo.'
     },
     {
       kind: 'nota',
       titulo: 'Solo un administrador paga',
       texto:
-        'Si su cuenta no es de administrador, la tarjeta dice «Solo un administrador de la firma puede pagar el plan» en lugar del botón. Si cambia de plan al pagar, el plan nuevo rige desde ese pago; no hay prorrateo. No se guarda tarjeta ni se cobra automáticamente: cada periodo se paga con un checkout nuevo.'
+        'Si su cuenta no es de administrador, la tarjeta dice «Solo un administrador de la firma puede pagar el plan» en lugar del botón. No se guarda tarjeta ni se cobra automáticamente: cada periodo se paga con un checkout nuevo.'
+    },
+    { kind: 'subtitulo', texto: 'Cambiar de plan: dos vías' },
+    {
+      kind: 'parrafo',
+      texto:
+        'Renovar el plan que ya tiene suma el periodo a la fecha vigente, incluso si pasa de mensual a anual: es el mismo plan comprado por más tiempo y no pierde ni un día. Cambiar a OTRO plan es distinto y se puede hacer de dos maneras, con consecuencias distintas; elija antes de pagar.'
+    },
+    {
+      kind: 'lista',
+      items: [
+        'Desde la aplicación: en «Plan de la firma» pulse «Contratar» en la tarjeta del plan que quiere. El plan nuevo se paga completo y su ciclo empieza el día del pago, así que el vencimiento se cuenta desde hoy y los días que le quedaban del plan anterior no se acreditan ni se devuelven. La tarjeta se lo advierte debajo del botón, con los días que va a entregar, antes de que abra la pasarela. No hay prorrateo.',
+        'Por Soporte, conservando su fecha: escríbanos antes de pagar. Le decimos la diferencia entre los dos planes, usted la envía por fuera de la pasarela y nosotros le subimos el plan dejando intacta la fecha de vencimiento que ya tenía. El cambio queda en la auditoría de su firma como «Operación actualizó el plan», con el motivo escrito.'
+      ]
+    },
+    {
+      kind: 'nota',
+      titulo: 'Por qué no hay prorrateo',
+      texto:
+        'Devolverle la diferencia por la pasarela obliga a un cobro más, y la comisión fija de la pasarela se come buena parte de un importe pequeño. En vez de disfrazar ese costo, la aplicación se lo dice: pagar desde aquí es cómodo e inmediato pero empieza de cero, y si lo que le importa es no perder los días que le quedan, esa vía existe y se pide por Soporte.'
     },
     { kind: 'subtitulo', texto: 'Qué pasa al vencer' },
     {

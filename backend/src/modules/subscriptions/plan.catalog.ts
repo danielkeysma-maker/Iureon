@@ -375,9 +375,13 @@ export const sumarMeses = (desde: Date, meses: number): Date => {
  * PAYING EARLY EXTENDS, IT NEVER RESTARTS. The new period begins where the
  * current one ends if that is still in the future, and now otherwise — so a
  * firm that renews a week early keeps the week, and a firm that comes back a
- * month after expiring does not pay for the month it did not use. Changing
- * plan on the same payment follows the same rule: no proration, the new plan
- * simply applies from the payment onward.
+ * month after expiring does not pay for the month it did not use.
+ *
+ * THIS IS THE RENEWAL ARITHMETIC AND IT KNOWS NOTHING ABOUT PLANS. Changing to
+ * a DIFFERENT plan does not extend: it is paid in full and its cycle starts on
+ * the day of the payment. That decision lives in `cambioDePlan.rules.ts`, which
+ * takes both plans and calls this same arithmetic from the date it chooses;
+ * callers that must handle a plan change go there, not here.
  */
 export const periodoQueCompra = (input: {
   ahora: Date;

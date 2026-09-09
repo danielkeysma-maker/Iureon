@@ -32,6 +32,8 @@ jobs:
         run: npm run check:wompi
       - name: Plan rules (prices, extension from a future expiry, expiry states, module gating)
         run: npm run check:plan
+      - name: Plan change rules (a different plan starts today, a renewal extends)
+        run: npm run check:cambio-plan
       - name: Free trial rules (7 days, one seat, honeypot, per-address window)
         run: npm run check:trial
       - name: Operator support rules (firm deletion confirmation, self-delete, password floor)
