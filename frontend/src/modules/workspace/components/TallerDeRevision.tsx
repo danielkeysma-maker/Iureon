@@ -1,7 +1,7 @@
 import React from 'react';
 import type { FormatoDelEscrito } from '../../documents/formatoEnPantalla';
 import { reviewApi, type Anotacion, type ConsentimientoDeGuardado, type InformeDeRevision, type PreguntasAudienciaGuardadas, type TurnoDelTaller, type VersionDelTexto } from '../services/review.api';
-import { exportarPreguntasAWord } from '../services/preguntasExport.service';
+import { exportarPreguntasAPdf, exportarPreguntasAWord } from '../services/preguntasExport.service';
 import { TallerDeEscrito } from './TallerDeEscrito';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 import { usePlan } from '../../subscriptions/PlanContext';
@@ -185,7 +185,8 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
                 precioCop: precioConsultaCop,
                 guardadas: preguntasGuardadas,
                 onGenerar: (parametros, textoActual) => reviewApi.preguntasParaAudiencia(datos.revisionId as string, { ...parametros, textoActual }),
-                onExportarWord: (generadas) => exportarPreguntasAWord(datos.documentType, generadas)
+                onExportarWord: (generadas) => exportarPreguntasAWord(datos.documentType, generadas),
+                onExportarPdf: (generadas) => exportarPreguntasAPdf(datos.documentType, generadas)
               }
             : undefined
         }

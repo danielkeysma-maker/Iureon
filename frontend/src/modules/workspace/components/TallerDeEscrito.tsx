@@ -118,6 +118,8 @@ export interface PreguntasDelTaller {
   guardadas: PreguntasAudienciaGuardadas | null;
   onGenerar: (parametros: ParametrosDePreguntas, textoActual: string) => Promise<RespuestaDePreguntas>;
   onExportarWord: (generadas: PreguntasAudienciaGuardadas) => Promise<void>;
+  /** El mismo juego, en PDF: a la audiencia se llega con la hoja impresa. */
+  onExportarPdf: (generadas: PreguntasAudienciaGuardadas) => Promise<void>;
 }
 
 type PosicionFija = 'Demandante' | 'Demandado' | 'Otro';
@@ -1131,9 +1133,13 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
                 {copiadas ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
                 {copiadas ? 'Copiadas' : 'Copiar'}
               </button>
-              <button type="button" onClick={() => void preguntas.onExportarWord(g).catch((err: unknown) => setError(err instanceof Error ? err.message : 'No se pudo exportar a Word.'))} className="btn-neutral btn-sm" title="Descargar en Word">
+              <button type="button" onClick={() => void preguntas.onExportarWord(g).catch((err: unknown) => setError(err instanceof Error ? err.message : 'No se pudo exportar a Word.'))} className="btn-neutral btn-sm" title="Descargar en Word para seguir trabajándolas">
                 <Download className="h-3 w-3" />
                 Word
+              </button>
+              <button type="button" onClick={() => void preguntas.onExportarPdf(g).catch((err: unknown) => setError(err instanceof Error ? err.message : 'No se pudo exportar a PDF.'))} className="btn-neutral btn-sm" title="Descargar en PDF para llevarlas impresas">
+                <Download className="h-3 w-3" />
+                PDF
               </button>
               <button type="button" onClick={() => setFormularioDePreguntas(true)} disabled={ocupado !== null} className="btn-secondary btn-sm" title="Pedir un juego nuevo con otros parámetros o sobre el texto corregido">
                 <RefreshCw className="h-3 w-3" />
