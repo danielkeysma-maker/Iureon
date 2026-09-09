@@ -859,11 +859,28 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
                   <span className="text-meta font-medium text-ink-500">Subir PDF, Word o texto (hasta 15 MB, con anexos)</span>
                 </label>
                 <p className="mt-2 text-center font-mono text-[10px] uppercase tracking-[0.08em] text-ink-400">o pegue el texto</p>
+                {/*
+                  AQUI VA EL DOCUMENTO ENTERO, NO LA PREGUNTA, y el marcador de
+                  posicion tiene que decirlo con esas palabras. Es la
+                  alternativa a subir el archivo —para el PDF escaneado, que no
+                  trae texto— y debajo, mas abajo en el formulario, vive «Que
+                  quiere saber», que si es la pregunta. Dos cuadros grandes y
+                  seguidos se confunden: un abogado leyo «pegue aqui el texto»
+                  y pregunto si era el escrito o el encargo.
+
+                  Y en el modo recibido no se dice «el escrito»: el auto del
+                  juez no es un escrito suyo, y llamarlo asi contradice al
+                  rotulo que esta justo encima.
+                */}
                 <textarea
                   value={texto}
                   onChange={(e) => setTexto(e.target.value)}
                   rows={6}
-                  placeholder="Pegue aquí el texto completo del escrito…"
+                  placeholder={
+                    esRecibido
+                      ? 'Pegue aquí el texto completo del documento que recibió — el auto, la sentencia, el oficio. No la pregunta: ésa va más abajo.'
+                      : 'Pegue aquí el texto completo de su escrito. No la pregunta: ésa va más abajo.'
+                  }
                   className="field-area mt-1.5 w-full resize-y"
                 />
               </>
