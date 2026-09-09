@@ -17,10 +17,18 @@ import { exigirFuncion, responderPlanError } from '../../subscriptions/plan.serv
 import { buildCatalogGuidance } from '../catalogGuidance';
 import { ENGINE, callOpenRouterWithUsage } from '../openrouter.client';
 import {
+  ETIQUETA_DOCUMENTO_RECIBIDO,
+  buildRecibidoSystemPrompt,
+  buildRecibidoUserPrompt,
   buildReviewSystemPrompt,
   buildReviewUserPrompt,
+  esModoDeRevision,
   parsearInforme,
-  prepararTexto
+  parsearInformeRecibido,
+  prepararTexto,
+  type InformeDeDocumentoRecibido,
+  type InformeDeRevision,
+  type ModoDeRevision
 } from './documentReview';
 import { documentReviewStore } from './documentReview.store';
 import { MAX_CARACTERES_MENSAJE, buildTallerSystemPrompt, buildTallerUserPrompt, parsearRespuestaDelTaller, type TurnoDelTaller } from './taller';
@@ -29,7 +37,20 @@ import { verificarProvidencias } from './verificarProvidencias';
 /**
  * POST /api/agent/review-document
  *
- * Body: { documentType, legalBranch?, pregunta?, fileName?, contentBase64? | texto? }
+ * Body: { modo?, documentType, legalBranch?, pregunta?, fileName?, contentBase64? | texto? }
+ *
+ * ─── DOS MODOS, Y EL SEGUNDO NO PREGUNTA QUÉ ACTUACIÓN ES ───────────────────
+ *
+ * `ESCRITO_PROPIO` (el de siempre, y el que rige si nadie manda `modo`) revisa
+ * el escrito que el abogado va a presentar, contra la ficha verificada de la
+ * actuación: por eso `documentType` sigue siendo obligatorio y sigue
+ * respondiendo 400 sin él.
+ *
+ * `DOCUMENTO_RECIBIDO` lee un papel que LLEGÓ —un auto, una sentencia, un
+ * oficio, una notificación—. Ahí no hay actuación que elegir: preguntarla era
+ * pedirle al abogado lo único que no puede saber del documento que acaba de
+ * recibir. No hay ficha, `con_ficha` va en falso, y el informe solo afirma lo
+ * que el propio texto dice, citándolo.
  *
  * ─── THE FILE COMES IN THE BODY, ON PURPOSE ─────────────────────────────────
  *
@@ -160,6 +181,9 @@ const extraerTexto = async (
 export const reviewDocumentController = async (req: Request, res: Response): Promise<void> => {
   const firmId = req.firmId as string;
   const userEmail = req.user?.email ?? 'desconocido';
+  /* Sin `modo` en el cuerpo manda el de siempre: ningún cliente viejo cambia de comportamiento. */
+  const modo: ModoDeRevision = esModoDeRevision(req.body.modo) ? req.body.modo : 'ESCRITO_PROPIO';
+  const esRecibido = modo === 'DOCUMENTO_RECIBIDO';
   const documentType = String(req.body.documentType ?? '').trim();
   const legalBranch = typeof req.body.legalBranch === 'string' ? (req.body.legalBranch as LegalBranch) : undefined;
   const pregunta = String(req.body.pregunta ?? '');
@@ -167,10 +191,26 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
   /* De qué cliente o proceso es el escrito: lo dice quien pide la revisión, y queda en la lista. */
   const cliente = String(req.body.cliente ?? '').trim().slice(0, 160);
 
-  if (!documentType) {
+  /*
+   * LA EXIGENCIA DE ACTUACIÓN NO SE RELAJA: SE CIRCUNSCRIBE AL MODO QUE LA
+   * NECESITA. En el modo propio la revisión objetiva se hace contra la ficha,
+   * así que sin actuación no hay contra qué revisar y el 400 se queda como
+   * estaba. En el modo recibido no hay ficha que traer y la pregunta no tiene
+   * respuesta posible para quien acaba de recibir el papel.
+   */
+  if (!esRecibido && !documentType) {
     res.status(400).json({ success: false, error: 'MISSING_DOCUMENT_TYPE', message: 'Indique la actuación del escrito.' });
     return;
   }
+
+  /*
+   * La etiqueta con la que la revisión se archiva y se titula. En el modo
+   * recibido es una etiqueta DEL PRODUCTO —nunca un nombre jurídico que el
+   * modelo haya supuesto—, porque `document_reviews.document_type` es lo que
+   * la lista y la cabecera del informe muestran, y una suposición archivada
+   * ahí se lee igual que una actuación resuelta contra su ficha.
+   */
+  const etiqueta = esRecibido ? ETIQUETA_DOCUMENTO_RECIBIDO : documentType;
 
   /*
    * ─── EL ORIGINAL SE CONSERVA CUANDO LA FIRMA LO AUTORIZÓ ──────────────────
@@ -254,12 +294,25 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
 
   const operationId = randomUUID();
   try {
-    const guidance = buildCatalogGuidance(documentType, legalBranch);
+    /*
+     * SIN FICHA EN EL MODO RECIBIDO, y no por falta de ganas: no se eligió
+     * actuación, así que no hay ficha que resolver. Buscar una a partir de lo
+     * que el modelo crea que es el documento sería fabricar el respaldo que
+     * este informe declara no tener.
+     */
+    const guidance = esRecibido ? null : buildCatalogGuidance(documentType, legalBranch);
+    /*
+     * El mismo motor, el mismo presupuesto de salida y el mismo límite de
+     * llamada que el modo propio: el modo nuevo no puede tardar más que el que
+     * ya cabía por debajo del reloj de la función.
+     */
     const llamada = await conLimite(
       callOpenRouterWithUsage(
         ENGINE.OPUS,
-        buildReviewSystemPrompt(),
-        buildReviewUserPrompt({ documentType, guidance, pregunta, texto: preparado.texto, truncado: preparado.truncado }),
+        esRecibido ? buildRecibidoSystemPrompt() : buildReviewSystemPrompt(),
+        esRecibido
+          ? buildRecibidoUserPrompt({ pregunta, texto: preparado.texto, truncado: preparado.truncado })
+          : buildReviewUserPrompt({ documentType, guidance, pregunta, texto: preparado.texto, truncado: preparado.truncado }),
         MAX_TOKENS_INFORME
       ),
       LIMITE_LLAMADA_MS
@@ -274,8 +327,10 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
       return;
     }
 
-    const informe = parsearInforme(llamada.text);
-    if (!informe) {
+    const informe: InformeDeRevision | null = esRecibido ? null : parsearInforme(llamada.text);
+    const informeRecibido: InformeDeDocumentoRecibido | null = esRecibido ? parsearInformeRecibido(llamada.text) : null;
+    const seOrdeno = esRecibido ? informeRecibido !== null : informe !== null;
+    if (!seOrdeno) {
       // Shape only, never content: the brief and the report are the lawyer's.
       console.warn(
         `[REVIEW] Informe no estructurable: ${llamada.text.length} caracteres, empieza con «${llamada.text.trimStart().slice(0, 1)}», termina con «${llamada.text.trimEnd().slice(-1)}», tokens de salida ${llamada.usage?.completionTokens ?? '?'}.`
@@ -288,7 +343,7 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
       operation: 'REVISION',
       operationId,
       reserved: reservado,
-      description: `Revisión: ${documentType} · ${fileName}`
+      description: `Revisión: ${etiqueta} · ${fileName}`
     });
 
     // To the audit BEFORE responding: serverless freezes on response. The
@@ -297,7 +352,7 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
       firmId,
       userEmail,
       action: 'DOCUMENT_REVIEWED',
-      resource: `${documentType} · ${fileName} · ${preparado.caracteres.toLocaleString('es-CO')} caracteres${preparado.truncado ? ' (recortado)' : ''}`,
+      resource: `${etiqueta} · ${fileName} · ${preparado.caracteres.toLocaleString('es-CO')} caracteres${preparado.truncado ? ' (recortado)' : ''}`,
       ipAddress: (req.headers['x-forwarded-for'] as string | undefined)?.split(',')[0]?.trim() ?? req.ip ?? ''
     });
 
@@ -311,8 +366,9 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
     const guardadaId = await documentReviewStore.guardar({
       firmId,
       userEmail,
-      documentType,
-      legalBranch: legalBranch ?? null,
+      documentType: etiqueta,
+      /* Sin actuación no hay rama: en el modo recibido nadie eligió ninguna. */
+      legalBranch: esRecibido ? null : legalBranch ?? null,
       fileName,
       cliente,
       pregunta: pregunta.trim(),
@@ -320,7 +376,8 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
       truncado: preparado.truncado,
       conFicha: guidance !== null,
       informe,
-      informeLibre: informe ? null : llamada.text,
+      informeRecibido,
+      informeLibre: seOrdeno ? null : llamada.text,
       cobradoCop: cobro.charged,
       textoOriginal: consentimiento.guarda ? preparado.texto : null
     });
@@ -353,8 +410,11 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
        */
       texto: preparado.texto,
       guardaTexto: consentimiento.guarda,
+      /** Cuál de los dos se leyó: la pantalla lo rotula y no lo adivina por la forma del informe. */
+      modo,
       informe,
-      informeLibre: informe ? null : llamada.text,
+      informeRecibido,
+      informeLibre: seOrdeno ? null : llamada.text,
       conFicha: guidance !== null,
       truncado: preparado.truncado,
       caracteres: preparado.caracteres,

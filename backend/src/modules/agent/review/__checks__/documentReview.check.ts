@@ -15,11 +15,17 @@
  *   · the answer is parsed defensively: fences, missing arrays, garbage.
  */
 import {
+  ETIQUETA_DOCUMENTO_RECIBIDO,
   MAX_CARACTERES_REVISION,
   PREGUNTA_POR_DEFECTO,
+  PREGUNTA_POR_DEFECTO_RECIBIDO,
+  buildRecibidoSystemPrompt,
+  buildRecibidoUserPrompt,
   buildReviewSystemPrompt,
   buildReviewUserPrompt,
+  esModoDeRevision,
   parsearInforme,
+  parsearInformeRecibido,
   prepararTexto,
   repararJsonCortado
 } from '../documentReview';
@@ -161,6 +167,56 @@ check('prosa sin JSON devuelve null (el controlador la entrega como texto libre)
 
 const conBasuraDentro = parsearInforme('{"resumen": 5, "fortalezas": "una sola", "erroresDeAplicacion": [{"donde": 1}]}');
 check('tipos equivocados se saneán a cadenas y listas', conBasuraDentro !== null && conBasuraDentro.resumen === '5' && conBasuraDentro.fortalezas.length === 1 && conBasuraDentro.erroresDeAplicacion[0]?.donde === '1');
+
+/* ─── EL SEGUNDO MODO: UN DOCUMENTO QUE EL ABOGADO RECIBIÓ ──────────────────
+ *
+ * Lo que estas comprobaciones sostienen es la regla que hizo nacer el modo: sin
+ * ficha del catálogo detrás, el informe SOLO puede afirmar lo que el documento
+ * dice, citándolo, y un plazo que el documento no anuncia se queda vacío. Un
+ * plazo rellenado de memoria es indistinguible de uno leído hasta que el
+ * abogado lo pierde.
+ */
+check('el modo se reconoce y cualquier otra cosa se rechaza', esModoDeRevision('DOCUMENTO_RECIBIDO') && esModoDeRevision('ESCRITO_PROPIO') && !esModoDeRevision('RECIBIDO') && !esModoDeRevision(undefined));
+
+const sistemaRecibido = buildRecibidoSystemPrompt();
+check('el prompt del modo recibido PROHÍBE completar de memoria', /PROHIBIDO escribir de memoria/.test(sistemaRecibido));
+check('y exige que el plazo esté citado o vacío', /EL PLAZO ES CITADO O ESTÁ VACÍO/.test(sistemaRecibido) && /cadena vacía/.test(sistemaRecibido));
+check('y no le pide al modelo que aconseje qué actuación presentar', /NO ACONSEJES QUÉ ACTUACIÓN PRESENTAR/.test(sistemaRecibido));
+check('y no habla de secciones que la norma exige, que es lo del escrito propio', !/seccionesFaltantes/.test(sistemaRecibido));
+
+const usuarioRecibido = buildRecibidoUserPrompt({ pregunta: '', texto: 'AUTO. El juzgado ordena…', truncado: false });
+check('sin pregunta va la del modo recibido, no la del propio', usuarioRecibido.includes(PREGUNTA_POR_DEFECTO_RECIBIDO) && !usuarioRecibido.includes(PREGUNTA_POR_DEFECTO));
+check('el prompt del usuario NO nombra ninguna actuación ni ficha', !/ACTUACIÓN:/.test(usuarioRecibido) && /no hay ficha verificada: no la supongas/.test(usuarioRecibido));
+check('el recorte se declara también aquí', buildRecibidoUserPrompt({ pregunta: '', texto: 'x', truncado: true }).includes('recortado'));
+
+const recibido = parsearInformeRecibido(
+  '{"queEs":"Auto que ordena subsanar la demanda.","quienLoProfirio":"Juzgado Tercero Civil Municipal de Sincelejo","radicado":"2026-00345","fecha":"3 de septiembre de 2026","decide":["Inadmite la demanda."],"cargas":[{"carga":"Subsanar la demanda.","plazo":"cinco (5) días","cita":"concédese el término de cinco (5) días para subsanar"}],"loQueSigue":["Vencido el término se resolverá sobre la admisión."],"noLoDiceElDocumento":["No indica desde cuándo se cuenta el término."]}'
+);
+check('el informe del documento recibido se lee entero', recibido?.queEs.startsWith('Auto') === true && recibido?.radicado === '2026-00345' && recibido?.decide.length === 1);
+check('la carga trae su plazo y su cita textual', recibido?.cargas[0]?.plazo === 'cinco (5) días' && recibido?.cargas[0]?.cita.includes('cinco (5) días'));
+
+/* EL CASO QUE MANDA: el documento no anuncia plazo. */
+const sinPlazo = parsearInformeRecibido('{"queEs":"Oficio.","cargas":[{"carga":"Remitir copia del expediente.","cita":"sírvase remitir copia del expediente"}],"decide":["Requiere información."]}');
+check('sin plazo en el documento el campo queda VACÍO, nunca relleno', sinPlazo?.cargas[0]?.plazo === '', JSON.stringify(sinPlazo?.cargas[0]));
+check('y la carga y su cita sobreviven intactas', sinPlazo?.cargas[0]?.carga === 'Remitir copia del expediente.' && sinPlazo?.cargas[0]?.cita.startsWith('sírvase'));
+
+check('un plazo nulo tampoco se convierte en texto', parsearInformeRecibido('{"queEs":"Auto.","cargas":[{"carga":"Comparecer.","plazo":null,"cita":"comparezca"}]}')?.cargas[0]?.plazo === '');
+check('prosa sin JSON devuelve null y el controlador la entrega como texto libre', parsearInformeRecibido('El auto ordena subsanar.') === null);
+check('un objeto vacío de contenido no pasa por informe', parsearInformeRecibido('{"queEs":"","decide":[],"cargas":[],"loQueSigue":[]}') === null);
+check('un JSON cortado a la mitad se repara igual que en el modo propio', parsearInformeRecibido('{"queEs":"Auto que inadmite.","decide":["Inadmite la demanda."],"cargas":[{"carga":"Subsan') !== null);
+
+/* La etiqueta con que se archiva es del producto, nunca un nombre jurídico. */
+check('la etiqueta del modo recibido es neutra', ETIQUETA_DOCUMENTO_RECIBIDO === 'Documento recibido');
+const filaRecibida = aRevisionGuardada({
+  id: 'r1', document_type: ETIQUETA_DOCUMENTO_RECIBIDO, file_name: 'auto.pdf', created_at: '2026-09-09T10:00:00Z', con_ficha: false,
+  informe: { queEs: 'Auto que inadmite.', decide: ['Inadmite.'], cargas: [], loQueSigue: [], noLoDiceElDocumento: [] }
+});
+check('la fila de un documento recibido se rotula por la FORMA de su informe', filaRecibida.modo === 'DOCUMENTO_RECIBIDO' && filaRecibida.informe === null && filaRecibida.informeRecibido?.queEs === 'Auto que inadmite.');
+check('y sin ficha, porque no hubo ninguna', filaRecibida.conFicha === false);
+const filaRecibidaDeLista = aRevisionGuardada({ id: 'r2', document_type: ETIQUETA_DOCUMENTO_RECIBIDO, file_name: 'auto.pdf', created_at: '2026-09-09T10:00:00Z' });
+check('en la lista, que no trae informe, lo rotula la etiqueta', filaRecibidaDeLista.modo === 'DOCUMENTO_RECIBIDO');
+check('una revisión de escrito propio sigue siendo del modo propio', fila.modo === 'ESCRITO_PROPIO' && fila.informeRecibido === null);
+check('y una guardada antes de que el modo existiera también', filaDeLista.modo === 'ESCRITO_PROPIO');
 
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);
 process.exitCode = fallos === 0 ? 0 : 1;

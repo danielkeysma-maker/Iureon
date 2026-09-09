@@ -2,11 +2,19 @@ import React from 'react';
 import { AlertTriangle, CheckCircle2, ClipboardCheck, Copy, Download, FileText, History, Loader2, Sparkles, Trash2, UploadCloud, X } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import { ApiError } from '../../../config/httpClient';
-import { archivoABase64, reviewApi, type ConsentimientoDeGuardado, type RespuestaDeRevision, type RevisionGuardada } from '../services/review.api';
+import {
+  archivoABase64,
+  reviewApi,
+  type ConsentimientoDeGuardado,
+  type InformeDeDocumentoRecibido,
+  type ModoDeRevision,
+  type RespuestaDeRevision,
+  type RevisionGuardada
+} from '../services/review.api';
 import { readSession } from '../../auth/session';
 import { uploadFileToStorage } from '../../documents/services/storageUpload';
 import { exportarInformeAPdf, exportarInformeAWord } from '../services/informeExport.service';
-import type { DatosDelInforme } from '../services/informeLayout';
+import type { DatosDeExportacion } from '../services/informeLayout';
 import type { DatosDelTaller } from './TallerDeRevision';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 import { Combobox, type OpcionCombobox } from './Combobox';
@@ -44,6 +52,30 @@ import type { ActuacionRole } from '../../catalog/types';
  * cuando el trabajo ya estaba en riesgo. Un abogado sin autoridad no se
  * bloquea nunca: revisa igual y al terminar se le dice qué no se conserva y a
  * quién pedirlo.
+ *
+ * ─── DOS MODOS, Y LA ELECCIÓN VA ANTES QUE NADA ─────────────────────────────
+ *
+ * «Un escrito mío, que voy a presentar» y «un documento que recibí». El primero
+ * es el de siempre y no cambia en nada. El segundo nació de una pregunta del
+ * usuario que no tenía respuesta posible: «si es un auto de un juez, ¿qué tipo
+ * de actuación escojo?». Ninguno. Un auto, una sentencia, un oficio o una
+ * notificación son papeles que LLEGAN: nadie los va a presentar, no les falta
+ * ninguna sección frente a la norma, y pedir su actuación es pedirle al abogado
+ * justamente lo que no sabe y lo que no le importa.
+ *
+ * Por eso la elección está ARRIBA DEL TODO, antes del archivo: decide qué se le
+ * pregunta y qué se le responde. Con «un documento que recibí» el bloque «Qué
+ * actuación es» desaparece y el botón de revisar se enciende con solo el
+ * archivo.
+ *
+ * ─── DÓNDE VIVE EL «¿Y QUÉ PUEDO HACER?» DEL MODO RECIBIDO ──────────────────
+ *
+ * No en el motor. El informe del documento recibido solo puede afirmar lo que
+ * el documento dice, porque no hay ficha del catálogo detrás de él. La pregunta
+ * que sigue —qué actuación procede, con qué término y ante qué autoridad— la
+ * responde el catálogo verificado: por eso el informe termina ofreciendo la
+ * MISMA guía de actuaciones que ya usa este diálogo, con el texto del documento
+ * como hechos, y recordando la agenda de términos. No hay un proponedor nuevo.
  *
  * ─── DE DÓNDE SALE LA ACTUACIÓN ─────────────────────────────────────────────
  *
@@ -98,11 +130,27 @@ const MAX_BYTES = 15 * 1024 * 1024;
 const EN_CUERPO = 3_500_000;
 const pesos = (n: number): string => `$${Math.round(n).toLocaleString('es-CO')}`;
 
-const SUGERENCIAS = [
+/*
+ * LAS SUGERENCIAS SON DE CADA MODO, y no por adorno: las del escrito propio
+ * («qué corregiría antes de presentarlo») no se le pueden preguntar a un auto
+ * que ya está proferido, y pegadas ahí enseñarían a usar mal el modo nuevo.
+ */
+const SUGERENCIAS_PROPIO = [
   'Señale debilidades, fortalezas, qué está mal aplicado y qué corregiría antes de presentarlo.',
   '¿La petición es concreta y ejecutable? ¿Qué le falta al escrito frente a lo que exige la norma?',
   '¿Los hechos sostienen las pretensiones? ¿Dónde flaquea la argumentación?'
 ];
+
+const SUGERENCIAS_RECIBIDO = [
+  'Dígame qué es este documento, qué decide, qué me exige y para cuándo, y qué queda pendiente.',
+  '¿Qué me ordena a mí en concreto y con qué palabras lo dice? ¿Anuncia algún plazo?',
+  '¿Qué resolvió y qué queda pendiente del trámite, según lo que el propio documento dice?'
+];
+
+const SUGERENCIAS: Record<ModoDeRevision, string[]> = {
+  ESCRITO_PROPIO: SUGERENCIAS_PROPIO,
+  DOCUMENTO_RECIBIDO: SUGERENCIAS_RECIBIDO
+};
 
 export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
   abierto,
@@ -115,9 +163,16 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
   eligeActuacion = false,
   userRole = 'LITIGANTE'
 }) => {
+  /*
+   * EL MODO ES LO PRIMERO QUE SE ELIGE Y LO PRIMERO QUE SE DECLARA. Por defecto
+   * el de siempre: quien abría este diálogo antes encuentra exactamente lo que
+   * encontraba.
+   */
+  const [modo, setModo] = React.useState<ModoDeRevision>('ESCRITO_PROPIO');
+  const esRecibido = modo === 'DOCUMENTO_RECIBIDO';
   const [archivo, setArchivo] = React.useState<File | null>(null);
   const [texto, setTexto] = React.useState('');
-  const [pregunta, setPregunta] = React.useState(SUGERENCIAS[0]);
+  const [pregunta, setPregunta] = React.useState(SUGERENCIAS_PROPIO[0]);
   /** De qué cliente o proceso es el escrito. Queda en la lista y en el PDF/Word. */
   const [cliente, setCliente] = React.useState('');
   const [ocupado, setOcupado] = React.useState(false);
@@ -144,6 +199,8 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
   const [exportando, setExportando] = React.useState<'pdf' | 'word' | null>(null);
   const [confirmacion, setConfirmacion] = React.useState<Confirmacion | null>(null);
   /** El texto del escrito y la conversacion de la revision en pantalla, para abrir el taller. */
+  /** Qué modo leyó el informe que está en pantalla. Puede diferir del elegido arriba al abrir uno anterior. */
+  const [modoDelInforme, setModoDelInforme] = React.useState<ModoDeRevision>('ESCRITO_PROPIO');
   const [paraElTaller, setParaElTaller] = React.useState<{ texto: string | null; conversacion: DatosDelTaller['conversacion']; anotaciones: NonNullable<DatosDelTaller['anotaciones']>; versiones: NonNullable<DatosDelTaller['versiones']>; guardaTexto: boolean; revisionId: string | null; archivo: File | null }>({ texto: null, conversacion: [], anotaciones: [], versiones: [], guardaTexto: false, revisionId: null, archivo: null });
 
   /* ─── LA ACTUACIÓN CUANDO NO SE HEREDA ─────────────────────────────────────
@@ -161,6 +218,15 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
   const [recargaCatalogo, setRecargaCatalogo] = React.useState(0);
   const [guiaAbierta, setGuiaAbierta] = React.useState(false);
   const [propiaAbierta, setPropiaAbierta] = React.useState(false);
+  /*
+   * LA RAMA CON LA QUE SE CONSULTA LA GUÍA DESPUÉS DE LEER UN DOCUMENTO
+   * RECIBIDO. Es aparte de `ramaPropia` a propósito: aquella elige contra qué
+   * ficha se revisa un escrito propio; esta solo acota la propuesta del
+   * catálogo, que nunca propone a ciegas entre las veintitantas ramas.
+   */
+  const [ramaParaLaGuia, setRamaParaLaGuia] = React.useState(legalBranch);
+  /** Lo que la guía propuso tras leer el documento recibido; lo escogió una persona. */
+  const [actuacionSugerida, setActuacionSugerida] = React.useState('');
   /*
    * Los hechos con los que se consulta el triaje son EL TEXTO DEL ESCRITO. No
    * se le pide al abogado que cuente otra vez lo que ya está en el archivo que
@@ -185,6 +251,8 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
    * sería esconderle justamente la que busca.
    */
   const catalogoDeLaRama = useBranchActuacionesState(rama, undefined, recargaCatalogo);
+  /** La guía propone dentro de una rama: en el modo recibido es la que se elige junto al informe. */
+  const ramaDeLaGuia = esRecibido ? ramaParaLaGuia : rama;
 
   const opcionesRama: OpcionCombobox[] = React.useMemo(
     () => ramasEstado.ramas.map((b) => ({ valor: b, etiqueta: BRANCH_LABELS[b] ?? b })),
@@ -249,6 +317,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
     setError('');
     try {
       const completa = await reviewApi.obtener(r.id);
+      setModoDelInforme(completa.modo ?? 'ESCRITO_PROPIO');
       setTituloDelInforme(completa.documentType);
       setOrigenDelInforme({
         fileName: completa.fileName,
@@ -261,7 +330,9 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
       setRespuesta({
         id: completa.id,
         guardada: true,
+        modo: completa.modo ?? 'ESCRITO_PROPIO',
         informe: completa.informe,
+        informeRecibido: completa.informeRecibido ?? null,
         informeLibre: completa.informeLibre,
         conFicha: completa.conFicha,
         truncado: completa.truncado,
@@ -287,9 +358,11 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
 
   React.useEffect(() => {
     if (abierto) return;
+    setModo('ESCRITO_PROPIO');
+    setModoDelInforme('ESCRITO_PROPIO');
     setArchivo(null);
     setTexto('');
-    setPregunta(SUGERENCIAS[0]);
+    setPregunta(SUGERENCIAS_PROPIO[0]);
     setCliente('');
     setError('');
     setRespuesta(null);
@@ -302,6 +375,8 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
      */
     setRamaPropia(legalBranch);
     setTipoPropio(documentType);
+    setRamaParaLaGuia(legalBranch);
+    setActuacionSugerida('');
     setHechos('');
     setAvisoDeLectura('');
     archivoLeido.current = null;
@@ -310,7 +385,26 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
   }, [abierto, legalBranch, documentType]);
 
   const hayEscrito = archivo !== null || texto.trim().length > 0;
-  const sinActuacion = !tipo || /^elegir/i.test(tipo);
+  /*
+   * EN EL MODO RECIBIDO NO FALTA NINGUNA ACTUACIÓN, porque no se pide: el botón
+   * se enciende con solo el archivo. En el modo propio la exigencia se queda
+   * intacta, y el servidor la sigue imponiendo con su 400.
+   */
+  const sinActuacion = !esRecibido && (!tipo || /^elegir/i.test(tipo));
+
+  /*
+   * Cambiar de modo arrastra la pregunta SOLO si era una sugerencia del modo
+   * anterior. Lo que el abogado escribió a mano no se le borra por cambiar de
+   * casilla: eso ya pasó en otras pantallas y se reportó como pérdida de
+   * trabajo.
+   */
+  const cambiarModo = (nuevo: ModoDeRevision) => {
+    if (nuevo === modo) return;
+    const eraSugerencia = SUGERENCIAS[modo].includes(pregunta);
+    setModo(nuevo);
+    if (eraSugerencia) setPregunta(SUGERENCIAS[nuevo][0]);
+    setError('');
+  };
 
   const elegirArchivo = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0] ?? null;
@@ -418,14 +512,24 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
         setSubiendo(null);
         cuerpo = { fileName: archivo.name, storageKey, conservarOriginal, contentType: archivo.type || undefined };
       }
-      setTituloDelInforme(tipo);
+      setTituloDelInforme(esRecibido ? 'Documento recibido' : tipo);
+      setModoDelInforme(modo);
       setOrigenDelInforme({
         fileName: cuerpo.fileName,
         fecha: new Date().toLocaleString('es-CO', { dateStyle: 'long', timeStyle: 'short' }),
         cliente: cliente.trim(),
         revisadoPor: ''
       });
-      const r = await reviewApi.revisar({ documentType: tipo, legalBranch: rama, pregunta, cliente: cliente.trim(), ...cuerpo });
+      /*
+       * En el modo recibido la actuación y la rama no viajan: no las eligió
+       * nadie. Mandar la heredada de la barra de Redacción habría revisado un
+       * auto ajeno contra la ficha del escrito que el abogado iba a redactar.
+       */
+      const r = await reviewApi.revisar(
+        esRecibido
+          ? { modo, documentType: '', pregunta, cliente: cliente.trim(), ...cuerpo }
+          : { modo, documentType: tipo, legalBranch: rama, pregunta, cliente: cliente.trim(), ...cuerpo }
+      );
       setParaElTaller({ texto: r.texto ?? null, conversacion: [], anotaciones: [], versiones: [], guardaTexto: Boolean(r.guardaTexto), revisionId: r.id ?? null, archivo });
       setRespuesta(r);
       onSaldoCambiado?.();
@@ -440,6 +544,39 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
 
   const textoDelInforme = (): string => {
     if (!respuesta) return '';
+    const r = respuesta.informeRecibido;
+    if (modoDelInforme === 'DOCUMENTO_RECIBIDO') {
+      if (!r) return respuesta.informeLibre ?? '';
+      const bloque = (t: string, xs: string[]) => (xs.length ? `${t}\n${xs.map((x) => `- ${x}`).join('\n')}\n` : '');
+      return [
+        `DOCUMENTO RECIBIDO · ${origenDelInforme.fileName || 'documento'}`,
+        '',
+        r.queEs,
+        '',
+        bloque(
+          'SEGÚN EL PROPIO DOCUMENTO',
+          [
+            r.quienLoProfirio && `Lo profirió: ${r.quienLoProfirio}`,
+            r.radicado && `Radicado: ${r.radicado}`,
+            r.fecha && `Fecha del documento: ${r.fecha}`
+          ].filter(Boolean) as string[]
+        ),
+        bloque('QUÉ DECIDE U ORDENA', r.decide),
+        r.cargas.length
+          ? `QUÉ LE EXIGE Y PARA CUÁNDO\n${r.cargas
+              .map(
+                (c) =>
+                  `- ${c.carga}\n  Plazo: ${c.plazo || 'el documento no anuncia plazo para esta carga'}\n  Dice: «${c.cita}»`
+              )
+              .join('\n')}\n`
+          : 'QUÉ LE EXIGE Y PARA CUÁNDO\n- Del texto de este documento no se desprende ninguna carga a su cargo.\n',
+        bloque('QUÉ QUEDA PENDIENTE, SEGÚN EL DOCUMENTO', r.loQueSigue),
+        bloque('LO QUE EL DOCUMENTO NO DICE', r.noLoDiceElDocumento),
+        'Este informe solo afirma lo que está escrito en el documento. No hay ficha verificada del catálogo detrás de ninguna de sus líneas.'
+      ]
+        .filter((x) => x !== '')
+        .join('\n');
+    }
     if (!respuesta.informe) return respuesta.informeLibre ?? '';
     const i = respuesta.informe;
     const bloque = (t: string, xs: string[]) => (xs.length ? `${t}\n${xs.map((x) => `- ${x}`).join('\n')}\n` : '');
@@ -470,9 +607,9 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
    * la letra de la firma. Solo cuando el informe se pudo ordenar; un informe
    * libre no tiene secciones que exportar y se copia.
    */
-  const datosParaExportar = (): DatosDelInforme | null => {
-    if (!respuesta?.informe) return null;
-    return {
+  const datosParaExportar = (): DatosDeExportacion | null => {
+    if (!respuesta) return null;
+    const comunes = {
       documentType: tituloDelInforme,
       fileName: origenDelInforme.fileName || 'escrito',
       fecha: origenDelInforme.fecha || new Date().toLocaleDateString('es-CO', { dateStyle: 'long' }),
@@ -480,10 +617,18 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
       truncado: respuesta.truncado,
       conFicha: respuesta.conFicha,
       cliente: origenDelInforme.cliente || undefined,
-      revisadoPor: origenDelInforme.revisadoPor || undefined,
-      informe: respuesta.informe
+      revisadoPor: origenDelInforme.revisadoPor || undefined
     };
+    /* La misma tubería de PDF y Word para los dos modos; solo cambia el cuerpo. */
+    if (modoDelInforme === 'DOCUMENTO_RECIBIDO') {
+      return respuesta.informeRecibido ? { ...comunes, modo: 'DOCUMENTO_RECIBIDO', informe: respuesta.informeRecibido } : null;
+    }
+    return respuesta.informe ? { ...comunes, informe: respuesta.informe } : null;
   };
+
+  /** Si el informe en pantalla se pudo ordenar por secciones: decide si hay algo que exportar. */
+  const informeOrdenado =
+    modoDelInforme === 'DOCUMENTO_RECIBIDO' ? Boolean(respuesta?.informeRecibido) : Boolean(respuesta?.informe);
 
   const exportar = async (formato: 'pdf' | 'word') => {
     const datos = datosParaExportar();
@@ -515,9 +660,13 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
       abierto={abierto}
       onCerrar={ocupado ? () => undefined : onCerrar}
       tamano="L"
-      titulo="Revisar un escrito"
+      titulo="Revisar un documento"
       subtitulo={
-        sinActuacion
+        esRecibido
+          ? `Un documento que recibió · lo que sigue sale del propio texto, citado · ${
+              consentimiento?.guarda ? 'el documento y su trabajo se conservan para la firma' : 'el documento no se guarda'
+            }`
+          : sinActuacion
           ? 'Elija primero la actuación arriba: la revisión objetiva se hace contra su ficha.'
           : `Contra la ficha de «${tipo}» · ${consentimiento?.guarda ? 'el escrito y su trabajo se conservan para la firma' : 'el documento no se guarda'}`
       }
@@ -569,9 +718,9 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
             <button
               type="button"
               onClick={() => void exportar('word')}
-              disabled={!respuesta.informe || exportando !== null}
+              disabled={!informeOrdenado || exportando !== null}
               className="btn-neutral btn-sm disabled:opacity-50"
-              title={respuesta.informe ? 'Descargar el informe en Word, con la letra de la firma' : 'Este informe no tiene secciones: cópielo'}
+              title={informeOrdenado ? 'Descargar el informe en Word, con la letra de la firma' : 'Este informe no tiene secciones: cópielo'}
             >
               <Download className="h-3.5 w-3.5" />
               {exportando === 'word' ? 'Word…' : 'Word'}
@@ -579,9 +728,9 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
             <button
               type="button"
               onClick={() => void exportar('pdf')}
-              disabled={!respuesta.informe || exportando !== null}
+              disabled={!informeOrdenado || exportando !== null}
               className="btn-neutral btn-sm disabled:opacity-50"
-              title={respuesta.informe ? 'Descargar el informe en PDF, con la letra de la firma' : 'Este informe no tiene secciones: cópielo'}
+              title={informeOrdenado ? 'Descargar el informe en PDF, con la letra de la firma' : 'Este informe no tiene secciones: cópielo'}
             >
               <Download className="h-3.5 w-3.5" />
               {exportando === 'pdf' ? 'PDF…' : 'PDF'}
@@ -611,9 +760,51 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
     >
       {!respuesta ? (
         <div className="space-y-4">
+          {/* ─── QUÉ ES LO QUE TRAE, Y VA ANTES QUE NADA ───────────────────
+              Esta elección decide qué se pregunta y qué se responde, así que no
+              puede ir después del archivo ni escondida: es lo primero que se ve
+              al abrir. En el teléfono las dos opciones se apilan; en escritorio
+              comparten fila. Cada una lleva `[overflow-wrap:anywhere]` porque
+              sus descripciones traen palabras largas y un ítem flex no baja del
+              ancho mínimo de su contenido. */}
+          <div>
+            <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">Qué trae</p>
+            <div className="mt-1.5 flex flex-col gap-2 sm:flex-row">
+              {(
+                [
+                  {
+                    valor: 'ESCRITO_PROPIO' as ModoDeRevision,
+                    titulo: 'Un escrito mío, que voy a presentar',
+                    detalle: 'Una tutela, una demanda, un recurso. Se revisa contra la ficha verificada de su actuación: qué le falta, qué está mal aplicado, qué corregiría antes de radicar.'
+                  },
+                  {
+                    valor: 'DOCUMENTO_RECIBIDO' as ModoDeRevision,
+                    titulo: 'Un documento que recibí',
+                    detalle: 'Un auto, una sentencia, un oficio, una notificación. No hay que decir qué actuación es: se le explica qué dice, qué le exige y para cuándo, citando el propio documento.'
+                  }
+                ] as const
+              ).map((o) => (
+                <button
+                  key={o.valor}
+                  type="button"
+                  onClick={() => cambiarModo(o.valor)}
+                  aria-pressed={modo === o.valor}
+                  className={`min-w-0 flex-1 rounded-control border px-3 py-2 text-left [overflow-wrap:anywhere] ${
+                    modo === o.valor ? 'border-brand-700 bg-brand-50' : 'border-line-200 bg-canvas hover:border-brand-700'
+                  }`}
+                >
+                  <span className={`block text-ui font-medium ${modo === o.valor ? 'text-brand-700' : 'text-ink-900'}`}>{o.titulo}</span>
+                  <span className="mt-0.5 block text-[11px] leading-snug text-ink-500 text-justify [text-wrap:pretty]">{o.detalle}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* ─── EL ESCRITO: archivo o texto ─────────────────────────────── */}
           <div>
-            <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">El escrito</p>
+            <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
+              {esRecibido ? 'El documento que recibió' : 'El escrito'}
+            </p>
             {archivo ? (
               <div className="mt-1.5 flex items-center gap-2 rounded-control border border-line-200 bg-canvas px-3 py-2">
                 <FileText className="h-4 w-4 shrink-0 text-ink-400" />
@@ -669,7 +860,13 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
               en una fila a 320px el segundo quedaría fuera. Cada uno va
               envuelto en `min-w-0 flex-1` para que encoja de verdad, y el botón
               trunca con su nombre completo en el `title`. */}
-          {eligeActuacion && (
+          {/*
+            EL BLOQUE ENTERO DESAPARECE CON «un documento que recibí», y esa es
+            la corrección de fondo: no se esconde detrás de un valor por
+            defecto ni se deja opcional. Quien acaba de recibir un auto no sabe
+            —ni tiene por qué saber— cómo se llama en el catálogo.
+          */}
+          {eligeActuacion && !esRecibido && (
             <div>
               <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">Qué actuación es</p>
               <p className="mt-1 text-[11px] leading-snug text-ink-500 text-justify">
@@ -792,7 +989,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
               className="field-area mt-1.5 w-full resize-none"
             />
             <div className="mt-1.5 flex flex-wrap gap-1.5">
-              {SUGERENCIAS.map((s) => (
+              {SUGERENCIAS[modo].map((s) => (
                 <button
                   key={s}
                   type="button"
@@ -823,13 +1020,16 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
             </p>
           )}
           {!error && !sinActuacion && !hayEscrito && (
-            <p className="text-[12px] leading-snug text-ink-500 text-justify">Suba el archivo o pegue el texto para habilitar el botón.</p>
+            <p className="text-[12px] leading-snug text-ink-500 text-justify">
+              {esRecibido ? 'Suba el documento o pegue su texto: no hace falta nada más.' : 'Suba el archivo o pegue el texto para habilitar el botón.'}
+            </p>
           )}
           {error && <p className="text-[12px] leading-snug text-danger text-justify">{error}</p>}
 
           <p className="text-meta text-ink-400 text-justify">
-            El informe no cita sentencias: cuando un punto necesite precedente, lo dirá y usted lo verifica. No reescribe el escrito;
-            señala y propone la corrección. El informe se guarda para su firma; el escrito no.
+            {esRecibido
+              ? 'El informe solo afirma lo que está escrito en el documento y lo dice citándolo: ni un artículo, ni un plazo, ni una autoridad de memoria. Si el documento no anuncia plazo, se lo dirá con esas palabras. Qué actuación procede lo responde después la guía del catálogo. El informe se guarda para su firma.'
+              : 'El informe no cita sentencias: cuando un punto necesite precedente, lo dirá y usted lo verifica. No reescribe el escrito; señala y propone la corrección. El informe se guarda para su firma; el escrito no.'}
           </p>
 
           {anteriores.length > 0 && (
@@ -892,7 +1092,21 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
               </span>
             </div>
           )}
-          <Informe respuesta={respuesta} documentType={tituloDelInforme} />
+          <Informe
+            respuesta={respuesta}
+            documentType={tituloDelInforme}
+            modo={modoDelInforme}
+            fileName={origenDelInforme.fileName}
+            actuacionSugerida={actuacionSugerida}
+            ramaParaLaGuia={ramaParaLaGuia}
+            opcionesRama={opcionesRama}
+            onRamaParaLaGuia={setRamaParaLaGuia}
+            onPedirLaGuia={() => {
+              /* Los hechos son EL TEXTO DEL DOCUMENTO que se acaba de leer: nadie lo vuelve a contar. */
+              setHechos(paraElTaller.texto ?? texto.trim());
+              setGuiaAbierta(true);
+            }}
+          />
         </>
       )}
       <Dialog
@@ -935,16 +1149,22 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
         hechos: allá los escribe el abogado, aquí salen del texto del escrito
         que acaba de adjuntar.
       */}
-      {eligeActuacion && (
+      {(eligeActuacion || esRecibido) && (
         <>
           <GuiaEligeActuacionDialog
             abierto={guiaAbierta}
             onCerrar={() => setGuiaAbierta(false)}
-            legalBranch={rama}
+            legalBranch={ramaDeLaGuia}
             hechos={hechos}
             setHechos={setHechos}
             onElegir={(exactName) => {
-              setTipoPropio(exactName);
+              /*
+               * En el modo recibido la elección NO cambia contra qué se revisó
+               * —eso ya ocurrió y no hubo ficha—: deja anotada la actuación que
+               * el abogado reconoció, para llevarla a la agenda de términos.
+               */
+              if (esRecibido) setActuacionSugerida(exactName);
+              else setTipoPropio(exactName);
               setGuiaAbierta(false);
             }}
             onEscribirNombre={() => {
@@ -955,12 +1175,13 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
           <ActuacionPropiaDialog
             abierto={propiaAbierta}
             onCerrar={() => setPropiaAbierta(false)}
-            legalBranch={rama}
+            legalBranch={ramaDeLaGuia}
             userRole={userRole}
             onCreada={(exactName) => {
               /* Primero la lista de nuevo, después la elección: al revés, el selector no la encontraría. */
               setRecargaCatalogo((n) => n + 1);
-              setTipoPropio(exactName);
+              if (esRecibido) setActuacionSugerida(exactName);
+              else setTipoPropio(exactName);
               setPropiaAbierta(false);
             }}
           />
@@ -995,18 +1216,74 @@ const Seccion: React.FC<{ titulo: string; items: string[]; tono?: 'ok' | 'aviso'
   );
 };
 
-const Informe: React.FC<{ respuesta: RespuestaDeRevision; documentType: string }> = ({ respuesta, documentType }) => {
+interface InformeProps {
+  respuesta: RespuestaDeRevision;
+  documentType: string;
+  /** Cuál de los dos se leyó. La pantalla lo ROTULA: no se deduce de la forma del informe. */
+  modo: ModoDeRevision;
+  fileName: string;
+  actuacionSugerida: string;
+  ramaParaLaGuia: string;
+  opcionesRama: OpcionCombobox[];
+  onRamaParaLaGuia: (rama: string) => void;
+  onPedirLaGuia: () => void;
+}
+
+const Informe: React.FC<InformeProps> = ({
+  respuesta,
+  documentType,
+  modo,
+  fileName,
+  actuacionSugerida,
+  ramaParaLaGuia,
+  opcionesRama,
+  onRamaParaLaGuia,
+  onPedirLaGuia
+}) => {
+  const esRecibido = modo === 'DOCUMENTO_RECIBIDO';
   const i = respuesta.informe;
+  const r = respuesta.informeRecibido ?? null;
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 [overflow-wrap:anywhere]">
+      {/*
+        EL RÓTULO DICE CUÁL DE LOS DOS SE LEYÓ, y no es decorativo: un informe
+        de un documento recibido que se confundiera con la revisión de un
+        escrito propio se leería como si el catálogo respaldara sus plazos.
+      */}
       <div className="flex flex-wrap items-center gap-2 text-[11px] text-ink-500">
-        <span className={`rounded-control border px-2 py-0.5 ${respuesta.conFicha ? 'border-line-200 text-verified' : 'border-line-200 text-ink-500'}`}>
-          {respuesta.conFicha ? `Revisado contra la ficha de «${documentType}»` : 'Sin ficha verificada: lo objetivo va con menos respaldo'}
+        <span
+          className={`rounded-control border px-2 py-0.5 ${
+            esRecibido ? 'border-line-200 text-ink-700' : respuesta.conFicha ? 'border-line-200 text-verified' : 'border-line-200 text-ink-500'
+          }`}
+        >
+          {esRecibido
+            ? `Documento recibido · ${fileName || 'sin nombre'}`
+            : respuesta.conFicha
+            ? `Revisado contra la ficha de «${documentType}»`
+            : 'Sin ficha verificada: lo objetivo va con menos respaldo'}
         </span>
         <span>{respuesta.caracteres.toLocaleString('es-CO')} caracteres{respuesta.truncado ? ' · recortado a 300.000' : ''}</span>
       </div>
 
-      {!i ? (
+      {esRecibido ? (
+        !r ? (
+          <>
+            <p className="rounded-control border border-line-200 bg-canvas px-3 py-2 text-[12px] leading-snug text-ink-700 text-justify">
+              La lectura no se pudo ordenar por secciones; abajo está el texto completo. El cobro es el mismo y el contenido también.
+            </p>
+            <pre className="whitespace-pre-wrap font-sans text-ui leading-relaxed text-ink-900">{respuesta.informeLibre}</pre>
+          </>
+        ) : (
+          <DocumentoRecibido
+            informe={r}
+            actuacionSugerida={actuacionSugerida}
+            ramaParaLaGuia={ramaParaLaGuia}
+            opcionesRama={opcionesRama}
+            onRamaParaLaGuia={onRamaParaLaGuia}
+            onPedirLaGuia={onPedirLaGuia}
+          />
+        )
+      ) : !i ? (
         <>
           <p className="rounded-control border border-line-200 bg-canvas px-3 py-2 text-[12px] leading-snug text-ink-700 text-justify">
             El revisor respondió en un formato que no se pudo ordenar por secciones; abajo está su texto completo. El cobro
@@ -1069,9 +1346,142 @@ const Informe: React.FC<{ respuesta: RespuestaDeRevision; documentType: string }
       )}
 
       <p className="border-t border-line-100 pt-3 text-meta text-ink-400 text-justify">
-        Lo marcado como exigencia de la norma sale de la ficha verificada; lo demás es criterio profesional del revisor y usted decide.
-        El informe queda guardado para su firma en «Revisiones anteriores»; el escrito y el trabajo del taller, solo si la firma autorizó conservarlos.
+        {esRecibido
+          ? 'Todo lo anterior sale del texto del propio documento y va citado. Ninguna ficha del catálogo respalda estas líneas: no se ha completado de memoria ningún artículo, plazo, autoridad ni recurso. El informe queda guardado para su firma en «Revisiones anteriores».'
+          : 'Lo marcado como exigencia de la norma sale de la ficha verificada; lo demás es criterio profesional del revisor y usted decide. El informe queda guardado para su firma en «Revisiones anteriores»; el escrito y el trabajo del taller, solo si la firma autorizó conservarlos.'}
       </p>
     </div>
+  );
+};
+
+/* ─── LO QUE EL ABOGADO LEE CUANDO SUBE UN AUTO DE UN JUEZ ──────────────────
+ *
+ * Cuatro cosas, en el orden en que las necesita: qué es y quién lo profirió,
+ * qué decide, QUÉ LE EXIGE Y PARA CUÁNDO —con las palabras del documento al
+ * lado— y qué queda pendiente. Después, lo que el documento calla.
+ *
+ * Y al final el «¿y qué puedo hacer?», que NO lo responde el motor: lo responde
+ * el catálogo verificado, a través de la misma guía de actuaciones que este
+ * diálogo ya usaba, y la agenda de términos que ya existe.
+ */
+const DocumentoRecibido: React.FC<{
+  informe: InformeDeDocumentoRecibido;
+  actuacionSugerida: string;
+  ramaParaLaGuia: string;
+  opcionesRama: OpcionCombobox[];
+  onRamaParaLaGuia: (rama: string) => void;
+  onPedirLaGuia: () => void;
+}> = ({ informe, actuacionSugerida, ramaParaLaGuia, opcionesRama, onRamaParaLaGuia, onPedirLaGuia }) => {
+  const identificacion = [
+    informe.quienLoProfirio && { etiqueta: 'Lo profirió', valor: informe.quienLoProfirio },
+    informe.radicado && { etiqueta: 'Radicado', valor: informe.radicado },
+    informe.fecha && { etiqueta: 'Fecha del documento', valor: informe.fecha }
+  ].filter(Boolean) as { etiqueta: string; valor: string }[];
+
+  return (
+    <>
+      {informe.queEs && <p className="text-[14px] leading-relaxed text-ink-900 text-justify [text-wrap:pretty]">{informe.queEs}</p>}
+
+      {identificacion.length > 0 && (
+        <section>
+          <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">Según el propio documento</h4>
+          <dl className="mt-1.5 space-y-1">
+            {identificacion.map((x) => (
+              <div key={x.etiqueta} className="flex flex-col gap-0.5 sm:flex-row sm:gap-2">
+                <dt className="min-w-0 shrink-0 font-mono text-[10.5px] uppercase tracking-[0.06em] text-ink-400 sm:w-40">{x.etiqueta}</dt>
+                <dd className="min-w-0 flex-1 text-ui leading-snug text-ink-900">{x.valor}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )}
+
+      <Seccion titulo="Qué decide u ordena" items={informe.decide} />
+
+      <section>
+        <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">Qué le exige y para cuándo</h4>
+        {informe.cargas.length === 0 ? (
+          <p className="mt-1.5 text-ui leading-snug text-ink-900 text-justify">
+            Del texto de este documento no se desprende ninguna carga a su cargo.
+          </p>
+        ) : (
+          <div className="mt-1.5 space-y-2.5">
+            {informe.cargas.map((c, k) => (
+              <div key={k} className="rounded-control border border-line-200 bg-canvas px-3 py-2.5">
+                {c.carga && <p className="text-ui leading-snug text-ink-900 text-justify [text-wrap:pretty]">{c.carga}</p>}
+                {/*
+                  EL PLAZO AUSENTE SE DICE CON TODAS SUS LETRAS. Callarlo dejaría
+                  al abogado suponiendo que no hay plazo —que es lo contrario de
+                  lo que se sabe— y rellenarlo con uno recordado sería la cita
+                  fabricada que esta casa tiene prohibida. La respuesta de dónde
+                  sale ese plazo está abajo: el catálogo verificado.
+                */}
+                {c.plazo ? (
+                  <p className="mt-1.5 text-ui font-semibold leading-snug text-brand-700">Plazo que anuncia el documento: {c.plazo}</p>
+                ) : (
+                  <p className="notice-unverified mt-1.5" role="status">
+                    <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-unverified" />
+                    <span className="min-w-0 text-justify">
+                      El documento no anuncia plazo para esta carga. No se le pone uno de memoria: consúltelo abajo, en la guía de actuaciones, donde
+                      el término viene con su artículo y su autoridad verificados.
+                    </span>
+                  </p>
+                )}
+                {c.cita && (
+                  <>
+                    <p className="mt-2 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-400">Dice el documento</p>
+                    <blockquote className="mt-0.5 border-l-2 border-line-200 pl-2.5 text-ui italic leading-snug text-ink-700 text-justify">
+                      «{c.cita}»
+                    </blockquote>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <Seccion titulo="Qué queda pendiente, según el documento" items={informe.loQueSigue} />
+      <Seccion titulo="Lo que el documento no dice" items={informe.noLoDiceElDocumento} tono="aviso" />
+
+      {/* ─── ¿Y QUÉ PUEDO HACER? ─────────────────────────────────────────── */}
+      <section className="rounded-card border border-[rgb(var(--brand-line))] bg-brand-50 px-3 py-3">
+        <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-brand-700">¿Y qué puedo hacer?</h4>
+        <p className="mt-1 text-[12px] leading-snug text-ink-700 text-justify [text-wrap:pretty]">
+          Eso ya no lo dice este documento: lo dice el catálogo. Lleve los hechos a la guía de actuaciones y le propondrá candidatas con su término, su
+          artículo y su autoridad verificados; después ponga el vencimiento en la agenda de términos, desde el icono de calendario de esta revisión en
+          «Revisiones».
+        </p>
+        <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-end">
+          <div className="min-w-0 flex-1">
+            <Combobox
+              etiqueta="Rama"
+              valor={ramaParaLaGuia}
+              opciones={opcionesRama}
+              onChange={onRamaParaLaGuia}
+              vacio="Elegir rama…"
+              anchoBoton="max-w-full"
+              pie="La guía propone dentro de una rama, nunca a ciegas."
+            />
+          </div>
+          <button
+            type="button"
+            onClick={onPedirLaGuia}
+            disabled={!ramaParaLaGuia}
+            className="btn-secondary btn-sm shrink-0 disabled:opacity-50"
+            title="Propone actuaciones del catálogo a partir del texto de este documento"
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+            Llevar a la guía de actuaciones
+          </button>
+        </div>
+        {actuacionSugerida && (
+          <p className="mt-2 rounded-control border border-line-200 bg-canvas px-3 py-2 text-[12px] leading-snug text-ink-900 text-justify">
+            Usted reconoció la actuación <span className="font-semibold">«{actuacionSugerida}»</span>. Su término, su artículo y su autoridad salen de la
+            ficha del catálogo, no de este documento. Póngala en la agenda desde «Revisiones».
+          </p>
+        )}
+      </section>
+    </>
   );
 };

@@ -124,6 +124,132 @@ ${input.texto}
 """`;
 };
 
+/* ─── EL SEGUNDO MODO: UN DOCUMENTO QUE EL ABOGADO RECIBIÓ ───────────────────
+ *
+ * Todo lo de arriba está construido para un escrito PROPIO, el que el abogado
+ * va a presentar: por eso pregunta qué actuación es —para traer su ficha— y
+ * por eso su informe habla de secciones que faltan y de qué corregir antes de
+ * radicar. Un auto, una sentencia, un oficio o una notificación no son eso.
+ * Son papeles que LLEGAN: nadie los va a presentar, no tienen secciones que
+ * les falten frente a la norma, y preguntarle al abogado qué actuación son es
+ * pedirle justamente lo que no sabe y lo que no le importa. Ese fue el defecto
+ * reportado, con estas palabras: «si es un auto de un juez, ¿qué tipo de
+ * actuación escojo? Eso es un problema.»
+ *
+ * ─── POR QUÉ AQUÍ NO HAY FICHA, Y QUÉ SE SIGUE DE ESO ───────────────────────
+ *
+ * En el modo propio la mitad objetiva del informe se apoya en la ficha
+ * verificada del catálogo. Aquí no hay ficha que traer —no se eligió actuación
+ * y no se va a inventar una—, así que el informe SOLO puede afirmar lo que
+ * está escrito en el documento, y tiene que decirlo citándolo. Ni un artículo,
+ * ni un plazo, ni una autoridad, ni un recurso escritos de memoria: sin ficha
+ * que los respalde, una afirmación jurídica de este informe sería exactamente
+ * la cita fabricada que esta casa tiene prohibida, con el agravante de que el
+ * abogado la leería como si viniera del papel que tiene en la mano.
+ *
+ * Por eso el plazo es un campo CITADO o VACÍO. Si el documento no anuncia
+ * plazo, el informe dice que no lo anuncia; nunca completa con uno recordado.
+ *
+ * ─── DÓNDE VIVE EL «¿Y QUÉ PUEDO HACER?» ────────────────────────────────────
+ *
+ * Fuera de este motor. Esa respuesta la da el catálogo, que sí está verificado:
+ * la guía de actuaciones propone candidatas con su término, su artículo y su
+ * autoridad, y la agenda de términos guarda el vencimiento. El informe termina
+ * invitando a esos dos caminos, que ya existen; no propone actuaciones por su
+ * cuenta.
+ */
+
+export type ModoDeRevision = 'ESCRITO_PROPIO' | 'DOCUMENTO_RECIBIDO';
+
+export const MODO_POR_DEFECTO: ModoDeRevision = 'ESCRITO_PROPIO';
+
+export const esModoDeRevision = (v: unknown): v is ModoDeRevision =>
+  v === 'ESCRITO_PROPIO' || v === 'DOCUMENTO_RECIBIDO';
+
+/**
+ * Lo que se guarda en `document_reviews.document_type` cuando el documento fue
+ * recibido.
+ *
+ * Es una etiqueta DEL PRODUCTO, no un nombre jurídico. La columna es texto y
+ * la cabecera del informe la usa para titular; si aquí se escribiera lo que el
+ * modelo cree que es el documento —«auto que resuelve recurso de reposición»—,
+ * esa suposición quedaría archivada con la misma cara que una actuación del
+ * catálogo resuelta contra su ficha. `con_ficha` va en falso por la misma
+ * razón: no hubo ficha.
+ */
+export const ETIQUETA_DOCUMENTO_RECIBIDO = 'Documento recibido';
+
+export const PREGUNTA_POR_DEFECTO_RECIBIDO =
+  'Dígame qué es este documento, qué decide, qué me exige y para cuándo, y qué queda pendiente.';
+
+export const buildRecibidoSystemPrompt = (): string => `Eres un abogado litigante senior en Colombia. Un colega te pasa un documento que RECIBIÓ —un auto, una sentencia, un oficio, una notificación, una resolución, un requerimiento— y te pregunta qué dice y qué tiene que hacer. No lo va a presentar: le llegó.
+
+LA REGLA QUE MANDA SOBRE TODAS: SOLO PUEDES AFIRMAR LO QUE ESTÁ ESCRITO EN EL DOCUMENTO. No dispones de ninguna ficha verificada ni de ninguna fuente distinta del texto que se te entrega. Está PROHIBIDO escribir de memoria un artículo, un plazo, una autoridad competente, un recurso procedente o un requisito. Si el documento no lo dice, la respuesta es que el documento no lo dice.
+
+CITA EL DOCUMENTO. Cada carga y cada plazo van acompañados de las palabras exactas del documento que los imponen, copiadas literalmente, sin corregirlas ni parafrasearlas.
+
+EL PLAZO ES CITADO O ESTÁ VACÍO. Si el documento anuncia un término, escríbelo tal como él lo anuncia y copia la frase. Si NO lo anuncia, deja el plazo como cadena vacía: no lo completes con lo que sabes, ni lo deduzcas del tipo de providencia. Un plazo recordado es indistinguible de uno leído hasta que el abogado lo pierde.
+
+NO ACONSEJES QUÉ ACTUACIÓN PRESENTAR ni qué recurso interponer, salvo que el propio documento lo anuncie, y entonces lo citas. La actuación que procede la resuelve el catálogo verificado de la aplicación, no tú.
+
+NO CITES NINGUNA SENTENCIA, auto ni providencia por su radicado, magistrado o año, salvo que el documento mismo la nombre; entonces la reproduces tal como aparece en él.
+
+RESPONDE ÚNICAMENTE CON UN OBJETO JSON, sin texto antes ni después, con esta forma exacta:
+{
+  "queEs": "qué clase de documento es, según su propio encabezado y su parte resolutiva",
+  "quienLoProfirio": "juzgado, despacho o autoridad, tal como se nombra en el documento; vacío si no se identifica",
+  "radicado": "el radicado o número de proceso tal como aparece; vacío si no aparece",
+  "fecha": "la fecha del documento tal como aparece; vacío si no aparece",
+  "decide": ["qué decide u ordena, en concreto, una frase por punto"],
+  "cargas": [{"carga": "qué le exige a usted, en concreto", "plazo": "el término tal como lo anuncia el documento, o vacío si no lo anuncia", "cita": "las palabras exactas del documento que imponen esa carga y ese plazo"}],
+  "loQueSigue": ["qué queda pendiente o cuál es el paso siguiente del trámite, SEGÚN LO QUE EL PROPIO DOCUMENTO DIGA"],
+  "noLoDiceElDocumento": ["lo que un abogado esperaría encontrar aquí y este documento no dice: el plazo, la autoridad ante quien se acude, el recurso procedente, la fecha de notificación"]
+}
+Si el documento no impone ninguna carga, "cargas" va vacío y lo dices en "loQueSigue". Escribe en español jurídico colombiano, neutro y preciso.
+
+SÉ BREVE Y DENSO, porque el informe tiene un presupuesto de salida fijo y un JSON cortado a la mitad no le sirve a nadie: como máximo CUATRO elementos por lista, cada uno de hasta 25 palabras; las citas, de hasta 40 palabras. JSON compacto, en una sola línea, sin comentarios ni texto fuera del objeto.`;
+
+export const buildRecibidoUserPrompt = (input: {
+  pregunta: string;
+  texto: string;
+  truncado: boolean;
+}): string => {
+  const pregunta = input.pregunta.trim() || PREGUNTA_POR_DEFECTO_RECIBIDO;
+  const recorte = input.truncado
+    ? `\nNOTA: el documento fue recortado por longitud a ${MAX_CARACTERES_REVISION.toLocaleString('es-CO')} caracteres. Léelo solo hasta donde llega y NO reportes como ausente lo que pudo quedar después del corte.\n`
+    : '';
+
+  return `El abogado RECIBIÓ este documento; no lo escribió y no lo va a presentar. No se sabe de qué actuación se trata y no hay ficha verificada: no la supongas.
+
+PREGUNTA DEL ABOGADO: ${pregunta}
+${recorte}
+DOCUMENTO RECIBIDO:
+"""
+${input.texto}
+"""`;
+};
+
+/** Una carga que el documento le impone al abogado, con el plazo que él mismo anuncia. */
+export interface CargaDelDocumento {
+  carga: string;
+  /** Tal como lo anuncia el documento. Vacío cuando el documento no anuncia ninguno. */
+  plazo: string;
+  /** Las palabras exactas del documento que la imponen. */
+  cita: string;
+}
+
+export interface InformeDeDocumentoRecibido {
+  queEs: string;
+  quienLoProfirio: string;
+  radicado: string;
+  fecha: string;
+  decide: string[];
+  cargas: CargaDelDocumento[];
+  loQueSigue: string[];
+  /** Lo que el documento calla y el abogado esperaría: se declara, no se rellena. */
+  noLoDiceElDocumento: string[];
+}
+
 export interface ErrorDeAplicacion {
   donde: string;
   problema: string;
@@ -379,29 +505,13 @@ export const parsearInforme = (crudo: string): InformeDeRevision | null => {
   const inicio = sinCerca.indexOf('{');
   if (inicio === -1) return null;
 
-  const intentos: string[] = [];
-  const fin = sinCerca.lastIndexOf('}');
-  if (fin > inicio) {
-    const bruto = sinCerca.slice(inicio, fin + 1);
-    intentos.push(bruto, sanearJson(bruto));
-  }
-  const saneado = sanearJson(sinCerca.slice(inicio));
-  const reparado = repararJsonCortado(saneado);
-  if (reparado) intentos.push(reparado);
-
-  let objeto: Record<string, unknown> | null = null;
-  for (const intento of intentos) {
-    try {
-      const o = JSON.parse(intento) as unknown;
-      if (o && typeof o === 'object' && !Array.isArray(o)) {
-        objeto = o as Record<string, unknown>;
-        break;
-      }
-    } catch {
-      objeto = null;
-    }
-  }
-
+  /*
+   * Los cuatro intentos de lectura viven en `objetoDelModelo`, compartidos con
+   * el informe del documento recibido: el modelo rompe su JSON de las mismas
+   * maneras en los dos modos, y tener dos copias de esa reparación garantiza
+   * que una de las dos se quede atrás.
+   */
+  const objeto = objetoDelModelo(crudo);
   if (!objeto) return extraerCampos(sinCerca.slice(inicio));
 
   return {
@@ -413,4 +523,88 @@ export const parsearInforme = (crudo: string): InformeDeRevision | null => {
     correccionesTextuales: citas(objeto.correccionesTextuales),
     recomendaciones: lista(objeto.recomendaciones)
   };
+};
+
+/* ─── EL PARSEO HERMANO: EL INFORME DE UN DOCUMENTO RECIBIDO ─────────────────
+ *
+ * Mismo camino de lectura que `parsearInforme` —vallas de código, JSON limpio,
+ * JSON saneado, JSON cortado y reparado— porque el defecto que lo motivó es el
+ * mismo: un informe pagado no se tira porque al modelo se le olvidó escapar
+ * una comilla. Lo que cambia son los campos, que aquí son los del papel que
+ * llegó y no los de un escrito por presentar.
+ *
+ * NO HAY RESCATE POR PATRONES como el de `extraerCampos`, y es deliberado: ahí
+ * el peor caso es una lista incompleta, mientras que aquí una carga a la que se
+ * le pierde la cita o el plazo se leería como una afirmación sin respaldo. Si
+ * el objeto no se puede leer, se devuelve null y el controlador entrega el
+ * texto del modelo tal cual, declarado como texto libre.
+ */
+
+/** El objeto del modelo, leído en orden de confianza. Nunca lanza. */
+const objetoDelModelo = (crudo: string): Record<string, unknown> | null => {
+  const sinCerca = crudo.replace(/```(?:json)?/gi, '').trim();
+  const inicio = sinCerca.indexOf('{');
+  if (inicio === -1) return null;
+
+  const intentos: string[] = [];
+  const fin = sinCerca.lastIndexOf('}');
+  if (fin > inicio) {
+    const bruto = sinCerca.slice(inicio, fin + 1);
+    intentos.push(bruto, sanearJson(bruto));
+  }
+  const reparado = repararJsonCortado(sanearJson(sinCerca.slice(inicio)));
+  if (reparado) intentos.push(reparado);
+
+  for (const intento of intentos) {
+    try {
+      const o = JSON.parse(intento) as unknown;
+      if (o && typeof o === 'object' && !Array.isArray(o)) return o as Record<string, unknown>;
+    } catch {
+      /* siguiente intento */
+    }
+  }
+  return null;
+};
+
+/**
+ * Las cargas, con su plazo y su cita.
+ *
+ * EL PLAZO SE DEJA VACÍO CUANDO EL MODELO NO LO TRAE, y esa es la regla dura:
+ * `cadena` de un `undefined` es la cadena vacía, así que un documento que no
+ * anuncia término llega a la pantalla con el plazo en blanco y la pantalla dice
+ * que el documento no lo anuncia. Nada rellena ese hueco aquí.
+ */
+const cargas = (v: unknown): CargaDelDocumento[] => {
+  if (!Array.isArray(v)) return [];
+  return v
+    .map((e) => {
+      const o = (e ?? {}) as Record<string, unknown>;
+      return { carga: cadena(o.carga), plazo: cadena(o.plazo), cita: cadena(o.cita) };
+    })
+    .filter((e) => e.carga || e.cita);
+};
+
+export const parsearInformeRecibido = (crudo: string): InformeDeDocumentoRecibido | null => {
+  const objeto = objetoDelModelo(crudo);
+  if (!objeto) return null;
+
+  const informe: InformeDeDocumentoRecibido = {
+    queEs: cadena(objeto.queEs),
+    quienLoProfirio: cadena(objeto.quienLoProfirio),
+    radicado: cadena(objeto.radicado),
+    fecha: cadena(objeto.fecha),
+    decide: lista(objeto.decide),
+    cargas: cargas(objeto.cargas),
+    loQueSigue: lista(objeto.loQueSigue),
+    noLoDiceElDocumento: lista(objeto.noLoDiceElDocumento)
+  };
+
+  /*
+   * Un objeto que no dice ni qué es el documento ni qué decide ni qué exige no
+   * es un informe: es un JSON con las llaves correctas y nada dentro. Se
+   * devuelve null y el abogado ve el texto del modelo, que al menos es honesto
+   * sobre lo poco que dijo.
+   */
+  const algo = informe.queEs || informe.decide.length || informe.cargas.length || informe.loQueSigue.length;
+  return algo ? informe : null;
 };

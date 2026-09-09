@@ -338,14 +338,23 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({
               <button
                 type="button"
                 onClick={() => {
+                  /*
+                   * DE UN DOCUMENTO RECIBIDO NO VIAJA NINGÚN NOMBRE DE
+                   * ACTUACIÓN. Ahí `documentType` es la etiqueta del producto
+                   * —«Documento recibido»—, no una actuación: prellenar la
+                   * agenda con ella crearía un vencimiento a nombre de algo que
+                   * el catálogo no conoce. La actuación la elige el abogado en
+                   * el formulario, o se la propone la guía desde el informe.
+                   */
+                  const recibido = r.modo === 'DOCUMENTO_RECIBIDO';
                   dejarPendiente({
                     origen: 'REVISION',
                     asunto: r.cliente || r.fileName,
                     cliente: r.cliente || null,
                     radicado: null,
                     actuacionId: null,
-                    actuacionNombre: r.documentType,
-                    rama: r.legalBranch
+                    actuacionNombre: recibido ? null : r.documentType,
+                    rama: recibido ? null : r.legalBranch
                   });
                   onIrAHerramientas();
                 }}

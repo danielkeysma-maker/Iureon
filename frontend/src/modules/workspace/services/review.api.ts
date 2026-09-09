@@ -33,6 +33,46 @@ export interface InformeDeRevision {
   recomendaciones: string[];
 }
 
+/* ─── LOS DOS MODOS DE REVISIÓN ─────────────────────────────────────────────
+ *
+ * `ESCRITO_PROPIO` es el de siempre: el escrito que el abogado va a presentar,
+ * revisado contra la ficha verificada de su actuación.
+ *
+ * `DOCUMENTO_RECIBIDO` lee un papel que llegó —un auto, una sentencia, un
+ * oficio, una notificación—. No pide actuación, porque quien acaba de recibir
+ * un auto no sabe cómo se llama en el catálogo y no le hace falta saberlo. Sin
+ * actuación no hay ficha, así que su informe SOLO afirma lo que el propio
+ * documento dice y lo dice citándolo; el «¿y qué puedo hacer?» lo responden la
+ * guía de actuaciones y la agenda de términos, que sí están verificadas.
+ */
+export type ModoDeRevision = 'ESCRITO_PROPIO' | 'DOCUMENTO_RECIBIDO';
+
+/** Una carga que el documento le impone al abogado, con el plazo que él mismo anuncia. */
+export interface CargaDelDocumento {
+  carga: string;
+  /**
+   * El término TAL COMO LO ANUNCIA EL DOCUMENTO. Vacío cuando el documento no
+   * anuncia ninguno, y entonces la pantalla dice que no lo anuncia: aquí no se
+   * rellena con un plazo recordado, que es indistinguible de uno leído hasta
+   * que el abogado lo pierde.
+   */
+  plazo: string;
+  /** Las palabras exactas del documento que imponen la carga y el plazo. */
+  cita: string;
+}
+
+export interface InformeDeDocumentoRecibido {
+  queEs: string;
+  quienLoProfirio: string;
+  radicado: string;
+  fecha: string;
+  decide: string[];
+  cargas: CargaDelDocumento[];
+  loQueSigue: string[];
+  /** Lo que el documento calla y el abogado esperaría: se declara, no se rellena. */
+  noLoDiceElDocumento: string[];
+}
+
 /** El archivo tal como se subió, cuando se conservó en el almacenamiento de la firma. */
 export interface ArchivoOriginalGuardado {
   /** Clave en B2, bajo el prefijo de la firma. Sola no abre nada: hace falta una URL firmada. */
@@ -52,7 +92,11 @@ export interface RespuestaDeRevision {
   texto?: string;
   /** Si la firma autorizó conservar el texto y la conversación en el servidor. */
   guardaTexto?: boolean;
+  /** Cuál de los dos modos leyó el documento. Falta en respuestas de servidores anteriores a los dos modos. */
+  modo?: ModoDeRevision;
   informe: InformeDeRevision | null;
+  /** El informe del documento recibido; null en el modo propio. */
+  informeRecibido?: InformeDeDocumentoRecibido | null;
   /** Cuando el revisor no devolvió JSON legible: su texto tal cual. */
   informeLibre: string | null;
   /** Si la actuación tenía ficha verificada y la revisión objetiva se apoyó en ella. */
@@ -64,6 +108,9 @@ export interface RespuestaDeRevision {
 }
 
 export interface PeticionDeRevision {
+  /** Sin él manda `ESCRITO_PROPIO`, que es como se comportaba antes de existir. */
+  modo?: ModoDeRevision;
+  /** Obligatorio en el modo propio; el servidor lo ignora en el recibido. */
   documentType: string;
   legalBranch?: string;
   pregunta: string;
@@ -95,7 +142,10 @@ export interface RevisionGuardada {
   caracteres: number;
   truncado: boolean;
   conFicha: boolean;
+  /** Cuál de los dos modos leyó el documento; el servidor lo deduce del informe guardado y de la etiqueta. */
+  modo: ModoDeRevision;
   informe: InformeDeRevision | null;
+  informeRecibido: InformeDeDocumentoRecibido | null;
   informeLibre: string | null;
   cobradoCop: number;
   userEmail: string;

@@ -1,5 +1,5 @@
 import { supabase } from '../../../config/supabase.config';
-import type { InformeDeRevision } from './documentReview';
+import { ETIQUETA_DOCUMENTO_RECIBIDO, type InformeDeDocumentoRecibido, type InformeDeRevision, type ModoDeRevision } from './documentReview';
 import type { TurnoDelTaller } from './taller';
 import type { ParametrosDePreguntas, PreguntasParaLaAudiencia } from './preguntasAudiencia.prompt';
 
@@ -24,6 +24,15 @@ import type { ParametrosDePreguntas, PreguntasParaLaAudiencia } from './pregunta
 
 export interface RevisionGuardada {
   id: string;
+  /**
+   * Cuál de los dos modos leyó este documento. NO HAY COLUMNA PROPIA y no
+   * hace falta: los dos informes tienen formas disjuntas, así que el modo se
+   * deduce del informe guardado —`queEs` solo existe en el del documento
+   * recibido—. Deducirlo de `document_type` habría atado el archivo a una
+   * etiqueta de producto que alguien puede cambiar; deducirlo de la forma del
+   * dato lo ata a lo que el dato es.
+   */
+  modo: ModoDeRevision;
   documentType: string;
   legalBranch: string | null;
   fileName: string;
@@ -33,7 +42,10 @@ export interface RevisionGuardada {
   caracteres: number;
   truncado: boolean;
   conFicha: boolean;
+  /** El informe del escrito propio. null en el modo recibido. */
   informe: InformeDeRevision | null;
+  /** El informe del documento recibido. null en el modo propio. */
+  informeRecibido: InformeDeDocumentoRecibido | null;
   informeLibre: string | null;
   cobradoCop: number;
   userEmail: string;
@@ -105,6 +117,8 @@ export interface NuevaRevision {
   truncado: boolean;
   conFicha: boolean;
   informe: InformeDeRevision | null;
+  /** Se guarda en la MISMA columna `informe`: es el informe de esta revisión, con otra forma. */
+  informeRecibido?: InformeDeDocumentoRecibido | null;
   informeLibre: string | null;
   cobradoCop: number;
   /** El texto revisado, solo si la firma autorizó conservarlo. */
@@ -112,8 +126,32 @@ export interface NuevaRevision {
 }
 
 /** A row as Supabase returns it → what the API hands out. Pure; tolerant to nulls. */
+/**
+ * Qué forma tiene el informe guardado. `queEs` es el primer campo del informe
+ * del documento recibido y no existe en el del escrito propio, así que basta
+ * mirarlo: una revisión guardada antes de que este modo existiera nunca lo
+ * trae y sigue leyéndose como escrito propio.
+ */
+const esInformeRecibido = (v: unknown): boolean =>
+  Boolean(v) && typeof v === 'object' && 'queEs' in (v as Record<string, unknown>);
+
+/**
+ * El modo de una fila.
+ *
+ * LA LISTA NO TRAE EL INFORME —`COLUMNAS_DE_LISTA` lo deja fuera a propósito,
+ * porque los cuerpos son largos—, así que ahí la forma del dato no está
+ * disponible y la etiqueta es lo único que hay. De ahí las dos vías: la forma
+ * manda cuando el informe viene, y la etiqueta responde en la lista. Con una
+ * sola de las dos, la lista rotularía como escrito propio todo lo recibido.
+ */
+const modoDeLaFila = (row: Record<string, unknown>): ModoDeRevision =>
+  esInformeRecibido(row.informe) || String(row.document_type ?? '') === ETIQUETA_DOCUMENTO_RECIBIDO
+    ? 'DOCUMENTO_RECIBIDO'
+    : 'ESCRITO_PROPIO';
+
 export const aRevisionGuardada = (row: Record<string, unknown>): RevisionGuardada => ({
   id: String(row.id),
+  modo: modoDeLaFila(row),
   documentType: String(row.document_type ?? ''),
   legalBranch: row.legal_branch ? String(row.legal_branch) : null,
   fileName: String(row.file_name ?? ''),
@@ -122,7 +160,9 @@ export const aRevisionGuardada = (row: Record<string, unknown>): RevisionGuardad
   caracteres: Number(row.caracteres ?? 0),
   truncado: Boolean(row.truncado),
   conFicha: Boolean(row.con_ficha),
-  informe: row.informe && typeof row.informe === 'object' ? (row.informe as InformeDeRevision) : null,
+  informe:
+    row.informe && typeof row.informe === 'object' && !esInformeRecibido(row.informe) ? (row.informe as InformeDeRevision) : null,
+  informeRecibido: esInformeRecibido(row.informe) ? (row.informe as InformeDeDocumentoRecibido) : null,
   informeLibre: row.informe_libre ? String(row.informe_libre) : null,
   cobradoCop: Number(row.cobrado_cop ?? 0),
   userEmail: String(row.user_email ?? ''),
@@ -183,7 +223,13 @@ export const documentReviewStore = {
         caracteres: n.caracteres,
         truncado: n.truncado,
         con_ficha: n.conFicha,
-        informe: n.informe,
+        /*
+         * UNA SOLA COLUMNA PARA LOS DOS INFORMES, y sin migración: `informe` es
+         * JSONB y cada modo escribe su propia forma. Añadir una columna hermana
+         * habría exigido SQL que aquí no se escribe, y habría dejado filas con
+         * las dos vacías o las dos llenas, que es peor que una sola verdad.
+         */
+        informe: n.informe ?? n.informeRecibido ?? null,
         informe_libre: n.informeLibre,
         cobrado_cop: n.cobradoCop,
         texto_original: n.textoOriginal ?? null,

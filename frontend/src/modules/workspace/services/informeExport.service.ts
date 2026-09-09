@@ -3,7 +3,7 @@ import { saveAs } from 'file-saver';
 import { jsPDF } from 'jspdf';
 import { registrarFuenteDelEscrito } from '../../documents/services/pdfFonts';
 import { getMarcaActual } from '../../tenant/services/branding.api';
-import { dibujarInformeEnPdf, type DatosDelInforme } from './informeLayout';
+import { dibujarInformeEnPdf, type DatosDeExportacion } from './informeLayout';
 
 /**
  * Exportar el informe de una revisión a PDF y a Word, con la estructura del
@@ -13,21 +13,33 @@ import { dibujarInformeEnPdf, type DatosDelInforme } from './informeLayout';
  * La letra y el tamaño son los de Membrete, como en los escritos: el informe
  * es material de trabajo de la firma y sale con su formato. Sin membrete
  * completo ni bloque de firma —no se radica; se lee para corregir—.
+ *
+ * ─── LOS DOS MODOS SALEN POR AQUÍ MISMO ─────────────────────────────────────
+ *
+ * El informe de un documento RECIBIDO —un auto, una sentencia, un oficio— usa
+ * estas dos mismas funciones, la misma letra, el mismo nombre de archivo y la
+ * misma geometría. Solo cambia lo que se escribe dentro, porque lo que se sabe
+ * de un papel que llegó es otra cosa que lo que se sabe de un escrito propio.
+ * Duplicar la exportación habría dejado una de las dos copias atrás.
  */
 
-const nombreDeArchivo = (d: DatosDelInforme, ext: string): string =>
-  `Revision_${d.documentType.replace(/[^\p{L}\p{N}]+/gu, '_')}_${d.fileName.replace(/\.[^.]+$/, '').replace(/[^\p{L}\p{N}]+/gu, '_')}.${ext}`;
+const nombreDeArchivo = (d: DatosDeExportacion, ext: string): string =>
+  `${d.modo === 'DOCUMENTO_RECIBIDO' ? 'Documento_recibido' : 'Revision'}_${d.documentType.replace(/[^\p{L}\p{N}]+/gu, '_')}_${d.fileName.replace(/\.[^.]+$/, '').replace(/[^\p{L}\p{N}]+/gu, '_')}.${ext}`;
 
-export const exportarInformeAPdf = async (d: DatosDelInforme): Promise<void> => {
+export const exportarInformeAPdf = async (d: DatosDeExportacion): Promise<void> => {
   const marca = getMarcaActual();
   const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'letter' });
   const F = await registrarFuenteDelEscrito(doc, marca?.fontFamily ?? 'Times New Roman');
   dibujarInformeEnPdf(doc, F, { ...d, firmName: d.firmName ?? marca?.firmName }, marca?.fontSizePt ?? 11);
-  doc.setProperties({ title: `Revisión · ${d.documentType}`, subject: d.fileName, creator: 'Iureon' });
+  doc.setProperties({
+    title: d.modo === 'DOCUMENTO_RECIBIDO' ? `Documento recibido · ${d.fileName}` : `Revisión · ${d.documentType}`,
+    subject: d.fileName,
+    creator: 'Iureon'
+  });
   doc.save(nombreDeArchivo(d, 'pdf'));
 };
 
-export const exportarInformeAWord = async (d: DatosDelInforme): Promise<void> => {
+export const exportarInformeAWord = async (d: DatosDeExportacion): Promise<void> => {
   const marca = getMarcaActual();
   const font = marca?.fontFamily === 'Inter' ? 'Calibri' : (marca?.fontFamily ?? 'Times New Roman');
   const base = (marca?.fontSizePt ?? 11) * 2; // docx mide en medios puntos
@@ -50,11 +62,18 @@ export const exportarInformeAWord = async (d: DatosDelInforme): Promise<void> =>
   const vineta = (t: string) =>
     new Paragraph({ bullet: { level: 0 }, alignment: AlignmentType.JUSTIFIED, spacing: { after: 80, line: 300 }, children: [new TextRun({ text: t, font, size: base })] });
 
-  const i = d.informe;
+  const esRecibido = d.modo === 'DOCUMENTO_RECIBIDO';
   const hijos: Paragraph[] = [];
   const firma = d.firmName ?? marca?.firmName;
   if (firma) hijos.push(p(firma, { size: base - 4, color: gris, after: 40, justificar: false }));
-  hijos.push(p(`Revisión del escrito · ${d.documentType}`, { bold: true, size: base + 8, after: 60, justificar: false }));
+  hijos.push(
+    p(esRecibido ? `Documento recibido · ${d.fileName}` : `Revisión del escrito · ${d.documentType}`, {
+      bold: true,
+      size: base + 8,
+      after: 60,
+      justificar: false
+    })
+  );
   if (d.cliente) hijos.push(p(`Cliente o proceso: ${d.cliente}`, { bold: true, size: base - 2, color: titulos, after: 40, justificar: false }));
   hijos.push(
     p(
@@ -64,21 +83,86 @@ export const exportarInformeAWord = async (d: DatosDelInforme): Promise<void> =>
     )
   );
   hijos.push(
-    p(d.conFicha ? `Revisado contra la ficha verificada de «${d.documentType}».` : 'Sin ficha verificada de la actuación: lo objetivo va con menos respaldo.', {
-      italics: true,
-      size: base - 4,
-      color: gris,
-      after: 200,
-      justificar: false
-    })
+    p(
+      esRecibido
+        ? 'Lectura de un documento recibido. Todo lo que sigue sale del texto del propio documento; no hay ficha del catálogo detrás de ninguna afirmación.'
+        : d.conFicha
+        ? `Revisado contra la ficha verificada de «${d.documentType}».`
+        : 'Sin ficha verificada de la actuación: lo objetivo va con menos respaldo.',
+      { italics: true, size: base - 4, color: gris, after: 200, justificar: false }
+    )
   );
-  if (i.resumen) hijos.push(p(i.resumen, { size: base + 1, after: 160 }));
 
   const seccion = (t: string, items: string[]) => {
     if (!items.length) return;
     hijos.push(titulo(t));
     items.forEach((x) => hijos.push(vineta(x)));
   };
+
+  const empaquetar = async () => {
+    const documento = new Document({
+      creator: 'Iureon',
+      title: esRecibido ? `Documento recibido · ${d.fileName}` : `Revisión · ${d.documentType}`,
+      sections: [{ properties: { page: { margin: { top: 1418, right: 1418, bottom: 1418, left: 1701 } } }, children: hijos }]
+    });
+    saveAs(await Packer.toBlob(documento), nombreDeArchivo(d, 'docx'));
+  };
+
+  /* ─── El documento recibido: lo que dice el papel, citado ──────────────── */
+  if (d.modo === 'DOCUMENTO_RECIBIDO') {
+    const r = d.informe;
+    if (r.queEs) hijos.push(p(r.queEs, { size: base + 1, after: 160 }));
+    seccion(
+      'Según el propio documento',
+      [
+        r.quienLoProfirio && `Lo profirió: ${r.quienLoProfirio}`,
+        r.radicado && `Radicado: ${r.radicado}`,
+        r.fecha && `Fecha del documento: ${r.fecha}`
+      ].filter(Boolean) as string[]
+    );
+    seccion('Qué decide u ordena', r.decide);
+
+    hijos.push(titulo('Qué le exige y para cuándo'));
+    if (r.cargas.length) {
+      for (const c of r.cargas) {
+        if (c.carga) hijos.push(p(c.carga, { after: 40 }));
+        /* El plazo ausente se declara: callarlo se leería como que no hay plazo. */
+        hijos.push(
+          p(
+            c.plazo
+              ? `Plazo que anuncia el documento: ${c.plazo}`
+              : 'El documento no anuncia plazo para esta carga. Consúltelo en la guía de actuaciones del catálogo antes de contar días.',
+            { bold: true, color: c.plazo ? titulos : gris, indent: 360, after: 40, justificar: false }
+          )
+        );
+        if (c.cita) hijos.push(p(`Dice el documento: «${c.cita}»`, { italics: true, size: base - 2, color: gris, indent: 360, after: 160 }));
+      }
+    } else {
+      hijos.push(p('Del texto de este documento no se desprende ninguna carga a su cargo.', { after: 120 }));
+    }
+
+    seccion('Qué queda pendiente, según el documento', r.loQueSigue);
+    seccion('Lo que el documento no dice', r.noLoDiceElDocumento);
+    hijos.push(
+      new Paragraph({
+        spacing: { before: 320 },
+        alignment: AlignmentType.LEFT,
+        children: [
+          new TextRun({
+            text: 'Este informe solo afirma lo que está escrito en el documento, citándolo. No hay ficha verificada del catálogo detrás de ninguna de sus líneas: ningún artículo, plazo, autoridad ni recurso se ha completado de memoria. Para saber qué actuación procede, con su término, su artículo y su autoridad verificados, lleve los hechos a la guía de actuaciones; y ponga el vencimiento en la agenda de términos.',
+            font,
+            size: base - 5,
+            color: '6E6E6E'
+          })
+        ]
+      })
+    );
+    await empaquetar();
+    return;
+  }
+
+  const i = d.informe;
+  if (i.resumen) hijos.push(p(i.resumen, { size: base + 1, after: 160 }));
   seccion('Secciones que la norma exige y faltan', i.seccionesFaltantes);
   seccion('Fortalezas', i.fortalezas);
   seccion('Debilidades', i.debilidades);
@@ -119,10 +203,5 @@ export const exportarInformeAWord = async (d: DatosDelInforme): Promise<void> =>
     })
   );
 
-  const documento = new Document({
-    creator: 'Iureon',
-    title: `Revisión · ${d.documentType}`,
-    sections: [{ properties: { page: { margin: { top: 1418, right: 1418, bottom: 1418, left: 1701 } } }, children: hijos }]
-  });
-  saveAs(await Packer.toBlob(documento), nombreDeArchivo(d, 'docx'));
+  await empaquetar();
 };

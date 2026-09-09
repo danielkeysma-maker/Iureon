@@ -1,5 +1,5 @@
 import type { jsPDF } from 'jspdf';
-import type { InformeDeRevision } from './review.api';
+import type { InformeDeDocumentoRecibido, InformeDeRevision } from './review.api';
 
 /**
  * El informe de revisión, dibujado en PDF con la misma estructura del diálogo.
@@ -18,7 +18,7 @@ import type { InformeDeRevision } from './review.api';
  * pantalla para explicar el recorte, no a un documento que se archiva.
  */
 
-export interface DatosDelInforme {
+interface DatosComunes {
   documentType: string;
   fileName: string;
   fecha: string;
@@ -30,8 +30,29 @@ export interface DatosDelInforme {
   cliente?: string;
   /** Quién pidió la revisión (correo), para saber qué abogado lleva el asunto. */
   revisadoPor?: string;
+}
+
+export interface DatosDelInforme extends DatosComunes {
+  /** Ausente en todo lo escrito antes de que existieran dos modos: entonces es el propio. */
+  modo?: 'ESCRITO_PROPIO';
   informe: InformeDeRevision;
 }
+
+/**
+ * El informe de un documento que el abogado RECIBIÓ.
+ *
+ * Comparte la geometría, la letra de la firma, el nombre de archivo y el mismo
+ * par de funciones de exportación que el informe del escrito propio: es la
+ * misma tubería con otro cuerpo. Lo que cambia es lo que se dibuja, porque lo
+ * que se sabe es distinto — aquí no hay ficha del catálogo detrás de nada, y
+ * el papel lo dice en su propia cabecera.
+ */
+export interface DatosDelInformeRecibido extends DatosComunes {
+  modo: 'DOCUMENTO_RECIBIDO';
+  informe: InformeDeDocumentoRecibido;
+}
+
+export type DatosDeExportacion = DatosDelInforme | DatosDelInformeRecibido;
 
 /** Carta con márgenes judiciales: 3 cm izquierda, 2,5 cm derecha, 2,5 arriba y abajo. */
 const PAGINA = { ancho: 215.9, alto: 279.4, izq: 30, der: 25, arriba: 25, abajo: 25 };
@@ -40,7 +61,7 @@ const TINTA: [number, number, number] = [17, 17, 17];
 const TITULO: [number, number, number] = [45, 45, 45];
 const NOTA: [number, number, number] = [100, 100, 100];
 
-export const dibujarInformeEnPdf = (doc: jsPDF, F: string, d: DatosDelInforme, cuerpoPt = 11): void => {
+export const dibujarInformeEnPdf = (doc: jsPDF, F: string, d: DatosDeExportacion, cuerpoPt = 11): void => {
   const anchoTexto = PAGINA.ancho - PAGINA.izq - PAGINA.der;
   const lineaMm = (pt: number) => (pt * 1.4 * 25.4) / 72;
   let y = PAGINA.arriba;
@@ -117,8 +138,21 @@ export const dibujarInformeEnPdf = (doc: jsPDF, F: string, d: DatosDelInforme, c
   };
 
   /* ─── Cabecera ─────────────────────────────────────────────────────────── */
+  const esRecibido = d.modo === 'DOCUMENTO_RECIBIDO';
   if (d.firmName) bloque(d.firmName, cuerpoPt - 2, 'normal', 0, NOTA, false);
-  bloque(`Revisión del escrito · ${d.documentType}`, cuerpoPt + 5, 'bold', 0, TINTA, false);
+  /*
+   * EL TÍTULO DICE CUÁL DE LOS DOS SE LEYÓ. Un informe archivado que no
+   * distingue entre «revisé mi escrito» y «leí el papel que me llegó» se
+   * malinterpreta el día que alguien lo abre sin recordar de dónde salió.
+   */
+  bloque(
+    esRecibido ? `Documento recibido · ${d.fileName}` : `Revisión del escrito · ${d.documentType}`,
+    cuerpoPt + 5,
+    'bold',
+    0,
+    TINTA,
+    false
+  );
   if (d.cliente) bloque(`Cliente o proceso: ${d.cliente}`, cuerpoPt - 1, 'bold', 0, TITULO, false);
   bloque(
     [d.fileName, d.fecha, d.revisadoPor && `revisión pedida por ${d.revisadoPor}`].filter(Boolean).join(' · ') +
@@ -130,7 +164,9 @@ export const dibujarInformeEnPdf = (doc: jsPDF, F: string, d: DatosDelInforme, c
     false
   );
   bloque(
-    d.conFicha
+    esRecibido
+      ? 'Lectura de un documento recibido. Todo lo que sigue sale del texto del propio documento; no hay ficha del catálogo detrás de ninguna afirmación.'
+      : d.conFicha
       ? `Revisado contra la ficha verificada de «${d.documentType}».`
       : 'Sin ficha verificada de la actuación: lo objetivo va con menos respaldo.',
     cuerpoPt - 2,
@@ -141,15 +177,73 @@ export const dibujarInformeEnPdf = (doc: jsPDF, F: string, d: DatosDelInforme, c
   );
   y += 2;
 
-  /* ─── Cuerpo, en el orden del diálogo ──────────────────────────────────── */
-  const i = d.informe;
-  if (i.resumen) bloque(i.resumen, cuerpoPt + 0.5);
-
   const seccion = (t: string, items: string[]) => {
     if (items.length === 0) return;
     titulo(t);
     lista(items);
   };
+
+  /* ─── Cuerpo del documento recibido ────────────────────────────────────── */
+  if (d.modo === 'DOCUMENTO_RECIBIDO') {
+    const r = d.informe;
+    if (r.queEs) bloque(r.queEs, cuerpoPt + 0.5);
+    const identificacion = [
+      r.quienLoProfirio && `Lo profirió: ${r.quienLoProfirio}`,
+      r.radicado && `Radicado: ${r.radicado}`,
+      r.fecha && `Fecha del documento: ${r.fecha}`
+    ].filter(Boolean) as string[];
+    if (identificacion.length) {
+      titulo('Según el propio documento');
+      lista(identificacion);
+    }
+    seccion('Qué decide u ordena', r.decide);
+
+    if (r.cargas.length > 0) {
+      titulo('Qué le exige y para cuándo');
+      for (const c of r.cargas) {
+        if (c.carga) bloque(c.carga, cuerpoPt);
+        /*
+         * EL PLAZO VACÍO SE ESCRIBE, NO SE OMITE. Saltarse la línea dejaría al
+         * lector suponiendo que no había plazo o que se olvidó decirlo; aquí se
+         * afirma lo único que se sabe — que el documento no lo anuncia — y se
+         * remite a donde ese dato sí está verificado.
+         */
+        bloque(
+          c.plazo
+            ? `Plazo que anuncia el documento: ${c.plazo}`
+            : 'El documento no anuncia plazo para esta carga. Consúltelo en la guía de actuaciones del catálogo antes de contar días.',
+          cuerpoPt,
+          'bold',
+          4,
+          c.plazo ? TITULO : NOTA,
+          false
+        );
+        if (c.cita) bloque(`Dice el documento: «${c.cita}»`, cuerpoPt - 1, 'italic', 4, NOTA);
+        y += 1.5;
+      }
+    } else {
+      titulo('Qué le exige y para cuándo');
+      bloque('Del texto de este documento no se desprende ninguna carga a su cargo.', cuerpoPt);
+    }
+
+    seccion('Qué queda pendiente, según el documento', r.loQueSigue);
+    seccion('Lo que el documento no dice', r.noLoDiceElDocumento);
+
+    y += 4;
+    bloque(
+      'Este informe solo afirma lo que está escrito en el documento, citándolo. No hay ficha verificada del catálogo detrás de ninguna de sus líneas: ningún artículo, plazo, autoridad ni recurso se ha completado de memoria. Para saber qué actuación procede, con su término, su artículo y su autoridad verificados, lleve los hechos a la guía de actuaciones; y ponga el vencimiento en la agenda de términos.',
+      cuerpoPt - 2.5,
+      'normal',
+      0,
+      NOTA
+    );
+    return;
+  }
+
+  /* ─── Cuerpo del escrito propio, en el orden del diálogo ───────────────── */
+  const i = d.informe;
+  if (i.resumen) bloque(i.resumen, cuerpoPt + 0.5);
+
   seccion('Secciones que la norma exige y faltan', i.seccionesFaltantes);
   seccion('Fortalezas', i.fortalezas);
   seccion('Debilidades', i.debilidades);

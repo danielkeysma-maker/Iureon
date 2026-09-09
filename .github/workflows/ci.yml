@@ -80,6 +80,8 @@ jobs:
         run: npm run check:preguntas
       - name: Agenda de terminos (when it warns, no repeats, refuses an ambiguous ficha)
         run: npm run check:agenda
+      - name: Revision (the received-document report never fills in a term the document does not state)
+        run: npm run check:revision
 
       - name: Build
         run: npm run build
