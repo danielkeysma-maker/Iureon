@@ -4,11 +4,17 @@
     "verified_at": "2026-08-29",
     "source_of_truth": "Ley 1448 de 2011, arts. 3, 72 a 102 y 208, leidos en secretariasenado.gov.co el 29 de agosto de 2026 con las reformas incorporadas: Ley 2078 de 2021 (art. 208: vigencia hasta el 10 de junio de 2031), Ley 2421 de 2024 (arts. 3 y 76) y Ley 2294 de 2023 (art. 97 lit. e). VIGENCIA COMPROBADA: la ley no vencio en 2021; rige hasta el 10 de junio de 2031, y son titulares los despojados entre el 1 de enero de 1991 y ese termino (art. 75). LO QUE DEFINE LA RAMA: jurisdiccion propia (jueces civiles del circuito y magistrados especializados, arts. 79-80), requisito de procedibilidad (registro de la URT, art. 76), inversion de la carga de la prueba con prueba sumaria (art. 78), presunciones de derecho y legales sobre los negocios (art. 77), unica instancia con revision ante la Corte (arts. 79 y 92) y consulta de la sentencia que niega. El reloj del opositor son quince dias (art. 88); el del comprador de un predio restituido, dos anos (art. 101).",
     "gaps": [
-      "RESTITUCION_TIERRAS: el computo exacto de los quince dias de oposicion (art. 88) figura en el Senado como aparte condicionalmente exequible; la sentencia de constitucionalidad no se leyo y la ficha lo declara.",
       "RESTITUCION_TIERRAS: el termino y las causales del recurso de revision (art. 92) remiten al estatuto procesal civil (CPC arts. 379 ss., hoy CGP); no se releyeron aqui y la ficha remite a la de CIVIL.",
       "RESTITUCION_TIERRAS: los decretos-ley etnicos 4633, 4634 y 4635 de 2011 (restitucion de derechos territoriales de pueblos indigenas, rrom y comunidades negras) no se catalogaron: tienen procedimiento propio.",
       "RESTITUCION_TIERRAS: el tramite administrativo interno de la URT (Decreto 1071 de 2015, antes 4829 de 2011) para la inscripcion —microfocalizacion, estudio, recursos contra la negativa— no se leyo; la ficha del registro cita solo lo que la ley dice.",
-      "RESTITUCION_TIERRAS: el art. 91 par. 1 se leyo hasta «hasta tanto esten completament[e]»; el resto del paragrafo y los pars. 2 y siguientes no se citan."
+      "RESTITUCION_TIERRAS: el art. 91 par. 1 se leyo hasta «hasta tanto esten completament[e]»; el resto del paragrafo y los pars. 2 y siguientes no se citan.",
+      "RESTITUCION_TIERRAS: La caracterización socioeconómica del segundo ocupante y la metodología con que la practica la Unidad de Restitución (art. 91A parágrafo) no se leyeron: la Unidad las define por acto administrativo propio, y ni el Senado ni Función Pública sirven esos acuerdos. La ficha del segundo ocupante cita solo lo que el art. 91A y la C-330 de 2016 dicen.",
+      "RESTITUCION_TIERRAS: Los Acuerdos de la Unidad Administrativa Especial de Gestión de Restitución de Tierras Despojadas sobre segundos ocupantes (los que la propia Corte exhortó a expedir en la C-330 de 2016) no se catalogaron: urt.gov.co no está en la lista blanca de fuentes oficiales y no se leyó ninguno en fuente admitida.",
+      "RESTITUCION_TIERRAS: El art. 91A tiene dos cortes temporales distintos y ambos quedaron citados verbatim en el término, porque no se leyó sentencia que los concilie: el inciso 1 exige que la relación con el predio sea anterior a «la diligencia de comunicación de la que trata el artículo 76» y el inciso 2 que sea «anterior a la macro focalización de la zona intervenida». La macrofocalización precede a la microfocalización y a la comunicación, así que el inciso 2 es el corte más exigente.",
+      "RESTITUCION_TIERRAS: La Sentencia C-143 de 2025, que declaró exequible el texto de la Ley 2294 de 2023 que adicionó el art. 91A, consta en las notas de vigencia del Senado como tomada del Comunicado de Prensa de 23 y 24 de abril de 2025; el texto completo de esa sentencia no se leyó.",
+      "RESTITUCION_TIERRAS: Tacha de testigos (CGP art. 211), tacha de falsedad de documento (CGP arts. 269 y 270), contradicción y solicitud de aclaración o complementación del dictamen pericial (CGP arts. 228 y 231) y alegatos de conclusión: la Ley 1448 de 2011 NO les da regla ni término propios en el proceso de restitución, y ninguno de ellos está catalogado hoy en CIVIL. Son un hueco del CGP, no de esta rama, y aquí no se crearon para no fijar en RESTITUCION_TIERRAS un término que pertenece al estatuto procesal general.",
+      "RESTITUCION_TIERRAS: Solicitud de acumulación procesal (Ley 1448 de 2011, art. 95): no se catalogó como actuación de parte porque el artículo la construye como pérdida de competencia de los funcionarios «desde el momento en que [...] sean informados sobre la iniciación del procedimiento de restitución por el magistrado que conoce del asunto», es decir como acto del despacho, y no fija término de parte alguno.",
+      "RESTITUCION_TIERRAS, 2026-09-08: hueco CERRADO. El cómputo de los quince días del art. 88 lo fijó la Sentencia C-438 de 2013 —«bajo el entendido que el término para las oposiciones se empezará a contar a partir de la notificación de la admisión de la solicitud», punto DÉCIMO PRIMERO de su parte resolutiva, leído en corteconstitucional.gov.co/Relatoria/2013/C-438-13.htm—, y la expresión «exenta de culpa» de los arts. 88, 91, 98 y 105 la condicionó la Sentencia C-330 de 2016."
     ],
     "unverified": []
   },
@@ -123,9 +129,9 @@
       "exact_name": "Oposición a la solicitud de restitución de tierras",
       "area": "RESTITUCION_TIERRAS",
       "role": "LITIGANTE",
-      "legal_basis": "Ley 1448 de 2011, art. 88 (oposiciones: quince días, bajo juramento, documentos que deben acompañarse), art. 87 (traslado a titulares inscritos y a indeterminados por la publicación; representante judicial en cinco días), art. 78 (inversión de la carga de la prueba), art. 77 (presunciones que debe desvirtuar), art. 89 (avalúo por Lonja), art. 90 (período probatorio de treinta días), art. 91 (compensación al opositor de buena fe exenta de culpa), art. 98 (pago por el Fondo de la URT) y art. 99 (contratos de uso sobre proyectos productivos)",
+      "legal_basis": "Ley 1448 de 2011, art. 88 (oposiciones: quince días, bajo juramento, documentos que deben acompañarse), art. 87 (traslado a titulares inscritos y a indeterminados por la publicación; representante judicial en cinco días), art. 78 (inversión de la carga de la prueba), art. 77 (presunciones que debe desvirtuar), art. 89 (avalúo por Lonja), art. 90 (período probatorio de treinta días), art. 91 (compensación al opositor de buena fe exenta de culpa), art. 98 (pago por el Fondo de la URT) y art. 99 (contratos de uso sobre proyectos productivos), y la Sentencia C-438 de 2013 de la Corte Constitucional, que fija el inicio del cómputo de los quince días en la notificación de la admisión de la solicitud",
       "competent_authority": "Juez Civil del Circuito especializado en restitución de tierras del lugar donde se hallen los bienes, en única instancia si no se reconocen opositores; si los hay, tramita hasta antes del fallo y remite a los Magistrados de la Sala Civil del Tribunal Superior especializados en restitución de tierras (Ley 1448 de 2011, arts. 79 y 80)",
-      "term": "QUINCE (15) DÍAS, RELOJ DEL OPOSITOR, Y LO QUE NO SE PRUEBA EN ESE ESCRITO NO SE PRESUME A SU FAVOR. «Las oposiciones se deberán presentar ante el juez dentro de los quince (15) días siguientes a la solicitud» (art. 88; el aparte figura como condicionalmente exequible en el Senado, y el cómputo exacto debe confrontarse con la sentencia de constitucionalidad, que no se leyó en esta pasada). El traslado se surte «a quienes figuren como titulares inscritos de derechos en el certificado de tradición y libertad», y a los indeterminados «con la publicación» del auto admisorio (art. 87); si los terceros determinados no se presentan, «se les designará un representante judicial para el proceso en el término de cinco (5) días». FORMA Y CONTENIDO: «Las oposiciones a la solicitud efectuadas por particulares se presentarán bajo la gravedad del juramento y se admitirán, si son pertinentes. […] Al escrito de oposición se acompañarán los documentos que se quieran hacer valer como prueba de la calidad de despojado del respectivo predio, de la buena fe exenta de culpa, del justo título del derecho y las demás pruebas que pretenda hacer valer el opositor en el proceso, referentes al valor del derecho, o la tacha de la calidad de despojado de la persona o grupo en cuyo favor se presentó la solicitud» (art. 88). LA CARGA ES DEL OPOSITOR: la prueba sumaria del solicitante basta «para trasladar la carga de la prueba al demandado o a quienes se opongan a la pretensión de la víctima» (art. 78), y contra los predios inscritos operan presunciones de derecho y legales de ausencia de consentimiento (art. 77): la oposición tiene que desvirtuarlas con prueba, no negarlas. LO QUE SE GANA PROBANDO LA BUENA FE EXENTA DE CULPA: la sentencia «decretará las compensaciones a que hubiera lugar, a favor de los opositores que probaron buena fe exenta de culpa» (art. 91), pagadas por el Fondo de la URT y «en ningún caso […] excederá el valor del predio acreditado en el proceso» (art. 98); «el valor del predio lo podrá acreditar el opositor mediante el avalúo comercial del predio elaborado por una Lonja de Propiedad Raíz», y sin controversia rige el avalúo catastral (art. 89). Si hay un proyecto agroindustrial, el opositor de buena fe exenta de culpa puede obtener autorización para un contrato de uso con el restituido (art. 99); sin esa prueba, el proyecto pasa a la URT. EL PROCESO ES CORTO: período probatorio de treinta (30) días (art. 90), y el juez «tan pronto […] llegue al convencimiento […] podrá proferir el fallo sin necesidad de decretar o practicar las pruebas solicitadas» (art. 89). Con opositor reconocido, la competencia para fallar pasa a los Magistrados del Tribunal (art. 79).",
+      "term": "QUINCE (15) DÍAS, RELOJ DEL OPOSITOR, Y LO QUE NO SE PRUEBA EN ESE ESCRITO NO SE PRESUME A SU FAVOR. «Las oposiciones se deberán presentar ante el juez dentro de los quince (15) días siguientes a la solicitud» (art. 88), aparte declarado EXEQUIBLE por la Corte Constitucional en la Sentencia C-438 de 2013 (M.P. Alberto Rojas Ríos, 11 de julio de 2013) «bajo el entendido que el término para las oposiciones se empezará a contar a partir de la notificación de la admisión de la solicitud»: EL RELOJ NO ARRANCA CON LA SOLICITUD SINO CON LA NOTIFICACIÓN DEL AUTO ADMISORIO. El traslado se surte «a quienes figuren como titulares inscritos de derechos en el certificado de tradición y libertad», y a los indeterminados «con la publicación» del auto admisorio (art. 87); si los terceros determinados no se presentan, «se les designará un representante judicial para el proceso en el término de cinco (5) días». FORMA Y CONTENIDO: «Las oposiciones a la solicitud efectuadas por particulares se presentarán bajo la gravedad del juramento y se admitirán, si son pertinentes. […] Al escrito de oposición se acompañarán los documentos que se quieran hacer valer como prueba de la calidad de despojado del respectivo predio, de la buena fe exenta de culpa, del justo título del derecho y las demás pruebas que pretenda hacer valer el opositor en el proceso, referentes al valor del derecho, o la tacha de la calidad de despojado de la persona o grupo en cuyo favor se presentó la solicitud» (art. 88). LA CARGA ES DEL OPOSITOR: la prueba sumaria del solicitante basta «para trasladar la carga de la prueba al demandado o a quienes se opongan a la pretensión de la víctima» (art. 78), y contra los predios inscritos operan presunciones de derecho y legales de ausencia de consentimiento (art. 77): la oposición tiene que desvirtuarlas con prueba, no negarlas. LO QUE SE GANA PROBANDO LA BUENA FE EXENTA DE CULPA: la sentencia «decretará las compensaciones a que hubiera lugar, a favor de los opositores que probaron buena fe exenta de culpa» (art. 91), pagadas por el Fondo de la URT y «en ningún caso […] excederá el valor del predio acreditado en el proceso» (art. 98); «el valor del predio lo podrá acreditar el opositor mediante el avalúo comercial del predio elaborado por una Lonja de Propiedad Raíz», y sin controversia rige el avalúo catastral (art. 89). Si hay un proyecto agroindustrial, el opositor de buena fe exenta de culpa puede obtener autorización para un contrato de uso con el restituido (art. 99); sin esa prueba, el proyecto pasa a la URT. EL PROCESO ES CORTO: período probatorio de treinta (30) días (art. 90), y el juez «tan pronto […] llegue al convencimiento […] podrá proferir el fallo sin necesidad de decretar o practicar las pruebas solicitadas» (art. 89). Con opositor reconocido, la competencia para fallar pasa a los Magistrados del Tribunal (art. 79).",
       "required_sections": [
         {
           "n": 1,
@@ -435,6 +441,224 @@
         }
       ],
       "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1448_2011_pr002.html"
+    },
+    {
+      "exact_name": "Solicitud de reconocimiento de la calidad de segundo ocupante y de las medidas del artículo 91A en el proceso de restitución de tierras",
+      "area": "RESTITUCION_TIERRAS",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1448 de 2011, art. 91A (adicionado por el art. 56 de la Ley 2294 de 2023; el texto adicionado fue declarado exequible por la Corte Constitucional en la Sentencia C-143 de 2025, según el comunicado de prensa de 23 y 24 de abril de 2025 reseñado en las notas de vigencia del Senado), art. 91 (contenido del fallo y término de cuatro meses para dictarlo), art. 88 (oportunidad de las oposiciones), art. 76 (diligencia de comunicación al ocupante), art. 94 (actuaciones inadmisibles) y art. 100 (entrega y desalojo). El estándar de la buena fe exenta de culpa de los arts. 88, 91, 98 y 105 fue declarado exequible de forma condicionada, frente a los segundos ocupantes, por la Sentencia C-330 de 2016 (M.P. María Victoria Calle Correa, 23 de junio de 2016)",
+      "competent_authority": "Juez Civil del Circuito especializado en restitución de tierras del lugar donde se hallen ubicados los bienes; si en el proceso se reconocen opositores, decide en única instancia el Magistrado de la Sala Civil del Tribunal Superior de Distrito Judicial especializado en restitución de tierras (Ley 1448 de 2011, arts. 79 y 80). La caracterización socioeconómica la practica, por orden del juez, la Unidad Administrativa Especial de Gestión de Restitución de Tierras Despojadas (art. 91A parágrafo)",
+      "term": "EL ARTÍCULO 91A NO FIJA TÉRMINO PROPIO, Y EL RELOJ QUE EXTINGUE EL DERECHO DEL SEGUNDO OCUPANTE ES EL DE LA OPOSICIÓN. Las medidas se reconocen en la sentencia —«Las medidas que se podrán reconocer en la sentencia deberán atender los principios de sostenibilidad, efectividad y carácter transformador de la restitución de tierras, así como el enfoque de género»— y el fallo tiene fecha cierta: «El Juez o Magistrado dictará el fallo dentro de los cuatro meses siguientes a la solicitud» (art. 91 par. 2). Quien quiera ser oído entra por la única puerta que el proceso abre a los terceros: las oposiciones, que «se deberán presentar ante el juez dentro de los quince (15) días siguientes a la solicitud» (art. 88), aparte declarado exequible por la Sentencia C-438 de 2013 «bajo el entendido que el término para las oposiciones se empezará a contar a partir de la notificación de la admisión de la solicitud». QUIÉN ES SEGUNDO OCUPANTE, VERBATIM: los jueces «reconocerán la calidad de segundo ocupante a quien tenga condiciones de vulnerabilidad socioeconómica y ejerza una relación material y/o jurídica de propiedad, posesión u ocupación permanente con un predio objeto de restitución, de la cual se deriven sus medios de subsistencia y/o tenga una relación de habitación; que no tenga o haya tenido nexos directos o indirectos con los hechos que dieron lugar al despojo o abandono forzoso y que la relación con el predio se haya dado antes de la diligencia de comunicación de la que trata el artículo 76 de la presente ley» (art. 91A inc. 1). DOS CORTES TEMPORALES DISTINTOS EN EL MISMO ARTÍCULO, Y HAY QUE PROBAR EL MÁS EXIGENTE: el inciso 2 añade que las medidas «se aplicarán por una sola vez y por núcleo familiar para quienes tengan relación con el predio objeto de restitución, la cual deberá ser anterior a la macro focalización de la zona intervenida, reconocidos como tal en las providencias judiciales de restitución de tierras». QUÉ SE PUEDE PEDIR: las medidas «comprenderán: i) acceso a tierras, ii) proyectos productivos, iii) gestión de priorización para el acceso a programas de subsidio de vivienda, y iv) traslado del caso para la formalización de la propiedad rural»; y «no podrán poner en riesgo la sostenibilidad fiscal de la política de restitución de tierras como tampoco ir en contra de lo establecido en el Marco de Gasto de Mediano Plazo y Marco Fiscal de Mediano Plazo vigente» (art. 91A). CARACTERIZACIÓN: «Cuando los jueces de la República ordenen a la Unidad Administrativa Especial de Gestión de Restitución de Tierras realizar caracterización socioeconómica, esta se realizará por una sola vez a los habitantes del predio, conforme la metodología que defina dicha Unidad» (art. 91A par.). EL ESTÁNDAR DE BUENA FE SE MIDE DISTINTO PARA ÉL: la expresión «exenta de culpa» de los arts. 88, 91, 98 y 105 es exequible «en el entendido de que es un estándar que debe ser interpretado por los jueces de forma diferencial, frente a los segundos ocupantes, que demuestren condiciones de vulnerabilidad, y no hayan tenido relación directa o indirecta con el despojo» (Sentencia C-330 de 2016). LO QUE ESTÁ PROHIBIDO INTENTAR: «En este proceso no son admisibles la demanda de reconvención, la intervención excluyente o coadyuvante, incidentes por hechos que configuren excepciones previas, ni la conciliación. En caso de que se propongan tales actuaciones o trámites, el Juez o Magistrado deberá rechazarlas de plano, por auto que no tendrá recurso alguno» (art. 94): la comparecencia del segundo ocupante no se canaliza como coadyuvancia ni como intervención excluyente. Y NO HAY SEGUNDA OPORTUNIDAD EN LA ENTREGA: para entregar el predio el juez «practicará la respectiva diligencia de desalojo en un término perentorio de cinco (5) días [...] De la diligencia se levantará un acta y en ella no procederá oposición alguna» (art. 100).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del solicitante y de su núcleo familiar, y del proceso de restitución y del predio",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 91A"
+        },
+        {
+          "n": 2,
+          "name": "Prueba de la relación material y/o jurídica de propiedad, posesión u ocupación permanente con el predio, y de que de ella se derivan los medios de subsistencia o la habitación",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 91A inc. 1"
+        },
+        {
+          "n": 3,
+          "name": "Prueba de las condiciones de vulnerabilidad socioeconómica",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 91A inc. 1; Sentencia C-330 de 2016"
+        },
+        {
+          "n": 4,
+          "name": "Prueba de la ausencia de nexos directos o indirectos con los hechos que dieron lugar al despojo o abandono forzoso",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 91A inc. 1"
+        },
+        {
+          "n": 5,
+          "name": "Prueba de que la relación con el predio es anterior a la diligencia de comunicación del art. 76 y anterior a la macrofocalización de la zona",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 91A incs. 1 y 2"
+        },
+        {
+          "n": 6,
+          "name": "Petición concreta de las medidas del art. 91A: acceso a tierras, proyecto productivo, priorización para subsidio de vivienda o traslado del caso para la formalización de la propiedad rural",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 91A inc. 1"
+        },
+        {
+          "n": 7,
+          "name": "Solicitud de caracterización socioeconómica a cargo de la Unidad de Restitución",
+          "mandatory": false,
+          "basis": "Ley 1448 de 2011, art. 91A parágrafo"
+        },
+        {
+          "n": 8,
+          "name": "Manifestación de que no se ha recibido antes ninguna de estas medidas, por aplicarse por una sola vez y por núcleo familiar",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 91A inc. 2"
+        },
+        {
+          "n": 9,
+          "name": "Constancia de presentación dentro de los quince días siguientes a la notificación de la admisión de la solicitud",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 88; Sentencia C-438 de 2013"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1448_2011_pr002.html"
+    },
+    {
+      "exact_name": "Solicitud de compensación a favor del opositor que probó buena fe exenta de culpa en el proceso de restitución de tierras",
+      "area": "RESTITUCION_TIERRAS",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1448 de 2011, art. 91 (contenido del fallo, lits. j y r), art. 98 (pago de compensaciones y tope), art. 89 inc. 2 (acreditación del valor del predio por avalúo de Lonja de Propiedad Raíz), art. 88 (oposiciones y documentos que se acompañan) y art. 90 (periodo probatorio de treinta días). El aparte tachado del art. 98 fue declarado inexequible por la Sentencia C-795 de 2014 (M.P. Jorge Iván Palacio Palacio) y la expresión «exenta de culpa» de los arts. 88, 91, 98 y 105 es condicionalmente exequible según la Sentencia C-330 de 2016 (M.P. María Victoria Calle Correa)",
+      "competent_authority": "El Juez Civil del Circuito especializado en restitución de tierras, o el Magistrado de la Sala Civil del Tribunal Superior especializado en restitución de tierras cuando se reconocen opositores, que decreta la compensación en la sentencia (Ley 1448 de 2011, arts. 79, 80 y 91). El pago lo hace el Fondo de la Unidad Administrativa Especial de Gestión de Restitución de Tierras Despojadas (art. 98)",
+      "term": "NO HAY TÉRMINO AUTÓNOMO: LA COMPENSACIÓN SE PIDE Y SE PRUEBA DENTRO DE LA OPOSICIÓN, Y ESE RELOJ ES DE QUINCE DÍAS. «Las oposiciones se deberán presentar ante el juez dentro de los quince (15) días siguientes a la solicitud» (art. 88), aparte declarado exequible por la Sentencia C-438 de 2013 «bajo el entendido que el término para las oposiciones se empezará a contar a partir de la notificación de la admisión de la solicitud»; y «Al escrito de oposición se acompañarán los documentos que se quieran hacer valer como prueba [...] de la buena fe exenta de culpa, del justo título del derecho y las demás pruebas que pretenda hacer valer el opositor en el proceso, referentes al valor del derecho» (art. 88). Después solo queda el «período probatorio [...] de treinta (30) días» (art. 90), y ni siquiera está asegurado: «Tan pronto el Juez o Magistrado llegue al convencimiento respecto de la situación litigiosa, podrá proferir el fallo sin necesidad de decretar o practicar las pruebas solicitadas» (art. 89). LA COMPENSACIÓN SOLO SE DECRETA A QUIEN PROBÓ: la sentencia «decretará las compensaciones a que hubiera lugar, a favor de los opositores que probaron buena fe exenta de culpa dentro del proceso» (art. 91) y contendrá «Las órdenes necesarias para garantizar que las partes de buena fe exenta de culpa vencidas en el proceso sean compensadas cuando fuera del caso, en los términos establecidos por la presente ley» (art. 91 lit. r) y «Las órdenes pertinentes para que se haga efectivo cumplimiento de las compensaciones de que trata la ley, y aquellas tendientes a garantizar los derechos de todas las partes en relación con las mejoras sobre los bienes objeto de restitución» (art. 91 lit. j). CÓMO SE ACREDITA EL VALOR, Y QUÉ PASA SI NO SE HACE: «El valor del predio lo podrá acreditar el opositor mediante el avalúo comercial del predio elaborado por una Lonja de Propiedad Raíz de las calidades que determine el Gobierno Nacional. Si no se presenta controversia sobre el precio, se tendrá como valor total del predio el avalúo presentado por la autoridad catastral competente» (art. 89 inc. 2): sin avalúo de Lonja rige el catastral, que suele ser inferior. EL TOPE: «El valor de las compensaciones que decrete la sentencia a favor de los opositores que probaron la buena fe exenta de culpa dentro del proceso, será pagado por el Fondo de la Unidad Administrativa Especial de Gestión de Restitución de Tierras Despojadas. En ningún caso el valor de la compensación o compensaciones excederá el valor del predio acreditado en el proceso» y «El valor de las compensaciones monetarias deberá ser pagado en dinero» (art. 98). ESTÁNDAR DIFERENCIAL: la expresión «exenta de culpa» es exequible «en el entendido de que es un estándar que debe ser interpretado por los jueces de forma diferencial, frente a los segundos ocupantes, que demuestren condiciones de vulnerabilidad, y no hayan tenido relación directa o indirecta con el despojo» (Sentencia C-330 de 2016). Y LA COMPENSACIÓN NO RETRASA LA ENTREGA MÁS DE TRES DÍAS: la entrega se hace «dentro de los tres días siguientes al pago de las compensaciones ordenadas por el Juez o Magistrado, cuando hubiera lugar a ello, o dentro de los tres días siguientes a la ejecutoria de la sentencia» (art. 100).",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del opositor, del proceso y del derecho que alega sobre el predio",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 88"
+        },
+        {
+          "n": 2,
+          "name": "Prueba de la buena fe exenta de culpa en la adquisición y en la tenencia del predio",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, arts. 88 y 91; Sentencia C-330 de 2016"
+        },
+        {
+          "n": 3,
+          "name": "Justo título y cadena de tradición",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 88"
+        },
+        {
+          "n": 4,
+          "name": "Avalúo comercial del predio elaborado por Lonja de Propiedad Raíz, con las calidades que determine el Gobierno Nacional",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 89 inc. 2"
+        },
+        {
+          "n": 5,
+          "name": "Relación y prueba de las mejoras sobre el bien objeto de restitución",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 91 lit. j"
+        },
+        {
+          "n": 6,
+          "name": "Petición expresa de que la sentencia decrete la compensación a cargo del Fondo de la Unidad de Restitución, sin exceder el valor del predio acreditado",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, arts. 91 lit. r y 98"
+        },
+        {
+          "n": 7,
+          "name": "Constancia de presentación dentro de los quince días siguientes a la notificación de la admisión de la solicitud",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 88; Sentencia C-438 de 2013"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1448_2011_pr002.html"
+    },
+    {
+      "exact_name": "Solicitud de autorización del contrato para el uso del predio restituido con proyecto agroindustrial productivo",
+      "area": "RESTITUCION_TIERRAS",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1448 de 2011, art. 99 (artículo condicionalmente exequible: incisos 1 y 3 declarados exequibles por la Sentencia C-715 de 2012, M.P. Luis Ernesto Vargas Silva, e inciso 2 declarado exequible de forma condicionada por la Sentencia C-820 de 2012, M.P. Mauricio González Cuervo), en concordancia con el art. 88 (oposiciones), el art. 91 (contenido del fallo) y el art. 98 (pago de compensaciones)",
+      "competent_authority": "El Magistrado de la Sala Civil del Tribunal Superior de Distrito Judicial especializado en restitución de tierras que conozca del proceso —el artículo lo asigna al Magistrado y no al Juez, y con opositor reconocido la competencia es suya (Ley 1448 de 2011, arts. 79 y 99)—, mediante trámite incidental. Si no se prueba la buena fe exenta de culpa, el proyecto productivo pasa a la Unidad Administrativa Especial de Gestión de Restitución de Tierras Despojadas (art. 99 inc. 2)",
+      "term": "EL ARTÍCULO 99 NO FIJA TÉRMINO PARA PEDIR EL CONTRATO; EL RELOJ QUE LO EXTINGUE ES EL DE LA PRUEBA DE LA BUENA FE EXENTA DE CULPA, QUE SE AGOTA EN LA OPOSICIÓN. La autorización procede solo cuando el opositor «haya probado su buena fe exenta de culpa en el proceso», y esa prueba se acompaña al escrito de oposición, que «se deberá presentar ante el juez dentro de los quince (15) días siguientes a la solicitud» (art. 88), contados —según la Sentencia C-438 de 2013— «a partir de la notificación de la admisión de la solicitud». LA REGLA, VERBATIM: «Cuando existan proyectos agroindustriales productivos en el predio objeto de restitución y con el propósito de desarrollar en forma completa el proyecto, el Magistrado que conozca del proceso podrá autorizar, mediante el trámite incidental, la celebración de contratos entre los beneficiarios de la restitución, y el opositor que estuviera desarrollando el proyecto productivo, sobre la base del reconocimiento del derecho de dominio del restituido o restituidos, y que el opositor haya probado su buena fe exenta de culpa en el proceso» (art. 99 inc. 1). LO QUE SE PIERDE SI NO SE PRUEBA: «Cuando no se pruebe la buena fe exenta de culpa, el Magistrado entregará el proyecto productivo a la Unidad Administrativa Especial de Gestión de Restitución de Tierras Despojadas para que lo explote a través de terceros y se destine el producido del proyecto a programas de reparación colectiva para víctimas en las vecindades del predio, incluyendo al beneficiario de la restitución» (art. 99 inc. 2), inciso exequible «bajo el entendido de que la entrega del proyecto productivo y las condiciones de explotación del mismo, procederán con el consentimiento de la víctima restituida y los recursos destinados a la reparación colectiva serán los que provinieren del producido del proyecto, descontada la participación de la víctima» (Sentencia C-820 de 2012). EL CONTRATO NO SE IMPONE A LA VÍCTIMA: la autorización se apoya en «el reconocimiento del derecho de dominio del restituido o restituidos» y «El Magistrado velará por la protección de los derechos de las partes y que estos obtengan una retribución económica adecuada» (art. 99 inc. 3). LA VÍA ES INCIDENTAL Y ESTÁ ACOTADA: el art. 94 rechaza de plano «la demanda de reconvención, la intervención excluyente o coadyuvante, incidentes por hechos que configuren excepciones previas, ni la conciliación», de modo que el incidente del art. 99 es la excepción expresa y no habilita otros.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del opositor, del proceso de restitución y del predio con el proyecto agroindustrial productivo",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 99"
+        },
+        {
+          "n": 2,
+          "name": "Descripción y prueba del proyecto agroindustrial productivo en curso sobre el predio y de su estado de desarrollo",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 99 inc. 1"
+        },
+        {
+          "n": 3,
+          "name": "Prueba de la buena fe exenta de culpa del opositor, aportada en la oportunidad de la oposición",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, arts. 88 y 99; Sentencia C-330 de 2016"
+        },
+        {
+          "n": 4,
+          "name": "Reconocimiento expreso del derecho de dominio del restituido o restituidos",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 99 inc. 1"
+        },
+        {
+          "n": 5,
+          "name": "Propuesta del contrato de uso, con la retribución económica para el restituido y las condiciones de explotación",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 99 incs. 1 y 3"
+        },
+        {
+          "n": 6,
+          "name": "Manifestación sobre el consentimiento de la víctima restituida",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 99; Sentencia C-820 de 2012"
+        },
+        {
+          "n": 7,
+          "name": "Petición de que se surta el trámite incidental y se autorice la celebración del contrato",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 99 inc. 1"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1448_2011_pr002.html"
+    },
+    {
+      "exact_name": "Solicitud de medidas cautelares en el proceso judicial de restitución de tierras",
+      "area": "RESTITUCION_TIERRAS",
+      "role": "LITIGANTE",
+      "legal_basis": "Ley 1448 de 2011, art. 86 (admisión de la solicitud: inscripción, sustracción provisional del comercio, suspensión de procesos, y parágrafo sobre medidas cautelares), art. 95 par. 2 (abstención de notarios, registradores y demás autoridades) y art. 102 (mantenimiento de competencia después del fallo)",
+      "competent_authority": "El Juez Civil del Circuito especializado en restitución de tierras o el Magistrado de la Sala Civil del Tribunal Superior especializado en restitución de tierras que conozca del proceso, del lugar donde se hallen ubicados los bienes (Ley 1448 de 2011, arts. 79, 80 y 86 par.)",
+      "term": "SIN TÉRMINO PRECLUSIVO: SE PUEDEN PEDIR EN CUALQUIER ESTADO DEL PROCESO, Y TAMBIÉN DESPUÉS DEL FALLO. «Adicionalmente el Juez o Magistrado en este auto o en cualquier estado del proceso podrá decretar las medidas cautelares que considere pertinentes para prevenir un daño inminente o para hacer cesar el que se estuviere causando sobre el inmueble» (art. 86 par.). LO QUE EL AUTO ADMISORIO YA TRAE DE OFICIO, Y POR ESO NO HAY QUE PEDIRLO: «La sustracción provisional del comercio del predio o de los predios cuya restitución se solicita, hasta la ejecutoria de la sentencia» (art. 86 lit. b) y «La suspensión de los procesos declarativos de derechos reales sobre el predio cuya restitución se solicita, los procesos sucesorios, de embargo, divisorios, de deslinde y amojonamiento, de servidumbres, posesorios de cualquier naturaleza, de restitución de tenencia, de declaración de pertenencia y de bienes vacantes y mostrencos, que se hubieran iniciado ante la justicia ordinaria en relación con el inmueble [...] así como los procesos ejecutivos, judiciales, notariales y administrativos que afecten el predio, con excepción de los procesos de expropiación» (art. 86 lit. c). Y mientras corre el proceso «los notarios, registradores y demás autoridades se abstendrán de iniciar, de oficio o a petición de parte, cualquier actuación que por razón de sus competencias afecte los predios objeto de la acción [...] incluyendo los permisos, concesiones y autorizaciones para el aprovechamiento de los recursos naturales que se hubieran otorgado sobre el predio respectivo» (art. 95 par. 2). EL FIN ES TASADO: la medida debe servir «para prevenir un daño inminente o para hacer cesar el que se estuviere causando sobre el inmueble» (art. 86 par.); no es la cautela genérica del proceso declarativo, y el artículo no exige caución ni la condiciona a apariencia de buen derecho. DESPUÉS DE LA SENTENCIA SIGUE HABIENDO JUEZ: «Después de dictar sentencia, el Juez o Magistrado mantendrá su competencia sobre el proceso para dictar todas aquellas medidas que, según fuere el caso, garanticen el uso, goce y disposición de los bienes por parte de los despojados a quienes les hayan sido restituidos o formalizados predios, y la seguridad para sus vidas, su integridad personal, y la de sus familias» (art. 102). LÍMITE DE LA VÍA: «En este proceso no son admisibles la demanda de reconvención, la intervención excluyente o coadyuvante, incidentes por hechos que configuren excepciones previas, ni la conciliación» (art. 94), de modo que la petición cautelar se formula como memorial dirigido al juez o magistrado y no como incidente.",
+      "required_sections": [
+        {
+          "n": 1,
+          "name": "Identificación del solicitante, del proceso de restitución y del predio, con matrícula inmobiliaria",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, arts. 84 y 86"
+        },
+        {
+          "n": 2,
+          "name": "Descripción del daño inminente que se pretende prevenir o del daño que se está causando sobre el inmueble",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 86 par."
+        },
+        {
+          "n": 3,
+          "name": "Prueba sumaria de los hechos que sustentan la cautela",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, arts. 78 y 89"
+        },
+        {
+          "n": 4,
+          "name": "Medida concreta que se pide y su idoneidad para prevenir o hacer cesar ese daño",
+          "mandatory": true,
+          "basis": "Ley 1448 de 2011, art. 86 par."
+        },
+        {
+          "n": 5,
+          "name": "Indicación de las medidas que el auto admisorio ya dispuso, para no duplicarlas",
+          "mandatory": false,
+          "basis": "Ley 1448 de 2011, art. 86 lits. a, b y c"
+        },
+        {
+          "n": 6,
+          "name": "Petición de comunicación a la Oficina de Registro de Instrumentos Públicos, notarías y autoridades administrativas",
+          "mandatory": false,
+          "basis": "Ley 1448 de 2011, arts. 86 lit. a y 95 par. 2"
+        }
+      ],
+      "source_url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1448_2011_pr001.html"
     }
   ]
 }

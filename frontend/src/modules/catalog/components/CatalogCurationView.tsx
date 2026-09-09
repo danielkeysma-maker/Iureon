@@ -258,22 +258,37 @@ export const CatalogCurationView: React.FC = () => {
         pide y hoy no tiene donde guardarse.
       */}
       {openActuacion && (
-        <aside className="flex w-[460px] shrink-0 flex-col overflow-y-auto border-l border-line-200 bg-canvas">
-          <div className="border-b border-line-200 p-4">
+        <aside className="flex w-[460px] shrink-0 flex-col overflow-hidden border-l border-line-200 bg-canvas">
+          {/*
+            EL PANEL NO SE DESPLAZA ENTERO, Y ESO NO ES ESTILO. El formulario
+            pide el alto completo de su contenedor —cabecera fija, cuerpo que
+            se desplaza y el botón «Guardar verificación» abajo—, así que
+            puesto DEBAJO de la ficha dentro de un panel desplazable empezaba
+            justo donde terminaba la pantalla: se asomaba su borde y el
+            abogado veía la ficha creyendo que no había nada más. Ahora la
+            ficha ocupa hasta un 42 % con su propio desplazamiento y el
+            formulario se queda con el resto, de modo que su botón está
+            siempre a la vista. Es el mismo defecto que enseñó el taller: una
+            acción que aparece lejos de donde se pulsa, en el caso grande no
+            aparece.
+          */}
+          <div className="max-h-[42%] shrink-0 overflow-y-auto border-b border-line-200 p-4">
             <ActuacionDetail actuacion={openActuacion} />
           </div>
-          <VerificationForm
-            actuacion={openActuacion}
-            isSaving={curation.isSaving}
-            error={curation.saveError}
-            onSave={curation.save}
-            onRevert={async (id) => {
-              const done = await curation.revert(id);
-              if (done) setSelected(null);
-              return done;
-            }}
-            onClose={() => setSelected(null)}
-          />
+          <div className="min-h-0 flex-1">
+            <VerificationForm
+              actuacion={openActuacion}
+              isSaving={curation.isSaving}
+              error={curation.saveError}
+              onSave={curation.save}
+              onRevert={async (id) => {
+                const done = await curation.revert(id);
+                if (done) setSelected(null);
+                return done;
+              }}
+              onClose={() => setSelected(null)}
+            />
+          </div>
         </aside>
       )}
     </div>

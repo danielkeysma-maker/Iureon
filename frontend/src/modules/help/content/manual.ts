@@ -69,13 +69,14 @@ const A_INICIO: ManualArticle = {
         '«Continuar donde iba» lista sus cinco borradores y sus cinco revisiones más recientes. Un borrador se abre en Redacción, tal como desde «Borradores»; una revisión se abre en su taller, tal como desde «Revisiones».',
         '«Plan y saldo» muestra el plan de la firma con su estado —activo, por vencer con los días que faltan, vencido, o en prueba con los días que quedan— y el saldo disponible en pesos. «Ver plan» abre la pantalla de planes; «Recargar saldo» abre la recarga, la misma del pie de la barra lateral.',
         '«Novedades» trae los tres cambios más recientes de la aplicación; «Ver todas» abre la lista completa en el manual.',
+        'Recargar la página no le mueve la pantalla: la pestaña vuelve al mismo módulo y a lo que tuviera abierto dentro de él —el borrador, el taller de la revisión, el transcrito, la herramienta o el artículo del manual—. Una pestaña nueva, en cambio, empieza en Inicio, porque abrir la aplicación es empezar.',
         '«¿Primera vez aquí?» tiene «Iniciar la visita guiada», que recorre cada módulo señalándolo en pantalla con una tarjeta que dice para qué sirve —«Anterior», «Siguiente» y «Salir», o las flechas del teclado y Esc—, y «Abrir el manual». La primera vez que entra desde un navegador, Inicio le ofrece la visita en una franja; «Ahora no» la guarda para cuando quiera, desde esta pantalla o desde el índice del manual.'
       ]
     },
     {
       kind: 'consejo',
       texto:
-        'Pulse el logo cuando se haya perdido: vuelve a Inicio y cierra lo que estuviera abierto en los demás módulos, sin descartar el escrito que tenga en pantalla en Redacción.'
+        'Pulse el logo cuando se haya perdido: vuelve a Inicio y cierra lo que estuviera abierto en los demás módulos, sin descartar el escrito que tenga en pantalla en Redacción. Iniciar sesión también abre Inicio, aunque otra cuenta hubiera dejado abierto otro módulo en ese navegador.'
     }
   ]
 };
@@ -107,7 +108,8 @@ const A_QUE_HACE: ManualArticle = {
         'Consultar: «Buscador» de jurisprudencia, «Catálogo» de actuaciones y «Herramientas» de cálculo.',
         'Aprender: este «Manual de uso» y «Soporte». Al inicio del índice del manual, «Novedades» lista qué cambió en la aplicación y cuándo.',
         'Administrar (plegado por defecto): «Seguridad», con la auditoría de la firma; «Privacidad», con los proveedores que tocan sus datos; y «Ajustes».',
-        'En el pie de la barra están «Saldo», «Plan», «Membrete» y «Avisos»: son ajustes de la firma y del aparato, no módulos. En «Ajustes», dentro de Administrar, están además «Atajos de teclado», con los que la aplicación escucha; «Avisos», para activar las notificaciones de este dispositivo e instalar la app; «Su cuenta», con su correo, rol y firma y el cierre de sesión; y «Plan y facturación», con el plan vigente y el acceso a la pantalla de planes.'
+        'La barra es un índice numerado: cada módulo lleva su número y el que está abierto se marca en azul. Arriba, el logo de Iureon lleva a Inicio. Abajo del todo, «Colapsar» deja la barra en una franja de iconos —el módulo abierto sigue en azul— y la vuelve a desplegar; su navegador recuerda cómo la dejó.',
+        'En el pie está la tarjeta del saldo: la cifra disponible con «Recargar», que compra saldo de consumo, y debajo, en su propia fila, el plan de la firma con su vencimiento, que abre la pantalla de planes. Son dos dineros distintos: el saldo se gasta escribiendo, el plan es el derecho a entrar. Al lado están «Membrete» y «Avisos», que son ajustes del aparato y de la firma, no módulos. En «Ajustes», dentro de Administrar, están además «Atajos de teclado», con los que la aplicación escucha; «Avisos», para activar las notificaciones de este dispositivo e instalar la app; «Su cuenta», con su correo, rol y firma, el cierre de sesión y la eliminación de su usuario o de la firma; y «Plan y facturación», con el plan vigente y el acceso a la pantalla de planes.'
       ]
     },
     { kind: 'subtitulo', texto: 'Lo que sí hace' },
@@ -590,7 +592,7 @@ const A_PLANES: ManualArticle = {
     {
       kind: 'pasos',
       pasos: [
-        'Pulse «Plan» en el pie de la barra lateral, junto a «Saldo». En el teléfono, abra «Más» y, bajo «Cuenta», toque «Plan de la firma».',
+        'En la barra lateral, al pie de la tarjeta del saldo, pulse la fila del plan: dice el plan de la firma y hasta cuándo va, o «Ver el plan» si todavía no hay ninguno. En el teléfono, abra «Más» y, bajo «Cuenta», toque «Plan de la firma».',
         'Arriba, «Plan actual» muestra el plan vigente y hasta cuándo. Debajo, en «Elija el plan», cambie el interruptor entre «Mensual» y «Anual»; el anual lleva la etiqueta «2 meses gratis».',
         'En la tarjeta del plan pulse el botón, que dice «Contratar Esencial mensual», «Renovar Premium anual» o la combinación que haya elegido. Dice «Renovar» cuando es el plan que ya tiene.',
         'La aplicación abre la pasarela de Wompi con el valor ya fijado; pague con PSE, tarjeta o los medios que ofrezca.',
@@ -618,6 +620,12 @@ const A_PLANES: ManualArticle = {
       kind: 'aviso',
       texto:
         'En el plan Esencial, Audiencias, Entrevistas y Orientación no aparecen en la barra, y crear una segunda cuenta responde que el plan admite una sola. Pasar a Premium habilita las tres pantallas y hasta cinco cuentas desde el momento del pago; Firma, las mismas pantallas y hasta quince cuentas.'
+    },
+    {
+      kind: 'nota',
+      titulo: 'Módulos o funciones no habilitados para su firma',
+      texto:
+        'Además de lo que trae cada plan, la operación de Iureon puede dejar sin habilitar un módulo o una función concreta para una firma —por ejemplo, «Preguntas para la audiencia» dentro de Revisiones—, normalmente mientras se acuerda algo con ella. En ese caso el módulo no aparece en la barra y su tarjeta de Inicio dice «No disponible para su firma»; si es una función, su botón o su pestaña no está. El mensaje es otro que el del plan: «no está habilitada para su firma» y le pide escribir por Soporte, sin ofrecerle cambiar de plan, porque el plan no es lo que falta. Escriba por Soporte y se habilita en el acto.'
     },
     {
       kind: 'nota',
@@ -963,7 +971,8 @@ const A_MOVIL: ManualArticle = {
         'Grabar: la grabadora ocupa la pantalla, con pausa y con la onda, y el mismo consentimiento; el cronómetro es lo más grande de la pantalla y la grabación sigue con la pantalla apagada. El guion de las cuatro preguntas aparece al terminar de transcribir, no mientras se graba.',
         'Audiencias: se sube el archivo, se ve el porcentaje mientras viaja, y el transcrito se lee con cada intervención a ancho completo. Las herramientas de corrección son las mismas; de pie se revisa mejor de lo que se edita.',
         'Catálogo: se busca por nombre y cada ficha se abre completa, con su término, su fuente y su estado.',
-        'Los diálogos suben desde abajo, como una hoja, y se cierran deslizando o con el velo.'
+        'Los diálogos suben desde abajo, como una hoja, y se cierran deslizando o con el velo.',
+        'Para actualizar, tire hacia abajo desde la parte de arriba de la pantalla: aparece el logo girando y, al soltar, la aplicación se recarga y vuelve a la misma pantalla en la que estaba.'
       ]
     },
     {

@@ -557,19 +557,20 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
           </>
         )}
 
-        {/* MEMBRETE, AVISOS Y EL SELLO DE VERSIÓN. Ajustes, no módulos: van
-            en fila compacta sobre el botón de colapsar. El sello importa: un
-            deploy «Ready» en Vercel no prueba lo que ESTE navegador corre;
-            con el commit a la vista, «no veo los cambios» se responde
-            comparando dos hashes. */}
-        <div className={`flex items-center ${isCollapsed ? 'flex-col gap-0.5' : 'gap-0.5'}`}>
+        {/* MEMBRETE Y AVISOS. Ajustes del aparato y de la firma, no módulos:
+            van en una fila pareja, cada uno con la mitad del ancho, para que
+            se lean como dos cosas del mismo rango. El sello de versión salía
+            aquí mismo, empujado a la derecha, y partía el renglón en dos:
+            ahora vive solo, bajo el botón de colapsar, que es donde termina
+            la barra y donde no estorba. */}
+        <div className={`flex ${isCollapsed ? 'flex-col items-center gap-0.5' : 'gap-1'}`}>
           <button
             type="button"
             onClick={onOpenBrandingModal}
             title="Membrete de la firma"
             aria-label="Membrete de la firma"
-            className={`flex items-center gap-1.5 rounded-[10px] text-[11.5px] text-rail-muted hover:bg-rail-ink/5 hover:text-rail-ink ${
-              isCollapsed ? 'h-8 w-8 justify-center' : 'h-7 px-2'
+            className={`flex items-center gap-1.5 rounded-[10px] text-[11.5px] text-rail-muted transition-colors hover:bg-rail-ink/5 hover:text-rail-ink ${
+              isCollapsed ? 'h-8 w-8 justify-center' : 'h-8 flex-1 justify-center'
             }`}
           >
             <Settings className="h-3.5 w-3.5 shrink-0" strokeWidth={1.8} />
@@ -582,38 +583,14 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
               onClick={onOpenAvisos}
               title="Avisos en este dispositivo"
               aria-label="Avisos en este dispositivo"
-              className={`flex items-center gap-1.5 rounded-[10px] text-[11.5px] text-rail-muted hover:bg-rail-ink/5 hover:text-rail-ink ${
-                isCollapsed ? 'h-8 w-8 justify-center' : 'h-7 px-2'
+              className={`flex items-center gap-1.5 rounded-[10px] text-[11.5px] text-rail-muted transition-colors hover:bg-rail-ink/5 hover:text-rail-ink ${
+                isCollapsed ? 'h-8 w-8 justify-center' : 'h-8 flex-1 justify-center'
               }`}
             >
               <Bell className="h-3.5 w-3.5 shrink-0" strokeWidth={1.8} />
               {!isCollapsed && <span>Avisos</span>}
             </button>
           )}
-
-          <button
-            type="button"
-            onClick={() => {
-              solicitarAbrirNovedades();
-              setMainView('manual');
-            }}
-            title={`Versión ${__COMMIT__} · ver qué cambió`}
-            aria-label={`Versión ${__COMMIT__}. Ver qué cambió`}
-            className={`relative flex items-center gap-1.5 rounded-[10px] font-mono text-[9px] tracking-wider text-rail-faint hover:text-rail-muted ${
-              isCollapsed ? 'h-8 w-8 justify-center' : 'ml-auto h-7 px-2'
-            }`}
-          >
-            {/* El punto dice que hay cambios que este navegador no ha visto en Novedades. */}
-            {novedadesNuevas > 0 && (
-              <span
-                className={`h-1.5 w-1.5 shrink-0 rounded-full bg-rail-gold ${
-                  isCollapsed ? 'absolute right-1 top-1' : ''
-                }`}
-                aria-hidden
-              />
-            )}
-            {isCollapsed ? 'v' : `v. ${__COMMIT__}`}
-          </button>
         </div>
 
         {/* COLAPSAR. Un botón entero al pie, no una flecha escondida. */}
@@ -649,6 +626,33 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
             <line x1="20" y1="6" x2="20" y2="18" />
           </svg>
           {!isCollapsed && <span>Colapsar</span>}
+        </button>
+
+        {/* EL SELLO DE VERSIÓN, SOLO Y AL FINAL. Importa: un despliegue «Ready»
+            en Vercel no prueba lo que ESTE navegador corre; con el commit a la
+            vista, «no veo los cambios» se responde comparando dos hashes. El
+            punto dice que hay cambios que este navegador no ha visto. */}
+        <button
+          type="button"
+          onClick={() => {
+            solicitarAbrirNovedades();
+            setMainView('manual');
+          }}
+          title={`Versión ${__COMMIT__} · ver qué cambió`}
+          aria-label={`Versión ${__COMMIT__}. Ver qué cambió`}
+          className={`relative mx-auto flex items-center justify-center gap-1.5 rounded-[10px] py-0.5 font-mono text-[9px] tracking-wider text-rail-faint transition-colors hover:text-rail-muted ${
+            isCollapsed ? 'w-12' : 'w-full'
+          }`}
+        >
+          {novedadesNuevas > 0 && (
+            <span
+              className={`h-1.5 w-1.5 shrink-0 rounded-full bg-rail-gold ${
+                isCollapsed ? 'absolute right-1.5 top-0.5' : ''
+              }`}
+              aria-hidden
+            />
+          )}
+          {isCollapsed ? 'v' : `v. ${__COMMIT__}`}
         </button>
       </div>
     </aside>
