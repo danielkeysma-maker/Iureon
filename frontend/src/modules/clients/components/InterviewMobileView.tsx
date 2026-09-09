@@ -188,7 +188,7 @@ export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
   if (!isAvailable) {
     return (
       <div className="flex h-full min-h-0 flex-1 flex-col bg-canvas p-4">
-        <p className="flex items-start gap-2 rounded-[8px] border border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))] px-3.5 py-3 text-[12.5px] leading-snug text-unverified">
+        <p className="flex items-start gap-2 rounded-[8px] border border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))] px-3.5 py-3 text-[12.5px] leading-snug text-unverified text-justify">
           <IconoSinVerificar className="mt-0.5 h-4 w-4 shrink-0" />
           El motor de transcripción no está configurado en el servidor.
         </p>
@@ -237,7 +237,7 @@ export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
           </div>
         ) : (
           <>
-            <p className="mb-2 text-[13px] font-semibold text-ink-900">
+            <p className="mb-2 text-[13px] font-semibold text-ink-900 text-justify">
               ¿Con quién es la entrevista?
             </p>
             <ClientPicker
@@ -301,13 +301,13 @@ export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
         />
 
         {!hasFirm && (
-          <p className="text-[12px] leading-snug text-ink-500">
+          <p className="text-[12px] leading-snug text-ink-500 text-justify">
             Sin una firma activa no se puede guardar la entrevista.
           </p>
         )}
 
         {trabajando && (
-          <p className="rounded-[8px] border border-line-200 bg-surface px-3.5 py-3 text-[12.5px] text-ink-700">
+          <p className="rounded-[8px] border border-line-200 bg-surface px-3.5 py-3 text-[12.5px] text-ink-700 text-justify">
             {isUploading
                     ? uploadProgress > 0
                       ? `Subiendo la grabación · ${uploadProgress}%`
@@ -317,7 +317,7 @@ export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
         )}
 
         {error && (
-          <p className="rounded-[8px] border border-[rgb(var(--danger)/0.35)] bg-[rgb(var(--danger)/0.06)] px-3.5 py-3 text-[12.5px] leading-snug text-danger">
+          <p className="rounded-[8px] border border-[rgb(var(--danger)/0.35)] bg-[rgb(var(--danger)/0.06)] px-3.5 py-3 text-[12.5px] leading-snug text-danger text-justify">
             {error}
           </p>
         )}
@@ -372,7 +372,7 @@ export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
               Lo que no puede quedarse sin preguntar
             </p>
             {!guionHabilitado ? (
-              <p className="notice text-[12px] leading-[1.5] [text-wrap:pretty]">{AVISO_FUNCION_DESHABILITADA}</p>
+              <p className="notice text-[12px] leading-[1.5] [text-wrap:pretty] text-justify">{AVISO_FUNCION_DESHABILITADA}</p>
             ) : (
             <ul className="space-y-2">
               {GUION_BASE.map((p) => {

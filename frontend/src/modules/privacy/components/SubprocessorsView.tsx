@@ -41,6 +41,14 @@ const ETIQUETA_DATOS: Record<DataClass, string> = {
 };
 
 /** Case content is the sensitive one: it is what professional secrecy covers. */
+/**
+ * El rótulo que solo existe donde no hay encabezado de columna: por debajo de
+ * `md` la tabla de infraestructura se apila, y un valor apilado sin su nombre
+ * es un dato que el lector tiene que adivinar.
+ */
+const ROTULO_MOVIL =
+  'font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-400 md:hidden';
+
 const esSensible = (dato: DataClass): boolean =>
   dato === 'CONTENIDO_DEL_CASO' || dato === 'AUDIO_DE_AUDIENCIA' || dato === 'TRANSCRITO';
 
@@ -78,17 +86,17 @@ export const SubprocessorsView: React.FC = () => {
   const infraestructura = lista.filter((s) => !tocaElCaso(s));
 
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col bg-canvas font-sans">
+    <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col bg-canvas font-sans">
       {/* ─── ENCABEZADO INSTITUCIONAL ──────────────────────────────────────── */}
       <header className="shrink-0 bg-nav px-6 py-5">
         <div className="mx-auto flex max-w-4xl flex-wrap items-end gap-3">
           <div className="min-w-0 flex-1">
             <h1 className="text-title text-white">Privacidad y seguridad</h1>
-            <p className="mt-1 text-ui leading-[1.5] text-nav-ink">
+            <p className="mt-1 text-ui leading-[1.5] text-nav-ink text-justify">
               Quién más puede haber visto el contrato de su cliente.
             </p>
             {disclosure && (
-              <p className="mt-2 max-w-2xl text-meta leading-[1.6] text-nav-muted">
+              <p className="mt-2 max-w-2xl text-meta leading-[1.6] text-nav-muted text-justify">
                 Su firma es la <span className="font-medium text-nav-ink">responsable</span> del
                 tratamiento; Iureon es su{' '}
                 <span className="font-medium text-nav-ink">encargado</span>. Cada proveedor de esta
@@ -97,7 +105,17 @@ export const SubprocessorsView: React.FC = () => {
             )}
           </div>
 
-          <div className="shrink-0 text-right">
+          {/*
+            EL SELLO BAJA A SU PROPIO RENGLÓN EN EL TELÉFONO, y esto era el
+            defecto de esta pantalla: con `shrink-0` medía 302px de los 327 de
+            la fila y le dejaba TRECE al bloque del título. La fila envuelve,
+            pero el título es `flex-1` —base 0—, así que nunca fuerza el salto:
+            se conformaba con esos 13px y «Privacidad y seguridad» se pintaba a
+            una palabra por línea, con la cabecera creciendo hasta 957px de alto
+            y empujando toda la pantalla fuera de la vista. `w-full` obliga a
+            envolver; a partir de `sm` vuelve a la derecha como estaba.
+          */}
+          <div className="w-full shrink-0 sm:w-auto sm:text-right">
             {/*
               EL SELLO. La lista se genera desde la configuración que está
               corriendo — nadie la mantiene a mano — y la hora es la de ESTA
@@ -129,7 +147,7 @@ export const SubprocessorsView: React.FC = () => {
           {error && <p className="notice-unverified">{error}</p>}
 
           {cargando && lista.length === 0 && (
-            <p className="text-meta text-ink-500">Leyendo la configuración…</p>
+            <p className="text-meta text-ink-500 text-justify">Leyendo la configuración…</p>
           )}
 
           {/* ─── POSICIÓN JURÍDICA ───────────────────────────────────────── */}
@@ -152,7 +170,7 @@ export const SubprocessorsView: React.FC = () => {
                     <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
                       {titulo}
                     </p>
-                    <p className="mt-1 text-ui leading-[1.55] text-ink-700">{texto}</p>
+                    <p className="mt-1 text-ui leading-[1.55] text-ink-700 text-justify">{texto}</p>
                   </div>
                 ))}
               </div>
@@ -171,7 +189,7 @@ export const SubprocessorsView: React.FC = () => {
                     <div className="mb-2 flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <h4 className="text-ui font-semibold text-ink-900">{s.nombre}</h4>
-                        <p className="text-meta text-ink-500">
+                        <p className="text-meta text-ink-500 text-justify">
                           {s.proposito}
                           {s.atravesDe && (
                             <span className="text-ink-400"> · a través de {s.atravesDe}</span>
@@ -253,9 +271,25 @@ export const SubprocessorsView: React.FC = () => {
                 <span className="w-[170px] shrink-0">Retención</span>
               </div>
 
+              {/*
+                ─── LA TABLA SE VUELVE FICHA EN EL TELÉFONO ────────────────
+
+                Las columnas son de ancho fijo —180, 110 y 170— y su encabezado
+                está oculto por debajo de `md`. La fila no se salía de la
+                pantalla, porque envuelve; lo que ocurría es peor de leer: las
+                tres cifras caían una debajo de otra SIN el rótulo que dice qué
+                son, de modo que «Estados Unidos» y «Registros de acceso por 30
+                días» aparecían sueltos y el abogado tenía que adivinar cuál era
+                la ubicación y cuál la retención. Aquí cada valor lleva su
+                rótulo mientras no haya encabezado que lo explique; a partir de
+                `md` vuelve a ser exactamente la misma fila de columnas.
+              */}
               {infraestructura.map((s, i) => (
-                <div key={`${s.nombre}-${i}`} className="t-row flex flex-wrap items-center gap-3">
-                  <span className="w-[180px] shrink-0">
+                <div
+                  key={`${s.nombre}-${i}`}
+                  className="t-row flex flex-col gap-1 md:flex-row md:flex-wrap md:items-center md:gap-3"
+                >
+                  <span className="w-full md:w-[180px] md:shrink-0">
                     <a
                       href={s.sitio}
                       target="_blank"
@@ -266,14 +300,19 @@ export const SubprocessorsView: React.FC = () => {
                       {s.nombre}
                     </a>
                   </span>
-                  <span className="min-w-0 flex-1 truncate text-meta text-ink-500">
+                  <span className="w-full text-meta text-ink-500 md:w-auto md:min-w-0 md:flex-1 md:truncate">
+                    <span className={ROTULO_MOVIL}>Qué recibe · </span>
                     {s.datos.map((d) => ETIQUETA_DATOS[d]).join(', ')}
                   </span>
-                  <span className="w-[110px] shrink-0 text-meta text-ink-700">{s.ubicacion}</span>
+                  <span className="w-full text-meta text-ink-700 md:w-[110px] md:shrink-0">
+                    <span className={ROTULO_MOVIL}>Ubicación · </span>
+                    {s.ubicacion}
+                  </span>
                   <span
-                    className="w-[170px] shrink-0 truncate text-meta text-ink-500"
+                    className="w-full text-meta text-ink-500 md:w-[170px] md:shrink-0 md:truncate"
                     title={s.retencion}
                   >
+                    <span className={ROTULO_MOVIL}>Retención · </span>
                     {s.retencion}
                   </span>
                 </div>
@@ -297,7 +336,7 @@ export const SubprocessorsView: React.FC = () => {
           )}
 
           {disclosure && (
-            <p className="px-1 pb-2 text-meta leading-[1.6] text-ink-400">
+            <p className="px-1 pb-2 text-meta leading-[1.6] text-ink-400 text-justify">
               {disclosure.advertencia}
             </p>
           )}

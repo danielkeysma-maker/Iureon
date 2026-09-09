@@ -68,6 +68,7 @@ const terminoDe = (a: Actuacion): { texto: string; clase: string } => {
 export const CatalogMobileView: React.FC = () => {
   const curation = useCatalogCuration();
   const [abierta, setAbierta] = React.useState<Actuacion | null>(null);
+  const [verificando, setVerificando] = React.useState(false);
 
   // Se relee de la lista fresca tras cada guardado, no de una copia vieja.
   const actual = abierta
@@ -76,10 +77,13 @@ export const CatalogMobileView: React.FC = () => {
 
   if (actual) {
     return (
-      <div className="flex h-full min-h-0 flex-1 flex-col overflow-y-auto bg-canvas">
+      <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-y-auto bg-canvas">
         <button
           type="button"
-          onClick={() => setAbierta(null)}
+          onClick={() => {
+            setVerificando(false);
+            setAbierta(null);
+          }}
           className="sticky top-0 z-10 flex min-h-[44px] shrink-0 items-center gap-2 border-b border-line-200 bg-surface px-4 text-[13px] font-semibold text-ink-700"
         >
           <IconoVolver className="h-4 w-4" />
@@ -91,20 +95,78 @@ export const CatalogMobileView: React.FC = () => {
             {actual.exactName}
           </h1>
           <ActuacionDetail actuacion={actual} />
+
+          {/*
+            ─── EL FORMULARIO SE ABRE COMO HOJA, NO SE APILA DEBAJO ─────────
+
+            Apilado, quedaba escondido de una forma que además parecía un error
+            del programa: el formulario pide `h-full` —está pensado para un
+            panel de altura fija— y en esta pantalla ese `h-full` competía por
+            el alto con el título y la ficha. Su cabecera, su franja de
+            término/norma/autoridad y su pie son `shrink-0`, así que lo único
+            que podía encogerse era justo el centro: las opciones del estado del
+            término y los campos. El resultado medido era un rótulo «ESTADO DEL
+            TÉRMINO» con el botón «Guardar verificación» pegado debajo, y el
+            formulario entero —lo que el botón guarda— en una franja de scroll
+            de casi cero. Un botón visible sobre un formulario invisible.
+
+            Como hoja, `h-full` significa lo que el formulario espera: la altura
+            de la hoja. Cabecera y pie fijos, y las opciones y los campos con su
+            propio desplazamiento en medio. Es además el gesto que esta casa ya
+            eligió para el teléfono: los diálogos suben desde abajo.
+          */}
         </div>
 
-        <VerificationForm
-          actuacion={actual}
-          isSaving={curation.isSaving}
-          error={curation.saveError}
-          onSave={curation.save}
-          onRevert={async (id) => {
-            const listo = await curation.revert(id);
-            if (listo) setAbierta(null);
-            return listo;
-          }}
-          onClose={() => setAbierta(null)}
-        />
+        {/*
+          EL BOTÓN NO SE VA CON EL SCROLL. Una ficha larga lo dejaba a
+          novecientos píxeles del pliegue, y una acción que hay que ir a buscar
+          es una acción que no existe.
+        */}
+        <div className="sticky bottom-0 mt-auto shrink-0 border-t border-line-200 bg-surface px-4 py-3">
+          <button
+            type="button"
+            onClick={() => setVerificando(true)}
+            className="min-h-[44px] w-full rounded-control bg-brand-700 px-4 text-[13px] font-semibold text-on-brand"
+          >
+            {actual.verification ? 'Revisar la verificación' : 'Verificar el término'}
+          </button>
+        </div>
+
+        {verificando && (
+          <div className="fixed inset-0 z-50 flex items-end" role="dialog" aria-modal="true">
+            <div
+              className="absolute inset-0 bg-[rgb(16_24_34/0.42)]"
+              onClick={() => setVerificando(false)}
+              aria-hidden="true"
+            />
+
+            {/*
+              `dvh` y no `vh`: en un teléfono 100vh se mide contra la ventana
+              SIN la barra de direcciones, y todo lo anclado abajo —aquí, el
+              botón de guardar— cae fuera de lo que se ve.
+            */}
+            <div className="relative flex h-[92dvh] w-full min-w-0 flex-col overflow-hidden rounded-t-[16px] bg-surface pb-[env(safe-area-inset-bottom)] shadow-[0_16px_40px_-12px_rgb(16_24_34/0.3)]">
+              <div className="flex shrink-0 justify-center pb-0.5 pt-2" aria-hidden="true">
+                <span className="h-1 w-[38px] rounded-full bg-neutral-line" />
+              </div>
+
+              <div className="min-h-0 min-w-0 flex-1">
+                <VerificationForm
+                  actuacion={actual}
+                  isSaving={curation.isSaving}
+                  error={curation.saveError}
+                  onSave={curation.save}
+                  onRevert={async (id) => {
+                    const listo = await curation.revert(id);
+                    if (listo) setVerificando(false);
+                    return listo;
+                  }}
+                  onClose={() => setVerificando(false)}
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -112,7 +174,17 @@ export const CatalogMobileView: React.FC = () => {
   const hayBusqueda = curation.query.trim().length > 0;
 
   return (
-    <div data-visita="vista-catalogo" className="flex h-full min-h-0 flex-1 flex-col bg-canvas">
+    /*
+      `min-w-0` Y LA FILA DE CHIPS. El comentario de arriba dice que los chips
+      «se contienen dentro de su fila: la página no se ensancha», y era cierto a
+      medias: `overflow-x-auto` desplaza dentro de la fila, pero esta columna es
+      un ítem flex y nace con `min-width: auto`, así que se negaba a bajar del
+      ancho mínimo de sus hijos. Medido con las 23 ramas cargadas: la columna
+      ocupaba 826px en un teléfono de 375 y la raíz recortaba el resto —las
+      tarjetas quedaban cortadas por la derecha—. `overflow-x-auto` solo puede
+      hacer su trabajo si su contenedor tiene permiso para encogerse.
+    */
+    <div data-visita="vista-catalogo" className="flex h-full min-h-0 min-w-0 flex-1 flex-col bg-canvas">
       {/* El titulo y el censo los pone `MobileHeader`: una sola cabecera (4d). */}
       <header className="shrink-0 border-b border-line-200 bg-surface px-4 py-3">
         <div className="relative">
@@ -197,24 +269,24 @@ export const CatalogMobileView: React.FC = () => {
                           : 'border border-line-200'
                       }`}
                     >
-                      <p className="text-[13px] font-medium leading-tight text-ink-900">
+                      <p className="text-[13px] font-medium leading-tight text-ink-900 text-justify">
                         {a.exactName}
                       </p>
 
                       <p className={`mt-1.5 ${TERMINO_GRANDE} ${t.clase}`}>{t.texto}</p>
 
-                      <p className="mt-1.5 text-[11.5px] leading-snug text-ink-500">
+                      <p className="mt-1.5 text-[11.5px] leading-snug text-ink-500 text-justify">
                         {a.legalBasis}
                       </p>
 
                       {a.verification ? (
-                        <p className="mt-1.5 flex items-center gap-1 text-[11px] text-verified">
+                        <p className="mt-1.5 flex items-center gap-1 text-[11px] text-verified text-justify">
                           <IconoVerificado className="h-3 w-3 shrink-0" />
                           Verificada por {a.verification.verifiedBy}
                         </p>
                       ) : (
                         sinVerificar && (
-                          <p className="mt-1.5 flex items-center gap-1 text-[11px] font-semibold text-unverified">
+                          <p className="mt-1.5 flex items-center gap-1 text-[11px] font-semibold text-unverified text-justify">
                             <IconoSinVerificar className="h-3 w-3 shrink-0" />
                             Verificar contra la norma
                           </p>

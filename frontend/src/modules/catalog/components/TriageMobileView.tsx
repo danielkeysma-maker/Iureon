@@ -195,14 +195,14 @@ export const TriageMobileView: React.FC<TriageMobileViewProps> = ({ onDraft }) =
             )}
           </button>
           {faltan > 0 && (
-            <p className="mt-1.5 text-[11px] text-ink-500">
+            <p className="mt-1.5 text-[11px] text-ink-500 text-justify">
               Faltan {faltan} caracteres: con menos, el catálogo no tiene con qué proponer.
             </p>
           )}
         </section>
 
         {error && (
-          <p className="rounded-[8px] border border-[rgb(var(--danger)/0.35)] bg-[rgb(var(--danger)/0.06)] px-3.5 py-3 text-[12px] leading-snug text-danger">
+          <p className="rounded-[8px] border border-[rgb(var(--danger)/0.35)] bg-[rgb(var(--danger)/0.06)] px-3.5 py-3 text-[12px] leading-snug text-danger text-justify">
             {error}
           </p>
         )}

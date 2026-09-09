@@ -185,7 +185,7 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({
 
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
         {actuacion.verification && (
-          <div className="rounded-control border border-line-200 bg-brand-50 px-3 py-2.5 text-justify text-[11px] leading-snug text-brand-700 [text-wrap:pretty]">
+          <div className="rounded-control border border-line-200 bg-brand-50 px-3 py-2.5 text-justify text-[11px] leading-snug text-brand-700 [overflow-wrap:anywhere] [text-wrap:pretty]">
             Verificada por <strong>{actuacion.verification.verifiedBy}</strong> el{' '}
             {new Date(actuacion.verification.verifiedAt).toLocaleDateString('es-CO')}. El catálogo base
             decía: <em>{actuacion.verification.replaced.description ?? 'término no verificado'}</em>.

@@ -171,6 +171,16 @@ export function App() {
   }, [debeIrALaPortada]);
   const currentUserEmail = session?.user.email ?? '';
   /*
+   * EL NOMBRE DE LA PERSONA, guardado en su cuenta.
+   *
+   * Arranca con lo que traiga la sesión —una sesión recién iniciada ya lo
+   * trae— y se confirma con `/api/auth/me`, que es lo que da nombre a las
+   * sesiones guardadas antes de que el nombre existiera. Vacío significa «esta
+   * cuenta todavía no tiene nombre», nunca «no se pudo leer»: quien lo usa
+   * decide qué escribir en su lugar.
+   */
+  const [currentUserName, setCurrentUserName] = useState<string>(session?.user.nombre ?? '');
+  /*
    * Quien opera la plataforma se decide por el ROL que impone el servidor,
    * no por un correo escrito aqui. Esta comprobacion es solo de interfaz:
    * el backend vuelve a imponer el rol en cada endpoint, asi que editar el
@@ -328,11 +338,16 @@ export function App() {
     let cancelled = false;
 
     httpClient
-      .get<{ firm: { id: string; name: string; nit: string; creditsBalance: number } | null }>(
-        '/api/auth/me'
-      )
-      .then(({ firm }) => {
-        if (cancelled || !firm) return;
+      .get<{
+        user?: { nombre?: string | null };
+        firm: { id: string; name: string; nit: string; creditsBalance: number } | null;
+      }>('/api/auth/me')
+      .then(({ user, firm }) => {
+        if (cancelled) return;
+        // El nombre viene del servidor, que es su única fuente. Si la cuenta no
+        // tiene ninguno queda en '' y las pantallas lo tratan como hueco.
+        setCurrentUserName(user?.nombre ?? '');
+        if (!firm) return;
         setActiveFirm({
           id: firm.id,
           name: firm.name,
@@ -867,7 +882,12 @@ export function App() {
    */
 
   return (
-    <TenantProvider activeFirm={activeFirm} currentUserEmail={currentUserEmail}>
+    <TenantProvider
+      activeFirm={activeFirm}
+      currentUserEmail={currentUserEmail}
+      currentUserName={currentUserName}
+      setCurrentUserName={setCurrentUserName}
+    >
     {/*
       EL PLAN VIAJA POR CONTEXTO: con el plan VENCIDO la aplicacion queda en
       solo lectura, y quien lo decide en cada pantalla es una hoja —el boton
@@ -1397,7 +1417,17 @@ export function App() {
               <div className="hidden min-h-0 flex-1 lg:flex">
                 <CatalogCurationView />
               </div>
-              <div className="flex min-h-0 flex-1 lg:hidden">
+              {/*
+                `min-w-0` TAMBIÉN AQUÍ, Y NO BASTA CON PONERLO DENTRO. Esta
+                envoltura es un ítem flex y nace con `min-width: auto`: se niega
+                a bajar del ancho mínimo de lo que contiene, y la fila de ramas
+                del catálogo son 23 chips que no encogen. Medido en un teléfono
+                de 375px, la columna ocupaba 826 y las tarjetas quedaban
+                cortadas por la derecha. Con el `min-w-0` de dentro solo, la
+                vista se ajustaba a esta envoltura, que seguía midiendo 826: hay
+                que dejar encoger a los DOS niveles o manda el que quede suelto.
+              */}
+              <div className="flex min-h-0 min-w-0 flex-1 lg:hidden">
                 <CatalogMobileView />
               </div>
             </ModuloBloqueado>

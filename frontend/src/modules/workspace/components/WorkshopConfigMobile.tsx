@@ -141,7 +141,7 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
       )}
 
       {!elegida && !abierto && (
-        <p className="border-t border-line-100 px-4 py-2 text-[12px] leading-snug text-ink-500">
+        <p className="border-t border-line-100 px-4 py-2 text-[12px] leading-snug text-ink-500 text-justify">
           Sin actuación elegida: el escrito saldrá sin término ni artículo verificados.
         </p>
       )}
@@ -195,7 +195,7 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
             </select>
           </label>
 
-          <p className="flex items-start gap-1.5 pt-1 text-[11px] leading-snug text-ink-500">
+          <p className="flex items-start gap-1.5 pt-1 text-[11px] leading-snug text-ink-500 text-justify">
             <IconoVerificado className="mt-0.5 h-3 w-3 shrink-0 text-verified" />
             <span className="text-justify [text-wrap:pretty]">
               La actuación es la que trae el artículo y el término verificados. Sin ella el

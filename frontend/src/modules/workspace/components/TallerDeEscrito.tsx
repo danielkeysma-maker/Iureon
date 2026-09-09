@@ -1045,7 +1045,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
       <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-3 text-[12.5px]">
         {formularioDePreguntas || !g ? (
           <>
-            <p className="leading-snug text-ink-700">
+            <p className="text-justify leading-snug text-ink-700 [text-wrap:pretty]">
               <span className="font-semibold text-ink-900">¿Qué preguntas hacer en la audiencia?</span> La guía lee este escrito y le propone las preguntas, numeradas y listas para leer en voz alta, cada una con para qué sirve y el pasaje del escrito del que sale. Marque a quién quiere preguntar, diga de qué lado está y pida las preguntas.
             </p>
             <div>

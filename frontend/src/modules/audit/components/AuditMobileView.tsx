@@ -94,7 +94,13 @@ export const AuditMobileView: React.FC = () => {
   }, [eventos]);
 
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col bg-canvas">
+    /*
+      `min-w-0` porque esta columna es un ítem flex y nace con `min-width: auto`:
+      se niega a bajar del ancho mínimo de su contenido, y ese mínimo lo fija el
+      correo del renglón de abajo —una sola palabra sin espacios de 370px—. La
+      pantalla medía 433px en un teléfono de 375 y la raíz recortaba el resto.
+    */
+    <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col bg-canvas">
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
         {cargando && (
           <div className="flex items-center justify-center gap-2 py-16 text-[12.5px] text-ink-500">
@@ -104,7 +110,7 @@ export const AuditMobileView: React.FC = () => {
         )}
 
         {error && (
-          <p className="rounded-[8px] border border-[rgb(var(--danger)/0.35)] bg-[rgb(var(--danger)/0.06)] px-3.5 py-3 text-[12.5px] leading-snug text-danger">
+          <p className="rounded-[8px] border border-[rgb(var(--danger)/0.35)] bg-[rgb(var(--danger)/0.06)] px-3.5 py-3 text-[12.5px] leading-snug text-danger text-justify">
             {error}
           </p>
         )}
@@ -148,7 +154,15 @@ export const AuditMobileView: React.FC = () => {
                       igual que en escritorio: identifica la sesion sin publicar
                       la direccion completa de nadie.
                     */}
-                    <p className="mt-1.5 font-mono text-[11px] text-ink-400">
+                    {/*
+                      UN CORREO ES UNA SOLA PALABRA DE 370px. No tiene espacios,
+                      así que el navegador no encuentra dónde partirlo y se sale
+                      de la tarjeta por la derecha. `break-words` no sirve aquí
+                      —está medido: el ancho mínimo se queda en 370—; hace falta
+                      `overflow-wrap: anywhere`, que sí permite cortar dentro de
+                      la palabra, y solo cuando no cabe de otro modo.
+                    */}
+                    <p className="mt-1.5 font-mono text-[11px] text-ink-400 [overflow-wrap:anywhere]">
                       {[e.userEmail, e.ipAddress].filter(Boolean).join(' · ')}
                     </p>
                   </li>

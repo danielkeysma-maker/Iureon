@@ -89,7 +89,7 @@ const Tarjeta: React.FC<TarjetaProps> = ({ item, curada, onCitar, copiada }) => 
       </span>
     </div>
 
-    <p className="mt-[3px] text-[11.5px] leading-snug text-ink-500">
+    <p className="mt-[3px] text-[11.5px] leading-snug text-ink-500 text-justify">
       {[item.corporacion?.replace(/_/g, ' '), item.magistradoPonente && `M.P. ${item.magistradoPonente}`]
         .filter(Boolean)
         .join(' · ') || 'Procedencia no registrada'}

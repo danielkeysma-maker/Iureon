@@ -175,7 +175,22 @@ export const ToolsView: React.FC = () => {
   const total = grupos.reduce((n, g) => n + g.utilidades.length, 0);
 
   return (
-    <div data-visita="vista-tools" className="flex h-full min-h-0 flex-1 flex-col bg-canvas font-sans">
+    /*
+      `min-w-0` NO ES ADORNO: SIN ÉL LA PANTALLA MIDE 679px EN UN TELÉFONO DE 375.
+
+      La línea que describe cada utilidad lleva `truncate`, y `truncate` es
+      `white-space: nowrap`: el ancho mínimo de ese renglón es la frase entera
+      —499px la más larga—, no la palabra más larga. Ese mínimo sube por los
+      contenedores hasta esta columna, que es un ítem flex y por tanto nace con
+      `min-width: auto`, es decir «no me encojas por debajo de mi contenido».
+      La página no se ensanchaba —`scrollWidth` seguía en 375— porque la raíz
+      recorta; simplemente faltaban 304px por la derecha, en silencio.
+
+      Medido en el navegador: con `min-w-0` la columna vuelve a 375 y ningún
+      elemento sobresale. Por encima de 1024px no cambia nada, porque allí el
+      contenido cabe y el mínimo nunca llega a aplicarse.
+    */
+    <div data-visita="vista-tools" className="flex h-full min-h-0 min-w-0 flex-1 flex-col bg-canvas font-sans">
       <ProceduralTermsModal isOpen={terminosAbierto} onClose={cerrar(setTerminosAbierto)} />
       <LaborSettlementModal isOpen={liquidacionAbierta} onClose={cerrar(setLiquidacionAbierta)} />
       <LegalSearchGlossaryModal isOpen={glosarioAbierto} onClose={cerrar(setGlosarioAbierto)} />
@@ -187,18 +202,25 @@ export const ToolsView: React.FC = () => {
       <header className="flex shrink-0 flex-wrap items-end gap-3 border-b border-line-200 bg-surface px-5 py-3.5">
         <div className="min-w-0 flex-1">
           <h1 className="text-title text-ink-900">Herramientas</h1>
-          <p className="mt-0.5 text-meta text-ink-500">
+          <p className="mt-0.5 text-meta text-ink-500 text-justify">
             Cálculos y verificaciones que no requieren generar un escrito · {total} utilidades
           </p>
         </div>
 
-        <div className="relative">
+        {/*
+          EN EL TELÉFONO LA BÚSQUEDA BAJA A SU PROPIO RENGLÓN. Con ancho
+          automático se quedaba al lado del título: la fila envuelve, pero el
+          bloque del título es `flex-1` —base 0— y por tanto nunca fuerza el
+          salto; se conformaba con los 43px que sobraban y el título caía a una
+          palabra por línea. `w-full` sí obliga a envolver.
+        */}
+        <div className="relative w-full sm:w-auto">
           <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-400" />
           <input
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
             placeholder="Por nombre o por lo que necesita calcular"
-            className="field w-[280px] max-w-full pl-8"
+            className="field w-full pl-8 sm:w-[280px]"
           />
         </div>
       </header>
@@ -251,7 +273,7 @@ export const ToolsView: React.FC = () => {
             LO QUE FALTA, DICHO EN LA PANTALLA. Una fila muerta prometería una
             calculadora que no calcula; la ausencia se declara en su lugar.
           */}
-          <p className="px-1 text-meta leading-[1.6] text-ink-400">
+          <p className="px-1 text-meta leading-[1.6] text-ink-400 text-justify">
             El cómputo de ejecutoria con traslados se agrega cuando esté construido y verificado — no antes.
             Cada resultado de estas herramientas se exporta a Excel con una hoja de fuentes.
           </p>

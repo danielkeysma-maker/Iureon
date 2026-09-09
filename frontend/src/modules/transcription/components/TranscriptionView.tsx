@@ -151,13 +151,25 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
   };
 
   return (
-    <div data-visita={`vista-${kind === 'AUDIENCIA' ? 'audiencias' : 'entrevistas'}`} className="flex h-full min-h-0 flex-1 flex-col bg-canvas font-sans">
+    /*
+      `min-w-0` ES LO QUE IMPIDE QUE EL LISTADO SE CORTE POR LA DERECHA.
+
+      La fila de una audiencia ya está pensada para el teléfono —envuelve en dos
+      renglones—, pero su ancho MÍNIMO no baja de 973px: el nombre del archivo
+      lleva `truncate`, que es `white-space: nowrap`, y un nombre de audiencia es
+      una frase larga. Esta columna es un ítem flex, así que nace con
+      `min-width: auto` y se niega a bajar de ese mínimo: medida en un teléfono
+      de 375px, ocupaba 1015 y la raíz recortaba los 640 restantes. Con `min-w-0`
+      la columna cede, la fila envuelve como estaba previsto y nada sobresale.
+      Por encima de 1024px el contenido cabe y el mínimo no llega a aplicarse.
+    */
+    <div data-visita={`vista-${kind === 'AUDIENCIA' ? 'audiencias' : 'entrevistas'}`} className="flex h-full min-h-0 min-w-0 flex-1 flex-col bg-canvas font-sans">
       <header className="flex shrink-0 flex-wrap items-end gap-3 border-b border-line-200 bg-surface px-5 py-3.5">
         <div className="min-w-0 flex-1">
           <h1 className="text-title text-ink-900">
             {kind === 'AUDIENCIA' ? 'Audiencias' : 'Entrevistas'}
           </h1>
-          <p className="mt-0.5 text-meta text-ink-500">
+          <p className="mt-0.5 text-meta text-ink-500 text-justify">
             {result
               ? `${result.segments.length} intervenciones · ${result.speakerLabels.length} interlocutores`
               : 'La grabación, separada por interlocutor y con cada voz nombrada.'}
@@ -361,7 +373,7 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
             {error && (
               <div className="bg-[rgb(var(--danger)/0.06)] border border-[rgb(var(--danger)/0.35)] rounded-card p-3 flex items-start gap-2">
                 <AlertTriangle className="w-4 h-4 text-danger shrink-0 mt-0.5" />
-                <p className="text-[11px] text-danger">
+                <p className="text-[11px] text-danger text-justify">
                   {error} La pantalla se devolvió a lo último que sí quedó guardado.
                 </p>
               </div>

@@ -107,7 +107,7 @@ export const SupportMobileView: React.FC<SupportMobileViewProps> = ({
                 <h2 className="text-[15px] font-semibold leading-tight text-ink-900">
                   {canal.nombre}
                 </h2>
-                <p className="mt-px text-[11.5px] leading-tight text-ink-500">{canal.paraQue}</p>
+                <p className="mt-px text-[11.5px] leading-tight text-ink-500 text-justify">{canal.paraQue}</p>
               </div>
               {/*
                 EL PUNTO VERDE SOLO CUANDO SE PUEDE USAR. En la maqueta indica

@@ -145,7 +145,7 @@ const BloqueEstados: React.FC = () => (
           <Icono size={20} strokeWidth={2.2} className="mt-0.5 shrink-0" style={{ color: e.color }} />
           <div className="min-w-0">
             <p className="text-subtitle text-ink-900">{e.nombre}</p>
-            <p className="mt-1 text-body leading-[1.65] text-ink-700 [text-wrap:pretty]">{e.texto}</p>
+            <p className="mt-1 text-body leading-[1.65] text-ink-700 text-justify [text-wrap:pretty]">{e.texto}</p>
             <p className="mt-1.5 font-mono text-meta text-ink-500">{e.seVeAsi}</p>
           </div>
         </div>
@@ -220,7 +220,7 @@ const Callout: React.FC<{
         {etiqueta}
       </p>
       {titulo && <p className="mt-0.5 text-ui font-semibold text-ink-900">{titulo}</p>}
-      <p className="mt-1 text-ui leading-[1.65] text-ink-700 [text-wrap:pretty]">{children}</p>
+      <p className="mt-1 text-justify text-ui leading-[1.65] text-ink-700 [text-wrap:pretty]">{children}</p>
     </div>
   </div>
 );
@@ -303,7 +303,7 @@ export const Bloque: React.FC<{ bloque: ManualBlock }> = ({ bloque }) => {
                   {i + 1}
                 </span>
                 <div className="min-w-0 flex-1 rounded-card border border-line-200 bg-surface px-3.5 py-2.5">
-                  <p className="text-body leading-[1.7] text-ink-700 [text-wrap:pretty]">{paso}</p>
+                  <p className="text-body leading-[1.7] text-ink-700 text-justify [text-wrap:pretty]">{paso}</p>
                 </div>
               </li>
             );
@@ -319,7 +319,7 @@ export const Bloque: React.FC<{ bloque: ManualBlock }> = ({ bloque }) => {
               <span className="mt-[5px] flex h-[15px] w-[15px] shrink-0 items-center justify-center rounded-full bg-brand-50">
                 <Check size={10} strokeWidth={3} className="text-brand-700" />
               </span>
-              <span className="text-body leading-[1.7] text-ink-700 [text-wrap:pretty]">{item}</span>
+              <span className="text-body leading-[1.7] text-ink-700 text-justify [text-wrap:pretty]">{item}</span>
             </li>
           ))}
         </ul>
