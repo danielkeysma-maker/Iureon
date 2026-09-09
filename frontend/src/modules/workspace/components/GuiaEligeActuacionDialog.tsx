@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { AlertTriangle, CalendarClock, CircleDashed, Landmark, Link2, Loader2, MinusCircle } from 'lucide-react';
+import {
+  AlertTriangle,
+  CalendarClock,
+  CircleDashed,
+  Globe,
+  Landmark,
+  Link2,
+  Loader2,
+  MinusCircle
+} from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import { triageApi, type TriageResponse } from '../../catalog/services/catalog.api';
 import { BRANCH_LABELS } from '../../catalog/branchLabels';
@@ -23,9 +32,23 @@ import type { LegalBranch } from '../../catalog/types';
  * abajo no es prosa del modelo: es la ficha del catálogo, más la frase con la
  * que el modelo justificó proponerla.
  *
- * ACOTADO A LA RAMA YA ELEGIDA. Quien está en «Laboral» no quiere que se le
- * proponga una tutela; y además el menú completo son unos 37.000 caracteres en
- * cada consulta, contra unos cientos por rama.
+ * ACOTADO A LA RAMA YA ELEGIDA, SALVO QUE EL ABOGADO DIGA QUE NO LA SABE.
+ * Quien está en «Laboral» no quiere que se le proponga una tutela; y además el
+ * menú completo son 55.624 caracteres en cada consulta, contra unos cientos por
+ * rama.
+ *
+ * PERO ACOTAR TENÍA UN DEFECTO REAL, y no es de precio: con la rama equivocada
+ * la plataforma responde «el catálogo no reconoce nada» sobre una actuación que
+ * SÍ existe, dos ramas más allá. Y quien no sabe qué actuación es tampoco sabe
+ * siempre en qué rama vive — es la misma ignorancia. Por eso se puede decir «no
+ * sé la rama»: el triaje corre sobre las 883 fichas de las 28 ramas y cada
+ * candidata muestra de dónde viene, que dentro de una rama es un dato de sobra
+ * y aquí es el dato que hace falta.
+ *
+ * SE DICE LO QUE CUESTA. Medido el 9 de septiembre de 2026: la consulta al
+ * catálogo entero tarda entre 11 y 14 segundos —contra un par en una rama— y le
+ * cuesta a la casa unas cuatro veces más. Vale la pena y por eso está; callarlo
+ * sería vender un botón que parece igual de barato que el de al lado.
  *
  * LOS HECHOS SON LOS QUE YA ESCRIBIÓ. Se traen del cuadro de instrucción y se
  * devuelven al cerrar, para que completarlos aquí no obligue a escribirlos dos
@@ -44,6 +67,24 @@ interface Props {
   onElegir: (exactName: string) => void;
   /** «Ninguna de estas»: abre el diálogo para escribir el nombre. */
   onEscribirNombre: () => void;
+  /**
+   * «Ni sé cómo se llama»: abre el diálogo que redacta sin nombre.
+   *
+   * Opcional porque no todos los llamadores redactan. En la revisión de un
+   * documento recibido la guía sirve para RECONOCER qué le llegó, y un escrito
+   * sin nombre no reconoce nada: allí la salida no existe, y su ausencia es la
+   * respuesta correcta, no un olvido.
+   */
+  onSinNombre?: () => void;
+  /**
+   * Con qué estado nace la casilla de «no sé la rama».
+   *
+   * Existe porque en la revisión de un documento recibido la pregunta se hace
+   * ANTES de abrir este diálogo —junto al informe, que es donde el abogado está
+   * mirando—, y llegar aquí con la casilla en blanco lo obligaría a contestar
+   * dos veces lo mismo y a pagar la consulta acotada por el camino.
+   */
+  sinRamaInicial?: boolean;
 }
 
 /** Mínimo para que la orientación signifique algo. Lo impone también el servidor. */
@@ -56,9 +97,17 @@ export const GuiaEligeActuacionDialog: React.FC<Props> = ({
   hechos,
   setHechos,
   onElegir,
-  onEscribirNombre
+  onEscribirNombre,
+  onSinNombre,
+  sinRamaInicial = false
 }) => {
   const [texto, setTexto] = useState(hechos);
+  /*
+   * ARRANCA CON LO QUE DIJO QUIEN ABRE, y de fábrica eso es «sí sé la rama».
+   * Nadie que la sepa debería pagar la consulta completa por descuido; quien no
+   * la sabe lo dice una vez y el diálogo se acuerda mientras esté abierto.
+   */
+  const [sinRama, setSinRama] = useState(sinRamaInicial);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [resultado, setResultado] = useState<TriageResponse | null>(null);
@@ -72,7 +121,24 @@ export const GuiaEligeActuacionDialog: React.FC<Props> = ({
     if (abierto) setTexto(hechos);
   }, [abierto, hechos]);
 
-  const orientar = async () => {
+  /*
+   * Al abrir, y al cambiar de rama, la casilla vuelve a lo que dijo quien abre.
+   * Cambiar de rama en la barra de Redacción es una pregunta nueva, y la
+   * respuesta anterior no vale para ella.
+   */
+  useEffect(() => {
+    setSinRama(sinRamaInicial);
+  }, [abierto, legalBranch, sinRamaInicial]);
+
+  /**
+   * @param forzarSinRama para el botón que reabre la búsqueda en todo el
+   *        catálogo tras un «no reconozco nada». El estado de React se aplica
+   *        después del render, así que leerlo aquí buscaría otra vez dentro de
+   *        la misma rama y el abogado vería repetirse el mismo «no» — que es
+   *        exactamente el defecto que ese botón existe para deshacer.
+   */
+  const orientar = async (forzarSinRama?: boolean) => {
+    const enTodoElCatalogo = forzarSinRama ?? sinRama;
     const limpio = texto.trim();
 
     if (limpio.length < MINIMO) {
@@ -88,7 +154,16 @@ export const GuiaEligeActuacionDialog: React.FC<Props> = ({
     setError(null);
 
     try {
-      const respuesta = await triageApi.orientar(limpio, legalBranch as LegalBranch);
+      /*
+       * SIN RAMA SE MANDA SIN RAMA, no con una vacía. `triageApi.orientar` deja
+       * el campo fuera del cuerpo y el controlador ya sabía tratar su ausencia:
+       * el menú se arma con el catálogo entero, y `findByDocumentType` recibe
+       * la rama que devuelva el modelo, que es la única que hay.
+       */
+      const respuesta = await triageApi.orientar(
+        limpio,
+        enTodoElCatalogo ? undefined : (legalBranch as LegalBranch)
+      );
       setResultado(respuesta);
     } catch (e) {
       /*
@@ -111,13 +186,22 @@ export const GuiaEligeActuacionDialog: React.FC<Props> = ({
       abierto={abierto}
       onCerrar={onCerrar}
       titulo="Que la guía proponga la actuación"
-      subtitulo={`Sobre los hechos que usted escriba, y solo dentro de ${rama}.`}
+      subtitulo={
+        sinRama
+          ? 'Sobre los hechos que usted escriba, en todo el catálogo.'
+          : `Sobre los hechos que usted escriba, y solo dentro de ${rama}.`
+      }
       tamano="L"
       acciones={
         <>
           <button type="button" onClick={onEscribirNombre} className="btn-neutral">
             Escribir el nombre
           </button>
+          {onSinNombre && (
+            <button type="button" onClick={onSinNombre} className="btn-neutral">
+              No sé cómo se llama
+            </button>
+          )}
           <button
             type="button"
             onClick={() => void orientar()}
@@ -144,6 +228,32 @@ export const GuiaEligeActuacionDialog: React.FC<Props> = ({
           />
           <p className="mt-1 text-right font-mono text-[11px] text-ink-400">
             {texto.trim().length.toLocaleString('es-CO')} caracteres
+          </p>
+        </div>
+
+        {/*
+          «NO SÉ LA RAMA» VA JUNTO AL BOTÓN QUE LA USA, no en un ajuste aparte:
+          la duda aparece al pulsar, no antes.
+        */}
+        <div className="rounded-card border border-line-200 bg-canvas px-3 py-2.5">
+          <label className="flex cursor-pointer items-start gap-2">
+            <input
+              type="checkbox"
+              checked={sinRama}
+              onChange={(e) => setSinRama(e.target.checked)}
+              className="mt-0.5 h-3.5 w-3.5 shrink-0 accent-[rgb(var(--brand-700))]"
+            />
+            <span className="min-w-0 text-ui leading-snug text-ink-900 [overflow-wrap:anywhere]">
+              No sé la rama: buscar en todo el catálogo
+            </span>
+          </label>
+          <p className="mt-1 flex items-start gap-1.5 pl-[22px] text-justify text-meta leading-snug text-ink-500 [text-wrap:pretty] [overflow-wrap:anywhere]">
+            <Globe className="mt-0.5 h-3 w-3 shrink-0" />
+            <span className="min-w-0">
+              {sinRama
+                ? 'Se buscará en las 883 actuaciones de las 28 ramas y cada candidata dirá de cuál viene. Tarda más —entre diez y quince segundos, contra un par— y le cuesta a la plataforma unas cuatro veces más que buscar en una sola rama.'
+                : `Ahora se busca solo en ${rama}. Si la rama no es esa, el catálogo dirá que no reconoce nada aunque la actuación exista en otra.`}
+            </span>
           </p>
         </div>
 
@@ -199,6 +309,21 @@ export const GuiaEligeActuacionDialog: React.FC<Props> = ({
                       mas abajo parecería un hueco del catalogo en vez de lo que
                       es: un plazo verificado en otra rama.
                     */}
+                    {/*
+                      LA RAMA SOLO CUANDO SE BUSCÓ SIN ELLA. Dentro de una rama
+                      elegida es un dato que todas comparten y que no distingue
+                      nada; buscando en las veintiocho es la mitad de la
+                      respuesta — dice ante quién y bajo qué código se surte.
+                    */}
+                    {sinRama && (
+                      <p className="mt-1 flex items-start gap-1.5 text-meta leading-snug text-ink-500">
+                        <Globe className="mt-0.5 h-3 w-3 shrink-0" />
+                        <span className="min-w-0 [overflow-wrap:anywhere]">
+                          {BRANCH_LABELS[actuacion.branch] ?? actuacion.branch}
+                        </span>
+                      </p>
+                    )}
+
                     {actuacion.porRemision && (
                       <p className="mt-1 flex items-start gap-1.5 text-justify text-meta leading-snug text-ink-500 [text-wrap:pretty]">
                         <Link2 className="mt-0.5 h-3 w-3 shrink-0" />
@@ -283,9 +408,34 @@ export const GuiaEligeActuacionDialog: React.FC<Props> = ({
               otra vez porque este es el momento en que hace falta: quien acaba
               de leer «no reconozco ninguna» no debería tener que buscarla.
             */}
-            <button type="button" onClick={onEscribirNombre} className="btn-neutral mt-3 self-start">
-              Ninguna de estas: escribir el nombre
-            </button>
+            {/*
+              CUANDO SE BUSCÓ EN UNA SOLA RAMA, «no reconozco nada» puede ser la
+              respuesta a la pregunta equivocada. Se ofrece repetir en todo el
+              catálogo antes de mandar a nadie a escribir un nombre.
+            */}
+            {!sinRama && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSinRama(true);
+                  void orientar(true);
+                }}
+                className="btn-neutral mt-3 self-start"
+              >
+                Puede que la rama no sea esa: buscar en todo el catálogo
+              </button>
+            )}
+
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button type="button" onClick={onEscribirNombre} className="btn-neutral">
+                Ninguna de estas: escribir el nombre
+              </button>
+              {onSinNombre && (
+                <button type="button" onClick={onSinNombre} className="btn-neutral">
+                  No sé cómo se llama: describir qué debe lograr
+                </button>
+              )}
+            </div>
           </div>
         )}
 

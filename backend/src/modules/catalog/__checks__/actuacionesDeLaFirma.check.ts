@@ -227,9 +227,17 @@ check(
   'el prompt prohíbe afirmar plazos y términos',
   /no afirmes plazos, términos ni caducidades/i.test(prompt)
 );
+/*
+ * LA FRASE CAMBIÓ Y ESTE CHECK SE QUEDÓ CON LA VIEJA, así que llevaba rojo
+ * desde `dec63b5` —el commit que reescribió la prohibición en
+ * `catalogGuidance.ts`— vigilando una redacción que ya no existía. La garantía
+ * nunca se perdió: lo que se perdió fue el literal. Se ajusta al texto vigente
+ * en vez de relajarlo, porque un check que persigue una frase muerta no
+ * protege nada y además enseña a ignorar el semáforo.
+ */
 check(
   'el prompt prohíbe enunciar secciones como exigidas por una norma',
-  /secciones como si una norma las exigiera/i.test(prompt)
+  /no digas de ninguna sección que una norma la exige/i.test(prompt)
 );
 check(
   'el prompt ordena decirlo EN EL ESCRITO',

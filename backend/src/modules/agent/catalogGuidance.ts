@@ -1,4 +1,5 @@
 import { catalogService } from '../catalog/catalog.service';
+import { esTituloDeTrabajo, objetivoDelTitulo } from '../catalog/tituloDeTrabajo';
 import type { Actuacion, LegalBranch } from '../catalog/types';
 
 /**
@@ -52,6 +53,21 @@ const formatTerm = (actuacion: Actuacion): string => {
 const renderFirmDefinedGuidance = (actuacion: Actuacion): string => {
   const curada = actuacion.term.status !== 'NO_VERIFICADO';
 
+  /*
+   * EL CAMINO SIN NOMBRE ENTRA POR AQUÍ, y entra a propósito por el MISMO
+   * bloque y no por uno paralelo.
+   *
+   * Lo que hay que decirle al motor es idéntico en los dos casos —no hay ficha,
+   * no la fabriques, y dilo en el escrito—, y dos bloques que dicen lo mismo
+   * divergen: el día que alguien endurezca uno, el otro se queda con la
+   * redacción vieja y nadie se entera hasta leer un borrador que afirma un
+   * artículo. Lo único que cambia aquí es CÓMO SE LLAMA la cosa que se escribe,
+   * porque de un título de trabajo hay que decir además que no es el nombre de
+   * una figura jurídica.
+   */
+  const trabajo = esTituloDeTrabajo(actuacion.exactName);
+  const objetivo = trabajo ? objetivoDelTitulo(actuacion.exactName) : '';
+
   const aportado = curada
     ? `
 LO QUE LA FIRMA SÍ COMPROBÓ Y PUEDES USAR:
@@ -63,14 +79,37 @@ No añadas ningún otro artículo, plazo ni requisito a los anteriores.`
 NO HAY TÉRMINO NI ARTÍCULO. No afirmes ninguno.
 EN EL PROPIO ESCRITO debes dejar constancia, con palabras llanas, de que el término aplicable a esta actuación no está verificado y debe comprobarse en la norma antes de radicar. No lo escondas en una nota al pie: dilo donde se lea.`;
 
-  return `ACTUACIÓN DEFINIDA POR LA FIRMA — "${actuacion.exactName}"
+  /*
+   * LA PROHIBICIÓN DE BAUTIZAR VA ANTES QUE TODO LO DEMÁS, y no al final.
+   *
+   * «Recurso de reposición» no es una etiqueta: es una figura con su artículo,
+   * su término y su autoridad, y ponerle ese nombre a un escrito que nadie
+   * verificó afirma las tres cosas sin haber leído ninguna norma. Un modelo al
+   * que se le entrega un objetivo en prosa y ningún nombre lo primero que hace
+   * es escoger uno del oficio, con toda naturalidad, en el encabezamiento.
+   */
+  const encabezado = trabajo
+    ? `ESCRITO SIN NOMBRE DE ACTUACIÓN — lo que la firma quiere lograr: "${objetivo}"
+
+NADIE LE PUSO NOMBRE A ESTA ACTUACIÓN, Y TÚ TAMPOCO SE LO PONES. Lo de arriba es un TÍTULO DE TRABAJO descriptivo escrito por el abogado, no la denominación jurídica de ninguna figura. PROHIBIDO llamar al escrito "recurso de reposición", "acción de tutela", "incidente", "nulidad" ni ninguna otra figura del ordenamiento colombiano, ni en el título, ni en el encabezamiento, ni en la referencia, ni en el cuerpo, ni al describir lo que se presenta. Encabézalo diciendo qué se pide y ante quién, con las palabras del objetivo.`
+    : `ACTUACIÓN DEFINIDA POR LA FIRMA — "${actuacion.exactName}"`;
+
+  /*
+   * Con nombre, el escrito ES de esa clase y se dice así. Sin nombre no hay
+   * clase que nombrar, así que lo que gobierna la estructura es el objetivo.
+   */
+  const queEscribes = trabajo
+    ? `QUÉ ESCRIBES, DE TODAS FORMAS: un escrito completo dirigido a lograr "${objetivo}"`
+    : `QUÉ ESCRIBES, DE TODAS FORMAS: un "${actuacion.exactName}" completo`;
+
+  return `${encabezado}
 
 ESTA ACTUACIÓN NO TIENE FICHA VERIFICADA EN EL CATÁLOGO. La añadió la propia firma porque el catálogo no la trae, y nadie ha comprobado contra la norma su artículo, su término ni las secciones que debe contener.
 
 PROHIBIDO INVENTAR, y esta prohibición manda sobre la línea de NORMATIVIDAD del encargo: no escribas números de artículo, no afirmes plazos, términos ni caducidades, y no digas de ninguna sección que una norma la exige. Si un requisito te parece necesario, descríbelo en palabras y di que debe verificarse; jamás le pongas una cita que no te hayan entregado aquí.
 ${aportado}
 
-QUÉ ESCRIBES, DE TODAS FORMAS: un "${actuacion.exactName}" completo, con la estructura usual de esa clase de escrito en la práctica colombiana y con sus TÍTULOS DE SECCIÓN escritos —encabezamiento y destinatario, referencia, presentación del apoderado, hechos, fundamentos, petición, pruebas, anexos, notificaciones y firma, o los que esa clase de escrito pida—. Cada título va solo en su línea, en mayúscula sostenida y entre **dobles asteriscos**, igual que en cualquier otro escrito.
+${queEscribes}, con la estructura usual de esa clase de escrito en la práctica colombiana y con sus TÍTULOS DE SECCIÓN escritos —encabezamiento y destinatario, referencia, presentación del apoderado, hechos, fundamentos, petición, pruebas, anexos, notificaciones y firma, o los que esa clase de escrito pida—. Cada título va solo en su línea, en mayúscula sostenida y entre **dobles asteriscos**, igual que en cualquier otro escrito.
 
 NO HAY CONTRADICCIÓN ENTRE LAS DOS REGLAS ANTERIORES, y conviene tenerlo claro: no tener ficha verificada te prohíbe AFIRMAR el artículo, el plazo o que la norma exige tal sección; no te autoriza a entregar un texto corrido sin títulos ni a escribir una pieza procesal distinta de la que se pidió. La estructura es del oficio; la cita es de la norma. Preséntala como la práctica usual, nunca como impuesta por una norma que nadie comprobó.`;
 };

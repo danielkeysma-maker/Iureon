@@ -1,6 +1,7 @@
 import React from 'react';
 import { AlertTriangle, BadgeCheck, ExternalLink, FileQuestion } from 'lucide-react';
 import type { ProcedenciaDelBorrador } from '../types';
+import { esTituloDeTrabajo } from '../../catalog/tituloDeTrabajo';
 
 /**
  * La barra de revisión del visor. Artboard 5a.
@@ -77,6 +78,14 @@ export const DraftProvenanceBar: React.FC<DraftProvenanceBarProps> = ({ proceden
    * barra queda en verde, pero no en silencio.
    */
   const deLaFirma = procedencia.definidaPorLaFirma === true;
+  /*
+   * SIN NOMBRE DE ACTUACIÓN. Lo que se lee arriba no es una denominación
+   * jurídica sino la descripción que escribió el abogado, y decirlo aquí es
+   * obligatorio: esta barra es la última pantalla antes de exportar, y quien
+   * lea «Sin nombre — que se levante el embargo» junto a un artículo podría
+   * entender que el catálogo bautizó algo. No bautizó nada.
+   */
+  const esTitulo = deLaFirma && esTituloDeTrabajo(procedencia.exactName);
 
   if (!sinTermino && !faltanArticulos && !deLaFirma && !procedencia.curadaPorLaFirma) return null;
 
@@ -104,10 +113,13 @@ export const DraftProvenanceBar: React.FC<DraftProvenanceBarProps> = ({ proceden
         {deLaFirma && (
           <p className="text-justify text-[12px] leading-snug [text-wrap:pretty]">
             <strong className="font-semibold">
-              Esta actuación la añadió su firma: el catálogo no la trae.
+              {esTitulo
+                ? 'Este escrito se redactó sin nombre de actuación.'
+                : 'Esta actuación la añadió su firma: el catálogo no la trae.'}
             </strong>{' '}
-            Ninguna norma verificada respalda su artículo ni su estructura, y la guía tuvo prohibido
-            inventarlos.
+            {esTitulo
+              ? 'Lo de arriba es un título de trabajo escrito por usted, no la denominación jurídica de ninguna figura: ninguna ficha verificada respaldó este escrito, y la guía tuvo prohibido ponerle nombre, artículo o término.'
+              : 'Ninguna norma verificada respalda su artículo ni su estructura, y la guía tuvo prohibido inventarlos.'}
           </p>
         )}
 

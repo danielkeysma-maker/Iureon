@@ -65,7 +65,8 @@
     "check:agenda": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agenda/__checks__/agenda.check.ts",
     "check:adjuntos": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/adjuntos/__checks__/adjuntos.check.ts",
     "check:remision": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/catalog/__checks__/remision.check.ts",
-    "check:plazos": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/__checks__/plazos.check.ts"
+    "check:plazos": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/__checks__/plazos.check.ts",
+    "check:sin-nombre": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/__checks__/sinNombre.check.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

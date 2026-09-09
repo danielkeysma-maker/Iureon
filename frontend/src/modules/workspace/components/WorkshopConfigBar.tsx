@@ -1,5 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { CheckCircle2, ChevronRight, CircleDashed, Link2, MinusCircle, PenLine, Sparkles } from 'lucide-react';
+import {
+  CheckCircle2,
+  ChevronRight,
+  CircleDashed,
+  HelpCircle,
+  Link2,
+  MinusCircle,
+  PenLine,
+  Sparkles
+} from 'lucide-react';
 import { Combobox, type OpcionCombobox } from './Combobox';
 import { useActuacionLookup } from '../../catalog/hooks/useActuacion';
 import { useBranchActuacionesState } from '../../catalog/hooks/useBranchActuaciones';
@@ -7,6 +16,8 @@ import { useCatalogBranchesState } from '../../catalog/hooks/useCatalogBranches'
 import { BRANCH_LABELS } from '../../catalog/branchLabels';
 import { GuiaEligeActuacionDialog } from './GuiaEligeActuacionDialog';
 import { ActuacionPropiaDialog } from './ActuacionPropiaDialog';
+import { EscritoSinNombreDialog } from './EscritoSinNombreDialog';
+import { esTituloDeTrabajo } from '../../catalog/tituloDeTrabajo';
 import type { Actuacion, ActuacionRole } from '../../catalog/types';
 
 /*
@@ -23,6 +34,17 @@ import type { Actuacion, ActuacionRole } from '../../catalog/types';
  */
 const OPCION_GUIA = '__QUE_LA_GUIA_ELIJA__';
 const OPCION_PROPIA = '__ESCRIBIR_EL_NOMBRE__';
+/*
+ * LA TERCERA SALIDA, y la que faltaba: no sé cómo se llama.
+ *
+ * Las otras dos suponen que existe un nombre y que alguien lo sabe — la
+ * guía lo busca en el catálogo, «escribir el nombre» se lo pide al abogado.
+ * Quien no lo sabe se quedaba sin puerta, y es justo el abogado para el que
+ * se construyó esta aplicación. Va DESPUÉS de «escribir el nombre» porque el
+ * orden sigue siendo el de la conversación: «no sé cuál es» → «no está» →
+ * «ni sé cómo se llama».
+ */
+const OPCION_SIN_NOMBRE = '__SIN_NOMBRE_DE_ACTUACION__';
 
 /**
  * "De qué se trata este escrito": rol → rama → tipo, en una barra de 42px.
@@ -109,6 +131,7 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
 }) => {
   const [guiaAbierta, setGuiaAbierta] = useState(false);
   const [propiaAbierta, setPropiaAbierta] = useState(false);
+  const [sinNombreAbierto, setSinNombreAbierto] = useState(false);
   /** Sube al crear una actuación propia: obliga a releer la lista de la rama. */
   const [recarga, setRecarga] = useState(0);
 
@@ -159,7 +182,9 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
         detalle: a.porRemision
           ? a.porRemision.marca
           : a.firmDefined
-          ? 'de su firma · sin norma verificada'
+          ? esTituloDeTrabajo(a.exactName)
+            ? 'título de trabajo · no es el nombre de una figura'
+            : 'de su firma · sin norma verificada'
           : a.term.status === 'NO_CADUCA'
           ? 'No caduca'
           : a.term.status === 'NO_VERIFICADO'
@@ -176,6 +201,12 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
         etiqueta: 'Ninguna de estas: escribir el nombre…',
         detalle: 'quedará en esta rama, sin norma verificada',
         icono: <PenLine className="h-3.5 w-3.5 shrink-0 text-unverified" strokeWidth={2.4} />
+      },
+      {
+        valor: OPCION_SIN_NOMBRE,
+        etiqueta: 'No sé cómo se llama: describir qué debe lograr…',
+        detalle: 'se redacta sin nombre de actuación y sin norma verificada',
+        icono: <HelpCircle className="h-3.5 w-3.5 shrink-0 text-unverified" strokeWidth={2.4} />
       }
     ],
     [catalogo.actuaciones]
@@ -194,6 +225,10 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
     }
     if (valor === OPCION_PROPIA) {
       setPropiaAbierta(true);
+      return;
+    }
+    if (valor === OPCION_SIN_NOMBRE) {
+      setSinNombreAbierto(true);
       return;
     }
     setDocumentType(valor);
@@ -260,6 +295,33 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
       onEscribirNombre={() => {
         setGuiaAbierta(false);
         setPropiaAbierta(true);
+      }}
+      onSinNombre={() => {
+        setGuiaAbierta(false);
+        setSinNombreAbierto(true);
+      }}
+    />
+
+    {/*
+      SIN NOMBRE, MISMO CIRCUITO. Lo que se guarda es un título de trabajo con
+      su marca, por el mismo endpoint de actuaciones de la firma: después se
+      puede curar en «Catálogo» con su norma al lado y dejar de ser un título
+      para volverse una ficha.
+    */}
+    <EscritoSinNombreDialog
+      abierto={sinNombreAbierto}
+      onCerrar={() => setSinNombreAbierto(false)}
+      legalBranch={legalBranch}
+      userRole={userRole}
+      onEscribirNombre={() => {
+        setSinNombreAbierto(false);
+        setPropiaAbierta(true);
+      }}
+      onCreada={(exactName) => {
+        /* Mismo orden que arriba: primero la lista, después la elección. */
+        setRecarga((n) => n + 1);
+        setDocumentType(exactName);
+        setSinNombreAbierto(false);
       }}
     />
 

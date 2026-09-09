@@ -24,6 +24,7 @@ import { BRANCH_LABELS } from '../../catalog/branchLabels';
 import { GuiaEligeActuacionDialog } from './GuiaEligeActuacionDialog';
 import { ActuacionPropiaDialog } from './ActuacionPropiaDialog';
 import { textoDelArchivo } from '../services/textoDelArchivo';
+import { etiquetaDeAtaque, hechosParaLaGuia, puntosDeAtaqueDe } from '../services/ataque';
 import type { ActuacionRole } from '../../catalog/types';
 
 /**
@@ -142,7 +143,8 @@ const SUGERENCIAS_PROPIO = [
 ];
 
 const SUGERENCIAS_RECIBIDO = [
-  'Dígame qué es este documento, qué decide, qué me exige y para cuándo, y qué queda pendiente.',
+  'Dígame qué es este documento, qué decide, qué me exige y para cuándo, qué queda pendiente y por dónde se ataca.',
+  '¿Qué afirmó aquí el juez que no se sostiene contra la norma que el propio auto cita? ¿Qué le pedí y no resolvió?',
   '¿Qué me ordena a mí en concreto y con qué palabras lo dice? ¿Anuncia algún plazo?',
   '¿Qué resolvió y qué queda pendiente del trámite, según lo que el propio documento dice?'
 ];
@@ -225,6 +227,17 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
    * catálogo, que nunca propone a ciegas entre las veintitantas ramas.
    */
   const [ramaParaLaGuia, setRamaParaLaGuia] = React.useState(legalBranch);
+  /*
+   * «NO SÉ LA RAMA» EN EL CAMINO DE «QUE LA GUÍA DIGA QUÉ ACTUACIÓN ES».
+   *
+   * Aquí el defecto se ve más que en ningún otro sitio: el abogado acaba de
+   * subir un documento que NO redactó él —un auto, un traslado, un oficio— y se
+   * le pedía que declarara de qué rama es antes de preguntar qué es. Con la
+   * rama equivocada la respuesta es «el catálogo no reconoce nada» sobre una
+   * actuación que existe dos ramas más allá, y quien acaba de recibir el
+   * documento es justamente quien no lo sabe.
+   */
+  const [guiaSinRama, setGuiaSinRama] = React.useState(false);
   /** Lo que la guía propuso tras leer el documento recibido; lo escogió una persona. */
   const [actuacionSugerida, setActuacionSugerida] = React.useState('');
   /*
@@ -572,7 +585,21 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
           : 'QUÉ LE EXIGE Y PARA CUÁNDO\n- Del texto de este documento no se desprende ninguna carga a su cargo.\n',
         bloque('QUÉ QUEDA PENDIENTE, SEGÚN EL DOCUMENTO', r.loQueSigue),
         bloque('LO QUE EL DOCUMENTO NO DICE', r.noLoDiceElDocumento),
-        'Este informe solo afirma lo que está escrito en el documento. No hay ficha verificada del catálogo detrás de ninguna de sus líneas.'
+        puntosDeAtaqueDe(r).length
+          ? `POR DÓNDE SE ATACA\n${puntosDeAtaqueDe(r)
+              .map((p) =>
+                [
+                  `- ${etiquetaDeAtaque(p.clase)}`,
+                  `  Dice el documento: «${p.cita}»`,
+                  p.norma && p.citaDeLaNorma ? `  Norma en que él mismo se apoya, ${p.norma}: «${p.citaDeLaNorma}»` : '',
+                  p.lectura ? `  Lectura del revisor: ${p.lectura}` : ''
+                ]
+                  .filter(Boolean)
+                  .join('\n')
+              )
+              .join('\n')}\n`
+          : '',
+        'Este informe solo afirma lo que está escrito en el documento. No hay ficha verificada del catálogo detrás de ninguna de sus líneas, y los flancos señalados salen de las citas: no declaran ilegalidad ni nulidad alguna.'
       ]
         .filter((x) => x !== '')
         .join('\n');
@@ -1099,11 +1126,21 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
             fileName={origenDelInforme.fileName}
             actuacionSugerida={actuacionSugerida}
             ramaParaLaGuia={ramaParaLaGuia}
+            guiaSinRama={guiaSinRama}
+            onGuiaSinRama={setGuiaSinRama}
             opcionesRama={opcionesRama}
             onRamaParaLaGuia={setRamaParaLaGuia}
             onPedirLaGuia={() => {
-              /* Los hechos son EL TEXTO DEL DOCUMENTO que se acaba de leer: nadie lo vuelve a contar. */
-              setHechos(paraElTaller.texto ?? texto.trim());
+              /*
+               * LOS HECHOS SON LO QUE HALLÓ EL INFORME, Y DEBAJO EL TEXTO DEL
+               * DOCUMENTO. El puente a la guía ya existía y no cambia: sigue
+               * siendo el MISMO diálogo del catálogo, que propone candidatas de
+               * su lista cerrada y las escoge una persona. Lo que cambia es con
+               * qué viaja — antes iba el texto crudo y el catálogo proponía
+               * para «esto que llegó»; ahora encabezan los flancos con su cita,
+               * y las candidatas son las de atacar eso.
+               */
+              setHechos(hechosParaLaGuia(respuesta.informeRecibido, paraElTaller.texto ?? texto.trim()));
               setGuiaAbierta(true);
             }}
           />
@@ -1155,6 +1192,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
             abierto={guiaAbierta}
             onCerrar={() => setGuiaAbierta(false)}
             legalBranch={ramaDeLaGuia}
+            sinRamaInicial={guiaSinRama}
             hechos={hechos}
             setHechos={setHechos}
             onElegir={(exactName) => {
@@ -1224,6 +1262,8 @@ interface InformeProps {
   fileName: string;
   actuacionSugerida: string;
   ramaParaLaGuia: string;
+  guiaSinRama: boolean;
+  onGuiaSinRama: (sinRama: boolean) => void;
   opcionesRama: OpcionCombobox[];
   onRamaParaLaGuia: (rama: string) => void;
   onPedirLaGuia: () => void;
@@ -1236,6 +1276,8 @@ const Informe: React.FC<InformeProps> = ({
   fileName,
   actuacionSugerida,
   ramaParaLaGuia,
+  guiaSinRama,
+  onGuiaSinRama,
   opcionesRama,
   onRamaParaLaGuia,
   onPedirLaGuia
@@ -1278,6 +1320,8 @@ const Informe: React.FC<InformeProps> = ({
             informe={r}
             actuacionSugerida={actuacionSugerida}
             ramaParaLaGuia={ramaParaLaGuia}
+            guiaSinRama={guiaSinRama}
+            onGuiaSinRama={onGuiaSinRama}
             opcionesRama={opcionesRama}
             onRamaParaLaGuia={onRamaParaLaGuia}
             onPedirLaGuia={onPedirLaGuia}
@@ -1347,7 +1391,7 @@ const Informe: React.FC<InformeProps> = ({
 
       <p className="border-t border-line-100 pt-3 text-meta text-ink-400 text-justify">
         {esRecibido
-          ? 'Todo lo anterior sale del texto del propio documento y va citado. Ninguna ficha del catálogo respalda estas líneas: no se ha completado de memoria ningún artículo, plazo, autoridad ni recurso. El informe queda guardado para su firma en «Revisiones anteriores».'
+          ? 'Todo lo anterior sale del texto del propio documento y va citado. Ninguna ficha del catálogo respalda estas líneas: no se ha completado de memoria ningún artículo, plazo, autoridad ni recurso, y los flancos señalados no declaran ilegalidad ni nulidad alguna. El informe queda guardado para su firma en «Revisiones anteriores».'
           : 'Lo marcado como exigencia de la norma sale de la ficha verificada; lo demás es criterio profesional del revisor y usted decide. El informe queda guardado para su firma en «Revisiones anteriores»; el escrito y el trabajo del taller, solo si la firma autorizó conservarlos.'}
       </p>
     </div>
@@ -1368,10 +1412,22 @@ const DocumentoRecibido: React.FC<{
   informe: InformeDeDocumentoRecibido;
   actuacionSugerida: string;
   ramaParaLaGuia: string;
+  guiaSinRama: boolean;
   opcionesRama: OpcionCombobox[];
   onRamaParaLaGuia: (rama: string) => void;
+  onGuiaSinRama: (sinRama: boolean) => void;
   onPedirLaGuia: () => void;
-}> = ({ informe, actuacionSugerida, ramaParaLaGuia, opcionesRama, onRamaParaLaGuia, onPedirLaGuia }) => {
+}> = ({
+  informe,
+  actuacionSugerida,
+  ramaParaLaGuia,
+  guiaSinRama,
+  opcionesRama,
+  onRamaParaLaGuia,
+  onGuiaSinRama,
+  onPedirLaGuia
+}) => {
+  const puntos = puntosDeAtaqueDe(informe);
   const identificacion = [
     informe.quienLoProfirio && { etiqueta: 'Lo profirió', valor: informe.quienLoProfirio },
     informe.radicado && { etiqueta: 'Radicado', valor: informe.radicado },
@@ -1444,13 +1500,69 @@ const DocumentoRecibido: React.FC<{
       <Seccion titulo="Qué queda pendiente, según el documento" items={informe.loQueSigue} />
       <Seccion titulo="Lo que el documento no dice" items={informe.noLoDiceElDocumento} tono="aviso" />
 
+      {/* ─── POR DÓNDE SE ATACA ───────────────────────────────────────────
+        *
+        * La mitad que faltaba. Y la más delicada de pintar, porque aquí no hay
+        * ficha detrás de nada: lo único que sostiene un flanco es la cita del
+        * propio documento. Por eso cada punto se dibuja en dos planos VISIBLES
+        * —las palabras del documento, entre comillas y en cursiva; debajo,
+        * rotulada, la lectura del revisor—, igual que el informe del escrito
+        * propio separa lo que exige la norma de lo que opina quien revisa. Un
+        * punto sin cita no llega hasta aquí: el servidor lo descarta al leer la
+        * respuesta.
+        */}
+      {puntos.length > 0 && (
+        <section>
+          <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">Por dónde se ataca</h4>
+          <p className="mt-1 text-[12px] leading-snug text-ink-500 text-justify [text-wrap:pretty]">
+            Cada punto se apoya en las palabras del propio documento, que van citadas. Lo rotulado como lectura del revisor es criterio, no texto del
+            documento: aquí se señala el flanco y concluye usted.
+          </p>
+          <div className="mt-1.5 space-y-2.5">
+            {puntos.map((p, k) => (
+              <div key={k} className="rounded-control border border-line-200 bg-canvas px-3 py-2.5">
+                <p className="font-mono text-[10.5px] font-semibold text-ink-500">{etiquetaDeAtaque(p.clase)}</p>
+                <p className="mt-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-400">Dice el documento</p>
+                <blockquote className="mt-0.5 border-l-2 border-line-200 pl-2.5 text-ui italic leading-snug text-ink-700 text-justify">
+                  «{p.cita}»
+                </blockquote>
+                {/*
+                  LA NORMA SOLO APARECE CON SU TEXTO AL LADO. Nombrar el artículo
+                  sin lo que el documento dice que ordena invitaría a completarlo
+                  de memoria, que es justo lo prohibido; el servidor ya vacía el
+                  nombre cuando falta la transcripción, y aquí se exige de nuevo.
+                */}
+                {p.norma && p.citaDeLaNorma && (
+                  <>
+                    <p className="mt-2 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-400">
+                      Norma en que el propio documento se apoya · {p.norma}
+                    </p>
+                    <blockquote className="mt-0.5 border-l-2 border-line-200 pl-2.5 text-ui italic leading-snug text-ink-700 text-justify">
+                      «{p.citaDeLaNorma}»
+                    </blockquote>
+                  </>
+                )}
+                {p.lectura && (
+                  <>
+                    <p className="mt-2 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-brand-700">Lectura del revisor</p>
+                    <p className="mt-0.5 text-ui leading-snug text-ink-900 text-justify [text-wrap:pretty]">{p.lectura}</p>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* ─── ¿Y QUÉ PUEDO HACER? ─────────────────────────────────────────── */}
       <section className="rounded-card border border-[rgb(var(--brand-line))] bg-brand-50 px-3 py-3">
-        <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-brand-700">¿Y qué puedo hacer?</h4>
+        <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-brand-700">
+          {puntos.length > 0 ? '¿Y con qué lo ataco?' : '¿Y qué puedo hacer?'}
+        </h4>
         <p className="mt-1 text-[12px] leading-snug text-ink-700 text-justify [text-wrap:pretty]">
-          Eso ya no lo dice este documento: lo dice el catálogo. Lleve los hechos a la guía de actuaciones y le propondrá candidatas con su término, su
-          artículo y su autoridad verificados; después ponga el vencimiento en la agenda de términos, desde el icono de calendario de esta revisión en
-          «Revisiones».
+          {puntos.length > 0
+            ? 'El nombre de la actuación no lo pone este informe: lo pone el catálogo. Los flancos de arriba, con sus citas, viajan a la guía de actuaciones junto al texto del documento, y ella propone candidatas para atacar eso, cada una con su término, su artículo y su autoridad verificados. Escoge usted; después ponga el vencimiento en la agenda de términos, desde el icono de calendario de esta revisión en «Revisiones».'
+            : 'Eso ya no lo dice este documento: lo dice el catálogo. Lleve los hechos a la guía de actuaciones y le propondrá candidatas con su término, su artículo y su autoridad verificados; después ponga el vencimiento en la agenda de términos, desde el icono de calendario de esta revisión en «Revisiones».'}
         </p>
         <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-end">
           <div className="min-w-0 flex-1">
@@ -1461,18 +1573,41 @@ const DocumentoRecibido: React.FC<{
               onChange={onRamaParaLaGuia}
               vacio="Elegir rama…"
               anchoBoton="max-w-full"
-              pie="La guía propone dentro de una rama, nunca a ciegas."
+              pie={
+                guiaSinRama
+                  ? 'Se buscará en todo el catálogo: la rama queda sin usar.'
+                  : 'La guía propone dentro de una rama; si no la sabe, márquelo abajo.'
+              }
             />
+            <label className="mt-1.5 flex cursor-pointer items-start gap-2">
+              <input
+                type="checkbox"
+                checked={guiaSinRama}
+                onChange={(e) => onGuiaSinRama(e.target.checked)}
+                className="mt-0.5 h-3.5 w-3.5 shrink-0 accent-[rgb(var(--brand-700))]"
+              />
+              <span className="min-w-0 text-justify text-[12px] leading-snug text-ink-700 [text-wrap:pretty] [overflow-wrap:anywhere]">
+                No sé la rama: buscar en todo el catálogo.{' '}
+                <span className="text-ink-500">
+                  Cada candidata dirá de cuál viene. Tarda entre diez y quince segundos —contra un
+                  par— y le cuesta a la plataforma unas cuatro veces más.
+                </span>
+              </span>
+            </label>
           </div>
           <button
             type="button"
             onClick={onPedirLaGuia}
-            disabled={!ramaParaLaGuia}
+            disabled={!ramaParaLaGuia && !guiaSinRama}
             className="btn-secondary btn-sm shrink-0 disabled:opacity-50"
-            title="Propone actuaciones del catálogo a partir del texto de este documento"
+            title={
+              puntos.length > 0
+                ? 'Propone actuaciones del catálogo para atacar los flancos señalados arriba, con el texto del documento como respaldo'
+                : 'Propone actuaciones del catálogo a partir del texto de este documento'
+            }
           >
             <Sparkles className="h-3.5 w-3.5" />
-            Llevar a la guía de actuaciones
+            {puntos.length > 0 ? 'Llevar los flancos a la guía de actuaciones' : 'Llevar a la guía de actuaciones'}
           </button>
         </div>
         {actuacionSugerida && (

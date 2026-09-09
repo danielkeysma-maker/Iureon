@@ -86,9 +86,20 @@ Responde SOLO con JSON válido, sin texto alrededor:
  * completo son unos 37.000 caracteres en CADA consulta, y una rama son unos
  * pocos cientos.
  *
- * Sigue siendo OPCIONAL: la pantalla de Orientación no sabe la rama —esa es
- * justo la pregunta que le hace al catálogo— y tiene que seguir viendo el menú
- * entero.
+ * Sigue siendo OPCIONAL, y ahora ese camino se pide a propósito desde
+ * Redacción: quien no sabe cómo se llama la actuación tampoco sabe siempre en
+ * qué rama vive — es la misma ignorancia—, y obligarlo a escoger una convertía
+ * un «no existe» en la respuesta a una pregunta mal hecha.
+ *
+ * MEDIDO EL 9 DE SEPTIEMBRE DE 2026 contra el motor real, con las 883 fichas de
+ * las 28 ramas: el menú completo son 55.624 caracteres, el encargo entero pesa
+ * 13.183 tokens de entrada, y la llamada tardó 11,7 s y 13,2 s en dos corridas,
+ * con 1.431 y 1.583 tokens de salida — muy por debajo del tope de 6.000, así
+ * que la respuesta NO se corta. Costó US$0,0098 y US$0,0158 (unos $42 a $67
+ * COP). El menú de una rama, para comparar, son unos cientos de caracteres.
+ *
+ * De esa medición sale el plazo propio de más abajo: 12 s medianos contra los
+ * 20 s por defecto del cliente dejaban la consulta a un suspiro de abortar.
  */
 const catalogueMenu = (branch?: LegalBranch): string => {
   if (branch) {
@@ -292,7 +303,16 @@ export const triageFacts = async (facts: string, branch?: LegalBranch): Promise<
       // Una lista vacía son 18 caracteres y es la respuesta correcta cuando
       // el catálogo no reconoce nada. El piso por defecto la tiraría.
       0,
-      { json: true }
+      /*
+       * EL PLAZO DEPENDE DEL TAMAÑO DEL MENÚ, y sin rama el menú es catorce
+       * veces más grande. Medido: 11,7 s y 13,2 s con el catálogo entero,
+       * contra los 20 s fijos que el cliente usa por defecto. Un margen de
+       * siete segundos no es un margen: cualquier día lento del proveedor
+       * convertía «buscar en todo el catálogo» en «el motor no respondió», y
+       * el abogado no tendría cómo distinguir eso de que su caso no exista.
+       * Con rama se queda en el plazo de siempre, que le sobra.
+       */
+      { json: true, ...(branch ? {} : { timeoutMs: 45_000 }) }
     );
     raw = result.text;
   } catch (error) {

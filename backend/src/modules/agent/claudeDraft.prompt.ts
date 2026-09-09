@@ -1,5 +1,28 @@
 import { resolveDocumentStructure } from './documentStructures';
 import { buildCatalogGuidance } from './catalogGuidance';
+import { esTituloDeTrabajo, objetivoDelTitulo } from '../catalog/tituloDeTrabajo';
+
+/**
+ * Cómo se nombra el encargo dentro del prompt.
+ *
+ * ─── POR QUÉ NO BASTA CON EL BLOQUE DEL CATÁLOGO ────────────────────────────
+ *
+ * `catalogGuidance` ya le prohíbe al motor bautizar figuras cuando el escrito
+ * no tiene nombre. Pero este prompt repite el `documentType` CUATRO veces por
+ * su cuenta —la tarea, la regla de la actuación, la estructura y el mensaje de
+ * usuario— y una de esas repeticiones le ORDENA que «su nombre debe leerse en
+ * el encabezado o en el asunto del escrito». Con un título de trabajo eso haría
+ * que el escrito saliera encabezado «SIN NOMBRE — QUE SE LEVANTE EL EMBARGO»,
+ * que es peor que inventar la figura: es enseñarle la costura al juez.
+ *
+ * Así que el nombre se traduce UNA vez, aquí, y las cuatro repeticiones usan lo
+ * traducido.
+ */
+const comoSeLlamaElEncargo = (documentType: string): { esTitulo: boolean; encargo: string } =>
+  esTituloDeTrabajo(documentType)
+    ? { esTitulo: true, encargo: objetivoDelTitulo(documentType) }
+    : { esTitulo: false, encargo: documentType };
+
 
 interface ClaudePromptInput {
   documentType: string;
@@ -76,6 +99,7 @@ export const buildClaudeDraftPrompt = ({
   // A catalogued actuación supplies the article, the deadline and the
   // norm-mandated sections. Only when the actuación is not catalogued yet does
   // the older free-text reference structure apply.
+  const { esTitulo, encargo } = comoSeLlamaElEncargo(documentType);
   const guidance =
     catalogGuidance === undefined ? buildCatalogGuidance(documentType) : catalogGuidance;
   const estructuraObligatoria = guidance ?? resolveDocumentStructure(documentType);
@@ -104,9 +128,13 @@ USA **negritas** ÚNICAMENTE para: títulos de secciones, numerales resolutivos 
 
 PERFIL: Abogado litigante senior y redactor judicial de élite en Colombia, 25 años de experiencia ante Corte Constitucional, CSJ, Consejo de Estado y Tribunales.
 ${continuationBlock}
-TAREA: ${existingDraft ? 'Continuar, corregir o proyectar a partir del borrador existente según la indicación del usuario' : 'Redactar ÍNTEGRAMENTE, COMPLETO y listo para firmar'}: "${documentType}".
+TAREA: ${existingDraft ? 'Continuar, corregir o proyectar a partir del borrador existente según la indicación del usuario' : 'Redactar ÍNTEGRAMENTE, COMPLETO y listo para firmar'}: ${esTitulo ? `un escrito dirigido a lograr "${encargo}"` : `"${encargo}"`}.
 
-REGLA DE LA ACTUACIÓN — manda sobre cualquier otra consideración de este prompt: el documento tiene que ser EXACTAMENTE un "${documentType}" y ninguna otra pieza procesal. El abogado ya eligió la actuación; no la sustituyas por la que te parezca más apropiada para los hechos, ni siquiera si otra encaja mejor. Si los hechos no alcanzan, redacta igual el "${documentType}" y deja entre corchetes lo que falte. Su nombre debe leerse en el encabezado o en el asunto del escrito, y la estructura debe ser la de esa clase de escrito.
+${
+  esTitulo
+    ? `REGLA DEL ENCARGO — manda sobre cualquier otra consideración de este prompt: el escrito tiene que buscar EXACTAMENTE "${encargo}" y nada distinto. NO TIENE NOMBRE DE ACTUACIÓN Y NO SE LO PONES: no lo llames recurso, acción, incidente, nulidad ni ninguna otra figura del ordenamiento colombiano, ni en el título, ni en el asunto, ni en la referencia, ni en el cuerpo. En el encabezado y en el asunto va LO QUE SE PIDE, con las palabras del encargo. Si los hechos no alcanzan, redáctalo igual y deja entre corchetes lo que falte.`
+    : `REGLA DE LA ACTUACIÓN — manda sobre cualquier otra consideración de este prompt: el documento tiene que ser EXACTAMENTE un "${encargo}" y ninguna otra pieza procesal. El abogado ya eligió la actuación; no la sustituyas por la que te parezca más apropiada para los hechos, ni siquiera si otra encaja mejor. Si los hechos no alcanzan, redacta igual el "${encargo}" y deja entre corchetes lo que falte. Su nombre debe leerse en el encabezado o en el asunto del escrito, y la estructura debe ser la de esa clase de escrito.`
+}
 
 INDICACIÓN DEL USUARIO: "${prompt}".
 ${reglaAdjuntos}
@@ -114,7 +142,7 @@ NORMATIVIDAD: Cita artículos pertinentes de CGP, CST, CPACA, CP, C. Civil, C. P
 
 ${renderJurisprudencia(citations)}
 
-${`ESTRUCTURA DE "${documentType}" — obligatoria. Las secciones marcadas [OBLIGATORIA] no pueden omitirse y la de petición/pretensiones/resuelve JAMÁS se omite. Cada sección abre con su título en su propia línea, en mayúscula sostenida y entre **dobles asteriscos**:\n${estructuraObligatoria}`}
+${`ESTRUCTURA ${esTitulo ? `DEL ESCRITO QUE BUSCA "${encargo}"` : `DE "${encargo}"`} — obligatoria. Las secciones marcadas [OBLIGATORIA] no pueden omitirse y la de petición/pretensiones/resuelve JAMÁS se omite. Cada sección abre con su título en su propia línea, en mayúscula sostenida y entre **dobles asteriscos**:\n${estructuraObligatoria}`}
 ${customFormat ? `\n⚠️ FORMATO DE LA FIRMA — manda sobre la PRESENTACIÓN (numeración, títulos, orden de secciones, bloque de firma). NO autoriza omitir ninguna sección marcada [OBLIGATORIA] arriba: esas las exige la norma, no el estilo de la casa.\n${customFormat}` : ''}
     `;
 };
@@ -140,6 +168,7 @@ export const buildClaudeUserMessage = ({
   // After the facts and before the citations: the writer reads the file data
   // next to Gemini's extraction, which already leaned on the same block.
   const adjuntosBlock = adjuntos ? `\n\n${adjuntos}\n` : '';
+  const { esTitulo, encargo } = comoSeLlamaElEncargo(documentType);
 
   return existingDraft
     ? `Instrucción del usuario: "${prompt}".
@@ -148,7 +177,11 @@ Insumos fácticos de Gemini: ${facts}.${adjuntosBlock}
 ${renderJurisprudencia(citations)}
 
 Toma el borrador existente como base y aplica las correcciones. Entrega el documento COMPLETO resultante.`
-    : `Genera el documento jurídico "${documentType}" COMPLETO hasta la firma.
+    : `${
+        esTitulo
+          ? `Genera un escrito jurídico dirigido a lograr "${encargo}", COMPLETO hasta la firma y SIN ponerle nombre de figura procesal.`
+          : `Genera el documento jurídico "${encargo}" COMPLETO hasta la firma.`
+      }
 Hechos extraídos por Gemini: ${facts}.${adjuntosBlock}
 
 ${renderJurisprudencia(citations)}

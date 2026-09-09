@@ -8,6 +8,7 @@ import {
 import { useBranchActuacionesState } from '../../catalog/hooks/useBranchActuaciones';
 import { GuiaEligeActuacionDialog } from './GuiaEligeActuacionDialog';
 import { ActuacionPropiaDialog } from './ActuacionPropiaDialog';
+import { EscritoSinNombreDialog } from './EscritoSinNombreDialog';
 import { useCatalogBranchesState } from '../../catalog/hooks/useCatalogBranches';
 import { BRANCH_LABELS } from '../../catalog/branchLabels';
 import type { ActuacionRole } from '../../catalog/types';
@@ -67,6 +68,8 @@ interface WorkshopConfigMobileProps {
  */
 const OPCION_GUIA = '__QUE_LA_GUIA_ELIJA__';
 const OPCION_PROPIA = '__ESCRIBIR_EL_NOMBRE__';
+/* La tercera salida: ni sé cómo se llama. Misma que en la barra de escritorio. */
+const OPCION_SIN_NOMBRE = '__SIN_NOMBRE_DE_ACTUACION__';
 
 const ROL_CORTO: Record<ActuacionRole, string> = {
   LITIGANTE: 'Litigante',
@@ -87,6 +90,7 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
   const [abierto, setAbierto] = React.useState(false);
   const [guiaAbierta, setGuiaAbierta] = React.useState(false);
   const [propiaAbierta, setPropiaAbierta] = React.useState(false);
+  const [sinNombreAbierto, setSinNombreAbierto] = React.useState(false);
   /** Sube al crear una actuación propia: obliga a releer la lista de la rama. */
   const [recarga, setRecarga] = React.useState(0);
   const catalogo = useBranchActuacionesState(legalBranch, userRole, recarga);
@@ -94,6 +98,10 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
   const elegirTipo = (valor: string) => {
     if (valor === OPCION_GUIA) {
       setGuiaAbierta(true);
+      return;
+    }
+    if (valor === OPCION_SIN_NOMBRE) {
+      setSinNombreAbierto(true);
       return;
     }
     if (valor === OPCION_PROPIA) {
@@ -257,6 +265,7 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
                 </optgroup>
               )}
               <option value={OPCION_PROPIA}>Ninguna de estas: escribir el nombre…</option>
+              <option value={OPCION_SIN_NOMBRE}>No sé cómo se llama: describir qué debe lograr…</option>
             </select>
           </label>
 
@@ -289,6 +298,26 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
         onEscribirNombre={() => {
           setGuiaAbierta(false);
           setPropiaAbierta(true);
+        }}
+        onSinNombre={() => {
+          setGuiaAbierta(false);
+          setSinNombreAbierto(true);
+        }}
+      />
+      <EscritoSinNombreDialog
+        abierto={sinNombreAbierto}
+        onCerrar={() => setSinNombreAbierto(false)}
+        legalBranch={legalBranch}
+        userRole={userRole}
+        onEscribirNombre={() => {
+          setSinNombreAbierto(false);
+          setPropiaAbierta(true);
+        }}
+        onCreada={(exactName) => {
+          setRecarga((n) => n + 1);
+          setDocumentType(exactName);
+          setSinNombreAbierto(false);
+          setAbierto(false);
         }}
       />
       <ActuacionPropiaDialog
