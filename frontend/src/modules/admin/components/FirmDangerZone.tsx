@@ -77,7 +77,8 @@ export const FirmDangerZone: React.FC<FirmDangerZoneProps> = ({ firma, onElimina
         deshabilitado: !(motivoValido && nombreValido),
         onConfirmar: eliminar,
         texto: (
-          <div className="space-y-3">
+          /* El nombre de la firma se cita dos veces aqui y puede no llevar espacios. */
+          <div className="min-w-0 space-y-3 [overflow-wrap:anywhere]">
             <p className="text-justify [text-wrap:pretty]">
               Se borran <b>todos</b> los datos de <b>{firma.name}</b>: escritos, revisiones,
               transcripciones, clientes, pagos, sus {firma.users} {firma.users === 1 ? 'cuenta' : 'cuentas'} y
@@ -111,7 +112,7 @@ export const FirmDangerZone: React.FC<FirmDangerZoneProps> = ({ firma, onElimina
                 <span className="mt-0.5 block text-[10.5px] text-ink-400">Todavía no coincide.</span>
               )}
             </label>
-            {error && <p className="text-[12px] text-danger">{error}</p>}
+            {error && <p className="text-justify text-[12px] leading-snug text-danger [text-wrap:pretty]">{error}</p>}
           </div>
         )
       }
@@ -121,7 +122,7 @@ export const FirmDangerZone: React.FC<FirmDangerZoneProps> = ({ firma, onElimina
     <section className="rounded-card border border-[rgb(var(--danger)/0.35)] bg-[rgb(var(--danger)/0.04)]">
       <header className="flex items-start gap-2 border-b border-[rgb(var(--danger)/0.25)] px-4 py-3">
         <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-danger" />
-        <div>
+        <div className="min-w-0">
           <h3 className="text-[13px] font-semibold text-danger">Zona de riesgo</h3>
           <p className="mt-0.5 text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
             Eliminar la firma borra escritos, revisiones, transcripciones, clientes, pagos, usuarios y

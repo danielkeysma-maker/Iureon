@@ -219,7 +219,14 @@ export const OperatorConsole: React.FC = () => {
   }).length;
 
   return (
-    <div className="space-y-4">
+    /*
+      `min-w-0` EN LA RAÍZ y `[overflow-wrap:anywhere]` heredado: la consola vive
+      dentro de un diálogo L que en el teléfono ocupa el ancho entero, y sus
+      datos son correos de firma y NIT — palabras sin espacios que se pintan
+      fuera de su caja sin agrandarla. Declararlo aquí cubre cada párrafo, cada
+      lista y cada cifra de abajo de una vez.
+    */
+    <div className="min-w-0 space-y-4 [overflow-wrap:anywhere]">
       {/*
         LA BANDEJA DE SOPORTE VA ARRIBA: es lo único de esta consola que tiene a
         alguien esperando al otro lado. Las cifras de saldo se consultan; una
@@ -230,34 +237,42 @@ export const OperatorConsole: React.FC = () => {
       {/* ─── LAS CIFRAS AGREGADAS (7a): la salud de la casa de un vistazo ── */}
       {firms.length > 0 && (
         <div className="grid grid-cols-2 gap-px overflow-hidden rounded-card border border-line-200 bg-line-100 sm:grid-cols-4">
-          <div className="bg-surface px-4 py-2.5">
+          <div className="min-w-0 bg-surface px-3 py-2.5 sm:px-4">
             <p className="font-mono text-[18px] font-semibold text-ink-900">
               ${saldoAgregado.toLocaleString('es-CO')}
             </p>
-            <p className="text-meta text-ink-500">Saldo agregado — es pasivo: trabajo ya vendido</p>
+            <p className="text-justify text-meta text-ink-500">Saldo agregado — es pasivo: trabajo ya vendido</p>
           </div>
-          <div className="bg-surface px-4 py-2.5">
+          <div className="min-w-0 bg-surface px-3 py-2.5 sm:px-4">
             <p className="font-mono text-[18px] font-semibold text-ink-900">
               ${consumo30Agregado.toLocaleString('es-CO')}
             </p>
             <p className="text-meta text-ink-500">Consumo 30 días</p>
           </div>
-          <div className="bg-surface px-4 py-2.5">
+          <div className="min-w-0 bg-surface px-3 py-2.5 sm:px-4">
             <p className={`font-mono text-[18px] font-semibold ${porAgotarse > 0 ? 'text-unverified' : 'text-ink-900'}`}>
               {porAgotarse}
             </p>
-            <p className="text-meta text-ink-500">Con ≤7 días de saldo al ritmo actual</p>
+            <p className="text-justify text-meta text-ink-500">Con ≤7 días de saldo al ritmo actual</p>
           </div>
-          <div className="bg-surface px-4 py-2.5">
+          <div className="min-w-0 bg-surface px-3 py-2.5 sm:px-4">
             <p className="font-mono text-[18px] font-semibold text-ink-900">{firms.length}</p>
             <p className="text-meta text-ink-500">Firmas en la plataforma</p>
           </div>
         </div>
       )}
-      <div className="flex items-center justify-between bg-surface border border-line-200 rounded-card px-4 py-3">
-        <div className="flex items-center gap-2">
-          <ShieldCheck className="w-4 h-4 text-brand-700" />
-          <div>
+      {/*
+        LA CABECERA ENVUELVE, Y ESE ERA EL CORTE. Los tres botones —«Catálogo
+        maestro», «Actualizar», «Nueva firma»— suman 320px con sus iconos, y el
+        rótulo de la izquierda otros 150: en una fila que no envolvía ni encogía,
+        «Nueva firma» terminaba en el píxel 390 de una pantalla de 360 y el
+        `overflow-hidden` del diálogo se lo comía. Ahora el grupo de botones baja
+        a su propio renglón cuando no cabe, y el rótulo puede encoger.
+      */}
+      <div className="flex flex-wrap items-center justify-between gap-2 bg-surface border border-line-200 rounded-card px-3 py-3 sm:px-4">
+        <div className="flex min-w-0 items-center gap-2">
+          <ShieldCheck className="w-4 h-4 shrink-0 text-brand-700" />
+          <div className="min-w-0">
             <h3 className="font-bold text-ink-900 text-xs">Firmas en la plataforma</h3>
             <p className="text-[11px] text-ink-500">
               {firms.length} {firms.length === 1 ? 'firma registrada' : 'firmas registradas'}
@@ -265,7 +280,7 @@ export const OperatorConsole: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
           {/*
             El maestro va en la cabecera de la lista de firmas y no dentro de
             una ficha: no es un dato DE una firma, es la base que reciben todas.
@@ -298,7 +313,7 @@ export const OperatorConsole: React.FC = () => {
       {error && (
         <div className="bg-[rgb(var(--danger)/0.06)] border border-[rgb(var(--danger)/0.35)] rounded-card p-3 flex items-start gap-2">
           <AlertCircle className="w-4 h-4 text-danger shrink-0 mt-0.5" />
-          <p className="text-[11px] text-danger">{error}</p>
+          <p className="min-w-0 text-justify text-[11px] leading-snug text-danger [text-wrap:pretty]">{error}</p>
         </div>
       )}
 
@@ -316,7 +331,7 @@ export const OperatorConsole: React.FC = () => {
             <ShieldCheck className="w-4 h-4 text-verified shrink-0 mt-0.5" />
           )}
           <div className="min-w-0 flex-1 text-[11px] text-ink-900">
-            <p>
+            <p className="text-justify [text-wrap:pretty]">
               La firma <b>{avisoDeBorrado.nombre}</b> fue eliminada con todos sus datos ·{' '}
               {avisoDeBorrado.usuariosEliminados}{' '}
               {avisoDeBorrado.usuariosEliminados === 1 ? 'cuenta eliminada' : 'cuentas eliminadas'}.
@@ -348,7 +363,7 @@ export const OperatorConsole: React.FC = () => {
       {creando && (
         <form onSubmit={crear} className="bg-surface border border-line-200 rounded-card p-4 space-y-3">
           <h4 className="font-bold text-ink-900 text-xs">Registrar una firma cliente</h4>
-          <p className="text-[11px] text-ink-500">
+          <p className="text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
             Se crea la firma y la cuenta de su administrador en un solo paso. Entrégale la contraseña
             por un canal seguro y pídele que la cambie.
           </p>
@@ -415,9 +430,7 @@ export const OperatorConsole: React.FC = () => {
       ) : firms.length === 0 ? (
         <div className="bg-surface border border-line-200 rounded-card p-6 text-center">
           <Building2 className="w-6 h-6 text-slate-300 mx-auto mb-2" />
-          <p className="text-[11px] text-ink-500">
-            Todavía no hay firmas registradas en la plataforma.
-          </p>
+          <p className="text-[11px] text-ink-500">Todavía no hay firmas registradas en la plataforma.</p>
         </div>
       ) : (
         <div className="bg-surface border border-line-200 rounded-card divide-y divide-line-100">
@@ -531,7 +544,7 @@ export const OperatorConsole: React.FC = () => {
         console — and because a firm that asks deserves an answer that matches
         what the code does.
       */}
-      <p className="text-[11px] text-ink-500 px-1">
+      <p className="px-1 text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
         Esta consola gestiona el negocio de cada firma: su plan, su saldo y sus cuentas. No da acceso
         a sus audiencias, borradores ni expedientes — eso es material amparado por el secreto
         profesional. Cada cambio queda registrado en la auditoría de la firma afectada, con tu correo.

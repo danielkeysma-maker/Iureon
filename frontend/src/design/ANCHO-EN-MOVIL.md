@@ -16,7 +16,7 @@ aplicación, `<main>` y la columna de trabajo de `App.tsx`— se come lo que sob
 Por eso `document.documentElement.scrollWidth` **sigue diciendo 360**: la página
 no desborda, el contenido se pierde. Un desbordamiento se ve; esto no.
 
-Ese mínimo lo fija algo concreto y distinto en cada pantalla. Los cinco que ya
+Ese mínimo lo fija algo concreto y distinto en cada pantalla. Los siete que ya
 aparecieron aquí:
 
 1. **`truncate`** — su ancho mínimo es la frase entera, no el ancho con puntos
@@ -31,6 +31,17 @@ aparecieron aquí:
    panel cubre todos sus párrafos, listas y citas de una vez.
 5. **Dos columnas de escritorio sin apilar** — lista + detalle en una fila que
    nunca cambia de dirección.
+6. **Una `<table>`** — y esta no la arregla ningún `min-w-0`, porque una celda
+   no es un ítem flex: el algoritmo de tabla reparte el ancho a partir del
+   mínimo de cada columna y no baja de ahí. Cinco columnas cuya primera lleva
+   un correo de firma piden 803px; dentro de una columna de 277 la mitad de
+   cada renglón cae fuera y la página no desborda. Se resuelve como la 8d:
+   tarjeta en el teléfono, fila en escritorio.
+7. **`shrink-0` sobre un contenido de ancho ilimitado** — `shrink-0` es
+   correcto para un icono, una fecha o un chip, y es una trampa para un correo
+   o un radicado: el ítem se queda con todo lo que su texto pide y estrangula
+   a sus hermanos. Un registro de auditoría llegó a dejar el hecho en 47px de
+   ancho porque el correo del operador, a su lado, no encogía.
 
 ## Cómo se mide (en el navegador, no de vista)
 
@@ -75,6 +86,20 @@ const derrame = [...document.querySelectorAll('body *')].filter((e) => {
 ```
 
 **Los dos barridos se corren siempre juntos.** Uno solo deja pasar la mitad.
+
+### Y no se mide una pantalla vacía
+
+`?vista=1` entra sin credenciales, pero su token es basura: la API contesta 401
+y las listas salen vacías. Una lista vacía no se corta nunca, así que medirla
+así es declararla sana sin haberla visto. Dos pantallas —la consola de operación
+y la gestión de usuarios de la firma— pasaron una auditoría entera por eso.
+
+Para medirlas de verdad hacen falta dos cosas, y las dos viven fuera del árbol:
+un servidor local en el puerto 4000 que conteste lo que `VITE_API_URL` espera,
+con contenido de tamaño real —correos de firma de sesenta caracteres, NIT,
+radicados—, y la sesión escrita a mano en `localStorage` bajo `iureon_session`
+con el rol que abre la pantalla (`SUPER_ADMIN` para la consola). Nada de eso
+puede quedar en el repositorio: se comprueba con `git status` al terminar.
 
 Y para saber **quién** impone el mínimo, se sube por los padres del infractor
 leyendo `getBoundingClientRect().width` y `getComputedStyle(n).minWidth`: el

@@ -133,8 +133,13 @@ export const FirmUsersDialog: React.FC<FirmUsersDialogProps> = ({
           </>
         }
       >
-        <div className="space-y-4">
-          {error && <p className="notice-unverified">{error}</p>}
+        /*
+          `[overflow-wrap:anywhere]` en la raiz: los correos de firma son la
+          materia de esta pantalla, y un correo de sesenta caracteres se pinta
+          fuera de su caja sin agrandarla.
+        */
+        <div className="min-w-0 space-y-4 [overflow-wrap:anywhere]">
+          {error && <p className="notice-unverified text-justify [text-wrap:pretty]">{error}</p>}
 
           <div className="relative max-w-[300px]">
             <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-400" />
@@ -252,14 +257,14 @@ export const FirmUsersDialog: React.FC<FirmUsersDialogProps> = ({
             <dl className="mt-2 space-y-1.5">
               <div>
                 <dt className="text-ui font-medium text-ink-900">Socio · administrador</dt>
-                <dd className="text-meta leading-[1.5] text-ink-500">
+                <dd className="text-justify text-meta leading-[1.5] text-ink-500 [text-wrap:pretty]">
                   Todo lo del abogado, más: verificar el catálogo, cambiar marca y formato, crear y
                   desactivar usuarios.
                 </dd>
               </div>
               <div>
                 <dt className="text-ui font-medium text-ink-900">Abogado litigante</dt>
-                <dd className="text-meta leading-[1.5] text-ink-500">
+                <dd className="text-justify text-meta leading-[1.5] text-ink-500 [text-wrap:pretty]">
                   Redacta, orienta, graba, exporta y propone actuaciones al catálogo; no las
                   verifica.
                 </dd>
@@ -355,7 +360,7 @@ const CrearUsuarioDialog: React.FC<{
         </>
       }
     >
-      <div className="space-y-3">
+      <div className="min-w-0 space-y-3 [overflow-wrap:anywhere]">
         <label className="block">
           <span className="field-label">Correo</span>
           <input
@@ -374,7 +379,7 @@ const CrearUsuarioDialog: React.FC<{
             placeholder="Valentina Orozco"
             className="field mt-1 w-full"
           />
-          <span className="mt-1 block text-meta text-ink-400">
+          <span className="mt-1 block text-justify text-meta leading-[1.5] text-ink-400 [text-wrap:pretty]">
             Aparecerá en esta lista junto al correo. Si lo deja vacío, la persona lo pone desde
             Ajustes → «Su cuenta».
           </span>
@@ -389,14 +394,14 @@ const CrearUsuarioDialog: React.FC<{
             placeholder="Mínimo 8 caracteres"
             className="field mt-1 w-full"
           />
-          <span className="mt-1 block text-meta text-ink-400">
+          <span className="mt-1 block text-justify text-meta leading-[1.5] text-ink-400 [text-wrap:pretty]">
             Entréguela por un canal seguro; la persona puede cambiarla al entrar.
           </span>
         </label>
 
         <div>
           <span className="field-label">Rol</span>
-          <div className="mt-1 flex gap-1.5">
+          <div className="mt-1 flex flex-wrap gap-1.5">
             {(['LAWYER', 'FIRM_ADMIN'] as const).map((r) => (
               <button
                 key={r}
@@ -431,7 +436,7 @@ const CrearUsuarioDialog: React.FC<{
           </ul>
         </div>
 
-        {error && <p className="notice-unverified">{error}</p>}
+        {error && <p className="notice-unverified text-justify [text-wrap:pretty]">{error}</p>}
       </div>
     </Dialog>
   );

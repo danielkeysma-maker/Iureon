@@ -96,7 +96,13 @@ export const ResetPasswordDialog: React.FC<ResetPasswordDialogProps> = ({
         deshabilitado: !hecho && contrasena.length < MIN,
         onConfirmar: hecho ? () => undefined : fijar,
         texto: (
-          <div className="space-y-3">
+          /*
+            `[overflow-wrap:anywhere]` EN LA RAIZ: el cuerpo entero de este
+            dialogo gira alrededor de un correo de firma —una palabra de 60
+            caracteres sin espacios— que a 320 se pintaba 137px fuera de su
+            parrafo sin que la caja creciera ni la pagina desbordara.
+          */
+          <div className="min-w-0 space-y-3 [overflow-wrap:anywhere]">
             <p className="text-justify [text-wrap:pretty]">
               {hecho ? (
                 <>
@@ -112,15 +118,16 @@ export const ResetPasswordDialog: React.FC<ResetPasswordDialogProps> = ({
             </p>
             <label className="block text-[11px] text-ink-500">
               Contraseña · mínimo {MIN} caracteres
-              <div className="mt-1 flex gap-1.5">
+              <div className="mt-1 flex min-w-0 flex-wrap gap-1.5">
                 <input
                   type="text"
                   value={contrasena}
+                  /* `min-w-0`: sin el, el campo se niega a bajar de su ancho por defecto y empuja a «Generar» y «Copiar» fuera de la hoja. */
                   onChange={(e) => setContrasena(e.target.value)}
                   readOnly={hecho}
                   autoComplete="new-password"
                   spellCheck={false}
-                  className="w-full rounded-control border border-line-200 bg-canvas px-2 py-1.5 font-mono text-[12px] text-ink-900 focus:border-brand-700 focus:outline-none"
+                  className="w-full min-w-0 rounded-control border border-line-200 bg-canvas px-2 py-1.5 font-mono text-[12px] text-ink-900 focus:border-brand-700 focus:outline-none"
                   autoFocus={!hecho}
                 />
                 {!hecho && (

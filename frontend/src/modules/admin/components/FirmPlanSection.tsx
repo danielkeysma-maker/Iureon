@@ -161,7 +161,7 @@ const ModulosDeLaFirma: React.FC<ModulosDeLaFirmaProps> = ({ firma, onGuardado }
   };
 
   return (
-    <div className="border-t border-line-200 px-4 py-3">
+    <div className="min-w-0 border-t border-line-200 px-4 py-3">
       <h4 className="text-[12.5px] font-semibold text-ink-900">Módulos de esta firma</h4>
       <p className="mt-0.5 text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
         El plan es la base; aquí se resta para esta firma. La firma verá el módulo como no disponible. Debajo de cada módulo,
@@ -225,7 +225,7 @@ const ModulosDeLaFirma: React.FC<ModulosDeLaFirmaProps> = ({ firma, onGuardado }
                             {f.nombre}
                             {conElModulo && <span className="ml-1 font-normal text-ink-400">(con el módulo)</span>}
                           </p>
-                          <p className="text-[10.5px] leading-snug text-ink-500 [text-wrap:pretty]">{f.descripcion}</p>
+                          <p className="text-justify text-[10.5px] leading-snug text-ink-500 [text-wrap:pretty]">{f.descripcion}</p>
                           {estadoF === 'DESACTIVADA' && (
                             <span className="chip-unverified mt-1 inline-block">Desactivada por el operador</span>
                           )}
@@ -309,7 +309,7 @@ const ModulosDeLaFirma: React.FC<ModulosDeLaFirmaProps> = ({ firma, onGuardado }
                     autoFocus
                   />
                 </label>
-                {error && <p className="text-[12px] text-danger">{error}</p>}
+                {error && <p className="text-justify text-[12px] leading-snug text-danger [text-wrap:pretty]">{error}</p>}
               </div>
             )
           }
@@ -420,9 +420,9 @@ export const FirmPlanSection: React.FC<FirmPlanSectionProps> = ({ firma, onGuard
   };
 
   return (
-    <section className="rounded-card border border-line-200 bg-surface">
+    <section className="min-w-0 rounded-card border border-line-200 bg-surface">
       <header className="flex flex-wrap items-start justify-between gap-2 border-b border-line-200 px-4 py-3">
-        <div>
+        <div className="min-w-0">
           <h3 className="text-[13px] font-semibold text-ink-900">Plan</h3>
           <p className="mt-0.5 text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
             Lo que la firma tiene contratado. Operación puede fijarlo a mano —extender una prueba,
@@ -545,7 +545,7 @@ export const FirmPlanSection: React.FC<FirmPlanSectionProps> = ({ firma, onGuard
             />
           </label>
 
-          {error && <p className="text-[12px] text-danger">{error}</p>}
+          {error && <p className="text-justify text-[12px] leading-snug text-danger [text-wrap:pretty]">{error}</p>}
 
           <div className="flex items-center gap-3">
             <button type="submit" disabled={guardando} className="btn-primary text-[12px] disabled:opacity-50">
@@ -592,7 +592,7 @@ export const FirmPlanSection: React.FC<FirmPlanSectionProps> = ({ firma, onGuard
                     autoFocus
                   />
                 </label>
-                {errorSuspension && <p className="text-[12px] text-danger">{errorSuspension}</p>}
+                {errorSuspension && <p className="text-justify text-[12px] leading-snug text-danger [text-wrap:pretty]">{errorSuspension}</p>}
               </div>
             )
           }

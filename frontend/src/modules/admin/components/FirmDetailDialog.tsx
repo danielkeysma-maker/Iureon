@@ -87,7 +87,13 @@ const Metrica: React.FC<{ rotulo: string; valor: string; nota: string }> = ({
   valor,
   nota
 }) => (
-  <div className="rounded-card border border-line-200 bg-surface px-4 py-3">
+  /*
+    `px-3` EN EL TELEFONO. Dos metricas por fila a 320 dejan 118px de caja; con
+    `px-4` a cada lado la cifra —«$1.240.800», que no tiene donde partirse— se
+    pintaba tres pixeles fuera de su tarjeta. Los ocho pixeles que devuelve el
+    relleno menor bastan, y en escritorio no cambia nada.
+  */
+  <div className="min-w-0 rounded-card border border-line-200 bg-surface px-3 py-3 sm:px-4">
     <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
       {rotulo}
     </p>
@@ -167,7 +173,13 @@ export const FirmDetailDialog: React.FC<FirmDetailDialogProps> = ({ firmId, onCl
       )}
 
       {firma && !cargando && (
-        <div className="space-y-4">
+        /*
+          `min-w-0` y `[overflow-wrap:anywhere]` EN LA RAIZ. Toda la ficha son
+          correos de firma, NIT e ids: palabras sin espacios que se pintan fuera
+          de su caja sin agrandarla, el corte que ningun barrido de cajas ve.
+          Declarado aqui, cubre cada parrafo, cada lista y cada celda de abajo.
+        */
+        <div className="min-w-0 space-y-4 [overflow-wrap:anywhere]">
           <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             <Metrica
               rotulo="Saldo"
@@ -210,49 +222,65 @@ export const FirmDetailDialog: React.FC<FirmDetailDialogProps> = ({ firmId, onCl
                 nueva cuando la firma lo pide: no hay correo de recuperación.
               </p>
             </header>
-            <table className="w-full text-[12px]">
-              <thead>
-                <tr className="border-b border-line-200 text-left text-ink-400">
-                  <th className="px-4 py-2 font-medium">Cuenta</th>
-                  <th className="px-4 py-2 font-medium">Rol</th>
-                  <th className="px-4 py-2 text-right font-medium">Consumo mes</th>
-                  <th className="px-4 py-2 text-right font-medium">Últ. sesión</th>
-                  <th className="px-4 py-2 text-right font-medium">
-                    <span className="sr-only">Acciones</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {firma.usuarios.map((u) => (
-                  <tr key={u.id} className="border-b border-line-200 last:border-0">
-                    <td className="px-4 py-2.5 text-ink-900">
-                      {u.email}
-                      {u.desactivado && (
-                        <span className="ml-2 inline-flex items-center gap-1 text-[10.5px] text-ink-400">
-                          <ShieldOff className="h-3 w-3" /> desactivada
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-2.5 text-ink-500">{ROL[u.role] ?? u.role}</td>
-                    <td className="px-4 py-2.5 text-right tabular-nums text-ink-700">
+            {/*
+              TARJETA EN EL TELEFONO, FILA EN ESCRITORIO. Esto era un `<table>`
+              de cinco columnas: una tabla no encoge por debajo del ancho minimo
+              de su contenido, y el contenido de la primera columna es un correo
+              de firma. Medida a 320, la tabla pedia 803px dentro de una columna
+              de 277 — la mitad de cada renglon caia fuera del dialogo sin que la
+              pagina desbordara, asi que nada lo delataba. Es el mismo remedio
+              que la 8d le dio a la lista de usuarios de la firma: identidad
+              arriba, y debajo, tras un filete, el rol, el consumo y la sesion.
+            */}
+            <div className="min-w-0">
+              <div className="t-head hidden items-center gap-3 md:flex">
+                <span className="min-w-0 flex-1">Cuenta</span>
+                <span className="w-[130px] shrink-0">Rol</span>
+                <span className="w-[92px] shrink-0 text-right">Consumo mes</span>
+                <span className="w-[96px] shrink-0 text-right">Últ. sesión</span>
+                <span className="w-[124px] shrink-0" />
+              </div>
+
+              {firma.usuarios.map((u) => (
+                <div
+                  key={u.id}
+                  className="flex min-w-0 flex-col items-stretch gap-2 border-b border-line-200 px-4 py-2.5 text-[12px] last:border-0 md:flex-row md:flex-wrap md:items-center md:gap-3"
+                >
+                  <span className="min-w-0 flex-1 text-ink-900">
+                    {u.email}
+                    {u.desactivado && (
+                      <span className="ml-2 inline-flex items-center gap-1 text-[10.5px] text-ink-400">
+                        <ShieldOff className="h-3 w-3 shrink-0" /> desactivada
+                      </span>
+                    )}
+                  </span>
+
+                  <span className="flex min-w-0 items-center gap-2 border-t border-line-100 pt-2 md:contents md:border-0 md:pt-0">
+                    <span className="min-w-0 flex-1 text-ink-500 md:w-[130px] md:flex-none md:shrink-0">
+                      {ROL[u.role] ?? u.role}
+                    </span>
+                    <span className="shrink-0 text-right tabular-nums text-ink-700 md:w-[92px]">
                       {pesos(u.consumoMesCop)}
-                    </td>
-                    <td className="px-4 py-2.5 text-right text-ink-500">{hace(u.ultimoAcceso)}</td>
-                    <td className="px-4 py-2.5 text-right">
-                      <button
-                        type="button"
-                        onClick={() => setCuentaAReiniciar(u)}
-                        className="inline-flex items-center gap-1 whitespace-nowrap text-[11px] font-medium text-brand-700 hover:underline"
-                        title="Fijar una contraseña nueva; se entrega por canal seguro"
-                      >
-                        <KeyRound className="h-3 w-3" />
-                        Nueva contraseña
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </span>
+                    <span className="shrink-0 text-right text-ink-500 md:w-[96px]">
+                      {hace(u.ultimoAcceso)}
+                    </span>
+                  </span>
+
+                  <span className="flex justify-end md:w-[124px] md:shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setCuentaAReiniciar(u)}
+                      className="inline-flex items-center gap-1 whitespace-nowrap text-[11px] font-medium text-brand-700 hover:underline"
+                      title="Fijar una contraseña nueva; se entrega por canal seguro"
+                    >
+                      <KeyRound className="h-3 w-3 shrink-0" />
+                      Nueva contraseña
+                    </button>
+                  </span>
+                </div>
+              ))}
+            </div>
           </section>
 
           <section className="rounded-card border border-line-200 bg-surface">
@@ -270,13 +298,23 @@ export const FirmDetailDialog: React.FC<FirmDetailDialogProps> = ({ firmId, onCl
               </p>
             ) : (
               <ul className="divide-y divide-line-200">
+                {/*
+                  EL CORREO DEL OPERADOR BAJA EN EL TELEFONO. Iba `shrink-0` en
+                  la misma fila, y un correo de firma no encoge: a 320 dejaba el
+                  hecho registrado en 47px de ancho y se pintaba el mismo fuera
+                  de la caja. Aqui la fecha y el hecho comparten renglon —la
+                  fecha SI es corta— y el correo va debajo, donde tiene el ancho
+                  entero; en escritorio los tres siguen en una sola linea.
+                */}
                 {firma.registroDeOperacion.slice(0, 12).map((e) => (
-                  <li key={e.id} className="flex gap-3 px-4 py-2.5 text-[12px]">
-                    <span className="shrink-0 tabular-nums text-ink-400">{fecha(e.timestamp)}</span>
-                    <span className="min-w-0 flex-1 text-justify text-ink-900 [text-wrap:pretty]">
-                      {e.resource || e.action}
+                  <li key={e.id} className="flex min-w-0 flex-col gap-1 px-4 py-2.5 text-[12px] sm:flex-row sm:gap-3">
+                    <span className="flex min-w-0 gap-3 sm:contents">
+                      <span className="shrink-0 tabular-nums text-ink-400">{fecha(e.timestamp)}</span>
+                      <span className="min-w-0 flex-1 text-justify text-ink-900 [text-wrap:pretty]">
+                        {e.resource || e.action}
+                      </span>
                     </span>
-                    <span className="shrink-0 text-ink-400">{e.userEmail}</span>
+                    <span className="min-w-0 text-ink-400 sm:shrink-0">{e.userEmail}</span>
                   </li>
                 ))}
               </ul>
