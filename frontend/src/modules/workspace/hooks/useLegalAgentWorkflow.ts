@@ -69,7 +69,7 @@ export function useLegalAgentWorkflow(formatoDeFirma?: string) {
       excepcionesFormuladas: ['Revisión Procesal en Curso'],
       legalText: `⏳ REDACTANDO PIEZA PROCESAL EN TIEMPO REAL...
 
-El Pipeline de 3 Motores (Gemini 3.6 Flash ➔ GPT-5.6 Sol ➔ Claude Opus 5) se encuentra procesando su indicación procesal, vectorizando precedentes en Supabase y estructurando la providencia.
+El Pipeline de 3 Motores (Gemini 3.8 Flash ➔ GPT-5.6 Sol ➔ Claude Opus 5) se encuentra procesando su indicación procesal, vectorizando precedentes en Supabase y estructurando la providencia.
 
 Por favor espere unos segundos mientras se finaliza la redacción solemne.`,
       // Zero, not 4820. This placeholder is shown BEFORE the request leaves the
@@ -86,7 +86,7 @@ Por favor espere unos segundos mientras se finaliza la redacción solemne.`,
         id: Date.now().toString(),
         timestamp: requestTimestamp,
         engine: 'GEMINI',
-        message: `[STAGE-1: INGESTION] Gemini 3.6 Flash procesando indicación procesal e insumos fácticos del caso...`,
+        message: `[STAGE-1: INGESTION] Gemini 3.8 Flash procesando indicación procesal e insumos fácticos del caso...`,
         type: 'info'
       }
     ]);
