@@ -153,17 +153,56 @@ interface ParsedTriage {
   preguntas: string[];
 }
 
+/*
+ * EL MOTOR NO SIEMPRE DEVUELVE JSON LIMPIO, y una de cada seis respuestas se
+ * perdía por eso: medido el 9 de septiembre de 2026 con la misma pregunta
+ * repetida, el mismo motor contestó cinco veces con JSON válido y una con un
+ * texto que `JSON.parse` rechazó — comillas rectas dentro de una «razon», una
+ * coma final, o prosa alrededor del objeto—. Para el abogado eso era «sale un
+ * error» sin más. El lector prueba primero el JSON tal cual; si falla, lo
+ * limpia de cercas y comas finales; y si aun así no se lee, rescata los
+ * «nombre» uno a uno con una expresión regular. Ese último rescate es seguro
+ * porque cada nombre se valida después contra el catálogo: un nombre que no
+ * exista se descarta igual que siempre. Y el texto crudo que no se pudo leer
+ * queda en el registro del servidor, recortado, para que la próxima vez no
+ * haya que adivinar.
+ */
+/** Último recurso: los «nombre» sueltos; cada uno se valida luego contra el catálogo. */
+const rescatarNombres = (objeto: string): Record<string, unknown> | null => {
+  const nombres = [...objeto.matchAll(/"nombre"\s*:\s*"((?:[^"\\]|\\.)*)"/g)].map((m) => m[1]);
+  if (nombres.length === 0) return null;
+  return { actuaciones: nombres.map((nombre) => ({ nombre, rama: '', razon: 'El motor propuso esta actuación; la razón no se pudo leer.' })) };
+};
+
+const intentarJson = (fragmento: string): Record<string, unknown> | null => {
+  try {
+    return JSON.parse(fragmento) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+};
+
 const parsePicks = (text: string): ParsedTriage | null => {
-  const start = text.indexOf('{');
-  const end = text.lastIndexOf('}');
+  const sinCercas = text.replace(/```(?:json)?/gi, '').trim();
+  const start = sinCercas.indexOf('{');
+  const end = sinCercas.lastIndexOf('}');
   if (start < 0 || end <= start) return null;
+  const objeto = sinCercas.slice(start, end + 1);
+
+  const parsed = (intentarJson(objeto) ??
+    intentarJson(objeto.replace(/,\s*([}\]])/g, '$1')) ??
+    rescatarNombres(objeto)) as {
+    actuaciones?: ModelPick[];
+    senales?: { rama?: unknown; elementos?: unknown };
+    preguntas?: unknown;
+  } | null;
+
+  if (!parsed) {
+    console.error('[TRIAGE] Respuesta ilegible del motor:', text.slice(0, 600).replace(/\s+/g, ' '));
+    return null;
+  }
 
   try {
-    const parsed = JSON.parse(text.slice(start, end + 1)) as {
-      actuaciones?: ModelPick[];
-      senales?: { rama?: unknown; elementos?: unknown };
-      preguntas?: unknown;
-    };
     if (!Array.isArray(parsed.actuaciones)) return null;
 
     return {

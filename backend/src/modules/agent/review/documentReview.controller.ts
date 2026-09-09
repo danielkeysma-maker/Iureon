@@ -503,7 +503,13 @@ export const reviewChatController = async (req: Request, res: Response): Promise
         ENGINE.OPUS,
         buildTallerSystemPrompt(),
         buildTallerUserPrompt({ documentType: revision.documentType, guidance, informe: revision.informe, textoActual: texto.texto, historial, mensaje, anotaciones: anotacionesDelAbogado, verificaciones }),
-        2500
+        /*
+         * 4.000 y no 2.500: una respuesta de la guía con tres puntos titulados
+         * y una edición propuesta pasaba de 2.500 tokens y llegaba cortada a
+         * mitad de frase, sin que nada lo dijera. Si aun así se corta, abajo
+         * se declara.
+         */
+        4000
       ),
       LIMITE_LLAMADA_MS
     );
@@ -514,6 +520,11 @@ export const reviewChatController = async (req: Request, res: Response): Promise
       return;
     }
     const respuesta = parsearRespuestaDelTaller(llamada.text);
+    if (llamada.truncated) {
+      // El proveedor paró por longitud: lo escrito es lo que cupo. Se dice, y se
+      // ofrece la salida, en vez de dejar una frase a medias como si fuera el final.
+      respuesta.respuesta = `${respuesta.respuesta.trimEnd()}\n\n[La respuesta se cortó por longitud. Escriba «continúa» para que la guía siga desde aquí.]`;
+    }
     const cobro = await settleOperation({
       firmId,
       userEmail,

@@ -62,6 +62,13 @@ export interface CallResult {
   text: string;
   /** Absent when the call failed before producing anything billable. */
   usage: CallUsage | null;
+  /**
+   * True when the provider stopped for length (`finish_reason: "length"`): the
+   * text is what fit in `max_tokens`, cut mid-sentence. Callers that show the
+   * text to a person must say so; the taller's chat answers were arriving cut
+   * and nothing told the lawyer that the rest existed and was not written.
+   */
+  truncated?: boolean;
 }
 
 const SIN_RESULTADO: CallResult = { text: '', usage: null };
@@ -205,13 +212,15 @@ const callOpenRouter = async (
       : null;
 
     const text: string = json.choices?.[0]?.message?.content?.trim() ?? '';
+    const truncated = json.choices?.[0]?.finish_reason === 'length';
 
     if (text.length > minUsableLength) {
       console.log(
         `[OPENROUTER] ${model} responded with ${text.length} characters` +
-          (usage ? ` (US$${usage.costUsd.toFixed(6)})` : '')
+          (usage ? ` (US$${usage.costUsd.toFixed(6)})` : '') +
+          (truncated ? ' · CUT FOR LENGTH' : '')
       );
-      return { text, usage };
+      return { text, usage, truncated };
     }
 
     // Too short to use, but it was still billed: the usage travels so the cost
