@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { ExternalLink, FileSpreadsheet } from 'lucide-react';
+import { ExternalLink, FileSpreadsheet, FileText } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import { toolsApi } from '../services/tools.api';
 import type { Fuente, IndexacionResult } from '../types';
-import { exportarExcel } from '../exportarExcel';
+import { exportarExcel, type LibroExcel } from '../exportarExcel';
+import { exportarPdf } from '../exportarPdf';
 import { FuentesBox } from './FuentesBox';
 
 /**
@@ -65,9 +66,10 @@ export const IndexacionModal: React.FC<{ isOpen: boolean; onClose: () => void }>
     }
   };
 
-  const exportar = () => {
-    if (!resultado) return;
-    exportarExcel({
+  /* El mismo objeto para las dos salidas: el Excel y el PDF no pueden diferir. */
+  const libro = (): LibroExcel | null => {
+    if (!resultado) return null;
+    return {
       archivo: 'indexacion-ipc',
       resultado: [
         ['Valor histórico', resultado.valor],
@@ -78,8 +80,24 @@ export const IndexacionModal: React.FC<{ isOpen: boolean; onClose: () => void }>
       ],
       detalle: { columnas: ['Fórmula'], filas: [[resultado.formula]] },
       fuentes: resultado.fuentes,
-      notas: resultado.advertencias
-    });
+      notas: resultado.advertencias,
+      titulo: 'Indexación por IPC'
+    };
+  };
+
+  const exportar = () => {
+    const l = libro();
+    if (l) exportarExcel(l);
+  };
+
+  const exportarPapel = async () => {
+    const l = libro();
+    if (!l) return;
+    try {
+      await exportarPdf(l);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'No se pudo generar el PDF.');
+    }
   };
 
   return (
@@ -92,10 +110,16 @@ export const IndexacionModal: React.FC<{ isOpen: boolean; onClose: () => void }>
       acciones={
         <>
           {resultado && (
-            <button onClick={exportar} className="btn-neutral btn-sm">
-              <FileSpreadsheet className="h-3.5 w-3.5" />
-              Exportar a Excel
-            </button>
+            <>
+              <button onClick={exportar} className="btn-neutral btn-sm">
+                <FileSpreadsheet className="h-3.5 w-3.5" />
+                Exportar a Excel
+              </button>
+              <button onClick={() => void exportarPapel()} className="btn-neutral btn-sm">
+                <FileText className="h-3.5 w-3.5" />
+                Exportar a PDF
+              </button>
+            </>
           )}
           <button onClick={() => void calcular()} disabled={calculando || !listo} className="btn-primary btn-sm">
             {calculando ? 'Calculando…' : 'Indexar'}

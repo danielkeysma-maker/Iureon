@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Check, Copy, FileSpreadsheet } from 'lucide-react';
+import { Check, Copy, FileSpreadsheet, FileText } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import { termsApi, type TermsCalculationResult } from '../services/terms.api';
-import { exportarExcel } from '../../tools/exportarExcel';
+import { exportarExcel, type LibroExcel } from '../../tools/exportarExcel';
+import { exportarPdf } from '../../tools/exportarPdf';
 
 interface ProceduralTermsModalProps {
   isOpen: boolean;
@@ -65,9 +66,10 @@ export const ProceduralTermsModal: React.FC<ProceduralTermsModalProps> = ({ isOp
    * The workbook carries the excluded days AND the sources the server used
    * (Ley 51 de 1983, CGP art. 118), so the computation leaves with its evidence.
    */
-  const exportar = () => {
-    if (!resultado) return;
-    exportarExcel({
+  /* El mismo objeto para las dos salidas: el Excel y el PDF no pueden diferir. */
+  const libro = (): LibroExcel | null => {
+    if (!resultado) return null;
+    return {
       archivo: 'contador-de-terminos',
       resultado: [
         ['Fecha de notificación', resultado.notifiedDate],
@@ -81,8 +83,24 @@ export const ProceduralTermsModal: React.FC<ProceduralTermsModalProps> = ({ isOp
         columnas: ['Fecha excluida', 'Motivo'],
         filas: resultado.excludedDays.map((d) => [d.date, d.reason])
       },
-      fuentes: resultado.fuentes ?? []
-    });
+      fuentes: resultado.fuentes ?? [],
+      titulo: 'Contador de términos'
+    };
+  };
+
+  const exportar = () => {
+    const l = libro();
+    if (l) exportarExcel(l);
+  };
+
+  const exportarPapel = async () => {
+    const l = libro();
+    if (!l) return;
+    try {
+      await exportarPdf(l);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'No se pudo generar el PDF.');
+    }
   };
 
   const copiar = async () => {
@@ -109,6 +127,10 @@ export const ProceduralTermsModal: React.FC<ProceduralTermsModalProps> = ({ isOp
               <button onClick={exportar} className="btn-neutral btn-sm">
                 <FileSpreadsheet className="h-3.5 w-3.5" />
                 Exportar a Excel
+              </button>
+              <button onClick={() => void exportarPapel()} className="btn-neutral btn-sm">
+                <FileText className="h-3.5 w-3.5" />
+                Exportar a PDF
               </button>
               <button onClick={() => void copiar()} className="btn-neutral btn-sm">
                 {copiado ? <Check className="h-3.5 w-3.5 text-verified" /> : <Copy className="h-3.5 w-3.5" />}

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { FileSpreadsheet } from 'lucide-react';
+import { FileSpreadsheet, FileText } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import { toolsApi } from '../services/tools.api';
 import type { CalendarioAnual } from '../types';
-import { exportarExcel } from '../exportarExcel';
+import { exportarExcel, type LibroExcel } from '../exportarExcel';
+import { exportarPdf } from '../exportarPdf';
 import { FuentesBox } from './FuentesBox';
 
 /**
@@ -57,10 +58,12 @@ export const CalendarioModal: React.FC<{ isOpen: boolean; onClose: () => void }>
     };
   }, [isOpen, anio, semanaSantaCompleta]);
 
-  const exportar = () => {
-    if (!calendario) return;
-    exportarExcel({
+  /* El mismo objeto para las dos salidas: el Excel y el PDF no pueden diferir. */
+  const libro = (): LibroExcel | null => {
+    if (!calendario) return null;
+    return {
       archivo: `calendario-judicial-${calendario.anio}`,
+      titulo: `Calendario judicial ${calendario.anio}`,
       resultado: [
         ['Año', calendario.anio],
         ['Festivos (Ley 51 de 1983)', calendario.festivos.length],
@@ -76,7 +79,22 @@ export const CalendarioModal: React.FC<{ isOpen: boolean; onClose: () => void }>
       },
       fuentes: calendario.fuentes,
       notas: [calendario.vacancia.descripcion, calendario.semanaSanta.nota]
-    });
+    };
+  };
+
+  const exportar = () => {
+    const l = libro();
+    if (l) exportarExcel(l);
+  };
+
+  const exportarPapel = async () => {
+    const l = libro();
+    if (!l) return;
+    try {
+      await exportarPdf(l);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'No se pudo generar el PDF.');
+    }
   };
 
   return (
@@ -89,10 +107,16 @@ export const CalendarioModal: React.FC<{ isOpen: boolean; onClose: () => void }>
       cuerpoEnCanvas
       acciones={
         calendario ? (
-          <button onClick={exportar} className="btn-neutral btn-sm">
-            <FileSpreadsheet className="h-3.5 w-3.5" />
-            Exportar a Excel
-          </button>
+          <>
+            <button onClick={exportar} className="btn-neutral btn-sm">
+              <FileSpreadsheet className="h-3.5 w-3.5" />
+              Exportar a Excel
+            </button>
+            <button onClick={() => void exportarPapel()} className="btn-neutral btn-sm">
+              <FileText className="h-3.5 w-3.5" />
+              Exportar a PDF
+            </button>
+          </>
         ) : undefined
       }
     >

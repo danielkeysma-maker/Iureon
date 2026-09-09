@@ -30,6 +30,12 @@ export interface FuenteExportable {
 export interface LibroExcel {
   /** File name without extension; the date is appended. */
   archivo: string;
+  /**
+   * Human title of the computation, printed as the PDF's heading. Optional
+   * because the workbook does not need it: the sheet names already say what
+   * each tab is. When it is missing the PDF falls back to the file name.
+   */
+  titulo?: string;
   resultado: Array<[string, string | number]>;
   detalle: { columnas: string[]; filas: Array<Array<string | number>> };
   fuentes: FuenteExportable[];
