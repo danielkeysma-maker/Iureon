@@ -63,8 +63,7 @@ const mensajeVacio = buildClaudeUserMessage({
   documentType: 'Acción de tutela',
   prompt: 'a mi cliente le negaron una cirugía autorizada',
   facts: 'EPS negó cirugía autorizada hace cuatro meses.',
-  citations: [],
-  gptSchemaOutput: ''
+  citations: []
 });
 
 check(

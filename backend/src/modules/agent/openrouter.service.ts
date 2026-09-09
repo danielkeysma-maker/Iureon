@@ -1,4 +1,11 @@
 import { ENGINE, callOpenRouterWithUsage } from './openrouter.client';
+import {
+  PLAZO_HECHOS_MS,
+  PLAZO_JURISPRUDENCIA_MS,
+  PLAZO_REDACCION_MS,
+  conPresupuesto,
+  relojDeEtapa
+} from './presupuestoDeTiempo';
 import { recordUsage } from '../billing/billing.service';
 import { vectorSearchService } from '../search/vectorSearch.service';
 import { discoverRulings } from '../jurisprudence/discovery.service';
@@ -13,7 +20,6 @@ import {
 } from './claudeDraft.prompt';
 import { buildCatalogGuidanceForFirm, resolverProcedencia } from './catalogGuidance';
 import type { LegalBranch } from '../catalog/types';
-import { buildSolemnColombianDraft } from './solemnDraft.fallback';
 
 /**
  * Precedents come from the shared corpus, never from a firm's own files: a
@@ -61,9 +67,9 @@ export interface WorkflowRequest {
    * What was read from the files the lawyer attached, already rendered as the
    * «DATOS DE LOS ADJUNTOS» block (see `adjuntos/renderBloqueAdjuntos`).
    * Appended to the material EVERY stage receives: Gemini extracts facts from
-   * it, GPT structures with it, Opus writes from it. Passing it to one stage
-   * only was the tempting shortcut, and it is how a plate number read by
-   * Gemini would still come out as [•] from Opus. Empty when nothing was read.
+   * it and Opus writes from it. Passing it to one stage only was the tempting
+   * shortcut, and it is how a plate number read by Gemini would still come out
+   * as [•] from Opus. Empty when nothing was read.
    */
   bloqueAdjuntos?: string;
 }
@@ -78,17 +84,15 @@ export interface AgentExecutionStep {
 
 /**
  * Token budget per engine. Each engine spends only what its own task needs:
- * Gemini and GPT never draft, and Claude never re-extracts facts. In
- * continuation mode the analysis engines get less, because they describe a
- * delta rather than the whole case.
+ * Gemini never drafts, and Claude never re-extracts facts. In continuation mode
+ * the extraction gets less, because it describes a delta rather than the whole
+ * case.
  */
 const MAX_TOKENS = {
   GEMINI_NEW: 1024,
   GEMINI_CONTINUATION: 768,
   /** Facts from the prompt AND from the attached files: a comparendo alone is thirty data points. */
-  GEMINI_CON_ADJUNTOS: 2048,
-  GPT_NEW: 1536,
-  GPT_CONTINUATION: 1024
+  GEMINI_CON_ADJUNTOS: 2048
 } as const;
 
 /**
@@ -108,11 +112,14 @@ const MIN_DRAFT_LENGTH = 200;
 const DRAFT_CONTEXT_CHARS = 3000;
 
 /**
- * Three-engine drafting pipeline over OpenRouter.
+ * Two-engine drafting pipeline over OpenRouter.
  *
- * Gemini extracts the facts, GPT turns them into a dogmatic outline, and Claude
- * Opus writes the document from both. Each stage reports progress through
- * onStepLog so the frontend can stream the console.
+ * Gemini extracts the facts and Claude Opus writes the document from them, from
+ * the catalogue ficha and from the verified jurisprudence. Each stage reports
+ * progress through onStepLog so the frontend can stream the console — and it
+ * reports the stages that actually run, which is why the dogmatic outline no
+ * longer appears there — la etapa 2 se retiró, y la razón medida está
+ * escrita en el sitio donde vivía.
  */
 /**
  * The precedent search runs on borrowed time, and the draft owns the clock.
@@ -132,10 +139,14 @@ const DRAFT_CONTEXT_CHARS = 3000;
  * The promise is abandoned, not cancelled. Whatever it was doing finishes or
  * dies with the invocation; nothing downstream reads it either way.
  */
-const PLAZO_DESCUBRIMIENTO = 20_000;
-
-/** Growing the corpus is a bonus. It never delays the document that paid for it. */
-const PLAZO_INDEXADO = 15_000;
+/**
+ * DEJARON DE SER FIJOS. Eran 20 s de descubrimiento y 15 s de indexado: 35 s
+ * dentro de una etapa que hoy tiene un presupuesto de 8 s, y dentro de una
+ * función que tiene 60. Ahora cada paso recibe lo que quede del presupuesto de
+ * su etapa, y el indexado —que es un regalo al corpus, no parte del escrito—
+ * solo corre si sobra tiempo de verdad.
+ */
+const MINIMO_PARA_INDEXAR_MS = 2_000;
 
 const conPlazo = async <T>(trabajo: Promise<T>, ms: number, alVencer: T): Promise<T> => {
   let reloj: NodeJS.Timeout | undefined;
@@ -169,10 +180,28 @@ export class OpenRouterService {
     const startTime = Date.now();
     const isContinuation = Boolean(req.existingDraft);
 
-    const geminiExtraction = await this.runFactExtraction(req, onStepLog);
-    const jurisprudencia = await this.runPrecedentSearch(req, onStepLog);
-    const gptStructure = await this.runDogmaticOutline(req, geminiExtraction, jurisprudencia, onStepLog);
-    const legalText = await this.runDrafting(req, geminiExtraction, jurisprudencia, gptStructure, onStepLog);
+    /*
+     * CADA ETAPA CON SU PRESUPUESTO, Y LA SUMA POR DEBAJO DEL TOPE DE LA
+     * FUNCION. Ver `presupuestoDeTiempo.ts`: agotar uno lanza
+     * `TiempoDeRedaccionAgotado`, que el controlador convierte en devolucion de
+     * la reserva y en un mensaje que el abogado lee. Antes cortaba la
+     * plataforma, que no devuelve nada ni dice nada.
+     */
+    const geminiExtraction = await conPresupuesto(
+      this.runFactExtraction(req, onStepLog),
+      PLAZO_HECHOS_MS,
+      'extraccion de hechos'
+    );
+    const jurisprudencia = await conPresupuesto(
+      this.runPrecedentSearch(req, onStepLog),
+      PLAZO_JURISPRUDENCIA_MS,
+      'busqueda de jurisprudencia'
+    );
+    const legalText = await conPresupuesto(
+      this.runDrafting(req, geminiExtraction, jurisprudencia, onStepLog),
+      PLAZO_REDACCION_MS,
+      'redaccion del escrito'
+    );
 
     onStepLog({
       stage: 'STAGE_3_REDACCION',
@@ -252,11 +281,28 @@ export class OpenRouterService {
         ? MAX_TOKENS.GEMINI_CONTINUATION
         : MAX_TOKENS.GEMINI_NEW;
 
+    /*
+     * RAZONAMIENTO MINIMO, Y NO ES UN AHORRO: ES LA DIFERENCIA ENTRE EXTRAER
+     * LOS HECHOS Y NO EXTRAERLOS.
+     *
+     * Medido el 9 de septiembre de 2026 con el mismo caso. Con el razonamiento
+     * por defecto la llamada gastaba 981 de sus 1.024 tokens razonando, el
+     * proveedor cortaba por longitud (`finish_reason: length`) y la etapa
+     * entregaba entre 89 y 168 caracteres de «hechos» — un encabezado y media
+     * frase— en 7,6-8,6 s. Con `minimal`: 5,4 s, 1.733 caracteres, extraccion
+     * completa, y la mitad del costo (US$0,0023 contra US$0,0041).
+     *
+     * Pasaba desapercibido porque Opus recibe ademas la indicacion literal del
+     * abogado, asi que el escrito salia bien igual y nadie notaba que la etapa
+     * que lo precede estaba entregando basura.
+     */
     const { text: extraction, usage } = await callOpenRouterWithUsage(
       ENGINE.GEMINI,
       systemPrompt,
       userPrompt,
-      maxTokens
+      maxTokens,
+      undefined,
+      { reasoningEffort: 'minimal', timeoutMs: PLAZO_HECHOS_MS }
     );
 
     // Recorded per stage, charged once for the document: three engines produce
@@ -293,6 +339,7 @@ export class OpenRouterService {
     req: PipelineRequest,
     onStepLog: (step: any) => void
   ): Promise<string[]> {
+    const reloj = relojDeEtapa(PLAZO_JURISPRUDENCIA_MS);
     const query = [req.documentType, req.legalPrompt].filter(Boolean).join('. ').trim();
     const result = await vectorSearchService.search(SHARED_CORPUS, query, 12);
 
@@ -341,7 +388,7 @@ export class OpenRouterService {
 
     if (jurisprudencia.length > 0) return jurisprudencia;
 
-    return this.runPrecedentDiscovery(query, onStepLog);
+    return this.runPrecedentDiscovery(query, reloj, onStepLog);
   }
 
   /**
@@ -368,6 +415,7 @@ export class OpenRouterService {
    */
   private async runPrecedentDiscovery(
     query: string,
+    reloj: { restante: () => number },
     onStepLog: (step: any) => void
   ): Promise<string[]> {
     /*
@@ -385,14 +433,15 @@ export class OpenRouterService {
      * ninguno, y toda la materia laboral, civil y penal se quedaba sin
      * precedente aunque las providencias estuvieran a una consulta de distancia.
      */
+    const plazoDescubrimiento = reloj.restante();
     const [discovery, csj] = await Promise.all([
-      conPlazo(discoverRulings(query), PLAZO_DESCUBRIMIENTO, {
+      conPlazo(discoverRulings(query), plazoDescubrimiento, {
         status: 'FAILED' as const,
         found: [],
         descartadas: [],
         reason: 'la búsqueda tardó más de lo que el borrador puede esperar'
       }),
-      conPlazo(discoverCsjRulings(query), PLAZO_DESCUBRIMIENTO, [])
+      conPlazo(discoverCsjRulings(query), plazoDescubrimiento, [])
     ]);
 
     const halladas = [
@@ -444,12 +493,16 @@ export class OpenRouterService {
      * Y falla en silencio a propósito: que el índice no acepte una sentencia no
      * es razón para tumbarle el borrador al abogado que ya la tiene confirmada.
      */
-    try {
-      const indexado = await conPlazo(
-        indexFetchedRulings(halladas),
-        PLAZO_INDEXADO,
-        []
+    const paraIndexar = reloj.restante();
+    if (paraIndexar < MINIMO_PARA_INDEXAR_MS) {
+      console.log(
+        `[PIPELINE] No se indexa lo descubierto: quedan ${paraIndexar} ms del presupuesto de la etapa y el escrito manda.`
       );
+      return jurisprudencia;
+    }
+
+    try {
+      const indexado = await conPlazo(indexFetchedRulings(halladas), paraIndexar, []);
       const nuevas = indexado.filter((r) => r.status === 'INDEXED').length;
       if (nuevas > 0) {
         console.log(`[PIPELINE] ${nuevas} providencia(s) incorporadas al corpus por descubrimiento.`);
@@ -460,73 +513,52 @@ export class OpenRouterService {
 
     return jurisprudencia;
   }
-
-  /**
-   * Phase 2 — GPT-5.6 Sol. Produces the dogmatic outline: legal problem,
-   * defences, governing norms and argumentative strategy. It never drafts.
+  /*
+   * ─── ETAPA 2 RETIRADA: EL ESQUEMA DOGMÁTICO DE GPT-5.6 SOL ────────────────
+   *
+   * Aquí vivía `runDogmaticOutline`, que le pedía a GPT el problema jurídico,
+   * las defensas, las normas clave y la estrategia, y se lo pasaba a Opus como
+   * guía de estructura.
+   *
+   * SE MIDIÓ ANTES DE QUITARLA, el 9 de septiembre de 2026, contra los motores
+   * reales y con el mismo caso:
+   *
+   *   · con su plazo de hoy (20 s) abortó en 3 de 3 corridas y entregó 0
+   *     caracteres — veinte segundos por borrador gastados en nada, y el
+   *     registro de ejecución anunciando «esquema consolidado (0 caracteres)»;
+   *   · con plazo largo SÍ responde y lo que entrega es útil: 3.601 caracteres
+   *     de esquema real. Pero tarda 35,3 s, y 39,5 s con su tope de tokens de
+   *     hoy, que además lo corta por longitud;
+   *   · `reasoning_effort: 'minimal'` no la acelera: 37,2 s.
+   *
+   * Es decir, no es una etapa rota que un plazo mayor arregle: es una etapa que
+   * cuesta entre 35 y 40 segundos dentro de una función que tiene 60 en total y
+   * cuya redacción sola ya necesita más de 80. No cabe con ningún plazo, y
+   * dejarla con el plazo corto es pagar veinte segundos por un aborto seguro.
+   *
+   * QUIÉN HACE AHORA SU TRABAJO. Opus, que es quien lo hacía de verdad: recibe
+   * los hechos de la etapa 1, la ficha del catálogo con el artículo, la
+   * autoridad y las secciones que la norma exige, la jurisprudencia verificada
+   * y la indicación literal del abogado. El esquema que GPT producía —problema
+   * jurídico, defensas, normas— es exactamente lo que esa ficha ya impone, y
+   * con más autoridad: la ficha está verificada contra el texto de la norma y
+   * el esquema no.
+   *
+   * SI ALGÚN DÍA SE REPONE, va con su plazo propio de al menos 45 s y solo en
+   * un plan cuya función lo aguante junto a la redacción — hoy, plan Pro.
    */
-  private async runDogmaticOutline(
-    req: PipelineRequest,
-    geminiExtraction: string,
-    jurisprudencia: string[],
-    onStepLog: (step: any) => void
-  ): Promise<string> {
-    onStepLog({
-      stage: 'STAGE_2_LOGIC',
-      engine: 'GPT',
-      message: `[GPT-5.6 Sol] Formulación del problema jurídico y esquema dogmático para ${req.documentType}...`,
-      timestamp: new Date().toISOString()
-    });
-
-    const systemPrompt = req.existingDraft
-      ? `Eres un revisor procesal senior de Colombia. Ya existe un borrador de "${req.documentType}" que el usuario quiere CORREGIR o CONTINUAR. Tu tarea es producir un ESQUEMA DE CORRECCIONES conciso con:\n1. CAMBIOS IDENTIFICADOS por Gemini que deben aplicarse\n2. NORMAS QUE APLICAN a las correcciones\n3. SECCIONES DEL BORRADOR QUE DEBEN MODIFICARSE\n\nNO generes un esquema completo desde cero. Solo lo necesario para las correcciones. Máximo 400 palabras.`
-      : `Eres un estructurador procesal senior de Colombia. Tu ÚNICA tarea es producir un ESQUEMA CONCISO con:\n1. PROBLEMA JURÍDICO (1-2 oraciones)\n2. EXCEPCIONES O DEFENSAS APLICABLES (lista)\n3. NORMAS CLAVE (artículos específicos)\n4. ESTRATEGIA DE SUSTENTACIÓN (enfoque argumentativo)\n\nNO redactes el documento final. Solo entrega el esquema estructurado. Máximo 600 palabras.`;
-
-    const facts = geminiExtraction || req.legalPrompt;
-    const userPrompt = conAdjuntos(
-      req.existingDraft
-        ? `CAMBIOS IDENTIFICADOS POR GEMINI:\n${facts}\n\n${renderJurisprudencia(jurisprudencia)}\n\nINSTRUCCIÓN DEL USUARIO: ${req.legalPrompt}\n\nTIPO DE DOCUMENTO: ${req.documentType}`
-        : `HECHOS EXTRAÍDOS POR GEMINI:\n${facts}\n\n${renderJurisprudencia(jurisprudencia)}\n\nTIPO DE DOCUMENTO: ${req.documentType}`,
-      req.bloqueAdjuntos
-    );
-
-    const { text: structure, usage } = await callOpenRouterWithUsage(
-      ENGINE.GPT,
-      systemPrompt,
-      userPrompt,
-      req.existingDraft ? MAX_TOKENS.GPT_CONTINUATION : MAX_TOKENS.GPT_NEW
-    );
-
-    await recordUsage({
-      firmId: req.firmId,
-      userEmail: req.userEmail,
-      operation: 'BORRADOR',
-      operationId: req.operationId,
-      usage
-    });
-
-    console.log(`[PIPELINE] GPT-5.6 Sol: ${structure.length} caracteres de esquema.`);
-
-    onStepLog({
-      stage: 'STAGE_2_LOGIC',
-      engine: 'GPT',
-      message: `[GPT Router] Esquema dogmático consolidado (${structure.length} caracteres).`,
-      timestamp: new Date().toISOString()
-    });
-
-    return structure;
-  }
 
   /**
-   * Phase 3 — Claude Opus 5. Writes the complete document from Gemini's facts
-   * and GPT's outline. Falls back to a static Colombian template if the call
-   * fails, so the lawyer never faces an empty canvas.
+   * Phase 2 — Claude Opus 5. Writes the complete document from Gemini's facts,
+   * the catalogue ficha and the verified jurisprudence. When the call yields
+   * nothing usable the stage FAILS: the empty canvas is honest, and the static
+   * template that used to fill it was a document of another kind wearing the
+   * lawyer's request as a title.
    */
   private async runDrafting(
     req: PipelineRequest,
     geminiExtraction: string,
     jurisprudencia: string[],
-    gptStructure: string,
     onStepLog: (step: any) => void
   ): Promise<string> {
     onStepLog({
@@ -563,16 +595,33 @@ export class OpenRouterService {
       prompt: req.legalPrompt,
       facts: geminiExtraction,
       citations: jurisprudencia,
-      gptSchemaOutput: gptStructure,
       existingDraft: req.existingDraft,
       adjuntos: req.bloqueAdjuntos
     });
 
+    /*
+     * `low` EN VEZ DE `medium`, Y ES UN CAMBIO MEDIDO, NO UNA CORAZONADA.
+     *
+     * Con el mismo caso y el mismo prompt, el 9 de septiembre de 2026:
+     *
+     *   · `medium`: 124,7 s · 21.399 caracteres · 106 negritas · 27 títulos · US$0,2506
+     *   · `low`:     84,8 s · 14.636 caracteres ·  81 negritas · 21 títulos · US$0,1829
+     *
+     * Los dos terminan el escrito (`finish_reason: stop`), los dos traen sus
+     * títulos de sección en negrita y su petición. `medium` compra un escrito
+     * más largo por cuarenta segundos más y un 37% más de costo, y cuarenta
+     * segundos es la mitad del reloj entero de la función. Se toma `low`.
+     *
+     * El plazo de la llamada es el presupuesto de la etapa: quien corta es este
+     * código, y por debajo del tope de la plataforma.
+     */
     const { text: draft, usage } = await callOpenRouterWithUsage(
       ENGINE.OPUS,
       systemPrompt,
       userMessage,
-      req.maxDraftTokens
+      req.maxDraftTokens,
+      undefined,
+      { reasoningEffort: 'low', timeoutMs: PLAZO_REDACCION_MS }
     );
 
     await recordUsage({
@@ -587,8 +636,47 @@ export class OpenRouterService {
       return draft;
     }
 
-    console.warn('[PIPELINE] Claude Opus 5 returned no usable draft; using the static template.');
-    return buildSolemnColombianDraft(req.documentType, req.legalPrompt, jurisprudencia, req.customFormatInstruction);
+    /*
+     * SIN BORRADOR SE FALLA. NO SE FABRICA UNO.
+     *
+     * ─── LO QUE HABIA AQUI, Y POR QUE ERA LOS DOS DEFECTOS REPORTADOS ────────
+     *
+     * Esta rama devolvia una plantilla estatica (`solemnDraft.fallback`, ya
+     * borrado): un texto escrito en el codigo que NO conoce la actuacion pedida,
+     * y que elegia entre tres
+     * textos fijos olfateando palabras —«tutela» en el tipo O EN LA INDICACION
+     * DEL ABOGADO, «soldado» o «mina» para reparacion directa— y, si ninguna
+     * casaba, entregaba un escrito generico encabezado «SEÑOR JUEZ PROCESAL DE
+     * COLOMBIA» con partes «DEMANDANTE / AFECTADO CONTRA DEMANDADO».
+     *
+     * Medido el 9 de septiembre de 2026 contra el motor real, en el mismo caso
+     * y con la misma ficha:
+     *
+     *   - un borrador de Opus trae entre 56 y 99 pares de `**` (129 a 184
+     *     capas de negrita para el lienzo), y su encabezado nombra la actuacion
+     *     pedida;
+     *   - la plantilla estatica trae CERO pares de `**`, y el visor de
+     *     Redaccion pinta en negrita UNICAMENTE lo que viene entre `**`.
+     *
+     * Es decir: la unica ruta del motor que entrega un escrito de otro tipo es
+     * exactamente la misma que lo entrega sin una sola negrita. Los dos
+     * sintomas que reporto el titular son un solo defecto, y es este.
+     *
+     * Y se cobraba: `settleOperation` corre igual, porque desde fuera esta
+     * rama era indistinguible de un exito — el registro de ejecucion decia
+     * «Redaccion finalizada exitosamente» y el aviso de la plantilla solo
+     * existia en la consola del servidor.
+     *
+     * Fallar aqui devuelve la reserva (el controlador ya lo hace en su catch) y
+     * le dice al abogado que no hubo escrito. Es la misma doctrina que ya rige
+     * en el navegador, donde se borraron 116 lineas que fabricaban una tutela
+     * completa cuando la llamada real fallaba: un error cuesta reintentar; un
+     * documento inventado, indistinguible de uno real, cuesta el caso.
+     */
+    throw new Error(
+      `El motor de redacción no devolvió el escrito de "${req.documentType}". No se entrega ningún documento: ` +
+        'un borrador fabricado por la aplicación no sería de la actuación que usted pidió. Vuelva a intentarlo.'
+    );
   }
 }
 

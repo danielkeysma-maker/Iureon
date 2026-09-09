@@ -103,5 +103,76 @@ check('las anotaciones se localizan con su color y las ausentes se omiten', anot
   check('una palabra suelta en mayúscula como AMPARAR va en negrita', negras2.includes('AMPARAR'));
 }
 
+/* ─── UNA SALIDA REAL DEL MOTOR SIN FICHA VERIFICADA ────────────────────────
+ *
+ * Nace del defecto que el titular reportó el 9 de septiembre de 2026: «el
+ * borrador, en tipos de actuación sugeridas o hechas por la firma, está
+ * omitiendo las negritas». Se midió con el motor real —misma indicación, mismos
+ * hechos, cambiando solo la ficha— y el borrador SIN ficha salió con 15 títulos
+ * y 56 pares de «**»: el modelo no las omitía. Quien las omitía era la plantilla
+ * estática de respaldo del backend, que entregaba un escrito de otro tipo y CERO
+ * «**»; ya no existe.
+ *
+ * El fragmento de abajo es literal de aquella salida sin ficha. Vigila las dos
+ * mitades del reconocedor: los títulos que el modelo marcó con «**» y los que
+ * solo van en mayúscula sostenida. Si una de las dos se rompe, un escrito de
+ * actuación propia vuelve a leerse plano. */
+{
+  const sinFicha = [
+    '**MEMORIAL DE INSISTENCIA EN LA PRÁCTICA DE LA PRUEBA PERICIAL**',
+    '',
+    'Señor',
+    '**JUEZ QUINTO CIVIL MUNICIPAL DE SINCELEJO**',
+    'E. S. D.',
+    '',
+    '**Referencia:** Proceso verbal',
+    '**Demandante:** **ALFONSO MONTERROZA ÁVILA**',
+    '',
+    '**I. CONSTANCIA EXPRESA SOBRE LA OPORTUNIDAD DE ESTE ESCRITO**',
+    '',
+    'Dejo constancia de que el término aplicable no se encuentra verificado y debe comprobarse en la norma antes de radicar.',
+    '',
+    'II. HECHOS Y ANTECEDENTES PROCESALES',
+    '',
+    '**PRIMERO:** Ante su Despacho cursa proceso verbal promovido por el señor **ALFONSO MONTERROZA ÁVILA**.',
+    '',
+    'IV. PETICIÓN',
+    '',
+    'PRIMERO: SOLICITO reponer el auto del 15 de octubre de 2025.'
+  ].join('\n');
+
+  const capas = capasTipograficas(sinFicha);
+  const negras = capas.filter((c) => c.capa === 'negrita').map((c) => sinFicha.slice(c.inicio, c.fin));
+  const cubre = (t: string): boolean => negras.some((n) => n.includes(t));
+
+  check('el título del escrito de actuación propia va en negrita', cubre('MEMORIAL DE INSISTENCIA EN LA PRÁCTICA DE LA PRUEBA PERICIAL'));
+  check('el destinatario también', cubre('JUEZ QUINTO CIVIL MUNICIPAL DE SINCELEJO'));
+  check('un título que el modelo marcó con ** va en negrita', cubre('I. CONSTANCIA EXPRESA SOBRE LA OPORTUNIDAD DE ESTE ESCRITO'));
+  check('un título en mayúscula sostenida SIN ** también, por el reconocedor', cubre('II. HECHOS Y ANTECEDENTES PROCESALES') && cubre('IV. PETICIÓN'));
+  check('las etiquetas del bloque de referencia van en negrita', cubre('Referencia:') && cubre('Demandante:'));
+  check('los ordinales que numeran hechos y peticiones van en negrita', cubre('PRIMERO:'));
+  check('los nombres propios en mayúscula sostenida van en negrita', cubre('ALFONSO MONTERROZA ÁVILA'));
+  check('los asteriscos del marcador se atenúan aparte y no se borran del texto', capas.some((c) => c.capa === 'marcador') && sinFicha.includes('**'));
+  check('y el reconocedor no se queda mudo ante un escrito sin ficha', negras.length >= 12, String(negras.length));
+
+  /*
+   * La forma exacta de lo que llegaba cuando saltaba el respaldo estático:
+   * títulos en mayúscula y ni un «**». El lienzo de Redacción pinta en negrita
+   * únicamente lo que viene entre «**» (markdownBoldToHtml), así que ese texto
+   * se leía plano por más títulos que tuviera. El taller sí los reconoce, y eso
+   * es lo que se asevera aquí: el reconocedor no depende de los asteriscos.
+   */
+  const sinAsteriscos = sinFicha.split('**').join('');
+  const negrasPlano = capasTipograficas(sinAsteriscos)
+    .filter((c) => c.capa === 'negrita')
+    .map((c) => sinAsteriscos.slice(c.inicio, c.fin));
+  check(
+    'sin un solo ** el reconocedor sigue viendo los títulos en mayúscula',
+    ['MEMORIAL DE INSISTENCIA EN LA PRÁCTICA DE LA PRUEBA PERICIAL', 'II. HECHOS Y ANTECEDENTES PROCESALES', 'IV. PETICIÓN'].every((t) =>
+      negrasPlano.some((n) => n.includes(t))
+    )
+  );
+}
+
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);
 process.exitCode = fallos === 0 ? 0 : 1;

@@ -49,6 +49,7 @@
     "check:discovery": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/jurisprudence/__checks__/discovery.check.ts",
     "check:triage": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/catalog/__checks__/triage.check.ts",
     "check:precedent": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/__checks__/precedent.check.ts",
+    "check:tipo": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/__checks__/tipoDeActuacion.check.ts",
     "check:csj": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/jurisprudence/__checks__/csjRuling.check.ts",
     "check:runway": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/admin/__checks__/runway.check.ts",
     "check:cupo": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/catalog/__checks__/orientacionQuota.check.ts",
@@ -62,7 +63,9 @@
     "check:fragmentos": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/transcription/__checks__/fragmentos.check.ts",
     "check:consejo": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/jurisprudence/__checks__/consejoEstado.check.ts",
     "check:agenda": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agenda/__checks__/agenda.check.ts",
-    "check:adjuntos": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/adjuntos/__checks__/adjuntos.check.ts"
+    "check:adjuntos": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/adjuntos/__checks__/adjuntos.check.ts",
+    "check:remision": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/catalog/__checks__/remision.check.ts",
+    "check:plazos": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/__checks__/plazos.check.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

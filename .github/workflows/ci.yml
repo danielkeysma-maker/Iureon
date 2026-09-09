@@ -48,6 +48,8 @@ jobs:
         run: npm run check:mail
       - name: Catalogue correctness checks
         run: npm run check:catalog
+      - name: Actuaciones reachable by remisión carry their envelope and no borrowed deadline
+        run: npm run check:remision
       - name: Embeddings guard (no fabricated vectors)
         run: npm run check:embeddings
       - name: Legal search guard (no fabricated law)
@@ -70,6 +72,10 @@ jobs:
         run: npm run check:pdf
       - name: Draft attachments (limits, block rendering, vision answer parsing)
         run: npm run check:adjuntos
+      - name: The draft is the actuacion the lawyer chose, with or without a verified ficha
+        run: npm run check:tipo
+      - name: Drafting deadlines fit under the function cap and running out returns the reservation
+        run: npm run check:plazos
       - name: Hearing questions (prompt sections, truncated JSON rescue, parameter validation)
         run: npm run check:preguntas
       - name: Agenda de terminos (when it warns, no repeats, refuses an ambiguous ficha)

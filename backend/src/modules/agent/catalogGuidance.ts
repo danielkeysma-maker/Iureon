@@ -67,10 +67,12 @@ EN EL PROPIO ESCRITO debes dejar constancia, con palabras llanas, de que el tér
 
 ESTA ACTUACIÓN NO TIENE FICHA VERIFICADA EN EL CATÁLOGO. La añadió la propia firma porque el catálogo no la trae, y nadie ha comprobado contra la norma su artículo, su término ni las secciones que debe contener.
 
-PROHIBIDO INVENTAR: no escribas números de artículo, no afirmes plazos, términos ni caducidades, y no enuncies secciones como si una norma las exigiera. Si un requisito te parece necesario, descríbelo en palabras y di que debe verificarse; jamás le pongas una cita que no te hayan entregado aquí.
+PROHIBIDO INVENTAR, y esta prohibición manda sobre la línea de NORMATIVIDAD del encargo: no escribas números de artículo, no afirmes plazos, términos ni caducidades, y no digas de ninguna sección que una norma la exige. Si un requisito te parece necesario, descríbelo en palabras y di que debe verificarse; jamás le pongas una cita que no te hayan entregado aquí.
 ${aportado}
 
-ESTRUCTURA: usa la estructura habitual de un escrito de esta clase en Colombia, y no la presentes como impuesta por ninguna norma.`;
+QUÉ ESCRIBES, DE TODAS FORMAS: un "${actuacion.exactName}" completo, con la estructura usual de esa clase de escrito en la práctica colombiana y con sus TÍTULOS DE SECCIÓN escritos —encabezamiento y destinatario, referencia, presentación del apoderado, hechos, fundamentos, petición, pruebas, anexos, notificaciones y firma, o los que esa clase de escrito pida—. Cada título va solo en su línea, en mayúscula sostenida y entre **dobles asteriscos**, igual que en cualquier otro escrito.
+
+NO HAY CONTRADICCIÓN ENTRE LAS DOS REGLAS ANTERIORES, y conviene tenerlo claro: no tener ficha verificada te prohíbe AFIRMAR el artículo, el plazo o que la norma exige tal sección; no te autoriza a entregar un texto corrido sin títulos ni a escribir una pieza procesal distinta de la que se pidió. La estructura es del oficio; la cita es de la norma. Preséntala como la práctica usual, nunca como impuesta por una norma que nadie comprobó.`;
 };
 
 /**

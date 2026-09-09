@@ -67,9 +67,19 @@ export function useLegalAgentWorkflow(formatoDeFirma?: string) {
       documentType: documentType,
       jurisprudenciaCitada: ['Corte Constitucional / CSJ / Consejo de Estado'],
       excepcionesFormuladas: ['Revisión Procesal en Curso'],
+      /*
+       * LO QUE ESTE TEXTO ANUNCIA TIENE QUE SER LO QUE DE VERDAD CORRE.
+       *
+       * Anunciaba «el Pipeline de 3 Motores (Gemini ➔ GPT-5.6 Sol ➔ Claude
+       * Opus 5)». La etapa de GPT se retiró el 9 de septiembre de 2026 tras
+       * medirla: abortaba por plazo en 3 de 3 corridas y, con plazo suficiente,
+       * cuesta entre 35 y 40 s dentro de una función que tiene 60 en total.
+       * Dejar su nombre aquí sería contarle al abogado un trabajo que nadie
+       * hace, en la pantalla donde espera su escrito.
+       */
       legalText: `⏳ REDACTANDO PIEZA PROCESAL EN TIEMPO REAL...
 
-El Pipeline de 3 Motores (Gemini 3.8 Flash ➔ GPT-5.6 Sol ➔ Claude Opus 5) se encuentra procesando su indicación procesal, vectorizando precedentes en Supabase y estructurando la providencia.
+Gemini 3.8 Flash extrae los hechos, se buscan precedentes verificados en el corpus y Claude Opus 5 redacta el escrito con la ficha del catálogo.
 
 Por favor espere unos segundos mientras se finaliza la redacción solemne.`,
       // Zero, not 4820. This placeholder is shown BEFORE the request leaves the
@@ -86,7 +96,7 @@ Por favor espere unos segundos mientras se finaliza la redacción solemne.`,
         id: Date.now().toString(),
         timestamp: requestTimestamp,
         engine: 'GEMINI',
-        message: `[STAGE-1: INGESTION] Gemini 3.8 Flash procesando indicación procesal e insumos fácticos del caso...`,
+        message: `[Etapa 1] Gemini 3.8 Flash procesando indicación procesal e insumos fácticos del caso...`,
         type: 'info'
       }
     ]);
@@ -122,6 +132,24 @@ Por favor espere unos segundos mientras se finaliza la redacción solemne.`,
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
         let buffer = '';
+        /*
+         * EL SERVIDOR PUEDE FALLAR CON EL FLUJO YA ABIERTO, y hasta hoy eso no
+         * se veía en ninguna parte.
+         *
+         * El backend manda `event: ERROR` con `{ message }`. Este bucle solo
+         * miraba dos formas de suceso —un evento con `stage`, que es una línea
+         * de la consola, y uno con `legalText`, que es el escrito—, así que el
+         * evento de error no casaba con ninguna y se descartaba en silencio: la
+         * pantalla se quedaba con el «⏳ REDACTANDO…» para siempre. Desde fuera
+         * es indistinguible de una aplicación colgada, y el abogado no tenía
+         * forma de saber que su reserva de saldo YA HABÍA VUELTO a su cuenta.
+         *
+         * Y lo mismo cuando el flujo se corta sin llegar a `COMPLETED` — que es
+         * exactamente lo que hacía la plataforma al matar la función a los 60
+         * segundos, sin darle al servidor ocasión de decir nada —: terminar de
+         * leer sin escrito es un fallo, no un final.
+         */
+        let fallo: string | null = null;
 
         while (true) {
           const { done, value } = await reader.read();
@@ -151,12 +179,23 @@ Por favor espere unos segundos mientras se finaliza la redacción solemne.`,
                   generado = payload as GeneratedDraft;
                   setGeneratedDraft(payload);
                   setRightView('draft');
+                } else if (typeof payload.message === 'string' && payload.message) {
+                  // El evento ERROR del servidor: trae el mensaje que hay que
+                  // mostrar y la constancia de que la reserva ya se devolvió.
+                  fallo = payload.message;
                 }
               } catch (err) {
                 console.warn('SSE Parse warning:', err);
               }
             }
           }
+        }
+
+        if (!generado) {
+          throw new Error(
+            fallo ??
+              'La conexión con el servidor se cortó antes de que llegara el escrito. No se descontó saldo.'
+          );
         }
       } else {
         /*

@@ -25,7 +25,6 @@ interface ClaudeUserMessageInput {
   prompt: string;
   facts: string;
   citations: string[];
-  gptSchemaOutput?: string;
   existingDraft?: string;
   adjuntos?: string;
 }
@@ -99,11 +98,15 @@ REGLA ABSOLUTA: Responde EXCLUSIVAMENTE con el texto del documento jurídico. Si
 
 REGLA DE COMPLETITUD: El documento DEBE estar COMPLETO de principio a fin hasta la firma. La sección de PETICIÓN/PRETENSIONES/RESUELVE es la MÁS IMPORTANTE — si la omites, el documento es inservible. NUNCA lo dejes incompleto.
 
-REGLA DE FORMATO: NO uses encabezados markdown (##, ###). NO uses separadores (---). USA **negritas** ÚNICAMENTE para: títulos de secciones (I. HECHOS, II. PRETENSIONES, RESUELVE), numerales resolutivos (PRIMERO:, SEGUNDO:), nombres propios de partes y entidades, y términos jurídicos clave como CONCEDER, NEGAR, TUTELAR, ORDENAR. NO pongas **negritas** en párrafos completos ni en texto normal de argumentación.
+REGLA DE FORMATO: NO uses encabezados markdown (##, ###). NO uses separadores (---).
+El escrito SIEMPRE va dividido en secciones, y CADA título de sección va SOLO en su propia línea, en MAYÚSCULA SOSTENIDA y entre dobles asteriscos: **I. HECHOS**, **II. PRETENSIONES**, **RESUELVE**. Rige tenga o no tenga ficha verificada la actuación: un escrito redactado de corrido, sin títulos de sección, llega al abogado sin una sola negrita.
+USA **negritas** ÚNICAMENTE para: títulos de secciones, numerales resolutivos (PRIMERO:, SEGUNDO:), nombres propios de partes y entidades, y términos jurídicos clave como CONCEDER, NEGAR, TUTELAR, ORDENAR. NO pongas **negritas** en párrafos completos ni en texto normal de argumentación.
 
 PERFIL: Abogado litigante senior y redactor judicial de élite en Colombia, 25 años de experiencia ante Corte Constitucional, CSJ, Consejo de Estado y Tribunales.
 ${continuationBlock}
 TAREA: ${existingDraft ? 'Continuar, corregir o proyectar a partir del borrador existente según la indicación del usuario' : 'Redactar ÍNTEGRAMENTE, COMPLETO y listo para firmar'}: "${documentType}".
+
+REGLA DE LA ACTUACIÓN — manda sobre cualquier otra consideración de este prompt: el documento tiene que ser EXACTAMENTE un "${documentType}" y ninguna otra pieza procesal. El abogado ya eligió la actuación; no la sustituyas por la que te parezca más apropiada para los hechos, ni siquiera si otra encaja mejor. Si los hechos no alcanzan, redacta igual el "${documentType}" y deja entre corchetes lo que falte. Su nombre debe leerse en el encabezado o en el asunto del escrito, y la estructura debe ser la de esa clase de escrito.
 
 INDICACIÓN DEL USUARIO: "${prompt}".
 ${reglaAdjuntos}
@@ -111,35 +114,42 @@ NORMATIVIDAD: Cita artículos pertinentes de CGP, CST, CPACA, CP, C. Civil, C. P
 
 ${renderJurisprudencia(citations)}
 
-${`GUÍA DE REFERENCIA para "${documentType}" (usa tu criterio jurídico para estructurar el documento como mejor corresponda según la práctica procesal colombiana, pero asegúrate de NO OMITIR la sección de petición/pretensiones/resuelve):\n${estructuraObligatoria}`}
+${`ESTRUCTURA DE "${documentType}" — obligatoria. Las secciones marcadas [OBLIGATORIA] no pueden omitirse y la de petición/pretensiones/resuelve JAMÁS se omite. Cada sección abre con su título en su propia línea, en mayúscula sostenida y entre **dobles asteriscos**:\n${estructuraObligatoria}`}
 ${customFormat ? `\n⚠️ FORMATO DE LA FIRMA — manda sobre la PRESENTACIÓN (numeración, títulos, orden de secciones, bloque de firma). NO autoriza omitir ninguna sección marcada [OBLIGATORIA] arriba: esas las exige la norma, no el estilo de la casa.\n${customFormat}` : ''}
     `;
 };
 
-/** Builds Claude's user message, carrying GPT's outline so it need not re-derive structure. */
+/**
+ * Builds Claude's user message.
+ *
+ * YA NO LLEVA EL ESQUEMA DOGMÁTICO, porque ya no existe quien lo produzca: la
+ * etapa de GPT-5.6 Sol se retiró tras medir que cuesta entre 35 y 40 s dentro
+ * de una función de 60, y abortaba en 3 de 3 corridas con el plazo que tenía
+ * (ver `openrouter.service.ts`, en el sitio donde vivía). La estructura la
+ * impone la ficha del catálogo, que además está verificada contra el texto de
+ * la norma — cosa que el esquema nunca estuvo.
+ */
 export const buildClaudeUserMessage = ({
   documentType,
   prompt,
   facts,
   citations,
-  gptSchemaOutput,
   existingDraft,
   adjuntos
 }: ClaudeUserMessageInput): string => {
-  const schemaBlock = gptSchemaOutput
-    ? `\nESQUEMA DOGMÁTICO (generado por GPT-5.6 Sol — úsalo como guía de estructura):\n${gptSchemaOutput}\n`
-    : '';
   // After the facts and before the citations: the writer reads the file data
   // next to Gemini's extraction, which already leaned on the same block.
   const adjuntosBlock = adjuntos ? `\n\n${adjuntos}\n` : '';
 
   return existingDraft
-    ? `Instrucción del usuario: "${prompt}".${schemaBlock}Insumos fácticos de Gemini: ${facts}.${adjuntosBlock}
+    ? `Instrucción del usuario: "${prompt}".
+Insumos fácticos de Gemini: ${facts}.${adjuntosBlock}
 
 ${renderJurisprudencia(citations)}
 
 Toma el borrador existente como base y aplica las correcciones. Entrega el documento COMPLETO resultante.`
-    : `Genera el documento jurídico "${documentType}" COMPLETO hasta la firma.${schemaBlock}Hechos extraídos por Gemini: ${facts}.${adjuntosBlock}
+    : `Genera el documento jurídico "${documentType}" COMPLETO hasta la firma.
+Hechos extraídos por Gemini: ${facts}.${adjuntosBlock}
 
 ${renderJurisprudencia(citations)}
 

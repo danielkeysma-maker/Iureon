@@ -111,6 +111,31 @@ export const callOpenRouterWithUsage = async (
  */
 export interface OpcionesDeLlamada {
   json?: boolean;
+  /**
+   * Esfuerzo de razonamiento pedido al proveedor.
+   *
+   * POR QUE ES POR LLAMADA Y NO GLOBAL, medido el 9 de septiembre de 2026: la
+   * extraccion de hechos pedia 1.024 tokens y el razonamiento se comia 981,
+   * asi que el proveedor cortaba por longitud y la etapa entregaba 89-168
+   * caracteres de «hechos» en 8,6 s. Con `minimal` la misma llamada tarda
+   * 5,4 s, entrega 1.733 caracteres completos y cuesta la mitad. La redaccion,
+   * en cambio, si necesita razonar; lo que no puede es razonar sin techo dentro
+   * de una funcion con reloj.
+   *
+   * Ojo: `{ reasoning: { enabled: false } }` NO sirve con Gemini 3.8 Flash —
+   * el proveedor responde «Reasoning is mandatory for this endpoint and cannot
+   * be disabled». `minimal` si.
+   */
+  reasoningEffort?: 'minimal' | 'low' | 'medium' | 'high';
+  /**
+   * Plazo propio de esta llamada, en milisegundos.
+   *
+   * Existe porque el reparto del reloj lo decide el pipeline —que sabe cuanto
+   * le queda a la funcion— y no el cliente, que solo conocia dos numeros fijos
+   * (120 s para Opus, 20 s para todo lo demas). Aquellos 20 s abortaban el
+   * esquema dogmatico en 3 de 3 corridas.
+   */
+  timeoutMs?: number;
 }
 
 /**
@@ -137,8 +162,9 @@ export const callOpenRouterMultimodal = async (
   systemPrompt: string,
   parts: ContentPart[],
   maxTokens?: number,
-  minUsableLength: number = MIN_USABLE_LENGTH
-): Promise<CallResult> => callOpenRouter(model, systemPrompt, parts, maxTokens, minUsableLength);
+  minUsableLength: number = MIN_USABLE_LENGTH,
+  opciones?: OpcionesDeLlamada
+): Promise<CallResult> => callOpenRouter(model, systemPrompt, parts, maxTokens, minUsableLength, opciones);
 
 const callOpenRouter = async (
   model: EngineModel | string,
@@ -156,7 +182,7 @@ const callOpenRouter = async (
   }
 
   const isOpus = model.includes('claude-opus');
-  const timeoutMs = isOpus ? OPUS_TIMEOUT_MS : DEFAULT_TIMEOUT_MS;
+  const timeoutMs = opciones?.timeoutMs ?? (isOpus ? OPUS_TIMEOUT_MS : DEFAULT_TIMEOUT_MS);
   const resolvedMaxTokens = maxTokens ?? (isOpus ? undefined : DEFAULT_MAX_TOKENS);
 
   const controller = new AbortController();
@@ -188,7 +214,11 @@ const callOpenRouter = async (
          * that already exists. Medium is the level that buys the writing
          * without paying for the re-derivation.
          */
-        ...(isOpus ? { reasoning_effort: 'medium' } : {}),
+        ...(opciones?.reasoningEffort
+          ? { reasoning_effort: opciones.reasoningEffort }
+          : isOpus
+            ? { reasoning_effort: 'medium' }
+            : {}),
         // Modo JSON solo para quien lo pide: al que redacta prosa le estorbaría.
         ...(opciones?.json ? { response_format: { type: 'json_object' } } : {}),
         messages: [

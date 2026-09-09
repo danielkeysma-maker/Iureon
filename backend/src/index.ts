@@ -166,7 +166,7 @@ app.listen(config.port, () => {
   console.log(`=======================================================`);
   console.log(`🚀 Iureon API Modular iniciada en el puerto ${config.port}`);
   console.log(`🛡️ Módulo Tenant: x-firm-id middleware activo`);
-  console.log(`🤖 Módulo Agent: Gemini 3.8 Flash -> GPT -> Claude Opus 5`);
+  console.log(`🤖 Módulo Agent: Gemini 3.8 Flash -> Claude Opus 5`);
   console.log(`🔍 Módulo Search: Glosario & Buscador de Leyes/Sentencias`);
   console.log(`📦 Módulo Documents: Backblaze B2 Vault Storage`);
   console.log(

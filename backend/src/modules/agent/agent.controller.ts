@@ -13,8 +13,63 @@ import {
   reserveForOperation,
   settleOperation
 } from '../billing/billing.service';
+import { PLAZO_REDACCION_MS, TiempoDeRedaccionAgotado, TOPE_DE_FUNCION_MS } from './presupuestoDeTiempo';
 
 const aiService = new OpenRouterMultiEngineService();
+
+/**
+ * Qué se hace con la reserva y qué se le dice al abogado cuando la redacción
+ * falla.
+ *
+ * ─── POR QUÉ ES UNA FUNCIÓN Y NO DOS LÍNEAS DENTRO DEL `catch` ─────────────
+ *
+ * Porque es la regla que el saldo de una firma depende de, y una regla que solo
+ * existe dentro de un `catch` de un controlador con flujo SSE no se puede
+ * comprobar sin montar la aplicación entera. Aquí sí: `plazos.check.ts` la
+ * interroga directamente y sostiene lo único que no puede fallar — que agotar
+ * el plazo DEVUELVE la reserva.
+ *
+ * Y devuelve la reserva SIEMPRE, cualquiera que sea la causa: si no hubo
+ * escrito, no hay nada que cobrar. Lo que cambia con la causa es el mensaje,
+ * porque «se acabó el tiempo que permite el plan» y «el motor no respondió» le
+ * piden cosas distintas al abogado.
+ */
+export const desenlaceDeFallo = (
+  error: unknown
+): { devuelveReserva: true; razon: string; mensaje: string } => {
+  if (error instanceof TiempoDeRedaccionAgotado) {
+    return {
+      devuelveReserva: true,
+      razon: `Devolución: se agotó el plazo en «${error.etapa}»`,
+      /*
+       * NO SE LE PROPONE AL ABOGADO NADA QUE NO SE HAYA MEDIDO.
+       *
+       * La primera versión de este mensaje le decía «un escrito más corto sí
+       * alcanza». Se midió antes de dejarlo escrito, y es falso: un recurso de
+       * reposición con UN SOLO hecho, 227 caracteres de indicación, también
+       * agotó los 33 s. El motor escribe a unos 75 tokens por segundo y el
+       * escrito más breve pasa de los 2.500. Sugerirle que recorte el caso lo
+       * mandaría a intentarlo una y otra vez contra un muro que no depende de
+       * él — la peor clase de mensaje de error, el que culpa al usuario de un
+       * límite de la casa.
+       */
+      mensaje:
+        `La redacción no alcanzó a terminar dentro del tiempo que la plataforma nos permite ` +
+        `por solicitud (${Math.round(TOPE_DE_FUNCION_MS / 1000)} segundos, de los cuales ` +
+        `${Math.round(PLAZO_REDACCION_MS / 1000)} son para escribir). No se descontó saldo: ` +
+        `su reserva ya volvió a la cuenta. Esto no depende de la extensión de su caso ni de ` +
+        `nada que usted pueda cambiar; es un límite del plan de alojamiento y estamos ` +
+        `ampliándolo. Vuelva a intentarlo más tarde.`
+    };
+  }
+
+  return {
+    devuelveReserva: true,
+    razon: 'Devolución: el borrador no se pudo generar',
+    mensaje:
+      (error instanceof Error && error.message) || 'Error durante la orquestación del agente RAG'
+  };
+};
 
 export const streamAgentDraftController = async (req: Request, res: Response): Promise<void> => {
   const firmId = req.firmId;
@@ -44,6 +99,29 @@ export const streamAgentDraftController = async (req: Request, res: Response): P
 
   if (!legalPrompt) {
     res.status(400).json({ error: 'MISSING_PROMPT', message: 'Se requiere la instrucción jurídica en legalPrompt' });
+    return;
+  }
+
+  /*
+   * SIN ACTUACIÓN NO SE REDACTA. NO SE ELIGE UNA POR EL ABOGADO.
+   *
+   * El tipo se rellenaba aquí con un valor por defecto al llamar al pipeline:
+   * una petición sin tipo se convertía, en silencio, en una contestación de
+   * demanda — y el nombre viajaba a las tres etapas, al título
+   * del archivo y a la procedencia del borrador como si el abogado la hubiera
+   * pedido. Es exactamente el síntoma reportado («el escrito no es del tipo que
+   * pedí»), producido por la aplicación y no por el modelo.
+   *
+   * El taller ya no deja generar sin elegir (el botón se deshabilita), así que
+   * una petición sin tipo viene de fuera de esa pantalla y merece un error, no
+   * una suplencia.
+   */
+  const tipoElegido = typeof documentType === 'string' ? documentType.trim() : '';
+  if (!tipoElegido) {
+    res.status(400).json({
+      error: 'MISSING_DOCUMENT_TYPE',
+      message: 'Elija la actuación antes de generar: la aplicación no escoge una por usted.'
+    });
     return;
   }
 
@@ -104,7 +182,7 @@ export const streamAgentDraftController = async (req: Request, res: Response): P
   }
 
   // Shared by every model call of this draft, so the ledger can total what ONE
-  // document cost across three engines rather than only what one stage did.
+  // document cost across both engines rather than only what one stage did.
   const operationId = randomUUID();
 
   /*
@@ -169,7 +247,7 @@ export const streamAgentDraftController = async (req: Request, res: Response): P
         userEmail: req.user?.email ?? 'desconocido',
         operationId,
         maxDraftTokens,
-        documentType: documentType || 'Contestación de Demanda',
+        documentType: tipoElegido,
         legalBranch,
         legalPrompt,
         expedienteId,
@@ -191,9 +269,9 @@ export const streamAgentDraftController = async (req: Request, res: Response): P
     /*
      * Charged once the document exists, not when the request arrived.
      *
-     * The pipeline degrades to a static template when the engines fail, and
-     * charging for that would be selling a form letter at the price of a
-     * drafted document. The stages recorded what they cost either way.
+     * Si el pipeline no entrega escrito —porque el motor calló o porque se agotó
+     * el presupuesto de tiempo—, esto no se ejecuta: lanza, y el `catch`
+     * devuelve la reserva. Las etapas registraron su costo de todas formas.
      */
     const cobro = await settleOperation({
       firmId: firmId as string,
@@ -233,15 +311,26 @@ export const streamAgentDraftController = async (req: Request, res: Response): P
      * A firm must not pay for a draft that failed — and the credit was taken
      * before the work precisely so nobody could start one they could not pay
      * for, which only holds up if a failure returns it.
+     *
+     * Y el mensaje sale de `desenlaceDeFallo`, que distingue el plazo agotado
+     * de cualquier otro fallo: el primero le dice al abogado que el escrito no
+     * cupo en el tiempo de la plataforma, con los segundos escritos, en vez de
+     * dejarle una consola muda. Antes de que existiera el presupuesto por
+     * etapa, este `catch` NO CORRÍA en producción cuando el reloj se agotaba:
+     * la plataforma mataba la función y con ella la devolución de la reserva.
      */
-    await refundReservation({
-      firmId: firmId as string,
-      userEmail: req.user?.email ?? 'desconocido',
-      operation: 'BORRADOR',
-      reason: 'Devolución: el borrador no se pudo generar'
-    });
+    const desenlace = desenlaceDeFallo(error);
 
-    sendEvent('ERROR', { message: error.message || 'Error durante la orquestación del agente RAG' });
+    if (desenlace.devuelveReserva) {
+      await refundReservation({
+        firmId: firmId as string,
+        userEmail: req.user?.email ?? 'desconocido',
+        operation: 'BORRADOR',
+        reason: desenlace.razon
+      });
+    }
+
+    sendEvent('ERROR', { message: desenlace.mensaje });
     res.end();
   }
 };
