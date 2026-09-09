@@ -156,6 +156,14 @@ const claseDeCapas = (capas: MarcaEnCapa[], abierta: number | null): string => {
   return clases.join(' ');
 };
 
+/**
+ * Las primeras palabras de la selección. La barra del teléfono vive lejos del
+ * pasaje —abajo del todo—, así que tiene que decir por escrito qué va a marcar:
+ * sin eso, quien la usa marca a ciegas.
+ */
+const primerasPalabras = (t: string, max = 52): string =>
+  t.length <= max ? t : `${t.slice(0, max).replace(/\s+\S*$/, '')}…`;
+
 const fechaCorta = (iso: string): string => new Date(iso).toLocaleString('es-CO', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 
 /**
@@ -476,19 +484,38 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   };
 
   /* ─── Selección para el resaltador ───────────────────────────────────────── */
-  const capturarSeleccion = () => {
+  /*
+   * EL TELÉFONO NO TIENE `mouseup`, Y EL SISTEMA MANDA SOBRE LA SELECCIÓN.
+   * Al mantener pulsado sobre el papel, el sistema abre su propio menú —copiar,
+   * buscar, compartir— y borra la selección en cuanto se toca cualquier otra
+   * cosa. Con el `mouseup` de antes, la barra de la aplicación no llegaba a
+   * salir. Por eso se escucha además `selectionchange`, que es el único evento
+   * que el teléfono sí emite mientras se arrastran los asideros de la selección.
+   *
+   * `descartarSiVacia` es toda la diferencia entre los dos caminos. Con el
+   * ratón, soltar sin selección esconde la barra: es lo que hacía antes y lo
+   * que sigue haciendo. Con el dedo NO, porque una anotación se ancla por
+   * TEXTO —`marcasDeAnotaciones` la vuelve a localizar por su contenido— y la
+   * cita queda guardada en el estado: resaltar y comentar siguen siendo válidos
+   * aunque la selección visible haya desaparecido entre medias.
+   *
+   * No se pelea con el menú del sistema: ni se bloquea la selección nativa ni
+   * se toca `-webkit-touch-callout`. Se convive con él poniéndose lejos.
+   */
+  const relojDeSeleccion = React.useRef(0);
+  const arrastrandoConRaton = React.useRef(false);
+
+  const capturarSeleccion = (descartarSiVacia: boolean) => {
     const sel = window.getSelection();
-    if (!sel || sel.isCollapsed || !lienzo.current || !contenedor.current || !sel.anchorNode || !lienzo.current.contains(sel.anchorNode)) {
-      setSeleccion(null);
-      return;
-    }
-    const t = sel.toString().replace(/\s+/g, ' ').trim();
-    if (t.length < 2) {
-      setSeleccion(null);
+    const caja = contenedor.current;
+    const dentro = Boolean(sel && !sel.isCollapsed && lienzo.current && caja && sel.anchorNode && lienzo.current.contains(sel.anchorNode));
+    const t = dentro && sel ? sel.toString().replace(/\s+/g, ' ').trim() : '';
+    if (!sel || !caja || !dentro || t.length < 2) {
+      if (descartarSiVacia) setSeleccion(null);
       return;
     }
     const r = sel.getRangeAt(0).getBoundingClientRect();
-    const caja = contenedor.current.getBoundingClientRect();
+    const marco = caja.getBoundingClientRect();
     /*
      * La barra se centra sobre la selección, pero NUNCA se sale del contenedor:
      * cerca del margen izquierdo se cortaba. Mitad de la barra (~150 px) de
@@ -496,17 +523,59 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
      * debajo en vez de encima.
      */
     const mitad = 150;
-    const x = Math.min(Math.max(r.left - caja.left + r.width / 2, mitad + 8), caja.width - mitad - 8);
-    const arriba = r.top - caja.top + contenedor.current.scrollTop;
+    const x = Math.min(Math.max(r.left - marco.left + r.width / 2, mitad + 8), marco.width - mitad - 8);
+    const arriba = r.top - marco.top + caja.scrollTop;
     const y = arriba < 56 ? arriba + r.height + 44 : arriba - 8;
     setSeleccion({ texto: t, x, y });
+  };
+
+  /* El oyente vive fuera de React; lee siempre la última captura por referencia. */
+  const capturar = React.useRef(capturarSeleccion);
+  capturar.current = capturarSeleccion;
+
+  React.useEffect(() => {
+    const alCambiarLaSeleccion = () => {
+      window.clearTimeout(relojDeSeleccion.current);
+      relojDeSeleccion.current = window.setTimeout(() => {
+        /*
+         * A mitad de un arrastre con el ratón la barra no debe asomar: en el
+         * computador la última palabra la sigue teniendo `mouseup`, como antes.
+         */
+        if (arrastrandoConRaton.current) return;
+        capturar.current(false);
+      }, 200);
+    };
+    const alPulsarElRaton = () => {
+      arrastrandoConRaton.current = true;
+    };
+    const alSoltarElRaton = () => {
+      arrastrandoConRaton.current = false;
+    };
+    document.addEventListener('selectionchange', alCambiarLaSeleccion);
+    document.addEventListener('mousedown', alPulsarElRaton);
+    document.addEventListener('mouseup', alSoltarElRaton);
+    return () => {
+      window.clearTimeout(relojDeSeleccion.current);
+      document.removeEventListener('selectionchange', alCambiarLaSeleccion);
+      document.removeEventListener('mousedown', alPulsarElRaton);
+      document.removeEventListener('mouseup', alSoltarElRaton);
+    };
+  }, []);
+
+  /*
+   * Olvidar la selección apaga también el reloj pendiente: si no, la captura
+   * retrasada devolvería la barra un cuarto de segundo después de resaltar.
+   */
+  const olvidarSeleccion = () => {
+    window.clearTimeout(relojDeSeleccion.current);
+    setSeleccion(null);
+    window.getSelection()?.removeAllRanges();
   };
 
   const resaltar = (color: ColorDeResaltado) => {
     if (!seleccion) return;
     setAnotaciones((xs) => [...xs.filter((a) => a.cita !== seleccion.texto), { cita: seleccion.texto, color }]);
-    setSeleccion(null);
-    window.getSelection()?.removeAllRanges();
+    olvidarSeleccion();
   };
 
   const comentarios = anotaciones.map((a, indice) => ({ a, indice })).filter(({ a }) => a.color === 'comentario');
@@ -514,8 +583,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   const abrirComentarioNuevo = () => {
     if (!seleccion) return;
     setComentario({ indice: null, cita: seleccion.texto, nota: '' });
-    setSeleccion(null);
-    window.getSelection()?.removeAllRanges();
+    olvidarSeleccion();
   };
 
   const guardarComentario = () => {
@@ -630,10 +698,10 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   );
 
   const Papel = (children: React.ReactNode) => (
-    <div ref={contenedor} className="scroll-documento relative min-h-0 flex-1 overflow-y-auto bg-canvas px-3 py-4 sm:px-6" onMouseUp={capturarSeleccion} onTouchEnd={capturarSeleccion}>
+    <div ref={contenedor} className="scroll-documento relative min-h-0 flex-1 overflow-y-auto bg-canvas px-3 py-4 sm:px-6" onMouseUp={() => capturarSeleccion(true)} onTouchEnd={() => capturarSeleccion(false)}>
       {seleccion && modo === 'marcas' && (
         <div
-          className="absolute z-10 flex -translate-x-1/2 -translate-y-full items-center gap-1 rounded-card border border-line-200 bg-surface p-1 shadow-lg"
+          className="absolute z-10 hidden -translate-x-1/2 -translate-y-full items-center gap-1 rounded-card border border-line-200 bg-surface p-1 shadow-lg lg:flex"
           style={{ left: seleccion.x, top: seleccion.y }}
           onMouseDown={(e) => e.preventDefault()}
         >
@@ -653,13 +721,28 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
             <MessageSquarePlus className="h-3.5 w-3.5" />
             Comentar
           </button>
-          <button type="button" onClick={() => setSeleccion(null)} className="h-7 rounded-control px-1.5 font-sans text-[11px] text-ink-500" title="Cancelar">
+          <button type="button" onClick={olvidarSeleccion} className="h-7 rounded-control px-1.5 font-sans text-[11px] text-ink-500" title="Cancelar">
             ✕
           </button>
         </div>
       )}
       {comentario && (
-        <div className="absolute inset-x-3 top-3 z-20 mx-auto max-w-[560px] rounded-card border border-line-200 bg-surface p-3 font-sans shadow-lg sm:inset-x-6">
+        <div
+          /*
+            EN EL TELÉFONO, HOJA ANCLADA ABAJO; EN EL COMPUTADOR, DONDE ESTABA.
+            El cuadro vivía pegado al borde superior del papel: con el teclado
+            abierto, el botón de guardar quedaba fuera de alcance y, al ser
+            `absolute` dentro del contenedor con desplazamiento, se iba hacia
+            arriba en cuanto el dedo movía el escrito. Anclado al borde inferior
+            —como los demás diálogos del producto— sube justo por encima del
+            teclado y las acciones quedan donde llega el pulgar.
+          */
+          className="fixed inset-x-0 bottom-0 z-50 max-h-[85dvh] overflow-y-auto rounded-t-[16px] border-t border-line-200 bg-surface px-3 pb-[calc(12px+env(safe-area-inset-bottom))] pt-2 font-sans shadow-[0_-16px_40px_-12px_rgb(16_24_34/0.3)] lg:absolute lg:inset-x-6 lg:bottom-auto lg:top-3 lg:mx-auto lg:max-h-none lg:max-w-[560px] lg:rounded-card lg:border lg:p-3 lg:shadow-lg"
+        >
+          {/* El asidero dice que esto es una hoja, no una pantalla nueva. */}
+          <div className="flex justify-center pb-1.5 lg:hidden" aria-hidden="true">
+            <span className="h-1 w-[38px] rounded-full bg-neutral-line" />
+          </div>
           <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-400">{comentario.indice === null ? 'Nuevo comentario' : 'Comentario'}</p>
           <p className="mt-0.5 text-[12px] italic leading-snug text-ink-500 text-justify">«{comentario.cita}»</p>
           <textarea
@@ -705,7 +788,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
               type="button"
               onClick={() => {
                 setModo(m);
-                setSeleccion(null);
+                olvidarSeleccion();
                 setVersionAbierta(null);
               }}
               className={`flex items-center gap-1 rounded-control px-2.5 py-1 text-[12px] ${modo === m && versionAbierta === null ? 'bg-brand-50 font-semibold text-brand-700' : 'text-ink-600 hover:text-ink-900'}`}
@@ -1325,6 +1408,52 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
           {panel === 'chat' ? Chat() : panel === 'comentarios' ? ComentariosPanel() : panel === 'informe' ? InformePanel() : panel === 'preguntas' ? PreguntasPanel() : VersionesPanel()}
         </div>
       </div>
+
+      {/*
+        LA BARRA DEL TELÉFONO VIVE ABAJO, LEJOS DE LA SELECCIÓN.
+        El menú del sistema —copiar, buscar, compartir— sale pegado al pasaje
+        seleccionado, así que una barra flotante encima nace tapada. Esta se
+        ancla al borde inferior del taller, por encima de la barra de pestañas
+        del teléfono, y respeta la franja del gesto de inicio. Va en el flujo,
+        no superpuesta: encoge el papel en vez de esconderle un renglón.
+
+        Y dice qué va a marcar. Desde ahí abajo no se ve la selección resaltada
+        —el sistema puede haberla borrado ya—, de modo que sin las primeras
+        palabras escritas se marcaría a ciegas.
+      */}
+      {seleccion && modo === 'marcas' && versionAbierta === null && vistaMovil === 'escrito' && (
+        <div className="shrink-0 border-t border-line-200 bg-surface px-3 pt-2 lg:hidden" style={{ paddingBottom: 'calc(8px + env(safe-area-inset-bottom))' }}>
+          <div className="flex min-w-0 items-center gap-2">
+            <p className="min-w-0 flex-1 truncate font-sans text-[11.5px] italic leading-snug text-ink-500">«{primerasPalabras(seleccion.texto)}»</p>
+            <button type="button" onClick={olvidarSeleccion} className="shrink-0 rounded-control px-2 py-1 font-sans text-[12px] text-ink-500" title="Descartar la selección" aria-label="Descartar la selección">
+              ✕
+            </button>
+          </div>
+          {/*
+            Cinco marcas y «Comentar» no caben en 320 px. La fila lleva
+            desplazamiento propio y cada botón se niega a encoger: un rótulo
+            medio borrado es peor que una fila a la que hay que deslizarse.
+          */}
+          <div className="mt-1.5 flex min-w-0 items-center gap-1.5 overflow-x-auto pb-0.5">
+            {COLORES.map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => resaltar(c.id)}
+                className={`h-9 min-w-9 shrink-0 rounded-control border border-line-200 px-2 font-sans text-[12px] text-ink-900 ${c.id === 'tachado' ? 'bg-surface' : c.muestra}`}
+                title={c.nombre}
+                aria-label={c.nombre}
+              >
+                {c.id === 'tachado' ? <span className="line-through">abc</span> : ''}
+              </button>
+            ))}
+            <button type="button" onClick={abrirComentarioNuevo} className="flex h-9 shrink-0 items-center gap-1 rounded-control border border-brand-700 px-2.5 font-sans text-[12px] text-brand-700" title="Dejar un comentario sobre este pasaje">
+              <MessageSquarePlus className="h-3.5 w-3.5" />
+              Comentar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

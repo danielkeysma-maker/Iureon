@@ -814,6 +814,12 @@ const A_REVISAR: ManualArticle = {
     },
     {
       kind: 'nota',
+      titulo: 'Resaltar y comentar desde el teléfono',
+      texto:
+        'Mantenga pulsado sobre el escrito y arrastre para escoger el pasaje. El teléfono abrirá su propio menú —copiar, buscar, compartir—: no le haga caso. La barra de Iureon aparece abajo del todo, sobre la barra de navegación, y le muestra entre comillas las primeras palabras de lo que va a marcar; ahí elige el color, tacha, o toca «Comentar». Si el teléfono borra el subrayado azul de la selección mientras usted decide, no pasa nada: la barra recuerda el pasaje y la marca cae donde debe. La equis descarta. Para releer o corregir un comentario, toque el pasaje subrayado con puntos y la nota se abre como una hoja desde abajo, con sitio para el teclado. En el computador todo sigue igual, con la barra flotando sobre lo que seleccionó.'
+    },
+    {
+      kind: 'nota',
       titulo: 'Si la guía niega una sentencia que sí existe',
       texto:
         'Cada vez que usted nombra una sentencia de la Corte Constitucional en el chat o en un comentario —por su tipo, número y año, como la escribe siempre—, la aplicación la consulta en el índice oficial de la Corte antes de que la guía responda, y le entrega el resultado con la fuente y un extracto del texto oficial. Ese resultado manda sobre la memoria del modelo: si la guía había dicho que no existía, debe reconocerlo y corregir con base en el extracto. Si el índice no la tiene, la guía se lo dice así, con la fuente, y le sugiere revisar número y año; si el índice no respondió, lo dice y no la da ni por existente ni por inexistente. Las providencias de la Corte Suprema, del Consejo de Estado y de tribunales no se verifican por esta vía: la guía debe pedirle la fuente o el radicado en vez de afirmar o negar que existan.'
