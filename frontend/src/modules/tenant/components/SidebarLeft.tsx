@@ -64,7 +64,14 @@ const TRANSICION = 'transition-[width] duration-300 ease-[cubic-bezier(.4,0,.2,1
 const ROTULO = 'text-[9.5px] font-semibold uppercase tracking-[0.18em] text-rail-ink/[.34]';
 
 /** Las fichas del riel colapsado: 48×42, blancas, con borde de tinta al 9 %. */
-const FICHA = 'h-[42px] w-12 rounded-[14px] border border-rail-ink/10 bg-rail-surface';
+/*
+ * La ficha colapsada SIN color: el fondo y el borde los pone cada estado.
+ * Traerlos aquí ponía dos `bg-` en el mismo elemento —el de la ficha y el del
+ * activo— y en Tailwind eso no lo decide el orden en que se escriben sino el
+ * orden de la hoja: ganaba el blanco, así que el módulo abierto se pintaba
+ * blanco y su icono, también blanco, desaparecía.
+ */
+const FICHA = 'h-[42px] w-12 rounded-[14px] border';
 
 /**
  * El panel se queda como se dejó. La clave es la del diseño; se lee una vez al
@@ -225,7 +232,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
           className={`relative grid place-items-center ${FICHA} transition-colors ${
             activo
               ? 'border-brand-700 bg-brand-700 text-white'
-              : 'text-rail-muted hover:border-rail-ink/20 hover:text-rail-ink'
+              : 'border-rail-ink/10 bg-rail-surface text-rail-muted hover:border-rail-ink/25 hover:text-rail-ink'
           }`}
         >
           <Icon className="h-[21px] w-[21px]" strokeWidth={1.6} aria-hidden />
@@ -345,7 +352,9 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
           data-visita="marca"
           title="Ir al inicio"
           aria-label="Ir al inicio"
-          className="flex min-w-0 flex-1 cursor-pointer items-center gap-[11px] rounded-control transition-opacity hover:opacity-80"
+          className={`flex min-w-0 cursor-pointer items-center gap-[11px] rounded-control transition-opacity hover:opacity-80 ${
+            isCollapsed ? 'justify-center' : 'flex-1'
+          }`}
         >
           <IureonMark size={30} className="shrink-0" />
           {!isCollapsed && (
@@ -481,24 +490,20 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
             data-visita="saldo"
             className="rounded-2xl border border-rail-ink/10 bg-rail-surface p-4"
           >
+            {/*
+              DOS DINEROS DISTINTOS, UNO ENCIMA DEL OTRO Y NO UNO AL LADO DEL
+              OTRO. Arriba el saldo, que es consumo: se gasta escribiendo y se
+              repone con «Recargar». Abajo el plan, que es el derecho a entrar:
+              se paga por periodos y se abre con su propia fila. Puestos como
+              dos enlaces gemelos en el mismo renglón parecían la misma puerta
+              con dos nombres, y el titular lo leyó así.
+            */}
             <div className="flex items-baseline gap-3">
               <span className={`${ROTULO} !text-rail-ink/[.38]`}>Saldo</span>
-              {/*
-                Dos puertas, dos cosas distintas: «Recargar» compra saldo de
-                consumo; «Plan» paga el derecho a usar la aplicación. Juntas
-                aquí porque las dos son dinero y las dos las decide un socio.
-              */}
-              <button
-                type="button"
-                onClick={onOpenSubscriptionModal}
-                className="ml-auto text-[12px] font-semibold text-rail-gold-ink hover:underline"
-              >
-                Plan
-              </button>
               <button
                 type="button"
                 onClick={onOpenRechargeModal || onOpenSubscriptionModal}
-                className="text-[12px] font-semibold text-rail-gold-ink hover:underline"
+                className="ml-auto text-[12px] font-semibold text-rail-gold-ink hover:underline"
               >
                 Recargar
               </button>
@@ -507,9 +512,19 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
             <p className="mt-1.5 font-mono text-[27px] font-semibold leading-none tracking-[-0.03em] text-rail-ink">
               {saldoTexto}
             </p>
+            <button
+              type="button"
+              onClick={onOpenSubscriptionModal}
+              title="Ver el plan de la firma"
+              className="mt-3 flex w-full items-center gap-2 border-t border-rail-ink/10 pt-2.5 text-left text-[11px] text-rail-faint transition-colors hover:text-rail-ink"
+            >
+              <span className="min-w-0 flex-1 truncate">{nota ?? 'Ver el plan'}</span>
+              <ChevronRight className="h-3.5 w-3.5 shrink-0" aria-hidden />
+            </button>
+            {/* La barra mide el periodo del plan, así que va con el plan. */}
             {fraccion !== null && (
               <div
-                className="mt-3 h-[3px] overflow-hidden rounded-full bg-rail-ink/10"
+                className="mt-2 h-[3px] overflow-hidden rounded-full bg-rail-ink/10"
                 role="progressbar"
                 aria-label="Parte del periodo del plan que queda"
                 aria-valuemin={0}
@@ -519,7 +534,6 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
                 <i className="block h-full rounded-full bg-rail-gold" style={{ width: `${fraccion * 100}%` }} />
               </div>
             )}
-            {nota && <p className="mt-2 text-[11px] text-rail-faint">{nota}</p>}
           </div>
         ) : (
           <>
