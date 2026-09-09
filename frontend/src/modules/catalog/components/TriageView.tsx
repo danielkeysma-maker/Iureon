@@ -21,6 +21,7 @@ import {
 } from '../services/catalog.api';
 import { indiceDelPrimario, porTerminoMasCorto } from '../triageOrder';
 import { ARCHIVOS_DE_HECHOS, useHechosDesdeArchivo } from '../hechosDesdeArchivo';
+import { PanelDeInstruccion } from './PanelDeInstruccion';
 import { ApiError } from '../../../config/httpClient';
 import { BRANCH_LABELS } from '../branchLabels';
 import type { MainView } from '../../tenant/types';
@@ -52,8 +53,13 @@ interface TriageViewProps {
    * The facts travel because the lawyer already wrote them here. Asking for
    * them again is how a two-screen flow becomes two transcriptions of the same
    * story, and the second one is always shorter than the first.
+   *
+   * @param instruccion lo que se escribe en el cuadro «Qué debe hacer este
+   *        escrito». Viaja APARTE de los hechos y puede venir vacía: escoger
+   *        una sugerencia es opcional y la instrucción en blanco es válida,
+   *        que es como funcionaba este camino antes de que existiera.
    */
-  onDraft: (actuacionName: string, branch: string, hechos: string) => void;
+  onDraft: (actuacionName: string, branch: string, hechos: string, instruccion: string) => void;
   setMainView: (view: MainView) => void;
 }
 
@@ -188,6 +194,19 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
     [result]
   );
   const idxPrimario = React.useMemo(() => indiceDelPrimario(sugerencias), [sugerencias]);
+
+  /*
+   * LA TARJETA CUYO PANEL DE INSTRUCCIÓN ESTÁ ABIERTO. Uno a la vez: dos
+   * paneles abiertos con dos instrucciones a medio escribir es una forma de
+   * llevar a Redacción la de la ficha que no era.
+   *
+   * Se cierra al llegar un resultado nuevo, o quedaría abierto sobre una
+   * actuación que ya no está en la lista.
+   */
+  const [eligiendo, setEligiendo] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    setEligiendo(null);
+  }, [result]);
 
   const campoHechos = React.useRef<HTMLTextAreaElement>(null);
 
@@ -459,7 +478,7 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
                         Buscar en jurisprudencia
                       </button>
                       <button
-                        onClick={() => onDraft('', '', hechos.trim())}
+                        onClick={() => onDraft('', '', hechos.trim(), '')}
                         className="btn-neutral btn-sm"
                         title="Lleva los hechos al taller. Tendrá que elegir allí la actuación."
                       >
@@ -660,7 +679,8 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
                       </button>
                     ) : (
                       <button
-                        onClick={() => onDraft(a.exactName, a.branch, hechos.trim())}
+                        onClick={() => setEligiendo(eligiendo === a.id ? null : a.id)}
+                        aria-expanded={eligiendo === a.id}
                         className={esPrimario ? 'btn-primary btn-sm' : 'btn-secondary btn-sm'}
                       >
                         <PenLine className="h-3 w-3" />
@@ -684,6 +704,24 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
                       </a>
                     )}
                   </div>
+
+                  {/*
+                    EL PANEL VA PEGADO A SU TARJETA, no al final de la lista.
+                    Es la misma lección del panel de dividir en Audiencias: si
+                    una acción responde lejos de donde se pulsa, con la lista
+                    larga —y aquí son hasta seis fichas— el abogado pulsa, el
+                    estado cambia, y no ve ocurrir nada.
+                  */}
+                  {eligiendo === a.id && (
+                    <PanelDeInstruccion
+                      actuacion={a}
+                      hechos={hechos}
+                      onCancelar={() => setEligiendo(null)}
+                      onLlevar={(instruccion) =>
+                        onDraft(a.exactName, a.branch, hechos.trim(), instruccion)
+                      }
+                    />
+                  )}
                 </article>
               );
             })}

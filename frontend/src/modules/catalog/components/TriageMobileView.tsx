@@ -8,6 +8,7 @@ import {
 import { ARCHIVOS_DE_HECHOS, useHechosDesdeArchivo } from '../hechosDesdeArchivo';
 import { triageApi, type TriageResponse } from '../services/catalog.api';
 import { BRANCH_LABELS } from '../branchLabels';
+import { PanelDeInstruccion } from './PanelDeInstruccion';
 import type { Actuacion } from '../types';
 
 /**
@@ -124,7 +125,11 @@ interface TriageMobileViewProps {
    * El nombre viaja TAL CUAL vino del catalogo: es el contrato con el motor de
    * redaccion, y cualquier otra cadena resuelve a una plantilla generica.
    */
-  onDraft: (actuacionName: string, branch: string, hechos: string) => void;
+  /*
+   * `instruccion` es lo que va al cuadro «Que debe hacer este escrito», APARTE
+   * de los hechos. Puede llegar vacia: escoger una sugerencia es opcional.
+   */
+  onDraft: (actuacionName: string, branch: string, hechos: string, instruccion: string) => void;
 }
 
 export const TriageMobileView: React.FC<TriageMobileViewProps> = ({ onDraft }) => {
@@ -154,6 +159,18 @@ export const TriageMobileView: React.FC<TriageMobileViewProps> = ({ onDraft }) =
   };
 
   const sugerencias = resultado?.status === 'OK' ? resultado.suggestions : [];
+
+  /*
+   * LA TARJETA CON EL PANEL DE INSTRUCCION ABIERTO. Una sola: en el telefono la
+   * lista se recorre desplazando, y dos paneles abiertos con dos instrucciones a
+   * medio escribir es como se lleva a Redaccion la de la ficha que no era. Se
+   * cierra al llegar un resultado nuevo, o quedaria abierto sobre una actuacion
+   * que ya no esta en la lista.
+   */
+  const [eligiendo, setEligiendo] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    setEligiendo(null);
+  }, [resultado]);
   const faltan = Math.max(0, MINIMO - hechos.trim().length);
 
   return (
@@ -372,7 +389,8 @@ export const TriageMobileView: React.FC<TriageMobileViewProps> = ({ onDraft }) =
                   {estado !== 'NO_VERIFICADO' && (
                     <button
                       type="button"
-                      onClick={() => onDraft(a.exactName, a.branch, hechos.trim())}
+                      onClick={() => setEligiendo(eligiendo === a.id ? null : a.id)}
+                      aria-expanded={eligiendo === a.id}
                       className={`mt-[11px] h-11 w-full rounded-[6px] text-[13.5px] ${
                         esPrimario
                           ? 'bg-brand-700 font-semibold text-on-brand'
@@ -381,6 +399,28 @@ export const TriageMobileView: React.FC<TriageMobileViewProps> = ({ onDraft }) =
                     >
                       Redactar esta
                     </button>
+                  )}
+
+                  {/*
+                    PEGADO AL BOTON, y en el telefono eso pesa mas que en
+                    escritorio: una tarjeta ocupa casi la pantalla, asi que un
+                    panel montado al final de la lista responderia cientos de
+                    pixeles bajo el pliegue y pareceria que el boton no hace
+                    nada. Los margenes negativos devuelven el panel al borde de
+                    la tarjeta, que trae su propio relleno.
+                  */}
+                  {eligiendo === a.id && (
+                    <div className="-mx-3.5 -mb-3 mt-[11px] min-w-0 overflow-hidden rounded-b-[7px]">
+                      <PanelDeInstruccion
+                        movil
+                        actuacion={a}
+                        hechos={hechos}
+                        onCancelar={() => setEligiendo(null)}
+                        onLlevar={(instruccion) =>
+                          onDraft(a.exactName, a.branch, hechos.trim(), instruccion)
+                        }
+                      />
+                    </div>
                   )}
                 </Tarjeta>
               );

@@ -27,6 +27,7 @@ import { AgentPanelLeft } from './modules/workspace/components/AgentPanelLeft';
 import { TallerDeRevision, type DatosDelTaller } from './modules/workspace/components/TallerDeRevision';
 import { RevisionesView } from './modules/workspace/components/RevisionesView';
 import { draftsApi } from './modules/documents/services/drafts.api';
+import { componerCuadroDeRedaccion } from './modules/catalog/instruccionSugerida';
 import { catalogApi } from './modules/catalog/services/catalog.api';
 import { procedenciaDesdeActuacion, tituloParaElBorrador } from './modules/documents/procedenciaDesdeCatalogo';
 import { TallerDeBorrador, type DatosDelBorrador } from './modules/workspace/components/TallerDeBorrador';
@@ -220,10 +221,19 @@ export function App() {
    * pisar la rama con una cadena vacia dejaria el selector sin valor y la lista
    * de actuaciones sin poder cargarse. Se conserva la que haya.
    */
-  const irARedactar = (nombre: string, rama: string, hechos: string) => {
+  const irARedactar = (nombre: string, rama: string, hechos: string, instruccion = '') => {
     if (rama) workflow.setLegalBranch(rama);
     workflow.setDocumentType(nombre);
-    if (hechos) workflow.setLegalPrompt(hechos);
+    /*
+     * LA INSTRUCCION VIAJA JUNTO A LOS HECHOS, NO EN LUGAR DE ELLOS.
+     *
+     * Redaccion tiene UN solo cuadro —«Que debe hacer este escrito»—, asi que
+     * las dos mitades comparten destino y la unica forma de no perder ninguna
+     * es escribirlas rotuladas y separadas. Sin instruccion se conserva el
+     * camino de siempre al pie de la letra: los hechos solos, sin anadidos.
+     */
+    const cuadro = componerCuadroDeRedaccion(instruccion, hechos);
+    if (cuadro) workflow.setLegalPrompt(cuadro);
     setMainView('workspace');
   };
   const [refrescoSoporte, setRefrescoSoporte] = useState(0);
