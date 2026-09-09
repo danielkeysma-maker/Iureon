@@ -4,6 +4,7 @@ import { reviewApi, type Anotacion, type ConsentimientoDeGuardado, type InformeD
 import { exportarPreguntasAWord } from '../services/preguntasExport.service';
 import { TallerDeEscrito } from './TallerDeEscrito';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
+import { usePlan } from '../../subscriptions/PlanContext';
 
 /**
  * El taller sobre un escrito REVISADO: el genérico (TallerDeEscrito) con lo
@@ -76,6 +77,9 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
    * una vez; un fallo de red deja la pestaña vacía y no bloquea nada.
    */
   const [preguntasGuardadas, setPreguntasGuardadas] = React.useState<PreguntasAudienciaGuardadas | null>(datos.preguntasAudiencia ?? null);
+  /* Las funciones de Revisiones que el operador puede apagar para esta firma: sin pestaña «Audiencia», sin entrada de chat, sin «Volver a revisar». */
+  const { funcionHabilitada } = usePlan();
+  const preguntasHabilitadas = funcionHabilitada('REVISIONES.PREGUNTAS_AUDIENCIA');
   React.useEffect(() => {
     if (datos.preguntasAudiencia !== undefined || !datos.revisionId) return;
     let vigente = true;
@@ -174,8 +178,9 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
         onCerrar={() => onCerrar()}
         onSaldoCambiado={onSaldoCambiado}
         formato={formatoDeFirma}
+        cerradas={{ chat: !funcionHabilitada('REVISIONES.CHAT_GUIA'), rerevisar: !funcionHabilitada('REVISIONES.REREVISAR') }}
         preguntas={
-          datos.revisionId
+          datos.revisionId && preguntasHabilitadas
             ? {
                 precioCop: precioConsultaCop,
                 guardadas: preguntasGuardadas,

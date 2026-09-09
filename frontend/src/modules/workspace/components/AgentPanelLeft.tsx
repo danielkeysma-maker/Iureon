@@ -17,6 +17,8 @@ import { useActuacionLookup } from '../../catalog/hooks/useActuacion';
 import type { AgentLog } from '../../agent/types';
 import type { ActuacionRole } from '../../catalog/types';
 import { RevisarEscritoDialog } from './RevisarEscritoDialog';
+import { useFuncionHabilitada } from '../../subscriptions/PlanContext';
+import { AVISO_FUNCION_DESHABILITADA } from '../../subscriptions/types';
 import type { DatosDelTaller } from './TallerDeRevision';
 import {
   EXTENSIONES_ACEPTADAS,
@@ -110,6 +112,8 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
   const [avisoAdjuntos, setAvisoAdjuntos] = useState<string | null>(null);
   /** Mientras se reducen fotos, se leen y se suben: el botón espera. */
   const [preparandoAdjuntos, setPreparandoAdjuntos] = useState(false);
+  /* El operador puede apagar los adjuntos para una firma: el botón queda gris con el aviso y el servidor rechaza los archivos con 403. */
+  const adjuntosHabilitados = useFuncionHabilitada('REDACCION.ADJUNTOS');
   /** «Revisar un escrito»: el tercer uso del módulo, junto a redactar y corregir. */
   const [revisarAbierto, setRevisarAbierto] = useState(false);
 
@@ -322,13 +326,18 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
 
           {/* ─── ADJUNTOS ────────────────────────────────────────────────── */}
           <div className="mt-3">
-            <label className="flex cursor-pointer items-center justify-center gap-2 rounded-control border border-dashed border-line-200 bg-canvas py-2.5 hover:bg-brand-50">
+            <label
+              title={adjuntosHabilitados ? undefined : AVISO_FUNCION_DESHABILITADA}
+              className={`flex items-center justify-center gap-2 rounded-control border border-dashed border-line-200 bg-canvas py-2.5 ${
+                adjuntosHabilitados ? 'cursor-pointer hover:bg-brand-50' : 'cursor-not-allowed opacity-60'
+              }`}
+            >
               <input
                 type="file"
                 multiple
                 accept={EXTENSIONES_ACEPTADAS}
                 onChange={handleFileSelection}
-                disabled={preparandoAdjuntos || isProcessing}
+                disabled={preparandoAdjuntos || isProcessing || !adjuntosHabilitados}
                 className="hidden"
               />
               <UploadCloud className="h-4 w-4 text-ink-400" />
@@ -350,6 +359,7 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
               archivos y {formatoMb(MAX_BYTES_TOTAL).replace('.0', '')} en total.
             </p>
 
+            {!adjuntosHabilitados && <p className="notice mt-1.5">{AVISO_FUNCION_DESHABILITADA}</p>}
             {avisoAdjuntos && <p className="notice-unverified mt-1.5">{avisoAdjuntos}</p>}
 
             {importedFiles.length > 0 && (

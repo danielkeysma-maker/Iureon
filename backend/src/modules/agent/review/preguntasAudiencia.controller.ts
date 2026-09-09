@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { auditService } from '../../audit/audit.service';
 import { BillingError, recordUsage, refundReservation, reserveForOperation, settleOperation } from '../../billing/billing.service';
 import type { LegalBranch } from '../../catalog/types';
+import { exigirFuncion, responderPlanError } from '../../subscriptions/plan.service';
 import { buildCatalogGuidanceForFirm } from '../catalogGuidance';
 import { ENGINE, callOpenRouterWithUsage } from '../openrouter.client';
 import { LIMITE_LLAMADA_MS, TiempoAgotado, conLimite } from './documentReview.controller';
@@ -32,6 +33,14 @@ export const preguntasAudienciaController = async (req: Request, res: Response):
   const firmId = req.firmId as string;
   const userEmail = req.user?.email ?? 'desconocido';
   const id = String(req.params.id);
+
+  // Before anything is reserved: a function the operator switched off answers 403 and costs nothing.
+  try {
+    await exigirFuncion(firmId, 'REVISIONES.PREGUNTAS_AUDIENCIA');
+  } catch (err) {
+    if (responderPlanError(res, err)) return;
+    throw err;
+  }
 
   const parametros = normalizarParametros((req.body ?? {}) as Record<string, unknown>);
   if (!parametros.ok) {

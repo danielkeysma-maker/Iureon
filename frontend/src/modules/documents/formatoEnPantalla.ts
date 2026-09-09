@@ -27,7 +27,8 @@ export type FuenteDelEscrito =
   | 'Plus Jakarta Sans'
   | 'Manrope'
   | 'Public Sans'
-  | 'Satoshi';
+  | 'Satoshi'
+  | 'Work Sans';
 export type Interlineado = '1.0' | '1.5' | '2.0';
 
 export interface FormatoDelEscrito {
@@ -53,7 +54,8 @@ const FAMILIAS: Record<FuenteDelEscrito, string> = {
   'Plus Jakarta Sans': "'Plus Jakarta Sans', system-ui, sans-serif",
   Manrope: 'Manrope, system-ui, sans-serif',
   'Public Sans': "'Public Sans', system-ui, sans-serif",
-  Satoshi: 'Satoshi, system-ui, sans-serif'
+  Satoshi: 'Satoshi, system-ui, sans-serif',
+  'Work Sans': "'Work Sans', system-ui, sans-serif"
 };
 
 /** 1 pt = 4/3 px a 96 ppp: 12 pt son 16 px, como en el papel. */

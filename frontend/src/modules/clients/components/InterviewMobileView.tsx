@@ -17,6 +17,8 @@ import {
   preguntasCubiertas
 } from '../guionDeEntrevista';
 import { IconoDocumento, IconoSinVerificar } from '../../../design/ArtboardIcons';
+import { useFuncionHabilitada } from '../../subscriptions/PlanContext';
+import { AVISO_FUNCION_DESHABILITADA } from '../../subscriptions/types';
 
 
 /**
@@ -145,6 +147,8 @@ export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
         : [],
     [stored, clienteId, transcriptionId]
   );
+  /* La lista es una función de Entrevistas que el operador puede apagar: el rótulo queda, con el aviso en vez de las preguntas. */
+  const guionHabilitado = useFuncionHabilitada('ENTREVISTAS.GUION');
   const estadosGuion = React.useMemo(
     () => estadoDelGuion(cubiertasHoy, cubiertasEnEntrevistasPrevias(previas)),
     [cubiertasHoy, previas]
@@ -367,6 +371,9 @@ export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
             <p className="mb-2 font-mono text-[9.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
               Lo que no puede quedarse sin preguntar
             </p>
+            {!guionHabilitado ? (
+              <p className="notice text-[12px] leading-[1.5] [text-wrap:pretty]">{AVISO_FUNCION_DESHABILITADA}</p>
+            ) : (
             <ul className="space-y-2">
               {GUION_BASE.map((p) => {
                 const estado = estadosGuion.get(p.id) ?? { estado: 'pendiente' as const };
@@ -404,6 +411,7 @@ export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
                 );
               })}
             </ul>
+            )}
           </div>
         )}
 

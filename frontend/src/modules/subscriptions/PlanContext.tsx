@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useMemo } from 'react';
-import type { PlanDeFirma } from './types';
+import type { Funcion, PlanDeFirma } from './types';
 
 /**
  * The firm's plan, readable from any screen without threading a prop.
@@ -26,13 +26,21 @@ interface PlanContextValue {
   abrirPlan: () => void;
   /** Whether the current session can pay — decides «Renovar plan» vs «Ver plan». */
   puedePagar: boolean;
+  /**
+   * Whether THIS firm may use a sub-service: its module is permitted and the
+   * operator did not switch the function off. Fails OPEN while the plan is
+   * not loaded, for the reason above: the server refuses with 403 anyway, and
+   * a hidden door costs more than a visible refusal.
+   */
+  funcionHabilitada: (funcion: Funcion) => boolean;
 }
 
 const PlanContext = createContext<PlanContextValue>({
   plan: null,
   soloLectura: false,
   abrirPlan: () => {},
-  puedePagar: false
+  puedePagar: false,
+  funcionHabilitada: () => true
 });
 
 interface PlanProviderProps {
@@ -44,13 +52,32 @@ interface PlanProviderProps {
 
 export const PlanProvider: React.FC<PlanProviderProps> = ({ plan, puedePagar, abrirPlan, children }) => {
   const value = useMemo<PlanContextValue>(
-    () => ({ plan, soloLectura: plan?.estado === 'VENCIDO', abrirPlan, puedePagar }),
+    () => ({
+      plan,
+      soloLectura: plan?.estado === 'VENCIDO',
+      abrirPlan,
+      puedePagar,
+      funcionHabilitada: (funcion) => funcionHabilitada(plan, funcion)
+    }),
     [plan, abrirPlan, puedePagar]
   );
   return <PlanContext.Provider value={value}>{children}</PlanContext.Provider>;
 };
 
+/** The module id is the prefix of the function id: `REVISIONES.REREVISAR` belongs to `REVISIONES`. */
+const moduloDeFuncion = (funcion: Funcion): PlanDeFirma['modulosPermitidos'][number] =>
+  funcion.split('.')[0] as PlanDeFirma['modulosPermitidos'][number];
+
+export const funcionHabilitada = (plan: PlanDeFirma | null, funcion: Funcion): boolean => {
+  if (!plan) return true;
+  if (!plan.modulosPermitidos.includes(moduloDeFuncion(funcion))) return false;
+  return !(plan.funcionesDesactivadas ?? []).includes(funcion);
+};
+
 export const usePlan = (): PlanContextValue => useContext(PlanContext);
+
+/** The single question a leaf asks before showing a sub-service's entry point. */
+export const useFuncionHabilitada = (funcion: Funcion): boolean => useContext(PlanContext).funcionHabilitada(funcion);
 
 /** The single boolean most leaves need: hide or disable what creates work. */
 export const usePlanSoloLectura = (): boolean => useContext(PlanContext).soloLectura;

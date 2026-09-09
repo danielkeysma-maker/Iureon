@@ -88,6 +88,12 @@ const MODULOS_CONMUTABLES: ReadonlyArray<{ id: string; nombre: string }> = Objec
 
 type EstadoDeModulo = 'ACTIVO' | 'DESACTIVADO' | 'NO_EN_PLAN';
 
+/** Una función: apagada por sí misma, o apagada porque su módulo lo está (o no viene en el plan). */
+type EstadoDeFuncion = 'ACTIVA' | 'DESACTIVADA' | 'CON_EL_MODULO';
+
+const estadoDeFuncion = (firma: FirmDetail, estadoDelModulo: EstadoDeModulo, id: string): EstadoDeFuncion =>
+  estadoDelModulo !== 'ACTIVO' ? 'CON_EL_MODULO' : firma.funcionesDesactivadas.includes(id) ? 'DESACTIVADA' : 'ACTIVA';
+
 /**
  * Del servidor salen dos listas: lo permitido (plan menos resta) y la resta.
  * Un módulo que no está en ninguna de las dos no lo trae el plan.
@@ -108,13 +114,20 @@ const ModulosDeLaFirma: React.FC<ModulosDeLaFirmaProps> = ({ firma, onGuardado }
   const [confirmacion, setConfirmacion] = React.useState<Confirmacion | null>(null);
   const [motivo, setMotivo] = React.useState('');
   const [error, setError] = React.useState<string | null>(null);
+  /** Módulo o función: cambia el texto de la confirmación, no la llamada. */
+  const [alcance, setAlcance] = React.useState<'modulo' | 'funcion'>('modulo');
   const motivoRef = React.useRef('');
   const mantenerAbiertoRef = React.useRef(false);
 
   const nombrePlan = firma.plan ? NOMBRE_PLAN[firma.plan] : 'Cortesía';
 
+  /*
+   * Se manda la lista COMPLETA de lo apagado — módulos y funciones en una sola
+   * lista, como la guarda la columna — y no un delta: apagar una función no
+   * puede reactivar un módulo por omisión.
+   */
   const aplicar = async (id: string, apagar: boolean) => {
-    const actuales = new Set(firma.modulosDesactivados);
+    const actuales = new Set<string>([...firma.modulosDesactivados, ...firma.funcionesDesactivadas]);
     if (apagar) actuales.add(id);
     else actuales.delete(id);
     setError(null);
@@ -133,10 +146,11 @@ const ModulosDeLaFirma: React.FC<ModulosDeLaFirmaProps> = ({ firma, onGuardado }
     onGuardado();
   };
 
-  const pedirConfirmacion = (id: string, nombre: string, apagar: boolean) => {
+  const pedirConfirmacion = (id: string, nombre: string, apagar: boolean, tipo: 'modulo' | 'funcion' = 'modulo') => {
     setError(null);
     setMotivo('');
     motivoRef.current = '';
+    setAlcance(tipo);
     setConfirmacion({
       titulo: apagar ? `Desactivar ${nombre} para esta firma` : `Reactivar ${nombre} para esta firma`,
       texto: '',
@@ -150,7 +164,8 @@ const ModulosDeLaFirma: React.FC<ModulosDeLaFirmaProps> = ({ firma, onGuardado }
     <div className="border-t border-line-200 px-4 py-3">
       <h4 className="text-[12.5px] font-semibold text-ink-900">Módulos de esta firma</h4>
       <p className="mt-0.5 text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
-        El plan es la base; aquí se resta para esta firma. La firma verá el módulo como no disponible.
+        El plan es la base; aquí se resta para esta firma. La firma verá el módulo como no disponible. Debajo de cada módulo,
+        sus funciones: se apagan una a una y la firma las ve como «no habilitada para su firma».
       </p>
 
       <ul className="mt-3 grid gap-2 sm:grid-cols-2">
@@ -158,13 +173,15 @@ const ModulosDeLaFirma: React.FC<ModulosDeLaFirmaProps> = ({ firma, onGuardado }
           const estado = estadoDeModulo(firma, id);
           const encendido = estado === 'ACTIVO';
           const enPlan = estado !== 'NO_EN_PLAN';
+          const funciones = (firma.funciones ?? []).filter((f) => f.modulo === id);
           return (
             <li
               key={id}
-              className={`flex items-center justify-between gap-3 rounded-control border border-line-200 px-3 py-2 ${
+              className={`rounded-control border border-line-200 px-3 py-2 ${
                 enPlan ? 'bg-canvas' : 'bg-surface opacity-70'
               }`}
             >
+              <div className="flex items-center justify-between gap-3">
               <div className="min-w-0">
                 <p className="truncate text-[12px] font-medium text-ink-900">{nombre}</p>
                 {estado === 'DESACTIVADO' && (
@@ -194,6 +211,48 @@ const ModulosDeLaFirma: React.FC<ModulosDeLaFirmaProps> = ({ firma, onGuardado }
                   }`}
                 />
               </button>
+              </div>
+              {funciones.length > 0 && (
+                <ul className="mt-2 space-y-1.5 border-l border-line-200 pl-3">
+                  {funciones.map((f) => {
+                    const estadoF = estadoDeFuncion(firma, estado, f.id);
+                    const encendida = estadoF === 'ACTIVA';
+                    const conElModulo = estadoF === 'CON_EL_MODULO';
+                    return (
+                      <li key={f.id} className={`flex items-start justify-between gap-3 ${conElModulo ? 'opacity-60' : ''}`}>
+                        <div className="min-w-0">
+                          <p className="text-[11.5px] font-medium text-ink-900">
+                            {f.nombre}
+                            {conElModulo && <span className="ml-1 font-normal text-ink-400">(con el módulo)</span>}
+                          </p>
+                          <p className="text-[10.5px] leading-snug text-ink-500 [text-wrap:pretty]">{f.descripcion}</p>
+                          {estadoF === 'DESACTIVADA' && (
+                            <span className="chip-unverified mt-1 inline-block">Desactivada por el operador</span>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={encendida}
+                          aria-label={`${f.nombre}: ${encendida ? 'activa' : 'inactiva'} para esta firma`}
+                          disabled={conElModulo}
+                          title={conElModulo ? 'Se apaga y se enciende con el módulo.' : undefined}
+                          onClick={() => pedirConfirmacion(f.id, f.nombre, encendida, 'funcion')}
+                          className={`relative mt-0.5 h-4 w-7 shrink-0 rounded-full border transition-colors disabled:cursor-not-allowed ${
+                            encendida ? 'border-brand-700 bg-brand-700' : 'border-line-200 bg-line-100'
+                          }`}
+                        >
+                          <span
+                            className={`absolute top-0.5 h-2.5 w-2.5 rounded-full bg-surface shadow transition-transform ${
+                              encendida ? 'left-0.5 translate-x-3' : 'left-0.5'
+                            }`}
+                          />
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
             </li>
           );
         })}
@@ -206,7 +265,20 @@ const ModulosDeLaFirma: React.FC<ModulosDeLaFirmaProps> = ({ firma, onGuardado }
             texto: (
               <div className="space-y-3">
                 <p>
-                  {confirmacion.peligro ? (
+                  {alcance === 'funcion' ? (
+                    confirmacion.peligro ? (
+                      <>
+                        La firma <b>{firma.name}</b> deja de ver esta función en el acto: el módulo sigue abierto y la
+                        pantalla la muestra como «no habilitada para su firma»; el servidor la rechaza aunque alguien la
+                        pida por fuera de la pantalla. El plan no cambia y lo ya creado se conserva; usted la reactiva
+                        desde aquí cuando corresponda.
+                      </>
+                    ) : (
+                      <>
+                        La firma <b>{firma.name}</b> vuelve a ver esta función en el acto, dentro de su módulo.
+                      </>
+                    )
+                  ) : confirmacion.peligro ? (
                     <>
                       La firma <b>{firma.name}</b> deja de ver este módulo en el acto: desaparece de su
                       barra y su portada lo muestra como «No disponible para su firma». El plan no cambia y

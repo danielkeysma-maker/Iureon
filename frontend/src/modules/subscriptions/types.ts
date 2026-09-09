@@ -27,6 +27,25 @@ export type Modulo =
   | 'ENTREVISTAS'
   | 'ORIENTACION';
 
+/**
+ * The sub-services the operator can switch off inside a module that stays on.
+ * Ids mirror `FUNCIONES` in `backend/src/modules/subscriptions/plan.catalog.ts`;
+ * the names and descriptions stay on the server (the operator console reads
+ * them from the firm's ficha) — the screen only needs the id to hide a door.
+ */
+export type Funcion =
+  | 'REDACCION.ADJUNTOS'
+  | 'REDACCION.TALLER_BORRADOR'
+  | 'REVISIONES.CHAT_GUIA'
+  | 'REVISIONES.REREVISAR'
+  | 'REVISIONES.PREGUNTAS_AUDIENCIA'
+  | 'AUDIENCIAS.RESUMEN'
+  | 'ENTREVISTAS.RESUMEN'
+  | 'ENTREVISTAS.GUION';
+
+/** The one sentence every closed function shows; the server's 403 says the same, naming the function. */
+export const AVISO_FUNCION_DESHABILITADA = 'Esta función no está habilitada para su firma. Escríbanos por Soporte para activarla.';
+
 export type EstadoDelPlan = 'ACTIVO' | 'POR_VENCER' | 'VENCIDO' | 'CORTESIA' | 'PRUEBA';
 
 export interface PlanDeFirma {
@@ -47,6 +66,12 @@ export interface PlanDeFirma {
    * incluido en su plan»: buying a bigger plan would not reopen it.
    */
   modulosDesactivados: readonly Modulo[];
+  /**
+   * The sub-services the operator switched off inside modules that stay on.
+   * Only what was stored: a function whose module is off is not repeated here,
+   * the screen derives it from `modulosPermitidos`.
+   */
+  funcionesDesactivadas: readonly Funcion[];
   /**
    * Whether THIS session may open the 7-day trial of Esencial from the plan
    * screen: the firm never paid nor tried, has one seat, and the person has

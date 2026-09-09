@@ -66,6 +66,22 @@
   --nav-line: 255 255 255; /* en claro el borde no hace falta: ver regla 04 */
 
   /*
+   * EL PANEL LATERAL «ÍNDICE CLARO». Papel, tinta y un oro que solo marca el
+   * número del módulo activo. Sus propios tokens porque los `nav-*` siguen
+   * vistiendo el portal de entrada y la cabecera de Privacidad, que son cromo
+   * oscuro a propósito. Los grises intermedios (etiquetas, bordes, hover) no
+   * son tokens: son la tinta con opacidad, así siguen bien en los dos temas.
+   */
+  --rail-paper: 247 245 239; /* #F7F5EF */
+  --rail-surface: 255 255 255; /* fichas y tarjeta de saldo */
+  --rail-ink: 11 18 32; /* #0B1220 · activo y texto fuerte */
+  --rail-ink-soft: 59 68 83; /* #3B4453 · etiquetas de módulo */
+  --rail-muted: 91 102 117; /* #5B6675 */
+  --rail-faint: 139 148 161; /* #8B94A1 */
+  --rail-gold: 200 160 70; /* #C8A046 · el número activo y la barra */
+  --rail-gold-ink: 138 109 31; /* #8A6D1F · «Plan» y «Recargar», legible sobre blanco */
+
+  /*
    * Sobre el primario va texto claro. En oscuro esto invierte, y es la ÚNICA
    * inversión del sistema — por eso el botón sigue siendo el elemento más
    * brillante de la pantalla.
@@ -138,6 +154,15 @@
   --dark-nav-ink: 147 163 184; /* #93A3B8 */
   --dark-nav-line: 28 39 50; /* #1C2732 */
 
+  /* El panel «Índice claro» en oscuro: papel oscuro, tinta clara, el mismo oro. */
+  --dark-rail-paper: 14 21 30; /* #0E151E */
+  --dark-rail-surface: 25 34 45; /* #19222D */
+  --dark-rail-ink: 232 236 241; /* #E8ECF1 */
+  --dark-rail-ink-soft: 195 203 214; /* #C3CBD6 */
+  --dark-rail-muted: 139 151 166; /* #8B97A6 */
+  --dark-rail-faint: 107 119 135; /* #6B7787 */
+  --dark-rail-gold-ink: 217 180 92; /* #D9B45C · el oro-tinta sube para leerse sobre oscuro */
+
   --dark-brand-700: 78 144 196; /* #4E90C4 */
   --dark-brand-800: 158 197 226; /* #9EC5E2 */
   --dark-brand-50: 22 41 58; /* #16293A */
@@ -194,6 +219,13 @@
     --nav-accent: var(--dark-nav-accent);
     --nav-ink: var(--dark-nav-ink);
     --nav-line: var(--dark-nav-line);
+    --rail-paper: var(--dark-rail-paper);
+    --rail-surface: var(--dark-rail-surface);
+    --rail-ink: var(--dark-rail-ink);
+    --rail-ink-soft: var(--dark-rail-ink-soft);
+    --rail-muted: var(--dark-rail-muted);
+    --rail-faint: var(--dark-rail-faint);
+    --rail-gold-ink: var(--dark-rail-gold-ink);
     --brand-700: var(--dark-brand-700);
     --brand-800: var(--dark-brand-800);
     --brand-50: var(--dark-brand-50);
@@ -232,6 +264,13 @@
   --nav-accent: var(--dark-nav-accent);
   --nav-ink: var(--dark-nav-ink);
   --nav-line: var(--dark-nav-line);
+  --rail-paper: var(--dark-rail-paper);
+  --rail-surface: var(--dark-rail-surface);
+  --rail-ink: var(--dark-rail-ink);
+  --rail-ink-soft: var(--dark-rail-ink-soft);
+  --rail-muted: var(--dark-rail-muted);
+  --rail-faint: var(--dark-rail-faint);
+  --rail-gold-ink: var(--dark-rail-gold-ink);
   --brand-700: var(--dark-brand-700);
   --brand-800: var(--dark-brand-800);
   --brand-50: var(--dark-brand-50);
@@ -315,6 +354,11 @@
  */
 :root[data-font='satoshi'] {
   --font-ui: 'Satoshi', system-ui, sans-serif;
+}
+
+/* Work Sans (Wei Huang, OFL). Viene de Google Fonts con las otras alternativas (index.html). */
+:root[data-font='worksans'] {
+  --font-ui: 'Work Sans', system-ui, sans-serif;
 }
 
 /* "La del sistema": no descarga nada y se ve como el resto de su equipo. */

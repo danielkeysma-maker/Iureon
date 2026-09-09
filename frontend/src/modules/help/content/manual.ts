@@ -915,7 +915,7 @@ const A_FORMATO: ManualArticle = {
       pasos: [
         'Pulse «Membrete» en el pie de la barra lateral. Se abre la configuración de la marca con una vista previa del escrito a la derecha, que reacciona a cada cambio.',
         'Suba el logo con «Subir logo» (PNG o SVG con fondo transparente) y complete «Razón social», «NIT», «Pie de página» —la dirección que va al pie del membrete—, «Teléfono», «T.P. del abogado que firma» y «Correo de notificaciones judiciales». Si quiere que la firma escaneada salga en el documento, súbala en «Firma escaneada».',
-        'Elija la «Tipografía» entre nueve: las clásicas de juzgado —Times New Roman, Arial, Calibri, Tahoma, Inter— y las libres —Plus Jakarta Sans, Manrope, Public Sans y Satoshi—. Debajo de la lista, la pantalla le dice cómo se comporta cada una en Word y en PDF.',
+        'Elija la «Tipografía» entre diez: las clásicas de juzgado —Times New Roman, Arial, Calibri, Tahoma, Inter— y las libres —Plus Jakarta Sans, Manrope, Public Sans, Satoshi y Work Sans—. Debajo de la lista, la pantalla le dice cómo se comporta cada una en Word y en PDF.',
         'Fije «Tamaño», «Interlineado» (1,0 · 1,5 · 2,0), «Numeración de hechos» («1. 2. 3.» o «PRIMERO.») y «Títulos de sección» («I. Romanos», «1. Arábigos» o «Sin numerar»).',
         'Pulse «Guardar y aplicar». Desde ese momento el formato viaja al motor de redacción como instrucción: el escrito nace ya con la numeración y los títulos que su firma usa, en vez de quedar maquillado al final.'
       ]

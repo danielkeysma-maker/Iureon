@@ -130,6 +130,105 @@ export const esModulo = (valor: unknown): valor is Modulo =>
   typeof valor === 'string' && (TODOS_LOS_MODULOS as readonly string[]).includes(valor);
 
 /**
+ * SUB-SERVICES THE OPERATOR CAN SWITCH OFF INSIDE A MODULE THAT STAYS ON.
+ *
+ * Ids are `<MODULO>.<FUNCION>`, and only what exists today is listed: every
+ * entry names a real endpoint or a real screen action, and the same id gates
+ * both — the controller refuses with FUNCION_DESHABILITADA and the screen
+ * hides the entry point. A function whose parent module is off is off too;
+ * nothing needs storing twice.
+ */
+export type Funcion =
+  | 'REDACCION.ADJUNTOS'
+  | 'REDACCION.TALLER_BORRADOR'
+  | 'REVISIONES.CHAT_GUIA'
+  | 'REVISIONES.REREVISAR'
+  | 'REVISIONES.PREGUNTAS_AUDIENCIA'
+  | 'AUDIENCIAS.RESUMEN'
+  | 'ENTREVISTAS.RESUMEN'
+  | 'ENTREVISTAS.GUION';
+
+export interface FuncionDefinition {
+  id: Funcion;
+  modulo: Modulo;
+  /** As the screen names it: the audit line and the refusal use this word. */
+  nombre: string;
+  descripcion: string;
+}
+
+export const FUNCIONES: ReadonlyArray<FuncionDefinition> = [
+  {
+    id: 'REDACCION.ADJUNTOS',
+    modulo: 'REDACCION',
+    nombre: 'Adjuntos en Redacción',
+    descripcion: 'Adjuntar sentencias, pruebas o fotos para que el escrito los lea.'
+  },
+  {
+    id: 'REDACCION.TALLER_BORRADOR',
+    modulo: 'REDACCION',
+    nombre: 'Taller del borrador',
+    descripcion: 'Resaltar, comentar y conversar con la guía sobre un borrador generado.'
+  },
+  {
+    id: 'REVISIONES.CHAT_GUIA',
+    modulo: 'REVISIONES',
+    nombre: 'Conversación con la guía',
+    descripcion: 'Preguntar y pedir cambios a la guía dentro del taller de una revisión.'
+  },
+  {
+    id: 'REVISIONES.REREVISAR',
+    modulo: 'REVISIONES',
+    nombre: 'Volver a revisar',
+    descripcion: 'Pedir un informe nuevo sobre el texto corregido en el taller.'
+  },
+  {
+    id: 'REVISIONES.PREGUNTAS_AUDIENCIA',
+    modulo: 'REVISIONES',
+    nombre: 'Preguntas para la audiencia',
+    descripcion: 'Tres listas de preguntas a partir del escrito revisado.'
+  },
+  {
+    id: 'AUDIENCIAS.RESUMEN',
+    modulo: 'AUDIENCIAS',
+    nombre: 'Resumen y hechos relevantes de la audiencia',
+    descripcion: 'El resumen con hechos anclados al minuto, generado desde el transcrito.'
+  },
+  {
+    id: 'ENTREVISTAS.RESUMEN',
+    modulo: 'ENTREVISTAS',
+    nombre: 'Resumen y hechos relevantes de la entrevista',
+    descripcion: 'El resumen con hechos anclados al minuto, generado desde el transcrito.'
+  },
+  {
+    id: 'ENTREVISTAS.GUION',
+    modulo: 'ENTREVISTAS',
+    nombre: 'Lo que no puede quedarse sin preguntar',
+    descripcion: 'La lista de comprobación que marca qué quedó dicho en la entrevista.'
+  }
+];
+
+export const TODAS_LAS_FUNCIONES: readonly Funcion[] = FUNCIONES.map((f) => f.id);
+
+export const esFuncion = (valor: unknown): valor is Funcion =>
+  typeof valor === 'string' && (TODAS_LAS_FUNCIONES as readonly string[]).includes(valor);
+
+export const definicionDeFuncion = (funcion: Funcion): FuncionDefinition =>
+  FUNCIONES.find((f) => f.id === funcion) as FuncionDefinition;
+
+export const moduloDeFuncion = (funcion: Funcion): Modulo => definicionDeFuncion(funcion).modulo;
+
+export const funcionesDeModulo = (modulo: Modulo): readonly FuncionDefinition[] =>
+  FUNCIONES.filter((f) => f.modulo === modulo);
+
+/** What `firms.modulos_desactivados` may hold: a module id or a function id. */
+export type Desactivable = Modulo | Funcion;
+
+/** Catalogue order: modules first, then functions — the order the audit line reads in. */
+export const TODO_LO_DESACTIVABLE: readonly Desactivable[] = [...TODOS_LOS_MODULOS, ...TODAS_LAS_FUNCIONES];
+
+export const esDesactivable = (valor: unknown): valor is Desactivable => esModulo(valor) || esFuncion(valor);
+
+/**
  * THE PLAN IS THE BASELINE; THE OPERATOR SUBTRACTS FROM IT PER FIRM.
  *
  * `firms.modulos_desactivados` holds what operation took away from one firm
@@ -141,25 +240,33 @@ export const esModulo = (valor: unknown): valor is Modulo =>
  */
 export const modulosDisponibles = (
   plan: Plan | null,
-  desactivados: readonly Modulo[]
+  desactivados: readonly Desactivable[]
 ): readonly Modulo[] => modulosPermitidos(plan).filter((m) => !desactivados.includes(m));
 
 /**
- * Validates the operator's list. Returns the bad id so the 400 can name it:
- * «INVALID_MODULE» without the offending value sends the operator guessing.
- * Duplicates collapse; order follows the catalogue so the audit line reads
- * the same whatever order the screen sent.
+ * Validates the operator's list: module ids and function ids alike. Returns
+ * the bad id so the 400 can name it: «INVALID_MODULE» without the offending
+ * value sends the operator guessing. Duplicates collapse; order follows the
+ * catalogue so the audit line reads the same whatever order the screen sent.
  */
 export const validarModulosDesactivados = (
   valores: unknown
-): { ok: true; modulos: Modulo[] } | { ok: false; invalido: string } => {
+): { ok: true; modulos: Desactivable[] } | { ok: false; invalido: string } => {
   if (!Array.isArray(valores)) return { ok: false, invalido: String(valores) };
   for (const v of valores) {
-    if (!esModulo(v)) return { ok: false, invalido: String(v) };
+    if (!esDesactivable(v)) return { ok: false, invalido: String(v) };
   }
-  const pedidos = new Set(valores as Modulo[]);
-  return { ok: true, modulos: TODOS_LOS_MODULOS.filter((m) => pedidos.has(m)) };
+  const pedidos = new Set(valores as Desactivable[]);
+  return { ok: true, modulos: TODO_LO_DESACTIVABLE.filter((m) => pedidos.has(m)) };
 };
+
+/** The module ids of a mixed list, in catalogue order. */
+export const soloModulos = (desactivados: readonly Desactivable[]): Modulo[] =>
+  TODOS_LOS_MODULOS.filter((m) => desactivados.includes(m));
+
+/** The function ids of a mixed list, in catalogue order. */
+export const soloFunciones = (desactivados: readonly Desactivable[]): Funcion[] =>
+  TODAS_LAS_FUNCIONES.filter((f) => desactivados.includes(f));
 
 /** What the firms table holds, as read. */
 export interface PlanRow {
@@ -167,13 +274,48 @@ export interface PlanRow {
   period: PlanPeriod | null;
   validUntil: Date | null;
   maxUsers: number | null;
-  /** The operator's per-firm subtraction. Empty when the column is missing. */
-  modulosDesactivados: readonly Modulo[];
+  /**
+   * The operator's per-firm subtraction: module ids and function ids in one
+   * list, as the column holds them. Empty when the column is missing.
+   */
+  modulosDesactivados: readonly Desactivable[];
 }
 
 /** Whether THIS firm may use the module: in the plan and not subtracted. */
 export const moduloDisponible = (row: PlanRow, modulo: Modulo): boolean =>
   modulosDisponibles(row.plan, row.modulosDesactivados).includes(modulo);
+
+/**
+ * Whether THIS firm may use the function: its module is available AND the
+ * function itself was not subtracted. A module switched off takes every
+ * function with it, whether or not the function id is also in the list.
+ */
+export const funcionDisponible = (row: PlanRow, funcion: Funcion): boolean =>
+  moduloDisponible(row, moduloDeFuncion(funcion)) && !row.modulosDesactivados.includes(funcion);
+
+/**
+ * Why a function is closed to this firm, or null when it is open. The pure
+ * half of `exigirFuncion`: the guard maps each reason to its status and
+ * message, and the check proves the reasons without a database.
+ *
+ * Order matters: an expired plan is said first (nothing works), then the
+ * module (the remedy is the plan or Soporte for the whole module), and only
+ * then the function itself.
+ */
+export type CierreDeFuncion = 'PLAN_VENCIDO' | 'MODULO_NO_EN_PLAN' | 'MODULO_DESACTIVADO' | 'FUNCION_DESACTIVADA';
+
+export const cierreDeFuncion = (row: PlanRow, funcion: Funcion, ahora: Date): CierreDeFuncion | null => {
+  if (planBloquea(row, ahora)) return 'PLAN_VENCIDO';
+  const modulo = moduloDeFuncion(funcion);
+  if (!permiteModulo(row.plan, modulo)) return 'MODULO_NO_EN_PLAN';
+  if (!moduloDisponible(row, modulo)) return 'MODULO_DESACTIVADO';
+  if (row.modulosDesactivados.includes(funcion)) return 'FUNCION_DESACTIVADA';
+  return null;
+};
+
+/** The refusal for a function the operator switched off for this firm. */
+export const mensajeDeFuncionDeshabilitada = (funcion: Funcion): string =>
+  `${definicionDeFuncion(funcion).nombre} no está habilitada para su firma. Escríbanos por Soporte para activarla.`;
 
 export type EstadoDelPlan = 'ACTIVO' | 'POR_VENCER' | 'VENCIDO' | 'CORTESIA' | 'PRUEBA';
 

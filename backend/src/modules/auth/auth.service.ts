@@ -407,7 +407,8 @@ export const firmProfile = async (firmId: string) => {
       estado: plan.estado,
       diasRestantes: plan.diasRestantes,
       modulosPermitidos: plan.modulosPermitidos,
-      modulosDesactivados: plan.modulosDesactivados
+      modulosDesactivados: plan.modulosDesactivados,
+      funcionesDesactivadas: plan.funcionesDesactivadas
     }
   };
 };

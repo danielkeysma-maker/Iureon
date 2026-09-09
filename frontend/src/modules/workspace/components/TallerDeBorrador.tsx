@@ -2,6 +2,7 @@ import React from 'react';
 import type { FormatoDelEscrito } from '../../documents/formatoEnPantalla';
 import { reviewApi, type Anotacion, type TurnoDelTaller, type VersionDelTexto } from '../services/review.api';
 import { TallerDeEscrito } from './TallerDeEscrito';
+import { useFuncionHabilitada } from '../../subscriptions/PlanContext';
 
 /**
  * El taller sobre un BORRADOR generado en Redacción: la misma guía, el mismo
@@ -53,8 +54,12 @@ export const TallerDeBorrador: React.FC<TallerDeBorradorProps> = ({
   onSaldoCambiado,
   onExportarTexto,
   formatoDeFirma
-}) => (
+}) => {
+  /* El botón «Taller» ya no se ofrece cuando la función está apagada; si el taller se abrió igual, la guía no recibe mensajes. */
+  const tallerHabilitado = useFuncionHabilitada('REDACCION.TALLER_BORRADOR');
+  return (
   <TallerDeEscrito
+    cerradas={{ chat: !tallerHabilitado }}
     datos={{
       titulo: datos.titulo,
       subtitulo: `${datos.documentType} · borrador de Redacción`,
@@ -100,4 +105,5 @@ export const TallerDeBorrador: React.FC<TallerDeBorradorProps> = ({
     onSaldoCambiado={onSaldoCambiado}
     formato={formatoDeFirma}
   />
-);
+  );
+};

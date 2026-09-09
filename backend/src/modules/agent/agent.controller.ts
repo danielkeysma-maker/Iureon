@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto';
 import { OpenRouterMultiEngineService, AgentExecutionStep } from './openrouter.service';
 import { mensajeInicioLectura, renderBloqueAdjuntos, resumenDeLectura, validarAdjuntos } from './adjuntos/adjuntos';
 import { leerAdjuntos } from './adjuntos/leerAdjuntos';
+import { exigirFuncion, responderPlanError } from '../subscriptions/plan.service';
 import {
   BillingError,
   balanceOf,
@@ -58,6 +59,20 @@ export const streamAgentDraftController = async (req: Request, res: Response): P
     return;
   }
   const adjuntos = adjuntosValidados.adjuntos;
+
+  /*
+   * Attachments are a sub-service the operator can switch off for one firm.
+   * Refused before the stream opens and before any reservation: the screen
+   * hides the button, so a request carrying files came from outside it.
+   */
+  if (adjuntos.length > 0) {
+    try {
+      await exigirFuncion(firmId as string, 'REDACCION.ADJUNTOS');
+    } catch (err) {
+      if (responderPlanError(res, err)) return;
+      throw err;
+    }
+  }
 
   /*
    * The balance is checked BEFORE the stream opens, and before a peso is spent

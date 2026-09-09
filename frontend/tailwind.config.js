@@ -100,6 +100,17 @@ export default {
           muted: token('nav-muted'),
           line: token('nav-line')
         },
+        /* El panel lateral «Índice claro». Ver tokens.css. */
+        rail: {
+          DEFAULT: token('rail-paper'),
+          surface: token('rail-surface'),
+          ink: token('rail-ink'),
+          'ink-soft': token('rail-ink-soft'),
+          muted: token('rail-muted'),
+          faint: token('rail-faint'),
+          gold: token('rail-gold'),
+          'gold-ink': token('rail-gold-ink')
+        },
         'on-brand': token('on-brand'),
 
         /* Los tres estados de una afirmación jurídica. */

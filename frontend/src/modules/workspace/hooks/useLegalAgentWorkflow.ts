@@ -159,7 +159,14 @@ Por favor espere unos segundos mientras se finaliza la redacción solemne.`,
           }
         }
       } else {
-        throw new Error('API Fallback simulation');
+        /*
+         * The server refused before the stream opened (plan expired, module or
+         * function switched off for the firm, no balance): its JSON says why,
+         * in the words the screen should show, and that is what is thrown.
+         */
+        const cuerpo = await response.json().catch(() => null);
+        const mensaje = cuerpo && typeof cuerpo.message === 'string' && cuerpo.message ? cuerpo.message : `respuesta ${response.status}`;
+        throw new Error(mensaje);
       }
     } catch (err) {
       /*

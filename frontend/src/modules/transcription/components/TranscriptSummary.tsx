@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { ListChecks, RefreshCw } from 'lucide-react';
 import { httpClient } from '../../../config/httpClient';
+import { useFuncionHabilitada } from '../../subscriptions/PlanContext';
+import { AVISO_FUNCION_DESHABILITADA } from '../../subscriptions/types';
 
 /**
  * El resumen y los hechos relevantes, extraídos por el motor.
@@ -51,6 +53,8 @@ export const TranscriptSummary: React.FC<TranscriptSummaryProps> = ({ transcript
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState('');
   const [pedido, setPedido] = useState(false);
+  /* El resumen es una función por módulo: el de una audiencia pertenece a Audiencias, el de una entrevista a Entrevistas. */
+  const habilitado = useFuncionHabilitada(kind === 'AUDIENCIA' ? 'AUDIENCIAS.RESUMEN' : 'ENTREVISTAS.RESUMEN');
 
   const pedir = async (regenerar = false) => {
     setCargando(true);
@@ -98,17 +102,20 @@ export const TranscriptSummary: React.FC<TranscriptSummaryProps> = ({ transcript
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={() => void pedir(Boolean(resumen))}
-          disabled={cargando}
-          className="btn-neutral btn-sm shrink-0"
-        >
-          <RefreshCw className={`h-3 w-3 ${cargando ? 'animate-spin' : ''}`} />
-          {cargando ? 'Generando…' : resumen ? 'Regenerar' : 'Generar'}
-        </button>
+        {habilitado && (
+          <button
+            type="button"
+            onClick={() => void pedir(Boolean(resumen))}
+            disabled={cargando}
+            className="btn-neutral btn-sm shrink-0"
+          >
+            <RefreshCw className={`h-3 w-3 ${cargando ? 'animate-spin' : ''}`} />
+            {cargando ? 'Generando…' : resumen ? 'Regenerar' : 'Generar'}
+          </button>
+        )}
       </div>
 
+      {!habilitado && <p className="notice">{AVISO_FUNCION_DESHABILITADA}</p>}
       {error && <p className="notice-unverified">{error}</p>}
 
       {!resumen && !error && pedido && !cargando && (

@@ -11,8 +11,8 @@
  * ─── INCRUSTADA O EQUIVALENTE, Y SE DICE CUÁL ───────────────────────────────
  *
  * Un PDF solo se ve igual en todas partes si la letra va DENTRO del archivo.
- * Las libres se incrustan: Plus Jakarta Sans, Manrope y Public Sans (OFL) y
- * Satoshi (licencia libre de Fontshare) viajan en el bundle como TTF y se
+ * Las libres se incrustan: Plus Jakarta Sans, Manrope, Public Sans y Work Sans
+ * (OFL) y Satoshi (licencia libre de Fontshare) viajan en el bundle como TTF y se
  * cargan solo cuando la firma las usa. Las propietarias no se pueden
  * incrustar sin licencia —Times New Roman, Arial, Calibri, Tahoma— y el PDF
  * usa la equivalente estándar que todo lector trae: Times para Times New
@@ -22,7 +22,9 @@
  * jsPDF necesita TTF estáticos (no variables) por estilo; Manrope y Public
  * Sans se convirtieron de los WOFF de Google Fonts con fontTools sin tocar
  * los contornos; Satoshi son los TTF que sirve Fontshare. Satoshi no trae
- * itálica en su versión estática libre: la itálica usa la redonda.
+ * itálica en su versión estática libre: la itálica usa la redonda. Work Sans
+ * (Wei Huang y colaboradores, SIL Open Font License 1.1) son los TTF
+ * estáticos de Google Fonts: regular, bold e itálica reales.
  */
 import regularUrl from '../../../assets/fonts/PlusJakartaSans-Regular.ttf?inline';
 import boldUrl from '../../../assets/fonts/PlusJakartaSans-Bold.ttf?inline';
@@ -70,6 +72,14 @@ const INCRUSTABLES: Record<string, () => Promise<{ regular: string; bold: string
       import('../../../assets/fonts/Satoshi-Bold.ttf?inline')
     ]);
     return { regular: r.default, bold: b.default, italic: r.default };
+  },
+  'Work Sans': async () => {
+    const [r, b, i] = await Promise.all([
+      import('../../../assets/fonts/WorkSans-Regular.ttf?inline'),
+      import('../../../assets/fonts/WorkSans-Bold.ttf?inline'),
+      import('../../../assets/fonts/WorkSans-Italic.ttf?inline')
+    ]);
+    return { regular: r.default, bold: b.default, italic: i.default };
   }
 };
 

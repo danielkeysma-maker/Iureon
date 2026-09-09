@@ -204,6 +204,7 @@ export const FirmBrandingModal: React.FC<FirmBrandingModalProps> = ({ isOpen, on
                       <option>Manrope</option>
                       <option>Public Sans</option>
                       <option>Satoshi</option>
+                      <option>Work Sans</option>
                       <option>Inter</option>
                     </select>
                     {/*
@@ -214,7 +215,7 @@ export const FirmBrandingModal: React.FC<FirmBrandingModalProps> = ({ isOpen, on
                       abre el archivo.
                     */}
                     <p className="mt-1 text-[11px] leading-snug text-ink-500">
-                      {['Plus Jakarta Sans', 'Manrope', 'Public Sans', 'Satoshi'].includes(m.fontFamily)
+                      {['Plus Jakarta Sans', 'Manrope', 'Public Sans', 'Satoshi', 'Work Sans'].includes(m.fontFamily)
                         ? 'Letra libre: el PDF la lleva incrustada y se ve igual en todas partes. En Word solo se ve así si quien lo abre la tiene instalada; si no, Word la sustituye.'
                         : m.fontFamily === 'Times New Roman'
                           ? 'Clásica: en Word está en todo equipo. El PDF usa Times, su equivalente estándar.'

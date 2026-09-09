@@ -7,6 +7,8 @@ import { DraftProvenanceBar } from './DraftProvenanceBar';
 import { markdownBoldToHtml } from '../services/documentExport.service';
 import { learningApi } from '../../agent/services/learning.api';
 import { ControlDeLetra, useTamanoDeLetra } from '../../../design/TamanoDeLetra';
+import { useFuncionHabilitada } from '../../subscriptions/PlanContext';
+import { AVISO_FUNCION_DESHABILITADA } from '../../subscriptions/types';
 
 export type { GeneratedDraft } from '../types';
 import type { GeneratedDraft } from '../types';
@@ -62,6 +64,8 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
 }) => {
   const [editableText, setEditableText] = useState(draft.legalText);
   const [avisoDeGuardado, setAvisoDeGuardado] = useState('');
+  /* El taller del borrador es una función de Redacción que el operador puede apagar: el botón queda gris con el aviso. */
+  const tallerHabilitado = useFuncionHabilitada('REDACCION.TALLER_BORRADOR');
 
   const guardar = async () => {
     if (!onSaveDraft) return;
@@ -199,7 +203,12 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
           <div className="absolute right-3 top-3 flex items-center gap-1.5">
             <ControlDeLetra letra={letra} />
             {onAbrirTaller && (
-              <button onClick={() => onAbrirTaller(editableText)} className="btn-secondary btn-sm" title="Resaltar, comentar y conversar con la guía sobre este escrito">
+              <button
+                onClick={() => onAbrirTaller(editableText)}
+                disabled={!tallerHabilitado}
+                className="btn-secondary btn-sm disabled:cursor-not-allowed disabled:opacity-60"
+                title={tallerHabilitado ? 'Resaltar, comentar y conversar con la guía sobre este escrito' : AVISO_FUNCION_DESHABILITADA}
+              >
                 <ClipboardCheck className="h-3 w-3" />
                 Taller
               </button>
@@ -244,7 +253,12 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
           </button>
 
           {onAbrirTaller && (
-            <button onClick={() => onAbrirTaller(editableText)} className="btn-secondary btn-sm" title="Resaltar, tachar y conversar con la guía sobre este escrito">
+            <button
+              onClick={() => onAbrirTaller(editableText)}
+              disabled={!tallerHabilitado}
+              className="btn-secondary btn-sm disabled:cursor-not-allowed disabled:opacity-60"
+              title={tallerHabilitado ? 'Resaltar, tachar y conversar con la guía sobre este escrito' : AVISO_FUNCION_DESHABILITADA}
+            >
               <ClipboardCheck className="h-3 w-3" />
               Taller
             </button>

@@ -11,7 +11,7 @@ export interface FirmBrandingConfig {
   firmAddress: string;
   firmPhone: string;
   firmEmail: string;
-  fontFamily: 'Times New Roman' | 'Arial' | 'Calibri' | 'Tahoma' | 'Inter' | 'Plus Jakarta Sans' | 'Manrope' | 'Public Sans' | 'Satoshi';
+  fontFamily: 'Times New Roman' | 'Arial' | 'Calibri' | 'Tahoma' | 'Inter' | 'Plus Jakarta Sans' | 'Manrope' | 'Public Sans' | 'Satoshi' | 'Work Sans';
   primaryColorHex: string;
   logoUrl?: string;
   /** Tamaño del escrito en puntos. Lo fija la marca de la firma; 12 por defecto. */

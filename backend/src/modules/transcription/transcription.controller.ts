@@ -20,7 +20,7 @@ import {
 import { randomUUID } from 'crypto';
 import { generarResumen, type ResumenDeTranscripcion } from './resumen.service';
 import type { SpeakerRole, TranscriptionKind } from './types';
-import { exigirModulo, responderPlanError } from '../subscriptions/plan.service';
+import { exigirFuncion, exigirModulo, responderPlanError } from '../subscriptions/plan.service';
 
 export const transcriptionService = new TranscriptionService();
 
@@ -228,6 +228,14 @@ export const transcriptionResumenController = async (req: Request, res: Response
   if (!transcripcion) {
     res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'No se encontro esa transcripcion.' });
     return;
+  }
+
+  // The summary is one function per module: an interview's belongs to Entrevistas, a hearing's to Audiencias.
+  try {
+    await exigirFuncion(firmId, transcripcion.kind === 'ENTREVISTA' ? 'ENTREVISTAS.RESUMEN' : 'AUDIENCIAS.RESUMEN');
+  } catch (error) {
+    if (responderPlanError(res, error)) return;
+    throw error;
   }
 
   const regenerar = req.query.regenerar === '1';

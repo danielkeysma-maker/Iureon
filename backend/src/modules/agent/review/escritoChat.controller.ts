@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { auditService } from '../../audit/audit.service';
 import { BillingError, recordUsage, refundReservation, reserveForOperation, settleOperation } from '../../billing/billing.service';
 import type { LegalBranch } from '../../catalog/types';
+import { exigirFuncion, responderPlanError } from '../../subscriptions/plan.service';
 import { buildCatalogGuidance } from '../catalogGuidance';
 import { ENGINE, callOpenRouterWithUsage } from '../openrouter.client';
 import { prepararTexto } from './documentReview';
@@ -26,6 +27,15 @@ import { verificarProvidencias } from './verificarProvidencias';
 export const escritoChatController = async (req: Request, res: Response): Promise<void> => {
   const firmId = req.firmId as string;
   const userEmail = req.user?.email ?? 'desconocido';
+
+  // The draft taller is the only screen that calls this: switching it off closes the endpoint too.
+  try {
+    await exigirFuncion(firmId, 'REDACCION.TALLER_BORRADOR');
+  } catch (err) {
+    if (responderPlanError(res, err)) return;
+    throw err;
+  }
+
   const documentType = String(req.body.documentType ?? '').trim() || 'Escrito';
   const legalBranch = typeof req.body.legalBranch === 'string' && req.body.legalBranch ? (req.body.legalBranch as LegalBranch) : undefined;
   const titulo = String(req.body.titulo ?? documentType).trim().slice(0, 160);

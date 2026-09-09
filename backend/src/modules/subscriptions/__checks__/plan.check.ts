@@ -11,16 +11,24 @@
  */
 import {
   DIAS_DE_AVISO,
+  FUNCIONES,
   PLANES,
+  TODAS_LAS_FUNCIONES,
   TODOS_LOS_MODULOS,
   cabeOtroUsuario,
+  cierreDeFuncion,
   diasRestantes,
   estadoDelPlan,
   esVigente,
+  funcionDisponible,
+  mensajeDeFuncionDeshabilitada,
+  moduloDeFuncion,
   moduloDisponible,
   modulosDisponibles,
   modulosPermitidos,
   periodoQueCompra,
+  soloFunciones,
+  soloModulos,
   validarModulosDesactivados,
   permiteModulo,
   planBloquea,
@@ -200,6 +208,94 @@ check(
   estadoDelPlan(fila({ plan: 'PREMIUM', period: 'CORTESIA', validUntil: dia('2026-01-01T00:00:00Z') }), ahora) === 'VENCIDO'
 );
 check('DIAS_DE_AVISO es 7', DIAS_DE_AVISO === 7);
+
+// ─── Funciones por firma: un sub-servicio apagado dentro de un módulo encendido ──
+const filaPremium = (desactivados: PlanRow['modulosDesactivados']): PlanRow => ({
+  plan: 'PREMIUM',
+  period: 'MENSUAL',
+  validUntil: null,
+  maxUsers: 5,
+  modulosDesactivados: desactivados
+});
+const enUnMes = dia('2099-01-01T00:00:00Z');
+
+check(
+  'cada función tiene la forma <MODULO>.<FUNCION> y su módulo existe en el catálogo',
+  FUNCIONES.every((f) => f.id.split('.').length === 2 && f.id.startsWith(`${f.modulo}.`) && TODOS_LOS_MODULOS.includes(f.modulo)) &&
+    FUNCIONES.every((f) => f.nombre.trim().length > 0 && f.descripcion.trim().length > 0)
+);
+check('no hay dos funciones con el mismo id', new Set(TODAS_LAS_FUNCIONES).size === TODAS_LAS_FUNCIONES.length);
+check(
+  'un id de función se acepta en la misma lista que los módulos',
+  (() => {
+    const r = validarModulosDesactivados(['REVISIONES.PREGUNTAS_AUDIENCIA', 'AUDIENCIAS']);
+    return r.ok && r.modulos.length === 2 && r.modulos[0] === 'AUDIENCIAS' && r.modulos[1] === 'REVISIONES.PREGUNTAS_AUDIENCIA';
+  })()
+);
+check(
+  'una función desconocida se rechaza nombrándola, aunque el módulo exista',
+  (() => {
+    const r = validarModulosDesactivados(['REVISIONES.FACTURAR']);
+    return !r.ok && r.invalido === 'REVISIONES.FACTURAR';
+  })()
+);
+check(
+  'la lista mixta se reparte: soloModulos y soloFunciones, cada una en orden de catálogo',
+  (() => {
+    const mixta = ['REVISIONES.REREVISAR', 'ORIENTACION', 'REDACCION.ADJUNTOS', 'AUDIENCIAS'] as const;
+    const m = soloModulos(mixta);
+    const f = soloFunciones(mixta);
+    return m.join(',') === 'AUDIENCIAS,ORIENTACION' && f.join(',') === 'REDACCION.ADJUNTOS,REVISIONES.REREVISAR';
+  })()
+);
+check(
+  'función apagada: el módulo sigue encendido y las otras funciones del módulo también',
+  (() => {
+    const fila = filaPremium(['REVISIONES.PREGUNTAS_AUDIENCIA']);
+    return (
+      moduloDisponible(fila, 'REVISIONES') &&
+      !funcionDisponible(fila, 'REVISIONES.PREGUNTAS_AUDIENCIA') &&
+      funcionDisponible(fila, 'REVISIONES.CHAT_GUIA') &&
+      funcionDisponible(fila, 'REVISIONES.REREVISAR') &&
+      modulosDisponibles(fila.plan, fila.modulosDesactivados).length === TODOS_LOS_MODULOS.length
+    );
+  })()
+);
+check(
+  'módulo apagado: todas sus funciones quedan no disponibles sin guardarlas',
+  (() => {
+    const fila = filaPremium(['REVISIONES']);
+    return FUNCIONES.filter((f) => f.modulo === 'REVISIONES').every((f) => !funcionDisponible(fila, f.id)) && funcionDisponible(fila, 'REDACCION.ADJUNTOS');
+  })()
+);
+check(
+  'módulo fuera del plan: sus funciones tampoco están, aunque nadie las haya restado',
+  (() => {
+    const esencial: PlanRow = { ...filaPremium([]), plan: 'ESENCIAL', maxUsers: 1 };
+    return !funcionDisponible(esencial, 'AUDIENCIAS.RESUMEN') && funcionDisponible(esencial, 'REVISIONES.REREVISAR');
+  })()
+);
+check('sin plan (cortesía legacy) toda función está disponible hasta que se resta', TODAS_LAS_FUNCIONES.every((f) => funcionDisponible(fila({}), f)));
+check(
+  'cierreDeFuncion: abierta = null; función restada = FUNCION_DESACTIVADA',
+  cierreDeFuncion(filaPremium([]), 'REVISIONES.REREVISAR', ahora) === null &&
+    cierreDeFuncion(filaPremium(['REVISIONES.REREVISAR']), 'REVISIONES.REREVISAR', ahora) === 'FUNCION_DESACTIVADA'
+);
+check(
+  'cierreDeFuncion: el módulo restado manda sobre la función, aunque las dos estén en la lista',
+  cierreDeFuncion(filaPremium(['REVISIONES', 'REVISIONES.REREVISAR']), 'REVISIONES.REREVISAR', ahora) === 'MODULO_DESACTIVADO'
+);
+check(
+  'cierreDeFuncion: módulo fuera del plan = MODULO_NO_EN_PLAN; plan vencido = PLAN_VENCIDO antes que nada',
+  cierreDeFuncion({ ...filaPremium([]), plan: 'ESENCIAL' }, 'ENTREVISTAS.GUION', ahora) === 'MODULO_NO_EN_PLAN' &&
+    cierreDeFuncion({ ...filaPremium(['REVISIONES.REREVISAR']), validUntil: dia('2026-01-01T00:00:00Z') }, 'REVISIONES.REREVISAR', ahora) === 'PLAN_VENCIDO' &&
+    cierreDeFuncion({ ...filaPremium([]), validUntil: enUnMes }, 'REVISIONES.REREVISAR', ahora) === null
+);
+check(
+  'el mensaje de la función nombra la función como la pantalla y manda a Soporte',
+  mensajeDeFuncionDeshabilitada('REVISIONES.REREVISAR') === 'Volver a revisar no está habilitada para su firma. Escríbanos por Soporte para activarla.' &&
+    moduloDeFuncion('REVISIONES.REREVISAR') === 'REVISIONES'
+);
 
 // ─── Solo lectura: quién puede escribir ─────────────────────────────────────
 check(

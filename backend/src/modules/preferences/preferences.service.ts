@@ -23,7 +23,7 @@ import { supabase } from '../../config/supabase.config';
  */
 
 export type Theme = 'system' | 'light' | 'dark';
-export type UiFont = 'plex' | 'jakarta' | 'manrope' | 'instrument' | 'public' | 'satoshi' | 'system';
+export type UiFont = 'plex' | 'jakarta' | 'manrope' | 'instrument' | 'public' | 'satoshi' | 'worksans' | 'system';
 export type Density = 'compact' | 'normal' | 'comfortable';
 
 export interface Preferences {
@@ -50,10 +50,10 @@ const TEMAS: Theme[] = ['system', 'light', 'dark'];
  * La lista vive en TRES sitios y deben coincidir: aqui, el tipo UiFont del
  * frontend, y el CHECK de `user_preferences.ui_font` en Supabase
  * (migration-preferencias.sql y las migraciones que lo amplian). Satoshi
- * entro con migration-fuente-satoshi.sql; sin correrla, guardarla falla en la
- * base aunque aqui pase.
+ * entro con migration-fuente-satoshi.sql y Work Sans con migration-work-sans.sql;
+ * sin correrlas, guardarlas falla en la base aunque aqui pasen.
  */
-const FUENTES: UiFont[] = ['plex', 'jakarta', 'manrope', 'instrument', 'public', 'satoshi', 'system'];
+const FUENTES: UiFont[] = ['plex', 'jakarta', 'manrope', 'instrument', 'public', 'satoshi', 'worksans', 'system'];
 const DENSIDADES: Density[] = ['compact', 'normal', 'comfortable'];
 
 /**

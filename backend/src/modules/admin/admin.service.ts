@@ -13,14 +13,22 @@ import { consumoDelMesPorUsuario } from '../billing/billing.service';
 import { auditService, type AuditLogEntry } from '../audit/audit.service';
 import {
   DIAS_DE_PRUEBA,
+  FUNCIONES,
   PLANES,
-  TODOS_LOS_MODULOS,
-  esModulo,
+  TODO_LO_DESACTIVABLE,
+  definicionDeFuncion,
+  esDesactivable,
+  esFuncion,
   esPeriodo,
   esPlan,
   etiquetaDePeriodo,
   modulosDisponibles,
+  soloFunciones,
+  soloModulos,
   validarModulosDesactivados,
+  type Desactivable,
+  type Funcion,
+  type FuncionDefinition,
   type Modulo,
   type Plan,
   type PlanPeriod
@@ -56,6 +64,8 @@ export interface FirmSummary {
   planMaxUsers: number | null;
   /** What the operator subtracted from this firm above its plan. Empty = the plan rules whole. */
   modulosDesactivados: readonly Modulo[];
+  /** The sub-services switched off inside modules that stay on. Same column, function ids. */
+  funcionesDesactivadas: readonly Funcion[];
   /** In the plan AND not subtracted: what the firm actually sees. */
   modulosPermitidos: readonly Modulo[];
   status: string;
@@ -145,9 +155,9 @@ const seleccionarFirmas = async (
   return ultimo;
 };
 
-/** Only catalogue ids survive: a stale id in the column cannot hide a module that no longer exists. */
-const modulosDesactivadosDe = (row: FirmRow): Modulo[] =>
-  Array.isArray(row.modulos_desactivados) ? row.modulos_desactivados.filter(esModulo) : [];
+/** Only catalogue ids survive: a stale id in the column cannot hide a module or function that no longer exists. */
+const desactivadosDe = (row: FirmRow): Desactivable[] =>
+  Array.isArray(row.modulos_desactivados) ? row.modulos_desactivados.filter(esDesactivable) : [];
 
 /** The volume figures a firm is judged by. Counts, never contents. */
 interface FirmVolumes {
@@ -240,7 +250,7 @@ const EMPTY_VOLUMES: FirmVolumes = {
 
 const toSummary = (row: FirmRow, volumes: FirmVolumes, catalogoTotal: number): FirmSummary => {
   const plan = esPlan(row.plan) ? row.plan : null;
-  const modulosDesactivados = modulosDesactivadosDe(row);
+  const desactivados = desactivadosDe(row);
   return {
     id: row.firm_id,
     name: row.name,
@@ -250,8 +260,9 @@ const toSummary = (row: FirmRow, volumes: FirmVolumes, catalogoTotal: number): F
     planPeriod: esPeriodo(row.plan_period) ? row.plan_period : null,
     planValidUntil: row.plan_valid_until ?? null,
     planMaxUsers: typeof row.plan_max_users === 'number' ? row.plan_max_users : null,
-    modulosDesactivados,
-    modulosPermitidos: modulosDisponibles(plan, modulosDesactivados),
+    modulosDesactivados: soloModulos(desactivados),
+    funcionesDesactivadas: soloFunciones(desactivados),
+    modulosPermitidos: modulosDisponibles(plan, desactivados),
     status: row.subscription_status,
     creditsBalance: Number(row.credit_balance_cop ?? 0),
     createdAt: row.created_at,
@@ -334,6 +345,12 @@ export interface FirmDetail extends FirmSummary {
   usuariosActivos14d: number;
   usuarios: FirmUserDetail[];
   registroDeOperacion: AuditLogEntry[];
+  /**
+   * The catalogue of sub-services the operator can switch off, with the name
+   * and description the screen shows under each module switch. Travels with
+   * the ficha so the operator console never keeps its own copy of the list.
+   */
+  funciones: readonly FuncionDefinition[];
 }
 
 /**
@@ -378,6 +395,7 @@ export const getFirmDetail = async (firmId: string): Promise<FirmDetail> => {
 
   return {
     ...summary,
+    funciones: FUNCIONES,
     // The account count comes from the same listing the rows come from, so the
     // header and the table can never disagree.
     users: cuentas.length,
@@ -554,6 +572,7 @@ export const createFirm = async (input: {
     planValidUntil: creada.validUntil,
     planMaxUsers: PLANES.PREMIUM.maxUsuarios,
     modulosDesactivados: [],
+    funcionesDesactivadas: [],
     modulosPermitidos: PLANES.PREMIUM.modulos,
     status: 'active',
     creditsBalance: creada.credits,
@@ -867,14 +886,14 @@ export const ajustarModulosDeFirma = async (
   firmId: string,
   desactivados: unknown,
   reason: unknown
-): Promise<{ desactivados: Modulo[]; reason: string }> => {
+): Promise<{ desactivados: Desactivable[]; reason: string }> => {
   const client = requireClient();
 
   const validacion = validarModulosDesactivados(desactivados);
   if (!validacion.ok) {
     throw new AuthError(
       'INVALID_MODULE',
-      `«${validacion.invalido}» no es un módulo del catálogo. Válidos: ${TODOS_LOS_MODULOS.join(', ')}.`,
+      `«${validacion.invalido}» no es un módulo ni una función del catálogo. Válidos: ${TODO_LO_DESACTIVABLE.join(', ')}.`,
       400
     );
   }
@@ -904,11 +923,17 @@ export const ajustarModulosDeFirma = async (
   return { desactivados: validacion.modulos, reason: motivo };
 };
 
-/** The audit wording for a module adjustment: the resulting list, never a delta. */
-export const describirAjusteDeModulos = (cambio: { desactivados: Modulo[]; reason: string }): string =>
-  `Módulos desactivados para la firma: ${
-    cambio.desactivados.length ? cambio.desactivados.map((m) => NOMBRE_DE_MODULO[m]).join(', ') : 'ninguno'
-  } · motivo: ${cambio.reason || 'sin motivo'}`;
+/**
+ * The audit wording for a module adjustment: the resulting list, never a
+ * delta. Functions are named as the screen names them, with their module, so
+ * a partner reading the trail knows what «Volver a revisar» belongs to.
+ */
+export const describirAjusteDeModulos = (cambio: { desactivados: readonly Desactivable[]; reason: string }): string => {
+  const nombres = cambio.desactivados.map((d) =>
+    esFuncion(d) ? `${definicionDeFuncion(d).nombre} (${NOMBRE_DE_MODULO[definicionDeFuncion(d).modulo]})` : NOMBRE_DE_MODULO[d]
+  );
+  return `Módulos desactivados para la firma: ${nombres.length ? nombres.join(', ') : 'ninguno'} · motivo: ${cambio.reason || 'sin motivo'}`;
+};
 
 /** The audit wording for a plan set by hand. */
 export const describirCambioDePlan = (cambio: {

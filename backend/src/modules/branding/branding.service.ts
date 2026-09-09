@@ -18,7 +18,7 @@ export interface FirmBranding {
   firmPhone: string;
   /** Correo de notificaciones judiciales. Va en el bloque de firma. */
   firmEmail: string;
-  fontFamily: 'Times New Roman' | 'Arial' | 'Calibri' | 'Tahoma' | 'Inter' | 'Plus Jakarta Sans' | 'Manrope' | 'Public Sans' | 'Satoshi';
+  fontFamily: 'Times New Roman' | 'Arial' | 'Calibri' | 'Tahoma' | 'Inter' | 'Plus Jakarta Sans' | 'Manrope' | 'Public Sans' | 'Satoshi' | 'Work Sans';
   fontSizePt: number;
   lineSpacing: '1.0' | '1.5' | '2.0';
   /** «1. 2. 3.» o «PRIMERO. SEGUNDO.» — lo que un despacho discute de verdad. */
@@ -78,15 +78,15 @@ export const sanear = (crudo: unknown): FirmBranding => {
     firmPhone: texto(b.firmPhone, 60),
     firmEmail: texto(b.firmEmail, 120),
     /*
-     * Las nueve letras del escrito. Las cuatro primeras son las que un juzgado y un
+     * Las diez letras del escrito. Las cuatro primeras son las que un juzgado y un
      * Word reconocen; las libres (Plus Jakarta Sans, Manrope, Public Sans,
-     * Satoshi) se incrustan en el PDF y en Word dependen de que el lector las
+     * Satoshi, Work Sans) se incrustan en el PDF y en Word dependen de que el lector las
      * tenga. La lista debe coincidir con FirmBranding en el frontend y con las
      * familias de formatoEnPantalla.ts y pdfFonts.ts.
      */
     fontFamily: uno(
       b.fontFamily,
-      ['Times New Roman', 'Arial', 'Calibri', 'Tahoma', 'Inter', 'Plus Jakarta Sans', 'Manrope', 'Public Sans', 'Satoshi'] as const,
+      ['Times New Roman', 'Arial', 'Calibri', 'Tahoma', 'Inter', 'Plus Jakarta Sans', 'Manrope', 'Public Sans', 'Satoshi', 'Work Sans'] as const,
       'Times New Roman'
     ),
     fontSizePt:

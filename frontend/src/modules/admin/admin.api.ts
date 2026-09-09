@@ -26,6 +26,8 @@ export interface FirmSummary {
   planMaxUsers: number | null;
   /** Lo que operación le restó a esta firma por encima del plan. Vacío = el plan manda entero. */
   modulosDesactivados: readonly string[];
+  /** Las funciones apagadas dentro de módulos que siguen encendidos. Misma columna, ids `<MODULO>.<FUNCION>`. */
+  funcionesDesactivadas: readonly string[];
   /** En el plan Y no restado: lo que la firma ve de verdad. */
   modulosPermitidos: readonly string[];
   status: string;
@@ -100,6 +102,16 @@ export interface FirmDetail extends FirmSummary {
   usuariosActivos14d: number;
   usuarios: FirmUserDetail[];
   registroDeOperacion: OperationLogEntry[];
+  /** El catálogo de funciones conmutables, con nombre y descripción: lo trae el servidor, aquí no hay copia. */
+  funciones: readonly FuncionConmutable[];
+}
+
+/** Un sub-servicio que el operador puede apagar dentro de un módulo encendido. Espejo de `FuncionDefinition` del servidor. */
+export interface FuncionConmutable {
+  id: string;
+  modulo: string;
+  nombre: string;
+  descripcion: string;
 }
 
 export const adminApi = {

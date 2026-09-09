@@ -1,17 +1,24 @@
 import { supabase } from '../../config/supabase.config';
 import {
   cabeOtroUsuario,
+  cierreDeFuncion,
   diasRestantes,
   estadoDelPlan,
   esPeriodo,
-  esModulo,
+  esDesactivable,
   esPlan,
+  mensajeDeFuncionDeshabilitada,
+  moduloDeFuncion,
   moduloDisponible,
   modulosDisponibles,
   permiteModulo,
   PLANES,
   planBloquea,
+  soloFunciones,
+  soloModulos,
+  type Desactivable,
   type EstadoDelPlan,
+  type Funcion,
   type Modulo,
   type Plan,
   type PlanPeriod,
@@ -40,7 +47,12 @@ import {
  */
 
 export class PlanError extends Error {
-  readonly code: 'PLAN_VENCIDO' | 'PLAN_INSUFICIENTE' | 'LIMITE_DE_USUARIOS' | 'PLAN_UNAVAILABLE';
+  readonly code:
+    | 'PLAN_VENCIDO'
+    | 'PLAN_INSUFICIENTE'
+    | 'FUNCION_DESHABILITADA'
+    | 'LIMITE_DE_USUARIOS'
+    | 'PLAN_UNAVAILABLE';
   readonly status: number;
 
   constructor(code: PlanError['code'], message: string, status: number) {
@@ -70,6 +82,12 @@ export interface PlanDeFirma {
    * partner to buy a plan that changes nothing.
    */
   modulosDesactivados: readonly Modulo[];
+  /**
+   * The sub-services the operator switched off inside modules that stay on.
+   * Only the ids stored: a function whose module is off is not repeated here,
+   * the screen derives that from `modulosPermitidos`.
+   */
+  funcionesDesactivadas: readonly Funcion[];
 }
 
 const requireDb = () => {
@@ -118,9 +136,9 @@ const avisarColumnaDeModulos = (detalle: string): void => {
 
 const COLUMNAS_DE_PLAN = 'plan, plan_period, plan_valid_until, plan_max_users';
 
-/** Only catalogue ids survive: a stale id left in the column cannot hide a module that no longer exists. */
-const leerModulosDesactivados = (valor: unknown): Modulo[] =>
-  Array.isArray(valor) ? valor.filter(esModulo) : [];
+/** Only catalogue ids survive: a stale id left in the column cannot hide a module or function that no longer exists. */
+const leerModulosDesactivados = (valor: unknown): Desactivable[] =>
+  Array.isArray(valor) ? valor.filter(esDesactivable) : [];
 
 /**
  * The plan row, cheap enough to read on every paid operation.
@@ -184,7 +202,8 @@ export const describirPlan = (row: PlanRow, usuarios: number, ahora = new Date()
   diasRestantes: diasRestantes(row.validUntil, ahora),
   usuarios,
   modulosPermitidos: modulosDisponibles(row.plan, row.modulosDesactivados),
-  modulosDesactivados: row.modulosDesactivados
+  modulosDesactivados: soloModulos(row.modulosDesactivados),
+  funcionesDesactivadas: soloFunciones(row.modulosDesactivados)
 });
 
 /** The plan as the firm's own screen and the operator's ficha show it. */
@@ -260,12 +279,38 @@ export const exigirModulo = async (firmId: string, modulo: Modulo): Promise<void
   }
 
   if (!permiteModulo(row.plan, modulo)) {
-    throw new PlanError(
-      'PLAN_INSUFICIENTE',
-      `${NOMBRE_DE_MODULO[modulo]} no está incluido en el plan Esencial. ` +
-        'Para usarlo, pase la firma a Premium o a Firma desde «Plan de la firma».',
-      403
-    );
+    throw new PlanError('PLAN_INSUFICIENTE', mensajeDeModuloNoIncluido(modulo), 403);
+  }
+};
+
+const mensajeDeModuloNoIncluido = (modulo: Modulo): string =>
+  `${NOMBRE_DE_MODULO[modulo]} no está incluido en el plan Esencial. ` +
+  'Para usarlo, pase la firma a Premium o a Firma desde «Plan de la firma».';
+
+/**
+ * Refuses when the sub-service is not available to this firm: the plan
+ * expired, its module is not in the plan or was switched off, or the function
+ * itself was switched off by the operator. Called at the top of the
+ * controller, after auth and before any reservation — nothing to refund.
+ *
+ * Same 403 logic as `exigirModulo` for the first three reasons, so a function
+ * inside a closed module answers exactly what the module would; only the last
+ * reason is new, and its message names the function as the screen does.
+ */
+export const exigirFuncion = async (firmId: string, funcion: Funcion): Promise<void> => {
+  const row = await leerPlan(firmId);
+  const cierre = cierreDeFuncion(row, funcion, new Date());
+  if (!cierre) return;
+
+  switch (cierre) {
+    case 'PLAN_VENCIDO':
+      throw new PlanError('PLAN_VENCIDO', mensajeVencido(row), 403);
+    case 'MODULO_DESACTIVADO':
+      throw new PlanError('PLAN_INSUFICIENTE', mensajeDeModuloDesactivado(moduloDeFuncion(funcion)), 403);
+    case 'MODULO_NO_EN_PLAN':
+      throw new PlanError('PLAN_INSUFICIENTE', mensajeDeModuloNoIncluido(moduloDeFuncion(funcion)), 403);
+    case 'FUNCION_DESACTIVADA':
+      throw new PlanError('FUNCION_DESHABILITADA', mensajeDeFuncionDeshabilitada(funcion), 403);
   }
 };
 

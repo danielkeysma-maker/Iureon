@@ -13,6 +13,7 @@ import { decodeDocument } from '../../ingestion/documentFetch';
 import { textoDeDocx } from '../../ingestion/docxText';
 import { BackblazeB2TenantStorageService } from '../../documents/b2.service';
 import type { LegalBranch } from '../../catalog/types';
+import { exigirFuncion, responderPlanError } from '../../subscriptions/plan.service';
 import { buildCatalogGuidance } from '../catalogGuidance';
 import { ENGINE, callOpenRouterWithUsage } from '../openrouter.client';
 import {
@@ -443,6 +444,14 @@ export const reviewChatController = async (req: Request, res: Response): Promise
   const firmId = req.firmId as string;
   const userEmail = req.user?.email ?? 'desconocido';
   const id = String(req.params.id);
+
+  try {
+    await exigirFuncion(firmId, 'REVISIONES.CHAT_GUIA');
+  } catch (err) {
+    if (responderPlanError(res, err)) return;
+    throw err;
+  }
+
   const mensaje = String(req.body.mensaje ?? '').trim();
   const textoActual = typeof req.body.textoActual === 'string' ? req.body.textoActual : '';
   const historialCliente: TurnoDelTaller[] = Array.isArray(req.body.historial) ? (req.body.historial as TurnoDelTaller[]) : [];
@@ -548,6 +557,14 @@ export const reReviewController = async (req: Request, res: Response): Promise<v
   const firmId = req.firmId as string;
   const userEmail = req.user?.email ?? 'desconocido';
   const id = String(req.params.id);
+
+  try {
+    await exigirFuncion(firmId, 'REVISIONES.REREVISAR');
+  } catch (err) {
+    if (responderPlanError(res, err)) return;
+    throw err;
+  }
+
   const revision = await documentReviewStore.obtener(firmId, id);
   if (!revision) {
     res.status(404).json({ success: false, error: 'REVIEW_NOT_FOUND', message: 'Esa revisión no existe o no es de su firma.' });

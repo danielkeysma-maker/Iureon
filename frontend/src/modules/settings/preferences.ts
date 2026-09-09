@@ -17,7 +17,7 @@ import { httpClient } from '../../config/httpClient';
  */
 
 export type Theme = 'system' | 'light' | 'dark';
-export type UiFont = 'plex' | 'jakarta' | 'manrope' | 'instrument' | 'public' | 'satoshi' | 'system';
+export type UiFont = 'plex' | 'jakarta' | 'manrope' | 'instrument' | 'public' | 'satoshi' | 'worksans' | 'system';
 export type Density = 'compact' | 'normal' | 'comfortable';
 
 export interface Preferences {

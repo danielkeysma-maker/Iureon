@@ -31,6 +31,7 @@ import { ApiError } from '../../../config/httpClient';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 import { ControlDeLetra, useTamanoDeLetra } from '../../../design/TamanoDeLetra';
 import { estiloDelLienzo, type FormatoDelEscrito } from '../../documents/formatoEnPantalla';
+import { AVISO_FUNCION_DESHABILITADA } from '../../subscriptions/types';
 
 /**
  * El taller: el escrito a la izquierda, la guía a la derecha. Sirve igual para
@@ -102,6 +103,13 @@ export interface TallerDeEscritoProps {
   formato?: FormatoDelEscrito | null;
   /** Solo en el taller de una revisión guardada: la pestaña «Audiencia» con las tres listas de preguntas. */
   preguntas?: PreguntasDelTaller;
+  /**
+   * Funciones que el operador apagó para esta firma: el padre las decide con
+   * `funcionHabilitada` (la del chat cambia según el taller sea de una revisión
+   * o de un borrador). La entrada se cambia por el aviso; el servidor rechaza
+   * igual con 403 si la petición llega por fuera de la pantalla.
+   */
+  cerradas?: { chat?: boolean; rerevisar?: boolean };
 }
 
 export interface PreguntasDelTaller {
@@ -236,7 +244,8 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   onCerrar,
   onSaldoCambiado,
   formato,
-  preguntas
+  preguntas,
+  cerradas
 }) => {
   /*
    * Los escritos revisados antes del 5 de septiembre de 2026 se guardaron sin
@@ -918,26 +927,30 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
             </button>
           </div>
         )}
-        <div className="flex items-end gap-2">
-          <textarea
-            value={mensaje}
-            onChange={(e) => setMensaje(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                void enviar();
-              }
-            }}
-            rows={2}
-            placeholder="Escriba a la guía… (Enter envía, Shift+Enter salta de línea)"
-            disabled={ocupado !== null}
-            className="field-area min-h-[44px] flex-1 resize-none"
-          />
-          <button type="button" onClick={() => void enviar()} disabled={!mensaje.trim() || ocupado !== null} className="btn-primary btn-sm h-[44px]">
-            <Send className="h-3.5 w-3.5" />
-            {pesos(precioConsultaCop)}
-          </button>
-        </div>
+        {cerradas?.chat ? (
+          <p className="notice text-ui leading-[1.5] [text-wrap:pretty]">{AVISO_FUNCION_DESHABILITADA}</p>
+        ) : (
+          <div className="flex items-end gap-2">
+            <textarea
+              value={mensaje}
+              onChange={(e) => setMensaje(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  void enviar();
+                }
+              }}
+              rows={2}
+              placeholder="Escriba a la guía… (Enter envía, Shift+Enter salta de línea)"
+              disabled={ocupado !== null}
+              className="field-area min-h-[44px] flex-1 resize-none"
+            />
+            <button type="button" onClick={() => void enviar()} disabled={!mensaje.trim() || ocupado !== null} className="btn-primary btn-sm h-[44px]">
+              <Send className="h-3.5 w-3.5" />
+              {pesos(precioConsultaCop)}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -1242,8 +1255,9 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
                 onConfirmar: rerevisar
               })
             }
-            disabled={ocupado !== null}
-            className="btn-secondary btn-sm"
+            disabled={ocupado !== null || Boolean(cerradas?.rerevisar)}
+            title={cerradas?.rerevisar ? AVISO_FUNCION_DESHABILITADA : undefined}
+            className="btn-secondary btn-sm disabled:cursor-not-allowed disabled:opacity-60"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${ocupado === 'revision' ? 'animate-spin' : ''}`} />
             {ocupado === 'revision' ? 'Revisando…' : informe ? `Volver a revisar · ${pesos(precioRevisionCop)}` : `Revisión completa · ${pesos(precioRevisionCop)}`}

@@ -30,6 +30,10 @@ check(
 const satoshi = sanear({ theme: 'light', uiFont: 'satoshi', density: 'normal' });
 check('Satoshi es una fuente aceptada', satoshi.uiFont === 'satoshi', String(satoshi.uiFont));
 
+// Work Sans (Google Fonts, OFL) es la octava: tambien debe pasar entera.
+const workSans = sanear({ theme: 'light', uiFont: 'worksans', density: 'normal' });
+check('Work Sans es una fuente aceptada', workSans.uiFont === 'worksans', String(workSans.uiFont));
+
 const basura = sanear({ theme: 'neon', uiFont: 'comic-sans', density: 'gigante' });
 check(
   'un valor inventado cae al por defecto en vez de colarse',

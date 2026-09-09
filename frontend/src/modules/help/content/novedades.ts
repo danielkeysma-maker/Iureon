@@ -40,6 +40,22 @@ export const NOVEDADES_ID = 'novedades';
 export const NOVEDADES: readonly Novedad[] = [
   {
     fecha: '2026-09-08',
+    titulo: 'Work Sans, nueva letra para la interfaz y para el escrito',
+    detalle:
+      'En «Ajustes · Apariencia» puede elegir Work Sans como letra de la aplicación; IBM Plex Sans sigue siendo la de por defecto. En «Membrete» también está disponible como letra del escrito: se ve en pantalla, sale en el Word y va incrustada en el PDF, con negrita e itálica propias.',
+    modulo: 'Ajustes',
+    tipo: 'nuevo'
+  },
+  {
+    fecha: '2026-09-08',
+    titulo: 'El menú lateral, rediseñado: índice numerado y panel claro',
+    detalle:
+      'En el computador, la barra de la izquierda pasa a ser un panel claro con los módulos numerados como un índice —01 Redacción, 02 Borradores…— y el activo en tinta con su número en dorado. La tarjeta de saldo muestra el plan y su vencimiento, y «Colapsar», al pie, reduce el panel a fichas con el icono de cada módulo; el botón cambia de sentido para volver a desplegarlo. En el teléfono nada cambia.',
+    modulo: 'Inicio',
+    tipo: 'mejora'
+  },
+  {
+    fecha: '2026-09-08',
     titulo: 'Preguntas para la audiencia a partir del escrito revisado',
     detalle:
       'En el taller de una revisión, la pestaña «Audiencia» pide a la guía tres listas de preguntas sobre el escrito tal como está: a la contraparte, a sus testigos y a los testigos de la contraparte. Usted indica su posición —Demandante, Demandado u otra— y, si quiere, qué busca probar y el tipo de audiencia. Cada pregunta trae para qué sirve y el pasaje del escrito del que nace; se copian o se descargan en Word, y el último juego queda con la revisión.',

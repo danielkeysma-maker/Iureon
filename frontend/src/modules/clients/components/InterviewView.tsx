@@ -17,6 +17,8 @@ import { InterviewInsights } from './InterviewInsights';
 import { TranscriptSummary } from '../../transcription/components/TranscriptSummary';
 import { AudioRecorder } from './AudioRecorder';
 import { clientsApi, type Client } from '../clients.api';
+import { useFuncionHabilitada } from '../../subscriptions/PlanContext';
+import { AVISO_FUNCION_DESHABILITADA } from '../../subscriptions/types';
 
 /**
  * The client interview, as its own screen.
@@ -259,6 +261,8 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft, onPrivaci
   const cubiertasAntes = React.useMemo(() => cubiertasEnEntrevistasPrevias(previas), [previas]);
   const estados = React.useMemo(() => estadoDelGuion(cubiertas, cubiertasAntes), [cubiertas, cubiertasAntes]);
   const respondidasAntes = [...estados.values()].filter((e) => e.estado === 'antes').length;
+  /* La lista es una función de Entrevistas que el operador puede apagar: el paso queda, con el aviso en vez de las preguntas. */
+  const guionHabilitado = useFuncionHabilitada('ENTREVISTAS.GUION');
 
   const fechaCorta = (iso: string | null): string =>
     iso
@@ -522,6 +526,10 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft, onPrivaci
             conversacion — no un resumen para leer al final.
           */}
           <Paso numero={2} titulo="Lo que no puede quedarse sin preguntar">
+            {!guionHabilitado ? (
+              <p className="notice text-ui leading-[1.5] [text-wrap:pretty]">{AVISO_FUNCION_DESHABILITADA}</p>
+            ) : (
+            <>
             {/*
               LO QUE YA QUEDO DICHO EN OTRA ENTREVISTA se anuncia arriba, una
               sola vez, y se marca abajo pregunta por pregunta con la fecha.
@@ -596,6 +604,8 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft, onPrivaci
               tachada no garantiza que la respuesta sirva, y que quede sin tachar no significa que
               no se habló del tema.
             </p>
+            </>
+            )}
           </Paso>
 
           <Paso numero={3} titulo="Captura la conversación">
