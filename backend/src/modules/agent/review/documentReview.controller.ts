@@ -717,6 +717,28 @@ export const reReviewController = async (req: Request, res: Response): Promise<v
     res.status(404).json({ success: false, error: 'REVIEW_NOT_FOUND', message: 'Esa revisión no existe o no es de su firma.' });
     return;
   }
+  /*
+   * NO SE REREVISA UN DOCUMENTO RECIBIDO, Y SE NIEGA ANTES DE COBRAR.
+   *
+   * Esta ruta rerevisa SIEMPRE con el prompt del escrito propio —«qué le falta
+   * frente a la ficha, qué corregiría antes de presentarlo»—, que sobre un auto
+   * ajeno no significa nada: no se va a presentar y no hay ficha suya contra la
+   * que medirlo. Peor todavía, el informe resultante tiene la OTRA forma, así
+   * que sobreescribiría el que sí sirve y la pantalla dejaría de reconocerlo.
+   *
+   * El frontend ya no ofrece el botón, pero eso no es una guarda: una guarda
+   * vive donde está el dinero. Se niega aquí, antes de reservar saldo.
+   */
+  if (revision.modo === 'DOCUMENTO_RECIBIDO') {
+    res.status(409).json({
+      success: false,
+      error: 'REREVIEW_NOT_APPLICABLE',
+      message:
+        'Esta revisión leyó un documento que usted recibió, no un escrito suyo. Volver a revisarlo no aplica: no se rerevisa lo que ya está proferido. No se descontó saldo.'
+    });
+    return;
+  }
+
   const preparado = prepararTexto(typeof req.body.textoActual === 'string' ? req.body.textoActual : revision.textoTrabajo || '');
   if (preparado.caracteres < TEXTO_MINIMO) {
     res.status(422).json({ success: false, error: 'TEXT_TOO_SHORT', message: `El texto tiene ${preparado.caracteres} caracteres; un escrito revisable tiene al menos ${TEXTO_MINIMO}.` });

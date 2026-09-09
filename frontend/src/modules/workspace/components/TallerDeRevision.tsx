@@ -1,6 +1,6 @@
 import React from 'react';
 import type { FormatoDelEscrito } from '../../documents/formatoEnPantalla';
-import { reviewApi, type Anotacion, type ConsentimientoDeGuardado, type InformeDeRevision, type PreguntasAudienciaGuardadas, type TurnoDelTaller, type VersionDelTexto } from '../services/review.api';
+import { reviewApi, type Anotacion, type ConsentimientoDeGuardado, type InformeDeDocumentoRecibido, type InformeDeRevision, type PreguntasAudienciaGuardadas, type TurnoDelTaller, type VersionDelTexto } from '../services/review.api';
 import { exportarPreguntasAPdf, exportarPreguntasAWord } from '../services/preguntasExport.service';
 import { TallerDeEscrito } from './TallerDeEscrito';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
@@ -29,6 +29,12 @@ export interface DatosDelTaller {
   cliente: string;
   texto: string;
   informe: InformeDeRevision | null;
+  /**
+   * El informe cuando lo revisado fue un DOCUMENTO RECIBIDO. Vive en la misma
+   * columna del servidor y se distingue por su FORMA, así que son dos campos
+   * distintos aquí: quien reciba estos datos no tiene que adivinar cuál llegó.
+   */
+  informeRecibido?: InformeDeDocumentoRecibido | null;
   informeLibre: string | null;
   conFicha: boolean;
   guardaTexto: boolean;
@@ -164,6 +170,8 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
           subtitulo: [datos.cliente, datos.fileName].filter(Boolean).join(' · '),
           texto: datos.texto,
           informe: datos.informe,
+          informeRecibido: datos.informeRecibido ?? null,
+          informeLibre: datos.informeLibre,
           conversacion: datos.conversacion,
           anotaciones: datos.anotaciones ?? [],
           versiones: datos.versiones ?? []
@@ -176,8 +184,14 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
             'Se guarda solo, en la nube de su firma: texto, conversación, marcas y versiones. Puede cerrar y retomar otro día.'
           ) : (
             <>
-              <span className="font-semibold">Solo en esta sesión.</span> Su firma no ha autorizado conservar escritos: al cerrar se pierden el texto, las
-              marcas, la conversación y las versiones; el informe sí queda.{' '}
+              {/*
+                SE NOMBRA EL ARCHIVO ORIGINAL, no solo «el texto». La pestaña
+                «Original» es lo primero que se echa en falta al volver otro
+                día, y hasta ahora este aviso no decía que también dependía de
+                esta autorización: parecía un fallo del visor.
+              */}
+              <span className="font-semibold">Solo en esta sesión.</span> Su firma no ha autorizado conservar escritos: al cerrar se pierden el texto, el
+              archivo tal como se subió —el de la pestaña «Original»—, las marcas, la conversación y las versiones; el informe sí queda.{' '}
               {esAdminDeFirma
                 ? 'Puede autorizarlo aquí, una vez, para toda la firma.'
                 : 'Puede autorizarlo un socio administrador de su firma, desde este mismo aviso o desde el módulo Revisiones.'}
@@ -207,7 +221,14 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
           if (!datos.revisionId) throw new Error('El chat necesita una revisión guardada.');
           return reviewApi.chat(datos.revisionId, { mensaje, textoActual, historial, anotaciones });
         }}
-        onRerevisar={datos.revisionId ? (textoActual) => reviewApi.rerevisar(datos.revisionId as string, textoActual) : undefined}
+        /*
+         * «VOLVER A REVISAR» NO SE OFRECE SOBRE UN DOCUMENTO RECIBIDO. El
+         * servidor rerevisa SIEMPRE con el prompt del escrito propio, así que
+         * pulsarlo cobraría una revisión y reemplazaría la lectura del auto
+         * por un informe de otra clase. Y de todos modos no tiene sentido:
+         * un auto de un juez ya está proferido y no se corrige aquí.
+         */
+        onRerevisar={datos.revisionId && !datos.informeRecibido ? (textoActual) => reviewApi.rerevisar(datos.revisionId as string, textoActual) : undefined}
         onExportarTexto={(formato, texto) => onExportarTexto(formato, `${datos.documentType} corregido`, texto)}
         llevarARedaccion={{
           onClick: onLlevarARedaccion,

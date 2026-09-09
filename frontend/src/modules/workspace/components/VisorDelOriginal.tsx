@@ -450,6 +450,19 @@ export const VisorDelOriginal: React.FC<VisorDelOriginalProps> = ({
             <FileUp className="h-7 w-7 text-ink-400" />
             <p className="text-ui text-ink-900">Aquí se ve el escrito tal como está constituido.</p>
             <p className="max-w-[46ch] text-[12.5px] leading-[1.6] text-ink-500 text-justify [text-wrap:pretty]">{motivo}</p>
+            {/*
+              QUIÉN LO AUTORIZA, DICHO AQUÍ. El motivo que da el servidor
+              explica que la firma no lo autorizó, pero no a quién pedírselo, y
+              el abogado que llega a esta pantalla vacía concluye que el visor
+              está roto. La autorización es la misma del aviso de guardado del
+              taller: se nombra para que se reconozca.
+            */}
+            {estado.fase === 'sin' && !estado.puedeConservarlo && (
+              <p className="max-w-[46ch] text-[12.5px] leading-[1.6] text-ink-500 text-justify [text-wrap:pretty]">
+                Para que se conserve solo, un socio administrador de la firma tiene que autorizar que Iureon guarde los escritos revisados: desde el
+                aviso de guardado de este taller o desde el módulo «Revisiones».
+              </p>
+            )}
             <button type="button" onClick={() => entrada.current?.click()} className="btn-secondary btn-sm mt-1">
               <FileUp className="h-3.5 w-3.5" />
               Subir el archivo

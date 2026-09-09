@@ -136,6 +136,8 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({
         cliente: c.cliente,
         texto,
         informe: c.informe,
+        /* El del documento recibido tiene otra forma y otra columna en la respuesta; sin él el taller decía «no tiene informe». */
+        informeRecibido: c.informeRecibido,
         informeLibre: c.informeLibre,
         conFicha: c.conFicha,
         guardaTexto: consentimiento.guarda,

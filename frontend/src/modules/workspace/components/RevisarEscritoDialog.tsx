@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, CheckCircle2, ClipboardCheck, Copy, Download, FileText, History, Loader2, Sparkles, Trash2, UploadCloud, X } from 'lucide-react';
+import { AlertTriangle, ClipboardCheck, Copy, Download, FileText, History, Loader2, Sparkles, Trash2, UploadCloud, X } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import { ApiError } from '../../../config/httpClient';
 import {
@@ -25,6 +25,7 @@ import { GuiaEligeActuacionDialog } from './GuiaEligeActuacionDialog';
 import { ActuacionPropiaDialog } from './ActuacionPropiaDialog';
 import { textoDelArchivo } from '../services/textoDelArchivo';
 import { etiquetaDeAtaque, hechosParaLaGuia, puntosDeAtaqueDe } from '../services/ataque';
+import { LecturaDelDocumentoRecibido, SeccionDeInforme } from './LecturaDelDocumentoRecibido';
 import type { ActuacionRole } from '../../catalog/types';
 
 /**
@@ -488,16 +489,29 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
 
   const decidirGuardado = async (conservar: boolean) => {
     setPreguntaDeGuardado(false);
+    /*
+     * LA AUTORIZACIÓN RECIÉN DADA VIAJA A MANO HASTA `revisar`, NO POR EL
+     * ESTADO. `setConsentimiento` no cambia la variable que esta función ya
+     * capturó: `revisar` seguiría leyendo el «no ha decidido» de antes y
+     * mandaría el archivo dentro del cuerpo, sin `conservarOriginal`. El
+     * resultado era el defecto que el socio administrador veía en su PRIMERA
+     * revisión después de autorizar: el informe salía, el texto se guardaba
+     * —eso lo decide el servidor leyendo la base— pero el archivo original no
+     * se conservaba, y el visor del taller decía después que «no se conservó»,
+     * como si nunca lo hubiera autorizado.
+     */
+    let vigente = consentimiento;
     try {
-      setConsentimiento(await reviewApi.autorizarGuardado(conservar));
+      vigente = await reviewApi.autorizarGuardado(conservar);
+      setConsentimiento(vigente);
     } catch (err) {
       /* La decisión no se pudo guardar; la revisión sigue y se dice por qué el taller queda solo en la sesión. */
       setError(err instanceof Error ? `${err.message} La revisión continúa; podrá autorizar el guardado desde «Revisiones».` : 'No se pudo guardar la decisión.');
     }
-    await revisar();
+    await revisar(vigente);
   };
 
-  const revisar = async () => {
+  const revisar = async (consentimientoVigente: ConsentimientoDeGuardado | null = consentimiento) => {
     if (!hayEscrito || ocupado) return;
     setOcupado(true);
     setError('');
@@ -513,7 +527,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
        * B2 desde la función gastaría su reloj en una subida que el navegador
        * ya sabe hacer. Sin autorización se sigue borrando al leerlo.
        */
-      const conservarOriginal = Boolean(consentimiento?.guarda);
+      const conservarOriginal = Boolean(consentimientoVigente?.guarda);
       let cuerpo: { fileName: string; contentBase64?: string; storageKey?: string; texto?: string; conservarOriginal?: boolean; contentType?: string };
       if (!archivo) {
         cuerpo = { fileName: 'texto-pegado.txt', texto };
@@ -724,6 +738,13 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
                     cliente: origenDelInforme.cliente,
                     texto: paraElTaller.texto as string,
                     informe: respuesta.informe,
+                    /*
+                     * EL INFORME DEL DOCUMENTO RECIBIDO TAMBIÉN VIAJA. Se
+                     * quedaba aquí, y el taller —que solo conocía la forma del
+                     * escrito propio— abría su pestaña «Informe» diciendo que
+                     * este escrito no tiene informe, justo después de cobrarlo.
+                     */
+                    informeRecibido: respuesta.informeRecibido ?? null,
                     informeLibre: respuesta.informeLibre,
                     conFicha: respuesta.conFicha,
                     guardaTexto: paraElTaller.guardaTexto,
@@ -1201,12 +1222,13 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
       >
         <div className="space-y-2 text-ui leading-relaxed text-ink-900">
           <p>
-            Con <span className="font-semibold">«Sí, conservar»</span> (recomendado) la firma guarda el texto del escrito, la conversación con la guía,
-            los comentarios y las versiones: nada se pierde al cerrar y no hay que volver a subir el archivo.
+            Con <span className="font-semibold">«Sí, conservar»</span> (recomendado) la firma guarda el texto del escrito,{' '}
+            <span className="font-semibold">el archivo tal como usted lo sube</span> —para volver a verlo con su diagramación, sus negritas y sus
+            tablas—, la conversación con la guía, los comentarios y las versiones: nada se pierde al cerrar.
           </p>
           <p>
-            Con <span className="font-semibold">«Solo el informe»</span> se conserva únicamente el informe, y el trabajo del taller desaparece al cerrar
-            la pestaña.
+            Con <span className="font-semibold">«Solo el informe»</span> se conserva únicamente el informe. El archivo y el trabajo del taller solo
+            viven en esta pestaña: al cerrarla, para volver a ver el documento tal cual habrá que subirlo otra vez.
           </p>
         </div>
       </Dialog>
@@ -1264,27 +1286,12 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
 
 /* ─── EL INFORME ──────────────────────────────────────────────────────────── */
 
-const Seccion: React.FC<{ titulo: string; items: string[]; tono?: 'ok' | 'aviso' | 'neutro' }> = ({ titulo, items, tono = 'neutro' }) => {
-  if (items.length === 0) return null;
-  const Icono = tono === 'ok' ? CheckCircle2 : tono === 'aviso' ? AlertTriangle : null;
-  return (
-    <section>
-      <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">{titulo}</h4>
-      <ul className="mt-1.5 space-y-1.5">
-        {items.map((it, i) => (
-          <li key={i} className="flex gap-2 text-ui leading-snug text-ink-900">
-            {Icono ? (
-              <Icono className={`mt-0.5 h-3.5 w-3.5 shrink-0 ${tono === 'ok' ? 'text-verified' : 'text-danger'}`} />
-            ) : (
-              <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-ink-400" />
-            )}
-            <span>{it}</span>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-};
+/*
+ * La sección con viñetas vive en `LecturaDelDocumentoRecibido`, porque el
+ * taller la necesita y no puede importar este diálogo. Aquí se le deja el
+ * nombre corto de siempre para no reescribir el informe del escrito propio.
+ */
+const Seccion = SeccionDeInforme;
 
 interface InformeProps {
   respuesta: RespuestaDeRevision;
@@ -1460,132 +1467,11 @@ const DocumentoRecibido: React.FC<{
   onPedirLaGuia
 }) => {
   const puntos = puntosDeAtaqueDe(informe);
-  const identificacion = [
-    informe.quienLoProfirio && { etiqueta: 'Lo profirió', valor: informe.quienLoProfirio },
-    informe.radicado && { etiqueta: 'Radicado', valor: informe.radicado },
-    informe.fecha && { etiqueta: 'Fecha del documento', valor: informe.fecha }
-  ].filter(Boolean) as { etiqueta: string; valor: string }[];
-
   return (
-    <>
-      {informe.queEs && <p className="text-[14px] leading-relaxed text-ink-900 text-justify [text-wrap:pretty]">{informe.queEs}</p>}
-
-      {identificacion.length > 0 && (
-        <section>
-          <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">Según el propio documento</h4>
-          <dl className="mt-1.5 space-y-1">
-            {identificacion.map((x) => (
-              <div key={x.etiqueta} className="flex flex-col gap-0.5 sm:flex-row sm:gap-2">
-                <dt className="min-w-0 shrink-0 font-mono text-[10.5px] uppercase tracking-[0.06em] text-ink-400 sm:w-40">{x.etiqueta}</dt>
-                <dd className="min-w-0 flex-1 text-ui leading-snug text-ink-900">{x.valor}</dd>
-              </div>
-            ))}
-          </dl>
-        </section>
-      )}
-
-      <Seccion titulo="Qué decide u ordena" items={informe.decide} />
-
-      <section>
-        <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">Qué le exige y para cuándo</h4>
-        {informe.cargas.length === 0 ? (
-          <p className="mt-1.5 text-ui leading-snug text-ink-900 text-justify">
-            Del texto de este documento no se desprende ninguna carga a su cargo.
-          </p>
-        ) : (
-          <div className="mt-1.5 space-y-2.5">
-            {informe.cargas.map((c, k) => (
-              <div key={k} className="rounded-control border border-line-200 bg-canvas px-3 py-2.5">
-                {c.carga && <p className="text-ui leading-snug text-ink-900 text-justify [text-wrap:pretty]">{c.carga}</p>}
-                {/*
-                  EL PLAZO AUSENTE SE DICE CON TODAS SUS LETRAS. Callarlo dejaría
-                  al abogado suponiendo que no hay plazo —que es lo contrario de
-                  lo que se sabe— y rellenarlo con uno recordado sería la cita
-                  fabricada que esta casa tiene prohibida. La respuesta de dónde
-                  sale ese plazo está abajo: el catálogo verificado.
-                */}
-                {c.plazo ? (
-                  <p className="mt-1.5 text-ui font-semibold leading-snug text-brand-700">Plazo que anuncia el documento: {c.plazo}</p>
-                ) : (
-                  <p className="notice-unverified mt-1.5" role="status">
-                    <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-unverified" />
-                    <span className="min-w-0 text-justify">
-                      El documento no anuncia plazo para esta carga. No se le pone uno de memoria: consúltelo abajo, en la guía de actuaciones, donde
-                      el término viene con su artículo y su autoridad verificados.
-                    </span>
-                  </p>
-                )}
-                {c.cita && (
-                  <>
-                    <p className="mt-2 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-400">Dice el documento</p>
-                    <blockquote className="mt-0.5 border-l-2 border-line-200 pl-2.5 text-ui italic leading-snug text-ink-700 text-justify">
-                      «{c.cita}»
-                    </blockquote>
-                  </>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-
-      <Seccion titulo="Qué queda pendiente, según el documento" items={informe.loQueSigue} />
-      <Seccion titulo="Lo que el documento no dice" items={informe.noLoDiceElDocumento} tono="aviso" />
-
-      {/* ─── POR DÓNDE SE ATACA ───────────────────────────────────────────
-        *
-        * La mitad que faltaba. Y la más delicada de pintar, porque aquí no hay
-        * ficha detrás de nada: lo único que sostiene un flanco es la cita del
-        * propio documento. Por eso cada punto se dibuja en dos planos VISIBLES
-        * —las palabras del documento, entre comillas y en cursiva; debajo,
-        * rotulada, la lectura del revisor—, igual que el informe del escrito
-        * propio separa lo que exige la norma de lo que opina quien revisa. Un
-        * punto sin cita no llega hasta aquí: el servidor lo descarta al leer la
-        * respuesta.
-        */}
-      {puntos.length > 0 && (
-        <section>
-          <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">Por dónde se ataca</h4>
-          <p className="mt-1 text-[12px] leading-snug text-ink-500 text-justify [text-wrap:pretty]">
-            Cada punto se apoya en las palabras del propio documento, que van citadas. Lo rotulado como lectura del revisor es criterio, no texto del
-            documento: aquí se señala el flanco y concluye usted.
-          </p>
-          <div className="mt-1.5 space-y-2.5">
-            {puntos.map((p, k) => (
-              <div key={k} className="rounded-control border border-line-200 bg-canvas px-3 py-2.5">
-                <p className="font-mono text-[10.5px] font-semibold text-ink-500">{etiquetaDeAtaque(p.clase)}</p>
-                <p className="mt-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-400">Dice el documento</p>
-                <blockquote className="mt-0.5 border-l-2 border-line-200 pl-2.5 text-ui italic leading-snug text-ink-700 text-justify">
-                  «{p.cita}»
-                </blockquote>
-                {/*
-                  LA NORMA SOLO APARECE CON SU TEXTO AL LADO. Nombrar el artículo
-                  sin lo que el documento dice que ordena invitaría a completarlo
-                  de memoria, que es justo lo prohibido; el servidor ya vacía el
-                  nombre cuando falta la transcripción, y aquí se exige de nuevo.
-                */}
-                {p.norma && p.citaDeLaNorma && (
-                  <>
-                    <p className="mt-2 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-400">
-                      Norma en que el propio documento se apoya · {p.norma}
-                    </p>
-                    <blockquote className="mt-0.5 border-l-2 border-line-200 pl-2.5 text-ui italic leading-snug text-ink-700 text-justify">
-                      «{p.citaDeLaNorma}»
-                    </blockquote>
-                  </>
-                )}
-                {p.lectura && (
-                  <>
-                    <p className="mt-2 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-brand-700">Lectura del revisor</p>
-                    <p className="mt-0.5 text-ui leading-snug text-ink-900 text-justify [text-wrap:pretty]">{p.lectura}</p>
-                  </>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
+    <LecturaDelDocumentoRecibido
+      informe={informe}
+      pie={
+        <>
       {/* ─── ¿Y QUÉ PUEDO HACER? ─────────────────────────────────────────── */}
       <section className="rounded-card border border-[rgb(var(--brand-line))] bg-brand-50 px-3 py-3">
         <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-brand-700">
@@ -1649,6 +1535,8 @@ const DocumentoRecibido: React.FC<{
           </p>
         )}
       </section>
-    </>
+        </>
+      }
+    />
   );
 };

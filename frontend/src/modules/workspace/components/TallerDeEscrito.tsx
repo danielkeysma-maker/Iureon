@@ -25,7 +25,7 @@ import {
   Send,
   ShieldCheck
 } from 'lucide-react';
-import type { Anotacion, EdicionPropuesta, InformeDeRevision, ParametrosDePreguntas, PreguntasAudienciaGuardadas, RespuestaDePreguntas, RespuestaDelChat, SeccionDePreguntas, TurnoDelTaller, VersionDelTexto } from '../services/review.api';
+import type { Anotacion, EdicionPropuesta, InformeDeDocumentoRecibido, InformeDeRevision, ParametrosDePreguntas, PreguntasAudienciaGuardadas, RespuestaDePreguntas, RespuestaDelChat, SeccionDePreguntas, TurnoDelTaller, VersionDelTexto } from '../services/review.api';
 import { TITULOS as SECCIONES_DE_PREGUNTAS, preguntasComoTexto, seccionesPedidas } from '../services/preguntasExport.service';
 import { aplicarReemplazo, capasTipograficas, esCapaTipografica, localizarCitas, marcasDeAnotaciones, reflujoDeSecciones, segmentarCapas, type MarcaEnCapa } from '../services/marcas';
 import { diferencias, resumenDeCambios } from '../services/diff';
@@ -36,6 +36,7 @@ import { estiloDelLienzo, type FormatoDelEscrito } from '../../documents/formato
 import type { FuenteDelOriginal } from '../services/originalDelEscrito';
 import type { CapaDeResaltado } from '../services/resaltadoNativo';
 import { VisorDelOriginal, type SuperficieDeSeleccion } from './VisorDelOriginal';
+import { LecturaDelDocumentoRecibido } from './LecturaDelDocumentoRecibido';
 import { AVISO_FUNCION_DESHABILITADA } from '../../subscriptions/types';
 
 /**
@@ -107,6 +108,15 @@ export interface DatosDelEscrito {
   subtitulo: string;
   texto: string;
   informe: InformeDeRevision | null;
+  /**
+   * EL SEGUNDO INFORME, EL DEL DOCUMENTO RECIBIDO. No es una variante del
+   * anterior: tiene otras secciones y otra promesa —solo afirma lo que el
+   * propio documento dice, y lo cita—. El panel lo dibuja como lo que es; si
+   * se leyera con la forma del escrito propio, no se pintaría nada.
+   */
+  informeRecibido?: InformeDeDocumentoRecibido | null;
+  /** Lo que el revisor devolvió cuando no se pudo ordenar por secciones. Sin esto, la pestaña decía «no hay informe» aunque se hubiera cobrado uno. */
+  informeLibre?: string | null;
   conversacion: TurnoDelTaller[];
   anotaciones: Anotacion[];
   versiones: VersionDelTexto[];
@@ -321,7 +331,16 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   const estiloDeFirma = estiloDelLienzo(formato);
   const baseDeLetra = estiloDeFirma ? parseFloat(estiloDeFirma.fontSize) : 14;
   const estiloDelPapel: React.CSSProperties = { ...estiloDeFirma, fontSize: letra.px(baseDeLetra) };
-  const [panel, setPanel] = React.useState<'chat' | 'informe' | 'versiones' | 'comentarios' | 'preguntas'>('chat');
+  /*
+   * SE ABRE EN EL INFORME CUANDO HAY UNO. El abogado acaba de pagar una
+   * revisión y entra al taller a leerla; abrir en el chat lo obligaba a buscar
+   * la pestaña, y quien no la encontraba concluía que el informe no había
+   * salido. Sin informe —el taller de un borrador— sigue abriendo en el chat,
+   * que es lo único que hay.
+   */
+  const [panel, setPanel] = React.useState<'chat' | 'informe' | 'versiones' | 'comentarios' | 'preguntas'>(
+    datos.informe || datos.informeRecibido || datos.informeLibre ? 'informe' : 'chat'
+  );
   const [citaAbierta, setCitaAbierta] = React.useState<number | null>(null);
   const [versionAbierta, setVersionAbierta] = React.useState<number | null>(null);
   const [mensaje, setMensaje] = React.useState('');
@@ -1202,8 +1221,34 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
       así que una sola declaración cubre resúmenes, listas y correcciones.
     */
     <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-3 text-[12.5px] [overflow-wrap:anywhere]">
-      {!informe ? (
-        <p className="text-ink-500 text-justify">Este escrito no tiene informe de revisión. Puede pedir uno con «Revisión completa» o conversar con la guía.</p>
+      {/*
+        TRES FORMAS DE INFORME, NO UNA. El del escrito propio; el del documento
+        recibido, que tiene otras secciones y otra promesa; y el texto libre de
+        cuando el revisor no devolvió algo ordenable. Antes solo se leía la
+        primera, así que un documento recibido —o un informe sin secciones—
+        abría esta pestaña diciendo «no tiene informe de revisión» encima de un
+        informe que la firma ya había pagado.
+      */}
+      {datos.informeRecibido ? (
+        <>
+          <p className="rounded-control border border-line-200 bg-canvas px-2.5 py-1.5 text-[11.5px] leading-snug text-ink-600 text-justify">
+            Lectura de un <span className="font-semibold">documento recibido</span>. Todo lo de abajo sale del texto del propio documento y va citado:
+            ninguna ficha del catálogo respalda estas líneas. Qué actuación procede lo responden la guía de actuaciones y la agenda de términos, desde
+            «Revisiones».
+          </p>
+          <LecturaDelDocumentoRecibido informe={datos.informeRecibido} />
+        </>
+      ) : !informe ? (
+        datos.informeLibre ? (
+          <>
+            <p className="rounded-control border border-line-200 bg-canvas px-2.5 py-1.5 text-[11.5px] leading-snug text-ink-600 text-justify">
+              El revisor respondió en un formato que no se pudo ordenar por secciones; abajo está su texto completo.
+            </p>
+            <pre className="whitespace-pre-wrap font-sans text-[12.5px] leading-relaxed text-ink-900">{datos.informeLibre}</pre>
+          </>
+        ) : (
+          <p className="text-ink-500 text-justify">Este escrito no tiene informe de revisión. Puede pedir uno con «Revisión completa» o conversar con la guía.</p>
+        )
       ) : (
         <>
           <p className="leading-relaxed text-ink-900 text-justify">{informe.resumen}</p>
