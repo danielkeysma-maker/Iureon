@@ -1144,6 +1144,14 @@ export function App() {
                   setLegalBranch={workflow.setLegalBranch}
                   documentType={workflow.documentType}
                   setDocumentType={workflow.setDocumentType}
+                  /*
+                    Los mismos hechos del cuadro de instrucción, no una copia:
+                    «que la guía proponga la actuación» orienta sobre lo que se
+                    va a redactar, y lo que se complete en ese diálogo vuelve
+                    aquí en vez de quedarse dentro de él.
+                  */
+                  hechos={workflow.legalPrompt}
+                  setHechos={workflow.setLegalPrompt}
                 />
               </div>
               <div className="lg:hidden">

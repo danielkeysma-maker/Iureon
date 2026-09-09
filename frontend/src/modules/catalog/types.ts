@@ -96,6 +96,36 @@ export interface Actuacion {
   requiredSections: RequiredSection[];
   sourceUrl: string | null;
   verification?: ActuacionVerification;
+  /**
+   * La actuación la escribió la firma porque el catálogo no la trae.
+   *
+   * Ninguna norma verificada la respalda: no hay artículo comprobado, ni
+   * término, ni secciones exigidas. Se pinta con el mismo tratamiento ámbar de
+   * «sin catalogar», porque para el abogado es el mismo hecho — el escrito no
+   * se apoya en nada que alguien haya leído.
+   */
+  firmDefined?: boolean;
+}
+
+/**
+ * Una actuación que la firma añadió a una rama.
+ *
+ * Nace sin norma verificada y sale de esa condición en la pantalla de Catálogo,
+ * con el mismo formulario con el que se cura una ficha de fábrica: término Y
+ * fuente, o no asciende.
+ */
+export interface FirmActuacion {
+  id: string;
+  area: LegalBranch;
+  exactName: string;
+  role: ActuacionRole;
+  termStatus: TermStatus;
+  legalBasis: string | null;
+  termDescription: string | null;
+  sourceUrl: string | null;
+  note: string | null;
+  createdBy: string;
+  createdAt: string;
 }
 
 /**

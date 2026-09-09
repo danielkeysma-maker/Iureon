@@ -69,8 +69,16 @@ export const DraftProvenanceBar: React.FC<DraftProvenanceBarProps> = ({ proceden
 
   const sinTermino = procedencia.termStatus === 'NO_VERIFICADO';
   const faltanArticulos = procedencia.seccionesSinArticulo > 0;
+  /*
+   * LA ACTUACIÓN ENTERA LA ESCRIBIÓ LA FIRMA. Es un hecho distinto de «el
+   * término no está comprobado», y hay que decirlo aunque el término sí lo
+   * esté: quien lo comprobó fue un colega, y ninguna norma verificada sostiene
+   * el artículo ni la estructura del escrito. Con la ficha propia curada la
+   * barra queda en verde, pero no en silencio.
+   */
+  const deLaFirma = procedencia.definidaPorLaFirma === true;
 
-  if (!sinTermino && !faltanArticulos && !procedencia.curadaPorLaFirma) return null;
+  if (!sinTermino && !faltanArticulos && !deLaFirma && !procedencia.curadaPorLaFirma) return null;
 
   const enAmbar = sinTermino || faltanArticulos;
 
@@ -92,6 +100,16 @@ export const DraftProvenanceBar: React.FC<DraftProvenanceBarProps> = ({ proceden
             <> · curada por {procedencia.curadaPor}</>
           )}
         </p>
+
+        {deLaFirma && (
+          <p className="text-justify text-[12px] leading-snug [text-wrap:pretty]">
+            <strong className="font-semibold">
+              Esta actuación la añadió su firma: el catálogo no la trae.
+            </strong>{' '}
+            Ninguna norma verificada respalda su artículo ni su estructura, y la guía tuvo prohibido
+            inventarlos.
+          </p>
+        )}
 
         {sinTermino && (
           <p className="text-justify text-[12px] leading-snug [text-wrap:pretty]">

@@ -76,8 +76,35 @@ Si devuelves la lista vacia, incluye "preguntas": 2 a 4 datos que faltan y defin
 Responde SOLO con JSON válido, sin texto alrededor:
 {"actuaciones":[{"nombre":"<nombre exacto de la lista>","rama":"<RAMA>","razon":"<una frase>"}],"senales":{"rama":"<RAMA dominante>","elementos":["<hecho clave>"]},"preguntas":["<solo si actuaciones quedo vacia>"]}`;
 
-/** The closed list the model must choose from: every catalogued name, by branch. */
-const catalogueMenu = (): string => {
+/**
+ * The closed list the model must choose from.
+ *
+ * CON RAMA, EL MENÚ ES SOLO DE ESA RAMA, y eso cambia dos cosas a la vez. La
+ * primera es la exactitud: quien ya escogió «Laboral» en Redacción no quiere
+ * que se le proponga una tutela, y una sugerencia fuera de rama es una
+ * sugerencia que hay que descartar a mano. La segunda es el precio: el menú
+ * completo son unos 37.000 caracteres en CADA consulta, y una rama son unos
+ * pocos cientos.
+ *
+ * Sigue siendo OPCIONAL: la pantalla de Orientación no sabe la rama —esa es
+ * justo la pregunta que le hace al catálogo— y tiene que seguir viendo el menú
+ * entero.
+ */
+const catalogueMenu = (branch?: LegalBranch): string => {
+  if (branch) {
+    /*
+     * `list(branch)` ya incluye las transversales, y aquí van dentro de la
+     * misma lista y no en sección aparte: no hay 22 ramas de las que
+     * distinguirlas, y separarlas sugeriría que son de otro catálogo.
+     */
+    const nombres = catalogService
+      .list(branch)
+      .map((a) => `  - ${a.exactName}`)
+      .join('\n');
+
+    return `${branch}:\n${nombres}`;
+  }
+
   /*
    * Las transversales van UNA vez, en su propia seccion. list(branch) ahora
    * las incluye en toda rama (derecho de peticion visible para el laboralista),
@@ -165,7 +192,12 @@ const parsePicks = (text: string): ParsedTriage | null => {
   }
 };
 
-export const triageFacts = async (facts: string): Promise<TriageResult> => {
+/**
+ * @param branch cuando el abogado YA eligió la rama en Redacción. Acota el menú
+ *        y descarta lo que caiga fuera; sin ella, el comportamiento es el de
+ *        siempre y `TriageView` no cambia.
+ */
+export const triageFacts = async (facts: string, branch?: LegalBranch): Promise<TriageResult> => {
   const clean = facts.trim();
 
   if (clean.length < 20) {
@@ -203,7 +235,7 @@ export const triageFacts = async (facts: string): Promise<TriageResult> => {
       // the feature cost more than the document it leads to.
       ENGINE.GEMINI,
       SYSTEM_PROMPT,
-      `HECHOS:\n${clean}\n\nACTUACIONES DISPONIBLES:\n${catalogueMenu()}`,
+      `HECHOS:\n${clean}\n\nACTUACIONES DISPONIBLES:\n${catalogueMenu(branch)}`,
       2000,
       // Una lista vacía son 18 caracteres y es la respuesta correcta cuando
       // el catálogo no reconoce nada. El piso por defecto la tiraría.
@@ -253,10 +285,22 @@ export const triageFacts = async (facts: string): Promise<TriageResult> => {
     // that fits more than one branch, which is why the branch travels with it.
     const actuacion = catalogService.findByDocumentType(
       nombre,
-      (pick.rama as LegalBranch) || undefined
+      branch ?? ((pick.rama as LegalBranch) || undefined)
     );
 
     if (!actuacion) {
+      descartadas.push(nombre);
+      continue;
+    }
+
+    /*
+     * SEGUNDA GUARDA, y no sobra. Acotar el menú no impide que el modelo
+     * devuelva un nombre de otra rama —lo hace, sobre todo con las que se
+     * parecen— y una sugerencia fuera de la rama que el abogado ya eligió
+     * cambiaría el escrito por debajo sin decirlo. Se descarta, y se ve en
+     * `descartadas`.
+     */
+    if (branch && actuacion.branch !== branch && actuacion.transversal !== true) {
       descartadas.push(nombre);
       continue;
     }

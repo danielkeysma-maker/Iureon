@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import { triageFacts } from './triage.service';
+import { catalogService } from './catalog.service';
+import type { LegalBranch } from './types';
 import { guardarOrientacion, listarOrientaciones, huecosDelCatalogo } from './orientacionHistory.service';
 import { consumirCupo, TOPE_DIARIO } from './orientacionQuota.service';
 import { reserveForOperation, refundReservation, BillingError, PRICE_COP } from '../billing/billing.service';
@@ -30,6 +32,20 @@ import { exigirModulo, responderPlanError } from '../subscriptions/plan.service'
  */
 export const triageController = async (req: Request, res: Response): Promise<void> => {
   const hechos = String(req.body?.hechos ?? '').trim();
+
+  /*
+   * LA RAMA ES OPCIONAL, y por eso el orden importa: cuando la petición viene
+   * de Redacción, el abogado YA la eligió, y proponerle actuaciones de otra
+   * rama sería cambiarle el escrito por debajo. Cuando viene de Orientación no
+   * llega, porque cuál es la rama es justamente lo que se está preguntando.
+   *
+   * Una rama desconocida se ignora en vez de rechazarse: el peor desenlace de
+   * un dato de más y mal escrito no puede ser quedarse sin orientación.
+   */
+  const ramaPedida = String(req.body?.branch ?? '').trim().toUpperCase();
+  const branch = catalogService.listBranches().includes(ramaPedida as LegalBranch)
+    ? (ramaPedida as LegalBranch)
+    : undefined;
 
   if (!hechos) {
     res.status(400).json({ success: false, error: 'MISSING_FACTS', message: 'Describe los hechos.' });
@@ -88,7 +104,7 @@ export const triageController = async (req: Request, res: Response): Promise<voi
     }
   }
 
-  const result = await triageFacts(hechos);
+  const result = await triageFacts(hechos, branch);
 
   if (result.status === 'FAILED') {
     /*

@@ -41,6 +41,14 @@ export type AuditAction =
   | 'TRANSCRIPTION_CREATED'
   | 'TRANSCRIPTION_DELETED'
   | 'CATALOG_TERM_VERIFIED'
+  /*
+   * La firma añadió a una rama una actuación que el catálogo no trae, o la
+   * retiró. Va al rastro porque cambia lo que la lista le ofrece a todos los
+   * abogados de la firma, y porque esa actuación nace SIN norma verificada:
+   * quien la eligió después tiene derecho a saber quién la puso ahí.
+   */
+  | 'FIRM_ACTUACION_CREATED'
+  | 'FIRM_ACTUACION_DELETED'
   | 'INTERVIEW_DECIDED'
   | 'ACTA_LISTA'
   /*

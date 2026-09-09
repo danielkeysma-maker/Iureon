@@ -1,6 +1,8 @@
 import { ALL_CATALOGS } from './data';
 import { applyVerification, applyVerifications } from './verification.merge';
 import { verificationStore, type VerificationLoad } from './verification.store';
+import { firmActuacionStore } from './firmActuaciones.store';
+import { actuacionPropiaComoCatalogo, normalizarNombre } from './firmActuaciones.validate';
 import type {
   Actuacion,
   ActuacionRole,
@@ -263,15 +265,48 @@ export class CatalogService {
       : { status: 'NO_TENANT', verifications: [] };
   }
 
+  /**
+   * Las actuaciones que ESTA firma añadió, ya con la forma del catálogo.
+   *
+   * Van SIEMPRE marcadas `firmDefined`, y esa marca no es decorativa: es la
+   * que hace que la pantalla las advierta y que el motor de redacción reciba
+   * la prohibición expresa de inventarles artículo, término o secciones.
+   *
+   * Un fallo de lectura devuelve lista vacía y queda anotado en el log del
+   * servidor: la alternativa —tumbar la petición entera— dejaría al abogado sin
+   * el catálogo de fábrica, que sí es correcto, por no poder leer un añadido.
+   */
+  private async loadPropias(
+    firmId?: string | null,
+    branch?: LegalBranch,
+    role?: ActuacionRole
+  ): Promise<Actuacion[]> {
+    const tenant = firmId?.trim();
+    if (!tenant) return [];
+
+    const load = await firmActuacionStore.listForFirm(tenant);
+
+    return load.actuaciones
+      .filter((a) => (!branch || a.area === branch) && (!role || a.role === role))
+      .map(actuacionPropiaComoCatalogo);
+  }
+
   async listForFirm(
     firmId?: string | null,
     branch?: LegalBranch,
     role?: ActuacionRole
   ): Promise<{ actuaciones: Actuacion[]; meta: CatalogMeta[]; curation: CurationStatus }> {
     const load = await this.loadCuration(firmId);
+    const propias = await this.loadPropias(firmId, branch, role);
 
     return {
-      actuaciones: applyVerifications(this.list(branch, role), load.verifications),
+      /*
+       * LO PROPIO DE LA FIRMA VA AL FINAL de la rama, detrás de lo verificado.
+       * Lo primero que se ofrece tiene que ser lo que sí tiene norma: una
+       * actuación sin respaldo encabezando la lista se leería como la opción
+       * recomendada.
+       */
+      actuaciones: [...applyVerifications(this.list(branch, role), load.verifications), ...propias],
       meta: this.listMeta(branch),
       curation: load.status
     };
@@ -288,8 +323,31 @@ export class CatalogService {
     documentType: string,
     branch?: LegalBranch
   ): Promise<{ actuacion: Actuacion | null; curation: CurationStatus }> {
-    const base = this.findByDocumentType(documentType, branch);
     const load = await this.loadCuration(firmId);
+
+    /*
+     * LO PROPIO DE LA FIRMA SE RESUELVE POR NOMBRE EXACTO Y NADA MÁS.
+     *
+     * El emparejador difuso existe porque el motor recibe etiquetas escritas a
+     * mano que rara vez coinciden con un nombre catalogado. Aquí no hace falta:
+     * estas actuaciones solo se eligen del desplegable, así que el nombre llega
+     * literal. Y aplicarles el puntaje sería peligroso — una actuación sin
+     * norma podría ganarle por vocabulario compartido a una verificada y
+     * quedarse con el escrito.
+     *
+     * Va antes del catálogo de fábrica porque crear una propia que tape a una
+     * publicada está prohibido en la validación: si el nombre exacto es de la
+     * firma, no hay ninguna verificada con ese nombre a la que estorbar.
+     */
+    const objetivo = normalizarNombre(documentType);
+    const propias = await this.loadPropias(firmId, branch);
+    const propia = objetivo
+      ? propias.find((a) => normalizarNombre(a.exactName) === objetivo)
+      : undefined;
+
+    if (propia) return { actuacion: propia, curation: load.status };
+
+    const base = this.findByDocumentType(documentType, branch);
 
     if (!base) return { actuacion: null, curation: load.status };
 
@@ -308,7 +366,11 @@ export class CatalogService {
     const base = this.getById(id);
     const load = await verificationStore.listForFirm(firmId);
 
-    if (!base) return { actuacion: null, curation: load.status };
+    if (!base) {
+      /* No está en el catálogo publicado: puede ser una que añadió la firma. */
+      const propia = (await this.loadPropias(firmId)).find((a) => a.id === id);
+      return { actuacion: propia ?? null, curation: load.status };
+    }
 
     const found = load.verifications.find((v) => v.actuacionId === base.id);
 

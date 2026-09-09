@@ -23,6 +23,8 @@ export interface ProcedenciaDelBorrador {
   termStatus: 'VERIFICADO' | 'NO_CADUCA' | 'NO_VERIFICADO';
   termDescription: string | null;
   curadaPorLaFirma: boolean;
+  /** La actuación entera la añadió la firma: el catálogo no la trae. */
+  definidaPorLaFirma?: boolean;
   curadaPor: string | null;
   seccionesSinArticulo: number;
   seccionesTotales: number;

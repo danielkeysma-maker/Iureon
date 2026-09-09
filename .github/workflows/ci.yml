@@ -38,6 +38,8 @@ jobs:
         run: npm run check:admin-reglas
       - name: Self-service deletion rules (last user, last administrator, operator, typed firm name)
         run: npm run check:borrado
+      - name: Firm-defined actuaciones (slug, shadowing the catalogue, no term without source)
+        run: npm run check:actuaciones-firma
       - name: Transactional mail (templates, subjects, cuenta de cobro PDF)
         run: npm run check:mail
       - name: Catalogue correctness checks

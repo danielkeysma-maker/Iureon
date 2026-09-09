@@ -3,7 +3,9 @@ import { catalogService } from './catalog.service';
 import { validateVerificationInput } from './verification.validate';
 import { auditService } from '../audit/audit.service';
 import { verificationStore, VerificationStoreError } from './verification.store';
-import type { ActuacionRole, LegalBranch } from './types';
+import { firmActuacionStore, FirmActuacionStoreError } from './firmActuaciones.store';
+import { actuacionPropiaComoCatalogo } from './firmActuaciones.validate';
+import type { ActuacionRole, CatalogVerificationInput, LegalBranch } from './types';
 
 /**
  * Read endpoints are firm-scoped: they return the shipped catalogue with the
@@ -132,6 +134,71 @@ export const listVerificationsController = async (req: Request, res: Response): 
 };
 
 /**
+ * Cura una actuación propia de la firma, si el id es de una.
+ *
+ * Devuelve true cuando ya respondió (curada o error de guardado) y false
+ * cuando ese id no es de ninguna actuación de esta firma, para que el llamador
+ * siga con su 404 de siempre.
+ */
+const curarActuacionPropia = async (
+  req: Request,
+  res: Response,
+  firmId: string,
+  value: CatalogVerificationInput
+): Promise<boolean> => {
+  const load = await firmActuacionStore.listForFirm(firmId);
+  const propia = load.actuaciones.find((a) => a.id === value.actuacionId);
+
+  if (!propia) return false;
+
+  try {
+    const guardada = await firmActuacionStore.curate(firmId, propia.id, {
+      termStatus: value.termStatus,
+      legalBasis: value.legalBasis ?? null,
+      termDescription: value.termDescription ?? null,
+      sourceUrl: value.sourceUrl ?? null,
+      note: value.note ?? null
+    });
+
+    if (!guardada) {
+      res.status(404).json({
+        error: 'ACTUACION_NOT_FOUND',
+        message: `La actuación "${value.actuacionId}" no está entre las que añadió su firma.`
+      });
+      return true;
+    }
+
+    await auditService.record({
+      firmId,
+      userEmail: req.user?.email ?? 'desconocido',
+      action: 'CATALOG_TERM_VERIFIED',
+      resource: `Verificó actuación propia · ${guardada.exactName}`
+    });
+
+    res.json({
+      success: true,
+      verification: null,
+      actuacion: actuacionPropiaComoCatalogo(guardada)
+    });
+  } catch (error) {
+    if (error instanceof FirmActuacionStoreError) {
+      console.error(`[CATALOG] ${error.code}: ${error.message}`);
+      res.status(503).json({
+        error: error.code,
+        message:
+          error.code === 'STORE_NOT_CONFIGURED'
+            ? error.message
+            : 'La verificación no pudo guardarse. Revise la conexión con la base de datos e inténtelo de nuevo.'
+      });
+      return true;
+    }
+    throw error;
+  }
+
+  return true;
+};
+
+/**
  * PUT /api/catalog/verifications
  *
  * Records the firm's verification of one catalogued actuación. The id travels
@@ -168,7 +235,21 @@ export const saveVerificationController = async (req: Request, res: Response): P
   // unknown id is rejected rather than stored as an orphan row that would never
   // surface anywhere.
   const base = catalogService.getById(validation.value.actuacionId);
+
   if (!base) {
+    /*
+     * PUEDE SER UNA ACTUACIÓN QUE LA FIRMA AÑADIÓ, y curarla es exactamente el
+     * punto del producto: nació sin norma, y aquí es donde deja de estarlo.
+     *
+     * Se escribe en `firm_actuaciones` y no en `catalog_verifications` porque
+     * esa tabla corrige una ficha PUBLICADA —su `actuacion_id` tiene que
+     * existir en el catálogo— y esta no lo es. Misma pantalla, mismo
+     * formulario, misma regla de que un término sin fuente no entra; otra
+     * tabla, porque es otro objeto.
+     */
+    const propia = await curarActuacionPropia(req, res, firmId, validation.value);
+    if (propia) return;
+
     res.status(404).json({
       error: 'ACTUACION_NOT_FOUND',
       message: `La actuación "${validation.value.actuacionId}" no está en el catálogo.`
@@ -235,11 +316,41 @@ export const deleteVerificationController = async (req: Request, res: Response):
   }
 
   try {
+    /*
+     * REVERTIR UNA ACTUACIÓN PROPIA NO LA BORRA: le quita lo verificado.
+     *
+     * «Volver al catálogo base» no significa nada para una actuación que el
+     * catálogo base no trae; lo que sí significa es dejarla como nació, sin
+     * término y sin fuente, y así vuelve a mostrarse advertida. Retirarla de la
+     * lista es otro acto y tiene su propia ruta, `/catalog/firm-actuaciones`.
+     */
+    if (!catalogService.getById(actuacionId)) {
+      const load = await firmActuacionStore.listForFirm(firmId);
+      const propia = load.actuaciones.find((a) => a.id === actuacionId);
+
+      if (propia) {
+        await firmActuacionStore.curate(firmId, propia.id, {
+          termStatus: 'NO_VERIFICADO',
+          legalBasis: null,
+          termDescription: null,
+          sourceUrl: null,
+          note: propia.note
+        });
+        res.json({ success: true, actuacionId });
+        return;
+      }
+    }
+
     await verificationStore.remove(firmId, actuacionId);
     res.json({ success: true, actuacionId });
   } catch (error) {
     if (error instanceof VerificationStoreError) {
       respondStoreError(res, error);
+      return;
+    }
+    if (error instanceof FirmActuacionStoreError) {
+      console.error(`[CATALOG] ${error.code}: ${error.message}`);
+      res.status(503).json({ error: error.code, message: 'No se pudo revertir la verificación.' });
       return;
     }
     throw error;

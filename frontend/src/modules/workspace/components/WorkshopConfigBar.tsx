@@ -1,11 +1,28 @@
-import React, { useEffect, useMemo } from 'react';
-import { CheckCircle2, ChevronRight, CircleDashed, MinusCircle } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { CheckCircle2, ChevronRight, CircleDashed, MinusCircle, PenLine, Sparkles } from 'lucide-react';
 import { Combobox, type OpcionCombobox } from './Combobox';
 import { useActuacionLookup } from '../../catalog/hooks/useActuacion';
 import { useBranchActuacionesState } from '../../catalog/hooks/useBranchActuaciones';
 import { useCatalogBranchesState } from '../../catalog/hooks/useCatalogBranches';
 import { BRANCH_LABELS } from '../../catalog/branchLabels';
+import { GuiaEligeActuacionDialog } from './GuiaEligeActuacionDialog';
+import { ActuacionPropiaDialog } from './ActuacionPropiaDialog';
 import type { Actuacion, ActuacionRole } from '../../catalog/types';
+
+/*
+ * LAS DOS OPCIONES QUE NO SON ACTUACIONES.
+ *
+ * Viven en la misma lista porque es donde se busca la actuación: quien no la
+ * encuentra ya está mirando aquí, y mandarlo a otro sitio a pedir ayuda es
+ * pedirle que sepa que la ayuda existe. Nunca llegan a `documentType` — el
+ * `onChange` las intercepta y abre su diálogo—, así que no pueden viajar al
+ * motor como si fueran el nombre de un escrito.
+ *
+ * La de la guía va PRIMERA y la de escribir el nombre, ÚLTIMA. El orden es el
+ * de la conversación real: primero «no sé cuál es», al final «no está».
+ */
+const OPCION_GUIA = '__QUE_LA_GUIA_ELIJA__';
+const OPCION_PROPIA = '__ESCRIBIR_EL_NOMBRE__';
 
 /**
  * "De qué se trata este escrito": rol → rama → tipo, en una barra de 42px.
@@ -45,6 +62,16 @@ interface WorkshopConfigBarProps {
   setLegalBranch: (branch: string) => void;
   documentType: string;
   setDocumentType: (type: string) => void;
+  /*
+   * Los hechos que el abogado ya escribió en el cuadro de instrucción.
+   *
+   * Bajan hasta aquí porque «que la guía elija» orienta sobre ESOS hechos y no
+   * sobre otros: pedirlos otra vez en el diálogo obligaría a escribir dos veces
+   * lo mismo, y quien lo hiciera acabaría orientando sobre un resumen y
+   * redactando sobre el original.
+   */
+  hechos: string;
+  setHechos: (texto: string) => void;
 }
 
 /**
@@ -76,11 +103,18 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
   legalBranch,
   setLegalBranch,
   documentType,
-  setDocumentType
+  setDocumentType,
+  hechos,
+  setHechos
 }) => {
+  const [guiaAbierta, setGuiaAbierta] = useState(false);
+  const [propiaAbierta, setPropiaAbierta] = useState(false);
+  /** Sube al crear una actuación propia: obliga a releer la lista de la rama. */
+  const [recarga, setRecarga] = useState(0);
+
   const ramasEstado = useCatalogBranchesState();
   const ramas = ramasEstado.ramas;
-  const catalogo = useBranchActuacionesState(legalBranch, userRole);
+  const catalogo = useBranchActuacionesState(legalBranch, userRole, recarga);
   const lookup = useActuacionLookup(documentType, legalBranch);
   const actuacion = lookup.actuacion;
 
@@ -99,20 +133,52 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
    * respalda, justo sobre el dato que decide.
    */
   const opcionesTipo: OpcionCombobox[] = useMemo(
-    () =>
-      catalogo.actuaciones.map((a) => ({
+    () => [
+      {
+        valor: OPCION_GUIA,
+        etiqueta: 'Que la guía proponga la actuación',
+        detalle: 'a partir de los hechos que usted escribió',
+        icono: <Sparkles className="h-3.5 w-3.5 shrink-0 text-brand-700" strokeWidth={2.4} />
+      },
+      ...catalogo.actuaciones.map((a) => ({
         valor: a.exactName,
         etiqueta: a.exactName,
-        detalle:
-          a.term.status === 'NO_CADUCA'
-            ? 'No caduca'
-            : a.term.status === 'NO_VERIFICADO'
-            ? 'sin dato'
-            : a.term.description ?? '',
+        detalle: a.firmDefined
+          ? 'de su firma · sin norma verificada'
+          : a.term.status === 'NO_CADUCA'
+          ? 'No caduca'
+          : a.term.status === 'NO_VERIFICADO'
+          ? 'sin dato'
+          : a.term.description ?? '',
         icono: <IconoEstado actuacion={a} />
       })),
+      {
+        valor: OPCION_PROPIA,
+        etiqueta: 'Ninguna de estas: escribir el nombre…',
+        detalle: 'quedará en esta rama, sin norma verificada',
+        icono: <PenLine className="h-3.5 w-3.5 shrink-0 text-unverified" strokeWidth={2.4} />
+      }
+    ],
     [catalogo.actuaciones]
   );
+
+  /*
+   * Las dos opciones de servicio NUNCA se guardan como tipo de documento: abren
+   * su diálogo y el selector se queda como estaba. Si una llegara a `documentType`
+   * viajaría al motor como el nombre de un escrito y el catálogo no resolvería
+   * nada, que es exactamente el estado que este selector existe para impedir.
+   */
+  const elegirTipo = (valor: string) => {
+    if (valor === OPCION_GUIA) {
+      setGuiaAbierta(true);
+      return;
+    }
+    if (valor === OPCION_PROPIA) {
+      setPropiaAbierta(true);
+      return;
+    }
+    setDocumentType(valor);
+  };
 
   const verificadas = catalogo.actuaciones.filter((a) => a.term.status === 'VERIFICADO').length;
 
@@ -123,7 +189,7 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
    * 35 actuaciones pero un litigante ve 20, y la pantalla no decía por qué —
    * parecía que faltaban. Ahora se dice, y se dice dónde están las otras.
    */
-  const todasDeLaRama = useBranchActuacionesState(legalBranch);
+  const todasDeLaRama = useBranchActuacionesState(legalBranch, undefined, recarga);
   const otrosRoles = Math.max(0, todasDeLaRama.nombres.length - catalogo.nombres.length);
 
   /*
@@ -156,7 +222,47 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
   }, [documentType, todasDeLaRama, setDocumentType]);
 
   return (
-    /*
+    <>
+    {/*
+      LOS DIÁLOGOS CUELGAN DE LA BARRA, no del panel de instrucción, porque es
+      la barra la que ofrece las dos opciones y la que recibe su resultado: el
+      nombre elegido o el nombre escrito acaban los dos en este selector.
+    */}
+    <GuiaEligeActuacionDialog
+      abierto={guiaAbierta}
+      onCerrar={() => setGuiaAbierta(false)}
+      legalBranch={legalBranch}
+      hechos={hechos}
+      setHechos={setHechos}
+      onElegir={(exactName) => {
+        setDocumentType(exactName);
+        setGuiaAbierta(false);
+      }}
+      onEscribirNombre={() => {
+        setGuiaAbierta(false);
+        setPropiaAbierta(true);
+      }}
+    />
+
+    <ActuacionPropiaDialog
+      abierto={propiaAbierta}
+      onCerrar={() => setPropiaAbierta(false)}
+      legalBranch={legalBranch}
+      userRole={userRole}
+      onCreada={(exactName) => {
+        /*
+         * El orden importa: primero se pide la lista de nuevo y después se
+         * elige. Al revés, el efecto que suelta una actuación ajena a la rama
+         * la encontraría ausente de una lista todavía vieja y la borraría en
+         * el acto — el abogado la vería aparecer y desaparecer.
+         */
+        setRecarga((n) => n + 1);
+        setDocumentType(exactName);
+        setPropiaAbierta(false);
+      }}
+    />
+
+    {/*
       SIN `overflow` Y SIN `flex-wrap`, y las dos ausencias son deliberadas.
       
       `flex-wrap` haría que la barra creciera a 84px y empujara el documento
@@ -170,8 +276,8 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
       
       La solución es que los controles se ENCOJAN: cada uno trunca su texto y el
       nombre completo vive en su `title` y en la lista.
-    */
-    /*
+    */}
+    {/*
       EN MOVIL LA FILA SE DESPLAZA DENTRO DE SI MISMA, no ensancha la pagina.
       Son selectores de ancho fijo —170, 150, 110px— que a 375px suman mas que
       la pantalla; sin contenerlos, el desbordamiento se lo comia el documento y
@@ -181,7 +287,7 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
       EN DOS CHIPS con el termino y la fecha de vencimiento visibles en 390px.
       Eso es rehacer la barra, no contenerla; mientras tanto esto evita que rompa
       el resto, que es un defecto distinto y peor.
-    */
+    */}
     <div className="flex h-[42px] shrink-0 items-center gap-2 overflow-x-auto border-b border-line-200 bg-surface px-5 lg:overflow-x-visible">
       <span className="shrink-0 font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
         Este escrito
@@ -226,7 +332,7 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
         etiqueta="Tipo de documento"
         valor={documentType}
         opciones={opcionesTipo}
-        onChange={setDocumentType}
+        onChange={elegirTipo}
         vacio="Elegir actuación…"
         anchoBoton="max-w-[280px]"
         cargando={catalogo.estado === 'CARGANDO'}
@@ -319,5 +425,6 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
         )}
       </div>
     </div>
+    </>
   );
 };

@@ -40,6 +40,14 @@ export const NOVEDADES_ID = 'novedades';
 export const NOVEDADES: readonly Novedad[] = [
   {
     fecha: '2026-09-08',
+    titulo: 'En Redacción, la guía puede proponerle la actuación —y si ninguna sirve, usted la escribe',
+    detalle:
+      'El desplegable «Tipo de documento» abre ahora con «Que la guía proponga la actuación»: sobre los hechos que ya escribió, le propone actuaciones de la rama elegida con la razón de cada una y su término, artículo y autoridad a la vista, para que decida usted. Y al final de la lista, «Ninguna de estas: escribir el nombre…» le deja añadir la actuación que le falta: queda elegida en el acto y disponible en esa rama para toda su firma, marcada «sin norma verificada» hasta que alguien escriba su término y su fuente en «Catálogo».',
+    modulo: 'Redacción',
+    tipo: 'nuevo'
+  },
+  {
+    fecha: '2026-09-08',
     titulo: 'Work Sans, nueva letra para la interfaz y para el escrito',
     detalle:
       'En «Ajustes · Apariencia» puede elegir Work Sans como letra de la aplicación; IBM Plex Sans sigue siendo la de por defecto. En «Membrete» también está disponible como letra del escrito: se ve en pantalla, sale en el Word y va incrustada en el PDF, con negrita e itálica propias.',

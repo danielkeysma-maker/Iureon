@@ -159,6 +159,8 @@ const A_PRIMER_ESCRITO: ManualArticle = {
       pasos: [
         'Abra «Redacción» en la barra lateral. Si todavía no sabe qué actuación necesita, entre primero por «Orientación», describa los hechos y pulse «Orientar»: el catálogo le propone actuaciones y en cada una hay un botón «Redactar esta» que lo trae aquí con la actuación ya elegida.',
         'En la barra de arriba escoja «Quién escribe» —«Firma / Litigante», «Juez / Despacho» o «Secretaría»—, luego la «Rama» y, en «Tipo de documento», la actuación. Esa lista se arma desde el catálogo de la rama que escogió, así que cambiar de rama cambia la lista.',
+        'Si no sabe cuál actuación corresponde, abra el mismo desplegable y elija la primera opción, «Que la guía proponga la actuación». Se abre un cuadro con los hechos que ya escribió —puede completarlos ahí— y, al pulsar «Pedir la orientación», la guía propone actuaciones de esa rama con la razón de cada una y su término, artículo y autoridad a la vista. Nada se aplica solo: usted pulsa «Elegir esta» en la que decida.',
+        'Si ninguna sirve, la última opción del desplegable es «Ninguna de estas: escribir el nombre…». Escriba el nombre de la actuación como la nombraría en el escrito, con una nota opcional para su firma, y quedará elegida y disponible en esa rama para todos sus abogados. Aparece marcada «de su firma · sin norma verificada», porque nadie ha comprobado su artículo ni su término.',
         'En el cuadro «Qué debe hacer este escrito» cuente los hechos y la pretensión en lenguaje corriente. No hace falta redactar: hace falta contar.',
         'Pulse «Generar escrito» (dice «Proyectar providencia» si escribe un juez y «Generar acto» si escribe la secretaría), o use ⌘↵ en Mac y Ctrl+↵ en Windows. El escrito aparece a la derecha a medida que se produce.',
         'Lea el escrito con la barra de arriba del papel a la vista. Si el término de la actuación no está comprobado o la actuación no está catalogada, ahí aparece una franja ámbar y un chip «Término sin verificar» o «Sin catalogar»; si la firma ya la curó, una marca verde discreta; si no hay nada que advertir, nada.',
@@ -174,6 +176,12 @@ const A_PRIMER_ESCRITO: ManualArticle = {
       kind: 'aviso',
       texto:
         'Elegir la actuación del catálogo no es un formalismo. El nombre catalogado es lo que conecta el escrito con un artículo y un término comprobados; cualquier otro texto produce una estructura genérica sin norma detrás.'
+    },
+    {
+      kind: 'nota',
+      titulo: 'Cuando la actuación la escribe usted',
+      texto:
+        'Una actuación escrita por su firma no trae artículo, término ni secciones comprobados, y el escrito lo dirá con todas sus letras: la guía tiene prohibido inventarlos. Para que deje de advertirse, abra «Catálogo», búsquela, y escriba su término junto con la dirección donde lo leyó. Sin la fuente no se guarda, igual que en cualquier otra ficha. Desde ahí también puede retirarla de la lista de la firma.'
     },
     {
       kind: 'nota',

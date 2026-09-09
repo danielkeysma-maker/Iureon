@@ -5,9 +5,13 @@ import {
   CalendarClock,
   Infinity as InfinityIcon,
   Loader2,
+  PenLine,
   Search,
-  ShieldAlert
+  ShieldAlert,
+  Trash2
 } from 'lucide-react';
+import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
+import { firmActuacionesApi } from '../services/catalog.api';
 import { useCatalogCuration } from '../hooks/useCatalogCuration';
 import { VerificationForm } from './VerificationForm';
 import { ActuacionDetail } from './ActuacionDetail';
@@ -49,6 +53,9 @@ const STATUS_BADGE: Record<TermStatus, { label: string; className: string; icon:
 export const CatalogCurationView: React.FC = () => {
   const curation = useCatalogCuration();
   const [selected, setSelected] = useState<Actuacion | null>(null);
+  /** Retirar una actuación propia se pregunta: se la quita a toda la firma. */
+  const [confirmacion, setConfirmacion] = useState<Confirmacion | null>(null);
+  const [errorPropia, setErrorPropia] = useState<string | null>(null);
 
   // Follows the branch filter: reading eleven branches' caveats at once is the
   // same as reading none.
@@ -238,6 +245,18 @@ export const CatalogCurationView: React.FC = () => {
                             Tu firma
                           </span>
                         )}
+                        {/*
+                          LA AÑADIÓ LA FIRMA, y se dice en la lista y no solo en
+                          la ficha: el catálogo no la trae, así que el sello de
+                          «con término» que pueda llevar al lado lo puso alguien
+                          de esta casa, no una verificación de fábrica.
+                        */}
+                        {actuacion.firmDefined && (
+                          <span className="inline-flex items-center gap-1 rounded-full border border-dashed border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))] px-2 py-0.5 text-[10px] font-bold text-unverified">
+                            <PenLine className="w-3 h-3" />
+                            De su firma
+                          </span>
+                        )}
                       </div>
                     </div>
                   </button>
@@ -274,6 +293,67 @@ export const CatalogCurationView: React.FC = () => {
           */}
           <div className="max-h-[42%] shrink-0 overflow-y-auto border-b border-line-200 p-4">
             <ActuacionDetail actuacion={openActuacion} />
+
+            {/*
+              LO QUE ESTA PANTALLA LE APORTA A UNA ACTUACIÓN PROPIA, y es el
+              punto del producto: nació sin norma y aquí deja de estarlo. El
+              formulario de abajo es el MISMO con el que se cura una ficha de
+              fábrica —término y fuente, o no se guarda—, y en cuanto queda
+              escrito la advertencia desaparece de la lista y del selector de
+              Redacción.
+            */}
+            {openActuacion.firmDefined && (
+              <div className="mt-3 space-y-2">
+                <p className="notice-unverified">
+                  <PenLine className="mt-0.5 h-4 w-4 shrink-0 text-unverified" />
+                  <span className="text-justify [text-wrap:pretty]">
+                    Esta actuación la añadió su firma; el catálogo no la trae.
+                    {openActuacion.term.status === 'NO_VERIFICADO'
+                      ? ' Escriba abajo el término y la fuente donde lo leyó, y dejará de advertirse.'
+                      : ' El término que lleva lo verificó su firma, no el catálogo.'}
+                  </span>
+                </p>
+
+                {errorPropia && (
+                  <p className="rounded-control border border-[rgb(var(--danger-line))] bg-[rgb(var(--danger)/0.06)] px-3 py-2 text-[11px] text-danger">
+                    {errorPropia}
+                  </p>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setConfirmacion({
+                      titulo: 'Retirar la actuación de la lista',
+                      texto: (
+                        <>
+                          «{openActuacion.exactName}» dejará de ofrecerse en esta rama a todos los
+                          abogados de su firma. Los escritos ya redactados con ella no cambian.
+                        </>
+                      ),
+                      etiqueta: 'Retirar',
+                      peligro: true,
+                      onConfirmar: async () => {
+                        setErrorPropia(null);
+                        try {
+                          await firmActuacionesApi.eliminar(openActuacion.id);
+                          setSelected(null);
+                          await curation.reload();
+                        } catch (e) {
+                          setErrorPropia(
+                            e instanceof Error ? e.message : 'No se pudo retirar la actuación.'
+                          );
+                        }
+                      }
+                    })
+                  }
+                  className="btn-danger btn-sm"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  Retirar de la lista de la firma
+                </button>
+              </div>
+            )}
           </div>
           <div className="min-h-0 flex-1">
             <VerificationForm
@@ -291,6 +371,8 @@ export const CatalogCurationView: React.FC = () => {
           </div>
         </aside>
       )}
+
+      <ConfirmarDialog confirmacion={confirmacion} onCerrar={() => setConfirmacion(null)} />
     </div>
   );
 };

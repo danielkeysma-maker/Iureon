@@ -33,6 +33,47 @@ const formatTerm = (actuacion: Actuacion): string => {
 };
 
 /**
+ * Lo que se le dice al modelo cuando la actuación la escribió la FIRMA.
+ *
+ * ─── POR QUÉ NECESITA BLOQUE PROPIO ─────────────────────────────────────────
+ *
+ * El bloque normal empieza diciendo «los siguientes datos fueron verificados
+ * contra el texto de la norma». Para una actuación propia eso sería falso, y
+ * peor: le daría al modelo permiso para completar los huecos con lo que
+ * recuerde. Un modelo al que se le entrega una ficha vacía bajo un
+ * encabezamiento de ficha verificada no deja el artículo en blanco — lo
+ * inventa, con la misma confianza con la que escribe el resto.
+ *
+ * Así que aquí se invierte la instrucción: no hay ficha, no la fabriques, y
+ * DILO en el escrito. Que el documento salga declarando que su término no está
+ * verificado es exactamente lo que se busca: el abogado firma sabiendo qué
+ * comprobar, en vez de leer un plazo que nadie leyó.
+ */
+const renderFirmDefinedGuidance = (actuacion: Actuacion): string => {
+  const curada = actuacion.term.status !== 'NO_VERIFICADO';
+
+  const aportado = curada
+    ? `
+LO QUE LA FIRMA SÍ COMPROBÓ Y PUEDES USAR:
+FUNDAMENTO NORMATIVO (aportado por la firma): ${actuacion.legalBasis}
+${actuacion.term.status === 'NO_CADUCA' ? 'TÉRMINO' : 'TÉRMINO DE CADUCIDAD'} (aportado por la firma): ${actuacion.term.description}
+${actuacion.sourceUrl ? `FUENTE: ${actuacion.sourceUrl}` : ''}
+No añadas ningún otro artículo, plazo ni requisito a los anteriores.`
+    : `
+NO HAY TÉRMINO NI ARTÍCULO. No afirmes ninguno.
+EN EL PROPIO ESCRITO debes dejar constancia, con palabras llanas, de que el término aplicable a esta actuación no está verificado y debe comprobarse en la norma antes de radicar. No lo escondas en una nota al pie: dilo donde se lea.`;
+
+  return `ACTUACIÓN DEFINIDA POR LA FIRMA — "${actuacion.exactName}"
+
+ESTA ACTUACIÓN NO TIENE FICHA VERIFICADA EN EL CATÁLOGO. La añadió la propia firma porque el catálogo no la trae, y nadie ha comprobado contra la norma su artículo, su término ni las secciones que debe contener.
+
+PROHIBIDO INVENTAR: no escribas números de artículo, no afirmes plazos, términos ni caducidades, y no enuncies secciones como si una norma las exigiera. Si un requisito te parece necesario, descríbelo en palabras y di que debe verificarse; jamás le pongas una cita que no te hayan entregado aquí.
+${aportado}
+
+ESTRUCTURA: usa la estructura habitual de un escrito de esta clase en Colombia, y no la presentes como impuesta por ninguna norma.`;
+};
+
+/**
  * Renders the guidance block for an already-resolved actuación, or null when
  * none was catalogued — in which case the caller keeps its previous reference
  * structure.
@@ -42,6 +83,8 @@ const formatTerm = (actuacion: Actuacion): string => {
  */
 export const renderCatalogGuidance = (actuacion: Actuacion | null): string | null => {
   if (!actuacion) return null;
+
+  if (actuacion.firmDefined) return renderFirmDefinedGuidance(actuacion);
 
   const curated = actuacion.verification
     ? `\nORIGEN DEL DATO: verificado por la firma (${actuacion.verification.verifiedBy}). Prevalece sobre el catálogo base.`
@@ -113,6 +156,8 @@ export interface ProcedenciaDelBorrador {
   termDescription: string | null;
   /** La firma corrigió o confirmó esta ficha en su pantalla de curaduría. */
   curadaPorLaFirma: boolean;
+  /** La actuación entera la añadió la firma: ninguna norma verificada la respalda. */
+  definidaPorLaFirma: boolean;
   curadaPor: string | null;
   /** Secciones que el escrito debe traer y cuyo artículo no está confirmado. */
   seccionesSinArticulo: number;
@@ -136,6 +181,7 @@ export const resolverProcedencia = async (
     termStatus: actuacion.term.status,
     termDescription: actuacion.term.description,
     curadaPorLaFirma: Boolean(actuacion.verification),
+    definidaPorLaFirma: Boolean(actuacion.firmDefined),
     curadaPor: actuacion.verification?.verifiedBy ?? null,
     seccionesSinArticulo: actuacion.requiredSections.filter((s) => !s.basis).length,
     seccionesTotales: actuacion.requiredSections.length

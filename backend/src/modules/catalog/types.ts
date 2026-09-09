@@ -107,6 +107,16 @@ export interface Actuacion {
   /** Present only when this firm curated the entry in-product. */
   verification?: ActuacionVerification;
   /*
+   * LA ACTUACION LA ESCRIBIO LA FIRMA, no viene con el producto.
+   *
+   * Nadie de esta casa leyo una norma para ella: no hay articulo comprobado,
+   * ni termino, ni secciones exigidas. Se marca en el dato y no solo en la
+   * pantalla porque el motor de redaccion tambien tiene que saberlo — a un
+   * modelo al que se le entrega una ficha sin fundamento hay que PROHIBIRLE
+   * expresamente inventarle uno, que es justo lo que hace por defecto.
+   */
+  firmDefined?: boolean;
+  /*
    * TRANSVERSAL: la actuacion aplica en TODA rama, no solo en la suya.
    *
    * El derecho de peticion (art. 23 C.P., Ley 1755 de 2015) se ejerce ante
@@ -162,4 +172,44 @@ export interface CatalogMeta {
 export interface BranchCatalog {
   meta: CatalogMeta;
   actuaciones: Actuacion[];
+}
+
+
+/**
+ * Una actuacion que la firma anadio a una rama porque el catalogo no la trae.
+ *
+ * NACE SIN NORMA VERIFICADA, y esa es su condicion normal, no un defecto: el
+ * abogado escribio un nombre, no una ficha. Se ofrece igual porque la
+ * alternativa real no era una ficha mejor sino redactar bajo una actuacion que
+ * no es la suya, o no redactar.
+ *
+ * Los campos opcionales son la puerta de salida de esa condicion: cuando la
+ * firma escribe el termino Y su fuente en la pantalla de Catalogo — el mismo
+ * formulario con el que cura una ficha de fabrica — la actuacion deja de
+ * mostrarse advertida. El termino sin la fuente no basta, ni aqui ni en la
+ * base: `chk_firm_actuacion_unverified_has_no_term`.
+ */
+export interface FirmActuacion {
+  /** Slug derivado de area + nombre, p. ej. 'civil/demanda-de-oposicion'. */
+  id: string;
+  area: LegalBranch;
+  exactName: string;
+  role: ActuacionRole;
+  /** Nace NO_VERIFICADO. Solo la curaduría de la firma lo mueve. */
+  termStatus: TermStatus;
+  legalBasis: string | null;
+  termDescription: string | null;
+  sourceUrl: string | null;
+  note: string | null;
+  createdBy: string;
+  createdAt: string;
+}
+
+/** Lo que llega al crear una actuacion propia. Se valida antes de escribirla. */
+export interface FirmActuacionInput {
+  area: string;
+  exactName: string;
+  role?: string;
+  note?: string | null;
+  createdBy: string;
 }

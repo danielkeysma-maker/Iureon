@@ -4,6 +4,7 @@ import type {
   ActuacionRole,
   CatalogMeta,
   CurationStatus,
+  FirmActuacion,
   LegalBranch,
   VerificationInput
 } from '../types';
@@ -100,6 +101,36 @@ export const catalogApi = {
 };
 
 /**
+ * Las actuaciones que la firma añadió a una rama porque el catálogo no la trae.
+ *
+ * LAS TRES LLAMADAS LANZAN AL FALLAR, incluida la lectura, y ahí se aparta de
+ * `resolve`. Un fallo de resolución no se dice porque el panel simplemente no
+ * aparece; aquí la pantalla existe para mostrar esta lista, y presentarla vacía
+ * cuando no se pudo leer haría creer que la actuación añadida ayer se perdió.
+ */
+export const firmActuacionesApi = {
+  listar: () =>
+    httpClient.get<{
+      success: boolean;
+      estado: CurationStatus;
+      actuaciones: FirmActuacion[];
+      comoCatalogo: Actuacion[];
+    }>('/api/catalog/firm-actuaciones', {}),
+
+  crear: (input: { area: LegalBranch; exactName: string; role?: ActuacionRole; note?: string | null }) =>
+    httpClient.post<{ success: boolean; actuacion: FirmActuacion; comoCatalogo: Actuacion }>(
+      '/api/catalog/firm-actuaciones',
+      { body: input }
+    ),
+
+  eliminar: (id: string) =>
+    httpClient.delete<{ success: boolean; id: string }>(
+      `/api/catalog/firm-actuaciones?id=${encodeURIComponent(id)}`,
+      {}
+    )
+};
+
+/**
  * Orientacion desde unos hechos hacia las actuaciones que podrian aplicar.
  *
  * `descartadas` son los nombres que el modelo propuso y el catalogo no
@@ -137,8 +168,16 @@ export interface OrientacionGuardada {
 }
 
 export const triageApi = {
-  orientar: (hechos: string) =>
-    httpClient.post<TriageResponse>('/api/catalog/triage', { body: { hechos } }),
+  /**
+   * @param branch cuando el abogado ya eligió la rama en Redacción: acota el
+   *        menú del catálogo a esa rama y descarta lo que caiga fuera. Desde
+   *        Orientación no se manda, porque cuál es la rama es justamente lo
+   *        que se está preguntando.
+   */
+  orientar: (hechos: string, branch?: LegalBranch) =>
+    httpClient.post<TriageResponse>('/api/catalog/triage', {
+      body: branch ? { hechos, branch } : { hechos }
+    }),
 
   /** El historial de la firma con sus huecos agrupados. */
   historial: () =>

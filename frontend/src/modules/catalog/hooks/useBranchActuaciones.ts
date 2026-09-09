@@ -38,9 +38,16 @@ export type BranchActuaciones =
  * rama: Constitucional tiene 35 actuaciones y un litigante ve 20, y sin esa
  * comparación la pantalla parecía estar perdiendo actuaciones.
  */
+/**
+ * @param recarga cambia para volver a pedir la lista sin cambiar de rama ni de
+ *        rol. Hace falta desde que la firma puede AÑADIR actuaciones: sin esto,
+ *        la recién creada no aparecía hasta cambiar de rama y volver, y el
+ *        desplegable parecía haberla perdido.
+ */
 export const useBranchActuacionesState = (
   branch: string,
-  role?: ActuacionRole
+  role?: ActuacionRole,
+  recarga = 0
 ): BranchActuaciones => {
   const [estado, setEstado] = useState<BranchActuaciones>({
     estado: 'CARGANDO',
@@ -87,7 +94,7 @@ export const useBranchActuacionesState = (
     return () => {
       cancelled = true;
     };
-  }, [branch, role]);
+  }, [branch, role, recarga]);
 
   return estado;
 };
