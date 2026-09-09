@@ -58,8 +58,9 @@ export const desenlaceDeFallo = (
         `por solicitud (${Math.round(TOPE_DE_FUNCION_MS / 1000)} segundos, de los cuales ` +
         `${Math.round(PLAZO_REDACCION_MS / 1000)} son para escribir). No se descontó saldo: ` +
         `su reserva ya volvió a la cuenta. Esto no depende de la extensión de su caso ni de ` +
-        `nada que usted pueda cambiar; es un límite del plan de alojamiento y estamos ` +
-        `ampliándolo. Vuelva a intentarlo más tarde.`
+        `nada que usted pueda cambiar. Vuelva a intentarlo: si vuelve a ocurrir, ` +
+        `avísenos, porque con el plan actual un escrito corriente cabe de sobra y ` +
+        `que no quepa significa que algo va mal de nuestro lado.`
     };
   }
 

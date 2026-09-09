@@ -3,14 +3,19 @@
  *
  * ─── POR QUÉ EXISTE ESTE ARCHIVO, MEDIDO EL 9 DE SEPTIEMBRE DE 2026 ─────────
  *
- * `vercel.json` fija `maxDuration: 60`, que es el techo del plan Hobby. Tres
+ * Cuando `vercel.json` fijaba `maxDuration: 60` —el techo del plan Hobby— tres
  * corridas del pipeline real contra los motores, con una actuación del catálogo
  * y hechos de tamaño corriente, dieron 153,6 s · 141,0 s · 129,8 s. La
- * plataforma mata la función a los 60 s, así que el borrador NUNCA llegaba a
+ * plataforma mataba la función a los 60 s, así que el borrador NUNCA llegaba a
  * producción; y como la reserva del saldo se toma antes de llamar a ningún
  * modelo y el proceso muere sin ejecutar su `catch`, la firma se quedaba con el
  * saldo descontado, sin escrito y sin mensaje. El navegador tampoco lo notaba:
  * el flujo SSE simplemente se cortaba y la pantalla se quedaba en «REDACTANDO».
+ *
+ * El 9 de septiembre de 2026 se subió el plan a Pro y con él el tope a 300 s.
+ * El reparto de abajo NO desaparece por eso: sigue siendo lo que hace que el
+ * corte lo dé este código y no la plataforma, que es la diferencia entre
+ * devolver la reserva con un motivo y morir en silencio.
  *
  * De ahí la doctrina que este módulo impone, la misma que ya rige en la
  * revisión de escritos (`review/documentReview.controller.ts`, `conLimite`):
@@ -29,7 +34,7 @@
  */
 
 /** Espejo de `maxDuration` en `vercel.json`. Hobby: 60 s. Pro: 300 s. */
-export const TOPE_DE_FUNCION_MS = 60_000;
+export const TOPE_DE_FUNCION_MS = 300_000;
 
 /**
  * Lo que queda reservado DESPUÉS de la última etapa: cobrar la operación,
@@ -64,13 +69,14 @@ export const PLAZO_JURISPRUDENCIA_MS = 8_000;
 /**
  * Etapa 2 — redacción (Opus).
  *
- * Es el remanente, y NO alcanza en el plan Hobby: Opus escribe a unos 75 tokens
- * de salida por segundo, así que en 33 s caben ~2.500 tokens (≈5.000 caracteres,
- * dos páginas) contra los 14.600–21.400 caracteres que produce un escrito
- * completo. Medido: 84,8 s con `reasoning_effort: 'low'` y 124,7 s con
- * `'medium'`. El número se deja aquí, honesto y visible, en vez de fingir que
- * cabe: mientras el plan sea Hobby la redacción de un caso corriente agota su
- * presupuesto, la reserva vuelve y el abogado lee por qué.
+ * Es el remanente. Con el tope de Hobby eran 33 s y NO alcanzaba: Opus escribe
+ * a unos 75 tokens de salida por segundo, así que en 33 s caben ~2.500 tokens
+ * (≈5.000 caracteres, dos páginas) contra los 14.600–21.400 caracteres de un
+ * escrito completo, y la redacción de cualquier caso agotaba su presupuesto.
+ * Con el tope de Pro son 273 s, y lo medido cabe con holgura: 84,8 s con
+ * `reasoning_effort: 'low'` y 124,7 s con `'medium'`. El presupuesto sigue
+ * existiendo porque un plazo generoso no es un plazo ausente — si un motor se
+ * cuelga, quien corta es este código y la reserva vuelve.
  */
 export const PLAZO_REDACCION_MS =
   TOPE_DE_FUNCION_MS - RESERVA_DE_CIERRE_MS - PLAZO_HECHOS_MS - PLAZO_JURISPRUDENCIA_MS - 2_000;
