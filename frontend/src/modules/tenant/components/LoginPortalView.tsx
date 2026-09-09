@@ -48,8 +48,8 @@ interface LoginPortalViewProps {
  */
 const PRUEBAS = [
   {
-    /* 858 de 860 catalogadas: las dos restantes están marcadas NO_VERIFICADO y no se cuentan. Contado el 4 de septiembre de 2026 sobre catalog/data. */
-    cifra: '858',
+    /* 879 de 881 catalogadas: las dos restantes están marcadas NO_VERIFICADO y no se cuentan. Contado el 9 de septiembre de 2026 sobre catalog/data. */
+    cifra: '879',
     texto: 'actuaciones procesales en 28 ramas, verificadas contra el texto oficial de la norma'
   },
   {
