@@ -635,7 +635,14 @@ const TarjetaUtilidad: React.FC<{ u: Utilidad }> = ({ u }) => {
       type="button"
       onClick={u.abrir}
       className={[
-        'min-w-0 overflow-hidden rounded-card border text-left [overflow-wrap:anywhere]',
+        /*
+          RADIO PROPIO, NO EL DE LA FICHA CORRIENTE. La maqueta dibuja estas
+          tarjetas con 20 px en el computador y 16 en el teléfono; `rounded-card`
+          son 6, y con ese radio el relieve no se lee como una tarjeta que flota
+          sino como una caja con sombra. Al pasar el cursor sube a 22, un paso
+          corto: desde 6 el salto era un brinco.
+        */
+        'min-w-0 overflow-hidden rounded-[16px] border text-left md:rounded-[20px] [overflow-wrap:anywhere]',
         /*
           LA TARJETA FLOTA AL PASAR EL CURSOR, que es lo que pedia la maqueta y
           se habia quedado en un simple cambio de borde: sube tres pixeles, la
@@ -645,10 +652,20 @@ const TarjetaUtilidad: React.FC<{ u: Utilidad }> = ({ u }) => {
           tactil se queda pegado despues de tocar. Se respeta a quien pidio
           menos movimiento en su sistema.
         */
+        /*
+          Y EN EL TELEFONO FLOTA SIN CURSOR. Un `:hover` tactil se queda pegado
+          despues de tocar, asi que alli el relieve no se activa: se lleva
+          puesto. La tarjeta reposa con una sombra difusa —eso es lo que se lee
+          como «esta por delante del papel»— y responde al dedo hundiendose un
+          pixel mientras se mantiene pulsada, que es el gesto que el sistema
+          entiende. En el computador manda el cursor, como en la maqueta.
+        */
         'transition-[transform,box-shadow,border-color,border-radius] duration-300 ease-[cubic-bezier(.4,0,.2,1)]',
+        'shadow-[0_12px_28px_-22px_rgb(var(--rail-ink)/0.45)] md:shadow-none',
+        'active:translate-y-px active:shadow-[0_6px_16px_-14px_rgb(var(--rail-ink)/0.5)] md:active:translate-y-0',
         'hover:border-[rgb(var(--rail-gold)/0.55)]',
         'md:hover:-translate-y-[3px] md:hover:rounded-[22px] md:hover:shadow-[0_26px_50px_-30px_rgb(var(--rail-ink)/0.4)]',
-        'motion-reduce:transition-none motion-reduce:hover:translate-y-0',
+        'motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:active:translate-y-0',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700/40',
         fondo,
         ancha
