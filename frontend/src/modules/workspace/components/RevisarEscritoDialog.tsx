@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, CheckCircle2, ClipboardCheck, Copy, Download, FileText, History, Trash2, UploadCloud, X } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, ClipboardCheck, Copy, Download, FileText, History, Loader2, Sparkles, Trash2, UploadCloud, X } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import { ApiError } from '../../../config/httpClient';
 import { archivoABase64, reviewApi, type ConsentimientoDeGuardado, type RespuestaDeRevision, type RevisionGuardada } from '../services/review.api';
@@ -9,6 +9,14 @@ import { exportarInformeAPdf, exportarInformeAWord } from '../services/informeEx
 import type { DatosDelInforme } from '../services/informeLayout';
 import type { DatosDelTaller } from './TallerDeRevision';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
+import { Combobox, type OpcionCombobox } from './Combobox';
+import { useCatalogBranchesState } from '../../catalog/hooks/useCatalogBranches';
+import { useBranchActuacionesState } from '../../catalog/hooks/useBranchActuaciones';
+import { BRANCH_LABELS } from '../../catalog/branchLabels';
+import { GuiaEligeActuacionDialog } from './GuiaEligeActuacionDialog';
+import { ActuacionPropiaDialog } from './ActuacionPropiaDialog';
+import { textoDelArchivo } from '../services/textoDelArchivo';
+import type { ActuacionRole } from '../../catalog/types';
 
 /**
  * Revisar un escrito ya redactado.
@@ -36,6 +44,26 @@ import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDia
  * cuando el trabajo ya estaba en riesgo. Un abogado sin autoridad no se
  * bloquea nunca: revisa igual y al terminar se le dice qué no se conserva y a
  * quién pedirlo.
+ *
+ * ─── DE DÓNDE SALE LA ACTUACIÓN ─────────────────────────────────────────────
+ *
+ * Abierto desde Redacción, la hereda: la barra de configuración ya la tiene
+ * elegida y este diálogo solo la usa. Abierto desde «Revisiones» no hay nada
+ * que heredar, y ese era el defecto de uso que se reportó: para revisar había
+ * que pasar por el panel de Redacción —que enreda, porque no se va a redactar
+ * nada— y encima había que saber de antemano CÓMO SE LLAMA en el catálogo el
+ * escrito que uno acaba de recibir. Nadie que sube un documento a revisar lo
+ * sabe.
+ *
+ * Con `eligeActuacion` el diálogo se vuelve autosuficiente: trae su propia
+ * rama y su propia actuación —las dos leídas del catálogo por API, nunca de
+ * listas escritas a mano— y ofrece que la guía las proponga leyendo el texto
+ * del archivo en el navegador, sin costo y sin subirlo.
+ *
+ * LO QUE NO CAMBIA: la petición viaja SIEMPRE con una actuación real escogida
+ * por una persona. El servidor sigue respondiendo 400 si falta, y aquí no se
+ * inventa ningún valor por defecto: mientras nadie haya elegido, el botón está
+ * apagado y dice por qué.
  */
 
 interface RevisarEscritoDialogProps {
@@ -48,6 +76,16 @@ interface RevisarEscritoDialogProps {
   onSaldoCambiado?: () => void;
   /** Abre el taller: el escrito con los pasajes marcados, edicion y chat con el revisor. */
   onAbrirTaller?: (datos: DatosDelTaller) => void;
+  /**
+   * El diálogo elige la actuación por su cuenta, porque no la heredó de ninguna
+   * barra de configuración. Lo enciende «Revisiones»; Redacción no lo pasa.
+   */
+  eligeActuacion?: boolean;
+  /**
+   * Quién firma. Solo se usa para crear una actuación propia de la firma desde
+   * aquí, y es el mismo valor con el que trabaja el espacio de redacción.
+   */
+  userRole?: ActuacionRole;
 }
 
 /*
@@ -73,7 +111,9 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
   legalBranch,
   precioCop,
   onSaldoCambiado,
-  onAbrirTaller
+  onAbrirTaller,
+  eligeActuacion = false,
+  userRole = 'LITIGANTE'
 }) => {
   const [archivo, setArchivo] = React.useState<File | null>(null);
   const [texto, setTexto] = React.useState('');
@@ -105,6 +145,75 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
   const [confirmacion, setConfirmacion] = React.useState<Confirmacion | null>(null);
   /** El texto del escrito y la conversacion de la revision en pantalla, para abrir el taller. */
   const [paraElTaller, setParaElTaller] = React.useState<{ texto: string | null; conversacion: DatosDelTaller['conversacion']; anotaciones: NonNullable<DatosDelTaller['anotaciones']>; versiones: NonNullable<DatosDelTaller['versiones']>; guardaTexto: boolean; revisionId: string | null; archivo: File | null }>({ texto: null, conversacion: [], anotaciones: [], versiones: [], guardaTexto: false, revisionId: null, archivo: null });
+
+  /* ─── LA ACTUACIÓN CUANDO NO SE HEREDA ─────────────────────────────────────
+   *
+   * Dos estados propios que SOLO mandan con `eligeActuacion`. Sin él, el
+   * diálogo sigue leyendo las props tal como venía haciéndolo desde Redacción:
+   * esto es aditivo y el recorrido viejo no cambia ni un renglón.
+   */
+  const [ramaPropia, setRamaPropia] = React.useState(legalBranch);
+  const [tipoPropio, setTipoPropio] = React.useState(documentType);
+  const rama = eligeActuacion ? ramaPropia : legalBranch;
+  const tipo = eligeActuacion ? tipoPropio : documentType;
+
+  /** Sube al crear una actuación propia: obliga a releer la lista de la rama. */
+  const [recargaCatalogo, setRecargaCatalogo] = React.useState(0);
+  const [guiaAbierta, setGuiaAbierta] = React.useState(false);
+  const [propiaAbierta, setPropiaAbierta] = React.useState(false);
+  /*
+   * Los hechos con los que se consulta el triaje son EL TEXTO DEL ESCRITO. No
+   * se le pide al abogado que cuente otra vez lo que ya está en el archivo que
+   * acaba de adjuntar.
+   */
+  const [hechos, setHechos] = React.useState('');
+  const [leyendoArchivo, setLeyendoArchivo] = React.useState(false);
+  const [avisoDeLectura, setAvisoDeLectura] = React.useState('');
+  /*
+   * EL ARCHIVO SE LEE UNA SOLA VEZ. Volver a abrir la guía sobre el mismo
+   * archivo no vuelve a descomprimir el PDF ni el Word; cambiarlo sí, porque
+   * entonces los hechos son otros.
+   */
+  const archivoLeido = React.useRef<File | null>(null);
+
+  const ramasEstado = useCatalogBranchesState();
+  /*
+   * SIN FILTRAR POR ROL, a diferencia de la barra de Redacción. Allí el abogado
+   * ya declaró quién firma el escrito que va a redactar; aquí está revisando un
+   * documento que puede venir de cualquiera —un auto del despacho, un traslado
+   * de la secretaría—, y esconderle actuaciones por un rol que nadie eligió
+   * sería esconderle justamente la que busca.
+   */
+  const catalogoDeLaRama = useBranchActuacionesState(rama, undefined, recargaCatalogo);
+
+  const opcionesRama: OpcionCombobox[] = React.useMemo(
+    () => ramasEstado.ramas.map((b) => ({ valor: b, etiqueta: BRANCH_LABELS[b] ?? b })),
+    [ramasEstado.ramas]
+  );
+
+  /*
+   * Cada actuación con su término a la vista, como en el selector de Redacción:
+   * el abogado tiene que poder ver ANTES de elegir si el plazo está verificado
+   * contra la norma, si no caduca o si nadie lo comprobó. Un visto verde en
+   * todas afirmaría una verificación que el catálogo no respalda.
+   */
+  const opcionesTipo: OpcionCombobox[] = React.useMemo(
+    () =>
+      catalogoDeLaRama.actuaciones.map((a) => ({
+        valor: a.exactName,
+        etiqueta: a.exactName,
+        detalle: a.porRemision
+          ? a.porRemision.marca
+          : a.firmDefined
+          ? 'de su firma · sin norma verificada'
+          : a.term.status === 'NO_CADUCA'
+          ? 'No caduca'
+          : a.term.status === 'NO_VERIFICADO'
+          ? 'sin dato'
+          : a.term.description ?? ''
+      })),
+    [catalogoDeLaRama.actuaciones]
+  );
 
   /*
    * La autorización de la firma, leída al abrir. `el === null` significa que
@@ -185,10 +294,23 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
     setError('');
     setRespuesta(null);
     setOcupado(false);
-  }, [abierto]);
+    /*
+     * La actuación elegida a mano también se suelta al cerrar: el diálogo que
+     * se abre desde «Revisiones» empieza siempre en blanco, y arrastrar la del
+     * escrito anterior sería exactamente la trampa que este cambio evita —
+     * revisar un documento contra la ficha de otro sin que nadie lo eligiera.
+     */
+    setRamaPropia(legalBranch);
+    setTipoPropio(documentType);
+    setHechos('');
+    setAvisoDeLectura('');
+    archivoLeido.current = null;
+    // Las props son la configuración heredada: si cambian con el diálogo
+    // cerrado, lo que se restaura es la nueva.
+  }, [abierto, legalBranch, documentType]);
 
   const hayEscrito = archivo !== null || texto.trim().length > 0;
-  const sinActuacion = !documentType || /^elegir/i.test(documentType);
+  const sinActuacion = !tipo || /^elegir/i.test(tipo);
 
   const elegirArchivo = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0] ?? null;
@@ -199,7 +321,48 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
       return;
     }
     setError('');
+    setAvisoDeLectura('');
     setArchivo(f);
+  };
+
+  /*
+   * ─── QUE LA GUÍA DIGA QUÉ ACTUACIÓN ES ────────────────────────────────────
+   *
+   * El texto se saca del archivo AQUÍ, en el navegador, con el servicio
+   * compartido: ni una subida ni un peso antes de que el abogado decida si
+   * sigue. Un PDF escaneado no trae texto y eso se dice con esas palabras, en
+   * vez de mandar una cadena vacía al triaje y recibir un «no reconozco nada»
+   * que parecería un fallo del catálogo.
+   *
+   * La guía PROPONE; elige una persona. Este botón no escribe `tipo`: lo
+   * escribe el `onElegir` del diálogo, con el nombre exacto del catálogo.
+   */
+  const pedirLaGuia = async () => {
+    if (leyendoArchivo) return;
+    setAvisoDeLectura('');
+    if (!archivo) {
+      /* Texto pegado: ya está leído, no hay archivo que abrir. */
+      setHechos(texto.trim());
+      setGuiaAbierta(true);
+      return;
+    }
+    if (archivoLeido.current === archivo && hechos) {
+      setGuiaAbierta(true);
+      return;
+    }
+    setLeyendoArchivo(true);
+    try {
+      const leido = await textoDelArchivo(archivo);
+      if (!leido.ok) {
+        setAvisoDeLectura(leido.motivo);
+        return;
+      }
+      archivoLeido.current = archivo;
+      setHechos(leido.texto);
+      setGuiaAbierta(true);
+    } finally {
+      setLeyendoArchivo(false);
+    }
   };
 
   /*
@@ -255,14 +418,14 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
         setSubiendo(null);
         cuerpo = { fileName: archivo.name, storageKey, conservarOriginal, contentType: archivo.type || undefined };
       }
-      setTituloDelInforme(documentType);
+      setTituloDelInforme(tipo);
       setOrigenDelInforme({
         fileName: cuerpo.fileName,
         fecha: new Date().toLocaleString('es-CO', { dateStyle: 'long', timeStyle: 'short' }),
         cliente: cliente.trim(),
         revisadoPor: ''
       });
-      const r = await reviewApi.revisar({ documentType, legalBranch, pregunta, cliente: cliente.trim(), ...cuerpo });
+      const r = await reviewApi.revisar({ documentType: tipo, legalBranch: rama, pregunta, cliente: cliente.trim(), ...cuerpo });
       setParaElTaller({ texto: r.texto ?? null, conversacion: [], anotaciones: [], versiones: [], guardaTexto: Boolean(r.guardaTexto), revisionId: r.id ?? null, archivo });
       setRespuesta(r);
       onSaldoCambiado?.();
@@ -281,7 +444,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
     const i = respuesta.informe;
     const bloque = (t: string, xs: string[]) => (xs.length ? `${t}\n${xs.map((x) => `- ${x}`).join('\n')}\n` : '');
     return [
-      `REVISIÓN · ${documentType}`,
+      `REVISIÓN · ${tipo}`,
       '',
       i.resumen,
       '',
@@ -356,7 +519,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
       subtitulo={
         sinActuacion
           ? 'Elija primero la actuación arriba: la revisión objetiva se hace contra su ficha.'
-          : `Contra la ficha de «${documentType}» · ${consentimiento?.guarda ? 'el escrito y su trabajo se conservan para la firma' : 'el documento no se guarda'}`
+          : `Contra la ficha de «${tipo}» · ${consentimiento?.guarda ? 'el escrito y su trabajo se conservan para la firma' : 'el documento no se guarda'}`
       }
       hayCambiosSinGuardar={ocupado}
       onIntentoDeCerrarConCambios={() => undefined}
@@ -380,7 +543,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
                   onAbrirTaller({
                     revisionId: paraElTaller.revisionId,
                     documentType: tituloDelInforme,
-                    legalBranch: legalBranch || null,
+                    legalBranch: rama || null,
                     fileName: origenDelInforme.fileName || 'escrito',
                     cliente: origenDelInforme.cliente,
                     texto: paraElTaller.texto as string,
@@ -456,7 +619,17 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
                 <FileText className="h-4 w-4 shrink-0 text-ink-400" />
                 <span className="min-w-0 flex-1 truncate text-ui text-ink-900">{archivo.name}</span>
                 <span className="shrink-0 font-mono text-[11px] text-ink-400">{(archivo.size / 1024).toFixed(0)} KB</span>
-                <button type="button" onClick={() => setArchivo(null)} className="text-ink-400 hover:text-danger" aria-label="Quitar archivo">
+                <button
+                  type="button"
+                  onClick={() => {
+                    /* Otro archivo son otros hechos: lo leído del anterior no puede sobrevivirle. */
+                    setArchivo(null);
+                    setAvisoDeLectura('');
+                    archivoLeido.current = null;
+                  }}
+                  className="text-ink-400 hover:text-danger"
+                  aria-label="Quitar archivo"
+                >
                   <X className="h-3.5 w-3.5" />
                 </button>
               </div>
@@ -482,6 +655,111 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
               lo que pase de ahí se declara recortado.
             </p>
           </div>
+
+          {/* ─── QUÉ ACTUACIÓN ES ─────────────────────────────────────────────
+              Solo cuando no se heredó. Va DESPUÉS del escrito y no antes,
+              porque ese es el orden real de quien revisa: primero tiene el
+              documento en la mano, y solo entonces puede decirse —o
+              preguntarse— cómo se llama. Al revés era el defecto que se
+              reportó: había que saber la actuación antes de poder subir nada.
+
+              EN EL TELÉFONO LOS DOS SELECTORES SE APILAN. Son dos controles con
+              nombres largos («Superintendencias (SIC, Salud, Financiera,
+              SSPD)») y un ítem flex no baja del ancho mínimo de su contenido:
+              en una fila a 320px el segundo quedaría fuera. Cada uno va
+              envuelto en `min-w-0 flex-1` para que encoja de verdad, y el botón
+              trunca con su nombre completo en el `title`. */}
+          {eligeActuacion && (
+            <div>
+              <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">Qué actuación es</p>
+              <p className="mt-1 text-[11px] leading-snug text-ink-500 text-justify">
+                La revisión objetiva se hace contra la ficha verificada de la actuación: por eso hay que decir cuál es. Si no lo sabe
+                —que es lo normal cuando el escrito viene de otro—, la guía la propone leyendo el archivo, con el término, el artículo y
+                la autoridad a la vista, y usted escoge.
+              </p>
+              <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+                <div className="min-w-0 flex-1">
+                  <Combobox
+                    etiqueta="Rama"
+                    valor={rama}
+                    opciones={opcionesRama}
+                    onChange={(v) => {
+                      setRamaPropia(v);
+                      /* Una actuación no sobrevive a su rama: la del catálogo anterior no está en esta. */
+                      setTipoPropio('');
+                    }}
+                    vacio="Elegir rama…"
+                    anchoBoton="max-w-full"
+                    cargando={ramasEstado.estado === 'CARGANDO'}
+                    pie={
+                      ramasEstado.estado === 'ERROR'
+                        ? 'No se pudo leer el catálogo. Revise la conexión y vuelva a intentarlo.'
+                        : ramasEstado.estado === 'CARGANDO'
+                        ? 'Consultando las ramas del catálogo…'
+                        : `${ramasEstado.ramas.length} ramas. La rama decide qué actuaciones se ofrecen y con qué término.`
+                    }
+                  />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <Combobox
+                    etiqueta="Actuación"
+                    valor={tipo}
+                    opciones={opcionesTipo}
+                    onChange={setTipoPropio}
+                    vacio={rama ? 'Elegir actuación…' : 'Elija primero la rama'}
+                    anchoBoton="max-w-full"
+                    cargando={Boolean(rama) && catalogoDeLaRama.estado === 'CARGANDO'}
+                    pie={
+                      !rama
+                        ? 'Sin rama no hay lista: cada rama tiene su propio catálogo.'
+                        : catalogoDeLaRama.estado === 'CARGANDO'
+                        ? 'Consultando el catálogo de esta rama…'
+                        : catalogoDeLaRama.estado === 'LISTA'
+                        ? `${catalogoDeLaRama.nombres.length} actuaciones en esta rama, con el término de cada una.`
+                        : 'Esta rama aún no tiene catálogo verificado.'
+                    }
+                  />
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => void pedirLaGuia()}
+                disabled={!rama || !hayEscrito || leyendoArchivo}
+                className="mt-2 flex w-full items-center gap-2.5 rounded-control border border-[rgb(var(--brand-line))] bg-brand-50 px-3 py-2 text-left hover:border-brand-700 disabled:opacity-50"
+              >
+                {leyendoArchivo ? (
+                  <Loader2 className="h-4 w-4 shrink-0 animate-spin text-brand-700" />
+                ) : (
+                  <Sparkles className="h-4 w-4 shrink-0 text-brand-700" />
+                )}
+                <span className="min-w-0 flex-1">
+                  <span className="block text-ui font-medium text-ink-900">
+                    {leyendoArchivo ? 'Leyendo el escrito…' : 'Que la guía diga qué actuación es'}
+                  </span>
+                  <span className="block text-[11px] leading-snug text-ink-500">
+                    Lee el archivo en su navegador —no lo sube, no cuesta nada— y propone candidatas del catálogo con su ficha.
+                  </span>
+                </span>
+              </button>
+
+              {!rama && (
+                <p className="mt-1.5 text-[11px] leading-snug text-ink-500 text-justify">
+                  Elija la rama para poder pedirle la propuesta a la guía: el catálogo propone dentro de una rama, nunca a ciegas.
+                </p>
+              )}
+              {rama && !hayEscrito && (
+                <p className="mt-1.5 text-[11px] leading-snug text-ink-500 text-justify">
+                  Suba el archivo o pegue el texto: la guía propone sobre lo que dice el escrito, no sobre suposiciones.
+                </p>
+              )}
+              {avisoDeLectura && (
+                <p className="mt-1.5 rounded-control border border-line-200 bg-canvas px-3 py-2 text-[12px] leading-snug text-ink-900 text-justify">
+                  {avisoDeLectura} Mientras tanto, la actuación se puede elegir a mano en la lista de arriba.
+                </p>
+              )}
+            </div>
+          )}
 
           {/* ─── DE QUIÉN ES EL ESCRITO ───────────────────────────────────── */}
           <div>
@@ -538,9 +816,10 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
           */}
           {!error && sinActuacion && (
             <p className="rounded-control border border-line-200 bg-canvas px-3 py-2 text-[12px] leading-snug text-ink-900 text-justify">
-              <span className="font-semibold">Falta elegir la actuación.</span> Está en la barra de arriba, en «Elegir
-              actuación…», después de la rama. La revisión objetiva se hace contra la ficha verificada de esa actuación; sin
-              ella no hay contra qué revisar.
+              <span className="font-semibold">Falta elegir la actuación.</span>{' '}
+              {eligeActuacion
+                ? 'Está aquí mismo, en «Qué actuación es»: elíjala de la lista o pídale a la guía que la proponga leyendo el escrito. La revisión objetiva se hace contra la ficha verificada de esa actuación; sin ella no hay contra qué revisar.'
+                : 'Está en la barra de arriba, en «Elegir actuación…», después de la rama. La revisión objetiva se hace contra la ficha verificada de esa actuación; sin ella no hay contra qué revisar.'}
             </p>
           )}
           {!error && !sinActuacion && !hayEscrito && (
@@ -648,6 +927,45 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
           </p>
         </div>
       </Dialog>
+      {/*
+        LOS DOS DIÁLOGOS DE LA ACTUACIÓN CUELGAN DE AQUÍ, y solo existen cuando
+        este diálogo es el que elige. Es el MISMO componente que usa la barra de
+        Redacción: las candidatas se pintan con su ficha —término, artículo,
+        autoridad— y quien elige es una persona. Lo único distinto son los
+        hechos: allá los escribe el abogado, aquí salen del texto del escrito
+        que acaba de adjuntar.
+      */}
+      {eligeActuacion && (
+        <>
+          <GuiaEligeActuacionDialog
+            abierto={guiaAbierta}
+            onCerrar={() => setGuiaAbierta(false)}
+            legalBranch={rama}
+            hechos={hechos}
+            setHechos={setHechos}
+            onElegir={(exactName) => {
+              setTipoPropio(exactName);
+              setGuiaAbierta(false);
+            }}
+            onEscribirNombre={() => {
+              setGuiaAbierta(false);
+              setPropiaAbierta(true);
+            }}
+          />
+          <ActuacionPropiaDialog
+            abierto={propiaAbierta}
+            onCerrar={() => setPropiaAbierta(false)}
+            legalBranch={rama}
+            userRole={userRole}
+            onCreada={(exactName) => {
+              /* Primero la lista de nuevo, después la elección: al revés, el selector no la encontraría. */
+              setRecargaCatalogo((n) => n + 1);
+              setTipoPropio(exactName);
+              setPropiaAbierta(false);
+            }}
+          />
+        </>
+      )}
       <ConfirmarDialog confirmacion={confirmacion} onCerrar={() => setConfirmacion(null)} />
     </Dialog>
   );

@@ -1,10 +1,11 @@
 import React from 'react';
-import { Loader2 } from 'lucide-react';
+import { AlertTriangle, FileText, Loader2, Paperclip, X } from 'lucide-react';
 import {
   IconoNoAplica,
   IconoSinVerificar,
   IconoVerificado
 } from '../../../design/ArtboardIcons';
+import { ARCHIVOS_DE_HECHOS, useHechosDesdeArchivo } from '../hechosDesdeArchivo';
 import { triageApi, type TriageResponse } from '../services/catalog.api';
 import { BRANCH_LABELS } from '../branchLabels';
 import type { Actuacion } from '../types';
@@ -128,6 +129,13 @@ interface TriageMobileViewProps {
 
 export const TriageMobileView: React.FC<TriageMobileViewProps> = ({ onDraft }) => {
   const [hechos, setHechos] = React.useState('');
+  /*
+   * ADJUNTAR, TAMBIÉN AQUÍ. En el teléfono es donde más pesa: nadie transcribe
+   * un oficio con el pulgar. La regla del texto es la misma que en escritorio y
+   * vive en el gancho compartido; lo que cambia es que aquí NO se arrastra —se
+   * escoge del teléfono—, así que no hay zona de soltar.
+   */
+  const adjuntoHechos = useHechosDesdeArchivo(setHechos);
   const [cargando, setCargando] = React.useState(false);
   const [resultado, setResultado] = React.useState<TriageResponse | null>(null);
   const [error, setError] = React.useState<string | null>(null);
@@ -161,6 +169,69 @@ export const TriageMobileView: React.FC<TriageMobileViewProps> = ({ onDraft }) =
             placeholder="Despido sin justa causa el 3 de febrero, estando incapacitado y sin permiso del inspector."
             className="mt-1.5 w-full resize-none border-0 bg-transparent p-0 text-[13px] leading-[1.6] text-ink-700 placeholder:text-ink-400 focus:outline-none"
           />
+
+          {/* El adjunto: una sola línea bajo el cuadro, sin robarle sitio. */}
+          <div className="mt-2 min-w-0 border-t border-line-100 pt-2">
+            {adjuntoHechos.leyendo ? (
+              /* Espera propia: la pantalla sigue viva mientras se lee el PDF. */
+              <p className="flex items-center gap-2 text-[11.5px] text-ink-500">
+                <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" />
+                Leyendo el archivo…
+              </p>
+            ) : adjuntoHechos.adjunto ? (
+              <div className="min-w-0 space-y-1">
+                <div className="flex min-w-0 items-start gap-2">
+                  <FileText className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink-400" />
+                  {/*
+                    Un nombre de archivo largo es una sola palabra: en 320px
+                    `break-words` no basta, hace falta `overflow-wrap:anywhere`.
+                  */}
+                  <span className="min-w-0 flex-1 text-[11.5px] leading-snug text-ink-700 [overflow-wrap:anywhere]">
+                    {adjuntoHechos.adjunto.nombre}
+                    <span className="ml-1.5 font-mono text-[10.5px] text-ink-400">
+                      {adjuntoHechos.adjunto.caracteres} caracteres
+                    </span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={adjuntoHechos.quitar}
+                    aria-label="Quitar el archivo"
+                    className="-m-1 shrink-0 p-1 text-ink-500"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+                {adjuntoHechos.adjunto.recortado && (
+                  <p className="text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
+                    El documento es largo: se leyó el comienzo del documento.
+                  </p>
+                )}
+              </div>
+            ) : (
+              <label className="flex min-w-0 items-center gap-2 text-[11.5px] text-brand-700">
+                <Paperclip className="h-3.5 w-3.5 shrink-0" />
+                <span className="min-w-0">Adjuntar el oficio o la demanda (PDF, Word o texto)</span>
+                <input
+                  type="file"
+                  accept={ARCHIVOS_DE_HECHOS}
+                  className="hidden"
+                  onChange={(e) => {
+                    void adjuntoHechos.leer(e.target.files?.[0]);
+                    /* Sin esto, volver a escoger el MISMO archivo no dispara nada. */
+                    e.target.value = '';
+                  }}
+                />
+              </label>
+            )}
+
+            {adjuntoHechos.motivo && (
+              /* No se pudo leer; lo escrito a mano sigue donde estaba. */
+              <p className="mt-2 flex items-start gap-2 rounded-[6px] border border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))]/60 px-2.5 py-2 text-justify text-[11px] leading-snug text-ink-700 [text-wrap:pretty]">
+                <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-unverified" />
+                <span className="min-w-0">{adjuntoHechos.motivo}</span>
+              </p>
+            )}
+          </div>
 
           {resultado?.senales && (
             <div className="mt-2 flex flex-wrap gap-[5px]">

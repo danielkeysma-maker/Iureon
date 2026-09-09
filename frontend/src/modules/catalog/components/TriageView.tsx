@@ -4,11 +4,14 @@ import {
   Clock,
   Compass,
   ExternalLink,
+  FileText,
   Loader2,
+  Paperclip,
   PenLine,
   Search,
   ShieldCheck,
-  ShieldOff
+  ShieldOff,
+  X
 } from 'lucide-react';
 import {
   catalogApi,
@@ -17,6 +20,7 @@ import {
   type TriageResponse
 } from '../services/catalog.api';
 import { indiceDelPrimario, porTerminoMasCorto } from '../triageOrder';
+import { ARCHIVOS_DE_HECHOS, useHechosDesdeArchivo } from '../hechosDesdeArchivo';
 import { ApiError } from '../../../config/httpClient';
 import { BRANCH_LABELS } from '../branchLabels';
 import type { MainView } from '../../tenant/types';
@@ -67,6 +71,13 @@ const EJEMPLOS = [
 
 export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) => {
   const [hechos, setHechos] = React.useState('');
+  /*
+   * EL DOCUMENTO QUE LLEGÓ, ADJUNTO. Lo que el abogado tiene delante es el
+   * oficio o la demanda, no un resumen; la regla de qué pasa con el cuadro de
+   * hechos vive en el gancho, compartida con la pantalla del teléfono.
+   */
+  const adjuntoHechos = useHechosDesdeArchivo(setHechos);
+  const [arrastrando, setArrastrando] = React.useState(false);
   const [result, setResult] = React.useState<TriageResponse | null>(null);
   /*
    * El historial: cada consulta guardada vale para la siguiente — la mitad de
@@ -220,6 +231,99 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
               className="field-area mt-1.5 w-full resize-y text-justify [text-wrap:pretty]"
             />
           </label>
+
+          {/* ─── ADJUNTAR EL DOCUMENTO ────────────────────────────────────────
+              Se lee aquí mismo, en el navegador, y el texto CAE EN EL CUADRO de
+              arriba, que sigue siendo editable: el abogado ve exactamente lo
+              que va a viajar y puede recortarlo. Nada se sube ni se cobra. */}
+          <div
+            onDragOver={(e) => {
+              e.preventDefault();
+              setArrastrando(true);
+            }}
+            onDragLeave={() => setArrastrando(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setArrastrando(false);
+              void adjuntoHechos.leer(e.dataTransfer.files?.[0]);
+            }}
+            className={`min-w-0 rounded-card border border-dashed px-3 py-2.5 transition-colors ${
+              arrastrando ? 'border-brand-700 bg-brand-700/[0.06]' : 'border-line-200 bg-canvas'
+            }`}
+          >
+            {adjuntoHechos.leyendo ? (
+              /*
+                ESPERA PROPIA, NO DE TODA LA PANTALLA. Un PDF de cuarenta
+                páginas tarda un par de segundos y el resto de la vista sigue
+                siendo usable mientras tanto.
+              */
+              <p className="flex items-center gap-2 text-meta text-ink-500">
+                <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" />
+                Leyendo el archivo…
+              </p>
+            ) : adjuntoHechos.adjunto ? (
+              <div className="min-w-0 space-y-1">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <FileText className="h-3.5 w-3.5 shrink-0 text-ink-400" />
+                  {/*
+                    El nombre de un archivo puede ser una sola palabra larguísima
+                    —un radicado, un guion bajo tras otro—: sin
+                    `[overflow-wrap:anywhere]` se pinta fuera de su caja.
+                  */}
+                  <span className="min-w-0 text-meta text-ink-700 [overflow-wrap:anywhere]">
+                    {adjuntoHechos.adjunto.nombre}
+                  </span>
+                  <span className="shrink-0 font-mono text-[11px] text-ink-400">
+                    {adjuntoHechos.adjunto.caracteres} caracteres
+                  </span>
+                  <button
+                    type="button"
+                    onClick={adjuntoHechos.quitar}
+                    className="ml-auto flex shrink-0 items-center gap-1 text-meta text-ink-500 hover:text-ink-900 hover:underline"
+                  >
+                    <X className="h-3 w-3" />
+                    Quitar
+                  </button>
+                </div>
+                {adjuntoHechos.adjunto.recortado && (
+                  <p className="text-justify text-meta text-ink-500 [text-wrap:pretty]">
+                    El documento es largo: se leyó el comienzo del documento.
+                  </p>
+                )}
+              </div>
+            ) : (
+              <label className="flex min-w-0 cursor-pointer flex-wrap items-center gap-x-2 gap-y-1">
+                <Paperclip className="h-3.5 w-3.5 shrink-0 text-ink-400" />
+                <span className="text-meta text-ink-700">
+                  Arrastre aquí el oficio, la demanda o la notificación
+                </span>
+                <span className="text-meta text-brand-700 underline">o escoja el archivo</span>
+                <span className="shrink-0 font-mono text-[11px] text-ink-400">PDF · Word · texto</span>
+                <input
+                  type="file"
+                  accept={ARCHIVOS_DE_HECHOS}
+                  className="hidden"
+                  onChange={(e) => {
+                    void adjuntoHechos.leer(e.target.files?.[0]);
+                    /* Sin esto, volver a escoger el MISMO archivo no dispara nada. */
+                    e.target.value = '';
+                  }}
+                />
+              </label>
+            )}
+          </div>
+
+          {adjuntoHechos.motivo && (
+            /*
+              No se pudo leer, y el cuadro de hechos quedó INTACTO. Se dice en
+              el tono de las advertencias y no en el de las averías: un escaneo
+              sin texto no es una falla de la aplicación.
+            */
+            <p className="flex items-start gap-2 rounded-card border border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))]/60 px-3 py-2 text-justify text-meta text-ink-700 [text-wrap:pretty]">
+              <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-unverified" />
+              <span className="min-w-0">{adjuntoHechos.motivo}</span>
+            </p>
+          )}
 
           <div className="flex flex-wrap items-center gap-3">
             {/*

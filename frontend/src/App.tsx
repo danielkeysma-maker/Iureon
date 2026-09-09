@@ -1648,6 +1648,15 @@ export function App() {
                 onAbrirTaller={abrirTallerDeRevision}
                 onIrARedaccion={() => setMainView('workspace')}
                 onIrAHerramientas={() => setMainView('tools')}
+                /*
+                 * Revisar un escrito ya no obliga a pasar por Redacción: el
+                 * módulo lo pide aquí mismo y el diálogo elige su actuación.
+                 * El rol viaja solo para poder crear una actuación propia de
+                 * la firma desde ahí; el precio es el mismo del taller.
+                 */
+                userRole={userRole}
+                precioRevisionCop={2000}
+                onSaldoCambiado={() => void refreshBalance()}
               />
             ))}
           {mainView === 'orientacion' && (

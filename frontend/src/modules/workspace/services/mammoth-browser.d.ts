@@ -20,6 +20,8 @@ declare module 'mammoth/mammoth.browser.min.js' {
     idPrefix?: string;
   }
   export function convertToHtml(entrada: { arrayBuffer: ArrayBuffer }, opciones?: OpcionesDeMammoth): Promise<ResultadoDeMammoth>;
-  const mammoth: { convertToHtml: typeof convertToHtml };
+  /* El texto sin marcas: para leer el escrito, no para pintarlo. */
+  export function extractRawText(entrada: { arrayBuffer: ArrayBuffer }): Promise<ResultadoDeMammoth>;
+  const mammoth: { convertToHtml: typeof convertToHtml; extractRawText: typeof extractRawText };
   export default mammoth;
 }

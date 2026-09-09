@@ -6,11 +6,27 @@ import type { DatosDelTaller } from './TallerDeRevision';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 import { PANTALLAS, recordado, recordar } from '../../tenant/pantallaRecordada';
 import { dejarPendiente } from '../../agenda/pendiente';
+import { RevisarEscritoDialog } from './RevisarEscritoDialog';
+import type { ActuacionRole } from '../../catalog/types';
 
 /**
  * Revisiones: la lista de escritos revisados de la firma, para abrir cada uno
- * en el taller. Es el módulo «Revisiones» de la barra; la revisión nueva se
- * pide desde Redacción, donde está la actuación elegida.
+ * en el taller. Es el módulo «Revisiones» de la barra.
+ *
+ * ─── LA REVISIÓN NUEVA SE PIDE AQUÍ ─────────────────────────────────────────
+ *
+ * Ya no hay que pasar por Redacción. Este comentario decía lo contrario, y esa
+ * era la descripción fiel de un defecto de uso: quien quería revisar un escrito
+ * acababa en el panel de redacción sin entender por qué —no va a redactar
+ * nada— y, peor, tenía que elegir la actuación ANTES de poder subir el
+ * archivo, cuando lo normal al recibir un escrito ajeno es no saber cómo se
+ * llama en el catálogo.
+ *
+ * El botón de Redacción se queda donde estaba —quien ya tiene la actuación
+ * elegida ahí no pierde nada—; este es el camino corto, y el diálogo que abre
+ * trae su propia rama, su propia actuación y la guía que la propone leyendo el
+ * archivo. La petición sigue viajando con una actuación real escogida por una
+ * persona: el servidor la exige y aquí no se inventa ninguna.
  *
  * Una revisión se abre en el taller solo si su texto se conservó (la firma lo
  * autorizó). Si no, se dice y se ofrece lo que sí hay: el informe.
@@ -21,6 +37,12 @@ interface RevisionesViewProps {
   esAdminDeFirma: boolean;
   onAbrirTaller: (datos: DatosDelTaller) => void;
   onIrARedaccion: () => void;
+  /** Quién firma, para poder crear una actuación propia desde el diálogo de revisión. */
+  userRole: ActuacionRole;
+  /** Lo que cuesta una revisión. Lo fija quien monta la pantalla, no esta lista. */
+  precioRevisionCop: number;
+  /** El saldo se reporta tras el cobro; nunca se deriva aquí. */
+  onSaldoCambiado: () => void;
   /**
    * «Poner en la agenda» prepara el caso y lleva a Herramientas, donde vive la
    * agenda de terminos. Una revision guarda el NOMBRE de la actuacion y su
@@ -31,7 +53,15 @@ interface RevisionesViewProps {
   onIrAHerramientas: () => void;
 }
 
-export const RevisionesView: React.FC<RevisionesViewProps> = ({ esAdminDeFirma, onAbrirTaller, onIrARedaccion, onIrAHerramientas }) => {
+export const RevisionesView: React.FC<RevisionesViewProps> = ({
+  esAdminDeFirma,
+  onAbrirTaller,
+  onIrARedaccion,
+  onIrAHerramientas,
+  userRole,
+  precioRevisionCop,
+  onSaldoCambiado
+}) => {
   /* Con el plan vencido los informes se abren y se leen; revisar uno nuevo no se ofrece. */
   const soloLectura = usePlanSoloLectura();
   const [lista, setLista] = React.useState<RevisionGuardada[]>([]);
@@ -39,6 +69,8 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({ esAdminDeFirma, 
   const [abriendo, setAbriendo] = React.useState<string | null>(null);
   const [error, setError] = React.useState('');
   const [confirmacion, setConfirmacion] = React.useState<Confirmacion | null>(null);
+  /* El diálogo de revisión, abierto desde aquí: sin actuación heredada, la elige él. */
+  const [revisarAbierto, setRevisarAbierto] = React.useState(false);
   /*
    * LA AUTORIZACION, A LA VISTA. El usuario vio el aviso ambar en el taller y
    * no encontro donde autorizar: el boton solo aparecia dentro del taller y
@@ -156,22 +188,61 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({ esAdminDeFirma, 
             <p className="mt-0.5 max-w-[60ch] text-[13px] leading-snug text-ink-500">
               Los escritos que su firma ha revisado. Abra uno para seguir corrigiéndolo en el taller, con los pasajes marcados y el revisor al
               lado; cuando el texto esté como lo quiere, «Llevar a Redacción» lo guarda como borrador de la firma y lo abre allí, sin tocar la
-              revisión. Para revisar un escrito nuevo, vaya a Redacción, elija la actuación y use «Revisar un escrito ya redactado».
+              revisión. Para revisar uno nuevo no hace falta salir de aquí ni saber de antemano qué actuación es: súbalo y, si no lo sabe,
+              pídale a la guía que la proponga con el término y el artículo a la vista.
             </p>
           </div>
-          <div className="flex gap-2">
+          {/*
+            LA FILA DE BOTONES ENVUELVE en el teléfono: son dos etiquetas largas
+            y `btn-sm` no encoge su texto, así que en 320px la segunda quedaría
+            fuera de la pantalla sin que la página llegara a desbordarse.
+          */}
+          <div className="flex flex-wrap gap-2">
             <button type="button" onClick={cargar} className="btn-neutral btn-sm">
               <RefreshCw className={`h-3.5 w-3.5 ${cargando ? 'animate-spin' : ''}`} />
               Actualizar
             </button>
+            {/*
+              CON EL PLAN VENCIDO NO SE OFRECE NINGUNO DE LOS DOS: revisar cuesta
+              saldo, y ofrecer un botón que va a fallar es peor que no tenerlo.
+            */}
             {!soloLectura && (
-            <button type="button" onClick={onIrARedaccion} className="btn-primary btn-sm">
-              <ClipboardCheck className="h-3.5 w-3.5" />
-              Revisar un escrito nuevo
-            </button>
+              <>
+                <button type="button" onClick={onIrARedaccion} className="btn-neutral btn-sm">
+                  <ClipboardCheck className="h-3.5 w-3.5" />
+                  Ir a Redacción
+                </button>
+                <button type="button" onClick={() => setRevisarAbierto(true)} className="btn-primary btn-sm">
+                  <ClipboardCheck className="h-3.5 w-3.5" />
+                  Revisar un escrito
+                </button>
+              </>
             )}
           </div>
         </div>
+
+        {/*
+          EL DIÁLOGO CUELGA DEL MÓDULO, no de Redacción. `eligeActuacion` es lo
+          que lo vuelve autosuficiente: sin él esperaría la actuación de una
+          barra de configuración que aquí no existe, y el botón de revisar se
+          quedaría apagado para siempre.
+        */}
+        {!soloLectura && (
+          <RevisarEscritoDialog
+            abierto={revisarAbierto}
+            onCerrar={() => setRevisarAbierto(false)}
+            documentType=""
+            legalBranch=""
+            eligeActuacion
+            userRole={userRole}
+            precioCop={precioRevisionCop}
+            onSaldoCambiado={onSaldoCambiado}
+            onAbrirTaller={(datos) => {
+              setRevisarAbierto(false);
+              onAbrirTaller(datos);
+            }}
+          />
+        )}
 
         {consentimiento && (
           <div
@@ -243,7 +314,10 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({ esAdminDeFirma, 
         {error && <p className="mt-4 rounded-control border border-line-200 bg-surface px-3 py-2 text-[12.5px] leading-snug text-danger">{error}</p>}
 
         {!cargando && lista.length === 0 && !error && (
-          <p className="mt-6 text-[13px] text-ink-500">Todavía no hay revisiones. La primera se pide desde Redacción.</p>
+          <p className="mt-6 text-[13px] text-ink-500">
+            Todavía no hay revisiones. Empiece con «Revisar un escrito»: suba el archivo y, si no sabe qué actuación es, deje que la guía
+            se lo proponga.
+          </p>
         )}
 
         <ul className="mt-4 divide-y divide-line-100 overflow-hidden rounded-card border border-line-200 bg-surface">

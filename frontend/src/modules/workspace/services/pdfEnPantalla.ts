@@ -46,7 +46,14 @@ const MAX_DPR = 2;
 
 let cargando: Promise<typeof import('pdfjs-dist')> | null = null;
 
-const cargarPdfjs = async (): Promise<typeof import('pdfjs-dist')> => {
+/**
+ * Carga la librería una sola vez, con su proceso de trabajo y sus fuentes ya
+ * configurados. Se exporta porque leer el TEXTO de un PDF —para proponer la
+ * actuación antes de saber cuál es— necesita exactamente el mismo montaje: dos
+ * configuraciones separadas terminarían divergiendo en la ruta del trabajador,
+ * que es un fallo silencioso (el documento simplemente no abre).
+ */
+export const cargarPdfjs = async (): Promise<typeof import('pdfjs-dist')> => {
   if (!cargando) {
     cargando = (async () => {
       const pdfjs = await import('pdfjs-dist');
