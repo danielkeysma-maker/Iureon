@@ -661,7 +661,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
       {comentario && (
         <div className="absolute inset-x-3 top-3 z-20 mx-auto max-w-[560px] rounded-card border border-line-200 bg-surface p-3 font-sans shadow-lg sm:inset-x-6">
           <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-400">{comentario.indice === null ? 'Nuevo comentario' : 'Comentario'}</p>
-          <p className="mt-0.5 text-[12px] italic leading-snug text-ink-500">«{comentario.cita}»</p>
+          <p className="mt-0.5 text-[12px] italic leading-snug text-ink-500 text-justify">«{comentario.cita}»</p>
           <textarea
             value={comentario.nota}
             onChange={(e) => setComentario({ ...comentario, nota: e.target.value })}
@@ -848,9 +848,9 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
             {citaAbierta !== null && informe?.correccionesTextuales?.[citaAbierta] && (
               <div className="sticky bottom-0 mt-4 rounded-card border border-line-200 bg-surface p-3 font-sans shadow-lg">
                 <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-400">Por qué</p>
-                <p className="mt-0.5 text-[12.5px] leading-snug text-ink-700">{informe.correccionesTextuales[citaAbierta].problema}</p>
+                <p className="mt-0.5 text-[12.5px] leading-snug text-ink-700 text-justify">{informe.correccionesTextuales[citaAbierta].problema}</p>
                 <p className="mt-2 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-brand-700">Reemplazo propuesto</p>
-                <p className="mt-0.5 text-[13px] leading-snug text-ink-900">«{informe.correccionesTextuales[citaAbierta].reemplazo}»</p>
+                <p className="mt-0.5 text-[13px] leading-snug text-ink-900 text-justify">«{informe.correccionesTextuales[citaAbierta].reemplazo}»</p>
                 <div className="mt-2 flex gap-2">
                   <button type="button" onClick={() => aplicar(informe.correccionesTextuales![citaAbierta].cita, informe.correccionesTextuales![citaAbierta].reemplazo)} className="btn-primary btn-sm">
                     <Check className="h-3.5 w-3.5" />
@@ -874,8 +874,8 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
         const aplicable = localizarCitas(texto, [e.cita]).marcas.length > 0;
         return (
           <div key={k} className="rounded-control border border-line-200 bg-surface px-2.5 py-2 font-sans">
-            <p className="text-[11px] italic leading-snug text-ink-500">«{e.cita}»</p>
-            <p className="mt-1 text-[12.5px] leading-snug text-ink-900">«{e.reemplazo}»</p>
+            <p className="text-[11px] italic leading-snug text-ink-500 text-justify">«{e.cita}»</p>
+            <p className="mt-1 text-[12.5px] leading-snug text-ink-900 text-justify">«{e.reemplazo}»</p>
             <button type="button" onClick={() => aplicar(e.cita, e.reemplazo)} disabled={!aplicable} className="btn-secondary btn-sm mt-1.5 disabled:opacity-50" title={aplicable ? 'Sustituir el pasaje en el texto' : 'El pasaje citado ya no está en el texto actual'}>
               <Check className="h-3 w-3" />
               {aplicable ? 'Aplicar' : 'Ya no está en el texto'}
@@ -890,7 +890,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
       <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-3">
         {conversacion.length === 0 && (
-          <p className="text-[12.5px] leading-snug text-ink-500">
+          <p className="text-[12.5px] leading-snug text-ink-500 text-justify">
             Pregúntele a la guía sobre el escrito o pídale redacciones: «reescribe la pretensión tercera como subsidiaria», «revisa lo que resalté en
             amarillo», «mira mi comentario sobre la jurisprudencia», «¿cómo va después de mis cambios?». Cada mensaje lleva el texto tal como está ahora, sus marcas de colores y sus comentarios, y cuesta{' '}
             {pesos(precioConsultaCop)}. Los pasajes de los que hable se subrayan en azul.
@@ -912,7 +912,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
             </p>
           </div>
         ))}
-        {ocupado === 'chat' && <p className="text-[12px] text-ink-500">La guía está leyendo el texto actual…</p>}
+        {ocupado === 'chat' && <p className="text-[12px] text-ink-500 text-justify">La guía está leyendo el texto actual…</p>}
         <div ref={finDelChat} />
       </div>
       <div className="border-t border-line-100 p-3">
@@ -930,7 +930,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
           </div>
         )}
         {cerradas?.chat ? (
-          <p className="notice text-ui leading-[1.5] [text-wrap:pretty]">{AVISO_FUNCION_DESHABILITADA}</p>
+          <p className="notice text-ui leading-[1.5] [text-wrap:pretty] text-justify">{AVISO_FUNCION_DESHABILITADA}</p>
         ) : (
           <div className="flex items-end gap-2">
             <textarea
@@ -967,10 +967,10 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
     */
     <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-3 text-[12.5px] [overflow-wrap:anywhere]">
       {!informe ? (
-        <p className="text-ink-500">Este escrito no tiene informe de revisión. Puede pedir uno con «Revisión completa» o conversar con la guía.</p>
+        <p className="text-ink-500 text-justify">Este escrito no tiene informe de revisión. Puede pedir uno con «Revisión completa» o conversar con la guía.</p>
       ) : (
         <>
-          <p className="leading-relaxed text-ink-900">{informe.resumen}</p>
+          <p className="leading-relaxed text-ink-900 text-justify">{informe.resumen}</p>
           {(
             [
               ['Secciones que la norma exige y faltan', informe.seccionesFaltantes],
@@ -984,7 +984,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
                 <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">{t}</h4>
                 <ul className="mt-1 list-disc space-y-1 pl-4 text-ink-800">
                   {items.map((x, k) => (
-                    <li key={k}>{x}</li>
+                    <li key={k} className="text-justify [text-wrap:pretty]">{x}</li>
                   ))}
                 </ul>
               </section>
@@ -997,7 +997,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
                 {informe.erroresDeAplicacion.map((e, k) => (
                   <li key={k} className="rounded-control border border-line-100 bg-canvas px-2.5 py-1.5">
                     <span className="font-mono text-[10px] text-ink-500">{e.donde}</span>
-                    <p className="text-ink-900">{e.problema}</p>
+                    <p className="text-ink-900 text-justify">{e.problema}</p>
                     {e.correccion && <p className="text-brand-700">Corrección: {e.correccion}</p>}
                   </li>
                 ))}
@@ -1012,7 +1012,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   const ComentariosPanel = () => (
     <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3 text-[12.5px]">
       {comentarios.length === 0 ? (
-        <p className="text-ink-500">
+        <p className="text-ink-500 text-justify">
           Seleccione un pasaje del escrito y elija «Comentar» para dejar una nota: algo que revisar después, una duda, o una corrección a la guía. Los
           comentarios viajan con cada mensaje, así que puede pedirle «mira mi comentario sobre la jurisprudencia».
         </p>
@@ -1023,7 +1023,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
               <button type="button" onClick={() => irAlPasaje(a.cita)} className="block w-full text-left text-[11px] italic leading-snug text-ink-500 hover:text-brand-700" title="Ir al pasaje">
                 «{a.cita.length > 140 ? `${a.cita.slice(0, 140)}…` : a.cita}»
               </button>
-              <p className="mt-1 whitespace-pre-wrap break-words leading-snug text-ink-900">{a.nota}</p>
+              <p className="mt-1 whitespace-pre-wrap break-words leading-snug text-ink-900 text-justify">{a.nota}</p>
               <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                 {a.fecha && <span className="font-mono text-[10px] text-ink-400">{fechaCorta(a.fecha)}</span>}
                 <button type="button" onClick={() => setComentario({ indice, cita: a.cita, nota: a.nota ?? '' })} className="btn-neutral btn-sm ml-auto">
@@ -1125,13 +1125,13 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
         ) : (
           <>
             {g.preguntas.enfoque && (
-              <p className="notice text-ui leading-[1.5] [text-wrap:pretty]" title="Lo que esta actuación exige probar, según su ficha, y la audiencia en la que se pregunta">
+              <p className="notice text-ui leading-[1.5] [text-wrap:pretty] text-justify" title="Lo que esta actuación exige probar, según su ficha, y la audiencia en la que se pregunta">
                 <span className="font-semibold text-ink-900">Enfoque · </span>
                 {g.preguntas.enfoque}
               </p>
             )}
             <div className="flex flex-wrap items-center gap-1.5">
-              <p className="min-w-0 flex-1 text-[11px] leading-snug text-ink-500">
+              <p className="min-w-0 flex-1 text-[11px] leading-snug text-ink-500 text-justify">
                 {total} preguntas · posición: <span className="text-ink-800">{g.parametros.posicion}</span>
                 {g.parametros.audiencia ? ` · ${g.parametros.audiencia}` : ''}
                 {g.generadoEl ? ` · ${fechaCorta(g.generadoEl)}` : ''}
@@ -1153,24 +1153,24 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
                 Volver a generar
               </button>
             </div>
-            {g.parametros.quiereProbar && <p className="text-[11.5px] italic leading-snug text-ink-600">Quiere probar: {g.parametros.quiereProbar}</p>}
+            {g.parametros.quiereProbar && <p className="text-[11.5px] italic leading-snug text-ink-600 text-justify">Quiere probar: {g.parametros.quiereProbar}</p>}
             {seccionesPedidas(g).map((s) => {
               const lista = g.preguntas[s.clave];
               return (
                 <section key={s.clave}>
                   <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">{s.titulo}</h4>
-                  <p className="text-[11px] italic text-ink-500">{s.nota}</p>
+                  <p className="text-[11px] italic text-ink-500 text-justify">{s.nota}</p>
                   {lista.length === 0 ? (
-                    <p className="mt-1 text-ink-500">La guía no encontró en el escrito sustento para preguntas de esta lista.</p>
+                    <p className="mt-1 text-ink-500 text-justify">La guía no encontró en el escrito sustento para preguntas de esta lista.</p>
                   ) : (
                     <ol className="mt-1.5 space-y-2">
                       {lista.map((q, i) => (
                         <li key={i} className="rounded-control border border-line-100 bg-canvas px-2.5 py-2">
-                          <p className="leading-snug text-ink-900">
+                          <p className="leading-snug text-ink-900 text-justify">
                             <span className="font-semibold">{i + 1}.</span> {q.pregunta}
                           </p>
                           {q.paraQue && (
-                            <p className="mt-1 text-[11.5px] leading-snug text-ink-600">
+                            <p className="mt-1 text-[11.5px] leading-snug text-ink-600 text-justify">
                               <span className="font-mono text-[9.5px] uppercase tracking-[0.06em] text-ink-400">Para qué</span> {q.paraQue}
                             </p>
                           )}
@@ -1186,7 +1186,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
                 </section>
               );
             })}
-            <p className="border-t border-line-100 pt-2 text-[11px] leading-snug text-ink-500">
+            <p className="border-t border-line-100 pt-2 text-[11px] leading-snug text-ink-500 text-justify">
               La guía solo conoce el escrito: no el expediente, las pruebas ni a las personas. Pese cada pregunta antes de formularla.
             </p>
           </>
@@ -1198,7 +1198,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   const VersionesPanel = () => (
     <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3 text-[12.5px]">
       {versiones.length === 0 ? (
-        <p className="text-ink-500">
+        <p className="text-ink-500 text-justify">
           Todavía no hay versiones. Se guarda una sola antes de cada revisión nueva y antes de cada consulta a la guía si el texto cambió; también con
           «Guardar versión». Se conservan las últimas {MAX_VERSIONES}.
         </p>
@@ -1280,7 +1280,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
       {Cinta()}
       <ConfirmarDialog confirmacion={confirmacion} onCerrar={() => setConfirmacion(null)} />
       {error && (
-        <p className="border-b border-line-100 bg-surface px-4 py-1.5 text-[12px] text-danger">
+        <p className="border-b border-line-100 bg-surface px-4 py-1.5 text-[12px] text-danger text-justify">
           {error}{' '}
           <button type="button" onClick={() => setError('')} className="underline">
             cerrar

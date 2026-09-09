@@ -166,7 +166,7 @@ export const FirmUsersDialog: React.FC<FirmUsersDialogProps> = ({
                   arriba, y debajo —tras un filete— el permiso y el consumo, que
                   son los dos datos por los que se abre esta pantalla.
                 */
-                className={`t-row flex flex-col items-stretch gap-2 md:flex-row md:flex-wrap md:items-center md:gap-3 ${
+                className={`t-row flex min-w-0 flex-col items-stretch gap-2 md:flex-row md:flex-wrap md:items-center md:gap-3 ${
                   u.desactivado ? 'opacity-60' : ''
                 }`}
               >
@@ -192,7 +192,7 @@ export const FirmUsersDialog: React.FC<FirmUsersDialogProps> = ({
                   siendo tres columnas, que es lo que permite comparar doce
                   personas de un vistazo.
                 */}
-                <span className="flex items-center gap-2 border-t border-line-100 pt-2 md:contents md:border-0 md:pt-0">
+                <span className="flex min-w-0 items-center gap-2 border-t border-line-100 pt-2 md:contents md:border-0 md:pt-0">
                 <span className="min-w-0 flex-1 md:w-[160px] md:flex-none md:shrink-0">
                   <span className="block text-[12.5px] text-ink-900">{ROL[u.role] ?? u.role}</span>
                   {/* La frontera real: verificar el catálogo es de socios, y el servidor lo impone. */}
@@ -210,7 +210,7 @@ export const FirmUsersDialog: React.FC<FirmUsersDialogProps> = ({
                 </span>
                 </span>
 
-                <span className="flex shrink-0 justify-end gap-1.5 md:w-[170px]">
+                <span className="flex flex-wrap justify-end gap-1.5 md:w-[170px] md:shrink-0 md:flex-nowrap">
                   {u.role !== 'SUPER_ADMIN' && (
                     <>
                       <button
@@ -265,14 +265,14 @@ export const FirmUsersDialog: React.FC<FirmUsersDialogProps> = ({
                 </dd>
               </div>
             </dl>
-            <p className="mt-2 border-t border-line-100 pt-2 text-meta leading-[1.5] text-ink-500">
+            <p className="mt-2 border-t border-line-100 pt-2 text-meta leading-[1.5] text-ink-500 text-justify">
               La única frontera que importa: <span className="font-medium text-ink-900">verificar es de socios</span>,
               y el servidor la impone — de eso depende que las actuaciones verificadas signifiquen
               algo.
             </p>
           </div>
 
-          <p className="text-meta leading-[1.6] text-ink-400">
+          <p className="text-meta leading-[1.6] text-ink-400 text-justify">
             Al desactivar a alguien, sus escritos y sus verificaciones permanecen; solo pierde el
             acceso. Nunca se borra su rastro.
           </p>

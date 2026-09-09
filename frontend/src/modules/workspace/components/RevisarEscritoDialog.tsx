@@ -462,7 +462,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
                 />
               </>
             )}
-            <p className="mt-1.5 text-[11px] leading-snug text-ink-500">
+            <p className="mt-1.5 text-[11px] leading-snug text-ink-500 text-justify">
               Un PDF escaneado no trae texto: si el archivo es una imagen, pegue el texto. Se revisan hasta 300.000 caracteres, unas 75 páginas;
               lo que pase de ahí se declara recortado.
             </p>
@@ -481,7 +481,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
               placeholder="Joel Ayús · tutela contra EPS Sanitas · rad. 2026-00345"
               className="field mt-1.5 w-full"
             />
-            <p className="mt-1 text-[11px] leading-snug text-ink-500">
+            <p className="mt-1 text-[11px] leading-snug text-ink-500 text-justify">
               Para saber de qué asunto es cuando vuelva a la lista. Queda también en el PDF y el Word del informe.
             </p>
           </div>
@@ -522,18 +522,18 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
             un defecto; un boton que dice que le falta se obedece.
           */}
           {!error && sinActuacion && (
-            <p className="rounded-control border border-line-200 bg-canvas px-3 py-2 text-[12px] leading-snug text-ink-900">
+            <p className="rounded-control border border-line-200 bg-canvas px-3 py-2 text-[12px] leading-snug text-ink-900 text-justify">
               <span className="font-semibold">Falta elegir la actuación.</span> Está en la barra de arriba, en «Elegir
               actuación…», después de la rama. La revisión objetiva se hace contra la ficha verificada de esa actuación; sin
               ella no hay contra qué revisar.
             </p>
           )}
           {!error && !sinActuacion && !hayEscrito && (
-            <p className="text-[12px] leading-snug text-ink-500">Suba el archivo o pegue el texto para habilitar el botón.</p>
+            <p className="text-[12px] leading-snug text-ink-500 text-justify">Suba el archivo o pegue el texto para habilitar el botón.</p>
           )}
-          {error && <p className="text-[12px] leading-snug text-danger">{error}</p>}
+          {error && <p className="text-[12px] leading-snug text-danger text-justify">{error}</p>}
 
-          <p className="text-meta text-ink-400">
+          <p className="text-meta text-ink-400 text-justify">
             El informe no cita sentencias: cuando un punto necesite precedente, lo dirá y usted lo verifica. No reescribe el escrito;
             señala y propone la corrección. El informe se guarda para su firma; el escrito no.
           </p>
@@ -675,7 +675,7 @@ const Informe: React.FC<{ respuesta: RespuestaDeRevision; documentType: string }
 
       {!i ? (
         <>
-          <p className="rounded-control border border-line-200 bg-canvas px-3 py-2 text-[12px] leading-snug text-ink-700">
+          <p className="rounded-control border border-line-200 bg-canvas px-3 py-2 text-[12px] leading-snug text-ink-700 text-justify">
             El revisor respondió en un formato que no se pudo ordenar por secciones; abajo está su texto completo. El cobro
             es el mismo y el contenido también.
           </p>
@@ -683,7 +683,7 @@ const Informe: React.FC<{ respuesta: RespuestaDeRevision; documentType: string }
         </>
       ) : (
         <>
-          <p className="text-[14px] leading-relaxed text-ink-900">{i.resumen}</p>
+          <p className="text-[14px] leading-relaxed text-ink-900 text-justify">{i.resumen}</p>
           <Seccion titulo="Secciones que la norma exige y faltan" items={i.seccionesFaltantes} tono="aviso" />
           <Seccion titulo="Fortalezas" items={i.fortalezas} tono="ok" />
           <Seccion titulo="Debilidades" items={i.debilidades} tono="aviso" />
@@ -694,8 +694,8 @@ const Informe: React.FC<{ respuesta: RespuestaDeRevision; documentType: string }
                 {i.erroresDeAplicacion.map((e, k) => (
                   <div key={k} className="rounded-control border border-line-200 bg-canvas px-3 py-2">
                     <p className="font-mono text-[10.5px] font-semibold text-ink-500">{e.donde}</p>
-                    <p className="mt-0.5 text-ui leading-snug text-ink-900">{e.problema}</p>
-                    {e.correccion && <p className="mt-1 text-ui leading-snug text-brand-700">Corrección: {e.correccion}</p>}
+                    <p className="mt-0.5 text-ui leading-snug text-ink-900 text-justify">{e.problema}</p>
+                    {e.correccion && <p className="mt-1 text-ui leading-snug text-brand-700 text-justify">Corrección: {e.correccion}</p>}
                   </div>
                 ))}
               </div>
@@ -719,11 +719,11 @@ const Informe: React.FC<{ respuesta: RespuestaDeRevision; documentType: string }
                     <blockquote className="mt-0.5 border-l-2 border-line-200 pl-2.5 text-ui italic leading-snug text-ink-700">
                       «{c.cita}»
                     </blockquote>
-                    {c.problema && <p className="mt-1.5 text-[12px] leading-snug text-ink-500">{c.problema}</p>}
+                    {c.problema && <p className="mt-1.5 text-[12px] leading-snug text-ink-500 text-justify">{c.problema}</p>}
                     {c.reemplazo && (
                       <>
                         <p className="mt-2 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-brand-700">Reemplazo propuesto</p>
-                        <p className="mt-0.5 text-ui leading-snug text-ink-900">«{c.reemplazo}»</p>
+                        <p className="mt-0.5 text-ui leading-snug text-ink-900 text-justify">«{c.reemplazo}»</p>
                       </>
                     )}
                   </div>
@@ -735,7 +735,7 @@ const Informe: React.FC<{ respuesta: RespuestaDeRevision; documentType: string }
         </>
       )}
 
-      <p className="border-t border-line-100 pt-3 text-meta text-ink-400">
+      <p className="border-t border-line-100 pt-3 text-meta text-ink-400 text-justify">
         Lo marcado como exigencia de la norma sale de la ficha verificada; lo demás es criterio profesional del revisor y usted decide.
         El informe queda guardado para su firma en «Revisiones anteriores»; el escrito y el trabajo del taller, solo si la firma autorizó conservarlos.
       </p>
