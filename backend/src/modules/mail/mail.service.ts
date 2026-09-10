@@ -2,9 +2,24 @@ import nodemailer from 'nodemailer';
 import type { Transporter } from 'nodemailer';
 import { config } from '../../config/env.config';
 import { PLANES } from '../subscriptions/plan.catalog';
-import type { Modulo } from '../subscriptions/plan.catalog';
-import { generarCuentaDeCobro, nombreDeArchivo } from './cuentaDeCobro.pdf';
+import { PRICE_COP } from '../billing/billing.service';
+import { generarCuentaDeCobro, generarCuentaDeCobroDeRecarga, nombreDeArchivo } from './cuentaDeCobro.pdf';
 import type { PagoDePlanServidor, PeriodoPagado, PlanPagado } from './cuentaDeCobro.pdf';
+import {
+  URL_ENTRAR,
+  botones,
+  dato,
+  documento,
+  fechaCorta,
+  fechaLarga,
+  fechaYHora,
+  nota,
+  pares,
+  pasos,
+  pesos,
+  titular
+} from './plantilla';
+import { QUE_CUESTA, SIN_CONSUMO, loQueIncluye, modulosDe, usuariosDe } from './vocabulario';
 
 /**
  * Correo transaccional de la plataforma.
@@ -154,30 +169,12 @@ export const enviarCorreo = async (correo: Correo): Promise<ResultadoDeEnvio> =>
 
 /* ────────────────────────── Plantillas ────────────────────────── */
 
-/** Color de marca (brand-700), el mismo de la barra lateral de la aplicación. */
-const COLOR_MARCA = '#17456B';
-
-export const pesos = (n: number): string => `$${Math.round(n).toLocaleString('es-CO')} COP`;
-
-export const fechaLarga = (iso: string): string =>
-  new Date(iso).toLocaleDateString('es-CO', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    timeZone: 'America/Bogota'
-  });
-
 /*
- * Todo lo que viene de la base (nombre de la firma, referencia) pasa por aquí
- * antes de entrar al HTML. Un nombre de firma con `<` no es un ataque probable,
- * pero un correo mal formado sí es una queja segura.
+ * EL DIBUJO NO VIVE AQUÍ. Cabecera, filete, dato grande, tabla de pares,
+ * botón, lista numerada y pie son de `plantilla.ts`, y los seis correos de la
+ * plataforma usan esa misma pieza. Este archivo solo decide QUÉ dicen los dos
+ * que confirman dinero.
  */
-const escapar = (texto: string): string =>
-  texto
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
 
 interface Plantilla {
   asunto: string;
@@ -185,33 +182,9 @@ interface Plantilla {
   texto: string;
 }
 
-/**
- * El marco común: barra de marca, cuerpo en párrafos y pie. Sin imágenes, para
- * que se lea igual con las imágenes bloqueadas, que es como llegan la mayoría
- * de correos a una bandeja corporativa.
- */
-const envolver = (titulo: string, cuerpoHtml: string): string => `<!doctype html>
-<html lang="es">
-<body style="margin:0;padding:0;background:#f7f8fa;font-family:Helvetica,Arial,sans-serif;color:#101822;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f7f8fa;padding:24px 0;">
-    <tr><td align="center">
-      <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;width:100%;background:#ffffff;border:1px solid #e3e7ec;">
-        <tr><td style="background:${COLOR_MARCA};color:#ffffff;padding:16px 24px;font-size:18px;font-weight:bold;">Iureon</td></tr>
-        <tr><td style="padding:24px;font-size:15px;line-height:1.5;">
-          <h1 style="margin:0 0 16px 0;font-size:20px;color:${COLOR_MARCA};">${titulo}</h1>
-          ${cuerpoHtml}
-        </td></tr>
-        <tr><td style="padding:16px 24px;border-top:1px solid #e3e7ec;font-size:12px;color:#667487;line-height:1.5;">
-          Este correo se envía automáticamente al confirmarse un pago en Iureon. Si usted no reconoce esta operación, responda a este mensaje y lo revisamos.
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
-
-const fila = (etiqueta: string, valor: string): string =>
-  `<tr><td style="padding:6px 12px 6px 0;color:#667487;white-space:nowrap;">${etiqueta}</td><td style="padding:6px 0;font-weight:bold;">${valor}</td></tr>`;
+/** Reexportadas: nacieron aquí y hay quien las importa por este nombre. */
+export { pesos, fechaLarga };
+export { loQueIncluye };
 
 export interface DatosDeRecarga {
   para: string;
@@ -221,60 +194,76 @@ export interface DatosDeRecarga {
   saldoCop?: number;
   /** ISO. La fecha en que se aplicó, no la del correo. */
   fecha: string;
+  /** Para la cuenta de cobro adjunta; ausente se imprime «Sin NIT registrado». */
+  nitDeLaFirma?: string | null;
 }
 
+/**
+ * La confirmación de una recarga ya acreditada.
+ *
+ * EL DATO GRANDE ES EL SALDO RESULTANTE cuando se conoce, y no el monto
+ * recargado: lo que el abogado necesita saber es con cuánto se queda, no
+ * cuánto acaba de mover. Sin saldo legible cae al monto, que es el otro hecho
+ * cierto — nunca a una cifra estimada.
+ *
+ * «CON ESTE SALDO PUEDE GENERAR N ESCRITOS» SE DICE COMO MÁXIMO, NO COMO
+ * PROMEDIO. `priceFor` cobra `max(piso, costo medido)`, así que dividir el
+ * saldo por el piso da el TOPE de escritos, y un escrito largo cuesta más.
+ * Presentar ese tope como una previsión sería inventar una cifra con cara de
+ * cálculo, que es justo lo que esta casa tiene prohibido.
+ */
 export const plantillaDeRecarga = (d: DatosDeRecarga): Plantilla => {
   const asunto = 'Recarga de saldo confirmada · Iureon';
-  const filas = [
-    fila('Firma', escapar(d.firma)),
-    fila('Monto acreditado', pesos(d.montoCop)),
-    ...(typeof d.saldoCop === 'number' ? [fila('Saldo disponible', pesos(d.saldoCop))] : []),
-    fila('Referencia Wompi', escapar(d.referencia)),
-    fila('Fecha', fechaLarga(d.fecha))
-  ].join('');
+  const saldoConocido = typeof d.saldoCop === 'number';
+  const protagonista = saldoConocido
+    ? dato('SALDO DISPONIBLE', pesos(d.saldoCop as number), `Recarga de ${pesos(d.montoCop)} ya acreditada`)
+    : dato('RECARGA ACREDITADA', pesos(d.montoCop), 'El saldo ya está disponible para toda la firma');
 
-  const html = envolver(
-    'Su recarga quedó aplicada',
-    `<p style="margin:0 0 16px 0;">Recibimos el pago y el saldo ya está disponible para generar escritos, revisiones y transcripciones.</p>
-     <table role="presentation" cellspacing="0" cellpadding="0" style="font-size:15px;margin:0 0 16px 0;">${filas}</table>
-     <p style="margin:0;color:#667487;font-size:13px;">El comprobante y el extracto del periodo se descargan desde la aplicación, en <strong>Saldo › Extracto</strong>.</p>`
-  );
+  const topeDeEscritos = saldoConocido ? Math.floor((d.saldoCop as number) / PRICE_COP.BORRADOR) : 0;
 
-  const texto = [
-    'Su recarga quedó aplicada.',
-    '',
-    `Firma: ${d.firma}`,
-    `Monto acreditado: ${pesos(d.montoCop)}`,
-    ...(typeof d.saldoCop === 'number' ? [`Saldo disponible: ${pesos(d.saldoCop)}`] : []),
-    `Referencia Wompi: ${d.referencia}`,
-    `Fecha: ${fechaLarga(d.fecha)}`,
-    '',
-    'El saldo ya está disponible. El comprobante y el extracto se descargan en la aplicación (Saldo › Extracto).'
-  ].join('\n');
+  const { html, texto } = documento({
+    titulo: 'Su recarga quedó acreditada',
+    numero: '03',
+    seccion: 'RECARGA DE SALDO',
+    mencionaPrecios: true,
+    adelanto: saldoConocido
+      ? `Su recarga de ${pesos(d.montoCop)} quedó acreditada. Saldo disponible de la firma: ${pesos(d.saldoCop as number)}.`
+      : `Su recarga de ${pesos(d.montoCop)} quedó acreditada.`,
+    razonDelPie:
+      'Recibe este correo porque el saldo de su firma fue recargado. Es un correo de facturación y no se puede desactivar.',
+    bloques: [
+      titular(
+        'Su recarga quedó acreditada.',
+        'El saldo es de la firma y lo usan todos sus abogados. Se descuenta por consumo, solo cuando se genera un escrito, se revisa uno o se consulta la guía del taller.'
+      ),
+      protagonista,
+      pares('LA TRANSACCIÓN', [
+        ['Valor recargado', pesos(d.montoCop)],
+        ['Medio de pago', `Wompi · ${d.referencia}`],
+        ['Fecha', fechaYHora(d.fecha)],
+        ['Firma', d.firma]
+      ]),
+      /*
+       * El botón lleva a la aplicación y no a «Saldo», que la maqueta enlazaba
+       * como `/saldo`: esa ruta no existe. El saldo es un panel dentro de la
+       * aplicación, y dónde está lo dice la nota de abajo con su nombre real.
+       */
+      botones({ texto: 'Entrar a Iureon', url: URL_ENTRAR }),
+      pasos('QUÉ CUESTA CADA COSA', [...QUE_CUESTA]),
+      nota(
+        `${SIN_CONSUMO}${
+          topeDeEscritos > 0
+            ? ` Con este saldo puede generar hasta ${topeDeEscritos.toLocaleString('es-CO')} escritos o revisiones; es un máximo, porque un escrito largo cuesta más que el mínimo.`
+            : ''
+        }`
+      ),
+      nota(
+        'Adjuntamos la cuenta de cobro en PDF. No es factura electrónica de venta validada por la DIAN y no discrimina IVA. El extracto del periodo se descarga desde la aplicación, en Saldo › Extracto.'
+      )
+    ]
+  });
 
   return { asunto, html, texto };
-};
-
-const NOMBRE_DE_MODULO: Record<Modulo, string> = {
-  REDACCION: 'Redacción',
-  BORRADORES: 'Borradores',
-  REVISIONES: 'Revisiones',
-  BUSCADOR: 'Buscador',
-  CATALOGO: 'Catálogo',
-  HERRAMIENTAS: 'Herramientas',
-  MANUAL: 'Manual',
-  SOPORTE: 'Soporte',
-  MEMBRETE: 'Membrete',
-  AUDIENCIAS: 'Audiencias',
-  ENTREVISTAS: 'Entrevistas',
-  ORIENTACION: 'Orientación'
-};
-
-/** Una línea leída del catálogo de planes, no escrita a mano: si el plan cambia, el correo cambia. */
-export const loQueIncluye = (plan: PlanPagado): string => {
-  const def = PLANES[plan];
-  const usuarios = def.maxUsuarios === 1 ? '1 usuario' : `hasta ${def.maxUsuarios} usuarios`;
-  return `${usuarios} · ${def.modulos.map((m) => NOMBRE_DE_MODULO[m]).join(', ')}`;
 };
 
 export interface DatosDeSuscripcion {
@@ -288,48 +277,115 @@ export interface DatosDeSuscripcion {
   referencia: string;
 }
 
+/**
+ * La confirmación de un plan YA PAGADO. Este sí puede decir «activo»: sale de
+ * `apply_subscription_payment`, que ya escribió el periodo en la fila de la
+ * firma. La bienvenida de quien apenas se registró para comprar no puede, y
+ * por eso es otro correo.
+ *
+ * LO QUE QUEDA HABILITADO SE LEE DEL CATÁLOGO. La maqueta prometía Audiencias,
+ * Entrevistas y Orientación en un correo que también podía confirmar un plan
+ * Esencial, que no tiene ninguno de los tres.
+ */
 export const plantillaDeSuscripcion = (d: DatosDeSuscripcion): Plantilla => {
-  const nombrePlan = PLANES[d.plan].nombre;
+  const def = PLANES[d.plan];
   const nombrePeriodo = d.periodo === 'ANUAL' ? 'anual' : 'mensual';
-  const asunto = `Suscripción al plan ${nombrePlan} confirmada · Iureon`;
+  const asunto = `Suscripción al plan ${def.nombre} confirmada · Iureon`;
   const cobertura = `del ${fechaLarga(d.validoDesde)} al ${fechaLarga(d.validoHasta)}`;
+  const precio = d.periodo === 'ANUAL' ? def.precioAnualCop : def.precioMensualCop;
 
-  const filas = [
-    fila('Firma', escapar(d.firma)),
-    fila('Plan', `${nombrePlan} · ${nombrePeriodo}`),
-    fila('Periodo cubierto', cobertura),
-    fila('Valor pagado', pesos(d.montoCop)),
-    fila('Referencia Wompi', escapar(d.referencia))
-  ].join('');
-
-  const html = envolver(
-    `Plan ${nombrePlan} activo`,
-    `<p style="margin:0 0 16px 0;">Recibimos el pago y el plan ${nombrePlan} quedó vigente ${cobertura}.</p>
-     <table role="presentation" cellspacing="0" cellpadding="0" style="font-size:15px;margin:0 0 16px 0;">${filas}</table>
-     <p style="margin:0 0 16px 0;">El plan incluye: ${escapar(loQueIncluye(d.plan))}.</p>
-     <p style="margin:0;color:#667487;font-size:13px;">Adjuntamos la cuenta de cobro en PDF. No es factura electrónica de venta validada por la DIAN y no discrimina IVA.</p>`
-  );
-
-  const texto = [
-    `Plan ${nombrePlan} activo.`,
-    '',
-    `Firma: ${d.firma}`,
-    `Plan: ${nombrePlan} · ${nombrePeriodo}`,
-    `Periodo cubierto: ${cobertura}`,
-    `Valor pagado: ${pesos(d.montoCop)}`,
-    `Referencia Wompi: ${d.referencia}`,
-    '',
-    `El plan incluye: ${loQueIncluye(d.plan)}.`,
-    'Adjuntamos la cuenta de cobro en PDF. No es factura electrónica de venta validada por la DIAN y no discrimina IVA.'
-  ].join('\n');
+  const { html, texto } = documento({
+    titulo: `Plan ${def.nombre} activo`,
+    numero: '02',
+    seccion: 'PLAN CONTRATADO',
+    mencionaPrecios: true,
+    adelanto: `Pago recibido por Wompi. Su plan ${def.nombre} queda activo hasta el ${fechaLarga(d.validoHasta)}.`,
+    razonDelPie:
+      'Recibe este correo porque es el socio administrador de la firma que contrató el plan. Es un correo de facturación y no se puede desactivar.',
+    bloques: [
+      titular(
+        `Su plan ${def.nombre} está activo.`,
+        'Recibimos el pago por Wompi. No guardamos su tarjeta y no habrá cobro automático: cuando quiera continuar, usted paga de nuevo desde la aplicación.'
+      ),
+      dato(
+        'VIGENTE HASTA',
+        fechaCorta(d.validoHasta),
+        `${def.nombre} · ${usuariosDe(def.maxUsuarios)} · ${pesos(precio)} al ${nombrePeriodo === 'anual' ? 'año' : 'mes'}, IVA incluido`
+      ),
+      pares('EL PAGO', [
+        ['Valor pagado', `${pesos(d.montoCop)} (IVA incluido)`],
+        ['Plan', `${def.nombre} · ${nombrePeriodo}`],
+        ['Periodo cubierto', cobertura],
+        ['Medio de pago', `Wompi · ${d.referencia}`],
+        ['Firma', d.firma]
+      ]),
+      botones({ texto: 'Entrar a Iureon', url: URL_ENTRAR }),
+      pasos('QUÉ QUEDA HABILITADO', [
+        {
+          titulo: `Los módulos de ${def.nombre}.`,
+          // Del catálogo de planes: Esencial no abre Audiencias, Entrevistas ni Orientación.
+          detalle: `${modulosDe(d.plan)}.`
+        },
+        {
+          titulo: 'El periodo se suma, no se reinicia.',
+          detalle:
+            'Si paga antes del vencimiento, los días que le quedaban se conservan y el periodo nuevo arranca donde terminaba el anterior.'
+        },
+        {
+          titulo: 'Sin cobro automático.',
+          detalle: 'No guardamos su tarjeta. Para continuar después del vencimiento, usted paga de nuevo desde «Plan».'
+        }
+      ]),
+      nota(
+        `El plan incluye ${usuariosDe(def.maxUsuarios)}. El uso de inteligencia artificial se paga aparte, con recargas de saldo dentro de la aplicación: un escrito o una revisión desde ${pesos(PRICE_COP.BORRADOR)} y una consulta a la guía del taller ${pesos(PRICE_COP.CONSULTA_REVISION)}. Si paga antes del vencimiento se suma el periodo, nunca se pierden días.`
+      ),
+      nota(
+        'Adjuntamos la cuenta de cobro en PDF. No es factura electrónica de venta validada por la DIAN y no discrimina IVA.'
+      )
+    ]
+  });
 
   return { asunto, html, texto };
 };
 
 /* ────────────────────────── Envíos ────────────────────────── */
 
-export const correoDeRecarga = (d: DatosDeRecarga): Promise<ResultadoDeEnvio> =>
-  enviarCorreo({ para: d.para, ...plantillaDeRecarga(d) });
+/**
+ * La recarga también viaja con su cuenta de cobro.
+ *
+ * POR QUÉ NO LA TENÍA. El PDF nació para la suscripción y se quedó ahí, pero
+ * una recarga de saldo es dinero que entró exactamente igual y el contador de
+ * la firma necesita el mismo soporte. El documento es el mismo que el de la
+ * suscripción, con el concepto que le corresponde y sin periodo cubierto: una
+ * recarga acredita saldo, no compra tiempo.
+ *
+ * Si el PDF no se pudiera producir, el correo sale igual sin adjunto: la
+ * confirmación de que el saldo está disponible importa más que el soporte.
+ */
+export const correoDeRecarga = (d: DatosDeRecarga): Promise<ResultadoDeEnvio> => {
+  let adjuntos: Adjunto[] | undefined;
+  try {
+    adjuntos = [
+      {
+        filename: nombreDeArchivo(d.referencia),
+        content: generarCuentaDeCobroDeRecarga(
+          {
+            reference: d.referencia,
+            amountCop: d.montoCop,
+            userEmail: d.para,
+            createdAt: d.fecha
+          },
+          { nombre: d.firma, nit: d.nitDeLaFirma, correo: d.para }
+        ),
+        contentType: 'application/pdf'
+      }
+    ];
+  } catch (err) {
+    console.error('[MAIL] No se pudo generar la cuenta de cobro de la recarga; el correo sale sin adjunto:', err);
+  }
+
+  return enviarCorreo({ para: d.para, adjuntos, ...plantillaDeRecarga(d) });
+};
 
 /**
  * La cuenta de cobro viaja adjunta, generada aquí con el mismo trazado que la
@@ -363,14 +419,40 @@ export const estadoDelCorreo = (): { enabled: boolean; user: string | null; from
   fromName: config.mail.fromName
 });
 
-/** El mensaje de prueba que `POST /api/admin/mail/test` manda al propio operador. */
-export const correoDePrueba = (para: string): Promise<ResultadoDeEnvio> =>
-  enviarCorreo({
-    para,
-    asunto: 'Prueba de correo · Iureon',
-    texto: `Este es un mensaje de prueba enviado desde Iureon el ${fechaLarga(new Date().toISOString())}. Si lo lee, el correo saliente está configurado.`,
-    html: envolver(
-      'El correo saliente funciona',
-      `<p style="margin:0;">Este es un mensaje de prueba enviado el ${fechaLarga(new Date().toISOString())}. Si lo lee, la cuenta de Gmail y su contraseña de aplicación están bien configuradas.</p>`
-    )
+/**
+ * El mensaje de prueba que `POST /api/admin/mail/test` manda al propio operador.
+ *
+ * Usa la MISMA pieza que los correos reales, y no un HTML suelto, porque su
+ * único trabajo es responder «¿llega y se ve bien?». Un mensaje de prueba con
+ * otro dibujo contesta la primera mitad de la pregunta y calla la segunda.
+ */
+export const correoDePrueba = (para: string): Promise<ResultadoDeEnvio> => {
+  const ahora = new Date().toISOString();
+  const { html, texto } = documento({
+    titulo: 'Prueba de correo de Iureon',
+    numero: '00',
+    seccion: 'PRUEBA DE CORREO',
+    mencionaPrecios: false,
+    adelanto: 'Si lee este mensaje, el correo saliente de Iureon está configurado.',
+    razonDelPie:
+      'Recibe este correo porque alguien pulsó «Probar el correo» en la consola de operación de Iureon. No se envía a ninguna firma.',
+    bloques: [
+      titular(
+        'El correo saliente funciona.',
+        'Este es un mensaje de prueba. Si lo está leyendo, las credenciales del proveedor de envío están bien configuradas y los correos de la plataforma pueden salir.'
+      ),
+      dato('ENVIADO EL', fechaCorta(ahora), fechaYHora(ahora)),
+      pares('LA PRUEBA', [
+        ['Destinatario', para],
+        ['Proveedor', config.mail.provider === 'resend' ? 'Resend' : 'Gmail'],
+        ['Remitente', config.mail.fromName]
+      ]),
+      botones({ texto: 'Entrar a Iureon', url: URL_ENTRAR }),
+      nota(
+        'Compruebe de paso que la cabecera, el filete dorado, el dato grande y la tabla se ven como aquí: es la misma pieza con la que salen los correos de bienvenida, de plan, de recarga y de borrado.'
+      )
+    ]
   });
+
+  return enviarCorreo({ para, asunto: 'Prueba de correo · Iureon', html, texto });
+};

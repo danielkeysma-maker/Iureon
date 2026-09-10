@@ -34,6 +34,12 @@ import {
   type PlanPeriod
 } from '../subscriptions/plan.catalog';
 import { MIGRACION_MODULOS, NOMBRE_DE_MODULO } from '../subscriptions/plan.service';
+import {
+  administradoresDeLaFirma,
+  correoDeCambioDePlan,
+  correoDeCancelacion,
+  correoDeFirmaCreada
+} from '../mail/avisos.mail';
 
 /**
  * Running the platform: the firms on it, their plans, their balances.
@@ -567,6 +573,39 @@ export const createFirm = async (input: {
     siFallaLaCuenta: 'CONSERVAR_FIRMA'
   });
 
+  /*
+   * LA BIENVENIDA, QUE HASTA HOY NO EXISTÍA.
+   *
+   * El alta desde la consola creaba la firma y su cuenta y NO avisaba a nadie:
+   * la persona quedaba con un acceso que no sabía que tenía, y el operador
+   * tenía que escribirle a mano. Sale DESPUÉS de que la firma y la cuenta
+   * existen y no puede tumbar el alta — `correoDeFirmaCreada` no lanza y
+   * devuelve `{ enviado, error }`, que se registra con el prefijo `[MAIL]`.
+   *
+   * Se espera a propósito: en una función serverless una promesa iniciada
+   * después de responder no termina nunca.
+   *
+   * Todo lo que afirma sale de lo que se acaba de escribir en la fila —el
+   * plan, el periodo, los días y el cupo son los mismos valores de arriba—,
+   * así que cambiar la política de alta cambia el correo con ella.
+   */
+  const aviso = await correoDeFirmaCreada({
+    para: input.adminEmail,
+    nombre: input.adminNombre ?? null,
+    firma: creada.firmName,
+    plan: 'PREMIUM',
+    periodo: 'PRUEBA',
+    validoHasta: creada.validUntil,
+    diasDeVigencia: DIAS_DE_PRUEBA,
+    maxUsuarios: PLANES.PREMIUM.maxUsuarios,
+    saldoInicialCop: creada.credits
+  });
+  if (!aviso.enviado) {
+    console.warn(
+      `[MAIL] La firma «${creada.firmName}» quedó creada pero no se pudo avisar a su socio administrador: ${aviso.error ?? 'sin detalle'}`
+    );
+  }
+
   return {
     id: creada.firmId,
     name: creada.firmName,
@@ -814,7 +853,52 @@ export const updateFirmPlan = async (
     throw new AuthError('UPDATE_FAILED', 'No se pudo fijar el plan de la firma.', 502);
   }
 
+  /*
+   * EL AVISO, DESPUÉS DE LA ESCRITURA Y SIN PODER DESHACERLA. Un pago por
+   * Wompi avisa a la firma; un plan movido a mano no avisaba a nadie, y la
+   * firma se enteraba —si acaso— al abrir la pantalla del plan. Sale aquí, con
+   * lo que quedó escrito de verdad, y un fallo de correo no vuelve atrás un
+   * plan ya guardado.
+   */
+  await avisarPorCorreo(async () =>
+    correoDeCambioDePlan({
+      destinatarios: await administradoresDeLaFirma(firmId),
+      firma: await nombreParaCorreo(firmId),
+      plan: changes.plan as Plan,
+      periodo: changes.period as PlanPeriod,
+      validoHasta: validUntil,
+      desde: new Date().toISOString()
+    })
+  );
+
   return { plan: changes.plan, period: changes.period, validUntil, reason: motivo };
+};
+
+/**
+ * El nombre registrado de la firma para un correo, con el id como respaldo
+ * honesto: mejor un identificador que un nombre inventado, y jamás una
+ * excepción — el hecho que el correo anuncia ya ocurrió.
+ */
+const nombreParaCorreo = async (firmId: string): Promise<string> => {
+  try {
+    const nombre = await nombreDeLaFirma(firmId);
+    return nombre.trim() || firmId;
+  } catch {
+    return firmId;
+  }
+};
+
+/**
+ * Corre un envío y se traga cualquier fallo. `enviarCorreo` ya no lanza, pero
+ * componer el mensaje sí puede (listar cuentas, leer la firma), y ninguna de
+ * esas dos cosas puede convertir una operación consumada en un 500.
+ */
+const avisarPorCorreo = async (envio: () => Promise<unknown>): Promise<void> => {
+  try {
+    await envio();
+  } catch (err) {
+    console.error('[MAIL] No se pudo avisar a la firma del cambio:', err);
+  }
 };
 
 /**
@@ -868,6 +952,24 @@ export const suspenderAccesoDeFirma = async (
     console.error('[ADMIN] No se pudo suspender el acceso:', error.message);
     throw new AuthError('UPDATE_FAILED', 'No se pudo suspender el acceso de la firma.', 502);
   }
+
+  /*
+   * ESTA ES LA CANCELACIÓN DEL PLAN, y por eso el aviso sale de aquí. No hay
+   * ninguna otra: la firma no tiene botón de cancelar, `subscription_status`
+   * no lo lee ningún guarda, y lo único que decide hasta cuándo hay plan es
+   * `plan_valid_until`, que esta función acaba de escribir. El correo dice esa
+   * fecha —ni una inventada— y lo que queda después, que es todo salvo crear
+   * trabajo nuevo.
+   */
+  await avisarPorCorreo(async () =>
+    correoDeCancelacion({
+      destinatarios: await administradoresDeLaFirma(firmId),
+      firma: await nombreParaCorreo(firmId),
+      plan,
+      periodo: period,
+      finDelPlan: validUntil
+    })
+  );
 
   return { plan, period, validUntil, reason: motivo };
 };
@@ -948,7 +1050,11 @@ export const describirCambioDePlan = (cambio: {
 }): string =>
   `Plan ${PLANES[cambio.plan].nombre} · ${etiquetaDePeriodo(cambio.period)} · ` +
   (cambio.validUntil
-    ? `vence el ${new Date(cambio.validUntil).toLocaleDateString('es-CO')}`
+    ? // Zona explícita: el servidor corre en UTC y un vencimiento fijado a las
+      // 23:59 de Bogotá se guarda como las 04:59 del día siguiente en UTC. Sin
+      // decir la zona, la traza de auditoría nombraba un día que no era el que
+      // el operador escribió — y ahora tiene que coincidir con el correo.
+      `vence el ${new Date(cambio.validUntil).toLocaleDateString('es-CO', { timeZone: 'America/Bogota' })}`
     : 'sin vencimiento');
 
 /** Adds an account to any firm, for onboarding and support. */
@@ -1029,6 +1135,8 @@ export const eliminarFirmaCompleta = async (input: {
   firmIdDelOperador: string;
   motivo: unknown;
   confirmacion: unknown;
+  /** Quién de la operación lo ejecutó; va en la constancia que sale al terminar. */
+  operador: string;
 }): Promise<FirmaEliminada & { motivo: string }> => {
   const nombre = await nombreDeLaFirma(input.firmId);
 
@@ -1040,6 +1148,10 @@ export const eliminarFirmaCompleta = async (input: {
     motivo: input.motivo
   });
 
-  const resultado = await borrarFirmaConTodo({ firmId: input.firmId, nombre });
+  const resultado = await borrarFirmaConTodo({
+    firmId: input.firmId,
+    nombre,
+    solicitante: { correo: input.operador, quien: 'OPERADOR' }
+  });
   return { ...resultado, motivo };
 };

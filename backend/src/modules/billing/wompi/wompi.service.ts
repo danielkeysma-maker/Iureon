@@ -428,7 +428,9 @@ const confirmarRecargaPorCorreo = async (
     montoCop: input.amountCop,
     referencia: input.referencia,
     saldoCop: input.balance,
-    fecha: new Date().toISOString()
+    fecha: new Date().toISOString(),
+    // El NIT va a la cuenta de cobro adjunta, igual que en la suscripción.
+    nitDeLaFirma: firma.nit
   });
 
   if (resultado.enviado) {

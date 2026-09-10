@@ -1,6 +1,8 @@
 import { supabase } from '../../config/supabase.config';
 import { AuthError, listFirmUsers } from '../auth/auth.service';
 import { BackblazeB2TenantStorageService } from '../documents/b2.service';
+import { correoDeBorrado } from '../mail/avisos.mail';
+import type { QuienBorro } from '../mail/avisos.mail';
 
 /**
  * Deleting a firm with everything it owns: the ONE pipeline, shared by the
@@ -81,8 +83,20 @@ export const firmIdDelOperador = async (): Promise<string | null> => {
  * The caller has ALREADY decided the deletion is allowed: this function does
  * not check names, reasons or passwords. It refuses nothing but the absent
  * migration and a failing database.
+ *
+ * LA CONSTANCIA SALE DE AQUÍ, y no de cada uno de los dos que llaman, por la
+ * misma razón por la que el borrado vive aquí: las dos puertas —el panel de la
+ * firma y la consola del operador— deben dejar el mismo papel. Se manda al
+ * final, con lo que el borrado realmente removió, y a las direcciones que se
+ * listaron en el paso 1, que es el último momento en que existen. `solicitante`
+ * dice quién lo pidió; sin él la constancia se escribe igual, porque un correo
+ * que no se puede componer no puede impedir un borrado ya consumado.
  */
-export const borrarFirmaConTodo = async (input: { firmId: string; nombre: string }): Promise<FirmaEliminada> => {
+export const borrarFirmaConTodo = async (input: {
+  firmId: string;
+  nombre: string;
+  solicitante?: { correo: string; quien: QuienBorro };
+}): Promise<FirmaEliminada> => {
   const client = requireClient();
   const advertencias: string[] = [];
 
@@ -140,7 +154,7 @@ export const borrarFirmaConTodo = async (input: { firmId: string; nombre: string
     else usuariosEliminados += 1;
   }
 
-  return {
+  const resultado: FirmaEliminada = {
     nombre: input.nombre,
     tablas: ((tablas ?? []) as Array<{ tabla: string; filas: number | string }>).map((t) => ({
       tabla: t.tabla,
@@ -149,4 +163,30 @@ export const borrarFirmaConTodo = async (input: { firmId: string; nombre: string
     usuariosEliminados,
     advertencias
   };
+
+  /*
+   * 5. La constancia, al final y sin poder estropear nada. El borrado ya está
+   * consumado y es irreversible: un correo que falla se registra con el
+   * prefijo [MAIL] y no cambia lo que se devuelve. Awaited a propósito — en
+   * una función serverless una promesa iniciada después de responder no
+   * termina nunca.
+   */
+  if (input.solicitante) {
+    try {
+      await correoDeBorrado({
+        destinatarios: cuentas.map((c) => c.email),
+        firma: input.nombre,
+        fecha: new Date().toISOString(),
+        quien: input.solicitante.quien,
+        solicitante: input.solicitante.correo,
+        tablas: resultado.tablas,
+        usuariosEliminados: resultado.usuariosEliminados,
+        advertencias: resultado.advertencias
+      });
+    } catch (err) {
+      console.error('[MAIL] No se pudo dejar constancia del borrado por correo:', err);
+    }
+  }
+
+  return resultado;
 };

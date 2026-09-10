@@ -45,7 +45,11 @@ export const eliminarMiFirmaController = async (req: Request, res: Response): Pr
       throw new AuthError('WRONG_PASSWORD', 'La contraseña no es correcta.', 401);
     }
 
-    const resultado = await borrarFirmaConTodo({ firmId, nombre });
+    const resultado = await borrarFirmaConTodo({
+      firmId,
+      nombre,
+      solicitante: { correo: user.email, quien: 'ADMINISTRADOR' }
+    });
 
     const traza =
       `Firma «${nombre}» (${firmId}) eliminada por su administrador ${user.email} · ` +

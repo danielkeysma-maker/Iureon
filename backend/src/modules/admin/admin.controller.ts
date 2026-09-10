@@ -309,7 +309,8 @@ export const eliminarFirmaController = async (req: Request, res: Response): Prom
       firmId,
       firmIdDelOperador: req.firmId ?? req.user!.firmId,
       motivo: req.body?.motivo,
-      confirmacion: req.body?.confirmacion
+      confirmacion: req.body?.confirmacion,
+      operador: req.user!.email
     });
 
     await auditService.record({

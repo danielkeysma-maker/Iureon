@@ -74,8 +74,77 @@ export const numeroDeCuenta = (referencia: string): string => referencia.replace
 /** El nombre con el que viaja el adjunto; el navegador guarda el suyo igual. */
 export const nombreDeArchivo = (referencia: string): string => `Cuenta-de-cobro-${numeroDeCuenta(referencia)}.pdf`;
 
+/**
+ * Lo mínimo que el papel necesita, sea lo que sea que se pagó.
+ *
+ * POR QUÉ SE EXTRAJO. La cuenta de cobro solo sabía de suscripciones, y una
+ * recarga de saldo también es dinero que entró y también necesita su soporte.
+ * El trazado NO se duplicó: lo que cambia entre una y otra es el concepto y su
+ * detalle, así que eso es lo único que se recibe. El dibujo sigue siendo uno y
+ * sigue siendo el gemelo del que produce el navegador.
+ */
+interface CuentaDibujable {
+  reference: string;
+  createdAt: string;
+  /** La línea grande del concepto. */
+  concepto: string;
+  /** La línea pequeña bajo el concepto; vacía cuando no hay nada que precisar. */
+  detalle: string;
+  amountCop: number;
+  userEmail: string;
+  /** Cómo se nombra lo pagado en el pie. */
+  loPagado: string;
+}
+
 /** Devuelve el PDF como Buffer, listo para adjuntar a un correo. */
-export const generarCuentaDeCobro = (pago: PagoDePlanServidor, cliente: ClienteDeLaCuenta): Buffer => {
+export const generarCuentaDeCobro = (pago: PagoDePlanServidor, cliente: ClienteDeLaCuenta): Buffer =>
+  dibujarCuenta(
+    {
+      reference: pago.reference,
+      createdAt: pago.createdAt,
+      concepto: `Suscripción a ${EMISOR.nombreComercial} · Plan ${NOMBRE_DE_PLAN[pago.plan]} ${NOMBRE_DE_PERIODO[pago.period]}`,
+      detalle: `Periodo cubierto: del ${fecha(pago.validFrom)} al ${fecha(pago.validUntil)}.`,
+      amountCop: pago.amountCop,
+      userEmail: pago.userEmail,
+      loPagado: 'el pago de la suscripción'
+    },
+    cliente
+  );
+
+/** Lo que el servidor sabe de una recarga aplicada: no hay plan ni periodo que cubrir. */
+export interface RecargaServidor {
+  reference: string;
+  amountCop: number;
+  userEmail: string;
+  createdAt: string;
+}
+
+/**
+ * La misma cuenta de cobro para una recarga de saldo.
+ *
+ * SIN PERIODO CUBIERTO, y eso no es un olvido: una recarga no compra tiempo,
+ * acredita un saldo que se gasta cuando la firma lo gasta. Poner ahí unas
+ * fechas cualesquiera sería inventarle al contador una vigencia que el pago no
+ * tiene. El detalle dice lo que sí es cierto: que el saldo quedó acreditado.
+ */
+export const generarCuentaDeCobroDeRecarga = (
+  recarga: RecargaServidor,
+  cliente: ClienteDeLaCuenta
+): Buffer =>
+  dibujarCuenta(
+    {
+      reference: recarga.reference,
+      createdAt: recarga.createdAt,
+      concepto: `Recarga de saldo de inteligencia artificial en ${EMISOR.nombreComercial}`,
+      detalle: `Saldo acreditado a la cuenta de la firma el ${fecha(recarga.createdAt)}.`,
+      amountCop: recarga.amountCop,
+      userEmail: recarga.userEmail,
+      loPagado: 'la recarga de saldo'
+    },
+    cliente
+  );
+
+const dibujarCuenta = (pago: CuentaDibujable, cliente: ClienteDeLaCuenta): Buffer => {
   const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'letter' });
   const ancho = doc.internal.pageSize.getWidth();
   const margen = 20;
@@ -130,15 +199,13 @@ export const generarCuentaDeCobro = (pago: PagoDePlanServidor, cliente: ClienteD
   y += 6;
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
-  const concepto = `Suscripción a ${EMISOR.nombreComercial} · Plan ${NOMBRE_DE_PLAN[pago.plan]} ${NOMBRE_DE_PERIODO[pago.period]}`;
-  const detalle = `Periodo cubierto: del ${fecha(pago.validFrom)} al ${fecha(pago.validUntil)}.`;
-  const lineasConcepto = doc.splitTextToSize(concepto, ancho - margen * 2 - 45) as string[];
+  const lineasConcepto = doc.splitTextToSize(pago.concepto, ancho - margen * 2 - 45) as string[];
   doc.text(lineasConcepto, margen, y);
   doc.text(pesos(pago.amountCop), derecha, y, { align: 'right' });
   y += lineasConcepto.length * 5;
   doc.setTextColor(80);
   doc.setFontSize(9);
-  doc.text(detalle, margen, y);
+  if (pago.detalle) doc.text(pago.detalle, margen, y);
   doc.setTextColor(0);
   y += 8;
   doc.line(margen, y, derecha, y);
@@ -166,7 +233,7 @@ export const generarCuentaDeCobro = (pago: PagoDePlanServidor, cliente: ClienteD
   doc.setFontSize(8);
   doc.setTextColor(120);
   const nota = doc.splitTextToSize(
-    `Cuenta de cobro emitida por ${EMISOR.titular} (${EMISOR.nombreComercial}) como soporte del pago de la suscripción. ` +
+    `Cuenta de cobro emitida por ${EMISOR.titular} (${EMISOR.nombreComercial}) como soporte de ${pago.loPagado}. ` +
       `No es factura electrónica de venta validada por la DIAN. Generada el ${fecha(new Date().toISOString())}.`,
     ancho - margen * 2
   ) as string[];
