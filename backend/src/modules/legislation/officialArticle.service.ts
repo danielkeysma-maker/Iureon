@@ -247,21 +247,55 @@ export const mapaDeFragmentos = (htmlIndice: string): Map<number, string> => {
   return mapa;
 };
 
-/**
- * El trozo de HTML que va desde el ancla del artículo hasta la siguiente ancla.
+/*
+ * EL ANCLA DEL ARTICULO NO SIEMPRE LLEVA LA CLASE, Y EXIGIRLA ROMPIA DOS COSAS.
  *
- * Se corta en la siguiente `bookmarkaj` sea del tipo que sea —artículo o título
- * de capítulo (`name="Nivel196"`)— porque cualquiera de las dos marca el final
- * del artículo, y quedarse con más texto arrastraría el artículo siguiente y con
- * él su marcador de derogación. Ese error sería una acusación falsa con
- * apariencia de dato duro, que es lo que este repositorio ya aprendió a temer.
+ * Este comentario decia, desde el primer dia, exactamente el error que habia
+ * que evitar: «quedarse con mas texto arrastraria el articulo siguiente y con
+ * el su marcador de derogacion... una acusacion falsa con apariencia de dato
+ * duro». Lo decia bien y no lo lograba, porque el corte solo reconocia anclas
+ * con `class="bookmarkaj"` y EL SENADO NO SE LA PONE A TODAS.
+ *
+ * MEDIDO el 10 de septiembre de 2026. El art. 72 de la Ley 160 de 1994 —la
+ * nulidad absoluta de la adjudicacion de baldios— salia DEROGADO del Senado y
+ * VIGENTE de Funcion Publica, y la ficha de baldios se quedo sin causal por esa
+ * «discrepancia». No habia tal: el art. 72 lleva «Inciso CONDICIONALMENTE
+ * exequible» y esta vivo. Lo que pasaba es que su ancla siguiente,
+ * `<A name="72A">`, VA SIN CLASE, asi que el corte la saltaba y se llevaba
+ * dentro el art. 72A entero — que si dice «Articulo INEXEQUIBLE» (C-644-12).
+ * El articulo heredaba la muerte del vecino.
+ *
+ * Y NO ES UN CASO SUELTO. Contando anclas en las paginas ya descargadas del
+ * Senado: Ley 1437 (CPACA) 47A, 53A, 60A, 136A, 149A, 182A, 182B, 185A, 201A,
+ * 243A y ademas 186, 199, 200, 219, 220, 222, 236, 271 y 299; Ley 1448 2A, 4A,
+ * 13A, 26, 32, 47, 62A, 66A, 68A, 68B, 130 y 130A; Ley 160 65A y 72A. Los
+ * articulos anadidos por leyes posteriores —los que llevan letra— casi nunca
+ * traen la clase, y son justo los que mas se citan porque son los nuevos.
+ *
+ * EL DANO ERA DOBLE: esos articulos no se podian ENCONTRAR (el ancla de inicio
+ * tambien exigia la clase, asi que devolvian SIN_ARTICULO) y ademas ENSUCIABAN
+ * al anterior, que se los tragaba con sus marcadores.
+ *
+ * Ahora el ancla se reconoce por el NOMBRE y no por la clase, y el corte para
+ * en cualquier ancla cuyo nombre tenga forma de articulo —numero con letra
+ * opcional— o de titulo de capitulo. Las anclas que NO son ninguna de las dos
+ * siguen sin cortar de mas porque no tienen esa forma: las subdivisiones del
+ * CGP son `name="206.P"` o `name="24.b"`, y las notas al pie `name="_ftn12"`.
+ * Comprobado contra las 52 anclas de la pagina real: las dos unicas sin clase
+ * eran 65A y 72A, ambas articulos.
  */
+const FORMA_DE_ARTICULO = '\\d{1,4}[A-Za-z]?';
+
 export const bloqueDelArticulo = (html: string, articulo: number): string | null => {
-  const ancla = new RegExp(`<a\\s+class="bookmarkaj"\\s+name="${articulo}"\\s*>`, 'i');
+  const ancla = new RegExp(`<a[^>]*\\sname="${articulo}"\\s*>`, 'i');
   const m = ancla.exec(html);
   if (!m) return null;
   const desde = m.index;
-  const siguiente = /<a\s+class="bookmarkaj"\s+name="/i.exec(html.slice(desde + m[0].length));
+  const siguienteAncla = new RegExp(
+    `<a[^>]*\\sname="(?:${FORMA_DE_ARTICULO}|Nivel\\d+)"`,
+    'i'
+  );
+  const siguiente = siguienteAncla.exec(html.slice(desde + m[0].length));
   const hasta = siguiente ? desde + m[0].length + siguiente.index : html.length;
   return html.slice(desde, hasta);
 };

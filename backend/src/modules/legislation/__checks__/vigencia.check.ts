@@ -157,6 +157,63 @@ const OPCIONES_LEY_CORTA = `<select><option value="#8">8</option>
   );
 }
 
+/* ─── 2.bis EL ANCLA SIN CLASE, QUE HACIA HEREDAR LA MUERTE DEL VECINO ────── */
+
+/*
+ * HTML REAL de `basedoc/ley_0160_1994_pr001.html`, recortado a las tres anclas
+ * que importan y copiado tal cual. FIJESE EN LA DEL 72A: va `<A name="72A">`,
+ * SIN `class="bookmarkaj"`, mientras el 72 y el 72B si la llevan. Esa asimetria
+ * es del sitio, no del fixture, y es toda la causa del defecto.
+ *
+ * El art. 72 —nulidad absoluta de la adjudicacion de baldios— salia DEROGADO
+ * del Senado y VIGENTE de Funcion Publica, y la ficha de baldios se quedo sin
+ * causal por una «discrepancia» que no existia: el corte se saltaba el ancla
+ * sin clase y se tragaba el art. 72A entero, que si es INEXEQUIBLE.
+ */
+const HTML_160_72 = `<p><a class="bookmarkaj" name="72">ART&Iacute;CULO 72. &lt;Inciso CONDICIONALMENTE exequible&gt; No se podr&aacute;n efectuar titulaciones de terrenos bald&iacute;os en favor de personas naturales o jur&iacute;dicas que sean propietarias de otros predios rurales. Ser&aacute;n absolutamente nulas las adjudicaciones que se efect&uacute;en con violaci&oacute;n de la prohibici&oacute;n establecida en este art&iacute;culo.</p>
+<p><B><A name="72A">ART&Iacute;CULO 72A. PROYECTOS ESPECIALES AGROPECUARIOS O FORESTALES. &lt;Art&iacute;culo INEXEQUIBLE&gt;</A></B></p>
+<p><a class="bookmarkaj" name="72B">ART&Iacute;CULO 72B. COMISI&Oacute;N DE PROYECTOS ESPECIALES. &lt;Art&iacute;culo INEXEQUIBLE&gt;</A></p>
+<p><a class="bookmarkaj" name="73">ART&Iacute;CULO 73. Las adjudicaciones de bald&iacute;os se har&aacute;n conforme a esta ley.</p>`;
+
+{
+  const b72 = bloqueDelArticulo(HTML_160_72, 72);
+  check('el bloque del art. 72 se corta en el 72A, aunque su ancla NO lleve la clase', b72 !== null && !b72.includes('72A'), `${b72?.length ?? 0} bytes`);
+  check(
+    'y por eso el art. 72 sale MODULADO por su propio inciso, no DEROGADO por el vecino',
+    estadoDeLosMarcadores(marcadoresDelBloque(b72 ?? '')).estado === 'MODULADO',
+    estadoDeLosMarcadores(marcadoresDelBloque(b72 ?? '')).marcador ?? 'sin marcador'
+  );
+
+  /*
+   * Y EL ARTICULO CON LETRA YA SE PUEDE ENCONTRAR. Antes el ancla de inicio
+   * tambien exigia la clase, asi que estos devolvian SIN_ARTICULO: no se podian
+   * ni leer ni comprobar, y ademas ensuciaban al anterior. Son los articulos
+   * anadidos por leyes posteriores, que es decir los mas nuevos y los mas
+   * citados.
+   */
+  const b72b = bloqueDelArticulo(HTML_160_72, 72);
+  check('el vecino de al lado no se pierde: el 73 sigue localizable y limpio', bloqueDelArticulo(HTML_160_72, 73) !== null && estadoDeLosMarcadores(marcadoresDelBloque(bloqueDelArticulo(HTML_160_72, 73) ?? '')).estado === 'VIGENTE');
+  check('y el bloque del 72 no se comio tampoco al 72B', !(b72b ?? '').includes('72B'));
+
+  /*
+   * CONTRACASO: una subdivision NO es un articulo y no puede cortar el bloque.
+   * El CGP ancla sus incisos como `name="206.P"` y `name="24.b"`, y las notas
+   * al pie van como `name="_ftn12"`. Si el corte se disparara con ellas,
+   * partiria articulos por la mitad y el juez de la glosa juzgaria medio texto
+   * creyendo que lo vio entero.
+   */
+  const CON_SUBANCLAS = `<p><a class="bookmarkaj" name="206">ART&Iacute;CULO 206. JURAMENTO ESTIMATORIO. Quien pretenda el reconocimiento de una indemnizacion debera estimarla razonadamente bajo juramento. <a name="206.P">PAR&Aacute;GRAFO.</a> Tambien habra lugar a la condena a que se refiere este articulo. <a name="_ftn12">nota</a> Fin del articulo.</p>
+<p><a class="bookmarkaj" name="207">ART&Iacute;CULO 207. Otro articulo.</p>`;
+  const b206 = bloqueDelArticulo(CON_SUBANCLAS, 206);
+  check(
+    'una subancla de inciso (name="206.P") NO corta el articulo por la mitad',
+    (b206 ?? '').includes('Fin del articulo'),
+    `${b206?.length ?? 0} bytes`
+  );
+  check('ni la corta una nota al pie (name="_ftn12")', (b206 ?? '').includes('_ftn12'));
+  check('pero el articulo siguiente si la corta', !(b206 ?? '').includes('207'));
+}
+
 /* ─── 3. EL MAPA ARTÍCULO → FRAGMENTO ─────────────────────────────────────── */
 
 {
