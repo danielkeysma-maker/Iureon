@@ -27,3 +27,8 @@ thumbs.db
 # Agent tooling
 .atl/
 *.tsbuildinfo
+
+# Andamios de medicion de los agentes. Se escriben para medir contra el motor
+# real y se borran al terminar; el 10 de septiembre de 2026 uno se colo en un
+# commit por un `git add -A` hecho mientras un agente trabajaba.
+backend/src/scripts/_tmp/
