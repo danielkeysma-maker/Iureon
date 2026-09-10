@@ -639,8 +639,13 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
    * A PDF Y A WORD, CON LA ESTRUCTURA DEL DIALOGO. Copiar el texto no basta:
    * el abogado guarda el informe junto al expediente o se lo manda a quien
    * redacto el escrito, y ahi tiene que verse como aqui: por secciones, con
-   * la letra de la firma. Solo cuando el informe se pudo ordenar; un informe
-   * libre no tiene secciones que exportar y se copia.
+   * la letra de la firma.
+   *
+   * LAS TRES FORMAS SE DESCARGAN. El informe que el revisor no devolvio
+   * ordenado por secciones tambien: sale con su texto tal cual y con la nota
+   * que lo explica. Hasta hoy los dos botones se quedaban apagados con un
+   * «copielo», y era la unica forma de informe que la firma pagaba y no podia
+   * archivar junto al expediente.
    */
   const datosParaExportar = (): DatosDeExportacion | null => {
     if (!respuesta) return null;
@@ -654,16 +659,22 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
       cliente: origenDelInforme.cliente || undefined,
       revisadoPor: origenDelInforme.revisadoPor || undefined
     };
-    /* La misma tubería de PDF y Word para los dos modos; solo cambia el cuerpo. */
-    if (modoDelInforme === 'DOCUMENTO_RECIBIDO') {
-      return respuesta.informeRecibido ? { ...comunes, modo: 'DOCUMENTO_RECIBIDO', informe: respuesta.informeRecibido } : null;
+    /* La misma tubería de PDF y Word para las tres formas; solo cambia el cuerpo. */
+    if (modoDelInforme === 'DOCUMENTO_RECIBIDO' && respuesta.informeRecibido) {
+      return { ...comunes, modo: 'DOCUMENTO_RECIBIDO', informe: respuesta.informeRecibido };
     }
-    return respuesta.informe ? { ...comunes, informe: respuesta.informe } : null;
+    if (modoDelInforme !== 'DOCUMENTO_RECIBIDO' && respuesta.informe) return { ...comunes, informe: respuesta.informe };
+    if (respuesta.informeLibre) {
+      return { ...comunes, modo: 'INFORME_LIBRE', origen: modoDelInforme, texto: respuesta.informeLibre };
+    }
+    return null;
   };
 
-  /** Si el informe en pantalla se pudo ordenar por secciones: decide si hay algo que exportar. */
+  /** Si hay algo que exportar. Ya no exige secciones: el informe libre sale con su texto tal cual. */
   const informeOrdenado =
-    modoDelInforme === 'DOCUMENTO_RECIBIDO' ? Boolean(respuesta?.informeRecibido) : Boolean(respuesta?.informe);
+    modoDelInforme === 'DOCUMENTO_RECIBIDO'
+      ? Boolean(respuesta?.informeRecibido || respuesta?.informeLibre)
+      : Boolean(respuesta?.informe || respuesta?.informeLibre);
 
   const exportar = async (formato: 'pdf' | 'word') => {
     const datos = datosParaExportar();
@@ -741,6 +752,12 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
                     informeRecibido: respuesta.informeRecibido ?? null,
                     informeLibre: respuesta.informeLibre,
                     conFicha: respuesta.conFicha,
+                    /* Lo mismo que la exportación de este diálogo usa: el taller descarga por la misma tubería. */
+                    modo: modoDelInforme,
+                    caracteres: respuesta.caracteres,
+                    truncado: respuesta.truncado,
+                    fechaDelInforme: origenDelInforme.fecha,
+                    revisadoPor: origenDelInforme.revisadoPor || undefined,
                     guardaTexto: paraElTaller.guardaTexto,
                     conversacion: paraElTaller.conversacion,
                     anotaciones: paraElTaller.anotaciones,
@@ -762,7 +779,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
               onClick={() => void exportar('word')}
               disabled={!informeOrdenado || exportando !== null}
               className="btn-neutral btn-sm disabled:opacity-50"
-              title={informeOrdenado ? 'Descargar el informe en Word, con la letra de la firma' : 'Este informe no tiene secciones: cópielo'}
+              title={informeOrdenado ? 'Descargar el informe en Word, con la letra de la firma' : 'Todavía no hay informe que descargar'}
             >
               <Download className="h-3.5 w-3.5" />
               {exportando === 'word' ? 'Word…' : 'Word'}
@@ -772,7 +789,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
               onClick={() => void exportar('pdf')}
               disabled={!informeOrdenado || exportando !== null}
               className="btn-neutral btn-sm disabled:opacity-50"
-              title={informeOrdenado ? 'Descargar el informe en PDF, con la letra de la firma' : 'Este informe no tiene secciones: cópielo'}
+              title={informeOrdenado ? 'Descargar el informe en PDF, con la letra de la firma' : 'Todavía no hay informe que descargar'}
             >
               <Download className="h-3.5 w-3.5" />
               {exportando === 'pdf' ? 'PDF…' : 'PDF'}

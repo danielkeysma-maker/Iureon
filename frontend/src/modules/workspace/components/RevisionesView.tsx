@@ -130,7 +130,7 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({
           return;
         }
         setError(
-          `El texto de «${c.fileName}» no se conservó porque la firma no había autorizado guardar escritos cuando se revisó. El informe sigue disponible en Redacción → Revisar un escrito → Revisiones anteriores. Para trabajarlo en el taller, vuelva a subir el archivo.`
+          `El texto de «${c.fileName}» no se conservó porque la firma no había autorizado guardar escritos cuando se revisó. El informe sigue disponible en «Revisar un documento» —el botón de esta cabecera, o el de Redacción— dentro de «Revisiones anteriores de la firma». Para trabajarlo en el taller, vuelva a subir el archivo.`
         );
         return;
       }
@@ -147,6 +147,18 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({
         informeRecibido: c.informeRecibido,
         informeLibre: c.informeLibre,
         conFicha: c.conFicha,
+        /*
+         * LO QUE LA CABECERA DEL INFORME DESCARGADO NECESITA. Este es el
+         * camino por el que el abogado vuelve días después —la fila abre el
+         * taller directamente—, así que si estos datos no viajan por aquí, el
+         * Word y el PDF salen sin fecha, sin quien pidió la revisión y sin
+         * decir que el escrito se recortó.
+         */
+        modo: c.modo,
+        caracteres: c.caracteres,
+        truncado: c.truncado,
+        fechaDelInforme: new Date(c.createdAt).toLocaleString('es-CO', { dateStyle: 'long', timeStyle: 'short' }),
+        revisadoPor: c.userEmail,
         guardaTexto: consentimiento.guarda,
         conversacion: c.conversacion,
         anotaciones: c.anotaciones ?? [],
@@ -223,7 +235,7 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({
                 </button>
                 <button type="button" onClick={() => setRevisarAbierto(true)} className="btn-primary btn-sm">
                   <ClipboardCheck className="h-3.5 w-3.5" />
-                  Revisar un escrito
+                  Revisar un documento
                 </button>
               </>
             )}
@@ -326,8 +338,8 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({
 
         {!cargando && lista.length === 0 && !error && (
           <p className="mt-6 text-[13px] text-ink-500">
-            Todavía no hay revisiones. Empiece con «Revisar un escrito»: suba el archivo y, si no sabe qué actuación es, deje que la guía
-            se lo proponga.
+            Todavía no hay revisiones. Empiece con «Revisar un documento» —un escrito suyo o uno que le llegó—: suba el archivo y, si no sabe qué
+            actuación es, deje que la guía se lo proponga.
           </p>
         )}
 

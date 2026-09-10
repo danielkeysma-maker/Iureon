@@ -1,6 +1,8 @@
 import React from 'react';
 import type { FormatoDelEscrito } from '../../documents/formatoEnPantalla';
-import { reviewApi, type Anotacion, type ConsentimientoDeGuardado, type InformeDeDocumentoRecibido, type InformeDeRevision, type PreguntasAudienciaGuardadas, type TurnoDelTaller, type VersionDelTexto } from '../services/review.api';
+import { reviewApi, type Anotacion, type ConsentimientoDeGuardado, type InformeDeDocumentoRecibido, type InformeDeRevision, type ModoDeRevision, type PreguntasAudienciaGuardadas, type TurnoDelTaller, type VersionDelTexto } from '../services/review.api';
+import { exportarInformeAPdf, exportarInformeAWord } from '../services/informeExport.service';
+import type { DatosDeExportacion } from '../services/informeLayout';
 import { exportarPreguntasAPdf, exportarPreguntasAWord } from '../services/preguntasExport.service';
 import { TallerDeEscrito } from './TallerDeEscrito';
 import { PuenteAlAtaque } from './PuenteAlAtaque';
@@ -39,6 +41,24 @@ export interface DatosDelTaller {
   informeRecibido?: InformeDeDocumentoRecibido | null;
   informeLibre: string | null;
   conFicha: boolean;
+  /*
+   * ─── LO QUE EL INFORME NECESITA PARA SALIR EN PAPEL ───────────────────────
+   *
+   * La cabecera del Word y del PDF lleva la fecha de la revisión, quién la
+   * pidió, si el escrito se recortó y en qué modo se leyó. Son OPCIONALES
+   * porque el taller de un borrador no tiene nada de esto y porque un dato
+   * ausente se declara —la exportación escribe la fecha de hoy y omite el
+   * resto— antes que inventarse un autor o una fecha.
+   */
+  /** Cuál de los dos se leyó. Cuando falta, se deduce de la forma del informe. */
+  modo?: ModoDeRevision;
+  /** Cuántos caracteres tenía el escrito y si se recortó a 300.000. */
+  caracteres?: number;
+  truncado?: boolean;
+  /** Cuándo se emitió el informe, ya formateado por quien abre el taller. */
+  fechaDelInforme?: string;
+  /** Correo de quien pidió la revisión. */
+  revisadoPor?: string;
   guardaTexto: boolean;
   conversacion: TurnoDelTaller[];
   anotaciones?: Anotacion[];
@@ -116,6 +136,51 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
   const guardaEnServidor = consentimiento.guarda && datos.revisionId !== null;
 
   /*
+   * ─── QUÉ SE LEYÓ: UN ESCRITO PROPIO O UN DOCUMENTO QUE LLEGÓ ──────────────
+   *
+   * Una condición con NOMBRE, no un `if` mudo repetido: de ella cuelgan la
+   * cabecera del informe descargado, la pestaña «Audiencia» y el pie del
+   * puente al ataque, y las tres tienen que decidir lo mismo.
+   *
+   * El modo viaja cuando quien abre el taller lo sabe; si no, se deduce de la
+   * FORMA del informe, que es como el resto del módulo lo distingue. La forma
+   * sola no basta: un documento recibido cuyo revisor no devolvió secciones
+   * llega como informe libre y seguiría pareciendo un escrito propio.
+   */
+  const esDocumentoRecibido = datos.modo === 'DOCUMENTO_RECIBIDO' || datos.informeRecibido != null;
+
+  /*
+   * DESCARGAR EL INFORME DESDE EL TALLER, por la misma tubería del diálogo.
+   * `informeLayout` arma el papel y `informeExport` lo descarga; aquí solo se
+   * reúnen los datos, con el informe VIGENTE que el taller entrega —el que
+   * dejó «Volver a revisar», si se volvió a revisar—.
+   */
+  const descargarInforme = async (formato: 'pdf' | 'word', vigente: { informe: InformeDeRevision | null; informeLibre: string | null }) => {
+    const comunes = {
+      documentType: datos.documentType,
+      fileName: datos.fileName || 'escrito',
+      /* Sin fecha guardada se pone la de hoy, que es cuando se emite este papel; nunca una inventada. */
+      fecha: datos.fechaDelInforme || new Date().toLocaleDateString('es-CO', { dateStyle: 'long' }),
+      caracteres: datos.caracteres ?? 0,
+      truncado: datos.truncado ?? false,
+      conFicha: datos.conFicha,
+      cliente: datos.cliente || undefined,
+      revisadoPor: datos.revisadoPor || undefined
+    };
+    /* LAS TRES FORMAS. El estructurado del documento recibido, el del escrito propio, y el que no se pudo ordenar. */
+    const d: DatosDeExportacion | null = datos.informeRecibido
+      ? { ...comunes, modo: 'DOCUMENTO_RECIBIDO', informe: datos.informeRecibido }
+      : vigente.informe
+        ? { ...comunes, informe: vigente.informe }
+        : vigente.informeLibre
+          ? { ...comunes, modo: 'INFORME_LIBRE', origen: esDocumentoRecibido ? 'DOCUMENTO_RECIBIDO' : 'ESCRITO_PROPIO', texto: vigente.informeLibre }
+          : null;
+    if (!d) throw new Error('Este escrito todavía no tiene informe que descargar.');
+    if (formato === 'pdf') await exportarInformeAPdf(d);
+    else await exportarInformeAWord(d);
+  };
+
+  /*
    * Las preguntas para la audiencia guardadas con la revisión. Quien abre el
    * taller arma los datos desde la lista (sin cuerpos), así que se piden aquí
    * una vez; un fallo de red deja la pestaña vacía y no bloquea nada.
@@ -124,6 +189,20 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
   /* Las funciones de Revisiones que el operador puede apagar para esta firma: sin pestaña «Audiencia», sin entrada de chat, sin «Volver a revisar». */
   const { funcionHabilitada } = usePlan();
   const preguntasHabilitadas = funcionHabilitada('REVISIONES.PREGUNTAS_AUDIENCIA');
+
+  /*
+   * ─── LAS PREGUNTAS DE AUDIENCIA NO SE OFRECEN SOBRE UN DOCUMENTO RECIBIDO ──
+   *
+   * El encargo que sale al servidor está escrito para el ESCRITO DEL ABOGADO:
+   * pide preguntas para interrogar a la contraparte y a los testigos a partir
+   * de lo que ese escrito afirma. Sobre un auto o una sentencia produce
+   * preguntas dirigidas al juez que lo profirió, que no se interroga, y COBRA
+   * saldo por ellas. No cobrar por algo que no sirve es más urgente que
+   * hacerlo servir: hasta que el encargo se adapte —eso es trabajo de
+   * servidor—, la pestaña no se ofrece y se dice por qué.
+   */
+  const preguntasOfrecidas = Boolean(datos.revisionId) && preguntasHabilitadas && !esDocumentoRecibido;
+
   React.useEffect(() => {
     if (datos.preguntasAudiencia !== undefined || !datos.revisionId) return;
     let vigente = true;
@@ -269,8 +348,18 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
         onSaldoCambiado={onSaldoCambiado}
         formato={formatoDeFirma}
         cerradas={{ chat: !funcionHabilitada('REVISIONES.CHAT_GUIA'), rerevisar: !funcionHabilitada('REVISIONES.REREVISAR') }}
+        descargarInforme={descargarInforme}
+        preguntasNoOfrecidas={
+          esDocumentoRecibido && preguntasHabilitadas ? (
+            <>
+              No hay pestaña <span className="font-semibold">«Audiencia»</span> sobre un documento recibido: las preguntas se preparan a partir del
+              escrito de usted, para interrogar a la contraparte y a los testigos, y de un auto o una sentencia saldrían preguntas dirigidas a quien lo
+              profirió. Prepare la audiencia desde la revisión del escrito propio con el que actúe en ella.
+            </>
+          ) : undefined
+        }
         preguntas={
-          datos.revisionId && preguntasHabilitadas
+          preguntasOfrecidas
             ? {
                 precioCop: precioConsultaCop,
                 guardadas: preguntasGuardadas,

@@ -200,8 +200,8 @@ export const InicioView: React.FC<InicioViewProps> = ({
           />
           <TarjetaDeAccion
             icono={ClipboardCheck}
-            titulo="Revisar un escrito"
-            queHace="Un informe sobre un escrito ya redactado, y el taller para corregirlo."
+            titulo="Revisar un documento"
+            queHace="Un informe sobre un escrito suyo o sobre uno que le llegó, y el taller para trabajarlo."
             onClick={() => onIr('taller')}
             noIncluida={ocultas.includes('taller')}
             motivoNoIncluida={motivoDePuertaCerrada('taller')}
@@ -273,8 +273,8 @@ export const InicioView: React.FC<InicioViewProps> = ({
                   <Vacio>Leyendo sus revisiones…</Vacio>
                 ) : revisionesRecientes.length === 0 ? (
                   <Vacio>
-                    Aún no ha revisado ningún escrito. Se pide desde Redacción, con «Revisar un escrito ya
-                    redactado».
+                    Aún no ha revisado ningún documento. Se pide desde «Revisiones», con «Revisar un
+                    documento»: un escrito suyo o uno que le llegó.
                   </Vacio>
                 ) : (
                   <ul className="divide-y divide-line-100">

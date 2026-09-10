@@ -7,7 +7,7 @@
  * not drawn.
  */
 import { jsPDF } from 'jspdf';
-import { dibujarInformeEnPdf, type DatosDelInforme, type DatosDelInformeRecibido } from '../services/informeLayout';
+import { dibujarInformeEnPdf, type DatosDelInforme, type DatosDelInformeLibre, type DatosDelInformeRecibido } from '../services/informeLayout';
 
 let fallos = 0;
 const check = (n: string, ok: boolean, d = ''): void => {
@@ -127,6 +127,48 @@ const anterior = { ...recibido, informe: { ...recibido.informe, porDondeSeAtaca:
 const doc7 = new jsPDF({ unit: 'mm', format: 'letter' });
 dibujarInformeEnPdf(doc7, 'helvetica', anterior, 11);
 check('un informe anterior a la seccion se dibuja igual, sin ella', doc7.getNumberOfPages() >= 1 && !/Lectura del revisor/.test(textoDe(doc7)));
+
+/* ─── LA TERCERA FORMA: EL INFORME QUE NO SE PUDO ORDENAR ───────────────────
+ *
+ * Existe, la firma la paga, y hasta hoy era la unica que no se podia
+ * descargar. Lo que tiene que aguantar: que el texto salga entero, que la
+ * cabecera diga cual de los dos se leyo —el origen manda sobre la forma— y
+ * que no se le inventen secciones que el revisor no produjo.
+ */
+const libre: DatosDelInformeLibre = {
+  documentType: 'Accion de tutela',
+  fileName: 'tutela.pdf',
+  fecha: '9 de septiembre de 2026',
+  caracteres: 4912,
+  truncado: false,
+  conFicha: true,
+  modo: 'INFORME_LIBRE',
+  origen: 'ESCRITO_PROPIO',
+  texto: 'El escrito cumple lo esencial.\n\nPero la tercera pretension es subsidiaria mal redactada y conviene reformularla como orden concreta.'
+};
+const doc8 = new jsPDF({ unit: 'mm', format: 'letter' });
+dibujarInformeEnPdf(doc8, 'helvetica', libre, 11);
+const salidaLibre = textoDe(doc8);
+check('el informe sin secciones se dibuja con su texto completo', /El escrito cumple lo esencial/.test(salidaLibre) && /subsidiaria mal redactada/.test(salidaLibre));
+check('y declara por que no viene por secciones', /no se pudo ordenar por secciones/.test(salidaLibre));
+check('no se le inventan secciones que el revisor no produjo', !/FORTALEZAS|DEBILIDADES|RECOMENDACIONES/.test(salidaLibre));
+check('sobre un escrito propio la cabecera dice revision del escrito', /Revisi.{1,6}n del escrito/.test(salidaLibre));
+
+/* El origen manda sobre la forma: un documento recibido sin secciones sigue siendo un documento recibido. */
+const libreRecibido: DatosDelInformeLibre = { ...libre, origen: 'DOCUMENTO_RECIBIDO', fileName: 'auto.pdf' };
+const doc9 = new jsPDF({ unit: 'mm', format: 'letter' });
+dibujarInformeEnPdf(doc9, 'helvetica', libreRecibido, 11);
+const salidaLibreRecibido = textoDe(doc9);
+check('un documento recibido sin secciones no se rotula como escrito propio', !/Revisi.{1,6}n del escrito/.test(salidaLibreRecibido) && /Documento recibido/.test(salidaLibreRecibido));
+
+/* Un informe largo sin secciones pagina igual que uno estructurado. */
+const libreLargo: DatosDelInformeLibre = {
+  ...libre,
+  texto: Array.from({ length: 60 }, (_, k) => `Parrafo ${k + 1}: ` + 'revisar con cuidado la redaccion de la pretension y su relacion con los hechos narrados, '.repeat(2)).join('\n\n')
+};
+const doc10 = new jsPDF({ unit: 'mm', format: 'letter' });
+dibujarInformeEnPdf(doc10, 'helvetica', libreLargo, 11);
+check('un informe largo sin secciones pagina en vez de salirse de la hoja', doc10.getNumberOfPages() >= 3, String(doc10.getNumberOfPages()));
 
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);
 process.exitCode = fallos === 0 ? 0 : 1;

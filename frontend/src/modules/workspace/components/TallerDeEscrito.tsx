@@ -174,6 +174,25 @@ export interface TallerDeEscritoProps {
    * a no pulsarlo.
    */
   original?: OriginalDelTaller;
+  /**
+   * DESCARGAR EL INFORME DESDE AQUÍ, en Word o en PDF.
+   *
+   * Existía solo en el diálogo de revisión, y la lista del módulo «Revisiones»
+   * abre DIRECTAMENTE el taller: quien volvía días después por ese camino no
+   * encontraba ni Word ni PDF, y tenía que adivinar que estaban dentro del
+   * diálogo, en «Revisiones anteriores». Nadie lo adivina.
+   *
+   * Recibe el informe VIGENTE y no el que llegó en `datos`, porque «Volver a
+   * revisar» lo reemplaza en esta misma pantalla: descargar el de antes sería
+   * archivar un informe que ya no es el que se está leyendo.
+   */
+  descargarInforme?: (formato: 'pdf' | 'word', vigente: { informe: InformeDeRevision | null; informeLibre: string | null }) => Promise<void>;
+  /**
+   * Por qué no hay pestaña «Audiencia», dicho en la pestaña donde el abogado
+   * acaba de leer el documento. Una capacidad ausente y muda se lee como un
+   * fallo; ausente y explicada, como una decisión.
+   */
+  preguntasNoOfrecidas?: React.ReactNode;
 }
 
 export interface PreguntasDelTaller {
@@ -322,6 +341,8 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   preguntas,
   cerradas,
   pieDelInformeRecibido,
+  descargarInforme,
+  preguntasNoOfrecidas,
   original
 }) => {
   /*
@@ -332,6 +353,13 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
    */
   const [texto, setTexto] = React.useState(() => reflujoDeSecciones(datos.texto));
   const [informe, setInforme] = React.useState<InformeDeRevision | null>(datos.informe);
+  /*
+   * EL INFORME SIN SECCIONES TAMBIÉN CAMBIA AL VOLVER A REVISAR, y se leía de
+   * `datos`: tras una revisión nueva que tampoco se pudo ordenar, la pestaña
+   * seguía mostrando el texto de la anterior — y la descarga habría archivado
+   * ese mismo texto viejo.
+   */
+  const [informeLibre, setInformeLibre] = React.useState<string | null>(datos.informeLibre ?? null);
   const [conversacion, setConversacion] = React.useState<TurnoDelTaller[]>(datos.conversacion);
   const [anotaciones, setAnotaciones] = React.useState<Anotacion[]>(datos.anotaciones);
   const [versiones, setVersiones] = React.useState<VersionDelTexto[]>(datos.versiones);
@@ -789,6 +817,26 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
     }
   };
 
+  /*
+   * DESCARGAR EL INFORME. El estado vive aquí y no en quien monta el taller
+   * porque el informe vigente es el de esta pantalla: quien exporta necesita
+   * el que «Volver a revisar» dejó, no el que llegó al abrirla.
+   */
+  const [descargando, setDescargando] = React.useState<'pdf' | 'word' | null>(null);
+  const [errorDescarga, setErrorDescarga] = React.useState('');
+  const descargar = async (formato: 'pdf' | 'word') => {
+    if (!descargarInforme || descargando) return;
+    setDescargando(formato);
+    setErrorDescarga('');
+    try {
+      await descargarInforme(formato, { informe, informeLibre });
+    } catch (err) {
+      setErrorDescarga(err instanceof Error ? err.message : 'No se pudo descargar el informe.');
+    } finally {
+      setDescargando(null);
+    }
+  };
+
   const rerevisar = async () => {
     if (!onRerevisar || ocupado) return;
     setOcupado('revision');
@@ -797,6 +845,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
     try {
       const r = await onRerevisar(texto);
       setInforme(r.informe);
+      setInformeLibre(r.informeLibre);
       setConversacion((c) => [
         ...c,
         { rol: 'revisor', texto: r.informe ? `Nueva revisión emitida. ${r.informe.resumen}` : (r.informeLibre ?? 'Nueva revisión emitida.'), fecha: new Date().toISOString() }
@@ -1224,89 +1273,145 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
     </div>
   );
 
+  /*
+   * LA BARRA DE DESCARGA DEL INFORME. Va fija arriba del panel y no dentro del
+   * desplazamiento: un informe largo dejaría los botones a varias pantallas de
+   * distancia, y ya se sabe en esta casa que una acción que responde lejos de
+   * donde se pulsa, en el caso grande no se encuentra.
+   *
+   * Solo aparece cuando hay informe. Las TRES formas se descargan —el del
+   * escrito propio, el del documento recibido y el que el revisor no devolvió
+   * ordenado por secciones—: la que faltaba era la tercera, y era justamente la
+   * que el abogado no podía archivar de ninguna otra manera.
+   */
+  const hayInforme = Boolean(datos.informeRecibido || informe || informeLibre);
+  const DescargaDelInforme = () =>
+    !descargarInforme || !hayInforme ? null : (
+      <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-line-100 bg-canvas px-4 py-2">
+        {/*
+          EN EL TELÉFONO EL AVISO OCUPA LA LÍNEA ENTERA y los botones bajan
+          solos. Con `flex-1` a secas se quedaría en la treintena de píxeles que
+          sobran junto a «Word» y «PDF», que no encogen: el mismo recorte que ya
+          se corrigió en la cinta de autorización de «Revisiones».
+        */}
+        <span className="w-full text-[11.5px] leading-snug text-ink-500 [overflow-wrap:anywhere] sm:w-auto sm:min-w-0 sm:flex-1">
+          Descargue el informe con la letra de su firma, para archivarlo con el expediente.
+        </span>
+        {(['word', 'pdf'] as const).map((f) => (
+          <button
+            key={f}
+            type="button"
+            onClick={() => void descargar(f)}
+            disabled={descargando !== null}
+            className="btn-neutral btn-sm shrink-0 disabled:opacity-50"
+            title={f === 'word' ? 'Descargar el informe en Word, con la letra de la firma' : 'Descargar el informe en PDF, con la letra de la firma'}
+          >
+            <Download className="h-3.5 w-3.5" />
+            {descargando === f ? (f === 'word' ? 'Word…' : 'PDF…') : f === 'word' ? 'Word' : 'PDF'}
+          </button>
+        ))}
+      </div>
+    );
+
   const InformePanel = () => (
-    /*
-      `[overflow-wrap:anywhere]` EN LA RAÍZ DEL PANEL, no en cada párrafo: el
-      informe cita artículos, correos y URLs de fuentes oficiales, y una URL es
-      una sola palabra que el navegador no parte. Sin esto el renglón se pinta
-      121px más allá del borde en un teléfono de 320. La propiedad se hereda,
-      así que una sola declaración cubre resúmenes, listas y correcciones.
-    */
-    <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-3 text-[12.5px] [overflow-wrap:anywhere]">
+    <div className="flex min-h-0 flex-1 flex-col">
+      <DescargaDelInforme />
+      {errorDescarga && (
+        <p className="shrink-0 border-b border-line-100 bg-canvas px-4 py-1.5 text-[11.5px] leading-snug text-danger [overflow-wrap:anywhere]">{errorDescarga}</p>
+      )}
       {/*
-        TRES FORMAS DE INFORME, NO UNA. El del escrito propio; el del documento
-        recibido, que tiene otras secciones y otra promesa; y el texto libre de
-        cuando el revisor no devolvió algo ordenable. Antes solo se leía la
-        primera, así que un documento recibido —o un informe sin secciones—
-        abría esta pestaña diciendo «no tiene informe de revisión» encima de un
-        informe que la firma ya había pagado.
+        `[overflow-wrap:anywhere]` EN LA RAÍZ DEL PANEL, no en cada párrafo: el
+        informe cita artículos, correos y URLs de fuentes oficiales, y una URL es
+        una sola palabra que el navegador no parte. Sin esto el renglón se pinta
+        121px más allá del borde en un teléfono de 320. La propiedad se hereda,
+        así que una sola declaración cubre resúmenes, listas y correcciones.
       */}
-      {datos.informeRecibido ? (
-        <>
-          <p className="rounded-control border border-line-200 bg-canvas px-2.5 py-1.5 text-[11.5px] leading-snug text-ink-600 text-justify">
-            Lectura de un <span className="font-semibold">documento recibido</span>. Todo lo de abajo sale del texto del propio documento y va citado:
-            ninguna ficha del catálogo respalda estas líneas.{' '}
-            {/*
-              DÓNDE ESTÁ LA RESPUESTA, DICHO DONDE TOCA. Esta línea mandaba al
-              abogado de vuelta a «Revisiones» porque aquí no había pie; con el
-              pie montado, mandarlo a otra pantalla sería enseñarle a no ver el
-              bloque que tiene debajo.
-            */}
-            {pieDelInformeRecibido
-              ? 'Qué actuación procede lo responde el catálogo, en el bloque que cierra esta lectura.'
-              : 'Qué actuación procede lo responden la guía de actuaciones y la agenda de términos, desde «Revisiones».'}
-          </p>
-          <LecturaDelDocumentoRecibido informe={datos.informeRecibido} pie={pieDelInformeRecibido} />
-        </>
-      ) : !informe ? (
-        datos.informeLibre ? (
+      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-3 text-[12.5px] [overflow-wrap:anywhere]">
+        {/*
+          TRES FORMAS DE INFORME, NO UNA. El del escrito propio; el del documento
+          recibido, que tiene otras secciones y otra promesa; y el texto libre de
+          cuando el revisor no devolvió algo ordenable. Antes solo se leía la
+          primera, así que un documento recibido —o un informe sin secciones—
+          abría esta pestaña diciendo «no tiene informe de revisión» encima de un
+          informe que la firma ya había pagado.
+        */}
+        {datos.informeRecibido ? (
           <>
             <p className="rounded-control border border-line-200 bg-canvas px-2.5 py-1.5 text-[11.5px] leading-snug text-ink-600 text-justify">
-              El revisor respondió en un formato que no se pudo ordenar por secciones; abajo está su texto completo.
+              Lectura de un <span className="font-semibold">documento recibido</span>. Todo lo de abajo sale del texto del propio documento y va citado:
+              ninguna ficha del catálogo respalda estas líneas.{' '}
+              {/*
+                DÓNDE ESTÁ LA RESPUESTA, DICHO DONDE TOCA. Esta línea mandaba al
+                abogado de vuelta a «Revisiones» porque aquí no había pie; con el
+                pie montado, mandarlo a otra pantalla sería enseñarle a no ver el
+                bloque que tiene debajo.
+              */}
+              {pieDelInformeRecibido
+                ? 'Qué actuación procede lo responde el catálogo, en el bloque que cierra esta lectura.'
+                : 'Qué actuación procede lo responden la guía de actuaciones y la agenda de términos, desde «Revisiones».'}
             </p>
-            <pre className="whitespace-pre-wrap font-sans text-[12.5px] leading-relaxed text-ink-900">{datos.informeLibre}</pre>
+            <LecturaDelDocumentoRecibido informe={datos.informeRecibido} pie={pieDelInformeRecibido} />
           </>
+        ) : !informe ? (
+          informeLibre ? (
+            <>
+              <p className="rounded-control border border-line-200 bg-canvas px-2.5 py-1.5 text-[11.5px] leading-snug text-ink-600 text-justify">
+                El revisor respondió en un formato que no se pudo ordenar por secciones; abajo está su texto completo.
+              </p>
+              <pre className="whitespace-pre-wrap font-sans text-[12.5px] leading-relaxed text-ink-900">{informeLibre}</pre>
+            </>
+          ) : (
+            <p className="text-ink-500 text-justify">Este escrito no tiene informe de revisión. Puede pedir uno con «Revisión completa» o conversar con la guía.</p>
+          )
         ) : (
-          <p className="text-ink-500 text-justify">Este escrito no tiene informe de revisión. Puede pedir uno con «Revisión completa» o conversar con la guía.</p>
-        )
-      ) : (
-        <>
-          <p className="leading-relaxed text-ink-900 text-justify">{informe.resumen}</p>
-          {(
-            [
-              ['Secciones que la norma exige y faltan', informe.seccionesFaltantes],
-              ['Debilidades', informe.debilidades],
-              ['Fortalezas', informe.fortalezas],
-              ['Recomendaciones', informe.recomendaciones]
-            ] as const
-          ).map(([t, items]) =>
-            items.length ? (
-              <section key={t}>
-                <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">{t}</h4>
-                <ul className="mt-1 list-disc space-y-1 pl-4 text-ink-800">
-                  {items.map((x, k) => (
-                    <li key={k} className="text-justify [text-wrap:pretty]">{x}</li>
+          <>
+            <p className="leading-relaxed text-ink-900 text-justify">{informe.resumen}</p>
+            {(
+              [
+                ['Secciones que la norma exige y faltan', informe.seccionesFaltantes],
+                ['Debilidades', informe.debilidades],
+                ['Fortalezas', informe.fortalezas],
+                ['Recomendaciones', informe.recomendaciones]
+              ] as const
+            ).map(([t, items]) =>
+              items.length ? (
+                <section key={t}>
+                  <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">{t}</h4>
+                  <ul className="mt-1 list-disc space-y-1 pl-4 text-ink-800">
+                    {items.map((x, k) => (
+                      <li key={k} className="text-justify [text-wrap:pretty]">{x}</li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null
+            )}
+            {informe.erroresDeAplicacion.length > 0 && (
+              <section>
+                <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">Errores de aplicación</h4>
+                <ul className="mt-1 space-y-1.5">
+                  {informe.erroresDeAplicacion.map((e, k) => (
+                    <li key={k} className="rounded-control border border-line-100 bg-canvas px-2.5 py-1.5">
+                      <span className="font-mono text-[10px] text-ink-500">{e.donde}</span>
+                      <p className="text-ink-900 text-justify">{e.problema}</p>
+                      {e.correccion && <p className="text-brand-700">Corrección: {e.correccion}</p>}
+                    </li>
                   ))}
                 </ul>
               </section>
-            ) : null
-          )}
-          {informe.erroresDeAplicacion.length > 0 && (
-            <section>
-              <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">Errores de aplicación</h4>
-              <ul className="mt-1 space-y-1.5">
-                {informe.erroresDeAplicacion.map((e, k) => (
-                  <li key={k} className="rounded-control border border-line-100 bg-canvas px-2.5 py-1.5">
-                    <span className="font-mono text-[10px] text-ink-500">{e.donde}</span>
-                    <p className="text-ink-900 text-justify">{e.problema}</p>
-                    {e.correccion && <p className="text-brand-700">Corrección: {e.correccion}</p>}
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-        </>
-      )}
+            )}
+          </>
+        )}
+        {/*
+          POR QUÉ NO HAY PESTAÑA «AUDIENCIA», dicho al pie del informe que el
+          abogado acaba de leer, que es donde la buscaría. Callarlo dejaría la
+          ausencia con la misma cara que un fallo.
+        */}
+        {preguntasNoOfrecidas && (
+          <p className="mt-3 rounded-control border border-line-200 bg-canvas px-2.5 py-1.5 text-[11.5px] leading-snug text-ink-600 text-justify [text-wrap:pretty]">
+            {preguntasNoOfrecidas}
+          </p>
+        )}
+      </div>
     </div>
   );
 

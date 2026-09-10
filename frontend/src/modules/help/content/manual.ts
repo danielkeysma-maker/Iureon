@@ -87,7 +87,7 @@ const A_INICIO: ManualArticle = {
     {
       kind: 'pasos',
       pasos: [
-        'Arriba está el saludo con su nombre, la firma y la fecha. Debajo, tres accesos: «Redactar un escrito» abre Redacción, «Revisar un escrito» abre Revisiones y «Transcribir una audiencia» abre Audiencias. Si su plan no incluye un módulo, su tarjeta aparece atenuada con «No incluido en su plan» en vez de desaparecer.',
+        'Arriba está el saludo con su nombre, la firma y la fecha. Debajo, tres accesos: «Redactar un escrito» abre Redacción, «Revisar un documento» abre Revisiones y «Transcribir una audiencia» abre Audiencias. Si su plan no incluye un módulo, su tarjeta aparece atenuada con «No incluido en su plan» en vez de desaparecer.',
         '«Continuar donde iba» lista sus cinco borradores y sus cinco revisiones más recientes. Un borrador se abre en Redacción, tal como desde «Borradores»; una revisión se abre en su taller, tal como desde «Revisiones».',
         '«Plan y saldo» muestra el plan de la firma con su estado —activo, por vencer con los días que faltan, vencido, o en prueba con los días que quedan— y el saldo disponible en pesos. «Ver plan» abre la pantalla de planes; «Recargar saldo» abre la recarga, la misma del pie de la barra lateral.',
         '«Novedades» trae los tres cambios más recientes de la aplicación; «Ver todas» abre la lista completa en el manual.',
@@ -863,7 +863,7 @@ const A_REVISAR: ManualArticle = {
   entradilla:
     'Suba la tutela, la demanda o el recurso que ya escribió y pregunte qué está bien, qué está mal y qué corregir. Después, corríjalo en el taller con el revisor al lado.',
   bloques: [
-    { kind: 'ruta', camino: ['Revisiones', '«Revisar un escrito»', '«Qué trae»', '«Abrir en el taller»'] },
+    { kind: 'ruta', camino: ['Revisiones', '«Revisar un documento»', '«Qué trae»', '«Abrir en el taller»'] },
     {
       kind: 'parrafo',
       texto:
@@ -878,14 +878,14 @@ const A_REVISAR: ManualArticle = {
     {
       kind: 'pasos',
       pasos: [
-        'Abra «Revisiones» en la barra lateral y pulse «Revisar un escrito», en la cabecera. También se llega desde «Redacción», con «Revisar un escrito ya redactado» debajo de los adjuntos: es el mismo diálogo, pero abierto desde ahí la rama y la actuación son las que tenga puestas en la barra de configuración de Redacción, y el bloque para elegirlas no aparece dentro del diálogo. Con el plan vencido no se ofrece ninguno de los dos caminos.',
+        'Abra «Revisiones» en la barra lateral y pulse «Revisar un documento», en la cabecera. También se llega desde «Redacción», con «Revisar un documento: suyo o recibido» debajo de los adjuntos: es el mismo diálogo, pero abierto desde ahí la rama y la actuación son las que tenga puestas en la barra de configuración de Redacción, y el bloque para elegirlas no aparece dentro del diálogo. Con el plan vencido no se ofrece ninguno de los dos caminos.',
         'Escoja «Un escrito mío, que voy a presentar» en «Qué trae». Es lo que viene marcado.',
         'Use «Subir PDF, Word o texto (hasta 15 MB, con anexos)» o pegue el texto en el cuadro. Indique el cliente o proceso en el campo de referencia.',
         'En «Qué actuación es» elija la «Rama» y después la «Actuación»: la revisión objetiva se hace contra la ficha verificada de esa actuación. Mientras falte, el botón sigue apagado y el diálogo dice «Falta elegir la actuación» señalando dónde está.',
         'Si no sabe cómo se llama —lo normal cuando el escrito viene de otro—, pulse «Que la guía diga qué actuación es». Lee el archivo en su propio navegador, no lo sube y no cuesta nada, y propone candidatas del catálogo con su término, su artículo y su autoridad para que escoja usted. Hace falta haber elegido la rama antes: sin ella el botón está apagado y la pantalla lo dice. Y escoja una candidata de la rama que puso: si viene de otra, lea el aviso que sigue a estos pasos antes de pulsar «Revisar».',
         'Escriba en «Qué quiere saber» lo que le preocupa. Está marcado «· opcional» porque solo dirige el énfasis: si lo deja vacío, el escrito se revisa completo igual.',
         'Pulse «Revisar», que muestra el precio. Cuesta lo mismo que un borrador y se descuenta del saldo de la firma; si el revisor no responde, no se cobra. La primera vez que un socio administrador revisa, antes de generar el informe la aplicación pregunta «¿Conservar el escrito y su trabajo?»: con «Sí, conservar» la firma guarda el texto, la conversación con la guía, los comentarios y las versiones; con «Solo el informe» el trabajo del taller desaparece al cerrar la pestaña. Se decide una vez para toda la firma y se puede cambiar en «Revisiones».',
-        'Lea el informe. Puede descargarlo en «Word» o «PDF» con la letra de la firma, o «Copiar informe» como texto. Queda en la lista del módulo «Revisiones» y en «Revisiones anteriores de la firma», dentro del mismo diálogo, con el cliente, la actuación, el archivo, la fecha y quién lo pidió.'
+        'Lea el informe. Puede descargarlo en «Word» o «PDF» con la letra de la firma, o «Copiar informe» como texto; los mismos dos botones están en la cabecera de la pestaña «Informe» del taller, para cuando vuelva días después por la lista de «Revisiones». Queda en la lista del módulo «Revisiones» y en «Revisiones anteriores de la firma», dentro del mismo diálogo, con el cliente, la actuación, el archivo, la fecha y quién lo pidió.'
       ]
     },
     {
@@ -958,7 +958,7 @@ const A_DOCUMENTO_RECIBIDO: ManualArticle = {
   entradilla:
     'Un auto, una sentencia, un oficio, una notificación: qué dice, qué le exige, para cuándo y por dónde se ataca. Sin tener que decir antes qué actuación es.',
   bloques: [
-    { kind: 'ruta', camino: ['Revisiones', '«Revisar un escrito»', '«Un documento que recibí»', '«¿Y con qué lo ataco?»'] },
+    { kind: 'ruta', camino: ['Revisiones', '«Revisar un documento»', '«Un documento que recibí»', '«¿Y con qué lo ataco?»'] },
     {
       kind: 'parrafo',
       texto:
@@ -968,7 +968,7 @@ const A_DOCUMENTO_RECIBIDO: ManualArticle = {
     {
       kind: 'pasos',
       pasos: [
-        'Abra «Revisiones» y pulse «Revisar un escrito». También sirve «Revisar un escrito ya redactado» en Redacción: ese botón conserva su nombre antiguo, pero abre el mismo diálogo con los dos modos.',
+        'Abra «Revisiones» y pulse «Revisar un documento». También sirve «Revisar un documento: suyo o recibido» en Redacción: es el mismo diálogo con los dos modos.',
         'En «Qué trae», pulse «Un documento que recibí». El bloque «Qué actuación es» desaparece entero, y el rótulo del adjunto pasa a decir «El documento que recibió».',
         'Suba el archivo o pegue el texto completo del documento. El cuadro de pegar espera el documento entero, no la pregunta: «No la pregunta: ésa va más abajo».',
         'Si quiere, escriba en «Qué quiere saber» lo que le interesa; está marcado «· opcional» y, vacío, el informe sale igual.',
@@ -1016,7 +1016,7 @@ const A_DOCUMENTO_RECIBIDO: ManualArticle = {
     {
       kind: 'consejo',
       texto:
-        'Entre por «Revisiones» y no por el diálogo cuando vuelva días después: pulsar la fila abre el taller directamente, y ahí la pestaña «Informe» tiene la lectura completa con su puente al final. Eso vale siempre que la firma tuviera autorizado conservar los escritos; si no lo tenía, la fila no abre nada y avisa de que el texto de ese documento no se conservó, y entonces la lectura hay que abrirla desde «Revisiones anteriores de la firma», dentro del diálogo «Revisar un escrito». Para descargar otra vez el Word o el PDF de esa lectura sí hay que ir por ahí en cualquier caso: el taller no lleva botones de descarga del informe.'
+        'Entre por «Revisiones» y no por el diálogo cuando vuelva días después: pulsar la fila abre el taller directamente, y ahí la pestaña «Informe» tiene la lectura completa con su puente al final. Eso vale siempre que la firma tuviera autorizado conservar los escritos; si no lo tenía, la fila no abre nada y avisa de que el texto de ese documento no se conservó, y entonces la lectura hay que abrirla desde «Revisiones anteriores de la firma», dentro del diálogo «Revisar un documento». El Word y el PDF se descargan desde la propia pestaña «Informe» del taller, con los botones «Word» y «PDF» de su cabecera; también siguen estando en el diálogo.'
     },
     {
       kind: 'lista',
@@ -1072,7 +1072,7 @@ const A_PREGUNTAS_AUDIENCIA: ManualArticle = {
     {
       kind: 'aviso',
       texto:
-        'Estas preguntas nacen de un escrito suyo. La pestaña «Audiencia» también aparece en el taller de un documento recibido —un auto, una sentencia—, y ahí trata el papel del juzgado como si lo hubiera escrito usted: pide saldo y devuelve preguntas construidas sobre el texto equivocado. Todavía no está adaptada a ese modo; no la use sobre un documento que recibió.'
+        'Estas preguntas nacen de un escrito suyo. Sobre un documento recibido —un auto, una sentencia— la pestaña «Audiencia» ya no se ofrece, y la pestaña «Informe» de ese taller dice por qué: el encargo está escrito para interrogar a la contraparte y a los testigos a partir de lo que su escrito afirma, y de un papel del juzgado salían preguntas dirigidas a quien lo profirió, cobrando saldo por ellas. Prepare la audiencia desde la revisión del escrito propio con el que actúe en ella.'
     },
     {
       kind: 'nota',

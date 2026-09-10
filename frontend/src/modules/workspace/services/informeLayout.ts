@@ -53,7 +53,24 @@ export interface DatosDelInformeRecibido extends DatosComunes {
   informe: InformeDeDocumentoRecibido;
 }
 
-export type DatosDeExportacion = DatosDelInforme | DatosDelInformeRecibido;
+/**
+ * El informe que el revisor NO devolvio ordenado por secciones.
+ *
+ * Es la tercera forma que existe de verdad, y hasta hoy era la unica que no se
+ * podia descargar: la pantalla la mostraba y los botones quedaban apagados con
+ * un «copielo». Un informe que la firma pago y no puede archivar junto al
+ * expediente no esta entregado. Sale por la misma tuberia, con la misma letra
+ * y el mismo nombre de archivo; el cuerpo es el texto tal como llego, sin
+ * inventarle secciones que el revisor no produjo.
+ */
+export interface DatosDelInformeLibre extends DatosComunes {
+  modo: 'INFORME_LIBRE';
+  /** Cual de los dos se leyo. Solo decide la cabecera y el pie: el cuerpo es el texto tal cual. */
+  origen: 'ESCRITO_PROPIO' | 'DOCUMENTO_RECIBIDO';
+  texto: string;
+}
+
+export type DatosDeExportacion = DatosDelInforme | DatosDelInformeRecibido | DatosDelInformeLibre;
 
 /** Carta con márgenes judiciales: 3 cm izquierda, 2,5 cm derecha, 2,5 arriba y abajo. */
 const PAGINA = { ancho: 215.9, alto: 279.4, izq: 30, der: 25, arriba: 25, abajo: 25 };
@@ -139,7 +156,14 @@ export const dibujarInformeEnPdf = (doc: jsPDF, F: string, d: DatosDeExportacion
   };
 
   /* ─── Cabecera ─────────────────────────────────────────────────────────── */
-  const esRecibido = d.modo === 'DOCUMENTO_RECIBIDO';
+  /*
+   * QUE SE LEYO no siempre coincide con QUE FORMA TIENE EL INFORME: un
+   * documento recibido cuyo revisor no devolvio secciones sale como informe
+   * libre y sigue siendo la lectura de un papel ajeno. La cabecera se decide
+   * por el origen, no por la forma, o el archivo diria «Revision del escrito»
+   * sobre el auto de un juez.
+   */
+  const esRecibido = d.modo === 'DOCUMENTO_RECIBIDO' || (d.modo === 'INFORME_LIBRE' && d.origen === 'DOCUMENTO_RECIBIDO');
   if (d.firmName) bloque(d.firmName, cuerpoPt - 2, 'normal', 0, NOTA, false);
   /*
    * EL TÍTULO DICE CUÁL DE LOS DOS SE LEYÓ. Un informe archivado que no
@@ -183,6 +207,43 @@ export const dibujarInformeEnPdf = (doc: jsPDF, F: string, d: DatosDeExportacion
     titulo(t);
     lista(items);
   };
+
+  /* ─── Cuerpo del informe sin secciones ─────────────────────────────────── */
+  if (d.modo === 'INFORME_LIBRE') {
+    bloque(
+      'El revisor respondio en un formato que no se pudo ordenar por secciones. Abajo va su texto completo, tal como lo devolvio: no se le ha impuesto ninguna estructura ni se ha suprimido nada.',
+      cuerpoPt - 2,
+      'italic',
+      0,
+      NOTA
+    );
+    y += 2;
+    /*
+     * PARRAFO A PARRAFO, no de una sola vez. `bloque` justifica cuando el
+     * texto cabe entero en la pagina; pasarle un informe de varias paginas
+     * como un solo bloque lo dejaria alineado a la izquierda de principio a
+     * fin. Y los renglones en blanco del revisor se respetan: en un texto sin
+     * titulos son la unica separacion que hay.
+     */
+    for (const parrafo of d.texto.split('\n')) {
+      if (parrafo.trim() === '') {
+        y += lineaMm(cuerpoPt) * 0.5;
+        continue;
+      }
+      bloque(parrafo, cuerpoPt);
+    }
+    y += 4;
+    bloque(
+      esRecibido
+        ? 'Este informe solo afirma lo que esta escrito en el documento recibido. Ninguna ficha verificada del catalogo respalda sus lineas: para saber que actuacion procede, con su termino y su articulo, lleve los hechos a la guia de actuaciones.'
+        : 'Lo que este informe afirme como exigencia de la norma no viene ordenado por secciones y no se pudo contrastar con la ficha del catalogo seccion por seccion: lealo como criterio profesional del revisor y verifique antes de presentar.',
+      cuerpoPt - 2.5,
+      'normal',
+      0,
+      NOTA
+    );
+    return;
+  }
 
   /* ─── Cuerpo del documento recibido ────────────────────────────────────── */
   if (d.modo === 'DOCUMENTO_RECIBIDO') {

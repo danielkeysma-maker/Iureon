@@ -421,11 +421,14 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
             )}
           </div>
 
-          {/* ─── REVISAR UN ESCRITO YA REDACTADO ─────────────────────────────
+          {/* ─── REVISAR UN DOCUMENTO ────────────────────────────────────────
               Aquí el archivo también se lee, pero no para redactar sino para
-              revisar: el abogado trae su
-              tutela y pregunta qué falla. Es un informe contra la ficha de la
-              actuación elegida arriba, y el documento no se guarda. */}
+              revisar. Y son DOS COSAS, no una: el escrito del propio abogado,
+              que se contrasta con la ficha de la actuación elegida arriba; o
+              un documento que le llegó —un auto, una sentencia, un oficio—,
+              que se lee para entender qué resolvió y por dónde se ataca.
+              La puerta decía solo lo primero, así que el segundo modo existía
+              detrás de un rótulo que lo negaba. */}
           <button
             type="button"
             onClick={() => setRevisarAbierto(true)}
@@ -433,9 +436,10 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
           >
             <ClipboardCheck className="h-4 w-4 shrink-0 text-brand-700" />
             <span className="min-w-0 flex-1">
-              <span className="block text-ui font-medium text-ink-900">Revisar un escrito ya redactado</span>
+              <span className="block text-ui font-medium text-ink-900">Revisar un documento: suyo o recibido</span>
               <span className="block text-[11px] leading-snug text-ink-500">
-                Suba su tutela, demanda o recurso y pregunte qué está bien, qué está mal y qué corregir. Informe, no borrador.
+                Su tutela, demanda o recurso, para saber qué está bien, qué está mal y qué corregir; o el auto, la sentencia o el oficio que le
+                llegó, para saber qué resolvió y por dónde se ataca. Informe, no borrador.
               </span>
             </span>
           </button>

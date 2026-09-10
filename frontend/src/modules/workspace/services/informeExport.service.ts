@@ -24,8 +24,12 @@ import { dibujarInformeEnPdf, type DatosDeExportacion } from './informeLayout';
  * Duplicar la exportación habría dejado una de las dos copias atrás.
  */
 
+/** Qué se leyó, no qué forma tomó el informe: el nombre del archivo tiene que decir la verdad sobre el papel. */
+const leyoUnDocumentoRecibido = (d: DatosDeExportacion): boolean =>
+  d.modo === 'DOCUMENTO_RECIBIDO' || (d.modo === 'INFORME_LIBRE' && d.origen === 'DOCUMENTO_RECIBIDO');
+
 const nombreDeArchivo = (d: DatosDeExportacion, ext: string): string =>
-  `${d.modo === 'DOCUMENTO_RECIBIDO' ? 'Documento_recibido' : 'Revision'}_${d.documentType.replace(/[^\p{L}\p{N}]+/gu, '_')}_${d.fileName.replace(/\.[^.]+$/, '').replace(/[^\p{L}\p{N}]+/gu, '_')}.${ext}`;
+  `${leyoUnDocumentoRecibido(d) ? 'Documento_recibido' : 'Revision'}_${d.documentType.replace(/[^\p{L}\p{N}]+/gu, '_')}_${d.fileName.replace(/\.[^.]+$/, '').replace(/[^\p{L}\p{N}]+/gu, '_')}.${ext}`;
 
 export const exportarInformeAPdf = async (d: DatosDeExportacion): Promise<void> => {
   const marca = getMarcaActual();
@@ -33,7 +37,7 @@ export const exportarInformeAPdf = async (d: DatosDeExportacion): Promise<void> 
   const F = await registrarFuenteDelEscrito(doc, marca?.fontFamily ?? 'Times New Roman');
   dibujarInformeEnPdf(doc, F, { ...d, firmName: d.firmName ?? marca?.firmName }, marca?.fontSizePt ?? 11);
   doc.setProperties({
-    title: d.modo === 'DOCUMENTO_RECIBIDO' ? `Documento recibido · ${d.fileName}` : `Revisión · ${d.documentType}`,
+    title: leyoUnDocumentoRecibido(d) ? `Documento recibido · ${d.fileName}` : `Revisión · ${d.documentType}`,
     subject: d.fileName,
     creator: 'Iureon'
   });
@@ -63,7 +67,8 @@ export const exportarInformeAWord = async (d: DatosDeExportacion): Promise<void>
   const vineta = (t: string) =>
     new Paragraph({ bullet: { level: 0 }, alignment: AlignmentType.JUSTIFIED, spacing: { after: 80, line: 300 }, children: [new TextRun({ text: t, font, size: base })] });
 
-  const esRecibido = d.modo === 'DOCUMENTO_RECIBIDO';
+  /* El origen manda sobre la forma: un documento recibido sin secciones sigue siendo un documento recibido. */
+  const esRecibido = leyoUnDocumentoRecibido(d);
   const hijos: Paragraph[] = [];
   const firma = d.firmName ?? marca?.firmName;
   if (firma) hijos.push(p(firma, { size: base - 4, color: gris, after: 40, justificar: false }));
@@ -108,6 +113,39 @@ export const exportarInformeAWord = async (d: DatosDeExportacion): Promise<void>
     });
     saveAs(await Packer.toBlob(documento), nombreDeArchivo(d, 'docx'));
   };
+
+  /* ─── El informe que no se pudo ordenar por secciones ──────────────────── */
+  if (d.modo === 'INFORME_LIBRE') {
+    hijos.push(
+      p(
+        'El revisor respondió en un formato que no se pudo ordenar por secciones. Abajo va su texto completo, tal como lo devolvió: no se le ha impuesto ninguna estructura ni se ha suprimido nada.',
+        { italics: true, size: base - 4, color: gris, after: 160 }
+      )
+    );
+    /* Párrafo a párrafo, respetando los renglones en blanco: en un texto sin títulos son la única separación que hay. */
+    for (const parrafo of d.texto.split('\n')) {
+      if (parrafo.trim() === '') continue;
+      hijos.push(p(parrafo, { after: 120 }));
+    }
+    hijos.push(
+      new Paragraph({
+        spacing: { before: 320 },
+        alignment: AlignmentType.LEFT,
+        children: [
+          new TextRun({
+            text: esRecibido
+              ? 'Este informe solo afirma lo que está escrito en el documento recibido. Ninguna ficha verificada del catálogo respalda sus líneas: para saber qué actuación procede, con su término y su artículo, lleve los hechos a la guía de actuaciones.'
+              : 'Lo que este informe afirme como exigencia de la norma no viene ordenado por secciones y no se pudo contrastar con la ficha del catálogo sección por sección: léalo como criterio profesional del revisor y verifique antes de presentar.',
+            font,
+            size: base - 5,
+            color: '6E6E6E'
+          })
+        ]
+      })
+    );
+    await empaquetar();
+    return;
+  }
 
   /* ─── El documento recibido: lo que dice el papel, citado ──────────────── */
   if (d.modo === 'DOCUMENTO_RECIBIDO') {
