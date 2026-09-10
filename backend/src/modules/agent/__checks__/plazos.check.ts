@@ -33,6 +33,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {
   PLAZO_HECHOS_MS,
+  PLAZO_GLOSA_MS,
   PLAZO_JURISPRUDENCIA_MS,
   PLAZO_REDACCION_MS,
   PLAZO_VIGENCIA_MS,
@@ -96,6 +97,16 @@ check(
   'la comprobación de vigencia tiene su propia partida, y le alcanza para el arranque en frío',
   PLAZO_VIGENCIA_MS >= 10_000,
   `${PLAZO_VIGENCIA_MS} ms`
+);
+/*
+ * LA COMPROBACIÓN DE GLOSA TAMBIÉN TIENE LA SUYA, y salió de la redacción — la
+ * única etapa con holgura: Opus tarda 85–125 s medidos dentro de un presupuesto
+ * que era de 253 s, así que cederle 25 s lo deja en 228 s y sigue sobrando.
+ */
+check(
+  'la comprobación de glosa tiene su propia partida, sacada de la redacción y no de una etapa justa',
+  PLAZO_GLOSA_MS >= 15_000 && PLAZO_REDACCION_MS >= 150_000,
+  `glosa ${PLAZO_GLOSA_MS} ms · redacción ${PLAZO_REDACCION_MS} ms`
 );
 check(
   'el cierre —cobrar, auditar y responder— tiene su parte reservada',
@@ -253,6 +264,28 @@ const pruebas = async (): Promise<void> => {
     /verificarVigenciaDelEscrito\(/.test(servicio) &&
       !/conPresupuesto\(\s*verificarVigenciaDelEscrito/.test(servicio) &&
       /PLAZO_VIGENCIA_MS/.test(servicio)
+  );
+  /*
+   * Y LA DE GLOSA, IGUAL. Es la regla que el usuario impuso con nombre propio:
+   * agotar el plazo significa DUDOSA, nunca un borrador perdido. Cuando esta
+   * etapa corre, el escrito ya está escrito y ya se pagó, así que envolverla en
+   * `conPresupuesto` —que RECHAZA— cambiaría un aviso por la pérdida del
+   * trabajo caro. El tope vive dentro del propio verificador.
+   */
+  check(
+    'la comprobación de glosa corre con su plazo pero TAMPOCO puede tumbar el escrito',
+    /verificarGlosaDelEscrito\(/.test(servicio) &&
+      !/conPresupuesto\(\s*verificarGlosaDelEscrito/.test(servicio) &&
+      /PLAZO_GLOSA_MS/.test(servicio)
+  );
+  /*
+   * Y SE JUZGA SOBRE EL ESCRITO DEL MOTOR, no sobre el ya anotado: pasarle el
+   * texto con la advertencia de vigencia encima le daría a juzgar las frases
+   * que el propio sistema acaba de escribir.
+   */
+  check(
+    'la glosa se juzga sobre el texto que salió del motor, no sobre el ya anotado',
+    /verificarGlosaDelEscrito\(legalText,/.test(servicio)
   );
 
   console.log(fallos === 0 ? `\nTODO BIEN (${suma} ms de ${TOPE_DE_FUNCION_MS} ms)` : `\n${fallos} FALLO(S)`);

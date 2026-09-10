@@ -284,11 +284,29 @@ const normaDeLaMencion = (
   return null;
 };
 
-const recorte = (texto: string, indice: number, largo = 110): string =>
-  texto
-    .slice(Math.max(0, indice - 45), Math.min(texto.length, indice + largo))
-    .replace(/\s+/g, ' ')
-    .trim();
+/**
+ * El fragmento que se muestra, cortado por PALABRAS y no por caracteres.
+ *
+ * Cortaba en el carácter 45 anterior a la cita, y eso bastaba mientras el
+ * fragmento solo servía para medir. Desde que la comprobación de glosa se lo
+ * muestra al abogado y se lo manda al juez, no basta: el caso real medido el 10
+ * de septiembre de 2026 empezaba en «nvocan como fundamento…», y una media
+ * palabra al principio de un aviso se lee como un error del sistema — le quita
+ * crédito justo al aviso que hay que creer.
+ *
+ * Se ensancha a los bordes en vez de encogerse: se busca el espacio ANTERIOR al
+ * corte y el POSTERIOR al final, así que ninguna palabra que estaba dentro se
+ * pierde.
+ */
+const recorte = (texto: string, indice: number, largo = 110): string => {
+  const crudoDesde = Math.max(0, indice - 45);
+  const crudoHasta = Math.min(texto.length, indice + largo);
+  const espacioAntes = crudoDesde === 0 ? 0 : texto.lastIndexOf(' ', crudoDesde);
+  const desde = espacioAntes < 0 ? 0 : espacioAntes;
+  const espacioDespues = crudoHasta >= texto.length ? texto.length : texto.indexOf(' ', crudoHasta);
+  const hasta = espacioDespues < 0 ? texto.length : espacioDespues;
+  return texto.slice(desde, hasta).replace(/\s+/g, ' ').trim();
+};
 
 /*
  * ─── LAS GLOSAS ────────────────────────────────────────────────────────────

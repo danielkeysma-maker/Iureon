@@ -158,35 +158,84 @@ const nombre = (r: VigenciaDeArticulo): string =>
  * número suelto puede ser una cuantía o un año, y marcar uno de esos sería la
  * falsa alarma que enseña a ignorar todas las marcas.
  */
-export const marcarEnLinea = (texto: string, articulo: number, marca: string): string => {
-  const re = new RegExp(`\\b(?:art[íi]culos?|arts?\\.)[^.;\\n]{0,60}?\\b${articulo}\\b`, 'gi');
-  return texto.replace(re, (cita) => `${cita} ${marca}`);
+export const marcarEnLinea = (texto: string, articulo: number, marca: string): string =>
+  marcarVarios(texto, [{ articulo, marca }]);
+
+/**
+ * VARIAS MARCAS EN UNA SOLA PASADA, Y NO ES UN REFINAMIENTO: encadenarlas
+ * perdía marcas.
+ *
+ * Medido el 10 de septiembre de 2026 sobre la frase real «los artículos 8, 9,
+ * 22 y 35 de la Ley 820 de 2003, sobre las obligaciones del arrendatario»: el
+ * art. 8 y el 22 salieron los dos NO SOSTENIDOS, y en el escrito solo apareció
+ * marcado el 8. La causa es que la marca del 8 se inserta EN MEDIO de la
+ * enumeración y contiene puntos, y la ventana de esta expresión regular
+ * (`[^.;\n]{0,60}`) se niega a cruzar un punto — así que al buscar el 22 la
+ * cabeza «los artículos» ya no lo alcanzaba. El escrito habría avisado de la
+ * mitad de sus afirmaciones falsas, en silencio y sin que nada fallara.
+ *
+ * Por eso todas las posiciones se calculan sobre el texto ORIGINAL y las
+ * inserciones se aplican de atrás hacia adelante, para que ninguna corra a las
+ * demás.
+ */
+export const marcarVarios = (
+  texto: string,
+  marcas: Array<{ articulo: number; marca: string }>
+): string => {
+  const inserciones: Array<{ en: number; marca: string }> = [];
+  for (const { articulo, marca } of marcas) {
+    const re = new RegExp(`\\b(?:art[íi]culos?|arts?\\.)[^.;\\n]{0,60}?\\b${articulo}\\b`, 'gi');
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(texto))) inserciones.push({ en: m.index + m[0].length, marca });
+  }
+  return inserciones
+    .sort((a, b) => b.en - a.en)
+    .reduce((acc, { en, marca }) => `${acc.slice(0, en)} ${marca}${acc.slice(en)}`, texto);
 };
 
 /**
- * El escrito con la comprobación de vigencia puesta encima.
+ * LA MARCA EN LÍNEA, SEPARADA DE LA CABECERA. Y separarlas hizo falta.
  *
- * Devuelve el texto tal cual cuando no hubo nada que comprobar: un encabezado
- * seguido de nada es una casilla, y este repositorio ya sabe cómo terminan.
+ * Cuando llegó la comprobación de GLOSA, las dos anotaciones pasaron a correr
+ * sobre el mismo escrito. Si cada una hace su marcado y su cabecera de una vez,
+ * la segunda marca DENTRO de la cabecera de la primera: el bloque de vigencia
+ * escribe «Ley 820 de 2003, art. 8», el marcador de la glosa ve ahí una cita y
+ * le pega su corchete. El aviso quedaría anotando a otro aviso, que es la forma
+ * más rápida de que un abogado deje de leer los dos.
+ *
+ * Con las dos mitades sueltas, el pipeline marca el CUERPO una vez con cada
+ * comprobación y apila las cabeceras encima, donde ya no hay nada que marcar.
  */
-export const anotarVigencia = (texto: string, revision: RevisionDeVigencia): string => {
+export const marcarVigenciaEnLinea = (texto: string, revision: RevisionDeVigencia): string =>
+  marcarVarios(
+    texto,
+    revision.resultados
+      .filter((x) => x.estado === 'DEROGADO')
+      .map((r) => ({
+        articulo: r.referencia.articulo,
+        marca: `[NORMA DEROGADA — este artículo NO está vigente: ${r.detalle}. No puede fundar lo que aquí se pide; corríjalo antes de radicar.]`
+      }))
+  );
+
+/** La línea que separa los avisos del escrito. Compartida con la comprobación de glosa. */
+export const SEPARADOR_DE_AVISOS = '─────────────────────────────────────────────';
+
+/**
+ * Los avisos de cabecera de esta comprobación, encabezado incluido. Lista vacía
+ * cuando no hubo nada que comprobar: un encabezado seguido de nada es una
+ * casilla, y este repositorio ya sabe cómo terminan.
+ */
+export const bloquesDeVigencia = (revision: RevisionDeVigencia): string[] => {
   const { resultados } = revision;
-  if (resultados.length === 0) return texto;
+  if (resultados.length === 0) return [];
 
   const derogados = resultados.filter((r) => r.estado === 'DEROGADO');
   const noVerificables = resultados.filter((r) => r.estado === 'NO_VERIFICABLE');
   const vigentes = resultados.filter((r) => r.estado === 'VIGENTE');
 
-  let cuerpo = texto;
-  for (const r of derogados) {
-    cuerpo = marcarEnLinea(
-      cuerpo,
-      r.referencia.articulo,
-      `[NORMA DEROGADA — este artículo NO está vigente: ${r.detalle}. No puede fundar lo que aquí se pide; corríjalo antes de radicar.]`
-    );
-  }
-
-  const bloques: string[] = [];
+  const bloques: string[] = [
+    'COMPROBACIÓN AUTOMÁTICA DE VIGENCIA — la hizo el sistema consultando el texto oficial del Senado de la República, artículo por artículo, sobre las citas que este escrito trae por fuera de la ficha verificada del catálogo. Esta advertencia se retira cuando se corrija lo que señala, no antes.'
+  ];
 
   if (derogados.length > 0) {
     bloques.push(
@@ -210,14 +259,25 @@ export const anotarVigencia = (texto: string, revision: RevisionDeVigencia): str
     bloques.push(
       `CITAS CON VIGENCIA COMPROBADA EL ${vigentes[0].consultadoEn} contra el texto oficial del Senado — ${vigentes.length}.\n` +
         vigentes.map((r) => `- ${nombre(r)} (${r.rubrica ?? 'sin epígrafe'}). ${r.url ?? ''}`).join('\n') +
-        '\nSe comprobó que siguen VIGENTES. NO se comprobó que el escrito diga bien lo que dicen: eso hay que leerlo en la fuente.'
+        '\nSe comprobó que siguen VIGENTES. NO se comprobó aquí que el escrito diga bien lo que dicen: eso lo comprueba, con el texto oficial delante, `verificarGlosa.ts`.'
     );
   }
 
-  const cabecera =
-    'COMPROBACIÓN AUTOMÁTICA DE VIGENCIA — la hizo el sistema consultando el texto oficial del Senado de la República, artículo por artículo, sobre las citas que este escrito trae por fuera de la ficha verificada del catálogo. Esta advertencia se retira cuando se corrija lo que señala, no antes.';
+  return bloques;
+};
 
-  return `${cabecera}\n\n${bloques.join('\n\n')}\n\n─────────────────────────────────────────────\n\n${cuerpo}`;
+/**
+ * El escrito con la comprobación de vigencia puesta encima.
+ *
+ * El pipeline NO la usa —compone las dos comprobaciones a la vez para que
+ * ninguna marque dentro de la cabecera de la otra— pero es la forma completa de
+ * esta comprobación y es la que se prueba en su guarda.
+ */
+export const anotarVigencia = (texto: string, revision: RevisionDeVigencia): string => {
+  const bloques = bloquesDeVigencia(revision);
+  if (bloques.length === 0) return texto;
+  const cuerpo = marcarVigenciaEnLinea(texto, revision);
+  return `${bloques.join('\n\n')}\n\n${SEPARADOR_DE_AVISOS}\n\n${cuerpo}`;
 };
 
 /** Una línea para el registro de la corrida, que es donde esto se mide. */

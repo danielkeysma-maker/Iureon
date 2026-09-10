@@ -69,7 +69,9 @@
     "check:sin-nombre": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/__checks__/sinNombre.check.ts",
     "check:citacion": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/__checks__/citacionNormativa.check.ts",
     "check:vigencia": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/legislation/__checks__/vigencia.check.ts",
-    "check:vigencia-red": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/legislation/__checks__/vigencia.check.ts --red"
+    "check:vigencia-red": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/legislation/__checks__/vigencia.check.ts --red",
+    "check:glosa": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/glosa.check.ts",
+    "check:glosa-red": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/glosa.check.ts --red"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

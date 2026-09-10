@@ -96,6 +96,8 @@ jobs:
         run: npm run check:citacion
       - name: "Vigencia (a repealed article is caught and flagged inside the draft: art. 2035 del Codigo Civil)"
         run: npm run check:vigencia
+      - name: "Glosa (what the draft claims an article says is checked against the official text: Ley 820 art. 8 is the ARRENDADOR, not the arrendatario)"
+        run: npm run check:glosa
 
       - name: Build
         run: npm run build
@@ -128,5 +130,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Enforce module boundaries
         run: bash scripts/check-module-boundaries.sh
+      - name: El propio flujo de CI es YAML valido
+        run: bash scripts/check-ci-yaml.sh
       - name: Reject committed secrets
         run: bash scripts/check-secrets.sh

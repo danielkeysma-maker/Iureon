@@ -3,6 +3,7 @@ import {
   PLAZO_HECHOS_MS,
   PLAZO_JURISPRUDENCIA_MS,
   PLAZO_REDACCION_MS,
+  PLAZO_GLOSA_MS,
   PLAZO_VIGENCIA_MS,
   conPresupuesto,
   relojDeEtapa
@@ -21,7 +22,19 @@ import {
 } from './claudeDraft.prompt';
 import { buildCatalogGuidanceForFirm, resolverProcedencia } from './catalogGuidance';
 import { revisarCitacionNormativa } from './citacionNormativa';
-import { anotarVigencia, resumenDeVigencia, verificarVigenciaDelEscrito } from './review/verificarVigencia';
+import {
+  SEPARADOR_DE_AVISOS,
+  bloquesDeVigencia,
+  marcarVigenciaEnLinea,
+  resumenDeVigencia,
+  verificarVigenciaDelEscrito
+} from './review/verificarVigencia';
+import {
+  bloquesDeGlosa,
+  marcarGlosaEnLinea,
+  resumenDeGlosa,
+  verificarGlosaDelEscrito
+} from './review/verificarGlosa';
 import type { LegalBranch } from '../catalog/types';
 
 /**
@@ -259,20 +272,67 @@ export class OpenRouterService {
      * NO_VERIFICABLE: llegados a este punto el escrito ya está escrito y ya se
      * pagó, así que una mala tarde del Senado no puede costar el borrador.
      */
-    let textoEntregado = legalText;
     const vigencia = await verificarVigenciaDelEscrito(
       legalText,
       procedencia?.articulosAutorizados ?? [],
       PLAZO_VIGENCIA_MS
     );
     if (vigencia.resultados.length > 0) {
-      textoEntregado = anotarVigencia(legalText, vigencia);
       onStepLog({
         stage: 'STAGE_3_REDACCION',
         engine: 'CLAUDE',
         message: `[Vigencia] ${resumenDeVigencia(vigencia)}`,
         timestamp: new Date().toISOString()
       });
+    }
+
+    /*
+     * ─── Y LO QUE EL ESCRITO AFIRMA DE CADA ARTÍCULO, CONTRA SU TEXTO ───────
+     *
+     * Tercera comprobación, tercer defecto distinto. La primera mira si la cita
+     * está DENTRO DE LO QUE ESTA CASA HA LEÍDO (el cedazo); la segunda, si el
+     * artículo sigue vivo (la vigencia). Esta mira si el escrito dice bien lo
+     * que ese artículo dice, que es lo único que ninguna de las dos podía ver:
+     * el art. 8 de la Ley 820 sale VIGENTE —lo está— mientras la frase «sobre
+     * las obligaciones del arrendatario» es su reverso exacto, porque son las
+     * del ARRENDADOR.
+     *
+     * NO DESCARGA NADA NUEVO: se le pasan los resultados de la vigencia, que ya
+     * traen el texto oficial de esos mismos artículos. Lo que añade son hasta
+     * ocho llamadas al motor barato, en paralelo, con el texto delante.
+     *
+     * Y como la vigencia, NO usa `conPresupuesto`: agotar el plazo aquí
+     * significa DUDOSA declarada, nunca un borrador perdido.
+     *
+     * SE JUZGA SOBRE `legalText`, el escrito tal como salió del motor. Pasarle
+     * el texto ya anotado le daría a juzgar las frases de la propia advertencia
+     * de vigencia — el sistema comprobando lo que el sistema acaba de escribir.
+     */
+    const glosa = await verificarGlosaDelEscrito(legalText, vigencia.resultados, PLAZO_GLOSA_MS);
+    if (glosa.resultados.length > 0) {
+      onStepLog({
+        stage: 'STAGE_3_REDACCION',
+        engine: 'GEMINI',
+        message: `[Glosa] ${resumenDeGlosa(glosa)}`,
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    /*
+     * ─── LAS DOS COMPROBACIONES SE COMPONEN AQUÍ, Y EN ESTE ORDEN ───────────
+     *
+     * El CUERPO se marca una vez con cada una, y solo después se apilan las
+     * cabeceras. Anotar por separado —cada comprobación con su marcado y su
+     * cabecera— hacía que la segunda pegara sus corchetes DENTRO del aviso de
+     * la primera, que escribe citas («Ley 820 de 2003, art. 8») indistinguibles
+     * de las del escrito. Un aviso anotando a otro aviso es la forma más rápida
+     * de que el abogado deje de leer los dos.
+     */
+    let textoEntregado = legalText;
+    const avisos = [...bloquesDeVigencia(vigencia), ...bloquesDeGlosa(glosa)];
+    if (avisos.length > 0) {
+      const cuerpo = marcarGlosaEnLinea(marcarVigenciaEnLinea(legalText, vigencia), glosa);
+      textoEntregado = `${avisos.join('\n\n')}\n\n${SEPARADOR_DE_AVISOS}\n\n${cuerpo}`;
     }
 
     if (procedencia && procedencia.articulosAutorizados.length > 0) {

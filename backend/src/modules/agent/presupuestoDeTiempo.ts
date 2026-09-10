@@ -30,8 +30,9 @@
  * `TOPE_DE_FUNCION_MS` es el espejo de `maxDuration` en `vercel.json`, y
  * `plazos.check.ts` los compara: si uno se mueve sin el otro, el check falla.
  * Hobby permite 60 s; Pro permite 300 s. Con 300 s el presupuesto de redacción
- * pasa de 33 s a 253 s —los otros 20 s son de la comprobación de vigencia, que
- * llegó después— y el borrador cabe entero con holgura.
+ * pasa de 33 s a 228 s —los otros 45 s se los llevan las dos comprobaciones que
+ * llegaron después: 20 s la de vigencia y 25 s la de la glosa— y el borrador
+ * cabe entero con holgura.
  */
 
 /** Espejo de `maxDuration` en `vercel.json`. Hobby: 60 s. Pro: 300 s. */
@@ -88,14 +89,40 @@ export const PLAZO_JURISPRUDENCIA_MS = 8_000;
 export const PLAZO_VIGENCIA_MS = 20_000;
 
 /**
+ * Etapa 4 — comprobación de la GLOSA contra el texto oficial.
+ *
+ * VA DESPUÉS DE LA VIGENCIA, y no es la misma comprobación. La vigencia mira
+ * si el artículo sigue vivo; esto mira si el escrito dice bien lo que ese
+ * artículo dice — el art. 8 de la Ley 820 está VIGENTE y aun así «sobre las
+ * obligaciones del arrendatario» es falso, porque son las del ARRENDADOR.
+ *
+ * DE DÓNDE SALE SU PARTIDA: de la redacción, que es la única etapa con holgura.
+ * Se midió que Opus tarda 85–125 s dentro de un presupuesto que era de 253 s;
+ * cederle 25 s a esta etapa lo deja en 228 s, todavía casi el doble de lo
+ * medido. Sacarla de cualquier otra habría estrechado una etapa ya justa.
+ *
+ * POR QUÉ 25 s: son hasta ocho llamadas al motor barato EN PARALELO, con el
+ * artículo entero de entrada, en modo JSON y con razonamiento mínimo — el
+ * mismo reparto con el que la extracción de hechos tarda 5,4 s. No hay
+ * descargas nuevas: el texto oficial lo trajo la etapa de vigencia y esta lo
+ * reusa.
+ *
+ * Y AGOTARLOS NO ES UN FALLO: `verificarGlosa.ts` devuelve DUDOSA y el escrito
+ * sale igual, diciéndolo. Cuando esta etapa corre, el borrador ya está escrito
+ * y ya se pagó; perderlo por una mala tarde del proveedor sería peor que el
+ * defecto que la etapa vigila.
+ */
+export const PLAZO_GLOSA_MS = 25_000;
+
+/**
  * Etapa 2 — redacción (Opus).
  *
  * Es el remanente. Con el tope de Hobby eran 33 s y NO alcanzaba: Opus escribe
  * a unos 75 tokens de salida por segundo, así que en 33 s caben ~2.500 tokens
  * (≈5.000 caracteres, dos páginas) contra los 14.600–21.400 caracteres de un
  * escrito completo, y la redacción de cualquier caso agotaba su presupuesto.
- * Con el tope de Pro son 253 s —eran 273 hasta que la comprobación de vigencia
- * reclamó su partida— y lo medido cabe con holgura: 84,8 s con
+ * Con el tope de Pro son 228 s —eran 273 hasta que la comprobación de vigencia
+ * reclamó 20 s y la de la glosa otros 25— y lo medido cabe con holgura: 84,8 s con
  * `reasoning_effort: 'low'` y 124,7 s con `'medium'`. El presupuesto sigue
  * existiendo porque un plazo generoso no es un plazo ausente — si un motor se
  * cuelga, quien corta es este código y la reserva vuelve.
@@ -106,6 +133,7 @@ export const PLAZO_REDACCION_MS =
   PLAZO_HECHOS_MS -
   PLAZO_JURISPRUDENCIA_MS -
   PLAZO_VIGENCIA_MS -
+  PLAZO_GLOSA_MS -
   2_000;
 
 /** Lo que las etapas más el cierre reclaman del reloj de la función. */
@@ -114,6 +142,7 @@ export const sumaDePresupuestos = (): number =>
   PLAZO_JURISPRUDENCIA_MS +
   PLAZO_REDACCION_MS +
   PLAZO_VIGENCIA_MS +
+  PLAZO_GLOSA_MS +
   RESERVA_DE_CIERRE_MS;
 
 /**
