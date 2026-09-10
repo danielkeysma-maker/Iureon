@@ -53,6 +53,7 @@
     "check:tipo": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/__checks__/tipoDeActuacion.check.ts",
     "check:csj": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/jurisprudence/__checks__/csjRuling.check.ts",
     "check:runway": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/admin/__checks__/runway.check.ts",
+    "check:vigencia-informe": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/vigenciaDelInforme.check.ts",
     "check:cupo": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/catalog/__checks__/orientacionQuota.check.ts",
     "check:prefs": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/preferences/__checks__/preferences.check.ts",
     "check:drafts": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/drafts/__checks__/drafts.check.ts",

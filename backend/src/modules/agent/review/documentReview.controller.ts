@@ -15,6 +15,13 @@ import { BackblazeB2TenantStorageService } from '../../documents/b2.service';
 import type { LegalBranch } from '../../catalog/types';
 import { exigirFuncion, responderPlanError } from '../../subscriptions/plan.service';
 import { buildCatalogGuidance } from '../catalogGuidance';
+import { universoCitable } from '../andamiaje';
+import { catalogService } from '../../catalog/catalog.service';
+import {
+  avisoDeVigencia,
+  marcarVigenciaEnInforme,
+  verificarVigenciaDelInforme
+} from './vigenciaDelInforme';
 import { ENGINE, callOpenRouterWithUsage } from '../openrouter.client';
 import {
   ETIQUETA_DOCUMENTO_RECIBIDO,
@@ -107,6 +114,37 @@ const MAX_TOKENS_INFORME = 3_000;
  */
 const MAX_TOKENS_INFORME_RECIBIDO = 4_000;
 export const LIMITE_LLAMADA_MS = 50_000;
+
+/*
+ * LO QUE PUEDE TARDAR LA COMPROBACIÓN DE VIGENCIA DEL INFORME.
+ *
+ * Corre DESPUÉS de que el informe ya está escrito y ya se pagó, así que su
+ * peor desenlace no puede ser perderlo: agotar el plazo significa
+ * NO_VERIFICABLE declarado, nunca una revisión caída. Por eso tiene tope
+ * propio en vez de compartir el de la llamada.
+ *
+ * TREINTA, Y NO ES EL NÚMERO QUE PUSE PRIMERO. Empecé en 15 —por debajo de
+ * los 20 de Redacción, porque esta petición carga cosas que aquella no: la
+ * descarga del archivo desde B2, la extracción de un PDF o DOCX de hasta 15 MB
+ * y la llamada al modelo con sus 50 s—. La prueba de punta a punta del 10 de
+ * septiembre de 2026 lo desmintió: dos artículos del Código Civil tardaron
+ * 44,2 s, y con 15 los dos salían NO_VERIFICABLE teniendo la respuesta a mano.
+ *
+ * UN PLAZO NO ES UNA ESPERA: es un techo. Si el Senado contesta en 3 s, cuesta
+ * 3 s — el día que se midió normal fueron 0,1 a 0,5 s por página. Subirlo no
+ * hace más lenta ninguna revisión de un día bueno; solo compra aviso en los
+ * malos. Lo que sí cuesta, y por eso no se sube más, es que en un día malo el
+ * abogado espere el techo entero con el informe ya escrito.
+ *
+ * Con 30 s, un Senado tan lento como hoy sigue dando NO_VERIFICABLE, y eso es
+ * aceptable: se DECLARA, no se marca nada, y el informe sale igual. Lo
+ * inaceptable sería lo contrario — dar por vivo lo que no se pudo leer.
+ *
+ * NO CUESTA UN PESO DE MOTOR. Descarga texto oficial y lee marcadores; lo
+ * único que gasta es reloj. Ésa es la razón de que entrara antes que la
+ * comprobación de glosa, que sí son hasta ocho llamadas por informe.
+ */
+export const PLAZO_VIGENCIA_INFORME_MS = 30_000;
 
 export class TiempoAgotado extends Error {}
 
@@ -350,6 +388,60 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
       );
     }
 
+    /*
+     * ─── ¿SIGUEN VIVOS LOS ARTÍCULOS QUE EL REVISOR CITÓ? ──────────────────
+     *
+     * Hasta el 10 de septiembre de 2026, ninguna de las tres comprobaciones
+     * del borrador llegaba aquí. Y este es el sitio donde más duelen: al
+     * modelo SE LE ORDENA citar («aquí eres categórico y citas el artículo»),
+     * la salida es texto LISTO PARA PEGAR, y el defecto medido —citar
+     * artículos reales pero MUERTOS— es exactamente el que nadie miraba.
+     *
+     * Un revisor que corrige una cita buena con una muerta es más peligroso
+     * que un redactor que la inventa: después de que el revisor habló, el
+     * abogado ya no vuelve a mirar.
+     *
+     * VA DESPUÉS DEL COBRO Y ANTES DE GUARDAR, y ese orden es deliberado. Se
+     * anota lo que se guarda, porque el abogado vuelve al informe días
+     * después —cuando corrige— y el aviso tiene que seguir ahí. Y no puede
+     * tumbar nada: llegados aquí el informe ya existe y ya se pagó, así que
+     * una mala tarde del Senado marca NO_VERIFICABLE y sigue.
+     *
+     * SOLO EN EL MODO PROPIO. El modo recibido no elige actuación, así que no
+     * hay ficha ni universo citable contra el que medir; y su prompt ya le
+     * prohíbe citar artículos de memoria, que es la otra mitad del problema.
+     */
+    let informeAnotado = informe;
+    if (informe) {
+      try {
+        const actuacion = catalogService.findByDocumentType(documentType, legalBranch);
+        const autorizados = actuacion ? universoCitable(actuacion) : [];
+        const vigencia = await verificarVigenciaDelInforme(
+          informe,
+          autorizados,
+          PLAZO_VIGENCIA_INFORME_MS
+        );
+        const aviso = avisoDeVigencia(vigencia);
+        if (aviso) {
+          const marcado = marcarVigenciaEnInforme(informe, vigencia);
+          /* El aviso va PRIMERO: detrás de siete consejos no lo lee nadie. */
+          informeAnotado = { ...marcado, recomendaciones: [aviso, ...marcado.recomendaciones] };
+          console.log(
+            `[REVIEW] Vigencia del informe: ${vigencia.resultados.length} citas fuera de ficha, ` +
+              `${vigencia.derogados} derogadas, ${vigencia.discrepantes} con discrepancia, ` +
+              `${vigencia.noVerificables} no verificables.`
+          );
+        }
+      } catch (err) {
+        /*
+         * NUNCA TUMBA LA REVISIÓN. El informe ya está escrito y ya se pagó;
+         * perderlo por un fallo del comprobador sería cambiar un aviso que
+         * falta por un producto que no llega.
+         */
+        console.warn(`[REVIEW] No se pudo comprobar la vigencia del informe: ${(err as Error).message}`);
+      }
+    }
+
     const cobro = await settleOperation({
       firmId,
       userEmail,
@@ -388,7 +480,8 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
       caracteres: preparado.caracteres,
       truncado: preparado.truncado,
       conFicha: guidance !== null,
-      informe,
+      /* El ANOTADO, no el crudo: el aviso tiene que seguir ahí cuando vuelva. */
+      informe: informeAnotado,
       informeRecibido,
       informeLibre: seOrdeno ? null : llamada.text,
       cobradoCop: cobro.charged,
@@ -425,7 +518,8 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
       guardaTexto: consentimiento.guarda,
       /** Cuál de los dos se leyó: la pantalla lo rotula y no lo adivina por la forma del informe. */
       modo,
-      informe,
+      /* El ANOTADO, igual que en el guardado: la pantalla y la base ven lo mismo. */
+      informe: informeAnotado,
       informeRecibido,
       informeLibre: seOrdeno ? null : llamada.text,
       conFicha: guidance !== null,
