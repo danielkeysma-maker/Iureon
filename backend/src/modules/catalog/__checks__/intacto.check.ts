@@ -91,7 +91,45 @@ const FUNDAMENTO_SUSTANCIAL_ANADIDO: readonly string[] = [
   'penal/solicitud-de-incidente-de-reparacion-integral',
   'penal/sentencia-penal-condenatoria',
   'penal/sentencia-penal-absolutoria',
-  'civil/demanda-de-impugnacion-de-actos-de-asambleas-juntas-directivas-o-de-socios'
+  'civil/demanda-de-impugnacion-de-actos-de-asambleas-juntas-directivas-o-de-socios',
+
+  /*
+   * LA TERCERA TANDA: los treinta huecos que dejó el censo de las 293 fichas
+   * grises (10 de septiembre de 2026). Normas mixtas —CPACA, Estatuto
+   * Tributario, Ley 1952— donde nadie había mirado si el artículo citado era
+   * del libro de fondo o del de trámite. 225 de las 293 ya estaban cubiertas;
+   * éstas no lo estaban.
+   */
+  'administrativo/demanda-contra-actos-producto-del-silencio-administrativo',
+  'administrativo/demanda-contra-actos-que-reconocen-o-niegan-total-o-parcialmente-prestaciones-periodicas',
+  'administrativo/demanda-cuyo-objeto-lo-constituyan-bienes-estatales-imprescriptibles-e-inenajenables',
+  'administrativo/demanda-de-expropiacion-de-inmueble-agrario',
+  'administrativo/demanda-de-nulidad-de-cartas-de-naturaleza-y-de-resoluciones-de-autorizacion-de-inscripcion-de-nacionales',
+  'administrativo/demanda-de-nulidad-o-de-nulidad-y-restablecimiento-del-derecho-contra-actos-administrativos-de-adjudicacion-de-baldios',
+  'administrativo/demanda-de-revision-de-actos-de-extincion-del-dominio-agrario-o-de-los-que-deciden-de-fondo-procedimientos-de-clarificacion-deslinde-y-recuperacion-de-baldios',
+  'aduanero/solicitud-de-revision-ante-el-comite-de-revision-de-aprehensiones',
+  'ambiental/acto-administrativo-que-ordena-el-archivo-de-la-solicitud-de-licencia-ambiental',
+  'contratacion/acto-de-liquidacion-unilateral-del-contrato',
+  'contratacion/descargos-en-audiencia-de-incumplimiento-contractual',
+  'contratacion/resolucion-de-adjudicacion',
+  'contratacion/resolucion-que-impone-multa-o-hace-efectiva-la-clausula-penal',
+  'contratacion/solicitud-de-liquidacion-bilateral-del-contrato-estatal',
+  'familia/demanda-de-alimentos-a-favor-de-mayor-de-edad',
+  'familia/demanda-de-restitucion-internacional-de-menores',
+  'familia/sentencia-de-homologacion-de-la-declaratoria-de-adoptabilidad',
+  'familia/sentencia-de-revision-de-las-decisiones-administrativas-del-defensor-o-comisario-de-familia',
+  'familia/sentencia-que-define-la-situacion-juridica-del-nino-nina-o-adolescente-por-perdida-de-competencia-de-la-autoridad-administrativa',
+  'familia/solicitud-de-aumento-disminucion-o-exoneracion-de-alimentos',
+  'familia_administrativa/resolucion-que-modifica-la-medida-de-restablecimiento-de-derechos',
+  'propiedad_intelectual/solicitud-de-patente-de-invencion',
+  'propiedad_intelectual/solicitud-de-registro-de-marca',
+  'responsabilidad_fiscal/intervencion-en-la-audiencia-de-descargos-del-proceso-verbal-de-responsabilidad-fiscal',
+  'societario/objecion-a-la-calificacion-y-graduacion-de-creditos',
+  'superintendencias/acto-de-medidas-preventivas-de-la-superintendencia-de-industria-y-comercio',
+  'superintendencias/demanda-de-proteccion-al-consumidor',
+  'superintendencias/solicitud-de-medidas-preventivas-en-proteccion-al-consumidor',
+  'transito/impugnacion-de-comparendo-por-deteccion-electronica',
+  'tributario/solicitud-de-revocatoria-directa-en-materia-tributaria'
 ];
 
 interface FilaDelRetrato {
