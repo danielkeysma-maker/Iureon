@@ -19,6 +19,7 @@ import {
   renderJurisprudencia
 } from './claudeDraft.prompt';
 import { buildCatalogGuidanceForFirm, resolverProcedencia } from './catalogGuidance';
+import { revisarCitacionNormativa } from './citacionNormativa';
 import type { LegalBranch } from '../catalog/types';
 
 /**
@@ -223,6 +224,36 @@ export class OpenRouterService {
       req.documentType,
       req.legalBranch as LegalBranch | undefined
     );
+
+    /*
+     * ─── EL CEDAZO CORRE EN LA MISMA PASADA QUE EL PROMPT ────────────────────
+     *
+     * Los tres jueces impusieron la misma condición de entrada: una instrucción
+     * de prompt sin cedazo en código es exactamente lo que llevábamos un mes
+     * teniendo. Aquí está, sobre el texto que salió, contra el universo
+     * autorizado que `procedencia` acaba de traer.
+     *
+     * SE DECLARA, NO SE EDITA. Recortar citas del escrito a espaldas del abogado
+     * sería peor que el defecto: quedaría un párrafo argumentando sobre un
+     * artículo que ya no está. Lo que hace es dejar constancia en el registro de
+     * la corrida, que es donde se mide, y dar la CIFRA REAL —producida por el
+     * código y no por la introspección del propio redactor, que es la razón por
+     * la que la propuesta del anexo se descartó.
+     */
+    if (procedencia && procedencia.articulosAutorizados.length > 0) {
+      const cedazo = revisarCitacionNormativa(legalText, procedencia.articulosAutorizados);
+      if (cedazo.hallazgos.length > 0) {
+        onStepLog({
+          stage: 'STAGE_3_REDACCION',
+          engine: 'CLAUDE',
+          message: `[Cedazo de citación] ${cedazo.articulosCitados} artículos citados, ${cedazo.citasFueraDeLaLista} fuera de lo verificado. ${cedazo.hallazgos
+            .slice(0, 8)
+            .map((h) => `${h.clase}: ${h.fragmento}`)
+            .join(' | ')}`,
+          timestamp: new Date().toISOString()
+        });
+      }
+    }
 
     const isTutela = detectLegalTopic(req.documentType, req.legalPrompt) === 'TUTELA';
 
@@ -576,7 +607,15 @@ export class OpenRouterService {
       ? await buildCatalogGuidanceForFirm(
           req.firmId,
           req.documentType,
-          req.legalBranch as LegalBranch | undefined
+          req.legalBranch as LegalBranch | undefined,
+          /*
+           * REDACCION cierra la lista de artículos y añade el andamiaje de la
+           * rama. Es la única superficie donde se cierra: la revisión, el chat
+           * y las preguntas de audiencia siguen con la lista abierta, porque
+           * señalar lo que a un escrito ajeno le falta exige nombrar normas que
+           * no están en su ficha. Ver `SuperficieDelBloque`.
+           */
+          'REDACCION'
         )
       : undefined;
 
@@ -596,7 +635,8 @@ export class OpenRouterService {
       facts: geminiExtraction,
       citations: jurisprudencia,
       existingDraft: req.existingDraft,
-      adjuntos: req.bloqueAdjuntos
+      adjuntos: req.bloqueAdjuntos,
+      catalogGuidance
     });
 
     /*

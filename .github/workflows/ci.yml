@@ -84,6 +84,8 @@ jobs:
         run: npm run check:revision
       - name: Sin nombre (a draft with no ficha never states an article, a term or an authority)
         run: npm run check:sin-nombre
+      - name: Citacion normativa (the draft cites only verified articles and never states what one says)
+        run: npm run check:citacion
 
       - name: Build
         run: npm run build
