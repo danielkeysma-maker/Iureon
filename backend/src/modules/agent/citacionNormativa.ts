@@ -248,7 +248,9 @@ const MISMA_ORACION = /^[^.;\n]*$/;
 const normaDeLaMencion = (
   mencion: MencionDeArticulo,
   marcas: Marca[],
-  texto: string
+  texto: string,
+  /** La norma de la ficha de la que salió el texto. Ver el comentario de abajo. */
+  normaDeLaFicha: string | null
 ): string | null => {
   const posterior = marcas.find(
     (x) =>
@@ -257,6 +259,25 @@ const normaDeLaMencion = (
       MISMA_ORACION.test(texto.slice(mencion.indice, x.indice))
   );
   if (posterior) return posterior.clave;
+  /*
+   * LA MARCA DE OTRA ORACIÓN NO PISA A LA NORMA DE LA PROPIA FICHA.
+   *
+   * La ventana hacia atrás era de 400 caracteres sin mirar puntos, así que una
+   * marca de norma se derramaba sobre las oraciones siguientes: la prosa del
+   * término de una ficha nombra «el art. 146 de la Ley 2220 de 2022» y los
+   * artículos 90 y 384 que venían después —del Código General del Proceso—
+   * quedaban archivados como «Ley 2220 de 2022 art. 90» y «art. 384». Dos
+   * referencias que NO EXISTEN. Fue inocuo porque el CGP los autoriza por su
+   * cuenta, pero en otra ficha habría autorizado un artículo de otra norma.
+   *
+   * El orden es este: la marca de la MISMA oración manda; si no la hay, manda la
+   * norma de la propia ficha, que es la atribución que acierta casi siempre en
+   * un texto que habla de esa actuación; y solo cuando la ficha no tiene norma
+   * se mira hacia atrás cruzando oraciones, porque ahí una atribución imperfecta
+   * es mejor que ninguna: sin código, el cedazo compara por número suelto y un
+   * artículo ajeno podría colarse por coincidir con uno autorizado.
+   */
+  if (normaDeLaFicha) return normaDeLaFicha;
   const anteriores = marcas.filter((x) => x.indice < mencion.indice);
   const anterior = anteriores[anteriores.length - 1];
   if (anterior && mencion.indice - anterior.indice <= 400) return anterior.clave;
@@ -280,6 +301,47 @@ const hayTranscripcionCerca = (texto: string, desde: number, hasta: number): boo
 const PALABRA = /[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]{3,}/g;
 
 /** El paréntesis que resume el artículo: «artículo 2005 (obligación de restituir…)». */
+/*
+ * EL PARÉNTESIS VA EN LOS DOS SENTIDOS, y el invertido era invisible.
+ *
+ * Solo se miraba «art. N (glosa)». El español jurídico escribe igual de a menudo
+ * «se corre traslado por veinte días (artículos 368 y 369)», con la glosa
+ * DELANTE y la cita dentro del paréntesis. Medido el 9 de septiembre de 2026
+ * sobre el escrito que esta misma regla produjo: dos frases de esa forma pasaron
+ * limpias por las dos mallas.
+ *
+ * El fragmento previo se acota a 70 caracteres y tiene que empezar tras un punto
+ * o al principio del renglón: barrer media oración convertiría cualquier cita en
+ * glosa, y la falsa alarma es peor que el silencio.
+ */
+const glosasEnParentesisInvertido = (texto: string): HallazgoDeCitacion[] => {
+  const out: HallazgoDeCitacion[] = [];
+  /*
+   * El fragmento previo PUEDE contener paréntesis: «por veinte (20) días
+   * (artículos 368 y 369)» es la forma más común, y excluirlos hacía que la
+   * búsqueda chocara con el «(20)» y no llegara nunca a la cita. Medido.
+   */
+  const re = /(?:^|[.;\n])\s*([^.;\n]{12,70}?)\(\s*(?:art[íi]culos?|arts?\.)\s*\d{1,4}[^)\n]{0,60}\)/gi;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(texto))) {
+    const antes = m[1];
+    if ((antes.match(PALABRA) ?? []).length < 4) continue;
+    /*
+     * PEDIR NO ES GLOSAR. «Solicito que se decrete la restitución (art. 384)»
+     * no dice qué dice el artículo: dice qué pide el abogado y en qué se apoya,
+     * que es exactamente lo que la regla permite. Lo que sí es glosa es
+     * describir lo que la NORMA hace —«se corre traslado por veinte días
+     * (arts. 368 y 369)»—. La diferencia está en quién es el sujeto, y se
+     * reconoce por el verbo de petición al principio del fragmento.
+     */
+    if (/^\s*(?:\d+[.)]\s*)?(?:que\s+)?(?:y\s+)?(?:se\s+)?(?:solicit|pid|rueg|depreca|impetr|reclam|demand|pretend|orden[ea]|decret[ea]|conden[ea]|declar[ea])/i.test(antes))
+      continue;
+    if (hayTranscripcionCerca(texto, m.index, m.index + m[0].length)) continue;
+    out.push({ clase: 'GLOSA_EN_PARENTESIS', fragmento: recorte(texto, m.index, m[0].length + 20) });
+  }
+  return out;
+};
+
 const glosasEnParentesis = (texto: string): HallazgoDeCitacion[] => {
   const out: HallazgoDeCitacion[] = [];
   const re = /\b(?:art[íi]culos?|arts?\.)\s*\d{1,4}[^()\n]{0,45}?\(([^)\n]{8,220})\)/gi;
@@ -303,7 +365,26 @@ const glosasEnParentesis = (texto: string): HallazgoDeCitacion[] => {
 const glosasAgregadas = (texto: string): HallazgoDeCitacion[] => {
   const out: HallazgoDeCitacion[] = [];
   const re =
-    /\b(?:art[íi]culos|arts\.)\s*\d{1,4}(?:\s*(?:,|;|\by\b|\be\b)\s*\d{1,4})+[^.;\n]{0,30}?,\s*(?:sobre|en\s+materia\s+de|relativos?\s+a|referentes?\s+a|que\s+regulan?|que\s+consagran?|que\s+establecen?)\s+\S/gi;
+  /*
+   * DOS AGUJEROS MEDIDOS EL 9 DE SEPTIEMBRE DE 2026, aislando el detector sobre
+   * el escrito que la propia regla acababa de producir, y que el cedazo declaro
+   * limpio:
+   *
+   *  · EL CONECTOR. Faltaba «en cuanto a». El escrito decia «los articulos 82,
+   *    84, 90 y 96 de la Ley 1564 de 2012, EN CUANTO A los requisitos de la
+   *    demanda, sus anexos y el lugar para notificaciones» —la misma forma que
+   *    la regla prohibe con su ejemplo literal— y paso sin hallazgo.
+   *
+   *  · EL PLURAL. Se exigian DOS o mas articulos, asi que «el articulo 365 EN
+   *    MATERIA DE condena en costas» pasaba por ser uno solo. La glosa de un
+   *    articulo es el mismo defecto: se le atribuye contenido sin tener su
+   *    texto. Ahora la lista de numeros puede ser de uno.
+   *
+   * Es la advertencia que este repositorio ya se hizo a si mismo: un check puede
+   * certificar el defecto que vigila. Que los dos agujeros aparecieran en la
+   * PRIMERA corrida prueba que al cedazo hay que atacarlo, no leerlo.
+   */
+    /\b(?:art[íi]culos?|arts?\.)\s*\d{1,4}(?:\s*(?:,|;|\by\b|\be\b)\s*\d{1,4})*[^.;\n]{0,30}?,?\s*(?:sobre|en\s+cuanto\s+a|en\s+lo\s+(?:relativo|referente|atinente|tocante)\s+a|en\s+materia\s+de|relativos?\s+a|referentes?\s+a|atinentes?\s+a|que\s+regulan?|que\s+consagran?|que\s+establecen?|que\s+gobiernan?|que\s+rigen?)\s+\S/gi;
   let m: RegExpExecArray | null;
   while ((m = re.exec(texto))) {
     if (hayTranscripcionCerca(texto, m.index, m.index + m[0].length)) continue;
@@ -316,7 +397,7 @@ const glosasAgregadas = (texto: string): HallazgoDeCitacion[] => {
 const contenidosPredicados = (texto: string): HallazgoDeCitacion[] => {
   const out: HallazgoDeCitacion[] = [];
   const re =
-    /\b(?:art[íi]culos?|arts?\.)\s*\d{1,4}[^.;:\n]{0,70}?\b(?:dispone|disponen|establece|establecen|se[ñn]ala|se[ñn]alan|prev[ée]|prev[ée]n|precept[úu]a|consagra|consagran|exige|exigen|ordena|ordenan|regula|regulan|define|definen|contempla|contemplan|autoriza|autorizan|obliga|obligan)\b/gi;
+    /\b(?:art[íi]culos?|arts?\.)\s*\d{1,4}[^.;:\n]{0,70}?\b(?:dispone|disponen|establece|establecen|se[ñn]ala|se[ñn]alan|prev[ée]|prev[ée]n|precept[úu]a|consagra|consagran|exige|exigen|ordena|ordenan|regula|regulan|define|definen|contempla|contemplan|autoriza|autorizan|obliga|obligan|determina|determinan|fija|fijan|impone|imponen|permite|permiten|faculta|facultan|se\s+refiere\s+a|se\s+refieren\s+a)\b/gi;
   let m: RegExpExecArray | null;
   while ((m = re.exec(texto))) {
     if (hayTranscripcionCerca(texto, m.index, m.index + m[0].length)) continue;
@@ -371,7 +452,13 @@ export const revisarCitacionNormativa = (
   const vistas = new Set<string>();
 
   for (const mencion of mencionesDeArticulo(texto)) {
-    const codigo = normaDeLaMencion(mencion, marcas, texto);
+    /*
+     * Aquí NO hay norma de ficha que anteponer: esto audita el ESCRITO, y en un
+     * escrito la norma la marca el propio texto. Se pasa null a propósito, para
+     * que el cedazo siga leyendo lo que el documento dice y no lo que la ficha
+     * supondría.
+     */
+    const codigo = normaDeLaMencion(mencion, marcas, texto, null);
     vistas.add(`${codigo ?? '?'}|${mencion.articulo}`);
 
     if (codigo === null) {
@@ -416,6 +503,7 @@ export const revisarCitacionNormativa = (
 
   hallazgos.push(
     ...glosasEnParentesis(texto),
+    ...glosasEnParentesisInvertido(texto),
     ...glosasAgregadas(texto),
     ...contenidosPredicados(texto),
     ...efectosAtribuidos(texto)
@@ -450,7 +538,7 @@ export const referenciasDelTexto = (
   const out: ReferenciaNormativa[] = [];
   const vistas = new Set<string>();
   for (const mencion of mencionesDeArticulo(texto)) {
-    const codigo = normaDeLaMencion(mencion, marcas, texto) ?? normaPorDefecto;
+    const codigo = normaDeLaMencion(mencion, marcas, texto, normaPorDefecto);
     if (!codigo) continue;
     const r = { codigo, articulo: mencion.articulo };
     if (vistas.has(claveDe(r))) continue;

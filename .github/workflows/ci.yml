@@ -86,6 +86,8 @@ jobs:
         run: npm run check:sin-nombre
       - name: Citacion normativa (the draft cites only verified articles and never states what one says)
         run: npm run check:citacion
+      - name: Vigencia (a repealed article is caught and flagged inside the draft: art. 2035 del Codigo Civil)
+        run: npm run check:vigencia
 
       - name: Build
         run: npm run build

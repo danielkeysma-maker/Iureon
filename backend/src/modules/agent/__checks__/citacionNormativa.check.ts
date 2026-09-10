@@ -31,7 +31,7 @@
  * transcripción entre comillas precedida de un verbo de contenido, y deja
  * abierta la disyuntiva de competencia. Tiene que dar CERO.
  */
-import { revisarCitacionNormativa, type ReferenciaNormativa } from '../citacionNormativa';
+import { referenciasDelTexto, revisarCitacionNormativa, type ReferenciaNormativa } from '../citacionNormativa';
 import { andamiajeDeLaRama, universoCitable } from '../andamiaje';
 import { buildCatalogGuidance, REGLA_DE_CITACION_REDACCION } from '../catalogGuidance';
 import { buildClaudeDraftPrompt, buildClaudeUserMessage } from '../claudeDraft.prompt';
@@ -291,12 +291,30 @@ check(
   ''
 );
 
+/*
+ * EL CENTINELA CAMBIÓ CON LA REGLA, y hay que decir por qué. Se buscaba «LA
+ * LISTA ES CERRADA», que dejó de existir el día que el verificador de vigencia
+ * permitió reabrirla; buscar una frase que ya no está en ninguna de las dos
+ * superficies habría dejado el check en verde sin mirar nada. Ahora se busca la
+ * promesa que SÍ es exclusiva de la superficie de redacción: la de comprobar
+ * cada cita contra el texto oficial y marcar lo derogado DENTRO del escrito,
+ * que en revisión sería mentira porque allí no se redacta ni se anota nada.
+ */
 check(
-  'la regla cerrada NO viaja a revisión, chat ni preguntas de audiencia',
+  'la promesa de comprobar la vigencia NO viaja a revisión, chat ni preguntas de audiencia',
   !(buildCatalogGuidance('Demanda de restitución de inmueble arrendado', 'CIVIL') ?? '').includes(
-    'LA LISTA ES CERRADA'
+    'TEXTO OFICIAL DEL SENADO'
   ),
-  'cerrar la lista allí volvería inútil señalar lo que a un escrito ajeno le falta'
+  'prometer allí una comprobación que no corre sería peor que no prometer nada'
+);
+
+check(
+  'y la superficie de redacción sí la hace, con la distinción entre vigencia y glosa escrita',
+  /TEXTO OFICIAL DEL SENADO/.test(REGLA_DE_CITACION_REDACCION) &&
+    /comprueba VIGENCIA, no GLOSA|comprueba VIGENCIA .* y NO comprueba la GLOSA/.test(
+      REGLA_DE_CITACION_REDACCION
+    ),
+  'sin esa distinción, el guardián de vigencia se lee como si cubriera la glosa'
 );
 
 check(
@@ -306,6 +324,106 @@ check(
   ),
   ''
 );
+
+/*
+ * ─── LOS CUATRO AGUJEROS QUE LA PRIMERA MEDICIÓN DESTAPÓ ────────────────────
+ *
+ * Los tres primeros los encontró la propia corrida de control del 9 de
+ * septiembre de 2026, aislando el detector sobre el escrito que esta misma regla
+ * acababa de producir y que el cedazo había declarado LIMPIO. El cuarto lo
+ * encontró comparando ese escrito con el de la regla vieja.
+ */
+{
+  const glosa = (texto: string): boolean =>
+    revisarCitacionNormativa(texto, []).hallazgos.some((h) => h.clase === 'GLOSA_AGREGADA');
+
+  check(
+    'la glosa con «en cuanto a» se detecta — el cedazo la dejaba pasar y la regla la prohíbe con su ejemplo',
+    glosa('Se invocan los artículos 82, 84, 90 y 96 de la Ley 1564 de 2012, en cuanto a los requisitos de la demanda, sus anexos y el lugar para notificaciones.')
+  );
+  check(
+    'la glosa de UN SOLO artículo se detecta — se exigían dos o más y por eso pasaba',
+    glosa('Se solicita conforme al artículo 365 en materia de condena en costas.')
+  );
+  check('la glosa clásica de varios artículos sigue detectándose', glosa('Sus artículos 8, 9, 22 y 35, sobre las obligaciones del arrendatario.'));
+  /*
+   * Y LAS DOS DE ABAJO IMPORTAN TANTO COMO LAS DE ARRIBA: una falsa alarma es
+   * peor que el silencio, porque una acusación errónea enseña a ignorar todos
+   * los avisos. Citar un número y enumerar artículos es exactamente lo que la
+   * regla permite.
+   */
+  check('citar un artículo autorizado no es glosa', !glosa('Con fundamento en el artículo 384 del Código General del Proceso, se solicita la restitución.'));
+  check('enumerar artículos sin decir qué dicen tampoco lo es', !glosa('Se anexan los documentos previstos en los artículos 82 y 84 del Código General del Proceso.'));
+}
+
+{
+  /*
+   * LA MARCA DE UNA ORACIÓN NO SE DERRAMA SOBRE LA SIGUIENTE. La prosa de una
+   * ficha nombraba «la Ley 2220 de 2022» y los artículos de la oración siguiente
+   * —del CGP— quedaban archivados bajo esa ley: referencias que no existen.
+   */
+  const prosa = 'El término lo fija el art. 146 de la Ley 2220 de 2022. La demanda se presenta conforme al art. 90 y se tramita por el art. 384.';
+  const conFicha = referenciasDelTexto(prosa, 'CGP');
+  check(
+    'con norma de ficha, los artículos de otra oración NO heredan la ley nombrada antes',
+    conFicha.every((r) => r.articulo === 146 || r.codigo === 'CGP'),
+    conFicha.map((r) => `${r.codigo}|${r.articulo}`).join(', ')
+  );
+  check('y el artículo que sí lleva su ley al lado la conserva', conFicha.some((r) => r.articulo === 146 && /2220/.test(r.codigo)));
+}
+
+{
+  /* NINGUNA SECCIÓN SE OMITE POR FALTARLE EL ARTÍCULO: es lo que dejó la primera corrida sin competencia. */
+  check('la regla ordena escribir la sección aunque su artículo no esté autorizado', /NINGUNA SECCIÓN SE OMITE/.test(REGLA_DE_CITACION_REDACCION));
+  check('y lo dice con el caso que salió mal, la competencia', /SIN SECCIÓN DE COMPETENCIA/.test(REGLA_DE_CITACION_REDACCION) && /se inadmite/.test(REGLA_DE_CITACION_REDACCION));
+}
+
+/*
+ * ─── EL TERCER AGUJERO, Y LAS OCHO FRASES QUE NO DEBEN MARCARSE ─────────────
+ *
+ * Lo encontró la segunda corrida de control: el cedazo declaró «casi limpio» un
+ * escrito que sí afirmaba el contenido de un artículo que nadie leyó —«el
+ * artículo 22 de la Ley 820 de 2003 SE REFIERE A caución de seis meses de
+ * canon»—, y de paso se le escaparon otras tres formas. Las seis primeras fijan
+ * que se detecten.
+ *
+ * LAS OCHO SIGUIENTES PESAN IGUAL. Una falsa alarma es peor que el silencio,
+ * porque una acusación errónea enseña a ignorar todos los avisos, y este cedazo
+ * ya produjo tres mientras se afinaba: «se rige por el artículo 384» no dice qué
+ * dice el artículo, y una PRETENSIÓN con su cita al final —«que se ordene la
+ * restitución (artículo 384)»— tampoco: dice qué pide el abogado y en qué se
+ * apoya, que es justo lo que la regla permite.
+ */
+{
+  const AUTORIZADOS: ReferenciaNormativa[] = [384, 368, 369, 82, 84, 90, 365]
+    .map((articulo) => ({ codigo: 'CGP', articulo }))
+    .concat([{ codigo: 'LEY 820 DE 2003', articulo: 22 }]);
+  const CLASES_DE_GLOSA = new Set(['GLOSA_AGREGADA', 'GLOSA_EN_PARENTESIS', 'CONTENIDO_PREDICADO', 'EFECTO_ATRIBUIDO']);
+  const glosa = (texto: string): boolean =>
+    revisarCitacionNormativa(texto, AUTORIZADOS).hallazgos.some((h) => CLASES_DE_GLOSA.has(h.clase));
+
+  const DEBEN_DETECTARSE: Array<[string, string]> = [
+    ['el verbo «determina», que no estaba en la lista', 'El artículo 384 numeral 9 determina que el proceso es de única instancia.'],
+    ['el conector «se refiere a» — la que de verdad se coló', 'El artículo 22 de la Ley 820 de 2003 se refiere a caución de seis (6) meses de canon.'],
+    ['el paréntesis invertido, con un plazo entre medias', 'Se corre traslado de la demanda por veinte (20) días (artículos 368 y 369).'],
+    ['el paréntesis invertido simple', 'El juez profiere sentencia ordenando la restitución (artículo 384 numeral 3).'],
+    ['la glosa con «en cuanto a»', 'Se invocan los artículos 82, 84 y 90 de la Ley 1564 de 2012, en cuanto a los requisitos de la demanda.'],
+    ['la glosa de un solo artículo', 'Se solicita conforme al artículo 365 en materia de condena en costas.']
+  ];
+  for (const [nombre, texto] of DEBEN_DETECTARSE) check(`se detecta ${nombre}`, glosa(texto), texto.slice(0, 52));
+
+  const NO_DEBEN_MARCARSE: Array<[string, string]> = [
+    ['«se rige por» no afirma qué dice el artículo', 'El asunto se tramita por el proceso verbal y se rige por el artículo 384 numeral 4.'],
+    ['citar un artículo y pedir algo con él', 'Con fundamento en el artículo 384 del Código General del Proceso, se solicita la restitución.'],
+    ['un plazo entre paréntesis no es una cita', 'Se concede el término de treinta (30) días para cumplir lo ordenado.'],
+    ['un puntero estructural entre paréntesis', 'Lo previsto en el artículo 384 (numeral 2) del mismo estatuto.'],
+    ['transcribir entre comillas es lo que se pide', 'El artículo 384 dispone: «no será oído hasta tanto consigne».'],
+    ['una petición con su cita al final', 'Solicito que se decrete la restitución del inmueble (artículo 384).'],
+    ['una pretensión con su cita al final', 'Que se ordene la restitución del bien arrendado (artículo 384).'],
+    ['una pretensión numerada', '1. Que se declare terminado el contrato de arrendamiento (artículo 384).']
+  ];
+  for (const [nombre, texto] of NO_DEBEN_MARCARSE) check(`NO se marca: ${nombre}`, !glosa(texto), texto.slice(0, 52));
+}
 
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);
 process.exitCode = fallos === 0 ? 0 : 1;

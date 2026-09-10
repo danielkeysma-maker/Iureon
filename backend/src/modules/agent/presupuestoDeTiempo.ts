@@ -30,7 +30,8 @@
  * `TOPE_DE_FUNCION_MS` es el espejo de `maxDuration` en `vercel.json`, y
  * `plazos.check.ts` los compara: si uno se mueve sin el otro, el check falla.
  * Hobby permite 60 s; Pro permite 300 s. Con 300 s el presupuesto de redacción
- * pasa de 33 s a 273 s y el borrador cabe entero con holgura.
+ * pasa de 33 s a 253 s —los otros 20 s son de la comprobación de vigencia, que
+ * llegó después— y el borrador cabe entero con holgura.
  */
 
 /** Espejo de `maxDuration` en `vercel.json`. Hobby: 60 s. Pro: 300 s. */
@@ -67,23 +68,53 @@ export const PLAZO_HECHOS_MS = 12_000;
 export const PLAZO_JURISPRUDENCIA_MS = 8_000;
 
 /**
+ * Etapa 3 — comprobación de vigencia contra el texto oficial del Senado.
+ *
+ * VA DESPUÉS DE REDACTAR, y por eso necesita partida propia: lo que comprueba
+ * son las citas que el borrador YA trae, así que no puede salir del presupuesto
+ * de la redacción sin quitárselo al escrito mismo.
+ *
+ * Medido el 9 de septiembre de 2026 contra `secretariasenado.gov.co`, con las
+ * consultas de los artículos en paralelo: la PRIMERA descarga de la instancia
+ * cuesta 6,6 s —se le va casi todo esperando al puerto 443, que desde aquí no
+ * conecta— y las siguientes 150–300 ms, porque el esquema que funcionó y el
+ * índice de la norma quedan en memoria. Veinte segundos cubren el arranque en
+ * frío más doce artículos con holgura.
+ *
+ * Y agotarlos NO es un fallo: `verificarVigencia.ts` devuelve NO_VERIFICABLE y
+ * el escrito sale igual, diciéndolo. Un borrador perdido por una mala tarde del
+ * Senado sería peor que el defecto que esta etapa vigila.
+ */
+export const PLAZO_VIGENCIA_MS = 20_000;
+
+/**
  * Etapa 2 — redacción (Opus).
  *
  * Es el remanente. Con el tope de Hobby eran 33 s y NO alcanzaba: Opus escribe
  * a unos 75 tokens de salida por segundo, así que en 33 s caben ~2.500 tokens
  * (≈5.000 caracteres, dos páginas) contra los 14.600–21.400 caracteres de un
  * escrito completo, y la redacción de cualquier caso agotaba su presupuesto.
- * Con el tope de Pro son 273 s, y lo medido cabe con holgura: 84,8 s con
+ * Con el tope de Pro son 253 s —eran 273 hasta que la comprobación de vigencia
+ * reclamó su partida— y lo medido cabe con holgura: 84,8 s con
  * `reasoning_effort: 'low'` y 124,7 s con `'medium'`. El presupuesto sigue
  * existiendo porque un plazo generoso no es un plazo ausente — si un motor se
  * cuelga, quien corta es este código y la reserva vuelve.
  */
 export const PLAZO_REDACCION_MS =
-  TOPE_DE_FUNCION_MS - RESERVA_DE_CIERRE_MS - PLAZO_HECHOS_MS - PLAZO_JURISPRUDENCIA_MS - 2_000;
+  TOPE_DE_FUNCION_MS -
+  RESERVA_DE_CIERRE_MS -
+  PLAZO_HECHOS_MS -
+  PLAZO_JURISPRUDENCIA_MS -
+  PLAZO_VIGENCIA_MS -
+  2_000;
 
 /** Lo que las etapas más el cierre reclaman del reloj de la función. */
 export const sumaDePresupuestos = (): number =>
-  PLAZO_HECHOS_MS + PLAZO_JURISPRUDENCIA_MS + PLAZO_REDACCION_MS + RESERVA_DE_CIERRE_MS;
+  PLAZO_HECHOS_MS +
+  PLAZO_JURISPRUDENCIA_MS +
+  PLAZO_REDACCION_MS +
+  PLAZO_VIGENCIA_MS +
+  RESERVA_DE_CIERRE_MS;
 
 /**
  * Se agotó el presupuesto de una etapa.

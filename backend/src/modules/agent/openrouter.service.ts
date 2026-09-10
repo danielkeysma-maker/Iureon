@@ -3,6 +3,7 @@ import {
   PLAZO_HECHOS_MS,
   PLAZO_JURISPRUDENCIA_MS,
   PLAZO_REDACCION_MS,
+  PLAZO_VIGENCIA_MS,
   conPresupuesto,
   relojDeEtapa
 } from './presupuestoDeTiempo';
@@ -20,6 +21,7 @@ import {
 } from './claudeDraft.prompt';
 import { buildCatalogGuidanceForFirm, resolverProcedencia } from './catalogGuidance';
 import { revisarCitacionNormativa } from './citacionNormativa';
+import { anotarVigencia, resumenDeVigencia, verificarVigenciaDelEscrito } from './review/verificarVigencia';
 import type { LegalBranch } from '../catalog/types';
 
 /**
@@ -240,6 +242,39 @@ export class OpenRouterService {
      * código y no por la introspección del propio redactor, que es la razón por
      * la que la propuesta del anexo se descartó.
      */
+    /*
+     * ─── Y LA VIGENCIA SE COMPRUEBA CONTRA EL TEXTO OFICIAL ─────────────────
+     *
+     * El cedazo de arriba mide si una cita está DENTRO DE LO QUE ESTA CASA HA
+     * LEÍDO. Esto de aquí mide otra cosa, y es la que hacía falta para poder
+     * volver a abrir la mano: si lo que el escrito citó por su cuenta SIGUE
+     * VIVO. Se midió que el motor no inventa artículos, pero sí cita muertos —el
+     * art. 2035 del Código Civil, derogado en 2003, invocado como fundamento de
+     * la pretensión— y un artículo muerto es peor que uno inventado, porque el
+     * juez sí lo encuentra.
+     *
+     * VA AQUÍ, DESPUÉS DE REDACTAR, con su propio presupuesto: lo que comprueba
+     * son las citas que el borrador ya trae. Y NO usa `conPresupuesto`, que
+     * rechaza, sino el tope interno del propio verificador, que devuelve
+     * NO_VERIFICABLE: llegados a este punto el escrito ya está escrito y ya se
+     * pagó, así que una mala tarde del Senado no puede costar el borrador.
+     */
+    let textoEntregado = legalText;
+    const vigencia = await verificarVigenciaDelEscrito(
+      legalText,
+      procedencia?.articulosAutorizados ?? [],
+      PLAZO_VIGENCIA_MS
+    );
+    if (vigencia.resultados.length > 0) {
+      textoEntregado = anotarVigencia(legalText, vigencia);
+      onStepLog({
+        stage: 'STAGE_3_REDACCION',
+        engine: 'CLAUDE',
+        message: `[Vigencia] ${resumenDeVigencia(vigencia)}`,
+        timestamp: new Date().toISOString()
+      });
+    }
+
     if (procedencia && procedencia.articulosAutorizados.length > 0) {
       const cedazo = revisarCitacionNormativa(legalText, procedencia.articulosAutorizados);
       if (cedazo.hallazgos.length > 0) {
@@ -264,7 +299,14 @@ export class OpenRouterService {
       excepcionesFormuladas: isTutela
         ? ['Protección Inmediata del Debido Proceso (Art. 29 C.P.)', 'Habeas Data Procesal & Corrección de Registros (Art. 15 C.P.)']
         : ['Prescripción Trienal (Art. 151 CPTSS)', 'Inexistencia de la Obligación'],
-      legalText,
+      /*
+       * EL TEXTO QUE SALE ES EL ANOTADO. Si la comprobación de vigencia
+       * encontró un artículo derogado, la advertencia viaja DENTRO del escrito
+       * —en el párrafo y en la cabecera— y no en un metadato que el visor
+       * podría no mostrar y la exportación a Word perdería. Cuando no hubo nada
+       * que comprobar, es el mismo texto del motor, carácter por carácter.
+       */
+      legalText: textoEntregado,
       /*
        * Zero, not 4820.
        *

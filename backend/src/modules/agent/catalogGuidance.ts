@@ -156,6 +156,24 @@ NO HAY CONTRADICCIÓN ENTRE LAS DOS REGLAS ANTERIORES, y conviene tenerlo claro:
  * una hipótesis de diseño: es un experimento controlado que ya corrió, y lo que
  * mide es la FORMA de la regla. Así que la de normas copia la forma que funcionó.
  *
+ * ─── Y POR QUÉ LA REGLA 1 VOLVIÓ A ABRIRSE ─────────────────────────────────
+ *
+ * Cerrar la lista funcionó: de 25 artículos fuera de ficha se pasó a 0. Pero se
+ * midió también lo que costaba, y era mucho — el escrito salía más pobre, sin
+ * norma sustancial y con secciones argumentadas solo en palabras, porque la
+ * regla no distinguía entre el artículo que el modelo recuerda mal y el que
+ * recuerda bien. Cerrar era la única respuesta posible mientras nadie pudiera
+ * comprobar. Ahora `agent/review/verificarVigencia.ts` consulta el texto oficial
+ * del Senado después de redactar y marca en el propio escrito lo que esté
+ * derogado, así que la lista puede volver a abrirse: el riesgo dejó de ser
+ * invisible, que era lo único que lo hacía inaceptable.
+ *
+ * LO QUE NO SE ABRE ES LA REGLA 2, y está dicho dentro de ella con todas sus
+ * letras: el verificador comprueba VIGENCIA, no GLOSA. Que el art. 8 de la Ley
+ * 820 esté vivo no vuelve verdadera la frase que se lo atribuye al arrendatario.
+ * Relajar las dos a la vez habría sido leer el guardián nuevo como si cubriera
+ * un defecto que ni mira.
+ *
  * LOS EJEMPLOS VAN LITERALES, y no es folclore. Los tres jueces coincidieron en
  * que la instrucción abstracta no muerde y la que trae el error medido sí. Cada
  * frase entrecomillada de aquí abajo salió de uno de los dos borradores que se
@@ -164,9 +182,11 @@ NO HAY CONTRADICCIÓN ENTRE LAS DOS REGLAS ANTERIORES, y conviene tenerlo claro:
  */
 export const REGLA_DE_CITACION_REDACCION = `REGLA DE CITACIÓN NORMATIVA — manda sobre la línea de NORMATIVIDAD del encargo y sobre cualquier otra invitación a fundamentar en derecho que leas en este prompt.
 
-1. LA LISTA ES CERRADA. Los únicos artículos, leyes y decretos que puedes escribir en este documento son los de la ficha de arriba y los del ANDAMIAJE PROCESAL VERIFICADO. NO agregues otros de memoria, ni siquiera si estás seguro de que existen y de que son los que corresponden a este caso. Un artículo real citado sin comprobar es indistinguible de uno inventado hasta que el juez lo lee, y para entonces el abogado ya firmó.
+1. LA LISTA DE ARRIBA ES LO COMPROBADO; FUERA DE ELLA PUEDES CITAR, PERO CADA NÚMERO QUE ESCRIBAS SE VA A COMPROBAR. Los artículos de la ficha y del ANDAMIAJE PROCESAL VERIFICADO los leyó alguien de esta casa contra el texto oficial de la norma: ésos son terreno firme. Fuera de ellos puedes citar el artículo que este escrito de verdad necesite —la competencia, los anexos, el juramento estimatorio, la norma sustancial de la pretensión— porque, terminado el escrito, el sistema consulta el TEXTO OFICIAL DEL SENADO artículo por artículo y comprueba si sigue VIGENTE; lo que resulte derogado queda marcado dentro de este mismo documento, con su nombre y a la vista del abogado. Esa comprobación es la razón por la que esta lista dejó de ser cerrada, y también su límite: cita lo que el caso pida y ni un número más, porque cada cita de adorno es trabajo de comprobación que le queda al abogado. Y NO inventes un número para tapar un hueco: el verificador comprueba vigencia, no existencia, y un número que la norma no tiene vuelve como «no se pudo comprobar» —un hueco disfrazado de cita—, no como error. Si no estás seguro, aplica la regla 7 y escríbelo en palabras.
 
 2. EL NÚMERO NO AUTORIZA EL CONTENIDO. De un artículo autorizado puedes escribir el número y transcribir entre comillas el texto que aparezca arriba. Si arriba no aparece su texto, NO digas qué dice, NO lo resumas entre paréntesis, NO le atribuyas un efecto jurídico y NO lo describas junto con otros en una sola frase que los cubra a todos. Está prohibido escribir «artículo 2005 (obligación de restituir la cosa arrendada al terminar el contrato)»; está prohibido escribir «sus artículos 8, 9, 22 y 35, sobre las obligaciones del arrendatario»; está prohibido escribir «su autenticidad se presume conforme al artículo 244». Los tres números existen y las tres frases suenan bien: por eso son peligrosas.
+
+ESTA REGLA NO SE RELAJA, Y LA DISTINCIÓN IMPORTA MÁS QUE NUNCA AHORA QUE LA 1 SÍ SE RELAJÓ. El verificador del que habla la regla 1 comprueba VIGENCIA —que el artículo siga en el ordenamiento— y NO comprueba la GLOSA —que sea verdad lo que tú dices que el artículo dice—. Son dos defectos distintos y solo uno tiene guardián. El ejemplo de arriba lo prueba: el artículo 8 de la Ley 820 está perfectamente vigente, y aun así la frase «los artículos 8, 9, 22 y 35, sobre las obligaciones del arrendatario» es falsa, porque el 8 regula las obligaciones del ARRENDADOR. La comprobación de vigencia habría dejado pasar esa frase entera sin decir nada. Así que sin el texto delante, el número sí; lo que dice, no.
 
 3. TAMPOCO AFIRMES CONTENIDO NORMATIVO SIN NÚMERO. Quitar la cita no vuelve comprobada la afirmación: «la ley exige restituir el inmueble al terminar el contrato» es lo mismo sin comprobar y además sin rastro. Si no tienes el texto, argumenta con los HECHOS del caso y di que el respaldo normativo debe comprobarse antes de radicar.
 
@@ -178,7 +198,9 @@ export const REGLA_DE_CITACION_REDACCION = `REGLA DE CITACIÓN NORMATIVA — man
 
 7. SI FALTA LA NORMA, FALTA Y SE DICE. Cuando un requisito, una causal o un fundamento sustancial no esté en ninguna de las dos listas, descríbelo en palabras y SIN número de artículo, y deja constancia EN EL PROPIO ESCRITO —donde se lea, no en una nota al pie— de que ese fundamento no está verificado y debe comprobarse antes de radicar.
 
-NO HAY CONTRADICCIÓN CON LA ORDEN DE REDACTAR COMPLETO: la estructura es del oficio y no la pierdes; la cita es de la norma y esa sí está tasada. Un escrito con menos artículos y todos comprobables se firma. Uno con veintitrés artículos que nadie leyó obliga al abogado a comprobarlos todos, y por eso vale menos que ninguno.`;
+8. NINGUNA SECCIÓN SE OMITE POR FALTARLE EL ARTÍCULO. Esto es lo que salió mal la primera vez que corrió esta regla: el escrito se quedó SIN SECCIÓN DE COMPETENCIA porque su artículo no estaba autorizado, y una demanda sin competencia se inadmite. La regla 7 dice que lo describas en palabras, y describirlo significa ESCRIBIR LA SECCIÓN: «Es usted competente por el factor territorial, por encontrarse el inmueble en [ciudad], y por la naturaleza del asunto; la autoridad que registra la ficha es [la que diga arriba]. El fundamento normativo de la competencia no está verificado aquí y debe comprobarse antes de radicar.» Lo mismo con el juramento estimatorio, los anexos y las notificaciones: la sección va, con su encabezado, con su contenido y sin número de artículo. Quitar la sección no protege a nadie: deja al abogado sin la parte y sin el aviso de que falta.
+
+NO HAY CONTRADICCIÓN CON LA ORDEN DE REDACTAR COMPLETO: la estructura es del oficio y no la pierdes; la cita es de la norma y esa sí está tasada. Un escrito cuyos artículos vienen de la ficha o resisten la comprobación de vigencia se firma. Uno con veintitrés artículos traídos de memoria obliga al abogado a comprobarlos todos, y por eso vale menos que ninguno.`;
 
 /*
  * La mitad que sí viaja a revisión, chat y preguntas de audiencia. No cierra la

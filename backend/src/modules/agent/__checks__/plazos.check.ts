@@ -35,6 +35,7 @@ import {
   PLAZO_HECHOS_MS,
   PLAZO_JURISPRUDENCIA_MS,
   PLAZO_REDACCION_MS,
+  PLAZO_VIGENCIA_MS,
   RESERVA_DE_CIERRE_MS,
   TOPE_DE_FUNCION_MS,
   TiempoDeRedaccionAgotado,
@@ -82,8 +83,19 @@ check(
 );
 check(
   'ninguna etapa tiene presupuesto cero o negativo',
-  PLAZO_HECHOS_MS > 0 && PLAZO_JURISPRUDENCIA_MS > 0 && PLAZO_REDACCION_MS > 0,
-  `${PLAZO_HECHOS_MS} / ${PLAZO_JURISPRUDENCIA_MS} / ${PLAZO_REDACCION_MS}`
+  PLAZO_HECHOS_MS > 0 && PLAZO_JURISPRUDENCIA_MS > 0 && PLAZO_REDACCION_MS > 0 && PLAZO_VIGENCIA_MS > 0,
+  `${PLAZO_HECHOS_MS} / ${PLAZO_JURISPRUDENCIA_MS} / ${PLAZO_REDACCION_MS} / ${PLAZO_VIGENCIA_MS}`
+);
+/*
+ * LA COMPROBACIÓN DE VIGENCIA TIENE PARTIDA PROPIA, y tenía que tenerla: corre
+ * DESPUÉS de redactar, así que sacarla del presupuesto de la redacción se lo
+ * habría quitado al escrito. Medido: la primera descarga de la instancia cuesta
+ * 6,6 s y las siguientes 150–300 ms.
+ */
+check(
+  'la comprobación de vigencia tiene su propia partida, y le alcanza para el arranque en frío',
+  PLAZO_VIGENCIA_MS >= 10_000,
+  `${PLAZO_VIGENCIA_MS} ms`
 );
 check(
   'el cierre —cobrar, auditar y responder— tiene su parte reservada',
@@ -229,6 +241,18 @@ const pruebas = async (): Promise<void> => {
   check(
     'y el registro de ejecución ya no anuncia un esquema que nadie produce',
     !/STAGE_2_LOGIC/.test(servicio)
+  );
+  /*
+   * LA VIGENCIA NO USA `conPresupuesto`, Y ESO ES EL DISEÑO. Cuando corre, el
+   * escrito ya está escrito y ya se pagó: rechazar ahí perdería el borrador por
+   * una mala tarde del Senado. Su tope vive dentro del verificador y devuelve
+   * NO_VERIFICABLE, que se declara en el propio escrito.
+   */
+  check(
+    'la comprobación de vigencia corre con su plazo pero NO puede tumbar el escrito',
+    /verificarVigenciaDelEscrito\(/.test(servicio) &&
+      !/conPresupuesto\(\s*verificarVigenciaDelEscrito/.test(servicio) &&
+      /PLAZO_VIGENCIA_MS/.test(servicio)
   );
 
   console.log(fallos === 0 ? `\nTODO BIEN (${suma} ms de ${TOPE_DE_FUNCION_MS} ms)` : `\n${fallos} FALLO(S)`);
