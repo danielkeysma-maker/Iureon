@@ -1242,7 +1242,24 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
             legalBranch={ramaDeLaGuia}
             hechos={hechos}
             setHechos={setHechos}
-            onElegir={(exactName) => {
+            onElegir={(exactName, branch) => {
+              /*
+               * LA RAMA QUE MANDA ES LA DE LA CANDIDATA, NO LA DEL SELECTOR.
+               *
+               * Desde que la guía puede buscar en todo el catálogo, la
+               * actuación que propone puede vivir en otra rama. Quedándose solo
+               * con el nombre pasaba esto: la petición viajaba con la rama que
+               * el abogado había elegido al principio, el servidor buscaba la
+               * ficha SOLO dentro de esa rama, no la encontraba, y la revisión
+               * salía rotulada «sin ficha verificada» — ya cobrada. Y antes de
+               * eso el síntoma desconcertaba: el selector se quedaba en gris
+               * con «Elegir actuación…», porque el nombre no está en la lista
+               * de esa rama, mientras el botón de revisar sí se encendía.
+               *
+               * El puente del informe ya lo resolvía así; aquí se había quedado
+               * el descuido viejo.
+               */
+              if (branch) setRamaPropia(branch);
               setTipoPropio(exactName);
               setGuiaAbierta(false);
             }}

@@ -290,7 +290,9 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
         legalBranch={legalBranch}
         hechos={hechos}
         setHechos={setHechos}
-        onElegir={(exactName) => {
+        onElegir={(exactName, branch) => {
+          /* La rama que manda es la de la candidata; ver WorkshopConfigBar. */
+          if (branch) setLegalBranch(branch);
           setDocumentType(exactName);
           setGuiaAbierta(false);
           setAbierto(false);

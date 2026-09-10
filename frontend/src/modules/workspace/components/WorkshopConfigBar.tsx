@@ -288,7 +288,14 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
       legalBranch={legalBranch}
       hechos={hechos}
       setHechos={setHechos}
-      onElegir={(exactName) => {
+      onElegir={(exactName, branch) => {
+        /*
+          LA RAMA QUE MANDA ES LA DE LA CANDIDATA. Buscando en todo el catálogo
+          la actuación propuesta puede vivir en otra rama, y un mismo rótulo
+          tiene plazos distintos en dos ramas: dejar la del selector redactaría
+          contra la ficha equivocada, o contra ninguna.
+        */
+        if (branch) setLegalBranch(branch);
         setDocumentType(exactName);
         setGuiaAbierta(false);
       }}
