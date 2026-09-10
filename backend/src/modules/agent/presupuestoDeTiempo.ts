@@ -30,9 +30,18 @@
  * `TOPE_DE_FUNCION_MS` es el espejo de `maxDuration` en `vercel.json`, y
  * `plazos.check.ts` los compara: si uno se mueve sin el otro, el check falla.
  * Hobby permite 60 s; Pro permite 300 s. Con 300 s el presupuesto de redacción
- * pasa de 33 s a 228 s —los otros 45 s se los llevan las dos comprobaciones que
- * llegaron después: 20 s la de vigencia y 25 s la de la glosa— y el borrador
- * cabe entero con holgura.
+ * pasa de 33 s a 138 s —los otros 135 s se los llevan las tres etapas que
+ * vinieron después de la redacción o volvieron tras ella: 90 s el esquema
+ * dogmático repuesto, 20 s la comprobación de vigencia y 25 s la de la glosa— y
+ * el borrador cabe entero con holgura.
+ *
+ * ─── DOS CLASES DE PARTIDA, Y LA DIFERENCIA IMPORTA ─────────────────────────
+ *
+ * Agotar el presupuesto de una etapa SIN LA CUAL NO HAY ESCRITO —hechos,
+ * jurisprudencia, redacción— rechaza con `conPresupuesto` y devuelve la
+ * reserva. Agotar el de una etapa que solo MEJORA el escrito —el esquema
+ * dogmático— o que lo COMPRUEBA después de escrito —vigencia, glosa— no puede
+ * costar el borrador: esas fallan abiertas y lo declaran.
  */
 
 /** Espejo de `maxDuration` en `vercel.json`. Hobby: 60 s. Pro: 300 s. */
@@ -115,23 +124,72 @@ export const PLAZO_VIGENCIA_MS = 20_000;
 export const PLAZO_GLOSA_MS = 25_000;
 
 /**
- * Etapa 2 — redacción (Opus).
+ * Etapa 2 — esquema dogmático (GPT-5.6 Sol).
+ *
+ * ─── POR QUÉ VUELVE A TENER PARTIDA ─────────────────────────────────────────
+ *
+ * El 9 de septiembre de 2026 esta etapa se retiró porque costaba 35–40 s dentro
+ * de una función de 60. Ese motivo caducó el mismo día: el plan pasó a Pro y el
+ * tope de la función a 300 s. Se volvió a medir el 10 de septiembre, un caso
+ * por brazo con los motores reales, y lo que decidió reponerla no fue el reloj
+ * sino lo que el escrito dice:
+ *
+ *   · SIN esquema, el borrador SE NIEGA A NOMBRAR la causal sustancial —«el
+ *     fundamento sustancial relativo a la obligación del arrendatario de pagar
+ *     el precio… no está verificado en este escrito y debe comprobarse antes de
+ *     radicar», tres veces— pese a que el artículo 22, numeral 1, de la Ley 820
+ *     de 2003 estaba autorizado en la ficha TODO EL TIEMPO;
+ *   · CON esquema lo invoca, añade un hecho que anticipa la excepción de
+ *     contrato no cumplido y ordena las pretensiones declarando primero la
+ *     existencia del contrato.
+ *
+ * Costo medido: US$0,2285 sin ella contra US$0,2997 con ella (+31%), y +56 s.
+ *
+ * ─── DE DÓNDE SALEN LOS 90 s, Y POR QUÉ NO SON 75 ──────────────────────────
+ *
+ * Lo medido el 10 de septiembre eran 36,5 s con el tope de tokens viejo
+ * (1.536), que además cortaba el esquema por longitud. Con el tope nuevo el
+ * esquema TERMINA, y terminar cuesta más tokens y por tanto más segundos.
+ * Primero se presupuestaron 75 s estimando ~60 s; la corrida de comprobación
+ * con los tres motores reales dio 69,5 s para un esquema completo de 3.818
+ * caracteres. Es decir: la estimación acertó de cerca y el margen que dejaba
+ * —5,5 s— era demasiado fino para una etapa que cuesta US$0,027 y que al
+ * vencer los tira.
+ *
+ * Noventa dan un 30% de holgura sobre lo medido, y salen de la redacción, que
+ * es la única etapa que la tiene: se queda en 138 s contra los 66,7 s que Opus
+ * tardó en esa misma corrida y los 84,8–95 s de las anteriores.
+ *
+ * ─── Y AGOTARLOS NO PUEDE TUMBAR EL BORRADOR ────────────────────────────────
+ *
+ * Esta partida NO se cobra con `conPresupuesto`, que RECHAZA. El esquema es una
+ * ayuda a la redacción, no la redacción: sin él el redactor sigue con los
+ * hechos, la ficha y la jurisprudencia, exactamente como el pipeline de dos
+ * motores que corrió hasta hoy. Perder el escrito caro por una mala tarde de
+ * GPT sería peor que quedarse sin la mejora que esta etapa aporta.
+ */
+export const PLAZO_ESQUEMA_MS = 90_000;
+
+/**
+ * Etapa 3 — redacción (Opus).
  *
  * Es el remanente. Con el tope de Hobby eran 33 s y NO alcanzaba: Opus escribe
  * a unos 75 tokens de salida por segundo, así que en 33 s caben ~2.500 tokens
  * (≈5.000 caracteres, dos páginas) contra los 14.600–21.400 caracteres de un
  * escrito completo, y la redacción de cualquier caso agotaba su presupuesto.
- * Con el tope de Pro son 228 s —eran 273 hasta que la comprobación de vigencia
- * reclamó 20 s y la de la glosa otros 25— y lo medido cabe con holgura: 84,8 s con
- * `reasoning_effort: 'low'` y 124,7 s con `'medium'`. El presupuesto sigue
- * existiendo porque un plazo generoso no es un plazo ausente — si un motor se
- * cuelga, quien corta es este código y la reserva vuelve.
+ * Con el tope de Pro son 138 s —eran 273 hasta que la comprobación de vigencia
+ * reclamó 20 s, la de la glosa otros 25 y el esquema dogmático 90 al
+ * reponerse— y lo medido cabe con holgura: 84,8 s con `reasoning_effort:
+ * 'low'` y 124,7 s con `'medium'`. El presupuesto sigue existiendo porque un
+ * plazo generoso no es un plazo ausente — si un motor se cuelga, quien corta es
+ * este código y la reserva vuelve.
  */
 export const PLAZO_REDACCION_MS =
   TOPE_DE_FUNCION_MS -
   RESERVA_DE_CIERRE_MS -
   PLAZO_HECHOS_MS -
   PLAZO_JURISPRUDENCIA_MS -
+  PLAZO_ESQUEMA_MS -
   PLAZO_VIGENCIA_MS -
   PLAZO_GLOSA_MS -
   2_000;
@@ -140,6 +198,7 @@ export const PLAZO_REDACCION_MS =
 export const sumaDePresupuestos = (): number =>
   PLAZO_HECHOS_MS +
   PLAZO_JURISPRUDENCIA_MS +
+  PLAZO_ESQUEMA_MS +
   PLAZO_REDACCION_MS +
   PLAZO_VIGENCIA_MS +
   PLAZO_GLOSA_MS +

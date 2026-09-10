@@ -1,5 +1,6 @@
 import { ENGINE, callOpenRouterWithUsage } from './openrouter.client';
 import {
+  PLAZO_ESQUEMA_MS,
   PLAZO_HECHOS_MS,
   PLAZO_JURISPRUDENCIA_MS,
   PLAZO_REDACCION_MS,
@@ -16,6 +17,7 @@ import { indexFetchedRulings } from '../jurisprudence/autoIngest.service';
 import { detectLegalTopic } from './topicDetector';
 import { generateCleanDocumentTitle } from './documentTitle';
 import {
+  MARCA_DE_ESQUEMA_CORTADO,
   buildClaudeDraftPrompt,
   buildClaudeUserMessage,
   renderJurisprudencia
@@ -100,15 +102,40 @@ export interface AgentExecutionStep {
 
 /**
  * Token budget per engine. Each engine spends only what its own task needs:
- * Gemini never drafts, and Claude never re-extracts facts. In continuation mode
- * the extraction gets less, because it describes a delta rather than the whole
- * case.
+ * Gemini and GPT never draft, and Claude never re-extracts facts. In
+ * continuation mode the analysis engines get less, because they describe a
+ * delta rather than the whole case.
  */
 const MAX_TOKENS = {
   GEMINI_NEW: 1024,
   GEMINI_CONTINUATION: 768,
   /** Facts from the prompt AND from the attached files: a comparendo alone is thirty data points. */
-  GEMINI_CON_ADJUNTOS: 2048
+  GEMINI_CON_ADJUNTOS: 2048,
+  /*
+   * ─── 4.096, Y EL NÚMERO SALE DE LO MEDIDO, NO DE UN REDONDEO ─────────────
+   *
+   * Con 1.536 el esquema salía CORTADO. Medido el 10 de septiembre de 2026:
+   * `finish_reason: 'length'` a los 1.536 tokens, 2.917 caracteres producidos y
+   * la ESTRATEGIA DE SUSTENTACIÓN —el último de los cuatro puntos que el prompt
+   * pide— cortada a media frase. Se pagaban US$0,017 por un documento
+   * incompleto, y lo incompleto viajaba al redactor como si estuviera entero.
+   *
+   * ARITMÉTICA: 2.917 caracteres en 1.536 tokens son 1,9 caracteres por token
+   * —bajo, porque el razonamiento del motor también consume de este tope—. El
+   * prompt pide «máximo 600 palabras», que en español son unos 4.200
+   * caracteres, y a 1,9 caracteres por token eso son ~2.210 tokens SOLO para
+   * llegar al límite pedido. 4.096 deja casi el doble de ese mínimo, que es lo
+   * que hace falta para que el motor cierre su última sección en vez de que se
+   * la corten. No es gratis en teoría, pero sí en la práctica: el motor para en
+   * `stop` cuando termina el esquema, así que el tope solo se paga si de verdad
+   * hacía falta.
+   */
+  GPT_NEW: 4096,
+  /*
+   * La continuación pide «máximo 400 palabras» (~2.800 caracteres), dos tercios
+   * de lo anterior. Mismo cálculo, misma proporción: 2.560.
+   */
+  GPT_CONTINUATION: 2560
 } as const;
 
 /**
@@ -128,14 +155,12 @@ const MIN_DRAFT_LENGTH = 200;
 const DRAFT_CONTEXT_CHARS = 3000;
 
 /**
- * Two-engine drafting pipeline over OpenRouter.
+ * Three-engine drafting pipeline over OpenRouter.
  *
- * Gemini extracts the facts and Claude Opus writes the document from them, from
- * the catalogue ficha and from the verified jurisprudence. Each stage reports
- * progress through onStepLog so the frontend can stream the console — and it
- * reports the stages that actually run, which is why the dogmatic outline no
- * longer appears there — la etapa 2 se retiró, y la razón medida está
- * escrita en el sitio donde vivía.
+ * Gemini reads the facts and the attachments, GPT-5.6 Sol structures them into
+ * a dogmatic outline, and Claude Opus writes the document from both plus the
+ * catalogue ficha and the verified jurisprudence. Each stage reports progress
+ * through onStepLog so the frontend can stream the console.
  */
 /**
  * The precedent search runs on borrowed time, and the draft owns the clock.
@@ -213,8 +238,23 @@ export class OpenRouterService {
       PLAZO_JURISPRUDENCIA_MS,
       'busqueda de jurisprudencia'
     );
+    /*
+     * ─── LA ETAPA 2 CORRE CON `conPlazo`, NO CON `conPresupuesto` ───────────
+     *
+     * Y esa es toda la diferencia entre una etapa que MEJORA el escrito y una
+     * sin la cual no hay escrito. `conPresupuesto` RECHAZA al vencer, que es lo
+     * correcto para los hechos o la redacción; aquí sería tumbar un borrador
+     * caro por perder una ayuda. Al vencer, el esquema queda vacío y
+     * `runDrafting` sigue con los hechos, la ficha y la jurisprudencia,
+     * exactamente como corría el pipeline de dos motores.
+     */
+    const gptStructure = await conPlazo(
+      this.runDogmaticOutline(req, geminiExtraction, jurisprudencia, onStepLog),
+      PLAZO_ESQUEMA_MS,
+      ''
+    );
     const legalText = await conPresupuesto(
-      this.runDrafting(req, geminiExtraction, jurisprudencia, onStepLog),
+      this.runDrafting(req, geminiExtraction, jurisprudencia, gptStructure, onStepLog),
       PLAZO_REDACCION_MS,
       'redaccion del escrito'
     );
@@ -646,44 +686,123 @@ export class OpenRouterService {
 
     return jurisprudencia;
   }
-  /*
-   * ─── ETAPA 2 RETIRADA: EL ESQUEMA DOGMÁTICO DE GPT-5.6 SOL ────────────────
-   *
-   * Aquí vivía `runDogmaticOutline`, que le pedía a GPT el problema jurídico,
-   * las defensas, las normas clave y la estrategia, y se lo pasaba a Opus como
-   * guía de estructura.
-   *
-   * SE MIDIÓ ANTES DE QUITARLA, el 9 de septiembre de 2026, contra los motores
-   * reales y con el mismo caso:
-   *
-   *   · con su plazo de hoy (20 s) abortó en 3 de 3 corridas y entregó 0
-   *     caracteres — veinte segundos por borrador gastados en nada, y el
-   *     registro de ejecución anunciando «esquema consolidado (0 caracteres)»;
-   *   · con plazo largo SÍ responde y lo que entrega es útil: 3.601 caracteres
-   *     de esquema real. Pero tarda 35,3 s, y 39,5 s con su tope de tokens de
-   *     hoy, que además lo corta por longitud;
-   *   · `reasoning_effort: 'minimal'` no la acelera: 37,2 s.
-   *
-   * Es decir, no es una etapa rota que un plazo mayor arregle: es una etapa que
-   * cuesta entre 35 y 40 segundos dentro de una función que tiene 60 en total y
-   * cuya redacción sola ya necesita más de 80. No cabe con ningún plazo, y
-   * dejarla con el plazo corto es pagar veinte segundos por un aborto seguro.
-   *
-   * QUIÉN HACE AHORA SU TRABAJO. Opus, que es quien lo hacía de verdad: recibe
-   * los hechos de la etapa 1, la ficha del catálogo con el artículo, la
-   * autoridad y las secciones que la norma exige, la jurisprudencia verificada
-   * y la indicación literal del abogado. El esquema que GPT producía —problema
-   * jurídico, defensas, normas— es exactamente lo que esa ficha ya impone, y
-   * con más autoridad: la ficha está verificada contra el texto de la norma y
-   * el esquema no.
-   *
-   * SI ALGÚN DÍA SE REPONE, va con su plazo propio de al menos 45 s y solo en
-   * un plan cuya función lo aguante junto a la redacción — hoy, plan Pro.
-   */
 
   /**
-   * Phase 2 — Claude Opus 5. Writes the complete document from Gemini's facts,
-   * the catalogue ficha and the verified jurisprudence. When the call yields
+   * Phase 2 — GPT-5.6 Sol. Produces the dogmatic outline: legal problem,
+   * defences, governing norms and argumentative strategy. It never drafts.
+   *
+   * ─── SE RETIRÓ EL 9 DE SEPTIEMBRE DE 2026 Y SE REPUSO EL 10 ───────────────
+   *
+   * Aquí decía que la etapa estaba retirada. HOY ESA AFIRMACIÓN SERÍA FALSA, y
+   * conviene que quede escrito por qué, porque el motivo de la retirada era
+   * real y caducó por una razón concreta.
+   *
+   * SE RETIRÓ porque costaba 35–40 s dentro de una función que tenía 60 —con su
+   * plazo de entonces (20 s) abortaba en 3 de 3 corridas y entregaba cero
+   * caracteres—, y porque se supuso que la ficha del catálogo hacía su trabajo.
+   * Ese mismo día el plan pasó a Pro y el tope de la función a 300 s, así que
+   * la mitad aritmética del motivo dejó de existir.
+   *
+   * SE REPUSO porque la otra mitad resultó falsa, y se midió: un caso por
+   * brazo, con los tres motores reales, el 10 de septiembre de 2026.
+   *
+   *   · SIN esquema, el escrito SE NIEGA A NOMBRAR LA CAUSAL SUSTANCIAL.
+   *     Escribe, tres veces, «el fundamento sustancial relativo a la obligación
+   *     del arrendatario de pagar el precio… no está verificado en este escrito
+   *     y debe comprobarse antes de radicar» — y el artículo 22, numeral 1, de
+   *     la Ley 820 de 2003 estaba autorizado en la ficha TODO EL TIEMPO. La
+   *     ficha imponía la norma; lo que faltaba era quien decidiera que ESA era
+   *     la causal del caso, y eso es exactamente el trabajo de esta etapa.
+   *   · CON esquema la invoca por su artículo, produce además un hecho que
+   *     anticipa la excepción de contrato no cumplido, y ordena las
+   *     pretensiones declarando primero la existencia del contrato.
+   *
+   * Precio de la mejora, medido: US$0,2285 → US$0,2997 (+31%) y +56 s.
+   */
+  private async runDogmaticOutline(
+    req: PipelineRequest,
+    geminiExtraction: string,
+    jurisprudencia: string[],
+    onStepLog: (step: any) => void
+  ): Promise<string> {
+    onStepLog({
+      stage: 'STAGE_2_LOGIC',
+      engine: 'GPT',
+      message: `[GPT-5.6 Sol] Formulación del problema jurídico y esquema dogmático para ${req.documentType}...`,
+      timestamp: new Date().toISOString()
+    });
+
+    const systemPrompt = req.existingDraft
+      ? `Eres un revisor procesal senior de Colombia. Ya existe un borrador de "${req.documentType}" que el usuario quiere CORREGIR o CONTINUAR. Tu tarea es producir un ESQUEMA DE CORRECCIONES conciso con:\n1. CAMBIOS IDENTIFICADOS por Gemini que deben aplicarse\n2. NORMAS QUE APLICAN a las correcciones\n3. SECCIONES DEL BORRADOR QUE DEBEN MODIFICARSE\n\nNO generes un esquema completo desde cero. Solo lo necesario para las correcciones. Máximo 400 palabras.`
+      : `Eres un estructurador procesal senior de Colombia. Tu ÚNICA tarea es producir un ESQUEMA CONCISO con:\n1. PROBLEMA JURÍDICO (1-2 oraciones)\n2. EXCEPCIONES O DEFENSAS APLICABLES (lista)\n3. NORMAS CLAVE (artículos específicos)\n4. ESTRATEGIA DE SUSTENTACIÓN (enfoque argumentativo)\n\nNO redactes el documento final. Solo entrega el esquema estructurado. Máximo 600 palabras.`;
+
+    const facts = geminiExtraction || req.legalPrompt;
+    const userPrompt = conAdjuntos(
+      req.existingDraft
+        ? `CAMBIOS IDENTIFICADOS POR GEMINI:\n${facts}\n\n${renderJurisprudencia(jurisprudencia)}\n\nINSTRUCCIÓN DEL USUARIO: ${req.legalPrompt}\n\nTIPO DE DOCUMENTO: ${req.documentType}`
+        : `HECHOS EXTRAÍDOS POR GEMINI:\n${facts}\n\n${renderJurisprudencia(jurisprudencia)}\n\nTIPO DE DOCUMENTO: ${req.documentType}`,
+      req.bloqueAdjuntos
+    );
+
+    /*
+     * El plazo de la llamada es el presupuesto de la etapa, igual que en la
+     * redacción: quien corta es este código, por debajo del tope de la
+     * plataforma. Sin esto la llamada usaría los 20 s fijos del cliente, que
+     * son precisamente los que la abortaban en 3 de 3 corridas.
+     */
+    const {
+      text: structure,
+      usage,
+      truncated
+    } = await callOpenRouterWithUsage(
+      ENGINE.GPT,
+      systemPrompt,
+      userPrompt,
+      req.existingDraft ? MAX_TOKENS.GPT_CONTINUATION : MAX_TOKENS.GPT_NEW,
+      undefined,
+      { timeoutMs: PLAZO_ESQUEMA_MS }
+    );
+
+    await recordUsage({
+      firmId: req.firmId,
+      userEmail: req.userEmail,
+      operation: 'BORRADOR',
+      operationId: req.operationId,
+      usage
+    });
+
+    console.log(
+      `[PIPELINE] GPT-5.6 Sol: ${structure.length} caracteres de esquema.` +
+        (truncated ? ' CORTADO POR LONGITUD.' : '')
+    );
+
+    /*
+     * ─── UN ESQUEMA CORTADO SE DECLARA, NO SE DISIMULA ──────────────────────
+     *
+     * Con el tope viejo esto pasaba SIEMPRE y no se veía en ninguna parte: el
+     * registro anunciaba «esquema consolidado (2.917 caracteres)» y el trozo
+     * incompleto viajaba al redactor como si estuviera entero, con la
+     * estrategia de sustentación cortada a media frase. El tope nuevo debería
+     * bastar; si aun así se corta, quien lee el registro tiene que enterarse
+     * aquí, y el redactor recibe el bloque rotulado como incompleto (ver
+     * `buildClaudeUserMessage`).
+     */
+    onStepLog({
+      stage: 'STAGE_2_LOGIC',
+      engine: 'GPT',
+      message: truncated
+        ? `[GPT Router] Esquema dogmático INCOMPLETO: el proveedor lo cortó por longitud a los ${structure.length} caracteres. Viaja al redactor rotulado como incompleto.`
+        : `[GPT Router] Esquema dogmático consolidado (${structure.length} caracteres).`,
+      timestamp: new Date().toISOString()
+    });
+
+    return truncated && structure ? `${structure}\n\n${MARCA_DE_ESQUEMA_CORTADO}` : structure;
+  }
+
+  /**
+   * Phase 3 — Claude Opus 5. Writes the complete document from Gemini's facts,
+   * GPT's dogmatic outline, the catalogue ficha and the verified
+   * jurisprudence. When the call yields
    * nothing usable the stage FAILS: the empty canvas is honest, and the static
    * template that used to fill it was a document of another kind wearing the
    * lawyer's request as a title.
@@ -692,6 +811,7 @@ export class OpenRouterService {
     req: PipelineRequest,
     geminiExtraction: string,
     jurisprudencia: string[],
+    gptStructure: string,
     onStepLog: (step: any) => void
   ): Promise<string> {
     onStepLog({
@@ -736,6 +856,7 @@ export class OpenRouterService {
       prompt: req.legalPrompt,
       facts: geminiExtraction,
       citations: jurisprudencia,
+      gptSchemaOutput: gptStructure,
       existingDraft: req.existingDraft,
       adjuntos: req.bloqueAdjuntos,
       catalogGuidance

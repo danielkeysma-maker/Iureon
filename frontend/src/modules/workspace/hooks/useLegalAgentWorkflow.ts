@@ -70,16 +70,17 @@ export function useLegalAgentWorkflow(formatoDeFirma?: string) {
       /*
        * LO QUE ESTE TEXTO ANUNCIA TIENE QUE SER LO QUE DE VERDAD CORRE.
        *
-       * Anunciaba «el Pipeline de 3 Motores (Gemini ➔ GPT-5.6 Sol ➔ Claude
-       * Opus 5)». La etapa de GPT se retiró el 9 de septiembre de 2026 tras
-       * medirla: abortaba por plazo en 3 de 3 corridas y, con plazo suficiente,
-       * cuesta entre 35 y 40 s dentro de una función que tiene 60 en total.
-       * Dejar su nombre aquí sería contarle al abogado un trabajo que nadie
-       * hace, en la pantalla donde espera su escrito.
+       * Aquí decía que la etapa de GPT se había retirado y que nombrarla sería
+       * contarle al abogado un trabajo que nadie hace. HOY ESO SERÍA FALSO AL
+       * REVÉS: la etapa 2 se repuso el 10 de septiembre de 2026, con el plan ya
+       * en Pro y su propia partida de 75 s, porque se midió que sin ella el
+       * escrito se niega a nombrar la causal sustancial que la ficha ya
+       * autorizaba. Los tres motores vuelven a nombrarse porque los tres
+       * corren.
        */
       legalText: `⏳ REDACTANDO PIEZA PROCESAL EN TIEMPO REAL...
 
-Gemini 3.8 Flash extrae los hechos, se buscan precedentes verificados en el corpus y Claude Opus 5 redacta el escrito con la ficha del catálogo.
+Gemini 3.8 Flash extrae los hechos, se buscan precedentes verificados en el corpus, GPT-5.6 Sol formula el problema jurídico y el esquema, y Claude Opus 5 redacta el escrito con la ficha del catálogo.
 
 Por favor espere unos segundos mientras se finaliza la redacción solemne.`,
       // Zero, not 4820. This placeholder is shown BEFORE the request leaves the

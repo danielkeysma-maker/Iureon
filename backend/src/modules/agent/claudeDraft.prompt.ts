@@ -43,11 +43,68 @@ interface ClaudePromptInput {
   adjuntos?: string;
 }
 
+/**
+ * Marca que la etapa 2 le pega a un esquema que el proveedor cortó por
+ * longitud, para que el rótulo del bloque pueda decirlo.
+ *
+ * Va aquí y no en el servicio porque quien tiene que reconocerla es este
+ * archivo, que es el que arma el bloque: si viviera en dos sitios podrían
+ * dejar de coincidir y el esquema truncado volvería a viajar como entero.
+ */
+export const MARCA_DE_ESQUEMA_CORTADO = '[[ESQUEMA CORTADO POR LONGITUD]]';
+
+/**
+ * El bloque con el que el esquema dogmático entra al prompt de Opus.
+ *
+ * ─── POR QUÉ VA ROTULADO, Y POR QUÉ CON ESTAS PALABRAS ──────────────────────
+ *
+ * El esquema lo produce GPT-5.6 Sol DE MEMORIA: no consulta el texto de
+ * ninguna norma, no ve la ficha del catálogo y no tiene forma de comprobar
+ * nada. Medido el 10 de septiembre de 2026, en una sola corrida, el esquema
+ * citó «Ley 2220 de 2022, art. 68» donde la ficha verificada dice **art. 146**,
+ * y de propina Ley 820 arts. 6, 9, 14 y 20; CGP 83, 88, 167 y 422; y C.C. 1602,
+ * 1603 y 2000.
+ *
+ * NINGUNA DE ELLAS LLEGÓ AL ESCRITO: la `REGLA_DE_CITACION_REDACCION` las
+ * filtró todas. Pero una salvaguarda que aguantó una vez y no está escrita en
+ * ninguna parte es una salvaguarda que se pierde en el siguiente cambio de
+ * prompt. Así que el bloque se rotula por lo que es —una PROPUESTA DE
+ * ESTRUCTURA NO VERIFICADA— y se dice explícitamente que sus citas no
+ * autorizan nada y quedan sujetas a la regla de citación como cualquier otra
+ * cosa que el modelo recuerde.
+ *
+ * Y si el proveedor lo cortó por longitud, el rótulo lo dice también: un
+ * esquema incompleto presentado como completo es una estrategia de sustentación
+ * que se acaba a media frase y que el redactor completaría por su cuenta.
+ */
+const bloqueDelEsquema = (esquema?: string): string => {
+  const texto = esquema?.trim();
+  if (!texto) return '';
+
+  const cortado = texto.includes(MARCA_DE_ESQUEMA_CORTADO);
+  const cuerpo = texto.replace(MARCA_DE_ESQUEMA_CORTADO, '').trim();
+  if (!cuerpo) return '';
+
+  return `
+ESQUEMA DE ESTRUCTURA PROPUESTO — PROPUESTA NO VERIFICADA. Lo produjo otro modelo de lenguaje de memoria, sin consultar el texto de ninguna norma y sin ver la ficha verificada del catálogo. Sirve para ORDENAR el escrito —problema jurídico, defensas, orden de las pretensiones, enfoque de la sustentación— y para nada más. SUS CITAS NO AUTORIZAN NADA: cualquier ley, artículo, decreto o sentencia que aparezca en este bloque queda sujeta a la regla de citación como cualquier otra cosa que tú recuerdes, y si no está en la ficha verificada NO la cites. Se ha medido que este esquema equivoca artículos.${
+    cortado
+      ? ' ADEMÁS ESTE ESQUEMA ESTÁ INCOMPLETO: el proveedor lo cortó por longitud, así que su último punto se interrumpe a media frase. No lo completes inventando: si la parte que falta hacía falta, resuélvela con la ficha verificada y los hechos.'
+      : ''
+  }
+${cuerpo}
+`;
+};
+
 interface ClaudeUserMessageInput {
   documentType: string;
   prompt: string;
   facts: string;
   citations: string[];
+  /**
+   * El esquema dogmático de la etapa 2, o cadena vacía si esa etapa falló o
+   * agotó su plazo — que no tumba el borrador, solo lo deja sin esta ayuda.
+   */
+  gptSchemaOutput?: string;
   existingDraft?: string;
   adjuntos?: string;
   /**
@@ -199,18 +256,19 @@ ${customFormat ? `\n⚠️ FORMATO DE LA FIRMA — manda sobre la PRESENTACIÓN 
 /**
  * Builds Claude's user message.
  *
- * YA NO LLEVA EL ESQUEMA DOGMÁTICO, porque ya no existe quien lo produzca: la
- * etapa de GPT-5.6 Sol se retiró tras medir que cuesta entre 35 y 40 s dentro
- * de una función de 60, y abortaba en 3 de 3 corridas con el plazo que tenía
- * (ver `openrouter.service.ts`, en el sitio donde vivía). La estructura la
- * impone la ficha del catálogo, que además está verificada contra el texto de
- * la norma — cosa que el esquema nunca estuvo.
+ * VUELVE A LLEVAR EL ESQUEMA DOGMATICO. Aqui decia que no lo llevaba «porque ya
+ * no existe quien lo produzca»; hoy esa afirmacion seria falsa: la etapa 2 se
+ * repuso el 10 de septiembre de 2026 (el porque medido esta en
+ * `runDogmaticOutline`). Lo que sigue siendo cierto es que la estructura
+ * VERIFICADA la impone la ficha del catalogo y el esquema no lo esta de ninguna
+ * forma — y por eso entra rotulado, no como derecho aplicable.
  */
 export const buildClaudeUserMessage = ({
   documentType,
   prompt,
   facts,
   citations,
+  gptSchemaOutput,
   existingDraft,
   adjuntos,
   catalogGuidance
@@ -222,13 +280,14 @@ export const buildClaudeUserMessage = ({
   const reglaDeCitacion = catalogGuidance?.includes(REGLA_DE_CITACION_REDACCION)
     ? `\n${REGLA_DE_CITACION_REDACCION}\n`
     : '';
+  const esquema = bloqueDelEsquema(gptSchemaOutput);
 
   return existingDraft
     ? `Instrucción del usuario: "${prompt}".
 Insumos fácticos de Gemini: ${facts}.${adjuntosBlock}
 ${reglaDeCitacion}
 ${renderJurisprudencia(citations)}
-
+${esquema}
 Toma el borrador existente como base y aplica las correcciones. Entrega el documento COMPLETO resultante.`
     : `${
         esTitulo
@@ -238,6 +297,6 @@ Toma el borrador existente como base y aplica las correcciones. Entrega el docum
 Hechos extraídos por Gemini: ${facts}.${adjuntosBlock}
 ${reglaDeCitacion}
 ${renderJurisprudencia(citations)}
-
+${esquema}
 El documento debe estar COMPLETO incluyendo PETICIÓN/PRETENSIONES/RESUELVE.`;
 };

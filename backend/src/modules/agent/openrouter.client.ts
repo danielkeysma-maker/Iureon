@@ -133,7 +133,8 @@ export interface OpcionesDeLlamada {
    * Existe porque el reparto del reloj lo decide el pipeline —que sabe cuanto
    * le queda a la funcion— y no el cliente, que solo conocia dos numeros fijos
    * (120 s para Opus, 20 s para todo lo demas). Aquellos 20 s abortaban el
-   * esquema dogmatico en 3 de 3 corridas.
+   * esquema dogmatico en 3 de 3 corridas; hoy esa etapa pasa su propia partida
+   * de 75 s por aqui, que es lo que le permitio volver.
    */
   timeoutMs?: number;
 }

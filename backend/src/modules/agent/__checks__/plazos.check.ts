@@ -12,6 +12,11 @@
  *   1  hechos (Gemini)             8,4 s       7,6 s       7,6 s
  *   1.5 jurisprudencia             8,0 s       2,1 s       2,1 s
  *   2  esquema (GPT)              20,0 s ✗    20,0 s ✗    20,0 s ✗   (abortó, 0 caracteres)
+ *
+ * (La etapa 2 se retiró ese día por esos números y se REPUSO el 10 de
+ * septiembre, con el plan ya en Pro y su propia partida de 75 s. Con plazo
+ * suficiente responde en 36,5 s y lo que aporta se midió: sin ella el escrito
+ * se niega a nombrar la causal sustancial que la ficha ya autorizaba.)
  *   3  redacción (Opus)          115,6 s     109,7 s      98,2 s
  *   TOTAL                        153,6 s     141,0 s     129,8 s
  *
@@ -32,6 +37,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {
+  PLAZO_ESQUEMA_MS,
   PLAZO_HECHOS_MS,
   PLAZO_GLOSA_MS,
   PLAZO_JURISPRUDENCIA_MS,
@@ -105,7 +111,7 @@ check(
  */
 check(
   'la comprobación de glosa tiene su propia partida, sacada de la redacción y no de una etapa justa',
-  PLAZO_GLOSA_MS >= 15_000 && PLAZO_REDACCION_MS >= 150_000,
+  PLAZO_GLOSA_MS >= 15_000 && PLAZO_REDACCION_MS >= 130_000,
   `glosa ${PLAZO_GLOSA_MS} ms · redacción ${PLAZO_REDACCION_MS} ms`
 );
 check(
@@ -232,27 +238,95 @@ const pruebas = async (): Promise<void> => {
     relojDeEtapa(0).restante() === 0
   );
 
-  /* ─── 6. LA ETAPA 2 NO VOLVIÓ POR LA PUERTA DE ATRÁS ─────────────────────── */
+  /* ─── 6. LA ETAPA 2 CORRE, Y NO PUEDE TUMBAR EL BORRADOR ────────────────── */
 
-
+  /*
+   * AQUÍ SE EXIGÍA LO CONTRARIO, y conviene decirlo: hasta el 10 de septiembre
+   * de 2026 esta sección se llamaba «la etapa 2 no volvió por la puerta de
+   * atrás» y aseveraba que el servicio NO nombra a `ENGINE.GPT`. La etapa se
+   * repuso —el porqué medido está en `runDogmaticOutline`— así que lo que este
+   * check tiene que sostener ahora son las tres condiciones con las que volvió.
+   */
   const rutaServicio = path.resolve(__dirname, '../openrouter.service.ts');
   const servicio = fs.readFileSync(rutaServicio, 'utf8');
   const conPresupuestos = (servicio.match(/conPresupuesto\(/g) ?? []).length;
 
-  check('el pipeline ya no llama al motor del esquema dogmático', !/ENGINE\.GPT/.test(servicio));
+  check('el pipeline vuelve a llamar al motor del esquema dogmático', /ENGINE\.GPT/.test(servicio));
   check(
-    'y la razón medida de su retiro sigue escrita donde vivía',
-    /ETAPA 2 RETIRADA/.test(servicio) && /3 de 3 corridas/.test(servicio)
+    'y el registro de ejecución vuelve a anunciar la etapa que sí corre',
+    /STAGE_2_LOGIC/.test(servicio)
+  );
+  /*
+   * LA CONDICIÓN QUE EL DUEÑO IMPUSO CON NOMBRE PROPIO: agotar el plazo del
+   * esquema deja al redactor sin esa ayuda, nunca sin borrador. Por eso la
+   * etapa 2 va con `conPlazo` —que devuelve un valor de respaldo, aquí la
+   * cadena vacía— y NO con `conPresupuesto`, que rechaza.
+   */
+  /*
+   * EL PISO SALE DE LO MEDIDO: un esquema completo tardó 69,5 s en la corrida
+   * de comprobación. Menos de 80 s dejaría a la etapa sin margen para una tarde
+   * lenta del proveedor, y vencer significa tirar los US$0,027 que ya se pagaron.
+   */
+  check(
+    'la etapa 2 tiene partida propia, con holgura sobre los 69,5 s medidos',
+    PLAZO_ESQUEMA_MS >= 80_000,
+    `${PLAZO_ESQUEMA_MS} ms`
   );
   check(
-    'las etapas que sí corren van cada una con su presupuesto',
+    'y agotarla NO puede tumbar el borrador: va con conPlazo, no con conPresupuesto',
+    /conPlazo\(\s*this\.runDogmaticOutline/.test(servicio) &&
+      !/conPresupuesto\(\s*this\.runDogmaticOutline/.test(servicio)
+  );
+  check(
+    'la partida del esquema salió de la redacción, que sigue con holgura sobre lo medido (66,7-95 s)',
+    PLAZO_REDACCION_MS >= 130_000,
+    `${PLAZO_REDACCION_MS} ms`
+  );
+  /*
+   * EL TOPE DE TOKENS TIENE QUE DEJARLO TERMINAR. Con 1.536 se cortaba por
+   * longitud a los 2.917 caracteres, con la estrategia de sustentación a media
+   * frase, y el trozo viajaba al redactor como si estuviera entero.
+   */
+  check(
+    'el tope de tokens del esquema deja que termine (con 1.536 se cortaba)',
+    /GPT_NEW: (?:[4-9]|[1-9]\d)\d{3}/.test(servicio),
+    (servicio.match(/GPT_NEW: \d+/) ?? ['sin GPT_NEW'])[0]
+  );
+  /*
+   * Y SI AUN ASÍ SE CORTA, SE DECLARA. Un esquema truncado presentado como
+   * completo es lo que ya pasó: el registro decía «consolidado» y nadie sabía
+   * que faltaba el final.
+   */
+  check(
+    'un esquema cortado por longitud se declara en el registro y viaja rotulado',
+    /truncated/.test(servicio) && /MARCA_DE_ESQUEMA_CORTADO/.test(servicio) && /INCOMPLETO/.test(servicio)
+  );
+  check(
+    'las etapas que no pueden faltar van cada una con su presupuesto',
     conPresupuestos >= 3,
     String(conPresupuestos)
   );
+  /*
+   * EL ROTULADO DEL ESQUEMA NO ES OPCIONAL. El esquema recita derecho de
+   * memoria —midió «Ley 2220 de 2022, art. 68» donde la ficha dice art. 146— y
+   * la regla de citación lo filtró todo esa vez. Una salvaguarda que aguantó
+   * una vez y no está escrita se pierde en el siguiente cambio de prompt.
+   */
+  const rutaPrompt = path.resolve(__dirname, '../claudeDraft.prompt.ts');
+  const prompt = fs.readFileSync(rutaPrompt, 'utf8');
   check(
-    'y el registro de ejecución ya no anuncia un esquema que nadie produce',
-    !/STAGE_2_LOGIC/.test(servicio)
+    'el esquema entra al prompt de Opus rotulado como propuesta NO VERIFICADA',
+    /PROPUESTA NO VERIFICADA/.test(prompt)
   );
+  check(
+    'y el prompt dice que sus citas no autorizan nada y quedan sujetas a la regla de citación',
+    /SUS CITAS NO AUTORIZAN NADA/.test(prompt) && /regla de citación/.test(prompt)
+  );
+  check(
+    'el rótulo se arma en un solo sitio y el redactor lo recibe',
+    /bloqueDelEsquema\(gptSchemaOutput\)/.test(prompt) && /gptSchemaOutput: gptStructure/.test(servicio)
+  );
+
   /*
    * LA VIGENCIA NO USA `conPresupuesto`, Y ESO ES EL DISEÑO. Cuando corre, el
    * escrito ya está escrito y ya se pagó: rechazar ahí perdería el borrador por
