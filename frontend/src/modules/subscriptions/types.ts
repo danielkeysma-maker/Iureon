@@ -23,6 +23,7 @@ export type Modulo =
   | 'MANUAL'
   | 'SOPORTE'
   | 'MEMBRETE'
+  | 'EXPEDIENTES'
   | 'AUDIENCIAS'
   | 'ENTREVISTAS'
   | 'ORIENTACION';
@@ -39,6 +40,7 @@ export type Funcion =
   | 'REVISIONES.CHAT_GUIA'
   | 'REVISIONES.REREVISAR'
   | 'REVISIONES.PREGUNTAS_AUDIENCIA'
+  | 'EXPEDIENTES.ACTORES'
   | 'AUDIENCIAS.RESUMEN'
   | 'ENTREVISTAS.RESUMEN'
   | 'ENTREVISTAS.GUION';
@@ -112,6 +114,7 @@ export const NOMBRE_DE_MODULO: Record<Modulo, string> = {
   MANUAL: 'Manual',
   SOPORTE: 'Soporte',
   MEMBRETE: 'Membrete',
+  EXPEDIENTES: 'Expedientes',
   AUDIENCIAS: 'Audiencias',
   ENTREVISTAS: 'Entrevistas',
   ORIENTACION: 'Orientación'

@@ -1,4 +1,4 @@
-import { Home, Sparkles, ClipboardCheck, Mic, BookOpen, BookMarked, LifeBuoy, Library, Wrench, Shield, UserRound, ShieldCheck, Compass, SlidersHorizontal, FileClock } from 'lucide-react';
+import { Home, Sparkles, ClipboardCheck, Mic, BookOpen, BookMarked, LifeBuoy, Library, Wrench, Shield, UserRound, ShieldCheck, Compass, SlidersHorizontal, FileClock, FolderOpen } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { MainView } from './types';
 
@@ -52,6 +52,18 @@ export const NAV_MODULES: NavModule[] = [
     icon: Compass
   },
   { id: 'workspace', label: 'Redacción', description: 'Providencias judiciales', icon: Sparkles },
+  /*
+   * EL EXPEDIENTE VA EN «REGISTRAR» Y NO EN «PRODUCIR», aunque de él salga el
+   * interrogatorio. Lo que se hace aquí es anotar el asunto y quién está en
+   * él; producir es lo que se hace DESPUÉS, con eso ya anotado. Ponerlo entre
+   * Redacción y Borradores lo haría parecer un tercer sitio donde se escribe.
+   */
+  {
+    id: 'expedientes',
+    label: 'Expedientes',
+    description: 'El asunto y quién está en él',
+    icon: FolderOpen
+  },
   /*
    * Un reloj y no una carpeta, y la descripción habla de términos.
    *
@@ -136,7 +148,7 @@ export interface NavGroup {
 export const NAV_GROUPS: NavGroup[] = [
   { titulo: 'Inicio', modulos: ['inicio'], sinTitulo: true },
   { titulo: 'Producir', modulos: ['workspace', 'borradores', 'taller', 'orientacion'] },
-  { titulo: 'Registrar', modulos: ['audiencias', 'entrevistas'] },
+  { titulo: 'Registrar', modulos: ['expedientes', 'audiencias', 'entrevistas'] },
   { titulo: 'Consultar', modulos: ['search', 'catalogo', 'tools'] },
   { titulo: 'Aprender', modulos: ['manual', 'soporte'] },
   { titulo: 'Administrar', modulos: ['audit', 'privacidad', 'ajustes'], plegable: true }
@@ -169,6 +181,7 @@ export const modulosSinGrupo = (): MainView[] => {
  */
 export const VISTA_POR_MODULO: Partial<Record<string, MainView>> = {
   REDACCION: 'workspace',
+  EXPEDIENTES: 'expedientes',
   BORRADORES: 'borradores',
   REVISIONES: 'taller',
   ORIENTACION: 'orientacion',

@@ -38,6 +38,7 @@ import { SearchView } from './modules/search/components/SearchView';
 import { SearchMobileView } from './modules/search/components/SearchMobileView';
 import { TranscriptionView } from './modules/transcription/components/TranscriptionView';
 import { InterviewView } from './modules/clients/components/InterviewView';
+import { ExpedientesView } from './modules/expedientes/components/ExpedientesView';
 import { InterviewMobileView } from './modules/clients/components/InterviewMobileView';
 import { CatalogCurationView } from './modules/catalog/components/CatalogCurationView';
 import { CatalogMobileView } from './modules/catalog/components/CatalogMobileView';
@@ -1453,6 +1454,26 @@ export function App() {
             elemento mas grande y por eso se avisa que sigue grabando con la
             pantalla apagada. La grabadora y el consentimiento son COMPARTIDOS.
           */}
+          {/*
+            EL EXPEDIENTE: UNA SOLA VISTA PARA TELEFONO Y ESCRITORIO, y no dos
+            como las entrevistas. Aquella tiene dos porque en el telefono el
+            aparato ES la grabadora y el cronometro manda; aqui se lee, se
+            escribe en formularios cortos y se marcan casillas — lo mismo en
+            los dos sitios. Dos componentes para el mismo trabajo se
+            desincronizan, y ya paso en esta casa con los seis modulos que
+            tenian su rotulo en dos listas.
+          */}
+          {mainView === 'expedientes' && (
+            <div className="min-h-0 min-w-0 flex-1 overflow-y-auto">
+              <ModuloBloqueado
+                modulo="EXPEDIENTES"
+                quePuede="Sus expedientes se conservan y vuelven a estar disponibles en cuanto renueve."
+              >
+                <ExpedientesView />
+              </ModuloBloqueado>
+            </div>
+          )}
+
           {mainView === 'entrevistas' && (
             <div className="flex min-h-0 min-w-0 flex-1 lg:hidden">
               <ModuloBloqueado modulo="ENTREVISTAS" quePuede="Las entrevistas ya transcritas se conservan y vuelven a estar disponibles en cuanto renueve.">

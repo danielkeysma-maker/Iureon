@@ -3,6 +3,7 @@ export type MainView =
   | 'inicio'
   | 'workspace'
   | 'borradores'
+  | 'expedientes'
   | 'audiencias'
   | 'entrevistas'
   | 'search'
