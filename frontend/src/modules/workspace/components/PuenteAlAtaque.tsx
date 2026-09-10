@@ -380,7 +380,20 @@ export const PuenteAlAtaque: React.FC<PuenteAlAtaqueProps> = ({
            */
           setElegida({ exactName, rama: branch || rama });
           setSinCoincidencia(null);
-          setPanelAbierto(false);
+          /*
+           * LAS INSTRUCCIONES SUGERIDAS SE ABREN SOLAS AL ELEGIR LA ACTUACIÓN.
+           *
+           * Antes había que pulsar «Redactar esta actuación» después de haber
+           * pulsado «Elegir esta», y ese segundo clic no compra nada: quien
+           * escoge una actuación para atacar el auto ya dijo que quiere
+           * redactarla. Peor todavía, escondía la función — el dueño llegó al
+           * paso de las candidatas, no vio ninguna instrucción y concluyó que
+           * nunca se había construido. Un paso de más no es solo incómodo:
+           * puede hacer invisible lo que hay detrás.
+           *
+           * El botón se queda para volver a abrir el panel si se cierra.
+           */
+          setPanelAbierto(true);
           setGuiaAbierta(false);
         }}
         onEscribirNombre={() => {
