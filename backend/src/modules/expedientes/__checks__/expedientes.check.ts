@@ -241,6 +241,51 @@ check(
   rutas.indexOf("'/expedientes/atar'") < rutas.indexOf("'/expedientes/:id'"),
   'si no, `atar` se leería como un id'
 );
+/*
+ * Y LA DE CANDIDATOS TAMBIÉN, que es la que más fácil se cuela después: es un
+ * GET, y el GET de `:id` existe desde antes. Puesta detrás, pedir la lista de
+ * lo que hay para traer devolvería «ese expediente no existe» buscando uno
+ * llamado «candidatos», y el 404 no explicaría nada.
+ */
+check(
+  'y la de candidatos también, por lo mismo',
+  rutas.indexOf("'/expedientes/candidatos'") < rutas.indexOf("'/expedientes/:id'"),
+  'un GET colado detrás de `:id` devolvería 404 buscando un expediente llamado «candidatos»'
+);
+/*
+ * LOS CANDIDATOS SE LEEN DE LAS CINCO TABLAS, y cada consulta filtra por
+ * firma. Aquí el olvido es más grave que en otros sitios: son tablas AJENAS al
+ * módulo, y una sin filtro devolvería las entrevistas de otra firma en la
+ * lista de «lo que usted ya tiene».
+ */
+const candidatos = leer('modules/expedientes/candidatos.service.ts');
+const tablasLeidas = (candidatos.match(/\.from\('/g) ?? []).length;
+const filtradas = (candidatos.match(/\.eq\('firm_id', firmId\)/g) ?? []).length;
+check(
+  'las cinco tablas de candidatos se leen filtrando por firma, sin excepción',
+  tablasLeidas === 5 && filtradas === 5,
+  `${tablasLeidas} tablas, ${filtradas} filtros`
+);
+/*
+ * SE MIRAN LAS COLUMNAS QUE SE PIDEN, NO EL ARCHIVO ENTERO.
+ *
+ * La primera versión de esta comprobación buscaba «informe» en todo el
+ * archivo y se puso roja por un COMENTARIO que explica precisamente que el
+ * informe no se trae. Una falsa alarma en una guarda es peor que no tenerla:
+ * enseña a ignorarla, y el día que señale algo cierto nadie la lee. Este
+ * repositorio lo tiene escrito y aun así lo repetí.
+ */
+const columnasPedidas = [...candidatos.matchAll(/\.select\('([^']+)'\)/g)].map((m) => m[1]);
+const cuerposColados = columnasPedidas.filter((c) =>
+  /full_text|legal_text|informe|texto_original|texto_trabajo|segments|conversacion/.test(c)
+);
+check(
+  'y no se traen los cuerpos: la lista es de rótulos, no de contenido',
+  columnasPedidas.length === 5 && cuerposColados.length === 0,
+  cuerposColados.length > 0
+    ? `SE CUELA UN CUERPO: ${cuerposColados.join(' | ')}`
+    : `${columnasPedidas.length} selects, todos de rótulos`
+);
 
 /* ─── 8. LOS ESTADOS Y LOS LADOS SIGUEN SIENDO LOS QUE LA BASE ACEPTA ────── */
 

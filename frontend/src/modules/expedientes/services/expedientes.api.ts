@@ -27,10 +27,28 @@ const revisar = <T extends Respuesta>(data: T, fallo: string): T => {
 /** Lo que se puede atar a un expediente. Espejo de `TABLA_DE_PIEZA`. */
 export type TipoDePieza = 'transcripcion' | 'revision' | 'borrador' | 'termino' | 'orientacion';
 
+/** Una pieza de la firma que se puede traer a un expediente. */
+export interface Candidato {
+  tipo: TipoDePieza;
+  id: string;
+  titulo: string;
+  cuando: string;
+  /** A qué expediente pertenece hoy. `null` si está libre. */
+  expedienteId: string | null;
+}
+
 export const expedientesApi = {
   async listar(): Promise<Expediente[]> {
     const data = await httpClient.get<Respuesta & { expedientes: Expediente[] }>('/api/expedientes');
     return revisar(data, 'No se pudieron cargar los expedientes.').expedientes;
+  },
+
+  /** Lo que la firma ya tiene y se puede traer. De la FIRMA, no de un expediente. */
+  async candidatos(): Promise<Candidato[]> {
+    const data = await httpClient.get<Respuesta & { candidatos: Candidato[] }>(
+      '/api/expedientes/candidatos'
+    );
+    return revisar(data, 'No se pudo cargar lo que hay para traer.').candidatos;
   },
 
   async obtener(id: string): Promise<ExpedienteConDetalle> {

@@ -17,6 +17,7 @@ import {
 } from '../types';
 import { ActoresDelExpediente } from './ActoresDelExpediente';
 import { PreguntasDelExpedientePanel } from './PreguntasDelExpedientePanel';
+import { TraerAlExpediente } from './TraerAlExpediente';
 
 /**
  * LOS EXPEDIENTES DE LA FIRMA.
@@ -205,7 +206,7 @@ export const ExpedientesView: React.FC = () => {
           */}
           <p className="mt-3 text-meta text-ink-500">
             {atadas === 0
-              ? 'Todavía no hay nada atado a este expediente. Desde Entrevistas, Revisiones, Borradores y la Agenda podrá traer lo que ya existe.'
+              ? 'Todavía no hay nada atado a este expediente. Use «Traer al expediente» aquí abajo para jalar lo que ya tiene.'
               : `Atado: ${[
                   p.entrevistas && `${p.entrevistas} entrevista(s)`,
                   p.audiencias && `${p.audiencias} audiencia(s)`,
@@ -225,6 +226,8 @@ export const ExpedientesView: React.FC = () => {
             <span className="[overflow-wrap:anywhere]">{error}</span>
           </p>
         )}
+
+        <TraerAlExpediente expediente={abierto} onCambio={refrescarAbierto} />
 
         <ActoresDelExpediente expediente={abierto} onCambio={refrescarAbierto} />
 

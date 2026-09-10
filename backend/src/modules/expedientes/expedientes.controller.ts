@@ -13,6 +13,7 @@ import {
   obtenerExpediente
 } from './expedientes.service';
 import { TIPOS_DE_PIEZA, type DatosDeActor, type TipoDePieza } from './types';
+import { candidatosDeLaFirma } from './candidatos.service';
 
 /**
  * Los expedientes de la firma. Ver `types.ts` para el porqué del módulo.
@@ -228,5 +229,23 @@ export const atarPiezaController = async (req: Request, res: Response): Promise<
     res.json({ success: true, atado: expedienteId !== null });
   } catch (err) {
     fallar(res, err, 'No se pudo atar al expediente.');
+  }
+};
+
+/**
+ * GET /api/expedientes/candidatos — lo que la firma ya tiene y se puede traer.
+ *
+ * Va SIN `:id` a propósito: la lista es de la firma, no de un expediente. El
+ * expediente al que se ata lo elige después el propio gesto de atar, y
+ * colgarla de un id obligaría a recargarla al cambiar de carpeta para obtener
+ * exactamente la misma respuesta.
+ */
+export const candidatosController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const firmId = req.firmId as string;
+    await exigirModulo(firmId, 'EXPEDIENTES');
+    res.json({ success: true, candidatos: await candidatosDeLaFirma(firmId) });
+  } catch (err) {
+    fallar(res, err, 'No se pudo cargar lo que hay para traer.');
   }
 };

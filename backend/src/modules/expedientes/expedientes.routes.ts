@@ -6,6 +6,7 @@ import {
   atarPiezaController,
   borrarActorController,
   borrarExpedienteController,
+  candidatosController,
   crearExpedienteController,
   listarExpedientesController,
   obtenerExpedienteController
@@ -35,7 +36,8 @@ const router = Router();
 router.get('/expedientes', listarExpedientesController as any);
 router.post('/expedientes', bloquearSiPlanVencido, crearExpedienteController as any);
 
-/* ANTES de `/:id`. Ver la nota de arriba. */
+/* ANTES de `/:id`, las dos. Ver la nota de arriba. */
+router.get('/expedientes/candidatos', candidatosController as any);
 router.patch('/expedientes/atar', bloquearSiPlanVencido, atarPiezaController as any);
 
 router.get('/expedientes/:id', obtenerExpedienteController as any);
