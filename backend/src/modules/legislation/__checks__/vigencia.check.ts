@@ -208,10 +208,40 @@ const OPCIONES_LEY_CORTA = `<select><option value="#8">8</option>
   const muertos: Array<[string, string]> = [
     ['derogado por otra ley (art. 2035 del Código Civil)', 'Artículo derogado por el artículo 43 de la Ley 820 de 2003'],
     ['derogado por el CGP (art. 126 del Código Civil)', 'Artículo derogado por el literal c) del artículo 626 de la Ley 1564 de 2012'],
-    ['declarado inexequible', 'Artículo INEXEQUIBLE']
+    ['declarado inexequible', 'Artículo INEXEQUIBLE'],
+    /*
+     * LA LEY MUERTA ENTERA, que hasta el 10 de septiembre de 2026 salía VIGENTE.
+     *
+     * Ningún artículo de una ley derogada en bloque dice «Artículo derogado»:
+     * el Senado repite en cada uno el marcador de la LEY. La Ley 43 de 1993
+     * —el régimen de nacionalidad— lleva esta frase en sus 30 artículos y el
+     * verificador los aprobaba todos.
+     */
+    [
+      'derogado porque murió la LEY entera (Ley 43 de 1993, nacionalidad)',
+      'Ley derogada por el artículo 54 de la Ley 2332 de 2023'
+    ],
+    [
+      'derogado con el rótulo de nota que el Senado pone en la portada',
+      'NOTA DE VIGENCIA: Ley derogada por el artículo 54 de la Ley 2332 de 2023'
+    ]
   ];
   for (const [nombre, marcador] of muertos) {
     check(`sigue detectándose el ${nombre}`, estadoDeLosMarcadores([marcador]).estado === 'DEROGADO', marcador.slice(0, 44));
+  }
+
+  /*
+   * LOS CONTRACASOS DE LA LEY MUERTA. Sin ellos, la regla nueva podría matar
+   * cualquier artículo cuyo marcador solo NOMBRE una ley, que es la mitad de
+   * los marcadores del Senado. Los tres se leen como derogatorias y no lo son.
+   */
+  const vivos: Array<[string, string]> = [
+    ['un artículo modificado por una ley posterior (CST art. 488)', 'Artículo modificado por el artículo 62 de la Ley 2466 de 2025. El nuevo texto es el siguiente:'],
+    ['un marcador que solo MENCIONA una ley derogada', 'Ley 100 de 1993, derogada en lo pertinente por la Ley 1122 de 2007'],
+    ['un artículo que remite a un decreto derogado sin morir con él', 'Ver el Decreto 2148 de 1983, derogado por el Decreto 1069 de 2015']
+  ];
+  for (const [nombre, marcador] of vivos) {
+    check(`y NO se mata ${nombre}`, estadoDeLosMarcadores([marcador]).estado === 'VIGENTE', marcador.slice(0, 44));
   }
 }
 

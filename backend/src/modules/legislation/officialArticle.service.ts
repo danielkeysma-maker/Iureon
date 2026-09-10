@@ -277,6 +277,36 @@ export const rubricaDelBloque = (bloque: string): string => {
  */
 const CAJA_PLEGABLE = /<a[^>]*class="caja_vja_encabezado"[^>]*>[\s\S]*?<\/a>/gi;
 
+/*
+ * EL TACHADO DEL SENADO ES DERECHO MUERTO, Y AL QUITAR LAS ETIQUETAS RESUCITABA.
+ *
+ * `sinEtiquetas` cambia cada `<...>` por un espacio, así que `<S>uso
+ * indebido</S>` salía del conversor como «uso indebido» —sin nada que lo
+ * distinguiera del resto—. El Senado marca con `<S>` los apartes que la Corte
+ * declaró INEXEQUIBLES: son las únicas palabras del artículo que YA NO SON
+ * DERECHO, y eran justamente las que el texto plano devolvía como si lo fueran.
+ *
+ * Medido el 10 de septiembre de 2026 en la Ley 610 de 2000, verificando el
+ * fundamento del proceso de responsabilidad fiscal: el art. 6 define el daño
+ * patrimonial y trae tachadas «uso indebido» e «inequitativa» —INEXEQUIBLES por
+ * C-340-07—, y ambas reaparecían intactas en el cuerpo. Son cuatro apartes en
+ * esa sola ley.
+ *
+ * A quién le duele: `verificarGlosa.ts` juzga lo que el escrito afirma de un
+ * artículo CONTRA ESTE TEXTO, y `apoyoEstaEnElTexto()` sostiene la glosa cuando
+ * encuentra el pasaje copiado. Con el tachado dentro, una glosa apoyada en
+ * palabras que la Corte borró salía SOSTENIDA con su pasaje de respaldo: el
+ * peor error posible, porque la comprobación no falla — certifica.
+ *
+ * Por qué se sustituye y no se borra: quitarlas en silencio dejaría una frase
+ * que se lee entera y no lo está, y este módulo no puede editar el texto
+ * oficial para dejarlo cómodo. La marca dice que ahí faltan palabras y que no
+ * son derecho, que es lo que el abogado necesita saber antes de apoyarse en él.
+ */
+const APARTE_TACHADO = /<s>[\s\S]*?<\/s>/gi;
+
+export const MARCA_TACHADO = '[aparte tachado, no vigente]';
+
 /**
  * El TEXTO del artículo: lo que viene después del epígrafe, sin etiquetas y sin
  * las cajas plegables.
@@ -291,7 +321,13 @@ export const cuerpoDelBloque = (bloque: string): string => {
   const finDelTitulo = /<\/a>/i.exec(bloque);
   const resto = finDelTitulo ? bloque.slice(finDelTitulo.index + finDelTitulo[0].length) : bloque;
   return recortarCuerpo(
-    enUnaLinea(decodificarEntidades(sinEtiquetas(resto.replace(CAJA_PLEGABLE, ' '))))
+    enUnaLinea(
+      decodificarEntidades(
+        sinEtiquetas(
+          resto.replace(CAJA_PLEGABLE, ' ').replace(APARTE_TACHADO, ` ${MARCA_TACHADO} `)
+        )
+      )
+    )
   );
 };
 
@@ -338,10 +374,34 @@ export const marcadoresDelBloque = (bloque: string): string[] => {
  */
 const MUERTO = /^art[íi]culo\s+(?:\d+[a-z]?\s+)?(?:derogad|anulad|inexequible|declarado\s+inexequible)/i;
 
+/*
+ * CUANDO MUERE LA LEY ENTERA, NINGÚN ARTÍCULO DICE «ARTÍCULO DEROGADO».
+ *
+ * `MUERTO` exige que el marcador empiece por «Artículo…», porque nació mirando
+ * derogatorias de un artículo suelto. Una ley derogada en bloque no se anuncia
+ * así: el Senado repite en CADA artículo el marcador «<Ley derogada por el
+ * artículo 54 de la Ley 2332 de 2023>», que empieza por «Ley». Ninguno de los
+ * artículos decía «Artículo derogado», así que todos salían VIGENTES.
+ *
+ * Medido el 10 de septiembre de 2026 buscando la causal de nulidad de la carta
+ * de naturaleza: la Ley 43 de 1993 —el régimen entero de nacionalidad— está
+ * derogada por la Ley 2332 de 2023, y `consultarVigencia` aprobó su art. 20
+ * teniendo esa frase delante. Es el falso NEGATIVO simétrico al que ya costó el
+ * art. 1040 del Código Civil, y del lado peligroso: allí una norma viva se dio
+ * por muerta y el escrito perdió un fundamento; aquí una norma muerta se da por
+ * viva y el escrito la invoca ante el juez.
+ *
+ * Se ancla el sustantivo PEGADO a «derogad», sin número en medio, para no
+ * matar el artículo cuyo marcador solo MENCIONA otra ley —«Artículo modificado
+ * por la Ley 2466 de 2025», «Ley 100 de 1993, derogada en lo pertinente»—. La
+ * falsa alarma es peor que el silencio, y el catálogo ya sabe por qué.
+ */
+const LEY_MUERTA = /^(?:nota\s+de\s+vigencia\s*:\s*)?(?:ley|decreto(?:\s+ley)?|c[óo]digo|estatuto|resoluci[óo]n|acuerdo|decisi[óo]n)\s+derogad[oa]\b/i;
+
 export const estadoDeLosMarcadores = (
   marcadores: string[]
 ): { estado: 'VIGENTE' | 'DEROGADO'; marcador?: string } => {
-  const mortal = marcadores.find((m) => MUERTO.test(m));
+  const mortal = marcadores.find((m) => MUERTO.test(m) || LEY_MUERTA.test(m));
   if (mortal) return { estado: 'DEROGADO', marcador: mortal };
   return { estado: 'VIGENTE', marcador: marcadores[0] };
 };

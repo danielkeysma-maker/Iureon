@@ -50,7 +50,12 @@ import {
   type RespuestaDelJuez
 } from '../verificarGlosa';
 import { marcarVarios } from '../verificarVigencia';
-import { cuerpoDelBloque, MAX_CUERPO, type VigenciaDeArticulo } from '../../../legislation/officialArticle.service';
+import {
+  cuerpoDelBloque,
+  MARCA_TACHADO,
+  MAX_CUERPO,
+  type VigenciaDeArticulo,
+} from '../../../legislation/officialArticle.service';
 import { PLAZO_GLOSA_MS, sumaDePresupuestos, TOPE_DE_FUNCION_MS } from '../../presupuestoDeTiempo';
 
 const conRed = process.argv.includes('--red');
@@ -155,6 +160,41 @@ const asincronos = async (): Promise<void> => {
     !cuerpo.includes('Notas de Vigencia'),
     cuerpo
   );
+  /*
+   * EL TACHADO NO PUEDE LLEGAR AL JUEZ DE LA GLOSA COMO SI FUERA DERECHO.
+   *
+   * Caso real: Ley 610 de 2000, art. 6 —el daño patrimonial al Estado—, cuyas
+   * expresiones «uso indebido» e «inequitativa» están tachadas por
+   * INEXEQUIBLES (C-340-07). Antes de la marca salían del conversor
+   * indistinguibles del texto vivo, y una glosa apoyada en ellas se habría
+   * declarado SOSTENIDA con su pasaje de respaldo.
+   */
+  const CON_TACHADO = `<p><a class="bookmarkaj" name="6">ART&Iacute;CULO 6o. DA&Ntilde;O PATRIMONIAL AL ESTADO.</A> Para efectos de esta ley se entiende por da&ntilde;o patrimonial al Estado la lesi&oacute;n del patrimonio p&uacute;blico, producida por una gesti&oacute;n fiscal antiecon&oacute;mica, <S>inequitativa</S> e inoportuna, o por el <S>uso indebido</S> de los bienes p&uacute;blicos.</p>`;
+  const tachado = cuerpoDelBloque(CON_TACHADO);
+  check(
+    'el aparte que la Corte declaró inexequible NO se devuelve como texto del artículo',
+    !tachado.includes('inequitativa') && !tachado.includes('uso indebido'),
+    tachado
+  );
+  check(
+    'y en su lugar queda dicho que ahí faltan palabras, para que la frase no se lea entera',
+    tachado.includes(MARCA_TACHADO),
+    tachado
+  );
+  check(
+    'lo que NO está tachado sigue intacto: la marca no se come el artículo',
+    tachado.includes('lesión del patrimonio público') && tachado.includes('antieconómica'),
+    tachado
+  );
+  const sinTachado = cuerpoDelBloque(
+    `<p><a class="bookmarkaj" name="1">ART. 1.</A> El <span>arrendador</span> debe la cosa.</p>`
+  );
+  check(
+    'y un artículo sin tachados no gana la marca ni pierde una etiqueta parecida (<span>)',
+    sinTachado === 'El arrendador debe la cosa.',
+    sinTachado
+  );
+
   check(
     'el tope del cuerpo cubre entero el artículo más largo que estos borradores citan (CGP 384, 6.089 caracteres)',
     MAX_CUERPO >= 6_089,
