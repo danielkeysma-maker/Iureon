@@ -466,5 +466,33 @@ check(
   check('y con dos normas seguidas, cada artículo va con la suya', dos.includes('CGP|384') && dos.includes('LEY 820 DE 2003|22'), dos.join(' '));
 }
 
+/*
+ * ─── LA NUMERACIÓN DE LOS DECRETOS ÚNICOS NO ES UN ARTÍCULO ────────────────
+ *
+ * «art. 2.2.6.15.2.1.1» casaba con el primer «2» y producía un artículo que NO
+ * EXISTE. La auditoría del catálogo del 10 de septiembre de 2026 lo encontró en
+ * el andamiaje de cinco ramas —NOTARIAL, AMBIENTAL, SOCIETARIO, SEGURIDAD
+ * SOCIAL y URBANISMO—, contaminando el universo citable con una referencia
+ * fabricada.
+ */
+{
+  const claves = (texto: string): string[] =>
+    referenciasDelTexto(texto, 'CGP').map((r) => `${r.codigo}|${r.articulo}`);
+
+  check(
+    'un rango de decreto compilatorio no produce ningún artículo',
+    claves('Conforme a los arts. 2.2.6.15.2.1.1 a 2.2.6.15.2.1.6 del Decreto 1069 de 2015.').every((k) => !k.endsWith('|2')),
+    claves('Conforme a los arts. 2.2.6.15.2.1.1 a 2.2.6.15.2.1.6 del Decreto 1069 de 2015.').join(' ') || '(ninguna)'
+  );
+  check(
+    'ni uno solo de esa forma',
+    claves('Lo previsto en el artículo 2.2.6.15.2.1.1 del Decreto 1069 de 2015.').every((k) => !k.endsWith('|2'))
+  );
+  /* Y lo contrario pesa igual: un artículo normal NO se puede perder por esto. */
+  check('un artículo corriente sigue leyéndose', claves('Conforme al artículo 384 del Código General del Proceso.').includes('CGP|384'));
+  const lista = claves('Los artículos 82, 84 y 90 del Código General del Proceso.');
+  check('y una lista corriente también', ['CGP|82', 'CGP|84', 'CGP|90'].every((k) => lista.includes(k)), lista.join(' '));
+}
+
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);
 process.exitCode = fallos === 0 ? 0 : 1;

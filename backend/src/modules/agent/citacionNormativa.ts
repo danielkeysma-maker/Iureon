@@ -190,6 +190,26 @@ const numerosDeLaCola = (cola: string): Array<{ n: number; desplazamiento: numbe
       i += numeral[0].length;
       continue;
     }
+    /*
+     * LA NUMERACIÓN DE LOS DECRETOS ÚNICOS NO ES UN ARTÍCULO SUELTO.
+     *
+     * Los decretos compilatorios numeran así: «art. 2.2.6.15.2.1.1». El patrón
+     * de abajo casaba con el primer «2», empujaba un «artículo 2» que NO EXISTE
+     * y se detenía en el punto. Medido en la auditoría del catálogo del 10 de
+     * septiembre de 2026: entradas de andamiaje anunciando ese artículo
+     * fantasma en NOTARIAL (5 fichas), AMBIENTAL (6), SOCIETARIO (2),
+     * SEGURIDAD_SOCIAL (2) y URBANISMO (2), contaminando el universo citable.
+     *
+     * Se CONSUME y no se emite, a propósito. Emitir «2» es fabricar una
+     * referencia; guardarla como número no se puede, porque no es un número. El
+     * precio es que el cedazo no vigila esas citas — y eso es mejor que
+     * vigilarlas contra una referencia inventada, que es lo que hacía.
+     */
+    const compilado = /^\d+(?:\.\d+){2,}/.exec(resto);
+    if (compilado) {
+      i += compilado[0].length;
+      continue;
+    }
     const numero = /^(\d{1,4})/.exec(resto);
     if (numero) {
       out.push({ n: Number(numero[1]), desplazamiento: i });
