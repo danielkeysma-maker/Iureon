@@ -16,7 +16,126 @@
       "PENAL: EJECUCION DE PENAS: la suspension condicional de la ejecucion de la pena (CP art. 63) se decide en la sentencia por el juez de conocimiento y ya vive en la ficha de sentencia condenatoria; aqui se catalogaron su revocatoria y su extincion, que son del juez de ejecucion.",
       "PENAL: EJECUCION DE PENAS: la ejecucion de medidas de seguridad a inimputables (Ley 906 arts. 465 a 470) no se catalogo; la solicitud de suspension, sustitucion o cesacion de la medida (art. 468) exige concepto de perito y es la siguiente tanda."
     ],
-    "unverified": []
+    "unverified": [],
+    "fundamentos_sustanciales": [
+      {
+        "actuacion": "penal/solicitud-de-incidente-de-reparacion-integral",
+        "norma": "Código Penal (Ley 599 de 2000)",
+        "articulo": 95,
+        "rubrica": "ARTÍCULO 95. TITULARES DE LA ACCIÓN CIVIL",
+        "estado_de_vigencia": "VIGENTE",
+        "fuentes_que_lo_confirman": [
+          "SENADO",
+          "FUNCION_PUBLICA"
+        ],
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_0599_2000_pr003.html#95",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "penal/solicitud-de-incidente-de-reparacion-integral",
+        "norma": "Código Penal (Ley 599 de 2000)",
+        "articulo": 96,
+        "rubrica": "ARTÍCULO 96. OBLIGADOS A INDEMNIZAR",
+        "estado_de_vigencia": "VIGENTE",
+        "fuentes_que_lo_confirman": [
+          "SENADO",
+          "FUNCION_PUBLICA"
+        ],
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_0599_2000_pr003.html#96",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "penal/sentencia-penal-condenatoria",
+        "norma": "Código Penal (Ley 599 de 2000)",
+        "articulo": 9,
+        "rubrica": "ARTÍCULO 9o. CONDUCTA PUNIBLE",
+        "estado_de_vigencia": "VIGENTE",
+        "fuentes_que_lo_confirman": [
+          "SENADO",
+          "FUNCION_PUBLICA"
+        ],
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_0599_2000.html#9",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "penal/sentencia-penal-condenatoria",
+        "norma": "Código Penal (Ley 599 de 2000)",
+        "articulo": 12,
+        "rubrica": "ARTÍCULO 12. CULPABILIDAD",
+        "estado_de_vigencia": "VIGENTE",
+        "fuentes_que_lo_confirman": [
+          "SENADO",
+          "FUNCION_PUBLICA"
+        ],
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_0599_2000.html#12",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "penal/sentencia-penal-condenatoria",
+        "norma": "Código Penal (Ley 599 de 2000)",
+        "articulo": 59,
+        "rubrica": "ARTÍCULO 59. MOTIVACIÓN DEL PROCESO DE INDIVIDUALIZACIÓN DE LA PENA",
+        "estado_de_vigencia": "VIGENTE",
+        "fuentes_que_lo_confirman": [
+          "SENADO",
+          "FUNCION_PUBLICA"
+        ],
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_0599_2000_pr001.html#59",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "penal/sentencia-penal-condenatoria",
+        "norma": "Código Penal (Ley 599 de 2000)",
+        "articulo": 61,
+        "rubrica": "ARTÍCULO 61. FUNDAMENTOS PARA LA INDIVIDUALIZACIÓN DE LA PENA",
+        "estado_de_vigencia": "VIGENTE",
+        "fuentes_que_lo_confirman": [
+          "SENADO",
+          "FUNCION_PUBLICA"
+        ],
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_0599_2000_pr002.html#61",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "penal/sentencia-penal-absolutoria",
+        "norma": "Código Penal (Ley 599 de 2000)",
+        "articulo": 9,
+        "rubrica": "ARTÍCULO 9o. CONDUCTA PUNIBLE",
+        "estado_de_vigencia": "VIGENTE",
+        "fuentes_que_lo_confirman": [
+          "SENADO",
+          "FUNCION_PUBLICA"
+        ],
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_0599_2000.html#9",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "penal/sentencia-penal-absolutoria",
+        "norma": "Código Penal (Ley 599 de 2000)",
+        "articulo": 12,
+        "rubrica": "ARTÍCULO 12. CULPABILIDAD",
+        "estado_de_vigencia": "VIGENTE",
+        "fuentes_que_lo_confirman": [
+          "SENADO",
+          "FUNCION_PUBLICA"
+        ],
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_0599_2000.html#12",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "penal/sentencia-penal-absolutoria",
+        "norma": "Código Penal (Ley 599 de 2000)",
+        "articulo": 32,
+        "rubrica": "ARTÍCULO 32. AUSENCIA DE RESPONSABILIDAD",
+        "estado_de_vigencia": "VIGENTE",
+        "fuentes_que_lo_confirman": [
+          "SENADO",
+          "FUNCION_PUBLICA"
+        ],
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/ley_0599_2000_pr001.html#32",
+        "consultado_el": "2026-09-10"
+      }
+    ]
   },
   "actuaciones": [
     {
@@ -642,7 +761,7 @@
     {
       "exact_name": "Solicitud de incidente de reparación integral",
       "role": "LITIGANTE",
-      "legal_basis": "Ley 906 de 2004, arts. 102 a 108",
+      "legal_basis": "Ley 906 de 2004, arts. 102 a 108 — FUNDAMENTO SUSTANCIAL (el derecho a la reparación, no el trámite): Código Penal (Ley 599 de 2000), arts. 95 y 96: las personas naturales, o sus sucesores, y las jurídicas perjudicadas directamente por la conducta punible tienen derecho a la acción indemnizatoria correspondiente —y el actor popular la tiene cuando se trate de lesión directa de bienes jurídicos colectivos—, y los daños causados con la infracción deben ser reparados por los penalmente responsables, en forma solidaria, y por los que, conforme a la ley sustancial, están obligados a responder.",
       "competent_authority": "Juez de conocimiento que profirió el fallo",
       "term": "La solicitud caduca treinta (30) días después de haber quedado en firme el fallo condenatorio (art. 106, modificado por el art. 89 de la Ley 1395 de 2010). Presentada en tiempo, el juez fallador convoca dentro de los ocho (8) días siguientes la audiencia pública con la que da inicio al incidente (art. 102, modificado por el art. 86 de la Ley 1395 de 2010); si no prospera la conciliación, fija nueva audiencia dentro de los ocho (8) días siguientes (art. 103).",
       "required_sections": [
@@ -910,7 +1029,7 @@
     {
       "exact_name": "Sentencia penal condenatoria",
       "role": "DESPACHO",
-      "legal_basis": "Ley 906 de 2004, arts. 446, 447 (modificado por el art. 100 de la Ley 1395 de 2010) y 448 — el término de la actuación está en el art. 447, no en el art. 317",
+      "legal_basis": "Ley 906 de 2004, arts. 446, 447 (modificado por el art. 100 de la Ley 1395 de 2010) y 448 — el término de la actuación está en el art. 447, no en el art. 317 — FUNDAMENTO SUSTANCIAL (lo que hay que declarar y dosificar, no el trámite): Código Penal (Ley 599 de 2000), arts. 9 y 12: para que la conducta sea punible se requiere que sea típica, antijurídica y culpable —la causalidad por sí sola no basta para la imputación jurídica del resultado, y en el inimputable se exige además constatar la inexistencia de causales de ausencia de responsabilidad—, y sólo se pueden imponer penas por conductas realizadas con culpabilidad, quedando erradicada toda forma de responsabilidad objetiva; arts. 59 y 61 (este último modificado por el art. 4 de la Ley 2098 de 2021): toda sentencia deberá contener una fundamentación explícita sobre los motivos de la determinación cualitativa y cuantitativa de la pena, y el sentenciador dividirá el ámbito punitivo de movilidad en cuartos —uno mínimo, dos medios y uno máximo—, moviéndose en el mínimo cuando no existan atenuantes ni agravantes o concurran únicamente circunstancias de atenuación, en los medios cuando concurran atenuación y agravación, y en el máximo cuando únicamente concurra agravación, e impondrá la pena ponderando la mayor o menor gravedad de la conducta, el daño real o potencial creado, la naturaleza de las causales que agraven o atenúen la punibilidad, la intensidad del dolo, la preterintención o la culpa concurrente, y la necesidad de pena y la función que ella ha de cumplir en el caso concreto.",
       "competent_authority": "Juez de conocimiento",
       "term": "QUINCE (15) DÍAS DESDE LA TERMINACIÓN DEL JUICIO ORAL PARA PROFERIR SENTENCIA, Y ESE RELOJ ES DEL JUEZ DE CONOCIMIENTO. El sentido del fallo se da a conocer de manera ORAL Y PÚBLICA inmediatamente después del receso previsto en el art. 445, individualizado frente a cada enjuiciado y cada cargo (art. 446). Anunciado el fallo condenatorio, o aceptado el acuerdo con la Fiscalía, el juez oye BREVEMENTE Y POR UNA SOLA VEZ al fiscal y a la defensa sobre las condiciones individuales, familiares, sociales, modo de vivir y antecedentes del culpable, y señala la audiencia para proferir sentencia «en un término que no podrá exceder de quince (15) días contados a partir de la terminación del juicio oral»; el mismo término rige para la sentencia absolutoria (art. 447). Si el juez estima necesario ampliar la información, el experto designado debe responder en el término IMPRORROGABLE de diez (10) días hábiles — reloj de un tercero, no del despacho ni del procesado.\n\nRELOJ DISTINTO Y A FAVOR DEL PROCESADO: si transcurren CIENTO CINCUENTA (150) DÍAS desde el inicio de la audiencia de juicio sin que se celebre la audiencia de lectura de fallo o su equivalente, procede la LIBERTAD POR VENCIMIENTO DE TÉRMINOS (art. 317 num. 6, modificado por el art. 6 de la Ley 2477 de 2025). No obliga al juez a fallar: hace exigible la libertad, y el proceso sigue. El plazo de quince días del art. 447 vive DENTRO de estos ciento cincuenta, y su incumplimiento no tiene sanción propia — se paga en la moneda del art. 317.\n\nLÍMITE DE CONGRUENCIA QUE ACOTA LA CONDENA: «El acusado no podrá ser declarado culpable por hechos que no consten en la acusación, ni por delitos por los cuales no se ha solicitado condena» (art. 448).",
       "required_sections": [
@@ -956,7 +1075,7 @@
     {
       "exact_name": "Sentencia penal absolutoria",
       "role": "DESPACHO",
-      "legal_basis": "Ley 906 de 2004, arts. 446 y 448",
+      "legal_basis": "Ley 906 de 2004, arts. 446 y 448 — FUNDAMENTO SUSTANCIAL (lo que hay que descartar, no el trámite): Código Penal (Ley 599 de 2000), arts. 9 y 12: para que la conducta sea punible se requiere que sea típica, antijurídica y culpable —la causalidad por sí sola no basta para la imputación jurídica del resultado, y en el inimputable se exige además constatar la inexistencia de causales de ausencia de responsabilidad—, y sólo se pueden imponer penas por conductas realizadas con culpabilidad, quedando erradicada toda forma de responsabilidad objetiva; art. 32: no habrá lugar a responsabilidad penal en los eventos de caso fortuito y fuerza mayor, cuando se actúe con el consentimiento válidamente emitido por el titular del bien jurídico disponible, en estricto cumplimiento de un deber legal, en cumplimiento de orden legítima de autoridad competente emitida con las formalidades legales —sin que pueda reconocerse la obediencia debida en genocidio, desaparición forzada y tortura—, en legítimo ejercicio de un derecho, de una actividad lícita o de un cargo público, o por la necesidad de defender un derecho propio o ajeno contra injusta agresión actual o inminente (numeral 6 modificado por el art. 3 de la Ley 2197 de 2022, corregido por el art. 2 del Decreto 207 de 2022).",
       "competent_authority": "Juez de conocimiento",
       "term": "El sentido del fallo se da a conocer oral y públicamente inmediatamente después del receso de hasta dos (2) horas que sigue al cierre del debate (arts. 445 y 446). La audiencia para proferir sentencia debe señalarse en un término que no podrá exceder de quince (15) días contados a partir de la terminación del juicio oral, plazo que el parágrafo del art. 447 extiende expresamente a la sentencia absolutoria (art. 447, modificado por el art. 100 de la Ley 1395 de 2010). En el procedimiento especial abreviado el juez cuenta con diez (10) días para proferir la sentencia y correr traslado escrito de la misma (art. 545). De ser absuelto de la totalidad de los cargos, el juez dispone la libertad inmediata y levanta todas las medidas cautelares (art. 449).",
       "required_sections": [

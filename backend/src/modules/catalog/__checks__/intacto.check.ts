@@ -69,7 +69,29 @@ const FUNDAMENTO_SUSTANCIAL_ANADIDO: readonly string[] = [
   'notarial/solicitud-de-liquidacion-de-herencia-ante-notario',
   'notarial/solicitud-de-liquidacion-de-sociedad-conyugal-ante-notario',
   'notarial/solicitud-de-declaracion-de-posesion-regular-ante-notario',
-  'notarial/solicitud-de-matrimonio-civil-ante-notario'
+  'notarial/solicitud-de-matrimonio-civil-ante-notario',
+
+  /*
+   * SEGUNDA TANDA, el mismo día: los otros cuatro cuerpos normativos que la
+   * auditoría señaló —Constitución Título II, Código Sustantivo del Trabajo,
+   * Código Penal y Código de Comercio—, doce fichas de cuatro ramas. Se
+   * añaden a la MISMA lista y contra el MISMO retrato a propósito: el retrato
+   * es anterior a las dos tandas, así que la garantía que se comprueba no es
+   * «no se dañó nada desde la tanda anterior» sino «no se ha dañado nada desde
+   * antes de tocar el catálogo», que es la que el abogado necesita.
+   */
+  'constitucional/solicitud-de-habeas-corpus',
+  'constitucional/impugnacion-de-la-decision-que-niega-el-habeas-corpus',
+  'constitucional/accion-de-tutela-contra-providencia-judicial',
+  'laboral/demanda-de-reintegro-por-fuero-sindical',
+  'laboral/demanda-de-levantamiento-de-fuero-sindical',
+  'laboral/sentencia-de-fuero-sindical',
+  'laboral/contestacion-de-la-demanda-laboral',
+  'laboral/excepciones-en-proceso-ejecutivo-laboral',
+  'penal/solicitud-de-incidente-de-reparacion-integral',
+  'penal/sentencia-penal-condenatoria',
+  'penal/sentencia-penal-absolutoria',
+  'civil/demanda-de-impugnacion-de-actos-de-asambleas-juntas-directivas-o-de-socios'
 ];
 
 interface FilaDelRetrato {

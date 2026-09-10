@@ -79,7 +79,7 @@ export const CONSTITUCIONAL_CATALOG: BranchCatalog = {
     exactName: 'Acción de tutela contra providencia judicial',
     branch: 'CONSTITUCIONAL',
     role: 'LITIGANTE',
-    legalBasis: 'Art. 86 C.P.; Decreto 2591 de 1991, arts. 14 y 37; Sentencia C-590 de 2005 de la Corte Constitucional (requisitos generales y causales especiales de procedibilidad)',
+    legalBasis: 'Art. 86 C.P.; Decreto 2591 de 1991, arts. 14 y 37; Sentencia C-590 de 2005 de la Corte Constitucional (requisitos generales y causales especiales de procedibilidad) — FUNDAMENTO SUSTANCIAL (el derecho invocado, no el trámite): Constitución Política, art. 29: el debido proceso se aplicará a toda clase de actuaciones judiciales y administrativas; nadie podrá ser juzgado sino conforme a leyes preexistentes al acto que se le imputa, ante juez o tribunal competente y con observancia de la plenitud de las formas propias de cada juicio; quien sea sindicado tiene derecho a la defensa, a un debido proceso público sin dilaciones injustificadas, a presentar pruebas y a controvertir las que se alleguen en su contra, y a impugnar la sentencia condenatoria; es nula, de pleno derecho, la prueba obtenida con violación del debido proceso.',
     competentAuthority: 'El superior funcional del juez o tribunal que profirió la providencia atacada. ADVERTENCIA: esta regla proviene del reparto (Decreto 1983 de 2017), norma que NO se leyó en esta verificación; lo único verificado es la competencia a prevención del art. 37 del Decreto 2591 de 1991.',
     term: { status: 'VERIFICADO', description: 'Fallo dentro de los diez (10) días siguientes a la presentación (Decreto 2591 de 1991, art. 29). No hay término de caducidad legal: el art. 11 del Decreto 2591, que fijaba dos (2) meses contra providencias judiciales ejecutoriadas, fue declarado INEXEQUIBLE. Rige el requisito jurisprudencial de inmediatez, es decir, la interposición "en un término razonable y proporcionado" (C-590 de 2005).' },
     requiredSections: [
@@ -287,7 +287,7 @@ export const CONSTITUCIONAL_CATALOG: BranchCatalog = {
     exactName: 'Solicitud de hábeas corpus',
     branch: 'CONSTITUCIONAL',
     role: 'LITIGANTE',
-    legalBasis: 'Art. 30 C.P.; Ley 1095 de 2006, arts. 1, 2, 3 y 4',
+    legalBasis: 'Art. 30 C.P.; Ley 1095 de 2006, arts. 1, 2, 3 y 4 — FUNDAMENTO SUSTANCIAL (el derecho invocado, no el trámite): Constitución Política, art. 28: toda persona es libre y nadie puede ser molestado en su persona o familia, ni reducido a prisión o arresto, ni detenido, sino en virtud de mandamiento escrito de autoridad judicial competente, con las formalidades legales y por motivo previamente definido en la ley; la persona detenida preventivamente debe ser puesta a disposición del juez competente dentro de las treinta y seis (36) horas siguientes; en ningún caso puede haber detención, prisión ni arresto por deudas, ni penas y medidas de seguridad imprescriptibles.',
     competentAuthority: '"Son competentes para resolver la solicitud de Hábeas Corpus todos los jueces y tribunales de la Rama Judicial del Poder Público" (Ley 1095 de 2006, art. 2). En los órganos plurales cada integrante actúa como juez individual (art. 2).',
     term: { status: 'VERIFICADO', description: 'El hábeas corpus "debe resolverse en el término de treinta y seis horas" (Art. 30 C.P.); la Ley 1095 de 2006, art. 3, reitera el término de treinta y seis (36) horas. Puede invocarse en cualquier tiempo mientras la violación persista, y las actividades no se suspenden por días festivos (art. 3). Sólo podrá invocarse o incoarse por una sola vez (art. 1).' },
     requiredSections: [
@@ -305,7 +305,7 @@ export const CONSTITUCIONAL_CATALOG: BranchCatalog = {
     exactName: 'Impugnación de la decisión que niega el hábeas corpus',
     branch: 'CONSTITUCIONAL',
     role: 'LITIGANTE',
-    legalBasis: 'Ley 1095 de 2006, art. 7',
+    legalBasis: 'Ley 1095 de 2006, art. 7 — FUNDAMENTO SUSTANCIAL (el derecho invocado, no el trámite): Constitución Política, art. 28: toda persona es libre y nadie puede ser molestado en su persona o familia, ni reducido a prisión o arresto, ni detenido, sino en virtud de mandamiento escrito de autoridad judicial competente, con las formalidades legales y por motivo previamente definido en la ley; la persona detenida preventivamente debe ser puesta a disposición del juez competente dentro de las treinta y seis (36) horas siguientes; en ningún caso puede haber detención, prisión ni arresto por deudas, ni penas y medidas de seguridad imprescriptibles.',
     competentAuthority: 'El superior jerárquico correspondiente (Ley 1095 de 2006, art. 7).',
     term: { status: 'VERIFICADO', description: 'La decisión denegatoria podrá ser impugnada "dentro de los tres (3) días calendario" siguientes a la notificación. El superior debe recibir el expediente dentro de las veinticuatro (24) horas siguientes y decidir dentro de los tres (3) días hábiles siguientes (Ley 1095 de 2006, art. 7).' },
     requiredSections: [
