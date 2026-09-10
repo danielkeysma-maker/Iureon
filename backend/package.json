@@ -66,7 +66,10 @@
     "check:adjuntos": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/adjuntos/__checks__/adjuntos.check.ts",
     "check:remision": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/catalog/__checks__/remision.check.ts",
     "check:plazos": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/__checks__/plazos.check.ts",
-    "check:sin-nombre": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/__checks__/sinNombre.check.ts"
+    "check:sin-nombre": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/__checks__/sinNombre.check.ts",
+    "check:citacion": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/__checks__/citacionNormativa.check.ts",
+    "check:vigencia": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/legislation/__checks__/vigencia.check.ts",
+    "check:vigencia-red": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/legislation/__checks__/vigencia.check.ts --red"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

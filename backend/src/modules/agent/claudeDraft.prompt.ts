@@ -1,5 +1,5 @@
 import { resolveDocumentStructure } from './documentStructures';
-import { buildCatalogGuidance } from './catalogGuidance';
+import { buildCatalogGuidance, REGLA_DE_CITACION_REDACCION } from './catalogGuidance';
 import { esTituloDeTrabajo, objetivoDelTitulo } from '../catalog/tituloDeTrabajo';
 
 /**
@@ -50,6 +50,13 @@ interface ClaudeUserMessageInput {
   citations: string[];
   existingDraft?: string;
   adjuntos?: string;
+  /**
+   * El mismo bloque que recibe el prompt de sistema. Solo se usa para saber si
+   * hay ficha verificada y, en tal caso, repetir aquí la regla de citación —la
+   * jurisprudencial se repite en las dos ramas de este mensaje desde agosto, y
+   * la de normas no; esa asimetría es la que se midió.
+   */
+  catalogGuidance?: string | null;
 }
 
 /**
@@ -101,7 +108,9 @@ export const buildClaudeDraftPrompt = ({
   // the older free-text reference structure apply.
   const { esTitulo, encargo } = comoSeLlamaElEncargo(documentType);
   const guidance =
-    catalogGuidance === undefined ? buildCatalogGuidance(documentType) : catalogGuidance;
+    catalogGuidance === undefined
+      ? buildCatalogGuidance(documentType, undefined, 'REDACCION')
+      : catalogGuidance;
   const estructuraObligatoria = guidance ?? resolveDocumentStructure(documentType);
   const continuationBlock = existingDraft
     ? `\nMODO CONTINUACIÓN/CORRECCIÓN: El usuario tiene un borrador previo que quiere que continúes, corrijas o proyectes. Tu tarea es tomar ese borrador como base y aplicar las instrucciones del usuario. Entrega el documento COMPLETO resultante (no solo la parte modificada).\n\nBORRADOR EXISTENTE:\n"""\n${existingDraft}\n"""\n`
@@ -117,6 +126,48 @@ export const buildClaudeDraftPrompt = ({
   const reglaAdjuntos = adjuntos
     ? `\nREGLA DE LOS ADJUNTOS: Los datos que vienen de los adjuntos se usan tal cual y no se reemplazan por marcadores; si el adjunto y el abogado se contradicen, prevalece lo que escribió el abogado y se anota entre corchetes la discrepancia.\n`
     : '';
+  /*
+   * ─── LA LÍNEA DE NORMATIVIDAD NO SE EMITE CUANDO OTRO BLOQUE MANDA ────────
+   *
+   * `NORMATIVIDAD: Cita artículos pertinentes de CGP, CST, CPACA, CP, C. Civil…
+   * o la que corresponda.` es ANTERIOR al catálogo —viene del 29 de julio de
+   * 2026, de cuando el prompt vivía en `openrouter.service.ts`— y nunca se
+   * revisó cuando el catálogo entró, el 11 de agosto. Es un mandato afirmativo
+   * con lista abierta, nombra expresamente el C. Civil, y de ahí salieron los
+   * arts. 2000, 2005 y 2035 del borrador medido.
+   *
+   * Hasta hoy solo estaba neutralizada en la rama SIN ficha (la actuación propia
+   * de la firma), que es la menos peligrosa. Los tres jueces coincidieron en que
+   * este era el injerto más barato y el que más rinde: mientras esa línea siga
+   * saliendo junto a una lista cerrada, el prompt se contradice a sí mismo y el
+   * modelo obedece a la orden más antigua, que es la que nombra el código.
+   *
+   * NO SE BORRA DEL TODO, y la distinción importa: sin ficha ni bloque que
+   * reclame precedencia —el camino de `resolveDocumentStructure`— no hay nada
+   * verificado que citar y quitarla dejaría el escrito sin ninguna orden de
+   * fundamentar. La condición es exactamente esa: se suprime cuando el bloque
+   * de arriba DECLARA que manda sobre ella. Las dos ramas del catálogo lo
+   * declaran hoy; si alguien escribe una tercera que no lo declare, la línea
+   * vuelve a salir sola, que es el lado seguro del fallo.
+   */
+  const otroBloqueManda = Boolean(guidance?.includes('manda sobre la línea de NORMATIVIDAD'));
+  const lineaNormatividad = otroBloqueManda
+    ? ''
+    : '\nNORMATIVIDAD: Cita artículos pertinentes de CGP, CST, CPACA, CP, C. Civil, C. Penal, Ley 1755/2015, Decreto 2591/1991, Ley 906/2004, Ley 472/1998 o la que corresponda.\n';
+
+  /*
+   * Y LA REGLA DE CITACIÓN SE REPITE ARRIBA, fuera del rótulo «ESTRUCTURA».
+   *
+   * El bloque del catálogo entero se inyecta como `estructuraObligatoria`, es
+   * decir bajo un encabezado que anuncia formato y en último lugar. La regla de
+   * jurisprudencia, en cambio, se emite tres veces y en primer plano — y esa
+   * asimetría de colocación es el mapa exacto de lo medido: 0 providencias
+   * inventadas contra 23 artículos fuera de la ficha. Se corrige aquí, donde
+   * estaba la orden que contradecía.
+   */
+  const reglaDeCitacion =
+    guidance && guidance.includes(REGLA_DE_CITACION_REDACCION) ? `\n${REGLA_DE_CITACION_REDACCION}\n` : '';
+
   return `
 REGLA ABSOLUTA: Responde EXCLUSIVAMENTE con el texto del documento jurídico. Sin comentarios, advertencias, explicaciones ni meta-texto. Comienza directamente con el encabezado del escrito.
 
@@ -137,9 +188,7 @@ ${
 }
 
 INDICACIÓN DEL USUARIO: "${prompt}".
-${reglaAdjuntos}
-NORMATIVIDAD: Cita artículos pertinentes de CGP, CST, CPACA, CP, C. Civil, C. Penal, Ley 1755/2015, Decreto 2591/1991, Ley 906/2004, Ley 472/1998 o la que corresponda.
-
+${reglaAdjuntos}${lineaNormatividad}${reglaDeCitacion}
 ${renderJurisprudencia(citations)}
 
 ${`ESTRUCTURA ${esTitulo ? `DEL ESCRITO QUE BUSCA "${encargo}"` : `DE "${encargo}"`} — obligatoria. Las secciones marcadas [OBLIGATORIA] no pueden omitirse y la de petición/pretensiones/resuelve JAMÁS se omite. Cada sección abre con su título en su propia línea, en mayúscula sostenida y entre **dobles asteriscos**:\n${estructuraObligatoria}`}
@@ -163,17 +212,21 @@ export const buildClaudeUserMessage = ({
   facts,
   citations,
   existingDraft,
-  adjuntos
+  adjuntos,
+  catalogGuidance
 }: ClaudeUserMessageInput): string => {
   // After the facts and before the citations: the writer reads the file data
   // next to Gemini's extraction, which already leaned on the same block.
   const adjuntosBlock = adjuntos ? `\n\n${adjuntos}\n` : '';
   const { esTitulo, encargo } = comoSeLlamaElEncargo(documentType);
+  const reglaDeCitacion = catalogGuidance?.includes(REGLA_DE_CITACION_REDACCION)
+    ? `\n${REGLA_DE_CITACION_REDACCION}\n`
+    : '';
 
   return existingDraft
     ? `Instrucción del usuario: "${prompt}".
 Insumos fácticos de Gemini: ${facts}.${adjuntosBlock}
-
+${reglaDeCitacion}
 ${renderJurisprudencia(citations)}
 
 Toma el borrador existente como base y aplica las correcciones. Entrega el documento COMPLETO resultante.`
@@ -183,7 +236,7 @@ Toma el borrador existente como base y aplica las correcciones. Entrega el docum
           : `Genera el documento jurídico "${encargo}" COMPLETO hasta la firma.`
       }
 Hechos extraídos por Gemini: ${facts}.${adjuntosBlock}
-
+${reglaDeCitacion}
 ${renderJurisprudencia(citations)}
 
 El documento debe estar COMPLETO incluyendo PETICIÓN/PRETENSIONES/RESUELVE.`;
