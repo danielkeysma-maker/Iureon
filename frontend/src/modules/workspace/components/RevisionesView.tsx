@@ -36,6 +36,12 @@ interface RevisionesViewProps {
   /** Socio administrador de la firma (o superusuario): puede autorizar que se conserven los escritos. */
   esAdminDeFirma: boolean;
   onAbrirTaller: (datos: DatosDelTaller) => void;
+  /**
+   * Lleva a Redacción la actuación que el abogado escogió en el catálogo tras
+   * leer un documento recibido, con sus hechos y la instrucción que editó.
+   * Opcional: sin ella el botón no se ofrece, en vez de ofrecerlo muerto.
+   */
+  onRedactar?: (exactName: string, rama: string, hechos: string, instruccion: string) => void;
   onIrARedaccion: () => void;
   /** Quién firma, para poder crear una actuación propia desde el diálogo de revisión. */
   userRole: ActuacionRole;
@@ -56,6 +62,7 @@ interface RevisionesViewProps {
 export const RevisionesView: React.FC<RevisionesViewProps> = ({
   esAdminDeFirma,
   onAbrirTaller,
+  onRedactar,
   onIrARedaccion,
   onIrAHerramientas,
   userRole,
@@ -239,6 +246,8 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({
             userRole={userRole}
             precioCop={precioRevisionCop}
             onSaldoCambiado={onSaldoCambiado}
+            /* De la lectura de un documento recibido a Redacción, sin copiar y pegar nada. */
+            onRedactar={onRedactar}
             onAbrirTaller={(datos) => {
               setRevisarAbierto(false);
               onAbrirTaller(datos);

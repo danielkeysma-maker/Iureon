@@ -74,3 +74,43 @@ export const hechosParaLaGuia = (informe: InformeDeDocumentoRecibido | null | un
     .filter((x) => x !== '')
     .join('\n');
 };
+
+/**
+ * Los flancos, transcritos para que viajen DENTRO de la instrucción de redacción.
+ *
+ * ─── POR QUÉ NO BASTA CON LOS HECHOS ────────────────────────────────────────
+ *
+ * `hechosParaLaGuia` cuenta lo que ocurrió; esto dice qué hacer con ello. En
+ * Redacción son dos cosas distintas y van rotuladas por separado (el cuadro es
+ * uno solo, y `componerCuadroDeRedaccion` es quien las separa): el escrito que
+ * se va a redactar ataca precisamente estos puntos, así que la instrucción los
+ * nombra uno por uno.
+ *
+ * ─── LO QUE ESTA FUNCIÓN NO HACE, Y ES LA REGLA DE LA CASA ──────────────────
+ *
+ * No escribe derecho. Ni un artículo, ni un plazo, ni una autoridad, ni una
+ * figura salen de aquí: todo lo que va entre comillas es TEXTO DEL PROPIO
+ * DOCUMENTO, tal como el revisor lo citó, y la frase que lo encabeza lo declara
+ * para que el motor no lo confunda con una ficha verificada. Por lo mismo vive
+ * aquí y no en `catalog/instruccionSugerida.ts`: aquel módulo solo puede citar
+ * campos de la ficha, y su guarda lo comprueba.
+ */
+export const flancosParaLaInstruccion = (informe: InformeDeDocumentoRecibido | null | undefined): string => {
+  const puntos = puntosDeAtaqueDe(informe);
+  if (puntos.length === 0) return '';
+
+  const lineas = puntos.map((p) =>
+    [
+      `- ${etiquetaDeAtaque(p.clase)}. Dice el documento: «${p.cita}»`,
+      p.norma && p.citaDeLaNorma ? `  Norma en que el propio documento se apoya, ${p.norma}, transcrita así: «${p.citaDeLaNorma}»` : '',
+      p.lectura ? `  Lectura del revisor: ${p.lectura}` : ''
+    ]
+      .filter(Boolean)
+      .join('\n')
+  );
+
+  return [
+    'Controvierta los puntos que la lectura del documento recibido señaló. Lo entrecomillado está transcrito del propio documento y no proviene de ninguna ficha del catálogo:',
+    ...lineas
+  ].join('\n');
+};

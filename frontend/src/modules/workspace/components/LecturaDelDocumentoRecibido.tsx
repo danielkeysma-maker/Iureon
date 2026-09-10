@@ -18,9 +18,14 @@ import { etiquetaDeAtaque, puntosDeAtaqueDe } from '../services/ataque';
  *
  * ─── LO QUE ESTE COMPONENTE NO TRAE ─────────────────────────────────────────
  *
- * El «¿y qué puedo hacer?» —la guía de actuaciones con su rama— NO vive aquí:
- * necesita el catálogo, y el catálogo es del diálogo. Entra por `pie`, así que
- * cada pantalla pone el suyo o ninguno.
+ * El «¿y qué puedo hacer?» —la guía de actuaciones con su rama, y el salto a
+ * Redacción— NO vive aquí. Vive en `PuenteAlAtaque`, que es un componente
+ * propio y no un fragmento de ninguna pantalla, y entra por `pie`. Antes ese
+ * pie lo escribía el diálogo de revisión y solo existía allí: el taller montaba
+ * este mismo componente SIN pie, así que en la pantalla donde el abogado
+ * vuelve a leer el informe días después no había ningún botón. Sigue entrando
+ * por `pie` —una lectura puede necesitar mostrarse sin salidas— pero lo que se
+ * le pasa es la misma pieza en los dos sitios.
  */
 
 /** Una lista con viñetas y su rótulo; vacía no se dibuja. */
@@ -148,8 +153,18 @@ export const LecturaDelDocumentoRecibido: React.FC<LecturaDelDocumentoRecibidoPr
         <section>
           <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">Por dónde se ataca</h4>
           <p className="mt-1 text-[12px] leading-snug text-ink-500 text-justify [text-wrap:pretty]">
-            Cada punto se apoya en las palabras del propio documento, que van citadas. Lo rotulado como lectura del revisor es criterio, no texto del
-            documento: aquí se señala el flanco y concluye usted.
+            {/*
+              QUÉ SON Y PARA QUÉ SIRVEN, EN UNA LÍNEA. Se reportó que «solo hay
+              unas descripciones de por dónde se ataca pero no se entiende cómo
+              usarlas»: la sección mostraba citas y lecturas sin decir nunca que
+              son el material con el que se funda el escrito que viene después.
+              Va primero, antes de las reglas de lectura, porque el para qué es
+              lo que decide si alguien sigue leyendo.
+            */}
+            Estos son los puntos por los que este documento se puede controvertir: son el material con el que se sustenta
+            el escrito que usted presente en su contra, y abajo puede llevarlos a la guía de actuaciones y de ahí a
+            Redacción. Cada punto se apoya en las palabras del propio documento, que van citadas. Lo rotulado como
+            lectura del revisor es criterio, no texto del documento: aquí se señala el flanco y concluye usted.
           </p>
           <div className="mt-1.5 space-y-2.5">
             {puntos.map((p, k) => (

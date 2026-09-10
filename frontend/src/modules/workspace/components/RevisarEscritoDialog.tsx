@@ -6,7 +6,6 @@ import {
   archivoABase64,
   reviewApi,
   type ConsentimientoDeGuardado,
-  type InformeDeDocumentoRecibido,
   type ModoDeRevision,
   type RespuestaDeRevision,
   type RevisionGuardada
@@ -24,8 +23,9 @@ import { BRANCH_LABELS } from '../../catalog/branchLabels';
 import { GuiaEligeActuacionDialog } from './GuiaEligeActuacionDialog';
 import { ActuacionPropiaDialog } from './ActuacionPropiaDialog';
 import { textoDelArchivo } from '../services/textoDelArchivo';
-import { etiquetaDeAtaque, hechosParaLaGuia, puntosDeAtaqueDe } from '../services/ataque';
+import { etiquetaDeAtaque, puntosDeAtaqueDe } from '../services/ataque';
 import { LecturaDelDocumentoRecibido, SeccionDeInforme } from './LecturaDelDocumentoRecibido';
+import { PuenteAlAtaque } from './PuenteAlAtaque';
 import type { ActuacionRole } from '../../catalog/types';
 
 /**
@@ -120,6 +120,15 @@ interface RevisarEscritoDialogProps {
    * aquí, y es el mismo valor con el que trabaja el espacio de redacción.
    */
   userRole?: ActuacionRole;
+  /**
+   * Lleva a Redacción la actuación que el abogado escogió tras leer un
+   * documento recibido, con sus hechos y la instrucción que haya editado.
+   *
+   * OPCIONAL, Y SU AUSENCIA ES UNA RESPUESTA: quien monte este diálogo sin
+   * saber llevar a Redacción no verá el botón, en vez de verlo y que no haga
+   * nada.
+   */
+  onRedactar?: (exactName: string, rama: string, hechos: string, instruccion: string) => void;
 }
 
 /*
@@ -164,7 +173,8 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
   onSaldoCambiado,
   onAbrirTaller,
   eligeActuacion = false,
-  userRole = 'LITIGANTE'
+  userRole = 'LITIGANTE',
+  onRedactar
 }) => {
   /*
    * EL MODO ES LO PRIMERO QUE SE ELIGE Y LO PRIMERO QUE SE DECLARA. Por defecto
@@ -222,25 +232,11 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
   const [guiaAbierta, setGuiaAbierta] = React.useState(false);
   const [propiaAbierta, setPropiaAbierta] = React.useState(false);
   /*
-   * LA RAMA CON LA QUE SE CONSULTA LA GUÍA DESPUÉS DE LEER UN DOCUMENTO
-   * RECIBIDO. Es aparte de `ramaPropia` a propósito: aquella elige contra qué
-   * ficha se revisa un escrito propio; esta solo acota la propuesta del
-   * catálogo, que nunca propone a ciegas entre las veintitantas ramas.
+   * LA RAMA, LA CASILLA DE «NO SÉ LA RAMA» Y LA ACTUACIÓN RECONOCIDA DEL MODO
+   * RECIBIDO YA NO VIVEN AQUÍ: son de `PuenteAlAtaque`, que es la misma pieza
+   * que monta el taller. Mientras vivieron en este diálogo, el pie con el botón
+   * hacia la guía existía solo dentro de él y el taller se quedaba sin salida.
    */
-  const [ramaParaLaGuia, setRamaParaLaGuia] = React.useState(legalBranch);
-  /*
-   * «NO SÉ LA RAMA» EN EL CAMINO DE «QUE LA GUÍA DIGA QUÉ ACTUACIÓN ES».
-   *
-   * Aquí el defecto se ve más que en ningún otro sitio: el abogado acaba de
-   * subir un documento que NO redactó él —un auto, un traslado, un oficio— y se
-   * le pedía que declarara de qué rama es antes de preguntar qué es. Con la
-   * rama equivocada la respuesta es «el catálogo no reconoce nada» sobre una
-   * actuación que existe dos ramas más allá, y quien acaba de recibir el
-   * documento es justamente quien no lo sabe.
-   */
-  const [guiaSinRama, setGuiaSinRama] = React.useState(false);
-  /** Lo que la guía propuso tras leer el documento recibido; lo escogió una persona. */
-  const [actuacionSugerida, setActuacionSugerida] = React.useState('');
   /*
    * Los hechos con los que se consulta el triaje son EL TEXTO DEL ESCRITO. No
    * se le pide al abogado que cuente otra vez lo que ya está en el archivo que
@@ -265,8 +261,8 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
    * sería esconderle justamente la que busca.
    */
   const catalogoDeLaRama = useBranchActuacionesState(rama, undefined, recargaCatalogo);
-  /** La guía propone dentro de una rama: en el modo recibido es la que se elige junto al informe. */
-  const ramaDeLaGuia = esRecibido ? ramaParaLaGuia : rama;
+  /** La guía de este diálogo es la del escrito PROPIO; la del modo recibido la lleva `PuenteAlAtaque`. */
+  const ramaDeLaGuia = rama;
 
   const opcionesRama: OpcionCombobox[] = React.useMemo(
     () => ramasEstado.ramas.map((b) => ({ valor: b, etiqueta: BRANCH_LABELS[b] ?? b })),
@@ -389,8 +385,6 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
      */
     setRamaPropia(legalBranch);
     setTipoPropio(documentType);
-    setRamaParaLaGuia(legalBranch);
-    setActuacionSugerida('');
     setHechos('');
     setAvisoDeLectura('');
     archivoLeido.current = null;
@@ -1177,25 +1171,25 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
             documentType={tituloDelInforme}
             modo={modoDelInforme}
             fileName={origenDelInforme.fileName}
-            actuacionSugerida={actuacionSugerida}
-            ramaParaLaGuia={ramaParaLaGuia}
-            guiaSinRama={guiaSinRama}
-            onGuiaSinRama={setGuiaSinRama}
-            opcionesRama={opcionesRama}
-            onRamaParaLaGuia={setRamaParaLaGuia}
-            onPedirLaGuia={() => {
-              /*
-               * LOS HECHOS SON LO QUE HALLÓ EL INFORME, Y DEBAJO EL TEXTO DEL
-               * DOCUMENTO. El puente a la guía ya existía y no cambia: sigue
-               * siendo el MISMO diálogo del catálogo, que propone candidatas de
-               * su lista cerrada y las escoge una persona. Lo que cambia es con
-               * qué viaja — antes iba el texto crudo y el catálogo proponía
-               * para «esto que llegó»; ahora encabezan los flancos con su cita,
-               * y las candidatas son las de atacar eso.
-               */
-              setHechos(hechosParaLaGuia(respuesta.informeRecibido, paraElTaller.texto ?? texto.trim()));
-              setGuiaAbierta(true);
-            }}
+            /*
+             * EL PIE DEL DOCUMENTO RECIBIDO ES UNA PIEZA, NO UN FRAGMENTO. La
+             * misma que monta el taller, con su rama, su guía y su salto a
+             * Redacción. Lo que viaja de aquí es solo el material: el texto del
+             * documento —el conservado si lo hay, si no el que se acaba de
+             * pegar— y la rama con la que se abrió el diálogo.
+             */
+            textoDelDocumento={paraElTaller.texto ?? texto.trim()}
+            ramaInicial={legalBranch}
+            userRole={userRole}
+            onRedactar={
+              onRedactar
+                ? (exactName, ramaElegida, hechosDelDocumento, instruccion) => {
+                    /* Redacción es otra pantalla: este diálogo se cierra o taparía el borrador. */
+                    onCerrar();
+                    onRedactar(exactName, ramaElegida, hechosDelDocumento, instruccion);
+                  }
+                : undefined
+            }
           />
         </>
       )}
@@ -1240,23 +1234,16 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
         hechos: allá los escribe el abogado, aquí salen del texto del escrito
         que acaba de adjuntar.
       */}
-      {(eligeActuacion || esRecibido) && (
+      {eligeActuacion && (
         <>
           <GuiaEligeActuacionDialog
             abierto={guiaAbierta}
             onCerrar={() => setGuiaAbierta(false)}
             legalBranch={ramaDeLaGuia}
-            sinRamaInicial={guiaSinRama}
             hechos={hechos}
             setHechos={setHechos}
             onElegir={(exactName) => {
-              /*
-               * En el modo recibido la elección NO cambia contra qué se revisó
-               * —eso ya ocurrió y no hubo ficha—: deja anotada la actuación que
-               * el abogado reconoció, para llevarla a la agenda de términos.
-               */
-              if (esRecibido) setActuacionSugerida(exactName);
-              else setTipoPropio(exactName);
+              setTipoPropio(exactName);
               setGuiaAbierta(false);
             }}
             onEscribirNombre={() => {
@@ -1272,8 +1259,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
             onCreada={(exactName) => {
               /* Primero la lista de nuevo, después la elección: al revés, el selector no la encontraría. */
               setRecargaCatalogo((n) => n + 1);
-              if (esRecibido) setActuacionSugerida(exactName);
-              else setTipoPropio(exactName);
+              setTipoPropio(exactName);
               setPropiaAbierta(false);
             }}
           />
@@ -1299,13 +1285,12 @@ interface InformeProps {
   /** Cuál de los dos se leyó. La pantalla lo ROTULA: no se deduce de la forma del informe. */
   modo: ModoDeRevision;
   fileName: string;
-  actuacionSugerida: string;
-  ramaParaLaGuia: string;
-  guiaSinRama: boolean;
-  onGuiaSinRama: (sinRama: boolean) => void;
-  opcionesRama: OpcionCombobox[];
-  onRamaParaLaGuia: (rama: string) => void;
-  onPedirLaGuia: () => void;
+  /** El texto del documento recibido, para que el pie se lo cuente a la guía. */
+  textoDelDocumento: string;
+  /** Con qué rama nace el selector del pie. */
+  ramaInicial: string;
+  userRole: ActuacionRole;
+  onRedactar?: (exactName: string, rama: string, hechos: string, instruccion: string) => void;
 }
 
 const Informe: React.FC<InformeProps> = ({
@@ -1313,13 +1298,10 @@ const Informe: React.FC<InformeProps> = ({
   documentType,
   modo,
   fileName,
-  actuacionSugerida,
-  ramaParaLaGuia,
-  guiaSinRama,
-  onGuiaSinRama,
-  opcionesRama,
-  onRamaParaLaGuia,
-  onPedirLaGuia
+  textoDelDocumento,
+  ramaInicial,
+  userRole,
+  onRedactar
 }) => {
   const esRecibido = modo === 'DOCUMENTO_RECIBIDO';
   const i = respuesta.informe;
@@ -1355,15 +1337,18 @@ const Informe: React.FC<InformeProps> = ({
             <pre className="whitespace-pre-wrap font-sans text-ui leading-relaxed text-ink-900">{respuesta.informeLibre}</pre>
           </>
         ) : (
-          <DocumentoRecibido
+          <LecturaDelDocumentoRecibido
             informe={r}
-            actuacionSugerida={actuacionSugerida}
-            ramaParaLaGuia={ramaParaLaGuia}
-            guiaSinRama={guiaSinRama}
-            onGuiaSinRama={onGuiaSinRama}
-            opcionesRama={opcionesRama}
-            onRamaParaLaGuia={onRamaParaLaGuia}
-            onPedirLaGuia={onPedirLaGuia}
+            pie={
+              <PuenteAlAtaque
+                key={fileName}
+                informe={r}
+                textoDelDocumento={textoDelDocumento}
+                ramaInicial={ramaInicial}
+                userRole={userRole}
+                onRedactar={onRedactar}
+              />
+            }
           />
         )
       ) : !i ? (
@@ -1439,104 +1424,10 @@ const Informe: React.FC<InformeProps> = ({
 
 /* ─── LO QUE EL ABOGADO LEE CUANDO SUBE UN AUTO DE UN JUEZ ──────────────────
  *
- * Cuatro cosas, en el orden en que las necesita: qué es y quién lo profirió,
- * qué decide, QUÉ LE EXIGE Y PARA CUÁNDO —con las palabras del documento al
- * lado— y qué queda pendiente. Después, lo que el documento calla.
- *
- * Y al final el «¿y qué puedo hacer?», que NO lo responde el motor: lo responde
- * el catálogo verificado, a través de la misma guía de actuaciones que este
- * diálogo ya usaba, y la agenda de términos que ya existe.
+ * Se pinta con `LecturaDelDocumentoRecibido` y su pie es `PuenteAlAtaque`. Los
+ * dos son componentes propios y los monta también el taller: mientras el pie
+ * fue un fragmento privado de este archivo, el botón que lleva a la guía de
+ * actuaciones existía SOLO aquí, y el taller —donde el abogado vuelve a leer el
+ * informe días después— no tenía ninguna salida. Por eso no queda aquí ninguna
+ * copia que pueda divergir.
  */
-const DocumentoRecibido: React.FC<{
-  informe: InformeDeDocumentoRecibido;
-  actuacionSugerida: string;
-  ramaParaLaGuia: string;
-  guiaSinRama: boolean;
-  opcionesRama: OpcionCombobox[];
-  onRamaParaLaGuia: (rama: string) => void;
-  onGuiaSinRama: (sinRama: boolean) => void;
-  onPedirLaGuia: () => void;
-}> = ({
-  informe,
-  actuacionSugerida,
-  ramaParaLaGuia,
-  guiaSinRama,
-  opcionesRama,
-  onRamaParaLaGuia,
-  onGuiaSinRama,
-  onPedirLaGuia
-}) => {
-  const puntos = puntosDeAtaqueDe(informe);
-  return (
-    <LecturaDelDocumentoRecibido
-      informe={informe}
-      pie={
-        <>
-      {/* ─── ¿Y QUÉ PUEDO HACER? ─────────────────────────────────────────── */}
-      <section className="rounded-card border border-[rgb(var(--brand-line))] bg-brand-50 px-3 py-3">
-        <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-brand-700">
-          {puntos.length > 0 ? '¿Y con qué lo ataco?' : '¿Y qué puedo hacer?'}
-        </h4>
-        <p className="mt-1 text-[12px] leading-snug text-ink-700 text-justify [text-wrap:pretty]">
-          {puntos.length > 0
-            ? 'El nombre de la actuación no lo pone este informe: lo pone el catálogo. Los flancos de arriba, con sus citas, viajan a la guía de actuaciones junto al texto del documento, y ella propone candidatas para atacar eso, cada una con su término, su artículo y su autoridad verificados. Escoge usted; después ponga el vencimiento en la agenda de términos, desde el icono de calendario de esta revisión en «Revisiones».'
-            : 'Eso ya no lo dice este documento: lo dice el catálogo. Lleve los hechos a la guía de actuaciones y le propondrá candidatas con su término, su artículo y su autoridad verificados; después ponga el vencimiento en la agenda de términos, desde el icono de calendario de esta revisión en «Revisiones».'}
-        </p>
-        <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-end">
-          <div className="min-w-0 flex-1">
-            <Combobox
-              etiqueta="Rama"
-              valor={ramaParaLaGuia}
-              opciones={opcionesRama}
-              onChange={onRamaParaLaGuia}
-              vacio="Elegir rama…"
-              anchoBoton="max-w-full"
-              pie={
-                guiaSinRama
-                  ? 'Se buscará en todo el catálogo: la rama queda sin usar.'
-                  : 'La guía propone dentro de una rama; si no la sabe, márquelo abajo.'
-              }
-            />
-            <label className="mt-1.5 flex cursor-pointer items-start gap-2">
-              <input
-                type="checkbox"
-                checked={guiaSinRama}
-                onChange={(e) => onGuiaSinRama(e.target.checked)}
-                className="mt-0.5 h-3.5 w-3.5 shrink-0 accent-[rgb(var(--brand-700))]"
-              />
-              <span className="min-w-0 text-justify text-[12px] leading-snug text-ink-700 [text-wrap:pretty] [overflow-wrap:anywhere]">
-                No sé la rama: buscar en todo el catálogo.{' '}
-                <span className="text-ink-500">
-                  Cada candidata dirá de cuál viene. Tarda entre diez y quince segundos —contra un
-                  par— y le cuesta a la plataforma unas cuatro veces más.
-                </span>
-              </span>
-            </label>
-          </div>
-          <button
-            type="button"
-            onClick={onPedirLaGuia}
-            disabled={!ramaParaLaGuia && !guiaSinRama}
-            className="btn-secondary btn-sm shrink-0 disabled:opacity-50"
-            title={
-              puntos.length > 0
-                ? 'Propone actuaciones del catálogo para atacar los flancos señalados arriba, con el texto del documento como respaldo'
-                : 'Propone actuaciones del catálogo a partir del texto de este documento'
-            }
-          >
-            <Sparkles className="h-3.5 w-3.5" />
-            {puntos.length > 0 ? 'Llevar los flancos a la guía de actuaciones' : 'Llevar a la guía de actuaciones'}
-          </button>
-        </div>
-        {actuacionSugerida && (
-          <p className="mt-2 rounded-control border border-line-200 bg-canvas px-3 py-2 text-[12px] leading-snug text-ink-900 text-justify">
-            Usted reconoció la actuación <span className="font-semibold">«{actuacionSugerida}»</span>. Su término, su artículo y su autoridad salen de la
-            ficha del catálogo, no de este documento. Póngala en la agenda desde «Revisiones».
-          </p>
-        )}
-      </section>
-        </>
-      }
-    />
-  );
-};

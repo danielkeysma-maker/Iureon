@@ -3,6 +3,8 @@ import type { FormatoDelEscrito } from '../../documents/formatoEnPantalla';
 import { reviewApi, type Anotacion, type ConsentimientoDeGuardado, type InformeDeDocumentoRecibido, type InformeDeRevision, type PreguntasAudienciaGuardadas, type TurnoDelTaller, type VersionDelTexto } from '../services/review.api';
 import { exportarPreguntasAPdf, exportarPreguntasAWord } from '../services/preguntasExport.service';
 import { TallerDeEscrito } from './TallerDeEscrito';
+import { PuenteAlAtaque } from './PuenteAlAtaque';
+import type { ActuacionRole } from '../../catalog/types';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 import { usePlan, usePlanSoloLectura } from '../../subscriptions/PlanContext';
 
@@ -66,6 +68,17 @@ interface TallerDeRevisionProps {
    */
   onLlevarARedaccion: (texto: string) => Promise<void>;
   formatoDeFirma?: FormatoDelEscrito | null;
+  /** Quién firma. Solo para poder escribir una actuación propia de la firma desde el pie. */
+  userRole: ActuacionRole;
+  /**
+   * De un documento recibido a un borrador empezado: la actuación que el
+   * abogado escogió en el catálogo, su rama, los hechos y la instrucción.
+   *
+   * ES OTRO CAMINO QUE «LLEVAR A REDACCIÓN». Aquel copia el texto del taller
+   * como borrador; este abre Redacción para escribir el escrito que ATACA lo
+   * leído, que es una actuación distinta y no una copia de nada.
+   */
+  onRedactarActuacion?: (exactName: string, rama: string, hechos: string, instruccion: string) => void;
 }
 
 export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
@@ -77,7 +90,9 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
   onSaldoCambiado,
   onExportarTexto,
   onLlevarARedaccion,
-  formatoDeFirma
+  formatoDeFirma,
+  userRole,
+  onRedactarActuacion
 }) => {
   /* Con el plan vencido el servidor rechaza crear borradores; el botón lo dice en vez de fallar al pulsarlo. */
   const soloLectura = usePlanSoloLectura();
@@ -177,6 +192,22 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
           versiones: datos.versiones ?? []
         }}
         precioConsultaCop={precioConsultaCop}
+        /*
+          EL PIE SOLO EXISTE CUANDO LO LEÍDO FUE UN DOCUMENTO RECIBIDO. Sobre un
+          escrito propio no hay nada que atacar, y ofrecer ahí la guía de
+          actuaciones propondría redactar contra el escrito del propio abogado.
+        */
+        pieDelInformeRecibido={
+          datos.informeRecibido ? (
+            <PuenteAlAtaque
+              informe={datos.informeRecibido}
+              textoDelDocumento={datos.texto}
+              ramaInicial={datos.legalBranch ?? ''}
+              userRole={userRole}
+              onRedactar={onRedactarActuacion}
+            />
+          ) : undefined
+        }
         precioRevisionCop={datos.revisionId ? precioRevisionCop : undefined}
         guardado={{
           activo: guardaEnServidor,

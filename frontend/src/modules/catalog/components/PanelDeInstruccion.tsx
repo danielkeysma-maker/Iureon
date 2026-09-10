@@ -38,6 +38,18 @@ interface PanelDeInstruccionProps {
   onCancelar: () => void;
   /** Objetivos de toque más grandes y una sola columna. */
   movil?: boolean;
+  /*
+   * SUGERENCIAS QUE NO SALEN DE LA FICHA, y por eso llegan de fuera.
+   *
+   * `sugerenciasDeInstruccion` solo puede citar campos del catálogo —su guarda
+   * lo comprueba renglón por renglón— y hay un caso en que eso no alcanza: al
+   * redactar contra un documento recibido, lo que hace útil la instrucción son
+   * los flancos con su cita, que salen del texto de ESE documento y de ninguna
+   * ficha. Quien tiene ese material lo compone y lo entrega ya escrito; aquí
+   * solo se ofrece, primero de la lista, con las mismas reglas: se escoge, se
+   * edita y se puede no usar.
+   */
+  sugerenciasExtra?: Array<{ id: string; titulo: string; texto: string }>;
 }
 
 export const PanelDeInstruccion: React.FC<PanelDeInstruccionProps> = ({
@@ -45,11 +57,15 @@ export const PanelDeInstruccion: React.FC<PanelDeInstruccionProps> = ({
   hechos,
   onLlevar,
   onCancelar,
-  movil = false
+  movil = false,
+  sugerenciasExtra
 }) => {
   const sugerencias = React.useMemo(
-    () => sugerenciasDeInstruccion(actuacion, hechos),
-    [actuacion, hechos]
+    () => [
+      ...(sugerenciasExtra ?? []),
+      ...sugerenciasDeInstruccion(actuacion, hechos)
+    ],
+    [actuacion, hechos, sugerenciasExtra]
   );
 
   const [texto, setTexto] = React.useState('');

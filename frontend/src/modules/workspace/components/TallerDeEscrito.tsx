@@ -158,6 +158,17 @@ export interface TallerDeEscritoProps {
    */
   cerradas?: { chat?: boolean; rerevisar?: boolean };
   /**
+   * El «¿y qué puedo hacer?» que va al pie de la lectura de un documento
+   * recibido: la guía de actuaciones y el salto a Redacción.
+   *
+   * ENTRA POR AQUÍ Y NO SE CONSTRUYE DENTRO porque necesita el catálogo y saber
+   * llevar a Redacción, y este taller sirve igual para un borrador que para una
+   * revisión. Que faltara era el defecto: el taller montaba la lectura sin pie,
+   * así que en la pantalla donde el abogado vuelve a leer el informe no había
+   * ningún botón, mientras el diálogo de revisión sí lo tenía.
+   */
+  pieDelInformeRecibido?: React.ReactNode;
+  /**
    * El archivo original, para la pestaña «Original». Cuando falta, la pestaña
    * no se ofrece: un botón que solo sirve para decir «aquí no hay nada» enseña
    * a no pulsarlo.
@@ -310,6 +321,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   formato,
   preguntas,
   cerradas,
+  pieDelInformeRecibido,
   original
 }) => {
   /*
@@ -1233,10 +1245,18 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
         <>
           <p className="rounded-control border border-line-200 bg-canvas px-2.5 py-1.5 text-[11.5px] leading-snug text-ink-600 text-justify">
             Lectura de un <span className="font-semibold">documento recibido</span>. Todo lo de abajo sale del texto del propio documento y va citado:
-            ninguna ficha del catálogo respalda estas líneas. Qué actuación procede lo responden la guía de actuaciones y la agenda de términos, desde
-            «Revisiones».
+            ninguna ficha del catálogo respalda estas líneas.{' '}
+            {/*
+              DÓNDE ESTÁ LA RESPUESTA, DICHO DONDE TOCA. Esta línea mandaba al
+              abogado de vuelta a «Revisiones» porque aquí no había pie; con el
+              pie montado, mandarlo a otra pantalla sería enseñarle a no ver el
+              bloque que tiene debajo.
+            */}
+            {pieDelInformeRecibido
+              ? 'Qué actuación procede lo responde el catálogo, en el bloque que cierra esta lectura.'
+              : 'Qué actuación procede lo responden la guía de actuaciones y la agenda de términos, desde «Revisiones».'}
           </p>
-          <LecturaDelDocumentoRecibido informe={datos.informeRecibido} />
+          <LecturaDelDocumentoRecibido informe={datos.informeRecibido} pie={pieDelInformeRecibido} />
         </>
       ) : !informe ? (
         datos.informeLibre ? (

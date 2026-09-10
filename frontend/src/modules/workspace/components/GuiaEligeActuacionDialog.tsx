@@ -63,8 +63,16 @@ interface Props {
   hechos: string;
   /** Se llama al pedir la orientación: lo completado aquí no se pierde. */
   setHechos: (texto: string) => void;
-  /** Con el nombre exacto de la actuación elegida. Cierra el diálogo. */
-  onElegir: (exactName: string) => void;
+  /**
+   * Con el nombre exacto de la actuación elegida. Cierra el diálogo.
+   *
+   * LA RAMA VIAJA CON EL NOMBRE, y no es adorno: buscando en todo el catálogo
+   * la candidata puede venir de una rama distinta a la que trajo quien abrió, y
+   * un nombre de escrito NO es único entre ramas —el mismo rótulo tiene plazos
+   * distintos en dos de ellas—. Sin la rama de la candidata, quien reciba el
+   * nombre volvería a resolverlo contra la rama equivocada.
+   */
+  onElegir: (exactName: string, branch: LegalBranch) => void;
   /** «Ninguna de estas»: abre el diálogo para escribir el nombre. */
   onEscribirNombre: () => void;
   /**
@@ -372,7 +380,7 @@ export const GuiaEligeActuacionDialog: React.FC<Props> = ({
 
                   <button
                     type="button"
-                    onClick={() => onElegir(actuacion.exactName)}
+                    onClick={() => onElegir(actuacion.exactName, actuacion.branch)}
                     className="btn-secondary btn-sm shrink-0"
                   >
                     Elegir esta

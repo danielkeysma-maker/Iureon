@@ -89,6 +89,12 @@ interface AgentPanelLeftProps {
   onSaldoCambiado?: () => void;
   /** Abrir el taller de revision con el escrito y su informe. */
   onAbrirTaller?: (datos: DatosDelTaller) => void;
+  /**
+   * Lleva a Redacción la actuación que el abogado escogió en el catálogo tras
+   * leer un documento recibido, con sus hechos y la instrucción que editó.
+   * Opcional: sin ella el botón no se ofrece, en vez de ofrecerlo muerto.
+   */
+  onRedactar?: (exactName: string, rama: string, hechos: string, instruccion: string) => void;
 }
 
 export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
@@ -105,7 +111,8 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
   onClearActiveDraft,
   ocultoEnMovil = false,
   onSaldoCambiado,
-  onAbrirTaller
+  onAbrirTaller,
+  onRedactar
 }) => {
   const [importedFiles, setImportedFiles] = useState<ArchivoAdjunto[]>([]);
   /** Por qué el último archivo elegido no entró a la lista; se borra al elegir otro. */
@@ -438,8 +445,17 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
             documentType={documentType}
             legalBranch={legalBranch}
             precioCop={2000}
+            /*
+              EL ROL Y EL SALTO A REDACCIÓN VIAJAN TAMBIÉN DESDE AQUÍ. El rol,
+              para poder escribir una actuación propia de la firma sin salir del
+              informe; el salto, porque leer un auto desde Redacción y no poder
+              redactar la respuesta es el mismo callejón sin salida que se
+              reportó en «Revisiones».
+            */
+            userRole={userRole}
             onSaldoCambiado={onSaldoCambiado}
             onAbrirTaller={onAbrirTaller}
+            onRedactar={onRedactar}
           />
 
           {/* ─── FUNDAMENTOS QUE VA A USAR ─────────────────────────────────

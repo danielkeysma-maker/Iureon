@@ -1315,6 +1315,15 @@ export function App() {
                     abrirTallerDeRevision(datos);
                     setMainView('taller');
                   }}
+                  /*
+                   * DEL DOCUMENTO RECIBIDO AL BORRADOR EMPEZADO. Es el MISMO
+                   * `irARedactar` que usa Orientación: la actuación y su rama
+                   * quedan puestas, y los hechos y la instrucción se escriben
+                   * rotulados en el cuadro «Qué debe hacer este escrito». Aquí
+                   * ya se está en Redacción, así que no hay pantalla que cambiar
+                   * — `irARedactar` la deja donde está.
+                   */
+                  onRedactar={irARedactar}
                   activeDraftText={workflow.activeDraftText}
                   onClearActiveDraft={() => workflow.setActiveDraftText(null)}
                 />
@@ -1658,6 +1667,17 @@ export function App() {
                 onCerrar={cerrarTallerDeRevision}
                 onSaldoCambiado={() => void refreshBalance()}
                 onLlevarARedaccion={(texto) => llevarRevisionARedaccion(tallerActivo, texto)}
+                userRole={userRole}
+                /*
+                 * OTRO CAMINO QUE «LLEVAR A REDACCIÓN», y por eso otra función:
+                 * aquel copia el texto del taller como borrador; este abre
+                 * Redacción para escribir el escrito que ATACA lo que se leyó.
+                 * El taller se cierra o taparía el borrador recién abierto.
+                 */
+                onRedactarActuacion={(exactName, rama, hechos, instruccion) => {
+                  cerrarTallerDeRevision();
+                  irARedactar(exactName, rama, hechos, instruccion);
+                }}
                 onExportarTexto={(formato, titulo, texto) => {
                   if (formato === 'word') DocumentExportService.exportToWordDocx(titulo, texto, marcaParaExportar(), opcionesDeExportacion());
                   else void DocumentExportService.exportToPdf(titulo, texto, marcaParaExportar(), opcionesDeExportacion());
@@ -1678,6 +1698,8 @@ export function App() {
                 userRole={userRole}
                 precioRevisionCop={2000}
                 onSaldoCambiado={() => void refreshBalance()}
+                /* El diálogo ya se cerró solo; aquí solo queda mudarse a Redacción. */
+                onRedactar={irARedactar}
               />
             ))}
           {mainView === 'orientacion' && (
