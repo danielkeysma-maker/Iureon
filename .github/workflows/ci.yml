@@ -82,6 +82,8 @@ jobs:
         run: npm run check:agenda
       - name: Revision (the received-document report never fills in a term the document does not state)
         run: npm run check:revision
+      - name: Taller (the chat over a received document never proposes edits to it)
+        run: npm run check:taller
       - name: Sin nombre (a draft with no ficha never states an article, a term or an authority)
         run: npm run check:sin-nombre
 

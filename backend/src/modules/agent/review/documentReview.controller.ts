@@ -31,7 +31,7 @@ import {
   type ModoDeRevision
 } from './documentReview';
 import { documentReviewStore } from './documentReview.store';
-import { MAX_CARACTERES_MENSAJE, buildTallerSystemPrompt, buildTallerUserPrompt, parsearRespuestaDelTaller, type TurnoDelTaller } from './taller';
+import { MAX_CARACTERES_MENSAJE, buildTallerSystemPrompt, buildTallerSystemPromptRecibido, buildTallerUserPrompt, parsearRespuestaDelTaller, type TurnoDelTaller } from './taller';
 import { verificarProvidencias } from './verificarProvidencias';
 
 /**
@@ -630,15 +630,39 @@ export const reviewChatController = async (req: Request, res: Response): Promise
 
   const operationId = randomUUID();
   try {
-    const guidance = buildCatalogGuidance(revision.documentType, (revision.legalBranch ?? undefined) as LegalBranch | undefined);
+    /*
+     * EL CHAT SOBRE UN DOCUMENTO RECIBIDO ES OTRA CONVERSACIÓN.
+     *
+     * Hasta hoy había una sola: la del escrito propio, que dice «acompañas al
+     * abogado mientras lo CORRIGE» y devuelve ediciones con botón «Aplicar».
+     * Sobre el auto de un juez eso proponía corregir la providencia ajena —que
+     * ya está proferida— y cobraba por hacerlo. Y viajaba CIEGO: se le pasaba
+     * `revision.informe`, que en este modo es null, así que el revisor no veía
+     * ni las cargas, ni los plazos citados, ni los flancos que él mismo halló.
+     */
+    const esRecibido = revision.modo === 'DOCUMENTO_RECIBIDO';
+    const guidance = esRecibido
+      ? null
+      : buildCatalogGuidance(revision.documentType, (revision.legalBranch ?? undefined) as LegalBranch | undefined);
     const historial = historialCliente.length ? historialCliente : revision.conversacion;
     // Las sentencias que el abogado nombra se consultan en el índice oficial ANTES de preguntar: la guía responde con la fuente, no de memoria.
     const verificaciones = await verificarProvidencias([mensaje, ...anotacionesDelAbogado.map((a) => a.nota ?? '')]);
     const llamada = await conLimite(
       callOpenRouterWithUsage(
         ENGINE.OPUS,
-        buildTallerSystemPrompt(),
-        buildTallerUserPrompt({ documentType: revision.documentType, guidance, informe: revision.informe, textoActual: texto.texto, historial, mensaje, anotaciones: anotacionesDelAbogado, verificaciones }),
+        esRecibido ? buildTallerSystemPromptRecibido() : buildTallerSystemPrompt(),
+        buildTallerUserPrompt({
+          documentType: revision.documentType,
+          guidance,
+          informe: revision.informe,
+          informeRecibido: revision.informeRecibido,
+          recibido: esRecibido,
+          textoActual: texto.texto,
+          historial,
+          mensaje,
+          anotaciones: anotacionesDelAbogado,
+          verificaciones
+        }),
         /*
          * 4.000 y no 2.500: una respuesta de la guía con tres puntos titulados
          * y una edición propuesta pasaba de 2.500 tokens y llegaba cortada a
@@ -656,6 +680,13 @@ export const reviewChatController = async (req: Request, res: Response): Promise
       return;
     }
     const respuesta = parsearRespuestaDelTaller(llamada.text);
+    /*
+     * LA GARANTÍA VIVE AQUÍ, NO EN EL PROMPT. Un documento recibido no se
+     * edita: ya está proferido. El prompt lo prohíbe, pero un prompt es una
+     * petición y esto es una promesa — si el modelo devolviera una edición, la
+     * pantalla pintaría un botón «Aplicar» sobre el auto de un juez.
+     */
+    if (esRecibido) respuesta.ediciones = [];
     if (llamada.truncated) {
       // El proveedor paró por longitud: lo escrito es lo que cupo. Se dice, y se
       // ofrece la salida, en vez de dejar una frase a medias como si fuera el final.

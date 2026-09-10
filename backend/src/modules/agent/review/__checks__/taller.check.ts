@@ -5,6 +5,7 @@
 import {
   MAX_TURNOS_EN_CONTEXTO,
   buildTallerSystemPrompt,
+  buildTallerSystemPromptRecibido,
   buildTallerUserPrompt,
   parsearRespuestaDelTaller,
   recortarHistorial,
@@ -103,6 +104,73 @@ check('un JSON con respuesta vacía cae a la prosa cruda, nunca a nada', vacia.r
   check('un JSON cortado a mitad de la respuesta se rescata como prosa legible, sin barras ni comillas escapadas', r.respuesta.startsWith('Le respondo en tres planos.') && r.respuesta.includes('\n\n1) HECHOS') && r.respuesta.includes('"funcionario de hecho"') && !r.respuesta.includes('\\n') && r.ediciones.length === 0);
   const cortadoEnEdiciones = '{"respuesta":"Texto completo.","ediciones":[{"cita":"a","reempl';
   check('si el corte cae en las ediciones, la respuesta se conserva entera y las ediciones se pierden', parsearRespuestaDelTaller(cortadoEnEdiciones).respuesta === 'Texto completo.');
+}
+
+/*
+ * ─── EL CHAT SOBRE UN DOCUMENTO RECIBIDO ────────────────────────────────────
+ *
+ * Un auto del juez YA ESTÁ PROFERIDO: no se corrige. El prompt del escrito
+ * propio decía «acompañas al abogado mientras lo CORRIGE» y devolvía ediciones
+ * con botón «Aplicar»; usado sobre una providencia ajena, proponía corregirla
+ * —y cobraba—. Estos casos fijan que los dos modos no vuelvan a ser uno.
+ */
+{
+  const recibido = buildTallerSystemPromptRecibido();
+  check('el modo recibido dice que el documento no es del abogado y no se corrige', /NO ES SUYO/.test(recibido) && /no se corrige|NO SE PUEDE CORREGIR/i.test(recibido));
+  check('y prohíbe proponer ediciones, con el campo siempre vacío', /"ediciones"\s*:\s*\[\]/.test(recibido) && /SIEMPRE vac[íi]o/i.test(recibido));
+  check('no le pide al revisor corregir el escrito, como sí hace el otro modo', !/mientras lo corrige/i.test(recibido));
+  check('ancla lo que afirme en el texto del propio documento', /EN EL TEXTO DEL DOCUMENTO/.test(recibido) && /lo citas/.test(recibido));
+  check('prohíbe afirmar normas que el documento no transcriba y citar jurisprudencia de memoria', /no transcribe/i.test(recibido) && /de memoria/i.test(recibido));
+  check('y prohíbe declarar que algo es ilegal o nulo: señala el flanco y concluye el abogado', /ilegal o nulo/i.test(recibido) && /concluye el abogado/i.test(recibido));
+  check('un plazo que el documento no anuncia no se completa de memoria', /no anuncia/i.test(recibido));
+
+  /*
+   * EL PROMPT DE USUARIO NO PUEDE FINGIR UNA ACTUACIÓN NI UNA FICHA. Decía
+   * «ACTUACIÓN: "Documento recibido"», que es la etiqueta del producto, no una
+   * actuación del catálogo.
+   */
+  const base = {
+    documentType: 'Documento recibido',
+    guidance: null,
+    informe: null,
+    textoActual: 'AUTO. Se decreta la practica de pruebas.',
+    historial: [] as TurnoDelTaller[],
+    mensaje: '¿Qué me exige este auto?'
+  };
+  const uRecibido = buildTallerUserPrompt({ ...base, recibido: true });
+  check('el prompt de usuario del modo recibido no anuncia una actuación', !/ACTUACIÓN: "/.test(uRecibido));
+  check('ni anuncia una ficha verificada que no existe', /NO HAY FICHA/.test(uRecibido) && !/FICHA VERIFICADA DE LA ACTUACIÓN/.test(uRecibido));
+  check('y llama al texto por lo que es, un documento recibido', /TEXTO DEL DOCUMENTO RECIBIDO/.test(uRecibido) && !/TEXTO ACTUAL DEL ESCRITO/.test(uRecibido));
+
+  /*
+   * Y NO PUEDE VIAJAR CIEGO. Se le pasaba `informe`, que en este modo es null,
+   * así que el revisor entraba sin ver lo que él mismo había hallado.
+   */
+  const conInforme = buildTallerUserPrompt({
+    ...base,
+    recibido: true,
+    informeRecibido: {
+      queEs: 'Auto que decreta pruebas',
+      quienLoProfirio: 'Juzgado Primero Civil del Circuito',
+      radicado: '2026-00345',
+      fecha: '3 de septiembre de 2026',
+      decide: ['Decreta la práctica de interrogatorio'],
+      cargas: [{ carga: 'Aportar el dictamen', plazo: 'treinta (30) días', cita: 'por el término de treinta (30) días' }],
+      loQueSigue: ['Audiencia por fijar'],
+      noLoDiceElDocumento: ['No dice desde cuándo corre el término'],
+      porDondeSeAtaca: [
+        { clase: 'NO_RESUELVE', cita: 'ABRIR PERIODO PROBATORIO', norma: '', citaDeLaNorma: '', lectura: 'No se pronuncia sobre el vencimiento del término que él mismo fijó' }
+      ]
+    }
+  });
+  check('el informe del documento recibido llega al chat, con sus cargas', /INFORME DEL DOCUMENTO RECIBIDO/.test(conInforme) && /Aportar el dictamen/.test(conInforme));
+  check('y con el plazo que el documento anuncia, tal como lo anuncia', /treinta \(30\) días/.test(conInforme));
+  check('y con los flancos que el informe halló', /No se pronuncia sobre el vencimiento/.test(conInforme));
+  check('sin el informe, se dice que no lo hay en vez de callarlo', /No hay informe previo estructurado/.test(uRecibido));
+
+  /* El modo propio no cambia: si lo hiciera, el arreglo habría roto lo que funcionaba. */
+  const uPropio = buildTallerUserPrompt({ ...base, documentType: 'Recurso de reposición', guidance: 'FICHA' });
+  check('el modo del escrito propio sigue anunciando su actuación y su texto actual', /ACTUACIÓN: "Recurso de reposición"/.test(uPropio) && /TEXTO ACTUAL DEL ESCRITO/.test(uPropio));
 }
 
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);

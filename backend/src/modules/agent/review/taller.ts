@@ -21,7 +21,7 @@
  * Mismas reglas que el informe: nada de providencias inventadas; lo que exige
  * la norma sale de la ficha; el resto es criterio y se dice.
  */
-import type { InformeDeRevision } from './documentReview';
+import type { InformeDeDocumentoRecibido, InformeDeRevision } from './documentReview';
 import { renderVerificaciones, type ProvidenciaVerificada } from './verificarProvidencias';
 
 export interface TurnoDelTaller {
@@ -61,6 +61,49 @@ export const MAX_TURNOS_EN_CONTEXTO = 12;
 /** Un turno del abogado más largo que esto es un escrito pegado por error, no una pregunta. */
 export const MAX_CARACTERES_MENSAJE = 4_000;
 
+/**
+ * EL CHAT SOBRE UN DOCUMENTO RECIBIDO NO ES EL MISMO CHAT.
+ *
+ * ─── QUÉ ESTABA PASANDO ─────────────────────────────────────────────────────
+ *
+ * Había un solo prompt, escrito para el escrito propio: «eres el mismo revisor
+ * que emitió el informe sobre este escrito, y ahora acompañas al abogado
+ * mientras lo CORRIGE», con ediciones «listas para pegar» y un botón «Aplicar»
+ * en la pantalla. Sobre un auto del juez, eso proponía corregir la providencia
+ * ajena como si fuera el borrador del abogado. Y cobraba por hacerlo.
+ *
+ * Además viajaba CIEGO: el controlador pasaba `informe`, que en el modo
+ * recibido es null, así que el prompt decía «no hay informe previo» y el
+ * revisor no veía nada de lo que él mismo había hallado —ni las cargas, ni los
+ * plazos citados, ni los flancos—.
+ *
+ * ─── LA REGLA DE FONDO ──────────────────────────────────────────────────────
+ *
+ * Un documento recibido NO SE EDITA. Ya está proferido. Lo que el abogado
+ * necesita del chat es entenderlo y encontrar por dónde atacarlo, y toda
+ * afirmación tiene que anclarse en el propio texto del documento, porque aquí
+ * no hay ficha del catálogo que respalde nada.
+ */
+export const buildTallerSystemPromptRecibido = (): string => `Eres el mismo revisor senior que leyó el documento que el abogado RECIBIÓ —un auto, una sentencia, un oficio, una notificación— y emitió el informe sobre él. Ahora el abogado te pregunta sobre ese documento. El documento NO ES SUYO y NO SE PUEDE CORREGIR: ya está proferido.
+
+QUÉ HACES: explicarle qué dice el documento y qué le exige; señalarle por dónde se ataca; y, cuando te lo pida, ayudarle a preparar el escrito con el que va a responder. Contestas sobre el TEXTO DEL DOCUMENTO, que te llega completo en cada turno.
+
+LO QUE NUNCA HACES, y es la diferencia con el otro modo: NO propones editar ni reescribir el documento. NO existe «aplicar un cambio» sobre él. El campo "ediciones" va SIEMPRE vacío en este modo, sin excepción; si lo que quieres es sugerir cómo redactar la respuesta del abogado, escríbelo dentro de "respuesta".
+
+DE DÓNDE SALE LO QUE AFIRMAS: aquí no hay ficha verificada del catálogo. Solo puedes afirmar lo que esté EN EL TEXTO DEL DOCUMENTO, y lo citas. Si el documento se apoya en una norma, puedes señalar la tensión entre lo que esa norma dice —según el propio documento la transcribe— y lo que el documento concluye. Lo que NO puedes: afirmar el contenido de una norma que el documento no transcribe, citar jurisprudencia de memoria, o declarar que algo es ilegal o nulo. Señalas el flanco con la cita; concluye el abogado.
+
+SI EL DOCUMENTO NO DICE ALGO, ESO SE DICE. Un plazo que el documento no anuncia no se completa de memoria: se responde que el documento no lo anuncia y que el término se consulta en la guía de actuaciones, donde viene con su artículo y su autoridad verificados.
+
+LAS MARCAS Y LOS COMENTARIOS DEL ABOGADO funcionan igual que siempre: si el mensaje trae «MARCAS DEL ABOGADO» o «COMENTARIOS DEL ABOGADO», son pasajes que él resaltó o anotó sobre el documento; cuando te hable de «lo amarillo» o «mi comentario», se refiere a eso.
+
+RESPONDE ÚNICAMENTE CON UN OBJETO JSON, sin texto antes ni después:
+{
+  "respuesta": "tu respuesta al abogado, en prosa clara; puedes usar saltos de línea",
+  "ediciones": [],
+  "referencias": ["pasaje LITERAL del documento al que tu respuesta se refiere, para que la pantalla lo resalte; 3 a 40 palabras cada uno"]
+}
+"referencias" son los lugares del documento de los que hablas, copiados exactos; máximo seis; vacío si tu respuesta no se refiere a ningún pasaje concreto. "ediciones" SIEMPRE vacío. Español jurídico colombiano, neutro y preciso.`;
+
 export const buildTallerSystemPrompt = (): string => `Eres el mismo revisor senior que emitió el informe sobre este escrito, y ahora acompañas al abogado mientras lo corrige. Contestas sobre el TEXTO ACTUAL del escrito, que te llega completo en cada turno con los cambios que el abogado ya hizo; no sobre la versión anterior.
 
 QUÉ HACES: responder lo que te pregunten con criterio profesional franco; cuando te pidan redactar o reformular un pasaje, lo redactas concreto y listo para pegar; cuando te pregunten «cómo va», dices qué mejoró, qué sigue fallando y qué falta, sin repetir hallazgos ya corregidos.
@@ -96,6 +139,36 @@ const resumirInforme = (i: InformeDeRevision): string =>
     .filter(Boolean)
     .join('\n');
 
+/**
+ * El informe del documento recibido, resumido para el chat.
+ *
+ * Sin esto el revisor entra a la conversación sin saber lo que él mismo halló:
+ * el controlador le pasaba `informe`, que en este modo es null, y el prompt
+ * decía «no hay informe previo estructurado». El abogado preguntaba «¿y el
+ * plazo?» y el revisor no tenía delante ni las cargas ni sus citas.
+ */
+const resumirInformeRecibido = (i: InformeDeDocumentoRecibido): string =>
+  [
+    `Qué es: ${i.queEs}`,
+    i.quienLoProfirio ? `Quién lo profirió: ${i.quienLoProfirio}` : '',
+    (i.decide ?? []).length ? `Qué decide: ${(i.decide ?? []).join(' | ')}` : '',
+    (i.cargas ?? []).length
+      ? `Qué le exige al abogado: ${(i.cargas ?? [])
+          .map((c) => `${c.carga}${c.plazo ? ` (plazo que el documento anuncia: ${c.plazo})` : ' (el documento NO anuncia plazo)'}`)
+          .join(' | ')}`
+      : '',
+    (i.porDondeSeAtaca ?? []).length
+      ? `Flancos señalados: ${(i.porDondeSeAtaca ?? [])
+          .map((p) => `${p.lectura}${p.cita ? ` [dice el documento: «${p.cita}»]` : ''}`)
+          .join(' | ')}`
+      : '',
+    (i.noLoDiceElDocumento ?? []).length
+      ? `Lo que el documento no dice: ${(i.noLoDiceElDocumento ?? []).join(' | ')}`
+      : ''
+  ]
+    .filter(Boolean)
+    .join('\n');
+
 /** Los últimos turnos, tal cual; los anteriores, una línea que dice que hubo más. */
 export const recortarHistorial = (turnos: TurnoDelTaller[], max = MAX_TURNOS_EN_CONTEXTO): TurnoDelTaller[] =>
   turnos.length <= max ? turnos : turnos.slice(turnos.length - max);
@@ -104,6 +177,10 @@ export const buildTallerUserPrompt = (input: {
   documentType: string;
   guidance: string | null;
   informe: InformeDeRevision | null;
+  /** El informe del documento recibido. Sin esto el revisor entra ciego a su propia conversación. */
+  informeRecibido?: InformeDeDocumentoRecibido | null;
+  /** Qué se leyó. En el modo recibido no hay actuación ni ficha, y el prompt no debe fingir que sí. */
+  recibido?: boolean;
   textoActual: string;
   historial: TurnoDelTaller[];
   mensaje: string;
@@ -112,10 +189,23 @@ export const buildTallerUserPrompt = (input: {
   /** Sentencias que el abogado nombró, ya consultadas en el índice oficial. */
   verificaciones?: ProvidenciaVerificada[];
 }): string => {
-  const ficha = input.guidance
-    ? `FICHA VERIFICADA DE LA ACTUACIÓN:\n${input.guidance}`
-    : 'La actuación no está catalogada: no hay ficha verificada; lo objetivo, solo con artículo exacto.';
-  const informe = input.informe ? `INFORME ORIGINAL (resumen):\n${resumirInforme(input.informe)}` : 'No hay informe previo estructurado.';
+  /*
+   * EN EL MODO RECIBIDO NO HAY FICHA NI ACTUACIÓN, Y NO SE FINGE QUE LAS HAY.
+   * El prompt decía «ACTUACIÓN: "Documento recibido"» —una etiqueta del
+   * producto, no una actuación— y anunciaba una ficha que no existe.
+   */
+  const ficha = input.recibido
+    ? 'NO HAY FICHA: esto no es una actuación del catálogo, es un documento que el abogado recibió. Solo puedes afirmar lo que esté en su texto, y lo citas.'
+    : input.guidance
+      ? `FICHA VERIFICADA DE LA ACTUACIÓN:\n${input.guidance}`
+      : 'La actuación no está catalogada: no hay ficha verificada; lo objetivo, solo con artículo exacto.';
+  const informe = input.recibido
+    ? input.informeRecibido
+      ? `INFORME DEL DOCUMENTO RECIBIDO (resumen):\n${resumirInformeRecibido(input.informeRecibido)}`
+      : 'No hay informe previo estructurado.'
+    : input.informe
+      ? `INFORME ORIGINAL (resumen):\n${resumirInforme(input.informe)}`
+      : 'No hay informe previo estructurado.';
   const historial = recortarHistorial(input.historial);
   const omitidos = input.historial.length - historial.length;
   const conversacion = historial.length
@@ -137,7 +227,7 @@ export const buildTallerUserPrompt = (input: {
     ? `COMENTARIOS DEL ABOGADO (notas sobre pasajes concretos):\n${comentarios.map((c) => `- Sobre «${c.cita}»: ${(c.nota ?? '').trim()}`).join('\n')}`
     : 'El abogado no ha dejado comentarios sobre pasajes.';
 
-  return `ACTUACIÓN: "${input.documentType}".
+  return `${input.recibido ? 'DOCUMENTO QUE EL ABOGADO RECIBIÓ (no es un escrito suyo y no se corrige)' : `ACTUACIÓN: "${input.documentType}"`}.
 
 ${ficha}
 
@@ -149,7 +239,7 @@ ${marcas}
 
 ${notas}${verificacion ? `\n\n${verificacion}` : ''}
 
-TEXTO ACTUAL DEL ESCRITO (con los cambios que el abogado ya hizo):
+${input.recibido ? 'TEXTO DEL DOCUMENTO RECIBIDO:' : 'TEXTO ACTUAL DEL ESCRITO (con los cambios que el abogado ya hizo):'}
 """
 ${input.textoActual}
 """
