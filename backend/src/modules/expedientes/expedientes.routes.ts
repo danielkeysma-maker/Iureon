@@ -1,0 +1,47 @@
+import { Router } from 'express';
+import { bloquearSiPlanVencido } from '../subscriptions/planVigente.middleware';
+import {
+  actualizarExpedienteController,
+  agregarActorController,
+  atarPiezaController,
+  borrarActorController,
+  borrarExpedienteController,
+  crearExpedienteController,
+  listarExpedientesController,
+  obtenerExpedienteController
+} from './expedientes.controller';
+
+/**
+ * Los expedientes de la firma.
+ *
+ * ─── EL ORDEN DE ESTE ARCHIVO NO ES ESTÉTICO ───────────────────────────────
+ *
+ * `/expedientes/atar` va ANTES que `/expedientes/:id`. Con Express, la segunda
+ * casaría con la primera y `atar` se leería como el identificador de un
+ * expediente: la petición de atar terminaría intentando actualizar un
+ * expediente llamado «atar», y el error sería un 404 que no explica nada.
+ * `clients.routes.ts` ya toma esta precaución con `/clients/link`.
+ *
+ * ─── EL PLAN VENCIDO BLOQUEA LO QUE ESCRIBE, NO LO QUE LEE ─────────────────
+ *
+ * Misma regla que la agenda: una firma que no ha pagado sigue viendo sus
+ * expedientes. Quitarle la vista de sus propios asuntos por un pago atrasado
+ * sería tomarle el trabajo de rehén, y además es lo que necesita consultar
+ * justamente cuando está decidiendo si renueva.
+ */
+const router = Router();
+
+router.get('/expedientes', listarExpedientesController as any);
+router.post('/expedientes', bloquearSiPlanVencido, crearExpedienteController as any);
+
+/* ANTES de `/:id`. Ver la nota de arriba. */
+router.patch('/expedientes/atar', bloquearSiPlanVencido, atarPiezaController as any);
+
+router.get('/expedientes/:id', obtenerExpedienteController as any);
+router.patch('/expedientes/:id', bloquearSiPlanVencido, actualizarExpedienteController as any);
+router.delete('/expedientes/:id', bloquearSiPlanVencido, borrarExpedienteController as any);
+
+router.post('/expedientes/:id/actores', bloquearSiPlanVencido, agregarActorController as any);
+router.delete('/expedientes/:id/actores/:actorId', bloquearSiPlanVencido, borrarActorController as any);
+
+export const expedientesRoutes = router;

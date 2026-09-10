@@ -72,13 +72,26 @@ check(
     !permiteModulo('ESENCIAL', 'ENTREVISTAS') &&
     !permiteModulo('ESENCIAL', 'ORIENTACION')
 );
+/*
+ * ERAN NUEVE Y SON DIEZ: entró EXPEDIENTES, y entró en el plan BASE.
+ *
+ * No es generosidad suelta. El expediente es la estantería de lo que ESENCIAL
+ * ya vende —Redacción, Borradores y Revisiones—, y venderlos sin una forma de
+ * agrupar por asunto es vender las piezas sin dónde ponerlas. Además no hace
+ * una sola llamada al motor: su costo es una tabla, así que reservarlo para
+ * Premium sería cobrar por ordenar.
+ *
+ * El conteo se deja escrito a mano A PROPÓSITO. Un módulo nuevo pone este
+ * check en rojo y obliga a decidir en qué plan entra, que es exactamente la
+ * decisión que no debe tomarse por descuido.
+ */
 check(
-  'ESENCIAL sí incluye los nueve módulos básicos',
-  (['REDACCION', 'BORRADORES', 'REVISIONES', 'BUSCADOR', 'CATALOGO', 'HERRAMIENTAS', 'MANUAL', 'SOPORTE', 'MEMBRETE'] as const).every((m) =>
+  'ESENCIAL sí incluye los diez módulos básicos, y el expediente es uno de ellos',
+  (['REDACCION', 'BORRADORES', 'REVISIONES', 'BUSCADOR', 'CATALOGO', 'HERRAMIENTAS', 'MANUAL', 'SOPORTE', 'MEMBRETE', 'EXPEDIENTES'] as const).every((m) =>
     permiteModulo('ESENCIAL', m)
-  ) && PLANES.ESENCIAL.modulos.length === 9
+  ) && PLANES.ESENCIAL.modulos.length === 10
 );
-check('PREMIUM incluye todos los módulos', TODOS_LOS_MODULOS.every((m) => permiteModulo('PREMIUM', m)) && TODOS_LOS_MODULOS.length === 12);
+check('PREMIUM incluye todos los módulos', TODOS_LOS_MODULOS.every((m) => permiteModulo('PREMIUM', m)) && TODOS_LOS_MODULOS.length === 13);
 check('FIRMA incluye exactamente los mismos módulos que PREMIUM', PLANES.FIRMA.modulos === PLANES.PREMIUM.modulos);
 check(
   'una firma sin plan (cortesía legacy) ve todos los módulos',
@@ -92,8 +105,8 @@ check(
     modulosDisponibles('PREMIUM', ['AUDIENCIAS']).length === TODOS_LOS_MODULOS.length - 1
 );
 check(
-  'la resta no añade: ESENCIAL menos ORIENTACION sigue siendo los nueve básicos',
-  modulosDisponibles('ESENCIAL', ['ORIENTACION']).length === 9 &&
+  'la resta no añade: ESENCIAL menos ORIENTACION sigue siendo los diez básicos',
+  modulosDisponibles('ESENCIAL', ['ORIENTACION']).length === 10 &&
     modulosDisponibles('ESENCIAL', ['ORIENTACION']).every((m) => PLANES.ESENCIAL.modulos.includes(m))
 );
 check(

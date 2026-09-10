@@ -32,6 +32,7 @@ export type Modulo =
   | 'MANUAL'
   | 'SOPORTE'
   | 'MEMBRETE'
+  | 'EXPEDIENTES'
   | 'AUDIENCIAS'
   | 'ENTREVISTAS'
   | 'ORIENTACION';
@@ -54,7 +55,15 @@ const MODULOS_ESENCIAL: readonly Modulo[] = [
   'HERRAMIENTAS',
   'MANUAL',
   'SOPORTE',
-  'MEMBRETE'
+  'MEMBRETE',
+  /*
+   * EL EXPEDIENTE VA EN EL PLAN BASE, y no es generosidad suelta: es la
+   * estantería de lo que ESENCIAL ya vende. Redacción, Borradores y Revisiones
+   * están ahí; venderlos sin una forma de agrupar por asunto es vender las
+   * piezas sin dónde ponerlas. Además no hace una sola llamada al motor — su
+   * costo es una tabla— así que reservarlo para Premium cobraría por ordenar.
+   */
+  'EXPEDIENTES'
 ];
 
 export const TODOS_LOS_MODULOS: readonly Modulo[] = [
@@ -144,6 +153,7 @@ export type Funcion =
   | 'REVISIONES.CHAT_GUIA'
   | 'REVISIONES.REREVISAR'
   | 'REVISIONES.PREGUNTAS_AUDIENCIA'
+  | 'EXPEDIENTES.ACTORES'
   | 'AUDIENCIAS.RESUMEN'
   | 'ENTREVISTAS.RESUMEN'
   | 'ENTREVISTAS.GUION';
@@ -192,6 +202,13 @@ export const FUNCIONES: ReadonlyArray<FuncionDefinition> = [
     modulo: 'AUDIENCIAS',
     nombre: 'Resumen y hechos relevantes de la audiencia',
     descripcion: 'El resumen con hechos anclados al minuto, generado desde el transcrito.'
+  },
+  {
+    id: 'EXPEDIENTES.ACTORES',
+    modulo: 'EXPEDIENTES',
+    nombre: 'Quién es quién en el asunto',
+    descripcion:
+      'Las partes, los testigos y los peritos del expediente, con su lado y sobre qué pueden declarar. Es lo que le da nombre propio a las preguntas de audiencia.'
   },
   {
     id: 'ENTREVISTAS.RESUMEN',

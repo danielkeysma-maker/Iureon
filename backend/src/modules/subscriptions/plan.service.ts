@@ -247,6 +247,7 @@ export const NOMBRE_DE_MODULO: Record<Modulo, string> = {
   MANUAL: 'Manual',
   SOPORTE: 'Soporte',
   MEMBRETE: 'Membrete',
+  EXPEDIENTES: 'Expedientes',
   AUDIENCIAS: 'Audiencias',
   ENTREVISTAS: 'Entrevistas',
   ORIENTACION: 'Orientación'
