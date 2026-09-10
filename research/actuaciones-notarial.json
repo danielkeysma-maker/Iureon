@@ -20,13 +20,105 @@
       "NOTARIAL: REGISTRO CIVIL DE NACIMIENTO Y DEFUNCIÓN (Cap. 12 del Título 6, arts. 2.2.6.12.x) — no se cataloga en esta pasada. Sólo se cubre la corrección del registro civil, que sí se agrega. El resto del registro del estado civil sigue siendo el hueco que el catálogo ya declaraba.",
       "NOTARIAL, verificado el esta pasada: QUÉ SE CONFIRMÓ, NORMA POR NORMA. (1) Decreto Ley 960 de 1970 (Estatuto del Notariado): VIGENTE, leído artículo por artículo en https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=149249. El texto servido trae las reformas del Decreto 2163 de 1970 (arts. 62, 65, 87) y la del art. 61 del Decreto Ley 2106 de 2019 sobre el art. 79 (copias digitalizadas o electrónicas), de modo que la versión leída es la reformada y no la original. (2) Decreto 2148 de 1983: DEROGADO Y COMPILADO. Su ficha oficial (https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=5227) dice a la vez 'Derogado por Decreto 1069 de 2015' y 'Compilado por el Decreto 1069 de 2015'. Citarlo hoy como norma autónoma es un error: sus arts. 9, 10, 47 a 55 y 142 a 146 viven ahora en los arts. 2.2.6.1.2.1.2, 2.2.6.1.2.1.3, 2.2.6.1.3.1.1, 2.2.6.1.3.2.1 a 2.2.6.1.3.2.5, 2.2.6.1.4.1.1 a 2.2.6.1.4.1.3, 2.2.6.1.7.1.2 y 2.2.6.1.8.1.1 a 2.2.6.1.8.1.2 del Decreto 1069 de 2015, y esas fichas los citan así. (3) Decreto 1069 de 2015: VIGENTE; su art. 3.1.1 es una DEROGATORIA INTEGRAL: 'Este decreto regula íntegramente las materias contempladas en él. Por consiguiente, de conformidad con el art. 3 de la Ley 153 de 1887, quedan derogadas todas las disposiciones de naturaleza reglamentaria relativas al Sector Justicia y del Derecho que versan sobre las mismas materias' (leído en https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=74174). Por esa vía quedaron derogados-y-compilados, además del Dec"
     ],
-    "unverified": []
+    "unverified": [],
+    "fundamentos_sustanciales": [
+      {
+        "actuacion": "notarial/solicitud-de-divorcio-ante-notario-por-mutuo-acuerdo",
+        "norma": "Código Civil",
+        "articulo": 154,
+        "rubrica": "ARTÍCULO 154. CAUSALES DE DIVORCIO",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr004.html#154",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "notarial/escritura-publica-de-divorcio-o-de-cesacion-de-efectos-civiles-del-matrimonio-religioso-ante-notario",
+        "norma": "Código Civil",
+        "articulo": 152,
+        "rubrica": "ARTÍCULO 152. CAUSALES Y EFECTOS DE LA DISOLUCIÓN",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr004.html#152",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "notarial/escritura-publica-de-divorcio-o-de-cesacion-de-efectos-civiles-del-matrimonio-religioso-ante-notario",
+        "norma": "Código Civil",
+        "articulo": 154,
+        "rubrica": "ARTÍCULO 154. CAUSALES DE DIVORCIO",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr004.html#154",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "notarial/solicitud-de-liquidacion-de-herencia-ante-notario",
+        "norma": "Código Civil",
+        "articulo": 1012,
+        "rubrica": "ARTÍCULO 1012. APERTURA DE LA SUCESIÓN",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr031.html#1012",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "notarial/solicitud-de-liquidacion-de-herencia-ante-notario",
+        "norma": "Código Civil",
+        "articulo": 1013,
+        "rubrica": "ARTÍCULO 1013. DELACIÓN DE ASIGNACIONES",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr031.html#1013",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "notarial/solicitud-de-liquidacion-de-sociedad-conyugal-ante-notario",
+        "norma": "Código Civil",
+        "articulo": 1820,
+        "rubrica": "ARTÍCULO 1820. CAUSALES DE DISOLUCIÓN DE LA SOCIEDAD CONYUGAL",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr056.html#1820",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "notarial/solicitud-de-liquidacion-de-sociedad-conyugal-ante-notario",
+        "norma": "Código Civil",
+        "articulo": 1821,
+        "rubrica": "ARTÍCULO 1821. LIQUIDACIÓN DE LA SOCIEDAD",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr056.html#1821",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "notarial/solicitud-de-liquidacion-de-sociedad-conyugal-ante-notario",
+        "norma": "Código Civil",
+        "articulo": 1830,
+        "rubrica": "ARTÍCULO 1830. DIVISIÓN DEL RESIDUO",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr056.html#1830",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "notarial/solicitud-de-declaracion-de-posesion-regular-ante-notario",
+        "norma": "Código Civil",
+        "articulo": 764,
+        "rubrica": "ARTÍCULO 764. TIPOS DE POSESIÓN",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr023.html#764",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "notarial/solicitud-de-matrimonio-civil-ante-notario",
+        "norma": "Código Civil",
+        "articulo": 115,
+        "rubrica": "ARTÍCULO 115. CONSTITUCIÓN Y PERFECCIÓN DEL MATRIMONIO",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr003.html#115",
+        "consultado_el": "2026-09-10"
+      }
+    ]
   },
   "actuaciones": [
     {
       "exact_name": "Solicitud de divorcio ante notario por mutuo acuerdo",
       "role": "LITIGANTE",
-      "legal_basis": "Ley 962 de 2005, art. 34; Decreto 4436 de 2005",
+      "legal_basis": "Ley 962 de 2005, art. 34; Decreto 4436 de 2005 — FUNDAMENTO SUSTANCIAL (la causal, no el trámite): Código Civil, art. 154 num. 9 (modificado por el art. 6 de la Ley 25 de 1992): es causal de divorcio el consentimiento de ambos cónyuges manifestado ante juez competente y reconocido por éste mediante sentencia. El num. 10, adicionado por el art. 2 de la Ley 2442 de 2024, añade la sola voluntad de cualquiera de los cónyuges.",
       "competent_authority": "Notario del círculo que escojan los interesados; se formaliza mediante escritura pública",
       "term": "Cuando hay hijos menores, el Defensor de Familia debe emitir su concepto dentro de los quince (15) días siguientes a la notificación. Si transcurren dos (2) meses desde que el instrumento quedó a disposición de los cónyuges sin que concurran a su otorgamiento, se entiende que desistieron de la solicitud (Decreto 4436 de 2005).",
       "required_sections": [
@@ -84,7 +176,7 @@
     {
       "exact_name": "Solicitud de liquidación de herencia ante notario",
       "role": "LITIGANTE",
-      "legal_basis": "Decreto 902 de 1988",
+      "legal_basis": "Decreto 902 de 1988 — FUNDAMENTO SUSTANCIAL (la causal, no el trámite): Código Civil, arts. 1012 y 1013: la sucesión en los bienes de una persona se abre al momento de su muerte en su último domicilio y se rige por la ley de ese domicilio; la delación —el llamamiento actual de la ley a aceptar o repudiar— se produce en ese mismo momento, salvo llamamiento condicional.",
       "competent_authority": "Notario del círculo correspondiente; procede sólo por acuerdo de todos los herederos",
       "term": "Aceptada la solicitud, el notario ordena el emplazamiento mediante edicto que se fija por diez (10) días en lugar visible de la notaría, se publica en periódico de circulación nacional y se radiodifunde una vez. Transcurridos esos diez (10) días sin oposición y cumplidos los requisitos fiscales, se otorga la escritura. Si pasan dos (2) meses desde que debía otorgarse sin que se firme, se entiende desistida la solicitud (Decreto 902 de 1988).",
       "required_sections": [
@@ -142,7 +234,7 @@
     {
       "exact_name": "Solicitud de liquidación de sociedad conyugal ante notario",
       "role": "LITIGANTE",
-      "legal_basis": "Decreto 902 de 1988; Ley 962 de 2005",
+      "legal_basis": "Decreto 902 de 1988; Ley 962 de 2005 — FUNDAMENTO SUSTANCIAL (la causal, no el trámite): Código Civil, arts. 1820 (modificado por el art. 25 de la Ley 1a. de 1976), 1821 y 1830: la sociedad conyugal se disuelve por la disolución del matrimonio, la separación judicial de cuerpos, la sentencia de separación de bienes, la declaración de nulidad del matrimonio o el mutuo acuerdo de los cónyuges capaces elevado a escritura pública; disuelta, se procede de inmediato al inventario y tasación de los bienes, y hechas las deducciones el residuo se divide por mitad entre los dos cónyuges.",
       "competent_authority": "Notario del círculo que escojan los interesados",
       "term": "Si transcurren dos (2) meses desde que la escritura quedó a disposición sin que los interesados concurran a otorgarla, se entiende desistida la solicitud (Decreto 902 de 1988).",
       "required_sections": [
@@ -546,7 +638,7 @@
     {
       "exact_name": "Solicitud de declaración de posesión regular ante notario",
       "role": "LITIGANTE",
-      "legal_basis": "Ley 1183 de 2008",
+      "legal_basis": "Ley 1183 de 2008 — FUNDAMENTO SUSTANCIAL (la causal, no el trámite): Código Civil, art. 764: se llama posesión regular la que procede de justo título y ha sido adquirida de buena fe, aunque la buena fe no subsista después de adquirida la posesión; si el título es traslaticio de dominio, es también necesaria la tradición.",
       "competent_authority": "Notario del círculo donde se ubique el inmueble",
       "term": "No hay plazo de caducidad para presentar la solicitud, pero sí términos propios del trámite. Requisito temporal sustancial: estar en posesión regular del inmueble, en nombre propio, en forma continua y exclusiva, sin violencia ni clandestinidad, \"durante un año continuo o más\" (Ley 1183 de 2008, art. 2, num. 1), acreditado con recibos de impuestos \"con una antigüedad de por lo menos un año\" (art. 6, num. 2). Efectuado el reparto o presentada la solicitud, el notario dispone de ocho (8) días hábiles para revisar que su contenido se ajuste a la Ley 1183 de 2008 y archivarla si opera alguna excepción del art. 9 (Decreto 1069 de 2015, art. 2.2.6.6.1, que compila el art. 1 del Decreto 2742 de 2008). La autoridad de planeación debe pronunciarse sobre la condición técnica y urbanística del inmueble \"en un término no superior a veinte (20) días hábiles\" contados desde la radicación; si guarda silencio el notario deja constancia y sigue el trámite, pero se abstiene de autorizar la escritura hasta que aquélla se pronuncie (art. 2.2.6.6.2). Si se presenta oposición en cualquier etapa, se ordena el archivo de las diligencias (Ley 1183 de 2008, art. 1, inciso 2). Inscrita la escritura, comienza a contarse el término de prescripción ordinaria conforme a la Ley 791 de 2002 (art. 2.2.6.6.4). Catastro y el IGAC deben entregar planos y certificaciones dentro de los diez (10) días hábiles siguientes a la solicitud (Ley 1183 de 2008, art. 21).",
       "required_sections": [
@@ -660,7 +752,7 @@
     {
       "exact_name": "Solicitud de matrimonio civil ante notario",
       "role": "LITIGANTE",
-      "legal_basis": "Decreto 2668 de 1988",
+      "legal_basis": "Decreto 2668 de 1988 — FUNDAMENTO SUSTANCIAL (la causal, no el trámite): Código Civil, art. 115 (incisos adicionados por el art. 1o. de la Ley 25 de 1992): el contrato de matrimonio se constituye y perfecciona por el libre y mutuo consentimiento de los contrayentes expresado ante el funcionario competente, en la forma y con las solemnidades y requisitos del Código, y no produce efectos civiles y políticos si en su celebración se contravienen esas formas.",
       "competent_authority": "Notario del círculo del domicilio de la mujer o el que escojan los contrayentes",
       "term": "Edicto de cinco (5) días hábiles: \"Presentada la solicitud con el lleno de todos los requisitos legales, el notario hará fijar un edicto por el término de cinco (5) días hábiles, en la secretaría de su despacho\" (Decreto 2668 de 1988, art. 4, modificado por el art. 1 del Decreto 1556 de 1989). Si el otro contrayente es vecino de municipio de distinto círculo, o si alguno no tiene seis (6) meses de residencia en el círculo, el notario primero del círculo fijará un nuevo edicto por cinco (5) días (art. 4, inciso 2, en concordancia con el art. 131 del Código Civil). Los registros civiles de nacimiento deben haberse expedido \"con antelación no mayor de un (1) mes a la solicitud del matrimonio\" (art. 3); el extranjero no domiciliado debe aportar registro civil de nacimiento y certificado de soltería con vigencia inferior a tres (3) meses (art. 4, inciso 3). Vencido y desfijado el edicto se otorga la escritura con la que queda perfeccionado el matrimonio (art. 5). Plazo de caducidad del trámite: \"Transcurridos seis (6) meses de la presentación de la solicitud, sin que se hubiere celebrado el matrimonio, se dará por terminado el trámite notarial, sin perjuicio de que los interesados puedan presentarla nuevamente\" (art. 9). Si se presenta oposición antes de la celebración, el trámite notarial termina (art. 8).",
       "required_sections": [
@@ -1449,7 +1541,7 @@
       "exact_name": "Escritura pública de divorcio o de cesación de efectos civiles del matrimonio religioso ante notario",
       "area": "NOTARIAL",
       "role": "DESPACHO",
-      "legal_basis": "Ley 962 de 2005, art. 34; Decreto 1069 de 2015, arts. 2.2.6.8.1, 2.2.6.8.3, 2.2.6.8.4, 2.2.6.8.5 y 2.2.6.8.6 (compilan los arts. 1, 3, 4, 5 y 6 del Decreto 4436 de 2005)",
+      "legal_basis": "Ley 962 de 2005, art. 34; Decreto 1069 de 2015, arts. 2.2.6.8.1, 2.2.6.8.3, 2.2.6.8.4, 2.2.6.8.5 y 2.2.6.8.6 (compilan los arts. 1, 3, 4, 5 y 6 del Decreto 4436 de 2005) — FUNDAMENTO SUSTANCIAL (la causal, no el trámite): Código Civil, arts. 152 (modificado por el art. 5o. de la Ley 25 de 1992) y 154 (modificado por el art. 6 de la Ley 25 de 1992, con el num. 10 adicionado por el art. 2 de la Ley 2442 de 2024): los efectos civiles del matrimonio religioso cesan por divorcio decretado por el juez de familia, y el escrito debe invocar una de las causales del art. 154 —entre ellas la separación de cuerpos judicial o de hecho por más de dos años, el consentimiento de ambos cónyuges y la sola voluntad de cualquiera de ellos—.",
       "competent_authority": "Notario del círculo que escojan los interesados. La inscripción se hace en el Libro Registro de Varios de la propia notaría; hecha ésta, 'el Notario comunicará la inscripción al funcionario competente del Registro del Estado Civil, quien hará las anotaciones del caso, a costa de los interesados' (art. 2.2.6.8.6)",
       "term": "DOS PLAZOS, Y NINGUNO DE LOS DOS ES DEL NOTARIO. (1) QUINCE (15) DÍAS DEL DEFENSOR DE FAMILIA, con silencio favorable al trámite: 'El Defensor de Familia deberá emitir su concepto en los quince (15) días siguientes a la notificación. Si en dicho plazo el Defensor de Familia no ha allegado su concepto, el Notario dejará constancia de tal circunstancia, autorizará la Escritura y le enviará una copia a costa de los interesados' (art. 2.2.6.8.3). (2) DOS (2) MESES DE LOS CÓNYUGES, que es el que extingue el trámite y se vence por pura inacción, sin notificación previa: 'Se considerará que los interesados han desistido de la solicitud de divorcio o de la cesación de efectos civiles del matrimonio religioso ante Notario, si transcurren dos (2) meses desde la fecha en que el instrumento fue puesto a su disposición, sin que concurran a su otorgamiento' (art. 2.2.6.8.4). HAY UN TERCER SUPUESTO DE MUERTE DEL TRÁMITE QUE NO ES DE PLAZO SINO DE DESACUERDO: si el Defensor formula observaciones legalmente sustentadas y los cónyuges no las aceptan, 'se entenderá que han desistido del perfeccionamiento de la Escritura Pública, y se devolverán los documentos de los interesados, bajo recibo' (art. 2.2.6.8.3, inciso 2). Cumplidos los requisitos, 'el Notario autorizará la Escritura' (art. 2.2.6.8.5).",
       "required_sections": [

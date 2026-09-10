@@ -435,7 +435,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     exactName: 'Demanda de declaración de pertenencia',
     branch: 'CIVIL',
     role: 'LITIGANTE',
-    legalBasis: 'Ley 1564 de 2012, art. 375',
+    legalBasis: 'Ley 1564 de 2012, art. 375 — FUNDAMENTO SUSTANCIAL (la causal, no el trámite): Código Civil, arts. 2512, 2518, 2527, 2528, 2529 (inciso modificado por el art. 4 de la Ley 791 de 2002), 2531 (ordinal modificado por el art. 5 de la Ley 791 de 2002) y 2532 (modificado por el art. 6 de la Ley 791 de 2002): la prescripción adquisitiva ordinaria exige posesión regular no interrumpida durante tres (3) años para muebles y cinco (5) para bienes raíces; la extraordinaria no exige título alguno y su lapso es de diez (10) años contra toda persona.',
     competentAuthority: 'Juez civil del circuito o municipal del lugar de ubicación del inmueble',
     term: { status: 'VERIFICADO', description: 'Un (1) mes para contestar, contado desde la inclusión del proceso en el Registro Nacional de Procesos de Pertenencia (art. 375). El mes que publica la ficha es el reloj de los EMPLAZADOS (personas indeterminadas y demandados de dirección ignorada), no el de todos los demandados. El demandado cierto —el titular de derecho real que figura en el certificado del registrador y contra quien debe dirigirse la demanda (art. 375 num. 5)— se rige por el traslado del proceso verbal: veinte (20) días (art. 369). Reloj de un tercero, no del cliente: el registrador de instrumentos públicos debe responder la petición del certificado dentro de quince (15) días (art. 375 num. 5), plazo que hay que anticipar al preparar la demanda. Reloj propio del demandado que alega la prescripción por vía de excepción: debe cumplir los numerales 5, 6 y 7, y si a los treinta (30) días del vencimiento del traslado de la demanda no ha cumplido lo de los numerales 6 y 7, el proceso sigue su curso pero en la sentencia no podrá declararse la pertenencia (art. 375 parágrafo 1).' },
     requiredSections: [
@@ -486,7 +486,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     exactName: 'Demanda de pago por consignación',
     branch: 'CIVIL',
     role: 'LITIGANTE',
-    legalBasis: 'Ley 1564 de 2012, art. 381',
+    legalBasis: 'Ley 1564 de 2012, art. 381 — FUNDAMENTO SUSTANCIAL (la causal, no el trámite): Código Civil, arts. 1656 y 1657: el pago es válido aun contra la voluntad del acreedor mediante la consignación, que es el depósito de la cosa debida —con las formalidades necesarias y en manos de un tercero— ante la repugnancia o no comparecencia del acreedor a recibirla.',
     competentAuthority: 'Juez civil municipal o del circuito, según la cuantía',
     term: { status: 'VERIFICADO', description: 'Si el demandado no se opone, el demandante debe depositar a órdenes del juzgado lo ofrecido dentro de los cinco (5) días siguientes al vencimiento del término del traslado (art. 381 num. 2). Si al contestar la demanda el demandado se opone a recibir el pago, el juez ordena por auto que no admite recurso que la consignación se haga en el término de cinco (5) días (art. 381 num. 3). Vencido el plazo sin efectuarse la consignación, el juez niega las pretensiones mediante sentencia que no admite apelación (art. 381 num. 2).' },
     requiredSections: [
@@ -519,7 +519,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     exactName: 'Demanda divisoria',
     branch: 'CIVIL',
     role: 'LITIGANTE',
-    legalBasis: 'Ley 1564 de 2012, arts. 406 a 411',
+    legalBasis: 'Ley 1564 de 2012, arts. 406 a 411 — FUNDAMENTO SUSTANCIAL (la causal, no el trámite): Código Civil, arts. 1374 y 2334: ningún coasignatario está obligado a permanecer en la indivisión y la partición puede pedirse siempre, salvo pacto de proindivisión que no puede exceder de cinco años; cualquiera de los comuneros puede pedir que la cosa común se divida o se venda para repartir su producto, con preferencia de la división cuando se trate de un terreno.',
     competentAuthority: 'Juez civil municipal o del circuito del lugar del bien',
     term: { status: 'VERIFICADO', description: 'En el auto admisorio de la demanda se ordena correr traslado al demandado por diez (10) días (art. 409). Los motivos que configuren excepciones previas deben alegarse mediante recurso de reposición contra el auto admisorio (art. 409).' },
     requiredSections: [
@@ -536,7 +536,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     exactName: 'Demanda de deslinde y amojonamiento',
     branch: 'CIVIL',
     role: 'LITIGANTE',
-    legalBasis: 'Ley 1564 de 2012, arts. 400 a 405',
+    legalBasis: 'Ley 1564 de 2012, arts. 400 a 405 — FUNDAMENTO SUSTANCIAL (la causal, no el trámite): Código Civil, art. 900: todo dueño de un predio tiene derecho a que se fijen los límites que lo separan de los predios colindantes y puede exigir a los respectivos dueños que concurran a la demarcación, que se hace a expensas comunes.',
     competentAuthority: 'Juez civil municipal del lugar de ubicación del inmueble',
     term: { status: 'VERIFICADO', description: 'De la demanda de deslinde y amojonamiento se corre traslado al demandado por tres (3) días (art. 402). Los hechos que constituyen excepciones previas, la cosa juzgada y la transacción solo pueden alegarse como fundamento del recurso de reposición contra el auto admisorio de la demanda (art. 402).' },
     requiredSections: [
@@ -569,7 +569,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     exactName: 'Demanda de proceso de sucesión',
     branch: 'CIVIL',
     role: 'LITIGANTE',
-    legalBasis: 'Ley 1564 de 2012, arts. 488 y siguientes',
+    legalBasis: 'Ley 1564 de 2012, arts. 488 y siguientes — FUNDAMENTO SUSTANCIAL (la causal, no el trámite): Código Civil, arts. 1012 y 1013: la sucesión en los bienes de una persona se abre al momento de su muerte en su último domicilio y se rige por la ley de ese domicilio; la delación —el llamamiento actual de la ley a aceptar o repudiar— se produce en ese mismo momento, salvo llamamiento condicional.',
     competentAuthority: 'Juez de familia o civil del último domicilio del causante',
     term: { status: 'NO_CADUCA', description: 'La apertura del proceso de sucesión puede pedirse desde el fallecimiento del causante y el artículo 488 no fija término alguno para presentar la demanda: no caduca. Los acreedores pueden hacer valer sus créditos dentro del proceso hasta que termine la diligencia de inventario (art. 491 num. 2), y el reconocimiento de herederos, legatarios, cesionarios, cónyuge o compañero permanente puede pedirse desde que se declare abierto el proceso y hasta antes de la ejecutoria de la sentencia aprobatoria de la última partición o adjudicación (art. 491 num. 3).' },
     requiredSections: [
@@ -1061,7 +1061,7 @@ export const CIVIL_CATALOG: BranchCatalog = {
     exactName: 'Sentencia de declaración de pertenencia',
     branch: 'CIVIL',
     role: 'DESPACHO',
-    legalBasis: 'Ley 1564 de 2012, art. 375',
+    legalBasis: 'Ley 1564 de 2012, art. 375 — FUNDAMENTO SUSTANCIAL (la causal, no el trámite): Código Civil, arts. 2512, 2518, 2527, 2528, 2529 (inciso modificado por el art. 4 de la Ley 791 de 2002), 2531 (ordinal modificado por el art. 5 de la Ley 791 de 2002) y 2532 (modificado por el art. 6 de la Ley 791 de 2002): la prescripción adquisitiva ordinaria exige posesión regular no interrumpida durante tres (3) años para muebles y cinco (5) para bienes raíces; la extraordinaria no exige título alguno y su lapso es de diez (10) años contra toda persona.',
     competentAuthority: 'El juez que conoce del proceso',
     term: { status: 'VERIFICADO', description: 'El art. 375 no fija plazo para proferir la sentencia de pertenencia. Los términos que la norma sí establece son: quince (15) días para que el registrador de instrumentos públicos expida el certificado de titulares de derechos reales (num. 5, inc. 2); inscripción del contenido de la valla o del aviso en el Registro Nacional de Procesos de Pertenencia por el término de un (1) mes, dentro del cual pueden contestar la demanda las personas emplazadas, tomando quienes concurran después el proceso en el estado en que se encuentre (num. 7, inc. final); y, cuando la prescripción adquisitiva se alegue por vía de excepción, treinta (30) días desde el vencimiento del traslado de la demanda para cumplir los numerales 6 y 7, so pena de que en la sentencia no pueda declararse la pertenencia (parágrafo 1°). La valla o el aviso deben permanecer instalados hasta la audiencia de instrucción y juzgamiento (num. 7).' },
     requiredSections: [

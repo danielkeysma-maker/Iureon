@@ -26,7 +26,252 @@
       "FAMILIA: HUECO DECLARADO, ya no ilegible: los arts. 310, 311 y 315 del Codigo Civil SI se leyeron en fuente oficial, bajando el HTML crudo completo de https://www.alcaldiabogota.gov.co/sisjur/normas/Norma1.jsp?i=39535 (2.4 MB; lo que fallaba antes era el lector, no la fuente). Ninguno de los tres fija termino de caducidad ni de prescripcion para la accion de privacion o suspension de la patria potestad: el art. 310 enumera las causales de suspension, el art. 315 las de emancipacion judicial y el art. 311 impone oir a los parientes del hijo y al defensor. La ficha no publica plazo de caducidad porque la norma no lo tiene, no porque no se haya podido leer.",
       "FAMILIA, verificado el esta pasada: Todas las fichas se leyeron artículo por artículo en el texto oficial descargado el 2026-08-26. (1) Ley 1564 de 2012 (CGP): texto integrado de https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=48425. Se comprobó que ese texto TRAE las reformas que importan aquí y no la versión original: el art. 22 num. 5 aparece 'Derogado por el Art. 61 de la Ley 1996 de 2019'; el art. 22 num. 7 y el art. 577 num. 6 aparecen modificados por los arts. 35 y 36 de la Ley 1996 de 2019; el art. 396 aparece sustituido por el art. 38 de la Ley 1996 de 2019; el art. 397 aparece con su parágrafo 2 'Eliminado por el art. 2, Ley 2541 de 2025' y con el art. 397A 'Adicionado por el art. 3, Ley 2541 de 2025'. (2) Ley 1098 de 2006 (Infancia y Adolescencia), con las reformas de la Ley 1878 de 2018 visibles en el art. 100: https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=22106. (3) Ley 1996 de 2019 (capacidad legal plena), arts. 33 a 42 y art. 53: https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=99712. Su art. 53 dispone literalmente: 'Queda prohibido iniciar procesos de interdicción o inhabilitación, o solicitar la sentencia de interdicción o inhabilitación para dar inicio a cualquier trámite público o privado a partir de la promulgación de la presente ley'. Ninguna ficha de este archivo ofrece interdicción ni inhabilitación. (4) Ley 2524 de 2025 (restitución internacional), arts. 25 a 32 y art. 41 ('Esta Ley entra en vigencia a partir de su promulgación'): h"
     ],
-    "unverified": []
+    "unverified": [],
+    "fundamentos_sustanciales": [
+      {
+        "actuacion": "familia/demanda-de-cesacion-de-efectos-civiles-de-matrimonio-religioso",
+        "norma": "Código Civil",
+        "articulo": 152,
+        "rubrica": "ARTÍCULO 152. CAUSALES Y EFECTOS DE LA DISOLUCIÓN",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr004.html#152",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "familia/demanda-de-cesacion-de-efectos-civiles-de-matrimonio-religioso",
+        "norma": "Código Civil",
+        "articulo": 154,
+        "rubrica": "ARTÍCULO 154. CAUSALES DE DIVORCIO",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr004.html#154",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "familia/sentencia-de-cesacion-de-efectos-civiles-de-matrimonio-religioso",
+        "norma": "Código Civil",
+        "articulo": 152,
+        "rubrica": "ARTÍCULO 152. CAUSALES Y EFECTOS DE LA DISOLUCIÓN",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr004.html#152",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "familia/sentencia-de-cesacion-de-efectos-civiles-de-matrimonio-religioso",
+        "norma": "Código Civil",
+        "articulo": 154,
+        "rubrica": "ARTÍCULO 154. CAUSALES DE DIVORCIO",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr004.html#154",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "familia/solicitud-de-divorcio-por-mutuo-consentimiento",
+        "norma": "Código Civil",
+        "articulo": 154,
+        "rubrica": "ARTÍCULO 154. CAUSALES DE DIVORCIO",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr004.html#154",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "familia/sentencia-de-divorcio",
+        "norma": "Código Civil",
+        "articulo": 154,
+        "rubrica": "ARTÍCULO 154. CAUSALES DE DIVORCIO",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr004.html#154",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "familia/demanda-de-separacion-de-cuerpos",
+        "norma": "Código Civil",
+        "articulo": 165,
+        "rubrica": "ARTÍCULO 165. CAUSALES - SEPARACIÓN DE CUERPOS",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr005.html#165",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "familia/demanda-de-separacion-de-cuerpos",
+        "norma": "Código Civil",
+        "articulo": 166,
+        "rubrica": "ARTÍCULO 166. MUTUO CONSENTIMIENTO - SEPARACIÓN DE CUERPOS",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr005.html#166",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "familia/demanda-de-separacion-de-cuerpos",
+        "norma": "Código Civil",
+        "articulo": 167,
+        "rubrica": "ARTÍCULO 167. EFECTOS DE LA SEPARACIÓN DE CUERPOS",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr005.html#167",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "familia/sentencia-de-separacion-de-cuerpos",
+        "norma": "Código Civil",
+        "articulo": 165,
+        "rubrica": "ARTÍCULO 165. CAUSALES - SEPARACIÓN DE CUERPOS",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr005.html#165",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "familia/sentencia-de-separacion-de-cuerpos",
+        "norma": "Código Civil",
+        "articulo": 166,
+        "rubrica": "ARTÍCULO 166. MUTUO CONSENTIMIENTO - SEPARACIÓN DE CUERPOS",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr005.html#166",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "familia/sentencia-de-separacion-de-cuerpos",
+        "norma": "Código Civil",
+        "articulo": 167,
+        "rubrica": "ARTÍCULO 167. EFECTOS DE LA SEPARACIÓN DE CUERPOS",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr005.html#167",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "familia/demanda-de-separacion-de-bienes",
+        "norma": "Código Civil",
+        "articulo": 197,
+        "rubrica": "ARTÍCULO 197. SEPARACIÓN DE BIENES",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr006.html#197",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "familia/demanda-de-separacion-de-bienes",
+        "norma": "Código Civil",
+        "articulo": 200,
+        "rubrica": "ARTÍCULO 200. CAUSALES - SEPARACIÓN DE BIENES",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr006.html#200",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "familia/demanda-de-liquidacion-de-sociedad-conyugal-o-patrimonial",
+        "norma": "Código Civil",
+        "articulo": 1820,
+        "rubrica": "ARTÍCULO 1820. CAUSALES DE DISOLUCIÓN DE LA SOCIEDAD CONYUGAL",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr056.html#1820",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "familia/demanda-de-liquidacion-de-sociedad-conyugal-o-patrimonial",
+        "norma": "Código Civil",
+        "articulo": 1821,
+        "rubrica": "ARTÍCULO 1821. LIQUIDACIÓN DE LA SOCIEDAD",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr056.html#1821",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "familia/demanda-de-liquidacion-de-sociedad-conyugal-o-patrimonial",
+        "norma": "Código Civil",
+        "articulo": 1830,
+        "rubrica": "ARTÍCULO 1830. DIVISIÓN DEL RESIDUO",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr056.html#1830",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "familia/sentencia-aprobatoria-de-la-particion-de-la-sociedad-conyugal-o-patrimonial",
+        "norma": "Código Civil",
+        "articulo": 1820,
+        "rubrica": "ARTÍCULO 1820. CAUSALES DE DISOLUCIÓN DE LA SOCIEDAD CONYUGAL",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr056.html#1820",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "familia/sentencia-aprobatoria-de-la-particion-de-la-sociedad-conyugal-o-patrimonial",
+        "norma": "Código Civil",
+        "articulo": 1821,
+        "rubrica": "ARTÍCULO 1821. LIQUIDACIÓN DE LA SOCIEDAD",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr056.html#1821",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "familia/sentencia-aprobatoria-de-la-particion-de-la-sociedad-conyugal-o-patrimonial",
+        "norma": "Código Civil",
+        "articulo": 1830,
+        "rubrica": "ARTÍCULO 1830. DIVISIÓN DEL RESIDUO",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr056.html#1830",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "familia/demanda-de-peticion-de-herencia",
+        "norma": "Código Civil",
+        "articulo": 1321,
+        "rubrica": "ARTÍCULO 1321. ACCIÓN DE PETICIÓN DE HERENCIA",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr040.html#1321",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "familia/demanda-de-nulidad-de-capitulaciones-matrimoniales",
+        "norma": "Código Civil",
+        "articulo": 1771,
+        "rubrica": "ARTÍCULO 1771. DEFINICIÓN DE CAPITULACIONES MATRIMONIALES",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr054.html#1771",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "familia/demanda-de-nulidad-de-capitulaciones-matrimoniales",
+        "norma": "Código Civil",
+        "articulo": 1772,
+        "rubrica": "ARTÍCULO 1772. FORMALIDADES DE LAS CAPITULACIONES MATRIMONIALES",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr054.html#1772",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "familia/demanda-de-nulidad-de-capitulaciones-matrimoniales",
+        "norma": "Código Civil",
+        "articulo": 1773,
+        "rubrica": "ARTÍCULO 1773. LIMITACIONES A LAS ESTIPULACIONES",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr054.html#1773",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "familia/sentencia-de-nulidad-de-matrimonio-civil",
+        "norma": "Código Civil",
+        "articulo": 140,
+        "rubrica": "ARTÍCULO 140. CAUSALES DE NULIDAD",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr004.html#140",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "familia/solicitud-de-declaracion-de-ausencia",
+        "norma": "Código Civil",
+        "articulo": 96,
+        "rubrica": "ARTÍCULO 96. AUSENCIA",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr003.html#96",
+        "consultado_el": "2026-09-10"
+      },
+      {
+        "actuacion": "familia/solicitud-de-declaracion-de-ausencia",
+        "norma": "Código Civil",
+        "articulo": 97,
+        "rubrica": "ARTÍCULO 97. CONDICIONES PARA LA PRESUNCIÓN DE MUERTE",
+        "estado_de_vigencia": "VIGENTE",
+        "source_url": "https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr003.html#97",
+        "consultado_el": "2026-09-10"
+      }
+    ]
   },
   "actuaciones": [
     {
@@ -90,7 +335,7 @@
     {
       "exact_name": "Solicitud de divorcio por mutuo consentimiento",
       "role": "LITIGANTE",
-      "legal_basis": "Ley 1564 de 2012, arts. 577 num. 10 y 578",
+      "legal_basis": "Ley 1564 de 2012, arts. 577 num. 10 y 578 — FUNDAMENTO SUSTANCIAL (la causal, no el trámite): Código Civil, art. 154 num. 9 (modificado por el art. 6 de la Ley 25 de 1992): es causal de divorcio el consentimiento de ambos cónyuges manifestado ante juez competente y reconocido por éste mediante sentencia. El num. 10, adicionado por el art. 2 de la Ley 2442 de 2024, añade la sola voluntad de cualquiera de los cónyuges.",
       "competent_authority": "Juez de familia, por el trámite de jurisdicción voluntaria",
       "term": "Se tramita por el procedimiento de jurisdicción voluntaria (art. 577 num. 10). Ni el art. 578 ni el art. 579 del CGP fijan término para presentar la solicitud ni plazo de extinción de la misma: no opera caducidad. Presentada la demanda el juez ordena las citaciones y publicaciones a que hubiere lugar, decreta las pruebas que considere necesarias y convoca a audiencia para practicarlas y proferir sentencia (art. 579 nums. 1 y 2); la notificación al agente del Ministerio Público que exige el num. 1 del art. 579 solo opera en los asuntos de los numerales 1 a 8 del art. 577, entre los que no está el divorcio por mutuo consentimiento.",
       "required_sections": [
@@ -130,7 +375,7 @@
     {
       "exact_name": "Demanda de cesación de efectos civiles de matrimonio religioso",
       "role": "LITIGANTE",
-      "legal_basis": "Ley 1564 de 2012, arts. 22 num. 1, 369 y 388",
+      "legal_basis": "Ley 1564 de 2012, arts. 22 num. 1, 369 y 388 — FUNDAMENTO SUSTANCIAL (la causal, no el trámite): Código Civil, arts. 152 (modificado por el art. 5o. de la Ley 25 de 1992) y 154 (modificado por el art. 6 de la Ley 25 de 1992, con el num. 10 adicionado por el art. 2 de la Ley 2442 de 2024): los efectos civiles del matrimonio religioso cesan por divorcio decretado por el juez de familia, y el escrito debe invocar una de las causales del art. 154 —entre ellas la separación de cuerpos judicial o de hecho por más de dos años, el consentimiento de ambos cónyuges y la sola voluntad de cualquiera de ellos—.",
       "competent_authority": "Juez de familia en primera instancia",
       "term": "Proceso verbal: traslado de veinte (20) días para contestar (art. 369).",
       "required_sections": [
@@ -170,7 +415,7 @@
     {
       "exact_name": "Demanda de separación de cuerpos",
       "role": "LITIGANTE",
-      "legal_basis": "Ley 1564 de 2012, arts. 22 num. 1 y 388 par.",
+      "legal_basis": "Ley 1564 de 2012, arts. 22 num. 1 y 388 par. — FUNDAMENTO SUSTANCIAL (la causal, no el trámite): Código Civil, arts. 165, 166 y 167 (modificados por los arts. 15, 16 y 17 de la Ley 1a. de 1976): hay lugar a la separación de cuerpos por las causales del art. 154 o por mutuo consentimiento manifestado ante el juez; la separación no disuelve el matrimonio pero suspende la vida en común y disuelve la sociedad conyugal, salvo que siendo temporal y por mutuo consentimiento los cónyuges manifiesten mantenerla.",
       "competent_authority": "Juez de familia en primera instancia",
       "term": "VEINTE (20) DÍAS DE TRASLADO PARA CONTESTAR, RELOJ DEL DEMANDADO. El art. 388 par. dice solo que a la separación de cuerpos, de matrimonio civil o religioso, «se aplican las mismas reglas del divorcio», sin publicar plazo alguno; el término concreto es el del proceso verbal: admitida la demanda se corre traslado por veinte (20) días (art. 369).\n\nSE APLICAN TAMBIÉN LAS DEMÁS REGLAS DEL ART. 388: son partes únicamente los cónyuges, el Ministerio Público es citado en interés de los hijos —omitirlo vicia la actuación—, y el desistimiento conjunto, la muerte de un cónyuge o la reconciliación ponen fin al proceso.\n\nREGLA POSTERIOR A LA SENTENCIA QUE HACE ÚTIL ESTA VÍA FRENTE AL DIVORCIO: ejecutoriada la sentencia, si los cónyuges DE COMÚN ACUERDO solicitan poner fin a la separación, el juez DICTA DE PLANO la sentencia respectiva (art. 388 parágrafo). La separación se deshace sin nuevo proceso; el divorcio no.",
       "required_sections": [
@@ -204,7 +449,7 @@
     {
       "exact_name": "Demanda de separación de bienes",
       "role": "LITIGANTE",
-      "legal_basis": "Ley 1564 de 2012, art. 22 num. 1",
+      "legal_basis": "Ley 1564 de 2012, art. 22 num. 1 — FUNDAMENTO SUSTANCIAL (la causal, no el trámite): Código Civil, arts. 197 y 200 (este último adicionado por el art. 21 de la Ley 1 de 1976): la simple separación de bienes se efectúa sin divorcio, en virtud de decreto judicial o por disposición de la ley, y cualquiera de los cónyuges puede demandarla por las mismas causas que autorizan la separación de cuerpos o por cesación de pagos, quiebra, oferta de cesión de bienes, insolvencia, concurso de acreedores, disipación o juego habitual, o administración fraudulenta o notoriamente descuidada del patrimonio del otro.",
       "competent_authority": "Juez de familia en primera instancia",
       "term": "La separación de bienes contenciosa es de competencia del juez de familia en primera instancia (art. 22 num. 1) y, al no estar sometida a un trámite especial, se sujeta al proceso verbal por remisión expresa del art. 368; admitida la demanda se corre traslado al demandado por el término de veinte (20) días (art. 369).",
       "required_sections": [
@@ -238,7 +483,7 @@
     {
       "exact_name": "Demanda de liquidación de sociedad conyugal o patrimonial",
       "role": "LITIGANTE",
-      "legal_basis": "Ley 1564 de 2012, art. 22 num. 3",
+      "legal_basis": "Ley 1564 de 2012, art. 22 num. 3 — FUNDAMENTO SUSTANCIAL (la causal, no el trámite): Código Civil, arts. 1820 (modificado por el art. 25 de la Ley 1a. de 1976), 1821 y 1830: la sociedad conyugal se disuelve por la disolución del matrimonio, la separación judicial de cuerpos, la sentencia de separación de bienes, la declaración de nulidad del matrimonio o el mutuo acuerdo de los cónyuges capaces elevado a escritura pública; disuelta, se procede de inmediato al inventario y tasación de los bienes, y hechas las deducciones el residuo se divide por mitad entre los dos cónyuges.",
       "competent_authority": "Juez de familia, cuando la causa es distinta de la muerte de los cónyuges o compañeros",
       "term": "Solo la sociedad patrimonial entre compañeros permanentes tiene término legal expreso: las acciones para obtener su disolución y liquidación prescriben en un (1) año, contado a partir de la separación física y definitiva de los compañeros, del matrimonio con terceros o de la muerte de uno o de ambos compañeros (Ley 54 de 1990, art. 8). Para la liquidación de la sociedad conyugal no se verificó término en el texto de la norma, de modo que este term cubre únicamente la hipótesis patrimonial.",
       "required_sections": [
@@ -700,7 +945,7 @@
     {
       "exact_name": "Solicitud de declaración de ausencia",
       "role": "LITIGANTE",
-      "legal_basis": "Ley 1564 de 2012, arts. 22 num. 21 y 577 num. 4",
+      "legal_basis": "Ley 1564 de 2012, arts. 22 num. 21 y 577 num. 4 — FUNDAMENTO SUSTANCIAL (la causal, no el trámite): Código Civil, arts. 96 y 97: cuando una persona desaparece del lugar de su domicilio ignorándose su paradero, el desaparecimiento se mira como mera ausencia y la representan sus apoderados o representantes legales; pasados dos años sin noticias del ausente se presume su muerte, previa citación por edictos en el periódico oficial y con las demás condiciones del art. 97, y el juez fija como día presuntivo de la muerte el último del primer bienio contado desde las últimas noticias.",
       "competent_authority": "Juez de familia, por el trámite de jurisdicción voluntaria",
       "term": "Ni el art. 583 del CGP ni el art. 96 del Código Civil, que define el desaparecimiento como mera ausencia, fijan término para pedir la declaración ni plazo de extinción de la solicitud: no opera caducidad. En el auto admisorio el juez designa administrador provisorio y ordena una publicación un (1) día domingo en un periódico de mayor circulación de la capital, en uno de amplia circulación en el último domicilio conocido del ausente y en una radiodifusora con sintonía en ese lugar; cumplidos esos trámites convoca audiencia para practicar pruebas y dictar sentencia (art. 583 nums. 2 y 4).",
       "required_sections": [
@@ -916,7 +1161,7 @@
     {
       "exact_name": "Demanda de petición de herencia",
       "role": "LITIGANTE",
-      "legal_basis": "Ley 1564 de 2012, art. 22 num. 12",
+      "legal_basis": "Ley 1564 de 2012, art. 22 num. 12 — FUNDAMENTO SUSTANCIAL (la causal, no el trámite): Código Civil, art. 1321: el que pruebe su derecho a una herencia ocupada por otra persona en calidad de heredero tiene acción para que se le adjudique la herencia y se le restituyan las cosas hereditarias, corporales e incorporales, y aun aquellas de que el difunto era mero tenedor.",
       "competent_authority": "Juez de familia en primera instancia",
       "term": "El derecho de petición de herencia expira en diez (10) años. No obstante, el heredero putativo podrá oponer a esta acción la prescripción de cinco (5) años, contados como para la adquisición del dominio (Código Civil, art. 1326, modificado por el art. 12 de la Ley 791 de 2002).",
       "required_sections": [
@@ -950,7 +1195,7 @@
     {
       "exact_name": "Demanda de nulidad de capitulaciones matrimoniales",
       "role": "LITIGANTE",
-      "legal_basis": "Ley 1564 de 2012, art. 22 num. 14",
+      "legal_basis": "Ley 1564 de 2012, art. 22 num. 14 — FUNDAMENTO SUSTANCIAL (la causal, no el trámite): Código Civil, arts. 1771, 1772 y 1773: las capitulaciones son las convenciones que celebran los esposos antes de contraer matrimonio sobre los bienes que aportan y las donaciones que se hacen; deben otorgarse por escritura pública salvo la excepción del art. 1772 —«De otra manera no valdrán»— y no pueden contener estipulaciones contrarias a las buenas costumbres ni a las leyes, ni ir en detrimento de los derechos y obligaciones que las leyes señalan a cada cónyuge respecto del otro o de los descendientes comunes.",
       "competent_authority": "Juez de familia en primera instancia",
       "term": "Del CGP se verificó únicamente lo siguiente: el asunto es de competencia del juez de familia en primera instancia (art. 22 num. 14) y, al ser contencioso y no estar sometido a trámite especial, se rige por el proceso verbal (art. 368), de modo que admitida la demanda se corre traslado al demandado por veinte (20) días (art. 369). ADVERTENCIA: el CGP no fija término alguno de caducidad ni de prescripción para esta acción; ese plazo, si existe, proviene del Código Civil, que NO se leyó en esta verificación. La ficha no debe publicar ningún término de caducidad hasta comprobarlo en fuente oficial.",
       "required_sections": [
@@ -1098,7 +1343,7 @@
     {
       "exact_name": "Sentencia de divorcio",
       "role": "DESPACHO",
-      "legal_basis": "Ley 1564 de 2012, arts. 280 y 388",
+      "legal_basis": "Ley 1564 de 2012, arts. 280 y 388 — FUNDAMENTO SUSTANCIAL (la causal, no el trámite): Código Civil, art. 154 (modificado por el art. 6 de la Ley 25 de 1992, con el num. 10 adicionado por el art. 2 de la Ley 2442 de 2024): la sentencia debe declarar probada una de las causales de divorcio allí enumeradas, y no la norma procesal que fija su trámite.",
       "competent_authority": "Juez de familia",
       "term": "El juez dicta sentencia de plano si las partes llegan a un acuerdo, SIEMPRE QUE ESTE SE ENCUENTRE AJUSTADO AL DERECHO SUSTANCIAL (art. 388); el acuerdo no vincula al juez por sí solo. La muerte de uno de los cónyuges o la reconciliación ocurridas durante el proceso le ponen fin, pero el divorcio puede demandarse nuevamente por causa que sobrevenga a la reconciliación (art. 388 num. 3). Trámite posterior a cargo del despacho, que condiciona la oponibilidad de la sentencia: copia de la sentencia que decrete el divorcio se envía al funcionario del estado civil para su inscripción en el folio de matrimonio y en el de nacimiento de cada uno de los cónyuges (art. 388 num. 2).",
       "required_sections": [
@@ -1676,7 +1921,7 @@
       "exact_name": "Sentencia aprobatoria de la partición de la sociedad conyugal o patrimonial",
       "area": "FAMILIA",
       "role": "DESPACHO",
-      "legal_basis": "Ley 1564 de 2012, arts. 523 inc. 6, 501, 502, 508, 509, 510, 511 y 512",
+      "legal_basis": "Ley 1564 de 2012, arts. 523 inc. 6, 501, 502, 508, 509, 510, 511 y 512 — FUNDAMENTO SUSTANCIAL (la causal, no el trámite): Código Civil, arts. 1820 (modificado por el art. 25 de la Ley 1a. de 1976), 1821 y 1830: la sociedad conyugal se disuelve por la disolución del matrimonio, la separación judicial de cuerpos, la sentencia de separación de bienes, la declaración de nulidad del matrimonio o el mutuo acuerdo de los cónyuges capaces elevado a escritura pública; disuelta, se procede de inmediato al inventario y tasación de los bienes, y hechas las deducciones el residuo se divide por mitad entre los dos cónyuges.",
       "competent_authority": "El mismo juez de familia que profirió la sentencia que causó la disolución y que tramita la liquidación en el mismo expediente (art. 523 inc. 1)",
       "term": "AVISO QUE VALE MÁS QUE CUALQUIER PLAZO: 'Si ninguna objeción se propone, el juez dictará sentencia aprobatoria de la partición, LA CUAL NO ES APELABLE' (art. 509 num. 2). El cliente que espere apelar esta sentencia no tiene recurso: su única oportunidad son los cinco días de objeciones anteriores. Reloj de LOS INTERESADOS: 'El juez dictará de plano sentencia aprobatoria si los herederos y el cónyuge sobreviviente o el compañero permanente lo solicitan. En los demás casos conferirá traslado de la partición a todos los interesados por el término de cinco (5) días, dentro del cual podrán formular objeciones con expresión de los hechos que les sirvan de fundamento' (art. 509 num. 1). 'Todas las objeciones que se formulen se tramitarán conjuntamente como incidente, pero si ninguna prospera, así lo declarará el juez en la sentencia aprobatoria de la partición' (num. 3). Reloj posterior, también de parte: 'la solicitud [de remate de los bienes de la hijuela de deudas] deberá formularse dentro de los cinco (5) días siguientes a la ejecutoria de la sentencia que apruebe la partición, o de la notificación del auto de obedecimiento a lo resuelto por el superior' (art. 511). Poderes oficiosos del juez: 'Si el juez encuentra fundada alguna objeción, resolverá el incidente por auto, en el cual ordenará que se rehaga la partición en el término que señale y expresará concretamente el sentido en que debe modificarse' (num. 4); y 'háyanse o no propuesto objeciones, el Juez ordenará que la partición se rehaga cuando no esté conforme a derecho y el cónyuge o compañero permanente, o algunos de los herederos fuere incapaz o estuviere ausente y carezca de apoderado' (num. 5) —esta es la salvaguarda del incapaz y no depende de que alguien objete—. Rehecha, 'el juez la aprobará por sentencia si la encuentra ajustada al auto que ordenó modificarla' (num. 6). Cargas registrales: 'La sentencia que verse sobre bienes sometidos a registro será inscrita, lo mismo que las hijuelas, en las oficinas respectivas' y 'la partición y la sentencia que la aprueba serán protocolizadas en una notaría del lugar que el juez determine' (num. 7). La entrega de bienes a los adjudicatarios 'se verificará una vez registrada la partición' (art. 512). Traslado de la solicitud de venta de bienes formulada por el partidor: tres (3) días (art. 508 num. 5).",
       "required_sections": [
@@ -1729,7 +1974,7 @@
       "exact_name": "Sentencia de cesación de efectos civiles de matrimonio religioso",
       "area": "FAMILIA",
       "role": "DESPACHO",
-      "legal_basis": "Ley 1564 de 2012, arts. 22 num. 1, 280, 373 num. 5, 388, 389, 321, 322 num. 3, 323 inc. 5 y 32 num. 1",
+      "legal_basis": "Ley 1564 de 2012, arts. 22 num. 1, 280, 373 num. 5, 388, 389, 321, 322 num. 3, 323 inc. 5 y 32 num. 1 — FUNDAMENTO SUSTANCIAL (la causal, no el trámite): Código Civil, arts. 152 (modificado por el art. 5o. de la Ley 25 de 1992) y 154 (modificado por el art. 6 de la Ley 25 de 1992, con el num. 10 adicionado por el art. 2 de la Ley 2442 de 2024): los efectos civiles del matrimonio religioso cesan por divorcio decretado por el juez de familia, y el escrito debe invocar una de las causales del art. 154 —entre ellas la separación de cuerpos judicial o de hecho por más de dos años, el consentimiento de ambos cónyuges y la sola voluntad de cualquiera de ellos—.",
       "competent_authority": "Juez de familia en primera instancia (art. 22 num. 1). La apelación la resuelve la Sala de Familia del Tribunal Superior de Distrito Judicial (art. 32 num. 1)",
       "term": "RELOJ DEL CLIENTE PARA APELAR, QUE ES EL ÚNICO QUE EXTINGUE SU DERECHO: la sentencia se profiere oralmente en la audiencia de instrucción y juzgamiento y, cuando así ocurre, la apelación 'deberá interponerse en forma verbal INMEDIATAMENTE DESPUÉS DE PRONUNCIADA' (art. 322 num. 1 inc. 1, al que remite el art. 373 num. 5 inc. final); si solo se anuncia el sentido del fallo, la apelación se rige por el inciso 2 del num. 1 del art. 322 —tres (3) días desde la notificación por estado—. En ambos casos el apelante 'al momento de interponer el recurso en la audiencia, si hubiere sido proferida en ella, o dentro de los tres (3) días siguientes a su finalización... deberá precisar, de manera breve, los reparos concretos que le hace a la decisión, sobre los cuales versará la sustentación que hará ante el superior' (art. 322 num. 3 inc. 2), y 'el juez de segunda instancia declarará desierto el recurso de apelación contra una sentencia que no hubiere sido sustentado'. Efecto: por versar sobre el estado civil, la apelación se concede en el EFECTO SUSPENSIVO (art. 323 inc. 5), salvo el pago de las prestaciones alimentarias impuestas, que la apelación no impide (art. 323 inc. 7). Reloj del JUZGADO: 'En la misma audiencia el juez proferirá sentencia en forma oral'; si no fuere posible, 'deberá anunciar el sentido de su fallo... y emitir la decisión escrita dentro de los diez (10) días siguientes, sin que en ningún caso, pueda desconocer el plazo de duración del proceso previsto en el artículo 121' (art. 373 num. 5), que es de un (1) año para dictar sentencia de primera instancia contado desde la notificación del auto admisorio al demandado (art. 121). Sentencia de plano: 'El Juez dictará sentencia de plano si las partes llegaren a un acuerdo, siempre que este se encuentre ajustado al derecho sustancial' (art. 388 num. 2 inc. 2). Trámite posterior que condiciona la oponibilidad: 'Copia de la sentencia que decrete el divorcio se enviará al respectivo funcionario del estado civil para su inscripción en el folio de matrimonio y en el de nacimiento de cada uno de los cónyuges' (art. 388 num. 2).",
       "required_sections": [
@@ -1794,7 +2039,7 @@
       "exact_name": "Sentencia de nulidad de matrimonio civil",
       "area": "FAMILIA",
       "role": "DESPACHO",
-      "legal_basis": "Ley 1564 de 2012, arts. 22 num. 1, 280, 373 num. 5, 387, 389, 322 num. 3, 323 inc. 5 y 32 num. 1",
+      "legal_basis": "Ley 1564 de 2012, arts. 22 num. 1, 280, 373 num. 5, 387, 389, 322 num. 3, 323 inc. 5 y 32 num. 1 — FUNDAMENTO SUSTANCIAL (la causal, no el trámite): Código Civil, art. 140 (num. 2 modificado por el art. 4 de la Ley 2447 de 2025): enumera las causales taxativas de nulidad del matrimonio —error sobre las personas, matrimonio con o entre menores de 18 años, falta de consentimiento, fuerza o miedo, parentesco en línea recta o entre hermanos y vínculo matrimonial anterior subsistente, entre otras—, varias de ellas moduladas por la Corte Constitucional según los apartes que el propio texto oficial marca INEXEQUIBLES o CONDICIONALMENTE exequibles.",
       "competent_authority": "Juez de familia en primera instancia (art. 22 num. 1). La apelación la resuelve la Sala de Familia del Tribunal Superior de Distrito Judicial (art. 32 num. 1)",
       "term": "Reloj del CLIENTE para apelar: sentencia oral en audiencia, apelación 'en forma verbal inmediatamente después de pronunciada' (art. 322 num. 1 inc. 1); si solo se anuncia el sentido del fallo, tres (3) días desde su notificación por estado (art. 322 num. 1 inc. 2), con precisión de los reparos concretos dentro de los tres (3) días siguientes a la finalización de la audiencia, so pena de que se declare desierto (art. 322 num. 3). La apelación se concede en el efecto SUSPENSIVO por versar sobre el estado civil (art. 323 inc. 5). Reloj del JUZGADO: sentencia oral en la audiencia de instrucción y juzgamiento, o decisión escrita dentro de los diez (10) días siguientes al anuncio del sentido del fallo, sin desconocer el año del art. 121 (art. 373 num. 5). Reglas propias de este proceso que la sentencia arrastra desde el trámite: 'La intervención de los padres o guardadores de los cónyuges solo procederá cuando el respectivo consorte fuere incapaz'; 'El agente del Ministerio Público intervendrá únicamente cuando existan hijos menores, y en defensa de estos tendrá las mismas facultades de las partes. Para este efecto se le notificará el auto admisorio de la demanda'; y 'desde la presentación de la demanda y en el curso del proceso, de oficio o a petición de cualquiera de las partes, el juez deberá regular la obligación alimentaria de los cónyuges entre sí y en relación con los hijos comunes' (art. 387 incs. 2, 3 y 4). Ejecución de los alimentos provisionales: 'se seguirá ejecución en el mismo expediente, en cuaderno separado, por el trámite del proceso ejecutivo' (art. 387 inc. 5). Trámite posterior obligatorio: 'Copia de la sentencia que decrete la nulidad del matrimonio civil se enviará al respectivo funcionario del estado civil para su inscripción en el folio de matrimonio y en el de nacimiento de cada uno de los cónyuges' (art. 387 inc. 6). Efecto sobre las cautelas: ejecutoriada la sentencia cesa la prelación de los embargos del proceso de familia y el juez lo comunica de inmediato al registrador (art. 598 num. 2 inc. final).",
       "required_sections": [
@@ -1853,7 +2098,7 @@
       "exact_name": "Sentencia de separación de cuerpos",
       "area": "FAMILIA",
       "role": "DESPACHO",
-      "legal_basis": "Ley 1564 de 2012, arts. 22 num. 1, 21 num. 2, 280, 373 num. 5, 388 parágrafo, 322, 323 inc. 5 y 32 num. 1",
+      "legal_basis": "Ley 1564 de 2012, arts. 22 num. 1, 21 num. 2, 280, 373 num. 5, 388 parágrafo, 322, 323 inc. 5 y 32 num. 1 — FUNDAMENTO SUSTANCIAL (la causal, no el trámite): Código Civil, arts. 165, 166 y 167 (modificados por los arts. 15, 16 y 17 de la Ley 1a. de 1976): hay lugar a la separación de cuerpos por las causales del art. 154 o por mutuo consentimiento manifestado ante el juez; la separación no disuelve el matrimonio pero suspende la vida en común y disuelve la sociedad conyugal, salvo que siendo temporal y por mutuo consentimiento los cónyuges manifiesten mantenerla.",
       "competent_authority": "Juez de familia en primera instancia cuando la separación de cuerpos es contenciosa (art. 22 num. 1); juez de familia en ÚNICA instancia cuando es de mutuo acuerdo, junto con la suspensión y el restablecimiento de la vida en común (art. 21 num. 2), caso en el cual NO hay apelación. La apelación de la contenciosa la resuelve la Sala de Familia del Tribunal Superior de Distrito Judicial (art. 32 num. 1)",
       "term": "REGLA DE REMISIÓN: 'A los procesos de separación de cuerpos de matrimonio civil o religioso se aplicarán, en lo pertinente, las normas del presente artículo' (art. 388 parágrafo inc. 1). Reloj del CLIENTE para apelar la separación CONTENCIOSA: apelación verbal inmediatamente después de pronunciada la sentencia oral, o tres (3) días desde la notificación por estado si solo se anunció el sentido del fallo, con precisión de los reparos concretos dentro de los tres (3) días siguientes a la finalización de la audiencia so pena de deserción (art. 322 nums. 1 y 3); efecto suspensivo por versar sobre el estado civil (art. 323 inc. 5). ADVERTENCIA QUE CIERRA ESE MISMO RELOJ: si la separación de cuerpos se tramitó de mutuo acuerdo, el asunto es de ÚNICA instancia (art. 21 num. 2) y no hay apelación alguna. Reloj del JUZGADO: sentencia oral en la audiencia de instrucción y juzgamiento, o escrita dentro de los diez (10) días siguientes al anuncio del sentido del fallo, sin desconocer el año del art. 121 (art. 373 num. 5). Reglas del art. 388 que se aplican: son partes únicamente los cónyuges, el Ministerio Público es citado en interés de los hijos, el desistimiento conjunto termina el proceso y 'la muerte de uno de los cónyuges o la reconciliación ocurridas durante el proceso, ponen fin a este' (nums. 1 y 3). REGLA POSTERIOR A LA SENTENCIA, PROPIA DE ESTA ACTUACIÓN: 'Después de ejecutoriada la sentencia, si los cónyuges de común acuerdo solicitan que se ponga fin a la separación, el juez de plano dictará la sentencia respectiva' (art. 388 parágrafo inc. 2); no hay término para pedirlo.",
       "required_sections": [

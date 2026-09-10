@@ -10,6 +10,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "check:catalog": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/catalog/__checks__/catalog.check.ts",
+    "check:intacto": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/catalog/__checks__/intacto.check.ts",
     "check:embeddings": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/embeddings/__checks__/embeddings.check.ts",
     "smoke:embeddings": "npx ts-node --transpile-only src/scripts/smokeLocalEmbeddings.ts",
     "check:search": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/search/__checks__/search.check.ts",

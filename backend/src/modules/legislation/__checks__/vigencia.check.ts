@@ -181,6 +181,36 @@ const OPCIONES_LEY_CORTA = `<select><option value="#8">8</option>
   );
 }
 
+/* ─── SUBROGAR NO ES MATAR ────────────────────────────────────────────────── */
+
+/*
+ * Medido el 10 de septiembre de 2026 verificando los fundamentos del Código
+ * Civil: el art. 1040 salió DEROGADO y no lo está. El Senado lo marca
+ * «subrogado por el art. 2 de la Ley 29 de 1982» Y PUBLICA EL TEXTO NUEVO.
+ * Subrogar sustituye el contenido dejando el artículo en pie; derogar lo quita
+ * del ordenamiento.
+ *
+ * La ficha de sucesión se quedó sin uno de sus fundamentos por esto, y el
+ * escrito habría marcado como norma muerta una que rige. Es la peor clase de
+ * error en un avisador: la falsa alarma enseña a ignorar los avisos ciertos.
+ */
+{
+  const subrogado = 'Artículo subrogado por el artículo 2o. de la Ley 29 de 1982. El nuevo texto es el siguiente:';
+  const r = estadoDeLosMarcadores([subrogado]);
+  check('un artículo SUBROGADO está vigente: cambió su texto, no murió el artículo', r.estado === 'VIGENTE', r.estado);
+  check('y su marcador viaja en el detalle, porque el texto que rige es el nuevo', r.marcador === subrogado);
+
+  /* Y LO CONTRARIO PESA IGUAL: las derogaciones reales siguen cazándose. Las tres son casos medidos. */
+  const muertos: Array<[string, string]> = [
+    ['derogado por otra ley (art. 2035 del Código Civil)', 'Artículo derogado por el artículo 43 de la Ley 820 de 2003'],
+    ['derogado por el CGP (art. 126 del Código Civil)', 'Artículo derogado por el literal c) del artículo 626 de la Ley 1564 de 2012'],
+    ['declarado inexequible', 'Artículo INEXEQUIBLE']
+  ];
+  for (const [nombre, marcador] of muertos) {
+    check(`sigue detectándose el ${nombre}`, estadoDeLosMarcadores([marcador]).estado === 'DEROGADO', marcador.slice(0, 44));
+  }
+}
+
 /* ─── 5. LO QUE NO SE PUEDE COMPROBAR SE DECLARA, Y NUNCA LANZA ───────────── */
 
 const asincronos = async (): Promise<void> => {

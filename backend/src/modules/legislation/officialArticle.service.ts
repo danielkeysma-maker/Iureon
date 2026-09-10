@@ -306,7 +306,26 @@ export const marcadoresDelBloque = (bloque: string): string[] => {
  * enseña a ignorar todos los avisos. Esos casos salen VIGENTES con la nota en el
  * detalle, que es lo que hay que leer antes de apoyarse en ellos.
  */
-const MUERTO = /^art[íi]culo\s+(?:\d+[a-z]?\s+)?(?:derogad|anulad|subrogad|inexequible|declarado\s+inexequible)/i;
+/*
+ * SUBROGAR NO ES MATAR, y tratarlo como muerte fue un falso positivo medido.
+ *
+ * El 10 de septiembre de 2026, verificando los fundamentos del Código Civil, el
+ * art. 1040 —el orden hereditario— salió DEROGADO. No lo está: el Senado lo
+ * marca «subrogado por el art. 2 de la Ley 29 de 1982» Y PUBLICA EL TEXTO
+ * NUEVO. Subrogar es sustituir el contenido dejando el artículo en pie; derogar
+ * es quitarlo del ordenamiento. Con el falso positivo, la ficha de sucesión se
+ * quedó sin uno de sus fundamentos y el escrito lo habría marcado como norma
+ * muerta delante del juez.
+ *
+ * Es la misma falta que este repositorio ya se conoce: la falsa alarma es peor
+ * que el silencio, porque una acusación errónea enseña a ignorar todos los
+ * avisos —incluidos los verdaderos, como el art. 483 o el 2035, que sí están
+ * derogados—.
+ *
+ * El artículo subrogado sale VIGENTE con su marcador en el detalle, que es lo
+ * que hay que leer antes de apoyarse en él: el texto que rige es el nuevo.
+ */
+const MUERTO = /^art[íi]culo\s+(?:\d+[a-z]?\s+)?(?:derogad|anulad|inexequible|declarado\s+inexequible)/i;
 
 export const estadoDeLosMarcadores = (
   marcadores: string[]

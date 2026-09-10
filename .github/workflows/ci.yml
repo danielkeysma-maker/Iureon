@@ -54,6 +54,8 @@ jobs:
         run: npm run check:mail
       - name: Catalogue correctness checks
         run: npm run check:catalog
+      - name: Nothing verified was damaged when the substantive basis was added
+        run: npm run check:intacto
       - name: Actuaciones reachable by remisión carry their envelope and no borrowed deadline
         run: npm run check:remision
       - name: Embeddings guard (no fabricated vectors)
