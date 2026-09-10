@@ -45,6 +45,17 @@ interface ComboboxProps {
   anchoBoton?: string;
   /** Sin lupa cuando hay tres opciones y buscar sobra. */
   conBusqueda?: boolean;
+  /**
+   * El nombre elegido PARTE en varios renglones en vez de truncarse.
+   *
+   * De fábrica va apagado: en una barra de una sola fila el truncado es lo que
+   * impide que un rótulo largo empuje a sus vecinos fuera de la pantalla. Se
+   * enciende donde el control ocupa todo el ancho y no tiene vecinos —una
+   * columna estrecha apilada—, porque ahí truncar deja de ser un recorte
+   * cortés: «Restitución de …» ya no dice qué rama se está usando, que es lo
+   * único que este control informa.
+   */
+  partirEtiqueta?: boolean;
 }
 
 export const Combobox: React.FC<ComboboxProps> = ({
@@ -56,7 +67,8 @@ export const Combobox: React.FC<ComboboxProps> = ({
   pie,
   cargando = false,
   anchoBoton = 'max-w-[200px]',
-  conBusqueda = true
+  conBusqueda = true,
+  partirEtiqueta = false
 }) => {
   const [abierto, setAbierto] = useState(false);
   const [filtro, setFiltro] = useState('');
@@ -114,19 +126,36 @@ export const Combobox: React.FC<ComboboxProps> = ({
         title={elegida?.etiqueta ?? vacio}
         aria-expanded={abierto}
         aria-label={etiqueta}
-        className={`flex w-full ${anchoBoton} items-center gap-1.5 rounded-control border bg-canvas px-2.5 py-1 text-[12.5px] font-medium transition-colors ${
-          abierto ? 'border-brand-700 bg-surface' : 'border-line-200 hover:bg-surface'
-        }`}
+        className={`flex w-full ${anchoBoton} gap-1.5 rounded-control border bg-canvas px-2.5 py-1 text-[12.5px] font-medium transition-colors ${
+          partirEtiqueta ? 'items-start text-left' : 'items-center'
+        } ${abierto ? 'border-brand-700 bg-surface' : 'border-line-200 hover:bg-surface'}`}
       >
-        <span className={`min-w-0 truncate ${elegida ? 'text-ink-900' : 'text-ink-400'}`}>
+        <span
+          className={`min-w-0 ${
+            partirEtiqueta ? 'flex-1 leading-snug [overflow-wrap:anywhere]' : 'truncate'
+          } ${elegida ? 'text-ink-900' : 'text-ink-400'}`}
+        >
           {elegida?.etiqueta ?? vacio}
         </span>
         {elegida?.icono}
-        <ChevronDown className="h-3 w-3 shrink-0 text-ink-400" strokeWidth={2.4} />
+        <ChevronDown
+          className={`h-3 w-3 shrink-0 text-ink-400 ${partirEtiqueta ? 'mt-[3px]' : ''}`}
+          strokeWidth={2.4}
+        />
       </button>
 
+      {/*
+        LA LISTA NO PUEDE SER MÁS ANCHA QUE SU COLUMNA cuando el control vive
+        apilado en un panel estrecho: 340px absolutos dentro de una columna de
+        300 se salen por la derecha y el antepasado que recorta se los come,
+        justo sobre los nombres de rama.
+      */}
       {abierto && (
-        <div className="surface-raised absolute left-0 top-full z-40 mt-1 w-[340px] max-w-[80vw] overflow-hidden">
+        <div
+          className={`surface-raised absolute left-0 top-full z-40 mt-1 max-w-[80vw] overflow-hidden ${
+            partirEtiqueta ? 'w-full min-w-0' : 'w-[340px]'
+          }`}
+        >
           <p className="border-b border-line-100 px-3 py-2 font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
             {etiqueta}
           </p>
@@ -183,10 +212,17 @@ export const Combobox: React.FC<ComboboxProps> = ({
                   donde debía mostrar actuaciones.
                 */}
                 <span className="min-w-0 flex-1">
+                  {/*
+                    LA LISTA TAMPOCO TRUNCA EN ESTRECHO. De poco sirve que el
+                    control cerrado muestre la rama entera si al abrirlo hay que
+                    escoger entre «Seguridad Social (Colpensiones, AFP, ARL…»:
+                    la elección es justo el momento en que el nombre completo
+                    hace falta.
+                  */}
                   <span
-                    className={`block truncate text-ui ${
-                      o.valor === valor ? 'font-medium text-brand-700' : 'text-ink-900'
-                    }`}
+                    className={`block text-ui ${
+                      partirEtiqueta ? 'leading-snug [overflow-wrap:anywhere]' : 'truncate'
+                    } ${o.valor === valor ? 'font-medium text-brand-700' : 'text-ink-900'}`}
                   >
                     {o.etiqueta}
                   </span>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { PenLine, Sparkles } from 'lucide-react';
+import { AlertTriangle, PenLine, Sparkles } from 'lucide-react';
 import { Combobox, type OpcionCombobox } from './Combobox';
 import { GuiaEligeActuacionDialog } from './GuiaEligeActuacionDialog';
 import { ActuacionPropiaDialog } from './ActuacionPropiaDialog';
@@ -70,6 +70,55 @@ export interface PuenteAlAtaqueProps {
   onRedactar?: (exactName: string, rama: string, hechos: string, instruccion: string) => void;
 }
 
+/**
+ * A partir de este ancho el bloque cabe en dos columnas. Por debajo se apila.
+ *
+ * ES EL ANCHO DEL BLOQUE, NO EL DE LA VENTANA, y esa es toda la decisión: esta
+ * misma pieza se pinta en el diálogo de revisión —cerca de 900px— y en la
+ * columna derecha del taller —unos 300—, las dos veces en una pantalla de
+ * escritorio. Un `sm:` mide la ventana, así que en el taller daba por holgado
+ * un panel estrecho: el selector truncaba la rama, la explicación de la casilla
+ * caía en una columna de tres palabras por renglón y el botón se salía del
+ * panel. Aquí manda lo que el bloque mide de verdad.
+ */
+const ANCHO_HOLGADO = 420;
+
+/**
+ * El ancho real del nodo, vigilado mientras exista.
+ *
+ * Se mide con `ResizeObserver` y no con `@container` porque este proyecto no
+ * tiene el complemento de container queries de Tailwind, y sí tiene ya este
+ * mismo patrón resolviendo lo mismo en `VisorDelOriginal`. Nace en `null` —no
+ * en cero— para que el primer render, antes de medir, se pinte apilado: apilado
+ * de más se ve sobrado, apilado de menos se ve roto.
+ */
+function useAnchoDelBloque<T extends HTMLElement>(): [React.RefObject<T | null>, number | null] {
+  const nodo = React.useRef<T>(null);
+  const [ancho, setAncho] = React.useState<number | null>(null);
+
+  React.useEffect(() => {
+    const actual = nodo.current;
+    if (!actual) return;
+    const medir = () => setAncho(actual.clientWidth);
+    medir();
+    const observador = new ResizeObserver(medir);
+    observador.observe(actual);
+    return () => observador.disconnect();
+  }, []);
+
+  return [nodo, ancho];
+}
+
+/**
+ * La segunda mitad de la casilla «no sé la rama»: lo que cuesta.
+ *
+ * Vive en una constante porque se pinta en dos sitios —seguida del rótulo
+ * cuando hay ancho, y en un renglón propio debajo cuando no— y dos copias de
+ * una advertencia de precio divergen en cuanto alguien corrija una sola.
+ */
+const LO_QUE_CUESTA_BUSCAR_EN_TODO =
+  'Cada candidata dirá de cuál viene. Tarda entre diez y quince segundos —contra un par— y le cuesta a la plataforma unas cuatro veces más.';
+
 export const PuenteAlAtaque: React.FC<PuenteAlAtaqueProps> = ({
   informe,
   textoDelDocumento,
@@ -91,6 +140,29 @@ export const PuenteAlAtaque: React.FC<PuenteAlAtaqueProps> = ({
   /** Lo que la guía propuso y una persona escogió, con la rama de la que salió. */
   const [elegida, setElegida] = React.useState<{ exactName: string; rama: string } | null>(null);
   const [panelAbierto, setPanelAbierto] = React.useState(false);
+  /*
+   * CUANDO EL CATÁLOGO NO RECONOCE NADA, ESO ES UN DESENLACE Y SE ESCRIBE.
+   *
+   * Antes la guía lo decía dentro de su diálogo y, al cerrarlo, el bloque
+   * quedaba otra vez con el selector, la casilla y el botón — tres controles
+   * sueltos sin rastro de que ya se había preguntado y la respuesta había sido
+   * «no». El abogado no podía distinguir «no he preguntado» de «pregunté y no
+   * hay». Se guarda la razón QUE DEVOLVIÓ EL SERVIDOR, y si no la hay se dice
+   * lo único que consta; aquí no se nombra ninguna actuación ni se insinúa cuál
+   * podría ser.
+   */
+  const [sinCoincidencia, setSinCoincidencia] = React.useState<{ razon: string; enTodoElCatalogo: boolean } | null>(
+    null
+  );
+
+  const [caja, anchoDelBloque] = useAnchoDelBloque<HTMLElement>();
+  const holgado = anchoDelBloque !== null && anchoDelBloque >= ANCHO_HOLGADO;
+  /*
+   * JUSTIFICAR SOLO CON ANCHO. La regla de la casa justifica la prosa que se lee
+   * en bloque, pero en una columna de 300px cada renglón lleva seis o siete
+   * palabras y justificarlo abre ríos de espacio entre ellas. Estrecho: bandera.
+   */
+  const alineacion = holgado ? 'text-justify' : 'text-left';
 
   const ramasEstado = useCatalogBranchesState();
   const opcionesRama: OpcionCombobox[] = React.useMemo(
@@ -109,16 +181,25 @@ export const PuenteAlAtaque: React.FC<PuenteAlAtaqueProps> = ({
   };
 
   return (
-    <section className="rounded-card border border-[rgb(var(--brand-line))] bg-brand-50 px-3 py-3 [overflow-wrap:anywhere]">
+    <section
+      ref={caja}
+      className="min-w-0 rounded-card border border-[rgb(var(--brand-line))] bg-brand-50 px-3 py-3 [overflow-wrap:anywhere]"
+    >
       <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-brand-700">
         {puntos.length > 0 ? '¿Y con qué lo ataco?' : '¿Y qué puedo hacer?'}
       </h4>
-      <p className="mt-1 text-[12px] leading-snug text-ink-700 text-justify [text-wrap:pretty]">
+      <p className={`mt-1 text-[12px] leading-snug text-ink-700 ${alineacion} [text-wrap:pretty]`}>
         {puntos.length > 0
           ? 'El nombre de la actuación no lo pone este informe: lo pone el catálogo. Los flancos de arriba, con sus citas, viajan a la guía de actuaciones junto al texto del documento, y ella propone candidatas para atacar eso, cada una con su término, su artículo y su autoridad verificados. Escoge usted; después ponga el vencimiento en la agenda de términos, desde el icono de calendario de esta revisión en «Revisiones».'
           : 'Eso ya no lo dice este documento: lo dice el catálogo. Lleve los hechos a la guía de actuaciones y le propondrá candidatas con su término, su artículo y su autoridad verificados; después ponga el vencimiento en la agenda de términos, desde el icono de calendario de esta revisión en «Revisiones».'}
       </p>
-      <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-end">
+      {/*
+        DOS COLUMNAS SOLO SI CABEN. Con ancho, el selector a la izquierda y el
+        botón a la derecha, como estaba. Sin ancho, todo apilado y cada control
+        a lo ancho del panel: partir 300px en dos deja al botón desbordando el
+        borde y a la explicación en una tira ilegible.
+      */}
+      <div className={`mt-2 flex min-w-0 gap-2 ${holgado ? 'flex-row items-end' : 'flex-col'}`}>
         <div className="min-w-0 flex-1">
           <Combobox
             etiqueta="Rama"
@@ -127,47 +208,112 @@ export const PuenteAlAtaque: React.FC<PuenteAlAtaqueProps> = ({
             onChange={setRama}
             vacio="Elegir rama…"
             anchoBoton="max-w-full"
+            /*
+              EL NOMBRE DE LA RAMA NO SE TRUNCA EN ESTRECHO. «Restitución de
+              tierras (Ley 1448)» con puntos suspensivos en «Restitución de …»
+              deja de decir cuál rama se está usando, que es lo único que ese
+              control informa. Con ancho sigue truncando: ahí el nombre cabe y
+              la fila debe mantener su altura.
+            */
+            partirEtiqueta={!holgado}
             pie={
               sinRama
                 ? 'Se buscará en todo el catálogo: la rama queda sin usar.'
                 : 'La guía propone dentro de una rama; si no la sabe, márquelo abajo.'
             }
           />
-          <label className="mt-1.5 flex cursor-pointer items-start gap-2">
+          <label className="mt-1.5 flex min-w-0 cursor-pointer items-start gap-2">
             <input
               type="checkbox"
               checked={sinRama}
               onChange={(e) => setSinRama(e.target.checked)}
               className="mt-0.5 h-3.5 w-3.5 shrink-0 accent-[rgb(var(--brand-700))]"
             />
-            <span className="min-w-0 text-justify text-[12px] leading-snug text-ink-700 [text-wrap:pretty] [overflow-wrap:anywhere]">
-              No sé la rama: buscar en todo el catálogo.{' '}
-              <span className="text-ink-500">
-                Cada candidata dirá de cuál viene. Tarda entre diez y quince segundos —contra un par— y le cuesta a la
-                plataforma unas cuatro veces más.
-              </span>
+            <span
+              className={`min-w-0 ${alineacion} text-[12px] leading-snug text-ink-700 [text-wrap:pretty] [overflow-wrap:anywhere]`}
+            >
+              No sé la rama: buscar en todo el catálogo.
+              {/*
+                LO QUE CUESTA VA DEBAJO CUANDO NO HAY ANCHO. Continuar la frase
+                al lado de la casilla la encierra en la columna que sobra —unos
+                150px— y sale un renglón por cada dos o tres palabras.
+              */}
+              {holgado && <span className="text-ink-500"> {LO_QUE_CUESTA_BUSCAR_EN_TODO}</span>}
             </span>
           </label>
+          {!holgado && (
+            <p className="mt-1 text-left text-[12px] leading-snug text-ink-500 [text-wrap:pretty] [overflow-wrap:anywhere]">
+              {LO_QUE_CUESTA_BUSCAR_EN_TODO}
+            </p>
+          )}
         </div>
         <button
           type="button"
           onClick={abrirLaGuia}
           disabled={!rama && !sinRama}
-          className="btn-secondary btn-sm shrink-0 disabled:opacity-50"
+          /*
+            EL BOTÓN A ANCHO COMPLETO EN ESTRECHO, y con altura libre: su rótulo
+            son seis palabras y `btn-sm` fija 28px de alto, así que al partir en
+            dos renglones el texto se salía de su propia caja.
+          */
+          className={`btn-secondary btn-sm disabled:opacity-50 ${
+            holgado ? 'shrink-0' : 'h-auto w-full whitespace-normal py-1.5 text-left leading-snug'
+          }`}
           title={
             puntos.length > 0
               ? 'Propone actuaciones del catálogo para atacar los flancos señalados arriba, con el texto del documento como respaldo'
               : 'Propone actuaciones del catálogo a partir del texto de este documento'
           }
         >
-          <Sparkles className="h-3.5 w-3.5" />
+          <Sparkles className="h-3.5 w-3.5 shrink-0" />
           {puntos.length > 0 ? 'Llevar los flancos a la guía de actuaciones' : 'Llevar a la guía de actuaciones'}
         </button>
       </div>
 
+      {/*
+        EL DESENLACE CUANDO EL CATÁLOGO CALLA. No se propone ninguna actuación ni
+        se insinúa cuál podría ser: se dice que no reconoció nada y se ofrecen
+        las DOS salidas que existen de verdad —repetir sobre las 28 ramas, y
+        ponerle el nombre uno mismo, que queda declarado sin verificar—.
+      */}
+      {!elegida && sinCoincidencia && (
+        <div className="notice-unverified mt-2 flex-col items-stretch">
+          <p className={`flex items-start gap-2 ${alineacion} text-[12px] leading-snug [text-wrap:pretty]`}>
+            <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-unverified" />
+            <span className="min-w-0">{sinCoincidencia.razon}</span>
+          </p>
+          <p className={`mt-1.5 ${alineacion} text-[12px] leading-snug text-ink-700 [text-wrap:pretty]`}>
+            {sinCoincidencia.enTodoElCatalogo
+              ? 'Se buscó en las 28 ramas, así que no hay una ficha verificada que ponerle a este documento. Puede escribir usted el nombre de la actuación: quedará en la lista de su firma, y su artículo, su término y su autoridad se declararán sin verificar hasta que alguien los compruebe en «Catálogo».'
+              : 'Se buscó solo dentro de la rama elegida. Si la rama no es esa, el catálogo dice que no reconoce nada aunque la actuación exista en otra: marque «No sé la rama» y vuelva a preguntar. Si tampoco así, puede escribir usted el nombre, que quedará sin verificar.'}
+          </p>
+          <div className={`mt-2 flex gap-1.5 ${holgado ? 'flex-wrap' : 'flex-col items-stretch'}`}>
+            {!sinCoincidencia.enTodoElCatalogo && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSinRama(true);
+                  abrirLaGuia();
+                }}
+                className={`btn-neutral btn-sm ${holgado ? '' : 'h-auto w-full whitespace-normal py-1.5 leading-snug'}`}
+              >
+                Puede que la rama no sea esa: buscar en todo el catálogo
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setPropiaAbierta(true)}
+              className={`btn-neutral btn-sm ${holgado ? '' : 'h-auto w-full whitespace-normal py-1.5 leading-snug'}`}
+            >
+              Escribir el nombre de la actuación
+            </button>
+          </div>
+        </div>
+      )}
+
       {elegida && (
         <div className="mt-2 rounded-control border border-line-200 bg-canvas">
-          <p className="px-3 py-2 text-[12px] leading-snug text-ink-900 text-justify [text-wrap:pretty]">
+          <p className={`px-3 py-2 text-[12px] leading-snug text-ink-900 ${alineacion} [text-wrap:pretty]`}>
             Usted reconoció la actuación <span className="font-semibold">«{elegida.exactName}»</span>. Su término, su
             artículo y su autoridad salen de la ficha del catálogo, no de este documento. Póngala en la agenda desde
             «Revisiones».
@@ -185,6 +331,7 @@ export const PuenteAlAtaque: React.FC<PuenteAlAtaqueProps> = ({
                 rama={elegida.rama}
                 hechos={hechos}
                 informe={informe}
+                holgado={holgado}
                 onLlevar={(instruccion) => {
                   setPanelAbierto(false);
                   onRedactar(elegida.exactName, elegida.rama, hechos, instruccion);
@@ -209,6 +356,12 @@ export const PuenteAlAtaque: React.FC<PuenteAlAtaqueProps> = ({
         sinRamaInicial={sinRama}
         hechos={hechos}
         setHechos={setHechos}
+        /*
+          EL «NO RECONOZCO NADA» SALE DEL DIÁLOGO Y SE QUEDA AQUÍ. Dentro del
+          diálogo esa respuesta se pierde al cerrarlo, y el bloque volvía a
+          quedar como si nunca se hubiera preguntado.
+        */
+        onSinCoincidencia={setSinCoincidencia}
         onElegir={(exactName, branch) => {
           /*
            * LA RAMA QUE MANDA ES LA DE LA CANDIDATA. Buscando en todo el
@@ -217,6 +370,7 @@ export const PuenteAlAtaque: React.FC<PuenteAlAtaqueProps> = ({
            * resolvería después contra la ficha equivocada.
            */
           setElegida({ exactName, rama: branch || rama });
+          setSinCoincidencia(null);
           setPanelAbierto(false);
           setGuiaAbierta(false);
         }}
@@ -232,6 +386,7 @@ export const PuenteAlAtaque: React.FC<PuenteAlAtaqueProps> = ({
         userRole={userRole}
         onCreada={(exactName) => {
           setElegida({ exactName, rama });
+          setSinCoincidencia(null);
           setPanelAbierto(false);
           setPropiaAbierta(false);
         }}
@@ -261,9 +416,11 @@ const RedactarLaActuacion: React.FC<{
   rama: string;
   hechos: string;
   informe: InformeDeDocumentoRecibido;
+  /** Lo mide el bloque padre: aquí solo decide justificar y apilar. */
+  holgado: boolean;
   onLlevar: (instruccion: string) => void;
   onCancelar: () => void;
-}> = ({ exactName, rama, hechos, informe, onLlevar, onCancelar }) => {
+}> = ({ exactName, rama, hechos, informe, holgado, onLlevar, onCancelar }) => {
   const lookup = useActuacionLookup(exactName, rama || undefined);
 
   /*
@@ -290,7 +447,11 @@ const RedactarLaActuacion: React.FC<{
 
   if (lookup.estado === 'CARGANDO') {
     return (
-      <p className="border-t border-line-100 px-3 py-2 text-[12px] leading-snug text-ink-500 text-justify">
+      <p
+        className={`border-t border-line-100 px-3 py-2 text-[12px] leading-snug text-ink-500 ${
+          holgado ? 'text-justify' : 'text-left'
+        }`}
+      >
         Leyendo la ficha del catálogo para proponerle qué pedirle al motor…
       </p>
     );
@@ -299,16 +460,26 @@ const RedactarLaActuacion: React.FC<{
   if (lookup.estado !== 'ENCONTRADA') {
     return (
       <div className="border-t border-line-100 px-3 py-2">
-        <p className="text-[12px] leading-snug text-ink-700 text-justify [text-wrap:pretty]">
+        <p
+          className={`text-[12px] leading-snug text-ink-700 ${holgado ? 'text-justify' : 'text-left'} [text-wrap:pretty]`}
+        >
           El catálogo no devolvió la ficha de «{exactName}», así que no hay nada verificado con lo que armarle una
           instrucción. Puede redactar igual: viajan la actuación y los hechos, y usted escribe el encargo en Redacción.
         </p>
-        <div className="mt-2 flex flex-wrap gap-1.5">
-          <button type="button" onClick={() => onLlevar('')} className="btn-primary btn-sm">
-            <PenLine className="h-3 w-3" />
+        <div className={`mt-2 flex gap-1.5 ${holgado ? 'flex-wrap' : 'flex-col items-stretch'}`}>
+          <button
+            type="button"
+            onClick={() => onLlevar('')}
+            className={`btn-primary btn-sm ${holgado ? '' : 'h-auto w-full whitespace-normal py-1.5 leading-snug'}`}
+          >
+            <PenLine className="h-3 w-3 shrink-0" />
             Llevar a Redacción
           </button>
-          <button type="button" onClick={onCancelar} className="btn-neutral btn-sm">
+          <button
+            type="button"
+            onClick={onCancelar}
+            className={`btn-neutral btn-sm ${holgado ? '' : 'w-full'}`}
+          >
             Cancelar
           </button>
         </div>

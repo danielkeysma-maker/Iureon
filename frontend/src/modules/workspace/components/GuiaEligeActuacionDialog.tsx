@@ -93,6 +93,18 @@ interface Props {
    * dos veces lo mismo y a pagar la consulta acotada por el camino.
    */
   sinRamaInicial?: boolean;
+  /**
+   * Qué pasó con la última consulta, para quien montó este diálogo.
+   *
+   * NACIÓ DE UN DEFECTO DE CONTENIDO, no de estilo: cuando el catálogo no
+   * reconoce ninguna actuación, ese «no» solo vivía dentro de este diálogo y
+   * moría al cerrarlo. El bloque que lo abrió volvía a quedar con sus controles
+   * sueltos, sin desenlace, indistinguible de no haber preguntado nunca.
+   *
+   * Se avisa con `null` cuando la consulta SÍ trajo candidatas, para que el
+   * aviso anterior no sobreviva a su propia respuesta.
+   */
+  onSinCoincidencia?: (info: { razon: string; enTodoElCatalogo: boolean } | null) => void;
 }
 
 /** Mínimo para que la orientación signifique algo. Lo impone también el servidor. */
@@ -107,7 +119,8 @@ export const GuiaEligeActuacionDialog: React.FC<Props> = ({
   onElegir,
   onEscribirNombre,
   onSinNombre,
-  sinRamaInicial = false
+  sinRamaInicial = false,
+  onSinCoincidencia
 }) => {
   const [texto, setTexto] = useState(hechos);
   /*
@@ -173,6 +186,23 @@ export const GuiaEligeActuacionDialog: React.FC<Props> = ({
         enTodoElCatalogo ? undefined : (legalBranch as LegalBranch)
       );
       setResultado(respuesta);
+      /*
+       * LA RAZÓN QUE SE SACA ES LA DEL SERVIDOR, y solo si no la hay se dice lo
+       * único que consta. Aquí no se nombra ninguna actuación ni se sugiere cuál
+       * podría ser: el catálogo calló y eso es lo que se transmite.
+       */
+      onSinCoincidencia?.(
+        respuesta.status === 'SIN_COINCIDENCIA'
+          ? {
+              razon:
+                respuesta.reason ??
+                (enTodoElCatalogo
+                  ? 'El catálogo no reconoce una actuación para estos hechos en ninguna de sus ramas.'
+                  : 'El catálogo no reconoce una actuación para estos hechos dentro de esta rama.'),
+              enTodoElCatalogo
+            }
+          : null
+      );
     } catch (e) {
       /*
        * Se dice lo que dijo el servidor, sin inventar una causa. Los dos fallos
