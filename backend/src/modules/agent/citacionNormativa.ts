@@ -423,6 +423,39 @@ const efectosAtribuidos = (texto: string): HallazgoDeCitacion[] => {
  * ─── EL CEDAZO ─────────────────────────────────────────────────────────────
  */
 
+/**
+ * LAS CINCO MALLAS DE GLOSA, en una sola puerta.
+ *
+ * Existe para que el comprobador de glosa (`review/verificarGlosa.ts`) mire
+ * POR LAS MISMAS MALLAS que el cedazo y no por una copia suya. Dos listas de
+ * detectores que empiezan iguales terminan distintas, y la que se quede atras
+ * dejara de ver justo la forma de glosa que alguien acaba de anadir aqui.
+ *
+ * No incluye las citas fuera de lista: eso no es una afirmacion sobre lo que un
+ * articulo DICE, y contrastarla contra el texto oficial no tendria que juzgar.
+ */
+export const glosasDelTexto = (texto: string): HallazgoDeCitacion[] => [
+  ...glosasEnParentesis(texto),
+  ...glosasEnParentesisInvertido(texto),
+  ...glosasAgregadas(texto),
+  ...contenidosPredicados(texto),
+  ...efectosAtribuidos(texto)
+];
+
+/**
+ * Los numeros de articulo que se citan DENTRO de un fragmento.
+ *
+ * Lo necesita el comprobador de glosa para saber de que articulo habla cada
+ * frase que el cedazo marco. Se lee con el mismo lector de colas de cita que
+ * usa todo este modulo —numerales, incisos y paragrafos descartados— porque un
+ * «art. 384 num. 2» leido como dos articulos mandaria a comprobar la glosa
+ * contra el texto del articulo 2, y el veredicto saldria falso con apariencia
+ * de comprobado.
+ */
+export const articulosDelFragmento = (fragmento: string): number[] => [
+  ...new Set(mencionesDeArticulo(fragmento).map((m) => m.articulo))
+];
+
 export interface ResultadoDelCedazo {
   hallazgos: HallazgoDeCitacion[];
   /** Cuántas citas distintas quedaron fuera del universo autorizado. */
@@ -501,13 +534,7 @@ export const revisarCitacionNormativa = (
     });
   }
 
-  hallazgos.push(
-    ...glosasEnParentesis(texto),
-    ...glosasEnParentesisInvertido(texto),
-    ...glosasAgregadas(texto),
-    ...contenidosPredicados(texto),
-    ...efectosAtribuidos(texto)
-  );
+  hallazgos.push(...glosasDelTexto(texto));
 
   return {
     hallazgos,

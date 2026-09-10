@@ -87,6 +87,20 @@ export interface VigenciaDeArticulo {
   url?: string;
   /** El epígrafe del artículo tal como lo publica el Senado. */
   rubrica?: string;
+  /**
+   * EL TEXTO DEL ARTÍCULO, que es la pieza sin la cual no se puede juzgar una
+   * glosa.
+   *
+   * La rúbrica sola no basta y está medido: «OBLIGACIONES DEL ARRENDADOR» sí
+   * habría bastado para el caso del art. 8 de la Ley 820, pero «MORA EN EL PAGO
+   * DE LA RENTA» no dice nada sobre si un canon insoluto cabe en el juramento
+   * estimatorio del art. 206 del CGP — cuya enumeración es cerrada y vive en el
+   * cuerpo, no en el epígrafe. Sin cuerpo, comprobar una glosa volvería a ser
+   * preguntarle al modelo qué recuerda, que es exactamente lo que falló.
+   *
+   * Va acotado por `MAX_CUERPO`. Ausente cuando la fuente no respondió.
+   */
+  cuerpo?: string;
   /** Las notas de vigencia del JS hermano, si las hay. */
   notaDeVigencia?: string;
   /** Cuándo se consultó. Una comprobación sin fecha no es una comprobación. */
@@ -208,6 +222,66 @@ export const bloqueDelArticulo = (html: string, articulo: number): string | null
 export const rubricaDelBloque = (bloque: string): string => {
   const titulo = /<a[^>]*>([\s\S]*?)<\/a>/i.exec(bloque)?.[1] ?? '';
   return enUnaLinea(decodificarEntidades(sinEtiquetas(titulo)).replace(/[<>]/g, '')).replace(/\.$/, '');
+};
+
+/**
+ * CUÁNTO TEXTO DE ARTÍCULO SE PUBLICA, y por qué ese número.
+ *
+ * MEDIDO el 10 de septiembre de 2026 bajando del Senado los artículos que estos
+ * borradores citan de verdad, y contando el cuerpo ya limpio:
+ *
+ *     Ley 820 de 2003, art. 8  (obligaciones del arrendador)   1.684 caracteres
+ *     Ley 820 de 2003, art. 9  (obligaciones del arrendatario) 1.209
+ *     Ley 820 de 2003, art. 22 (terminación por el arrendador) 3.550
+ *     CGP, art. 206 (juramento estimatorio)                    2.838
+ *     CGP, art. 626 (derogaciones)                             4.798
+ *     CGP, art. 384 (restitución de inmueble arrendado)        6.089
+ *
+ * Ocho mil caracteres los cubren TODOS ENTEROS, y que quepan enteros es el
+ * punto: el art. 206 es taxativo —su enumeración cerrada es justo lo que hace
+ * falta para saber si un canon insoluto cabe en el juramento estimatorio— y
+ * cortarlo antes del último inciso convertiría al juez de la glosa en un juez
+ * que no vio el texto. Su NO_SOSTENIDA sería entonces una falsa alarma
+ * fabricada por el recorte, que es peor que no comprobar nada.
+ *
+ * Por arriba, ocho mil caracteres son ~2.300 tokens: a los US$0,75 por millón
+ * de entrada del motor barato, menos de US$0,002 por artículo. Así que el tope
+ * no está puesto por dinero sino para que un artículo monstruoso no se lleve el
+ * presupuesto de la etapa entera. Cuando se corta, SE DICE dentro del propio
+ * texto: un juez que ignore que le faltaba el final juzgaría creyendo que lo vio.
+ */
+export const MAX_CUERPO = 8_000;
+
+/**
+ * Las cajas plegables del Senado, quitadas POR SU ETIQUETA HTML y no por su texto.
+ *
+ * Perseguirlas por las palabras («Notas de Vigencia», «Legislación Anterior»)
+ * parecía equivalente y no lo era: el art. 35 de la Ley 820 dice dentro de su
+ * propio corchete «ver en Legislación Anterior el texto vigente hasta esta
+ * fecha», y el barrido por palabras le arrancaba esa frase al artículo. Editar
+ * el texto oficial para limpiarlo es justo lo que este módulo no puede hacer.
+ * La clase  SÍ identifica exactamente el enlace de la caja.
+ */
+const CAJA_PLEGABLE = /<a[^>]*class="caja_vja_encabezado"[^>]*>[\s\S]*?<\/a>/gi;
+
+/**
+ * El TEXTO del artículo: lo que viene después del epígrafe, sin etiquetas y sin
+ * las cajas plegables.
+ *
+ * Las cajas se quitan porque en el HTML solo dejan su rótulo suelto —su
+ * contenido lo inyecta el JS— y dárselo al juez de la glosa sería darle
+ * palabras que no son del artículo. Y NO se quitan los marcadores angulares
+ * —«<Artículo modificado por…>»— porque eso SÍ es del artículo y cambia lo que
+ * dice.
+ */
+export const cuerpoDelBloque = (bloque: string): string => {
+  const finDelTitulo = /<\/a>/i.exec(bloque);
+  const resto = finDelTitulo ? bloque.slice(finDelTitulo.index + finDelTitulo[0].length) : bloque;
+  const plano = enUnaLinea(
+    decodificarEntidades(sinEtiquetas(resto.replace(CAJA_PLEGABLE, ' ')))
+  );
+  if (plano.length <= MAX_CUERPO) return plano;
+  return `${plano.slice(0, MAX_CUERPO)} […texto oficial recortado en ${MAX_CUERPO} caracteres; el artículo sigue más allá de este punto…]`;
 };
 
 /**
@@ -455,6 +529,7 @@ export const consultarVigencia = async (
           : 'El texto oficial lo publica sin marca de derogación.',
     url,
     rubrica: rubricaDelBloque(bloque),
+    cuerpo: cuerpoDelBloque(bloque),
     notaDeVigencia: nota,
     consultadoEn: new Date().toISOString().slice(0, 10)
   };
