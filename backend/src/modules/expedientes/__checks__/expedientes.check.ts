@@ -11,6 +11,13 @@ import {
   type PapelEnElExpediente
 } from '../types';
 import type { SpeakerRole } from '../../transcription/types';
+import {
+  MAX_PERSONAS_POR_TANDA,
+  interrogables,
+  leerPreguntas,
+  tecnicaPara
+} from '../preguntasDelExpediente';
+import type { ActorDelExpediente, ExpedienteConDetalle } from '../types';
 
 /**
  * GUARDA DEL EXPEDIENTE.
@@ -257,6 +264,154 @@ check(
   'y acepta los veintiún papeles, sin que sobre ni falte uno',
   papelesQueFaltan.length === 0,
   papelesQueFaltan.length > 0 ? `faltan en la base: ${papelesQueFaltan.join(', ')}` : `${PAPELES.length} papeles`
+);
+
+/* ─── 9. EL INTERROGATORIO SABE A QUIÉN SE LE PREGUNTA ──────────────────── */
+
+const actor = (
+  id: string,
+  nombre: string,
+  papel: ActorDelExpediente['papel'],
+  lado: ActorDelExpediente['lado'],
+  sobreQue: string | null = null
+): ActorDelExpediente => ({
+  id,
+  expedienteId: 'exp-1',
+  nombre,
+  papel,
+  lado,
+  sobreQue,
+  identificacion: null,
+  notas: null,
+  clienteId: null,
+  createdAt: '2026-09-10'
+});
+
+const TESTIGO_PROPIO = actor('a1', 'Marta Ríos', 'TESTIGO', 'PROPIO', 'la entrega del inmueble');
+const TESTIGO_AJENO = actor('a2', 'Jorge Pineda', 'TESTIGO', 'CONTRARIO');
+const PARTE_AJENA = actor('a3', 'ACME S.A.S.', 'DEMANDADO', 'CONTRARIO');
+const PERITO_AJENO = actor('a4', 'Luis Gómez', 'PERITO', 'CONTRARIO');
+const PERITO_OFICIO = actor('a5', 'Ana Cuervo', 'PERITO', 'NEUTRAL');
+const EL_JUEZ = actor('a6', 'Juzgado 3 Civil', 'JUEZ', 'NEUTRAL');
+
+/*
+ * LA TÉCNICA LA DECIDE EL CÓDIGO Y NO EL MODELO, porque se deduce de dos
+ * campos que el abogado ya llenó. Interrogar a un testigo propio con preguntas
+ * cerradas, o contrainterrogar con abiertas, arruina la diligencia por muy
+ * inteligente que sea la pregunta.
+ */
+check(
+  'al testigo PROPIO se le interroga con abiertas',
+  /ABIERTAS/.test(tecnicaPara(TESTIGO_PROPIO)) && /DIRECTO/.test(tecnicaPara(TESTIGO_PROPIO))
+);
+check(
+  'al testigo de la CONTRAPARTE se le contrainterroga con cerradas',
+  /CERRADAS/.test(tecnicaPara(TESTIGO_AJENO)) && /CONTRAINTERROGATORIO/.test(tecnicaPara(TESTIGO_AJENO))
+);
+check(
+  'a la PARTE contraria se le hace interrogatorio de parte, que no es lo mismo',
+  /INTERROGATORIO DE PARTE/.test(tecnicaPara(PARTE_AJENA))
+);
+/*
+ * Al perito NO se le pregunta qué vio: no vio nada, dictaminó. Es el caso que
+ * un cajón de «testigos de la contraparte» borraba.
+ */
+check(
+  'al PERITO ajeno se le va por el método y no por lo que vio',
+  /CONTRADICCIÓN DEL DICTAMEN/.test(tecnicaPara(PERITO_AJENO)) &&
+    /no vio nada/.test(tecnicaPara(PERITO_AJENO))
+);
+check(
+  'y al perito de oficio no se le contrainterroga: no es de nadie',
+  !/CONTRAINTERROGATORIO/.test(tecnicaPara(PERITO_OFICIO)) &&
+    /ESCLARECIMIENTO/.test(tecnicaPara(PERITO_OFICIO))
+);
+
+const EXPEDIENTE: ExpedienteConDetalle = {
+  id: 'exp-1',
+  caratula: 'Mosquera vs. ACME',
+  radicado: null,
+  despacho: null,
+  rama: 'CIVIL',
+  clienteId: null,
+  clienteNombre: null,
+  contraparte: 'ACME S.A.S.',
+  estado: 'ACTIVO',
+  notas: null,
+  createdBy: 'a@b.co',
+  createdAt: '2026-09-10',
+  updatedAt: '2026-09-10',
+  listaDeActores: [TESTIGO_PROPIO, TESTIGO_AJENO, PARTE_AJENA, PERITO_AJENO, EL_JUEZ],
+  piezas: { entrevistas: 0, audiencias: 0, revisiones: 0, borradores: 0, terminos: 0, orientaciones: 0 }
+};
+
+check(
+  'el juez no aparece entre las personas a las que se prepara interrogatorio',
+  !interrogables(EXPEDIENTE).some((a) => a.papel === 'JUEZ'),
+  `${interrogables(EXPEDIENTE).length} de ${EXPEDIENTE.listaDeActores.length} actores`
+);
+
+/*
+ * ─── LO QUE MÁS IMPORTA: EL ACTOR MANDA SOBRE LO QUE DIGA EL MODELO ───────
+ *
+ * Si el motor devuelve un `actorId` que no se le mandó, o le cambia el nombre
+ * a alguien, el resultado sería una lista de preguntas atribuidas a una
+ * persona que no está en el expediente — y eso se lee igual de bien que una
+ * lista correcta. El nombre y la técnica se toman del actor, nunca de la
+ * respuesta, y lo que no case se descarta.
+ */
+const RESPUESTA = JSON.stringify({
+  enfoque: 'Probar la entrega y el incumplimiento.',
+  porPersona: [
+    { actorId: 'a1', nombre: 'OTRA PERSONA', preguntas: [{ pregunta: '¿Qué vio usted?', paraQue: 'fijar el hecho' }] },
+    { actorId: 'inventado', preguntas: [{ pregunta: '¿Y usted?', paraQue: 'nada' }] }
+  ]
+});
+const leidas = leerPreguntas(RESPUESTA, [TESTIGO_PROPIO], 'a@b.co');
+check(
+  'una lista con un actorId inventado se DESCARTA, no entra con el nombre que el modelo quiso',
+  leidas !== null && leidas.porPersona.length === 1,
+  `${leidas?.porPersona.length ?? 0} listas`
+);
+check(
+  'y el nombre sale del actor real, aunque el modelo devuelva otro',
+  leidas?.porPersona[0].nombre === 'Marta Ríos',
+  leidas?.porPersona[0].nombre
+);
+check(
+  'la técnica también sale del actor: el modelo no la escoge',
+  /ABIERTAS/.test(leidas?.porPersona[0].tecnica ?? '')
+);
+check(
+  'una respuesta ilegible no se inventa: devuelve null y el saldo se reembolsa',
+  leerPreguntas('esto no es JSON', [TESTIGO_PROPIO], 'a@b.co') === null
+);
+check(
+  'y una respuesta sin una sola pregunta tampoco cuenta como respuesta',
+  leerPreguntas(JSON.stringify({ enfoque: 'x', porPersona: [{ actorId: 'a1', preguntas: [] }] }), [TESTIGO_PROPIO], 'a@b.co') === null
+);
+
+/*
+ * EL TOPE POR TANDA EXISTE POR EL PRESUPUESTO DE SALIDA. Cada persona son
+ * ~1.100 tokens; sin tope, ocho personas cortarían el JSON y lo que se
+ * perdería es la última lista, en silencio.
+ */
+const preguntasCtrl = leer('modules/expedientes/preguntas.controller.ts');
+check(
+  'el número de personas por tanda tiene tope y el presupuesto de salida crece con ellas',
+  MAX_PERSONAS_POR_TANDA > 0 &&
+    /TOKENS_POR_PERSONA \* aQuienes\.length/.test(preguntasCtrl),
+  `${MAX_PERSONAS_POR_TANDA} personas por tanda`
+);
+check(
+  'si no produce preguntas legibles, se devuelve el saldo ANTES de responder',
+  preguntasCtrl.indexOf('refundReservation') < preguntasCtrl.indexOf("error: 'QUESTIONS_FAILED'"),
+  'serverless se congela al responder'
+);
+check(
+  'se cobra con la MISMA operación que las preguntas de una revisión: el histórico no se parte',
+  /const OPERACION = 'CONSULTA_REVISION'/.test(preguntasCtrl),
+  'mismo trabajo, mismo renglón en el movimiento de crédito'
 );
 
 console.log('');

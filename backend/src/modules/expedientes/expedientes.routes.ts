@@ -10,6 +10,7 @@ import {
   listarExpedientesController,
   obtenerExpedienteController
 } from './expedientes.controller';
+import { preguntasDelExpedienteController } from './preguntas.controller';
 
 /**
  * Los expedientes de la firma.
@@ -43,5 +44,11 @@ router.delete('/expedientes/:id', bloquearSiPlanVencido, borrarExpedienteControl
 
 router.post('/expedientes/:id/actores', bloquearSiPlanVencido, agregarActorController as any);
 router.delete('/expedientes/:id/actores/:actorId', bloquearSiPlanVencido, borrarActorController as any);
+
+/*
+ * El interrogatorio. Cuesta saldo, así que va detrás de `bloquearSiPlanVencido`
+ * como toda escritura, y además `exigirModulo` dentro del controlador.
+ */
+router.post('/expedientes/:id/preguntas', bloquearSiPlanVencido, preguntasDelExpedienteController as any);
 
 export const expedientesRoutes = router;
