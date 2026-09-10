@@ -252,6 +252,43 @@ const normaDeLaMencion = (
   /** La norma de la ficha de la que salió el texto. Ver el comentario de abajo. */
   normaDeLaFicha: string | null
 ): string | null => {
+  /*
+   * «DE LA MISMA LEY» APUNTA HACIA ATRÁS, Y EL CÓDIGO MIRABA HACIA DELANTE.
+   *
+   * Medido el 10 de septiembre de 2026 sobre un borrador real: el escrito decía
+   * «los artículos 82, 84, 368, 369 y 365 DE LA MISMA LEY, y el artículo 146 de
+   * la Ley 2220 de 2022», y los cinco primeros quedaban atribuidos a la Ley
+   * 2220 —la norma nombrada DESPUÉS—. El cedazo los reportó como cinco citas
+   * fuera de lo autorizado, y las cinco eran correctas: son del Código General
+   * del Proceso, que se había nombrado antes.
+   *
+   * Cinco falsas alarmas en un solo escrito. Y en esta casa está escrito que la
+   * falsa alarma es peor que el silencio, porque una acusación errónea enseña a
+   * ignorar todos los avisos — precisamente los que sí importan.
+   *
+   * La anáfora se reconoce y manda: quien dice «de la misma ley» se refiere a
+   * la última norma nombrada, no a la siguiente.
+   */
+  const ANAFORA = /\b(?:de\s+(?:la\s+)?mism[ao]s?\s+(?:ley|c[óo]digo|estatuto|norma|decreto)|del\s+mismo\s+(?:c[óo]digo|estatuto|decreto)|ib[íi]dem)\b/i;
+  /*
+   * La anáfora vale si aparece ANTES que la siguiente marca de norma. En «82,
+   * 84 y 365 de la misma ley, y el artículo 146 de la Ley 2220» el «de la misma
+   * ley» llega primero: los tres primeros son de la norma anterior. Si la marca
+   * llegara antes, mandaría ella, que es el caso normal.
+   */
+  const ventana = texto.slice(mencion.indice, mencion.indice + 160);
+  const dondeAnafora = ventana.search(ANAFORA);
+  if (dondeAnafora !== -1) {
+    const siguiente = marcas.find((x) => x.indice > mencion.indice);
+    const distanciaMarca = siguiente ? siguiente.indice - mencion.indice : Infinity;
+    if (dondeAnafora < distanciaMarca) {
+      const previas = marcas.filter((x) => x.indice < mencion.indice);
+      const previa = previas[previas.length - 1];
+      if (previa) return previa.clave;
+      if (normaDeLaFicha) return normaDeLaFicha;
+    }
+  }
+
   const posterior = marcas.find(
     (x) =>
       x.indice >= mencion.indice &&

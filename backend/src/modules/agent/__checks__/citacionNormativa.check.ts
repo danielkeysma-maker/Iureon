@@ -425,5 +425,46 @@ check(
   for (const [nombre, texto] of NO_DEBEN_MARCARSE) check(`NO se marca: ${nombre}`, !glosa(texto), texto.slice(0, 52));
 }
 
+/*
+ * ─── «DE LA MISMA LEY» APUNTA HACIA ATRÁS ──────────────────────────────────
+ *
+ * Medido el 10 de septiembre de 2026 sobre un borrador real: el escrito decía
+ * «los artículos 82, 84, 368, 369 y 365 DE LA MISMA LEY, y el artículo 146 de
+ * la Ley 2220 de 2022», y los cinco primeros se atribuían a la Ley 2220 —la
+ * norma nombrada DESPUÉS—. El cedazo los reportó como cinco citas fuera de lo
+ * autorizado, y las cinco eran correctas.
+ *
+ * Cinco falsas alarmas en un solo escrito, y en esta casa está escrito que la
+ * falsa alarma es peor que el silencio: una acusación errónea enseña a ignorar
+ * todos los avisos, incluidos los que sí importan.
+ */
+{
+  const claves = (texto: string): string[] =>
+    referenciasDelTexto(texto, 'CGP').map((r) => `${r.codigo}|${r.articulo}`);
+
+  const real = claves('Con fundamento en los artículos 82, 84, 368, 369 y 365 de la misma ley, y el artículo 146 de la Ley 2220 de 2022, se solicita.');
+  check(
+    'la anáfora «de la misma ley» lleva los artículos a la norma ANTERIOR, no a la siguiente',
+    ['CGP|82', 'CGP|84', 'CGP|368', 'CGP|369', 'CGP|365'].every((k) => real.includes(k)),
+    real.join(' ')
+  );
+  check('y el que sí lleva su ley al lado la conserva', real.includes('LEY 2220 DE 2022|146'));
+  check(
+    'otras formas de la anáfora también se resuelven hacia atrás',
+    claves('Lo previsto en el artículo 90 del mismo estatuto, y el artículo 12 de la Ley 820 de 2003.').includes('CGP|90')
+  );
+  /*
+   * Y LO CONTRARIO PESA IGUAL: sin anáfora manda la marca posterior, que es el
+   * caso corriente. Una correccion que rompiera esto cambiaria cinco falsas
+   * alarmas por un monton de citas mal archivadas.
+   */
+  check(
+    'sin anáfora, la norma nombrada después sigue mandando',
+    claves('Se invoca el artículo 22 de la Ley 820 de 2003.').includes('LEY 820 DE 2003|22')
+  );
+  const dos = claves('El artículo 384 del Código General del Proceso y el artículo 22 de la Ley 820 de 2003.');
+  check('y con dos normas seguidas, cada artículo va con la suya', dos.includes('CGP|384') && dos.includes('LEY 820 DE 2003|22'), dos.join(' '));
+}
+
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);
 process.exitCode = fallos === 0 ? 0 : 1;
