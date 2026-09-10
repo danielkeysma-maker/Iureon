@@ -1,4 +1,4 @@
-import { httpClient } from '../../config/httpClient';
+import { ApiError, httpClient } from '../../config/httpClient';
 import type {
   EstadoDeAcceso,
   SupportAccess,
@@ -112,6 +112,33 @@ export interface FuncionConmutable {
   modulo: string;
   nombre: string;
   descripcion: string;
+}
+
+/**
+ * Lo que `GET /api/admin/mail/status` contesta, tal cual.
+ *
+ * `user` LLEGA YA ENMASCARADA (`d***@dominio`): el servidor la recorta en
+ * `enmascarar()` antes de responder, y aquí no se reconstruye ni se pide
+ * completa. Reconocer la cuenta basta para saber si el correo sale de donde
+ * debe; publicarla entera no aporta nada y expone la casilla del titular.
+ *
+ * El endpoint NO dice por qué proveedor sale (Resend o Gmail): `estadoDelCorreo`
+ * en el servidor solo devuelve estos tres campos. No se adivina por la forma de
+ * la dirección — un `@gmail.com` puede estar saliendo por Resend igual.
+ */
+export interface EstadoDelCorreo {
+  enabled: boolean;
+  /** `null` cuando no hay correo configurado: no hay cuenta que nombrar. */
+  user: string | null;
+  /** El nombre que ve el destinatario junto a la dirección. */
+  fromName: string;
+}
+
+/** Lo que devuelve `correoDePrueba` en el servidor, con 200 o con 502. */
+export interface ResultadoDeCorreoDePrueba {
+  enviado: boolean;
+  /** Lo que dijo el proveedor cuando rechazó. Ausente cuando salió. */
+  error?: string;
 }
 
 export const adminApi = {
@@ -240,5 +267,41 @@ export const adminApi = {
       tablas: Array<{ tabla: string; filas: number }>;
       usuariosEliminados: number;
       advertencias: string[];
-    }>(`/api/admin/firms/${firmId}`, { body: input })
+    }>(`/api/admin/firms/${firmId}`, { body: input }),
+
+  /*
+   * Las dos rutas de correo saliente. Existían desde hace tiempo en el servidor
+   * y NADIE las llamaba: un endpoint que existe no prueba que alguien lo
+   * invoque, y mientras tanto la única forma de saber si el correo salía era
+   * provocar un pago real.
+   */
+  estadoDelCorreo: () =>
+    httpClient.get<{ success: boolean } & EstadoDelCorreo>('/api/admin/mail/status'),
+
+  /**
+   * Manda el mensaje de prueba AL PROPIO OPERADOR: el servidor toma el
+   * destinatario del token y no del cuerpo, así que aquí no hay nada que
+   * enviar ni dirección que escoger.
+   *
+   * DEVUELVE EL RECHAZO EN VEZ DE LANZARLO. El endpoint contesta 502 con
+   * `{ enviado: false, error: '<lo que dijo el proveedor>' }`, y ese cuerpo no
+   * trae `message`: `httpClient` construye entonces un `ApiError` cuyo texto es
+   * «POST … failed with 502» y deja el error de verdad en `code`. Si esto
+   * lanzara tal cual, la tarjeta enseñaría el código de estado en lugar de la
+   * respuesta del proveedor, que es exactamente lo que el operador necesita
+   * leer para arreglarlo. Un envío rechazado es un RESULTADO del envío; el 401
+   * y el 403 siguen lanzando, porque esos sí son otra cosa.
+   */
+  enviarCorreoDePrueba: async (): Promise<ResultadoDeCorreoDePrueba> => {
+    try {
+      return await httpClient.post<{ success: boolean } & ResultadoDeCorreoDePrueba>(
+        '/api/admin/mail/test'
+      );
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 502) {
+        return { enviado: false, error: err.code ?? err.message };
+      }
+      throw err;
+    }
+  }
 };

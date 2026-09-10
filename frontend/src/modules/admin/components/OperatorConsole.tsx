@@ -5,6 +5,7 @@ import { FirmDetailDialog } from './FirmDetailDialog';
 import { CatalogMasterDialog } from './CatalogMasterDialog';
 import { RechargeFirmDialog } from './RechargeFirmDialog';
 import { BandejaDeSoporte } from './BandejaDeSoporte';
+import { CorreoSaliente } from './CorreoSaliente';
 
 /**
  * Running the platform: the firms on it, their plans, their balances.
@@ -538,6 +539,15 @@ export const OperatorConsole: React.FC = () => {
           ))}
         </div>
       )}
+
+      {/*
+        EL CORREO SALIENTE VA ABAJO, no arriba: no hay nadie esperando al otro
+        lado, como sí lo hay en la bandeja de soporte. Es infraestructura que se
+        comprueba cuando se cambia la configuración —o cuando una firma dice que
+        no le llegó la confirmación de su pago—, y hasta entonces no debe
+        competir con las firmas por la parte alta de la pantalla.
+      */}
+      <CorreoSaliente />
 
       {/*
         Said plainly, because an operator should know the limits of their own
