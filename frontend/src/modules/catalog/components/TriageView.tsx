@@ -420,7 +420,11 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
         {result?.cupoRestante !== undefined && result.cupoRestante <= 5 && (
           <p className="px-1 text-meta text-ink-500">
             {result.cupoRestante > 0
-              ? `Le quedan ${result.cupoRestante} orientaciones gratuitas hoy. Después de eso, cada una descuenta $50 del saldo.`
+              ? `Le quedan ${result.cupoRestante} orientaciones gratuitas hoy.${
+                  result.precioOrientacionCop
+                    ? ` Después de eso, cada una descuenta $${result.precioOrientacionCop.toLocaleString('es-CO')} del saldo.`
+                    : ''
+                }`
               : `Ya usó las gratuitas de hoy${
                   result.cobradoCop ? `; esta descontó $${result.cobradoCop} del saldo` : ''
                 }. Mañana se reinicia el cupo.`}

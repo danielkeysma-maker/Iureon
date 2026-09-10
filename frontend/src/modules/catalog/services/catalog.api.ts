@@ -161,6 +161,12 @@ export interface TriageResponse {
   cupoRestante?: number;
   /** Lo que costó ESTA consulta. 0 mientras haya cupo gratuito. */
   cobradoCop?: number;
+  /**
+   * Lo que costará la siguiente pasada el cupo. Viene del servidor y NO se
+   * escribe a mano en la pantalla: cuando el precio subió de $50 a $150, el
+   * texto fijo habría seguido prometiendo $50 sin que nada se pusiera rojo.
+   */
+  precioOrientacionCop?: number;
 }
 
 export interface OrientacionGuardada {

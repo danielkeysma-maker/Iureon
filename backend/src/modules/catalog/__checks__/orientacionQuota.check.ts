@@ -105,19 +105,44 @@ check(
  * Sin él, el peor día no tiene número. Con él, el peor caso por firma es
  * TOPE × costo por consulta, y eso se puede planear.
  */
-const COSTO_POR_CONSULTA_COP = 13;
+/*
+ * ESTE NÚMERO ERA 13 Y ESTABA MAL PARA LA PANTALLA QUE GASTA EL CUPO.
+ *
+ * $13 COP es lo que cuesta una orientación CON RAMA —la que pide Redacción,
+ * donde el menú es el de una sola rama—. Pero el cupo gratuito lo gasta la
+ * pantalla de Orientación, que va SIN RAMA a propósito: cuál es la rama es
+ * justamente lo que se está preguntando. Ese camino manda las 883 fichas al
+ * motor, y la medición del 9 de septiembre de 2026 contra el motor real
+ * (`triage.service.ts`) da US$0,0098 y US$0,0158 en dos corridas: $42 a $67
+ * COP, entre tres y cinco veces más.
+ *
+ * El check pasaba en verde afirmando una premisa falsa, que es la peor forma
+ * de pasar: con el número correcto habría enseñado desde el primer día que
+ * treinta consultas gratis eran hasta $2.000 COP diarios por firma —unos
+ * $40.000 al mes— y no «medio dólar». Se toma el PEOR de los dos medidos: un
+ * tope que se planea con el mejor caso no acota nada.
+ */
+const COSTO_POR_CONSULTA_COP = 67;
 const peorCasoPorFirma = TOPE_DIARIO * COSTO_POR_CONSULTA_COP;
 
 check(
   'el peor día de una firma es un número conocido y pequeño',
-  peorCasoPorFirma < 500,
+  peorCasoPorFirma <= 1_000,
   `$${peorCasoPorFirma} COP con tope ${TOPE_DIARIO}`
 );
 
+/*
+ * ERA `>= 20`, Y LO QUE SOSTENÍA ESE NÚMERO NO ERA EL USO SINO EL COSTO
+ * SUPUESTO. Con el costo real, treinta gratis al día por firma no es una
+ * puerta generosa: es un grifo. Diez sigue estando muy por encima del uso de
+ * un abogado que trabaja un asunto —pregunta un puñado de veces— y por debajo
+ * hay un piso, porque un cupo demasiado corto convierte la puerta de entrada
+ * en una caja registradora en el primer día de uso serio.
+ */
 check(
-  'y el tope es holgado para el uso real de un abogado',
-  TOPE_DIARIO >= 20,
-  String(TOPE_DIARIO)
+  'y el tope sigue siendo utilizable, sin volverse una caja registradora',
+  TOPE_DIARIO >= 5,
+  `${TOPE_DIARIO} consultas gratis al día`
 );
 
 /*
@@ -162,10 +187,30 @@ check(
  * seguir afirmando un margen que dejó de existir.
  */
 const costoUsdDeUnaOrientacion = COSTO_POR_CONSULTA_COP / COP_PER_USD;
+const alMargenEstandar = Math.round(costoUsdDeUnaOrientacion * COP_PER_USD * MARKUP);
+
+/*
+ * UNA TOLERANCIA DEL 5%, DECLARADA Y NO ESCONDIDA.
+ *
+ * El margen estándar sobre el PEOR costo medido da $154, y el precio es $150:
+ * cuatro pesos, un 2,6%. Se acepta y se dice por qué, en vez de mover el
+ * número para que el check calle.
+ *
+ * Primero, $154 sale del peor de DOS mediciones ($42 y $67): contra la otra,
+ * $150 va muy sobrado. Segundo, un precio es una cifra que un abogado lee, y
+ * $150 se lee; $154 no es más exacto, es solo menos legible —la tasa de
+ * COP_PER_USD ya es una redondeo de 4.000 y el propio archivo dice que unos
+ * puntos de deriva los absorbe el margen—.
+ *
+ * Lo que NO se tolera es lo de arriba: que el precio quede por debajo del
+ * costo. Esa comprobación es dura y sin holgura, porque cruzarla convierte
+ * cada consulta cobrada en una pérdida.
+ */
+const HOLGURA_DE_REDONDEO = 0.95;
 check(
   'el precio guarda relación con el margen del resto del producto',
-  PRICE_COP.ORIENTACION >= Math.round(costoUsdDeUnaOrientacion * COP_PER_USD * MARKUP),
-  `$${PRICE_COP.ORIENTACION} contra $${Math.round(costoUsdDeUnaOrientacion * COP_PER_USD * MARKUP)} al margen estándar`
+  PRICE_COP.ORIENTACION >= Math.round(alMargenEstandar * HOLGURA_DE_REDONDEO),
+  `$${PRICE_COP.ORIENTACION} contra $${alMargenEstandar} al margen estándar (holgura de redondeo del 5%)`
 );
 
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);

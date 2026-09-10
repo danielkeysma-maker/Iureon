@@ -4,7 +4,7 @@ import { triageFacts } from './triage.service';
 import { catalogService } from './catalog.service';
 import type { LegalBranch } from './types';
 import { guardarOrientacion, listarOrientaciones, huecosDelCatalogo } from './orientacionHistory.service';
-import { consumirCupo, TOPE_DIARIO } from './orientacionQuota.service';
+import { consumirCupo, devolverCupo, TOPE_DIARIO } from './orientacionQuota.service';
 import {
   BillingError,
   PRICE_COP,
@@ -37,6 +37,13 @@ import { exigirModulo, responderPlanError } from '../subscriptions/plan.service'
  * impedirlo. Si el modelo falla después, ese intento igual se gastó: un tope
  * que se esquiva haciendo fallar las llamadas no es un tope.
  */
+/**
+ * Lo más largo que puede ser el relato de hechos. Ver la guarda de abajo: no
+ * es una preferencia de estilo, es lo que impide que el cliente empuje la
+ * llamada hacia el fallo y hacia el costo.
+ */
+export const MAX_HECHOS = 8_000;
+
 export const triageController = async (req: Request, res: Response): Promise<void> => {
   const hechos = String(req.body?.hechos ?? '').trim();
 
@@ -56,6 +63,39 @@ export const triageController = async (req: Request, res: Response): Promise<voi
 
   if (!hechos) {
     res.status(400).json({ success: false, error: 'MISSING_FACTS', message: 'Describe los hechos.' });
+    return;
+  }
+
+  /*
+   * LOS HECHOS TIENEN TOPE, Y NO TENERLO ERA UN AGUJERO DE DOS FILOS.
+   *
+   * Este campo iba SIN LÍMITE hasta el 10 de septiembre de 2026: se podían
+   * mandar megabytes. Cortaba por los dos lados a la vez — el motor cobra por
+   * lo que lee, así que una entrada enorme sube el costo de una consulta que
+   * dentro del cupo es gratuita para la firma; y una entrada enorme también
+   * empuja la llamada hacia el plazo, es decir, hacia el FALLO. Sin tope, «el
+   * cliente no puede provocar un fallo» era una afirmación que no se sostenía,
+   * y de ella dependía la regla de que un intento fallido gastara cupo.
+   *
+   * OCHO MIL CARACTERES, y el número no es de pulgar: el menú del catálogo que
+   * va en la misma petición son 55.624 caracteres medidos, así que los hechos
+   * nunca son la parte grande. Ocho mil son unas mil trescientas palabras —muy
+   * por encima de cualquier relato de hechos real— y dejan el peor caso de
+   * entrada en el mismo orden de magnitud que ya se midió.
+   *
+   * SE RECHAZA ANTES DE CONSUMIR CUPO, que es todo el punto: una petición que
+   * no se atiende no puede gastar una de las diez del día. Y se dice cuánto se
+   * mandó y cuánto cabe, para que se pueda recortar en vez de adivinar.
+   */
+  if (hechos.length > MAX_HECHOS) {
+    res.status(400).json({
+      success: false,
+      error: 'FACTS_TOO_LONG',
+      message:
+        `El relato de hechos es demasiado largo (${hechos.length.toLocaleString('es-CO')} caracteres; ` +
+        `caben ${MAX_HECHOS.toLocaleString('es-CO')}). Deje los hechos que definen el caso: ` +
+        'la orientación escoge la actuación por lo que pasó, no por el expediente completo.'
+    });
     return;
   }
 
@@ -156,6 +196,23 @@ export const triageController = async (req: Request, res: Response): Promise<voi
         operation: 'ORIENTACION',
         reason: 'la orientación no produjo resultado'
       });
+    } else {
+      /*
+       * Y DENTRO DEL CUPO SE DEVUELVE LA CONSULTA, que hasta hoy no se hacía.
+       *
+       * La regla vieja —«si el modelo falla, ese intento igual se gastó»—
+       * descansaba en que el cliente pudiera provocar el fallo. Ya no puede:
+       * FAILED solo lo producen el motor que no contestó, que contestó vacío o
+       * que contestó ilegible, y el único empujón que quedaba era mandar unos
+       * hechos enormes, que ahora se rechazan arriba SIN consumir cupo.
+       *
+       * Cerrada esa puerta, gastarle una de las diez del día por una mala
+       * tarde de OpenRouter es cobrarle al abogado un error nuestro. Ojo con
+       * la frontera: SIN_COINCIDENCIA no pasa por aquí y sí consume cupo, como
+       * debe ser — que el catálogo no reconozca los hechos es una respuesta,
+       * no un fallo.
+       */
+      await devolverCupo(firmId);
     }
 
     res.status(502).json({ success: false, error: result.status, message: result.reason });
@@ -188,7 +245,17 @@ export const triageController = async (req: Request, res: Response): Promise<voi
     // sorprender al abogado con un cobro que no esperaba.
     cupoRestante: cupo.restantes,
     /** Lo que se cobró por ESTA consulta: 0 dentro del cupo. */
-    cobradoCop: cupo.cobrar ? PRICE_COP.ORIENTACION : 0
+    cobradoCop: cupo.cobrar ? PRICE_COP.ORIENTACION : 0,
+    /*
+     * EL PRECIO VIAJA, NO SE ESCRIBE EN LA PANTALLA.
+     *
+     * La pantalla anunciaba «cada una descuenta $50» con el número a mano, y
+     * al subirlo a $150 le habria mentido al abogado sin que nada se pusiera
+     * rojo: es una cadena de texto, no un calculo. Un precio anunciado mal es
+     * peor que no anunciarlo — el abogado decide seguir preguntando creyendo
+     * que le cuesta un tercio.
+     */
+    precioOrientacionCop: PRICE_COP.ORIENTACION
   });
 };
 

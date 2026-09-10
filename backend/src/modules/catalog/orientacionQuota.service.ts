@@ -28,14 +28,26 @@ import { supabase } from '../../config/supabase.config';
  */
 
 /**
- * Queries per firm per day.
+ * Consultas gratuitas por firma y por día.
  *
- * Chosen against use, not against cost: a lawyer working through a real matter
- * asks a handful of times, and thirty is far past that while keeping the worst
- * case per firm under half a dollar. It is deliberately not a number to be
- * tuned by feel — moving it moves the ceiling of what a bad day can cost.
+ * ERAN TREINTA, Y EL NÚMERO SE ESCOGIÓ CONTRA EL USO SIN MIRAR EL COSTO REAL.
+ * El razonamiento original decía «el peor caso por firma se queda bajo medio
+ * dólar»; la medición del 9 de septiembre de 2026, en este mismo repositorio
+ * (`triage.service.ts`), dice otra cosa: una orientación SIN RAMA —que es la
+ * de esta pantalla, porque cuál es la rama es justo lo que se pregunta— manda
+ * las 883 fichas al motor y cuesta entre US$0,0098 y US$0,0158, o sea $42 a
+ * $67 COP. Treinta al día son $1.260 a $2.000 COP POR FIRMA Y POR DÍA: unos
+ * $40.000 COP al mes por firma, no medio dólar.
+ *
+ * DIEZ Y NO TREINTA. Un abogado trabajando un asunto real pregunta un puñado
+ * de veces; diez sigue estando por encima de eso y baja el peor caso a $420 a
+ * $670 COP diarios. Y no cierra la puerta a nadie: pasada la décima la
+ * consulta no se niega, se cobra.
+ *
+ * Este número NO se ajusta a ojo: moverlo mueve el techo de lo que puede
+ * costar un mal día. Si vuelve a subir, que sea contra una medición nueva.
  */
-export const TOPE_DIARIO = 30;
+export const TOPE_DIARIO = 10;
 
 export type CupoResultado =
   /** Dentro del cupo gratuito del día. No se cobra nada. */
@@ -111,4 +123,64 @@ export const consumirCupo = async (firmId: string): Promise<CupoResultado> => {
     consultasHoy,
     restantes: Math.max(0, TOPE_DIARIO - consultasHoy)
   };
+};
+
+/**
+ * DEVUELVE UNA CONSULTA DEL CUPO CUANDO EL FALLO FUE NUESTRO.
+ *
+ * ─── POR QUÉ ESTO NO EXISTÍA, Y POR QUÉ AHORA SÍ ───────────────────────────
+ *
+ * La regla original era dura a propósito: «si el modelo falla después, ese
+ * intento igual se gastó — un tope que se esquiva haciendo fallar las llamadas
+ * no es un tope». El razonamiento era correcto y la conclusión ya no lo es,
+ * porque descansaba en una premisa que no se comprobó: que el cliente pudiera
+ * provocar el fallo.
+ *
+ * MIRADO EL 10 DE SEPTIEMBRE DE 2026, `triage.service.ts` devuelve FAILED en
+ * exactamente tres casos, y los tres son de la casa: el motor no contestó a
+ * tiempo, contestó vacío, o contestó algo que no se pudo leer. Que los hechos
+ * del abogado no correspondan a ninguna actuación NO es un fallo — es
+ * SIN_COINCIDENCIA, una respuesta legítima que sí consume cupo y debe hacerlo.
+ *
+ * Lo único con lo que el cliente podía empujar hacia el fallo era el tamaño de
+ * los hechos, que no tenía tope; ahora lo tiene (`MAX_HECHOS` en el
+ * controlador) y se rechaza ANTES de consumir cupo. Cerrada esa puerta, cobrar
+ * una consulta del cupo por una mala tarde de OpenRouter es cobrarle al
+ * abogado un error nuestro.
+ *
+ * ─── LA CARRERA QUE SE ACEPTA, Y POR QUÉ SE ACEPTA ─────────────────────────
+ *
+ * Esto lee y luego escribe, así que dos devoluciones simultáneas de la misma
+ * firma podrían devolver una sola. El peor desenlace es que una firma se quede
+ * con una consulta gratis de más. La operación contraria —consumir— NO se hace
+ * así justamente porque allí la carrera regala cupo por encima del tope; aquí
+ * lo que está en juego es un centavo a favor del cliente, no un grifo abierto.
+ * Se prefiere eso a pedir una función nueva en la base por una devolución.
+ *
+ * Nunca lanza: llega después de que la orientación ya falló, y un fallo al
+ * devolver el cupo no puede convertirse en un segundo error para el abogado.
+ */
+export const devolverCupo = async (firmId: string): Promise<void> => {
+  if (!supabase) return;
+
+  const dia = diaEnColombia();
+  const { data, error } = await supabase
+    .from('orientacion_diaria')
+    .select('consultas')
+    .eq('firm_id', firmId)
+    .eq('dia', dia)
+    .maybeSingle();
+
+  if (error || !data || Number(data.consultas) <= 0) return;
+
+  const { error: errorAlEscribir } = await supabase
+    .from('orientacion_diaria')
+    .update({ consultas: Number(data.consultas) - 1, updated_at: new Date().toISOString() })
+    .eq('firm_id', firmId)
+    .eq('dia', dia)
+    .gt('consultas', 0);
+
+  if (errorAlEscribir) {
+    console.warn(`[ORIENTACION] No se pudo devolver el cupo de ${firmId}: ${errorAlEscribir.message}`);
+  }
 };

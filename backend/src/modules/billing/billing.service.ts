@@ -108,10 +108,21 @@ export const PRICE_COP: Record<Operation, number> = {
    * que a partir de ahí el consumo lo paga quien consume, así que el abuso deja
    * de salir de la tarjeta de la casa y se vuelve un problema de quien lo hace.
    *
-   * Cuesta unos $13 arriba; a $50 el margen es parecido al de un borrador y el
-   * precio sigue siendo trivial para una firma que está trabajando.
+   * ERAN $50, Y ESTABAN POR DEBAJO DEL COSTO. El número viejo se fijó contra
+   * «unos $13 arriba», que es lo que cuesta una orientación CON RAMA —la que
+   * pide Redacción, donde el menú es el de una sola rama—. Pero quien paga es
+   * la pantalla de Orientación, que va SIN RAMA a propósito, porque cuál es la
+   * rama es justamente lo que se está preguntando: ese camino manda las 883
+   * fichas al motor y costó US$0,0098 y US$0,0158 en las dos corridas medidas
+   * el 9 de septiembre de 2026, o sea $42 a $67 COP.
+   *
+   * Cobrar $50 por algo que cuesta hasta $67 es peor que regalarlo: al que
+   * abusa le sale MÁS BARATO pagar, y cada consulta pasada del cupo es una
+   * pérdida. $150 es el peor costo medido al margen estándar de la casa
+   * (2,3 × $67 = $154, redondeado hacia abajo a una cifra legible), y sigue
+   * siendo una fracción de un borrador.
    */
-  ORIENTACION: 50,
+  ORIENTACION: 150,
   /*
    * Revisar un escrito ya redactado. Cuesta lo mismo que un borrador porque
    * lee lo mismo o mas (el escrito entero, la ficha) y lo revisa el mismo
