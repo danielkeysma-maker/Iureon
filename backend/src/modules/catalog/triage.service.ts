@@ -1,5 +1,5 @@
 import { config } from '../../config/env.config';
-import { ENGINE, callOpenRouterWithUsage } from '../agent/openrouter.client';
+import { ENGINE, callOpenRouterWithUsage, type CallUsage } from '../agent/openrouter.client';
 import { catalogService } from './catalog.service';
 import type { Actuacion, LegalBranch } from './types';
 
@@ -56,6 +56,19 @@ export interface TriageResult {
   senales?: { rama: string | null; elementos: string[] };
   /** Solo con SIN_COINCIDENCIA: los datos que faltan y definirian la via. */
   preguntas?: string[];
+  /*
+   * LO QUE COSTO ESTA ORIENTACION, PARA QUE EL CONTROLADOR LO REGISTRE.
+   *
+   * Hasta el 10 de septiembre de 2026 esta llamada no dejaba una sola fila en
+   * `ai_usage`. Y no es una llamada pequena: le manda al motor el MENU ENTERO
+   * del catalogo —13.183 tokens de entrada medidos sin rama—, treinta veces
+   * gratis por firma y por dia. El techo de gasto diario era un calculo de
+   * cabeza escrito en un comentario, no un dato que se pudiera consultar.
+   *
+   * Ausente cuando no se llamo al motor (sin proveedor) o cuando la llamada
+   * murio antes de producir algo facturable.
+   */
+  usage?: CallUsage | null;
 }
 
 /** More than this and the answer stops being a shortlist and becomes a menu. */
@@ -283,6 +296,7 @@ export const triageFacts = async (facts: string, branch?: LegalBranch): Promise<
   }
 
   let raw: string;
+  let gasto: CallUsage | null = null;
 
   try {
     const result = await callOpenRouterWithUsage(
@@ -315,6 +329,7 @@ export const triageFacts = async (facts: string, branch?: LegalBranch): Promise<
       { json: true, ...(branch ? {} : { timeoutMs: 45_000 }) }
     );
     raw = result.text;
+    gasto = result.usage;
   } catch (error) {
     return {
       status: 'FAILED',
@@ -329,7 +344,8 @@ export const triageFacts = async (facts: string, branch?: LegalBranch): Promise<
       status: 'FAILED',
       suggestions: [],
       descartadas: [],
-      reason: 'El motor no devolvió respuesta.'
+      reason: 'El motor no devolvió respuesta.',
+      usage: gasto
     };
   }
 
@@ -340,7 +356,8 @@ export const triageFacts = async (facts: string, branch?: LegalBranch): Promise<
       status: 'FAILED',
       suggestions: [],
       descartadas: [],
-      reason: 'El motor respondió en un formato que no se pudo leer.'
+      reason: 'El motor respondió en un formato que no se pudo leer.',
+      usage: gasto
     };
   }
 
@@ -395,9 +412,17 @@ export const triageFacts = async (facts: string, branch?: LegalBranch): Promise<
       senales: parsed.senales,
       preguntas: parsed.preguntas,
       reason:
-        'El catálogo no reconoce una actuación para estos hechos. Puede ser una materia que aún no está catalogada, o que los hechos necesiten más detalle.'
+        'El catálogo no reconoce una actuación para estos hechos. Puede ser una materia que aún no está catalogada, o que los hechos necesiten más detalle.',
+      usage: gasto
     };
   }
 
-  return { status: 'OK', suggestions, descartadas, senales: parsed.senales };
+  /*
+   * EL GASTO VIAJA EN LOS CUATRO CAMINOS QUE LLAMARON AL MOTOR, incluidos los
+   * que FALLARON. Que la respuesta no sirviera no la hace gratis: el motor
+   * leyo el menu entero y cobro por leerlo. Registrar solo los aciertos
+   * dejaria el gasto de los fallos donde estaba antes — invisible — y
+   * justamente los fallos son los que hay que poder contar.
+   */
+  return { status: 'OK', suggestions, descartadas, senales: parsed.senales, usage: gasto };
 };

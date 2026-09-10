@@ -1,10 +1,17 @@
+import { randomUUID } from 'node:crypto';
 import { Request, Response } from 'express';
 import { triageFacts } from './triage.service';
 import { catalogService } from './catalog.service';
 import type { LegalBranch } from './types';
 import { guardarOrientacion, listarOrientaciones, huecosDelCatalogo } from './orientacionHistory.service';
 import { consumirCupo, TOPE_DIARIO } from './orientacionQuota.service';
-import { reserveForOperation, refundReservation, BillingError, PRICE_COP } from '../billing/billing.service';
+import {
+  BillingError,
+  PRICE_COP,
+  recordUsage,
+  refundReservation,
+  reserveForOperation
+} from '../billing/billing.service';
 import { exigirModulo, responderPlanError } from '../subscriptions/plan.service';
 
 /**
@@ -104,7 +111,32 @@ export const triageController = async (req: Request, res: Response): Promise<voi
     }
   }
 
+  const operationId = randomUUID();
   const result = await triageFacts(hechos, branch);
+
+  /*
+   * ─── LO QUE COSTO SE REGISTRA, HAYA COBRO O NO ────────────────────────────
+   *
+   * Hasta el 10 de septiembre de 2026 esta llamada no dejaba una sola fila en
+   * `ai_usage`, y no es una llamada pequena: le manda al motor el MENU ENTERO
+   * del catalogo —13.183 tokens de entrada medidos sin rama—, treinta veces
+   * gratis por firma y por dia. El techo de gasto diario era un calculo de
+   * cabeza en un comentario (`orientacionQuota.service.ts`), no un dato que
+   * nadie pudiera consultar.
+   *
+   * SE REGISTRA TAMBIEN LO GRATUITO, y esa es la mitad del punto. Gratis para
+   * la firma no es gratis para la casa: las treinta del cupo son el grueso del
+   * consumo de este modulo y eran justamente las invisibles. Registrar solo
+   * las cobradas dejaria el agujero donde estaba.
+   *
+   * Y SE REGISTRA ANTES DE LA RAMA DEL FALLO, a proposito. Una orientacion que
+   * fallo se devuelve —nadie paga por lo que no recibio— pero el motor ya leyo
+   * el menu y ya cobro por leerlo. El reembolso es de la firma; el costo es de
+   * la casa, y esa asimetria es justo lo que hay que poder ver.
+   *
+   * Nunca tumba la orientacion: `recordUsage` avisa por consola y sigue.
+   */
+  await recordUsage({ firmId, userEmail, operation: 'ORIENTACION', operationId, usage: result.usage ?? null });
 
   if (result.status === 'FAILED') {
     /*

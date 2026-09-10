@@ -141,8 +141,15 @@ const RESPUESTA_ART_9: RespuestaDelJuez = {
 /** Un juez postizo que contesta según el artículo que le pongan delante. */
 const juezDeFixture =
   (porArticulo: Record<number, RespuestaDelJuez | null>): JuezDeGlosa =>
-  async (afirmacion) =>
-    porArticulo[afirmacion.referencia.articulo] ?? null;
+  async (afirmacion) => ({
+    respuesta: porArticulo[afirmacion.referencia.articulo] ?? null,
+    /*
+     * El postizo declara un gasto de mentira A PROPOSITO: asi el check puede
+     * comprobar que la tuberia lo SUBE hasta el pipeline. Un fixture que
+     * devolviera `usage: null` haria pasar el check con una tuberia rota.
+     */
+    usage: { model: 'fixture', promptTokens: 100, completionTokens: 10, costUsd: 0.001 }
+  });
 
 const asincronos = async (): Promise<void> => {
   /* ─── 1. EL TEXTO DEL ARTÍCULO SE PUBLICA, Y ES LO QUE FALTABA ─────────── */
@@ -253,6 +260,26 @@ const asincronos = async (): Promise<void> => {
     juezDeFixture({ 8: RESPUESTA_ART_8, 9: RESPUESTA_ART_9 })
   );
 
+  /*
+   * ─── EL GASTO DE ESTA ETAPA SUBE, Y ANTES SE PERDIA ────────────────────
+   *
+   * Hasta el 10 de septiembre de 2026 estas hasta ocho llamadas al motor no
+   * dejaban fila en `ai_usage`, y `settleOperation` liquida SUMANDO esa tabla:
+   * el costo de cada borrador quedaba subestimado en ocho llamadas. Aqui se
+   * comprueba la tuberia —que lo que el juez informa llega al orquestador—;
+   * que el pipeline lo registre lo vigila `usoDeLaGlosa.check.ts`.
+   */
+  check(
+    'lo que gastaron los jueces sube en la revision, una entrada por llamada',
+    revision.usos.length === revision.resultados.length,
+    `${revision.usos.length} usos para ${revision.resultados.length} glosas`
+  );
+  check(
+    'y cada entrada trae el modelo y el costo, que es lo que se registra',
+    revision.usos.every((u) => u.model.length > 0 && u.costUsd > 0),
+    JSON.stringify(revision.usos[0] ?? null)
+  );
+
   const art8 = revision.resultados.find((r) => r.referencia.articulo === 8);
   const art9 = revision.resultados.find((r) => r.referencia.articulo === 9);
 
@@ -339,6 +366,17 @@ const asincronos = async (): Promise<void> => {
     'y un fallo del motor tampoco: también sale DUDOSA declarada',
     porFallo.dudosas === 2 && porFallo.resultados.every((r) => /SIN COMPROBAR/.test(r.motivo))
   );
+  /*
+   * NO SE INVENTA GASTO QUE NO SE CONOCE. La llamada cortada por plazo pudo
+   * consumir tokens, pero el proveedor informa el uso al responder y aqui no
+   * respondio. Un numero estimado en la tabla del gasto es peor que un hueco:
+   * nadie sabria despues cual era medido y cual supuesto.
+   */
+  check(
+    'una llamada cortada por plazo no aporta gasto: se registra lo que se sabe',
+    porPlazo.usos.length === 0 && porFallo.usos.length === 0,
+    `${porPlazo.usos.length} y ${porFallo.usos.length}`
+  );
 
   /* ─── 6. QUÉ LE PASA AL ESCRITO ────────────────────────────────────────── */
 
@@ -365,7 +403,7 @@ const asincronos = async (): Promise<void> => {
   );
   check(
     'sin nada que juzgar, el escrito sale idéntico y sin cabecera vacía',
-    anotarGlosa(BORRADOR, { resultados: [], noSostenidas: 0, dudosas: 0 }) === BORRADOR
+    anotarGlosa(BORRADOR, { resultados: [], noSostenidas: 0, dudosas: 0, usos: [] }) === BORRADOR
   );
   check(
     'una dudosa se declara DUDOSA: ni por buena ni por mala',
@@ -440,7 +478,12 @@ const asincronos = async (): Promise<void> => {
     console.log('Juzgando con el motor real, con el texto oficial delante…');
     const t = Date.now();
     const real = await juezDelMotor(afirmacion8, 25_000);
-    const juzgado = veredictoDe(afirmacion8, real);
+    const juzgado = veredictoDe(afirmacion8, real.respuesta);
+    check(
+      'EN VIVO: y la llamada informa lo que gastó, que es lo que se registra',
+      (real.usage?.costUsd ?? 0) > 0,
+      `${real.usage?.model ?? 'sin modelo'} · US$${real.usage?.costUsd ?? 0}`
+    );
     check(
       'EN VIVO: el motor, con el art. 8 delante, NO sostiene «sobre las obligaciones del arrendatario»',
       juzgado.veredicto === 'NO_SOSTENIDA',

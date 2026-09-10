@@ -349,6 +349,41 @@ export class OpenRouterService {
      * de vigencia — el sistema comprobando lo que el sistema acaba de escribir.
      */
     const glosa = await verificarGlosaDelEscrito(legalText, vigencia.resultados, PLAZO_GLOSA_MS);
+
+    /*
+     * ─── Y SE REGISTRA LO QUE ESTA ETAPA GASTO, QUE ANTES ERA INVISIBLE ────
+     *
+     * Hasta el 10 de septiembre de 2026 estas hasta ocho llamadas al motor
+     * barato no dejaban una sola fila en `ai_usage`. No era un informe que
+     * faltara: `settleOperation` calcula el excedente SUMANDO
+     * `ai_usage.cost_usd` por `operation_id`, asi que el costo de cada
+     * borrador quedaba subestimado en ocho llamadas y el margen que `MARKUP`
+     * promete se media sobre un costo que no era el real.
+     *
+     * El dueno lo vio antes que la tabla: «no costo 40 centavos, costo casi 3
+     * dolares porque el saldo se bajo abruptamente». Parte de esa diferencia
+     * se gastaba aqui, sin rastro.
+     *
+     * Van con la MISMA `operation` y el MISMO `operationId` que las otras tres
+     * etapas, y eso es deliberado: el precio que ve la firma sigue siendo uno
+     * por documento —cuatro motores, un borrador, una linea— y lo que cambia
+     * es que el costo contra el que se liquida por fin incluye todo.
+     *
+     * En serie y no con `Promise.all` porque son escrituras a la misma tabla
+     * al final de una funcion que ya gasto su presupuesto de reloj; y si una
+     * falla, `recordUsage` lo dice por consola y no tumba el borrador, que a
+     * estas alturas ya esta escrito y pagado.
+     */
+    for (const usage of glosa.usos) {
+      await recordUsage({
+        firmId: req.firmId,
+        userEmail: req.userEmail,
+        operation: 'BORRADOR',
+        operationId: req.operationId,
+        usage
+      });
+    }
+
     if (glosa.resultados.length > 0) {
       onStepLog({
         stage: 'STAGE_3_REDACCION',

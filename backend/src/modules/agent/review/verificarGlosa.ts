@@ -7,7 +7,7 @@ import {
   type ReferenciaNormativa
 } from '../citacionNormativa';
 import type { VigenciaDeArticulo } from '../../legislation/officialArticle.service';
-import { ENGINE, callOpenRouterWithUsage } from '../openrouter.client';
+import { ENGINE, callOpenRouterWithUsage, type CallUsage } from '../openrouter.client';
 import { SEPARADOR_DE_AVISOS, marcarVarios } from './verificarVigencia';
 
 /**
@@ -113,6 +113,11 @@ export interface RevisionDeGlosa {
   resultados: GlosaJuzgada[];
   noSostenidas: number;
   dudosas: number;
+  /**
+   * Lo que gastaron los jueces, una entrada por llamada que produjo algo
+   * facturable. Sube hasta el pipeline para que lo registre: ver `FalloDelJuez`.
+   */
+  usos: CallUsage[];
 }
 
 /**
@@ -210,10 +215,35 @@ export interface RespuestaDelJuez {
  * red y sin motor: un check que necesita OpenRouter no se puede exigir en CI, y
  * un check que no se exige no protege nada.
  */
+/*
+ * EL JUEZ DEVUELVE TAMBIEN LO QUE GASTO, y esto no es contabilidad menor.
+ *
+ * Estas llamadas —hasta ocho por borrador contra el motor barato, con el
+ * articulo entero de entrada— NO se registraban en `ai_usage`. Y ese registro
+ * no es un informe: `settleOperation` calcula el excedente SUMANDO
+ * `ai_usage.cost_usd` por `operation_id` (`billing.service.ts`), asi que el
+ * costo de cada borrador quedaba subestimado en ocho llamadas y el margen que
+ * `MARKUP` promete se estaba midiendo sobre un costo que no era el real.
+ *
+ * El dueno lo vio antes que la tabla: «no costo 40 centavos, costo casi 3
+ * dolares porque el saldo se bajo abruptamente». Una parte de esa diferencia
+ * se gastaba aqui, sin dejar rastro.
+ *
+ * El gasto SUBE en vez de registrarse aqui porque este modulo no sabe de que
+ * firma es el escrito ni con que `operationId` corre: eso lo sabe el pipeline,
+ * que ya llama a `recordUsage` tres veces. Meterle billing a un verificador
+ * seria darle una dependencia que no necesita para juzgar un texto.
+ */
+export interface FalloDelJuez {
+  respuesta: RespuestaDelJuez | null;
+  /** Ausente cuando la llamada murio antes de producir algo facturable. */
+  usage?: CallUsage | null;
+}
+
 export type JuezDeGlosa = (
   afirmacion: AfirmacionSobreArticulo,
   limiteMs: number
-) => Promise<RespuestaDelJuez | null>;
+) => Promise<FalloDelJuez>;
 
 const NL = String.fromCharCode(10);
 
@@ -310,8 +340,8 @@ export const juezDelMotor: JuezDeGlosa = async (afirmacion, limiteMs) => {
     10,
     { json: true, reasoningEffort: 'minimal', timeoutMs: limiteMs }
   );
-  if (!respuesta.text) return null;
-  return leerRespuestaDelJuez(respuesta.text);
+  if (!respuesta.text) return { respuesta: null, usage: respuesta.usage };
+  return { respuesta: leerRespuestaDelJuez(respuesta.text), usage: respuesta.usage };
 };
 
 /*
@@ -440,7 +470,7 @@ export const verificarGlosaDelEscrito = async (
   juez: JuezDeGlosa = juezDelMotor
 ): Promise<RevisionDeGlosa> => {
   const porComprobar = afirmacionesPorComprobar(texto, vigencias);
-  if (porComprobar.length === 0) return { resultados: [], noSostenidas: 0, dudosas: 0 };
+  if (porComprobar.length === 0) return { resultados: [], noSostenidas: 0, dudosas: 0, usos: [] };
 
   /*
    * El plazo individual queda por debajo del de la etapa para que el corte lo
@@ -448,20 +478,33 @@ export const verificarGlosaDelEscrito = async (
    * cortada desde arriba sin decir de qué. Misma doctrina que en la vigencia.
    */
   const plazoIndividual = Math.max(3_000, limiteMs - 2_000);
-  const resultados = await Promise.all(
+  const fallos = await Promise.all(
     porComprobar.map((afirmacion) =>
       conTope(
-        juez(afirmacion, plazoIndividual).then((respuesta) => veredictoDe(afirmacion, respuesta)),
+        juez(afirmacion, plazoIndividual).then((fallo) => ({
+          juzgada: veredictoDe(afirmacion, fallo.respuesta),
+          usage: fallo.usage ?? null
+        })),
         plazoIndividual,
-        veredictoDe(afirmacion, null)
+        /*
+         * EL CORTE POR PLAZO NO TRAE GASTO, y no porque no lo haya: la llamada
+         * pudo consumir tokens antes de que este codigo dejara de esperarla.
+         * Lo que no hay es forma de conocerlo — el proveedor informa el uso al
+         * responder, y aqui no respondio. Se registra lo que se sabe y no se
+         * estima lo que no: un numero inventado en la tabla del gasto es peor
+         * que un hueco, porque nadie sabria despues cual era cual.
+         */
+        { juzgada: veredictoDe(afirmacion, null), usage: null }
       )
     )
   );
 
+  const resultados = fallos.map((f) => f.juzgada);
   return {
     resultados,
     noSostenidas: resultados.filter((r) => r.veredicto === 'NO_SOSTENIDA').length,
-    dudosas: resultados.filter((r) => r.veredicto === 'DUDOSA').length
+    dudosas: resultados.filter((r) => r.veredicto === 'DUDOSA').length,
+    usos: fallos.map((f) => f.usage).filter((u): u is CallUsage => u !== null)
   };
 };
 
