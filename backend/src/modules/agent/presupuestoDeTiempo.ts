@@ -78,7 +78,7 @@ export const PLAZO_HECHOS_MS = 12_000;
 export const PLAZO_JURISPRUDENCIA_MS = 8_000;
 
 /**
- * Etapa 3 — comprobación de vigencia contra el texto oficial del Senado.
+ * Etapa 3 — comprobación de vigencia contra las fuentes normativas oficiales.
  *
  * VA DESPUÉS DE REDACTAR, y por eso necesita partida propia: lo que comprueba
  * son las citas que el borrador YA trae, así que no puede salir del presupuesto
@@ -88,12 +88,30 @@ export const PLAZO_JURISPRUDENCIA_MS = 8_000;
  * consultas de los artículos en paralelo: la PRIMERA descarga de la instancia
  * cuesta 6,6 s —se le va casi todo esperando al puerto 443, que desde aquí no
  * conecta— y las siguientes 150–300 ms, porque el esquema que funcionó y el
- * índice de la norma quedan en memoria. Veinte segundos cubren el arranque en
+ * índice de la norma quedan en memoria. Veinte segundos cubrían el arranque en
  * frío más doce artículos con holgura.
  *
+ * ─── LA SEGUNDA FUENTE NO DOBLÓ EL RELOJ, Y ESTÁ MEDIDO ───────────────────
+ *
+ * Desde el 10 de septiembre de 2026 la etapa consulta también el Gestor
+ * Normativo de Función Pública. Las fuentes van EN PARALELO dentro de cada
+ * consulta, así que la etapa cuesta lo que cueste la más lenta y no la suma:
+ * doce artículos en frío, con las dos fuentes, 14,5 s.
+ *
+ * Función Pública contesta en 966–1.861 ms, búsqueda del identificador
+ * incluida. La Secretaría del Senado ese mismo día tardó 18,4 s en servir la
+ * portada del Código Civil (168.336 bytes) y 34,6 s la de la Ley 820, y un
+ * artículo suyo completo —portada, página y JS de vigencia— costó 27,1 s el
+ * art. 1040 y 45,5 s el art. 2035. ESO NO CABE EN VEINTE SEGUNDOS, y el número
+ * no se estira a ciegas: estirarlo se lo quitaría a la redacción para pagar una
+ * mala tarde de un servidor ajeno. Lo que se hizo fue repartir —ninguna fuente
+ * se lleva más del 80% del plazo, ver `officialArticle.service.ts`— para que la
+ * fuente rápida no muera esperando a la lenta. En un día normal el Senado
+ * costaba 6,6 s y entra sin problema.
+ *
  * Y agotarlos NO es un fallo: `verificarVigencia.ts` devuelve NO_VERIFICABLE y
- * el escrito sale igual, diciéndolo. Un borrador perdido por una mala tarde del
- * Senado sería peor que el defecto que esta etapa vigila.
+ * el escrito sale igual, diciéndolo. Un borrador perdido por una mala tarde de
+ * un sitio público sería peor que el defecto que esta etapa vigila.
  */
 export const PLAZO_VIGENCIA_MS = 20_000;
 

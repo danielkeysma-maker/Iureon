@@ -1,8 +1,25 @@
 import { decodeBody } from '../ingestion/documentFetch';
+import {
+  NAVEGADOR,
+  NOMBRE_DE_FUENTE,
+  decodificarEntidades,
+  enUnaLinea,
+  esOpinion,
+  guardar,
+  recortarCuerpo,
+  sinEtiquetas,
+  vivo,
+  type EnCache,
+  type FuenteOficial,
+  type LecturaDeFuente,
+  type ReferenciaDeArticulo
+} from './fuenteOficial';
+import { leerEnFuncionPublica, limpiarCacheDeFuncionPublica } from './funcionPublica.source';
 
 /**
- * ¿SIGUE VIVO ESTE ARTÍCULO? Se lo pregunta al texto oficial del Senado,
- * artículo por artículo, y responde VIGENTE · DEROGADO · NO_VERIFICABLE.
+ * ¿SIGUE VIVO ESTE ARTÍCULO? Se lo pregunta a las fuentes oficiales, artículo
+ * por artículo, y responde VIGENTE · DEROGADO · DISCREPANCIA_ENTRE_FUENTES ·
+ * NO_VERIFICABLE.
  *
  * ─── POR QUÉ EXISTE ────────────────────────────────────────────────────────
  *
@@ -22,32 +39,69 @@ import { decodeBody } from '../ingestion/documentFetch';
  * manos de la memoria del modelo, que recuerda el texto derogado igual de bien
  * que el vigente.
  *
- * Este módulo es el gemelo de `jurisprudence/officialRuling.service.ts` para las
- * normas: consulta la fuente oficial antes de que el resultado llegue al
- * abogado, y lo que la fuente diga manda sobre lo que el modelo recuerde. Igual
- * que allá hay un estado que se DECLARA y no se adivina —NO_VERIFICABLE— y
- * confundirlo con «vigente» convertiría una caída del sitio en una certificación
- * falsa, que es el único resultado peor que no mirar.
+ * ─── POR QUÉ YA NO BASTA UNA FUENTE, CON LAS TRES RAZONES MEDIDAS ──────────
  *
- * ─── DÓNDE MIRA, Y POR QUÉ AHÍ ─────────────────────────────────────────────
+ * Hasta el 10 de septiembre de 2026 esto consultaba SOLO la Secretaría del
+ * Senado. Tres hechos del mismo día lo rompieron:
  *
- * `research/VERIFICATION-DOCTRINE.md` fija las fuentes admisibles y su orden:
- * `secretariasenado.gov.co/senado/basedoc/…` primero. Se usa esa y solo esa
- * porque es la única que publica la DEROGACIÓN dentro del propio artículo, en el
- * corchete angular que lo encabeza («<Artículo derogado por…>», «<Artículo
- * INEXEQUIBLE>»). Función Pública y el SUIN sirven el texto, pero leer allí la
- * vigencia exige interpretar tablas distintas en cada norma, y una lectura
- * equivocada aquí es una falsa alarma en la pantalla donde se decide firmar.
- * Cuando el Senado no tiene la norma, la respuesta es NO_VERIFICABLE con el
- * motivo: un hueco declarado vale, uno rellenado destruye el producto.
+ *   1. EL SENADO NOS DEJÓ SIN RESPUESTA. Verificando los fundamentos del Código
+ *      Civil, la Ley 54 de 1990 no se pudo leer en cuatro intentos y la ficha
+ *      quedó sin cerrar.
+ *   2. `basedoc` NO PUBLICA DECRETOS NI RESOLUCIONES. Y es donde más muerde: los
+ *      Decretos Únicos —1069 de justicia, 1076 de ambiente— derogaron sectores
+ *      enteros y esas normas siguen circulando como si vivieran. Con una sola
+ *      fuente, toda cita de decreto salía «no verificable».
+ *   3. UNA FUENTE OFICIAL TAMBIÉN PUEDE ESTAR DESACTUALIZADA. La doctrina
+ *      (regla 3) lo documenta con un caso medido en esta casa: Función Pública
+ *      sirve el art. 159 ORIGINAL de la Ley 769 de 2002, no el que reformó el
+ *      Decreto Ley 019 de 2012. Si le pasa a una, le puede pasar a la otra — y
+ *      con una sola no hay forma de enterarse.
  *
- * Se descarga además el JS HERMANO de vigencia (`basedoc/js/<documento>.js`),
- * porque la doctrina lo exige con nombre propio: las notas de vigencia no están
- * en el HTML sino en ese archivo, y sin él el texto «se lee como si estuviera
- * intacto». Aquí no decide el estado —lo decide el corchete, que es donde el
- * Senado registra la derogación— pero viaja en el detalle, que es lo que se lee.
+ * ─── LA REGLA QUE GOBIERNA ESTE ARCHIVO ────────────────────────────────────
  *
- * ─── EL PUERTO 443 NO RESPONDE DESDE AQUÍ, Y ESTÁ MEDIDO ───────────────────
+ * ESTO NO ES «SI FALLA UNA, USO LA OTRA». Es:
+ *
+ *   · CONCORDANCIA → VIGENTE o DEROGADO con la confianza de dos lecturas que
+ *     coinciden, y SE DICE cuáles concordaron.
+ *   · DISCREPANCIA → SE DECLARA, NO SE RESUELVE. Si una fuente dice vigente y
+ *     otra derogado, el estado es `DISCREPANCIA_ENTRE_FUENTES` y viajan LAS DOS
+ *     versiones con SUS DOS URLs, para que el abogado lo vea y decida. Elegir la
+ *     que convenga —o la de la fuente «mejor»— sería inventar con cara de rigor:
+ *     el producto quedaría idéntico al de una sola fuente, pero con dos sellos.
+ *   · SOLO UNA RESPONDE → vale, y se dice que solo una respondió y cuál.
+ *   · NINGUNA RESPONDE → NO_VERIFICABLE, como siempre.
+ *
+ * Y un SILENCIO NO ES UNA OPINIÓN. Que Función Pública no publique el Código
+ * Civil, o que el Decreto 1069 de 2015 no tenga un «artículo 1» porque numera
+ * 2.2.4.4.2.4, no contradice al Senado: contarlo como desacuerdo habría
+ * fabricado discrepancias donde solo hay una copia que no llega. Por eso una
+ * lectura tiene cuatro estados y solo dos votan. Ver `fuenteOficial.ts`.
+ *
+ * ─── EL SUIN-JURISCOL, QUE ES LA TERCERA FUENTE Y NO SE PUDO LEER ──────────
+ *
+ * `research/VERIFICATION-DOCTRINE.md` admite tres sitios para el texto de una
+ * norma, y el tercero es `suin-juriscol.gov.co`. NO está implementado, y el
+ * motivo se deja escrito porque es un hallazgo, no un olvido.
+ *
+ * MEDIDO el 10 de septiembre de 2026, desde dos rutas de red distintas:
+ *
+ *     DNS  → 186.86.242.143, resuelve
+ *     TCP  → el puerto 443 ACEPTA la conexión
+ *     TLS  → el handshake TERMINA, con certificado EV válido del Ministerio de
+ *            Justicia y del Derecho, expedido por Sectigo
+ *     HTTP → la petición se envía entera y el servidor cierra sin contestar
+ *            una sola cabecera («server closed abruptly»), con curl, con
+ *            `openssl s_client` a mano y con `fetch` de Node (UND_ERR_SOCKET)
+ *     :80  → no conecta.   ping → 100% de pérdida.
+ *
+ * Es decir: no hay HTML del SUIN que nadie de esta casa haya visto. Escribir su
+ * lector sería escribir un analizador contra una página imaginada y una guarda
+ * contra un HTML inventado — exactamente lo que la regla 2 de la doctrina
+ * prohíbe («nunca completes con lo que sabes»). El día que el sitio conteste, la
+ * fuente entra como un archivo más en `FUENTES`: la composición de abajo ya
+ * trabaja con N lecturas, no con dos.
+ *
+ * ─── EL PUERTO 443 DEL SENADO NO RESPONDE DESDE AQUÍ, Y ESTÁ MEDIDO ────────
  *
  * Medido el 9 de septiembre de 2026 desde el entorno de desarrollo:
  *
@@ -58,9 +112,7 @@ import { decodeBody } from '../ingestion/documentFetch';
  * de navegador y sin ninguna, con el mismo resultado— sino la conexión TCP al
  * 443, que nunca se establece; el 80 sí. Así que se intenta HTTPS primero, con
  * un plazo corto, y se cae a HTTP: en producción, donde el 443 puede estar
- * abierto, se lee cifrado; desde aquí se lee igual en vez de no leer nada. Se
- * manda además un User-Agent de navegador porque no cuesta nada y varios sitios
- * públicos colombianos rechazan al cliente que no se identifica.
+ * abierto, se lee cifrado; desde aquí se lee igual en vez de no leer nada.
  *
  * DEGRADAR A HTTP ES ACEPTABLE AQUÍ Y NO LO SERÍA EN OTRO SITIO: no se envía
  * ningún dato del caso ni credencial alguna, solo se pide una página pública, y
@@ -70,22 +122,29 @@ import { decodeBody } from '../ingestion/documentFetch';
  * que es exactamente donde estábamos antes de este archivo.
  */
 
-/** Un artículo, en la misma forma que usa el cedazo (`agent/citacionNormativa.ts`). */
-export interface ReferenciaDeArticulo {
-  codigo: string;
-  articulo: number;
-}
+export {
+  MAX_CUERPO,
+  NOMBRE_DE_FUENTE,
+  decodificarEntidades,
+  type FuenteOficial,
+  type LecturaDeFuente,
+  type ReferenciaDeArticulo
+} from './fuenteOficial';
 
-export type EstadoDeVigencia = 'VIGENTE' | 'DEROGADO' | 'NO_VERIFICABLE';
+export type EstadoDeVigencia =
+  | 'VIGENTE'
+  | 'DEROGADO'
+  | 'DISCREPANCIA_ENTRE_FUENTES'
+  | 'NO_VERIFICABLE';
 
 export interface VigenciaDeArticulo {
   referencia: ReferenciaDeArticulo;
   estado: EstadoDeVigencia;
-  /** Qué dice la fuente, o por qué no se pudo saber. Una frase que el abogado pueda leer. */
+  /** Qué dicen las fuentes, o por qué no se pudo saber. Una frase que el abogado pueda leer. */
   detalle: string;
   /** La página oficial exacta, para que se pueda abrir y comprobar a mano. */
   url?: string;
-  /** El epígrafe del artículo tal como lo publica el Senado. */
+  /** El epígrafe del artículo tal como lo publica la fuente que se muestra. */
   rubrica?: string;
   /**
    * EL TEXTO DEL ARTÍCULO, que es la pieza sin la cual no se puede juzgar una
@@ -98,16 +157,25 @@ export interface VigenciaDeArticulo {
    * cuerpo, no en el epígrafe. Sin cuerpo, comprobar una glosa volvería a ser
    * preguntarle al modelo qué recuerda, que es exactamente lo que falló.
    *
-   * Va acotado por `MAX_CUERPO`. Ausente cuando la fuente no respondió.
+   * Va acotado por `MAX_CUERPO`. Ausente cuando ninguna fuente respondió, y
+   * AUSENTE TAMBIÉN EN LA DISCREPANCIA: cuando las fuentes no coinciden no hay
+   * «el» texto del artículo, y elegir uno para que el juez de la glosa lo use
+   * sería resolver a escondidas lo que este estado existe para declarar.
    */
   cuerpo?: string;
-  /** Las notas de vigencia del JS hermano, si las hay. */
+  /** Las notas de vigencia del JS hermano del Senado, si las hay. */
   notaDeVigencia?: string;
+  /** LO QUE DIJO CADA FUENTE, incluidas las que callaron. Es el sustento del estado. */
+  lecturas: LecturaDeFuente[];
+  /** Las fuentes que sí opinaron sobre el artículo. Vacío en NO_VERIFICABLE. */
+  fuentesQueOpinaron: FuenteOficial[];
   /** Cuándo se consultó. Una comprobación sin fecha no es una comprobación. */
   consultadoEn: string;
 }
 
 /*
+ * ═══ LA SECRETARÍA DEL SENADO ══════════════════════════════════════════════
+ *
  * ─── DE LA CLAVE CANÓNICA AL DOCUMENTO DEL SENADO ──────────────────────────
  *
  * Las claves son las que produce `canonizarNorma` en `agent/citacionNormativa.ts`
@@ -147,33 +215,6 @@ const BASE = 'www.secretariasenado.gov.co/senado/basedoc';
 
 export const urlDelDocumento = (documento: string, fragmento = ''): string =>
   `https://${BASE}/${documento}${fragmento}.html`;
-
-/*
- * ─── LECTURA DEL HTML ──────────────────────────────────────────────────────
- */
-
-/**
- * Las entidades que aparecen de verdad en estas páginas. No es un decodificador
- * general de HTML a propósito: `&lt;` y `&gt;` SON el marcador de derogación, y
- * cambiar una tabla que se lee de un vistazo por un paquete que nadie audita no
- * mejora nada aquí.
- */
-const ENTIDADES: Record<string, string> = {
-  aacute: 'á', eacute: 'é', iacute: 'í', oacute: 'ó', uacute: 'ú', uuml: 'ü',
-  Aacute: 'Á', Eacute: 'É', Iacute: 'Í', Oacute: 'Ó', Uacute: 'Ú',
-  ntilde: 'ñ', Ntilde: 'Ñ', ordm: 'o', ordf: 'a', deg: '°',
-  nbsp: ' ', amp: '&', quot: '"', apos: "'", lt: '<', gt: '>',
-  laquo: '«', raquo: '»', ldquo: '“', rdquo: '”', mdash: '—', ndash: '–'
-};
-
-export const decodificarEntidades = (texto: string): string =>
-  texto
-    .replace(/&#(\d{1,5});/g, (_todo, n: string) => String.fromCodePoint(Number(n)))
-    .replace(/&([A-Za-z]+);/g, (todo, nombre: string) => ENTIDADES[nombre] ?? todo);
-
-const sinEtiquetas = (html: string): string => html.replace(/<[^>]*>/g, ' ');
-
-const enUnaLinea = (texto: string): string => texto.replace(/\s+/g, ' ').trim();
 
 /**
  * El índice del documento es, sin quererlo, un mapa artículo → fragmento.
@@ -225,34 +266,6 @@ export const rubricaDelBloque = (bloque: string): string => {
 };
 
 /**
- * CUÁNTO TEXTO DE ARTÍCULO SE PUBLICA, y por qué ese número.
- *
- * MEDIDO el 10 de septiembre de 2026 bajando del Senado los artículos que estos
- * borradores citan de verdad, y contando el cuerpo ya limpio:
- *
- *     Ley 820 de 2003, art. 8  (obligaciones del arrendador)   1.684 caracteres
- *     Ley 820 de 2003, art. 9  (obligaciones del arrendatario) 1.209
- *     Ley 820 de 2003, art. 22 (terminación por el arrendador) 3.550
- *     CGP, art. 206 (juramento estimatorio)                    2.838
- *     CGP, art. 626 (derogaciones)                             4.798
- *     CGP, art. 384 (restitución de inmueble arrendado)        6.089
- *
- * Ocho mil caracteres los cubren TODOS ENTEROS, y que quepan enteros es el
- * punto: el art. 206 es taxativo —su enumeración cerrada es justo lo que hace
- * falta para saber si un canon insoluto cabe en el juramento estimatorio— y
- * cortarlo antes del último inciso convertiría al juez de la glosa en un juez
- * que no vio el texto. Su NO_SOSTENIDA sería entonces una falsa alarma
- * fabricada por el recorte, que es peor que no comprobar nada.
- *
- * Por arriba, ocho mil caracteres son ~2.300 tokens: a los US$0,75 por millón
- * de entrada del motor barato, menos de US$0,002 por artículo. Así que el tope
- * no está puesto por dinero sino para que un artículo monstruoso no se lleve el
- * presupuesto de la etapa entera. Cuando se corta, SE DICE dentro del propio
- * texto: un juez que ignore que le faltaba el final juzgaría creyendo que lo vio.
- */
-export const MAX_CUERPO = 8_000;
-
-/**
  * Las cajas plegables del Senado, quitadas POR SU ETIQUETA HTML y no por su texto.
  *
  * Perseguirlas por las palabras («Notas de Vigencia», «Legislación Anterior»)
@@ -277,11 +290,9 @@ const CAJA_PLEGABLE = /<a[^>]*class="caja_vja_encabezado"[^>]*>[\s\S]*?<\/a>/gi;
 export const cuerpoDelBloque = (bloque: string): string => {
   const finDelTitulo = /<\/a>/i.exec(bloque);
   const resto = finDelTitulo ? bloque.slice(finDelTitulo.index + finDelTitulo[0].length) : bloque;
-  const plano = enUnaLinea(
-    decodificarEntidades(sinEtiquetas(resto.replace(CAJA_PLEGABLE, ' ')))
+  return recortarCuerpo(
+    enUnaLinea(decodificarEntidades(sinEtiquetas(resto.replace(CAJA_PLEGABLE, ' '))))
   );
-  if (plano.length <= MAX_CUERPO) return plano;
-  return `${plano.slice(0, MAX_CUERPO)} […texto oficial recortado en ${MAX_CUERPO} caracteres; el artículo sigue más allá de este punto…]`;
 };
 
 /**
@@ -343,6 +354,9 @@ export const estadoDeLosMarcadores = (
  * dentro. Solo se lee la de vigencia: la caja «Legislación Anterior» contiene el
  * texto DEROGADO del artículo, y confundirlo con el vigente sería devolver como
  * derecho justo lo que este módulo existe para señalar.
+ *
+ * La doctrina lo exige con nombre propio (regla 3): «las notas de vigencia viven
+ * en un JS aparte», y sin él el texto «se lee como si estuviera intacto».
  */
 export const notaDeVigencia = (bloque: string, js: string): string | undefined => {
   const enlace = /href="javascript:insRow(\d+)\(\)"[^>]*>\s*Notas de Vigencia/i.exec(bloque);
@@ -357,21 +371,6 @@ export const notaDeVigencia = (bloque: string, js: string): string | undefined =
 };
 
 /*
- * ─── LA RED ────────────────────────────────────────────────────────────────
- */
-
-/** Se identifica como navegador: varios sitios públicos del país rechazan al que no lo hace. */
-const NAVEGADOR =
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
-
-/**
- * Descarga una página del Senado. HTTPS primero; si no contesta, HTTP.
- *
- * Devuelve null en vez de lanzar: «no se pudo leer» tiene que llegar arriba como
- * NO_VERIFICABLE, nunca como una excepción que tumbe la entrega de un escrito
- * que ya está escrito.
- */
-/*
  * EL ESQUEMA QUE FUNCIONÓ SE RECUERDA, y sin esto el presupuesto no alcanzaba.
  *
  * Medido: una consulta baja tres archivos (portada, página del artículo y JS de
@@ -383,15 +382,37 @@ const NAVEGADOR =
  */
 let esquemaQueFunciona: 'https' | 'http' | null = null;
 
-const descargar = async (ruta: string, limiteMs: number): Promise<string | null> => {
-  const mitad = Math.max(1_500, Math.floor(limiteMs / 2));
+/*
+ * PARTIR EL PLAZO EN DOS SOLO MIENTRAS NO SE SEPA CUÁL ESQUEMA SIRVE.
+ *
+ * Medido el 10 de septiembre de 2026: la portada del Código Civil por el puerto
+ * 80 tarda 13,8 s —168.336 bytes servidos por un Apache lento— y el 443 sigue
+ * sin conectar. Con el plazo partido a la mitad, el intento por HTTP se abortaba
+ * a los 10 s de un plazo de 20 y la lectura salía SIN_RESPUESTA teniendo el
+ * sitio en pie. Repartir a ciegas costaba justo la lectura que se podía hacer.
+ *
+ * Ahora el esquema que NO se ha comprobado solo recibe un SONDEO corto: una
+ * conexión que va a establecerse se establece en menos de cuatro segundos, y lo
+ * que se está esperando en el 443 no es una página lenta sino un SYN que nunca
+ * vuelve. El esquema aprendido —o el segundo, cuando el sondeo falla— se lleva
+ * todo lo que quede. Es el mismo aprendizaje de siempre, por proceso y no por
+ * norma, usado además para repartir el reloj y no solo para ordenar.
+ */
+const SONDEO_MS = 4_000;
+
+const descargarDelSenado = async (ruta: string, limiteMs: number): Promise<string | null> => {
+  const inicio = Date.now();
+  const queda = (): number => Math.max(1_500, limiteMs - (Date.now() - inicio));
   const esquemas: Array<'https' | 'http'> =
     esquemaQueFunciona === 'http' ? ['http', 'https'] : ['https', 'http'];
   for (const esquema of esquemas) {
+    const ultimo = esquema === esquemas[esquemas.length - 1];
+    const plazo =
+      esquemaQueFunciona === esquema || ultimo ? queda() : Math.min(SONDEO_MS, queda());
     try {
       const respuesta = await fetch(`${esquema}://${ruta}`, {
         headers: { 'User-Agent': NAVEGADOR, Accept: 'text/html,application/xhtml+xml,*/*' },
-        signal: AbortSignal.timeout(mitad)
+        signal: AbortSignal.timeout(plazo)
       });
       // Un 404 es una RESPUESTA: el sitio contestó y no la tiene. Reintentar por
       // el otro esquema solo gastaría el presupuesto para oír lo mismo.
@@ -406,97 +427,71 @@ const descargar = async (ruta: string, limiteMs: number): Promise<string | null>
   return null;
 };
 
-/*
- * ─── LA CACHÉ ──────────────────────────────────────────────────────────────
- *
- * La vigencia de un artículo no cambia de un día para otro: entre la derogación
- * y su publicación hay un trámite legislativo entero. Consultar el Senado en
- * cada borrador sería lento para el abogado y descortés con un sitio público.
- * Siete días es más corto que cualquier tránsito normativo y más largo que
- * cualquier ráfaga de borradores.
- *
- * Vive en memoria del proceso, como la de `officialRuling.service.ts`: en
- * serverless cada instancia empieza vacía, así que esto amortigua la ráfaga —que
- * es el caso que importa— y no promete una persistencia que no hay.
+/**
+ * Descarga por URL absoluta, que es la forma que comparten todas las fuentes.
+ * El Senado necesita elegir esquema, así que aquí se le quita el prefijo y se
+ * deja que decida `descargarDelSenado`.
  */
-const SIETE_DIAS_MS = 7 * 24 * 60 * 60 * 1000;
-
-interface EnCache<T> {
-  valor: T;
-  expira: number;
-}
+const descargarSenadoPorUrl = (url: string, ms: number): Promise<string | null> =>
+  descargarDelSenado(url.replace(/^https?:\/\//, ''), ms);
 
 const cacheDeIndices = new Map<string, EnCache<Map<number, string>>>();
-const cacheDeArticulos = new Map<string, EnCache<VigenciaDeArticulo>>();
 
-/** Solo para los checks: una caché que sobrevive entre pruebas mide la prueba anterior. */
-export const limpiarCacheDeVigencia = (): void => {
-  cacheDeIndices.clear();
-  cacheDeArticulos.clear();
-};
-
-const vivo = <T>(entrada: EnCache<T> | undefined): T | null =>
-  entrada && entrada.expira > Date.now() ? entrada.valor : null;
-
-const noVerificable = (
-  referencia: ReferenciaDeArticulo,
-  detalle: string,
-  url?: string
-): VigenciaDeArticulo => ({
-  referencia,
-  estado: 'NO_VERIFICABLE',
+const silencioDelSenado = (detalle: string, url?: string): LecturaDeFuente => ({
+  fuente: 'SENADO',
+  estado: 'SIN_RESPUESTA',
   detalle,
-  url,
-  consultadoEn: new Date().toISOString().slice(0, 10)
+  url
 });
 
 /**
- * Consulta la vigencia de UN artículo en el texto oficial.
+ * Lo que la Secretaría del Senado dice de UN artículo. Nunca lanza.
  *
- * Nunca lanza y nunca adivina. Los tres estados son los del molde de
- * providencias: lo comprobado se afirma, lo desmentido se afirma, y lo que no se
- * pudo mirar se DECLARA sin mirar.
+ * `descargarPagina` está inyectado por la misma razón que en Función Pública:
+ * la guarda determinista corre el lector ENTERO sobre HTML verbatim del sitio
+ * sin salir a la red, y así se prueba también el pegamento entre las piezas.
  */
-export const consultarVigencia = async (
+export const leerEnSenado = async (
   referencia: ReferenciaDeArticulo,
-  limiteMs = 8_000
-): Promise<VigenciaDeArticulo> => {
-  const clave = `${referencia.codigo}|${referencia.articulo}`;
-  const enCache = vivo(cacheDeArticulos.get(clave));
-  if (enCache) return enCache;
+  limiteMs = 8_000,
+  descargarPagina: (url: string, ms: number) => Promise<string | null> = descargarSenadoPorUrl
+): Promise<LecturaDeFuente> => {
+  const inicio = Date.now();
+  const restante = (): number => Math.max(0, limiteMs - (Date.now() - inicio));
+  const con = (l: LecturaDeFuente): LecturaDeFuente => ({ ...l, duracionMs: Date.now() - inicio });
 
   const documento = documentoDelSenado(referencia.codigo);
   if (!documento) {
-    /*
-     * No se cachea: mañana la tabla puede conocer la norma, y un hueco cacheado
-     * sobreviviría al arreglo.
-     */
-    return noVerificable(
-      referencia,
-      `Esta casa no sabe en qué documento del Senado vive «${referencia.codigo}», así que su vigencia no se comprobó.`
-    );
+    return con({
+      fuente: 'SENADO',
+      estado: 'SIN_ARTICULO',
+      detalle: `Esta casa no sabe en qué documento de ${NOMBRE_DE_FUENTE.SENADO} vive «${referencia.codigo}».`
+    });
   }
-
-  const inicio = Date.now();
-  const restante = (): number => Math.max(0, limiteMs - (Date.now() - inicio));
 
   let indice = vivo(cacheDeIndices.get(documento));
   if (!indice) {
-    const portada = await descargar(`${BASE}/${documento}.html`, restante());
+    const portada = await descargarPagina(urlDelDocumento(documento), restante());
     if (!portada) {
-      return noVerificable(
-        referencia,
-        'El texto oficial del Senado no respondió, así que no se sabe si el artículo sigue vigente.',
-        urlDelDocumento(documento)
+      /*
+       * «No entregó» y no «no respondió»: medido el 10 de septiembre de 2026,
+       * `basedoc/ley_0054_1990.html` devuelve un 404 honesto de 1.515 bytes en
+       * 15,8 s — el sitio SÍ contestó, sencillamente no tiene esa norma. Decir
+       * «no respondió» habría acusado de caída a un servidor en pie.
+       */
+      return con(
+        silencioDelSenado(
+          `${NOMBRE_DE_FUENTE.SENADO} no entregó esa norma (no la publica, o no contestó a tiempo).`,
+          urlDelDocumento(documento)
+        )
       );
     }
-    indice = mapaDeFragmentos(portada);
     /*
      * Una norma corta puede no traer desplegable. En ese caso el índice queda
      * vacío y el propio documento es la página del artículo: se registra así
      * para no volver a bajarlo, y la búsqueda del ancla dirá si está o no.
      */
-    cacheDeIndices.set(documento, { valor: indice, expira: Date.now() + SIETE_DIAS_MS });
+    indice = guardar(cacheDeIndices, documento, mapaDeFragmentos(portada));
   }
 
   const fragmento = indice.get(referencia.articulo) ?? (indice.size === 0 ? '' : null);
@@ -507,52 +502,272 @@ export const consultarVigencia = async (
      * norma no lo tiene, o que el escrito le puso el código equivocado— y esta
      * casa no puede distinguirlas. Se declara, no se acusa.
      */
-    return noVerificable(
-      referencia,
-      `El índice oficial de la norma no lista un artículo ${referencia.articulo}: puede que la cita lleve el código de otra norma. No se pudo comprobar su vigencia.`,
-      urlDelDocumento(documento)
-    );
+    return con({
+      fuente: 'SENADO',
+      estado: 'SIN_ARTICULO',
+      detalle: `El índice de ${NOMBRE_DE_FUENTE.SENADO} no lista un artículo ${referencia.articulo} en esa norma.`,
+      url: urlDelDocumento(documento)
+    });
   }
 
   const url = `${urlDelDocumento(documento, fragmento)}#${referencia.articulo}`;
-  const pagina = await descargar(`${BASE}/${documento}${fragmento}.html`, restante());
-  if (!pagina) {
-    return noVerificable(
-      referencia,
-      'El texto oficial del Senado no respondió, así que no se sabe si el artículo sigue vigente.',
-      url
+  const pagina = await descargarPagina(urlDelDocumento(documento, fragmento), restante());
+  if (!pagina)
+    return con(
+      silencioDelSenado(`${NOMBRE_DE_FUENTE.SENADO} no entregó la página del artículo.`, url)
     );
-  }
 
   const bloque = bloqueDelArticulo(pagina, referencia.articulo);
   if (!bloque) {
-    return noVerificable(
-      referencia,
-      'La página oficial de la norma no trae el ancla de ese artículo; no se pudo comprobar su vigencia.',
+    return con({
+      fuente: 'SENADO',
+      estado: 'SIN_ARTICULO',
+      detalle: `La página de ${NOMBRE_DE_FUENTE.SENADO} no trae el ancla del artículo ${referencia.articulo}.`,
       url
-    );
+    });
   }
 
   const { estado, marcador } = estadoDeLosMarcadores(marcadoresDelBloque(bloque));
-  const js = await descargar(`${BASE}/js/${documento}${fragmento}.js`, Math.min(restante(), 4_000));
-  const nota = js ? notaDeVigencia(bloque, js) : undefined;
+  const js = await descargarPagina(
+    `https://${BASE}/js/${documento}${fragmento}.js`,
+    Math.min(restante(), 4_000)
+  );
 
-  const resultado: VigenciaDeArticulo = {
-    referencia,
+  return con({
+    fuente: 'SENADO',
     estado,
     detalle:
       estado === 'DEROGADO'
-        ? (marcador ?? 'El texto oficial lo marca derogado.')
+        ? (marcador ?? `${NOMBRE_DE_FUENTE.SENADO} lo marca derogado.`)
         : marcador
-          ? `El texto oficial no lo marca derogado. Nota del artículo: «${marcador}».`
-          : 'El texto oficial lo publica sin marca de derogación.',
+          ? `${NOMBRE_DE_FUENTE.SENADO} no lo marca derogado. Nota del artículo: «${marcador}».`
+          : `${NOMBRE_DE_FUENTE.SENADO} lo publica sin marca de derogación.`,
     url,
     rubrica: rubricaDelBloque(bloque),
     cuerpo: cuerpoDelBloque(bloque),
-    notaDeVigencia: nota,
-    consultadoEn: new Date().toISOString().slice(0, 10)
-  };
+    notaDeVigencia: js ? notaDeVigencia(bloque, js) : undefined
+  });
+};
 
-  cacheDeArticulos.set(clave, { valor: resultado, expira: Date.now() + SIETE_DIAS_MS });
+/*
+ * ═══ LA COMPOSICIÓN ════════════════════════════════════════════════════════
+ */
+
+/** El orden de la doctrina (regla 1). Decide QUÉ texto se muestra cuando hay acuerdo. */
+const ORDEN_DOCTRINAL: FuenteOficial[] = ['SENADO', 'FUNCION_PUBLICA', 'SUIN'];
+
+const porOrdenDoctrinal = (a: LecturaDeFuente, b: LecturaDeFuente): number =>
+  ORDEN_DOCTRINAL.indexOf(a.fuente) - ORDEN_DOCTRINAL.indexOf(b.fuente);
+
+const listar = (fuentes: FuenteOficial[]): string =>
+  fuentes.map((f) => NOMBRE_DE_FUENTE[f]).join(' y ');
+
+/**
+ * EL VEREDICTO A PARTIR DE LO QUE DIJO CADA FUENTE.
+ *
+ * Pura y sin red a propósito: es la regla que gobierna todo este archivo y tiene
+ * que poder probarse con lecturas fabricadas, sin depender de que tres sitios
+ * públicos estén de buen humor.
+ */
+export const componerVigencia = (
+  referencia: ReferenciaDeArticulo,
+  lecturas: LecturaDeFuente[]
+): VigenciaDeArticulo => {
+  const consultadoEn = new Date().toISOString().slice(0, 10);
+  const opiniones = lecturas.filter(esOpinion).sort(porOrdenDoctrinal);
+  const base = { referencia, lecturas, consultadoEn };
+
+  if (opiniones.length === 0) {
+    /*
+     * NINGUNA FUENTE OPINÓ. Se enumera qué se intentó y qué contestó cada una:
+     * un hueco declarado vale, uno rellenado destruye el producto.
+     */
+    return {
+      ...base,
+      estado: 'NO_VERIFICABLE',
+      fuentesQueOpinaron: [],
+      detalle:
+        lecturas.length === 0
+          ? 'No se consultó ninguna fuente oficial, así que no se sabe si el artículo sigue vigente.'
+          : `Ninguna fuente oficial pudo confirmarlo. ${lecturas
+              .map((l) => l.detalle)
+              .join(' ')}`,
+      url: lecturas.find((l) => l.url)?.url
+    };
+  }
+
+  const estados = new Set(opiniones.map((l) => l.estado));
+  const fuentesQueOpinaron = opiniones.map((l) => l.fuente);
+
+  if (estados.size > 1) {
+    /*
+     * LA DISCREPANCIA SE DECLARA Y NO SE RESUELVE.
+     *
+     * Aquí estaba la tentación: quedarse con el Senado «porque es el primero de
+     * la doctrina» y seguir. Sería el peor resultado posible — el abogado vería
+     * un veredicto de dos fuentes que en realidad es el de una, y jamás sabría
+     * que la otra decía lo contrario. Se devuelven LAS DOS versiones con SUS DOS
+     * URLs y sin cuerpo: cuando no hay acuerdo no hay «el» texto del artículo, y
+     * el juez de la glosa no debe juzgar sobre un texto elegido a dedo.
+     */
+    return {
+      ...base,
+      estado: 'DISCREPANCIA_ENTRE_FUENTES',
+      fuentesQueOpinaron,
+      detalle:
+        'LAS FUENTES OFICIALES NO COINCIDEN sobre este artículo, así que esta casa NO decide cuál tiene razón. ' +
+        opiniones
+          .map(
+            (l) =>
+              `${NOMBRE_DE_FUENTE[l.fuente]} lo da por ${l.estado} — ${l.detalle} (${l.url ?? 'sin URL'})`
+          )
+          .join(' | ') +
+        '. Ábralas las dos y decida antes de radicar.',
+      url: opiniones[0].url
+    };
+  }
+
+  /*
+   * CONCORDANCIA, o una sola fuente. En los dos casos se DICE cuál es el caso:
+   * un veredicto que no dice cuántos ojos lo miraron se lee como si lo hubieran
+   * mirado todos.
+   */
+  /* `esOpinion` ya garantizó que solo puede ser uno de estos dos. */
+  const estado = opiniones[0].estado as 'VIGENTE' | 'DEROGADO';
+  const conTexto = opiniones.find((l) => l.cuerpo && l.cuerpo.length > 0) ?? opiniones[0];
+  const sustento =
+    opiniones.length > 1
+      ? `Concordaron ${listar(fuentesQueOpinaron)}.`
+      : `Solo respondió ${listar(fuentesQueOpinaron)}; las demás fuentes no lo confirmaron.`;
+
+  return {
+    ...base,
+    estado,
+    fuentesQueOpinaron,
+    detalle: `${opiniones.map((l) => l.detalle).join(' ')} ${sustento}`,
+    url: conTexto.url,
+    rubrica: conTexto.rubrica,
+    cuerpo: conTexto.cuerpo,
+    notaDeVigencia: opiniones.find((l) => l.notaDeVigencia)?.notaDeVigencia
+  };
+};
+
+/*
+ * LAS FUENTES, EN PARALELO Y NO EN CADENA.
+ *
+ * La etapa de vigencia tiene 20 s (`agent/presupuestoDeTiempo.ts`) y ahora
+ * consulta más de un sitio. En cadena, dos sitios lentos sumarían sus esperas y
+ * el presupuesto se agotaría; en paralelo el costo es el del MÁS LENTO, que es
+ * lo mismo que costaba antes con una sola fuente. Cada lector recibe el plazo
+ * entero porque compiten contra el reloj, no entre ellos.
+ */
+const FUENTES: Array<
+  (r: ReferenciaDeArticulo, ms: number) => Promise<LecturaDeFuente>
+> = [
+  (r, ms) => leerEnSenado(r, ms),
+  (r, ms) => leerEnFuncionPublica(r, ms)
+];
+
+/** En el mismo orden que `FUENTES`: sirve para nombrar a la que no llegó a tiempo. */
+const NOMBRES_DE_LAS_FUENTES: FuenteOficial[] = ['SENADO', 'FUNCION_PUBLICA'];
+
+/**
+ * Cuánto del plazo puede gastar UNA fuente. Ver la nota de `consultarVigencia`:
+ * el resto es el margen que garantiza que la composición ocurra antes de que el
+ * tope de la etapa corte, y con él se salvan las lecturas que sí llegaron.
+ */
+const PARTE_DEL_PLAZO_POR_FUENTE = 0.8;
+
+const conPlazoDeFuente = (
+  lectura: Promise<LecturaDeFuente>,
+  ms: number,
+  fuente: FuenteOficial
+): Promise<LecturaDeFuente> =>
+  new Promise((resolve) => {
+    const reloj = setTimeout(
+      () =>
+        resolve({
+          fuente,
+          estado: 'SIN_RESPUESTA',
+          detalle: `${NOMBRE_DE_FUENTE[fuente]} no contestó dentro del plazo de la comprobación.`,
+          duracionMs: ms
+        }),
+      ms
+    );
+    lectura.then(
+      (l) => {
+        clearTimeout(reloj);
+        resolve(l);
+      },
+      () => {
+        clearTimeout(reloj);
+        resolve({
+          fuente,
+          estado: 'SIN_RESPUESTA',
+          detalle: `${NOMBRE_DE_FUENTE[fuente]} falló al consultarse.`
+        });
+      }
+    );
+  });
+
+const cacheDeArticulos = new Map<string, EnCache<VigenciaDeArticulo>>();
+
+/** Solo para los checks: una caché que sobrevive entre pruebas mide la prueba anterior. */
+export const limpiarCacheDeVigencia = (): void => {
+  cacheDeIndices.clear();
+  cacheDeArticulos.clear();
+  limpiarCacheDeFuncionPublica();
+};
+
+/**
+ * Consulta la vigencia de UN artículo en las fuentes oficiales.
+ *
+ * Nunca lanza y nunca adivina. Los cuatro estados son los del molde de
+ * providencias, más el que trajo la segunda fuente: lo comprobado se afirma, lo
+ * desmentido se afirma, lo que no se pudo mirar se DECLARA sin mirar, y lo que
+ * las fuentes cuentan distinto se DECLARA distinto.
+ */
+export const consultarVigencia = async (
+  referencia: ReferenciaDeArticulo,
+  limiteMs = 8_000
+): Promise<VigenciaDeArticulo> => {
+  const clave = `${referencia.codigo}|${referencia.articulo}`;
+  const enCache = vivo(cacheDeArticulos.get(clave));
+  if (enCache) return enCache;
+
+  /*
+   * NINGUNA FUENTE PUEDE QUEDARSE CON EL RELOJ ENTERO, y esto es un defecto
+   * medido, no una precaución.
+   *
+   * El 10 de septiembre de 2026, con la Secretaría del Senado lenta, Función
+   * Pública contestó la Ley 54 de 1990 en 999 ms y la composición se quedó
+   * esperando al Senado hasta los 20 s. Arriba, el tope de
+   * `verificarVigencia.ts` corta a los 19 s y devuelve NO_VERIFICABLE: el
+   * escrito habría tirado a la basura una lectura oficial buena que llegó en un
+   * segundo. Por eso cada fuente recibe una parte del plazo y la composición
+   * ocurre SIEMPRE dentro del presupuesto, con lo que haya llegado. Una fuente
+   * que no alcanzó es un silencio, y un silencio ya sabe declararse.
+   */
+  const plazoPorFuente = Math.max(3_000, Math.floor(limiteMs * PARTE_DEL_PLAZO_POR_FUENTE));
+  const lecturas = await Promise.all(
+    FUENTES.map((leer, i) =>
+      conPlazoDeFuente(
+        leer(referencia, plazoPorFuente),
+        plazoPorFuente + 500,
+        NOMBRES_DE_LAS_FUENTES[i]
+      )
+    )
+  );
+  const resultado = componerVigencia(referencia, lecturas);
+
+  /*
+   * NO_VERIFICABLE no se cachea: puede venir de una mala tarde de los sitios, y
+   * guardarlo siete días convertiría un tropiezo de un minuto en una semana sin
+   * comprobar. Lo mismo vale para la discrepancia, que puede ser una fuente a
+   * medio actualizar y conviene volver a mirar.
+   */
+  if (resultado.estado === 'VIGENTE' || resultado.estado === 'DEROGADO') {
+    guardar(cacheDeArticulos, clave, resultado);
+  }
   return resultado;
 };

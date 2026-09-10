@@ -25,15 +25,19 @@
  */
 import {
   bloqueDelArticulo,
+  componerVigencia,
   consultarVigencia,
   documentoDelSenado,
   estadoDeLosMarcadores,
+  leerEnSenado,
   limpiarCacheDeVigencia,
   mapaDeFragmentos,
   marcadoresDelBloque,
   notaDeVigencia,
-  rubricaDelBloque
+  rubricaDelBloque,
+  type LecturaDeFuente
 } from '../officialArticle.service';
+import { leerEnFuncionPublica } from '../funcionPublica.source';
 import {
   anotarVigencia,
   articulosPorComprobar,
@@ -246,11 +250,14 @@ const asincronos = async (): Promise<void> => {
         detalle: 'Artículo derogado por el artículo 43 de la Ley 820 de 2003',
         url: 'https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr063.html#2035',
         rubrica: 'ARTÍCULO 2035. MORA EN EL PAGO DE LA RENTA',
+        lecturas: [],
+        fuentesQueOpinaron: ['SENADO'],
         consultadoEn: '2026-09-09'
       }
     ],
     derogados: 1,
-    noVerificables: 0
+    noVerificables: 0,
+    discrepantes: 0
   };
 
   const anotado = anotarVigencia(escrito, revision);
@@ -269,7 +276,8 @@ const asincronos = async (): Promise<void> => {
   );
   check(
     'sin nada que comprobar, el escrito sale idéntico y sin encabezado vacío',
-    anotarVigencia(escrito, { resultados: [], derogados: 0, noVerificables: 0 }) === escrito
+    anotarVigencia(escrito, { resultados: [], derogados: 0, noVerificables: 0, discrepantes: 0 }) ===
+      escrito
   );
 
   /* La marca en línea no persigue números sueltos: eso sería la falsa alarma. */
@@ -288,6 +296,213 @@ const asincronos = async (): Promise<void> => {
     1_000
   );
   check('sin citas por fuera de la ficha no se consulta nada', nada.resultados.length === 0);
+
+  /* ─── 8 bis. VARIAS FUENTES: CONCORDANCIA, DISCREPANCIA Y SILENCIO ─────
+   *
+   * TODO ESTO CORRE SIN RED, sobre HTML VERBATIM de cada fuente, descargado el
+   * 10 de septiembre de 2026 y pegado sin tocar una coma. La descarga va
+   * INYECTADA, así que lo que se prueba es el lector ENTERO —búsqueda del
+   * identificador, corte del bloque, marcador de derogación y composición— y no
+   * sus piezas por separado, que es justo donde estaba el defecto del «artículo
+   * 14 de la Ley 1033» leído como si fuera un encabezado.
+   *
+   * Corre sin red porque una mala tarde de un sitio público no puede poner en
+   * rojo un repositorio que no está roto — la misma doctrina de `run-all-checks`.
+   *
+   * Los fragmentos van como cadenas escapadas y no como plantillas para que
+   * ningún normalizador de fin de línea les cambie un byte: son el HTML que el
+   * sitio sirve, con sus CRLF incluidos.
+   */
+
+  /* Consulta avanzada de Función Pública, resultados para la Ley 820 de 2003. */
+  const FP_BUSCA_820 = "\t\n<div class=\"container\"> <h2><strong>Resultados</strong></h2>\n\t\t\t\t\t  <div class=\"row mt-3\"> \n\t\t\t\t\t  <div class=\"col-lg-12 col-md-12\"> \n\t\t\t\t\t  <p class=\"list-group-item-text\">Número de documentos encontrados: 1</p> \n\t\t\t\t\t\t<a href=\"norma.php?i=8738\" target=\"_blank\" class=\"list-group-item list-group-item-action\">\n\t\t\t\t\t\t\t<h5 class=\"list-group-item-heading\">Ley 820 de 2003</h5>\n\t\t\t\t\t\t\t<p class=\"list-group-item-text\">  Se  expide el régimen de arrendamiento de vivienda urbana; objeto del contrato, definición, forma, clasificación, terminación, prórroga, obligaciones de las partes, prohibición de garantías y depósitos, subarriendo y cesión del contrato, renta de arrendamiento, terminación del contrato, quienes ejercen la actividad de arrendamiento, inspección, control y vigilancia, sanciones aspectos procesales, vigencia.</p>\n\t\t\t\t\t\t</a></div></div></div>";
+  /* `norma.php?i=8738`, desde el div del contenido hasta pasado el artículo 8. */
+  const FP_820_ART_8 = "class=\"descripcion-contenido\">\n\n<P><STRONG>Artículo 8º. <EM>Obligaciones del arrendador.</EM></STRONG> Son obligaciones del arrendador, las siguientes:</P>\r\n<P>1. Entregar al arrendatario en la fecha convenida, o en el momento de la celebración del contrato, el inmueble dado en arrendamiento en buen estado de servicio, seguridad <EM>y </EM>sanidad y poner a su disposición los servicios, cosas o usos conexos y los adicionales convenidos.</P>\r\n<P>2. Mantener en el inmueble los servicios, las cosas <EM>y </EM>los usos conexos <EM>y </EM>adicionales en buen estado de servir para el fin convenido en el contrato.</P>\r\n<P>3. Cuando el contrato de arrendamiento de vivienda urbana conste por escrito, el arrendador deberá suministrar tanto al arrendatario como al codeudor, cuando sea el caso, copia del mismo con firmas originales.</P>\r\n<P>Esta obligación deberá ser satisfecha en el plazo máximo de diez (10) días contados a partir de la fecha de celebración del contrato.</P>\r\n<P>4. Cuando se trate de viviendas sometidas a régimen de propiedad horizontal, el arrendador deberá entregar al arrendatario una copia de la parte normativa del mismo.</P>\r\n<P>En el caso de vivienda compartida, el arrendador tiene además, la obligación de mantener en adecuadas condiciones de funcionamiento, de seguridad y de sanidad las zonas o servicios de uso común y de efectuar por su cuenta las reparaciones y sustituciones necesarias, cuando no sean atribuibles a los arrendatarios, y de garantizar el mantenimiento del orden interno de la vivienda;</P>\r\n<P>5. Las demás obligaciones consagradas para los arrendadores en el Capítulo II, Título XXVI, Libro 4 del Código Civil.</P>\r\n<P><STRONG>Parágrafo.</STRONG> El incumplimiento del numeral tercero del presente artículo será sancionado, a petición de parte, por la autoridad competente, con multas equivalentes a tres (3) mensualidades de arrendamiento.</P>\r\n<P><STRONG>Artículo 9º. Obligaciones del arrendatario.</STRONG> Son obligaciones del arrendatario:</P>\r\n<P>1. Pagar el precio del arrendamiento dentro del plazo estipulado en el contrato, en el inmueble arrendado o en el lugar convenido.</P>\r\n<P>2. Cuidar el inmueble y las cosas recibidas en arrendamiento. En caso de daños o deter";
+  /* Resultados para la Ley 1437 de 2011 (CPACA). */
+  const FP_BUSCA_1437 = "\t\n<div class=\"container\"> <h2><strong>Resultados</strong></h2>\n\t\t\t\t\t  <div class=\"row mt-3\"> \n\t\t\t\t\t  <div class=\"col-lg-12 col-md-12\"> \n\t\t\t\t\t  <p class=\"list-group-item-text\">Número de documentos encontrados: 1</p> \n\t\t\t\t\t\t<a href=\"norma.php?i=41249\" target=\"_blank\" class=\"list-group-item list-group-item-action\">\n\t\t\t\t\t\t\t<h5 class=\"list-group-item-heading\">Ley 1437 de 2011</h5>\n\t\t\t\t\t\t\t<p class=\"list-group-item-text\">Por la cual se expide el Código de Procedimiento Administrativo y de lo Contencioso Administrativo. Establece los principios sobre los cuales las  autoridades deberán interpretar y aplicar las disposiciones que regulan las actuaciones y procedimientos administrativos, haciendo énfasis en el cumplimiento de los principios estatuidos en la Constitución Política, los que se establecen en la parte primera del  Código de Procedimiento Administrativo y de lo Contencioso Administrativo  (Ley 1437 de 2011) y en las leyes especiales. Señala que las actuaciones administrativas se desarrollarán con especial atención a los siguientes principios: debido proceso, igualdad, buena fe imparcialidad, moralidad, participación, responsabilidad, transparencia, publicidad, coordinación, eficacia, economía y celeridad. ( art. 3)</p>\n\t\t\t\t\t\t</a></div></div></div>";
+  /* `norma.php?i=41249`: el art. 226, DEROGADO por el art. 87 de la Ley 2080 de 2021. */
+  const FP_1437_ART_226 = "class=\"descripcion-contenido\">\n\n<p class=\"MsoNormal\"><strong>ARTÍCULO<a id=\"sp226\" name=\"226\"></a> 226. <em>Impugnación de las decisiones sobre intervención de terceros.</em></strong> <em>(Derogado por el Art. <a href=\"norma.php?i=156590#87\">87</a> de la Ley 2080 de 2021)</em></p>\r\n<p class=\"MsoNormal\"> </p>\r\n<p class=\"MsoNormal\"><strong>ARTÍCULO<a id=\"sp227\" name=\"227\"></a> 227. Trámite y alcances de la intervención de terceros</strong>. En lo no regulado en este Código sobre la intervención de terceros se aplicarán las normas del Código General del Proceso.</p>\r\n<p class=\"MsoNormal\"> </p>\r\n<p class=\"MsoNormal\">(Modificado por el Art. <a href=\"norma.php?i=156590#85\">85</a> de la Ley 2080 de 2021)</p>\r\n<p align=\"left\">(Ver <a href=\"norma.php?i=48425#0\">Código General del Proceso</a>)</p>\r\n<p class=\"MsoNormal\"> </p>\r\n<p class=\"MsoNormal\"> </p>\r\n<p class=\"MsoNormal\"><strong>ARTÍCULO<a id=\"sp228\" name=\"228\"></a> 228. <em>";
+  /* Resultados para la Ley 54 de 1990, la que `basedoc` no publica (404 de 1.515 bytes). */
+  const FP_BUSCA_54 = "\t\n<div class=\"container\"> <h2><strong>Resultados</strong></h2>\n\t\t\t\t\t  <div class=\"row mt-3\"> \n\t\t\t\t\t  <div class=\"col-lg-12 col-md-12\"> \n\t\t\t\t\t  <p class=\"list-group-item-text\">Número de documentos encontrados: 1</p> \n\t\t\t\t\t\t<a href=\"norma.php?i=30896\" target=\"_blank\" class=\"list-group-item list-group-item-action\">\n\t\t\t\t\t\t\t<h5 class=\"list-group-item-heading\">Ley 54 de 1990</h5>\n\t\t\t\t\t\t\t<p class=\"list-group-item-text\">  Define las uniones maritales de hecho y régimen patrimonial entre compañeros permanentes. Señala los eventos en que procese su declaración, los bienes que forman parte de la sociedad patrimonial y la procedencia de la liquidación de la misma, así como el régimen aplicable.</p>\n\t\t\t\t\t\t</a></div></div></div>";
+  /* `norma.php?i=30896`: el art. 2, MODIFICADO —que no es derogado— por la Ley 979 de 2005. */
+  const FP_54_ART_2 = "class=\"descripcion-contenido\">\n\n<p>Artículo <a id=\"sp2\" name=\"2\"></a> 2o.</p>\r\n<p><a href=\"norma.php?i=30898#1\">Modificado por el art. 1, Ley 979 de 2005</a>. Se presume sociedad patrimonial entre compañeros permanentes y hay lugar a declararla judicialmente en cualquiera de los siguientes casos:</p>\r\n<p>a) Cuando exista unión marital de hecho durante un lapso no inferior a dos años, entre un hombre y una mujer sin impedimento legal para contraer matrimonio;</p>\r\n<p align=\"left\"><strong>NOTA: Literal declarado EXEQUIBLE por la Corte Constitucional mediante Sentencia</strong> C-257 <strong>de 2015.</strong></p>\r\n<p><a id=\"sp2.b\" name=\"2.b\"></a> b) Cuando exista una unión marital de hecho por un lapso no inferior a dos años e impedimento legal para contraer matrimonio por parte de uno o de ambos compañeros permanentes, siempre y cuando la sociedad o sociedades conyugales anteriores hayan sido disueltas <u>y liquidadas</u> por lo menos un año antes de la fecha en que se inicio la unión marital de hecho.</p>\r\n<p align=\"left\"><strong>NOTA: El texto subrayado fue declarado INEXEQUIBLE por la Corte Constitucional mediante Sentencia</strong> <a href=\"norma.php?i=56635#Primero\">C-700</a> <strong>de 2013</strong>.</p>\r\n<p><strong>NOTA: Literal declarado EXEQUIBLE por la Corte Constitucional mediante Sentencia </strong>C-257 <strong>de 2015.</strong></p>\r\n<p> </p>\r\n<p><strong><em>PARÁGRAFO<a id=\"2p\"></a>. </em></strong><em>En lo relativo a la sociedad patrimonial no se considerará como impedimento legal la unión en las que uno o ambos de los compañeros sea menor de18 años.</em></p>\r\n<p><em><a title=\"vinculo\" href=\"norma.php?i=258256#11\">(Parágrafo adicionado por el Art. 11 de la Ley 2247 de 2025)</a></em></p>\r\n<p> </p>\r\n<p>Artículo <a id=\"3\"></a>3o. El patrimonio o capital producto del trabajo, ayuda y socorro m";
+
+  /**
+   * Una descarga de mentira que sirve HTML verbatim según lo que pida la URL.
+   * Las parejas se prueban EN ORDEN, para poder distinguir el JS hermano del
+   * Senado de la página que lo enlaza.
+   */
+  const sirviendo =
+    (paginas: Array<[string, string]>) =>
+    async (url: string): Promise<string | null> => {
+      for (const [clave, html] of paginas) if (url.includes(clave)) return html;
+      return null;
+    };
+
+  const FP_820 = sirviendo([
+    ['nrodoc=820', FP_BUSCA_820],
+    ['norma.php?i=8738', FP_820_ART_8]
+  ]);
+  const FP_1437 = sirviendo([
+    ['nrodoc=1437', FP_BUSCA_1437],
+    ['norma.php?i=41249', FP_1437_ART_226]
+  ]);
+  const FP_54 = sirviendo([
+    ['nrodoc=54', FP_BUSCA_54],
+    ['norma.php?i=30896', FP_54_ART_2]
+  ]);
+  const SENADO_820 = sirviendo([['ley_0820_2003', HTML_820_8]]);
+  const NADIE = sirviendo([]);
+
+  const ref820 = { codigo: 'LEY 820 DE 2003', articulo: 8 };
+
+  /* Cada lector, entero, contra el HTML real de SU sitio. */
+  const fp820 = await leerEnFuncionPublica(ref820, 5_000, FP_820);
+  check(
+    'Función Pública encuentra la norma por su número y lee el artículo 8 vivo',
+    fp820.estado === 'VIGENTE' && (fp820.url ?? '').includes('norma.php?i=8738'),
+    `${fp820.estado} · ${fp820.url}`
+  );
+  check(
+    'y trae el texto, que es lo que necesita el juez de la glosa',
+    (fp820.cuerpo ?? '').includes('Obligaciones del arrendador'),
+    `${(fp820.cuerpo ?? '').length} caracteres`
+  );
+
+  const fp226 = await leerEnFuncionPublica(
+    { codigo: 'LEY 1437 DE 2011', articulo: 226 },
+    5_000,
+    FP_1437
+  );
+  check(
+    'y caza la derogación como la escribe ESTA fuente, en prosa y no en corchete angular',
+    fp226.estado === 'DEROGADO' && fp226.detalle.includes('Ley 2080 de 2021'),
+    fp226.detalle.slice(0, 90)
+  );
+
+  /*
+   * MODIFICAR NO ES DEROGAR, y aquí también. El art. 2 de la Ley 54 abre con
+   * «Modificado por el art. 1, Ley 979 de 2005» y está perfectamente vivo:
+   * marcarlo muerto sería la falsa alarma que enseña a ignorar los avisos.
+   */
+  const fp54 = await leerEnFuncionPublica({ codigo: 'LEY 54 DE 1990', articulo: 2 }, 5_000, FP_54);
+  check(
+    'un artículo MODIFICADO no se confunde con uno derogado',
+    fp54.estado === 'VIGENTE',
+    fp54.detalle.slice(0, 90)
+  );
+
+  /* Y si el resultado no es la norma pedida, no se lee ese texto: se calla. */
+  const fpOtra = await leerEnFuncionPublica({ codigo: 'LEY 820 DE 1999', articulo: 1 }, 5_000, FP_820);
+  check(
+    'si el título del resultado no es el de la norma pedida, NO se lee ese texto',
+    fpOtra.estado === 'SIN_ARTICULO',
+    fpOtra.detalle.slice(0, 90)
+  );
+
+  const senado820 = await leerEnSenado(ref820, 5_000, SENADO_820);
+  check(
+    'la Secretaría del Senado lee el mismo artículo 8 y también lo da por vivo',
+    senado820.estado === 'VIGENTE',
+    senado820.detalle.slice(0, 80)
+  );
+
+  /* (1) CONCORDANCIA → VIGENTE, y se dice quiénes concordaron. */
+  const concordancia = componerVigencia(ref820, [senado820, fp820]);
+  check(
+    'CONCORDANCIA: dos fuentes que coinciden dan VIGENTE',
+    concordancia.estado === 'VIGENTE',
+    concordancia.estado
+  );
+  check(
+    'y el resultado DICE cuáles concordaron: un veredicto que no lo dice se lee como si lo hubieran mirado todos',
+    concordancia.fuentesQueOpinaron.length === 2 && concordancia.detalle.includes('Concordaron'),
+    concordancia.detalle.slice(-120)
+  );
+
+  /*
+   * (2) DISCREPANCIA FABRICADA, con HTML verbatim de las dos fuentes: se le da a
+   * la composición la lectura VIVA del Senado y la lectura DEROGADA de Función
+   * Pública sobre una misma referencia. Es la parte más importante del archivo.
+   */
+  const discrepancia = componerVigencia(ref820, [senado820, fp226]);
+  check(
+    'DISCREPANCIA: si una fuente lo da por vivo y otra por muerto, el estado es propio',
+    discrepancia.estado === 'DISCREPANCIA_ENTRE_FUENTES',
+    discrepancia.estado
+  );
+  check(
+    'y viajan LAS DOS URLs, para que el abogado abra las dos y decida',
+    discrepancia.detalle.includes(senado820.url ?? 'x') &&
+      discrepancia.detalle.includes(fp226.url ?? 'y'),
+    discrepancia.detalle.slice(0, 200)
+  );
+  check(
+    'esta casa NO elige: no se devuelve cuerpo, porque no hay «el» texto del artículo',
+    discrepancia.cuerpo === undefined
+  );
+  check(
+    'y la discrepancia también se marca en el párrafo, no solo en la cabecera',
+    anotarVigencia('Con fundamento en el artículo 8 de la Ley 820 de 2003.', {
+      resultados: [discrepancia],
+      derogados: 0,
+      noVerificables: 0,
+      discrepantes: 1
+    }).includes('LAS FUENTES OFICIALES NO COINCIDEN')
+  );
+
+  /* (3) SOLO UNA RESPONDE → vale, y se dice que solo una respondió. */
+  const senadoMudo = await leerEnSenado(ref820, 500, NADIE);
+  const unaSola = componerVigencia(ref820, [senadoMudo, fp820]);
+  check('SOLO UNA FUENTE: sigue valiendo el veredicto', unaSola.estado === 'VIGENTE', unaSola.estado);
+  check(
+    'y se dice que solo una respondió y cuál',
+    unaSola.fuentesQueOpinaron.length === 1 && unaSola.detalle.includes('Solo respondió'),
+    unaSola.detalle.slice(-120)
+  );
+
+  /*
+   * (4) NINGUNA RESPONDE → NO_VERIFICABLE, como siempre.
+   *
+   * Se vacía la caché antes: sin esto, Función Pública contestaría con lo que
+   * aprendió tres comprobaciones más arriba y la prueba mediría la caché en vez
+   * del silencio. Es la misma razón por la que `limpiarCacheDeVigencia` existe.
+   */
+  limpiarCacheDeVigencia();
+  const fpMudo = await leerEnFuncionPublica(ref820, 500, NADIE);
+  const silencio = componerVigencia(ref820, [senadoMudo, fpMudo]);
+  check('SILENCIO DE TODAS: NO_VERIFICABLE', silencio.estado === 'NO_VERIFICABLE', silencio.estado);
+  check(
+    'y se enumera qué se intentó: un hueco declarado vale, uno rellenado destruye el producto',
+    silencio.detalle.includes('Senado') && silencio.detalle.includes('Función Pública'),
+    silencio.detalle.slice(0, 160)
+  );
+
+  /*
+   * (5) UN SILENCIO NO CONTRADICE A NADIE. Que una fuente no publique el
+   * artículo no puede fabricar una discrepancia contra la que sí lo publica:
+   * ésa fue la trampa que casi entra, y habría llenado los escritos de
+   * conflictos inexistentes.
+   */
+  const senadoMuerto: LecturaDeFuente = {
+    fuente: 'SENADO',
+    estado: 'DEROGADO',
+    detalle: 'Artículo derogado por el artículo 43 de la Ley 820 de 2003',
+    url: 'https://www.secretariasenado.gov.co/senado/basedoc/codigo_civil_pr063.html#2035'
+  };
+  const sinDiscrepancia = componerVigencia({ codigo: 'CODIGO CIVIL', articulo: 2035 }, [
+    senadoMuerto,
+    {
+      fuente: 'FUNCION_PUBLICA',
+      estado: 'SIN_ARTICULO',
+      detalle: 'el Gestor Normativo de Función Pública no publica el Código Civil.'
+    }
+  ]);
+  check(
+    'que una fuente no tenga el artículo NO es un desacuerdo: sigue saliendo DEROGADO',
+    sinDiscrepancia.estado === 'DEROGADO',
+    sinDiscrepancia.estado
+  );
 
   /* ─── 9. Y AHORA, SI SE PIDIÓ, CONTRA LA FUENTE DE VERDAD ───────────────── */
 

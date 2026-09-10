@@ -96,7 +96,7 @@ jobs:
         run: npm run check:sin-nombre
       - name: Citacion normativa (the draft cites only verified articles and never states what one says)
         run: npm run check:citacion
-      - name: "Vigencia (a repealed article is caught and flagged inside the draft: art. 2035 del Codigo Civil)"
+      - name: "Vigencia en varias fuentes oficiales (art. 2035 del Codigo Civil sale DEROGADO; concordancia da VIGENTE; una discrepancia se DECLARA con las dos URLs; una sola fuente vale y se dice cual; el silencio de todas es NO_VERIFICABLE)"
         run: npm run check:vigencia
       - name: "Glosa (what the draft claims an article says is checked against the official text: Ley 820 art. 8 is the ARRENDADOR, not the arrendatario)"
         run: npm run check:glosa

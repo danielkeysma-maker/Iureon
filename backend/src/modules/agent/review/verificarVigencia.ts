@@ -1,5 +1,6 @@
 import { referenciasDelTexto, claveDe, etiquetaDeNorma, type ReferenciaNormativa } from '../citacionNormativa';
 import {
+  NOMBRE_DE_FUENTE,
   consultarVigencia,
   type EstadoDeVigencia,
   type VigenciaDeArticulo
@@ -68,6 +69,8 @@ export interface RevisionDeVigencia {
   resultados: VigenciaDeArticulo[];
   derogados: number;
   noVerificables: number;
+  /** Los que las fuentes oficiales cuentan distinto. Ver `officialArticle.service.ts`. */
+  discrepantes: number;
 }
 
 const conTope = <T>(promesa: Promise<T>, ms: number, siTarda: T): Promise<T> =>
@@ -114,22 +117,29 @@ export const verificarVigenciaDelEscrito = async (
   limiteMs = 20_000
 ): Promise<RevisionDeVigencia> => {
   const porComprobar = articulosPorComprobar(texto, autorizados);
-  if (porComprobar.length === 0) return { resultados: [], derogados: 0, noVerificables: 0 };
+  if (porComprobar.length === 0)
+    return { resultados: [], derogados: 0, noVerificables: 0, discrepantes: 0 };
 
   const seAgotoElPlazo = (referencia: ReferenciaNormativa): VigenciaDeArticulo => ({
     referencia,
     estado: 'NO_VERIFICABLE',
     detalle:
-      'El texto oficial del Senado no respondió dentro del plazo del escrito; no se sabe si el artículo sigue vigente.',
+      'Ninguna fuente oficial respondió dentro del plazo del escrito; no se sabe si el artículo sigue vigente.',
+    lecturas: [],
+    fuentesQueOpinaron: [],
     consultadoEn: new Date().toISOString().slice(0, 10)
   });
 
   /*
-   * En paralelo, y con el MISMO plazo para todos: van contra el mismo sitio, así
-   * que el que llega tarde es el sitio y no un artículo en particular. El plazo
-   * individual es un poco menor que el de la etapa para que el tope de aquí
-   * gane siempre al de arriba y el resultado sea NO_VERIFICABLE declarado en vez
-   * de una etapa cortada sin decir de qué.
+   * En paralelo, y con el MISMO plazo para todos: las fuentes son públicas y
+   * comunes a todos los artículos, así que el que llega tarde es el sitio y no
+   * un artículo en particular. El plazo individual es un poco menor que el de
+   * la etapa para que el tope de aquí gane siempre al de arriba y el resultado
+   * sea NO_VERIFICABLE declarado en vez de una etapa cortada sin decir de qué.
+   *
+   * Y DENTRO de cada consulta las fuentes también corren en paralelo
+   * (`consultarVigencia`), así que pasar de una fuente a dos no dobló el reloj:
+   * cuesta lo que cueste la más lenta.
    */
   const plazoIndividual = Math.max(2_000, limiteMs - 1_000);
   const resultados = await Promise.all(
@@ -141,7 +151,8 @@ export const verificarVigenciaDelEscrito = async (
   return {
     resultados,
     derogados: resultados.filter((r) => r.estado === 'DEROGADO').length,
-    noVerificables: resultados.filter((r) => r.estado === 'NO_VERIFICABLE').length
+    noVerificables: resultados.filter((r) => r.estado === 'NO_VERIFICABLE').length,
+    discrepantes: resultados.filter((r) => r.estado === 'DISCREPANCIA_ENTRE_FUENTES').length
   };
 };
 
@@ -207,15 +218,28 @@ export const marcarVarios = (
  * comprobación y apila las cabeceras encima, donde ya no hay nada que marcar.
  */
 export const marcarVigenciaEnLinea = (texto: string, revision: RevisionDeVigencia): string =>
-  marcarVarios(
-    texto,
-    revision.resultados
+  marcarVarios(texto, [
+    ...revision.resultados
       .filter((x) => x.estado === 'DEROGADO')
       .map((r) => ({
         articulo: r.referencia.articulo,
         marca: `[NORMA DEROGADA — este artículo NO está vigente: ${r.detalle}. No puede fundar lo que aquí se pide; corríjalo antes de radicar.]`
+      })),
+    /*
+     * LA DISCREPANCIA TAMBIÉN SE MARCA EN EL PÁRRAFO, y no solo arriba.
+     *
+     * Dejarla únicamente en la cabecera la convertiría en un dato de auditoría:
+     * quien lee el párrafo se apoyaría en el artículo sin enterarse de que dos
+     * fuentes oficiales no se ponen de acuerdo sobre si existe. La marca no dice
+     * qué hacer —esta casa no lo sabe— sino que hay que abrir las dos y decidir.
+     */
+    ...revision.resultados
+      .filter((x) => x.estado === 'DISCREPANCIA_ENTRE_FUENTES')
+      .map((r) => ({
+        articulo: r.referencia.articulo,
+        marca: `[LAS FUENTES OFICIALES NO COINCIDEN sobre este artículo — ${r.detalle} Esta casa no elige: compruébelo usted antes de radicar.]`
       }))
-  );
+  ]);
 
 /** La línea que separa los avisos del escrito. Compartida con la comprobación de glosa. */
 export const SEPARADOR_DE_AVISOS = '─────────────────────────────────────────────';
@@ -231,10 +255,11 @@ export const bloquesDeVigencia = (revision: RevisionDeVigencia): string[] => {
 
   const derogados = resultados.filter((r) => r.estado === 'DEROGADO');
   const noVerificables = resultados.filter((r) => r.estado === 'NO_VERIFICABLE');
+  const discrepantes = resultados.filter((r) => r.estado === 'DISCREPANCIA_ENTRE_FUENTES');
   const vigentes = resultados.filter((r) => r.estado === 'VIGENTE');
 
   const bloques: string[] = [
-    'COMPROBACIÓN AUTOMÁTICA DE VIGENCIA — la hizo el sistema consultando el texto oficial del Senado de la República, artículo por artículo, sobre las citas que este escrito trae por fuera de la ficha verificada del catálogo. Esta advertencia se retira cuando se corrija lo que señala, no antes.'
+    'COMPROBACIÓN AUTOMÁTICA DE VIGENCIA — la hizo el sistema consultando las fuentes normativas oficiales (la Secretaría del Senado y el Gestor Normativo de Función Pública), artículo por artículo, sobre las citas que este escrito trae por fuera de la ficha verificada del catálogo. Esta advertencia se retira cuando se corrija lo que señala, no antes.'
   ];
 
   if (derogados.length > 0) {
@@ -244,6 +269,28 @@ export const bloquesDeVigencia = (revision: RevisionDeVigencia): string[] => {
           .map((r) => `- ${nombre(r)} (${r.rubrica ?? 'sin epígrafe'}): ${r.detalle}. Fuente: ${r.url ?? 'texto oficial del Senado'}.`)
           .join('\n') +
         '\nCada uno queda marcado también en el párrafo donde aparece. El texto se dejó intacto a propósito, para que usted vea qué argumentó el borrador y decida con qué lo reemplaza.'
+    );
+  }
+
+  /*
+   * VA ANTES QUE LOS NO VERIFICABLES A PROPÓSITO: un artículo sobre el que dos
+   * fuentes oficiales se contradicen es más urgente que uno que nadie contestó.
+   * En el segundo caso no se sabe nada; en el primero se sabe que ALGO está mal
+   * en el ordenamiento publicado, y el escrito se apoya en él.
+   */
+  if (discrepantes.length > 0) {
+    bloques.push(
+      `CITAS SOBRE LAS QUE LAS FUENTES OFICIALES NO COINCIDEN — ${discrepantes.length}. NO RADIQUE SIN COMPROBARLAS.\n` +
+        discrepantes
+          .map(
+            (r) =>
+              `- ${nombre(r)}: ${r.lecturas
+                .filter((l) => l.estado === 'VIGENTE' || l.estado === 'DEROGADO')
+                .map((l) => `${NOMBRE_DE_FUENTE[l.fuente]} lo da por ${l.estado} → ${l.url ?? 'sin URL'}`)
+                .join('   ·   ')}`
+          )
+          .join('\n') +
+        '\nEl sistema NO escoge cuál tiene razón: escoger sería inventar con cara de rigor. Abra las dos páginas y decida usted.'
     );
   }
 
@@ -286,7 +333,9 @@ export const resumenDeVigencia = (revision: RevisionDeVigencia): string => {
     revision.resultados.filter((r) => r.estado === estado).length;
   return (
     `${revision.resultados.length} citas fuera de ficha comprobadas contra el texto oficial: ` +
-    `${porEstado('VIGENTE')} vigentes, ${porEstado('DEROGADO')} DEROGADAS, ${porEstado('NO_VERIFICABLE')} no verificables.` +
+    `${porEstado('VIGENTE')} vigentes, ${porEstado('DEROGADO')} DEROGADAS, ` +
+    `${porEstado('DISCREPANCIA_ENTRE_FUENTES')} con DISCREPANCIA entre fuentes, ` +
+    `${porEstado('NO_VERIFICABLE')} no verificables.` +
     (revision.derogados > 0
       ? ` Derogadas: ${revision.resultados
           .filter((r) => r.estado === 'DEROGADO')

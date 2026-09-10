@@ -82,6 +82,8 @@ const vigenciaDe = (articulo: number, cuerpo: string, rubrica: string): Vigencia
   url: `https://www.secretariasenado.gov.co/senado/basedoc/ley_0820_2003.html#${articulo}`,
   rubrica,
   cuerpo,
+  lecturas: [],
+  fuentesQueOpinaron: ['SENADO'],
   consultadoEn: '2026-09-10'
 });
 
@@ -94,6 +96,8 @@ const VIGENCIAS: VigenciaDeArticulo[] = [
     estado: 'DEROGADO',
     detalle: 'Artículo derogado por el literal c) del artículo 626 de la Ley 1564 de 2012.',
     cuerpo: '<Artículo derogado por el literal c) del artículo 626 de la Ley 1564 de 2012.>',
+    lecturas: [],
+    fuentesQueOpinaron: ['SENADO'],
     consultadoEn: '2026-09-10'
   },
   {
@@ -101,6 +105,8 @@ const VIGENCIAS: VigenciaDeArticulo[] = [
     referencia: { codigo: 'CGP', articulo: 384 },
     estado: 'NO_VERIFICABLE',
     detalle: 'El texto oficial del Senado no respondió.',
+    lecturas: [],
+    fuentesQueOpinaron: [],
     consultadoEn: '2026-09-10'
   }
 ];
