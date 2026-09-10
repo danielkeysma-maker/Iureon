@@ -154,7 +154,14 @@ export const afirmacionesPorComprobar = (
 ): AfirmacionSobreArticulo[] => {
   const conTexto = new Map<number, VigenciaDeArticulo>();
   for (const v of vigencias) {
-    if (v.estado !== 'VIGENTE') continue;
+    /*
+     * EL MODULADO TAMBIÉN SE JUZGA, y con más razón que el vigente limpio: es
+     * un artículo vivo cuyo texto publicado ya no dice lo que se lee, así que
+     * es donde una glosa se equivoca más fácil. Saltarlo dejaría sin comprobar
+     * justo el caso peligroso. Lo que NO se juzga es el derogado —que lleva su
+     * propia marca— ni la discrepancia, que viaja sin cuerpo a propósito.
+     */
+    if (v.estado !== 'VIGENTE' && v.estado !== 'MODULADO') continue;
     if (!v.cuerpo || v.cuerpo.trim().length < 40) continue;
     if (!conTexto.has(v.referencia.articulo)) conTexto.set(v.referencia.articulo, v);
   }

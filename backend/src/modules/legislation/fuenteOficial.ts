@@ -67,7 +67,12 @@ export const NOMBRE_DE_FUENTE: Record<FuenteOficial, string> = {
  * silencios: viajan en el resultado para que se lea qué se intentó, pero no
  * votan.
  */
-export type EstadoDeLectura = 'VIGENTE' | 'DEROGADO' | 'SIN_ARTICULO' | 'SIN_RESPUESTA';
+export type EstadoDeLectura =
+  | 'VIGENTE'
+  | 'MODULADO'
+  | 'DEROGADO'
+  | 'SIN_ARTICULO'
+  | 'SIN_RESPUESTA';
 
 export interface LecturaDeFuente {
   fuente: FuenteOficial;
@@ -86,9 +91,30 @@ export interface LecturaDeFuente {
   duracionMs?: number;
 }
 
-/** Las dos lecturas que SÍ son una opinión sobre el artículo. */
+/** Las lecturas que SÍ son una opinión sobre el artículo. */
 export const esOpinion = (l: LecturaDeFuente): boolean =>
-  l.estado === 'VIGENTE' || l.estado === 'DEROGADO';
+  l.estado === 'VIGENTE' || l.estado === 'MODULADO' || l.estado === 'DEROGADO';
+
+/*
+ * MODULADO Y VIGENTE DICEN LO MISMO SOBRE LO ÚNICO QUE SE COMPARA: SI VIVE.
+ *
+ * Una fuente que publica «Aparte subrayado CONDICIONALMENTE exequible» y otra
+ * que no lo publica no se están contradiciendo: la primera vio la nota de la
+ * Corte y la segunda no la trae. Ya está medido que Función Pública sirve el
+ * Código Penal con transcripción degradada, así que tratar esa pareja como
+ * DISCREPANCIA fabricaría un conflicto donde solo hay una copia más pobre — y
+ * la falsa alarma es peor que el silencio.
+ *
+ * Por eso la concordancia se mide por FAMILIA —vive o no vive— y la modulación
+ * se suma después: vista por una fuente, es un hecho positivo, no un empate.
+ * Lo que sí sigue siendo discrepancia de verdad es VIVE contra NO VIVE.
+ */
+export const familiaDeLectura = (estado: EstadoDeLectura): 'VIVE' | 'NO_VIVE' | 'SILENCIO' =>
+  estado === 'VIGENTE' || estado === 'MODULADO'
+    ? 'VIVE'
+    : estado === 'DEROGADO'
+      ? 'NO_VIVE'
+      : 'SILENCIO';
 
 /**
  * CUÁNTO TEXTO DE ARTÍCULO SE PUBLICA, y por qué ese número.

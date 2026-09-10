@@ -238,6 +238,22 @@ export const marcarVigenciaEnLinea = (texto: string, revision: RevisionDeVigenci
       .map((r) => ({
         articulo: r.referencia.articulo,
         marca: `[LAS FUENTES OFICIALES NO COINCIDEN sobre este artículo — ${r.detalle} Esta casa no elige: compruébelo usted antes de radicar.]`
+      })),
+    /*
+     * EL MODULADO SE MARCA EN EL PÁRRAFO, y es el que más lo necesita.
+     *
+     * El derogado se defiende solo: quien lo abre ve el corchete de muerte. El
+     * modulado NO — se abre, se lee entero y dice exactamente lo que el escrito
+     * promete; lo que falta es lo que la Corte le quitó o le condicionó, y eso
+     * no está en el texto. El art. 97 del Código Penal publica un tope de 1000
+     * SMLMV que la Corte no dejó como se lee. Sin esta marca, el párrafo se
+     * apoya en un texto que parece intacto.
+     */
+    ...revision.resultados
+      .filter((x) => x.estado === 'MODULADO')
+      .map((r) => ({
+        articulo: r.referencia.articulo,
+        marca: `[NORMA VIGENTE PERO MODULADA POR LA CORTE — este artículo rige, pero SU TEXTO PUBLICADO NO ES EL QUE RIGE: ${r.detalle} Léalo en la sentencia antes de citarlo como se lee.]`
       }))
   ]);
 
@@ -256,6 +272,7 @@ export const bloquesDeVigencia = (revision: RevisionDeVigencia): string[] => {
   const derogados = resultados.filter((r) => r.estado === 'DEROGADO');
   const noVerificables = resultados.filter((r) => r.estado === 'NO_VERIFICABLE');
   const discrepantes = resultados.filter((r) => r.estado === 'DISCREPANCIA_ENTRE_FUENTES');
+  const modulados = resultados.filter((r) => r.estado === 'MODULADO');
   const vigentes = resultados.filter((r) => r.estado === 'VIGENTE');
 
   const bloques: string[] = [
@@ -291,6 +308,26 @@ export const bloquesDeVigencia = (revision: RevisionDeVigencia): string[] => {
           )
           .join('\n') +
         '\nEl sistema NO escoge cuál tiene razón: escoger sería inventar con cara de rigor. Abra las dos páginas y decida usted.'
+    );
+  }
+
+  /*
+   * ENTRE LA DISCREPANCIA Y LOS NO VERIFICABLES, y no al final con los buenos.
+   *
+   * Un artículo modulado NO es una cita comprobada: es una cita que hay que
+   * corregir o matizar antes de radicar. Ponerlo abajo, junto a las que pasaron
+   * limpias, lo leería como una nota al pie.
+   */
+  if (modulados.length > 0) {
+    bloques.push(
+      `CITAS VIGENTES PERO MODULADAS POR LA CORTE — ${modulados.length}. RIGEN, PERO NO COMO ESTÁN ESCRITAS.\n` +
+        modulados
+          .map(
+            (r) =>
+              `- ${nombre(r)} (${r.rubrica ?? 'sin epígrafe'}): ${r.detalle} Fuente: ${r.url ?? 'texto oficial del Senado'}.`
+          )
+          .join('\n') +
+        '\nEl texto publicado de estos artículos NO es el que rige: la Corte les quitó apartes o los ató a un sentido determinado. Puede invocarlos —no están derogados— pero abra la sentencia y cite con la condición puesta.'
     );
   }
 
@@ -333,7 +370,8 @@ export const resumenDeVigencia = (revision: RevisionDeVigencia): string => {
     revision.resultados.filter((r) => r.estado === estado).length;
   return (
     `${revision.resultados.length} citas fuera de ficha comprobadas contra el texto oficial: ` +
-    `${porEstado('VIGENTE')} vigentes, ${porEstado('DEROGADO')} DEROGADAS, ` +
+    `${porEstado('VIGENTE')} vigentes, ${porEstado('MODULADO')} MODULADAS por la Corte, ` +
+    `${porEstado('DEROGADO')} DEROGADAS, ` +
     `${porEstado('DISCREPANCIA_ENTRE_FUENTES')} con DISCREPANCIA entre fuentes, ` +
     `${porEstado('NO_VERIFICABLE')} no verificables.` +
     (revision.derogados > 0

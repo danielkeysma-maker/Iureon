@@ -5,6 +5,7 @@ import {
   decodificarEntidades,
   enUnaLinea,
   esOpinion,
+  familiaDeLectura,
   guardar,
   recortarCuerpo,
   sinEtiquetas,
@@ -18,8 +19,8 @@ import { leerEnFuncionPublica, limpiarCacheDeFuncionPublica } from './funcionPub
 
 /**
  * ¿SIGUE VIVO ESTE ARTÍCULO? Se lo pregunta a las fuentes oficiales, artículo
- * por artículo, y responde VIGENTE · DEROGADO · DISCREPANCIA_ENTRE_FUENTES ·
- * NO_VERIFICABLE.
+ * por artículo, y responde VIGENTE · MODULADO · DEROGADO ·
+ * DISCREPANCIA_ENTRE_FUENTES · NO_VERIFICABLE.
  *
  * ─── POR QUÉ EXISTE ────────────────────────────────────────────────────────
  *
@@ -133,6 +134,12 @@ export {
 
 export type EstadoDeVigencia =
   | 'VIGENTE'
+  /**
+   * VIVO, PERO SU TEXTO PUBLICADO NO ES EL QUE RIGE: la Corte le quitó apartes
+   * o lo ató a un sentido. Se puede invocar —y por eso NO es DEROGADO— pero no
+   * se puede citar como se lee. Ver `MODULADO` en este archivo.
+   */
+  | 'MODULADO'
   | 'DEROGADO'
   | 'DISCREPANCIA_ENTRE_FUENTES'
   | 'NO_VERIFICABLE';
@@ -398,11 +405,52 @@ const MUERTO = /^art[íi]culo\s+(?:\d+[a-z]?\s+)?(?:derogad|anulad|inexequible|d
  */
 const LEY_MUERTA = /^(?:nota\s+de\s+vigencia\s*:\s*)?(?:ley|decreto(?:\s+ley)?|c[óo]digo|estatuto|resoluci[óo]n|acuerdo|decisi[óo]n)\s+derogad[oa]\b/i;
 
+/*
+ * EL TERCER ESTADO: VIVO, PERO NO COMO ESTÁ ESCRITO.
+ *
+ * Hasta el 10 de septiembre de 2026 este módulo solo sabía decir dos cosas de
+ * un artículo, y con eso bastaba para el trabajo con el que nació: o la fuente
+ * lo marca muerto, o no. Un catálogo que redacta escritos necesita una tercera,
+ * porque hay artículos que están en pie y cuyo TEXTO PUBLICADO NO ES EL QUE
+ * RIGE: la Corte les quitó palabras o los ató a un sentido.
+ *
+ * EL CASO QUE LO OBLIGA, y es peligroso justamente por lo tranquilo que se ve:
+ * el art. 97 del Código Penal publica un tope de indemnización de 1000 SMLMV
+ * que la Corte no dejó como se lee. Con dos estados salía VIGENTE —«la fuente
+ * no lo marca muerto»— y un escrito podía afirmar ese tope ante el juez con el
+ * respaldo de esta casa. El art. 411 del Código Civil, la lista de quién debe
+ * alimentos y a quién, trae apartes tachados y numerales condicionados: es la
+ * mitad de una demanda de alimentos.
+ *
+ * SON DIEZ ARTÍCULOS MEDIDOS, no una hipótesis: C.C. 411, 414, 416 y 422;
+ * C. Penal 94 y 97; Ley 1480 art. 59 y Ley 769 art. 131 —el corazón sustantivo
+ * de sus fichas—; Ley 160 art. 72; y Ley 610 arts. 1 y 6. Todos quedaron FUERA
+ * del catálogo mientras el estado no existió, que es la decisión prudente y
+ * también una pérdida real: dejar sin causal a la ficha de alimentos no protege
+ * al abogado, lo desarma.
+ *
+ * LA MARCA YA VENÍA EN LA FUENTE. No hay que ir a la sentencia para DETECTARLO:
+ * el Senado lo publica en el propio marcador angular del artículo —«Aparte
+ * subrayado CONDICIONALMENTE exequible», «Apartes tachados INEXEQUIBLES»,
+ * «EXEQUIBLE, en el entendido de que…»—. Lo único que faltaba era dejar de
+ * leerlo como ruido. Ir a leer QUÉ dijo la Corte es otro trabajo, y se hace
+ * artículo por artículo contra `corteconstitucional.gov.co`, que la doctrina ya
+ * admite (regla 1, fuente 4).
+ *
+ * LA MUERTE MANDA SOBRE LA MODULACIÓN, y por eso se pregunta después: un
+ * artículo derogado cuyo marcador además mencione una condicionalidad sigue
+ * derogado. Modular un cadáver no lo resucita.
+ */
+const MODULADO =
+  /(?:condicionalmente\s+exequible|exequible\s+de\s+manera\s+condicionad|exequibilidad\s+condicionad|en\s+el\s+entendido\s+(?:de\s+)?que|aparte[s]?\s+tachad[oa]s?\s+inexequible|expresi[óo]n(?:es)?\s+[^<>]{0,120}\s+inexequible|aparte[s]?\s+(?:subrayad[oa]s?|tachad[oa]s?)\s+[^<>]{0,80}inexequible)/i;
+
 export const estadoDeLosMarcadores = (
   marcadores: string[]
-): { estado: 'VIGENTE' | 'DEROGADO'; marcador?: string } => {
+): { estado: 'VIGENTE' | 'MODULADO' | 'DEROGADO'; marcador?: string } => {
   const mortal = marcadores.find((m) => MUERTO.test(m) || LEY_MUERTA.test(m));
   if (mortal) return { estado: 'DEROGADO', marcador: mortal };
+  const modulado = marcadores.find((m) => MODULADO.test(m));
+  if (modulado) return { estado: 'MODULADO', marcador: modulado };
   return { estado: 'VIGENTE', marcador: marcadores[0] };
 };
 
@@ -656,7 +704,15 @@ export const componerVigencia = (
     };
   }
 
-  const estados = new Set(opiniones.map((l) => l.estado));
+  /*
+   * SE COMPARA LA FAMILIA —vive o no vive—, NO LA ETIQUETA.
+   *
+   * Ver `familiaDeLectura` en `fuenteOficial.ts`: una fuente que trae la nota
+   * de la Corte y otra que no la trae no se contradicen, y ya está medido que
+   * Función Pública sirve copias degradadas. Comparar etiquetas convertiría
+   * cada modulación vista por una sola fuente en una discrepancia inventada.
+   */
+  const estados = new Set(opiniones.map((l) => familiaDeLectura(l.estado)));
   const fuentesQueOpinaron = opiniones.map((l) => l.fuente);
 
   if (estados.size > 1) {
@@ -692,13 +748,27 @@ export const componerVigencia = (
    * un veredicto que no dice cuántos ojos lo miraron se lee como si lo hubieran
    * mirado todos.
    */
-  /* `esOpinion` ya garantizó que solo puede ser uno de estos dos. */
-  const estado = opiniones[0].estado as 'VIGENTE' | 'DEROGADO';
-  const conTexto = opiniones.find((l) => l.cuerpo && l.cuerpo.length > 0) ?? opiniones[0];
+  /*
+   * DENTRO DE LA FAMILIA «VIVE», LA MODULACIÓN GANA — vista por una fuente, es
+   * un hecho positivo, y no verla es un silencio. Si el Senado publica la nota
+   * de la Corte y Función Pública no, el veredicto es MODULADO: rebajarlo a
+   * VIGENTE porque «una de las dos no lo dijo» sería devolver como derecho un
+   * texto que la Corte ya tocó.
+   */
+  const moduladas = opiniones.filter((l) => l.estado === 'MODULADO');
+  const estado: EstadoDeVigencia = moduladas.length > 0 ? 'MODULADO' : opiniones[0].estado === 'DEROGADO' ? 'DEROGADO' : 'VIGENTE';
+  /* Con modulación, el texto que se muestra es el de la fuente QUE LA VIO. */
+  const conCuerpo = (l: LecturaDeFuente): boolean => Boolean(l.cuerpo && l.cuerpo.length > 0);
+  const conTexto =
+    moduladas.find(conCuerpo) ?? moduladas[0] ?? opiniones.find(conCuerpo) ?? opiniones[0];
   const sustento =
-    opiniones.length > 1
+    (opiniones.length > 1
       ? `Concordaron ${listar(fuentesQueOpinaron)}.`
-      : `Solo respondió ${listar(fuentesQueOpinaron)}; las demás fuentes no lo confirmaron.`;
+      : `Solo respondió ${listar(fuentesQueOpinaron)}; las demás fuentes no lo confirmaron.`) +
+    (estado === 'MODULADO'
+      ? ' ESTE ARTÍCULO ESTÁ VIGENTE PERO LA CORTE LO TOCÓ: su texto publicado no es el que rige,' +
+        ' así que no puede citarse como se lee. Lea la sentencia antes de apoyarse en él.'
+      : '');
 
   return {
     ...base,
@@ -826,7 +896,11 @@ export const consultarVigencia = async (
    * comprobar. Lo mismo vale para la discrepancia, que puede ser una fuente a
    * medio actualizar y conviene volver a mirar.
    */
-  if (resultado.estado === 'VIGENTE' || resultado.estado === 'DEROGADO') {
+  if (
+    resultado.estado === 'VIGENTE' ||
+    resultado.estado === 'MODULADO' ||
+    resultado.estado === 'DEROGADO'
+  ) {
     guardar(cacheDeArticulos, clave, resultado);
   }
   return resultado;

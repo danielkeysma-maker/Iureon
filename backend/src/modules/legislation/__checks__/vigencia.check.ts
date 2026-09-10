@@ -243,6 +243,57 @@ const OPCIONES_LEY_CORTA = `<select><option value="#8">8</option>
   for (const [nombre, marcador] of vivos) {
     check(`y NO se mata ${nombre}`, estadoDeLosMarcadores([marcador]).estado === 'VIGENTE', marcador.slice(0, 44));
   }
+
+  /*
+   * ─── EL TERCER ESTADO: VIVO, PERO NO COMO ESTA ESCRITO ───────────────────
+   *
+   * Hasta el 10 de septiembre de 2026 estos articulos salian VIGENTE a secas,
+   * porque la fuente no los marca muertos. El art. 97 del Codigo Penal publica
+   * un tope de 1000 SMLMV que la Corte no dejo como se lee, y un escrito podia
+   * afirmarlo ante el juez con el respaldo de esta casa.
+   *
+   * Las marcas son las que el Senado publica de verdad, copiadas de los diez
+   * articulos que quedaron fuera del catalogo por esto.
+   */
+  const modulados: Array<[string, string]> = [
+    ['el aparte subrayado condicionalmente exequible (C.C. 414, alimentos congruos)', 'Aparte subrayado CONDICIONALMENTE exequible'],
+    ['los apartes tachados inexequibles (C.C. 411, titulares de alimentos)', 'Apartes tachados INEXEQUIBLES'],
+    ['el artículo atado a un sentido (Ley 1480 art. 59)', 'Articulo EXEQUIBLE, en el entendido de que la medida no excede el término legal'],
+    ['la expresión declarada inexequible (Ley 610 art. 6)', "Expresion 'uso indebido' INEXEQUIBLE"],
+    ['el numeral condicionalmente exequible (Ley 769 art. 131)', 'Numeral CONDICIONALMENTE exequible por la Corte Constitucional']
+  ];
+  for (const [nombre, marcador] of modulados) {
+    check(`se detecta ${nombre}`, estadoDeLosMarcadores([marcador]).estado === 'MODULADO', marcador.slice(0, 46));
+  }
+
+  /*
+   * LA MUERTE MANDA SOBRE LA MODULACION. Modular un cadaver no lo resucita, y
+   * un articulo derogado cuyo marcador ademas mencione una condicionalidad
+   * tiene que seguir saliendo DEROGADO: es el unico orden en que el aviso mas
+   * grave no queda tapado por el mas leve.
+   */
+  check(
+    'un artículo derogado que además trae nota de condicionalidad sigue DEROGADO',
+    estadoDeLosMarcadores([
+      'Articulo derogado por el articulo 626 de la Ley 1564 de 2012',
+      'Aparte subrayado CONDICIONALMENTE exequible'
+    ]).estado === 'DEROGADO'
+  );
+
+  /*
+   * Y LOS CONTRACASOS DE LA MODULACION, que son la mitad del valor: si esta
+   * regla se dispara con cualquier mencion de la Corte, marcaria como
+   * «no se puede citar tal como se lee» a articulos intactos, y el abogado
+   * dejaria de leer el aviso. Los tres nombran a la Corte y estan limpios.
+   */
+  const limpios: Array<[string, string]> = [
+    ['un artículo declarado EXEQUIBLE a secas', 'Articulo declarado EXEQUIBLE por la Corte Constitucional, Sentencia C-1064 de 2001'],
+    ['un artículo modificado por una ley, sin sentencia de por medio', 'Articulo modificado por el articulo 62 de la Ley 2466 de 2025'],
+    ['un artículo subrogado', 'Articulo subrogado por el articulo 2o. de la Ley 29 de 1982']
+  ];
+  for (const [nombre, marcador] of limpios) {
+    check(`y NO se modula ${nombre}`, estadoDeLosMarcadores([marcador]).estado === 'VIGENTE', marcador.slice(0, 46));
+  }
 }
 
 /* ─── 5. LO QUE NO SE PUEDE COMPROBAR SE DECLARA, Y NUNCA LANZA ───────────── */
