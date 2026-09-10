@@ -69,6 +69,20 @@ export const DIRECCION = 'Sincelejo, Sucre, Colombia';
  * Gmail y Outlook ELIMINAN el `<svg>`, así que las marcas vectoriales del
  * producto no sirven aquí. Ésta es la única imagen de todo el correo.
  *
+ * ─── EL ISOTIPO CLARO, SOBRE TRANSPARENCIA, Y NO EL ICONO DE LA APLICACIÓN ──
+ *
+ * El icono de la aplicación trae su cuadro azul marino y encima un trazo casi
+ * blanco (#F4F1EA). Recortado a transparencia sobre el papel crema, ese trazo
+ * desaparecería y quedaría medio logotipo. La variante clara —`isotipo-light`—
+ * está dibujada en marino y oro precisamente para fondos claros, y es la que se
+ * rasterizó a 136 px (cuatro veces los 34 en que se pinta).
+ *
+ * LO QUE ESTO CUESTA, dicho para que nadie lo descubra por sorpresa: sin cuadro
+ * de fondo, un cliente que fuerce el modo oscuro invierte el papel y el trazo
+ * marino se pierde; el dorado sobrevive. Es el mismo riesgo que ya corre la
+ * palabra «Iureon», que también es marina, así que no añade uno nuevo — pero si
+ * algún día importa, la salida es una variante con los dos trazos en oro.
+ *
  * ─── POR QUÉ EL NOMBRE SIGUE SIENDO TEXTO AL LADO ───────────────────────────
  *
  * La mayoría de los clientes bloquean las imágenes hasta que el destinatario
