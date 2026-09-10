@@ -40,6 +40,78 @@ export const NOVEDADES_ID = 'novedades';
 export const NOVEDADES: readonly Novedad[] = [
   {
     fecha: '2026-09-09',
+    titulo: 'Suba el auto que le llegó y sepa qué le exige, para cuándo y por dónde se ataca',
+    detalle:
+      'El diálogo de revisión empieza ahora preguntando «Qué trae», con dos botones: «Un escrito mío, que voy a presentar» y «Un documento que recibí». Con el segundo no hay que decir qué actuación es —desaparece ese bloque entero y el botón se enciende con solo el documento— y lo que recibe no es una corrección sino una lectura: qué es el documento, qué decide u ordena, qué le exige y para cuándo con las palabras del propio documento entre comillas, qué queda pendiente, lo que el documento no dice, y hasta tres flancos «por dónde se ataca», cada uno con su cita y con el criterio del revisor rotulado aparte. Cuando el documento no anuncia plazo para una carga, la pantalla lo dice en ámbar en vez de ponerle uno de memoria, y lo mismo sale en el Word y en el PDF. La lectura se descarga en «Word» y «PDF» al pie del diálogo y vuelve a leerse después en la pestaña «Informe» del taller.',
+    modulo: 'Revisiones',
+    tipo: 'nuevo'
+  },
+  {
+    fecha: '2026-09-09',
+    titulo: 'Del documento que recibió a Redacción, con el escrito ya empezado',
+    detalle:
+      'Al pie de esa lectura está «¿Y con qué lo ataco?». «Llevar los flancos a la guía de actuaciones» los manda a la guía con la cita literal del documento, la norma que el documento invoca transcrita y el texto completo debajo; escogida una candidata aparece «Redactar esta actuación», que abre «Qué pedirle al motor» con instrucciones ya escritas —la primera junta el encargo de la ficha con los flancos y sus citas— y «Llevar a Redacción» abre el taller con la actuación puesta y el cuadro «Qué debe hacer este escrito» en dos mitades rotuladas: la instrucción arriba y «HECHOS» debajo. Esas instrucciones ya escritas existen cuando el catálogo devuelve la ficha de la actuación; si es una actuación propia de la firma, sin catalogar, la pantalla lo dice, los flancos viajan a Redacción dentro de los HECHOS y el cuadro va sin encargo. Ese pie está ahora también en el taller, que es donde se vuelve a leer el informe días después; hasta hoy ahí no había por dónde seguir.',
+    modulo: 'Revisiones',
+    tipo: 'nuevo'
+  },
+  {
+    fecha: '2026-09-09',
+    titulo: 'Pedir una revisión desde «Revisiones», sin pasar por Redacción',
+    detalle:
+      'La cabecera del módulo tiene ahora tres botones: «Actualizar», «Ir a Redacción» y «Revisar un escrito», que abre el diálogo ahí mismo. Y dentro del diálogo, la rama y la actuación se eligen sin salir: escoja la rama, adjunte el archivo y pulse entonces «Que la guía diga qué actuación es» —lee el archivo en su propio navegador, no lo sube y no cuesta nada— para que el catálogo proponga candidatas con su término, su artículo y su autoridad. La rama se sigue eligiendo a mano y es obligatoria: sin ella el botón está apagado, porque el catálogo propone dentro de una rama y nunca a ciegas; lo que la guía propone es la actuación. Hasta hoy el botón de esa cabecera prometía revisar y solo navegaba a Redacción, donde había que declarar la actuación antes de tener el archivo delante, que es justo lo que no sabe quien recibe un escrito ajeno.',
+    modulo: 'Revisiones',
+    tipo: 'mejora'
+  },
+  {
+    fecha: '2026-09-09',
+    titulo: 'En Orientación puede adjuntar el oficio en vez de volver a contarlo',
+    detalle:
+      'Bajo el cuadro de los hechos hay ahora dónde soltar el documento: en el computador, «Arrastre aquí el oficio, la demanda o la notificación» o escoger el archivo; en el teléfono, un renglón que abre el selector. Se leen PDF de hasta 40 páginas, Word y texto plano, en su propio navegador: no se sube nada y no cuesta nada. El texto cae añadido al final de lo que ya escribió, separado por un renglón en blanco, y nunca lo sustituye; el cuadro sigue siendo editable, así que usted ve y recorta exactamente lo que va a viajar, y «Quitar» deshace el adjunto. Si el archivo no se deja leer, lo escrito queda intacto y la pantalla dice el motivo.',
+    modulo: 'Orientación',
+    tipo: 'nuevo'
+  },
+  {
+    fecha: '2026-09-09',
+    titulo: 'Al escoger la actuación propuesta, se le ofrece ya escrito qué pedirle al motor',
+    detalle:
+      'En las fichas cuyo término ya está verificado, «Redactar esta» ya no salta a Redacción: abre debajo de esa misma tarjeta el panel «Qué pedirle al motor», con hasta tres instrucciones listas —«Con las secciones y la autoridad», «Con la norma y el término» y «Solo el encargo»—, escogibles y editables. Cada línea jurídica es cita literal de un campo de la ficha, y el término solo entra cuando está verificado. Al pulsar «Llevar a Redacción», el cuadro «Qué debe hacer este escrito» llega en dos mitades rotuladas: la instrucción arriba y «HECHOS» debajo con su relato. En las fichas cuyo término está sin verificar no hay panel: en el computador el botón es «Verificar y catalogar» y en el teléfono la tarjeta no ofrece botón, porque primero se comprueba el término. Antes viajaban los hechos y nada más, y usted llegaba a ese cuadro con su propio relato dentro y sin saber qué pedir.',
+    modulo: 'Orientación',
+    tipo: 'nuevo'
+  },
+  {
+    fecha: '2026-09-09',
+    titulo: 'Redactar cuando no sabe cómo se llama la actuación',
+    detalle:
+      'El desplegable «Actuación» tiene una salida más: «No sé cómo se llama: describir qué debe lograr…». Escriba en sus palabras qué debe conseguir el escrito, vea antes de guardar exactamente cómo va a quedar en la lista, y pulse «Guardar y redactar». Queda como actuación de su firma, marcada «título de trabajo · no es el nombre de una figura». El escrito que sale no se bautiza recurso, tutela, incidente ni nulidad: se encabeza diciendo qué se pide y ante quién, con las palabras de su objetivo, y declara que su término no está verificado y debe comprobarse antes de radicar. La franja sobre el papel lo repite: «Este escrito se redactó sin nombre de actuación». La salida anterior le exigía justamente lo que no tenía —un nombre— y empujaba a inventar una denominación jurídica. En «Catálogo» puede escribirle después el término y la fuente que le faltan.',
+    modulo: 'Redacción',
+    tipo: 'nuevo'
+  },
+  {
+    fecha: '2026-09-09',
+    titulo: 'Cuando el catálogo no reconoce nada en su rama, se puede buscar en todo el catálogo',
+    detalle:
+      'En el cuadro «Que la guía proponga la actuación» hay ahora una casilla «No sé la rama: buscar en todo el catálogo», y tras un «no reconozco nada» aparece además el botón «Puede que la rama no sea esa: buscar en todo el catálogo», que repite la consulta en el acto sin volver a escribir los hechos. La búsqueda corre sobre las veintiocho ramas y cada candidata dice de cuál viene. Se le advierte antes lo que cuesta la espera: entre diez y quince segundos, contra un par. Hasta hoy, escoger la rama equivocada hacía que la plataforma dijera que no había actuación para esos hechos sobre una actuación que sí estaba catalogada. La búsqueda la encuentra y dice de qué rama viene, pero escogerla todavía no cambia la «Rama» de la barra: hay que cambiarla usted arriba y elegir después la actuación en la lista. Si no lo hace, en el computador el selector vuelve a «Elegir actuación…» y en el teléfono el nombre se queda puesto pero el escrito se resuelve contra la rama de arriba y sale sin ficha.',
+    modulo: 'Redacción',
+    tipo: 'mejora'
+  },
+  {
+    fecha: '2026-09-09',
+    titulo: 'El escrito llega completo, y si el motor no lo entrega la pantalla lo dice',
+    detalle:
+      'La redacción vuelve a terminar y a entregar el escrito de la actuación que usted eligió, con sus títulos de sección en negrita. Cuando el motor no alcanzaba a entregarlo pasaban dos cosas peores que un error: la aplicación devolvía una plantilla genérica que no era la actuación pedida y sin negritas, y la pantalla se quedaba esperando indefinidamente. Ya no fabrica ningún escrito de repuesto y ya no se queda colgada: el aviso aparece en rojo en la consola «Ejecución», la espera se cierra y la reserva del saldo vuelve a la cuenta.',
+    modulo: 'Redacción',
+    tipo: 'correccion'
+  },
+  {
+    fecha: '2026-09-09',
+    titulo: 'Ya no se pierden letras al escribir dentro de un diálogo',
+    detalle:
+      'Con un diálogo abierto —el de revisar, el de una calculadora, el del membrete, el de cerrar una entrevista, el de la agenda de términos— el cursor se salía solo del cuadro de texto cada veinte segundos, y también cada vez que usted volvía a la ventana del navegador después de cambiar de aplicación: las teclas siguientes no entraban en ninguna parte y la palabra quedaba partida. Ya no ocurre en ninguno. «Esc» sigue cerrando, y al cerrar de verdad el foco sigue volviendo al botón que abrió el diálogo.',
+    modulo: 'Toda la aplicación',
+    tipo: 'correccion'
+  },
+  {
+    fecha: '2026-09-09',
     titulo: 'Los recursos del CGP ya se ven en las ramas que el CGP gobierna',
     detalle:
       'En familia, societario, insolvencia, propiedad intelectual, contratos y constitucional aparecen ahora, al final de la lista de actuaciones, la reposición, la apelación, la queja, la súplica, la nulidad procesal, el desistimiento, la aclaración, la corrección, la adición, el amparo de pobreza, la acumulación y el poder. Hasta hoy solo eran alcanzables desde la rama civil, así que al revisar un escrito de esas ramas no había ficha contra la cual revisarlo. Llegan marcadas «por remisión del CGP · plazo sin verificar en esta rama» y sin afirmar plazo: su término está comprobado en lo civil y nadie lo ha comprobado para la rama de usted. En «Catálogo», quien cura puede verificarlo para su rama sin que eso cambie la ficha civil.',

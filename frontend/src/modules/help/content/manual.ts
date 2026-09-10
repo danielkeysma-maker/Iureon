@@ -46,6 +46,28 @@ import type { ManualArticle, ManualBlock, ManualEntry, ManualGroup } from '../ty
  *   switch and a button that reads «Contratar <plan> mensual» or «Renovar …».
  * · "cada herramienta exporta" Excel. Six do; the glossary does not.
  *
+ * Corrected on 2026-09-09, after the two review modes shipped:
+ * · "En «Redacción», elija arriba la actuación en «Tipo de documento»" as step
+ *   ONE of asking for a review. False twice over: the dialog now opens from
+ *   «Revisiones» with its own branch/actuación block, and in «Un documento que
+ *   recibí» that block does not exist at all and the button lights with only
+ *   the file. The article's route said «Redacción» for a screen that has two
+ *   other doors.
+ * · "«Redactar esta» que lo trae aquí con la actuación ya elegida" in
+ *   Orientación. It no longer jumps: it opens «Qué pedirle al motor» under the
+ *   card, and «Llevar a Redacción» is what jumps.
+ * · The actuación dropdown had two exits described; it has three since
+ *   «No sé cómo se llama: describir qué debe lograr…» shipped.
+ *
+ * Two articles were added rather than stretching old ones: reading a document
+ * somebody sent you is not reviewing your own draft, and Orientación had no
+ * article at all while owning two screens a lawyer uses daily.
+ *
+ * Where a path half-works, the article says where it stops instead of
+ * describing the happy half: a candidate from another branch does not move the
+ * branch selector in Redacción, and the taller's «Guía» and «Audiencia» tabs
+ * were never adapted to a received document. Both are `todavia-no` blocks.
+ *
  * Reading time is computed from the words actually written below, so it cannot
  * drift away from the text the way a hand-typed "3 min" does.
  */
@@ -103,7 +125,7 @@ const A_QUE_HACE: ManualArticle = {
       kind: 'pasos',
       pasos: [
         '«Inicio», arriba de todo: la pantalla de entrada, con los accesos del día, lo que dejó abierto, el plan y el saldo.',
-        'Producir: «Redacción» (el taller donde se genera un escrito), «Borradores» (los escritos guardados con su término), «Revisiones» (los escritos ya redactados que un revisor corrigió con usted) y «Orientación» (de los hechos a la actuación).',
+        'Producir: «Redacción» (el taller donde se genera un escrito), «Borradores» (los escritos guardados con su término), «Revisiones» (los escritos ya redactados que un revisor corrigió con usted, y los documentos que le llegaron y hay que entender) y «Orientación» (de los hechos a la actuación).',
         'Registrar: «Audiencias» y «Entrevistas», las dos pantallas que transcriben una grabación.',
         'Consultar: «Buscador» de jurisprudencia, «Catálogo» de actuaciones y «Herramientas» de cálculo.',
         'Aprender: este «Manual de uso» y «Soporte». Al inicio del índice del manual, «Novedades» lista qué cambió en la aplicación y cuándo.',
@@ -118,6 +140,7 @@ const A_QUE_HACE: ManualArticle = {
       items: [
         'Redacta un escrito completo a partir de los hechos que usted describa, con la estructura de la actuación que elija del catálogo.',
         'Resuelve el nombre de la actuación contra el catálogo verificado y le dice qué término rige, con el artículo que lo fija.',
+        'Lee un auto, una sentencia, un oficio o una notificación que usted recibió, y le dice qué decide, qué le exige y para cuándo con las palabras del propio documento, qué queda pendiente y por dónde se ataca.',
         'Transcribe una grabación separando quién habla, y le deja corregir el texto, dividir una intervención y reasignar una voz.',
         'Busca jurisprudencia en el corpus curado y, cuando ese corpus calla, consulta las relatorías oficiales de la Corte Constitucional, la Corte Suprema, el Consejo de Estado y la Comisión Nacional de Disciplina Judicial. Si el asunto es de un tribunal o un juzgado, no vive en ninguna de ellas y el escrito lo dice.',
         'Exporta a Word y a PDF con el membrete, la tipografía y la numeración que su firma haya configurado.'
@@ -157,13 +180,16 @@ const A_PRIMER_ESCRITO: ManualArticle = {
     {
       kind: 'pasos',
       pasos: [
-        'Abra «Redacción» en la barra lateral. Si todavía no sabe qué actuación necesita, entre primero por «Orientación», describa los hechos y pulse «Orientar»: el catálogo le propone actuaciones y en cada una hay un botón «Redactar esta» que lo trae aquí con la actuación ya elegida.',
+        'Abra «Redacción» en la barra lateral. Si todavía no sabe qué actuación necesita, entre primero por «Orientación», describa los hechos —o adjunte el documento que le llegó— y pulse «Orientar»: el catálogo le propone actuaciones y en cada una hay un botón «Redactar esta» que abre, bajo la tarjeta, el panel «Qué pedirle al motor»; desde ahí, «Llevar a Redacción» lo trae aquí con la actuación, la rama y el encargo ya escritos. Está explicado en «De los hechos a la actuación».',
         'En la barra de arriba escoja «Quién escribe» —«Firma / Litigante», «Juez / Despacho» o «Secretaría»—, luego la «Rama» y, en «Tipo de documento», la actuación. Esa lista se arma desde el catálogo de la rama que escogió, así que cambiar de rama cambia la lista.',
         'Al final de esa lista pueden aparecer actuaciones marcadas «por remisión del CGP · plazo sin verificar en esta rama». Existen en su rama porque el Código General del Proceso la gobierna, pero su plazo está comprobado en lo civil y no para la rama que usted escogió. Se pueden elegir, y el escrito advertirá en vez de afirmar un plazo. Quien cura el catálogo de la firma puede comprobarlas para su rama en «Catálogo».',
         'Si no sabe cuál actuación corresponde, abra el mismo desplegable y elija la primera opción, «Que la guía proponga la actuación». Se abre un cuadro con los hechos que ya escribió —puede completarlos ahí— y, al pulsar «Pedir la orientación», la guía propone actuaciones de esa rama con la razón de cada una y su término, artículo y autoridad a la vista. Nada se aplica solo: usted pulsa «Elegir esta» en la que decida.',
-        'Si ninguna sirve, la última opción del desplegable es «Ninguna de estas: escribir el nombre…». Escriba el nombre de la actuación como la nombraría en el escrito, con una nota opcional para su firma, y quedará elegida y disponible en esa rama para todos sus abogados. Aparece marcada «de su firma · sin norma verificada», porque nadie ha comprobado su artículo ni su término.',
+        'Si sospecha que la rama no es la que puso, marque dentro de ese cuadro «No sé la rama: buscar en todo el catálogo»: la consulta corre sobre las veintiocho ramas, cada candidata dice de cuál viene, y la propia pantalla le advierte antes que tarda más —entre diez y quince segundos, contra un par—. Cuando el catálogo no reconoce nada dentro de la rama elegida, aparece además «Puede que la rama no sea esa: buscar en todo el catálogo», que repite la consulta en el acto sin volver a escribir los hechos.',
+        'Si ninguna sirve, el desplegable tiene dos salidas más. «Ninguna de estas: escribir el nombre…» sirve cuando usted sí sabe cómo se llama: escríbalo como lo nombraría en el escrito, con una nota opcional para su firma, y quedará elegida y disponible en esa rama para todos sus abogados, marcada «de su firma · sin norma verificada».',
+        'Y si tampoco sabe cómo se llama, «No sé cómo se llama: describir qué debe lograr…» le deja redactar de todos modos: escriba entre quince y ciento siete caracteres diciendo qué debe conseguir el escrito, vea en «Quedará en la lista como» exactamente lo que se va a guardar, y pulse «Guardar y redactar». Queda como actuación de la firma con el nombre «Sin nombre — …» y se elige sola en el selector. La guía tiene prohibido bautizarla, y el escrito lo declara.',
         'En el cuadro «Qué debe hacer este escrito» cuente los hechos y la pretensión en lenguaje corriente. No hace falta redactar: hace falta contar.',
-        'Pulse «Generar escrito» (dice «Proyectar providencia» si escribe un juez y «Generar acto» si escribe la secretaría), o use ⌘↵ en Mac y Ctrl+↵ en Windows. El escrito aparece a la derecha a medida que se produce.',
+        'Pulse «Generar escrito» (dice «Proyectar providencia» si escribe un juez y «Generar acto» si escribe la secretaría), o use ⌘↵ en Mac y Ctrl+↵ en Windows. El escrito aparece a la derecha a medida que se produce, con los títulos de sección en negrita. Sin actuación elegida el botón está apagado y a su lado se lee «Elija la actuación arriba: es la que trae el artículo y el término verificados».',
+        'Si el motor no llega a entregar el escrito, la aplicación no fabrica uno de repuesto: lo dice. El aviso sale en rojo en la consola «Ejecución», al pie del panel izquierdo, la espera se cierra y la reserva del saldo vuelve a la cuenta. Ese recuadro es pequeño y es el único sitio donde se escribe, así que mírelo cuando el escrito no aparezca.',
         'Lea el escrito con la barra de arriba del papel a la vista. Si el término de la actuación no está comprobado o la actuación no está catalogada, ahí aparece una franja ámbar y un chip «Término sin verificar» o «Sin catalogar»; si la firma ya la curó, una marca verde discreta; si no hay nada que advertir, nada.',
         'Pulse «Guardar» al pie del papel si va a seguir mañana, o «Word» o «PDF» en la cabecera si va a radicar.'
       ]
@@ -182,7 +208,18 @@ const A_PRIMER_ESCRITO: ManualArticle = {
       kind: 'nota',
       titulo: 'Cuando la actuación la escribe usted',
       texto:
-        'Una actuación escrita por su firma no trae artículo, término ni secciones comprobados, y el escrito lo dirá con todas sus letras: la guía tiene prohibido inventarlos. Para que deje de advertirse, abra «Catálogo», búsquela, y escriba su término junto con la dirección donde lo leyó. Sin la fuente no se guarda, igual que en cualquier otra ficha. Desde ahí también puede retirarla de la lista de la firma.'
+        'Una actuación escrita por su firma no trae artículo, término ni secciones comprobados, y el escrito lo dirá con todas sus letras: la guía tiene prohibido inventarlos. Para que el escrito deje de advertirlo, abra «Catálogo», búsquela, y escriba su término junto con la dirección donde lo leyó. Eso vale para el escrito, no para el informe de revisión: si después manda esa misma actuación a revisar, el informe sigue saliendo «Sin ficha verificada», porque la curaduría de la firma todavía no llega al motor que revisa. Sin la fuente no se guarda, igual que en cualquier otra ficha. Desde ahí también puede retirarla de la lista de la firma.'
+    },
+    {
+      kind: 'nota',
+      titulo: 'Cuando el escrito va sin nombre de actuación',
+      texto:
+        'Un título de trabajo —lo que crea «No sé cómo se llama: describir qué debe lograr…»— vive en la lista de su rama con el nombre «Sin nombre — …» y el detalle «título de trabajo · no es el nombre de una figura». La marca no se asoma al documento: el motor recibe lo que la firma quiere lograr, con prohibición expresa de llamarlo recurso, tutela, incidente o nulidad, y el escrito declara que su término no está verificado y debe comprobarse antes de radicar. Sobre el papel, la franja de procedencia dice «Este escrito se redactó sin nombre de actuación». En «Catálogo» puede escribirle el término y su fuente, y eso sí llega al motor a partir de entonces; lo que no se puede es rebautizarlo, así que el título de trabajo se sigue llamando «Sin nombre — …» en el desplegable, en el borrador y en el catálogo.'
+    },
+    {
+      kind: 'todavia-no',
+      texto:
+        'Escoger en la guía una candidata de OTRA rama todavía no cambia la rama de la barra de Redacción. En el computador el selector «Actuación» se queda en «Elegir actuación…», porque ese nombre no está en la lista de la rama que sigue puesta; en el teléfono el nombre se queda escrito, pero el escrito se resuelve contra la rama de arriba y sale sin ficha. En los dos casos la salida es la misma: cambie primero la rama por la que la candidata indica, y elíjala después en la lista. Las actuaciones transversales, como el derecho de petición, y las que llegan por remisión del CGP no dan este problema, porque ya están en su rama.'
     },
     {
       kind: 'nota',
@@ -275,6 +312,54 @@ const A_VERIFICAR: ManualArticle = {
   ]
 };
 
+const A_ORIENTACION: ManualArticle = {
+  id: 'orientacion',
+  titulo: 'De los hechos a la actuación',
+  entradilla:
+    'Cuando tiene el caso y no sabe qué actuación procede: cuente los hechos o adjunte el documento que le llegó, y el catálogo le propone actuaciones con su término.',
+  bloques: [
+    { kind: 'ruta', camino: ['Orientación', '«Los hechos, como se los contaría a un colega»', '«Orientar»', '«Redactar esta»'] },
+    {
+      kind: 'parrafo',
+      texto:
+        'Orientación es la puerta de quien tiene hechos y no tiene nombre. Se cuenta el caso, se pulsa «Orientar» y el catálogo devuelve actuaciones posibles con su término, su artículo y su autoridad. En el teléfono la pestaña de abajo se llama «Orientar».'
+    },
+    {
+      kind: 'pasos',
+      pasos: [
+        'Abra «Orientación» y cuente el caso en «Los hechos, como se los contaría a un colega». No hace falta redactar: hace falta contar.',
+        'Si el caso le llegó por escrito, adjúntelo en vez de resumirlo. En el computador, bajo el cuadro hay una zona punteada que dice «Arrastre aquí el oficio, la demanda o la notificación» y «o escoja el archivo · PDF · Word · texto». En el teléfono no se arrastra: hay un solo renglón, «Adjuntar el oficio o la demanda (PDF, Word o texto)», que abre el selector de archivos.',
+        'El texto del archivo se lee en su propio navegador —no se sube nada y no cuesta nada— y cae AÑADIDO al final de lo que ya había escrito, separado por un renglón en blanco. Nunca lo sustituye. El cuadro sigue siendo editable, así que usted ve exactamente lo que va a viajar y puede recortarlo.',
+        'Pulse «Orientar» y lea las fichas propuestas, cada una con su término, su artículo y su autoridad.',
+        'En la ficha que decida, pulse «Redactar esta». Debajo de esa misma tarjeta se abre «Qué pedirle al motor»: hasta tres instrucciones ya escritas —«Con las secciones y la autoridad», «Con la norma y el término» y «Solo el encargo»—, un cuadro editable y los botones «Llevar a Redacción» y «Cancelar». Cada línea jurídica de esas instrucciones es cita literal de un campo de la ficha; el término solo aparece cuando está verificado.',
+        'Pulse «Llevar a Redacción». Llegan la actuación, su rama y el cuadro «Qué debe hacer este escrito» escrito en dos mitades rotuladas: la instrucción arriba y «HECHOS» debajo, con su relato. Puede llevarlo sin ninguna instrucción: el botón no se bloquea por dejar el cuadro vacío.'
+      ]
+    },
+    { kind: 'subtitulo', texto: 'Qué se puede adjuntar y qué pasa si no se deja leer' },
+    {
+      kind: 'lista',
+      items: [
+        'Se leen PDF —hasta 40 páginas, respetando los saltos de renglón—, Word .docx y texto plano .txt o .md. De cada documento entran al cuadro hasta 60.000 caracteres; si es más largo, la pantalla avisa: «El documento es largo: se leyó el comienzo del documento.»',
+        'La cifra de caracteres que muestra la ficha del adjunto es la del documento entero. Cuando aparece ese aviso de recorte, al cuadro entró menos que esa cifra.',
+        'Si el archivo no se deja leer, el cuadro de hechos queda intacto —no se pierde lo escrito— y la pantalla explica el motivo en tono de advertencia: una imagen no trae texto, y de un formato sin lector (un .doc antiguo) hay que guardar una copia en PDF, Word o texto, o pegarlo.',
+        'Un documento del que se lean menos de doscientos caracteres se rechaza con el aviso del PDF escaneado, aunque sea un texto corto y perfectamente legible. La salida es la misma: pegue el texto en el cuadro.',
+        '«Quitar» deshace el adjunto y devuelve el cuadro a como estaba antes de él. Si soltó dos archivos seguidos, «Quitar» retira la ficha y el texto del segundo, pero el del primero se queda dentro del cuadro: léalo antes de orientar.',
+        'En las tarjetas cuyo término está sin verificar no se redacta desde ahí: en el computador el botón cambia a «Verificar y catalogar», que lleva al «Catálogo»; en el teléfono esa tarjeta no ofrece botón ninguno, y la verificación se hace entrando por «Catálogo». En los dos casos no se abre el panel de instrucción: primero se comprueba el término, después se redacta.'
+      ]
+    },
+    {
+      kind: 'consejo',
+      texto:
+        'Adjunte el oficio en vez de resumirlo. El resumen escrito de memoria pierde justo el dato que define la vía —la fecha de notificación, la palabra con la que el juzgado nombra la carga—, y el catálogo propone sobre lo que lee.'
+    },
+    {
+      kind: 'aviso',
+      texto:
+        'Los topes de 40 páginas y 60.000 caracteres son de lectura, no de carga: un PDF muy pesado se abre entero en la memoria del navegador antes de que esos topes lleguen a aplicarse. Con un documento de cientos de megas, y sobre todo en el teléfono, conviene partirlo o pegar el tramo que importa.'
+    }
+  ]
+};
+
 const A_INSTRUCCION: ManualArticle = {
   id: 'instruccion',
   titulo: 'Escribir la instrucción',
@@ -315,6 +400,12 @@ const A_INSTRUCCION: ManualArticle = {
       titulo: 'Los adjuntos se leen',
       texto:
         'Con «Adjuntar sentencias, pruebas o fotos» puede subir PDF, Word (.doc y .docx), texto e imágenes JPG, PNG o WEBP: la foto de un comparendo, un oficio, una cédula. Al generar, cada archivo se lee antes de redactar y sus datos —números, placas, radicados, fechas, lugares, nombres, valores— entran al escrito tal cual; lo que el adjunto no trae sigue saliendo como [•]. Si un dato del adjunto contradice lo que usted escribió, prevalece lo suyo y la discrepancia queda anotada entre corchetes. Límites: hasta 8 archivos y 20 MB por escrito; 15 MB por documento; las fotos se reducen en su navegador a 2000 px antes de enviarse (máximo 6 MB reducidas); de cada archivo se leen hasta 40.000 caracteres y 120.000 entre todos. La consola de ejecución dice qué se leyó de cada uno y qué no, con el motivo. Los archivos no se guardan: los que pasan por el almacenamiento se borran en la misma petición.'
+    },
+    {
+      kind: 'nota',
+      titulo: 'Cuando el cuadro llega ya escrito',
+      texto:
+        'Si entró por «Orientación» o por el pie «¿Y con qué lo ataco?» de un documento recibido, el cuadro no llega vacío: llega en dos mitades rotuladas, la instrucción arriba y «HECHOS» debajo con el relato o con los flancos y sus citas. Esas dos mitades son texto corriente y se editan como cualquier otra cosa que usted escriba ahí; puede recortar, añadir o borrarlo todo antes de generar. La instrucción sugerida no inventa derecho: cada línea jurídica es cita literal de un campo de la ficha del catálogo, y donde no hay ficha, no hay instrucción sugerida.'
     },
     {
       kind: 'nota',
@@ -708,7 +799,7 @@ const A_ROLES_SALDO: ManualArticle = {
     {
       kind: 'lista',
       items: [
-        'Los escritos generados y las revisiones de un escrito ya redactado, con un precio que se muestra en el propio botón.',
+        'Los escritos generados y las revisiones —tanto la de un escrito suyo como la lectura de un documento que recibió—, con un precio que se muestra en el propio botón.',
         'Cada mensaje a la guía del taller ($300) y cada «Volver a revisar» ($2.000).',
         'El resumen de una audiencia o entrevista ($50 cada vez que se genera o regenera).',
         'Las orientaciones que pasen del cupo diario gratuito de la firma.',
@@ -772,22 +863,41 @@ const A_REVISAR: ManualArticle = {
   entradilla:
     'Suba la tutela, la demanda o el recurso que ya escribió y pregunte qué está bien, qué está mal y qué corregir. Después, corríjalo en el taller con el revisor al lado.',
   bloques: [
-    { kind: 'ruta', camino: ['Redacción', '«Revisar un escrito ya redactado»', '«Abrir en el taller»'] },
+    { kind: 'ruta', camino: ['Revisiones', '«Revisar un escrito»', '«Qué trae»', '«Abrir en el taller»'] },
     {
       kind: 'parrafo',
       texto:
         'La revisión es un informe, no un borrador: juicio global, secciones que la norma exige y faltan, fortalezas, debilidades, errores de aplicación con su corrección, citas textuales del escrito con la frase que las reemplazaría y recomendaciones. Separa dos planos y lo dice en cada punto: lo que exige la norma, que sale de la ficha del catálogo y se cita con artículo, y lo que es criterio profesional del revisor, que usted pesa. No cita sentencias: cuando un punto necesite precedente, lo señala para que usted lo verifique.'
     },
+    {
+      kind: 'parrafo',
+      texto:
+        'El diálogo empieza preguntando «Qué trae», con dos botones: «Un escrito mío, que voy a presentar» y «Un documento que recibí». Este artículo trata el primero. El segundo —un auto, una sentencia, un oficio— se lee de otra manera y tiene su propio artículo, «Leer un documento que recibió».'
+    },
     { kind: 'subtitulo', texto: 'Pedir el informe' },
     {
       kind: 'pasos',
       pasos: [
-        'En «Redacción», elija arriba la actuación en «Tipo de documento»: la revisión objetiva se hace contra su ficha verificada. Sin actuación, el diálogo dice «Falta elegir la actuación».',
-        'Debajo de los adjuntos pulse «Revisar un escrito ya redactado».',
-        'Use «Subir PDF, Word o texto (hasta 15 MB, con anexos)» o pegue el texto en el cuadro. Indique el cliente o proceso en el campo de referencia y escriba en «Qué quiere saber» lo que le preocupa.',
+        'Abra «Revisiones» en la barra lateral y pulse «Revisar un escrito», en la cabecera. También se llega desde «Redacción», con «Revisar un escrito ya redactado» debajo de los adjuntos: es el mismo diálogo, pero abierto desde ahí la rama y la actuación son las que tenga puestas en la barra de configuración de Redacción, y el bloque para elegirlas no aparece dentro del diálogo. Con el plan vencido no se ofrece ninguno de los dos caminos.',
+        'Escoja «Un escrito mío, que voy a presentar» en «Qué trae». Es lo que viene marcado.',
+        'Use «Subir PDF, Word o texto (hasta 15 MB, con anexos)» o pegue el texto en el cuadro. Indique el cliente o proceso en el campo de referencia.',
+        'En «Qué actuación es» elija la «Rama» y después la «Actuación»: la revisión objetiva se hace contra la ficha verificada de esa actuación. Mientras falte, el botón sigue apagado y el diálogo dice «Falta elegir la actuación» señalando dónde está.',
+        'Si no sabe cómo se llama —lo normal cuando el escrito viene de otro—, pulse «Que la guía diga qué actuación es». Lee el archivo en su propio navegador, no lo sube y no cuesta nada, y propone candidatas del catálogo con su término, su artículo y su autoridad para que escoja usted. Hace falta haber elegido la rama antes: sin ella el botón está apagado y la pantalla lo dice. Y escoja una candidata de la rama que puso: si viene de otra, lea el aviso que sigue a estos pasos antes de pulsar «Revisar».',
+        'Escriba en «Qué quiere saber» lo que le preocupa. Está marcado «· opcional» porque solo dirige el énfasis: si lo deja vacío, el escrito se revisa completo igual.',
         'Pulse «Revisar», que muestra el precio. Cuesta lo mismo que un borrador y se descuenta del saldo de la firma; si el revisor no responde, no se cobra. La primera vez que un socio administrador revisa, antes de generar el informe la aplicación pregunta «¿Conservar el escrito y su trabajo?»: con «Sí, conservar» la firma guarda el texto, la conversación con la guía, los comentarios y las versiones; con «Solo el informe» el trabajo del taller desaparece al cerrar la pestaña. Se decide una vez para toda la firma y se puede cambiar en «Revisiones».',
-        'Lea el informe. Puede descargarlo en «Word» o «PDF» con la letra de la firma, o «Copiar informe» como texto. Queda en «Revisiones anteriores», dentro del mismo diálogo, con el cliente, la actuación, el archivo, la fecha y quién lo pidió.'
+        'Lea el informe. Puede descargarlo en «Word» o «PDF» con la letra de la firma, o «Copiar informe» como texto. Queda en la lista del módulo «Revisiones» y en «Revisiones anteriores de la firma», dentro del mismo diálogo, con el cliente, la actuación, el archivo, la fecha y quién lo pidió.'
       ]
+    },
+    {
+      kind: 'todavia-no',
+      texto:
+        'Escoger en la guía una candidata de OTRA rama todavía no cambia la «Rama» de este diálogo. Dentro de la guía la casilla «No sé la rama: buscar en todo el catálogo» está siempre a la mano, pero si la candidata que escoge vive en otra rama, su nombre no está en la lista de la rama que sigue puesta y el selector «Actuación» se queda pintado en gris con «Elegir actuación…». El botón «Revisar» sí se enciende, y aquí eso cuesta dinero: la petición viaja con la rama vieja, el servidor no encuentra la ficha y el informe sale rotulado «Sin ficha verificada», ya cobrado. Antes de pulsar «Revisar», cambie la «Rama» por la que la candidata indica, vuelva a elegir la actuación en la lista y compruebe que el selector quedó con el nombre puesto.'
+    },
+    {
+      kind: 'nota',
+      titulo: 'Una actuación de su firma no tiene ficha contra la cual revisar',
+      texto:
+        'En el desplegable «Actuación» aparecen también las actuaciones que su firma añadió —las marcadas «de su firma · sin norma verificada» y los títulos de trabajo «Sin nombre — …»—. Se pueden escoger, pero el informe sale rotulado «Sin ficha verificada» aunque su firma ya le haya escrito el término y la fuente en «Catálogo»: hoy la curaduría de la firma llega al motor que redacta, no al que revisa. Lo objetivo del informe va entonces con menos respaldo, y la pantalla lo dice en esa misma etiqueta.'
     },
     { kind: 'subtitulo', texto: 'Corregir en el taller' },
     {
@@ -842,6 +952,94 @@ const A_REVISAR: ManualArticle = {
   ]
 };
 
+const A_DOCUMENTO_RECIBIDO: ManualArticle = {
+  id: 'documento-recibido',
+  titulo: 'Leer un documento que recibió',
+  entradilla:
+    'Un auto, una sentencia, un oficio, una notificación: qué dice, qué le exige, para cuándo y por dónde se ataca. Sin tener que decir antes qué actuación es.',
+  bloques: [
+    { kind: 'ruta', camino: ['Revisiones', '«Revisar un escrito»', '«Un documento que recibí»', '«¿Y con qué lo ataco?»'] },
+    {
+      kind: 'parrafo',
+      texto:
+        'Es el otro modo del mismo diálogo de revisión, y es el contrario del anterior: aquí el papel no es suyo y no se corrige, se entiende. La lectura sale entera del texto del documento y va citada; ninguna ficha del catálogo respalda esas líneas, y la pantalla lo dice al pie. Por eso no hay que elegir actuación: quien acaba de recibir un auto no sabe —ni tiene por qué saber— cómo se llama en el catálogo.'
+    },
+    { kind: 'subtitulo', texto: 'Pedir la lectura' },
+    {
+      kind: 'pasos',
+      pasos: [
+        'Abra «Revisiones» y pulse «Revisar un escrito». También sirve «Revisar un escrito ya redactado» en Redacción: ese botón conserva su nombre antiguo, pero abre el mismo diálogo con los dos modos.',
+        'En «Qué trae», pulse «Un documento que recibí». El bloque «Qué actuación es» desaparece entero, y el rótulo del adjunto pasa a decir «El documento que recibió».',
+        'Suba el archivo o pegue el texto completo del documento. El cuadro de pegar espera el documento entero, no la pregunta: «No la pregunta: ésa va más abajo».',
+        'Si quiere, escriba en «Qué quiere saber» lo que le interesa; está marcado «· opcional» y, vacío, el informe sale igual.',
+        'Pulse «Revisar», que muestra el precio. Se enciende con solo el documento: no falta nada más.',
+        'Lea el informe ahí mismo y descárguelo con «Word» o «PDF», al pie del diálogo. Salen con todo, «Por dónde se ataca» incluida.'
+      ]
+    },
+    { kind: 'subtitulo', texto: 'Qué trae el informe' },
+    {
+      kind: 'lista',
+      items: [
+        'Qué es el documento, en una frase.',
+        '«Según el propio documento»: quién lo profirió, el radicado y la fecha, y solo si el texto los trae. Lo que el documento no diga, no aparece.',
+        '«Qué decide u ordena».',
+        '«Qué le exige y para cuándo»: cada carga con su plazo y, debajo, las palabras exactas del documento entre comillas, bajo el rótulo «Dice el documento». Si del texto no se desprende ninguna carga a su cargo, lo dice.',
+        '«Qué queda pendiente, según el documento» y «Lo que el documento no dice».',
+        '«Por dónde se ataca»: hasta tres flancos. Cada uno lleva la cita del documento; la norma solo se nombra cuando el propio documento la transcribe, y con su texto al lado; y el criterio va aparte, rotulado «Lectura del revisor». Un flanco sin cita no llega a la pantalla, y si no hay ninguno anclado en el texto, la sección no se dibuja.'
+      ]
+    },
+    {
+      kind: 'aviso',
+      texto:
+        'Cuando el documento no anuncia plazo para una carga, el informe no le pone uno: la casilla queda vacía y en su lugar aparece una franja ámbar que dice que el documento no lo anuncia y que no se le pone uno de memoria. En el Word, en el PDF y en «Copiar informe» sale la línea equivalente. Ese hueco no es un dato que la aplicación se haya olvidado de traer: es la respuesta. El término con su artículo y su autoridad verificados está en el catálogo, y ahí es donde hay que buscarlo.'
+    },
+    { kind: 'subtitulo', texto: 'De los flancos a Redacción' },
+    {
+      kind: 'parrafo',
+      texto:
+        'Al pie de la lectura está «¿Y con qué lo ataco?» —«¿Y qué puedo hacer?» si el informe no halló flancos—. Es el puente entre entender el documento y contestarlo, y está en los tres sitios donde se lee la lectura: el diálogo abierto desde «Redacción», el mismo diálogo abierto desde «Revisiones», y la pestaña «Informe» del taller.'
+    },
+    {
+      kind: 'pasos',
+      pasos: [
+        'Elija la «Rama» en ese pie —o marque ahí mismo, en la casilla que está bajo el selector, «No sé la rama: buscar en todo el catálogo»— y después pulse «Llevar los flancos a la guía de actuaciones». Sin una de las dos cosas el botón está apagado. Viajan los flancos hallados —cada uno con la cita literal del documento, la norma que el documento invoca transcrita y la lectura del revisor— y, debajo, el texto del documento.',
+        'Escoja una candidata en la guía. Si marcó «No sé la rama», la guía abre ya con la casilla puesta —dentro también se puede marcar y desmarcar—: la consulta corre sobre todas las ramas, tarda más y cada candidata dice de cuál viene. Aquí la rama que manda es la de la candidata: la que ella indique es la que viaja a Redacción, no la que quedó en el pie.',
+        'Con la candidata escogida aparece «Redactar esta actuación». Ábralo y verá «Qué pedirle al motor»: instrucciones ya escritas, escogibles y editables. La primera de la lista es «Con los flancos que se atacan, citados», que junta el encargo de la ficha del catálogo con los flancos y sus citas.',
+        'Pulse «Llevar a Redacción». Nunca se bloquea: puede ir sin ninguna instrucción. Redacción se abre con la actuación puesta en el selector y el cuadro «Qué debe hacer este escrito» escrito en dos mitades rotuladas, la instrucción arriba y «HECHOS» debajo.'
+      ]
+    },
+    {
+      kind: 'aviso',
+      texto:
+        'Antes de generar, mire la barra de arriba de Redacción y compruebe que la rama y la actuación son las que quería. Cuando la actuación la escogió la guía, su rama viaja con ella; cuando usted la escribe a mano con «Escribir el nombre de la actuación», la rama que viaja es la que estuviera puesta en el pie, y si había marcado «No sé la rama» no viaja ninguna y Redacción se queda con la que ya tenía. La rama decide qué ficha se busca y, con ella, qué término se afirma.'
+    },
+    {
+      kind: 'consejo',
+      texto:
+        'Entre por «Revisiones» y no por el diálogo cuando vuelva días después: pulsar la fila abre el taller directamente, y ahí la pestaña «Informe» tiene la lectura completa con su puente al final. Eso vale siempre que la firma tuviera autorizado conservar los escritos; si no lo tenía, la fila no abre nada y avisa de que el texto de ese documento no se conservó, y entonces la lectura hay que abrirla desde «Revisiones anteriores de la firma», dentro del diálogo «Revisar un escrito». Para descargar otra vez el Word o el PDF de esa lectura sí hay que ir por ahí en cualquier caso: el taller no lleva botones de descarga del informe.'
+    },
+    {
+      kind: 'lista',
+      items: [
+        'La instrucción sugerida con los flancos existe solo cuando el catálogo devuelve la ficha de la actuación. Si es una actuación propia de la firma, sin catalogar, los flancos llegan a Redacción dentro de los HECHOS y el cuadro va sin encargo.',
+        '«Volver a revisar» no se ofrece sobre un documento recibido, ni desde el taller ni por ninguna otra vía: el informe bueno no se sobrescribe con otro de distinta forma.',
+        'En la lista de «Revisiones», la fila queda rotulada «Documento recibido». Es la etiqueta del producto, no una actuación del catálogo: nadie clasificó el auto. Por eso «Poner en la agenda» abre el formulario sin actuación ni rama prellenadas.'
+      ]
+    },
+    {
+      kind: 'nota',
+      titulo: 'Si el texto del documento no viaja',
+      texto:
+        'El puente lleva a la guía los flancos y el texto del documento. Al reabrir una lectura antigua desde «Revisiones anteriores de la firma», el texto solo está si la firma había autorizado conservar los escritos; si no, viajan los flancos con sus citas y nada más. En una lectura recién hecha esto no ocurre.'
+    },
+    {
+      kind: 'todavia-no',
+      texto:
+        'El taller de un documento recibido abre también la pestaña «Guía» y, si su firma la tiene habilitada, la de «Audiencia», y sobre el papel sigue estando «Llevar a Redacción». Los tres están hechos para un escrito suyo: la guía conversa como si acompañara a quien corrige su propio texto y ofrece «Aplicar» sobre él, las preguntas nacen del papel como si fuera el escrito de usted, y «Llevar a Redacción» copia el papel ajeno como borrador de la firma, con el auto del juzgado por cuerpo y «Documento recibido» —la etiqueta del producto— por actuación. Sobre el auto de un juez nada de eso tiene sentido, y la guía y las preguntas además cuestan saldo. Todavía no están adaptados a este modo: lo que sí lo está es la lectura y su puente, y el botón que casi siempre se busca es «Redactar esta actuación», en el pie «¿Y con qué lo ataco?».'
+    }
+  ]
+};
+
 const A_PREGUNTAS_AUDIENCIA: ManualArticle = {
   id: 'preguntas-audiencia',
   titulo: 'Preguntas para la audiencia',
@@ -870,6 +1068,11 @@ const A_PREGUNTAS_AUDIENCIA: ManualArticle = {
       kind: 'consejo',
       texto:
         'Corrija primero el escrito y pida las preguntas después: la guía trabaja sobre el texto tal como está en ese momento, y un hecho que usted quitó del escrito ya no produce preguntas.'
+    },
+    {
+      kind: 'aviso',
+      texto:
+        'Estas preguntas nacen de un escrito suyo. La pestaña «Audiencia» también aparece en el taller de un documento recibido —un auto, una sentencia—, y ahí trata el papel del juzgado como si lo hubiera escrito usted: pide saldo y devuelve preguntas construidas sobre el texto equivocado. Todavía no está adaptada a ese modo; no la use sobre un documento que recibió.'
     },
     {
       kind: 'nota',
@@ -1014,7 +1217,7 @@ const A_MOVIL: ManualArticle = {
       kind: 'lista',
       items: [
         'Redactar: arriba, la barra de rama y actuación; debajo, el taller en dos pestañas —«Instrucción» y «Documento»— y el visor con la barra de revisión.',
-        'Orientar: describa los hechos y pulse «Orientar»; el salto «Redactar esta» es el mismo que en el computador.',
+        'Orientar: describa los hechos y pulse «Orientar»; «Redactar esta» abre el mismo panel «Qué pedirle al motor» que en el computador, con una diferencia: en las tarjetas cuyo término está sin verificar el teléfono no muestra botón, ni «Redactar esta» ni «Verificar y catalogar», así que esas hay que verificarlas entrando por «Catálogo». Para adjuntar el documento no se arrastra —eso solo existe en el computador—: hay un renglón, «Adjuntar el oficio o la demanda (PDF, Word o texto)», que abre el selector de archivos.',
         'Grabar: la grabadora ocupa la pantalla, con pausa y con la onda, y el mismo consentimiento; el cronómetro es lo más grande de la pantalla y la grabación sigue con la pantalla apagada. El guion de las cuatro preguntas aparece al terminar de transcribir, no mientras se graba.',
         'Audiencias: se sube el archivo, se ve el porcentaje mientras viaja, y el transcrito se lee con cada intervención a ancho completo. Las herramientas de corrección son las mismas; de pie se revisa mejor de lo que se edita.',
         'Catálogo: se busca por nombre y cada ficha se abre completa, con su término, su fuente y su estado.',
@@ -1120,7 +1323,7 @@ const A_HERRAMIENTAS: ManualArticle = {
         'Cuando el término no se cuenta en días —meses, años o «en cualquier tiempo»— o la actuación no está catalogada, escriba la fecha límite. Queda marcada «Fecha escrita a mano»: la aplicación la vigila, pero no la calculó.',
         'Elija a quién se le avisa: a toda la firma, solo a usted, o a otra persona por su correo. Con un responsable, el aviso es solo suyo.',
         'En «Lo que viene», cada entrada dice cuántos días faltan, contra qué actuación corre y a quién se avisa. «Cumplida» la retira de la lista y de los avisos; «Borrar» la elimina. En «El año» verá los doce meses con los días que no cuentan en gris y sus vencimientos en oro.',
-        'Desde «Borradores», en el menú de un escrito, «Poner en la agenda» abre el formulario con el caso y la actuación ya elegidas. Desde «Revisiones», el mismo icono de calendario al final de cada fila.'
+        'Desde «Borradores», en el menú de un escrito, «Poner en la agenda» abre el formulario con el caso y la actuación ya elegidas. Desde «Revisiones», el mismo icono de calendario al final de cada fila. Si esa fila es la lectura de un documento que recibió, el formulario se abre sin actuación ni rama: «Documento recibido» es la etiqueta del producto y no una actuación del catálogo, así que la escoge usted.'
       ]
     },
     {
@@ -1174,7 +1377,18 @@ export const MANUAL: readonly ManualGroup[] = [
     titulo: 'Primeros 20 minutos',
     articulos: [A_INICIO, A_QUE_HACE, A_PRIMER_ESCRITO, A_TRES_ESTADOS, A_VERIFICAR, A_MOVIL]
   },
-  { titulo: 'Redactar', articulos: [A_INSTRUCCION, A_REVISAR, A_PREGUNTAS_AUDIENCIA, A_EXPORTAR, A_BORRADORES] },
+  {
+    titulo: 'Redactar',
+    articulos: [
+      A_ORIENTACION,
+      A_INSTRUCCION,
+      A_REVISAR,
+      A_DOCUMENTO_RECIBIDO,
+      A_PREGUNTAS_AUDIENCIA,
+      A_EXPORTAR,
+      A_BORRADORES
+    ]
+  },
   { titulo: 'Calcular', articulos: [A_HERRAMIENTAS] },
   { titulo: 'Grabar', articulos: [A_ENTREVISTA, A_AUDIENCIA] },
   {
