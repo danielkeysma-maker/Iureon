@@ -81,7 +81,15 @@ export interface PuenteAlAtaqueProps {
  * caía en una columna de tres palabras por renglón y el botón se salía del
  * panel. Aquí manda lo que el bloque mide de verdad.
  */
-const ANCHO_HOLGADO = 420;
+/*
+ * 700, Y NO 420. El primer intento midió el bloque aislado a 300 px, dio por
+ * bueno todo lo demás y falló donde más se usa: la columna de la guía en el
+ * taller es el 42% del lienzo —unos 600 px en una pantalla corriente—, entraba
+ * en «holgado» y la fila de tres columnas no cabía. El selector, la casilla con
+ * su explicación y el botón en un mismo renglón necesitan unos 700; por debajo
+ * de eso, apilado se lee y en fila no.
+ */
+const ANCHO_HOLGADO = 700;
 
 /**
  * El ancho real del nodo, vigilado mientras exista.
@@ -233,19 +241,20 @@ export const PuenteAlAtaque: React.FC<PuenteAlAtaqueProps> = ({
               className={`min-w-0 ${alineacion} text-[12px] leading-snug text-ink-700 [text-wrap:pretty] [overflow-wrap:anywhere]`}
             >
               No sé la rama: buscar en todo el catálogo.
-              {/*
-                LO QUE CUESTA VA DEBAJO CUANDO NO HAY ANCHO. Continuar la frase
-                al lado de la casilla la encierra en la columna que sobra —unos
-                150px— y sale un renglón por cada dos o tres palabras.
-              */}
-              {holgado && <span className="text-ink-500"> {LO_QUE_CUESTA_BUSCAR_EN_TODO}</span>}
             </span>
           </label>
-          {!holgado && (
-            <p className="mt-1 text-left text-[12px] leading-snug text-ink-500 [text-wrap:pretty] [overflow-wrap:anywhere]">
-              {LO_QUE_CUESTA_BUSCAR_EN_TODO}
-            </p>
-          )}
+          {/*
+            LO QUE CUESTA VA SIEMPRE DEBAJO, A ANCHO COMPLETO, y no continuando
+            la frase de la casilla. Antes se pegaba al lado cuando había
+            «holgura», y eso lo encerraba en la columna que sobra de la fila
+            —unos 150 px— con un renglón por cada dos o tres palabras. No hay un
+            ancho en el que una frase de treinta palabras se lea bien metida
+            junto a una casilla dentro de una fila compartida: el sitio de una
+            advertencia de precio es su propio renglón.
+          */}
+          <p className="mt-1 text-left text-[12px] leading-snug text-ink-500 [text-wrap:pretty] [overflow-wrap:anywhere]">
+            {LO_QUE_CUESTA_BUSCAR_EN_TODO}
+          </p>
         </div>
         <button
           type="button"
