@@ -1,3 +1,4 @@
+import { isAuthRetryableFetchError } from '@supabase/supabase-js';
 import { supabase, supabaseAuth } from '../../config/supabase.config';
 import { validarBorradoDePropioUsuario } from './borrado.rules';
 import { validarNombre, validarNombreOpcional } from './nombre.rules';
@@ -103,10 +104,87 @@ const requireSupabase = () => {
  * this process does not check is a signature nobody checks, and a forged
  * `app_metadata` would hand over any tenant.
  */
-export const userFromToken = async (accessToken: string): Promise<AuthenticatedUser | null> => {
-  const { data, error } = await requireAuthClient().auth.getUser(accessToken);
+/**
+ * LOS TRES DESENLACES DE VERIFICAR UN TOKEN, Y POR QUÉ NO PUEDEN SER DOS.
+ *
+ * ─── EL DEFECTO QUE ESTO CIERRA ────────────────────────────────────────────
+ *
+ * `userFromToken` devolvía `null` tanto cuando el token era inválido como
+ * cuando NO SE PUDO HABLAR con el servicio de autenticación. El middleware
+ * convertía ese `null` en 401, y el navegador trata cualquier 401 como sesión
+ * perdida: BORRA la sesión guardada y devuelve al login.
+ *
+ * Así que un tropiezo de red, un 5xx de Supabase o un arranque en frío que
+ * tarda de más echaban al abogado en medio del trabajo, con su token intacto.
+ *
+ * Y la exposición no es teórica: la aplicación sondea el saldo cada 20 s y
+ * las respuestas de soporte cada 30 s, así que verifica el token unas CINCO
+ * VECES POR MINUTO mientras la pestaña está abierta. Son unas trescientas
+ * verificaciones por hora, y bastaba con que UNA fallara por causas ajenas.
+ *
+ * ─── LA REGLA ──────────────────────────────────────────────────────────────
+ *
+ * «No sé» no es «no». Un token que no se pudo comprobar NO es un token
+ * rechazado, y la respuesta correcta es 503 —vuelva a intentar— y no 401
+ * —vuelva a iniciar sesión—. Es la misma distinción que el catálogo hace
+ * entre NO_CADUCA y NO_VERIFICADO, y por el mismo motivo: colapsarlas hace
+ * que el sistema afirme con seguridad algo que no comprobó.
+ */
+export type VerificacionDeToken =
+  | { estado: 'VALIDO'; user: AuthenticatedUser }
+  /**
+   * El token no sirve: expiró, viene falseado, o la cuenta no tiene firma.
+   *
+   * `motivo` viaja para PODER REGISTRARLO en el servidor, nunca para
+   * responderlo: al cliente se le da una sola frase para los tres casos,
+   * porque distinguirlos le dice a quien sondea cuáles tokens solo están
+   * viejos. Pero sin dejar rastro de por qué, un cierre de sesión inesperado
+   * no se puede investigar — que es justo lo que acaba de pasar.
+   */
+  | { estado: 'INVALIDO'; motivo: string }
+  /** No se pudo comprobar. No dice nada sobre el token. */
+  | { estado: 'NO_DISPONIBLE'; motivo: string };
 
-  if (error || !data.user) return null;
+/**
+ * Si el fallo es del transporte y no del token.
+ *
+ * `isAuthRetryableFetchError` cubre lo que `auth-js` ya clasifica como
+ * reintentable —red caída, DNS, 5xx del servidor de autenticación—. Se añaden
+ * a mano los estados que llegan sin esa envoltura: cualquier 5xx, el 429 de
+ * cuota, y el status 0 de una petición que ni siquiera salió.
+ *
+ * SE DECIDE POR LO QUE SÍ SABEMOS QUE ES TRANSITORIO, nunca al revés. Un error
+ * desconocido cuenta como token inválido: equivocarse hacia «vuelva a entrar»
+ * es molesto, y equivocarse hacia «siga» sería dejar pasar a quien no debe.
+ */
+const esFalloDeTransporte = (error: unknown): boolean => {
+  if (isAuthRetryableFetchError(error)) return true;
+  const status = (error as { status?: unknown } | null)?.status;
+  if (typeof status !== 'number') return false;
+  return status === 0 || status === 429 || status >= 500;
+};
+
+export const verificarToken = async (accessToken: string): Promise<VerificacionDeToken> => {
+  let data: Awaited<ReturnType<ReturnType<typeof requireAuthClient>['auth']['getUser']>>['data'];
+
+  try {
+    const respuesta = await requireAuthClient().auth.getUser(accessToken);
+    if (respuesta.error) {
+      return esFalloDeTransporte(respuesta.error)
+        ? { estado: 'NO_DISPONIBLE', motivo: respuesta.error.message }
+        : { estado: 'INVALIDO', motivo: respuesta.error.message };
+    }
+    data = respuesta.data;
+  } catch (err) {
+    /*
+     * `getUser` normalmente devuelve el error en vez de lanzarlo, pero un
+     * `fetch` abortado o un fallo de DNS sí llegan aquí. Tratarlo como token
+     * inválido sería exactamente el defecto que este código cierra.
+     */
+    return { estado: 'NO_DISPONIBLE', motivo: (err as Error)?.message ?? 'fallo al verificar la sesión' };
+  }
+
+  if (!data.user) return { estado: 'INVALIDO', motivo: 'el token no corresponde a ningún usuario' };
 
   const metadata = (data.user.app_metadata ?? {}) as Record<string, unknown>;
   const firmId = typeof metadata.firm_id === 'string' ? metadata.firm_id : '';
@@ -115,14 +193,27 @@ export const userFromToken = async (accessToken: string): Promise<AuthenticatedU
   // every route below the middleware is tenant-scoped. Treated as unauthorized
   // rather than defaulted to something, because defaulting a tenant is how the
   // header version went wrong.
-  if (!firmId) return null;
+  if (!firmId) return { estado: 'INVALIDO', motivo: 'la cuenta no tiene firma en app_metadata' };
 
   const role = (metadata.role as FirmUserRole) ?? 'LAWYER';
 
   const propios = (data.user.user_metadata ?? {}) as Record<string, unknown>;
   const nombre = typeof propios.nombre === 'string' && propios.nombre.trim() ? propios.nombre.trim() : null;
 
-  return { id: data.user.id, email: data.user.email ?? '', firmId, role, nombre };
+  return {
+    estado: 'VALIDO',
+    user: { id: data.user.id, email: data.user.email ?? '', firmId, role, nombre }
+  };
+};
+
+/**
+ * La forma corta, para quien no puede hacer nada distinto con «no se pudo
+ * comprobar»: el inicio de sesión y el refresco, que acaban de recibir el
+ * token del propio Supabase.
+ */
+export const userFromToken = async (accessToken: string): Promise<AuthenticatedUser | null> => {
+  const r = await verificarToken(accessToken);
+  return r.estado === 'VALIDO' ? r.user : null;
 };
 
 /** Exchanges e-mail and password for a session. */
@@ -161,17 +252,41 @@ export const signIn = async (email: string, password: string): Promise<Session> 
  * nothing on it to explain why.
  */
 export const refreshSession = async (refreshToken: string): Promise<Session> => {
-  const { data, error } = await requireAuthClient().auth.refreshSession({ refresh_token: refreshToken });
+  let sesion: Awaited<ReturnType<ReturnType<typeof requireAuthClient>['auth']['refreshSession']>>;
+  try {
+    sesion = await requireAuthClient().auth.refreshSession({ refresh_token: refreshToken });
+  } catch (err) {
+    throw new AuthError('AUTH_NO_DISPONIBLE', 'No se pudo renovar la sesión en este momento. Vuelva a intentarlo.', 503);
+  }
+
+  const { data, error } = sesion;
 
   if (error || !data.session) {
+    /*
+     * AQUÍ TAMBIÉN SE DISTINGUE, Y ES EL MISMO DEFECTO EN OTRO SITIO.
+     *
+     * El cliente borra la sesión cuando el refresco falla, así que un 5xx del
+     * servicio de autenticación echaba al abogado con un token de refresco
+     * perfectamente bueno. Un refresco que no se pudo intentar no es un
+     * refresco rechazado.
+     */
+    if (esFalloDeTransporte(error)) {
+      throw new AuthError('AUTH_NO_DISPONIBLE', 'No se pudo renovar la sesión en este momento. Vuelva a intentarlo.', 503);
+    }
     throw new AuthError('SESSION_EXPIRED', 'La sesión expiró. Vuelve a iniciar sesión.', 401);
   }
 
-  const user = await userFromToken(data.session.access_token);
+  const verificacion = await verificarToken(data.session.access_token);
 
-  if (!user) {
+  if (verificacion.estado === 'NO_DISPONIBLE') {
+    throw new AuthError('AUTH_NO_DISPONIBLE', 'No se pudo renovar la sesión en este momento. Vuelva a intentarlo.', 503);
+  }
+
+  if (verificacion.estado === 'INVALIDO') {
     throw new AuthError('NO_FIRM', 'Esta cuenta no está asociada a ninguna firma.', 403);
   }
+
+  const user = verificacion.user;
 
   return {
     accessToken: data.session.access_token,

@@ -73,6 +73,22 @@ export const setSessionLostHandler = (handler: (() => void) | null): void => {
  */
 let renewal: Promise<string | null> | null = null;
 
+/**
+ * Si el servidor RECHAZÓ el refresco, que es lo único que prueba que la sesión
+ * ya no vale.
+ *
+ * Se enumera lo que sí es un rechazo en vez de lo que no, y el resto —un 500,
+ * un 502, un 429, una petición que ni salió— cuenta como tropiezo. En esta
+ * dirección equivocarse solo cuesta un reintento; en la otra cuesta la sesión
+ * de alguien que estaba trabajando.
+ *
+ * 400 entra porque es «falta el token de refresco»: con el cuerpo mal formado,
+ * insistir daría lo mismo para siempre.
+ */
+const RECHAZOS = new Set([400, 401, 403]);
+const refrescoRechazado = (err: unknown): boolean =>
+  err instanceof ApiError && RECHAZOS.has(err.status);
+
 const currentAccessToken = async (): Promise<string | null> => {
   const session = readSession();
   if (!session) return null;
@@ -82,7 +98,25 @@ const currentAccessToken = async (): Promise<string | null> => {
     try {
       const { session: fresh } = await authApi.refresh(session.refreshToken);
       return saveSession(fresh).accessToken;
-    } catch {
+    } catch (err) {
+      /*
+       * ─── UN REFRESCO QUE NO SE PUDO INTENTAR NO ES UN REFRESCO RECHAZADO ──
+       *
+       * Antes CUALQUIER fallo aquí borraba la sesión: un corte de red de dos
+       * segundos, un 5xx del servicio de autenticación o un arranque en frío
+       * lento devolvían al abogado al login con su token de refresco intacto.
+       *
+       * Y el momento es el peor posible: la renovación empieza CINCO MINUTOS
+       * ANTES de que el token caduque, así que el de ahora todavía sirve. Se
+       * devuelve ése y se deja que la petición siga; si el problema persiste,
+       * el siguiente intento vuelve a probar, y cuando el token de verdad
+       * expire la respuesta será un 401 y entonces sí se cierra la sesión.
+       *
+       * Solo se borra cuando el servidor RECHAZÓ el refresco, que es lo único
+       * que prueba que la sesión ya no vale.
+       */
+      if (!refrescoRechazado(err)) return session.accessToken;
+
       // The refresh token is spent or revoked; there is no recovering here.
       clearSession();
       onSessionLost?.();
@@ -100,7 +134,26 @@ const authHeaders = async (): Promise<Record<string, string>> => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-const request = async <T>(
+/**
+ * EL SERVIDOR NO PUDO COMPROBAR LA SESIÓN — Y ESO SE REINTENTA.
+ *
+ * El servidor distingue «el token no sirve» (401) de «no pude comprobarlo»
+ * (503 `AUTH_NO_DISPONIBLE`): un tropiezo de red contra el servicio de
+ * autenticación, un 5xx suyo, un arranque en frío lento. Antes las dos cosas
+ * salían por el mismo 401 y aquí se borraba la sesión, así que un parpadeo
+ * ajeno devolvía al abogado al login con su token intacto.
+ *
+ * REINTENTARLO ES SEGURO POR CONSTRUCCIÓN, y por eso se hace incluso con POST:
+ * ese 503 lo emite el middleware ANTES de que corra ningún manejador, así que
+ * la petición no llegó a ejecutar nada — no se reservó saldo, no se llamó a
+ * ningún motor, no se escribió una fila. Reintentar no puede cobrar dos veces
+ * porque la primera no cobró.
+ */
+const ESPERA_DE_REINTENTO_MS = 700;
+const esAuthNoDisponible = (status: number, codigo: unknown): boolean =>
+  status === 503 && codigo === 'AUTH_NO_DISPONIBLE';
+
+const unaVez = async <T>(
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
   path: string,
   { body, signal, keepalive }: RequestOptions = {}
@@ -142,6 +195,25 @@ const request = async <T>(
   }
 
   return (await response.json()) as T;
+};
+
+const request = async <T>(
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
+  path: string,
+  options: RequestOptions = {}
+): Promise<T> => {
+  try {
+    return await unaVez<T>(method, path, options);
+  } catch (err) {
+    if (!(err instanceof ApiError) || !esAuthNoDisponible(err.status, err.code)) throw err;
+    /*
+     * UNA sola vez. Si el servicio de autenticación está caído de verdad,
+     * insistir solo alarga la espera y multiplica la carga contra algo que ya
+     * no responde; el mensaje del servidor dice qué hacer.
+     */
+    await new Promise((listo) => setTimeout(listo, ESPERA_DE_REINTENTO_MS));
+    return unaVez<T>(method, path, options);
+  }
 };
 
 /**

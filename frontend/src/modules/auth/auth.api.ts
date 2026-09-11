@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '../../config/api.config';
-import { httpClient } from '../../config/httpClient';
+import { ApiError, httpClient } from '../../config/httpClient';
 import { readSession, type Session } from './session';
 
 /**
@@ -34,9 +34,21 @@ const post = async <T>(path: string, body: unknown): Promise<T> => {
   const payload = await response.json().catch(() => null);
 
   if (!response.ok) {
-    // The API explains rejections in Spanish for the lawyer — "Correo o
-    // contraseña incorrectos", not "failed with 401".
-    throw new Error(payload?.message || `La petición falló (${response.status}).`);
+    /*
+     * SE LANZA `ApiError`, CON SU ESTADO Y SU CÓDIGO, y no un `Error` pelado.
+     *
+     * El mensaje en español sigue siendo lo que ve el abogado —«Correo o
+     * contraseña incorrectos», no «failed with 401»—, pero quien renueva la
+     * sesión NECESITA saber si el servidor rechazó el refresco o si no pudo
+     * atenderlo: con un `Error` sin estado las dos cosas eran la misma, y
+     * cualquier tropiezo borraba la sesión.
+     */
+    throw new ApiError(
+      payload?.message || `La petición falló (${response.status}).`,
+      response.status,
+      `${API_BASE_URL}${path}`,
+      typeof payload?.error === 'string' ? payload.error : null
+    );
   }
 
   return payload as T;
