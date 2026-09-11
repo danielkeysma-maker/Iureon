@@ -6,6 +6,8 @@ import { useCatalogBranches } from '../../catalog/hooks/useCatalogBranches';
 import { readSession } from '../../auth/session';
 import { agendaApi } from '../services/agenda.api';
 import type { AgendaPendiente } from '../pendiente';
+import { expedientesApi } from '../../expedientes/services/expedientes.api';
+import type { Expediente } from '../../expedientes/types';
 import type { EntradaDeAgenda, PlazoDeActuacion, TipoDeDias, VencimientoPrevisto } from '../types';
 
 /**
@@ -52,6 +54,34 @@ export const AgendaForm: React.FC<AgendaFormProps> = ({ pendiente, onGuardada })
   const [asunto, setAsunto] = useState(pendiente?.asunto ?? '');
   const [cliente, setCliente] = useState(pendiente?.cliente ?? '');
   const [radicado, setRadicado] = useState(pendiente?.radicado ?? '');
+  /*
+   * ─── DE QUE CASO ES EL VENCIMIENTO ────────────────────────────────────────
+   *
+   * La columna `agenda_terminos.expediente_id` existia y solo la escribia
+   * «Traer al expediente» — despues y a mano. Un termino pertenece a un caso
+   * POR NATURALEZA, asi que puede nacer atado.
+   *
+   * Y si viene de una revision que YA estaba atada, llega heredado: el
+   * desplegable aparece con ese caso puesto y nadie vuelve a escogerlo.
+   */
+  const [expedienteId, setExpedienteId] = useState(pendiente?.expedienteId ?? '');
+  const [expedientes, setExpedientes] = useState<Expediente[]>([]);
+
+  useEffect(() => {
+    let vivo = true;
+    expedientesApi
+      .listar()
+      .then((e) => {
+        if (vivo) setExpedientes(e);
+      })
+      .catch(() => {
+        /* Sin lista no se pinta el selector; el termino se guarda igual. */
+        if (vivo) setExpedientes([]);
+      });
+    return () => {
+      vivo = false;
+    };
+  }, []);
   const [rama, setRama] = useState(pendiente?.rama ?? '');
   const [actuacionId, setActuacionId] = useState(pendiente?.actuacionId ?? '');
   const [nombreSinCatalogar, setNombreSinCatalogar] = useState(
@@ -175,7 +205,8 @@ export const AgendaForm: React.FC<AgendaFormProps> = ({ pendiente, onGuardada })
         tipoDias: !lecturaLegible && Number(dias) > 0 ? tipoDias : null,
         fechaLimiteManual: !lecturaLegible && !(Number(dias) > 0) ? fechaManual || null : null,
         responsable,
-        notas: notas.trim() || null
+        notas: notas.trim() || null,
+        expedienteId: expedienteId || null
       });
       onGuardada(entrada);
     } catch (e: unknown) {
@@ -197,6 +228,38 @@ export const AgendaForm: React.FC<AgendaFormProps> = ({ pendiente, onGuardada })
 
       {/* ── El caso ─────────────────────────────────────────────────────── */}
       <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2">
+        {/*
+          EL EXPEDIENTE VA PRIMERO, y no por jerarquia: es lo unico de este
+          bloque que ata el vencimiento a algo. «Asunto», «Cliente» y
+          «Radicado» son texto libre que sirve para reconocerlo en la lista;
+          el expediente es lo que hace que el caso lo cuente como suyo.
+
+          Solo se pinta si la firma tiene expedientes: un desplegable con
+          «— sin expediente —» y nada mas no ofrece nada.
+        */}
+        {expedientes.length > 0 && (
+          <label className="block min-w-0 sm:col-span-2">
+            <span className="field-label">Expediente (opcional)</span>
+            <select
+              value={expedienteId}
+              onChange={(e) => setExpedienteId(e.target.value)}
+              className="field mt-1 w-full"
+            >
+              <option value="">— sin expediente —</option>
+              {expedientes.map((e) => (
+                <option key={e.id} value={e.id}>
+                  {e.caratula}
+                  {e.radicado ? ` · ${e.radicado}` : ''}
+                </option>
+              ))}
+            </select>
+            <span className="mt-1 block text-meta text-ink-500">
+              {pendiente?.expedienteId
+                ? 'Heredado de la revisión de la que viene.'
+                : 'Átelo y el vencimiento aparece contado dentro del caso.'}
+            </span>
+          </label>
+        )}
         <label className="block min-w-0 sm:col-span-2">
           <span className="field-label">Asunto o proceso</span>
           <input

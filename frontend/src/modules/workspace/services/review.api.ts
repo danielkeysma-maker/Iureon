@@ -188,6 +188,11 @@ export interface PeticionDeRevision {
 
 export interface RevisionGuardada {
   id: string;
+  /**
+   * El caso al que pertenece, o null si nacio suelta. Lo hereda «Poner en la
+   * agenda»: un vencimiento que sale de una revision atada es del mismo caso.
+   */
+  expedienteId?: string | null;
   documentType: string;
   legalBranch: string | null;
   fileName: string;

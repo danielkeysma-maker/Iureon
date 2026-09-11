@@ -165,6 +165,44 @@ check(
   'comprobarlo al final seria descubrir el error con el informe escrito y pagado'
 );
 
+/* ─── 6. LA CADENA: DOCUMENTO → REVISION → TERMINO, SIN REPETIR EL CASO ─── */
+/*
+ * Un vencimiento pertenece a un caso por naturaleza, y el suyo salia sin
+ * expediente: la columna existia y solo la escribia «Traer al expediente».
+ * Peor: cuando el termino nace DESDE una revision ya atada, el caso es el
+ * mismo y volver a preguntarlo es pedir un dato que la fila de origen trae.
+ */
+const agenda = leer('agenda/agenda.service.ts');
+
+check(
+  'el termino GUARDA su expediente',
+  /expediente_id: expedienteId/.test(agenda)
+);
+check(
+  'y el servicio comprueba que sea de la firma',
+  /esExpedienteDeLaFirma\(input\.firmId, expedienteId\)/.test(agenda),
+  'el id llega del cuerpo de la peticion'
+);
+check(
+  'un expediente ajeno se RECHAZA, no se ignora',
+  /EXPEDIENTE_NO_ENCONTRADO/.test(agenda),
+  'aqui no hay nada pagado que perder, y guardarlo desatado en silencio dejaria al abogado creyendo que su caso lo vigila'
+);
+check(
+  'la revision EXPONE su caso, para que el termino lo herede',
+  /expedienteId: row\.expediente_id/.test(almacen)
+);
+
+const vista = readFileSync(
+  join(process.cwd(), '../frontend/src/modules/workspace/components/RevisionesView.tsx'),
+  'utf8'
+);
+check(
+  '«Poner en la agenda» lo hereda de la revision',
+  /expedienteId: r\.expedienteId/.test(vista),
+  'sin esto la cadena se corta justo donde el dato ya estaba'
+);
+
 console.log('');
 if (fallos > 0) {
   console.log(`${fallos} comprobación(es) no pasaron.`);

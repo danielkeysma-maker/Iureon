@@ -50,6 +50,14 @@ export interface RevisionGuardada {
   fileName: string;
   /** Cliente o proceso al que pertenece el escrito; texto libre de quien pidió la revisión. */
   cliente: string;
+  /**
+   * El caso al que pertenece, o `null` si nació suelta.
+   *
+   * Viaja para que «Poner en la agenda» lo HEREDE: un vencimiento que sale de
+   * una revisión atada es del mismo caso, y volver a preguntarlo sería pedir
+   * un dato que la fila ya trae.
+   */
+  expedienteId: string | null;
   pregunta: string;
   caracteres: number;
   truncado: boolean;
@@ -180,6 +188,12 @@ export const aRevisionGuardada = (row: Record<string, unknown>): RevisionGuardad
   informeRecibido: esInformeRecibido(row.informe) ? (row.informe as InformeDeDocumentoRecibido) : null,
   informeLibre: row.informe_libre ? String(row.informe_libre) : null,
   cobradoCop: Number(row.cobrado_cop ?? 0),
+  /*
+   * DE QUE CASO ES. Viaja para que «Poner en la agenda» pueda HEREDARLO: un
+   * vencimiento que sale de una revision atada pertenece al mismo caso, y
+   * volver a preguntarlo seria pedir un dato que la fila ya trae.
+   */
+  expedienteId: row.expediente_id ? String(row.expediente_id) : null,
   userEmail: String(row.user_email ?? ''),
   createdAt: String(row.created_at ?? ''),
   textoOriginal: row.texto_original ? String(row.texto_original) : null,

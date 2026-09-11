@@ -77,4 +77,11 @@ export interface EntradaNueva {
   fechaLimiteManual?: string | null;
   responsable?: string | null;
   notas?: string | null;
+  /**
+   * De qué caso es el vencimiento. El servidor comprueba que el expediente
+   * sea de la firma y RECHAZA con 404 si no lo es: aquí no hay nada pagado
+   * que perder, y guardar el término desatado en silencio dejaría al abogado
+   * creyendo que su caso lo vigila.
+   */
+  expedienteId?: string | null;
 }

@@ -403,7 +403,13 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({
                     radicado: null,
                     actuacionId: null,
                     actuacionNombre: recibido ? null : r.documentType,
-                    rama: recibido ? null : r.legalBranch
+                    rama: recibido ? null : r.legalBranch,
+                    /*
+                     * EL CASO SE HEREDA. Si la revision nacio atada a un
+                     * expediente, su vencimiento es del mismo caso: volver a
+                     * preguntarlo seria pedir un dato que esta fila ya trae.
+                     */
+                    expedienteId: r.expedienteId ?? null
                   });
                   onIrAHerramientas();
                 }}

@@ -1,4 +1,5 @@
 import { supabase } from '../../config/supabase.config';
+import { esExpedienteDeLaFirma } from '../expedientes/expedientes.service';
 import { auditService } from '../audit/audit.service';
 import { catalogService } from '../catalog/catalog.service';
 import { contarDiasHabiles, fuentesDelCalendario } from '../tools/calendario.service';
@@ -327,6 +328,21 @@ export const crear = async (input: {
 
   const v = await resolverVencimiento(input.firmId, input.datos);
 
+  /*
+   * EL EXPEDIENTE SE COMPRUEBA, NO SE CREE. Llega del cuerpo de una peticion y
+   * el aislamiento de esta casa lo da el filtro por firma de cada consulta:
+   * sin esto, un termino podria quedar colgando del caso de otra firma.
+   *
+   * Un id que no es de la firma se RECHAZA en vez de ignorarse. Aqui no hay
+   * nada pagado que perder —a diferencia de la revision, donde el informe ya
+   * costo— y guardar el vencimiento desatado en silencio dejaria al abogado
+   * creyendo que su caso lo vigila.
+   */
+  const expedienteId = texto(input.datos.expedienteId, 60);
+  if (expedienteId && !(await esExpedienteDeLaFirma(input.firmId, expedienteId))) {
+    throw new AgendaError('EXPEDIENTE_NO_ENCONTRADO', 'Ese expediente no existe.', 404);
+  }
+
   const { data, error } = await client
     .from('agenda_terminos')
     .insert({
@@ -346,6 +362,7 @@ export const crear = async (input: {
       termino_evidencia: v.terminoEvidencia,
       responsable: texto(input.datos.responsable, 200),
       notas: texto(input.datos.notas, 2000),
+      expediente_id: expedienteId,
       created_by: input.userEmail
     })
     .select(COLUMNAS)

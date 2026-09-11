@@ -80,6 +80,19 @@ export interface EntradaNueva {
   fechaLimiteManual?: string | null;
   responsable?: string | null;
   notas?: string | null;
+  /**
+   * DE QUE CASO ES ESTE TERMINO.
+   *
+   * La columna `agenda_terminos.expediente_id` existia desde la migracion de
+   * expedientes y solo la escribia «Traer al expediente» — despues y a mano.
+   * Un vencimiento pertenece a un caso POR NATURALEZA, asi que puede nacer
+   * atado; y cuando llega desde una revision que ya sabe su expediente, se
+   * hereda sin preguntar nada.
+   *
+   * El servicio comprueba que sea de la firma: llega del cuerpo de una
+   * peticion.
+   */
+  expedienteId?: string | null;
 }
 
 /** Los campos que una edición puede mover. */

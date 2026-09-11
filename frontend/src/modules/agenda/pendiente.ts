@@ -37,6 +37,19 @@ export interface AgendaPendiente {
   actuacionId?: string | null;
   actuacionNombre?: string | null;
   rama?: string | null;
+  /**
+   * EL CASO, HEREDADO DEL ORIGEN.
+   *
+   * Un vencimiento que sale de una revisión atada a un expediente pertenece a
+   * ese mismo caso: preguntarlo otra vez sería pedir un dato que la fila de
+   * origen ya trae. Viaja vacío cuando el origen no lo sabe, y entonces el
+   * formulario lo pregunta como cualquier otro campo.
+   *
+   * Es un IDENTIFICADOR, que es lo único que este canal transporta —ver la
+   * cabecera—: el servidor comprueba que el expediente sea de la firma antes
+   * de guardar nada.
+   */
+  expedienteId?: string | null;
 }
 
 export const dejarPendiente = (pendiente: AgendaPendiente): void => {
@@ -61,7 +74,8 @@ export const tomarPendiente = (): AgendaPendiente | null => {
       radicado: valor.radicado ?? null,
       actuacionId: valor.actuacionId ?? null,
       actuacionNombre: valor.actuacionNombre ?? null,
-      rama: valor.rama ?? null
+      rama: valor.rama ?? null,
+      expedienteId: valor.expedienteId ?? null
     };
   } catch {
     return null;
