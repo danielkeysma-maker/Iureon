@@ -30,6 +30,32 @@ import { readFileSync } from 'node:fs';
  */
 const CON_RED = new Set(['csj', 'consejo', 'discovery', 'ruling', 'triage', 'retrieval', 'conceptos', 'precedent', 'vigencia-red', 'glosa-red']);
 
+/**
+ * Checks que necesitan la BASE DE DATOS, y que por eso NO pueden gatear el CI.
+ *
+ * ─── POR QUE ESTA CATEGORIA EXISTE, Y POR QUE APARECIO TARDE ───────────────
+ *
+ * El 10 de septiembre de 2026 se conto cuantos checks corria el CI: 28 de 50.
+ * El flujo listaba 34 pasos con nombre, uno por check, y esa lista habia
+ * envejecido. Al reemplazarla por este ejecutor —que los descubre solos— el
+ * CI se puso ROJO, y los seis que fallaron fueron estos.
+ *
+ * Y la falla resulto ser la respuesta, no el problema: NECESITAN UNA BASE
+ * VIVA. Sin `SUPABASE_URL` no arrancan, y CON ella escribirian en la base de
+ * PRODUCCION — que es exactamente el defecto que esta casa ya tiene
+ * documentado y pendiente: la suite deja filas de prueba con usuarios
+ * `@iureon.test` en la base real. Correrlos en cada empuje multiplicaria ese
+ * problema por cada rama y cada reintento.
+ *
+ * Asi que estaban fuera del CI por una razon buena que nadie habia escrito.
+ * Ahora esta escrita, y el ejecutor la conoce en vez de depender de que
+ * alguien recuerde no ponerlos en una lista.
+ *
+ * SE SIGUEN CORRIENDO EN LOCAL con `npm test` o `test:todos`, que es donde
+ * hay una base a la que se le puede escribir sin que le importe a nadie.
+ */
+const CON_BASE = new Set(['admin', 'billing', 'clients', 'auth', 'stored', 'names']);
+
 /** Descarga ~600 MB de ONNX. Nunca en un run ordinario. */
 const NUNCA = new Set(['embeddings']);
 
@@ -40,11 +66,19 @@ const todos = Object.keys(pkg.scripts)
   .filter((n) => !NUNCA.has(n));
 
 const conRed = process.argv.includes('--todos');
-const aCorrer = todos.filter((n) => conRed || !CON_RED.has(n));
+/*
+ * `--sin-base` es lo que corre el CI. No se invierte la regla —los de base NO
+ * se omiten por defecto— porque en local la respuesta correcta es correrlos:
+ * quien trabaja aqui tiene base y quiere saber si los rompio. El que se tiene
+ * que acordar de pedir menos es el CI, que es un solo sitio y esta escrito.
+ */
+const sinBase = process.argv.includes('--sin-base');
+const aCorrer = todos.filter((n) => (conRed || !CON_RED.has(n)) && !(sinBase && CON_BASE.has(n)));
 
 console.log(
   `Corriendo ${aCorrer.length} checks${conRed ? ' (incluidos los de red)' : ' deterministas'}.` +
-    (conRed ? '' : `  ${todos.length - aCorrer.length} de red omitidos: usa --todos para incluirlos.`)
+    (conRed ? '' : `  ${todos.filter((n) => CON_RED.has(n)).length} de red omitidos: usa --todos para incluirlos.`) +
+    (sinBase ? `  ${CON_BASE.size} que escriben en la base, omitidos (--sin-base).` : '')
 );
 console.log('');
 

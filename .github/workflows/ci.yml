@@ -53,8 +53,14 @@ jobs:
       # propio ejecutor, que imprime que check fallo y con que texto, y que
       # ademas caza la contradiccion entre el codigo de salida y el banner —
       # algo que 34 pasos sueltos no podian hacer.
+      #
+      # `--sin-base` omite los seis que necesitan una base VIVA. No es que no
+      # importen: es que con credenciales escribirian en la base de PRODUCCION,
+      # y dejar filas de prueba en la base real en cada empuje es peor que no
+      # correrlos. Ver `CON_BASE` en el ejecutor, donde esta escrito el porque.
+      # Esos seis se corren en local con `npm test`.
       - name: Toda la suite determinista del backend (el ejecutor la descubre; ninguna se queda fuera)
-        run: node scripts/run-all-checks.mjs
+        run: node scripts/run-all-checks.mjs --sin-base
 
       - name: Build
         run: npm run build
