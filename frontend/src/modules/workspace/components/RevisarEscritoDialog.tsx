@@ -909,6 +909,22 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
             campo obligatorio aquí frenaría la lectura del auto —que es lo que
             el abogado vino a hacer— por un dato que solo mejora un aviso.
           */}
+          {/*
+            EL DOCUMENTO QUE VENIA DE ORIENTACION Y NO CUPO. Solo se dice
+            cuando traia nombre: eso prueba que hubo un archivo. Por la puerta
+            «Me llego un documento» de Inicio no hay archivo todavia, y
+            avisarle de que «no cupo» seria inventarle una perdida.
+          */}
+          {documentoTraido && !documentoTraido.completo && documentoTraido.nombre && (
+            <p className="notice-unverified" role="status">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-unverified" />
+              <span className="min-w-0 text-justify [overflow-wrap:anywhere]">
+                «{documentoTraido.nombre}» es demasiado largo para traerlo desde Orientación. El modo ya está
+                escogido: vuelva a adjuntarlo aquí.
+              </span>
+            </p>
+          )}
+
           {esRecibido && (
             <div>
               <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">

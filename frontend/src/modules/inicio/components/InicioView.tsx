@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-  BookMarked,
-  ClipboardCheck,
-  FileClock,
-  Mic,
-  Route,
-  Sparkles,
-  Wallet
-} from 'lucide-react';
+import { BookMarked, ClipboardCheck, FileClock, Route, Wallet } from 'lucide-react';
 import type { MainView } from '../../tenant/types';
 import { moduloDeVista } from '../../tenant/navigation';
 import type { SavedDraftEntry } from '../../documents/types';
@@ -17,6 +9,8 @@ import { useTenant } from '../../tenant/TenantContext';
 import { ETIQUETA_DE_PERIODO, NOMBRE_DE_PLAN, type Modulo } from '../../subscriptions/types';
 import { NOVEDADES } from '../../help/content/novedades';
 import { TarjetaDeAccion } from './TarjetaDeAccion';
+import { PUERTAS_DE_INICIO } from '../puertas';
+import { dejarDocumentoParaLeer } from '../../workspace/documentoParaLeer';
 import { fechaCorta, fechaLarga, nombreParaSaludar, saludoSegunHora } from '../saludo';
 
 /**
@@ -24,8 +18,9 @@ import { fechaCorta, fechaLarga, nombreParaSaludar, saludoSegunHora } from '../s
  *
  * ─── WHAT IT SHOWS, TOP TO BOTTOM ───────────────────────────────────────────
  *
- * The greeting with the firm and the date; three doors to the daily work
- * (redactar, revisar, transcribir); what was left open — the latest saved
+ * The greeting with the firm and the date; «Por dónde empiezo», the doors
+ * phrased as what the lawyer has in front of them (see `inicio/puertas.ts`);
+ * what was left open — the latest saved
  * drafts and the latest reviews, opened through the SAME paths their lists
  * use; the plan and the balance, read from the plan context and the firm;
  * the three newest entries of Novedades; and the guided tour.
@@ -188,32 +183,36 @@ export const InicioView: React.FC<InicioViewProps> = ({
           </div>
         )}
 
-        {/* ─── TRES PUERTAS ───────────────────────────────────────────────── */}
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <TarjetaDeAccion
-            icono={Sparkles}
-            titulo="Redactar un escrito"
-            queHace="El primer borrador de una actuación del catálogo, con su término y su fuente."
-            onClick={() => onIr('workspace')}
-            noIncluida={ocultas.includes('workspace')}
-            motivoNoIncluida={motivoDePuertaCerrada('workspace')}
-          />
-          <TarjetaDeAccion
-            icono={ClipboardCheck}
-            titulo="Revisar un documento"
-            queHace="Un informe sobre un escrito suyo o sobre uno que le llegó, y el taller para trabajarlo."
-            onClick={() => onIr('taller')}
-            noIncluida={ocultas.includes('taller')}
-            motivoNoIncluida={motivoDePuertaCerrada('taller')}
-          />
-          <TarjetaDeAccion
-            icono={Mic}
-            titulo="Transcribir una audiencia"
-            queHace="El transcrito de una grabación, con cada interlocutor separado, y su acta."
-            onClick={() => onIr('audiencias')}
-            noIncluida={ocultas.includes('audiencias')}
-            motivoNoIncluida={motivoDePuertaCerrada('audiencias')}
-          />
+        {/* ─── POR DÓNDE EMPIEZO ──────────────────────────────────────────
+          Las puertas van en `inicio/puertas.ts`: son datos, no JSX, para que
+          un guarda pueda comprobar que todas apuntan a un módulo real y que
+          ninguna se ofrece cuando el plan la tiene cerrada. */}
+        <div>
+          <h2 className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-400">
+            Por dónde empiezo
+          </h2>
+          <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {PUERTAS_DE_INICIO.map((p) => (
+              <TarjetaDeAccion
+                key={p.destino}
+                icono={p.icono}
+                titulo={p.titulo}
+                queHace={p.queHace}
+                onClick={() => {
+                  /*
+                   * La puerta del documento recibido deja anotado el modo
+                   * antes de navegar, para que Revisiones abra el dialogo
+                   * correcto en vez de su lista. Sin texto: el abogado
+                   * todavia no ha subido nada.
+                   */
+                  if (p.abreDocumentoRecibido) dejarDocumentoParaLeer({ texto: '', nombre: '' });
+                  onIr(p.destino);
+                }}
+                noIncluida={ocultas.includes(p.destino)}
+                motivoNoIncluida={motivoDePuertaCerrada(p.destino)}
+              />
+            ))}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">

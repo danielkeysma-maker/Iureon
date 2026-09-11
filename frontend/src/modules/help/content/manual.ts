@@ -87,12 +87,13 @@ const A_INICIO: ManualArticle = {
     {
       kind: 'pasos',
       pasos: [
-        'Arriba está el saludo con su nombre, la firma y la fecha. Debajo, tres accesos: «Redactar un escrito» abre Redacción, «Revisar un documento» abre Revisiones y «Transcribir una audiencia» abre Audiencias. Si su plan no incluye un módulo, su tarjeta aparece atenuada con «No incluido en su plan» en vez de desaparecer.',
+        'Arriba está el saludo con su nombre, la firma y la fecha. Debajo, «Por dónde empiezo»: cinco puertas nombradas por lo que usted tiene delante, no por el nombre del módulo. «Me llegó un documento» abre Revisiones; «Tengo los hechos y no el nombre» abre Orientación; «Ya sé qué voy a presentar» abre Redacción; «Tengo un caso con muchos papeles» abre Expedientes; «Grabé una audiencia» abre Audiencias. Si su plan no incluye un módulo, su tarjeta aparece atenuada con «No incluido en su plan» en vez de desaparecer.',
+        'Están nombradas así a propósito. «Orientación» y «Expedientes» son nombres correctos y no dicen nada a quien entra por primera vez: quien tiene unos hechos sin calificar tendría que saber ya que eso se llama «Orientación» para llegar a la pantalla que existe justamente porque no lo sabe.',
         '«Continuar donde iba» lista sus cinco borradores y sus cinco revisiones más recientes. Un borrador se abre en Redacción, tal como desde «Borradores»; una revisión se abre en su taller, tal como desde «Revisiones».',
         '«Plan y saldo» muestra el plan de la firma con su estado —activo, por vencer con los días que faltan, vencido, o en prueba con los días que quedan— y el saldo disponible en pesos. «Ver plan» abre la pantalla de planes; «Recargar saldo» abre la recarga, la misma del pie de la barra lateral.',
         '«Novedades» trae los tres cambios más recientes de la aplicación; «Ver todas» abre la lista completa en el manual.',
         'Recargar la página no le mueve la pantalla: la pestaña vuelve al mismo módulo y a lo que tuviera abierto dentro de él —el borrador, el taller de la revisión, el transcrito, la herramienta o el artículo del manual—. Una pestaña nueva, en cambio, empieza en Inicio, porque abrir la aplicación es empezar.',
-        '«¿Primera vez aquí?» tiene «Iniciar la visita guiada», que recorre cada módulo señalándolo en pantalla con una tarjeta que dice para qué sirve —«Anterior», «Siguiente» y «Salir», o las flechas del teclado y Esc—, y «Abrir el manual». La primera vez que entra desde un navegador, Inicio le ofrece la visita en una franja; «Ahora no» la guarda para cuando quiera, desde esta pantalla o desde el índice del manual.'
+        '«¿Primera vez aquí?» tiene «Iniciar la visita guiada», que recorre cada módulo de trabajo diario —Expedientes incluido— señalándolo en pantalla con una tarjeta que dice para qué sirve —«Anterior», «Siguiente» y «Salir», o las flechas del teclado y Esc—, y «Abrir el manual». La primera vez que entra desde un navegador, Inicio le ofrece la visita en una franja; «Ahora no» la guarda para cuando quiera, desde esta pantalla o desde el índice del manual.'
       ]
     },
     {

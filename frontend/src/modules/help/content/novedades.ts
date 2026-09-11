@@ -40,6 +40,14 @@ export const NOVEDADES_ID = 'novedades';
 export const NOVEDADES: readonly Novedad[] = [
   {
     fecha: '2026-09-11',
+    titulo: 'Inicio ya no pregunta por el nombre del módulo, sino por lo que usted tiene delante',
+    detalle:
+      'Las tres tarjetas de Inicio —«Redactar un escrito», «Revisar un documento», «Transcribir una audiencia»— eran verbos del producto, y dejaban fuera justo los dos módulos que un recién llegado no encuentra solo. En su lugar hay cinco puertas con la frase del abogado: «Me llegó un documento», «Tengo los hechos y no el nombre», «Ya sé qué voy a presentar», «Tengo un caso con muchos papeles» y «Grabé una audiencia». Orientación entra por fin a la pantalla de entrada —es la que existe para quien NO sabe cómo se llama lo suyo, así que pedirle su nombre para llegar a ella era un contrasentido— y Expedientes también, que no estaba en ninguna parte de Inicio. La visita guiada gana además su parada de Expedientes: hasta hoy quien entraba por primera vez la recorría entera sin enterarse de que el módulo existía. Las tarjetas siguen atenuándose con «No incluido en su plan» cuando la firma no tiene ese módulo.',
+    modulo: 'Inicio',
+    tipo: 'mejora'
+  },
+  {
+    fecha: '2026-09-11',
     titulo: 'Si el documento que adjunta en Orientación anuncia un plazo, se lo decimos',
     detalle:
       'Orientación acepta adjuntar el oficio o el auto que le llegó, y no lee plazos: devuelve actuaciones del catálogo con el término de la NORMA. Así que quien entraba por aquí con un auto que dice «subsane dentro de los cinco (5) días» se iba con una lista correcta y sin el número cinco. Ahora, cuando el documento adjuntado anuncia un término, la pantalla lo dice en ámbar y CITA la frase del propio documento, con el botón «Leerlo primero: qué le exige y para cuándo». Ese botón lleva el documento a Revisiones ya leído —no hay que volver a adjuntar trescientas páginas— y abre el modo «Un documento que recibí». El aviso no cierra el paso: «Orientar» sigue encendido para quien solo quiera saber qué actuación presentar. Y calla cuando no está seguro: no salta con «lleva tres (3) meses sin pagar» ni con «dentro de los seis meses anteriores», porque un aviso que sale siempre deja de leerse.',

@@ -1,4 +1,6 @@
 import { NAV_GROUPS, NAV_MODULES, VISTA_POR_MODULO, modulosSinGrupo } from '../navigation';
+import { PUERTAS_DE_INICIO } from '../../inicio/puertas';
+import { PASOS_DE_VISITA } from '../../inicio/visitaGuiada/pasos';
 import type { MainView } from '../types';
 
 /**
@@ -105,6 +107,64 @@ check(
   'y el operador puede apagárselo a una firma',
   VISTA_POR_MODULO.EXPEDIENTES === 'expedientes',
   'sin esto, apagar el módulo dejaría la puerta abierta a un 403'
+);
+
+/* ─── 5. LAS PUERTAS DE INICIO LLEVAN A ALGUN SITIO ─────────────────────── */
+/*
+ * «Por donde empiezo» es lo primero que ve quien no sabe usar la aplicacion.
+ * Una tarjeta cuyo destino no existe no falla: abre una vista en blanco, que
+ * para un recien llegado es indistinguible de que el producto no sirve.
+ */
+const puertasAlVacio = PUERTAS_DE_INICIO.filter((p) => !declarados.has(p.destino));
+check(
+  'cada puerta de Inicio lleva a un modulo que existe',
+  puertasAlVacio.length === 0,
+  puertasAlVacio.length > 0
+    ? `AL VACIO: ${puertasAlVacio.map((p) => p.destino).join(', ')}`
+    : `${PUERTAS_DE_INICIO.length} puertas`
+);
+
+const destinos = PUERTAS_DE_INICIO.map((p) => p.destino);
+check(
+  'ninguna puerta se repite',
+  new Set(destinos).size === destinos.length,
+  'dos tarjetas al mismo sitio obligan a leer las dos para descubrir que daba igual'
+);
+
+/*
+ * ORIENTACION Y EXPEDIENTES SON LOS DOS QUE NADIE ENCUENTRA SOLO, y por eso se
+ * fijan aqui con su razon escrita. Orientacion existe justamente para quien NO
+ * sabe como se llama lo suyo: dejarla fuera de la puerta de entrada obliga a
+ * saber su nombre para llegar a la pantalla que existe porque no lo sabe.
+ * Expedientes es el mas nuevo y no estaba en ninguna parte de Inicio.
+ */
+check(
+  'Orientacion tiene puerta: es la pantalla para quien no sabe el nombre',
+  destinos.includes('orientacion')
+);
+check('Expedientes tiene puerta: es el modulo mas nuevo', destinos.includes('expedientes'));
+
+/* ─── 6. Y LA VISITA GUIADA NO DEJA MODULOS FUERA EN SILENCIO ───────────── */
+/*
+ * Expedientes se anadio a la barra y NO a la visita, asi que quien entraba por
+ * primera vez recorria las paradas sin enterarse de que el modulo existia. No
+ * lanza error y no se ve: es la misma forma de defecto que `modulosSinGrupo`
+ * caza un escalon mas arriba.
+ *
+ * Se exceptua «Administrar» a proposito: seguridad, privacidad y ajustes no
+ * son trabajo diario y la visita ya es larga.
+ */
+const administrar = new Set<string>(NAV_GROUPS.find((g) => g.titulo === 'Administrar')?.modulos ?? []);
+const conParada = new Set(PASOS_DE_VISITA.map((p) => p.vista).filter(Boolean));
+const sinParada = NAV_MODULES.map((m) => m.id).filter(
+  (id) => !administrar.has(id) && !conParada.has(id)
+);
+check(
+  'la visita guiada pasa por todo modulo de trabajo diario',
+  sinParada.length === 0,
+  sinParada.length > 0
+    ? `SIN PARADA: ${sinParada.join(', ')} — existe, funciona, y el recien llegado no se entera`
+    : `${PASOS_DE_VISITA.length} paradas`
 );
 
 console.log('');

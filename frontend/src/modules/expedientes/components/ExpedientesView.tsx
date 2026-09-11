@@ -270,7 +270,12 @@ export const ExpedientesView: React.FC = () => {
   // ─── LISTA ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="mx-auto w-full max-w-4xl space-y-4 px-3 py-4 sm:px-4">
+    /*
+     * `data-visita` marca el objetivo de la visita guiada, igual que en los
+     * demas modulos. Sin el, la parada de Expedientes caia al objetivo de
+     * reserva —el boton de la barra— y senalaba el menu en vez del modulo.
+     */
+    <div data-visita="vista-expedientes" className="mx-auto w-full max-w-4xl space-y-4 px-3 py-4 sm:px-4">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-h2">Expedientes</h1>

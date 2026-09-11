@@ -42,7 +42,7 @@ export const PASOS_DE_VISITA: readonly PasoDeVisita[] = [
   modulo(
     'inicio',
     'Inicio',
-    'Su punto de partida. Reúne los accesos a redactar, revisar y transcribir, lo último que dejó abierto, el estado del plan y el saldo de la firma, y las novedades de la aplicación.'
+    'Su punto de partida. «Por dónde empiezo» ofrece las puertas por lo que usted tiene delante —un documento que le llegó, unos hechos sin nombre, un escrito que ya sabe cuál es— y debajo están lo último que dejó abierto, el estado del plan y el saldo de la firma, y las novedades.'
   ),
   modulo(
     'workspace',
@@ -63,6 +63,11 @@ export const PASOS_DE_VISITA: readonly PasoDeVisita[] = [
     'orientacion',
     'Orientación',
     'Para cuando todavía no sabe qué actuación necesita. Describa los hechos y el catálogo le propone actuaciones posibles; cada una trae «Redactar esta», que lo lleva a Redacción con la actuación ya elegida.'
+  ),
+  modulo(
+    'expedientes',
+    'Expedientes',
+    'El asunto completo y quién está en él. Reúna aquí los documentos del caso —hasta trescientas páginas—, búsquelos por significado y no por palabra exacta, organícelos en carpetas, y prepare el interrogatorio de cada actor con la técnica que le corresponde.'
   ),
   modulo(
     'audiencias',

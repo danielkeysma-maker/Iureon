@@ -56,12 +56,21 @@ export const MAXIMO_PARA_PASAR = 1_500_000;
 export interface DocumentoParaLeer {
   /** El texto ya extraído en el navegador. Vacío si no cupo. Nunca el archivo. */
   texto: string;
-  /** Cómo se llamaba el archivo, para que el diálogo lo nombre igual. */
+  /**
+   * Cómo se llamaba el archivo, o cadena vacía cuando NO HABÍA ARCHIVO.
+   *
+   * El vacío distingue dos llegadas que de otro modo se confunden: desde
+   * Orientación con un documento que no cupo —y entonces hay que decírselo al
+   * abogado, porque él sí adjuntó algo— y desde Inicio, por la puerta «Me
+   * llegó un documento», donde todavía no ha subido nada y avisarle de que
+   * «no cupo» sería inventarle una pérdida.
+   */
   nombre: string;
   /**
    * SI EL TEXTO VIAJÓ COMPLETO.
    *
-   * En falso, el diálogo se abre en el modo correcto pero VACÍO, y lo dice.
+   * En falso, el diálogo se abre en el modo correcto pero VACÍO. Y lo dice,
+   * pero solo si `nombre` viene lleno: entonces hubo un archivo que no cupo.
    * La alternativa —mandar medio documento— sería peor que no mandar nada: un
    * informe sobre la mitad de un auto no anuncia que le falta la otra, y lo
    * que se corta primero es la parte resolutiva, que va al final.
@@ -102,7 +111,8 @@ export const tomarDocumentoParaLeer = (): DocumentoParaLeer | null => {
     if (!valor || typeof valor.texto !== 'string') return null;
     return {
       texto: valor.texto,
-      nombre: typeof valor.nombre === 'string' && valor.nombre ? valor.nombre : 'documento recibido',
+      /* Se conserva el vacío: es el que dice que no había archivo. */
+      nombre: typeof valor.nombre === 'string' ? valor.nombre : '',
       completo: valor.completo === true && valor.texto.trim().length > 0
     };
   } catch {
