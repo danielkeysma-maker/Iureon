@@ -40,6 +40,14 @@ export const NOVEDADES_ID = 'novedades';
 export const NOVEDADES: readonly Novedad[] = [
   {
     fecha: '2026-09-11',
+    titulo: 'Si el documento que adjunta en Orientación anuncia un plazo, se lo decimos',
+    detalle:
+      'Orientación acepta adjuntar el oficio o el auto que le llegó, y no lee plazos: devuelve actuaciones del catálogo con el término de la NORMA. Así que quien entraba por aquí con un auto que dice «subsane dentro de los cinco (5) días» se iba con una lista correcta y sin el número cinco. Ahora, cuando el documento adjuntado anuncia un término, la pantalla lo dice en ámbar y CITA la frase del propio documento, con el botón «Leerlo primero: qué le exige y para cuándo». Ese botón lleva el documento a Revisiones ya leído —no hay que volver a adjuntar trescientas páginas— y abre el modo «Un documento que recibí». El aviso no cierra el paso: «Orientar» sigue encendido para quien solo quiera saber qué actuación presentar. Y calla cuando no está seguro: no salta con «lleva tres (3) meses sin pagar» ni con «dentro de los seis meses anteriores», porque un aviso que sale siempre deja de leerse.',
+    modulo: 'Orientación',
+    tipo: 'mejora'
+  },
+  {
+    fecha: '2026-09-11',
     titulo: 'El informe de un documento recibido ya sabe a quién representa usted',
     detalle:
       'Al leer un documento que le llegó, el diálogo pregunta ahora «A quién representa en este proceso»: al demandante, al demandado, a la víctima o a la persona procesada en su etapa. No es obligatorio y arranca sin declarar. Con la respuesta, cada carga sale con su dueño: la que el documento le impone a la otra parte aparece marcada «Esta carga no es suya», con el destinatario que el propio documento nombra, y deja de pedirle que vaya a contar días por ella. Antes el informe decía «Qué LE exige y para cuándo» sin saber qué parte era usted, así que un auto que ordena al demandante subsanar en cinco días se lo publicaba igual al apoderado del demandado. Sin declarar posición, el rótulo pasa a «Qué exige el documento y para cuándo» y no se atribuye nada: la aplicación prefiere callar antes que suponerle un lado. Solo habla cuando el documento nombra a una sola parte; con «las partes», con los dos bandos a la vez o en una reconvención —donde los papeles se invierten— se queda en silencio. Lo mismo sale en el Word y en el PDF.',

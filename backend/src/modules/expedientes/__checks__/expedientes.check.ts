@@ -771,7 +771,7 @@ check(
  */
 check(
   'se pregunta antes, con el dialogo de la casa y no con uno del navegador',
-  /ConfirmarDialog/.test(pantallaCarpetas) && !/window\.confirm|confirm\(/.test(sinComentarios(pantallaCarpetas)),
+  /ConfirmarDialog/.test(pantallaCarpetas) && !/window\.confirm|\bconfirm\(/.test(sinComentarios(pantallaCarpetas)),
   'una accion que no se deshace no puede no preguntar'
 );
 check(

@@ -22,6 +22,7 @@
     "check:navegacion": "npx esbuild src/modules/tenant/__checks__/navegacion.check.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/navegacion.check.mjs --log-level=error && node node_modules/.cache/navegacion.check.mjs",
     "check:instruccion": "npx esbuild src/modules/catalog/__checks__/instruccion.check.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/instruccion.check.mjs --log-level=error && node node_modules/.cache/instruccion.check.mjs",
     "check:calculadoras": "npx esbuild src/modules/tools/__checks__/calculadoras.check.ts --bundle --platform=node --format=cjs --outfile=node_modules/.cache/calculadoras.check.cjs --log-level=error && node node_modules/.cache/calculadoras.check.cjs",
+    "check:plazo-anunciado": "npx esbuild src/modules/catalog/__checks__/plazoAnunciado.check.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/plazoAnunciado.check.mjs --log-level=error && node node_modules/.cache/plazoAnunciado.check.mjs",
     "check:rama-candidata": "npx esbuild src/modules/workspace/__checks__/ramaDeLaCandidata.check.ts --bundle --platform=node --format=cjs --outfile=node_modules/.cache/ramaDeLaCandidata.check.cjs --log-level=error && node node_modules/.cache/ramaDeLaCandidata.check.cjs"
   },
   "dependencies": {

@@ -1,5 +1,6 @@
 import React from 'react';
 import { textoDelArchivo } from '../workspace/services/textoDelArchivo';
+import { plazoAnunciado } from './plazoAnunciado';
 
 /**
  * Adjuntar el documento que llegó, en vez de volver a contarlo por escrito.
@@ -43,6 +44,24 @@ export interface HechosAdjuntados {
   caracteres: number;
   /** El documento era más largo que el techo del lector: se leyó el comienzo. */
   recortado: boolean;
+  /**
+   * EL TEXTO DEL DOCUMENTO, APARTE DEL CUADRO DE HECHOS.
+   *
+   * El cuadro mezcla lo que escribió el abogado con lo que trajo el archivo, y
+   * para mandarlo a leer a Revisiones hace falta SOLO el documento: un informe
+   * que lea «me llamó el cliente» como si fuera parte del auto diría cosas del
+   * papel que el papel no dice.
+   */
+  texto: string;
+  /**
+   * LA FRASE CON QUE EL DOCUMENTO ANUNCIA UN TÉRMINO, o null.
+   *
+   * Se calcula aquí, en el gancho compartido, y no en cada pantalla: es la
+   * misma regla en el escritorio y en el teléfono, y separarla garantizaría
+   * que una de las dos se quedara sin el aviso a la primera corrección. Es la
+   * misma razón por la que este gancho existe.
+   */
+  plazo: string | null;
 }
 
 export interface AdjuntoDeHechos {
@@ -86,7 +105,9 @@ export const useHechosDesdeArchivo = (
         setAdjunto({
           nombre: archivo.name,
           caracteres: lectura.caracteres,
-          recortado: lectura.recortado
+          recortado: lectura.recortado,
+          texto: lectura.texto,
+          plazo: plazoAnunciado(lectura.texto)
         });
       } finally {
         setLeyendo(false);

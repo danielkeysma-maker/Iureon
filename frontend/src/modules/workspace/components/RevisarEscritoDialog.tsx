@@ -105,6 +105,18 @@ import type { PapelEnElExpediente } from '../../expedientes/types';
 interface RevisarEscritoDialogProps {
   abierto: boolean;
   onCerrar: () => void;
+  /**
+   * UN DOCUMENTO QUE LLEGA YA LEIDO DESDE OTRA PANTALLA.
+   *
+   * Orientacion detecta que el papel adjuntado anuncia un termino —que ella no
+   * lee— y ofrece traerlo aqui. Llega el texto y el nombre, y el dialogo se
+   * abre directamente en «Un documento que recibi»: mandarlo a la puerta
+   * correcta y dejarle escoger el modo otra vez seria devolverle el trabajo.
+   *
+   * `completo` en falso significa que el texto no cupo en el traspaso; el
+   * dialogo se abre en el modo correcto, vacio, y lo dice.
+   */
+  documentoTraido?: { texto: string; nombre: string; completo: boolean } | null;
   documentType: string;
   legalBranch: string;
   precioCop: number;
@@ -169,6 +181,7 @@ const SUGERENCIAS: Record<ModoDeRevision, string[]> = {
 export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
   abierto,
   onCerrar,
+  documentoTraido,
   documentType,
   legalBranch,
   precioCop,
@@ -309,6 +322,24 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
   const rol = readSession()?.user.role;
   const puedeAutorizar = rol === 'FIRM_ADMIN' || rol === 'SUPER_ADMIN';
   const firmaSinDecidir = consentimiento !== null && consentimiento.el === null && !consentimiento.guarda;
+
+  /*
+   * EL DOCUMENTO QUE VINO DE ORIENTACION SE COLOCA AL ABRIR, una sola vez por
+   * apertura. Se pone el modo ANTES que el texto porque `cambiarModo` limpia
+   * lo que hubiera: al reves, el texto recien puesto se borraria solo.
+   */
+  const traidoPuesto = React.useRef(false);
+  React.useEffect(() => {
+    if (!abierto) {
+      traidoPuesto.current = false;
+      return;
+    }
+    if (traidoPuesto.current || !documentoTraido) return;
+    traidoPuesto.current = true;
+    setModo('DOCUMENTO_RECIBIDO');
+    setArchivo(null);
+    setTexto(documentoTraido.completo ? documentoTraido.texto : '');
+  }, [abierto, documentoTraido]);
 
   React.useEffect(() => {
     if (!abierto) return;

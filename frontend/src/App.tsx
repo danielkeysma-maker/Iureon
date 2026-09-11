@@ -26,6 +26,7 @@ import { TenantProvider } from './modules/tenant/TenantContext';
 import { AgentPanelLeft } from './modules/workspace/components/AgentPanelLeft';
 import { TallerDeRevision, type DatosDelTaller } from './modules/workspace/components/TallerDeRevision';
 import { RevisionesView } from './modules/workspace/components/RevisionesView';
+import { dejarDocumentoParaLeer } from './modules/workspace/documentoParaLeer';
 import { draftsApi } from './modules/documents/services/drafts.api';
 import { componerCuadroDeRedaccion } from './modules/catalog/instruccionSugerida';
 import { catalogApi } from './modules/catalog/services/catalog.api';
@@ -1734,11 +1735,35 @@ export function App() {
               se tiene delante, no se revisa lo de la semana pasada.
             */}
             <div className="flex min-h-0 min-w-0 flex-1 lg:hidden">
-              <TriageMobileView onDraft={irARedactar} />
+              <TriageMobileView
+                onDraft={irARedactar}
+                /* La misma puerta, en el teléfono. Ver el comentario de TriageView. */
+                onLeerRecibido={(texto, nombre) => {
+                  dejarDocumentoParaLeer({ texto, nombre });
+                  cerrarTallerDeRevision();
+                  setMainView('taller');
+                }}
+              />
             </div>
             <div className="hidden min-h-0 flex-1 lg:flex">
             <TriageView
               setMainView={setMainView}
+              /*
+               * ─── LA PUERTA QUE PIERDE EL PLAZO, CERRADA ─────────────────
+               *
+               * Orientación acepta el auto adjunto y NO lee plazos: devuelve
+               * actuaciones con el término de la NORMA. Cuando el documento
+               * anuncia el suyo, ofrece traerlo a «Revisiones», que sí lo lee.
+               *
+               * El taller se cierra antes de navegar: «Revisiones» y el taller
+               * comparten vista, y con uno abierto el abogado aterrizaría en el
+               * escrito de la semana pasada en vez de en su documento.
+               */
+              onLeerRecibido={(texto, nombre) => {
+                dejarDocumentoParaLeer({ texto, nombre });
+                cerrarTallerDeRevision();
+                setMainView('taller');
+              }}
               /*
                * Una sugerencia se convierte en borrador sin volver a escribir su
                * nombre. El nombre catalogado es el contrato con el motor de

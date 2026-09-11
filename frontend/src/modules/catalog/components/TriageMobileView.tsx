@@ -5,6 +5,7 @@ import {
   IconoSinVerificar,
   IconoVerificado
 } from '../../../design/ArtboardIcons';
+import { AvisoDePlazoEnElAdjunto } from './AvisoDePlazoEnElAdjunto';
 import { ARCHIVOS_DE_HECHOS, useHechosDesdeArchivo } from '../hechosDesdeArchivo';
 import { triageApi, type TriageResponse } from '../services/catalog.api';
 import { BRANCH_LABELS } from '../branchLabels';
@@ -116,6 +117,17 @@ const Tarjeta: React.FC<{ estado: Estado; children: React.ReactNode; rayada?: bo
 );
 
 interface TriageMobileViewProps {
+  /**
+   * Lleva el documento adjuntado a «Revisiones», ya leido, para que lo lea la
+   * pantalla que si extrae plazos. Se ofrece SOLO cuando el documento anuncia
+   * un termino; ver `AvisoDePlazoEnElAdjunto`.
+   *
+   * OPCIONAL, Y SU AUSENCIA ES UNA RESPUESTA: quien monte esta pantalla sin
+   * saber navegar a Revisiones ve el aviso sin boton, en vez de un boton que
+   * no hace nada.
+   */
+  onLeerRecibido?: (texto: string, nombre: string) => void;
+
   /*
    * Convierte una sugerencia en borrador SIN volver a escribir los hechos: el
    * abogado ya los escribio aqui, y pedirlos otra vez convierte un flujo de dos
@@ -132,7 +144,7 @@ interface TriageMobileViewProps {
   onDraft: (actuacionName: string, branch: string, hechos: string, instruccion: string) => void;
 }
 
-export const TriageMobileView: React.FC<TriageMobileViewProps> = ({ onDraft }) => {
+export const TriageMobileView: React.FC<TriageMobileViewProps> = ({ onDraft, onLeerRecibido }) => {
   const [hechos, setHechos] = React.useState('');
   /*
    * ADJUNTAR, TAMBIÉN AQUÍ. En el teléfono es donde más pesa: nadie transcribe
@@ -222,6 +234,16 @@ export const TriageMobileView: React.FC<TriageMobileViewProps> = ({ onDraft }) =
                   <p className="text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
                     El documento es largo: se leyó el comienzo del documento.
                   </p>
+                )}
+                {adjuntoHechos.adjunto.plazo && (
+                  <AvisoDePlazoEnElAdjunto
+                    plazo={adjuntoHechos.adjunto.plazo}
+                    onLeer={
+                      onLeerRecibido && adjuntoHechos.adjunto
+                        ? () => onLeerRecibido(adjuntoHechos.adjunto!.texto, adjuntoHechos.adjunto!.nombre)
+                        : undefined
+                    }
+                  />
                 )}
               </div>
             ) : (

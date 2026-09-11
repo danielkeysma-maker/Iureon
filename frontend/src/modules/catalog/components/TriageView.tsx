@@ -20,6 +20,7 @@ import {
   type TriageResponse
 } from '../services/catalog.api';
 import { indiceDelPrimario, porTerminoMasCorto } from '../triageOrder';
+import { AvisoDePlazoEnElAdjunto } from './AvisoDePlazoEnElAdjunto';
 import { ARCHIVOS_DE_HECHOS, useHechosDesdeArchivo } from '../hechosDesdeArchivo';
 import { PanelDeInstruccion } from './PanelDeInstruccion';
 import { ApiError } from '../../../config/httpClient';
@@ -48,6 +49,17 @@ import type { MainView } from '../../tenant/types';
 
 interface TriageViewProps {
   /**
+   * Lleva el documento adjuntado a «Revisiones», ya leido, para que lo lea la
+   * pantalla que si extrae plazos. Se ofrece SOLO cuando el documento anuncia
+   * un termino; ver `AvisoDePlazoEnElAdjunto`.
+   *
+   * OPCIONAL, Y SU AUSENCIA ES UNA RESPUESTA: quien monte esta pantalla sin
+   * saber navegar a Revisiones ve el aviso sin boton, en vez de un boton que
+   * no hace nada.
+   */
+  onLeerRecibido?: (texto: string, nombre: string) => void;
+
+  /**
    * Turns a suggestion into a draft carrying the name AND the facts.
    *
    * The facts travel because the lawyer already wrote them here. Asking for
@@ -75,7 +87,7 @@ const EJEMPLOS = [
   'El padre de los niños no ha dado alimentos en ocho meses.'
 ];
 
-export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) => {
+export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView, onLeerRecibido }) => {
   const [hechos, setHechos] = React.useState('');
   /*
    * EL DOCUMENTO QUE LLEGÓ, ADJUNTO. Lo que el abogado tiene delante es el
@@ -308,6 +320,16 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView }) 
                   <p className="text-justify text-meta text-ink-500 [text-wrap:pretty]">
                     El documento es largo: se leyó el comienzo del documento.
                   </p>
+                )}
+                {adjuntoHechos.adjunto.plazo && (
+                  <AvisoDePlazoEnElAdjunto
+                    plazo={adjuntoHechos.adjunto.plazo}
+                    onLeer={
+                      onLeerRecibido && adjuntoHechos.adjunto
+                        ? () => onLeerRecibido(adjuntoHechos.adjunto!.texto, adjuntoHechos.adjunto!.nombre)
+                        : undefined
+                    }
+                  />
                 )}
               </div>
             ) : (

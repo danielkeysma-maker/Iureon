@@ -81,8 +81,11 @@ jobs:
       - run: npm ci
       - name: Lint
         run: npm run lint
-      - name: Design tokens, interview guide and document format checks
-        run: npm run check:tokens && npm run check:guion && npm run check:formato && npm run check:informe && npm run check:membrete && npm run check:marcas && npm run check:estructura && npm run check:diff && npm run check:calculadoras && npm run check:instruccion && npm run check:rama-candidata && npm run check:navegacion
+      # Los DESCUBRE de package.json en vez de listarlos: una lista a mano
+      # envejece en silencio y deja checks fuera del CI. Ya pasó con los del
+      # backend (28 de 50 corrían) y estaba a punto de repetirse aquí.
+      - name: Frontend checks
+        run: node scripts/run-all-checks.mjs
       - name: Build
         run: npm run build
 

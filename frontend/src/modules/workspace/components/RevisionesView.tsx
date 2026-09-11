@@ -6,6 +6,7 @@ import type { DatosDelTaller } from './TallerDeRevision';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 import { PANTALLAS, recordado, recordar } from '../../tenant/pantallaRecordada';
 import { dejarPendiente } from '../../agenda/pendiente';
+import { tomarDocumentoParaLeer, type DocumentoParaLeer } from '../documentoParaLeer';
 import { RevisarEscritoDialog } from './RevisarEscritoDialog';
 import type { ActuacionRole } from '../../catalog/types';
 
@@ -78,6 +79,26 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({
   const [confirmacion, setConfirmacion] = React.useState<Confirmacion | null>(null);
   /* El diálogo de revisión, abierto desde aquí: sin actuación heredada, la elige él. */
   const [revisarAbierto, setRevisarAbierto] = React.useState(false);
+  /*
+   * ─── EL DOCUMENTO QUE VIENE DE ORIENTACION ────────────────────────────────
+   *
+   * Orientacion acepta adjuntar el auto que llego y NO lee plazos. Cuando el
+   * documento anuncia un termino, ofrece traerlo aqui, que es la pantalla que
+   * si lo lee; llega por `sessionStorage` para no atravesar media aplicacion
+   * con un prop, igual que la agenda.
+   *
+   * SE RECOGE AL MONTAR Y SE CONSUME: si se quedara, el dialogo volveria a
+   * abrirse solo con el auto de la semana pasada cada vez que alguien entra a
+   * Revisiones — y una revision cuesta saldo.
+   */
+  const [traido, setTraido] = React.useState<DocumentoParaLeer | null>(null);
+
+  React.useEffect(() => {
+    const d = tomarDocumentoParaLeer();
+    if (!d) return;
+    setTraido(d);
+    setRevisarAbierto(true);
+  }, []);
   /*
    * LA AUTORIZACION, A LA VISTA. El usuario vio el aviso ambar en el taller y
    * no encontro donde autorizar: el boton solo aparecia dentro del taller y
@@ -251,7 +272,12 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({
         {!soloLectura && (
           <RevisarEscritoDialog
             abierto={revisarAbierto}
-            onCerrar={() => setRevisarAbierto(false)}
+            documentoTraido={traido}
+            onCerrar={() => {
+              setRevisarAbierto(false);
+              /* Cerrar el dialogo suelta el documento: no vuelve a ponerse solo. */
+              setTraido(null);
+            }}
             documentType=""
             legalBranch=""
             eligeActuacion
