@@ -39,6 +39,14 @@ export const NOVEDADES_ID = 'novedades';
 
 export const NOVEDADES: readonly Novedad[] = [
   {
+    fecha: '2026-09-11',
+    titulo: 'El informe de un documento recibido ya sabe a quién representa usted',
+    detalle:
+      'Al leer un documento que le llegó, el diálogo pregunta ahora «A quién representa en este proceso»: al demandante, al demandado, a la víctima o a la persona procesada en su etapa. No es obligatorio y arranca sin declarar. Con la respuesta, cada carga sale con su dueño: la que el documento le impone a la otra parte aparece marcada «Esta carga no es suya», con el destinatario que el propio documento nombra, y deja de pedirle que vaya a contar días por ella. Antes el informe decía «Qué LE exige y para cuándo» sin saber qué parte era usted, así que un auto que ordena al demandante subsanar en cinco días se lo publicaba igual al apoderado del demandado. Sin declarar posición, el rótulo pasa a «Qué exige el documento y para cuándo» y no se atribuye nada: la aplicación prefiere callar antes que suponerle un lado. Solo habla cuando el documento nombra a una sola parte; con «las partes», con los dos bandos a la vez o en una reconvención —donde los papeles se invierten— se queda en silencio. Lo mismo sale en el Word y en el PDF.',
+    modulo: 'Revisiones',
+    tipo: 'mejora'
+  },
+  {
     fecha: '2026-09-10',
     titulo: 'El interrogatorio se prepara desde el expediente, persona por persona',
     detalle:

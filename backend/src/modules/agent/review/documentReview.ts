@@ -36,6 +36,9 @@
  * corta a los 60. Más allá, el corte se declara; la salida de verdad es una
  * revisión asíncrona, que es otra pieza.
  */
+import type { PapelEnElExpediente } from '../../expedientes/types';
+import type { AQuienLeToca } from './posicionProcesal';
+
 export const MAX_CARACTERES_REVISION = 300_000;
 
 export const PREGUNTA_POR_DEFECTO =
@@ -254,6 +257,8 @@ LA REGLA QUE MANDA SOBRE TODAS: SOLO PUEDES AFIRMAR LO QUE ESTÁ ESCRITO EN EL D
 
 CITA EL DOCUMENTO. Cada carga y cada plazo van acompañados de las palabras exactas del documento que los imponen, copiadas literalmente, sin corregirlas ni parafrasearlas.
 
+DI A QUIÉN SE DIRIGE CADA CARGA, Y NO DECIDAS SI ES DEL LECTOR. En «aQuien» copia cómo nombra el documento a quien le impone esa carga: «el demandante», «la parte ejecutada», «el apoderado del accionante». Son palabras del documento, no tuyas. Si el documento no identifica a quién se la impone, deja «aQuien» vacío. ESTÁ PROHIBIDO que escribas si la carga es o no del abogado que te consulta, aunque te haya dicho a quién representa: eso lo resuelve la aplicación comparando, no tú. Tu trabajo es transcribir el destinatario.
+
 EL PLAZO ES CITADO O ESTÁ VACÍO. Si el documento anuncia un término, escríbelo tal como él lo anuncia y copia la frase. Si NO lo anuncia, deja el plazo como cadena vacía: no lo completes con lo que sabes, ni lo deduzcas del tipo de providencia. Un plazo recordado es indistinguible de uno leído hasta que el abogado lo pierde.
 
 NO ACONSEJES QUÉ ACTUACIÓN PRESENTAR ni qué recurso interponer, salvo que el propio documento lo anuncie, y entonces lo citas. La actuación que procede la resuelve el catálogo verificado de la aplicación, no tú.
@@ -274,7 +279,7 @@ RESPONDE ÚNICAMENTE CON UN OBJETO JSON, sin texto antes ni después, con esta f
   "radicado": "el radicado o número de proceso tal como aparece; vacío si no aparece",
   "fecha": "la fecha del documento tal como aparece; vacío si no aparece",
   "decide": ["qué decide u ordena, en concreto, una frase por punto"],
-  "cargas": [{"carga": "qué le exige a usted, en concreto", "plazo": "el término tal como lo anuncia el documento, o vacío si no lo anuncia", "cita": "las palabras exactas del documento que imponen esa carga y ese plazo"}],
+  "cargas": [{"carga": "qué exige el documento, en concreto", "aQuien": "a quién se lo exige, con las palabras del documento, o vacío si no lo identifica", "plazo": "el término tal como lo anuncia el documento, o vacío si no lo anuncia", "cita": "las palabras exactas del documento que imponen esa carga y ese plazo"}],
   "loQueSigue": ["qué queda pendiente o cuál es el paso siguiente del trámite, SEGÚN LO QUE EL PROPIO DOCUMENTO DIGA"],
   "noLoDiceElDocumento": ["lo que un abogado esperaría encontrar aquí y este documento no dice: el plazo, la autoridad ante quien se acude, el recurso procedente, la fecha de notificación"],
   "porDondeSeAtaca": [{"clase": "NO_SE_SOSTIENE | TENSION_CON_LA_NORMA | NO_RESUELVE | SIN_APOYO_CITADO", "cita": "las palabras exactas del documento en que se apoya el punto", "norma": "el artículo tal como el documento lo nombra, o vacío", "citaDeLaNorma": "lo que el DOCUMENTO dice que esa norma ordena, copiado de él, o vacío", "lectura": "tu lectura de esa tensión o de ese vacío, en una frase, sin concluir en derecho"}]
@@ -303,13 +308,37 @@ ${input.texto}
 """`;
 };
 
-/** Una carga que el documento le impone al abogado, con el plazo que él mismo anuncia. */
+/** Una carga que el documento impone, con el plazo que él mismo anuncia. */
 export interface CargaDelDocumento {
   carga: string;
   /** Tal como lo anuncia el documento. Vacío cuando el documento no anuncia ninguno. */
   plazo: string;
   /** Las palabras exactas del documento que la imponen. */
   cita: string;
+  /**
+   * A QUIÉN SE LA IMPONE EL DOCUMENTO, con las palabras del documento.
+   *
+   * «el demandante», «la parte ejecutada», «el apoderado del accionante». Es
+   * transcripción, no juicio: el motor NO decide si la carga es del lector.
+   * Esa comparación la hace `posicionProcesal.ts` contra la posición que el
+   * abogado declaró, de forma determinista y reproducible.
+   *
+   * Vacío cuando el documento no identifica destinatario, y entonces no se
+   * atribuye nada. Puede faltar en informes guardados antes de que existiera.
+   */
+  aQuien: string;
+  /**
+   * EL VEREDICTO, Y LO PONE EL SERVIDOR — NUNCA EL MODELO.
+   *
+   * `parsearInformeRecibido` NO lo lee de la respuesta: lo calcula el
+   * controlador con `aQuienLeToca`, comparando `aQuien` contra la posicion
+   * que declaro el abogado. Si algun dia el modelo devolviera este campo, se
+   * ignora, y hay un guarda que lo asevera.
+   *
+   * Se guarda junto al informe en vez de recalcularse al pintar: el informe
+   * es la lectura de un dia, bajo una posicion concreta.
+   */
+  deQuienEs?: AQuienLeToca;
 }
 
 export interface InformeDeDocumentoRecibido {
@@ -331,6 +360,23 @@ export interface InformeDeDocumentoRecibido {
    * debe tolerar `undefined`.
    */
   porDondeSeAtaca: PuntoDeAtaque[];
+  /**
+   * A QUIÉN REPRESENTA EL ABOGADO, tal como él lo declaró al pedir el informe.
+   *
+   * Viaja DENTRO del informe y no en columna propia por lo mismo que los dos
+   * informes comparten la columna `informe`: es JSONB y añadir una columna
+   * hermana obliga a una migración para un dato que solo esta forma usa.
+   *
+   * Y se GUARDA, no se recalcula al pintar: un informe que se abre tres
+   * semanas después tiene que atribuir las cargas igual que el día que se
+   * pidió. Si mañana el abogado cambia de posición en el expediente, el
+   * informe viejo sigue diciendo lo que dijo, que es lo correcto — fue leído
+   * bajo esa posición.
+   *
+   * Ausente en todo informe anterior a este campo: quien lo lea tolera
+   * `undefined` y entonces no atribuye nada.
+   */
+  posicion?: PapelEnElExpediente | null;
 }
 
 export interface ErrorDeAplicacion {
@@ -662,7 +708,7 @@ const cargas = (v: unknown): CargaDelDocumento[] => {
   return v
     .map((e) => {
       const o = (e ?? {}) as Record<string, unknown>;
-      return { carga: cadena(o.carga), plazo: cadena(o.plazo), cita: cadena(o.cita) };
+      return { carga: cadena(o.carga), plazo: cadena(o.plazo), cita: cadena(o.cita), aQuien: cadena(o.aQuien) };
     })
     .filter((e) => e.carga || e.cita);
 };

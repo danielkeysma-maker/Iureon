@@ -27,6 +27,8 @@ import { etiquetaDeAtaque, puntosDeAtaqueDe } from '../services/ataque';
 import { LecturaDelDocumentoRecibido, SeccionDeInforme } from './LecturaDelDocumentoRecibido';
 import { PuenteAlAtaque } from './PuenteAlAtaque';
 import type { ActuacionRole } from '../../catalog/types';
+import { COMO_SE_REPRESENTA, PAPELES_REPRESENTABLES } from '../../expedientes/types';
+import type { PapelEnElExpediente } from '../../expedientes/types';
 
 /**
  * Revisar un escrito ya redactado.
@@ -182,6 +184,11 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
    * encontraba.
    */
   const [modo, setModo] = React.useState<ModoDeRevision>('ESCRITO_PROPIO');
+  /*
+   * A quien representa el abogado. Arranca sin declarar, que es lo honesto:
+   * suponerle una posicion produciria exactamente el aviso equivocado.
+   */
+  const [posicion, setPosicion] = React.useState<PapelEnElExpediente>('DESCONOCIDO');
   const esRecibido = modo === 'DOCUMENTO_RECIBIDO';
   const [archivo, setArchivo] = React.useState<File | null>(null);
   const [texto, setTexto] = React.useState('');
@@ -548,7 +555,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
        */
       const r = await reviewApi.revisar(
         esRecibido
-          ? { modo, documentType: '', pregunta, cliente: cliente.trim(), ...cuerpo }
+          ? { modo, documentType: '', pregunta, cliente: cliente.trim(), posicion, ...cuerpo }
           : { modo, documentType: tipo, legalBranch: rama, pregunta, cliente: cliente.trim(), ...cuerpo }
       );
       setParaElTaller({ texto: r.texto ?? null, conversacion: [], anotaciones: [], versiones: [], guardaTexto: Boolean(r.guardaTexto), revisionId: r.id ?? null, archivo });
@@ -858,6 +865,45 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
               ))}
             </div>
           </div>
+
+          {/* ─── A QUIÉN REPRESENTA, Y SOLO EN EL MODO RECIBIDO ──────────── */}
+          {/*
+            Sobre un escrito PROPIO no tiene sentido: el autor es él y no hay a
+            quién atribuirle nada. Sobre uno RECIBIDO lo cambia todo — sin esta
+            respuesta, un auto que ordena al demandante subsanar en cinco días
+            se le publicaba al apoderado del demandado bajo el rótulo «qué le
+            exige y para cuándo».
+
+            NO ES OBLIGATORIO, y por eso el valor por defecto es no decirlo. Un
+            campo obligatorio aquí frenaría la lectura del auto —que es lo que
+            el abogado vino a hacer— por un dato que solo mejora un aviso.
+          */}
+          {esRecibido && (
+            <div>
+              <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
+                A quién representa en este proceso
+              </p>
+              <label className="sr-only" htmlFor="posicion-procesal">
+                A quién representa en este proceso
+              </label>
+              <select
+                id="posicion-procesal"
+                className="field mt-1.5"
+                value={posicion}
+                onChange={(e) => setPosicion(e.target.value as PapelEnElExpediente)}
+              >
+                {PAPELES_REPRESENTABLES.map((p) => (
+                  <option key={p} value={p}>
+                    {COMO_SE_REPRESENTA[p]}
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1 text-[11px] leading-snug text-ink-500 text-justify [text-wrap:pretty]">
+                Con esto, el informe separa las cargas que son suyas de las que el documento le impone a la
+                otra parte. Sin esto las muestra todas sin decir de quién son.
+              </p>
+            </div>
+          )}
 
           {/* ─── EL ESCRITO: archivo o texto ─────────────────────────────── */}
           <div>

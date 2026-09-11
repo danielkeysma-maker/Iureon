@@ -248,6 +248,8 @@ export const dibujarInformeEnPdf = (doc: jsPDF, F: string, d: DatosDeExportacion
   /* ─── Cuerpo del documento recibido ────────────────────────────────────── */
   if (d.modo === 'DOCUMENTO_RECIBIDO') {
     const r = d.informe;
+    /* Igual que en la pantalla: sin posición declarada no se habla en segunda persona. */
+    const seSabeLaPosicion = Boolean(r.posicion) && r.posicion !== 'DESCONOCIDO';
     if (r.queEs) bloque(r.queEs, cuerpoPt + 0.5);
     const identificacion = [
       r.quienLoProfirio && `Lo profirió: ${r.quienLoProfirio}`,
@@ -260,32 +262,63 @@ export const dibujarInformeEnPdf = (doc: jsPDF, F: string, d: DatosDeExportacion
     }
     seccion('Qué decide u ordena', r.decide);
 
+    /*
+     * EL RÓTULO SOLO DICE «LE» SI SE SABE A QUIÉN. Y aquí importa más que en
+     * la pantalla: un PDF se imprime, se archiva y se lee meses después, sin
+     * nadie al lado que aclare que la app no sabía qué parte era el lector.
+     */
+    const rotuloCargas = seSabeLaPosicion ? 'Qué le exige y para cuándo' : 'Qué exige el documento y para cuándo';
+
     if (r.cargas.length > 0) {
-      titulo('Qué le exige y para cuándo');
+      titulo(rotuloCargas);
       for (const c of r.cargas) {
         if (c.carga) bloque(c.carga, cuerpoPt);
+        /* De quién es, cuando el servidor pudo decirlo sin ambigüedad. */
+        if (c.deQuienEs === 'DE_OTRO') {
+          bloque(`Esta carga NO es suya: el documento se la impone a ${c.aQuien}.`, cuerpoPt, 'bold', 4, NOTA, false);
+        } else if (c.aQuien) {
+          bloque(`El documento se la impone a ${c.aQuien}.`, cuerpoPt - 1, 'normal', 4, NOTA, false);
+        }
         /*
          * EL PLAZO VACÍO SE ESCRIBE, NO SE OMITE. Saltarse la línea dejaría al
          * lector suponiendo que no había plazo o que se olvidó decirlo; aquí se
          * afirma lo único que se sabe — que el documento no lo anuncia — y se
          * remite a donde ese dato sí está verificado.
+         *
+         * SALVO QUE LA CARGA SEA AJENA: ahí no falta ningún plazo suyo, y el
+         * aviso de ir a contar días al catálogo sería un encargo que nadie le
+         * hizo. Se escribe el plazo si el documento lo trae, y nada si no.
          */
-        bloque(
-          c.plazo
-            ? `Plazo que anuncia el documento: ${c.plazo}`
-            : 'El documento no anuncia plazo para esta carga. Consúltelo en la guía de actuaciones del catálogo antes de contar días.',
-          cuerpoPt,
-          'bold',
-          4,
-          c.plazo ? TITULO : NOTA,
-          false
-        );
+        if (c.plazo) {
+          bloque(
+            `Plazo que anuncia el documento: ${c.plazo}`,
+            cuerpoPt,
+            'bold',
+            4,
+            c.deQuienEs === 'DE_OTRO' ? NOTA : TITULO,
+            false
+          );
+        } else if (c.deQuienEs !== 'DE_OTRO') {
+          bloque(
+            'El documento no anuncia plazo para esta carga. Consúltelo en la guía de actuaciones del catálogo antes de contar días.',
+            cuerpoPt,
+            'bold',
+            4,
+            NOTA,
+            false
+          );
+        }
         if (c.cita) bloque(`Dice el documento: «${c.cita}»`, cuerpoPt - 1, 'italic', 4, NOTA);
         y += 1.5;
       }
     } else {
-      titulo('Qué le exige y para cuándo');
-      bloque('Del texto de este documento no se desprende ninguna carga a su cargo.', cuerpoPt);
+      titulo(rotuloCargas);
+      bloque(
+        seSabeLaPosicion
+          ? 'Del texto de este documento no se desprende ninguna carga a su cargo.'
+          : 'Del texto de este documento no se desprende ninguna carga.',
+        cuerpoPt
+      );
     }
 
     seccion('Qué queda pendiente, según el documento', r.loQueSigue);

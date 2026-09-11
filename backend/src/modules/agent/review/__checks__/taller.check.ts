@@ -155,7 +155,14 @@ check('un JSON con respuesta vacía cae a la prosa cruda, nunca a nada', vacia.r
       radicado: '2026-00345',
       fecha: '3 de septiembre de 2026',
       decide: ['Decreta la práctica de interrogatorio'],
-      cargas: [{ carga: 'Aportar el dictamen', plazo: 'treinta (30) días', cita: 'por el término de treinta (30) días' }],
+      cargas: [
+        {
+          carga: 'Aportar el dictamen',
+          aQuien: 'la parte demandada',
+          plazo: 'treinta (30) días',
+          cita: 'por el término de treinta (30) días'
+        }
+      ],
       loQueSigue: ['Audiencia por fijar'],
       noLoDiceElDocumento: ['No dice desde cuándo corre el término'],
       porDondeSeAtaca: [

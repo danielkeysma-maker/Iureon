@@ -971,6 +971,7 @@ const A_DOCUMENTO_RECIBIDO: ManualArticle = {
         'Abra «Revisiones» y pulse «Revisar un documento». También sirve «Revisar un documento: suyo o recibido» en Redacción: es el mismo diálogo con los dos modos.',
         'En «Qué trae», pulse «Un documento que recibí». El bloque «Qué actuación es» desaparece entero, y el rótulo del adjunto pasa a decir «El documento que recibió».',
         'Suba el archivo o pegue el texto completo del documento. El cuadro de pegar espera el documento entero, no la pregunta: «No la pregunta: ésa va más abajo».',
+        'En «A quién representa en este proceso», escoja a su cliente: «Represento al demandante», «Represento al demandado», la víctima o la persona procesada en su etapa. No es obligatorio y arranca en «Prefiero no decirlo por ahora»; lo que cambia es que el informe pueda separar las cargas suyas de las de la otra parte.',
         'Si quiere, escriba en «Qué quiere saber» lo que le interesa; está marcado «· opcional» y, vacío, el informe sale igual.',
         'Pulse «Revisar», que muestra el precio. Se enciende con solo el documento: no falta nada más.',
         'Lea el informe ahí mismo y descárguelo con «Word» o «PDF», al pie del diálogo. Salen con todo, «Por dónde se ataca» incluida.'
@@ -983,7 +984,8 @@ const A_DOCUMENTO_RECIBIDO: ManualArticle = {
         'Qué es el documento, en una frase.',
         '«Según el propio documento»: quién lo profirió, el radicado y la fecha, y solo si el texto los trae. Lo que el documento no diga, no aparece.',
         '«Qué decide u ordena».',
-        '«Qué le exige y para cuándo»: cada carga con su plazo y, debajo, las palabras exactas del documento entre comillas, bajo el rótulo «Dice el documento». Si del texto no se desprende ninguna carga a su cargo, lo dice.',
+        '«Qué le exige y para cuándo»: cada carga con su plazo y, debajo, las palabras exactas del documento entre comillas, bajo el rótulo «Dice el documento». Si del texto no se desprende ninguna carga, lo dice.',
+        'De quién es cada carga, cuando se puede saber. Si declaró a quién representa y el documento nombra a una sola parte, la carga ajena sale marcada «Esta carga no es suya» con el destinatario que el documento nombra, y no se le pide ir a contar días por ella. Si no declaró posición, el rótulo pasa a «Qué exige el documento y para cuándo» y las cargas salen sin atribuir: la aplicación no supone de qué lado está usted.',
         '«Qué queda pendiente, según el documento» y «Lo que el documento no dice».',
         '«Por dónde se ataca»: hasta tres flancos. Cada uno lleva la cita del documento; la norma solo se nombra cuando el propio documento la transcribe, y con su texto al lado; y el criterio va aparte, rotulado «Lectura del revisor». Un flanco sin cita no llega a la pantalla, y si no hay ninguno anclado en el texto, la sección no se dibuja.'
       ]

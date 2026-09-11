@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, UserX } from 'lucide-react';
 import type { InformeDeDocumentoRecibido } from '../services/review.api';
 import { etiquetaDeAtaque, puntosDeAtaqueDe } from '../services/ataque';
 
@@ -66,6 +66,12 @@ export interface LecturaDelDocumentoRecibidoProps {
  */
 export const LecturaDelDocumentoRecibido: React.FC<LecturaDelDocumentoRecibidoProps> = ({ informe, pie }) => {
   const puntos = puntosDeAtaqueDe(informe);
+  /*
+   * SI SE SABE QUÉ PARTE ES EL LECTOR. Falta en todo informe anterior a este
+   * campo y cuando el abogado prefirió no decirlo; en los dos casos la
+   * pantalla deja de hablar en segunda persona en vez de suponerla.
+   */
+  const seSabeLaPosicion = Boolean(informe.posicion) && informe.posicion !== 'DESCONOCIDO';
   const identificacion = [
     informe.quienLoProfirio && { etiqueta: 'Lo profirió', valor: informe.quienLoProfirio },
     informe.radicado && { etiqueta: 'Radicado', valor: informe.radicado },
@@ -93,16 +99,60 @@ export const LecturaDelDocumentoRecibido: React.FC<LecturaDelDocumentoRecibidoPr
       <SeccionDeInforme titulo="Qué decide u ordena" items={informe.decide} />
 
       <section>
-        <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">Qué le exige y para cuándo</h4>
+        {/*
+          EL RÓTULO CAMBIA SEGÚN SE SEPA A QUIÉN, y no es cosmético. «Qué LE
+          exige» afirma que la carga es del lector; mientras no se sepa qué
+          parte es, esa afirmación no se puede hacer y el rótulo se limita a lo
+          que sí consta: qué exige el documento.
+        */}
+        <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
+          {seSabeLaPosicion ? 'Qué le exige y para cuándo' : 'Qué exige el documento y para cuándo'}
+        </h4>
         {informe.cargas.length === 0 ? (
           <p className="mt-1.5 text-ui leading-snug text-ink-900 text-justify">
-            Del texto de este documento no se desprende ninguna carga a su cargo.
+            {/*
+              «Ninguna carga A SU CARGO» decía de quién no era la carga sin
+              saber quién era el lector. Sin posición declarada se dice lo
+              único comprobado: que el documento no impone ninguna.
+            */}
+            {seSabeLaPosicion
+              ? 'Del texto de este documento no se desprende ninguna carga a su cargo.'
+              : 'Del texto de este documento no se desprende ninguna carga.'}
           </p>
         ) : (
           <div className="mt-1.5 space-y-2.5">
             {informe.cargas.map((c, k) => (
               <div key={k} className="rounded-control border border-line-200 bg-canvas px-3 py-2.5">
                 {c.carga && <p className="text-ui leading-snug text-ink-900 text-justify [text-wrap:pretty]">{c.carga}</p>}
+                {/*
+                  DE QUIÉN ES, cuando se puede decir. El veredicto lo calcula
+                  el servidor comparando a quién se la impone el documento con
+                  la posición que el abogado declaró; aquí solo se pinta.
+
+                  «No es suya» va primero y destacado porque es el que evita
+                  trabajo y evita el susto. «Es suya» va discreto: confirma sin
+                  gritar. Y sin veredicto se muestra el destinatario tal cual
+                  lo escribió el documento, que informa sin atribuir.
+                */}
+                {c.deQuienEs === 'DE_OTRO' && (
+                  <p className="mt-1.5 flex items-start gap-1.5 text-ui leading-snug text-ink-700">
+                    <UserX className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink-400" />
+                    <span className="min-w-0 text-justify">
+                      <span className="font-semibold">Esta carga no es suya.</span> El documento se la impone a{' '}
+                      <span className="[overflow-wrap:anywhere]">{c.aQuien}</span>.
+                    </span>
+                  </p>
+                )}
+                {c.deQuienEs === 'SUYA' && (
+                  <p className="mt-1.5 text-meta text-ink-500">
+                    El documento se la impone a {c.aQuien}: le corresponde a usted.
+                  </p>
+                )}
+                {c.deQuienEs !== 'DE_OTRO' && c.deQuienEs !== 'SUYA' && c.aQuien && (
+                  <p className="mt-1.5 text-meta text-ink-500 [overflow-wrap:anywhere]">
+                    El documento se la impone a {c.aQuien}.
+                  </p>
+                )}
                 {/*
                   EL PLAZO AUSENTE SE DICE CON TODAS SUS LETRAS. Callarlo dejaría
                   al abogado suponiendo que no hay plazo —que es lo contrario de
@@ -111,7 +161,27 @@ export const LecturaDelDocumentoRecibido: React.FC<LecturaDelDocumentoRecibidoPr
                   sale ese plazo está en el catálogo verificado.
                 */}
                 {c.plazo ? (
-                  <p className="mt-1.5 text-ui font-semibold leading-snug text-brand-700">Plazo que anuncia el documento: {c.plazo}</p>
+                  /*
+                    EL PLAZO AJENO NO SE PINTA EN ROJO DE FIRMA. Es el mismo
+                    dato y no es la misma noticia: en el color del plazo propio
+                    vuelve a ser una alarma, que es justo lo que esta sección
+                    existe para no hacer.
+                  */
+                  <p
+                    className={`mt-1.5 text-ui leading-snug ${
+                      c.deQuienEs === 'DE_OTRO' ? 'text-ink-600' : 'font-semibold text-brand-700'
+                    }`}
+                  >
+                    Plazo que anuncia el documento: {c.plazo}
+                  </p>
+                ) : c.deQuienEs === 'DE_OTRO' ? (
+                  /*
+                    Y SI LA CARGA ES AJENA, NO FALTA NINGÚN PLAZO SUYO. El aviso
+                    de abajo manda a buscar el término al catálogo, que es
+                    consejo para quien tiene que cumplir: sobre la carga de la
+                    contraparte es ruido que compite con los avisos de verdad.
+                  */
+                  null
                 ) : (
                   <p className="notice-unverified mt-1.5" role="status">
                     <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-unverified" />

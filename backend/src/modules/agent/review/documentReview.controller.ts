@@ -40,6 +40,8 @@ import {
   verificarVigenciaDelInforme
 } from './vigenciaDelInforme';
 import { ENGINE, callOpenRouterWithUsage } from '../openrouter.client';
+import { aQuienLeToca, esPapelRepresentable } from './posicionProcesal';
+import type { PapelEnElExpediente } from '../../expedientes/types';
 import {
   ETIQUETA_DOCUMENTO_RECIBIDO,
   buildRecibidoSystemPrompt,
@@ -257,6 +259,20 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
   const fileName = String(req.body.fileName ?? 'escrito.txt');
   /* De qué cliente o proceso es el escrito: lo dice quien pide la revisión, y queda en la lista. */
   const cliente = String(req.body.cliente ?? '').trim().slice(0, 160);
+  /*
+   * A QUIÉN REPRESENTA EL ABOGADO EN ESTE PROCESO.
+   *
+   * Solo tiene sentido sobre un documento RECIBIDO: en el escrito propio, el
+   * autor es él y no hay a quién atribuirle nada.
+   *
+   * Lo que no se reconozca cae a `DESCONOCIDO`, que es lo mismo que no haber
+   * contestado: con él no se atribuye ninguna carga. Un valor raro no puede
+   * tratarse como una posición cualquiera — atribuir por un dato corrupto es
+   * justo el error que este campo existe para evitar.
+   */
+  const posicion: PapelEnElExpediente = esPapelRepresentable(req.body.posicion)
+    ? req.body.posicion
+    : 'DESCONOCIDO';
 
   /*
    * LA EXIGENCIA DE ACTUACIÓN NO SE RELAJA: SE CIRCUNSCRIBE AL MODO QUE LA
@@ -396,7 +412,26 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
     }
 
     const informe: InformeDeRevision | null = esRecibido ? null : parsearInforme(llamada.text);
-    const informeRecibido: InformeDeDocumentoRecibido | null = esRecibido ? parsearInformeRecibido(llamada.text) : null;
+    const leido = esRecibido ? parsearInformeRecibido(llamada.text) : null;
+    /*
+     * LA POSICIÓN SE SELLA EN EL INFORME, no se recalcula al pintarlo. Un
+     * informe que se abre tres semanas después tiene que atribuir las cargas
+     * igual que el día que se pidió; si para entonces el abogado cambió de
+     * posición, lo que se leyó bajo la anterior sigue siendo lo que se leyó.
+     */
+    const informeRecibido: InformeDeDocumentoRecibido | null = leido
+      ? {
+          ...leido,
+          posicion,
+          /*
+           * EL VEREDICTO LO PONE AQUÍ EL CÓDIGO, comparando lo que el motor
+           * transcribió contra lo que el abogado declaró. El modelo no opina
+           * sobre de quién es la carga y, si lo hiciera, el parser ya descartó
+           * ese campo: `deQuienEs` no se lee de la respuesta.
+           */
+          cargas: leido.cargas.map((c) => ({ ...c, deQuienEs: aQuienLeToca(c.aQuien, posicion) }))
+        }
+      : null;
     const seOrdeno = esRecibido ? informeRecibido !== null : informe !== null;
     if (!seOrdeno) {
       // Shape only, never content: the brief and the report are the lawyer's.

@@ -1,3 +1,4 @@
+import type { PapelEnElExpediente } from '../../expedientes/types';
 import { httpClient } from '../../../config/httpClient';
 
 /**
@@ -59,6 +60,17 @@ export interface CargaDelDocumento {
   plazo: string;
   /** Las palabras exactas del documento que imponen la carga y el plazo. */
   cita: string;
+  /**
+   * A quien se la impone el documento, con las palabras del documento. Vacio
+   * cuando no identifica destinatario. Falta en informes anteriores al campo.
+   */
+  aQuien?: string;
+  /**
+   * El veredicto, y LO PONE EL SERVIDOR comparando `aQuien` con la posicion
+   * declarada. El motor no opina sobre esto. Falta en informes anteriores al
+   * campo, y entonces la pantalla no atribuye nada.
+   */
+  deQuienEs?: 'SUYA' | 'DE_OTRO' | 'NO_SE_SABE';
 }
 
 /* ─── POR DÓNDE SE ATACA ────────────────────────────────────────────────────
@@ -97,6 +109,12 @@ export interface InformeDeDocumentoRecibido {
   noLoDiceElDocumento: string[];
   /** Falta en los informes guardados antes de que la sección existiera. */
   porDondeSeAtaca?: PuntoDeAtaque[];
+  /**
+   * A quién representaba el abogado cuando pidió este informe. Se guarda con
+   * el informe y no se recalcula: uno abierto tres semanas después tiene que
+   * atribuir las cargas igual que el día que se leyó.
+   */
+  posicion?: PapelEnElExpediente | null;
 }
 
 /** El archivo tal como se subió, cuando se conservó en el almacenamiento de la firma. */
@@ -156,6 +174,11 @@ export interface PeticionDeRevision {
   conservarOriginal?: boolean;
   /** MIME que declaró el navegador; decide con qué visor se abre el original. */
   contentType?: string;
+  /**
+   * A quién representa el abogado en este proceso. Solo tiene sentido en el
+   * modo recibido: sin ella el informe no atribuye ninguna carga.
+   */
+  posicion?: PapelEnElExpediente;
 }
 
 export interface RevisionGuardada {

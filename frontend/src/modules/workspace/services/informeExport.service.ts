@@ -161,23 +161,75 @@ export const exportarInformeAWord = async (d: DatosDeExportacion): Promise<void>
     );
     seccion('Qué decide u ordena', r.decide);
 
-    hijos.push(titulo('Qué le exige y para cuándo'));
+    /*
+     * «LE» SOLO SI SE SABE A QUIÉN, igual que en la pantalla y en el PDF. Un
+     * Word se reenvía y se archiva: la afirmación en segunda persona viaja más
+     * lejos que la sesión en que se hizo.
+     */
+    const seSabeLaPosicion = Boolean(r.posicion) && r.posicion !== 'DESCONOCIDO';
+    hijos.push(titulo(seSabeLaPosicion ? 'Qué le exige y para cuándo' : 'Qué exige el documento y para cuándo'));
     if (r.cargas.length) {
       for (const c of r.cargas) {
         if (c.carga) hijos.push(p(c.carga, { after: 40 }));
-        /* El plazo ausente se declara: callarlo se leería como que no hay plazo. */
-        hijos.push(
-          p(
-            c.plazo
-              ? `Plazo que anuncia el documento: ${c.plazo}`
-              : 'El documento no anuncia plazo para esta carga. Consúltelo en la guía de actuaciones del catálogo antes de contar días.',
-            { bold: true, color: c.plazo ? titulos : gris, indent: 360, after: 40, justificar: false }
-          )
-        );
+        /* De quién es, cuando el servidor pudo decirlo sin ambigüedad. */
+        if (c.deQuienEs === 'DE_OTRO') {
+          hijos.push(
+            p(`Esta carga NO es suya: el documento se la impone a ${c.aQuien}.`, {
+              bold: true,
+              color: gris,
+              indent: 360,
+              after: 40,
+              justificar: false
+            })
+          );
+        } else if (c.aQuien) {
+          hijos.push(
+            p(`El documento se la impone a ${c.aQuien}.`, {
+              size: base - 2,
+              color: gris,
+              indent: 360,
+              after: 40,
+              justificar: false
+            })
+          );
+        }
+        /*
+         * El plazo ausente se declara: callarlo se leería como que no hay
+         * plazo. Salvo en la carga ajena, donde no falta ningún plazo suyo y
+         * el encargo de ir a contar días al catálogo no es de quien lee.
+         */
+        if (c.plazo) {
+          hijos.push(
+            p(`Plazo que anuncia el documento: ${c.plazo}`, {
+              bold: true,
+              color: c.deQuienEs === 'DE_OTRO' ? gris : titulos,
+              indent: 360,
+              after: 40,
+              justificar: false
+            })
+          );
+        } else if (c.deQuienEs !== 'DE_OTRO') {
+          hijos.push(
+            p('El documento no anuncia plazo para esta carga. Consúltelo en la guía de actuaciones del catálogo antes de contar días.', {
+              bold: true,
+              color: gris,
+              indent: 360,
+              after: 40,
+              justificar: false
+            })
+          );
+        }
         if (c.cita) hijos.push(p(`Dice el documento: «${c.cita}»`, { italics: true, size: base - 2, color: gris, indent: 360, after: 160 }));
       }
     } else {
-      hijos.push(p('Del texto de este documento no se desprende ninguna carga a su cargo.', { after: 120 }));
+      hijos.push(
+        p(
+          seSabeLaPosicion
+            ? 'Del texto de este documento no se desprende ninguna carga a su cargo.'
+            : 'Del texto de este documento no se desprende ninguna carga.',
+          { after: 120 }
+        )
+      );
     }
 
     seccion('Qué queda pendiente, según el documento', r.loQueSigue);

@@ -99,6 +99,51 @@ export const SE_LE_PREGUNTA: readonly PapelEnElExpediente[] = [
   'PERITO'
 ];
 
+/**
+ * A QUIÉN PUEDE REPRESENTAR EL ABOGADO cuando lee un documento que recibió.
+ *
+ * Copia de `PAPELES_REPRESENTABLES` del backend, y el servidor manda: lo que
+ * no esté en su lista cae a `DESCONOCIDO` y no atribuye ninguna carga. Si las
+ * dos se separaran, la pantalla ofrecería una posición que el servidor va a
+ * descartar — y el abogado creería haberla declarado.
+ *
+ * Se pregunta por el papel de SU CLIENTE, no por el suyo: por eso no están los
+ * apoderados, y no están el estrado ni la prueba porque a nadie de ahí se le
+ * representa. `DESCONOCIDO` va de último y es el valor por defecto.
+ */
+export const PAPELES_REPRESENTABLES: readonly PapelEnElExpediente[] = [
+  'DEMANDANTE',
+  'DEMANDADO',
+  'VICTIMA',
+  'INDICIADO',
+  'IMPUTADO',
+  'ACUSADO',
+  'PROCESADO',
+  'CONDENADO',
+  'DESCONOCIDO'
+];
+
+/**
+ * Cómo se le pregunta en la pantalla de revisión, que NO es como se nombra al
+ * actor en el expediente.
+ *
+ * Allí se rotula a un tercero —«Demandante»— y aquí se declara una relación:
+ * «Represento al demandante». Reusar la etiqueta corta haría leer el
+ * desplegable como «yo soy el demandante», que es falso: el abogado es el
+ * apoderado y el demandante es su cliente.
+ */
+export const COMO_SE_REPRESENTA: Record<string, string> = {
+  DEMANDANTE: 'Represento al demandante (accionante, ejecutante, convocante)',
+  DEMANDADO: 'Represento al demandado (accionado, ejecutado, convocado)',
+  VICTIMA: 'Represento a la víctima',
+  INDICIADO: 'Represento al indiciado',
+  IMPUTADO: 'Represento al imputado',
+  ACUSADO: 'Represento al acusado',
+  PROCESADO: 'Represento al procesado',
+  CONDENADO: 'Represento al condenado',
+  DESCONOCIDO: 'Prefiero no decirlo por ahora'
+};
+
 export type LadoEnElExpediente = 'PROPIO' | 'CONTRARIO' | 'NEUTRAL';
 
 export const NOMBRE_DE_LADO: Record<LadoEnElExpediente, string> = {
