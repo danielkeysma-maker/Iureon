@@ -192,6 +192,15 @@ export interface ExpedienteConDetalle extends Expediente {
     terminos: number;
     orientaciones: number;
   };
+  /**
+   * A quien representa la firma, DEDUCIDO por el servidor de los actores ya
+   * registrados. `null` cuando no se puede deducir sin adivinar.
+   *
+   * Es una sugerencia para prellenar, nunca una orden: el abogado la ve en el
+   * desplegable y puede cambiarla. Falta en respuestas de servidores
+   * anteriores al campo, asi que se lee tolerando `undefined`.
+   */
+  posicionSugerida?: PapelEnElExpediente | null;
 }
 
 export interface PreguntaParaAlguien {

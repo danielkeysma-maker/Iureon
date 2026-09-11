@@ -1,4 +1,5 @@
 import { supabase } from '../../config/supabase.config';
+import { posicionSegunElExpediente } from './posicionDelExpediente';
 import {
   ESTADOS_DE_EXPEDIENTE,
   LADOS,
@@ -225,10 +226,20 @@ export const obtenerExpediente = async (
     contar('orientaciones')
   ]);
 
+  const lista = ((actores ?? []) as FilaDeActor[]).map(aActor);
+
   return {
     ...aExpediente(fila, clienteNombre),
-    listaDeActores: ((actores ?? []) as FilaDeActor[]).map(aActor),
-    piezas: { entrevistas, audiencias, revisiones, borradores, terminos, orientaciones }
+    listaDeActores: lista,
+    piezas: { entrevistas, audiencias, revisiones, borradores, terminos, orientaciones },
+    /*
+     * LA POSICION SE DEDUCE AQUI Y NO EN LA PANTALLA. El informe de un
+     * documento recibido la necesita para decir de quien es cada carga, y
+     * calcularla en el navegador significaria dos copias de la misma regla
+     * que se separan a la primera correccion. Devuelve `null` cuando no se
+     * puede deducir sin adivinar; ver `posicionDelExpediente.ts`.
+     */
+    posicionSugerida: posicionSegunElExpediente(lista, fila.cliente_id ?? null)
   };
 };
 
@@ -345,6 +356,29 @@ export const borrarExpediente = async (firmId: string, id: string): Promise<void
 };
 
 // ─── ACTORES ────────────────────────────────────────────────────────────────
+
+/**
+ * ¿Es de esta firma?, para quien NO puede lanzar.
+ *
+ * La version que lanza sirve dentro de este modulo, donde un expediente ajeno
+ * es un error de la peticion. Fuera —la revision, que ata su informe a un
+ * caso— hace falta preguntarlo y decidir: alli el expediente es un extra, y
+ * tumbar una revision ya pagada por una atadura invalida seria cobrar por
+ * nada.
+ *
+ * Existe porque el aislamiento de esta casa lo da el `.eq('firm_id')` de cada
+ * consulta y no la politica: un id que llega del cuerpo de una peticion se
+ * comprueba o no se usa.
+ */
+export const esExpedienteDeLaFirma = async (firmId: string, expedienteId: string): Promise<boolean> => {
+  const { data } = await db()
+    .from('expedientes')
+    .select('id')
+    .eq('firm_id', firmId)
+    .eq('id', expedienteId)
+    .maybeSingle();
+  return Boolean(data);
+};
 
 /** Comprueba que el expediente sea de la firma antes de tocar a sus hijos. */
 const expedienteDeLaFirma = async (firmId: string, expedienteId: string): Promise<void> => {

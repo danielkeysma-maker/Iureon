@@ -126,6 +126,18 @@ export interface NuevaRevision {
   cobradoCop: number;
   /** El texto revisado, solo si la firma autorizó conservarlo. */
   textoOriginal?: string | null;
+  /**
+   * DE QUÉ CASO ES, cuando el abogado lo dijo al pedir la revisión.
+   *
+   * La columna existía desde la migración de expedientes y solo la escribía
+   * «Traer al expediente», es decir, DESPUÉS y a mano. Una revisión puede
+   * nacer atada, y entonces el expediente la cuenta sin que nadie vuelva a
+   * buscarla.
+   *
+   * El controlador comprueba que el expediente sea de la firma antes de
+   * pasarla: llega del cuerpo de una petición y aquí no se valida nada.
+   */
+  expedienteId?: string | null;
 }
 
 /** A row as Supabase returns it → what the API hands out. Pure; tolerant to nulls. */
@@ -215,7 +227,8 @@ export const documentReviewStore = {
         informe_libre: n.informeLibre,
         cobrado_cop: n.cobradoCop,
         texto_original: n.textoOriginal ?? null,
-        texto_trabajo: n.textoOriginal ?? null
+        texto_trabajo: n.textoOriginal ?? null,
+        expediente_id: n.expedienteId ?? null
       })
       .select('id')
       .single();

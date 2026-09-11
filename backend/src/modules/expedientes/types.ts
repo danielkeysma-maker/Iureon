@@ -209,6 +209,14 @@ export interface ExpedienteConDetalle extends Expediente {
     terminos: number;
     orientaciones: number;
   };
+  /**
+   * A QUIEN REPRESENTA LA FIRMA, DEDUCIDO de los actores ya registrados.
+   *
+   * `null` cuando no se puede deducir sin adivinar. Es una SUGERENCIA para
+   * prellenar el desplegable del informe de un documento recibido, nunca una
+   * orden: el abogado la ve y puede cambiarla. Ver `posicionDelExpediente.ts`.
+   */
+  posicionSugerida: PapelEnElExpediente | null;
 }
 
 export interface DatosDeExpediente {

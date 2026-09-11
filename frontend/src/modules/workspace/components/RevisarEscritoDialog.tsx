@@ -28,6 +28,8 @@ import { LecturaDelDocumentoRecibido, SeccionDeInforme } from './LecturaDelDocum
 import { PuenteAlAtaque } from './PuenteAlAtaque';
 import type { ActuacionRole } from '../../catalog/types';
 import { COMO_SE_REPRESENTA, PAPELES_REPRESENTABLES } from '../../expedientes/types';
+import type { Expediente } from '../../expedientes/types';
+import { expedientesApi } from '../../expedientes/services/expedientes.api';
 import type { PapelEnElExpediente } from '../../expedientes/types';
 
 /**
@@ -202,6 +204,22 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
    * suponerle una posicion produciria exactamente el aviso equivocado.
    */
   const [posicion, setPosicion] = React.useState<PapelEnElExpediente>('DESCONOCIDO');
+  /*
+   * ─── DE QUE CASO ES, Y POR QUE ESO PRELLENA LA POSICION ──────────────────
+   *
+   * La columna `document_reviews.expediente_id` existia y solo la escribia
+   * «Traer al expediente», o sea DESPUES y a mano. Diciendolo aqui, la
+   * revision NACE atada: el expediente la cuenta sin que nadie vuelva a
+   * buscarla.
+   *
+   * Y de paso deja de preguntarse algo que la aplicacion ya sabe. Si el
+   * expediente tiene registrado a su cliente como actor, su papel ES la
+   * posicion; el servidor la deduce y la manda en `posicionSugerida`, con
+   * `null` cuando no se puede deducir sin adivinar.
+   */
+  const [expedientes, setExpedientes] = React.useState<Expediente[]>([]);
+  const [expedienteId, setExpedienteId] = React.useState('');
+  const [posicionDeducida, setPosicionDeducida] = React.useState(false);
   const esRecibido = modo === 'DOCUMENTO_RECIBIDO';
   const [archivo, setArchivo] = React.useState<File | null>(null);
   const [texto, setTexto] = React.useState('');
@@ -340,6 +358,52 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
     setArchivo(null);
     setTexto(documentoTraido.completo ? documentoTraido.texto : '');
   }, [abierto, documentoTraido]);
+
+  /*
+   * La lista de expedientes se pide al ABRIR y no al montar: el dialogo vive
+   * montado detras de la pantalla y pedirla antes seria una consulta por cada
+   * visita a Revisiones, se abra o no.
+   */
+  React.useEffect(() => {
+    if (!abierto) return;
+    let vivo = true;
+    expedientesApi
+      .listar()
+      .then((e) => {
+        if (vivo) setExpedientes(e);
+      })
+      .catch(() => {
+        /* Sin lista, el selector no se pinta y todo lo demas sigue igual. */
+        if (vivo) setExpedientes([]);
+      });
+    return () => {
+      vivo = false;
+    };
+  }, [abierto]);
+
+  /*
+   * AL ESCOGER CASO SE PIDE SU DETALLE Y SE PRELLENA LA POSICION.
+   *
+   * Solo si el abogado no la habia tocado: una sugerencia que pisa lo que el
+   * escribio no es una sugerencia. `posicionDeducida` recuerda que el valor
+   * actual lo puso el servidor, asi que cambiar de caso si puede
+   * reemplazarlo — pero una eleccion suya, no.
+   */
+  const eligeExpediente = async (id: string): Promise<void> => {
+    setExpedienteId(id);
+    if (!id) return;
+    try {
+      const detalle = await expedientesApi.obtener(id);
+      const sugerida = detalle.posicionSugerida;
+      if (!sugerida) return;
+      if (posicion === 'DESCONOCIDO' || posicionDeducida) {
+        setPosicion(sugerida);
+        setPosicionDeducida(true);
+      }
+    } catch {
+      /* El detalle es un extra: sin el, el desplegable se llena a mano. */
+    }
+  };
 
   React.useEffect(() => {
     if (!abierto) return;
@@ -586,7 +650,15 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
        */
       const r = await reviewApi.revisar(
         esRecibido
-          ? { modo, documentType: '', pregunta, cliente: cliente.trim(), posicion, ...cuerpo }
+          ? {
+              modo,
+              documentType: '',
+              pregunta,
+              cliente: cliente.trim(),
+              posicion,
+              expedienteId: expedienteId || undefined,
+              ...cuerpo
+            }
           : { modo, documentType: tipo, legalBranch: rama, pregunta, cliente: cliente.trim(), ...cuerpo }
       );
       setParaElTaller({ texto: r.texto ?? null, conversacion: [], anotaciones: [], versiones: [], guardaTexto: Boolean(r.guardaTexto), revisionId: r.id ?? null, archivo });
@@ -925,6 +997,42 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
             </p>
           )}
 
+          {/* ─── DE QUÉ CASO ES ──────────────────────────────────────────
+            Va ENCIMA de la posición porque es lo que la deduce: escoger el
+            caso contesta la pregunta de abajo sin que nadie la responda.
+
+            Solo se pinta si la firma tiene expedientes. Un desplegable vacío
+            con «— sin expediente —» y nada más no ofrece nada y enseña que
+            sobra un campo. */}
+          {esRecibido && expedientes.length > 0 && (
+            <div>
+              <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
+                De qué caso es
+              </p>
+              <label className="sr-only" htmlFor="expediente-de-la-revision">
+                De qué caso es
+              </label>
+              <select
+                id="expediente-de-la-revision"
+                className="field mt-1.5"
+                value={expedienteId}
+                onChange={(e) => void eligeExpediente(e.target.value)}
+              >
+                <option value="">— sin expediente —</option>
+                {expedientes.map((e) => (
+                  <option key={e.id} value={e.id}>
+                    {e.caratula}
+                    {e.radicado ? ` · ${e.radicado}` : ''}
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1 text-[11px] leading-snug text-ink-500 text-justify [text-wrap:pretty]">
+                La lectura queda guardada dentro del caso, y si el expediente ya sabe a quién representa
+                usted, lo de abajo se llena solo.
+              </p>
+            </div>
+          )}
+
           {esRecibido && (
             <div>
               <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
@@ -937,7 +1045,11 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
                 id="posicion-procesal"
                 className="field mt-1.5"
                 value={posicion}
-                onChange={(e) => setPosicion(e.target.value as PapelEnElExpediente)}
+                onChange={(e) => {
+                  setPosicion(e.target.value as PapelEnElExpediente);
+                  /* Escogida a mano: cambiar de caso ya no la pisa. */
+                  setPosicionDeducida(false);
+                }}
               >
                 {PAPELES_REPRESENTABLES.map((p) => (
                   <option key={p} value={p}>
@@ -946,8 +1058,9 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
                 ))}
               </select>
               <p className="mt-1 text-[11px] leading-snug text-ink-500 text-justify [text-wrap:pretty]">
-                Con esto, el informe separa las cargas que son suyas de las que el documento le impone a la
-                otra parte. Sin esto las muestra todas sin decir de quién son.
+                {posicionDeducida
+                  ? 'Tomado del expediente, de quien registró como su cliente. Cámbielo si no es así.'
+                  : 'Con esto, el informe separa las cargas que son suyas de las que el documento le impone a la otra parte. Sin esto las muestra todas sin decir de quién son.'}
               </p>
             </div>
           )}

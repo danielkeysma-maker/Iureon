@@ -179,6 +179,11 @@ export interface PeticionDeRevision {
    * modo recibido: sin ella el informe no atribuye ninguna carga.
    */
   posicion?: PapelEnElExpediente;
+  /**
+   * De qué caso es la revisión. El servidor comprueba que el expediente sea
+   * de la firma ANTES de reservar saldo, y responde 404 si no lo es.
+   */
+  expedienteId?: string;
 }
 
 export interface RevisionGuardada {

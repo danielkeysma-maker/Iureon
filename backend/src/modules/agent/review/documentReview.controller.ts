@@ -41,6 +41,7 @@ import {
 } from './vigenciaDelInforme';
 import { ENGINE, callOpenRouterWithUsage } from '../openrouter.client';
 import { aQuienLeToca, esPapelRepresentable } from './posicionProcesal';
+import { esExpedienteDeLaFirma } from '../../expedientes/expedientes.service';
 import type { PapelEnElExpediente } from '../../expedientes/types';
 import {
   ETIQUETA_DOCUMENTO_RECIBIDO,
@@ -273,6 +274,17 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
   const posicion: PapelEnElExpediente = esPapelRepresentable(req.body.posicion)
     ? req.body.posicion
     : 'DESCONOCIDO';
+  /*
+   * DE QUÉ CASO ES LA REVISIÓN, si el abogado lo dijo.
+   *
+   * La columna `document_reviews.expediente_id` existía desde la migración de
+   * expedientes y solo la escribía «Traer al expediente» — es decir, DESPUÉS y
+   * a mano. Una revisión puede nacer atada, y entonces el caso la cuenta sin
+   * que nadie tenga que volver a buscarla.
+   */
+  const expedienteId = typeof req.body.expedienteId === 'string' && req.body.expedienteId.trim()
+    ? req.body.expedienteId.trim()
+    : null;
 
   /*
    * LA EXIGENCIA DE ACTUACIÓN NO SE RELAJA: SE CIRCUNSCRIBE AL MODO QUE LA
@@ -358,6 +370,25 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
       success: false,
       error: 'TEXT_TOO_SHORT',
       message: `El texto tiene ${preparado.caracteres} caracteres; un escrito revisable tiene al menos ${TEXTO_MINIMO}. Si es un PDF escaneado, no trae texto: péguelo.`
+    });
+    return;
+  }
+
+  /*
+   * SE COMPRUEBA ANTES DE RESERVAR, no al guardar. El id llega del cuerpo de
+   * una petición y el aislamiento de esta casa lo da el filtro por firma en
+   * cada consulta, no la política: sin esto, una revisión podría quedar atada
+   * al expediente de otra firma.
+   *
+   * Y va temprano a propósito. Comprobarlo al final significaría descubrir el
+   * error con el informe ya escrito y ya pagado, y entonces solo quedarían dos
+   * salidas malas: perder la revisión, o guardarla desatada en silencio.
+   */
+  if (expedienteId && !(await esExpedienteDeLaFirma(firmId, expedienteId))) {
+    res.status(404).json({
+      success: false,
+      error: 'EXPEDIENTE_NO_ENCONTRADO',
+      message: 'Ese expediente no existe.'
     });
     return;
   }
@@ -537,7 +568,8 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
       informeRecibido,
       informeLibre: seOrdeno ? null : llamada.text,
       cobradoCop: cobro.charged,
-      textoOriginal: consentimiento.guarda ? preparado.texto : null
+      textoOriginal: consentimiento.guarda ? preparado.texto : null,
+      expedienteId
     });
 
     /*

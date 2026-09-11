@@ -397,6 +397,8 @@ check(
 );
 
 const EXPEDIENTE: ExpedienteConDetalle = {
+  /* El servidor la deduce de los actores; este fixture no la ejercita. */
+  posicionSugerida: null,
   id: 'exp-1',
   caratula: 'Mosquera vs. ACME',
   radicado: null,
