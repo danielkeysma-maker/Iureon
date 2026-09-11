@@ -7,6 +7,7 @@ import {
   borrarActorController,
   borrarExpedienteController,
   candidatosController,
+  buscarEnExpedienteController,
   documentosDelExpedienteController,
   quitarDocumentoController,
   crearExpedienteController,
@@ -65,6 +66,13 @@ router.post('/expedientes/:id/indexar', bloquearSiPlanVencido, indexarEnExpedien
 
 /* Lo que el expediente tiene indexado. La lectura no bloquea con el plan vencido. */
 router.get('/expedientes/:id/documentos', documentosDelExpedienteController as any);
+
+/*
+ * Buscar dentro del expediente. NO lleva `bloquearSiPlanVencido`: es lectura de
+ * lo que la firma ya subio, y quitarle la busqueda de sus propios papeles por
+ * un pago atrasado seria tomarle el trabajo de rehen.
+ */
+router.get('/expedientes/:id/buscar', buscarEnExpedienteController as any);
 router.delete(
   '/expedientes/:id/documentos/:documentId',
   bloquearSiPlanVencido,

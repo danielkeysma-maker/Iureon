@@ -35,6 +35,13 @@ export interface DocumentoIndexado {
   indexadoEl: string;
 }
 
+/** Un pasaje del expediente que responde a lo que se buscó. */
+export interface PasajeDelExpediente {
+  documento: string;
+  texto: string;
+  similitud: number;
+}
+
 /** Una pieza de la firma que se puede traer a un expediente. */
 export interface Candidato {
   tipo: TipoDePieza;
@@ -147,6 +154,20 @@ export const expedientesApi = {
       `/api/expedientes/${expedienteId}/documentos`
     );
     return revisar(data, 'No se pudieron cargar los documentos del expediente.').documentos;
+  },
+
+  /**
+   * Busca dentro del expediente. NO consume saldo: es la consulta contra un
+   * índice ya pagado, sin llamada a ningún modelo de lenguaje.
+   */
+  async buscar(
+    expedienteId: string,
+    q: string
+  ): Promise<{ estado: string; razon: string | null; pasajes: PasajeDelExpediente[] }> {
+    const data = await httpClient.get<
+      Respuesta & { estado: string; razon: string | null; pasajes: PasajeDelExpediente[] }
+    >(`/api/expedientes/${expedienteId}/buscar?q=${encodeURIComponent(q)}`);
+    return revisar(data, 'No se pudo buscar en el expediente.');
   },
 
   async quitarDocumento(expedienteId: string, documentId: string): Promise<void> {

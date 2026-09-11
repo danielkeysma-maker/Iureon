@@ -20,6 +20,7 @@ import { PreguntasDelExpedientePanel } from './PreguntasDelExpedientePanel';
 import { TraerAlExpediente } from './TraerAlExpediente';
 import { IndexarEnExpediente } from './IndexarEnExpediente';
 import { ClienteDelExpediente } from './ClienteDelExpediente';
+import { BuscarEnExpediente } from './BuscarEnExpediente';
 
 /**
  * LOS EXPEDIENTES DE LA FIRMA.
@@ -232,6 +233,8 @@ export const ExpedientesView: React.FC = () => {
         <ClienteDelExpediente expediente={abierto} onCambio={refrescarAbierto} />
 
         <IndexarEnExpediente expediente={abierto} onIndexado={refrescarAbierto} />
+
+        <BuscarEnExpediente expediente={abierto} />
 
         <TraerAlExpediente expediente={abierto} onCambio={refrescarAbierto} />
 

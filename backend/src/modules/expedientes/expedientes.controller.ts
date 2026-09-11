@@ -14,6 +14,7 @@ import {
 } from './expedientes.service';
 import { TIPOS_DE_PIEZA, type DatosDeActor, type TipoDePieza } from './types';
 import { candidatosDeLaFirma, documentosDelExpediente, quitarDocumento } from './candidatos.service';
+import { vectorSearchService } from '../search/vectorSearch.service';
 
 /**
  * Los expedientes de la firma. Ver `types.ts` para el porqué del módulo.
@@ -290,5 +291,74 @@ export const quitarDocumentoController = async (req: Request, res: Response): Pr
     res.json({ success: true, fragmentos: quitados });
   } catch (err) {
     fallar(res, err, 'No se pudo quitar el documento.');
+  }
+};
+
+/**
+ * GET /api/expedientes/:id/buscar?q=… — buscar DENTRO del expediente.
+ *
+ * ─── POR QUÉ ESTA PUERTA VALE MÁS QUE UNA CARPETA ──────────────────────────
+ *
+ * Un expediente de trescientas páginas no se navega: se pregunta. Escribir
+ * «entrega del inmueble» y ver los tres pasajes que hablan de eso, con el
+ * documento del que salieron al lado, es lo que un índice de carpetas no puede
+ * dar por muchos niveles que tenga.
+ *
+ * ─── NO CUESTA SALDO, Y POR ESO NO SE COBRA ────────────────────────────────
+ *
+ * Buscar es un embedding de la consulta —unas pocas palabras— contra un índice
+ * que ya está pagado. No llama a ningún modelo de lenguaje. Cobrar por esto
+ * sería cobrar por leer lo que el abogado ya subió.
+ *
+ * ─── ACOTADO AL CASO, Y SIN EL CORPUS PÚBLICO ──────────────────────────────
+ *
+ * El corpus de jurisprudencia entra en las búsquedas del interrogatorio
+ * —porque la ley es de todos los casos— pero NO aquí: quien busca dentro de su
+ * expediente quiere sus papeles, y devolverle una sentencia de la Corte
+ * mezclada con ellos convierte «buscar en mi caso» en otro buscador de
+ * jurisprudencia, que ya existe en su propio módulo.
+ */
+export const buscarEnExpedienteController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const firmId = req.firmId as string;
+    await exigirModulo(firmId, 'EXPEDIENTES');
+    const expediente = await obtenerExpediente(firmId, String(req.params.id));
+
+    const q = String(req.query.q ?? '').trim();
+    if (q.length < 3) {
+      res.status(400).json({
+        success: false,
+        error: 'CONSULTA_CORTA',
+        message: 'Escriba al menos tres letras de lo que busca.'
+      });
+      return;
+    }
+
+    const hallado = await vectorSearchService.search(firmId, q, 12, expediente.id);
+
+    /*
+     * Fuera el corpus compartido. La RPC lo deja entrar siempre —y hace bien,
+     * porque el interrogatorio lo necesita— así que el filtro va aquí, donde se
+     * sabe que la pregunta es «qué dice MI expediente».
+     */
+    const delCaso = hallado.matches.filter((m) => m.firmId === firmId);
+
+    res.json({
+      success: true,
+      /*
+       * El estado viaja tal cual. `NO_PROVIDER` o `NO_INDEX` no son «sin
+       * resultados»: son «no se pudo buscar», y confundirlos deja al abogado
+       * creyendo que su expediente no dice nada de lo que preguntó.
+       */
+      estado: hallado.status,
+      razon: hallado.reason ?? null,
+      pasajes: delCaso.map((m) => ({
+        documento: m.fileName ?? m.documentId,
+        texto: m.contentChunk,
+        similitud: m.similarity
+      }))
+    });
+  } catch (err) {
+    fallar(res, err, 'No se pudo buscar en el expediente.');
   }
 };

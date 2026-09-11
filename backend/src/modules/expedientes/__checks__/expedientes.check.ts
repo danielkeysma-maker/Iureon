@@ -619,6 +619,56 @@ check(
   'treinta fragmentos convertirian el interrogatorio en un resumen del expediente'
 );
 
+/* ─── 12. BUSCAR DENTRO DEL EXPEDIENTE ───────────────────────────────────── */
+
+const controladorExp = leer('modules/expedientes/expedientes.controller.ts');
+
+check(
+  'buscar en el expediente va acotado a ESE caso',
+  /vectorSearchService\.search\(firmId, q, \d+, expediente\.id\)/.test(controladorExp),
+  'sin el id del caso devolveria papeles de otro cliente'
+);
+
+/*
+ * EL CORPUS PUBLICO NO ENTRA AQUI, y si en el interrogatorio. La RPC lo deja
+ * pasar siempre —hace bien: la ley es de todos los casos— asi que el filtro va
+ * en el controlador. Quien busca dentro de SU expediente quiere sus papeles;
+ * devolverle una sentencia de la Corte mezclada convierte esto en un segundo
+ * buscador de jurisprudencia, que ya existe en su propio modulo.
+ */
+check(
+  'y no mezcla el corpus publico con los papeles del caso',
+  /const delCaso = hallado\.matches\.filter\(\(m\) => m\.firmId === firmId\)/.test(controladorExp),
+  'buscar en mi caso no es buscar jurisprudencia'
+);
+
+/*
+ * «NO SE PUDO BUSCAR» NO ES «NO HAY RESULTADOS». Sin proveedor o sin indice,
+ * decir «nada coincide» dejaria al abogado creyendo que su expediente no habla
+ * de lo que pregunto — y decidiendo sobre esa falsedad.
+ */
+const pantallaDeBusqueda = readFileSync(
+  join(process.cwd(), '..', 'frontend', 'src', 'modules', 'expedientes', 'components', 'BuscarEnExpediente.tsx'),
+  'utf8'
+);
+check(
+  'el estado de la busqueda viaja, y la pantalla distingue «no se pudo» de «no hay»',
+  /estado: hallado\.status/.test(controladorExp) && /r\.estado !== 'OK'/.test(pantallaDeBusqueda),
+  'un fallo del indice no puede leerse como un expediente que no dice nada'
+);
+
+/*
+ * BUSCAR NO COBRA. Es un embedding de unas pocas palabras contra un indice ya
+ * pagado, sin modelo de lenguaje de por medio. Si algun dia alguien le mete una
+ * reserva de saldo, este check lo dice.
+ */
+const bloqueBuscar = controladorExp.slice(controladorExp.indexOf('buscarEnExpedienteController'));
+check(
+  'y no cobra: no hay reserva de saldo en el camino de buscar',
+  !/reserveForOperation|settleOperation/.test(bloqueBuscar),
+  'cobrar por buscar seria cobrar por leer lo que el abogado ya subio'
+);
+
 console.log('');
 console.log(fallos === 0 ? 'ALL CHECKS PASSED' : `${fallos} CHECKS FAILED`);
 process.exit(fallos === 0 ? 0 : 1);
