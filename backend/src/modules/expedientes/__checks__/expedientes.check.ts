@@ -748,15 +748,46 @@ check(
   /padre_id UUID REFERENCES public\.expediente_carpetas\(id\) ON DELETE CASCADE/.test(migracionCarpetas),
   'dejarlas sueltas llena la raiz de huerfanas que nadie sabe de donde salieron'
 );
+/*
+ * Y TAMBIEN SUS DOCUMENTOS. Esto estuvo al reves: la primera version los
+ * conservaba subiendolos a la raiz, para que un gesto de ordenar no borrara
+ * trescientas paginas indexadas. El dueno lo corrigio con razon — en cualquier
+ * gestor de archivos borrar una carpeta borra su contenido, y pelear con esa
+ * intuicion no evita el dano, lo cambia de sitio: el abogado los da por
+ * perdidos mientras siguen saliendo en las busquedas desde una raiz donde
+ * nadie los puso.
+ */
 check(
-  'pero NO se lleva los documentos: suben a la raiz y siguen buscandose',
-  /carpeta_id UUID[\s\S]{0,80}REFERENCES public\.expediente_carpetas\(id\) ON DELETE SET NULL/.test(migracionCarpetas),
-  'un documento indexado costo una vectorizacion y es del expediente'
+  'y tambien sus documentos, que es lo que el abogado espera al borrar una carpeta',
+  /\.from\('legal_documents'\)[\s\S]{0,200}\.delete\(\)[\s\S]{0,200}\.in\('carpeta_id', rama\)/.test(carpetas),
+  'borrar una carpeta borra su contenido, como en cualquier gestor de archivos'
+);
+
+/*
+ * PERO NO SIN PREGUNTAR, Y CON NUMEROS. Una accion que no se deshace no puede
+ * no preguntar —la primera version borraba de un clic— y «se borrara todo lo
+ * que contiene» sin cifras no advierte nada: el abogado no sabe si son dos
+ * archivos o trescientas paginas que costo vectorizar.
+ */
+check(
+  'se pregunta antes, con el dialogo de la casa y no con uno del navegador',
+  /ConfirmarDialog/.test(pantallaCarpetas) && !/window\.confirm|confirm\(/.test(sinComentarios(pantallaCarpetas)),
+  'una accion que no se deshace no puede no preguntar'
 );
 check(
-  'y al borrar se DICE que se fue y que no',
-  /Los documentos siguen en el expediente, en la ra/.test(controladorExp),
-  'un borrado silencioso se lee como haber perdido lo de dentro'
+  'y el dialogo dice CUANTO se va, no solo que se va',
+  /contenidoDeCarpeta/.test(pantallaCarpetas) && /documento\(s\) indexado\(s\)/.test(pantallaCarpetas),
+  'sin numeros, la advertencia no advierte'
+);
+check(
+  'si la cuenta falla, NO se dice que la carpeta esta vacia',
+  /prometer un n/.test(pantallaCarpetas),
+  'decir «vacia» porque el conteo fallo es la peor forma de equivocarse en un borrado'
+);
+check(
+  'y despues se informa con numeros lo que efectivamente se fue',
+  /subcarpeta\(s\)/.test(controladorExp) && /Se borr/.test(controladorExp),
+  'lo advertido y lo ocurrido pueden no coincidir: alguien pudo mover algo en medio'
 );
 
 /*

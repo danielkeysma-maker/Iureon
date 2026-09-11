@@ -10,6 +10,7 @@ import {
   Rows3,
   X
 } from 'lucide-react';
+import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 import { expedientesApi, type Carpeta, type DocumentoIndexado } from '../services/expedientes.api';
 import type { ExpedienteConDetalle } from '../types';
 
@@ -78,6 +79,7 @@ export const CarpetasDelExpediente: React.FC<{
   const [nombre, setNombre] = React.useState('');
   const [error, setError] = React.useState('');
   const [ocupado, setOcupado] = React.useState(false);
+  const [confirmacion, setConfirmacion] = React.useState<Confirmacion | null>(null);
 
   const cargar = React.useCallback(async () => {
     setError('');
@@ -139,19 +141,69 @@ export const CarpetasDelExpediente: React.FC<{
     }
   };
 
-  const borrar = async (carpetaId: string): Promise<void> => {
-    setOcupado(true);
+  /**
+   * ─── BORRAR UNA CARPETA SE LLEVA LO DE DENTRO, Y SE PREGUNTA ANTES ───────
+   *
+   * La primera versión borraba de un clic y conservaba los documentos,
+   * subiéndolos a la raíz. Las dos cosas estaban mal.
+   *
+   * Lo de conservar, porque en cualquier gestor de archivos borrar una carpeta
+   * borra su contenido: pelear con esa intuición no evita el daño, lo cambia
+   * de sitio — el abogado da los documentos por perdidos mientras siguen
+   * apareciendo en las búsquedas desde una raíz donde nadie los puso.
+   *
+   * Y lo del clic, porque una acción que no se deshace no puede no preguntar.
+   * El diálogo dice CUÁNTO se va, no solo que se va: «se borrará todo lo que
+   * contiene» sin números no advierte nada — el abogado no sabe si son dos
+   * archivos o trescientas páginas que costó vectorizar.
+   */
+  const pedirBorrado = async (c: Carpeta): Promise<void> => {
     setError('');
+    let dentro = { subcarpetas: 0, documentos: 0 };
     try {
-      const mensaje = await expedientesApi.borrarCarpeta(expediente.id, carpetaId);
-      /* El mensaje del servidor dice qué se fue y qué no. Se muestra tal cual. */
-      setError(mensaje);
-      await cargar();
+      dentro = await expedientesApi.contenidoDeCarpeta(expediente.id, c.id);
     } catch (err) {
+      /*
+       * Si no se pudo contar, se pregunta igual pero SIN prometer un número.
+       * Decir «está vacía» porque la cuenta falló sería la peor forma de
+       * equivocarse en un diálogo de borrado.
+       */
       setError((err as Error).message);
-    } finally {
-      setOcupado(false);
     }
+
+    const partes = [
+      dentro.subcarpetas > 0 ? `${dentro.subcarpetas} subcarpeta(s)` : null,
+      dentro.documentos > 0 ? `${dentro.documentos} documento(s) indexado(s)` : null
+    ].filter(Boolean);
+
+    setConfirmacion({
+      titulo: `Borrar «${c.nombre}»`,
+      texto:
+        partes.length > 0 ? (
+          <>
+            Se borrará la carpeta con <span className="font-semibold">{partes.join(' y ')}</span>. Los
+            documentos dejarán de estar en el expediente y de aparecer en las búsquedas; para volver a
+            tenerlos habría que indexarlos de nuevo. Esto no se deshace.
+          </>
+        ) : (
+          <>Esta carpeta está vacía. Se borrará la carpeta.</>
+        ),
+      etiqueta: 'Borrar la carpeta',
+      peligro: true,
+      onConfirmar: async () => {
+        setOcupado(true);
+        try {
+          /* El mensaje del servidor dice, con números, lo que efectivamente se fue. */
+          setError(await expedientesApi.borrarCarpeta(expediente.id, c.id));
+          if (aqui === c.id) setAqui(c.padreId);
+          await cargar();
+        } catch (err) {
+          setError((err as Error).message);
+        } finally {
+          setOcupado(false);
+        }
+      }
+    });
   };
 
   const mover = async (documentId: string, destino: string | null): Promise<void> => {
@@ -324,7 +376,7 @@ export const CarpetasDelExpediente: React.FC<{
               </button>
               <button
                 type="button"
-                onClick={() => void borrar(c.id)}
+                onClick={() => void pedirBorrado(c)}
                 className="btn-ghost btn-sm shrink-0 px-1.5"
                 disabled={ocupado}
                 aria-label={`Borrar la carpeta ${c.nombre}`}
@@ -358,6 +410,8 @@ export const CarpetasDelExpediente: React.FC<{
           ))}
         </ul>
       )}
+
+      <ConfirmarDialog confirmacion={confirmacion} onCerrar={() => setConfirmacion(null)} />
     </section>
   );
 };

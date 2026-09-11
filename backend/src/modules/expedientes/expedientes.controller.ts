@@ -18,6 +18,7 @@ import { vectorSearchService } from '../search/vectorSearch.service';
 import {
   borrarCarpeta,
   carpetasDelExpediente,
+  contenidoDeCarpeta,
   crearCarpeta,
   moverCarpeta,
   moverDocumento
@@ -426,16 +427,26 @@ export const borrarCarpetaController = async (req: Request, res: Response): Prom
   try {
     const firmId = req.firmId as string;
     await exigirModulo(firmId, 'EXPEDIENTES');
-    await borrarCarpeta(firmId, String(req.params.id), String(req.params.carpetaId));
+    const ido = await borrarCarpeta(firmId, String(req.params.id), String(req.params.carpetaId));
+
+    /*
+     * SE DICE EXACTAMENTE QUÉ SE FUE, con números. La pantalla ya lo advirtió
+     * antes de borrar; esto es la constancia de lo que efectivamente ocurrió,
+     * que no siempre coincide con lo que se advirtió —alguien pudo mover algo
+     * entre una cosa y la otra—.
+     */
+    const partes = [
+      ido.subcarpetas > 0 ? `${ido.subcarpetas} subcarpeta(s)` : null,
+      ido.documentos > 0 ? `${ido.documentos} documento(s) indexado(s)` : null
+    ].filter(Boolean);
+
     res.json({
       success: true,
-      /*
-       * SE DICE QUÉ SE FUE Y QUÉ NO. Las subcarpetas se van; los documentos
-       * suben a la raíz. Sin decirlo, borrar una carpeta con trescientas
-       * páginas dentro se lee como haberlas perdido.
-       */
+      contenido: ido,
       message:
-        'Se borró la carpeta y las que tenía dentro. Los documentos siguen en el expediente, en la raíz.'
+        partes.length > 0
+          ? `Se borró la carpeta con ${partes.join(' y ')}.`
+          : 'Se borró la carpeta, que estaba vacía.'
     });
   } catch (err) {
     fallar(res, err, 'No se pudo borrar la carpeta.');
@@ -452,5 +463,26 @@ export const moverDocumentoController = async (req: Request, res: Response): Pro
     res.json({ success: true });
   } catch (err) {
     fallar(res, err, 'No se pudo mover el documento.');
+  }
+};
+
+/**
+ * GET /api/expedientes/:id/carpetas/:carpetaId/contenido
+ *
+ * Qué se llevaría por delante borrar esta carpeta. Lo pide el diálogo de
+ * confirmación ANTES de borrar: una advertencia que dice «se borrará todo lo
+ * que contiene» sin decir cuánto es no advierte nada — el abogado no sabe si
+ * son dos archivos o trescientas páginas indexadas.
+ */
+export const contenidoDeCarpetaController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const firmId = req.firmId as string;
+    await exigirModulo(firmId, 'EXPEDIENTES');
+    res.json({
+      success: true,
+      contenido: await contenidoDeCarpeta(firmId, String(req.params.id), String(req.params.carpetaId))
+    });
+  } catch (err) {
+    fallar(res, err, 'No se pudo consultar el contenido de la carpeta.');
   }
 };

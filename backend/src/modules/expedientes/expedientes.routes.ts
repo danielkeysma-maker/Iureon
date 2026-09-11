@@ -10,6 +10,7 @@ import {
   borrarCarpetaController,
   buscarEnExpedienteController,
   carpetasController,
+  contenidoDeCarpetaController,
   crearCarpetaController,
   moverCarpetaController,
   moverDocumentoController,
@@ -86,6 +87,8 @@ router.get('/expedientes/:id/buscar', buscarEnExpedienteController as any);
 router.get('/expedientes/:id/carpetas', carpetasController as any);
 router.post('/expedientes/:id/carpetas', bloquearSiPlanVencido, crearCarpetaController as any);
 router.patch('/expedientes/:id/carpetas/:carpetaId', bloquearSiPlanVencido, moverCarpetaController as any);
+/* Lo que se llevaria borrar la carpeta. Lo pide el dialogo ANTES de borrar. */
+router.get('/expedientes/:id/carpetas/:carpetaId/contenido', contenidoDeCarpetaController as any);
 router.delete('/expedientes/:id/carpetas/:carpetaId', bloquearSiPlanVencido, borrarCarpetaController as any);
 router.patch(
   '/expedientes/:id/documentos/:documentId/carpeta',

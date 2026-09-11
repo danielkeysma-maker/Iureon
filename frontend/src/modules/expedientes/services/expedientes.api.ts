@@ -37,6 +37,12 @@ export interface DocumentoIndexado {
   carpetaId: string | null;
 }
 
+/** Qué hay dentro de una carpeta, contando hacia abajo. */
+export interface ContenidoDeCarpeta {
+  subcarpetas: number;
+  documentos: number;
+}
+
 /** Una carpeta del expediente. Se anidan por `padreId`; `null` es la raíz. */
 export interface Carpeta {
   id: string;
@@ -200,7 +206,15 @@ export const expedientesApi = {
     return revisar(data, 'No se pudo crear la carpeta.').carpeta;
   },
 
-  /** Devuelve el mensaje del servidor, que dice qué se fue y qué no. */
+  /** Qué se llevaría por delante borrar esta carpeta. Lo pide el diálogo ANTES de borrar. */
+  async contenidoDeCarpeta(expedienteId: string, carpetaId: string): Promise<ContenidoDeCarpeta> {
+    const data = await httpClient.get<Respuesta & { contenido: ContenidoDeCarpeta }>(
+      `/api/expedientes/${expedienteId}/carpetas/${carpetaId}/contenido`
+    );
+    return revisar(data, 'No se pudo consultar el contenido de la carpeta.').contenido;
+  },
+
+  /** Devuelve el mensaje del servidor, que dice con números qué se fue. */
   async borrarCarpeta(expedienteId: string, carpetaId: string): Promise<string> {
     const data = await httpClient.delete<Respuesta>(
       `/api/expedientes/${expedienteId}/carpetas/${carpetaId}`

@@ -222,21 +222,105 @@ const esDescendiente = async (
   return false;
 };
 
+/** Qué hay dentro de una carpeta, contando hacia abajo. */
+export interface ContenidoDeCarpeta {
+  subcarpetas: number;
+  documentos: number;
+}
+
 /**
- * Borra la carpeta. Sus SUBCARPETAS se van con ella; sus DOCUMENTOS no.
+ * La carpeta y TODAS las que cuelgan de ella, incluida ella misma.
  *
- * Las dos cosas son decisiones opuestas y a propósito, y viven en la migración:
- * dejar subcarpetas sueltas en la raíz llena el expediente de huérfanas que
- * nadie sabe de dónde salieron, mientras que llevarse los documentos borraría
- * trescientas páginas indexadas por un gesto que el abogado hizo para ordenar.
- * Los documentos suben a la raíz y siguen buscándose.
+ * Baja por niveles en vez de recursivamente por fila: un expediente tiene
+ * pocas carpetas y así son tres consultas en vez de una por nodo. El tope de
+ * niveles existe por si hubiera un ciclo creado a mano en la base — sin él
+ * este bucle no terminaría.
+ */
+const ramaDeCarpetas = async (expedienteId: string, raiz: string): Promise<string[]> => {
+  const todas: { data: unknown } = await db()
+    .from('expediente_carpetas')
+    .select('id, padre_id')
+    .eq('expediente_id', expedienteId);
+
+  const filas = (todas.data ?? []) as Array<{ id: string; padre_id: string | null }>;
+  const rama = [raiz];
+  for (let nivel = 0; nivel < 50; nivel += 1) {
+    const hijas = filas.filter((f) => f.padre_id && rama.includes(f.padre_id) && !rama.includes(f.id));
+    if (hijas.length === 0) break;
+    rama.push(...hijas.map((h) => h.id));
+  }
+  return rama;
+};
+
+/** Cuántas subcarpetas y cuántos documentos se irían al borrar esta carpeta. */
+export const contenidoDeCarpeta = async (
+  firmId: string,
+  expedienteId: string,
+  carpetaId: string
+): Promise<ContenidoDeCarpeta> => {
+  await expedienteDeLaFirma(firmId, expedienteId);
+  const rama = await ramaDeCarpetas(expedienteId, carpetaId);
+
+  const { count } = await db()
+    .from('legal_documents')
+    .select('id', { count: 'exact', head: true })
+    .eq('firm_id', firmId)
+    .in('carpeta_id', rama);
+
+  /* La rama incluye la propia carpeta, que no cuenta como subcarpeta suya. */
+  return { subcarpetas: rama.length - 1, documentos: count ?? 0 };
+};
+
+/**
+ * Borra la carpeta Y TODO LO QUE HAY DENTRO: subcarpetas y documentos.
+ *
+ * ─── ESTO ESTUVO AL REVÉS, Y EL DUEÑO TENÍA RAZÓN ──────────────────────────
+ *
+ * La primera versión conservaba los documentos: los subía a la raíz para que
+ * un gesto de ordenar no borrara trescientas páginas indexadas. El
+ * razonamiento sobre el daño era correcto; la conclusión, no.
+ *
+ * Porque en cualquier gestor de archivos del mundo, borrar una carpeta borra
+ * lo que contiene. Pelear contra esa intuición no evita el daño: lo cambia de
+ * sitio. El abogado borra «Pruebas» creyendo que se llevó los cinco
+ * documentos, no los ve en la carpeta —claro, ya no existe— y los da por
+ * perdidos, mientras siguen apareciendo en las búsquedas del caso desde una
+ * raíz donde nadie los puso.
+ *
+ * La protección correcta no era desobedecer el gesto, sino PREGUNTAR ANTES
+ * diciendo exactamente qué se va. Eso lo hace la pantalla con
+ * `contenidoDeCarpeta`, y es lo que faltaba de verdad: la versión anterior
+ * borraba de un clic, sin confirmación ninguna.
+ *
+ * LOS DOCUMENTOS SE BORRAN PRIMERO, y no es orden caprichoso: al quitar la
+ * carpeta, el `ON DELETE SET NULL` de la columna los habría soltado a la raíz
+ * un instante antes, y entonces ya no habría forma de saber cuáles eran.
+ * Sus fragmentos se van solos: `document_embeddings` tiene CASCADE contra
+ * `legal_documents`.
  */
 export const borrarCarpeta = async (
   firmId: string,
   expedienteId: string,
   carpetaId: string
-): Promise<void> => {
+): Promise<ContenidoDeCarpeta> => {
   await expedienteDeLaFirma(firmId, expedienteId);
+  const rama = await ramaDeCarpetas(expedienteId, carpetaId);
+  const contenido = await contenidoDeCarpeta(firmId, expedienteId, carpetaId);
+
+  const { error: errorDocs } = await db()
+    .from('legal_documents')
+    .delete()
+    .eq('firm_id', firmId)
+    .in('carpeta_id', rama);
+
+  if (errorDocs) {
+    console.error('[CARPETAS] No se pudieron borrar los documentos:', errorDocs.message);
+    throw new ExpedienteError(
+      'CARPETA_DELETE_FAILED',
+      'No se pudieron borrar los documentos de la carpeta, así que la carpeta tampoco se borró.',
+      502
+    );
+  }
 
   const { data, error } = await db()
     .from('expediente_carpetas')
@@ -251,6 +335,8 @@ export const borrarCarpeta = async (
     throw new ExpedienteError('CARPETA_DELETE_FAILED', 'No se pudo borrar la carpeta.', 502);
   }
   if (!data) throw new ExpedienteError('CARPETA_NOT_FOUND', 'Esa carpeta no existe en este expediente.', 404);
+
+  return contenido;
 };
 
 /**

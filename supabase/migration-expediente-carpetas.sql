@@ -42,7 +42,8 @@ CREATE TABLE IF NOT EXISTS public.expediente_carpetas (
     -- abogado borra «Pruebas» creyendo que se va con sus tres subcarpetas y se
     -- le llena la raíz de carpetas huérfanas que ya no sabe de dónde salieron.
     --
-    -- Lo que NO se lleva son los DOCUMENTOS: ver la columna del punto 2.
+    -- Los DOCUMENTOS tambien se van, pero por otra via: los borra el servicio
+    -- antes de quitar la carpeta, para poder decir cuantos eran. Ver el punto 2.
     padre_id UUID REFERENCES public.expediente_carpetas(id) ON DELETE CASCADE,
 
     nombre TEXT NOT NULL CHECK (btrim(nombre) <> ''),
@@ -85,12 +86,27 @@ ALTER TABLE public.legal_documents
     ADD COLUMN IF NOT EXISTS carpeta_id UUID
     REFERENCES public.expediente_carpetas(id) ON DELETE SET NULL;
 
--- ── SET NULL Y NO CASCADE, y aquí sí al revés que las subcarpetas ───────────
--- Borrar una carpeta NO puede borrar los documentos que había dentro. Un
--- documento indexado costó una vectorización y es del expediente, no de la
--- carpeta: se sube a la raíz y sigue buscándose. Que una carpeta se lleve por
--- delante trescientas páginas indexadas sería el peor efecto posible de un
--- gesto que el abogado hace para ordenar.
+-- ── SET NULL AQUÍ, PERO EL BORRADO SE LOS LLEVA IGUAL ──────────────────────
+--
+-- La columna es SET NULL y el servicio borra los documentos A MANO antes de
+-- quitar la carpeta. Parece contradictorio y no lo es: hace falta ese orden
+-- para poder DECIR CUÁNTOS se fueron. Con un CASCADE en la columna, la base
+-- los borraría sin que nadie los contara, y el diálogo de confirmación —que
+-- existe justamente para advertir «se van 5 documentos indexados»— no tendría
+-- de dónde sacar el número.
+--
+-- Y SET NULL es además la red de seguridad correcta si algún día alguien borra
+-- una carpeta por fuera del servicio, desde el editor SQL: los documentos
+-- suben a la raíz en vez de desaparecer.
+--
+-- EL COMPORTAMIENTO DEL PRODUCTO ES QUE SE BORRAN. La primera versión los
+-- conservaba —para que un gesto de ordenar no borrara trescientas páginas
+-- indexadas— y el dueño lo corrigió con razón: en cualquier gestor de archivos
+-- borrar una carpeta borra su contenido, y pelear con esa intuición no evita
+-- el daño sino que lo cambia de sitio. El abogado da los documentos por
+-- perdidos mientras siguen apareciendo en las búsquedas desde una raíz donde
+-- nadie los puso. La protección correcta no era desobedecer el gesto: era
+-- preguntar antes diciendo cuánto se va.
 
 CREATE INDEX IF NOT EXISTS idx_documentos_carpeta
     ON public.legal_documents(carpeta_id) WHERE carpeta_id IS NOT NULL;
