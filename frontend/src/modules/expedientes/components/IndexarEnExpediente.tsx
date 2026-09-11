@@ -1,10 +1,10 @@
 import React from 'react';
-import { AlertCircle, CheckCircle2, FileUp, Loader2 } from 'lucide-react';
+import { AlertCircle, CheckCircle2, FileText, FileUp, Loader2, X } from 'lucide-react';
 import {
   PARA_INDEXAR,
   textoDelArchivo
 } from '../../workspace/services/textoDelArchivo';
-import { expedientesApi } from '../services/expedientes.api';
+import { expedientesApi, type DocumentoIndexado } from '../services/expedientes.api';
 import type { ExpedienteConDetalle } from '../types';
 
 /**
@@ -51,6 +51,45 @@ export const IndexarEnExpediente: React.FC<{
   );
   const [hecho, setHecho] = React.useState<{ fragmentos: number; buscable: boolean } | null>(null);
 
+  /*
+   * ─── LO QUE YA HAY DENTRO ────────────────────────────────────────────────
+   *
+   * Un expediente que se llena EN EL TIEMPO —el caso de un cliente nuevo, con
+   * los papeles llegando de a poco— necesita mostrar lo que ya tiene. Sin esta
+   * lista, indexar decía «295 fragmentos» y después no había forma de saber
+   * qué hay dentro: a la tercera semana nadie recuerda si el poder ya se subió,
+   * y la salida natural es volver a subirlo. Indexado dos veces, el mismo
+   * párrafo sale repetido en la búsqueda y desplaza a otro que sí hacía falta.
+   */
+  const [documentos, setDocumentos] = React.useState<DocumentoIndexado[]>([]);
+  const [quitando, setQuitando] = React.useState<string | null>(null);
+
+  const cargarDocumentos = React.useCallback(async () => {
+    try {
+      setDocumentos(await expedientesApi.documentos(expediente.id));
+    } catch (err) {
+      setError((err as Error).message);
+    }
+  }, [expediente.id]);
+
+  React.useEffect(() => {
+    void cargarDocumentos();
+  }, [cargarDocumentos]);
+
+  const quitar = async (documentId: string): Promise<void> => {
+    setQuitando(documentId);
+    setError('');
+    try {
+      await expedientesApi.quitarDocumento(expediente.id, documentId);
+      await cargarDocumentos();
+      await onIndexado();
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setQuitando(null);
+    }
+  };
+
   const escoger = async (archivo: File | undefined): Promise<void> => {
     if (!archivo) return;
     setError('');
@@ -81,6 +120,7 @@ export const IndexarEnExpediente: React.FC<{
       setHecho({ fragmentos: r.resultado.totalChunksCreated, buscable: r.buscable });
       setLeido(null);
       setTitulo('');
+      await cargarDocumentos();
       await onIndexado();
     } catch (err) {
       setError((err as Error).message);
@@ -107,6 +147,46 @@ export const IndexarEnExpediente: React.FC<{
           {abierto ? 'Cerrar' : 'Indexar un documento'}
         </button>
       </div>
+
+      {/*
+        LA LISTA VA ARRIBA DEL FORMULARIO, no debajo. Quien vuelve a esta
+        pantalla la semana siguiente viene a ver qué hay, no a subir a ciegas:
+        poner primero el formulario invita a subir de nuevo lo que ya está.
+      */}
+      {documentos.length > 0 && (
+        <ul className="mt-3 space-y-1.5">
+          {documentos.map((d) => (
+            <li
+              key={d.documentId}
+              className="flex items-start justify-between gap-2 rounded-card border border-line-200 p-2.5"
+            >
+              <div className="min-w-0">
+                <p className="flex items-baseline gap-1.5 text-body">
+                  <FileText className="h-3.5 w-3.5 shrink-0 text-ink-500" />
+                  <span className="font-medium [overflow-wrap:anywhere]">{d.titulo}</span>
+                </p>
+                <p className="mt-0.5 text-meta text-ink-500">
+                  {d.fragmentos.toLocaleString('es-CO')} fragmentos buscables
+                  {d.indexadoEl ? ` · ${d.indexadoEl.slice(0, 10)}` : ''}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => void quitar(d.documentId)}
+                className="btn-ghost btn-sm shrink-0 px-1.5"
+                disabled={quitando === d.documentId}
+                aria-label={`Quitar ${d.titulo} del expediente`}
+              >
+                {quitando === d.documentId ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <X className="h-3.5 w-3.5" />
+                )}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
 
       {abierto && (
         <div className="mt-3 space-y-3 rounded-card border border-line-200 bg-canvas p-3">

@@ -27,6 +27,14 @@ const revisar = <T extends Respuesta>(data: T, fallo: string): T => {
 /** Lo que se puede atar a un expediente. Espejo de `TABLA_DE_PIEZA`. */
 export type TipoDePieza = 'transcripcion' | 'revision' | 'borrador' | 'termino' | 'orientacion';
 
+/** Un documento ya indexado dentro del expediente. */
+export interface DocumentoIndexado {
+  documentId: string;
+  titulo: string;
+  fragmentos: number;
+  indexadoEl: string;
+}
+
 /** Una pieza de la firma que se puede traer a un expediente. */
 export interface Candidato {
   tipo: TipoDePieza;
@@ -131,6 +139,21 @@ export const expedientesApi = {
       Respuesta & { resultado: { totalChunksCreated: number; status: string }; buscable: boolean }
     >(`/api/expedientes/${expedienteId}/indexar`, { body });
     return revisar(data, 'No se pudo indexar el documento.');
+  },
+
+  /** Lo que el expediente tiene indexado, con cuántos fragmentos cada documento. */
+  async documentos(expedienteId: string): Promise<DocumentoIndexado[]> {
+    const data = await httpClient.get<Respuesta & { documentos: DocumentoIndexado[] }>(
+      `/api/expedientes/${expedienteId}/documentos`
+    );
+    return revisar(data, 'No se pudieron cargar los documentos del expediente.').documentos;
+  },
+
+  async quitarDocumento(expedienteId: string, documentId: string): Promise<void> {
+    const data = await httpClient.delete<Respuesta>(
+      `/api/expedientes/${expedienteId}/documentos/${documentId}`
+    );
+    revisar(data, 'No se pudo quitar el documento.');
   },
 
   /** Prepara el interrogatorio. CUESTA SALDO: la pantalla lo dice antes de llamar. */

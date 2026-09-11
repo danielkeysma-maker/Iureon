@@ -13,7 +13,7 @@ import {
   obtenerExpediente
 } from './expedientes.service';
 import { TIPOS_DE_PIEZA, type DatosDeActor, type TipoDePieza } from './types';
-import { candidatosDeLaFirma } from './candidatos.service';
+import { candidatosDeLaFirma, documentosDelExpediente, quitarDocumento } from './candidatos.service';
 
 /**
  * Los expedientes de la firma. Ver `types.ts` para el porqué del módulo.
@@ -247,5 +247,48 @@ export const candidatosController = async (req: Request, res: Response): Promise
     res.json({ success: true, candidatos: await candidatosDeLaFirma(firmId) });
   } catch (err) {
     fallar(res, err, 'No se pudo cargar lo que hay para traer.');
+  }
+};
+
+/**
+ * GET /api/expedientes/:id/documentos — lo que el expediente tiene indexado.
+ *
+ * Un expediente que se llena en el tiempo necesita mostrar lo que ya tiene: sin
+ * esta lista, a la tercera semana nadie recuerda si el poder ya se subió, y
+ * volver a subirlo duplica sus fragmentos y hace que la búsqueda devuelva el
+ * mismo párrafo dos veces.
+ */
+export const documentosDelExpedienteController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const firmId = req.firmId as string;
+    await exigirModulo(firmId, 'EXPEDIENTES');
+    /* Comprueba de paso que el expediente sea de la firma. */
+    const expediente = await obtenerExpediente(firmId, String(req.params.id));
+    res.json({ success: true, documentos: await documentosDelExpediente(firmId, expediente.id) });
+  } catch (err) {
+    fallar(res, err, 'No se pudieron cargar los documentos del expediente.');
+  }
+};
+
+/** DELETE /api/expedientes/:id/documentos/:documentId */
+export const quitarDocumentoController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const firmId = req.firmId as string;
+    const userEmail = req.user?.email ?? 'desconocido';
+    await exigirModulo(firmId, 'EXPEDIENTES');
+    const expediente = await obtenerExpediente(firmId, String(req.params.id));
+    const quitados = await quitarDocumento(firmId, expediente.id, String(req.params.documentId));
+
+    await auditService.record({
+      firmId,
+      userEmail,
+      action: 'EXPEDIENTE_INDEXED',
+      resource: `${expediente.caratula} · documento retirado · ${quitados} fragmentos`,
+      ipAddress: (req.headers['x-forwarded-for'] as string | undefined)?.split(',')[0]?.trim() ?? req.ip ?? ''
+    });
+
+    res.json({ success: true, fragmentos: quitados });
+  } catch (err) {
+    fallar(res, err, 'No se pudo quitar el documento.');
   }
 };

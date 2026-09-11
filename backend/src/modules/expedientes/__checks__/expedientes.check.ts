@@ -261,9 +261,17 @@ check(
 const candidatos = leer('modules/expedientes/candidatos.service.ts');
 const tablasLeidas = (candidatos.match(/\.from\('/g) ?? []).length;
 const filtradas = (candidatos.match(/\.eq\('firm_id', firmId\)/g) ?? []).length;
+/*
+ * EL INVARIANTE, NO EL CONTEO. La primera version exigia exactamente cinco
+ * tablas y cinco filtros, y se puso roja el dia que el archivo gano las
+ * consultas de los documentos indexados — nueve y nueve, igual de correctas.
+ * Un check que cuenta obliga a tocarlo cada vez que el archivo crece y ensena
+ * a subirle el numero sin mirar; uno que compara la relacion sigue diciendo lo
+ * mismo con cinco consultas o con veinte.
+ */
 check(
-  'las cinco tablas de candidatos se leen filtrando por firma, sin excepción',
-  tablasLeidas === 5 && filtradas === 5,
+  'toda consulta de este archivo filtra por firma, sin excepcion',
+  tablasLeidas > 0 && filtradas >= tablasLeidas,
   `${tablasLeidas} tablas, ${filtradas} filtros`
 );
 /*
@@ -281,7 +289,7 @@ const cuerposColados = columnasPedidas.filter((c) =>
 );
 check(
   'y no se traen los cuerpos: la lista es de rótulos, no de contenido',
-  columnasPedidas.length === 5 && cuerposColados.length === 0,
+  columnasPedidas.length > 0 && cuerposColados.length === 0,
   cuerposColados.length > 0
     ? `SE CUELA UN CUERPO: ${cuerposColados.join(' | ')}`
     : `${columnasPedidas.length} selects, todos de rótulos`

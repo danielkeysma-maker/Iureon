@@ -167,3 +167,113 @@ export const candidatosDeLaFirma = async (firmId: string): Promise<Candidato[]> 
   /* Lo más reciente primero, mezclando los cinco tipos: así se busca. */
   return out.sort((a, b) => (a.cuando < b.cuando ? 1 : a.cuando > b.cuando ? -1 : 0));
 };
+
+// ─── LOS DOCUMENTOS INDEXADOS DE UN EXPEDIENTE ──────────────────────────────
+
+export interface DocumentoIndexado {
+  documentId: string;
+  titulo: string;
+  fragmentos: number;
+  indexadoEl: string;
+}
+
+/**
+ * Qué documentos tiene indexados el expediente, y con cuántos fragmentos cada uno.
+ *
+ * ─── POR QUÉ ESTO NO ES UN ADORNO ──────────────────────────────────────────
+ *
+ * Un expediente que se llena EN EL TIEMPO —el caso de un cliente nuevo, con
+ * los archivos llegando de a poco— necesita mostrar lo que ya tiene. Sin esta
+ * lista, indexar decía «295 fragmentos» y después no había forma de saber qué
+ * hay dentro: a la tercera semana nadie recuerda si el poder ya se subió, y la
+ * salida natural es volver a subirlo. Un documento indexado dos veces duplica
+ * sus fragmentos y hace que la búsqueda devuelva el mismo párrafo dos veces,
+ * desplazando a otro que sí hacía falta.
+ *
+ * ─── SE CUENTA DESDE LOS FRAGMENTOS, NO DESDE `legal_documents` ────────────
+ *
+ * Y es deliberado: la lista tiene que decir lo que está BUSCABLE, no lo que se
+ * subió. Un documento cuya vectorización falló deja fila en `legal_documents`
+ * y ni un fragmento — mostrarlo diría que el expediente lo tiene cuando
+ * ninguna búsqueda lo va a encontrar.
+ *
+ * Se traen solo los `document_id`, sin cuerpos ni vectores: diez documentos de
+ * trescientas páginas son unas tres mil filas de un identificador corto.
+ */
+export const documentosDelExpediente = async (
+  firmId: string,
+  expedienteId: string
+): Promise<DocumentoIndexado[]> => {
+  const { data: fragmentos, error } = await db()
+    .from('document_embeddings')
+    .select('document_id')
+    .eq('firm_id', firmId)
+    .eq('expediente_id', expedienteId);
+
+  if (error) {
+    console.error('[EXPEDIENTES] No se pudieron listar los documentos:', error.message);
+    throw new ExpedienteError('DOCS_FAILED', 'No se pudieron cargar los documentos del expediente.', 502);
+  }
+
+  const cuantos = new Map<string, number>();
+  for (const f of (fragmentos ?? []) as Array<{ document_id: string | null }>) {
+    if (!f.document_id) continue;
+    cuantos.set(f.document_id, (cuantos.get(f.document_id) ?? 0) + 1);
+  }
+  if (cuantos.size === 0) return [];
+
+  const { data: docs } = await db()
+    .from('legal_documents')
+    .select('id, title, created_at')
+    .eq('firm_id', firmId)
+    .in('id', [...cuantos.keys()]);
+
+  const porId = new Map(
+    ((docs ?? []) as Array<{ id: string; title: string; created_at: string }>).map((d) => [d.id, d])
+  );
+
+  return [...cuantos.entries()]
+    .map(([documentId, fragmentosDelDoc]) => ({
+      documentId,
+      /* Sin ficha en `legal_documents` el documento sigue siendo buscable: se nombra por su id antes que esconderlo. */
+      titulo: porId.get(documentId)?.title ?? `Documento ${documentId}`,
+      fragmentos: fragmentosDelDoc,
+      indexadoEl: porId.get(documentId)?.created_at ?? ''
+    }))
+    .sort((a, b) => (a.indexadoEl < b.indexadoEl ? 1 : -1));
+};
+
+/**
+ * Quita un documento del expediente: sus fragmentos y su ficha.
+ *
+ * Se borran los FRAGMENTOS primero. Al revés, el CASCADE de
+ * `legal_documents` ya se los habría llevado y el conteo que se devuelve sería
+ * cero siempre — un borrado que dice «0 fragmentos» se lee como que no borró
+ * nada.
+ */
+export const quitarDocumento = async (
+  firmId: string,
+  expedienteId: string,
+  documentId: string
+): Promise<number> => {
+  const { data, error } = await db()
+    .from('document_embeddings')
+    .delete()
+    .eq('firm_id', firmId)
+    .eq('expediente_id', expedienteId)
+    .eq('document_id', documentId)
+    .select('id');
+
+  if (error) {
+    console.error('[EXPEDIENTES] No se pudo quitar el documento:', error.message);
+    throw new ExpedienteError('DOC_DELETE_FAILED', 'No se pudo quitar el documento.', 502);
+  }
+
+  const quitados = (data ?? []).length;
+  if (quitados === 0) {
+    throw new ExpedienteError('DOC_NOT_FOUND', 'Ese documento no está en este expediente.', 404);
+  }
+
+  await db().from('legal_documents').delete().eq('firm_id', firmId).eq('id', documentId);
+  return quitados;
+};

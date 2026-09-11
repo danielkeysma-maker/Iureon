@@ -7,6 +7,8 @@ import {
   borrarActorController,
   borrarExpedienteController,
   candidatosController,
+  documentosDelExpedienteController,
+  quitarDocumentoController,
   crearExpedienteController,
   listarExpedientesController,
   obtenerExpedienteController
@@ -60,5 +62,13 @@ router.post('/expedientes/:id/preguntas', bloquearSiPlanVencido, preguntasDelExp
  * detras de `bloquearSiPlanVencido` como todas.
  */
 router.post('/expedientes/:id/indexar', bloquearSiPlanVencido, indexarEnExpedienteController as any);
+
+/* Lo que el expediente tiene indexado. La lectura no bloquea con el plan vencido. */
+router.get('/expedientes/:id/documentos', documentosDelExpedienteController as any);
+router.delete(
+  '/expedientes/:id/documentos/:documentId',
+  bloquearSiPlanVencido,
+  quitarDocumentoController as any
+);
 
 export const expedientesRoutes = router;
