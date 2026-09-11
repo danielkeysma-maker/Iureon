@@ -12,6 +12,7 @@ import {
   obtenerExpedienteController
 } from './expedientes.controller';
 import { preguntasDelExpedienteController } from './preguntas.controller';
+import { indexarEnExpedienteController } from './indexar.controller';
 
 /**
  * Los expedientes de la firma.
@@ -52,5 +53,12 @@ router.delete('/expedientes/:id/actores/:actorId', bloquearSiPlanVencido, borrar
  * como toda escritura, y además `exigirModulo` dentro del controlador.
  */
 router.post('/expedientes/:id/preguntas', bloquearSiPlanVencido, preguntasDelExpedienteController as any);
+
+/*
+ * Indexar el expediente de 300 paginas. No cuesta saldo del motor de redaccion
+ * —son embeddings, no un modelo de lenguaje— pero es escritura, asi que va
+ * detras de `bloquearSiPlanVencido` como todas.
+ */
+router.post('/expedientes/:id/indexar', bloquearSiPlanVencido, indexarEnExpedienteController as any);
 
 export const expedientesRoutes = router;

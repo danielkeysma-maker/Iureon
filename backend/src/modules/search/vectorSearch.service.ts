@@ -101,10 +101,21 @@ const bestPerDocument = (matches: VectorMatch[], limit: number): VectorMatch[] =
 };
 
 export class VectorSearchService {
+  /**
+   * @param expedienteId Cuando se pasa, la búsqueda se ENCIERRA en ese caso —más
+   *        el corpus público, que es de todos los casos—. Sin él, el
+   *        comportamiento es el de siempre: toda la firma.
+   *
+   *        No es una comodidad: sin esta puerta, preparar el interrogatorio de
+   *        «Mosquera» buscaría dentro de los expedientes de los demás clientes
+   *        de la firma. No hay fuga entre firmas —el filtro por `firm_id` sigue
+   *        intacto— pero sí le llevaría al motor el caso de otro cliente.
+   */
   async search(
     firmId: string,
     query: string,
-    matchCount: number = DEFAULT_MATCH_COUNT
+    matchCount: number = DEFAULT_MATCH_COUNT,
+    expedienteId?: string | null
   ): Promise<VectorSearchResult> {
     if (!query.trim()) {
       return { status: 'OK', matches: [] };
@@ -133,7 +144,10 @@ export class VectorSearchService {
       const { data, error } = await supabase.rpc('match_document_chunks_multi_tenant', {
         query_embedding: queryEmbedding,
         match_count: Math.min(matchCount * OVERFETCH, MAX_RAW_MATCHES),
-        filter_firm_id: firmId
+        filter_firm_id: firmId,
+        /* NULO = como siempre. La función lo declara con valor por defecto, así
+           que el buscador de jurisprudencia sigue llamando con tres. */
+        filter_expediente_id: expedienteId ?? null
       });
 
       if (error) {

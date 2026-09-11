@@ -74,7 +74,18 @@ export interface IngestionRequest {
   firmId: string;
   title: string;
   b2FileUrl: string;
-  rawText?: string;
+  /**
+   * El texto del documento. OBLIGATORIO desde el 10 de septiembre de 2026: ver
+   * la nota de `ingestion.service.ts` sobre el expediente de muestra.
+   */
+  rawText: string;
+  /**
+   * DE QUÉ CASO ES. Sin él, los fragmentos se ven desde toda la firma —que es
+   * lo correcto para un documento general— pero con él la búsqueda se puede
+   * encerrar en el expediente, y sin eso preparar el interrogatorio de un caso
+   * buscaría dentro de los expedientes de los demás clientes.
+   */
+  expedienteId?: string | null;
   metadata?: Record<string, any>;
 }
 

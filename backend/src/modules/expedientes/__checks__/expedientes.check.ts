@@ -459,6 +459,114 @@ check(
   'mismo trabajo, mismo renglón en el movimiento de crédito'
 );
 
+/* ─── 10. EL EXPEDIENTE DE 300 PAGINAS ───────────────────────────────────── */
+
+const indexar = leer('modules/expedientes/indexar.controller.ts');
+const ingesta = leer('modules/ingestion/ingestion.service.ts');
+const buscador = leer('modules/search/vectorSearch.service.ts');
+const migracionIndice = readFileSync(
+  join(process.cwd(), '..', 'supabase', 'migration-expediente-indexado.sql'),
+  'utf8'
+);
+
+/*
+ * LO QUE MAS IMPORTA DE TODO ESTE BLOQUE: un caso no puede ver el de otro
+ * cliente. No es fuga entre firmas —el filtro por `firm_id` sigue— pero
+ * llevarle al motor el expediente de otro cliente de la misma firma es
+ * exactamente lo que un abogado no puede permitirse.
+ */
+check(
+  'la busqueda se puede encerrar en un expediente',
+  /filter_expediente_id/.test(buscador) && /expedienteId\?: string \| null/.test(buscador),
+  'sin esto, preparar un interrogatorio busca en los casos de los demas clientes'
+);
+check(
+  'y sin expediente pedido se comporta como siempre: toda la firma',
+  /filter_expediente_id IS NULL/.test(migracionIndice),
+  'el buscador de jurisprudencia sigue llamando con tres argumentos'
+);
+check(
+  'el corpus publico entra igual dentro de un expediente: la jurisprudencia es de todos los casos',
+  /OR de\.firm_id = 'SYSTEM_CORPUS'/.test(migracionIndice),
+  'acotar al caso no puede dejar sin jurisprudencia'
+);
+check(
+  'indexar comprueba que el expediente sea de la firma ANTES de escribir fragmentos',
+  indexar.indexOf('obtenerExpediente(firmId') < indexar.indexOf('ingestLegalDocument'),
+  'un id ajeno por la URL dejaria fragmentos de un cliente colgando del caso de otro'
+);
+
+/*
+ * NO SE INDEXA TEXTO INVENTADO. Aqui vivia un «expediente de muestra» con un
+ * demandante, un juzgado y una afirmacion sobre la prescripcion del art. 151
+ * del CPTSS, que se indexaba cuando el texto venia vacio. Vectorizado, queda
+ * indistinguible de lo real — y el propio archivo tenia escrito que fabricar
+ * vectores «envenena el indice para siempre».
+ */
+/*
+ * SE MIRA EL CODIGO, NO LA PROSA. La primera version de esta comprobacion
+ * buscaba «Mario Alberto Perez» en el archivo entero y se puso roja por el
+ * COMENTARIO que explica que ese texto se retiro. Es la SEGUNDA vez en el
+ * mismo dia que caigo en esto —la otra fue buscando «informe» en el servicio
+ * de candidatos— y el patron es siempre el mismo: un archivo que documenta el
+ * defecto que quito contiene, por escrito, las palabras del defecto.
+ *
+ * La regla, para no repetirla una tercera: una guarda que busca la HUELLA de
+ * un defecto tiene que mirar el codigo con los comentarios fuera.
+ */
+const sinComentarios = (fuente: string): string =>
+  fuente.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/.*$/gm, ' ');
+
+check(
+  'el «expediente de muestra» inventado no volvio',
+  !/Mario Alberto P|Torres & Asociados|getSampleExpedienteText\s*\(/.test(sinComentarios(ingesta)),
+  'sin texto se rechaza, no se rellena'
+);
+check(
+  'y sin texto suficiente se rechaza diciendo por que',
+  /SIN_TEXTO/.test(ingesta) && /MINIMO_PARA_INDEXAR/.test(ingesta),
+  'un PDF escaneado sin OCR devuelve basura, y vectorizar basura ensucia el caso'
+);
+
+/*
+ * EL RELOJ. Insertar de una en una eran 295 idas y vueltas para el Codigo
+ * General del Proceso; ese era el riesgo real, no los embeddings. Y un fallo a
+ * mitad dejaba el documento MEDIO indexado, que se ve igual que entero.
+ */
+check(
+  'los fragmentos se insertan por lotes, no de uno en uno',
+  /FILAS_POR_INSERCION/.test(ingesta) && /\.insert\(lote\)/.test(ingesta),
+  '295 inserciones sueltas contra tres lotes'
+);
+check(
+  'y un lote que falle lo dice en vez de dejar el documento a medias en silencio',
+  /INDICE_INCOMPLETO/.test(ingesta),
+  'medio indexado responde igual que entero, solo que sin la mitad del expediente'
+);
+
+/*
+ * EL TRASLAPE. Sin el, una regla que caiga en el corte queda partida entre dos
+ * fragmentos y ninguno la dice entera — en texto juridico es la diferencia
+ * entre recuperar el articulo y recuperar su titulo.
+ */
+check(
+  'los fragmentos se traslapan',
+  /PALABRAS_DE_TRASLAPE/.test(ingesta) && /overlapWords/.test(ingesta),
+  'una regla partida en el corte no se recupera entera'
+);
+
+/*
+ * LOS FRAGMENTOS SI SE VAN CON EL EXPEDIENTE, y es la unica excepcion a la
+ * regla del modulo. Un pedazo de 400 palabras sin titulo no significa nada
+ * fuera de su documento: desatarlo dejaria cientos de trozos anonimos en el
+ * indice, saliendo en busquedas de otros casos.
+ */
+check(
+  'borrar el expediente SI se lleva sus fragmentos (CASCADE), al reves que todo lo demas',
+  /expediente_id UUID[\s\S]{0,80}REFERENCES public\.expedientes\(id\) ON DELETE CASCADE/.test(migracionIndice),
+  'un parrafo suelto sin caso no se puede reconstruir'
+);
+
 console.log('');
 console.log(fallos === 0 ? 'ALL CHECKS PASSED' : `${fallos} CHECKS FAILED`);
 process.exit(fallos === 0 ? 0 : 1);
