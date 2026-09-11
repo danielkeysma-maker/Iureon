@@ -14,7 +14,24 @@ import { textoDeDocx } from '../../ingestion/docxText';
 import { BackblazeB2TenantStorageService } from '../../documents/b2.service';
 import type { LegalBranch } from '../../catalog/types';
 import { exigirFuncion, responderPlanError } from '../../subscriptions/plan.service';
-import { buildCatalogGuidance } from '../catalogGuidance';
+/*
+ * ─── LA CURADURÍA DE LA FIRMA TAMBIÉN LLEGA A LA REVISIÓN ──────────────────
+ *
+ * Aquí se usaba `buildCatalogGuidance`, la versión SIN firma, en los tres
+ * caminos: revisar, el taller y volver a revisar. Y no había razón escrita en
+ * ninguna parte — era deriva.
+ *
+ * El efecto era absurdo visto de fuera: un término que el abogado verificó a
+ * mano en el Catálogo moldeaba SU BORRADOR y sus preguntas de audiencia, pero
+ * NO la revisión de ese mismo borrador. El producto le pedía verificar una vez
+ * y después revisaba contra la ficha de fábrica, que es justo la que él ya
+ * había corregido.
+ *
+ * La versión con firma resuelve lo mismo con la corrección de la firma
+ * superpuesta. Cuesta una consulta más a la base, que es lo que ya paga
+ * Redacción por lo mismo.
+ */
+import { buildCatalogGuidanceForFirm } from '../catalogGuidance';
 import { universoCitable } from '../andamiaje';
 import { catalogService } from '../../catalog/catalog.service';
 import {
@@ -350,7 +367,7 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
      * que el modelo crea que es el documento sería fabricar el respaldo que
      * este informe declara no tener.
      */
-    const guidance = esRecibido ? null : buildCatalogGuidance(documentType, legalBranch);
+    const guidance = esRecibido ? null : await buildCatalogGuidanceForFirm(firmId, documentType, legalBranch);
     /*
      * El mismo motor y el mismo límite de llamada que el modo propio: ninguno
      * de los dos puede tardar más de lo que cabe por debajo del reloj de la
@@ -737,7 +754,7 @@ export const reviewChatController = async (req: Request, res: Response): Promise
     const esRecibido = revision.modo === 'DOCUMENTO_RECIBIDO';
     const guidance = esRecibido
       ? null
-      : buildCatalogGuidance(revision.documentType, (revision.legalBranch ?? undefined) as LegalBranch | undefined);
+      : await buildCatalogGuidanceForFirm(firmId, revision.documentType, (revision.legalBranch ?? undefined) as LegalBranch | undefined);
     const historial = historialCliente.length ? historialCliente : revision.conversacion;
     // Las sentencias que el abogado nombra se consultan en el índice oficial ANTES de preguntar: la guía responde con la fuente, no de memoria.
     const verificaciones = await verificarProvidencias([mensaje, ...anotacionesDelAbogado.map((a) => a.nota ?? '')]);
@@ -883,7 +900,7 @@ export const reReviewController = async (req: Request, res: Response): Promise<v
 
   const operationId = randomUUID();
   try {
-    const guidance = buildCatalogGuidance(revision.documentType, (revision.legalBranch ?? undefined) as LegalBranch | undefined);
+    const guidance = await buildCatalogGuidanceForFirm(firmId, revision.documentType, (revision.legalBranch ?? undefined) as LegalBranch | undefined);
     const llamada = await conLimite(
       callOpenRouterWithUsage(
         ENGINE.OPUS,

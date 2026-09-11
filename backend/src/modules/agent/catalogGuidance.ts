@@ -16,11 +16,30 @@ import type { ReferenciaNormativa } from './citacionNormativa';
  *   firma, así que cada artículo que ponga es un artículo firmado.
  *
  *   REVISION — lista ABIERTA, pero sin permiso para afirmar contenido. Revisar
- *   un escrito ajeno exige poder decir «le falta el artículo de los anexos», y
- *   una lista cerrada allí vuelve la revisión inútil: degradaría tres productos
- *   para arreglar uno. Lo que sí viaja a la revisión es la mitad que no cuesta
- *   nada y que arregla la mitad del defecto medido: no digas QUÉ DICE un
- *   artículo cuyo texto nadie te entregó.
+ *   un escrito ajeno exige poder decir «le falta el articulo de los anexos», y
+ *   una lista cerrada alli vuelve la revision inutil: degradaria tres productos
+ *   para arreglar uno. Lo que viaja a la revision es la regla que arregla la
+ *   mitad del defecto medido: no digas QUE DICE un articulo cuyo texto nadie
+ *   te entrego.
+ *
+ * ─── EL ANDAMIAJE TAMBIEN VA A REVISION, Y ANTES NO ────────────────────────
+ *
+ * Esta decision estaba tomada al reves y por una razon de costo que se dio por
+ * buena SIN MEDIRLA: el andamiaje se mandaba solo a redaccion, y aqui se leia
+ * «lo que si viaja a la revision es la mitad que NO CUESTA NADA».
+ *
+ * MEDIDO el 10 de septiembre de 2026 sobre las 28 ramas: el bloque son 3.485
+ * caracteres de media —unos 871 tokens— y 5.587 en la rama mas cargada. A los
+ * precios de Opus eso es CUATRO MILESIMAS DE DOLAR, en una peticion que ya
+ * manda hasta 75.000 tokens del escrito. No costaba nada; costaba menos que
+ * nada.
+ *
+ * Y lo que se perdia no era pequeno: sin el andamiaje, la revision podia
+ * NOMBRAR el art. 384 del CGP pero no decir que dice, AUNQUE ESTA CASA LO HAYA
+ * LEIDO contra el texto oficial. Los 67 fundamentos sustanciales que costaron
+ * un dia entero de trabajo no salian de Redaccion. Con el andamiaje arriba, la
+ * regla de citacion no cambia una coma —sigue prohibiendo afirmar contenido de
+ * lo que no esta— y simplemente abarca los articulos que si se leyeron.
  */
 export type SuperficieDelBloque = 'REDACCION' | 'REVISION';
 
@@ -235,8 +254,8 @@ export const renderCatalogGuidance = (
     ? `\nAUTORIDAD COMPETENTE: ${actuacion.competentAuthority}`
     : '';
 
-  const andamiaje =
-    superficie === 'REDACCION' ? `\n\n${renderAndamiaje(actuacion.branch)}` : '';
+  /* En las dos superficies: ver la nota de arriba, con la medicion. */
+  const andamiaje = `\n\n${renderAndamiaje(actuacion.branch)}`;
   const regla =
     superficie === 'REDACCION' ? REGLA_DE_CITACION_REDACCION : REGLA_DE_CITACION_REVISION;
 

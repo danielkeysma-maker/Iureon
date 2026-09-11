@@ -4,7 +4,8 @@ import { auditService } from '../../audit/audit.service';
 import { BillingError, recordUsage, refundReservation, reserveForOperation, settleOperation } from '../../billing/billing.service';
 import type { LegalBranch } from '../../catalog/types';
 import { exigirFuncion, responderPlanError } from '../../subscriptions/plan.service';
-import { buildCatalogGuidance } from '../catalogGuidance';
+/* Con la curaduría de la firma, igual que la revisión y el borrador: ver la nota de `documentReview.controller.ts`. */
+import { buildCatalogGuidanceForFirm } from '../catalogGuidance';
 import { ENGINE, callOpenRouterWithUsage } from '../openrouter.client';
 import { prepararTexto } from './documentReview';
 import { LIMITE_LLAMADA_MS, TiempoAgotado, conLimite } from './documentReview.controller';
@@ -75,7 +76,7 @@ export const escritoChatController = async (req: Request, res: Response): Promis
 
   const operationId = randomUUID();
   try {
-    const guidance = buildCatalogGuidance(documentType, legalBranch);
+    const guidance = await buildCatalogGuidanceForFirm(firmId, documentType, legalBranch);
     // Las sentencias que el abogado nombra se consultan en el índice oficial ANTES de preguntar: la guía responde con la fuente, no de memoria.
     const verificaciones = await verificarProvidencias([mensaje, ...anotacionesDelAbogado.map((a) => a.nota ?? '')]);
     const llamada = await conLimite(
