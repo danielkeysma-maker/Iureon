@@ -18,6 +18,7 @@ import {
 import { ActoresDelExpediente } from './ActoresDelExpediente';
 import { PreguntasDelExpedientePanel } from './PreguntasDelExpedientePanel';
 import { TraerAlExpediente } from './TraerAlExpediente';
+import { IndexarEnExpediente } from './IndexarEnExpediente';
 
 /**
  * LOS EXPEDIENTES DE LA FIRMA.
@@ -226,6 +227,8 @@ export const ExpedientesView: React.FC = () => {
             <span className="[overflow-wrap:anywhere]">{error}</span>
           </p>
         )}
+
+        <IndexarEnExpediente expediente={abierto} onIndexado={refrescarAbierto} />
 
         <TraerAlExpediente expediente={abierto} onCambio={refrescarAbierto} />
 

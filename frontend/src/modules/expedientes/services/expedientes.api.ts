@@ -116,6 +116,23 @@ export const expedientesApi = {
     revisar(data, 'No se pudo atar al expediente.');
   },
 
+  /**
+   * Indexa un documento largo dentro del expediente.
+   *
+   * Va el TEXTO, no el archivo: un PDF de 300 páginas no cabe bajo el tope de
+   * cuerpo de Vercel, y el navegador ya sabe extraerlo. Medido con el Código
+   * General del Proceso entero: 0,73 MB de texto contra un tope de 4,5 MB.
+   */
+  async indexar(
+    expedienteId: string,
+    body: { titulo: string; texto: string; claveB2?: string }
+  ): Promise<{ resultado: { totalChunksCreated: number; status: string }; buscable: boolean }> {
+    const data = await httpClient.post<
+      Respuesta & { resultado: { totalChunksCreated: number; status: string }; buscable: boolean }
+    >(`/api/expedientes/${expedienteId}/indexar`, { body });
+    return revisar(data, 'No se pudo indexar el documento.');
+  },
+
   /** Prepara el interrogatorio. CUESTA SALDO: la pantalla lo dice antes de llamar. */
   async preguntas(
     expedienteId: string,

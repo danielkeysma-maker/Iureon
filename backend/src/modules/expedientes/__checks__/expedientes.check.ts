@@ -567,6 +567,50 @@ check(
   'un parrafo suelto sin caso no se puede reconstruir'
 );
 
+/* ─── 11. LO INDEXADO ALIMENTA EL INTERROGATORIO, SIN PODER TUMBARLO ─────── */
+
+const conPreguntas = leer('modules/expedientes/preguntas.controller.ts');
+
+check(
+  'el interrogatorio busca en el expediente indexado, acotado a ESE caso',
+  /vectorSearchService\.search\(firmId, consulta, FRAGMENTOS_DEL_CASO, expediente\.id\)/.test(conPreguntas),
+  'sin el id del caso traeria parrafos del expediente de otro cliente'
+);
+
+/*
+ * LA BUSQUEDA NO PUEDE COSTAR EL INTERROGATORIO. Corre ANTES de llamar al
+ * motor, con la reserva de saldo ya hecha: si un fallo de red la dejara
+ * escapar, el abogado perderia la peticion por un extra que ni siquiera
+ * pidio. Sin proveedor, sin indice o con la red caida, se prepara como antes.
+ */
+const bloqueBusqueda = conPreguntas.slice(
+  conPreguntas.indexOf('let material'),
+  conPreguntas.indexOf('const llamada = await conLimite')
+);
+check(
+  'y un fallo de la busqueda no tumba el interrogatorio: va dentro de un try',
+  bloqueBusqueda.includes('try') && bloqueBusqueda.includes('catch'),
+  'es un extra, no un requisito'
+);
+check(
+  'sin nada indexado, el material va nulo y el prompt lo dice',
+  /material: null/.test(leer('modules/expedientes/preguntasDelExpediente.ts')) ||
+    /no adjunt/.test(leer('modules/expedientes/preguntasDelExpediente.ts')),
+  'el prompt tiene una rama para cuando no hay material'
+);
+
+/*
+ * Y NO SE TRAE EL EXPEDIENTE ENTERO. Seis fragmentos de 400 palabras son unas
+ * 2.400: bastante para que las preguntas nazcan de hechos del caso, y poco
+ * para que no desplacen a los actores y a la ficha dentro del encargo.
+ */
+check(
+  'se traen unos pocos pasajes, no el expediente entero',
+  /FRAGMENTOS_DEL_CASO = \d+/.test(conPreguntas) &&
+    Number(/FRAGMENTOS_DEL_CASO = (\d+)/.exec(conPreguntas)?.[1] ?? 0) <= 12,
+  'treinta fragmentos convertirian el interrogatorio en un resumen del expediente'
+);
+
 console.log('');
 console.log(fallos === 0 ? 'ALL CHECKS PASSED' : `${fallos} CHECKS FAILED`);
 process.exit(fallos === 0 ? 0 : 1);
