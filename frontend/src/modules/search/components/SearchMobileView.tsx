@@ -66,7 +66,7 @@ interface TarjetaProps {
 const Tarjeta: React.FC<TarjetaProps> = ({ item, curada, onCitar, copiada }) => (
   <article
     className={`rounded-[8px] px-3 py-[11px] ${
-      curada ? 'border border-brand-line bg-surface' : 'border border-line-200 bg-surface'
+      curada ? 'border border-[rgb(var(--brand-line))] bg-surface' : 'border border-line-200 bg-surface'
     }`}
     style={{
       borderLeft: `3px solid ${curada ? 'rgb(var(--brand-700))' : 'rgb(var(--neutral-line))'}`
@@ -164,7 +164,7 @@ const Rotulo: React.FC<{ texto: string; curada: boolean }> = ({ texto, curada })
     >
       {texto}
     </span>
-    <div className={`h-px flex-1 ${curada ? 'bg-brand-line' : 'bg-line-200'}`} />
+    <div className={`h-px flex-1 ${curada ? 'bg-[rgb(var(--brand-line))]' : 'bg-line-200'}`} />
   </div>
 );
 

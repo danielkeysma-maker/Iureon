@@ -78,7 +78,6 @@ export interface WorkflowRequest {
    */
   legalBranch?: string;
   legalPrompt: string;
-  expedienteId?: string;
   customFormatInstruction?: string;
   existingDraft?: string;
   /**

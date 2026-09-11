@@ -386,7 +386,7 @@ export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
                         hoy
                           ? 'border-verified bg-[rgb(var(--verified-surf))]'
                           : antes
-                            ? 'border-brand-line bg-brand-50'
+                            ? 'border-[rgb(var(--brand-line))] bg-brand-50'
                             : 'border-line-200'
                       }`}
                     />
@@ -445,7 +445,7 @@ export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
             <button
               type="button"
               onClick={() => exportar('word')}
-              className="flex h-11 flex-1 items-center justify-center gap-[7px] rounded-[6px] border border-brand-line bg-surface text-[13px] font-medium text-brand-700"
+              className="flex h-11 flex-1 items-center justify-center gap-[7px] rounded-[6px] border border-[rgb(var(--brand-line))] bg-surface text-[13px] font-medium text-brand-700"
             >
               <IconoDocumento className="h-3.5 w-3.5" />
               Word
@@ -453,7 +453,7 @@ export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
             <button
               type="button"
               onClick={() => exportar('pdf')}
-              className="flex h-11 flex-1 items-center justify-center gap-[7px] rounded-[6px] border border-brand-line bg-surface text-[13px] font-medium text-brand-700"
+              className="flex h-11 flex-1 items-center justify-center gap-[7px] rounded-[6px] border border-[rgb(var(--brand-line))] bg-surface text-[13px] font-medium text-brand-700"
             >
               <IconoDocumento className="h-3.5 w-3.5" />
               PDF

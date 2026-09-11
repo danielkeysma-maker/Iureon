@@ -191,7 +191,7 @@ const COLORES: { id: ColorDeResaltado; nombre: string; clase: string; muestra: s
   { id: 'amarillo', nombre: 'Amarillo', clase: 'bg-yellow-200/80', muestra: 'bg-yellow-300' },
   { id: 'verde', nombre: 'Verde', clase: 'bg-green-200/80', muestra: 'bg-green-300' },
   { id: 'azul', nombre: 'Azul', clase: 'bg-sky-200/80', muestra: 'bg-sky-300' },
-  { id: 'rosa', nombre: 'Rosa', clase: 'bg-pink-200/80', muestra: 'bg-pink-300' },
+  { id: 'rosa', nombre: 'Rosa', clase: 'bg-pink-200/80', muestra: 'bg-pink-400' },
   { id: 'tachado', nombre: 'Tachar', clase: 'line-through decoration-ink-700 decoration-2', muestra: '' }
 ];
 
@@ -758,7 +758,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   /* ─── Piezas (funciones de render) ───────────────────────────────────────── */
 
   const Cinta = () => (
-    <div className={`flex flex-wrap items-center gap-x-3 gap-y-1 border-b px-4 py-1.5 text-[11.5px] ${guardado.activo ? 'border-line-100 bg-canvas text-ink-600' : 'border-amber-200 bg-amber-50 text-amber-900'}`}>
+    <div className={`flex flex-wrap items-center gap-x-3 gap-y-1 border-b px-4 py-1.5 text-[11.5px] ${guardado.activo ? 'border-line-100 bg-canvas text-ink-700' : 'border-amber-200 bg-amber-50 text-amber-900'}`}>
       {guardado.activo ? <ShieldCheck className="h-3.5 w-3.5 text-verified" /> : <AlertTriangle className="h-3.5 w-3.5" />}
       <span>
         {guardado.aviso}
@@ -887,7 +887,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
                 setVersionAbierta(null);
               }}
               title={m === 'original' ? 'El archivo tal como se subió: su diagramación, sus negritas, sus tablas' : undefined}
-              className={`flex shrink-0 items-center gap-1 whitespace-nowrap rounded-control px-2.5 py-1 text-[12px] ${modo === m && versionAbierta === null ? 'bg-brand-50 font-semibold text-brand-700' : 'text-ink-600 hover:text-ink-900'}`}
+              className={`flex shrink-0 items-center gap-1 whitespace-nowrap rounded-control px-2.5 py-1 text-[12px] ${modo === m && versionAbierta === null ? 'bg-brand-50 font-semibold text-brand-700' : 'text-ink-700 hover:text-ink-900'}`}
             >
               {m === 'marcas' ? <Eye className="h-3.5 w-3.5" /> : m === 'editar' ? <PenLine className="h-3.5 w-3.5" /> : <FileText className="h-3.5 w-3.5" />}
               {m === 'marcas' ? 'Con marcas' : m === 'editar' ? 'Editar' : 'Original'}
@@ -958,7 +958,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
               const r = resumenDeCambios(tramos);
               return (
                 <>
-                  <div className="mb-4 flex flex-wrap items-center gap-2 border-b border-line-100 pb-3 font-sans text-[12px] text-ink-600">
+                  <div className="mb-4 flex flex-wrap items-center gap-2 border-b border-line-100 pb-3 font-sans text-[12px] text-ink-700">
                     <History className="h-3.5 w-3.5" />
                     <span>
                       Versión de {fechaCorta(v.fecha)} · {v.motivo}
@@ -1219,7 +1219,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
         */}
         {datos.informeRecibido ? (
           <>
-            <p className="rounded-control border border-line-200 bg-canvas px-2.5 py-1.5 text-[11.5px] leading-snug text-ink-600 text-justify">
+            <p className="rounded-control border border-line-200 bg-canvas px-2.5 py-1.5 text-[11.5px] leading-snug text-ink-700 text-justify">
               Lectura de un <span className="font-semibold">documento recibido</span>. Todo lo de abajo sale del texto del propio documento y va citado:
               ninguna ficha del catálogo respalda estas líneas.{' '}
               {/*
@@ -1237,7 +1237,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
         ) : !informe ? (
           informeLibre ? (
             <>
-              <p className="rounded-control border border-line-200 bg-canvas px-2.5 py-1.5 text-[11.5px] leading-snug text-ink-600 text-justify">
+              <p className="rounded-control border border-line-200 bg-canvas px-2.5 py-1.5 text-[11.5px] leading-snug text-ink-700 text-justify">
                 El revisor respondió en un formato que no se pudo ordenar por secciones; abajo está su texto completo.
               </p>
               <pre className="whitespace-pre-wrap font-sans text-[12.5px] leading-relaxed text-ink-900">{informeLibre}</pre>
@@ -1259,7 +1259,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
               items.length ? (
                 <section key={t}>
                   <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">{t}</h4>
-                  <ul className="mt-1 list-disc space-y-1 pl-4 text-ink-800">
+                  <ul className="mt-1 list-disc space-y-1 pl-4 text-ink-900">
                     {items.map((x, k) => (
                       <li key={k} className="text-justify [text-wrap:pretty]">{x}</li>
                     ))}

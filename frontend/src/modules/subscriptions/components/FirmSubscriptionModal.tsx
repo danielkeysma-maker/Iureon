@@ -327,7 +327,7 @@ export const FirmSubscriptionModal: React.FC<FirmSubscriptionModalProps> = ({
                       onClick={() => setPeriodo(p)}
                       aria-pressed={periodo === p}
                       className={`rounded-full px-4 py-1.5 text-[12.5px] font-medium transition-colors ${
-                        periodo === p ? 'bg-brand-700 text-white shadow-e1' : 'text-ink-600 hover:text-ink-900'
+                        periodo === p ? 'bg-brand-700 text-white shadow-e1' : 'text-ink-700 hover:text-ink-900'
                       }`}
                     >
                       {p === 'MENSUAL' ? 'Mensual' : 'Anual'}
@@ -397,8 +397,8 @@ export const FirmSubscriptionModal: React.FC<FirmSubscriptionModalProps> = ({
                         {TODOS_LOS_MODULOS.map((m) => {
                           const si = incluidos.has(m);
                           return (
-                            <li key={m} className={`flex items-center gap-1.5 ${si ? 'text-ink-800' : 'text-ink-400 line-through decoration-ink-300'}`}>
-                              {si ? <Check className="h-3.5 w-3.5 shrink-0 text-verified" /> : <Minus className="h-3.5 w-3.5 shrink-0 text-ink-300" />}
+                            <li key={m} className={`flex items-center gap-1.5 ${si ? 'text-ink-900' : 'text-ink-400 line-through decoration-ink-400'}`}>
+                              {si ? <Check className="h-3.5 w-3.5 shrink-0 text-verified" /> : <Minus className="h-3.5 w-3.5 shrink-0 text-ink-400" />}
                               {NOMBRE_DE_MODULO[m]}
                             </li>
                           );
@@ -468,7 +468,7 @@ export const FirmSubscriptionModal: React.FC<FirmSubscriptionModalProps> = ({
                             {activandoPrueba ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Gift className="h-4 w-4" />}
                             {activandoPrueba ? 'Activando la prueba…' : 'Probar Esencial gratis 7 días'}
                           </button>
-                          <p className="mt-1 text-center text-[11.5px] leading-snug text-ink-600">
+                          <p className="mt-1 text-center text-[11.5px] leading-snug text-ink-700">
                             Un usuario, sin tarjeta y sin cobro al terminar.
                           </p>
                         </div>

@@ -227,7 +227,7 @@ export const PreguntasDelExpedientePanel: React.FC<{ expediente: ExpedienteConDe
       </button>
 
       {error && (
-        <p className="mt-2 flex items-start gap-2 text-meta text-ink-600">
+        <p className="mt-2 flex items-start gap-2 text-meta text-ink-700">
           <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
           <span className="[overflow-wrap:anywhere]">{error}</span>
         </p>
@@ -270,7 +270,7 @@ export const PreguntasDelExpedientePanel: React.FC<{ expediente: ExpedienteConDe
             </button>
           </div>
           {resultado.enfoque && (
-            <p className="rounded-card border border-line-200 bg-canvas p-3 text-meta text-ink-600 [overflow-wrap:anywhere]">
+            <p className="rounded-card border border-line-200 bg-canvas p-3 text-meta text-ink-700 [overflow-wrap:anywhere]">
               {resultado.enfoque}
             </p>
           )}

@@ -178,7 +178,7 @@ export const ActoresDelExpediente: React.FC<{
         </form>
       )}
 
-      {error && <p className="mt-2 text-meta text-ink-600 [overflow-wrap:anywhere]">{error}</p>}
+      {error && <p className="mt-2 text-meta text-ink-700 [overflow-wrap:anywhere]">{error}</p>}
 
       {expediente.listaDeActores.length === 0 ? (
         <p className="mt-3 text-meta text-ink-500">

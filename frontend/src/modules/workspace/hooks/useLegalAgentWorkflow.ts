@@ -123,7 +123,6 @@ Por favor espere unos segundos mientras se finaliza la redacción solemne.`,
         documentType,
         legalBranch,
         legalPrompt,
-        expedienteId: 'EXP-2026-904',
         existingDraft: activeDraftText || undefined,
         customFormatInstruction: formatoDeFirma || undefined,
         adjuntos: adjuntos.length > 0 ? adjuntos : undefined

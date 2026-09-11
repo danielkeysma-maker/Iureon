@@ -233,7 +233,7 @@ export const ExpedientesView: React.FC = () => {
         </header>
 
         {error && (
-          <p className="flex items-start gap-2 rounded-card border border-line-200 bg-canvas p-3 text-meta text-ink-600">
+          <p className="flex items-start gap-2 rounded-card border border-line-200 bg-canvas p-3 text-meta text-ink-700">
             <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
             <span className="[overflow-wrap:anywhere]">{error}</span>
           </p>
@@ -360,7 +360,7 @@ export const ExpedientesView: React.FC = () => {
       )}
 
       {error && !abierto && (
-        <p className="flex items-start gap-2 rounded-card border border-line-200 bg-canvas p-3 text-meta text-ink-600">
+        <p className="flex items-start gap-2 rounded-card border border-line-200 bg-canvas p-3 text-meta text-ink-700">
           <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
           <span className="[overflow-wrap:anywhere]">{error}</span>
         </p>

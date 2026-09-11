@@ -93,7 +93,6 @@ export const streamAgentDraftController = async (req: Request, res: Response): P
     documentType,
     legalBranch,
     legalPrompt,
-    expedienteId,
     existingDraft,
     customFormatInstruction
   } = req.body;
@@ -251,7 +250,6 @@ export const streamAgentDraftController = async (req: Request, res: Response): P
         documentType: tipoElegido,
         legalBranch,
         legalPrompt,
-        expedienteId,
         existingDraft,
         /*
          * El formato de la firma (numeracion de hechos, titulos, bloque de

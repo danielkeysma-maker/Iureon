@@ -169,7 +169,7 @@ export const LecturaDelDocumentoRecibido: React.FC<LecturaDelDocumentoRecibidoPr
                   */
                   <p
                     className={`mt-1.5 text-ui leading-snug ${
-                      c.deQuienEs === 'DE_OTRO' ? 'text-ink-600' : 'font-semibold text-brand-700'
+                      c.deQuienEs === 'DE_OTRO' ? 'text-ink-700' : 'font-semibold text-brand-700'
                     }`}
                   >
                     Plazo que anuncia el documento: {c.plazo}

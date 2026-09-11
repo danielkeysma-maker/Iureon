@@ -175,7 +175,7 @@ export const ClienteDelExpediente: React.FC<{
             </button>
           )}
 
-          {error && <p className="text-meta text-ink-600 [overflow-wrap:anywhere]">{error}</p>}
+          {error && <p className="text-meta text-ink-700 [overflow-wrap:anywhere]">{error}</p>}
         </div>
       )}
     </section>

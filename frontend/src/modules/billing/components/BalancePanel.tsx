@@ -355,7 +355,7 @@ export const BalancePanel: React.FC<BalancePanelProps> = ({
             toque aqui la abre. Es la misma intencion firmada, no otra.
           */}
           {enlaceCheckout && !abriendo && (
-            <p className="mt-2 rounded-control border border-brand-line bg-brand-50 px-3 py-2 text-[12px] leading-snug text-brand-700">
+            <p className="mt-2 rounded-control border border-[rgb(var(--brand-line))] bg-brand-50 px-3 py-2 text-[12px] leading-snug text-brand-700">
               Si la pasarela no se abrió sola,{' '}
               <a href={enlaceCheckout} className="font-semibold underline underline-offset-2">
                 tóquelo aquí para abrir Wompi

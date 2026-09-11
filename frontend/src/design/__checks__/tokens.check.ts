@@ -12,7 +12,7 @@
  * No lanza error, no aparece en consola, y no se ve hasta que alguien abre esa
  * pantalla con esa preferencia. Por eso se comprueba aquí.
  */
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -130,6 +130,95 @@ check(
   'ninguna elección de fuente toca la monoespaciada',
   !bloquesFuente.some((b) => /--font-mono|--font-legal/.test(b)),
   ''
+);
+
+/* ─── EL TONO QUE NO EXISTE, Y LA CLASE QUE NO EMITE NADA ──────────────────
+ *
+ * `border-brand-line` se usaba en seis archivos y NO EXISTE: `brand` solo
+ * declara 50, 700 y 800. Tailwind no avisa de una clase que no reconoce —
+ * simplemente no emite regla—, así que el borde se quedaba en el gris por
+ * defecto y nadie lo notó. Lo mismo vale para `bg-`, `text-` y `ring-`.
+ *
+ * Es la clase de defecto que este archivo existe para cazar: no lanza error,
+ * no sale en consola, y solo se ve si alguien compara la pantalla con el
+ * diseño que tenía en la cabeza.
+ *
+ * SE COMPRUEBAN SOLO LAS FAMILIAS QUE ESTE PROYECTO DECLARA. Tailwind trae las
+ * suyas —`text-white`, `bg-red-500`— y validarlas aquí obligaría a copiar su
+ * paleta entera, que envejecería a la primera actualización. Lo que se puede
+ * sostener es lo propio: si una clase nombra `brand`, `ink`, `line`, `nav` o
+ * `rail`, su tono tiene que estar en `tailwind.config.js`.
+ */
+const CONFIG = readFileSync(join(AQUI, '..', '..', '..', 'tailwind.config.js'), 'utf8');
+
+/** Los tonos declarados de una familia, leídos del config y no de una lista. */
+const tonosDe = (familia: string): Set<string> => {
+  const abre = CONFIG.indexOf(`        ${familia}: {`);
+  if (abre === -1) return new Set();
+  const cierra = CONFIG.indexOf('\n        },', abre);
+  const bloque = CONFIG.slice(abre, cierra === -1 ? undefined : cierra);
+  const tonos = [...bloque.matchAll(/^\s*'?([A-Za-z0-9-]+)'?\s*:/gm)].map((m) => m[1]);
+  /* La primera coincidencia es el nombre de la familia. */
+  return new Set(tonos.slice(1).map((t) => t.toLowerCase()));
+};
+
+/*
+ * `nav` y `rail` traen `DEFAULT`, que en Tailwind se escribe sin tono
+ * (`bg-nav`). Se acepta como tono vacío.
+ */
+const FAMILIAS = ['ink', 'line', 'brand', 'nav', 'rail'];
+const PREFIJOS = ['bg', 'text', 'border', 'ring', 'divide', 'outline', 'from', 'via', 'to', 'fill', 'stroke', 'shadow', 'accent', 'caret', 'decoration'];
+
+/*
+ * SE MIRA EL CODIGO SIN COMENTARIOS, Y ESTA LECCION YA SE PAGO EN ESTA CASA
+ * TRES VECES. Un comentario que EXPLICA una clase rota —«`border-brand-line`
+ * NO existe»— la contiene, asi que un barrido ingenuo la denuncia y el arreglo
+ * documentado se vuelve la falsa alarma. El propio archivo de este check es el
+ * peor caso: su cabecera nombra la clase para explicarla.
+ */
+const sinComentarios = (codigo: string): string =>
+  codigo.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/.*$/gm, '$1');
+
+const fuentes: string[] = [];
+const recorrer = (dir: string): void => {
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    const ruta = join(dir, e.name);
+    /* Los checks hablan DE las clases rotas; no las usan. */
+    if (e.isDirectory() && e.name !== '__checks__') recorrer(ruta);
+    else if (!e.isDirectory() && (e.name.endsWith('.tsx') || e.name.endsWith('.ts'))) fuentes.push(ruta);
+  }
+};
+recorrer(join(AQUI, '..', '..'));
+
+const rotas: string[] = [];
+for (const familia of FAMILIAS) {
+  const tonos = tonosDe(familia);
+  /*
+   * `[^\]]` tras el tono descarta las clases arbitrarias
+   * `border-[rgb(var(--brand-line))]`, que son la forma CORRECTA de usar un
+   * token sin escala: ahí `brand-line` es el nombre de una variable CSS, no
+   * un tono de Tailwind.
+   */
+  const uso = new RegExp(`\\b(?:${PREFIJOS.join('|')})-${familia}-([a-z0-9-]+)\\b`, 'g');
+  for (const ruta of fuentes) {
+    const codigo = sinComentarios(readFileSync(ruta, 'utf8'));
+    for (const m of codigo.matchAll(uso)) {
+      const tono = m[1].toLowerCase();
+      if (tonos.has(tono)) continue;
+      /* Dentro de una clase arbitraria no es un tono: es una variable CSS. */
+      const antes = codigo.slice(Math.max(0, m.index - 30), m.index);
+      if (antes.includes('var(--')) continue;
+      rotas.push(`${ruta.split('src')[1] ?? ruta}: ${m[0]}`);
+    }
+  }
+}
+
+check(
+  'ninguna clase nombra un tono que la paleta no declara',
+  rotas.length === 0,
+  rotas.length > 0
+    ? `NO EMITEN NADA: ${[...new Set(rotas)].join(' · ')}`
+    : `${FAMILIAS.length} familias comprobadas en ${fuentes.length} archivos`
 );
 
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);

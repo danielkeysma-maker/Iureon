@@ -101,7 +101,7 @@ export const TraerAlExpediente: React.FC<{
             />
           </div>
 
-          {error && <p className="mt-2 text-meta text-ink-600 [overflow-wrap:anywhere]">{error}</p>}
+          {error && <p className="mt-2 text-meta text-ink-700 [overflow-wrap:anywhere]">{error}</p>}
 
           {cargando ? (
             <p className="mt-3 flex items-center gap-2 text-meta text-ink-500">

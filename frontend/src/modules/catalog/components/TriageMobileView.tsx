@@ -416,7 +416,7 @@ export const TriageMobileView: React.FC<TriageMobileViewProps> = ({ onDraft, onL
                       className={`mt-[11px] h-11 w-full rounded-[6px] text-[13.5px] ${
                         esPrimario
                           ? 'bg-brand-700 font-semibold text-on-brand'
-                          : 'border border-brand-line bg-surface font-medium text-brand-700'
+                          : 'border border-[rgb(var(--brand-line))] bg-surface font-medium text-brand-700'
                       }`}
                     >
                       Redactar esta

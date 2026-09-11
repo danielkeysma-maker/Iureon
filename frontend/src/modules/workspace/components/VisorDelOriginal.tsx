@@ -379,10 +379,10 @@ export const VisorDelOriginal: React.FC<VisorDelOriginalProps> = ({
   const Avisos = (
     <>
       {subiendo !== null && (
-        <p className="border-b border-line-100 bg-canvas px-4 py-1.5 text-[11.5px] text-ink-600">Guardando el archivo con la revisión · {subiendo}%</p>
+        <p className="border-b border-line-100 bg-canvas px-4 py-1.5 text-[11.5px] text-ink-700">Guardando el archivo con la revisión · {subiendo}%</p>
       )}
       {avisoDeSubida && (
-        <p className="border-b border-line-100 bg-canvas px-4 py-1.5 text-[11.5px] text-ink-600 text-justify [text-wrap:pretty]">
+        <p className="border-b border-line-100 bg-canvas px-4 py-1.5 text-[11.5px] text-ink-700 text-justify [text-wrap:pretty]">
           {avisoDeSubida}{' '}
           <button type="button" onClick={() => setAvisoDeSubida('')} className="underline">
             cerrar
@@ -390,7 +390,7 @@ export const VisorDelOriginal: React.FC<VisorDelOriginalProps> = ({
         </p>
       )}
       {original && totalDeMarcas > 0 && (
-        <p className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 border-b border-line-100 bg-canvas px-4 py-1.5 text-[11.5px] text-ink-600">
+        <p className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 border-b border-line-100 bg-canvas px-4 py-1.5 text-[11.5px] text-ink-700">
           <Highlighter className="h-3.5 w-3.5 shrink-0" />
           {!hayResaltadoNativo() ? (
             <span className="min-w-0 text-justify [text-wrap:pretty]">

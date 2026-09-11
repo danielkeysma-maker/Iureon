@@ -216,7 +216,7 @@ export const IndexarEnExpediente: React.FC<{
 
           {leido && (
             <>
-              <p className="text-meta text-ink-600">
+              <p className="text-meta text-ink-700">
                 Se leyeron {leido.caracteres.toLocaleString('es-CO')} caracteres (~{paginas} páginas).
                 {leido.recortado && ' El documento es más largo y se recortó.'}
               </p>
@@ -244,14 +244,14 @@ export const IndexarEnExpediente: React.FC<{
           )}
 
           {error && (
-            <p className="flex items-start gap-2 text-meta text-ink-600">
+            <p className="flex items-start gap-2 text-meta text-ink-700">
               <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
               <span className="[overflow-wrap:anywhere]">{error}</span>
             </p>
           )}
 
           {hecho && (
-            <p className="flex items-start gap-2 text-meta text-ink-600">
+            <p className="flex items-start gap-2 text-meta text-ink-700">
               <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0" />
               <span>
                 {hecho.buscable

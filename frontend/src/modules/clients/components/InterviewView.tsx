@@ -537,7 +537,7 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft, onPrivaci
               tres semanas se relee, no se da por hecha.
             */}
             {previas.length > 0 && (
-              <p className="mb-3 rounded-control border border-brand-line bg-brand-50 px-3 py-2 text-[11.5px] leading-snug text-brand-700">
+              <p className="mb-3 rounded-control border border-[rgb(var(--brand-line))] bg-brand-50 px-3 py-2 text-[11.5px] leading-snug text-brand-700">
                 {previas.length === 1 ? 'Hay una entrevista anterior' : `Hay ${previas.length} entrevistas anteriores`} con
                 este cliente.{' '}
                 {respondidasAntes === 0
@@ -559,7 +559,7 @@ export const InterviewView: React.FC<InterviewViewProps> = ({ onDraft, onPrivaci
                         cubierta
                           ? 'border-verified bg-[rgb(var(--verified-surf))]'
                           : antes
-                            ? 'border-brand-line bg-brand-50'
+                            ? 'border-[rgb(var(--brand-line))] bg-brand-50'
                             : 'border-line-200'
                       }`}
                     >
