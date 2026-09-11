@@ -40,6 +40,14 @@ export const NOVEDADES_ID = 'novedades';
 export const NOVEDADES: readonly Novedad[] = [
   {
     fecha: '2026-09-11',
+    titulo: 'Dos modulos que la barra ofrecia y el manual no explicaba',
+    detalle:
+      'Expedientes solo estaba documentado por su interrogatorio: el expediente en si —crearlo, atar el cliente, traer lo que ya tiene, indexar trescientas paginas, buscar dentro por significado, las carpetas y quien es quien— no tenia articulo. Y «Buscador» no aparecia en ninguna ruta de ningun articulo: cobertura cero. Ya tienen el suyo: «Reunir el expediente de un caso» y «Buscar jurisprudencia». El manual gana ademas dos grupos, «Organizar el caso» y «Consultar», y «Preparar el interrogatorio» se muda de «Redactar» al primero, que es donde vive desde que el interrogatorio se hace en el expediente. Para que no vuelva a pasar, hay una comprobacion que se pone roja cuando un modulo de trabajo diario no aparece en la ruta de ningun articulo; caza la cobertura cero, no la parcial, y eso queda escrito en el propio check.',
+    modulo: 'Manual de uso',
+    tipo: 'mejora'
+  },
+  {
+    fecha: '2026-09-11',
     titulo: 'Inicio ya no pregunta por el nombre del módulo, sino por lo que usted tiene delante',
     detalle:
       'Las tres tarjetas de Inicio —«Redactar un escrito», «Revisar un documento», «Transcribir una audiencia»— eran verbos del producto, y dejaban fuera justo los dos módulos que un recién llegado no encuentra solo. En su lugar hay cinco puertas con la frase del abogado: «Me llegó un documento», «Tengo los hechos y no el nombre», «Ya sé qué voy a presentar», «Tengo un caso con muchos papeles» y «Grabé una audiencia». Orientación entra por fin a la pantalla de entrada —es la que existe para quien NO sabe cómo se llama lo suyo, así que pedirle su nombre para llegar a ella era un contrasentido— y Expedientes también, que no estaba en ninguna parte de Inicio. La visita guiada gana además su parada de Expedientes: hasta hoy quien entraba por primera vez la recorría entera sin enterarse de que el módulo existía. Las tarjetas siguen atenuándose con «No incluido en su plan» cuando la firma no tiene ese módulo.',

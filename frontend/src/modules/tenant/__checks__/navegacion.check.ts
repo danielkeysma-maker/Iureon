@@ -1,6 +1,7 @@
 import { NAV_GROUPS, NAV_MODULES, VISTA_POR_MODULO, modulosSinGrupo } from '../navigation';
 import { PUERTAS_DE_INICIO } from '../../inicio/puertas';
 import { PASOS_DE_VISITA } from '../../inicio/visitaGuiada/pasos';
+import { MANUAL } from '../../help/content/manual';
 import type { MainView } from '../types';
 
 /**
@@ -165,6 +166,43 @@ check(
   sinParada.length > 0
     ? `SIN PARADA: ${sinParada.join(', ')} — existe, funciona, y el recien llegado no se entera`
     : `${PASOS_DE_VISITA.length} paradas`
+);
+
+/* ─── 7. Y NINGUN MODULO DE TRABAJO DIARIO SE QUEDA SIN MANUAL ──────────── */
+/*
+ * Expedientes llevaba dias en la barra con una sola mencion en el manual —la
+ * del interrogatorio— y el expediente en si sin documentar. Y «Buscador» no
+ * aparecia en NINGUNA ruta de ningun articulo: cobertura cero, sin que nada
+ * lo dijera.
+ *
+ * Se mide por la ruta («ruta») y no por el texto, porque la ruta es lo que el
+ * articulo promete: «este articulo pasa por aqui». Que una prosa nombre un
+ * modulo de pasada no lo documenta.
+ *
+ * LIMITE DECLARADO: esto caza la cobertura CERO, no la parcial. Expedientes
+ * habria pasado este check el mes pasado con solo el articulo del
+ * interrogatorio. Decirlo aqui vale mas que fingir que el check hace mas.
+ */
+const enRutas = new Set<string>();
+for (const grupo of MANUAL) {
+  for (const articulo of grupo.articulos) {
+    for (const b of articulo.bloques) {
+      if (b.kind === 'ruta') for (const chip of b.camino) enRutas.add(chip);
+    }
+  }
+}
+
+/* El manual se documenta a si mismo, y al estrado no se le escribe un articulo. */
+const SIN_ARTICULO_PROPIO = new Set<MainView>(['manual']);
+const sinManual = NAV_MODULES.filter(
+  (m) => !administrar.has(m.id) && !SIN_ARTICULO_PROPIO.has(m.id) && !enRutas.has(m.label)
+);
+check(
+  'todo modulo de trabajo diario aparece en la ruta de algun articulo del manual',
+  sinManual.length === 0,
+  sinManual.length > 0
+    ? `SIN MANUAL: ${sinManual.map((m) => m.label).join(', ')}`
+    : `${enRutas.size} destinos nombrados en las rutas`
 );
 
 console.log('');

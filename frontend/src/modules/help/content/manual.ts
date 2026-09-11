@@ -1045,6 +1045,179 @@ const A_DOCUMENTO_RECIBIDO: ManualArticle = {
   ]
 };
 
+const A_BUSCADOR: ManualArticle = {
+  id: 'buscador',
+  titulo: 'Buscar jurisprudencia',
+  entradilla:
+    'Providencias del corpus curado y, cuando el corpus no alcanza, del registro oficial en vivo — con la diferencia entre las dos dicha en pantalla.',
+  bloques: [
+    { kind: 'ruta', camino: ['Buscador', 'Escriba lo que busca', '«Buscar»'] },
+    {
+      kind: 'parrafo',
+      texto:
+        'El Buscador responde con providencias reales, no con un resumen redactado por un modelo: cada resultado trae su número, su corporación, su magistrado ponente cuando consta, el fragmento de donde salió y el enlace «Leer la providencia en la fuente oficial». Lo que usted cita lo cita del documento, no de esta pantalla.'
+    },
+    {
+      kind: 'parrafo',
+      texto:
+        'Busca por significado, igual que la búsqueda dentro de un expediente: no hace falta acertar la palabra de la providencia. El cuadro propone ejemplos —«estabilidad laboral reforzada», «mínimo vital», «contrato realidad»— porque así es como se busca aquí: por la figura, no por una cita literal.'
+    },
+    { kind: 'subtitulo', texto: 'Acotar la consulta' },
+    {
+      kind: 'lista',
+      items: [
+        '«Corporación» filtra entre «Todas las corporaciones», «Corte Constitucional», «Corte Suprema» y «Disciplina Judicial».',
+        '«Año» solo aparece cuando los resultados traen más de un año, y se arma con los años que de verdad volvieron: no ofrece años vacíos.',
+        '«Solo curadas» esconde lo traído automáticamente y deja únicamente lo que alguien leyó.',
+        'Junto a los filtros se muestran el número de resultados y el tiempo REAL que tardó la consulta.'
+      ]
+    },
+    { kind: 'subtitulo', texto: 'Lo curado y lo automático no son lo mismo' },
+    {
+      kind: 'parrafo',
+      texto:
+        'Los resultados llegan en dos bloques rotulados y la pantalla no los mezcla. Arriba, «Corpus curado · N — una persona la leyó y extrajo sus hechos y su ratio». Debajo, «Descubrimiento automático · N — relevancia del modelo, sin lectura humana», que es lo que la búsqueda alcanzó en vivo; cada tarjeta de ese bloque lleva además el chip «Automático» y su cita va con filete punteado.'
+    },
+    {
+      kind: 'aviso',
+      texto:
+        'Esa distinción es la razón de ser de la pantalla, no un adorno. Un resultado automático es igual de real y NO está comprobado: nadie de esta casa lo ha abierto. Antes de llevar uno a un escrito, ábralo por «Leer la providencia en la fuente oficial» y compruebe que dice lo que la aplicación cree que dice.'
+    },
+    { kind: 'subtitulo', texto: 'Cuando no devuelve nada' },
+    {
+      kind: 'parrafo',
+      texto:
+        '«Sin resultados» no siempre significa lo mismo, y la segunda línea lo precisa: que no hubo coincidencias para lo que usted escribió, o que el corpus todavía no tiene providencias indexadas, o que falta el proveedor que convierte la consulta en vector, o que la búsqueda no pudo completarse. Las tres últimas no dicen nada sobre su consulta: dicen que la pantalla no pudo buscar.'
+    },
+    {
+      kind: 'consejo',
+      texto:
+        'Buscar no descuenta saldo de la firma. Puede probar la misma idea con tres redacciones distintas sin pensar en el costo — y conviene, porque la búsqueda por significado responde mejor a la figura jurídica que a la frase suelta.'
+    },
+    {
+      kind: 'nota',
+      titulo: 'Antes de escribir nada',
+      texto:
+        'Sin consulta todavía, la pantalla no finge resultados: dice «Escriba una consulta para buscar en el corpus indexado.» Y cuando responde, a la derecha de los filtros aparecen cuántos resultados son y cuántos segundos tardó de verdad, medidos y sin adornar.'
+    },
+    {
+      kind: 'todavia-no',
+      texto:
+        'El Consejo de Estado no está entre las corporaciones. Su API oficial existe pero exige una llave que no es de autoservicio, y ofrecer una opción que nunca devuelve nada enseñaría que el buscador no sirve — sobre la única pantalla cuyo valor es que lo que muestra está comprobado. Vuelve el día que haya llave.'
+    }
+  ]
+};
+
+const A_EXPEDIENTE: ManualArticle = {
+  id: 'expediente',
+  titulo: 'Reunir el expediente de un caso',
+  entradilla:
+    'Un asunto por carpeta: quiénes son las partes, qué documentos hay —aunque sean trescientas páginas— y cómo encontrar un párrafo dentro de ellos sin recordar en qué archivo estaba.',
+  bloques: [
+    { kind: 'ruta', camino: ['Expedientes', '«Nuevo expediente»'] },
+    {
+      kind: 'parrafo',
+      texto:
+        'Un expediente es el asunto, no el cliente ni el documento: un mismo cliente puede tener varios, y cada uno reúne lo suyo. Sirve para dos cosas que antes no se podían hacer: guardar los papeles del caso de modo que se puedan CONSULTAR —no solo archivar— y registrar quién es quién, que es de donde salen después las preguntas del interrogatorio con nombre propio.'
+    },
+    {
+      kind: 'parrafo',
+      texto:
+        'Está pensado para el caso que se llena con el tiempo, no solo para el que llega completo. Se crea con el nombre con el que usted lo llama y se le va añadiendo lo que aparezca: el radicado cuando lo haya, el cliente cuando esté registrado, los documentos a medida que lleguen.'
+    },
+    { kind: 'subtitulo', texto: 'Crearlo y darle nombre' },
+    {
+      kind: 'pasos',
+      pasos: [
+        'Abra «Expedientes» y pulse «Nuevo expediente». Pide cuatro cosas y solo la primera es obligatoria: «Nombre del asunto», y debajo «Radicado», «Despacho» y «Contraparte», los tres marcados «(opcional)».',
+        'En el nombre escriba cómo llama usted al asunto, no cómo lo llama el juzgado: la pantalla lo dice —«Con lo que usted lo busca después. El radicado puede venir más tarde.»— y el ejemplo del cuadro es «Mosquera vs. ACME — restitución de inmueble».',
+        'Dentro del expediente, «Estado» es un desplegable con «Activo», «Suspendido», «Terminado» y «Archivado». Se guarda al escogerlo, sin botón de guardar. En la lista, el estado solo aparece como chip cuando NO es «Activo»: lo normal no se rotula.',
+        'En «De quién es el asunto», «Atar un cliente» lo enlaza con un cliente ya registrado; si es nuevo, «El cliente es nuevo: registrarlo aquí» lo crea con su nombre y su documento sin salir de la pantalla. Sin cliente atado, el aviso dice qué se pierde: «Sin cliente. Átelo y el expediente alcanza sus entrevistas.»'
+      ]
+    },
+    { kind: 'subtitulo', texto: 'Traer lo que ya tiene' },
+    {
+      kind: 'parrafo',
+      texto:
+        'Lo que la firma ya produjo no hay que volver a subirlo. «Traer al expediente» → «Ver lo que hay» lista las entrevistas, audiencias, revisiones, borradores, términos y orientaciones existentes, con un buscador por nombre; «Traer» ata la pieza y «Soltar» la desata. Si una pieza ya pertenece a otro expediente, la fila lo advierte —«Ya está en otro expediente. Traerla aquí la mueve.»— antes de que usted decida, porque atarla aquí se la quita al otro.'
+    },
+    { kind: 'subtitulo', texto: 'Los documentos, y por qué se «indexan»' },
+    {
+      kind: 'parrafo',
+      texto:
+        'La revisión lee un escrito de principio a fin y corta a los 300.000 caracteres. Para veinte páginas sobra; para un expediente de trescientas, no alcanza, y ningún motor lee trescientas páginas de un tirón. Indexar es la otra forma de leer: el documento se parte en fragmentos una sola vez y, a partir de ahí, la aplicación recupera los pedazos que vienen al caso. Es lo mismo que sostiene el corpus de jurisprudencia.'
+    },
+    {
+      kind: 'pasos',
+      pasos: [
+        'En «Documentos del expediente», pulse «Indexar un documento». Acepta PDF, Word y texto; la pantalla lo dice así: «PDF, Word o texto. Se lee aquí en su equipo: el archivo no se envía, solo su texto.»',
+        'Al escoger el archivo, y antes de indexar nada, la pantalla informa cuánto leyó: «Se leyeron N caracteres (~N páginas).» Si el documento era más largo que el techo del lector, añade «El documento es más largo y se recortó.» Ese aviso aparece ANTES de mandarlo, para que usted decida.',
+        'Póngale el nombre con el que lo va a reconocer —viene propuesto el del archivo— y pulse «Indexar en este expediente». Tarda: el botón dice «Indexando… puede tardar un minuto».',
+        'Al terminar dice en cuántos fragmentos quedó y que ya se puede buscar. Cada documento aparece después en la lista con su número de «fragmentos buscables» y la fecha, y una equis para quitarlo.'
+      ]
+    },
+    {
+      kind: 'aviso',
+      texto:
+        'Si el motor de búsqueda no está disponible, el documento se lee pero NO queda buscable, y la pantalla lo dice con esas palabras: «Se leyó el documento (N fragmentos) pero NO quedó buscable: el motor de búsqueda no está disponible. Vuelva a intentarlo más tarde.» No es un detalle de servidor: un documento que usted crea indexado y no lo esté saldrá ausente de todas las búsquedas sin que nada falle. Vuelva a indexarlo cuando salga ese mensaje.'
+    },
+    {
+      kind: 'aviso',
+      texto:
+        'Un PDF escaneado no trae texto: son imágenes. El lector lo dice con todas sus letras —«El archivo no trae texto que se pueda leer. Si es un PDF escaneado o una foto, son imágenes: copie y pegue el texto en su lugar.»— en vez de indexar un documento vacío. La salida es pegar el texto.'
+    },
+    { kind: 'subtitulo', texto: 'Buscar dentro del caso' },
+    {
+      kind: 'parrafo',
+      texto:
+        'Un expediente de trescientas páginas no se navega: se pregunta. «Buscar en el expediente» busca POR SIGNIFICADO y no por palabra exacta —la propia pantalla lo explica: «no entregó el inmueble» encuentra un pasaje que dice «se abstuvo de restituir el bien»—, y devuelve los pasajes con el documento del que salieron encima. No consume saldo, y la pantalla también lo dice, porque el botón de al lado sí cobra.'
+    },
+    {
+      kind: 'nota',
+      titulo: 'Si no aparece lo que usted sabe que está',
+      texto:
+        'La búsqueda solo ve lo indexado. Cuando no hay coincidencias, el aviso lo recuerda: «Nada en este expediente habla de eso. Si el documento no está indexado, la búsqueda no lo ve: revise arriba qué hay dentro.» Es el primer sitio donde mirar antes de concluir que el expediente no dice nada del asunto.'
+    },
+    { kind: 'subtitulo', texto: 'Carpetas: para ordenar, no para acotar' },
+    {
+      kind: 'lista',
+      items: [
+        'Las carpetas se anidan y un documento está en UNA sola. «Nueva carpeta» la crea donde usted esté; la miga de pan de arriba devuelve a la raíz, que lleva el nombre del expediente. Dos carpetas hermanas no pueden llamarse igual.',
+        'Tres modos de ver, con sus botones: «Lista» para recorrer con la vista, «Detalle» para ver cuántos fragmentos tiene cada documento y cuándo se indexó, y «Tarjetas» para reconocer por forma. El modo se recuerda por navegador, no por expediente.',
+        'Un documento se mueve con el selector de su fila, que incluye «Raíz del expediente» como destino.',
+        'ORDENAR NO ESCONDE NADA. El interrogatorio y la búsqueda leen TODO el expediente, esté cada cosa en la carpeta que esté; la pantalla lo dice para que la duda razonable —«si lo meto aquí, ¿deja de verlo?»— no impida organizar.',
+        'Vacío, se dice cuál de los dos vacíos es: «Todo está en la raíz. Cree carpetas para agrupar por prueba, por etapa o como prefiera.» en la raíz, y «Esta carpeta está vacía.» dentro de una.'
+      ]
+    },
+    {
+      kind: 'aviso',
+      texto:
+        'Borrar una carpeta SE LLEVA lo que hay dentro, subcarpetas y documentos. Se pregunta antes y con números: «Se borrará la carpeta con 2 subcarpeta(s) y 5 documento(s) indexado(s). Los documentos dejarán de estar en el expediente y de aparecer en las búsquedas; para volver a tenerlos habría que indexarlos de nuevo. Esto no se deshace.» Si la carpeta está vacía, lo dice también. Y si el conteo previo falla, pregunta igual pero sin prometer un número: decir «vacía» sin haberlo comprobado sería la peor forma de equivocarse aquí.'
+    },
+    { kind: 'subtitulo', texto: 'Quién es quién, y para qué sirve' },
+    {
+      kind: 'parrafo',
+      texto:
+        'En «Quién es quién» se registran las partes, los testigos y el perito. Cada persona lleva su nombre, «Qué es en el proceso» —un desplegable agrupado en Partes, Prueba, Penal y Estrado—, «De qué lado» —«De mi lado», «De la contraparte» o «De ninguno»— y «Sobre qué declara», que está marcado «(opcional, pero es el que más sirve)».'
+    },
+    {
+      kind: 'parrafo',
+      texto:
+        'El lado no es una etiqueta: decide la técnica. La pantalla lo explica debajo del campo —«al propio se le interroga, al de enfrente se le contrainterroga»— y es lo que la aplicación usa después para armar preguntas abiertas o cerradas. Un chip «se le pregunta» marca a quién se le puede preparar interrogatorio; al juez, al secretario, a los apoderados y al intérprete no, y no cuentan para eso. Cómo se pide el interrogatorio está en «Preparar el interrogatorio de la audiencia».'
+    },
+    {
+      kind: 'consejo',
+      texto:
+        'Registre el lado con cuidado al crear cada persona: el campo nace en «De mi lado» y nadie lo corrige después. Una contraparte registrada como propia recibe preguntas abiertas para que cuente su versión, que es exactamente lo contrario de lo que se quiere en una audiencia.'
+    },
+    {
+      kind: 'aviso',
+      texto:
+        'Borrar un expediente NO borra el trabajo que tenía atado. La pantalla lo dice antes: «Se borra la carpeta y las personas que registró en ella. Lo demás —entrevistas, revisiones, borradores y términos— sigue en su sitio, sin expediente.» Los documentos INDEXADOS aquí son otra cosa: esos viven en el expediente y se van con él.'
+    }
+  ]
+};
+
 const A_PREGUNTAS_AUDIENCIA: ManualArticle = {
   id: 'preguntas-audiencia',
   titulo: 'Preparar el interrogatorio de la audiencia',
@@ -1389,16 +1562,16 @@ export const MANUAL: readonly ManualGroup[] = [
   },
   {
     titulo: 'Redactar',
-    articulos: [
-      A_ORIENTACION,
-      A_INSTRUCCION,
-      A_REVISAR,
-      A_DOCUMENTO_RECIBIDO,
-      A_PREGUNTAS_AUDIENCIA,
-      A_EXPORTAR,
-      A_BORRADORES
-    ]
+    articulos: [A_ORIENTACION, A_INSTRUCCION, A_REVISAR, A_DOCUMENTO_RECIBIDO, A_EXPORTAR, A_BORRADORES]
   },
+  /*
+   * «Preparar el interrogatorio» SALE DE «Redactar» y se viene aquí. Su ruta
+   * empieza en «Expedientes» desde que el interrogatorio se mudó a ese módulo,
+   * y un manual que agrupa por tarea no puede dejarlo bajo el verbo de otra:
+   * nadie que quiera preparar una audiencia lo busca en «Redactar».
+   */
+  { titulo: 'Organizar el caso', articulos: [A_EXPEDIENTE, A_PREGUNTAS_AUDIENCIA] },
+  { titulo: 'Consultar', articulos: [A_BUSCADOR] },
   { titulo: 'Calcular', articulos: [A_HERRAMIENTAS] },
   { titulo: 'Grabar', articulos: [A_ENTREVISTA, A_AUDIENCIA] },
   {
