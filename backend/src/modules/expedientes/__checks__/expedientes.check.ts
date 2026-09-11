@@ -40,6 +40,22 @@ const check = (nombre: string, ok: boolean, detalle = ''): void => {
 const RAIZ = join(process.cwd(), 'src');
 const leer = (rel: string): string => readFileSync(join(RAIZ, rel), 'utf8');
 
+/**
+ * EL CODIGO SIN LOS COMENTARIOS.
+ *
+ * Una guarda que busca la HUELLA de un defecto tiene que mirar el codigo con
+ * los comentarios fuera, porque el archivo que QUITO un defecto suele
+ * explicarlo por escrito — y entonces la guarda caza su propia documentacion.
+ *
+ * Pasó TRES VECES el 10 y 11 de septiembre de 2026: buscando «informe» en el
+ * servicio de candidatos, «Mario Alberto Perez» en el de ingesta y
+ * «document_embeddings» en el de carpetas. Las dos primeras se arreglaron una
+ * por una; a la tercera la funcion subio aqui, porque el problema no era de
+ * cada check sino de todos.
+ */
+const sinComentarios = (fuente: string): string =>
+  fuente.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/.*$/gm, ' ');
+
 /* ─── 1. UN SOLO VOCABULARIO DE PAPELES ──────────────────────────────────── */
 
 /*
@@ -522,8 +538,6 @@ check(
  * La regla, para no repetirla una tercera: una guarda que busca la HUELLA de
  * un defecto tiene que mirar el codigo con los comentarios fuera.
  */
-const sinComentarios = (fuente: string): string =>
-  fuente.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/.*$/gm, ' ');
 
 check(
   'el «expediente de muestra» inventado no volvio',
@@ -667,6 +681,127 @@ check(
   'y no cobra: no hay reserva de saldo en el camino de buscar',
   !/reserveForOperation|settleOperation/.test(bloqueBuscar),
   'cobrar por buscar seria cobrar por leer lo que el abogado ya subio'
+);
+
+/* ─── 13. LAS CARPETAS ───────────────────────────────────────────────────── */
+
+const carpetas = leer('modules/expedientes/carpetas.service.ts');
+const migracionCarpetas = readFileSync(
+  join(process.cwd(), '..', 'supabase', 'migration-expediente-carpetas.sql'),
+  'utf8'
+);
+const pantallaCarpetas = readFileSync(
+  join(process.cwd(), '..', 'frontend', 'src', 'modules', 'expedientes', 'components', 'CarpetasDelExpediente.tsx'),
+  'utf8'
+);
+
+/*
+ * ─── LA REGLA QUE GOBIERNA TODO: ORGANIZAR NO CAMBIA LO QUE EL MOTOR LEE ───
+ *
+ * El dueno lo fijo: el interrogatorio lee TODO el expediente, no la carpeta
+ * abierta. Por eso este modulo NO puede tocar `document_embeddings` ni filtrar
+ * la recuperacion por carpeta. Si alguien lo hiciera, mover un documento
+ * empezaria a esconderselo al motor — en silencio, porque el interrogatorio
+ * seguiria respondiendo, solo que sin esa prueba.
+ */
+check(
+  'las carpetas NO tocan los fragmentos ni la recuperacion',
+  !/document_embeddings/.test(sinComentarios(carpetas)) &&
+    !/carpeta_id/.test(sinComentarios(leer('modules/search/vectorSearch.service.ts'))),
+  'organizar no puede cambiar lo que el interrogatorio lee'
+);
+check(
+  'y la pantalla se lo dice al abogado',
+  /leen todo el expediente/.test(pantallaCarpetas),
+  'la duda «si lo meto aqui, deja de verlo?» haria que nadie organizara nada'
+);
+
+/*
+ * UNA CARPETA DENTRO DE SI MISMA ROMPE EL ARBOL EN SILENCIO. La base no lo
+ * impide —un ciclo de padres es una fila valida para Postgres— y el efecto es
+ * un ramal que deja de colgar de la raiz: la pantalla no lo dibuja y sus
+ * documentos se vuelven inalcanzables sin que nada falle.
+ */
+check(
+  'no se puede meter una carpeta dentro de si misma',
+  /CARPETA_EN_SI_MISMA/.test(carpetas),
+  'seria un ciclo, y el ramal desapareceria del arbol'
+);
+check(
+  'ni dentro de una de sus propias descendientes',
+  /CARPETA_EN_SU_HIJA/.test(carpetas) && /esDescendiente/.test(carpetas),
+  'el mismo ciclo, un nivel mas abajo'
+);
+check(
+  'y el recorrido de padres tiene tope, por si ya hubiera un ciclo en la base',
+  /saltos < \d+/.test(carpetas),
+  'sin tope, un ciclo existente colgaria el servidor'
+);
+
+/*
+ * DOS DECISIONES OPUESTAS Y A PROPOSITO, las dos en la migracion:
+ * las subcarpetas se van con la carpeta; los documentos NO. Que un gesto para
+ * ORDENAR borre trescientas paginas indexadas seria el peor efecto posible.
+ */
+check(
+  'borrar una carpeta se lleva sus subcarpetas',
+  /padre_id UUID REFERENCES public\.expediente_carpetas\(id\) ON DELETE CASCADE/.test(migracionCarpetas),
+  'dejarlas sueltas llena la raiz de huerfanas que nadie sabe de donde salieron'
+);
+check(
+  'pero NO se lleva los documentos: suben a la raiz y siguen buscandose',
+  /carpeta_id UUID[\s\S]{0,80}REFERENCES public\.expediente_carpetas\(id\) ON DELETE SET NULL/.test(migracionCarpetas),
+  'un documento indexado costo una vectorizacion y es del expediente'
+);
+check(
+  'y al borrar se DICE que se fue y que no',
+  /Los documentos siguen en el expediente, en la ra/.test(controladorExp),
+  'un borrado silencioso se lee como haber perdido lo de dentro'
+);
+
+/*
+ * UN DOCUMENTO EN UNA SOLA CARPETA, y la estructura lo hace imposible de
+ * romper: es una COLUMNA, no una tabla de union. Con una tabla, «un documento
+ * en dos carpetas» seria un error de aplicacion que nadie notaria.
+ */
+check(
+  'un documento esta en UNA sola carpeta: es una columna, no una tabla de union',
+  /ADD COLUMN IF NOT EXISTS carpeta_id/.test(migracionCarpetas) &&
+    !/CREATE TABLE[\s\S]{0,200}documento_carpeta/.test(migracionCarpetas),
+  'con una tabla de union la regla seria una promesa; con una columna, no se puede expresar'
+);
+
+/*
+ * DOS CARPETAS HERMANAS NO SE PUEDEN LLAMAR IGUAL. Y hacen falta DOS indices,
+ * no uno: en SQL `NULL <> NULL`, asi que un UNIQUE sobre `padre_id` no
+ * restringe nada en la raiz — que es justo donde mas se repiten los nombres.
+ */
+check(
+  'dos carpetas hermanas no se pueden llamar igual, tambien en la raiz',
+  /idx_carpetas_nombre_unico\b/.test(migracionCarpetas) &&
+    /idx_carpetas_nombre_unico_raiz/.test(migracionCarpetas),
+  'un UNIQUE con padre_id NULL no restringe nada: hacen falta dos indices'
+);
+check(
+  'y el choque de nombres se le dice al abogado con palabras, no con un codigo de Postgres',
+  /NOMBRE_REPETIDO/.test(carpetas) && /23505/.test(carpetas),
+  'dos «Pruebas» hermanas son indistinguibles y el archivo acaba en la otra'
+);
+
+/*
+ * LOS TRES MODOS DE VISTA. Se comprueba que existan los tres y que el escogido
+ * se recuerde: volver a escoger «tarjetas» en cada expediente es pedirle al
+ * abogado que repita una decision que ya tomo.
+ */
+check(
+  'los tres modos de vista existen',
+  /'lista'/.test(pantallaCarpetas) && /'detalle'/.test(pantallaCarpetas) && /'tarjetas'/.test(pantallaCarpetas),
+  'lista, detalle y tarjetas'
+);
+check(
+  'y el modo escogido se recuerda, sin que un fallo del almacenamiento tumbe la pantalla',
+  /localStorage/.test(pantallaCarpetas) && /catch/.test(pantallaCarpetas),
+  'una ventana privada no puede dejar sin expediente al abogado'
 );
 
 console.log('');

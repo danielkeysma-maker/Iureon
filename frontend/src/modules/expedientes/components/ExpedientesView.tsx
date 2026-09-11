@@ -21,6 +21,7 @@ import { TraerAlExpediente } from './TraerAlExpediente';
 import { IndexarEnExpediente } from './IndexarEnExpediente';
 import { ClienteDelExpediente } from './ClienteDelExpediente';
 import { BuscarEnExpediente } from './BuscarEnExpediente';
+import { CarpetasDelExpediente } from './CarpetasDelExpediente';
 
 /**
  * LOS EXPEDIENTES DE LA FIRMA.
@@ -49,6 +50,13 @@ export const ExpedientesView: React.FC = () => {
   const [creando, setCreando] = React.useState(false);
   const [guardando, setGuardando] = React.useState(false);
   const [nuevo, setNuevo] = React.useState({ caratula: '', radicado: '', despacho: '', contraparte: '' });
+  /*
+   * Una señal, no un objeto: las carpetas y los documentos los carga el panel
+   * de carpetas por su cuenta, y lo único que necesita de aquí es enterarse de
+   * que algo cambió. Pasarle los datos desde este componente lo obligaría a
+   * mantener dos copias del mismo listado y a decidir cuál manda.
+   */
+  const [senalDeRecarga, setSenalDeRecarga] = React.useState(0);
 
   const cargar = React.useCallback(async () => {
     setCargando(true);
@@ -82,6 +90,7 @@ export const ExpedientesView: React.FC = () => {
    */
   const refrescarAbierto = async (): Promise<void> => {
     if (!abierto) return;
+    setSenalDeRecarga((n) => n + 1);
     try {
       setAbierto(await expedientesApi.obtener(abierto.id));
     } catch (err) {
@@ -233,6 +242,8 @@ export const ExpedientesView: React.FC = () => {
         <ClienteDelExpediente expediente={abierto} onCambio={refrescarAbierto} />
 
         <IndexarEnExpediente expediente={abierto} onIndexado={refrescarAbierto} />
+
+        <CarpetasDelExpediente expediente={abierto} recargarSenal={senalDeRecarga} />
 
         <BuscarEnExpediente expediente={abierto} />
 

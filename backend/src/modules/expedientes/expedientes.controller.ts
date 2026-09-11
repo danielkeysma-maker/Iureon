@@ -15,6 +15,13 @@ import {
 import { TIPOS_DE_PIEZA, type DatosDeActor, type TipoDePieza } from './types';
 import { candidatosDeLaFirma, documentosDelExpediente, quitarDocumento } from './candidatos.service';
 import { vectorSearchService } from '../search/vectorSearch.service';
+import {
+  borrarCarpeta,
+  carpetasDelExpediente,
+  crearCarpeta,
+  moverCarpeta,
+  moverDocumento
+} from './carpetas.service';
 
 /**
  * Los expedientes de la firma. Ver `types.ts` para el porqué del módulo.
@@ -360,5 +367,90 @@ export const buscarEnExpedienteController = async (req: Request, res: Response):
     });
   } catch (err) {
     fallar(res, err, 'No se pudo buscar en el expediente.');
+  }
+};
+
+// ─── CARPETAS ───────────────────────────────────────────────────────────────
+
+/** GET /api/expedientes/:id/carpetas — planas; el árbol lo arma la pantalla. */
+export const carpetasController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const firmId = req.firmId as string;
+    await exigirModulo(firmId, 'EXPEDIENTES');
+    res.json({ success: true, carpetas: await carpetasDelExpediente(firmId, String(req.params.id)) });
+  } catch (err) {
+    fallar(res, err, 'No se pudieron cargar las carpetas.');
+  }
+};
+
+/** POST /api/expedientes/:id/carpetas   { nombre, padreId? } */
+export const crearCarpetaController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const firmId = req.firmId as string;
+    await exigirModulo(firmId, 'EXPEDIENTES');
+    const carpeta = await crearCarpeta(
+      firmId,
+      String(req.params.id),
+      req.user?.email ?? 'desconocido',
+      String(req.body?.nombre ?? ''),
+      cadena(req.body?.padreId) ?? null
+    );
+    res.status(201).json({ success: true, carpeta });
+  } catch (err) {
+    fallar(res, err, 'No se pudo crear la carpeta.');
+  }
+};
+
+/** PATCH /api/expedientes/:id/carpetas/:carpetaId   { nombre?, padreId? } */
+export const moverCarpetaController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const firmId = req.firmId as string;
+    await exigirModulo(firmId, 'EXPEDIENTES');
+
+    /* `undefined` es «no lo toques» y `null` es «llévala a la raíz». */
+    const cambios: { nombre?: string; padreId?: string | null } = {};
+    if ('nombre' in (req.body ?? {})) cambios.nombre = String(req.body.nombre ?? '');
+    if ('padreId' in (req.body ?? {})) {
+      cambios.padreId = req.body.padreId === null ? null : cadena(req.body.padreId) ?? null;
+    }
+
+    const carpeta = await moverCarpeta(firmId, String(req.params.id), String(req.params.carpetaId), cambios);
+    res.json({ success: true, carpeta });
+  } catch (err) {
+    fallar(res, err, 'No se pudo guardar la carpeta.');
+  }
+};
+
+/** DELETE /api/expedientes/:id/carpetas/:carpetaId */
+export const borrarCarpetaController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const firmId = req.firmId as string;
+    await exigirModulo(firmId, 'EXPEDIENTES');
+    await borrarCarpeta(firmId, String(req.params.id), String(req.params.carpetaId));
+    res.json({
+      success: true,
+      /*
+       * SE DICE QUÉ SE FUE Y QUÉ NO. Las subcarpetas se van; los documentos
+       * suben a la raíz. Sin decirlo, borrar una carpeta con trescientas
+       * páginas dentro se lee como haberlas perdido.
+       */
+      message:
+        'Se borró la carpeta y las que tenía dentro. Los documentos siguen en el expediente, en la raíz.'
+    });
+  } catch (err) {
+    fallar(res, err, 'No se pudo borrar la carpeta.');
+  }
+};
+
+/** PATCH /api/expedientes/:id/documentos/:documentId/carpeta   { carpetaId | null } */
+export const moverDocumentoController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const firmId = req.firmId as string;
+    await exigirModulo(firmId, 'EXPEDIENTES');
+    const destino = req.body?.carpetaId === null ? null : cadena(req.body?.carpetaId) ?? null;
+    await moverDocumento(firmId, String(req.params.id), String(req.params.documentId), destino);
+    res.json({ success: true });
+  } catch (err) {
+    fallar(res, err, 'No se pudo mover el documento.');
   }
 };

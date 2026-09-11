@@ -7,7 +7,12 @@ import {
   borrarActorController,
   borrarExpedienteController,
   candidatosController,
+  borrarCarpetaController,
   buscarEnExpedienteController,
+  carpetasController,
+  crearCarpetaController,
+  moverCarpetaController,
+  moverDocumentoController,
   documentosDelExpedienteController,
   quitarDocumentoController,
   crearExpedienteController,
@@ -73,6 +78,20 @@ router.get('/expedientes/:id/documentos', documentosDelExpedienteController as a
  * un pago atrasado seria tomarle el trabajo de rehen.
  */
 router.get('/expedientes/:id/buscar', buscarEnExpedienteController as any);
+
+/*
+ * Las carpetas. Organizar no cuesta saldo, pero es escritura: detras de
+ * `bloquearSiPlanVencido` como todas, salvo la lectura.
+ */
+router.get('/expedientes/:id/carpetas', carpetasController as any);
+router.post('/expedientes/:id/carpetas', bloquearSiPlanVencido, crearCarpetaController as any);
+router.patch('/expedientes/:id/carpetas/:carpetaId', bloquearSiPlanVencido, moverCarpetaController as any);
+router.delete('/expedientes/:id/carpetas/:carpetaId', bloquearSiPlanVencido, borrarCarpetaController as any);
+router.patch(
+  '/expedientes/:id/documentos/:documentId/carpeta',
+  bloquearSiPlanVencido,
+  moverDocumentoController as any
+);
 router.delete(
   '/expedientes/:id/documentos/:documentId',
   bloquearSiPlanVencido,

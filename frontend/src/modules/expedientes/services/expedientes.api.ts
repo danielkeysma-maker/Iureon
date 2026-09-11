@@ -33,6 +33,17 @@ export interface DocumentoIndexado {
   titulo: string;
   fragmentos: number;
   indexadoEl: string;
+  /** En qué carpeta está. `null` = en la raíz del expediente. */
+  carpetaId: string | null;
+}
+
+/** Una carpeta del expediente. Se anidan por `padreId`; `null` es la raíz. */
+export interface Carpeta {
+  id: string;
+  expedienteId: string;
+  padreId: string | null;
+  nombre: string;
+  createdAt: string;
 }
 
 /** Un pasaje del expediente que responde a lo que se buscó. */
@@ -168,6 +179,42 @@ export const expedientesApi = {
       Respuesta & { estado: string; razon: string | null; pasajes: PasajeDelExpediente[] }
     >(`/api/expedientes/${expedienteId}/buscar?q=${encodeURIComponent(q)}`);
     return revisar(data, 'No se pudo buscar en el expediente.');
+  },
+
+  /** Todas las carpetas del expediente, planas. El árbol lo arma la pantalla. */
+  async carpetas(expedienteId: string): Promise<Carpeta[]> {
+    const data = await httpClient.get<Respuesta & { carpetas: Carpeta[] }>(
+      `/api/expedientes/${expedienteId}/carpetas`
+    );
+    return revisar(data, 'No se pudieron cargar las carpetas.').carpetas;
+  },
+
+  async crearCarpeta(
+    expedienteId: string,
+    body: { nombre: string; padreId?: string | null }
+  ): Promise<Carpeta> {
+    const data = await httpClient.post<Respuesta & { carpeta: Carpeta }>(
+      `/api/expedientes/${expedienteId}/carpetas`,
+      { body }
+    );
+    return revisar(data, 'No se pudo crear la carpeta.').carpeta;
+  },
+
+  /** Devuelve el mensaje del servidor, que dice qué se fue y qué no. */
+  async borrarCarpeta(expedienteId: string, carpetaId: string): Promise<string> {
+    const data = await httpClient.delete<Respuesta>(
+      `/api/expedientes/${expedienteId}/carpetas/${carpetaId}`
+    );
+    return revisar(data, 'No se pudo borrar la carpeta.').message ?? '';
+  },
+
+  /** Mueve un documento a una carpeta, o a la raíz con `null`. */
+  async moverDocumento(expedienteId: string, documentId: string, carpetaId: string | null): Promise<void> {
+    const data = await httpClient.patch<Respuesta>(
+      `/api/expedientes/${expedienteId}/documentos/${documentId}/carpeta`,
+      { body: { carpetaId } }
+    );
+    revisar(data, 'No se pudo mover el documento.');
   },
 
   async quitarDocumento(expedienteId: string, documentId: string): Promise<void> {

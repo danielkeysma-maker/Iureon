@@ -175,6 +175,8 @@ export interface DocumentoIndexado {
   titulo: string;
   fragmentos: number;
   indexadoEl: string;
+  /** En qué carpeta está. `null` = en la raíz del expediente. */
+  carpetaId: string | null;
 }
 
 /**
@@ -224,12 +226,14 @@ export const documentosDelExpediente = async (
 
   const { data: docs } = await db()
     .from('legal_documents')
-    .select('id, title, created_at')
+    .select('id, title, created_at, carpeta_id')
     .eq('firm_id', firmId)
     .in('id', [...cuantos.keys()]);
 
   const porId = new Map(
-    ((docs ?? []) as Array<{ id: string; title: string; created_at: string }>).map((d) => [d.id, d])
+    (
+      (docs ?? []) as Array<{ id: string; title: string; created_at: string; carpeta_id: string | null }>
+    ).map((d) => [d.id, d])
   );
 
   return [...cuantos.entries()]
@@ -238,7 +242,8 @@ export const documentosDelExpediente = async (
       /* Sin ficha en `legal_documents` el documento sigue siendo buscable: se nombra por su id antes que esconderlo. */
       titulo: porId.get(documentId)?.title ?? `Documento ${documentId}`,
       fragmentos: fragmentosDelDoc,
-      indexadoEl: porId.get(documentId)?.created_at ?? ''
+      indexadoEl: porId.get(documentId)?.created_at ?? '',
+      carpetaId: porId.get(documentId)?.carpeta_id ?? null
     }))
     .sort((a, b) => (a.indexadoEl < b.indexadoEl ? 1 : -1));
 };
