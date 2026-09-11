@@ -57,6 +57,13 @@ export interface SavedDraftEntry {
   id: string;
   savedAt: string;
   draft: GeneratedDraft;
+  /**
+   * El caso al que pertenece, o null si nacio suelto.
+   *
+   * Vuelve al abrir el borrador para que siga atado: sin esto, editarlo y
+   * volver a guardarlo lo soltaria del expediente sin decir nada.
+   */
+  expedienteId?: string | null;
 
   /**
    * The DATE it expires, never the catalogue term.

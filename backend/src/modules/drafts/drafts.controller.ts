@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { esExpedienteDeLaFirma } from '../expedientes/expedientes.service';
 import { DraftsService } from './drafts.service';
 
 const draftsService = new DraftsService();
@@ -46,13 +47,31 @@ export const createDraftController = async (req: Request, res: Response): Promis
     venceEl,
     cliente,
     despacho,
-    radicado
+    radicado,
+    expedienteId
   } = req.body;
   // The author is whoever the token says, never whoever the body claims.
   const userEmail = req.user?.email ?? '';
 
   if (!userEmail || !title || !legalText) {
     res.status(400).json({ error: 'MISSING_FIELDS', message: 'Se requieren userEmail, title y legalText.' });
+    return;
+  }
+
+  /*
+   * EL EXPEDIENTE SE COMPRUEBA, NO SE CREE. Llega del cuerpo de la peticion y
+   * el aislamiento de esta casa lo da el filtro por firma de cada consulta:
+   * sin esto, un borrador podria quedar colgando del caso de otra firma.
+   *
+   * Un id ajeno se RECHAZA en vez de ignorarse: aqui no hay nada pagado que
+   * perder —el escrito ya esta escrito y se guarda igual al reintentar— y
+   * guardarlo desatado en silencio dejaria al abogado creyendo que el caso lo
+   * tiene contado.
+   */
+  const expedienteDelBorrador =
+    typeof expedienteId === 'string' && expedienteId.trim() ? expedienteId.trim() : null;
+  if (expedienteDelBorrador && !(await esExpedienteDeLaFirma(firmId, expedienteDelBorrador))) {
+    res.status(404).json({ error: 'EXPEDIENTE_NO_ENCONTRADO', message: 'Ese expediente no existe.' });
     return;
   }
 
@@ -83,6 +102,11 @@ export const createDraftController = async (req: Request, res: Response): Promis
     cliente: cliente ?? null,
     despacho: despacho ?? null,
     radicado: radicado ?? null,
+    /*
+     * EL CASO, comprobado arriba contra la firma. `cliente` y `radicado` son
+     * texto libre para reconocerlo; esto es lo que lo ata.
+     */
+    expediente_id: expedienteDelBorrador,
     estado: 'BORRADOR',
     radicado_el: null,
     version: 1

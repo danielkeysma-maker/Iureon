@@ -851,6 +851,8 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
                     legalBranch: rama || null,
                     fileName: origenDelInforme.fileName || 'escrito',
                     cliente: origenDelInforme.cliente,
+                    /* El caso escogido arriba viaja al taller y de ahi al borrador. */
+                    expedienteId: expedienteId || null,
                     texto: paraElTaller.texto as string,
                     informe: respuesta.informe,
                     /*

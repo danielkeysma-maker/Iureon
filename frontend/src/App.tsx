@@ -803,9 +803,26 @@ export function App() {
       tokensConsumed: 0,
       procedencia
     };
-    const id = await guardarAlGenerar(draft, { legalBranch: datos.legalBranch, cliente: datos.cliente || null });
+    /*
+     * EL CASO SE HEREDA DE LA REVISION. Si aquella nacio atada a un
+     * expediente, esta copia es del mismo caso: sin esto el borrador nace
+     * suelto y hay que volver a jalarlo desde Expedientes, que es justo el
+     * paso a mano que todo esto existe para quitar.
+     */
+    const id = await guardarAlGenerar(draft, {
+      legalBranch: datos.legalBranch,
+      cliente: datos.cliente || null,
+      expedienteId: datos.expedienteId ?? null
+    });
     if (!id) throw new Error('No se pudo guardar el borrador; el escrito sigue aquí, en el taller. Inténtelo de nuevo.');
-    handleLoadDraft({ id, savedAt: '', draft, legalBranch: datos.legalBranch, cliente: datos.cliente || null });
+    handleLoadDraft({
+      id,
+      savedAt: '',
+      draft,
+      legalBranch: datos.legalBranch,
+      cliente: datos.cliente || null,
+      expedienteId: datos.expedienteId ?? null
+    });
     setAvisoDeRedaccion({
       texto: `Guardado como borrador de la firma: «${draft.title}». La revisión sigue intacta en Revisiones; aquí trabaja sobre una copia.`,
       clave: Date.now()

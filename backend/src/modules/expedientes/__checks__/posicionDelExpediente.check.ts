@@ -203,6 +203,37 @@ check(
   'sin esto la cadena se corta justo donde el dato ya estaba'
 );
 
+/* ─── 7. Y EL BORRADOR QUE NACE DE UNA REVISION ATADA ───────────────────── */
+/*
+ * «Llevar a Redaccion» guarda una COPIA del escrito como borrador de la
+ * firma. Si la revision era de un caso, la copia es del mismo caso: nacer
+ * suelta obliga a volver a jalarla desde Expedientes, que es el paso a mano
+ * que toda esta cadena existe para quitar.
+ */
+const draftsSrv = leer('drafts/drafts.service.ts');
+const draftsCtl = leer('drafts/drafts.controller.ts');
+const front = (r: string): string => readFileSync(join(process.cwd(), '../frontend/src', r), 'utf8');
+
+check('el borrador GUARDA su expediente', /expediente_id: draft\.expediente_id/.test(draftsSrv));
+check(
+  'y el controlador comprueba que sea de la firma',
+  /esExpedienteDeLaFirma\(firmId, expedienteDelBorrador\)/.test(draftsCtl)
+);
+check(
+  'el taller lleva el caso de la revision',
+  /expedienteId: c\.expedienteId/.test(front('modules/workspace/components/RevisionesView.tsx'))
+);
+check(
+  'y «Llevar a Redaccion» lo pasa al borrador',
+  /expedienteId: datos\.expedienteId/.test(front('App.tsx')),
+  'es donde se corta la herencia si alguien la olvida'
+);
+check(
+  'el borrador recuerda su caso al volverse a abrir',
+  /expedienteId: row\.expediente_id/.test(front('modules/documents/services/drafts.api.ts')),
+  'sin esto, editarlo y guardarlo lo soltaria del expediente sin decir nada'
+);
+
 console.log('');
 if (fallos > 0) {
   console.log(`${fallos} comprobación(es) no pasaron.`);

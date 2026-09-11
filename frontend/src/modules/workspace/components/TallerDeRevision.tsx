@@ -30,6 +30,15 @@ export interface DatosDelTaller {
   legalBranch: string | null;
   fileName: string;
   cliente: string;
+  /**
+   * EL CASO AL QUE PERTENECE, para que el borrador lo HEREDE.
+   *
+   * «Llevar a Redacción» guarda una copia del escrito como borrador de la
+   * firma; si la revisión nació atada a un expediente, esa copia es del mismo
+   * caso. Sin esto, el borrador nace suelto y hay que volver a jalarlo desde
+   * Expedientes — que es el paso a mano que todo esto existe para quitar.
+   */
+  expedienteId?: string | null;
   texto: string;
   informe: InformeDeRevision | null;
   /**

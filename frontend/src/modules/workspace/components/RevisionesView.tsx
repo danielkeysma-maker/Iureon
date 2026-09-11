@@ -162,6 +162,8 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({
         legalBranch: c.legalBranch,
         fileName: c.fileName,
         cliente: c.cliente,
+        /* El caso viaja al taller para que «Llevar a Redacción» lo herede. */
+        expedienteId: c.expedienteId ?? null,
         texto,
         informe: c.informe,
         /* El del documento recibido tiene otra forma y otra columna en la respuesta; sin él el taller decía «no tiene informe». */

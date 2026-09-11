@@ -30,6 +30,18 @@ export interface SavedDraftRow {
   cliente: string | null;
   despacho: string | null;
   radicado: string | null;
+  /**
+   * DE QUE CASO ES, cuando se supo al crearlo.
+   *
+   * La columna existia desde la migracion de expedientes y solo la escribia
+   * «Traer al expediente» — despues y a mano. `cliente`, `despacho` y
+   * `radicado` son texto libre para reconocer el borrador en la lista; esto es
+   * lo unico que lo ATA a un caso y hace que el expediente lo cuente.
+   *
+   * El controlador comprueba que el expediente sea de la firma: llega del
+   * cuerpo de una peticion y aqui no se valida nada.
+   */
+  expediente_id: string | null;
   estado: EstadoBorrador;
   /** Con fecha, el texto ya no se puede modificar. Lo impone la base. */
   radicado_el: string | null;
@@ -168,6 +180,7 @@ export class DraftsService {
         cliente: draft.cliente ?? null,
         despacho: draft.despacho ?? null,
         radicado: draft.radicado ?? null,
+        expediente_id: draft.expediente_id ?? null,
         estado: draft.estado ?? 'BORRADOR'
       })
       .select()

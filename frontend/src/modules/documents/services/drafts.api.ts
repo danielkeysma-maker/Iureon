@@ -38,6 +38,8 @@ interface SavedDraftRow {
   vence_el?: string | null;
   legal_branch?: string | null;
   cliente?: string | null;
+  /** El caso al que pertenece, o null si nacio suelto. */
+  expediente_id?: string | null;
   despacho?: string | null;
   radicado?: string | null;
   estado?: EstadoBorrador;
@@ -52,6 +54,14 @@ interface SavedDraftRow {
 export interface DatosDeExpedienteAlCrear {
   legalBranch?: string | null;
   cliente?: string | null;
+  /**
+   * DE QUE CASO ES EL BORRADOR.
+   *
+   * `cliente` es texto libre para reconocerlo en la lista; esto es lo que lo
+   * ATA a un expediente y hace que el caso lo cuente como suyo. El servidor
+   * comprueba que sea de la firma y responde 404 si no lo es.
+   */
+  expedienteId?: string | null;
 }
 
 const formatSavedAt = (value: string): string =>
@@ -93,6 +103,8 @@ const toEntry = (row: SavedDraftRow): SavedDraftEntry => ({
   anotaciones: Array.isArray(row.anotaciones) ? (row.anotaciones as unknown[]) : [],
   versiones: Array.isArray(row.versiones) ? (row.versiones as unknown[]) : [],
   cliente: row.cliente ?? null,
+  /* Vuelve al abrirlo, para que el borrador siga atado a su caso. */
+  expedienteId: row.expediente_id ?? null,
   despacho: row.despacho ?? null,
   radicado: row.radicado ?? null,
   estado: row.estado ?? 'BORRADOR',
@@ -155,7 +167,8 @@ export const draftsApi = {
           /* La ficha con la que se redacto, para que el borrador la recuerde. */
           procedencia: draft.procedencia ?? null,
           ...(extras.legalBranch !== undefined ? { legalBranch: extras.legalBranch } : {}),
-          ...(extras.cliente !== undefined ? { cliente: extras.cliente } : {})
+          ...(extras.cliente !== undefined ? { cliente: extras.cliente } : {}),
+          ...(extras.expedienteId ? { expedienteId: extras.expedienteId } : {})
         }
       });
       return json.success && json.draft?.id ? String(json.draft.id) : null;
