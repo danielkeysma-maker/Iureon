@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { expedientesApi } from '../../expedientes/services/expedientes.api';
+import type { Expediente } from '../../expedientes/types';
 import {
   IconoNoAplica,
   IconoSinVerificar,
@@ -51,6 +53,9 @@ interface WorkshopConfigMobileProps {
   setLegalBranch: (branch: string) => void;
   documentType: string;
   setDocumentType: (type: string) => void;
+  /** De que caso es este escrito. Mismo control que en el escritorio. */
+  expedienteId: string;
+  setExpedienteId: (id: string) => void;
   /** Los hechos del cuadro de instrucción: la guía orienta sobre ESOS y no sobre otros. */
   hechos: string;
   setHechos: (texto: string) => void;
@@ -84,6 +89,8 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
   setLegalBranch,
   documentType,
   setDocumentType,
+  expedienteId,
+  setExpedienteId,
   hechos,
   setHechos
 }) => {
@@ -111,6 +118,22 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
     setDocumentType(valor);
   };
   const ramasEstado = useCatalogBranchesState();
+
+  const [expedientes, setExpedientes] = useState<Expediente[]>([]);
+  useEffect(() => {
+    let vivo = true;
+    expedientesApi
+      .listar()
+      .then((e) => {
+        if (vivo) setExpedientes(e);
+      })
+      .catch(() => {
+        if (vivo) setExpedientes([]);
+      });
+    return () => {
+      vivo = false;
+    };
+  }, []);
 
   const elegida = catalogo.actuaciones.find((a) => a.exactName === documentType) ?? null;
 
@@ -268,6 +291,34 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
               <option value={OPCION_SIN_NOMBRE}>No sé cómo se llama: describir qué debe lograr…</option>
             </select>
           </label>
+
+          {/*
+            EL MISMO CONTROL QUE EN EL ESCRITORIO, y por eso está aquí: el
+            gancho compartido no existe para esta barra, así que lo que evita
+            que las dos se separen es que las dos se toquen a la vez. Hay un
+            check que lo asevera.
+          */}
+          {expedientes.length > 0 && (
+            <label className="block">
+              <span className="field-label">De qué caso</span>
+              <select
+                value={expedienteId}
+                onChange={(e) => setExpedienteId(e.target.value)}
+                className="field w-full"
+              >
+                <option value="">Sin expediente</option>
+                {expedientes.map((e) => (
+                  <option key={e.id} value={e.id}>
+                    {e.caratula}
+                    {e.radicado ? ` · ${e.radicado}` : ''}
+                  </option>
+                ))}
+              </select>
+              <span className="mt-1 block text-[11px] leading-snug text-ink-500">
+                El borrador queda contado dentro del caso.
+              </span>
+            </label>
+          )}
 
           <p className="flex items-start gap-1.5 pt-1 text-[11px] leading-snug text-ink-500 text-justify">
             <IconoVerificado className="mt-0.5 h-3 w-3 shrink-0 text-verified" />

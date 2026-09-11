@@ -234,6 +234,32 @@ check(
   'sin esto, editarlo y guardarlo lo soltaria del expediente sin decir nada'
 );
 
+/* ─── 8. LAS DOS BARRAS DE REDACCION, NO UNA ────────────────────────────── */
+/*
+ * Escritorio y telefono son dos archivos que pintan la misma configuracion, y
+ * no comparten gancho: lo unico que impide que se separen es tocarlas a la
+ * vez. Si el selector de caso falta en una, quien redacte desde ahi guarda un
+ * borrador suelto sin enterarse — y lo descubrira semanas despues, cuando el
+ * expediente no lo cuente.
+ */
+for (const barra of ['WorkshopConfigBar.tsx', 'WorkshopConfigMobile.tsx']) {
+  const codigo = front(`modules/workspace/components/${barra}`);
+  check(
+    `${barra} ofrece escoger el caso`,
+    /expedienteId/.test(codigo) && /De qu[eé] caso/.test(codigo)
+  );
+}
+
+check(
+  'el borrador normal guarda el caso elegido en la barra',
+  /expedienteId: expedienteDeRedaccion \|\| null/.test(front('App.tsx'))
+);
+check(
+  'y al abrir un borrador, el caso vuelve a la barra',
+  /setExpedienteDeRedaccion\(entry\.expedienteId/.test(front('App.tsx')),
+  'sin esto, abrirlo y guardarlo lo ataria al caso que quedara elegido de antes'
+);
+
 console.log('');
 if (fallos > 0) {
   console.log(`${fallos} comprobación(es) no pasaron.`);

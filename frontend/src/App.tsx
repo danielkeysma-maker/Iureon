@@ -305,6 +305,19 @@ export function App() {
     setTallerActivo(datos);
     recordar(PANTALLAS.tallerRevision, datos.revisionId);
   };
+  /*
+   * ─── DE QUE CASO ES LO QUE SE ESTA REDACTANDO ─────────────────────────────
+   *
+   * Vive aqui, junto a la rama y la actuacion, porque es configuracion del
+   * escrito y porque las dos barras —escritorio y telefono— tienen que
+   * compartirlo. Se pasa al guardar el borrador, y vuelve al abrir uno.
+   *
+   * Se escoge A LA VISTA en la barra. Heredarlo en silencio del puente
+   * «Redactar esta actuacion» ataria el escrito a un caso que nadie ve, y el
+   * siguiente de la sesion heredaria uno viejo sin que nada lo diga.
+   */
+  const [expedienteDeRedaccion, setExpedienteDeRedaccion] = useState('');
+
   const cerrarTallerDeRevision = (): void => {
     recordar(PANTALLAS.tallerRevision, null);
     setTallerActivo(null);
@@ -769,6 +782,12 @@ export function App() {
      * verificada. La fila ya traía `legalBranch` desde el servidor.
      */
     if (entry.legalBranch) workflow.setLegalBranch(entry.legalBranch);
+    /*
+     * Y EL CASO TAMBIEN. Mismo razonamiento que la rama: sin esto, abrir un
+     * borrador atado y volver a guardarlo lo soltaria del expediente, o peor,
+     * lo ataria al caso que quedara elegido en la barra de la sesion anterior.
+     */
+    setExpedienteDeRedaccion(entry.expedienteId ?? '');
     workflow.setDocumentType(entry.draft.documentType);
     workflow.setRightView('draft');
     setLoadedDraftId(entry.id);
@@ -1267,6 +1286,8 @@ export function App() {
                   setLegalBranch={workflow.setLegalBranch}
                   documentType={workflow.documentType}
                   setDocumentType={workflow.setDocumentType}
+                  expedienteId={expedienteDeRedaccion}
+                  setExpedienteId={setExpedienteDeRedaccion}
                   /*
                     Los mismos hechos del cuadro de instrucción, no una copia:
                     «que la guía proponga la actuación» orienta sobre lo que se
@@ -1285,6 +1306,8 @@ export function App() {
                   setLegalBranch={workflow.setLegalBranch}
                   documentType={workflow.documentType}
                   setDocumentType={workflow.setDocumentType}
+                  expedienteId={expedienteDeRedaccion}
+                  setExpedienteId={setExpedienteDeRedaccion}
                   hechos={workflow.legalPrompt}
                   setHechos={workflow.setLegalPrompt}
                 />
@@ -1321,7 +1344,17 @@ export function App() {
                      * recargar la página lo vuelve a abrir.
                      */
                     if (generado) {
-                      const id = await guardarAlGenerar(generado);
+                      /*
+                       * LA RAMA TAMBIEN VIAJA, y no viajaba. El comentario de
+                       * `drafts.api.create` ya decia que un borrador que nace
+                       * sin rama «abre luego con la rama que hubiera elegida»
+                       * —un defecto que `handleLoadDraft` tuvo que corregir—,
+                       * y este camino, el normal, no la mandaba.
+                       */
+                      const id = await guardarAlGenerar(generado, {
+                        legalBranch: workflow.legalBranch || null,
+                        expedienteId: expedienteDeRedaccion || null
+                      });
                       if (id) {
                         setLoadedDraftId(id);
                         recordar(PANTALLAS.borrador, id);

@@ -10,6 +10,8 @@ import {
   Sparkles
 } from 'lucide-react';
 import { Combobox, type OpcionCombobox } from './Combobox';
+import { expedientesApi } from '../../expedientes/services/expedientes.api';
+import type { Expediente } from '../../expedientes/types';
 import { useActuacionLookup } from '../../catalog/hooks/useActuacion';
 import { useBranchActuacionesState } from '../../catalog/hooks/useBranchActuaciones';
 import { useCatalogBranchesState } from '../../catalog/hooks/useCatalogBranches';
@@ -84,6 +86,20 @@ interface WorkshopConfigBarProps {
   setLegalBranch: (branch: string) => void;
   documentType: string;
   setDocumentType: (type: string) => void;
+  /**
+   * DE QUE CASO ES ESTE ESCRITO.
+   *
+   * Va aqui y no en el panel de la izquierda porque es configuracion del
+   * escrito, como la rama y la actuacion, y porque el estado de esa
+   * configuracion vive arriba: el panel lo lee y no lo cambia.
+   *
+   * Y va A LA VISTA a proposito. Se penso en heredarlo en silencio del puente
+   * «Redactar esta actuacion» y se descarto: ataria el borrador a un caso que
+   * el abogado no ve, y el siguiente escrito de la sesion heredaria uno viejo
+   * sin que nada lo diga. Una atadura que no se ve no se puede corregir.
+   */
+  expedienteId: string;
+  setExpedienteId: (id: string) => void;
   /*
    * Los hechos que el abogado ya escribió en el cuadro de instrucción.
    *
@@ -126,6 +142,8 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
   setLegalBranch,
   documentType,
   setDocumentType,
+  expedienteId,
+  setExpedienteId,
   hechos,
   setHechos
 }) => {
@@ -140,6 +158,38 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
   const catalogo = useBranchActuacionesState(legalBranch, userRole, recarga);
   const lookup = useActuacionLookup(documentType, legalBranch);
   const actuacion = lookup.actuacion;
+
+  /*
+   * Los expedientes de la firma, leidos aqui igual que las ramas: esta barra
+   * carga lo suyo y el panel de al lado no sabe de esto.
+   */
+  const [expedientes, setExpedientes] = useState<Expediente[]>([]);
+  useEffect(() => {
+    let vivo = true;
+    expedientesApi
+      .listar()
+      .then((e) => {
+        if (vivo) setExpedientes(e);
+      })
+      .catch(() => {
+        /* Sin lista no se pinta el control; redactar no depende de esto. */
+        if (vivo) setExpedientes([]);
+      });
+    return () => {
+      vivo = false;
+    };
+  }, []);
+
+  const opcionesExpediente: OpcionCombobox[] = useMemo(
+    () => [
+      { valor: '', etiqueta: 'Sin expediente' },
+      ...expedientes.map((e) => ({
+        valor: e.id,
+        etiqueta: e.radicado ? `${e.caratula} · ${e.radicado}` : e.caratula
+      }))
+    ],
+    [expedientes]
+  );
 
   const opcionesRama: OpcionCombobox[] = useMemo(
     () => ramas.map((b) => ({ valor: b, etiqueta: BRANCH_LABELS[b] ?? b })),
@@ -464,6 +514,30 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
           )
         }
       />
+
+      {/*
+        EL CASO VA AL FINAL, y es una decisión de riesgo y no de importancia.
+        Ponerlo primero leería mejor —el caso contiene al escrito— pero movería
+        de sitio los tres controles que el abogado ya tiene en la mano, sobre
+        la pantalla más usada, a cambio de nada funcional.
+
+        Solo se pinta si la firma tiene expedientes: un desplegable con «Sin
+        expediente» y nada más no ofrece nada.
+      */}
+      {expedientes.length > 0 && (
+        <>
+          <Flecha />
+          <Combobox
+            etiqueta="De qué caso"
+            valor={expedienteId}
+            opciones={opcionesExpediente}
+            onChange={setExpedienteId}
+            vacio="Sin expediente"
+            anchoBoton="max-w-[220px]"
+            pie="El borrador queda contado dentro del caso. Sin esto nace suelto y hay que jalarlo después desde Expedientes."
+          />
+        </>
+      )}
 
       {/*
         El término va a la derecha y en mono: es lo que se vence mientras alguien
