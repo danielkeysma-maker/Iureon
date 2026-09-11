@@ -11,7 +11,7 @@ import {
 } from '../billing/billing.service';
 import { ENGINE, callOpenRouterWithUsage } from '../agent/openrouter.client';
 import { conLimite, LIMITE_LLAMADA_MS } from '../agent/review/documentReview.controller';
-import { exigirModulo, responderPlanError } from '../subscriptions/plan.service';
+import { exigirFuncion, responderPlanError } from '../subscriptions/plan.service';
 import { ExpedienteError, obtenerExpediente } from './expedientes.service';
 import {
   MAX_AUDIENCIA,
@@ -31,16 +31,16 @@ import {
  *
  * ─── SE COBRA COMO `CONSULTA_REVISION`, Y NO ES PEREZA ─────────────────────
  *
- * Es la misma operación que ya cobran las preguntas colgadas de una revisión,
- * al mismo precio y con el mismo nombre. Inventar una operación nueva partiría
- * el histórico en dos: los movimientos de crédito de antes seguirían diciendo
- * «consulta de revisión» y los de después otra cosa, para un trabajo que el
- * abogado vive como el mismo. Mientras el trabajo sea el mismo, el renglón
- * también.
+ * Es la misma operación que cobraban las preguntas colgadas de una revisión
+ * —el camino que este módulo reemplazó y que ya se retiró—, al mismo precio y
+ * con el mismo nombre. Inventar una operación nueva partiría el histórico en
+ * dos: los movimientos de crédito de antes seguirían diciendo «consulta de
+ * revisión» y los de después otra cosa, para un trabajo que el abogado vive
+ * como el mismo. Mientras el trabajo sea el mismo, el renglón también.
  *
  * ─── EL PRESUPUESTO DE SALIDA CRECE CON LA GENTE ───────────────────────────
  *
- * Las preguntas por revisión piden 3.500 tokens para tres listas. Aquí las
+ * Las preguntas por revisión pedían 3.500 tokens para tres listas. Aquí las
  * listas son tantas como personas se preparen, así que el tope se calcula por
  * cabeza en vez de fijarse: cuatro personas con doce preguntas cada una no
  * caben en el presupuesto de tres listas, y lo que se corta es la última
@@ -72,7 +72,15 @@ export const preguntasDelExpedienteController = async (req: Request, res: Respon
   let expediente;
   let aQuienes;
   try {
-    await exigirModulo(firmId, 'EXPEDIENTES');
+    /*
+     * SE EXIGE LA FUNCIÓN, NO SOLO EL MÓDULO. Este endpoint gastaba saldo sin
+     * comprobar ninguna función: bastaba con tener Expedientes encendido. El
+     * operador que quiera dejar el módulo abierto y cerrar solo el
+     * interrogatorio —lo caro— no tenía dónde hacerlo. `exigirFuncion` cubre
+     * además todo lo que cubría `exigirModulo`: plan vencido, módulo fuera del
+     * plan y módulo apagado dan el mismo 403 de antes.
+     */
+    await exigirFuncion(firmId, 'EXPEDIENTES.PREGUNTAS_AUDIENCIA');
     expediente = await obtenerExpediente(firmId, String(req.params.id));
 
     /*

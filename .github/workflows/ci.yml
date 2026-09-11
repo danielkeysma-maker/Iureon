@@ -34,72 +34,27 @@ jobs:
       - run: npm ci
       - name: Typecheck
         run: npx tsc --noEmit
-      - name: Payment gateway guard (no forgeable webhook)
-        run: npm run check:wompi
-      - name: Plan rules (prices, extension from a future expiry, expiry states, module gating)
-        run: npm run check:plan
-      - name: Plan change rules (a different plan starts today, a renewal extends)
-        run: npm run check:cambio-plan
-      - name: Free trial rules (7 days, one seat, honeypot, per-address window)
-        run: npm run check:trial
-      - name: Operator support rules (firm deletion confirmation, self-delete, password floor)
-        run: npm run check:admin-reglas
-      - name: Self-service deletion rules (last user, last administrator, operator, typed firm name)
-        run: npm run check:borrado
-      - name: Person name rules (2-80 characters, trimmed, never empty)
-        run: npm run check:nombre
-      - name: Firm-defined actuaciones (slug, shadowing the catalogue, no term without source)
-        run: npm run check:actuaciones-firma
-      - name: Transactional mail (templates, subjects, cuenta de cobro PDF)
-        run: npm run check:mail
-      - name: Catalogue correctness checks
-        run: npm run check:catalog
-      - name: Nothing verified was damaged when the substantive basis was added
-        run: npm run check:intacto
-      - name: Actuaciones reachable by remisión carry their envelope and no borrowed deadline
-        run: npm run check:remision
-      - name: Embeddings guard (no fabricated vectors)
-        run: npm run check:embeddings
-      - name: Legal search guard (no fabricated law)
-        run: npm run check:search
-      - name: Doctrine guard (no unsourced quote)
-        run: npm run check:conceptos
-      - name: Subprocessor register matches the running config
-        run: npm run check:subprocessors
-      - name: On-demand ruling fetch refuses what the Court does not have
-        run: npm run check:ruling
-      - name: Topic discovery cannot admit what the Court does not have
-        run: npm run check:discovery
-      - name: Facts triage cannot invent an actuación
-        run: npm run check:triage
-      - name: Period statement arithmetic is exact
-        run: npm run check:extracto
-      - name: Herramientas calculators (holidays from statute, 1.5 x IBC, cuantia tiers, indexation)
-        run: npm run check:tools
-      - name: PDF reader works without the optional native canvas
-        run: npm run check:pdf
-      - name: Draft attachments (limits, block rendering, vision answer parsing)
-        run: npm run check:adjuntos
-      - name: The draft is the actuacion the lawyer chose, with or without a verified ficha
-        run: npm run check:tipo
-      - name: Drafting deadlines fit under the function cap and running out returns the reservation
-        run: npm run check:plazos
-      - name: Hearing questions (prompt sections, truncated JSON rescue, parameter validation)
-        run: npm run check:preguntas
-      - name: Agenda de terminos (when it warns, no repeats, refuses an ambiguous ficha)
-        run: npm run check:agenda
-      - name: Revision (the received-document report never fills in a term the document does not state)
-        run: npm run check:revision
-      - name: Taller (the chat over a received document never proposes edits to it)
-        run: npm run check:taller
-      - name: Sin nombre (a draft with no ficha never states an article, a term or an authority)
-        run: npm run check:sin-nombre
-      - name: Citacion normativa (the draft cites only verified articles and never states what one says)
-        run: npm run check:citacion
-      - name: "Vigencia en varias fuentes oficiales (art. 2035 del Codigo Civil sale DEROGADO; concordancia da VIGENTE; una discrepancia se DECLARA con las dos URLs; una sola fuente vale y se dice cual; el silencio de todas es NO_VERIFICABLE)"
-        run: npm run check:vigencia
-      - name: "Glosa (what the draft claims an article says is checked against the official text: Ley 820 art. 8 is the ARRENDADOR, not the arrendatario)"
-        run: npm run check:glosa
+      # ── TODA LA SUITE, Y NO UNA LISTA A MANO ─────────────────────────────
+      #
+      # Aqui habia 34 pasos con nombre, uno por check. Se leian muy bien y
+      # tenian un defecto que nadie veia: ENVEJECIAN. El 10 de septiembre de
+      # 2026 se conto contra `package.json` y 22 de los 50 checks
+      # deterministas del backend NO ESTABAN en la lista — entre ellos los de
+      # facturacion, clientes, autenticacion y rutas—. Se escribieron, pasan
+      # en local, y el CI llevaba meses sin correrlos.
+      #
+      # `run-all-checks.mjs` descubre los checks LEYENDO `package.json`, asi
+      # que un check nuevo entra solo y ninguno se queda fuera por olvido.
+      # Tambien conoce cuales salen a la red y los omite: una mala tarde del
+      # Senado no puede poner rojo un repositorio que no esta roto.
+      #
+      # LO QUE SE PIERDE, dicho para que nadie lo eche de menos sin saber por
+      # que: la atribucion por paso en la interfaz de GitHub. La compensa el
+      # propio ejecutor, que imprime que check fallo y con que texto, y que
+      # ademas caza la contradiccion entre el codigo de salida y el banner —
+      # algo que 34 pasos sueltos no podian hacer.
+      - name: Toda la suite determinista del backend (el ejecutor la descubre; ninguna se queda fuera)
+        run: node scripts/run-all-checks.mjs
 
       - name: Build
         run: npm run build

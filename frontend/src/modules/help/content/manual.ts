@@ -65,8 +65,8 @@ import type { ManualArticle, ManualBlock, ManualEntry, ManualGroup } from '../ty
  *
  * Where a path half-works, the article says where it stops instead of
  * describing the happy half: a candidate from another branch does not move the
- * branch selector in Redacción, and the taller's «Guía» and «Audiencia» tabs
- * were never adapted to a received document. Both are `todavia-no` blocks.
+ * branch selector in Redacción, and the taller's «Guía» tab was never adapted
+ * to a received document. Both are `todavia-no` blocks.
  *
  * Reading time is computed from the words actually written below, so it cannot
  * drift away from the text the way a hand-typed "3 min" does.
@@ -746,7 +746,7 @@ const A_PLANES: ManualArticle = {
       kind: 'nota',
       titulo: 'Módulos o funciones no habilitados para su firma',
       texto:
-        'Además de lo que trae cada plan, la operación de Iureon puede dejar sin habilitar un módulo o una función concreta para una firma —por ejemplo, «Preguntas para la audiencia» dentro de Revisiones—, normalmente mientras se acuerda algo con ella. En ese caso el módulo no aparece en la barra y su tarjeta de Inicio dice «No disponible para su firma»; si es una función, su botón o su pestaña no está. El mensaje es otro que el del plan: «no está habilitada para su firma» y le pide escribir por Soporte, sin ofrecerle cambiar de plan, porque el plan no es lo que falta. Escriba por Soporte y se habilita en el acto.'
+        'Además de lo que trae cada plan, la operación de Iureon puede dejar sin habilitar un módulo o una función concreta para una firma —por ejemplo, «Preguntas para la audiencia» dentro de Expedientes—, normalmente mientras se acuerda algo con ella. En ese caso el módulo no aparece en la barra y su tarjeta de Inicio dice «No disponible para su firma»; si es una función, su botón o su pestaña no está. El mensaje es otro que el del plan: «no está habilitada para su firma» y le pide escribir por Soporte, sin ofrecerle cambiar de plan, porque el plan no es lo que falta. Escriba por Soporte y se habilita en el acto.'
     },
     {
       kind: 'nota',
@@ -1035,50 +1035,55 @@ const A_DOCUMENTO_RECIBIDO: ManualArticle = {
     {
       kind: 'todavia-no',
       texto:
-        'El taller de un documento recibido abre también la pestaña «Guía» y, si su firma la tiene habilitada, la de «Audiencia», y sobre el papel sigue estando «Llevar a Redacción». Los tres están hechos para un escrito suyo: la guía conversa como si acompañara a quien corrige su propio texto y ofrece «Aplicar» sobre él, las preguntas nacen del papel como si fuera el escrito de usted, y «Llevar a Redacción» copia el papel ajeno como borrador de la firma, con el auto del juzgado por cuerpo y «Documento recibido» —la etiqueta del producto— por actuación. Sobre el auto de un juez nada de eso tiene sentido, y la guía y las preguntas además cuestan saldo. Todavía no están adaptados a este modo: lo que sí lo está es la lectura y su puente, y el botón que casi siempre se busca es «Redactar esta actuación», en el pie «¿Y con qué lo ataco?».'
+        'El taller de un documento recibido abre también la pestaña «Guía», y sobre el papel sigue estando «Llevar a Redacción». Los dos están hechos para un escrito suyo: la guía conversa como si acompañara a quien corrige su propio texto y ofrece «Aplicar» sobre él, y «Llevar a Redacción» copia el papel ajeno como borrador de la firma, con el auto del juzgado por cuerpo y «Documento recibido» —la etiqueta del producto— por actuación. Sobre el auto de un juez nada de eso tiene sentido, y la guía además cuesta saldo. Todavía no están adaptados a este modo: lo que sí lo está es la lectura y su puente, y el botón que casi siempre se busca es «Redactar esta actuación», en el pie «¿Y con qué lo ataco?».'
     }
   ]
 };
 
 const A_PREGUNTAS_AUDIENCIA: ManualArticle = {
   id: 'preguntas-audiencia',
-  titulo: 'Preguntas para la audiencia',
+  titulo: 'Preparar el interrogatorio de la audiencia',
   entradilla:
-    'Con el escrito en el taller, pida a la guía tres listas de preguntas para la audiencia: a la contraparte, a sus testigos y a los testigos de la contraparte, cada una con para qué sirve y el pasaje del escrito del que nace.',
+    'Desde el expediente, escoja a quién va a interrogar y pida una lista de preguntas POR PERSONA: con su nombre, con la técnica que le corresponde y con lo que cada pregunta busca establecer.',
   bloques: [
-    { kind: 'ruta', camino: ['Revisiones', 'El taller', 'Pestaña «Audiencia»', '«Pedir las preguntas»'] },
+    { kind: 'ruta', camino: ['Expedientes', 'Abra el expediente', '«Preparar el interrogatorio»'] },
     {
       kind: 'parrafo',
       texto:
-        'La guía lee el escrito tal como está en el taller —una demanda, una contestación, un dictamen, una declaración— y sugiere preguntas con tres técnicas distintas. A la contraparte, preguntas de interrogatorio de parte cuya respuesta favorece a su cliente, sacadas de los hechos, las contradicciones, las omisiones y las admisiones del propio escrito. A sus testigos, preguntas abiertas y no sugestivas, ordenadas como un relato: quién es, cuándo, dónde, qué vio, cómo le consta. A los testigos de la contraparte, preguntas cerradas de contrainterrogatorio que ponen a prueba la credibilidad, las contradicciones con el escrito, la razón del conocimiento y el interés.'
+        'Un interrogatorio se prepara contra una persona, no contra una categoría. Por eso las preguntas salen del expediente y no de un escrito: la aplicación ya sabe quién es cada quien en el asunto —qué papel tiene, de qué lado está y sobre qué declara— porque usted lo registró en «Quién es quién en el asunto», y con eso arma una lista distinta para cada nombre.'
+    },
+    {
+      kind: 'parrafo',
+      texto:
+        'La técnica la decide la aplicación a partir de ese registro, y se la muestra encima de cada lista. Al testigo o a la parte de su lado se le interroga con preguntas abiertas y no sugestivas, ordenadas como un relato. A la parte contraria se le hacen preguntas cuya respuesta, sea cual sea, favorezca a su cliente; a su testigo, contrainterrogatorio de preguntas cerradas que se contestan sí o no. Al perito no se le pregunta qué vio —no vio nada, dictaminó— sino por su calificación, su método, los datos de los que partió y lo que no examinó; y si el perito lo nombró el despacho, no se le contrainterroga: se le piden esclarecimientos.'
     },
     {
       kind: 'pasos',
       pasos: [
-        'Abra la revisión en el taller, desde «Revisiones» o desde «Abrir en el taller» en el diálogo de revisión. A la derecha, elija la pestaña «Audiencia»; también llega con el botón «Preguntas para la audiencia» que está sobre el cuadro de la guía.',
-        'Marque a quién quiere preguntar: a la contraparte, a sus testigos, a los testigos de la contraparte, o cualquier combinación; por defecto están los tres. Solo se generan las listas marcadas.',
-        'Indique su posición en el proceso: «Demandante», «Demandado» u «Otro», y en ese caso escríbala —Ministerio Público, tercero, apoderado de la víctima—. Las listas se orientan a lo que le conviene a esa posición.',
-        'Si quiere, escriba en «¿Qué quiere probar?» lo que busca establecer en la audiencia y en «Tipo de audiencia» cuál es. Sin eso, la guía lo deduce del escrito y de la posición.',
-        'Pulse «Pedir las preguntas», que muestra el precio: cuesta lo mismo que un mensaje a la guía y se descuenta del saldo de la firma; si la guía no responde, no se cobra.',
-        'Lea las listas. Arriba aparece el «Enfoque»: lo que esa actuación exige probar y la audiencia en la que se pregunta. Cada pregunta viene numerada, con «Para qué» —lo que busca establecer o desvirtuar— y, cuando nace de un pasaje concreto, la cita «Del escrito»; tocar la cita subraya ese pasaje en el papel.',
-        'Use «Copiar» para llevarse las tres listas como texto, o «Word» para descargarlas con la letra de la firma. «Volver a generar» pide un juego nuevo, con otros parámetros o sobre el texto ya corregido.'
+        'Abra el expediente en «Expedientes» y compruebe que las personas están registradas arriba, con su papel, su lado y sobre qué declaran. Si el bloque del interrogatorio dice que no hay a quién preguntar, es que faltan: al juez, al secretario, a los apoderados y al intérprete no se les pregunta y no cuentan para esto.',
+        'Marque a quién va a interrogar. Caben cuatro personas por tanda; con más, la última lista saldría cortada, así que pida otra tanda para los demás.',
+        'Si quiere, escriba qué quiere probar en la audiencia y de qué audiencia se trata. Sin eso, la aplicación lo deduce del expediente.',
+        'Pulse «Preparar para N persona(s)». Consume saldo de la firma una vez por tanda, y el aviso está encima del botón; si la guía no devuelve preguntas legibles, no se descuenta nada.',
+        'Lea el enfoque —lo que este asunto exige probar y en qué audiencia— y luego cada lista, con el nombre de la persona y su técnica arriba. Cada pregunta trae «Para» —lo que busca establecer o desvirtuar— y, cuando nace de un pasaje del material, la cita literal.',
+        'Llévese el interrogatorio: «Copiar» lo pasa como texto, «Word» lo descarga para seguir trabajándolo y «PDF» para imprimirlo. Los dos archivos salen con la letra de su membrete y sin bloque de firma: es material de trabajo, no se radica.'
       ]
     },
     {
       kind: 'consejo',
       texto:
-        'Corrija primero el escrito y pida las preguntas después: la guía trabaja sobre el texto tal como está en ese momento, y un hecho que usted quitó del escrito ya no produce preguntas.'
-    },
-    {
-      kind: 'aviso',
-      texto:
-        'Estas preguntas nacen de un escrito suyo. Sobre un documento recibido —un auto, una sentencia— la pestaña «Audiencia» ya no se ofrece, y la pestaña «Informe» de ese taller dice por qué: el encargo está escrito para interrogar a la contraparte y a los testigos a partir de lo que su escrito afirma, y de un papel del juzgado salían preguntas dirigidas a quien lo profirió, cobrando saldo por ellas. Prepare la audiencia desde la revisión del escrito propio con el que actúe en ella.'
+        'Corrija primero el registro de las personas y pida el interrogatorio después. El lado de cada quien es lo que decide la técnica, así que un testigo marcado del lado equivocado recibe preguntas cerradas cuando le correspondían abiertas — y eso se ve en la audiencia, no antes.'
     },
     {
       kind: 'nota',
-      titulo: 'Son sugerencias, y la guía no conoce el caso',
+      titulo: 'Son sugerencias, y salen de lo que usted registró',
       texto:
-        'La guía solo conoce el escrito: no el expediente, las pruebas, a las partes ni a los testigos. Por eso no afirma hechos que el escrito no traiga ni cita normas o sentencias, y por eso cada lista puede quedar corta o vacía cuando el texto no da sustento. Las preguntas son material de trabajo que usted pesa, ordena y descarta con su conocimiento del caso; formularlas es decisión suya. El último juego generado queda guardado con la revisión y vuelve a aparecer al abrir el taller; en la auditoría de la firma consta que se pidieron preguntas para tal escrito, nunca su contenido.'
+        'La aplicación conoce el expediente que usted llenó: la carátula, el radicado, las personas y lo que anotó de cada una. No afirma hechos que ese material no traiga ni cita normas o sentencias, y por eso una lista puede quedar corta cuando de esa persona se sabe poco. Las preguntas son material de trabajo que usted pesa, ordena y descarta con su conocimiento del caso; formularlas es decisión suya. En la auditoría de la firma consta que se preparó interrogatorio para tal asunto y para cuántas personas, nunca su contenido.'
+    },
+    {
+      kind: 'nota',
+      titulo: 'Antes vivía en el taller de revisión',
+      texto:
+        'Hasta ahora esto era una pestaña «Audiencia» dentro del taller de una revisión, y daba tres listas fijas —a la contraparte, a mis testigos, a los testigos de la contraparte— porque solo conocía el escrito y no sabía quién había en el caso. Esa pestaña ya no existe: el taller quedaba muy cargado y las listas por categoría no preparaban a nadie en concreto. Si su firma tenía habilitada la función, la sigue teniendo aquí.'
     }
   ]
 };

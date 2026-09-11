@@ -1,7 +1,6 @@
 import { supabase } from '../../../config/supabase.config';
 import { ETIQUETA_DOCUMENTO_RECIBIDO, type InformeDeDocumentoRecibido, type InformeDeRevision, type ModoDeRevision } from './documentReview';
 import type { TurnoDelTaller } from './taller';
-import type { ParametrosDePreguntas, PreguntasParaLaAudiencia } from './preguntasAudiencia.prompt';
 
 /**
  * Where a review's report lives after the request ends.
@@ -20,6 +19,19 @@ import type { ParametrosDePreguntas, PreguntasParaLaAudiencia } from './pregunta
  * paid for is never withheld because the archive hiccupped. The drafts
  * taught this the hard way — a silent fallback hid a missing migration for
  * weeks — so here the failure is reported, not swallowed.
+ *
+ * ─── `preguntas_audiencia` ESTÁ EN LA TABLA Y YA NO LA LEE NADIE ────────────
+ *
+ * Las preguntas para la audiencia vivían aquí, colgadas de la revisión, y se
+ * llevaron al módulo de Expedientes: allí se preparan por persona y no en tres
+ * cajones fijos, así que este camino quedó muerto y se retiró junto con su
+ * controlador, su prompt y su check.
+ *
+ * LA COLUMNA SE DEJA. Quitarla exige un SQL que corre el dueño, y antes de
+ * retirar el código se comprobó contra la base de producción que no tiene una
+ * sola fila no nula: no hay un juego de preguntas generado y pagado que se
+ * quede huérfano. Una columna vacía que nadie escribe ni lee no le cuesta nada
+ * a nadie; un DROP a destiempo sí.
  */
 
 export interface RevisionGuardada {
@@ -58,8 +70,6 @@ export interface RevisionGuardada {
   anotaciones: Anotacion[];
   /** Instantáneas del texto, las últimas quince. */
   versiones: VersionDelTexto[];
-  /** El último juego de preguntas para la audiencia, con los parámetros con que se pidió. null si nunca se pidió (o la columna no existe). */
-  preguntasAudiencia: PreguntasAudienciaGuardadas | null;
   /**
    * El archivo tal como se subió, si se conservó. null cuando la firma no
    * autorizó guardar escritos, cuando el escrito llegó pegado como texto, o
@@ -75,13 +85,6 @@ export interface ArchivoOriginalGuardado {
   /** MIME declarado al subirlo: decide el visor. */
   tipo: string;
   bytes: number;
-}
-
-export interface PreguntasAudienciaGuardadas {
-  parametros: ParametrosDePreguntas;
-  preguntas: PreguntasParaLaAudiencia;
-  generadoEl: string;
-  por: string;
 }
 
 export interface VersionDelTexto {
@@ -172,7 +175,6 @@ export const aRevisionGuardada = (row: Record<string, unknown>): RevisionGuardad
   conversacion: Array.isArray(row.conversacion) ? (row.conversacion as TurnoDelTaller[]) : [],
   anotaciones: Array.isArray(row.anotaciones) ? (row.anotaciones as Anotacion[]) : [],
   versiones: Array.isArray(row.versiones) ? (row.versiones as VersionDelTexto[]) : [],
-  preguntasAudiencia: aPreguntasGuardadas(row.preguntas_audiencia),
   archivoOriginal: row.archivo_original_clave
     ? {
         clave: String(row.archivo_original_clave),
@@ -181,26 +183,6 @@ export const aRevisionGuardada = (row: Record<string, unknown>): RevisionGuardad
       }
     : null
 });
-
-/** Tolerante: la columna puede faltar (migración sin correr) o traer una forma vieja. */
-const aPreguntasGuardadas = (v: unknown): PreguntasAudienciaGuardadas | null => {
-  if (!v || typeof v !== 'object') return null;
-  const o = v as Record<string, unknown>;
-  const preguntas = o.preguntas as Record<string, unknown> | undefined;
-  if (!preguntas || typeof preguntas !== 'object') return null;
-  const lista = (k: string) => (Array.isArray(preguntas[k]) ? (preguntas[k] as PreguntasParaLaAudiencia['contraparte']) : []);
-  const parametros = (o.parametros ?? {}) as Record<string, unknown>;
-  return {
-    parametros: {
-      posicion: String(parametros.posicion ?? ''),
-      ...(parametros.quiereProbar ? { quiereProbar: String(parametros.quiereProbar) } : {}),
-      ...(parametros.audiencia ? { audiencia: String(parametros.audiencia) } : {})
-    },
-    preguntas: { contraparte: lista('contraparte'), misTestigos: lista('misTestigos'), testigosContraparte: lista('testigosContraparte') },
-    generadoEl: String(o.generadoEl ?? ''),
-    por: String(o.por ?? '')
-  };
-};
 
 /** Columns for the list: everything but the report bodies, which can be long. */
 const COLUMNAS_DE_LISTA =
@@ -337,22 +319,6 @@ export const documentReviewStore = {
       .eq('firm_id', firmId)
       .eq('id', id);
     if (error) console.error('[REVIEW] No se pudo guardar la nueva revisión:', error.message);
-    return !error;
-  },
-
-  /**
-   * El último juego de preguntas para la audiencia. Si la columna no existe
-   * todavía (migración sin correr) se dice en consola y se sigue: las
-   * preguntas ya viajan en la respuesta; lo que se pierde es verlas al recargar.
-   */
-  async guardarPreguntas(firmId: string, id: string, datos: PreguntasAudienciaGuardadas): Promise<boolean> {
-    if (!supabase) return false;
-    const { error } = await supabase
-      .from('document_reviews')
-      .update({ preguntas_audiencia: datos, updated_at: new Date().toISOString() })
-      .eq('firm_id', firmId)
-      .eq('id', id);
-    if (error) console.warn('[REVIEW] No se pudieron guardar las preguntas para la audiencia (¿falta supabase/migration-preguntas-audiencia.sql?):', error.message);
     return !error;
   },
 

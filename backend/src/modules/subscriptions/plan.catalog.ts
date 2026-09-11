@@ -152,8 +152,24 @@ export type Funcion =
   | 'REDACCION.TALLER_BORRADOR'
   | 'REVISIONES.CHAT_GUIA'
   | 'REVISIONES.REREVISAR'
-  | 'REVISIONES.PREGUNTAS_AUDIENCIA'
   | 'EXPEDIENTES.ACTORES'
+  /*
+   * EL PREFIJO ES EL MÓDULO, ASÍ QUE RENOMBRAR NO ES COSMÉTICO.
+   *
+   * Esta función se llamaba `REVISIONES.PREGUNTAS_AUDIENCIA` cuando el
+   * interrogatorio se preparaba desde el taller de una revisión. Al mudarse a
+   * Expedientes había que mudar también el prefijo: `moduloDeFuncion` deduce el
+   * módulo del id, y con el nombre viejo una firma con Expedientes encendido y
+   * Revisiones apagado no habría visto el interrogatorio que sí tiene.
+   *
+   * EL RENOMBRADO ES SEGURO PORQUE SE COMPROBÓ, NO PORQUE SE SUPUSIERA. Un id
+   * que cambia deja de casar con lo que hay en `firms.modulos_desactivados`, y
+   * eso REACTIVA en silencio una función que el operador había apagado. Se miró
+   * la base antes de tocar nada: ninguna firma tiene funciones desactivadas.
+   * Si alguna la hubiera tenido apagada, esto habría que hacerlo con un UPDATE
+   * que traduzca el id viejo al nuevo en la misma jugada.
+   */
+  | 'EXPEDIENTES.PREGUNTAS_AUDIENCIA'
   | 'AUDIENCIAS.RESUMEN'
   | 'ENTREVISTAS.RESUMEN'
   | 'ENTREVISTAS.GUION';
@@ -192,12 +208,6 @@ export const FUNCIONES: ReadonlyArray<FuncionDefinition> = [
     descripcion: 'Pedir un informe nuevo sobre el texto corregido en el taller.'
   },
   {
-    id: 'REVISIONES.PREGUNTAS_AUDIENCIA',
-    modulo: 'REVISIONES',
-    nombre: 'Preguntas para la audiencia',
-    descripcion: 'Tres listas de preguntas a partir del escrito revisado.'
-  },
-  {
     id: 'AUDIENCIAS.RESUMEN',
     modulo: 'AUDIENCIAS',
     nombre: 'Resumen y hechos relevantes de la audiencia',
@@ -209,6 +219,12 @@ export const FUNCIONES: ReadonlyArray<FuncionDefinition> = [
     nombre: 'Quién es quién en el asunto',
     descripcion:
       'Las partes, los testigos y los peritos del expediente, con su lado y sobre qué pueden declarar. Es lo que le da nombre propio a las preguntas de audiencia.'
+  },
+  {
+    id: 'EXPEDIENTES.PREGUNTAS_AUDIENCIA',
+    modulo: 'EXPEDIENTES',
+    nombre: 'Preguntas para la audiencia',
+    descripcion: 'Preparar el interrogatorio de las personas del expediente, una lista por cada una.'
   },
   {
     id: 'ENTREVISTAS.RESUMEN',

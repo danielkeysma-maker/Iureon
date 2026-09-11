@@ -4,9 +4,7 @@ import {
   ArrowLeft,
   Check,
   ClipboardCheck,
-  Copy,
   Download,
-  Gavel,
   Eraser,
   Eye,
   FileOutput,
@@ -25,8 +23,7 @@ import {
   Send,
   ShieldCheck
 } from 'lucide-react';
-import type { Anotacion, EdicionPropuesta, InformeDeDocumentoRecibido, InformeDeRevision, ParametrosDePreguntas, PreguntasAudienciaGuardadas, RespuestaDePreguntas, RespuestaDelChat, SeccionDePreguntas, TurnoDelTaller, VersionDelTexto } from '../services/review.api';
-import { TITULOS as SECCIONES_DE_PREGUNTAS, preguntasComoTexto, seccionesPedidas } from '../services/preguntasExport.service';
+import type { Anotacion, EdicionPropuesta, InformeDeDocumentoRecibido, InformeDeRevision, RespuestaDelChat, TurnoDelTaller, VersionDelTexto } from '../services/review.api';
 import { aplicarReemplazo, capasTipograficas, esCapaTipografica, localizarCitas, marcasDeAnotaciones, reflujoDeSecciones, segmentarCapas, type MarcaEnCapa } from '../services/marcas';
 import { diferencias, resumenDeCambios } from '../services/diff';
 import { ApiError } from '../../../config/httpClient';
@@ -148,8 +145,6 @@ export interface TallerDeEscritoProps {
   onSaldoCambiado: () => void;
   /** Formato de la firma (Membrete): familia, cuerpo e interlineado. El papel del taller se lee con la misma letra que el visor y el PDF. */
   formato?: FormatoDelEscrito | null;
-  /** Solo en el taller de una revisión guardada: la pestaña «Audiencia» con las tres listas de preguntas. */
-  preguntas?: PreguntasDelTaller;
   /**
    * Funciones que el operador apagó para esta firma: el padre las decide con
    * `funcionHabilitada` (la del chat cambia según el taller sea de una revisión
@@ -187,30 +182,7 @@ export interface TallerDeEscritoProps {
    * archivar un informe que ya no es el que se está leyendo.
    */
   descargarInforme?: (formato: 'pdf' | 'word', vigente: { informe: InformeDeRevision | null; informeLibre: string | null }) => Promise<void>;
-  /**
-   * Por qué no hay pestaña «Audiencia», dicho en la pestaña donde el abogado
-   * acaba de leer el documento. Una capacidad ausente y muda se lee como un
-   * fallo; ausente y explicada, como una decisión.
-   */
-  preguntasNoOfrecidas?: React.ReactNode;
 }
-
-export interface PreguntasDelTaller {
-  precioCop: number;
-  /** Lo último generado para esta revisión, si el servidor lo conservó. */
-  guardadas: PreguntasAudienciaGuardadas | null;
-  onGenerar: (parametros: ParametrosDePreguntas, textoActual: string) => Promise<RespuestaDePreguntas>;
-  onExportarWord: (generadas: PreguntasAudienciaGuardadas) => Promise<void>;
-  /** El mismo juego, en PDF: a la audiencia se llega con la hoja impresa. */
-  onExportarPdf: (generadas: PreguntasAudienciaGuardadas) => Promise<void>;
-}
-
-type PosicionFija = 'Demandante' | 'Demandado' | 'Otro';
-const posicionInicial = (g: PreguntasAudienciaGuardadas | null): { tipo: PosicionFija; otra: string } => {
-  const p = g?.parametros.posicion ?? '';
-  if (p === 'Demandante' || p === 'Demandado') return { tipo: p, otra: '' };
-  return { tipo: p ? 'Otro' : 'Demandante', otra: p };
-};
 
 const pesos = (n: number): string => `$${Math.round(n).toLocaleString('es-CO')}`;
 const MAX_VERSIONES = 15;
@@ -338,11 +310,9 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   onCerrar,
   onSaldoCambiado,
   formato,
-  preguntas,
   cerradas,
   pieDelInformeRecibido,
   descargarInforme,
-  preguntasNoOfrecidas,
   original
 }) => {
   /*
@@ -378,13 +348,13 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
    * salido. Sin informe —el taller de un borrador— sigue abriendo en el chat,
    * que es lo único que hay.
    */
-  const [panel, setPanel] = React.useState<'chat' | 'informe' | 'versiones' | 'comentarios' | 'preguntas'>(
+  const [panel, setPanel] = React.useState<'chat' | 'informe' | 'versiones' | 'comentarios'>(
     datos.informe || datos.informeRecibido || datos.informeLibre ? 'informe' : 'chat'
   );
   const [citaAbierta, setCitaAbierta] = React.useState<number | null>(null);
   const [versionAbierta, setVersionAbierta] = React.useState<number | null>(null);
   const [mensaje, setMensaje] = React.useState('');
-  const [ocupado, setOcupado] = React.useState<'chat' | 'revision' | 'preguntas' | null>(null);
+  const [ocupado, setOcupado] = React.useState<'chat' | 'revision' | null>(null);
   /* «Llevar a Redacción» en vuelo: crea un borrador y cambia de módulo; dos pulsaciones serían dos borradores. */
   const [llevando, setLlevando] = React.useState(false);
   const llevar = async () => {
@@ -399,20 +369,6 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
       setLlevando(false);
     }
   };
-  /* ─── Preguntas para la audiencia: el formulario vive aquí, no en la pieza, para que el área de texto no pierda el foco. */
-  const [preguntasGeneradas, setPreguntasGeneradas] = React.useState<PreguntasAudienciaGuardadas | null>(preguntas?.guardadas ?? null);
-  const [formularioDePreguntas, setFormularioDePreguntas] = React.useState<boolean>(!preguntas?.guardadas);
-  const [posicionTipo, setPosicionTipo] = React.useState<PosicionFija>(() => posicionInicial(preguntas?.guardadas ?? null).tipo);
-  const [posicionOtra, setPosicionOtra] = React.useState(() => posicionInicial(preguntas?.guardadas ?? null).otra);
-  const [quiereProbar, setQuiereProbar] = React.useState(preguntas?.guardadas?.parametros.quiereProbar ?? '');
-  const [tipoDeAudiencia, setTipoDeAudiencia] = React.useState(preguntas?.guardadas?.parametros.audiencia ?? '');
-  /* A quién preguntar. Por defecto a los tres; el abogado quita los que no le interesan. */
-  const [publicos, setPublicos] = React.useState<SeccionDePreguntas[]>(
-    () => preguntas?.guardadas?.parametros.publicos?.length ? preguntas.guardadas.parametros.publicos : SECCIONES_DE_PREGUNTAS.map((s) => s.clave)
-  );
-  const alternarPublico = (clave: SeccionDePreguntas) =>
-    setPublicos((prev) => (prev.includes(clave) ? prev.filter((p) => p !== clave) : [...prev, clave]));
-  const [copiadas, setCopiadas] = React.useState(false);
   const [error, setError] = React.useState('');
   const [estadoGuardado, setEstadoGuardado] = React.useState<'quieto' | 'guardando' | 'guardado' | 'fallo'>('quieto');
   const [confirmacion, setConfirmacion] = React.useState<Confirmacion | null>(null);
@@ -544,67 +500,6 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
     window.addEventListener('keydown', salir);
     return () => window.removeEventListener('keydown', salir);
   }, [pantallaCompleta]);
-
-  /*
-   * Las guardadas pueden llegar después de montar (quien abre el taller las
-   * pide aparte). Se adoptan solo si aquí no se ha generado nada todavía.
-   */
-  const guardadasDelServidor = preguntas?.guardadas ?? null;
-  React.useEffect(() => {
-    if (!guardadasDelServidor) return;
-    setPreguntasGeneradas((actuales) => actuales ?? guardadasDelServidor);
-    setFormularioDePreguntas(false);
-    const ini = posicionInicial(guardadasDelServidor);
-    setPosicionTipo(ini.tipo);
-    setPosicionOtra(ini.otra);
-    setQuiereProbar(guardadasDelServidor.parametros.quiereProbar ?? '');
-    setTipoDeAudiencia(guardadasDelServidor.parametros.audiencia ?? '');
-  }, [guardadasDelServidor]);
-
-  const posicionElegida = (posicionTipo === 'Otro' ? posicionOtra : posicionTipo).trim();
-
-  const generarPreguntas = async () => {
-    if (!preguntas || ocupado) return;
-    if (!posicionElegida) {
-      setError('Indique su posición en el proceso: Demandante, Demandado u otra.');
-      return;
-    }
-    if (publicos.length === 0) {
-      setError('Marque al menos a quién quiere preguntar.');
-      return;
-    }
-    setOcupado('preguntas');
-    setError('');
-    try {
-      const r = await preguntas.onGenerar(
-        {
-          posicion: posicionElegida,
-          ...(quiereProbar.trim() ? { quiereProbar: quiereProbar.trim() } : {}),
-          ...(tipoDeAudiencia.trim() ? { audiencia: tipoDeAudiencia.trim() } : {}),
-          ...(publicos.length > 0 && publicos.length < SECCIONES_DE_PREGUNTAS.length ? { publicos } : {})
-        },
-        texto
-      );
-      setPreguntasGeneradas({ parametros: r.parametros, preguntas: r.preguntas, generadoEl: r.generadoEl, por: r.por });
-      setFormularioDePreguntas(false);
-      onSaldoCambiado();
-    } catch (err) {
-      setError(err instanceof ApiError || err instanceof Error ? err.message : 'No se pudieron generar las preguntas.');
-    } finally {
-      setOcupado(null);
-    }
-  };
-
-  const copiarPreguntas = async () => {
-    if (!preguntasGeneradas) return;
-    try {
-      await navigator.clipboard.writeText(preguntasComoTexto(datos.titulo, preguntasGeneradas));
-      setCopiadas(true);
-      window.setTimeout(() => setCopiadas(false), 2000);
-    } catch {
-      setError('No se pudo copiar al portapapeles.');
-    }
-  };
 
   /* ─── Versiones ──────────────────────────────────────────────────────────── */
   const tomarVersion = (motivo: string, resumen?: string): boolean => {
@@ -1232,19 +1127,6 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
         <div ref={finDelChat} />
       </div>
       <div className="border-t border-line-100 p-3">
-        {preguntas && (
-          <div className="mb-2 flex flex-wrap gap-1.5">
-            <button
-              type="button"
-              onClick={() => setPanel('preguntas')}
-              className="inline-flex items-center gap-1 rounded-full border border-line-200 bg-canvas px-2.5 py-1 text-[11.5px] text-ink-700 hover:border-brand-700 hover:text-brand-700"
-              title="Tres listas de preguntas para la audiencia a partir del escrito"
-            >
-              <Gavel className="h-3 w-3" />
-              Preguntas para la audiencia
-            </button>
-          </div>
-        )}
         {cerradas?.chat ? (
           <p className="notice text-ui leading-[1.5] [text-wrap:pretty] text-justify">{AVISO_FUNCION_DESHABILITADA}</p>
         ) : (
@@ -1401,16 +1283,6 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
             )}
           </>
         )}
-        {/*
-          POR QUÉ NO HAY PESTAÑA «AUDIENCIA», dicho al pie del informe que el
-          abogado acaba de leer, que es donde la buscaría. Callarlo dejaría la
-          ausencia con la misma cara que un fallo.
-        */}
-        {preguntasNoOfrecidas && (
-          <p className="mt-3 rounded-control border border-line-200 bg-canvas px-2.5 py-1.5 text-[11.5px] leading-snug text-ink-600 text-justify [text-wrap:pretty]">
-            {preguntasNoOfrecidas}
-          </p>
-        )}
       </div>
     </div>
   );
@@ -1449,157 +1321,6 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
       )}
     </div>
   );
-
-  const PreguntasPanel = () => {
-    if (!preguntas) return null;
-    const g = preguntasGeneradas;
-    const total = g ? g.preguntas.contraparte.length + g.preguntas.misTestigos.length + g.preguntas.testigosContraparte.length : 0;
-    return (
-      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-3 text-[12.5px]">
-        {formularioDePreguntas || !g ? (
-          <>
-            <p className="text-justify leading-snug text-ink-700 [text-wrap:pretty]">
-              <span className="font-semibold text-ink-900">¿Qué preguntas hacer en la audiencia?</span> La guía lee este escrito y le propone las preguntas, numeradas y listas para leer en voz alta, cada una con para qué sirve y el pasaje del escrito del que sale. Marque a quién quiere preguntar, diga de qué lado está y pida las preguntas.
-            </p>
-            <div>
-              <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">1 · ¿A quién quiere preguntar?</p>
-              <div className="mt-1 flex flex-wrap gap-1.5">
-                {SECCIONES_DE_PREGUNTAS.map((s) => {
-                  const activo = publicos.includes(s.clave);
-                  return (
-                    <button
-                      key={s.clave}
-                      type="button"
-                      onClick={() => alternarPublico(s.clave)}
-                      aria-pressed={activo}
-                      title={s.nota}
-                      className={`inline-flex items-center gap-1.5 rounded-control border px-2.5 py-1 text-[12px] ${activo ? 'border-brand-300 bg-brand-50 font-semibold text-brand-700' : 'border-line-200 text-ink-600 hover:text-ink-900'}`}
-                    >
-                      <span className={`flex h-3.5 w-3.5 items-center justify-center rounded-[3px] border ${activo ? 'border-brand-600 bg-brand-600 text-white' : 'border-line-300'}`}>
-                        {activo && <Check className="h-2.5 w-2.5" />}
-                      </span>
-                      {s.titulo}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-            <div>
-              <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">2 · ¿De qué lado está usted?</p>
-              <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                <div className="flex rounded-control border border-line-200 p-0.5">
-                  {(['Demandante', 'Demandado', 'Otro'] as const).map((t) => (
-                    <button key={t} type="button" onClick={() => setPosicionTipo(t)} className={`rounded-control px-2.5 py-1 text-[12px] ${posicionTipo === t ? 'bg-brand-50 font-semibold text-brand-700' : 'text-ink-600 hover:text-ink-900'}`}>
-                      {t}
-                    </button>
-                  ))}
-                </div>
-                {posicionTipo === 'Otro' && (
-                  <input
-                    type="text"
-                    value={posicionOtra}
-                    onChange={(e) => setPosicionOtra(e.target.value)}
-                    maxLength={80}
-                    placeholder="Ministerio Público, tercero, apoderado de la víctima…"
-                    className="field min-w-[200px] flex-1"
-                    autoFocus
-                  />
-                )}
-              </div>
-            </div>
-            <div>
-              <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">3 · ¿Qué quiere probar? (opcional)</p>
-              <textarea value={quiereProbar} onChange={(e) => setQuiereProbar(e.target.value)} rows={3} maxLength={1000} placeholder="Por ejemplo: que el pago se hizo antes del plazo y la contraparte lo recibió." className="field-area mt-1 w-full resize-none" />
-            </div>
-            <div>
-              <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">4 · Tipo de audiencia (opcional)</p>
-              <input type="text" value={tipoDeAudiencia} onChange={(e) => setTipoDeAudiencia(e.target.value)} maxLength={120} placeholder="Audiencia inicial, de instrucción y juzgamiento, de juicio oral…" className="field mt-1 w-full" />
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <button type="button" onClick={() => void generarPreguntas()} disabled={ocupado !== null || !posicionElegida || publicos.length === 0} className="btn-primary btn-sm disabled:opacity-50" title="La guía lee el escrito y devuelve las preguntas; se descuenta del saldo solo si responde">
-                <RefreshCw className={`h-3.5 w-3.5 ${ocupado === 'preguntas' ? 'animate-spin' : ''}`} />
-                {ocupado === 'preguntas' ? 'La guía está leyendo el escrito…' : `Pedir las preguntas · ${pesos(preguntas.precioCop)}`}
-              </button>
-              <span className="self-center text-[11px] text-ink-500">Se descuenta del saldo de la firma; si la guía no responde, no se cobra.</span>
-              {g && (
-                <button type="button" onClick={() => setFormularioDePreguntas(false)} disabled={ocupado !== null} className="btn-neutral btn-sm">
-                  Ver las anteriores
-                </button>
-              )}
-            </div>
-          </>
-        ) : (
-          <>
-            {g.preguntas.enfoque && (
-              <p className="notice text-ui leading-[1.5] [text-wrap:pretty] text-justify" title="Lo que esta actuación exige probar, según su ficha, y la audiencia en la que se pregunta">
-                <span className="font-semibold text-ink-900">Enfoque · </span>
-                {g.preguntas.enfoque}
-              </p>
-            )}
-            <div className="flex flex-wrap items-center gap-1.5">
-              <p className="min-w-0 flex-1 text-[11px] leading-snug text-ink-500 text-justify">
-                {total} preguntas · posición: <span className="text-ink-800">{g.parametros.posicion}</span>
-                {g.parametros.audiencia ? ` · ${g.parametros.audiencia}` : ''}
-                {g.generadoEl ? ` · ${fechaCorta(g.generadoEl)}` : ''}
-              </p>
-              <button type="button" onClick={() => void copiarPreguntas()} className="btn-neutral btn-sm" title="Copiar las tres listas como texto">
-                {copiadas ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-                {copiadas ? 'Copiadas' : 'Copiar'}
-              </button>
-              <button type="button" onClick={() => void preguntas.onExportarWord(g).catch((err: unknown) => setError(err instanceof Error ? err.message : 'No se pudo exportar a Word.'))} className="btn-neutral btn-sm" title="Descargar en Word para seguir trabajándolas">
-                <Download className="h-3 w-3" />
-                Word
-              </button>
-              <button type="button" onClick={() => void preguntas.onExportarPdf(g).catch((err: unknown) => setError(err instanceof Error ? err.message : 'No se pudo exportar a PDF.'))} className="btn-neutral btn-sm" title="Descargar en PDF para llevarlas impresas">
-                <Download className="h-3 w-3" />
-                PDF
-              </button>
-              <button type="button" onClick={() => setFormularioDePreguntas(true)} disabled={ocupado !== null} className="btn-secondary btn-sm" title="Pedir un juego nuevo con otros parámetros o sobre el texto corregido">
-                <RefreshCw className="h-3 w-3" />
-                Volver a generar
-              </button>
-            </div>
-            {g.parametros.quiereProbar && <p className="text-[11.5px] italic leading-snug text-ink-600 text-justify">Quiere probar: {g.parametros.quiereProbar}</p>}
-            {seccionesPedidas(g).map((s) => {
-              const lista = g.preguntas[s.clave];
-              return (
-                <section key={s.clave}>
-                  <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">{s.titulo}</h4>
-                  <p className="text-[11px] italic text-ink-500 text-justify">{s.nota}</p>
-                  {lista.length === 0 ? (
-                    <p className="mt-1 text-ink-500 text-justify">La guía no encontró en el escrito sustento para preguntas de esta lista.</p>
-                  ) : (
-                    <ol className="mt-1.5 space-y-2">
-                      {lista.map((q, i) => (
-                        <li key={i} className="rounded-control border border-line-100 bg-canvas px-2.5 py-2">
-                          <p className="leading-snug text-ink-900 text-justify">
-                            <span className="font-semibold">{i + 1}.</span> {q.pregunta}
-                          </p>
-                          {q.paraQue && (
-                            <p className="mt-1 text-[11.5px] leading-snug text-ink-600 text-justify">
-                              <span className="font-mono text-[9.5px] uppercase tracking-[0.06em] text-ink-400">Para qué</span> {q.paraQue}
-                            </p>
-                          )}
-                          {q.delEscrito && (
-                            <button type="button" onClick={() => setReferencias([q.delEscrito as string])} className="mt-1 block w-full border-l-2 border-line-200 pl-2 text-left text-[11.5px] italic leading-snug text-ink-500 hover:border-sky-500 hover:text-ink-700" title="Subrayar este pasaje en el escrito">
-                              «{q.delEscrito}»
-                            </button>
-                          )}
-                        </li>
-                      ))}
-                    </ol>
-                  )}
-                </section>
-              );
-            })}
-            <p className="border-t border-line-100 pt-2 text-[11px] leading-snug text-ink-500 text-justify">
-              La guía solo conoce el escrito: no el expediente, las pruebas ni a las personas. Pese cada pregunta antes de formularla.
-            </p>
-          </>
-        )}
-      </div>
-    );
-  };
 
   const VersionesPanel = () => (
     <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3 text-[12.5px]">
@@ -1706,29 +1427,28 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
         <div className={`min-h-0 min-w-0 flex-1 flex-col lg:flex ${guiaVisible ? 'lg:w-[58%] lg:flex-none' : 'lg:w-full'} ${vistaMovil === 'escrito' ? 'flex' : 'hidden'}`}>{Escrito()}</div>
         <div className={`min-h-0 min-w-0 flex-1 flex-col border-l border-line-200 bg-surface ${guiaVisible ? 'lg:flex' : 'lg:hidden'} ${vistaMovil === 'revisor' ? 'flex' : 'hidden'}`}>
           {/*
-            CINCO PESTAÑAS NO CABEN EN UN TELÉFONO, Y LA QUE SOBRA ES LA ÚLTIMA.
-            Sumadas con su relleno miden 390px, así que en 360 «Audiencia»
-            quedaba fuera del borde y en 320 también «Versiones»: no estaban
-            estrechas, estaban invisibles. La fila lleva desplazamiento propio y
-            cada pestaña se niega a encogerse, que es como se conserva el rótulo
-            entero; el escritorio no cambia porque ahí caben las cinco.
+            LA FILA CONSERVA SU DESPLAZAMIENTO PROPIO AUNQUE HOY SEAN CUATRO.
+            Con cinco pestañas —la quinta era «Audiencia», que se fue a
+            Expedientes— sumaban 390px de ancho, así que en un teléfono de 360
+            la última no quedaba estrecha sino invisible. Cuatro caben, pero el
+            rótulo de «Comentarios» y el de «Versiones» crecen con su contador,
+            así que el desplazamiento y el `shrink-0` siguen siendo lo que
+            impide que el defecto vuelva por la puerta de al lado.
           */}
           <div className="flex overflow-x-auto border-b border-line-100">
-            {(['chat', 'comentarios', 'informe', 'versiones', ...(preguntas ? (['preguntas'] as const) : [])] as const).map((p) => (
-              <button key={p} type="button" onClick={() => setPanel(p)} className={`shrink-0 whitespace-nowrap px-3 py-2 text-[12.5px] ${panel === p ? 'border-b-2 border-brand-700 font-semibold text-brand-700' : 'text-ink-500'}`} title={p === 'preguntas' ? 'Preguntas para la audiencia' : undefined}>
+            {(['chat', 'comentarios', 'informe', 'versiones'] as const).map((p) => (
+              <button key={p} type="button" onClick={() => setPanel(p)} className={`shrink-0 whitespace-nowrap px-3 py-2 text-[12.5px] ${panel === p ? 'border-b-2 border-brand-700 font-semibold text-brand-700' : 'text-ink-500'}`}>
                 {p === 'chat'
                   ? 'Guía'
                   : p === 'comentarios'
                     ? `Comentarios${comentarios.length ? ` (${comentarios.length})` : ''}`
                     : p === 'informe'
                       ? 'Informe'
-                      : p === 'versiones'
-                        ? `Versiones${versiones.length ? ` (${versiones.length})` : ''}`
-                        : 'Audiencia'}
+                      : `Versiones${versiones.length ? ` (${versiones.length})` : ''}`}
               </button>
             ))}
           </div>
-          {panel === 'chat' ? Chat() : panel === 'comentarios' ? ComentariosPanel() : panel === 'informe' ? InformePanel() : panel === 'preguntas' ? PreguntasPanel() : VersionesPanel()}
+          {panel === 'chat' ? Chat() : panel === 'comentarios' ? ComentariosPanel() : panel === 'informe' ? InformePanel() : VersionesPanel()}
         </div>
       </div>
 

@@ -39,8 +39,15 @@ export type Funcion =
   | 'REDACCION.TALLER_BORRADOR'
   | 'REVISIONES.CHAT_GUIA'
   | 'REVISIONES.REREVISAR'
-  | 'REVISIONES.PREGUNTAS_AUDIENCIA'
   | 'EXPEDIENTES.ACTORES'
+  /*
+   * El id cambió de `REVISIONES.` a `EXPEDIENTES.` cuando el interrogatorio se
+   * mudó del taller de revisión al expediente. `moduloDeFuncion` deduce el
+   * módulo del prefijo, así que con el nombre viejo esta función habría
+   * quedado atada al módulo Revisiones: una firma con Expedientes encendido y
+   * Revisiones apagado no vería el interrogatorio que sí tiene contratado.
+   */
+  | 'EXPEDIENTES.PREGUNTAS_AUDIENCIA'
   | 'AUDIENCIAS.RESUMEN'
   | 'ENTREVISTAS.RESUMEN'
   | 'ENTREVISTAS.GUION';

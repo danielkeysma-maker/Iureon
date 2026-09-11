@@ -1,6 +1,14 @@
 import React from 'react';
-import { AlertCircle, Gavel, Loader2 } from 'lucide-react';
+import { AlertCircle, Check, Copy, Download, Gavel, Loader2 } from 'lucide-react';
+import { useFuncionHabilitada } from '../../subscriptions/PlanContext';
+import { AVISO_FUNCION_DESHABILITADA } from '../../subscriptions/types';
 import { expedientesApi } from '../services/expedientes.api';
+import {
+  exportarPreguntasAPdf,
+  exportarPreguntasAWord,
+  preguntasComoTexto,
+  type ContextoDelInterrogatorio
+} from '../services/preguntasExport.service';
 import {
   MAX_PERSONAS_POR_TANDA,
   SE_LE_PREGUNTA,
@@ -13,11 +21,11 @@ import {
  *
  * ─── LO QUE ESTA PANTALLA HACE DISTINTO ────────────────────────────────────
  *
- * Las preguntas de audiencia que ya existían salen de un escrito y en tres
- * cajones fijos: la contraparte, mis testigos, los testigos de la contraparte.
- * Su propio prompt lo dice — «no conoces el expediente, las pruebas, a las
- * partes ni a los testigos»— y por eso en modo documento recibido la función
- * ni se ofrecía.
+ * Las preguntas de audiencia vivían en el taller de revisión y salían de un
+ * escrito, en tres cajones fijos: la contraparte, mis testigos, los testigos de
+ * la contraparte. Su propio prompt lo decía — «no conoces el expediente, las
+ * pruebas, a las partes ni a los testigos»— y por eso sobre un documento
+ * recibido la pestaña ni se ofrecía. Ese camino se retiró: éste es su relevo.
  *
  * Aquí se escoge GENTE. La técnica de cada lista la decide el servidor a
  * partir de lo que el abogado ya registró: al propio se le interroga con
@@ -28,6 +36,14 @@ import {
  *
  * El botón lleva el precio y la advertencia va arriba, no debajo. Un cobro que
  * se descubre después de pulsar es un cobro que el abogado no autorizó.
+ *
+ * ─── Y SE LLEVA EN LA MANO ─────────────────────────────────────────────────
+ *
+ * Copiar, Word y PDF. Vinieron con la mudanza desde el taller de revisión, y
+ * no son adorno: a una audiencia se entra con la hoja impresa, no con una
+ * pestaña abierta. Pintar el interrogatorio solo en pantalla obligaba a
+ * seleccionarlo con el ratón y pegarlo en otra parte, perdiendo la técnica y
+ * los «para qué» por el camino.
  */
 export const PreguntasDelExpedientePanel: React.FC<{ expediente: ExpedienteConDetalle }> = ({
   expediente
@@ -40,6 +56,40 @@ export const PreguntasDelExpedientePanel: React.FC<{ expediente: ExpedienteConDe
   const [pidiendo, setPidiendo] = React.useState(false);
   const [error, setError] = React.useState('');
   const [resultado, setResultado] = React.useState<PreguntasDelExpediente | null>(null);
+  const [copiado, setCopiado] = React.useState(false);
+
+  /*
+   * El operador puede apagar el interrogatorio dejando el módulo encendido:
+   * es lo caro de Expedientes. La pantalla lo dice y no ofrece el botón; el
+   * servidor rechaza igual con 403 si la petición llega por fuera de aquí.
+   */
+  const habilitado = useFuncionHabilitada('EXPEDIENTES.PREGUNTAS_AUDIENCIA');
+
+  /* Lo que titula y encabeza la hoja exportada; el radicado sale del expediente, no de un formulario. */
+  const contexto: ContextoDelInterrogatorio = {
+    caratula: expediente.caratula,
+    radicado: expediente.radicado,
+    ...(quiereProbar.trim() ? { quiereProbar: quiereProbar.trim() } : {}),
+    ...(audiencia.trim() ? { audiencia: audiencia.trim() } : {})
+  };
+
+  const copiar = async (r: PreguntasDelExpediente): Promise<void> => {
+    try {
+      await navigator.clipboard.writeText(preguntasComoTexto(contexto, r));
+      setCopiado(true);
+      window.setTimeout(() => setCopiado(false), 2000);
+    } catch {
+      setError('No se pudo copiar al portapapeles.');
+    }
+  };
+
+  /* Un fallo al exportar se dice donde ya se dicen los demás errores, no en un diálogo del navegador. */
+  const descargar = (formato: 'word' | 'pdf', r: PreguntasDelExpediente): void => {
+    const exportar = formato === 'word' ? exportarPreguntasAWord : exportarPreguntasAPdf;
+    void exportar(contexto, r).catch((err: unknown) =>
+      setError(err instanceof Error ? err.message : `No se pudo descargar en ${formato === 'word' ? 'Word' : 'PDF'}.`)
+    );
+  };
 
   const alternar = (id: string): void => {
     setEscogidos((antes) =>
@@ -156,11 +206,17 @@ export const PreguntasDelExpedientePanel: React.FC<{ expediente: ExpedienteConDe
         Preparar el interrogatorio consume saldo de la firma, una vez por tanda.
       </p>
 
+      {!habilitado && (
+        <p className="notice mt-1.5 text-meta [text-wrap:pretty] [overflow-wrap:anywhere]">
+          {AVISO_FUNCION_DESHABILITADA}
+        </p>
+      )}
+
       <button
         type="button"
         onClick={() => void pedir()}
         className="btn-primary btn-sm mt-1.5 gap-1.5"
-        disabled={pidiendo || escogidos.length === 0}
+        disabled={pidiendo || escogidos.length === 0 || !habilitado}
       >
         {pidiendo ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Gavel className="h-3.5 w-3.5" />}
         {pidiendo
@@ -179,6 +235,40 @@ export const PreguntasDelExpedientePanel: React.FC<{ expediente: ExpedienteConDe
 
       {resultado && (
         <div className="mt-4 space-y-4">
+          {/*
+            LLEVARSE EL INTERROGATORIO: Word para seguir trabajándolo, PDF para
+            imprimirlo. Los dos salen con la letra del membrete de la firma y
+            sin bloque de firma — es material de trabajo, no se radica.
+          */}
+          <div className="flex flex-wrap gap-1.5">
+            <button
+              type="button"
+              onClick={() => void copiar(resultado)}
+              className="btn-neutral btn-sm gap-1.5"
+              title="Copiar el interrogatorio completo como texto"
+            >
+              {copiado ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+              {copiado ? 'Copiado' : 'Copiar'}
+            </button>
+            <button
+              type="button"
+              onClick={() => descargar('word', resultado)}
+              className="btn-neutral btn-sm gap-1.5"
+              title="Descargar en Word para seguir trabajándolo"
+            >
+              <Download className="h-3.5 w-3.5" />
+              Word
+            </button>
+            <button
+              type="button"
+              onClick={() => descargar('pdf', resultado)}
+              className="btn-neutral btn-sm gap-1.5"
+              title="Descargar en PDF para llevarlo impreso a la audiencia"
+            >
+              <Download className="h-3.5 w-3.5" />
+              PDF
+            </button>
+          </div>
           {resultado.enfoque && (
             <p className="rounded-card border border-line-200 bg-canvas p-3 text-meta text-ink-600 [overflow-wrap:anywhere]">
               {resultado.enfoque}

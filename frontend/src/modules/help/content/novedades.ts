@@ -39,6 +39,14 @@ export const NOVEDADES_ID = 'novedades';
 
 export const NOVEDADES: readonly Novedad[] = [
   {
+    fecha: '2026-09-10',
+    titulo: 'El interrogatorio se prepara desde el expediente, persona por persona',
+    detalle:
+      'La pestaña «Audiencia» del taller de revisión ya no está: el interrogatorio se prepara ahora en «Expedientes», dentro del asunto. En vez de tres listas fijas —a la contraparte, a mis testigos, a los testigos de la contraparte— escoge usted a quién va a interrogar, hasta cuatro por tanda, y recibe una lista por cada nombre, con la técnica que le corresponde escrita encima: abiertas a los suyos, cerradas a los de enfrente, y al perito por el método y no por lo que vio. Cada pregunta trae para qué sirve y, cuando nace de un pasaje, la cita literal. El interrogatorio se copia, se descarga en Word para seguir trabajándolo y en PDF para llevarlo impreso a la audiencia, con la letra de su membrete.',
+    modulo: 'Expedientes',
+    tipo: 'nuevo'
+  },
+  {
     fecha: '2026-09-09',
     titulo: 'Suba el auto que le llegó y sepa qué le exige, para cuándo y por dónde se ataca',
     detalle:

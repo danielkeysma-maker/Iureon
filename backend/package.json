@@ -24,7 +24,6 @@
     "check:trial": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/trial/__checks__/trial.check.ts",
     "check:taller": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/taller.check.ts",
     "check:revision": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/documentReview.check.ts",
-    "check:preguntas": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/preguntas.check.ts",
     "check:extracto": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/billing/__checks__/extracto.check.ts",
     "check:billing": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/billing/__checks__/billing.check.ts",
     "check:clients": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/clients/__checks__/clients.check.ts",

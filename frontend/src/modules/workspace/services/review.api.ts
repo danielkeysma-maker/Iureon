@@ -182,53 +182,8 @@ export interface RevisionGuardada {
   conversacion: TurnoDelTaller[];
   anotaciones: Anotacion[];
   versiones: VersionDelTexto[];
-  /** El último juego de preguntas para la audiencia; null si nunca se pidió. Falta en la lista sin cuerpos. */
-  preguntasAudiencia?: PreguntasAudienciaGuardadas | null;
   /** El archivo tal como se subió, si se conservó. Falta en la lista sin cuerpos. */
   archivoOriginal?: ArchivoOriginalGuardado | null;
-}
-
-/* ─── Preguntas para la audiencia ──────────────────────────────────────────── */
-
-export interface PreguntaDeAudiencia {
-  pregunta: string;
-  /** Una línea: qué busca establecer o desvirtuar. */
-  paraQue: string;
-  /** Pasaje literal del escrito del que nace, si lo hay. */
-  delEscrito?: string;
-}
-
-/** Las tres listas del JSON; el «enfoque» es texto y no entra aquí. */
-export type SeccionDePreguntas = 'contraparte' | 'misTestigos' | 'testigosContraparte';
-
-export interface PreguntasParaLaAudiencia {
-  /** Qué exige probar esta actuación y en qué audiencia se pregunta; una o dos frases del modelo. */
-  enfoque?: string;
-  contraparte: PreguntaDeAudiencia[];
-  misTestigos: PreguntaDeAudiencia[];
-  testigosContraparte: PreguntaDeAudiencia[];
-}
-
-export interface ParametrosDePreguntas {
-  /** «Demandante», «Demandado» o texto libre: «Ministerio Público», «tercero». */
-  posicion: string;
-  quiereProbar?: string;
-  audiencia?: string;
-  /** A quién se le pregunta; ausente = a los tres. */
-  publicos?: SeccionDePreguntas[];
-}
-
-export interface PreguntasAudienciaGuardadas {
-  parametros: ParametrosDePreguntas;
-  preguntas: PreguntasParaLaAudiencia;
-  generadoEl: string;
-  por: string;
-}
-
-export interface RespuestaDePreguntas extends PreguntasAudienciaGuardadas {
-  guardado: boolean;
-  cobradoCop: number;
-  saldoCop: number;
 }
 
 export interface EdicionPropuesta {
@@ -348,10 +303,6 @@ export const reviewApi = {
 
   chat: (id: string, body: { mensaje: string; textoActual: string; historial: TurnoDelTaller[]; anotaciones?: Anotacion[] }) =>
     httpClient.post<RespuestaDelChat>(`/api/agent/reviews/${encodeURIComponent(id)}/chat`, { body }),
-
-  /** Tres listas de preguntas para la audiencia a partir del escrito. Cobra como una consulta. */
-  preguntasParaAudiencia: (id: string, body: ParametrosDePreguntas & { textoActual: string }) =>
-    httpClient.post<RespuestaDePreguntas>(`/api/agent/reviews/${encodeURIComponent(id)}/preguntas`, { body }),
 
   rerevisar: (id: string, textoActual: string) =>
     httpClient.post<RespuestaDeNuevaRevision>(`/api/agent/reviews/${encodeURIComponent(id)}/rerevisar`, { body: { textoActual } }),

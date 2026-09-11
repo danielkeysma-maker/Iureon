@@ -241,8 +241,8 @@ check('no hay dos funciones con el mismo id', new Set(TODAS_LAS_FUNCIONES).size 
 check(
   'un id de función se acepta en la misma lista que los módulos',
   (() => {
-    const r = validarModulosDesactivados(['REVISIONES.PREGUNTAS_AUDIENCIA', 'AUDIENCIAS']);
-    return r.ok && r.modulos.length === 2 && r.modulos[0] === 'AUDIENCIAS' && r.modulos[1] === 'REVISIONES.PREGUNTAS_AUDIENCIA';
+    const r = validarModulosDesactivados(['EXPEDIENTES.PREGUNTAS_AUDIENCIA', 'AUDIENCIAS']);
+    return r.ok && r.modulos.length === 2 && r.modulos[0] === 'AUDIENCIAS' && r.modulos[1] === 'EXPEDIENTES.PREGUNTAS_AUDIENCIA';
   })()
 );
 check(
@@ -264,12 +264,12 @@ check(
 check(
   'función apagada: el módulo sigue encendido y las otras funciones del módulo también',
   (() => {
-    const fila = filaPremium(['REVISIONES.PREGUNTAS_AUDIENCIA']);
+    const fila = filaPremium(['EXPEDIENTES.PREGUNTAS_AUDIENCIA']);
     return (
-      moduloDisponible(fila, 'REVISIONES') &&
-      !funcionDisponible(fila, 'REVISIONES.PREGUNTAS_AUDIENCIA') &&
+      moduloDisponible(fila, 'EXPEDIENTES') &&
+      !funcionDisponible(fila, 'EXPEDIENTES.PREGUNTAS_AUDIENCIA') &&
+      funcionDisponible(fila, 'EXPEDIENTES.ACTORES') &&
       funcionDisponible(fila, 'REVISIONES.CHAT_GUIA') &&
-      funcionDisponible(fila, 'REVISIONES.REREVISAR') &&
       modulosDisponibles(fila.plan, fila.modulosDesactivados).length === TODOS_LOS_MODULOS.length
     );
   })()

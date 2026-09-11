@@ -5,9 +5,9 @@ import { seLePregunta, type ActorDelExpediente, type ExpedienteConDetalle } from
  *
  * ─── QUÉ CAMBIA RESPECTO DE LO QUE YA HABÍA ────────────────────────────────
  *
- * Las preguntas de audiencia existen desde hace tiempo y cuelgan de una
- * revisión: `POST /agent/reviews/:id/preguntas`. Funcionan y se siguen usando.
- * Lo que no podían hacer está escrito en su propio prompt, con todas las
+ * Las preguntas de audiencia colgaban de una revisión: `POST
+ * /agent/reviews/:id/preguntas`. Ese camino YA SE RETIRÓ y éste es su relevo;
+ * lo que no podía hacer estaba escrito en su propio prompt, con todas las
  * letras: «no conoces el expediente, las pruebas, a las partes ni a los
  * testigos». De ahí salían TRES CAJONES FIJOS —la contraparte, mis testigos,
  * los testigos de la contraparte— porque sin saber quién hay en el caso, una

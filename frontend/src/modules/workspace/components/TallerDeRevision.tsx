@@ -1,9 +1,8 @@
 import React from 'react';
 import type { FormatoDelEscrito } from '../../documents/formatoEnPantalla';
-import { reviewApi, type Anotacion, type ConsentimientoDeGuardado, type InformeDeDocumentoRecibido, type InformeDeRevision, type ModoDeRevision, type PreguntasAudienciaGuardadas, type TurnoDelTaller, type VersionDelTexto } from '../services/review.api';
+import { reviewApi, type Anotacion, type ConsentimientoDeGuardado, type InformeDeDocumentoRecibido, type InformeDeRevision, type ModoDeRevision, type TurnoDelTaller, type VersionDelTexto } from '../services/review.api';
 import { exportarInformeAPdf, exportarInformeAWord } from '../services/informeExport.service';
 import type { DatosDeExportacion } from '../services/informeLayout';
-import { exportarPreguntasAPdf, exportarPreguntasAWord } from '../services/preguntasExport.service';
 import { TallerDeEscrito } from './TallerDeEscrito';
 import { PuenteAlAtaque } from './PuenteAlAtaque';
 import type { ActuacionRole } from '../../catalog/types';
@@ -63,8 +62,6 @@ export interface DatosDelTaller {
   conversacion: TurnoDelTaller[];
   anotaciones?: Anotacion[];
   versiones?: VersionDelTexto[];
-  /** Si quien abre el taller ya las tiene; si falta, el taller las pide al servidor. */
-  preguntasAudiencia?: PreguntasAudienciaGuardadas | null;
   /**
    * El archivo tal como se subió, cuando todavía está en esta pestaña: quien
    * acaba de pedir la revisión lo tiene en memoria y el visor lo abre sin
@@ -139,8 +136,8 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
    * ─── QUÉ SE LEYÓ: UN ESCRITO PROPIO O UN DOCUMENTO QUE LLEGÓ ──────────────
    *
    * Una condición con NOMBRE, no un `if` mudo repetido: de ella cuelgan la
-   * cabecera del informe descargado, la pestaña «Audiencia» y el pie del
-   * puente al ataque, y las tres tienen que decidir lo mismo.
+   * cabecera del informe descargado y el pie del puente al ataque, y las dos
+   * tienen que decidir lo mismo.
    *
    * El modo viaja cuando quien abre el taller lo sabe; si no, se deduce de la
    * FORMA del informe, que es como el resto del módulo lo distingue. La forma
@@ -180,42 +177,8 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
     else await exportarInformeAWord(d);
   };
 
-  /*
-   * Las preguntas para la audiencia guardadas con la revisión. Quien abre el
-   * taller arma los datos desde la lista (sin cuerpos), así que se piden aquí
-   * una vez; un fallo de red deja la pestaña vacía y no bloquea nada.
-   */
-  const [preguntasGuardadas, setPreguntasGuardadas] = React.useState<PreguntasAudienciaGuardadas | null>(datos.preguntasAudiencia ?? null);
-  /* Las funciones de Revisiones que el operador puede apagar para esta firma: sin pestaña «Audiencia», sin entrada de chat, sin «Volver a revisar». */
+  /* Las funciones de Revisiones que el operador puede apagar para esta firma: sin entrada de chat, sin «Volver a revisar». */
   const { funcionHabilitada } = usePlan();
-  const preguntasHabilitadas = funcionHabilitada('REVISIONES.PREGUNTAS_AUDIENCIA');
-
-  /*
-   * ─── LAS PREGUNTAS DE AUDIENCIA NO SE OFRECEN SOBRE UN DOCUMENTO RECIBIDO ──
-   *
-   * El encargo que sale al servidor está escrito para el ESCRITO DEL ABOGADO:
-   * pide preguntas para interrogar a la contraparte y a los testigos a partir
-   * de lo que ese escrito afirma. Sobre un auto o una sentencia produce
-   * preguntas dirigidas al juez que lo profirió, que no se interroga, y COBRA
-   * saldo por ellas. No cobrar por algo que no sirve es más urgente que
-   * hacerlo servir: hasta que el encargo se adapte —eso es trabajo de
-   * servidor—, la pestaña no se ofrece y se dice por qué.
-   */
-  const preguntasOfrecidas = Boolean(datos.revisionId) && preguntasHabilitadas && !esDocumentoRecibido;
-
-  React.useEffect(() => {
-    if (datos.preguntasAudiencia !== undefined || !datos.revisionId) return;
-    let vigente = true;
-    reviewApi
-      .obtener(datos.revisionId)
-      .then((r) => {
-        if (vigente && r.preguntasAudiencia) setPreguntasGuardadas(r.preguntasAudiencia);
-      })
-      .catch(() => undefined);
-    return () => {
-      vigente = false;
-    };
-  }, [datos.revisionId, datos.preguntasAudiencia]);
 
   const autorizar = async () => {
     setErrorAutorizacion('');
@@ -349,26 +312,6 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
         formato={formatoDeFirma}
         cerradas={{ chat: !funcionHabilitada('REVISIONES.CHAT_GUIA'), rerevisar: !funcionHabilitada('REVISIONES.REREVISAR') }}
         descargarInforme={descargarInforme}
-        preguntasNoOfrecidas={
-          esDocumentoRecibido && preguntasHabilitadas ? (
-            <>
-              No hay pestaña <span className="font-semibold">«Audiencia»</span> sobre un documento recibido: las preguntas se preparan a partir del
-              escrito de usted, para interrogar a la contraparte y a los testigos, y de un auto o una sentencia saldrían preguntas dirigidas a quien lo
-              profirió. Prepare la audiencia desde la revisión del escrito propio con el que actúe en ella.
-            </>
-          ) : undefined
-        }
-        preguntas={
-          preguntasOfrecidas
-            ? {
-                precioCop: precioConsultaCop,
-                guardadas: preguntasGuardadas,
-                onGenerar: (parametros, textoActual) => reviewApi.preguntasParaAudiencia(datos.revisionId as string, { ...parametros, textoActual }),
-                onExportarWord: (generadas) => exportarPreguntasAWord(datos.documentType, generadas),
-                onExportarPdf: (generadas) => exportarPreguntasAPdf(datos.documentType, generadas)
-              }
-            : undefined
-        }
       />
       <ConfirmarDialog confirmacion={confirmacion} onCerrar={() => setConfirmacion(null)} />
     </>
