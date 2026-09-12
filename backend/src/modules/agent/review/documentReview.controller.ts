@@ -42,6 +42,9 @@ import {
 import { ENGINE, callOpenRouterWithUsage } from '../openrouter.client';
 import { aQuienLeToca, esPapelRepresentable } from './posicionProcesal';
 import { esExpedienteDeLaFirma } from '../../expedientes/expedientes.service';
+import type { VigenciaDeArticulo } from '../../legislation/officialArticle.service';
+import { avisoDeGlosa, marcarGlosaEnInforme, verificarGlosaDelInforme } from './glosaDelInforme';
+import { resumenDeGlosa } from './verificarGlosa';
 import { traerMaterialDelExpediente } from '../../expedientes/materialDelExpediente';
 import type { PapelEnElExpediente } from '../../expedientes/types';
 import {
@@ -166,6 +169,25 @@ export const LIMITE_LLAMADA_MS = 50_000;
  * comprobación de glosa, que sí son hasta ocho llamadas por informe.
  */
 export const PLAZO_VIGENCIA_INFORME_MS = 30_000;
+
+/**
+ * Lo que la comprobación de GLOSA puede tardar. Ver `glosaDelInforme.ts`.
+ *
+ * ─── POR QUÉ 30 Y NO LOS 25 DEL BORRADOR ───────────────────────────────────
+ *
+ * En Redacción los 25 s salen de un presupuesto apretado: cuatro etapas y la
+ * redacción se reparten los 300 s de la función, y cada segundo que toma esta
+ * comprobación se lo quita al motor que escribe. Aquí no hay tal reparto — la
+ * revisión gasta 50 s en la llamada al modelo y 30 en la vigencia, y le sobran
+ * más de tres minutos—, así que ser tacaño no compra nada.
+ *
+ * Y UN PLAZO NO ES UNA ESPERA: es un techo. Las hasta ocho llamadas van en
+ * paralelo y el motor barato responde en segundos; el techo solo se paga el día
+ * que el proveedor va lento, y ese día se paga con DUDOSA declarada, no con un
+ * informe perdido. Lo que impide subirlo más es lo mismo que en la vigencia:
+ * en un día malo el abogado espera el techo entero con el informe ya escrito.
+ */
+export const PLAZO_GLOSA_INFORME_MS = 30_000;
 
 export class TiempoAgotado extends Error {}
 
@@ -532,7 +554,26 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
      * prohíbe citar artículos de memoria, que es la otra mitad del problema.
      */
     let informeAnotado = informe;
+    /*
+     * LOS AVISOS DE CABECERA SE JUNTAN Y SE PONEN UNA VEZ, AL FINAL.
+     *
+     * Cada comprobación los ponía por su cuenta con un `unshift`, y encadenados
+     * el orden lo decidía el orden en que corren: la última en hablar quedaba
+     * primera. Aquí se acumulan y se anteponen juntos, en un orden escrito a
+     * mano — la vigencia antes que la glosa, porque un artículo derogado
+     * invalida el punto entero y una glosa mal explicada invalida una frase.
+     */
+    const avisos: string[] = [];
+    let citasComprobadas: VigenciaDeArticulo[] = [];
+
     if (informe) {
+      /*
+       * Una sola variable estrechada para las dos comprobaciones: cada una toma
+       * el informe que dejó la anterior y le añade sus marcas, así que las dos
+       * marcas conviven en el mismo informe en vez de pisarse.
+       */
+      let anotado = informe;
+
       try {
         const actuacion = catalogService.findByDocumentType(documentType, legalBranch);
         const autorizados = actuacion ? universoCitable(actuacion) : [];
@@ -541,11 +582,11 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
           autorizados,
           PLAZO_VIGENCIA_INFORME_MS
         );
+        citasComprobadas = vigencia.resultados;
         const aviso = avisoDeVigencia(vigencia);
         if (aviso) {
-          const marcado = marcarVigenciaEnInforme(informe, vigencia);
-          /* El aviso va PRIMERO: detrás de siete consejos no lo lee nadie. */
-          informeAnotado = { ...marcado, recomendaciones: [aviso, ...marcado.recomendaciones] };
+          anotado = marcarVigenciaEnInforme(anotado, vigencia);
+          avisos.push(aviso);
           console.log(
             `[REVIEW] Vigencia del informe: ${vigencia.resultados.length} citas fuera de ficha, ` +
               `${vigencia.derogados} derogadas, ${vigencia.discrepantes} con discrepancia, ` +
@@ -560,6 +601,56 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
          */
         console.warn(`[REVIEW] No se pudo comprobar la vigencia del informe: ${(err as Error).message}`);
       }
+
+      /*
+       * ─── ¿DICE EL ARTÍCULO LO QUE EL REVISOR DICE QUE DICE? ──────────────
+       *
+       * La tercera comprobación del borrador, y la última que le faltaba a
+       * Revisión. Ve el defecto que las otras dos aprueban con razón: un artículo
+       * VIGENTE y de la ficha, explicado al revés. Ver `glosaDelInforme.ts`.
+       *
+       * SE ALIMENTA DE LO QUE LA VIGENCIA YA BAJÓ. `citasComprobadas` trae el
+       * texto oficial de esos mismos artículos, así que esta etapa no añade una
+       * sola petición al Senado; sin ellas —porque la vigencia falló o porque el
+       * informe no citó nada fuera de ficha— no hay contra qué comparar y no se
+       * juzga nada. Preguntarle al motor qué recuerda del artículo es justo lo
+       * que falló al escribir la frase.
+       *
+       * LO QUE SÍ CUESTA SON HASTA OCHO LLAMADAS al motor barato, en paralelo,
+       * con el texto delante: unos US$0,014 por informe, que cabe de sobra bajo
+       * el piso de la REVISIÓN. Se registran en `ai_usage` una por una, porque
+       * `settleOperation` liquida sumando esa tabla y lo que no se registra
+       * quedaría fuera del margen — el defecto del gasto invisible, ya medido.
+       */
+      if (citasComprobadas.length > 0) {
+        try {
+          const glosa = await verificarGlosaDelInforme(informe, citasComprobadas, PLAZO_GLOSA_INFORME_MS);
+
+          for (const usage of glosa.usos) {
+            await recordUsage({ firmId, userEmail, operation: 'REVISION', operationId, usage });
+          }
+
+          const avisoGlosa = avisoDeGlosa(glosa);
+          if (avisoGlosa) {
+            anotado = marcarGlosaEnInforme(anotado, glosa);
+            avisos.push(avisoGlosa);
+          }
+          if (glosa.resultados.length > 0) {
+            console.log(`[REVIEW] Glosa del informe: ${resumenDeGlosa(glosa)}`);
+          }
+        } catch (err) {
+          console.warn(`[REVIEW] No se pudo comprobar la glosa del informe: ${(err as Error).message}`);
+        }
+      }
+
+      /*
+       * Y AL FRENTE DE LAS RECOMENDACIONES, que es donde se hojea. No son
+       * recomendaciones más: son las líneas que dicen que una parte del propio
+       * informe no se puede usar tal como está, y detrás de siete consejos no
+       * las lee nadie.
+       */
+      informeAnotado =
+        avisos.length > 0 ? { ...anotado, recomendaciones: [...avisos, ...anotado.recomendaciones] } : anotado;
     }
 
     const cobro = await settleOperation({
