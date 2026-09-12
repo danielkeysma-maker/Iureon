@@ -4,6 +4,7 @@ import {
   PARA_INDEXAR,
   textoDelArchivo
 } from '../../workspace/services/textoDelArchivo';
+import { uploadFileToStorage } from '../../documents/services/storageUpload';
 import { expedientesApi, type DocumentoIndexado } from '../services/expedientes.api';
 import { LeerDocumentoIndexado } from './LeerDocumentoIndexado';
 import type { ExpedienteConDetalle } from '../types';
@@ -47,6 +48,19 @@ export const IndexarEnExpediente: React.FC<{
   const [leyendo, setLeyendo] = React.useState(false);
   const [indexando, setIndexando] = React.useState(false);
   const [error, setError] = React.useState('');
+  /*
+   * EL ARCHIVO, ADEMAS DE SU TEXTO.
+   *
+   * Hasta hoy solo viajaba el texto: el expediente guardaba lo buscable y NO
+   * el documento, asi que no habia nada que abrir ni que descargar. Un
+   * expediente sin sus papeles es un indice, no un expediente.
+   *
+   * El archivo sube DIRECTO a B2 con la misma tuberia que usa la revision:
+   * Vercel rechaza cuerpos de mas de 4,5 MB y un escaneado de trescientas
+   * paginas pesa mucho mas, asi que no puede pasar por el servidor.
+   */
+  const [archivo, setArchivo] = React.useState<File | null>(null);
+  const [subiendo, setSubiendo] = React.useState(0);
   const [leido, setLeido] = React.useState<{ texto: string; caracteres: number; recortado: boolean } | null>(
     null
   );
@@ -111,6 +125,7 @@ export const IndexarEnExpediente: React.FC<{
         return;
       }
       setLeido({ texto: r.texto, caracteres: r.caracteres, recortado: r.recortado });
+      setArchivo(archivo);
       /* El nombre del archivo es el mejor título por defecto, y se puede cambiar. */
       if (!titulo.trim()) setTitulo(archivo.name.replace(/\.[^.]+$/, ''));
     } finally {
@@ -122,10 +137,31 @@ export const IndexarEnExpediente: React.FC<{
     if (!leido || !titulo.trim()) return;
     setIndexando(true);
     setError('');
+    setSubiendo(0);
     try {
-      const r = await expedientesApi.indexar(expediente.id, { titulo: titulo.trim(), texto: leido.texto });
+      /*
+       * SE SUBE PRIMERO Y SE INDEXA DESPUES. Si la subida falla, no se indexa:
+       * un documento buscable cuyo original nunca llego seria justo la mitad
+       * que no se puede reparar despues sin volver a subirlo todo.
+       *
+       * Si el abogado pego el texto en vez de escoger un archivo, no hay nada
+       * que subir y se indexa igual — lo que se pierde es poder volver al
+       * original, no la busqueda.
+       */
+      let claveB2: string | undefined;
+      if (archivo) {
+        claveB2 = await uploadFileToStorage(archivo, `expedientes/${expediente.id}`, setSubiendo, 'el documento');
+      }
+      const r = await expedientesApi.indexar(expediente.id, {
+        titulo: titulo.trim(),
+        texto: leido.texto,
+        claveB2,
+        contentType: archivo?.type || undefined,
+        bytes: archivo?.size
+      });
       setHecho({ fragmentos: r.resultado.totalChunksCreated, buscable: r.buscable });
       setLeido(null);
+      setArchivo(null);
       setTitulo('');
       await cargarDocumentos();
       await onIndexado();
@@ -252,7 +288,11 @@ export const IndexarEnExpediente: React.FC<{
                 disabled={indexando || !titulo.trim()}
               >
                 {indexando && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                {indexando ? 'Indexando… puede tardar un minuto' : 'Indexar en este expediente'}
+                {indexando
+                  ? subiendo > 0 && subiendo < 100
+                    ? `Subiendo el documento… ${subiendo}%`
+                    : 'Indexando… puede tardar un minuto'
+                  : 'Indexar en este expediente'}
               </button>
             </>
           )}

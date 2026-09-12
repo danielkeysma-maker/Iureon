@@ -93,6 +93,8 @@ export const indexarEnExpedienteController = async (req: Request, res: Response)
        * poder volver al original, no la búsqueda.
        */
       b2FileUrl: claveB2,
+      contentType: String(req.body?.contentType ?? '').trim() || undefined,
+      bytes: typeof req.body?.bytes === 'number' ? req.body.bytes : undefined,
       rawText: texto,
       expedienteId: expediente.id,
       metadata: { expediente: expediente.caratula, radicado: expediente.radicado }

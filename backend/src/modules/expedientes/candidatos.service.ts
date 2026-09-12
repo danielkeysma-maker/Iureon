@@ -1,4 +1,5 @@
 import { supabase } from '../../config/supabase.config';
+import { BackblazeB2TenantStorageService } from '../documents/b2.service';
 import { textoDesdeFragmentos, type FragmentoGuardado } from './textoIndexado';
 import { ExpedienteError } from './expedientes.service';
 import type { TipoDePieza } from './types';
@@ -27,6 +28,10 @@ import type { TipoDePieza } from './types';
  * no aparece, sin saber por qué. Se muestra, se dice de qué expediente es, y
  * se puede mover: cambiar de carpeta es una corrección legítima y frecuente.
  */
+
+/* Una sola instancia, perezosa: el servicio no guarda estado entre llamadas. */
+let b2: BackblazeB2TenantStorageService | null = null;
+const almacen = (): BackblazeB2TenantStorageService => (b2 ??= new BackblazeB2TenantStorageService());
 
 const db = () => {
   if (!supabase) throw new ExpedienteError('NO_DB', 'La base de datos no está configurada.', 503);
@@ -280,8 +285,77 @@ export const quitarDocumento = async (
     throw new ExpedienteError('DOC_NOT_FOUND', 'Ese documento no está en este expediente.', 404);
   }
 
+  await borrarOriginales(firmId, [documentId]);
   await db().from('legal_documents').delete().eq('firm_id', firmId).eq('id', documentId);
   return quitados;
+};
+
+/**
+ * BORRAR TAMBIÉN EL ARCHIVO, y no solo su fila.
+ *
+ * Desde que el expediente guarda el documento original en el almacenamiento,
+ * borrar la fila y dejar el objeto sería lo peor de las dos opciones: el
+ * abogado ve desaparecer el documento y cree que se fue, mientras un papel
+ * privilegiado de su cliente sigue en el bucket sin nada que lo reclame — sin
+ * fila, ya no hay ni forma de encontrarlo para borrarlo después.
+ *
+ * NO TUMBA EL BORRADO SI FALLA. La fila se va igual: dejar el documento
+ * visible porque el almacenamiento tuvo una mala tarde le diría al abogado que
+ * su orden no se cumplió, cuando lo que quedó pendiente es una limpieza. Se
+ * registra para poder barrerlo.
+ */
+export const borrarOriginales = async (firmId: string, documentIds: readonly string[]): Promise<void> => {
+  if (documentIds.length === 0) return;
+
+  const { data } = await db()
+    .from('legal_documents')
+    .select('id, b2_file_url')
+    .eq('firm_id', firmId)
+    .in('id', [...documentIds]);
+
+  for (const d of (data ?? []) as Array<{ id: string; b2_file_url: string | null }>) {
+    const clave = (d.b2_file_url ?? '').trim();
+    /* Sin clave no hay archivo: se indexó pegando el texto, o antes de que se guardara. */
+    if (!clave) continue;
+    const ok = await almacen().deleteObject(firmId, clave).catch(() => false);
+    if (!ok) console.error(`[EXPEDIENTES] Quedó sin borrar en el almacenamiento: ${clave}`);
+  }
+};
+
+/**
+ * Un enlace firmado al archivo original, o `null` si ese documento no tiene.
+ *
+ * Se filtra por firma Y por expediente antes de firmar nada: el id llega de la
+ * URL, y una URL firmada es acceso directo al objeto — entregarla sin
+ * comprobar de quién es sería peor que devolver la fila.
+ */
+export const enlaceAlOriginal = async (
+  firmId: string,
+  expedienteId: string,
+  documentId: string
+): Promise<string | null> => {
+  /* Que el documento sea DE ESTE expediente: lo dicen sus fragmentos. */
+  const { data: pertenece } = await db()
+    .from('document_embeddings')
+    .select('id')
+    .eq('firm_id', firmId)
+    .eq('expediente_id', expedienteId)
+    .eq('document_id', documentId)
+    .limit(1)
+    .maybeSingle();
+  if (!pertenece) throw new ExpedienteError('DOC_NOT_FOUND', 'Ese documento no está en este expediente.', 404);
+
+  const { data: fila } = await db()
+    .from('legal_documents')
+    .select('b2_file_url')
+    .eq('firm_id', firmId)
+    .eq('id', documentId)
+    .maybeSingle();
+
+  const clave = ((fila as { b2_file_url: string | null } | null)?.b2_file_url ?? '').trim();
+  if (!clave) return null;
+
+  return almacen().generateDownloadPresignedUrl(firmId, clave);
 };
 
 

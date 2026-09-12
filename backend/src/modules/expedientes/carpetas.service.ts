@@ -1,4 +1,5 @@
 import { supabase } from '../../config/supabase.config';
+import { borrarOriginales } from './candidatos.service';
 import { ExpedienteError } from './expedientes.service';
 
 /**
@@ -306,6 +307,19 @@ export const borrarCarpeta = async (
   await expedienteDeLaFirma(firmId, expedienteId);
   const rama = await ramaDeCarpetas(expedienteId, carpetaId);
   const contenido = await contenidoDeCarpeta(firmId, expedienteId, carpetaId);
+
+  /*
+   * LOS ARCHIVOS SE BORRAN ANTES QUE SUS FILAS, y ese orden importa: la clave
+   * del objeto vive EN la fila. Borrando primero la fila ya no habria de donde
+   * sacarla, y quedarian papeles privilegiados del cliente en el almacenamiento
+   * sin nada que los reclame — invisibles y sin forma de encontrarlos.
+   */
+  const { data: aBorrar } = await db()
+    .from('legal_documents')
+    .select('id')
+    .eq('firm_id', firmId)
+    .in('carpeta_id', rama);
+  await borrarOriginales(firmId, ((aBorrar ?? []) as Array<{ id: string }>).map((d) => d.id));
 
   const { error: errorDocs } = await db()
     .from('legal_documents')

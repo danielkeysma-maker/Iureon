@@ -16,6 +16,7 @@ import {
   moverDocumentoController,
   documentosDelExpedienteController,
   textoDelDocumentoController,
+  originalDelDocumentoController,
   quitarDocumentoController,
   crearExpedienteController,
   listarExpedientesController,
@@ -75,6 +76,7 @@ router.post('/expedientes/:id/indexar', bloquearSiPlanVencido, indexarEnExpedien
 router.get('/expedientes/:id/documentos', documentosDelExpedienteController as any);
 /* Leer el texto de un documento indexado. Va antes del DELETE del mismo camino. */
 router.get('/expedientes/:id/documentos/:documentId/texto', textoDelDocumentoController as any);
+router.get('/expedientes/:id/documentos/:documentId/original', originalDelDocumentoController as any);
 
 /*
  * Buscar dentro del expediente. NO lleva `bloquearSiPlanVencido`: es lectura de

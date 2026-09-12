@@ -17,7 +17,8 @@ import {
   candidatosDeLaFirma,
   documentosDelExpediente,
   quitarDocumento,
-  textoDelDocumentoIndexado
+  textoDelDocumentoIndexado,
+  enlaceAlOriginal
 } from './candidatos.service';
 import { vectorSearchService } from '../search/vectorSearch.service';
 import {
@@ -302,6 +303,26 @@ export const textoDelDocumentoController = async (req: Request, res: Response): 
     res.json({ success: true, documento });
   } catch (err) {
     fallar(res, err, 'No se pudo leer el documento.');
+  }
+};
+
+/**
+ * GET /api/expedientes/:id/documentos/:documentId/original
+ *
+ * Un enlace firmado al ARCHIVO tal como se subio. `url` viene en null cuando
+ * ese documento se indexo sin archivo —se pego el texto, o se indexo antes de
+ * que el expediente guardara originales—: la pantalla lo dice en vez de
+ * ofrecer un boton muerto.
+ */
+export const originalDelDocumentoController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const firmId = req.firmId as string;
+    await exigirModulo(firmId, 'EXPEDIENTES');
+    const expediente = await obtenerExpediente(firmId, String(req.params.id));
+    const url = await enlaceAlOriginal(firmId, expediente.id, String(req.params.documentId));
+    res.json({ success: true, url });
+  } catch (err) {
+    fallar(res, err, 'No se pudo abrir el documento original.');
   }
 };
 

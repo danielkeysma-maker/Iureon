@@ -75,6 +75,17 @@ export interface IngestionRequest {
   title: string;
   b2FileUrl: string;
   /**
+   * MIME que declaro el navegador, para saber con que visor abrir el original.
+   *
+   * Sin el, la columna se queda con su valor por defecto —«application/pdf»—
+   * y un Word guardado se anunciaria como PDF: el visor intentaria pintar una
+   * pagina donde hay un ZIP y el abogado veria un error en vez de su
+   * documento.
+   */
+  contentType?: string;
+  /** Tamano del original, para poder anunciarlo antes de descargarlo. */
+  bytes?: number;
+  /**
    * El texto del documento. OBLIGATORIO desde el 10 de septiembre de 2026: ver
    * la nota de `ingestion.service.ts` sobre el expediente de muestra.
    */

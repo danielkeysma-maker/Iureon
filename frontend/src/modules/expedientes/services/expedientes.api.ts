@@ -157,7 +157,7 @@ export const expedientesApi = {
    */
   async indexar(
     expedienteId: string,
-    body: { titulo: string; texto: string; claveB2?: string }
+    body: { titulo: string; texto: string; claveB2?: string; contentType?: string; bytes?: number }
   ): Promise<{ resultado: { totalChunksCreated: number; status: string }; buscable: boolean }> {
     const data = await httpClient.post<
       Respuesta & { resultado: { totalChunksCreated: number; status: string }; buscable: boolean }
@@ -169,9 +169,8 @@ export const expedientesApi = {
   /**
    * El texto de un documento indexado, para poder leerlo.
    *
-   * NO es el PDF: el archivo nunca sale del navegador, asi que no hay copia
-   * del original en el servidor. Es el texto guardado — el mismo que ven la
-   * busqueda y el interrogatorio.
+   * Es el TEXTO guardado — el mismo que ven la busqueda y el interrogatorio—,
+   * no el archivo. Para el original hay `descargarDocumento`.
    */
   async textoDelDocumento(
     expedienteId: string,
@@ -181,6 +180,20 @@ export const expedientesApi = {
       `/api/expedientes/${expedienteId}/documentos/${documentId}/texto`
     );
     return revisar(data, 'No se pudo leer el documento.').documento;
+  },
+
+  /**
+   * Un enlace firmado al archivo ORIGINAL, para abrirlo o descargarlo.
+   *
+   * Devuelve null cuando ese documento se indexo sin archivo —el abogado pego
+   * el texto, o se indexo antes de que se guardara el original—. La pantalla
+   * dice cual de las dos cosas pasa en vez de ofrecer un boton muerto.
+   */
+  async enlaceAlOriginal(expedienteId: string, documentId: string): Promise<string | null> {
+    const data = await httpClient.get<Respuesta & { url: string | null }>(
+      `/api/expedientes/${expedienteId}/documentos/${documentId}/original`
+    );
+    return revisar(data, 'No se pudo abrir el documento original.').url;
   },
 
   async documentos(expedienteId: string): Promise<DocumentoIndexado[]> {

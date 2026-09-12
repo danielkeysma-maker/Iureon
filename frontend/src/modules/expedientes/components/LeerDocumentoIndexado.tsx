@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, Loader2 } from 'lucide-react';
+import { AlertTriangle, Download, Loader2 } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import { expedientesApi } from '../services/expedientes.api';
 
@@ -39,6 +39,13 @@ export const LeerDocumentoIndexado: React.FC<{
   const [cargando, setCargando] = React.useState(false);
   const [error, setError] = React.useState('');
   const [doc, setDoc] = React.useState<{ titulo: string; texto: string; fragmentos: number } | null>(null);
+  /*
+   * EL ENLACE AL ARCHIVO ORIGINAL. `null` cuando ese documento no tiene: se
+   * indexó pegando el texto, o antes de que el expediente guardara originales.
+   * Se distingue de «todavía no lo he pedido» para no ofrecer un botón muerto
+   * ni esconderlo mientras carga.
+   */
+  const [original, setOriginal] = React.useState<{ url: string | null } | null>(null);
 
   React.useEffect(() => {
     if (!documentId) {
@@ -50,6 +57,16 @@ export const LeerDocumentoIndexado: React.FC<{
     setCargando(true);
     setError('');
     setDoc(null);
+    setOriginal(null);
+    expedientesApi
+      .enlaceAlOriginal(expedienteId, documentId)
+      .then((url) => {
+        if (vivo) setOriginal({ url });
+      })
+      .catch(() => {
+        /* El texto se lee igual: el original es un extra, no la pantalla. */
+        if (vivo) setOriginal({ url: null });
+      });
     expedientesApi
       .textoDelDocumento(expedienteId, documentId)
       .then((d) => {
@@ -103,11 +120,34 @@ export const LeerDocumentoIndexado: React.FC<{
             aplicación le estropeó el documento. Lo que ve es lo que el motor
             tiene, que es otra cosa y es la que importa aquí.
           */}
-          <p className="mb-3 rounded-card border border-line-200 bg-canvas px-3 py-2 text-meta text-ink-500 text-justify [text-wrap:pretty]">
-            Esto no es su PDF: el archivo se leyó en su equipo y nunca se envió, así que no hay copia del
-            original aquí. Es el texto que la aplicación guardó —sin sangrías ni saltos de página— y es
-            exactamente lo que leen la búsqueda y el interrogatorio.
-          </p>
+          {/*
+            SE DICE QUÉ ES ESTO, Y AHORA HAY DOS RESPUESTAS DISTINTAS.
+
+            Con el archivo guardado, el botón lo abre tal cual: es el documento
+            del abogado, con su diagramación. Sin él, no hay original que abrir
+            y decirlo es lo único honesto — ofrecer un botón que no descarga
+            nada sería peor que no ofrecerlo.
+          */}
+          <div className="mb-3 flex flex-wrap items-start justify-between gap-2 rounded-card border border-line-200 bg-canvas px-3 py-2">
+            <p className="min-w-0 flex-1 text-meta text-ink-500 text-justify [text-wrap:pretty]">
+              Lo de abajo es el texto que la aplicación guardó —sin sangrías ni saltos de página— y es
+              exactamente lo que leen la búsqueda y el interrogatorio.
+              {original && original.url === null
+                ? ' De este documento no se guardó el archivo: se indexó pegando el texto, o antes de que el expediente los conservara.'
+                : ''}
+            </p>
+            {original?.url && (
+              <a
+                href={original.url}
+                target="_blank"
+                rel="noreferrer"
+                className="btn-secondary btn-sm shrink-0 gap-1.5"
+              >
+                <Download className="h-3.5 w-3.5" />
+                Abrir el original
+              </a>
+            )}
+          </div>
 
           {/*
             En la tipografía del documento y con las líneas separadas: son
