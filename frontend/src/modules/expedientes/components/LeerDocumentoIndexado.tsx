@@ -2,7 +2,7 @@ import React from 'react';
 import { AlertTriangle, Download, Loader2 } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import { expedientesApi } from '../services/expedientes.api';
-import { OriginalDelExpediente } from './OriginalDelExpediente';
+import { VisorDeArchivo } from '../../workspace/components/VisorDeArchivo';
 
 /**
  * LEER UN DOCUMENTO INDEXADO.
@@ -185,7 +185,7 @@ export const LeerDocumentoIndexado: React.FC<{
             </p>
           )}
 
-          {vista === 'original' && original?.dato && <OriginalDelExpediente fuente={original.dato} />}
+          {vista === 'original' && original?.dato && <VisorDeArchivo fuente={{ de: 'enlace', ...original.dato }} />}
 
           {/*
             En la tipografía del documento y con las líneas separadas: son

@@ -19,6 +19,8 @@ import type { ActuacionRole } from '../../catalog/types';
 import { RevisarEscritoDialog } from './RevisarEscritoDialog';
 import { useFuncionHabilitada } from '../../subscriptions/PlanContext';
 import { AVISO_FUNCION_DESHABILITADA } from '../../subscriptions/types';
+import { Dialog } from '../../../design/Dialog';
+import { VisorDeArchivo } from './VisorDeArchivo';
 import type { DatosDelTaller } from './TallerDeRevision';
 import {
   EXTENSIONES_ACEPTADAS,
@@ -121,6 +123,20 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
   const [preparandoAdjuntos, setPreparandoAdjuntos] = useState(false);
   /* El operador puede apagar los adjuntos para una firma: el botón queda gris con el aviso y el servidor rechaza los archivos con 403. */
   const adjuntosHabilitados = useFuncionHabilitada('REDACCION.ADJUNTOS');
+  /*
+   * ─── EL ADJUNTO QUE SE ESTA MIRANDO ───────────────────────────────────────
+   *
+   * La fila del adjunto mostraba nombre, estado y tamano, y nada mas: al
+   * pulsarla no pasaba nada. El abogado adjuntaba un auto y no tenia forma de
+   * comprobar que habia escogido el archivo correcto — solo lo sabria despues,
+   * leyendo un borrador redactado sobre otra cosa.
+   *
+   * Y para VERLO no hace falta guardarlo: el `File` esta aqui, en el
+   * navegador. Se pinta desde memoria, sin red y sin almacenamiento, asi que
+   * esto no toca la doctrina del pasillo — el archivo se sigue borrando de B2
+   * en cuanto el servidor lee su texto.
+   */
+  const [adjuntoAbierto, setAdjuntoAbierto] = React.useState<File | null>(null);
   /** «Revisar un escrito»: el tercer uso del módulo, junto a redactar y corregir. */
   const [revisarAbierto, setRevisarAbierto] = useState(false);
 
@@ -382,7 +398,14 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
                     ) : (
                       <FileText className="h-3 w-3 shrink-0 text-ink-400" />
                     )}
-                    <span className="min-w-0 flex-1 truncate text-ink-700">{file.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => setAdjuntoAbierto(file.file)}
+                      className="min-w-0 flex-1 truncate text-left text-ink-700 underline decoration-line-200 underline-offset-2"
+                      title="Ver el documento tal como es, antes de generar"
+                    >
+                      {file.name}
+                    </button>
                     {/*
                       El estado, por archivo: «leyendo…» mientras se reduce o
                       sube, «enviado» cuando viaja, «no se pudo leer» con el
@@ -652,6 +675,22 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
         </form>
 
       <AgentConsoleStream logs={logs} isProcessing={isProcessing} />
+
+      {/*
+        EL ADJUNTO, TAL COMO ES. Se pinta desde el archivo en memoria: sin red,
+        sin almacenamiento y sin tocar la doctrina del pasillo — lo que sube a
+        B2 se sigue borrando en cuanto el servidor lee su texto. Para mirar el
+        documento nunca hizo falta guardarlo.
+      */}
+      <Dialog
+        abierto={adjuntoAbierto !== null}
+        onCerrar={() => setAdjuntoAbierto(null)}
+        titulo={adjuntoAbierto?.name ?? 'Documento adjunto'}
+        subtitulo="El archivo tal como es, antes de generar el escrito"
+        tamano="L"
+      >
+        {adjuntoAbierto && <VisorDeArchivo fuente={{ de: 'sesion', file: adjuntoAbierto }} />}
+      </Dialog>
     </section>
   );
 };

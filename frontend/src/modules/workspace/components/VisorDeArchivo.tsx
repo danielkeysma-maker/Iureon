@@ -4,12 +4,24 @@ import {
   cargarOriginal,
   htmlDelDocx,
   porQueNoHayVisor,
+  type FuenteDelOriginal,
   type OriginalCargado
-} from '../../workspace/services/originalDelEscrito';
-import { CSS_DE_LA_CAPA_DE_TEXTO, abrirPdf, type DocumentoPdf } from '../../workspace/services/pdfEnPantalla';
+} from '../services/originalDelEscrito';
+import { CSS_DE_LA_CAPA_DE_TEXTO, abrirPdf, type DocumentoPdf } from '../services/pdfEnPantalla';
 
 /**
- * EL DOCUMENTO DEL EXPEDIENTE, TAL COMO SE SUBIÓ.
+ * UN ARCHIVO, TAL COMO ES. El visor pequeño.
+ *
+ * ─── DOS MODULOS LO USAN, Y POR RAZONES DISTINTAS ──────────────────────────
+ *
+ * EXPEDIENTES lo abre desde un enlace firmado: el documento se guardó y hay
+ * que traerlo. REDACCION lo abre desde el `File` que el abogado acaba de
+ * escoger, que ya está en el navegador — ahí no hay red, ni servidor, ni nada
+ * guardado, y aun así se ve el documento exacto.
+ *
+ * Esa segunda es la que contesta una queja concreta: al adjuntar un escrito en
+ * Redacción no se veía el documento sino, más tarde, su texto extraído. Para
+ * MIRARLO nunca hizo falta guardarlo; hacía falta pintarlo.
  *
  * ─── POR QUÉ NO SE REUSA `VisorDelOriginal` ────────────────────────────────
  *
@@ -36,8 +48,9 @@ import { CSS_DE_LA_CAPA_DE_TEXTO, abrirPdf, type DocumentoPdf } from '../../work
  * tablas y listas, pero pierde centrados, tipografías y saltos de página—, y
  * eso va escrito debajo del documento en vez de dejar creer que se ve todo.
  */
-export const OriginalDelExpediente: React.FC<{
-  fuente: { url: string; nombre: string; tipo: string };
+export const VisorDeArchivo: React.FC<{
+  /** De dónde salen los bytes: del archivo en memoria, o de un enlace firmado. */
+  fuente: FuenteDelOriginal;
 }> = ({ fuente }) => {
   const [estado, setEstado] = React.useState<
     | { fase: 'cargando'; porcentaje: number | null }
@@ -59,7 +72,7 @@ export const OriginalDelExpediente: React.FC<{
     setHtml(null);
     setPagina(1);
 
-    cargarOriginal({ de: 'enlace', url: fuente.url, nombre: fuente.nombre, tipo: fuente.tipo }, (p) => {
+    cargarOriginal(fuente, (p) => {
       if (vivo) setEstado({ fase: 'cargando', porcentaje: p });
     })
       .then((r) => {
@@ -80,7 +93,7 @@ export const OriginalDelExpediente: React.FC<{
       pdf.current?.cerrar();
       pdf.current = null;
     };
-  }, [fuente.url, fuente.nombre, fuente.tipo]);
+  }, [fuente]);
 
   /* El PDF: se abre una vez y se pinta la página pedida. */
   React.useEffect(() => {
@@ -104,6 +117,18 @@ export const OriginalDelExpediente: React.FC<{
       vivo = false;
     };
   }, [estado, pagina]);
+
+  /* La imagen: se pinta desde los bytes ya traidos, no volviendo a pedirlos. */
+  const [urlDeImagen, setUrlDeImagen] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    if (estado.fase !== 'listo' || estado.original.clase !== 'imagen') return;
+    const url = URL.createObjectURL(new Blob([estado.original.bytes], { type: estado.original.tipo }));
+    setUrlDeImagen(url);
+    return () => {
+      URL.revokeObjectURL(url);
+      setUrlDeImagen(null);
+    };
+  }, [estado]);
 
   /* El Word: se convierte una vez. */
   React.useEffect(() => {
@@ -208,9 +233,15 @@ export const OriginalDelExpediente: React.FC<{
         </>
       )}
 
-      {original.clase === 'imagen' && (
+      {/*
+        LA IMAGEN SE PINTA DESDE LOS BYTES QUE YA SE TRAJERON, no desde la
+        fuente: un `File` en memoria no tiene URL, y volver a pedir el enlace
+        firmado descargaria el archivo dos veces. `objectURL` se libera al
+        desmontar; sin eso, abrir diez adjuntos deja diez copias en memoria.
+      */}
+      {original.clase === 'imagen' && urlDeImagen && (
         <img
-          src={fuente.url}
+          src={urlDeImagen}
           alt={original.nombre}
           className="mx-auto max-h-[58vh] rounded-card border border-line-200"
         />
