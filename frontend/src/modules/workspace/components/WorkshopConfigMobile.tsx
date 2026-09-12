@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { ChevronDown } from 'lucide-react';
-import { expedientesApi } from '../../expedientes/services/expedientes.api';
-import type { Expediente } from '../../expedientes/types';
+import { rotuloDeExpediente, useExpedientes } from '../../expedientes/useExpedientes';
 import {
   IconoNoAplica,
   IconoSinVerificar,
@@ -119,21 +118,8 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
   };
   const ramasEstado = useCatalogBranchesState();
 
-  const [expedientes, setExpedientes] = useState<Expediente[]>([]);
-  useEffect(() => {
-    let vivo = true;
-    expedientesApi
-      .listar()
-      .then((e) => {
-        if (vivo) setExpedientes(e);
-      })
-      .catch(() => {
-        if (vivo) setExpedientes([]);
-      });
-    return () => {
-      vivo = false;
-    };
-  }, []);
+  /* Los mismos datos que el escritorio; la pintura es de cada barra. */
+  const expedientes = useExpedientes();
 
   const elegida = catalogo.actuaciones.find((a) => a.exactName === documentType) ?? null;
 
@@ -309,8 +295,7 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
                 <option value="">Sin expediente</option>
                 {expedientes.map((e) => (
                   <option key={e.id} value={e.id}>
-                    {e.caratula}
-                    {e.radicado ? ` · ${e.radicado}` : ''}
+                    {rotuloDeExpediente(e)}
                   </option>
                 ))}
               </select>

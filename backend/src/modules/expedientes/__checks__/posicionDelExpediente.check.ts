@@ -294,14 +294,45 @@ check(
  * hacian falta dos mas. Copiarlo es como se separan: la primera correccion se
  * hace en uno y los otros se quedan atras sin que nada falle.
  */
-const pantallas = [
+const DE_BLOQUE = [
   'modules/catalog/components/TriageView.tsx',
   'modules/catalog/components/TriageMobileView.tsx',
-  'modules/transcription/components/SubirAudienciaDialog.tsx'
+  'modules/transcription/components/SubirAudienciaDialog.tsx',
+  'modules/workspace/components/RevisarEscritoDialog.tsx',
+  'modules/agenda/components/AgendaForm.tsx'
 ];
-for (const r of pantallas) {
+for (const r of DE_BLOQUE) {
   check(`${r.split('/').pop()} usa el selector compartido`, /SelectorDeExpediente/.test(front(r)));
 }
+
+/*
+ * LAS DOS BARRAS DE REDACCION NO CABEN EN EL BLOQUE —su control es un
+ * `Combobox` horizontal con su busqueda y su pie— y aun asi comparten los
+ * DATOS. Se parte por donde de verdad se comparte: el gancho.
+ */
+const DE_BARRA = [
+  'modules/workspace/components/WorkshopConfigBar.tsx',
+  'modules/workspace/components/WorkshopConfigMobile.tsx'
+];
+for (const r of DE_BARRA) {
+  check(`${r.split('/').pop()} lee la lista del gancho compartido`, /useExpedientes\(\)/.test(front(r)));
+}
+
+/*
+ * Y NADIE VUELVE A CARGARLA POR SU CUENTA. Es la copia que se separa: seis
+ * llamadas iguales a `expedientesApi.listar()`, y la primera correccion —un
+ * orden, un filtro por estado, un tope— se hace en una sola.
+ */
+const copiaronLaCarga = [...DE_BLOQUE, ...DE_BARRA].filter((r) =>
+  /expedientesApi[\s\S]{0,40}\.listar\(\)/.test(front(r))
+);
+check(
+  'ninguna pantalla carga la lista por su cuenta',
+  copiaronLaCarga.length === 0,
+  copiaronLaCarga.length > 0
+    ? `LA COPIARON: ${copiaronLaCarga.map((r) => r.split('/').pop()).join(', ')}`
+    : `${DE_BLOQUE.length + DE_BARRA.length} pantallas, una sola carga`
+);
 
 console.log('');
 if (fallos > 0) {

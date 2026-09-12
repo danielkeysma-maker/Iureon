@@ -6,8 +6,7 @@ import { useCatalogBranches } from '../../catalog/hooks/useCatalogBranches';
 import { readSession } from '../../auth/session';
 import { agendaApi } from '../services/agenda.api';
 import type { AgendaPendiente } from '../pendiente';
-import { expedientesApi } from '../../expedientes/services/expedientes.api';
-import type { Expediente } from '../../expedientes/types';
+import { SelectorDeExpediente } from '../../expedientes/components/SelectorDeExpediente';
 import type { EntradaDeAgenda, PlazoDeActuacion, TipoDeDias, VencimientoPrevisto } from '../types';
 
 /**
@@ -65,23 +64,7 @@ export const AgendaForm: React.FC<AgendaFormProps> = ({ pendiente, onGuardada })
    * desplegable aparece con ese caso puesto y nadie vuelve a escogerlo.
    */
   const [expedienteId, setExpedienteId] = useState(pendiente?.expedienteId ?? '');
-  const [expedientes, setExpedientes] = useState<Expediente[]>([]);
 
-  useEffect(() => {
-    let vivo = true;
-    expedientesApi
-      .listar()
-      .then((e) => {
-        if (vivo) setExpedientes(e);
-      })
-      .catch(() => {
-        /* Sin lista no se pinta el selector; el termino se guarda igual. */
-        if (vivo) setExpedientes([]);
-      });
-    return () => {
-      vivo = false;
-    };
-  }, []);
   const [rama, setRama] = useState(pendiente?.rama ?? '');
   const [actuacionId, setActuacionId] = useState(pendiente?.actuacionId ?? '');
   const [nombreSinCatalogar, setNombreSinCatalogar] = useState(
@@ -237,29 +220,19 @@ export const AgendaForm: React.FC<AgendaFormProps> = ({ pendiente, onGuardada })
           Solo se pinta si la firma tiene expedientes: un desplegable con
           «— sin expediente —» y nada mas no ofrece nada.
         */}
-        {expedientes.length > 0 && (
-          <label className="block min-w-0 sm:col-span-2">
-            <span className="field-label">Expediente (opcional)</span>
-            <select
-              value={expedienteId}
-              onChange={(e) => setExpedienteId(e.target.value)}
-              className="field mt-1 w-full"
-            >
-              <option value="">— sin expediente —</option>
-              {expedientes.map((e) => (
-                <option key={e.id} value={e.id}>
-                  {e.caratula}
-                  {e.radicado ? ` · ${e.radicado}` : ''}
-                </option>
-              ))}
-            </select>
-            <span className="mt-1 block text-meta text-ink-500">
-              {pendiente?.expedienteId
+        <div className="min-w-0 sm:col-span-2">
+          <SelectorDeExpediente
+            valor={expedienteId}
+            onCambio={setExpedienteId}
+            etiqueta="Expediente (opcional)"
+            id="expediente-del-termino"
+            pie={
+              pendiente?.expedienteId
                 ? 'Heredado de la revisión de la que viene.'
-                : 'Átelo y el vencimiento aparece contado dentro del caso.'}
-            </span>
-          </label>
-        )}
+                : 'Átelo y el vencimiento aparece contado dentro del caso.'
+            }
+          />
+        </div>
         <label className="block min-w-0 sm:col-span-2">
           <span className="field-label">Asunto o proceso</span>
           <input

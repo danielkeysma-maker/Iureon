@@ -10,8 +10,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { Combobox, type OpcionCombobox } from './Combobox';
-import { expedientesApi } from '../../expedientes/services/expedientes.api';
-import type { Expediente } from '../../expedientes/types';
+import { rotuloDeExpediente, useExpedientes } from '../../expedientes/useExpedientes';
 import { useActuacionLookup } from '../../catalog/hooks/useActuacion';
 import { useBranchActuacionesState } from '../../catalog/hooks/useBranchActuaciones';
 import { useCatalogBranchesState } from '../../catalog/hooks/useCatalogBranches';
@@ -160,33 +159,17 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
   const actuacion = lookup.actuacion;
 
   /*
-   * Los expedientes de la firma, leidos aqui igual que las ramas: esta barra
-   * carga lo suyo y el panel de al lado no sabe de esto.
+   * La lista viene del gancho compartido: esta barra no cabe en
+   * `SelectorDeExpediente` —su control es un `Combobox` horizontal con su
+   * busqueda y su pie— pero los DATOS son los mismos que en las otras cinco
+   * pantallas, y eso es lo que no puede estar copiado.
    */
-  const [expedientes, setExpedientes] = useState<Expediente[]>([]);
-  useEffect(() => {
-    let vivo = true;
-    expedientesApi
-      .listar()
-      .then((e) => {
-        if (vivo) setExpedientes(e);
-      })
-      .catch(() => {
-        /* Sin lista no se pinta el control; redactar no depende de esto. */
-        if (vivo) setExpedientes([]);
-      });
-    return () => {
-      vivo = false;
-    };
-  }, []);
+  const expedientes = useExpedientes();
 
   const opcionesExpediente: OpcionCombobox[] = useMemo(
     () => [
       { valor: '', etiqueta: 'Sin expediente' },
-      ...expedientes.map((e) => ({
-        valor: e.id,
-        etiqueta: e.radicado ? `${e.caratula} · ${e.radicado}` : e.caratula
-      }))
+      ...expedientes.map((e) => ({ valor: e.id, etiqueta: rotuloDeExpediente(e) }))
     ],
     [expedientes]
   );

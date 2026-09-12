@@ -1,6 +1,5 @@
 import React from 'react';
-import { expedientesApi } from '../services/expedientes.api';
-import type { Expediente } from '../types';
+import { rotuloDeExpediente, useExpedientes } from '../useExpedientes';
 
 /**
  * «DE QUÉ CASO ES», UNA SOLA VEZ.
@@ -17,6 +16,11 @@ import type { Expediente } from '../types';
  * una y las otras cinco se quedan atrás, sin que nada falle. Es exactamente el
  * defecto que este proyecto ya documentó con las dos barras de configuración y
  * con el gancho de los adjuntos.
+ *
+ * LA CARGA DE LA LISTA VIVE EN `useExpedientes`, no aquí: las dos barras de
+ * configuración de Redacción no caben en este bloque —su control es un
+ * `Combobox` horizontal— y aun así comparten los datos. Se parte por donde de
+ * verdad se comparte.
  *
  * ─── NO SE PINTA SI NO HAY EXPEDIENTES ─────────────────────────────────────
  *
@@ -40,22 +44,7 @@ export const SelectorDeExpediente: React.FC<{
   pie?: React.ReactNode;
   id?: string;
 }> = ({ valor, onCambio, etiqueta = 'De qué caso es', pie, id = 'expediente-del-trabajo' }) => {
-  const [expedientes, setExpedientes] = React.useState<Expediente[]>([]);
-
-  React.useEffect(() => {
-    let vivo = true;
-    expedientesApi
-      .listar()
-      .then((e) => {
-        if (vivo) setExpedientes(e);
-      })
-      .catch(() => {
-        if (vivo) setExpedientes([]);
-      });
-    return () => {
-      vivo = false;
-    };
-  }, []);
+  const expedientes = useExpedientes();
 
   if (expedientes.length === 0) return null;
 
@@ -69,8 +58,7 @@ export const SelectorDeExpediente: React.FC<{
         <option value="">— sin expediente —</option>
         {expedientes.map((e) => (
           <option key={e.id} value={e.id}>
-            {e.caratula}
-            {e.radicado ? ` · ${e.radicado}` : ''}
+            {rotuloDeExpediente(e)}
           </option>
         ))}
       </select>

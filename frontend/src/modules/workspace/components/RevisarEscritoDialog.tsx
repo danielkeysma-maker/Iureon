@@ -28,8 +28,8 @@ import { LecturaDelDocumentoRecibido, SeccionDeInforme } from './LecturaDelDocum
 import { PuenteAlAtaque } from './PuenteAlAtaque';
 import type { ActuacionRole } from '../../catalog/types';
 import { COMO_SE_REPRESENTA, PAPELES_REPRESENTABLES } from '../../expedientes/types';
-import type { Expediente } from '../../expedientes/types';
 import { expedientesApi } from '../../expedientes/services/expedientes.api';
+import { SelectorDeExpediente } from '../../expedientes/components/SelectorDeExpediente';
 import type { PapelEnElExpediente } from '../../expedientes/types';
 
 /**
@@ -217,7 +217,6 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
    * posicion; el servidor la deduce y la manda en `posicionSugerida`, con
    * `null` cuando no se puede deducir sin adivinar.
    */
-  const [expedientes, setExpedientes] = React.useState<Expediente[]>([]);
   const [expedienteId, setExpedienteId] = React.useState('');
   const [posicionDeducida, setPosicionDeducida] = React.useState(false);
   const esRecibido = modo === 'DOCUMENTO_RECIBIDO';
@@ -358,28 +357,6 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
     setArchivo(null);
     setTexto(documentoTraido.completo ? documentoTraido.texto : '');
   }, [abierto, documentoTraido]);
-
-  /*
-   * La lista de expedientes se pide al ABRIR y no al montar: el dialogo vive
-   * montado detras de la pantalla y pedirla antes seria una consulta por cada
-   * visita a Revisiones, se abra o no.
-   */
-  React.useEffect(() => {
-    if (!abierto) return;
-    let vivo = true;
-    expedientesApi
-      .listar()
-      .then((e) => {
-        if (vivo) setExpedientes(e);
-      })
-      .catch(() => {
-        /* Sin lista, el selector no se pinta y todo lo demas sigue igual. */
-        if (vivo) setExpedientes([]);
-      });
-    return () => {
-      vivo = false;
-    };
-  }, [abierto]);
 
   /*
    * AL ESCOGER CASO SE PIDE SU DETALLE Y SE PRELLENA LA POSICION.
@@ -1006,33 +983,16 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
             Solo se pinta si la firma tiene expedientes. Un desplegable vacío
             con «— sin expediente —» y nada más no ofrece nada y enseña que
             sobra un campo. */}
-          {esRecibido && expedientes.length > 0 && (
-            <div>
-              <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
-                De qué caso es
-              </p>
-              <label className="sr-only" htmlFor="expediente-de-la-revision">
-                De qué caso es
-              </label>
-              <select
-                id="expediente-de-la-revision"
-                className="field mt-1.5"
-                value={expedienteId}
-                onChange={(e) => void eligeExpediente(e.target.value)}
-              >
-                <option value="">— sin expediente —</option>
-                {expedientes.map((e) => (
-                  <option key={e.id} value={e.id}>
-                    {e.caratula}
-                    {e.radicado ? ` · ${e.radicado}` : ''}
-                  </option>
-                ))}
-              </select>
-              <p className="mt-1 text-[11px] leading-snug text-ink-500 text-justify [text-wrap:pretty]">
-                La lectura queda guardada dentro del caso, y si el expediente ya sabe a quién representa
-                usted, lo de abajo se llena solo.
-              </p>
-            </div>
+          {/* ─── DE QUÉ CASO ES ──────────────────────────────────────────
+            Va ENCIMA de la posición porque es lo que la deduce: escoger el
+            caso contesta la pregunta de abajo sin que nadie la responda. */}
+          {esRecibido && (
+            <SelectorDeExpediente
+              valor={expedienteId}
+              onCambio={(id) => void eligeExpediente(id)}
+              id="expediente-de-la-revision"
+              pie="La lectura queda guardada dentro del caso, y si el expediente ya sabe a quién representa usted, lo de abajo se llena solo."
+            />
           )}
 
           {esRecibido && (
