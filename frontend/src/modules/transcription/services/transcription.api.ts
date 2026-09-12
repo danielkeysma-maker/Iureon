@@ -114,6 +114,14 @@ export interface TranscribeInput {
   contextPrompt?: string;
   /** Hora en que el entrevistado autorizó la grabación. La constancia de la Ley 1581. */
   autorizoGrabacionEl?: string;
+  /**
+   * De qué caso es la grabación. Una audiencia pertenece a un proceso, así que
+   * puede nacer atada en vez de jalarse después desde Expedientes.
+   *
+   * Un expediente ajeno NO tumba el transcrito: llegados ahí el audio ya se
+   * transcribió y eso cuesta. Se guarda desatado y el servidor lo registra.
+   */
+  expedienteId?: string;
 }
 
 /**
@@ -249,6 +257,9 @@ export const transcriptionApi = {
     if (input.autorizoGrabacionEl) {
       form.append('autorizoGrabacionEl', input.autorizoGrabacionEl);
     }
+    if (input.expedienteId) {
+      form.append('expedienteId', input.expedienteId);
+    }
 
     const data = await httpClient.postForm<TranscribeResponse>('/api/transcription', form, {
 
@@ -297,7 +308,8 @@ export const transcriptionApi = {
         fileKey,
         kind: input.kind,
         contextPrompt: input.contextPrompt?.trim() || undefined,
-        autorizoGrabacionEl: input.autorizoGrabacionEl || undefined
+        autorizoGrabacionEl: input.autorizoGrabacionEl || undefined,
+        expedienteId: input.expedienteId || undefined
       }
     });
 

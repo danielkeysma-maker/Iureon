@@ -70,7 +70,16 @@ export class TranscriptionStore {
     sourceFileName: string,
     result: TranscriptionResult,
     /** Hora en que el entrevistado autorizo la grabacion, si el cliente la mando. */
-    autorizoGrabacionEl?: string | null
+    autorizoGrabacionEl?: string | null,
+    /**
+     * De que caso es. La columna existia desde la migracion de expedientes y
+     * solo la escribia «Traer al expediente» — despues y a mano. Un transcrito
+     * de audiencia pertenece a un proceso, asi que puede nacer atado.
+     *
+     * Quien llama comprueba que el expediente sea de la firma: aqui no se
+     * valida nada.
+     */
+    expedienteId?: string | null
   ): Promise<StoredTranscription | null> {
     if (!supabase) {
       console.warn('[TRANSCRIPTION] Supabase no configurado: el transcrito no se guarda.');
@@ -98,6 +107,8 @@ export class TranscriptionStore {
      * columna para guardarse.
      */
     if (autorizoGrabacionEl) fila.autorizo_grabacion_el = autorizoGrabacionEl;
+    /* Misma regla que arriba: la llave solo viaja cuando trae valor. */
+    if (expedienteId) fila.expediente_id = expedienteId;
 
     let { data, error } = await supabase.from('transcriptions').insert(fila).select().single();
 

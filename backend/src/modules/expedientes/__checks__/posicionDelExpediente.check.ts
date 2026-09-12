@@ -260,6 +260,49 @@ check(
   'sin esto, abrirlo y guardarlo lo ataria al caso que quedara elegido de antes'
 );
 
+/* ─── 9. LOS DOS ULTIMOS: TRANSCRITO Y ORIENTACION ──────────────────────── */
+/*
+ * Cierran la cadena. Las cinco columnas `expediente_id` existian desde la
+ * migracion y ninguna se escribia fuera de «Traer al expediente».
+ */
+const transcritos = leer('transcription/transcriptionStore.service.ts');
+const transCtl = leer('transcription/transcription.controller.ts');
+const orientHist = leer('catalog/orientacionHistory.service.ts');
+const triage = leer('catalog/triage.controller.ts');
+
+check('el transcrito GUARDA su expediente', /fila\.expediente_id = expedienteId/.test(transcritos));
+check(
+  'y solo manda la llave cuando trae valor',
+  /if \(expedienteId\) fila\.expediente_id/.test(transcritos),
+  'mandarla en null rompe todo guardado entre el deploy y la migracion; ya paso con la autorizacion de grabacion'
+);
+check(
+  'un expediente ajeno NO tumba el transcrito',
+  /el transcrito se guarda sin atar/.test(transCtl),
+  'llegados ahi el audio ya se transcribio: perder una audiencia de dos horas por una atadura invalida seria peor'
+);
+check('la orientacion GUARDA su expediente', /expediente_id: input\.expedienteId/.test(orientHist));
+check(
+  'y el triaje lo comprueba ANTES de consumir cupo',
+  triage.indexOf('esExpedienteDeLaFirma(firmId, expedienteId)') < triage.indexOf('await consumirCupo(firmId)'),
+  'descubrirlo al guardar seria descubrirlo con la orientacion ya pagada'
+);
+
+/* ─── 10. UN SOLO SELECTOR, NO SEIS ──────────────────────────────────────── */
+/*
+ * El control «De que caso es» se escribio a mano cuatro veces en dos dias y
+ * hacian falta dos mas. Copiarlo es como se separan: la primera correccion se
+ * hace en uno y los otros se quedan atras sin que nada falle.
+ */
+const pantallas = [
+  'modules/catalog/components/TriageView.tsx',
+  'modules/catalog/components/TriageMobileView.tsx',
+  'modules/transcription/components/SubirAudienciaDialog.tsx'
+];
+for (const r of pantallas) {
+  check(`${r.split('/').pop()} usa el selector compartido`, /SelectorDeExpediente/.test(front(r)));
+}
+
 console.log('');
 if (fallos > 0) {
   console.log(`${fallos} comprobación(es) no pasaron.`);

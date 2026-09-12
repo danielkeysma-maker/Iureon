@@ -13,6 +13,7 @@ import {
   reserveForOperation
 } from '../billing/billing.service';
 import { exigirModulo, responderPlanError } from '../subscriptions/plan.service';
+import { esExpedienteDeLaFirma } from '../expedientes/expedientes.service';
 
 /**
  * POST /api/catalog/triage   { hechos: string }
@@ -123,6 +124,24 @@ export const triageController = async (req: Request, res: Response): Promise<voi
     throw err;
   }
 
+  /*
+   * ─── DE QUE CASO ES ESTA ORIENTACION, si el abogado lo dijo ──────────────
+   *
+   * Se comprueba contra la firma ANTES de consumir cupo y de llamar al motor:
+   * el id llega del cuerpo de la peticion y el aislamiento de esta casa lo da
+   * el filtro por firma de cada consulta. Descubrirlo al guardar seria
+   * descubrirlo con la orientacion ya pagada — y ahi solo quedarian dos
+   * salidas malas: perderla, o guardarla desatada en silencio.
+   *
+   * Va DESPUES del try del plan y no dentro: alli quedaba fuera de alcance
+   * donde se usa, y ademas un expediente ajeno no es un error de plan.
+   */
+  const expedienteId = String(req.body?.expedienteId ?? '').trim() || null;
+  if (expedienteId && !(await esExpedienteDeLaFirma(firmId, expedienteId))) {
+    res.status(404).json({ success: false, error: 'EXPEDIENTE_NO_ENCONTRADO', message: 'Ese expediente no existe.' });
+    return;
+  }
+
   const cupo = await consumirCupo(firmId);
   const userEmail = req.user?.email ?? 'desconocido';
 
@@ -230,7 +249,8 @@ export const triageController = async (req: Request, res: Response): Promise<voi
     hechos,
     status: result.status === 'OK' ? 'OK' : 'SIN_COINCIDENCIA',
     senales: result.senales ?? null,
-    sugerencias: result.suggestions.map((s) => ({ id: s.actuacion.id, nombre: s.actuacion.exactName }))
+    sugerencias: result.suggestions.map((s) => ({ id: s.actuacion.id, nombre: s.actuacion.exactName })),
+    expedienteId
   });
 
   res.json({

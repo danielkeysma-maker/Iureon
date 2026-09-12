@@ -6,6 +6,7 @@ import {
   IconoVerificado
 } from '../../../design/ArtboardIcons';
 import { AvisoDePlazoEnElAdjunto } from './AvisoDePlazoEnElAdjunto';
+import { SelectorDeExpediente } from '../../expedientes/components/SelectorDeExpediente';
 import { ARCHIVOS_DE_HECHOS, useHechosDesdeArchivo } from '../hechosDesdeArchivo';
 import { triageApi, type TriageResponse } from '../services/catalog.api';
 import { BRANCH_LABELS } from '../branchLabels';
@@ -147,6 +148,13 @@ interface TriageMobileViewProps {
 export const TriageMobileView: React.FC<TriageMobileViewProps> = ({ onDraft, onLeerRecibido }) => {
   const [hechos, setHechos] = React.useState('');
   /*
+   * DE QUE CASO SON ESTOS HECHOS. Opcional: quien orienta sobre un asunto que
+   * todavia no es expediente lo deja vacio, que es el caso normal de esta
+   * pantalla — se entra aqui justamente cuando no se sabe que es lo que se
+   * tiene. Con caso escogido, la orientacion queda contada dentro de el.
+   */
+  const [expedienteId, setExpedienteId] = React.useState('');
+  /*
    * ADJUNTAR, TAMBIÉN AQUÍ. En el teléfono es donde más pesa: nadie transcribe
    * un oficio con el pulgar. La regla del texto es la misma que en escritorio y
    * vive en el gancho compartido; lo que cambia es que aquí NO se arrastra —se
@@ -162,7 +170,7 @@ export const TriageMobileView: React.FC<TriageMobileViewProps> = ({ onDraft, onL
     setCargando(true);
     setError(null);
     try {
-      setResultado(await triageApi.orientar(hechos.trim()));
+      setResultado(await triageApi.orientar(hechos.trim(), undefined, expedienteId || undefined));
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'No se pudo orientar.');
     } finally {
@@ -289,6 +297,21 @@ export const TriageMobileView: React.FC<TriageMobileViewProps> = ({ onDraft, onL
                 ))}
             </div>
           )}
+
+{/*
+            EL CASO, OPCIONAL Y DESPUÉS DE LOS HECHOS. Ésta es la pantalla de
+            quien NO sabe todavía qué tiene, así que pedirle el expediente
+            antes de contar el caso sería pedirle lo que quizá no existe. Va
+            debajo, y solo si la firma tiene expedientes.
+          */}
+          <div className="mb-3">
+            <SelectorDeExpediente
+              valor={expedienteId}
+              onCambio={setExpedienteId}
+              id="expediente-de-la-orientacion-movil"
+              pie="La orientación queda contada dentro del caso. Déjelo vacío si el asunto todavía no es un expediente."
+            />
+          </div>
 
           <button
             type="button"

@@ -21,6 +21,21 @@ import { randomUUID } from 'crypto';
 import { generarResumen, type ResumenDeTranscripcion } from './resumen.service';
 import type { SpeakerRole, TranscriptionKind } from './types';
 import { exigirFuncion, exigirModulo, responderPlanError } from '../subscriptions/plan.service';
+import { esExpedienteDeLaFirma } from '../expedientes/expedientes.service';
+
+/**
+ * El expediente que llego en el cuerpo, o `null` si no es de esta firma.
+ *
+ * Devuelve en vez de lanzar: cuando esto se pregunta, el audio YA se
+ * transcribio y eso costo. Un id invalido cuesta la atadura, no el trabajo.
+ */
+const expedienteValido = async (firmId: string, valor: unknown): Promise<string | null> => {
+  const id = typeof valor === 'string' ? valor.trim() : '';
+  if (!id) return null;
+  if (await esExpedienteDeLaFirma(firmId, id)) return id;
+  console.warn(`[TRANSCRIPTION] Expediente ajeno o inexistente (${id}): el transcrito se guarda sin atar.`);
+  return null;
+};
 
 export const transcriptionService = new TranscriptionService();
 
@@ -129,13 +144,27 @@ export const transcribeAudioController = async (req: Request, res: Response): Pr
     const autorizoEl =
       typeof req.body.autorizoGrabacionEl === 'string' ? req.body.autorizoGrabacionEl : null;
 
+    /*
+     * DE QUE CASO ES ESTE TRANSCRITO, si el abogado lo dijo al subir el audio.
+     *
+     * Se comprueba contra la firma: el id llega del cuerpo de la peticion y el
+     * aislamiento de esta casa lo da el filtro por firma de cada consulta.
+     *
+     * UN EXPEDIENTE AJENO NO TUMBA EL TRANSCRITO: llegados aqui el audio ya se
+     * transcribio y eso cuesta. Se guarda desatado y se registra — perder una
+     * audiencia de dos horas por una atadura invalida seria cambiar un dato de
+     * mas por un trabajo entero de menos.
+     */
+    const expedienteId = await expedienteValido(req.firmId as string, req.body.expedienteId);
+
     const stored = await transcriptionStore.save(
       req.firmId as string,
       req.user?.email ?? 'desconocido',
       (req.body.title as string) || file.originalname,
       file.originalname,
       result,
-      autorizoEl
+      autorizoEl,
+      expedienteId
     );
 
     if (stored) {
@@ -639,7 +668,9 @@ export const transcribeFromStorageController = async (
       (req.body.title as string) || fileKey.split('/').pop() || 'Transcripción',
       fileKey,
       result,
-      typeof req.body.autorizoGrabacionEl === 'string' ? req.body.autorizoGrabacionEl : null
+      typeof req.body.autorizoGrabacionEl === 'string' ? req.body.autorizoGrabacionEl : null,
+      /* Mismo criterio que el otro camino: ver la nota de arriba. */
+      await expedienteValido(firmId, req.body.expedienteId)
     );
 
     const audioDeleted = await discardAudio();

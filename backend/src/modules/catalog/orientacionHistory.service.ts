@@ -29,6 +29,8 @@ export const guardarOrientacion = async (input: {
   status: 'OK' | 'SIN_COINCIDENCIA';
   senales: { rama: string | null; elementos: string[] } | null;
   sugerencias: Array<{ id: string; nombre: string }>;
+  /** El caso, cuando el abogado lo dijo. El controlador ya comprobo que sea de la firma. */
+  expedienteId?: string | null;
 }): Promise<void> => {
   if (!supabase) return;
 
@@ -38,7 +40,14 @@ export const guardarOrientacion = async (input: {
     hechos: input.hechos,
     status: input.status,
     senales: input.senales,
-    sugerencias: input.sugerencias
+    sugerencias: input.sugerencias,
+    /*
+     * DE QUE CASO ES. La columna existia desde la migracion de expedientes y
+     * solo la escribia «Traer al expediente» — despues y a mano. Quien orienta
+     * sobre los hechos de un caso puede decirlo aqui y el expediente la cuenta
+     * sin que nadie vuelva a buscarla.
+     */
+    expediente_id: input.expedienteId ?? null
   });
 
   if (error) console.warn('[ORIENTACION] No se pudo guardar en el historial:', error.message);

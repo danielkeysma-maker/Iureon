@@ -148,7 +148,7 @@ export const useTranscription = (kind: TranscriptionKind) => {
   }, [firmId]);
 
   const transcribe = useCallback(
-    async (file: File, contextPrompt?: string, autorizoGrabacionEl?: string) => {
+    async (file: File, contextPrompt?: string, autorizoGrabacionEl?: string, expedienteId?: string) => {
       const validationError = validate(file, maxAudioBytes);
 
       if (validationError) {
@@ -176,13 +176,20 @@ export const useTranscription = (kind: TranscriptionKind) => {
             outcome = await transcriptionApi.transcribeFromStorage(fileKey, {
               kind,
               contextPrompt,
-              autorizoGrabacionEl
+              autorizoGrabacionEl,
+              expedienteId
             });
           } finally {
             setIsUploading(false);
           }
         } else {
-          outcome = await transcriptionApi.transcribe({ file, kind, contextPrompt, autorizoGrabacionEl });
+          outcome = await transcriptionApi.transcribe({
+            file,
+            kind,
+            contextPrompt,
+            autorizoGrabacionEl,
+            expedienteId
+          });
         }
 
         setResult(outcome.result);

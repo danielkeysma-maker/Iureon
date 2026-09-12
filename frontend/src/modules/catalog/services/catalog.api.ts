@@ -186,9 +186,17 @@ export const triageApi = {
    *        Orientación no se manda, porque cuál es la rama es justamente lo
    *        que se está preguntando.
    */
-  orientar: (hechos: string, branch?: LegalBranch) =>
+  orientar: (hechos: string, branch?: LegalBranch, expedienteId?: string) =>
     httpClient.post<TriageResponse>('/api/catalog/triage', {
-      body: branch ? { hechos, branch } : { hechos }
+      body: {
+        hechos,
+        ...(branch ? { branch } : {}),
+        /*
+         * El caso, cuando el abogado lo dijo. El servidor comprueba que sea de
+         * la firma ANTES de consumir cupo y responde 404 si no lo es.
+         */
+        ...(expedienteId ? { expedienteId } : {})
+      }
     }),
 
   /** El historial de la firma con sus huecos agrupados. */

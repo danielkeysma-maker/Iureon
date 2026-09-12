@@ -349,10 +349,12 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
           uploadProgress={uploadProgress}
           isTranscribing={isTranscribing}
           error={error}
-          onTranscribir={(archivo, contexto) => {
+          onTranscribir={(archivo, contexto, expedienteId) => {
             setSelectedFile(archivo);
             setContextPrompt(contexto);
-            void transcribe(archivo, contexto).then(() => setSubirAbierto(false));
+            void transcribe(archivo, contexto, undefined, expedienteId || undefined).then(() =>
+              setSubirAbierto(false)
+            );
           }}
         />
 

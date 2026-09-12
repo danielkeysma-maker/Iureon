@@ -21,6 +21,7 @@ import {
 } from '../services/catalog.api';
 import { indiceDelPrimario, porTerminoMasCorto } from '../triageOrder';
 import { AvisoDePlazoEnElAdjunto } from './AvisoDePlazoEnElAdjunto';
+import { SelectorDeExpediente } from '../../expedientes/components/SelectorDeExpediente';
 import { ARCHIVOS_DE_HECHOS, useHechosDesdeArchivo } from '../hechosDesdeArchivo';
 import { PanelDeInstruccion } from './PanelDeInstruccion';
 import { ApiError } from '../../../config/httpClient';
@@ -90,6 +91,13 @@ const EJEMPLOS = [
 export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView, onLeerRecibido }) => {
   const [hechos, setHechos] = React.useState('');
   /*
+   * DE QUE CASO SON ESTOS HECHOS. Opcional: quien orienta sobre un asunto que
+   * todavia no es expediente lo deja vacio, que es el caso normal de esta
+   * pantalla — se entra aqui justamente cuando no se sabe que es lo que se
+   * tiene. Con caso escogido, la orientacion queda contada dentro de el.
+   */
+  const [expedienteId, setExpedienteId] = React.useState('');
+  /*
    * EL DOCUMENTO QUE LLEGÓ, ADJUNTO. Lo que el abogado tiene delante es el
    * oficio o la demanda, no un resumen; la regla de qué pasa con el cuadro de
    * hechos vive en el gancho, compartida con la pantalla del teléfono.
@@ -152,7 +160,7 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView, on
     setResult(null);
 
     try {
-      setResult(await triageApi.orientar(consulta));
+      setResult(await triageApi.orientar(consulta, undefined, expedienteId || undefined));
       // La consulta recien hecha aparece en el historial sin recargar la pantalla.
       cargarHistorial();
     } catch (err) {
@@ -378,7 +386,22 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView, on
               Sin datos personales del cliente
             </p>
 
-            <p className="font-mono text-[11px] text-ink-400">
+{/*
+            EL CASO, OPCIONAL Y DESPUÉS DE LOS HECHOS. Ésta es la pantalla de
+            quien NO sabe todavía qué tiene, así que pedirle el expediente
+            antes de contar el caso sería pedirle lo que quizá no existe. Va
+            debajo, y solo si la firma tiene expedientes.
+          */}
+          <div className="mb-3">
+            <SelectorDeExpediente
+              valor={expedienteId}
+              onCambio={setExpedienteId}
+              id="expediente-de-la-orientacion"
+              pie="La orientación queda contada dentro del caso. Déjelo vacío si el asunto todavía no es un expediente."
+            />
+          </div>
+
+          <p className="font-mono text-[11px] text-ink-400">
               {hechos.trim().length < 20
                 ? 'Cuéntelo con algo más de detalle: quién, qué pasó y qué se busca.'
                 : `${hechos.trim().length} caracteres`}

@@ -3,6 +3,7 @@ import { AlertTriangle, Cpu, FileAudio, Upload } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import { billingApi } from '../../billing/billing.api';
 import { SUPPORTED_AUDIO_EXTENSIONS } from '../types';
+import { SelectorDeExpediente } from '../../expedientes/components/SelectorDeExpediente';
 
 /**
  * Subir audio de audiencia. Diálogo tipo 2 —formulario— en tamaño M.
@@ -33,7 +34,8 @@ interface SubirAudienciaDialogProps {
   uploadProgress?: number;
   isTranscribing: boolean;
   error: string | null;
-  onTranscribir: (archivo: File, contexto: string) => void;
+  /** El tercer argumento es el caso, vacío cuando la firma no tiene expedientes o no escogió. */
+  onTranscribir: (archivo: File, contexto: string, expedienteId: string) => void;
 }
 
 const megabytes = (bytes: number): string => (bytes / (1024 * 1024)).toFixed(1);
@@ -63,6 +65,12 @@ export const SubirAudienciaDialog: React.FC<SubirAudienciaDialogProps> = ({
    * vuelve a tener precio, el servidor lo manda y el rótulo reaparece solo: la
    * pantalla sigue al servidor, no al revés.
    */
+  /*
+   * DE QUE CASO ES LA GRABACION. Una audiencia pertenece a un proceso, asi que
+   * puede nacer atada en vez de jalarse despues desde Expedientes.
+   */
+  const [expedienteId, setExpedienteId] = useState('');
+
   useEffect(() => {
     if (!abierto || precio !== null) return;
     billingApi
@@ -96,7 +104,7 @@ export const SubirAudienciaDialog: React.FC<SubirAudienciaDialogProps> = ({
           </button>
           {/* Lleva la cifra solo si la hay: transcribir no se cobra desde el 29/08/2026. */}
           <button
-            onClick={() => archivo && onTranscribir(archivo, contexto)}
+            onClick={() => archivo && onTranscribir(archivo, contexto, expedienteId)}
             disabled={!archivo || trabajando}
             className="btn-primary btn-sm"
           >
@@ -166,6 +174,20 @@ export const SubirAudienciaDialog: React.FC<SubirAudienciaDialogProps> = ({
             transcriben bien.
           </span>
         </label>
+
+        {/*
+          EL CASO VA DEBAJO DEL CONTEXTO, y son cosas distintas aunque lo
+          parezcan. El contexto es TEXTO que viaja al motor para que reconozca
+          los nombres y el radicado; el expediente es la ATADURA, y no cambia
+          una sola palabra del transcrito. Juntarlos en un campo haría que
+          escoger el caso pareciera mejorar la transcripción, que no.
+        */}
+        <SelectorDeExpediente
+          valor={expedienteId}
+          onCambio={setExpedienteId}
+          id="expediente-de-la-audiencia"
+          pie="La audiencia queda contada dentro del caso, y desde ahí se prepara el interrogatorio."
+        />
 
         {/* ─── QUÉ VA A PASAR ──────────────────────────────────────────────── */}
         <div className="rounded-card border border-line-200 bg-canvas px-4 py-3">
