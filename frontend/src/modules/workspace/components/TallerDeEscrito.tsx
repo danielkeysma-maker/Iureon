@@ -949,6 +949,33 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
         </div>
       </div>
 
+      {/*
+        ─── LO QUE SE LEE AQUI NO ES EL ARCHIVO, Y HAY QUE DECIRLO ────────────
+
+        «Con marcas» y «Editar» muestran el TEXTO EXTRAIDO y reflujado: sin
+        sangrias, sin negritas, sin tablas. Es lo correcto para corregir
+        palabras y no se parece al documento que el abogado subio.
+
+        Y hasta hoy no se decia. La pestaña «Original» solo aparece cuando el
+        archivo se guardo —«un boton que solo sirve para decir aqui no hay nada
+        ensena a no pulsarlo»—, de modo que quien revisaba un escrito sin
+        original guardado no veia ninguna pestaña, leia esto, y concluia que la
+        aplicacion le habia deformado el documento. Nunca se enteraba de que su
+        archivo no se conservo, ni de por que.
+
+        Se dice en las dos direcciones: con original, donde esta; sin el, por
+        que no lo hay.
+      */}
+      {versionAbierta === null && modo !== 'original' && (
+        <p className="mx-4 mt-3 rounded-card border border-line-200 bg-canvas px-3 py-2 text-[11.5px] leading-snug text-ink-500 text-justify [text-wrap:pretty]">
+          Esto es el texto extraído de su archivo, no el archivo: se pierden la diagramación, las negritas y
+          las tablas.{' '}
+          {original
+            ? 'Para verlo tal como se subió, abra la pestaña «Original».'
+            : 'De esta revisión no se guardó el archivo, así que no hay original que abrir. Los que revise de ahora en adelante sí lo conservan.'}
+        </p>
+      )}
+
       {versionAbierta !== null && versiones[versionAbierta] ? (
         Papel(
           <>
