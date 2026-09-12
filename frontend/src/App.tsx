@@ -491,7 +491,10 @@ export function App() {
       lineSpacing: b.lineSpacing
     }));
   };
-  const workflow = useLegalAgentWorkflow(marcaDeFirma ? formatoComoInstruccion(marcaDeFirma) : undefined);
+  const workflow = useLegalAgentWorkflow(
+    marcaDeFirma ? formatoComoInstruccion(marcaDeFirma) : undefined,
+    expedienteDeRedaccion
+  );
 
   /*
    * Quién firma el escrito.

@@ -9,8 +9,14 @@ import { adjuntosPendientes } from '../services/adjuntos';
  * @param formatoDeFirma La instruccion de formato de la marca de la firma
  * (numeracion de hechos, titulos, bloque de firma). Viaja al prompt del motor
  * que escribe — el pipeline la aceptaba desde el principio y nadie la enviaba.
+ * @param expedienteId El caso al que la barra de configuración ató este
+ * escrito. Viaja al servidor para que el borrador nazca con lo que el
+ * expediente ya sabe: si tiene documentos indexados, el motor recibe los
+ * pasajes del caso —partes, radicado, juzgado, fechas— en vez de obligar al
+ * colega a teclear otra vez lo que la aplicación ya leyó. Vacío significa
+ * «sin expediente», que es un escrito suelto y perfectamente válido.
  */
-export function useLegalAgentWorkflow(formatoDeFirma?: string) {
+export function useLegalAgentWorkflow(formatoDeFirma?: string, expedienteId?: string) {
 
   const [rightView, setRightView] = useState<'pdf' | 'draft'>('pdf');
   const [legalPrompt, setLegalPrompt] = useState('');
@@ -125,6 +131,7 @@ Por favor espere unos segundos mientras se finaliza la redacción solemne.`,
         legalPrompt,
         existingDraft: activeDraftText || undefined,
         customFormatInstruction: formatoDeFirma || undefined,
+        expedienteId: expedienteId || undefined,
         adjuntos: adjuntos.length > 0 ? adjuntos : undefined
       });
 

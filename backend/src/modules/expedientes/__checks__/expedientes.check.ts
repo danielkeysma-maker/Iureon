@@ -593,46 +593,35 @@ check(
 
 /* ─── 11. LO INDEXADO ALIMENTA EL INTERROGATORIO, SIN PODER TUMBARLO ─────── */
 
+/*
+ * LA RECUPERACION YA NO SE ESCRIBE AQUI. El interrogatorio la escribio primero;
+ * cuando Redaccion la necesito, copiarla habria sido la tercera copia del mismo
+ * cerco —y la primera que alguien corrija dejaria a las otras dos atras—. Vive
+ * en `materialDelExpediente.ts`, con su propia guarda
+ * (`npm run check:material-expediente`), que es donde se comprueban el cerco al
+ * caso, el filtro por firma y que un fallo no lance.
+ *
+ * Lo que se comprueba AQUI es que este controlador la use en vez de tener la
+ * suya, y que el prompt siga teniendo rama para cuando no hay nada indexado.
+ */
+
 const conPreguntas = leer('modules/expedientes/preguntas.controller.ts');
 
 check(
-  'el interrogatorio busca en el expediente indexado, acotado a ESE caso',
-  /vectorSearchService\.search\(firmId, consulta, FRAGMENTOS_DEL_CASO, expediente\.id\)/.test(conPreguntas),
+  'el interrogatorio usa la recuperacion compartida, acotada a ESE caso',
+  /buscarPasajesDelExpediente\(firmId, expediente\.id, consulta\)/.test(conPreguntas),
   'sin el id del caso traeria parrafos del expediente de otro cliente'
 );
-
-/*
- * LA BUSQUEDA NO PUEDE COSTAR EL INTERROGATORIO. Corre ANTES de llamar al
- * motor, con la reserva de saldo ya hecha: si un fallo de red la dejara
- * escapar, el abogado perderia la peticion por un extra que ni siquiera
- * pidio. Sin proveedor, sin indice o con la red caida, se prepara como antes.
- */
-const bloqueBusqueda = conPreguntas.slice(
-  conPreguntas.indexOf('let material'),
-  conPreguntas.indexOf('const llamada = await conLimite')
-);
 check(
-  'y un fallo de la busqueda no tumba el interrogatorio: va dentro de un try',
-  bloqueBusqueda.includes('try') && bloqueBusqueda.includes('catch'),
-  'es un extra, no un requisito'
+  'y no se quedo con una copia propia de la busqueda',
+  !/vectorSearchService/.test(conPreguntas),
+  'dos copias del mismo cerco se separan en cuanto alguien corrija una'
 );
 check(
   'sin nada indexado, el material va nulo y el prompt lo dice',
   /material: null/.test(leer('modules/expedientes/preguntasDelExpediente.ts')) ||
     /no adjunt/.test(leer('modules/expedientes/preguntasDelExpediente.ts')),
   'el prompt tiene una rama para cuando no hay material'
-);
-
-/*
- * Y NO SE TRAE EL EXPEDIENTE ENTERO. Seis fragmentos de 400 palabras son unas
- * 2.400: bastante para que las preguntas nazcan de hechos del caso, y poco
- * para que no desplacen a los actores y a la ficha dentro del encargo.
- */
-check(
-  'se traen unos pocos pasajes, no el expediente entero',
-  /FRAGMENTOS_DEL_CASO = \d+/.test(conPreguntas) &&
-    Number(/FRAGMENTOS_DEL_CASO = (\d+)/.exec(conPreguntas)?.[1] ?? 0) <= 12,
-  'treinta fragmentos convertirian el interrogatorio en un resumen del expediente'
 );
 
 /* ─── 12. BUSCAR DENTRO DEL EXPEDIENTE ───────────────────────────────────── */

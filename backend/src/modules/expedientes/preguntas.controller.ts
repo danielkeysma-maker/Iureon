@@ -12,8 +12,8 @@ import {
 import { ENGINE, callOpenRouterWithUsage } from '../agent/openrouter.client';
 import { conLimite, LIMITE_LLAMADA_MS } from '../agent/review/documentReview.controller';
 import { exigirFuncion, responderPlanError } from '../subscriptions/plan.service';
-import { vectorSearchService } from '../search/vectorSearch.service';
 import { ExpedienteError, obtenerExpediente } from './expedientes.service';
+import { buscarPasajesDelExpediente } from './materialDelExpediente';
 import {
   MAX_AUDIENCIA,
   MAX_PERSONAS_POR_TANDA,
@@ -55,16 +55,6 @@ const OPERACION = 'CONSULTA_REVISION' as const;
 const TOKENS_POR_PERSONA = 1_100;
 /** El enfoque y la estructura del JSON, que no dependen de cuánta gente haya. */
 const TOKENS_DE_BASE = 600;
-
-/**
- * Cuántos pasajes del expediente indexado se le ponen delante al motor.
- *
- * Seis fragmentos de 400 palabras son unas 2.400 palabras: bastante para que
- * las preguntas nazcan de hechos del caso, y poco para que no desplacen a los
- * actores y a la ficha dentro del encargo. Traer treinta convertiría el
- * interrogatorio en un resumen del expediente.
- */
-const FRAGMENTOS_DEL_CASO = 6;
 
 const fallar = (res: Response, err: unknown, mensaje: string): void => {
   if (responderPlanError(res, err)) return;
@@ -168,29 +158,26 @@ export const preguntasDelExpedienteController = async (req: Request, res: Respon
      * NUNCA TUMBA NADA. Sin proveedor de embeddings, sin índice o con un fallo
      * de red, la búsqueda devuelve vacío y el interrogatorio se prepara como
      * antes. Es un extra, no un requisito.
+     *
+     * LA RECUPERACIÓN ES COMPARTIDA (`materialDelExpediente.ts`). Redacción y
+     * Revisión traen los mismos pasajes por el mismo camino; lo que cambia es
+     * cómo se rinden dentro del encargo, y eso sí es de cada pantalla. Esta
+     * escribe su propio `material` porque `buildPreguntasUserPrompt` lo pide
+     * con esa forma.
      */
     let material: { que: string; texto: string; truncado: boolean } | null = null;
-    try {
-      const consulta = [quiereProbar, audiencia, ...aQuienes.map((a) => `${a.nombre} ${a.sobreQue ?? ''}`)]
-        .map((t) => t.trim())
-        .filter(Boolean)
-        .join('. ');
-
-      if (consulta.length > 0) {
-        const hallado = await vectorSearchService.search(firmId, consulta, FRAGMENTOS_DEL_CASO, expediente.id);
-        /* Solo lo del propio expediente: el corpus público entra por otra puerta. */
-        const delCaso = hallado.matches.filter((m) => m.firmId === firmId);
-        if (delCaso.length > 0) {
-          material = {
-            que: `${delCaso.length} pasaje(s) del expediente indexado`,
-            texto: delCaso.map((m) => `[${m.fileName ?? 'documento del caso'}] ${m.contentChunk}`).join('\n\n'),
-            truncado: true
-          };
-          console.log(`[EXPEDIENTES/PREGUNTAS] ${delCaso.length} fragmentos del caso recuperados.`);
-        }
-      }
-    } catch (err) {
-      console.warn(`[EXPEDIENTES/PREGUNTAS] No se pudo consultar el expediente indexado: ${(err as Error).message}`);
+    const consulta = [quiereProbar, audiencia, ...aQuienes.map((a) => `${a.nombre} ${a.sobreQue ?? ''}`)]
+      .map((t) => t.trim())
+      .filter(Boolean)
+      .join('. ');
+    const pasajes = await buscarPasajesDelExpediente(firmId, expediente.id, consulta);
+    if (pasajes.length > 0) {
+      material = {
+        que: `${pasajes.length} pasaje(s) del expediente indexado`,
+        texto: pasajes.map((p) => `[${p.archivo ?? 'documento del caso'}] ${p.texto}`).join('\n\n'),
+        truncado: true
+      };
+      console.log(`[EXPEDIENTES/PREGUNTAS] ${pasajes.length} fragmentos del caso recuperados.`);
     }
 
     const llamada = await conLimite(

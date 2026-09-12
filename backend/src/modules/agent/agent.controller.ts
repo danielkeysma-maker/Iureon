@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto';
 import { OpenRouterMultiEngineService, AgentExecutionStep } from './openrouter.service';
 import { mensajeInicioLectura, renderBloqueAdjuntos, resumenDeLectura, validarAdjuntos } from './adjuntos/adjuntos';
 import { leerAdjuntos } from './adjuntos/leerAdjuntos';
+import { traerMaterialDelExpediente } from '../expedientes/materialDelExpediente';
 import { exigirFuncion, responderPlanError } from '../subscriptions/plan.service';
 import {
   BillingError,
@@ -94,7 +95,8 @@ export const streamAgentDraftController = async (req: Request, res: Response): P
     legalBranch,
     legalPrompt,
     existingDraft,
-    customFormatInstruction
+    customFormatInstruction,
+    expedienteId
   } = req.body;
 
   if (!legalPrompt) {
@@ -241,6 +243,44 @@ export const streamAgentDraftController = async (req: Request, res: Response): P
       } satisfies AgentExecutionStep);
     }
 
+    /*
+     * ─── ETAPA 0.5 — LO QUE EL EXPEDIENTE YA SABE ──────────────────────────
+     *
+     * Si el escrito está atado a un caso y ese caso tiene documentos
+     * indexados, se recuperan los pasajes que se parecen a lo que el abogado
+     * pidió. El caso estaba adentro y el escrito nacía en blanco: el colega
+     * volvía a teclear radicado, juzgado y nombres de las partes que la
+     * aplicación ya había leído.
+     *
+     * LA CONSULTA ES LA INSTRUCCIÓN MÁS LA ACTUACIÓN, no una frase genérica.
+     * Buscar «demanda» en un expediente devuelve la demanda entera; buscar lo
+     * que el abogado escribió devuelve los párrafos que le sirven.
+     *
+     * NO SE COBRA APARTE. La única llamada externa es la vectorización de la
+     * consulta —una frase—, que en producción va por Cloudflare y ya está
+     * dentro del precio del borrador. Ver `materialDelExpediente`.
+     *
+     * Y NUNCA TUMBA NADA: sin proveedor, sin índice o con la red caída, el
+     * bloque llega vacío y el borrador se redacta como antes.
+     */
+    let bloqueExpediente: string | undefined;
+    const delExpediente = typeof expedienteId === 'string' ? expedienteId.trim() : '';
+    if (delExpediente) {
+      bloqueExpediente = await traerMaterialDelExpediente(
+        firmId as string,
+        delExpediente,
+        `${legalPrompt} ${tipoElegido}`
+      );
+      sendEvent('AGENT_LOG', {
+        stage: 'STAGE_0_EXPEDIENTE',
+        engine: 'BUSQUEDA',
+        message: bloqueExpediente
+          ? 'Se recuperaron pasajes del expediente indexado para este caso.'
+          : 'El expediente no aportó pasajes indexados; el escrito se redacta con lo que usted escribió.',
+        timestamp: new Date().toISOString()
+      } satisfies AgentExecutionStep);
+    }
+
     const result = await aiService.executeMultiEnginePipeline(
       {
         firmId: firmId || 'unknown-firm',
@@ -258,7 +298,8 @@ export const streamAgentDraftController = async (req: Request, res: Response): P
          * y nadie se lo enviaba: era un ajuste que se guardaba y no hacia nada.
          */
         customFormatInstruction,
-        bloqueAdjuntos
+        bloqueAdjuntos,
+        bloqueExpediente
       },
       (step: AgentExecutionStep) => {
         sendEvent('AGENT_LOG', step);

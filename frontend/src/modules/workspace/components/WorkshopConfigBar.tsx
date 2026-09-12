@@ -517,7 +517,7 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
             onChange={setExpedienteId}
             vacio="Sin expediente"
             anchoBoton="max-w-[220px]"
-            pie="El borrador queda contado dentro del caso. Sin esto nace suelto y hay que jalarlo después desde Expedientes."
+            pie="El borrador queda contado dentro del caso, y si el caso tiene documentos cargados el escrito nace con lo que ellos dicen. Sin esto nace suelto y hay que jalarlo después desde Expedientes."
           />
         </>
       )}

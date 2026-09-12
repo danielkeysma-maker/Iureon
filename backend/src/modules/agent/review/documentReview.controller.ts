@@ -42,6 +42,7 @@ import {
 import { ENGINE, callOpenRouterWithUsage } from '../openrouter.client';
 import { aQuienLeToca, esPapelRepresentable } from './posicionProcesal';
 import { esExpedienteDeLaFirma } from '../../expedientes/expedientes.service';
+import { traerMaterialDelExpediente } from '../../expedientes/materialDelExpediente';
 import type { PapelEnElExpediente } from '../../expedientes/types';
 import {
   ETIQUETA_DOCUMENTO_RECIBIDO,
@@ -415,6 +416,35 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
      * este informe declara no tener.
      */
     const guidance = esRecibido ? null : await buildCatalogGuidanceForFirm(firmId, documentType, legalBranch);
+
+    /*
+     * ─── LO QUE EL EXPEDIENTE DICE DEL CASO, SOLO EN EL MODO PROPIO ────────
+     *
+     * En el modo propio el revisor lee un escrito que el abogado va a
+     * presentar EN un proceso, y los papeles de ese proceso están indexados.
+     * Con ellos puede hacer lo único que nadie más hace: cotejar. Si el
+     * escrito dice un radicado y el expediente dice otro, si nombra a una
+     * parte que no figura, si da por notificada una fecha que no coincide —
+     * eso no se ve leyendo el escrito solo, por bueno que sea el revisor.
+     *
+     * ─── Y NO EN EL MODO RECIBIDO ──────────────────────────────────────────
+     *
+     * Ese informe se rige por una regla que manda sobre todas: SOLO PUEDE
+     * AFIRMAR LO QUE ESTÁ ESCRITO EN EL DOCUMENTO, porque no hay ficha ni
+     * fuente distinta del texto que llegó. Meterle pasajes del expediente la
+     * contradice de frente: el informe empezaría a afirmar cosas que el auto
+     * no dice, con la misma voz con la que dice lo que sí dice, y el abogado
+     * no tendría cómo distinguirlas. La regla vale más que la comodidad.
+     *
+     * NO TUMBA NADA. Sin proveedor, sin índice o con la red caída, el bloque
+     * llega vacío y la revisión sigue igual.
+     */
+    const bloqueExpediente = esRecibido
+      ? undefined
+      : await traerMaterialDelExpediente(firmId, expedienteId, `${documentType} ${pregunta}`);
+    if (bloqueExpediente) {
+      console.log('[REVIEW] Pasajes del expediente indexado incorporados al cotejo.');
+    }
     /*
      * El mismo motor y el mismo límite de llamada que el modo propio: ninguno
      * de los dos puede tardar más de lo que cabe por debajo del reloj de la
@@ -427,7 +457,14 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
         esRecibido ? buildRecibidoSystemPrompt() : buildReviewSystemPrompt(),
         esRecibido
           ? buildRecibidoUserPrompt({ pregunta, texto: preparado.texto, truncado: preparado.truncado })
-          : buildReviewUserPrompt({ documentType, guidance, pregunta, texto: preparado.texto, truncado: preparado.truncado }),
+          : buildReviewUserPrompt({
+              documentType,
+              guidance,
+              pregunta,
+              texto: preparado.texto,
+              truncado: preparado.truncado,
+              expediente: bloqueExpediente
+            }),
         esRecibido ? MAX_TOKENS_INFORME_RECIBIDO : MAX_TOKENS_INFORME
       ),
       LIMITE_LLAMADA_MS

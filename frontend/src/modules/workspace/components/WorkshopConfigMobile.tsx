@@ -300,7 +300,8 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
                 ))}
               </select>
               <span className="mt-1 block text-[11px] leading-snug text-ink-500">
-                El borrador queda contado dentro del caso.
+                El borrador queda contado dentro del caso, y si el caso tiene documentos
+                cargados el escrito nace con lo que ellos dicen.
               </span>
             </label>
           )}

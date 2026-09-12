@@ -106,11 +106,37 @@ export const buildReviewUserPrompt = (input: {
   pregunta: string;
   texto: string;
   truncado: boolean;
+  /**
+   * Pasajes del expediente indexado al que la revisión está atada, ya rendidos
+   * como bloque (ver `expedientes/materialDelExpediente`). Ausente cuando la
+   * revisión no está atada a un caso o cuando el caso no tiene nada indexado.
+   */
+  expediente?: string;
 }): string => {
   const pregunta = input.pregunta.trim() || PREGUNTA_POR_DEFECTO;
   const ficha = input.guidance
     ? `FICHA VERIFICADA DE LA ACTUACIÓN (fuente oficial; úsala para lo objetivo):\n${input.guidance}`
     : 'La actuación no está catalogada todavía: no hay ficha verificada. Limita lo objetivo a lo que puedas sostener con el artículo exacto de la norma; todo lo demás va como criterio.';
+  /*
+   * ─── EL COTEJO, QUE ES LO ÚNICO QUE NADIE MÁS PUEDE HACER ────────────────
+   *
+   * Leyendo el escrito solo, ni el mejor revisor sabe si el radicado es el de
+   * ESTE proceso, si la parte se llama así, o si la fecha de notificación es
+   * la que corre. Los papeles del caso sí lo dicen, y están indexados.
+   *
+   * LO QUE SE LE PIDE ES QUE SEÑALE LA DISCREPANCIA, NO QUE LA RESUELVA. Un
+   * pasaje puede ser de una etapa anterior y estar superado por una actuación
+   * que solo el abogado conoce; un revisor que «corrige» el radicado con el de
+   * un memorial viejo hace más daño que el error que creyó ver. Por eso el
+   * mandato es enseñar las dos versiones y decir de dónde sale cada una.
+   *
+   * Y NO ES FUENTE DE DERECHO: el respaldo normativo es la ficha, arriba. Un
+   * artículo citado de pasada en un memorial del expediente no está
+   * verificado, y esta casa no cita lo que no está verificado.
+   */
+  const delExpediente = input.expediente
+    ? `\n${input.expediente}\n\nCÓMO SE USA EL EXPEDIENTE: coteja el escrito contra estos pasajes. Si discrepan en el radicado, en el nombre de una parte, en una fecha, en una cuantía o en un antecedente, dilo como discrepancia —qué dice el escrito, qué dice el expediente— y deja que el abogado decida cuál rige; NO afirmes cuál de los dos es el correcto. Los pasajes NO son fuente de derecho: el respaldo normativo es la ficha. Si no discrepan en nada, no menciones el expediente.`
+    : '';
   const recorte = input.truncado
     ? `\nNOTA: el escrito fue recortado por longitud a ${MAX_CARACTERES_REVISION.toLocaleString('es-CO')} caracteres. Revisa solo lo presente y NO reportes como faltante lo que pudo quedar después del corte.\n`
     : '';
@@ -118,7 +144,7 @@ export const buildReviewUserPrompt = (input: {
   return `ACTUACIÓN: "${input.documentType}".
 
 ${ficha}
-
+${delExpediente}
 PREGUNTA DEL ABOGADO: ${pregunta}
 ${recorte}
 ESCRITO A REVISAR:

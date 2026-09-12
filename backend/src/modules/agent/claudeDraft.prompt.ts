@@ -41,6 +41,12 @@ interface ClaudePromptInput {
    * `adjuntos/renderBloqueAdjuntos`). Empty or absent when nothing was read.
    */
   adjuntos?: string;
+  /**
+   * El bloque de pasajes del expediente indexado (ver
+   * `expedientes/materialDelExpediente`). Ausente cuando el escrito no está
+   * atado a un expediente o cuando el expediente no tiene nada indexado.
+   */
+  expediente?: string;
 }
 
 /**
@@ -107,6 +113,8 @@ interface ClaudeUserMessageInput {
   gptSchemaOutput?: string;
   existingDraft?: string;
   adjuntos?: string;
+  /** El bloque de pasajes del expediente indexado. */
+  expediente?: string;
   /**
    * El mismo bloque que recibe el prompt de sistema. Solo se usa para saber si
    * hay ficha verificada y, en tal caso, repetir aquí la regla de citación —la
@@ -158,7 +166,8 @@ export const buildClaudeDraftPrompt = ({
   customFormat,
   existingDraft,
   catalogGuidance,
-  adjuntos
+  adjuntos,
+  expediente
 }: ClaudePromptInput): string => {
   // A catalogued actuación supplies the article, the deadline and the
   // norm-mandated sections. Only when the actuación is not catalogued yet does
@@ -182,6 +191,23 @@ export const buildClaudeDraftPrompt = ({
    */
   const reglaAdjuntos = adjuntos
     ? `\nREGLA DE LOS ADJUNTOS: Los datos que vienen de los adjuntos se usan tal cual y no se reemplazan por marcadores; si el adjunto y el abogado se contradicen, prevalece lo que escribió el abogado y se anota entre corchetes la discrepancia.\n`
+    : '';
+  /*
+   * ─── Y LA DEL EXPEDIENTE, QUE NO ES LA MISMA ──────────────────────────────
+   *
+   * Un adjunto lo escogió el abogado para ESTE escrito. Un pasaje del
+   * expediente lo escogió un buscador por parecido: puede ser de otra etapa del
+   * proceso, puede estar superado por una actuación posterior, y puede citar
+   * una norma que ya no rige. Sirve para los DATOS del caso —partes, radicado,
+   * juzgado, fechas, cuantías— y no como fuente de derecho, que llega por la
+   * ficha del catálogo y por la jurisprudencia verificada.
+   *
+   * Sin esta línea el modelo trataría los dos bloques igual, y citar como norma
+   * un artículo leído de pasada en un memorial ajeno es exactamente el defecto
+   * que el catálogo existe para cerrar.
+   */
+  const reglaExpediente = expediente
+    ? `\nREGLA DEL EXPEDIENTE: Los pasajes del expediente aportan DATOS del caso (partes, radicado, juzgado, fechas, cuantías, antecedentes) y se usan tal cual; no son fuente de derecho, así que no cites un pasaje como norma ni como jurisprudencia. Si un pasaje contradice lo que escribió el abogado, prevalece el abogado.\n`
     : '';
   /*
    * ─── LA LÍNEA DE NORMATIVIDAD NO SE EMITE CUANDO OTRO BLOQUE MANDA ────────
@@ -245,7 +271,7 @@ ${
 }
 
 INDICACIÓN DEL USUARIO: "${prompt}".
-${reglaAdjuntos}${lineaNormatividad}${reglaDeCitacion}
+${reglaAdjuntos}${reglaExpediente}${lineaNormatividad}${reglaDeCitacion}
 ${renderJurisprudencia(citations)}
 
 ${`ESTRUCTURA ${esTitulo ? `DEL ESCRITO QUE BUSCA "${encargo}"` : `DE "${encargo}"`} — obligatoria. Las secciones marcadas [OBLIGATORIA] no pueden omitirse y la de petición/pretensiones/resuelve JAMÁS se omite. Cada sección abre con su título en su propia línea, en mayúscula sostenida y entre **dobles asteriscos**:\n${estructuraObligatoria}`}
@@ -271,11 +297,18 @@ export const buildClaudeUserMessage = ({
   gptSchemaOutput,
   existingDraft,
   adjuntos,
+  expediente,
   catalogGuidance
 }: ClaudeUserMessageInput): string => {
   // After the facts and before the citations: the writer reads the file data
   // next to Gemini's extraction, which already leaned on the same block.
   const adjuntosBlock = adjuntos ? `\n\n${adjuntos}\n` : '';
+  /*
+   * Después de los adjuntos y antes de las citas, por la misma razón: el
+   * redactor lee los datos del caso junto a la extracción de Gemini, que ya se
+   * apoyó en este mismo bloque.
+   */
+  const expedienteBlock = expediente ? `\n\n${expediente}\n` : '';
   const { esTitulo, encargo } = comoSeLlamaElEncargo(documentType);
   const reglaDeCitacion = catalogGuidance?.includes(REGLA_DE_CITACION_REDACCION)
     ? `\n${REGLA_DE_CITACION_REDACCION}\n`
@@ -284,7 +317,7 @@ export const buildClaudeUserMessage = ({
 
   return existingDraft
     ? `Instrucción del usuario: "${prompt}".
-Insumos fácticos de Gemini: ${facts}.${adjuntosBlock}
+Insumos fácticos de Gemini: ${facts}.${adjuntosBlock}${expedienteBlock}
 ${reglaDeCitacion}
 ${renderJurisprudencia(citations)}
 ${esquema}
@@ -294,7 +327,7 @@ Toma el borrador existente como base y aplica las correcciones. Entrega el docum
           ? `Genera un escrito jurídico dirigido a lograr "${encargo}", COMPLETO hasta la firma y SIN ponerle nombre de figura procesal.`
           : `Genera el documento jurídico "${encargo}" COMPLETO hasta la firma.`
       }
-Hechos extraídos por Gemini: ${facts}.${adjuntosBlock}
+Hechos extraídos por Gemini: ${facts}.${adjuntosBlock}${expedienteBlock}
 ${reglaDeCitacion}
 ${renderJurisprudencia(citations)}
 ${esquema}

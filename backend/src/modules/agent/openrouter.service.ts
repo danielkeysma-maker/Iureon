@@ -89,6 +89,19 @@ export interface WorkflowRequest {
    * as [•] from Opus. Empty when nothing was read.
    */
   bloqueAdjuntos?: string;
+  /**
+   * Pasajes recuperados del expediente indexado, ya rendidos como bloque (ver
+   * `expedientes/materialDelExpediente`). Viaja junto a los adjuntos y por las
+   * mismas tres etapas, y por la MISMA razon: un radicado que Gemini leyo del
+   * expediente y que Opus no ve vuelve a salir como [•].
+   *
+   * ES UN BLOQUE APARTE Y NO SE FUNDE CON LOS ADJUNTOS. Un adjunto lo escogio
+   * el abogado para ESTE escrito; un pasaje lo escogio un buscador por
+   * parecido, puede venir de otra etapa del proceso y puede citar una norma
+   * que ya no rige. Cada bloque lleva su propia advertencia, y fundirlos le
+   * daria al pasaje la autoridad del adjunto.
+   */
+  bloqueExpediente?: string;
 }
 
 export interface AgentExecutionStep {
@@ -138,14 +151,16 @@ const MAX_TOKENS = {
 } as const;
 
 /**
- * Appends the attachments block to the material a stage receives.
+ * Appends the extra blocks — the attachments, the expediente passages — to the
+ * material a stage receives.
  *
- * One helper so the three stages cannot disagree about where the block goes
- * or whether an empty block leaves a dangling header — it never does: with
- * nothing read the material is returned untouched.
+ * One helper so the three stages cannot disagree about where the blocks go, in
+ * which order, or whether an empty block leaves a dangling header — it never
+ * does: a block with nothing in it is dropped and the material comes back
+ * untouched.
  */
-const conAdjuntos = (material: string, bloque?: string): string =>
-  bloque && bloque.trim() ? `${material}\n\n${bloque}` : material;
+const conMaterial = (material: string, ...bloques: (string | undefined)[]): string =>
+  [material, ...bloques.filter((b): b is string => Boolean(b && b.trim()))].join('\n\n');
 
 /** Below this length Claude's answer is treated as a failed generation. */
 const MIN_DRAFT_LENGTH = 200;
@@ -475,7 +490,7 @@ export class OpenRouterService {
     const base = req.existingDraft
       ? `${req.legalPrompt}\n\n--- BORRADOR EXISTENTE (primeros ${DRAFT_CONTEXT_CHARS} caracteres) ---\n${req.existingDraft.substring(0, DRAFT_CONTEXT_CHARS)}`
       : req.legalPrompt;
-    const userPrompt = conAdjuntos(base, req.bloqueAdjuntos);
+    const userPrompt = conMaterial(base, req.bloqueAdjuntos, req.bloqueExpediente);
 
     /*
      * With attachments the extraction has more to carry — every number, date,
@@ -771,11 +786,12 @@ export class OpenRouterService {
       : `Eres un estructurador procesal senior de Colombia. Tu ÚNICA tarea es producir un ESQUEMA CONCISO con:\n1. PROBLEMA JURÍDICO (1-2 oraciones)\n2. EXCEPCIONES O DEFENSAS APLICABLES (lista)\n3. NORMAS CLAVE (artículos específicos)\n4. ESTRATEGIA DE SUSTENTACIÓN (enfoque argumentativo)\n\nNO redactes el documento final. Solo entrega el esquema estructurado. Máximo 600 palabras.`;
 
     const facts = geminiExtraction || req.legalPrompt;
-    const userPrompt = conAdjuntos(
+    const userPrompt = conMaterial(
       req.existingDraft
         ? `CAMBIOS IDENTIFICADOS POR GEMINI:\n${facts}\n\n${renderJurisprudencia(jurisprudencia)}\n\nINSTRUCCIÓN DEL USUARIO: ${req.legalPrompt}\n\nTIPO DE DOCUMENTO: ${req.documentType}`
         : `HECHOS EXTRAÍDOS POR GEMINI:\n${facts}\n\n${renderJurisprudencia(jurisprudencia)}\n\nTIPO DE DOCUMENTO: ${req.documentType}`,
-      req.bloqueAdjuntos
+      req.bloqueAdjuntos,
+      req.bloqueExpediente
     );
 
     /*
@@ -882,7 +898,8 @@ export class OpenRouterService {
       customFormat: req.customFormatInstruction,
       existingDraft: req.existingDraft,
       catalogGuidance,
-      adjuntos: req.bloqueAdjuntos
+      adjuntos: req.bloqueAdjuntos,
+      expediente: req.bloqueExpediente
     });
 
     const userMessage = buildClaudeUserMessage({
@@ -893,6 +910,7 @@ export class OpenRouterService {
       gptSchemaOutput: gptStructure,
       existingDraft: req.existingDraft,
       adjuntos: req.bloqueAdjuntos,
+      expediente: req.bloqueExpediente,
       catalogGuidance
     });
 
