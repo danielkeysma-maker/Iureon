@@ -166,6 +166,23 @@ export const expedientesApi = {
   },
 
   /** Lo que el expediente tiene indexado, con cuántos fragmentos cada documento. */
+  /**
+   * El texto de un documento indexado, para poder leerlo.
+   *
+   * NO es el PDF: el archivo nunca sale del navegador, asi que no hay copia
+   * del original en el servidor. Es el texto guardado — el mismo que ven la
+   * busqueda y el interrogatorio.
+   */
+  async textoDelDocumento(
+    expedienteId: string,
+    documentId: string
+  ): Promise<{ titulo: string; texto: string; fragmentos: number }> {
+    const data = await httpClient.get<Respuesta & { documento: { titulo: string; texto: string; fragmentos: number } }>(
+      `/api/expedientes/${expedienteId}/documentos/${documentId}/texto`
+    );
+    return revisar(data, 'No se pudo leer el documento.').documento;
+  },
+
   async documentos(expedienteId: string): Promise<DocumentoIndexado[]> {
     const data = await httpClient.get<Respuesta & { documentos: DocumentoIndexado[] }>(
       `/api/expedientes/${expedienteId}/documentos`

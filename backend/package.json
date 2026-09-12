@@ -74,6 +74,7 @@
     "check:vigencia-red": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/legislation/__checks__/vigencia.check.ts --red",
     "check:gasto": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/billing/__checks__/gastoRegistrado.check.ts",
     "check:sesion": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/auth/__checks__/sesion.check.ts",
+    "check:texto-indexado": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/expedientes/__checks__/textoIndexado.check.ts",
     "check:posicion-expediente": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/expedientes/__checks__/posicionDelExpediente.check.ts",
     "check:posicion": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/posicion.check.ts",
     "check:glosa": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/glosa.check.ts",

@@ -11,6 +11,7 @@ import {
   X
 } from 'lucide-react';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
+import { LeerDocumentoIndexado } from './LeerDocumentoIndexado';
 import { expedientesApi, type Carpeta, type DocumentoIndexado } from '../services/expedientes.api';
 import type { ExpedienteConDetalle } from '../types';
 
@@ -80,6 +81,8 @@ export const CarpetasDelExpediente: React.FC<{
   const [error, setError] = React.useState('');
   const [ocupado, setOcupado] = React.useState(false);
   const [confirmacion, setConfirmacion] = React.useState<Confirmacion | null>(null);
+  /* El documento abierto para leerlo. Las tres vistas comparten el visor. */
+  const [leyendoDoc, setLeyendoDoc] = React.useState<string | null>(null);
 
   const cargar = React.useCallback(async () => {
     setError('');
@@ -349,11 +352,18 @@ export const CarpetasDelExpediente: React.FC<{
             </button>
           ))}
           {archivos.map((d) => (
-            <div key={d.documentId} className="card p-3">
+            /* La tarjeta ABRE el documento: hasta hoy no hacia nada al pulsarla. */
+            <button
+              key={d.documentId}
+              type="button"
+              onClick={() => setLeyendoDoc(d.documentId)}
+              className="card p-3 text-left hover:border-brand-700"
+              title="Leer lo que quedó indexado de este documento"
+            >
               <FileText className="h-5 w-5 text-ink-500" />
               <p className="mt-1.5 text-body [overflow-wrap:anywhere]">{d.titulo}</p>
               <p className="mt-0.5 text-meta text-ink-500">{d.fragmentos.toLocaleString('es-CO')} fragmentos</p>
-            </div>
+            </button>
           ))}
         </div>
       )}
@@ -389,10 +399,17 @@ export const CarpetasDelExpediente: React.FC<{
           {archivos.map((d) => (
             <li key={d.documentId} className="rounded-card border border-line-200 p-2.5">
               <div className="flex flex-wrap items-start justify-between gap-2">
-                <p className="flex min-w-0 items-baseline gap-1.5 text-body">
+                <button
+                  type="button"
+                  onClick={() => setLeyendoDoc(d.documentId)}
+                  className="flex min-w-0 items-baseline gap-1.5 text-left text-body"
+                  title="Leer lo que quedó indexado de este documento"
+                >
                   <FileText className="h-3.5 w-3.5 shrink-0 text-ink-500" />
-                  <span className="[overflow-wrap:anywhere]">{d.titulo}</span>
-                </p>
+                  <span className="underline decoration-line-200 underline-offset-2 [overflow-wrap:anywhere]">
+                    {d.titulo}
+                  </span>
+                </button>
                 {selectorDeDestino(d)}
               </div>
               {/*
@@ -412,6 +429,11 @@ export const CarpetasDelExpediente: React.FC<{
       )}
 
       <ConfirmarDialog confirmacion={confirmacion} onCerrar={() => setConfirmacion(null)} />
+      <LeerDocumentoIndexado
+        expedienteId={expediente.id}
+        documentId={leyendoDoc}
+        onCerrar={() => setLeyendoDoc(null)}
+      />
     </section>
   );
 };

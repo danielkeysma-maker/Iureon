@@ -13,7 +13,12 @@ import {
   obtenerExpediente
 } from './expedientes.service';
 import { TIPOS_DE_PIEZA, type DatosDeActor, type TipoDePieza } from './types';
-import { candidatosDeLaFirma, documentosDelExpediente, quitarDocumento } from './candidatos.service';
+import {
+  candidatosDeLaFirma,
+  documentosDelExpediente,
+  quitarDocumento,
+  textoDelDocumentoIndexado
+} from './candidatos.service';
 import { vectorSearchService } from '../search/vectorSearch.service';
 import {
   borrarCarpeta,
@@ -276,6 +281,27 @@ export const documentosDelExpedienteController = async (req: Request, res: Respo
     res.json({ success: true, documentos: await documentosDelExpediente(firmId, expediente.id) });
   } catch (err) {
     fallar(res, err, 'No se pudieron cargar los documentos del expediente.');
+  }
+};
+
+/**
+ * GET /api/expedientes/:id/documentos/:documentId/texto
+ *
+ * El texto del documento indexado, para poder LEERLO. No es el PDF: el archivo
+ * nunca sale del navegador, asi que no hay original que previsualizar — lo que
+ * se devuelve es lo que la aplicacion guardo, que es tambien lo que ven la
+ * busqueda y el interrogatorio.
+ */
+export const textoDelDocumentoController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const firmId = req.firmId as string;
+    await exigirModulo(firmId, 'EXPEDIENTES');
+    /* Comprueba de paso que el expediente sea de la firma. */
+    const expediente = await obtenerExpediente(firmId, String(req.params.id));
+    const documento = await textoDelDocumentoIndexado(firmId, expediente.id, String(req.params.documentId));
+    res.json({ success: true, documento });
+  } catch (err) {
+    fallar(res, err, 'No se pudo leer el documento.');
   }
 };
 

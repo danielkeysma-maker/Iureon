@@ -5,6 +5,7 @@ import {
   textoDelArchivo
 } from '../../workspace/services/textoDelArchivo';
 import { expedientesApi, type DocumentoIndexado } from '../services/expedientes.api';
+import { LeerDocumentoIndexado } from './LeerDocumentoIndexado';
 import type { ExpedienteConDetalle } from '../types';
 
 /**
@@ -63,6 +64,12 @@ export const IndexarEnExpediente: React.FC<{
    */
   const [documentos, setDocumentos] = React.useState<DocumentoIndexado[]>([]);
   const [quitando, setQuitando] = React.useState<string | null>(null);
+  /*
+   * EL DOCUMENTO ABIERTO PARA LEERLO. Antes la fila no hacia nada al pulsarla:
+   * el abogado veia «56 fragmentos buscables» y tenia que creer que ahi dentro
+   * estaba lo suyo. Es la pregunta que se hace cuando una busqueda falla.
+   */
+  const [leyendoDoc, setLeyendoDoc] = React.useState<string | null>(null);
 
   const cargarDocumentos = React.useCallback(async () => {
     try {
@@ -160,16 +167,23 @@ export const IndexarEnExpediente: React.FC<{
               key={d.documentId}
               className="flex items-start justify-between gap-2 rounded-card border border-line-200 p-2.5"
             >
-              <div className="min-w-0">
+              <button
+                type="button"
+                onClick={() => setLeyendoDoc(d.documentId)}
+                className="min-w-0 text-left"
+                title="Leer lo que quedó indexado de este documento"
+              >
                 <p className="flex items-baseline gap-1.5 text-body">
                   <FileText className="h-3.5 w-3.5 shrink-0 text-ink-500" />
-                  <span className="font-medium [overflow-wrap:anywhere]">{d.titulo}</span>
+                  <span className="font-medium underline decoration-line-200 underline-offset-2 [overflow-wrap:anywhere]">
+                    {d.titulo}
+                  </span>
                 </p>
                 <p className="mt-0.5 text-meta text-ink-500">
                   {d.fragmentos.toLocaleString('es-CO')} fragmentos buscables
                   {d.indexadoEl ? ` · ${d.indexadoEl.slice(0, 10)}` : ''}
                 </p>
-              </div>
+              </button>
               <button
                 type="button"
                 onClick={() => void quitar(d.documentId)}
@@ -268,6 +282,11 @@ export const IndexarEnExpediente: React.FC<{
           )}
         </div>
       )}
+      <LeerDocumentoIndexado
+        expedienteId={expediente.id}
+        documentId={leyendoDoc}
+        onCerrar={() => setLeyendoDoc(null)}
+      />
     </section>
   );
 };

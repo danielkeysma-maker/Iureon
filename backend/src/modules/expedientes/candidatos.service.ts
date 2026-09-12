@@ -1,4 +1,5 @@
 import { supabase } from '../../config/supabase.config';
+import { textoDesdeFragmentos, type FragmentoGuardado } from './textoIndexado';
 import { ExpedienteError } from './expedientes.service';
 import type { TipoDePieza } from './types';
 
@@ -281,4 +282,60 @@ export const quitarDocumento = async (
 
   await db().from('legal_documents').delete().eq('firm_id', firmId).eq('id', documentId);
   return quitados;
+};
+
+
+/**
+ * EL TEXTO DE UN DOCUMENTO INDEXADO, PARA PODER LEERLO.
+ *
+ * Un documento se podia listar y no abrir: la pantalla decia «56 fragmentos
+ * buscables» y al pulsarlo no pasaba nada, asi que el abogado tenia que
+ * creerle a la aplicacion que ahi dentro estaba lo que subio.
+ *
+ * NO ES EL PDF: el archivo nunca sale del navegador —se lee alli y solo viaja
+ * su texto—, de modo que no hay copia del original en el servidor y no hay
+ * nada que previsualizar. Lo que se devuelve es el texto guardado, que ademas
+ * es EXACTAMENTE lo que ven la busqueda y el interrogatorio. Para la pregunta
+ * que se hace de verdad —«¿de verdad quedo esto adentro?»— esa es la respuesta
+ * correcta, no una copia bonita.
+ *
+ * Se filtra por firma Y por expediente: el `document_id` llega de la URL, y
+ * sin las dos condiciones bastaria con acertar un id para leer el documento de
+ * otro caso, o de otra firma.
+ */
+export const textoDelDocumentoIndexado = async (
+  firmId: string,
+  expedienteId: string,
+  documentId: string
+): Promise<{ titulo: string; texto: string; fragmentos: number }> => {
+  const { data, error } = await db()
+    .from('document_embeddings')
+    .select('chunk_index, content_chunk')
+    .eq('firm_id', firmId)
+    .eq('expediente_id', expedienteId)
+    .eq('document_id', documentId)
+    .order('chunk_index', { ascending: true });
+
+  if (error) {
+    console.error('[EXPEDIENTES] No se pudo leer el documento:', error.message);
+    throw new ExpedienteError('DOC_READ_FAILED', 'No se pudo leer el documento.', 502);
+  }
+
+  const fragmentos = (data ?? []) as FragmentoGuardado[];
+  if (fragmentos.length === 0) {
+    throw new ExpedienteError('DOC_NOT_FOUND', 'Ese documento no esta en este expediente.', 404);
+  }
+
+  const { data: fila } = await db()
+    .from('legal_documents')
+    .select('title')
+    .eq('firm_id', firmId)
+    .eq('id', documentId)
+    .maybeSingle();
+
+  return {
+    titulo: (fila as { title: string } | null)?.title ?? `Documento ${documentId}`,
+    texto: textoDesdeFragmentos(fragmentos),
+    fragmentos: fragmentos.length
+  };
 };
