@@ -189,11 +189,14 @@ export const expedientesApi = {
    * el texto, o se indexo antes de que se guardara el original—. La pantalla
    * dice cual de las dos cosas pasa en vez de ofrecer un boton muerto.
    */
-  async enlaceAlOriginal(expedienteId: string, documentId: string): Promise<string | null> {
-    const data = await httpClient.get<Respuesta & { url: string | null }>(
-      `/api/expedientes/${expedienteId}/documentos/${documentId}/original`
-    );
-    return revisar(data, 'No se pudo abrir el documento original.').url;
+  async enlaceAlOriginal(
+    expedienteId: string,
+    documentId: string
+  ): Promise<{ url: string; nombre: string; tipo: string } | null> {
+    const data = await httpClient.get<
+      Respuesta & { original: { url: string; nombre: string; tipo: string } | null }
+    >(`/api/expedientes/${expedienteId}/documentos/${documentId}/original`);
+    return revisar(data, 'No se pudo abrir el documento original.').original;
   },
 
   async documentos(expedienteId: string): Promise<DocumentoIndexado[]> {

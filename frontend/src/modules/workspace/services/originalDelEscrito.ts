@@ -77,7 +77,17 @@ export type FuenteDelOriginal =
   /** El archivo que el abogado acaba de elegir: está en memoria, no hace falta red. */
   | { de: 'sesion'; file: File }
   /** Hay que preguntarle al servidor dónde está. */
-  | { de: 'servidor'; revisionId: string };
+  | { de: 'servidor'; revisionId: string }
+  /**
+   * UN ENLACE FIRMADO QUE YA SE TIENE, para quien no es una revisión.
+   *
+   * El expediente guarda sus documentos igual que la revisión guarda el
+   * escrito, pero no tiene `revisionId` y su endpoint es otro. Sin esta
+   * variante, Expedientes habría necesitado su propia descarga y su propia
+   * detección de clase — dos copias de lo mismo que se separan a la primera
+   * corrección, que es como este archivo llegó a existir.
+   */
+  | { de: 'enlace'; url: string; nombre: string; tipo: string };
 
 export type EstadoDelOriginal =
   | { hay: true; original: OriginalCargado }
@@ -122,6 +132,20 @@ export const cargarOriginal = async (fuente: FuenteDelOriginal, onProgreso?: (po
         bytes,
         clase: claseDelOriginal(fuente.file.type, fuente.file.name),
         conservado: false
+      }
+    };
+  }
+
+  if (fuente.de === 'enlace') {
+    const bytes = await descargarOriginal(fuente.url, onProgreso);
+    return {
+      hay: true,
+      original: {
+        nombre: fuente.nombre,
+        tipo: fuente.tipo,
+        bytes,
+        clase: claseDelOriginal(fuente.tipo, fuente.nombre),
+        conservado: true
       }
     };
   }

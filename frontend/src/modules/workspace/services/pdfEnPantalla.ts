@@ -41,6 +41,32 @@ export interface DocumentoPdf {
   cerrar: () => void;
 }
 
+/**
+ * LA CSS DE LA CAPA DE TEXTO, QUE ES CONTRATO DE PDF.JS Y NO DECORACIÓN.
+ *
+ * pdf.js coloca cada renglón con variables CSS que escribe en el `<span>`; sin
+ * estas reglas los renglones caen fuera de sitio y, peor, VISIBLES encima del
+ * lienzo: el documento se ve con su texto duplicado y descuadrado. No falla,
+ * no avisa, y parece que el visor está roto.
+ *
+ * Vivía dentro del visor del taller. Al abrir un segundo visor —el del
+ * expediente— habría habido dos copias, y la primera corrección las habría
+ * separado. Ahora vive junto a la función que crea la capa, que es de donde
+ * viene el contrato: quien pinte un PDF importa las dos cosas o ninguna.
+ *
+ * Van planas, sin anidar: el postcss de este proyecto no lleva anidamiento.
+ */
+export const CSS_DE_LA_CAPA_DE_TEXTO = `
+.textLayer{position:absolute;inset:0;overflow:clip;line-height:1;text-align:initial;opacity:1;
+  -webkit-text-size-adjust:none;text-size-adjust:none;forced-color-adjust:none;transform-origin:0 0;z-index:0;
+  --min-font-size:1;--text-scale-factor:calc(var(--total-scale-factor) * var(--min-font-size));--min-font-size-inv:calc(1 / var(--min-font-size));}
+.textLayer span,.textLayer br{color:transparent;position:absolute;white-space:pre;cursor:text;transform-origin:0% 0%;-webkit-user-select:text;user-select:text;}
+.textLayer > :not(.markedContent),.textLayer .markedContent span:not(.markedContent){z-index:1;--font-height:0;
+  font-size:calc(var(--text-scale-factor) * var(--font-height));--scale-x:1;--rotate:0deg;
+  transform:rotate(var(--rotate)) scaleX(var(--scale-x)) scale(var(--min-font-size-inv));}
+.textLayer .markedContent{display:contents;}
+`;
+
 /** Más de esto no mejora nada en pantalla y multiplica la memoria del lienzo. */
 const MAX_DPR = 2;
 

@@ -329,11 +329,19 @@ export const borrarOriginales = async (firmId: string, documentIds: readonly str
  * URL, y una URL firmada es acceso directo al objeto — entregarla sin
  * comprobar de quién es sería peor que devolver la fila.
  */
+export interface OriginalDelExpediente {
+  url: string;
+  /** Con qué nombre se guardó: el visor decide por él cuando el tipo calla. */
+  nombre: string;
+  /** MIME real, guardado al indexar. Decide si se pinta una página o un HTML. */
+  tipo: string;
+}
+
 export const enlaceAlOriginal = async (
   firmId: string,
   expedienteId: string,
   documentId: string
-): Promise<string | null> => {
+): Promise<OriginalDelExpediente | null> => {
   /* Que el documento sea DE ESTE expediente: lo dicen sus fragmentos. */
   const { data: pertenece } = await db()
     .from('document_embeddings')
@@ -347,15 +355,26 @@ export const enlaceAlOriginal = async (
 
   const { data: fila } = await db()
     .from('legal_documents')
-    .select('b2_file_url')
+    .select('b2_file_url, title, mime_type')
     .eq('firm_id', firmId)
     .eq('id', documentId)
     .maybeSingle();
 
-  const clave = ((fila as { b2_file_url: string | null } | null)?.b2_file_url ?? '').trim();
+  const doc = fila as { b2_file_url: string | null; title: string; mime_type: string | null } | null;
+  const clave = (doc?.b2_file_url ?? '').trim();
   if (!clave) return null;
 
-  return almacen().generateDownloadPresignedUrl(firmId, clave);
+  return {
+    url: await almacen().generateDownloadPresignedUrl(firmId, clave),
+    /*
+     * EL NOMBRE DEL ARCHIVO, no el título del documento: la clave de B2 acaba
+     * en el nombre con que se subió, y de ahí sale la extensión. El visor la
+     * usa cuando el tipo calla, y un título sin extensión lo dejaría sin saber
+     * qué está abriendo.
+     */
+    nombre: clave.split('/').pop() || doc?.title || 'documento',
+    tipo: (doc?.mime_type ?? '').trim() || 'application/octet-stream'
+  };
 };
 
 

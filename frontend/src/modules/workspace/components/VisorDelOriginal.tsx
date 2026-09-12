@@ -12,7 +12,7 @@ import {
   type FuenteDelOriginal,
   type OriginalCargado
 } from '../services/originalDelEscrito';
-import { abrirPdf, type DocumentoPdf } from '../services/pdfEnPantalla';
+import { CSS_DE_LA_CAPA_DE_TEXTO, abrirPdf, type DocumentoPdf } from '../services/pdfEnPantalla';
 import { borrarCapas, hayResaltadoNativo, pintarCapas, type CapaDeResaltado } from '../services/resaltadoNativo';
 
 /**
@@ -159,7 +159,10 @@ export const VisorDelOriginal: React.FC<VisorDelOriginalProps> = ({
     ? ''
     : fuente.de === 'sesion'
       ? `sesion:${fuente.file.name}:${fuente.file.size}:${fuente.file.lastModified}`
-      : `servidor:${fuente.revisionId}`;
+      : fuente.de === 'servidor'
+        ? `servidor:${fuente.revisionId}`
+        : /* El taller no usa esta variante, pero la clave tiene que existir igual. */
+          `enlace:${fuente.nombre}`;
 
   React.useEffect(() => {
     const actual = fuenteVigente.current;
@@ -587,9 +590,10 @@ export const VisorDelOriginal: React.FC<VisorDelOriginalProps> = ({
  *
  * Tres cosas viven aquí y no en Tailwind, cada una por su razón:
  *
- *  1. `.textLayer` es el contrato de pdf.js: sus renglones se colocan con
- *     variables CSS que la librería escribe en cada `<span>`. Se copian planas
- *     —sin anidar— porque el postcss de este proyecto no lleva anidamiento.
+ *  1. `.textLayer` es el contrato de pdf.js y ya NO vive aquí: se movió a
+ *     `pdfEnPantalla.ts`, junto a la función que crea la capa, cuando abrió un
+ *     segundo visor —el del expediente— y dos copias se habrían separado a la
+ *     primera corrección.
  *  2. `::highlight(...)` es la única forma de pintar un rango sin tocar el
  *     documento, y solo admite color, fondo y decoración de texto.
  *  3. El HTML de un Word llega sin estilo y el `preflight` de Tailwind deja los
@@ -597,14 +601,7 @@ export const VisorDelOriginal: React.FC<VisorDelOriginalProps> = ({
  *     mínima para que un escrito se lea como un escrito.
  */
 const ESTILOS = `
-.textLayer{position:absolute;inset:0;overflow:clip;line-height:1;text-align:initial;opacity:1;
-  -webkit-text-size-adjust:none;text-size-adjust:none;forced-color-adjust:none;transform-origin:0 0;z-index:0;
-  --min-font-size:1;--text-scale-factor:calc(var(--total-scale-factor) * var(--min-font-size));--min-font-size-inv:calc(1 / var(--min-font-size));}
-.textLayer span,.textLayer br{color:transparent;position:absolute;white-space:pre;cursor:text;transform-origin:0% 0%;-webkit-user-select:text;user-select:text;}
-.textLayer > :not(.markedContent),.textLayer .markedContent span:not(.markedContent){z-index:1;--font-height:0;
-  font-size:calc(var(--text-scale-factor) * var(--font-height));--scale-x:1;--rotate:0deg;
-  transform:rotate(var(--rotate)) scaleX(var(--scale-x)) scale(var(--min-font-size-inv));}
-.textLayer .markedContent{display:contents;}
+${CSS_DE_LA_CAPA_DE_TEXTO}
 
 ::highlight(iureon-original-amarillo){background-color:rgb(253 224 71 / .55);}
 ::highlight(iureon-original-verde){background-color:rgb(134 239 172 / .55);}

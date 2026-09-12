@@ -2,6 +2,7 @@ import React from 'react';
 import { AlertTriangle, Download, Loader2 } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import { expedientesApi } from '../services/expedientes.api';
+import { OriginalDelExpediente } from './OriginalDelExpediente';
 
 /**
  * LEER UN DOCUMENTO INDEXADO.
@@ -45,7 +46,15 @@ export const LeerDocumentoIndexado: React.FC<{
    * Se distingue de «todavía no lo he pedido» para no ofrecer un botón muerto
    * ni esconderlo mientras carga.
    */
-  const [original, setOriginal] = React.useState<{ url: string | null } | null>(null);
+  const [original, setOriginal] = React.useState<{
+    dato: { url: string; nombre: string; tipo: string } | null;
+  } | null>(null);
+  /*
+   * QUE SE VE PRIMERO. El original, cuando lo hay: es el documento del
+   * abogado. El texto extraido es lo que ve el MOTOR, y esa es otra pregunta
+   * —util, pero segunda—. Sin archivo guardado solo queda el texto.
+   */
+  const [vista, setVista] = React.useState<'original' | 'texto'>('original');
 
   React.useEffect(() => {
     if (!documentId) {
@@ -58,14 +67,20 @@ export const LeerDocumentoIndexado: React.FC<{
     setError('');
     setDoc(null);
     setOriginal(null);
+    setVista('original');
     expedientesApi
       .enlaceAlOriginal(expedienteId, documentId)
-      .then((url) => {
-        if (vivo) setOriginal({ url });
+      .then((dato) => {
+        if (!vivo) return;
+        setOriginal({ dato });
+        /* Sin archivo guardado no hay pestaña que escoger: se cae al texto. */
+        if (!dato) setVista('texto');
       })
       .catch(() => {
-        /* El texto se lee igual: el original es un extra, no la pantalla. */
-        if (vivo) setOriginal({ url: null });
+        if (vivo) {
+          setOriginal({ dato: null });
+          setVista('texto');
+        }
       });
     expedientesApi
       .textoDelDocumento(expedienteId, documentId)
@@ -121,44 +136,69 @@ export const LeerDocumentoIndexado: React.FC<{
             tiene, que es otra cosa y es la que importa aquí.
           */}
           {/*
-            SE DICE QUÉ ES ESTO, Y AHORA HAY DOS RESPUESTAS DISTINTAS.
+            DOS PESTANAS, Y NO SON DOS PINTURAS DE LO MISMO.
 
-            Con el archivo guardado, el botón lo abre tal cual: es el documento
-            del abogado, con su diagramación. Sin él, no hay original que abrir
-            y decirlo es lo único honesto — ofrecer un botón que no descarga
-            nada sería peor que no ofrecerlo.
+            «El documento» es el archivo tal como se subio: es lo que el
+            abogado reconoce y lo que veria el juez. «El texto indexado» es lo
+            que la aplicacion guardo — sin sangrias ni saltos— y es
+            EXACTAMENTE lo que leen la busqueda y el interrogatorio.
+
+            La segunda existe porque contesta una pregunta que la primera no
+            puede: «¿por que la busqueda no encontro esto?». Mirar el PDF no lo
+            dice; mirar lo indexado, si.
           */}
-          <div className="mb-3 flex flex-wrap items-start justify-between gap-2 rounded-card border border-line-200 bg-canvas px-3 py-2">
-            <p className="min-w-0 flex-1 text-meta text-ink-500 text-justify [text-wrap:pretty]">
-              Lo de abajo es el texto que la aplicación guardó —sin sangrías ni saltos de página— y es
-              exactamente lo que leen la búsqueda y el interrogatorio.
-              {original && original.url === null
-                ? ' De este documento no se guardó el archivo: se indexó pegando el texto, o antes de que el expediente los conservara.'
-                : ''}
-            </p>
-            {original?.url && (
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <div className="flex overflow-hidden rounded-control border border-line-200">
+              {(['original', 'texto'] as const)
+                .filter((v) => v !== 'original' || Boolean(original?.dato))
+                .map((v) => (
+                  <button
+                    key={v}
+                    type="button"
+                    onClick={() => setVista(v)}
+                    className={`px-3 py-1 text-[12px] ${
+                      vista === v ? 'bg-brand-50 font-semibold text-brand-700' : 'text-ink-700 hover:text-ink-900'
+                    }`}
+                  >
+                    {v === 'original' ? 'El documento' : 'El texto indexado'}
+                  </button>
+                ))}
+            </div>
+            {original?.dato && (
               <a
-                href={original.url}
+                href={original.dato.url}
                 target="_blank"
                 rel="noreferrer"
-                className="btn-secondary btn-sm shrink-0 gap-1.5"
+                className="btn-secondary btn-sm ml-auto gap-1.5"
               >
                 <Download className="h-3.5 w-3.5" />
-                Abrir el original
+                Descargar
               </a>
             )}
           </div>
+
+          {original && original.dato === null && (
+            <p className="mb-3 rounded-card border border-line-200 bg-canvas px-3 py-2 text-meta text-ink-500 text-justify [text-wrap:pretty]">
+              De este documento no se guardó el archivo: se indexó pegando el texto, o antes de que el
+              expediente los conservara. Lo de abajo es el texto guardado, que es lo que leen la búsqueda y
+              el interrogatorio.
+            </p>
+          )}
+
+          {vista === 'original' && original?.dato && <OriginalDelExpediente fuente={original.dato} />}
 
           {/*
             En la tipografía del documento y con las líneas separadas: son
             varias páginas de prosa jurídica seguidas, y leerlas en la letra de
             interfaz cansa a los dos párrafos.
           */}
+          {vista === 'texto' && (
           <div className="max-h-[60vh] overflow-y-auto rounded-card border border-line-200 bg-paper p-4">
             <p className="whitespace-pre-wrap text-justify font-legal text-[13.5px] leading-[1.75] text-paper-ink [text-wrap:pretty] [overflow-wrap:anywhere]">
               {doc.texto}
             </p>
           </div>
+          )}
         </>
       )}
     </Dialog>

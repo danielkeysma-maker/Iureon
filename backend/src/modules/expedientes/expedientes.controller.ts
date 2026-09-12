@@ -319,8 +319,8 @@ export const originalDelDocumentoController = async (req: Request, res: Response
     const firmId = req.firmId as string;
     await exigirModulo(firmId, 'EXPEDIENTES');
     const expediente = await obtenerExpediente(firmId, String(req.params.id));
-    const url = await enlaceAlOriginal(firmId, expediente.id, String(req.params.documentId));
-    res.json({ success: true, url });
+    const original = await enlaceAlOriginal(firmId, expediente.id, String(req.params.documentId));
+    res.json({ success: true, original });
   } catch (err) {
     fallar(res, err, 'No se pudo abrir el documento original.');
   }
