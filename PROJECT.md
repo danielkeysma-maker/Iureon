@@ -21,10 +21,11 @@ Iureon es la plataforma B2B SaaS de Inteligencia Artificial y Ecosistema Judicia
 - **Despliegue Obligatorio vía Git**: Todo cambio realizado en la plataforma debe empaquetarse y desplegarse inmediatamente a producción usando Git (`git add .`, `git commit`, `git push origin main`).
 
 ### 2. Modelo Económico de Créditos
-- **Sin suscripciones**: Modelo pay-as-you-go con recarga de créditos en COP $.
+- **DOS COBROS DISTINTOS, y cada uno paga una cosa distinta.** El PLAN paga el ACCESO (módulos y puestos), mensual o anual — Esencial $85.000/$850.000 · 1 usuario, Premium $120.000/$1.200.000 · 5, Firma $250.000/$2.500.000 · 15; el anual son DIEZ meses, no doce, y esa proporción tiene su comprobación. El SALDO paga el CONSUMO, y **el plan no incluye créditos**: el pago de un plan viaja con propósito `SUSCRIPCION` para extender la suscripción EN VEZ DE acreditar saldo (`planCheckout.service.ts`). La fuente es `subscriptions/plan.catalog.ts`, no esta línea.
+  - *Esta viñeta decía «sin suscripciones: modelo pay-as-you-go» y llevaba desde el 31 de julio de 2026 sin tocarse. Los planes entraron después, así que el documento seguía anunciando un modelo que la aplicación ya no tenía — y le costó a un colaborador un trabajo bloqueado antes de que alguien lo notara.*
 - **Costo por borrador**: $2.000 COP por cada generación de documento con IA. Se descuenta automáticamente del saldo.
 - **Saldo en tiempo real**: `SidebarLeft.tsx` muestra el saldo actual de la firma sin fallbacks ficticios (`?? 0` en vez de `|| 500000`).
-- **Recarga**: `FirmCreditsRechargeModal.tsx` (integración futura con Wompi / PSE / Nequi / Tarjeta).
+- **Recarga**: VIVA, no futura. `billing/components/BalancePanel.tsx` con `billing/wompiCheckout.ts` en el frontend, y el módulo `billing/wompi` en el backend (`wompi.service.ts` decide el precio desde el catálogo y nunca lo lee del cuerpo: un navegador que nombra su propio precio no es un sistema de pago). La suscripción se compra desde `subscriptions/components/FirmSubscriptionModal.tsx`. El `FirmCreditsRechargeModal.tsx` que nombraba esta línea ya no existe.
 - **Persistencia**: El saldo se actualiza en React state y localStorage por firma.
 
 ### 3. Pipeline de Inteligencia Artificial (OpenRouter API) — 3 Motores
