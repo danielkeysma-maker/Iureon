@@ -1,3 +1,5 @@
+import type { User } from '@supabase/supabase-js';
+import type { supabase } from '../../../config/supabase.config';
 import { createFirm } from '../../admin/admin.service';
 import { signIn, type Session } from '../auth.service';
 
@@ -37,3 +39,118 @@ export const crearFirmaConSesion = async (input: {
  */
 export const clavePrueba = (): string =>
   `pr-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+
+type ClienteSupabase = NonNullable<typeof supabase>;
+
+/** Supabase no admite paginas mayores; con este tamano una base pequena cabe en una sola. */
+const USUARIOS_POR_PAGINA = 1000;
+
+/**
+ * Recorre TODAS las paginas de `listUsers`, y dice si alguna no se pudo leer.
+ *
+ * `listUsers()` sin argumentos devuelve SOLO LA PRIMERA PAGINA, de 50 usuarios.
+ * Los checks lo llamaban asi para buscar sus propias cuentas, de modo que con
+ * mas de 50 usuarios en la base las cuentas de prueba que cayeran en la pagina
+ * dos no se veian — ni para borrarlas ni para comprobar nada sobre ellas — y
+ * nadie se enteraba. Y un error al listar no es una base sin usuarios: tratarlo
+ * como lista vacia es declarar limpio lo que nunca se miro.
+ */
+const listarTodosLosUsuarios = async (
+  c: ClienteSupabase
+): Promise<{ usuarios: User[]; falla: string | null }> => {
+  const usuarios: User[] = [];
+  for (let page = 1; ; page++) {
+    const { data, error } = await c.auth.admin.listUsers({ page, perPage: USUARIOS_POR_PAGINA });
+    if (error) return { usuarios, falla: `listUsers (pagina ${page}): ${error.message}` };
+    usuarios.push(...data.users);
+    if (data.users.length < USUARIOS_POR_PAGINA) return { usuarios, falla: null };
+  }
+};
+
+/** Busca una cuenta por correo exacto en todas las paginas. Un error al listar se lanza: no es «no existe». */
+export const buscarUsuarioPorCorreo = async (c: ClienteSupabase, correo: string): Promise<User | undefined> => {
+  const { usuarios, falla } = await listarTodosLosUsuarios(c);
+  if (falla) throw new Error(falla);
+  return usuarios.find((u) => u.email === correo);
+};
+
+/**
+ * Borra las cuentas de prueba de UNA corrida y devuelve lo que no se pudo borrar.
+ *
+ * ─── POR QUE EXISTE ─────────────────────────────────────────────────────────
+ *
+ * Cada check que crea cuentas las borraba con su propio bucle, y los cinco
+ * bucles tenian los mismos dos defectos:
+ *
+ * 1. No paginaban (ver `listarTodosLosUsuarios`).
+ * 2. IGNORABAN EL RESULTADO DE `deleteUser`. Esta medido: en la base de
+ *    produccion quedo `fb1789069190749@iureon.test`, de `check:billing`, del
+ *    10 de septiembre de 2026. La limpieza borro su firma y borro la cuenta de
+ *    la firma A; la de B no se borro, y el check termino en verde sin decir
+ *    nada. Una limpieza que no mira si funciono no es una limpieza.
+ *
+ * Ademas se exigen DOS condiciones para borrar: que el correo termine en
+ * `@iureon.test` y que contenga la marca de la corrida. Casar solo por la marca
+ * —un numero— podia alcanzar a cualquier cuenta cuyo correo contuviera esos
+ * digitos; este helper borra cuentas en la base del usuario, y no puede tocar
+ * una que no sea de prueba.
+ *
+ * Nunca lanza: devuelve la lista de fallas (vacia = limpio), para que quien lo
+ * llame siga borrando lo demas y haga FALLAR el check si algo quedo.
+ */
+export const borrarUsuariosDePrueba = async (c: ClienteSupabase, marca: string | number): Promise<string[]> => {
+  const texto = String(marca);
+  if (texto.length === 0) return ['marca vacia: se habria borrado toda cuenta @iureon.test, no se borro nada'];
+
+  const fallas: string[] = [];
+  try {
+    const { usuarios, falla } = await listarTodosLosUsuarios(c);
+    if (falla) fallas.push(falla);
+
+    const deEstaCorrida = usuarios.filter((u) => {
+      const correo = u.email?.toLowerCase() ?? '';
+      return correo.endsWith('@iureon.test') && correo.includes(texto);
+    });
+
+    for (const u of deEstaCorrida) {
+      const { error } = await c.auth.admin.deleteUser(u.id);
+      if (error) fallas.push(`deleteUser ${u.email} (${u.id}): ${error.message}`);
+    }
+  } catch (err) {
+    fallas.push(`borrado de cuentas de prueba: ${(err as Error).message}`);
+  }
+  return fallas;
+};
+
+/**
+ * Ejecuta un borrado de filas y anota su error, en vez de descartarlo.
+ *
+ * Mismo defecto que `deleteUser`: `await c.from(...).delete()` NO LANZA cuando
+ * falla, devuelve `{ error }`, y los checks nunca lo leian. Tampoco lanza este
+ * helper, para que un borrado fallido no impida intentar los siguientes.
+ */
+export const borrarYAnotar = async (
+  fallas: string[],
+  etiqueta: string,
+  consulta: PromiseLike<{ error: { message: string } | null }>
+): Promise<void> => {
+  try {
+    const { error } = await consulta;
+    if (error) fallas.push(`${etiqueta}: ${error.message}`);
+  } catch (err) {
+    fallas.push(`${etiqueta}: ${(err as Error).message}`);
+  }
+};
+
+/**
+ * Imprime, bien visible, lo que la limpieza no pudo borrar, y devuelve cuantas
+ * fallas hubo para sumarlas a las del check.
+ *
+ * UN CHECK QUE DEJA DATOS EN LA BASE DEL USUARIO NO ES UN CHECK QUE PASA.
+ */
+export const informarLimpieza = (fallas: string[]): number => {
+  if (fallas.length === 0) return 0;
+  console.error('\n!!! LA LIMPIEZA FALLO: QUEDARON DATOS DE PRUEBA EN LA BASE !!!');
+  for (const f of fallas) console.error(`FAIL limpieza — ${f}`);
+  return fallas.length;
+};

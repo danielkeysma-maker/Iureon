@@ -51,8 +51,11 @@ const CON_RED = new Set(['csj', 'consejo', 'discovery', 'ruling', 'triage', 'ret
  * Ahora esta escrita, y el ejecutor la conoce en vez de depender de que
  * alguien recuerde no ponerlos en una lista.
  *
- * SE SIGUEN CORRIENDO EN LOCAL con `npm test` o `test:todos`, que es donde
- * hay una base a la que se le puede escribir sin que le importe a nadie.
+ * Y EN LOCAL TAMPOCO HAY UNA BASE DESECHABLE. El entorno local apunta a la
+ * base de PRODUCCION: `npm test` o `test:todos` corren estos seis contra los
+ * datos reales de los clientes, y asi fue exactamente como aparecieron alli
+ * las filas y las cuentas `@iureon.test`. Mientras no exista una base de
+ * pruebas separada, correrlos es escribir en produccion.
  */
 const CON_BASE = new Set(['admin', 'billing', 'clients', 'auth', 'stored', 'names']);
 

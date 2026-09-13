@@ -16,7 +16,14 @@ import { authPublicRoutes, authRoutes } from '../../auth/auth.routes';
 import { adminRoutes } from '../admin.routes';
 import { transcriptionRoutes } from '../../transcription/transcription.routes';
 import { auditRoutes } from '../../audit/audit.routes';
-import { clavePrueba, crearFirmaConSesion } from '../../auth/__checks__/helpers';
+import {
+  borrarUsuariosDePrueba,
+  borrarYAnotar,
+  buscarUsuarioPorCorreo,
+  clavePrueba,
+  crearFirmaConSesion,
+  informarLimpieza
+} from '../../auth/__checks__/helpers';
 
 const app = express();
 app.use(express.json());
@@ -58,297 +65,310 @@ const PRIVILEGIADO = 'material privilegiado';
   const correoOperador = `op${m}@iureon.test`;
   const claveOperador = clavePrueba();
 
-  const op = await crearFirmaConSesion({
-    firmName: `Operador ${m}`,
-    nit: `970${m}`,
-    email: correoOperador,
-    password: claveOperador
-  });
-  const cliente = await crearFirmaConSesion({
-    firmName: `Cliente ${m}`,
-    nit: `971${m}`,
-    email: `cl${m}@iureon.test`,
-    password: clavePrueba()
-  });
-
-  await c.from('transcriptions').insert({
-    firm_id: cliente.user.firmId,
-    user_email: cliente.user.email,
-    kind: 'AUDIENCIA',
-    title: RESERVADA,
-    source_file_name: 'x.mp3',
-    full_text: PRIVILEGIADO,
-    segments: [],
-    speaker_labels: [],
-    model: 'x',
-    transcribed_at: new Date().toISOString()
-  });
-
-  // ─── Sin el rol, la consola no existe para nadie ──────────────────────────
-  const antes = await pedir('/admin/firms', op.accessToken);
-  check('un administrador de firma no entra a la consola', antes.status === 403, String(antes.status));
-
-  const conCliente = await pedir('/admin/firms', cliente.accessToken);
-  check('un cliente tampoco entra', conCliente.status === 403, String(conCliente.status));
-
   /*
-   * Y la consola no puede estorbar al resto de la aplicación.
-   *
-   * `router.use(guard)` corre para TODA petición que entra al router, no solo
-   * las que casan con una de sus rutas: montado en /api, este guardia respondía
-   * 403 a cualquier abogado en cualquier endpoint. La pantalla de auditoría se
-   * quedó en blanco en esta misma prueba, y eso resultó significar exactamente
-   * eso.
+   * LA LIMPIEZA VA EN UN `finally`. Antes corria al final del cuerpo: una
+   * excepcion a mitad del check la saltaba y dejaba en la base de PRODUCCION
+   * —la que apunta el entorno local— las firmas, las cuentas y la audiencia
+   * reservada de prueba. Cada firma, incluidas las dos sin NIT que crea la
+   * consola, se anota aqui en cuanto existe.
    */
-  const ajeno = await pedir('/transcription', cliente.accessToken);
-  check('la consola no bloquea el resto de la API', ajeno.status === 200, String(ajeno.status));
+  const firmasCreadas: string[] = [];
+  try {
+    const op = await crearFirmaConSesion({
+      firmName: `Operador ${m}`,
+      nit: `970${m}`,
+      email: correoOperador,
+      password: claveOperador
+    });
+    firmasCreadas.push(op.user.firmId);
+    const cliente = await crearFirmaConSesion({
+      firmName: `Cliente ${m}`,
+      nit: `971${m}`,
+      email: `cl${m}@iureon.test`,
+      password: clavePrueba()
+    });
+    firmasCreadas.push(cliente.user.firmId);
 
-  // ─── Promoción, como la hace el script ────────────────────────────────────
-  const { data: usuarios } = await c.auth.admin.listUsers();
-  const cuentaOp = usuarios.users.find((u) => u.email === correoOperador)!;
-  await c.auth.admin.updateUserById(cuentaOp.id, {
-    app_metadata: { firm_id: op.user.firmId, role: 'SUPER_ADMIN' }
-  });
+    await c.from('transcriptions').insert({
+      firm_id: cliente.user.firmId,
+      user_email: cliente.user.email,
+      kind: 'AUDIENCIA',
+      title: RESERVADA,
+      source_file_name: 'x.mp3',
+      full_text: PRIVILEGIADO,
+      segments: [],
+      speaker_labels: [],
+      model: 'x',
+      transcribed_at: new Date().toISOString()
+    });
 
-  const relogin = await fetch(`${base}/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: correoOperador, password: claveOperador })
-  }).then((r) => r.json());
+    // ─── Sin el rol, la consola no existe para nadie ──────────────────────────
+    const antes = await pedir('/admin/firms', op.accessToken);
+    check('un administrador de firma no entra a la consola', antes.status === 403, String(antes.status));
 
-  const opToken: string = relogin.session.accessToken;
-  check('el rol viaja en el token nuevo', relogin.session.user.role === 'SUPER_ADMIN', relogin.session.user.role);
+    const conCliente = await pedir('/admin/firms', cliente.accessToken);
+    check('un cliente tampoco entra', conCliente.status === 403, String(conCliente.status));
 
-  // ─── Lo que SÍ puede: gestionar el negocio ────────────────────────────────
-  const listado = await pedir('/admin/firms', opToken);
-  const firmas = listado.body?.firms ?? [];
-  check('el operador ve todas las firmas', listado.status === 200 && firmas.length >= 2, `${listado.status} · ${firmas.length}`);
+    /*
+     * Y la consola no puede estorbar al resto de la aplicación.
+     *
+     * `router.use(guard)` corre para TODA petición que entra al router, no solo
+     * las que casan con una de sus rutas: montado en /api, este guardia respondía
+     * 403 a cualquier abogado en cualquier endpoint. La pantalla de auditoría se
+     * quedó en blanco en esta misma prueba, y eso resultó significar exactamente
+     * eso.
+     */
+    const ajeno = await pedir('/transcription', cliente.accessToken);
+    check('la consola no bloquea el resto de la API', ajeno.status === 200, String(ajeno.status));
 
-  const clienteEnLista = firmas.find((f: { id: string }) => f.id === cliente.user.firmId);
-  check(
-    've el VOLUMEN del cliente, nunca su contenido',
-    clienteEnLista?.transcriptions === 1 &&
-      !JSON.stringify(listado.body).includes(PRIVILEGIADO) &&
-      !JSON.stringify(listado.body).includes(RESERVADA),
-    `transcritos=${clienteEnLista?.transcriptions}`
-  );
+    // ─── Promoción, como la hace el script ────────────────────────────────────
+    const cuentaOp = (await buscarUsuarioPorCorreo(c, correoOperador))!;
+    await c.auth.admin.updateUserById(cuentaOp.id, {
+      app_metadata: { firm_id: op.user.firmId, role: 'SUPER_ADMIN' }
+    });
 
-  /*
-   * SIN MOTIVO NO HAY ACCION DE OPERACION.
-   *
-   * El artboard 7b lo exige — «cada accion exige un motivo escrito y queda en
-   * el registro que los socios de la firma tambien ven» — y esa es toda la
-   * garantia: un poder que cruza el limite del inquilino solo es aceptable si
-   * el inquilino puede leer que se hizo Y POR QUE.
-   */
-  /*
-   * SIN NIT TAMBIEN SE PUEDE. Hay litigantes —personas naturales— y despachos
-   * pequenos que no tienen NIT, y el alta los rechazaba con «se requieren el
-   * nombre y el NIT». El NIT es opcional; si viene, sigue siendo unico. Dos
-   * firmas sin NIT deben convivir: la columna es UNIQUE y Postgres admite
-   * varios NULL, pero no varios '' — asi que el servidor guarda NULL.
-   */
-  const sinNit1 = await pedir('/admin/firms', opToken, {
-    method: 'POST',
-    body: JSON.stringify({
-      firmName: `Litigante sin NIT ${m}`,
-      adminEmail: `sinnit1-${m}@iureon.test`,
-      adminPassword: clavePrueba()
-    })
-  });
-  check('una firma sin NIT se crea', sinNit1.status === 201, `${sinNit1.status} ${JSON.stringify(sinNit1.body)}`);
-  check('y su NIT queda vacio, no inventado', sinNit1.body?.firm?.nit === null, String(sinNit1.body?.firm?.nit));
+    const relogin = await fetch(`${base}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: correoOperador, password: claveOperador })
+    }).then((r) => r.json());
 
-  const sinNit2 = await pedir('/admin/firms', opToken, {
-    method: 'POST',
-    body: JSON.stringify({
-      firmName: `Otro litigante sin NIT ${m}`,
-      nit: '   ',
-      adminEmail: `sinnit2-${m}@iureon.test`,
-      adminPassword: clavePrueba()
-    })
-  });
-  check('una segunda firma sin NIT tambien (NULL, no cadena vacia)', sinNit2.status === 201, `${sinNit2.status} ${JSON.stringify(sinNit2.body)}`);
+    const opToken: string = relogin.session.accessToken;
+    check('el rol viaja en el token nuevo', relogin.session.user.role === 'SUPER_ADMIN', relogin.session.user.role);
 
-  const sinNombre = await pedir('/admin/firms', opToken, {
-    method: 'POST',
-    body: JSON.stringify({ firmName: '  ', adminEmail: `sinnombre-${m}@iureon.test`, adminPassword: clavePrueba() })
-  });
-  check('el nombre si sigue siendo obligatorio', sinNombre.status === 400, String(sinNombre.status));
+    // ─── Lo que SÍ puede: gestionar el negocio ────────────────────────────────
+    const listado = await pedir('/admin/firms', opToken);
+    const firmas = listado.body?.firms ?? [];
+    check('el operador ve todas las firmas', listado.status === 200 && firmas.length >= 2, `${listado.status} · ${firmas.length}`);
 
-  const sinMotivo = await pedir(`/admin/firms/${cliente.user.firmId}/credits`, opToken, {
-    method: 'POST',
-    body: JSON.stringify({ amount: 50000 })
-  });
-  check(
-    'una recarga sin motivo se rechaza',
-    sinMotivo.status === 400 && sinMotivo.body?.error === 'REASON_REQUIRED',
-    `${sinMotivo.status} · ${sinMotivo.body?.error}`
-  );
+    const clienteEnLista = firmas.find((f: { id: string }) => f.id === cliente.user.firmId);
+    check(
+      've el VOLUMEN del cliente, nunca su contenido',
+      clienteEnLista?.transcriptions === 1 &&
+        !JSON.stringify(listado.body).includes(PRIVILEGIADO) &&
+        !JSON.stringify(listado.body).includes(RESERVADA),
+      `transcritos=${clienteEnLista?.transcriptions}`
+    );
 
-  // Un motivo de relleno tampoco pasa: el minimo es que diga algo.
-  const motivoVacio = await pedir(`/admin/firms/${cliente.user.firmId}/credits`, opToken, {
-    method: 'POST',
-    body: JSON.stringify({ amount: 50000, reason: '   ok   ' })
-  });
-  check(
-    'un motivo de relleno tampoco pasa',
-    motivoVacio.status === 400,
-    `${motivoVacio.status} · ${motivoVacio.body?.error}`
-  );
+    /*
+     * SIN MOTIVO NO HAY ACCION DE OPERACION.
+     *
+     * El artboard 7b lo exige — «cada accion exige un motivo escrito y queda en
+     * el registro que los socios de la firma tambien ven» — y esa es toda la
+     * garantia: un poder que cruza el limite del inquilino solo es aceptable si
+     * el inquilino puede leer que se hizo Y POR QUE.
+     */
+    /*
+     * SIN NIT TAMBIEN SE PUEDE. Hay litigantes —personas naturales— y despachos
+     * pequenos que no tienen NIT, y el alta los rechazaba con «se requieren el
+     * nombre y el NIT». El NIT es opcional; si viene, sigue siendo unico. Dos
+     * firmas sin NIT deben convivir: la columna es UNIQUE y Postgres admite
+     * varios NULL, pero no varios '' — asi que el servidor guarda NULL.
+     */
+    const sinNit1 = await pedir('/admin/firms', opToken, {
+      method: 'POST',
+      body: JSON.stringify({
+        firmName: `Litigante sin NIT ${m}`,
+        adminEmail: `sinnit1-${m}@iureon.test`,
+        adminPassword: clavePrueba()
+      })
+    });
+    if (typeof sinNit1.body?.firm?.id === 'string' && sinNit1.body.firm.id.length > 0) firmasCreadas.push(sinNit1.body.firm.id);
+    check('una firma sin NIT se crea', sinNit1.status === 201, `${sinNit1.status} ${JSON.stringify(sinNit1.body)}`);
+    check('y su NIT queda vacio, no inventado', sinNit1.body?.firm?.nit === null, String(sinNit1.body?.firm?.nit));
 
-  const recarga = await pedir(`/admin/firms/${cliente.user.firmId}/credits`, opToken, {
-    method: 'POST',
-    body: JSON.stringify({ amount: 50000, reason: MOTIVO_DE_PRUEBA })
-  });
-  check(
-    'puede recargar el saldo de una firma, con motivo',
-    recarga.status === 200 && recarga.body?.creditsBalance === 50000,
-    JSON.stringify(recarga.body)
-  );
+    const sinNit2 = await pedir('/admin/firms', opToken, {
+      method: 'POST',
+      body: JSON.stringify({
+        firmName: `Otro litigante sin NIT ${m}`,
+        nit: '   ',
+        adminEmail: `sinnit2-${m}@iureon.test`,
+        adminPassword: clavePrueba()
+      })
+    });
+    if (typeof sinNit2.body?.firm?.id === 'string' && sinNit2.body.firm.id.length > 0) firmasCreadas.push(sinNit2.body.firm.id);
+    check('una segunda firma sin NIT tambien (NULL, no cadena vacia)', sinNit2.status === 201, `${sinNit2.status} ${JSON.stringify(sinNit2.body)}`);
 
-  /*
-   * ─── EL AJUSTE EN CONTRA, Y EL LIBRO ──────────────────────────────────────
-   *
-   * Una compensacion dada por error tiene que poder deshacerse por la misma
-   * puerta y con el mismo rastro. Y lo que se acredita tiene que aparecer en
-   * el libro de movimientos que el socio ve en su panel de Saldo: antes solo
-   * cambiaba la cifra de la firma y el libro callaba.
-   */
-  const descuento = await pedir(`/admin/firms/${cliente.user.firmId}/credits`, opToken, {
-    method: 'POST',
-    body: JSON.stringify({ amount: -20000, reason: 'Reversion parcial de la compensacion de prueba' })
-  });
-  check(
-    'puede descontar saldo con motivo, y el saldo baja',
-    descuento.status === 200 && descuento.body?.creditsBalance === 30000,
-    JSON.stringify(descuento.body)
-  );
+    const sinNombre = await pedir('/admin/firms', opToken, {
+      method: 'POST',
+      body: JSON.stringify({ firmName: '  ', adminEmail: `sinnombre-${m}@iureon.test`, adminPassword: clavePrueba() })
+    });
+    check('el nombre si sigue siendo obligatorio', sinNombre.status === 400, String(sinNombre.status));
 
-  const enRojo = await pedir(`/admin/firms/${cliente.user.firmId}/credits`, opToken, {
-    method: 'POST',
-    body: JSON.stringify({ amount: -100000, reason: 'Intento de dejar el saldo negativo' })
-  });
-  check(
-    'pero nunca deja el saldo bajo cero',
-    enRojo.status === 400 && enRojo.body?.error === 'INSUFFICIENT_BALANCE',
-    `${enRojo.status} · ${enRojo.body?.error}`
-  );
+    const sinMotivo = await pedir(`/admin/firms/${cliente.user.firmId}/credits`, opToken, {
+      method: 'POST',
+      body: JSON.stringify({ amount: 50000 })
+    });
+    check(
+      'una recarga sin motivo se rechaza',
+      sinMotivo.status === 400 && sinMotivo.body?.error === 'REASON_REQUIRED',
+      `${sinMotivo.status} · ${sinMotivo.body?.error}`
+    );
 
-  const { data: libro } = await supabase!
-    .from('credit_movements')
-    .select('kind, amount_cop, balance_after_cop, description, actor_email')
-    .eq('firm_id', cliente.user.firmId)
-    .order('created_at', { ascending: true });
-  const filas = (libro ?? []) as Array<{ kind: string; amount_cop: number; description: string; actor_email: string }>;
-  check(
-    'la recarga y el ajuste quedan en el libro de movimientos que el socio ve',
-    filas.some((f) => f.kind === 'RECARGA' && Number(f.amount_cop) === 50000) &&
-      filas.some((f) => f.kind === 'AJUSTE' && Number(f.amount_cop) === -20000),
-    filas.map((f) => `${f.kind}:${f.amount_cop}`).join(' | ') || 'libro vacio'
-  );
-  check(
-    'cada fila del libro lleva el motivo y el correo del operador',
-    filas.every((f) => f.description.includes(' · ') && f.actor_email === correoOperador),
-    filas.map((f) => f.actor_email).join(',')
-  );
+    // Un motivo de relleno tampoco pasa: el minimo es que diga algo.
+    const motivoVacio = await pedir(`/admin/firms/${cliente.user.firmId}/credits`, opToken, {
+      method: 'POST',
+      body: JSON.stringify({ amount: 50000, reason: '   ok   ' })
+    });
+    check(
+      'un motivo de relleno tampoco pasa',
+      motivoVacio.status === 400,
+      `${motivoVacio.status} · ${motivoVacio.body?.error}`
+    );
 
-  /*
-   * ─── LA FICHA DE LA FIRMA (7b) ────────────────────────────────────────────
-   *
-   * Trae lo que se necesita para gestionar el negocio del inquilino y NADA de
-   * su contenido. Se comprueban las dos mitades: que los datos esten, y que el
-   * material amparado por el secreto profesional NO.
-   */
-  const ficha = await pedir(`/admin/firms/${cliente.user.firmId}`, opToken);
-  const f = ficha.body?.firm;
-  check(
-    'la ficha de la firma responde con sus datos reales',
-    ficha.status === 200 && f?.nit === cliente.user.firmId.replace('firm-', '') ? true : ficha.status === 200 && Boolean(f?.name),
-    `${ficha.status} · ${f?.name ?? 'sin nombre'}`
-  );
-  check(
-    'la ficha trae las cuentas de la firma con su consumo',
-    Array.isArray(f?.usuarios) && f.usuarios.length > 0 && 'consumoMesCop' in f.usuarios[0],
-    `usuarios=${f?.usuarios?.length ?? 0}`
-  );
-  check(
-    'la ficha NO trae transcritos, borradores ni expedientes',
-    !('transcritos' in (f ?? {})) && !('borradores' in (f ?? {})) && !('documentos' in (f ?? {})),
-    Object.keys(f ?? {}).join(',')
-  );
-  const fichaAjena = await pedir(`/admin/firms/${cliente.user.firmId}`, cliente.accessToken);
-  check(
-    'un abogado no puede abrir la ficha de su propia firma por la consola',
-    fichaAjena.status === 403,
-    String(fichaAjena.status)
-  );
+    const recarga = await pedir(`/admin/firms/${cliente.user.firmId}/credits`, opToken, {
+      method: 'POST',
+      body: JSON.stringify({ amount: 50000, reason: MOTIVO_DE_PRUEBA })
+    });
+    check(
+      'puede recargar el saldo de una firma, con motivo',
+      recarga.status === 200 && recarga.body?.creditsBalance === 50000,
+      JSON.stringify(recarga.body)
+    );
 
-  // ─── Lo que NO puede: leer el expediente ajeno ────────────────────────────
-  const espiando = await pedir('/transcription', opToken);
-  const titulos = (espiando.body?.items ?? []).map((t: { title: string }) => t.title);
-  check('NO puede leer las audiencias del cliente', !titulos.includes(RESERVADA), `${titulos.length} transcritos propios`);
+    /*
+     * ─── EL AJUSTE EN CONTRA, Y EL LIBRO ──────────────────────────────────────
+     *
+     * Una compensacion dada por error tiene que poder deshacerse por la misma
+     * puerta y con el mismo rastro. Y lo que se acredita tiene que aparecer en
+     * el libro de movimientos que el socio ve en su panel de Saldo: antes solo
+     * cambiaba la cifra de la firma y el libro callaba.
+     */
+    const descuento = await pedir(`/admin/firms/${cliente.user.firmId}/credits`, opToken, {
+      method: 'POST',
+      body: JSON.stringify({ amount: -20000, reason: 'Reversion parcial de la compensacion de prueba' })
+    });
+    check(
+      'puede descontar saldo con motivo, y el saldo baja',
+      descuento.status === 200 && descuento.body?.creditsBalance === 30000,
+      JSON.stringify(descuento.body)
+    );
 
-  // ─── Y lo que hizo queda donde el cliente lo ve ───────────────────────────
-  const auditoria = await pedir('/audit/logs', cliente.accessToken);
-  const registros = (auditoria.body?.logs ?? []) as Array<{
-    action: string;
-    userEmail: string;
-    resource: string;
-  }>;
-  const acciones = registros.map((l) => `${l.action}:${l.userEmail}`);
-  check(
-    'la recarga queda en la auditoría del cliente, con el operador nombrado',
-    acciones.some((a: string) => a.startsWith('FIRM_CREDITS_ADDED') && a.includes(correoOperador)),
-    acciones.join(' | ') || 'sin registros'
-  );
+    const enRojo = await pedir(`/admin/firms/${cliente.user.firmId}/credits`, opToken, {
+      method: 'POST',
+      body: JSON.stringify({ amount: -100000, reason: 'Intento de dejar el saldo negativo' })
+    });
+    check(
+      'pero nunca deja el saldo bajo cero',
+      enRojo.status === 400 && enRojo.body?.error === 'INSUFFICIENT_BALANCE',
+      `${enRojo.status} · ${enRojo.body?.error}`
+    );
 
-  /*
-   * Y EL MOTIVO VIAJA HASTA ALLA. Registrar «recargado» sin el porque deja al
-   * socio de la firma leyendo un movimiento de dinero que nadie le explico:
-   * la mitad util del registro es la razon.
-   */
-  const laRecarga = registros.find((l) => l.action === 'FIRM_CREDITS_ADDED');
-  check(
-    'el motivo escrito llega a la auditoría de la firma',
-    Boolean(laRecarga?.resource?.includes(MOTIVO_DE_PRUEBA)),
-    laRecarga?.resource ?? 'sin la recarga en el registro'
-  );
+    const { data: libro } = await supabase!
+      .from('credit_movements')
+      .select('kind, amount_cop, balance_after_cop, description, actor_email')
+      .eq('firm_id', cliente.user.firmId)
+      .order('created_at', { ascending: true });
+    const filas = (libro ?? []) as Array<{ kind: string; amount_cop: number; description: string; actor_email: string }>;
+    check(
+      'la recarga y el ajuste quedan en el libro de movimientos que el socio ve',
+      filas.some((f) => f.kind === 'RECARGA' && Number(f.amount_cop) === 50000) &&
+        filas.some((f) => f.kind === 'AJUSTE' && Number(f.amount_cop) === -20000),
+      filas.map((f) => `${f.kind}:${f.amount_cop}`).join(' | ') || 'libro vacio'
+    );
+    check(
+      'cada fila del libro lleva el motivo y el correo del operador',
+      filas.every((f) => f.description.includes(' · ') && f.actor_email === correoOperador),
+      filas.map((f) => f.actor_email).join(',')
+    );
 
-  // ─── El rol no se puede pedir por la red ──────────────────────────────────
-  const pidiendoRol = await pedir(`/admin/firms/${cliente.user.firmId}/users`, opToken, {
-    method: 'POST',
-    body: JSON.stringify({
-      email: `colado${m}@iureon.test`,
-      password: clavePrueba(),
-      role: 'SUPER_ADMIN',
-      reason: MOTIVO_DE_PRUEBA
-    })
-  });
-  const { data: tras } = await c.auth.admin.listUsers();
-  const colado = tras.users.find((u) => u.email === `colado${m}@iureon.test`);
-  const rolColado = (colado?.app_metadata as Record<string, unknown>)?.role;
-  check('SUPER_ADMIN no se puede otorgar por un endpoint', rolColado === 'LAWYER', `${pidiendoRol.status} · rol=${rolColado}`);
+    /*
+     * ─── LA FICHA DE LA FIRMA (7b) ────────────────────────────────────────────
+     *
+     * Trae lo que se necesita para gestionar el negocio del inquilino y NADA de
+     * su contenido. Se comprueban las dos mitades: que los datos esten, y que el
+     * material amparado por el secreto profesional NO.
+     */
+    const ficha = await pedir(`/admin/firms/${cliente.user.firmId}`, opToken);
+    const f = ficha.body?.firm;
+    check(
+      'la ficha de la firma responde con sus datos reales',
+      ficha.status === 200 && f?.nit === cliente.user.firmId.replace('firm-', '') ? true : ficha.status === 200 && Boolean(f?.name),
+      `${ficha.status} · ${f?.name ?? 'sin nombre'}`
+    );
+    check(
+      'la ficha trae las cuentas de la firma con su consumo',
+      Array.isArray(f?.usuarios) && f.usuarios.length > 0 && 'consumoMesCop' in f.usuarios[0],
+      `usuarios=${f?.usuarios?.length ?? 0}`
+    );
+    check(
+      'la ficha NO trae transcritos, borradores ni expedientes',
+      !('transcritos' in (f ?? {})) && !('borradores' in (f ?? {})) && !('documentos' in (f ?? {})),
+      Object.keys(f ?? {}).join(',')
+    );
+    const fichaAjena = await pedir(`/admin/firms/${cliente.user.firmId}`, cliente.accessToken);
+    check(
+      'un abogado no puede abrir la ficha de su propia firma por la consola',
+      fichaAjena.status === 403,
+      String(fichaAjena.status)
+    );
 
-  // ─── Limpieza ─────────────────────────────────────────────────────────────
-  /*
-   * TODO LO QUE ESTE CHECK CREA, ESTE CHECK LO BORRA. Las dos firmas sin NIT
-   * quedaron una vez en la base de produccion porque no estaban en esta lista,
-   * y el operador las vio en su consola junto a sus clientes reales. Un check
-   * que deja rastro en la base del usuario no es un check: es un incidente.
-   */
-  const ids = [op.user.firmId, cliente.user.firmId, sinNit1.body?.firm?.id, sinNit2.body?.firm?.id].filter(
-    (id): id is string => typeof id === 'string' && id.length > 0
-  );
-  await c.from('transcriptions').delete().in('firm_id', ids);
-  await c.from('audit_logs').delete().in('firm_id', ids);
-  const { data: finales } = await c.auth.admin.listUsers();
-  for (const u of finales.users) {
-    if (u.email?.includes(String(m))) await c.auth.admin.deleteUser(u.id);
+    // ─── Lo que NO puede: leer el expediente ajeno ────────────────────────────
+    const espiando = await pedir('/transcription', opToken);
+    const titulos = (espiando.body?.items ?? []).map((t: { title: string }) => t.title);
+    check('NO puede leer las audiencias del cliente', !titulos.includes(RESERVADA), `${titulos.length} transcritos propios`);
+
+    // ─── Y lo que hizo queda donde el cliente lo ve ───────────────────────────
+    const auditoria = await pedir('/audit/logs', cliente.accessToken);
+    const registros = (auditoria.body?.logs ?? []) as Array<{
+      action: string;
+      userEmail: string;
+      resource: string;
+    }>;
+    const acciones = registros.map((l) => `${l.action}:${l.userEmail}`);
+    check(
+      'la recarga queda en la auditoría del cliente, con el operador nombrado',
+      acciones.some((a: string) => a.startsWith('FIRM_CREDITS_ADDED') && a.includes(correoOperador)),
+      acciones.join(' | ') || 'sin registros'
+    );
+
+    /*
+     * Y EL MOTIVO VIAJA HASTA ALLA. Registrar «recargado» sin el porque deja al
+     * socio de la firma leyendo un movimiento de dinero que nadie le explico:
+     * la mitad util del registro es la razon.
+     */
+    const laRecarga = registros.find((l) => l.action === 'FIRM_CREDITS_ADDED');
+    check(
+      'el motivo escrito llega a la auditoría de la firma',
+      Boolean(laRecarga?.resource?.includes(MOTIVO_DE_PRUEBA)),
+      laRecarga?.resource ?? 'sin la recarga en el registro'
+    );
+
+    // ─── El rol no se puede pedir por la red ──────────────────────────────────
+    const pidiendoRol = await pedir(`/admin/firms/${cliente.user.firmId}/users`, opToken, {
+      method: 'POST',
+      body: JSON.stringify({
+        email: `colado${m}@iureon.test`,
+        password: clavePrueba(),
+        role: 'SUPER_ADMIN',
+        reason: MOTIVO_DE_PRUEBA
+      })
+    });
+    const colado = await buscarUsuarioPorCorreo(c, `colado${m}@iureon.test`);
+    const rolColado = (colado?.app_metadata as Record<string, unknown>)?.role;
+    check('SUPER_ADMIN no se puede otorgar por un endpoint', rolColado === 'LAWYER', `${pidiendoRol.status} · rol=${rolColado}`);
+  } catch (err) {
+    check('el check corre hasta el final sin excepciones', false, (err as Error).message);
+  } finally {
+    // ─── Limpieza ─────────────────────────────────────────────────────────────
+    /*
+     * TODO LO QUE ESTE CHECK CREA, ESTE CHECK LO BORRA. Las dos firmas sin NIT
+     * quedaron una vez en la base de produccion porque no estaban en esta lista,
+     * y el operador las vio en su consola junto a sus clientes reales. Un check
+     * que deja rastro en la base del usuario no es un check: es un incidente.
+     */
+    const ids = firmasCreadas;
+    const limpieza: string[] = [];
+    if (ids.length > 0) {
+      await borrarYAnotar(limpieza, 'transcriptions', c.from('transcriptions').delete().in('firm_id', ids));
+      await borrarYAnotar(limpieza, 'audit_logs', c.from('audit_logs').delete().in('firm_id', ids));
+    }
+    limpieza.push(...(await borrarUsuariosDePrueba(c, m)));
+    if (ids.length > 0) await borrarYAnotar(limpieza, 'firms', c.from('firms').delete().in('firm_id', ids));
+    fallos += informarLimpieza(limpieza);
+    server.close();
   }
-  await c.from('firms').delete().in('firm_id', ids);
 
-  server.close();
   console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);
   process.exit(fallos === 0 ? 0 : 1);
 })();

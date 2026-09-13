@@ -71,57 +71,76 @@ const say = (speakerLabel: string, text: string, startSeconds = 0): TranscriptSe
   }
 
   // ─── Lo que un humano fija, contra la base ────────────────────────────────
-  const guardado = await transcriptionStore.save(FIRM, 'p@iureon.co', 'p', 'p.mp3', {
-    kind: 'AUDIENCIA',
-    fullText: 'x',
-    segments: [
-      say('speaker_0', 'Se declara abierta la audiencia.', 0),
-      say('speaker_1', 'Mi nombre es Tomás Enrique Wilches.', 64),
-      say('speaker_1', 'Sí, señoría, así es.', 300)
-    ],
-    speakerLabels: ['speaker_0', 'speaker_1'],
-    language: 'es',
-    durationSeconds: 400,
-    model: 'nova-3',
-    transcribedAt: new Date(0).toISOString()
-  } as never);
+  /*
+   * LA LIMPIEZA VA EN UN `finally`. Antes corria al final del cuerpo, y el
+   * `releido` de abajo se usaba sin comprobar que existiera: una lectura fallida
+   * lanzaba, saltaba el borrado y dejaba la fila de prueba en la base — que en
+   * local es la de PRODUCCION. La salida temprana cuando `guardado` es nulo no
+   * deja nada: no se inserto ninguna fila.
+   */
+  try {
+    const guardado = await transcriptionStore.save(FIRM, 'p@iureon.co', 'p', 'p.mp3', {
+      kind: 'AUDIENCIA',
+      fullText: 'x',
+      segments: [
+        say('speaker_0', 'Se declara abierta la audiencia.', 0),
+        say('speaker_1', 'Mi nombre es Tomás Enrique Wilches.', 64),
+        say('speaker_1', 'Sí, señoría, así es.', 300)
+      ],
+      speakerLabels: ['speaker_0', 'speaker_1'],
+      language: 'es',
+      durationSeconds: 400,
+      model: 'nova-3',
+      transcribedAt: new Date(0).toISOString()
+    } as never);
 
-  if (!guardado) {
-    console.error('no se pudo crear la fila de prueba');
-    process.exit(1);
+    if (!guardado) {
+      console.error('no se pudo crear la fila de prueba');
+      process.exit(1);
+    }
+
+    const id = guardado.id;
+
+    const conNombre = await transcriptionStore.assignSpeakerName(FIRM, id, 'speaker_1', 'Tomás Enrique Wilches Salsa');
+    const deVoz1 = (conNombre?.segments ?? []).filter((s) => s.speakerLabel === 'speaker_1');
+    check(
+      'el nombre se aplica a TODAS las intervenciones de esa voz',
+      deVoz1.length === 2 && deVoz1.every((s) => s.speakerName === 'Tomás Enrique Wilches Salsa'),
+      JSON.stringify(deVoz1.map((s) => s.speakerName))
+    );
+
+    const otraVoz = (conNombre?.segments ?? []).find((s) => s.speakerLabel === 'speaker_0');
+    check('y no toca las demás voces', otraVoz?.speakerName === undefined, String(otraVoz?.speakerName));
+
+    const { data: releido } = await supabase!.from('transcriptions').select('segments').eq('id', id).single();
+    const persistido = ((releido as { segments: TranscriptSegment[] }).segments ?? []).find(
+      (s) => s.speakerLabel === 'speaker_1'
+    );
+    check('está en la base, no solo en la respuesta', persistido?.speakerName === 'Tomás Enrique Wilches Salsa');
+
+    const sinNombre = await transcriptionStore.assignSpeakerName(FIRM, id, 'speaker_1', '   ');
+    const trasBorrar = (sinNombre?.segments ?? []).find((s) => s.speakerLabel === 'speaker_1');
+    check(
+      'un nombre vacío lo quita en vez de guardar un blanco',
+      trasBorrar !== undefined && !('speakerName' in trasBorrar),
+      JSON.stringify(trasBorrar)
+    );
+
+    const ajena = await transcriptionStore.assignSpeakerName('otra-firma', id, 'speaker_1', 'Intruso');
+    check('otra firma no puede nombrar nada', ajena === null);
+  } catch (err) {
+    check('el check corre hasta el final sin excepciones', false, (err as Error).message);
+  } finally {
+    const limpieza: string[] = [];
+    const { error } = await supabase!.from('transcriptions').delete().eq('firm_id', FIRM);
+    if (error) limpieza.push(`transcriptions: ${error.message}`);
+    if (limpieza.length > 0) {
+      console.error('\n!!! LA LIMPIEZA FALLO: QUEDARON DATOS DE PRUEBA EN LA BASE !!!');
+      for (const f of limpieza) console.error(`FAIL limpieza — ${f}`);
+      fallos += limpieza.length;
+    }
   }
 
-  const id = guardado.id;
-
-  const conNombre = await transcriptionStore.assignSpeakerName(FIRM, id, 'speaker_1', 'Tomás Enrique Wilches Salsa');
-  const deVoz1 = (conNombre?.segments ?? []).filter((s) => s.speakerLabel === 'speaker_1');
-  check(
-    'el nombre se aplica a TODAS las intervenciones de esa voz',
-    deVoz1.length === 2 && deVoz1.every((s) => s.speakerName === 'Tomás Enrique Wilches Salsa'),
-    JSON.stringify(deVoz1.map((s) => s.speakerName))
-  );
-
-  const otraVoz = (conNombre?.segments ?? []).find((s) => s.speakerLabel === 'speaker_0');
-  check('y no toca las demás voces', otraVoz?.speakerName === undefined, String(otraVoz?.speakerName));
-
-  const { data: releido } = await supabase!.from('transcriptions').select('segments').eq('id', id).single();
-  const persistido = ((releido as { segments: TranscriptSegment[] }).segments ?? []).find(
-    (s) => s.speakerLabel === 'speaker_1'
-  );
-  check('está en la base, no solo en la respuesta', persistido?.speakerName === 'Tomás Enrique Wilches Salsa');
-
-  const sinNombre = await transcriptionStore.assignSpeakerName(FIRM, id, 'speaker_1', '   ');
-  const trasBorrar = (sinNombre?.segments ?? []).find((s) => s.speakerLabel === 'speaker_1');
-  check(
-    'un nombre vacío lo quita en vez de guardar un blanco',
-    trasBorrar !== undefined && !('speakerName' in trasBorrar),
-    JSON.stringify(trasBorrar)
-  );
-
-  const ajena = await transcriptionStore.assignSpeakerName('otra-firma', id, 'speaker_1', 'Intruso');
-  check('otra firma no puede nombrar nada', ajena === null);
-
-  await supabase!.from('transcriptions').delete().eq('firm_id', FIRM);
   console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);
   process.exit(fallos === 0 ? 0 : 1);
 })();
