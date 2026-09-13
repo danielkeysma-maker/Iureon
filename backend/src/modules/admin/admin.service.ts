@@ -1,3 +1,4 @@
+import { leerTodasLasFilas } from '../../config/leerTodasLasFilas';
 import { listarTodasLasCuentas } from '../auth/listarCuentas';
 import { catalogService } from '../catalog/catalog.service';
 import { supabase } from '../../config/supabase.config';
@@ -236,32 +237,47 @@ const firmVolumes = async (scope?: string): Promise<Map<string, FirmVolumes>> =>
 
   // One query for the ids alone, counted in memory: a per-firm round trip would
   // be a query per row on a screen whose whole point is seeing them together.
-  let transcriptionsQuery = client.from('transcriptions').select('firm_id');
-  if (scope) transcriptionsQuery = transcriptionsQuery.eq('firm_id', scope);
-  const { data: transcritos, error: errorTranscritos } = await transcriptionsQuery;
-  if (errorTranscritos) noDisponible('transcritos', errorTranscritos.message);
-  for (const row of (transcritos ?? []) as { firm_id: string }[]) {
+  /*
+   * POR PARTES Y ORDENADO. PostgREST corta un select en 1.000 filas sin error
+   * (medido: 7.922 reales, 1.000 devueltas), y aqui lo leido se CUENTA: pasadas
+   * las mil, cada cifra de la consola salia por debajo de la real. El orden por
+   * la llave es lo que impide que una fila caiga en dos partes o en ninguna.
+   * Ver `config/leerTodasLasFilas.ts`.
+   */
+  const transcritos = await leerTodasLasFilas<{ firm_id: string }>((desde, hasta) => {
+    let q = client.from('transcriptions').select('firm_id').order('id');
+    if (scope) q = q.eq('firm_id', scope);
+    return q.range(desde, hasta);
+  });
+  if (transcritos.falla) noDisponible('transcritos', transcritos.falla);
+  for (const row of transcritos.filas) {
     bucket(row.firm_id).transcriptions += 1;
   }
 
   const hace30 = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-  let consumoQuery = client
-    .from('credit_movements')
-    .select('firm_id, amount_cop')
-    .eq('kind', 'CONSUMO')
-    .gte('created_at', hace30);
-  if (scope) consumoQuery = consumoQuery.eq('firm_id', scope);
-  const { data: consumos, error: errorConsumos } = await consumoQuery;
-  if (errorConsumos) noDisponible('consumo', errorConsumos.message);
-  for (const row of (consumos ?? []) as { firm_id: string; amount_cop: number }[]) {
+  const consumos = await leerTodasLasFilas<{ firm_id: string; amount_cop: number }>((desde, hasta) => {
+    let q = client
+      .from('credit_movements')
+      .select('firm_id, amount_cop')
+      .eq('kind', 'CONSUMO')
+      .gte('created_at', hace30)
+      .order('id');
+    if (scope) q = q.eq('firm_id', scope);
+    return q.range(desde, hasta);
+  });
+  if (consumos.falla) noDisponible('consumo', consumos.falla);
+  for (const row of consumos.filas) {
     bucket(row.firm_id).consumo30dCop += Math.abs(Number(row.amount_cop ?? 0));
   }
 
-  let verificacionesQuery = client.from('catalog_verifications').select('firm_id');
-  if (scope) verificacionesQuery = verificacionesQuery.eq('firm_id', scope);
-  const { data: verificaciones, error: errorVerificaciones } = await verificacionesQuery;
-  if (errorVerificaciones) noDisponible('catalogo curado', errorVerificaciones.message);
-  for (const row of (verificaciones ?? []) as { firm_id: string }[]) {
+  /* Sin columna `id`: la llave es la pareja (firm_id, actuacion_id), y se ordena por las dos. */
+  const verificaciones = await leerTodasLasFilas<{ firm_id: string }>((desde, hasta) => {
+    let q = client.from('catalog_verifications').select('firm_id').order('firm_id').order('actuacion_id');
+    if (scope) q = q.eq('firm_id', scope);
+    return q.range(desde, hasta);
+  });
+  if (verificaciones.falla) noDisponible('catalogo curado', verificaciones.falla);
+  for (const row of verificaciones.filas) {
     bucket(row.firm_id).catalogoCuradas += 1;
   }
 
