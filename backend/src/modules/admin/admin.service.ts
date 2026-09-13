@@ -1,3 +1,4 @@
+import { listarTodasLasCuentas } from '../auth/listarCuentas';
 import { catalogService } from '../catalog/catalog.service';
 import { supabase } from '../../config/supabase.config';
 import {
@@ -206,10 +207,27 @@ const firmVolumes = async (scope?: string): Promise<Map<string, FirmVolumes>> =>
     return current;
   };
 
+  /*
+   * LOS VOLUMENES NO SE INVENTAN CUANDO NO SE PUEDEN LEER.
+   *
+   * Las cuatro consultas de abajo descartaban su `error` y seguian con una lista
+   * vacia, asi que una caida de la base se veia en la consola como una firma
+   * con cero usuarios, cero transcritos y cero consumo — datos plausibles, y
+   * falsos. Y las cuentas se leian con `listUsers()` a secas, que trae 50: con
+   * mas cuentas en la plataforma, cada firma aparecia con menos usuarios de los
+   * que tiene. Ahora cualquier falla lanza, igual que ya hacia `listFirms` al no
+   * poder leer las firmas, y el operador ve un error en vez de un cero.
+   */
+  const noDisponible = (que: string, detalle: string): never => {
+    console.error(`[ADMIN] No se pudieron leer los volumenes (${que}): ${detalle}`);
+    throw new AuthError('FIRM_VOLUMES_UNAVAILABLE', 'No se pudieron leer los volumenes de las firmas.', 502);
+  };
+
   // GoTrue has no server-side filter on app_metadata, so the accounts are always
   // read whole and narrowed here.
-  const { data: users } = await client.auth.admin.listUsers();
-  for (const user of users?.users ?? []) {
+  const cuentas = await listarTodasLasCuentas(client);
+  if (cuentas.falla) noDisponible('cuentas', cuentas.falla);
+  for (const user of cuentas.usuarios) {
     const firmId = (user.app_metadata as Record<string, unknown>)?.firm_id;
     if (typeof firmId !== 'string') continue;
     if (scope && firmId !== scope) continue;
@@ -220,7 +238,8 @@ const firmVolumes = async (scope?: string): Promise<Map<string, FirmVolumes>> =>
   // be a query per row on a screen whose whole point is seeing them together.
   let transcriptionsQuery = client.from('transcriptions').select('firm_id');
   if (scope) transcriptionsQuery = transcriptionsQuery.eq('firm_id', scope);
-  const { data: transcritos } = await transcriptionsQuery;
+  const { data: transcritos, error: errorTranscritos } = await transcriptionsQuery;
+  if (errorTranscritos) noDisponible('transcritos', errorTranscritos.message);
   for (const row of (transcritos ?? []) as { firm_id: string }[]) {
     bucket(row.firm_id).transcriptions += 1;
   }
@@ -232,14 +251,16 @@ const firmVolumes = async (scope?: string): Promise<Map<string, FirmVolumes>> =>
     .eq('kind', 'CONSUMO')
     .gte('created_at', hace30);
   if (scope) consumoQuery = consumoQuery.eq('firm_id', scope);
-  const { data: consumos } = await consumoQuery;
+  const { data: consumos, error: errorConsumos } = await consumoQuery;
+  if (errorConsumos) noDisponible('consumo', errorConsumos.message);
   for (const row of (consumos ?? []) as { firm_id: string; amount_cop: number }[]) {
     bucket(row.firm_id).consumo30dCop += Math.abs(Number(row.amount_cop ?? 0));
   }
 
   let verificacionesQuery = client.from('catalog_verifications').select('firm_id');
   if (scope) verificacionesQuery = verificacionesQuery.eq('firm_id', scope);
-  const { data: verificaciones } = await verificacionesQuery;
+  const { data: verificaciones, error: errorVerificaciones } = await verificacionesQuery;
+  if (errorVerificaciones) noDisponible('catalogo curado', errorVerificaciones.message);
   for (const row of (verificaciones ?? []) as { firm_id: string }[]) {
     bucket(row.firm_id).catalogoCuradas += 1;
   }

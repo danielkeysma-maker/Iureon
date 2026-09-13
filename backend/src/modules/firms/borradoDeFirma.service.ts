@@ -1,3 +1,4 @@
+import { listarTodasLasCuentas } from '../auth/listarCuentas';
 import { supabase } from '../../config/supabase.config';
 import { AuthError, listFirmUsers } from '../auth/auth.service';
 import { BackblazeB2TenantStorageService } from '../documents/b2.service';
@@ -57,9 +58,12 @@ export const nombreDeLaFirma = async (firmId: string): Promise<string> => {
  * says so in the log instead.
  */
 export const firmIdDelOperador = async (): Promise<string | null> => {
-  const { data, error } = await requireClient().auth.admin.listUsers({ page: 1, perPage: 1000 });
-  if (error) return null;
-  for (const u of data?.users ?? []) {
+  const { usuarios, falla } = await listarTodasLasCuentas(requireClient());
+  if (falla) {
+    console.error(`[FIRMAS] No se pudo buscar la firma del operador: ${falla}`);
+    return null;
+  }
+  for (const u of usuarios) {
     const meta = (u.app_metadata ?? {}) as Record<string, unknown>;
     if (meta.role === 'SUPER_ADMIN' && typeof meta.firm_id === 'string' && meta.firm_id) {
       return meta.firm_id;

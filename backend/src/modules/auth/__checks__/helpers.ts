@@ -1,3 +1,4 @@
+import { listarTodasLasCuentas } from '../listarCuentas';
 import type { User } from '@supabase/supabase-js';
 import type { supabase } from '../../../config/supabase.config';
 import { createFirm } from '../../admin/admin.service';
@@ -42,30 +43,17 @@ export const clavePrueba = (): string =>
 
 type ClienteSupabase = NonNullable<typeof supabase>;
 
-/** Supabase no admite paginas mayores; con este tamano una base pequena cabe en una sola. */
-const USUARIOS_POR_PAGINA = 1000;
-
 /**
- * Recorre TODAS las paginas de `listUsers`, y dice si alguna no se pudo leer.
+ * Las cuentas de TODAS las paginas, con la falla al lado.
  *
- * `listUsers()` sin argumentos devuelve SOLO LA PRIMERA PAGINA, de 50 usuarios.
- * Los checks lo llamaban asi para buscar sus propias cuentas, de modo que con
- * mas de 50 usuarios en la base las cuentas de prueba que cayeran en la pagina
- * dos no se veian — ni para borrarlas ni para comprobar nada sobre ellas — y
- * nadie se enteraba. Y un error al listar no es una base sin usuarios: tratarlo
- * como lista vacia es declarar limpio lo que nunca se miro.
+ * YA NO PAGINA AQUI. Esta funcion tuvo su propia paginacion mientras solo los
+ * checks la necesitaban; cuando aparecio el mismo defecto en siete sitios de
+ * produccion, la paginacion subio a `listarCuentas.ts` y esta la usa. Dos
+ * copias del mismo bucle se separan en cuanto alguien corrige una — y la que
+ * se quedaria atras es justo la que borra cuentas en la base del usuario.
  */
-const listarTodosLosUsuarios = async (
-  c: ClienteSupabase
-): Promise<{ usuarios: User[]; falla: string | null }> => {
-  const usuarios: User[] = [];
-  for (let page = 1; ; page++) {
-    const { data, error } = await c.auth.admin.listUsers({ page, perPage: USUARIOS_POR_PAGINA });
-    if (error) return { usuarios, falla: `listUsers (pagina ${page}): ${error.message}` };
-    usuarios.push(...data.users);
-    if (data.users.length < USUARIOS_POR_PAGINA) return { usuarios, falla: null };
-  }
-};
+const listarTodosLosUsuarios = (c: ClienteSupabase): Promise<{ usuarios: User[]; falla: string | null }> =>
+  listarTodasLasCuentas(c);
 
 /** Busca una cuenta por correo exacto en todas las paginas. Un error al listar se lanza: no es «no existe». */
 export const buscarUsuarioPorCorreo = async (c: ClienteSupabase, correo: string): Promise<User | undefined> => {

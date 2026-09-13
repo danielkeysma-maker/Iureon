@@ -118,14 +118,27 @@ for (const { nombre, archivo, creaCuentas, limpieza } of CHECKS_CON_BASE) {
 /* ─── El helper ─────────────────────────────────────────────────────────── */
 
 const helper = leer('auth/__checks__/helpers.ts');
-check('helper: listUsers pide pagina y tamano', /listUsers\(\{\s*page,\s*perPage/.test(helper));
+/*
+ * LA PAGINACION YA NO VIVE AQUI, Y ESO NO AFLOJA LA GUARDA: LA MUDA.
+ *
+ * Estas tres comprobaciones buscaban el bucle de paginas dentro de este
+ * helper. Cuando el mismo defecto aparecio en siete sitios de produccion, la
+ * paginacion subio a `modules/auth/listarCuentas.ts`, y alli se prueba POR
+ * COMPORTAMIENTO en `check:listar-cuentas` —2.345 cuentas en tres paginas, una
+ * pagina que falla, un cliente que lanza—, que es mas fuerte que buscar texto.
+ *
+ * Lo que queda por vigilar AQUI es que este helper no vuelva a tener su propio
+ * bucle: dos copias se separan, y la que se quedaria atras es la que borra
+ * cuentas en la base del usuario.
+ */
 check(
-  'helper: sigue pidiendo paginas hasta una incompleta',
-  /for \(let page = 1; ; page\+\+\)/.test(helper) && /data\.users\.length < USUARIOS_POR_PAGINA/.test(helper)
+  'helper: lista cuentas con el helper de produccion, no con su propio bucle',
+  /listarTodasLasCuentas\(/.test(helper) && !/listUsers\(/.test(helper),
+  'la paginacion se prueba en check:listar-cuentas'
 );
 check(
-  'helper: un error de listUsers es una falla, no una lista vacia',
-  /listUsers[\s\S]{0,120}if \(error\) return \{ usuarios, falla:/.test(helper)
+  'helper: una falla al listar se sigue anotando, no se toma por lista vacia',
+  /if \(falla\) fallas\.push\(falla\)/.test(helper)
 );
 check(
   'helper: lee el error de cada deleteUser',

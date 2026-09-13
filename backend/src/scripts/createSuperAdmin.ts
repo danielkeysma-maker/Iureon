@@ -1,3 +1,4 @@
+import { listarTodasLasCuentas } from '../modules/auth/listarCuentas';
 import * as readline from 'node:readline';
 import { supabase } from '../config/supabase.config';
 
@@ -49,8 +50,9 @@ const salir: (mensaje: string) => never = (mensaje) => {
   const correoDirecto = process.argv[2]?.trim().toLowerCase();
 
   if (correoDirecto) {
-    const { data: usuarios } = await client.auth.admin.listUsers();
-    const cuenta = usuarios.users.find((u) => u.email?.toLowerCase() === correoDirecto);
+    const cuentas = await listarTodasLasCuentas(client);
+    if (cuentas.falla) salir(`No se pudieron leer las cuentas: ${cuentas.falla}`);
+    const cuenta = cuentas.usuarios.find((u) => u.email?.toLowerCase() === correoDirecto);
 
     if (!cuenta) {
       salir(
@@ -90,8 +92,15 @@ const salir: (mensaje: string) => never = (mensaje) => {
   if (!email || !password || !firmName || !nit) salir('Faltan datos. No se creó nada.');
   if (password.length < 8) salir('La contraseña debe tener al menos 8 caracteres.');
 
-  const { data: usuarios } = await client.auth.admin.listUsers();
-  const yaExiste = usuarios.users.find((u) => u.email?.toLowerCase() === email);
+  /*
+   * TODAS LAS PAGINAS, Y UNA FALLA DETIENE EL SCRIPT. De esta busqueda depende
+   * promover la cuenta existente en vez de crear otra firma: con una lista
+   * corta, una cuenta de la pagina dos pareceria no existir y se intentaria
+   * abrir un segundo tenant para el mismo correo.
+   */
+  const cuentas = await listarTodasLasCuentas(client);
+  if (cuentas.falla) salir(`No se pudieron leer las cuentas: ${cuentas.falla}. No se creó nada.`);
+  const yaExiste = cuentas.usuarios.find((u) => u.email?.toLowerCase() === email);
 
   const { data: firmaConEseNit } = await client
     .from('firms')

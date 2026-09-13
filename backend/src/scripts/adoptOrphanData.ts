@@ -1,3 +1,4 @@
+import { listarTodasLasCuentas } from '../modules/auth/listarCuentas';
 import { supabase } from '../config/supabase.config';
 
 /**
@@ -55,8 +56,9 @@ const salir: (mensaje: string) => never = (mensaje) => {
   const nombreDestino = (destino as { firm_id: string; name: string }).name;
 
   // El administrador de la firma, para que los transcritos aparezcan en su lista.
-  const { data: usuarios } = await client.auth.admin.listUsers();
-  const admin = usuarios.users.find(
+  const cuentas = await listarTodasLasCuentas(client);
+  if (cuentas.falla) salir(`No se pudieron leer las cuentas: ${cuentas.falla}`);
+  const admin = cuentas.usuarios.find(
     (u) => (u.app_metadata as Record<string, unknown>)?.firm_id === firmaDestino
   );
 

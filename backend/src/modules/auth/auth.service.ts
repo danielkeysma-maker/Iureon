@@ -1,3 +1,4 @@
+import { listarTodasLasCuentas } from './listarCuentas';
 import { isAuthRetryableFetchError } from '@supabase/supabase-js';
 import { supabase, supabaseAuth } from '../../config/supabase.config';
 import { validarBorradoDePropioUsuario } from './borrado.rules';
@@ -411,10 +412,10 @@ export interface UsuarioDeFirma {
 export const listFirmUsers = async (firmId: string): Promise<UsuarioDeFirma[]> => {
   const client = requireSupabase();
 
-  const { data, error } = await client.auth.admin.listUsers({ page: 1, perPage: 1000 });
-  if (error) throw new AuthError('USERS_UNAVAILABLE', 'No se pudieron listar los usuarios.', 502);
+  const { usuarios, falla } = await listarTodasLasCuentas(client);
+  if (falla) throw new AuthError('USERS_UNAVAILABLE', 'No se pudieron listar los usuarios.', 502);
 
-  return (data?.users ?? [])
+  return usuarios
     .filter((u) => (u.app_metadata as Record<string, unknown>)?.firm_id === firmId)
     .map((u) => ({
       id: u.id,

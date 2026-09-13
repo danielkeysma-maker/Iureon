@@ -1,3 +1,4 @@
+import { listarTodasLasCuentas } from '../auth/listarCuentas';
 import { supabase } from '../../config/supabase.config';
 import {
   cabeOtroUsuario,
@@ -185,10 +186,10 @@ export const leerPlan = async (firmId: string): Promise<PlanRow> => {
  */
 export const contarUsuarios = async (firmId: string): Promise<number> => {
   const db = requireDb();
-  const { data, error } = await db.auth.admin.listUsers({ page: 1, perPage: 1000 });
-  if (error) throw new PlanError('PLAN_UNAVAILABLE', 'No se pudieron contar los usuarios.', 502);
+  const { usuarios, falla } = await listarTodasLasCuentas(db);
+  if (falla) throw new PlanError('PLAN_UNAVAILABLE', 'No se pudieron contar los usuarios.', 502);
 
-  return (data?.users ?? []).filter(
+  return usuarios.filter(
     (u) => (u.app_metadata as Record<string, unknown>)?.firm_id === firmId
   ).length;
 };
