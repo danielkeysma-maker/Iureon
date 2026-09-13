@@ -164,7 +164,7 @@ export const ExpedientesView: React.FC = () => {
         </button>
 
         <header className="card p-4">
-          <h1 className="text-h2 [overflow-wrap:anywhere]">{abierto.caratula}</h1>
+          <h1 className="text-title text-ink-900 [overflow-wrap:anywhere]">{abierto.caratula}</h1>
           <dl className="mt-2 grid grid-cols-1 gap-x-6 gap-y-1 text-meta text-ink-500 sm:grid-cols-2">
             {abierto.radicado && (
               <div className="[overflow-wrap:anywhere]">
@@ -278,7 +278,7 @@ export const ExpedientesView: React.FC = () => {
     <div data-visita="vista-expedientes" className="mx-auto w-full max-w-4xl space-y-4 px-3 py-4 sm:px-4">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-h2">Expedientes</h1>
+          <h1 className="text-title text-ink-900">Expedientes</h1>
           <p className="text-meta text-ink-500">
             Un asunto por carpeta. Lo que ya tiene —entrevistas, revisiones, borradores, términos— se ata
             aquí, y desde aquí prepara el interrogatorio sabiendo a quién se le pregunta.

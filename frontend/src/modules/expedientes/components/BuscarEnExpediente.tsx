@@ -61,7 +61,7 @@ export const BuscarEnExpediente: React.FC<{ expediente: ExpedienteConDetalle }> 
 
   return (
     <section className="card p-4">
-      <h2 className="text-h3">Buscar en el expediente</h2>
+      <h2 className="text-subtitle text-ink-900">Buscar en el expediente</h2>
       <p className="mt-1 text-meta text-ink-500">
         Busca por significado, no por palabra exacta: «no entregó el inmueble» encuentra un pasaje que dice
         «se abstuvo de restituir el bien». No consume saldo.

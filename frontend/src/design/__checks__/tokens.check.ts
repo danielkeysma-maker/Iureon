@@ -221,5 +221,51 @@ check(
     : `${FAMILIAS.length} familias comprobadas en ${fuentes.length} archivos`
 );
 
+/* ─── EL TAMAÑO QUE NO EXISTE: LA MISMA FALLA, EN LA TIPOGRAFÍA ────────────
+ *
+ * El barrido de arriba mira colores y dejó pasar DIEZ títulos. El módulo de
+ * Expedientes escribió `text-h2` y `text-h3` —una escala que suena a sistema de
+ * diseño— y la escala de este proyecto se llama `display`, `title`,
+ * `subtitle`, `body`, `ui`, `meta` y `label`. Tailwind no emitió nada, así que
+ * «Expedientes», la carátula del caso y los ocho encabezados de sección se
+ * pintaron al tamaño de un párrafo. El dueño lo reportó con estas palabras:
+ * «no se identifican bien los títulos».
+ *
+ * NO SE VALIDA TODO `text-*`: Tailwind usa ese prefijo para alineación
+ * (`text-center`), color (`text-white`) y sus propios tamaños (`text-sm`), y
+ * listar todo eso envejecería. Se caza la forma exacta del defecto —un nombre
+ * de encabezado HTML usado como tamaño— y se confirma contra el config que ese
+ * nombre de verdad no está declarado, para que el día que alguien lo declare la
+ * guarda no estorbe.
+ */
+const abreTamanos = CONFIG.indexOf('      fontSize: {');
+const tamanos = new Set(
+  [...CONFIG.slice(abreTamanos, CONFIG.indexOf('\n      },', abreTamanos)).matchAll(/^\s+([a-z0-9-]+):\s*\[/gm)].map(
+    (m) => m[1]
+  )
+);
+
+const tamanosRotos: string[] = [];
+for (const ruta of fuentes) {
+  const codigo = sinComentarios(readFileSync(ruta, 'utf8'));
+  for (const m of codigo.matchAll(/\btext-(h[1-6])\b/g)) {
+    if (tamanos.has(m[1])) continue;
+    tamanosRotos.push(`${ruta.split('src')[1] ?? ruta}: ${m[0]}`);
+  }
+}
+
+check(
+  'la escala tipográfica se lee del config, no de una lista copiada',
+  tamanos.has('title') && tamanos.has('subtitle') && tamanos.size >= 7,
+  [...tamanos].join(', ')
+);
+check(
+  'ningún título usa un tamaño que la escala no declara',
+  tamanosRotos.length === 0,
+  tamanosRotos.length > 0
+    ? `NO EMITEN NADA (use text-title o text-subtitle): ${tamanosRotos.join(' · ')}`
+    : `${tamanos.size} tamaños declarados`
+);
+
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);
 process.exitCode = fallos === 0 ? 0 : 1;

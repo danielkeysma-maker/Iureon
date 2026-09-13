@@ -117,7 +117,7 @@ export const PreguntasDelExpedientePanel: React.FC<{ expediente: ExpedienteConDe
   if (interrogables.length === 0) {
     return (
       <section className="card p-4">
-        <h2 className="text-h3">Preparar el interrogatorio</h2>
+        <h2 className="text-subtitle text-ink-900">Preparar el interrogatorio</h2>
         <p className="mt-1 text-meta text-ink-500">
           Agregue arriba a las partes, los testigos o el perito —con su lado y sobre qué declaran— y desde
           aquí se prepara el interrogatorio de cada uno. Al juez, al secretario, a los apoderados y al
@@ -131,7 +131,7 @@ export const PreguntasDelExpedientePanel: React.FC<{ expediente: ExpedienteConDe
 
   return (
     <section className="card p-4">
-      <h2 className="text-h3">Preparar el interrogatorio</h2>
+      <h2 className="text-subtitle text-ink-900">Preparar el interrogatorio</h2>
       <p className="mt-1 text-meta text-ink-500">
         Escoja a quién va a interrogar. La técnica la pone el sistema según lo que cada persona sea en el
         proceso y de qué lado esté.

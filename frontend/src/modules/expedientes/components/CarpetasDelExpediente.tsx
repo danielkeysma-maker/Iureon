@@ -244,7 +244,7 @@ export const CarpetasDelExpediente: React.FC<{
     <section className="card p-4">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
-          <h2 className="text-h3">Carpetas</h2>
+          <h2 className="text-subtitle text-ink-900">Carpetas</h2>
           {/*
             SE DICE QUE ORGANIZAR NO CAMBIA LO QUE EL MOTOR LEE. Desde fuera no
             se puede saber, y la duda razonable —«¿si lo meto aquí, el sistema

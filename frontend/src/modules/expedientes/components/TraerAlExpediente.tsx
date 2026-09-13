@@ -74,7 +74,7 @@ export const TraerAlExpediente: React.FC<{
     <section className="card p-4">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
-          <h2 className="text-h3">Traer al expediente</h2>
+          <h2 className="text-subtitle text-ink-900">Traer al expediente</h2>
           <p className="text-meta text-ink-500">
             Las entrevistas, audiencias, revisiones, borradores, términos y orientaciones que ya tiene.
           </p>

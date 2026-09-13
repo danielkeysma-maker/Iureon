@@ -84,7 +84,7 @@ export const ActoresDelExpediente: React.FC<{
     <section className="card p-4">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
-          <h2 className="text-h3">Quién es quién</h2>
+          <h2 className="text-subtitle text-ink-900">Quién es quién</h2>
           <p className="text-meta text-ink-500">
             Las partes, los testigos y el perito. Es de aquí de donde salen las preguntas con nombre propio.
           </p>
