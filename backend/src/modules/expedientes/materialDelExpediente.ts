@@ -1,4 +1,37 @@
+import { supabase } from '../../config/supabase.config';
 import { vectorSearchService } from '../search/vectorSearch.service';
+import { rotuloDelPasaje } from './nombreDelDocumento';
+
+/**
+ * Los títulos vigentes de unos documentos de la firma, por id.
+ *
+ * Es la única lectura del nombre visible para los pasajes: la usan la búsqueda
+ * del expediente y el material que recibe el motor. Filtra por firma de forma
+ * explícita porque el cliente de base salta RLS.
+ *
+ * NUNCA LANZA: sin base o con un fallo devuelve un mapa vacío y el pasaje cae
+ * al rótulo de reemplazo. Quedarse sin nombre es un defecto menor; tumbar la
+ * búsqueda o la redacción por él sería uno mayor.
+ */
+export const titulosDeDocumentos = async (
+  firmId: string,
+  documentIds: ReadonlyArray<string | null | undefined>
+): Promise<Map<string, string>> => {
+  const unicos = [...new Set(documentIds.filter((id): id is string => Boolean(id)))];
+  if (unicos.length === 0 || !supabase) return new Map();
+
+  const { data, error } = await supabase
+    .from('legal_documents')
+    .select('id, title')
+    .eq('firm_id', firmId)
+    .in('id', unicos);
+
+  if (error) {
+    console.warn('[EXPEDIENTE-MATERIAL] No se pudieron leer los nombres de los documentos:', error.message);
+    return new Map();
+  }
+  return new Map(((data ?? []) as Array<{ id: string; title: string }>).map((d) => [d.id, d.title]));
+};
 
 /**
  * LO QUE EL EXPEDIENTE YA SABE, PUESTO SOBRE LA MESA DEL MOTOR.
@@ -111,9 +144,21 @@ export const buscarPasajesDelExpediente = async (
       expedienteId
     );
     /* Solo lo del propio expediente: el corpus público entra por otra puerta. */
-    return hallado.matches
-      .filter((m) => m.firmId === firmId)
-      .map((m) => ({ archivo: m.fileName, texto: m.contentChunk }));
+    const propios = hallado.matches.filter((m) => m.firmId === firmId);
+    /*
+     * EL RÓTULO `[n] (archivo)` SALE DEL TÍTULO VIGENTE. Los fragmentos de un
+     * documento de la firma no llevan `file_name`, así que el motor leía
+     * «documento del caso» en todos; y un nombre copiado en otro sitio quedaría
+     * viejo al renombrar. Una sola fuente: `legal_documents.title`.
+     */
+    const titulos = await titulosDeDocumentos(
+      firmId,
+      propios.map((m) => m.documentId)
+    );
+    return propios.map((m) => ({
+      archivo: rotuloDelPasaje(titulos, m.documentId, m.fileName),
+      texto: m.contentChunk
+    }));
   } catch (err) {
     console.warn(
       '[EXPEDIENTE-MATERIAL] No se pudo leer el expediente indexado:',

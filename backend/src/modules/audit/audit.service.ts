@@ -32,6 +32,23 @@ export type AuditAction =
   | 'EXPEDIENTE_CREATED'
   | 'EXPEDIENTE_DELETED'
   | 'EXPEDIENTE_INDEXED'
+  /*
+   * Un documento del expediente cambió de nombre visible. Va al rastro con el
+   * nombre anterior y el nuevo: el rótulo es lo que el abogado y el motor leen
+   * al citar un pasaje, y quien no lo encuentre por su nombre de siempre tiene
+   * derecho a saber quién lo cambió y cómo se llamaba.
+   */
+  | 'EXPEDIENTE_DOCUMENT_RENAMED'
+  /*
+   * Las carpetas del expediente. Cambian dónde encuentran todos los abogados de
+   * la firma los papeles del caso, y borrar una se lleva sus documentos
+   * indexados. El rastro dice qué carpeta, de qué nombre a cuál, de qué sitio a
+   * cuál y, al borrar, cuántas subcarpetas y documentos se fueron con ella.
+   */
+  | 'EXPEDIENTE_CARPETA_CREATED'
+  | 'EXPEDIENTE_CARPETA_RENAMED'
+  | 'EXPEDIENTE_CARPETA_MOVED'
+  | 'EXPEDIENTE_CARPETA_DELETED'
   | 'REVIEW_TEXT_STORAGE_AUTHORIZED'
   | 'FIRM_STATUS_CHANGED'
   | 'USER_CREATED'

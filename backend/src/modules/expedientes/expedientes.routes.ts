@@ -18,6 +18,7 @@ import {
   textoDelDocumentoController,
   originalDelDocumentoController,
   quitarDocumentoController,
+  renombrarDocumentoController,
   crearExpedienteController,
   listarExpedientesController,
   obtenerExpedienteController
@@ -99,6 +100,16 @@ router.patch(
   '/expedientes/:id/documentos/:documentId/carpeta',
   bloquearSiPlanVencido,
   moverDocumentoController as any
+);
+/*
+ * Renombrar un documento: cambia solo su nombre visible (`legal_documents.title`).
+ * La clave del almacenamiento no se toca. Es escritura, así que va detrás de
+ * `bloquearSiPlanVencido` como todas.
+ */
+router.patch(
+  '/expedientes/:id/documentos/:documentId',
+  bloquearSiPlanVencido,
+  renombrarDocumentoController as any
 );
 router.delete(
   '/expedientes/:id/documentos/:documentId',

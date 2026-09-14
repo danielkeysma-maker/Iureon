@@ -333,6 +333,27 @@ export const expedientesApi = {
     revisar(data, 'No se pudo mover el documento.');
   },
 
+  /**
+   * Cambia el nombre visible de un documento indexado.
+   *
+   * Solo el nombre: el archivo guardado no se toca. El servidor recorta los
+   * espacios y responde con el nombre tal como quedó, que es el que la pantalla
+   * debe pintar. Rechaza (con su mensaje en español) un nombre vacío, de más de
+   * 160 caracteres, con barras o caracteres invisibles, y uno repetido en la
+   * misma carpeta.
+   */
+  async renombrarDocumento(
+    expedienteId: string,
+    documentId: string,
+    nombre: string
+  ): Promise<{ documentId: string; titulo: string }> {
+    const data = await httpClient.patch<Respuesta & { documento: { documentId: string; titulo: string } }>(
+      `/api/expedientes/${expedienteId}/documentos/${documentId}`,
+      { body: { nombre } }
+    );
+    return revisar(data, 'No se pudo renombrar el documento.').documento;
+  },
+
   async quitarDocumento(expedienteId: string, documentId: string): Promise<void> {
     const data = await httpClient.delete<Respuesta>(
       `/api/expedientes/${expedienteId}/documentos/${documentId}`

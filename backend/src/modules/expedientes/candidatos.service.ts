@@ -2,6 +2,7 @@ import { supabase } from '../../config/supabase.config';
 import { BackblazeB2TenantStorageService } from '../documents/b2.service';
 import { textoDesdeFragmentos, type FragmentoGuardado } from './textoIndexado';
 import { ExpedienteError } from './expedientes.service';
+import { nombreRepetidoEnCarpeta, validarNombreDeDocumento } from './nombreDelDocumento';
 import type { TipoDePieza } from './types';
 
 /**
@@ -255,6 +256,40 @@ export const documentosDelExpediente = async (
 };
 
 /**
+ * Exige que el documento sea de ESTE expediente, no solo de la firma.
+ *
+ * `legal_documents` no tiene columna de expediente: la pertenencia la dicen
+ * los fragmentos, igual que en `documentosDelExpediente`. Basta con saber si
+ * existe UNO, así que se pide uno solo y sin cuerpo. Lo ajeno responde 404 como
+ * lo inexistente, para no confirmar que ese id existe en otro caso.
+ *
+ * Vive aquí y no en `carpetas.service` a propósito: las carpetas no deben tocar
+ * `document_embeddings` (el interrogatorio lee todo el expediente y organizar
+ * no puede cambiar eso), y este módulo es el dueño de leer los fragmentos.
+ */
+export const exigirDocumentoDelExpediente = async (
+  firmId: string,
+  expedienteId: string,
+  documentId: string
+): Promise<void> => {
+  const { data, error } = await db()
+    .from('document_embeddings')
+    .select('document_id')
+    .eq('firm_id', firmId)
+    .eq('expediente_id', expedienteId)
+    .eq('document_id', documentId)
+    .limit(1);
+
+  if (error) {
+    console.error('[EXPEDIENTES] No se pudo comprobar el documento:', error.message);
+    throw new ExpedienteError('DOCS_FAILED', 'No se pudo comprobar el documento del expediente.', 502);
+  }
+  if (!data || data.length === 0) {
+    throw new ExpedienteError('DOC_NOT_FOUND', 'Ese documento no está en este expediente.', 404);
+  }
+};
+
+/**
  * Quita un documento del expediente: sus fragmentos y su ficha.
  *
  * Se borran los FRAGMENTOS primero. Al revés, el CASCADE de
@@ -431,4 +466,74 @@ export const textoDelDocumentoIndexado = async (
     texto: textoDesdeFragmentos(fragmentos),
     fragmentos: fragmentos.length
   };
+};
+
+/**
+ * RENOMBRA UN DOCUMENTO DEL EXPEDIENTE: solo su nombre visible.
+ *
+ * ─── UNA ACTUALIZACIÓN, UNA COLUMNA ────────────────────────────────────────
+ *
+ * El nombre vive únicamente en `legal_documents.title` (ver
+ * `nombreDelDocumento.ts`). No se reescriben los fragmentos ni se renombra el
+ * objeto en el almacenamiento: la clave de B2 es interna y de ella dependen la
+ * descarga y el borrado del original.
+ *
+ * ─── LA PERTENENCIA SE COMPRUEBA POR EL EXPEDIENTE, NO SOLO POR LA FIRMA ───
+ *
+ * `legal_documents` no tiene columna de expediente; la pertenencia la dicen
+ * los fragmentos. Por eso se parte de `documentosDelExpediente`, que filtra por
+ * firma Y por expediente: sin eso, un id de otro asunto de la misma firma se
+ * podría renombrar desde la pantalla de un caso que no lo contiene.
+ *
+ * ─── 404 Y NO 403 PARA LO AJENO ────────────────────────────────────────────
+ *
+ * Un documento de otra firma responde exactamente igual que uno inexistente.
+ * Distinguirlos le confirmaría a quien prueba identificadores que ese
+ * documento existe en alguna parte.
+ *
+ * El cliente de base es el service role, que salta RLS: por eso la escritura
+ * repite el filtro por firma de forma explícita, aunque la lectura previa ya lo
+ * haya comprobado.
+ */
+export const renombrarDocumento = async (
+  firmId: string,
+  expedienteId: string,
+  documentId: string,
+  nombre: unknown
+): Promise<{ documentId: string; titulo: string; anterior: string }> => {
+  const validado = validarNombreDeDocumento(nombre);
+  if (!validado.ok) throw new ExpedienteError(validado.code, validado.message);
+
+  const documentos = await documentosDelExpediente(firmId, expedienteId);
+  const actual = documentos.find((d) => d.documentId === documentId);
+  if (!actual) throw new ExpedienteError('DOC_NOT_FOUND', 'Ese documento no está en este expediente.', 404);
+
+  if (nombreRepetidoEnCarpeta(validado.nombre, actual.carpetaId, documentId, documentos)) {
+    throw new ExpedienteError(
+      'NOMBRE_REPETIDO',
+      `Ya hay un documento «${validado.nombre}» en ese mismo sitio.`,
+      409
+    );
+  }
+
+  const { data, error } = await db()
+    .from('legal_documents')
+    .update({ title: validado.nombre, updated_at: new Date().toISOString() })
+    .eq('firm_id', firmId)
+    .eq('id', documentId)
+    .select('id')
+    .maybeSingle();
+
+  if (error) {
+    console.error('[EXPEDIENTES] No se pudo renombrar el documento:', error.message);
+    throw new ExpedienteError('DOC_RENAME_FAILED', 'No se pudo renombrar el documento.', 502);
+  }
+  /*
+   * Buscable pero sin ficha: la lista lo muestra como «Documento <id>» y no hay
+   * fila donde guardar un nombre. Se dice que no existe en vez de fingir que
+   * quedó renombrado.
+   */
+  if (!data) throw new ExpedienteError('DOC_NOT_FOUND', 'Ese documento no está en este expediente.', 404);
+
+  return { documentId, titulo: validado.nombre, anterior: actual.titulo };
 };

@@ -18,9 +18,12 @@ import {
   candidatosDeLaFirma,
   documentosDelExpediente,
   quitarDocumento,
+  renombrarDocumento,
   textoDelDocumentoIndexado,
   enlaceAlOriginal
 } from './candidatos.service';
+import { titulosDeDocumentos } from './materialDelExpediente';
+import { rotuloDelPasaje } from './nombreDelDocumento';
 import { vectorSearchService } from '../search/vectorSearch.service';
 import {
   borrarCarpeta,
@@ -417,6 +420,17 @@ export const buscarEnExpedienteController = async (req: Request, res: Response):
      */
     const delCaso = hallado.matches.filter((m) => m.firmId === firmId);
 
+    /*
+     * EL NOMBRE DE CADA PASAJE SALE DE `legal_documents.title`, la fuente única.
+     * Los fragmentos de un documento de la firma no llevan `file_name`, así que
+     * rotular con él mostraba el identificador; y, con el renombrado, cualquier
+     * copia del nombre en otro sitio quedaría vieja.
+     */
+    const titulos = await titulosDeDocumentos(
+      firmId,
+      delCaso.map((m) => m.documentId)
+    );
+
     res.json({
       success: true,
       /*
@@ -427,13 +441,58 @@ export const buscarEnExpedienteController = async (req: Request, res: Response):
       estado: hallado.status,
       razon: hallado.reason ?? null,
       pasajes: delCaso.map((m) => ({
-        documento: m.fileName ?? m.documentId,
+        documento: rotuloDelPasaje(titulos, m.documentId, m.fileName) ?? m.documentId,
         texto: m.contentChunk,
         similitud: m.similarity
       }))
     });
   } catch (err) {
     fallar(res, err, 'No se pudo buscar en el expediente.');
+  }
+};
+
+/**
+ * PATCH /api/expedientes/:id/documentos/:documentId   { nombre }
+ *
+ * Cambia el nombre visible de un documento indexado. La firma sale del token,
+ * nunca del cuerpo; el expediente se lee primero para comprobar que sea de esa
+ * firma (404 si no), y el servicio comprueba que el documento sea de ese
+ * expediente (404 si no).
+ *
+ * Errores: 400 MISSING_NOMBRE · NOMBRE_LARGO · NOMBRE_INVALIDO; 404 NOT_FOUND
+ * (expediente) · DOC_NOT_FOUND; 409 NOMBRE_REPETIDO; 502 DOC_RENAME_FAILED.
+ */
+export const renombrarDocumentoController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const firmId = req.firmId as string;
+    const userEmail = req.user?.email ?? 'desconocido';
+    await exigirModulo(firmId, 'EXPEDIENTES');
+    const expediente = await obtenerExpediente(firmId, String(req.params.id));
+    const renombrado = await renombrarDocumento(
+      firmId,
+      expediente.id,
+      String(req.params.documentId),
+      req.body?.nombre
+    );
+
+    /*
+     * Al rastro van el nombre anterior y el nuevo, no el contenido. Un
+     * «renombrado» al mismo nombre exacto no cambió nada y no se anota: llenar
+     * la auditoría de no-cambios ahoga los cambios reales.
+     */
+    if (renombrado.anterior !== renombrado.titulo) {
+      await auditService.record({
+        firmId,
+        userEmail,
+        action: 'EXPEDIENTE_DOCUMENT_RENAMED',
+        resource: `${expediente.caratula} · «${renombrado.anterior}» → «${renombrado.titulo}»`,
+        ipAddress: (req.headers['x-forwarded-for'] as string | undefined)?.split(',')[0]?.trim() ?? req.ip ?? ''
+      });
+    }
+
+    res.json({ success: true, documento: { documentId: renombrado.documentId, titulo: renombrado.titulo } });
+  } catch (err) {
+    fallar(res, err, 'No se pudo renombrar el documento.');
   }
 };
 
@@ -450,38 +509,96 @@ export const carpetasController = async (req: Request, res: Response): Promise<v
   }
 };
 
-/** POST /api/expedientes/:id/carpetas   { nombre, padreId? } */
+/** La IP de quien actúa, como la anotan las demás entradas de auditoría del módulo. */
+const ipDe = (req: Request): string =>
+  (req.headers['x-forwarded-for'] as string | undefined)?.split(',')[0]?.trim() ?? req.ip ?? '';
+
+/** Cómo se nombra un sitio del árbol en el rastro: la raíz no tiene carpeta. */
+const sitio = (nombre: string | null): string => (nombre ? `«${nombre}»` : 'la raíz');
+
+/*
+ * ─── LA AUDITORÍA DE LAS CARPETAS ──────────────────────────────────────────
+ *
+ * Crear, renombrar, mover y borrar una carpeta cambian dónde encuentran los
+ * abogados de la firma los papeles del caso; borrarla, además, se lleva
+ * documentos indexados. Quien no encuentre algo tiene derecho a leer quién lo
+ * movió o lo borró. Se sigue el patrón del módulo: la entrada se escribe
+ * DESPUÉS de que la acción tuvo éxito —nunca se anota lo que no ocurrió— y
+ * `auditService.record` informa por consola si la base la rechaza, sin
+ * deshacer una acción que sí quedó hecha.
+ */
+
+/** POST /api/expedientes/:id/carpetas   { nombre, padreId? } — 400 MISSING_NOMBRE · NOMBRE_LARGO · NOMBRE_INVALIDO; 409 NOMBRE_REPETIDO. */
 export const crearCarpetaController = async (req: Request, res: Response): Promise<void> => {
   try {
     const firmId = req.firmId as string;
+    const userEmail = req.user?.email ?? 'desconocido';
     await exigirModulo(firmId, 'EXPEDIENTES');
+    const expediente = await obtenerExpediente(firmId, String(req.params.id));
     const carpeta = await crearCarpeta(
       firmId,
-      String(req.params.id),
-      req.user?.email ?? 'desconocido',
-      String(req.body?.nombre ?? ''),
+      expediente.id,
+      userEmail,
+      req.body?.nombre,
       cadena(req.body?.padreId) ?? null
     );
+
+    await auditService.record({
+      firmId,
+      userEmail,
+      action: 'EXPEDIENTE_CARPETA_CREATED',
+      resource: `${expediente.caratula} · carpeta «${carpeta.nombre}»`,
+      ipAddress: ipDe(req)
+    });
+
     res.status(201).json({ success: true, carpeta });
   } catch (err) {
     fallar(res, err, 'No se pudo crear la carpeta.');
   }
 };
 
-/** PATCH /api/expedientes/:id/carpetas/:carpetaId   { nombre?, padreId? } */
+/** PATCH /api/expedientes/:id/carpetas/:carpetaId   { nombre?, padreId? } — mismos 400 y 409 que crear; 404 CARPETA_NOT_FOUND. */
 export const moverCarpetaController = async (req: Request, res: Response): Promise<void> => {
   try {
     const firmId = req.firmId as string;
+    const userEmail = req.user?.email ?? 'desconocido';
     await exigirModulo(firmId, 'EXPEDIENTES');
+    const expediente = await obtenerExpediente(firmId, String(req.params.id));
 
     /* `undefined` es «no lo toques» y `null` es «llévala a la raíz». */
-    const cambios: { nombre?: string; padreId?: string | null } = {};
-    if ('nombre' in (req.body ?? {})) cambios.nombre = String(req.body.nombre ?? '');
+    const cambios: { nombre?: unknown; padreId?: string | null } = {};
+    if ('nombre' in (req.body ?? {})) cambios.nombre = req.body.nombre;
     if ('padreId' in (req.body ?? {})) {
       cambios.padreId = req.body.padreId === null ? null : cadena(req.body.padreId) ?? null;
     }
 
-    const carpeta = await moverCarpeta(firmId, String(req.params.id), String(req.params.carpetaId), cambios);
+    const cambio = await moverCarpeta(firmId, expediente.id, String(req.params.carpetaId), cambios);
+    const { carpeta } = cambio;
+
+    /*
+     * Un mismo PATCH puede renombrar y mover a la vez: son dos hechos distintos
+     * y van como dos entradas. Lo que no cambió no se anota, igual que en el
+     * renombrado de documentos: la auditoría de no-cambios ahoga los reales.
+     */
+    if (cambios.nombre !== undefined && cambio.nombreAnterior !== carpeta.nombre) {
+      await auditService.record({
+        firmId,
+        userEmail,
+        action: 'EXPEDIENTE_CARPETA_RENAMED',
+        resource: `${expediente.caratula} · carpeta «${cambio.nombreAnterior}» → «${carpeta.nombre}»`,
+        ipAddress: ipDe(req)
+      });
+    }
+    if (cambios.padreId !== undefined && cambio.padreIdAnterior !== carpeta.padreId) {
+      await auditService.record({
+        firmId,
+        userEmail,
+        action: 'EXPEDIENTE_CARPETA_MOVED',
+        resource: `${expediente.caratula} · carpeta «${carpeta.nombre}»: ${sitio(cambio.padreAnterior)} → ${sitio(cambio.padreNuevo)}`,
+        ipAddress: ipDe(req)
+      });
+    }
+
     res.json({ success: true, carpeta });
   } catch (err) {
     fallar(res, err, 'No se pudo guardar la carpeta.');
@@ -492,8 +609,18 @@ export const moverCarpetaController = async (req: Request, res: Response): Promi
 export const borrarCarpetaController = async (req: Request, res: Response): Promise<void> => {
   try {
     const firmId = req.firmId as string;
+    const userEmail = req.user?.email ?? 'desconocido';
     await exigirModulo(firmId, 'EXPEDIENTES');
-    const ido = await borrarCarpeta(firmId, String(req.params.id), String(req.params.carpetaId));
+    const expediente = await obtenerExpediente(firmId, String(req.params.id));
+    const { nombre, ...ido } = await borrarCarpeta(firmId, expediente.id, String(req.params.carpetaId));
+
+    await auditService.record({
+      firmId,
+      userEmail,
+      action: 'EXPEDIENTE_CARPETA_DELETED',
+      resource: `${expediente.caratula} · carpeta «${nombre}» con ${ido.subcarpetas} subcarpetas y ${ido.documentos} documentos`,
+      ipAddress: ipDe(req)
+    });
 
     /*
      * SE DICE EXACTAMENTE QUÉ SE FUE, con números. La pantalla ya lo advirtió

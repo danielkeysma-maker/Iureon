@@ -86,6 +86,8 @@
     "check:material-expediente": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/expedientes/__checks__/materialDelExpediente.check.ts",
     "check:posicion-expediente": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/expedientes/__checks__/posicionDelExpediente.check.ts",
     "check:proximo-termino": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/expedientes/__checks__/proximoTermino.check.ts",
+    "check:renombrar-documento": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/expedientes/__checks__/renombrarDocumento.check.ts",
+    "check:carpetas-guardas": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/expedientes/__checks__/carpetasGuardas.check.ts",
     "check:posicion": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/posicion.check.ts",
     "check:comprobaciones-informe": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/comprobacionesDelInforme.check.ts",
     "check:glosa-informe":"npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/glosaDelInforme.check.ts",

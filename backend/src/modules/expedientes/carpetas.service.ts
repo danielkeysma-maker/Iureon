@@ -1,6 +1,7 @@
 import { supabase } from '../../config/supabase.config';
-import { borrarOriginales } from './candidatos.service';
+import { borrarOriginales, exigirDocumentoDelExpediente } from './candidatos.service';
 import { ExpedienteError } from './expedientes.service';
+import { validarNombreDeCarpeta } from './nombreDelDocumento';
 
 /**
  * LAS CARPETAS DEL EXPEDIENTE.
@@ -84,34 +85,42 @@ const expedienteDeLaFirma = async (firmId: string, expedienteId: string): Promis
   if (!data) throw new ExpedienteError('NOT_FOUND', 'Ese expediente no existe.', 404);
 };
 
-/** Y que la carpeta sea de ESE expediente, cuando se nombra una. */
+/**
+ * Y que la carpeta sea de ESE expediente, cuando se nombra una.
+ *
+ * Devuelve la fila y no solo el id porque la auditoría necesita nombrar la
+ * carpeta y su padre anterior: leerla aquí evita una segunda consulta. Lo
+ * ajeno responde 404 igual que lo inexistente, para no confirmarle a nadie
+ * que ese id existe en otro caso.
+ */
 const carpetaDelExpediente = async (
   expedienteId: string,
   carpetaId: string | null | undefined
-): Promise<string | null> => {
+): Promise<FilaDeCarpeta | null> => {
   if (!carpetaId) return null;
   const { data } = await db()
     .from('expediente_carpetas')
-    .select('id')
+    .select('*')
     .eq('expediente_id', expedienteId)
     .eq('id', carpetaId)
     .maybeSingle();
   if (!data) throw new ExpedienteError('CARPETA_NOT_FOUND', 'Esa carpeta no existe en este expediente.', 404);
-  return carpetaId;
+  return data as FilaDeCarpeta;
 };
 
 export const crearCarpeta = async (
   firmId: string,
   expedienteId: string,
   userEmail: string,
-  nombre: string,
+  nombre: unknown,
   padreId?: string | null
 ): Promise<Carpeta> => {
-  await expedienteDeLaFirma(firmId, expedienteId);
-  const limpio = (nombre ?? '').trim();
-  if (!limpio) throw new ExpedienteError('MISSING_NOMBRE', 'La carpeta necesita un nombre.');
+  const validado = validarNombreDeCarpeta(nombre);
+  if (!validado.ok) throw new ExpedienteError(validado.code, validado.message);
+  const limpio = validado.nombre;
 
-  const padre = await carpetaDelExpediente(expedienteId, padreId);
+  await expedienteDeLaFirma(firmId, expedienteId);
+  const padre = (await carpetaDelExpediente(expedienteId, padreId))?.id ?? null;
 
   const { data, error } = await db()
     .from('expediente_carpetas')
@@ -145,25 +154,54 @@ export const crearCarpeta = async (
  * sería un ramal que desaparece del árbol: la pantalla lo dibuja desde la raíz
  * y ese grupo ya no cuelga de ninguna, así que sus documentos se vuelven
  * inalcanzables sin que nada falle. Se comprueba subiendo por los padres.
+ *
+ * ─── LAS DOS PUNTAS SON DE ESTE EXPEDIENTE ─────────────────────────────────
+ *
+ * La carpeta movida se lee primero filtrando por el expediente de la ruta, y
+ * el padre destino también. Así un id de carpeta de otro caso de la misma
+ * firma responde 404 antes de escribir nada, en vez de depender de que la
+ * actualización final no encuentre fila.
+ *
+ * Devuelve también cómo estaba ANTES —nombre y padre— para que la auditoría
+ * pueda escribir de dónde a dónde sin volver a consultar.
  */
+export interface CambioDeCarpeta {
+  carpeta: Carpeta;
+  nombreAnterior: string;
+  /** Id del padre antes del cambio. Se compara por id: dos padres distintos pueden llamarse igual. */
+  padreIdAnterior: string | null;
+  /** Nombre del padre anterior y del nuevo; `null` es la raíz. Solo tienen sentido si cambió el padre. */
+  padreAnterior: string | null;
+  padreNuevo: string | null;
+}
+
 export const moverCarpeta = async (
   firmId: string,
   expedienteId: string,
   carpetaId: string,
-  cambios: { nombre?: string; padreId?: string | null }
-): Promise<Carpeta> => {
+  cambios: { nombre?: unknown; padreId?: string | null }
+): Promise<CambioDeCarpeta> => {
   await expedienteDeLaFirma(firmId, expedienteId);
+  const actual = (await carpetaDelExpediente(expedienteId, carpetaId)) as FilaDeCarpeta;
 
   const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
 
   if (cambios.nombre !== undefined) {
-    const limpio = cambios.nombre.trim();
-    if (!limpio) throw new ExpedienteError('MISSING_NOMBRE', 'La carpeta no se puede quedar sin nombre.');
-    patch.nombre = limpio;
+    const validado = validarNombreDeCarpeta(cambios.nombre);
+    if (!validado.ok) throw new ExpedienteError(validado.code, validado.message);
+    patch.nombre = validado.nombre;
   }
 
+  let padreAnterior: string | null = null;
+  let padreNuevo: string | null = null;
+
   if (cambios.padreId !== undefined) {
-    const destino = await carpetaDelExpediente(expedienteId, cambios.padreId);
+    const filaDestino = await carpetaDelExpediente(expedienteId, cambios.padreId);
+    const destino = filaDestino?.id ?? null;
+    padreNuevo = filaDestino?.nombre ?? null;
+    padreAnterior = actual.padre_id
+      ? (await carpetaDelExpediente(expedienteId, actual.padre_id).catch(() => null))?.nombre ?? null
+      : null;
     if (destino === carpetaId) {
       throw new ExpedienteError('CARPETA_EN_SI_MISMA', 'Una carpeta no puede estar dentro de sí misma.');
     }
@@ -192,7 +230,11 @@ export const moverCarpeta = async (
     throw new ExpedienteError('CARPETA_FAILED', 'No se pudo guardar la carpeta.', 502);
   }
   if (!data) throw new ExpedienteError('CARPETA_NOT_FOUND', 'Esa carpeta no existe en este expediente.', 404);
-  return aCarpeta(data as FilaDeCarpeta);
+  return { carpeta: aCarpeta(data as FilaDeCarpeta), nombreAnterior: actual.nombre,
+    padreIdAnterior: actual.padre_id,
+    padreAnterior,
+    padreNuevo
+  };
 };
 
 /**
@@ -303,8 +345,14 @@ export const borrarCarpeta = async (
   firmId: string,
   expedienteId: string,
   carpetaId: string
-): Promise<ContenidoDeCarpeta> => {
+): Promise<ContenidoDeCarpeta & { nombre: string }> => {
   await expedienteDeLaFirma(firmId, expedienteId);
+  /*
+   * Se lee la carpeta antes de nada: una carpeta de otro caso responde 404 sin
+   * haber tocado un solo documento, y la auditoría conserva el nombre de lo que
+   * se borró, que después ya no existe en ninguna parte.
+   */
+  const carpeta = (await carpetaDelExpediente(expedienteId, carpetaId)) as FilaDeCarpeta;
   const rama = await ramaDeCarpetas(expedienteId, carpetaId);
   const contenido = await contenidoDeCarpeta(firmId, expedienteId, carpetaId);
 
@@ -350,16 +398,19 @@ export const borrarCarpeta = async (
   }
   if (!data) throw new ExpedienteError('CARPETA_NOT_FOUND', 'Esa carpeta no existe en este expediente.', 404);
 
-  return contenido;
+  return { ...contenido, nombre: carpeta.nombre };
 };
 
 /**
  * Mueve un documento a una carpeta, o a la raíz con `carpetaId: null`.
  *
- * Se comprueban los dos lados: que el documento sea de la firma y que la
- * carpeta sea de ESTE expediente. Sin lo segundo, un id de carpeta de otro
- * asunto llegado por el cuerpo dejaría el documento colgando de un árbol que
- * su pantalla no dibuja — invisible, sin que nada falle.
+ * ─── SE COMPRUEBAN LOS DOS LADOS CONTRA EL EXPEDIENTE DE LA RUTA ───────────
+ *
+ * La versión anterior solo comprobaba que el documento fuera de la FIRMA. Con
+ * eso, un documento de otro caso de la misma firma se podía colgar de una
+ * carpeta de este: desaparecía del árbol de su caso —cuyo `carpeta_id` ya
+ * apuntaba a una carpeta que ese árbol no dibuja— sin que nada fallara. Ahora
+ * el documento tiene que ser de este expediente y la carpeta destino también.
  */
 export const moverDocumento = async (
   firmId: string,
@@ -368,7 +419,8 @@ export const moverDocumento = async (
   carpetaId: string | null
 ): Promise<void> => {
   await expedienteDeLaFirma(firmId, expedienteId);
-  const destino = await carpetaDelExpediente(expedienteId, carpetaId);
+  await exigirDocumentoDelExpediente(firmId, expedienteId, documentId);
+  const destino = (await carpetaDelExpediente(expedienteId, carpetaId))?.id ?? null;
 
   const { data, error } = await db()
     .from('legal_documents')
