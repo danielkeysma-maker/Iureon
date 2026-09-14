@@ -131,6 +131,8 @@ interface Fila {
   estado: EstadoDeEntrada;
   cumplida_el: string | null;
   notas: string | null;
+  /* `*` ya la trae; faltaba declararla para poder devolverla. */
+  expediente_id: string | null;
   created_by: string;
   created_at: string;
   updated_at: string;
@@ -157,6 +159,11 @@ const aEntrada = (f: Fila): EntradaDeAgenda => ({
   estado: f.estado,
   cumplidaEl: f.cumplida_el,
   notas: f.notas,
+  /*
+   * Se guardaba al crear y no se devolvía, así que ninguna pantalla podía ir
+   * del término a su caso. `?? null` cubre filas anteriores a la columna.
+   */
+  expedienteId: f.expediente_id ?? null,
   createdBy: f.created_by,
   createdAt: f.created_at,
   updatedAt: f.updated_at,

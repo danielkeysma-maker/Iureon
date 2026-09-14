@@ -40,6 +40,11 @@ export interface EntradaDeAgenda {
   estado: EstadoDeEntrada;
   cumplidaEl: string | null;
   notas: string | null;
+  /**
+   * El caso del vencimiento, o null si se guardó suelto. Se escribía al crear
+   * y no se devolvía: Inicio no podía ofrecer ir al caso de un término.
+   */
+  expedienteId: string | null;
   createdBy: string;
   createdAt: string;
   updatedAt: string;

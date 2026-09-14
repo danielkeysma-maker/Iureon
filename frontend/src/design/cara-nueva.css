@@ -1661,6 +1661,609 @@
   background: var(--gold);
 }
 
+/* ═══ INICIO ══════════════════════════════════════════════════════════════
+ * Artboards 1 (escritorio) y 2 (móvil 375) de `public/handoff/app-inicio.html`,
+ * solo el contenido: el marco ya está arriba. README-app §2: tres niveles —lo
+ * que vence (24 px, ámbar), continuar donde iba (18 px), por dónde empiezo (al
+ * final, apagado)—. Reglas que se ven aquí:
+ *   · el ámbar es SOLO de «Lo que vence»; el plan por vencer y el error de
+ *     lectura no lo usan, o el color dejaría de decir «término»;
+ *   · «sin verificar» es un BORDE DISCONTINUO con su rótulo, no un tono;
+ *   · la tinta secundaria sobre gris es `--ink-4` (#5C6673): `--ink-5` solo
+ *     pasa AA sobre blanco, y las filas se pintan de gris al pasar el cursor;
+ *   · en el teléfono no hay botón pegado abajo: la barra de pestañas de 62 px
+ *     ya vive ahí, y un pie fijo la taparía o se le montaría encima.
+ */
+.cara-nueva.cn-ini {
+  --ini-guion: rgb(138 90 18 / 0.55);
+  background: var(--canvas);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .cara-nueva.cn-ini {
+    --ini-guion: rgb(217 166 74 / 0.6);
+  }
+}
+:root[data-theme='dark'] .cara-nueva.cn-ini {
+  --ini-guion: rgb(217 166 74 / 0.6);
+}
+
+.cara-nueva .cn-ini-cuerpo {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 20px;
+  padding: 12px 16px 32px;
+}
+.cara-nueva .cn-ini-niveles {
+  display: flex;
+  width: 100%;
+  max-width: 760px;
+  flex-direction: column;
+  gap: 28px;
+}
+.cara-nueva .cn-ini-mono {
+  font-family: var(--mono);
+  font-weight: 500;
+}
+
+/* ── Saludo ───────────────────────────────────────────────────────────── */
+.cara-nueva .cn-ini-cabeza {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.cara-nueva .cn-ini-h1 {
+  font-size: 28px;
+  line-height: 34px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+.cara-nueva .cn-ini-firma {
+  margin-top: 4px;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-ini-acciones {
+  display: grid;
+  gap: 8px;
+}
+
+/* ── Botones ──────────────────────────────────────────────────────────── */
+.cara-nueva .cn-ini-boton {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.16s, color 0.16s;
+}
+.cara-nueva .cn-ini-boton--primario {
+  background: var(--brand-fill);
+  box-shadow: var(--shadow-btn);
+  color: #fff;
+}
+.cara-nueva .cn-ini-boton--primario:hover {
+  background: var(--brand-fill-hover);
+}
+.cara-nueva .cn-ini-boton--suave {
+  background: var(--neutral);
+  color: var(--ink-2);
+}
+.cara-nueva .cn-ini-boton--suave:hover {
+  background: var(--line-2);
+}
+.cara-nueva .cn-ini-boton--blanco {
+  background: var(--canvas);
+  box-shadow: var(--shadow-1);
+  color: var(--brand);
+}
+.cara-nueva .cn-ini-boton--blanco:hover {
+  background: var(--brand-soft);
+}
+.cara-nueva .cn-ini-boton--texto {
+  background: transparent;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-ini-boton--texto:hover {
+  background: var(--field);
+}
+.cara-nueva .cn-ini-enlace {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--brand);
+  text-align: left;
+  cursor: pointer;
+}
+.cara-nueva .cn-ini-enlace:hover {
+  color: var(--brand-dark);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* ── Invitación a la visita ───────────────────────────────────────────── */
+.cara-nueva .cn-ini-visita {
+  display: flex;
+  max-width: 760px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: var(--brand-soft);
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-2);
+}
+.cara-nueva .cn-ini-visita svg {
+  flex: none;
+  color: var(--brand);
+}
+.cara-nueva .cn-ini-visita p {
+  min-width: 200px;
+  flex: 1;
+}
+.cara-nueva .cn-ini-visita-botones {
+  display: flex;
+  gap: 8px;
+}
+.cara-nueva .cn-ini-visita .cn-ini-boton {
+  min-height: 44px;
+  font-size: 15px;
+}
+
+/* ── Nivel 1: lo que vence ────────────────────────────────────────────── */
+.cara-nueva .cn-ini-vence-cabeza {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.cara-nueva .cn-ini-punto {
+  width: 9px;
+  height: 9px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--warn);
+}
+.cara-nueva .cn-ini-h2-vence {
+  font-size: 22px;
+  line-height: 30px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.cara-nueva .cn-ini-cuenta {
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  padding: 0 9px;
+  border-radius: 8px;
+  background: var(--warn-bg);
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 600;
+  color: var(--warn);
+}
+.cara-nueva .cn-ini-vence-lista {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-ini-termino {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  border: 1.5px solid transparent;
+  border-radius: 14px;
+  background: var(--warn-bg);
+}
+.cara-nueva .cn-ini-termino--sin {
+  border-style: dashed;
+  border-color: var(--ini-guion);
+}
+.cara-nueva .cn-ini-termino-textos {
+  min-width: 0;
+}
+.cara-nueva .cn-ini-termino-titulo {
+  font-size: 17px;
+  line-height: 25px;
+  font-weight: 600;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-ini-termino-plazo {
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--warn);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-ini-termino-plazo strong {
+  font-weight: 600;
+}
+.cara-nueva .cn-ini-sin-verificar {
+  margin-top: 4px;
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-ini-termino-acciones {
+  display: grid;
+  gap: 8px;
+}
+.cara-nueva .cn-ini-vence-pie {
+  margin-top: 4px;
+}
+
+/* Las dos líneas calladas: nada pendiente, o todavía leyendo. */
+.cara-nueva .cn-ini-calma {
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+}
+/* El fallo de lectura: visible, sin ámbar (no es un término) y sin rojo (no es destructivo). */
+.cara-nueva .cn-ini-fallo {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--field);
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-2);
+}
+.cara-nueva .cn-ini-fallo svg {
+  flex: none;
+  margin-top: 4px;
+  color: var(--ink-3);
+}
+
+/* ── Nivel 2: continuar donde iba ─────────────────────────────────────── */
+.cara-nueva .cn-ini-h2 {
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.cara-nueva .cn-ini-bajada {
+  margin: 2px 0 12px;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-ini-recientes {
+  display: grid;
+  gap: 2px;
+  margin: 0 -12px;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-ini-reciente {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 12px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.14s;
+}
+.cara-nueva .cn-ini-reciente:hover {
+  background: var(--field);
+}
+.cara-nueva .cn-ini-reciente-textos {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+}
+.cara-nueva .cn-ini-reciente-titulo {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-ini-reciente-detalle {
+  font-size: 14.5px;
+  line-height: 21px;
+  color: var(--ink-4);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-ini-reciente-accion {
+  flex: none;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--brand);
+}
+.cara-nueva .cn-ini-nota {
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-5);
+}
+
+/* ── Plan y saldo ─────────────────────────────────────────────────────── */
+.cara-nueva .cn-ini-fichas {
+  display: grid;
+  gap: 10px;
+}
+.cara-nueva .cn-ini-ficha {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 18px 20px 8px;
+  border-radius: 14px;
+  background: var(--field);
+}
+.cara-nueva .cn-ini-ficha-rotulo,
+.cara-nueva .cn-ini-ficha-nota {
+  font-size: 14.5px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ini-ficha-valor {
+  margin: 2px 0;
+  font-size: 19px;
+  line-height: 27px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+/* ── Nivel 3: por dónde empiezo ───────────────────────────────────────── */
+.cara-nueva .cn-ini-seccion--puertas {
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+.cara-nueva .cn-ini-puertas {
+  display: grid;
+  gap: 10px;
+}
+.cara-nueva .cn-ini-puerta {
+  display: flex;
+  min-height: 44px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 16px;
+  border: none;
+  border-radius: 12px;
+  background: var(--wash);
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.cara-nueva .cn-ini-puerta:hover {
+  background: var(--neutral);
+}
+.cara-nueva .cn-ini-puerta-cabeza {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  gap: 8px;
+}
+.cara-nueva .cn-ini-puerta-icono {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  margin-top: 3px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ini-puerta-titulo {
+  min-width: 0;
+  flex: 1;
+  font-size: 15.5px;
+  line-height: 23px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-ini-puerta-texto {
+  font-size: 14.5px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ini-puerta--cerrada,
+.cara-nueva .cn-ini-puerta--cerrada:hover {
+  background: var(--wash);
+  cursor: default;
+}
+.cara-nueva .cn-ini-puerta--cerrada .cn-ini-puerta-titulo {
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ini-chip {
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  margin-top: 6px;
+  padding: 0 8px;
+  border-radius: 8px;
+  background: var(--neutral);
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 600;
+  color: var(--ink-4);
+}
+
+/* ── Pie callado: novedades y primera vez ─────────────────────────────── */
+.cara-nueva .cn-ini-pie {
+  display: grid;
+  gap: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+.cara-nueva .cn-ini-pie-cabeza {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.cara-nueva .cn-ini-h3 {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.cara-nueva .cn-ini-novedades {
+  display: grid;
+  gap: 10px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-ini-novedades li {
+  display: flex;
+  gap: 12px;
+  font-size: 14.5px;
+  line-height: 21px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-ini-novedad-fecha {
+  flex: none;
+  font-size: 13px;
+  line-height: 21px;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-ini-pie-texto {
+  margin: 6px 0 10px;
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ini-pie-botones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+.cara-nueva .cn-ini-pie-botones .cn-ini-boton {
+  min-height: 44px;
+  font-size: 15px;
+}
+
+@media (min-width: 640px) {
+  .cara-nueva .cn-ini-fichas,
+  .cara-nueva .cn-ini-puertas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .cara-nueva .cn-ini-cuerpo {
+    gap: 24px;
+    padding: 28px 40px 40px;
+  }
+  .cara-nueva .cn-ini-cabeza {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 32px;
+  }
+  .cara-nueva .cn-ini-h1 {
+    margin-bottom: 6px;
+    font-size: 34px;
+    line-height: 40px;
+  }
+  .cara-nueva .cn-ini-firma {
+    margin-top: 0;
+    font-size: 18px;
+    line-height: 26px;
+    color: var(--ink-4);
+  }
+  .cara-nueva .cn-ini-acciones {
+    display: flex;
+    flex: none;
+  }
+  .cara-nueva .cn-ini-acciones .cn-ini-boton {
+    min-height: 44px;
+    border-radius: 10px;
+    font-size: 15px;
+  }
+  /* En escritorio el primario va a la derecha, como en el artboard; en el teléfono va primero. */
+  .cara-nueva .cn-ini-boton--principal {
+    order: 2;
+  }
+  .cara-nueva .cn-ini-solo-movil {
+    display: none;
+  }
+  .cara-nueva .cn-ini-niveles {
+    gap: 32px;
+  }
+  .cara-nueva .cn-ini-h2-vence {
+    font-size: 24px;
+    line-height: 32px;
+  }
+  .cara-nueva .cn-ini-termino {
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 22px;
+  }
+  .cara-nueva .cn-ini-termino-textos {
+    flex: 1;
+  }
+  .cara-nueva .cn-ini-termino-titulo {
+    font-size: 18px;
+    line-height: 26px;
+  }
+  .cara-nueva .cn-ini-termino-acciones {
+    flex: none;
+  }
+  .cara-nueva .cn-ini-termino-acciones .cn-ini-boton {
+    min-height: 44px;
+    border-radius: 10px;
+    font-size: 15px;
+  }
+  .cara-nueva .cn-ini-reciente-titulo {
+    font-size: 17px;
+    line-height: 25px;
+  }
+  .cara-nueva .cn-ini-ficha {
+    padding: 20px 22px 8px;
+  }
+  .cara-nueva .cn-ini-ficha-valor {
+    font-size: 20px;
+    line-height: 28px;
+  }
+  .cara-nueva .cn-ini-puertas {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .cara-nueva .cn-ini-pie {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cara-nueva.cn-rail {
     transition: none;

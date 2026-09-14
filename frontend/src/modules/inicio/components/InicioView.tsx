@@ -1,44 +1,52 @@
 import React from 'react';
-import { BookMarked, ClipboardCheck, FileClock, Route, Wallet } from 'lucide-react';
+import { AlertCircle, BookMarked, Route, Wallet } from 'lucide-react';
 import type { MainView } from '../../tenant/types';
 import { moduloDeVista } from '../../tenant/navigation';
 import type { SavedDraftEntry } from '../../documents/types';
 import { reviewApi, type RevisionGuardada } from '../../workspace/services/review.api';
+import { agendaApi } from '../../agenda/services/agenda.api';
+import type { EntradaDeAgenda } from '../../agenda/types';
 import { usePlan } from '../../subscriptions/PlanContext';
 import { useTenant } from '../../tenant/TenantContext';
 import { ETIQUETA_DE_PERIODO, NOMBRE_DE_PLAN, type Modulo } from '../../subscriptions/types';
 import { NOVEDADES } from '../../help/content/novedades';
-import { TarjetaDeAccion } from './TarjetaDeAccion';
 import { PUERTAS_DE_INICIO } from '../puertas';
 import { dejarDocumentoParaLeer } from '../../workspace/documentoParaLeer';
 import { fechaCorta, fechaLarga, nombreParaSaludar, saludoSegunHora } from '../saludo';
+import { diasHastaVencer, haceCuanto, textoDelPlazo } from '../plazos';
 
 /**
- * Inicio: the screen the lawyer lands on, and the one the brand mark returns to.
+ * Inicio: la pantalla a la que se llega, y a la que devuelve la marca.
  *
- * ─── WHAT IT SHOWS, TOP TO BOTTOM ───────────────────────────────────────────
+ * ─── NO ES UN TABLERO: TRES NIVELES (README-app §2) ─────────────────────────
  *
- * The greeting with the firm and the date; «Por dónde empiezo», the doors
- * phrased as what the lawyer has in front of them (see `inicio/puertas.ts`);
- * what was left open — the latest saved
- * drafts and the latest reviews, opened through the SAME paths their lists
- * use; the plan and the balance, read from the plan context and the firm;
- * the three newest entries of Novedades; and the guided tour.
+ * 1. «Lo que vence»: los términos pendientes más próximos de la agenda, con
+ *    el botón que los resuelve. Va primero porque quien tiene un término
+ *    corriendo no debe encontrarse antes con un menú de sugerencias.
+ * 2. «Continuar donde iba»: borradores y revisiones recientes, juntos por
+ *    fecha, más el plan y el saldo.
+ * 3. «Por dónde empiezo»: las puertas de `inicio/puertas.ts`, al final y
+ *    apagadas, con Novedades y la visita guiada debajo.
  *
- * ─── NOTHING HERE IS COMPUTED TWICE ─────────────────────────────────────────
+ * ─── «NO SÉ» NO ES «CERO» ──────────────────────────────────────────────────
  *
- * Drafts arrive as a prop because `App` already loads them; reviews are read
- * with the call `RevisionesView` makes, and the row that opens in the taller
- * is the row that view would open. The plan state and its days come from the
- * server via the context; the balance is the firm's figure the sidebar shows.
- * An Inicio that recomputed any of these would disagree with the module it
- * points to on the first edge case.
+ * La agenda tiene tres estados y no dos. Si la lectura falla, la pantalla lo
+ * dice; nunca pinta «no hay términos pendientes», porque esa frase sobre un
+ * error es exactamente la que deja a un abogado tranquilo con un término
+ * vencido. Lo mismo con «Alcanza para…»: sin la cifra del servidor, se calla.
  *
- * ─── ONE COMPONENT FOR BOTH LAYOUTS ─────────────────────────────────────────
+ * ─── NADA SE CALCULA DOS VECES ─────────────────────────────────────────────
  *
- * Mobile-first stacking: one column that becomes two at `lg`. The other
- * modules have separate phone screens because their desktop tables do not
- * fold; a screen made of cards does.
+ * Los borradores llegan como prop porque `App` ya los carga; las revisiones se
+ * leen con la llamada de `RevisionesView` y se abren por su mismo camino; la
+ * agenda se lee con su servicio, ya ordenada por fecha límite en el servidor;
+ * el plan y sus días vienen del contexto; el saldo es la cifra de la firma.
+ *
+ * ─── UN SOLO COMPONENTE PARA LOS DOS TAMAÑOS ───────────────────────────────
+ *
+ * Una columna en el teléfono, con las acciones principales EN LÍNEA arriba y
+ * no pegadas al borde: la barra inferior de 62 px ya ocupa ese sitio. El
+ * estilo vive en `design/cara-nueva.css`, bajo `.cara-nueva`.
  */
 
 interface InicioViewProps {
@@ -59,28 +67,46 @@ interface InicioViewProps {
     iniciar: () => void;
     declinarInvitacion: () => void;
   };
+  /** `summary.mes.escritosRestantes` del servidor; `null` si no lo informó. */
+  escritosRestantes: number | null;
+  /** `irARedactar` de App: Redacción con la actuación y la rama ya puestas. */
+  onRedactarActuacion: (nombre: string, rama: string, hechos: string) => void;
+  /** Abre la agenda de términos dentro de Herramientas. */
+  onAbrirAgenda: () => void;
 }
 
+const MAXIMO_VENCIMIENTOS = 3;
 const MAXIMO_RECIENTES = 5;
 const MAXIMO_NOVEDADES = 3;
 
-const Seccion: React.FC<{ titulo: string; accion?: React.ReactNode; children: React.ReactNode }> = ({
-  titulo,
-  accion,
-  children
-}) => (
-  <section className="card">
-    <header className="card-head">
-      <h2 className="text-ui font-semibold text-ink-900">{titulo}</h2>
-      {accion && <div className="ml-auto">{accion}</div>}
-    </header>
-    <div className="p-4">{children}</div>
-  </section>
-);
+type LecturaDeAgenda =
+  | { estado: 'cargando' }
+  | { estado: 'error' }
+  | { estado: 'listo'; entradas: EntradaDeAgenda[] };
 
-const Vacio: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <p className="text-ui leading-[1.5] text-ink-500">{children}</p>
-);
+type Reciente =
+  | { tipo: 'borrador'; fecha: string; entrada: SavedDraftEntry }
+  | { tipo: 'revision'; fecha: string; revision: RevisionGuardada };
+
+const marcaDeTiempo = (iso: string): number => {
+  const t = new Date(iso).getTime();
+  return Number.isNaN(t) ? 0 : t;
+};
+
+/*
+ * LOS «HECHOS» QUE VIAJAN A REDACCIÓN SON LOS DATOS DE LA PROPIA ENTRADA.
+ * Nada que la agenda no tenga escrito: el asunto, el cliente y el radicado,
+ * rotulados, para que el abogado cuente los hechos debajo en vez de encontrar
+ * el cuadro vacío o, peor, relleno con algo que nadie dijo.
+ */
+const datosDeLaEntrada = (e: EntradaDeAgenda): string =>
+  [
+    e.asunto ? `Asunto: ${e.asunto}` : null,
+    e.cliente ? `Cliente: ${e.cliente}` : null,
+    e.radicado ? `Radicado: ${e.radicado}` : null
+  ]
+    .filter(Boolean)
+    .join('\n');
 
 export const InicioView: React.FC<InicioViewProps> = ({
   correo,
@@ -93,13 +119,19 @@ export const InicioView: React.FC<InicioViewProps> = ({
   onAbrirRevision,
   onRecargar,
   onVerNovedades,
-  visita
+  visita,
+  escritosRestantes,
+  onRedactarActuacion,
+  onAbrirAgenda
 }) => {
   const { plan, abrirPlan } = usePlan();
   // El nombre guardado, para el saludo. Vacío deja el derivado del correo de
   // siempre: mejor un saludo aproximado que un saludo sin nadie.
   const { currentUserName } = useTenant();
   const ahora = React.useMemo(() => new Date(), []);
+
+  /* Un botón hacia una vista que el plan oculta no llevaría a ninguna parte: App la devuelve a Inicio. */
+  const puede = (vista: MainView): boolean => !ocultas.includes(vista);
 
   /*
    * A closed door says why. The sidebar hides the view either way; here the
@@ -112,6 +144,23 @@ export const InicioView: React.FC<InicioViewProps> = ({
       ? 'No disponible para su firma'
       : 'No incluido en su plan';
   };
+
+  /* ─── La agenda: tres estados, y el error no se confunde con el vacío ─── */
+  const [agenda, setAgenda] = React.useState<LecturaDeAgenda>({ estado: 'cargando' });
+  React.useEffect(() => {
+    let cancelado = false;
+    agendaApi
+      .listar('PENDIENTE')
+      .then((entradas) => {
+        if (!cancelado) setAgenda({ estado: 'listo', entradas });
+      })
+      .catch(() => {
+        if (!cancelado) setAgenda({ estado: 'error' });
+      });
+    return () => {
+      cancelado = true;
+    };
+  }, []);
 
   /* The latest reviews, with the same call the Revisiones module makes. */
   const [revisiones, setRevisiones] = React.useState<RevisionGuardada[] | null>(null);
@@ -131,254 +180,379 @@ export const InicioView: React.FC<InicioViewProps> = ({
     };
   }, []);
 
-  const borradoresRecientes = React.useMemo(
+  const recientes = React.useMemo<Reciente[]>(
     () =>
-      [...savedDrafts]
-        .sort((a, b) => new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime())
+      [
+        ...savedDrafts.map((entrada): Reciente => ({ tipo: 'borrador', fecha: entrada.savedAt, entrada })),
+        ...(revisiones ?? []).map((revision): Reciente => ({ tipo: 'revision', fecha: revision.createdAt, revision }))
+      ]
+        .sort((a, b) => marcaDeTiempo(b.fecha) - marcaDeTiempo(a.fecha))
         .slice(0, MAXIMO_RECIENTES),
-    [savedDrafts]
-  );
-  const revisionesRecientes = React.useMemo(
-    () =>
-      [...(revisiones ?? [])]
-        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-        .slice(0, MAXIMO_RECIENTES),
-    [revisiones]
+    [savedDrafts, revisiones]
   );
 
+  const pendientes = agenda.estado === 'listo' ? agenda.entradas : [];
+  const proximos = pendientes.slice(0, MAXIMO_VENCIMIENTOS);
+  const hayVencimientos = pendientes.length > 0;
   const estadoDelPlan = describirPlan(plan);
+
+  const botonAgenda = (texto: string) =>
+    puede('tools') ? (
+      <button type="button" onClick={onAbrirAgenda} className="cn-ini-enlace">
+        {texto}
+      </button>
+    ) : null;
+
+  /* ─── NIVEL 1 · LO QUE VENCE ──────────────────────────────────────────── */
+  const loQueVence = (
+    <section className="cn-ini-vence" aria-labelledby="inicio-lo-que-vence">
+      <div className="cn-ini-vence-cabeza">
+        <span className="cn-ini-punto" aria-hidden="true" />
+        <h2 id="inicio-lo-que-vence" className="cn-ini-h2-vence">
+          Lo que vence
+        </h2>
+        <span className="cn-ini-cuenta">
+          {pendientes.length} {pendientes.length === 1 ? 'término pendiente' : 'términos pendientes'}
+        </span>
+      </div>
+      <ul className="cn-ini-vence-lista">
+        {proximos.map((e) => {
+          const dias = diasHastaVencer(e.fechaLimite, ahora);
+          const puedeRedactar = Boolean(e.actuacionId) && puede('workspace');
+          const puedeVerCaso = Boolean(e.expedienteId) && puede('expedientes');
+          return (
+            <li key={e.id} className={`cn-ini-termino${e.terminoVerificado ? '' : ' cn-ini-termino--sin'}`}>
+              <div className="cn-ini-termino-textos">
+                <p className="cn-ini-termino-titulo">
+                  {e.actuacionNombre}
+                  {e.asunto ? ` · ${e.asunto}` : ''}
+                </p>
+                <p className="cn-ini-termino-plazo">
+                  <strong>{textoDelPlazo(dias)}</strong> · <span className="cn-ini-mono">{fechaCorta(e.fechaLimite)}</span>
+                  {e.radicado && (
+                    <>
+                      {' · '}
+                      <span className="cn-ini-mono">{e.radicado}</span>
+                    </>
+                  )}
+                  {e.cliente ? ` · ${e.cliente}` : ''}
+                </p>
+                {!e.terminoVerificado && <p className="cn-ini-sin-verificar">Término sin verificar</p>}
+              </div>
+              {(puedeRedactar || puedeVerCaso || puede('tools')) && (
+                <div className="cn-ini-termino-acciones">
+                  {puedeRedactar && (
+                    <button
+                      type="button"
+                      onClick={() => onRedactarActuacion(e.actuacionNombre, e.rama ?? '', datosDeLaEntrada(e))}
+                      className="cn-ini-boton cn-ini-boton--primario"
+                    >
+                      Empezar el borrador
+                    </button>
+                  )}
+                  {/*
+                    NO HAY FORMA DE ABRIR UN EXPEDIENTE CONCRETO DESDE FUERA:
+                    `ExpedientesView` no recibe props ni lee una pantalla
+                    recordada, y su detalle vive en estado local. Por eso el
+                    botón no promete «el caso»: abre Expedientes, donde está.
+                  */}
+                  {puedeVerCaso && (
+                    <button
+                      type="button"
+                      onClick={() => onIr('expedientes')}
+                      className="cn-ini-boton cn-ini-boton--blanco"
+                    >
+                      Ver en Expedientes
+                    </button>
+                  )}
+                  {!puedeRedactar && !puedeVerCaso && (
+                    <button type="button" onClick={onAbrirAgenda} className="cn-ini-boton cn-ini-boton--blanco">
+                      Ver en la agenda
+                    </button>
+                  )}
+                </div>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+      <div className="cn-ini-vence-pie">{botonAgenda('Ver la agenda completa')}</div>
+    </section>
+  );
+
+  const agendaCargando = (
+    <p className="cn-ini-calma" role="status">
+      Leyendo la agenda de términos…
+    </p>
+  );
+
+  const agendaFallida = (
+    <div className="cn-ini-fallo" role="alert">
+      <AlertCircle className="h-4 w-4" aria-hidden="true" />
+      <p>
+        No se pudieron leer los vencimientos de la agenda. Esto no significa que no haya términos
+        pendientes. {botonAgenda('Abrir la agenda para comprobarlo')}
+      </p>
+    </div>
+  );
+
+  const agendaVacia = (
+    <p className="cn-ini-calma">
+      No hay términos pendientes en la agenda de la firma. {botonAgenda('Abrir la agenda')}
+    </p>
+  );
+
+  /* ─── NIVEL 2 · CONTINUAR DONDE IBA ───────────────────────────────────── */
+  const continuar = (
+    <section className="cn-ini-seccion" aria-labelledby="inicio-continuar">
+      <h2 id="inicio-continuar" className="cn-ini-h2">
+        Continuar donde iba
+      </h2>
+      <p className="cn-ini-bajada">Sus borradores y revisiones recientes.</p>
+
+      {recientes.length > 0 && (
+        <ul className="cn-ini-recientes">
+          {recientes.map((r) =>
+            r.tipo === 'borrador' ? (
+              <li key={`b-${r.entrada.id || r.entrada.savedAt}`}>
+                <button type="button" onClick={() => onAbrirBorrador(r.entrada)} className="cn-ini-reciente">
+                  <span className="cn-ini-reciente-textos">
+                    <span className="cn-ini-reciente-titulo">
+                      {r.entrada.draft.title || r.entrada.draft.documentType}
+                    </span>
+                    <span className="cn-ini-reciente-detalle">
+                      {['Borrador', r.entrada.cliente, haceCuanto(r.entrada.savedAt, ahora)].filter(Boolean).join(' · ')}
+                    </span>
+                  </span>
+                  <span className="cn-ini-reciente-accion">Seguir</span>
+                </button>
+              </li>
+            ) : (
+              <li key={`r-${r.revision.id}`}>
+                <button type="button" onClick={() => onAbrirRevision(r.revision.id)} className="cn-ini-reciente">
+                  <span className="cn-ini-reciente-textos">
+                    <span className="cn-ini-reciente-titulo">{r.revision.fileName || r.revision.documentType}</span>
+                    <span className="cn-ini-reciente-detalle">
+                      {['Revisión', r.revision.cliente, haceCuanto(r.revision.createdAt, ahora)].filter(Boolean).join(' · ')}
+                    </span>
+                  </span>
+                  <span className="cn-ini-reciente-accion">Ver</span>
+                </button>
+              </li>
+            )
+          )}
+        </ul>
+      )}
+
+      {recientes.length === 0 && (revisiones !== null || revisionesFallaron) && (
+        <p className="cn-ini-calma">
+          {revisionesFallaron ? 'Aún no tiene borradores.' : 'Aún no tiene borradores ni revisiones.'}{' '}
+          {puede('workspace') && (
+            <button type="button" onClick={() => onIr('workspace')} className="cn-ini-enlace">
+              Redacte el primero desde aquí.
+            </button>
+          )}
+          {!revisionesFallaron &&
+            ' Las revisiones se piden desde «Revisiones», con «Revisar un documento»: un escrito suyo o uno que le llegó.'}
+        </p>
+      )}
+      {revisionesFallaron && (
+        <p className="cn-ini-nota">No se pudieron leer sus revisiones. Ábralas desde «Revisiones».</p>
+      )}
+      {!revisionesFallaron && revisiones === null && (
+        <p className="cn-ini-nota" role="status">
+          Leyendo sus revisiones…
+        </p>
+      )}
+    </section>
+  );
+
+  /* ─── PLAN Y SALDO ────────────────────────────────────────────────────── */
+  const planYSaldo = (
+    <div className="cn-ini-fichas">
+      <div className="cn-ini-ficha">
+        <p className="cn-ini-ficha-rotulo">Su plan</p>
+        <p className="cn-ini-ficha-valor">{estadoDelPlan.nombre}</p>
+        <p className="cn-ini-ficha-nota">
+          {estadoDelPlan.estado}
+          {plan?.maxUsers ? ` · hasta ${plan.maxUsers} ${plan.maxUsers === 1 ? 'usuario' : 'usuarios'}` : ''}
+        </p>
+        <button type="button" onClick={abrirPlan} className="cn-ini-enlace">
+          Ver plan
+        </button>
+      </div>
+      <div className="cn-ini-ficha">
+        <p className="cn-ini-ficha-rotulo">Saldo · COP disponibles</p>
+        <p className="cn-ini-ficha-valor cn-ini-mono">${saldoCop.toLocaleString('es-CO')}</p>
+        {escritosRestantes !== null && (
+          <p className="cn-ini-ficha-nota">
+            {escritosRestantes <= 0
+              ? 'No alcanza para otro escrito'
+              : escritosRestantes === 1
+                ? 'Alcanza para un escrito'
+                : `Alcanza para unos ${escritosRestantes.toLocaleString('es-CO')} escritos`}
+          </p>
+        )}
+        <button type="button" onClick={onRecargar} className="cn-ini-enlace">
+          <Wallet className="h-4 w-4" aria-hidden="true" />
+          Recargar saldo
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <div
       data-visita="vista-inicio"
-      className="flex h-full min-h-0 flex-1 flex-col overflow-y-auto bg-canvas font-sans"
+      className="cara-nueva cn-ini flex h-full min-h-0 flex-1 flex-col overflow-y-auto"
     >
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-5 px-4 py-5 sm:px-6 lg:py-7">
-        {/* ─── SALUDO ─────────────────────────────────────────────────────── */}
-        <header>
-          <h1 className="text-title text-ink-900">
-            {saludoSegunHora(ahora)}, {nombreParaSaludar(correo, currentUserName)}
-          </h1>
-          <p className="mt-1 text-meta text-ink-500">
-            {firma ? `${firma} · ` : ''}
-            {fechaLarga(ahora)}
-          </p>
+      <div className="cn-ini-cuerpo">
+        {/* ─── SALUDO Y ACCIONES PRINCIPALES ─────────────────────────────── */}
+        <header className="cn-ini-cabeza">
+          <div>
+            <h1 className="cn-ini-h1">
+              {saludoSegunHora(ahora)}, {nombreParaSaludar(correo, currentUserName)}
+            </h1>
+            <p className="cn-ini-firma">
+              {firma ? `${firma} · ` : ''}
+              {fechaLarga(ahora)}
+            </p>
+          </div>
+          {(puede('workspace') || puede('taller')) && (
+            <div className="cn-ini-acciones">
+              {puede('workspace') && (
+                <button
+                  type="button"
+                  onClick={() => onIr('workspace')}
+                  className="cn-ini-boton cn-ini-boton--primario cn-ini-boton--principal"
+                >
+                  Redactar<span className="cn-ini-solo-movil"> un escrito</span>
+                </button>
+              )}
+              {/* La misma entrada de hoy: Revisiones, donde está «Revisar un documento». */}
+              {puede('taller') && (
+                <button type="button" onClick={() => onIr('taller')} className="cn-ini-boton cn-ini-boton--suave">
+                  Revisar un escrito
+                </button>
+              )}
+            </div>
+          )}
         </header>
 
         {/* ─── INVITACIÓN A LA VISITA, solo la primera vez en este navegador ── */}
         {visita.invitacionPendiente && (
-          <div className="notice flex-wrap items-center gap-3">
-            <Route className="h-4 w-4 shrink-0 text-brand-700" />
-            <p className="min-w-0 flex-1">
-              ¿Quiere una visita guiada de dos minutos? Recorre cada módulo y dice para qué sirve.
-            </p>
-            <div className="flex shrink-0 gap-2">
-              <button type="button" onClick={visita.declinarInvitacion} className="btn-ghost btn-sm">
+          <div className="cn-ini-visita">
+            <Route className="h-5 w-5" aria-hidden="true" />
+            <p>¿Quiere una visita guiada de dos minutos? Recorre cada módulo y dice para qué sirve.</p>
+            <div className="cn-ini-visita-botones">
+              <button type="button" onClick={visita.declinarInvitacion} className="cn-ini-boton cn-ini-boton--texto">
                 Ahora no
               </button>
-              <button type="button" onClick={visita.iniciar} className="btn-primary btn-sm">
+              <button type="button" onClick={visita.iniciar} className="cn-ini-boton cn-ini-boton--primario">
                 Empezar
               </button>
             </div>
           </div>
         )}
 
-        {/* ─── POR DÓNDE EMPIEZO ──────────────────────────────────────────
-          Las puertas van en `inicio/puertas.ts`: son datos, no JSX, para que
-          un guarda pueda comprobar que todas apuntan a un módulo real y que
-          ninguna se ofrece cuando el plan la tiene cerrada. */}
-        <div>
-          <h2 className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-400">
-            Por dónde empiezo
-          </h2>
-          <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {PUERTAS_DE_INICIO.map((p) => (
-              <TarjetaDeAccion
-                key={p.destino}
-                icono={p.icono}
-                titulo={p.titulo}
-                queHace={p.queHace}
-                onClick={() => {
-                  /*
-                   * La puerta del documento recibido deja anotado el modo
-                   * antes de navegar, para que Revisiones abra el dialogo
-                   * correcto en vez de su lista. Sin texto: el abogado
-                   * todavia no ha subido nada.
-                   */
-                  if (p.abreDocumentoRecibido) dejarDocumentoParaLeer({ texto: '', nombre: '' });
-                  onIr(p.destino);
-                }}
-                noIncluida={ocultas.includes(p.destino)}
-                motivoNoIncluida={motivoDePuertaCerrada(p.destino)}
-              />
-            ))}
-          </div>
-        </div>
+        <div className="cn-ini-niveles">
+          {agenda.estado === 'cargando' && agendaCargando}
+          {agenda.estado === 'error' && agendaFallida}
+          {hayVencimientos && loQueVence}
 
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-          {/* ─── CONTINUAR DONDE IBA ────────────────────────────────────── */}
-          <Seccion titulo="Continuar donde iba">
-            <div className="flex flex-col gap-5">
-              <div>
-                <p className="mb-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-400">
-                  Borradores recientes
-                </p>
-                {borradoresRecientes.length === 0 ? (
-                  <Vacio>
-                    Aún no tiene borradores.{' '}
-                    <button
-                      type="button"
-                      onClick={() => onIr('workspace')}
-                      className="font-medium text-brand-700 hover:underline"
-                    >
-                      Redacte el primero desde aquí.
-                    </button>
-                  </Vacio>
-                ) : (
-                  <ul className="divide-y divide-line-100">
-                    {borradoresRecientes.map((b) => (
-                      <li key={b.id || b.savedAt}>
-                        <button
-                          type="button"
-                          onClick={() => onAbrirBorrador(b)}
-                          className="flex w-full items-center gap-3 py-2 text-left hover:bg-canvas"
-                        >
-                          <FileClock className="h-4 w-4 shrink-0 text-ink-400" />
-                          <span className="min-w-0 flex-1">
-                            <span className="block truncate text-ui font-medium text-ink-900">
-                              {b.draft.title || b.draft.documentType}
-                            </span>
-                            <span className="block truncate text-meta text-ink-500">
-                              {[b.cliente, b.draft.documentType].filter(Boolean).join(' · ')}
-                            </span>
-                          </span>
-                          <span className="shrink-0 font-mono text-[11px] text-ink-400">
-                            {fechaCorta(b.savedAt)}
-                          </span>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
+          {continuar}
 
-              <div>
-                <p className="mb-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-400">
-                  Revisiones recientes
-                </p>
-                {revisionesFallaron ? (
-                  <Vacio>No se pudieron leer sus revisiones. Ábralas desde «Revisiones».</Vacio>
-                ) : revisiones === null ? (
-                  <Vacio>Leyendo sus revisiones…</Vacio>
-                ) : revisionesRecientes.length === 0 ? (
-                  <Vacio>
-                    Aún no ha revisado ningún documento. Se pide desde «Revisiones», con «Revisar un
-                    documento»: un escrito suyo o uno que le llegó.
-                  </Vacio>
-                ) : (
-                  <ul className="divide-y divide-line-100">
-                    {revisionesRecientes.map((r) => (
-                      <li key={r.id}>
-                        <button
-                          type="button"
-                          onClick={() => onAbrirRevision(r.id)}
-                          className="flex w-full items-center gap-3 py-2 text-left hover:bg-canvas"
-                        >
-                          <ClipboardCheck className="h-4 w-4 shrink-0 text-ink-400" />
-                          <span className="min-w-0 flex-1">
-                            <span className="block truncate text-ui font-medium text-ink-900">
-                              {r.cliente || r.fileName}
-                            </span>
-                            <span className="block truncate text-meta text-ink-500">
-                              {[r.cliente ? r.fileName : null, r.documentType].filter(Boolean).join(' · ')}
-                            </span>
-                          </span>
-                          <span className="shrink-0 font-mono text-[11px] text-ink-400">
-                            {fechaCorta(r.createdAt)}
-                          </span>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
+          {/* Sin nada pendiente, el nivel 1 se reduce a una línea y cede el primer lugar. */}
+          {agenda.estado === 'listo' && !hayVencimientos && agendaVacia}
+
+          {planYSaldo}
+
+          {/* ─── NIVEL 3 · POR DÓNDE EMPIEZO ─────────────────────────────────
+            Las puertas van en `inicio/puertas.ts`: son datos, no JSX, para que
+            un guarda pueda comprobar que todas apuntan a un módulo real y que
+            ninguna se repite. */}
+          <section className="cn-ini-seccion cn-ini-seccion--puertas" aria-labelledby="inicio-por-donde">
+            <h2 id="inicio-por-donde" className="cn-ini-h2">
+              Por dónde empiezo
+            </h2>
+            <p className="cn-ini-bajada">Si no tiene nada urgente, entre por lo que tiene delante.</p>
+            <div className="cn-ini-puertas">
+              {PUERTAS_DE_INICIO.map((p) => {
+                const cerrada = ocultas.includes(p.destino);
+                const Icono = p.icono;
+                return (
+                  <button
+                    key={p.destino}
+                    type="button"
+                    aria-disabled={cerrada || undefined}
+                    onClick={
+                      cerrada
+                        ? undefined
+                        : () => {
+                            /*
+                             * La puerta del documento recibido deja anotado el modo
+                             * antes de navegar, para que Revisiones abra el dialogo
+                             * correcto en vez de su lista. Sin texto: el abogado
+                             * todavia no ha subido nada.
+                             */
+                            if (p.abreDocumentoRecibido) dejarDocumentoParaLeer({ texto: '', nombre: '' });
+                            onIr(p.destino);
+                          }
+                    }
+                    className={`cn-ini-puerta${cerrada ? ' cn-ini-puerta--cerrada' : ''}`}
+                  >
+                    <span className="cn-ini-puerta-cabeza">
+                      <Icono className="cn-ini-puerta-icono" aria-hidden="true" />
+                      <span className="cn-ini-puerta-titulo">{p.titulo}</span>
+                    </span>
+                    <span className="cn-ini-puerta-texto">{p.queHace}</span>
+                    {cerrada && <span className="cn-ini-chip">{motivoDePuertaCerrada(p.destino)}</span>}
+                  </button>
+                );
+              })}
             </div>
-          </Seccion>
+          </section>
 
-          <div className="flex flex-col gap-5">
-            {/* ─── PLAN Y SALDO ─────────────────────────────────────────── */}
-            <Seccion titulo="Plan y saldo">
-              <dl className="grid grid-cols-2 gap-x-4 gap-y-3">
-                <div>
-                  <dt className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-400">
-                    Plan
-                  </dt>
-                  <dd className="mt-0.5 text-ui font-medium text-ink-900">{estadoDelPlan.nombre}</dd>
-                  <dd className={`text-meta ${estadoDelPlan.tono}`}>{estadoDelPlan.estado}</dd>
-                </div>
-                <div>
-                  <dt className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-400">
-                    Saldo
-                  </dt>
-                  <dd className="mt-0.5 font-mono text-[15px] font-semibold text-ink-900">
-                    ${saldoCop.toLocaleString('es-CO')}
-                  </dd>
-                  <dd className="text-meta text-ink-500">COP disponibles</dd>
-                </div>
-              </dl>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <button type="button" onClick={abrirPlan} className="btn-neutral btn-sm">
-                  Ver plan
-                </button>
-                <button type="button" onClick={onRecargar} className="btn-secondary btn-sm">
-                  <Wallet className="h-3.5 w-3.5" />
-                  Recargar saldo
-                </button>
-              </div>
-            </Seccion>
-
-            {/* ─── NOVEDADES ────────────────────────────────────────────── */}
-            <Seccion
-              titulo="Novedades"
-              accion={
-                <button type="button" onClick={onVerNovedades} className="text-meta font-medium text-brand-700 hover:underline">
+          {/* ─── NOVEDADES Y PRIMERA VEZ: una fila callada al pie ──────────── */}
+          <div className="cn-ini-pie">
+            <section className="cn-ini-pie-bloque" aria-labelledby="inicio-novedades">
+              <div className="cn-ini-pie-cabeza">
+                <h2 id="inicio-novedades" className="cn-ini-h3">
+                  Novedades
+                </h2>
+                <button type="button" onClick={onVerNovedades} className="cn-ini-enlace">
                   Ver todas
                 </button>
-              }
-            >
-              <ul className="flex flex-col gap-3">
+              </div>
+              <ul className="cn-ini-novedades">
                 {NOVEDADES.slice(0, MAXIMO_NOVEDADES).map((n) => (
-                  <li key={`${n.fecha}-${n.titulo}`} className="flex gap-3">
-                    <span className="shrink-0 pt-0.5 font-mono text-[11px] text-ink-400">
-                      {fechaCorta(n.fecha)}
-                    </span>
-                    <span className="text-ui leading-[1.45] text-ink-900">{n.titulo}</span>
+                  <li key={`${n.fecha}-${n.titulo}`}>
+                    <span className="cn-ini-mono cn-ini-novedad-fecha">{fechaCorta(n.fecha)}</span>
+                    <span>{n.titulo}</span>
                   </li>
                 ))}
               </ul>
-            </Seccion>
+            </section>
 
-            {/* ─── PRIMERA VEZ ──────────────────────────────────────────── */}
-            <Seccion titulo="¿Primera vez aquí?">
-              <p className="text-ui leading-[1.5] text-ink-500">
+            <section className="cn-ini-pie-bloque" aria-labelledby="inicio-primera-vez">
+              <h2 id="inicio-primera-vez" className="cn-ini-h3">
+                ¿Primera vez aquí?
+              </h2>
+              <p className="cn-ini-pie-texto">
                 La visita guiada recorre cada módulo en dos minutos y dice para qué sirve. El manual
                 explica cada tarea paso a paso.
               </p>
-              <div className="mt-3 flex flex-wrap items-center gap-3">
-                <button type="button" onClick={visita.iniciar} className="btn-primary btn-sm">
-                  <Route className="h-3.5 w-3.5" />
+              <div className="cn-ini-pie-botones">
+                <button type="button" onClick={visita.iniciar} className="cn-ini-boton cn-ini-boton--suave">
+                  <Route className="h-4 w-4" aria-hidden="true" />
                   Iniciar la visita guiada
                 </button>
-                <button
-                  type="button"
-                  onClick={() => onIr('manual')}
-                  className="inline-flex items-center gap-1.5 text-ui font-medium text-brand-700 hover:underline"
-                >
-                  <BookMarked className="h-3.5 w-3.5" />
+                <button type="button" onClick={() => onIr('manual')} className="cn-ini-enlace">
+                  <BookMarked className="h-4 w-4" aria-hidden="true" />
                   Abrir el manual
                 </button>
               </div>
-            </Seccion>
+            </section>
           </div>
         </div>
       </div>
@@ -386,15 +560,21 @@ export const InicioView: React.FC<InicioViewProps> = ({
   );
 };
 
+/** «vence hoy», «vence en 1 día», «vence en 12 días». */
+const venceEn = (dias: number): string =>
+  dias <= 0 ? 'vence hoy' : `vence en ${dias} ${dias === 1 ? 'día' : 'días'}`;
+
 /**
  * The plan in words. Every figure is the server's: the state, the days, the
  * period. `null` plan means the server did not answer, and that is said
  * rather than guessed.
+ *
+ * DICE «VENCE» Y NUNCA «SE RENUEVA»: no hay cobro automático. Un plan que se
+ * anuncia como renovable deja a la firma esperando una renovación que nadie
+ * va a hacer, y el día siguiente la aplicación se le cierra.
  */
-const describirPlan = (
-  plan: ReturnType<typeof usePlan>['plan']
-): { nombre: string; estado: string; tono: string } => {
-  if (!plan) return { nombre: 'Sin información', estado: 'El servidor no informó el plan.', tono: 'text-ink-500' };
+const describirPlan = (plan: ReturnType<typeof usePlan>['plan']): { nombre: string; estado: string } => {
+  if (!plan) return { nombre: 'Sin información', estado: 'El servidor no informó el plan.' };
 
   const nombre = plan.plan ? NOMBRE_DE_PLAN[plan.plan] : 'Cortesía';
   const periodo = plan.period ? ETIQUETA_DE_PERIODO[plan.period] : null;
@@ -405,28 +585,21 @@ const describirPlan = (
     case 'ACTIVO':
       return {
         nombre: periodo ? `${nombre} · ${periodo}` : nombre,
-        estado: dias !== null ? `Activo · vence en ${diasTexto}` : 'Activo',
-        tono: 'text-verified'
+        estado: dias !== null ? `Activo · ${venceEn(dias)}` : 'Activo'
       };
     case 'POR_VENCER':
       return {
         nombre: periodo ? `${nombre} · ${periodo}` : nombre,
-        estado: dias !== null ? `Por vencer · ${diasTexto}` : 'Por vencer',
-        tono: 'text-unverified'
+        estado: dias !== null ? `Por vencer · ${venceEn(dias)}` : 'Por vencer'
       };
     case 'VENCIDO':
-      return {
-        nombre,
-        estado: dias !== null ? `Vencido hace ${diasTexto}` : 'Vencido',
-        tono: 'text-danger'
-      };
+      return { nombre, estado: dias !== null ? `Vencido hace ${diasTexto}` : 'Vencido' };
     case 'PRUEBA':
       return {
         nombre: `${nombre} · Prueba`,
-        estado: dias !== null ? `Quedan ${diasTexto} de prueba` : 'Prueba',
-        tono: 'text-brand-700'
+        estado: dias !== null ? `Quedan ${diasTexto} de prueba` : 'Prueba'
       };
     case 'CORTESIA':
-      return { nombre: 'Cortesía', estado: 'Sin vencimiento', tono: 'text-ink-500' };
+      return { nombre: 'Cortesía', estado: 'Sin vencimiento' };
   }
 };

@@ -82,15 +82,16 @@ const A_INICIO: ManualArticle = {
     {
       kind: 'parrafo',
       texto:
-        'Inicio es la primera pantalla al entrar y la que abre el logo de Iureon, en la barra lateral y en la cabecera del teléfono. Reúne lo que se hace a diario y lo que conviene tener a la vista antes de empezar: lo que dejó abierto, el estado del plan y el saldo de la firma, y qué cambió en la aplicación.'
+        'Inicio es la primera pantalla al entrar y la que abre el logo de Iureon, en la barra lateral y en la cabecera del teléfono. Reúne lo que conviene tener a la vista antes de empezar, en ese orden: lo que vence, lo que dejó abierto, el estado del plan y el saldo de la firma, las puertas para empezar y qué cambió en la aplicación.'
     },
     {
       kind: 'pasos',
       pasos: [
-        'Arriba está el saludo con su nombre, la firma y la fecha. Debajo, «Por dónde empiezo»: cinco puertas nombradas por lo que usted tiene delante, no por el nombre del módulo. «Me llegó un documento» abre Revisiones; «Tengo los hechos y no el nombre» abre Orientación; «Ya sé qué voy a presentar» abre Redacción; «Tengo un caso con muchos papeles» abre Expedientes; «Grabé una audiencia» abre Audiencias. Si su plan no incluye un módulo, su tarjeta aparece atenuada con «No incluido en su plan» en vez de desaparecer.',
+        'Arriba está el saludo con su nombre, la firma y la fecha, con «Redactar» y «Revisar un escrito». Debajo, «Lo que vence»: los tres términos pendientes más próximos de la agenda de la firma —los vencidos primero, que no se esconden—, cada uno con cuánto falta y su fecha límite. Si el término no salió de una ficha verificada, su recuadro lleva el borde discontinuo y dice «Término sin verificar». «Empezar el borrador» abre Redacción con esa actuación y los datos del término; «Ver en Expedientes» abre el módulo donde está el caso al que se ató; «Ver la agenda completa» abre la agenda en Herramientas. Si no hay nada pendiente lo dice en una línea, y si la agenda no se pudo leer lo dice también, en vez de dar a entender que no vence nada.',
+        '«Continuar donde iba» junta sus borradores y sus revisiones más recientes, los cinco últimos por fecha, con el cliente y hace cuánto. Un borrador se abre en Redacción, tal como desde «Borradores»; una revisión se abre en su taller, tal como desde «Revisiones».',
+        '«Su plan» muestra el plan de la firma con su estado —activo con los días para que venza, por vencer, vencido, o en prueba con los días que quedan— y cuántos usuarios admite; «Saldo» trae el saldo disponible en pesos y, cuando el servidor lo calcula, para cuántos escritos alcanza según lo que cuestan en promedio. «Ver plan» abre la pantalla de planes; «Recargar saldo» abre la recarga, la misma del pie de la barra lateral.',
+        'Al final, «Por dónde empiezo»: cinco puertas nombradas por lo que usted tiene delante, no por el nombre del módulo. «Me llegó un documento» abre Revisiones; «Tengo los hechos y no el nombre» abre Orientación; «Ya sé qué voy a presentar» abre Redacción; «Tengo un caso con muchos papeles» abre Expedientes; «Grabé una audiencia» abre Audiencias. Si su plan no incluye un módulo, su tarjeta aparece atenuada con «No incluido en su plan» en vez de desaparecer.',
         'Están nombradas así a propósito. «Orientación» y «Expedientes» son nombres correctos y no dicen nada a quien entra por primera vez: quien tiene unos hechos sin calificar tendría que saber ya que eso se llama «Orientación» para llegar a la pantalla que existe justamente porque no lo sabe.',
-        '«Continuar donde iba» lista sus cinco borradores y sus cinco revisiones más recientes. Un borrador se abre en Redacción, tal como desde «Borradores»; una revisión se abre en su taller, tal como desde «Revisiones».',
-        '«Plan y saldo» muestra el plan de la firma con su estado —activo, por vencer con los días que faltan, vencido, o en prueba con los días que quedan— y el saldo disponible en pesos. «Ver plan» abre la pantalla de planes; «Recargar saldo» abre la recarga, la misma del pie de la barra lateral.',
         '«Novedades» trae los tres cambios más recientes de la aplicación; «Ver todas» abre la lista completa en el manual.',
         'Recargar la página no le mueve la pantalla: la pestaña vuelve al mismo módulo y a lo que tuviera abierto dentro de él —el borrador, el taller de la revisión, el transcrito, la herramienta o el artículo del manual—. Una pestaña nueva, en cambio, empieza en Inicio, porque abrir la aplicación es empezar.',
         '«¿Primera vez aquí?» tiene «Iniciar la visita guiada», que recorre cada módulo de trabajo diario —Expedientes incluido— señalándolo en pantalla con una tarjeta que dice para qué sirve —«Anterior», «Siguiente» y «Salir», o las flechas del teclado y Esc—, y «Abrir el manual». La primera vez que entra desde un navegador, Inicio le ofrece la visita en una franja; «Ahora no» la guarda para cuando quiera, desde esta pantalla o desde el índice del manual.'
@@ -125,7 +126,7 @@ const A_QUE_HACE: ManualArticle = {
     {
       kind: 'pasos',
       pasos: [
-        '«Inicio», arriba de todo: la pantalla de entrada, con los accesos del día, lo que dejó abierto, el plan y el saldo.',
+        '«Inicio», arriba de todo: la pantalla de entrada, con lo que vence, lo que dejó abierto, el plan y el saldo, y los accesos para empezar.',
         'Producir: «Redacción» (el taller donde se genera un escrito), «Borradores» (los escritos guardados con su término), «Revisiones» (los escritos ya redactados que un revisor corrigió con usted, y los documentos que le llegaron y hay que entender) y «Orientación» (de los hechos a la actuación).',
         'Registrar: «Audiencias» y «Entrevistas», las dos pantallas que transcriben una grabación.',
         'Consultar: «Buscador» de jurisprudencia, «Catálogo» de actuaciones y «Herramientas» de cálculo.',

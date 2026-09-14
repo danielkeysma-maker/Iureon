@@ -13,6 +13,7 @@
     "check:prueba-terminada": "npx tsx src/modules/subscriptions/__checks__/pruebaTerminada.check.ts",
     "check:tokens":"npx tsx src/design/__checks__/tokens.check.ts",
     "check:landing": "npx tsx src/design/__checks__/landing.check.ts",
+    "check:inicio": "npx tsx src/modules/inicio/__checks__/inicio.check.ts",
     "preview": "vite preview",
     "check:diff": "npx esbuild src/modules/workspace/__checks__/diff.check.ts --bundle --platform=node --format=cjs --outfile=node_modules/.cache/diff.check.cjs --log-level=error && node node_modules/.cache/diff.check.cjs",
     "check:marcas": "npx esbuild src/modules/workspace/__checks__/marcas.check.ts --bundle --platform=node --format=cjs --outfile=node_modules/.cache/marcas.check.cjs --log-level=error && node node_modules/.cache/marcas.check.cjs",

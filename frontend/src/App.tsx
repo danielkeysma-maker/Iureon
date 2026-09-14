@@ -585,11 +585,19 @@ export function App() {
    * on every render, and the `!session` guard inside makes the logged-out case
    * a no-op instead of a request.
    */
+  /*
+   * PARA CUÁNTOS ESCRITOS ALCANZA, tal como lo cuenta el servidor en el mismo
+   * resumen del saldo. `null` es «no lo dijo» —un servidor anterior no manda
+   * `mes`— y Inicio entonces calla la frase en vez de inventarle un número.
+   */
+  const [escritosRestantes, setEscritosRestantes] = useState<number | null>(null);
+
   const refreshBalance = React.useCallback(async () => {
     if (!session) return;
 
     try {
       const { summary } = await billingApi.summary();
+      setEscritosRestantes(summary.mes?.escritosRestantes ?? null);
       /*
        * SI EL SALDO NO CAMBIÓ, NO SE TOCA EL OBJETO. Se devolvía siempre uno
        * nuevo, así que el sondeo de cada 20 segundos repintaba la aplicación
@@ -1349,6 +1357,18 @@ export function App() {
                 setMainView('manual');
               }}
               visita={visita}
+              escritosRestantes={escritosRestantes}
+              /* El mismo paso a Redacción que usan Orientación y Revisiones. */
+              onRedactarActuacion={(nombre, rama, hechos) => irARedactar(nombre, rama, hechos)}
+              /*
+                La agenda es un diálogo de Herramientas: se abre por el mismo
+                camino que el aviso de un término, con el remonte incluido.
+              */
+              onAbrirAgenda={() => {
+                recordar(PANTALLAS.herramienta, 'agenda');
+                setHerramientasEpoca((n) => n + 1);
+                setMainView('tools');
+              }}
             />
           )}
           {mainView === 'workspace' && (

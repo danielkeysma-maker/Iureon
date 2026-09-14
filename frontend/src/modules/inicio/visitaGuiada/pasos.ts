@@ -42,7 +42,7 @@ export const PASOS_DE_VISITA: readonly PasoDeVisita[] = [
   modulo(
     'inicio',
     'Inicio',
-    'Su punto de partida. «Por dónde empiezo» ofrece las puertas por lo que usted tiene delante —un documento que le llegó, unos hechos sin nombre, un escrito que ya sabe cuál es— y debajo están lo último que dejó abierto, el estado del plan y el saldo de la firma, y las novedades.'
+    'Su punto de partida. Arriba, «Lo que vence»: los términos más próximos de la agenda, con el botón que los resuelve. Debajo, lo último que dejó abierto, el plan y el saldo de la firma, y al final «Por dónde empiezo», las puertas por lo que usted tiene delante —un documento que le llegó, unos hechos sin nombre, un escrito que ya sabe cuál es—, con las novedades.'
   ),
   modulo(
     'workspace',
