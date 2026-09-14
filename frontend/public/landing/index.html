@@ -3,871 +3,877 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Iureon — Inteligencia jurídica para firmas</title>
-<meta name="description" content="Iureon redacta el primer borrador, revisa el escrito que usted ya hizo, transcribe audiencias separando quién habla y guarda un catálogo de actuaciones con sus términos y su fuente oficial.">
-<meta name="theme-color" content="#14294A">
+<title>Iureon — Inteligencia jurídica para firmas en Colombia</title>
+<meta name="description" content="Iureon redacta el primer borrador, revisa el escrito que usted ya hizo y reúne el expediente. Lo cotejado con el texto oficial lo dice; lo que no se pudo cotejar, también.">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Iureon">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="icon" type="image/svg+xml" href="/brand/favicon.svg">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/manifest.webmanifest">
-<link rel="canonical" href="https://iureon-app.vercel.app/landing/">
+<link rel="canonical" href="https://www.iureoncolombia.com/landing/">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="es_CO">
 <meta property="og:site_name" content="Iureon">
-<meta property="og:title" content="Iureon — Inteligencia jurídica para firmas">
-<meta property="og:description" content="El conocimiento procesal, ya verificado. Usted decide. Redacción, revisión de escritos, audiencias, entrevistas, catálogo de actuaciones y herramientas para firmas en Colombia.">
-<meta property="og:url" content="https://iureon-app.vercel.app/landing/">
-<meta property="og:image" content="https://iureon-app.vercel.app/pwa/icon-512.png">
+<meta property="og:title" content="Iureon — Cada término, con el artículo que lo respalda">
+<meta property="og:description" content="Redacción, revisión de escritos y expediente para abogados y firmas en Colombia. Lo cotejado con el texto oficial lo dice; lo que no se pudo cotejar, también.">
+<meta property="og:url" content="https://www.iureoncolombia.com/landing/">
+<meta property="og:image" content="https://www.iureoncolombia.com/pwa/icon-512.png">
 <meta property="og:image:width" content="512">
 <meta property="og:image:height" content="512">
 <meta name="twitter:card" content="summary">
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* ── Tokens (SPEC.md) ─────────────────────────────────────────────────── */
+/* ═══ IUREON · «Papel y estructura» ═══════════════════════════════════════
+   Dos superficies en tensión: el papel (el escrito, Source Serif 4) y la
+   estructura (la interfaz, Satoshi). Forma del sistema nuevo de la app
+   (README-app §1): radios 8 control pequeño · 10 control · 12 campo ·
+   14 tarjeta · 16–20 superficie grande. Botones sin contorno.
+   Mono SOLO para lo citable. Oro solo como acento semántico. El «sin
+   verificar» se reconoce por el BORDE DISCONTINUO, no por el ámbar: por eso
+   ninguna otra cosa de esta página lleva borde discontinuo.
+   Punto de corte: ≤ 600 px es el diseño móvil propio; ≤ 860 px el menú se
+   pliega; ≤ 1100 px las rejillas de escritorio se apilan.                 */
 :root{
-  --navy:#14294A; --navy-900:#0e1f3a; --halo:#1f4372; --halo-2:#24508a;
-  --action:#17456B;
-  --gold:#C8A046; --gold-hover:#d6b05a; --gold-text:#7a5f1c;
-  --cream:#F4F1EA; --page:#F7F8FA; --white:#fff;
-  --ink:#101822; --ink-2:#4a5563; --ink-off:#98a1ac;
-  --line:rgba(16,24,34,.08); --line-strong:rgba(16,24,34,.12);
-  --line-dark:rgba(244,241,234,.12); --line-dark-2:rgba(244,241,234,.25);
-  --ok-bg:#E6F4EA; --ok-text:#1E6B3A; --ok-line:#2E8B57;
-  --nc-bg:#E7EEF5; --nc-text:#17456B;
-  --sv-bg:#FDF3DC; --sv-text:#7A4E00; --sv-line:#C8850A; --sv-surf:#FFFBF2;
-  --ui:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
-  --serif:'Source Serif 4',Georgia,'Times New Roman',serif;
-  --shadow-card:0 24px 48px -24px rgba(20,41,74,.25);
-  --gutter:64px;
+  --brand:#17456B; --brand-dark:#113652; --brand-soft:#EAF0F5; --brand-line:#CBD9E4;
+  --ink:#101822; --ink-2:#2B3542; --ink-3:#667487; --ink-3g:#5C6673;
+  --nav-900:#0F2233; --nav-700:#14294A;
+  --gold:#C8A046; --gold-ink:#8A6D1F; --gold-soft:#E0C58A;
+  --ok-ink:#14653F; --ok-bg:#E9F2EC; --ok-line:#A8C8B6;
+  --warn-ink:#8A5A12; --warn-bg:#FBF3E4; --warn-line:#CFAE6E;
+  --neutral-ink:#4A566B; --neutral-bg:#EDF0F4; --neutral-line:#CFD6E0;
+  --canvas:#F7F8FA; --surface:#fff; --line:#E3E7EC; --hair:#EEF1F4;
+  --neutral:#F1F3F6; --neutral-hover:#E6E9EE;
+  --on-dark:#A9BCCC; --on-dark-2:#7FA8C4; --cream:#F4F1EA;
+  --r-sm:8px; --r-ctl:10px; --r-field:12px; --r-card:14px; --r-lg:16px; --r-xl:20px;
+  --e1:0 1px 2px rgb(16 24 34/.06); --e2:0 1px 3px rgb(16 24 34/.08);
+  --e-paper:0 4px 24px rgb(16 24 34/.10); --e-float:0 8px 28px rgb(16 24 34/.12);
+  --sans:'Satoshi',-apple-system,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+  --serif:'Source Serif 4',Georgia,serif;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
-body{margin:0;background:var(--page);color:var(--ink);font-family:var(--ui);font-size:16px;line-height:1.5;overflow-x:hidden}
-img,svg{display:block;max-width:100%}
-a{color:var(--action)}
-a:hover{color:var(--navy)}
-h1,h2,h3{margin:0;font-weight:800;letter-spacing:-.03em}
-p{margin:0}
-button{font:inherit}
-:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:6px}
+body{margin:0;background:var(--canvas);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+h1,h2,h3{margin:0;text-wrap:balance}
+p{margin:0;text-wrap:pretty}
+a{color:var(--brand)}
+a:hover{color:var(--brand-dark)}
+button{font-family:inherit;cursor:pointer}
+svg{display:block}
+*:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.oscuro *:focus-visible{outline-color:var(--gold-soft)}
 .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-.skip{position:absolute;left:16px;top:-60px;z-index:200;padding:10px 16px;border-radius:999px;background:var(--gold);color:var(--navy);font-weight:700;text-decoration:none}
-.skip:focus{top:16px}
-.contenedor{padding-left:var(--gutter);padding-right:var(--gutter)}
-.kicker{font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--gold);margin-bottom:12px;text-transform:uppercase}
-.kicker--oro{color:var(--gold-text)}
-h2{font-size:40px;line-height:1.1}
-.serif{font-family:var(--serif)}
+.salto{position:absolute;left:16px;top:-60px;z-index:50;display:inline-flex;align-items:center;min-height:44px;box-sizing:border-box;padding:10px 16px;border-radius:var(--r-ctl);background:var(--brand);color:#fff;font-weight:600;text-decoration:none}
+.salto:focus{top:12px;color:#fff}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.pagina{max-width:1440px;margin:0 auto;background:var(--canvas)}
 
-/* ── Botones ─────────────────────────────────────────────────────────── */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:48px;padding:0 24px;border-radius:999px;font-size:15px;font-weight:700;text-decoration:none;transition:background .2s,color .2s,border-color .2s,transform .2s,box-shadow .2s;cursor:pointer;border:1px solid transparent;white-space:nowrap}
-.btn:hover{transform:translateY(-1px)}
-.btn--oro{background:var(--gold);color:var(--navy);box-shadow:0 8px 24px -8px rgba(200,160,70,.6)}
-.btn--oro:hover{background:var(--gold-hover);color:var(--navy)}
-.btn--fantasma{border-color:var(--line-dark-2);color:var(--cream);font-weight:600}
-.btn--fantasma:hover{background:rgba(244,241,234,.08);color:var(--cream)}
-.btn--crema{background:var(--cream);color:var(--navy)}
-.btn--crema:hover{background:#fff;color:var(--navy)}
-.btn--primario{background:var(--action);color:#fff}
-.btn--primario:hover{background:var(--navy);color:#fff}
-.btn--secundario{border:1.5px solid var(--action);color:var(--action)}
-.btn--secundario:hover{background:var(--action);color:#fff}
-.btn--sm{height:40px;padding:0 18px;font-size:14px}
-.btn--lg{height:50px;padding:0 28px}
+/* ── Rótulos ───────────────────────────────────────────────────────── */
+.rotulo{font-size:11px;line-height:14px;letter-spacing:.09em;font-weight:600;text-transform:uppercase}
+.sobre{display:flex;align-items:center;gap:8px}
+.sobre__num{font-family:var(--mono);font-size:12px;color:var(--gold-ink)}
+.filete{width:20px;height:1px;background:var(--gold);flex:none}
+.sobre .rotulo{color:var(--ink-3g)}
 
-/* ── Nav (píldora de la Dirección B) ─────────────────────────────────── */
-.nav{position:fixed;top:16px;left:var(--gutter);right:var(--gutter);z-index:100;display:flex;align-items:center;justify-content:space-between;height:76px;padding:0 8px 0 18px;border:1px solid var(--line-dark);border-radius:999px;background:rgba(14,31,58,.55);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);color:var(--cream);transition:background .25s,box-shadow .25s}
-.nav.is-scrolled{background:rgba(14,31,58,.9);box-shadow:0 12px 32px -16px rgba(0,0,0,.45)}
-.marca{display:inline-flex;align-items:center;gap:10px;color:inherit;text-decoration:none}
-.marca svg{width:32px;height:32px}
-.marca img{height:22px;width:auto}
-.nav__links{display:flex;gap:6px;font-size:14px;font-weight:500}
-.nav__links a{padding:9px 14px;border-radius:999px;color:rgba(244,241,234,.8);text-decoration:none;transition:background .2s,color .2s}
-.nav__links a:hover{background:rgba(244,241,234,.1);color:var(--cream)}
-.nav__acciones{display:flex;gap:8px;align-items:center}
-.nav__acciones .btn--fantasma{border-color:transparent}
-.hamburguesa{display:none;width:44px;height:44px;border:0;background:transparent;border-radius:999px;place-items:center;cursor:pointer;color:var(--cream)}
-.hamburguesa span{display:block;width:20px;height:2px;background:currentColor;margin:5px auto;transition:transform .2s,opacity .2s}
-.hamburguesa[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg)}
-.hamburguesa[aria-expanded="true"] span:nth-child(2){opacity:0}
-.hamburguesa[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
-.menu{position:fixed;top:84px;left:16px;right:16px;z-index:99;padding:16px;border-radius:20px;background:var(--navy-900);border:1px solid var(--line-dark);box-shadow:0 24px 48px -16px rgba(0,0,0,.5);color:var(--cream)}
-.menu[hidden]{display:none}
-.menu nav{display:grid}
-.menu nav a{padding:14px 12px;border-radius:12px;color:var(--cream);text-decoration:none;font-weight:600;font-size:16px;min-height:48px;display:flex;align-items:center}
-.menu nav a:hover{background:rgba(244,241,234,.08)}
-.menu__acciones{display:grid;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line-dark)}
-.menu__acciones .btn{width:100%}
+/* ── Botones: primario sólido, secundario gris sin borde, terciario texto ─ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 20px;border:0;border-radius:var(--r-ctl);font:600 14px/1 var(--sans);text-decoration:none;white-space:nowrap;cursor:pointer;transition:background .16s,color .16s}
+.btn--sm{height:36px;padding:0 14px;font-size:13px;border-radius:var(--r-sm)}
+.btn--primario{background:var(--brand);color:#fff;box-shadow:var(--e1)}
+.btn--primario:hover{background:var(--brand-dark);color:#fff}
+.btn--secundario{background:var(--neutral);color:var(--brand)}
+.btn--secundario:hover{background:var(--neutral-hover);color:var(--brand-dark)}
+.btn--terciario{background:transparent;color:var(--brand);padding:0 10px}
+.btn--terciario:hover{color:var(--brand-dark);text-decoration:underline;text-underline-offset:4px}
+.btn--crema{background:var(--cream);color:var(--nav-900)}
+.btn--crema:hover{background:#fff;color:var(--nav-900)}
+.btn--bloque{display:flex;width:100%}
 
-/* ── Hero (Dirección A) ──────────────────────────────────────────────── */
-.hero{position:relative;background:var(--navy);background-image:radial-gradient(1100px 600px at 78% 10%,var(--halo) 0%,rgba(31,67,114,0) 60%),radial-gradient(700px 500px at 5% 100%,#0b1a33 0%,rgba(11,26,51,0) 60%);color:var(--cream);overflow:hidden}
-.hero__grid{display:grid;grid-template-columns:520px 1fr;gap:56px;align-items:center;padding:172px var(--gutter) 104px}
-.hero__pastilla{display:inline-flex;align-items:center;gap:8px;padding:6px 12px 6px 8px;border-radius:999px;border:1px solid rgba(200,160,70,.35);font-size:12px;font-weight:600;color:var(--gold);margin-bottom:28px}
-.hero__pastilla i{width:6px;height:6px;border-radius:50%;background:var(--gold)}
-.hero h1{font-size:58px;line-height:1.04;letter-spacing:-.035em;margin-bottom:24px;text-wrap:balance}
-.hero h1 em{font-style:normal;color:var(--gold)}
-.hero__lead{font-size:17px;line-height:1.6;color:rgba(244,241,234,.78);margin-bottom:36px;text-wrap:pretty}
-.hero__cta{display:flex;gap:12px;flex-wrap:wrap}
-.escena{position:relative;perspective:1600px}
-.escena__halo{position:absolute;inset:-30px -10px;background:radial-gradient(closest-side,rgba(200,160,70,.18),rgba(200,160,70,0));filter:blur(20px)}
-.app{position:relative;display:flex;height:400px;border-radius:14px;overflow:hidden;background:var(--page);border:1px solid rgba(244,241,234,.14);box-shadow:0 40px 80px -30px rgba(0,0,0,.6);transform:rotateY(-7deg) rotateX(3deg);transition:transform .5s}
-.escena:hover .app{transform:rotateY(0) rotateX(0)}
-.app__menu{width:150px;background:var(--navy);padding:16px 12px;display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:rgba(244,241,234,.7)}
-.app__logo{display:flex;align-items:center;gap:6px;margin:0 4px 14px;font-weight:700;font-size:13px;color:var(--cream)}
-.app__logo svg{width:18px;height:18px}
-.app__menu div{padding:7px 8px}
-.app__menu .on{border-radius:7px;background:rgba(244,241,234,.12);color:var(--cream);font-weight:600}
-.app__saldo{margin-top:auto;font-size:10px;color:rgba(244,241,234,.45)}
-.app__cuerpo{flex:1;padding:22px 26px;display:flex;flex-direction:column;gap:12px;min-width:0}
-.app__barra{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11px;color:#5b6675}
-.app__barra > span:last-child{display:inline-flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-.pill{padding:3px 8px;border-radius:999px;font-weight:600;white-space:nowrap}
-.pill--ok{background:var(--ok-bg);color:var(--ok-text)}
-.pill--sv{background:var(--sv-bg);color:var(--sv-text);border:1px dashed var(--sv-line)}
-.papel{flex:1;background:#fff;border:1px solid var(--line);border-radius:8px;padding:26px 30px;font-family:var(--serif);font-size:12.5px;line-height:1.75;color:var(--ink);box-shadow:0 1px 2px rgba(16,24,34,.05);overflow:hidden}
-.papel__titulo{text-align:center;font-weight:600;letter-spacing:.06em;font-size:11px;margin-bottom:14px}
-.papel p{margin:0 0 10px}
+/* ── Cabecera ──────────────────────────────────────────────────────── */
+.cabecera{position:relative;z-index:20;display:flex;align-items:center;justify-content:space-between;height:64px;padding:0 32px;background:#fff;border-bottom:1px solid var(--line)}
+.cabecera__izq{display:flex;align-items:center;gap:32px}
+.cabecera__der{display:flex;align-items:center;gap:8px}
+.marca{display:inline-flex;align-items:center;min-height:44px;gap:9px;color:var(--ink);text-decoration:none}
+.marca:hover{color:var(--ink)}
+.marca__palabra{font-size:17px;line-height:26px;font-weight:600;letter-spacing:.09em;color:var(--ink)}
+.nav{display:flex;gap:2px;font-size:14px;line-height:20px}
+.nav a{padding:8px 12px;border-radius:var(--r-sm);color:var(--ink-2);text-decoration:none;transition:background .16s}
+.nav a:hover{background:var(--canvas);color:var(--ink)}
+.menu-movil{display:none}
+.menu-movil summary{list-style:none;display:grid;place-items:center;width:44px;height:44px;border-radius:var(--r-ctl);color:var(--ink);cursor:pointer}
+.menu-movil summary::-webkit-details-marker{display:none}
+.menu-movil summary:hover{background:var(--neutral)}
+.hamb{display:grid;gap:4px;width:20px}
+.hamb i{display:block;height:2px;border-radius:1px;background:currentColor;transition:transform .16s,opacity .16s}
+.menu-movil[open] .hamb i:nth-child(1){transform:translateY(6px) rotate(45deg)}
+.menu-movil[open] .hamb i:nth-child(2){opacity:0}
+.menu-movil[open] .hamb i:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+.menu-movil__panel{position:absolute;left:0;right:0;top:100%;padding:8px 16px 16px;background:#fff;border-bottom:1px solid var(--line);border-radius:0 0 var(--r-xl) var(--r-xl);box-shadow:var(--e-float)}
+.menu-movil__panel nav{display:grid}
+.menu-movil__panel a{display:flex;align-items:center;min-height:48px;padding:0 12px;border-radius:var(--r-ctl);color:var(--ink);font-size:16px;font-weight:500;text-decoration:none}
+.menu-movil__panel a:hover{background:var(--canvas)}
+.menu-movil__acciones{display:grid;gap:8px;margin-top:8px;padding-top:12px;border-top:1px solid var(--hair)}
+.menu-movil__acciones .btn{height:48px;font-size:15px}
+
+/* ── Hero ──────────────────────────────────────────────────────────── */
+.hero{display:grid;grid-template-columns:600px 1fr;gap:32px;padding:80px 32px 88px;align-items:center}
+.hero .sobre{margin-bottom:24px}
+.hero .sobre .rotulo{color:var(--warn-ink)}
+.hero h1{margin:0 0 24px;font-size:64px;line-height:68px;font-weight:700;letter-spacing:-.035em;color:var(--ink);max-width:15ch}
+.hero__lead{margin:0 0 32px;max-width:52ch;font-size:16px;line-height:26px;color:var(--ink-2)}
+.hero__cta{display:flex;gap:8px}
+.hero__prueba{margin:14px 0 40px;font-size:14px;line-height:22px;color:var(--ink-3g)}
+.hero__prueba a{font-weight:600;text-underline-offset:4px}
+.cifras{display:flex;gap:32px;padding-top:24px;border-top:1px solid var(--line)}
+.cifra__valor{font-family:var(--mono);font-size:20px;line-height:26px;font-weight:500;color:var(--ink)}
+.cifra__texto{font-size:13px;line-height:18px;color:var(--ink-3g);margin-top:4px;max-width:20ch}
+
+/* Maqueta del hero (decorativa, aria-hidden) */
+.maqueta{position:relative;height:520px;perspective:1600px;perspective-origin:35% 45%}
+.maqueta__reticula{position:absolute;inset:0;background-image:linear-gradient(var(--hair) 1px,transparent 1px),linear-gradient(90deg,var(--hair) 1px,transparent 1px);background-size:32px 32px;-webkit-mask-image:radial-gradient(70% 60% at 45% 45%,#000,transparent);mask-image:radial-gradient(70% 60% at 45% 45%,#000,transparent)}
+.maqueta__escrito{position:absolute;left:0;top:40px;width:520px;transform:rotateY(-16deg) rotateX(5deg) rotateZ(-1deg);transform-style:preserve-3d}
+.maqueta__expediente{position:absolute;right:0;top:0;width:300px;transform:translateZ(90px) rotateY(-16deg) rotateX(5deg);transform-style:preserve-3d}
+.maqueta__fuente{position:absolute;right:64px;bottom:24px;width:264px;transform:translateZ(150px) rotateY(-16deg) rotateX(5deg);transform-style:preserve-3d}
+.maqueta__lectura{position:absolute;left:112px;bottom:0;transform:translateZ(190px)}
+
+/* Piezas compartidas por la maqueta y el plató */
+.hoja{background:#fff;border:1px solid var(--line);border-radius:var(--r-card);box-shadow:var(--e-float);overflow:hidden}
+.hoja__cab{display:flex;align-items:center;justify-content:space-between;gap:8px;height:34px;padding:0 12px;border-bottom:1px solid var(--hair);background:var(--canvas)}
+.hoja__cab .rotulo{color:var(--ink-3g)}
+.hoja__cab .mono{font-size:12px;color:var(--neutral-ink)}
+.papel{padding:24px 28px;font-family:var(--serif);font-size:14px;line-height:24px;color:var(--ink)}
+.papel p{margin:0 0 12px}
 .papel p:last-child{margin:0}
-.marca-sv{background:var(--sv-bg);border-bottom:2px dashed var(--sv-line);padding:0 3px}
-.marca-ok{background:var(--ok-bg);border-bottom:2px solid var(--ok-line);padding:0 3px}
-.etiqueta{display:inline-block;vertical-align:middle;font-family:var(--ui);font-size:9.5px;font-weight:700;border-radius:999px;padding:1px 7px;margin-left:2px;white-space:nowrap}
-.etiqueta--sv{color:var(--sv-text);background:var(--sv-bg);border:1px dashed var(--sv-line)}
-.etiqueta--ok{color:var(--ok-text);background:var(--ok-bg)}
+.marca-ok{background:var(--ok-bg);border-bottom:2px solid var(--ok-line);padding:0 2px}
+.marca-sv{background:var(--warn-bg);border-bottom:2px dashed var(--warn-line);padding:0 2px}
+.hoja__pie{display:flex;flex-wrap:wrap;gap:6px;padding:10px 12px;border-top:1px solid var(--hair);background:var(--canvas)}
+.sello{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:999px;font-family:var(--sans);font-size:11px;line-height:14px;font-weight:600;white-space:nowrap;vertical-align:middle}
+.sello--ok{background:var(--ok-bg);border:1px solid var(--ok-line);color:var(--ok-ink)}
+.sello--nc{background:var(--neutral-bg);border:1px solid var(--neutral-line);color:var(--neutral-ink)}
+.sello--sv{background:var(--warn-bg);border:1px dashed var(--warn-line);color:var(--warn-ink)}
+.papel .sello{height:20px;margin-left:6px}
+.ficha{padding:12px}
+.ficha__titulo{font-size:13px;line-height:19px;font-weight:600;color:var(--ink)}
+.ficha__radicado{font-family:var(--mono);font-size:12px;line-height:17px;color:var(--neutral-ink);margin-top:2px}
+.ficha__sep{height:1px;background:var(--hair);margin:12px 0}
+.ficha__filas{display:grid;gap:8px;font-size:12px;line-height:17px;color:var(--ink-3)}
+.ficha__fila{display:flex;justify-content:space-between;gap:12px}
+.ficha__fila b{font-weight:400;color:var(--ink)}
+.ficha__fila .mono{color:var(--ink)}
+.ficha__fila .termino{color:var(--warn-ink)}
+.ficha__actuacion{font-size:12px;line-height:17px;color:var(--ink-2)}
+.hoja__cab--limpia{background:#fff;height:32px}
+.punto-oro{width:6px;height:6px;border-radius:50%;background:var(--gold);flex:none}
+.nota-oscura{background:var(--nav-900);border-radius:var(--r-card);box-shadow:var(--e-float);padding:14px 16px}
+.nota-oscura .rotulo{color:var(--on-dark-2);margin-bottom:8px}
+.nota-oscura__titulo{font-size:13px;line-height:19px;color:#fff;margin-bottom:4px}
+.nota-oscura__linea{display:flex;align-items:center;gap:6px;font-size:12px;line-height:17px;color:var(--on-dark)}
+.punto-verde{width:5px;height:5px;border-radius:50%;background:#4FB483;flex:none}
+.pastilla-sv{display:inline-flex;align-items:center;height:26px;padding:0 12px;border-radius:999px;background:#fff;border:1px dashed var(--warn-line);box-shadow:var(--e1);font-size:12px;line-height:14px;font-weight:600;color:var(--warn-ink);white-space:nowrap}
 
-/* ── Cifras en cinta (Dirección B) ───────────────────────────────────── */
-.cinta{background:#fff;border-bottom:1px solid var(--line);padding:28px var(--gutter)}
-.cinta__fila{display:flex;align-items:center;justify-content:space-between;gap:24px;font-size:14px;color:var(--ink-2)}
-.cifra{display:flex;align-items:baseline;gap:10px}
-.cifra b{font-size:28px;font-weight:800;letter-spacing:-.03em;color:var(--navy)}
-.cifra--larga{max-width:420px}
-.cifra--larga span{line-height:1.35}
-.cinta__sep{width:1px;height:28px;background:var(--gold);opacity:.6;flex:none}
-.cinta__iva{display:flex;align-items:center;gap:8px;font-weight:600;color:var(--navy);white-space:nowrap}
-.cinta__iva i{width:8px;height:8px;border-radius:50%;background:var(--gold)}
+/* ── La pista: el scroll mueve la cámara, no el contenido ─────────── */
+@keyframes ir-settle{from{opacity:.35;transform:translate(var(--dx),var(--dy)) rotate(var(--dr))}to{opacity:1;transform:none}}
+@keyframes ir-stamp{0%,35%{opacity:0;transform:translateY(4px)}55%,100%{opacity:1;transform:none}}
+@keyframes ir-dolly{0%{transform:translate3d(80px,40px,-560px) rotateY(11deg) rotateX(4deg)}44%{transform:translate3d(0,0,-40px) rotateY(2deg) rotateX(1deg)}100%{transform:translate3d(-60px,-30px,360px) rotateY(-7deg) rotateX(-2deg)}}
+@keyframes ir-dolly-m{0%{transform:translate3d(24px,18px,-220px) rotateY(5deg)}50%{transform:translate3d(0,0,-20px) rotateY(1deg)}100%{transform:translate3d(-8px,-10px,60px) rotateY(-3deg)}}
+@keyframes ir-converge{0%,30%{transform:translate3d(var(--x),var(--y),var(--z)) rotate(var(--r));opacity:.55}70%,100%{transform:translate3d(0,0,0) rotate(0deg);opacity:1}}
+@keyframes ir-seal{0%,58%{opacity:0;transform:scale(.9)}72%,100%{opacity:1;transform:scale(1)}}
+@keyframes ir-rail{0%,34%{opacity:0;transform:translateX(-18px)}48%,100%{opacity:1;transform:none}}
+.ir-frag{animation:ir-settle .55s cubic-bezier(.4,0,.2,1) both}
+.ir-frag--2{animation-delay:.12s}
+.ir-stamp{animation:ir-stamp .7s ease-out .3s both}
 
-/* ── Qué hace: bento (Dirección B) ───────────────────────────────────── */
-.que-hace{padding:96px var(--gutter)}
-.que-hace__cab{display:flex;justify-content:space-between;align-items:end;gap:40px;margin-bottom:40px}
-.que-hace__cab h2{max-width:640px}
-.que-hace__cab p{max-width:360px;font-size:15px;line-height:1.55;color:var(--ink-2)}
-.bento{display:grid;grid-template-columns:repeat(6,1fr);grid-auto-rows:minmax(200px,auto);gap:16px}
-.celda{position:relative;overflow:hidden;background:#fff;border:1px solid var(--line);border-radius:20px;padding:32px;display:flex;flex-direction:column;justify-content:space-between;gap:20px;transition:transform .25s,box-shadow .25s,border-color .25s}
-.celda:hover{transform:translateY(-4px);box-shadow:var(--shadow-card);border-color:rgba(200,160,70,.45)}
-.celda h3{font-size:24px;font-weight:700;letter-spacing:-.02em;margin-bottom:8px}
-.celda p{font-size:15px;line-height:1.6;color:var(--ink-2)}
-.celda svg{width:26px;height:26px;flex:none}
-.celda--3{grid-column:span 3}
-.celda--2{grid-column:span 2;padding:28px}
-.celda--2 h3{font-size:19px}
-.celda--2 p{font-size:14px;line-height:1.55}
-.celda--2 svg{width:24px;height:24px}
-.celda--6{grid-column:span 6;display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center}
-.celda--navy{background:var(--navy);color:var(--cream);border-color:transparent}
-.celda--navy p{color:rgba(244,241,234,.75);max-width:440px}
-.celda--navy::before,.celda--navy::after{content:"";position:absolute;border-radius:50%;border:1px solid rgba(200,160,70,.35);pointer-events:none}
-.celda--navy::before{right:-40px;top:-40px;width:200px;height:200px}
-.celda--navy::after{right:-10px;top:-10px;width:120px;height:120px;border-color:rgba(200,160,70,.25)}
-.celda--crema{background:var(--cream);border-color:rgba(200,160,70,.3)}
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{padding:9px 14px;border-radius:999px;border:1px solid var(--line-strong);font-size:13px;font-weight:600}
-.chip--oro{background:var(--cream);color:var(--gold-text);border-color:transparent;font-weight:700}
+/* La línea de tiempo se declara en la PISTA ALTA, no en el escenario fijo:
+   un sujeto pegado con position:sticky nunca cambia de sitio en el puerto de
+   desplazamiento, así que su ViewTimeline quedaría degenerada e inactiva. */
+.pista{position:relative;height:3200px;view-timeline-name:--ir-track;view-timeline-axis:block}
+.escenario{position:sticky;top:0;height:100vh;overflow:hidden;perspective:1200px;perspective-origin:50% 46%;background:radial-gradient(120% 90% at 50% 30%,#fff 0%,var(--canvas) 55%,var(--hair) 100%)}
+.escenario__reticula{position:absolute;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:64px 64px;-webkit-mask-image:radial-gradient(75% 60% at 50% 46%,#000,transparent 78%);mask-image:radial-gradient(75% 60% at 50% 46%,#000,transparent 78%);opacity:.7}
+.escenario__velo{position:absolute;inset:0;pointer-events:none;background:radial-gradient(60% 50% at 50% 46%,rgba(247,248,250,0) 40%,rgba(247,248,250,.75) 100%)}
+.escenario__aviso{position:absolute;right:32px;top:32px;display:flex;align-items:center;gap:10px;height:28px;padding:0 12px;border-radius:999px;background:rgb(255 255 255/.9);border:1px solid var(--line);color:var(--ink-3)}
+.ir-cam{position:absolute;inset:0;transform-style:preserve-3d}
+.plano{position:absolute;left:50%;top:50%;transform-style:preserve-3d}
+.plano--catalogo{width:640px;margin:-190px 0 0 -320px;transform:translateZ(-460px) scale(1.06);filter:saturate(.72);opacity:.62}
+.catalogo__cab{height:30px;display:flex;align-items:center;padding:0 12px;border-bottom:1px solid var(--hair);background:var(--canvas);color:var(--ink-3g)}
+.catalogo__filas{padding:10px 12px;display:grid;gap:6px}
+.catalogo__fila{display:flex;justify-content:space-between;gap:12px;font-size:12px;line-height:17px;color:var(--ink-3)}
+.catalogo__fila + .catalogo__fila{padding-top:6px;border-top:1px solid var(--hair)}
+.plano--rail{width:210px;margin:-210px 0 0 -560px;transform:translateZ(-160px) rotateY(16deg)}
+.rail{background:#F7F5EF;border:1px solid var(--line);border-radius:var(--r-card);box-shadow:var(--e-float);padding:12px 10px}
+.rail__marca{display:flex;align-items:center;gap:8px;padding:2px 4px 12px;color:#0B1220}
+.rail__grupo{color:var(--ink-3g);padding:0 4px 6px}
+.rail__grupo--2{padding-top:10px}
+.rail__item{display:flex;gap:10px;padding:5px 6px;font-size:13px;line-height:19px;color:#3B4453}
+.rail__item .mono{font-size:11px;color:var(--ink-3g)}
+.rail__item--on{border-radius:var(--r-sm);background:#fff;font-weight:600;color:#0B1220;box-shadow:inset 2px 0 0 var(--gold)}
+.rail__item--on .mono{color:var(--gold-ink)}
+.plano--escrito{width:560px;margin:-210px 0 0 -180px;transform:translateZ(0) rotateY(-11deg) rotateX(3deg)}
+.plano--escrito .papel{padding:26px 30px}
+.frag{position:absolute;left:50%;top:50%;transform-style:preserve-3d}
+.frag--radicado{--x:-300px;--y:170px;--z:60px;--r:-8deg;margin:120px 0 0 -100px}
+.frag--memoria{--x:250px;--y:210px;--z:180px;--r:7deg;margin:172px 0 0 -60px}
+.frag--fuente{--x:-210px;--y:-190px;--z:220px;--r:6deg;margin:-268px 0 0 40px}
+.pieza{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border:1px solid var(--line);border-radius:var(--r-field);box-shadow:var(--e-float);font-size:12px;line-height:17px;color:var(--ink-3);white-space:nowrap}
+.pieza .mono{color:var(--neutral-ink)}
+.pieza--sv{border-style:dashed;border-color:var(--warn-line)}
+.pieza--sv .mono{color:var(--warn-ink)}
+.pieza--oscura{background:var(--nav-900);border-color:var(--nav-900);color:#fff}
+.plano--expediente{width:300px;margin:-60px 0 0 220px;transform:translateZ(190px) rotateY(-11deg)}
 
-/* ── Tres motores ────────────────────────────────────────────────────── */
-.motores{background:var(--cream);border-top:1px solid rgba(200,160,70,.25);border-bottom:1px solid rgba(200,160,70,.25);padding:96px var(--gutter)}
-.motores__cab{display:grid;grid-template-columns:1fr 1fr;gap:64px;margin-bottom:48px;align-items:start}
-.motores__cab h2{line-height:1.08;letter-spacing:-.035em}
-.motores__cab p{font-size:15.5px;line-height:1.6;color:var(--ink-2);text-wrap:pretty}
-.cadena{display:grid;grid-template-columns:1fr 40px 1fr 40px 1fr;gap:12px;align-items:center}
-.motor{position:relative;background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:18px;padding:28px;transition:transform .25s,box-shadow .25s,border-color .25s}
-.motor:hover{transform:translateY(-4px);box-shadow:var(--shadow-card);border-color:rgba(200,160,70,.45)}
-.motor__cab{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
-.motor__n{width:32px;height:32px;border-radius:50%;background:var(--cream);color:var(--gold-text);display:grid;place-items:center;font-weight:800;font-size:13px}
-.motor h3{font-size:20px;font-weight:700;letter-spacing:-.02em;margin-bottom:6px}
-.motor h3 span{color:var(--gold-text);font-weight:500}
-.motor p{font-size:14px;line-height:1.55;color:var(--ink-2)}
-.motor--navy{background:var(--navy);color:var(--cream);border-color:rgba(200,160,70,.4)}
-.motor--navy .motor__n{background:var(--gold);color:var(--navy)}
-.motor--navy h3 span{color:var(--gold)}
-.motor--navy p{color:rgba(244,241,234,.75)}
-.flecha{display:grid;place-items:center;color:var(--gold)}
-.motores__pie{display:flex;justify-content:space-between;align-items:center;gap:32px;margin-top:32px;padding-top:20px;border-top:1px solid rgba(200,160,70,.3);font-size:13.5px;line-height:1.55;color:var(--ink-2)}
-.motores__pie span:first-child{max-width:560px}
-.motores__pie span:last-child{max-width:520px;text-align:right}
-.motores__pie b{color:var(--ink)}
+.ir-cam,.ir-conv,.ir-seal,.ir-rail{animation-fill-mode:both;animation-timing-function:linear;animation-timeline:--ir-track;animation-range:contain 0% contain 100%}
+.ir-cam{animation-name:ir-dolly}
+.ir-conv{animation-name:ir-converge}
+.ir-seal{animation-name:ir-seal}
+.ir-rail{animation-name:ir-rail}
 
-/* ── Tres estados ────────────────────────────────────────────────────── */
-.estados{background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:96px var(--gutter)}
-.estados__grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
-.estados h2{margin-bottom:20px}
-.cita{font-family:var(--serif);font-size:22px;line-height:1.5;color:var(--navy);text-wrap:pretty}
-.estados__lista{display:flex;flex-direction:column;gap:14px}
-.estado{display:flex;gap:18px;align-items:flex-start;padding:22px 24px;border-radius:14px;border:1px solid var(--line);background:var(--page);transition:transform .25s,box-shadow .25s}
-.estado:hover{transform:translateY(-4px);box-shadow:var(--shadow-card)}
-.estado--sv{border:1px dashed var(--sv-line);background:var(--sv-surf)}
-.chip-estado{flex:none;margin-top:2px;padding:5px 12px;border-radius:999px;font-size:12.5px;font-weight:700}
-.chip-estado--ok{background:var(--ok-bg);color:var(--ok-text)}
-.chip-estado--nc{background:var(--nc-bg);color:var(--nc-text)}
-.chip-estado--sv{background:var(--sv-bg);color:var(--sv-text);border:1px dashed var(--sv-line)}
-.estado strong{display:block;font-weight:700;font-size:15px;margin-bottom:4px}
-.estado span{font-size:14px;line-height:1.55;color:var(--ink-2)}
+/* Los textos de los tres tiempos viven en la columna que se desplaza:
+   no dependen de la animación y se leen igual con ella apagada. */
+.tiempo{position:absolute;left:56px;width:520px;z-index:2}
+.tiempo--1{top:260px}
+.tiempo--2{top:1420px}
+.tiempo--3{top:2560px}
+.tiempo__caja{display:inline-block;padding:20px 24px;background:rgb(247 248 250/.94);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--e-float);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.tiempo .sobre{margin-bottom:12px}
+.tiempo h2{margin:0 0 8px;font-size:44px;line-height:50px;font-weight:700;letter-spacing:-.03em;color:var(--ink)}
+.tiempo p{font-size:16px;line-height:26px;color:var(--ink-2);max-width:44ch}
 
-/* ── Planes ──────────────────────────────────────────────────────────── */
-.planes{padding:96px var(--gutter)}
-.planes__cab{text-align:center;max-width:640px;margin:0 auto 40px}
-.planes__cab h2{margin-bottom:14px}
-.conmutador{display:flex;justify-content:center;align-items:center;gap:12px;margin-bottom:44px;flex-wrap:wrap}
-.segs{display:inline-flex;padding:4px;border-radius:999px;background:#fff;border:1px solid rgba(16,24,34,.1)}
-.seg{height:40px;padding:0 18px;border-radius:999px;border:none;font:700 14px var(--ui);cursor:pointer;background:transparent;color:var(--ink-2);transition:background .2s,color .2s}
-.seg.on{background:var(--navy);color:var(--cream)}
-.ahorro{padding:5px 10px;border-radius:999px;background:var(--sv-bg);color:var(--sv-text);font-size:12px;font-weight:700}
-/* Dirección B: la tarjeta Premium es navy con acentos dorados y crece un 15 %;
-   las otras dos son claras sobre el fondo de página. Las listas empujan los
-   botones al pie para que los tres «Contratar» queden alineados. */
-.planes__grid{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:16px;align-items:stretch}
-.plan{position:relative;display:flex;flex-direction:column;background:var(--page);border:1px solid var(--line);border-radius:22px;padding:32px;transition:transform .25s,box-shadow .25s,border-color .25s}
-.plan:hover{transform:translateY(-4px);box-shadow:var(--shadow-card);border-color:rgba(200,160,70,.45)}
-.plan__cab{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.plan__nombre{font-size:15px;font-weight:700;color:var(--ink)}
-.plan__usuarios{font-size:14px;color:var(--ink-2);margin-top:4px}
-.plan__precio{display:flex;align-items:baseline;gap:4px;margin:28px 0 24px}
-.plan__precio b{font-size:40px;font-weight:800;letter-spacing:-.03em;line-height:1}
-.plan__precio span{font-size:15px;color:var(--ink-2)}
-.plan__acciones{display:grid;gap:10px;margin-top:28px}
-.plan .btn{width:100%;height:48px;font-size:14.5px;margin:0}
-.plan .btn--prueba{height:42px;font-size:13.5px;border-style:dashed}
-.hero__prueba{margin-top:14px;font-size:14px;color:rgba(244,241,234,.7)}
-.hero__prueba a{color:var(--gold);text-decoration:underline;text-underline-offset:4px;font-weight:600}
-.plan ul{list-style:none;margin:0;padding:0;display:grid;gap:10px;font-size:14px;line-height:1.4;flex:1}
-.plan li.no{color:var(--ink-off);text-decoration:line-through}
-.plan li.cab{font-weight:600}
-.plan--premium{background:var(--navy);background-image:radial-gradient(400px 300px at 100% 0%,var(--halo-2) 0%,rgba(36,80,138,0) 70%);color:var(--cream);border-color:transparent;padding:36px 32px;box-shadow:0 40px 80px -40px rgba(20,41,74,.7)}
-.plan--premium:hover{border-color:rgba(200,160,70,.5)}
-.plan--premium .plan__nombre{color:var(--cream)}
-.plan--premium .plan__usuarios,.plan--premium .plan__precio span{color:rgba(244,241,234,.7)}
-.plan--premium .plan__precio b{font-size:48px;letter-spacing:-.035em;color:var(--cream)}
-.plan--premium li.cab{color:var(--gold)}
-.plan--premium .btn{height:50px;font-size:15px}
-.recomendado{padding:5px 12px;border-radius:999px;border:1px solid rgba(200,160,70,.6);color:var(--gold);font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
-.planes__nota{margin:32px auto 0;max-width:900px;text-align:center;font-size:13.5px;line-height:1.6;color:var(--ink-2);text-wrap:pretty}
-
-/* ── Seguridad + Cómo empieza ────────────────────────────────────────── */
-.dos{background:#fff;border-top:1px solid var(--line);padding:96px var(--gutter)}
-.dos__grid{display:grid;grid-template-columns:1fr 1fr;gap:80px}
-.dos h2{font-size:34px;line-height:1.12;margin-bottom:32px}
-.puntos{display:grid}
-.punto{display:flex;gap:16px;padding:20px 0;border-top:1px solid var(--line)}
-.punto:last-child{border-bottom:1px solid var(--line)}
-.punto i{flex:none;width:8px;height:8px;border-radius:50%;background:var(--gold);margin-top:8px}
-.punto p{font-size:15.5px;line-height:1.55}
-.pasos{display:grid;gap:14px}
-.paso{display:flex;gap:18px;align-items:flex-start;padding:20px 22px;border-radius:14px;background:var(--page);border:1px solid rgba(16,24,34,.06)}
-.paso b{flex:none;width:32px;height:32px;border-radius:50%;background:var(--navy);color:var(--gold);display:grid;place-items:center;font-weight:800;font-size:14px}
-.paso p{font-size:15px;line-height:1.55;padding-top:5px}
-.prueba{margin-top:20px;font-size:14px;color:var(--ink-2);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.prueba b{padding:4px 10px;border-radius:999px;background:var(--cream);color:var(--gold-text);font-weight:700;font-size:12px}
-
-/* ── Se instala como app ─────────────────────────────────────────────── */
-.instala{padding:96px var(--gutter);background:var(--page)}
-.instala__caja{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:24px;padding:56px 64px;overflow:hidden}
-.instala h2{font-size:34px;line-height:1.12;margin-bottom:16px}
-.instala p{font-size:16px;line-height:1.6;color:var(--ink-2);text-wrap:pretty}
-.dispositivos{position:relative;height:280px}
-.pc{position:absolute;right:0;top:20px;width:360px;max-width:100%;height:240px;border-radius:12px;background:var(--page);border:1px solid rgba(16,24,34,.1);box-shadow:0 24px 48px -24px rgba(20,41,74,.3);display:flex;overflow:hidden}
-.pc__menu{width:90px;background:var(--navy);padding:14px 10px;display:grid;gap:8px;align-content:start}
-.pc__menu i{height:8px;border-radius:4px;background:rgba(244,241,234,.2)}
-.pc__menu i:first-child{background:rgba(244,241,234,.5)}
-.pc__cuerpo{flex:1;padding:16px}
-.pc__titulo{height:10px;width:60%;border-radius:4px;background:rgba(16,24,34,.12);margin-bottom:12px}
-.pc__hoja{background:#fff;border:1px solid var(--line);border-radius:6px;height:150px}
-.telefono{position:absolute;left:10px;bottom:0;width:130px;height:260px;border-radius:24px;background:var(--ink);padding:8px;box-shadow:0 24px 48px -24px rgba(0,0,0,.5)}
-.telefono__pantalla{height:100%;border-radius:18px;background:var(--page);overflow:hidden;display:flex;flex-direction:column}
-.telefono__barra{height:44px;background:var(--navy)}
-.telefono__avisos{padding:10px;display:grid;gap:8px}
-.telefono__linea{height:8px;width:70%;border-radius:4px;background:rgba(16,24,34,.15)}
-.aviso{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px;font-size:9px;line-height:1.4;color:var(--ink)}
-
-/* ── CTA final + pie ─────────────────────────────────────────────────── */
-.cta{background:var(--navy);background-image:radial-gradient(800px 400px at 50% 120%,var(--halo) 0%,rgba(31,67,114,0) 70%);color:var(--cream);text-align:center;padding:104px var(--gutter) 96px}
-.cta h2{font-size:52px;line-height:1.05;letter-spacing:-.035em;margin-bottom:32px}
-.cta__botones{display:flex;justify-content:center;gap:12px;margin-bottom:24px;flex-wrap:wrap}
-.cta__soporte{font-size:14px;color:rgba(244,241,234,.7);text-decoration:underline;text-underline-offset:4px}
-.cta__soporte:hover{color:var(--cream)}
-.pie{background:var(--navy-900);color:rgba(244,241,234,.65);padding:40px var(--gutter);display:flex;justify-content:space-between;align-items:flex-start;gap:40px;font-size:13px;line-height:1.6}
-.pie .marca{display:inline-flex;align-items:center;gap:10px;margin-bottom:8px;color:var(--cream)}
-.pie__sede{display:block}
-.pie .marca svg{width:24px;height:24px}
-.pie .marca img{height:18px}
-.pie__links{display:flex;gap:28px;flex-wrap:wrap}
-.pie__links a{color:inherit;text-decoration:none}
-.pie__links a:hover{color:var(--cream)}
-.pie__nota{max-width:360px;text-align:right}
-
-/* ── Aparición al hacer scroll ───────────────────────────────────────── */
-.js .reveal{opacity:0;transform:translateY(16px);transition:opacity .4s ease,transform .4s ease}
-.js .reveal.in{opacity:1;transform:none}
+/* Sin líneas de tiempo de desplazamiento: la composición final, quieta. */
+@supports not (animation-timeline: view()){
+  .ir-cam,.ir-conv,.ir-seal,.ir-rail{animation:none;opacity:1;transform:none}
+  .escenario__aviso{display:none}
+}
 @media (prefers-reduced-motion:reduce){
-  .js .reveal{opacity:1;transform:none;transition:none}
-  .btn,.celda,.motor,.estado,.plan,.app,.seg,.nav{transition:none}
-  .btn:hover,.celda:hover,.motor:hover,.estado:hover,.plan:hover{transform:none}
+  html{scroll-behavior:auto}
+  .ir-cam,.ir-conv,.ir-seal,.ir-rail,.ir-frag,.ir-stamp{animation:none!important;opacity:1!important;transform:none!important}
+  .escenario__aviso{display:none}
+  *{transition:none!important}
 }
 
-/* ── Tablet ──────────────────────────────────────────────────────────── */
+/* ── 04 · Módulos ──────────────────────────────────────────────────── */
+.barra{position:sticky;top:0;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:16px;height:48px;padding:0 24px;background:rgb(247 248 250/.94);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.barra__verbos{font-size:13px;line-height:18px;color:var(--ink-3g)}
+.modulos__cab{padding:56px 56px 32px;max-width:calc(56ch + 112px)}
+.modulos__cab h2,.acuerdo__cab h2{margin:0 0 12px;font-size:44px;line-height:50px;font-weight:700;letter-spacing:-.03em;color:var(--ink)}
+.modulos__cab p{font-size:16px;line-height:26px;color:var(--ink-2)}
+.modulos__cuerpo{padding:0 56px 64px;display:grid;gap:32px}
+.grupo__cab{display:flex;align-items:center;gap:10px;padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.grupo__cab .rotulo{color:var(--gold-ink)}
+.grupo__rango{font-family:var(--mono);font-size:12px;color:var(--ink-3g)}
+.grupo__nota{margin-left:auto;font-size:13px;line-height:18px;color:var(--ink-3g)}
+.grupo__nota--ok{color:var(--ok-ink)}
+.rejilla{display:grid;gap:12px}
+.rejilla--4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.rejilla--3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.rejilla--2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.rejilla--registrar{grid-template-columns:1.4fr 1fr 1fr}
+.fila-doble{display:grid;grid-template-columns:1.6fr 1fr;gap:32px}
+.mod{background:#fff;border:1px solid var(--line);border-radius:var(--r-card);padding:16px;box-shadow:var(--e1);transition:box-shadow .18s,transform .18s}
+.mod:hover{box-shadow:var(--e-float);transform:translateY(-2px)}
+.mod__num{display:block;font-family:var(--mono);font-size:12px;color:var(--gold-ink);margin-bottom:10px}
+.mod h3{font-size:15px;line-height:21px;font-weight:600;color:var(--ink);margin-bottom:4px}
+.mod p{font-size:13px;line-height:19px;color:var(--ink-3)}
+.mod--exp{background:var(--nav-900);border-color:var(--nav-900);padding:20px;box-shadow:var(--e-float)}
+.mod--exp:hover{transform:none}
+.mod--exp .mod__cab{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.mod--exp .mod__num{color:var(--gold);margin:0}
+.nuevo{display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:999px;background:rgb(200 160 70/.18);color:var(--gold-soft)}
+.mod--exp h3{font-size:17px;line-height:23px;color:#fff;margin-bottom:6px}
+.mod--exp p{font-size:14px;line-height:21px;color:var(--on-dark);margin-bottom:14px}
+.exp__datos{display:flex;gap:16px;padding-top:12px;border-top:1px solid rgb(255 255 255/.12)}
+.exp__valor{font-family:var(--mono);font-size:14px;color:#fff}
+.exp__valor--oro{color:var(--gold-soft)}
+.exp__etq{font-size:12px;line-height:16px;color:var(--on-dark-2)}
+.administrar{display:flex;align-items:center;gap:16px;padding:16px 20px;background:#fff;border:1px solid var(--line);border-radius:var(--r-card)}
+.administrar .rotulo{color:var(--gold-ink);flex:none}
+.separador{width:1px;height:20px;background:var(--line);flex:none}
+.administrar p{font-size:14px;line-height:21px;color:var(--ink-2)}
+
+/* ── 05 · El acuerdo ───────────────────────────────────────────────── */
+.acuerdo__cab{display:flex;align-items:flex-end;justify-content:space-between;gap:48px;padding:64px 56px 40px;background:#fff;border-bottom:1px solid var(--line)}
+.acuerdo__cab .sobre{margin-bottom:16px}
+.acuerdo__cab h2{max-width:22ch}
+.acuerdo__cab p{max-width:50ch;font-size:16px;line-height:26px;color:var(--ink-2)}
+.periodo{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex:none}
+.segs{display:inline-flex;padding:3px;border-radius:var(--r-field);background:var(--neutral)}
+.seg{height:34px;padding:0 14px;border:0;border-radius:var(--r-sm);background:transparent;color:var(--ink-2);font-size:13px;font-weight:500;transition:background .16s,color .16s}
+.seg:hover{color:var(--ink)}
+.seg.is-on{background:var(--brand);color:#fff;font-weight:600}
+.periodo__nota{font-size:13px;line-height:18px;color:var(--warn-ink)}
+.planes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:stretch;padding:40px 56px 24px}
+.plan{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);border-radius:var(--r-card);padding:24px;box-shadow:var(--e2)}
+.plan__cab{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:20px}
+.plan__nombre{font-size:15px;line-height:21px;font-weight:600;color:var(--ink)}
+.plan__cab .rotulo{color:var(--ink-3)}
+.plan__precio{display:flex;align-items:baseline;gap:4px;font-variant-numeric:tabular-nums}
+.plan__cifra{font-family:var(--mono);font-size:30px;line-height:36px;font-weight:500;letter-spacing:-.02em;color:var(--ink);font-variant-numeric:tabular-nums}
+.plan__per{font-size:14px;line-height:20px;color:var(--ink-3)}
+.plan__sub{font-size:13px;line-height:18px;color:var(--ink-3);padding:6px 0 20px;border-bottom:1px solid var(--hair)}
+.plan__cuerpo{padding-top:16px;flex:1}
+.plan__cuerpo > .rotulo{color:var(--ink-3);margin-bottom:12px}
+.plan__lista{display:grid;gap:8px;margin:0;padding:0;list-style:none;font-size:14px;line-height:20px;color:var(--ink-2)}
+.plan__lista li{display:flex;align-items:center;gap:10px}
+.plan__lista .mono{font-size:11px;color:var(--ink-3);flex:none;min-width:40px}
+.plan__nota{margin-top:14px;padding-top:12px;border-top:1px solid var(--hair);font-size:13px;line-height:19px;color:var(--ink-3)}
+.plan__acciones{display:grid;gap:4px;margin-top:20px}
+.plan--premium{position:relative;overflow:hidden;background:var(--nav-900);border-color:var(--nav-900);box-shadow:var(--e-float)}
+.plan--premium::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,rgba(200,160,70,0),var(--gold),rgba(200,160,70,0))}
+.plan--premium .plan__nombre,.plan--premium .plan__cifra,.plan--premium .plan__lista{color:#fff}
+.plan--premium .plan__cab .rotulo,.plan--premium .plan__cuerpo > .rotulo{color:var(--gold-soft)}
+.plan--premium .plan__per,.plan--premium .plan__sub,.plan--premium .plan__nota{color:var(--on-dark)}
+.plan--premium .plan__sub,.plan--premium .plan__nota{border-color:rgb(255 255 255/.12)}
+.plan--premium .plan__lista .mono{color:var(--on-dark-2)}
+.saldo-wrap{padding:0 56px 40px}
+.saldo{display:flex;align-items:center;gap:20px;padding:16px 20px;background:#fff;border:1px solid var(--line);border-radius:var(--r-card)}
+.saldo .rotulo{color:var(--gold-ink);flex:none}
+.saldo p{flex:1;font-size:14px;line-height:21px;color:var(--ink-2)}
+.saldo .mono{color:var(--ink)}
+.cierre-wrap{padding:0 56px 64px}
+.cierre{display:grid;grid-template-columns:1fr auto;gap:40px;align-items:center;padding:40px;background:#fff;border:1px solid var(--line);border-radius:var(--r-xl)}
+.cierre h2{margin:0 0 10px;font-size:30px;line-height:36px;font-weight:700;letter-spacing:-.02em;color:var(--ink)}
+.cierre p{max-width:56ch;font-size:15px;line-height:23px;color:var(--ink-2)}
+.cierre__botones{display:flex;gap:8px;flex:none}
+
+/* ── Pie ───────────────────────────────────────────────────────────── */
+.pie{display:flex;align-items:center;justify-content:space-between;gap:24px 40px;flex-wrap:wrap;padding:28px 56px;background:#fff;border-top:1px solid var(--line);font-size:13px;line-height:18px;color:var(--ink-3)}
+.pie__marca{display:flex;align-items:center;gap:10px}
+.pie__marca .marca__palabra{font-size:14px;line-height:20px}
+.pie__links{display:flex;flex-wrap:wrap;gap:4px 24px}
+.pie__links a{color:var(--brand);text-decoration:none}
+.pie__links a:hover{text-decoration:underline;text-underline-offset:4px}
+
+/* ── Tableta ───────────────────────────────────────────────────────── */
 @media (max-width:1100px){
-  :root{--gutter:32px}
-  .hero__grid{grid-template-columns:1fr 1fr;gap:40px}
-  .hero h1{font-size:48px}
-  .cinta__fila{flex-wrap:wrap;justify-content:flex-start}
-  .cinta__sep{display:none}
-  .celda--3{grid-column:span 6}
-  .celda--2{grid-column:span 3}
-  .dos__grid{gap:48px}
+  .hero{grid-template-columns:minmax(0,1fr)}
+  .maqueta{height:600px;padding-bottom:40px}
+  .rejilla--4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .rejilla--registrar,.fila-doble,.rejilla--3{grid-template-columns:minmax(0,1fr)}
+  .planes{grid-template-columns:minmax(0,1fr)}
+  .acuerdo__cab{flex-direction:column;align-items:flex-start;gap:24px}
+  .periodo{align-items:flex-start}
+  .cierre{grid-template-columns:minmax(0,1fr);gap:24px}
+}
+@media (max-width:860px){
+  .nav,.solo-ancho{display:none}
+  .menu-movil{display:block}
 }
 
-/* ── Móvil (artboard 375) ────────────────────────────────────────────── */
-@media (max-width:768px){
-  :root{--gutter:20px}
+/* ── Móvil (diseño propio de 390, no un reescalado) ────────────────── */
+@media (max-width:600px){
   body{font-size:15px}
-  h2{font-size:28px;line-height:1.12}
-  .kicker{font-size:11px;margin-bottom:10px}
-  .nav{top:8px;left:12px;right:12px;height:60px;padding:0 6px 0 14px}
-  .nav__links{display:none}
-  .nav__acciones .btn--fantasma{display:none}
-  .nav__acciones .btn{height:44px;padding:0 14px;font-size:13px}
-  .hamburguesa{display:grid}
-  .menu{top:76px;left:12px;right:12px}
-  .hero{background-image:radial-gradient(500px 400px at 90% 0%,var(--halo) 0%,rgba(31,67,114,0) 60%)}
-  .hero__grid{grid-template-columns:1fr;gap:0;padding:96px var(--gutter) 40px}
-  .hero__pastilla{margin-bottom:20px}
-  .hero h1{font-size:36px;line-height:1.06;letter-spacing:-.03em;margin-bottom:16px}
-  .hero__lead{font-size:15px;margin-bottom:24px}
-  .hero__cta{display:grid;gap:10px}
-  .hero__cta .btn{width:100%;height:48px}
-  .escena{margin-top:32px;perspective:none}
-  .escena__halo{display:none}
-  .app{height:230px;border-radius:12px;transform:none}
-  .app__menu{width:92px;padding:12px 8px;font-size:10px}
-  .app__logo{display:none}
-  .app__menu div{padding:6px}
-  .app__saldo{display:none}
-  .app__cuerpo{padding:12px}
-  .app__barra{display:none}
-  .papel{padding:14px;font-size:10px;line-height:1.7;border-radius:6px}
-  .papel__titulo{display:none}
-  .papel p{margin:0 0 8px}
-  .etiqueta{font-size:8px;padding:0 6px}
-  .cinta{padding:22px var(--gutter)}
-  .cinta__fila{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  .cifra{display:block}
-  .cifra b{display:block;font-size:30px}
-  .cifra span{font-size:12.5px;line-height:1.4}
-  .cifra--larga{grid-column:span 2;max-width:none}
-  .cinta__iva{grid-column:span 2;white-space:normal}
-  .que-hace,.motores,.estados,.planes,.dos,.instala{padding:56px var(--gutter)}
-  .que-hace__cab{display:block;margin-bottom:24px}
-  .que-hace__cab p{margin-top:12px;max-width:none}
-  .bento{grid-template-columns:1fr 1fr;grid-auto-rows:auto;gap:12px}
-  .celda{padding:24px;border-radius:16px;gap:14px}
-  .celda h3{font-size:20px;margin-bottom:6px}
-  .celda p{font-size:14px;line-height:1.55}
-  .celda--3,.celda--6{grid-column:span 2}
-  .celda--2{grid-column:span 1;padding:18px}
-  .celda--2 h3{font-size:16px}
-  .celda--2 p{font-size:13px;line-height:1.5}
-  .celda--2 svg{display:none}
-  .celda--crema{grid-column:span 2}
-  .celda--6{display:flex}
-  .chip{padding:7px 11px;font-size:12px}
-  .motores__cab{display:block;margin-bottom:24px}
-  .motores__cab h2{margin-bottom:14px}
-  .motores__cab p{font-size:14px}
-  .cadena{grid-template-columns:1fr;gap:4px}
-  .flecha{height:24px}
-  .flecha svg{transform:rotate(90deg)}
-  .motores__pie{display:block;margin-top:20px;padding-top:14px;font-size:13px}
-  .motores__pie span{display:block;max-width:none}
-  .motores__pie span:last-child{text-align:left;margin-top:10px;font-size:12.5px}
-  .estados__grid{grid-template-columns:1fr;gap:24px}
-  .estados h2{margin-bottom:16px}
-  .cita{font-size:18px}
-  .estados__lista{gap:10px}
-  .estado{display:block;padding:16px;border-radius:12px}
-  .chip-estado{display:inline-block;margin:0 0 8px;font-size:12px;padding:4px 10px}
-  .estado strong{display:none}
-  .estado span{font-size:13.5px}
-  .planes__cab{text-align:left;margin-bottom:20px}
-  .conmutador{justify-content:flex-start;gap:10px;margin-bottom:24px}
-  .ahorro{font-size:11.5px}
-  .planes__grid{grid-template-columns:1fr;gap:12px;align-items:stretch}
-  .plan{padding:24px 22px;border-radius:20px}
-  .plan--premium{order:-1;padding:28px 22px}
-  .recomendado{font-size:11px;padding:4px 10px}
-  .plan__precio{margin:18px 0 16px}
-  .plan__precio b{font-size:34px}
-  .plan--premium .plan__precio b{font-size:40px}
-  .plan__acciones{margin-top:20px}
-  .plan ul{gap:8px}
-  .planes__nota{margin-top:20px;text-align:left;font-size:12.5px}
-  .dos__grid{grid-template-columns:1fr;gap:48px}
-  .dos h2{font-size:26px;margin-bottom:16px}
-  .punto{gap:12px;padding:14px 0}
-  .punto p{font-size:14.5px}
-  .pasos{gap:10px}
-  .paso{gap:14px;padding:16px;border-radius:12px}
-  .paso b{width:30px;height:30px;font-size:13px}
-  .paso p{font-size:14.5px;padding-top:4px}
-  .prueba{font-size:13.5px}
-  .instala__caja{grid-template-columns:1fr;gap:24px;padding:28px 22px;border-radius:20px}
-  .instala h2{font-size:26px;margin-bottom:12px}
-  .instala p{font-size:14.5px}
-  .dispositivos{height:auto;display:flex;gap:12px;align-items:flex-end;justify-content:center}
-  .telefono{position:static;width:96px;height:190px;border-radius:20px;padding:6px}
-  .telefono__pantalla{border-radius:15px}
-  .telefono__barra{height:32px}
-  .telefono__avisos{padding:8px;gap:6px}
-  .telefono__linea{display:none}
-  .aviso{font-size:7.5px;padding:6px;border-radius:6px}
-  .aviso small{display:none}
-  .pc{position:static;width:200px;height:140px;border-radius:10px;box-shadow:none}
-  .pc__menu{width:52px;padding:0}
-  .pc__menu i{display:none}
-  .pc__cuerpo{padding:10px}
-  .pc__titulo{display:none}
-  .pc__hoja{height:100%;border-radius:5px}
-  .cta{padding:64px var(--gutter) 56px}
-  .cta h2{font-size:36px;margin-bottom:24px}
-  .cta__botones{display:grid;gap:10px;margin-bottom:20px}
-  .cta__botones .btn{width:100%;height:50px}
-  .pie{display:grid;gap:16px;padding:32px var(--gutter)}
-  .pie__links{gap:16px}
-  .pie__nota{max-width:none;text-align:left}
-}
-@media (max-width:380px){
-  .cinta__fila{grid-template-columns:1fr}
-  .cifra--larga,.cinta__iva{grid-column:span 1}
+  .cabecera{position:sticky;top:0;height:56px;padding:0 8px 0 16px}
+  .marca{gap:8px}
+  .marca svg{width:22px;height:22px}
+  .marca__palabra{font-size:15px;line-height:22px}
+  .cabecera__der{gap:4px}
+  .cabecera__der > .btn--primario{height:44px;padding:0 14px;font-size:13px}
+
+  .hero{display:block;padding:28px 16px 24px}
+  .hero .sobre{margin-bottom:14px}
+  .hero h1{margin:0 0 14px;font-size:34px;line-height:38px;letter-spacing:-.03em;max-width:none}
+  .hero__lead{margin:0 0 20px;font-size:15px;line-height:24px}
+  .hero__cta{display:grid;gap:8px}
+  .hero__cta .btn{width:100%;height:48px;font-size:15px}
+  .hero__prueba{margin:8px 0 24px;text-align:center}
+  .hero__prueba a{display:inline-flex;align-items:center;min-height:44px}
+  .cifras{gap:16px;justify-content:space-between}
+  .cifra__valor{font-size:18px;line-height:24px}
+  .cifra__texto{font-size:12px;line-height:16px}
+  .maqueta{display:none}
+
+  .pista{height:1600px}
+  .escenario{top:56px;height:min(46vh,340px);perspective:800px;perspective-origin:50% 40%;background:radial-gradient(120% 90% at 50% 25%,#fff 0%,var(--canvas) 60%,var(--hair) 100%);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .escenario__reticula{background-size:40px 40px;-webkit-mask-image:radial-gradient(70% 60% at 50% 40%,#000,transparent 80%);mask-image:radial-gradient(70% 60% at 50% 40%,#000,transparent 80%);opacity:.65}
+  .escenario__velo{background:radial-gradient(70% 60% at 50% 40%,rgba(247,248,250,0) 45%,rgba(247,248,250,.7) 100%)}
+  .ir-cam{animation-name:ir-dolly-m}
+  /* En pantalla estrecha el giro sobre Y marea y deforma el escrito: quedan
+     dos planos, dos piezas y un avance suave. */
+  .plano--rail,.plano--expediente,.frag--memoria,.escenario__aviso,.solo-escritorio{display:none}
+  .plano--catalogo{width:300px;margin:-84px 0 0 -150px;transform:translateZ(-140px) rotateY(-7deg);filter:saturate(.75);opacity:.7}
+  .catalogo__cab{height:26px;padding:0 10px}
+  .catalogo__filas{padding:8px 10px;gap:5px}
+  .catalogo__fila{font-size:11px}
+  .plano--escrito{width:318px;margin:-92px 0 0 -159px;transform:translateZ(20px)}
+  .plano--escrito .hoja__cab{height:30px;padding:0 10px}
+  .plano--escrito .papel{padding:14px 16px;font-size:13px;line-height:22px}
+  .plano--escrito .papel p{margin:0 0 8px}
+  .frag--radicado{--x:-120px;--y:90px;--z:40px;--r:-6deg;margin:66px 0 0 -140px}
+  .frag--fuente{--x:130px;--y:-100px;--z:90px;--r:7deg;margin:-124px 0 0 -20px}
+  .pieza{gap:8px;padding:8px 10px;font-size:11px}
+  .tiempo{left:16px;right:16px;width:auto}
+  .tiempo--1{top:340px}
+  .tiempo--2{top:860px}
+  .tiempo--3{top:1340px}
+  .tiempo__caja{display:block;padding:16px}
+  .tiempo .sobre{margin-bottom:10px}
+  .tiempo h2{margin:0 0 6px;font-size:28px;line-height:32px;letter-spacing:-.02em}
+  .tiempo p{font-size:14px;line-height:22px}
+
+  .modulos{background:#fff;border-top:1px solid var(--line)}
+  .barra{position:static;height:auto;padding:32px 16px 0;background:transparent;border:0;-webkit-backdrop-filter:none;backdrop-filter:none}
+  .barra__verbos{display:none}
+  .modulos__cab{padding:12px 16px 16px}
+  .modulos__cab h2,.acuerdo__cab h2{font-size:28px;line-height:32px;letter-spacing:-.02em;margin-bottom:8px}
+  .modulos__cab p{font-size:14px;line-height:22px}
+  .modulos__cuerpo{padding:0 16px 24px;gap:16px}
+  .grupo__cab{gap:8px;padding-bottom:8px;border-bottom-color:var(--hair);margin-bottom:10px}
+  .grupo__rango{font-size:11px}
+  .grupo__nota{font-size:12px;line-height:16px}
+  /* Las tarjetas se vuelven renglones: numeral y nombre. La descripción de
+     cada módulo es lectura de escritorio; en 390 la lista es la navegación. */
+  .rejilla{gap:8px}
+  .rejilla--4,.rejilla--3,.rejilla--2,.rejilla--registrar{grid-template-columns:1fr 1fr}
+  .fila-doble{gap:16px}
+  .mod{display:flex;align-items:baseline;gap:8px;padding:0;background:none;border:0;border-radius:0;box-shadow:none}
+  .mod:hover{box-shadow:none;transform:none}
+  .mod__num{display:inline;margin:0;font-size:11px;color:var(--ink-3)}
+  .mod h3{font-size:14px;line-height:20px;font-weight:500;color:var(--ink-2);margin:0}
+  .mod p{display:none}
+  .mod--exp{grid-column:1/-1;display:block;padding:16px;background:var(--nav-900);border-radius:var(--r-card)}
+  .mod--exp .mod__num{font-size:11px;color:var(--gold)}
+  .mod--exp h3{font-size:16px;line-height:22px;font-weight:600;color:#fff;margin-bottom:4px}
+  .mod--exp p{display:block;font-size:13px;line-height:20px;margin-bottom:12px}
+  .administrar{display:block;padding:14px 16px}
+  .administrar .separador{display:none}
+  .administrar .rotulo{margin-bottom:8px}
+  .administrar p{font-size:13px;line-height:20px}
+
+  .acuerdo__cab{padding:32px 16px 16px;background:transparent;border:0;gap:14px}
+  .acuerdo__cab .sobre{margin-bottom:12px}
+  .acuerdo__cab p{font-size:14px;line-height:22px}
+  .periodo{flex-direction:row;align-items:center;justify-content:space-between;width:100%}
+  .seg{height:44px;padding:0 16px;font-size:14px}
+  .periodo__nota{font-size:12px;text-align:right}
+  .planes{padding:0 16px;gap:10px}
+  .plan{padding:20px}
+  .plan--premium{order:-1}
+  .plan__cab{margin-bottom:16px}
+  .plan__cifra{font-size:28px;line-height:34px}
+  .plan__sub{padding:6px 0 14px}
+  .plan__cuerpo{padding-top:12px}
+  .plan__lista{gap:7px;font-size:13px;line-height:19px}
+  .plan__acciones{margin-top:16px;gap:6px}
+  .plan__acciones .btn{height:48px;font-size:15px}
+  .saldo-wrap{padding:14px 16px 0}
+  .saldo{display:block;padding:14px 16px}
+  .saldo .separador{display:none}
+  .saldo .rotulo{margin-bottom:8px}
+  .saldo p{font-size:13px;line-height:20px}
+  .cierre-wrap{padding:24px 16px 40px}
+  .cierre{padding:20px;border-radius:var(--r-lg);gap:16px}
+  .cierre h2{font-size:24px;line-height:30px}
+  .cierre p{font-size:14px;line-height:22px}
+  .cierre__botones{display:grid;gap:8px}
+  .cierre__botones .btn{width:100%;height:48px;font-size:15px}
+
+  .pie{display:grid;gap:12px;padding:20px 16px}
+  .pie__links{gap:0 20px}
+  .pie__links a{display:inline-flex;align-items:center;min-height:44px}
 }
 </style>
 </head>
 <body>
-<a class="skip" href="#contenido">Ir al contenido</a>
+<a class="salto" href="#contenido">Ir al contenido</a>
+<div class="pagina">
 
-<header class="nav" id="nav">
-  <a class="marca" href="#top" aria-label="Iureon, inicio">
-    <svg viewBox="0 0 64 64" aria-hidden="true"><g fill="none" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M39 57C39 48 25 44 25 34C25 27 30 23 32 21" stroke="#C8A046"/><path d="M25 57C25 48 39 44 39 34C39 27 34 23 32 21" stroke="#F4F1EA"/></g><path d="M32 6L40 19H24Z" fill="#F4F1EA"/></svg>
-    <img src="/brand/wordmark-dark.svg" alt="Iureon" width="208" height="56">
-  </a>
-  <nav class="nav__links" aria-label="Secciones">
-    <a href="#que-hace">Qué hace</a>
-    <a href="#planes">Planes</a>
-    <a href="#seguridad">Seguridad</a>
-    <a href="/?entrar=1&amp;ir=manual">Manual</a>
-  </nav>
-  <div class="nav__acciones">
-    <a class="btn btn--fantasma btn--sm" href="/?entrar=1">Iniciar sesión</a>
-    <a class="btn btn--oro btn--sm" href="#planes">Contratar</a>
-    <button class="hamburguesa" type="button" aria-controls="menu" aria-expanded="false" aria-label="Abrir el menú"><span></span><span></span><span></span></button>
+<header class="cabecera">
+  <div class="cabecera__izq">
+    <a class="marca" href="#inicio" aria-label="Iureon, inicio">
+      <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true"><g fill="none" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M39 57C39 48 25 44 25 34C25 27 30 23 32 21" stroke="#C8A046"/><path d="M25 57C25 48 39 44 39 34C39 27 34 23 32 21" stroke="#14294A"/></g><path d="M32 6L40 19H24Z" fill="#14294A"/></svg>
+      <span class="marca__palabra">IUREON</span>
+    </a>
+    <nav class="nav" aria-label="Secciones">
+      <a href="#modulos">Módulos</a>
+      <a href="#verificacion">Verificación</a>
+      <a href="#planes">Planes</a>
+      <a href="/?entrar=1&amp;ir=manual">Manual</a>
+    </nav>
+  </div>
+  <div class="cabecera__der">
+    <a class="btn btn--terciario btn--sm solo-ancho" href="/?entrar=1">Iniciar sesión</a>
+    <a class="btn btn--primario btn--sm" href="#planes">Contratar</a>
+    <!-- Sin JavaScript <details> abre y cierra solo: los enlaces siguen al alcance. -->
+    <details class="menu-movil">
+      <summary><span class="hamb" aria-hidden="true"><i></i><i></i><i></i></span><span class="sr">Menú</span></summary>
+      <div class="menu-movil__panel">
+        <nav aria-label="Menú">
+          <a href="#modulos">Módulos</a>
+          <a href="#verificacion">Verificación</a>
+          <a href="#planes">Planes</a>
+          <a href="/?entrar=1&amp;ir=manual">Manual</a>
+        </nav>
+        <div class="menu-movil__acciones">
+          <a class="btn btn--secundario" href="/?entrar=1">Iniciar sesión</a>
+        </div>
+      </div>
+    </details>
   </div>
 </header>
-<div class="menu" id="menu" hidden>
-  <nav aria-label="Secciones">
-    <a href="#que-hace">Qué hace</a>
-    <a href="#motores">Tres motores</a>
-    <a href="#planes">Planes</a>
-    <a href="#seguridad">Seguridad</a>
-    <a href="/?entrar=1&amp;ir=manual">Manual</a>
-  </nav>
-  <div class="menu__acciones">
-    <a class="btn btn--crema" href="/?entrar=1">Iniciar sesión</a>
-    <a class="btn btn--oro" href="#planes">Ver planes</a>
-  </div>
-</div>
 
 <main id="contenido">
-<span id="top"></span>
 
-<!-- ── Hero ─────────────────────────────────────────────────────────── -->
-<section class="hero">
-  <div class="hero__grid">
-    <div>
-      <div class="hero__pastilla"><i aria-hidden="true"></i>Inteligencia jurídica para firmas en Colombia</div>
-      <h1>El conocimiento procesal, ya verificado. <em>Usted decide.</em></h1>
-      <p class="hero__lead">Iureon redacta el primer borrador, revisa el escrito que usted ya hizo, transcribe audiencias separando quién habla y guarda un catálogo de actuaciones con sus términos y su fuente oficial. Lo que no está verificado, la pantalla lo dice.</p>
-      <div class="hero__cta">
-        <a class="btn btn--oro" href="#planes">Ver planes</a>
-        <a class="btn btn--fantasma" href="/?entrar=1">Iniciar sesión</a>
-      </div>
-      <p class="hero__prueba">o <a href="/?prueba=1">pruebe Esencial gratis 7 días</a>, sin tarjeta.</p>
+<!-- ── Hero ──────────────────────────────────────────────────────────── -->
+<section class="hero" id="inicio">
+  <div>
+    <div class="sobre"><span class="filete" aria-hidden="true"></span><span class="rotulo">Inteligencia jurídica · Colombia</span></div>
+    <h1>Cada término, con el artículo que lo respalda.</h1>
+    <p class="hero__lead">Iureon redacta el primer borrador, revisa el escrito que usted ya hizo y reúne el expediente. Lo que está cotejado con el texto oficial lo dice. Lo que no se pudo cotejar también lo dice, y no se disimula.</p>
+    <div class="hero__cta">
+      <a class="btn btn--primario" href="#planes">Ver planes</a>
+      <a class="btn btn--secundario" href="#verificacion">Cómo verifica</a>
     </div>
-    <div class="escena" aria-hidden="true">
-      <div class="escena__halo"></div>
-      <div class="app">
-        <div class="app__menu">
-          <div class="app__logo"><svg viewBox="0 0 64 64"><g fill="none" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><path d="M39 57C39 48 25 44 25 34C25 27 30 23 32 21" stroke="#C8A046"/><path d="M25 57C25 48 39 44 39 34C39 27 34 23 32 21" stroke="#F4F1EA"/></g><path d="M32 6L40 19H24Z" fill="#F4F1EA"/></svg>Iureon</div>
-          <div class="on">Redacción</div>
-          <div>Revisión</div>
-          <div>Audiencias</div>
-          <div>Entrevistas</div>
-          <div>Catálogo</div>
-          <div>Orientación</div>
-          <div>Herramientas</div>
-          <div class="app__saldo">Saldo · $46.000</div>
+    <p class="hero__prueba">o <a href="/?prueba=1">pruebe Esencial gratis 7 días</a></p>
+    <div class="cifras">
+      <div><div class="cifra__valor">883</div><div class="cifra__texto">actuaciones con su fundamento y su fuente</div></div>
+      <div><div class="cifra__valor">28</div><div class="cifra__texto">ramas del derecho</div></div>
+      <div><div class="cifra__valor">12</div><div class="cifra__texto">módulos en la aplicación</div></div>
+    </div>
+  </div>
+
+  <div class="maqueta" aria-hidden="true">
+    <div class="maqueta__reticula"></div>
+    <div class="maqueta__escrito">
+      <div class="hoja">
+        <div class="hoja__cab"><span class="rotulo">Escrito · Acción de tutela</span><span class="mono">EXP-0000-000</span></div>
+        <div class="papel">
+          <p>Señor Juez: con fundamento en el Decreto 2591 de 1991, interpongo acción de tutela por la vulneración del derecho fundamental que se describe en los hechos.</p>
+          <p>El juez proferirá el fallo <span class="marca-ok">dentro de los diez (10) días siguientes a la presentación de la solicitud</span>.</p>
+          <p>Para la Actuación 00 el término es <span class="marca-sv">de 0 días</span>, dictado de memoria.</p>
         </div>
-        <div class="app__cuerpo">
-          <div class="app__barra">
-            <span>Borrador · Acción de tutela</span>
-            <span><span class="pill pill--ok">3 verificados</span><span class="pill pill--sv">1 sin verificar</span></span>
+        <div class="hoja__pie">
+          <span class="sello sello--ok">Verificado · art. 29</span>
+          <span class="sello sello--nc">No caduca · art. 1</span>
+          <span class="sello sello--sv ir-stamp">Sin verificar</span>
+        </div>
+      </div>
+    </div>
+    <div class="maqueta__expediente">
+      <div class="hoja">
+        <div class="hoja__cab hoja__cab--limpia"><span class="rotulo">Expediente</span><span class="punto-oro"></span></div>
+        <div class="ficha">
+          <div class="ficha__titulo">Carátula del asunto</div>
+          <div class="ficha__radicado">00000-00-00-000-0000-00000-00</div>
+          <div class="ficha__sep"></div>
+          <div class="ficha__filas">
+            <div class="ficha__fila"><span>Despacho</span><b>Juzgado 00 Civil</b></div>
+            <div class="ficha__fila"><span>Piezas</span><span class="mono">14</span></div>
+            <div class="ficha__fila"><span>Próximo término</span><span class="mono termino">3 días</span></div>
+            <div class="ficha__actuacion">Impugnación del fallo de tutela</div>
           </div>
+        </div>
+      </div>
+    </div>
+    <div class="maqueta__fuente ir-frag" style="--dx:26px;--dy:34px;--dr:6deg">
+      <div class="nota-oscura">
+        <div class="rotulo">Cotejado contra</div>
+        <div class="nota-oscura__titulo">Decreto 2591 de 1991</div>
+        <div class="nota-oscura__linea"><span class="punto-verde"></span>Texto oficial · Gestor Normativo</div>
+      </div>
+    </div>
+    <div class="maqueta__lectura ir-frag ir-frag--2" style="--dx:-30px;--dy:26px;--dr:-7deg"><span class="pastilla-sv">Requiere lectura del abogado</span></div>
+  </div>
+</section>
+
+<!-- ── 01–03 · La pista: el scroll mueve la cámara ───────────────────── -->
+<section class="pista" id="verificacion" aria-label="Cómo verifica Iureon">
+  <div class="escenario" aria-hidden="true">
+    <div class="escenario__reticula"></div>
+    <div class="ir-cam">
+
+      <div class="plano plano--catalogo">
+        <div class="hoja">
+          <div class="catalogo__cab rotulo">Catálogo · 883 actuaciones</div>
+          <div class="catalogo__filas">
+            <div class="catalogo__fila"><span>Acción de tutela</span><span class="mono">No caduca</span></div>
+            <div class="catalogo__fila"><span>Impugnación del fallo de tutela</span><span class="mono">3 días</span></div>
+            <div class="catalogo__fila solo-escritorio"><span>Recurso de apelación · fuera de audiencia</span><span class="mono">3 días</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="plano plano--rail">
+        <div class="rail ir-rail">
+          <div class="rail__marca"><svg width="20" height="20" viewBox="0 0 64 64"><g fill="none" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M39 57C39 48 25 44 25 34C25 27 30 23 32 21" stroke="#C8A046"/><path d="M25 57C25 48 39 44 39 34C39 27 34 23 32 21" stroke="#14294A"/></g><path d="M32 6L40 19H24Z" fill="#14294A"/></svg><span class="rotulo">Iureon</span></div>
+          <div class="rail__grupo rotulo">Producir</div>
+          <div class="rail__item"><span class="mono">01</span>Redacción</div>
+          <div class="rail__item"><span class="mono">02</span>Borradores</div>
+          <div class="rail__item"><span class="mono">03</span>Revisiones</div>
+          <div class="rail__grupo rail__grupo--2 rotulo">Registrar</div>
+          <div class="rail__item rail__item--on"><span class="mono">05</span>Expediente</div>
+        </div>
+      </div>
+
+      <div class="plano plano--escrito">
+        <div class="hoja">
+          <div class="hoja__cab"><span class="rotulo">Escrito · Acción de tutela</span><span class="mono">EXP-0000-000</span></div>
           <div class="papel">
-            <div class="papel__titulo">ACCIÓN DE TUTELA</div>
-            <p>Señor Juez: con fundamento en el artículo 86 de la Constitución Política y el Decreto 2591 de 1991, interpongo acción de tutela contra la EPS accionada por la vulneración del derecho fundamental a la salud.</p>
-            <p>La presente acción se presenta dentro del término <span class="marca-sv">de seis meses desde el hecho vulnerador</span> <span class="etiqueta etiqueta--sv">Término sin verificar</span></p>
-            <p>El juez deberá resolver <span class="marca-ok">dentro de los diez días siguientes a la solicitud</span> <span class="etiqueta etiqueta--ok">Verificado · art. 86</span></p>
+            <p class="solo-escritorio">Señor Juez: con fundamento en el Decreto 2591 de 1991, interpongo acción de tutela por la vulneración del derecho fundamental que se describe en los hechos.</p>
+            <p>El juez proferirá el fallo <span class="marca-ok">dentro de los diez (10) días siguientes a la presentación de la solicitud</span>.<span class="sello sello--ok ir-seal">Verificado · art. 29</span></p>
+            <p>Para la Actuación 00 el término es <span class="marca-sv">de 0 días</span>.<span class="sello sello--sv ir-seal">Sin verificar</span></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="frag frag--radicado ir-conv"><div class="pieza"><span class="mono">00000-00-00-000-0000-00000-00</span><span>radicado</span></div></div>
+      <div class="frag frag--memoria ir-conv"><div class="pieza pieza--sv"><span class="mono">0 días</span><span>dictado de memoria</span></div></div>
+      <div class="frag frag--fuente ir-conv"><div class="pieza pieza--oscura"><span class="punto-verde"></span><span>Decreto 2591 de 1991 · texto oficial</span></div></div>
+
+      <div class="plano plano--expediente">
+        <div class="hoja">
+          <div class="hoja__cab hoja__cab--limpia"><span class="rotulo">Expediente</span><span class="punto-oro"></span></div>
+          <div class="ficha">
+            <div class="ficha__titulo">Carátula del asunto</div>
+            <div class="ficha__radicado">00000-00-00-000-0000-00000-00</div>
+            <div class="ficha__sep"></div>
+            <div class="ficha__filas">
+              <div class="ficha__fila"><span>Piezas</span><span class="mono">14</span></div>
+              <div class="ficha__fila"><span>Próximo término</span><span class="mono termino">3 días</span></div>
+              <div class="ficha__actuacion">Impugnación del fallo de tutela</div>
+            </div>
           </div>
         </div>
       </div>
     </div>
+    <div class="escenario__velo"></div>
+    <div class="escenario__aviso"><span class="punto-oro" style="width:5px;height:5px"></span><span class="rotulo">Desplace para mover la cámara</span></div>
   </div>
-</section>
 
-<!-- ── Cifras en cinta ──────────────────────────────────────────────── -->
-<section class="cinta" aria-label="Cifras">
-  <div class="cinta__fila">
-    <div class="cifra"><b>879</b><span>actuaciones verificadas contra el texto oficial</span></div>
-    <span class="cinta__sep" aria-hidden="true"></span>
-    <div class="cifra"><b>28</b><span>ramas del derecho</span></div>
-    <span class="cinta__sep" aria-hidden="true"></span>
-    <div class="cifra cifra--larga"><b>4</b><span>registros en vivo: Corte Constitucional, Corte Suprema, Consejo de Estado y Comisión Nacional de Disciplina Judicial</span></div>
-    <span class="cinta__sep" aria-hidden="true"></span>
-    <div class="cinta__iva"><i aria-hidden="true"></i>Precios con IVA incluido</div>
-  </div>
-</section>
-
-<!-- ── Qué hace: bento ──────────────────────────────────────────────── -->
-<section class="que-hace" id="que-hace">
-  <div class="que-hace__cab">
-    <div>
-      <div class="kicker">Qué hace</div>
-      <h2>Seis módulos, una sola regla: cada término con su artículo.</h2>
+  <div class="tiempo tiempo--1">
+    <div class="tiempo__caja">
+      <div class="sobre"><span class="sobre__num">01</span><span class="filete" aria-hidden="true"></span><span class="rotulo">La complejidad</span></div>
+      <h2>Un caso no llega ordenado.</h2>
+      <p>Piezas sueltas: un radicado en un correo, un término dictado de memoria, una sentencia que quizá aplica.</p>
     </div>
-    <p>Nada se radica desde Iureon y nada reemplaza al abogado: la plataforma guarda el conocimiento procesal verificado y usted decide.</p>
   </div>
-  <div class="bento">
-    <article class="celda celda--3 celda--navy reveal">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#C8A046" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="12" y2="16"/></svg>
-      <div><h3>Redacción</h3><p>Un borrador completo desde los hechos, con la estructura de la actuación elegida del catálogo y cada término con su artículo.</p></div>
+  <div class="tiempo tiempo--2">
+    <div class="tiempo__caja">
+      <div class="sobre"><span class="sobre__num">02</span><span class="filete" aria-hidden="true"></span><span class="rotulo">La verificación</span></div>
+      <h2>Cada dato queda con su artículo.</h2>
+      <p>Lo cotejado con el texto oficial lo dice. Lo que no se pudo cotejar queda con el borde roto, hasta que usted lo lea.</p>
+    </div>
+  </div>
+  <div class="tiempo tiempo--3">
+    <div class="tiempo__caja">
+      <div class="sobre"><span class="sobre__num">03</span><span class="filete" aria-hidden="true"></span><span class="rotulo">El expediente</span></div>
+      <h2>Y el caso queda armado.</h2>
+      <p>Los escritos, las piezas y los términos de un mismo asunto, en un solo lugar y con su fuente.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── 04 · El trabajo ───────────────────────────────────────────────── -->
+<section class="modulos" id="modulos">
+  <div class="barra">
+    <div class="sobre"><span class="sobre__num">04</span><span class="filete" aria-hidden="true"></span><span class="rotulo">El trabajo · doce módulos</span></div>
+    <span class="barra__verbos">Producir · Registrar · Consultar · Aprender</span>
+  </div>
+  <div class="modulos__cab">
+    <h2>Doce módulos, cuatro verbos.</h2>
+    <p>El panel de la aplicación no ordena por función técnica sino por lo que usted va a hacer. Esta página usa el mismo orden, para que reconozca la casa cuando entre.</p>
+  </div>
+
+  <div class="modulos__cuerpo">
+    <div class="grupo">
+      <div class="grupo__cab"><span class="rotulo">Producir</span><span class="grupo__rango">01 — 04</span><span class="grupo__nota">Consume saldo de inteligencia artificial</span></div>
+      <div class="rejilla rejilla--4">
+        <article class="mod"><span class="mod__num">01</span><h3>Redacción</h3><p>El primer borrador de una actuación del catálogo, con su término y su fuente. «Enseñar estilo» guarda el formato y la jerga de la firma.</p></article>
+        <article class="mod"><span class="mod__num">02</span><h3>Borradores</h3><p>Todo lo empezado, en un solo lugar, para retomarlo donde iba.</p></article>
+        <article class="mod"><span class="mod__num">03</span><h3>Revisiones</h3><p>Un informe sobre su escrito o sobre el que le llegó, y el taller para trabajarlo.</p></article>
+        <article class="mod"><span class="mod__num">04</span><h3>Orientación</h3><p>Describa los hechos y reciba las actuaciones candidatas del catálogo, con su término.</p></article>
+      </div>
+    </div>
+
+    <div class="grupo">
+      <div class="grupo__cab"><span class="rotulo">Registrar</span><span class="grupo__rango">05 — 07</span></div>
+      <div class="rejilla rejilla--registrar">
+        <article class="mod mod--exp oscuro">
+          <div class="mod__cab"><span class="mod__num">05</span><span class="nuevo rotulo">Nuevo</span></div>
+          <h3>Expediente</h3>
+          <p>Los escritos, las piezas y los términos de un mismo asunto, reunidos y en orden. Es el módulo donde converge todo lo demás.</p>
+          <div class="exp__datos" aria-hidden="true">
+            <div><div class="exp__valor">00</div><div class="exp__etq">piezas</div></div>
+            <div><div class="exp__valor exp__valor--oro">0 días</div><div class="exp__etq">próximo término</div></div>
+          </div>
+        </article>
+        <article class="mod"><span class="mod__num">06</span><h3>Audiencias</h3><p>El transcrito con cada interlocutor separado, y su acta.</p></article>
+        <article class="mod"><span class="mod__num">07</span><h3>Entrevistas</h3><p>El guion de lo que no puede quedar sin preguntar al cliente.</p></article>
+      </div>
+    </div>
+
+    <div class="fila-doble">
+      <div class="grupo">
+        <div class="grupo__cab"><span class="rotulo">Consultar</span><span class="grupo__rango">08 — 10</span><span class="grupo__nota grupo__nota--ok">No consume saldo</span></div>
+        <div class="rejilla rejilla--3">
+          <article class="mod"><span class="mod__num">08</span><h3>Buscador</h3><p>La norma, la sentencia o la actuación que resuelve su consulta.</p></article>
+          <article class="mod"><span class="mod__num">09</span><h3>Catálogo</h3><p>883 actuaciones en 28 ramas, cada una con su fundamento y el enlace a su fuente. La que no está verificada lo dice.</p></article>
+          <article class="mod"><span class="mod__num">10</span><h3>Herramientas</h3><p>Términos con festivos de ley, liquidaciones, IPC, mora y cuantía.</p></article>
+        </div>
+      </div>
+      <div class="grupo">
+        <div class="grupo__cab"><span class="rotulo">Aprender</span><span class="grupo__rango">11 — 12</span></div>
+        <div class="rejilla rejilla--2">
+          <article class="mod"><span class="mod__num">11</span><h3>Manual de uso</h3><p>Qué hace cada módulo, con la visita guiada.</p></article>
+          <article class="mod"><span class="mod__num">12</span><h3>Soporte</h3><p>Escriba desde la aplicación y reciba aviso al responder.</p></article>
+        </div>
+      </div>
+    </div>
+
+    <div class="administrar">
+      <span class="rotulo">Administrar</span>
+      <span class="separador" aria-hidden="true"></span>
+      <p>No es un módulo: es la sección del socio administrador — usuarios y roles, membrete de la firma, auditoría y el saldo compartido. Está en todos los planes.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── 05 · El acuerdo ───────────────────────────────────────────────── -->
+<section class="acuerdo" id="planes">
+  <div class="acuerdo__cab">
+    <div>
+      <div class="sobre"><span class="sobre__num">05</span><span class="filete" aria-hidden="true"></span><span class="rotulo">El acuerdo</span></div>
+      <h2>Un plan por firma, y nada más que eso.</h2>
+      <p>Pago por Wompi, sin tarjeta guardada y sin cobro automático. Al pagar antes del vencimiento se suma el periodo: no se pierden días.</p>
+    </div>
+    <div class="periodo">
+      <div class="segs" role="group" aria-label="Periodo de pago">
+        <button type="button" class="seg is-on" data-billing="monthly" aria-pressed="true">Mensual</button>
+        <button type="button" class="seg" data-billing="annual" aria-pressed="false">Anual</button>
+      </div>
+      <span class="periodo__nota">Anual: 2 meses gratis</span>
+    </div>
+  </div>
+
+  <div class="planes">
+    <article class="plan" data-plan="ESENCIAL">
+      <div class="plan__cab"><h3 class="plan__nombre">Esencial</h3><span class="rotulo">1 usuario</span></div>
+      <div class="plan__precio"><span class="plan__cifra" data-price="es">$85.000</span><span class="plan__per" data-per>/mes</span></div>
+      <div class="plan__sub">IVA incluido · el abogado que trabaja solo</div>
+      <div class="plan__cuerpo">
+        <div class="rotulo">Nueve de doce módulos</div>
+        <ul class="plan__lista">
+          <li><span class="mono">01—03</span>Redacción, Borradores y Revisiones</li>
+          <li><span class="mono">05</span>Expediente</li>
+          <li><span class="mono">08—10</span>Buscador, Catálogo y Herramientas</li>
+          <li><span class="mono">11—12</span>Manual de uso y Soporte</li>
+          <li><span class="mono">+</span>Membrete de la firma</li>
+        </ul>
+        <div class="plan__nota">No incluye Orientación, Audiencias ni Entrevistas.</div>
+      </div>
+      <div class="plan__acciones">
+        <a class="btn btn--secundario btn--bloque" href="/?registro=ESENCIAL">Contratar Esencial</a>
+        <a class="btn btn--terciario btn--bloque" href="/?prueba=1">Probar Esencial 7 días gratis</a>
+      </div>
     </article>
-    <article class="celda celda--3 reveal">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#14294A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><polyline points="8 12 11 15 16 9"/></svg>
-      <div><h3>Revisión de escritos</h3><p>Suba su tutela, demanda o recurso y reciba un informe con lo que la norma exige, lo que falla y la corrección textual; luego un taller para corregirlo con una guía al lado, con resaltador, comentarios y versiones.</p></div>
+
+    <article class="plan plan--premium oscuro" data-plan="PREMIUM">
+      <div class="plan__cab"><h3 class="plan__nombre">Premium</h3><span class="rotulo">Hasta 5 usuarios</span></div>
+      <div class="plan__precio"><span class="plan__cifra" data-price="pr">$120.000</span><span class="plan__per" data-per>/mes</span></div>
+      <div class="plan__sub">IVA incluido · hasta cinco abogados</div>
+      <div class="plan__cuerpo">
+        <div class="rotulo">Los doce módulos</div>
+        <ul class="plan__lista">
+          <li><span class="mono">01—12</span>Todo lo de Esencial</li>
+          <li><span class="mono">04</span>Orientación por hechos</li>
+          <li><span class="mono">06—07</span>Audiencias y Entrevistas</li>
+        </ul>
+        <div class="plan__nota">Orientación, Audiencias y Entrevistas son los tres módulos que Esencial no incluye.</div>
+      </div>
+      <div class="plan__acciones">
+        <a class="btn btn--crema btn--bloque" href="/?registro=PREMIUM">Contratar Premium</a>
+      </div>
     </article>
-    <article class="celda celda--2 reveal">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#14294A" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="10" x2="4" y2="14"/><line x1="8" y1="6" x2="8" y2="18"/><line x1="12" y1="9" x2="12" y2="15"/><line x1="16" y1="4" x2="16" y2="20"/><line x1="20" y1="10" x2="20" y2="14"/></svg>
-      <div><h3>Audiencias</h3><p>Transcripción que separa quién habla, con roles procesales, hechos clave por minuto y acta exportable.</p></div>
+
+    <article class="plan" data-plan="FIRMA">
+      <div class="plan__cab"><h3 class="plan__nombre">Firma</h3><span class="rotulo">Hasta 15 usuarios</span></div>
+      <div class="plan__precio"><span class="plan__cifra" data-price="fi">$250.000</span><span class="plan__per" data-per>/mes</span></div>
+      <div class="plan__sub">IVA incluido · la firma con más de cinco abogados</div>
+      <div class="plan__cuerpo">
+        <div class="rotulo">Los mismos módulos de Premium</div>
+        <ul class="plan__lista">
+          <li><span class="mono">01—12</span>Los doce módulos</li>
+          <li><span class="mono">+</span>Hasta 15 usuarios</li>
+        </ul>
+        <div class="plan__nota">No abre nada que Premium no tenga: suma puestos para la firma que ya no cabe en cinco.</div>
+      </div>
+      <div class="plan__acciones">
+        <a class="btn btn--secundario btn--bloque" href="/?registro=FIRMA">Contratar Firma</a>
+      </div>
     </article>
-    <article class="celda celda--2 reveal">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#14294A" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-      <div><h3>Entrevistas</h3><p>Grabe al cliente, obtenga el guion de lo que no puede quedar sin preguntar y decida si toma el caso.</p></div>
-    </article>
-    <article class="celda celda--2 celda--crema reveal">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#14294A" stroke-width="1.6" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>
-      <div><h3>Catálogo y Orientación</h3><p>879 actuaciones con término, autoridad competente y fuente oficial; describa los hechos y la plataforma le propone la actuación.</p></div>
-    </article>
-    <article class="celda celda--6 reveal">
+  </div>
+
+  <div class="saldo-wrap">
+    <div class="saldo">
+      <span class="rotulo">Saldo de inteligencia artificial</span>
+      <span class="separador" aria-hidden="true"></span>
+      <p>Se recarga dentro de la aplicación y se consume por uso, aparte del plan: <span class="mono">$2.000</span> un escrito o una revisión, <span class="mono">$300</span> una consulta a la guía. Buscador, Catálogo y Herramientas no consumen saldo.</p>
+    </div>
+  </div>
+
+  <div class="cierre-wrap">
+    <div class="cierre">
       <div>
-        <svg viewBox="0 0 24 24" fill="none" stroke="#14294A" stroke-width="1.6" stroke-linecap="round" style="margin-bottom:20px" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="12" x2="10" y2="12"/><line x1="12" y1="12" x2="14" y2="12"/><line x1="8" y1="16" x2="10" y2="16"/><line x1="12" y1="16" x2="14" y2="16"/></svg>
-        <h3>Herramientas</h3>
-        <p>Términos procesales con festivos calculados desde la ley, liquidación de prestaciones, indexación por IPC, intereses de mora, competencia por cuantía y calendario judicial, todo con su fuente y exportable a Excel.</p>
+        <h2>Empiece con su firma.</h2>
+        <p>Elija el plan y abra la cuenta; el socio administrador recarga saldo e invita a sus abogados. Nada se radica desde Iureon y nada reemplaza al abogado: un borrador es un borrador hasta que usted lo firma.</p>
       </div>
-      <div class="chips" aria-label="Herramientas incluidas">
-        <span class="chip">Términos con festivos</span>
-        <span class="chip">Liquidación de prestaciones</span>
-        <span class="chip">Indexación IPC</span>
-        <span class="chip">Intereses de mora</span>
-        <span class="chip">Competencia por cuantía</span>
-        <span class="chip">Calendario judicial</span>
-        <span class="chip chip--oro">Exportable a Excel</span>
-      </div>
-    </article>
-  </div>
-</section>
-
-<!-- ── Tres motores ─────────────────────────────────────────────────── -->
-<section class="motores" id="motores">
-  <div class="motores__cab">
-    <div>
-      <div class="kicker kicker--oro">Tres motores, un solo escrito</div>
-      <h2>Tres motores de inteligencia artificial trabajan en cadena.</h2>
-    </div>
-    <p>Cada escrito pasa por tres modelos distintos, cada uno en lo que mejor hace: Gemini de Google ordena los hechos y las pruebas que usted entrega; GPT de OpenAI arma la estructura procesal según la actuación elegida del catálogo; y Claude de Anthropic redacta el texto final, revisa los escritos que usted sube y conversa con usted en el taller. Iureon trabaja con las versiones vigentes de cada proveedor y las actualiza cuando ellos publican una nueva, sin que la firma tenga que cambiar nada.</p>
-  </div>
-  <div class="cadena">
-    <article class="motor reveal">
-      <div class="motor__cab"><span class="motor__n">1</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#14294A" stroke-width="1.6" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="3"/><rect x="10" y="10" width="4" height="4" rx="1"/></svg></div>
-      <h3>Gemini <span>· ordena</span></h3>
-      <p>Ordena los hechos y las pruebas que usted entrega.</p>
-    </article>
-    <div class="flecha" aria-hidden="true"><svg width="40" height="16" viewBox="0 0 40 16" fill="none" stroke="#C8A046" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="8" x2="36" y2="8"/><polyline points="30 2 36 8 30 14"/></svg></div>
-    <article class="motor reveal">
-      <div class="motor__cab"><span class="motor__n">2</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#14294A" stroke-width="1.6" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="3"/><rect x="10" y="10" width="4" height="4" rx="1"/></svg></div>
-      <h3>GPT <span>· estructura</span></h3>
-      <p>Arma la estructura procesal según la actuación elegida del catálogo.</p>
-    </article>
-    <div class="flecha" aria-hidden="true"><svg width="40" height="16" viewBox="0 0 40 16" fill="none" stroke="#C8A046" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="8" x2="36" y2="8"/><polyline points="30 2 36 8 30 14"/></svg></div>
-    <article class="motor motor--navy reveal">
-      <div class="motor__cab"><span class="motor__n">3</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C8A046" stroke-width="1.6" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="3"/><rect x="10" y="10" width="4" height="4" rx="1"/></svg></div>
-      <h3>Claude <span>· redacta y revisa</span></h3>
-      <p>Redacta el texto final, revisa los escritos que usted sube y conversa con usted en el taller.</p>
-    </article>
-  </div>
-  <div class="motores__pie">
-    <span><b>Enseñar estilo</b> guarda el formato y la jerga de la firma para los próximos borradores. Iureon no entrena modelos ni aprende de los escritos de la firma.</span>
-    <span>El uso de los motores se paga por consumo dentro de la aplicación, con saldo recargable, aparte del plan: un escrito o una revisión cuesta $2.000 y una consulta a la guía del taller $300.</span>
-  </div>
-</section>
-
-<!-- ── Tres estados ─────────────────────────────────────────────────── -->
-<section class="estados">
-  <div class="estados__grid">
-    <div>
-      <div class="kicker">Tres estados de una afirmación</div>
-      <h2>Cada afirmación dice de dónde viene.</h2>
-      <p class="cita">«Un escrito de Iureon es un borrador hasta que un abogado lo lee. La aplicación existe para que esa lectura sea corta.»</p>
-    </div>
-    <div class="estados__lista">
-      <div class="estado reveal">
-        <span class="chip-estado chip-estado--ok">Verificado</span>
-        <div><strong>Cotejado con el texto oficial</strong><span>El término coincide con el artículo citado y con el registro consultado en vivo.</span></div>
-      </div>
-      <div class="estado reveal">
-        <span class="chip-estado chip-estado--nc">No caduca</span>
-        <div><strong>La norma no fija término</strong><span>La actuación puede presentarse en cualquier tiempo; la pantalla lo indica con su fuente.</span></div>
-      </div>
-      <div class="estado estado--sv reveal">
-        <span class="chip-estado chip-estado--sv">Sin verificar</span>
-        <div><strong>Requiere lectura del abogado</strong><span>No se pudo cotejar con una fuente oficial. Se marca en ámbar y con borde punteado hasta que usted lo confirme.</span></div>
+      <div class="cierre__botones">
+        <a class="btn btn--primario" href="#planes">Contratar</a>
+        <a class="btn btn--secundario" href="https://wa.me/573011750316" target="_blank" rel="noopener">Escríbanos</a>
       </div>
     </div>
   </div>
-</section>
-
-<!-- ── Planes ───────────────────────────────────────────────────────── -->
-<section class="planes" id="planes">
-  <div class="planes__cab">
-    <div class="kicker">Planes</div>
-    <h2>Un plan por firma. Sin tarjeta guardada.</h2>
-  </div>
-  <div class="conmutador">
-    <div class="segs" role="group" aria-label="Periodo de pago">
-      <button type="button" data-billing="monthly" class="seg on" aria-pressed="true">Mensual</button>
-      <button type="button" data-billing="annual" class="seg" aria-pressed="false">Anual</button>
-    </div>
-    <span class="ahorro">2 meses gratis</span>
-  </div>
-  <div class="planes__grid">
-    <article class="plan reveal">
-      <div class="plan__cab"><div class="plan__nombre">Esencial</div></div>
-      <div class="plan__usuarios">1 usuario</div>
-      <div class="plan__precio"><b><span data-price="es">$85.000</span></b><span data-per>/mes</span></div>
-      <ul>
-        <li>Redacción y Borradores</li>
-        <li>Revisiones</li>
-        <li>Buscador y Catálogo</li>
-        <li>Herramientas</li>
-        <li>Manual, Soporte y Membrete</li>
-        <li class="no">Audiencias</li>
-        <li class="no">Entrevistas</li>
-        <li class="no">Orientación</li>
-      </ul>
-      <div class="plan__acciones">
-        <a class="btn btn--secundario" href="/?registro=ESENCIAL">Contratar Esencial</a>
-        <a class="btn btn--secundario btn--prueba" href="/?prueba=1">Probar gratis 7 días</a>
-      </div>
-    </article>
-    <article class="plan plan--premium reveal">
-      <div class="plan__cab"><div class="plan__nombre">Premium</div><span class="recomendado">Recomendado</span></div>
-      <div class="plan__usuarios">Hasta 5 usuarios</div>
-      <div class="plan__precio"><b><span data-price="pr">$120.000</span></b><span data-per>/mes</span></div>
-      <ul>
-        <li class="cab">Todos los módulos</li>
-        <li>Redacción, Borradores y Revisiones</li>
-        <li>Buscador, Catálogo y Herramientas</li>
-        <li>Audiencias</li>
-        <li>Entrevistas</li>
-        <li>Orientación</li>
-        <li>Manual, Soporte y Membrete</li>
-      </ul>
-      <div class="plan__acciones">
-        <a class="btn btn--oro" href="/?registro=PREMIUM">Contratar Premium</a>
-      </div>
-    </article>
-    <article class="plan reveal">
-      <div class="plan__cab"><div class="plan__nombre">Firma</div></div>
-      <div class="plan__usuarios">Hasta 15 usuarios</div>
-      <div class="plan__precio"><b><span data-price="fi">$250.000</span></b><span data-per>/mes</span></div>
-      <ul>
-        <li class="cab">Todos los módulos</li>
-        <li>Redacción, Borradores y Revisiones</li>
-        <li>Buscador, Catálogo y Herramientas</li>
-        <li>Audiencias y Entrevistas</li>
-        <li>Orientación</li>
-        <li>Manual, Soporte y Membrete</li>
-      </ul>
-      <div class="plan__acciones">
-        <a class="btn btn--secundario" href="/?registro=FIRMA">Contratar Firma</a>
-      </div>
-    </article>
-  </div>
-  <p class="planes__nota">Precios con IVA incluido. El uso de inteligencia artificial se paga aparte, por recargas de saldo dentro de la aplicación: un escrito o una revisión cuesta $2.000 y una consulta a la guía $300. Pago seguro por Wompi; no se guarda tarjeta ni se cobra automáticamente. Al pagar antes del vencimiento se suma el periodo, nunca se pierden días.</p>
-</section>
-
-<!-- ── Seguridad + Cómo empieza ─────────────────────────────────────── -->
-<section class="dos" id="seguridad">
-  <div class="dos__grid">
-    <div>
-      <div class="kicker">Seguridad y datos</div>
-      <h2>Lo de su firma es de su firma.</h2>
-      <div class="puntos">
-        <div class="punto"><i aria-hidden="true"></i><p>Los datos de cada firma están aislados por firma.</p></div>
-        <div class="punto"><i aria-hidden="true"></i><p>El audio de una grabación se borra del almacenamiento apenas se transcribe.</p></div>
-        <div class="punto"><i aria-hidden="true"></i><p>Hay auditoría inmutable de los actos de la firma y el operador solo accede a los datos con autorización expresa y temporal de un socio.</p></div>
-      </div>
-    </div>
-    <div>
-      <div class="kicker">Cómo empieza una firma</div>
-      <h2>Tres pasos, sin instalación en servidor.</h2>
-      <div class="pasos">
-        <div class="paso reveal"><b>1</b><p>El operador de Iureon crea la firma y su socio administrador.</p></div>
-        <div class="paso reveal"><b>2</b><p>El socio elige el plan y recarga saldo.</p></div>
-        <div class="paso reveal"><b>3</b><p>Invita a sus abogados y empiezan por Redacción u Orientación.</p></div>
-      </div>
-      <p class="prueba"><b>14 días</b>Las firmas nuevas empiezan con 14 días de prueba del plan Premium.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ── Se instala como app ──────────────────────────────────────────── -->
-<section class="instala">
-  <div class="instala__caja">
-    <div>
-      <div class="kicker">Se instala como app</div>
-      <h2>En el bolsillo y en el escritorio.</h2>
-      <p>Instálela en Android, iPhone y PC, y reciba avisos cuando soporte responda o cuando otro abogado de su firma cree o edite un escrito.</p>
-    </div>
-    <div class="dispositivos" aria-hidden="true">
-      <div class="pc">
-        <div class="pc__menu"><i></i><i></i><i></i><i></i></div>
-        <div class="pc__cuerpo"><div class="pc__titulo"></div><div class="pc__hoja"></div></div>
-      </div>
-      <div class="telefono">
-        <div class="telefono__pantalla">
-          <div class="telefono__barra"></div>
-          <div class="telefono__avisos">
-            <div class="telefono__linea"></div>
-            <div class="aviso"><b>Soporte respondió</b><small><br>Su consulta sobre el membrete.</small></div>
-            <div class="aviso"><b>Nuevo escrito</b><small><br>M. Pérez creó «Recurso de apelación».</small></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── CTA final ────────────────────────────────────────────────────── -->
-<section class="cta">
-  <h2>Empiece con su firma</h2>
-  <div class="cta__botones">
-    <a class="btn btn--oro btn--lg" href="#planes">Contratar</a>
-    <a class="btn btn--fantasma btn--lg" href="/?entrar=1">Iniciar sesión</a>
-  </div>
-  <a class="cta__soporte" href="https://wa.me/573011750316" target="_blank" rel="noopener">Escríbanos a soporte (WhatsApp)</a>
 </section>
 </main>
 
 <footer class="pie">
-  <div>
-    <a class="marca" href="#top" aria-label="Iureon, inicio">
-      <svg viewBox="0 0 64 64" aria-hidden="true"><g fill="none" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M39 57C39 48 25 44 25 34C25 27 30 23 32 21" stroke="#C8A046"/><path d="M25 57C25 48 39 44 39 34C39 27 34 23 32 21" stroke="#F4F1EA"/></g><path d="M32 6L40 19H24Z" fill="#F4F1EA"/></svg>
-      <img src="/brand/wordmark-dark.svg" alt="Iureon" width="208" height="56">
-    </a>
-    <span class="pie__sede">Sincelejo, Sucre, Colombia</span>
+  <div class="pie__marca">
+    <svg width="22" height="22" viewBox="0 0 64 64" aria-hidden="true"><g fill="none" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M39 57C39 48 25 44 25 34C25 27 30 23 32 21" stroke="#C8A046"/><path d="M25 57C25 48 39 44 39 34C39 27 34 23 32 21" stroke="#14294A"/></g><path d="M32 6L40 19H24Z" fill="#14294A"/></svg>
+    <span class="marca__palabra">IUREON</span><span>· Sincelejo, Sucre, Colombia</span>
   </div>
   <nav class="pie__links" aria-label="Enlaces del pie">
     <a href="/?entrar=1&amp;ir=manual">Manual</a>
     <a href="#planes">Planes</a>
-    <a href="/?entrar=1&amp;ir=privacidad">Política de tratamiento de datos</a>
+    <a href="/?entrar=1&amp;ir=privacidad">Tratamiento de datos</a>
+    <a href="https://wa.me/573011750316" target="_blank" rel="noopener">WhatsApp</a>
   </nav>
-  <div class="pie__nota">Los precios incluyen IVA. Las cuentas de cobro se emiten a nombre del titular de la plataforma.</div>
+  <span>Los precios incluyen IVA. Nada se radica desde Iureon.</span>
 </footer>
+</div>
 
 <script>
 (function () {
-  document.documentElement.classList.add('js');
-
-  /* Mensual / Anual: cambia los precios de toda la página. */
+  /* Mensual / Anual: cambia TODOS los precios de la página. */
   var P = {
     monthly: { es: '$85.000', pr: '$120.000', fi: '$250.000', per: '/mes' },
     annual: { es: '$850.000', pr: '$1.200.000', fi: '$2.500.000', per: '/año' }
   };
-  document.querySelectorAll('.seg').forEach(function (b) {
+  var segs = document.querySelectorAll('[data-billing]');
+  segs.forEach(function (b) {
     b.addEventListener('click', function () {
-      var k = b.dataset.billing;
-      document.querySelectorAll('.seg').forEach(function (x) {
-        var on = x.dataset.billing === k;
-        x.classList.toggle('on', on);
+      var k = b.getAttribute('data-billing');
+      segs.forEach(function (x) {
+        var on = x.getAttribute('data-billing') === k;
+        x.classList.toggle('is-on', on);
         x.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
-      document.querySelectorAll('[data-price]').forEach(function (e) { e.textContent = P[k][e.dataset.price]; });
+      document.querySelectorAll('[data-price]').forEach(function (e) { e.textContent = P[k][e.getAttribute('data-price')]; });
       document.querySelectorAll('[data-per]').forEach(function (e) { e.textContent = P[k].per; });
     });
   });
 
-  /* Nav: se oscurece al hacer scroll. */
-  var nav = document.getElementById('nav');
-  var alScroll = function () { nav.classList.toggle('is-scrolled', window.scrollY > 24); };
-  alScroll();
-  window.addEventListener('scroll', alScroll, { passive: true });
-
-  /* Menú móvil. */
-  var boton = document.querySelector('.hamburguesa');
-  var menu = document.getElementById('menu');
-  var cerrar = function () {
-    menu.hidden = true;
-    boton.setAttribute('aria-expanded', 'false');
-    boton.setAttribute('aria-label', 'Abrir el menú');
-  };
-  boton.addEventListener('click', function () {
-    var abierto = !menu.hidden;
-    if (abierto) { cerrar(); return; }
-    menu.hidden = false;
-    boton.setAttribute('aria-expanded', 'true');
-    boton.setAttribute('aria-label', 'Cerrar el menú');
+  /* Menú móvil: <details> ya funciona sin script; esto solo lo cierra al
+     elegir un enlace, con Escape o al tocar fuera. */
+  var menu = document.querySelector('.menu-movil');
+  if (!menu) return;
+  menu.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', function () { menu.open = false; }); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && menu.open) { menu.open = false; menu.querySelector('summary').focus(); }
   });
-  menu.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', cerrar); });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !menu.hidden) { cerrar(); boton.focus(); } });
-  window.addEventListener('resize', function () { if (window.innerWidth > 768 && !menu.hidden) cerrar(); });
-
-  /* Aparición suave al hacer scroll; sin animación si el sistema lo pide. */
-  var reveals = document.querySelectorAll('.reveal');
-  var reducido = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reducido || !('IntersectionObserver' in window)) {
-    reveals.forEach(function (el) { el.classList.add('in'); });
-    return;
-  }
-  var io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (en) {
-      if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
-    });
-  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.1 });
-  reveals.forEach(function (el) { io.observe(el); });
-  /*
-   * Red de seguridad: una landing que deja secciones invisibles porque un
-   * observador no disparó (vista embebida, extensión, navegador raro) es peor
-   * que una sin animación. Pasados 2,5 s, lo que no haya aparecido aparece.
-   */
-  setTimeout(function () {
-    reveals.forEach(function (el) { el.classList.add('in'); });
-  }, 2500);
+  document.addEventListener('click', function (e) { if (menu.open && !menu.contains(e.target)) menu.open = false; });
 })();
 </script>
 </body>

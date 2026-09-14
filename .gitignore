@@ -36,3 +36,7 @@ backend/src/scripts/_tmp/
 # Cache de Python: la generan los scripts del catalogo al correr, no es codigo.
 __pycache__/
 *.pyc
+
+# Entrega de diseno: vive en public/ para abrirla en el navegador, pero TODO lo que
+# se sube desde public/ queda publicado en el dominio. Es material interno.
+frontend/public/handoff/
