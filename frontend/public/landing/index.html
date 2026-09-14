@@ -305,29 +305,37 @@ svg{display:block}
 .seg:hover{color:var(--ink)}
 .seg.is-on{background:var(--brand);color:#fff;font-weight:600}
 .periodo__nota{font-size:13px;line-height:18px;color:var(--warn-ink)}
-.planes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:stretch;padding:40px 56px 24px}
-.plan{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);border-radius:var(--r-card);padding:24px;box-shadow:var(--e2)}
-.plan__cab{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:20px}
-.plan__nombre{font-size:15px;line-height:21px;font-weight:600;color:var(--ink)}
-.plan__cab .rotulo{color:var(--ink-3)}
-.plan__precio{display:flex;align-items:baseline;gap:4px;font-variant-numeric:tabular-nums}
-.plan__cifra{font-family:var(--mono);font-size:30px;line-height:36px;font-weight:500;letter-spacing:-.02em;color:var(--ink);font-variant-numeric:tabular-nums}
-.plan__per{font-size:14px;line-height:20px;color:var(--ink-3)}
-.plan__sub{font-size:13px;line-height:18px;color:var(--ink-3);padding:6px 0 20px;border-bottom:1px solid var(--hair)}
-.plan__cuerpo{padding-top:16px;flex:1}
-.plan__cuerpo > .rotulo{color:var(--ink-3);margin-bottom:12px}
-.plan__lista{display:grid;gap:8px;margin:0;padding:0;list-style:none;font-size:14px;line-height:20px;color:var(--ink-2)}
-.plan__lista li{display:flex;align-items:center;gap:10px}
-.plan__lista .mono{font-size:11px;color:var(--ink-3);flex:none;min-width:40px}
-.plan__nota{margin-top:14px;padding-top:12px;border-top:1px solid var(--hair);font-size:13px;line-height:19px;color:var(--ink-3)}
-.plan__acciones{display:grid;gap:4px;margin-top:20px}
-.plan--premium{position:relative;overflow:hidden;background:var(--nav-900);border-color:var(--nav-900);box-shadow:var(--e-float)}
-.plan--premium::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,rgba(200,160,70,0),var(--gold),rgba(200,160,70,0))}
-.plan--premium .plan__nombre,.plan--premium .plan__cifra,.plan--premium .plan__lista{color:#fff}
-.plan--premium .plan__cab .rotulo,.plan--premium .plan__cuerpo > .rotulo{color:var(--gold-soft)}
-.plan--premium .plan__per,.plan--premium .plan__sub,.plan--premium .plan__nota{color:var(--on-dark)}
-.plan--premium .plan__sub,.plan--premium .plan__nota{border-color:rgb(255 255 255/.12)}
-.plan--premium .plan__lista .mono{color:var(--on-dark-2)}
+/* Las tarjetas de plan (README-app §2). Fallaban por estructura: el precio y
+   el nombre pesaban lo mismo y las tres columnas repetían la misma lista.
+   Aquí el PRECIO es lo más grande y el nombre baja a rótulo; cada plan dice
+   solo lo que añade sobre el anterior; y Premium se separa por superficie en
+   tinta y elevación, sin filete dorado ni otro adorno. El precio va en
+   Satoshi con cifras tabulares: no es un dato citable, así que no lleva mono. */
+.planes{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.08fr) minmax(0,1fr);gap:14px;align-items:stretch;padding:40px 56px 24px}
+.plan{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:32px 28px;box-shadow:var(--e2)}
+.plan__nombre{margin-bottom:18px;font-size:13px;line-height:18px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3g)}
+/* flex-wrap: el anual de Firma ($2.500.000/año) no debe desbordar la tarjeta
+   entre 1100 y 1440 px, donde las columnas son más estrechas. */
+.plan__precio{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:6px;font-variant-numeric:tabular-nums}
+.plan__cifra{font-size:clamp(34px,3.2vw,46px);line-height:1.12;font-weight:700;letter-spacing:-.035em;color:var(--ink);font-variant-numeric:tabular-nums}
+.plan__per{font-size:15px;line-height:22px;font-weight:500;color:var(--ink-3g)}
+.plan__sub{margin:6px 0 22px;font-size:14px;line-height:21px;color:var(--ink-3g)}
+.plan__cuerpo{flex:1;display:flex;flex-direction:column}
+.plan__lema{margin-bottom:12px;font-size:16px;line-height:24px;font-weight:600;color:var(--ink)}
+.plan__lista{display:grid;gap:10px;margin:0;padding:0;list-style:none;font-size:15px;line-height:23px;color:var(--ink-2)}
+.plan__lista li{display:flex;align-items:flex-start;gap:10px}
+.plan__marca{flex:none;width:14px;height:1.5px;margin-top:11px;border-radius:1px;background:#8FA0B2}
+.plan__lista b{font-weight:600}
+.plan__nota{margin-top:auto;padding-top:14px;font-size:14px;line-height:21px;color:var(--ink-3g)}
+.plan__lista + .plan__nota{margin-top:16px;border-top:1px solid var(--hair)}
+.plan__acciones{display:grid;gap:4px;margin-top:24px}
+.plan--premium{padding:36px 30px;background:var(--nav-900);border-color:var(--nav-900);box-shadow:0 24px 60px -24px rgb(16 24 34/.5)}
+.plan--premium .plan__nombre{color:var(--gold-soft)}
+.plan--premium .plan__cifra{font-size:clamp(38px,3.7vw,54px);color:#fff}
+.plan--premium .plan__lema,.plan--premium .plan__lista{color:#fff}
+.plan--premium .plan__per,.plan--premium .plan__sub,.plan--premium .plan__detalle{color:var(--on-dark)}
+.plan--premium .plan__marca{background:var(--gold)}
+.plan__detalle{color:var(--ink-3g)}
 .saldo-wrap{padding:0 56px 40px}
 .saldo{display:flex;align-items:center;gap:20px;padding:16px 20px;background:#fff;border:1px solid var(--line);border-radius:var(--r-card)}
 .saldo .rotulo{color:var(--gold-ink);flex:none}
@@ -450,14 +458,20 @@ svg{display:block}
   .seg{height:44px;padding:0 16px;font-size:14px}
   .periodo__nota{font-size:12px;text-align:right}
   .planes{padding:0 16px;gap:10px}
-  .plan{padding:20px}
-  .plan--premium{order:-1}
-  .plan__cab{margin-bottom:16px}
-  .plan__cifra{font-size:28px;line-height:34px}
-  .plan__sub{padding:6px 0 14px}
-  .plan__cuerpo{padding-top:12px}
-  .plan__lista{gap:7px;font-size:13px;line-height:19px}
-  .plan__acciones{margin-top:16px;gap:6px}
+  .planes{gap:12px}
+  .plan{padding:24px 20px}
+  .plan--premium{order:-1;padding:26px 22px;box-shadow:0 18px 44px -20px rgb(16 24 34/.5)}
+  .plan__nombre{margin-bottom:14px}
+  .plan__cifra{font-size:38px;line-height:44px}
+  .plan--premium .plan__cifra{font-size:44px;line-height:50px}
+  .plan__sub{margin:4px 0 16px;font-size:14px}
+  .plan__lema{font-size:15px;line-height:23px;margin-bottom:10px}
+  .plan__lista{gap:8px;font-size:14px;line-height:22px}
+  /* En 390 la descripción de cada módulo añadido es lectura de escritorio:
+     el nombre basta para ver la diferencia. */
+  .plan__detalle{display:none}
+  .plan__nota{font-size:13px;line-height:20px}
+  .plan__acciones{margin-top:18px;gap:6px}
   .plan__acciones .btn{height:48px;font-size:15px}
   .saldo-wrap{padding:14px 16px 0}
   .saldo{display:block;padding:14px 16px}
@@ -749,20 +763,22 @@ svg{display:block}
   </div>
 
   <div class="planes">
+    <!-- Esencial es la base: es el único que enumera sus módulos. La prueba
+         gratuita existe solo para este plan (trial.rules.ts), por eso su enlace
+         vive aquí y en ningún otro bloque. -->
     <article class="plan" data-plan="ESENCIAL">
-      <div class="plan__cab"><h3 class="plan__nombre">Esencial</h3><span class="rotulo">1 usuario</span></div>
+      <h3 class="plan__nombre">Esencial</h3>
       <div class="plan__precio"><span class="plan__cifra" data-price="es">$85.000</span><span class="plan__per" data-per>/mes</span></div>
-      <div class="plan__sub">IVA incluido · el abogado que trabaja solo</div>
+      <div class="plan__sub">IVA incluido · 1 usuario</div>
       <div class="plan__cuerpo">
-        <div class="rotulo">Nueve de doce módulos</div>
+        <div class="plan__lema">Para el abogado que trabaja solo.</div>
         <ul class="plan__lista">
-          <li><span class="mono">01—03</span>Redacción, Borradores y Revisiones</li>
-          <li><span class="mono">05</span>Expediente</li>
-          <li><span class="mono">08—10</span>Buscador, Catálogo y Herramientas</li>
-          <li><span class="mono">11—12</span>Manual de uso y Soporte</li>
-          <li><span class="mono">+</span>Membrete de la firma</li>
+          <li><span class="plan__marca" aria-hidden="true"></span>Redacción, Borradores y Revisiones</li>
+          <li><span class="plan__marca" aria-hidden="true"></span>Expediente, Buscador y Catálogo</li>
+          <li><span class="plan__marca" aria-hidden="true"></span>Herramientas, Manual de uso y Soporte</li>
+          <li><span class="plan__marca" aria-hidden="true"></span>Membrete de la firma</li>
         </ul>
-        <div class="plan__nota">No incluye Orientación, Audiencias ni Entrevistas.</div>
+        <div class="plan__nota">No trae Orientación, Audiencias ni Entrevistas.</div>
       </div>
       <div class="plan__acciones">
         <a class="btn btn--secundario btn--bloque" href="/?registro=ESENCIAL">Contratar Esencial</a>
@@ -770,35 +786,40 @@ svg{display:block}
       </div>
     </article>
 
+    <!-- Premium enuncia SOLO lo que añade sobre Esencial: tres módulos y los
+         puestos. Enseñar estilo y el membrete ya están en Esencial; nombrarlos
+         aquí sería vender dos veces lo mismo. -->
     <article class="plan plan--premium oscuro" data-plan="PREMIUM">
-      <div class="plan__cab"><h3 class="plan__nombre">Premium</h3><span class="rotulo">Hasta 5 usuarios</span></div>
+      <h3 class="plan__nombre">Premium</h3>
       <div class="plan__precio"><span class="plan__cifra" data-price="pr">$120.000</span><span class="plan__per" data-per>/mes</span></div>
-      <div class="plan__sub">IVA incluido · hasta cinco abogados</div>
+      <div class="plan__sub">IVA incluido · hasta 5 usuarios</div>
       <div class="plan__cuerpo">
-        <div class="rotulo">Los doce módulos</div>
+        <div class="plan__lema">Todo lo de Esencial, y además:</div>
         <ul class="plan__lista">
-          <li><span class="mono">01—12</span>Todo lo de Esencial</li>
-          <li><span class="mono">04</span>Orientación por hechos</li>
-          <li><span class="mono">06—07</span>Audiencias y Entrevistas</li>
+          <li><span class="plan__marca" aria-hidden="true"></span><span><b>Orientación</b><span class="plan__detalle"> — describa los hechos y reciba las actuaciones candidatas, con su término</span></span></li>
+          <li><span class="plan__marca" aria-hidden="true"></span><span><b>Audiencias</b><span class="plan__detalle"> — el transcrito con cada interlocutor separado, y su acta</span></span></li>
+          <li><span class="plan__marca" aria-hidden="true"></span><span><b>Entrevistas</b><span class="plan__detalle"> — el guion de lo que no puede quedar sin preguntar al cliente</span></span></li>
+          <li><span class="plan__marca" aria-hidden="true"></span>Hasta 5 usuarios</li>
         </ul>
-        <div class="plan__nota">Orientación, Audiencias y Entrevistas son los tres módulos que Esencial no incluye.</div>
       </div>
       <div class="plan__acciones">
         <a class="btn btn--crema btn--bloque" href="/?registro=PREMIUM">Contratar Premium</a>
       </div>
     </article>
 
+    <!-- Firma no abre ningún módulo que Premium no tenga: lo único que añade
+         son los puestos. No se le atribuyen auditoría ni saldo compartido
+         (son de todos los planes) ni un membrete por dependencia (no existe). -->
     <article class="plan" data-plan="FIRMA">
-      <div class="plan__cab"><h3 class="plan__nombre">Firma</h3><span class="rotulo">Hasta 15 usuarios</span></div>
+      <h3 class="plan__nombre">Firma</h3>
       <div class="plan__precio"><span class="plan__cifra" data-price="fi">$250.000</span><span class="plan__per" data-per>/mes</span></div>
-      <div class="plan__sub">IVA incluido · la firma con más de cinco abogados</div>
+      <div class="plan__sub">IVA incluido · hasta 15 usuarios</div>
       <div class="plan__cuerpo">
-        <div class="rotulo">Los mismos módulos de Premium</div>
+        <div class="plan__lema">Todo lo de Premium, y además:</div>
         <ul class="plan__lista">
-          <li><span class="mono">01—12</span>Los doce módulos</li>
-          <li><span class="mono">+</span>Hasta 15 usuarios</li>
+          <li><span class="plan__marca" aria-hidden="true"></span>Hasta 15 usuarios</li>
         </ul>
-        <div class="plan__nota">No abre nada que Premium no tenga: suma puestos para la firma que ya no cabe en cinco.</div>
+        <div class="plan__nota">Los mismos módulos de Premium: lo que cambia son los puestos.</div>
       </div>
       <div class="plan__acciones">
         <a class="btn btn--secundario btn--bloque" href="/?registro=FIRMA">Contratar Firma</a>

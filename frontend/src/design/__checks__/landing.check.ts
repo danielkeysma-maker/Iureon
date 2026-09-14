@@ -178,6 +178,54 @@ check(
   pruebaSuelta.map((m) => m[1].trim()).join(' · ')
 );
 
+/* ─── 2b. CADA PLAN DICE SOLO LO QUE AÑADE, Y NADA QUE NO TENGA ─────────── */
+/*
+ * El diseño de las tarjetas (handoff app-registro-y-planes) vendía en Premium
+ * «Enseñar estilo y membrete», que Esencial ya trae, y en Firma «auditoría por
+ * usuario», «membrete por dependencia» y «saldo compartido», que son de todos
+ * los planes o no existen. Premium añade tres módulos y puestos; Firma añade
+ * solo puestos. Todo lo demás en esos dos bloques sería una venta falsa.
+ *
+ * «gratis» se prohíbe sin excepción dentro de los bloques: la nota del periodo
+ * anual («2 meses gratis») vive en la cabecera de la sección, fuera de todo
+ * <article data-plan>, así que no necesita salvedad. Si algún día se mueve a
+ * una tarjeta, este chequeo obliga a decidirlo aquí de forma explícita.
+ */
+const textoDe = (plan: string): string =>
+  (bloqueDe(plan)?.contenido ?? '').replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' ');
+const PROHIBIDO_EN_PLANES_SUPERIORES = [/Enseñar estilo/i, /membrete/i, /auditor[ií]a/i, /saldo compartido/i, /prueba/i, /gratis/i];
+for (const plan of ['PREMIUM', 'FIRMA']) {
+  const b = bloqueDe(plan);
+  const hallados = PROHIBIDO_EN_PLANES_SUPERIORES.filter((r) => r.test(b?.contenido ?? ''));
+  check(
+    `el bloque de ${plan} no se atribuye lo que ya trae Esencial ni lo que no existe`,
+    Boolean(b) && hallados.length === 0,
+    hallados.map((r) => r.source).join(', ')
+  );
+}
+
+const MODULOS = [
+  'Redacción',
+  'Borradores',
+  'Revisiones',
+  'Orientación',
+  'Expediente',
+  'Audiencias',
+  'Entrevistas',
+  'Buscador',
+  'Catálogo',
+  'Herramientas',
+  'Manual',
+  'Soporte'
+];
+const textoFirma = textoDe('FIRMA');
+check('el bloque de Firma dice que tiene los mismos módulos de Premium', /mismos módulos de Premium/i.test(textoFirma));
+const modulosEnFirma = MODULOS.filter((m) => new RegExp(`\\b${m}\\b`, 'iu').test(textoFirma));
+check('el bloque de Firma no enumera ningún módulo como añadido', modulosEnFirma.length === 0, modulosEnFirma.join(', '));
+
+check('«saldo de cortesía» no aparece en ninguna parte', !/saldo\s+de\s+cortes[ií]a/i.test(HTML));
+check('«siete días antes» no aparece en ninguna parte', !/siete\s+d[ií]as\s+antes/i.test(HTML));
+
 /* ─── 3. LOS ENLACES QUE LA APLICACIÓN SABE ATENDER ─────────────────────── */
 /*
  * App.tsx: `debeIrALaPortada` solo reconoce entrar, prueba, registro, ir y
