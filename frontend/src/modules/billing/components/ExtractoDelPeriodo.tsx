@@ -118,11 +118,18 @@ export const ExtractoDelPeriodo: React.FC<ExtractoDelPeriodoProps> = ({ activo, 
   const r = extracto?.resumen ?? null;
   const hayMovimientos = (extracto?.movimientos.length ?? 0) > 0;
 
+  /*
+   * VESTIDO CON LA CARA NUEVA (cn-adm-) y sin raíz propia: vive dentro de
+   * Saldo, que ya abre `.cara-nueva`. Los rótulos dejan el mono de 9,5 px: el
+   * mono es para lo citable —las cifras—, y nada baja de 14 px.
+   */
   return (
-    <div className="rounded-card border border-line-200 bg-surface p-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-baseline gap-2">
-          <h4 className="text-ui font-semibold text-ink-900">Extracto</h4>
+    <section className="cn-adm-extracto" aria-labelledby="cn-adm-extracto-titulo">
+      <div className="cn-adm-extracto-cabeza">
+        <div className="cn-adm-extracto-titulo">
+          <h3 id="cn-adm-extracto-titulo" className="cn-adm-seccion-titulo">
+            Extracto
+          </h3>
           <label htmlFor="periodo-extracto" className="sr-only">
             Período
           </label>
@@ -130,7 +137,7 @@ export const ExtractoDelPeriodo: React.FC<ExtractoDelPeriodoProps> = ({ activo, 
             id="periodo-extracto"
             value={periodo}
             onChange={(e) => setPeriodo(e.target.value)}
-            className="field h-8 w-auto py-0 text-[12.5px]"
+            className="cn-adm-campo cn-adm-campo--selector"
           >
             {periodos.map((p) => (
               <option key={p} value={p}>
@@ -143,59 +150,65 @@ export const ExtractoDelPeriodo: React.FC<ExtractoDelPeriodoProps> = ({ activo, 
           type="button"
           onClick={() => window.print()}
           disabled={!hayMovimientos || cargando}
-          className="btn-neutral btn-sm"
+          className="cn-adm-boton cn-adm-boton--suave"
           title="Imprimir o guardar como PDF el comprobante del período"
         >
-          <Printer className="h-3.5 w-3.5" />
+          <Printer className="h-4 w-4" aria-hidden="true" />
           Imprimir comprobante
         </button>
       </div>
 
-      {error && <p className="mt-2 text-meta text-danger">{error}</p>}
+      {error && (
+        <p role="alert" className="cn-adm-error cn-adm-error--arriba">
+          {error}
+        </p>
+      )}
+
+      {cargando && !r && <p className="cn-adm-extracto-detalle">Leyendo el extracto…</p>}
 
       {r && !hayMovimientos && !cargando && (
-        <p className="mt-3 text-meta text-ink-500">Sin movimientos en {nombreDelPeriodo(periodo)}.</p>
+        <p className="cn-adm-extracto-detalle">Sin movimientos en {nombreDelPeriodo(periodo)}.</p>
       )}
 
       {r && hayMovimientos && (
-        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-          <div className="rounded-control border border-line-100 bg-canvas p-2.5">
-            <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">Saldo inicial</p>
-            <p className="mt-0.5 font-mono text-[15px] font-semibold text-ink-900">{pesos(r.saldoInicial)}</p>
+        <div className="cn-adm-extracto-cifras">
+          <div className="cn-adm-extracto-cifra">
+            <p className="cn-adm-extracto-rotulo">Saldo inicial</p>
+            <p className="cn-adm-extracto-valor">{pesos(r.saldoInicial)}</p>
           </div>
-          <div className="rounded-control border border-line-100 bg-canvas p-2.5">
-            <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">Entradas</p>
-            <p className="mt-0.5 font-mono text-[15px] font-semibold text-verified">+{pesos(r.entradas)}</p>
-            <p className="text-[11px] leading-snug text-ink-500">
+          <div className="cn-adm-extracto-cifra">
+            <p className="cn-adm-extracto-rotulo">Entradas</p>
+            <p className="cn-adm-extracto-valor cn-adm-extracto-valor--entra">+{pesos(r.entradas)}</p>
+            <p className="cn-adm-extracto-detalle">
               {cuenta(r.recargas, 'recarga', 'recargas')}
               {r.devoluciones.cantidad > 0 && ` · ${cuenta(r.devoluciones, 'devolución', 'devoluciones')}`}
             </p>
           </div>
-          <div className="rounded-control border border-line-100 bg-canvas p-2.5">
-            <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">Salidas</p>
-            <p className="mt-0.5 font-mono text-[15px] font-semibold text-ink-900">{pesos(r.salidas)}</p>
-            <p className="text-[11px] leading-snug text-ink-500">
+          <div className="cn-adm-extracto-cifra">
+            <p className="cn-adm-extracto-rotulo">Salidas</p>
+            <p className="cn-adm-extracto-valor">{pesos(r.salidas)}</p>
+            <p className="cn-adm-extracto-detalle">
               {CONCEPTOS.filter((c) => r.consumo[c.clave].cantidad > 0)
                 .map((c) => cuenta(r.consumo[c.clave], c.singular, c.plural))
                 .join(' · ') || 'sin consumo'}
               {r.ajustes.cantidad > 0 && ` · ${cuenta(r.ajustes, 'ajuste', 'ajustes')}`}
             </p>
           </div>
-          <div className="rounded-control border border-line-100 bg-canvas p-2.5">
-            <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">Saldo final</p>
-            <p className="mt-0.5 font-mono text-[15px] font-semibold text-ink-900">{pesos(r.saldoFinal)}</p>
+          <div className="cn-adm-extracto-cifra">
+            <p className="cn-adm-extracto-rotulo">Saldo final</p>
+            <p className="cn-adm-extracto-valor">{pesos(r.saldoFinal)}</p>
           </div>
         </div>
       )}
 
-      <p className="mt-2 text-meta text-ink-400">
+      <p className="cn-adm-extracto-detalle cn-adm-extracto-detalle--pie">
         Comprobante informativo de movimientos. No es factura de venta ni documento equivalente.
       </p>
 
       {extracto && hayMovimientos && (
         <HojaImprimible extracto={extracto} firmName={firmName} firmNit={firmNit} />
       )}
-    </div>
+    </section>
   );
 };
 

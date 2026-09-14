@@ -8,7 +8,9 @@ import type { TrabajoConservado } from '../types';
  * La pantalla completa de una firma cuya prueba gratuita terminó sin pagar.
  *
  * SIGUE EL MARCO «PRUEBA TERMINADA» DE `public/handoff/app-entrada-y-sesion.html`
- * (SPEC-entrada-y-sesion §3.3), con las correcciones del titular:
+ * (:165, SPEC-entrada-y-sesion §3.3): tarjeta blanca de radio 16 sobre gris, la
+ * etiqueta en ámbar, el título de 24 px, el saldo en su recuadro, dos botones y
+ * la franja inferior para quien no es socio. Con las correcciones del titular:
  *
  * - LOS DÍAS SON LOS DE LA PRUEBA PÚBLICA, NO 14. La maqueta copió el plazo
  *   del alta por operador; el número sale de `DIAS_DE_PRUEBA_GRATUITA`, que
@@ -16,14 +18,16 @@ import type { TrabajoConservado } from '../types';
  * - NO HAY «EXPORTAR MI TRABAJO». La firma perdió todo el acceso (decisión del
  *   14 de septiembre de 2026) y el servidor responde 403 a cualquier descarga;
  *   ofrecer el botón sería prometer una salida que no existe.
+ * - LA FRANJA NO NOMBRA EL CORREO DEL SOCIO. La maqueta lo pinta, pero la
+ *   firma bloqueada solo puede leer su plan y su propia sesión: ese correo no
+ *   llega a esta pantalla y no se inventa.
  * - LE QUEDAN DOS COSAS: CONTRATAR Y BORRAR LO SUYO. «Ver planes» abre la misma
  *   pantalla de compra de siempre, que usa las rutas que el servidor deja
  *   abiertas para leer el plan y pagar. Y borrar la firma o la propia cuenta es
  *   la otra salida que el titular decidió dejar: quien ya no puede entrar tiene
  *   derecho a pedir la supresión de sus datos (Ley 1581 de 2012). Se usa el
- *   MISMO componente de «Ajustes» —contraseña, y el nombre exacto de la firma
- *   para borrarla—, no una copia: dos puertas de borrado se separan, y la que
- *   se quede atrás sería la que borra sin confirmar.
+ *   MISMO componente de «Ajustes», no una copia: dos puertas de borrado se
+ *   separan, y la que se quede atrás sería la que borra sin confirmar.
  *
  * LO QUE AFIRMA, EL SERVIDOR LO GARANTIZA: nada se borra al terminar la prueba y
  * el saldo sigue en la fila de la firma. Los números los cuenta el servidor; uno
@@ -72,50 +76,48 @@ export const PruebaTerminadaView: React.FC<PruebaTerminadaViewProps> = ({
   const saldo = trabajo?.saldoCop ?? null;
 
   return (
-    <main className="flex min-h-[100dvh] w-full items-center justify-center bg-canvas px-4 py-8 font-sans">
-      <div className="w-full max-w-[560px] overflow-hidden rounded-card border border-line-200 bg-surface shadow-e1">
-        <div className="px-5 py-6 sm:px-7 sm:py-7">
-          <p className="mb-5 text-label tracking-[0.09em] text-ink-900">IUREON</p>
+    <main className="cara-nueva cn-plan-bloqueo">
+      <div className="cn-plan-bloqueo-tarjeta">
+        <div className="cn-plan-bloqueo-cuerpo">
+          <p className="cn-plan-marca">IUREON</p>
 
-          <span className="mb-3 inline-flex items-center gap-1.5 rounded-control border border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))] px-2.5 py-1 text-label text-unverified">
-            <Lock className="h-3.5 w-3.5" aria-hidden="true" />
+          <span className="cn-plan-chip cn-plan-chip--aviso">
+            <Lock className="cn-plan-chip-icono" aria-hidden="true" />
             PRUEBA TERMINADA
           </span>
 
-          <h1 className="text-display text-ink-900 [text-wrap:balance]">
-            Los {DIAS_DE_PRUEBA_GRATUITA} días de prueba se acabaron
-          </h1>
+          <h1 className="cn-plan-bloqueo-titulo">Los {DIAS_DE_PRUEBA_GRATUITA} días de prueba se acabaron</h1>
 
-          <p className="mt-2 text-body text-ink-700 [text-wrap:pretty]">
+          <p className="cn-plan-bloqueo-texto">
             Su trabajo está intacto: no se borró nada
-            {piezas.length > 0 ? ` y ${enumerar(piezas)} siguen aquí` : ''}. Para volver a entrar a la aplicación hay
+            {piezas.length > 0 ? `; siguen aquí ${enumerar(piezas)}` : ''}. Para volver a entrar a la aplicación hay
             que contratar un plan.
           </p>
 
-          <div className="mt-4 rounded-control bg-canvas px-4 py-3 text-ui text-ink-700">
+          <div className="cn-plan-bloqueo-saldo">
             {saldo !== null && saldo > 0 ? (
-              <>
-                Le quedan <span className="font-mono text-ink-900">{pesos(saldo)}</span> de saldo sin usar. No se
+              <p>
+                Le quedan <span className="cn-plan-cifra-en-texto">{pesos(saldo)}</span> de saldo sin usar. No se
                 pierde: sigue ahí cuando active el plan.
-              </>
+              </p>
             ) : (
-              <>El saldo de recargas de la firma no se pierde: sigue ahí cuando active el plan.</>
+              <p>El saldo de recargas de la firma no se pierde: sigue ahí cuando active el plan.</p>
             )}
           </div>
 
-          <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-            <button type="button" onClick={onVerPlanes} className="btn-primary min-h-[44px] px-5 text-body">
+          <div className="cn-plan-bloqueo-acciones">
+            <button type="button" onClick={onVerPlanes} className="cn-plan-boton cn-plan-boton--primario min-h-[44px]">
               {puedePagar ? 'Ver planes y contratar' : 'Ver los planes'}
             </button>
-            <button type="button" onClick={onSalir} className="btn-neutral min-h-[44px] px-4 text-body">
-              <LogOut className="h-4 w-4" aria-hidden="true" />
+            <button type="button" onClick={onSalir} className="cn-plan-boton cn-plan-boton--suave min-h-[44px]">
+              <LogOut className="cn-plan-boton-icono" aria-hidden="true" />
               Salir
             </button>
           </div>
         </div>
 
         {!puedePagar && (
-          <p className="border-t border-line-100 bg-canvas px-5 py-4 text-ui text-ink-500 sm:px-7">
+          <p className="cn-plan-bloqueo-franja">
             Contratar el plan lo hace un socio administrador de la firma. Si usted no lo es, avísele.
           </p>
         )}
@@ -124,17 +126,15 @@ export const PruebaTerminadaView: React.FC<PruebaTerminadaViewProps> = ({
           SI NO VA A CONTRATAR, PUEDE BORRAR LO SUYO. Va al final y separado:
           es irreversible, y no puede competir con la salida principal.
         */}
-        <div className="border-t border-line-100 px-5 py-5 sm:px-7">
-          <p className="text-ui text-ink-700">
+        <div className="cn-plan-bloqueo-riesgo">
+          <p className="cn-plan-bloqueo-texto">
             Si no va a contratar, puede borrar sus datos de Iureon. Este paso no se deshace.
           </p>
-          <div className="mt-3">
-            <ZonaDeRiesgoDeCuenta
-              nombreDeLaFirma={nombreDeLaFirma}
-              esAdministrador={esAdministrador}
-              onEliminado={onEliminado}
-            />
-          </div>
+          <ZonaDeRiesgoDeCuenta
+            nombreDeLaFirma={nombreDeLaFirma}
+            esAdministrador={esAdministrador}
+            onEliminado={onEliminado}
+          />
         </div>
       </div>
     </main>

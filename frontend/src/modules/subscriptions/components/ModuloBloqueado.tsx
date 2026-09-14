@@ -4,7 +4,7 @@ import { usePlan } from '../PlanContext';
 import type { Modulo } from '../types';
 
 /**
- * Covers a whole module while the plan is expired.
+ * Covers a whole module while the plan is expired, or when the firm cannot use it.
  *
  * WHY COVER AND NOT UNMOUNT. The module stays rendered underneath, dimmed and
  * inert, so the lawyer still sees what the screen IS — the workshop, the
@@ -21,6 +21,11 @@ import type { Modulo } from '../types';
  * Which modules get covered is decided where they are mounted (`App.tsx`), not
  * here: lists of existing work — drafts, reviews, hearings, interviews — stay
  * open for reading and exporting and only lose their creation buttons.
+ *
+ * LA CARA DEL AVISO ES DERIVADA: ningún artboard dibuja un módulo cubierto.
+ * Toma la anatomía de las confirmaciones de `public/handoff/app-dialogos-y-estados.html`
+ * —panel de 20 px, título de 18, texto de 15 y botón de 44— para que se lea
+ * como parte de la misma aplicación y no como un error del navegador.
  */
 interface ModuloBloqueadoProps {
   /** One sentence on what the lawyer can still do instead, in this module's terms. */
@@ -67,36 +72,34 @@ export const ModuloBloqueado: React.FC<ModuloBloqueadoProps> = ({ quePuede, modu
       ? quePuede
       : cierre === 'DESACTIVADO'
         ? 'Escríbanos por Soporte para activarlo.'
-        : 'Para usarlo, pase la firma a Premium o a Firma desde «Plan de la firma».';
+        : 'Para usarlo, pase la firma a un plan que lo incluya desde «Plan de la firma».';
 
   return (
     <div className="relative flex min-h-0 min-w-0 flex-1">
       <div className="pointer-events-none flex min-h-0 min-w-0 flex-1 select-none opacity-60" aria-hidden="true" inert>
         {children}
       </div>
-      <div className="absolute inset-0 z-20 flex items-center justify-center bg-canvas/70 p-4 backdrop-blur-[2px]">
+      <div className="cara-nueva cn-plan-cierre-velo absolute inset-0 z-20 flex items-center justify-center p-4">
         <div
           role="alertdialog"
           aria-labelledby="modulo-bloqueado-titulo"
           /* Radio de 20 px (14 sep 2026): es un diálogo de alerta y va con el radio común de los diálogos. */
-          className="flex w-full max-w-sm flex-col items-center gap-3 rounded-[20px] border border-line-200 bg-surface px-6 py-6 text-center shadow-lg"
+          className="cn-plan-cierre flex w-full max-w-sm flex-col items-center rounded-[20px]"
         >
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[rgb(var(--danger)/0.08)] text-danger">
-            <Lock className="h-5 w-5" />
+          <span className="cn-plan-cierre-icono">
+            <Lock aria-hidden="true" />
           </span>
-          <h2 id="modulo-bloqueado-titulo" className="text-[15px] font-semibold text-ink-900">
+          <h2 id="modulo-bloqueado-titulo" className="cn-plan-cierre-titulo">
             {titulo}
           </h2>
-          <p className="text-[12.5px] leading-snug text-ink-500 [text-wrap:pretty]">{texto}</p>
+          <p className="cn-plan-cierre-texto">{texto}</p>
           {cierre !== 'DESACTIVADO' && (
-            <button type="button" onClick={abrirPlan} className="btn-primary btn-sm mt-1">
+            <button type="button" onClick={abrirPlan} className="cn-plan-boton cn-plan-boton--primario">
               {cierre === 'VENCIDO' ? (puedePagar ? 'Renovar plan' : 'Ver plan') : 'Ver planes'}
             </button>
           )}
           {cierre === 'VENCIDO' && !puedePagar && (
-            <p className="text-[11.5px] leading-snug text-ink-400">
-              Solo un administrador de su firma puede renovarlo.
-            </p>
+            <p className="cn-plan-cierre-nota">Solo un administrador de su firma puede renovarlo.</p>
           )}
         </div>
       </div>

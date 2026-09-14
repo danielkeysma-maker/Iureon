@@ -12,10 +12,16 @@ import { usePlan } from '../PlanContext';
  * as broken. So the bar names the cause to everyone, and the button adapts —
  * a partner renews, a lawyer is told whom to ask.
  *
+ * SOLO LECTURA SIN LÍMITE DE DÍAS, y se dice. Es la gracia de la firma que pagó
+ * alguna vez: no se le borra nada ni se le cierra la puerta con el tiempo. La
+ * prueba que terminó sin pagar no llega a esta franja: la cáscara le muestra su
+ * propia pantalla de bloqueo.
+ *
  * WHY IT CANNOT BE DISMISSED. Same reasoning as the support-access band: a
  * closed notice is forgotten, and a lawyer who spends an hour correcting a
- * transcript that will not save is the failure this prevents. It pushes the
- * content down instead of floating over it.
+ * transcript that will not save is the failure this prevents.
+ *
+ * CARA DERIVADA: la misma franja de `PlanExpiryBanner`, sobre el fondo de peligro.
  */
 const fechaLarga = (iso: string): string =>
   new Date(iso).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -26,21 +32,16 @@ export const PlanVencidoBar: React.FC = () => {
 
   const fecha = plan.validUntil ? ` el ${fechaLarga(plan.validUntil)}` : '';
   const texto = puedePagar
-    ? `Plan vencido${fecha}. Solo lectura: puede leer y descargar lo que ya tiene. Renueve el plan para volver a trabajar.`
-    : `Plan vencido${fecha}. Solo lectura: puede leer y descargar lo que ya tiene. Para volver a trabajar, pida a un administrador de su firma que lo renueve.`;
+    ? 'Solo lectura, sin límite de días: puede leer y descargar lo que ya tiene. Renueve el plan para volver a trabajar.'
+    : 'Solo lectura, sin límite de días: puede leer y descargar lo que ya tiene. Para volver a trabajar, pida a un administrador de su firma que lo renueve.';
 
   return (
-    <div
-      role="status"
-      className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2 border-b border-[rgb(var(--danger)/0.35)] bg-[rgb(var(--danger)/0.06)] px-4 py-2 text-[12.5px] text-danger"
-    >
-      <Lock className="h-4 w-4 shrink-0" />
-      <p className="min-w-0 flex-1 text-justify leading-snug [text-wrap:pretty]">{texto}</p>
-      <button
-        type="button"
-        onClick={abrirPlan}
-        className="shrink-0 rounded-control border border-current px-2.5 py-1 text-[12px] font-semibold hover:bg-white/40"
-      >
+    <div role="status" className="cara-nueva cn-plan-franja cn-plan-franja--peligro">
+      <Lock className="cn-plan-franja-icono" aria-hidden="true" />
+      <p className="cn-plan-franja-texto">
+        <b>Plan vencido{fecha}.</b> {texto}
+      </p>
+      <button type="button" onClick={abrirPlan} className="cn-plan-franja-boton">
         {puedePagar ? 'Renovar plan' : 'Ver plan'}
       </button>
     </div>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { CalendarClock } from 'lucide-react';
+import { avisoDelPlan } from '../planEnPantalla';
 import type { PlanDeFirma } from '../types';
 
 /**
@@ -7,15 +8,21 @@ import type { PlanDeFirma } from '../types';
  *
  * WHO SEES IT. Only FIRM_ADMIN and SUPER_ADMIN: they are the ones who can pay,
  * and telling a lawyer who cannot act on it produces a question to the partner
- * instead of a payment. Seven days before expiry and after it.
+ * instead of a payment. Seven days before expiry.
  *
  * WHY IT CANNOT BE DISMISSED. Same reasoning as the support-access band: a
- * notice that can be closed is closed, and a firm that goes read-only on a
+ * notice that can be closed is closed, and a firm that loses service on a
  * Monday because a banner was dismissed on Friday is the failure this exists
  * to prevent. It pushes the content down instead of floating over it.
  *
- * Amber while there is still time (the same surface the product uses for
- * "unverified"), danger once expired.
+ * LA FRASE ES LA MISMA DE «PLAN Y SALDO» (`avisoDelPlan`), y no por economía.
+ * Esta franja decía que la prueba gratuita, al terminar, «pasa a solo
+ * lectura»: era falso desde el 14 de septiembre de 2026 —la prueba que termina
+ * sin pagar pierde todo el acceso— y nadie lo vio porque la frase vivía
+ * escrita aquí aparte. Una sola fuente, con su check, no se desincroniza.
+ *
+ * CARA DERIVADA: la franja de ámbar de los avisos que no se cierran, con la
+ * escala de la cara nueva (15 px, botón de 44).
  */
 interface PlanExpiryBannerProps {
   plan: PlanDeFirma | null;
@@ -30,36 +37,19 @@ export const PlanExpiryBanner: React.FC<PlanExpiryBannerProps> = ({ plan, puedeV
   if (!puedeVer || !plan || !plan.validUntil) return null;
   /*
    * Once expired, `PlanVencidoBar` takes over for every role; painting both
-   * would stack two red bars saying the same thing to the partner.
+   * would stack two bars saying the same thing to the partner.
    */
   if (plan.estado !== 'POR_VENCER') return null;
-
-  const dias = plan.diasRestantes ?? 0;
-
-  const cuando = dias === 1 ? ' (mañana)' : dias > 1 ? ` (en ${dias} días)` : '';
-  /*
-   * A 7-day trial is POR_VENCER from its first day (DIAS_DE_AVISO is seven),
-   * so this banner IS the trial's countdown. "Pagar antes suma el periodo" is
-   * true for a trial too, but the partner has not paid anything yet: what
-   * they need to hear is that nothing is charged and what happens at the end.
-   */
-  const texto =
-    plan.period === 'PRUEBA'
-      ? `Su prueba gratuita termina el ${fechaLarga(plan.validUntil)}${cuando}. No se cobra nada al terminar: la aplicación pasa a solo lectura y conserva su trabajo. Para continuar, contrate un plan.`
-      : `Su plan vence el ${fechaLarga(plan.validUntil)}${cuando}. Pagar antes suma el periodo a la fecha vigente: no se pierde ningún día.`;
+  const aviso = avisoDelPlan(plan, fechaLarga);
+  if (!aviso) return null;
 
   return (
-    <div
-      role="status"
-      className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2 border-b border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))] px-4 py-2 text-[12.5px] text-unverified"
-    >
-      <CalendarClock className="h-4 w-4 shrink-0" />
-      <p className="min-w-0 flex-1 text-justify leading-snug [text-wrap:pretty]">{texto}</p>
-      <button
-        type="button"
-        onClick={onAbrirPlan}
-        className="shrink-0 rounded-control border border-current px-2.5 py-1 text-[12px] font-semibold hover:bg-white/40"
-      >
+    <div role="status" className="cara-nueva cn-plan-franja">
+      <CalendarClock className="cn-plan-franja-icono" aria-hidden="true" />
+      <p className="cn-plan-franja-texto">
+        <b>{aviso.titulo}.</b> {aviso.texto}
+      </p>
+      <button type="button" onClick={onAbrirPlan} className="cn-plan-franja-boton">
         Ver el plan
       </button>
     </div>

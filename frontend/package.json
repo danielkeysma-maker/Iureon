@@ -44,6 +44,8 @@
     "check:manual-soporte-cara": "npx tsx src/modules/help/__checks__/manualSoporteCara.check.ts",
     "check:cerrar-sesion": "npx tsx src/modules/tenant/__checks__/cerrarSesion.check.ts",
     "check:herramientas-cara": "npx tsx src/modules/tools/__checks__/herramientasCara.check.ts",
+    "check:ajustes-plan-cara": "npx tsx src/modules/settings/__checks__/ajustesPlanCara.check.ts",
+    "check:administrar-saldo-cara": "npx tsx src/modules/billing/__checks__/administrarSaldoCara.check.ts",
     "check:agenda-contador": "npx tsx src/modules/agenda/__checks__/desdeElContador.check.ts",
     "check:agenda-exportar": "npx esbuild src/modules/agenda/__checks__/agendaExportar.check.ts --bundle --platform=node --format=cjs --outfile=node_modules/.cache/agendaExportar.check.cjs --log-level=error && node node_modules/.cache/agendaExportar.check.cjs"
   },

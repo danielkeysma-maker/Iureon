@@ -67,7 +67,7 @@ const SELECTORES_MODALES: ReadonlyArray<{ clase: string; componente: string }> =
  * `[role='dialog'] > div:last-child`. Deben existir en el CSS: si uno se
  * renombra, su override deja de estar a la vista de este check.
  */
-const OVERRIDES_DEL_MARCO = ['cn-aud-dialogos', 'cn-her-dialogos'];
+const OVERRIDES_DEL_MARCO = ['cn-aud-dialogos', 'cn-her-dialogos', 'cn-adm-dialogos', 'cn-aju-dialogos', 'cn-plan-dialogos'];
 
 /**
  * Modales armados con Tailwind: `ancla` es un trozo único del `className` del

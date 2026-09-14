@@ -17649,3 +17649,2796 @@
   }
 }
 /* ─── fin Herramientas ─── */
+/* ─── Ajustes y plan ─── */
+/*
+ * Ajustes (`modules/settings`) y el plan de la firma (`modules/subscriptions`).
+ *
+ * FORMA de `public/handoff/app-ajustes-y-plan.html`: índice y «Su cuenta» (:237),
+ * Apariencia (:309), Plan y saldo (:347), Cambiar de plan (:390), Zona de
+ * riesgo (:433) y el teléfono (:460); y del marco «Prueba terminada» de
+ * `app-entrada-y-sesion.html` (:165). Las franjas de vencimiento y el módulo
+ * cubierto son DERIVADOS: ningún artboard los dibuja, y toman la escala de las
+ * confirmaciones de `app-dialogos-y-estados.html`.
+ *
+ * Prefijos `cn-aju-` (Ajustes) y `cn-plan-` (plan). Cada raíz abre su propio
+ * alcance `.cara-nueva`, porque las franjas, el módulo cubierto y la pantalla de
+ * la prueba terminada se montan fuera de cualquier otra pantalla nueva.
+ */
+.cara-nueva.cn-aju,
+.cara-nueva.cn-aju-riesgo,
+.cara-nueva.cn-plan-dialogos,
+.cara-nueva.cn-plan-bloqueo,
+.cara-nueva.cn-plan-franja,
+.cara-nueva.cn-plan-cierre-velo {
+  /* La tarjeta del plan va en tinta en claro; en oscuro sube de superficie, no se hunde. */
+  --plan-tinta: #101822;
+  --plan-sobre-tinta: #fff;
+  --plan-sobre-tinta-2: rgb(255 255 255 / 0.72);
+  --plan-sobre-tinta-3: rgb(255 255 255 / 0.7);
+  --plan-tinta-raya: rgb(255 255 255 / 0.14);
+  --plan-blanco: #fff;
+  --plan-blanco-tinta: #101822;
+  /* El texto sobre el rojo de borrar: blanco en claro, oscuro en oscuro, donde el rojo aclara. */
+  --plan-sobre-peligro: #fff;
+  --plan-peligro-linea: #e5c6c2;
+  --plan-segmento-activo: #fff;
+  --plan-mesa: #edeff2;
+  --plan-franja-fondo: #fbf3e4;
+  --plan-franja-linea: #cfae6e;
+  --plan-franja-peligro: #faf0ee;
+  --plan-velo-cierre: rgb(247 248 250 / 0.72);
+  --plan-sombra-dialogo: 0 20px 60px rgb(16 24 34 / 0.18);
+  --plan-sombra-tarjeta: 0 8px 30px rgb(16 24 34 / 0.14);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .cara-nueva.cn-aju,
+  :root:not([data-theme='light']) .cara-nueva.cn-aju-riesgo,
+  :root:not([data-theme='light']) .cara-nueva.cn-plan-dialogos,
+  :root:not([data-theme='light']) .cara-nueva.cn-plan-bloqueo,
+  :root:not([data-theme='light']) .cara-nueva.cn-plan-franja,
+  :root:not([data-theme='light']) .cara-nueva.cn-plan-cierre-velo {
+    --plan-tinta: #1a2430;
+    --plan-sobre-tinta: #e8edf2;
+    --plan-sobre-tinta-2: #c3cdd8;
+    --plan-sobre-tinta-3: #c3cdd8;
+    --plan-tinta-raya: #24303d;
+    --plan-blanco: #e8edf2;
+    --plan-blanco-tinta: #131b24;
+    --plan-sobre-peligro: #131b24;
+    --plan-peligro-linea: rgb(235 165 156 / 0.4);
+    --plan-segmento-activo: #24303d;
+    --plan-mesa: #0b1219;
+    --plan-franja-fondo: #2a2418;
+    --plan-franja-linea: rgb(217 166 74 / 0.35);
+    --plan-franja-peligro: #2c1d1c;
+    --plan-velo-cierre: rgb(11 18 25 / 0.72);
+    --plan-sombra-dialogo: none;
+    --plan-sombra-tarjeta: none;
+  }
+}
+:root[data-theme='dark'] .cara-nueva.cn-aju,
+:root[data-theme='dark'] .cara-nueva.cn-aju-riesgo,
+:root[data-theme='dark'] .cara-nueva.cn-plan-dialogos,
+:root[data-theme='dark'] .cara-nueva.cn-plan-bloqueo,
+:root[data-theme='dark'] .cara-nueva.cn-plan-franja,
+:root[data-theme='dark'] .cara-nueva.cn-plan-cierre-velo {
+  --plan-tinta: #1a2430;
+  --plan-sobre-tinta: #e8edf2;
+  --plan-sobre-tinta-2: #c3cdd8;
+  --plan-sobre-tinta-3: #c3cdd8;
+  --plan-tinta-raya: #24303d;
+  --plan-blanco: #e8edf2;
+  --plan-blanco-tinta: #131b24;
+  --plan-sobre-peligro: #131b24;
+  --plan-peligro-linea: rgb(235 165 156 / 0.4);
+  --plan-segmento-activo: #24303d;
+  --plan-mesa: #0b1219;
+  --plan-franja-fondo: #2a2418;
+  --plan-franja-linea: rgb(217 166 74 / 0.35);
+  --plan-franja-peligro: #2c1d1c;
+  --plan-velo-cierre: rgb(11 18 25 / 0.72);
+  --plan-sombra-dialogo: none;
+  --plan-sombra-tarjeta: none;
+}
+
+/* ── Ajustes: el marco de dos columnas (:237) ──────────────────────────── */
+.cara-nueva.cn-aju {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--canvas);
+  color: var(--ink);
+}
+.cara-nueva .cn-aju-indice {
+  flex: none;
+  width: 236px;
+  overflow-y: auto;
+  padding: 26px 16px;
+  background: var(--wash);
+}
+.cara-nueva .cn-aju-titulo {
+  margin: 0 0 18px;
+  padding: 0 10px;
+  font-size: 26px;
+  line-height: 32px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+.cara-nueva .cn-aju-grupo {
+  margin-bottom: 18px;
+}
+.cara-nueva .cn-aju-grupo-titulo {
+  padding: 0 10px 8px;
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 600;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-aju-grupo-nota,
+.cara-nueva .cn-aju-entrada-valor,
+.cara-nueva .cn-aju-entrada-flecha,
+.cara-nueva .cn-aju-plan-telefono,
+.cara-nueva .cn-aju-volver {
+  display: none;
+}
+.cara-nueva .cn-aju-entradas {
+  display: grid;
+  gap: 2px;
+}
+.cara-nueva .cn-aju-entrada {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-3);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.cara-nueva .cn-aju-entrada:hover {
+  background: var(--neutral);
+}
+.cara-nueva .cn-aju-entrada--activa,
+.cara-nueva .cn-aju-entrada--activa:hover {
+  background: var(--canvas);
+  box-shadow: var(--shadow-1);
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-aju-entrada-nombre {
+  flex: 1;
+  min-width: 0;
+}
+.cara-nueva .cn-aju-indice-nota {
+  margin-top: 18px;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--canvas);
+  box-shadow: var(--shadow-1);
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-aju-indice-nota b {
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-aju-contenido {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  padding: 28px 32px 36px;
+}
+.cara-nueva .cn-aju-contenido > section {
+  max-width: 860px;
+}
+
+/* ── Ajustes: cabecera, campos y botones (:260) ────────────────────────── */
+.cara-nueva .cn-aju-cabecera {
+  margin-bottom: 24px;
+}
+.cara-nueva .cn-aju-cabecera-titulo {
+  font-size: 28px;
+  line-height: 34px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+.cara-nueva .cn-aju-cabecera-texto {
+  margin-top: 4px;
+  font-size: 16.5px;
+  line-height: 25px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-aju-pila {
+  display: grid;
+  gap: 20px;
+  max-width: 600px;
+}
+.cara-nueva .cn-aju-etiqueta {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.cara-nueva .cn-aju-campo {
+  width: 100%;
+  height: 46px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 12px;
+  background: var(--field);
+  font-size: 16px;
+  color: var(--ink);
+  outline: none;
+  transition: box-shadow 0.16s;
+}
+.cara-nueva .cn-aju-campo::placeholder {
+  color: var(--ink-5);
+}
+.cara-nueva .cn-aju-campo:focus {
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+.cara-nueva .cn-aju-ayuda {
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-aju-ayuda--antes {
+  margin: 0 0 12px;
+}
+.cara-nueva .cn-aju-error,
+.cara-nueva .cn-aju-exito {
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 21px;
+}
+.cara-nueva .cn-aju-error {
+  color: var(--danger);
+}
+.cara-nueva .cn-aju-exito {
+  color: var(--ok);
+}
+.cara-nueva .cn-aju-cargando {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-aju-girando,
+.cara-nueva .cn-plan-girando {
+  width: 16px;
+  height: 16px;
+  /* `spin` es el de Tailwind (`animate-spin`), que ya viaja en el CSS: un @keyframes propio sería una regla fuera de `.cara-nueva`. */
+  animation: spin 1s linear infinite;
+}
+.cara-nueva .cn-aju-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+.cara-nueva .cn-aju-boton,
+.cara-nueva .cn-plan-boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 12px;
+  font-size: 15.5px;
+  line-height: 22px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.16s, filter 0.16s;
+}
+.cara-nueva .cn-aju-boton:disabled,
+.cara-nueva .cn-plan-boton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.cara-nueva .cn-aju-boton--primario,
+.cara-nueva .cn-plan-boton--primario {
+  background: var(--brand-fill);
+  color: #fff;
+  box-shadow: var(--shadow-btn);
+}
+.cara-nueva .cn-aju-boton--primario:hover:not(:disabled),
+.cara-nueva .cn-plan-boton--primario:hover:not(:disabled) {
+  background: var(--brand-fill-hover);
+}
+.cara-nueva .cn-aju-boton--suave,
+.cara-nueva .cn-plan-boton--suave {
+  background: var(--neutral);
+  color: var(--ink-2);
+}
+.cara-nueva .cn-aju-boton--suave:hover:not(:disabled),
+.cara-nueva .cn-plan-boton--suave:hover:not(:disabled) {
+  background: var(--line-2);
+}
+.cara-nueva .cn-plan-boton--terciario {
+  background: transparent;
+  color: var(--ink-3);
+  font-weight: 500;
+}
+.cara-nueva .cn-plan-boton--terciario:hover {
+  background: var(--neutral);
+}
+.cara-nueva .cn-aju-boton--peligro-suave {
+  background: var(--canvas);
+  color: var(--danger);
+  box-shadow: inset 0 0 0 1px var(--plan-peligro-linea);
+}
+.cara-nueva .cn-aju-boton--peligro-suave:hover {
+  background: var(--danger-bg);
+}
+.cara-nueva .cn-aju-boton--peligro {
+  background: var(--danger);
+  color: var(--plan-sobre-peligro);
+}
+.cara-nueva .cn-aju-boton--peligro:hover {
+  filter: brightness(0.92);
+}
+.cara-nueva .cn-aju-boton-icono,
+.cara-nueva .cn-plan-boton-icono {
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+.cara-nueva .cn-aju-enlace {
+  display: inline-block;
+  margin: -12px 0;
+  padding: 12px 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  color: var(--brand);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.cara-nueva .cn-aju-subtitulo {
+  margin: 0 0 10px;
+  font-size: 17.5px;
+  line-height: 26px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-aju-separador {
+  height: 1px;
+  margin: 4px 0;
+  background: var(--line);
+}
+.cara-nueva .cn-aju-cifra {
+  font-family: var(--mono);
+  font-size: 15px;
+}
+
+/* ── Su cuenta: el correo fijo y los datos ─────────────────────────────── */
+.cara-nueva .cn-aju-dato-fijo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--field);
+}
+.cara-nueva .cn-aju-dato-fijo-valor {
+  flex: 1;
+  min-width: 0;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-aju-dato-fijo-nota {
+  flex: none;
+  font-size: 14px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-aju-datos {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+.cara-nueva .cn-aju-dato {
+  display: flex;
+  gap: 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+}
+.cara-nueva .cn-aju-dato dt {
+  flex: none;
+  width: 160px;
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-aju-dato dd {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 15.5px;
+  line-height: 23px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+/* ── Atajos ────────────────────────────────────────────────────────────── */
+.cara-nueva .cn-aju-atajos {
+  display: grid;
+  gap: 12px;
+  max-width: 720px;
+}
+.cara-nueva .cn-aju-atajo-grupo {
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: var(--wash);
+}
+.cara-nueva .cn-aju-atajo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 0;
+}
+.cara-nueva .cn-aju-atajo + .cn-aju-atajo {
+  border-top: 1px solid var(--line);
+}
+.cara-nueva .cn-aju-teclas {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  width: 130px;
+}
+.cara-nueva .cn-aju-tecla {
+  display: inline-flex;
+  justify-content: center;
+  min-width: 30px;
+  padding: 3px 8px;
+  border-radius: 8px;
+  background: var(--canvas);
+  box-shadow: inset 0 0 0 1px var(--line-2);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.cara-nueva .cn-aju-mas {
+  font-size: 14px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-aju-atajo-texto {
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-3);
+}
+
+/* ── Apariencia (:309) ─────────────────────────────────────────────────── */
+.cara-nueva .cn-aju-temas {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.cara-nueva .cn-aju-tema {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  border: none;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--field);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.cara-nueva .cn-aju-tema:hover {
+  background: var(--neutral);
+}
+/* El contorno y no una sombra: la miniatura tapa una sombra interior, el contorno se pinta encima. */
+.cara-nueva .cn-aju-tema--activo {
+  outline: 2px solid var(--brand);
+  outline-offset: -2px;
+}
+/* Las miniaturas NO siguen el tema: muestran cómo se verá cada opción. */
+.cara-nueva .cn-aju-tema-muestra {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  height: 86px;
+  padding: 12px;
+  background: #fff;
+}
+.cara-nueva .cn-aju-tema-muestra--system {
+  background: linear-gradient(135deg, #fff 0 50%, #0b1219 50%);
+}
+.cara-nueva .cn-aju-tema-muestra--dark {
+  background: #0b1219;
+}
+.cara-nueva .cn-aju-tema-raya {
+  display: block;
+  height: 6px;
+  border-radius: 3px;
+  background: #eef1f4;
+}
+.cara-nueva .cn-aju-tema-raya--larga {
+  width: 60%;
+  height: 8px;
+  background: #e0e4ea;
+}
+.cara-nueva .cn-aju-tema-raya--media {
+  width: 80%;
+}
+.cara-nueva .cn-aju-tema-muestra--dark .cn-aju-tema-raya {
+  background: #1c2732;
+}
+.cara-nueva .cn-aju-tema-muestra--dark .cn-aju-tema-raya--larga {
+  background: #24303d;
+}
+.cara-nueva .cn-aju-tema-pie {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+}
+.cara-nueva .cn-aju-tema-nombre {
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-aju-tema-nota {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-aju-nota-aviso {
+  margin: 12px 0 26px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: var(--warn-bg);
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+}
+.cara-nueva .cn-aju-nota-aviso b {
+  font-weight: 600;
+}
+.cara-nueva .cn-aju-opciones {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+  margin-bottom: 26px;
+}
+.cara-nueva .cn-aju-segmentos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.cara-nueva .cn-aju-opcion {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 44px;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 12px;
+  background: var(--wash);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.cara-nueva .cn-aju-opcion:hover {
+  background: var(--neutral);
+}
+.cara-nueva .cn-aju-opcion--activa,
+.cara-nueva .cn-aju-opcion--activa:hover {
+  background: var(--field);
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+.cara-nueva .cn-aju-opcion-nombre {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-aju-opcion-nota {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+
+/* ── Zona de riesgo (:433) ─────────────────────────────────────────────── */
+.cara-nueva.cn-aju-riesgo {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  color: var(--ink);
+}
+.cara-nueva .cn-aju-riesgo-titulo {
+  margin: 0 0 4px;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--danger);
+}
+.cara-nueva .cn-aju-riesgo-intro {
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-aju-riesgo-tarjeta {
+  padding: 22px;
+  border-radius: 14px;
+  background: var(--wash);
+}
+.cara-nueva .cn-aju-riesgo-tarjeta--firma {
+  background: var(--danger-bg);
+}
+.cara-nueva .cn-aju-riesgo-tarjeta-titulo {
+  margin-bottom: 6px;
+  font-size: 17.5px;
+  line-height: 26px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-aju-riesgo-tarjeta-texto {
+  margin-bottom: 14px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-aju-riesgo-tarjeta-texto b {
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-aju-riesgo-nota {
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: var(--field);
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-aju-riesgo-telefono {
+  display: none;
+}
+.cara-nueva .cn-aju-dialogos,
+.cara-nueva.cn-plan-dialogos {
+  display: contents;
+}
+.cara-nueva .cn-aju-dlg {
+  display: grid;
+  gap: 14px;
+}
+.cara-nueva .cn-aju-dlg-texto,
+.cara-nueva .cn-plan-dlg-texto {
+  font-size: 15.5px;
+  line-height: 24px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-aju-dlg-texto b {
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-aju-dlg-campo {
+  display: block;
+}
+.cara-nueva .cn-aju-nombre-exacto {
+  font-family: var(--mono);
+  color: var(--danger);
+}
+.cara-nueva .cn-aju-no-coincide {
+  display: block;
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--warn);
+}
+
+/* ── El diálogo compartido, vestido desde fuera (:390) ─────────────────── */
+.cara-nueva .cn-aju-dialogos [role='dialog'] > div:last-child,
+.cara-nueva.cn-plan-dialogos [role='dialog'] > div:last-child {
+  border: none;
+  background: var(--canvas);
+  color: var(--ink);
+}
+.cara-nueva .cn-aju-dialogos [role='dialog'] header,
+.cara-nueva.cn-plan-dialogos [role='dialog'] header {
+  padding: 24px 28px 4px;
+  border-bottom: none;
+}
+.cara-nueva .cn-aju-dialogos [role='dialog'] header h2,
+.cara-nueva.cn-plan-dialogos [role='dialog'] header h2 {
+  overflow: visible;
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  white-space: normal;
+  color: var(--ink);
+}
+.cara-nueva .cn-aju-dialogos [role='dialog'] header p,
+.cara-nueva.cn-plan-dialogos [role='dialog'] header p {
+  margin-top: 4px;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-aju-dialogos [role='dialog'] header button,
+.cara-nueva.cn-plan-dialogos [role='dialog'] header button {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-aju-dialogos [role='dialog'] header + div,
+.cara-nueva.cn-plan-dialogos [role='dialog'] header + div {
+  padding: 16px 28px 22px;
+  background: transparent;
+}
+.cara-nueva .cn-aju-dialogos [role='dialog'] footer,
+.cara-nueva.cn-plan-dialogos [role='dialog'] footer {
+  gap: 10px;
+  padding: 16px 28px;
+  border-top: none;
+  background: var(--wash);
+}
+.cara-nueva .cn-aju-dialogos [role='dialog'] footer > span:first-child,
+.cara-nueva .cn-aju-dialogos [role='dialog'] footer > span:first-child span,
+.cara-nueva.cn-plan-dialogos [role='dialog'] footer > span:first-child,
+.cara-nueva.cn-plan-dialogos [role='dialog'] footer > span:first-child span {
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--ink-4);
+}
+/* Los botones de `ConfirmarDialog` traen sus clases viejas; aquí toman la escala de 44 px. */
+.cara-nueva .cn-aju-dialogos [role='dialog'] footer button,
+.cara-nueva.cn-plan-dialogos [role='dialog'] footer button:not(.cn-plan-boton) {
+  min-height: 44px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-aju-dialogos [role='dialog'] footer button.btn-danger {
+  background: var(--danger);
+  font-weight: 600;
+  color: var(--plan-sobre-peligro);
+}
+.cara-nueva.cn-plan-dialogos [role='dialog'] footer button.btn-primary {
+  background: var(--brand-fill);
+  font-weight: 600;
+  color: #fff;
+}
+@media (min-width: 640px) {
+  /*
+   * 20 px, el radio común de los diálogos de la cara nueva y el mismo del marco
+   * compartido. Bajo 640 px no se pisa: la hoja del teléfono conserva los 20 px
+   * arriba y 0 abajo del marco.
+   */
+  .cara-nueva .cn-aju-dialogos [role='dialog'] > div:last-child,
+  .cara-nueva.cn-plan-dialogos [role='dialog'] > div:last-child {
+    border-radius: 20px;
+    box-shadow: var(--plan-sombra-dialogo);
+  }
+}
+
+/* ── Plan y saldo (:347) ───────────────────────────────────────────────── */
+.cara-nueva .cn-plan-tarjeta {
+  max-width: 860px;
+  margin-bottom: 12px;
+  padding: 24px;
+  border-radius: 14px;
+  background: var(--plan-tinta);
+}
+.cara-nueva .cn-plan-tarjeta-cabeza {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+.cara-nueva .cn-plan-tarjeta-textos {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+.cara-nueva .cn-plan-kicker {
+  margin-bottom: 4px;
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 600;
+  color: var(--plan-sobre-tinta-3);
+}
+.cara-nueva .cn-plan-nombre {
+  font-size: 26px;
+  line-height: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--plan-sobre-tinta);
+}
+.cara-nueva .cn-plan-linea {
+  font-size: 15.5px;
+  line-height: 24px;
+  color: var(--plan-sobre-tinta-2);
+}
+.cara-nueva .cn-plan-cifras {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 20px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--plan-tinta-raya);
+}
+.cara-nueva .cn-plan-cifras dd {
+  margin: 0;
+}
+.cara-nueva .cn-plan-cifra-rotulo {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--plan-sobre-tinta-3);
+}
+.cara-nueva .cn-plan-cifra {
+  font-family: var(--mono);
+  font-size: 19px;
+  line-height: 28px;
+  font-weight: 500;
+  color: var(--plan-sobre-tinta);
+}
+.cara-nueva .cn-plan-boton--blanco {
+  background: var(--plan-blanco);
+  color: var(--plan-blanco-tinta);
+}
+.cara-nueva .cn-plan-boton--blanco:hover {
+  filter: brightness(0.95);
+}
+.cara-nueva .cn-plan-boton--ancho {
+  width: 100%;
+}
+.cara-nueva .cn-plan-aviso {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 20px;
+  max-width: 860px;
+  margin-bottom: 22px;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: var(--warn-bg);
+}
+.cara-nueva .cn-plan-cuerpo .cn-plan-aviso {
+  margin-bottom: 0;
+}
+.cara-nueva .cn-plan-aviso--peligro {
+  background: var(--danger-bg);
+}
+.cara-nueva .cn-plan-aviso-textos {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+.cara-nueva .cn-plan-aviso-titulo {
+  font-size: 16.5px;
+  line-height: 25px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-plan-aviso-texto {
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--warn);
+}
+.cara-nueva .cn-plan-aviso--peligro .cn-plan-aviso-texto {
+  color: var(--danger);
+}
+.cara-nueva .cn-plan-boton--sobre-aviso {
+  flex: none;
+  background: var(--canvas);
+  color: var(--warn);
+  box-shadow: var(--shadow-1);
+}
+.cara-nueva .cn-plan-aviso--peligro .cn-plan-boton--sobre-aviso {
+  color: var(--danger);
+}
+.cara-nueva .cn-plan-uso-titulo {
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+.cara-nueva .cn-plan-uso {
+  display: grid;
+  gap: 2px;
+  max-width: 860px;
+  margin: 12px 0 22px;
+}
+.cara-nueva .cn-plan-uso-fila {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 13px 14px;
+  border-radius: 10px;
+  transition: background 0.14s;
+}
+.cara-nueva .cn-plan-uso-fila:hover {
+  background: var(--field);
+}
+.cara-nueva .cn-plan-uso-nombre {
+  flex: 1;
+  min-width: 0;
+  font-size: 15.5px;
+  line-height: 23px;
+  color: var(--ink);
+}
+.cara-nueva .cn-plan-uso-cifra {
+  flex: none;
+  font-family: var(--mono);
+  font-size: 15px;
+  color: var(--ink);
+}
+.cara-nueva .cn-plan-uso-nota {
+  flex: none;
+  width: 120px;
+  font-size: 14.5px;
+  color: var(--ink-4);
+  text-align: right;
+}
+.cara-nueva .cn-plan-nota {
+  max-width: 860px;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: var(--field);
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-plan-nota b {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* ── Renovar o cambiar de plan (:390) ──────────────────────────────────── */
+.cara-nueva .cn-plan-cuerpo {
+  display: grid;
+  gap: 18px;
+}
+.cara-nueva .cn-plan-cargando {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 48px 0;
+  font-size: 15px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-plan-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--danger-bg);
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--danger);
+}
+.cara-nueva .cn-plan-error .cn-plan-boton-icono {
+  margin-top: 3px;
+}
+.cara-nueva .cn-plan-enlace-caja {
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--brand-soft);
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-2);
+}
+.cara-nueva .cn-plan-enlace-caja a {
+  font-weight: 600;
+}
+.cara-nueva .cn-plan-enlace-icono {
+  display: inline;
+  width: 14px;
+  height: 14px;
+  vertical-align: -2px;
+}
+.cara-nueva .cn-plan-hoy {
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-plan-hoy b {
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-plan-periodo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.cara-nueva .cn-plan-segmentos {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 12px;
+  background: var(--neutral);
+}
+.cara-nueva .cn-plan-segmento {
+  min-height: 44px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+.cara-nueva .cn-plan-segmento--activo {
+  background: var(--plan-segmento-activo);
+  box-shadow: var(--shadow-1);
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-plan-diez {
+  font-size: 14.5px;
+  color: var(--warn);
+}
+.cara-nueva .cn-plan-tarjetas {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.cara-nueva .cn-plan-opcion {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 20px;
+  border: none;
+  border-radius: 14px;
+  background: var(--wash);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.cara-nueva .cn-plan-opcion:hover {
+  background: var(--field);
+}
+.cara-nueva .cn-plan-opcion--elegida,
+.cara-nueva .cn-plan-opcion--elegida:hover {
+  background: var(--field);
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+.cara-nueva .cn-plan-opcion-cabeza {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.cara-nueva .cn-plan-opcion-nombre {
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-plan-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+  padding: 0 9px;
+  border-radius: 8px;
+  background: var(--brand-soft);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--brand);
+}
+.cara-nueva .cn-plan-chip--aviso {
+  min-height: 28px;
+  padding: 0 11px;
+  border-radius: 9px;
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+.cara-nueva .cn-plan-chip-icono {
+  width: 14px;
+  height: 14px;
+}
+.cara-nueva .cn-plan-precio {
+  margin: 8px 0 2px;
+  font-family: var(--mono);
+  font-size: 24px;
+  line-height: 30px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.cara-nueva .cn-plan-precio-periodo {
+  margin-left: 6px;
+  font-family: 'Satoshi', -apple-system, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-plan-opcion-resumen {
+  margin-bottom: 14px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-plan-opcion-sin {
+  margin: -8px 0 14px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-plan-opcion-nota {
+  margin-top: auto;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--canvas);
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-plan-opcion-nota--no-alcanza {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+.cara-nueva .cn-plan-prueba {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--brand-soft);
+}
+.cara-nueva .cn-plan-prueba-boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--brand);
+  cursor: pointer;
+}
+.cara-nueva .cn-plan-prueba-boton:disabled {
+  opacity: 0.5;
+}
+.cara-nueva .cn-plan-prueba-detalle {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-3);
+  text-align: center;
+}
+.cara-nueva .cn-plan-advertencia {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--warn-bg);
+}
+.cara-nueva .cn-plan-advertencia-texto {
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--warn);
+}
+.cara-nueva .cn-plan-advertencia-otra {
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-plan-pie {
+  font-size: 14px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-plan-historial {
+  border-radius: 14px;
+  background: var(--wash);
+}
+.cara-nueva .cn-plan-historial-boton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: 14px 16px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+.cara-nueva .cn-plan-historial-titulo {
+  display: block;
+  font-size: 15.5px;
+  line-height: 23px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-plan-historial-detalle {
+  display: block;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-plan-historial-accion {
+  flex: none;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--brand);
+}
+.cara-nueva .cn-plan-tabla-caja {
+  overflow-x: auto;
+  border-top: 1px solid var(--line);
+}
+.cara-nueva .cn-plan-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.cara-nueva .cn-plan-tabla th {
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-4);
+  text-align: left;
+  white-space: nowrap;
+}
+.cara-nueva .cn-plan-tabla td {
+  padding: 10px 16px;
+  border-top: 1px solid var(--line);
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.cara-nueva .cn-plan-mono {
+  font-family: var(--mono);
+  font-size: 14px;
+}
+.cara-nueva .cn-plan-tabla .cn-plan-derecha {
+  text-align: right;
+}
+.cara-nueva .cn-plan-tabla-boton {
+  min-height: 44px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 10px;
+  background: var(--neutral);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+/* ── Prueba terminada (app-entrada-y-sesion.html :165) ─────────────────── */
+.cara-nueva.cn-plan-bloqueo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 32px 16px;
+  background: var(--plan-mesa);
+  color: var(--ink);
+}
+.cara-nueva .cn-plan-bloqueo-tarjeta {
+  width: 100%;
+  max-width: 600px;
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--canvas);
+  box-shadow: var(--plan-sombra-tarjeta);
+}
+.cara-nueva .cn-plan-bloqueo-cuerpo {
+  padding: 26px 28px;
+}
+.cara-nueva .cn-plan-marca {
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  color: var(--ink);
+}
+.cara-nueva .cn-plan-bloqueo-titulo {
+  margin: 12px 0 6px;
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.cara-nueva .cn-plan-bloqueo-texto {
+  font-size: 15.5px;
+  line-height: 24px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-plan-bloqueo-saldo {
+  margin: 16px 0;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: var(--field);
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-plan-cifra-en-texto {
+  font-family: var(--mono);
+  color: var(--ink);
+}
+.cara-nueva .cn-plan-bloqueo-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cara-nueva .cn-plan-bloqueo-franja {
+  padding: 16px 28px;
+  background: var(--wash);
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-plan-bloqueo-riesgo {
+  display: grid;
+  gap: 14px;
+  padding: 22px 28px 26px;
+  border-top: 1px solid var(--line);
+}
+
+/* ── Franjas de vencimiento (derivadas) ────────────────────────────────── */
+.cara-nueva.cn-plan-franja {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--plan-franja-linea);
+  background: var(--plan-franja-fondo);
+  color: var(--warn);
+}
+.cara-nueva.cn-plan-franja--peligro {
+  border-bottom-color: var(--plan-peligro-linea);
+  background: var(--plan-franja-peligro);
+  color: var(--danger);
+}
+.cara-nueva .cn-plan-franja-icono {
+  flex: none;
+  width: 18px;
+  height: 18px;
+}
+.cara-nueva .cn-plan-franja-texto {
+  flex: 1 1 240px;
+  min-width: 0;
+  font-size: 15px;
+  line-height: 22px;
+}
+.cara-nueva .cn-plan-franja-texto b {
+  font-weight: 600;
+}
+.cara-nueva .cn-plan-franja-boton {
+  flex: none;
+  min-height: 44px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 10px;
+  background: var(--canvas);
+  box-shadow: var(--shadow-1);
+  font-size: 14.5px;
+  font-weight: 600;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* ── Módulo cubierto (derivado) ────────────────────────────────────────── */
+.cara-nueva.cn-plan-cierre-velo {
+  background: var(--plan-velo-cierre);
+  backdrop-filter: blur(2px);
+}
+.cara-nueva .cn-plan-cierre {
+  gap: 12px;
+  padding: 28px 24px;
+  background: var(--canvas);
+  box-shadow: var(--plan-sombra-dialogo);
+  text-align: center;
+}
+.cara-nueva .cn-plan-cierre-icono {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+.cara-nueva .cn-plan-cierre-icono svg {
+  width: 20px;
+  height: 20px;
+}
+.cara-nueva .cn-plan-cierre-titulo {
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-plan-cierre-texto {
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-plan-cierre-nota {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+
+/* ── Intermedio: el índice se vuelve lista (:460) ──────────────────────── */
+@media (max-width: 1023px) {
+  .cara-nueva.cn-aju {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .cara-nueva .cn-aju-indice {
+    width: 100%;
+    overflow: visible;
+    padding: 16px 16px 24px;
+    background: var(--canvas);
+  }
+  .cara-nueva .cn-aju-titulo,
+  .cara-nueva .cn-aju-indice-nota {
+    display: none;
+  }
+  .cara-nueva .cn-aju-contenido {
+    overflow: visible;
+    padding: 8px 16px 32px;
+  }
+  .cara-nueva.cn-aju--en-seccion .cn-aju-indice,
+  .cara-nueva.cn-aju:not(.cn-aju--en-seccion) .cn-aju-contenido {
+    display: none;
+  }
+  .cara-nueva .cn-aju-volver {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 44px;
+    margin: 0 0 8px -8px;
+    padding: 0 12px 0 4px;
+    border: none;
+    border-radius: 12px;
+    background: transparent;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink-3);
+    cursor: pointer;
+  }
+  .cara-nueva .cn-aju-volver-icono {
+    width: 20px;
+    height: 20px;
+  }
+  .cara-nueva .cn-aju-grupo {
+    margin-bottom: 20px;
+  }
+  .cara-nueva .cn-aju-grupo-titulo {
+    padding: 0 0 8px;
+  }
+  .cara-nueva .cn-aju-grupo-nota {
+    display: block;
+    margin: -6px 0 8px;
+    font-size: 14px;
+    line-height: 21px;
+    color: var(--ink-4);
+  }
+  .cara-nueva .cn-aju-entrada {
+    width: calc(100% + 24px);
+    min-height: 52px;
+    margin: 0 -12px;
+    padding: 14px 12px;
+    border-radius: 12px;
+    font-size: 16px;
+    color: var(--ink);
+  }
+  .cara-nueva .cn-aju-entrada--activa,
+  .cara-nueva .cn-aju-entrada--activa:hover {
+    background: transparent;
+    box-shadow: none;
+    font-weight: 400;
+  }
+  .cara-nueva .cn-aju-entrada-valor {
+    display: inline;
+    flex: none;
+    font-size: 14.5px;
+    color: var(--ink-4);
+  }
+  .cara-nueva .cn-aju-entrada-flecha {
+    display: block;
+    flex: none;
+    width: 18px;
+    height: 18px;
+    color: var(--ink-5);
+  }
+  .cara-nueva .cn-aju-plan-telefono {
+    display: block;
+    margin-bottom: 20px;
+    padding: 20px;
+    border-radius: 14px;
+    background: var(--plan-tinta);
+  }
+  .cara-nueva .cn-aju-plan-telefono .cn-plan-kicker {
+    margin-bottom: 2px;
+    font-size: 13.5px;
+  }
+  .cara-nueva .cn-aju-plan-telefono-nombre {
+    font-size: 22px;
+    line-height: 28px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--plan-sobre-tinta);
+  }
+  .cara-nueva .cn-aju-plan-telefono-linea {
+    margin-bottom: 14px;
+    font-size: 14.5px;
+    line-height: 22px;
+    color: var(--plan-sobre-tinta-2);
+  }
+  .cara-nueva .cn-aju-cabecera-titulo {
+    font-size: 24px;
+    line-height: 32px;
+  }
+}
+@media (max-width: 767px) {
+  .cara-nueva .cn-plan-tarjetas {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ── Teléfono (:460) ───────────────────────────────────────────────────── */
+@media (max-width: 639px) {
+  .cara-nueva .cn-aju-temas,
+  .cara-nueva .cn-aju-segmentos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cara-nueva .cn-aju-dato {
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 0;
+  }
+  .cara-nueva .cn-aju-dato dt {
+    width: auto;
+  }
+  .cara-nueva .cn-aju-dato-fijo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+  .cara-nueva .cn-aju-atajo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .cara-nueva .cn-plan-tarjeta {
+    padding: 20px;
+  }
+  .cara-nueva .cn-plan-tarjeta-cabeza .cn-plan-boton {
+    width: 100%;
+  }
+  .cara-nueva .cn-plan-cifras {
+    gap: 10px;
+  }
+  .cara-nueva .cn-plan-cifra {
+    font-size: 16px;
+  }
+  .cara-nueva .cn-plan-uso-nota {
+    width: auto;
+  }
+  /* En Ajustes los botones de borrar no se ofrecen en el teléfono (:490): se dice por qué. */
+  .cara-nueva .cn-aju-riesgo--solo-computador .cn-aju-riesgo-intro,
+  .cara-nueva .cn-aju-riesgo--solo-computador .cn-aju-riesgo-tarjeta,
+  .cara-nueva .cn-aju-riesgo--solo-computador .cn-aju-riesgo-nota {
+    display: none;
+  }
+  .cara-nueva .cn-aju-riesgo--solo-computador .cn-aju-riesgo-telefono {
+    display: block;
+    padding: 16px 18px;
+    border-radius: 14px;
+    background: var(--danger-bg);
+    font-size: 14.5px;
+    line-height: 22px;
+    color: var(--ink-3);
+  }
+  /* Hoja del teléfono: botones apilados, el pulgar no acierta en una fila de dos. */
+  .cara-nueva .cn-aju-dialogos [role='dialog'] footer,
+  .cara-nueva.cn-plan-dialogos [role='dialog'] footer {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 14px 18px;
+  }
+  .cara-nueva .cn-aju-dialogos [role='dialog'] header,
+  .cara-nueva.cn-plan-dialogos [role='dialog'] header {
+    padding: 14px 18px 2px;
+  }
+  .cara-nueva .cn-aju-dialogos [role='dialog'] header + div,
+  .cara-nueva.cn-plan-dialogos [role='dialog'] header + div {
+    padding: 12px 18px 18px;
+  }
+  .cara-nueva .cn-plan-bloqueo-cuerpo {
+    padding: 22px 20px;
+  }
+  .cara-nueva .cn-plan-bloqueo-acciones {
+    flex-direction: column;
+  }
+  .cara-nueva .cn-plan-bloqueo-franja,
+  .cara-nueva .cn-plan-bloqueo-riesgo {
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cara-nueva .cn-aju-girando,
+  .cara-nueva .cn-plan-girando {
+    animation: none;
+  }
+  .cara-nueva [class*='cn-aju-'],
+  .cara-nueva [class*='cn-plan-'] {
+    transition: none;
+  }
+}
+/* ─── fin Ajustes y plan ─── */
+/* ─── Administrar y saldo ─── */
+/*
+ * «Su firma» (usuarios y roles), «Saldo de la firma», la recarga por Wompi con
+ * sus estados, y Membrete. De `public/handoff/app-administrar-y-saldo.html`
+ * (artboards 1-4 y 6); los estados del pago también de
+ * `app-registro-y-planes.html`, y la confirmación destructiva y la hoja del
+ * teléfono de `app-dialogos-y-estados.html`.
+ *
+ * Reglas del bloque, las mismas de la casa:
+ *   · el diálogo compartido se viste desde fuera (`cn-adm-dialogos`) sin tocar
+ *     `design/Dialog.tsx`, y su radio no baja de 20 px;
+ *   · mono solo para lo citable (saldos, montos, NIT, T.P., referencias);
+ *   · nada por debajo de 14 px, y todo control del tamaño del dedo (44 px);
+ *   · el discontinuo no se usa: se reserva a lo sin verificar;
+ *   · #8C2F26 solo en retirar e intentar de nuevo tras un pago fallido;
+ *   · el papel del membrete es blanco también en oscuro, porque así se exporta.
+ */
+
+/* ── El diálogo compartido, vestido desde fuera ────────────────────────── */
+.cara-nueva.cn-adm-dialogos [role='dialog'] > div:last-child {
+  border: none;
+  background: var(--canvas);
+  color: var(--ink);
+}
+.cara-nueva.cn-adm-dialogos [role='dialog'] header {
+  padding: 22px 26px 6px;
+  border-bottom: none;
+}
+.cara-nueva.cn-adm-dialogos [role='dialog'] header h2 {
+  overflow: visible;
+  font-size: 22px;
+  line-height: 30px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  white-space: normal;
+  color: var(--ink);
+}
+.cara-nueva.cn-adm-dialogos [role='dialog'] header h2 + p {
+  margin-top: 4px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+}
+.cara-nueva.cn-adm-dialogos [role='dialog'] header button {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  color: var(--ink-4);
+}
+.cara-nueva.cn-adm-dialogos [role='dialog'] header + div {
+  padding: 14px 26px 24px;
+  background: transparent;
+}
+.cara-nueva.cn-adm-dialogos [role='dialog'] footer {
+  gap: 10px;
+  padding: 14px 26px;
+  border-top: none;
+  background: var(--wash);
+}
+.cara-nueva.cn-adm-dialogos [role='dialog'] footer > span:first-child,
+.cara-nueva.cn-adm-dialogos [role='dialog'] footer > span:first-child span {
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva.cn-adm-dialogos [role='dialog'] footer .cn-adm-pie-monto {
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.cara-nueva.cn-adm-dialogos [role='dialog'] footer .cn-adm-pie-aviso {
+  font-weight: 600;
+  color: var(--warn);
+}
+/* Las pantallas (Su firma, Saldo, Membrete) llevan el título grande del artboard. */
+.cara-nueva .cn-adm-pantalla [role='dialog'] header {
+  padding: 26px 32px 8px;
+}
+.cara-nueva .cn-adm-pantalla [role='dialog'] header h2 {
+  font-size: 30px;
+  line-height: 38px;
+  letter-spacing: -0.03em;
+}
+.cara-nueva .cn-adm-pantalla [role='dialog'] header h2 + p {
+  font-size: 17px;
+  line-height: 25px;
+}
+.cara-nueva .cn-adm-pantalla [role='dialog'] header + div {
+  padding: 16px 32px 28px;
+}
+.cara-nueva .cn-adm-pantalla [role='dialog'] footer {
+  padding: 14px 32px;
+}
+@media (min-width: 640px) {
+  /* 20 px, el radio común de los diálogos de la cara nueva; bajo 640 manda la hoja del marco (20 arriba, 0 abajo). */
+  .cara-nueva.cn-adm-dialogos [role='dialog'] > div:last-child {
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgb(16 24 34 / 0.18);
+  }
+}
+
+.cara-nueva .cn-adm-cuerpo {
+  min-width: 0;
+}
+.cara-nueva .cn-adm-mono {
+  font-family: var(--mono);
+}
+
+/* ── Botones: sin contorno, del tamaño del dedo ────────────────────────── */
+.cara-nueva .cn-adm-boton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 12px;
+  background: var(--neutral);
+  color: var(--ink-2);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.16s, color 0.16s;
+}
+.cara-nueva .cn-adm-boton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.cara-nueva .cn-adm-boton:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.cara-nueva .cn-adm-boton--primario {
+  background: var(--brand-fill);
+  color: #fff;
+  box-shadow: var(--shadow-btn);
+}
+.cara-nueva .cn-adm-boton--primario:hover:not(:disabled) {
+  background: var(--brand-fill-hover);
+}
+.cara-nueva .cn-adm-boton--suave {
+  font-weight: 500;
+}
+.cara-nueva .cn-adm-boton--suave:hover:not(:disabled) {
+  background: var(--line-2);
+}
+.cara-nueva .cn-adm-boton--terciario {
+  padding: 0 14px;
+  background: transparent;
+  color: var(--ink-3);
+  font-weight: 500;
+}
+.cara-nueva .cn-adm-boton--terciario:hover:not(:disabled) {
+  background: var(--neutral);
+}
+.cara-nueva .cn-adm-boton--texto-peligro {
+  color: var(--danger);
+}
+.cara-nueva .cn-adm-boton--texto-peligro:hover:not(:disabled) {
+  background: var(--danger-bg);
+}
+.cara-nueva .cn-adm-boton--peligro {
+  background: #8c2f26;
+  color: #fff;
+}
+.cara-nueva .cn-adm-boton--peligro:hover:not(:disabled) {
+  background: #74251e;
+}
+.cara-nueva .cn-adm-boton--claro {
+  margin-top: 16px;
+  background: #fff;
+  color: #101822;
+}
+.cara-nueva .cn-adm-boton--claro:hover:not(:disabled) {
+  background: #f1f3f6;
+}
+.cara-nueva .cn-adm-boton--blanco {
+  background: var(--canvas);
+  color: var(--brand);
+  box-shadow: var(--shadow-1);
+}
+
+/* ── Campos ────────────────────────────────────────────────────────────── */
+.cara-nueva .cn-adm-campos {
+  display: grid;
+  gap: 16px;
+}
+.cara-nueva .cn-adm-etiqueta {
+  display: block;
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 22px;
+  color: var(--ink);
+}
+.cara-nueva .cn-adm-etiqueta-opcional {
+  font-weight: 400;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-adm-campo {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 12px;
+  background: var(--field);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 16px;
+  outline: none;
+  transition: box-shadow 0.16s;
+}
+.cara-nueva .cn-adm-campo::placeholder {
+  color: var(--ink-5);
+}
+.cara-nueva .cn-adm-campo:focus-visible,
+.cara-nueva .cn-adm-campo:focus {
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+.cara-nueva .cn-adm-campo--cifra {
+  font-family: var(--mono);
+  font-size: 15px;
+}
+.cara-nueva .cn-adm-campo--buscar {
+  padding-left: 44px;
+}
+.cara-nueva .cn-adm-campo--selector {
+  width: auto;
+  min-width: 200px;
+}
+.cara-nueva .cn-adm-ayuda {
+  margin: 6px 0 0;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-adm-archivo {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+}
+
+/* ── Textos, avisos y vacíos ───────────────────────────────────────────── */
+.cara-nueva .cn-adm-texto {
+  margin: 0;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-adm-texto strong,
+.cara-nueva .cn-adm-recuadro strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-adm-recuadro {
+  margin: 14px 0 0;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--field);
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-adm-recuadro--arriba {
+  margin: 0 0 16px;
+}
+.cara-nueva .cn-adm-error {
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--danger-bg);
+  color: var(--danger);
+  font-size: 15px;
+  line-height: 23px;
+}
+.cara-nueva .cn-adm-error--arriba {
+  margin: 14px 0 0;
+}
+.cara-nueva .cn-adm-vacio {
+  margin: 0;
+  padding: 28px 16px;
+  text-align: center;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-adm-rotulo-movil {
+  display: none;
+}
+.cara-nueva .cn-adm-derecha {
+  text-align: right;
+}
+
+/* ── Su firma · barra, tabla y notas ───────────────────────────────────── */
+.cara-nueva .cn-adm-barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.cara-nueva .cn-adm-buscar {
+  position: relative;
+  flex: 1 1 260px;
+  min-width: 0;
+}
+.cara-nueva .cn-adm-buscar svg {
+  position: absolute;
+  top: 50%;
+  left: 15px;
+  transform: translateY(-50%);
+  color: var(--ink-5);
+  pointer-events: none;
+}
+.cara-nueva .cn-adm-tabla {
+  min-width: 0;
+}
+.cara-nueva .cn-adm-tabla-cabeza {
+  display: grid;
+  gap: 16px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-adm-fila {
+  display: grid;
+  align-items: center;
+  gap: 16px;
+  padding: 14px;
+  border-bottom: 1px solid var(--line);
+  transition: background 0.14s;
+}
+.cara-nueva .cn-adm-fila:last-child {
+  border-bottom: none;
+}
+.cara-nueva .cn-adm-fila:hover {
+  background: var(--field);
+}
+.cara-nueva .cn-adm-tabla--usuarios .cn-adm-tabla-cabeza,
+.cara-nueva .cn-adm-tabla--usuarios .cn-adm-fila {
+  grid-template-columns: minmax(0, 1fr) 190px 130px 130px auto;
+}
+.cara-nueva .cn-adm-tabla--movimientos .cn-adm-tabla-cabeza,
+.cara-nueva .cn-adm-tabla--movimientos .cn-adm-fila {
+  grid-template-columns: 110px minmax(0, 1fr) 150px 120px 120px;
+}
+.cara-nueva .cn-adm-usuario {
+  min-width: 0;
+}
+.cara-nueva .cn-adm-usuario-correo {
+  margin: 0;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-adm-usuario-detalle {
+  margin: 0;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-5);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-adm-fila--retirada .cn-adm-usuario-correo {
+  color: var(--ink-5);
+}
+.cara-nueva .cn-adm-rol {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 28px;
+  padding: 2px 11px;
+  border-radius: 9px;
+  background: var(--neutral);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-adm-rol--socio {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+.cara-nueva .cn-adm-fila-consumo {
+  font-size: 15px;
+  text-align: right;
+  color: var(--ink);
+}
+.cara-nueva .cn-adm-fila-ingreso {
+  font-size: 15px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-adm-fila-ingreso--nunca {
+  color: var(--warn);
+}
+.cara-nueva .cn-adm-fila-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px;
+}
+.cara-nueva .cn-adm-nota {
+  margin-top: 24px;
+  padding: 20px 22px;
+  border-radius: 14px;
+  background: var(--wash);
+}
+.cara-nueva .cn-adm-nota + .cn-adm-nota {
+  margin-top: 12px;
+}
+.cara-nueva .cn-adm-nota--gris {
+  background: var(--field);
+}
+.cara-nueva .cn-adm-nota-titulo {
+  margin: 0 0 10px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  color: var(--ink);
+}
+.cara-nueva .cn-adm-nota-roles {
+  display: grid;
+  gap: 12px;
+}
+.cara-nueva .cn-adm-nota-rol {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 23px;
+  color: var(--ink);
+}
+.cara-nueva .cn-adm-nota-texto {
+  margin: 0;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+  text-wrap: pretty;
+}
+.cara-nueva .cn-adm-nota-texto strong,
+.cara-nueva .cn-adm-nota-frontera strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-adm-nota-frontera {
+  margin: 12px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--line-2);
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+}
+
+/* ── Agregar un abogado · el rol en dos tarjetas ───────────────────────── */
+.cara-nueva .cn-adm-opciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cara-nueva .cn-adm-opcion {
+  flex: 1 1 200px;
+  min-height: 64px;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 12px;
+  background: var(--neutral);
+  color: var(--ink-2);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.cara-nueva .cn-adm-opcion--elegida {
+  background: var(--ink);
+  color: var(--canvas);
+}
+.cara-nueva .cn-adm-opcion:focus-visible,
+.cara-nueva .cn-adm-pastilla:focus-visible,
+.cara-nueva .cn-adm-monto:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.cara-nueva .cn-adm-opcion-titulo {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+}
+.cara-nueva .cn-adm-opcion-detalle {
+  display: block;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-adm-opcion--elegida .cn-adm-opcion-detalle {
+  color: inherit;
+  opacity: 0.8;
+}
+
+/* ── Saldo · las cifras ────────────────────────────────────────────────── */
+.cara-nueva .cn-adm-cifras {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.cara-nueva .cn-adm-saldo {
+  flex: 1.3 1 260px;
+  min-width: 0;
+  padding: 22px 24px;
+  border-radius: 14px;
+  background: #101822;
+  color: #fff;
+}
+.cara-nueva .cn-adm-saldo-rotulo,
+.cara-nueva .cn-adm-saldo-nota {
+  margin: 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: rgb(255 255 255 / 0.72);
+}
+.cara-nueva .cn-adm-saldo-cifra {
+  margin: 4px 0 2px;
+  font-family: var(--mono);
+  font-size: 36px;
+  font-weight: 500;
+  line-height: 42px;
+  letter-spacing: -0.02em;
+  color: #fff;
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-adm-tarjeta {
+  flex: 1 1 200px;
+  min-width: 0;
+  padding: 22px 24px;
+  border-radius: 14px;
+  background: var(--wash);
+}
+.cara-nueva .cn-adm-tarjeta-rotulo {
+  margin: 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-adm-tarjeta-cifra {
+  margin: 4px 0 12px;
+  font-family: var(--mono);
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 32px;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.cara-nueva .cn-adm-tarjeta-cifra--menor {
+  margin-bottom: 4px;
+  font-size: 20px;
+  line-height: 26px;
+}
+.cara-nueva .cn-adm-tarjeta-nota {
+  margin: 8px 0 0;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-adm-consumo {
+  display: grid;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink);
+}
+.cara-nueva .cn-adm-consumo li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+.cara-nueva .cn-adm-consumo-quien {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink-3);
+}
+
+/* ── Saldo · movimientos y extracto ────────────────────────────────────── */
+.cara-nueva .cn-adm-seccion-cabeza {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.cara-nueva .cn-adm-seccion-titulo {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 28px;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+.cara-nueva .cn-adm-fila-fecha {
+  font-size: 14px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-adm-fila-concepto {
+  font-size: 15px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-adm-fila-quien {
+  font-size: 15px;
+  color: var(--ink-4);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-adm-fila-monto,
+.cara-nueva .cn-adm-fila-saldo {
+  font-size: 15px;
+  text-align: right;
+  color: var(--ink);
+}
+.cara-nueva .cn-adm-fila-monto--sale {
+  color: var(--danger);
+}
+.cara-nueva .cn-adm-fila-monto--entra {
+  color: var(--ok);
+}
+.cara-nueva .cn-adm-pie-nota {
+  margin: 20px 0 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-adm-extracto {
+  margin-top: 24px;
+  padding: 20px 22px;
+  border-radius: 14px;
+  background: var(--wash);
+}
+.cara-nueva .cn-adm-extracto-cabeza,
+.cara-nueva .cn-adm-extracto-titulo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.cara-nueva .cn-adm-extracto-cabeza {
+  justify-content: space-between;
+}
+.cara-nueva .cn-adm-extracto-cifras {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+.cara-nueva .cn-adm-extracto-cifra {
+  min-width: 0;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--canvas);
+}
+.cara-nueva .cn-adm-extracto-rotulo {
+  margin: 0;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-adm-extracto-valor {
+  margin: 4px 0 0;
+  font-family: var(--mono);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 24px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-adm-extracto-valor--entra {
+  color: var(--ok);
+}
+.cara-nueva .cn-adm-extracto-detalle {
+  margin: 12px 0 0;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-adm-extracto-cifra .cn-adm-extracto-detalle {
+  margin-top: 4px;
+}
+
+/* ── El pago · esperando, recargado, rechazado ─────────────────────────── */
+.cara-nueva .cn-adm-pago {
+  margin-bottom: 20px;
+  padding: 22px 24px;
+  border-radius: 16px;
+  background: var(--wash);
+}
+.cara-nueva .cn-adm-pago--rechazada,
+.cara-nueva .cn-adm-pago--anulada,
+.cara-nueva .cn-adm-pago--fallida {
+  background: var(--danger-bg);
+}
+.cara-nueva .cn-adm-pago-cabeza {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.cara-nueva .cn-adm-pago-cabeza svg {
+  flex: none;
+  margin-top: 3px;
+  color: var(--ok);
+}
+.cara-nueva .cn-adm-pago-textos {
+  min-width: 0;
+}
+.cara-nueva .cn-adm-pago-titulo {
+  margin: 0 0 4px;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 27px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.cara-nueva .cn-adm-pago-detalle {
+  margin: 0;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-adm-pago--rechazada .cn-adm-pago-detalle,
+.cara-nueva .cn-adm-pago--anulada .cn-adm-pago-detalle,
+.cara-nueva .cn-adm-pago--fallida .cn-adm-pago-detalle {
+  color: var(--danger);
+}
+.cara-nueva .cn-adm-pago .cn-adm-recuadro {
+  background: var(--canvas);
+}
+.cara-nueva .cn-adm-pago-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+.cara-nueva .cn-adm-giro {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  margin-top: 3px;
+  border: 2px solid var(--line-2);
+  border-top-color: var(--brand);
+  border-radius: 50%;
+  /*
+   * Los `@keyframes spin` que Tailwind ya emite, como en Expedientes: los pasos
+   * de un `@keyframes` no pueden vivir bajo `.cara-nueva`, y un selector suelto
+   * rompe los checks que exigen el alcance.
+   */
+  animation: spin 0.9s linear infinite;
+}
+
+/* ── Recargar · montos ─────────────────────────────────────────────────── */
+.cara-nueva .cn-adm-montos {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.cara-nueva .cn-adm-monto {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 64px;
+  padding: 14px 10px;
+  border: none;
+  border-radius: 12px;
+  background: var(--field);
+  color: var(--ink);
+  font-family: inherit;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.cara-nueva .cn-adm-monto:hover {
+  background: var(--line-2);
+}
+.cara-nueva .cn-adm-monto--elegido {
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+.cara-nueva .cn-adm-monto-cifra {
+  display: block;
+  font-family: var(--mono);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 26px;
+}
+.cara-nueva .cn-adm-monto-nota {
+  display: block;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-adm-enlace-respaldo {
+  margin: 12px 0 0;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--brand-soft);
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--brand);
+}
+.cara-nueva .cn-adm-enlace-respaldo a {
+  font-weight: 600;
+  color: inherit;
+}
+
+/* ── Membrete · formulario y papel ─────────────────────────────────────── */
+.cara-nueva .cn-adm-membrete {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+  min-width: 0;
+}
+.cara-nueva .cn-adm-membrete-form {
+  display: grid;
+  gap: 28px;
+  min-width: 0;
+}
+.cara-nueva .cn-adm-grupo {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+.cara-nueva .cn-adm-grupo .cn-adm-seccion-titulo {
+  font-size: 18px;
+  line-height: 26px;
+}
+.cara-nueva .cn-adm-logo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--field);
+  box-shadow: inset 0 0 0 2px var(--line-2);
+  color: var(--ink-4);
+}
+.cara-nueva .cn-adm-logo img {
+  height: 44px;
+  max-width: 140px;
+  border-radius: 6px;
+  background: #fff;
+  object-fit: contain;
+}
+.cara-nueva .cn-adm-logo-texto {
+  flex: 1 1 140px;
+  min-width: 0;
+  font-size: 15px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-adm-par {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px;
+  gap: 12px;
+}
+.cara-nueva .cn-adm-pastillas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cara-nueva .cn-adm-pastilla {
+  min-height: 44px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 10px;
+  background: var(--neutral);
+  color: var(--ink-2);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.cara-nueva .cn-adm-pastilla--elegida {
+  background: var(--ink);
+  color: var(--canvas);
+}
+.cara-nueva .cn-adm-escritorio {
+  min-width: 0;
+  padding: 28px;
+  border-radius: 14px;
+  background: #edeff2;
+}
+.cara-nueva .cn-adm-papel {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 40px;
+  border-radius: 6px;
+  background: #fff;
+  color: #101822;
+  box-shadow: 0 4px 24px rgb(16 24 34 / 0.1);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-adm-papel p {
+  margin: 0;
+}
+.cara-nueva .cn-adm-papel-membrete {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #e6e9ee;
+}
+.cara-nueva .cn-adm-papel-membrete img {
+  height: 44px;
+  max-width: 120px;
+  object-fit: contain;
+}
+.cara-nueva .cn-adm-papel .cn-adm-papel-firma {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.cara-nueva .cn-adm-papel .cn-adm-papel-datos,
+.cara-nueva .cn-adm-papel .cn-adm-papel-vacio {
+  color: #5c6673;
+}
+.cara-nueva .cn-adm-papel .cn-adm-papel-centro {
+  text-align: center;
+  font-weight: 600;
+}
+.cara-nueva .cn-adm-papel .cn-adm-papel-centro--suave {
+  margin-bottom: 18px;
+  font-weight: 400;
+  color: #5c6673;
+}
+.cara-nueva .cn-adm-papel .cn-adm-papel-titulo {
+  margin-top: 18px;
+  font-weight: 700;
+}
+.cara-nueva .cn-adm-papel .cn-adm-papel-parrafo {
+  text-align: justify;
+  text-wrap: pretty;
+}
+.cara-nueva .cn-adm-papel .cn-adm-papel-cierre {
+  margin-top: 24px;
+}
+.cara-nueva .cn-adm-papel .cn-adm-papel-pie {
+  margin-top: 28px;
+  padding-top: 12px;
+  border-top: 1px solid #e6e9ee;
+  color: #5c6673;
+}
+.cara-nueva .cn-adm-escritorio-nota {
+  margin: 12px 0 0;
+  text-align: center;
+  font-size: 14px;
+  line-height: 21px;
+  color: #5c6673;
+}
+@media (min-width: 1024px) {
+  .cara-nueva .cn-adm-membrete {
+    grid-template-columns: 380px minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+/* ── Oscuro: sustitución, no inversión (los tokens ya cambian solos) ───── */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .cara-nueva .cn-adm-saldo {
+    background: var(--field);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  :root:not([data-theme='light']) .cara-nueva .cn-adm-boton--claro {
+    background: var(--ink);
+    color: var(--wash);
+  }
+  :root:not([data-theme='light']) .cara-nueva .cn-adm-escritorio {
+    background: var(--wash);
+  }
+  :root:not([data-theme='light']) .cara-nueva .cn-adm-escritorio-nota {
+    color: var(--ink-4);
+  }
+  :root:not([data-theme='light']) .cara-nueva .cn-adm-boton--peligro:hover:not(:disabled) {
+    background: #a3392e;
+  }
+}
+:root[data-theme='dark'] .cara-nueva .cn-adm-saldo {
+  background: var(--field);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+:root[data-theme='dark'] .cara-nueva .cn-adm-boton--claro {
+  background: var(--ink);
+  color: var(--wash);
+}
+:root[data-theme='dark'] .cara-nueva .cn-adm-escritorio {
+  background: var(--wash);
+}
+:root[data-theme='dark'] .cara-nueva .cn-adm-escritorio-nota {
+  color: var(--ink-4);
+}
+:root[data-theme='dark'] .cara-nueva .cn-adm-boton--peligro:hover:not(:disabled) {
+  background: #a3392e;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cara-nueva .cn-adm-giro {
+    animation: none;
+  }
+  .cara-nueva .cn-adm-boton,
+  .cara-nueva .cn-adm-campo,
+  .cara-nueva .cn-adm-fila,
+  .cara-nueva .cn-adm-monto {
+    transition: none;
+  }
+}
+
+/* ── Tabletas y teléfonos: las tablas pasan a tarjetas ─────────────────── */
+@media (max-width: 1023px) {
+  .cara-nueva .cn-adm-tabla-cabeza {
+    display: none;
+  }
+  .cara-nueva .cn-adm-rotulo-movil {
+    display: block;
+    font-family: 'Satoshi', -apple-system, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--ink-5);
+  }
+  .cara-nueva .cn-adm-tabla--usuarios .cn-adm-fila {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px 12px;
+    padding: 16px 4px;
+  }
+  .cara-nueva .cn-adm-tabla--usuarios .cn-adm-usuario,
+  .cara-nueva .cn-adm-tabla--usuarios .cn-adm-fila-acciones {
+    grid-column: 1 / -1;
+  }
+  .cara-nueva .cn-adm-tabla--usuarios .cn-adm-fila-acciones {
+    justify-content: flex-start;
+    margin-left: -14px;
+  }
+  .cara-nueva .cn-adm-tabla--movimientos .cn-adm-fila {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'concepto monto' 'fecha saldo' 'quien quien';
+    gap: 2px 12px;
+    padding: 14px 4px;
+  }
+  .cara-nueva .cn-adm-tabla--movimientos .cn-adm-fila-concepto {
+    grid-area: concepto;
+  }
+  .cara-nueva .cn-adm-tabla--movimientos .cn-adm-fila-monto {
+    grid-area: monto;
+  }
+  .cara-nueva .cn-adm-tabla--movimientos .cn-adm-fila-fecha {
+    grid-area: fecha;
+  }
+  .cara-nueva .cn-adm-tabla--movimientos .cn-adm-fila-saldo {
+    grid-area: saldo;
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    color: var(--ink-4);
+  }
+  .cara-nueva .cn-adm-tabla--movimientos .cn-adm-fila-saldo .cn-adm-rotulo-movil {
+    display: inline;
+  }
+  .cara-nueva .cn-adm-tabla--movimientos .cn-adm-fila-quien {
+    grid-area: quien;
+    font-size: 14px;
+  }
+  .cara-nueva .cn-adm-extracto-cifras {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 639px) {
+  .cara-nueva.cn-adm-dialogos [role='dialog'] header,
+  .cara-nueva .cn-adm-pantalla [role='dialog'] header {
+    padding: 14px 18px 4px;
+  }
+  .cara-nueva .cn-adm-pantalla [role='dialog'] header h2 {
+    font-size: 24px;
+    line-height: 32px;
+  }
+  .cara-nueva .cn-adm-pantalla [role='dialog'] header h2 + p {
+    font-size: 15px;
+    line-height: 23px;
+  }
+  .cara-nueva.cn-adm-dialogos [role='dialog'] header + div,
+  .cara-nueva .cn-adm-pantalla [role='dialog'] header + div {
+    padding: 12px 18px 18px;
+  }
+  .cara-nueva.cn-adm-dialogos [role='dialog'] footer,
+  .cara-nueva .cn-adm-pantalla [role='dialog'] footer {
+    padding: 12px 18px;
+  }
+  /* Las acciones del pie, a lo ancho y apiladas, como la hoja de 375 del artboard. */
+  .cara-nueva.cn-adm-dialogos [role='dialog'] footer > span:first-child {
+    flex-basis: 100%;
+  }
+  .cara-nueva.cn-adm-dialogos [role='dialog'] footer .cn-adm-boton {
+    flex: 1 1 100%;
+  }
+  .cara-nueva .cn-adm-barra .cn-adm-boton {
+    width: 100%;
+  }
+  .cara-nueva .cn-adm-montos {
+    flex-direction: column;
+  }
+  .cara-nueva .cn-adm-saldo-cifra {
+    font-size: 32px;
+    line-height: 38px;
+  }
+  .cara-nueva .cn-adm-par {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cara-nueva .cn-adm-escritorio {
+    padding: 14px;
+  }
+  .cara-nueva .cn-adm-papel {
+    padding: 22px;
+  }
+  .cara-nueva .cn-adm-campo--selector {
+    width: 100%;
+    min-width: 0;
+  }
+  .cara-nueva .cn-adm-extracto {
+    padding: 16px;
+  }
+}
+/* ─── fin Administrar y saldo ─── */

@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertCircle, ArrowRight, Check, ExternalLink, Gift, Lock, Minus, RefreshCw, ShieldCheck, Sparkles, Users } from 'lucide-react';
+import { AlertCircle, ExternalLink, Gift, RefreshCw } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 import { urlDelCheckout } from '../../billing/wompiCheckout';
@@ -7,11 +7,18 @@ import { subscriptionApi } from '../subscription.api';
 import { generarCuentaDeCobro } from '../cuentaDeCobro.pdf';
 import { useTenant } from '../../tenant/TenantContext';
 import {
-  ETIQUETA_DE_ESTADO,
+  anualSonDiezMeses,
+  avisoDelPlan,
+  lineaDelVencimiento,
+  modulosDelCatalogo,
+  nombreDelPlanActual,
+  notaDeLaTarjeta,
+  encajeDePuestos,
+  TEXTO_DE_LA_PRUEBA
+} from '../planEnPantalla';
+import {
   ETIQUETA_DE_PERIODO,
   NOMBRE_DE_MODULO,
-  type EstadoDelPlan,
-  type Modulo,
   type PagoDePlan,
   type PaidPeriod,
   type Plan,
@@ -20,49 +27,54 @@ import {
 } from '../types';
 
 /**
- * «Plan de la firma»: una página de precios, no un formulario.
+ * «Renovar o cambiar de plan».
  *
- * LO QUE SE DECIDE AQUÍ ES ANUAL O MENSUAL, y por eso el interruptor va arriba
- * y manda sobre las dos tarjetas a la vez: el socio compara los dos planes en
- * el mismo periodo, ve el precio grande y un solo botón por tarjeta. Dos
- * botones por tarjeta —como estaba— obligaban a leer cuatro cifras para elegir
- * una.
+ * SIGUE EL ARTBOARD «CAMBIAR DE PLAN» DE `public/handoff/app-ajustes-y-plan.html`
+ * (:390): cuántos usuarios tiene la firma arriba, el interruptor mensual/anual,
+ * tres tarjetas que se ELIGEN —precio en monoespaciada, usuarios y módulos, y
+ * una nota sobre si le alcanza a esta firma—, la nota de lo que cambia al
+ * cambiar, y el pie con «Pago por Wompi» y un solo primario que nombra el plan
+ * elegido. Elegir primero y pagar abajo, con un solo botón, es lo que evita
+ * leer tres botones para decidir uno.
  *
  * PAGAR ES UN CHECKOUT DE WOMPI POR PERIODO. El servidor firma el precio del
  * catálogo y el navegador salta a la pasarela con esa firma; nada se cobra
- * automáticamente ni se guarda tarjeta. La confirmación extiende el plan desde
- * la fecha vigente cuando se RENUEVA el mismo plan, así que pagar antes nunca
- * pierde días; al CAMBIAR de plan el ciclo empieza el día del pago y los días
- * que quedaban no se acreditan, y por eso la tarjeta lo advierte debajo del
- * botón antes de pagar y ofrece la otra vía —Soporte, conservando la fecha—.
- * Advertir después del pago sería una explicación, no una elección. El consumo de
- * inteligencia artificial va aparte, por recargas de saldo, y se dice en la
- * misma pantalla porque quien acaba de pagar un plan espera que los escritos
- * vayan incluidos.
+ * automáticamente ni se guarda tarjeta. Renovar el MISMO plan extiende desde la
+ * fecha vigente, así que pagar antes nunca pierde días; CAMBIAR de plan empieza
+ * el ciclo el día del pago y no acredita lo que quedaba, y por eso se advierte
+ * ANTES de pagar, con la otra vía —Soporte, conservando la fecha—.
  *
- * SOLO LOS ADMINISTRADORES PAGAN. Un abogado ve planes y precios, no los
- * botones: comprometer a la firma por un año es decisión de un socio, y el
- * servidor rechaza el checkout a cualquier otro.
+ * LO QUE EL ARTBOARD PIDE Y AQUÍ NO ESTÁ, con la razón:
+ *  · «Si sube de plan, el periodo que ya pagó se descuenta» — es falso: el
+ *    servidor no acredita los días (`cambioDePlan.rules`). Se dice lo contrario.
+ *  · «Tendría que retirar a 3 abogados» — el checkout no compara usuarios con el
+ *    tope; se dice cuántos tiene la firma y hasta cuántos llega el plan.
+ *  · Los estados «esperando la confirmación», «pago aprobado» y «pago rechazado»
+ *    de `app-registro-y-planes.html` — la aplicación no recibe hoy el regreso
+ *    de Wompi para un plan: la confirmación llega al servidor por el evento y el
+ *    plan se extiende solo. Pintar una espera que nadie resuelve sería peor que
+ *    decir, como se dice, que se vuelva a abrir esta pantalla para verlo.
  *
- * LA PRUEBA GRATUITA TAMBIÉN SE PIDE DESDE AQUÍ. La firma que nació con
- * «Contratar» en la portada abre vencida y nunca vio la prueba que la portada
- * ofrece al lado; cuando el servidor dice `pruebaDisponible` —firma sin
- * pagos ni prueba, un usuario, persona que no ha probado— la tarjeta Esencial
- * ofrece los siete días. El servidor vuelve a decidir al pedirla y responde
- * con la misma frase del formulario público si la persona ya probó.
+ * SOLO LOS ADMINISTRADORES PAGAN. Un abogado ve planes y precios, no el botón:
+ * comprometer a la firma por un año es decisión de un socio, y el servidor
+ * rechaza el checkout a cualquier otro.
+ *
+ * LA PRUEBA GRATUITA SE PIDE DESDE AQUÍ, y solo la de Esencial. Cuando el
+ * servidor dice `pruebaDisponible` —firma sin pagos ni prueba, un usuario,
+ * persona que no ha probado— se ofrece; el servidor vuelve a decidir al pedirla.
  */
 
 interface FirmSubscriptionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  /** FIRM_ADMIN o SUPER_ADMIN. Decide si se pintan los botones de pago. */
+  /** FIRM_ADMIN o SUPER_ADMIN. Decide si se pinta el botón de pago. */
   puedePagar: boolean;
   /** La cáscara guarda una copia del plan para la navegación y el aviso. */
   onPlanLeido?: (plan: PlanDeFirma) => void;
   /**
    * El plan que el socio ya eligió afuera (portada o registro para
-   * contratar). Esa tarjeta se destaca en lugar de Premium: quien acaba de
-   * pedir Firma no debe ver «Recomendado» sobre otro plan.
+   * contratar). Esa tarjeta llega elegida: quien acaba de pedir Firma no debe
+   * encontrar otro plan marcado.
    */
   planSugerido?: Plan | null;
 }
@@ -75,39 +87,9 @@ const fechaLarga = (iso: string): string =>
 const fechaCorta = (iso: string): string =>
   new Date(iso).toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-const ESTILO_DE_ESTADO: Record<EstadoDelPlan, string> = {
-  ACTIVO: 'bg-[rgb(var(--verified-surf))] text-verified border-[rgb(var(--verified-line))]',
-  PRUEBA: 'bg-brand-50 text-brand-700 border-[rgb(var(--brand-line))]',
-  CORTESIA: 'bg-canvas text-ink-700 border-line-200',
-  POR_VENCER: 'bg-[rgb(var(--unverified-surf))] text-unverified border-[rgb(var(--unverified-line))]',
-  VENCIDO: 'bg-[rgb(var(--danger)/0.06)] text-danger border-[rgb(var(--danger)/0.35)]'
-};
+const ORDEN_DE_PLANES: readonly Plan[] = ['ESENCIAL', 'PREMIUM', 'FIRMA'];
 
-/** Una frase por plan: lo que el precio compra, antes de la lista. */
-const LEMA: Record<Plan, string> = {
-  ESENCIAL: 'Para el abogado que redacta y revisa solo.',
-  PREMIUM: 'Para la firma: audiencias, entrevistas, orientación y hasta cinco personas.',
-  FIRMA: 'Para la firma que crece: todos los módulos y hasta quince personas.'
-};
-
-/** Orden fijo para que la tarjeta Esencial muestre en gris lo que no incluye. */
-const TODOS_LOS_MODULOS: readonly Modulo[] = [
-  'REDACCION',
-  'REVISIONES',
-  'BORRADORES',
-  'ORIENTACION',
-  'AUDIENCIAS',
-  'ENTREVISTAS',
-  'BUSCADOR',
-  'CATALOGO',
-  'HERRAMIENTAS',
-  'MEMBRETE',
-  'SOPORTE',
-  'MANUAL'
-];
-
-const nombreDelPlan = (plan: Plan | null, planes: Record<Plan, PlanDefinition> | null): string =>
-  plan ? planes?.[plan]?.nombre ?? plan : 'Cortesía';
+const esPeriodoPagado = (plan: PlanDeFirma | null): boolean => plan?.period === 'MENSUAL' || plan?.period === 'ANUAL';
 
 export const FirmSubscriptionModal: React.FC<FirmSubscriptionModalProps> = ({
   isOpen,
@@ -122,9 +104,10 @@ export const FirmSubscriptionModal: React.FC<FirmSubscriptionModalProps> = ({
   const [pagos, setPagos] = React.useState<PagoDePlan[]>([]);
   const [cargando, setCargando] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
-  const [pagando, setPagando] = React.useState<Plan | null>(null);
-  /* El anual por defecto: es la opción que la propia pantalla recomienda. */
+  const [pagando, setPagando] = React.useState(false);
+  /* El anual por defecto: es el que rinde doce meses por el precio de diez. */
   const [periodo, setPeriodo] = React.useState<PaidPeriod>('ANUAL');
+  const [elegido, setElegido] = React.useState<Plan | null>(null);
   const [verHistorial, setVerHistorial] = React.useState(false);
   /*
    * EL SALTO SE HACE NAVEGANDO, Y SI NO OCURRE SE OFRECE EL ENLACE. Un
@@ -144,9 +127,9 @@ export const FirmSubscriptionModal: React.FC<FirmSubscriptionModalProps> = ({
       /*
        * EL HISTORIAL NO PUEDE TUMBAR LA COMPRA. Con la prueba gratuita
        * terminada el servidor solo abre leer el plan y pagar: el historial
-       * responde 403, y antes ese rechazo dentro de `Promise.all` dejaba la
-       * pantalla sin planes — la única salida de esa firma, cerrada. Esa firma
-       * no tiene pagos por definición, así que la lista vacía es la verdad.
+       * responde 403, y ese rechazo dentro de `Promise.all` dejaba la pantalla
+       * sin planes — la única salida de esa firma, cerrada. Esa firma no tiene
+       * pagos por definición, así que la lista vacía es la verdad.
        */
       const [{ plan: p, planes: catalogo }, historial] = await Promise.all([
         subscriptionApi.plan(),
@@ -154,7 +137,6 @@ export const FirmSubscriptionModal: React.FC<FirmSubscriptionModalProps> = ({
       ]);
       setPlan(p);
       setPlanes(catalogo);
-      /* Un historial vacío o ausente no puede tumbar la pantalla de pago. */
       setPagos(Array.isArray(historial) ? historial : []);
       onPlanLeido?.(p);
     } catch (e) {
@@ -167,11 +149,19 @@ export const FirmSubscriptionModal: React.FC<FirmSubscriptionModalProps> = ({
   React.useEffect(() => {
     if (!isOpen) return;
     setEnlaceCheckout(null);
+    setElegido(null);
     void cargar();
   }, [isOpen, cargar]);
 
-  const pagar = async (elegido: Plan) => {
-    setPagando(elegido);
+  /* Llega elegido lo que el socio pidió afuera; si no pidió nada, el plan que ya tiene; si no tiene, Premium. */
+  React.useEffect(() => {
+    if (!plan || elegido) return;
+    setElegido(planSugerido ?? plan.plan ?? 'PREMIUM');
+  }, [plan, elegido, planSugerido]);
+
+  const pagar = async () => {
+    if (!elegido) return;
+    setPagando(true);
     setError(null);
     try {
       const intent = await subscriptionApi.checkout(elegido, periodo);
@@ -179,17 +169,16 @@ export const FirmSubscriptionModal: React.FC<FirmSubscriptionModalProps> = ({
       setEnlaceCheckout(url);
       window.location.assign(url);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'No se pudo iniciar el pago.');
+      setError(e instanceof Error ? e.message : 'No se pudo iniciar el pago. No se cobró nada.');
     } finally {
-      setPagando(null);
+      setPagando(false);
     }
   };
 
   /*
    * Al terminar, el plan nuevo sube a la cáscara por `onPlanLeido`: es lo que
-   * alimenta el PlanContext, y con estado PRUEBA la franja de solo lectura se
-   * apaga sin recargar. Un 409 trae la frase del servidor y se muestra en el
-   * mismo sitio que cualquier otro error de esta pantalla.
+   * alimenta el PlanContext. Un 409 trae la frase del servidor y se muestra en
+   * el mismo sitio que cualquier otro error de esta pantalla.
    */
   const solicitarPrueba = async () => {
     setActivandoPrueba(true);
@@ -208,21 +197,13 @@ export const FirmSubscriptionModal: React.FC<FirmSubscriptionModalProps> = ({
 
   const ofrecerPrueba = () =>
     setConfirmacion({
-      titulo: 'Probar Esencial gratis 7 días',
-      texto: (
-        <p>
-          La firma queda en el plan Esencial durante siete días, con un usuario y todos sus módulos. No se pide tarjeta
-          y al terminar no se cobra nada: la aplicación vuelve a solo lectura y desde esta pantalla se contrata el plan
-          que prefiera. La prueba es una sola por firma y por persona.
-        </p>
-      ),
+      titulo: TEXTO_DE_LA_PRUEBA.oferta,
+      texto: <p className="cn-plan-dlg-texto">{TEXTO_DE_LA_PRUEBA.confirmacion}</p>,
       etiqueta: 'Empezar la prueba',
       onConfirmar: solicitarPrueba
     });
 
   const precioDe = (def: PlanDefinition): number => (periodo === 'ANUAL' ? def.precioAnualCop : def.precioMensualCop);
-  const mensualEquivalente = (def: PlanDefinition): number => (periodo === 'ANUAL' ? def.precioAnualCop / 12 : def.precioMensualCop);
-  const ahorroAnual = (def: PlanDefinition): number => def.precioMensualCop * 12 - def.precioAnualCop;
 
   /*
    * Espejo de `debeAdvertirCambio` del backend (subscriptions/cambioDePlan.rules):
@@ -230,344 +211,287 @@ export const FirmSubscriptionModal: React.FC<FirmSubscriptionModalProps> = ({
    * le queda tiempo pagado, que es exactamente lo que va a entregar. Sin plan,
    * sin fecha o ya vencida no pierde nada, así que no se le dice nada.
    */
-  const advertirCambio = (elegido: Plan): boolean =>
+  const advertirCambio = (destino: Plan): boolean =>
     plan !== null &&
     plan.plan !== null &&
-    plan.plan !== elegido &&
+    plan.plan !== destino &&
     plan.validUntil !== null &&
     plan.diasRestantes !== null &&
     plan.diasRestantes > 0;
 
+  const todos = modulosDelCatalogo(planes);
+  const defElegida = elegido && planes ? planes[elegido] : null;
+  const verbo = plan?.plan === elegido && esPeriodoPagado(plan) ? 'Renovar' : esPeriodoPagado(plan) ? 'Pasar a' : 'Contratar';
+
+  const subtitulo =
+    plan && defElegida
+      ? `Su firma tiene ${plan.usuarios} ${plan.usuarios === 1 ? 'usuario' : 'usuarios'} con acceso. ${defElegida.nombre} llega a ${defElegida.maxUsuarios}.`
+      : 'El consumo de inteligencia artificial va aparte, por recargas de saldo.';
+
+  /* La prueba terminada no tiene aviso en `avisoDelPlan`: tiene su pantalla, y aquí se le recuerda su única salida. */
+  const aviso = plan
+    ? plan.acceso === 'PRUEBA_TERMINADA'
+      ? {
+          titulo: 'La prueba gratuita terminó',
+          texto:
+            'Para volver a entrar a la aplicación hay que contratar un plan. El trabajo de la firma se conserva y el saldo de recargas no se pierde.',
+          tono: 'peligro' as const
+        }
+      : avisoDelPlan(plan, fechaLarga)
+    : null;
+
   return (
-    <Dialog
-      abierto={isOpen}
-      onCerrar={onClose}
-      titulo="Plan de la firma"
-      subtitulo="Lo que la firma tiene contratado y lo que puede contratar. El consumo de inteligencia artificial va aparte, por recargas de saldo."
-      tamano="L"
-      cuerpoEnCanvas
-    >
-      {cargando && !plan && (
-        <div className="flex items-center justify-center gap-2 py-16 text-ink-400">
-          <RefreshCw className="h-4 w-4 animate-spin" />
-          <span className="text-[13px]">Leyendo el plan…</span>
-        </div>
-      )}
+    <div className="cara-nueva cn-plan-dialogos">
+      <Dialog
+        abierto={isOpen}
+        onCerrar={onClose}
+        titulo={esPeriodoPagado(plan) ? 'Renovar o cambiar de plan' : 'Elegir un plan'}
+        subtitulo={subtitulo}
+        tamano="L"
+        pieIzquierda={
+          <span className="cn-plan-pie">
+            {puedePagar ? 'Pago por Wompi, sin tarjeta guardada · IVA incluido' : 'Solo un socio administrador puede pagar el plan.'}
+          </span>
+        }
+        acciones={
+          <>
+            <button type="button" onClick={onClose} className="cn-plan-boton cn-plan-boton--terciario">
+              {puedePagar ? 'Cancelar' : 'Cerrar'}
+            </button>
+            {puedePagar && defElegida && (
+              <button
+                type="button"
+                onClick={() => void pagar()}
+                disabled={pagando || activandoPrueba}
+                className="cn-plan-boton cn-plan-boton--primario"
+              >
+                {pagando ? (
+                  <>
+                    <RefreshCw className="cn-plan-girando" aria-hidden="true" />
+                    Abriendo Wompi…
+                  </>
+                ) : (
+                  `${verbo} ${defElegida.nombre} ${periodo === 'ANUAL' ? 'anual' : 'mensual'}`
+                )}
+              </button>
+            )}
+          </>
+        }
+      >
+        <div className="cn-plan-cuerpo">
+          {cargando && !plan && (
+            <p className="cn-plan-cargando" role="status">
+              <RefreshCw className="cn-plan-girando" aria-hidden="true" />
+              Leyendo el plan…
+            </p>
+          )}
 
-      {error && (
-        <div className="mb-4 flex items-start gap-2 rounded-card border border-[rgb(var(--danger)/0.35)] bg-[rgb(var(--danger)/0.06)] px-4 py-3">
-          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-danger" />
-          <p className="text-justify text-[12px] leading-snug text-danger [text-wrap:pretty]">{error}</p>
-        </div>
-      )}
+          {error && (
+            <div className="cn-plan-error" role="alert">
+              <AlertCircle className="cn-plan-boton-icono" aria-hidden="true" />
+              <p>{error}</p>
+            </div>
+          )}
 
-      {enlaceCheckout && (
-        <div className="mb-4 rounded-card border border-[rgb(var(--brand-line))] bg-surface px-4 py-3 text-[12px] text-ink-700">
-          Si la pasarela no se abrió,{' '}
-          <a href={enlaceCheckout} className="inline-flex items-center gap-1 font-medium text-brand-700 underline">
-            abra el pago aquí <ExternalLink className="h-3 w-3" />
-          </a>
-          . Al confirmarse, el plan se extiende solo; vuelva a abrir esta pantalla para verlo.
-        </div>
-      )}
+          {enlaceCheckout && (
+            <p className="cn-plan-enlace-caja">
+              Si la pasarela no se abrió,{' '}
+              <a href={enlaceCheckout}>
+                abra el pago aquí <ExternalLink className="cn-plan-enlace-icono" aria-hidden="true" />
+              </a>
+              . Al confirmarse, el plan se extiende solo; vuelva a abrir esta pantalla para verlo.
+            </p>
+          )}
 
-      {plan && (
-        <div className="space-y-5">
-          {/* ─── El plan vigente: una franja oscura con el dato que importa ── */}
-          <section className="relative overflow-hidden rounded-card bg-gradient-to-br from-brand-700 to-ink-900 px-5 py-5 text-white shadow-e2">
-            <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-white/10 blur-2xl" />
-            <div className="pointer-events-none absolute -bottom-24 left-1/3 h-56 w-56 rounded-full bg-brand-50/10 blur-3xl" />
-            <div className="relative flex flex-wrap items-end justify-between gap-4">
-              <div>
-                <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.12em] text-white/60">Plan actual</p>
-                <p className="mt-1 text-[26px] font-semibold leading-none tracking-tight">
-                  {nombreDelPlan(plan.plan, planes)}
-                  {plan.period && plan.period !== 'CORTESIA' && (
-                    <span className="ml-2 text-[13px] font-normal text-white/70">{ETIQUETA_DE_PERIODO[plan.period]}</span>
-                  )}
-                </p>
-                <p className="mt-2 text-[12.5px] text-white/80">
-                  {plan.validUntil ? (
-                    <>
-                      {plan.estado === 'VENCIDO' ? 'Venció el ' : 'Vence el '}
-                      <span className="font-medium text-white">{fechaLarga(plan.validUntil)}</span>
-                      {plan.diasRestantes !== null && plan.diasRestantes > 0 && (
-                        <span className="text-white/60">
-                          {' '}
-                          · {plan.diasRestantes} {plan.diasRestantes === 1 ? 'día' : 'días'}
-                        </span>
-                      )}
-                    </>
-                  ) : (
-                    'Sin vencimiento'
-                  )}
-                </p>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11.5px] text-white">
-                  <Users className="h-3.5 w-3.5" />
-                  {plan.usuarios}
-                  {plan.maxUsers !== null ? ` de ${plan.maxUsers} usuarios` : ' usuarios · sin tope'}
-                </span>
-                <span className={`rounded-full border px-3 py-1 text-[11px] font-semibold ${ESTILO_DE_ESTADO[plan.estado]}`}>
-                  {ETIQUETA_DE_ESTADO[plan.estado]}
-                </span>
+          {plan && (
+            <p className="cn-plan-hoy">
+              Hoy: <b>{nombreDelPlanActual(plan, planes)}</b>
+              {plan.period && plan.period !== 'CORTESIA' ? ` ${ETIQUETA_DE_PERIODO[plan.period].toLowerCase()}` : ''} ·{' '}
+              {lineaDelVencimiento(plan, fechaLarga)}
+            </p>
+          )}
+
+          {aviso && (
+            <div className={`cn-plan-aviso${aviso.tono === 'peligro' ? ' cn-plan-aviso--peligro' : ''}`}>
+              <div className="cn-plan-aviso-textos">
+                <p className="cn-plan-aviso-titulo">{aviso.titulo}</p>
+                <p className="cn-plan-aviso-texto">{aviso.texto}</p>
               </div>
             </div>
-            {plan.estado === 'VENCIDO' && (
-              <p className="relative mt-4 rounded-control bg-white/10 px-3 py-2 text-justify text-[12px] leading-snug text-white [text-wrap:pretty]">
-                {plan.acceso === 'PRUEBA_TERMINADA'
-                  ? 'La prueba gratuita terminó. Para volver a entrar a la aplicación hay que contratar un plan; el trabajo de la firma se conserva y el saldo de recargas no se pierde.'
-                  : 'El plan venció. La firma puede entrar, leer y exportar; para volver a generar escritos, revisar o transcribir, hay que pagar un periodo. El saldo de recargas no se pierde.'}
-              </p>
-            )}
-          </section>
+          )}
 
-          {/* ─── Mensual / Anual ─────────────────────────────────────────── */}
-          {planes && (
+          {plan && planes && (
             <>
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <h3 className="text-[15px] font-semibold text-ink-900">Elija el plan</h3>
-                <div className="inline-flex items-center rounded-full border border-line-200 bg-surface p-1 shadow-e1">
+              <div className="cn-plan-periodo">
+                <div className="cn-plan-segmentos" role="radiogroup" aria-label="Periodo">
                   {(['MENSUAL', 'ANUAL'] as const).map((p) => (
                     <button
                       key={p}
                       type="button"
+                      role="radio"
+                      aria-checked={periodo === p}
                       onClick={() => setPeriodo(p)}
-                      aria-pressed={periodo === p}
-                      className={`rounded-full px-4 py-1.5 text-[12.5px] font-medium transition-colors ${
-                        periodo === p ? 'bg-brand-700 text-white shadow-e1' : 'text-ink-700 hover:text-ink-900'
-                      }`}
+                      className={`cn-plan-segmento${periodo === p ? ' cn-plan-segmento--activo' : ''}`}
                     >
-                      {p === 'MENSUAL' ? 'Mensual' : 'Anual'}
-                      {p === 'ANUAL' && (
-                        <span className={`ml-2 rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${periodo === 'ANUAL' ? 'bg-white/20 text-white' : 'bg-brand-50 text-brand-700'}`}>
-                          2 meses gratis
-                        </span>
-                      )}
+                      {ETIQUETA_DE_PERIODO[p]}
                     </button>
                   ))}
                 </div>
+                {anualSonDiezMeses(planes) && <span className="cn-plan-diez">El año son diez meses</span>}
               </div>
 
-              {/* ─── Las tres tarjetas ───────────────────────────────────── */}
-              <section className="grid gap-4 md:grid-cols-3">
-                {(['ESENCIAL', 'PREMIUM', 'FIRMA'] as const).map((clave) => {
+              <div className="cn-plan-tarjetas" role="radiogroup" aria-label="Plan">
+                {ORDEN_DE_PLANES.map((clave) => {
                   const def = planes[clave];
                   const esElActual = plan.plan === clave;
-                  const destacado = planSugerido ? clave === planSugerido : clave === 'PREMIUM';
-                  const incluidos = new Set<Modulo>(def.modulos);
+                  const activa = elegido === clave;
+                  const faltan = todos.filter((m) => !def.modulos.includes(m));
+                  const { cabe } = encajeDePuestos(plan.usuarios, def.maxUsuarios);
                   return (
-                    <article
+                    <button
                       key={clave}
-                      className={`relative flex flex-col rounded-card border bg-surface px-5 py-5 transition-shadow hover:shadow-e2 ${
-                        destacado ? 'border-brand-700 shadow-e2 ring-1 ring-brand-700/20' : 'border-line-200 shadow-e1'
-                      }`}
+                      type="button"
+                      role="radio"
+                      aria-checked={activa}
+                      onClick={() => setElegido(clave)}
+                      className={`cn-plan-opcion${activa ? ' cn-plan-opcion--elegida' : ''}`}
                     >
-                      {destacado && (
-                        <span className="absolute -top-3 left-5 inline-flex items-center gap-1 rounded-full bg-brand-700 px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-wide text-white shadow-e1">
-                          <Sparkles className="h-3 w-3" />
-                          {planSugerido ? 'Su elección' : 'Recomendado'}
-                        </span>
+                      <span className="cn-plan-opcion-cabeza">
+                        <span className="cn-plan-opcion-nombre">{def.nombre}</span>
+                        {esElActual && <span className="cn-plan-chip">El suyo</span>}
+                        {!esElActual && planSugerido === clave && <span className="cn-plan-chip">Su elección</span>}
+                      </span>
+                      <span className="cn-plan-precio">
+                        {pesos(precioDe(def))}
+                        <span className="cn-plan-precio-periodo">{periodo === 'ANUAL' ? 'al año' : 'al mes'}</span>
+                      </span>
+                      <span className="cn-plan-opcion-resumen">
+                        {def.maxUsuarios === 1 ? '1 usuario' : `Hasta ${def.maxUsuarios} usuarios`} ·{' '}
+                        {faltan.length === 0 ? `los ${todos.length} módulos` : `${def.modulos.length} de ${todos.length} módulos`}
+                      </span>
+                      {faltan.length > 0 && (
+                        <span className="cn-plan-opcion-sin">Sin {faltan.map((m) => NOMBRE_DE_MODULO[m]).join(', ')}</span>
                       )}
-                      {esElActual && (
-                        <span className="absolute -top-3 right-5 rounded-full border border-line-200 bg-canvas px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-wide text-ink-700">
-                          Su plan
-                        </span>
-                      )}
-
-                      <header>
-                        <h4 className="text-[17px] font-semibold text-ink-900">{def.nombre}</h4>
-                        <p className="mt-1 text-[12px] leading-snug text-ink-500">{LEMA[clave]}</p>
-                      </header>
-
-                      <div className="mt-4 flex items-baseline gap-1.5">
-                        <span className="text-[34px] font-semibold leading-none tracking-tight text-ink-900">{pesos(precioDe(def))}</span>
-                        <span className="text-[12.5px] text-ink-500">{periodo === 'ANUAL' ? '/ año' : '/ mes'}</span>
-                      </div>
-                      <p className="mt-1 text-[11.5px] text-ink-500">
-                        {periodo === 'ANUAL' ? (
-                          <>
-                            Equivale a {pesos(mensualEquivalente(def))} al mes ·{' '}
-                            <span className="font-medium text-verified">ahorra {pesos(ahorroAnual(def))}</span>
-                          </>
-                        ) : (
-                          <>
-                            En anual: {pesos(def.precioAnualCop)} · {pesos(def.precioAnualCop / 12)} al mes
-                          </>
-                        )}
-                      </p>
-                      <p className="mt-2 inline-flex items-center gap-1.5 text-[12px] text-ink-700">
-                        <Users className="h-3.5 w-3.5 text-ink-400" />
-                        {def.maxUsuarios === 1 ? '1 usuario' : `Hasta ${def.maxUsuarios} usuarios`}
-                      </p>
-
-                      <ul className="mt-4 grid flex-1 grid-cols-1 gap-1.5 text-[12px] sm:grid-cols-2">
-                        {TODOS_LOS_MODULOS.map((m) => {
-                          const si = incluidos.has(m);
-                          return (
-                            <li key={m} className={`flex items-center gap-1.5 ${si ? 'text-ink-900' : 'text-ink-400 line-through decoration-ink-400'}`}>
-                              {si ? <Check className="h-3.5 w-3.5 shrink-0 text-verified" /> : <Minus className="h-3.5 w-3.5 shrink-0 text-ink-400" />}
-                              {NOMBRE_DE_MODULO[m]}
-                            </li>
-                          );
-                        })}
-                      </ul>
-
-                      {puedePagar ? (
-                        <button
-                          type="button"
-                          disabled={pagando !== null || activandoPrueba}
-                          onClick={() => void pagar(clave)}
-                          className={`mt-5 inline-flex h-11 w-full items-center justify-center gap-2 rounded-control text-[13px] font-semibold transition-colors disabled:opacity-50 ${
-                            destacado ? 'bg-brand-700 text-white hover:bg-ink-900' : 'border border-brand-700 bg-surface text-brand-700 hover:bg-brand-50'
-                          }`}
-                        >
-                          {pagando === clave ? (
-                            <>
-                              <RefreshCw className="h-4 w-4 animate-spin" />
-                              Abriendo Wompi…
-                            </>
-                          ) : (
-                            <>
-                              {esElActual ? 'Renovar' : 'Contratar'} {def.nombre} {periodo === 'ANUAL' ? 'anual' : 'mensual'}
-                              <ArrowRight className="h-4 w-4" />
-                            </>
-                          )}
-                        </button>
-                      ) : (
-                        <p className="mt-5 inline-flex items-center gap-1.5 text-[11.5px] text-ink-500">
-                          <Lock className="h-3.5 w-3.5" />
-                          Solo un administrador de la firma puede pagar el plan.
-                        </p>
-                      )}
-
-                      {/*
-                        LO QUE CUESTA CAMBIAR DE PLAN SE DICE ANTES DE PAGAR.
-                        Cambiar de plan se paga completo y el ciclo empieza el
-                        día del pago, así que los días que le quedan del plan
-                        actual se pierden. Solo aparece cuando hay algo que
-                        perder —plan distinto, con fecha y todavía al día—:
-                        advertirle a una firma vencida de unos días que ya no
-                        tiene sería una falsa alarma, y una advertencia que casi
-                        siempre está deja de leerse el día que importa.
-                      */}
-                      {puedePagar && advertirCambio(clave) && (
-                        <div className="mt-3 space-y-1.5 rounded-control border border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))] px-3 py-2.5">
-                          <p className="text-justify text-[11.5px] leading-snug text-unverified [text-wrap:pretty]">
-                            Va a cambiar de plan: {def.nombre} se paga completo y su ciclo empieza el día del pago. Los{' '}
-                            {plan.diasRestantes} {plan.diasRestantes === 1 ? 'día' : 'días'} que le quedan de{' '}
-                            {nombreDelPlan(plan.plan, planes)} no se acreditan ni se devuelven, y su vencimiento pasa a
-                            contarse desde hoy.
-                          </p>
-                          <p className="text-justify text-[11.5px] leading-snug text-ink-700 [text-wrap:pretty]">
-                            Si prefiere conservar su fecha de vencimiento, escríbanos por Soporte antes de pagar.
-                          </p>
-                        </div>
-                      )}
-
-                      {clave === 'ESENCIAL' && plan.pruebaDisponible && puedePagar && (
-                        <div className="mt-3 rounded-control border border-dashed border-[rgb(var(--brand-line))] bg-brand-50/60 px-3 py-2.5">
-                          <button
-                            type="button"
-                            disabled={pagando !== null || activandoPrueba}
-                            onClick={ofrecerPrueba}
-                            className="inline-flex w-full items-center justify-center gap-2 text-[13px] font-semibold text-brand-700 hover:underline disabled:opacity-50"
-                          >
-                            {activandoPrueba ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Gift className="h-4 w-4" />}
-                            {activandoPrueba ? 'Activando la prueba…' : 'Probar Esencial gratis 7 días'}
-                          </button>
-                          <p className="mt-1 text-center text-[11.5px] leading-snug text-ink-700">
-                            Un usuario, sin tarjeta y sin cobro al terminar.
-                          </p>
-                        </div>
-                      )}
-                    </article>
+                      <span className={`cn-plan-opcion-nota${cabe ? '' : ' cn-plan-opcion-nota--no-alcanza'}`}>
+                        {notaDeLaTarjeta(esElActual, plan.usuarios, def)}
+                      </span>
+                    </button>
                   );
                 })}
-              </section>
-
-              {/* ─── Confianza, en una línea ─────────────────────────────── */}
-              <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-[11.5px] text-ink-500">
-                <span className="inline-flex items-center gap-1.5">
-                  <ShieldCheck className="h-3.5 w-3.5 text-verified" />
-                  Pago seguro en la pasarela de Wompi
-                </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <Lock className="h-3.5 w-3.5 text-ink-400" />
-                  No se guarda tarjeta ni se cobra automáticamente
-                </span>
-                <span>Precios con IVA incluido</span>
               </div>
 
-              <p className="px-1 text-justify text-[11.5px] leading-snug text-ink-500 [text-wrap:pretty]">
-                Renovar el plan que ya tiene —también al pasar de mensual a anual— suma el periodo a la fecha vigente: pagar antes nunca pierde días. Cambiar a otro plan se paga completo y su ciclo empieza el día del pago, sin acreditar lo que quedaba del anterior; si prefiere conservar su fecha de vencimiento, escríbanos por Soporte antes de pagar. Los escritos, las revisiones y los resúmenes se descuentan del saldo de recargas, aparte del plan.
-              </p>
+              {plan.pruebaDisponible && puedePagar && (
+                <div className="cn-plan-prueba">
+                  <button
+                    type="button"
+                    disabled={pagando || activandoPrueba}
+                    onClick={ofrecerPrueba}
+                    className="cn-plan-prueba-boton"
+                  >
+                    {activandoPrueba ? <RefreshCw className="cn-plan-girando" aria-hidden="true" /> : <Gift className="cn-plan-boton-icono" aria-hidden="true" />}
+                    {activandoPrueba ? 'Activando la prueba…' : TEXTO_DE_LA_PRUEBA.oferta}
+                  </button>
+                  <p className="cn-plan-prueba-detalle">{TEXTO_DE_LA_PRUEBA.detalle}</p>
+                </div>
+              )}
+
+              {/*
+                LO QUE CUESTA CAMBIAR DE PLAN SE DICE ANTES DE PAGAR, y solo del
+                plan elegido. Aparece cuando hay algo que perder —plan distinto,
+                con fecha y todavía al día—: advertirle a una firma vencida lo que
+                ya no tiene sería una falsa alarma, y una advertencia que casi
+                siempre está deja de leerse el día que importa.
+              */}
+              {puedePagar && elegido && defElegida && advertirCambio(elegido) && (
+                <div className="cn-plan-advertencia" role="status">
+                  <p className="cn-plan-advertencia-texto">
+                    Va a cambiar de plan: {defElegida.nombre} se paga completo y su ciclo empieza el día del pago. Los{' '}
+                    {plan.diasRestantes} {plan.diasRestantes === 1 ? 'día' : 'días'} que le quedan de{' '}
+                    {nombreDelPlanActual(plan, planes)} no se acreditan ni se devuelven.
+                  </p>
+                  <p className="cn-plan-advertencia-otra">
+                    Si prefiere conservar su fecha de vencimiento, escríbanos por Soporte antes de pagar.
+                  </p>
+                </div>
+              )}
+
+              <div className="cn-plan-nota">
+                <p>
+                  Renovar el plan que ya tiene —también al pasar de mensual a anual— suma el periodo a la fecha vigente:
+                  pagar antes nunca pierde días. Cambiar a otro plan se paga completo y su ciclo empieza el día del pago,
+                  sin acreditar lo que quedaba del anterior. Cambiar de plan no toca el saldo ni borra nada: los escritos,
+                  las revisiones y los resúmenes se descuentan del saldo de recargas, aparte del plan.
+                </p>
+              </div>
             </>
           )}
 
-          {/* ─── Historial, plegado: importa después de pagar, no antes ──── */}
-          <section className="rounded-card border border-line-200 bg-surface">
-            <button
-              type="button"
-              onClick={() => setVerHistorial((v) => !v)}
-              className="flex w-full items-center justify-between px-4 py-3 text-left"
-              aria-expanded={verHistorial}
-            >
-              <span>
-                <span className="block text-[13px] font-semibold text-ink-900">Pagos del plan</span>
-                <span className="mt-0.5 block text-[11px] text-ink-500">
-                  {pagos.length === 0 ? 'La firma todavía no ha pagado ningún periodo.' : `${pagos.length} ${pagos.length === 1 ? 'pago' : 'pagos'} · las recargas de saldo están en su propio extracto.`}
+          {plan && (
+            /* Historial, plegado: importa después de pagar, no antes. */
+            <section className="cn-plan-historial">
+              <button
+                type="button"
+                onClick={() => setVerHistorial((v) => !v)}
+                className="cn-plan-historial-boton"
+                aria-expanded={verHistorial}
+              >
+                <span>
+                  <span className="cn-plan-historial-titulo">Pagos del plan</span>
+                  <span className="cn-plan-historial-detalle">
+                    {pagos.length === 0
+                      ? 'La firma todavía no ha pagado ningún periodo.'
+                      : `${pagos.length} ${pagos.length === 1 ? 'pago' : 'pagos'} · las recargas de saldo tienen su propio extracto.`}
+                  </span>
                 </span>
-              </span>
-              <span className="text-[12px] font-medium text-brand-700">{verHistorial ? 'Ocultar' : 'Ver'}</span>
-            </button>
-            {verHistorial && pagos.length > 0 && (
-              <div className="overflow-x-auto border-t border-line-200">
-                <table className="w-full text-[12px]">
-                  <thead>
-                    <tr className="border-b border-line-200 text-left text-ink-400">
-                      <th className="px-4 py-2 font-medium">Fecha</th>
-                      <th className="px-4 py-2 font-medium">Plan</th>
-                      <th className="px-4 py-2 font-medium">Periodo cubierto</th>
-                      <th className="px-4 py-2 text-right font-medium">Valor</th>
-                      <th className="px-4 py-2 font-medium">Pagó</th>
-                      <th className="px-4 py-2 font-medium">Soporte</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pagos.map((p) => (
-                      <tr key={p.id} className="border-b border-line-200 last:border-0">
-                        <td className="px-4 py-2.5 tabular-nums text-ink-700">{fechaCorta(p.createdAt)}</td>
-                        <td className="px-4 py-2.5 text-ink-900">
-                          {planes?.[p.plan]?.nombre ?? p.plan} · {ETIQUETA_DE_PERIODO[p.period]}
-                        </td>
-                        <td className="px-4 py-2.5 tabular-nums text-ink-700">
-                          {fechaCorta(p.validFrom)} → {fechaCorta(p.validUntil)}
-                        </td>
-                        <td className="px-4 py-2.5 text-right tabular-nums text-ink-900">{pesos(p.amountCop)}</td>
-                        <td className="px-4 py-2.5 text-ink-500">{p.userEmail}</td>
-                        <td className="px-4 py-2.5">
-                          <button
-                            type="button"
-                            onClick={() => generarCuentaDeCobro(p, { nombre: activeFirm.name, nit: activeFirm.nit, correo: p.userEmail })}
-                            className="btn-neutral btn-sm whitespace-nowrap"
-                            title="Descargar la cuenta de cobro de este pago en PDF"
-                          >
-                            Cuenta de cobro
-                          </button>
-                        </td>
+                {pagos.length > 0 && <span className="cn-plan-historial-accion">{verHistorial ? 'Ocultar' : 'Ver'}</span>}
+              </button>
+              {verHistorial && pagos.length > 0 && (
+                <div className="cn-plan-tabla-caja">
+                  <table className="cn-plan-tabla">
+                    <thead>
+                      <tr>
+                        <th>Fecha</th>
+                        <th>Plan</th>
+                        <th>Periodo cubierto</th>
+                        <th className="cn-plan-derecha">Valor</th>
+                        <th>Pagó</th>
+                        <th>Soporte</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </section>
+                    </thead>
+                    <tbody>
+                      {pagos.map((p) => (
+                        <tr key={p.id}>
+                          <td className="cn-plan-mono">{fechaCorta(p.createdAt)}</td>
+                          <td>
+                            {planes?.[p.plan]?.nombre ?? p.plan} · {ETIQUETA_DE_PERIODO[p.period]}
+                          </td>
+                          <td className="cn-plan-mono">
+                            {fechaCorta(p.validFrom)} → {fechaCorta(p.validUntil)}
+                          </td>
+                          <td className="cn-plan-mono cn-plan-derecha">{pesos(p.amountCop)}</td>
+                          <td>{p.userEmail}</td>
+                          <td>
+                            <button
+                              type="button"
+                              onClick={() => generarCuentaDeCobro(p, { nombre: activeFirm.name, nit: activeFirm.nit, correo: p.userEmail })}
+                              className="cn-plan-tabla-boton"
+                              title="Descargar la cuenta de cobro de este pago en PDF"
+                            >
+                              Cuenta de cobro
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+          )}
         </div>
-      )}
+      </Dialog>
 
       <ConfirmarDialog confirmacion={confirmacion} onCerrar={() => setConfirmacion(null)} />
-    </Dialog>
+    </div>
   );
 };

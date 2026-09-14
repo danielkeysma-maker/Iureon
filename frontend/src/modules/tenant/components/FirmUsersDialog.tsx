@@ -1,37 +1,49 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { RefreshCw, Search, ShieldCheck, UserPlus } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import { firmUsersApi, type UsuarioDeFirma } from '../services/firmUsers.api';
+import type { PlanDeFirma } from '../../subscriptions/types';
+import { NOMBRE_DE_PLAN } from '../../subscriptions/types';
+import { usePlan } from '../../subscriptions/PlanContext';
+import { useTenant } from '../TenantContext';
+import {
+  ROL_EN_PALABRAS,
+  accionesPosibles,
+  esLimiteDeUsuarios,
+  puestosEnPalabras,
+  quedanPuestos,
+  ultimoIngreso
+} from '../usuariosEnPantalla';
 
 /**
- * Gestión de la firma. Diálogo tipo 4 —visor— en tamaño L, del artboard 6c.
+ * «Su firma»: usuarios y roles. Pantalla de `app-administrar-y-saldo.html`
+ * (artboard 1) con sus diálogos (artboard 2): agregar, retirar y «No quedan
+ * puestos». Solo la abre un socio; el operador recibe la consola (App.tsx).
  *
  * ─── TODO LO QUE SE VE ES REAL ──────────────────────────────────────────────
  *
- * La versión anterior guardaba los usuarios en localStorage y el «invitar»
- * fabricaba una cuenta que no existía. Esta lista sale de Supabase Auth — la
- * misma fuente que decide quién puede entrar — así que la pantalla y el acceso
- * no pueden contar historias distintas. El consumo del mes sale de lo cobrado
- * de verdad (`ai_usage`), por usuario.
+ * La lista sale de Supabase Auth —la misma fuente que decide quién entra— y el
+ * consumo del mes de lo cobrado de verdad (`ai_usage`). Las acciones de cada
+ * fila son las que el servidor admite (`accionesPosibles`): a uno mismo no se le
+ * ofrece retirarse ni cambiarse el rol, porque el servidor lo rechaza.
  *
- * ─── AL DESACTIVAR, NADA SE BORRA ───────────────────────────────────────────
+ * ─── LO QUE EL ARTBOARD PIDE Y AQUÍ NO ESTÁ, con la razón ──────────────────
  *
- * Sus escritos, sus verificaciones y su rastro en Auditoría permanecen; solo
- * pierde el acceso. Por eso es desactivar y no eliminar: borrar la cuenta
- * rompería la autoría de todo lo que esa persona hizo.
- *
- * ─── LO QUE EL ARTBOARD 6c PIDE Y AQUÍ NO ESTÁ, con la razón ────────────────
- *
- * · Los roles «Dependiente judicial» y «Contabilidad»: un rol es imposición en
- *   cada endpoint, no una etiqueta. Existen los dos que el servidor impone
- *   (administrador y abogado); los otros dos se agregan cuando su imposición
- *   esté escrita.
- * · Tope de gasto por usuario, segundo factor, restricción de dominio, cierre
- *   por inactividad: cada uno es obra de backend propia. No se pintan
- *   interruptores muertos.
- * · «Invitaciones» con expiración: la creación es directa con contraseña
- *   (no hay flujo de correo de invitación todavía), y eso es lo que la
- *   pantalla ofrece.
+ * · «Invitar a un abogado», «Invitación enviada», «La invitación no vence»: no
+ *   sale ningún correo. La cuenta se crea con la contraseña que el socio
+ *   entrega, y la pantalla lo dice así («Agregar un abogado»). Quien nunca ha
+ *   entrado se muestra como «Todavía no ha entrado», no como invitación.
+ * · «Retirarlo libera un puesto»: FALSO en este servidor. `contarUsuarios`
+ *   cuenta todas las cuentas de la firma, también las desactivadas, así que
+ *   la confirmación dice que el puesto sigue ocupado.
+ * · En la explicación de roles, «recarga saldo» y «pone el membrete» como
+ *   poderes del socio: el servidor no les pone puerta de rol —cualquier
+ *   usuario puede recargar o guardar el membrete—, y decir lo contrario sería
+ *   describir una frontera que no existe.
+ * · «Última actividad»: lo que existe es el último INGRESO (Supabase Auth), y
+ *   la columna se llama así.
+ * · Tope de gasto, segundo factor, dominio de correo y los roles de
+ *   dependiente y contabilidad: se declaran como pendientes en la nota final,
+ *   igual que en el artboard, sin interruptores muertos.
  */
 
 interface FirmUsersDialogProps {
@@ -39,38 +51,48 @@ interface FirmUsersDialogProps {
   onClose: () => void;
   firmName: string;
   firmNit?: string;
+  /**
+   * El correo de la sesión: a uno mismo no se le ofrecen acciones que el
+   * servidor rechaza. Opcional porque Ajustes también monta esta pantalla; sin
+   * él se lee del contexto de la firma, que dice lo mismo.
+   */
+  correoPropio?: string;
+  /** El plan, para los puestos. Sin él se lee del contexto del plan; `null` mientras no se lea. */
+  plan?: PlanDeFirma | null;
+  /** «Ver los planes» cuando no quedan puestos. */
+  onVerPlanes?: () => void;
 }
-
-const ROL: Record<string, string> = {
-  FIRM_ADMIN: 'Socio · administrador',
-  LAWYER: 'Abogado litigante',
-  SUPER_ADMIN: 'Operación Iureon'
-};
 
 const pesos = (v: number): string => `$${Math.round(v).toLocaleString('es-CO')}`;
 
-const hace = (iso: string | null): string => {
-  if (!iso) return 'nunca ha entrado';
-  const min = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
-  if (min < 2) return 'ahora';
-  if (min < 60) return `hace ${min} min`;
-  const h = Math.floor(min / 60);
-  if (h < 24) return `hace ${h} h`;
-  const d = Math.floor(h / 24);
-  return d === 1 ? 'ayer' : `hace ${d} días`;
-};
+type CambioDeRol = { usuario: UsuarioDeFirma; a: 'FIRM_ADMIN' | 'LAWYER' };
+
+const nombreDe = (u: UsuarioDeFirma): string => u.nombre ?? u.email;
 
 export const FirmUsersDialog: React.FC<FirmUsersDialogProps> = ({
   isOpen,
   onClose,
   firmName,
-  firmNit
+  firmNit,
+  correoPropio: correoDeProps,
+  plan: planDeProps,
+  onVerPlanes: verPlanesDeProps
 }) => {
+  const tenant = useTenant();
+  const contextoDelPlan = usePlan();
+  const correoPropio = correoDeProps ?? tenant.currentUserEmail;
+  const plan = planDeProps !== undefined ? planDeProps : contextoDelPlan.plan;
+  const onVerPlanes = verPlanesDeProps ?? (contextoDelPlan.puedePagar ? contextoDelPlan.abrirPlan : undefined);
   const [usuarios, setUsuarios] = useState<UsuarioDeFirma[]>([]);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState('');
   const [busqueda, setBusqueda] = useState('');
   const [crearAbierto, setCrearAbierto] = useState(false);
+  const [porRetirar, setPorRetirar] = useState<UsuarioDeFirma | null>(null);
+  const [porCambiar, setPorCambiar] = useState<CambioDeRol | null>(null);
+  /** `null` = cerrado; texto = el diálogo abierto, con el mensaje del servidor si lo hubo. */
+  const [sinPuestos, setSinPuestos] = useState<string | null>(null);
+  const [ocupado, setOcupado] = useState(false);
 
   const cargar = async () => {
     setCargando(true);
@@ -88,225 +110,377 @@ export const FirmUsersDialog: React.FC<FirmUsersDialogProps> = ({
     if (isOpen) void cargar();
   }, [isOpen]);
 
+  /*
+   * LOS PUESTOS SE CUENTAN SOBRE LA LISTA RECIÉN LEÍDA. El plan de App se leyó
+   * al entrar; tras crear una cuenta su conteo queda atrás. La lista sale del
+   * mismo filtro que usa el servidor para contar (`app_metadata.firm_id`), así
+   * que cuando está cargada manda ella.
+   */
+  const puestos = useMemo(
+    () => (plan ? { ...plan, usuarios: usuarios.length > 0 ? usuarios.length : plan.usuarios } : null),
+    [plan, usuarios.length]
+  );
+
   const visibles = useMemo(() => {
     const q = busqueda.trim().toLowerCase();
     if (!q) return usuarios;
-    return usuarios.filter(
-      (u) => u.email.toLowerCase().includes(q) || (u.nombre ?? '').toLowerCase().includes(q)
-    );
+    return usuarios.filter((u) => u.email.toLowerCase().includes(q) || (u.nombre ?? '').toLowerCase().includes(q));
   }, [usuarios, busqueda]);
 
-  const accion = async (fn: () => Promise<void>) => {
+  const agregar = () => {
+    if (!quedanPuestos(puestos)) {
+      setSinPuestos('');
+      return;
+    }
+    setCrearAbierto(true);
+  };
+
+  const ejecutar = async (fn: () => Promise<void>, alTerminar: () => void) => {
+    setOcupado(true);
     setError('');
     try {
       await fn();
+      alTerminar();
       await cargar();
     } catch (e) {
+      alTerminar();
       setError(e instanceof Error ? e.message : 'No se pudo completar la acción.');
+    } finally {
+      setOcupado(false);
     }
   };
 
+  const libres = puestos && puestos.maxUsers !== null ? Math.max(0, puestos.maxUsers - puestos.usuarios) : null;
+  const nombreDelPlan = plan?.plan ? NOMBRE_DE_PLAN[plan.plan] : 'actual';
+  const enPalabras = puestosEnPalabras(puestos);
+
   return (
-    <>
+    /* El de adentro solo viste la pantalla: las confirmaciones de abajo conservan el título de diálogo. */
+    <div className="cara-nueva cn-adm-dialogos">
+      <div className="cn-adm-pantalla">
       <Dialog
         abierto={isOpen}
         onCerrar={onClose}
         tamano="L"
-        titulo="Gestión de la firma"
+        titulo="Su firma"
         subtitulo={
           <>
             {firmName}
-            {firmNit && <span className="font-mono"> · NIT {firmNit}</span>} · {usuarios.length}{' '}
-            {usuarios.length === 1 ? 'usuario' : 'usuarios'}
+            {firmNit && (
+              <>
+                {' '}· NIT <span className="cn-adm-mono">{firmNit}</span>
+              </>
+            )}
+            {enPalabras && <> · {enPalabras}</>}
           </>
         }
-        cuerpoEnCanvas
+        pieIzquierda={<span>Retirar a alguien le quita el acceso; su trabajo y su rastro quedan en la firma.</span>}
         acciones={
-          <>
-            <button onClick={() => void cargar()} className="btn-neutral btn-sm" disabled={cargando}>
-              <RefreshCw className={`h-3.5 w-3.5 ${cargando ? 'animate-spin' : ''}`} />
-            </button>
-            <button onClick={() => setCrearAbierto(true)} className="btn-primary btn-sm">
-              <UserPlus className="h-3.5 w-3.5" />
-              Crear usuario
-            </button>
-          </>
+          <button type="button" onClick={() => void cargar()} className="cn-adm-boton cn-adm-boton--suave" disabled={cargando}>
+            {cargando ? 'Actualizando…' : 'Actualizar'}
+          </button>
         }
       >
         {/*
-          `[overflow-wrap:anywhere]` en la raíz: los correos de firma son la
-          materia de esta pantalla, y un correo de sesenta caracteres se pinta
-          fuera de su caja sin agrandarla.
-
-          LAS LLAVES NO SON ADORNO. Sin ellas esto no es un comentario sino un
-          hijo del JSX, y React lo imprime: el diálogo mostró el texto del
-          comentario en pantalla. Un comentario entre etiquetas va siempre
-          entre llaves; entre paréntesis de una expresión, no hacen falta.
+          `overflow-wrap:anywhere` vive en las celdas: los correos son la
+          materia de esta pantalla, y uno de sesenta caracteres no puede
+          empujar la tabla fuera del teléfono.
         */}
-        <div className="min-w-0 space-y-4 [overflow-wrap:anywhere]">
-          {error && <p className="notice-unverified text-justify [text-wrap:pretty]">{error}</p>}
+        <div className="cn-adm-cuerpo">
+          {error && (
+            <p role="alert" className="cn-adm-error">
+              {error}
+            </p>
+          )}
 
-          <div className="relative max-w-[300px]">
-            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-400" />
-            <input
-              value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
-              placeholder="Buscar por correo"
-              className="field w-full pl-8"
-            />
+          <div className="cn-adm-barra">
+            <div className="cn-adm-buscar">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" />
+                <line x1="16.5" y1="16.5" x2="21" y2="21" />
+              </svg>
+              <input
+                type="search"
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+                placeholder="Buscar por correo o nombre"
+                aria-label="Buscar por correo o nombre"
+                className="cn-adm-campo cn-adm-campo--buscar"
+              />
+            </div>
+            <button type="button" onClick={agregar} className="cn-adm-boton cn-adm-boton--primario">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              Agregar un abogado
+            </button>
           </div>
 
-          {/* ─── LA TABLA · Usuario · Rol · Consumo mes · Últ. actividad ──── */}
-          <div className="overflow-hidden rounded-card border border-line-200 bg-surface">
-            <div className="t-head hidden items-center gap-3 md:flex">
-              <span className="min-w-0 flex-1">Usuario</span>
-              <span className="w-[160px] shrink-0">Rol</span>
-              <span className="w-[100px] shrink-0 text-right">Consumo mes</span>
-              <span className="w-[110px] shrink-0">Últ. actividad</span>
-              <span className="w-[170px] shrink-0" />
+          {/* ─── LA TABLA · Usuario · Rol · Consumo del mes · Último ingreso ─── */}
+          <div className="cn-adm-tabla cn-adm-tabla--usuarios" role="table" aria-label="Usuarios de la firma">
+            <div className="cn-adm-tabla-cabeza" role="row">
+              <span role="columnheader">Usuario</span>
+              <span role="columnheader">Rol</span>
+              <span role="columnheader" className="cn-adm-derecha">
+                Consumo del mes
+              </span>
+              <span role="columnheader">Último ingreso</span>
+              <span role="columnheader" className="sr-only">
+                Acciones
+              </span>
             </div>
 
-            {visibles.map((u) => (
-              <div
-                key={u.id}
-                /*
-                  TARJETA EN MOVIL, FILA EN ESCRITORIO (8d). Las cuatro columnas
-                  suman 540px antes del correo; en 375 quedaban cuatro datos
-                  sueltos sin rotulo. 8d lo resuelve como tarjeta: identidad
-                  arriba, y debajo —tras un filete— el permiso y el consumo, que
-                  son los dos datos por los que se abre esta pantalla.
-                */
-                className={`t-row flex min-w-0 flex-col items-stretch gap-2 md:flex-row md:flex-wrap md:items-center md:gap-3 ${
-                  u.desactivado ? 'opacity-60' : ''
-                }`}
-              >
-                <span className="min-w-0 flex-1">
-                  {/*
-                    «Nombre · correo» cuando la persona ya puso su nombre. El
-                    correo NO se sustituye: es con lo que se entra y por lo que
-                    esta lista se busca; el nombre solo lo precede.
-                  */}
-                  <span className="block truncate text-ui text-ink-900">
-                    {u.nombre ? `${u.nombre} · ${u.email}` : u.email}
-                  </span>
-                  {u.desactivado && (
-                    <span className="text-[11px] text-ink-400">
-                      desactivado · conserva su rastro en Auditoría
+            {visibles.map((u) => {
+              const puede = accionesPosibles(u, correoPropio);
+              const propio = u.email.trim().toLowerCase() === correoPropio.trim().toLowerCase();
+              const detalle = [u.nombre, propio ? 'usted' : null, u.desactivado ? 'Retirado · conserva su rastro en Auditoría' : null]
+                .filter(Boolean)
+                .join(' · ');
+              return (
+                <div key={u.id} role="row" className={`cn-adm-fila ${u.desactivado ? 'cn-adm-fila--retirada' : ''}`}>
+                  <div role="cell" className="cn-adm-usuario">
+                    <p className="cn-adm-usuario-correo">{u.email}</p>
+                    {detalle && <p className="cn-adm-usuario-detalle">{detalle}</p>}
+                  </div>
+                  <div role="cell" className="cn-adm-fila-rol">
+                    <span className={`cn-adm-rol ${u.role === 'FIRM_ADMIN' ? 'cn-adm-rol--socio' : ''}`}>
+                      {u.role === 'FIRM_ADMIN' && (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z" />
+                        </svg>
+                      )}
+                      {ROL_EN_PALABRAS[u.role] ?? u.role}
                     </span>
-                  )}
-                </span>
-
-                {/*
-                  EN MOVIL EL ROL, EL CONSUMO Y LA ACTIVIDAD VAN EN UNA FILA
-                  BAJO EL FILETE, como en la maqueta. En escritorio siguen
-                  siendo tres columnas, que es lo que permite comparar doce
-                  personas de un vistazo.
-                */}
-                <span className="flex min-w-0 items-center gap-2 border-t border-line-100 pt-2 md:contents md:border-0 md:pt-0">
-                <span className="min-w-0 flex-1 md:w-[160px] md:flex-none md:shrink-0">
-                  <span className="block text-[12.5px] text-ink-900">{ROL[u.role] ?? u.role}</span>
-                  {/* La frontera real: verificar el catálogo es de socios, y el servidor lo impone. */}
-                  <span className={`text-[11px] ${u.role === 'FIRM_ADMIN' ? 'text-verified' : 'text-ink-400'}`}>
-                    {u.role === 'FIRM_ADMIN' ? 'Puede curar el catálogo' : 'Propone, no verifica'}
-                  </span>
-                </span>
-
-                <span className="shrink-0 text-right font-mono text-[12px] text-ink-900 md:w-[100px]">
-                  {u.consumoMesCop > 0 ? pesos(u.consumoMesCop) : '—'}
-                </span>
-
-                <span className="shrink-0 text-meta text-ink-500 md:w-[110px]">
-                  {hace(u.ultimoAcceso)}
-                </span>
-                </span>
-
-                <span className="flex flex-wrap justify-end gap-1.5 md:w-[170px] md:shrink-0 md:flex-nowrap">
-                  {u.role !== 'SUPER_ADMIN' && (
-                    <>
+                  </div>
+                  <div role="cell" className="cn-adm-fila-consumo">
+                    <span className="cn-adm-rotulo-movil">Consumo del mes</span>
+                    <span className="cn-adm-mono">{u.consumoMesCop > 0 ? pesos(u.consumoMesCop) : '—'}</span>
+                  </div>
+                  <div role="cell" className={`cn-adm-fila-ingreso ${!u.ultimoAcceso && !u.desactivado ? 'cn-adm-fila-ingreso--nunca' : ''}`}>
+                    <span className="cn-adm-rotulo-movil">Último ingreso</span>
+                    {ultimoIngreso(u.ultimoAcceso)}
+                  </div>
+                  <div role="cell" className="cn-adm-fila-acciones">
+                    {puede.cambiarRol && (
                       <button
-                        onClick={() =>
-                          void accion(() =>
-                            firmUsersApi.setRol(u.id, u.role === 'FIRM_ADMIN' ? 'LAWYER' : 'FIRM_ADMIN')
-                          )
-                        }
-                        className="btn-neutral btn-sm"
-                        title={u.role === 'FIRM_ADMIN' ? 'Pasar a abogado litigante' : 'Hacer socio administrador'}
+                        type="button"
+                        className="cn-adm-boton cn-adm-boton--terciario"
+                        onClick={() => setPorCambiar({ usuario: u, a: u.role === 'FIRM_ADMIN' ? 'LAWYER' : 'FIRM_ADMIN' })}
                       >
-                        {u.role === 'FIRM_ADMIN' ? 'Quitar admin' : 'Hacer socio'}
+                        {u.role === 'FIRM_ADMIN' ? 'Pasar a abogado' : 'Hacer socio'}
                       </button>
+                    )}
+                    {puede.retirar && (
                       <button
-                        onClick={() => void accion(() => firmUsersApi.setActivo(u.id, u.desactivado))}
-                        className={u.desactivado ? 'btn-secondary btn-sm' : 'btn-danger btn-sm'}
+                        type="button"
+                        className="cn-adm-boton cn-adm-boton--terciario cn-adm-boton--texto-peligro"
+                        onClick={() => setPorRetirar(u)}
                       >
-                        {u.desactivado ? 'Reactivar' : 'Desactivar'}
+                        Retirar
                       </button>
-                    </>
-                  )}
-                </span>
-              </div>
-            ))}
+                    )}
+                    {puede.reactivar && (
+                      <button
+                        type="button"
+                        className="cn-adm-boton cn-adm-boton--terciario"
+                        disabled={ocupado}
+                        onClick={() => void ejecutar(() => firmUsersApi.setActivo(u.id, true), () => undefined)}
+                      >
+                        Reactivar
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
 
-            {visibles.length === 0 && !cargando && (
-              <p className="px-4 py-6 text-center text-meta text-ink-500">
-                {usuarios.length === 0 ? 'Todavía no hay usuarios en la firma.' : 'Ninguno coincide.'}
+            {visibles.length === 0 && (
+              <p className="cn-adm-vacio">
+                {cargando
+                  ? 'Leyendo los usuarios de la firma…'
+                  : usuarios.length === 0
+                    ? 'Todavía no hay usuarios en la firma.'
+                    : 'Ningún usuario coincide con la búsqueda.'}
               </p>
             )}
           </div>
 
-          {/* ─── LOS DOS ROLES, CON SU DIFERENCIA REAL ─────────────────────── */}
-          <div className="rounded-card border border-line-200 bg-surface p-4">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="h-4 w-4 shrink-0 text-brand-700" />
-              <h3 className="text-ui font-semibold text-ink-900">Dos roles, una diferencia real</h3>
+          {/* ─── LOS DOS ROLES, CON SU DIFERENCIA REAL (la que impone el servidor) ─── */}
+          <section className="cn-adm-nota">
+            <h3 className="cn-adm-nota-titulo">Dos roles, una diferencia real</h3>
+            <div className="cn-adm-nota-roles">
+              <div>
+                <p className="cn-adm-nota-rol">Socio · administrador</p>
+                <p className="cn-adm-nota-texto">
+                  Todo lo del abogado, y además: agrega y retira usuarios, cambia roles, paga el plan y{' '}
+                  <strong>verifica actuaciones del catálogo</strong> para toda la firma.
+                </p>
+              </div>
+              <div>
+                <p className="cn-adm-nota-rol">Abogado litigante</p>
+                <p className="cn-adm-nota-texto">
+                  Trabaja: redacta, revisa, transcribe y consulta. Consume del saldo compartido, que cualquier usuario
+                  de la firma puede recargar.
+                </p>
+              </div>
             </div>
-            <dl className="mt-2 space-y-1.5">
-              <div>
-                <dt className="text-ui font-medium text-ink-900">Socio · administrador</dt>
-                <dd className="text-justify text-meta leading-[1.5] text-ink-500 [text-wrap:pretty]">
-                  Todo lo del abogado, más: verificar el catálogo, cambiar marca y formato, crear y
-                  desactivar usuarios.
-                </dd>
-              </div>
-              <div>
-                <dt className="text-ui font-medium text-ink-900">Abogado litigante</dt>
-                <dd className="text-justify text-meta leading-[1.5] text-ink-500 [text-wrap:pretty]">
-                  Redacta, orienta, graba, exporta y propone actuaciones al catálogo; no las
-                  verifica.
-                </dd>
-              </div>
-            </dl>
-            <p className="mt-2 border-t border-line-100 pt-2 text-meta leading-[1.5] text-ink-500 text-justify">
-              La única frontera que importa: <span className="font-medium text-ink-900">verificar es de socios</span>,
-              y el servidor la impone — de eso depende que las actuaciones verificadas signifiquen
-              algo.
+            <p className="cn-adm-nota-frontera">
+              La única frontera que importa: <strong>verificar es de socios</strong>. Una verificación dice «esta firma
+              responde por este término», y el servidor no deja que la firme cualquiera.
             </p>
-          </div>
+          </section>
 
-          <p className="text-meta leading-[1.6] text-ink-400 text-justify">
-            Al desactivar a alguien, sus escritos y sus verificaciones permanecen; solo pierde el
-            acceso. Nunca se borra su rastro.
-          </p>
+          <section className="cn-adm-nota cn-adm-nota--gris">
+            <h3 className="cn-adm-nota-titulo">Lo que todavía no existe, y por qué no está pintado aquí</h3>
+            <p className="cn-adm-nota-texto">
+              Tope de gasto por usuario, segundo factor, restricción de dominio de correo, invitaciones por correo y los
+              roles de dependiente judicial y contabilidad. Cada uno necesita trabajo de servidor: un interruptor que no
+              impone nada en el servidor es peor que su ausencia.
+            </p>
+          </section>
         </div>
       </Dialog>
+      </div>
 
       <CrearUsuarioDialog
         abierto={crearAbierto}
         onCerrar={() => setCrearAbierto(false)}
         onCreado={() => void cargar()}
+        onSinPuestos={(mensaje) => {
+          setCrearAbierto(false);
+          setSinPuestos(mensaje);
+        }}
+        subtitulo={
+          libres !== null && puestos?.maxUsers
+            ? `${libres === 1 ? 'Queda 1 puesto libre' : `Quedan ${libres} puestos libres`} de los ${puestos.maxUsers} del plan ${nombreDelPlan}.`
+            : 'La cuenta queda activa de inmediato, con la contraseña que usted entregue.'
+        }
       />
-    </>
+
+      {/* ─── RETIRAR · confirmación destructiva, #8C2F26 ─────────────────── */}
+      <Dialog
+        abierto={porRetirar !== null}
+        onCerrar={() => !ocupado && setPorRetirar(null)}
+        tamano="S"
+        titulo={porRetirar ? `¿Retirar a ${nombreDe(porRetirar)}?` : ''}
+        acciones={
+          <>
+            <button type="button" className="cn-adm-boton cn-adm-boton--terciario" disabled={ocupado} onClick={() => setPorRetirar(null)}>
+              No, dejarlo
+            </button>
+            <button
+              type="button"
+              className="cn-adm-boton cn-adm-boton--peligro"
+              disabled={ocupado}
+              onClick={() =>
+                porRetirar && void ejecutar(() => firmUsersApi.setActivo(porRetirar.id, false), () => setPorRetirar(null))
+              }
+            >
+              {ocupado ? 'Retirando…' : 'Sí, retirarlo'}
+            </button>
+          </>
+        }
+      >
+        <p className="cn-adm-texto">
+          Pierde el acceso en menos de un minuto y <strong>sigue ocupando su puesto</strong> del plan mientras la cuenta
+          exista. <strong>Su trabajo no se borra</strong>: los borradores, las revisiones y los casos que abrió siguen en
+          la firma, con su nombre.
+        </p>
+        <p className="cn-adm-recuadro">
+          Lo que hizo queda en la auditoría. Retirarlo no borra ese registro, y puede reactivarlo cuando quiera.
+        </p>
+      </Dialog>
+
+      {/* ─── CAMBIAR EL ROL · no destruye, pero da o quita poderes: se confirma ─── */}
+      <Dialog
+        abierto={porCambiar !== null}
+        onCerrar={() => !ocupado && setPorCambiar(null)}
+        tamano="S"
+        titulo={
+          porCambiar
+            ? porCambiar.a === 'FIRM_ADMIN'
+              ? `¿Hacer socio a ${nombreDe(porCambiar.usuario)}?`
+              : `¿Pasar a ${nombreDe(porCambiar.usuario)} a abogado litigante?`
+            : ''
+        }
+        acciones={
+          <>
+            <button type="button" className="cn-adm-boton cn-adm-boton--terciario" disabled={ocupado} onClick={() => setPorCambiar(null)}>
+              Cancelar
+            </button>
+            <button
+              type="button"
+              className="cn-adm-boton cn-adm-boton--primario"
+              disabled={ocupado}
+              onClick={() =>
+                porCambiar &&
+                void ejecutar(() => firmUsersApi.setRol(porCambiar.usuario.id, porCambiar.a), () => setPorCambiar(null))
+              }
+            >
+              {ocupado ? 'Cambiando…' : porCambiar?.a === 'FIRM_ADMIN' ? 'Sí, hacerlo socio' : 'Sí, cambiar el rol'}
+            </button>
+          </>
+        }
+      >
+        <p className="cn-adm-texto">
+          {porCambiar?.a === 'FIRM_ADMIN'
+            ? 'Podrá agregar y retirar usuarios, cambiar roles, pagar el plan y verificar actuaciones del catálogo para toda la firma.'
+            : 'Deja de poder administrar usuarios, pagar el plan y verificar actuaciones. Conserva su trabajo.'}{' '}
+          El cambio rige en menos de un minuto.
+        </p>
+      </Dialog>
+
+      {/* ─── NO QUEDAN PUESTOS · antes de abrir el formulario, o con el 409 del servidor ─── */}
+      <Dialog
+        abierto={sinPuestos !== null}
+        onCerrar={() => setSinPuestos(null)}
+        tamano="S"
+        titulo="No quedan puestos"
+        acciones={
+          <>
+            <button type="button" className="cn-adm-boton cn-adm-boton--terciario" onClick={() => setSinPuestos(null)}>
+              Ver los usuarios
+            </button>
+            {onVerPlanes && (
+              <button
+                type="button"
+                className="cn-adm-boton cn-adm-boton--primario"
+                onClick={() => {
+                  setSinPuestos(null);
+                  onVerPlanes();
+                }}
+              >
+                Ver los planes
+              </button>
+            )}
+          </>
+        }
+      >
+        <p className="cn-adm-texto">
+          {sinPuestos ||
+            (puestos?.maxUsers
+              ? `El plan ${nombreDelPlan} llega a ${puestos.maxUsers} ${puestos.maxUsers === 1 ? 'usuario' : 'usuarios'} y la firma ya tiene ${puestos.usuarios}. Puede pasar a un plan con más puestos.`
+              : 'El plan de la firma no admite más usuarios.')}
+        </p>
+        <p className="cn-adm-recuadro">Las cuentas retiradas también ocupan su puesto mientras existan.</p>
+      </Dialog>
+    </div>
   );
 };
 
 /**
- * Crear usuario. Tipo 2 (formulario, M). Directo con contraseña — no hay flujo
- * de correo de invitación todavía, y la pantalla ofrece lo que existe.
+ * Agregar un abogado. Diálogo M del artboard 2: correo, nombre opcional, rol en
+ * dos tarjetas y contraseña inicial. Directo con contraseña —no hay correo de
+ * invitación— y la pantalla lo dice antes de crear.
  */
 const CrearUsuarioDialog: React.FC<{
   abierto: boolean;
   onCerrar: () => void;
   onCreado: () => void;
-}> = ({ abierto, onCerrar, onCreado }) => {
+  onSinPuestos: (mensaje: string) => void;
+  subtitulo: string;
+}> = ({ abierto, onCerrar, onCreado, onSinPuestos, subtitulo }) => {
   const [email, setEmail] = useState('');
   const [nombre, setNombre] = useState('');
   const [password, setPassword] = useState('');
@@ -314,7 +488,16 @@ const CrearUsuarioDialog: React.FC<{
   const [error, setError] = useState('');
   const [creando, setCreando] = useState(false);
 
+  // 8 caracteres: la misma regla que impone `addUserToFirm` (WEAK_PASSWORD).
   const listo = email.includes('@') && password.length >= 8;
+
+  const limpiar = () => {
+    setEmail('');
+    setNombre('');
+    setPassword('');
+    setRole('LAWYER');
+    setError('');
+  };
 
   const crear = async () => {
     if (!listo) return;
@@ -322,27 +505,23 @@ const CrearUsuarioDialog: React.FC<{
     setError('');
     try {
       await firmUsersApi.crear(email.trim(), password, role, nombre);
-      setEmail('');
-      setNombre('');
-      setPassword('');
-      setRole('LAWYER');
+      limpiar();
       onCreado();
       onCerrar();
     } catch (e) {
+      if (esLimiteDeUsuarios(e)) {
+        onSinPuestos(e instanceof Error ? e.message : '');
+        return;
+      }
       setError(e instanceof Error ? e.message : 'No se pudo crear la cuenta.');
     } finally {
       setCreando(false);
     }
   };
 
-  /* Lo que el rol elegido PUEDE, dicho antes de crear — no después. */
-  const permisos: Array<[string, boolean]> = [
-    ['Redactar y exportar escritos', true],
-    ['Grabar entrevistas y audiencias', true],
-    ['Proponer actuaciones al catálogo', true],
-    ['Verificar actuaciones', role === 'FIRM_ADMIN'],
-    ['Cambiar marca y formato', role === 'FIRM_ADMIN'],
-    ['Crear y desactivar usuarios', role === 'FIRM_ADMIN']
+  const OPCIONES: Array<{ valor: 'LAWYER' | 'FIRM_ADMIN'; detalle: string }> = [
+    { valor: 'LAWYER', detalle: 'Trabaja y consume saldo' },
+    { valor: 'FIRM_ADMIN', detalle: 'Además administra y verifica' }
   ];
 
   return (
@@ -350,98 +529,94 @@ const CrearUsuarioDialog: React.FC<{
       abierto={abierto}
       onCerrar={onCerrar}
       tamano="M"
-      titulo="Crear usuario"
-      subtitulo="La cuenta queda activa de inmediato, con la contraseña que usted entregue."
+      titulo="Agregar un abogado"
+      subtitulo={subtitulo}
       hayCambiosSinGuardar={Boolean(email || nombre || password)}
       onIntentoDeCerrarConCambios={() => undefined}
       acciones={
         <>
-          <button onClick={onCerrar} className="btn-neutral btn-sm" disabled={creando}>
+          <button type="button" onClick={onCerrar} className="cn-adm-boton cn-adm-boton--terciario" disabled={creando}>
             Cancelar
           </button>
-          <button onClick={() => void crear()} className="btn-primary btn-sm" disabled={!listo || creando}>
-            {creando ? 'Creando…' : 'Crear cuenta'}
+          <button type="button" onClick={() => void crear()} className="cn-adm-boton cn-adm-boton--primario" disabled={!listo || creando}>
+            {creando ? 'Creando…' : 'Crear el usuario'}
           </button>
         </>
       }
     >
-      <div className="min-w-0 space-y-3 [overflow-wrap:anywhere]">
-        <label className="block">
-          <span className="field-label">Correo</span>
+      <div className="cn-adm-campos">
+        <div>
+          <label className="cn-adm-etiqueta" htmlFor="cn-adm-nuevo-correo">
+            Correo
+          </label>
           <input
+            id="cn-adm-nuevo-correo"
+            type="email"
+            autoComplete="off"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="valentina.orozco@sufirma.co"
-            className="field mt-1 w-full"
+            placeholder="nombre@sufirma.co"
+            className="cn-adm-campo"
           />
-        </label>
-
-        <label className="block">
-          <span className="field-label">Nombre (opcional)</span>
-          <input
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            placeholder="Valentina Orozco"
-            className="field mt-1 w-full"
-          />
-          <span className="mt-1 block text-justify text-meta leading-[1.5] text-ink-400 [text-wrap:pretty]">
-            Aparecerá en esta lista junto al correo. Si lo deja vacío, la persona lo pone desde
-            Ajustes → «Su cuenta».
-          </span>
-        </label>
-
-        <label className="block">
-          <span className="field-label">Contraseña inicial</span>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Mínimo 8 caracteres"
-            className="field mt-1 w-full"
-          />
-          <span className="mt-1 block text-justify text-meta leading-[1.5] text-ink-400 [text-wrap:pretty]">
-            Entréguela por un canal seguro; la persona puede cambiarla al entrar.
-          </span>
-        </label>
+        </div>
 
         <div>
-          <span className="field-label">Rol</span>
-          <div className="mt-1 flex flex-wrap gap-1.5">
-            {(['LAWYER', 'FIRM_ADMIN'] as const).map((r) => (
+          <label className="cn-adm-etiqueta" htmlFor="cn-adm-nuevo-nombre">
+            Nombre <span className="cn-adm-etiqueta-opcional">(opcional)</span>
+          </label>
+          <input
+            id="cn-adm-nuevo-nombre"
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
+            placeholder="Nombre y apellido"
+            className="cn-adm-campo"
+          />
+          <p className="cn-adm-ayuda">Si lo deja vacío, la persona lo pone desde Ajustes, en «Su cuenta».</p>
+        </div>
+
+        <div role="radiogroup" aria-label="Rol">
+          <p className="cn-adm-etiqueta">Rol</p>
+          <div className="cn-adm-opciones">
+            {OPCIONES.map((o) => (
               <button
-                key={r}
+                key={o.valor}
                 type="button"
-                onClick={() => setRole(r)}
-                className={`rounded-control border px-3 py-1.5 text-[12.5px] font-medium ${
-                  role === r
-                    ? 'border-brand-700 bg-brand-50 text-brand-700'
-                    : 'border-line-200 bg-canvas text-ink-700 hover:border-brand-700'
-                }`}
+                role="radio"
+                aria-checked={role === o.valor}
+                onClick={() => setRole(o.valor)}
+                className={`cn-adm-opcion ${role === o.valor ? 'cn-adm-opcion--elegida' : ''}`}
               >
-                {ROL[r]}
+                <span className="cn-adm-opcion-titulo">{ROL_EN_PALABRAS[o.valor]}</span>
+                <span className="cn-adm-opcion-detalle">{o.detalle}</span>
               </button>
             ))}
           </div>
         </div>
 
-        <div className="rounded-card border border-line-200 bg-canvas px-3.5 py-3">
-          <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
-            Con este rol podrá
+        <div>
+          <label className="cn-adm-etiqueta" htmlFor="cn-adm-nuevo-clave">
+            Contraseña inicial
+          </label>
+          <input
+            id="cn-adm-nuevo-clave"
+            type="password"
+            autoComplete="new-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Mínimo 8 caracteres"
+            className="cn-adm-campo"
+          />
+          <p className="cn-adm-ayuda">
+            Se la entrega usted por un canal seguro; no sale ningún correo. La cuenta queda activa de inmediato y ocupa
+            un puesto del plan.
           </p>
-          <ul className="mt-1.5 space-y-1">
-            {permisos.map(([texto, puede]) => (
-              <li
-                key={texto}
-                className={`flex items-center gap-2 text-ui ${puede ? 'text-ink-900' : 'text-ink-400 line-through'}`}
-              >
-                <span className={puede ? 'text-verified' : 'text-ink-400'}>{puede ? '✓' : '✗'}</span>
-                {texto}
-              </li>
-            ))}
-          </ul>
         </div>
 
-        {error && <p className="notice-unverified text-justify [text-wrap:pretty]">{error}</p>}
+        {error && (
+          <p role="alert" className="cn-adm-error">
+            {error}
+          </p>
+        )}
       </div>
     </Dialog>
   );

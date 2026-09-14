@@ -1,9 +1,17 @@
 import React from 'react';
-import { ArrowDownRight, ArrowUpRight, Download, RefreshCw } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
-import { billingApi, type BillingSummary, type CheckoutIntent, type Movement } from '../billing.api';
+import { billingApi, type BillingSummary, type Movement, type Recharge } from '../billing.api';
+import { firmUsersApi, type UsuarioDeFirma } from '../../tenant/services/firmUsers.api';
 import { ExtractoDelPeriodo } from './ExtractoDelPeriodo';
-import { urlDelCheckout } from '../wompiCheckout';
+import { RecargarSaldoDialog } from './RecargarSaldoDialog';
+import {
+  buscarIntento,
+  estadoDeRecarga,
+  leerRecargaEnCurso,
+  olvidarRecargaEnCurso,
+  pesos,
+  textoDelEstado
+} from '../recargaEnPantalla';
 
 interface BalancePanelProps {
   isOpen: boolean;
@@ -11,76 +19,79 @@ interface BalancePanelProps {
   firmName: string;
   /** El NIT va en la cabecera: la cuenta es de la firma, no de quien mira. */
   firmNit?: string;
+  /**
+   * Solo el socio ve «Quién consumió»: sale de la lista de usuarios, que el
+   * servidor niega con 403 a un abogado. Recargar, en cambio, lo puede
+   * cualquiera — el servidor no le pone puerta de rol.
+   */
+  esAdministrador?: boolean;
+  /** «Escribir a soporte» tras un pago rechazado. */
+  onSoporte?: () => void;
 }
 
 /**
- * Saldo y recarga. Diálogo tipo 4 —visor— en tamaño L, según el artboard 1k.
+ * Saldo de la firma. Pantalla de `app-administrar-y-saldo.html` (artboard 3):
+ * la cifra disponible en la tarjeta oscura con «Recargar», lo cobrado y el
+ * costo medio al lado, quién consumió, y los movimientos en tabla.
  *
  * ─── EL SALDO SE TRADUCE A ESCRITOS ─────────────────────────────────────────
  *
  * «$412.500» no dice si alcanza para el término de mañana; «≈121 escritos» sí.
  * La traducción usa el costo medio REAL de los escritos de esta firma este
- * mes, calculado por el servidor — y cuando el mes no tiene escritos, la cifra
- * se declara «al precio base», porque un promedio de cero escritos no es un
- * promedio.
+ * mes, calculado por el servidor — y cuando el mes no tiene escritos, se
+ * declara «al precio base», porque un promedio de cero escritos no es uno.
+ *
+ * ─── LOS ESTADOS DEL PAGO SON LOS DEL SERVIDOR ──────────────────────────────
+ *
+ * Antes no había ninguno: se volvía de Wompi a una aplicación que no sabía que
+ * hubo un pago. Ahora la referencia se guarda en la pestaña al saltar, Saldo se
+ * reabre al volver y consulta `GET /billing/recharges` cada cinco segundos
+ * mientras el intento siga PENDING. Lo que se pinta —esperando, recargado,
+ * rechazado, anulado, fallido— es lo que el webhook escribió, nunca un
+ * temporizador que finge (el modal original anunciaba «Recarga acreditada» a
+ * los 800 ms sin pago ni servidor).
  *
  * ─── LO QUE EL ARTBOARD PIDE Y AQUÍ NO ESTÁ, con la razón ──────────────────
  *
- * · El desglose de IVA (19%) sobre la recarga: el servidor firma el monto tal
- *   cual y la comisión de la pasarela la absorbe la plataforma — mostrar un
- *   IVA que no se cobra sería inventar un impuesto.
- * · «Factura electrónica al correo de facturación»: la factura electrónica no
- *   existe todavía; anunciarla sería prometer un documento que no va a llegar.
- *   Lo que SÍ hay es el extracto del período con su comprobante imprimible,
- *   que dice en su pie que no es factura (ExtractoDelPeriodo.tsx).
- * · «Avisar a los socios bajo $120.000»: no hay sistema de avisos. La regla
- *   que SÍ es real se declara abajo: el cobro se reserva al INICIAR el
- *   escrito, así que la generación nunca se corta a mitad de uno.
- *
- * Lo que sí reemplazó esta pantalla desde su primera versión: un modal que
- * anunciaba «✅ Recarga acreditada» tras un setTimeout, sin pago ni servidor.
- * Todo lo de aquí viene del servidor, incluida la firma del checkout de Wompi.
+ * · «Descargar en Excel»: lo que se descarga es un CSV (con BOM, Excel lo abre
+ *   con acentos). El botón dice lo que entrega.
+ * · «La factura electrónica… llegará al correo de facturación»: no existe
+ *   todavía; se dice que no se emite, sin prometer cuándo.
+ * · Un estado «vencido» del pago: el servidor no vence intenciones.
+ * · Los nombres «C. Restrepo» en movimientos: el libro guarda el correo de
+ *   quien consumió, y eso es lo que se muestra.
  */
 
-const pesos = (valor: number): string => `$${Math.round(valor).toLocaleString('es-CO')}`;
-
 const fecha = (iso: string): string =>
-  new Date(iso).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' });
+  new Date(iso).toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-const MES_ACTUAL = new Date().toLocaleDateString('es-CO', { month: 'long' });
+const csv = (valor: string | number | null | undefined): string => `"${String(valor ?? '').replace(/"/g, '""')}"`;
 
-/** Los montos que una firma recarga de verdad. «Otro» abre el campo. */
-const PRESETS = [100_000, 300_000, 500_000, 1_000_000];
-
-const csv = (valor: string | number | null | undefined): string =>
-  `"${String(valor ?? '').replace(/"/g, '""')}"`;
+const CADA_CUANTO_SE_CONSULTA_MS = 5000;
 
 export const BalancePanel: React.FC<BalancePanelProps> = ({
   isOpen,
   onClose,
   firmName,
-  firmNit
+  firmNit,
+  esAdministrador = false,
+  onSoporte
 }) => {
   const [summary, setSummary] = React.useState<BillingSummary | null>(null);
-  // Read from the server rather than written here, so the figure on screen and
-  // the rule that enforces it can never say two different things.
+  // Leído del servidor y no escrito aquí: la cifra en pantalla y la regla que la impone no pueden discrepar.
   const [minRecharge, setMinRecharge] = React.useState(0);
   const [movements, setMovements] = React.useState<Movement[]>([]);
+  const [consumo, setConsumo] = React.useState<UsuarioDeFirma[] | null>(null);
   const [cargando, setCargando] = React.useState(false);
   const [error, setError] = React.useState('');
-  const [monto, setMonto] = React.useState('');
-  const [otroAbierto, setOtroAbierto] = React.useState(false);
-  const [abriendo, setAbriendo] = React.useState(false);
-  /**
-   * La URL del checkout ya firmada, para ofrecerla como enlace si el salto
-   * automatico no ocurrio. Se limpia al cerrar el panel.
-   */
-  const [enlaceCheckout, setEnlaceCheckout] = React.useState<string | null>(null);
+  const [recargaAbierta, setRecargaAbierta] = React.useState(false);
+  const [referencia, setReferencia] = React.useState<string | null>(null);
+  const [intento, setIntento] = React.useState<Recharge | null>(null);
+  const movimientosRef = React.useRef<HTMLElement>(null);
 
   const cargar = React.useCallback(async () => {
     setCargando(true);
     setError('');
-
     try {
       const [{ summary: resumen, minRecharge: minimo }, movs] = await Promise.all([
         billingApi.summary(),
@@ -94,69 +105,66 @@ export const BalancePanel: React.FC<BalancePanelProps> = ({
     } finally {
       setCargando(false);
     }
-  }, []);
+    /* Quién consumió: solo para el socio. Si falla, la tarjeta no se pinta; el saldo no depende de ella. */
+    if (esAdministrador) {
+      firmUsersApi.list().then(setConsumo).catch(() => setConsumo(null));
+    }
+  }, [esAdministrador]);
+
+  React.useEffect(() => {
+    if (!isOpen) return;
+    void cargar();
+    setReferencia(leerRecargaEnCurso());
+  }, [isOpen, cargar]);
 
   /*
-   * Hands the browser off to Wompi's checkout.
-   *
-   * A form POST and not a fetch, because the client has to LAND on Wompi's page
-   * to type their card: an XHR would fetch the checkout HTML into this tab and
-   * show nothing. Every field comes from the server's intent — including the
-   * signature, which is what makes editing any of them produce a checkout Wompi
-   * refuses.
+   * LA ESPERA CONSULTA AL SERVIDOR. Mientras el intento siga PENDING (o todavía
+   * no aparezca en la lista) se vuelve a preguntar; al aprobarse se relee el
+   * saldo para que la cifra nueva sea la del servidor.
    */
-  /*
-   * La URL del checkout vive en `wompiCheckout.ts`: la comparte el pago del
-   * plan, y dos copias de los campos que Wompi exige se separarian en silencio.
-   */
+  React.useEffect(() => {
+    if (!isOpen || !referencia) return;
+    let vigente = true;
+    let temporizador: number | undefined;
 
-  /*
-   * EL SALTO SE HACE NAVEGANDO, Y SI NO OCURRE SE OFRECE EL ENLACE.
-   *
-   * Antes se fabricaba un <form method="GET"> oculto y se llamaba a
-   * `form.submit()`. En el escritorio funciona; en el telefono el usuario
-   * toco «Pagar», la intencion quedo registrada en el servidor (se ve en
-   * `payment_intents`, con su hora) y la pantalla no se movio. Un envio
-   * programatico despues de un `await` es exactamente la clase de navegacion
-   * que algunos navegadores moviles frenan en silencio, y un formulario
-   * invisible no deja nada que el usuario pueda tocar.
-   *
-   * `location.assign` con la URL del checkout es el mismo GET sin el
-   * formulario intermedio. Y por si tampoco ocurre, la URL se muestra como
-   * enlace de respaldo: un toque del usuario es una navegacion que ningun
-   * navegador bloquea. La intencion es la misma —misma referencia, misma
-   * firma— asi que abrirla por el enlace no crea un segundo intento.
-   */
-  const irAlCheckout = (intent: CheckoutIntent): void => {
-    const url = urlDelCheckout(intent);
-    setEnlaceCheckout(url);
-    window.location.assign(url);
+    const consultar = async (): Promise<void> => {
+      try {
+        const hallado = buscarIntento(await billingApi.recharges(), referencia);
+        if (!vigente) return;
+        setIntento(hallado);
+        const estado = hallado ? estadoDeRecarga(hallado.status) : null;
+        if (estado === null || estado === 'esperando') {
+          temporizador = window.setTimeout(() => void consultar(), CADA_CUANTO_SE_CONSULTA_MS);
+          return;
+        }
+        if (estado === 'aprobada') void cargar();
+      } catch {
+        if (vigente) temporizador = window.setTimeout(() => void consultar(), CADA_CUANTO_SE_CONSULTA_MS);
+      }
+    };
+
+    void consultar();
+    return () => {
+      vigente = false;
+      window.clearTimeout(temporizador);
+    };
+  }, [isOpen, referencia, cargar]);
+
+  const olvidarIntento = () => {
+    olvidarRecargaEnCurso();
+    setReferencia(null);
+    setIntento(null);
   };
 
-  const recargar = async () => {
-    const valor = Number(monto);
-    if (!valor) return;
-
-    setAbriendo(true);
-    setError('');
-
-    try {
-      irAlCheckout(await billingApi.startRecharge(valor));
-      /*
-       * Si en tres segundos seguimos aqui, la navegacion no ocurrio: se suelta
-       * el boton y el enlace de respaldo queda a la vista. Si si ocurrio, esta
-       * pestaña ya no existe y el temporizador muere con ella.
-       */
-      window.setTimeout(() => setAbriendo(false), 3000);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'No se pudo iniciar la recarga.');
-      setAbriendo(false);
-    }
+  /* Un intento ya resuelto se olvida al cerrar; uno que sigue esperando se conserva para la próxima apertura. */
+  const cerrar = () => {
+    if (intento && estadoDeRecarga(intento.status) !== 'esperando') olvidarIntento();
+    onClose();
   };
 
   /** La tabla tal como se ve, con BOM para que Excel lea los acentos. */
   const exportarCsv = () => {
-    const cabecera = ['Fecha', 'Concepto', 'Usuario', 'Valor', 'Saldo'];
+    const cabecera = ['Fecha', 'Concepto', 'Usuario', 'Monto', 'Saldo después'];
     const filas = movements.map((m) =>
       [csv(fecha(m.createdAt)), csv(m.description), csv(m.actorEmail), csv(m.amountCop), csv(m.balanceAfterCop)].join(',')
     );
@@ -171,274 +179,274 @@ export const BalancePanel: React.FC<BalancePanelProps> = ({
     URL.revokeObjectURL(url);
   };
 
-  React.useEffect(() => {
-    if (isOpen) void cargar();
-    else setEnlaceCheckout(null);
-  }, [isOpen, cargar]);
-
-  const valorElegido = Number(monto);
   const mes = summary?.mes;
+  const consumidores = (consumo ?? [])
+    .filter((u) => u.consumoMesCop > 0)
+    .sort((a, b) => b.consumoMesCop - a.consumoMesCop);
+
+  const estado = intento ? estadoDeRecarga(intento.status) : null;
+  const textos = estado ? textoDelEstado(estado) : null;
+  const fallido = estado === 'rechazada' || estado === 'anulada' || estado === 'fallida';
 
   return (
-    <Dialog
-      abierto={isOpen}
-      onCerrar={onClose}
-      tamano="L"
-      titulo="Saldo"
-      subtitulo={
-        <>
-          Cuenta de la firma · {firmName}
-          {firmNit && <span className="font-mono"> · {firmNit}</span>}
-        </>
-      }
-      cuerpoEnCanvas
-      pieIzquierda={
-        /*
-         * LA REGLA REAL, donde el usuario la puede verificar: el cobro se
-         * reserva al iniciar el escrito, así que la generación nunca se corta
-         * a mitad de uno. Sin umbral de aviso — ese sistema no existe aún.
-         */
-        <span>
-          Sin saldo suficiente, un escrito no inicia — pero ninguno se corta a mitad.
-        </span>
-      }
-      acciones={
-        <button onClick={() => void cargar()} className="btn-neutral btn-sm" disabled={cargando}>
-          <RefreshCw className={`h-3.5 w-3.5 ${cargando ? 'animate-spin' : ''}`} />
-          Actualizar
-        </button>
-      }
-    >
-      <div className="space-y-4">
-        {error && <p className="notice-unverified">{error}</p>}
-
-        {/* ─── LAS TRES CIFRAS ────────────────────────────────────────────── */}
-        {summary && (
-          /*
-            LA JERARQUIA DE 5c EN MOVIL: el saldo ocupa el ancho entero y su
-            cifra sube a 32px; el consumo del mes y el costo por escrito quedan
-            en pareja debajo. En escritorio siguen siendo tres tarjetas iguales,
-            que es lo correcto ahi — con ancho de sobra, comparar tres cifras
-            del mismo tamaño es mas rapido que jerarquizarlas.
-
-            NO SE PINTA LA BARRA DE PROGRESO DE LA MAQUETA. Marca un 41%, y no
-            hay contra que medirlo: el saldo no tiene techo ni cupo declarado en
-            los datos. Una barra necesita un denominador, y el unico disponible
-            seria inventado — en la pantalla del dinero.
-          */
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-            <div className="col-span-2 rounded-card border border-line-200 bg-surface p-3.5 sm:col-span-1">
-              <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
-                Saldo disponible
-              </p>
-              <p className="mt-1.5 font-mono text-[32px] font-semibold leading-[1.1] text-ink-900 sm:mt-1 sm:text-[22px]">
-                {pesos(summary.balance)}
-              </p>
-              {mes && (
-                <p className="mt-0.5 text-meta text-ink-500">
-                  ≈ {mes.escritosRestantes.toLocaleString('es-CO')} escritos{' '}
-                  {mes.costoMedioEsReal ? 'al consumo de este mes' : 'al precio base'}
-                </p>
-              )}
-            </div>
-
-            <div className="rounded-card border border-line-200 bg-surface p-3.5">
-              <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
-                Consumo de {MES_ACTUAL}
-              </p>
-              <p className="mt-1 font-mono text-[22px] font-semibold text-ink-900">
-                {mes ? pesos(mes.cobradoCop) : '—'}
-              </p>
-              {mes && (
-                <p className="mt-0.5 text-meta text-ink-500">
-                  {mes.escritos} {mes.escritos === 1 ? 'escrito' : 'escritos'} ·{' '}
-                  {mes.transcripciones}{' '}
-                  {mes.transcripciones === 1 ? 'transcripción' : 'transcripciones'}
-                </p>
-              )}
-            </div>
-
-            <div className="rounded-card border border-line-200 bg-surface p-3.5">
-              <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
-                Costo medio por escrito
-              </p>
-              <p className="mt-1 font-mono text-[22px] font-semibold text-ink-900">
-                {mes ? pesos(mes.costoMedioEscritoCop) : '—'}
-              </p>
-              <p className="mt-0.5 text-meta text-ink-500">3 modelos, según extensión</p>
-            </div>
-          </div>
-        )}
-
-        {/* ─── RECARGAR ───────────────────────────────────────────────────── */}
-        <div className="rounded-card border border-line-200 bg-surface p-4">
-          <div className="flex items-baseline justify-between gap-2">
-            <h4 className="text-ui font-semibold text-ink-900">Recargar</h4>
-            {minRecharge > 0 && (
-              <span className="text-meta text-ink-500">
-                Mínimo {pesos(minRecharge)}. Sin vencimiento.
-              </span>
+    /*
+      DOS ENVOLTORIOS A PROPÓSITO. El de afuera abre el alcance y viste todo
+      diálogo de dentro; el de adentro (`cn-adm-pantalla`) solo a esta pantalla,
+      para que el diálogo de recarga que cuelga de ella no herede el título
+      grande.
+    */
+    <div className="cara-nueva cn-adm-dialogos">
+      <div className="cn-adm-pantalla">
+      <Dialog
+        abierto={isOpen}
+        onCerrar={cerrar}
+        tamano="L"
+        titulo="Saldo de la firma"
+        subtitulo={
+          <>
+            {firmName} · se comparte entre sus usuarios y se paga por consumo, aparte del plan.
+            {firmNit && (
+              <>
+                {' '}NIT <span className="cn-adm-mono">{firmNit}</span>
+              </>
             )}
-          </div>
-
-          <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-            {PRESETS.map((p) => (
-              <button
-                key={p}
-                onClick={() => {
-                  setMonto(String(p));
-                  setOtroAbierto(false);
-                }}
-                className={`rounded-control border px-3 py-1.5 font-mono text-[12.5px] font-medium transition-colors ${
-                  valorElegido === p && !otroAbierto
-                    ? 'border-brand-700 bg-brand-50 text-brand-700'
-                    : 'border-line-200 bg-canvas text-ink-700 hover:border-brand-700'
-                }`}
-              >
-                {pesos(p)}
-              </button>
-            ))}
-            <button
-              onClick={() => {
-                setOtroAbierto(true);
-                setMonto('');
-              }}
-              className={`rounded-control border px-3 py-1.5 text-[12.5px] font-medium ${
-                otroAbierto
-                  ? 'border-brand-700 bg-brand-50 text-brand-700'
-                  : 'border-line-200 bg-canvas text-ink-700 hover:border-brand-700'
-              }`}
-            >
-              Otro valor
-            </button>
-
-            {otroAbierto && (
-              <div className="relative">
-                <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-[12px] text-ink-400">
-                  $
-                </span>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  value={monto}
-                  /* Only digits: a thousands separator typed by hand becomes a
-                     different number once parsed, and the amount is money. */
-                  onChange={(e) => setMonto(e.target.value.replace(/[^\d]/g, ''))}
-                  placeholder={String(minRecharge || 100000)}
-                  autoFocus
-                  className="field w-[140px] pl-6 font-mono"
-                />
-              </div>
-            )}
-
-            <button
-              onClick={() => void recargar()}
-              disabled={abriendo || valorElegido < minRecharge}
-              className="btn-primary btn-sm ml-auto"
-            >
-              {abriendo
-                ? 'Abriendo…'
-                : valorElegido >= minRecharge
-                ? `Pagar ${pesos(valorElegido)}`
-                : 'Pagar'}
-            </button>
-          </div>
-
-          {/* Says why the button is disabled, instead of leaving it dead. */}
-          {monto !== '' && valorElegido < minRecharge && (
-            <p className="mt-1.5 text-meta text-ink-500">El mínimo es {pesos(minRecharge)}.</p>
-          )}
-
-          {/*
-            EL RESPALDO. Solo existe despues de que el servidor devolvio el
-            checkout, y dice lo que pasa: si la pasarela no se abrio sola, un
-            toque aqui la abre. Es la misma intencion firmada, no otra.
-          */}
-          {enlaceCheckout && !abriendo && (
-            <p className="mt-2 rounded-control border border-[rgb(var(--brand-line))] bg-brand-50 px-3 py-2 text-[12px] leading-snug text-brand-700">
-              Si la pasarela no se abrió sola,{' '}
-              <a href={enlaceCheckout} className="font-semibold underline underline-offset-2">
-                tóquelo aquí para abrir Wompi
-              </a>
-              . Es el mismo pago: no se crea otro intento.
+          </>
+        }
+        cuerpoEnCanvas
+        pieIzquierda={<span>Sin saldo suficiente, un escrito no inicia; ninguno se corta a mitad.</span>}
+        acciones={
+          <button type="button" onClick={() => void cargar()} className="cn-adm-boton cn-adm-boton--suave" disabled={cargando}>
+            {cargando ? 'Actualizando…' : 'Actualizar'}
+          </button>
+        }
+      >
+        <div className="cn-adm-cuerpo">
+          {error && (
+            <p role="alert" className="cn-adm-error">
+              {error}
             </p>
           )}
 
-          <p className="mt-2 text-meta text-ink-400">
-            El pago se hace en la pasarela de Wompi — PSE, tarjeta o los medios que ofrezca. El
-            saldo se acredita cuando la pasarela confirma el pago, y el movimiento queda abajo.
-          </p>
-        </div>
-
-        {/* ─── EXTRACTO DEL PERÍODO · sumado por el servidor, imprimible ──── */}
-        <ExtractoDelPeriodo activo={isOpen} firmName={firmName} firmNit={firmNit} />
-
-        {/* ─── MOVIMIENTOS · Fecha Concepto Usuario Valor Saldo ──────────── */}
-        <div className="overflow-hidden rounded-card border border-line-200 bg-surface">
-          <div className="flex items-center justify-between border-b border-line-100 px-4 py-2.5">
-            <h4 className="text-ui font-semibold text-ink-900">Movimientos</h4>
-            <button
-              onClick={exportarCsv}
-              className="btn-neutral btn-sm"
-              disabled={movements.length === 0}
-            >
-              <Download className="h-3.5 w-3.5" />
-              Descargar CSV
-            </button>
-          </div>
-
-          {movements.length === 0 ? (
-            <p className="px-4 py-6 text-center text-meta text-ink-500">
-              Todavía no hay movimientos. Aparecerán aquí las recargas y cada operación que
-              consuma saldo.
-            </p>
-          ) : (
-            <>
-              <div className="t-head hidden items-center gap-3 md:flex">
-                <span className="w-[52px] shrink-0">Fecha</span>
-                <span className="min-w-0 flex-1">Concepto</span>
-                <span className="w-[120px] shrink-0">Usuario</span>
-                <span className="w-[90px] shrink-0 text-right">Valor</span>
-                <span className="w-[90px] shrink-0 text-right">Saldo</span>
+          {/* ─── EL PAGO QUE ESTA PESTAÑA INICIÓ, con el estado que escribió el servidor ─── */}
+          {intento && estado && textos && (
+            <section className={`cn-adm-pago cn-adm-pago--${estado}`} aria-live="polite">
+              <div className="cn-adm-pago-cabeza">
+                {estado === 'esperando' && <span className="cn-adm-giro" aria-hidden="true" />}
+                {estado === 'aprobada' && (
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9" />
+                    <polyline points="8 12.5 11 15.5 16 9" />
+                  </svg>
+                )}
+                <div className="cn-adm-pago-textos">
+                  <p className="cn-adm-pago-titulo">{textos.titulo}</p>
+                  <p className="cn-adm-pago-detalle">
+                    {estado === 'aprobada' && summary ? (
+                      <>
+                        Entraron <span className="cn-adm-mono">{pesos(intento.amountCop)}</span>. Su saldo queda en{' '}
+                        <span className="cn-adm-mono">{pesos(summary.balance)}</span>
+                        {mes && (
+                          <>
+                            {' '}— alcanza para unos {mes.escritosRestantes.toLocaleString('es-CO')} escritos
+                            {mes.costoMedioEsReal ? '' : ' al precio base'}
+                          </>
+                        )}
+                        .
+                      </>
+                    ) : (
+                      textos.detalle
+                    )}
+                  </p>
+                </div>
               </div>
 
-              {movements.map((mov, i) => {
-                const entra = mov.amountCop > 0;
-                return (
-                  <div key={`${mov.createdAt}-${i}`} className="t-row flex items-center gap-3">
-                    <span className="w-[52px] shrink-0 font-mono text-[11px] text-ink-500">
-                      {fecha(mov.createdAt)}
-                    </span>
-                    <span className="flex min-w-0 flex-1 items-center gap-1.5">
-                      {entra ? (
-                        <ArrowUpRight className="h-3 w-3 shrink-0 text-verified" />
-                      ) : (
-                        <ArrowDownRight className="h-3 w-3 shrink-0 text-ink-400" />
-                      )}
-                      <span className="truncate text-ui text-ink-900">{mov.description}</span>
-                    </span>
-                    <span className="hidden w-[120px] shrink-0 truncate text-meta text-ink-500 md:block">
-                      {mov.actorEmail.split('@')[0]}
-                    </span>
-                    {/* En mono: es plata, y la plata se coteja dígito a dígito. */}
-                    <span
-                      className={`w-[90px] shrink-0 text-right font-mono text-[12px] font-medium ${
-                        entra ? 'text-verified' : 'text-ink-900'
-                      }`}
+              {estado !== 'aprobada' && (
+                <p className="cn-adm-recuadro">
+                  Referencia <span className="cn-adm-mono">{intento.reference}</span> · si algo falla, esta es la
+                  referencia que hay que dar en soporte.
+                </p>
+              )}
+
+              <div className="cn-adm-pago-acciones">
+                {estado === 'aprobada' && (
+                  <button
+                    type="button"
+                    className="cn-adm-boton cn-adm-boton--suave"
+                    onClick={() => movimientosRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                  >
+                    Ver el movimiento
+                  </button>
+                )}
+                {fallido && (
+                  <>
+                    <button
+                      type="button"
+                      className="cn-adm-boton cn-adm-boton--peligro"
+                      onClick={() => {
+                        olvidarIntento();
+                        setRecargaAbierta(true);
+                      }}
                     >
-                      {entra ? '+' : ''}
-                      {pesos(mov.amountCop)}
-                    </span>
-                    <span className="w-[90px] shrink-0 text-right font-mono text-[11px] text-ink-400">
-                      {pesos(mov.balanceAfterCop)}
-                    </span>
-                  </div>
-                );
-              })}
-            </>
+                      Intentar de nuevo
+                    </button>
+                    {onSoporte && (
+                      <button
+                        type="button"
+                        className="cn-adm-boton cn-adm-boton--terciario cn-adm-boton--texto-peligro"
+                        onClick={() => {
+                          olvidarIntento();
+                          onSoporte();
+                        }}
+                      >
+                        Escribir a soporte
+                      </button>
+                    )}
+                  </>
+                )}
+                {estado === 'esperando' && (
+                  <button type="button" className="cn-adm-boton cn-adm-boton--terciario" onClick={olvidarIntento}>
+                    Ocultar este aviso
+                  </button>
+                )}
+              </div>
+            </section>
           )}
+
+          {/* ─── LAS CIFRAS ────────────────────────────────────────────────── */}
+          {summary ? (
+            <div className="cn-adm-cifras">
+              <div className="cn-adm-saldo">
+                <p className="cn-adm-saldo-rotulo">Disponible ahora</p>
+                <p className="cn-adm-saldo-cifra">{pesos(summary.balance)}</p>
+                {mes && (
+                  <p className="cn-adm-saldo-nota">
+                    ≈ {mes.escritosRestantes.toLocaleString('es-CO')} escritos,{' '}
+                    {mes.costoMedioEsReal ? 'con el costo medio real de su firma' : 'al precio base de un escrito'}
+                  </p>
+                )}
+                <button type="button" onClick={() => setRecargaAbierta(true)} className="cn-adm-boton cn-adm-boton--claro">
+                  Recargar
+                </button>
+              </div>
+
+              <div className="cn-adm-tarjeta">
+                <p className="cn-adm-tarjeta-rotulo">Cobrado este mes</p>
+                <p className="cn-adm-tarjeta-cifra">{mes ? pesos(mes.cobradoCop) : '—'}</p>
+                <p className="cn-adm-tarjeta-rotulo">Costo medio por escrito</p>
+                <p className="cn-adm-tarjeta-cifra cn-adm-tarjeta-cifra--menor">{mes ? pesos(mes.costoMedioEscritoCop) : '—'}</p>
+                {mes && (
+                  <p className="cn-adm-tarjeta-nota">
+                    {mes.escritos} {mes.escritos === 1 ? 'escrito' : 'escritos'} · {mes.transcripciones}{' '}
+                    {mes.transcripciones === 1 ? 'transcripción' : 'transcripciones'}
+                  </p>
+                )}
+              </div>
+
+              {esAdministrador && consumo && (
+                <div className="cn-adm-tarjeta">
+                  <p className="cn-adm-tarjeta-rotulo">Quién consumió</p>
+                  {consumidores.length === 0 ? (
+                    <p className="cn-adm-tarjeta-nota">Nadie ha consumido saldo este mes.</p>
+                  ) : (
+                    <ul className="cn-adm-consumo">
+                      {consumidores.slice(0, 6).map((u) => (
+                        <li key={u.id}>
+                          <span className="cn-adm-consumo-quien" title={u.email}>
+                            {u.nombre ?? u.email.split('@')[0]}
+                          </span>
+                          <span className="cn-adm-mono">{pesos(u.consumoMesCop)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
+            </div>
+          ) : (
+            cargando && <p className="cn-adm-vacio">Leyendo el saldo de la firma…</p>
+          )}
+
+          {/* ─── MOVIMIENTOS · Fecha · Concepto · Usuario · Monto · Saldo después ─── */}
+          <section ref={movimientosRef} className="cn-adm-seccion" aria-labelledby="cn-adm-movimientos-titulo">
+            <div className="cn-adm-seccion-cabeza">
+              <h3 id="cn-adm-movimientos-titulo" className="cn-adm-seccion-titulo">
+                Movimientos
+              </h3>
+              <button
+                type="button"
+                onClick={exportarCsv}
+                className="cn-adm-boton cn-adm-boton--suave"
+                disabled={movements.length === 0}
+              >
+                Descargar CSV
+              </button>
+            </div>
+
+            {movements.length === 0 ? (
+              <p className="cn-adm-vacio">
+                {cargando
+                  ? 'Leyendo los movimientos…'
+                  : 'Todavía no hay movimientos. Aparecerán aquí las recargas y cada operación que consuma saldo.'}
+              </p>
+            ) : (
+              <div className="cn-adm-tabla cn-adm-tabla--movimientos" role="table" aria-label="Movimientos del saldo">
+                <div className="cn-adm-tabla-cabeza" role="row">
+                  <span role="columnheader">Fecha</span>
+                  <span role="columnheader">Concepto</span>
+                  <span role="columnheader">Usuario</span>
+                  <span role="columnheader" className="cn-adm-derecha">Monto</span>
+                  <span role="columnheader" className="cn-adm-derecha">Saldo después</span>
+                </div>
+                {movements.map((mov, i) => {
+                  const entra = mov.amountCop > 0;
+                  return (
+                    <div key={`${mov.createdAt}-${i}`} className="cn-adm-fila" role="row">
+                      <span role="cell" className="cn-adm-mono cn-adm-fila-fecha">
+                        {fecha(mov.createdAt)}
+                      </span>
+                      <span role="cell" className="cn-adm-fila-concepto">
+                        {mov.description}
+                      </span>
+                      <span role="cell" className="cn-adm-fila-quien">
+                        {mov.actorEmail.split('@')[0]}
+                      </span>
+                      {/* En mono: es plata, y la plata se coteja dígito a dígito. */}
+                      <span
+                        role="cell"
+                        className={`cn-adm-mono cn-adm-fila-monto ${entra ? 'cn-adm-fila-monto--entra' : 'cn-adm-fila-monto--sale'}`}
+                      >
+                        {entra ? '+' : ''}
+                        {pesos(mov.amountCop)}
+                      </span>
+                      <span role="cell" className="cn-adm-mono cn-adm-fila-saldo">
+                        <span className="cn-adm-rotulo-movil">Saldo después </span>
+                        {pesos(mov.balanceAfterCop)}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            <p className="cn-adm-pie-nota">
+              El saldo no vence. Iureon todavía no emite factura electrónica por las recargas; el extracto de abajo es
+              un comprobante informativo de movimientos.
+            </p>
+          </section>
+
+          {/* ─── EXTRACTO DEL PERÍODO · sumado por el servidor, imprimible ──── */}
+          <ExtractoDelPeriodo activo={isOpen} firmName={firmName} firmNit={firmNit} />
         </div>
+      </Dialog>
       </div>
-    </Dialog>
+
+      <RecargarSaldoDialog
+        abierto={recargaAbierta}
+        onCerrar={() => setRecargaAbierta(false)}
+        minimo={minRecharge}
+        costoMedio={mes?.costoMedioEscritoCop ?? 0}
+        costoMedioEsReal={mes?.costoMedioEsReal ?? false}
+      />
+    </div>
   );
 };

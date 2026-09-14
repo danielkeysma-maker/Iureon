@@ -1,5 +1,4 @@
 import React from 'react';
-import { Check } from 'lucide-react';
 import {
   useSistemaOscuro,
   type Density,
@@ -7,22 +6,29 @@ import {
   type Theme,
   type UiFont
 } from '../preferences';
+import { Cabecera } from './SeccionesSuyas';
 
 /**
  * Ajustes · Apariencia.
  *
- * SOLO SU SESIÓN, y la pantalla lo dice. Es la mitad "Suyos" de Ajustes, frente
- * a la mitad "De la firma" que cambia un socio y aplica a todos. El diseño pone
- * esa frontera por escrito porque el error más caro en una app de despacho es
- * cambiarle el membrete a todos creyendo que se cambiaba el propio.
+ * SIGUE EL ARTBOARD «APARIENCIA» DE `public/handoff/app-ajustes-y-plan.html`
+ * (:309): tres tarjetas de tema con su miniatura, la nota del papel blanco sobre
+ * ámbar, las familias de letra como opciones sobre gris y la densidad como
+ * botones del mismo peso.
  *
- * NO CAMBIA EL ESCRITO QUE GENERA LA IA. Ni el tema, ni la familia, ni la
- * densidad tocan el documento: el .docx y el PDF salen siempre en papel blanco
- * con la tipografía que la firma definió. Se dice en la pantalla porque la
- * pregunta se la hace todo el mundo.
+ * SOLO SU SESIÓN, y la pantalla lo dice. El diseño pone esa frontera por
+ * escrito porque el error más caro en una app de despacho es cambiarle el
+ * membrete a todos creyendo que se cambiaba el propio.
  *
  * SE APLICA AL ELEGIR, sin botón de guardar. Un ajuste de apariencia que exija
  * confirmar obliga a imaginar el resultado; aplicándolo, se ve.
+ *
+ * LO QUE EL ARTBOARD PIDE Y AQUÍ ES DISTINTO, con la razón:
+ *  · Tres familias (Satoshi, sistema, Plex Mono) — la aplicación ofrece ocho y
+ *    las guarda el servidor; quitar cinco le cambiaría la letra a quien ya las
+ *    eligió. «Todo monoespaciado» no se ofrece: la monoespaciada es la señal de
+ *    lo citable, y usarla en todo borraría esa señal.
+ *  · Dos densidades — hay tres guardadas; se muestran las tres.
  */
 
 interface AppearanceSectionProps {
@@ -31,281 +37,133 @@ interface AppearanceSectionProps {
 }
 
 const TEMAS: { valor: Theme; titulo: string }[] = [
-  { valor: 'system', titulo: 'Según el sistema' },
-  { valor: 'light', titulo: 'Claro' },
-  { valor: 'dark', titulo: 'Oscuro' }
+  { valor: 'system', titulo: 'Sigue al sistema' },
+  { valor: 'light', titulo: 'Claro siempre' },
+  { valor: 'dark', titulo: 'Oscuro siempre' }
 ];
 
-/**
- * Las ocho familias, cada una descrita por lo que hace bien.
- *
- * La muestra "Ag 0123 Il1" está para comparar lo único que importa aquí: si los
- * dígitos y las letras ambiguas se distinguen. Un abogado que confunde un 1 con
- * una l en un radicado pierde una hora.
- */
+/** Las ocho familias, cada una descrita por lo que hace bien y escrita en sí misma. */
 const FUENTES: { valor: UiFont; nombre: string; nota: string; css: string }[] = [
-  {
-    valor: 'plex',
-    nombre: 'IBM Plex Sans',
-    nota: 'Por defecto · neutra, hecha para tablas densas',
-    css: "'IBM Plex Sans', system-ui, sans-serif"
-  },
-  {
-    valor: 'jakarta',
-    nombre: 'Plus Jakarta Sans',
-    nota: 'Geométrica y cálida · la más contemporánea del juego',
-    css: "'Plus Jakarta Sans', system-ui, sans-serif"
-  },
-  {
-    valor: 'manrope',
-    nombre: 'Manrope',
-    nota: 'Cierres abiertos y buen ritmo en cifras',
-    css: "'Manrope', system-ui, sans-serif"
-  },
-  {
-    valor: 'instrument',
-    nombre: 'Instrument Sans',
-    nota: 'Estrecha y sobria · cabe más texto por fila',
-    css: "'Instrument Sans', system-ui, sans-serif"
-  },
-  {
-    valor: 'public',
-    nombre: 'Public Sans',
-    nota: 'De uso oficial · la más institucional',
-    css: "'Public Sans', system-ui, sans-serif"
-  },
-  {
-    valor: 'satoshi',
-    nombre: 'Satoshi',
-    nota: 'Geométrica y limpia · de Indian Type Foundry, vía Fontshare',
-    css: "'Satoshi', system-ui, sans-serif"
-  },
-  {
-    valor: 'worksans',
-    nombre: 'Work Sans',
-    nota: 'Abierta y legible en pantalla · de Wei Huang, libre (OFL)',
-    css: "'Work Sans', system-ui, sans-serif"
-  },
-  {
-    valor: 'system',
-    nombre: 'La del sistema',
-    nota: 'Se ve como el resto de su equipo · no descarga nada',
-    css: 'system-ui, -apple-system, sans-serif'
-  }
+  { valor: 'plex', nombre: 'IBM Plex Sans', nota: 'Por defecto · neutra, para tablas densas', css: "'IBM Plex Sans', system-ui, sans-serif" },
+  { valor: 'satoshi', nombre: 'Satoshi', nota: 'Geométrica y limpia', css: "'Satoshi', system-ui, sans-serif" },
+  { valor: 'system', nombre: 'La del sistema', nota: 'Sin descargar nada', css: 'system-ui, -apple-system, sans-serif' },
+  { valor: 'jakarta', nombre: 'Plus Jakarta Sans', nota: 'Geométrica y cálida', css: "'Plus Jakarta Sans', system-ui, sans-serif" },
+  { valor: 'manrope', nombre: 'Manrope', nota: 'Buen ritmo en cifras', css: "'Manrope', system-ui, sans-serif" },
+  { valor: 'instrument', nombre: 'Instrument Sans', nota: 'Estrecha · cabe más por fila', css: "'Instrument Sans', system-ui, sans-serif" },
+  { valor: 'public', nombre: 'Public Sans', nota: 'De uso oficial', css: "'Public Sans', system-ui, sans-serif" },
+  { valor: 'worksans', nombre: 'Work Sans', nota: 'Abierta y legible en pantalla', css: "'Work Sans', system-ui, sans-serif" }
 ];
 
-const DENSIDADES: { valor: Density; titulo: string; alto: string }[] = [
-  { valor: 'compact', titulo: 'Compacta', alto: 'fila 26px' },
-  { valor: 'normal', titulo: 'Normal', alto: '36px' },
-  { valor: 'comfortable', titulo: 'Amplia', alto: '44px' }
+const DENSIDADES: { valor: Density; titulo: string; nota: string }[] = [
+  { valor: 'comfortable', titulo: 'Amplia', nota: 'Más aire entre líneas' },
+  { valor: 'normal', titulo: 'Normal', nota: 'La de siempre' },
+  { valor: 'compact', titulo: 'Compacta', nota: 'Más filas en pantalla' }
 ];
-
-/** Cabecera de bloque: etiqueta en mono y una línea que llega hasta el borde. */
-const Bloque: React.FC<{ titulo: string; nota?: string; children: React.ReactNode }> = ({
-  titulo,
-  nota,
-  children
-}) => (
-  <section className="mt-6">
-    <div className="flex items-center gap-2">
-      <h3 className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
-        {titulo}
-      </h3>
-      {nota && <span className="text-meta text-ink-400">{nota}</span>}
-      <div className="h-px flex-1 bg-line-200" />
-    </div>
-    <div className="mt-3">{children}</div>
-  </section>
-);
-
-/** El punto de selección. Redondo y sólido: es un radio, no una casilla. */
-const Marca: React.FC<{ activo: boolean }> = ({ activo }) =>
-  activo ? (
-    <span className="flex h-[17px] w-[17px] shrink-0 items-center justify-center rounded-full bg-brand-700">
-      <Check className="h-3 w-3 text-on-brand" strokeWidth={3.2} />
-    </span>
-  ) : (
-    <span className="h-[17px] w-[17px] shrink-0 rounded-full border border-line-200" />
-  );
 
 export const AppearanceSection: React.FC<AppearanceSectionProps> = ({ prefs, cambiar }) => {
   const sistemaOscuro = useSistemaOscuro();
 
   return (
-    <div className="max-w-[860px]">
-      <h2 className="text-title text-ink-900">Apariencia</h2>
-      <p className="mt-1 text-ui text-ink-500">
-        Solo su sesión, en este y en sus demás dispositivos. No cambia el escrito que genera la IA.
-      </p>
+    <section>
+      <Cabecera titulo="Apariencia" texto="Cómo se ve la aplicación para usted, en este y en sus demás dispositivos. No afecta a nadie más." />
 
-      {/* ─── TEMA ──────────────────────────────────────────────────────────*/}
-      <Bloque titulo="Tema">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          {TEMAS.map((t) => (
+      <p className="cn-aju-subtitulo">Tema</p>
+      <div className="cn-aju-temas" role="radiogroup" aria-label="Tema">
+        {TEMAS.map((t) => {
+          const activo = prefs.theme === t.valor;
+          return (
             <button
               key={t.valor}
+              type="button"
+              role="radio"
+              aria-checked={activo}
               onClick={() => cambiar({ theme: t.valor })}
-              className={`overflow-hidden rounded-card border bg-surface text-left transition-colors ${
-                prefs.theme === t.valor
-                  ? 'border-[1.5px] border-brand-700 ring-[3px] ring-brand-700/10'
-                  : 'border-line-200 hover:border-[rgb(var(--brand-line))]'
-              }`}
+              className={`cn-aju-tema${activo ? ' cn-aju-tema--activo' : ''}`}
             >
               <VistaPrevia tema={t.valor} />
-              <div className="flex items-center gap-2 border-t border-line-200 px-3 py-2.5">
-                <div className="min-w-0">
-                  <div className="text-ui font-semibold text-ink-900">{t.titulo}</div>
-                  <div className="mt-px text-meta text-ink-500">
-                    {t.valor === 'system'
-                      ? /*
-                         * Solo lo comprobable. El diseño muestra "oscuro a las
-                         * 18:30", pero esa hora NO la sabe el navegador:
-                         * `prefers-color-scheme` dice claro u oscuro ahora
-                         * mismo, y ningún API expone el horario del sistema
-                         * operativo. Escribirla sería poner un dato falso en una
-                         * pantalla de ajustes.
-                         */
-                        `Ahora en ${sistemaOscuro ? 'oscuro' : 'claro'}`
-                      : 'Siempre'}
-                  </div>
-                </div>
-                <span className="ml-auto">
-                  <Marca activo={prefs.theme === t.valor} />
-                </span>
-              </div>
+              <span className="cn-aju-tema-pie">
+                <span className="cn-aju-tema-nombre">{t.titulo}</span>
+                {/*
+                  Solo lo comprobable. `prefers-color-scheme` dice claro u oscuro
+                  ahora mismo; ningún API expone a qué hora cambia el sistema.
+                */}
+                {t.valor === 'system' && (
+                  <span className="cn-aju-tema-nota">Ahora en {sistemaOscuro ? 'oscuro' : 'claro'}</span>
+                )}
+              </span>
             </button>
-          ))}
-        </div>
-
-        <p className="notice mt-3">
-          <span>
-            El escrito se exporta <b className="font-semibold">siempre en papel blanco</b> — no se
-            puede desactivar.
-          </span>
+          );
+        })}
+      </div>
+      <div className="cn-aju-nota-aviso">
+        <p>
+          El escrito se exporta <b>siempre en papel blanco</b>, aunque usted trabaje en oscuro. Lo que va a un juzgado
+          no lleva su tema de pantalla.
         </p>
-      </Bloque>
+      </div>
 
-      {/* ─── TIPOGRAFÍA DE LA INTERFAZ ─────────────────────────────────────*/}
-      <Bloque titulo="Tipografía de la interfaz" nota="ocho familias probadas con datos densos">
-        <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-          {FUENTES.map((f) => (
+      <p className="cn-aju-subtitulo">Tipografía de la interfaz</p>
+      <p className="cn-aju-ayuda cn-aju-ayuda--antes">
+        La del escrito no cambia, y términos, radicados y saldos van siempre en monoespaciada.
+      </p>
+      <div className="cn-aju-opciones" role="radiogroup" aria-label="Tipografía de la interfaz">
+        {FUENTES.map((f) => {
+          const activa = prefs.uiFont === f.valor;
+          return (
             <button
               key={f.valor}
+              type="button"
+              role="radio"
+              aria-checked={activa}
               onClick={() => cambiar({ uiFont: f.valor })}
-              className={`flex items-center gap-3 rounded-card border px-3 py-2.5 text-left transition-colors ${
-                prefs.uiFont === f.valor
-                  ? 'border-brand-700 bg-brand-50'
-                  : 'border-line-200 bg-surface hover:bg-canvas'
-              }`}
+              className={`cn-aju-opcion${activa ? ' cn-aju-opcion--activa' : ''}`}
             >
-              <div className="min-w-0 flex-1">
-                {/* Cada familia se muestra ESCRITA EN SÍ MISMA. */}
-                <div className="text-ui font-semibold text-ink-900" style={{ fontFamily: f.css }}>
-                  {f.nombre}
-                </div>
-                <div className="mt-px truncate text-meta text-ink-500">{f.nota}</div>
-              </div>
-              <span
-                className="shrink-0 text-[15px] text-ink-700"
-                style={{ fontFamily: f.css }}
-                aria-hidden="true"
-              >
-                Ag 0123 Il1
+              <span className="cn-aju-opcion-nombre" style={{ fontFamily: f.css }}>
+                {f.nombre}
               </span>
-              <Marca activo={prefs.uiFont === f.valor} />
+              <span className="cn-aju-opcion-nota">{f.nota}</span>
             </button>
-          ))}
-        </div>
+          );
+        })}
+      </div>
 
-        {/*
-          LA MONOESPACIADA NO SE ELIGE, y eso se dice aquí y no en una nota al
-          pie: es lo que impide confundir un 1 con una l en un radicado de
-          veintitrés dígitos.
-        */}
-        <div className="mt-2 flex items-center gap-3 rounded-card border border-line-200 bg-canvas px-3 py-2.5">
-          <div className="min-w-0 flex-1">
-            <div className="font-mono text-ui font-semibold text-ink-900">IBM Plex Mono</div>
-            <div className="mt-px truncate font-mono text-meta text-ink-500">
-              1l0O · 11001310300320250014700
-            </div>
-          </div>
-          <span className="chip-neutral shrink-0">Fija</span>
-        </div>
-        <p className="mt-2 text-meta leading-[1.5] text-ink-500">
-          Términos, radicados y saldos van siempre en monoespaciada, cualquiera sea la familia
-          elegida.
-        </p>
-      </Bloque>
-
-      {/* ─── DENSIDAD ──────────────────────────────────────────────────────*/}
-      <Bloque titulo="Densidad">
-        <div className="inline-flex rounded-control border border-line-200 bg-canvas p-0.5">
-          {DENSIDADES.map((d) => (
+      <p className="cn-aju-subtitulo">Densidad</p>
+      <div className="cn-aju-segmentos" role="radiogroup" aria-label="Densidad">
+        {DENSIDADES.map((d) => {
+          const activa = prefs.density === d.valor;
+          return (
             <button
               key={d.valor}
+              type="button"
+              role="radio"
+              aria-checked={activa}
               onClick={() => cambiar({ density: d.valor })}
-              className={`rounded-[3px] px-3 py-1.5 text-meta font-medium transition-colors ${
-                prefs.density === d.valor
-                  ? 'bg-brand-700 text-on-brand'
-                  : 'text-ink-500 hover:text-ink-900'
-              }`}
+              className={`cn-aju-opcion${activa ? ' cn-aju-opcion--activa' : ''}`}
             >
-              {d.titulo} <span className="font-mono opacity-70">· {d.alto}</span>
+              <span className="cn-aju-opcion-nombre">{d.titulo}</span>
+              <span className="cn-aju-opcion-nota">{d.nota}</span>
             </button>
-          ))}
-        </div>
-        <p className="mt-2 text-meta leading-[1.5] text-ink-500">
-          La densidad cambia altos de fila y de control, nunca los tamaños de letra: el mínimo de
-          11px de las etiquetas no se toca en ninguna opción.
-        </p>
-      </Bloque>
-    </div>
+          );
+        })}
+      </div>
+      <p className="cn-aju-ayuda">
+        La densidad no cambia los tamaños de letra: cambia el espacio. El texto mínimo sigue siendo legible en las tres.
+      </p>
+    </section>
   );
 };
 
 /**
- * La miniatura de cada tema: barra, superficie y tres renglones.
- *
- * Para "según el sistema" se parte en diagonal y muestra los dos a la vez, que
- * es lo que esa opción realmente hace. Un solo color ahí obligaría a adivinar
- * cuál de los dos va a tocar.
+ * La miniatura de cada tema (:315). Sus colores son los de la maqueta y NO
+ * siguen el tema: muestran cómo se verá cada opción, así que la de «Oscuro
+ * siempre» tiene que verse oscura aunque la pantalla esté en claro. Para
+ * «sigue al sistema» se parte en diagonal y muestra los dos a la vez, que es lo
+ * que esa opción hace.
  */
-const VistaPrevia: React.FC<{ tema: Theme }> = ({ tema }) => {
-  const diagonal = tema === 'system';
-  const oscuro = tema === 'dark';
-
-  const barra = diagonal
-    ? 'linear-gradient(135deg,#0F2233 0 50%,#0A121A 50%)'
-    : oscuro
-    ? '#0A121A'
-    : '#0F2233';
-
-  const fondo = diagonal
-    ? 'linear-gradient(135deg,#F7F8FA 0 50%,#0B1219 50%)'
-    : oscuro
-    ? '#0B1219'
-    : '#F7F8FA';
-
-  const cabecera = diagonal
-    ? 'linear-gradient(135deg,#fff 0 52%,#131B24 52%)'
-    : oscuro
-    ? '#131B24'
-    : '#fff';
-
-  return (
-    <div className="flex h-[88px]" aria-hidden="true">
-      <div className="w-[38%]" style={{ background: barra }} />
-      <div className="flex flex-1 flex-col" style={{ background: fondo }}>
-        <div
-          className="h-[15px] border-b"
-          style={{ background: cabecera, borderColor: oscuro ? '#24303D' : '#E3E7EC' }}
-        />
-        <div className="flex flex-1 flex-col gap-[5px] p-2">
-          <div className="h-[5px] w-[82%] rounded-sm" style={{ background: oscuro ? '#2E3B4A' : '#C3CBD6' }} />
-          <div className="h-[5px] w-[64%] rounded-sm" style={{ background: oscuro ? '#3A4756' : '#8B96A6' }} />
-          <div className="h-[5px] w-[74%] rounded-sm" style={{ background: oscuro ? '#8FA0B2' : '#4A566B' }} />
-        </div>
-      </div>
-    </div>
-  );
-};
+const VistaPrevia: React.FC<{ tema: Theme }> = ({ tema }) => (
+  <span className={`cn-aju-tema-muestra cn-aju-tema-muestra--${tema}`} aria-hidden="true">
+    <span className="cn-aju-tema-raya cn-aju-tema-raya--larga" />
+    <span className="cn-aju-tema-raya" />
+    <span className="cn-aju-tema-raya cn-aju-tema-raya--media" />
+  </span>
+);

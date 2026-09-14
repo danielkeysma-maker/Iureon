@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { httpClient, setSessionLostHandler } from './config/httpClient';
 import { billingApi } from './modules/billing/billing.api';
 import { BalancePanel } from './modules/billing/components/BalancePanel';
+import { hayRecargaPorConfirmar } from './modules/billing/recargaEnPantalla';
 import { clearSession, readSession, saveSession, type Session } from './modules/auth/session';
 import { sesionDeVistaPreviaLocal } from './modules/auth/vistaPreviaLocal';
 import { SidebarLeft } from './modules/tenant/components/SidebarLeft';
@@ -500,7 +501,12 @@ export function App() {
     [planDeFirma]
   );
   const [isUserManagementModalOpen, setIsUserManagementModalOpen] = useState(false);
-  const [isRechargeModalOpen, setIsRechargeModalOpen] = useState(false);
+  /*
+   * AL VOLVER DE WOMPI, SALDO SE ABRE SOLO. El checkout es otra página y la
+   * pestaña regresa sin estado; la recarga dejó su referencia en la pestaña
+   * antes de saltar, y con ella Saldo muestra el estado real de ese pago.
+   */
+  const [isRechargeModalOpen, setIsRechargeModalOpen] = useState(hayRecargaPorConfirmar);
 
   /*
    * LA VISITA GUIADA vive aqui porque cada parada abre primero su modulo, y
@@ -1234,6 +1240,11 @@ export function App() {
         onClose={() => setIsRechargeModalOpen(false)}
         firmNit={activeFirm.nit}
         firmName={activeFirm.name}
+        esAdministrador={esSocio}
+        onSoporte={() => {
+          setIsRechargeModalOpen(false);
+          setMainView('soporte');
+        }}
       />
 
       {/*
@@ -1255,6 +1266,12 @@ export function App() {
           onClose={() => setIsUserManagementModalOpen(false)}
           firmName={activeFirm.name}
           firmNit={activeFirm.nit}
+          correoPropio={currentUserEmail}
+          plan={planDeFirma}
+          onVerPlanes={() => {
+            setIsUserManagementModalOpen(false);
+            abrirPlan();
+          }}
         />
       )}
 

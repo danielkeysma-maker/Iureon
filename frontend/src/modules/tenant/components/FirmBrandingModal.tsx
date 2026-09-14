@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Upload, X as XIcon } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import { brandingApi, type FirmBranding } from '../services/branding.api';
+import { lineasDeMembrete } from '../../documents/services/membrete';
 
 interface FirmBrandingModalProps {
   isOpen: boolean;
@@ -11,28 +11,45 @@ interface FirmBrandingModalProps {
 }
 
 /**
- * Marca y formato de la firma. Diálogo tipo 2 —formulario— en tamaño L.
+ * Membrete. Pantalla de `app-administrar-y-saldo.html` (artboard 6): el
+ * formulario a la izquierda y, sobre el escritorio gris, el papel del escrito.
  *
- * ─── FORMULARIO A LA IZQUIERDA, ESCRITO REAL A LA DERECHA ───────────────────
+ * ─── EL PAPEL SE ARMA CON LAS LÍNEAS DEL EXPORTADOR ─────────────────────────
  *
- * Nadie puede juzgar un membrete en abstracto. La previsualización es un
- * escrito de verdad —membrete, juzgado, pretensiones, hechos, bloque de
- * firma— que reacciona a cada opción: cambiar el interlineado se ve en el
- * párrafo, no en una etiqueta.
+ * La previsualización no decide dónde va cada dato: llama a `lineasDeMembrete`,
+ * la misma función con que el PDF y el Word arman su membrete. Así el nombre
+ * encabeza, el NIT y la dirección van debajo, y los pies dicen lo que de verdad
+ * imprime cada formato. Una previsualización con su propia idea del membrete
+ * enseñaría un documento que no sale.
  *
- * ─── LAS OPCIONES SON LAS QUE UN DESPACHO DISCUTE ───────────────────────────
+ * ─── LO QUE EL ARTBOARD PIDE Y AQUÍ NO ESTÁ, con la razón ──────────────────
  *
- * Romanos contra arábigos, «PRIMERO.» contra «1.», la T.P. en el bloque de
- * firma, el correo de notificaciones judiciales. No es un panel de estilos
- * genérico. La numeración y los títulos se aplican AL GENERAR el escrito —el
- * texto ya escrito no se renumera— y viajan como instrucción al motor.
+ * · Los datos de ejemplo del artboard (nombre de firma, abogada, T.P.): van
+ *   los marcadores del README §3. La versión anterior traía un nombre, una
+ *   cédula, un NIT y una resolución de Colpensiones verosímiles.
+ *
+ * ─── LO QUE SE QUITÓ PORQUE NO SE IMPRIME ───────────────────────────────────
+ *
+ * · «Firma escaneada»: el servidor la guarda, pero NINGÚN exportador la lee
+ *   (ni `documentExport.service` ni el acta). Ofrecer subirla era prometer una
+ *   firma en el escrito que nunca aparecía. El dato guardado se conserva: se
+ *   envía tal como llegó.
+ * · El logotipo en SVG: el exportador solo incrusta PNG y JPG
+ *   (`data:image/(png|jpe?g)`), así que el selector ya no ofrece SVG.
  *
  * ─── EL VELO NO CIERRA CON CAMBIOS SIN GUARDAR ──────────────────────────────
  *
- * Regla del tipo 2 en 3a: es el único caso del sistema donde el clic afuera
- * pregunta en vez de cerrar. Y el primario dice el verbo real —«Guardar y
- * aplicar»— porque guardar sin aplicar no es lo que nadie espera aquí.
+ * Es el único caso del sistema donde el clic afuera pregunta en vez de cerrar.
  */
+
+/* El papel se ve al tamaño del documento (1 pt = 4/3 px), sin bajar de 14 px en pantalla. */
+const px = (pt: number): string => `${Math.max(14, Math.round((pt * 4) / 3))}px`;
+
+const titulo = (m: FirmBranding, texto: string, n: number): string =>
+  m.sectionTitles === 'ROMANOS' ? `${['I', 'II', 'III'][n - 1]}. ${texto}` : m.sectionTitles === 'ARABIGOS' ? `${n}. ${texto}` : texto;
+
+const LETRAS_LIBRES = ['Plus Jakarta Sans', 'Manrope', 'Public Sans', 'Satoshi', 'Work Sans'];
+
 export const FirmBrandingModal: React.FC<FirmBrandingModalProps> = ({ isOpen, onClose, onSaved }) => {
   const [marca, setMarca] = useState<FirmBranding | null>(null);
   const [original, setOriginal] = useState<string>('');
@@ -43,13 +60,14 @@ export const FirmBrandingModal: React.FC<FirmBrandingModalProps> = ({ isOpen, on
   useEffect(() => {
     if (!isOpen) return;
     setError('');
+    setAvisoVelo(false);
     brandingApi
       .get()
       .then(({ branding }) => {
         setMarca(branding);
         setOriginal(JSON.stringify(branding));
       })
-      .catch((e) => setError(e instanceof Error ? e.message : 'No se pudo leer la marca.'));
+      .catch((e) => setError(e instanceof Error ? e.message : 'No se pudo leer el membrete.'));
   }, [isOpen]);
 
   const hayCambios = marca !== null && JSON.stringify(marca) !== original;
@@ -57,11 +75,11 @@ export const FirmBrandingModal: React.FC<FirmBrandingModalProps> = ({ isOpen, on
   const poner = <K extends keyof FirmBranding>(campo: K, valor: FirmBranding[K]) =>
     setMarca((m) => (m ? { ...m, [campo]: valor } : m));
 
-  const subirImagen = (campo: 'logoUrl' | 'signatureImageUrl') => (e: React.ChangeEvent<HTMLInputElement>) => {
+  const subirLogo = (e: React.ChangeEvent<HTMLInputElement>) => {
     const archivo = e.target.files?.[0];
     if (!archivo) return;
     const lector = new FileReader();
-    lector.onload = (ev) => poner(campo, (ev.target?.result as string) ?? null);
+    lector.onload = (ev) => poner('logoUrl', (ev.target?.result as string) ?? null);
     lector.readAsDataURL(archivo);
     e.target.value = '';
   };
@@ -70,311 +88,349 @@ export const FirmBrandingModal: React.FC<FirmBrandingModalProps> = ({ isOpen, on
     if (!marca) return;
     setGuardando(true);
     setError('');
-
     try {
       const guardada = await brandingApi.put(marca);
       setMarca(guardada);
       setOriginal(JSON.stringify(guardada));
       onSaved?.(guardada);
+      /*
+       * El servidor sanea y descarta una imagen demasiado pesada sin fallar.
+       * Si el logotipo enviado no volvió, se dice aquí en vez de cerrar como si
+       * todo se hubiera guardado.
+       */
+      if (marca.logoUrl && !guardada.logoUrl) {
+        setError('El servidor no guardó el logotipo: pruebe con una imagen más liviana. Lo demás quedó guardado.');
+        return;
+      }
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'No se pudo guardar la marca.');
+      setError(e instanceof Error ? e.message : 'No se pudo guardar el membrete.');
     } finally {
       setGuardando(false);
     }
   };
 
+  const descartar = () => {
+    setMarca(original ? (JSON.parse(original) as FirmBranding) : null);
+    setAvisoVelo(false);
+    onClose();
+  };
+
   const m = marca;
+  const lineas = m ? lineasDeMembrete(m) : null;
 
   return (
-    <Dialog
-      abierto={isOpen}
-      onCerrar={onClose}
-      tamano="L"
-      titulo="Marca y formato de la firma"
-      subtitulo="Se aplica a todo escrito nuevo y a los exportados. Sustituye el formato por defecto de Iureon."
-      hayCambiosSinGuardar={hayCambios}
-      onIntentoDeCerrarConCambios={() => setAvisoVelo(true)}
-      pieIzquierda={
-        hayCambios ? (
-          <span className="text-unverified">Cambios sin guardar</span>
-        ) : (
-          <span className="font-mono text-[11px]">Esc cierra</span>
-        )
-      }
-      acciones={
-        <>
-          <button
-            onClick={() => {
-              if (m) setMarca(JSON.parse(original || 'null'));
-              setAvisoVelo(false);
-              onClose();
-            }}
-            className="btn-neutral btn-sm"
-            disabled={guardando}
-          >
-            Descartar
-          </button>
-          <button
-            onClick={() => void guardar()}
-            className="btn-primary btn-sm"
-            disabled={!hayCambios || guardando}
-          >
-            {guardando ? 'Guardando…' : 'Guardar y aplicar'}
-          </button>
-        </>
-      }
-    >
-      {error && <p className="notice-unverified mb-3">{error}</p>}
-      {avisoVelo && hayCambios && (
-        <p className="notice mb-3">
-          Hay cambios sin guardar. Use «Guardar y aplicar» o «Descartar» — el clic afuera no
-          decide por usted.
-        </p>
-      )}
-
-      {!m ? (
-        <p className="text-meta text-ink-500">Leyendo la marca de la firma…</p>
-      ) : (
-        <div className="flex h-full min-h-0 flex-col gap-4 lg:flex-row">
-          {/* ─── EL FORMULARIO ─────────────────────────────────────────────── */}
-          <div className="flex w-full min-w-0 flex-col gap-4 overflow-y-auto lg:w-[360px] lg:shrink-0">
-            <section>
-              <h3 className="mb-2 font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
-                Membrete
-              </h3>
-
-              <div className="space-y-2.5">
-                <div className="flex items-center gap-2">
-                  {m.logoUrl ? (
-                    <img src={m.logoUrl} alt="Logo" className="h-[38px] max-w-[120px] rounded border border-line-200 bg-white object-contain px-1" />
-                  ) : (
-                    <span className="flex h-[38px] w-[90px] items-center justify-center rounded border border-dashed border-line-200 text-[10px] text-ink-400">
-                      Sin logo
-                    </span>
-                  )}
-                  <label className="btn-neutral btn-sm cursor-pointer">
-                    <Upload className="h-3 w-3" />
-                    {m.logoUrl ? 'Reemplazar' : 'Subir logo'}
-                    <input type="file" accept="image/png,image/svg+xml,image/jpeg" className="hidden" onChange={subirImagen('logoUrl')} />
-                  </label>
-                  {m.logoUrl && (
-                    <button onClick={() => poner('logoUrl', null)} className="btn-neutral btn-sm">
-                      <XIcon className="h-3 w-3" />
-                      Quitar
-                    </button>
-                  )}
-                </div>
-                <p className="text-meta text-ink-400">PNG o SVG con fondo transparente · alto útil 60px en el escrito.</p>
-
-                <label className="block">
-                  <span className="field-label">Razón social</span>
-                  <input value={m.firmName} onChange={(e) => poner('firmName', e.target.value)} className="field mt-1 w-full" placeholder="Restrepo & Cárdenas Abogados" />
-                </label>
-                <label className="block">
-                  <span className="field-label">NIT</span>
-                  <input value={m.firmNit} onChange={(e) => poner('firmNit', e.target.value)} className="field mt-1 w-full font-mono" placeholder="900.482.117-3" />
-                </label>
-                <label className="block">
-                  <span className="field-label">Pie de página</span>
-                  <input value={m.firmAddress} onChange={(e) => poner('firmAddress', e.target.value)} className="field mt-1 w-full" placeholder="Cra. 11 # 93-46, of. 302 · Bogotá" />
-                </label>
-                <label className="block">
-                  <span className="field-label">Teléfono</span>
-                  <input value={m.firmPhone} onChange={(e) => poner('firmPhone', e.target.value)} className="field mt-1 w-full" placeholder="(601) 742 18 90" />
-                </label>
-              </div>
-            </section>
-
-            <section>
-              <h3 className="mb-2 font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
-                Formato del escrito
-              </h3>
-
-              <div className="space-y-2.5">
-                <div className="grid grid-cols-2 gap-2">
-                  <label className="block">
-                    <span className="field-label">Tipografía</span>
-                    <select value={m.fontFamily} onChange={(e) => poner('fontFamily', e.target.value as FirmBranding['fontFamily'])} className="field mt-1 w-full">
-                      <option>Times New Roman</option>
-                      <option>Arial</option>
-                      <option>Calibri</option>
-                      <option>Tahoma</option>
-                      <option>Plus Jakarta Sans</option>
-                      <option>Manrope</option>
-                      <option>Public Sans</option>
-                      <option>Satoshi</option>
-                      <option>Work Sans</option>
-                      <option>Inter</option>
-                    </select>
-                    {/*
-                      LO QUE PASA CON CADA LETRA AL SALIR, dicho antes de elegir. Un PDF
-                      solo se ve igual en todas partes si la letra va dentro del archivo;
-                      las libres se incrustan, las propietarias no se pueden y el PDF usa
-                      la equivalente estandar. En Word manda lo que tenga instalado quien
-                      abre el archivo.
-                    */}
-                    <p className="mt-1 text-[11px] leading-snug text-ink-500">
-                      {['Plus Jakarta Sans', 'Manrope', 'Public Sans', 'Satoshi', 'Work Sans'].includes(m.fontFamily)
-                        ? 'Letra libre: el PDF la lleva incrustada y se ve igual en todas partes. En Word solo se ve así si quien lo abre la tiene instalada; si no, Word la sustituye.'
-                        : m.fontFamily === 'Times New Roman'
-                          ? 'Clásica: en Word está en todo equipo. El PDF usa Times, su equivalente estándar.'
-                          : 'En Word está en todo equipo con Office. El PDF usa Helvetica, la equivalente estándar, porque esta letra no se puede incrustar sin licencia.'}
-                    </p>
-                  </label>
-                  <label className="block">
-                    <span className="field-label">Tamaño</span>
-                    <select value={m.fontSizePt} onChange={(e) => poner('fontSizePt', Number(e.target.value))} className="field mt-1 w-full">
-                      {[10, 11, 12, 13, 14].map((n) => (
-                        <option key={n} value={n}>{n} pt</option>
-                      ))}
-                    </select>
-                  </label>
-                </div>
-
-                <Radios etiqueta="Interlineado" valor={m.lineSpacing} opciones={[['1.0', '1,0'], ['1.5', '1,5'], ['2.0', '2,0']]} onChange={(v) => poner('lineSpacing', v as FirmBranding['lineSpacing'])} />
-                <Radios etiqueta="Numeración de hechos" valor={m.factNumbering} opciones={[['ARABIGA', '1. 2. 3.'], ['ORDINAL', 'PRIMERO.']]} onChange={(v) => poner('factNumbering', v as FirmBranding['factNumbering'])} />
-                <Radios etiqueta="Títulos de sección" valor={m.sectionTitles} opciones={[['ROMANOS', 'I. Romanos'], ['ARABIGOS', '1. Arábigos'], ['SIN_NUMERAR', 'Sin numerar']]} onChange={(v) => poner('sectionTitles', v as FirmBranding['sectionTitles'])} />
-
-                {/* La numeración se impone al GENERAR: el texto ya escrito no se renumera. */}
-                <p className="text-meta text-ink-400">
-                  Numeración y títulos se aplican a los escritos que se generen desde ahora.
-                </p>
-              </div>
-            </section>
-
-            <section>
-              <h3 className="mb-2 font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
-                Bloque de firma
-              </h3>
-
-              <div className="space-y-2.5">
-                <label className="block">
-                  <span className="field-label">T.P. del abogado que firma</span>
-                  <input value={m.tpNumber} onChange={(e) => poner('tpNumber', e.target.value)} className="field mt-1 w-full font-mono" placeholder="214.882 del C.S.J." />
-                </label>
-                <label className="block">
-                  <span className="field-label">Correo de notificaciones judiciales</span>
-                  <input value={m.firmEmail} onChange={(e) => poner('firmEmail', e.target.value)} className="field mt-1 w-full" placeholder="notificaciones@rcabogados.co" />
-                </label>
-
-                <div className="flex items-center gap-2">
-                  {m.signatureImageUrl ? (
-                    <img src={m.signatureImageUrl} alt="Firma" className="h-[34px] rounded border border-line-200 bg-white object-contain px-1" />
-                  ) : (
-                    <span className="text-meta text-ink-400">Sin imagen de firma</span>
-                  )}
-                  <label className="btn-neutral btn-sm cursor-pointer">
-                    <Upload className="h-3 w-3" />
-                    {m.signatureImageUrl ? 'Reemplazar' : 'Firma escaneada'}
-                    <input type="file" accept="image/png,image/jpeg" className="hidden" onChange={subirImagen('signatureImageUrl')} />
-                  </label>
-                  {m.signatureImageUrl && (
-                    <button onClick={() => poner('signatureImageUrl', null)} className="btn-neutral btn-sm">
-                      <XIcon className="h-3 w-3" />
-                    </button>
-                  )}
-                </div>
-              </div>
-            </section>
-          </div>
-
-          {/* ─── LA PREVISUALIZACIÓN · un escrito real ─────────────────────── */}
-          <div className="min-w-0 flex-1 overflow-y-auto">
-            <div className="mb-1.5 flex items-center justify-between">
-              <span className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
-                Previsualización · escrito real
-              </span>
-              <span className="chip-neutral">Manda sobre el defecto</span>
-            </div>
-
-            <div
-              className="rounded-card border border-line-200 bg-white px-8 py-7 text-black shadow-e1"
-              style={{
-                fontFamily: `'${m.fontFamily}', serif`,
-                fontSize: `${m.fontSizePt}px`,
-                lineHeight: m.lineSpacing === '1.0' ? 1.35 : m.lineSpacing === '1.5' ? 1.7 : 2.1
-              }}
+    <div className="cara-nueva cn-adm-dialogos">
+      <div className="cn-adm-pantalla">
+      <Dialog
+        abierto={isOpen}
+        onCerrar={onClose}
+        tamano="L"
+        titulo="Membrete"
+        subtitulo="Va en los escritos que exporte y manda sobre el formato por defecto."
+        hayCambiosSinGuardar={hayCambios}
+        onIntentoDeCerrarConCambios={() => setAvisoVelo(true)}
+        pieIzquierda={
+          hayCambios ? <span className="cn-adm-pie-aviso">Cambios sin guardar</span> : <span>Se aplica a toda la firma</span>
+        }
+        acciones={
+          <>
+            <button type="button" onClick={descartar} className="cn-adm-boton cn-adm-boton--terciario" disabled={guardando}>
+              Descartar
+            </button>
+            <button
+              type="button"
+              onClick={() => void guardar()}
+              className="cn-adm-boton cn-adm-boton--primario"
+              disabled={!hayCambios || guardando}
             >
-              {/* Membrete */}
-              <div className="mb-4 flex items-center gap-3 border-b border-black/20 pb-2">
-                {m.logoUrl && <img src={m.logoUrl} alt="" className="h-[42px] object-contain" />}
-                <div className="min-w-0">
-                  <p className="font-bold uppercase tracking-wide">{m.firmName || 'RAZÓN SOCIAL DE LA FIRMA'}</p>
-                  <p style={{ fontSize: `${m.fontSizePt - 2}px` }}>NIT {m.firmNit || '—'}</p>
-                </div>
+              {guardando ? 'Guardando…' : 'Guardar el membrete'}
+            </button>
+          </>
+        }
+      >
+        <div className="cn-adm-cuerpo">
+          {error && (
+            <p role="alert" className="cn-adm-error">
+              {error}
+            </p>
+          )}
+          {avisoVelo && hayCambios && (
+            <p role="status" className="cn-adm-recuadro cn-adm-recuadro--arriba">
+              Hay cambios sin guardar. Use «Guardar el membrete» o «Descartar»: el clic afuera no decide por usted.
+            </p>
+          )}
+
+          {!m || !lineas ? (
+            <p className="cn-adm-vacio">{error ? '' : 'Leyendo el membrete de la firma…'}</p>
+          ) : (
+            <div className="cn-adm-membrete">
+              {/* ─── EL FORMULARIO ─────────────────────────────────────────── */}
+              <div className="cn-adm-membrete-form">
+                <section className="cn-adm-grupo" aria-labelledby="cn-adm-mem-datos">
+                  <h3 id="cn-adm-mem-datos" className="cn-adm-seccion-titulo">
+                    Datos de la firma
+                  </h3>
+                  <Campo
+                    id="cn-adm-mem-nombre"
+                    etiqueta="Nombre de la firma"
+                    valor={m.firmName}
+                    onCambio={(v) => poner('firmName', v)}
+                    marcador="Nombre de la firma"
+                    ayuda="Encabeza el escrito, en mayúsculas."
+                  />
+                  <Campo id="cn-adm-mem-nit" etiqueta="NIT" valor={m.firmNit} onCambio={(v) => poner('firmNit', v)} marcador="000.000.000-0" cifra />
+                  <Campo
+                    id="cn-adm-mem-direccion"
+                    etiqueta="Dirección"
+                    valor={m.firmAddress}
+                    onCambio={(v) => poner('firmAddress', v)}
+                    marcador="Dirección 00, ciudad"
+                    ayuda="Va bajo el nombre, junto al NIT, y en el pie del Word."
+                  />
+                  <Campo
+                    id="cn-adm-mem-telefono"
+                    etiqueta="Teléfono"
+                    valor={m.firmPhone}
+                    onCambio={(v) => poner('firmPhone', v)}
+                    marcador="(000) 000 00 00"
+                    ayuda="Va en el pie del Word."
+                  />
+                  <Campo
+                    id="cn-adm-mem-correo"
+                    etiqueta="Correo de notificaciones judiciales"
+                    valor={m.firmEmail}
+                    onCambio={(v) => poner('firmEmail', v)}
+                    marcador="notificaciones@sufirma.co"
+                    ayuda="Va en el pie del PDF, y el motor lo escribe al cierre de los escritos nuevos."
+                  />
+
+                  <div>
+                    <p className="cn-adm-etiqueta">
+                      Logotipo <span className="cn-adm-etiqueta-opcional">(opcional)</span>
+                    </p>
+                    <div className="cn-adm-logo">
+                      {m.logoUrl ? (
+                        <img src={m.logoUrl} alt="Logotipo actual de la firma" />
+                      ) : (
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <path d="M4 16v3a2 2 0 002 2h12a2 2 0 002-2v-3" />
+                          <polyline points="8 9 12 5 16 9" />
+                          <line x1="12" y1="5" x2="12" y2="16" />
+                        </svg>
+                      )}
+                      <span className="cn-adm-logo-texto">PNG o JPG, idealmente con fondo transparente.</span>
+                      <label className="cn-adm-boton cn-adm-boton--blanco">
+                        {m.logoUrl ? 'Reemplazar' : 'Elegir'}
+                        <input type="file" accept="image/png,image/jpeg" className="cn-adm-archivo" onChange={subirLogo} />
+                      </label>
+                      {m.logoUrl && (
+                        <button type="button" onClick={() => poner('logoUrl', null)} className="cn-adm-boton cn-adm-boton--terciario">
+                          Quitar
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </section>
+
+                <section className="cn-adm-grupo" aria-labelledby="cn-adm-mem-formato">
+                  <h3 id="cn-adm-mem-formato" className="cn-adm-seccion-titulo">
+                    Formato del escrito
+                  </h3>
+                  <div className="cn-adm-par">
+                    <div>
+                      <label className="cn-adm-etiqueta" htmlFor="cn-adm-mem-letra">
+                        Tipografía
+                      </label>
+                      <select
+                        id="cn-adm-mem-letra"
+                        value={m.fontFamily}
+                        onChange={(e) => poner('fontFamily', e.target.value as FirmBranding['fontFamily'])}
+                        className="cn-adm-campo"
+                      >
+                        {['Times New Roman', 'Arial', 'Calibri', 'Tahoma', 'Plus Jakarta Sans', 'Manrope', 'Public Sans', 'Satoshi', 'Work Sans', 'Inter'].map((f) => (
+                          <option key={f}>{f}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="cn-adm-etiqueta" htmlFor="cn-adm-mem-tamano">
+                        Tamaño
+                      </label>
+                      <select
+                        id="cn-adm-mem-tamano"
+                        value={m.fontSizePt}
+                        onChange={(e) => poner('fontSizePt', Number(e.target.value))}
+                        className="cn-adm-campo"
+                      >
+                        {[10, 11, 12, 13, 14].map((n) => (
+                          <option key={n} value={n}>
+                            {n} pt
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  {/*
+                    LO QUE PASA CON CADA LETRA AL SALIR, dicho antes de elegir: un
+                    PDF solo se ve igual en todas partes si la letra va dentro; las
+                    libres se incrustan, las propietarias no se pueden.
+                  */}
+                  <p className="cn-adm-ayuda">
+                    {LETRAS_LIBRES.includes(m.fontFamily)
+                      ? 'Letra libre: el PDF la lleva incrustada y se ve igual en todas partes. En Word solo se ve así si quien lo abre la tiene instalada.'
+                      : m.fontFamily === 'Times New Roman'
+                        ? 'Clásica: en Word está en todo equipo. El PDF usa Times, su equivalente estándar.'
+                        : 'En Word está en todo equipo con Office. El PDF usa Helvetica, la equivalente estándar, porque esta letra no se puede incrustar sin licencia.'}
+                  </p>
+
+                  <Pastillas
+                    etiqueta="Interlineado"
+                    valor={m.lineSpacing}
+                    opciones={[['1.0', '1,0'], ['1.5', '1,5'], ['2.0', '2,0']]}
+                    onCambio={(v) => poner('lineSpacing', v as FirmBranding['lineSpacing'])}
+                  />
+                  <Pastillas
+                    etiqueta="Numeración de hechos"
+                    valor={m.factNumbering}
+                    opciones={[['ARABIGA', '1. 2. 3.'], ['ORDINAL', 'PRIMERO.']]}
+                    onCambio={(v) => poner('factNumbering', v as FirmBranding['factNumbering'])}
+                  />
+                  <Pastillas
+                    etiqueta="Títulos de sección"
+                    valor={m.sectionTitles}
+                    opciones={[['ROMANOS', 'I. Romanos'], ['ARABIGOS', '1. Arábigos'], ['SIN_NUMERAR', 'Sin numerar']]}
+                    onCambio={(v) => poner('sectionTitles', v as FirmBranding['sectionTitles'])}
+                  />
+                  {/* La numeración se impone al GENERAR: el texto ya escrito no se renumera. */}
+                  <p className="cn-adm-ayuda">Numeración y títulos se aplican a los escritos que se generen desde ahora.</p>
+                </section>
+
+                <section className="cn-adm-grupo" aria-labelledby="cn-adm-mem-firma">
+                  <h3 id="cn-adm-mem-firma" className="cn-adm-seccion-titulo">
+                    Bloque de firma
+                  </h3>
+                  <Campo
+                    id="cn-adm-mem-tp"
+                    etiqueta="T.P. del abogado que firma"
+                    valor={m.tpNumber}
+                    onCambio={(v) => poner('tpNumber', v)}
+                    marcador="000.000 del C.S.J."
+                    ayuda="El motor la incluye en el bloque de firma de los escritos nuevos."
+                    cifra
+                  />
+                </section>
               </div>
 
-              <p className="font-bold">JUZGADO TREINTA Y CUATRO (34) ADMINISTRATIVO DEL CIRCUITO DE BOGOTÁ</p>
-              <p className="mt-2">Referencia: Nulidad y restablecimiento del derecho</p>
-              <p>Demandante: Jorge Elías Mosquera Rentería</p>
+              {/* ─── EL PAPEL · siempre blanco, como sale el Word y el PDF ───── */}
+              <div className="cn-adm-escritorio">
+                <div
+                  className="cn-adm-papel"
+                  aria-label="Previsualización del escrito"
+                  style={{
+                    fontFamily: `'${m.fontFamily}', Georgia, serif`,
+                    fontSize: px(m.fontSizePt),
+                    lineHeight: m.lineSpacing === '1.0' ? 1.35 : m.lineSpacing === '1.5' ? 1.7 : 2.1
+                  }}
+                >
+                  <div className="cn-adm-papel-membrete">
+                    {m.logoUrl && <img src={m.logoUrl} alt="" />}
+                    <div>
+                      {lineas.encabezado ? (
+                        <p className="cn-adm-papel-firma">{lineas.encabezado}</p>
+                      ) : (
+                        <p className="cn-adm-papel-vacio">Sin nombre: el escrito sale sin encabezado.</p>
+                      )}
+                      {lineas.identificacion && (
+                        <p className="cn-adm-papel-datos" style={{ fontSize: px(m.fontSizePt - 2) }}>
+                          {lineas.identificacion}
+                        </p>
+                      )}
+                    </div>
+                  </div>
 
-              <p className="mt-4 font-bold">
-                {m.sectionTitles === 'ROMANOS' ? 'I. PRETENSIONES' : m.sectionTitles === 'ARABIGOS' ? '1. PRETENSIONES' : 'PRETENSIONES'}
-              </p>
-              <p className="mt-1 text-justify">
-                Solicito al despacho declarar la nulidad de la Resolución 8842 del 12 de noviembre
-                de 2024, expedida por Colpensiones, y, a título de restablecimiento del derecho,
-                ordenar el reconocimiento y pago retroactivo de la prestación.
-              </p>
+                  <p className="cn-adm-papel-centro">JUZGADO 00 CIVIL MUNICIPAL</p>
+                  <p className="cn-adm-papel-centro cn-adm-papel-centro--suave">E. S. D.</p>
+                  <p className="cn-adm-papel-parrafo">
+                    <strong>Referencia:</strong> contestación de la demanda.
+                  </p>
 
-              <p className="mt-4 font-bold">
-                {m.sectionTitles === 'ROMANOS' ? 'II. HECHOS' : m.sectionTitles === 'ARABIGOS' ? '2. HECHOS' : 'HECHOS'}
-              </p>
-              <p className="mt-1 text-justify">
-                {m.factNumbering === 'ORDINAL' ? 'PRIMERO.' : '1.'} La Junta Regional de
-                Calificación de Invalidez dictaminó una pérdida de capacidad laboral del 62,3%.
-              </p>
+                  <p className="cn-adm-papel-titulo">{titulo(m, 'PRETENSIONES', 1)}</p>
+                  <p className="cn-adm-papel-parrafo">Texto de las pretensiones del escrito.</p>
 
-              {/* Bloque de firma */}
-              <p className="mt-5">Atentamente,</p>
-              {m.signatureImageUrl && <img src={m.signatureImageUrl} alt="" className="mt-1 h-[38px] object-contain" />}
-              <p className="mt-1 font-bold">Camila Restrepo Vélez</p>
-              <p style={{ fontSize: `${m.fontSizePt - 2}px` }}>
-                C.C. 52.418.907{m.tpNumber ? ` · T.P. ${m.tpNumber}` : ''}
-              </p>
-              {m.firmEmail && <p style={{ fontSize: `${m.fontSizePt - 2}px` }}>{m.firmEmail}</p>}
+                  <p className="cn-adm-papel-titulo">{titulo(m, 'HECHOS', 2)}</p>
+                  <p className="cn-adm-papel-parrafo">{m.factNumbering === 'ORDINAL' ? 'PRIMERO.' : '1.'} Texto del primer hecho.</p>
 
-              {/* Pie */}
-              {(m.firmAddress || m.firmPhone) && (
-                <p className="mt-5 border-t border-black/20 pt-1.5 text-center" style={{ fontSize: `${m.fontSizePt - 3}px` }}>
-                  {[m.firmAddress, m.firmPhone].filter(Boolean).join(' · ')}
+                  <p className="cn-adm-papel-cierre">Atentamente,</p>
+                  <p className="cn-adm-papel-firma">Nombre del abogado</p>
+                  <p style={{ fontSize: px(m.fontSizePt - 2) }}>
+                    C.C. 00.000.000{m.tpNumber ? ` · T.P. ${m.tpNumber}` : ''}
+                  </p>
+                  {m.firmEmail && <p style={{ fontSize: px(m.fontSizePt - 2) }}>{m.firmEmail}</p>}
+
+                  {(lineas.pieIzquierda || lineas.pieContacto) && (
+                    <div className="cn-adm-papel-pie" style={{ fontSize: px(m.fontSizePt - 2) }}>
+                      {lineas.pieIzquierda && <p>Pie del PDF: {lineas.pieIzquierda}</p>}
+                      {lineas.pieContacto && <p>Pie del Word: {lineas.pieContacto}</p>}
+                    </div>
+                  )}
+                </div>
+                <p className="cn-adm-escritorio-nota">
+                  Sobre papel blanco a propósito: así sale el Word y el PDF, esté la aplicación en el tema que esté.
                 </p>
-              )}
+              </div>
             </div>
-
-            {/* La previsualización es SIEMPRE en papel blanco: es lo que se exporta. */}
-            <p className="mt-1.5 text-center text-meta text-ink-400">
-              Sobre papel blanco a propósito: así sale el .docx y el PDF, esté la aplicación en el
-              tema que esté.
-            </p>
-          </div>
+          )}
         </div>
-      )}
-    </Dialog>
+      </Dialog>
+      </div>
+    </div>
   );
 };
 
-/** Radio en línea: etiqueta a la izquierda, opciones como pastillas. */
-const Radios: React.FC<{
+/** Un campo de texto con su etiqueta y su ayuda. `cifra` = mono, solo para lo citable (NIT, T.P.). */
+const Campo: React.FC<{
+  id: string;
+  etiqueta: string;
+  valor: string;
+  onCambio: (v: string) => void;
+  marcador: string;
+  ayuda?: string;
+  cifra?: boolean;
+}> = ({ id, etiqueta, valor, onCambio, marcador, ayuda, cifra }) => (
+  <div>
+    <label className="cn-adm-etiqueta" htmlFor={id}>
+      {etiqueta}
+    </label>
+    <input
+      id={id}
+      value={valor}
+      onChange={(e) => onCambio(e.target.value)}
+      placeholder={marcador}
+      className={`cn-adm-campo ${cifra ? 'cn-adm-campo--cifra' : ''}`}
+    />
+    {ayuda && <p className="cn-adm-ayuda">{ayuda}</p>}
+  </div>
+);
+
+/** Opciones en pastillas del tamaño del dedo. */
+const Pastillas: React.FC<{
   etiqueta: string;
   valor: string;
   opciones: Array<[string, string]>;
-  onChange: (v: string) => void;
-}> = ({ etiqueta, valor, opciones, onChange }) => (
-  <div>
-    <span className="field-label">{etiqueta}</span>
-    <div className="mt-1 flex flex-wrap gap-1.5">
+  onCambio: (v: string) => void;
+}> = ({ etiqueta, valor, opciones, onCambio }) => (
+  <div role="radiogroup" aria-label={etiqueta}>
+    <p className="cn-adm-etiqueta">{etiqueta}</p>
+    <div className="cn-adm-pastillas">
       {opciones.map(([v, texto]) => (
         <button
           key={v}
           type="button"
-          onClick={() => onChange(v)}
-          className={`rounded-control border px-2.5 py-1 text-[12px] font-medium ${
-            valor === v
-              ? 'border-brand-700 bg-brand-50 text-brand-700'
-              : 'border-line-200 bg-canvas text-ink-700 hover:border-brand-700'
-          }`}
+          role="radio"
+          aria-checked={valor === v}
+          onClick={() => onCambio(v)}
+          className={`cn-adm-pastilla ${valor === v ? 'cn-adm-pastilla--elegida' : ''}`}
         >
           {texto}
         </button>
