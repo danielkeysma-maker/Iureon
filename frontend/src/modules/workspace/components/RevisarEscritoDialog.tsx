@@ -25,7 +25,7 @@ import { ActuacionPropiaDialog } from './ActuacionPropiaDialog';
 import { textoDelArchivo } from '../services/textoDelArchivo';
 import { etiquetaDeAtaque, puntosDeAtaqueDe } from '../services/ataque';
 import { LecturaDelDocumentoRecibido } from './LecturaDelDocumentoRecibido';
-import { BandaDeComprobacion, MarcasDelHallazgo, SeccionConMarcas } from './ComprobacionAutomatica';
+import { InformeDelEscritoPropio } from './InformeDelEscritoPropio';
 import { lineaDePasajes, lineasDeLaBanda, marcasDelHallazgo, normalizarInforme, rotuloDeMarca } from '../services/comprobaciones';
 import type { SeccionDelInforme } from '../services/review.api';
 import { PuenteAlAtaque } from './PuenteAlAtaque';
@@ -834,7 +834,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
       hayCambiosSinGuardar={ocupado}
       onIntentoDeCerrarConCambios={() => undefined}
       pieIzquierda={
-        <span className="font-mono text-[11px] text-ink-400">
+        <span className="cn-inf-precio">
           {respuesta
             ? `Cobrado ${pesos(respuesta.cobradoCop)}${Number.isFinite(respuesta.saldoCop) ? ` · saldo ${pesos(respuesta.saldoCop)}` : ''}${respuesta.guardada === false ? ' · no se pudo guardar' : ''}`
             : `Cuesta ${pesos(precioCop)}`}
@@ -843,7 +843,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
       acciones={
         respuesta ? (
           <>
-            <button type="button" onClick={() => setRespuesta(null)} className="btn-neutral btn-sm">
+            <button type="button" onClick={() => setRespuesta(null)} className="cn-tal-boton cn-tal-boton--fantasma">
               Revisar otro
             </button>
             {onAbrirTaller && paraElTaller.texto && (
@@ -884,7 +884,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
                   });
                   onCerrar();
                 }}
-                className="btn-secondary btn-sm"
+                className="cn-tal-boton cn-tal-boton--marca"
                 title="El escrito con los pasajes marcados, para editarlo y seguir con el revisor"
               >
                 <ClipboardCheck className="h-3.5 w-3.5" />
@@ -895,7 +895,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
               type="button"
               onClick={() => void exportar('word')}
               disabled={!informeOrdenado || exportando !== null}
-              className="btn-neutral btn-sm disabled:opacity-50"
+              className="cn-tal-boton"
               title={informeOrdenado ? 'Descargar el informe en Word, con la letra de la firma' : 'Todavía no hay informe que descargar'}
             >
               <Download className="h-3.5 w-3.5" />
@@ -905,27 +905,27 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
               type="button"
               onClick={() => void exportar('pdf')}
               disabled={!informeOrdenado || exportando !== null}
-              className="btn-neutral btn-sm disabled:opacity-50"
+              className="cn-tal-boton"
               title={informeOrdenado ? 'Descargar el informe en PDF, con la letra de la firma' : 'Todavía no hay informe que descargar'}
             >
               <Download className="h-3.5 w-3.5" />
               {exportando === 'pdf' ? 'PDF…' : 'PDF'}
             </button>
-            <button type="button" onClick={() => void copiar()} className="btn-primary btn-sm">
+            <button type="button" onClick={() => void copiar()} className="cn-tal-boton cn-tal-boton--primario">
               <Copy className="h-3.5 w-3.5" />
               {copiado ? 'Copiado' : 'Copiar informe'}
             </button>
           </>
         ) : (
           <>
-            <button type="button" onClick={onCerrar} className="btn-neutral btn-sm" disabled={ocupado}>
+            <button type="button" onClick={onCerrar} className="cn-tal-boton cn-tal-boton--fantasma" disabled={ocupado}>
               Cancelar
             </button>
             <button
               type="button"
               onClick={pedirRevision}
               disabled={!hayEscrito || ocupado || sinActuacion}
-              className="btn-primary btn-sm disabled:opacity-50"
+              className="cn-tal-boton cn-tal-boton--primario"
             >
               <ClipboardCheck className="h-3.5 w-3.5" />
               {ocupado ? (subiendo !== null ? `Enviando · ${subiendo}%` : 'Revisando…') : `Revisar · ${pesos(precioCop)}`}
@@ -935,7 +935,18 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
       }
     >
       {!respuesta ? (
-        <div className="space-y-4">
+        <div className="cara-nueva cn-inf-form">
+          {/*
+            LA ESPERA SE VE EN EL CUERPO, NO SOLO EN EL BOTÓN. Dice lo mismo que
+            el botón —«Revisando…» o el porcentaje de la subida— y nada más: el
+            diseño promete pasos y un minuto que el servidor no reporta.
+          */}
+          {ocupado && (
+            <p className="cn-inf-espera" role="status">
+              <Loader2 className="cn-inf-espera-icono animate-spin" />
+              {subiendo !== null ? `Enviando · ${subiendo}%` : 'Revisando…'}
+            </p>
+          )}
           {/* ─── QUÉ ES LO QUE TRAE, Y VA ANTES QUE NADA ───────────────────
               Esta elección decide qué se pregunta y qué se responde, así que no
               puede ir después del archivo ni escondida: es lo primero que se ve
@@ -943,9 +954,9 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
               comparten fila. Cada una lleva `[overflow-wrap:anywhere]` porque
               sus descripciones traen palabras largas y un ítem flex no baja del
               ancho mínimo de su contenido. */}
-          <div>
-            <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">Qué trae</p>
-            <div className="mt-1.5 flex flex-col gap-2 sm:flex-row">
+          <div className="cn-inf-bloque">
+            <p className="cn-inf-etiqueta">Qué trae</p>
+            <div className="cn-inf-modos">
               {(
                 [
                   {
@@ -965,12 +976,10 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
                   type="button"
                   onClick={() => cambiarModo(o.valor)}
                   aria-pressed={modo === o.valor}
-                  className={`min-w-0 flex-1 rounded-control border px-3 py-2 text-left [overflow-wrap:anywhere] ${
-                    modo === o.valor ? 'border-brand-700 bg-brand-50' : 'border-line-200 bg-canvas hover:border-brand-700'
-                  }`}
+                  className="cn-inf-modo"
                 >
-                  <span className={`block text-ui font-medium ${modo === o.valor ? 'text-brand-700' : 'text-ink-900'}`}>{o.titulo}</span>
-                  <span className="mt-0.5 block text-[11px] leading-snug text-ink-500 text-justify [text-wrap:pretty]">{o.detalle}</span>
+                  <span className="cn-inf-modo-titulo">{o.titulo}</span>
+                  <span className="cn-inf-modo-detalle">{o.detalle}</span>
                 </button>
               ))}
             </div>
@@ -995,8 +1004,8 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
             avisarle de que «no cupo» seria inventarle una perdida.
           */}
           {documentoTraido && !documentoTraido.completo && documentoTraido.nombre && (
-            <p className="notice-unverified" role="status">
-              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-unverified" />
+            <p className="cn-inf-aviso" role="status">
+              <AlertTriangle className="cn-inf-aviso-icono" />
               <span className="min-w-0 text-justify [overflow-wrap:anywhere]">
                 «{documentoTraido.nombre}» es demasiado largo para traerlo desde Orientación. El modo ya está
                 escogido: vuelva a adjuntarlo aquí.
@@ -1024,8 +1033,8 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
           )}
 
           {esRecibido && (
-            <div>
-              <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
+            <div className="cn-inf-bloque">
+              <p className="cn-inf-etiqueta" aria-hidden="true">
                 A quién representa en este proceso
               </p>
               <label className="sr-only" htmlFor="posicion-procesal">
@@ -1033,7 +1042,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
               </label>
               <select
                 id="posicion-procesal"
-                className="field mt-1.5"
+                className="cn-inf-campo"
                 value={posicion}
                 onChange={(e) => {
                   setPosicion(e.target.value as PapelEnElExpediente);
@@ -1047,7 +1056,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
                   </option>
                 ))}
               </select>
-              <p className="mt-1 text-[11px] leading-snug text-ink-500 text-justify [text-wrap:pretty]">
+              <p className="cn-inf-ayuda">
                 {posicionDeducida
                   ? 'Tomado del expediente, de quien registró como su cliente. Cámbielo si no es así.'
                   : 'Con esto, el informe separa las cargas que son suyas de las que el documento le impone a la otra parte. Sin esto las muestra todas sin decir de quién son.'}
@@ -1056,15 +1065,15 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
           )}
 
           {/* ─── EL ESCRITO: archivo o texto ─────────────────────────────── */}
-          <div>
-            <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
+          <div className="cn-inf-bloque">
+            <p className="cn-inf-etiqueta">
               {esRecibido ? 'El documento que recibió' : 'El escrito'}
             </p>
             {archivo ? (
-              <div className="mt-1.5 flex items-center gap-2 rounded-control border border-line-200 bg-canvas px-3 py-2">
-                <FileText className="h-4 w-4 shrink-0 text-ink-400" />
-                <span className="min-w-0 flex-1 truncate text-ui text-ink-900">{archivo.name}</span>
-                <span className="shrink-0 font-mono text-[11px] text-ink-400">{(archivo.size / 1024).toFixed(0)} KB</span>
+              <div className="cn-inf-archivo">
+                <FileText className="h-5 w-5 shrink-0 text-ink-500" />
+                <span className="cn-inf-archivo-nombre">{archivo.name}</span>
+                <span className="cn-inf-precio shrink-0">{(archivo.size / 1024).toFixed(0)} KB</span>
                 <button
                   type="button"
                   onClick={() => {
@@ -1073,20 +1082,24 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
                     setAvisoDeLectura('');
                     archivoLeido.current = null;
                   }}
-                  className="text-ink-400 hover:text-danger"
+                  className="cn-tal-icono-boton"
                   aria-label="Quitar archivo"
                 >
-                  <X className="h-3.5 w-3.5" />
+                  <X className="h-4 w-4" />
                 </button>
               </div>
             ) : (
               <>
-                <label className="mt-1.5 flex cursor-pointer items-center justify-center gap-2 rounded-control border border-dashed border-line-200 bg-canvas py-3 hover:bg-brand-50">
+                {/* Sin borde discontinuo: en esta casa el guion es solo de «sin verificar», y una zona de subir no lo es. */}
+                <label className="cn-inf-subir">
                   <input type="file" accept=".pdf,.docx,.doc,.txt" onChange={elegirArchivo} className="hidden" />
-                  <UploadCloud className="h-4 w-4 text-ink-400" />
-                  <span className="text-meta font-medium text-ink-500">Subir PDF, Word o texto (hasta 15 MB, con anexos)</span>
+                  <UploadCloud className="cn-inf-subir-icono" />
+                  <span className="min-w-0 flex-1">
+                    <span className="cn-inf-etiqueta">Subir PDF, Word o texto</span>
+                    <span className="cn-inf-ayuda block">Hasta 15 MB, con anexos.</span>
+                  </span>
                 </label>
-                <p className="mt-2 text-center font-mono text-[10px] uppercase tracking-[0.08em] text-ink-400">o pegue el texto</p>
+                <p className="cn-inf-o">o pegue el texto</p>
                 {/*
                   AQUI VA EL DOCUMENTO ENTERO, NO LA PREGUNTA, y el marcador de
                   posicion tiene que decirlo con esas palabras. Es la
@@ -1109,13 +1122,14 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
                       ? 'Pegue aquí el texto completo del documento que recibió — el auto, la sentencia, el oficio. No la pregunta: ésa va más abajo.'
                       : 'Pegue aquí el texto completo de su escrito. No la pregunta: ésa va más abajo.'
                   }
-                  className="field-area mt-1.5 w-full resize-y"
+                  className="cn-inf-campo resize-y"
                 />
               </>
             )}
-            <p className="mt-1.5 text-[11px] leading-snug text-ink-500 text-justify">
-              Un PDF escaneado no trae texto: si el archivo es una imagen, pegue el texto. Se revisan hasta 300.000 caracteres, unas 75 páginas;
-              lo que pase de ahí se declara recortado.
+            <p className="cn-inf-ayuda">
+              {/* Sin «unas 75 páginas»: la plataforma solo conoce caracteres, y una cuenta de páginas sería una estimación con cara de dato. */}
+              Un PDF escaneado no trae texto: si el archivo es una imagen, pegue el texto. Se revisan hasta 300.000 caracteres; lo que pase de ahí se
+              declara recortado.
             </p>
           </div>
 
@@ -1139,9 +1153,9 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
             —ni tiene por qué saber— cómo se llama en el catálogo.
           */}
           {eligeActuacion && !esRecibido && (
-            <div>
-              <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">Qué actuación es</p>
-              <p className="mt-1 text-[11px] leading-snug text-ink-500 text-justify">
+            <div className="cn-inf-bloque">
+              <p className="cn-inf-etiqueta">Qué actuación es</p>
+              <p className="cn-inf-ayuda">
                 La revisión objetiva se hace contra la ficha verificada de la actuación: por eso hay que decir cuál es. Si no lo sabe
                 —que es lo normal cuando el escrito viene de otro—, la guía la propone leyendo el archivo, con el término, el artículo y
                 la autoridad a la vista, y usted escoge.
@@ -1195,7 +1209,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
                 type="button"
                 onClick={() => void pedirLaGuia()}
                 disabled={!rama || !hayEscrito || leyendoArchivo}
-                className="mt-2 flex w-full items-center gap-2.5 rounded-control border border-[rgb(var(--brand-line))] bg-brand-50 px-3 py-2 text-left hover:border-brand-700 disabled:opacity-50"
+                className="cn-inf-guia"
               >
                 {leyendoArchivo ? (
                   <Loader2 className="h-4 w-4 shrink-0 animate-spin text-brand-700" />
@@ -1203,27 +1217,27 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
                   <Sparkles className="h-4 w-4 shrink-0 text-brand-700" />
                 )}
                 <span className="min-w-0 flex-1">
-                  <span className="block text-ui font-medium text-ink-900">
+                  <span className="cn-inf-guia-titulo">
                     {leyendoArchivo ? 'Leyendo el escrito…' : 'Que la guía diga qué actuación es'}
                   </span>
-                  <span className="block text-[11px] leading-snug text-ink-500">
+                  <span className="cn-inf-ayuda block">
                     Lee el archivo en su navegador —no lo sube, no cuesta nada— y propone candidatas del catálogo con su ficha.
                   </span>
                 </span>
               </button>
 
               {!rama && (
-                <p className="mt-1.5 text-[11px] leading-snug text-ink-500 text-justify">
+                <p className="cn-inf-ayuda">
                   Elija la rama para poder pedirle la propuesta a la guía: el catálogo propone dentro de una rama, nunca a ciegas.
                 </p>
               )}
               {rama && !hayEscrito && (
-                <p className="mt-1.5 text-[11px] leading-snug text-ink-500 text-justify">
+                <p className="cn-inf-ayuda">
                   Suba el archivo o pegue el texto: la guía propone sobre lo que dice el escrito, no sobre suposiciones.
                 </p>
               )}
               {avisoDeLectura && (
-                <p className="mt-1.5 rounded-control border border-line-200 bg-canvas px-3 py-2 text-[12px] leading-snug text-ink-900 text-justify">
+                <p className="cn-inf-nota">
                   {avisoDeLectura} Mientras tanto, la actuación se puede elegir a mano en la lista de arriba.
                 </p>
               )}
@@ -1231,19 +1245,24 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
           )}
 
           {/* ─── DE QUIÉN ES EL ESCRITO ───────────────────────────────────── */}
-          <div>
-            <label htmlFor="cliente-revision" className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
+          <div className="cn-inf-bloque">
+            <label htmlFor="cliente-revision" className="cn-inf-etiqueta">
               Cliente o proceso
             </label>
+            {/*
+              EL EJEMPLO ES UN MOLDE, NO UN CASO. Traía un nombre, una EPS y un
+              radicado verosímiles: README-app §3 pide que todo ejemplo se lea
+              como relleno a primera vista.
+            */}
             <input
               id="cliente-revision"
               value={cliente}
               onChange={(e) => setCliente(e.target.value)}
               maxLength={160}
-              placeholder="Joel Ayús · tutela contra EPS Sanitas · rad. 2026-00345"
-              className="field mt-1.5 w-full"
+              placeholder="Nombre del cliente · asunto · rad. 00000-00-00-000-0000-00000-00"
+              className="cn-inf-campo"
             />
-            <p className="mt-1 text-[11px] leading-snug text-ink-500 text-justify">
+            <p className="cn-inf-ayuda">
               Para saber de qué asunto es cuando vuelva a la lista. Queda también en el PDF y el Word del informe.
             </p>
           </div>
@@ -1259,11 +1278,11 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
 
               Asi que el rotulo dice que es opcional y la linea de abajo dice
               que hace, en vez de dejar que cada quien lo adivine. */}
-          <div>
-            <label htmlFor="pregunta-revision" className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
-              Qué quiere saber <span className="font-normal normal-case tracking-normal text-ink-400">· opcional</span>
+          <div className="cn-inf-bloque">
+            <label htmlFor="pregunta-revision" className="cn-inf-etiqueta">
+              Qué quiere saber <span className="cn-inf-opcional">· opcional</span>
             </label>
-            <p className="mt-1 text-[11px] leading-snug text-ink-500 text-justify">
+            <p className="cn-inf-ayuda">
               {esRecibido
                 ? 'El informe trae siempre lo mismo: qué es el documento, qué decide, qué le exige y para cuándo, qué queda pendiente y por dónde se ataca. Esto solo dirige el énfasis; si lo deja vacío, se revisa el documento completo igual.'
                 : 'El informe trae siempre lo mismo: qué exige la ficha de la actuación, qué falta y qué corregiría. Esto solo dirige el énfasis; si lo deja vacío, se revisa el escrito completo igual.'}
@@ -1273,17 +1292,16 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
               value={pregunta}
               onChange={(e) => setPregunta(e.target.value)}
               rows={2}
-              className="field-area mt-1.5 w-full resize-none"
+              className="cn-inf-campo resize-none"
             />
-            <div className="mt-1.5 flex flex-wrap gap-1.5">
+            <div className="cn-inf-sugerencias">
               {SUGERENCIAS[modo].map((s) => (
                 <button
                   key={s}
                   type="button"
                   onClick={() => setPregunta(s)}
-                  className={`rounded-control border px-2 py-1 text-left text-[11px] leading-snug ${
-                    pregunta === s ? 'border-brand-700 bg-brand-50 text-brand-700' : 'border-line-200 bg-canvas text-ink-700 hover:border-brand-700'
-                  }`}
+                  aria-pressed={pregunta === s}
+                  className="cn-inf-sugerencia"
                 >
                   {s}
                 </button>
@@ -1299,47 +1317,52 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
             un defecto; un boton que dice que le falta se obedece.
           */}
           {!error && sinActuacion && (
-            <p className="rounded-control border border-line-200 bg-canvas px-3 py-2 text-[12px] leading-snug text-ink-900 text-justify">
-              <span className="font-semibold">Falta elegir la actuación.</span>{' '}
+            <p className="cn-inf-nota">
+              <span className="cn-inf-seleccionado">Falta elegir la actuación.</span>{' '}
               {eligeActuacion
                 ? 'Está aquí mismo, en «Qué actuación es»: elíjala de la lista o pídale a la guía que la proponga leyendo el escrito. La revisión objetiva se hace contra la ficha verificada de esa actuación; sin ella no hay contra qué revisar.'
                 : 'Está en la barra de arriba, en «Elegir actuación…», después de la rama. La revisión objetiva se hace contra la ficha verificada de esa actuación; sin ella no hay contra qué revisar.'}
             </p>
           )}
           {!error && !sinActuacion && !hayEscrito && (
-            <p className="text-[12px] leading-snug text-ink-500 text-justify">
+            <p className="cn-inf-ayuda">
               {esRecibido ? 'Suba el documento o pegue su texto: no hace falta nada más.' : 'Suba el archivo o pegue el texto para habilitar el botón.'}
             </p>
           )}
-          {error && <p className="text-[12px] leading-snug text-danger text-justify">{error}</p>}
+          {error && (
+            <p className="cn-error" role="alert">
+              <AlertTriangle className="h-4 w-4" />
+              <span className="min-w-0 [overflow-wrap:anywhere]">{error}</span>
+            </p>
+          )}
 
-          <p className="text-meta text-ink-400 text-justify">
+          <p className="cn-inf-ayuda">
             {esRecibido
               ? 'El informe solo afirma lo que está escrito en el documento y lo dice citándolo: ni un artículo, ni un plazo, ni una autoridad de memoria. Si el documento no anuncia plazo, se lo dirá con esas palabras. Qué actuación procede lo responde después la guía del catálogo. El informe se guarda para su firma.'
               : 'El informe no cita sentencias: cuando un punto necesite precedente, lo dirá y usted lo verifica. No reescribe el escrito; señala y propone la corrección. El informe se guarda para su firma; el escrito no.'}
           </p>
 
           {anteriores.length > 0 && (
-            <div className="border-t border-line-100 pt-3">
-              <p className="flex items-center gap-1.5 font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
-                <History className="h-3 w-3" />
+            <div className="cn-inf-anteriores">
+              <p className="cn-inf-etiqueta flex items-center gap-2">
+                <History className="h-4 w-4 text-ink-500" />
                 Revisiones anteriores de la firma
               </p>
-              <ul className="mt-1.5 max-h-56 space-y-1 overflow-y-auto">
+              <ul className="cn-inf-anteriores-lista">
                 {anteriores.map((r) => (
-                  <li key={r.id} className="flex items-center gap-2 rounded-control border border-line-100 bg-canvas px-2.5 py-1.5">
+                  <li key={r.id} className="cn-inf-anterior">
                     <button
                       type="button"
                       onClick={() => void abrirAnterior(r)}
                       disabled={abriendo !== null}
-                      className="min-w-0 flex-1 text-left"
+                      className="cn-inf-anterior-abrir"
                       title="Abrir el informe"
                     >
-                      <span className="block truncate text-ui text-ink-900">
-                        {r.cliente ? <span className="font-medium">{r.cliente}</span> : <span className="text-ink-400">Sin cliente indicado</span>}
-                        <span className="text-ink-400"> · {r.documentType}</span>
+                      <span className="cn-inf-linea">
+                        {r.cliente ? <span className="cn-inf-seleccionado">{r.cliente}</span> : <span className="text-ink-500">Sin cliente indicado</span>}
+                        <span className="text-ink-500"> · {r.documentType}</span>
                       </span>
-                      <span className="block truncate text-[11px] text-ink-500">
+                      <span className="cn-inf-linea cn-inf-linea--meta">
                         {r.fileName} · {new Date(r.createdAt).toLocaleString('es-CO', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })} ·
                         revisión pedida por {r.userEmail}
                         {abriendo === r.id ? ' · abriendo…' : ''}
@@ -1350,16 +1373,20 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
                       onClick={() =>
                         setConfirmacion({
                           titulo: 'Eliminar la revisión',
-                          texto: <>Se elimina el informe de «{r.fileName}» y, si se guardó, su texto de trabajo y su conversación. No se puede recuperar.</>,
+                          texto: (
+                            <span className="cn-inf-dialogo-texto">
+                              <span>Se elimina el informe de «{r.fileName}» y, si se guardó, su texto de trabajo y su conversación. No se puede recuperar.</span>
+                            </span>
+                          ),
                           etiqueta: 'Eliminar',
                           peligro: true,
                           onConfirmar: () => eliminarAnterior(r)
                         })
                       }
-                      className="shrink-0 text-ink-400 hover:text-danger"
+                      className="cn-tal-icono-boton cn-inf-borrar"
                       aria-label={`Eliminar el informe de ${r.fileName}`}
                     >
-                      <Trash2 className="h-3.5 w-3.5" />
+                      <Trash2 className="h-4 w-4" />
                     </button>
                   </li>
                 ))}
@@ -1368,11 +1395,11 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
           )}
         </div>
       ) : (
-        <>
+        <div className="cara-nueva cn-inf" data-informe>
           {/* Al abogado sin autoridad se le dice qué no se conserva y a quién pedirlo; nunca se le impide revisar. */}
           {!paraElTaller.guardaTexto && !puedeAutorizar && firmaSinDecidir && (
-            <div className="notice-unverified mb-3" role="status">
-              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-unverified" />
+            <div className="cn-inf-aviso" role="status">
+              <AlertTriangle className="cn-inf-aviso-icono" />
               <span>
                 Su trabajo en el taller no se conserva porque la firma aún no ha autorizado guardar escritos. Pida a su administrador activarlo en
                 Revisiones.
@@ -1404,7 +1431,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
                 : undefined
             }
           />
-        </>
+        </div>
       )}
       <Dialog
         abierto={preguntaDeGuardado}
@@ -1418,23 +1445,23 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
         subtitulo="Se decide una vez, para toda la firma; puede cambiarlo en «Revisiones»."
         acciones={
           <>
-            <button type="button" onClick={() => void decidirGuardado(false)} className="btn-neutral btn-sm">
+            <button type="button" onClick={() => void decidirGuardado(false)} className="cn-tal-boton cn-tal-boton--fantasma">
               Solo el informe
             </button>
-            <button type="button" onClick={() => void decidirGuardado(true)} className="btn-primary btn-sm">
+            <button type="button" onClick={() => void decidirGuardado(true)} className="cn-tal-boton cn-tal-boton--primario">
               Sí, conservar
             </button>
           </>
         }
       >
-        <div className="space-y-2 text-ui leading-relaxed text-ink-900">
+        <div className="cara-nueva cn-inf-dialogo-texto">
           <p>
-            Con <span className="font-semibold">«Sí, conservar»</span> (recomendado) la firma guarda el texto del escrito,{' '}
-            <span className="font-semibold">el archivo tal como usted lo sube</span> —para volver a verlo con su diagramación, sus negritas y sus
+            Con <span className="cn-inf-seleccionado">«Sí, conservar»</span> (recomendado) la firma guarda el texto del escrito,{' '}
+            <span className="cn-inf-seleccionado">el archivo tal como usted lo sube</span> —para volver a verlo con su diagramación, sus negritas y sus
             tablas—, la conversación con la guía, los comentarios y las versiones: nada se pierde al cerrar.
           </p>
           <p>
-            Con <span className="font-semibold">«Solo el informe»</span> se conserva únicamente el informe. El archivo y el trabajo del taller solo
+            Con <span className="cn-inf-seleccionado">«Solo el informe»</span> se conserva únicamente el informe. El archivo y el trabajo del taller solo
             viven en esta pestaña: al cerrarla, para volver a ver el documento tal cual habrá que subirlo otra vez.
           </p>
         </div>
@@ -1541,38 +1568,35 @@ const Informe: React.FC<InformeProps> = ({
    * hallazgo— y ninguna advertencia se ve dos veces.
    */
   const normal = respuesta.informe ? normalizarInforme(respuesta.informe) : null;
-  const i = normal?.informe ?? null;
-  const comprobaciones = normal?.comprobaciones ?? null;
   const r = respuesta.informeRecibido ?? null;
   return (
-    <div className="space-y-4 [overflow-wrap:anywhere]">
+    <>
       {/*
         EL RÓTULO DICE CUÁL DE LOS DOS SE LEYÓ, y no es decorativo: un informe
         de un documento recibido que se confundiera con la revisión de un
-        escrito propio se leería como si el catálogo respaldara sus plazos.
+        escrito propio se leería como si el catálogo respaldara sus plazos. Sin
+        ficha lleva el borde discontinuo: es un grado de respaldo, no un error.
       */}
-      <div className="flex flex-wrap items-center gap-2 text-[11px] text-ink-500">
-        <span
-          className={`rounded-control border px-2 py-0.5 ${
-            esRecibido ? 'border-line-200 text-ink-700' : respuesta.conFicha ? 'border-line-200 text-verified' : 'border-line-200 text-ink-500'
-          }`}
-        >
+      <div className="cn-inf-sellos">
+        <span className={`cn-inf-sello ${esRecibido ? 'cn-inf-sello--neutro' : respuesta.conFicha ? 'cn-inf-sello--ok' : 'cn-inf-sello--sin'}`}>
           {esRecibido
             ? `Documento recibido · ${fileName || 'sin nombre'}`
             : respuesta.conFicha
             ? `Revisado contra la ficha de «${documentType}»`
             : 'Sin ficha verificada: lo objetivo va con menos respaldo'}
         </span>
-        <span>{respuesta.caracteres.toLocaleString('es-CO')} caracteres{respuesta.truncado ? ' · recortado a 300.000' : ''}</span>
+        <span className="cn-inf-sello cn-inf-sello--neutro">
+          {respuesta.caracteres.toLocaleString('es-CO')} caracteres{respuesta.truncado ? ' · recortado a 300.000' : ''}
+        </span>
       </div>
 
       {esRecibido ? (
         !r ? (
           <>
-            <p className="rounded-control border border-line-200 bg-canvas px-3 py-2 text-[12px] leading-snug text-ink-700 text-justify">
+            <p className="cn-inf-aviso">
               La lectura no se pudo ordenar por secciones; abajo está el texto completo. El cobro es el mismo y el contenido también.
             </p>
-            <pre className="whitespace-pre-wrap font-sans text-ui leading-relaxed text-ink-900">{respuesta.informeLibre}</pre>
+            <pre className="cn-inf-libre">{respuesta.informeLibre}</pre>
           </>
         ) : (
           <LecturaDelDocumentoRecibido
@@ -1589,83 +1613,38 @@ const Informe: React.FC<InformeProps> = ({
             }
           />
         )
-      ) : !i || !normal ? (
+      ) : !normal ? (
         <>
           {lineaDePasajes({ pasajesDelCaso: respuesta.pasajesDelCaso ?? null }) && (
-            <p className="text-meta text-ink-500">{lineaDePasajes({ pasajesDelCaso: respuesta.pasajesDelCaso ?? null })}</p>
+            <p className="cn-inf-pasajes">{lineaDePasajes({ pasajesDelCaso: respuesta.pasajesDelCaso ?? null })}</p>
           )}
-          <p className="rounded-control border border-line-200 bg-canvas px-3 py-2 text-[12px] leading-snug text-ink-700 text-justify">
+          <p className="cn-inf-aviso">
             El revisor respondió en un formato que no se pudo ordenar por secciones; abajo está su texto completo. El cobro
             es el mismo y el contenido también.
           </p>
-          <pre className="whitespace-pre-wrap font-sans text-ui leading-relaxed text-ink-900">{respuesta.informeLibre}</pre>
+          <pre className="cn-inf-libre">{respuesta.informeLibre}</pre>
         </>
       ) : (
-        <>
-          {/* La comprobación automática va ARRIBA de las secciones: es lo que dice qué del informe no se puede usar tal cual. */}
-          <BandaDeComprobacion normal={normal} pasajesDelCaso={respuesta.pasajesDelCaso ?? normal.pasajesDelCaso} />
-          <p className="text-[14px] leading-relaxed text-ink-900 text-justify">{i.resumen}</p>
-          <MarcasDelHallazgo comprobaciones={comprobaciones} seccion="resumen" indice={0} />
-          <SeccionConMarcas titulo="Secciones que la norma exige y faltan" items={i.seccionesFaltantes} tono="aviso" seccion="seccionesFaltantes" comprobaciones={comprobaciones} />
-          <SeccionConMarcas titulo="Fortalezas" items={i.fortalezas} tono="ok" seccion="fortalezas" comprobaciones={comprobaciones} />
-          <SeccionConMarcas titulo="Debilidades" items={i.debilidades} tono="aviso" seccion="debilidades" comprobaciones={comprobaciones} />
-          {i.erroresDeAplicacion.length > 0 && (
-            <section>
-              <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">Errores de aplicación</h4>
-              <div className="mt-1.5 space-y-2">
-                {i.erroresDeAplicacion.map((e, k) => (
-                  <div key={k} className="rounded-control border border-line-200 bg-canvas px-3 py-2">
-                    <p className="font-mono text-[10.5px] font-semibold text-ink-500">{e.donde}</p>
-                    <p className="mt-0.5 text-ui leading-snug text-ink-900 text-justify">{e.problema}</p>
-                    {e.correccion && <p className="mt-1 text-ui leading-snug text-brand-700 text-justify">Corrección: {e.correccion}</p>}
-                    <MarcasDelHallazgo comprobaciones={comprobaciones} seccion="erroresDeAplicacion" indice={k} />
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-          {(i.correccionesTextuales ?? []).length > 0 && (
-            <section>
-              {/*
-                LO QUE DICE Y LO QUE DEBERIA DECIR, palabra por palabra. Un informe
-                que dice «la peticion no es concreta» obliga a buscar la frase; este
-                la copia tal cual y pone al lado la redaccion propuesta, lista para
-                pegar. Es lo que el usuario echo de menos del primer informe.
-              */}
-              <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
-                Citas del escrito y reemplazo propuesto
-              </h4>
-              <div className="mt-1.5 space-y-2.5">
-                {(i.correccionesTextuales ?? []).map((c, k) => (
-                  <div key={k} className="rounded-control border border-line-200 bg-canvas px-3 py-2.5">
-                    <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-400">Dice</p>
-                    <blockquote className="mt-0.5 border-l-2 border-line-200 pl-2.5 text-ui italic leading-snug text-ink-700">
-                      «{c.cita}»
-                    </blockquote>
-                    {c.problema && <p className="mt-1.5 text-[12px] leading-snug text-ink-500 text-justify">{c.problema}</p>}
-                    {c.reemplazo && (
-                      <>
-                        <p className="mt-2 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-brand-700">Reemplazo propuesto</p>
-                        <p className="mt-0.5 text-ui leading-snug text-ink-900 text-justify">«{c.reemplazo}»</p>
-                      </>
-                    )}
-                    {/* Debajo de la tarjeta, nunca dentro de la cita del abogado. */}
-                    <MarcasDelHallazgo comprobaciones={comprobaciones} seccion="correccionesTextuales" indice={k} />
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-          <SeccionConMarcas titulo="Recomendaciones" items={i.recomendaciones} seccion="recomendaciones" comprobaciones={comprobaciones} />
-        </>
+        /*
+          LOS DOS ESTRATOS, EN LA PIEZA QUE COMPARTE CON EL TALLER. Las
+          correcciones van completas: lo que dice el escrito, el problema y la
+          redacción propuesta, lista para pegar. La marca va sobre el problema,
+          nunca dentro de la cita del abogado.
+        */
+        <InformeDelEscritoPropio
+          normal={normal}
+          pasajesDelCaso={respuesta.pasajesDelCaso ?? normal.pasajesDelCaso}
+          correcciones="completas"
+          conFicha={respuesta.conFicha}
+        />
       )}
 
-      <p className="border-t border-line-100 pt-3 text-meta text-ink-400 text-justify">
+      <p className="cn-inf-pie">
         {esRecibido
           ? 'Todo lo anterior sale del texto del propio documento y va citado. Ninguna ficha del catálogo respalda estas líneas: no se ha completado de memoria ningún artículo, plazo, autoridad ni recurso, y los flancos señalados no declaran ilegalidad ni nulidad alguna. El informe queda guardado para su firma en «Revisiones anteriores».'
           : 'Lo marcado como exigencia de la norma sale de la ficha verificada; lo demás es criterio profesional del revisor y usted decide. El informe queda guardado para su firma en «Revisiones anteriores»; el escrito y el trabajo del taller, solo si la firma autorizó conservarlos.'}
       </p>
-    </div>
+    </>
   );
 };
 

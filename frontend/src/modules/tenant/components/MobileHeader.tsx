@@ -165,15 +165,23 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
                     el estado del borrador — exportar es un medio, y el estado es
                     lo que la firma necesita registrar.
                   */}
-                  {onMarcarListo && estadoDelBorrador && estadoDelBorrador !== 'LISTO' && (
-                    <Accion
-                      icono={<IconoPalomita className="h-5 w-5" />}
-                      onClick={cerrarY(onMarcarListo)}
-                      destacada
-                    >
-                      Marcar listo para firma
-                    </Accion>
-                  )}
+                  {/*
+                    Y SOLO MIENTRAS FALTA: se ofrecía también sobre un borrador
+                    RADICADO, que es un estado posterior a «listo» — marcarlo
+                    habría devuelto un escrito ya presentado a «listo para firma».
+                  */}
+                  {onMarcarListo &&
+                    estadoDelBorrador &&
+                    estadoDelBorrador !== 'LISTO' &&
+                    estadoDelBorrador !== 'RADICADO' && (
+                      <Accion
+                        icono={<IconoPalomita className="h-5 w-5" />}
+                        onClick={cerrarY(onMarcarListo)}
+                        destacada
+                      >
+                        Marcar como listo
+                      </Accion>
+                    )}
 
                   <Accion icono={<Copy className="h-5 w-5" />} onClick={cerrarY(onCopyText)}>
                     {copied ? 'Copiado' : 'Copiar el texto'}

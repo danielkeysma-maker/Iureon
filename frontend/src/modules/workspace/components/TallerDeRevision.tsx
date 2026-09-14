@@ -208,10 +208,16 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
     setConfirmacion({
       titulo: 'Autorizar que la firma conserve sus escritos',
       texto: (
-        <>
-          Iureon conservará el texto de los escritos que su firma revise, sus marcas y la conversación con la guía, para retomar el trabajo otro día.
-          Aplica a <span className="font-semibold">toda la firma</span> y queda en la auditoría con su correo. Puede retirarla después.
-        </>
+        /*
+          La confirmación se monta fuera del taller —fuera de toda pantalla
+          rediseñada—, así que el propio texto abre el alcance de la cara nueva.
+        */
+        <span className="cara-nueva cn-inf-dialogo-texto">
+          <span>
+            Iureon conservará el texto de los escritos que su firma revise, sus marcas y la conversación con la guía, para retomar el trabajo otro día.
+            Aplica a <span className="cn-inf-seleccionado">toda la firma</span> y queda en la auditoría con su correo. Puede retirarla después.
+          </span>
+        </span>
       ),
       etiqueta: 'Autorizar',
       onConfirmar: autorizar

@@ -170,7 +170,7 @@ export const PuenteAlAtaque: React.FC<PuenteAlAtaqueProps> = ({
    * en bloque, pero en una columna de 300px cada renglón lleva seis o siete
    * palabras y justificarlo abre ríos de espacio entre ellas. Estrecho: bandera.
    */
-  const alineacion = holgado ? 'text-justify' : 'text-left';
+  const alineacion = holgado ? '' : 'cn-inf-bandera';
 
   const ramasEstado = useCatalogBranchesState();
   const opcionesRama: OpcionCombobox[] = React.useMemo(
@@ -189,14 +189,9 @@ export const PuenteAlAtaque: React.FC<PuenteAlAtaqueProps> = ({
   };
 
   return (
-    <section
-      ref={caja}
-      className="min-w-0 rounded-card border border-[rgb(var(--brand-line))] bg-brand-50 px-3 py-3 [overflow-wrap:anywhere]"
-    >
-      <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-brand-700">
-        {puntos.length > 0 ? '¿Y con qué lo ataco?' : '¿Y qué puedo hacer?'}
-      </h4>
-      <p className={`mt-1 text-[12px] leading-snug text-ink-700 ${alineacion} [text-wrap:pretty]`}>
+    <section ref={caja} className="cn-inf-puente [overflow-wrap:anywhere]">
+      <h4 className="cn-inf-h2">{puntos.length > 0 ? '¿Y con qué lo ataco?' : '¿Y qué puedo hacer?'}</h4>
+      <p className={`cn-inf-bajada ${alineacion}`}>
         {puntos.length > 0
           ? 'El nombre de la actuación no lo pone este informe: lo pone el catálogo. Los flancos de arriba, con sus citas, viajan a la guía de actuaciones junto al texto del documento, y ella propone candidatas para atacar eso, cada una con su término, su artículo y su autoridad verificados. Escoge usted; después ponga el vencimiento en la agenda de términos, desde el icono de calendario de esta revisión en «Revisiones».'
           : 'Eso ya no lo dice este documento: lo dice el catálogo. Lleve los hechos a la guía de actuaciones y le propondrá candidatas con su término, su artículo y su autoridad verificados; después ponga el vencimiento en la agenda de términos, desde el icono de calendario de esta revisión en «Revisiones».'}
@@ -207,7 +202,7 @@ export const PuenteAlAtaque: React.FC<PuenteAlAtaqueProps> = ({
         a lo ancho del panel: partir 300px en dos deja al botón desbordando el
         borde y a la explicación en una tira ilegible.
       */}
-      <div className={`mt-2 flex min-w-0 gap-2 ${holgado ? 'flex-row items-end' : 'flex-col'}`}>
+      <div className={`flex min-w-0 gap-3 ${holgado ? 'flex-row items-end' : 'flex-col'}`}>
         <div className="min-w-0 flex-1">
           <Combobox
             etiqueta="Rama"
@@ -230,16 +225,9 @@ export const PuenteAlAtaque: React.FC<PuenteAlAtaqueProps> = ({
                 : 'La guía propone dentro de una rama; si no la sabe, márquelo abajo.'
             }
           />
-          <label className="mt-1.5 flex min-w-0 cursor-pointer items-start gap-2">
-            <input
-              type="checkbox"
-              checked={sinRama}
-              onChange={(e) => setSinRama(e.target.checked)}
-              className="mt-0.5 h-3.5 w-3.5 shrink-0 accent-[rgb(var(--brand-700))]"
-            />
-            <span
-              className={`min-w-0 ${alineacion} text-[12px] leading-snug text-ink-700 [text-wrap:pretty] [overflow-wrap:anywhere]`}
-            >
+          <label className="cn-inf-casilla mt-2 min-w-0">
+            <input type="checkbox" checked={sinRama} onChange={(e) => setSinRama(e.target.checked)} />
+            <span className={`min-w-0 ${alineacion} [overflow-wrap:anywhere]`}>
               No sé la rama: buscar en todo el catálogo.
             </span>
           </label>
@@ -252,7 +240,7 @@ export const PuenteAlAtaque: React.FC<PuenteAlAtaqueProps> = ({
             junto a una casilla dentro de una fila compartida: el sitio de una
             advertencia de precio es su propio renglón.
           */}
-          <p className="mt-1 text-left text-[12px] leading-snug text-ink-500 [text-wrap:pretty] [overflow-wrap:anywhere]">
+          <p className="cn-inf-costo mt-2 [overflow-wrap:anywhere]">
             {LO_QUE_CUESTA_BUSCAR_EN_TODO}
           </p>
         </div>
@@ -265,9 +253,7 @@ export const PuenteAlAtaque: React.FC<PuenteAlAtaqueProps> = ({
             son seis palabras y `btn-sm` fija 28px de alto, así que al partir en
             dos renglones el texto se salía de su propia caja.
           */
-          className={`btn-secondary btn-sm disabled:opacity-50 ${
-            holgado ? 'shrink-0' : 'h-auto w-full whitespace-normal py-1.5 text-left leading-snug'
-          }`}
+          className={`cn-tal-boton cn-tal-boton--primario ${holgado ? '' : 'cn-tal-boton--ancho'}`}
           title={
             puntos.length > 0
               ? 'Propone actuaciones del catálogo para atacar los flancos señalados arriba, con el texto del documento como respaldo'
@@ -286,12 +272,12 @@ export const PuenteAlAtaque: React.FC<PuenteAlAtaqueProps> = ({
         ponerle el nombre uno mismo, que queda declarado sin verificar—.
       */}
       {!elegida && sinCoincidencia && (
-        <div className="notice-unverified mt-2 flex-col items-stretch">
-          <p className={`flex items-start gap-2 ${alineacion} text-[12px] leading-snug [text-wrap:pretty]`}>
-            <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-unverified" />
+        <div className="cn-inf-sin-plazo flex-col items-stretch">
+          <p className={`flex items-start gap-2 ${alineacion}`}>
+            <AlertTriangle className="cn-inf-aviso-icono" />
             <span className="min-w-0">{sinCoincidencia.razon}</span>
           </p>
-          <p className={`mt-1.5 ${alineacion} text-[12px] leading-snug text-ink-700 [text-wrap:pretty]`}>
+          <p className={alineacion}>
             {sinCoincidencia.enTodoElCatalogo
               ? 'Se buscó en las 28 ramas, así que no hay una ficha verificada que ponerle a este documento. Puede escribir usted el nombre de la actuación: quedará en la lista de su firma, y su artículo, su término y su autoridad se declararán sin verificar hasta que alguien los compruebe en «Catálogo».'
               : 'Se buscó solo dentro de la rama elegida. Si la rama no es esa, el catálogo dice que no reconoce nada aunque la actuación exista en otra: marque «No sé la rama» y vuelva a preguntar. Si tampoco así, puede escribir usted el nombre, que quedará sin verificar.'}
@@ -304,7 +290,7 @@ export const PuenteAlAtaque: React.FC<PuenteAlAtaqueProps> = ({
                   setSinRama(true);
                   abrirLaGuia();
                 }}
-                className={`btn-neutral btn-sm ${holgado ? '' : 'h-auto w-full whitespace-normal py-1.5 leading-snug'}`}
+                className={`cn-tal-boton ${holgado ? '' : 'cn-tal-boton--ancho'}`}
               >
                 Puede que la rama no sea esa: buscar en todo el catálogo
               </button>
@@ -312,7 +298,7 @@ export const PuenteAlAtaque: React.FC<PuenteAlAtaqueProps> = ({
             <button
               type="button"
               onClick={() => setPropiaAbierta(true)}
-              className={`btn-neutral btn-sm ${holgado ? '' : 'h-auto w-full whitespace-normal py-1.5 leading-snug'}`}
+              className={`cn-tal-boton ${holgado ? '' : 'cn-tal-boton--ancho'}`}
             >
               Escribir el nombre de la actuación
             </button>
@@ -321,9 +307,9 @@ export const PuenteAlAtaque: React.FC<PuenteAlAtaqueProps> = ({
       )}
 
       {elegida && (
-        <div className="mt-2 rounded-control border border-line-200 bg-canvas">
-          <p className={`px-3 py-2 text-[12px] leading-snug text-ink-900 ${alineacion} [text-wrap:pretty]`}>
-            Usted reconoció la actuación <span className="font-semibold">«{elegida.exactName}»</span>. Su término, su
+        <div className="cn-inf-elegida">
+          <p className={`cn-inf-elegida-texto ${alineacion}`}>
+            Usted reconoció la actuación <span className="cn-inf-seleccionado">«{elegida.exactName}»</span>. Su término, su
             artículo y su autoridad salen de la ficha del catálogo, no de este documento. Póngala en la agenda desde
             «Revisiones».
           </p>
@@ -348,9 +334,9 @@ export const PuenteAlAtaque: React.FC<PuenteAlAtaqueProps> = ({
                 onCancelar={() => setPanelAbierto(false)}
               />
             ) : (
-              <div className="border-t border-line-100 px-3 py-2">
-                <button type="button" onClick={() => setPanelAbierto(true)} className="btn-primary btn-sm">
-                  <PenLine className="h-3 w-3" />
+              <div className="cn-inf-elegida-pie">
+                <button type="button" onClick={() => setPanelAbierto(true)} className="cn-tal-boton cn-tal-boton--primario">
+                  <PenLine className="h-4 w-4" />
                   Redactar esta actuación
                 </button>
               </div>
@@ -469,11 +455,7 @@ const RedactarLaActuacion: React.FC<{
 
   if (lookup.estado === 'CARGANDO') {
     return (
-      <p
-        className={`border-t border-line-100 px-3 py-2 text-[12px] leading-snug text-ink-500 ${
-          holgado ? 'text-justify' : 'text-left'
-        }`}
-      >
+      <p className={`cn-inf-elegida-pie cn-inf-costo ${holgado ? '' : 'cn-inf-bandera'}`}>
         Leyendo la ficha del catálogo para proponerle qué pedirle al motor…
       </p>
     );
@@ -481,10 +463,8 @@ const RedactarLaActuacion: React.FC<{
 
   if (lookup.estado !== 'ENCONTRADA') {
     return (
-      <div className="border-t border-line-100 px-3 py-2">
-        <p
-          className={`text-[12px] leading-snug text-ink-700 ${holgado ? 'text-justify' : 'text-left'} [text-wrap:pretty]`}
-        >
+      <div className="cn-inf-elegida-pie flex-col items-stretch">
+        <p className={holgado ? 'text-justify' : 'cn-inf-bandera'}>
           El catálogo no devolvió la ficha de «{exactName}», así que no hay nada verificado con lo que armarle una
           instrucción. Puede redactar igual: viajan la actuación y los hechos, y usted escribe el encargo en Redacción.
         </p>
@@ -492,15 +472,15 @@ const RedactarLaActuacion: React.FC<{
           <button
             type="button"
             onClick={() => onLlevar('')}
-            className={`btn-primary btn-sm ${holgado ? '' : 'h-auto w-full whitespace-normal py-1.5 leading-snug'}`}
+            className={`cn-tal-boton cn-tal-boton--primario ${holgado ? '' : 'cn-tal-boton--ancho'}`}
           >
-            <PenLine className="h-3 w-3 shrink-0" />
+            <PenLine className="h-4 w-4 shrink-0" />
             Llevar a Redacción
           </button>
           <button
             type="button"
             onClick={onCancelar}
-            className={`btn-neutral btn-sm ${holgado ? '' : 'w-full'}`}
+            className={`cn-tal-boton cn-tal-boton--fantasma ${holgado ? '' : 'w-full'}`}
           >
             Cancelar
           </button>

@@ -324,55 +324,50 @@ export const VisorDelOriginal: React.FC<VisorDelOriginalProps> = ({
 
   /* ─── Barra ──────────────────────────────────────────────────────────────── */
   const Barra = (
-    <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 border-b border-line-100 bg-surface px-3 py-2 sm:px-4">
+    <div className="cn-tal-herramientas">
       {selector}
-      <span className="min-w-0 flex-1 truncate text-[12px] text-ink-900" title={original?.nombre}>
+      <span className="cn-tal-visor-nombre" title={original?.nombre}>
         {original ? original.nombre : 'Original'}
-        {original ? <span className="ml-1.5 font-mono text-[11px] text-ink-400">{formatoDeBytes(original.bytes.byteLength)}</span> : null}
+        {original ? <span className="cn-tal-peso">{formatoDeBytes(original.bytes.byteLength)}</span> : null}
       </span>
 
       {esPdf && totalPaginas > 0 && (
-        <div className="flex shrink-0 items-center gap-0.5 rounded-control border border-line-200 bg-canvas px-1 py-0.5">
-          <button
-            type="button"
-            onClick={() => setPagina((p) => Math.max(1, p - 1))}
-            disabled={pagina <= 1}
-            className="rounded p-1 text-ink-500 hover:text-ink-900 disabled:opacity-40"
-            aria-label="Página anterior"
-          >
-            <ChevronLeft className="h-3.5 w-3.5" />
+        <div className="cn-tal-grupo">
+          <button type="button" onClick={() => setPagina((p) => Math.max(1, p - 1))} disabled={pagina <= 1} aria-label="Página anterior">
+            <ChevronLeft className="h-4 w-4" />
           </button>
-          <span className="min-w-[54px] text-center font-mono text-[11px] text-ink-700">
+          {/* El número de página es citable: va en mono. */}
+          <span className="cn-tal-grupo-cifra">
             {pagina} / {totalPaginas}
           </span>
-          <button
-            type="button"
-            onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
-            disabled={pagina >= totalPaginas}
-            className="rounded p-1 text-ink-500 hover:text-ink-900 disabled:opacity-40"
-            aria-label="Página siguiente"
-          >
-            <ChevronRight className="h-3.5 w-3.5" />
+          <button type="button" onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))} disabled={pagina >= totalPaginas} aria-label="Página siguiente">
+            <ChevronRight className="h-4 w-4" />
           </button>
         </div>
       )}
 
       {original && original.clase !== 'sinVisor' && (
-        <div className="flex shrink-0 items-center gap-0.5 rounded-control border border-line-200 bg-canvas px-1 py-0.5">
-          <button type="button" onClick={() => setZoom((z) => Math.max(ZOOM_MIN, z - PASO_DE_ZOOM))} className="rounded p-1 text-ink-500 hover:text-ink-900" aria-label="Alejar">
-            <ZoomOut className="h-3.5 w-3.5" />
+        <div className="cn-tal-grupo">
+          <button type="button" onClick={() => setZoom((z) => Math.max(ZOOM_MIN, z - PASO_DE_ZOOM))} aria-label="Alejar">
+            <ZoomOut className="h-4 w-4" />
           </button>
-          <button type="button" onClick={() => setZoom(100)} className="w-[46px] text-center font-mono text-[11px] text-ink-700" title="Ajustar al ancho">
+          <button type="button" onClick={() => setZoom(100)} className="min-w-[56px]" title="Ajustar al ancho">
             {zoom}%
           </button>
-          <button type="button" onClick={() => setZoom((z) => Math.min(ZOOM_MAX, z + PASO_DE_ZOOM))} className="rounded p-1 text-ink-500 hover:text-ink-900" aria-label="Acercar">
-            <ZoomIn className="h-3.5 w-3.5" />
+          <button type="button" onClick={() => setZoom((z) => Math.min(ZOOM_MAX, z + PASO_DE_ZOOM))} aria-label="Acercar">
+            <ZoomIn className="h-4 w-4" />
           </button>
         </div>
       )}
 
-      <button type="button" onClick={() => entrada.current?.click()} className="btn-neutral btn-sm shrink-0" title="Abrir otro archivo como original de este escrito">
-        <FileUp className="h-3.5 w-3.5" />
+      <button
+        type="button"
+        onClick={() => entrada.current?.click()}
+        className="cn-tal-boton"
+        title="Abrir otro archivo como original de este escrito"
+        aria-label={original ? 'Otro archivo' : 'Subir el archivo'}
+      >
+        <FileUp className="cn-tal-boton-icono" />
         <span className="hidden sm:inline">{original ? 'Otro archivo' : 'Subir el archivo'}</span>
       </button>
     </div>
@@ -381,20 +376,18 @@ export const VisorDelOriginal: React.FC<VisorDelOriginalProps> = ({
   /* ─── Avisos: qué se ve, qué no, y dónde están las marcas ────────────────── */
   const Avisos = (
     <>
-      {subiendo !== null && (
-        <p className="border-b border-line-100 bg-canvas px-4 py-1.5 text-[11.5px] text-ink-700">Guardando el archivo con la revisión · {subiendo}%</p>
-      )}
+      {subiendo !== null && <p className="cn-tal-visor-aviso">Guardando el archivo con la revisión · {subiendo}%</p>}
       {avisoDeSubida && (
-        <p className="border-b border-line-100 bg-canvas px-4 py-1.5 text-[11.5px] text-ink-700 text-justify [text-wrap:pretty]">
-          {avisoDeSubida}{' '}
-          <button type="button" onClick={() => setAvisoDeSubida('')} className="underline">
+        <p className="cn-tal-visor-aviso">
+          <span className="min-w-0 flex-1 text-justify">{avisoDeSubida}</span>
+          <button type="button" onClick={() => setAvisoDeSubida('')} className="cn-tal-enlace mt-0">
             cerrar
           </button>
         </p>
       )}
       {original && totalDeMarcas > 0 && (
-        <p className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 border-b border-line-100 bg-canvas px-4 py-1.5 text-[11.5px] text-ink-700">
-          <Highlighter className="h-3.5 w-3.5 shrink-0" />
+        <p className="cn-tal-visor-aviso">
+          <Highlighter className="h-4 w-4 shrink-0" />
           {!hayResaltadoNativo() ? (
             <span className="min-w-0 text-justify [text-wrap:pretty]">
               Este navegador no sabe pintar marcas sobre un documento sin modificarlo, así que aquí no se ven. Hay {totalDeMarcas}{' '}
@@ -409,7 +402,7 @@ export const VisorDelOriginal: React.FC<VisorDelOriginalProps> = ({
                 : '.'}
             </span>
           )}
-          <button type="button" onClick={onIrAlPapel} className="shrink-0 underline">
+          <button type="button" onClick={onIrAlPapel} className="cn-tal-enlace mt-0 shrink-0">
             ver en el papel
           </button>
         </p>
@@ -421,9 +414,9 @@ export const VisorDelOriginal: React.FC<VisorDelOriginalProps> = ({
   const Cuerpo = () => {
     if (estado.fase === 'cargando') {
       return (
-        <div className="flex flex-col items-center gap-2 py-16 text-center">
-          <Loader2 className="h-6 w-6 animate-spin text-ink-400" />
-          <p className="text-[12.5px] text-ink-500">
+        <div className="cn-tal-vacio">
+          <Loader2 className="cn-tal-vacio-icono animate-spin" />
+          <p className="cn-tal-vacio-texto">
             Trayendo el archivo original{estado.porcentaje !== null ? ` · ${estado.porcentaje}%` : '…'}
           </p>
         </div>
@@ -432,15 +425,13 @@ export const VisorDelOriginal: React.FC<VisorDelOriginalProps> = ({
 
     if (estado.fase === 'error') {
       return (
-        <div className="mx-auto max-w-[560px] py-12">
-          <div className="card flex flex-col items-center gap-2 py-8 text-center">
-            <AlertTriangle className="h-6 w-6 text-amber-600" />
-            <p className="text-[12.5px] leading-snug text-ink-700 text-justify [text-wrap:pretty]">{estado.mensaje}</p>
-            <button type="button" onClick={() => entrada.current?.click()} className="btn-secondary btn-sm mt-1">
-              <FileUp className="h-3.5 w-3.5" />
-              Subir el archivo
-            </button>
-          </div>
+        <div className="cn-tal-vacio">
+          <AlertTriangle className="cn-tal-vacio-icono cn-tal-vacio-icono--aviso" />
+          <p className="cn-tal-vacio-texto">{estado.mensaje}</p>
+          <button type="button" onClick={() => entrada.current?.click()} className="cn-tal-boton cn-tal-boton--marca">
+            <FileUp className="cn-tal-boton-icono" />
+            Subir el archivo
+          </button>
         </div>
       );
     }
@@ -448,11 +439,10 @@ export const VisorDelOriginal: React.FC<VisorDelOriginalProps> = ({
     if (estado.fase === 'sin' || estado.fase === 'inicial') {
       const motivo = estado.fase === 'sin' ? estado.motivo : 'Cargando…';
       return (
-        <div className="mx-auto max-w-[560px] py-12">
-          <div className="card flex flex-col items-center gap-2 py-8 text-center">
-            <FileUp className="h-7 w-7 text-ink-400" />
-            <p className="text-ui text-ink-900">Aquí se ve el escrito tal como está constituido.</p>
-            <p className="max-w-[46ch] text-[12.5px] leading-[1.6] text-ink-500 text-justify [text-wrap:pretty]">{motivo}</p>
+        <div className="cn-tal-vacio">
+          <FileUp className="cn-tal-vacio-icono" />
+          <p className="cn-tal-vacio-titulo">Aquí se ve el escrito tal como está constituido.</p>
+          <p className="cn-tal-vacio-texto">{motivo}</p>
             {/*
               QUIÉN LO AUTORIZA, DICHO AQUÍ. El motivo que da el servidor
               explica que la firma no lo autorizó, pero no a quién pedírselo, y
@@ -460,17 +450,18 @@ export const VisorDelOriginal: React.FC<VisorDelOriginalProps> = ({
               está roto. La autorización es la misma del aviso de guardado del
               taller: se nombra para que se reconozca.
             */}
-            {estado.fase === 'sin' && !estado.puedeConservarlo && (
-              <p className="max-w-[46ch] text-[12.5px] leading-[1.6] text-ink-500 text-justify [text-wrap:pretty]">
-                Para que se conserve solo, un socio administrador de la firma tiene que autorizar que Iureon guarde los escritos revisados: desde el
-                aviso de guardado de este taller o desde el módulo «Revisiones».
-              </p>
-            )}
-            <button type="button" onClick={() => entrada.current?.click()} className="btn-secondary btn-sm mt-1">
-              <FileUp className="h-3.5 w-3.5" />
+          {estado.fase === 'sin' && !estado.puedeConservarlo && (
+            <p className="cn-tal-vacio-texto">
+              Para que se conserve solo, un socio administrador de la firma tiene que autorizar que Iureon guarde los escritos revisados: desde el
+              aviso de guardado de este taller o desde el módulo «Revisiones».
+            </p>
+          )}
+          <div className="cn-tal-fila-botones justify-center">
+            <button type="button" onClick={() => entrada.current?.click()} className="cn-tal-boton cn-tal-boton--marca">
+              <FileUp className="cn-tal-boton-icono" />
               Subir el archivo
             </button>
-            <button type="button" onClick={onIrAlPapel} className="text-[12px] text-ink-500 underline">
+            <button type="button" onClick={onIrAlPapel} className="cn-tal-boton cn-tal-boton--fantasma">
               Seguir en el papel
             </button>
           </div>
@@ -488,7 +479,7 @@ export const VisorDelOriginal: React.FC<VisorDelOriginalProps> = ({
             transparente. `position:relative` en el envoltorio es lo que ancla
             la capa: sin él, los renglones se irían a la esquina del documento.
           */}
-          <canvas ref={lienzoPdf} className="block rounded-card border border-line-200 bg-paper shadow-sm" />
+          <canvas ref={lienzoPdf} className="cn-tal-hoja block bg-paper" />
           <div ref={capaDeTexto} className="textLayer" />
         </div>
       );
@@ -497,21 +488,21 @@ export const VisorDelOriginal: React.FC<VisorDelOriginalProps> = ({
     if (o.clase === 'docx') {
       if (!html) {
         return (
-          <div className="flex flex-col items-center gap-2 py-16 text-center">
-            <Loader2 className="h-6 w-6 animate-spin text-ink-400" />
-            <p className="text-[12.5px] text-ink-500">Convirtiendo el documento de Word…</p>
+          <div className="cn-tal-vacio">
+            <Loader2 className="cn-tal-vacio-icono animate-spin" />
+            <p className="cn-tal-vacio-texto">Convirtiendo el documento de Word…</p>
           </div>
         );
       }
       return (
         <>
           <div
-            className="original-docx mx-auto w-full max-w-[816px] rounded-card border border-line-200 bg-paper px-5 py-8 shadow-sm sm:px-12 sm:py-10"
+            className="original-docx cn-tal-hoja mx-auto w-full max-w-[816px] bg-paper px-5 py-8 sm:px-12 sm:py-10"
             style={{ fontSize: `${Math.round(14.5 * (zoom / 100))}px` }}
           >
             <div ref={cuerpoHtml} dangerouslySetInnerHTML={{ __html: html.cuerpo }} />
           </div>
-          <p className="mx-auto mt-3 max-w-[816px] text-[11.5px] leading-[1.6] text-ink-500 text-justify [text-wrap:pretty]">
+          <p className="cn-tal-visor-nota">
             Del Word se conservan negritas, cursivas, subrayados, títulos, listas, tablas, imágenes y notas al pie. No se conservan los centrados, la
             tipografía ni los saltos de página: la conversión lee la estructura del documento, no su maquetación. Para verlo exactamente como se
             imprime, exporte el archivo a PDF y ábralo aquí.
@@ -527,10 +518,10 @@ export const VisorDelOriginal: React.FC<VisorDelOriginalProps> = ({
           <img
             src={urlDelArchivo ?? ''}
             alt={o.nombre}
-            className="mx-auto block rounded-card border border-line-200 bg-paper shadow-sm"
+            className="cn-tal-hoja mx-auto block bg-paper"
             style={{ width: `${Math.min(100, zoom)}%`, maxWidth: '100%' }}
           />
-          <p className="mx-auto mt-3 max-w-[816px] text-[11.5px] leading-[1.6] text-ink-500 text-justify [text-wrap:pretty]">
+          <p className="cn-tal-visor-nota">
             Es una imagen: se ve tal cual, pero no tiene texto que seleccionar. Para resaltar y comentar, vuelva al papel — el texto que se revisó salió
             de ahí.
           </p>
@@ -542,7 +533,7 @@ export const VisorDelOriginal: React.FC<VisorDelOriginalProps> = ({
       return (
         <div
           ref={cuerpoHtml}
-          className="original-docx mx-auto w-full max-w-[816px] whitespace-pre-wrap rounded-card border border-line-200 bg-paper px-5 py-8 font-legal leading-[1.8] text-paper-ink shadow-sm [overflow-wrap:anywhere] sm:px-12 sm:py-10"
+          className="original-docx cn-tal-hoja mx-auto w-full max-w-[816px] whitespace-pre-wrap bg-paper px-5 py-8 font-legal leading-[1.8] text-paper-ink [overflow-wrap:anywhere] sm:px-12 sm:py-10"
           style={{ fontSize: `${Math.round(14.5 * (zoom / 100))}px` }}
         >
           {textoPlanoDelOriginal(o.bytes)}
@@ -551,15 +542,13 @@ export const VisorDelOriginal: React.FC<VisorDelOriginalProps> = ({
     }
 
     return (
-      <div className="mx-auto max-w-[560px] py-12">
-        <div className="card flex flex-col items-center gap-2 py-8 text-center">
-          <AlertTriangle className="h-6 w-6 text-amber-600" />
-          <p className="max-w-[46ch] text-[12.5px] leading-[1.6] text-ink-700 text-justify [text-wrap:pretty]">{porQueNoHayVisor(o.tipo, o.nombre)}</p>
-          <a href={urlDelArchivo ?? '#'} download={o.nombre} className="btn-secondary btn-sm mt-1">
-            <Download className="h-3.5 w-3.5" />
-            Descargar el archivo
-          </a>
-        </div>
+      <div className="cn-tal-vacio">
+        <AlertTriangle className="cn-tal-vacio-icono cn-tal-vacio-icono--aviso" />
+        <p className="cn-tal-vacio-texto">{porQueNoHayVisor(o.tipo, o.nombre)}</p>
+        <a href={urlDelArchivo ?? '#'} download={o.nombre} className="cn-tal-boton cn-tal-boton--marca">
+          <Download className="cn-tal-boton-icono" />
+          Descargar el archivo
+        </a>
       </div>
     );
   };
@@ -577,7 +566,7 @@ export const VisorDelOriginal: React.FC<VisorDelOriginalProps> = ({
         pasar es que el ancho del documento empuje a la columna del taller, y
         por eso `min-w-0` va en cada nivel.
       */}
-      <div ref={caja} className="scroll-documento relative min-h-0 min-w-0 flex-1 overflow-auto bg-canvas px-3 py-4 sm:px-6">
+      <div ref={caja} className="scroll-documento cn-tal-mesa relative min-h-0 min-w-0 flex-1 overflow-auto">
         {barraDeMarcado}
         {Cuerpo()}
       </div>
@@ -603,13 +592,13 @@ export const VisorDelOriginal: React.FC<VisorDelOriginalProps> = ({
 const ESTILOS = `
 ${CSS_DE_LA_CAPA_DE_TEXTO}
 
-::highlight(iureon-original-amarillo){background-color:rgb(253 224 71 / .55);}
-::highlight(iureon-original-verde){background-color:rgb(134 239 172 / .55);}
-::highlight(iureon-original-azul){background-color:rgb(125 211 252 / .55);}
-::highlight(iureon-original-rosa){background-color:rgb(249 168 212 / .55);}
+::highlight(iureon-original-amarillo){background-color:rgb(251 227 180 / .75);}
+::highlight(iureon-original-verde){background-color:rgb(191 221 201 / .75);}
+::highlight(iureon-original-azul){background-color:rgb(203 217 228 / .75);}
+::highlight(iureon-original-rosa){background-color:rgb(231 201 196 / .75);}
 ::highlight(iureon-original-tachado){text-decoration:line-through 2px;}
-::highlight(iureon-original-comentario){background-color:rgb(203 217 228 / .5);text-decoration:underline dotted 2px;}
-::highlight(iureon-original-cita){background-color:rgb(253 230 138 / .6);text-decoration:line-through 2px;}
+::highlight(iureon-original-comentario){background-color:rgb(234 240 245 / .8);text-decoration:underline dotted 2px;}
+::highlight(iureon-original-cita){background-color:rgb(251 243 228 / .85);text-decoration:underline 2px;}
 ::highlight(iureon-original-referencia){text-decoration:underline 2px;}
 
 .original-docx{line-height:1.7;}

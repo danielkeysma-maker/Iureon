@@ -1,50 +1,41 @@
 import React from 'react';
-import { ChevronDown } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { rotuloDeExpediente, useExpedientes } from '../../expedientes/useExpedientes';
-import {
-  IconoNoAplica,
-  IconoSinVerificar,
-  IconoVerificado
-} from '../../../design/ArtboardIcons';
+import { useActuacionLookup } from '../../catalog/hooks/useActuacion';
 import { useBranchActuacionesState } from '../../catalog/hooks/useBranchActuaciones';
 import { GuiaEligeActuacionDialog } from './GuiaEligeActuacionDialog';
 import { ActuacionPropiaDialog } from './ActuacionPropiaDialog';
 import { EscritoSinNombreDialog } from './EscritoSinNombreDialog';
+import { ActuacionElegida } from './ActuacionElegida';
 import { useCatalogBranchesState } from '../../catalog/hooks/useCatalogBranches';
 import { BRANCH_LABELS } from '../../catalog/branchLabels';
 import type { ActuacionRole } from '../../catalog/types';
 import { esTituloDeTrabajo } from '../../catalog/tituloDeTrabajo';
 import { estadoDeLaFicha, ordenarParaLaLista } from '../services/fichaEnLaLista';
+import { desacuerdoDeRama, ramaAlElegirCaso } from '../services/ramaDelCaso';
 
 /**
- * La configuración del taller en móvil. Artboard 4d.
+ * «Qué va a presentar» en el teléfono. Artboard de 375 px (líneas 248–283 de
+ * `public/handoff/app-redaccion-revision.html`).
  *
- * ─── POR QUÉ NO ES LA BARRA DE ESCRITORIO ───────────────────────────────────
+ * ─── LAS TRES LISTAS A LA VISTA, Y NATIVAS ──────────────────────────────────
  *
- * La de escritorio son tres selectores en fila —rol, rama, actuación— con sus
- * rótulos y sus anchos. En 375px cada uno quedaba en «Fi… ▾ › ▾ › El… ▾»: tres
- * palabras cortadas que no dicen nada, y encima había que desplazarlas para
- * verlas. Configurar dejó de ser posible sin adivinar.
+ * La versión anterior comprimía la configuración en dos chips con un «Cambiar»
+ * que abría las listas. El artboard nuevo las pone a la vista, una debajo de la
+ * otra, porque en el paso 1 del asistente elegir ES lo que se está haciendo. Son
+ * `<select>` del sistema: se abren a pantalla completa, buscan con el teclado
+ * del teléfono y agrupan «por remisión» con su cabecera.
  *
- * 4d lo resuelve al revés: **la configuración se comprime en DOS CHIPS y lo que
- * se muestra en su lugar es la consecuencia** — la actuación elegida con su
- * término y su fecha de vencimiento, que es lo único que hay que poder leer en
- * 390px antes de escribir. Los selectores se abren al tocar «Cambiar».
- *
- * ─── EL TÉRMINO VA DONDE SE VE, NO DETRÁS DE UN SELECTOR ────────────────────
- *
- * El artboard pone «Nulidad y restablecimiento · 4 meses · 18 jul» como una
- * línea propia. Es la información por la que existe el catálogo, y esconderla
- * dentro de la etiqueta de un `<select>` truncado la volvía invisible justo en
- * la pantalla donde se decide qué escribir.
+ * Con la actuación elegida se pliegan en la misma tarjeta que el escritorio.
  *
  * ─── LO QUE EL ARTBOARD PIDE Y AQUÍ NO ESTÁ, con la razón ───────────────────
  *
- * · La FECHA de vencimiento («18 jul»). El catálogo guarda el término en prosa
- *   —«dentro de los cuatro (4) meses siguientes a la notificación»— y no la
- *   fecha: calcularla exige saber cuándo empezó a correr, y eso solo lo sabe
- *   quien lleva el caso. Es la misma razón por la que Orientación tampoco
- *   pinta «Vence». Se muestra el plazo, que es verdad, y no una fecha inventada.
+ * · «$300» en «No sé cómo se llama». La orientación desde Redacción es gratis
+ *   diez veces al día; este componente no conoce el cupo y no afirma un precio.
+ * · «148 actuaciones en esta rama». La lista de ramas no trae el conteo.
+ * · «Siguiente · qué pasó». El asistente es una sola columna que se desplaza;
+ *   un botón que solo baja la página partiría en pantallas lo que es un
+ *   formulario.
  */
 
 interface WorkshopConfigMobileProps {
@@ -54,27 +45,19 @@ interface WorkshopConfigMobileProps {
   setLegalBranch: (branch: string) => void;
   documentType: string;
   setDocumentType: (type: string) => void;
-  /** De que caso es este escrito. Mismo control que en el escritorio. */
-  expedienteId: string;
-  setExpedienteId: (id: string) => void;
   /** Los hechos del cuadro de instrucción: la guía orienta sobre ESOS y no sobre otros. */
   hechos: string;
   setHechos: (texto: string) => void;
 }
 
 /*
- * LAS DOS PUERTAS DE SERVICIO TAMBIÉN AQUÍ. Nacieron solo en la barra de
- * escritorio y el teléfono se quedó con la lista pelada: quien redacta desde el
- * teléfono no podía pedirle a la guía que propusiera la actuación ni escribir
- * una que el catálogo no tiene. Son la misma función y los mismos diálogos; lo
- * único distinto es que aquí la lista es un `<select>` del sistema, así que
- * viajan como dos opciones con un valor centinela que `elegirTipo` intercepta.
- * Un centinela NUNCA se guarda como tipo de documento: iría al motor como el
- * nombre de un escrito y el catálogo no resolvería nada.
+ * LAS TRES SALIDAS DE SERVICIO TAMBIÉN AQUÍ, con los mismos diálogos que el
+ * escritorio. La lista es un `<select>` del sistema, así que viajan como
+ * opciones con un valor centinela que `elegirTipo` intercepta. Un centinela
+ * NUNCA se guarda como tipo de documento.
  */
 const OPCION_GUIA = '__QUE_LA_GUIA_ELIJA__';
 const OPCION_PROPIA = '__ESCRIBIR_EL_NOMBRE__';
-/* La tercera salida: ni sé cómo se llama. Misma que en la barra de escritorio. */
 const OPCION_SIN_NOMBRE = '__SIN_NOMBRE_DE_ACTUACION__';
 
 const ROL_CORTO: Record<ActuacionRole, string> = {
@@ -90,130 +73,62 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
   setLegalBranch,
   documentType,
   setDocumentType,
-  expedienteId,
-  setExpedienteId,
   hechos,
   setHechos
 }) => {
-  const [abierto, setAbierto] = React.useState(false);
+  const [cambiando, setCambiando] = React.useState(false);
   const [guiaAbierta, setGuiaAbierta] = React.useState(false);
   const [propiaAbierta, setPropiaAbierta] = React.useState(false);
   const [sinNombreAbierto, setSinNombreAbierto] = React.useState(false);
   /** Sube al crear una actuación propia: obliga a releer la lista de la rama. */
   const [recarga, setRecarga] = React.useState(0);
   const catalogo = useBranchActuacionesState(legalBranch, userRole, recarga);
+  const ficha = useActuacionLookup(documentType, legalBranch);
+  const ramasEstado = useCatalogBranchesState();
+
+  /* Elegir pliega las listas; se ancla al tipo, que solo cambia cuando alguien elige. */
+  React.useEffect(() => {
+    setCambiando(false);
+  }, [documentType]);
 
   const elegirTipo = (valor: string) => {
     if (valor === OPCION_GUIA) {
       setGuiaAbierta(true);
       return;
     }
-    if (valor === OPCION_SIN_NOMBRE) {
-      setSinNombreAbierto(true);
-      return;
-    }
     if (valor === OPCION_PROPIA) {
       setPropiaAbierta(true);
       return;
     }
+    if (valor === OPCION_SIN_NOMBRE) {
+      setSinNombreAbierto(true);
+      return;
+    }
     setDocumentType(valor);
   };
-  const ramasEstado = useCatalogBranchesState();
-
-  /* Los mismos datos que el escritorio; la pintura es de cada barra. */
-  const expedientes = useExpedientes();
-
-  const elegida = catalogo.actuaciones.find((a) => a.exactName === documentType) ?? null;
-
-  const termino = elegida
-    ? elegida.term.status === 'NO_CADUCA'
-      ? { texto: 'No caduca', Icono: IconoNoAplica, tono: 'neutro' }
-      : elegida.term.status === 'NO_VERIFICADO'
-      ? { texto: 'Término sin verificar', Icono: IconoSinVerificar, tono: 'sin' }
-      : {
-          /*
-           * La primera frase del término y no el párrafo: varios son cuatro
-           * plazos distintos separados por punto, y un párrafo aquí empuja el
-           * campo de instrucción fuera de la pantalla.
-           */
-          texto: (elegida.term.description ?? '').split(/(?<=\.)\s/)[0],
-          Icono: IconoVerificado,
-          tono: 'ok'
-        }
-    : null;
 
   /* Mismo orden y mismos bloques que el escritorio: alfabético, propias y luego prestadas. */
   const ordenadas = ordenarParaLaLista(catalogo.actuaciones);
   const propias = ordenadas.filter((a) => !a.porRemision);
   const prestadas = ordenadas.filter((a) => a.porRemision);
 
+  const plegada = Boolean(documentType) && !cambiando;
+
   return (
     <div className="cn-red-movil">
-      <div className="cn-red-movil-cabeza">
-        {/*
-          Los dos chips dicen lo elegido; «Cambiar» abre las listas. Sin el
-          rótulo «Config.» en versales de 9,5 px: la escala nueva empieza en 14 y
-          los chips ya se explican solos.
-        */}
-        <span className="cn-red-chip">{ROL_CORTO[userRole]}</span>
-        <span className="cn-red-chip">{BRANCH_LABELS[legalBranch] ?? legalBranch}</span>
-        <button
-          type="button"
-          onClick={() => setAbierto((v) => !v)}
-          aria-expanded={abierto}
-          className="cn-red-cambiar"
-        >
-          {abierto ? 'Listo' : 'Cambiar'}
-          <ChevronDown
-            className={`cn-red-cambiar-chevron ${abierto ? 'cn-red-cambiar-chevron--abierto' : ''}`}
-            aria-hidden
-          />
-        </button>
-      </div>
-
-      {/*
-        LA ACTUACION Y SU TERMINO, en su propia linea y siempre visibles. Es lo
-        que 4d quiere que se lea en 390px: sin esto, el abogado escribe la
-        instruccion sin saber contra que ficha se va a redactar.
-      */}
-      {elegida && termino && !abierto && (
-        <div className="cn-red-resumen">
-          <termino.Icono
-            className={`cn-red-termino-icono cn-red-termino-icono--${termino.tono}`}
-            strokeWidth={2.2}
-          />
-          {/*
-            UNA SOLA LINEA, como en el HTML: «Nulidad y restablecimiento ·
-            4 meses», con el nombre en 12px regular y el TERMINO en mono
-            semibold. Partirlo en dos renglones —como estaba— le quitaba a la
-            fila su cualidad de resumen: 4d la quiere de un vistazo.
-          */}
-          <p className="cn-red-resumen-texto">
-            {elegida.exactName}
-            {' · '}
-            <b className={`cn-red-mono cn-red-resumen-termino cn-red-resumen-termino--${termino.tono}`}>
-              {termino.texto}
-            </b>
-          </p>
-        </div>
-      )}
-
-      {/* Sin actuación, nada del escrito está verificado: por eso lleva el guion. */}
-      {!elegida && !abierto && (
-        <p className="cn-red-sin-actuacion">
-          Sin actuación elegida: el escrito saldrá sin término ni artículo verificados.
-        </p>
-      )}
-
-      {abierto && (
+      {plegada ? (
+        <ActuacionElegida
+          quienFirma={ROL_CORTO[userRole]}
+          rama={BRANCH_LABELS[legalBranch] ?? legalBranch}
+          documentType={documentType}
+          ficha={ficha}
+          onCambiar={() => setCambiando(true)}
+        />
+      ) : (
         <div className="cn-red-movil-campos">
           <label className="cn-red-movil-campo">
             <span className="cn-red-rotulo">Quién firma</span>
-            <select
-              value={userRole}
-              onChange={(e) => setUserRole(e.target.value as ActuacionRole)}
-              className="cn-red-select"
-            >
+            <select value={userRole} onChange={(e) => setUserRole(e.target.value as ActuacionRole)} className="cn-red-select">
               {(Object.keys(ROL_CORTO) as ActuacionRole[]).map((r) => (
                 <option key={r} value={r}>
                   {ROL_CORTO[r]}
@@ -224,11 +139,7 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
 
           <label className="cn-red-movil-campo">
             <span className="cn-red-rotulo">Rama</span>
-            <select
-              value={legalBranch}
-              onChange={(e) => setLegalBranch(e.target.value)}
-              className="cn-red-select"
-            >
+            <select value={legalBranch} onChange={(e) => setLegalBranch(e.target.value)} className="cn-red-select">
               {ramasEstado.ramas.map((b) => (
                 <option key={b} value={b}>
                   {BRANCH_LABELS[b] ?? b}
@@ -239,27 +150,20 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
 
           <label className="cn-red-movil-campo">
             <span className="cn-red-rotulo">Actuación</span>
-            <select
-              value={documentType}
-              onChange={(e) => elegirTipo(e.target.value)}
-              className="cn-red-select"
-            >
+            <select value={documentType} onChange={(e) => elegirTipo(e.target.value)} className="cn-red-select">
               <option value="">Elija la actuación…</option>
               {/*
-                LAS TRES SALIDAS, ANTES DE TODA FICHA y en su propio grupo. En el
-                teléfono solo la guía iba arriba y las otras dos al fondo, detrás
-                de toda la rama: quien no encuentra su actuación no llega allá.
-                Mismo orden que el escritorio.
+                LAS TRES SALIDAS, ANTES DE TODA FICHA y en su propio grupo, en el
+                mismo orden que el escritorio: de más a menos respaldo.
               */}
               <optgroup label="Si no está en la lista">
-                <option value={OPCION_GUIA}>Que la guía proponga la actuación…</option>
-                <option value={OPCION_SIN_NOMBRE}>No sé cómo se llama: describir qué debe lograr…</option>
-                <option value={OPCION_PROPIA}>Ninguna de estas: escribir el nombre…</option>
+                <option value={OPCION_GUIA}>No sé cuál es: que la guía la proponga…</option>
+                <option value={OPCION_PROPIA}>No está en la lista: la escribo yo…</option>
+                <option value={OPCION_SIN_NOMBRE}>Redactar sin actuación…</option>
               </optgroup>
               {/*
                 EL ESTADO VA EN LA OPCIÓN, con el artículo cuando el fundamento lo
-                trae. Un `<option>` no admite estilos, así que es texto; lo que
-                dice es lo mismo que la píldora del escritorio.
+                trae. Un `<option>` no admite estilos, así que es texto.
               */}
               <optgroup label="Actuaciones de esta rama">
                 {propias.map((a) => {
@@ -272,13 +176,8 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
                 })}
               </optgroup>
               {/*
-                AQUI SI SE AGRUPA, y en el escritorio no.
-                El <select> nativo trae <optgroup> de fabrica, asi que el
-                telefono puede poner el aviso UNA vez encima del bloque en vez
-                de repetirlo en cada renglon; en el escritorio el Combobox no
-                tiene cabeceras y el aviso va en el detalle de cada opcion. Dos
-                pantallas, dos formas de decir lo mismo, y la frase es la que
-                manda el servidor para que no diverja.
+                El <select> nativo trae <optgroup> de fábrica, así que el aviso de
+                lo prestado va UNA vez encima del bloque, con la frase del servidor.
               */}
               {prestadas.length > 0 && (
                 <optgroup label={prestadas[0].porRemision?.marca ?? 'por remisión del CGP'}>
@@ -293,48 +192,32 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
           </label>
 
           {/*
-            EL MISMO CONTROL QUE EN EL ESCRITORIO, y por eso está aquí: el
-            gancho compartido no existe para esta barra, así que lo que evita
-            que las dos se separen es que las dos se toquen a la vez. Hay un
-            check que lo asevera.
+            SIN ACTUACIÓN NO SE GENERA, y el aviso lo dice antes del botón. No
+            promete que «se puede redactar igual»: el botón está apagado.
           */}
-          {expedientes.length > 0 && (
-            <label className="cn-red-movil-campo">
-              <span className="cn-red-rotulo">De qué caso</span>
-              <select
-                value={expedienteId}
-                onChange={(e) => setExpedienteId(e.target.value)}
-                className="cn-red-select"
-              >
-                <option value="">Sin expediente</option>
-                {expedientes.map((e) => (
-                  <option key={e.id} value={e.id}>
-                    {rotuloDeExpediente(e)}
-                  </option>
-                ))}
-              </select>
-              <span className="cn-red-nota">
-                El borrador queda contado dentro del caso, y si el caso tiene documentos
-                cargados el escrito nace con lo que ellos dicen.
-              </span>
-            </label>
+          {!documentType && (
+            <p className="cn-red-sin-actuacion">
+              Sin actuación elegida no se puede generar: es la que trae el artículo y el término verificados.
+            </p>
           )}
 
-          <p className="cn-red-nota cn-red-nota--icono">
-            <IconoVerificado className="cn-red-termino-icono cn-red-termino-icono--ok" />
-            <span>
-              La actuación es la que trae el artículo y el término verificados. Sin ella el
-              escrito se redacta sin respaldo del catálogo.
+          {/* La guía, a un toque: es la salida de quien no sabe qué elegir, y en una lista nativa queda escondida. */}
+          <button type="button" onClick={() => setGuiaAbierta(true)} className="cn-red-servicio cn-red-servicio--suelto">
+            <Sparkles className="cn-red-servicio-icono" strokeWidth={1.8} aria-hidden />
+            <span className="cn-red-fila-textos">
+              <span className="cn-red-servicio-nombre">No sé cuál es: que la guía la proponga</span>
+              <span className="cn-red-fila-detalle">Cuente los hechos y la guía le propone actuaciones del catálogo.</span>
             </span>
-          </p>
+          </button>
+
+          {documentType && (
+            <button type="button" onClick={() => setCambiando(false)} className="cn-red-listo">
+              Dejar «{documentType}»
+            </button>
+          )}
         </div>
       )}
 
-      {/*
-        Los mismos diálogos del escritorio, montados aquí: elegir en cualquiera
-        de los dos deja la actuación puesta y cierra el panel, para que el
-        abogado vuelva al escrito y no a la configuración.
-      */}
       <GuiaEligeActuacionDialog
         abierto={guiaAbierta}
         onCerrar={() => setGuiaAbierta(false)}
@@ -346,7 +229,6 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
           if (branch) setLegalBranch(branch);
           setDocumentType(exactName);
           setGuiaAbierta(false);
-          setAbierto(false);
         }}
         onEscribirNombre={() => {
           setGuiaAbierta(false);
@@ -370,7 +252,6 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
           setRecarga((n) => n + 1);
           setDocumentType(exactName);
           setSinNombreAbierto(false);
-          setAbierto(false);
         }}
       />
       <ActuacionPropiaDialog
@@ -382,9 +263,70 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
           setRecarga((n) => n + 1);
           setDocumentType(exactName);
           setPropiaAbierta(false);
-          setAbierto(false);
         }}
       />
+    </div>
+  );
+};
+
+/**
+ * «De qué caso» en el teléfono. Mismo control que el escritorio y en el mismo
+ * sitio del paso 1, y la misma regla: la rama del caso se propone solo al
+ * cambiar el caso aquí y solo si no hay actuación elegida; si no coincide, se
+ * avisa sin bloquear. Ver `SelectorDeCasoDeRedaccion`.
+ */
+interface SelectorDeCasoMovilProps {
+  expedienteId: string;
+  setExpedienteId: (id: string) => void;
+  legalBranch: string;
+  setLegalBranch: (branch: string) => void;
+  documentType: string;
+}
+
+export const SelectorDeCasoMovil: React.FC<SelectorDeCasoMovilProps> = ({
+  expedienteId,
+  setExpedienteId,
+  legalBranch,
+  setLegalBranch,
+  documentType
+}) => {
+  const expedientes = useExpedientes();
+  if (expedientes.length === 0) return null;
+
+  const caso = expedientes.find((e) => e.id === expedienteId) ?? null;
+  const desacuerdo = caso ? desacuerdoDeRama(caso.rama, legalBranch, BRANCH_LABELS) : null;
+
+  const elegirCaso = (id: string) => {
+    setExpedienteId(id);
+    const elegido = expedientes.find((e) => e.id === id);
+    const rama = elegido ? ramaAlElegirCaso(elegido.rama, legalBranch, Boolean(documentType), BRANCH_LABELS) : null;
+    if (rama) setLegalBranch(rama);
+  };
+
+  return (
+    <div className="cn-red-caso">
+      <label className="cn-red-movil-campo">
+        <span className="cn-red-rotulo">De qué caso</span>
+        <select value={expedienteId} onChange={(e) => elegirCaso(e.target.value)} className="cn-red-select">
+          <option value="">Sin expediente</option>
+          {expedientes.map((e) => (
+            <option key={e.id} value={e.id}>
+              {rotuloDeExpediente(e)}
+            </option>
+          ))}
+        </select>
+        <span className="cn-red-nota">
+          El borrador queda contado dentro del caso, y si el caso tiene documentos cargados el escrito nace con lo que ellos dicen.
+        </span>
+      </label>
+      {desacuerdo && (
+        <div className="cn-red-caso-aviso" role="status">
+          <p className="cn-red-caso-aviso-texto">{desacuerdo.texto}</p>
+          <button type="button" onClick={() => setLegalBranch(desacuerdo.delCaso)} className="cn-red-caso-aviso-boton">
+            {desacuerdo.boton}
+          </button>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,31 +1,40 @@
 import React, { useEffect, useState } from 'react';
-import { AlertTriangle, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import { firmActuacionesApi } from '../../catalog/services/catalog.api';
 import { BRANCH_LABELS } from '../../catalog/branchLabels';
 import type { ActuacionRole, LegalBranch } from '../../catalog/types';
 
 /**
- * «Ninguna de estas: escribir el nombre…»
+ * «No está en la lista: la escribo yo». Artboard «Escribir la actuación yo»
+ * (líneas 463–486 de `public/handoff/app-redaccion-revision.html`).
  *
  * ─── POR QUÉ ESTO NO CONTRADICE AL CATÁLOGO ─────────────────────────────────
  *
  * La regla de la casa es que un término afirmado sin comprobar es peor que su
  * ausencia. Aquí no se afirma ninguno: se guarda un NOMBRE. El artículo, el
  * término y las secciones quedan declarados como no verificados en la lista, en
- * la barra sobre el papel y en las instrucciones que recibe el modelo, que
+ * la franja sobre el papel y en las instrucciones que recibe el modelo, que
  * tiene prohibido inventarlos.
  *
- * La alternativa real, cuando la rama no trae la actuación, no era una ficha
- * mejor: era redactar bajo la ficha equivocada —que sí afirma un plazo, y el de
- * otro— o no redactar.
+ * NO SE PIDE EL TÉRMINO AQUÍ, y es deliberado: un plazo tecleado de memoria es
+ * indistinguible de uno verificado en cuanto queda guardado. El término se
+ * escribe en «Catálogo», con su fuente al lado.
  *
- * NO SE PIDE EL TÉRMINO AQUÍ, y es deliberado. Un campo de plazo en el momento
- * de crear invita a escribir el que uno recuerda, sin abrir la norma; y un
- * plazo tecleado de memoria es indistinguible de uno verificado en cuanto queda
- * guardado. El término se escribe en «Catálogo», con su fuente al lado, que es
- * el mismo sitio y el mismo formulario con el que la firma cura cualquier otra
- * ficha.
+ * «LO QUE ESTO IMPLICA» VA PRIMERO, como en el artboard: es la condición de lo
+ * que se crea, y leída después del campo ya no cambia la decisión.
+ *
+ * ─── LO QUE EL ARTBOARD PIDE Y AQUÍ NO ESTÁ, con la razón ───────────────────
+ *
+ * · El selector «Rama (para clasificarla)». La rama es la de la cascada: una
+ *   segunda elección aquí podría guardar la actuación en una rama y dejar el
+ *   escrito resolviéndose en otra. Se dice en el subtítulo dónde queda.
+ * · «Qué debe llevar el escrito». La actuación de la firma no guarda secciones.
+ * · «Proponerla al catálogo de Iureon». No existe ese flujo.
+ * · «Volver a buscar en el catálogo». Cerrar con «Cancelar» o la × ya devuelve
+ *   a la lista; un tercer botón para lo mismo obligaría a preguntarse la diferencia.
+ * · «Es un título de trabajo, no la denominación jurídica…». Eso describe a
+ *   «Redactar sin actuación»; aquí el abogado sí escribe un nombre.
  */
 
 interface Props {
@@ -40,13 +49,7 @@ interface Props {
 const MIN = 4;
 const MAX = 120;
 
-export const ActuacionPropiaDialog: React.FC<Props> = ({
-  abierto,
-  onCerrar,
-  legalBranch,
-  userRole,
-  onCreada
-}) => {
+export const ActuacionPropiaDialog: React.FC<Props> = ({ abierto, onCerrar, legalBranch, userRole, onCreada }) => {
   const [nombre, setNombre] = useState('');
   const [nota, setNota] = useState('');
   const [guardando, setGuardando] = useState(false);
@@ -81,8 +84,7 @@ export const ActuacionPropiaDialog: React.FC<Props> = ({
     } catch (e) {
       /*
        * El servidor responde 409 con el nombre de la actuación publicada que ya
-       * cubre lo que se pidió. Ese mensaje es LO ÚTIL —dice cuál elegir— así
-       * que se muestra tal cual en vez de un «no se pudo guardar».
+       * cubre lo que se pidió. Ese mensaje es LO ÚTIL —dice cuál elegir—.
        */
       setError(e instanceof Error ? e.message : 'La actuación no pudo guardarse.');
     } finally {
@@ -96,31 +98,35 @@ export const ActuacionPropiaDialog: React.FC<Props> = ({
     <Dialog
       abierto={abierto}
       onCerrar={onCerrar}
-      titulo="Escribir el nombre de la actuación"
-      subtitulo={`Quedará en la lista de ${rama}, para toda su firma.`}
+      titulo="Escribir la actuación yo"
+      subtitulo={`Para lo que el catálogo todavía no trae. Quedará en la lista de ${rama}, para toda su firma.`}
       hayCambiosSinGuardar={limpio.length > 0}
       onIntentoDeCerrarConCambios={() => setError('Guarde la actuación o cierre con la ×.')}
       acciones={
-        <>
-          <button type="button" onClick={onCerrar} className="btn-neutral">
+        <div className="cara-nueva cn-red-dlg-acciones">
+          <button type="button" onClick={onCerrar} className="cn-red-dlg-boton">
             Cancelar
           </button>
-          <button
-            type="button"
-            onClick={() => void guardar()}
-            disabled={!valido || guardando}
-            className="btn-primary"
-          >
-            {guardando && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+          <button type="button" onClick={() => void guardar()} disabled={!valido || guardando} className="cn-red-dlg-primario">
+            {guardando && <Loader2 className="cn-red-dlg-svg animate-spin" aria-hidden />}
             Guardar y elegirla
           </button>
-        </>
+        </div>
       }
     >
-      <div className="space-y-4">
-        <div>
-          <label className="field-label" htmlFor="nombre-actuacion-propia">
-            Nombre de la actuación
+      <div className="cara-nueva cn-red-dlg">
+        <div className="cn-red-dlg-aviso cn-red-dlg-aviso--sin">
+          <p className="cn-red-dlg-aviso-titulo">Lo que esto implica</p>
+          <p className="cn-red-dlg-aviso-texto">
+            Ninguna norma comprobada respaldará su artículo ni su estructura, y la guía tiene prohibido inventarlos. El escrito lo dirá arriba, y
+            si afirma un plazo, ese plazo no vendrá del catálogo: tendrá que confirmarlo usted contra la norma. Cuando alguien de su firma lea la
+            norma, escriba el término y su fuente en «Catálogo» y la advertencia desaparece.
+          </p>
+        </div>
+
+        <div className="cn-red-dlg-campo">
+          <label className="cn-red-dlg-rotulo" htmlFor="nombre-actuacion-propia">
+            Cómo la llama
           </label>
           <input
             id="nombre-actuacion-propia"
@@ -128,18 +134,20 @@ export const ActuacionPropiaDialog: React.FC<Props> = ({
             onChange={(e) => setNombre(e.target.value)}
             maxLength={MAX}
             placeholder="Como la nombraría en el escrito"
-            className="field"
+            className="cn-red-dlg-entrada"
             autoFocus
           />
-          <p className="mt-1 flex justify-between text-meta text-ink-400">
-            <span>Entre {MIN} y {MAX} caracteres.</span>
-            <span className="font-mono">{limpio.length}</span>
+          <p className="cn-red-dlg-contador">
+            <span>
+              Entre {MIN} y {MAX} caracteres.
+            </span>
+            <span>{limpio.length}</span>
           </p>
         </div>
 
-        <div>
-          <label className="field-label" htmlFor="nota-actuacion-propia">
-            Nota para su firma <span className="normal-case text-ink-400">(opcional)</span>
+        <div className="cn-red-dlg-campo">
+          <label className="cn-red-dlg-rotulo" htmlFor="nota-actuacion-propia">
+            Nota para su firma <span className="cn-red-dlg-opcional">(opcional)</span>
           </label>
           <textarea
             id="nota-actuacion-propia"
@@ -147,30 +155,11 @@ export const ActuacionPropiaDialog: React.FC<Props> = ({
             onChange={(e) => setNota(e.target.value)}
             maxLength={400}
             placeholder="Para qué la usan, ante quién se radica, qué conviene recordar."
-            className="field-area min-h-[80px]"
+            className="cn-red-dlg-area cn-red-dlg-area--baja"
           />
         </div>
 
-        {/*
-          EL AVISO NO ES LETRA PEQUEÑA: es la condición de lo que se está
-          creando, y va con el mismo tratamiento ámbar con el que el resto de la
-          aplicación marca lo no verificado.
-        */}
-        <p className="notice-unverified">
-          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-unverified" />
-          <span className="text-justify [text-wrap:pretty]">
-            <b className="font-semibold">Ninguna norma verificada la respaldará.</b> El escrito se
-            redactará sin artículo ni término comprobados, y la guía tiene prohibido inventarlos: lo
-            dirá en el propio documento. Cuando alguien de su firma lea la norma, escriba el término
-            y su fuente en <b className="font-semibold">Catálogo</b> y la advertencia desaparece.
-          </span>
-        </p>
-
-        {error && (
-          <p className="rounded-card border border-[rgb(var(--danger-line))] bg-[rgb(var(--danger)/0.06)] px-3 py-2.5 text-justify text-ui text-danger [text-wrap:pretty]">
-            {error}
-          </p>
-        )}
+        {error && <p className="cn-red-dlg-error">{error}</p>}
       </div>
     </Dialog>
   );

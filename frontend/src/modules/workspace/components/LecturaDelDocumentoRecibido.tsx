@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, CheckCircle2, UserX } from 'lucide-react';
+import { AlertTriangle, UserX } from 'lucide-react';
 import type { InformeDeDocumentoRecibido } from '../services/review.api';
 import { etiquetaDeAtaque, puntosDeAtaqueDe } from '../services/ataque';
 
@@ -26,24 +26,37 @@ import { etiquetaDeAtaque, puntosDeAtaqueDe } from '../services/ataque';
  * vuelve a leer el informe días después no había ningún botón. Sigue entrando
  * por `pie` —una lectura puede necesitar mostrarse sin salidas— pero lo que se
  * le pasa es la misma pieza en los dos sitios.
+ *
+ * ─── LA CARA ────────────────────────────────────────────────────────────────
+ *
+ * La de `public/handoff/app-informe-de-revision.html` (artboards 4 y 5). Se
+ * pinta dentro de un contenedor `cn-inf`, que pone la rejilla y los tokens.
  */
 
-/** Una lista con viñetas y su rótulo; vacía no se dibuja. */
-export const SeccionDeInforme: React.FC<{ titulo: string; items: string[]; tono?: 'ok' | 'aviso' | 'neutro' }> = ({ titulo, items, tono = 'neutro' }) => {
+/**
+ * Una lista con viñetas y su rótulo; vacía no se dibuja.
+ *
+ * `tono="aviso"` es lo que el documento calla: va en tarjetas sobre gris y no
+ * con el icono rojo de antes, porque una ausencia declarada no es un error.
+ */
+export const SeccionDeInforme: React.FC<{ titulo: string; items: string[]; tono?: 'ok' | 'aviso' | 'neutro'; bajada?: string }> = ({
+  titulo,
+  items,
+  tono = 'neutro',
+  bajada
+}) => {
   if (items.length === 0) return null;
-  const Icono = tono === 'ok' ? CheckCircle2 : tono === 'aviso' ? AlertTriangle : null;
   return (
-    <section>
-      <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">{titulo}</h4>
-      <ul className="mt-1.5 space-y-1.5">
+    <section className="cn-inf-estrato">
+      <h4 className="cn-inf-h2">{titulo}</h4>
+      {bajada && <p className="cn-inf-bajada">{bajada}</p>}
+      <ul className="cn-inf-lista">
         {items.map((it, i) => (
-          <li key={i} className="flex gap-2 text-ui leading-snug text-ink-900">
-            {Icono ? (
-              <Icono className={`mt-0.5 h-3.5 w-3.5 shrink-0 ${tono === 'ok' ? 'text-verified' : 'text-danger'}`} />
-            ) : (
-              <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-ink-400" />
-            )}
-            <span>{it}</span>
+          <li key={i} className={tono === 'aviso' ? 'cn-inf-nota' : ''}>
+            <div className="cn-inf-punto">
+              <span className="cn-inf-guion" aria-hidden="true" />
+              <span className="cn-inf-punto-texto">{it}</span>
+            </div>
           </li>
         ))}
       </ul>
@@ -72,24 +85,25 @@ export const LecturaDelDocumentoRecibido: React.FC<LecturaDelDocumentoRecibidoPr
    * pantalla deja de hablar en segunda persona en vez de suponerla.
    */
   const seSabeLaPosicion = Boolean(informe.posicion) && informe.posicion !== 'DESCONOCIDO';
+  /* El radicado y la fecha son citables: van en mono. Quién lo profirió es un nombre. */
   const identificacion = [
-    informe.quienLoProfirio && { etiqueta: 'Lo profirió', valor: informe.quienLoProfirio },
-    informe.radicado && { etiqueta: 'Radicado', valor: informe.radicado },
-    informe.fecha && { etiqueta: 'Fecha del documento', valor: informe.fecha }
-  ].filter(Boolean) as { etiqueta: string; valor: string }[];
+    informe.quienLoProfirio && { etiqueta: 'Lo profirió', valor: informe.quienLoProfirio, mono: false },
+    informe.radicado && { etiqueta: 'Radicado', valor: informe.radicado, mono: true },
+    informe.fecha && { etiqueta: 'Fecha del documento', valor: informe.fecha, mono: true }
+  ].filter(Boolean) as { etiqueta: string; valor: string; mono: boolean }[];
 
   return (
     <>
-      {informe.queEs && <p className="text-[14px] leading-relaxed text-ink-900 text-justify [text-wrap:pretty]">{informe.queEs}</p>}
+      {informe.queEs && <p className="cn-inf-que-es">{informe.queEs}</p>}
 
       {identificacion.length > 0 && (
-        <section>
-          <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">Según el propio documento</h4>
-          <dl className="mt-1.5 space-y-1">
+        <section className="cn-inf-estrato">
+          <h4 className="cn-inf-h2">Según el propio documento</h4>
+          <dl className="cn-inf-datos">
             {identificacion.map((x) => (
-              <div key={x.etiqueta} className="flex flex-col gap-0.5 sm:flex-row sm:gap-2">
-                <dt className="min-w-0 shrink-0 font-mono text-[10.5px] uppercase tracking-[0.06em] text-ink-400 sm:w-40">{x.etiqueta}</dt>
-                <dd className="min-w-0 flex-1 text-ui leading-snug text-ink-900">{x.valor}</dd>
+              <div key={x.etiqueta} className="cn-inf-dato">
+                <dt className="cn-inf-dato-etiqueta">{x.etiqueta}</dt>
+                <dd className={`cn-inf-dato-valor ${x.mono ? 'cn-inf-mono' : ''}`}>{x.valor}</dd>
               </div>
             ))}
           </dl>
@@ -98,18 +112,16 @@ export const LecturaDelDocumentoRecibido: React.FC<LecturaDelDocumentoRecibidoPr
 
       <SeccionDeInforme titulo="Qué decide u ordena" items={informe.decide} />
 
-      <section>
+      <section className="cn-inf-estrato">
         {/*
           EL RÓTULO CAMBIA SEGÚN SE SEPA A QUIÉN, y no es cosmético. «Qué LE
           exige» afirma que la carga es del lector; mientras no se sepa qué
           parte es, esa afirmación no se puede hacer y el rótulo se limita a lo
           que sí consta: qué exige el documento.
         */}
-        <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
-          {seSabeLaPosicion ? 'Qué le exige y para cuándo' : 'Qué exige el documento y para cuándo'}
-        </h4>
+        <h4 className="cn-inf-h2">{seSabeLaPosicion ? 'Qué le exige y para cuándo' : 'Qué exige el documento y para cuándo'}</h4>
         {informe.cargas.length === 0 ? (
-          <p className="mt-1.5 text-ui leading-snug text-ink-900 text-justify">
+          <p className="cn-inf-vacio">
             {/*
               «Ninguna carga A SU CARGO» decía de quién no era la carga sin
               saber quién era el lector. Sin posición declarada se dice lo
@@ -120,10 +132,10 @@ export const LecturaDelDocumentoRecibido: React.FC<LecturaDelDocumentoRecibidoPr
               : 'Del texto de este documento no se desprende ninguna carga.'}
           </p>
         ) : (
-          <div className="mt-1.5 space-y-2.5">
+          <ul className="cn-inf-lista">
             {informe.cargas.map((c, k) => (
-              <div key={k} className="rounded-control border border-line-200 bg-canvas px-3 py-2.5">
-                {c.carga && <p className="text-ui leading-snug text-ink-900 text-justify [text-wrap:pretty]">{c.carga}</p>}
+              <li key={k} className={`cn-inf-carga ${c.deQuienEs === 'DE_OTRO' ? 'cn-inf-carga--ajena' : ''}`}>
+                {c.carga && <p className="cn-inf-carga-titulo">{c.carga}</p>}
                 {/*
                   DE QUIÉN ES, cuando se puede decir. El veredicto lo calcula
                   el servidor comparando a quién se la impone el documento con
@@ -135,23 +147,17 @@ export const LecturaDelDocumentoRecibido: React.FC<LecturaDelDocumentoRecibidoPr
                   lo escribió el documento, que informa sin atribuir.
                 */}
                 {c.deQuienEs === 'DE_OTRO' && (
-                  <p className="mt-1.5 flex items-start gap-1.5 text-ui leading-snug text-ink-700">
-                    <UserX className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink-400" />
+                  <p className="cn-inf-atribucion">
+                    <UserX className="cn-inf-atribucion-icono" aria-hidden="true" />
                     <span className="min-w-0 text-justify">
-                      <span className="font-semibold">Esta carga no es suya.</span> El documento se la impone a{' '}
+                      <span className="cn-inf-seleccionado">Esta carga no es suya.</span> El documento se la impone a{' '}
                       <span className="[overflow-wrap:anywhere]">{c.aQuien}</span>.
                     </span>
                   </p>
                 )}
-                {c.deQuienEs === 'SUYA' && (
-                  <p className="mt-1.5 text-meta text-ink-500">
-                    El documento se la impone a {c.aQuien}: le corresponde a usted.
-                  </p>
-                )}
+                {c.deQuienEs === 'SUYA' && <p className="cn-inf-atribucion">El documento se la impone a {c.aQuien}: le corresponde a usted.</p>}
                 {c.deQuienEs !== 'DE_OTRO' && c.deQuienEs !== 'SUYA' && c.aQuien && (
-                  <p className="mt-1.5 text-meta text-ink-500 [overflow-wrap:anywhere]">
-                    El documento se la impone a {c.aQuien}.
-                  </p>
+                  <p className="cn-inf-atribucion [overflow-wrap:anywhere]">El documento se la impone a {c.aQuien}.</p>
                 )}
                 {/*
                   EL PLAZO AUSENTE SE DICE CON TODAS SUS LETRAS. Callarlo dejaría
@@ -162,18 +168,12 @@ export const LecturaDelDocumentoRecibido: React.FC<LecturaDelDocumentoRecibidoPr
                 */}
                 {c.plazo ? (
                   /*
-                    EL PLAZO AJENO NO SE PINTA EN ROJO DE FIRMA. Es el mismo
+                    EL PLAZO AJENO NO SE PINTA EN EL COLOR DE FIRMA. Es el mismo
                     dato y no es la misma noticia: en el color del plazo propio
                     vuelve a ser una alarma, que es justo lo que esta sección
                     existe para no hacer.
                   */
-                  <p
-                    className={`mt-1.5 text-ui leading-snug ${
-                      c.deQuienEs === 'DE_OTRO' ? 'text-ink-700' : 'font-semibold text-brand-700'
-                    }`}
-                  >
-                    Plazo que anuncia el documento: {c.plazo}
-                  </p>
+                  <p className={`cn-inf-plazo ${c.deQuienEs === 'DE_OTRO' ? 'cn-inf-plazo--ajeno' : ''}`}>Plazo que anuncia el documento: {c.plazo}</p>
                 ) : c.deQuienEs === 'DE_OTRO' ? (
                   /*
                     Y SI LA CARGA ES AJENA, NO FALTA NINGÚN PLAZO SUYO. El aviso
@@ -183,25 +183,24 @@ export const LecturaDelDocumentoRecibido: React.FC<LecturaDelDocumentoRecibidoPr
                   */
                   null
                 ) : (
-                  <p className="notice-unverified mt-1.5" role="status">
-                    <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-unverified" />
-                    <span className="min-w-0 text-justify">
+                  /* Sin plazo anunciado es exactamente «sin verificar»: por eso lleva el borde discontinuo. */
+                  <p className="cn-inf-sin-plazo" role="status">
+                    <AlertTriangle className="cn-inf-aviso-icono" aria-hidden="true" />
+                    <span className="min-w-0">
                       El documento no anuncia plazo para esta carga. No se le pone uno de memoria: consúltelo en la guía de actuaciones, donde el
                       término viene con su artículo y su autoridad verificados.
                     </span>
                   </p>
                 )}
                 {c.cita && (
-                  <>
-                    <p className="mt-2 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-400">Dice el documento</p>
-                    <blockquote className="mt-0.5 border-l-2 border-line-200 pl-2.5 text-ui italic leading-snug text-ink-700 text-justify">
-                      «{c.cita}»
-                    </blockquote>
-                  </>
+                  <div>
+                    <span className="cn-inf-rotulo">Dice el documento</span>
+                    <blockquote className="cn-inf-cita font-legal">«{c.cita}»</blockquote>
+                  </div>
                 )}
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
         )}
       </section>
 
@@ -213,16 +212,16 @@ export const LecturaDelDocumentoRecibido: React.FC<LecturaDelDocumentoRecibidoPr
         * La mitad que faltaba. Y la más delicada de pintar, porque aquí no hay
         * ficha detrás de nada: lo único que sostiene un flanco es la cita del
         * propio documento. Por eso cada punto se dibuja en dos planos VISIBLES
-        * —las palabras del documento, entre comillas y en cursiva; debajo,
-        * rotulada, la lectura del revisor—, igual que el informe del escrito
-        * propio separa lo que exige la norma de lo que opina quien revisa. Un
-        * punto sin cita no llega hasta aquí: el servidor lo descarta al leer la
-        * respuesta.
+        * —las palabras del documento, entre comillas; debajo, rotulada y sobre
+        * otra superficie, la lectura del revisor—, igual que el informe del
+        * escrito propio separa lo que exige la norma de lo que opina quien
+        * revisa. Un punto sin cita no llega hasta aquí: el servidor lo descarta
+        * al leer la respuesta.
         */}
       {puntos.length > 0 && (
-        <section>
-          <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">Por dónde se ataca</h4>
-          <p className="mt-1 text-[12px] leading-snug text-ink-500 text-justify [text-wrap:pretty]">
+        <section className="cn-inf-estrato">
+          <h4 className="cn-inf-h2">Por dónde se ataca</h4>
+          <p className="cn-inf-bajada">
             {/*
               QUÉ SON Y PARA QUÉ SIRVEN, EN UNA LÍNEA. Se reportó que «solo hay
               unas descripciones de por dónde se ataca pero no se entiende cómo
@@ -236,39 +235,40 @@ export const LecturaDelDocumentoRecibido: React.FC<LecturaDelDocumentoRecibidoPr
             Redacción. Cada punto se apoya en las palabras del propio documento, que van citadas. Lo rotulado como
             lectura del revisor es criterio, no texto del documento: aquí se señala el flanco y concluye usted.
           </p>
-          <div className="mt-1.5 space-y-2.5">
+          <ul className="cn-inf-lista">
             {puntos.map((p, k) => (
-              <div key={k} className="rounded-control border border-line-200 bg-canvas px-3 py-2.5">
-                <p className="font-mono text-[10.5px] font-semibold text-ink-500">{etiquetaDeAtaque(p.clase)}</p>
-                <p className="mt-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-400">Dice el documento</p>
-                <blockquote className="mt-0.5 border-l-2 border-line-200 pl-2.5 text-ui italic leading-snug text-ink-700 text-justify">
-                  «{p.cita}»
-                </blockquote>
-                {/*
-                  LA NORMA SOLO APARECE CON SU TEXTO AL LADO. Nombrar el artículo
-                  sin lo que el documento dice que ordena invitaría a completarlo
-                  de memoria, que es justo lo prohibido; el servidor ya vacía el
-                  nombre cuando falta la transcripción, y aquí se exige de nuevo.
-                */}
-                {p.norma && p.citaDeLaNorma && (
-                  <>
-                    <p className="mt-2 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-400">
-                      Norma en que el propio documento se apoya · {p.norma}
-                    </p>
-                    <blockquote className="mt-0.5 border-l-2 border-line-200 pl-2.5 text-ui italic leading-snug text-ink-700 text-justify">
-                      «{p.citaDeLaNorma}»
-                    </blockquote>
-                  </>
-                )}
-                {p.lectura && (
-                  <>
-                    <p className="mt-2 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-brand-700">Lectura del revisor</p>
-                    <p className="mt-0.5 text-ui leading-snug text-ink-900 text-justify [text-wrap:pretty]">{p.lectura}</p>
-                  </>
-                )}
-              </div>
+              <li key={k} className="cn-inf-flanco">
+                <div className="cn-inf-flanco-cabeza">
+                  <span className="cn-inf-numero">{String(k + 1).padStart(2, '0')}</span>
+                  <span className="cn-inf-flanco-clase">{etiquetaDeAtaque(p.clase)}</span>
+                </div>
+                <div className="cn-inf-flanco-cuerpo">
+                  <div>
+                    <span className="cn-inf-rotulo">Dice el documento</span>
+                    <blockquote className="cn-inf-cita font-legal">«{p.cita}»</blockquote>
+                  </div>
+                  {/*
+                    LA NORMA SOLO APARECE CON SU TEXTO AL LADO. Nombrar el artículo
+                    sin lo que el documento dice que ordena invitaría a completarlo
+                    de memoria, que es justo lo prohibido; el servidor ya vacía el
+                    nombre cuando falta la transcripción, y aquí se exige de nuevo.
+                  */}
+                  {p.norma && p.citaDeLaNorma && (
+                    <div className="cn-inf-norma">
+                      <span className="cn-inf-rotulo">Norma en que el propio documento se apoya · {p.norma}</span>
+                      <blockquote className="cn-inf-cita font-legal">«{p.citaDeLaNorma}»</blockquote>
+                    </div>
+                  )}
+                  {p.lectura && (
+                    <div className="cn-inf-lectura">
+                      <span className="cn-inf-rotulo cn-inf-rotulo--marca">Lectura del revisor</span>
+                      <p className="cn-inf-valor">{p.lectura}</p>
+                    </div>
+                  )}
+                </div>
+              </li>
             ))}
-          </div>
+          </ul>
         </section>
       )}
 

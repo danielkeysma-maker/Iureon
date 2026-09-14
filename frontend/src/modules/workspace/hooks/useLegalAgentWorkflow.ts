@@ -18,7 +18,13 @@ import { adjuntosPendientes } from '../services/adjuntos';
  */
 export function useLegalAgentWorkflow(formatoDeFirma?: string, expedienteId?: string) {
 
-  const [rightView, setRightView] = useState<'pdf' | 'draft'>('pdf');
+  /*
+   * NACE EN EL DOCUMENTO. Con el asistente de Redactar, el lienzo solo aparece
+   * cuando ya hay un borrador, y lo primero que alguien busca ahí es el escrito,
+   * no el expediente. `handleLoadDraft` y el flujo de generación lo siguen
+   * poniendo en 'draft' por su cuenta.
+   */
+  const [rightView, setRightView] = useState<'pdf' | 'draft'>('draft');
   const [legalPrompt, setLegalPrompt] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   /*
@@ -52,6 +58,13 @@ export function useLegalAgentWorkflow(formatoDeFirma?: string, expedienteId?: st
   const handleSendPrompt = async (e: React.FormEvent): Promise<GeneratedDraft | null> => {
     e.preventDefault();
     if (!legalPrompt.trim() || isProcessing) return null;
+    /*
+     * NADIE LO ENCENDÍA. `isProcessing` solo se apagaba en el `finally`, así que
+     * el botón nunca decía «Generando…», un segundo clic mandaba otra petición y
+     * la consola no anunciaba el trabajo. El asistente depende de este valor para
+     * no saltar al papel mientras el escrito todavía no existe.
+     */
+    setIsProcessing(true);
     let generado: GeneratedDraft | null = null;
 
     // Generar título limpio temporal: TipoActuacion_Fecha

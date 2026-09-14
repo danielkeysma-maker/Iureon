@@ -47,7 +47,7 @@ export const PASOS_DE_VISITA: readonly PasoDeVisita[] = [
   modulo(
     'workspace',
     'Redacción',
-    'Aquí se genera el primer borrador de un escrito. En la barra de arriba escoge quién escribe, la rama y la actuación del catálogo; a la izquierda cuenta los hechos y la pretensión; a la derecha aparece el escrito, con su término y su fuente a la vista.'
+    'Aquí se genera el primer borrador de un escrito, en pasos: qué va a presentar —el caso, quién firma, la rama y la actuación del catálogo— y los hechos con sus pruebas. Al generarlo aparece el papel con su barra, y a la derecha lo que lo respalda: la ficha, su término y las secciones que pide.'
   ),
   modulo(
     'borradores',

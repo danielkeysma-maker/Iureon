@@ -8,7 +8,8 @@ import { SidebarLeft } from './modules/tenant/components/SidebarLeft';
 import { MobileTabBar } from './modules/tenant/components/MobileTabBar';
 import { MobileHeader } from './modules/tenant/components/MobileHeader';
 import { MobileWorkshopTabs, type VistaTaller } from './modules/workspace/components/MobileWorkshopTabs';
-import { WorkshopConfigMobile } from './modules/workspace/components/WorkshopConfigMobile';
+import { SelectorDeCasoMovil, WorkshopConfigMobile } from './modules/workspace/components/WorkshopConfigMobile';
+import { BarraDelBorrador } from './modules/workspace/components/BarraDelBorrador';
 import { MobileMoreSheet } from './modules/tenant/components/MobileMoreSheet';
 import { SupportAccessBanner } from './modules/support/components/SupportAccessBanner';
 import { SupportAccessDecisionDialog } from './modules/support/components/SupportAccessDecisionDialog';
@@ -54,7 +55,7 @@ import { SupportView } from './modules/help/components/SupportView';
 import { SupportMobileView } from './modules/help/components/SupportMobileView';
 import { TriageView } from './modules/catalog/components/TriageView';
 import { SettingsView } from './modules/settings/components/SettingsView';
-import { WorkshopConfigBar } from './modules/workspace/components/WorkshopConfigBar';
+import { SelectorDeCasoDeRedaccion, WorkshopConfigBar } from './modules/workspace/components/WorkshopConfigBar';
 import type { ActuacionRole } from './modules/catalog/types';
 import { FirmBrandingModal } from './modules/tenant/components/FirmBrandingModal';
 import { brandingApi, formatoComoInstruccion, setMarcaActual, type FirmBranding } from './modules/tenant/services/branding.api';
@@ -239,6 +240,12 @@ export function App() {
      */
     const cuadro = componerCuadroDeRedaccion(instruccion, hechos);
     if (cuadro) workflow.setLegalPrompt(cuadro);
+    /*
+     * LLEGA AL ASISTENTE, no al borrador que hubiera abierto: lo que se trae es
+     * una actuación para redactar, y el borrador anterior sigue guardado y a un
+     * clic desde el propio asistente.
+     */
+    setVistaTaller('instruccion');
     setMainView('workspace');
   };
   const [refrescoSoporte, setRefrescoSoporte] = useState(0);
@@ -821,10 +828,20 @@ export function App() {
    * el objeto, porque el objeto se recrea al editar el texto y devolveria al
    * abogado al documento cada vez que corrige la instruccion.
    */
+  /*
+   * Y YA NO ES SOLO EN EL TELÉFONO: en escritorio el asistente y el borrador
+   * también se alternan (`vistaTaller` manda en los dos tamaños). Por eso el
+   * salto espera a que termine la generación: el hook pone un borrador de
+   * espera («⏳ REDACTANDO…») antes de llamar al servidor, y saltar a él dejaría
+   * al abogado mirando un papel provisional mientras la consola, que dice qué
+   * está pasando, queda en el asistente.
+   */
   const tituloGenerado = workflow.generatedDraft?.title ?? null;
   useEffect(() => {
-    if (tituloGenerado) setVistaTaller('documento');
-  }, [tituloGenerado]);
+    if (tituloGenerado && !workflow.isProcessing) setVistaTaller('documento');
+  }, [tituloGenerado, workflow.isProcessing]);
+  /* El asistente se ve sin borrador, o cuando el abogado volvió a él a propósito. */
+  const verAsistente = !workflow.generatedDraft || vistaTaller === 'instruccion';
 
   /* El mensaje vuelve al lienzo, que lo pinta como aviso; nada de diálogos del navegador. */
   const handleSaveDraft = async (updatedText: string): Promise<string> => {
@@ -854,6 +871,8 @@ export function App() {
     setExpedienteDeRedaccion(entry.expedienteId ?? '');
     workflow.setDocumentType(entry.draft.documentType);
     workflow.setRightView('draft');
+    /* Abrir un borrador es ir a él, aunque su título coincida con el que ya estaba a la vista. */
+    setVistaTaller('documento');
     setLoadedDraftId(entry.id);
     recordar(PANTALLAS.borrador, entry.id || null);
     setIsSavedDraftsModalOpen(false);
@@ -1285,7 +1304,8 @@ export function App() {
               ? 'Apariencia · lo suyo, no de la firma'
               : null
           }
-          enTaller={mainView === 'workspace'}
+          /* Copiar y exportar solo con un escrito que copiar: antes aparecían en el asistente vacío y no hacían nada. */
+          enTaller={mainView === 'workspace' && Boolean(workflow.generatedDraft)}
           copied={workflow.copied}
           onCopyText={workflow.handleCopyText}
           onExportWord={handleExportWord}
@@ -1301,27 +1321,12 @@ export function App() {
         />
 
         <div className="hidden lg:block">
+        {/*
+          LAS ACCIONES DEL ESCRITO YA NO VIAJAN A LA CABECERA: viven en
+          `BarraDelBorrador`, sobre el escrito. Aquí queda el módulo y la sesión.
+        */}
         <HeaderTop
           mainView={mainView}
-          // El nombre del escrito, no una miga de pan. Sin borrador todavía se
-          // muestra el tipo de actuación: es lo que alguien necesita al volver a
-          // una pestaña abierta desde ayer.
-          tituloDelEscrito={workflow.generatedDraft?.title || workflow.documentType}
-          rightView={workflow.rightView}
-          setRightView={workflow.setRightView}
-          copied={workflow.copied}
-          onCopyText={workflow.handleCopyText}
-          onExportWord={handleExportWord}
-          onExportPdf={handleExportPdf}
-          hayFuentes={(workflow.generatedDraft?.jurisprudenciaCitada.length ?? 0) > 0}
-          estadoDelBorrador={borradorAbierto?.estado ?? null}
-          onMarcarListo={
-            borradorAbierto
-              ? () => void updateMetadata(borradorAbierto.id, { estado: 'LISTO' })
-              : undefined
-          }
-          isFocusMode={workflow.isFocusMode}
-          onToggleFocusMode={() => workflow.setIsFocusMode(!workflow.isFocusMode)}
           onOpenUserManagementModal={() => setIsUserManagementModalOpen(true)}
           onLogout={handleLogout}
         />
@@ -1381,60 +1386,114 @@ export function App() {
             <ModuloBloqueado modulo="REDACCION" quePuede="Los escritos ya guardados siguen en Borradores: puede abrirlos, leerlos y exportarlos a Word o PDF.">
             <div data-visita="vista-workspace" className="cara-nueva flex min-h-0 min-w-0 flex-1 flex-col">
               {/*
-                DOS BARRAS DE CONFIGURACION, UNA POR TAMAÑO. La de escritorio son
-                tres selectores en fila; en 375px quedaban en «Fi… > … > El…» y
-                configurar dejaba de ser posible sin adivinar. 4d comprime la
-                configuracion en dos chips y pone en su lugar LA CONSECUENCIA:
-                la actuacion elegida con su termino, que es lo unico que hay que
-                poder leer antes de escribir.
-              */}
-              <div className="hidden lg:block">
-                <WorkshopConfigBar
-                  userRole={userRole}
-                  setUserRole={setUserRole}
-                  legalBranch={workflow.legalBranch}
-                  setLegalBranch={workflow.setLegalBranch}
-                  documentType={workflow.documentType}
-                  setDocumentType={workflow.setDocumentType}
-                  expedienteId={expedienteDeRedaccion}
-                  setExpedienteId={setExpedienteDeRedaccion}
-                  /*
-                    Los mismos hechos del cuadro de instrucción, no una copia:
-                    «que la guía proponga la actuación» orienta sobre lo que se
-                    va a redactar, y lo que se complete en ese diálogo vuelve
-                    aquí en vez de quedarse dentro de él.
-                  */
-                  hechos={workflow.legalPrompt}
-                  setHechos={workflow.setLegalPrompt}
-                />
-              </div>
-              <div className="lg:hidden">
-                <WorkshopConfigMobile
-                  userRole={userRole}
-                  setUserRole={setUserRole}
-                  legalBranch={workflow.legalBranch}
-                  setLegalBranch={workflow.setLegalBranch}
-                  documentType={workflow.documentType}
-                  setDocumentType={workflow.setDocumentType}
-                  expedienteId={expedienteDeRedaccion}
-                  setExpedienteId={setExpedienteDeRedaccion}
-                  hechos={workflow.legalPrompt}
-                  setHechos={workflow.setLegalPrompt}
-                />
-              </div>
+                ANTES DEL BORRADOR, EL ASISTENTE; CON EL BORRADOR, EL PAPEL.
 
-              {!workflow.isFocusMode && (
-                <MobileWorkshopTabs
-                  vista={vistaTaller}
-                  onCambiar={setVistaTaller}
-                  hayBorrador={Boolean(workflow.generatedDraft)}
+                Redacción eran dos columnas fijas —la instrucción y un lienzo que
+                decía «Aún no hay borrador»— bajo una barra de configuración a
+                todo lo ancho. El titular vio en producción que la cara nueva solo
+                las había recoloreado. Los artboards piden dos pantallas: el
+                asistente «Redactar un escrito» y el borrador con su barra y su
+                columna de respaldo. `vistaTaller` decide cuál se ve en los dos
+                tamaños; en el teléfono sus pestañas son el camino de ida y
+                vuelta, y en escritorio la flecha de la barra del borrador.
+
+                LAS DOS SE OCULTAN, NINGUNA SE DESMONTA mientras exista el
+                borrador: los adjuntos elegidos, lo escrito en el papel y la regla
+                que suelta una actuación ajena a la rama siguen vivos al ir y
+                volver.
+              */}
+              {workflow.generatedDraft && !workflow.isFocusMode && (
+                <MobileWorkshopTabs vista={vistaTaller} onCambiar={setVistaTaller} hayBorrador />
+              )}
+
+              {workflow.generatedDraft && !verAsistente && (
+                <BarraDelBorrador
+                  titulo={workflow.generatedDraft.title}
+                  expedienteId={expedienteDeRedaccion}
+                  onVolver={() => {
+                    workflow.setIsFocusMode(false);
+                    setVistaTaller('instruccion');
+                  }}
+                  guardadoEl={borradorAbierto?.savedAt || null}
+                  copied={workflow.copied}
+                  onCopiar={workflow.handleCopyText}
+                  onWord={handleExportWord}
+                  onPdf={handleExportPdf}
+                  hayFuentes={workflow.generatedDraft.jurisprudenciaCitada.length > 0}
+                  estado={borradorAbierto?.estado ?? null}
+                  onMarcarListo={borradorAbierto ? () => void updateMetadata(borradorAbierto.id, { estado: 'LISTO' }) : undefined}
+                  isFocusMode={workflow.isFocusMode}
+                  onToggleFocusMode={() => workflow.setIsFocusMode(!workflow.isFocusMode)}
                 />
               )}
 
               <div className="flex min-h-0 min-w-0 flex-1">
-              {!workflow.isFocusMode && (
                 <AgentPanelLeft
-                  ocultoEnMovil={vistaTaller !== 'instruccion'}
+                  oculto={!verAsistente}
+                  /*
+                    UNA CASCADA POR TAMAÑO. La de escritorio son tres selectores en
+                    fila con flechas; en 375 px son tres listas nativas del sistema.
+                    Los mismos hechos del cuadro de instrucción bajan a las dos: la
+                    guía orienta sobre lo que se va a redactar.
+                  */
+                  cascada={
+                    <>
+                      <div className="hidden lg:block">
+                        <WorkshopConfigBar
+                          userRole={userRole}
+                          setUserRole={setUserRole}
+                          legalBranch={workflow.legalBranch}
+                          setLegalBranch={workflow.setLegalBranch}
+                          documentType={workflow.documentType}
+                          setDocumentType={workflow.setDocumentType}
+                          hechos={workflow.legalPrompt}
+                          setHechos={workflow.setLegalPrompt}
+                        />
+                      </div>
+                      <div className="lg:hidden">
+                        <WorkshopConfigMobile
+                          userRole={userRole}
+                          setUserRole={setUserRole}
+                          legalBranch={workflow.legalBranch}
+                          setLegalBranch={workflow.setLegalBranch}
+                          documentType={workflow.documentType}
+                          setDocumentType={workflow.setDocumentType}
+                          hechos={workflow.legalPrompt}
+                          setHechos={workflow.setLegalPrompt}
+                        />
+                      </div>
+                    </>
+                  }
+                  caso={
+                    <>
+                      <div className="hidden lg:block">
+                        <SelectorDeCasoDeRedaccion
+                          expedienteId={expedienteDeRedaccion}
+                          setExpedienteId={setExpedienteDeRedaccion}
+                          legalBranch={workflow.legalBranch}
+                          setLegalBranch={workflow.setLegalBranch}
+                          documentType={workflow.documentType}
+                        />
+                      </div>
+                      <div className="lg:hidden">
+                        <SelectorDeCasoMovil
+                          expedienteId={expedienteDeRedaccion}
+                          setExpedienteId={setExpedienteDeRedaccion}
+                          legalBranch={workflow.legalBranch}
+                          setLegalBranch={workflow.setLegalBranch}
+                          documentType={workflow.documentType}
+                        />
+                      </div>
+                    </>
+                  }
+                  /* Lo único de «cómo escribe su firma» que viaja al motor es la marca de Membrete, y solo si la firma la configuró. */
+                  formatoDeFirmaConfigurado={Boolean(marcaDeFirma)}
+                  onAbrirMembrete={() => setIsBrandingModalOpen(true)}
+                  borradorAbierto={
+                    workflow.generatedDraft && !workflow.isProcessing
+                      ? { titulo: workflow.generatedDraft.title, onVolver: () => setVistaTaller('documento') }
+                      : null
+                  }
                   userRole={userRole}
                   setUserRole={setUserRole}
                   documentType={workflow.documentType}
@@ -1489,22 +1548,16 @@ export function App() {
                   activeDraftText={workflow.activeDraftText}
                   onClearActiveDraft={() => workflow.setActiveDraftText(null)}
                 />
-              )}
 
+              {workflow.generatedDraft && (
               <DocumentCanvasRight
-                ocultoEnMovil={!workflow.isFocusMode && vistaTaller !== 'documento'}
+                oculto={verAsistente}
                 documentType={workflow.documentType}
                 legalBranch={workflow.legalBranch}
                 rightView={workflow.rightView}
                 setRightView={workflow.setRightView}
                 generatedDraft={workflow.generatedDraft}
-                                copied={workflow.copied}
-                onOpenBrandingModal={() => setIsBrandingModalOpen(true)}
-                onCopyText={workflow.handleCopyText}
-                onExportWord={handleExportWord}
-                onExportPdf={handleExportPdf}
                 isFocusMode={workflow.isFocusMode}
-                onToggleFocusMode={() => workflow.setIsFocusMode(!workflow.isFocusMode)}
                 onSaveDraft={handleSaveDraft}
                 avisoExterno={avisoDeRedaccion}
                 onSalirConCambios={(texto) => {
@@ -1529,6 +1582,7 @@ export function App() {
                   setMainView('taller');
                 }}
               />
+              )}
               </div>
             </div>
             </ModuloBloqueado>

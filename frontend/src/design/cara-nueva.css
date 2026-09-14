@@ -4151,7 +4151,10 @@
 .cara-nueva .cn-red-movil,
 .cara-nueva .cn-red-pestanas,
 .cara-nueva .cn-red-panel,
-.cara-nueva .cn-red-lienzo {
+.cara-nueva .cn-red-lienzo,
+.cara-nueva .cn-red-bdb,
+.cara-nueva .cn-red-dlg,
+.cara-nueva .cn-red-dlg-acciones {
   --red-mesa: #edeff2;
   --red-ok-bg: #e9f2ec;
   --red-guion: rgb(138 90 18 / 0.55);
@@ -4162,7 +4165,10 @@
   :root:not([data-theme='light']) .cara-nueva .cn-red-movil,
   :root:not([data-theme='light']) .cara-nueva .cn-red-pestanas,
   :root:not([data-theme='light']) .cara-nueva .cn-red-panel,
-  :root:not([data-theme='light']) .cara-nueva .cn-red-lienzo {
+  :root:not([data-theme='light']) .cara-nueva .cn-red-lienzo,
+  :root:not([data-theme='light']) .cara-nueva .cn-red-bdb,
+  :root:not([data-theme='light']) .cara-nueva .cn-red-dlg,
+  :root:not([data-theme='light']) .cara-nueva .cn-red-dlg-acciones {
     --red-mesa: #0b1219;
     --red-ok-bg: rgb(79 180 131 / 0.14);
     --red-guion: rgb(217 166 74 / 0.6);
@@ -4173,7 +4179,10 @@
 :root[data-theme='dark'] .cara-nueva .cn-red-movil,
 :root[data-theme='dark'] .cara-nueva .cn-red-pestanas,
 :root[data-theme='dark'] .cara-nueva .cn-red-panel,
-:root[data-theme='dark'] .cara-nueva .cn-red-lienzo {
+:root[data-theme='dark'] .cara-nueva .cn-red-lienzo,
+:root[data-theme='dark'] .cara-nueva .cn-red-bdb,
+:root[data-theme='dark'] .cara-nueva .cn-red-dlg,
+:root[data-theme='dark'] .cara-nueva .cn-red-dlg-acciones {
   --red-mesa: #0b1219;
   --red-ok-bg: rgb(79 180 131 / 0.14);
   --red-guion: rgb(217 166 74 / 0.6);
@@ -4254,15 +4263,17 @@
 }
 
 /* ── Barra de escritorio: la cascada ───────────────────────────────────── */
+/*
+ * Ya no es una barra a todo lo ancho sino la fila del paso 1 del asistente:
+ * sin fondo ni raya propios, porque el paso ya los tiene. Conserva su capa para
+ * que las listas se pinten sobre lo que venga debajo.
+ */
 .cara-nueva .cn-red-barra {
   position: relative;
   z-index: 30;
   display: flex;
   align-items: flex-end;
-  gap: 8px;
-  padding: 12px 20px 14px;
-  border-bottom: 1px solid var(--line-2);
-  background: var(--canvas);
+  gap: 4px;
 }
 .cara-nueva .cn-red-campo {
   position: relative;
@@ -4356,10 +4367,25 @@
   z-index: 40;
   width: 420px;
   max-width: min(80vw, 520px);
+  /*
+   * LA LISTA NO PASA DEL BORDE DE LA VENTANA. La aplicación no se desplaza, así
+   * que lo que quedaba por debajo —las últimas actuaciones, el pie— no se podía
+   * alcanzar en una pantalla de portátil. Arriba quedan fijos la lupa y las
+   * tres salidas; solo las filas se desplazan (`.cn-red-filas`).
+   */
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100dvh - 190px);
   overflow: hidden;
   border-radius: 14px;
   background: var(--canvas);
   box-shadow: var(--shadow-menu), 0 0 0 1px var(--line);
+}
+/* Lo fijo de la lista no se encoge: cede espacio solo la zona de filas. */
+.cara-nueva .cn-red-lista > .cn-red-buscar-caja,
+.cara-nueva .cn-red-lista > .cn-red-servicios,
+.cara-nueva .cn-red-lista > .cn-red-lista-pie {
+  flex-shrink: 0;
 }
 .cara-nueva .cn-red-buscar-caja {
   position: relative;
@@ -4449,8 +4475,11 @@
   color: var(--brand);
 }
 .cara-nueva .cn-red-filas {
+  flex: 1 1 auto;
+  min-height: 96px;
   max-height: 340px;
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 6px;
 }
 .cara-nueva .cn-red-lista-nota {
@@ -4586,8 +4615,7 @@
 
 /* ── Barra del teléfono ────────────────────────────────────────────────── */
 .cara-nueva .cn-red-movil {
-  border-bottom: 1px solid var(--line-2);
-  background: var(--canvas);
+  min-width: 0;
 }
 .cara-nueva .cn-red-movil-cabeza {
   display: flex;
@@ -4664,7 +4692,7 @@
   color: var(--ink-4);
 }
 .cara-nueva .cn-red-sin-actuacion {
-  margin: 6px 16px 10px;
+  margin: 0;
   padding: 8px 12px;
   border: 1px dashed var(--red-guion);
   border-radius: 10px;
@@ -4675,10 +4703,7 @@
 }
 .cara-nueva .cn-red-movil-campos {
   display: grid;
-  gap: 14px;
-  margin-top: 6px;
-  padding: 12px 16px 16px;
-  border-top: 1px solid var(--line);
+  gap: 16px;
 }
 .cara-nueva .cn-red-movil-campo {
   display: flex;
@@ -4754,12 +4779,11 @@
 
 /* ── Panel de la instrucción ───────────────────────────────────────────── */
 .cara-nueva .cn-red-panel {
-  border-right: 1px solid var(--line-2);
   background: var(--canvas);
 }
+/* El relleno lo pone la columna del asistente, centrada dentro del formulario que se desplaza. */
 .cara-nueva .cn-red-form {
-  gap: 12px;
-  padding: 20px 16px 16px;
+  padding: 0;
 }
 .cara-nueva .cn-red-cabeza {
   display: flex;
@@ -5599,9 +5623,6 @@
 }
 
 @media (min-width: 1024px) {
-  .cara-nueva .cn-red-form {
-    padding: 20px 20px 16px;
-  }
   .cara-nueva .cn-red-pie {
     flex-direction: row;
     align-items: center;
@@ -5621,5 +5642,2959 @@
 @media (min-width: 1280px) {
   .cara-nueva .cn-red-termino-caja {
     display: flex;
+  }
+}
+
+/* ── Redacción en dos pantallas: el asistente, el borrador y su respaldo ────
+ * Artboards «Redactar un escrito» (676–755), «Borrador» (756–841), selectores
+ * (78–154), guía (198–247), 375 px (248–283) y «Escribir la actuación yo»
+ * (463–486) de `public/handoff/app-redaccion-revision.html`. Las reglas del
+ * bloque siguen: guion solo en lo sin verificar, mono solo en lo citable, la
+ * letra del papel intacta y nada por debajo de 14 px. La barra del borrador
+ * recibe su `display` de Tailwind (`hidden lg:flex`).
+ */
+.cara-nueva .cn-red-asistente {
+  display: grid;
+  width: 100%;
+  max-width: 760px;
+  gap: 28px;
+  margin: 0 auto;
+  padding: 20px 16px 0;
+}
+.cara-nueva .cn-red-asistente-cabeza {
+  display: grid;
+  gap: 6px;
+}
+.cara-nueva .cn-red-h1 {
+  font-size: 26px;
+  line-height: 32px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+.cara-nueva .cn-red-asistente .cn-red-bajada {
+  max-width: 70ch;
+  margin-top: 0;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--ink-3);
+}
+/* Solo escritorio: en el teléfono las pestañas Instrucción / Documento ya son el camino de vuelta. */
+.cara-nueva .cn-red-volver {
+  display: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin-top: 10px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--brand-soft);
+}
+.cara-nueva .cn-red-volver-texto {
+  min-width: 0;
+  flex: 1 1 260px;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-red-volver-boton,
+.cara-nueva .cn-red-elegida-cambiar,
+.cara-nueva .cn-red-estilo-boton,
+.cara-nueva .cn-red-caso-aviso-boton {
+  display: inline-flex;
+  min-height: 44px;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 10px;
+  background: var(--canvas);
+  box-shadow: var(--shadow-1);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--brand);
+  cursor: pointer;
+}
+.cara-nueva .cn-red-volver-svg {
+  width: 16px;
+  height: 16px;
+}
+.cara-nueva .cn-red-paso {
+  display: grid;
+  min-width: 0;
+  gap: 12px;
+}
+.cara-nueva .cn-red-paso-cabeza {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cara-nueva .cn-red-paso-n {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  flex: none;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--canvas);
+}
+.cara-nueva .cn-red-paso-titulo {
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+.cara-nueva .cn-red-paso-cuerpo {
+  display: grid;
+  min-width: 0;
+  gap: 12px;
+}
+.cara-nueva .cn-red-cascada {
+  display: grid;
+  gap: 10px;
+}
+.cara-nueva .cn-red-cascada-pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+.cara-nueva .cn-red-listo {
+  min-height: 44px;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 0 12px;
+  border: none;
+  border-radius: 10px;
+  background: var(--neutral);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--brand);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+/* La lista de la actuación abre hacia la izquierda: es la caja del borde derecho y no debe salirse de la columna. */
+.cara-nueva .cn-red-campo--actuacion .cn-red-lista {
+  right: 0;
+  left: auto;
+}
+.cara-nueva .cn-red-servicio--suelto {
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--field);
+}
+.cara-nueva .cn-red-caso {
+  display: grid;
+  gap: 8px;
+}
+.cara-nueva .cn-red-caso .cn-red-campo--caso {
+  max-width: 440px;
+}
+/* El desacuerdo de rama no es «sin verificar»: fondo ámbar, sin guion, y no bloquea nada. */
+.cara-nueva .cn-red-caso-aviso {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--warn-bg);
+}
+.cara-nueva .cn-red-caso-aviso-texto {
+  min-width: 0;
+  flex: 1 1 240px;
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink);
+}
+.cara-nueva .cn-red-elegida {
+  display: grid;
+  gap: 14px;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: var(--field);
+}
+.cara-nueva .cn-red-elegida-cabeza {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.cara-nueva .cn-red-elegida-textos {
+  min-width: 0;
+}
+.cara-nueva .cn-red-elegida-contexto {
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-red-elegida-nombre {
+  font-size: 17px;
+  line-height: 25px;
+  font-weight: 600;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-red-elegida-detalle {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line-2);
+}
+.cara-nueva .cn-red-elegida-termino {
+  font-size: 15px;
+  line-height: 24px;
+  color: var(--ink-2);
+  text-align: justify;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-red-elegida-rotulo {
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-red-estilo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: var(--field);
+}
+.cara-nueva .cn-red-estilo-texto {
+  min-width: 0;
+  flex: 1 1 240px;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink);
+}
+/* En el teléfono el primario queda anclado abajo, con el precio debajo, a la altura del pulgar. */
+.cara-nueva .cn-red-asistente .cn-red-pie {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  margin: 0 -16px;
+  padding: 12px 16px 16px;
+  background: var(--canvas);
+}
+.cara-nueva .cn-red-pie-textos {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+/*
+ * En el teléfono la nota de «elija la actuación» no viaja en el pie anclado: el
+ * paso 1 ya lo dice encima de las listas, y repetido aquí el pie se comía un
+ * tercio de la pantalla. Queda el precio, que es lo único que decide al pulsar.
+ */
+.cara-nueva .cn-red-asistente .cn-red-pie-nota {
+  display: none;
+}
+.cara-nueva .cn-red-pie-precio {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-red-consola-caja {
+  overflow: hidden;
+  margin-bottom: 24px;
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.cara-nueva .cn-red-consola-caja .cn-red-consola {
+  border-top: none;
+}
+
+/* La barra del borrador. */
+.cara-nueva .cn-red-bdb {
+  position: relative;
+  z-index: 45;
+  min-height: 60px;
+  flex: none;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 20px;
+  border-bottom: 1px solid var(--line-2);
+  background: var(--canvas);
+}
+.cara-nueva .cn-red-bdb-volver {
+  display: inline-flex;
+  min-height: 44px;
+  max-width: 240px;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px 0 8px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  font-size: 14.5px;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.cara-nueva .cn-red-bdb-volver:hover,
+.cara-nueva .cn-red-bdb-icono:hover {
+  background: var(--field);
+}
+.cara-nueva .cn-red-bdb-volver-texto {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cara-nueva .cn-red-bdb-svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.cara-nueva .cn-red-bdb-svg--ok {
+  color: var(--ok);
+}
+.cara-nueva .cn-red-bdb-textos {
+  min-width: 0;
+  flex: 1;
+}
+.cara-nueva .cn-red-bdb-titulo,
+.cara-nueva .cn-red-bdb-sub {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cara-nueva .cn-red-bdb-titulo {
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-red-bdb-sub {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-bdb-grupo {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 12px;
+  background: var(--neutral);
+}
+.cara-nueva .cn-red-bdb-boton {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.cara-nueva .cn-red-bdb-boton:hover {
+  background: var(--canvas);
+}
+.cara-nueva .cn-red-bdb-boton--icono {
+  padding: 0 9px;
+}
+.cara-nueva .cn-red-bdb-icono {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  place-items: center;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.cara-nueva .cn-red-bdb-primario {
+  min-height: 44px;
+  flex: none;
+  padding: 0 16px;
+  border: none;
+  border-radius: 10px;
+  background: var(--brand-fill);
+  box-shadow: var(--shadow-btn);
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+}
+.cara-nueva .cn-red-bdb-primario:hover {
+  background: var(--brand-fill-hover);
+}
+/* EL DESPLEGABLE MANDA SOBRE TODO: la barra abre su propia capa sobre el lienzo y la columna fija. */
+.cara-nueva .cn-red-bdb-pop {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 60;
+  width: 300px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--canvas);
+  box-shadow: var(--shadow-menu), 0 0 0 1px var(--line);
+}
+.cara-nueva .cn-red-bdb-pop-rotulo {
+  margin-bottom: 4px;
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 600;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-bdb-pop-casilla {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.cara-nueva .cn-red-bdb-pop-casilla input {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  margin: 0;
+  accent-color: var(--brand-fill);
+}
+.cara-nueva .cn-red-bdb-pop-nota {
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+
+/* La franja de procedencia, a todo lo ancho. Si no hay nada que advertir no ocupa sitio. */
+.cara-nueva .cn-red-franja {
+  flex: none;
+  max-height: 32vh;
+  overflow-y: auto;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--line-2);
+  background: var(--canvas);
+}
+.cara-nueva .cn-red-franja:empty {
+  display: none;
+}
+
+/* El papel y su columna: apilados en el teléfono, lado a lado desde 1024. */
+.cara-nueva .cn-red-borrador {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+.cara-nueva .cn-red-borrador-hoja {
+  width: 100%;
+  min-width: 0;
+  max-width: 816px;
+}
+.cara-nueva .cn-red-respaldo {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  max-width: 816px;
+  align-content: start;
+  gap: 16px;
+}
+.cara-nueva .cn-red-papel .cn-red-parrafo-senalado {
+  border-radius: 4px;
+  background: var(--brand-soft);
+  box-shadow: 0 0 0 6px var(--brand-soft);
+}
+.cara-nueva .cn-red-respaldo-cuerpo,
+.cara-nueva .cn-red-trabajar {
+  display: grid;
+  min-width: 0;
+  gap: 14px;
+  padding: 18px 18px 20px;
+  border-radius: 14px;
+  background: var(--canvas);
+  box-shadow: var(--shadow-1);
+}
+.cara-nueva .cn-red-borrador-hoja > .cn-red-trabajar {
+  margin-top: 16px;
+}
+.cara-nueva .cn-red-respaldo-titulo,
+.cara-nueva .cn-red-trabajar-titulo {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-red-respaldo-nota,
+.cara-nueva .cn-red-trabajar-nota {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-respaldo-aviso {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--warn-bg);
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--warn);
+  text-align: justify;
+  text-wrap: pretty;
+}
+.cara-nueva .cn-red-respaldo-aviso--sin {
+  border: 1px dashed var(--red-guion);
+}
+.cara-nueva .cn-red-respaldo-bloque {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+}
+.cara-nueva .cn-red-respaldo-nombre {
+  font-size: 15.5px;
+  line-height: 23px;
+  font-weight: 600;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-red-respaldo-datos {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+.cara-nueva .cn-red-respaldo-par {
+  display: grid;
+  gap: 2px;
+}
+.cara-nueva .cn-red-respaldo-rotulo {
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 600;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-respaldo-valor {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink-2);
+  text-align: justify;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-red-respaldo-marca {
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-red-respaldo-enlace {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-self: start;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--brand);
+  text-decoration: none;
+}
+.cara-nueva .cn-red-respaldo-enlace:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.cara-nueva .cn-red-respaldo-svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.cara-nueva .cn-red-respaldo-subtitulo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-red-respaldo-secciones {
+  display: grid;
+  width: 100%;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-red-respaldo-seccion {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--field);
+}
+.cara-nueva .cn-red-respaldo-seccion-nombre {
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-red-respaldo-seccion-fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 10px;
+}
+.cara-nueva .cn-red-respaldo-estado {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-respaldo-estado--ok {
+  font-weight: 600;
+  color: var(--ok);
+}
+.cara-nueva .cn-red-respaldo-ir {
+  min-height: 36px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 8px;
+  background: var(--canvas);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--brand);
+  cursor: pointer;
+}
+.cara-nueva .cn-red-respaldo-juris {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-red-respaldo-juris-item {
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-3);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-red-trabajar-lista {
+  display: grid;
+  gap: 8px;
+}
+.cara-nueva .cn-red-trabajar-boton {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 12px;
+  background: var(--neutral);
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 500;
+  color: var(--ink-2);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.cara-nueva .cn-red-trabajar-boton:hover {
+  background: var(--line-2);
+}
+.cara-nueva .cn-red-trabajar-boton--marca,
+.cara-nueva .cn-red-trabajar-boton--marca:hover {
+  background: var(--brand-soft);
+  font-weight: 600;
+  color: var(--brand);
+}
+.cara-nueva .cn-red-trabajar-boton:disabled,
+.cara-nueva .cn-red-trabajar-boton:disabled:hover {
+  background: var(--neutral);
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.cara-nueva .cn-red-trabajar-textos {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+.cara-nueva .cn-red-trabajar-detalle {
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 400;
+  color: var(--ink-3);
+}
+
+/* Los tres diálogos de servicio: cuerpo y botonera con la cara nueva; el marco del diálogo es compartido y no se toca. */
+/* El marco compartido pone 13 px de base; el cuerpo y la botonera fijan la suya para que nada herede por debajo de 14. */
+.cara-nueva .cn-red-dlg {
+  display: grid;
+  gap: 18px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+}
+.cara-nueva .cn-red-dlg-acciones {
+  font-size: 15px;
+}
+.cara-nueva .cn-red-dlg-bajada {
+  font-size: 16px;
+  line-height: 25px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-red-dlg-campo {
+  display: grid;
+  gap: 6px;
+}
+.cara-nueva .cn-red-dlg-rotulo {
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.cara-nueva .cn-red-dlg-opcional {
+  font-weight: 400;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-dlg-area,
+.cara-nueva .cn-red-dlg-entrada {
+  display: block;
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  background: var(--field);
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 25px;
+  color: var(--ink);
+}
+.cara-nueva .cn-red-dlg-area {
+  min-height: 120px;
+  padding: 14px 16px;
+  resize: vertical;
+}
+.cara-nueva .cn-red-dlg-area--baja {
+  min-height: 88px;
+}
+.cara-nueva .cn-red-dlg-entrada {
+  height: 46px;
+  padding: 0 16px;
+}
+.cara-nueva .cn-red-dlg-area::placeholder,
+.cara-nueva .cn-red-dlg-entrada::placeholder {
+  color: var(--ink-4);
+  opacity: 1;
+}
+.cara-nueva .cn-red-dlg-area:focus,
+.cara-nueva .cn-red-dlg-entrada:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+.cara-nueva .cn-red-dlg-contador {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-dlg-casilla {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--field);
+  cursor: pointer;
+}
+.cara-nueva .cn-red-dlg-casilla input {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  margin: 2px 0 0;
+  accent-color: var(--brand-fill);
+}
+.cara-nueva .cn-red-dlg-casilla-textos {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+.cara-nueva .cn-red-dlg-casilla-titulo {
+  font-size: 15.5px;
+  line-height: 24px;
+  color: var(--ink-2);
+}
+.cara-nueva .cn-red-dlg-casilla-detalle,
+.cara-nueva .cn-red-dlg-nota {
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink-3);
+  text-align: justify;
+  text-wrap: pretty;
+}
+.cara-nueva .cn-red-dlg-error {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--danger-bg);
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+}
+.cara-nueva .cn-red-dlg-seccion {
+  font-size: 14.5px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-red-dlg-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.cara-nueva .cn-red-dlg-chip {
+  padding: 2px 10px;
+  border-radius: 8px;
+  background: var(--neutral);
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--ink-2);
+}
+.cara-nueva .cn-red-dlg-candidatas {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-red-dlg-candidata {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: var(--canvas);
+  box-shadow: var(--shadow-1), 0 0 0 1px var(--line);
+}
+.cara-nueva .cn-red-dlg-candidata-cabeza {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px 14px;
+}
+.cara-nueva .cn-red-dlg-candidata-nombre {
+  min-width: 0;
+  font-size: 17px;
+  line-height: 26px;
+  font-weight: 600;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-red-dlg-linea {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-2);
+  text-align: justify;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-red-dlg-linea--tenue {
+  color: var(--ink-3);
+}
+.cara-nueva .cn-red-dlg-linea--sin {
+  color: var(--warn);
+}
+.cara-nueva .cn-red-dlg-linea-svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  margin-top: 3px;
+}
+.cara-nueva .cn-red-dlg-elegir {
+  min-height: 44px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 10px;
+  background: var(--brand-soft);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--brand);
+  text-align: left;
+  cursor: pointer;
+}
+.cara-nueva .cn-red-dlg-aviso {
+  display: grid;
+  gap: 10px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: var(--warn-bg);
+}
+.cara-nueva .cn-red-dlg-aviso--sin {
+  border: 1px dashed var(--red-guion);
+}
+.cara-nueva .cn-red-dlg-aviso-titulo {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-red-dlg-aviso-texto {
+  display: flex;
+  gap: 8px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--warn);
+  text-align: justify;
+  text-wrap: pretty;
+}
+.cara-nueva .cn-red-dlg-preguntas {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding-left: 24px;
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink-2);
+}
+.cara-nueva .cn-red-dlg-fila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cara-nueva .cn-red-dlg-vista {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--field);
+}
+.cara-nueva .cn-red-dlg-vista-nombre {
+  font-size: 15.5px;
+  line-height: 23px;
+  font-weight: 600;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-red-dlg-acciones {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.cara-nueva .cn-red-dlg-boton,
+.cara-nueva .cn-red-dlg-primario {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  cursor: pointer;
+}
+.cara-nueva .cn-red-dlg-boton {
+  padding: 0 14px;
+  background: transparent;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+.cara-nueva .cn-red-dlg-boton:hover {
+  background: var(--field);
+}
+.cara-nueva .cn-red-dlg-primario {
+  padding: 0 20px;
+  background: var(--brand-fill);
+  box-shadow: var(--shadow-btn);
+  font-weight: 600;
+  color: #fff;
+}
+.cara-nueva .cn-red-dlg-primario:hover {
+  background: var(--brand-fill-hover);
+}
+.cara-nueva .cn-red-dlg-primario:disabled {
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.cara-nueva .cn-red-dlg-svg {
+  width: 16px;
+  height: 16px;
+}
+
+@media (min-width: 1024px) {
+  .cara-nueva .cn-red-asistente {
+    gap: 32px;
+    padding: 36px 24px 8px;
+  }
+  .cara-nueva .cn-red-h1 {
+    font-size: 34px;
+    line-height: 40px;
+  }
+  .cara-nueva .cn-red-asistente .cn-red-bajada {
+    font-size: 18px;
+    line-height: 26px;
+  }
+  .cara-nueva .cn-red-volver {
+    display: flex;
+  }
+  .cara-nueva .cn-red-paso-cuerpo {
+    padding-left: 38px;
+  }
+  .cara-nueva .cn-red-asistente .cn-red-pie {
+    position: static;
+    margin: 0;
+    padding: 24px 0;
+    border-top: 1px solid var(--line);
+  }
+  /*
+   * DOS COLUMNAS, DOS DESPLAZAMIENTOS. La primera versión fijaba la columna con
+   * `sticky` dentro de la mesa y le calculaba un alto contra la ventana; con la
+   * franja de procedencia abierta en un portátil de 768 px la columna medía más
+   * que lo visible y su pie no se alcanzaba. Ahora la mesa no se desplaza: el
+   * papel y la columna ocupan su alto y cada uno se desplaza por dentro.
+   */
+  .cara-nueva .cn-red-mesa--borrador {
+    display: flex;
+    overflow: hidden;
+    padding: 0;
+  }
+  .cara-nueva .cn-red-borrador {
+    min-height: 0;
+    flex: 1;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 0;
+  }
+  /*
+   * El área que se desplaza es todo el ancho; el papel sigue centrado y sin
+   * pasar de 816 px. Se centra cada hijo y no con un relleno en porcentaje: el
+   * porcentaje de un relleno se mide contra el contenedor y no contra la
+   * columna, y dejaba el papel en la mitad de su ancho.
+   */
+  .cara-nueva .cn-red-borrador-hoja {
+    min-height: 0;
+    flex: 1 1 auto;
+    max-width: none;
+    overflow-y: auto;
+    padding: 28px 24px 40px;
+  }
+  .cara-nueva .cn-red-borrador-hoja > * {
+    max-width: 816px;
+    margin-right: auto;
+    margin-left: auto;
+  }
+  .cara-nueva .cn-red-respaldo {
+    min-height: 0;
+    width: 348px;
+    flex: 0 0 348px;
+    max-width: none;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 28px 24px 40px 0;
+  }
+}
+
+/* ─── Taller e informe ─── */
+/*
+ * El taller de un escrito (el de una revisión y el de un borrador), el visor
+ * del original, el diálogo «Revisar un documento» y el informe en sus dos
+ * modos. Sale de `public/handoff/app-informe-de-revision.html` y de los
+ * artboards del taller de `app-redaccion-revision.html`. Solo la piel: qué se
+ * muestra lo deciden los componentes y `services/comprobaciones.ts`. Reglas
+ * que se ven aquí:
+ *   · `cn-tal-` es el marco de trabajo (barras, papel, paneles, marcas del
+ *     abogado); `cn-inf-` es el informe y el formulario que lo pide;
+ *   · los cuatro colores del resaltador son los del diseño, pero se cuelgan de
+ *     los identificadores que ya existen —amarillo, verde, azul, rosa—, que
+ *     viajan a la base y a la guía. El diseño les puso significados
+ *     («importante», «por comprobar»…) que el producto no tiene: aquí no se
+ *     escriben;
+ *   · el BORDE DISCONTINUO es solo de «sin verificar»: el sello de una revisión
+ *     sin ficha, la fila «No comprobada» de la banda y el documento que no
+ *     anuncia plazo. Nada más lo lleva;
+ *   · el rojo del diseño en «Derogada» y «No lo dice el artículo» no se copia:
+ *     `--danger` es de lo destructivo. La gravedad se dice con ámbar sólido
+ *     frente a ámbar suave, y la palabra va escrita;
+ *   · el papel conserva la letra de la firma: ninguna regla nombra su familia,
+ *     su tamaño ni su interlineado; solo su marco y el fondo de las marcas;
+ *   · las raíces que Tailwind muestra u oculta por tamaño no reciben `display`
+ *     desde aquí.
+ */
+.cara-nueva.cn-tal,
+.cara-nueva .cn-tal,
+.cara-nueva .cn-inf,
+.cara-nueva.cn-inf {
+  --tal-mesa: #edeff2;
+  --tal-ok-bg: #e9f2ec;
+  --tal-guion: rgb(138 90 18 / 0.55);
+  --tal-filete: #d7dde4;
+  --tal-cita-linea: #cbd9e4;
+  --tal-flota: #101822;
+  --tal-flota-ink: #c3cdd8;
+  --tal-sombra-papel: 0 4px 24px rgb(16 24 34 / 0.1);
+  --tal-hl-amarillo: #fbe3b4;
+  --tal-hl-verde: #bfddc9;
+  --tal-hl-azul: #cbd9e4;
+  --tal-hl-rosa: #e7c9c4;
+  --tal-cita-bg: #fbf3e4;
+  --tal-cita-bg-abierta: #fbe3b4;
+  --tal-cita-subrayado: #cfae6e;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .cara-nueva.cn-tal,
+  :root:not([data-theme='light']) .cara-nueva .cn-tal,
+  :root:not([data-theme='light']) .cara-nueva .cn-inf,
+  :root:not([data-theme='light']) .cara-nueva.cn-inf {
+    --tal-mesa: #0b1219;
+    --tal-ok-bg: rgb(79 180 131 / 0.14);
+    --tal-guion: rgb(217 166 74 / 0.6);
+    --tal-filete: #24303d;
+    --tal-cita-linea: #2f4458;
+    --tal-flota: #1a2430;
+    --tal-flota-ink: #c3cdd8;
+    --tal-sombra-papel: none;
+    --tal-hl-amarillo: rgb(251 227 180 / 0.3);
+    --tal-hl-verde: rgb(191 221 201 / 0.28);
+    --tal-hl-azul: rgb(203 217 228 / 0.28);
+    --tal-hl-rosa: rgb(231 201 196 / 0.3);
+    --tal-cita-bg: rgb(217 166 74 / 0.16);
+    --tal-cita-bg-abierta: rgb(217 166 74 / 0.32);
+    --tal-cita-subrayado: #d9a64a;
+  }
+}
+:root[data-theme='dark'] .cara-nueva.cn-tal,
+:root[data-theme='dark'] .cara-nueva .cn-tal,
+:root[data-theme='dark'] .cara-nueva .cn-inf,
+:root[data-theme='dark'] .cara-nueva.cn-inf {
+  --tal-mesa: #0b1219;
+  --tal-ok-bg: rgb(79 180 131 / 0.14);
+  --tal-guion: rgb(217 166 74 / 0.6);
+  --tal-filete: #24303d;
+  --tal-cita-linea: #2f4458;
+  --tal-flota: #1a2430;
+  --tal-flota-ink: #c3cdd8;
+  --tal-sombra-papel: none;
+  --tal-hl-amarillo: rgb(251 227 180 / 0.3);
+  --tal-hl-verde: rgb(191 221 201 / 0.28);
+  --tal-hl-azul: rgb(203 217 228 / 0.28);
+  --tal-hl-rosa: rgb(231 201 196 / 0.3);
+  --tal-cita-bg: rgb(217 166 74 / 0.16);
+  --tal-cita-bg-abierta: rgb(217 166 74 / 0.32);
+  --tal-cita-subrayado: #d9a64a;
+}
+
+/* ── Raíz del taller ───────────────────────────────────────────────────── */
+.cara-nueva.cn-tal {
+  background: var(--canvas);
+  font-size: 15px;
+  line-height: 23px;
+}
+
+/* ── Botones, segmentos y pestañas ─────────────────────────────────────── */
+.cara-nueva .cn-tal-boton {
+  display: inline-flex;
+  min-height: 40px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 10px;
+  background: var(--neutral);
+  font-size: 14.5px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--ink-2);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.16s, filter 0.16s;
+}
+.cara-nueva .cn-tal-boton:hover {
+  background: var(--line-2);
+}
+.cara-nueva .cn-tal-boton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.cara-nueva .cn-tal-boton--primario {
+  background: var(--brand-fill);
+  box-shadow: var(--shadow-btn);
+  color: #fff;
+}
+.cara-nueva .cn-tal-boton--primario:hover {
+  background: var(--brand-fill-hover);
+}
+.cara-nueva .cn-tal-boton--primario:disabled {
+  box-shadow: none;
+}
+.cara-nueva .cn-tal-boton--marca {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+.cara-nueva .cn-tal-boton--marca:hover {
+  background: var(--brand-soft);
+  filter: brightness(0.96);
+}
+.cara-nueva .cn-tal-boton--fantasma {
+  background: transparent;
+  font-weight: 500;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-tal-boton--fantasma:hover {
+  background: var(--neutral);
+}
+.cara-nueva .cn-tal-boton--ancho {
+  width: 100%;
+  justify-content: flex-start;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  white-space: normal;
+}
+.cara-nueva .cn-tal-boton-icono {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.cara-nueva .cn-tal-icono-boton {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  place-items: center;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink-4);
+  cursor: pointer;
+  transition: background 0.16s, color 0.16s;
+}
+.cara-nueva .cn-tal-icono-boton:hover {
+  background: var(--neutral);
+  color: var(--ink);
+}
+.cara-nueva .cn-tal-segmentos {
+  display: inline-flex;
+  max-width: 100%;
+  flex: none;
+  gap: 2px;
+  padding: 3px;
+  overflow-x: auto;
+  border-radius: 10px;
+  background: var(--neutral);
+}
+.cara-nueva .cn-tal-segmento {
+  display: inline-flex;
+  min-height: 34px;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 14.5px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--ink-3);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.16s, color 0.16s;
+}
+.cara-nueva .cn-tal-segmento:hover {
+  background: var(--canvas);
+  color: var(--ink);
+}
+.cara-nueva .cn-tal-segmento:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.cara-nueva .cn-tal-segmento--activo {
+  background: var(--canvas);
+  box-shadow: 0 1px 2px rgb(16 24 34 / 0.08);
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-tal-pestanas {
+  display: flex;
+  flex: none;
+  gap: 22px;
+  padding: 0 20px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--line);
+}
+.cara-nueva .cn-tal-pestana {
+  position: relative;
+  display: inline-flex;
+  min-height: 48px;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: 15.5px;
+  line-height: 22px;
+  font-weight: 500;
+  color: var(--ink-3);
+  white-space: nowrap;
+  cursor: pointer;
+}
+.cara-nueva .cn-tal-pestana:hover {
+  color: var(--ink);
+}
+.cara-nueva .cn-tal-pestana--activa {
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-tal-pestana--activa::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--brand);
+  content: '';
+}
+.cara-nueva .cn-tal-contador {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-5);
+}
+
+/* ── Cabecera, cinta del guardado y errores ────────────────────────────── */
+.cara-nueva .cn-tal-cabeza {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--canvas);
+}
+.cara-nueva .cn-tal-cabeza-textos {
+  min-width: 0;
+  flex: 1 1 220px;
+}
+.cara-nueva .cn-tal-titulo {
+  overflow: hidden;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--ink);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cara-nueva .cn-tal-subtitulo {
+  overflow: hidden;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cara-nueva .cn-tal-cabeza-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.cara-nueva .cn-tal-cinta {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 10px 16px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-tal-cinta--nube {
+  background: var(--field);
+}
+.cara-nueva .cn-tal-cinta--sesion {
+  background: var(--warn-bg);
+  color: var(--ink);
+}
+.cara-nueva .cn-tal-cinta-icono {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.cara-nueva .cn-tal-cinta--nube .cn-tal-cinta-icono {
+  color: var(--ok);
+}
+.cara-nueva .cn-tal-cinta--sesion .cn-tal-cinta-icono {
+  color: var(--warn);
+}
+.cara-nueva .cn-tal-cinta-texto {
+  min-width: 0;
+  flex: 1 1 260px;
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-tal-cinta-fallo {
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-tal-error {
+  flex: none;
+  margin: 10px 16px 0;
+}
+.cara-nueva .cn-tal-error-cerrar {
+  min-height: 24px;
+  margin-left: 6px;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ── Vistas del teléfono: escrito o guía ───────────────────────────────── */
+.cara-nueva .cn-tal-vistas {
+  flex: none;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.cara-nueva .cn-tal-vistas .cn-tal-segmentos {
+  width: 100%;
+}
+.cara-nueva .cn-tal-vistas .cn-tal-segmento {
+  min-height: 40px;
+  flex: 1;
+  justify-content: center;
+}
+
+/* ── El escrito: herramientas, nota, mesa y papel ──────────────────────── */
+.cara-nueva .cn-tal-herramientas {
+  display: flex;
+  min-width: 0;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--canvas);
+}
+.cara-nueva .cn-tal-herramientas-fin {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+.cara-nueva .cn-tal-pista {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-tal-pista-icono {
+  display: inline;
+  width: 14px;
+  height: 14px;
+  margin-right: 4px;
+  vertical-align: -2px;
+}
+.cara-nueva .cn-tal-letra {
+  overflow: hidden;
+  border: none;
+  border-radius: 10px;
+  background: var(--neutral);
+}
+.cara-nueva .cn-tal-letra button {
+  min-width: 36px;
+  min-height: 36px;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+.cara-nueva .cn-tal-letra button:hover {
+  background: var(--line-2);
+}
+.cara-nueva .cn-tal-nota {
+  flex: none;
+  margin: 10px 16px 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--field);
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+  text-align: justify;
+}
+.cara-nueva .cn-tal-mesa {
+  background: var(--tal-mesa);
+  padding: 16px 12px;
+}
+/* Solo el marco. La letra del escrito la pone `estiloDelLienzo` en el `style` del texto. */
+.cara-nueva .cn-tal-hoja {
+  border-radius: 8px;
+  box-shadow: var(--tal-sombra-papel);
+}
+.cara-nueva .cn-tal-capa--amarillo {
+  background: var(--tal-hl-amarillo);
+}
+.cara-nueva .cn-tal-capa--verde {
+  background: var(--tal-hl-verde);
+}
+.cara-nueva .cn-tal-capa--azul {
+  background: var(--tal-hl-azul);
+}
+.cara-nueva .cn-tal-capa--rosa {
+  background: var(--tal-hl-rosa);
+}
+.cara-nueva .cn-tal-capa--tachado {
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}
+.cara-nueva .cn-tal-capa--cita {
+  background: var(--tal-cita-bg);
+  box-shadow: inset 0 -2px 0 var(--tal-cita-subrayado);
+}
+.cara-nueva .cn-tal-capa--cita-abierta {
+  background: var(--tal-cita-bg-abierta);
+}
+.cara-nueva .cn-tal-capa--referencia {
+  text-decoration: underline;
+  text-decoration-color: var(--brand);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+.cara-nueva .cn-tal-capa--comentario {
+  background: var(--brand-soft);
+  border-bottom: 2px dotted var(--brand);
+}
+.cara-nueva .cn-tal-diff--quitado {
+  background: var(--danger-bg);
+  text-decoration: line-through;
+}
+.cara-nueva .cn-tal-diff--anadido {
+  background: var(--tal-ok-bg);
+}
+.cara-nueva .cn-tal-diff-cabeza {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+  font-family: 'Satoshi', -apple-system, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-tal-diff-cifra--mas {
+  font-weight: 600;
+  color: var(--ok);
+}
+.cara-nueva .cn-tal-diff-cifra--menos {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* ── Barra flotante del resaltador y hoja del comentario ───────────────── */
+.cara-nueva .cn-tal-flota {
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--tal-flota);
+  box-shadow: var(--shadow-menu);
+  font-family: 'Satoshi', -apple-system, 'Segoe UI', sans-serif;
+}
+.cara-nueva .cn-tal-flota-colores {
+  display: flex;
+  gap: 1px;
+  padding: 2px;
+  border-radius: 9px;
+  background: rgb(255 255 255 / 0.1);
+}
+.cara-nueva .cn-tal-muestra-boton {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+}
+.cara-nueva .cn-tal-muestra-boton:hover {
+  background: rgb(255 255 255 / 0.14);
+}
+.cara-nueva .cn-tal-muestra {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+}
+.cara-nueva .cn-tal-muestra--amarillo {
+  background: #fbe3b4;
+}
+.cara-nueva .cn-tal-muestra--verde {
+  background: #bfddc9;
+}
+.cara-nueva .cn-tal-muestra--azul {
+  background: #cbd9e4;
+}
+.cara-nueva .cn-tal-muestra--rosa {
+  background: #e7c9c4;
+}
+.cara-nueva .cn-tal-flota-boton {
+  display: inline-flex;
+  min-width: 36px;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--tal-flota-ink);
+  cursor: pointer;
+}
+.cara-nueva .cn-tal-flota-boton:hover {
+  background: rgb(255 255 255 / 0.14);
+  color: #fff;
+}
+.cara-nueva .cn-tal-flota-filete {
+  width: 1px;
+  height: 22px;
+  margin: 0 2px;
+  background: rgb(255 255 255 / 0.18);
+}
+.cara-nueva .cn-tal-hoja-comentario {
+  border-top: none;
+  border-radius: 20px 20px 0 0;
+  background: var(--canvas);
+  box-shadow: 0 -16px 40px -12px rgb(16 24 34 / 0.3);
+  font-family: 'Satoshi', -apple-system, 'Segoe UI', sans-serif;
+}
+.cara-nueva .cn-tal-asidero {
+  display: block;
+  width: 38px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--line-2);
+}
+.cara-nueva .cn-tal-rotulo {
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 600;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-tal-cita-corta {
+  margin-top: 2px;
+  font-size: 14.5px;
+  line-height: 22px;
+  font-style: italic;
+  color: var(--ink-4);
+  text-align: justify;
+}
+.cara-nueva .cn-tal-campo {
+  width: 100%;
+  min-height: 44px;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 12px;
+  background: var(--field);
+  font-family: inherit;
+  font-size: 15.5px;
+  line-height: 23px;
+  color: var(--ink);
+}
+.cara-nueva .cn-tal-campo::placeholder {
+  color: var(--ink-5);
+}
+.cara-nueva .cn-tal-campo:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+.cara-nueva .cn-tal-campo:disabled {
+  opacity: 0.6;
+}
+.cara-nueva .cn-tal-fila-botones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── La corrección del informe, al tocar el pasaje ─────────────────────── */
+.cara-nueva .cn-tal-correccion {
+  display: grid;
+  gap: 6px;
+  margin-top: 16px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: var(--canvas);
+  box-shadow: var(--shadow-menu), inset 0 0 0 1px var(--line-2);
+  font-family: 'Satoshi', -apple-system, 'Segoe UI', sans-serif;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+}
+
+/* ── Paneles de la guía: chat, comentarios y versiones ─────────────────── */
+.cara-nueva .cn-tal-panel-cuerpo {
+  padding: 16px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+}
+.cara-nueva .cn-tal-vacio-texto {
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+  text-align: justify;
+}
+.cara-nueva .cn-tal-burbuja {
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-size: 15px;
+  line-height: 23px;
+}
+.cara-nueva .cn-tal-burbuja--abogado {
+  background: var(--brand-fill);
+  color: #fff;
+}
+.cara-nueva .cn-tal-burbuja--guia {
+  background: var(--field);
+  color: var(--ink);
+}
+.cara-nueva .cn-tal-hora {
+  margin-top: 4px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-tal-enlace {
+  min-height: 32px;
+  margin-top: 6px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--brand);
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.cara-nueva .cn-tal-edicion {
+  display: grid;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--canvas);
+  box-shadow: inset 0 0 0 1px var(--line-2);
+  color: var(--ink);
+}
+.cara-nueva .cn-tal-redactor {
+  flex: none;
+  padding: 12px 16px;
+  border-top: 1px solid var(--line);
+  background: var(--wash);
+}
+.cara-nueva .cn-tal-item {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--wash);
+}
+.cara-nueva .cn-tal-item-cita {
+  display: block;
+  width: 100%;
+  min-height: 32px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: 14.5px;
+  line-height: 22px;
+  font-style: italic;
+  color: var(--ink-4);
+  text-align: left;
+  cursor: pointer;
+}
+.cara-nueva .cn-tal-item-cita:hover {
+  color: var(--brand);
+}
+.cara-nueva .cn-tal-fecha {
+  font-size: 14px;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-tal-version {
+  display: grid;
+  width: 100%;
+  gap: 2px;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+.cara-nueva .cn-tal-version:hover {
+  background: var(--field);
+}
+.cara-nueva .cn-tal-version--abierta,
+.cara-nueva .cn-tal-version--abierta:hover {
+  background: var(--brand-soft);
+}
+.cara-nueva .cn-tal-version-fecha {
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-tal-version-motivo {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-tal-pie-nota {
+  margin-top: 12px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-tal-descarga {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--wash);
+}
+.cara-nueva .cn-tal-descarga-texto {
+  width: 100%;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-tal-barra-movil {
+  flex: none;
+  padding: 10px 16px 0;
+  border-top: 1px solid var(--line);
+  background: var(--canvas);
+}
+
+/* ── Visor del original ────────────────────────────────────────────────── */
+.cara-nueva .cn-tal-visor-nombre {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cara-nueva .cn-tal-peso {
+  margin-left: 8px;
+  font-size: 14px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-tal-grupo {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 10px;
+  background: var(--neutral);
+}
+.cara-nueva .cn-tal-grupo button {
+  display: inline-grid;
+  min-width: 34px;
+  min-height: 34px;
+  place-items: center;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 14px;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+.cara-nueva .cn-tal-grupo button:hover {
+  background: var(--canvas);
+  color: var(--ink);
+}
+.cara-nueva .cn-tal-grupo button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+.cara-nueva .cn-tal-grupo-cifra {
+  min-width: 58px;
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--ink-2);
+  text-align: center;
+}
+.cara-nueva .cn-tal-visor-aviso {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--field);
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-tal-vacio {
+  display: flex;
+  max-width: 560px;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin: 32px auto;
+  padding: 32px 24px;
+  border-radius: 16px;
+  background: var(--canvas);
+  text-align: center;
+}
+.cara-nueva .cn-tal-vacio-icono {
+  width: 28px;
+  height: 28px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-tal-vacio-icono--aviso {
+  color: var(--warn);
+}
+.cara-nueva .cn-tal-vacio-titulo {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-tal-vacio .cn-tal-vacio-texto {
+  max-width: 50ch;
+}
+.cara-nueva .cn-tal-visor-nota {
+  max-width: 816px;
+  margin: 12px auto 0;
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--ink-4);
+  text-align: justify;
+}
+
+/* ── Informe: sellos, banda de la comprobación y resumen ───────────────── */
+.cara-nueva .cn-inf {
+  display: grid;
+  min-width: 0;
+  gap: 18px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-inf-sellos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cara-nueva .cn-inf-sello {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: 10px;
+  font-size: 14.5px;
+  line-height: 21px;
+  font-weight: 600;
+}
+.cara-nueva .cn-inf-sello--ok {
+  background: var(--tal-ok-bg);
+  color: var(--ok);
+}
+.cara-nueva .cn-inf-sello--sin {
+  border-left: 2px dashed var(--tal-guion);
+  background: var(--canvas);
+  box-shadow: inset 0 0 0 1px var(--tal-filete);
+  color: var(--ink-3);
+}
+.cara-nueva .cn-inf-sello--neutro {
+  background: var(--neutral);
+  font-weight: 500;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-inf-pasajes {
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-inf-banda {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 14px;
+  background: var(--warn-bg);
+}
+.cara-nueva .cn-inf-banda--quieta {
+  background: var(--field);
+}
+.cara-nueva .cn-inf-banda-titulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 21px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--warn);
+  text-transform: uppercase;
+}
+.cara-nueva .cn-inf-banda--quieta .cn-inf-banda-titulo {
+  color: var(--ink-4);
+}
+.cara-nueva .cn-inf-banda-punto {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: 50%;
+  background: currentColor;
+}
+.cara-nueva .cn-inf-banda-nota {
+  display: flex;
+  gap: 8px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-3);
+  text-align: justify;
+}
+.cara-nueva .cn-inf-banda-nota-icono {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  margin-top: 4px;
+  color: var(--ok);
+}
+.cara-nueva .cn-inf-banda-filas {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-inf-banda-fila {
+  display: flex;
+  min-height: 44px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--canvas);
+}
+.cara-nueva .cn-inf-banda-fila--no-comprobada {
+  border-left: 2px dashed var(--tal-guion);
+  box-shadow: inset 0 0 0 1px var(--tal-filete);
+}
+.cara-nueva .cn-inf-banda-cuenta {
+  min-width: 0;
+  flex: 1 1 120px;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-inf-clase {
+  display: inline-flex;
+  min-height: 26px;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+}
+.cara-nueva .cn-inf-clase--fuerte {
+  background: var(--warn);
+  color: var(--canvas);
+}
+.cara-nueva .cn-inf-clase--media {
+  background: var(--warn-bg);
+  box-shadow: inset 0 0 0 1px var(--tal-guion);
+  color: var(--warn);
+}
+.cara-nueva .cn-inf-clase--neutra {
+  background: var(--neutral);
+  color: var(--ink-3);
+}
+.cara-nueva .cn-inf-ir {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 4px;
+  padding: 0 4px;
+  border: none;
+  background: transparent;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--brand);
+  cursor: pointer;
+}
+.cara-nueva .cn-inf-ir:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.cara-nueva .cn-inf-banda-aviso {
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+  text-align: justify;
+}
+.cara-nueva .cn-inf-banda-sub {
+  font-size: 14.5px;
+  line-height: 21px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-inf-banda-lista {
+  display: grid;
+  gap: 4px;
+  margin: 4px 0 0;
+  padding-left: 20px;
+  list-style: disc;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-inf-resumen {
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: var(--wash);
+}
+.cara-nueva .cn-inf-kicker {
+  font-size: 14.5px;
+  line-height: 21px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--ink-4);
+  text-transform: uppercase;
+}
+.cara-nueva .cn-inf-resumen-texto {
+  margin-top: 6px;
+  font-size: 16.5px;
+  line-height: 26px;
+  color: var(--ink);
+  text-align: justify;
+}
+
+/* ── Informe: los dos estratos y sus hallazgos ─────────────────────────── */
+.cara-nueva .cn-inf-estrato {
+  display: grid;
+  min-width: 0;
+  gap: 12px;
+}
+.cara-nueva .cn-inf-estrato--criterio {
+  padding: 18px 16px;
+  border-radius: 16px;
+  background: var(--field);
+}
+.cara-nueva .cn-inf-h2 {
+  margin: 0;
+  font-size: 19px;
+  line-height: 27px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.cara-nueva .cn-inf-bajada {
+  margin-top: -6px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+  text-align: justify;
+}
+.cara-nueva .cn-inf-h3 {
+  margin: 6px 0 0;
+  font-size: 16.5px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-inf-lista {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-inf-tarjeta {
+  min-width: 0;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--canvas);
+  box-shadow: inset 0 0 0 1px var(--line-2);
+}
+.cara-nueva .cn-inf-hallazgo {
+  scroll-margin: 96px;
+  transition: box-shadow 0.2s;
+}
+.cara-nueva .cn-inf-hallazgo:focus {
+  outline: none;
+}
+.cara-nueva .cn-inf-hallazgo--destacado {
+  box-shadow: 0 0 0 3px var(--brand);
+}
+.cara-nueva .cn-inf-punto {
+  display: flex;
+  min-width: 0;
+  gap: 12px;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--ink);
+}
+.cara-nueva .cn-inf-punto-texto {
+  min-width: 0;
+  flex: 1;
+  text-align: justify;
+}
+.cara-nueva .cn-inf-guion {
+  width: 14px;
+  height: 2px;
+  flex: none;
+  margin-top: 11px;
+  border-radius: 1px;
+  background: var(--ink-5);
+}
+.cara-nueva .cn-inf-guion--norma {
+  background: var(--warn);
+}
+.cara-nueva .cn-inf-numero {
+  min-width: 22px;
+  flex: none;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-4);
+  font-variant-numeric: tabular-nums;
+}
+.cara-nueva .cn-inf-vacio {
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--field);
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-inf-rotulo {
+  display: block;
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--ink-4);
+  text-transform: uppercase;
+}
+.cara-nueva .cn-inf-rotulo:first-child {
+  margin-top: 0;
+}
+.cara-nueva .cn-inf-rotulo--marca {
+  color: var(--brand);
+}
+.cara-nueva .cn-inf-valor {
+  margin-top: 2px;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--ink);
+  text-align: justify;
+}
+.cara-nueva .cn-inf-cita {
+  margin: 4px 0 0;
+  padding: 12px 14px;
+  border-left: 3px solid var(--tal-cita-linea);
+  border-radius: 10px;
+  background: var(--field);
+  font-size: 16px;
+  line-height: 25px;
+  color: var(--ink);
+  text-align: justify;
+}
+.cara-nueva .cn-inf-reemplazo {
+  margin-top: 4px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--tal-ok-bg);
+  font-size: 16px;
+  line-height: 25px;
+  color: var(--ink);
+  text-align: justify;
+}
+.cara-nueva .cn-inf-marcas {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+.cara-nueva .cn-inf-marca {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--warn-bg);
+}
+.cara-nueva .cn-inf-marca-rotulo {
+  display: inline-flex;
+  min-height: 26px;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border-radius: 8px;
+  background: var(--canvas);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--warn);
+}
+.cara-nueva .cn-inf-marca-icono {
+  width: 14px;
+  height: 14px;
+  flex: none;
+}
+.cara-nueva .cn-inf-marca-texto {
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+  text-align: justify;
+}
+.cara-nueva .cn-inf-pie {
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink-4);
+  text-align: justify;
+}
+.cara-nueva .cn-inf-aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--warn-bg);
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+}
+.cara-nueva .cn-inf-aviso-icono {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  margin-top: 4px;
+  color: var(--warn);
+}
+.cara-nueva .cn-inf-nota {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--field);
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-3);
+  text-align: justify;
+}
+.cara-nueva .cn-inf-libre {
+  margin: 0;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: var(--field);
+  font-family: inherit;
+  font-size: 15.5px;
+  line-height: 24px;
+  color: var(--ink);
+  white-space: pre-wrap;
+}
+
+/* ── Informe del documento recibido y el puente al ataque ──────────────── */
+.cara-nueva .cn-inf-que-es {
+  font-size: 17px;
+  line-height: 27px;
+  color: var(--ink);
+  text-align: justify;
+}
+.cara-nueva .cn-inf-datos {
+  margin: 0;
+  border-radius: 14px;
+  background: var(--wash);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.cara-nueva .cn-inf-dato {
+  display: grid;
+  gap: 2px 16px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.cara-nueva .cn-inf-dato:last-child {
+  border-bottom: none;
+}
+.cara-nueva .cn-inf-dato-etiqueta {
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-inf-dato-valor {
+  margin: 0;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--ink);
+}
+.cara-nueva .cn-inf-mono {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 500;
+}
+.cara-nueva .cn-inf-carga {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--canvas);
+  box-shadow: inset 0 0 0 1px var(--line-2);
+}
+.cara-nueva .cn-inf-carga--ajena {
+  background: var(--wash);
+  box-shadow: none;
+}
+.cara-nueva .cn-inf-carga-titulo {
+  font-size: 17px;
+  line-height: 25px;
+  font-weight: 600;
+  color: var(--ink);
+  text-align: justify;
+}
+.cara-nueva .cn-inf-carga--ajena .cn-inf-carga-titulo {
+  color: var(--ink-3);
+}
+.cara-nueva .cn-inf-atribucion {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-inf-atribucion-icono {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  margin-top: 4px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-inf-plazo {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--brand);
+}
+.cara-nueva .cn-inf-plazo--ajeno {
+  font-weight: 500;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-inf-sin-plazo {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-left: 2px dashed var(--tal-guion);
+  border-radius: 10px;
+  background: var(--warn-bg);
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+  text-align: justify;
+}
+.cara-nueva .cn-inf-flanco {
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--canvas);
+  box-shadow: inset 0 0 0 1px var(--line-2);
+}
+.cara-nueva .cn-inf-flanco-cabeza {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--wash);
+}
+.cara-nueva .cn-inf-flanco-clase {
+  font-size: 15.5px;
+  line-height: 23px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-inf-flanco-cuerpo {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+}
+.cara-nueva .cn-inf-norma {
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--wash);
+}
+.cara-nueva .cn-inf-norma .cn-inf-cita {
+  background: var(--canvas);
+}
+.cara-nueva .cn-inf-lectura {
+  padding: 12px 14px;
+  border-left: 3px solid var(--brand);
+  border-radius: 10px;
+  background: var(--brand-soft);
+}
+.cara-nueva .cn-inf-puente {
+  display: grid;
+  min-width: 0;
+  gap: 12px;
+  padding: 18px 16px;
+  border-radius: 16px;
+  background: var(--field);
+}
+.cara-nueva .cn-inf-casilla {
+  display: flex;
+  min-height: 44px;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--canvas);
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.cara-nueva .cn-inf-casilla input {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  margin: 1px 0 0;
+  accent-color: var(--brand-fill);
+}
+.cara-nueva .cn-inf-costo {
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-inf-elegida {
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--canvas);
+}
+.cara-nueva .cn-inf-elegida-texto {
+  padding: 14px 16px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+}
+.cara-nueva .cn-inf-elegida-pie {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--line);
+}
+
+/* ── Formulario «Revisar un documento» ─────────────────────────────────── */
+.cara-nueva .cn-inf-form {
+  display: grid;
+  gap: 20px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+}
+.cara-nueva .cn-inf-bloque {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+}
+.cara-nueva .cn-inf-etiqueta {
+  display: block;
+  font-size: 15px;
+  line-height: 23px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.cara-nueva .cn-inf-opcional {
+  font-weight: 400;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-inf-ayuda {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+  text-align: justify;
+}
+.cara-nueva .cn-inf-modos {
+  display: grid;
+  gap: 8px;
+}
+.cara-nueva .cn-inf-modo {
+  display: grid;
+  min-width: 0;
+  min-height: 44px;
+  gap: 2px;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 12px;
+  background: var(--neutral);
+  color: var(--ink-2);
+  text-align: left;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+  transition: background 0.16s;
+}
+.cara-nueva .cn-inf-modo:hover {
+  background: var(--line-2);
+}
+.cara-nueva .cn-inf-modo[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--canvas);
+}
+.cara-nueva .cn-inf-modo-titulo {
+  font-size: 15.5px;
+  line-height: 23px;
+  font-weight: 600;
+}
+.cara-nueva .cn-inf-modo-detalle {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-inf-modo[aria-pressed='true'] .cn-inf-modo-detalle {
+  color: var(--canvas);
+  opacity: 0.82;
+}
+.cara-nueva .cn-inf-subir {
+  display: flex;
+  min-height: 64px;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--field);
+  box-shadow: inset 0 0 0 2px var(--line-2);
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.cara-nueva .cn-inf-subir:hover {
+  background: var(--neutral);
+}
+.cara-nueva .cn-inf-subir-icono {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-inf-archivo {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 4px 4px 14px;
+  border-radius: 12px;
+  background: var(--field);
+}
+.cara-nueva .cn-inf-archivo-nombre {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  font-size: 15px;
+  color: var(--ink);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cara-nueva .cn-inf-o {
+  font-size: 14px;
+  color: var(--ink-4);
+  text-align: center;
+}
+.cara-nueva .cn-inf-campo {
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 14px;
+  border: none;
+  border-radius: 12px;
+  background: var(--field);
+  font-family: inherit;
+  font-size: 15.5px;
+  line-height: 23px;
+  color: var(--ink);
+}
+.cara-nueva .cn-inf-campo::placeholder {
+  color: var(--ink-5);
+}
+.cara-nueva .cn-inf-campo:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+.cara-nueva .cn-inf-sugerencias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cara-nueva .cn-inf-sugerencia {
+  min-height: 44px;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 10px;
+  background: var(--neutral);
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-2);
+  text-align: left;
+  cursor: pointer;
+}
+.cara-nueva .cn-inf-sugerencia:hover {
+  background: var(--line-2);
+}
+.cara-nueva .cn-inf-sugerencia[aria-pressed='true'] {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+.cara-nueva .cn-inf-guia {
+  display: flex;
+  width: 100%;
+  min-height: 56px;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 14px;
+  background: var(--brand-soft);
+  text-align: left;
+  cursor: pointer;
+}
+.cara-nueva .cn-inf-guia:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.cara-nueva .cn-inf-guia-titulo {
+  display: block;
+  font-size: 15.5px;
+  line-height: 23px;
+  font-weight: 600;
+  color: var(--brand);
+}
+.cara-nueva .cn-inf-anteriores {
+  display: grid;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.cara-nueva .cn-inf-anteriores-lista {
+  display: grid;
+  max-height: 16rem;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+.cara-nueva .cn-inf-anterior {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+  border-radius: 12px;
+}
+.cara-nueva .cn-inf-anterior:hover {
+  background: var(--field);
+}
+.cara-nueva .cn-inf-anterior-abrir {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: 2px;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+.cara-nueva .cn-inf-linea {
+  overflow: hidden;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cara-nueva .cn-inf-linea--meta {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+/* Borrar una revisión es destructivo: es el único rojo del bloque, y solo al pasar el cursor. */
+.cara-nueva .cn-inf-borrar:hover {
+  color: var(--danger);
+}
+.cara-nueva .cn-inf-precio {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-4);
+}
+/*
+ * El cuerpo de una confirmación. `ConfirmarDialog` es compartido y no se toca:
+ * se viste lo que se le pasa. Donde la confirmación se monta fuera de toda
+ * pantalla rediseñada (la autorización del taller de revisión), el propio texto
+ * lleva `cara-nueva`, y de ahí la segunda forma del selector.
+ */
+.cara-nueva .cn-inf-dialogo-texto,
+.cara-nueva.cn-inf-dialogo-texto {
+  display: grid;
+  gap: 10px;
+  font-size: 15.5px;
+  line-height: 24px;
+  color: var(--ink);
+}
+.cara-nueva .cn-inf-seleccionado {
+  font-weight: 600;
+}
+.cara-nueva .cn-inf-espera {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: var(--wash);
+  box-shadow: inset 0 0 0 1px var(--line);
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-inf-espera-icono {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  color: var(--brand);
+}
+/* En la columna estrecha del taller se lee en bandera: justificar seis palabras por renglón abre ríos. */
+.cara-nueva .cn-inf-bandera {
+  text-align: left;
+}
+
+/* En pantalla táctil, todo lo que se toca llega a 44 px. */
+@media (pointer: coarse) {
+  .cara-nueva .cn-tal-boton,
+  .cara-nueva .cn-tal-icono-boton,
+  .cara-nueva .cn-tal-segmento,
+  .cara-nueva .cn-tal-letra button,
+  .cara-nueva .cn-tal-grupo button,
+  .cara-nueva .cn-tal-muestra-boton,
+  .cara-nueva .cn-tal-flota-boton,
+  .cara-nueva .cn-tal-enlace,
+  .cara-nueva .cn-tal-item-cita,
+  .cara-nueva .cn-inf-ir {
+    min-height: 44px;
+  }
+  .cara-nueva .cn-tal-icono-boton,
+  .cara-nueva .cn-tal-letra button,
+  .cara-nueva .cn-tal-grupo button,
+  .cara-nueva .cn-tal-muestra-boton {
+    min-width: 44px;
+  }
+  .cara-nueva .cn-tal-icono-boton {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (min-width: 640px) {
+  .cara-nueva .cn-tal-cabeza,
+  .cara-nueva .cn-tal-herramientas,
+  .cara-nueva .cn-tal-cinta,
+  .cara-nueva .cn-tal-descarga {
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+  .cara-nueva .cn-tal-mesa {
+    padding: 28px 32px 40px;
+  }
+  .cara-nueva .cn-tal-panel-cuerpo {
+    padding: 18px 20px;
+  }
+  .cara-nueva .cn-tal-descarga-texto {
+    width: auto;
+    min-width: 0;
+    flex: 1;
+  }
+  .cara-nueva .cn-inf-modos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .cara-nueva .cn-inf-dato {
+    grid-template-columns: 190px minmax(0, 1fr);
+  }
+  .cara-nueva .cn-inf-banda {
+    padding: 20px 22px;
+  }
+  .cara-nueva .cn-inf-tarjeta {
+    padding: 16px 18px;
+  }
+  .cara-nueva .cn-inf-estrato--criterio,
+  .cara-nueva .cn-inf-puente {
+    padding: 22px 24px;
+  }
+  .cara-nueva .cn-inf-h2 {
+    font-size: 21px;
+    line-height: 29px;
+  }
+  .cara-nueva .cn-inf-h3 {
+    font-size: 17.5px;
+    line-height: 25px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .cara-nueva .cn-tal-hoja-comentario {
+    border-radius: 14px;
+    box-shadow: var(--shadow-menu), inset 0 0 0 1px var(--line-2);
   }
 }

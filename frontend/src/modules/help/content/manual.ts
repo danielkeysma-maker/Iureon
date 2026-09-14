@@ -173,33 +173,33 @@ const A_PRIMER_ESCRITO: ManualArticle = {
   titulo: 'Su primer escrito, paso a paso',
   entradilla: 'De la pantalla en blanco a un documento exportado, sin pasos de más.',
   bloques: [
-    { kind: 'ruta', camino: ['Redacción', '«Tipo de documento»', '«Qué debe hacer este escrito»', '«Generar escrito»'] },
+    { kind: 'ruta', camino: ['Redacción', '«Qué va a presentar»', '«Los hechos y las pruebas»', '«Generar escrito»'] },
     {
       kind: 'parrafo',
       texto:
-        'Redacción tiene dos mitades: a la izquierda, lo que usted le pide; a la derecha, el papel donde aparece el escrito. Arriba, una barra fija con tres selectores decide qué clase de documento se va a producir. Si prefiere ver antes cada módulo en su sitio, en «Inicio» está «Iniciar la visita guiada»: dos minutos, una parada por módulo.'
+        'Redacción abre como una sola columna, «Redactar un escrito», con pasos numerados: qué va a presentar, los hechos y las pruebas y, si su firma configuró Membrete, cómo escribe su firma. El papel aparece cuando el escrito existe, con lo que lo respalda a la derecha. Si prefiere ver antes cada módulo en su sitio, en «Inicio» está «Iniciar la visita guiada»: dos minutos, una parada por módulo.'
     },
     {
       kind: 'pasos',
       pasos: [
         'Abra «Redacción» en la barra lateral. Si todavía no sabe qué actuación necesita, entre primero por «Orientación», describa los hechos —o adjunte el documento que le llegó— y pulse «Orientar»: el catálogo le propone actuaciones y en cada una hay un botón «Redactar esta» que abre, bajo la tarjeta, el panel «Qué pedirle al motor»; desde ahí, «Llevar a Redacción» lo trae aquí con la actuación, la rama y el encargo ya escritos. Está explicado en «De los hechos a la actuación».',
-        'En la barra de arriba escoja «Quién escribe» —«Firma / Litigante», «Juez / Despacho» o «Secretaría»—, luego la «Rama» y, en «Tipo de documento», la actuación. Esa lista se arma desde el catálogo de la rama que escogió, así que cambiar de rama cambia la lista.',
+        'En el paso 1, «Qué va a presentar», escoja primero «De qué caso» si su firma tiene expedientes y el escrito es de uno: si el caso tiene rama registrada y todavía no hay actuación elegida, esa rama se pone sola; si la rama elegida no coincide con la del caso, un aviso lo dice y ofrece volver a la del caso, sin impedir que redacte en otra. Luego escoja «Quién firma» —«Firma / Litigante», «Juez / Despacho» o «Secretaría»—, la «Rama» y la «Actuación». Esa lista se arma desde el catálogo de la rama que escogió, así que cambiar de rama cambia la lista. Al elegir la actuación, los selectores se pliegan en una tarjeta con la rama, el nombre, su estado —por ejemplo «art. 96 · término verificado»— y el término completo; «Cambiar» los vuelve a abrir.',
         'Al final de esa lista pueden aparecer actuaciones marcadas «por remisión del CGP · plazo sin verificar en esta rama». Existen en su rama porque el Código General del Proceso la gobierna, pero su plazo está comprobado en lo civil y no para la rama que usted escogió. Se pueden elegir, y el escrito advertirá en vez de afirmar un plazo. Quien cura el catálogo de la firma puede comprobarlas para su rama en «Catálogo».',
-        'Si no sabe cuál actuación corresponde, abra el selector «Actuación» y, en el bloque de arriba «Si no está en la lista», elija «Que la guía proponga la actuación». Se abre un cuadro con los hechos que ya escribió —puede completarlos ahí— y, al pulsar «Pedir la orientación», la guía propone actuaciones de esa rama con la razón de cada una y su término, artículo y autoridad a la vista. Nada se aplica solo: usted pulsa «Elegir esta» en la que decida.',
+        'Si no sabe cuál actuación corresponde, abra el selector «Actuación» y, en el bloque de arriba «Si no está en la lista», elija «No sé cuál es: que la guía la proponga». Se abre un cuadro con los hechos que ya escribió —puede completarlos ahí— y, al pulsar «Pedir la orientación», la guía propone actuaciones de esa rama con la razón de cada una y su término, artículo y autoridad a la vista. Nada se aplica solo: usted pulsa «Elegir esta» en la que decida.',
         'Si sospecha que la rama no es la que puso, marque dentro de ese cuadro «No sé la rama: buscar en todo el catálogo»: la consulta corre sobre las veintiocho ramas, cada candidata dice de cuál viene, y la propia pantalla le advierte antes que tarda más —entre diez y quince segundos, contra un par—. Cuando el catálogo no reconoce nada dentro de la rama elegida, aparece además «Puede que la rama no sea esa: buscar en todo el catálogo», que repite la consulta en el acto sin volver a escribir los hechos.',
-        'Si ninguna sirve, el desplegable tiene dos salidas más. «Ninguna de estas: escribir el nombre…» sirve cuando usted sí sabe cómo se llama: escríbalo como lo nombraría en el escrito, con una nota opcional para su firma, y quedará elegida y disponible en esa rama para todos sus abogados, marcada «de su firma · sin norma verificada».',
-        'Y si tampoco sabe cómo se llama, «No sé cómo se llama: describir qué debe lograr…» le deja redactar de todos modos: escriba entre quince y ciento siete caracteres diciendo qué debe conseguir el escrito, vea en «Quedará en la lista como» exactamente lo que se va a guardar, y pulse «Guardar y redactar». Queda como actuación de la firma con el nombre «Sin nombre — …» y se elige sola en el selector. La guía tiene prohibido bautizarla, y el escrito lo declara.',
-        'En el cuadro «Qué debe hacer este escrito» cuente los hechos y la pretensión en lenguaje corriente. No hace falta redactar: hace falta contar.',
-        'Pulse «Generar escrito» (dice «Proyectar providencia» si escribe un juez y «Generar acto» si escribe la secretaría), o use ⌘↵ en Mac y Ctrl+↵ en Windows. El escrito aparece a la derecha a medida que se produce, con los títulos de sección en negrita. Sin actuación elegida el botón está apagado y a su lado se lee «Elija la actuación arriba: es la que trae el artículo y el término verificados».',
-        'Si el motor no llega a entregar el escrito, la aplicación no fabrica uno de repuesto: lo dice. El aviso sale en rojo en la consola «Ejecución», al pie del panel izquierdo, la espera se cierra y la reserva del saldo vuelve a la cuenta. Ese recuadro es pequeño y es el único sitio donde se escribe, así que mírelo cuando el escrito no aparezca.',
-        'Lea el escrito con la barra de arriba del papel a la vista. Si el término de la actuación no está comprobado o la actuación no está catalogada, ahí aparece una franja ámbar y un chip «Término sin verificar» o «Sin catalogar»; si la firma ya la curó, una marca verde discreta; si no hay nada que advertir, nada.',
-        'Pulse «Guardar» al pie del papel si va a seguir mañana, o «Word» o «PDF» en la cabecera si va a radicar.'
+        'Si ninguna sirve, ese bloque tiene dos salidas más. «No está en la lista: la escribo yo» sirve cuando usted sí sabe cómo se llama: escríbalo como lo nombraría en el escrito, con una nota opcional para su firma, y quedará elegida y disponible en esa rama para todos sus abogados, marcada «de su firma, sin norma verificada».',
+        'Y si tampoco sabe cómo se llama, «Redactar sin actuación» le deja redactar de todos modos: escriba entre quince y ciento siete caracteres diciendo qué debe conseguir el escrito, vea en «Quedará en la lista como» exactamente lo que se va a guardar, y pulse «Guardar y redactar». Queda como actuación de la firma con el nombre «Sin nombre — …» y se elige sola en el selector. La guía tiene prohibido bautizarla, y el escrito lo declara.',
+        'En el paso 2, «Los hechos y las pruebas», cuente en el cuadro «Qué debe hacer este escrito» los hechos y la pretensión en lenguaje corriente, y adjunte lo que tenga. No hace falta redactar: hace falta contar.',
+        'Pulse «Generar escrito» al final de la columna (dice «Proyectar providencia» si escribe un juez y «Generar acto» si escribe la secretaría), o use ⌘↵ en Mac y Ctrl+↵ en Windows. Junto al botón está el precio: desde $2.000 de su saldo, y un escrito largo cuesta lo que mida. Mientras se genera, la consola «Ejecución» aparece debajo del botón; cuando el escrito llega, la pantalla pasa al papel, con los títulos de sección en negrita. Sin actuación elegida el botón está apagado y a su lado se lee «Elija la actuación arriba: es la que trae el artículo y el término verificados».',
+        'Si el motor no llega a entregar el escrito, la aplicación no fabrica uno de repuesto: lo dice. El aviso sale en rojo en la consola «Ejecución», debajo del botón de generar, la espera se cierra y la reserva del saldo vuelve a la cuenta. Mírela cuando el escrito no aparezca.',
+        'Lea el escrito. Bajo la barra del borrador, si el término de la actuación no está comprobado o la actuación no está catalogada, aparece una franja ámbar a todo lo ancho; si la firma ya la curó, una marca verde discreta; si no hay nada que advertir, nada. A la derecha del papel, «Lo que respalda este escrito» muestra la ficha: la norma, la autoridad, el término completo, «Ver la norma» y las secciones que pide, cada una «encontrada» —con «Ir al párrafo»— o «no se encontró el rótulo».',
+        'El escrito queda guardado como borrador de la firma al generarse. Si lo corrige en el papel, pulse «Guardar» en «Trabajar el escrito», junto al papel; para radicar, «Word» o «PDF» en la barra del borrador. La flecha de la izquierda de esa barra vuelve al asistente sin borrar nada, y el asistente ofrece «Volver al borrador».'
       ]
     },
     {
       kind: 'consejo',
       texto:
-        'Antes de generar, mire el término que la barra de arriba muestra junto a la actuación. Si dice «Término sin verificar», puede abrir «Catálogo», verificarlo en dos minutos y volver: el escrito saldrá ya con el término comprobado, en vez de tener que regenerarlo después.'
+        'Antes de generar, mire el estado que la tarjeta de la actuación muestra en el paso 1. Si dice «sin verificar», puede abrir «Catálogo», verificarlo en dos minutos y volver: el escrito saldrá ya con el término comprobado, en vez de tener que regenerarlo después.'
     },
     {
       kind: 'aviso',
@@ -216,12 +216,7 @@ const A_PRIMER_ESCRITO: ManualArticle = {
       kind: 'nota',
       titulo: 'Cuando el escrito va sin nombre de actuación',
       texto:
-        'Un título de trabajo —lo que crea «No sé cómo se llama: describir qué debe lograr…»— vive en la lista de su rama con el nombre «Sin nombre — …» y el detalle «título de trabajo · no es el nombre de una figura». La marca no se asoma al documento: el motor recibe lo que la firma quiere lograr, con prohibición expresa de llamarlo recurso, tutela, incidente o nulidad, y el escrito declara que su término no está verificado y debe comprobarse antes de radicar. Sobre el papel, la franja de procedencia dice «Este escrito se redactó sin nombre de actuación». En «Catálogo» puede escribirle el término y su fuente, y eso sí llega al motor a partir de entonces; lo que no se puede es rebautizarlo, así que el título de trabajo se sigue llamando «Sin nombre — …» en el desplegable, en el borrador y en el catálogo.'
-    },
-    {
-      kind: 'todavia-no',
-      texto:
-        'Escoger en la guía una candidata de OTRA rama todavía no cambia la rama de la barra de Redacción. En el computador el selector «Actuación» se queda en «Elegir actuación…», porque ese nombre no está en la lista de la rama que sigue puesta; en el teléfono el nombre se queda escrito, pero el escrito se resuelve contra la rama de arriba y sale sin ficha. En los dos casos la salida es la misma: cambie primero la rama por la que la candidata indica, y elíjala después en la lista. Las actuaciones transversales, como el derecho de petición, y las que llegan por remisión del CGP no dan este problema, porque ya están en su rama.'
+        'Un título de trabajo —lo que crea «Redactar sin actuación»— vive en la lista de su rama con el nombre «Sin nombre — …» y el detalle «título de trabajo · no es el nombre de una figura». La marca no se asoma al documento: el motor recibe lo que la firma quiere lograr, con prohibición expresa de llamarlo recurso, tutela, incidente o nulidad, y el escrito declara que su término no está verificado y debe comprobarse antes de radicar. Sobre el papel, la franja de procedencia dice «Este escrito se redactó sin nombre de actuación». En «Catálogo» puede escribirle el término y su fuente, y eso sí llega al motor a partir de entonces; lo que no se puede es rebautizarlo, así que el título de trabajo se sigue llamando «Sin nombre — …» en el desplegable, en el borrador y en el catálogo.'
     },
     {
       kind: 'nota',
@@ -238,7 +233,7 @@ const A_TRES_ESTADOS: ManualArticle = {
   entradilla:
     'Todo término, artículo y autoridad que aparece en un escrito está en uno de tres estados. Distinguirlos de un vistazo es lo único imprescindible para usar Iureon con seguridad.',
   bloques: [
-    { kind: 'ruta', camino: ['Redacción', 'Barra sobre el papel', 'Catálogo', 'Ficha de la actuación'] },
+    { kind: 'ruta', camino: ['Redacción', 'Lo que respalda este escrito', 'Catálogo', 'Ficha de la actuación'] },
     { kind: 'estados' },
     { kind: 'subtitulo', texto: 'Cómo se ve en el escrito' },
     { kind: 'ejemplo' },
@@ -246,16 +241,15 @@ const A_TRES_ESTADOS: ManualArticle = {
     {
       kind: 'pasos',
       pasos: [
-        'En Redacción, con el escrito generado, mire la barra que hay entre la cabecera y el papel: si la actuación tiene término sin comprobar aparece el chip «Término sin verificar»; si no está en el catálogo, «Sin catalogar». Si no hay chip, no hay nada que advertir sobre el término.',
-        'En esa misma barra, «Secciones exigidas N/M encontradas» dice cuántas de las secciones que la ficha exige aparecen en el texto. Verde si están todas; ámbar si falta alguna.',
-        'Justo arriba del papel, la franja de procedencia dice contra qué ficha se redactó: su artículo, su fuente y si alguien de su firma la curó. Es ámbar cuando falta comprobación y no aparece cuando no hay nada que decir.',
+        'En Redacción, con el escrito generado, mire la franja de procedencia, bajo la barra del borrador y a todo lo ancho: dice contra qué ficha se redactó, su artículo, su fuente y si alguien de su firma la curó. Es ámbar cuando el término no está comprobado o la actuación no está en el catálogo, y no aparece cuando no hay nada que decir.',
+        'A la derecha del papel, «Lo que respalda este escrito» muestra el estado de la ficha —por ejemplo «art. 96 · término verificado» o «sin verificar»—, su término completo y las secciones que pide: cada una «encontrada», con «Ir al párrafo», o «no se encontró el rótulo». Encontrar el rótulo no dice que la sección esté bien escrita; solo que su nombre aparece en el texto.',
         'Para ver el detalle completo, abra «Catálogo», busque la actuación y lea los tres bloques de la ficha —término, norma y autoridad—, cada uno con su propio estado.'
       ]
     },
     {
       kind: 'consejo',
       texto:
-        'Cuando el chip diga «Término sin verificar», no lo resuelva corrigiendo el escrito a mano: verifique la ficha en Catálogo. El arreglo a mano sirve para ese documento; la verificación sirve para todos los que vengan.'
+        'Cuando la ficha diga «sin verificar», no lo resuelva corrigiendo el escrito a mano: verifique la ficha en Catálogo. El arreglo a mano sirve para ese documento; la verificación sirve para todos los que vengan.'
     },
     {
       kind: 'parrafo',
@@ -373,7 +367,7 @@ const A_INSTRUCCION: ManualArticle = {
     {
       kind: 'parrafo',
       texto:
-        'El cuadro «Qué debe hacer este escrito» espera hechos, no redacción. Escriba lo que pasó, en qué orden, quién es quién, qué pide y contra quién. La estructura del escrito no sale de ahí: sale de la actuación que usted escogió en «Tipo de documento».'
+        'El cuadro «Qué debe hacer este escrito» espera hechos, no redacción. Escriba lo que pasó, en qué orden, quién es quién, qué pide y contra quién. La estructura del escrito no sale de ahí: sale de la actuación que usted escogió en el paso 1, «Qué va a presentar».'
     },
     {
       kind: 'pasos',
@@ -425,19 +419,19 @@ const A_EXPORTAR: ManualArticle = {
   titulo: 'Revisar y exportar a Word o PDF',
   entradilla: 'Qué mirar antes de exportar, y qué diferencia hay entre los dos formatos.',
   bloques: [
-    { kind: 'ruta', camino: ['Redacción', 'Cabecera', '«Word» · «PDF»'] },
+    { kind: 'ruta', camino: ['Redacción', 'Barra del borrador', '«Word» · «PDF»'] },
     {
       kind: 'parrafo',
       texto:
-        'Los botones de exportar viven en la cabecera de Redacción, a la derecha, cuando la pestaña «Documento» está activa: «Copiar», «Word», «PDF» y una flecha con las opciones de exportación.'
+        'Los botones de exportar viven en la barra del borrador, arriba del papel: «Word», «PDF», «Copiar» y una flecha con las opciones de exportación. En el teléfono están en el menú de la cabecera, con «Marcar como listo» primero cuando el borrador todavía no está listo ni radicado.'
     },
     {
       kind: 'pasos',
       pasos: [
         'Lea el escrito completo. Es un borrador, y la lectura es corta precisamente porque el estado de la ficha está marcado arriba del papel.',
-        'Mire la barra sobre el papel: si hay un chip «Término sin verificar» o «Sin catalogar», decida antes de exportar si verifica la ficha en Catálogo, cambia el dato a mano o lo asume.',
+        'Mire la franja bajo la barra del borrador y la columna «Lo que respalda este escrito»: si el término no está comprobado o la actuación no está catalogada, decida antes de exportar si verifica la ficha en Catálogo, cambia el dato a mano o lo asume.',
         'Compruebe los datos que solo usted conoce: nombres, radicado, cuantía, direcciones de notificación. Para corregirlos, pulse «Editar» en la esquina del papel y luego «Ver» para volver al formato.',
-        'Abra la flecha junto a «PDF» si quiere cambiar cómo sale: bajo «Al exportar» está la casilla «Membrete de la firma» y, solo cuando el escrito trae fuentes, la casilla para anexarlas.',
+        'Abra la flecha junto a «Copiar» si quiere cambiar cómo sale: bajo «Al exportar» está la casilla «Membrete de la firma» y, solo cuando el escrito trae fuentes, la casilla para anexarlas.',
         'Pulse «Word» para seguir editando en su procesador, o «PDF» para radicar o archivar como quedó.'
       ]
     },
@@ -474,11 +468,11 @@ const A_BORRADORES: ManualArticle = {
     {
       kind: 'pasos',
       pasos: [
-        'Con el escrito generado, pulse «Guardar» al pie del papel. Queda a nombre de quien lo creó, que sale de su sesión y no de un campo que se pueda escribir.',
+        'El escrito se guarda solo al generarse. Si lo corrige en el papel, pulse «Guardar» en «Trabajar el escrito», junto al papel. Queda a nombre de quien lo creó, que sale de su sesión y no de un campo que se pueda escribir.',
         'Abra «Borradores» en la barra lateral. La tabla «Borradores guardados» muestra escrito, término, versión, estado y última edición; puede filtrar con «Buscar por cliente, radicado o actuación» y por rama.',
         'Abra el menú de acciones de una fila: «Abrir» lo lleva de vuelta al taller para continuarlo; «Duplicar» crea una copia; «Marcar radicado» lo saca de los que vencen; «Eliminar» lo borra. Ningún borrador se borra solo.',
         'Complete los datos del proceso en la ficha del borrador —«Cliente o parte», «Despacho», «Radicado», «Vence el»— y su estado: Borrador, Revisar, Listo o Radicado. Son los datos por los que después lo va a encontrar.',
-        'Cuando lo abra en el taller, el cuadro de instrucción pasa a pedir qué corregir o ampliar, y «Mis borradores» al pie del papel abre la misma lista sin salir de Redacción.'
+        'Cuando lo abra, Redacción muestra el papel. Para pedirle al motor que lo corrija o lo amplíe, vuelva al asistente con la flecha de la barra del borrador: el cuadro de instrucción pasa a pedir qué corregir o ampliar. «Mis borradores», en «Trabajar el escrito», abre la misma lista sin salir de Redacción.'
       ]
     },
     {
@@ -882,7 +876,7 @@ const A_REVISAR: ManualArticle = {
     {
       kind: 'pasos',
       pasos: [
-        'Abra «Revisiones» en la barra lateral y pulse «Revisar un documento», en la cabecera. También se llega desde «Redacción», con «Revisar un documento: suyo o recibido» debajo de los adjuntos: es el mismo diálogo, pero abierto desde ahí la rama y la actuación son las que tenga puestas en la barra de configuración de Redacción, y el bloque para elegirlas no aparece dentro del diálogo. Con el plan vencido no se ofrece ninguno de los dos caminos.',
+        'Abra «Revisiones» en la barra lateral y pulse «Revisar un documento», en la cabecera. También se llega desde «Redacción», con «Revisar un documento: suyo o recibido» debajo de los adjuntos: es el mismo diálogo, pero abierto desde ahí la rama y la actuación son las que tenga puestas en el paso 1 de Redacción, y el bloque para elegirlas no aparece dentro del diálogo. Con el plan vencido no se ofrece ninguno de los dos caminos.',
         'Escoja «Un escrito mío, que voy a presentar» en «Qué trae». Es lo que viene marcado.',
         'Use «Subir PDF, Word o texto (hasta 15 MB, con anexos)» o pegue el texto en el cuadro. Indique el cliente o proceso en el campo de referencia.',
         'En «Qué actuación es» elija la «Rama» y después la «Actuación»: la revisión objetiva se hace contra la ficha verificada de esa actuación. Mientras falte, el botón sigue apagado y el diálogo dice «Falta elegir la actuación» señalando dónde está.',
