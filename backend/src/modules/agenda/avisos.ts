@@ -55,6 +55,29 @@ export interface AvisoQueCorresponde {
 const DIA_MS = 24 * 60 * 60 * 1000;
 
 /**
+ * El día de hoy en Colombia, calculado EN EL SERVIDOR.
+ *
+ * Vercel corre en UTC, así que entre las 19:00 y las 24:00 de Colombia el
+ * servidor ya está en el día siguiente. Un aviso «vence hoy» calculado en UTC
+ * saldría un día antes de tiempo la mitad del año y el hito de cero nunca
+ * coincidiría con el vencimiento real.
+ *
+ * VIVE AQUÍ, EN EL ARCHIVO PURO, Y NO EN EL SERVICIO DE LA PASADA DIARIA. Lo
+ * necesita también la lista de expedientes para decir cuántos días le quedan
+ * al próximo término de cada caso, y traerlo desde el servicio arrastraba el
+ * cliente de la base y el de notificaciones a un cálculo de calendario. Moverlo
+ * conserva UNA sola definición del «hoy» de la firma; copiarlo habría creado
+ * dos que un día discrepan en el término que vence esta noche.
+ */
+export const hoyEnColombia = (ahora: Date = new Date()): string =>
+  new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Bogota',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(ahora);
+
+/**
  * Días de calendario entre hoy y la fecha límite. Negativo cuando ya pasó.
  *
  * TODO EN UTC, y no es preferencia de estilo. `new Date('2026-09-24')` es

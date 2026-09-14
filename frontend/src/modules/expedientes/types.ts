@@ -182,7 +182,62 @@ export interface Expediente {
   actores?: number;
 }
 
-export interface ExpedienteConDetalle extends Expediente {
+/**
+ * Un término de la agenda visto desde su caso. Espejo de `TerminoDelExpediente`.
+ *
+ * Nada de esto lo calcula el servidor a partir del derecho: la fecha y la
+ * actuación son las que la entrada de la agenda guardó. `diasRestantes` se
+ * cuenta en días de calendario de Bogotá EN EL SERVIDOR; la pantalla lo pinta y
+ * no lo recalcula con el reloj del equipo.
+ */
+export interface TerminoDelExpediente {
+  agendaId: string;
+  /** AAAA-MM-DD. */
+  vence: string;
+  /** 0 hoy, 1 mañana, negativo si ya pasó. */
+  diasRestantes: number;
+  que: string;
+  /** Falso cuando la entrada no está verificada: la pantalla debe marcarlo, no afirmarlo. */
+  verificado: boolean;
+  vencido: boolean;
+}
+
+/**
+ * Espejo de `ResumenDelCaso`. «NO SÉ» NUNCA ES «CERO»: con `terminosLeidos`
+ * falso, `proximoTermino: null` no significa «nada vence», significa que la
+ * agenda no se pudo leer; y `documentos: null` es «no se pudo contar».
+ */
+export interface ResumenDelCaso {
+  terminosLeidos: boolean;
+  proximoTermino: TerminoDelExpediente | null;
+  terminoVencido: TerminoDelExpediente | null;
+  terminosPendientes: number | null;
+  /** Documentos buscables del caso (distintos en el índice). */
+  documentos: number | null;
+}
+
+export type ExpedienteEnLista = Expediente & ResumenDelCaso;
+
+/** Ids ya ordenados por el servidor. `estaSemana` ⊂ `activos`; null si la agenda no se leyó. */
+export interface PestanasDeMisCasos {
+  estaSemana: string[] | null;
+  activos: string[];
+  cerrados: string[];
+}
+
+export interface MisCasos {
+  expedientes: ExpedienteEnLista[];
+  pestanas: PestanasDeMisCasos;
+  hoy: string;
+  avisoTerminos: string | null;
+  avisoDocumentos: string | null;
+}
+
+/*
+ * El resumen del caso es OPCIONAL en el detalle: falta en respuestas de
+ * servidores anteriores al campo, así que se lee tolerando `undefined`.
+ */
+export interface ExpedienteConDetalle extends Expediente, Partial<ResumenDelCaso> {
   listaDeActores: ActorDelExpediente[];
   piezas: {
     entrevistas: number;

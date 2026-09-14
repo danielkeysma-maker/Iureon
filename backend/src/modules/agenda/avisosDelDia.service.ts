@@ -1,6 +1,6 @@
 import { supabase } from '../../config/supabase.config';
 import { enviarAFirma, enviarAUsuario } from '../push/push.service';
-import { avisoQueCorresponde, textoDelAviso, type EntradaVigilada } from './avisos';
+import { avisoQueCorresponde, hoyEnColombia, textoDelAviso, type EntradaVigilada } from './avisos';
 import { AgendaError, type EstadoDeEntrada, type HitoDeAviso } from './types';
 
 /**
@@ -43,21 +43,12 @@ const DIAS_DE_VENTANA = 5;
 /** Cuántas entradas mira una pasada. Una función serverless tiene su propio reloj. */
 const MAX_ENTRADAS = 500;
 
-/**
- * El día de hoy en Colombia, calculado EN EL SERVIDOR.
- *
- * Vercel corre en UTC, así que entre las 19:00 y las 24:00 de Colombia el
- * servidor ya está en el día siguiente. Un aviso «vence hoy» calculado en UTC
- * saldría un día antes de tiempo la mitad del año y el hito de cero nunca
- * coincidiría con el vencimiento real.
+/*
+ * `hoyEnColombia` se mudó a `avisos.ts`, el archivo puro, para que la lista de
+ * expedientes use el mismo «hoy» sin cargar este servicio. Se reexporta para
+ * que quien ya lo importaba de aquí siga funcionando sin tocar una línea.
  */
-export const hoyEnColombia = (ahora: Date = new Date()): string =>
-  new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'America/Bogota',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  }).format(ahora);
+export { hoyEnColombia };
 
 const sumarDias = (fecha: string, dias: number): string =>
   new Date(Date.parse(`${fecha}T00:00:00Z`) + dias * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);

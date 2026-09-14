@@ -2,6 +2,7 @@ import { httpClient } from '../../../config/httpClient';
 import type {
   ActorDelExpediente,
   Expediente,
+  MisCasos,
   ExpedienteConDetalle,
   LadoEnElExpediente,
   PapelEnElExpediente,
@@ -73,6 +74,48 @@ export const expedientesApi = {
   async listar(): Promise<Expediente[]> {
     const data = await httpClient.get<Respuesta & { expedientes: Expediente[] }>('/api/expedientes');
     return revisar(data, 'No se pudieron cargar los expedientes.').expedientes;
+  },
+
+  /**
+   * «MIS CASOS»: la misma ruta, leída entera — cada caso con su próximo término
+   * y sus documentos, y las tres pestañas ya ordenadas por el servidor.
+   *
+   * Un servidor anterior al campo no trae `pestanas`. En ese caso NO se
+   * reclasifica aquí por fechas —serían dos definiciones de «esta semana»—: se
+   * declara la agenda como no leída y solo se separan activos de cerrados por
+   * su estado, en el orden en que el servidor ya los entrega.
+   */
+  async listarMisCasos(): Promise<MisCasos> {
+    const data = await httpClient.get<Respuesta & Partial<MisCasos>>('/api/expedientes');
+    const r = revisar(data, 'No se pudieron cargar los expedientes.');
+    if (r.pestanas && r.expedientes) {
+      return {
+        expedientes: r.expedientes,
+        pestanas: r.pestanas,
+        hoy: r.hoy ?? '',
+        avisoTerminos: r.avisoTerminos ?? null,
+        avisoDocumentos: r.avisoDocumentos ?? null
+      };
+    }
+    const expedientes = (r.expedientes ?? []).map((e) => ({
+      ...e,
+      terminosLeidos: false,
+      proximoTermino: null,
+      terminoVencido: null,
+      terminosPendientes: null,
+      documentos: null
+    }));
+    return {
+      expedientes,
+      pestanas: {
+        estaSemana: null,
+        activos: expedientes.filter((e) => e.estado === 'ACTIVO' || e.estado === 'SUSPENDIDO').map((e) => e.id),
+        cerrados: expedientes.filter((e) => e.estado === 'TERMINADO' || e.estado === 'ARCHIVADO').map((e) => e.id)
+      },
+      hoy: '',
+      avisoTerminos: 'El servidor todavía no entrega los términos de cada caso.',
+      avisoDocumentos: 'El servidor todavía no entrega los documentos de cada caso.'
+    };
   },
 
   /** Lo que la firma ya tiene y se puede traer. De la FIRMA, no de un expediente. */

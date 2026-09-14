@@ -1,5 +1,15 @@
+import { leerTodasLasFilas } from '../../config/leerTodasLasFilas';
 import { supabase } from '../../config/supabase.config';
+import { hoyEnColombia } from '../agenda/avisos';
 import { posicionSegunElExpediente } from './posicionDelExpediente';
+import {
+  armarMisCasos,
+  documentosPorExpediente,
+  resumenDelCaso,
+  terminosPorExpediente,
+  type FilaDeFragmento,
+  type FilaDeTerminoPendiente
+} from './terminosDelExpediente';
 import {
   ESTADOS_DE_EXPEDIENTE,
   LADOS,
@@ -10,6 +20,8 @@ import {
   type DatosDeExpediente,
   type Expediente,
   type ExpedienteConDetalle,
+  type MisCasos,
+  type ResumenDelCaso,
   type TipoDePieza
 } from './types';
 
@@ -117,7 +129,56 @@ const ahora = (): string => new Date().toISOString();
 
 // ─── EXPEDIENTES ─────────────────────────────────────────────────────────────
 
-export const listarExpedientes = async (firmId: string): Promise<Expediente[]> => {
+/*
+ * ─── LOS TÉRMINOS Y LOS DOCUMENTOS DE LOS CASOS SE LEEN EN LOTE ────────────
+ *
+ * Una consulta por firma, no una por caso: cuarenta asuntos no pueden ser
+ * cuarenta viajes a la agenda. Y con `leerTodasLasFilas`, ordenado por `id`
+ * —que es único—, porque PostgREST corta en mil filas sin avisar: una firma con
+ * más de mil fragmentos indexados vería documentos contados de menos, y una
+ * agenda cortada podría dejar fuera justo el término más próximo.
+ *
+ * `leerTodasLasFilas` devuelve la falla en vez de lanzar, y ésa es la razón de
+ * usarla aquí también: una agenda ilegible NO puede tumbar la lista de casos,
+ * pero tampoco puede leerse como «no vence nada». La falla viaja hasta
+ * `armarMisCasos`, que la convierte en bandera y aviso.
+ *
+ * Con `expedienteId` se acota a un caso, para el detalle; sin él, se leen solo
+ * las filas atadas a ALGÚN caso, que es lo único que la lista necesita.
+ */
+const leerTerminosPendientes = (firmId: string, expedienteId?: string) =>
+  leerTodasLasFilas<FilaDeTerminoPendiente>((desde, hasta) => {
+    let q = db()
+      .from('agenda_terminos')
+      .select('id, firm_id, expediente_id, actuacion_nombre, fecha_limite, estado, termino_verificado')
+      .eq('firm_id', firmId)
+      .eq('estado', 'PENDIENTE');
+    q = expedienteId ? q.eq('expediente_id', expedienteId) : q.not('expediente_id', 'is', null);
+    return q.order('id').range(desde, hasta);
+  });
+
+/*
+ * Solo identificadores: ni el texto del fragmento ni el vector. Aun así es la
+ * lectura más pesada de la lista —una fila por fragmento, unas mil por cada
+ * documento de trescientas páginas— y está dicho como riesgo: el día que pese,
+ * el arreglo es un conteo agregado en la base, no recortar la lectura.
+ */
+const leerFragmentosDeCasos = (firmId: string, expedienteId?: string) =>
+  leerTodasLasFilas<FilaDeFragmento>((desde, hasta) => {
+    let q = db()
+      .from('document_embeddings')
+      .select('firm_id, expediente_id, document_id')
+      .eq('firm_id', firmId);
+    q = expedienteId ? q.eq('expediente_id', expedienteId) : q.not('expediente_id', 'is', null);
+    return q.order('id').range(desde, hasta);
+  });
+
+const registrarFallas = (terminos: { falla: string | null }, fragmentos: { falla: string | null }): void => {
+  if (terminos.falla) console.error('[EXPEDIENTES] No se pudo leer la agenda de los casos:', terminos.falla);
+  if (fragmentos.falla) console.error('[EXPEDIENTES] No se pudieron contar los documentos de los casos:', fragmentos.falla);
+};
+
+export const listarExpedientes = async (firmId: string, ahora: Date = new Date()): Promise<MisCasos> => {
   const { data, error } = await db()
     .from('expedientes')
     .select('*')
@@ -129,17 +190,33 @@ export const listarExpedientes = async (firmId: string): Promise<Expediente[]> =
     throw new ExpedienteError('LIST_FAILED', 'No se pudieron cargar los expedientes.', 502);
   }
 
+  /*
+   * EL «HOY» ES EL DE BOGOTÁ, CALCULADO EN EL SERVIDOR con la misma función de
+   * la pasada de avisos. Vercel corre en UTC: a las 20:00 de Colombia ya es el
+   * día siguiente y un término de hoy se contaría como vencido.
+   */
+  const hoy = hoyEnColombia(ahora);
   const filas = (data ?? []) as FilaDeExpediente[];
-  if (filas.length === 0) return [];
+  if (filas.length === 0) {
+    return armarMisCasos({
+      firmId,
+      hoy,
+      expedientes: [],
+      terminos: { filas: [], falla: null },
+      fragmentos: { filas: [], falla: null }
+    });
+  }
 
   /*
-   * DOS CONSULTAS PARA LA LISTA ENTERA, no dos por expediente. Un despacho con
-   * cuarenta asuntos haría ochenta viajes a la base para pintar una pantalla —
-   * es el mismo criterio con el que `listClients` cuenta entrevistas.
+   * CUATRO LECTURAS PARA LA LISTA ENTERA, en paralelo y ninguna por expediente.
+   * Un despacho con cuarenta asuntos haría ciento sesenta viajes a la base para
+   * pintar una pantalla — es el mismo criterio con el que `listClients` cuenta
+   * entrevistas.
    */
   const idsDeCliente = [...new Set(filas.map((f) => f.cliente_id).filter((x): x is string => Boolean(x)))];
-  const nombres = new Map<string, string>();
-  if (idsDeCliente.length > 0) {
+  const leerClientes = async (): Promise<Map<string, string>> => {
+    const nombres = new Map<string, string>();
+    if (idsDeCliente.length === 0) return nombres;
     const { data: clientes } = await db()
       .from('clients')
       .select('id, full_name')
@@ -148,22 +225,57 @@ export const listarExpedientes = async (firmId: string): Promise<Expediente[]> =
     for (const c of (clientes ?? []) as { id: string; full_name: string }[]) {
       nombres.set(c.id, c.full_name);
     }
-  }
+    return nombres;
+  };
 
-  const { data: actores } = await db()
-    .from('expediente_actores')
-    .select('expediente_id')
-    .in('expediente_id', filas.map((f) => f.id));
+  const [nombres, actores, terminos, fragmentos] = await Promise.all([
+    leerClientes(),
+    db()
+      .from('expediente_actores')
+      .select('expediente_id')
+      .in('expediente_id', filas.map((f) => f.id)),
+    leerTerminosPendientes(firmId),
+    leerFragmentosDeCasos(firmId)
+  ]);
+  registrarFallas(terminos, fragmentos);
 
   const cuantos = new Map<string, number>();
-  for (const a of (actores ?? []) as { expediente_id: string }[]) {
+  for (const a of (actores.data ?? []) as { expediente_id: string }[]) {
     cuantos.set(a.expediente_id, (cuantos.get(a.expediente_id) ?? 0) + 1);
   }
 
-  return filas.map((f) => ({
+  const expedientes: Expediente[] = filas.map((f) => ({
     ...aExpediente(f, f.cliente_id ? nombres.get(f.cliente_id) ?? null : null),
     actores: cuantos.get(f.id) ?? 0
   }));
+
+  return armarMisCasos({ firmId, hoy, expedientes, terminos, fragmentos });
+};
+
+/**
+ * El próximo término y los documentos de UN caso, para el detalle.
+ *
+ * NUNCA LANZA: una lectura fallida vuelve como `terminosLeidos: false` o
+ * `documentos: null`. Filtra por firma en las dos consultas, así que pedirlo
+ * con el id de un caso ajeno devuelve un resumen vacío y no datos de otra firma.
+ */
+export const resumenDelExpediente = async (
+  firmId: string,
+  expedienteId: string,
+  ahora: Date = new Date()
+): Promise<ResumenDelCaso> => {
+  const hoy = hoyEnColombia(ahora);
+  const [terminos, fragmentos] = await Promise.all([
+    leerTerminosPendientes(firmId, expedienteId),
+    leerFragmentosDeCasos(firmId, expedienteId)
+  ]);
+  registrarFallas(terminos, fragmentos);
+
+  return resumenDelCaso(
+    expedienteId,
+    terminos.falla === null ? terminosPorExpediente(terminos.filas, firmId, hoy) : null,
+    fragmentos.falla === null ? documentosPorExpediente(fragmentos.filas, firmId) : null
+  );
 };
 
 /** El expediente, sus actores y CUÁNTAS piezas tiene atadas. */

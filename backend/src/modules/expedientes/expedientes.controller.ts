@@ -10,7 +10,8 @@ import {
   borrarExpediente,
   crearExpediente,
   listarExpedientes,
-  obtenerExpediente
+  obtenerExpediente,
+  resumenDelExpediente
 } from './expedientes.service';
 import { TIPOS_DE_PIEZA, type DatosDeActor, type TipoDePieza } from './types';
 import {
@@ -59,18 +60,36 @@ export const listarExpedientesController = async (req: Request, res: Response): 
   try {
     const firmId = req.firmId as string;
     await exigirModulo(firmId, 'EXPEDIENTES');
-    res.json({ success: true, expedientes: await listarExpedientes(firmId) });
+    /*
+     * `expedientes` sigue en la raíz de la respuesta con el mismo nombre: la
+     * pantalla de hoy lo lee así. Lo nuevo —pestañas, «hoy» y avisos— viaja a su
+     * lado y quien no lo conoce simplemente no lo lee.
+     */
+    res.json({ success: true, ...(await listarExpedientes(firmId)) });
   } catch (err) {
     fallar(res, err, 'No se pudieron cargar los expedientes.');
   }
 };
 
-/** GET /api/expedientes/:id — con sus actores y las cuentas de lo que tiene atado. */
+/** GET /api/expedientes/:id — con sus actores, las cuentas de lo que tiene atado y su próximo término. */
 export const obtenerExpedienteController = async (req: Request, res: Response): Promise<void> => {
   try {
     const firmId = req.firmId as string;
     await exigirModulo(firmId, 'EXPEDIENTES');
-    res.json({ success: true, expediente: await obtenerExpediente(firmId, String(req.params.id)) });
+    const id = String(req.params.id);
+    /*
+     * EL RESUMEN SE PIDE AQUÍ Y NO DENTRO DE `obtenerExpediente`, porque ésa la
+     * usan también indexar y preparar preguntas, que no necesitan leer la
+     * agenda ni el índice del caso. Van en paralelo: `resumenDelExpediente`
+     * filtra por firma y nunca lanza, así que si el expediente no es de la firma
+     * responde el 404 de `obtenerExpediente` y el resumen se descarta sin haber
+     * leído nada ajeno.
+     */
+    const [expediente, resumen] = await Promise.all([
+      obtenerExpediente(firmId, id),
+      resumenDelExpediente(firmId, id)
+    ]);
+    res.json({ success: true, expediente: { ...expediente, ...resumen } });
   } catch (err) {
     fallar(res, err, 'No se pudo cargar el expediente.');
   }

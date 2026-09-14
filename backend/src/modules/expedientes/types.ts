@@ -219,6 +219,99 @@ export interface ExpedienteConDetalle extends Expediente {
   posicionSugerida: PapelEnElExpediente | null;
 }
 
+/**
+ * UN TÉRMINO DE LA AGENDA, VISTO DESDE SU CASO.
+ *
+ * ─── NADA DE ESTO SE CALCULA AQUÍ ──────────────────────────────────────────
+ *
+ * La fecha límite, la actuación y la marca de verificación son las que la
+ * entrada de `agenda_terminos` ya guardó. Este módulo NO deduce un plazo de la
+ * rama, del estado del proceso ni de ninguna ficha: si la firma no registró el
+ * término, el caso no tiene próximo término, y eso se dice. Inventar un
+ * vencimiento para llenar la tarjeta sería el defecto más caro posible.
+ *
+ * Lo único derivado es `diasRestantes`, contado en días de calendario de Bogotá
+ * con `diasQueFaltan` y `hoyEnColombia` de la agenda: la misma cuenta con la
+ * que salen los avisos, para que la tarjeta y la notificación no discrepen.
+ */
+export interface TerminoDelExpediente {
+  /** El id de la entrada en `agenda_terminos`, para ir a ella. */
+  agendaId: string;
+  /** AAAA-MM-DD, tal como se guardó. */
+  vence: string;
+  /** Días de calendario en Bogotá: 0 hoy, 1 mañana, negativo si ya pasó. */
+  diasRestantes: number;
+  /** La actuación que se vence, tal como se guardó en la agenda. */
+  que: string;
+  /**
+   * `termino_verificado` de la propia entrada. Falso cuando el plazo lo leyó el
+   * abogado o la fecha es manual: la pantalla debe marcarlo, no afirmarlo.
+   */
+  verificado: boolean;
+  /** Verdadero si la fecha límite ya pasó y la entrada sigue PENDIENTE. */
+  vencido: boolean;
+}
+
+/**
+ * LO QUE LA LISTA DE CASOS NECESITA SABER DE CADA UNO.
+ *
+ * ─── «NO SÉ» NUNCA ES «CERO» ───────────────────────────────────────────────
+ *
+ * Si la agenda no se pudo leer, `terminosLeidos` es falso y `terminosPendientes`
+ * es null. Devolver `proximoTermino: null` a secas diría «este caso no tiene
+ * nada que venza», que es exactamente lo que un abogado no puede leer cuando
+ * lo cierto es que no se sabe. Lo mismo `documentos`: null es «no se pudo
+ * contar», nunca «no hay».
+ */
+export interface ResumenDelCaso {
+  terminosLeidos: boolean;
+  /** El pendiente con fecha límite ≥ hoy más cercano. */
+  proximoTermino: TerminoDelExpediente | null;
+  /**
+   * El pendiente VENCIDO más antiguo. Va aparte porque un vencido no es «el
+   * próximo término», pero tampoco puede desaparecer de la lista: es el que
+   * más importa que se vea.
+   */
+  terminoVencido: TerminoDelExpediente | null;
+  /** Entradas PENDIENTES atadas al caso, vencidas incluidas. Null si no se leyó. */
+  terminosPendientes: number | null;
+  /**
+   * Documentos BUSCABLES del caso: `document_id` distintos en
+   * `document_embeddings` con este `expediente_id`. Es la misma definición que
+   * `documentosDelExpediente`: un documento cuya vectorización falló deja fila
+   * en `legal_documents` y ninguna búsqueda lo encuentra. Null si no se leyó.
+   */
+  documentos: number | null;
+}
+
+export type ExpedienteEnLista = Expediente & ResumenDelCaso;
+
+/**
+ * LAS TRES PESTAÑAS DE «MIS CASOS», como listas de ids ya ordenadas.
+ *
+ * `estaSemana` es un SUBCONJUNTO de `activos`, no una pestaña excluyente: el
+ * diseño cuenta «Esta semana 2 · Activos 4» con los dos de esta semana dentro
+ * de los cuatro activos. Es null cuando la agenda no se leyó, porque no se
+ * puede decir qué vence esta semana sin haberla leído.
+ */
+export interface PestanasDeMisCasos {
+  estaSemana: string[] | null;
+  activos: string[];
+  cerrados: string[];
+}
+
+/** La respuesta de `GET /api/expedientes`. */
+export interface MisCasos {
+  expedientes: ExpedienteEnLista[];
+  pestanas: PestanasDeMisCasos;
+  /** El «hoy» de Bogotá contra el que se contaron los días. */
+  hoy: string;
+  /** Texto para la pantalla si la agenda no se pudo leer; null si se leyó. */
+  avisoTerminos: string | null;
+  /** Texto para la pantalla si los documentos no se pudieron contar; null si sí. */
+  avisoDocumentos: string | null;
+}
+
 export interface DatosDeExpediente {
   caratula: string;
   radicado?: string | null;
