@@ -357,11 +357,29 @@ const PRIVILEGIADO = 'material privilegiado';
      * y el operador las vio en su consola junto a sus clientes reales. Un check
      * que deja rastro en la base del usuario no es un check: es un incidente.
      */
+    /*
+     * LOS MOVIMIENTOS DE CREDITO SE BORRAN; LA AUDITORIA NO SE PUEDE, Y ESTA BIEN.
+     *
+     * Este check recarga y descuenta saldo con motivo, y eso escribe dos filas
+     * en `credit_movements`. Nunca se borraban: la corrida del 13 de septiembre
+     * de 2026 dejo una RECARGA de $50.000 y un AJUSTE de -$20.000 colgados de
+     * una firma ya borrada. El hueco estuvo escondido mientras la limpieza no
+     * revisaba errores.
+     *
+     * `audit_logs`, en cambio, es INALTERABLE en la base
+     * (`supabase/migration-auditoria-inmutable.sql`): un disparador rechaza todo
+     * UPDATE y DELETE. Intentar borrarla aqui fallaba en CADA corrida — antes en
+     * silencio, y desde que la limpieza revisa errores, con el check en rojo
+     * para siempre. No se intenta: cada corrida deja sus eventos de auditoria,
+     * colgados de firmas que ya no existen, y ninguna pantalla de firma los
+     * muestra. ESA ES LA RAZON PARA CORRER ESTOS CHECKS CONTRA UNA BASE DE
+     * PRUEBAS Y NO CONTRA PRODUCCION.
+     */
     const ids = firmasCreadas;
     const limpieza: string[] = [];
     if (ids.length > 0) {
       await borrarYAnotar(limpieza, 'transcriptions', c.from('transcriptions').delete().in('firm_id', ids));
-      await borrarYAnotar(limpieza, 'audit_logs', c.from('audit_logs').delete().in('firm_id', ids));
+      await borrarYAnotar(limpieza, 'credit_movements', c.from('credit_movements').delete().in('firm_id', ids));
     }
     limpieza.push(...(await borrarUsuariosDePrueba(c, m)));
     if (ids.length > 0) await borrarYAnotar(limpieza, 'firms', c.from('firms').delete().in('firm_id', ids));

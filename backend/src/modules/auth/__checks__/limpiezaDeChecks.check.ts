@@ -149,5 +149,35 @@ check(
   /endsWith\('@iureon\.test'\) && correo\.includes\(texto\)/.test(helper)
 );
 
+/* ─── Las dos tablas que la corrida del 13 de septiembre destapo ────────── */
+/*
+ * `audit_logs` es inalterable por disparador (migration-auditoria-inmutable.sql):
+ * un check que intente borrarla falla en cada corrida y queda en rojo para
+ * siempre, que es la forma de que nadie vuelva a mirar su resultado. Y el check
+ * de admin escribe movimientos de credito al recargar y descontar saldo: si no
+ * los borra, quedan colgados de una firma que ya no existe.
+ */
+const seisChecks = [
+  'admin/__checks__/admin.check.ts',
+  'auth/__checks__/auth.check.ts',
+  'billing/__checks__/billing.check.ts',
+  'clients/__checks__/clients.check.ts',
+  'transcription/__checks__/storedList.check.ts',
+  'transcription/__checks__/speakerNames.check.ts'
+];
+const intentanBorrarAuditoria = seisChecks.filter((a) =>
+  /from\('audit_logs'\)\.delete\(\)/.test(leer(a))
+);
+check(
+  'ningun check intenta borrar la auditoria, que la base protege',
+  intentanBorrarAuditoria.length === 0,
+  intentanBorrarAuditoria.length > 0 ? `lo intentan: ${intentanBorrarAuditoria.join(', ')}` : ''
+);
+check(
+  'admin borra los movimientos de credito que crea al recargar y descontar',
+  /from\('credit_movements'\)\.delete\(\)/.test(leer('admin/__checks__/admin.check.ts')),
+  'la corrida del 13 de septiembre dejo una recarga y un ajuste colgados de una firma borrada'
+);
+
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);
 process.exit(fallos === 0 ? 0 : 1);
