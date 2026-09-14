@@ -48,7 +48,7 @@ import {
 } from '../avisos.mail';
 import { plantillaDeBienvenida, plantillaDeBienvenidaDeCompra } from '../../trial/trial.mail';
 import { DIAS_DE_PRUEBA_GRATUITA, PLAN_DE_PRUEBA, USUARIOS_DE_PRUEBA } from '../../trial/trial.rules';
-import { DIAS_DE_PRUEBA, PLANES } from '../../subscriptions/plan.catalog';
+import { PLANES } from '../../subscriptions/plan.catalog';
 import { PRICE_COP } from '../../billing/billing.service';
 import { SITIO, URL_ENTRAR, URL_MANUAL, URL_PRIVACIDAD, URL_SOPORTE, pesos } from '../plantilla';
 import { loQueIncluye } from '../vocabulario';
@@ -129,9 +129,10 @@ const firmaCreada = plantillaDeFirmaCreada({
   nombre: 'Miguel Pérez Ortega',
   firma: 'Pérez & Asociados',
   plan: 'PREMIUM',
-  periodo: 'PRUEBA',
-  validoHasta: '2026-09-18T15:00:00.000Z',
-  diasDeVigencia: DIAS_DE_PRUEBA,
+  /* Lo que `createFirm` escribe desde el 14 de septiembre de 2026: cortesía Premium sin fecha. */
+  periodo: 'CORTESIA',
+  validoHasta: null,
+  diasDeVigencia: null,
   maxUsuarios: PLANES.PREMIUM.maxUsuarios,
   saldoInicialCop: 0
 });
@@ -408,8 +409,18 @@ check('la suscripción pagada sí dice que está activo', suscripcion.html.inclu
 check('la bienvenida del operador existe y tiene asunto propio', firmaCreada.asunto === 'Su firma ya está creada en Iureon · Pérez & Asociados', firmaCreada.asunto);
 check('dice quién creó la firma', firmaCreada.html.includes('operador de Iureon creó'));
 check('dice que la persona quedó como socio administrador', firmaCreada.html.includes('socio administrador'));
-check('el dato grande sale de los días que se escribieron', firmaCreada.html.includes(`${DIAS_DE_PRUEBA} días`));
-check('dice hasta cuándo, en Bogotá', firmaCreada.html.includes('18 de septiembre de 2026') && firmaCreada.texto.includes('18 de septiembre de 2026'));
+/*
+ * LA CORTESÍA DE LA CONSOLA NO VENCE, Y EL CORREO LO DICE SIN INVENTAR NADA.
+ * Antes el alta era una prueba de catorce días y este check pedía esos días;
+ * ahora pide que no aparezca ni una prueba ni una fecha que la fila no tiene.
+ */
+check('la cortesía dice que no tiene vencimiento', firmaCreada.html.includes('SIN VENCIMIENTO') && firmaCreada.texto.includes('Sin fecha de vencimiento'));
+check('la cortesía no habla de prueba', !/prueba/i.test(firmaCreada.html) && !/prueba/i.test(firmaCreada.texto), 'el alta de la consola ya no es una prueba');
+check(
+  'la cortesía no finge una fecha',
+  !firmaCreada.html.includes('PLAN VIGENTE HASTA') && !firmaCreada.html.includes('Vigente hasta') && !/\d{1,2} de [a-z]+ de \d{4}/.test(firmaCreada.texto),
+  'validoHasta es null'
+);
 check('dice con qué plan queda', firmaCreada.html.includes(PLANES.PREMIUM.nombre) && firmaCreada.html.includes('hasta 5 usuarios'));
 check('NO trae la contraseña ni la promete en el mensaje', /este correo no la trae/.test(firmaCreada.html) && !/contrase(ñ|n)a[:=]\s*\S/i.test(firmaCreada.texto));
 check('sin nombre del socio no inventa uno', (() => {

@@ -141,9 +141,16 @@ export const FirmSubscriptionModal: React.FC<FirmSubscriptionModalProps> = ({
     setCargando(true);
     setError(null);
     try {
+      /*
+       * EL HISTORIAL NO PUEDE TUMBAR LA COMPRA. Con la prueba gratuita
+       * terminada el servidor solo abre leer el plan y pagar: el historial
+       * responde 403, y antes ese rechazo dentro de `Promise.all` dejaba la
+       * pantalla sin planes — la única salida de esa firma, cerrada. Esa firma
+       * no tiene pagos por definición, así que la lista vacía es la verdad.
+       */
       const [{ plan: p, planes: catalogo }, historial] = await Promise.all([
         subscriptionApi.plan(),
-        subscriptionApi.payments()
+        subscriptionApi.payments().catch((): PagoDePlan[] => [])
       ]);
       setPlan(p);
       setPlanes(catalogo);
@@ -309,7 +316,9 @@ export const FirmSubscriptionModal: React.FC<FirmSubscriptionModalProps> = ({
             </div>
             {plan.estado === 'VENCIDO' && (
               <p className="relative mt-4 rounded-control bg-white/10 px-3 py-2 text-justify text-[12px] leading-snug text-white [text-wrap:pretty]">
-                El plan venció. La firma puede entrar, leer y exportar; para volver a generar escritos, revisar o transcribir, hay que pagar un periodo. El saldo de recargas no se pierde.
+                {plan.acceso === 'PRUEBA_TERMINADA'
+                  ? 'La prueba gratuita terminó. Para volver a entrar a la aplicación hay que contratar un plan; el trabajo de la firma se conserva y el saldo de recargas no se pierde.'
+                  : 'El plan venció. La firma puede entrar, leer y exportar; para volver a generar escritos, revisar o transcribir, hay que pagar un periodo. El saldo de recargas no se pierde.'}
               </p>
             )}
           </section>

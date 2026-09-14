@@ -3,7 +3,7 @@ import { isAuthRetryableFetchError } from '@supabase/supabase-js';
 import { supabase, supabaseAuth } from '../../config/supabase.config';
 import { validarBorradoDePropioUsuario } from './borrado.rules';
 import { validarNombre, validarNombreOpcional } from './nombre.rules';
-import { describirPlan, leerPlan } from '../subscriptions/plan.service';
+import { describirPlan, estadoDeAcceso, leerPlan } from '../subscriptions/plan.service';
 
 /**
  * Real identity for Iureon: who the user is, and which firm they belong to.
@@ -569,7 +569,8 @@ export const firmProfile = async (firmId: string) => {
    * round trip. Read separately and cheaply (no user count): the count belongs
    * to the plan screen, which asks /api/subscription/plan.
    */
-  const plan = describirPlan(await leerPlan(firmId), 0);
+  const fila = await leerPlan(firmId);
+  const plan = describirPlan(fila, 0, await estadoDeAcceso(firmId, fila));
 
   return {
     id: data.firm_id,
@@ -587,7 +588,9 @@ export const firmProfile = async (firmId: string) => {
       diasRestantes: plan.diasRestantes,
       modulosPermitidos: plan.modulosPermitidos,
       modulosDesactivados: plan.modulosDesactivados,
-      funcionesDesactivadas: plan.funcionesDesactivadas
+      funcionesDesactivadas: plan.funcionesDesactivadas,
+      acceso: plan.acceso,
+      trabajoConservado: plan.trabajoConservado
     }
   };
 };

@@ -75,10 +75,19 @@ export const refreshController = async (req: Request, res: Response): Promise<vo
 
 /** GET /api/auth/me — who the token says you are, and which firm it binds you to. */
 export const meController = async (req: Request, res: Response): Promise<void> => {
+  const firm = await firmProfile(req.firmId as string);
   res.json({
     success: true,
     user: req.user,
-    firm: await firmProfile(req.firmId as string)
+    firm,
+    /*
+     * El acceso va también arriba, suelto, porque es lo primero que la cáscara
+     * decide: con PRUEBA_TERMINADA no pinta la aplicación sino la pantalla de
+     * bloqueo, y esta es una de las tres rutas que esa firma todavía puede
+     * leer. Sin fila de firma se dice COMPLETO: nunca se bloquea por no saber.
+     */
+    acceso: firm?.plan.acceso ?? 'COMPLETO',
+    trabajoConservado: firm?.plan.trabajoConservado ?? null
   });
 };
 

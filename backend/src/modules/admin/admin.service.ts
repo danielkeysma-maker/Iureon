@@ -14,7 +14,6 @@ import { validarBorradoDeFirma, validarContrasenaDeOperador } from './admin.rule
 import { consumoDelMesPorUsuario } from '../billing/billing.service';
 import { auditService, type AuditLogEntry } from '../audit/audit.service';
 import {
-  DIAS_DE_PRUEBA,
   FUNCIONES,
   PLANES,
   TODO_LO_DESACTIVABLE,
@@ -470,8 +469,8 @@ export const getFirmDetail = async (firmId: string): Promise<FirmDetail> => {
 /**
  * The one routine that brings a firm and its first administrator into being.
  *
- * WHY IT IS SHARED. Two doors open a tenant: the operator console (Premium on
- * a 14-day trial, five seats) and the public 7-day trial of Esencial (one
+ * WHY IT IS SHARED. Two doors open a tenant: the operator console (a Premium
+ * courtesy with no expiry, five seats) and the public 7-day trial of Esencial (one
  * seat, no credit). Both must write the same row shape, retry without plan
  * columns the same way and stamp the administrator with the same metadata; a
  * second copy of this in the trial module would drift the day one of them is
@@ -484,7 +483,13 @@ export const getFirmDetail = async (firmId: string): Promise<FirmDetail> => {
  * inert. The public trial deletes it: an anonymous visitor who types an
  * existing address must not leave a tenant behind on every attempt.
  */
-export const crearFirmaConAdministrador = async (input: {
+/*
+ * EL TIPO DE LA FECHA SIGUE A LOS DÍAS. Con un número hay fecha (`string`);
+ * con `null` no la hay (`null`). Así el camino de la prueba pública y el de la
+ * compra, que siempre pasan días, siguen recibiendo una fecha segura sin
+ * comprobarla, y la cortesía de la consola no puede leer una que no existe.
+ */
+export const crearFirmaConAdministrador = async <D extends number | null>(input: {
   firmName: string;
   nit?: string;
   adminEmail: string;
@@ -494,11 +499,21 @@ export const crearFirmaConAdministrador = async (input: {
   initialCredits?: number;
   plan: Plan;
   period: PlanPeriod;
-  /** Days until `plan_valid_until`, counted from now. */
-  diasDeVigencia: number;
+  /**
+   * Days until `plan_valid_until`, counted from now. `null` writes NO date:
+   * a courtesy never expires, and a date computed from zero days would turn
+   * it into a plan born expired.
+   */
+  diasDeVigencia: D;
   maxUsers: number;
   siFallaLaCuenta: 'CONSERVAR_FIRMA' | 'BORRAR_FIRMA';
-}): Promise<{ firmId: string; firmName: string; nit: string | null; credits: number; validUntil: string }> => {
+}): Promise<{
+  firmId: string;
+  firmName: string;
+  nit: string | null;
+  credits: number;
+  validUntil: D extends number ? string : null;
+}> => {
   const client = requireClient();
 
   const firmName = input.firmName.trim();
@@ -529,7 +544,10 @@ export const crearFirmaConAdministrador = async (input: {
 
   const firmId = `firm-${Date.now()}`;
   const credits = Number.isFinite(input.initialCredits) ? Number(input.initialCredits) : 0;
-  const validUntil = new Date(Date.now() + input.diasDeVigencia * 24 * 60 * 60 * 1000).toISOString();
+  const validUntil =
+    input.diasDeVigencia === null
+      ? null
+      : new Date(Date.now() + input.diasDeVigencia * 24 * 60 * 60 * 1000).toISOString();
   const filaBase = {
     firm_id: firmId,
     name: firmName,
@@ -579,7 +597,7 @@ export const crearFirmaConAdministrador = async (input: {
     throw err;
   }
 
-  return { firmId, firmName, nit, credits, validUntil };
+  return { firmId, firmName, nit, credits, validUntil: validUntil as D extends number ? string : null };
 };
 
 export const createFirm = async (input: {
@@ -593,10 +611,18 @@ export const createFirm = async (input: {
   initialCredits?: number;
 }): Promise<FirmSummary> => {
   /*
-   * A NEW FIRM STARTS ON PREMIUM, ON TRIAL, FOR FOURTEEN DAYS. Premium so the
-   * trial shows everything the product does; a date so the trial ends without
-   * anyone remembering to end it. The operator can stretch or change it from
-   * the ficha, with a written reason.
+   * A FIRM THE SUPERUSER CREATES FROM THE CONSOLE IS A COURTESY, NOT A TRIAL,
+   * AND IT HAS NO EXPIRY. Owner's decision of 2026-09-14: Premium, period
+   * CORTESIA, no `plan_valid_until`, Premium's seats — the same shape
+   * `updateFirmPlan` writes for a courtesy.
+   *
+   * WHY NOT A TRIAL ANY MORE. It used to start on PREMIUM, PRUEBA, fourteen
+   * days. Since the same date a self-service trial that ends unpaid loses ALL
+   * access (`accesoDeLaFirma`), and the rule reads the period: a client the
+   * operator onboarded by hand would have been locked out on day fifteen by a
+   * rule written for anonymous sign-ups. An operator who wants a dated plan
+   * sets one from the ficha, with a written reason, and that is the only way
+   * this firm ever gets an expiry.
    *
    * Throws on a duplicate e-mail, leaving the firm row behind for a retry to
    * reuse — an empty firm is inert, an account pointing at nothing is not.
@@ -604,8 +630,8 @@ export const createFirm = async (input: {
   const creada = await crearFirmaConAdministrador({
     ...input,
     plan: 'PREMIUM',
-    period: 'PRUEBA',
-    diasDeVigencia: DIAS_DE_PRUEBA,
+    period: 'CORTESIA',
+    diasDeVigencia: null,
     maxUsers: PLANES.PREMIUM.maxUsuarios,
     siFallaLaCuenta: 'CONSERVAR_FIRMA'
   });
@@ -631,9 +657,9 @@ export const createFirm = async (input: {
     nombre: input.adminNombre ?? null,
     firma: creada.firmName,
     plan: 'PREMIUM',
-    periodo: 'PRUEBA',
+    periodo: 'CORTESIA',
     validoHasta: creada.validUntil,
-    diasDeVigencia: DIAS_DE_PRUEBA,
+    diasDeVigencia: null,
     maxUsuarios: PLANES.PREMIUM.maxUsuarios,
     saldoInicialCop: creada.credits
   });
@@ -649,7 +675,7 @@ export const createFirm = async (input: {
     nit: creada.nit,
     planTier: 'PRO_FIRM',
     plan: 'PREMIUM',
-    planPeriod: 'PRUEBA',
+    planPeriod: 'CORTESIA',
     planValidUntil: creada.validUntil,
     planMaxUsers: PLANES.PREMIUM.maxUsuarios,
     modulosDesactivados: [],

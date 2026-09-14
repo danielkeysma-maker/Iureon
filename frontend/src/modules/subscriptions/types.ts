@@ -87,6 +87,28 @@ export interface PlanDeFirma {
    * not used a trial anywhere. Decided by the server on every read.
    */
   pruebaDisponible: boolean;
+  /**
+   * Cuánto de la aplicación le queda a la firma. Opcional porque un servidor
+   * anterior no lo manda, y sin él no se bloquea nada.
+   */
+  acceso?: AccesoDeFirma;
+  /** Solo con PRUEBA_TERMINADA: lo que la pantalla de bloqueo afirma que sigue ahí. */
+  trabajoConservado?: TrabajoConservado | null;
+}
+
+/**
+ * Espejo de `accesoDeLaFirma` en `backend/src/modules/subscriptions/plan.catalog.ts`.
+ * PRUEBA_TERMINADA: la prueba gratuita terminó sin un solo pago y la firma
+ * perdió todo el acceso salvo contratar un plan.
+ */
+export type AccesoDeFirma = 'COMPLETO' | 'SOLO_LECTURA' | 'PRUEBA_TERMINADA';
+
+/** Cada número es `null` cuando el servidor no pudo contarlo: nunca se pinta como 0. */
+export interface TrabajoConservado {
+  expedientes: number | null;
+  borradores: number | null;
+  audiencias: number | null;
+  saldoCop: number | null;
 }
 
 export interface PlanDefinition {

@@ -83,10 +83,14 @@ export interface DatosDeFirmaCreada {
   firma: string;
   plan: Plan;
   periodo: PlanPeriod;
-  /** ISO completo: hasta cuándo quedó el plan, tal como se escribió en la fila. */
-  validoHasta: string;
-  /** Los días de vigencia con los que se calculó esa fecha. */
-  diasDeVigencia: number;
+  /**
+   * ISO completo: hasta cuándo quedó el plan, tal como se escribió en la fila.
+   * `null` cuando no se escribió fecha: la cortesía que la consola da desde el
+   * 14 de septiembre de 2026 no vence, y el correo no puede inventarle una.
+   */
+  validoHasta: string | null;
+  /** Los días de vigencia con los que se calculó esa fecha; `null` sin fecha. */
+  diasDeVigencia: number | null;
   /** El cupo de cuentas escrito en la firma. */
   maxUsuarios: number;
   /** Saldo acreditado al crearla, en pesos. Cero es lo normal. */
@@ -102,7 +106,7 @@ const NOMBRE_DE_PERIODO: Record<PlanPeriod, string> = {
 
 export const plantillaDeFirmaCreada = (d: DatosDeFirmaCreada): Plantilla => {
   const def = PLANES[d.plan];
-  const vence = fechaLarga(d.validoHasta);
+  const vence = d.validoHasta ? fechaLarga(d.validoHasta) : null;
   const cupo = usuariosDe(d.maxUsuarios);
   const asunto = `Su firma ya está creada en Iureon · ${d.firma}`;
   const tratamiento = d.nombre?.trim() ? `${d.nombre.trim()}: el` : 'El';
@@ -113,10 +117,17 @@ export const plantillaDeFirmaCreada = (d: DatosDeFirmaCreada): Plantilla => {
    * tiene fecha que enseñar, y fingir una sería el defecto que este encargo
    * viene a corregir.
    */
+  /*
+   * SIN FECHA NO HAY «VIGENTE HASTA». Una cortesía sin vencimiento se dice
+   * como lo que es; antes esta rama imprimía la fecha de `validoHasta` sin
+   * mirar si existía, y con `null` habría salido una fecha inventada.
+   */
   const protagonista =
-    d.periodo === 'PRUEBA' && d.diasDeVigencia > 0
+    d.periodo === 'PRUEBA' && d.diasDeVigencia !== null && d.diasDeVigencia > 0 && vence
       ? dato('PRUEBA INCLUIDA', `${d.diasDeVigencia} días`, `Plan ${def.nombre} · ${cupo} · hasta el ${vence}`)
-      : dato('PLAN VIGENTE HASTA', fechaCorta(d.validoHasta), `Plan ${def.nombre} · ${cupo} · ${NOMBRE_DE_PERIODO[d.periodo]}`);
+      : d.validoHasta
+        ? dato('PLAN VIGENTE HASTA', fechaCorta(d.validoHasta), `Plan ${def.nombre} · ${cupo} · ${NOMBRE_DE_PERIODO[d.periodo]}`)
+        : dato('SIN VENCIMIENTO', `Plan ${def.nombre}`, `${cupo} · ${NOMBRE_DE_PERIODO[d.periodo]} sin fecha de vencimiento`);
 
   const { html, texto } = documento({
     titulo: 'Su firma ya está creada en Iureon',
@@ -138,7 +149,7 @@ export const plantillaDeFirmaCreada = (d: DatosDeFirmaCreada): Plantilla => {
         ['Correo de acceso', d.para],
         ['Plan', `${def.nombre} · ${NOMBRE_DE_PERIODO[d.periodo]}`],
         ['Cuentas incluidas', cupo],
-        ['Vigente hasta', vence],
+        vence ? (['Vigente hasta', vence] as const) : (['Vencimiento', 'Sin fecha de vencimiento'] as const),
         ...(d.saldoInicialCop > 0
           ? ([['Saldo inicial acreditado', pesos(d.saldoInicialCop)]] as ReadonlyArray<readonly [string, string]>)
           : [])

@@ -11,6 +11,7 @@ import { healthRoutes } from './modules/health/health.routes';
 import { agentRoutes } from './modules/agent/agent.routes';
 import { documentRoutes } from './modules/documents/document.routes';
 import { subscriptionRoutes } from './modules/subscriptions/subscription.routes';
+import { bloquearPruebaTerminada } from './modules/subscriptions/pruebaTerminada.middleware';
 import { ingestionRoutes } from './modules/ingestion/ingestion.routes';
 import { proceduralTermsRoutes } from './modules/procedural-terms/terms.routes';
 import { settlementRoutes } from './modules/settlements/settlement.routes';
@@ -123,6 +124,12 @@ app.use('/api', trialPublicRoutes);
  * reads that same claim.
  */
 app.use('/api', authMiddleware);
+/*
+ * JUSTO DESPUÉS DE LA SESIÓN Y ANTES DE CUALQUIER RUTA: una prueba gratuita
+ * que terminó sin pagar no llega a ningún router salvo los tres que su lista
+ * abre. Ver `pruebaTerminada.middleware.ts`.
+ */
+app.use('/api', bloquearPruebaTerminada);
 
 // Carga Modular de Rutas de la API
 app.use('/api', authRoutes);

@@ -62,6 +62,21 @@ export const setSessionLostHandler = (handler: (() => void) | null): void => {
 };
 
 /**
+ * Called when ANY call answers 403 `PRUEBA_TERMINADA`. The free trial can end
+ * in the middle of a session, and from that moment the server closes every
+ * route but three; without this the app would keep painting a workspace whose
+ * every button fails. The shell swaps itself for the block screen instead.
+ */
+let onPruebaTerminada: (() => void) | null = null;
+export const setPruebaTerminadaHandler = (handler: (() => void) | null): void => {
+  onPruebaTerminada = handler;
+};
+
+const avisarSiPruebaTerminada = (status: number, codigo: unknown): void => {
+  if (status === 403 && codigo === 'PRUEBA_TERMINADA') onPruebaTerminada?.();
+};
+
+/**
  * The access token to send, renewed BEFORE it expires rather than after a
  * failure.
  *
@@ -182,6 +197,7 @@ const unaVez = async <T>(
     // The API explains rejections in Spanish for the lawyer — a curation form
     // needs to say "falta la fuente normativa", not "failed with 400".
     const payload = await response.json().catch(() => null);
+    avisarSiPruebaTerminada(response.status, payload?.error);
     throw new ApiError(
       payload?.message || `${method} ${path} failed with ${response.status}`,
       response.status,
@@ -242,6 +258,7 @@ const postForm = async <T>(
       onSessionLost?.();
     }
 
+    avisarSiPruebaTerminada(response.status, payload?.error);
     // The API explains upload failures in Spanish for the lawyer; keep that
     // message rather than replacing it with a status code.
     throw new ApiError(

@@ -12,10 +12,12 @@
 export type Plan = 'ESENCIAL' | 'PREMIUM' | 'FIRMA';
 
 /**
- * MENSUAL and ANUAL are bought. PRUEBA is what a firm the operator onboards
- * starts with (14 days). CORTESIA has no expiry and no module restriction: it
- * is the state every firm that existed before the migration is in, so nobody
- * lost service the morning it ran.
+ * MENSUAL and ANUAL are bought. PRUEBA is the self-service free trial opened
+ * from the public form (`trial.rules.ts`, DIAS_DE_PRUEBA_GRATUITA). CORTESIA
+ * has no expiry and no module restriction: it is the state every firm that
+ * existed before the migration is in, so nobody lost service the morning it
+ * ran — and, since 2026-09-14, the state of every firm the operator creates
+ * from the console (see `createFirm`).
  */
 export type PlanPeriod = 'MENSUAL' | 'ANUAL' | 'PRUEBA' | 'CORTESIA';
 
@@ -118,9 +120,6 @@ export const esPeriodo = (valor: unknown): valor is PlanPeriod =>
 
 export const precioDe = (plan: Plan, period: PaidPeriod): number =>
   period === 'ANUAL' ? PLANES[plan].precioAnualCop : PLANES[plan].precioMensualCop;
-
-/** Days a new firm gets before it has to pay. */
-export const DIAS_DE_PRUEBA = 14;
 
 /** Days before expiry at which the app starts warning the partners. */
 export const DIAS_DE_AVISO = 7;
@@ -445,6 +444,41 @@ export const esVigente = (estado: EstadoDelPlan): boolean => estado !== 'VENCIDO
 /** Whether paid operations must be refused. Only an expired dated plan blocks. */
 export const planBloquea = (row: PlanRow, ahora: Date): boolean =>
   !esVigente(estadoDelPlan(row, ahora));
+
+/**
+ * CUÁNTO DE LA APLICACIÓN LE QUEDA A UNA FIRMA. Decisión del titular del
+ * 14 de septiembre de 2026, y cada caso lleva sus palabras:
+ *
+ * - PRUEBA_TERMINADA — «UNA PRUEBA GRATUITA QUE TERMINÓ Y NUNCA PAGÓ PIERDE
+ *   TODO EL ACCESO. Sin solo lectura y sin gracia.» Es la firma en periodo
+ *   PRUEBA, con el plan VENCIDO y SIN UN SOLO PAGO APROBADO. Conserva la
+ *   sesión, puede leer su plan y comprar uno; nada más. Sus datos NO se
+ *   borran: pagar le devuelve el acceso.
+ * - SOLO_LECTURA — «LA FIRMA QUE PAGÓ ALGUNA VEZ Y SE VENCIÓ conserva la
+ *   gracia de solo lectura, sin límite de días.» Y también la firma que se
+ *   registró para COMPRAR y aún no paga (MENSUAL o ANUAL nacido vencido): «no
+ *   es una prueba», necesita leer para poder pagar. Es cualquier VENCIDO que
+ *   no sea el caso anterior; `bloquearSiPlanVencido` lo sigue aplicando ruta
+ *   por ruta.
+ * - COMPLETO — todo lo demás: plan vigente, por vencer, prueba en curso,
+ *   cortesía sin fecha.
+ *
+ * `pagoAlgunaVez === null` SIGNIFICA «NO SE PUDO SABER», Y NUNCA BLOQUEA. Una
+ * caída de la base al consultar los pagos no puede dejar por fuera a un
+ * cliente que sí pagó: se trata como si hubiera pagado. Es la misma doctrina
+ * de `planVigente.middleware.ts` — un apagón nunca se vuelve un bloqueo.
+ */
+export type AccesoDeFirma = 'COMPLETO' | 'SOLO_LECTURA' | 'PRUEBA_TERMINADA';
+
+/** Solo la prueba vencida necesita saber si hubo pagos; las demás filas no pagan esa consulta. */
+export const necesitaConsultarPagos = (row: PlanRow, ahora: Date): boolean =>
+  row.period === 'PRUEBA' && estadoDelPlan(row, ahora) === 'VENCIDO';
+
+export const accesoDeLaFirma = (row: PlanRow, pagoAlgunaVez: boolean | null, ahora: Date): AccesoDeFirma => {
+  if (estadoDelPlan(row, ahora) !== 'VENCIDO') return 'COMPLETO';
+  if (row.period === 'PRUEBA' && pagoAlgunaVez === false) return 'PRUEBA_TERMINADA';
+  return 'SOLO_LECTURA';
+};
 
 /**
  * Whether one more account fits. A NULL cap (cortesía) never refuses; the

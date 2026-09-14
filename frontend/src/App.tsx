@@ -64,6 +64,9 @@ import { PlanVencidoBar } from './modules/subscriptions/components/PlanVencidoBa
 import { ModuloBloqueado } from './modules/subscriptions/components/ModuloBloqueado';
 import { PlanProvider } from './modules/subscriptions/PlanContext';
 import { subscriptionApi } from './modules/subscriptions/subscription.api';
+import { setPruebaTerminadaHandler } from './config/httpClient';
+import { PruebaTerminadaView } from './modules/subscriptions/components/PruebaTerminadaView';
+import type { TrabajoConservado } from './modules/subscriptions/types';
 import type { Plan, PlanDeFirma } from './modules/subscriptions/types';
 import { DEFAULT_FIRM_BRANDING, DocumentExportService } from './modules/documents/services/documentExport.service';
 import type { FirmBrandingConfig } from './modules/documents/services/documentExport.service';
@@ -347,6 +350,43 @@ export function App() {
   };
 
   /*
+   * LA PRUEBA GRATUITA TERMINADA SIN PAGAR NO VE LA APLICACIÓN. Tres fuentes
+   * encienden la pantalla de bloqueo —`/auth/me`, el plan y cualquier 403
+   * `PRUEBA_TERMINADA`, porque la prueba puede vencer con la sesión abierta— y
+   * solo una la apaga: un plan leído del servidor que ya no lo dice (la firma
+   * pagó). Los números de la pantalla vienen del servidor, que es el único que
+   * la firma bloqueada todavía puede consultar.
+   */
+  const [pruebaTerminada, setPruebaTerminada] = useState(false);
+  const [trabajoConservado, setTrabajoConservado] = useState<TrabajoConservado | null>(null);
+  const releyendoPlanRef = useRef(false);
+
+  useEffect(() => {
+    setPruebaTerminadaHandler(() => {
+      setPruebaTerminada(true);
+      /* Muchas llamadas pueden rebotar a la vez al abrir: el plan se relee una sola. */
+      if (releyendoPlanRef.current) return;
+      releyendoPlanRef.current = true;
+      subscriptionApi
+        .plan()
+        .then(({ plan }) => setPlanDeFirma(plan))
+        .catch(() => {
+          /* Sin plan la pantalla sale sin números: nunca con un 0 inventado. */
+        })
+        .finally(() => {
+          releyendoPlanRef.current = false;
+        });
+    });
+    return () => setPruebaTerminadaHandler(null);
+  }, []);
+
+  useEffect(() => {
+    if (session) return;
+    setPruebaTerminada(false);
+    setTrabajoConservado(null);
+  }, [session]);
+
+  /*
    * The firm's registry row, and the way back to the login screen.
    *
    * A refresh token can be spent or revoked between visits, and the screens
@@ -372,9 +412,15 @@ export function App() {
       .get<{
         user?: { nombre?: string | null };
         firm: { id: string; name: string; nit: string; creditsBalance: number } | null;
+        acceso?: string;
+        trabajoConservado?: TrabajoConservado | null;
       }>('/api/auth/me')
-      .then(({ user, firm }) => {
+      .then(({ user, firm, acceso, trabajoConservado: trabajo }) => {
         if (cancelled) return;
+        if (acceso === 'PRUEBA_TERMINADA') {
+          setPruebaTerminada(true);
+          if (trabajo) setTrabajoConservado(trabajo);
+        }
         // El nombre viene del servidor, que es su única fuente. Si la cuenta no
         // tiene ninguno queda en '' y las pantallas lo tratan como hueco.
         setCurrentUserName(user?.nombre ?? '');
@@ -588,6 +634,13 @@ export function App() {
       cancelado = true;
     };
   }, [session]);
+
+  /* El plan leído —al entrar, al releerlo tras un 403 o desde la pantalla de planes— decide el bloqueo. */
+  useEffect(() => {
+    if (!planDeFirma?.acceso) return;
+    setPruebaTerminada(planDeFirma.acceso === 'PRUEBA_TERMINADA');
+    if (planDeFirma.trabajoConservado) setTrabajoConservado(planDeFirma.trabajoConservado);
+  }, [planDeFirma]);
 
   /*
    * Una vista guardada en la sesión que el plan ya no incluye (la pestaña
@@ -987,6 +1040,40 @@ export function App() {
     setSession(null);
     setActiveFirm(EMPTY_FIRM_PLACEHOLDER);
   };
+
+  /*
+   * EN LUGAR DE LA APLICACIÓN, NO ENCIMA. Con la prueba terminada el servidor
+   * cierra todo salvo leer el plan y pagar, así que pintar el espacio de trabajo
+   * detrás sería ofrecer botones que responden 403. Solo viajan la pantalla de
+   * bloqueo y la de planes, que es su salida y funciona con esas dos rutas.
+   */
+  if (pruebaTerminada) {
+    return (
+      <TenantProvider
+        activeFirm={activeFirm}
+        currentUserEmail={currentUserEmail}
+        currentUserName={currentUserName}
+        setCurrentUserName={setCurrentUserName}
+      >
+        <PruebaTerminadaView
+          trabajo={trabajoConservado}
+          puedePagar={Boolean(esSocio || esSuperusuario)}
+          onVerPlanes={abrirPlan}
+          onSalir={handleLogout}
+          nombreDeLaFirma={activeFirm.name}
+          esAdministrador={esSocio}
+          onEliminado={handleLogout}
+        />
+        <FirmSubscriptionModal
+          isOpen={isSubscriptionModalOpen}
+          onClose={() => setIsSubscriptionModalOpen(false)}
+          puedePagar={Boolean(esSocio || esSuperusuario)}
+          onPlanLeido={setPlanDeFirma}
+          planSugerido={planSugerido}
+        />
+      </TenantProvider>
+    );
+  }
 
   /*
    * The recharge modal is gone, and it had to be.

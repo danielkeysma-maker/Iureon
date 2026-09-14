@@ -21,7 +21,7 @@ import {
   validarSolicitud,
   vencimientoDePrueba
 } from '../trial.rules';
-import { DIAS_DE_PRUEBA, PLANES, estadoDelPlan } from '../../subscriptions/plan.catalog';
+import { PLANES, estadoDelPlan } from '../../subscriptions/plan.catalog';
 
 let fallos = 0;
 const check = (n: string, ok: boolean, d = ''): void => {
@@ -43,7 +43,8 @@ const valida = {
 
 // ─── Constantes ─────────────────────────────────────────────────────────────
 check('la prueba es de Esencial y solo de Esencial', PLAN_DE_PRUEBA === 'ESENCIAL');
-check('dura 7 días, no los 14 del alta por operador', DIAS_DE_PRUEBA_GRATUITA === 7 && DIAS_DE_PRUEBA === 14);
+/* El alta por operador ya no es una prueba de 14 días sino una cortesía sin fecha (2026-09-14); la constante se retiró. */
+check('dura 7 días', DIAS_DE_PRUEBA_GRATUITA === 7);
 check('un solo usuario, que es el tope de Esencial', USUARIOS_DE_PRUEBA === 1 && PLANES.ESENCIAL.maxUsuarios === 1);
 check('contraseña mínima de 10', MIN_CONTRASENA === 10);
 check('tres altas por dirección y día', MAX_PRUEBAS_POR_IP === 3);

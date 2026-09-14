@@ -1,6 +1,9 @@
 import { listarTodasLasCuentas } from '../auth/listarCuentas';
 import { supabase } from '../../config/supabase.config';
 import {
+  accesoDeLaFirma,
+  necesitaConsultarPagos,
+  type AccesoDeFirma,
   cabeOtroUsuario,
   cierreDeFuncion,
   diasRestantes,
@@ -89,6 +92,10 @@ export interface PlanDeFirma {
    * the screen derives that from `modulosPermitidos`.
    */
   funcionesDesactivadas: readonly Funcion[];
+  /** COMPLETO, SOLO_LECTURA o PRUEBA_TERMINADA: ver `accesoDeLaFirma`. */
+  acceso: AccesoDeFirma;
+  /** Lo que la pantalla de prueba terminada muestra; `null` con cualquier otro acceso. */
+  trabajoConservado: TrabajoConservado | null;
 }
 
 const requireDb = () => {
@@ -194,7 +201,126 @@ export const contarUsuarios = async (firmId: string): Promise<number> => {
   ).length;
 };
 
-export const describirPlan = (row: PlanRow, usuarios: number, ahora = new Date()): PlanDeFirma => ({
+/**
+ * SI LA FIRMA PAGÓ SU PLAN ALGUNA VEZ: `true`, `false`, o `null` si no se pudo
+ * saber.
+ *
+ * `subscription_payments` solo recibe pagos de plan que Wompi APROBÓ (la
+ * referencia es única), así que una fila basta para decir «pagó».
+ *
+ * NO SE REUSA `historialDePagos`, Y ES A PROPÓSITO. Aquel devuelve `[]` cuando
+ * la consulta falla —para la pantalla del historial eso es honesto—, y aquí
+ * `[]` se leería como «nunca pagó» y DEJARÍA POR FUERA A UNA FIRMA QUE SÍ PAGÓ
+ * el día que la base tropiece. Esta función distingue el error (`null`) del
+ * vacío (`false`), y `accesoDeLaFirma` trata `null` como pagado.
+ */
+export const firmaPagoAlgunaVez = async (firmId: string): Promise<boolean | null> => {
+  if (!supabase) return null;
+  try {
+    const { count, error } = await supabase
+      .from('subscription_payments')
+      .select('id', { count: 'exact', head: true })
+      .eq('firm_id', firmId);
+    if (error || typeof count !== 'number') {
+      console.error(
+        '[PLAN] No se pudo saber si la firma pagó alguna vez; se trata como pagada:',
+        error?.message ?? 'sin conteo'
+      );
+      return null;
+    }
+    return count > 0;
+  } catch (err) {
+    console.error(
+      '[PLAN] No se pudo saber si la firma pagó alguna vez; se trata como pagada:',
+      err instanceof Error ? err.message : err
+    );
+    return null;
+  }
+};
+
+/**
+ * Lo que la pantalla de bloqueo afirma: el trabajo sigue ahí y el saldo no se
+ * perdió. Se cuenta en el servidor porque la firma bloqueada no puede leer
+ * ninguna otra ruta. `null` en un conteo que falló, NUNCA 0: decirle a una
+ * firma que tiene «0 borradores» cuando no se pudo contar es afirmar que se
+ * borraron.
+ */
+export interface TrabajoConservado {
+  expedientes: number | null;
+  borradores: number | null;
+  audiencias: number | null;
+  saldoCop: number | null;
+}
+
+const contar = async (tabla: string, firmId: string, filtro?: [string, string]): Promise<number | null> => {
+  if (!supabase) return null;
+  try {
+    let consulta = supabase.from(tabla).select('id', { count: 'exact', head: true }).eq('firm_id', firmId);
+    if (filtro) consulta = consulta.eq(filtro[0], filtro[1]);
+    const { count, error } = await consulta;
+    if (error || typeof count !== 'number') {
+      console.error(`[PLAN] No se pudo contar ${tabla} para la pantalla de prueba terminada:`, error?.message ?? 'sin conteo');
+      return null;
+    }
+    return count;
+  } catch (err) {
+    console.error(`[PLAN] No se pudo contar ${tabla}:`, err instanceof Error ? err.message : err);
+    return null;
+  }
+};
+
+const leerSaldo = async (firmId: string): Promise<number | null> => {
+  if (!supabase) return null;
+  try {
+    const { data, error } = await supabase.from('firms').select('credit_balance_cop').eq('firm_id', firmId).maybeSingle();
+    if (error || !data) return null;
+    const saldo = Number((data as Record<string, unknown>).credit_balance_cop);
+    return Number.isFinite(saldo) ? saldo : null;
+  } catch {
+    return null;
+  }
+};
+
+export const trabajoConservado = async (firmId: string): Promise<TrabajoConservado> => {
+  const [expedientes, borradores, audiencias, saldoCop] = await Promise.all([
+    contar('expedientes', firmId),
+    contar('saved_drafts', firmId),
+    contar('transcriptions', firmId, ['kind', 'AUDIENCIA']),
+    leerSaldo(firmId)
+  ]);
+  return { expedientes, borradores, audiencias, saldoCop };
+};
+
+/**
+ * El acceso de la firma, con la consulta de pagos SOLO cuando la fila es una
+ * prueba vencida: una petición normal no paga esa consulta.
+ */
+export const accesoDeFirma = async (firmId: string, row?: PlanRow, ahora = new Date()): Promise<AccesoDeFirma> => {
+  const fila = row ?? (await leerPlan(firmId));
+  const pago = necesitaConsultarPagos(fila, ahora) ? await firmaPagoAlgunaVez(firmId) : null;
+  return accesoDeLaFirma(fila, pago, ahora);
+};
+
+export interface EstadoDeAcceso {
+  acceso: AccesoDeFirma;
+  /** Solo con PRUEBA_TERMINADA; `null` en cualquier otro acceso. */
+  trabajoConservado: TrabajoConservado | null;
+}
+
+export const estadoDeAcceso = async (firmId: string, row: PlanRow, ahora = new Date()): Promise<EstadoDeAcceso> => {
+  const acceso = await accesoDeFirma(firmId, row, ahora);
+  return {
+    acceso,
+    trabajoConservado: acceso === 'PRUEBA_TERMINADA' ? await trabajoConservado(firmId) : null
+  };
+};
+
+export const describirPlan = (
+  row: PlanRow,
+  usuarios: number,
+  estadoAcceso: EstadoDeAcceso,
+  ahora = new Date()
+): PlanDeFirma => ({
   plan: row.plan,
   period: row.period,
   validUntil: row.validUntil ? row.validUntil.toISOString() : null,
@@ -204,13 +330,15 @@ export const describirPlan = (row: PlanRow, usuarios: number, ahora = new Date()
   usuarios,
   modulosPermitidos: modulosDisponibles(row.plan, row.modulosDesactivados),
   modulosDesactivados: soloModulos(row.modulosDesactivados),
-  funcionesDesactivadas: soloFunciones(row.modulosDesactivados)
+  funcionesDesactivadas: soloFunciones(row.modulosDesactivados),
+  acceso: estadoAcceso.acceso,
+  trabajoConservado: estadoAcceso.trabajoConservado
 });
 
 /** The plan as the firm's own screen and the operator's ficha show it. */
 export const planDeFirma = async (firmId: string): Promise<PlanDeFirma> => {
   const [row, usuarios] = await Promise.all([leerPlan(firmId), contarUsuarios(firmId)]);
-  return describirPlan(row, usuarios);
+  return describirPlan(row, usuarios, await estadoDeAcceso(firmId, row));
 };
 
 const fechaLarga = (fecha: Date): string =>
