@@ -1,27 +1,34 @@
 import React from 'react';
-import { ArrowLeft, CheckCircle2, MessageSquare, RefreshCw, Send } from 'lucide-react';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
-import {
-  supportChatApi,
-  type ConversacionConFirma,
-  type Mensaje
-} from '../../support/supportChat.api';
+import { Dialog } from '../../../design/Dialog';
+import { supportChatApi, type ConversacionConFirma, type Mensaje } from '../../support/supportChat.api';
+import { esperanRespuesta } from '../consolaEnPantalla';
 
 /**
  * La bandeja de soporte del operador: todas las firmas, abiertas primero.
+ * Cara nueva: `public/handoff/app-consola-de-operacion.html`, artboard 5
+ * (primer diálogo: «Soporte · conversaciones de las firmas», «Tres esperan
+ * respuesta.», tarjetas por conversación —ámbar la que espera— con la firma, la
+ * hora y la última frase entre comillas, y el campo «Responder a la firma…»).
  *
  * ─── LO QUE EL OPERADOR VE Y LO QUE NO ──────────────────────────────────────
  *
  * Ve lo que la firma le ESCRIBIÓ, y nada más: el chat no da acceso al material
  * de la firma. Si para responder necesita ver un escrito, el camino sigue
- * siendo el acceso de soporte (8a), que pide un socio autorice. Aquí no hay
- * enlace a esa ficha a propósito, para que el atajo no exista.
+ * siendo pedir acceso desde la ficha. Aquí no hay enlace a esa ficha a
+ * propósito, para que el atajo no exista.
+ *
+ * ─── LO QUE EL ARTBOARD DICE Y AQUÍ NO SE DICE, con la razón ───────────────
+ *
+ * «La respuesta le llega a la firma por correo»: `supportChat.service` no
+ * importa ningún correo. Avisa con una notificación a los navegadores de la
+ * firma que la activaron (`enviarAFirma`), y la respuesta queda en su historial
+ * de soporte. La nota del pie dice eso.
  *
  * ─── CERRAR NO ES BLOQUEAR ──────────────────────────────────────────────────
  *
- * Cerrar dice «por ahora está resuelto» y saca el hilo de la parte alta de la
- * bandeja. Si la firma vuelve a escribir, el hilo se reabre solo. Por eso el
- * diálogo de confirmación lo dice así y el botón no es de peligro.
+ * Cerrar dice «por ahora está resuelto». Si la firma vuelve a escribir, el hilo
+ * se reabre solo. Por eso la confirmación lo dice así y el botón no es de peligro.
  *
  * Sondeo cada 30 segundos mientras la pestaña esté visible, como el resto.
  */
@@ -29,22 +36,22 @@ import {
 const CADA_MS = 30_000;
 
 const fechaCorta = (iso: string): string =>
-  new Date(iso).toLocaleString('es-CO', {
-    day: '2-digit',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
+  new Date(iso).toLocaleString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 
-const hora = (iso: string): string =>
-  new Date(iso).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+const hora = (iso: string): string => new Date(iso).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
 
 const mensajeDeError = (err: unknown, porDefecto: string): string =>
   err instanceof Error && err.message ? err.message : porDefecto;
 
-export const BandejaDeSoporte: React.FC = () => {
+interface BandejaDeSoporteProps {
+  onCerrar: () => void;
+  /** Cuántas esperan respuesta tras cada lectura; `null` si la bandeja no se pudo leer. */
+  onCambio?: (esperan: number | null) => void;
+}
+
+export const BandejaDeSoporte: React.FC<BandejaDeSoporteProps> = ({ onCerrar, onCambio }) => {
   const [conversaciones, setConversaciones] = React.useState<ConversacionConFirma[]>([]);
-  const [totales, setTotales] = React.useState({ abiertas: 0, sinLeer: 0 });
+  const [leida, setLeida] = React.useState(false);
   const [abierta, setAbierta] = React.useState<ConversacionConFirma | null>(null);
   const [mensajes, setMensajes] = React.useState<Mensaje[]>([]);
   const [cargando, setCargando] = React.useState(true);
@@ -55,15 +62,21 @@ export const BandejaDeSoporte: React.FC = () => {
 
   const finDelHilo = React.useRef<HTMLDivElement>(null);
   const hiloAbiertoRef = React.useRef<string | null>(null);
+  const alCambiarRef = React.useRef(onCambio);
+  React.useEffect(() => {
+    alCambiarRef.current = onCambio;
+  });
 
   const cargarBandeja = React.useCallback(async () => {
     try {
       const r = await supportChatApi.bandeja();
       setConversaciones(r.conversaciones);
-      setTotales(r.totales);
+      setLeida(true);
       setError('');
+      alCambiarRef.current?.(esperanRespuesta(r.conversaciones));
     } catch (err) {
-      setError(mensajeDeError(err, 'No se pudo cargar la bandeja de soporte.'));
+      setError(mensajeDeError(err, 'No se pudo leer la bandeja de soporte.'));
+      alCambiarRef.current?.(null);
     } finally {
       setCargando(false);
     }
@@ -111,10 +124,7 @@ export const BandejaDeSoporte: React.FC = () => {
     setTexto('');
     await cargarHilo(c.id);
     // El servidor puso el contador a cero al abrir; la bandeja lo refleja sin otra lectura.
-    setConversaciones((lista) =>
-      lista.map((x) => (x.id === c.id ? { ...x, unreadForOperator: 0 } : x))
-    );
-    setTotales((t) => ({ ...t, sinLeer: Math.max(0, t.sinLeer - c.unreadForOperator) }));
+    setConversaciones((lista) => lista.map((x) => (x.id === c.id ? { ...x, unreadForOperator: 0 } : x)));
   };
 
   const volver = () => {
@@ -147,13 +157,12 @@ export const BandejaDeSoporte: React.FC = () => {
     setConfirmacion({
       titulo: 'Cerrar la conversación',
       texto: (
-        <>
-          «{hilo.subject}» de <b>{hilo.firmName}</b> pasa a cerrada y sale de la parte alta de la
-          bandeja. La firma sigue viéndola, y si vuelve a escribir se reabre sola. Queda en su
-          auditoría con su correo.
-        </>
+        <p className="cn-ope-texto">
+          «{hilo.subject}» de <strong>{hilo.firmName}</strong> pasa a cerrada y sale de la parte alta de la bandeja. La firma sigue
+          viéndola, y si vuelve a escribir se reabre sola. Queda en su auditoría con su correo.
+        </p>
       ),
-      etiqueta: 'Cerrar conversación',
+      etiqueta: 'Cerrar la conversación',
       onConfirmar: async () => {
         const cerrada = await supportChatApi.cerrar(hilo.id);
         setAbierta({ ...cerrada, firmName: hilo.firmName });
@@ -162,184 +171,152 @@ export const BandejaDeSoporte: React.FC = () => {
     });
   };
 
-  // ─── El hilo ───────────────────────────────────────────────────────────────
-  if (abierta) {
-    return (
-      <section className="flex min-h-[420px] flex-col rounded-card border border-line-200 bg-surface">
-        <header className="flex items-center gap-2.5 border-b border-line-100 px-4 py-3">
-          <button type="button" onClick={volver} className="btn-ghost btn-sm" title="Volver a la bandeja">
-            <ArrowLeft size={14} strokeWidth={2.2} />
-            Bandeja
-          </button>
-          <div className="min-w-0 flex-1">
-            <h3 className="truncate text-subtitle text-ink-900">{abierta.subject}</h3>
-            <p className="truncate font-mono text-[10px] text-ink-400">
-              {abierta.firmName} · abrió {abierta.openedByEmail} · {fechaCorta(abierta.createdAt)}
-            </p>
-          </div>
-          <span className={abierta.status === 'ABIERTA' ? 'chip-curated' : 'chip-neutral'}>
-            {abierta.status === 'ABIERTA' ? 'Abierta' : 'Cerrada'}
-          </span>
-          {abierta.status === 'ABIERTA' && (
-            <button type="button" onClick={pedirCierre} className="btn-secondary btn-sm">
-              <CheckCircle2 className="h-3.5 w-3.5" />
-              Cerrar conversación
-            </button>
-          )}
-        </header>
+  const esperan = leida ? esperanRespuesta(conversaciones) : null;
+  const subtitulo =
+    esperan === null
+      ? cargando
+        ? 'Leyendo la bandeja…'
+        : 'La bandeja no se pudo leer.'
+      : esperan === 0
+        ? 'Ninguna espera respuesta.'
+        : `${esperan} ${esperan === 1 ? 'espera' : 'esperan'} respuesta.`;
 
-        <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-3">
-          {mensajes.map((m) => {
-            const mio = m.authorSide === 'OPERADOR';
-            return (
-              <div key={m.id} className={`max-w-[88%] ${mio ? 'ml-auto' : ''}`}>
-                <div
-                  className={`rounded-card px-3 py-2 text-[13px] leading-relaxed ${
-                    mio ? 'bg-brand-700 text-white' : 'border border-line-200 bg-canvas text-ink-900'
-                  }`}
-                >
-                  <p className="whitespace-pre-wrap [overflow-wrap:anywhere]">{m.body}</p>
-                </div>
-                <p className={`mt-0.5 font-mono text-[10px] text-ink-400 [overflow-wrap:anywhere] ${mio ? 'text-right' : ''}`}>
-                  {mio ? 'Usted (soporte)' : m.authorEmail} · {hora(m.createdAt)}
-                </p>
-              </div>
-            );
-          })}
-          {abierta.status === 'CERRADA' && (
-            <p className="text-center font-mono text-[10.5px] text-ink-400">
-              Cerrada{abierta.closedByEmail ? ` por ${abierta.closedByEmail}` : ''}
-              {abierta.closedAt ? ` · ${fechaCorta(abierta.closedAt)}` : ''}. Si la firma escribe, se
-              reabre.
-            </p>
-          )}
-          <div ref={finDelHilo} />
-        </div>
-
-        {error && <p className="px-4 pb-1 text-meta text-danger">{error}</p>}
-
-        {abierta.status === 'ABIERTA' && (
-          <div className="border-t border-line-100 p-3">
-            <div className="flex items-end gap-2">
-              <textarea
-                value={texto}
-                onChange={(e) => setTexto(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    void responder();
-                  }
-                }}
-                rows={2}
-                maxLength={4000}
-                placeholder="Responder a la firma… (Enter envía, Shift+Enter salta de línea)"
-                disabled={enviando}
-                className="field-area min-h-[44px] flex-1 resize-none"
-              />
-              <button
-                type="button"
-                onClick={() => void responder()}
-                disabled={!texto.trim() || enviando}
-                className="btn-primary btn-sm h-[44px] disabled:opacity-50"
-              >
-                <Send className="h-3.5 w-3.5" />
-                Responder
-              </button>
-            </div>
-          </div>
+  return (
+    <Dialog abierto onCerrar={onCerrar} titulo="Soporte · conversaciones de las firmas" subtitulo={subtitulo} tamano="L">
+      <div className="cn-ope-cuerpo cn-ope-soporte">
+        {error && (
+          <p role="alert" className="cn-ope-error">
+            {error}
+          </p>
         )}
 
-        <ConfirmarDialog confirmacion={confirmacion} onCerrar={() => setConfirmacion(null)} />
-      </section>
-    );
-  }
-
-  // ─── La bandeja ────────────────────────────────────────────────────────────
-  return (
-    <section className="rounded-card border border-line-200 bg-surface">
-      <header className="flex items-center justify-between gap-3 px-4 py-3">
-        <div className="flex items-center gap-2">
-          <MessageSquare className="h-4 w-4 text-brand-700" />
-          <div>
-            <h3 className="text-xs font-bold text-ink-900">Soporte · conversaciones de las firmas</h3>
-            <p className="text-[11px] text-ink-500">
-              {totales.abiertas} {totales.abiertas === 1 ? 'abierta' : 'abiertas'} ·{' '}
-              <span className={totales.sinLeer > 0 ? 'font-semibold text-unverified' : ''}>
-                {totales.sinLeer} sin leer
+        {abierta ? (
+          <section className="cn-ope-hilo" aria-labelledby="ope-hilo-asunto">
+            <div className="cn-ope-hilo-cabeza">
+              <button type="button" className="cn-ope-volver" onClick={volver}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
+                Bandeja
+              </button>
+              <div className="cn-ope-hilo-titulo">
+                <h3 id="ope-hilo-asunto" className="cn-ope-subtitulo">
+                  {abierta.subject}
+                </h3>
+                <p className="cn-ope-secundario">
+                  {abierta.firmName} · abrió {abierta.openedByEmail} · {fechaCorta(abierta.createdAt)}
+                </p>
+              </div>
+              <span className={`cn-ope-estado ${abierta.status === 'ABIERTA' ? 'cn-ope-estado--marca' : 'cn-ope-estado--neutro'}`}>
+                {abierta.status === 'ABIERTA' ? 'Abierta' : 'Cerrada'}
               </span>
-            </p>
-          </div>
-        </div>
-        <button
-          type="button"
-          onClick={() => void cargarBandeja()}
-          className="flex items-center gap-1.5 rounded-control border border-line-200 bg-canvas px-3 py-1.5 text-[11px] font-semibold text-ink-700 hover:bg-line-100"
-        >
-          <RefreshCw className={`h-3.5 w-3.5 ${cargando ? 'animate-spin' : ''}`} />
-          Actualizar
-        </button>
-      </header>
+              {abierta.status === 'ABIERTA' && (
+                <button type="button" onClick={pedirCierre} className="cn-ope-boton cn-ope-boton--suave">
+                  Cerrar la conversación
+                </button>
+              )}
+            </div>
 
-      {error && <p className="px-4 pb-2 text-[11px] text-danger">{error}</p>}
+            <div className="cn-ope-mensajes">
+              {mensajes.map((m) => {
+                const mio = m.authorSide === 'OPERADOR';
+                return (
+                  <div key={m.id} className={`cn-ope-mensaje ${mio ? 'cn-ope-mensaje--mio' : ''}`}>
+                    <p className="cn-ope-mensaje-cuerpo">{m.body}</p>
+                    <p className="cn-ope-mensaje-pie">
+                      {mio ? 'Usted (soporte)' : m.authorEmail} · {hora(m.createdAt)}
+                    </p>
+                  </div>
+                );
+              })}
+              {abierta.status === 'CERRADA' && (
+                <p className="cn-ope-texto cn-ope-texto--centro">
+                  Cerrada{abierta.closedByEmail ? ` por ${abierta.closedByEmail}` : ''}
+                  {abierta.closedAt ? ` · ${fechaCorta(abierta.closedAt)}` : ''}. Si la firma escribe, se reabre.
+                </p>
+              )}
+              <div ref={finDelHilo} />
+            </div>
 
-      {cargando && conversaciones.length === 0 ? (
-        <p className="px-4 pb-4 text-[11px] text-ink-500">Cargando conversaciones…</p>
-      ) : conversaciones.length === 0 ? (
-        <p className="px-4 pb-4 text-[11px] text-ink-500">
-          Ninguna firma ha escrito a soporte desde la aplicación.
-        </p>
-      ) : (
-        <div className="overflow-x-auto border-t border-line-100">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="t-head">
-                <th className="px-4 py-2">Firma</th>
-                <th className="px-2 py-2">Asunto</th>
-                <th className="px-2 py-2">Último mensaje</th>
-                <th className="px-2 py-2">Fecha</th>
-                <th className="px-4 py-2 text-right">Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              {conversaciones.map((c) => (
-                <tr
-                  key={c.id}
-                  onClick={() => void abrirHilo(c)}
-                  className="t-row cursor-pointer hover:bg-canvas"
+            {abierta.status === 'ABIERTA' && (
+              <div className="cn-ope-responder">
+                <label htmlFor="ope-respuesta" className="cn-ope-solo-lector">
+                  Responder a la firma
+                </label>
+                <textarea
+                  id="ope-respuesta"
+                  value={texto}
+                  onChange={(e) => setTexto(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      void responder();
+                    }
+                  }}
+                  rows={2}
+                  maxLength={4000}
+                  placeholder="Responder a la firma… (Enter envía, Shift+Enter salta de línea)"
+                  disabled={enviando}
+                  className="cn-ope-campo cn-ope-area"
+                />
+                <button
+                  type="button"
+                  onClick={() => void responder()}
+                  disabled={!texto.trim() || enviando}
+                  className="cn-ope-boton cn-ope-boton--primario"
                 >
-                  <td className="max-w-[180px] truncate px-4 py-2 text-[12px] font-semibold text-ink-900">
-                    {c.firmName}
-                  </td>
-                  <td className="max-w-[260px] px-2 py-2">
-                    <span className="flex items-center gap-2">
-                      <span className={`truncate text-[12px] text-ink-900 ${c.unreadForOperator > 0 ? 'font-semibold' : ''}`}>
-                        {c.subject}
-                      </span>
+                  {enviando ? 'Enviando…' : 'Responder'}
+                </button>
+              </div>
+            )}
+          </section>
+        ) : cargando && !leida ? (
+          <p className="cn-ope-vacio">Leyendo las conversaciones…</p>
+        ) : leida && conversaciones.length === 0 ? (
+          <p className="cn-ope-vacio">Ninguna firma ha escrito a soporte desde la aplicación.</p>
+        ) : (
+          <ul className="cn-ope-conversaciones">
+            {conversaciones.map((c) => {
+              const espera = c.status === 'ABIERTA' && c.lastAuthor === 'FIRMA';
+              return (
+                <li key={c.id}>
+                  <button
+                    type="button"
+                    onClick={() => void abrirHilo(c)}
+                    className={`cn-ope-conversacion ${espera ? 'cn-ope-conversacion--espera' : ''}`}
+                  >
+                    <span className="cn-ope-conversacion-cabeza">
+                      <span className="cn-ope-principal">{c.firmName}</span>
+                      <span className="cn-ope-conversacion-hora">{fechaCorta(c.lastMessageAt ?? c.updatedAt)}</span>
+                    </span>
+                    <span className="cn-ope-conversacion-asunto">
+                      {c.subject}
                       {c.unreadForOperator > 0 && (
-                        <span className="shrink-0 rounded-full bg-brand-700 px-1.5 font-mono text-[10px] font-semibold text-white">
+                        <span className="cn-ope-contador" aria-label={`${c.unreadForOperator} sin leer`}>
                           {c.unreadForOperator}
                         </span>
                       )}
+                      {c.status === 'CERRADA' && <span className="cn-ope-estado cn-ope-estado--neutro">Cerrada</span>}
                     </span>
-                  </td>
-                  <td className="max-w-[320px] truncate px-2 py-2 text-[11.5px] text-ink-500">
-                    {c.lastAuthor === 'OPERADOR' ? 'Usted: ' : c.lastAuthor === 'FIRMA' ? 'Firma: ' : ''}
-                    {c.lastMessagePreview ?? '—'}
-                  </td>
-                  <td className="whitespace-nowrap px-2 py-2 font-mono text-[10.5px] text-ink-400">
-                    {fechaCorta(c.lastMessageAt ?? c.updatedAt)}
-                  </td>
-                  <td className="px-4 py-2 text-right">
-                    <span className={c.status === 'ABIERTA' ? 'chip-curated' : 'chip-neutral'}>
-                      {c.status === 'ABIERTA' ? 'Abierta' : 'Cerrada'}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </section>
+                    {c.lastMessagePreview && (
+                      <span className="cn-ope-conversacion-texto">
+                        {c.lastAuthor === 'OPERADOR' ? 'Usted: ' : ''}«{c.lastMessagePreview}»
+                      </span>
+                    )}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+
+        <p className="cn-ope-recuadro">
+          La respuesta queda en el historial de soporte de la firma y le llega como aviso a los navegadores de la firma que
+          activaron las notificaciones. No sale por correo.
+        </p>
+
+        <ConfirmarDialog confirmacion={confirmacion} onCerrar={() => setConfirmacion(null)} />
+      </div>
+    </Dialog>
   );
 };

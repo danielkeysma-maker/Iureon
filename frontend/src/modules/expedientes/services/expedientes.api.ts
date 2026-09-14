@@ -94,7 +94,17 @@ export const expedientesApi = {
         pestanas: r.pestanas,
         hoy: r.hoy ?? '',
         avisoTerminos: r.avisoTerminos ?? null,
-        avisoDocumentos: r.avisoDocumentos ?? null
+        avisoDocumentos: r.avisoDocumentos ?? null,
+        /*
+         * Un servidor anterior a los datos de búsqueda no trae personas ni
+         * documentos: se dice, en vez de dejar que una búsqueda por cédula
+         * vuelva vacía como si ningún caso la tuviera.
+         */
+        avisoBusqueda:
+          r.avisoBusqueda ??
+          (r.expedientes.some((e) => e.personas === undefined)
+            ? 'El servidor todavía no entrega las personas ni los documentos de cada caso: la búsqueda por cédula o por persona no los encuentra.'
+            : null)
       };
     }
     const expedientes = (r.expedientes ?? []).map((e) => ({

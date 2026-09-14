@@ -18,6 +18,8 @@ import {
   resumenDeCarpeta
 } from '../services/casoEnPantalla';
 import { ListaDeLaSemana, ListaPorCliente } from './CasosEnLaLista';
+import { FiltrosDeLaLista } from './FiltrosDeLaLista';
+import { buscarCasos, filtrarPorRegistro, filtrosEnPalabras, indexarCaso } from '../services/buscarCasos';
 import { ActoresDelExpediente } from './ActoresDelExpediente';
 import { PreguntasDelExpedientePanel } from './PreguntasDelExpedientePanel';
 import { TraerAlExpediente } from './TraerAlExpediente';
@@ -74,6 +76,14 @@ type VistaDelCaso = 'documentos' | 'personas';
 
 const NUEVO_VACIO = { caratula: '', radicado: '', despacho: '', contraparte: '' };
 
+/*
+ * LA BÚSQUEDA ES INMEDIATA HASTA 300 CASOS y espera 120 ms por encima: con mil
+ * casos cada tecla recalcularía la lista entera mientras se escribe una
+ * cédula de diez dígitos. Enter no espera: busca con lo escrito.
+ */
+const CASOS_SIN_ESPERA = 300;
+const ESPERA_DE_BUSQUEDA_MS = 120;
+
 export const ExpedientesView: React.FC<{
   /** Abre la agenda de términos. La conecta `App.tsx`; sin ella el aviso no ofrece botón. */
   onIrAAgenda?: () => void;
@@ -82,6 +92,13 @@ export const ExpedientesView: React.FC<{
   const [pestana, setPestana] = React.useState<Pestana | null>(null);
   /* La búsqueda sobrevive al cambio de pestaña: se busca un cliente, no una pestaña. */
   const [busqueda, setBusqueda] = React.useState('');
+  const [busquedaAplicada, setBusquedaAplicada] = React.useState('');
+  /*
+   * AÑO Y MES DE REGISTRO: como la búsqueda, sobreviven al cambio de pestaña y
+   * no se guardan en el navegador. Al recargar se ve todo otra vez.
+   */
+  const [anio, setAnio] = React.useState<number | null>(null);
+  const [mes, setMes] = React.useState<number | null>(null);
   const [abierto, setAbierto] = React.useState<ExpedienteConDetalle | null>(null);
   const [abriendo, setAbriendo] = React.useState<string | null>(null);
   const [vista, setVista] = React.useState<VistaDelCaso>('documentos');
@@ -133,6 +150,22 @@ export const ExpedientesView: React.FC<{
   React.useEffect(() => {
     void cargar();
   }, [cargar]);
+
+  /*
+   * EL ÍNDICE DE BÚSQUEDA SE CALCULA UNA VEZ POR RESPUESTA DEL SERVIDOR: nombres
+   * sin tildes, documentos en dígitos, segmentos del radicado y mes de registro
+   * en Bogotá. Cada tecla solo compara.
+   */
+  const indices = React.useMemo(() => (misCasos?.expedientes ?? []).map(indexarCaso), [misCasos]);
+
+  React.useEffect(() => {
+    if (indices.length <= CASOS_SIN_ESPERA) {
+      setBusquedaAplicada(busqueda);
+      return;
+    }
+    const espera = window.setTimeout(() => setBusquedaAplicada(busqueda), ESPERA_DE_BUSQUEDA_MS);
+    return () => window.clearTimeout(espera);
+  }, [busqueda, indices.length]);
 
   const abrir = async (id: string): Promise<void> => {
     setError('');
@@ -584,13 +617,26 @@ export const ExpedientesView: React.FC<{
 
   // ─── LISTA ────────────────────────────────────────────────────────────────
 
-  const porId = new Map((misCasos?.expedientes ?? []).map((e) => [e.id, e]));
+  const porId = new Map(indices.map((x) => [x.caso.id, x]));
   const idsDe = (p: Pestana): string[] | null => (misCasos ? misCasos.pestanas[p] : []);
-  const casosDe = (p: Pestana): ExpedienteEnLista[] =>
-    (idsDe(p) ?? []).map((id) => porId.get(id)).filter((e): e is ExpedienteEnLista => Boolean(e));
   const pestanaActual: Pestana = pestana ?? 'activos';
-  const casos = casosDe(pestanaActual);
+  const indicesDeLaPestana = (idsDe(pestanaActual) ?? [])
+    .map((id) => porId.get(id))
+    .filter((x): x is (typeof indices)[number] => Boolean(x));
+  const casos: ExpedienteEnLista[] = indicesDeLaPestana.map((x) => x.caso);
   const total = misCasos?.expedientes.length ?? 0;
+
+  /* Pestaña, luego año y mes, luego el texto: los tres se combinan. */
+  const resultadosPara = (texto: string) => buscarCasos(filtrarPorRegistro(indicesDeLaPestana, { anio, mes }), texto);
+  const resultados = resultadosPara(busquedaAplicada);
+  const filtros = filtrosEnPalabras({ busqueda: busquedaAplicada, anio, mes });
+  const hayFiltros = busqueda.trim() !== '' || anio !== null;
+  const limpiarFiltros = (): void => {
+    setBusqueda('');
+    setBusquedaAplicada('');
+    setAnio(null);
+    setMes(null);
+  };
 
   const PESTANAS: { id: Pestana; nombre: string }[] = [
     { id: 'estaSemana', nombre: 'Esta semana' },
@@ -649,17 +695,54 @@ export const ExpedientesView: React.FC<{
               className="cn-exp-entrada cn-exp-entrada--con-icono"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              placeholder="Buscar cliente o radicado"
-              aria-label="Buscar por cliente, nombre del caso, radicado o despacho"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  /* Con lo escrito, sin esperar: quien pulsa Enter ya terminó de teclear. */
+                  const encontrados = busqueda.trim() ? resultadosPara(busqueda) : [];
+                  if (encontrados.length === 1) void abrir(encontrados[0].caso.id);
+                } else if (e.key === 'Escape') {
+                  e.preventDefault();
+                  setBusqueda('');
+                  setBusquedaAplicada('');
+                }
+              }}
+              placeholder="Nombre, cédula o radicado"
+              aria-label="Buscar por nombre, cédula o NIT, o radicado. Enter abre el caso si queda uno solo; Escape borra."
             />
           </div>
         )}
       </div>
 
+      {total > 0 && (
+        <div className="cn-exp-lista-filtros">
+          <FiltrosDeLaLista
+            indices={indices}
+            anio={anio}
+            mes={mes}
+            onCambiar={(a, m) => {
+              setAnio(a);
+              setMes(m);
+            }}
+          />
+          {hayFiltros && (
+            <>
+              <span className="cn-exp-lista-cuenta" role="status">
+                {resultados.length.toLocaleString('es-CO')} de {casos.length.toLocaleString('es-CO')} en esta pestaña
+              </span>
+              <button type="button" className="cn-ini-boton cn-ini-boton--texto cn-exp-boton" onClick={limpiarFiltros}>
+                Limpiar filtros
+              </button>
+            </>
+          )}
+        </div>
+      )}
+
       <div className="cn-exp-cuerpo">
         {aviso && <p className="cn-exp-nota cn-exp-nota--caja [overflow-wrap:anywhere]">{aviso}</p>}
         {errorEnPantalla}
         {misCasos?.avisoDocumentos && <p className="cn-exp-nota">{misCasos.avisoDocumentos}</p>}
+        {misCasos?.avisoBusqueda && <p className="cn-exp-nota">{misCasos.avisoBusqueda}</p>}
 
         {cargando && !misCasos ? (
           <p className="cn-exp-cargando">
@@ -712,11 +795,11 @@ export const ExpedientesView: React.FC<{
           </div>
         ) : pestanaActual === 'estaSemana' ? (
           <ListaDeLaSemana
-            casos={casos}
-            busqueda={busqueda}
+            resultados={resultados}
+            filtros={filtros}
             abriendo={abriendo}
             onAbrir={(id) => void abrir(id)}
-            onBorrarBusqueda={() => setBusqueda('')}
+            onLimpiarFiltros={limpiarFiltros}
           />
         ) : (
           /*
@@ -725,12 +808,12 @@ export const ExpedientesView: React.FC<{
            * planas; el agrupado es derivado y está explicado en la lista.
            */
           <ListaPorCliente
-            casos={casos}
-            busqueda={busqueda}
+            resultados={resultados}
+            filtros={filtros}
             cerrados={pestanaActual === 'cerrados'}
             abriendo={abriendo}
             onAbrir={(id) => void abrir(id)}
-            onBorrarBusqueda={() => setBusqueda('')}
+            onLimpiarFiltros={limpiarFiltros}
           />
         )}
       </div>

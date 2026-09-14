@@ -7,6 +7,11 @@ import { ControlDeLetra, useTamanoDeLetra } from '../../../design/TamanoDeLetra'
 import { useFuncionHabilitada } from '../../subscriptions/PlanContext';
 import { AVISO_FUNCION_DESHABILITADA } from '../../subscriptions/types';
 import type { ActuacionLookup } from '../../catalog/hooks/useActuacion';
+import type { ActuacionRole } from '../../catalog/types';
+import { EnsenarFormatoDialog } from '../../estilo/components/EnsenarFormatoDialog';
+import { JergaDeLaFirma } from '../../estilo/components/JergaDeLaFirma';
+import { MENSAJE_SOLO_SOCIO, TEXTO_BOTON_ENSENAR } from '../../estilo/estiloEnPantalla';
+import { TEXTO_BOTON_JERGA, type SeleccionDelAbogado } from '../../estilo/jerga';
 import { LoQueRespaldaElEscrito } from '../../workspace/components/LoQueRespaldaElEscrito';
 import { parrafosDelEscrito } from '../../workspace/services/seccionesEnElEscrito';
 
@@ -35,6 +40,13 @@ interface LegalDraftViewerProps {
   onAbrirTaller?: (textoActual: string) => void;
   /** La ficha del catálogo contra la que se lee el escrito, para la columna «Lo que respalda este escrito». */
   ficha?: ActuacionLookup | null;
+  /** Quién firma el escrito: el rol de la ficha si resolvió, si no el del taller. Decide a qué formato se enseña. */
+  rolDelEscrito?: ActuacionRole;
+  ramaDelEscrito?: string;
+  /** Solo el socio administrador enseña. El servidor lo impone; aquí se apaga el botón y se dice por qué. */
+  puedeEnsenarFormato?: boolean;
+  /** Tras cobrar «Leer el formato», para que la barra lateral relea el saldo. */
+  onSaldoCambiado?: () => void;
 }
 
 /**
@@ -65,9 +77,20 @@ interface LegalDraftViewerProps {
  * YA NO ESTÁN CABLEADOS A NADA (14 de septiembre de 2026). El diálogo de
  * sugerencias escritas a mano, el cliente de `learning.api` y las tres rutas
  * del servidor que fingían aprender se borraron: un botón apagado que apunta a
- * un simulacro es un simulacro esperando que alguien quite el `disabled`. Las
- * funciones de verdad se construyen sobre `estilo_lecciones`, con el socio
- * administrador como único que enseña, y se conectan aquí cuando existan.
+ * un simulacro es un simulacro esperando que alguien quite el `disabled`.
+ *
+ * «ENSEÑAR ESTE FORMATO» YA ES DE VERDAD (mismo día, más tarde). Abre
+ * `EnsenarFormatoDialog`, que lee el formato en el servidor, muestra lo que se
+ * guardaría y lo guarda en `estilo_lecciones`. Solo para el socio
+ * administrador: a los demás el botón se les muestra apagado y con la razón,
+ * porque esconderlo haría creer que la firma no tiene cómo enseñar su formato.
+ *
+ * «SUGERIR JERGA» TAMBIÉN ES DE VERDAD (mismo día, unidad siguiente), y ya no
+ * lleva «Próximamente». Abre «Jerga de su firma» (`JergaDeLaFirma`), que busca
+ * en el texto las variantes del glosario que la firma enseñó —sin modelo y sin
+ * costo— y reemplaza por posición. Es para todos: leer el glosario no es del
+ * socio. El texto nuevo entra por `setEditableText`, el mismo camino que la
+ * edición a mano, así que «Guardar» y el guardado al salir lo recogen igual.
  *
  * EN MODO OSCURO EL PAPEL SE OSCURECE PERO EL .DOCX NO, y el pie lo dice.
  */
@@ -80,9 +103,18 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
   onOpenSavedDraftsModal,
   formato,
   onAbrirTaller,
-  ficha = null
+  ficha = null,
+  rolDelEscrito,
+  ramaDelEscrito = '',
+  puedeEnsenarFormato = false,
+  onSaldoCambiado
 }) => {
   const [editableText, setEditableText] = useState(draft.legalText);
+  const [ensenarAbierto, setEnsenarAbierto] = useState(false);
+  const [jergaAbierta, setJergaAbierta] = useState(false);
+  const [seleccion, setSeleccion] = useState<SeleccionDelAbogado | null>(null);
+  const [avisoDeJerga, setAvisoDeJerga] = useState('');
+  const areaRef = useRef<HTMLTextAreaElement>(null);
   const [avisoDeGuardado, setAvisoDeGuardado] = useState('');
   useEffect(() => {
     if (!avisoExterno) return;
@@ -173,6 +205,44 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
   };
 
   /*
+   * LO QUE EL ABOGADO SELECCIONÓ, para que «Jerga de su firma» liste solo eso.
+   *
+   * En el cuadro de edición hay posiciones exactas. En el papel no: el HTML no
+   * trae los `**` del texto, así que se guarda el texto seleccionado y
+   * `filtrarPorSeleccion` lo ubica. Una selección que nace o se colapsa FUERA
+   * del escrito —pulsar un botón del panel— no borra la anterior: si no, la
+   * selección se perdería justo al pedir la jerga.
+   */
+  const seleccionActual = (): SeleccionDelAbogado | null | undefined => {
+    const area = areaRef.current;
+    if (area && document.activeElement === area) {
+      return area.selectionEnd > area.selectionStart ? { inicio: area.selectionStart, fin: area.selectionEnd } : null;
+    }
+    const sel = window.getSelection();
+    const papel = papelRef.current;
+    if (!sel || !papel || sel.rangeCount === 0 || !sel.anchorNode || !papel.contains(sel.anchorNode)) return undefined;
+    const t = sel.toString();
+    return t.trim() ? { texto: t } : null;
+  };
+  useEffect(() => {
+    if (!jergaAbierta) return;
+    const alCambiar = () => {
+      const s = seleccionActual();
+      if (s !== undefined) setSeleccion(s);
+    };
+    document.addEventListener('selectionchange', alCambiar);
+    return () => document.removeEventListener('selectionchange', alCambiar);
+    // `seleccionActual` solo lee refs y el DOM.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [jergaAbierta]);
+
+  const alReemplazarJerga = (textoNuevo: string, aviso: string) => {
+    setEditableText(textoNuevo);
+    setSeleccion(null);
+    setAvisoDeJerga(`${aviso} Pulse «Guardar» para dejarlo en el historial de la firma.`);
+  };
+
+  /*
    * EN PANTALLA LO MISMO QUE EN EL PAPEL. La firma elige la letra en Membrete y
    * el lienzo la obedece.
    */
@@ -221,16 +291,68 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
           </button>
         )}
 
-        <button type="button" disabled className="cn-red-trabajar-boton">
+        <button
+          type="button"
+          onClick={() => setEnsenarAbierto(true)}
+          disabled={!puedeEnsenarFormato}
+          className="cn-red-trabajar-boton"
+          title={puedeEnsenarFormato ? undefined : MENSAJE_SOLO_SOCIO}
+        >
           <BrainCircuit className="cn-red-herr-icono" strokeWidth={1.8} aria-hidden />
-          Enseñar estilo
+          {TEXTO_BOTON_ENSENAR}
         </button>
-        <button type="button" disabled className="cn-red-trabajar-boton">
-          <Sparkles className="cn-red-herr-icono" strokeWidth={1.8} aria-hidden />
-          Sugerir jerga
-        </button>
+        {rolDelEscrito && (
+          <button
+            type="button"
+            /* Al pulsar, la selección del papel se colapsa: se lee ANTES, en el mousedown. */
+            onMouseDown={() => {
+              const s = seleccionActual();
+              if (s !== undefined) setSeleccion(s);
+            }}
+            onClick={() => {
+              setJergaAbierta((a) => !a);
+              setAvisoDeJerga('');
+            }}
+            aria-expanded={jergaAbierta}
+            aria-controls="cn-jer-panel"
+            className={`cn-red-trabajar-boton${jergaAbierta ? ' cn-jer-boton--abierto' : ''}`}
+          >
+            <Sparkles className="cn-red-herr-icono" strokeWidth={1.8} aria-hidden />
+            {TEXTO_BOTON_JERGA}
+          </button>
+        )}
       </div>
-      <p className="cn-red-trabajar-nota">Próximamente: aprender el formato y la jerga de su firma. Mientras tanto, esos dos botones no guardan ni proponen nada.</p>
+      {!puedeEnsenarFormato && <p className="cn-red-trabajar-nota">{MENSAJE_SOLO_SOCIO}</p>}
+      {avisoDeJerga && (
+        <p role="status" className="cn-jer-ok">
+          <Check className="cn-jer-ok-icono" strokeWidth={2} aria-hidden />
+          <span>{avisoDeJerga}</span>
+        </p>
+      )}
+      {jergaAbierta && rolDelEscrito && (
+        <JergaDeLaFirma
+          texto={editableText}
+          citas={draft.jurisprudenciaCitada ?? []}
+          rol={rolDelEscrito}
+          rama={ramaDelEscrito || null}
+          seleccion={seleccion}
+          onQuitarSeleccion={() => setSeleccion(null)}
+          onReemplazar={alReemplazarJerga}
+          onCerrar={() => setJergaAbierta(false)}
+        />
+      )}
+      {rolDelEscrito && (
+        <EnsenarFormatoDialog
+          abierto={ensenarAbierto}
+          onCerrar={() => setEnsenarAbierto(false)}
+          texto={editableText}
+          documentType={draft.documentType}
+          rol={rolDelEscrito}
+          rama={ramaDelEscrito || null}
+          puedeEnsenar={puedeEnsenarFormato}
+          onSaldoCambiado={onSaldoCambiado}
+        />
+      )}
     </section>
   );
 
@@ -282,8 +404,14 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
 
             {isEditMode ? (
               <textarea
+                ref={areaRef}
                 value={editableText}
                 onChange={(e) => setEditableText(e.target.value)}
+                onSelect={() => {
+                  if (!jergaAbierta) return;
+                  const s = seleccionActual();
+                  if (s !== undefined) setSeleccion(s);
+                }}
                 className="min-h-[540px] w-full resize-y break-words border-0 bg-transparent font-legal leading-[1.8] text-paper-ink focus:outline-none"
                 style={estiloLectura}
               />

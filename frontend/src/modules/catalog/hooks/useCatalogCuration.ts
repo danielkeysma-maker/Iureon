@@ -138,15 +138,22 @@ export const useCatalogCuration = () => {
     [branchFilter, load]
   );
 
-  const visible = useMemo(() => {
+  /*
+   * DOS LISTAS Y NO UNA: la que respeta rama y búsqueda (`enElFiltro`) y la
+   * que además aplica «solo sin verificar» (`visible`). El chip de ese filtro
+   * lleva su cuenta al lado, y esa cuenta tiene que salir de la primera: si
+   * saliera de la segunda diría siempre el total de lo que ya se está viendo, y
+   * si saliera del catálogo entero prometería cientos donde la rama elegida
+   * tiene tres.
+   */
+  const { visible, enElFiltro } = useMemo(() => {
     const needle = query
       .toLowerCase()
       .normalize('NFD')
       .replace(/[̀-ͯ]/g, '')
       .trim();
 
-    const pasa = (a: Actuacion): boolean => {
-      if (onlyUnverified && a.term.status !== 'NO_VERIFICADO') return false;
+    const coincide = (a: Actuacion): boolean => {
       if (!needle) return true;
 
       const haystack = `${a.exactName} ${a.legalBasis}`
@@ -158,7 +165,7 @@ export const useCatalogCuration = () => {
     };
 
     const propias = actuaciones.filter(
-      (a) => (branchFilter === 'TODAS' || a.branch === branchFilter) && pasa(a)
+      (a) => (branchFilter === 'TODAS' || a.branch === branchFilter) && coincide(a)
     );
 
     /*
@@ -166,8 +173,17 @@ export const useCatalogCuration = () => {
      * primero que se ofrece tiene que ser lo que esta verificado PARA ESTA
      * RAMA.
      */
-    return [...propias, ...remitidas.filter(pasa)];
+    const filtradas = [...propias, ...remitidas.filter(coincide)];
+    return {
+      enElFiltro: filtradas,
+      visible: onlyUnverified ? filtradas.filter((a) => a.term.status === 'NO_VERIFICADO') : filtradas
+    };
   }, [actuaciones, branchFilter, onlyUnverified, query, remitidas]);
+
+  const pendientesEnElFiltro = useMemo(
+    () => enElFiltro.filter((a) => a.term.status === 'NO_VERIFICADO').length,
+    [enElFiltro]
+  );
 
   // The headline the screen leads with: how much of the catalogue still needs a
   // human to open the norm.
@@ -178,8 +194,11 @@ export const useCatalogCuration = () => {
 
   return {
     actuaciones: visible,
+    /** El catálogo entero, sin filtros: de aquí sale el censo del encabezado. */
+    todas: actuaciones,
     total: actuaciones.length,
     pending,
+    pendientesEnElFiltro,
     branches,
     meta,
     curation,

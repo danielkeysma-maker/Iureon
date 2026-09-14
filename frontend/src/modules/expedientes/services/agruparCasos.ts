@@ -1,6 +1,7 @@
 import { BRANCH_LABELS } from '../../catalog/branchLabels';
 import { compararEnEspanol } from '../../workspace/services/fichaEnLaLista';
 import type { ExpedienteEnLista } from '../types';
+import { buscarCasos, indexarCaso } from './buscarCasos';
 
 /**
  * LA LISTA DE EXPEDIENTES POR CLIENTE Y, DENTRO DE CADA CLIENTE, POR RAMA.
@@ -84,27 +85,15 @@ const masUrgente = (casos: readonly ExpedienteEnLista[]): Urgencia =>
 
 /* ─── LA BÚSQUEDA ─────────────────────────────────────────────────────────── */
 
-const normalizar = (texto: string): string =>
-  texto.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
-
-/* El radicado se escribe con y sin guiones o espacios; se compara sin ellos. */
-const soloAlfanumerico = (texto: string): string => normalizar(texto).replace(/[^a-z0-9]/g, '');
-
 /**
- * Por cliente, carátula, radicado o despacho, sin mayúsculas ni tildes. Se
- * filtra CASO a caso: un cliente con cinco asuntos muestra solo el que
- * coincide, que es el que se estaba buscando.
+ * Por nombre, cédula o NIT, o radicado. Se filtra CASO a caso: un cliente con
+ * cinco asuntos muestra solo el que coincide, que es el que se estaba
+ * buscando. Las reglas viven en `buscarCasos.ts`; aquí se reusan para no tener
+ * dos búsquedas que se separen a la primera corrección. La pantalla usa el
+ * índice precalculado; esta forma es para quien tiene la lista suelta.
  */
-export const filtrarCasos = (casos: readonly ExpedienteEnLista[], busqueda: string): ExpedienteEnLista[] => {
-  const q = normalizar(busqueda);
-  if (!q) return [...casos];
-  const qRadicado = soloAlfanumerico(busqueda);
-  return casos.filter((c) => {
-    const textos = [c.clienteNombre, c.caratula, c.despacho, c.radicado].filter((t): t is string => Boolean(t));
-    if (textos.some((t) => normalizar(t).includes(q))) return true;
-    return qRadicado !== '' && c.radicado !== null && soloAlfanumerico(c.radicado).includes(qRadicado);
-  });
-};
+export const filtrarCasos = (casos: readonly ExpedienteEnLista[], busqueda: string): ExpedienteEnLista[] =>
+  buscarCasos(casos.map(indexarCaso), busqueda).map((r) => r.caso);
 
 /* ─── EL AGRUPADO ─────────────────────────────────────────────────────────── */
 

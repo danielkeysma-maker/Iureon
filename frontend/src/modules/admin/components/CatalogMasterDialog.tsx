@@ -1,99 +1,49 @@
 import React from 'react';
-import { AlertCircle, Lock, RefreshCw } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
+import { branchLabel } from '../../catalog/branchLabels';
 import { adminApi, type CatalogoMaestro } from '../admin.api';
+import { cifra } from '../consolaEnPantalla';
 
 /**
- * Catálogo maestro. Artboard 8b.
+ * Catálogo maestro.
+ * Cara nueva: `public/handoff/app-consola-de-operacion.html`, artboard 5 del
+ * archivo (el de 900 px: cuatro cifras, «Reparto por rama» con las tres primeras
+ * y «y N ramas más», «Reparto por rol · Quién firma el documento.», «Lo que
+ * todavía no se puede hacer desde aquí» en tres tarjetas ámbar y la nota final
+ * de lo que operación sabe y no sabe).
  *
- * ─── LA TARJETA ROJA ES LA PANTALLA, NO UN PIE DE PÁGINA ────────────────────
+ * ─── LO QUE LLEGA DEL SERVIDOR SON CUENTAS, NUNCA CONTENIDO ────────────────
  *
- * El artboard llama a esto «la línea que no se cruza»: lo que una firma cura es
- * suyo y nunca vuelve al maestro. Aquí eso no se promete, se demuestra — lo
- * único que llega del servidor son cuentas (cuántas firmas tocaron cada
- * actuación), porque la consulta no selecciona una sola columna de texto
- * escrito por un abogado de otra firma. Lo que no se lee no se puede filtrar
- * por descuido.
+ * La consulta de la curaduría selecciona dos columnas —qué firma y qué
+ * actuación— y ninguna de texto. Lo que no se lee no se puede filtrar por
+ * descuido: la frontera vive en el `select`, no en este componente.
  *
- * ─── LO QUE EL ARTBOARD PIDE Y AQUÍ NO ESTÁ, con la razón ───────────────────
+ * ─── LO QUE EL ARTBOARD PIDE Y AQUÍ ES DISTINTO, con la razón ──────────────
  *
- * Tres bloques del diseño no se pintaron, y NO por falta de tiempo: pintarlos
- * hoy sería mentir sobre lo que el producto puede hacer.
+ * · «con artículo comprobado / sin artículo confirmado»: el maestro cuenta
+ *   TÉRMINOS verificados (`conTerminoVerificado`, `sinVerificar`), no artículos.
+ *   Rotular una cifra con lo que no mide es exactamente el defecto que esta casa
+ *   persigue en el catálogo.
+ * · Las tres tarjetas ámbar se construyen como PENDIENTES DECLARADOS, no como
+ *   botones: publicar no propaga nada (el maestro es un artefacto de
+ *   compilación), la derogatoria no tiene campo, y las propuestas de las firmas
+ *   no tienen tabla ni flujo. Un botón peligroso que no hace nada enseña a pulsarlo.
  *
- * · «Norma derogada · 38». El tipo `Actuacion` no tiene campo de derogatoria.
- *   Ninguna ficha declara si su norma sigue viva, así que la cifra no se puede
- *   calcular; adivinarla leyendo el texto del artículo daría un número que
- *   parece dato. Se dice que no se sabe, que es lo que se sabe.
- * · «Publicar cambios» y la propagación a las firmas. El maestro es un
- *   ARTEFACTO DE COMPILACIÓN: sale de `research/actuaciones-*.json`, pasa por
- *   `build-catalog.py` y viaja dentro del paquete. No hay nada que escribir en
- *   caliente, así que un botón «Publicar» no propagaría nada — y el propio
- *   artboard llama a esa acción la más peligrosa de toda la consola. Un botón
- *   peligroso que no hace nada enseña a pulsarlo.
- * · «Propuestas de las firmas». No hay tabla ni flujo: hoy una firma no puede
- *   ofrecer una actuación al maestro. La lista está vacía por inexistente, no
- *   por estar a cero, y la diferencia importa.
+ * ─── Y LO QUE SE AÑADIÓ (derivado) ─────────────────────────────────────────
  *
- * La regla de fondo del artboard —una derogatoria no borra la verificación de
- * la firma, la reetiqueta como «verificada contra norma derogada»— se escribe
- * aquí como lo que gobernará esa publicación cuando exista, para que quien la
- * construya no tenga que redescubrirla.
+ * El alcance de la curaduría (cuántas firmas, cuántas verificaciones) y «las que
+ * más firmas han corregido»: el servidor ya los calcula, y una ficha que varias
+ * firmas corrigen por separado es una señal sobre el maestro.
  */
 
-const numero = (n: number): string => n.toLocaleString('es-CO');
-
-const RAMA: Record<string, string> = {
-  ADMINISTRATIVO: 'Administrativo',
-  CIVIL: 'Civil',
-  FAMILIA: 'Familia',
-  FAMILIA_ADMINISTRATIVA: 'Familia administrativa',
-  NOTARIAL: 'Notarial',
-  CONSTITUCIONAL: 'Constitucional',
-  LABORAL: 'Laboral',
-  SEGURIDAD_SOCIAL: 'Seguridad social',
-  RESPONSABILIDAD_FISCAL: 'Responsabilidad fiscal',
-  CONTRATOS: 'Contratos privados',
-  EXTINCION_DOMINIO: 'Extinción de dominio',
-  RESTITUCION_TIERRAS: 'Restitución de tierras',
-  URBANISMO: 'Urbanismo y licencias',
-  DISCIPLINARIO: 'Disciplinario',
-  PENAL: 'Penal',
-  AMBIENTAL: 'Ambiental',
-  ADUANERO: 'Aduanero',
-  INSOLVENCIA: 'Insolvencia',
-  SOCIETARIO: 'Societario',
-  POLICIVO: 'Policivo',
-  ARBITRAJE: 'Arbitraje',
-  PROPIEDAD_INTELECTUAL: 'Propiedad intelectual',
-  CONTRATACION: 'Contratación',
-  TRIBUTARIO: 'Tributario',
-  SUPERINTENDENCIAS: 'Superintendencias',
-  TRANSITO: 'Tránsito',
-  INTERNACIONAL: 'Internacional',
-  AGRARIO: 'Agrario'
-};
-
 const ROL: Record<string, string> = {
-  LITIGANTE: 'Litigante',
-  DESPACHO: 'Despacho',
+  LITIGANTE: 'Firma litigante',
+  DESPACHO: 'Juzgado o despacho',
   SECRETARIA: 'Secretaría'
 };
 
-const Metrica: React.FC<{ rotulo: string; valor: string; nota: string }> = ({
-  rotulo,
-  valor,
-  nota
-}) => (
-  <div className="rounded-card border border-line-200 bg-surface px-4 py-3">
-    <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
-      {rotulo}
-    </p>
-    <p className="mt-1 text-[19px] font-semibold leading-none text-ink-900">{valor}</p>
-    <p className="mt-1.5 text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
-      {nota}
-    </p>
-  </div>
-);
+/** Cuántas ramas se nombran antes de «y N ramas más», como el artboard. */
+const RAMAS_VISIBLES = 3;
 
 interface CatalogMasterDialogProps {
   isOpen: boolean;
@@ -104,6 +54,8 @@ export const CatalogMasterDialog: React.FC<CatalogMasterDialogProps> = ({ isOpen
   const [maestro, setMaestro] = React.useState<CatalogoMaestro | null>(null);
   const [cargando, setCargando] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [intento, setIntento] = React.useState(0);
+  const [todasLasRamas, setTodasLasRamas] = React.useState(false);
 
   React.useEffect(() => {
     if (!isOpen) return;
@@ -124,192 +76,170 @@ export const CatalogMasterDialog: React.FC<CatalogMasterDialogProps> = ({ isOpen
     return () => {
       vigente = false;
     };
-  }, [isOpen]);
+  }, [isOpen, intento]);
+
+  const ramas = maestro ? [...maestro.reparticion.porRama].sort((a, b) => b.total - a.total) : [];
+  const primeras = todasLasRamas ? ramas : ramas.slice(0, RAMAS_VISIBLES);
+  const resto = ramas.slice(RAMAS_VISIBLES);
+  const sumaDelResto = resto.reduce((t, r) => t + r.total, 0);
 
   return (
     <Dialog
       abierto={isOpen}
       onCerrar={onClose}
       titulo="Catálogo maestro"
-      subtitulo="La base que reciben todas las firmas. Cada una la extiende y la verifica por su cuenta; lo que una firma cura nunca vuelve aquí."
+      subtitulo="El catálogo que comparten todas las firmas. Lo que cada firma curó es suyo y no se toca desde aquí."
       tamano="L"
-      cuerpoEnCanvas
     >
-      {cargando && (
-        <div className="flex items-center justify-center gap-2 py-16 text-ink-400">
-          <RefreshCw className="h-4 w-4 animate-spin" />
-          <span className="text-[13px]">Leyendo el maestro…</span>
-        </div>
-      )}
+      <div className="cn-ope-cuerpo">
+        {cargando && !maestro && <p className="cn-ope-vacio">Leyendo el maestro…</p>}
 
-      {error && (
-        <div className="flex items-start gap-2 rounded-card border border-[rgb(var(--danger)/0.35)] bg-[rgb(var(--danger)/0.06)] px-4 py-3">
-          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-danger" />
-          <p className="text-justify text-[12px] leading-snug text-danger [text-wrap:pretty]">
-            {error}
-          </p>
-        </div>
-      )}
+        {error && (
+          <div role="alert" className="cn-ope-error">
+            <p>{error}</p>
+            <button type="button" className="cn-ope-boton cn-ope-boton--suave" onClick={() => setIntento((n) => n + 1)}>
+              Intentar de nuevo
+            </button>
+          </div>
+        )}
 
-      {maestro && !cargando && (
-        <div className="space-y-4">
-          <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <Metrica
-              rotulo="Actuaciones base"
-              valor={numero(maestro.actuacionesBase)}
-              nota={`En ${maestro.ramas} ramas · ${maestro.transversales} transversales, que aparecen en todas`}
-            />
-            <Metrica
-              rotulo="Con término verificado"
-              valor={numero(maestro.conTerminoVerificado)}
-              nota={`${numero(maestro.noCaduca)} más no caducan, que es una respuesta y no un hueco`}
-            />
-            <Metrica
-              rotulo="Sin verificar"
-              valor={numero(maestro.sinVerificar)}
-              nota="Publican advertencia al abogado en vez de un plazo que nadie comprobó"
-            />
-            <Metrica
-              rotulo="Con norma derogada"
-              valor="—"
-              nota="No se sabe: ninguna ficha declara si su norma sigue viva. Ver abajo."
-            />
-          </section>
+        {maestro && (
+          <>
+            <section className="cn-ope-cifras" aria-label="El maestro en cifras">
+              <div className="cn-ope-cifra">
+                <p className="cn-ope-cifra-valor cn-ope-mono">{cifra(maestro.actuacionesBase)}</p>
+                <p className="cn-ope-cifra-rotulo">
+                  actuaciones · {cifra(maestro.transversales)} transversales, que aparecen en todas las ramas
+                </p>
+              </div>
+              <div className="cn-ope-cifra cn-ope-cifra--ok">
+                <p className="cn-ope-cifra-valor cn-ope-mono">{cifra(maestro.conTerminoVerificado)}</p>
+                <p className="cn-ope-cifra-rotulo">
+                  con término verificado, y {cifra(maestro.noCaduca)} que no caducan
+                </p>
+              </div>
+              <div className="cn-ope-cifra cn-ope-cifra--aviso">
+                <p className="cn-ope-cifra-valor cn-ope-mono">{cifra(maestro.sinVerificar)}</p>
+                <p className="cn-ope-cifra-rotulo">sin verificar: publican advertencia en vez de un plazo</p>
+              </div>
+              <div className="cn-ope-cifra">
+                <p className="cn-ope-cifra-valor cn-ope-mono">{cifra(maestro.ramas)}</p>
+                <p className="cn-ope-cifra-rotulo">ramas</p>
+              </div>
+            </section>
 
-          <section className="grid gap-3 lg:grid-cols-2">
-            <div className="rounded-card border border-line-200 bg-surface">
-              <header className="border-b border-line-200 px-4 py-2.5">
-                <h3 className="text-[13px] font-semibold text-ink-900">Reparto por rama</h3>
-              </header>
-              <ul className="max-h-64 divide-y divide-line-200 overflow-y-auto">
-                {maestro.reparticion.porRama.map((r) => (
-                  <li key={r.branch} className="flex justify-between px-4 py-1.5 text-[12px]">
-                    <span className="text-ink-900">{RAMA[r.branch] ?? r.branch}</span>
-                    <span className="tabular-nums text-ink-500">{r.total}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <div className="cn-ope-dos cn-ope-dos--tarjetas">
+              <section className="cn-ope-tarjeta" aria-labelledby="ope-por-rama">
+                <h3 id="ope-por-rama" className="cn-ope-tarjeta-titulo">
+                  Reparto por rama
+                </h3>
+                <ul className="cn-ope-reparto">
+                  {primeras.map((r) => (
+                    <li key={r.branch}>
+                      <span>{branchLabel(r.branch)}</span>
+                      <span className="cn-ope-mono">{cifra(r.total)}</span>
+                    </li>
+                  ))}
+                  {!todasLasRamas && resto.length > 0 && (
+                    <li className="cn-ope-reparto-resto">
+                      <span>
+                        y {cifra(resto.length)} {resto.length === 1 ? 'rama más' : 'ramas más'}
+                      </span>
+                      <span className="cn-ope-mono">{cifra(sumaDelResto)}</span>
+                    </li>
+                  )}
+                </ul>
+                {resto.length > 0 && (
+                  <button type="button" className="cn-ope-boton cn-ope-boton--terciario" onClick={() => setTodasLasRamas((v) => !v)}>
+                    {todasLasRamas ? 'Ver solo las tres primeras' : `Ver las ${cifra(ramas.length)} ramas`}
+                  </button>
+                )}
+              </section>
 
-            <div className="space-y-3">
-              <div className="rounded-card border border-line-200 bg-surface">
-                <header className="border-b border-line-200 px-4 py-2.5">
-                  <h3 className="text-[13px] font-semibold text-ink-900">Reparto por rol</h3>
-                  <p className="mt-0.5 text-[11px] text-ink-500">Quién firma el documento.</p>
-                </header>
-                <ul className="divide-y divide-line-200">
+              <section className="cn-ope-tarjeta" aria-labelledby="ope-por-rol">
+                <h3 id="ope-por-rol" className="cn-ope-tarjeta-titulo">
+                  Reparto por rol
+                </h3>
+                <p className="cn-ope-tarjeta-nota">Quién firma el documento.</p>
+                <ul className="cn-ope-reparto">
                   {maestro.reparticion.porRol.map((r) => (
-                    <li key={r.role} className="flex justify-between px-4 py-1.5 text-[12px]">
-                      <span className="text-ink-900">{ROL[r.role] ?? r.role}</span>
-                      <span className="tabular-nums text-ink-500">{r.total}</span>
+                    <li key={r.role}>
+                      <span>{ROL[r.role] ?? r.role}</span>
+                      <span className="cn-ope-mono">{cifra(r.total)}</span>
                     </li>
                   ))}
                 </ul>
-              </div>
-
-              <div className="rounded-card border border-line-200 bg-surface px-4 py-3">
-                <h3 className="text-[13px] font-semibold text-ink-900">
-                  Alcance de la curaduría de las firmas
-                </h3>
-                <p className="mt-1 text-justify text-[12px] leading-snug text-ink-700 [text-wrap:pretty]">
-                  <strong className="font-semibold">{numero(maestro.firmasQueCuraron)}</strong>{' '}
-                  {maestro.firmasQueCuraron === 1 ? 'firma ha' : 'firmas han'} corregido o
-                  confirmado alguna ficha, con{' '}
-                  <strong className="font-semibold">
-                    {numero(maestro.verificacionesDeFirmas)}
-                  </strong>{' '}
-                  verificaciones en total.
-                </p>
-                <p className="mt-1.5 text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
-                  Son cuentas, no contenido: esta pantalla sabe cuántas firmas tocaron una
-                  actuación y no qué escribieron. Sirve para avisar antes de publicar un cambio, que
-                  es exactamente para lo que hace falta.
-                </p>
-              </div>
+              </section>
             </div>
-          </section>
 
-          {maestro.masCuradas.length > 0 && (
-            <section className="rounded-card border border-line-200 bg-surface">
-              <header className="border-b border-line-200 px-4 py-2.5">
-                <h3 className="text-[13px] font-semibold text-ink-900">
-                  Las que más firmas han corregido
-                </h3>
-                <p className="mt-0.5 text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
-                  Una ficha que varias firmas corrigen por separado es una señal sobre el maestro,
-                  no sobre las firmas: probablemente su término está incompleto de origen.
-                </p>
-              </header>
-              <ul className="divide-y divide-line-200">
-                {maestro.masCuradas.map((a) => (
-                  <li key={a.actuacionId} className="flex gap-3 px-4 py-2 text-[12px]">
-                    <span className="min-w-0 flex-1 text-ink-900">
-                      {a.exactName ?? (
-                        <span className="text-ink-500">
-                          {a.actuacionId} · ya no está en este paquete
+            <section className="cn-ope-tarjeta cn-ope-tarjeta--suelta" aria-labelledby="ope-curaduria">
+              <h3 id="ope-curaduria" className="cn-ope-tarjeta-titulo">
+                Alcance de la curaduría de las firmas
+              </h3>
+              <p className="cn-ope-texto">
+                <strong>{cifra(maestro.firmasQueCuraron)}</strong> {maestro.firmasQueCuraron === 1 ? 'firma ha' : 'firmas han'}{' '}
+                corregido o confirmado alguna ficha, con <strong>{cifra(maestro.verificacionesDeFirmas)}</strong> verificaciones
+                en total.
+              </p>
+              {maestro.masCuradas.length > 0 && (
+                <>
+                  <p className="cn-ope-tarjeta-nota">
+                    Las que más firmas han corregido. Una ficha que varias firmas corrigen por separado probablemente nació
+                    incompleta.
+                  </p>
+                  <ul className="cn-ope-reparto">
+                    {maestro.masCuradas.map((a) => (
+                      <li key={a.actuacionId}>
+                        <span>{a.exactName ?? <span className="cn-ope-apagado">{a.actuacionId} · ya no está en este paquete</span>}</span>
+                        <span>
+                          {cifra(a.firmas)} {a.firmas === 1 ? 'firma' : 'firmas'}
                         </span>
-                      )}
-                    </span>
-                    <span className="shrink-0 tabular-nums text-ink-500">
-                      {a.firmas} {a.firmas === 1 ? 'firma' : 'firmas'}
-                    </span>
-                  </li>
-                ))}
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+            </section>
+
+            <section className="cn-ope-seccion" aria-labelledby="ope-pendientes">
+              <h3 id="ope-pendientes" className="cn-ope-subtitulo">
+                Lo que todavía no se puede hacer desde aquí
+              </h3>
+              <ul className="cn-ope-pendientes">
+                <li className="cn-ope-pendiente">
+                  <p className="cn-ope-pendiente-titulo">Publicar un cambio normativo</p>
+                  <p className="cn-ope-pendiente-texto">
+                    El maestro no vive en base de datos: se compila desde los archivos de investigación y viaja dentro del
+                    paquete, así que hoy un cambio se publica desplegando. Regla que deberá cumplirse: una{' '}
+                    <strong>derogatoria no borra</strong> la verificación de una firma — la reetiqueta, para que no haya que
+                    redescubrirla.
+                  </p>
+                </li>
+                <li className="cn-ope-pendiente">
+                  <p className="cn-ope-pendiente-titulo">Contar las fichas con norma derogada</p>
+                  <p className="cn-ope-pendiente-texto">
+                    Hoy no hay ese conteo: ninguna ficha declara si su norma sigue vigente, y un número estimado se leería igual
+                    que uno medido.
+                  </p>
+                </li>
+                <li className="cn-ope-pendiente">
+                  <p className="cn-ope-pendiente-titulo">Recibir propuestas de las firmas</p>
+                  <p className="cn-ope-pendiente-texto">
+                    Una firma que añade una actuación propia no tiene cómo proponerla al maestro. Falta la tabla y el flujo: la
+                    lista está vacía por inexistente, no por estar en cero.
+                  </p>
+                </li>
               </ul>
             </section>
-          )}
 
-          <section className="rounded-card border border-[rgb(var(--danger)/0.35)] bg-[rgb(var(--danger)/0.06)] px-4 py-3">
-            <h3 className="flex items-center gap-2 text-[13px] font-semibold text-danger">
-              <Lock className="h-4 w-4" />
-              La línea que no se cruza
-            </h3>
-            <p className="mt-1.5 text-justify text-[12px] leading-relaxed text-ink-900 [text-wrap:pretty]">
-              El catálogo curado por una firma —sus verificaciones, sus notas, sus correcciones— es
-              suyo. No se agrega, no se anonimiza y no alimenta el maestro. Es lo mismo que le
-              promete Privacidad al cliente: no compartimos datos entre firmas.
+            <p className="cn-ope-recuadro">
+              Operación puede saber <strong>cuántas</strong> firmas corrigieron una actuación; nunca <strong>qué</strong> corrigió
+              cada una. Publicar tampoco marcará como verificada una ficha que la firma no leyó: verificado significa «alguien de
+              esta firma lo leyó».
             </p>
-            <p className="mt-2 text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
-              La restricción es técnica, no de interfaz: el servidor consulta dos columnas —qué
-              firma y qué actuación— y ninguna de texto. Aunque alguien quisiera pintar aquí lo que
-              escribió un abogado de otra firma, no tendría de dónde sacarlo.
-            </p>
-          </section>
-
-          <section className="rounded-card border border-line-200 bg-canvas px-4 py-3">
-            <h3 className="text-[13px] font-semibold text-ink-900">
-              Lo que esta pantalla todavía no puede hacer
-            </h3>
-            <ul className="mt-2 space-y-2 text-[12px] text-ink-700">
-              <li className="text-justify [text-wrap:pretty]">
-                <strong className="font-semibold">Publicar un cambio normativo.</strong> El maestro
-                no vive en base de datos: se compila desde los archivos de investigación y viaja
-                dentro del paquete, así que hoy un cambio se publica desplegando. Un botón
-                «Publicar» aquí no propagaría nada, y el propio diseño llama a esa acción la más
-                peligrosa de la consola — un botón peligroso que no hace nada enseña a pulsarlo.
-              </li>
-              <li className="text-justify [text-wrap:pretty]">
-                <strong className="font-semibold">Contar las fichas con norma derogada.</strong>{' '}
-                Ninguna ficha declara si su norma sigue vigente. La cifra no se estima leyendo el
-                texto del artículo: un número inventado se lee igual que uno medido.
-              </li>
-              <li className="text-justify [text-wrap:pretty]">
-                <strong className="font-semibold">Recibir propuestas de las firmas.</strong> No hay
-                flujo para que una firma ofrezca una actuación suya al maestro, así que la lista
-                está vacía por inexistente y no por estar en cero.
-              </li>
-            </ul>
-            <p className="mt-3 text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
-              La regla que gobernará esa publicación cuando exista, escrita aquí para que no haya
-              que redescubrirla: una derogatoria <strong>no borra</strong> la verificación de la
-              firma, la reetiqueta como «verificada contra norma derogada» y muestra el artículo
-              equivalente al lado. Y su recíproca: publicar <strong>nunca</strong> marca como
-              verificada una ficha que la firma no verificó — si el maestro pudiera conceder
-              verificaciones, el sello dejaría de significar que alguien de esa firma lo leyó.
-            </p>
-          </section>
-        </div>
-      )}
+          </>
+        )}
+      </div>
     </Dialog>
   );
 };

@@ -121,6 +121,23 @@ export const aplicarReemplazo = (texto: string, cita: string, reemplazo: string)
   return texto.slice(0, m.inicio) + reemplazo + texto.slice(m.fin);
 };
 
+/**
+ * Sustituye el tramo EXACTO [inicio, fin) por el reemplazo, solo si ese tramo
+ * sigue diciendo `esperado`. Devuelve null si no.
+ *
+ * POR QUÉ NO BASTA `aplicarReemplazo`: esa busca la PRIMERA aparición, que es
+ * lo correcto para una cita del revisor —un pasaje largo que aparece una vez—
+ * y lo incorrecto para una palabra que aparece diez veces. «Reemplazar» en la
+ * tercera «demanda» tiene que cambiar la tercera. La comprobación de
+ * `esperado` cubre el caso en que el abogado editó el texto entre que se
+ * calculó la posición y se pulsó el botón: se niega en vez de pisar otra cosa.
+ */
+export const aplicarReemplazoEnPosicion = (texto: string, inicio: number, fin: number, esperado: string, reemplazo: string): string | null => {
+  if (inicio < 0 || fin > texto.length || inicio >= fin) return null;
+  if (texto.slice(inicio, fin) !== esperado) return null;
+  return texto.slice(0, inicio) + reemplazo + texto.slice(fin);
+};
+
 /*
  * ─── EL REEMPLAZO SE PEGA LIMPIO ─────────────────────────────────────────────
  *

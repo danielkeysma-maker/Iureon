@@ -73,5 +73,7 @@ export const PANTALLAS = {
   /** Id of the tool (calculator) whose dialog is open in Herramientas. */
   herramienta: 'herramienta',
   /** Id of the manual article being read. */
-  manual: 'manual'
+  manual: 'manual',
+  /** Section Ajustes must open on (e.g. `estilo`), set by whoever navigates there; Ajustes forgets it once read. */
+  ajustes: 'ajustes'
 } as const;

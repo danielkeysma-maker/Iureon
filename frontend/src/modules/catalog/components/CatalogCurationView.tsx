@@ -1,441 +1,438 @@
-import React, { useState } from 'react';
-import {
-  AlertTriangle,
-  BadgeCheck,
-  CalendarClock,
-  Infinity as InfinityIcon,
-  Link2,
-  Loader2,
-  PenLine,
-  Search,
-  ShieldAlert,
-  Trash2
-} from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Loader2, X } from 'lucide-react';
+import { IconoBuscar } from '../../../design/ArtboardIcons';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 import { firmActuacionesApi } from '../services/catalog.api';
 import { useCatalogCuration } from '../hooks/useCatalogCuration';
 import { VerificationForm } from './VerificationForm';
 import { ActuacionDetail } from './ActuacionDetail';
-import { BRANCH_LABELS } from '../branchLabels';
-import type { Actuacion, TermStatus } from '../types';
-
-/*
- * Los tres estados del sistema, no una paleta propia. "Con término" iba en
- * rojo, y el rojo de este producto significa exactamente dos cosas: grabando y
- * destruir. Un término VERIFICADO es un dato confiable — verde —; que el plazo
- * corra es información del término mismo, no una alarma del estado.
- */
-const STATUS_BADGE: Record<TermStatus, { label: string; className: string; icon: typeof CalendarClock }> = {
-  VERIFICADO: {
-    label: 'Con término',
-    className: 'bg-[rgb(var(--verified-surf))] text-verified border-[rgb(var(--verified-line))]',
-    icon: CalendarClock
-  },
-  NO_CADUCA: {
-    label: 'No caduca',
-    className: 'bg-canvas text-ink-500 border-line-200',
-    icon: InfinityIcon
-  },
-  NO_VERIFICADO: {
-    label: 'Sin verificar',
-    className: 'border-dashed bg-[rgb(var(--unverified-surf))] text-unverified border-[rgb(var(--unverified-line))]',
-    icon: AlertTriangle
-  }
-};
+import { InvitacionAVerificar } from './InvitacionAVerificar';
+import { branchLabel } from '../branchLabels';
+import { censoDelCatalogo, filaDelCatalogo } from '../estadoEnElCatalogo';
+import { esTituloDeTrabajo } from '../tituloDeTrabajo';
+import type { Actuacion, ActuacionRole } from '../types';
 
 /**
- * The firm's knowledge base, editable.
+ * El Catálogo de escritorio. Artboard 3 de `public/handoff/app-buscador-catalogo.html`:
+ * cabecera con el censo a la derecha, buscador, ramas en chips con «ver todas»,
+ * el filtro de lo que falta por verificar, y la TABLA de cuatro columnas
+ * —actuación, término, fundamento, estado—.
  *
- * This is what makes the catalogue the product's rather than the developer's:
- * an actuación verified here is verified once and applies to every later draft,
- * for everyone in the firm. It is not per-document review — no draft should
- * ever require that — it is the one-time confirmation that a deadline is what
- * the norm says it is.
+ * ─── LA FICHA PASA DE PANEL LATERAL A DIÁLOGO (derivada) ────────────────────
+ *
+ * La tabla ocupa el ancho entero: un panel fijo de 460 px al lado la dejaba en
+ * dos columnas y el término —lo que se viene a consultar— se cortaba. La ficha
+ * se abre con la anatomía del artboard 2 (ficha de providencia, 860 px:
+ * cabecera con la cita, cuerpo en prosa, pie gris con las acciones) y, cuando
+ * el término está sin verificar, con la tarjeta ámbar del artboard 4 arriba. La
+ * verificación ocurre DENTRO de la misma ficha, sin perder de vista de qué
+ * actuación se trata.
+ *
+ * ─── LAS CIFRAS SE CUENTAN ──────────────────────────────────────────────────
+ *
+ * La maqueta imprime «883 actuaciones de 28 ramas» y «550 con artículo
+ * comprobado». Aquí salen de `censoDelCatalogo`, y la cifra de la derecha dice
+ * «con término verificado»: lo que el catálogo verifica es el término, y el
+ * artículo del fundamento se publica como lo trae la ficha. Llamarlo «artículo
+ * comprobado» sería afirmar lo que nadie comprobó.
+ *
+ * ─── LO QUE EL ARTBOARD PIDE Y AQUÍ NO ESTÁ, con la razón ───────────────────
+ *
+ * · Las ramas con su conteo en el chip: el catálogo no se pide por rama al
+ *   cargar (una sola lista), así que cada chip lo contaría sobre la lista
+ *   visible y cambiaría al buscar. No aporta y confunde.
+ * · Verificar sección por sección e historia de curaduría: ver `ActuacionDetail`.
  */
+
+const ROLES: Record<ActuacionRole, string> = {
+  LITIGANTE: 'Litigante',
+  DESPACHO: 'Despacho',
+  SECRETARIA: 'Secretaría'
+};
+
+/* Cinco a la vista y el resto a un clic: veintitantos chips en fila son una pared. */
+const RAMAS_A_LA_VISTA = 5;
+
+/*
+ * La misma ficha puede estar dos veces en la lista: como propia de su rama y
+ * como prestada a otra. Son dos curadurías distintas y se distinguen así.
+ */
+const mismaFicha = (a: Actuacion, b: Actuacion): boolean =>
+  a.id === b.id && (a.porRemision?.paraRama ?? null) === (b.porRemision?.paraRama ?? null);
+const claveDe = (a: Actuacion): string => `${a.id}:${a.porRemision?.paraRama ?? ''}`;
+
+type Modo = 'ficha' | 'verificar';
+
 export const CatalogCurationView: React.FC = () => {
   const curation = useCatalogCuration();
   const [selected, setSelected] = useState<Actuacion | null>(null);
+  const [modo, setModo] = useState<Modo>('ficha');
+  const [verTodasLasRamas, setVerTodasLasRamas] = useState(false);
   /** Retirar una actuación propia se pregunta: se la quita a toda la firma. */
   const [confirmacion, setConfirmacion] = useState<Confirmacion | null>(null);
   const [errorPropia, setErrorPropia] = useState<string | null>(null);
+  const panel = useRef<HTMLElement>(null);
+  const hayConfirmacion = useRef(false);
+  hayConfirmacion.current = confirmacion !== null;
 
-  // Follows the branch filter: reading eleven branches' caveats at once is the
-  // same as reading none.
-  const visibleGaps = curation.meta
+  const censo = censoDelCatalogo(curation.todas, curation.branches);
+
+  // Sigue el filtro de rama: leer las advertencias de todas a la vez es no leer ninguna.
+  const huecos = curation.meta
     .filter((m) => curation.branchFilter === 'TODAS' || m.branch === curation.branchFilter)
     .flatMap((m) => m.gaps.map((text) => ({ branch: m.branch, text })));
 
-  // The list is reloaded after each write, so the open actuación is re-read
-  // from the fresh data rather than kept as a stale snapshot.
-  const openActuacion = selected
-    ? curation.actuaciones.find(
-        (a) =>
-          a.id === selected.id &&
-          // La misma ficha puede estar dos veces en la lista: como propia de su
-          // rama y como prestada a otra. Son dos curadurías distintas.
-          (a.porRemision?.paraRama ?? null) === (selected.porRemision?.paraRama ?? null)
-      ) ?? selected
+  /*
+   * La lista se recarga tras cada escritura, así que la ficha abierta se relee
+   * de los datos frescos. Se busca también en el catálogo sin filtros: con
+   * «solo sin verificar» activo, la ficha recién verificada sale de la lista
+   * visible y la ficha quedaría mostrando la copia vieja.
+   */
+  const abierta = selected
+    ? [...curation.actuaciones, ...curation.todas].find((a) => mismaFicha(a, selected)) ?? selected
     : null;
 
+  const cerrar = () => {
+    setSelected(null);
+    setModo('ficha');
+    setErrorPropia(null);
+  };
+
+  const claveAbierta = abierta ? claveDe(abierta) : null;
+  useEffect(() => {
+    if (!claveAbierta) return;
+    panel.current?.focus();
+    const alPulsar = (e: KeyboardEvent) => {
+      /* Con la confirmación encima, Esc es de ella: cerrar las dos a la vez perdería la ficha. */
+      if (e.key === 'Escape' && !hayConfirmacion.current) cerrar();
+    };
+    document.addEventListener('keydown', alPulsar);
+    return () => document.removeEventListener('keydown', alPulsar);
+  }, [claveAbierta]);
+
+  const ramasVisibles = verTodasLasRamas
+    ? curation.branches
+    : curation.branches.filter(
+        (b, i) => i < RAMAS_A_LA_VISTA || b === curation.branchFilter
+      );
+
   return (
-    <div data-visita="vista-catalogo" className="flex-1 flex overflow-hidden bg-canvas">
-      {/*
-        ESTA VISTA ES SOLO DE ESCRITORIO. El movil tiene la suya, `CatalogMobileView`
-        (artboard 5c), pensada desde cero y no derivada de esta: alli la tarjeta
-        lleva el termino y el articulo porque no hay panel lateral donde
-        mostrarlos. `App` monta una u otra; aqui no hay clases `lg:` que
-        mantener.
-      */}
-      <section className="flex flex-1 flex-col overflow-hidden">
-        <header className="px-6 py-4 border-b border-line-200 bg-surface">
-          <div className="flex items-baseline gap-3 flex-wrap">
-            <h1 className="text-base font-bold text-ink-900">Catálogo procesal</h1>
-            <p className="text-[12px] text-ink-500">
-              {curation.total} actuaciones ·{' '}
-              <span className={curation.pending > 0 ? 'text-unverified font-semibold' : 'text-verified font-semibold'}>
-                {curation.pending} sin verificar
-              </span>
+    <div data-visita="vista-catalogo" className="cara-nueva cn-cat cn-cat-dialogos flex h-full min-h-0 min-w-0 flex-1 flex-col">
+      <div className="cn-cat-cabeza">
+        <div className="cn-cat-titular">
+          <div className="min-w-0">
+            <h1 className="cn-cat-h1">Catálogo</h1>
+            <p className="cn-cat-bajada">
+              {curation.isLoading || censo.total === 0
+                ? 'Las actuaciones con su término, su norma y su autoridad.'
+                : `${censo.total} actuaciones en ${censo.ramas} ${censo.ramas === 1 ? 'rama' : 'ramas'}. Lo que su firma verifica aquí queda para todos sus escritos: se verifica una vez, no documento por documento.`}
             </p>
           </div>
-          <p className="mt-1 max-w-2xl text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
-            Lo que verifiques aquí queda para toda la firma y la aplicación lo usará en cada
-            redacción. Se verifica una vez, no documento por documento.
+          {!curation.isLoading && censo.total > 0 && (
+            <div className="cn-cat-cifra">
+              <div className="cn-cat-cifra-numero">{censo.conTerminoVerificado}</div>
+              <div className="cn-cat-cifra-rotulo">con término verificado</div>
+            </div>
+          )}
+        </div>
+
+        {curation.curation === 'UNAVAILABLE' && (
+          <p className="cn-cat-aviso cn-cat-aviso--peligro" role="status">
+            No se pudieron leer las verificaciones de su firma. Lo que ve es el catálogo base: puede no incluir correcciones
+            que su firma ya hizo. No lo tome como vigente.
           </p>
+        )}
+        {curation.curation === 'NOT_CONFIGURED' && (
+          <p className="cn-cat-aviso" role="status">
+            La base de datos no está configurada, así que las verificaciones no pueden guardarse todavía. Puede consultar el
+            catálogo base.
+          </p>
+        )}
 
-          {curation.curation === 'UNAVAILABLE' && (
-            <div className="mt-3 flex items-start gap-2 rounded-control border border-[rgb(var(--danger)/0.35)] bg-[rgb(var(--danger)/0.06)] px-3 py-2.5">
-              <ShieldAlert className="w-4 h-4 text-danger shrink-0 mt-0.5" />
-              <p className="text-[11px] text-danger leading-snug">
-                No se pudieron leer las verificaciones de tu firma. Lo que ves es el catálogo base:
-                puede no incluir correcciones que ya hiciste. No lo tomes como vigente.
-              </p>
-            </div>
-          )}
-
-          {curation.curation === 'NOT_CONFIGURED' && (
-            <div className="mt-3 flex items-start gap-2 rounded-control border border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))] px-3 py-2.5">
-              <AlertTriangle className="w-4 h-4 text-unverified shrink-0 mt-0.5" />
-              <p className="text-[11px] text-ink-900 leading-snug">
-                La base de datos no está configurada, así que las verificaciones no pueden guardarse
-                todavía. Puedes consultar el catálogo base.
-              </p>
-            </div>
-          )}
-
-          {/* Declared coverage gaps. These are the things the catalogue knows
-              it does not cover — including, for labour, that a whole transition
-              regime runs alongside the code it was verified against. Leaving
-              them in a research file would make the catalogue look complete. */}
-          {visibleGaps.length > 0 && (
-            <details className="mt-3 rounded-control border border-line-200 bg-surface">
-              <summary className="cursor-pointer px-3 py-2 text-[11px] font-semibold text-ink-700 select-none">
-                Lo que este catálogo NO cubre
-                <span className="ml-1.5 font-normal text-ink-500">
-                  ({visibleGaps.length} advertencia{visibleGaps.length === 1 ? '' : 's'})
-                </span>
-              </summary>
-              <ul className="px-3 pb-3 pt-1 space-y-1.5">
-                {visibleGaps.map((gap) => (
-                  <li key={gap.branch + gap.text} className="text-[11px] text-ink-700 leading-snug flex gap-1.5">
-                    <span className="shrink-0 font-bold text-ink-400">{gap.branch}</span>
-                    <span>{gap.text}</span>
-                  </li>
-                ))}
-              </ul>
-            </details>
-          )}
-
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            <div className="relative">
-              <Search className="w-3.5 h-3.5 text-ink-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="search"
-                value={curation.query}
-                onChange={(e) => curation.setQuery(e.target.value)}
-                placeholder="Buscar actuación o norma"
-                className="w-64 text-[12px] border border-line-200 rounded-control pl-8 pr-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-brand-700/20 focus:border-brand-700"
-              />
-            </div>
-
-            <select
-              value={curation.branchFilter}
-              onChange={(e) => curation.setBranchFilter(e.target.value as typeof curation.branchFilter)}
-              className="text-[12px] border border-line-200 rounded-control px-2.5 py-1.5 bg-surface focus:outline-none focus:ring-2 focus:ring-brand-700/20 focus:border-brand-700"
-            >
-              <option value="TODAS">Todas las ramas</option>
-              {curation.branches.map((branch) => (
-                <option key={branch} value={branch}>
-                  {branch}
-                </option>
+        {/*
+          LO QUE EL CATÁLOGO DECLARA QUE NO CUBRE. Dejarlo en un archivo de
+          investigación haría parecer completo el catálogo.
+        */}
+        {huecos.length > 0 && (
+          <details className="cn-cat-huecos">
+            <summary>
+              Lo que este catálogo no cubre · {huecos.length} {huecos.length === 1 ? 'advertencia' : 'advertencias'}
+            </summary>
+            <ul>
+              {huecos.map((h) => (
+                <li key={h.branch + h.text}>
+                  <span className="cn-cat-hueco-rama">{branchLabel(h.branch)}</span>
+                  {h.text}
+                </li>
               ))}
-            </select>
+            </ul>
+          </details>
+        )}
 
-            <label className="inline-flex items-center gap-1.5 text-[12px] text-ink-700 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={curation.onlyUnverified}
-                onChange={(e) => curation.setOnlyUnverified(e.target.checked)}
-                className="rounded border-line-200"
-              />
-              Solo pendientes
-            </label>
-          </div>
-        </header>
+        <label className="cn-cat-busqueda">
+          <span className="sr-only">Buscar una actuación</span>
+          <IconoBuscar className="cn-cat-campo-icono" />
+          <input
+            type="search"
+            value={curation.query}
+            onChange={(e) => curation.setQuery(e.target.value)}
+            placeholder="Buscar una actuación por su nombre o su norma"
+            className="cn-cat-campo"
+          />
+        </label>
 
-        <div className="flex-1 overflow-y-auto">
-          {curation.isLoading && (
-            <div className="flex items-center justify-center gap-2 py-16 text-[12px] text-ink-500">
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Cargando catálogo…
-            </div>
+        <div className="cn-cat-ramas">
+          <button
+            type="button"
+            aria-pressed={curation.branchFilter === 'TODAS'}
+            onClick={() => curation.setBranchFilter('TODAS')}
+            className={`cn-cat-chip${curation.branchFilter === 'TODAS' ? ' cn-cat-chip--activa' : ''}`}
+          >
+            Todas
+          </button>
+          {ramasVisibles.map((b) => (
+            <button
+              key={b}
+              type="button"
+              aria-pressed={curation.branchFilter === b}
+              onClick={() => curation.setBranchFilter(b)}
+              className={`cn-cat-chip${curation.branchFilter === b ? ' cn-cat-chip--activa' : ''}`}
+            >
+              {branchLabel(b)}
+            </button>
+          ))}
+          {curation.branches.length > RAMAS_A_LA_VISTA && (
+            <button
+              type="button"
+              aria-expanded={verTodasLasRamas}
+              onClick={() => setVerTodasLasRamas((v) => !v)}
+              className="cn-cat-chip cn-cat-chip--mas"
+            >
+              {verTodasLasRamas ? 'Ver menos ramas' : `Ver las ${curation.branches.length} ramas`}
+            </button>
           )}
+          <button
+            type="button"
+            aria-pressed={curation.onlyUnverified}
+            onClick={() => curation.setOnlyUnverified(!curation.onlyUnverified)}
+            className="cn-cat-chip cn-cat-chip--pendientes"
+          >
+            Solo las que faltan por verificar · {curation.pendientesEnElFiltro}
+          </button>
+        </div>
+      </div>
 
-          {!curation.isLoading && curation.loadError && (
-            <div className="m-6 rounded-control border border-[rgb(var(--danger)/0.35)] bg-[rgb(var(--danger)/0.06)] px-4 py-3">
-              <p className="text-[12px] text-danger leading-snug">{curation.loadError}</p>
-              <button
-                onClick={() => void curation.reload()}
-                className="mt-2 text-[11px] font-semibold text-danger underline"
-              >
+      <div className="cn-cat-cuerpo">
+        {curation.isLoading && (
+          <p className="cn-cat-cargando">
+            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+            Cargando el catálogo…
+          </p>
+        )}
+
+        {!curation.isLoading && curation.loadError && (
+          <div className="cn-cat-error" role="alert">
+            <p>{curation.loadError}</p>
+            <div className="cn-cat-acciones">
+              <button type="button" onClick={() => void curation.reload()} className="cn-cat-boton cn-cat-boton--neutro">
                 Reintentar
               </button>
             </div>
-          )}
+          </div>
+        )}
 
-          {!curation.isLoading && !curation.loadError && curation.actuaciones.length === 0 && (
-            <p className="px-6 py-16 text-center text-[12px] text-ink-500">
-              Ninguna actuación coincide con el filtro.
-            </p>
-          )}
+        {!curation.isLoading && !curation.loadError && curation.actuaciones.length === 0 && (
+          <div className="cn-cat-vacio">
+            <p className="cn-cat-vacio-titulo">Ninguna actuación coincide</p>
+            <p>Cambie las palabras de la búsqueda o elija otra rama.</p>
+          </div>
+        )}
 
-          <ul className="divide-y divide-line-100">
-            {curation.actuaciones.map((actuacion) => {
-              const badge = STATUS_BADGE[actuacion.term.status];
-              const BadgeIcon = badge.icon;
-              const isOpen = openActuacion?.id === actuacion.id;
-
-              return (
-                <li key={actuacion.id}>
-                  <button
-                    onClick={() => setSelected(actuacion)}
-                    className={`w-full text-left px-6 py-3 transition-colors ${
-                      isOpen ? 'bg-brand-50/60' : 'hover:bg-surface'
-                    }`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="min-w-0 flex-1">
-                        <p className="text-[12px] font-semibold text-ink-900 leading-tight">
-                          {actuacion.exactName}
-                        </p>
-                        <p className="mt-0.5 text-justify text-[11px] leading-tight text-ink-500 [text-wrap:pretty]">
-                          {actuacion.legalBasis}
-                        </p>
-                        {actuacion.term.description && (
-                          <p className="mt-1 text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
-                            {actuacion.term.description}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="shrink-0 flex flex-col items-end gap-1">
-                        <span
-                          className={`inline-flex items-center gap-1 border rounded-full px-2 py-0.5 text-[10px] font-bold ${badge.className}`}
-                        >
-                          <BadgeIcon className="w-3 h-3" />
-                          {badge.label}
+        {!curation.isLoading && curation.actuaciones.length > 0 && (
+          <>
+            <div className="cn-cat-tabla-cabeza" aria-hidden="true">
+              <span>Actuación</span>
+              <span>Término</span>
+              <span className="cn-cat-col-fundamento">Fundamento</span>
+              <span>Estado</span>
+            </div>
+            <ul className="cn-cat-filas">
+              {curation.actuaciones.map((a) => {
+                const fila = filaDelCatalogo(a);
+                const sub = [
+                  fila.marca ?? (a.firmDefined ? 'Añadida por su firma' : a.competentAuthority ?? 'Autoridad no declarada'),
+                  a.verification ? 'Verificó su firma' : null
+                ]
+                  .filter(Boolean)
+                  .join(' · ');
+                return (
+                  <li key={claveDe(a)}>
+                    <button
+                      type="button"
+                      className="cn-cat-fila"
+                      onClick={() => {
+                        setSelected(a);
+                        setModo('ficha');
+                      }}
+                    >
+                      <span className="cn-cat-fila-nombre">
+                        <span className="cn-cat-fila-titulo">{a.exactName}</span>
+                        <span className="cn-cat-fila-sub">{sub}</span>
+                      </span>
+                      <span className={`cn-cat-fila-termino cn-cat-tono--${fila.termino.tono}`}>{fila.termino.texto}</span>
+                      <span
+                        className={`cn-cat-col-fundamento ${fila.fundamento.mono ? 'cn-cat-fila-cita' : 'cn-cat-fila-fundamento'} cn-cat-tono--${fila.fundamento.tono}`}
+                      >
+                        {fila.fundamento.texto}
+                      </span>
+                      <span>
+                        <span className={`cn-cat-sello cn-cat-sello--${fila.estado.tono}`}>
+                          {fila.estado.tono === 'ok' && <span className="cn-cat-punto" aria-hidden="true" />}
+                          {fila.estado.texto}
                         </span>
-                        {actuacion.verification && (
-                          <span
-                            className="inline-flex items-center gap-1 text-[10px] font-semibold text-brand-700"
-                            title={`Verificado por ${actuacion.verification.verifiedBy}`}
-                          >
-                            <BadgeCheck className="w-3 h-3" />
-                            Tu firma
-                          </span>
-                        )}
-                        {/*
-                          LA AÑADIÓ LA FIRMA, y se dice en la lista y no solo en
-                          la ficha: el catálogo no la trae, así que el sello de
-                          «con término» que pueda llevar al lado lo puso alguien
-                          de esta casa, no una verificación de fábrica.
-                        */}
-                        {actuacion.firmDefined && (
-                          <span className="inline-flex items-center gap-1 rounded-full border border-dashed border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))] px-2 py-0.5 text-[10px] font-bold text-unverified">
-                            <PenLine className="w-3 h-3" />
-                            De su firma
-                          </span>
-                        )}
-                        {/*
-                          LA FICHA ES DE OTRA RAMA Y ESTA LA ALCANZA. Se dice en
-                          la lista y no solo en la ficha por lo mismo que lo de
-                          arriba: al lado va el sello «Sin verificar», y sin esta
-                          marca el socio leería que el catálogo dejó un hueco en
-                          su rama, cuando lo que pasa es que el plazo está
-                          verificado en otra y nadie lo comprobó para esta.
-                        */}
-                        {actuacion.porRemision && (
-                          <span
-                            className="inline-flex items-center gap-1 rounded-full border border-line-200 bg-canvas px-2 py-0.5 text-[10px] font-bold text-ink-500"
-                            title={actuacion.porRemision.marca}
-                          >
-                            <Link2 className="w-3 h-3" />
-                            Por remisión
-                          </span>
-                        )}
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+            <p className="cn-cat-pie-nota">
+              «Sin verificar» no quiere decir que la actuación no exista: quiere decir que nadie ha leído su término en el
+              texto oficial. Su firma puede verificarlo y esa verificación queda con su nombre. «Término verificado» se
+              refiere al plazo; el artículo del fundamento se muestra como lo trae la ficha.
+            </p>
+          </>
+        )}
+      </div>
+
+      {abierta && (
+        <div className="cn-cat-ficha" role="dialog" aria-modal="true" aria-label={abierta.exactName}>
+          <div className="cn-cat-velo" onClick={cerrar} aria-hidden="true" />
+          <section ref={panel} tabIndex={-1} className="cn-cat-ficha-panel">
+            <header className="cn-cat-ficha-cabeza">
+              <div className="min-w-0">
+                <p className="cn-cat-ficha-meta">
+                  {[
+                    branchLabel(abierta.porRemision?.paraRama ?? abierta.branch),
+                    ROLES[abierta.role],
+                    modo === 'verificar' ? 'Verificar el término' : null
+                  ]
+                    .filter(Boolean)
+                    .join(' · ')}
+                </p>
+                <h2 className="cn-cat-ficha-titulo">{abierta.exactName}</h2>
+              </div>
+              <button type="button" aria-label="Cerrar" className="cn-cat-cerrar" onClick={cerrar}>
+                <X className="h-5 w-5" aria-hidden="true" />
+              </button>
+            </header>
+
+            {modo === 'verificar' ? (
+              <div className="cn-cat-ficha-contenido">
+                <VerificationForm
+                  actuacion={abierta}
+                  conResumen={false}
+                  conCabecera={false}
+                  isSaving={curation.isSaving}
+                  error={curation.saveError}
+                  onSave={curation.save}
+                  onRevert={async (id, rama) => {
+                    const hecho = await curation.revert(id, rama);
+                    if (hecho) setModo('ficha');
+                    return hecho;
+                  }}
+                  onClose={() => setModo('ficha')}
+                />
+              </div>
+            ) : (
+              <>
+                <div className="cn-cat-ficha-cuerpo">
+                  {esTituloDeTrabajo(abierta.exactName) && (
+                    <p className="cn-cat-sobre">
+                      Es un título de trabajo: describe lo que el escrito debe lograr, en palabras de su firma. No es el
+                      nombre de una figura del derecho, y por eso no trae artículo, término ni autoridad.
+                    </p>
+                  )}
+
+                  {/*
+                    LO QUE ESTA PANTALLA LE APORTA A UNA ACTUACIÓN PROPIA: nació
+                    sin norma y aquí deja de estarlo, con el MISMO formulario con
+                    que se cura una ficha de fábrica.
+                  */}
+                  {abierta.firmDefined && (
+                    <div className="cn-cat-propia">
+                      <p>
+                        Esta actuación la añadió su firma; el catálogo no la trae.{' '}
+                        {abierta.term.status === 'NO_VERIFICADO'
+                          ? 'Ninguna norma verificada la respalda.'
+                          : 'El término que lleva lo verificó su firma, no el catálogo.'}
+                      </p>
+                      {errorPropia && (
+                        <p className="cn-cat-error" role="alert">
+                          {errorPropia}
+                        </p>
+                      )}
+                      <div className="cn-cat-acciones">
+                        <button
+                          type="button"
+                          className="cn-cat-boton cn-cat-boton--peligro"
+                          onClick={() =>
+                            setConfirmacion({
+                              titulo: 'Retirar la actuación de la lista',
+                              texto: (
+                                <>
+                                  «{abierta.exactName}» dejará de ofrecerse en esta rama a todos los abogados de su firma.
+                                  Los escritos ya redactados con ella no cambian.
+                                </>
+                              ),
+                              etiqueta: 'Retirar',
+                              peligro: true,
+                              onConfirmar: async () => {
+                                setErrorPropia(null);
+                                try {
+                                  await firmActuacionesApi.eliminar(abierta.id);
+                                  cerrar();
+                                  await curation.reload();
+                                } catch (e) {
+                                  setErrorPropia(e instanceof Error ? e.message : 'No se pudo retirar la actuación.');
+                                }
+                              }
+                            })
+                          }
+                        >
+                          Retirar de la lista de la firma
+                        </button>
                       </div>
                     </div>
+                  )}
+
+                  <InvitacionAVerificar actuacion={abierta} onAnotar={() => setModo('verificar')} />
+
+                  <ActuacionDetail actuacion={abierta} />
+
+                  {abierta.porRemision?.terminoEnLaRamaFuente.description && (
+                    <p className="cn-cat-sobre">
+                      <b>Lo que dice en {branchLabel(abierta.porRemision.ramaFuente)}, como referencia:</b>{' '}
+                      {abierta.porRemision.terminoEnLaRamaFuente.description}
+                    </p>
+                  )}
+                </div>
+
+                <footer className="cn-cat-ficha-pie">
+                  <span className="cn-cat-separa" aria-hidden="true" />
+                  <button type="button" onClick={cerrar} className="cn-cat-boton cn-cat-boton--neutro">
+                    Cerrar
                   </button>
-                </li>
-              );
-            })}
-          </ul>
+                  {abierta.term.status !== 'NO_VERIFICADO' && (
+                    <button type="button" onClick={() => setModo('verificar')} className="cn-cat-boton cn-cat-boton--primario">
+                      {abierta.verification ? 'Revisar la verificación' : 'Verificar contra la norma'}
+                    </button>
+                  )}
+                </footer>
+              </>
+            )}
+          </section>
         </div>
-      </section>
-
-      {/*
-        EL PANEL PASA DE 380 A 460 Y SE VUELVE DESPLAZABLE, porque ahora carga
-        la ficha entera: los tres bloques —termino, norma, autoridad, cada uno
-        con SU estado— y las secciones obligatorias, que el catalogo siempre
-        trajo y esta pantalla nunca mostro. Un requisito que la aplicacion le
-        exige al escrito y el abogado no puede leer es un requisito que no puede
-        discutir. Ver `ActuacionDetail`, que declara ademas lo que el artboard
-        pide y hoy no tiene donde guardarse.
-      */}
-      {openActuacion && (
-        <aside className="flex w-[460px] shrink-0 flex-col overflow-hidden border-l border-line-200 bg-canvas">
-          {/*
-            EL PANEL NO SE DESPLAZA ENTERO, Y ESO NO ES ESTILO. El formulario
-            pide el alto completo de su contenedor —cabecera fija, cuerpo que
-            se desplaza y el botón «Guardar verificación» abajo—, así que
-            puesto DEBAJO de la ficha dentro de un panel desplazable empezaba
-            justo donde terminaba la pantalla: se asomaba su borde y el
-            abogado veía la ficha creyendo que no había nada más. Ahora la
-            ficha ocupa hasta un 42 % con su propio desplazamiento y el
-            formulario se queda con el resto, de modo que su botón está
-            siempre a la vista. Es el mismo defecto que enseñó el taller: una
-            acción que aparece lejos de donde se pulsa, en el caso grande no
-            aparece.
-          */}
-          <div className="max-h-[42%] shrink-0 overflow-y-auto border-b border-line-200 p-4">
-            <ActuacionDetail actuacion={openActuacion} />
-
-            {/*
-              LO QUE ESTA PANTALLA LE APORTA A UNA ACTUACIÓN PROPIA, y es el
-              punto del producto: nació sin norma y aquí deja de estarlo. El
-              formulario de abajo es el MISMO con el que se cura una ficha de
-              fábrica —término y fuente, o no se guarda—, y en cuanto queda
-              escrito la advertencia desaparece de la lista y del selector de
-              Redacción.
-            */}
-            {/*
-              LO QUE ESTA PANTALLA LE APORTA A UNA FICHA PRESTADA: la firma
-              puede verificar su plazo PARA SU RAMA, y eso no toca el de la rama
-              de origen. Es la única forma honesta de cerrar el hueco: la ficha
-              existe aquí porque el Código General del Proceso gobierna estos
-              asuntos, y su plazo aquí lo tiene que leer alguien.
-            */}
-            {openActuacion.porRemision && (
-              <div className="mt-3 space-y-2">
-                <p className="notice">
-                  <Link2 className="mt-0.5 h-4 w-4 shrink-0 text-brand-700" />
-                  <span className="text-justify [text-wrap:pretty]">
-                    Esta ficha es de {BRANCH_LABELS[openActuacion.porRemision.ramaFuente] ??
-                      openActuacion.porRemision.ramaFuente}{' '}
-                    y llega a {BRANCH_LABELS[openActuacion.porRemision.paraRama] ??
-                      openActuacion.porRemision.paraRama}{' '}
-                    por remisión ({openActuacion.porRemision.base}).{' '}
-                    {openActuacion.porRemision.aviso}
-                    {openActuacion.porRemision.alcance
-                      ? ` ${openActuacion.porRemision.alcance}`
-                      : ''}{' '}
-                    {openActuacion.term.status === 'NO_VERIFICADO'
-                      ? 'Si lo comprueba abajo, quedará verificado solo para esta rama y no cambiará el del proceso civil.'
-                      : 'El término que lleva lo verificó su firma para esta rama.'}
-                  </span>
-                </p>
-                {openActuacion.porRemision.terminoEnLaRamaFuente.description && (
-                  <p className="rounded-control border border-line-200 bg-canvas px-3 py-2 text-[11px] leading-snug text-ink-500 text-justify [text-wrap:pretty]">
-                    <span className="font-semibold text-ink-700">
-                      Lo que dice en{' '}
-                      {BRANCH_LABELS[openActuacion.porRemision.ramaFuente] ??
-                        openActuacion.porRemision.ramaFuente}
-                      , como referencia:
-                    </span>{' '}
-                    {openActuacion.porRemision.terminoEnLaRamaFuente.description}
-                  </p>
-                )}
-              </div>
-            )}
-
-            {openActuacion.firmDefined && (
-              <div className="mt-3 space-y-2">
-                <p className="notice-unverified">
-                  <PenLine className="mt-0.5 h-4 w-4 shrink-0 text-unverified" />
-                  <span className="text-justify [text-wrap:pretty]">
-                    Esta actuación la añadió su firma; el catálogo no la trae.
-                    {openActuacion.term.status === 'NO_VERIFICADO'
-                      ? ' Escriba abajo el término y la fuente donde lo leyó, y dejará de advertirse.'
-                      : ' El término que lleva lo verificó su firma, no el catálogo.'}
-                  </span>
-                </p>
-
-                {errorPropia && (
-                  <p className="rounded-control border border-[rgb(var(--danger-line))] bg-[rgb(var(--danger)/0.06)] px-3 py-2 text-[11px] text-danger">
-                    {errorPropia}
-                  </p>
-                )}
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    setConfirmacion({
-                      titulo: 'Retirar la actuación de la lista',
-                      texto: (
-                        <>
-                          «{openActuacion.exactName}» dejará de ofrecerse en esta rama a todos los
-                          abogados de su firma. Los escritos ya redactados con ella no cambian.
-                        </>
-                      ),
-                      etiqueta: 'Retirar',
-                      peligro: true,
-                      onConfirmar: async () => {
-                        setErrorPropia(null);
-                        try {
-                          await firmActuacionesApi.eliminar(openActuacion.id);
-                          setSelected(null);
-                          await curation.reload();
-                        } catch (e) {
-                          setErrorPropia(
-                            e instanceof Error ? e.message : 'No se pudo retirar la actuación.'
-                          );
-                        }
-                      }
-                    })
-                  }
-                  className="btn-danger btn-sm"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                  Retirar de la lista de la firma
-                </button>
-              </div>
-            )}
-          </div>
-          <div className="min-h-0 flex-1">
-            <VerificationForm
-              actuacion={openActuacion}
-              conResumen={false}
-              isSaving={curation.isSaving}
-              error={curation.saveError}
-              onSave={curation.save}
-              onRevert={async (id, rama) => {
-                const done = await curation.revert(id, rama);
-                if (done) setSelected(null);
-                return done;
-              }}
-              onClose={() => setSelected(null)}
-            />
-          </div>
-        </aside>
       )}
 
       <ConfirmarDialog confirmacion={confirmacion} onCerrar={() => setConfirmacion(null)} />

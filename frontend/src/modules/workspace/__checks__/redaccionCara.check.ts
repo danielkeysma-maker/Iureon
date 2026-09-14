@@ -151,7 +151,8 @@ check(
 check('la franja de procedencia sigue sobre el borrador, ahora a todo lo ancho', LIENZO.includes('<DraftProvenanceBar'));
 check(
   'el papel conserva todas las acciones del taller (README-app §2)',
-  ['Taller', "'Ver' : 'Editar'", 'Sugerir jerga', 'Enseñar estilo', 'Mis borradores', 'Guardar', '<ControlDeLetra'].every((t) => VISOR.includes(t))
+  /* «Enseñar estilo» pasó a «Enseñar este formato» (14 sep 2026) y su texto sale de `TEXTO_BOTON_ENSENAR`. */
+  ['Taller', "'Ver' : 'Editar'", 'TEXTO_BOTON_JERGA', 'TEXTO_BOTON_ENSENAR', 'Mis borradores', 'Guardar', '<ControlDeLetra'].every((t) => VISOR.includes(t))
 );
 check(
   'la letra del papel sigue llegando de la firma y del control de letra',
@@ -302,7 +303,19 @@ check(
       PANEL.includes(t)
     )
   );
-  check('«Cómo escribe su firma» solo existe con Membrete configurado y sin interruptor', /\{formatoDeFirmaConfigurado && \(\s*<Paso n=\{3\} titulo="Cómo escribe su firma">/.test(PANEL) && !/type="checkbox"[^>]*role="switch"|role="switch"/.test(PANEL));
+  /*
+   * CAMBIÓ EL 14 DE SEPTIEMBRE DE 2026, a propósito: el paso 3 ya no es solo
+   * Membrete. El formato que la firma enseñó también viaja, y con él llega el
+   * interruptor — pero solo cuando HAY formato enseñado. Sin él, una línea dice
+   * que se redacta con el formato por defecto y no hay nada que apagar.
+   */
+  check(
+    '«Cómo escribe su firma» existe con Membrete o con respuesta del perfil; el interruptor, una vez y solo con formato enseñado',
+    /\{\(formatoDeFirmaConfigurado \|\| lineaDeEstilo\) && \(\s*<Paso n=\{3\} titulo="Cómo escribe su firma">/.test(PANEL) &&
+      /lineaDeEstilo\?\.tipo === 'CON_PERFIL' && \(\s*<label className="cn-est-interruptor">\s*<input\s+type="checkbox"\s+role="switch"/.test(PANEL) &&
+      (PANEL.match(/role="switch"/g) ?? []).length === 1 &&
+      PANEL.includes("lineaDeEstilo?.tipo === 'SIN_PERFIL'")
+  );
   check('la consola va debajo del botón, solo cuando hay algo que decir', PANEL.indexOf('className="cn-red-generar"') < PANEL.indexOf('<AgentConsoleStream') && PANEL.includes('isProcessing || logs.length > 0'));
   check('el asistente no promete lo que no existe', !/Usar[aá] los \d+ documentos|Armar el borrador|jerga que usted ense[nñ][oó]/.test(PANEL));
 
@@ -329,12 +342,21 @@ check(
   check('el término de la columna no va en mono', !/cn-red-mono[^>]*>\s*\{actuacion\.term\.description/.test(RESPALDO + ELEGIDA));
   check('la tarjeta dice «término verificado» y no «Término y artículo comprobados»', !/T[eé]rmino y art[ií]culo comprobados/.test(ELEGIDA + BARRA + MOVIL) && ELEGIDA.includes('estadoDeLaFicha('));
 
-  check('«Enseñar estilo» ya no dice «Aprendido»', !/Aprendido/.test(VISOR));
+  check('«Enseñar este formato» no dice «Aprendido»', !/Aprendido/.test(VISOR));
+  /*
+   * CAMBIÓ EL 14 DE SEPTIEMBRE DE 2026: «Enseñar este formato» abre el diálogo
+   * real y se apaga para quien no es socio. Y el mismo día, en la unidad
+   * siguiente, «Sugerir jerga» dejó de estar apagado con «Próximamente»: abre
+   * «Jerga de su firma», sin modelo, para todos (check:estilo y check:jerga).
+   */
   check(
-    '«Enseñar estilo» y «Sugerir jerga» siguen a la vista, apagados, sin cablear al simulacro y con «Próximamente»',
-    (VISOR.match(/<button type="button" disabled className="cn-red-trabajar-boton">/g) ?? []).length === 2 &&
+    '«Enseñar este formato» abre el diálogo real solo para el socio; «Sugerir jerga» abre la jerga real, sin simulacro ni «Próximamente»',
+    VISOR.includes('<EnsenarFormatoDialog') &&
+      VISOR.includes('disabled={!puedeEnsenarFormato}') &&
+      VISOR.includes('<JergaDeLaFirma') &&
+      !/<button type="button" disabled className="cn-red-trabajar-boton">/.test(VISOR) &&
       !/JargonSuggestionModal|learningApi|learning\.api/.test(VISOR) &&
-      VISOR.includes('Próximamente')
+      !VISOR.includes('Próximamente')
   );
   check('la columna y «Trabajar el escrito» se van en modo concentración', VISOR.includes('{!isFocusMode && (') && VISOR.includes('{isFocusMode && trabajar}'));
   check('lo editado sale con keepalive también al desmontar el visor', /return \(\) => \{[\s\S]*?removeEventListener\('pagehide', vaciar\);\s*vaciar\(\);/.test(VISOR));

@@ -6,6 +6,7 @@ import { LegalDraftViewer } from '../../documents/components/LegalDraftViewer';
 import { DraftProvenanceBar } from '../../documents/components/DraftProvenanceBar';
 import { useActuacionLookup } from '../../catalog/hooks/useActuacion';
 import type { GeneratedDraft } from '../../documents/types';
+import type { ActuacionRole } from '../../catalog/types';
 
 interface DocumentCanvasRightProps {
   rightView: 'pdf' | 'draft';
@@ -26,6 +27,11 @@ interface DocumentCanvasRightProps {
   /** Formato del escrito de la firma, para que el lienzo se vea como el papel. */
   formato?: FormatoDelEscrito | null;
   onAbrirTaller?: (textoActual: string) => void;
+  /** El rol del taller: decide a qué formato se enseña cuando la actuación no resuelve en el catálogo. */
+  rolDelTaller?: ActuacionRole;
+  /** Solo el socio administrador enseña el formato de la firma. */
+  puedeEnsenarFormato?: boolean;
+  onSaldoCambiado?: () => void;
 }
 
 /**
@@ -61,7 +67,10 @@ export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
   legalBranch = '',
   oculto = false,
   formato = null,
-  onAbrirTaller
+  onAbrirTaller,
+  rolDelTaller = 'LITIGANTE',
+  puedeEnsenarFormato = false,
+  onSaldoCambiado
 }) => {
   const lookup = useActuacionLookup(documentType, legalBranch);
   const texto = generatedDraft?.legalText ?? '';
@@ -82,7 +91,7 @@ export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
     <section className={`cn-red-lienzo h-full min-w-0 flex-1 flex-col overflow-hidden ${oculto ? 'hidden' : 'flex'}`}>
       {rightView === 'draft' && generatedDraft && (
         <div className="cn-red-franja">
-          <DraftProvenanceBar procedencia={generatedDraft.procedencia} />
+          <DraftProvenanceBar procedencia={generatedDraft.procedencia} estiloAplicado={generatedDraft.estiloAplicado} />
         </div>
       )}
 
@@ -116,6 +125,10 @@ export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
               formato={formato}
               onAbrirTaller={onAbrirTaller}
               ficha={lookup}
+              rolDelEscrito={lookup.actuacion?.role ?? rolDelTaller}
+              ramaDelEscrito={legalBranch}
+              puedeEnsenarFormato={puedeEnsenarFormato}
+              onSaldoCambiado={onSaldoCambiado}
             />
           ) : (
             /*

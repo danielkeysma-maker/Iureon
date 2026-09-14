@@ -18,6 +18,7 @@
     "check:orientacion-cara": "npx tsx src/modules/catalog/__checks__/orientacionCara.check.ts",
     "check:borradores-cara": "npx tsx src/modules/documents/__checks__/borradoresCara.check.ts",
     "check:expedientes-cara": "npx tsx src/modules/expedientes/__checks__/expedientesCara.check.ts",
+    "check:buscar-casos": "npx tsx src/modules/expedientes/__checks__/buscarCasos.check.ts",
     "check:avisos-cara": "npx tsx src/modules/push/__checks__/avisosCara.check.ts",
     "check:audiencias-cara": "npx tsx src/modules/transcription/__checks__/audienciasCara.check.ts",
     "check:entrevistas-cara": "npx tsx src/modules/clients/__checks__/entrevistasCara.check.ts",
@@ -47,7 +48,11 @@
     "check:ajustes-plan-cara": "npx tsx src/modules/settings/__checks__/ajustesPlanCara.check.ts",
     "check:administrar-saldo-cara": "npx tsx src/modules/billing/__checks__/administrarSaldoCara.check.ts",
     "check:agenda-contador": "npx tsx src/modules/agenda/__checks__/desdeElContador.check.ts",
-    "check:agenda-exportar": "npx esbuild src/modules/agenda/__checks__/agendaExportar.check.ts --bundle --platform=node --format=cjs --outfile=node_modules/.cache/agendaExportar.check.cjs --log-level=error && node node_modules/.cache/agendaExportar.check.cjs"
+    "check:agenda-exportar": "npx esbuild src/modules/agenda/__checks__/agendaExportar.check.ts --bundle --platform=node --format=cjs --outfile=node_modules/.cache/agendaExportar.check.cjs --log-level=error && node node_modules/.cache/agendaExportar.check.cjs",
+    "check:consola-cara": "npx tsx src/modules/admin/__checks__/consolaCara.check.ts",
+    "check:buscador-catalogo-cara": "npx tsx src/modules/search/__checks__/buscadorCatalogoCara.check.ts",
+    "check:estilo": "npx tsx src/modules/estilo/__checks__/estilo.check.ts",
+    "check:jerga": "npx tsx src/modules/estilo/__checks__/jerga.check.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",

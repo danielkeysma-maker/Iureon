@@ -9,6 +9,10 @@ import { FirmUsersDialog } from '../../tenant/components/FirmUsersDialog';
 import { useTenant } from '../../tenant/TenantContext';
 import { usePlan } from '../../subscriptions/PlanContext';
 import { lineaDelVencimiento, nombreDelPlanActual } from '../../subscriptions/planEnPantalla';
+import { EstiloDeLaFirmaSection } from '../../estilo/components/EstiloDeLaFirmaSection';
+import { TITULO_SECCION_AJUSTES } from '../../estilo/estiloEnPantalla';
+import { SECCION_ESTILO, alPedirElEstiloDeLaFirma } from '../../estilo/irAlEstilo';
+import { PANTALLAS, recordado, recordar } from '../../tenant/pantallaRecordada';
 
 /**
  * Ajustes, dividido en «Suyas» y «De la firma».
@@ -35,9 +39,14 @@ import { lineaDelVencimiento, nombreDelPlanActual } from '../../subscriptions/pl
  *    servidor no avisa por tipo; los avisos se activan por dispositivo.
  * Y se quedan «Atajos de teclado», que la maqueta no dibuja y la aplicación sí
  * escucha: quitarlos esconde algo que funciona.
+ *
+ * «ESTILO DE LA FIRMA» (14 sep 2026) es la sección que promete el pie de
+ * «Enseñar este formato». Se llega también desde ese diálogo: quien navega deja
+ * la sección en `PANTALLAS.ajustes` (o pide ir con el evento de `irAlEstilo`),
+ * y Ajustes abre en ella y la olvida.
  */
 
-type Seccion = 'cuenta' | 'apariencia' | 'avisos' | 'instalar' | 'atajos' | 'plan';
+type Seccion = 'cuenta' | 'apariencia' | 'avisos' | 'instalar' | 'atajos' | 'plan' | 'estilo';
 
 interface Entrada {
   id: Seccion | 'documento' | 'membrete' | 'usuarios';
@@ -56,7 +65,8 @@ const DE_LA_FIRMA: Entrada[] = [
   { id: 'plan', label: 'Plan y saldo' },
   { id: 'usuarios', label: 'Usuarios' },
   { id: 'membrete', label: 'Membrete' },
-  { id: 'documento', label: 'Documento y formato' }
+  { id: 'documento', label: 'Documento y formato' },
+  { id: 'estilo', label: TITULO_SECCION_AJUSTES }
 ];
 
 const NOMBRE_DEL_TEMA: Record<Theme, string> = { system: 'Sigue al sistema', light: 'Claro siempre', dark: 'Oscuro siempre' };
@@ -73,8 +83,18 @@ interface SettingsViewProps {
 
 export const SettingsView: React.FC<SettingsViewProps> = ({ onLogout }) => {
   /* En escritorio abre en «Su cuenta», como el artboard; en el teléfono manda `abiertaEnTelefono`. */
-  const [seccion, setSeccion] = useState<Seccion>('cuenta');
-  const [abiertaEnTelefono, setAbiertaEnTelefono] = useState(false);
+  const pedida = recordado(PANTALLAS.ajustes) === SECCION_ESTILO;
+  const [seccion, setSeccion] = useState<Seccion>(pedida ? 'estilo' : 'cuenta');
+  const [abiertaEnTelefono, setAbiertaEnTelefono] = useState(pedida);
+  /* La sección pedida se usa una vez: volver a Ajustes otro día abre donde siempre. */
+  React.useEffect(() => {
+    recordar(PANTALLAS.ajustes, null);
+    return alPedirElEstiloDeLaFirma(() => {
+      recordar(PANTALLAS.ajustes, null);
+      setSeccion('estilo');
+      setAbiertaEnTelefono(true);
+    });
+  }, []);
   const { prefs, cambiar } = usePreferences();
   const { activeFirm } = useTenant();
   const { plan, abrirPlan, puedePagar } = usePlan();
@@ -175,6 +195,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onLogout }) => {
         {seccion === 'instalar' && <InstalarSection />}
         {seccion === 'atajos' && <AtajosSection />}
         {seccion === 'plan' && <PlanYSaldoSection />}
+        {seccion === 'estilo' && <EstiloDeLaFirmaSection />}
       </main>
 
       <FirmBrandingModal isOpen={marcaAbierta} onClose={() => setMarcaAbierta(false)} />

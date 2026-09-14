@@ -5,10 +5,10 @@ import { documentosEnPalabras, esUrgente, plazoEnPalabras } from '../services/ca
 import {
   agruparPorClienteYRama,
   clienteYRama,
-  filtrarCasos,
   gruposAbiertosPorDefecto,
   resumenDelCliente
 } from '../services/agruparCasos';
+import type { MotivoDeCoincidencia, ResultadoDeBusqueda } from '../services/buscarCasos';
 
 /**
  * LOS CASOS EN LA LISTA DE EXPEDIENTES: plana en «Esta semana», por cliente y
@@ -24,25 +24,30 @@ import {
  * arriba abajo por fecha, y partirla por cliente escondería el segundo término
  * más urgente dentro de un grupo cerrado. Por eso cada tarjeta dice ahí de
  * quién es el caso.
+ *
+ * LA LISTA LLEGA YA FILTRADA —pestaña, año, mes y búsqueda— desde la vista,
+ * con el porqué de cada coincidencia. Aquí solo se pinta.
  */
 
 interface PropsDeLista {
-  casos: ExpedienteEnLista[];
-  busqueda: string;
+  resultados: ResultadoDeBusqueda[];
+  /** Los filtros puestos, en palabras; vacío si no hay ninguno. */
+  filtros: string[];
   abriendo: string | null;
   onAbrir: (id: string) => void;
-  onBorrarBusqueda: () => void;
+  onLimpiarFiltros: () => void;
 }
 
 /* ─── LA TARJETA ──────────────────────────────────────────────────────────── */
 
 const TarjetaDeCaso: React.FC<{
   caso: ExpedienteEnLista;
+  porQue: MotivoDeCoincidencia | null;
   conClienteYRama: boolean;
   cerrado: boolean;
   abriendo: boolean;
   onAbrir: () => void;
-}> = ({ caso, conClienteYRama, cerrado, abriendo, onAbrir }) => {
+}> = ({ caso, porQue, conClienteYRama, cerrado, abriendo, onAbrir }) => {
   /* Lo vencido manda sobre lo próximo, igual que en el aviso del caso. */
   const t = caso.terminoVencido ?? caso.proximoTermino;
   const docs = documentosEnPalabras(caso.documentos);
@@ -77,6 +82,18 @@ const TarjetaDeCaso: React.FC<{
           )}
         </span>
       )}
+      {/*
+        POR QUÉ APARECE, cuando la tarjeta no lo deja ver: la cédula de la
+        contraparte, una persona del caso, el año del radicado. Solo el campo
+        que coincidió, y como se guardó.
+      */}
+      {porQue && (
+        <span className="cn-exp-tarjeta-porque">
+          Coincide con: {porQue.etiqueta}
+          {porQue.conDosPuntos ? ': ' : ' '}
+          <span className={porQue.mono ? 'cn-exp-mono' : undefined}>{porQue.valor}</span>
+        </span>
+      )}
       <span className="cn-exp-tarjeta-estado">
         {abriendo ? (
           <span className="inline-flex items-center gap-2">
@@ -108,29 +125,30 @@ const TarjetaDeCaso: React.FC<{
   );
 };
 
-const NingunoCoincide: React.FC<{ busqueda: string; onBorrarBusqueda: () => void }> = ({ busqueda, onBorrarBusqueda }) => (
+const NingunoCoincide: React.FC<{ filtros: string[]; onLimpiarFiltros: () => void }> = ({ filtros, onLimpiarFiltros }) => (
   <div className="cn-exp-vacio" role="status">
     <p className="cn-exp-vacio-titulo">Ninguno coincide</p>
     <p className="cn-exp-vacio-texto [overflow-wrap:anywhere]">
-      Ningún caso de esta pestaña tiene «{busqueda.trim()}» en el cliente, el nombre, el radicado o el despacho.
+      Ningún caso de esta pestaña coincide con {filtros.join(' · ')}. Se busca por nombre del cliente, del caso o de
+      cualquier persona registrada, por cédula o NIT, por radicado y por despacho.
     </p>
-    <button type="button" className="cn-ini-boton cn-ini-boton--suave cn-exp-boton" onClick={onBorrarBusqueda}>
-      Borrar la búsqueda
+    <button type="button" className="cn-ini-boton cn-ini-boton--suave cn-exp-boton" onClick={onLimpiarFiltros}>
+      Limpiar filtros
     </button>
   </div>
 );
 
 /* ─── «ESTA SEMANA»: PLANA ────────────────────────────────────────────────── */
 
-export const ListaDeLaSemana: React.FC<PropsDeLista> = ({ casos, busqueda, abriendo, onAbrir, onBorrarBusqueda }) => {
-  const visibles = filtrarCasos(casos, busqueda);
-  if (visibles.length === 0) return <NingunoCoincide busqueda={busqueda} onBorrarBusqueda={onBorrarBusqueda} />;
+export const ListaDeLaSemana: React.FC<PropsDeLista> = ({ resultados, filtros, abriendo, onAbrir, onLimpiarFiltros }) => {
+  if (resultados.length === 0) return <NingunoCoincide filtros={filtros} onLimpiarFiltros={onLimpiarFiltros} />;
   return (
     <ul className="cn-exp-tarjetas">
-      {visibles.map((caso) => (
+      {resultados.map(({ caso, porQue }) => (
         <li key={caso.id}>
           <TarjetaDeCaso
             caso={caso}
+            porQue={porQue}
             conClienteYRama
             cerrado={false}
             abriendo={abriendo === caso.id}
@@ -171,34 +189,36 @@ const guardarAbiertos = (abiertos: Record<string, boolean>): void => {
 };
 
 export const ListaPorCliente: React.FC<PropsDeLista & { cerrados: boolean }> = ({
-  casos,
-  busqueda,
+  resultados,
+  filtros,
   cerrados,
   abriendo,
   onAbrir,
-  onBorrarBusqueda
+  onLimpiarFiltros
 }) => {
   const base = React.useId();
-  const hayBusqueda = busqueda.trim() !== '';
-  const grupos = React.useMemo(() => agruparPorClienteYRama(casos, busqueda), [casos, busqueda]);
-  const porDefecto = React.useMemo(() => gruposAbiertosPorDefecto(grupos, hayBusqueda), [grupos, hayBusqueda]);
+  const hayFiltros = filtros.length > 0;
+  const grupos = React.useMemo(() => agruparPorClienteYRama(resultados.map((r) => r.caso), ''), [resultados]);
+  const porQue = React.useMemo(() => new Map(resultados.map((r) => [r.caso.id, r.porQue])), [resultados]);
+  const porDefecto = React.useMemo(() => gruposAbiertosPorDefecto(grupos, hayFiltros), [grupos, hayFiltros]);
   const [preferencias, setPreferencias] = React.useState(leerAbiertos);
   /*
-   * CON BÚSQUEDA TODO SE ABRE, aunque el abogado hubiera cerrado ese cliente:
-   * si no, buscaría un radicado y no lo vería. Lo que cierre mientras busca no
-   * se guarda —dura hasta que cambie la búsqueda— para no esconderle ese
-   * cliente la próxima vez que entre sin buscar.
+   * CON UN FILTRO PUESTO TODO SE ABRE, aunque el abogado hubiera cerrado ese
+   * cliente: si no, buscaría un radicado y no lo vería. Lo que cierre mientras
+   * filtra no se guarda —dura hasta que cambien los filtros— para no esconderle
+   * ese cliente la próxima vez que entre sin filtrar.
    */
+  const claveDeFiltros = filtros.join('|');
   const [cerradosAlBuscar, setCerradosAlBuscar] = React.useState<ReadonlySet<string>>(new Set());
   React.useEffect(() => {
     setCerradosAlBuscar(new Set());
-  }, [busqueda]);
+  }, [claveDeFiltros]);
 
   const estaAbierto = (clave: string): boolean =>
-    hayBusqueda ? !cerradosAlBuscar.has(clave) : preferencias[clave] ?? porDefecto.has(clave);
+    hayFiltros ? !cerradosAlBuscar.has(clave) : preferencias[clave] ?? porDefecto.has(clave);
 
   const alternar = (clave: string): void => {
-    if (hayBusqueda) {
+    if (hayFiltros) {
       setCerradosAlBuscar((previo) => {
         const siguiente = new Set(previo);
         if (siguiente.has(clave)) siguiente.delete(clave);
@@ -212,7 +232,7 @@ export const ListaPorCliente: React.FC<PropsDeLista & { cerrados: boolean }> = (
     guardarAbiertos(siguiente);
   };
 
-  if (grupos.length === 0) return <NingunoCoincide busqueda={busqueda} onBorrarBusqueda={onBorrarBusqueda} />;
+  if (grupos.length === 0) return <NingunoCoincide filtros={filtros} onLimpiarFiltros={onLimpiarFiltros} />;
 
   return (
     <div className="cn-exp-clientes">
@@ -246,6 +266,7 @@ export const ListaPorCliente: React.FC<PropsDeLista & { cerrados: boolean }> = (
                       <li key={caso.id}>
                         <TarjetaDeCaso
                           caso={caso}
+                          porQue={porQue.get(caso.id) ?? null}
                           conClienteYRama={false}
                           cerrado={cerrados}
                           abriendo={abriendo === caso.id}

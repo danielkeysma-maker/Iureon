@@ -16,7 +16,13 @@ import { adjuntosPendientes } from '../services/adjuntos';
  * colega a teclear otra vez lo que la aplicación ya leyó. Vacío significa
  * «sin expediente», que es un escrito suelto y perfectamente válido.
  */
-export function useLegalAgentWorkflow(formatoDeFirma?: string, expedienteId?: string) {
+/*
+ * @param rolDelTaller Quién firma, según la cascada. Viaja para que el servidor
+ * elija el estilo enseñado cuando la actuación no resuelve en el catálogo; con
+ * ficha manda el rol de la ficha. NUNCA viaja el texto del estilo: lo lee el
+ * servidor de la base.
+ */
+export function useLegalAgentWorkflow(formatoDeFirma?: string, expedienteId?: string, rolDelTaller?: string) {
 
   /*
    * NACE EN EL DOCUMENTO. Con el asistente de Redactar, el lienzo solo aparece
@@ -42,6 +48,12 @@ export function useLegalAgentWorkflow(formatoDeFirma?: string, expedienteId?: st
   // de reposición" exists in civil and administrativo with different deadlines,
   // and without the branch the backend correctly refuses to guess.
   const [legalBranch, setLegalBranch] = useState('CONSTITUCIONAL');
+  /*
+   * «Usar el formato y la jerga que su firma enseñó». NACE ENCENDIDO y vuelve a
+   * encenderse al terminar cada generación: apagarlo es una decisión sobre ESTE
+   * borrador, no un ajuste que se queda pegado sin que nadie lo recuerde.
+   */
+  const [usarEstilo, setUsarEstilo] = useState(true);
   const [copied, setCopied] = useState(false);
   const [generatedDraft, setGeneratedDraft] = useState<GeneratedDraft | null>(null);
   const [isFocusMode, setIsFocusMode] = useState(false);
@@ -145,6 +157,8 @@ Por favor espere unos segundos mientras se finaliza la redacción solemne.`,
         existingDraft: activeDraftText || undefined,
         customFormatInstruction: formatoDeFirma || undefined,
         expedienteId: expedienteId || undefined,
+        usarEstilo,
+        rolDelTaller: rolDelTaller || undefined,
         adjuntos: adjuntos.length > 0 ? adjuntos : undefined
       });
 
@@ -266,6 +280,7 @@ Por favor espere unos segundos mientras se finaliza la redacción solemne.`,
       setIsProcessing(false);
       setLegalPrompt('');
       setActiveDraftText(null);
+      setUsarEstilo(true);
     }
     return generado;
   };
@@ -287,6 +302,8 @@ Por favor espere unos segundos mientras se finaliza la redacción solemne.`,
     setDocumentType,
     legalBranch,
     setLegalBranch,
+    usarEstilo,
+    setUsarEstilo,
     copied,
     generatedDraft,
     setGeneratedDraft,

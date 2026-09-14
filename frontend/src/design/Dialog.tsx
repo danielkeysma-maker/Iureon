@@ -28,18 +28,42 @@ import { X } from 'lucide-react';
 export type TamanoDialogo = 'S' | 'M' | 'L';
 
 /**
- * S · 420px — confirmaciones. Alto libre, nunca scroll.
- * M · 640px — formularios y calculadoras. Alto máximo 72vh.
+ * S · 420px — confirmaciones.
+ * M · 640px — formularios y calculadoras.
  * L · 960px — visores y tablas. Alto fijo 80vh, cuerpo con scroll.
+ *
+ * EL ALTO MÁXIMO NO VA POR TAMAÑO: lo pone el panel para los tres (ver «TODO
+ * DIÁLOGO CABE EN LA VENTANA»). El `max-h-[72vh]` que tenía M aquí nunca se aplicó en
+ * escritorio, porque el panel ponía `sm:max-h-none` y ese ganaba.
  *
  * El ancho lo decide el CONTENIDO, no el módulo: una confirmación de una línea
  * en un diálogo de 960px se lee como un error del programa.
  */
 const ANCHO: Record<TamanoDialogo, string> = {
   S: 'max-w-[420px]',
-  M: 'max-w-[640px] max-h-[72vh]',
+  M: 'max-w-[640px]',
   L: 'max-w-[960px] h-[80vh]'
 };
+
+/*
+ * ─── TODO DIÁLOGO CABE EN LA VENTANA (14 sep 2026) ─────────────────────────
+ *
+ * DEFECTO QUE ESTO CORRIGE: el panel llevaba `sm:max-h-none`, que en escritorio
+ * anulaba cualquier alto máximo. Un diálogo largo crecía con su contenido: la
+ * vista previa de «Enseñar este formato» midió 1.357 px en una pantalla de
+ * 768, con el título y los botones fuera de la vista y sin forma de llegar a
+ * «Guardar». El comentario de arriba prometía «cabecera y pie fijos, scroll
+ * solo en el cuerpo», y la clase lo desmentía.
+ *
+ * El tope es la ventana menos 24 px arriba y abajo (el `sm:p-4` del velo más
+ * aire), en `dvh` para que en una tableta la barra del navegador no lo corte.
+ * Con el panel acotado, el cuerpo (`min-h-0 flex-1 overflow-y-auto`) es lo
+ * único que se desplaza. En el teléfono sigue la hoja de 76 %.
+ *
+ * Va escrito en el `className` del panel y no en una constante: el check
+ * `esquinasDeDialogos` lee esa cadena para exigir el tope y prohibir
+ * `sm:max-h-none`.
+ */
 
 interface DialogProps {
   abierto: boolean;
@@ -188,7 +212,7 @@ export const Dialog: React.FC<DialogProps> = ({
           tarjetas que no son diálogos, así que se cambia el marco y no el token;
           `overflow-hidden` ya recorta cabecera y pie contra la curva.
         */
-        className={`relative flex max-h-[76vh] w-full flex-col overflow-hidden rounded-t-[20px] border-line-200 bg-surface pb-[env(safe-area-inset-bottom)] shadow-[0_16px_40px_-12px_rgb(16_24_34/0.3)] focus:outline-none sm:max-h-none sm:rounded-[20px] sm:border sm:pb-0 ${ANCHO[tamano]}`}
+        className={`relative flex max-h-[76vh] sm:max-h-[calc(100dvh-48px)] w-full flex-col overflow-hidden rounded-t-[20px] border-line-200 bg-surface pb-[env(safe-area-inset-bottom)] shadow-[0_16px_40px_-12px_rgb(16_24_34/0.3)] focus:outline-none sm:rounded-[20px] sm:border sm:pb-0 ${ANCHO[tamano]}`}
       >
         {/* ─── CABECERA · fija, nunca lleva controles ni pestañas ────────── */}
         {/*

@@ -9419,6 +9419,78 @@
 .cara-nueva .cn-exp-lista-filtro .cn-exp-entrada {
   height: 44px;
 }
+/*
+ * Año y mes de registro, en su renglón bajo la raya: filtran la misma pestaña
+ * que la búsqueda, y en un segundo renglón no le quitan ancho a la caja.
+ */
+.cara-nueva .cn-exp-lista-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px 16px;
+  margin: 14px 40px 0;
+}
+.cara-nueva .cn-exp-fechas {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 6px 12px;
+}
+.cara-nueva .cn-exp-fechas-rotulo {
+  flex-basis: 100%;
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-exp-fechas .cn-exp-fecha {
+  width: 190px;
+  flex: 0 1 190px;
+}
+.cara-nueva .cn-exp-fecha .cn-red-lista {
+  width: 240px;
+}
+.cara-nueva .cn-exp-fecha-apagada,
+.cara-nueva .cn-exp-fecha-apagada:hover {
+  background: var(--field);
+  color: var(--ink-4);
+  cursor: not-allowed;
+}
+.cara-nueva .cn-exp-fecha-movil {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cara-nueva .cn-exp-fecha-rotulo {
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 500;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-exp-fecha-select {
+  width: 100%;
+  font-size: 16px;
+}
+.cara-nueva .cn-exp-fecha-select:disabled {
+  color: var(--ink-4);
+  cursor: not-allowed;
+}
+.cara-nueva .cn-exp-lista-cuenta {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-exp-tarjeta-porque {
+  min-width: 0;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-3);
+  overflow-wrap: anywhere;
+}
 .cara-nueva .cn-exp-cuerpo {
   display: grid;
   max-width: 860px;
@@ -10475,6 +10547,21 @@
   .cara-nueva .cn-exp-lista-filtro {
     flex: 1 1 100%;
     padding-block: 0 10px;
+  }
+  /* En el teléfono año y mes comparten renglón a partes iguales. */
+  .cara-nueva .cn-exp-lista-filtros {
+    margin: 12px 16px 0;
+  }
+  .cara-nueva .cn-exp-fechas {
+    display: grid;
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .cara-nueva .cn-exp-fechas-rotulo {
+    grid-column: 1 / -1;
+  }
+  .cara-nueva .cn-exp-fechas .cn-exp-fecha {
+    width: auto;
   }
   .cara-nueva .cn-exp-cuerpo {
     padding: 16px 16px 24px;
@@ -20442,3 +20529,4117 @@
   }
 }
 /* ─── fin Administrar y saldo ─── */
+
+/* ─── Consola de operación ─── */
+/*
+ * La consola del superusuario: firmas, ficha de firma, plan y módulos, recarga
+ * con motivo, zona de riesgo, nueva contraseña, pedido de acceso al contenido,
+ * catálogo maestro, bandeja de soporte, correo saliente y nueva firma. De
+ * `public/handoff/app-consola-de-operacion.html` (seis artboards); la nueva
+ * firma, la contraseña y los estados, de `app-dialogos-y-estados.html`.
+ *
+ * Reglas del bloque, las mismas de la casa:
+ *   · el marco compartido se viste desde fuera (`cn-ope-dialogos`) sin tocar
+ *     `design/Dialog.tsx`, y su radio no baja de 20 px;
+ *   · `cn-ope-pantalla` solo viste el diálogo de la consola, con combinador
+ *     HIJO: los diálogos anidados están dentro de él y no deben heredar su ancho
+ *     ni su cabecera;
+ *   · mono solo para lo citable (saldos, montos, NIT, fechas, contraseñas);
+ *   · nada por debajo de 14 px, y todo control del tamaño del dedo (44 px);
+ *   · el discontinuo no se usa; el dorado tampoco (es del módulo activo);
+ *   · #8C2F26 solo en lo que destruye: eliminar la firma y su confirmación;
+ *   · el riesgo operativo (saldo bajo, vencido) es ámbar, no rojo.
+ */
+
+/* ── El marco compartido, vestido desde fuera ──────────────────────────── */
+.cara-nueva.cn-ope-dialogos [role='dialog'] > div:last-child {
+  border: none;
+  background: var(--canvas);
+  color: var(--ink);
+}
+/*
+ * CADA REGLA DEL MARCO VA POR HIJOS DIRECTOS DEL PANEL (`> div:last-child >
+ * header`). Escritas como descendientes —`[role='dialog'] header button`—
+ * alcanzaban también el `<header>` de la ficha de firma, que vive DENTRO del
+ * cuerpo: sus tres acciones quedaban a 44 px de ancho, el tamaño de la × del
+ * marco. Lo midió el navegador; ningún check de texto lo habría visto.
+ */
+.cara-nueva.cn-ope-dialogos [role='dialog'] > div:last-child > header {
+  padding: 22px 26px 6px;
+  border-bottom: none;
+}
+.cara-nueva.cn-ope-dialogos [role='dialog'] > div:last-child > header h2 {
+  overflow: visible;
+  font-size: 21px;
+  line-height: 29px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  white-space: normal;
+  color: var(--ink);
+}
+.cara-nueva.cn-ope-dialogos [role='dialog'] > div:last-child > header h2 + p {
+  margin-top: 4px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+}
+.cara-nueva.cn-ope-dialogos [role='dialog'] > div:last-child > header > button {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  color: var(--ink-4);
+}
+.cara-nueva.cn-ope-dialogos [role='dialog'] > div:last-child > header + div {
+  padding: 14px 26px 24px;
+  background: transparent;
+}
+.cara-nueva.cn-ope-dialogos [role='dialog'] > div:last-child > header + div > .text-ui {
+  font-size: 15px;
+  line-height: 23px;
+}
+.cara-nueva.cn-ope-dialogos [role='dialog'] > div:last-child > footer {
+  gap: 10px;
+  padding: 14px 26px;
+  border-top: none;
+  background: var(--wash);
+}
+.cara-nueva.cn-ope-dialogos [role='dialog'] > div:last-child > footer > span:first-child,
+.cara-nueva.cn-ope-dialogos [role='dialog'] > div:last-child > footer > span:first-child span {
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+/* Los botones de `ConfirmarDialog` son del sistema viejo: aquí toman la medida del dedo. */
+.cara-nueva.cn-ope-dialogos [role='dialog'] > div:last-child > footer .btn-sm {
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 12px;
+  font-size: 15px;
+}
+@media (min-width: 640px) {
+  /* 20 px, el radio de los diálogos de la cara nueva; bajo 640 manda la hoja del marco (20 arriba, 0 abajo). */
+  .cara-nueva.cn-ope-dialogos [role='dialog'] > div:last-child {
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgb(16 24 34 / 0.18);
+  }
+  /* La consola es una pantalla de trabajo: el ancho del artboard (1100) y casi todo el alto. */
+  .cara-nueva .cn-ope-pantalla > [role='dialog'] > div:last-child {
+    max-width: 1100px;
+    height: 88vh;
+  }
+}
+/* La cabecera de la consola es la barra «IUREON · OPERACIÓN» del artboard, no un título de diálogo. */
+.cara-nueva .cn-ope-pantalla > [role='dialog'] > div:last-child > header {
+  align-items: center;
+  padding: 10px 20px 10px 28px;
+  border-bottom: 1px solid var(--line);
+}
+.cara-nueva .cn-ope-pantalla > [role='dialog'] > div:last-child > header h2 {
+  font-size: 15px;
+  line-height: 24px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.cara-nueva .cn-ope-pantalla > [role='dialog'] > div:last-child > header + div {
+  padding: 20px 28px 28px;
+}
+
+.cara-nueva .cn-ope-cuerpo {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-ope-mono {
+  font-family: var(--mono);
+}
+.cara-nueva .cn-ope-solo-lector {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+/* ── Botones ───────────────────────────────────────────────────────────── */
+.cara-nueva .cn-ope-boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 12px;
+  background: var(--neutral);
+  color: var(--ink-2);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  /*
+   * SIN ESTO LOS BOTONES SE APLASTABAN. El cuerpo lleva `overflow-wrap:
+   * anywhere` por los correos y los NIT, y eso baja el ancho mínimo de todo lo
+   * que contiene: en la ficha, «Recargar saldo», «Cambiar plan» y «Pedir acceso
+   * al contenido» cabían en 148 px, a 44 cada uno, con la etiqueta partida letra
+   * por letra. Medido en el navegador, no a ojo. Un botón no parte su etiqueta.
+   */
+  overflow-wrap: normal;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.16s, color 0.16s;
+}
+.cara-nueva .cn-ope-boton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.cara-nueva .cn-ope-boton:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.cara-nueva .cn-ope-boton--primario {
+  background: var(--brand-fill);
+  color: #fff;
+  box-shadow: var(--shadow-btn);
+}
+.cara-nueva .cn-ope-boton--primario:hover:not(:disabled) {
+  background: var(--brand-fill-hover);
+}
+.cara-nueva .cn-ope-boton--suave {
+  font-weight: 500;
+}
+.cara-nueva .cn-ope-boton--suave:hover:not(:disabled) {
+  background: var(--line-2);
+}
+.cara-nueva .cn-ope-boton--terciario {
+  padding: 0 14px;
+  background: transparent;
+  color: var(--ink-3);
+  font-weight: 500;
+}
+.cara-nueva .cn-ope-boton--terciario:hover:not(:disabled) {
+  background: var(--neutral);
+}
+.cara-nueva .cn-ope-boton--texto-peligro {
+  color: var(--danger);
+}
+.cara-nueva .cn-ope-boton--texto-peligro:hover:not(:disabled) {
+  background: var(--danger-bg);
+}
+.cara-nueva .cn-ope-boton--peligro {
+  background: #8c2f26;
+  color: #fff;
+}
+.cara-nueva .cn-ope-boton--peligro:hover:not(:disabled) {
+  background: #74251e;
+}
+.cara-nueva .cn-ope-boton--ancho {
+  width: 100%;
+  margin-top: 18px;
+}
+.cara-nueva .cn-ope-volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  margin: 0 0 8px -6px;
+  padding: 0 12px 0 6px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink-4);
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.cara-nueva .cn-ope-volver:hover {
+  background: var(--field);
+  color: var(--ink);
+}
+
+/* ── Campos ────────────────────────────────────────────────────────────── */
+.cara-nueva .cn-ope-campos {
+  display: grid;
+  gap: 16px;
+}
+.cara-nueva .cn-ope-dos {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+}
+.cara-nueva .cn-ope-selector {
+  min-width: 0;
+}
+.cara-nueva .cn-ope-grupo {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+.cara-nueva .cn-ope-etiqueta {
+  display: block;
+  margin: 0 0 6px;
+  padding: 0;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 22px;
+  color: var(--ink);
+}
+.cara-nueva .cn-ope-etiqueta-opcional {
+  font-weight: 400;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-ope-campo {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 12px;
+  background: var(--field);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 16px;
+  outline: none;
+  transition: box-shadow 0.16s;
+}
+.cara-nueva .cn-ope-campo::placeholder {
+  color: var(--ink-5);
+}
+.cara-nueva .cn-ope-campo:focus,
+.cara-nueva .cn-ope-campo:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+.cara-nueva .cn-ope-campo--cifra {
+  font-family: var(--mono);
+  font-size: 15px;
+}
+.cara-nueva .cn-ope-campo--buscar {
+  padding-left: 42px;
+}
+.cara-nueva .cn-ope-campo--blanco {
+  background: var(--canvas);
+}
+.cara-nueva .cn-ope-area {
+  min-height: 88px;
+  padding: 12px 16px;
+  line-height: 23px;
+  resize: vertical;
+}
+.cara-nueva .cn-ope-ayuda {
+  margin: 6px 0 0;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-ope-ayuda--aviso {
+  color: var(--warn);
+}
+.cara-nueva .cn-ope-opciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cara-nueva .cn-ope-opcion {
+  display: grid;
+  flex: 1 1 170px;
+  gap: 2px;
+  min-height: 64px;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 12px;
+  background: var(--neutral);
+  color: var(--ink-2);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.cara-nueva .cn-ope-opcion:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.cara-nueva .cn-ope-opcion--elegida {
+  background: var(--ink);
+  color: var(--canvas);
+}
+.cara-nueva .cn-ope-opcion-titulo {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+}
+.cara-nueva .cn-ope-opcion-nota {
+  font-size: 14px;
+  line-height: 20px;
+  opacity: 0.85;
+}
+.cara-nueva .cn-ope-contrasena {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cara-nueva .cn-ope-contrasena .cn-ope-campo {
+  flex: 1 1 200px;
+  width: auto;
+  min-width: 0;
+}
+
+/* ── Textos, recuadros, avisos y vacíos ────────────────────────────────── */
+.cara-nueva .cn-ope-texto {
+  margin: 0;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+  text-wrap: pretty;
+}
+.cara-nueva .cn-ope-texto strong,
+.cara-nueva .cn-ope-recuadro strong,
+.cara-nueva .cn-ope-pendiente-texto strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-ope-texto--pie {
+  margin-top: 16px;
+}
+.cara-nueva .cn-ope-texto--intro {
+  margin: 12px 0 18px;
+}
+.cara-nueva .cn-ope-texto--centro {
+  text-align: center;
+}
+.cara-nueva .cn-ope-apagado {
+  color: var(--ink-5);
+}
+.cara-nueva .cn-ope-recuadro {
+  margin: 16px 0 0;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--field);
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ope-recuadro--arriba {
+  margin: 0 0 18px;
+}
+.cara-nueva .cn-ope-recuadro--aviso {
+  margin: 0;
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+.cara-nueva .cn-ope-error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--danger-bg);
+  color: var(--danger);
+  font-size: 15px;
+  line-height: 23px;
+}
+.cara-nueva .cn-ope-error p {
+  margin: 0;
+}
+.cara-nueva .cn-ope-error--abajo {
+  margin: 16px 0 0;
+}
+.cara-nueva .cn-ope-aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 0 0 16px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--warn-bg);
+  color: var(--ink-2);
+}
+.cara-nueva .cn-ope-aviso--ok {
+  background: var(--ok-bg);
+}
+.cara-nueva .cn-ope-aviso-texto {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 15px;
+  line-height: 23px;
+}
+.cara-nueva .cn-ope-aviso-texto p {
+  margin: 0;
+}
+.cara-nueva .cn-ope-aviso-titulo {
+  font-weight: 600;
+}
+.cara-nueva .cn-ope-aviso-lista {
+  margin: 4px 0 0;
+  padding-left: 20px;
+}
+.cara-nueva .cn-ope-vacio {
+  margin: 0;
+  padding: 28px 16px;
+  text-align: center;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ope-confirmacion {
+  display: grid;
+  gap: 14px;
+}
+.cara-nueva .cn-ope-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  margin-top: 6px;
+  padding: 0 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.cara-nueva .cn-ope-chip--aviso {
+  background: var(--canvas);
+  color: var(--warn);
+}
+.cara-nueva .cn-ope-chip--kicker {
+  margin: 0;
+  background: var(--neutral);
+  color: var(--ink-3);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.cara-nueva .cn-ope-estado {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.cara-nueva .cn-ope-estado--ok {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+.cara-nueva .cn-ope-estado--aviso {
+  background: var(--warn-bg);
+  box-shadow: inset 0 0 0 1px #cfae6e;
+  color: var(--warn);
+}
+.cara-nueva .cn-ope-estado--neutro {
+  background: var(--neutral);
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ope-estado--marca {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+/* ── La consola · barra, cifras y tabla de firmas ──────────────────────── */
+.cara-nueva .cn-ope-barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 20px;
+}
+.cara-nueva .cn-ope-sello {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 9px;
+  background: var(--neutral);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-ope-barra-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cara-nueva .cn-ope-cifras {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 0 26px;
+}
+.cara-nueva .cn-ope-cifras--ficha {
+  margin: 22px 0 12px;
+}
+.cara-nueva .cn-ope-cifra {
+  min-width: 0;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: var(--wash);
+}
+.cara-nueva .cn-ope-cifra-valor {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 30px;
+  color: var(--ink);
+}
+.cara-nueva .cn-ope-cifra-valor--sin-leer {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ope-cifra-rotulo {
+  margin: 2px 0 0;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ope-cifra-pasivo {
+  font-weight: 600;
+  color: var(--warn);
+}
+.cara-nueva .cn-ope-cifra--aviso {
+  background: var(--warn-bg);
+}
+.cara-nueva .cn-ope-cifra--aviso .cn-ope-cifra-valor,
+.cara-nueva .cn-ope-cifra--aviso .cn-ope-cifra-rotulo {
+  color: var(--warn);
+}
+.cara-nueva .cn-ope-cifra--ok {
+  background: var(--ok-bg);
+}
+.cara-nueva .cn-ope-cifra--ok .cn-ope-cifra-valor,
+.cara-nueva .cn-ope-cifra--ok .cn-ope-cifra-rotulo {
+  color: var(--ok);
+}
+.cara-nueva .cn-ope-cifra--dato {
+  padding: 16px 18px;
+  border-radius: 12px;
+}
+.cara-nueva .cn-ope-dato-rotulo {
+  margin: 0;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ope-dato-valor {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  color: var(--ink);
+}
+.cara-nueva .cn-ope-dato-valor.cn-ope-mono {
+  font-weight: 500;
+}
+.cara-nueva .cn-ope-dato-nota {
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ope-seccion {
+  margin-top: 28px;
+}
+.cara-nueva .cn-ope-cifras + .cn-ope-seccion {
+  margin-top: 0;
+}
+.cara-nueva .cn-ope-seccion-cabeza {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.cara-nueva .cn-ope-titulo {
+  margin: 0 0 6px;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 27px;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+.cara-nueva .cn-ope-seccion-cabeza .cn-ope-titulo {
+  margin: 0 auto 0 0;
+}
+.cara-nueva .cn-ope-subtitulo {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 26px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.cara-nueva .cn-ope-buscar {
+  position: relative;
+  flex: 0 1 280px;
+  min-width: 0;
+}
+.cara-nueva .cn-ope-buscar svg {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  transform: translateY(-50%);
+  color: var(--ink-5);
+  pointer-events: none;
+}
+.cara-nueva .cn-ope-tabla {
+  min-width: 0;
+}
+.cara-nueva .cn-ope-tabla-cabeza {
+  display: grid;
+  gap: 14px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ope-filas {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-ope-fila {
+  display: grid;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 44px;
+  padding: 14px;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  transition: background 0.14s;
+}
+.cara-nueva .cn-ope-filas > li:last-child > .cn-ope-fila,
+.cara-nueva .cn-ope-filas > .cn-ope-fila:last-child {
+  border-bottom: none;
+}
+.cara-nueva .cn-ope-fila--firma {
+  cursor: pointer;
+}
+.cara-nueva .cn-ope-fila--firma:hover {
+  background: var(--field);
+}
+.cara-nueva .cn-ope-fila--firma:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: -2px;
+}
+.cara-nueva .cn-ope-tabla--firmas .cn-ope-tabla-cabeza,
+.cara-nueva .cn-ope-tabla--firmas .cn-ope-fila {
+  grid-template-columns: minmax(0, 1fr) 150px 130px 130px 140px;
+}
+.cara-nueva .cn-ope-tabla--usuarios .cn-ope-tabla-cabeza,
+.cara-nueva .cn-ope-tabla--usuarios .cn-ope-fila {
+  grid-template-columns: minmax(0, 1fr) 180px 120px 120px auto;
+}
+.cara-nueva .cn-ope-celda-principal {
+  display: block;
+  min-width: 0;
+}
+.cara-nueva .cn-ope-principal {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-ope-fila--usuario .cn-ope-principal {
+  font-size: 15px;
+  font-weight: 400;
+}
+.cara-nueva .cn-ope-fila--retirada .cn-ope-principal {
+  color: var(--ink-5);
+}
+.cara-nueva .cn-ope-secundario {
+  display: block;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-ope-celda-plan {
+  font-size: 15px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-ope-derecha {
+  text-align: right;
+}
+.cara-nueva .cn-ope-fila .cn-ope-derecha {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 15px;
+  color: var(--ink);
+}
+.cara-nueva .cn-ope-fila .cn-ope-derecha.cn-ope-apagado {
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ope-rotulo-movil {
+  display: none;
+}
+.cara-nueva .cn-ope-rol {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  min-height: 28px;
+  padding: 2px 11px;
+  border-radius: 9px;
+  background: var(--neutral);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-ope-rol--socio {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+.cara-nueva .cn-ope-fila-acciones {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ── La ficha ──────────────────────────────────────────────────────────── */
+.cara-nueva .cn-ope-ficha-cabeza {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+.cara-nueva .cn-ope-ficha-identidad {
+  flex: 1 1 320px;
+  min-width: 0;
+}
+.cara-nueva .cn-ope-ficha-nombre {
+  margin: 0 0 4px;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 36px;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-ope-ficha-meta {
+  margin: 0;
+  font-size: 15px;
+  line-height: 28px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ope-ficha-meta .cn-ope-estado {
+  margin-left: 6px;
+}
+.cara-nueva .cn-ope-ficha-acciones {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cara-nueva .cn-ope-hechos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  margin: 0;
+  padding: 0 2px;
+}
+.cara-nueva .cn-ope-hechos > div {
+  min-width: 0;
+}
+.cara-nueva .cn-ope-hechos dt {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ope-hechos dd {
+  margin: 0;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+}
+.cara-nueva .cn-ope-registro {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-ope-registro-item {
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--wash);
+}
+.cara-nueva .cn-ope-registro-cabeza {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 14px;
+  margin: 0 0 3px;
+}
+.cara-nueva .cn-ope-registro-hecho {
+  flex: 1 1 280px;
+  min-width: 0;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+}
+.cara-nueva .cn-ope-registro-fecha {
+  flex: none;
+  font-size: 14px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ope-registro-quien {
+  margin: 0;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ope-nota {
+  margin-top: 28px;
+  padding: 20px 22px;
+  border-radius: 14px;
+  background: var(--wash);
+}
+.cara-nueva .cn-ope-nota-titulo {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  color: var(--ink);
+}
+.cara-nueva .cn-ope-fuera {
+  display: grid;
+  gap: 2px;
+  margin: 0 0 10px;
+  padding-left: 20px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-2);
+}
+.cara-nueva .cn-ope-riesgo {
+  margin-top: 28px;
+  padding: 20px 22px;
+  border-radius: 14px;
+  background: var(--danger-bg);
+}
+.cara-nueva .cn-ope-riesgo .cn-ope-texto {
+  margin-bottom: 14px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-ope-peligro-rotulo {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--danger);
+}
+.cara-nueva .cn-ope-peligro-nombre {
+  font-family: var(--mono);
+  color: var(--danger);
+}
+.cara-nueva .cn-ope-riesgo-campo {
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--danger-bg);
+}
+
+/* ── Plan y módulos ────────────────────────────────────────────────────── */
+.cara-nueva .cn-ope-modulos {
+  display: grid;
+  gap: 6px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-ope-modulo {
+  padding: 8px 8px 8px 15px;
+  border-radius: 10px;
+  background: var(--wash);
+}
+.cara-nueva .cn-ope-modulo--apagado {
+  background: var(--warn-bg);
+}
+.cara-nueva .cn-ope-modulo--fuera {
+  background: var(--field);
+  opacity: 0.75;
+}
+.cara-nueva .cn-ope-modulo-fila,
+.cara-nueva .cn-ope-funcion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+.cara-nueva .cn-ope-modulo-nombre {
+  flex: 1;
+  min-width: 0;
+}
+.cara-nueva .cn-ope-modulo-nombre > p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+}
+.cara-nueva .cn-ope-modulo-fuera-texto {
+  flex: none;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding-right: 8px;
+  font-size: 14px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ope-funciones {
+  display: grid;
+  gap: 4px;
+  margin: 6px 0 4px;
+  padding: 0 0 0 14px;
+  border-left: 2px solid var(--line-2);
+  list-style: none;
+}
+.cara-nueva .cn-ope-funcion--con-el-modulo {
+  opacity: 0.6;
+}
+.cara-nueva .cn-ope-modulo-nombre > .cn-ope-funcion-descripcion {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ope-interruptor {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+.cara-nueva .cn-ope-interruptor:disabled {
+  cursor: not-allowed;
+}
+.cara-nueva .cn-ope-interruptor:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 0;
+  border-radius: 12px;
+}
+.cara-nueva .cn-ope-interruptor-pista {
+  position: relative;
+  width: 44px;
+  height: 26px;
+  border-radius: 999px;
+  background: #dde3ea;
+  transition: background 0.16s;
+}
+.cara-nueva .cn-ope-interruptor[aria-checked='true'] .cn-ope-interruptor-pista {
+  background: var(--brand-fill);
+}
+.cara-nueva .cn-ope-interruptor-perilla {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(16 24 34 / 0.16);
+  transition: transform 0.16s;
+}
+.cara-nueva .cn-ope-interruptor[aria-checked='true'] .cn-ope-interruptor-perilla {
+  transform: translateX(18px);
+}
+.cara-nueva .cn-ope-suspender {
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+.cara-nueva .cn-ope-suspender .cn-ope-texto {
+  margin-bottom: 8px;
+}
+
+/* ── Catálogo maestro ──────────────────────────────────────────────────── */
+.cara-nueva .cn-ope-dos--tarjetas {
+  margin: 0 0 12px;
+}
+.cara-nueva .cn-ope-tarjeta {
+  min-width: 0;
+  padding: 20px 22px;
+  border-radius: 14px;
+  background: var(--wash);
+}
+.cara-nueva .cn-ope-tarjeta--suelta {
+  margin: 0 0 26px;
+}
+.cara-nueva .cn-ope-tarjeta-titulo {
+  margin: 0 0 10px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  color: var(--ink);
+}
+.cara-nueva .cn-ope-tarjeta-nota {
+  margin: -6px 0 10px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ope-tarjeta .cn-ope-texto + .cn-ope-tarjeta-nota {
+  margin-top: 12px;
+}
+.cara-nueva .cn-ope-reparto {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 6px;
+  padding: 0;
+  list-style: none;
+  font-size: 15px;
+  line-height: 23px;
+}
+.cara-nueva .cn-ope-reparto li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-ope-reparto li > span:last-child {
+  flex: none;
+  color: var(--ink);
+}
+.cara-nueva .cn-ope-reparto-resto,
+.cara-nueva .cn-ope-reparto .cn-ope-reparto-resto > span:last-child {
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ope-pendientes {
+  display: grid;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-ope-pendiente {
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: var(--warn-bg);
+}
+.cara-nueva .cn-ope-pendiente-titulo {
+  margin: 0 0 3px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 23px;
+  color: var(--ink);
+}
+.cara-nueva .cn-ope-pendiente-texto {
+  margin: 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--warn);
+}
+
+/* ── Soporte ───────────────────────────────────────────────────────────── */
+.cara-nueva .cn-ope-conversaciones {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-ope-conversacion {
+  display: grid;
+  gap: 3px;
+  width: 100%;
+  min-height: 44px;
+  padding: 16px 18px;
+  border: none;
+  border-radius: 12px;
+  background: var(--wash);
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: filter 0.16s, background 0.16s;
+}
+.cara-nueva .cn-ope-conversacion:hover {
+  background: var(--neutral);
+}
+.cara-nueva .cn-ope-conversacion:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.cara-nueva .cn-ope-conversacion--espera {
+  background: var(--warn-bg);
+}
+.cara-nueva .cn-ope-conversacion--espera:hover {
+  background: var(--warn-bg);
+  filter: brightness(0.97);
+}
+.cara-nueva .cn-ope-conversacion-cabeza {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2px 14px;
+}
+.cara-nueva .cn-ope-conversacion-hora {
+  flex: none;
+  font-size: 14px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ope-conversacion--espera .cn-ope-conversacion-hora {
+  color: var(--warn);
+}
+.cara-nueva .cn-ope-conversacion-asunto {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-2);
+}
+.cara-nueva .cn-ope-conversacion-texto {
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-ope-contador {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--brand-fill);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}
+.cara-nueva .cn-ope-hilo-cabeza {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-bottom: 16px;
+}
+.cara-nueva .cn-ope-hilo-cabeza .cn-ope-volver {
+  margin: 0;
+}
+.cara-nueva .cn-ope-hilo-titulo {
+  flex: 1 1 240px;
+  min-width: 0;
+}
+.cara-nueva .cn-ope-hilo-titulo .cn-ope-subtitulo {
+  margin: 0;
+}
+.cara-nueva .cn-ope-mensajes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.cara-nueva .cn-ope-mensaje {
+  align-self: flex-start;
+  max-width: 88%;
+}
+.cara-nueva .cn-ope-mensaje--mio {
+  align-self: flex-end;
+}
+.cara-nueva .cn-ope-mensaje-cuerpo {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: var(--field);
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-ope-mensaje--mio .cn-ope-mensaje-cuerpo {
+  background: var(--brand-fill);
+  color: #fff;
+}
+.cara-nueva .cn-ope-mensaje-pie {
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-5);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-ope-mensaje--mio .cn-ope-mensaje-pie {
+  text-align: right;
+}
+.cara-nueva .cn-ope-responder {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+.cara-nueva .cn-ope-responder .cn-ope-campo {
+  flex: 1;
+  min-height: 46px;
+}
+
+/* ── Correo saliente ───────────────────────────────────────────────────── */
+.cara-nueva .cn-ope-correo .cn-ope-aviso,
+.cara-nueva .cn-ope-correo .cn-ope-error {
+  margin: 14px 0 0;
+}
+.cara-nueva .cn-ope-correo-fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+.cara-nueva .cn-ope-correo-fila .cn-ope-texto {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+.cara-nueva .cn-ope-correo-fila .cn-ope-principal {
+  display: inline;
+  font-size: 15px;
+}
+
+/*
+ * ── La confirmación que destruye, rellena ─────────────────────────────────
+ * `ConfirmarDialog` pinta `btn-danger` como contorno sobre blanco (el sistema
+ * viejo). El artboard 4 rellena «Eliminar la firma», y `cn-aju` ya lo hace así.
+ * Va con los tokens y no con el hexadecimal: en oscuro `--danger` aclara a rosa,
+ * y el texto blanco sobre rosa no llega a 4,5:1 — por eso el texto es
+ * `--canvas`, blanco en claro y casi negro en oscuro.
+ */
+.cara-nueva.cn-ope-dialogos [role='dialog'] > div:last-child > footer button.btn-danger {
+  border: none;
+  background: var(--danger);
+  font-weight: 600;
+  color: var(--canvas);
+}
+.cara-nueva.cn-ope-dialogos [role='dialog'] > div:last-child > footer button.btn-danger:hover:not(:disabled) {
+  filter: brightness(0.92);
+}
+
+/* ── El teléfono: la tabla se vuelve tarjetas, los botones se apilan ───── */
+@media (max-width: 639px) {
+  .cara-nueva .cn-ope-pantalla > [role='dialog'] > div:last-child {
+    max-height: 94dvh;
+  }
+  .cara-nueva .cn-ope-pantalla > [role='dialog'] > div:last-child > header {
+    padding: 8px 12px 8px 16px;
+  }
+  .cara-nueva .cn-ope-pantalla > [role='dialog'] > div:last-child > header + div,
+  .cara-nueva.cn-ope-dialogos [role='dialog'] > div:last-child > header + div {
+    padding: 14px 16px 20px;
+  }
+  .cara-nueva.cn-ope-dialogos [role='dialog'] > div:last-child > header {
+    padding: 14px 16px 4px;
+  }
+  .cara-nueva.cn-ope-dialogos [role='dialog'] > div:last-child > footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    padding: 12px 16px;
+  }
+  .cara-nueva.cn-ope-dialogos [role='dialog'] > div:last-child > footer > * {
+    width: 100%;
+    margin: 0;
+    text-align: center;
+  }
+  .cara-nueva .cn-ope-barra-acciones,
+  .cara-nueva .cn-ope-ficha-acciones {
+    width: 100%;
+  }
+  .cara-nueva .cn-ope-barra-acciones .cn-ope-boton,
+  .cara-nueva .cn-ope-ficha-acciones .cn-ope-boton {
+    flex: 1 1 140px;
+  }
+  .cara-nueva .cn-ope-cifras {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .cara-nueva .cn-ope-cifra {
+    padding: 14px;
+  }
+  .cara-nueva .cn-ope-cifra-valor {
+    font-size: 19px;
+    line-height: 26px;
+  }
+  .cara-nueva .cn-ope-buscar {
+    flex: 1 1 100%;
+  }
+  .cara-nueva .cn-ope-tabla-cabeza {
+    display: none;
+  }
+  .cara-nueva .cn-ope-tabla--firmas .cn-ope-fila,
+  .cara-nueva .cn-ope-tabla--usuarios .cn-ope-fila {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px 12px;
+    padding: 14px 4px;
+  }
+  .cara-nueva .cn-ope-celda-principal,
+  .cara-nueva .cn-ope-fila-acciones {
+    grid-column: 1 / -1;
+  }
+  .cara-nueva .cn-ope-fila-acciones {
+    justify-content: flex-start;
+  }
+  .cara-nueva .cn-ope-celda-estado {
+    justify-self: end;
+  }
+  .cara-nueva .cn-ope-fila .cn-ope-derecha {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .cara-nueva .cn-ope-rotulo-movil {
+    display: block;
+    font-size: 14px;
+    line-height: 21px;
+    color: var(--ink-5);
+  }
+  .cara-nueva .cn-ope-ficha-nombre {
+    font-size: 24px;
+    line-height: 31px;
+  }
+  .cara-nueva .cn-ope-dos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cara-nueva .cn-ope-nota,
+  .cara-nueva .cn-ope-riesgo,
+  .cara-nueva .cn-ope-tarjeta {
+    padding: 16px;
+  }
+  .cara-nueva .cn-ope-responder {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .cara-nueva .cn-ope-mensaje {
+    max-width: 100%;
+  }
+}
+
+/* ── Oscuro, por los dos caminos: el del sistema y el elegido ──────────── */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .cara-nueva .cn-ope-campo {
+    color-scheme: dark;
+  }
+  :root:not([data-theme='light']) .cara-nueva .cn-ope-estado--aviso {
+    box-shadow: inset 0 0 0 1px rgb(217 166 74 / 0.45);
+  }
+  :root:not([data-theme='light']) .cara-nueva .cn-ope-interruptor-pista {
+    background: #2b3644;
+  }
+  :root:not([data-theme='light']) .cara-nueva .cn-ope-interruptor-perilla {
+    background: #e8edf2;
+    box-shadow: none;
+  }
+  :root:not([data-theme='light']) .cara-nueva .cn-ope-boton--peligro:hover:not(:disabled) {
+    background: #a2382e;
+  }
+}
+:root[data-theme='dark'] .cara-nueva .cn-ope-campo {
+  color-scheme: dark;
+}
+:root[data-theme='dark'] .cara-nueva .cn-ope-estado--aviso {
+  box-shadow: inset 0 0 0 1px rgb(217 166 74 / 0.45);
+}
+:root[data-theme='dark'] .cara-nueva .cn-ope-interruptor-pista {
+  background: #2b3644;
+}
+:root[data-theme='dark'] .cara-nueva .cn-ope-interruptor-perilla {
+  background: #e8edf2;
+  box-shadow: none;
+}
+:root[data-theme='dark'] .cara-nueva .cn-ope-boton--peligro:hover:not(:disabled) {
+  background: #a2382e;
+}
+/* ─── fin Consola de operación ─── */
+/* ─── Estilo de la firma ─── */
+/*
+ * «Enseñar este formato» (artboard app-redaccion-revision ~436–462), el
+ * interruptor del paso 3 del asistente y la línea «Con el estilo de su firma»
+ * de la procedencia. Solo tokens: el modo oscuro los redefine, y lo único que
+ * se pinta a mano es la pista del interruptor apagado, que en oscuro se perdía
+ * contra el campo.
+ */
+.cara-nueva .cn-est-dialogos {
+  display: contents;
+}
+.cara-nueva .cn-est-dialogos [role='dialog'] > div:last-child {
+  border: none;
+  background: var(--canvas);
+  color: var(--ink);
+}
+.cara-nueva .cn-est-dialogos [role='dialog'] header {
+  padding: 24px 28px 4px;
+  border-bottom: none;
+}
+.cara-nueva .cn-est-dialogos [role='dialog'] header h2 {
+  overflow: visible;
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  white-space: normal;
+  color: var(--ink);
+}
+.cara-nueva .cn-est-dialogos [role='dialog'] header p {
+  margin-top: 4px;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-est-dialogos [role='dialog'] header button {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-est-dialogos [role='dialog'] header + div {
+  padding: 16px 28px 22px;
+  background: transparent;
+}
+.cara-nueva .cn-est-dialogos [role='dialog'] footer {
+  gap: 10px;
+  padding: 16px 28px;
+  border-top: none;
+  background: var(--wash);
+}
+.cara-nueva .cn-est-dialogos [role='dialog'] footer > span:first-child,
+.cara-nueva .cn-est-dialogos [role='dialog'] footer > span:first-child span {
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--ink-4);
+}
+@media (min-width: 640px) {
+  /* 20 px, el radio común de los diálogos de la cara nueva. Bajo 640 px la hoja conserva 20 arriba y 0 abajo del marco. */
+  /*
+   * EL TOPE DE ALTO YA NO VIVE AQUÍ. Este bloque acotaba el panel porque el
+   * marco compartido ponía `sm:max-h-none`; desde que `design/Dialog.tsx` acota
+   * todos los tamaños a la ventana (y el cuerpo se desplaza), repetirlo sería
+   * una segunda regla que puede contradecir a la primera.
+   */
+  .cara-nueva .cn-est-dialogos [role='dialog'] > div:last-child {
+    border-radius: 20px;
+    box-shadow: var(--shadow-menu);
+  }
+}
+.cara-nueva .cn-est-cuerpo {
+  display: grid;
+  gap: 20px;
+}
+.cara-nueva .cn-est-titulo {
+  margin: 0 0 10px;
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-est-lista {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-est-fila {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 11px 12px;
+  border-radius: 10px;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink);
+}
+.cara-nueva .cn-est-fila--no {
+  color: var(--ink-3);
+}
+.cara-nueva .cn-est-icono {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  margin-top: 4px;
+}
+.cara-nueva .cn-est-icono--si {
+  color: var(--ok);
+}
+.cara-nueva .cn-est-icono--no {
+  color: var(--danger);
+}
+.cara-nueva .cn-est-nota {
+  margin: 0;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: var(--wash);
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink-4);
+  text-wrap: pretty;
+}
+.cara-nueva .cn-est-aviso {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--warn-bg);
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--warn);
+}
+.cara-nueva .cn-est-ayuda {
+  margin: -4px 0 12px;
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-est-grupos {
+  display: grid;
+  gap: 14px;
+}
+.cara-nueva .cn-est-grupo {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+.cara-nueva .cn-est-grupo-titulo {
+  margin-bottom: 4px;
+  padding: 0;
+  font-size: 13.5px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-est-casilla {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 44px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.14s;
+}
+.cara-nueva .cn-est-casilla:hover {
+  background: var(--field);
+}
+.cara-nueva .cn-est-casilla input {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  margin-top: 2px;
+  accent-color: var(--brand-fill);
+}
+.cara-nueva .cn-est-casilla-texto {
+  min-width: 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+/* Lo descartado lleva guion: en la cara nueva el borde discontinuo es la señal de «no pasó». */
+.cara-nueva .cn-est-descartado {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 1px dashed var(--line-2);
+  border-radius: 10px;
+}
+.cara-nueva .cn-est-descartado-texto {
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink-3);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-est-descartado-motivo {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--warn);
+}
+.cara-nueva .cn-est-exito {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: var(--ok-bg);
+  font-size: 15.5px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--ok);
+}
+.cara-nueva .cn-est-alerta {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--danger-bg);
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--danger);
+}
+.cara-nueva .cn-est-dialogos [role='dialog'] footer .cn-est-boton {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink-3);
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.cara-nueva .cn-est-dialogos [role='dialog'] footer .cn-est-boton:hover:not(:disabled) {
+  background: var(--field);
+}
+.cara-nueva .cn-est-dialogos [role='dialog'] footer .cn-est-boton--primario {
+  padding: 0 20px;
+  background: var(--brand-fill);
+  font-weight: 600;
+  color: #fff;
+  box-shadow: var(--shadow-btn);
+}
+.cara-nueva .cn-est-dialogos [role='dialog'] footer .cn-est-boton--primario:hover:not(:disabled) {
+  background: var(--brand-fill-hover);
+}
+.cara-nueva .cn-est-dialogos [role='dialog'] footer .cn-est-boton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.cara-nueva .cn-est-girando {
+  width: 16px;
+  height: 16px;
+  /* `spin` es el de Tailwind (`animate-spin`): un @keyframes propio sería una regla fuera de `.cara-nueva`. */
+  animation: spin 0.9s linear infinite;
+}
+/* ── El paso 3 del asistente ──────────────────────────────────────────── */
+.cara-nueva .cn-red-estilo + .cn-est-interruptor,
+.cara-nueva .cn-red-estilo + .cn-est-sin-perfil {
+  margin-top: 10px;
+}
+.cara-nueva .cn-est-interruptor {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: var(--field);
+  cursor: pointer;
+}
+/*
+ * La perilla es un degradado radial sobre la pista, no un pseudo-elemento: un
+ * `::before` sobre un <input> no se pinta en todos los navegadores, y el
+ * interruptor tiene que seguir siendo un checkbox de verdad para el teclado y
+ * los lectores de pantalla.
+ */
+.cara-nueva .cn-est-interruptor-control {
+  width: 44px;
+  height: 26px;
+  flex: none;
+  margin: 0;
+  border-radius: 13px;
+  background: radial-gradient(circle at 13px 50%, #fff 9px, transparent 10px) no-repeat var(--line-2);
+  appearance: none;
+  cursor: pointer;
+  transition: background-color 0.16s, background-position 0.16s;
+}
+.cara-nueva .cn-est-interruptor-control:checked {
+  background-color: var(--brand-fill);
+  background-position: 18px 0;
+}
+.cara-nueva .cn-est-interruptor-control:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.cara-nueva .cn-est-interruptor-control:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.cara-nueva .cn-est-interruptor-textos {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+.cara-nueva .cn-est-interruptor-titulo {
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-est-interruptor-detalle {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-est-sin-perfil {
+  margin: 0;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: var(--field);
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-3);
+}
+/* ── La procedencia: un dato de cómo se redactó, en gris ──────────────── */
+.cara-nueva .cn-est-procedencia {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 8px 16px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-est-procedencia-icono {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: var(--ink-4);
+}
+@media (max-width: 639px) {
+  /* Hoja del teléfono: botones apilados, el pulgar no acierta en una fila de dos. */
+  .cara-nueva .cn-est-dialogos [role='dialog'] footer {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 14px 18px;
+  }
+  .cara-nueva .cn-est-dialogos [role='dialog'] header {
+    padding: 14px 18px 2px;
+  }
+  .cara-nueva .cn-est-dialogos [role='dialog'] header h2 {
+    font-size: 21px;
+    line-height: 28px;
+  }
+  .cara-nueva .cn-est-dialogos [role='dialog'] header + div {
+    padding: 12px 18px 18px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cara-nueva .cn-est-girando {
+    animation: none;
+  }
+  .cara-nueva [class*='cn-est-'] {
+    transition: none;
+  }
+}
+:root[data-theme='dark'] .cara-nueva .cn-est-interruptor-control:not(:checked) {
+  background-color: #2b3644;
+}
+/* ─── fin Estilo de la firma ─── */
+/* ─── Estilo en Ajustes y jerga ─── */
+/*
+ * Ajustes → Estilo de la firma y el panel «Jerga de su firma» del borrador.
+ * Solo tokens: los dos oscuros (el del sistema y el forzado) los redefinen en
+ * `.cara-nueva`, así que no hace falta pintar nada a mano. Ningún borde
+ * discontinuo: aquí no hay nada sin verificar, y el guion en la cara nueva es
+ * esa señal.
+ */
+.cara-nueva .cn-est-seccion {
+  display: grid;
+  gap: 22px;
+}
+.cara-nueva .cn-est-seccion .cn-aju-cabecera {
+  margin-bottom: 0;
+}
+.cara-nueva .cn-est-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-self: start;
+  max-width: 100%;
+  padding: 4px;
+  border-radius: 14px;
+  background: var(--field);
+}
+.cara-nueva .cn-est-rol {
+  min-height: 44px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-3);
+  cursor: pointer;
+  transition: background 0.16s, color 0.16s;
+}
+.cara-nueva .cn-est-rol:hover {
+  color: var(--ink);
+}
+.cara-nueva .cn-est-rol[aria-selected='true'] {
+  background: var(--canvas);
+  color: var(--ink);
+  box-shadow: var(--shadow-btn);
+}
+.cara-nueva .cn-est-rol:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.cara-nueva .cn-est-filtros {
+  display: grid;
+  gap: 8px;
+  max-width: 520px;
+}
+.cara-nueva .cn-est-recalculo {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--wash);
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-3);
+  text-wrap: pretty;
+}
+.cara-nueva .cn-est-estado {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-est-error-lectura {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--danger-bg);
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--danger);
+}
+.cara-nueva .cn-est-error-lectura p {
+  flex: 1 1 240px;
+  margin: 0;
+}
+.cara-nueva .cn-est-reintentar,
+.cara-nueva .cn-est-quitar {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  background: var(--canvas);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.cara-nueva .cn-est-quitar {
+  flex: none;
+  color: var(--danger);
+}
+.cara-nueva .cn-est-reintentar:hover,
+.cara-nueva .cn-est-quitar:hover {
+  background: var(--field);
+}
+.cara-nueva .cn-est-quitar-icono {
+  width: 16px;
+  height: 16px;
+}
+.cara-nueva .cn-est-vacio,
+.cara-nueva .cn-est-respaldo {
+  margin: 0;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-3);
+  text-wrap: pretty;
+}
+.cara-nueva .cn-est-respaldo {
+  border: none;
+  background: var(--field);
+}
+.cara-nueva .cn-est-aviso-ok {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--ok-bg);
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ok);
+}
+.cara-nueva .cn-est-perfil {
+  display: grid;
+  margin: 0;
+}
+.cara-nueva .cn-est-perfil-fila {
+  display: grid;
+  grid-template-columns: minmax(160px, 220px) minmax(0, 1fr);
+  gap: 16px;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+}
+.cara-nueva .cn-est-perfil-rotulo {
+  font-size: 14.5px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-est-perfil-valor {
+  min-width: 0;
+  margin: 0;
+}
+.cara-nueva .cn-est-perfil-items {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-est-perfil-item {
+  display: grid;
+  gap: 1px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-est-visto {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-est-solo-socio {
+  margin: 0 0 10px;
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-est-lecciones {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-est-leccion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  padding: 12px 14px 12px 16px;
+  border-radius: 12px;
+  background: var(--field);
+}
+.cara-nueva .cn-est-leccion-textos {
+  display: grid;
+  flex: 1 1 260px;
+  min-width: 0;
+  gap: 2px;
+}
+.cara-nueva .cn-est-leccion-fecha {
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-est-leccion-detalle {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-est-confirmacion {
+  margin: 0;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+.cara-nueva .cn-est-confirmacion-detalle {
+  margin: 0;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-est-dialogos [role='dialog'] footer .cn-est-boton--peligro {
+  padding: 0 20px;
+  background: var(--danger);
+  font-weight: 600;
+  color: #fff;
+}
+.cara-nueva .cn-est-dialogos [role='dialog'] footer .cn-est-boton--peligro:hover:not(:disabled) {
+  background: var(--danger);
+  filter: brightness(0.92);
+}
+.cara-nueva .cn-est-enlace {
+  justify-self: start;
+  min-height: 44px;
+  padding: 0 4px;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--brand);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+/* ── Jerga de su firma ─────────────────────────────────────────────────── */
+.cara-nueva .cn-jer-boton--abierto,
+.cara-nueva .cn-jer-boton--abierto:hover {
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+.cara-nueva .cn-jer-panel {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--canvas);
+}
+.cara-nueva .cn-jer-cabeza {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.cara-nueva .cn-jer-titulo {
+  margin: 0;
+  font-size: 16.5px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-jer-cerrar {
+  display: inline-flex;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  margin: -8px -8px -8px 0;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink-4);
+  cursor: pointer;
+}
+.cara-nueva .cn-jer-cerrar:hover {
+  background: var(--field);
+  color: var(--ink);
+}
+.cara-nueva .cn-jer-cerrar-icono {
+  width: 18px;
+  height: 18px;
+}
+.cara-nueva .cn-jer-alcance,
+.cara-nueva .cn-jer-nota {
+  margin: 0;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+  text-wrap: pretty;
+}
+.cara-nueva .cn-jer-seleccion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 8px 8px 8px 12px;
+  border-radius: 10px;
+  background: var(--field);
+  font-size: 14.5px;
+  line-height: 21px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-jer-estado {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-jer-estado--ok {
+  color: var(--ok);
+}
+.cara-nueva .cn-jer-error {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--danger-bg);
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--danger);
+}
+.cara-nueva .cn-jer-error p {
+  margin: 0;
+}
+.cara-nueva .cn-jer-grupos {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-jer-grupo {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--field);
+}
+.cara-nueva .cn-jer-par {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  margin: 0;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-jer-variante {
+  color: var(--ink-3);
+}
+.cara-nueva .cn-jer-flecha {
+  color: var(--ink-4);
+}
+.cara-nueva .cn-jer-preferido {
+  font-weight: 600;
+}
+.cara-nueva .cn-jer-visto {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-jer-apariciones {
+  display: grid;
+  gap: 10px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-jer-aparicion {
+  display: grid;
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.cara-nueva .cn-jer-contexto {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink-3);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-jer-marca {
+  padding: 0 2px;
+  border-radius: 4px;
+  background: var(--warn-bg);
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-jer-accion {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-self: start;
+  padding: 0 14px;
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  background: var(--canvas);
+  font-family: inherit;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--brand);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.cara-nueva .cn-jer-accion:hover {
+  background: var(--wash);
+}
+.cara-nueva .cn-jer-accion--todas {
+  margin-top: 8px;
+  border-color: transparent;
+  background: var(--brand-fill);
+  color: #fff;
+}
+.cara-nueva .cn-jer-accion--todas:hover {
+  background: var(--brand-fill-hover);
+}
+.cara-nueva .cn-jer-accion:focus-visible,
+.cara-nueva .cn-jer-cerrar:focus-visible,
+.cara-nueva .cn-est-quitar:focus-visible,
+.cara-nueva .cn-est-reintentar:focus-visible,
+.cara-nueva .cn-est-enlace:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.cara-nueva .cn-jer-ok {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--ok-bg);
+  font-size: 14.5px;
+  line-height: 21px;
+  color: var(--ok);
+}
+.cara-nueva .cn-jer-ok-icono {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  margin-top: 3px;
+}
+@media (max-width: 639px) {
+  .cara-nueva .cn-est-perfil-fila {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+  .cara-nueva .cn-est-roles {
+    justify-self: stretch;
+  }
+  .cara-nueva .cn-est-rol {
+    flex: 1 1 0;
+    padding: 0 10px;
+  }
+  .cara-nueva .cn-est-quitar {
+    flex: 1 1 100%;
+  }
+  .cara-nueva .cn-jer-accion {
+    justify-self: stretch;
+    justify-content: center;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cara-nueva [class*='cn-jer-'] {
+    transition: none;
+  }
+}
+/* ─── fin Estilo en Ajustes y jerga ─── */
+/* ─── Buscador y Catálogo ─── */
+/*
+ * Buscador (08) y Catálogo (09), de `public/handoff/app-buscador-catalogo.html`
+ * (cinco artboards: buscador, ficha de providencia, catálogo, estados y
+ * formularios, buscador a 375). Reglas del bloque:
+ *   · dos corpus que no se mezclan: la tarjeta leída es blanca con sombra; la
+ *     que nadie leyó, lavada y sin sombra, con sello y filete discontinuos;
+ *   · el discontinuo es SOLO de lo que no está verificado o no se ha leído
+ *     (selectores `--sin`); ningún otro recuadro lo usa;
+ *   · el mono solo para lo citable: providencias, radicados, artículos
+ *     (selectores `-cita`); los conteos van en la letra de interfaz;
+ *   · nada por debajo de 14 px, todo control a 44 px, el oro no aparece (es
+ *     del módulo activo del panel lateral);
+ *   · la ficha y las hojas propias van a 20 px; el marco compartido
+ *     (`ConfirmarDialog`) se viste desde fuera con `cn-cat-dialogos`.
+ */
+.cara-nueva.cn-bus,
+.cara-nueva.cn-cat {
+  --bc-sombra: 0 1px 3px rgb(16 24 34 / 0.1);
+  --bc-sombra-alta: 0 8px 24px rgb(16 24 34 / 0.12);
+  --bc-sin-linea: #cfae6e;
+  --bc-hueco: max(36px, calc((100% - 1100px) / 2));
+  background: var(--canvas);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .cara-nueva.cn-bus,
+  :root:not([data-theme='light']) .cara-nueva.cn-cat {
+    --bc-sombra: inset 0 0 0 1px #24303d;
+    --bc-sombra-alta: inset 0 0 0 1px #3a4757;
+    --bc-sin-linea: rgb(217 166 74 / 0.6);
+  }
+}
+:root[data-theme='dark'] .cara-nueva.cn-bus,
+:root[data-theme='dark'] .cara-nueva.cn-cat {
+  --bc-sombra: inset 0 0 0 1px #24303d;
+  --bc-sombra-alta: inset 0 0 0 1px #3a4757;
+  --bc-sin-linea: rgb(217 166 74 / 0.6);
+}
+
+/* ── Compartido: botones, chips, cierre, velo ─────────────────────────── */
+.cara-nueva .cn-bus-boton {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.16s, box-shadow 0.16s;
+}
+.cara-nueva .cn-cat-boton {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.16s, box-shadow 0.16s;
+}
+.cara-nueva .cn-bus-boton:disabled,
+.cara-nueva .cn-cat-boton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.cara-nueva .cn-bus-boton--primario,
+.cara-nueva .cn-cat-boton--primario {
+  background: var(--brand-fill);
+  box-shadow: var(--shadow-btn);
+  color: #fff;
+}
+.cara-nueva .cn-bus-boton--primario:hover:not(:disabled),
+.cara-nueva .cn-cat-boton--primario:hover:not(:disabled) {
+  background: var(--brand-fill-hover);
+  color: #fff;
+}
+.cara-nueva .cn-bus-boton--suave,
+.cara-nueva .cn-cat-boton--neutro {
+  background: var(--neutral);
+  color: var(--ink-2);
+}
+.cara-nueva .cn-bus-boton--suave:hover:not(:disabled),
+.cara-nueva .cn-cat-boton--neutro:hover:not(:disabled) {
+  background: var(--line-2);
+  color: var(--ink);
+}
+.cara-nueva .cn-bus-boton--fantasma,
+.cara-nueva .cn-cat-boton--fantasma {
+  background: transparent;
+  color: var(--ink-4);
+  font-weight: 500;
+}
+.cara-nueva .cn-bus-boton--fantasma:hover,
+.cara-nueva .cn-cat-boton--fantasma:hover {
+  background: var(--neutral);
+  color: var(--ink);
+}
+.cara-nueva .cn-cat-boton--blanco {
+  background: var(--canvas);
+  color: var(--ink);
+}
+.cara-nueva .cn-cat-boton--ambar {
+  background: transparent;
+  color: var(--warn);
+}
+.cara-nueva .cn-cat-boton--ambar:hover {
+  background: rgb(138 90 18 / 0.08);
+  color: var(--warn);
+}
+/* El rojo solo en lo que destruye: retirar una actuación de la firma. */
+.cara-nueva .cn-cat-boton--peligro {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+.cara-nueva .cn-bus-chip {
+  display: inline-flex;
+  min-height: 44px;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 10px;
+  background: var(--neutral);
+  color: var(--ink-3);
+  font-family: inherit;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.16s;
+}
+.cara-nueva .cn-cat-chip {
+  display: inline-flex;
+  min-height: 44px;
+  flex: none;
+  align-items: center;
+  gap: 7px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 10px;
+  background: var(--neutral);
+  color: var(--ink-3);
+  font-family: inherit;
+  font-size: 14.5px;
+  cursor: pointer;
+  transition: background-color 0.16s;
+}
+.cara-nueva .cn-bus-chip:hover,
+.cara-nueva .cn-cat-chip:hover {
+  background: var(--line-2);
+}
+.cara-nueva .cn-bus-cerrar,
+.cara-nueva .cn-cat-cerrar {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  place-items: center;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink-4);
+  cursor: pointer;
+}
+.cara-nueva .cn-bus-cerrar:hover,
+.cara-nueva .cn-cat-cerrar:hover {
+  background: var(--neutral);
+  color: var(--ink);
+}
+.cara-nueva .cn-bus-velo,
+.cara-nueva .cn-cat-velo {
+  position: absolute;
+  inset: 0;
+  background: var(--velo);
+}
+
+/* ── Buscador: cabecera, campo y filtros (artboard 1) ─────────────────── */
+.cara-nueva .cn-bus-cabeza {
+  flex: none;
+  padding: 28px var(--bc-hueco) 0;
+}
+.cara-nueva .cn-bus-h1 {
+  font-size: 34px;
+  line-height: 40px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+.cara-nueva .cn-bus-bajada {
+  max-width: 72ch;
+  margin: 6px 0 20px;
+  font-size: 18px;
+  line-height: 26px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-bus-busqueda {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.cara-nueva .cn-bus-campo-envoltura {
+  position: relative;
+  min-width: 0;
+  flex: 1;
+}
+.cara-nueva .cn-bus-campo-icono,
+.cara-nueva .cn-cat-campo-icono {
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  width: 18px;
+  height: 18px;
+  color: var(--ink-5);
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+.cara-nueva .cn-bus-campo {
+  width: 100%;
+  height: 52px;
+  padding: 0 16px 0 46px;
+  border: none;
+  border-radius: 14px;
+  background: var(--field);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 16.5px;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: box-shadow 0.16s;
+}
+.cara-nueva .cn-bus-campo:focus,
+.cara-nueva .cn-cat-campo:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--brand);
+}
+.cara-nueva .cn-bus-busqueda .cn-bus-boton--primario {
+  min-height: 52px;
+  border-radius: 14px;
+}
+.cara-nueva .cn-bus-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 20px;
+}
+.cara-nueva .cn-bus-selector select {
+  min-height: 44px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 10px;
+  background: var(--neutral);
+  color: var(--ink-3);
+  font-family: inherit;
+  font-size: 15px;
+  cursor: pointer;
+}
+.cara-nueva .cn-bus-divisor,
+.cara-nueva .cn-cat-divisor {
+  width: 1px;
+  height: 22px;
+  margin: 0 2px;
+  background: var(--line-2);
+}
+.cara-nueva .cn-bus-interruptor {
+  position: relative;
+}
+.cara-nueva .cn-bus-interruptor input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.cara-nueva .cn-bus-interruptor:focus-within {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.cara-nueva .cn-bus-casilla {
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  border-radius: 7px;
+  background: var(--canvas);
+  box-shadow: inset 0 0 0 1.5px var(--ink-5);
+  color: #fff;
+}
+.cara-nueva .cn-bus-interruptor--activo {
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-weight: 600;
+}
+.cara-nueva .cn-bus-interruptor--activo .cn-bus-casilla {
+  background: var(--brand-fill);
+  box-shadow: none;
+}
+.cara-nueva .cn-bus-estado {
+  margin-left: auto;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-5);
+}
+
+/* ── Buscador: cuerpo, estados y bloques ──────────────────────────────── */
+.cara-nueva .cn-bus-cuerpo {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 var(--bc-hueco) 32px;
+}
+.cara-nueva .cn-bus-vacio {
+  margin: 8px 0 16px;
+  padding: 28px;
+  border-radius: 16px;
+  background: var(--wash);
+}
+.cara-nueva .cn-bus-vacio--compacto {
+  padding: 20px;
+}
+.cara-nueva .cn-bus-vacio p {
+  max-width: 80ch;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-bus-vacio-titulo {
+  margin: 0 0 6px;
+  font-size: 19px;
+  line-height: 27px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.cara-nueva .cn-bus-acciones,
+.cara-nueva .cn-cat-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+.cara-nueva .cn-bus-cargando,
+.cara-nueva .cn-cat-cargando {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 0;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-bus-aviso {
+  margin: 8px 0 12px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: var(--warn-bg);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 23px;
+}
+.cara-nueva .cn-bus-aviso-titulo {
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+.cara-nueva .cn-bus-bloque {
+  margin: 8px 0 32px;
+}
+.cara-nueva .cn-bus-bloque-cabeza {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 16px 0 10px;
+}
+.cara-nueva .cn-bus-h2 {
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+.cara-nueva .cn-bus-cuenta {
+  font-size: 15px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-bus-bloque-bajada {
+  max-width: 84ch;
+  margin: 0 0 14px;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-bus-lista {
+  display: grid;
+  gap: 10px;
+}
+.cara-nueva .cn-bus-nota {
+  margin: 8px 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-bus-nadie {
+  margin-bottom: 12px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: var(--warn-bg);
+}
+.cara-nueva .cn-bus-nadie p {
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+}
+.cara-nueva .cn-bus-nadie b {
+  font-weight: 600;
+}
+.cara-nueva .cn-bus-nadie .cn-bus-boton {
+  margin-top: 8px;
+  padding: 0 12px;
+  color: var(--warn);
+}
+
+/* ── Buscador: las dos tarjetas ───────────────────────────────────────── */
+.cara-nueva .cn-bus-tarjeta {
+  min-width: 0;
+  padding: 20px 22px;
+  border-radius: 14px;
+  background: var(--canvas);
+  box-shadow: var(--bc-sombra);
+  transition: box-shadow 0.18s;
+}
+.cara-nueva .cn-bus-tarjeta:not(.cn-bus-tarjeta--sin):hover {
+  box-shadow: var(--bc-sombra-alta);
+}
+/* Lo que nadie leyó: lavado y sin sombra, igual de real y más callado. */
+.cara-nueva .cn-bus-tarjeta--sin {
+  padding: 18px 20px;
+  background: var(--wash);
+  box-shadow: none;
+}
+.cara-nueva .cn-bus-tarjeta-abrir {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.cara-nueva .cn-bus-tarjeta-cabeza {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+.cara-nueva .cn-bus-tarjeta-linea {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+}
+.cara-nueva .cn-bus-tarjeta-cita {
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-bus-procedencia {
+  min-width: 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-4);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-bus-sello {
+  display: inline-flex;
+  min-height: 28px;
+  flex: none;
+  align-items: center;
+  gap: 7px;
+  padding: 0 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.cara-nueva .cn-bus-sello--leida {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+.cara-nueva .cn-bus-sello--sin {
+  border: 1px dashed var(--bc-sin-linea);
+  background: var(--canvas);
+  color: var(--warn);
+}
+.cara-nueva .cn-bus-punto {
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-radius: 50%;
+  background: currentColor;
+}
+.cara-nueva .cn-bus-tarjeta-texto {
+  display: block;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-3);
+  text-align: justify;
+  text-wrap: pretty;
+}
+.cara-nueva .cn-bus-tarjeta-pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-size: 14.5px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-bus-separa,
+.cara-nueva .cn-cat-separa {
+  flex: 1;
+}
+.cara-nueva .cn-bus-enlace {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.cara-nueva .cn-bus-enlace--grande {
+  flex: 1;
+  font-size: 15px;
+}
+/* La cita en serif, como se lee un fragmento de providencia. */
+.cara-nueva .cn-bus-fragmento {
+  margin: 0;
+  padding-left: 14px;
+  border-left: 2px solid var(--brand);
+  color: var(--ink-3);
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-size: 15px;
+  line-height: 1.7;
+  text-align: justify;
+  text-wrap: pretty;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-bus-fragmento--sin {
+  margin-top: 10px;
+  border-left: 2px dashed var(--bc-sin-linea);
+}
+.cara-nueva .cn-bus-descartadas {
+  margin-top: 12px;
+  padding: 4px 16px 12px;
+  border-radius: 12px;
+  background: var(--wash);
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-bus-descartadas summary {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  cursor: pointer;
+}
+.cara-nueva .cn-bus-descartadas ul {
+  margin: 4px 0 0;
+  padding-left: 18px;
+}
+.cara-nueva .cn-bus-descartada-cita {
+  font-family: var(--mono);
+  font-weight: 500;
+  color: var(--ink-2);
+}
+
+/* ── Buscador: la ficha de la providencia leída (artboard 2) ──────────── */
+.cara-nueva .cn-bus-ficha {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.cara-nueva .cn-bus-ficha-panel {
+  position: relative;
+  display: flex;
+  width: 100%;
+  max-width: 860px;
+  max-height: 88vh;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--canvas);
+  box-shadow: 0 20px 60px rgb(16 24 34 / 0.18);
+}
+.cara-nueva .cn-bus-ficha-panel:focus {
+  outline: none;
+}
+.cara-nueva .cn-bus-ficha-cabeza {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 28px 0;
+}
+.cara-nueva .cn-bus-ficha-cita {
+  margin-top: 4px;
+  font-family: var(--mono);
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 500;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-bus-ficha-cuerpo {
+  display: grid;
+  min-height: 0;
+  flex: 1;
+  align-content: start;
+  gap: 20px;
+  overflow-y: auto;
+  padding: 22px 28px;
+}
+.cara-nueva .cn-bus-ficha-rotulo {
+  margin: 0 0 6px;
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-bus-prosa {
+  font-size: 16px;
+  line-height: 26px;
+  color: var(--ink-3);
+  text-align: justify;
+  text-wrap: pretty;
+}
+.cara-nueva .cn-bus-datos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 28px;
+  margin: 0;
+}
+.cara-nueva .cn-bus-datos dt {
+  margin-bottom: 2px;
+  font-size: 14px;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-bus-datos dd {
+  margin: 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink);
+}
+.cara-nueva .cn-bus-ficha-pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 28px;
+  background: var(--wash);
+}
+
+/* ── Buscador: teléfono (artboard 5) ──────────────────────────────────── */
+.cara-nueva.cn-bus--movil .cn-bus-cabeza {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.cara-nueva.cn-bus--movil .cn-bus-busqueda {
+  margin-bottom: 0;
+}
+.cara-nueva.cn-bus--movil .cn-bus-campo {
+  height: 48px;
+  padding-left: 42px;
+  border-radius: 12px;
+  font-size: 16px;
+}
+.cara-nueva.cn-bus--movil .cn-bus-busqueda .cn-bus-boton--primario {
+  min-height: 48px;
+  padding: 0 16px;
+  border-radius: 12px;
+}
+.cara-nueva .cn-bus-pestanas {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.cara-nueva .cn-bus-pestana {
+  border-radius: 12px;
+  font-size: 14.5px;
+}
+.cara-nueva .cn-bus-pestana--activa,
+.cara-nueva .cn-bus-pestana--activa:hover {
+  background: var(--ink);
+  color: var(--canvas);
+  font-weight: 600;
+}
+.cara-nueva.cn-bus--movil .cn-bus-cuerpo {
+  padding: 16px;
+}
+.cara-nueva.cn-bus--movil .cn-bus-bloque {
+  margin-top: 0;
+}
+.cara-nueva.cn-bus--movil .cn-bus-tarjeta {
+  padding: 18px;
+}
+.cara-nueva.cn-bus--movil .cn-bus-tarjeta-cabeza {
+  align-items: center;
+  margin-bottom: 4px;
+}
+.cara-nueva.cn-bus--movil .cn-bus-tarjeta-cita {
+  font-size: 15px;
+}
+.cara-nueva.cn-bus--movil .cn-bus-tarjeta-texto {
+  margin: 6px 0;
+}
+.cara-nueva.cn-bus--movil .cn-bus-acciones {
+  margin-top: 10px;
+}
+.cara-nueva.cn-bus--movil .cn-bus-vacio {
+  padding: 20px;
+}
+.cara-nueva .cn-bus-hoja-capa {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.cara-nueva .cn-bus-hoja {
+  position: relative;
+  display: flex;
+  max-height: 85dvh;
+  flex-direction: column;
+  overflow: hidden;
+  padding-bottom: env(safe-area-inset-bottom);
+  border-radius: 20px 20px 0 0;
+  background: var(--canvas);
+}
+.cara-nueva .cn-bus-asidero,
+.cara-nueva .cn-cat-asidero {
+  display: block;
+  width: 38px;
+  height: 4px;
+  flex: none;
+  margin: 8px auto 2px;
+  border-radius: 999px;
+  background: var(--line-2);
+}
+.cara-nueva .cn-bus-hoja-cabeza {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 12px 4px 20px;
+}
+.cara-nueva .cn-bus-hoja-cuerpo {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 12px 12px;
+}
+.cara-nueva .cn-bus-hoja-rotulo {
+  padding: 12px 8px 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-bus-opcion {
+  display: flex;
+  width: 100%;
+  min-height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 16px;
+  text-align: left;
+  cursor: pointer;
+}
+.cara-nueva .cn-bus-opcion--activa {
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-weight: 600;
+}
+.cara-nueva .cn-bus-hoja-pie {
+  display: flex;
+  padding: 12px 16px;
+  border-top: 1px solid var(--line);
+}
+.cara-nueva .cn-bus-hoja-pie .cn-bus-boton {
+  flex: 1;
+}
+
+/* ── Catálogo: cabecera, ramas y tabla (artboard 3) ───────────────────── */
+.cara-nueva .cn-cat-cabeza {
+  flex: none;
+  padding: 28px var(--bc-hueco) 0;
+}
+.cara-nueva .cn-cat-titular {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 32px;
+  margin-bottom: 20px;
+}
+.cara-nueva .cn-cat-h1 {
+  font-size: 34px;
+  line-height: 40px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+.cara-nueva .cn-cat-bajada {
+  max-width: 64ch;
+  margin-top: 6px;
+  font-size: 18px;
+  line-height: 26px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-cat-cifra {
+  flex: none;
+  text-align: right;
+}
+.cara-nueva .cn-cat-cifra-numero {
+  font-size: 26px;
+  line-height: 32px;
+  font-weight: 600;
+  color: var(--ok);
+  font-variant-numeric: tabular-nums;
+}
+.cara-nueva .cn-cat-cifra-rotulo {
+  font-size: 14.5px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-cat-aviso {
+  margin-bottom: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--warn-bg);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 23px;
+}
+.cara-nueva .cn-cat-aviso--peligro {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+.cara-nueva .cn-cat-huecos {
+  margin-bottom: 12px;
+  border-radius: 12px;
+  background: var(--wash);
+}
+.cara-nueva .cn-cat-huecos summary {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  padding: 0 16px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.cara-nueva .cn-cat-huecos ul {
+  margin: 0;
+  padding: 0 16px 12px 34px;
+}
+.cara-nueva .cn-cat-huecos li {
+  margin: 6px 0;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-cat-hueco-rama {
+  margin-right: 8px;
+  font-weight: 600;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-cat-busqueda {
+  position: relative;
+  display: block;
+  margin-bottom: 14px;
+}
+.cara-nueva .cn-cat-campo {
+  width: 100%;
+  height: 48px;
+  padding: 0 16px 0 46px;
+  border: none;
+  border-radius: 14px;
+  background: var(--field);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 16px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.cara-nueva .cn-cat-ramas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding-bottom: 18px;
+}
+.cara-nueva .cn-cat-chip--activa,
+.cara-nueva .cn-cat-chip--activa:hover {
+  background: var(--ink);
+  color: var(--canvas);
+  font-weight: 600;
+}
+.cara-nueva .cn-cat-chip--mas {
+  background: transparent;
+  color: var(--brand);
+  font-weight: 600;
+}
+.cara-nueva .cn-cat-chip--mas:hover {
+  background: var(--brand-soft);
+}
+.cara-nueva .cn-cat-chip--pendientes {
+  margin-left: auto;
+  background: var(--warn-bg);
+  color: var(--warn);
+  font-weight: 600;
+}
+.cara-nueva .cn-cat-chip--pendientes:hover {
+  background: var(--warn-bg);
+  filter: brightness(0.97);
+}
+.cara-nueva .cn-cat-chip--pendientes[aria-pressed='true'] {
+  box-shadow: inset 0 0 0 2px var(--warn);
+}
+.cara-nueva .cn-cat-cuerpo {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 var(--bc-hueco) 32px;
+}
+.cara-nueva .cn-cat-tabla-cabeza,
+.cara-nueva .cn-cat-fila {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 200px 190px 190px;
+  gap: 16px;
+}
+.cara-nueva .cn-cat-tabla-cabeza {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--canvas);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-cat-filas {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-cat-fila {
+  width: 100%;
+  min-height: 44px;
+  align-items: center;
+  padding: 14px;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.14s;
+}
+.cara-nueva .cn-cat-fila:hover {
+  background: var(--field);
+}
+.cara-nueva .cn-cat-fila-nombre {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+.cara-nueva .cn-cat-fila-titulo {
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-cat-fila-sub {
+  overflow: hidden;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-5);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cara-nueva .cn-cat-fila-termino {
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-cat-fila-cita {
+  font-family: var(--mono);
+  font-size: 14.5px;
+  line-height: 21px;
+  color: var(--ink-3);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-cat-fila-fundamento {
+  font-size: 14.5px;
+  line-height: 21px;
+}
+.cara-nueva .cn-cat-tono--sin {
+  color: var(--warn);
+}
+.cara-nueva .cn-cat-sello {
+  display: inline-flex;
+  min-height: 26px;
+  align-items: center;
+  gap: 7px;
+  padding: 2px 10px;
+  border-radius: 9px;
+  background: var(--neutral);
+  color: var(--ink-4);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+}
+.cara-nueva .cn-cat-sello--ok {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+.cara-nueva .cn-cat-sello--sin {
+  border: 1px dashed var(--bc-sin-linea);
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+.cara-nueva .cn-cat-punto {
+  width: 5px;
+  height: 5px;
+  flex: none;
+  border-radius: 50%;
+  background: currentColor;
+}
+.cara-nueva .cn-cat-vacio {
+  padding: 48px 16px;
+  text-align: center;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-cat-vacio-titulo {
+  margin-bottom: 4px;
+  font-size: 19px;
+  line-height: 27px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-cat-error {
+  margin: 8px 0;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--danger-bg);
+  color: var(--danger);
+  font-size: 15px;
+  line-height: 23px;
+}
+.cara-nueva .cn-cat-pie-nota {
+  max-width: 92ch;
+  margin-top: 20px;
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink-5);
+}
+@media (max-width: 1279px) {
+  /* En un escritorio angosto el fundamento se lee en la ficha: sin él, el término no se corta. */
+  .cara-nueva .cn-cat-tabla-cabeza,
+  .cara-nueva .cn-cat-fila {
+    grid-template-columns: minmax(0, 1fr) 190px 170px;
+  }
+  .cara-nueva .cn-cat-col-fundamento {
+    display: none;
+  }
+}
+
+/* ── Catálogo: la ficha de la actuación (derivada del artboard 2) ─────── */
+.cara-nueva .cn-cat-ficha {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.cara-nueva .cn-cat-ficha-panel {
+  position: relative;
+  display: flex;
+  width: 100%;
+  max-width: 860px;
+  max-height: 88vh;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--canvas);
+  box-shadow: 0 20px 60px rgb(16 24 34 / 0.18);
+}
+.cara-nueva .cn-cat-ficha-panel:focus {
+  outline: none;
+}
+.cara-nueva .cn-cat-ficha-cabeza {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 28px 8px;
+}
+.cara-nueva .cn-cat-ficha-meta {
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-cat-ficha-titulo {
+  margin-top: 4px;
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-cat-ficha-cuerpo {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  padding: 16px 28px 24px;
+}
+.cara-nueva .cn-cat-ficha-contenido {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+}
+.cara-nueva .cn-cat-ficha-pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 28px;
+  background: var(--wash);
+}
+.cara-nueva .cn-cat-invitacion {
+  padding: 24px 26px;
+  border-radius: 16px;
+  background: var(--warn-bg);
+}
+.cara-nueva .cn-cat-invitacion-titulo {
+  margin: 0 0 4px;
+  font-size: 19px;
+  line-height: 27px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.cara-nueva .cn-cat-invitacion p {
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--warn);
+}
+.cara-nueva .cn-cat-propia {
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: var(--warn-bg);
+}
+.cara-nueva .cn-cat-propia > p {
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+}
+
+/* ── Catálogo: la ficha por dentro (término, norma, autoridad, secciones) */
+.cara-nueva .cn-cat-detalle {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.cara-nueva .cn-cat-sobre {
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--wash);
+  color: var(--ink-3);
+  font-size: 15px;
+  line-height: 23px;
+  text-align: justify;
+  text-wrap: pretty;
+}
+.cara-nueva .cn-cat-bloques {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.cara-nueva .cn-cat-bloque {
+  min-width: 0;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: var(--canvas);
+  box-shadow: var(--bc-sombra);
+}
+.cara-nueva .cn-cat-bloque--ancho {
+  grid-column: 1 / -1;
+}
+.cara-nueva .cn-cat-bloque-cabeza {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  margin-bottom: 8px;
+}
+.cara-nueva .cn-cat-rotulo {
+  margin: 0;
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-cat-prosa {
+  font-size: 15.5px;
+  line-height: 25px;
+  color: var(--ink-3);
+  text-align: justify;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-cat-bloque-cita {
+  font-family: var(--mono);
+  font-size: 15px;
+  line-height: 24px;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-cat-nota {
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-cat-justificado {
+  text-align: justify;
+  text-wrap: pretty;
+}
+.cara-nueva .cn-cat-enlace {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  align-self: flex-start;
+  font-size: 15px;
+  font-weight: 600;
+}
+.cara-nueva .cn-cat-secciones,
+.cara-nueva .cn-cat-curaduria {
+  display: grid;
+  gap: 8px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: var(--wash);
+}
+.cara-nueva .cn-cat-lista-secciones {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-cat-seccion {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+.cara-nueva .cn-cat-seccion-numero {
+  flex: none;
+  padding-top: 1px;
+  font-size: 14px;
+  color: var(--ink-5);
+  font-variant-numeric: tabular-nums;
+}
+.cara-nueva .cn-cat-seccion-nombre {
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink);
+}
+.cara-nueva .cn-cat-seccion-cita {
+  margin-top: 2px;
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-cat-datos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 24px;
+  margin: 0;
+}
+.cara-nueva .cn-cat-datos dt,
+.cara-nueva .cn-cat-resumen dt {
+  font-size: 14px;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-cat-datos dd,
+.cara-nueva .cn-cat-resumen dd {
+  margin: 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+/* ── Catálogo: el formulario de verificación (artboard 4) ─────────────── */
+.cara-nueva .cn-cat-form {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
+  background: var(--canvas);
+}
+.cara-nueva .cn-cat-form-cabeza {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 12px 8px 18px;
+}
+.cara-nueva .cn-cat-form-titulo {
+  font-size: 19px;
+  line-height: 27px;
+  font-weight: 600;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-cat-resumen {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 12px 18px;
+  background: var(--wash);
+}
+.cara-nueva .cn-cat-resumen-cita {
+  font-family: var(--mono);
+  font-size: 14.5px;
+}
+.cara-nueva .cn-cat-form-cuerpo {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  padding: 16px 18px;
+}
+.cara-nueva .cn-cat-ficha-contenido .cn-cat-form-cuerpo {
+  padding: 16px 28px;
+}
+.cara-nueva .cn-cat-opciones {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+.cara-nueva .cn-cat-etiqueta {
+  display: block;
+  margin-bottom: 6px;
+  padding: 0;
+  font-size: 15px;
+  line-height: 23px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.cara-nueva .cn-cat-opcion {
+  position: relative;
+  display: flex;
+  min-height: 44px;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--field);
+  cursor: pointer;
+}
+.cara-nueva .cn-cat-opcion:focus-within {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.cara-nueva .cn-cat-opcion--activa {
+  background: var(--brand-soft);
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+.cara-nueva .cn-cat-opcion-marca {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  margin-top: 3px;
+  border-radius: 50%;
+  background: var(--canvas);
+  box-shadow: inset 0 0 0 2px var(--ink-5);
+}
+.cara-nueva .cn-cat-opcion--activa .cn-cat-opcion-marca {
+  box-shadow: inset 0 0 0 5px var(--brand);
+}
+.cara-nueva .cn-cat-opcion-titulo {
+  display: block;
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-cat-opcion-ayuda {
+  display: block;
+  font-size: 14.5px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-cat-campo-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.cara-nueva .cn-cat-entrada {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 12px;
+  background: var(--field);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 15px;
+}
+.cara-nueva .cn-cat-area {
+  width: 100%;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 12px;
+  background: var(--field);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 23px;
+  resize: vertical;
+}
+.cara-nueva .cn-cat-entrada:focus,
+.cara-nueva .cn-cat-area:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--brand);
+}
+.cara-nueva .cn-cat-form-pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  background: var(--wash);
+}
+.cara-nueva .cn-cat-ficha-contenido .cn-cat-form-pie {
+  padding: 16px 28px;
+}
+
+/* ── Catálogo: teléfono (derivado del artboard 5) ─────────────────────── */
+.cara-nueva.cn-cat--movil .cn-cat-cabeza {
+  padding: 12px 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+.cara-nueva.cn-cat--movil .cn-cat-busqueda {
+  margin-bottom: 10px;
+}
+.cara-nueva.cn-cat--movil .cn-cat-campo {
+  border-radius: 12px;
+}
+.cara-nueva.cn-cat--movil .cn-cat-ramas {
+  min-width: 0;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  scrollbar-width: none;
+}
+.cara-nueva.cn-cat--movil .cn-cat-chip--pendientes {
+  margin-left: 0;
+}
+.cara-nueva.cn-cat--movil .cn-cat-cuerpo {
+  padding: 12px 16px 24px;
+}
+.cara-nueva .cn-cat-rotulo-lista {
+  margin: 4px 0 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-cat-tarjetas {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-cat-tarjeta {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  padding: 16px 18px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  background: var(--canvas);
+  box-shadow: var(--bc-sombra);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.cara-nueva .cn-cat-tarjeta--sin {
+  border: 1px dashed var(--bc-sin-linea);
+  box-shadow: none;
+}
+.cara-nueva .cn-cat-tarjeta-nombre {
+  display: block;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-cat-tarjeta-marca {
+  display: block;
+  margin-top: 4px;
+  font-size: 14.5px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+/* El término, lo más grande de la tarjeta: es lo que se viene a buscar. */
+.cara-nueva .cn-cat-tarjeta-termino {
+  display: block;
+  margin-top: 8px;
+  font-size: 17px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-cat-tarjeta-termino.cn-cat-tono--sin {
+  color: var(--warn);
+}
+.cara-nueva .cn-cat-tarjeta-cita {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--mono);
+  font-size: 14.5px;
+  line-height: 21px;
+  color: var(--ink-3);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-cat-tarjeta-fundamento {
+  display: block;
+  margin-top: 4px;
+  font-size: 14.5px;
+  line-height: 21px;
+}
+.cara-nueva .cn-cat-tarjeta-pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-cat-volver {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  width: 100%;
+  min-height: 48px;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  background: var(--canvas);
+  color: var(--ink-2);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.cara-nueva .cn-cat-movil-detalle {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+}
+.cara-nueva .cn-cat-movil-titulo {
+  font-size: 22px;
+  line-height: 30px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-cat-pie-fijo {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  margin-top: auto;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+  background: var(--canvas);
+}
+.cara-nueva .cn-cat-pie-fijo .cn-cat-boton {
+  flex: 1;
+}
+.cara-nueva .cn-cat-hoja-capa {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.cara-nueva .cn-cat-hoja {
+  position: relative;
+  display: flex;
+  height: 92dvh;
+  flex-direction: column;
+  overflow: hidden;
+  padding-bottom: env(safe-area-inset-bottom);
+  border-radius: 20px 20px 0 0;
+  background: var(--canvas);
+}
+
+/* ── El marco compartido (`ConfirmarDialog`), vestido desde fuera ─────── */
+.cara-nueva.cn-cat-dialogos [role='dialog'] > div:last-child {
+  border: none;
+  background: var(--canvas);
+  color: var(--ink);
+}
+.cara-nueva.cn-cat-dialogos [role='dialog'] > div:last-child > header {
+  padding: 22px 26px 6px;
+  border-bottom: none;
+}
+.cara-nueva.cn-cat-dialogos [role='dialog'] > div:last-child > header h2 {
+  overflow: visible;
+  font-size: 21px;
+  line-height: 29px;
+  font-weight: 700;
+  white-space: normal;
+  color: var(--ink);
+}
+.cara-nueva.cn-cat-dialogos [role='dialog'] > div:last-child > header > button {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  color: var(--ink-4);
+}
+.cara-nueva.cn-cat-dialogos [role='dialog'] > div:last-child > header + div {
+  padding: 14px 26px 24px;
+  background: transparent;
+  font-size: 15px;
+  line-height: 23px;
+}
+.cara-nueva.cn-cat-dialogos [role='dialog'] > div:last-child > header + div > .text-ui {
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+}
+.cara-nueva.cn-cat-dialogos [role='dialog'] > div:last-child > footer {
+  gap: 10px;
+  padding: 14px 26px;
+  border-top: none;
+  background: var(--wash);
+}
+.cara-nueva.cn-cat-dialogos [role='dialog'] > div:last-child > footer > span:first-child,
+.cara-nueva.cn-cat-dialogos [role='dialog'] > div:last-child > footer > span:first-child span {
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva.cn-cat-dialogos [role='dialog'] > div:last-child > footer .btn-sm {
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 12px;
+  font-size: 15px;
+}
+@media (min-width: 640px) {
+  .cara-nueva.cn-cat-dialogos [role='dialog'] > div:last-child {
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgb(16 24 34 / 0.18);
+  }
+}
+
+/* ── Teléfono y reducción de movimiento ───────────────────────────────── */
+@media (max-width: 639px) {
+  .cara-nueva .cn-bus-ficha,
+  .cara-nueva .cn-cat-ficha {
+    align-items: flex-end;
+    padding: 0;
+  }
+  .cara-nueva .cn-bus-ficha-panel {
+    max-height: 92dvh;
+    border-radius: 20px 20px 0 0;
+  }
+  .cara-nueva .cn-cat-ficha-panel {
+    max-height: 92dvh;
+    border-radius: 20px 20px 0 0;
+  }
+  .cara-nueva .cn-bus-ficha-cabeza,
+  .cara-nueva .cn-cat-ficha-cabeza {
+    padding: 18px 12px 0 18px;
+  }
+  .cara-nueva .cn-bus-ficha-cuerpo,
+  .cara-nueva .cn-cat-ficha-cuerpo {
+    padding: 16px 18px;
+  }
+  .cara-nueva .cn-bus-ficha-pie,
+  .cara-nueva .cn-cat-ficha-pie {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 14px 18px;
+  }
+  .cara-nueva .cn-bus-datos,
+  .cara-nueva .cn-cat-datos,
+  .cara-nueva .cn-cat-bloques,
+  .cara-nueva .cn-cat-resumen {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cara-nueva .cn-cat-form-pie {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+  .cara-nueva .cn-bus-tarjeta-cabeza {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cara-nueva .cn-bus-tarjeta,
+  .cara-nueva .cn-bus-boton,
+  .cara-nueva .cn-cat-boton,
+  .cara-nueva .cn-cat-fila {
+    transition: none;
+  }
+}
+/* ─── fin Buscador y Catálogo ─── */

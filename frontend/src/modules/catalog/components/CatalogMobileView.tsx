@@ -1,69 +1,47 @@
 import React from 'react';
-import { Link2, Loader2 } from 'lucide-react';
-import {
-  IconoBuscar,
-  IconoSinVerificar,
-  IconoVerificado,
-  IconoVolver
-} from '../../../design/ArtboardIcons';
+import { Loader2 } from 'lucide-react';
+import { IconoBuscar, IconoVolver } from '../../../design/ArtboardIcons';
 import { useCatalogCuration } from '../hooks/useCatalogCuration';
 import { VerificationForm } from './VerificationForm';
 import { ActuacionDetail } from './ActuacionDetail';
-import { BRANCH_LABELS } from '../branchLabels';
+import { InvitacionAVerificar } from './InvitacionAVerificar';
+import { branchLabel } from '../branchLabels';
+import { filaDelCatalogo } from '../estadoEnElCatalogo';
 import type { Actuacion } from '../types';
 
 /**
- * Catálogo en móvil. Artboard 5c — pantalla propia, NO la de escritorio encogida.
+ * El Catálogo en el teléfono. Derivada: `app-buscador-catalogo.html` no trae
+ * catálogo a 375 px, así que toma la anatomía del Buscador móvil del mismo
+ * archivo (artboard 5: campo de 48, chips de 40+ que se desplazan, tarjetas de
+ * radio 14) y la tabla del escritorio (artboard 3) convertida en tarjeta.
  *
- * ─── LA DIFERENCIA DE FONDO CON LA 1i ───────────────────────────────────────
+ * ─── LA TABLA NO CABE Y NO SE INTENTA ───────────────────────────────────────
  *
- * En escritorio hay una lista angosta y una ficha al lado: la lista solo tiene
- * que decir el nombre, porque el término y el artículo se leen en el panel. En
- * móvil ese panel no existe —no hay «al lado»—, así que 5c mueve el dato a la
- * TARJETA: nombre, término en grande, artículo debajo y quién lo verificó. El
- * abogado resuelve la consulta sin abrir nada, que es lo que se hace de pie en
- * un juzgado.
+ * Cuatro columnas en 375 px dejan el término en tres letras por renglón. La
+ * tarjeta lleva lo mismo que la fila, en el orden en que se lee de pie en un
+ * juzgado: nombre, la marca de la ficha prestada ANTES del término (o «sin
+ * verificar» se leería como hueco de la rama), el término en grande, el
+ * fundamento y el estado con la palabra de la doctrina. Lo que nadie verificó
+ * lleva el borde discontinuo; nada más lo lleva.
  *
- * Encoger la 1i habría dado lo contrario: una lista de nombres sin plazo, y un
- * panel de 460px atravesado. Por eso esto es un componente aparte y no un
- * puñado de `lg:` sobre el otro.
+ * ─── DOS DEFECTOS CORREGIDOS AL VESTIRLA ────────────────────────────────────
  *
- * ─── EL TÉRMINO ES EL ELEMENTO MÁS GRANDE DE LA TARJETA ─────────────────────
+ * · REVERTIR NO LLEVABA LA RAMA. El escritorio revierte la curaduría de la
+ *   rama en que se verificó; el teléfono llamaba `revert(id)` a secas, así que
+ *   revertir una ficha prestada a familia retiraba la curaduría CIVIL de la
+ *   misma ficha, que es otra y estaba bien.
+ * · La ficha abierta se buscaba solo por id, y la misma ficha vive dos veces
+ *   (propia y prestada): podía abrirse la curaduría de la otra rama.
  *
- * «3 meses» va en 15px y el nombre de la actuación en 13. Es deliberado y es de
- * 5c: en una pantalla pequeña se lee lo grande primero, y lo que se viene a
- * buscar es el plazo. El nombre ya lo trae el abogado en la cabeza.
+ * ─── LO QUE NO ESTÁ, con la razón ───────────────────────────────────────────
  *
- * ─── LAS RAMAS SON CHIPS QUE SE DESPLAZAN, NO UN SELECTOR ───────────────────
- *
- * Un `<select>` de veintitrés ramas obliga a abrir, buscar y confirmar. Los
- * chips muestran dónde está uno sin abrir nada, y el desplazamiento horizontal
- * es el gesto que ya se conoce. Se contiene dentro de su fila: la página no se
- * ensancha.
- *
- * ─── LO QUE EL ARTBOARD PIDE Y AQUÍ NO ESTÁ, con la razón ───────────────────
- *
- * · El conteo por rama en el encabezado de sección («Laboral · 84
- *   actuaciones») se calcula sobre lo VISIBLE, no sobre la rama entera, porque
- *   con búsqueda activa el total de la rama sería un número que no corresponde
- *   a lo que se está viendo. Se rotula «coincidencias» cuando hay búsqueda.
+ * · Retirar una actuación propia: vive en el escritorio, donde se ve la lista
+ *   entera de la firma; un borrado a la firma entera no se ofrece en una
+ *   tarjeta de teléfono sin esa vista.
  */
 
-const TERMINO_GRANDE = 'text-[15px] font-semibold leading-none';
-
-const terminoDe = (a: Actuacion): { texto: string; clase: string } => {
-  if (a.term.status === 'NO_CADUCA') return { texto: 'No aplica término', clase: 'text-ink-500' };
-  if (a.term.status === 'NO_VERIFICADO')
-    return { texto: 'Sin verificar', clase: 'text-unverified' };
-  /*
-   * El término se publica ENTERO en el detalle, pero en la tarjeta se muestra
-   * su primera frase: varios términos del catálogo son párrafos de cuatro
-   * plazos distintos, y un párrafo dentro de una tarjeta de lista deja de
-   * leerse. Quien necesita el matiz abre la ficha, que está a un toque.
-   */
-  const primera = (a.term.description ?? '').split(/(?<=\.)\s|·/)[0];
-  return { texto: primera.length > 60 ? `${primera.slice(0, 57)}…` : primera, clase: 'text-ink-900' };
-};
+const mismaFicha = (a: Actuacion, b: Actuacion): boolean =>
+  a.id === b.id && (a.porRemision?.paraRama ?? null) === (b.porRemision?.paraRama ?? null);
 
 export const CatalogMobileView: React.FC = () => {
   const curation = useCatalogCuration();
@@ -72,101 +50,70 @@ export const CatalogMobileView: React.FC = () => {
 
   // Se relee de la lista fresca tras cada guardado, no de una copia vieja.
   const actual = abierta
-    ? curation.actuaciones.find((a) => a.id === abierta.id) ?? abierta
+    ? [...curation.actuaciones, ...curation.todas].find((a) => mismaFicha(a, abierta)) ?? abierta
     : null;
 
   if (actual) {
     return (
-      <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-y-auto bg-canvas">
+      <div className="cara-nueva cn-cat cn-cat--movil flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-y-auto">
         <button
           type="button"
           onClick={() => {
             setVerificando(false);
             setAbierta(null);
           }}
-          className="sticky top-0 z-10 flex min-h-[44px] shrink-0 items-center gap-2 border-b border-line-200 bg-surface px-4 text-[13px] font-semibold text-ink-700"
+          className="cn-cat-volver"
         >
           <IconoVolver className="h-4 w-4" />
           Catálogo
         </button>
 
-        <div className="p-4">
-          <h1 className="mb-3 text-[15px] font-semibold leading-tight text-ink-900">
-            {actual.exactName}
-          </h1>
+        <div className="cn-cat-movil-detalle">
+          <div>
+            <p className="cn-cat-ficha-meta">{branchLabel(actual.porRemision?.paraRama ?? actual.branch)}</p>
+            <h1 className="cn-cat-movil-titulo">{actual.exactName}</h1>
+          </div>
+          <InvitacionAVerificar actuacion={actual} onAnotar={() => setVerificando(true)} />
           <ActuacionDetail actuacion={actual} />
-
-          {/*
-            ─── EL FORMULARIO SE ABRE COMO HOJA, NO SE APILA DEBAJO ─────────
-
-            Apilado, quedaba escondido de una forma que además parecía un error
-            del programa: el formulario pide `h-full` —está pensado para un
-            panel de altura fija— y en esta pantalla ese `h-full` competía por
-            el alto con el título y la ficha. Su cabecera, su franja de
-            término/norma/autoridad y su pie son `shrink-0`, así que lo único
-            que podía encogerse era justo el centro: las opciones del estado del
-            término y los campos. El resultado medido era un rótulo «ESTADO DEL
-            TÉRMINO» con el botón «Guardar verificación» pegado debajo, y el
-            formulario entero —lo que el botón guarda— en una franja de scroll
-            de casi cero. Un botón visible sobre un formulario invisible.
-
-            Como hoja, `h-full` significa lo que el formulario espera: la altura
-            de la hoja. Cabecera y pie fijos, y las opciones y los campos con su
-            propio desplazamiento en medio. Es además el gesto que esta casa ya
-            eligió para el teléfono: los diálogos suben desde abajo.
-          */}
         </div>
 
         {/*
-          EL BOTÓN NO SE VA CON EL SCROLL. Una ficha larga lo dejaba a
-          novecientos píxeles del pliegue, y una acción que hay que ir a buscar
-          es una acción que no existe.
+          EL BOTÓN NO SE VA CON EL SCROLL. Una ficha larga lo dejaba a novecientos
+          píxeles del pliegue, y una acción que hay que ir a buscar no existe.
         */}
-        <div className="sticky bottom-0 mt-auto shrink-0 border-t border-line-200 bg-surface px-4 py-3">
-          <button
-            type="button"
-            onClick={() => setVerificando(true)}
-            className="min-h-[44px] w-full rounded-control bg-brand-700 px-4 text-[13px] font-semibold text-on-brand"
-          >
+        <div className="cn-cat-pie-fijo">
+          <button type="button" onClick={() => setVerificando(true)} className="cn-cat-boton cn-cat-boton--primario">
             {actual.verification ? 'Revisar la verificación' : 'Verificar el término'}
           </button>
         </div>
 
+        {/*
+          EL FORMULARIO SE ABRE COMO HOJA, NO SE APILA DEBAJO. Apilado, su alto
+          completo competía con la ficha y lo único que encogía era el centro:
+          un botón «Guardar» visible sobre un formulario invisible. En la hoja,
+          cabecera y pie fijos y los campos con su propio desplazamiento. Alto en
+          `dvh`: en un teléfono `vh` no descuenta la barra de direcciones.
+        */}
         {verificando && (
-          <div className="fixed inset-0 z-50 flex items-end" role="dialog" aria-modal="true">
-            <div
-              className="absolute inset-0 bg-[rgb(16_24_34/0.42)]"
-              onClick={() => setVerificando(false)}
-              aria-hidden="true"
-            />
-
-            {/*
-              `dvh` y no `vh`: en un teléfono 100vh se mide contra la ventana
-              SIN la barra de direcciones, y todo lo anclado abajo —aquí, el
-              botón de guardar— cae fuera de lo que se ve.
-
-              Radio de 20 px arriba (14 sep 2026): el mismo de toda hoja inferior.
-            */}
-            <div className="relative flex h-[92dvh] w-full min-w-0 flex-col overflow-hidden rounded-t-[20px] bg-surface pb-[env(safe-area-inset-bottom)] shadow-[0_16px_40px_-12px_rgb(16_24_34/0.3)]">
-              <div className="flex shrink-0 justify-center pb-0.5 pt-2" aria-hidden="true">
-                <span className="h-1 w-[38px] rounded-full bg-neutral-line" />
-              </div>
-
+          <div className="cn-cat-hoja-capa" role="dialog" aria-modal="true" aria-label="Verificar el término">
+            <div className="cn-cat-velo" onClick={() => setVerificando(false)} aria-hidden="true" />
+            <section className="cn-cat-hoja">
+              <span className="cn-cat-asidero" aria-hidden="true" />
               <div className="min-h-0 min-w-0 flex-1">
                 <VerificationForm
                   actuacion={actual}
                   isSaving={curation.isSaving}
                   error={curation.saveError}
                   onSave={curation.save}
-                  onRevert={async (id) => {
-                    const listo = await curation.revert(id);
+                  onRevert={async (id, rama) => {
+                    const listo = await curation.revert(id, rama);
                     if (listo) setVerificando(false);
                     return listo;
                   }}
                   onClose={() => setVerificando(false)}
                 />
               </div>
-            </div>
+            </section>
           </div>
         )}
       </div>
@@ -177,137 +124,118 @@ export const CatalogMobileView: React.FC = () => {
 
   return (
     /*
-      `min-w-0` Y LA FILA DE CHIPS. El comentario de arriba dice que los chips
-      «se contienen dentro de su fila: la página no se ensancha», y era cierto a
-      medias: `overflow-x-auto` desplaza dentro de la fila, pero esta columna es
-      un ítem flex y nace con `min-width: auto`, así que se negaba a bajar del
-      ancho mínimo de sus hijos. Medido con las 23 ramas cargadas: la columna
-      ocupaba 826px en un teléfono de 375 y la raíz recortaba el resto —las
-      tarjetas quedaban cortadas por la derecha—. `overflow-x-auto` solo puede
-      hacer su trabajo si su contenedor tiene permiso para encogerse.
+      `min-w-0` Y LA FILA DE CHIPS: esta columna es un ítem flex y nace con
+      `min-width: auto`. Medido con todas las ramas cargadas, ocupaba 826 px en un
+      teléfono de 375 y la raíz recortaba las tarjetas. El desplazamiento de los
+      chips solo funciona si su contenedor tiene permiso para encoger.
     */
-    <div data-visita="vista-catalogo" className="flex h-full min-h-0 min-w-0 flex-1 flex-col bg-canvas">
-      {/* El titulo y el censo los pone `MobileHeader`: una sola cabecera (4d). */}
-      <header className="shrink-0 border-b border-line-200 bg-surface px-4 py-3">
-        <div className="relative">
-          <IconoBuscar className="pointer-events-none absolute left-3 top-[11px] h-3.5 w-3.5 text-ink-400" />
+    <div data-visita="vista-catalogo" className="cara-nueva cn-cat cn-cat--movil flex h-full min-h-0 min-w-0 flex-1 flex-col">
+      {/* El título lo pone la cabecera móvil de la aplicación: una sola cabecera. */}
+      <div className="cn-cat-cabeza">
+        <label className="cn-cat-busqueda">
+          <span className="sr-only">Buscar una actuación</span>
+          <IconoBuscar className="cn-cat-campo-icono" />
           <input
+            type="search"
+            enterKeyHint="search"
             value={curation.query}
             onChange={(e) => curation.setQuery(e.target.value)}
-            placeholder="Buscar actuación"
-            className="field h-[38px] w-full pl-9"
+            placeholder="Buscar una actuación o su norma"
+            className="cn-cat-campo"
           />
-        </div>
-      </header>
+        </label>
 
-      {/*
-        Los chips se desplazan DENTRO de su fila. `overflow-x-auto` aquí y no en
-        la página: una barra de ramas que ensanche el documento vuelve a
-        recortar todo lo demás, que es el defecto que ya se pagó una vez.
-      */}
-      <div className="flex shrink-0 gap-1.5 overflow-x-auto border-b border-line-200 bg-surface px-4 py-2">
-        <button
-          type="button"
-          onClick={() => curation.setBranchFilter('TODAS')}
-          className={`min-h-[32px] shrink-0 rounded-full px-3 text-[11.5px] font-semibold ${
-            curation.branchFilter === 'TODAS'
-              ? 'bg-brand-700 text-on-brand'
-              : 'bg-canvas text-ink-500'
-          }`}
-        >
-          Todas
-        </button>
-        {curation.branches.map((b) => (
+        {/* Los chips se desplazan DENTRO de su fila, nunca ensanchan la página. */}
+        <div className="cn-cat-ramas">
           <button
-            key={b}
             type="button"
-            onClick={() => curation.setBranchFilter(b)}
-            className={`min-h-[32px] shrink-0 rounded-full px-3 text-[11.5px] font-semibold ${
-              curation.branchFilter === b ? 'bg-brand-700 text-on-brand' : 'bg-canvas text-ink-500'
-            }`}
+            aria-pressed={curation.branchFilter === 'TODAS'}
+            onClick={() => curation.setBranchFilter('TODAS')}
+            className={`cn-cat-chip${curation.branchFilter === 'TODAS' ? ' cn-cat-chip--activa' : ''}`}
           >
-            {BRANCH_LABELS[b] ?? b}
+            Todas
           </button>
-        ))}
+          {curation.branches.map((b) => (
+            <button
+              key={b}
+              type="button"
+              aria-pressed={curation.branchFilter === b}
+              onClick={() => curation.setBranchFilter(b)}
+              className={`cn-cat-chip${curation.branchFilter === b ? ' cn-cat-chip--activa' : ''}`}
+            >
+              {branchLabel(b)}
+            </button>
+          ))}
+        </div>
+        <div className="cn-cat-ramas">
+          <button
+            type="button"
+            aria-pressed={curation.onlyUnverified}
+            onClick={() => curation.setOnlyUnverified(!curation.onlyUnverified)}
+            className="cn-cat-chip cn-cat-chip--pendientes"
+          >
+            Solo sin verificar · {curation.pendientesEnElFiltro}
+          </button>
+        </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="cn-cat-cuerpo">
         {curation.isLoading && (
-          <div className="flex items-center justify-center gap-2 py-16 text-[12.5px] text-ink-500">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Cargando catálogo…
+          <p className="cn-cat-cargando">
+            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+            Cargando el catálogo…
+          </p>
+        )}
+
+        {!curation.isLoading && curation.loadError && (
+          <div className="cn-cat-error" role="alert">
+            <p>{curation.loadError}</p>
+            <div className="cn-cat-acciones">
+              <button type="button" onClick={() => void curation.reload()} className="cn-cat-boton cn-cat-boton--neutro">
+                Reintentar
+              </button>
+            </div>
           </div>
         )}
 
-        {!curation.isLoading && curation.actuaciones.length === 0 && (
-          <p className="px-4 py-16 text-center text-[12.5px] text-ink-500">
-            Ninguna actuación coincide.
-          </p>
+        {!curation.isLoading && !curation.loadError && curation.actuaciones.length === 0 && (
+          <div className="cn-cat-vacio">
+            <p className="cn-cat-vacio-titulo">Ninguna actuación coincide</p>
+            <p>Cambie las palabras o elija otra rama.</p>
+          </div>
         )}
 
         {!curation.isLoading && curation.actuaciones.length > 0 && (
           <>
-            <p className="px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-400">
-              {curation.branchFilter === 'TODAS'
-                ? 'Todas las ramas'
-                : BRANCH_LABELS[curation.branchFilter] ?? curation.branchFilter}
-              {' · '}
+            <p className="cn-cat-rotulo-lista">
+              {curation.branchFilter === 'TODAS' ? 'Todas las ramas' : branchLabel(curation.branchFilter)} ·{' '}
               {curation.actuaciones.length} {hayBusqueda ? 'coincidencias' : 'actuaciones'}
             </p>
-
-            <ul className="space-y-2 px-3 pb-4">
+            <ul className="cn-cat-tarjetas">
               {curation.actuaciones.map((a) => {
-                const sinVerificar = a.term.status === 'NO_VERIFICADO';
-                const t = terminoDe(a);
-
+                const fila = filaDelCatalogo(a);
                 return (
-                  <li key={a.id}>
+                  <li key={`${a.id}:${a.porRemision?.paraRama ?? ''}`}>
                     <button
                       type="button"
                       onClick={() => setAbierta(a)}
-                      className={`w-full rounded-card bg-surface px-3.5 py-3 text-left ${
-                        sinVerificar
-                          ? 'border border-dashed border-[rgb(var(--unverified-line))]'
-                          : 'border border-line-200'
-                      }`}
+                      className={`cn-cat-tarjeta${fila.estado.tono === 'sin' ? ' cn-cat-tarjeta--sin' : ''}`}
                     >
-                      <p className="text-[13px] font-medium leading-tight text-ink-900 text-justify">
-                        {a.exactName}
-                      </p>
-
-                      {/*
-                        LA MARCA VA ANTES DEL TERMINO, no después. En el
-                        teléfono el término se pinta grande y es lo primero que
-                        el ojo coge; si dijera «sin verificar» sin que antes se
-                        haya dicho que la ficha es prestada, se leería como un
-                        hueco del catálogo en esta rama.
-                      */}
-                      {a.porRemision && (
-                        <p className="mt-1 flex items-start gap-1 text-[11px] leading-snug text-ink-500 text-justify">
-                          <Link2 className="mt-0.5 h-3 w-3 shrink-0" />
-                          {a.porRemision.marca}
-                        </p>
-                      )}
-
-                      <p className={`mt-1.5 ${TERMINO_GRANDE} ${t.clase}`}>{t.texto}</p>
-
-                      <p className="mt-1.5 text-[11.5px] leading-snug text-ink-500 text-justify">
-                        {a.legalBasis}
-                      </p>
-
-                      {a.verification ? (
-                        <p className="mt-1.5 flex items-center gap-1 text-[11px] text-verified text-justify">
-                          <IconoVerificado className="h-3 w-3 shrink-0" />
-                          Verificada por {a.verification.verifiedBy}
-                        </p>
-                      ) : (
-                        sinVerificar && (
-                          <p className="mt-1.5 flex items-center gap-1 text-[11px] font-semibold text-unverified text-justify">
-                            <IconoSinVerificar className="h-3 w-3 shrink-0" />
-                            Verificar contra la norma
-                          </p>
-                        )
-                      )}
+                      <span className="cn-cat-tarjeta-nombre">{a.exactName}</span>
+                      {fila.marca && <span className="cn-cat-tarjeta-marca">{fila.marca}</span>}
+                      <span className={`cn-cat-tarjeta-termino cn-cat-tono--${fila.termino.tono}`}>{fila.termino.texto}</span>
+                      <span
+                        className={`${fila.fundamento.mono ? 'cn-cat-tarjeta-cita' : 'cn-cat-tarjeta-fundamento'} cn-cat-tono--${fila.fundamento.tono}`}
+                      >
+                        {fila.fundamento.texto}
+                      </span>
+                      <span className="cn-cat-tarjeta-pie">
+                        <span className={`cn-cat-sello cn-cat-sello--${fila.estado.tono}`}>
+                          {fila.estado.tono === 'ok' && <span className="cn-cat-punto" aria-hidden="true" />}
+                          {fila.estado.texto}
+                        </span>
+                        {a.verification && <span>Verificó {a.verification.verifiedBy}</span>}
+                      </span>
                     </button>
                   </li>
                 );

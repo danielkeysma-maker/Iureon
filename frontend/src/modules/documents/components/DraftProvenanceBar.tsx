@@ -1,6 +1,8 @@
 import React from 'react';
-import { AlertTriangle, BadgeCheck, ExternalLink, FileQuestion } from 'lucide-react';
+import { AlertTriangle, BadgeCheck, ExternalLink, FileQuestion, PenLine } from 'lucide-react';
 import type { ProcedenciaDelBorrador } from '../types';
+import type { EstiloAplicado } from '../../estilo/types';
+import { etiquetaEstiloAplicado } from '../../estilo/estiloEnPantalla';
 import { esTituloDeTrabajo } from '../../catalog/tituloDeTrabajo';
 
 /**
@@ -40,6 +42,8 @@ import { esTituloDeTrabajo } from '../../catalog/tituloDeTrabajo';
 
 interface DraftProvenanceBarProps {
   procedencia: ProcedenciaDelBorrador | null | undefined;
+  /** El estilo enseñado con que se redactó. Si falta, se lee de la procedencia. */
+  estiloAplicado?: EstiloAplicado | null;
 }
 
 /*
@@ -50,7 +54,29 @@ interface DraftProvenanceBarProps {
 const AMBAR = 'cn-red-procedencia cn-red-procedencia--ambar';
 const VERDE = 'cn-red-procedencia cn-red-procedencia--verde';
 
-export const DraftProvenanceBar: React.FC<DraftProvenanceBarProps> = ({ procedencia }) => {
+/*
+ * «CON EL ESTILO DE SU FIRMA» VA APARTE DE LA FRANJA DE LA FICHA, y en gris.
+ * No es una advertencia ni un sello de verificación: es un dato de cómo se
+ * redactó. Si viviera dentro de la franja, se callaría cada vez que la ficha no
+ * tiene nada que advertir, que es el caso normal; y pintado en verde se leería
+ * como que el estilo está «verificado», que no significa nada.
+ */
+export const DraftProvenanceBar: React.FC<DraftProvenanceBarProps> = ({ procedencia, estiloAplicado }) => {
+  const estilo = estiloAplicado ?? procedencia?.estiloAplicado ?? null;
+  return (
+    <>
+      <FranjaDeLaFicha procedencia={procedencia} />
+      {estilo && (
+        <p className="cn-est-procedencia">
+          <PenLine className="cn-est-procedencia-icono" strokeWidth={1.8} aria-hidden />
+          {etiquetaEstiloAplicado(estilo)}
+        </p>
+      )}
+    </>
+  );
+};
+
+const FranjaDeLaFicha: React.FC<{ procedencia: ProcedenciaDelBorrador | null | undefined }> = ({ procedencia }) => {
   /*
    * `undefined` es un borrador guardado antes de que esto existiera. No se
    * advierte nada: no sabemos que le falte respaldo, sabemos que no lo

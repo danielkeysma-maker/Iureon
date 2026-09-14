@@ -37,6 +37,16 @@ export interface CorpusPrecedent {
   outcome: string | null;
   sourceUrl: string | null;
   isSharedCorpus: boolean;
+  /**
+   * Jurisprudencia o concepto. El backend lo manda desde que existen conceptos
+   * en el corpus y este tipo no lo declaraba, así que la pantalla no podía
+   * evitar presentar un concepto como providencia. Lo ausente es jurisprudencia.
+   */
+  sourceKind?: 'JURISPRUDENCIA' | 'CONCEPTO';
+  /** A quién obliga un concepto, solo si se verificó. Nunca se inventa. */
+  bindingScope?: string | null;
+  /** La entidad que emitió el concepto. */
+  entidad?: string | null;
 }
 
 export interface GlossaryTerm {

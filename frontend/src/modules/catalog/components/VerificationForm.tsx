@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AlertTriangle, CalendarClock, Check, Infinity as InfinityIcon, Loader2, RotateCcw, X } from 'lucide-react';
+import { Loader2, X } from 'lucide-react';
 import { useTenant } from '../../tenant/TenantContext';
 import type { Actuacion, LegalBranch, TermStatus, VerificationInput } from '../types';
 
@@ -12,38 +12,48 @@ interface VerificationFormProps {
   onClose: () => void;
   /** La franja que repite término, norma y autoridad. Se apaga donde ya se muestra la ficha completa. */
   conResumen?: boolean;
+  /** La cabecera con el nombre. Se apaga dentro de la ficha, que ya tiene la suya. */
+  conCabecera?: boolean;
 }
 
-const STATUS_OPTIONS: { value: TermStatus; label: string; help: string; icon: typeof CalendarClock }[] = [
+/*
+ * «NO CADUCA» AL MISMO NIVEL QUE «TIENE TÉRMINO». Son tres respuestas del mismo
+ * peso a una misma pregunta, y ninguna se esconde detrás de otra: quien lee la
+ * norma y encuentra que no fija plazo tiene una respuesta verificada, no un
+ * hueco.
+ */
+const STATUS_OPTIONS: { value: TermStatus; label: string; help: string }[] = [
   {
     value: 'VERIFICADO',
     label: 'Tiene término',
-    help: 'La norma fija un plazo y lo leíste en su texto.',
-    icon: CalendarClock
+    help: 'La norma fija un plazo y usted lo leyó en su texto.'
   },
   {
     value: 'NO_CADUCA',
     label: 'No caduca',
-    help: 'La norma dice expresamente que puede presentarse en cualquier tiempo.',
-    icon: InfinityIcon
+    help: 'La norma dice expresamente que puede presentarse en cualquier tiempo.'
   },
   {
     value: 'NO_VERIFICADO',
     label: 'Sin verificar',
-    help: 'Nadie lo ha comprobado. La aplicación advertirá en lugar de afirmar.',
-    icon: AlertTriangle
+    help: 'Nadie lo ha comprobado. La aplicación advertirá en lugar de afirmar.'
   }
 ];
 
 /**
- * Where a lawyer confirms an actuación's term against the norm, once, for every
- * future draft.
+ * Donde un abogado confirma el término de una actuación contra la norma, una
+ * vez, para todos los escritos posteriores de su firma.
  *
- * The form mirrors the backend's rules instead of trusting them silently: a
- * claimed term needs its wording and its source, and "sin verificar" hides
- * those fields entirely, because a description typed under that status would be
- * precisely the unchecked deadline the catalogue exists to prevent. The server
- * still validates — this only keeps the lawyer from being rejected after typing.
+ * Artboard 4 de `app-buscador-catalogo.html` («Verificar una actuación del
+ * catálogo») para la entrada, y la anatomía del formulario de curaduría del
+ * mismo artboard: etiqueta encima, campo sobre gris, primario abajo a la
+ * derecha.
+ *
+ * El formulario refleja las reglas del backend en vez de confiar en ellas en
+ * silencio: un término afirmado necesita su texto y su fuente, y «sin
+ * verificar» esconde esos campos, porque un plazo escrito bajo ese estado sería
+ * justo el plazo sin comprobar que el catálogo existe para impedir. El servidor
+ * valida igual; esto evita que el abogado escriba para ser rechazado después.
  */
 export const VerificationForm: React.FC<VerificationFormProps> = ({
   actuacion,
@@ -52,7 +62,8 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({
   onSave,
   onRevert,
   onClose,
-  conResumen = true
+  conResumen = true,
+  conCabecera = true
 }) => {
   const { currentUserEmail } = useTenant();
 
@@ -63,7 +74,7 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({
   const [note, setNote] = useState(actuacion.verification?.note ?? '');
   const [verifiedBy, setVerifiedBy] = useState(actuacion.verification?.verifiedBy ?? currentUserEmail);
 
-  // Reset when the lawyer moves to another actuación without closing the panel.
+  // Se reinicia cuando el abogado pasa a otra actuación sin cerrar el panel.
   useEffect(() => {
     setTermStatus(actuacion.term.status);
     setTermDescription(actuacion.term.description ?? '');
@@ -103,242 +114,155 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col h-full bg-surface">
-      <header className="px-5 py-4 border-b border-line-200 flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-sm font-semibold text-ink-900 leading-tight">{actuacion.exactName}</p>
-          <p className="text-[11px] text-ink-500 mt-0.5">{actuacion.branch}</p>
-        </div>
-        <button
-          type="button"
-          onClick={onClose}
-          className="p-1 text-ink-400 hover:text-ink-700 transition-colors"
-          aria-label="Cerrar"
-        >
-          <X className="w-4 h-4" />
-        </button>
-      </header>
+    <form onSubmit={handleSubmit} className="cn-cat-form">
+      {conCabecera && (
+        <header className="cn-cat-form-cabeza">
+          <div className="min-w-0">
+            <h2 className="cn-cat-form-titulo">{actuacion.exactName}</h2>
+            <p className="cn-cat-nota">Verificar el término contra la norma</p>
+          </div>
+          <button type="button" onClick={onClose} className="cn-cat-cerrar" aria-label="Cerrar">
+            <X className="h-5 w-5" aria-hidden="true" />
+          </button>
+        </header>
+      )}
 
       {/*
-        ─── LOS TRES DATOS QUE DEFINEN LA ACTUACIÓN, cada uno con SU estado ───
-
-        Término, norma y autoridad en tres bloques iguales. La ficha puede
-        estar verificada en el término y coja en la autoridad, y eso tiene que
-        VERSE — un solo chip global promediaría tres verdades distintas en una
-        mentira cómoda.
-      */}
-      {/*
-        EL RESUMEN SE APAGA DONDE YA ESTÁ LA FICHA. Esta franja repite término,
-        norma y autoridad, y en la pantalla de curaduría vive justo debajo de
-        `ActuacionDetail`, que trae lo mismo y mejor: los tres bloques con su
-        estado y las secciones que la norma exige. Duplicado, empujaba los
-        campos de verificación fuera de la pantalla y el abogado veía dos veces
-        lo que ya sabía y ni una el formulario que venía a llenar.
+        EL RESUMEN SE APAGA DONDE YA ESTÁ LA FICHA. Duplicado, empujaba los
+        campos fuera de la pantalla y el abogado veía dos veces lo que ya sabía
+        y ni una el formulario que venía a llenar.
       */}
       {conResumen && (
-        <div className="grid shrink-0 grid-cols-3 gap-px border-b border-line-200 bg-line-100">
-          <div className="bg-surface px-3 py-2.5">
-            <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
-              Término
-            </p>
-            <p className="mt-0.5 text-justify text-[11.5px] font-medium leading-snug text-ink-900 [text-wrap:pretty]">
+        <dl className="cn-cat-resumen">
+          <div>
+            <dt>Término</dt>
+            <dd>
               {actuacion.term.status === 'NO_CADUCA'
                 ? 'No caduca'
                 : actuacion.term.description
-                ? actuacion.term.description.length > 60
-                  ? `${actuacion.term.description.slice(0, 60)}…`
-                  : actuacion.term.description
-                : 'Sin término registrado'}
-            </p>
-            <span className={`mt-1 inline-block ${actuacion.term.status === 'NO_VERIFICADO' ? 'chip-unverified' : 'chip-verified'}`}>
-              {actuacion.term.status === 'NO_VERIFICADO' ? 'Sin verificar' : 'Verificado'}
-            </span>
+                  ? actuacion.term.description.length > 90
+                    ? `${actuacion.term.description.slice(0, 90)}…`
+                    : actuacion.term.description
+                  : 'Sin término registrado'}
+            </dd>
           </div>
-
-          <div className="bg-surface px-3 py-2.5">
-            <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
-              Norma
-            </p>
-            <p className="mt-0.5 text-justify text-[11.5px] font-medium leading-snug text-ink-900 [text-wrap:pretty]">
-              {actuacion.legalBasis || 'Sin artículo'}
-            </p>
-            {actuacion.sourceUrl ? (
-              <a
-                href={actuacion.sourceUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-1 inline-block text-[10.5px] font-semibold text-brand-700 hover:underline"
-              >
-                Texto oficial
-              </a>
-            ) : (
-              <span className="mt-1 inline-block chip-unverified">Sin fuente</span>
-            )}
+          <div>
+            <dt>Norma</dt>
+            <dd className="cn-cat-resumen-cita">{actuacion.legalBasis || 'Sin artículo'}</dd>
           </div>
-
-          <div className="bg-surface px-3 py-2.5">
-            <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
-              Autoridad
-            </p>
-            <p className="mt-0.5 text-justify text-[11.5px] font-medium leading-snug text-ink-900 [text-wrap:pretty]">
-              {actuacion.competentAuthority ?? 'No registrada'}
-            </p>
-            <span className={`mt-1 inline-block ${actuacion.competentAuthority ? 'chip-neutral' : 'chip-unverified'}`}>
-              {actuacion.competentAuthority ? 'Del catálogo' : 'Falta'}
-            </span>
-          </div>
-        </div>
+        </dl>
       )}
 
-      <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+      <div className="cn-cat-form-cuerpo">
         {actuacion.verification && (
-          <div className="rounded-control border border-line-200 bg-brand-50 px-3 py-2.5 text-justify text-[11px] leading-snug text-brand-700 [overflow-wrap:anywhere] [text-wrap:pretty]">
-            Verificada por <strong>{actuacion.verification.verifiedBy}</strong> el{' '}
-            {new Date(actuacion.verification.verifiedAt).toLocaleDateString('es-CO')}. El catálogo base
-            decía: <em>{actuacion.verification.replaced.description ?? 'término no verificado'}</em>.
-          </div>
+          <p className="cn-cat-sobre">
+            Verificada por <b>{actuacion.verification.verifiedBy}</b> el{' '}
+            {new Date(actuacion.verification.verifiedAt).toLocaleDateString('es-CO')}. El catálogo base decía:{' '}
+            <em>{actuacion.verification.replaced.description ?? 'término no verificado'}</em>.
+          </p>
         )}
 
-        <fieldset>
-          <legend className="text-[11px] font-bold uppercase tracking-wide text-ink-500 mb-2">
-            Estado del término
-          </legend>
-          <div className="space-y-2">
-            {STATUS_OPTIONS.map((option) => {
-              const Icon = option.icon;
-              const selected = termStatus === option.value;
-
-              return (
-                <label
-                  key={option.value}
-                  className={`flex gap-2.5 items-start rounded-control border p-2.5 cursor-pointer transition-colors ${
-                    selected
-                      ? 'border-brand-700 bg-brand-50/60'
-                      : 'border-line-200 hover:border-line-200'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="termStatus"
-                    className="sr-only"
-                    checked={selected}
-                    onChange={() => setTermStatus(option.value)}
-                  />
-                  <Icon
-                    className={`w-4 h-4 shrink-0 mt-0.5 ${selected ? 'text-brand-700' : 'text-ink-400'}`}
-                  />
-                  <span className="min-w-0">
-                    <span className="block text-[12px] font-semibold text-ink-900">{option.label}</span>
-                    <span className="block text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">{option.help}</span>
-                  </span>
-                </label>
-              );
-            })}
-          </div>
+        <fieldset className="cn-cat-opciones">
+          <legend className="cn-cat-etiqueta">Estado del término</legend>
+          {STATUS_OPTIONS.map((option) => {
+            const selected = termStatus === option.value;
+            return (
+              <label key={option.value} className={`cn-cat-opcion${selected ? ' cn-cat-opcion--activa' : ''}`}>
+                <input
+                  type="radio"
+                  name="termStatus"
+                  className="sr-only"
+                  checked={selected}
+                  onChange={() => setTermStatus(option.value)}
+                />
+                <span className="cn-cat-opcion-marca" aria-hidden="true" />
+                <span className="min-w-0">
+                  <span className="cn-cat-opcion-titulo">{option.label}</span>
+                  <span className="cn-cat-opcion-ayuda">{option.help}</span>
+                </span>
+              </label>
+            );
+          })}
         </fieldset>
 
         {claimsTerm && (
           <>
-            <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wide text-ink-500 mb-1.5">
-                Término, como lo dice la norma
-              </label>
+            <label className="cn-cat-campo-grupo">
+              <span className="cn-cat-etiqueta">Término, como lo dice la norma</span>
               <textarea
                 value={termDescription}
                 onChange={(e) => setTermDescription(e.target.value)}
                 rows={3}
-                placeholder="Ej.: Cuatro (4) meses contados a partir del día siguiente a la notificación del acto."
-                className="w-full text-[12px] border border-line-200 rounded-control px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-700/20 focus:border-brand-700 resize-none"
+                placeholder="Cópielo del artículo: el plazo, sus unidades y desde cuándo corre."
+                className="cn-cat-area"
               />
-            </div>
+            </label>
 
-            <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wide text-ink-500 mb-1.5">
-                Fuente donde lo verificaste
-              </label>
+            <label className="cn-cat-campo-grupo">
+              <span className="cn-cat-etiqueta">Fuente donde lo verificó</span>
               <input
                 type="url"
                 value={sourceUrl}
                 onChange={(e) => setSourceUrl(e.target.value)}
-                placeholder="https://www.suin-juriscol.gov.co/..."
-                className="w-full text-[12px] border border-line-200 rounded-control px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-700/20 focus:border-brand-700"
+                placeholder="https://… (el texto oficial de la norma)"
+                className="cn-cat-entrada"
               />
-              <p className="mt-1 text-justify text-[10px] leading-snug text-ink-500 [text-wrap:pretty]">
-                Obligatoria. Sin fuente no es una verificación, es una afirmación.
-              </p>
-            </div>
+              <span className="cn-cat-nota">Obligatoria. Sin fuente no es una verificación, es una afirmación.</span>
+            </label>
           </>
         )}
 
-        <div>
-          <label className="block text-[11px] font-bold uppercase tracking-wide text-ink-500 mb-1.5">
-            Fundamento normativo
-          </label>
+        <label className="cn-cat-campo-grupo">
+          <span className="cn-cat-etiqueta">Fundamento normativo</span>
           <input
             type="text"
             value={legalBasis}
             onChange={(e) => setLegalBasis(e.target.value)}
-            placeholder="Ley 1437 de 2011, art. 138"
-            className="w-full text-[12px] border border-line-200 rounded-control px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-700/20 focus:border-brand-700"
+            placeholder="Norma y artículo, como aparecen en el texto oficial"
+            className="cn-cat-entrada"
           />
-        </div>
+        </label>
 
-        <div>
-          <label className="block text-[11px] font-bold uppercase tracking-wide text-ink-500 mb-1.5">
-            Quién verifica
-          </label>
-          <input
-            type="text"
-            value={verifiedBy}
-            onChange={(e) => setVerifiedBy(e.target.value)}
-            className="w-full text-[12px] border border-line-200 rounded-control px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-700/20 focus:border-brand-700"
-          />
-          <p className="mt-1 text-justify text-[10px] leading-snug text-ink-500 [text-wrap:pretty]">
-            Queda registrado: toda afirmación sobre un término es atribuible.
-          </p>
-        </div>
+        <label className="cn-cat-campo-grupo">
+          <span className="cn-cat-etiqueta">Quién verifica</span>
+          <input type="text" value={verifiedBy} onChange={(e) => setVerifiedBy(e.target.value)} className="cn-cat-entrada" />
+          <span className="cn-cat-nota">Queda registrado: toda afirmación sobre un término es atribuible.</span>
+        </label>
 
-        <div>
-          <label className="block text-[11px] font-bold uppercase tracking-wide text-ink-500 mb-1.5">
-            Nota interna <span className="font-normal normal-case text-ink-400">(opcional)</span>
-          </label>
-          <textarea
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            rows={2}
-            className="w-full text-[12px] border border-line-200 rounded-control px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-700/20 focus:border-brand-700 resize-none"
-          />
-        </div>
+        <label className="cn-cat-campo-grupo">
+          <span className="cn-cat-etiqueta">
+            Nota interna <span className="cn-cat-nota">(opcional)</span>
+          </span>
+          <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} className="cn-cat-area" />
+        </label>
 
         {error && (
-          <div className="rounded-control border border-[rgb(var(--danger)/0.35)] bg-[rgb(var(--danger)/0.06)] px-3 py-2.5 text-[11px] text-danger leading-snug">
+          <p className="cn-cat-error" role="alert">
             {error}
-          </div>
+          </p>
         )}
       </div>
 
-      <footer className="px-5 py-3 border-t border-line-200 flex items-center gap-2">
-        <button
-          type="submit"
-          disabled={!canSubmit || isSaving}
-          className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-control bg-brand-700 px-4 py-2 text-[12px] font-semibold text-white transition-colors hover:bg-blue-800 disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
-          Guardar verificación
-        </button>
-
+      <footer className="cn-cat-form-pie">
         {actuacion.verification && (
           <button
             type="button"
             disabled={isSaving}
             onClick={() => void onRevert(actuacion.id, actuacion.porRemision?.paraRama ?? null)}
             title="Descartar la verificación de la firma y volver al catálogo base"
-            className="inline-flex items-center gap-1.5 rounded-control border border-line-200 px-3 py-2 text-[12px] font-semibold text-ink-700 transition-colors hover:bg-canvas disabled:opacity-40"
+            className="cn-cat-boton cn-cat-boton--fantasma"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
-            Revertir
+            Revertir al catálogo base
           </button>
         )}
+        <span className="cn-cat-separa" aria-hidden="true" />
+        <button type="button" onClick={onClose} disabled={isSaving} className="cn-cat-boton cn-cat-boton--neutro">
+          Cancelar
+        </button>
+        <button type="submit" disabled={!canSubmit || isSaving} className="cn-cat-boton cn-cat-boton--primario">
+          {isSaving && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
+          Guardar verificación
+        </button>
       </footer>
     </form>
   );

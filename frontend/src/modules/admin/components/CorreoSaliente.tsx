@@ -1,35 +1,29 @@
 import React from 'react';
-import { AlertCircle, CheckCircle2, Mail, Send } from 'lucide-react';
 import { adminApi, type EstadoDelCorreo } from '../admin.api';
 import { readSession } from '../../auth/session';
 
 /**
  * El correo saliente de la plataforma, visto desde la consola de operación.
+ * Cara nueva: derivada. El artboard de la consola no lo dibuja; toma la tarjeta
+ * gris de notas y los avisos verde/ámbar de `app-dialogos-y-estados.html`.
  *
  * ─── POR QUÉ EXISTE ESTA TARJETA ────────────────────────────────────────────
  *
- * `GET /api/admin/mail/status` y `POST /api/admin/mail/test` llevaban tiempo
- * montadas en el servidor y NADIE las llamaba. Es el mismo defecto que ya
- * mordió antes aquí —la ficha de firma, la recarga con motivo—: un endpoint que
- * existe no prueba que exista quien lo invoque. Mientras tanto, la única forma
- * de comprobar si el correo salía de verdad era provocar un pago real y esperar
- * a ver si llegaba la confirmación.
+ * `GET /api/admin/mail/status` y `POST /api/admin/mail/test` estaban montadas y
+ * NADIE las llamaba: la única forma de comprobar si el correo salía era provocar
+ * un pago real. Hoy salen por aquí la bienvenida de una firma nueva y las
+ * confirmaciones de pago, así que conviene poder probarlo sin gastar nada.
  *
  * ─── EL DESTINATARIO NO SE ELIGE, Y SE DICE ─────────────────────────────────
  *
- * El servidor toma la dirección del token de la sesión y no del cuerpo, a
- * propósito: un endpoint que manda correos a quien le pidan es una herramienta
- * de spam con el remitente del titular. Aquí no hay campo de destinatario
- * porque no hay decisión que tomar, y la pantalla lo dice con esas palabras
- * para que nadie salga a buscar el campo que falta.
+ * El servidor toma la dirección del token de la sesión y no del cuerpo: un
+ * endpoint que manda correos a quien le pidan es una herramienta de spam con el
+ * remitente del titular. La pantalla lo dice para que nadie busque el campo.
  *
  * ─── EL ERROR SE ENSEÑA ENTERO ──────────────────────────────────────────────
  *
- * Cuando el envío falla se muestra lo que respondió el proveedor, no un «no se
- * pudo enviar». La diferencia entre una llave caducada, un dominio sin
- * verificar y un puerto cerrado está en ese texto, y quien lee esta pantalla es
- * quien puede arreglarlo. Nunca se muestra la llave: el servidor no la manda y
- * la dirección llega ya enmascarada.
+ * La diferencia entre una llave caducada y un dominio sin verificar está en el
+ * texto del proveedor, y quien lee esta pantalla es quien puede arreglarlo.
  */
 
 const mensajeDeError = (err: unknown, porDefecto: string): string =>
@@ -41,21 +35,13 @@ export const CorreoSaliente: React.FC = () => {
   /** Fallo al CONSULTAR el estado; distinto de un envío rechazado. */
   const [errorDeEstado, setErrorDeEstado] = React.useState('');
   const [enviando, setEnviando] = React.useState(false);
-  const [resultado, setResultado] = React.useState<{ enviado: boolean; detalle: string } | null>(
-    null
-  );
+  const [resultado, setResultado] = React.useState<{ enviado: boolean; detalle: string } | null>(null);
 
-  /*
-   * La dirección de la sesión, leída del mismo sitio del que sale el token. No
-   * se la pedimos al servidor: es la que este navegador ya tiene, y enseñarla
-   * junto al botón es lo que convierte «enviar una prueba» en «enviármela a
-   * mí». Si la sesión no la trajera, se dice en vez de dejar el hueco.
-   */
+  /* La dirección de la sesión, del mismo sitio del que sale el token. */
   const correoDeLaSesion = readSession()?.user.email ?? null;
 
   React.useEffect(() => {
     let vigente = true;
-
     void (async () => {
       try {
         const r = await adminApi.estadoDelCorreo();
@@ -69,7 +55,6 @@ export const CorreoSaliente: React.FC = () => {
         if (vigente) setCargando(false);
       }
     })();
-
     return () => {
       vigente = false;
     };
@@ -80,99 +65,65 @@ export const CorreoSaliente: React.FC = () => {
     setResultado(null);
     try {
       const r = await adminApi.enviarCorreoDePrueba();
-      setResultado({
-        enviado: r.enviado,
-        detalle: r.error ?? (r.enviado ? '' : 'El servidor no explicó por qué.')
-      });
+      setResultado({ enviado: r.enviado, detalle: r.error ?? (r.enviado ? '' : 'El servidor no explicó por qué.') });
     } catch (err) {
-      // Aquí solo caen el 400 sin correo en la sesión y las averías de red: el
-      // rechazo del proveedor ya viene como resultado desde `admin.api`.
+      // Aquí solo caen el 400 sin correo en la sesión y las averías de red: el rechazo del proveedor ya viene como resultado.
       setResultado({ enviado: false, detalle: mensajeDeError(err, 'No se pudo enviar la prueba.') });
     } finally {
       setEnviando(false);
     }
   };
 
-  /*
-    `min-w-0` y `[overflow-wrap:anywhere]` en la raíz de la tarjeta: aquí vive
-    una dirección de correo, que es UNA PALABRA SIN ESPACIOS y se pinta fuera de
-    su caja sin agrandarla —`break-words` no la parte—, y también el texto crudo
-    de un proveedor, que puede traer una URL larga.
-  */
   return (
-    <div className="min-w-0 bg-surface border border-line-200 rounded-card p-3 space-y-2.5 [overflow-wrap:anywhere] sm:p-4">
-      <div className="flex min-w-0 items-center gap-2">
-        <Mail className="w-4 h-4 shrink-0 text-brand-700" />
-        <div className="min-w-0">
-          <h3 className="font-bold text-ink-900 text-xs">Correo saliente</h3>
-          <p className="text-[11px] text-ink-500">
-            Por donde salen las confirmaciones de pago a las firmas.
-          </p>
-        </div>
-      </div>
+    <section className="cn-ope-nota cn-ope-correo" aria-labelledby="ope-correo">
+      <h2 id="ope-correo" className="cn-ope-nota-titulo">
+        Correo saliente
+      </h2>
+      <p className="cn-ope-texto">Por donde salen la bienvenida de una firma nueva y las confirmaciones de pago.</p>
 
       {cargando ? (
-        <p className="text-[11px] text-ink-500">Comprobando la configuración…</p>
+        <p className="cn-ope-texto">Comprobando la configuración…</p>
       ) : errorDeEstado ? (
-        <div className="flex items-start gap-2 rounded-card border border-[rgb(var(--danger)/0.35)] bg-[rgb(var(--danger)/0.06)] p-2.5">
-          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-danger" />
-          <p className="min-w-0 text-justify text-[11px] leading-snug text-danger [text-wrap:pretty]">
-            {errorDeEstado}
-          </p>
-        </div>
+        <p role="alert" className="cn-ope-error cn-ope-error--abajo">
+          {errorDeEstado}
+        </p>
       ) : estado?.enabled ? (
-        <div className="flex items-start gap-2 rounded-card border border-[rgb(var(--verified-line))] bg-[rgb(var(--verified-surf))] p-2.5">
-          <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-verified" />
-          <div className="min-w-0 text-[11px] leading-snug text-ink-900">
-            <p className="font-semibold text-verified">Hay correo saliente configurado.</p>
-            {/*
-              La dirección llega recortada por el servidor (`d***@dominio`) y se
-              enseña así: reconocer la cuenta es todo lo que hace falta para
-              saber si sale de donde debe.
-            */}
-            <p className="mt-0.5 text-ink-700">
-              Sale desde <b className="font-mono text-ink-900">{estado.user ?? '—'}</b>, con el
-              nombre «{estado.fromName}». La dirección viene enmascarada por el servidor.
+        <div className="cn-ope-aviso cn-ope-aviso--ok">
+          <div className="cn-ope-aviso-texto">
+            <p className="cn-ope-aviso-titulo">Hay correo saliente configurado.</p>
+            {/* La dirección llega recortada por el servidor (`d***@dominio`) y se enseña así. */}
+            <p>
+              Sale desde <span className="cn-ope-mono">{estado.user ?? '—'}</span>, con el nombre «{estado.fromName}». La dirección
+              viene enmascarada por el servidor.
             </p>
           </div>
         </div>
       ) : (
-        <div className="flex items-start gap-2 rounded-card border border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))] p-2.5">
-          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-unverified" />
-          <div className="min-w-0 text-[11px] leading-snug text-ink-900">
-            <p className="font-semibold text-unverified">No hay correo saliente configurado.</p>
-            <p className="mt-0.5 text-justify text-ink-700 [text-wrap:pretty]">
-              Sin él no salen las confirmaciones de pago: el pago se aplica igual y el saldo queda
-              acreditado, pero la firma no recibe aviso ni su cuenta de cobro.
+        <div className="cn-ope-aviso">
+          <div className="cn-ope-aviso-texto">
+            <p className="cn-ope-aviso-titulo">No hay correo saliente configurado.</p>
+            <p>
+              Sin él no salen la bienvenida ni las confirmaciones de pago: el pago se aplica igual y el saldo queda acreditado, pero
+              la firma no recibe aviso.
             </p>
           </div>
         </div>
       )}
 
-      {/*
-        LA FILA ENVUELVE. El botón y la frase de destinatario suman más que 320px
-        en una sola línea, y la frase lleva una dirección de correo: en una fila
-        que no envolviera, el `overflow-hidden` del diálogo se comería el final.
-      */}
-      <div className="flex min-w-0 flex-wrap items-center gap-2">
+      <div className="cn-ope-correo-fila">
         <button
           type="button"
           onClick={() => void enviarPrueba()}
           disabled={enviando || cargando || estado?.enabled !== true}
-          className="shrink-0 px-3 py-1.5 bg-brand-700 hover:bg-brand-800 text-white rounded-control text-[11px] font-semibold flex items-center gap-1.5 disabled:opacity-50"
+          className="cn-ope-boton cn-ope-boton--suave"
         >
-          <Send className="w-3.5 h-3.5" />
           {enviando ? 'Enviando…' : 'Enviar una prueba'}
         </button>
-        <p className="min-w-0 flex-1 text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
-          {/*
-            Se nombra la dirección exacta para que no parezca que hay un
-            destinatario que escoger: no lo hay, y el servidor lo impide.
-          */}
-          La prueba se envía a la dirección de tu propia sesión
+        <p className="cn-ope-texto">
+          La prueba se envía a la dirección de su propia sesión
           {correoDeLaSesion ? (
             <>
-              , <b className="font-mono text-ink-700">{correoDeLaSesion}</b>
+              , <span className="cn-ope-principal">{correoDeLaSesion}</span>
             </>
           ) : null}
           . No se puede escoger destinatario.
@@ -181,27 +132,19 @@ export const CorreoSaliente: React.FC = () => {
 
       {resultado &&
         (resultado.enviado ? (
-          <div className="flex items-start gap-2 rounded-card border border-[rgb(var(--verified-line))] bg-[rgb(var(--verified-surf))] p-2.5">
-            <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-verified" />
-            <p className="min-w-0 text-justify text-[11px] leading-snug text-ink-900 [text-wrap:pretty]">
-              El proveedor aceptó el mensaje. Revisa la bandeja de{' '}
-              <b className="font-mono">{correoDeLaSesion ?? 'tu sesión'}</b> — y también el correo
-              no deseado, que es donde cae la primera prueba de un dominio recién configurado.
+          <div role="status" className="cn-ope-aviso cn-ope-aviso--ok">
+            <p className="cn-ope-aviso-texto">
+              El proveedor aceptó el mensaje. Revise la bandeja de {correoDeLaSesion ?? 'su sesión'} — y también el correo no
+              deseado, que es donde cae la primera prueba de un dominio recién configurado.
             </p>
           </div>
         ) : (
-          <div className="flex items-start gap-2 rounded-card border border-[rgb(var(--danger)/0.35)] bg-[rgb(var(--danger)/0.06)] p-2.5">
-            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-danger" />
-            <div className="min-w-0 text-[11px] leading-snug text-ink-900">
-              <p className="font-semibold text-danger">No se envió.</p>
-              {/*
-                El texto del proveedor, tal cual y en monoespaciada: un «502» no
-                se arregla, un «domain is not verified» sí.
-              */}
-              <p className="mt-0.5 font-mono text-ink-700">{resultado.detalle}</p>
-            </div>
+          <div role="alert" className="cn-ope-error">
+            <p>No se envió.</p>
+            {/* El texto del proveedor, tal cual: un «502» no se arregla, un «domain is not verified» sí. */}
+            <p className="cn-ope-mono">{resultado.detalle}</p>
           </div>
         ))}
-    </div>
+    </section>
   );
 };

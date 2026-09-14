@@ -1,274 +1,216 @@
 import React from 'react';
-import { Ban, CalendarClock } from 'lucide-react';
-import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
-import { adminApi, type FirmDetail } from '../admin.api';
+import { ConfirmarDialog } from '../../../design/ConfirmarDialog';
+import { Dialog } from '../../../design/Dialog';
+import { SelectorDelFormulario } from '../../workspace/components/SelectorDelFormulario';
+import { subscriptionApi } from '../../subscriptions/subscription.api';
 import { VISTA_POR_MODULO, navModule } from '../../tenant/navigation';
+import { adminApi, type FirmDetail } from '../admin.api';
+import { cifra, describirPlan, estadoDeFirma, opcionDePlan, validarCambioDePlan } from '../consolaEnPantalla';
 
 /**
- * La sección «Plan» de la ficha de la firma (7b), con su formulario.
+ * «Plan de esta firma»: plan, periodo, vencimiento y módulos, con motivo.
+ * Cara nueva: `public/handoff/app-consola-de-operacion.html`, artboard 3
+ * (Plan y Periodo en dos columnas, «“Cortesía” no vence.», motivo con «Sin
+ * motivo, el botón queda inhabilitado.», módulos con interruptor y chip
+ * «Desactivado por el operador», y «No lo abre su plan» para lo que el plan no
+ * trae). Se abre desde «Cambiar plan» en la ficha.
  *
- * LO QUE OPERACIÓN PUEDE HACER AQUÍ: fijar plan, periodo y vencimiento a mano
- * —extender una prueba, conceder una cortesía, mover una firma a Esencial tras
- * una llamada—. Cada cambio exige motivo escrito y queda en la auditoría de la
- * firma como PLAN_ACTUALIZADO, que sus socios también leen. Es la acción
- * «cambiar plan / extender prueba» que la cabecera de la ficha declaraba
- * ausente por falta de endpoint; ahora el endpoint existe.
+ * ─── CAMBIAR EL PLAN PASA POR LA CONFIRMACIÓN DEL SISTEMA ───────────────────
  *
- * SUSPENDER ES PONER EL VENCIMIENTO EN AHORA. No hay un interruptor aparte:
- * la firma queda VENCIDA en el acto —solo lectura, franja «Renovar plan»— por
- * la misma regla que cierra una prueba cumplida, y la reactiva un pago de la
- * firma o este mismo formulario. Un segundo estado «suspendida» habría que
- * enseñárselo a cada guardia; la fecha ya se la saben todos. Exige motivo:
- * queda en la auditoría de la firma como PLAN_SUSPENDIDO y los socios lo leen.
+ * Mover el vencimiento de una firma decide si trabaja mañana. El botón del
+ * formulario no guarda: abre `ConfirmarDialog` con el antes y el después, y es
+ * ahí donde se guarda. Suspender va por la misma puerta, en rojo.
  *
- * LO QUE NO HACE: cobrar. Un pago lo hace la firma desde su propia pantalla,
- * por Wompi; operación no puede marcar un periodo como pagado.
+ * ─── EL MOTIVO TIENE EL MÍNIMO DEL SERVIDOR ─────────────────────────────────
  *
- * MÓDULOS DE ESTA FIRMA. El plan es la base y aquí se RESTA: un interruptor
- * por módulo, apagado = «desactivado por el operador», y la firma lo ve como
- * no disponible (no como «no incluido en el plan», que sería falso y la
- * mandaría a comprar un plan que no cambia nada). Lo que el plan no incluye se
- * muestra deshabilitado con su chip: para abrirlo se cambia el plan, no este
- * interruptor. La lista de módulos y sus nombres salen de `VISTA_POR_MODULO`
- * y `NAV_MODULES` —lo mismo que pinta la barra lateral—, nunca de una lista
- * escrita aquí: un módulo nuevo aparece solo. Cada cambio manda la lista
- * COMPLETA de lo apagado y queda en la auditoría de la firma como
- * MODULOS_AJUSTADOS; el motivo es opcional (reactivar tras un pago no tiene
- * nada que explicar).
+ * Aquí se pedían 5 caracteres y `requireReason` exige 10: el botón se encendía
+ * y el servidor rechazaba. `validarCambioDePlan` usa la constante que el check
+ * compara con el servidor.
+ *
+ * ─── LOS PUESTOS DE CADA PLAN SALEN DEL CATÁLOGO ───────────────────────────
+ *
+ * «Premium · hasta 5 usuarios» estaba escrito aquí. Ahora se lee de
+ * `/api/subscription/plan`, que sirve `plan.catalog.ts`; si esa lectura falla se
+ * muestran solo los nombres, y la lista lo dice.
+ *
+ * ─── LO QUE EL ARTBOARD PIDE Y AQUÍ ES DISTINTO, con la razón ──────────────
+ *
+ * · Un solo «Guardar el cambio» para plan y módulos: en el servidor son dos
+ *   escrituras distintas (`PATCH /plan` y `PATCH /modulos`). Un interruptor
+ *   se confirma y se guarda en el acto; «Guardar el cambio» guarda solo el plan,
+ *   y por eso va ANTES de los módulos, para no sugerir que también los guarda.
+ * · El número de módulo («01 Redacción»): la navegación no numera sus módulos,
+ *   y un número inventado aquí no coincidiría con ningún otro lugar.
+ * · El motivo bajo un módulo apagado: la ficha no trae el motivo por módulo;
+ *   está en el registro de operación.
+ * · El campo «Vence», que el artboard no dibuja: el servidor exige fecha a todo
+ *   periodo que no sea cortesía.
  */
 
 type Plan = 'ESENCIAL' | 'PREMIUM' | 'FIRMA';
 type Periodo = 'MENSUAL' | 'ANUAL' | 'PRUEBA' | 'CORTESIA';
+type Planes = Partial<Record<Plan, { nombre: string; maxUsuarios: number }>>;
 
-const NOMBRE_PLAN: Record<Plan, string> = { ESENCIAL: 'Esencial', PREMIUM: 'Premium', FIRMA: 'Firma' };
-const NOMBRE_PERIODO: Record<Periodo, string> = {
-  MENSUAL: 'Mensual',
-  ANUAL: 'Anual',
-  PRUEBA: 'Prueba',
-  CORTESIA: 'Cortesía'
-};
+const PLANES: readonly Plan[] = ['ESENCIAL', 'PREMIUM', 'FIRMA'];
+const PERIODOS: ReadonlyArray<{ valor: Periodo; etiqueta: string }> = [
+  { valor: 'PRUEBA', etiqueta: 'Prueba' },
+  { valor: 'MENSUAL', etiqueta: 'Mensual' },
+  { valor: 'ANUAL', etiqueta: 'Anual' },
+  { valor: 'CORTESIA', etiqueta: 'Cortesía' }
+];
 
-const fechaLarga = (iso: string): string =>
-  new Date(iso).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
+/** DD/MM/AAAA, como se lee una fecha en Colombia; el formato ISO es solo para el campo. */
+const fechaCorta = (iso: string): string =>
+  new Date(iso).toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
 /** AAAA-MM-DD para el <input type="date">, en hora local. */
 const aFechaDeInput = (iso: string | null): string => {
   if (!iso) return '';
   const d = new Date(iso);
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  return `${d.getFullYear()}-${mm}-${dd}`;
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 };
 
-const estadoDe = (f: FirmDetail): { etiqueta: string; clase: string } => {
-  if (!f.planValidUntil) return { etiqueta: 'Cortesía', clase: 'bg-canvas text-ink-700 border-line-200' };
-  const dias = Math.ceil((new Date(f.planValidUntil).getTime() - Date.now()) / 86_400_000);
-  if (dias <= 0)
-    return { etiqueta: 'Vencido', clase: 'bg-[rgb(var(--danger)/0.06)] text-danger border-[rgb(var(--danger)/0.35)]' };
-  if (dias <= 7)
-    return {
-      etiqueta: `Vence en ${dias} ${dias === 1 ? 'día' : 'días'}`,
-      clase: 'bg-[rgb(var(--unverified-surf))] text-unverified border-[rgb(var(--unverified-line))]'
-    };
-  if (f.planPeriod === 'PRUEBA')
-    return { etiqueta: 'Prueba', clase: 'bg-brand-50 text-brand-700 border-[rgb(var(--brand-line))]' };
-  return { etiqueta: 'Activo', clase: 'bg-[rgb(var(--verified-surf))] text-verified border-[rgb(var(--verified-line))]' };
-};
+/** Fin del día local elegido: «vence el 30» significa que el 30 todavía trabaja. */
+const finDelDia = (fecha: string): string => new Date(`${fecha}T23:59:59`).toISOString();
 
-interface FirmPlanSectionProps {
-  firma: FirmDetail;
-  /**
-   * Tras guardar, la ficha se relee entera: el estado sale del servidor.
-   *
-   * SALVO CUANDO EL SERVIDOR YA LA DEVOLVIÓ. `PATCH /modulos` responde con la
-   * ficha releída, así que pasarla aquí ahorra la segunda vuelta y su espera
-   * en blanco. Sin argumento, el comportamiento de siempre.
-   */
-  onGuardado: (yaLeida?: FirmDetail) => void;
-}
+const limpio = (s: string): string => s.replace(/\s+/g, ' ').trim();
 
-/** Los módulos que la aplicación puede cerrar, con el nombre que usa la barra lateral. */
+/* ─── Módulos ──────────────────────────────────────────────────────────────── */
+
+/** Los módulos que la aplicación puede cerrar, con el nombre que usa la barra lateral: un módulo nuevo aparece solo. */
 const MODULOS_CONMUTABLES: ReadonlyArray<{ id: string; nombre: string }> = Object.entries(VISTA_POR_MODULO).map(
   ([id, vista]) => ({ id, nombre: navModule(vista as NonNullable<typeof vista>).label })
 );
 
 type EstadoDeModulo = 'ACTIVO' | 'DESACTIVADO' | 'NO_EN_PLAN';
 
-/** Una función: apagada por sí misma, o apagada porque su módulo lo está (o no viene en el plan). */
-type EstadoDeFuncion = 'ACTIVA' | 'DESACTIVADA' | 'CON_EL_MODULO';
-
-const estadoDeFuncion = (firma: FirmDetail, estadoDelModulo: EstadoDeModulo, id: string): EstadoDeFuncion =>
-  estadoDelModulo !== 'ACTIVO' ? 'CON_EL_MODULO' : firma.funcionesDesactivadas.includes(id) ? 'DESACTIVADA' : 'ACTIVA';
-
-/**
- * Del servidor salen dos listas: lo permitido (plan menos resta) y la resta.
- * Un módulo que no está en ninguna de las dos no lo trae el plan.
- */
+/** Del servidor salen lo permitido (plan menos resta) y la resta. Lo que no está en ninguna no lo trae el plan. */
 const estadoDeModulo = (firma: FirmDetail, id: string): EstadoDeModulo =>
-  firma.modulosDesactivados.includes(id)
-    ? 'DESACTIVADO'
-    : firma.modulosPermitidos.includes(id)
-      ? 'ACTIVO'
-      : 'NO_EN_PLAN';
+  firma.modulosDesactivados.includes(id) ? 'DESACTIVADO' : firma.modulosPermitidos.includes(id) ? 'ACTIVO' : 'NO_EN_PLAN';
 
-interface ModulosDeLaFirmaProps {
-  firma: FirmDetail;
-  onGuardado: (yaLeida?: FirmDetail) => void;
-}
+const Interruptor: React.FC<{ encendido: boolean; etiqueta: string; deshabilitado?: boolean; titulo?: string; onClick: () => void }> = ({
+  encendido,
+  etiqueta,
+  deshabilitado = false,
+  titulo,
+  onClick
+}) => (
+  <button
+    type="button"
+    role="switch"
+    aria-checked={encendido}
+    aria-label={etiqueta}
+    disabled={deshabilitado}
+    title={titulo}
+    onClick={onClick}
+    className="cn-ope-interruptor"
+  >
+    <span className="cn-ope-interruptor-pista" aria-hidden="true">
+      <span className="cn-ope-interruptor-perilla" />
+    </span>
+  </button>
+);
 
-const ModulosDeLaFirma: React.FC<ModulosDeLaFirmaProps> = ({ firma, onGuardado }) => {
-  const [confirmacion, setConfirmacion] = React.useState<Confirmacion | null>(null);
+const ModulosDeLaFirma: React.FC<{ firma: FirmDetail; onGuardado: (yaLeida?: FirmDetail) => void }> = ({ firma, onGuardado }) => {
+  const [pendiente, setPendiente] = React.useState<{ id: string; nombre: string; apagar: boolean; tipo: 'modulo' | 'funcion' } | null>(
+    null
+  );
   const [motivo, setMotivo] = React.useState('');
   const [error, setError] = React.useState<string | null>(null);
-  /** Módulo o función: cambia el texto de la confirmación, no la llamada. */
-  const [alcance, setAlcance] = React.useState<'modulo' | 'funcion'>('modulo');
-  const motivoRef = React.useRef('');
+  /* `ConfirmarDialog` cierra al terminar `onConfirmar`; si el servidor rechaza, esta bandera lo deja abierto una vez. */
   const mantenerAbiertoRef = React.useRef(false);
 
-  const nombrePlan = firma.plan ? NOMBRE_PLAN[firma.plan] : 'Cortesía';
+  const nombrePlan = firma.plan ? describirPlan({ plan: firma.plan, planPeriod: null }) : 'Cortesía';
 
   /*
-   * Se manda la lista COMPLETA de lo apagado — módulos y funciones en una sola
-   * lista, como la guarda la columna — y no un delta: apagar una función no
-   * puede reactivar un módulo por omisión.
+   * Se manda la lista COMPLETA de lo apagado —módulos y funciones juntos, como
+   * la guarda la columna— y no un delta: apagar una función no puede reactivar
+   * un módulo por omisión. `PATCH /modulos` devuelve la ficha releída y se
+   * entrega tal cual: un viaje, sin espera en blanco.
    */
-  const aplicar = async (id: string, apagar: boolean) => {
+  const aplicar = async () => {
+    if (!pendiente) return;
     const actuales = new Set<string>([...firma.modulosDesactivados, ...firma.funcionesDesactivadas]);
-    if (apagar) actuales.add(id);
-    else actuales.delete(id);
+    if (pendiente.apagar) actuales.add(pendiente.id);
+    else actuales.delete(pendiente.id);
     setError(null);
-    /*
-     * ─── UNA SOLA VUELTA AL SERVIDOR, Y LA FICHA NO DESAPARECE ──────────────
-     *
-     * DEFECTO QUE ESTO CORRIGE: cada interruptor tardaba y «no respondía
-     * bien». No era el interruptor: eran DOS peticiones seguidas. Esta, que
-     * guarda, y otra que releía la ficha completa; y mientras la segunda
-     * viajaba, toda la ficha se sustituía por «Leyendo la firma…» y la sección
-     * se remontaba, así que apagar una función parpadeaba la pantalla entera.
-     *
-     * `PATCH /modulos` YA devuelve la ficha releída —el servidor la manda
-     * desde el principio— y se estaba tirando. Ahora se entrega tal cual: un
-     * viaje, sin espera en blanco y sin remontar nada. El estado lo sigue
-     * decidiendo el servidor; aquí no se adivina el resultado.
-     */
-    let respuesta: Awaited<ReturnType<typeof adminApi.ajustarModulos>>;
     try {
-      respuesta = await adminApi.ajustarModulos(firma.id, {
-        desactivados: [...actuales],
-        motivo: motivoRef.current.replace(/\s+/g, ' ').trim() || undefined
-      });
+      const r = await adminApi.ajustarModulos(firma.id, { desactivados: [...actuales], motivo: limpio(motivo) || undefined });
+      setMotivo('');
+      onGuardado(r.firm);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudieron ajustar los módulos.');
       mantenerAbiertoRef.current = true;
-      return;
     }
-    setMotivo('');
-    motivoRef.current = '';
-    onGuardado(respuesta.firm);
   };
 
-  const pedirConfirmacion = (id: string, nombre: string, apagar: boolean, tipo: 'modulo' | 'funcion' = 'modulo') => {
+  const pedir = (id: string, nombre: string, apagar: boolean, tipo: 'modulo' | 'funcion') => {
     setError(null);
     setMotivo('');
-    motivoRef.current = '';
-    setAlcance(tipo);
-    setConfirmacion({
-      titulo: apagar ? `Desactivar ${nombre} para esta firma` : `Reactivar ${nombre} para esta firma`,
-      texto: '',
-      etiqueta: apagar ? 'Desactivar' : 'Reactivar',
-      peligro: apagar,
-      onConfirmar: () => aplicar(id, apagar)
-    });
+    setPendiente({ id, nombre, apagar, tipo });
   };
 
   return (
-    <div className="min-w-0 border-t border-line-200 px-4 py-3">
-      <h4 className="text-[12.5px] font-semibold text-ink-900">Módulos de esta firma</h4>
-      <p className="mt-0.5 text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
-        El plan es la base; aquí se resta para esta firma. La firma verá el módulo como no disponible. Debajo de cada módulo,
-        sus funciones: se apagan una a una y la firma las ve como «no habilitada para su firma».
+    <section className="cn-ope-seccion" aria-labelledby="ope-modulos">
+      <h3 id="ope-modulos" className="cn-ope-subtitulo">
+        Módulos de esta firma
+      </h3>
+      <p className="cn-ope-texto">
+        El plan decide qué módulos abre. Operación puede <strong>apagar</strong> uno que el plan incluye —nunca encender uno que
+        no—, y la firma lo ve como no disponible para ella. Cada interruptor se confirma y se guarda en el acto.
       </p>
 
-      <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+      <ul className="cn-ope-modulos">
         {MODULOS_CONMUTABLES.map(({ id, nombre }) => {
           const estado = estadoDeModulo(firma, id);
           const encendido = estado === 'ACTIVO';
-          const enPlan = estado !== 'NO_EN_PLAN';
           const funciones = (firma.funciones ?? []).filter((f) => f.modulo === id);
           return (
             <li
               key={id}
-              className={`rounded-control border border-line-200 px-3 py-2 ${
-                enPlan ? 'bg-canvas' : 'bg-surface opacity-70'
+              className={`cn-ope-modulo ${estado === 'DESACTIVADO' ? 'cn-ope-modulo--apagado' : ''} ${
+                estado === 'NO_EN_PLAN' ? 'cn-ope-modulo--fuera' : ''
               }`}
             >
-              <div className="flex items-center justify-between gap-3">
-              <div className="min-w-0">
-                <p className="truncate text-[12px] font-medium text-ink-900">{nombre}</p>
-                {estado === 'DESACTIVADO' && (
-                  <span className="chip-unverified mt-1 inline-block">Desactivado por el operador</span>
+              <div className="cn-ope-modulo-fila">
+                <div className="cn-ope-modulo-nombre">
+                  <p>{nombre}</p>
+                  {estado === 'DESACTIVADO' && <span className="cn-ope-chip cn-ope-chip--aviso">Desactivado por el operador</span>}
+                </div>
+                {estado === 'NO_EN_PLAN' ? (
+                  <span className="cn-ope-modulo-fuera-texto">No lo abre su plan</span>
+                ) : (
+                  <Interruptor
+                    encendido={encendido}
+                    etiqueta={`${nombre}: ${encendido ? 'activo' : 'apagado'} para esta firma`}
+                    onClick={() => pedir(id, nombre, encendido, 'modulo')}
+                  />
                 )}
-                {estado === 'NO_EN_PLAN' && (
-                  <span className="chip-neutral mt-1 inline-block">No incluido en el plan {nombrePlan}</span>
-                )}
-              </div>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={encendido}
-                aria-label={`${nombre}: ${encendido ? 'activo' : 'inactivo'} para esta firma`}
-                disabled={!enPlan}
-                title={enPlan ? undefined : `Para abrirlo, cambie el plan de la firma: ${nombrePlan} no lo incluye.`}
-                onClick={() => pedirConfirmacion(id, nombre, encendido)}
-                className={`relative h-5 w-9 shrink-0 rounded-full border transition-colors disabled:cursor-not-allowed ${
-                  encendido
-                    ? 'border-brand-700 bg-brand-700'
-                    : 'border-line-200 bg-line-100'
-                }`}
-              >
-                <span
-                  className={`absolute top-0.5 h-3.5 w-3.5 rounded-full bg-surface shadow transition-transform ${
-                    encendido ? 'left-0.5 translate-x-4' : 'left-0.5'
-                  }`}
-                />
-              </button>
               </div>
               {funciones.length > 0 && (
-                <ul className="mt-2 space-y-1.5 border-l border-line-200 pl-3">
+                <ul className="cn-ope-funciones">
                   {funciones.map((f) => {
-                    const estadoF = estadoDeFuncion(firma, estado, f.id);
-                    const encendida = estadoF === 'ACTIVA';
-                    const conElModulo = estadoF === 'CON_EL_MODULO';
+                    const conElModulo = estado !== 'ACTIVO';
+                    const encendida = !conElModulo && !firma.funcionesDesactivadas.includes(f.id);
                     return (
-                      <li key={f.id} className={`flex items-start justify-between gap-3 ${conElModulo ? 'opacity-60' : ''}`}>
-                        <div className="min-w-0">
-                          <p className="text-[11.5px] font-medium text-ink-900">
+                      <li key={f.id} className={`cn-ope-funcion ${conElModulo ? 'cn-ope-funcion--con-el-modulo' : ''}`}>
+                        <div className="cn-ope-modulo-nombre">
+                          <p>
                             {f.nombre}
-                            {conElModulo && <span className="ml-1 font-normal text-ink-400">(con el módulo)</span>}
+                            {conElModulo && <span className="cn-ope-apagado"> · con el módulo</span>}
                           </p>
-                          <p className="text-justify text-[10.5px] leading-snug text-ink-500 [text-wrap:pretty]">{f.descripcion}</p>
-                          {estadoF === 'DESACTIVADA' && (
-                            <span className="chip-unverified mt-1 inline-block">Desactivada por el operador</span>
+                          <p className="cn-ope-funcion-descripcion">{f.descripcion}</p>
+                          {!conElModulo && !encendida && (
+                            <span className="cn-ope-chip cn-ope-chip--aviso">Desactivada por el operador</span>
                           )}
                         </div>
-                        <button
-                          type="button"
-                          role="switch"
-                          aria-checked={encendida}
-                          aria-label={`${f.nombre}: ${encendida ? 'activa' : 'inactiva'} para esta firma`}
-                          disabled={conElModulo}
-                          title={conElModulo ? 'Se apaga y se enciende con el módulo.' : undefined}
-                          onClick={() => pedirConfirmacion(f.id, f.nombre, encendida, 'funcion')}
-                          className={`relative mt-0.5 h-4 w-7 shrink-0 rounded-full border transition-colors disabled:cursor-not-allowed ${
-                            encendida ? 'border-brand-700 bg-brand-700' : 'border-line-200 bg-line-100'
-                          }`}
-                        >
-                          <span
-                            className={`absolute top-0.5 h-2.5 w-2.5 rounded-full bg-surface shadow transition-transform ${
-                              encendida ? 'left-0.5 translate-x-3' : 'left-0.5'
-                            }`}
-                          />
-                        </button>
+                        <Interruptor
+                          encendido={encendida}
+                          etiqueta={`${f.nombre}: ${encendida ? 'activa' : 'apagada'} para esta firma`}
+                          deshabilitado={conElModulo}
+                          titulo={conElModulo ? 'Se apaga y se enciende con el módulo.' : undefined}
+                          onClick={() => pedir(f.id, f.nombre, encendida, 'funcion')}
+                        />
                       </li>
                     );
                   })}
@@ -281,56 +223,58 @@ const ModulosDeLaFirma: React.FC<ModulosDeLaFirmaProps> = ({ firma, onGuardado }
 
       <ConfirmarDialog
         confirmacion={
-          confirmacion && {
-            ...confirmacion,
+          pendiente && {
+            titulo: `${pendiente.apagar ? 'Desactivar' : 'Reactivar'} ${pendiente.nombre} para esta firma`,
+            etiqueta: pendiente.apagar ? 'Desactivar' : 'Reactivar',
+            peligro: pendiente.apagar,
+            onConfirmar: aplicar,
             texto: (
-              <div className="space-y-3">
-                <p>
-                  {alcance === 'funcion' ? (
-                    confirmacion.peligro ? (
+              <div className="cn-ope-confirmacion">
+                <p className="cn-ope-texto">
+                  {pendiente.tipo === 'funcion' ? (
+                    pendiente.apagar ? (
                       <>
-                        La firma <b>{firma.name}</b> deja de ver esta función en el acto: el módulo sigue abierto y la
-                        pantalla la muestra como «no habilitada para su firma»; el servidor la rechaza aunque alguien la
-                        pida por fuera de la pantalla. El plan no cambia y lo ya creado se conserva; usted la reactiva
-                        desde aquí cuando corresponda.
+                        La firma <strong>{firma.name}</strong> deja de ver esta función en el acto: el módulo sigue abierto y la
+                        pantalla la muestra como «no habilitada para su firma»; el servidor la rechaza aunque alguien la pida
+                        por fuera de la pantalla. Lo ya creado se conserva.
                       </>
                     ) : (
                       <>
-                        La firma <b>{firma.name}</b> vuelve a ver esta función en el acto, dentro de su módulo.
+                        La firma <strong>{firma.name}</strong> vuelve a ver esta función en el acto, dentro de su módulo.
                       </>
                     )
-                  ) : confirmacion.peligro ? (
+                  ) : pendiente.apagar ? (
                     <>
-                      La firma <b>{firma.name}</b> deja de ver este módulo en el acto: desaparece de su
-                      barra y su portada lo muestra como «No disponible para su firma». El plan no cambia y
-                      lo ya creado se conserva; usted lo reactiva desde aquí cuando corresponda.
+                      La firma <strong>{firma.name}</strong> deja de ver este módulo en el acto: desaparece de su barra y su
+                      portada lo muestra como «No disponible para su firma». El plan no cambia y lo ya creado se conserva.
                     </>
                   ) : (
                     <>
-                      La firma <b>{firma.name}</b> vuelve a ver este módulo en el acto, tal como lo incluye su
-                      plan {nombrePlan}.
+                      La firma <strong>{firma.name}</strong> vuelve a ver este módulo en el acto, tal como lo incluye su plan{' '}
+                      {nombrePlan}.
                     </>
                   )}
                 </p>
-                <label className="block text-[11px] text-ink-500">
-                  Motivo (opcional) · queda en la auditoría de la firma con su correo
+                <div>
+                  <label htmlFor="ope-motivo-modulo" className="cn-ope-etiqueta">
+                    Motivo <span className="cn-ope-etiqueta-opcional">(opcional)</span>
+                  </label>
                   <input
+                    id="ope-motivo-modulo"
                     type="text"
                     value={motivo}
-                    onChange={(e) => {
-                      setMotivo(e.target.value);
-                      motivoRef.current = e.target.value;
-                    }}
-                    placeholder={
-                      confirmacion.peligro
-                        ? 'Pago de Audiencias pendiente; acordado con el socio'
-                        : 'Pago recibido'
-                    }
-                    className="mt-1 w-full rounded-control border border-line-200 bg-canvas px-2 py-1.5 text-[12px] text-ink-900 focus:border-brand-700 focus:outline-none"
+                    onChange={(e) => setMotivo(e.target.value)}
+                    placeholder={pendiente.apagar ? 'La firma pidió apagarlo por un tiempo' : 'Pago recibido'}
+                    className="cn-ope-campo"
                     autoFocus
                   />
-                </label>
-                {error && <p className="text-justify text-[12px] leading-snug text-danger [text-wrap:pretty]">{error}</p>}
+                  <p className="cn-ope-ayuda">Queda en la auditoría de la firma con su correo.</p>
+                </div>
+                {error && (
+                  <p role="alert" className="cn-ope-error">
+                    {error}
+                  </p>
+                )}
               </div>
             )
           }
@@ -340,293 +284,355 @@ const ModulosDeLaFirma: React.FC<ModulosDeLaFirmaProps> = ({ firma, onGuardado }
             mantenerAbiertoRef.current = false;
             return;
           }
-          setConfirmacion(null);
+          setPendiente(null);
           setError(null);
         }}
       />
-    </div>
+    </section>
   );
 };
 
-export const FirmPlanSection: React.FC<FirmPlanSectionProps> = ({ firma, onGuardado }) => {
-  const [editando, setEditando] = React.useState(false);
+/* ─── El diálogo ───────────────────────────────────────────────────────────── */
+
+interface PlanDeLaFirmaDialogProps {
+  abierto: boolean;
+  firma: FirmDetail;
+  onCerrar: () => void;
+  /**
+   * Tras guardar. Con la ficha ya releída (módulos) se entrega; sin argumento
+   * (plan, suspensión) quien abrió el diálogo la relee.
+   */
+  onGuardado: (yaLeida?: FirmDetail) => void;
+}
+
+export const PlanDeLaFirmaDialog: React.FC<PlanDeLaFirmaDialogProps> = ({ abierto, firma, onCerrar, onGuardado }) => {
   const [plan, setPlan] = React.useState<Plan>(firma.plan ?? 'PREMIUM');
   const [periodo, setPeriodo] = React.useState<Periodo>(firma.planPeriod ?? 'CORTESIA');
   const [vence, setVence] = React.useState(aFechaDeInput(firma.planValidUntil));
   const [motivo, setMotivo] = React.useState('');
-  const [guardando, setGuardando] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
-  const [confirmacion, setConfirmacion] = React.useState<Confirmacion | null>(null);
+  const [planes, setPlanes] = React.useState<Planes | null>(null);
+  const [lecturaDePlanes, setLecturaDePlanes] = React.useState<'leyendo' | 'leida' | 'fallida'>('leyendo');
+  const [confirmarPlan, setConfirmarPlan] = React.useState(false);
+  const [confirmarSuspension, setConfirmarSuspension] = React.useState(false);
   const [motivoSuspension, setMotivoSuspension] = React.useState('');
   const [errorSuspension, setErrorSuspension] = React.useState<string | null>(null);
-
-  const estado = estadoDe(firma);
-  const necesitaFecha = periodo !== 'CORTESIA';
-  const yaVencida = estado.etiqueta === 'Vencido';
-
-  /*
-   * El motivo se escribe dentro del diálogo y se valida al confirmar: el
-   * servidor exige diez caracteres y aquí se pide lo mismo antes de viajar.
-   * Un motivo corto no cierra el diálogo; explica qué falta.
-   */
-  const motivoRef = React.useRef('');
-  /*
-   * `ConfirmarDialog` cierra al terminar `onConfirmar`, sin distinguir éxito de
-   * fallo. Cuando el motivo falta o el servidor rechaza, el diálogo debe
-   * quedarse abierto mostrando por qué: esta bandera le pide al cierre que
-   * no cierre, una sola vez.
-   */
   const mantenerAbiertoRef = React.useRef(false);
+  const cerrarTrasGuardarRef = React.useRef(false);
+
+  /* Cada apertura arranca de lo que la firma tiene hoy: el motivo de la vez anterior no es el de esta. */
+  React.useEffect(() => {
+    if (!abierto) return;
+    setPlan(firma.plan ?? 'PREMIUM');
+    setPeriodo(firma.planPeriod ?? 'CORTESIA');
+    setVence(aFechaDeInput(firma.planValidUntil));
+    setMotivo('');
+    setError(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [abierto, firma.id]);
+
+  React.useEffect(() => {
+    if (!abierto || lecturaDePlanes === 'leida') return;
+    let vigente = true;
+    subscriptionApi
+      .plan()
+      .then((r) => {
+        if (!vigente) return;
+        setPlanes(r.planes);
+        setLecturaDePlanes('leida');
+      })
+      .catch(() => {
+        if (vigente) setLecturaDePlanes('fallida');
+      });
+    return () => {
+      vigente = false;
+    };
+  }, [abierto, lecturaDePlanes]);
+
+  const estado = estadoDeFirma(firma);
+  const razon = validarCambioDePlan({ periodo, vence, motivo });
+  const sinCambios = plan === firma.plan && periodo === firma.planPeriod && vence === aFechaDeInput(firma.planValidUntil);
+
+  const guardar = async () => {
+    setError(null);
+    try {
+      await adminApi.updateFirmPlan(firma.id, {
+        plan,
+        period: periodo,
+        validUntil: vence ? finDelDia(vence) : null,
+        motivo: limpio(motivo)
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudo fijar el plan.');
+      mantenerAbiertoRef.current = true;
+      return;
+    }
+    setMotivo('');
+    cerrarTrasGuardarRef.current = true;
+    onGuardado();
+  };
+
+  /*
+   * SUSPENDER ES PONER EL VENCIMIENTO EN AHORA: la firma queda en solo lectura
+   * por la misma regla que cierra un plan vencido, y la reactiva un pago o este
+   * mismo formulario. Exige motivo, como toda acción de operación.
+   */
   const suspender = async () => {
-    const motivo = motivoRef.current.replace(/\s+/g, ' ').trim();
-    if (motivo.length < 10) {
-      setErrorSuspension('Escriba el motivo (al menos 10 caracteres): queda en la auditoría de la firma.');
+    const m = limpio(motivoSuspension);
+    if (validarCambioDePlan({ periodo: 'CORTESIA', vence: '', motivo: m }) !== null) {
+      setErrorSuspension('Escriba el motivo, al menos 10 caracteres: queda en la auditoría de la firma.');
       mantenerAbiertoRef.current = true;
       return;
     }
     setErrorSuspension(null);
     try {
-      await adminApi.suspenderFirma(firma.id, motivo);
+      await adminApi.suspenderFirma(firma.id, m);
     } catch (err) {
       setErrorSuspension(err instanceof Error ? err.message : 'No se pudo suspender el acceso.');
       mantenerAbiertoRef.current = true;
       return;
     }
     setMotivoSuspension('');
-    motivoRef.current = '';
+    cerrarTrasGuardarRef.current = true;
     onGuardado();
   };
 
-  const abrirSuspension = () => {
-    setErrorSuspension(null);
-    setConfirmacion({
-      titulo: 'Suspender el acceso ahora',
-      texto: '',
-      etiqueta: 'Suspender acceso',
-      peligro: true,
-      onConfirmar: suspender
-    });
-  };
-
-  const guardar = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-
-    if (necesitaFecha && !vence) {
-      setError('Ese periodo necesita una fecha de vencimiento.');
+  const alCerrarConfirmacion = (cerrarla: () => void) => {
+    if (mantenerAbiertoRef.current) {
+      mantenerAbiertoRef.current = false;
       return;
     }
-    if (motivo.trim().length < 5) {
-      setError('Escriba el motivo: queda en la auditoría de la firma.');
-      return;
-    }
-
-    setGuardando(true);
-    try {
-      await adminApi.updateFirmPlan(firma.id, {
-        plan,
-        period: periodo,
-        // Fin del día local elegido: «vence el 30» significa que el 30 todavía trabaja.
-        validUntil: vence ? new Date(`${vence}T23:59:59`).toISOString() : null,
-        motivo: motivo.trim()
-      });
-      setEditando(false);
-      setMotivo('');
-      onGuardado();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'No se pudo fijar el plan.');
-    } finally {
-      setGuardando(false);
+    cerrarla();
+    if (cerrarTrasGuardarRef.current) {
+      cerrarTrasGuardarRef.current = false;
+      onCerrar();
     }
   };
+
+  const nuevo = describirPlan({ plan, planPeriod: periodo });
 
   return (
-    <section className="min-w-0 rounded-card border border-line-200 bg-surface">
-      <header className="flex flex-wrap items-start justify-between gap-2 border-b border-line-200 px-4 py-3">
-        <div className="min-w-0">
-          <h3 className="text-[13px] font-semibold text-ink-900">Plan</h3>
-          <p className="mt-0.5 text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
-            Lo que la firma tiene contratado. Operación puede fijarlo a mano —extender una prueba,
-            conceder cortesía— con motivo escrito; cobrar solo lo hace la firma, por Wompi.
-          </p>
-        </div>
-        <span className={`shrink-0 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold ${estado.clase}`}>
-          {estado.etiqueta}
-        </span>
-      </header>
+    <Dialog
+      abierto={abierto}
+      onCerrar={onCerrar}
+      titulo="Plan de esta firma"
+      subtitulo="Cambiarlo aquí exige motivo, y el motivo queda en la auditoría de la firma."
+      tamano="M"
+      hayCambiosSinGuardar={motivo.trim().length > 0}
+      onIntentoDeCerrarConCambios={() => undefined}
+    >
+      <div className="cn-ope-cuerpo">
+        <p className="cn-ope-recuadro cn-ope-recuadro--arriba">
+          Hoy: <strong>{describirPlan(firma)}</strong> ·{' '}
+          {firma.planValidUntil ? (
+            <>
+              vence el <span className="cn-ope-mono">{fechaCorta(firma.planValidUntil)}</span>
+            </>
+          ) : (
+            'sin vencimiento'
+          )}{' '}
+          · {firma.planMaxUsers !== null ? `${cifra(firma.users)} de ${cifra(firma.planMaxUsers)} usuarios` : `${cifra(firma.users)} usuarios, sin tope`}{' '}
+          <span className={`cn-ope-estado cn-ope-estado--${estado.tono}`}>{estado.etiqueta}</span>
+        </p>
 
-      <dl className="grid gap-3 px-4 py-3 text-[12px] sm:grid-cols-4">
-        <div>
-          <dt className="text-ink-400">Plan</dt>
-          <dd className="mt-0.5 font-medium text-ink-900">
-            {firma.plan ? NOMBRE_PLAN[firma.plan] : 'Cortesía (sin plan)'}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-ink-400">Periodo</dt>
-          <dd className="mt-0.5 font-medium text-ink-900">
-            {firma.planPeriod ? NOMBRE_PERIODO[firma.planPeriod] : '—'}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-ink-400">Vence</dt>
-          <dd className="mt-0.5 font-medium text-ink-900">
-            {firma.planValidUntil ? fechaLarga(firma.planValidUntil) : 'Sin vencimiento'}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-ink-400">Usuarios</dt>
-          <dd className="mt-0.5 font-medium text-ink-900">
-            {firma.users}
-            {firma.planMaxUsers !== null ? ` de ${firma.planMaxUsers}` : ' · sin tope'}
-          </dd>
-        </div>
-      </dl>
-
-      {!editando ? (
-        <div className="flex flex-wrap items-center gap-3 border-t border-line-200 px-4 py-3">
-          <button type="button" onClick={() => setEditando(true)} className="btn-secondary flex items-center gap-2">
-            <CalendarClock className="h-4 w-4" />
-            {yaVencida ? 'Reactivar: fijar plan o vencimiento' : 'Fijar plan o vencimiento'}
-          </button>
-          {/* Una firma ya vencida no tiene nada que suspender: el botón sobraría y confundiría. */}
-          {!yaVencida && (
-            <button
-              type="button"
-              onClick={abrirSuspension}
-              className="flex items-center gap-2 text-[12px] font-medium text-danger hover:underline"
-            >
-              <Ban className="h-4 w-4" />
-              Suspender acceso ahora
-            </button>
-          )}
-        </div>
-      ) : (
-        <form onSubmit={(e) => void guardar(e)} className="space-y-3 border-t border-line-200 px-4 py-3">
-          {/*
-            PARA QUÉ SIRVE ESTA VÍA, ESCRITO AL LADO DEL FORMULARIO. Dentro de
-            la aplicación, cambiar de plan se paga completo y el ciclo empieza
-            el día del pago: la firma pierde los días que le quedaban. La otra
-            vía es esta — la firma escribe, envía la diferencia por fuera, sin
-            comisión de pasarela, y aquí se le sube el plan RESPETANDO su fecha.
-            El campo «Vence» abre con la fecha que la firma ya tiene justamente
-            para eso: cambiar solo el plan no debe mover el vencimiento.
-          */}
-          <p className="text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
-            Esta es la vía de la petición interna: la firma pidió cambiar de plan, envió la diferencia por fuera de la
-            pasarela y se le respeta su fecha de vencimiento. El campo «Vence» abre con la que ya tiene: cambie el plan
-            y déjela como está. Si en cambio la firma paga desde la aplicación, el ciclo del plan nuevo empieza el día
-            del pago y los días que le quedaban no se acreditan.
-          </p>
-          <div className="grid gap-3 sm:grid-cols-3">
-            <label className="block text-[11px] text-ink-500">
-              Plan
-              <select
-                value={plan}
-                onChange={(e) => setPlan(e.target.value as Plan)}
-                className="mt-1 w-full rounded-control border border-line-200 bg-canvas px-2 py-1.5 text-[12px] text-ink-900 focus:border-brand-700 focus:outline-none"
-              >
-                <option value="ESENCIAL">Esencial · 1 usuario</option>
-                <option value="PREMIUM">Premium · hasta 5 usuarios</option>
-                <option value="FIRMA">Firma · hasta 15 usuarios</option>
-              </select>
-            </label>
-            <label className="block text-[11px] text-ink-500">
-              Periodo
-              <select
-                value={periodo}
-                onChange={(e) => setPeriodo(e.target.value as Periodo)}
-                className="mt-1 w-full rounded-control border border-line-200 bg-canvas px-2 py-1.5 text-[12px] text-ink-900 focus:border-brand-700 focus:outline-none"
-              >
-                <option value="PRUEBA">Prueba</option>
-                <option value="MENSUAL">Mensual</option>
-                <option value="ANUAL">Anual</option>
-                <option value="CORTESIA">Cortesía (sin vencimiento)</option>
-              </select>
-            </label>
-            <label className="block text-[11px] text-ink-500">
-              Vence {necesitaFecha ? '' : '(opcional)'}
-              <input
-                type="date"
-                value={vence}
-                onChange={(e) => setVence(e.target.value)}
-                className="mt-1 w-full rounded-control border border-line-200 bg-canvas px-2 py-1.5 text-[12px] text-ink-900 focus:border-brand-700 focus:outline-none"
+        <div className="cn-ope-campos">
+          <div className="cn-ope-dos">
+            <div className="cn-ope-selector">
+              <SelectorDelFormulario
+                id="ope-plan"
+                etiqueta="Plan"
+                valor={plan}
+                opciones={PLANES.map((p) => ({ valor: p, etiqueta: opcionDePlan(p, planes) }))}
+                onChange={(v) => setPlan(v as Plan)}
+                conBusqueda={false}
+                cargando={lecturaDePlanes === 'leyendo'}
               />
-            </label>
+              {lecturaDePlanes === 'fallida' && (
+                <p className="cn-ope-ayuda cn-ope-ayuda--aviso">Los usuarios de cada plan no se pudieron leer del catálogo.</p>
+              )}
+            </div>
+            <div className="cn-ope-selector">
+              <SelectorDelFormulario
+                id="ope-periodo"
+                etiqueta="Periodo"
+                valor={periodo}
+                opciones={PERIODOS.map((p) => ({ valor: p.valor, etiqueta: p.etiqueta }))}
+                onChange={(v) => setPeriodo(v as Periodo)}
+                conBusqueda={false}
+              />
+              <p className="cn-ope-ayuda">«Cortesía» no vence.</p>
+            </div>
           </div>
 
-          <label className="block text-[11px] text-ink-500">
-            Motivo · queda en la auditoría de la firma con su correo
+          <div>
+            <label htmlFor="ope-vence" className="cn-ope-etiqueta">
+              Vence {periodo === 'CORTESIA' && <span className="cn-ope-etiqueta-opcional">(opcional)</span>}
+            </label>
+            <input id="ope-vence" type="date" value={vence} onChange={(e) => setVence(e.target.value)} className="cn-ope-campo cn-ope-campo--cifra" />
+            {/*
+              PARA QUÉ SIRVE ESTA VÍA. Dentro de la aplicación, cambiar de plan se
+              paga completo y el ciclo empieza el día del pago. Aquí la firma pidió
+              el cambio por fuera y se le respeta su fecha: por eso el campo abre
+              con la que ya tiene.
+            */}
+            <p className="cn-ope-ayuda">
+              Abre con la fecha que la firma ya tiene: cambiar solo el plan no mueve su vencimiento. Si la firma paga desde la
+              aplicación, el ciclo nuevo empieza el día del pago.
+            </p>
+          </div>
+
+          <div>
+            <label htmlFor="ope-motivo-plan" className="cn-ope-etiqueta">
+              Motivo del cambio
+            </label>
             <input
+              id="ope-motivo-plan"
               type="text"
               value={motivo}
               onChange={(e) => setMotivo(e.target.value)}
               placeholder="Prueba extendida dos semanas a petición del socio"
-              className="mt-1 w-full rounded-control border border-line-200 bg-canvas px-2 py-1.5 text-[12px] text-ink-900 focus:border-brand-700 focus:outline-none"
+              className="cn-ope-campo"
             />
-          </label>
+            <p className={`cn-ope-ayuda ${razon ? 'cn-ope-ayuda--aviso' : ''}`}>
+              {razon ?? (sinCambios ? 'No hay cambios que guardar.' : 'Queda en la auditoría de la firma con su correo.')}
+            </p>
+          </div>
+        </div>
 
-          {error && <p className="text-justify text-[12px] leading-snug text-danger [text-wrap:pretty]">{error}</p>}
+        {error && !confirmarPlan && (
+          <p role="alert" className="cn-ope-error cn-ope-error--abajo">
+            {error}
+          </p>
+        )}
 
-          <div className="flex items-center gap-3">
-            <button type="submit" disabled={guardando} className="btn-primary text-[12px] disabled:opacity-50">
-              {guardando ? 'Guardando…' : 'Guardar plan'}
-            </button>
+        <button
+          type="button"
+          className="cn-ope-boton cn-ope-boton--primario cn-ope-boton--ancho"
+          disabled={razon !== null || sinCambios}
+          onClick={() => {
+            setError(null);
+            setConfirmarPlan(true);
+          }}
+        >
+          Guardar el cambio
+        </button>
+
+        <ModulosDeLaFirma firma={firma} onGuardado={onGuardado} />
+
+        {/* Una firma ya vencida no tiene nada que suspender: el botón sobraría y confundiría. */}
+        {estado.etiqueta !== 'Vencido' && (
+          <section className="cn-ope-seccion cn-ope-suspender" aria-labelledby="ope-suspender">
+            <h3 id="ope-suspender" className="cn-ope-subtitulo">
+              Suspender el acceso
+            </h3>
+            <p className="cn-ope-texto">
+              La firma queda en solo lectura en el acto y conserva todo lo que tiene. La reactiva un pago suyo o un cambio de plan
+              desde aquí.
+            </p>
             <button
               type="button"
+              className="cn-ope-boton cn-ope-boton--terciario cn-ope-boton--texto-peligro"
               onClick={() => {
-                setEditando(false);
-                setError(null);
+                setErrorSuspension(null);
+                setConfirmarSuspension(true);
               }}
-              className="text-[12px] text-ink-500 hover:text-ink-700"
             >
-              Cancelar
+              Suspender el acceso ahora
             </button>
-          </div>
-        </form>
-      )}
-
-      <ModulosDeLaFirma firma={firma} onGuardado={onGuardado} />
+          </section>
+        )}
+      </div>
 
       <ConfirmarDialog
         confirmacion={
-          confirmacion && {
-            ...confirmacion,
-            texto: (
-              <div className="space-y-3">
-                <p>
-                  La firma <b>{firma.name}</b> queda en solo lectura en el acto: sus usuarios ven la
-                  franja «Renovar plan» y ninguna pantalla crea ni modifica trabajo. Conserva todo lo que
-                  tiene. La reactiva un pago de la firma por Wompi o usted, con «Fijar plan o vencimiento».
-                </p>
-                <label className="block text-[11px] text-ink-500">
-                  Motivo · queda en la auditoría de la firma con su correo
-                  <input
-                    type="text"
-                    value={motivoSuspension}
-                    onChange={(e) => {
-                      setMotivoSuspension(e.target.value);
-                      motivoRef.current = e.target.value;
-                    }}
-                    placeholder="Pago rechazado dos veces; acordado con el socio por teléfono"
-                    className="mt-1 w-full rounded-control border border-line-200 bg-canvas px-2 py-1.5 text-[12px] text-ink-900 focus:border-brand-700 focus:outline-none"
-                    autoFocus
-                  />
-                </label>
-                {errorSuspension && <p className="text-justify text-[12px] leading-snug text-danger [text-wrap:pretty]">{errorSuspension}</p>}
-              </div>
-            )
-          }
+          confirmarPlan
+            ? {
+                titulo: '¿Cambiar el plan de esta firma?',
+                etiqueta: 'Sí, cambiar el plan',
+                onConfirmar: guardar,
+                texto: (
+                  <div className="cn-ope-confirmacion">
+                    <p className="cn-ope-texto">
+                      <strong>{firma.name}</strong>{' '}
+                      {nuevo === describirPlan(firma) ? (
+                        <>
+                          mantiene <strong>{nuevo}</strong> y su vencimiento queda{' '}
+                        </>
+                      ) : (
+                        <>
+                          pasa de <strong>{describirPlan(firma)}</strong> a <strong>{nuevo}</strong>,{' '}
+                        </>
+                      )}
+                      {vence ? (
+                        <>
+                          {nuevo === describirPlan(firma) ? 'en el ' : 'con vencimiento el '}
+                          <span className="cn-ope-mono">{fechaCorta(finDelDia(vence))}</span>
+                        </>
+                      ) : (
+                        'sin vencimiento'
+                      )}
+                      . El motivo queda en su auditoría, que sus socios leen.
+                    </p>
+                    {error && (
+                      <p role="alert" className="cn-ope-error">
+                        {error}
+                      </p>
+                    )}
+                  </div>
+                )
+              }
+            : null
         }
-        onCerrar={() => {
-          if (mantenerAbiertoRef.current) {
-            mantenerAbiertoRef.current = false;
-            return;
-          }
-          setConfirmacion(null);
-          setErrorSuspension(null);
-        }}
+        onCerrar={() => alCerrarConfirmacion(() => setConfirmarPlan(false))}
       />
-    </section>
+
+      <ConfirmarDialog
+        confirmacion={
+          confirmarSuspension
+            ? {
+                titulo: 'Suspender el acceso ahora',
+                etiqueta: 'Suspender el acceso',
+                peligro: true,
+                onConfirmar: suspender,
+                texto: (
+                  <div className="cn-ope-confirmacion">
+                    <p className="cn-ope-texto">
+                      La firma <strong>{firma.name}</strong> queda en solo lectura en el acto: sus usuarios ven la franja «Renovar
+                      plan» y ninguna pantalla crea ni modifica trabajo. Conserva todo lo que tiene. La reactiva un pago de la firma
+                      o usted, desde «Plan de esta firma».
+                    </p>
+                    <div>
+                      <label htmlFor="ope-motivo-suspension" className="cn-ope-etiqueta">
+                        Motivo
+                      </label>
+                      <input
+                        id="ope-motivo-suspension"
+                        type="text"
+                        value={motivoSuspension}
+                        onChange={(e) => setMotivoSuspension(e.target.value)}
+                        placeholder="Pago rechazado dos veces; acordado con el socio por teléfono"
+                        className="cn-ope-campo"
+                        autoFocus
+                      />
+                      <p className="cn-ope-ayuda">Queda en la auditoría de la firma con su correo.</p>
+                    </div>
+                    {errorSuspension && (
+                      <p role="alert" className="cn-ope-error">
+                        {errorSuspension}
+                      </p>
+                    )}
+                  </div>
+                )
+              }
+            : null
+        }
+        onCerrar={() =>
+          alCerrarConfirmacion(() => {
+            setConfirmarSuspension(false);
+            setErrorSuspension(null);
+          })
+        }
+      />
+    </Dialog>
   );
 };

@@ -59,7 +59,11 @@ const SELECTORES_MODALES: ReadonlyArray<{ clase: string; componente: string }> =
   { clase: 'cn-vis-globo', componente: 'modules/inicio/visitaGuiada/VisitaGuiada.tsx' },
   { clase: 'cn-vis-hoja', componente: 'modules/inicio/visitaGuiada/VisitaGuiada.tsx' },
   { clase: 'cn-vis-hoja--arriba', componente: 'modules/inicio/visitaGuiada/VisitaGuiada.tsx' },
-  { clase: 'cn-tal-hoja-comentario', componente: 'modules/workspace/components/TallerDeEscrito.tsx' }
+  { clase: 'cn-tal-hoja-comentario', componente: 'modules/workspace/components/TallerDeEscrito.tsx' },
+  { clase: 'cn-bus-ficha-panel', componente: 'modules/search/components/SearchView.tsx' },
+  { clase: 'cn-bus-hoja', componente: 'modules/search/components/SearchMobileView.tsx' },
+  { clase: 'cn-cat-ficha-panel', componente: 'modules/catalog/components/CatalogCurationView.tsx' },
+  { clase: 'cn-cat-hoja', componente: 'modules/catalog/components/CatalogMobileView.tsx' }
 ];
 
 /**
@@ -67,7 +71,7 @@ const SELECTORES_MODALES: ReadonlyArray<{ clase: string; componente: string }> =
  * `[role='dialog'] > div:last-child`. Deben existir en el CSS: si uno se
  * renombra, su override deja de estar a la vista de este check.
  */
-const OVERRIDES_DEL_MARCO = ['cn-aud-dialogos', 'cn-her-dialogos', 'cn-adm-dialogos', 'cn-aju-dialogos', 'cn-plan-dialogos'];
+const OVERRIDES_DEL_MARCO = ['cn-aud-dialogos', 'cn-her-dialogos', 'cn-adm-dialogos', 'cn-aju-dialogos', 'cn-plan-dialogos', 'cn-ope-dialogos', 'cn-est-dialogos', 'cn-cat-dialogos'];
 
 /**
  * Modales armados con Tailwind: `ancla` es un trozo único del `className` del
@@ -76,9 +80,12 @@ const OVERRIDES_DEL_MARCO = ['cn-aud-dialogos', 'cn-her-dialogos', 'cn-adm-dialo
 const COMPONENTES_MODALES: ReadonlyArray<{ ruta: string; ancla: string; que: string }> = [
   { ruta: 'design/Dialog.tsx', ancla: 'max-h-[76vh]', que: 'marco compartido de diálogos' },
   { ruta: 'modules/subscriptions/components/ModuloBloqueado.tsx', ancla: 'max-w-sm flex-col items-center', que: 'aviso de módulo bloqueado' },
-  { ruta: 'modules/tenant/components/MobileMoreSheet.tsx', ancla: 'max-h-[75vh] overflow-y-auto', que: 'hoja «Todo lo demás»' },
-  { ruta: 'modules/search/components/SearchMobileView.tsx', ancla: 'border-t border-line-200 bg-surface pb-[env(safe-area-inset-bottom)]', que: 'hoja de corporación del Buscador' },
-  { ruta: 'modules/catalog/components/CatalogMobileView.tsx', ancla: 'h-[92dvh]', que: 'hoja de verificación del Catálogo' }
+  { ruta: 'modules/tenant/components/MobileMoreSheet.tsx', ancla: 'max-h-[75vh] overflow-y-auto', que: 'hoja «Todo lo demás»' }
+  /*
+   * La hoja de filtros del Buscador y la de verificación del Catálogo salieron de
+   * aquí el 14 de septiembre de 2026: con la cara nueva se pintan desde el CSS
+   * (`cn-bus-hoja`, `cn-cat-hoja`) y las vigila la lista de arriba.
+   */
 ];
 
 /* ─── Reglas, puras ─────────────────────────────────────────────────────── */
@@ -191,6 +198,46 @@ for (const { ruta, ancla, que } of COMPONENTES_MODALES) {
   const tieneRadio = /(?:^|\s)(?:[a-z0-9]+:)*rounded/.test(clases);
   check(`${que} va a 20 px`, tieneRadio && cortas.length === 0, tieneRadio ? cortas.join(', ') : 'el panel no declara radio');
 }
+
+/* ─── 2b. El alto: todo diálogo cabe en la ventana ──────────────────────── */
+
+/*
+ * DEFECTO QUE VIGILA (14 sep 2026): el marco llevaba `sm:max-h-none`, que en
+ * escritorio anulaba el alto máximo de cada tamaño. Un diálogo largo crecía con
+ * su contenido —1.357 px en una pantalla de 768— y el título y los botones
+ * quedaban fuera. Un envoltorio lo tapaba para un solo diálogo; los demás
+ * seguían expuestos. Se exige el tope en el marco, y que ningún override del
+ * CSS lo quite.
+ */
+const TOPE_DE_ESCRITORIO = 'sm:max-h-[calc(100dvh-48px)]';
+
+/** Clases de alto del panel que dejan crecer el diálogo más que la ventana. */
+const altoSinTope = (clases: string): string[] => {
+  const problemas: string[] = [];
+  if (!clases.split(/\s+/).includes(TOPE_DE_ESCRITORIO)) problemas.push(`falta ${TOPE_DE_ESCRITORIO}`);
+  for (const c of clases.split(/\s+/)) if (/^(?:[a-z0-9]+:)*max-h-(?:none|screen)$/.test(c)) problemas.push(c);
+  return problemas;
+};
+
+/** Reglas del CSS que le quitan el tope al panel del marco. */
+const overridesSinTope = (hoja: string): string[] => {
+  const limpio = hoja.replace(/\/\*[\s\S]*?\*\//g, (c) => c.replace(/[^\n]/g, ' '));
+  const salida: string[] = [];
+  for (const m of limpio.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+    if (!/\[role=['"]dialog['"]\][^,]*>\s*div:last-child\s*$/m.test(m[1].trim())) continue;
+    const alto = /max-height:\s*(none|unset|initial|auto)\s*;/.exec(m[2]);
+    if (alto) salida.push(`${m[1].trim()} { max-height: ${alto[1]} }`);
+  }
+  return salida;
+};
+
+const clasesDelMarco = classNameConAncla(leer('design/Dialog.tsx'), 'max-h-[76vh]') ?? '';
+const sinTope = altoSinTope(clasesDelMarco);
+check('el marco compartido acota el alto a la ventana en escritorio (cabecera y pie a la vista)', clasesDelMarco !== '' && sinTope.length === 0, sinTope.join(', '));
+const cssSinTope = overridesSinTope(css);
+check('ningún override del CSS le quita el tope al panel', cssSinTope.length === 0, cssSinTope.join('; '));
+check('muerde: el marco con sm:max-h-none', altoSinTope('max-h-[76vh] sm:max-h-none rounded-t-[20px]').length > 0);
+check('muerde: un override con max-height: none', overridesSinTope(".cara-nueva .cn-x-dialogos [role='dialog'] > div:last-child {\n  max-height: none;\n}").length === 1);
 
 /* ─── 3. Que muerda ─────────────────────────────────────────────────────── */
 

@@ -1,23 +1,24 @@
 import React from 'react';
-import { Check, Copy, RefreshCw } from 'lucide-react';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 import { adminApi, type FirmUserDetail } from '../admin.api';
 
 /**
  * Nueva contraseña para una cuenta de la firma, puesta por operación.
+ * Cara nueva: derivada. `app-consola-de-operacion.html` no la dibuja; toma la
+ * anatomía de la confirmación de `app-dialogos-y-estados.html` y los campos del
+ * diálogo de recarga del artboard 4.
  *
- * POR QUÉ EXISTE. No hay correo de recuperación: un abogado que olvida su
- * contraseña llama, y la única salida era tocar la base a mano. Aquí el
- * operador la fija —o la genera— y la entrega por el canal que la firma
- * elija. No se envía ningún correo, a propósito: el correo es el canal que
- * este producto no tiene asegurado.
+ * POR QUÉ EXISTE. Cuando la persona no puede recuperar su contraseña sola —el
+ * correo no le llega, o la firma pide que se la ponga soporte—, el operador la
+ * fija o la genera y la entrega por el canal que la firma elija. Desde aquí no
+ * se envía ningún correo (`restablecerContrasenaDeUsuario` no lo hace).
  *
- * LA CONTRASEÑA SE VE UNA VEZ, AQUÍ. Tras confirmar, el diálogo se queda
- * abierto mostrándola en un campo copiable hasta que el operador diga que ya
- * la copió: si se cerrara solo, la contraseña que acaba de fijarse se habría
- * perdido con él. La auditoría de la firma anota la cuenta, nunca la clave.
+ * PASA POR LA CONFIRMACIÓN DEL SISTEMA, y la contraseña SE VE UNA VEZ: tras
+ * confirmar, el diálogo se queda abierto mostrándola hasta que el operador
+ * diga que ya la copió. La auditoría de la firma anota la cuenta, nunca la clave.
  */
 
+/** El mismo mínimo que `MIN_CONTRASENA_OPERADOR` en el servidor. */
 const MIN = 10;
 const LARGO_GENERADA = 14;
 /* Sin 0/O, 1/l/I: la va a dictar alguien por teléfono. */
@@ -38,12 +39,7 @@ interface ResetPasswordDialogProps {
   onHecho: () => void;
 }
 
-export const ResetPasswordDialog: React.FC<ResetPasswordDialogProps> = ({
-  firmId,
-  usuario,
-  onCerrar,
-  onHecho
-}) => {
+export const ResetPasswordDialog: React.FC<ResetPasswordDialogProps> = ({ firmId, usuario, onCerrar, onHecho }) => {
   const [contrasena, setContrasena] = React.useState('');
   const [hecho, setHecho] = React.useState(false);
   const [copiada, setCopiada] = React.useState(false);
@@ -68,16 +64,16 @@ export const ResetPasswordDialog: React.FC<ResetPasswordDialogProps> = ({
   };
 
   const fijar = async () => {
+    if (!usuario) return;
     setError(null);
     try {
-      await adminApi.restablecerContrasena(firmId, usuario!.id, contrasena);
+      await adminApi.restablecerContrasena(firmId, usuario.id, contrasena);
       setHecho(true);
       onHecho();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo restablecer la contraseña.');
     }
-    // En ambos casos el diálogo se queda: con el error a la vista, o con la
-    // contraseña recién fijada para copiarla.
+    // En ambos casos el diálogo se queda: con el error a la vista, o con la contraseña para copiarla.
     mantenerAbiertoRef.current = true;
   };
 
@@ -89,55 +85,47 @@ export const ResetPasswordDialog: React.FC<ResetPasswordDialogProps> = ({
     onCerrar();
   };
 
+  const faltan = Math.max(0, MIN - contrasena.length);
+
   const confirmacion: Confirmacion | null = usuario
     ? {
         titulo: hecho ? 'Contraseña fijada' : 'Nueva contraseña',
-        etiqueta: hecho ? 'Listo, ya la copié' : 'Fijar contraseña',
-        deshabilitado: !hecho && contrasena.length < MIN,
+        etiqueta: hecho ? 'Listo, ya la copié' : 'Fijar la contraseña',
+        deshabilitado: !hecho && faltan > 0,
         onConfirmar: hecho ? () => undefined : fijar,
         texto: (
-          /*
-            `[overflow-wrap:anywhere]` EN LA RAIZ: el cuerpo entero de este
-            dialogo gira alrededor de un correo de firma —una palabra de 60
-            caracteres sin espacios— que a 320 se pintaba 137px fuera de su
-            parrafo sin que la caja creciera ni la pagina desbordara.
-          */
-          <div className="min-w-0 space-y-3 [overflow-wrap:anywhere]">
-            <p className="text-justify [text-wrap:pretty]">
+          <div className="cn-ope-confirmacion">
+            <p className="cn-ope-texto">
               {hecho ? (
                 <>
-                  La cuenta <b>{usuario.email}</b> ya entra con esta contraseña. Cópiela ahora: al cerrar
-                  este diálogo no vuelve a mostrarse.
+                  La cuenta <strong>{usuario.email}</strong> ya entra con esta contraseña. Cópiela ahora: al cerrar este diálogo no
+                  vuelve a mostrarse.
                 </>
               ) : (
                 <>
-                  Fija la contraseña de <b>{usuario.email}</b>. No se envía ningún correo: entréguela
-                  usted por un canal seguro (llamada, mensaje cifrado) y pídale que la cambie al entrar.
+                  Fija la contraseña de <strong>{usuario.email}</strong>. Desde aquí no sale ningún correo: entréguela usted por un
+                  canal seguro y pídale que la cambie al entrar.
                 </>
               )}
             </p>
-            <label className="block text-[11px] text-ink-500">
-              Contraseña · mínimo {MIN} caracteres
-              <div className="mt-1 flex min-w-0 flex-wrap gap-1.5">
+            <div>
+              <label htmlFor="ope-contrasena" className="cn-ope-etiqueta">
+                Contraseña
+              </label>
+              <div className="cn-ope-contrasena">
                 <input
+                  id="ope-contrasena"
                   type="text"
                   value={contrasena}
-                  /* `min-w-0`: sin el, el campo se niega a bajar de su ancho por defecto y empuja a «Generar» y «Copiar» fuera de la hoja. */
                   onChange={(e) => setContrasena(e.target.value)}
                   readOnly={hecho}
                   autoComplete="new-password"
                   spellCheck={false}
-                  className="w-full min-w-0 rounded-control border border-line-200 bg-canvas px-2 py-1.5 font-mono text-[12px] text-ink-900 focus:border-brand-700 focus:outline-none"
+                  className="cn-ope-campo cn-ope-campo--cifra"
                   autoFocus={!hecho}
                 />
                 {!hecho && (
-                  <button
-                    type="button"
-                    onClick={() => setContrasena(generar())}
-                    className="btn-neutral btn-sm flex shrink-0 items-center gap-1"
-                    title={`Generar una de ${LARGO_GENERADA} caracteres`}
-                  >
-                    <RefreshCw className="h-3.5 w-3.5" />
+                  <button type="button" onClick={() => setContrasena(generar())} className="cn-ope-boton cn-ope-boton--suave">
                     Generar
                   </button>
                 )}
@@ -145,18 +133,26 @@ export const ResetPasswordDialog: React.FC<ResetPasswordDialogProps> = ({
                   type="button"
                   onClick={() => void copiar()}
                   disabled={contrasena.length === 0}
-                  className="btn-neutral btn-sm flex shrink-0 items-center gap-1 disabled:opacity-50"
+                  className="cn-ope-boton cn-ope-boton--suave"
                 >
-                  {copiada ? <Check className="h-3.5 w-3.5 text-verified" /> : <Copy className="h-3.5 w-3.5" />}
                   {copiada ? 'Copiada' : 'Copiar'}
                 </button>
               </div>
-            </label>
-            <p className="rounded-control border border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))] px-2.5 py-2 text-justify text-[11px] leading-snug text-unverified [text-wrap:pretty]">
-              Entréguela solo por un canal seguro y a la persona titular de la cuenta. Queda en la
-              auditoría de la firma que operación restableció esta contraseña; la contraseña no.
+              {!hecho && (
+                <p className={`cn-ope-ayuda ${faltan > 0 ? 'cn-ope-ayuda--aviso' : ''}`}>
+                  {faltan > 0 ? `Mínimo ${MIN} caracteres: faltan ${faltan}.` : `«Generar» crea una de ${LARGO_GENERADA} caracteres, fácil de dictar.`}
+                </p>
+              )}
+            </div>
+            <p className="cn-ope-recuadro cn-ope-recuadro--aviso">
+              Entréguela solo por un canal seguro y a la persona titular de la cuenta. Queda en la auditoría de la firma que
+              operación restableció esta contraseña; la contraseña no.
             </p>
-            {error && <p className="text-[12px] text-danger">{error}</p>}
+            {error && (
+              <p role="alert" className="cn-ope-error">
+                {error}
+              </p>
+            )}
           </div>
         )
       }

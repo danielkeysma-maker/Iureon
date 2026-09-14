@@ -1,211 +1,169 @@
 import React from 'react';
-import { Loader2 } from 'lucide-react';
+import { Check, Copy, ExternalLink, Loader2, X } from 'lucide-react';
 import { IconoBuscar } from '../../../design/ArtboardIcons';
 import { searchPrecedents, type CorpusPrecedent, type CorpusStatus } from '../services/legalSearch.api';
+import {
+  CORPORACIONES,
+  alcanzanLaConsulta,
+  aniosDisponibles,
+  cercaniaMaxima,
+  citaCopiable,
+  corporacionEnPalabras,
+  leerFicha,
+  parecidoEnPalabras,
+  resultadosVisibles
+} from '../dosCorpus';
 
 /**
- * El buscador en móvil. Artboard 5c, con las medidas copiadas de su HTML.
+ * El Buscador en el teléfono. Artboard 5 de `public/handoff/app-buscador-catalogo.html`
+ * (375 px): campo de 48, pestañas «Leídas · N» / «Sin leer · N» / filtros, y
+ * tarjetas de radio 14.
  *
- * ─── LO QUE DICE LA MAQUETA, CITADO ─────────────────────────────────────────
+ * ─── LAS PESTAÑAS SON LA SEPARACIÓN ─────────────────────────────────────────
  *
- *     cabecera:   padding:8px 16px 12px · campo con `border:1px solid #17456B`
- *                 y `box-shadow:0 0 0 3px rgba(23,69,107,.10)` · radius 8
- *     conteo:     «38 resultados» 400 11.5px MONO #8B96A6 + «Filtros · 2»
- *     cuerpo:     padding:12px 16px; gap:9px
- *     rótulo:     600 9.5px MONO tracking .1em uppercase + filete
- *                 curadas → texto #17456B, filete #CBD9E4
- *                 automático → texto #8B96A6, filete #E3E7EC
- *     curada:     border #CBD9E4 + `border-left:3px solid #17456B`
- *                 providencia 600 14px MONO · cita en serif 13/1.7 con filete
- *                 SÓLIDO de 2px · botones «Citar» y «Texto completo» de 44px
- *     automático: border #E3E7EC + `border-left:3px solid #CFD6E0`
- *                 providencia 600 13.5px MONO en #2B3542 —más apagada— y la
- *                 cita con filete PUNTEADO. Sin botón de citar.
+ * En 375 px no caben dos bloques con su explicación sin que el segundo quede a
+ * tres pantallas del primero, y el pulgar toca lo primero que aparece. Por eso
+ * el artboard no apila: muestra UN corpus a la vez y deja el otro a una
+ * pestaña, con su cuenta a la vista. Nunca hay una lista con los dos. Lo que
+ * nadie leyó no ofrece copiar la cita.
  *
- * ─── LA SEPARACIÓN ES LA PANTALLA, NO UN FILTRO ─────────────────────────────
+ * ─── DOS DEFECTOS QUE ESTA PANTALLA TENÍA, CORREGIDOS AL VESTIRLA ──────────
  *
- * 1h ya lo decía y 5c lo conserva en 390px: curado y automático son **dos
- * bloques con encabezado propio**, no un chip perdido. Lo curado lo leyó una
- * persona y lleva sus hechos y su ratio; lo automático lo trajo el registro
- * oficial y **nadie lo ha leído**. Por eso el segundo va más bajo en contraste,
- * con filete punteado, y **sin botón de citar**: citar algo que nadie leyó debe
- * costar un clic más.
- *
- * En una pantalla pequeña esa diferencia importa más, no menos — hay menos
- * espacio para matices y más tentación de tocar el primer botón que aparezca.
+ * · NO APLICABA EL UMBRAL. El escritorio calla por debajo de 0,60 porque ahí
+ *   lo más cercano es ruido; el teléfono lo presentaba como resultado. Ahora
+ *   las dos pasan por `alcanzanLaConsulta`.
+ * · OFRECÍA «CONSEJO_DE_ESTADO», etiqueta que el corpus no usa (archiva
+ *   `CONSEJO_ESTADO`): elegirla vaciaba la lista. La lista es la de `dosCorpus`.
+ * · Un fallo de red quedaba sin atrapar y la pantalla se congelaba en «Buscar».
  *
  * ─── LO QUE EL ARTBOARD PIDE Y AQUÍ NO ESTÁ, con la razón ───────────────────
  *
- * · «Anotada por D. Cárdenas» y su nota. `CorpusPrecedent` no tiene campo de
- *   anotador: el corpus guarda el fragmento y su procedencia, no quién lo
- *   comentó. Es construible —una tabla de anotaciones por firma— y queda
- *   anotado como tal, no como imposible.
- * · «Podría ir en contra de su tesis». Exige comparar la providencia con la
- *   tesis del escrito, y ni el corpus ni la búsqueda saben cuál es la tesis.
- * · «Filtros · 2» abre las corporaciones y el año. Aquí el botón existe y lleva
- *   a esa hoja; el contador cuenta filtros REALES aplicados, no un número fijo.
+ * · El título «Buscador» en la pantalla: lo pone la cabecera móvil de la
+ *   aplicación, y dos títulos seguidos se leen como un error.
+ * · «Curada por C. Restrepo · citada en 3 escritos» y la nota del curador: no
+ *   hay curaduría de jurisprudencia por firma (ver `SearchView`).
+ * · La búsqueda en las relatorías oficiales cuando el corpus no alcanza: en el
+ *   teléfono no se ha construido, y la pantalla lo dice en vez de callarlo.
  */
 
-const CORPORACIONES = [
-  { id: 'TODAS', label: 'Todas' },
-  { id: 'CORTE_CONSTITUCIONAL', label: 'Corte Constitucional' },
-  { id: 'CORTE_SUPREMA', label: 'Corte Suprema' },
-  { id: 'CONSEJO_DE_ESTADO', label: 'Consejo de Estado' }
-] as const;
+type Pestana = 'leidas' | 'sinLeer';
 
-const limpiar = (texto: string): string =>
-  texto.replace(/\s+/g, ' ').replace(/^[^A-ZÁÉÍÓÚÑ«"]*/u, '').trim();
+const ESTADOS_QUE_NO_RESPONDEN: ReadonlyArray<CorpusStatus> = ['NOT_SEEDED', 'NO_PROVIDER', 'NO_INDEX', 'FAILED'];
 
-interface TarjetaProps {
+const procedenciaDe = (item: CorpusPrecedent): string => {
+  if (item.sourceKind === 'CONCEPTO') return ['Concepto', item.entidad].filter(Boolean).join(' · ');
+  return (
+    [corporacionEnPalabras(item.corporacion), item.magistradoPonente && `M.P. ${item.magistradoPonente}`]
+      .filter(Boolean)
+      .join(' · ') || 'Procedencia no registrada'
+  );
+};
+
+interface TarjetaLeidaProps {
   item: CorpusPrecedent;
-  curada: boolean;
-  onCitar: (item: CorpusPrecedent) => void;
   copiada: boolean;
+  onCitar: (item: CorpusPrecedent) => void;
 }
 
-const Tarjeta: React.FC<TarjetaProps> = ({ item, curada, onCitar, copiada }) => (
-  <article
-    className={`rounded-[8px] px-3 py-[11px] ${
-      curada ? 'border border-[rgb(var(--brand-line))] bg-surface' : 'border border-line-200 bg-surface'
-    }`}
-    style={{
-      borderLeft: `3px solid ${curada ? 'rgb(var(--brand-700))' : 'rgb(var(--neutral-line))'}`
-    }}
-  >
-    <div className="flex items-baseline gap-2">
-      <h3
-        className={`min-w-0 flex-1 font-mono font-semibold ${
-          curada ? 'text-[14px] text-ink-900' : 'text-[13.5px] text-ink-700'
-        }`}
-      >
-        {item.providencia ?? 'Fragmento sin providencia registrada'}
-      </h3>
-      <span
-        className={`shrink-0 font-mono text-[9.5px] font-semibold uppercase tracking-[0.07em] ${
-          curada ? 'text-brand-700' : 'text-ink-500'
-        }`}
-      >
-        {curada ? 'Curada' : 'Automático'}
-      </span>
-    </div>
-
-    <p className="mt-[3px] text-[11.5px] leading-snug text-ink-500 text-justify">
-      {[item.corporacion?.replace(/_/g, ' '), item.magistradoPonente && `M.P. ${item.magistradoPonente}`]
-        .filter(Boolean)
-        .join(' · ') || 'Procedencia no registrada'}
-    </p>
-
-    {/*
-      LA CITA EN SERIF CON FILETE: solido cuando alguien la leyo, PUNTEADO
-      cuando la trajo el registro y nadie la ha leido. La textura dice lo mismo
-      que el color, para quien no distingue el contraste.
-    */}
-    <blockquote
-      className={`mt-2 pl-2.5 font-legal text-[13px] leading-[1.7] ${
-        curada
-          ? 'border-l-2 border-line-200 text-ink-900'
-          : 'border-l-2 border-dotted border-neutral-line text-ink-700'
-      }`}
-    >
-      {limpiar(item.contentChunk).slice(0, curada ? 400 : 300)}
-    </blockquote>
-
-    {curada ? (
-      <div className="mt-2.5 flex gap-[7px]">
-        <button
-          type="button"
-          onClick={() => onCitar(item)}
-          disabled={!item.providencia}
-          className="h-11 flex-1 rounded-[6px] bg-brand-700 text-[13px] font-semibold text-on-brand disabled:opacity-50"
-        >
-          {copiada ? 'Copiada' : 'Citar'}
+const TarjetaLeida: React.FC<TarjetaLeidaProps> = ({ item, copiada, onCitar }) => {
+  const ficha = leerFicha(item.contentChunk);
+  return (
+    <article className="cn-bus-tarjeta">
+      <div className="cn-bus-tarjeta-cabeza">
+        <span className="cn-bus-tarjeta-cita">{item.providencia ?? 'Fragmento sin providencia registrada'}</span>
+        <span className="cn-bus-sello cn-bus-sello--leida">
+          <span className="cn-bus-punto" aria-hidden="true" />
+          Leída
+        </span>
+      </div>
+      <p className="cn-bus-procedencia">{procedenciaDe(item)}</p>
+      <p className="cn-bus-tarjeta-texto">{ficha.ratio ? `Ratio: ${ficha.ratio}` : ficha.texto.slice(0, 280)}</p>
+      <p className="cn-bus-procedencia">{parecidoEnPalabras(item.similarity)}</p>
+      <div className="cn-bus-acciones">
+        <button type="button" onClick={() => onCitar(item)} disabled={!item.providencia} className="cn-bus-boton cn-bus-boton--suave">
+          {copiada ? <Check className="h-4 w-4" aria-hidden="true" /> : <Copy className="h-4 w-4" aria-hidden="true" />}
+          {copiada ? 'Cita copiada' : 'Copiar la cita'}
         </button>
         {item.sourceUrl && (
-          <a
-            href={item.sourceUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex h-11 flex-1 items-center justify-center rounded-[6px] border border-line-200 bg-surface text-[13px] font-medium text-ink-700"
-          >
-            Texto completo
+          <a href={item.sourceUrl} target="_blank" rel="noopener noreferrer" className="cn-bus-boton cn-bus-boton--fantasma">
+            Fuente oficial
+            <ExternalLink className="h-4 w-4" aria-hidden="true" />
           </a>
         )}
       </div>
-    ) : (
-      /*
-        SIN BOTON DE CITAR. Nadie ha leido esto: el unico camino es abrirlo en
-        la fuente. Citar algo que nadie leyo debe costar un clic mas, y en el
-        telefono —donde el pulgar toca lo primero que aparece— esa friccion es
-        justamente la que protege.
-      */
-      <div className="mt-2 flex items-center justify-between gap-2">
-        <span className="text-[11px] text-ink-400">Sin lectura humana</span>
-        {item.sourceUrl && (
-          <a
-            href={item.sourceUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[11.5px] font-semibold text-brand-700 underline underline-offset-2"
-          >
-            Leer en la fuente oficial
-          </a>
-        )}
-      </div>
-    )}
-  </article>
-);
+    </article>
+  );
+};
 
-const Rotulo: React.FC<{ texto: string; curada: boolean }> = ({ texto, curada }) => (
-  <div className="flex items-center gap-[7px]">
-    <span
-      className={`shrink-0 font-mono text-[9.5px] font-semibold uppercase tracking-[0.1em] ${
-        curada ? 'text-brand-700' : 'text-ink-400'
-      }`}
-    >
-      {texto}
-    </span>
-    <div className={`h-px flex-1 ${curada ? 'bg-[rgb(var(--brand-line))]' : 'bg-line-200'}`} />
-  </div>
-);
+/* SIN BOTÓN DE COPIAR: nadie de la firma leyó esto. El check lo vigila. */
+const TarjetaSinLeer: React.FC<{ item: CorpusPrecedent }> = ({ item }) => {
+  return (
+    <article className="cn-bus-tarjeta cn-bus-tarjeta--sin">
+      <div className="cn-bus-tarjeta-cabeza">
+        <span className="cn-bus-tarjeta-cita">{item.providencia ?? 'Fragmento sin providencia registrada'}</span>
+        <span className="cn-bus-sello cn-bus-sello--sin">Sin leer</span>
+      </div>
+      <p className="cn-bus-procedencia">{procedenciaDe(item)}</p>
+      <blockquote className="cn-bus-fragmento cn-bus-fragmento--sin">{leerFicha(item.contentChunk).texto.slice(0, 300)}</blockquote>
+      <p className="cn-bus-procedencia">{parecidoEnPalabras(item.similarity)}</p>
+      {item.sourceUrl && (
+        <div className="cn-bus-acciones">
+          <a href={item.sourceUrl} target="_blank" rel="noopener noreferrer" className="cn-bus-boton cn-bus-boton--fantasma">
+            Leer en la fuente oficial
+            <ExternalLink className="h-4 w-4" aria-hidden="true" />
+          </a>
+        </div>
+      )}
+    </article>
+  );
+};
 
 export const SearchMobileView: React.FC = () => {
   const [consulta, setConsulta] = React.useState('');
   const [buscando, setBuscando] = React.useState(false);
   const [resultados, setResultados] = React.useState<CorpusPrecedent[]>([]);
+  const [cercania, setCercania] = React.useState<number | null>(null);
   const [estado, setEstado] = React.useState<CorpusStatus | null>(null);
   const [motivo, setMotivo] = React.useState<string | undefined>(undefined);
   const [corporacion, setCorporacion] = React.useState<string>('TODAS');
+  const [anio, setAnio] = React.useState<string>('TODOS');
+  const [pestana, setPestana] = React.useState<Pestana>('leidas');
   const [filtrosAbiertos, setFiltrosAbiertos] = React.useState(false);
   const [copiada, setCopiada] = React.useState<string | null>(null);
+  const campo = React.useRef<HTMLInputElement>(null);
 
   const buscar = async () => {
     if (!consulta.trim() || buscando) return;
     setBuscando(true);
     try {
       const r = await searchPrecedents(consulta.trim());
-      setResultados(r.items ?? []);
+      const items = r.items ?? [];
+      const relevantes = alcanzanLaConsulta(items);
+      setResultados(relevantes);
+      setCercania(relevantes.length > 0 ? null : cercaniaMaxima(items));
       setEstado(r.status);
       setMotivo(r.reason);
+      /* Se abre la pestaña que tiene algo: abrir en «Leídas» vacía escondería lo único que hay. */
+      const dos = resultadosVisibles(relevantes, { corporacion, anio, soloLeidas: false });
+      setPestana(dos.leidas.length === 0 && dos.sinLeer.length > 0 ? 'sinLeer' : 'leidas');
+    } catch (error) {
+      setResultados([]);
+      setCercania(null);
+      setEstado('FAILED');
+      setMotivo(error instanceof Error ? error.message : 'La búsqueda no pudo completarse.');
     } finally {
       setBuscando(false);
     }
   };
 
-  const visibles = resultados.filter(
-    (r) => corporacion === 'TODAS' || r.corporacion === corporacion
-  );
-  const curadas = visibles.filter((r) => r.curado !== false);
-  const automaticas = visibles.filter((r) => r.curado === false);
-  /* Cuenta filtros REALES aplicados, no un numero fijo como en la maqueta. */
-  const filtrosActivos = corporacion === 'TODAS' ? 0 : 1;
+  const { leidas, sinLeer } = resultadosVisibles(resultados, { corporacion, anio, soloLeidas: false });
+  const anios = aniosDisponibles(resultados);
+  /* Cuenta filtros REALES aplicados, no un número fijo como en la maqueta. */
+  const filtrosActivos = (corporacion === 'TODAS' ? 0 : 1) + (anio === 'TODOS' ? 0 : 1);
+  const corpusNoResponde = estado !== null && ESTADOS_QUE_NO_RESPONDEN.includes(estado);
 
   const citar = (item: CorpusPrecedent) => {
-    const partes = [
-      item.providencia,
-      item.corporacion?.replace(/_/g, ' '),
-      item.magistradoPonente && `M.P. ${item.magistradoPonente}`
-    ];
-    const cita = partes.filter(Boolean).join(', ');
+    const cita = citaCopiable(item);
     if (!cita) return;
     void navigator.clipboard.writeText(cita);
     setCopiada(item.id);
@@ -213,125 +171,200 @@ export const SearchMobileView: React.FC = () => {
   };
 
   return (
-    <div data-visita="vista-search" className="flex h-full min-h-0 flex-1 flex-col bg-canvas">
-      <header className="shrink-0 border-b border-line-200 bg-surface px-4 pb-3 pt-2">
-        <div className="relative">
-          <IconoBuscar className="pointer-events-none absolute left-3 top-[13px] h-3.5 w-3.5 text-ink-400" />
-          <textarea
-            value={consulta}
-            onChange={(e) => setConsulta(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                void buscar();
-              }
-            }}
-            rows={2}
-            placeholder="Estabilidad laboral reforzada, despido sin permiso del inspector…"
-            className="field-area w-full resize-none pl-9 text-[13.5px] leading-[1.6]"
-          />
-        </div>
+    <div data-visita="vista-search" className="cara-nueva cn-bus cn-bus--movil flex h-full min-h-0 min-w-0 flex-1 flex-col">
+      <div className="cn-bus-cabeza">
+        <form
+          className="cn-bus-busqueda"
+          onSubmit={(e) => {
+            e.preventDefault();
+            void buscar();
+          }}
+        >
+          <label className="cn-bus-campo-envoltura">
+            <span className="sr-only">Consulta</span>
+            <IconoBuscar className="cn-bus-campo-icono" />
+            <input
+              ref={campo}
+              type="search"
+              enterKeyHint="search"
+              value={consulta}
+              onChange={(e) => setConsulta(e.target.value)}
+              placeholder="Problema jurídico o sentencia"
+              className="cn-bus-campo"
+            />
+          </label>
+          <button type="submit" disabled={!consulta.trim() || buscando} className="cn-bus-boton cn-bus-boton--primario">
+            {buscando ? <Loader2 className="h-4 w-4 animate-spin" aria-label="Buscando" /> : 'Buscar'}
+          </button>
+        </form>
 
-        <div className="mt-2.5 flex items-center gap-2">
-          <span className="font-mono text-[11.5px] text-ink-400">
-            {estado === null
-              ? 'Sin buscar'
-              : `${visibles.length} ${visibles.length === 1 ? 'resultado' : 'resultados'}`}
-          </span>
+        <div className="cn-bus-pestanas" role="group" aria-label="Qué corpus ver">
           <button
             type="button"
-            onClick={() => setFiltrosAbiertos(true)}
-            className="rounded-[6px] border border-line-200 bg-canvas px-2.5 py-1 text-[11.5px] font-medium text-ink-700"
+            aria-pressed={pestana === 'leidas'}
+            onClick={() => setPestana('leidas')}
+            className={`cn-bus-chip cn-bus-pestana${pestana === 'leidas' ? ' cn-bus-pestana--activa' : ''}`}
           >
+            Leídas · {leidas.length}
+          </button>
+          <button
+            type="button"
+            aria-pressed={pestana === 'sinLeer'}
+            onClick={() => setPestana('sinLeer')}
+            className={`cn-bus-chip cn-bus-pestana${pestana === 'sinLeer' ? ' cn-bus-pestana--activa' : ''}`}
+          >
+            Sin leer · {sinLeer.length}
+          </button>
+          <button type="button" onClick={() => setFiltrosAbiertos(true)} className="cn-bus-chip cn-bus-pestana">
             Filtros{filtrosActivos > 0 ? ` · ${filtrosActivos}` : ''}
           </button>
-          <button
-            type="button"
-            onClick={() => void buscar()}
-            disabled={!consulta.trim() || buscando}
-            className="btn-primary ml-auto h-9 px-4 disabled:opacity-50"
-          >
-            {buscando ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : 'Buscar'}
-          </button>
-        </div>
-      </header>
-
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
-        <div className="flex flex-col gap-[9px]">
-          {estado !== null && visibles.length === 0 && (
-            <p className="rounded-[8px] border border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))] px-3.5 py-3 text-justify text-[12.5px] leading-snug text-unverified [text-wrap:pretty]">
-              {motivo ?? `Sin coincidencias para «${consulta.trim()}» en el corpus indexado.`}
-            </p>
-          )}
-
-          {curadas.length > 0 && (
-            <>
-              <Rotulo texto={`Curadas por la firma · ${curadas.length}`} curada />
-              {curadas.map((r) => (
-                <Tarjeta
-                  key={r.id}
-                  item={r}
-                  curada
-                  onCitar={citar}
-                  copiada={copiada === r.id}
-                />
-              ))}
-            </>
-          )}
-
-          {automaticas.length > 0 && (
-            <>
-              <div className="mt-1">
-                <Rotulo
-                  texto={`Descubrimiento automático · ${automaticas.length}`}
-                  curada={false}
-                />
-              </div>
-              {automaticas.map((r) => (
-                <Tarjeta
-                  key={r.id}
-                  item={r}
-                  curada={false}
-                  onCitar={citar}
-                  copiada={false}
-                />
-              ))}
-            </>
-          )}
         </div>
       </div>
 
+      <div className="cn-bus-cuerpo">
+        {estado === null && !buscando && (
+          <div className="cn-bus-vacio">
+            <h2 className="cn-bus-vacio-titulo">Escriba una consulta</h2>
+            <p>Se busca en el corpus curado. Lo que una persona leyó y lo que nadie ha leído se muestran por separado.</p>
+          </div>
+        )}
+
+        {buscando && (
+          <p className="cn-bus-cargando">
+            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+            Buscando en el corpus curado…
+          </p>
+        )}
+
+        {!buscando && corpusNoResponde && (
+          <div className="cn-bus-aviso" role="status">
+            <p className="cn-bus-aviso-titulo">El corpus no pudo responder</p>
+            <p>{motivo ?? 'La búsqueda no pudo completarse.'}</p>
+          </div>
+        )}
+
+        {!buscando && estado !== null && !corpusNoResponde && resultados.length === 0 && (
+          <div className="cn-bus-vacio">
+            <h2 className="cn-bus-vacio-titulo">
+              {cercania !== null ? 'Nada suficientemente cercano' : 'Sin coincidencias en el corpus curado'}
+            </h2>
+            <p>
+              {cercania !== null
+                ? 'Lo más cercano quedó lejos, y mostrarlo sería sugerir un parecido que no existe.'
+                : 'El corpus curado no devolvió nada para esta consulta.'}{' '}
+              En el teléfono se consulta solo el corpus; las relatorías oficiales se consultan desde el escritorio.
+            </p>
+            <div className="cn-bus-acciones">
+              <button
+                type="button"
+                className="cn-bus-boton cn-bus-boton--suave"
+                onClick={() => {
+                  campo.current?.focus();
+                  campo.current?.select();
+                }}
+              >
+                Cambiar las palabras
+              </button>
+            </div>
+          </div>
+        )}
+
+        {!buscando && resultados.length > 0 && pestana === 'leidas' && (
+          <section className="cn-bus-bloque" aria-label="Lo que una persona leyó">
+            <p className="cn-bus-bloque-bajada">
+              Lo que una persona leyó antes de indexarlo. Lleva sus hechos y su ratio. El orden es por parecido del texto,
+              no por autoridad.
+            </p>
+            {leidas.length === 0 && <p className="cn-bus-nota">Ninguna leída coincide con esta consulta y estos filtros.</p>}
+            <div className="cn-bus-lista">
+              {leidas.map((r) => (
+                <TarjetaLeida key={r.id} item={r} copiada={copiada === r.id} onCitar={citar} />
+              ))}
+              {sinLeer.length > 0 && (
+                <div className="cn-bus-nadie">
+                  <p>
+                    <b>
+                      Hay {sinLeer.length} sin leer.
+                    </b>{' '}
+                    Son igual de reales, pero nadie de la firma las ha leído: no pasan por leídas.
+                  </p>
+                  <button type="button" className="cn-bus-boton cn-bus-boton--fantasma" onClick={() => setPestana('sinLeer')}>
+                    Ver las que nadie leyó
+                  </button>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
+        {!buscando && resultados.length > 0 && pestana === 'sinLeer' && (
+          <section className="cn-bus-bloque" aria-label="Encontrado automáticamente">
+            <div className="cn-bus-nadie">
+              <p>
+                <b>Nadie de la firma ha leído esto.</b> Es igual de real que lo leído y no es lo mismo: hacerlo pasar por
+                curado sería promoverlo en silencio.
+              </p>
+            </div>
+            {sinLeer.length === 0 && <p className="cn-bus-nota">No hay nada sin leer para esta consulta y estos filtros.</p>}
+            <div className="cn-bus-lista">
+              {sinLeer.map((r) => (
+                <TarjetaSinLeer key={r.id} item={r} />
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
+
       {filtrosAbiertos && (
-        <div className="fixed inset-0 z-40 flex flex-col justify-end lg:hidden">
-          <button
-            type="button"
-            aria-label="Cerrar"
-            onClick={() => setFiltrosAbiertos(false)}
-            className="flex-1 bg-black/40"
-          />
-          {/* Hoja inferior: 20 px arriba (14 sep 2026) y recorte para que la cabecera siga la curva. */}
-          <div className="overflow-hidden rounded-t-[20px] border-t border-line-200 bg-surface pb-[env(safe-area-inset-bottom)]">
-            <header className="border-b border-line-200 px-4 py-3">
-              <h2 className="text-[14px] font-semibold text-ink-900">Corporación</h2>
+        <div className="cn-bus-hoja-capa" role="dialog" aria-modal="true" aria-label="Filtros">
+          <div className="cn-bus-velo" onClick={() => setFiltrosAbiertos(false)} aria-hidden="true" />
+          {/* Hoja inferior: 20 px arriba y 0 abajo, la de toda hoja de la casa. */}
+          <section className="cn-bus-hoja">
+            <span className="cn-bus-asidero" aria-hidden="true" />
+            <header className="cn-bus-hoja-cabeza">
+              <h2 className="cn-bus-h2">Filtros</h2>
+              <button type="button" aria-label="Cerrar" className="cn-bus-cerrar" onClick={() => setFiltrosAbiertos(false)}>
+                <X className="h-5 w-5" aria-hidden="true" />
+              </button>
             </header>
-            <div className="p-2">
+            <div className="cn-bus-hoja-cuerpo">
+              <p className="cn-bus-hoja-rotulo">Corporación</p>
               {CORPORACIONES.map((c) => (
                 <button
                   key={c.id}
                   type="button"
-                  onClick={() => {
-                    setCorporacion(c.id);
-                    setFiltrosAbiertos(false);
-                  }}
-                  className={`flex min-h-[48px] w-full items-center rounded-control px-3 text-left text-[13.5px] ${
-                    corporacion === c.id ? 'bg-brand-50 font-semibold text-brand-700' : 'text-ink-900'
-                  }`}
+                  aria-pressed={corporacion === c.id}
+                  onClick={() => setCorporacion(c.id)}
+                  className={`cn-bus-opcion${corporacion === c.id ? ' cn-bus-opcion--activa' : ''}`}
                 >
                   {c.label}
+                  {corporacion === c.id && <Check className="h-4 w-4" aria-hidden="true" />}
                 </button>
               ))}
+              {anios.length > 1 && (
+                <>
+                  <p className="cn-bus-hoja-rotulo">Año de la providencia</p>
+                  {['TODOS', ...anios].map((a) => (
+                    <button
+                      key={a}
+                      type="button"
+                      aria-pressed={anio === a}
+                      onClick={() => setAnio(a)}
+                      className={`cn-bus-opcion${anio === a ? ' cn-bus-opcion--activa' : ''}`}
+                    >
+                      {a === 'TODOS' ? 'Todos los años' : a}
+                      {anio === a && <Check className="h-4 w-4" aria-hidden="true" />}
+                    </button>
+                  ))}
+                </>
+              )}
             </div>
-          </div>
+            <footer className="cn-bus-hoja-pie">
+              <button type="button" className="cn-bus-boton cn-bus-boton--primario" onClick={() => setFiltrosAbiertos(false)}>
+                Ver resultados
+              </button>
+            </footer>
+          </section>
         </div>
       )}
     </div>

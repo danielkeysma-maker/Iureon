@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRight, ClipboardCheck, FileText, Image as ImageIcon, Paperclip, RefreshCw, UploadCloud, X } from 'lucide-react';
 import { AgentConsoleStream } from '../../agent/components/AgentConsoleStream';
 import { useActuacionLookup } from '../../catalog/hooks/useActuacion';
+import { usePerfilDeEstilo } from '../../estilo/hooks/usePerfilDeEstilo';
+import { lineaDelPaso3, TEXTO_INTERRUPTOR } from '../../estilo/estiloEnPantalla';
 import type { AgentLog } from '../../agent/types';
 import type { ActuacionRole } from '../../catalog/types';
 import { RevisarEscritoDialog } from './RevisarEscritoDialog';
@@ -46,9 +48,11 @@ import {
  * · «Usará los 3 documentos del caso · Elegir». Los documentos del expediente
  *   llegan al motor solos al atar el caso; no hay un selector de cuáles, y
  *   pintarlo sería ofrecer una elección que no se aplica.
- * · El interruptor «Usar el formato y la jerga que usted enseñó». No existe un
- *   perfil de estilo aprendido: lo que viaja es el formato de Membrete, y eso
- *   se dice en una línea de solo lectura.
+ * · El interruptor del artboard habla de lo que «usted» enseñó. Existe desde el
+ *   14 de septiembre de 2026, pero dice «su firma»: enseña el socio
+ *   administrador, no necesariamente quien redacta. Solo aparece cuando la firma
+ *   enseñó un formato para ese rol; si no, una línea lo dice y no hay nada que
+ *   apagar.
  * · «Cuesta $2.000 de su saldo». $2.000 es el PISO: se cobra el mayor entre el
  *   piso y lo que el escrito midió (`priceFor` en el servidor).
  * · «Armar el borrador». El verbo sigue a quién firma, como antes.
@@ -114,6 +118,9 @@ interface AgentPanelLeftProps {
   /** Si la firma configuró Membrete: es lo único de «cómo escribe su firma» que viaja al motor. */
   formatoDeFirmaConfigurado?: boolean;
   onAbrirMembrete?: () => void;
+  /** «Usar el formato y la jerga que su firma enseñó», para este borrador. */
+  usarEstilo?: boolean;
+  setUsarEstilo?: (usar: boolean) => void;
   /** Un borrador abierto en esta pestaña al que se puede volver. */
   borradorAbierto?: { titulo: string; onVolver: () => void } | null;
 }
@@ -151,6 +158,8 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
   caso,
   formatoDeFirmaConfigurado = false,
   onAbrirMembrete,
+  usarEstilo = true,
+  setUsarEstilo,
   borradorAbierto = null
 }) => {
   const [importedFiles, setImportedFiles] = useState<ArchivoAdjunto[]>([]);
@@ -170,6 +179,20 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
 
   const lookup = useActuacionLookup(documentType, legalBranch);
   const actuacion = lookup.actuacion;
+
+  /*
+   * EL FORMATO ENSEÑADO SE BUSCA COMO LO BUSCARÁ EL SERVIDOR: con el rol de la
+   * ficha cuando la actuación resuelve y, si no, con el del taller; y con la rama
+   * del paso 1, con respaldo al general del rol. Mientras carga o si la consulta
+   * falla no se dice nada del estilo: «su firma no ha enseñado» sería afirmar lo
+   * que no se comprobó.
+   */
+  const rolDelEstilo = actuacion?.role ?? userRole;
+  const perfilDeEstilo = usePerfilDeEstilo(rolDelEstilo, legalBranch || null);
+  const lineaDeEstilo =
+    perfilDeEstilo.estado === 'LISTO'
+      ? lineaDelPaso3({ lecciones: perfilDeEstilo.respuesta.perfil.lecciones, rama: perfilDeEstilo.respuesta.rama }, rolDelEstilo)
+      : null;
 
   /*
    * El rol sigue a la actuación, UNA SOLA VEZ por actuación nueva.
@@ -452,13 +475,16 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
           </Paso>
 
           {/*
-            «CÓMO ESCRIBE SU FIRMA», SOLO CON LO QUE VIAJA. Lo único de ese paso que
-            existe hoy es el formato de Membrete, que el motor recibe como
-            instrucción. Sin Membrete configurado no hay nada que decir, y el paso
-            no se pinta. No lleva interruptor: no hay nada que apagar.
+            «CÓMO ESCRIBE SU FIRMA», SOLO CON LO QUE VIAJA. Dos cosas viajan al
+            motor: el formato de Membrete, si la firma lo configuró, y el formato
+            que la firma enseñó para ese rol. El interruptor existe solo cuando hay
+            formato enseñado —apagarlo vale para este borrador—; sin él, una línea
+            dice que se redacta con el formato por defecto. Sin ninguna de las dos
+            cosas que decir, el paso no se pinta.
           */}
-          {formatoDeFirmaConfigurado && (
+          {(formatoDeFirmaConfigurado || lineaDeEstilo) && (
             <Paso n={3} titulo="Cómo escribe su firma">
+              {formatoDeFirmaConfigurado && (
               <p className="cn-red-estilo">
                 <span className="cn-red-estilo-texto">Usará el formato de escrito de su firma (Membrete).</span>
                 {onAbrirMembrete && (
@@ -467,6 +493,27 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
                   </button>
                 )}
               </p>
+              )}
+              {lineaDeEstilo?.tipo === 'CON_PERFIL' && (
+                <label className="cn-est-interruptor">
+                  <input
+                    type="checkbox"
+                    role="switch"
+                    className="cn-est-interruptor-control"
+                    checked={usarEstilo}
+                    onChange={(e) => setUsarEstilo?.(e.target.checked)}
+                    disabled={isProcessing}
+                  />
+                  <span className="cn-est-interruptor-textos">
+                    <span className="cn-est-interruptor-titulo">{TEXTO_INTERRUPTOR}</span>
+                    <span className="cn-est-interruptor-detalle">{lineaDeEstilo.detalle}</span>
+                    {!usarEstilo && (
+                      <span className="cn-est-interruptor-detalle">Solo para este borrador: el siguiente vuelve a usarlo.</span>
+                    )}
+                  </span>
+                </label>
+              )}
+              {lineaDeEstilo?.tipo === 'SIN_PERFIL' && <p className="cn-est-sin-perfil">{lineaDeEstilo.texto}</p>}
             </Paso>
           )}
 

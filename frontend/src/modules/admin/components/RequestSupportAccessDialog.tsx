@@ -1,29 +1,35 @@
 import React from 'react';
-import { Send } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import { adminApi } from '../admin.api';
 
 /**
- * Pedirle acceso a una firma. Artboard 8a, lado de operación (botón de 7b′).
+ * Pedirle a una firma ver algo suyo. Lado de operación del acceso de soporte.
+ * Cara nueva: `public/handoff/app-consola-de-operacion.html`, artboard 5
+ * (segundo diálogo: rótulo «Acceso al contenido», «Pedir ver algo de esta
+ * firma», «Operación no ve escritos ni casos», Qué necesita ver, Por qué, el
+ * recuadro de condiciones y el pie Cancelar · Pedir el acceso).
  *
  * ─── ESTA PANTALLA NO CONCEDE NADA ──────────────────────────────────────────
  *
- * Al enviarla, operación no ve ni un dato más de la firma. Lo único que ocurre
- * es que a un socio le aparece una pregunta. Por eso el botón dice «Enviar la
- * solicitud» y la confirmación dice que hay que esperar: un verbo que sugiera
- * entrada —«acceder», «abrir»— enseñaría a operación que pedir es un trámite.
+ * Al enviarla, operación no ve ni un dato más. Lo único que ocurre es que a un
+ * socio de la firma le aparece una pregunta, y hasta que la autorice no hay
+ * nada abierto. Por eso la confirmación dice que hay que esperar.
+ *
+ * ─── LO QUE EL ARTBOARD DICE Y AQUÍ NO SE DICE, con la razón ───────────────
+ *
+ * · «El acceso vence a las 24 horas»: la duración la elige operación entre las
+ *   tres del servidor (`DURACIONES_PERMITIDAS`: 1, 4 o 24 horas), y el reloj
+ *   empieza cuando un socio autoriza.
+ * · «Se limita a lo que pidió»: el alcance es texto que el socio lee para
+ *   decidir; ninguna regla del servidor recorta lo que se abre por ese texto.
+ *   Afirmarlo sería prometer una frontera técnica que no existe.
+ * · El rótulo en rojo: el rojo de la casa es solo de lo que destruye, y pedir
+ *   no destruye nada.
  *
  * ─── EL MOTIVO TIENE MÍNIMO PORQUE ALGUIEN LO VA A LEER ─────────────────────
  *
- * Treinta caracteres los impone el servidor, y el contador está aquí para que
- * la restricción se entienda antes de chocar con ella. No es burocracia: el
- * socio decide con esas palabras y nada más, así que «revisar» no es un motivo.
- *
- * ─── LAS TRES DURACIONES SON DEL PRODUCTO, NO DEL SOLICITANTE ───────────────
- *
- * Un campo libre dejaría pedir veinte mil minutos y que alguien autorizara sin
- * mirar el número. Se eligen, no se escriben, y el servidor rechaza cualquier
- * otro valor — la restricción vive en la tabla, no en este formulario.
+ * Treinta caracteres los impone el servidor; el contador está para que la
+ * restricción se entienda antes de chocar con ella.
  */
 
 const MOTIVO_MINIMO = 30;
@@ -41,12 +47,7 @@ interface RequestSupportAccessDialogProps {
   onEnviada?: () => void;
 }
 
-export const RequestSupportAccessDialog: React.FC<RequestSupportAccessDialogProps> = ({
-  firmId,
-  firmName,
-  onCerrar,
-  onEnviada
-}) => {
+export const RequestSupportAccessDialog: React.FC<RequestSupportAccessDialogProps> = ({ firmId, firmName, onCerrar, onEnviada }) => {
   const [motivo, setMotivo] = React.useState('');
   const [alcance, setAlcance] = React.useState('');
   const [duracion, setDuracion] = React.useState<60 | 240 | 1440>(60);
@@ -65,18 +66,14 @@ export const RequestSupportAccessDialog: React.FC<RequestSupportAccessDialogProp
   }, [firmId]);
 
   const faltan = Math.max(0, MOTIVO_MINIMO - motivo.trim().length);
-  const listo = faltan === 0 && alcance.trim().length >= 3;
+  const listo = faltan === 0 && alcance.trim().length >= 3 && !enviando;
 
   const enviar = async () => {
     if (!firmId || !listo) return;
     setEnviando(true);
     setError(null);
     try {
-      await adminApi.solicitarSoporte(firmId, {
-        motive: motivo.trim(),
-        scope: alcance.trim(),
-        durationMinutes: duracion
-      });
+      await adminApi.solicitarSoporte(firmId, { motive: motivo.trim(), scope: alcance.trim(), durationMinutes: duracion });
       setEnviada(true);
       onEnviada?.();
     } catch (e: unknown) {
@@ -90,110 +87,109 @@ export const RequestSupportAccessDialog: React.FC<RequestSupportAccessDialogProp
     <Dialog
       abierto={firmId !== null}
       onCerrar={onCerrar}
-      titulo="Solicitar acceso de soporte"
+      titulo={enviada ? 'Solicitud enviada' : 'Pedir ver algo de esta firma'}
       subtitulo={`${firmName} · la decisión es de un socio de la firma, no suya.`}
       tamano="M"
       hayCambiosSinGuardar={!enviada && (motivo.length > 0 || alcance.length > 0)}
+      onIntentoDeCerrarConCambios={() => undefined}
+      acciones={
+        enviada ? (
+          <button type="button" className="cn-ope-boton cn-ope-boton--primario" onClick={onCerrar}>
+            Entendido
+          </button>
+        ) : (
+          <>
+            <button type="button" className="cn-ope-boton cn-ope-boton--terciario" onClick={onCerrar} disabled={enviando}>
+              Cancelar
+            </button>
+            <button type="button" className="cn-ope-boton cn-ope-boton--primario" onClick={() => void enviar()} disabled={!listo}>
+              {enviando ? 'Enviando…' : 'Pedir el acceso'}
+            </button>
+          </>
+        )
+      }
     >
       {enviada ? (
-        <div className="space-y-3 py-4">
-          <p className="text-justify text-[13px] leading-relaxed text-ink-900 [text-wrap:pretty]">
-            La solicitud quedó registrada y un socio de {firmName} la verá en su aplicación. Hasta
-            que la autorice, usted no ve nada distinto de lo que veía antes.
+        <div className="cn-ope-cuerpo cn-ope-confirmacion">
+          <p className="cn-ope-texto">
+            La solicitud quedó registrada y un socio de <strong>{firmName}</strong> la verá en su aplicación. Hasta que la autorice,
+            usted no ve nada distinto de lo que veía antes.
           </p>
-          <p className="text-justify text-[12px] leading-snug text-ink-500 [text-wrap:pretty]">
-            Si la niega, el servicio de la firma sigue igual y no hay nada que reintentar. Cada paso
-            —la solicitud, la respuesta y cada pantalla que llegue a abrirse— queda en la auditoría
-            de la firma, donde ella puede leerlo.
+          <p className="cn-ope-texto">
+            Si la niega, el servicio de la firma sigue igual y no hay nada que reintentar. La solicitud, la respuesta y cada pantalla
+            que llegue a abrirse quedan en la auditoría de la firma, donde ella puede leerlo.
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
-          <div>
-            <label
-              htmlFor="alcance-soporte"
-              className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400"
-            >
-              Qué necesita ver
-            </label>
-            <input
-              id="alcance-soporte"
-              value={alcance}
-              onChange={(e) => setAlcance(e.target.value)}
-              placeholder="Un escrito y su ficha del catálogo"
-              className="field mt-1 w-full"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="motivo-soporte"
-              className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400"
-            >
-              Por qué lo necesita
-            </label>
-            <textarea
-              id="motivo-soporte"
-              value={motivo}
-              onChange={(e) => setMotivo(e.target.value)}
-              rows={4}
-              placeholder="La firma reporta que un término aparece sin verificar en un escrito ya generado y no puedo reproducirlo sin ver la ficha que se usó."
-              className="field-area mt-1 w-full resize-none"
-            />
-            <p className="mt-1 text-[11px] text-ink-500">
-              {faltan > 0
-                ? `Faltan ${faltan} caracteres. Lo va a leer un socio antes de decidir.`
-                : 'Suficiente para que se pueda juzgar.'}
-            </p>
-          </div>
-
-          <fieldset>
-            <legend className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
-              Durante cuánto
-            </legend>
-            <div className="mt-1.5 grid gap-2 sm:grid-cols-3">
-              {DURACIONES.map((d) => (
-                <button
-                  key={d.minutos}
-                  type="button"
-                  onClick={() => setDuracion(d.minutos)}
-                  aria-pressed={duracion === d.minutos}
-                  className={`rounded-card border px-3 py-2 text-left ${
-                    duracion === d.minutos
-                      ? 'border-ink-900 bg-canvas'
-                      : 'border-line-200 bg-surface hover:bg-canvas'
-                  }`}
-                >
-                  <span className="block text-[13px] font-semibold text-ink-900">{d.rotulo}</span>
-                  <span className="mt-0.5 block text-[11px] leading-snug text-ink-500">
-                    {d.nota}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </fieldset>
-
-          {error && (
-            <p className="text-justify text-[12px] leading-snug text-danger [text-wrap:pretty]">
-              {error}
-            </p>
-          )}
-
-          <p className="text-justify text-[12px] leading-snug text-ink-500 [text-wrap:pretty]">
-            El acceso será de solo lectura, se cerrará solo al vencer el plazo y la firma podrá
-            cortarlo antes en cualquier momento. Todo lo que abra queda registrado con su nombre y
-            visible para ella.
+        <div className="cn-ope-cuerpo">
+          <span className="cn-ope-chip cn-ope-chip--kicker">Acceso al contenido</span>
+          <p className="cn-ope-texto cn-ope-texto--intro">
+            Operación <strong>no ve escritos ni casos</strong>. Para resolver un reporte hay que pedir acceso con justificación: lo
+            decide un socio de la firma, y <strong>la firma lo ve en su auditoría</strong>.
           </p>
 
-          <button
-            type="button"
-            onClick={enviar}
-            disabled={!listo || enviando}
-            className="btn-primary flex w-full items-center justify-center gap-2 disabled:opacity-50"
-          >
-            <Send className="h-4 w-4" />
-            {enviando ? 'Enviando…' : 'Enviar la solicitud'}
-          </button>
+          <div className="cn-ope-campos">
+            <div>
+              <label htmlFor="ope-alcance" className="cn-ope-etiqueta">
+                Qué necesita ver
+              </label>
+              <input
+                id="ope-alcance"
+                value={alcance}
+                onChange={(e) => setAlcance(e.target.value)}
+                placeholder="Un escrito y su ficha del catálogo"
+                className="cn-ope-campo"
+                autoFocus
+              />
+            </div>
+
+            <div>
+              <label htmlFor="ope-motivo-acceso" className="cn-ope-etiqueta">
+                Por qué
+              </label>
+              <textarea
+                id="ope-motivo-acceso"
+                value={motivo}
+                onChange={(e) => setMotivo(e.target.value)}
+                rows={4}
+                placeholder="La firma reporta que un término aparece sin verificar en un escrito ya generado y no puedo reproducirlo sin ver la ficha que se usó."
+                className="cn-ope-campo cn-ope-area"
+              />
+              <p className={`cn-ope-ayuda ${faltan > 0 ? 'cn-ope-ayuda--aviso' : ''}`}>
+                {faltan > 0 ? `Faltan ${faltan} caracteres. Lo va a leer un socio antes de decidir.` : 'Suficiente para que se pueda juzgar.'}
+              </p>
+            </div>
+
+            <fieldset className="cn-ope-grupo">
+              <legend className="cn-ope-etiqueta">Durante cuánto, si lo autoriza</legend>
+              <div className="cn-ope-opciones">
+                {DURACIONES.map((d) => (
+                  <button
+                    key={d.minutos}
+                    type="button"
+                    onClick={() => setDuracion(d.minutos)}
+                    aria-pressed={duracion === d.minutos}
+                    className={`cn-ope-opcion ${duracion === d.minutos ? 'cn-ope-opcion--elegida' : ''}`}
+                  >
+                    <span className="cn-ope-opcion-titulo">{d.rotulo}</span>
+                    <span className="cn-ope-opcion-nota">{d.nota}</span>
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+
+            <p className="cn-ope-recuadro">
+              Enviarla <strong>no le abre nada</strong>: un socio de la firma decide. Si la autoriza, el acceso se cierra solo al
+              cumplirse el plazo que usted eligió y la firma puede cortarlo antes. Cada pantalla que se abra queda registrada con
+              su correo.
+            </p>
+
+            {error && (
+              <p role="alert" className="cn-ope-error">
+                {error}
+              </p>
+            )}
+          </div>
         </div>
       )}
     </Dialog>

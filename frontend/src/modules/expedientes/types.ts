@@ -216,7 +216,27 @@ export interface ResumenDelCaso {
   documentos: number | null;
 }
 
-export type ExpedienteEnLista = Expediente & ResumenDelCaso;
+/** Una persona del caso vista desde la lista: lo justo para encontrarlo. Espejo de `PersonaEnLista`. */
+export interface PersonaEnLista {
+  nombre: string;
+  /** Tal como se escribió en la ficha del actor. */
+  identificacion: string | null;
+  papel: PapelEnElExpediente;
+  lado: LadoEnElExpediente;
+}
+
+/**
+ * Lo que la lista trae para buscar por cédula, NIT o persona.
+ *
+ * OPCIONAL porque falta en servidores anteriores al campo; `personas: null` es
+ * «no se pudo leer», nunca «el caso no tiene personas».
+ */
+export interface DatosDeBusquedaDelCaso {
+  clienteDocumento?: string | null;
+  personas?: PersonaEnLista[] | null;
+}
+
+export type ExpedienteEnLista = Expediente & ResumenDelCaso & DatosDeBusquedaDelCaso;
 
 /** Ids ya ordenados por el servidor. `estaSemana` ⊂ `activos`; null si la agenda no se leyó. */
 export interface PestanasDeMisCasos {
@@ -231,6 +251,8 @@ export interface MisCasos {
   hoy: string;
   avisoTerminos: string | null;
   avisoDocumentos: string | null;
+  /** Si las personas o los documentos de los clientes no se leyeron, lo que la búsqueda no puede prometer. */
+  avisoBusqueda?: string | null;
 }
 
 /*

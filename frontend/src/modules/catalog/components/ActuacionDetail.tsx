@@ -1,134 +1,117 @@
 import React from 'react';
-import { AlertTriangle, CalendarClock, Gavel, Infinity as InfinityIcon, Link2, Scale } from 'lucide-react';
 import type { Actuacion, RequiredSection } from '../types';
 import { branchLabel } from '../branchLabels';
 
 /**
- * La ficha de la actuación: los tres datos y las secciones. Artboard 1i.
+ * La ficha de la actuación: los tres datos y las secciones.
  *
- * ─── TRES BLOQUES IGUALES, CADA UNO CON SU PROPIO ESTADO ────────────────────
+ * Vestida con la cara nueva desde `app-buscador-catalogo.html` (la anatomía de
+ * la ficha de providencia, artboard 2: rótulo, prosa, datos en rejilla). Vive
+ * dentro de la ficha del escritorio y de la pantalla de detalle del teléfono.
  *
- * Término, norma y autoridad definen la actuación, y el artboard insiste en que
- * cada uno lleve su estado por separado: **una ficha puede estar verificada en
- * el término y coja en la autoridad, y eso tiene que verse**. Un único sello de
- * «verificada» arriba escondería justo la mitad que falta — y la autoridad es
- * la que manda al abogado a radicar ante quien no es.
+ * ─── TRES BLOQUES, CADA UNO CON SU PROPIO ESTADO ────────────────────────────
+ *
+ * Término, norma y autoridad definen la actuación: **una ficha puede estar
+ * verificada en el término y coja en la autoridad, y eso tiene que verse**. Un
+ * único sello arriba escondería justo la mitad que falta — y la autoridad es la
+ * que manda al abogado a radicar ante quien no es. El término va a lo ancho
+ * porque es prosa larga; norma y autoridad, lado a lado.
+ *
+ * ─── «TÉRMINO VERIFICADO» NO ES «NORMA VERIFICADA» ──────────────────────────
+ *
+ * El bloque de la norma decía «Verificada contra su texto oficial» con solo
+ * traer una URL. Lo que el catálogo verifica es el TÉRMINO, leído en esa
+ * fuente; el artículo se publica como lo trae la ficha. Afirmar que la norma
+ * está verificada porque existe un enlace es exactamente la confusión que la
+ * doctrina de verificación prohíbe. Hoy dice «Con fuente» y qué significa.
  *
  * ─── LAS SECCIONES EXISTÍAN Y NADIE LAS VEÍA ────────────────────────────────
  *
- * Las 794 fichas del catálogo traen sus secciones obligatorias —4.685 en total,
- * 333 sin artículo confirmado— y la pantalla de curaduría no mostraba ninguna.
- * El motor SÍ las usa: son las que exige el escrito al redactarlo. Un requisito
- * que la aplicación impone y el abogado no puede leer es un requisito que no
- * puede discutir, y las 333 sin artículo son precisamente las que convendría
- * discutir.
+ * Las fichas traen sus secciones obligatorias y el motor las exige al redactar.
+ * Un requisito que la aplicación impone y el abogado no puede leer es un
+ * requisito que no puede discutir.
  *
- * ─── LO QUE EL ARTBOARD PIDE Y AQUÍ NO ESTÁ, con la razón ───────────────────
+ * ─── LO QUE NO ESTÁ, con la razón ───────────────────────────────────────────
  *
- * · **Verificar una sección concreta** («Verificar sección 04», con su casilla
- *   y su «No aplica»). `catalog_verifications` guarda UNA fila por firma y
- *   actuación —esa es su llave primaria— y no tiene columnas por sección. El
- *   panel se podría pintar hoy y no habría dónde guardar el resultado: el
- *   curador leería el artículo, marcaría la casilla, y al recargar seguiría sin
- *   verificar. Peor que no ofrecerlo. Exige columnas nuevas, no un componente.
- * · **Historia de curaduría** con varias entradas y sus horas. Por la misma
- *   llave primaria solo sobrevive la ÚLTIMA curación: no hay historia que
- *   listar, solo un estado actual. Se muestra ese, con su nombre y su fecha.
- * · **«Usada en 11 escritos de la firma»** y **«Actuación 214 de 651»**. Lo
- *   primero exige contar borradores por actuación, que hoy no se relaciona; lo
- *   segundo, un índice estable dentro del filtro activo. Ninguno cambia lo que
- *   el abogado puede verificar, así que no se inventan.
- * · **«Texto oficial recuperado»** de la norma. Existe recuperación oficial
- *   para JURISPRUDENCIA, no para normas: traer el artículo de una ley exige otro
- *   verificador. El enlace a la fuente sí está, que es lo comprobable hoy.
+ * · Verificar una sección concreta: `catalog_verifications` guarda UNA fila
+ *   por firma y actuación, sin columnas por sección. El curador marcaría la
+ *   casilla y al recargar seguiría sin verificar. Peor que no ofrecerlo.
+ * · Historia de curaduría: por la misma llave solo sobrevive la última.
+ * · «Usada en N escritos»: los borradores no se relacionan con la actuación.
  */
 
-const SIN_ARTICULO = 'sin artículo confirmado';
+type TonoDelBloque = 'ok' | 'sin' | 'neutro';
 
-interface BloqueProps {
-  icono: React.ReactNode;
-  rotulo: string;
-  valor: string | null;
-  detalle?: string | null;
-  /** El estado de ESTE dato, no el de la ficha. */
-  estado: { texto: string; clase: string };
+interface Estado {
+  texto: string;
+  tono: TonoDelBloque;
 }
 
-const Bloque: React.FC<BloqueProps> = ({ icono, rotulo, valor, detalle, estado }) => (
-  <div className="rounded-card border border-line-200 bg-surface px-3 py-2.5">
-    <div className="flex items-center justify-between gap-2">
-      <span className="flex items-center gap-1.5 font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
-        {icono}
-        {rotulo}
-      </span>
-      <span
-        className={`shrink-0 rounded-full border px-1.5 py-0.5 text-[9px] font-bold ${estado.clase}`}
-      >
-        {estado.texto}
-      </span>
-    </div>
-    <p className="mt-1.5 text-justify text-[12px] font-semibold leading-snug text-ink-900 [text-wrap:pretty]">
-      {valor ?? <span className="font-normal text-ink-500">No declarada en la ficha</span>}
-    </p>
-    {detalle && (
-      <p className="mt-0.5 text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
-        {detalle}
-      </p>
-    )}
-  </div>
-);
-
-const VERDE = 'bg-[rgb(var(--verified-surf))] text-verified border-[rgb(var(--verified-line))]';
-const AMBAR =
-  'border-dashed bg-[rgb(var(--unverified-surf))] text-unverified border-[rgb(var(--unverified-line))]';
-const NEUTRO = 'bg-canvas text-ink-500 border-line-200';
-
-const estadoDelTermino = (a: Actuacion) => {
-  if (a.term.status === 'VERIFICADO') return { texto: 'VERIFICADO', clase: VERDE };
-  if (a.term.status === 'NO_CADUCA') return { texto: 'NO CADUCA', clase: NEUTRO };
-  return { texto: 'SIN VERIFICAR', clase: AMBAR };
+const estadoDelTermino = (a: Actuacion): Estado => {
+  if (a.term.status === 'VERIFICADO') return { texto: 'Término verificado', tono: 'ok' };
+  if (a.term.status === 'NO_CADUCA') return { texto: 'No caduca', tono: 'neutro' };
+  return { texto: 'Sin verificar', tono: 'sin' };
 };
 
 /*
- * La norma se da por comprobada cuando la ficha trae su fuente. Sin URL el
- * artículo puede estar bien y no hay cómo saberlo: es «sin comprobar», que no
- * es lo mismo que estar mal, y por eso no va en rojo.
+ * Con fuente es neutro, no verde: la URL dice dónde se leyó el término, no que
+ * alguien comprobara el artículo. Sin fuente es «sin comprobar», que no es
+ * estar mal, y por eso no va en rojo.
  */
-const estadoDeLaNorma = (a: Actuacion) =>
-  a.sourceUrl ? { texto: 'CON FUENTE', clase: VERDE } : { texto: 'SIN FUENTE', clase: AMBAR };
+const estadoDeLaNorma = (a: Actuacion): Estado =>
+  a.sourceUrl ? { texto: 'Con fuente', tono: 'neutro' } : { texto: 'Sin fuente', tono: 'sin' };
 
-const estadoDeLaAutoridad = (a: Actuacion) =>
-  a.competentAuthority ? { texto: 'DECLARADA', clase: VERDE } : { texto: 'SIN DECLARAR', clase: AMBAR };
+const estadoDeLaAutoridad = (a: Actuacion): Estado =>
+  a.competentAuthority ? { texto: 'Declarada', tono: 'neutro' } : { texto: 'Sin declarar', tono: 'sin' };
+
+const Sello: React.FC<{ estado: Estado }> = ({ estado }) => (
+  <span className={`cn-cat-sello cn-cat-sello--${estado.tono}`}>
+    {estado.tono === 'ok' && <span className="cn-cat-punto" aria-hidden="true" />}
+    {estado.texto}
+  </span>
+);
+
+interface BloqueProps {
+  rotulo: string;
+  valor: string | null;
+  detalle?: string | null;
+  estado: Estado;
+  ancho?: boolean;
+  cita?: boolean;
+}
+
+const Bloque: React.FC<BloqueProps> = ({ rotulo, valor, detalle, estado, ancho, cita }) => (
+  <div className={`cn-cat-bloque${ancho ? ' cn-cat-bloque--ancho' : ''}`}>
+    <div className="cn-cat-bloque-cabeza">
+      <h3 className="cn-cat-rotulo">{rotulo}</h3>
+      <Sello estado={estado} />
+    </div>
+    {valor ? (
+      <p className={cita ? 'cn-cat-bloque-cita' : 'cn-cat-prosa'}>{valor}</p>
+    ) : (
+      <p className="cn-cat-nota">No declarada en la ficha</p>
+    )}
+    {detalle && <p className="cn-cat-nota">{detalle}</p>}
+  </div>
+);
 
 const Seccion: React.FC<{ seccion: RequiredSection }> = ({ seccion }) => {
-  const confirmada = Boolean(seccion.basis);
+  const conArticulo = Boolean(seccion.basis);
   return (
-    <li className="flex gap-2.5 px-3 py-2">
-      <span className="shrink-0 pt-0.5 font-mono text-[10px] tabular-nums text-ink-400">
-        {String(seccion.n).padStart(2, '0')}
-      </span>
+    <li className="cn-cat-seccion">
+      <span className="cn-cat-seccion-numero">{String(seccion.n).padStart(2, '0')}</span>
       <div className="min-w-0 flex-1">
-        <p className="text-[12px] leading-snug text-ink-900">
+        <p className="cn-cat-seccion-nombre">
           {seccion.name}
-          {!seccion.mandatory && (
-            <span className="ml-1.5 text-[10px] font-medium text-ink-400">opcional</span>
-          )}
+          {!seccion.mandatory && <span className="cn-cat-nota"> · opcional</span>}
         </p>
-        <p
-          className={`mt-0.5 text-[10.5px] leading-snug ${
-            confirmada ? 'text-ink-500' : 'text-unverified'
-          }`}
-        >
-          {seccion.basis ?? SIN_ARTICULO}
-        </p>
+        {conArticulo ? (
+          <p className="cn-cat-seccion-cita">{seccion.basis}</p>
+        ) : (
+          <p className="cn-cat-tono--sin">sin artículo confirmado</p>
+        )}
       </div>
-      <span
-        className={`h-fit shrink-0 rounded-full border px-1.5 py-0.5 text-[9px] font-bold ${
-          confirmada ? VERDE : AMBAR
-        }`}
-      >
-        {confirmada ? 'CON ARTÍCULO' : 'SIN ARTÍCULO'}
-      </span>
+      <Sello estado={conArticulo ? { texto: 'Con artículo', tono: 'neutro' } : { texto: 'Sin artículo', tono: 'sin' }} />
     </li>
   );
 };
@@ -143,81 +126,66 @@ export const ActuacionDetail: React.FC<ActuacionDetailProps> = ({ actuacion }) =
   const sinArticulo = secciones.length - conArticulo;
 
   return (
-    <div className="space-y-3">
+    <div className="cn-cat-detalle">
       {/*
-        EL SOBRE VA PRIMERO, ANTES DE LOS TRES DATOS. Quien abre esta ficha
-        desde una rama que la alcanza por remisión tiene que saberlo ANTES de
-        leer el término: el bloque de «Término» dirá «sin verificar», y sin esta
-        línea eso se leería como un hueco del catálogo en su rama y no como lo
-        que es — un plazo verificado en otra rama que nadie comprobó para esta.
+        EL SOBRE VA PRIMERO. Quien abre una ficha que llega por remisión tiene
+        que saberlo ANTES de leer «sin verificar» en el término, o lo leería
+        como un hueco del catálogo en su rama.
       */}
       {actuacion.porRemision && (
-        <p className="flex items-start gap-1.5 rounded-card border border-line-200 bg-canvas px-3 py-2 text-[11px] leading-snug text-ink-500">
-          <Link2 className="mt-0.5 h-3 w-3 shrink-0" />
-          <span className="text-justify [text-wrap:pretty]">
-            Esta ficha es de {branchLabel(actuacion.porRemision.ramaFuente)} y llega a{' '}
-            {branchLabel(actuacion.porRemision.paraRama)} por remisión (
-            {actuacion.porRemision.base}). {actuacion.porRemision.aviso}
-            {actuacion.porRemision.alcance ? ` ${actuacion.porRemision.alcance}` : ''}
-          </span>
+        <p className="cn-cat-sobre">
+          Esta ficha es de {branchLabel(actuacion.porRemision.ramaFuente)} y llega a{' '}
+          {branchLabel(actuacion.porRemision.paraRama)} por remisión ({actuacion.porRemision.base}).{' '}
+          {actuacion.porRemision.aviso}
+          {actuacion.porRemision.alcance ? ` ${actuacion.porRemision.alcance}` : ''}
         </p>
       )}
 
-      <div className="grid gap-2">
+      <div className="cn-cat-bloques">
         <Bloque
-          icono={<CalendarClock className="h-3 w-3" />}
+          ancho
           rotulo="Término"
           valor={
             actuacion.term.description ??
-            (actuacion.term.status === 'NO_CADUCA'
-              ? 'No caduca'
-              : 'Nadie ha comprobado el plazo')
+            (actuacion.term.status === 'NO_CADUCA' ? 'No caduca' : 'Nadie ha comprobado el plazo')
           }
           estado={estadoDelTermino(actuacion)}
         />
         <Bloque
-          icono={<Scale className="h-3 w-3" />}
+          cita
           rotulo="Norma"
-          valor={actuacion.legalBasis}
-          detalle={actuacion.sourceUrl ? 'Verificada contra su texto oficial' : null}
+          valor={actuacion.legalBasis || null}
+          detalle={
+            actuacion.sourceUrl
+              ? 'La fuente es donde se leyó el término; el artículo se muestra como lo trae la ficha.'
+              : null
+          }
           estado={estadoDeLaNorma(actuacion)}
         />
-        <Bloque
-          icono={<Gavel className="h-3 w-3" />}
-          rotulo="Autoridad competente"
-          valor={actuacion.competentAuthority}
-          estado={estadoDeLaAutoridad(actuacion)}
-        />
+        <Bloque rotulo="Autoridad competente" valor={actuacion.competentAuthority} estado={estadoDeLaAutoridad(actuacion)} />
       </div>
 
       {actuacion.sourceUrl && (
-        <a
-          href={actuacion.sourceUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block text-[11px] font-semibold text-brand-700 underline underline-offset-2"
-        >
+        <a href={actuacion.sourceUrl} target="_blank" rel="noopener noreferrer" className="cn-cat-enlace">
           Ver el texto oficial de la norma
         </a>
       )}
 
-      <section className="rounded-card border border-line-200 bg-surface">
-        <header className="border-b border-line-200 px-3 py-2">
-          <h3 className="text-[12px] font-semibold text-ink-900">
+      <section className="cn-cat-secciones" aria-labelledby={`secciones-${actuacion.id}`}>
+        <header className="cn-cat-secciones-cabeza">
+          <h3 id={`secciones-${actuacion.id}`} className="cn-cat-rotulo">
             Secciones obligatorias del escrito
           </h3>
-          <p className="mt-0.5 text-[10.5px] text-ink-500">
+          <p className="cn-cat-nota">
             {conArticulo} con artículo
             {sinArticulo > 0 && ` · ${sinArticulo} sin artículo confirmado`}
           </p>
         </header>
 
         {secciones.length === 0 ? (
-          <p className="px-3 py-6 text-center text-[11.5px] text-ink-500">
-            Esta ficha no declara secciones.
-          </p>
+          <p className="cn-cat-nota">Esta ficha no declara secciones.</p>
         ) : (
-          <ul className="divide-y divide-line-100">
+          <ul className="cn-cat-lista-secciones">
             {secciones.map((s) => (
               <Seccion key={s.n} seccion={s} />
             ))}
@@ -225,50 +193,47 @@ export const ActuacionDetail: React.FC<ActuacionDetailProps> = ({ actuacion }) =
         )}
 
         {sinArticulo > 0 && (
-          <p className="border-t border-line-200 px-3 py-2 text-justify text-[10.5px] leading-snug text-ink-500 [text-wrap:pretty]">
-            Una sección sin artículo confirmado se le sigue exigiendo al escrito: lo que falta es la
-            cita que la sostiene, no el requisito. Confirmarla una por una todavía no se puede
-            guardar —la curaduría se registra por actuación, no por sección—, así que se muestra en
-            vez de ofrecerse un botón que no dejaría rastro.
+          <p className="cn-cat-nota cn-cat-justificado">
+            Una sección sin artículo confirmado se le sigue exigiendo al escrito: lo que falta es la cita que la sostiene,
+            no el requisito. Confirmarla una por una todavía no se puede guardar —la curaduría se registra por actuación,
+            no por sección—, así que se muestra en vez de ofrecerse un botón que no dejaría rastro.
           </p>
         )}
       </section>
 
       {actuacion.verification && (
-        <section className="rounded-card border border-line-200 bg-canvas px-3 py-2.5">
-          <h3 className="text-[12px] font-semibold text-ink-900">Curaduría de su firma</h3>
-          <p className="mt-1 text-justify text-[11px] leading-snug text-ink-700 [text-wrap:pretty]">
-            {actuacion.verification.verifiedBy} ·{' '}
-            {new Date(actuacion.verification.verifiedAt).toLocaleString('es-CO', {
-              day: 'numeric',
-              month: 'short',
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
-            })}
-          </p>
-          {actuacion.verification.note && (
-            <p className="mt-1 text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
-              {actuacion.verification.note}
-            </p>
-          )}
-          <p className="mt-1.5 flex items-start gap-1.5 text-[10.5px] leading-snug text-ink-400">
-            <AlertTriangle className="mt-0.5 h-3 w-3 shrink-0" />
-            <span className="text-justify [text-wrap:pretty]">
-              Se conserva la última curación, no el historial: el catálogo guarda una fila por
-              actuación y firma, así que una curación reemplaza a la anterior.
-            </span>
+        <section className="cn-cat-curaduria">
+          <h3 className="cn-cat-rotulo">Curaduría de su firma</h3>
+          <dl className="cn-cat-datos">
+            <div>
+              <dt>Verificó</dt>
+              <dd>{actuacion.verification.verifiedBy}</dd>
+            </div>
+            <div>
+              <dt>Fecha</dt>
+              <dd>
+                {new Date(actuacion.verification.verifiedAt).toLocaleString('es-CO', {
+                  day: 'numeric',
+                  month: 'short',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </dd>
+            </div>
+          </dl>
+          {actuacion.verification.note && <p className="cn-cat-prosa">{actuacion.verification.note}</p>}
+          <p className="cn-cat-nota">
+            Se conserva la última curación, no el historial: el catálogo guarda una fila por actuación y firma, así que una
+            curación reemplaza a la anterior.
           </p>
         </section>
       )}
 
       {!actuacion.verification && actuacion.term.status === 'NO_VERIFICADO' && (
-        <p className="flex items-start gap-1.5 rounded-card border border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))] px-3 py-2 text-[11px] leading-snug text-unverified">
-          <InfinityIcon className="mt-0.5 h-3 w-3 shrink-0 rotate-90" />
-          <span className="text-justify [text-wrap:pretty]">
-            Nadie de su firma ha comprobado esta ficha. Mientras siga así, los escritos advierten en
-            vez de afirmar un plazo — que es lo correcto, no un defecto.
-          </span>
+        <p className="cn-cat-nota cn-cat-justificado">
+          Nadie de su firma ha comprobado esta ficha. Mientras siga así, los escritos advierten en vez de afirmar un plazo
+          — que es lo correcto, no un defecto.
         </p>
       )}
     </div>

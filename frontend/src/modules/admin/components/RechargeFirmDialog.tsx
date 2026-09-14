@@ -1,130 +1,111 @@
 import React from 'react';
 import { Dialog } from '../../../design/Dialog';
 import type { FirmSummary } from '../admin.api';
+import { faltaParaElMotivo, pesos } from '../consolaEnPantalla';
 
 /**
- * Recargar el saldo de una firma desde la consola del operador.
+ * Recargar —o descontar— el saldo de una firma desde la consola.
+ * Cara nueva: `public/handoff/app-consola-de-operacion.html`, artboard 4
+ * (primer diálogo: «Recargar saldo de la firma», «Queda en la auditoría de la
+ * firma», firma y saldo actual, Monto, Motivo con «Escriba el motivo para
+ * habilitar el botón.», pie con Cancelar y Recargar).
  *
  * ─── POR QUÉ EXISTE ─────────────────────────────────────────────────────────
  *
- * Era un `window.prompt` del navegador: una caja gris con «iureon-app.vercel.app
- * dice» arriba, fuera del sistema de diseño, sin decir de qué firma ni qué saldo
- * tiene. El usuario lo vio y no le gustó, con razón.
+ * Era un `window.prompt` que solo pedía el monto, mientras el servidor EXIGE
+ * motivo (`requireReason`): la recarga fallaba siempre. Este diálogo pide las
+ * dos cosas que el servidor pide, y el motivo va a la auditoría de la firma.
  *
- * ─── Y LO QUE EL PROMPT ESCONDÍA ────────────────────────────────────────────
+ * ─── LO QUE EL ARTBOARD NO TRAE Y SE CONSERVA (derivado) ────────────────────
  *
- * El servidor EXIGE un motivo —`requireReason` rechaza la recarga sin él, antes
- * de tocar dinero— y el prompt solo pedía el monto. La recarga desde la consola
- * fallaba siempre, y el mensaje de error era el del servidor. Este diálogo pide
- * las dos cosas que el servidor pide: cuánto y por qué. El motivo va a la
- * auditoría de la firma con el correo del operador; es la única traza de por
- * qué se movió un saldo que es pasivo de la plataforma.
+ * «Descontar». Una compensación dada por error tenía que revertirse a mano en
+ * la base; el servidor ya acepta montos negativos con el mismo motivo y la
+ * misma auditoría, y no deja el saldo bajo cero. Aquí se dice antes de intentarlo.
  *
- * ─── EL MÍNIMO ES UNA SUGERENCIA, NO UNA REGLA ──────────────────────────────
+ * ─── SIN MÍNIMO ESCRITO A MANO ─────────────────────────────────────────────
  *
- * $100.000 es el mínimo de recarga para la firma que paga por pasarela. Aquí
- * viene prellenado como empujón, pero se puede bajar: compensar un borrador
- * fallido de $2.000 no debe obligar al operador a regalar $98.000.
+ * El campo venía prellenado con el mínimo de compra por pasarela, escrito como
+ * cifra en este archivo. Ese mínimo no ata al operador —compensar un borrador
+ * fallido no obliga a regalar el resto— y una cifra copiada aquí se quedaría
+ * vieja el día que el servidor cambie la suya. El campo arranca vacío.
  */
 
 interface RechargeFirmDialogProps {
   firm: FirmSummary | null;
   ocupado: boolean;
+  /** Lo que respondió el servidor al rechazar; se muestra entero. */
+  errorDelServidor?: string;
   onCerrar: () => void;
   onConfirmar: (firm: FirmSummary, monto: number, motivo: string) => Promise<void>;
 }
 
-const MONTO_SUGERIDO = 100000;
-/** El mismo minimo que `requireReason` en el servidor: al menos diez caracteres. */
-const MIN_MOTIVO = 10;
-
-const pesos = (n: number): string => `$${n.toLocaleString('es-CO')}`;
-
-export const RechargeFirmDialog: React.FC<RechargeFirmDialogProps> = ({
-  firm,
-  ocupado,
-  onCerrar,
-  onConfirmar
-}) => {
-  const [montoTexto, setMontoTexto] = React.useState(String(MONTO_SUGERIDO));
+export const RechargeFirmDialog: React.FC<RechargeFirmDialogProps> = ({ firm, ocupado, errorDelServidor = '', onCerrar, onConfirmar }) => {
+  const [montoTexto, setMontoTexto] = React.useState('');
   const [motivo, setMotivo] = React.useState('');
-  const [error, setError] = React.useState('');
-  /*
-   * ACREDITAR O DESCONTAR, POR LA MISMA PUERTA. El descuento existe porque una
-   * compensacion dada por error —dos toques de prueba y $200.000 que nadie
-   * pago— tenia que revertirse a mano en la base. El servidor no deja el saldo
-   * bajo cero; aqui se dice antes de intentarlo.
-   */
   const [modo, setModo] = React.useState<'acreditar' | 'descontar'>('acreditar');
 
   // Cada firma arranca limpia: el motivo de la anterior no es el de esta.
   React.useEffect(() => {
     if (!firm) return;
-    setMontoTexto(String(MONTO_SUGERIDO));
+    setMontoTexto('');
     setMotivo('');
-    setError('');
     setModo('acreditar');
   }, [firm?.id]);
 
   const monto = Number(montoTexto.replace(/[^\d]/g, ''));
-  const motivoLimpio = motivo.trim();
+  const faltan = faltaParaElMotivo(motivo);
   const excedeSaldo = modo === 'descontar' && firm !== null && monto > firm.creditsBalance;
-  const listo = monto > 0 && motivoLimpio.length >= MIN_MOTIVO && !ocupado && !excedeSaldo;
+  const listo = monto > 0 && faltan === 0 && !ocupado && !excedeSaldo;
+  const verbo = modo === 'descontar' ? 'Descontar' : 'Recargar';
 
-  const confirmar = async () => {
-    if (!firm) return;
-    if (!monto) {
-      setError('El monto debe ser un número mayor que cero.');
-      return;
-    }
-    if (motivoLimpio.length < MIN_MOTIVO) {
-      setError('Escriba el motivo, al menos diez caracteres: queda en la auditoría de la firma y lo leerán sus socios.');
-      return;
-    }
-    if (excedeSaldo) {
-      setError(`La firma tiene ${pesos(firm.creditsBalance)}: no se puede descontar más que eso.`);
-      return;
-    }
-    setError('');
-    await onConfirmar(firm, modo === 'descontar' ? -monto : monto, motivoLimpio);
-  };
+  /*
+   * POR QUÉ EL BOTÓN ESTÁ APAGADO, escrito: un botón gris sin razón se lee como
+   * un defecto del producto, no como un requisito.
+   */
+  const porQueNo = !monto
+    ? 'Escriba el monto en pesos.'
+    : excedeSaldo && firm
+      ? `La firma tiene ${pesos(firm.creditsBalance)}: se puede descontar hasta esa cifra, que deja el saldo en cero.`
+      : motivo.trim().length === 0
+        ? 'Escriba el motivo para habilitar el botón.'
+        : faltan > 0
+          ? `Al motivo le faltan ${faltan} ${faltan === 1 ? 'carácter' : 'caracteres'}: lo leerán los socios de la firma.`
+          : null;
 
   return (
     <Dialog
       abierto={firm !== null}
       onCerrar={ocupado ? () => undefined : onCerrar}
-      tamano="S"
-      titulo={modo === 'descontar' ? 'Descontar saldo' : 'Recargar saldo'}
-      subtitulo={firm ? `${firm.name} · saldo actual ${pesos(firm.creditsBalance)}` : undefined}
-      hayCambiosSinGuardar={motivoLimpio.length > 0 || ocupado}
-      onIntentoDeCerrarConCambios={() => undefined}
-      pieIzquierda={
-        <span className="font-mono text-[11px] text-ink-400">Queda en la auditoría de la firma</span>
+      tamano="M"
+      titulo={modo === 'descontar' ? 'Descontar saldo de la firma' : 'Recargar saldo de la firma'}
+      subtitulo={
+        firm ? (
+          <>
+            {firm.name} · saldo actual <span className="cn-ope-mono">{pesos(firm.creditsBalance)}</span>
+          </>
+        ) : undefined
       }
+      hayCambiosSinGuardar={motivo.trim().length > 0 || ocupado}
+      onIntentoDeCerrarConCambios={() => undefined}
+      pieIzquierda={<span>Queda en la auditoría de la firma</span>}
       acciones={
         <>
-          <button type="button" onClick={onCerrar} className="btn-neutral btn-sm" disabled={ocupado}>
+          <button type="button" onClick={onCerrar} className="cn-ope-boton cn-ope-boton--terciario" disabled={ocupado}>
             Cancelar
           </button>
           <button
             type="button"
-            onClick={() => void confirmar()}
+            onClick={() => firm && void onConfirmar(firm, modo === 'descontar' ? -monto : monto, motivo.replace(/\s+/g, ' ').trim())}
             disabled={!listo}
-            className="btn-primary btn-sm disabled:opacity-50"
+            className="cn-ope-boton cn-ope-boton--primario"
           >
-            {ocupado
-              ? 'Aplicando…'
-              : monto > 0
-                ? `${modo === 'descontar' ? 'Descontar' : 'Recargar'} ${pesos(monto)}`
-                : modo === 'descontar'
-                  ? 'Descontar'
-                  : 'Recargar'}
+            {ocupado ? 'Aplicando…' : monto > 0 ? `${verbo} ${pesos(monto)}` : verbo}
           </button>
         </>
       }
     >
-      <div className="space-y-4">
-        <div className="flex gap-1.5" role="radiogroup" aria-label="Sentido del ajuste">
+      <div className="cn-ope-cuerpo cn-ope-campos">
+        <div className="cn-ope-opciones" role="radiogroup" aria-label="Sentido del ajuste">
           {(['acreditar', 'descontar'] as const).map((m) => (
             <button
               key={m}
@@ -132,83 +113,56 @@ export const RechargeFirmDialog: React.FC<RechargeFirmDialogProps> = ({
               role="radio"
               aria-checked={modo === m}
               onClick={() => setModo(m)}
-              className={`rounded-control border px-3 py-1.5 text-[12.5px] font-medium ${
-                modo === m
-                  ? 'border-brand-700 bg-brand-50 text-brand-700'
-                  : 'border-line-200 bg-canvas text-ink-700 hover:border-brand-700'
-              }`}
+              className={`cn-ope-opcion ${modo === m ? 'cn-ope-opcion--elegida' : ''}`}
             >
-              {m === 'acreditar' ? 'Acreditar' : 'Descontar'}
+              <span className="cn-ope-opcion-titulo">{m === 'acreditar' ? 'Acreditar' : 'Descontar'}</span>
+              <span className="cn-ope-opcion-nota">
+                {m === 'acreditar' ? 'Suma al saldo de la firma' : 'Revierte un abono dado por error'}
+              </span>
             </button>
           ))}
         </div>
 
         <div>
-          <label
-            htmlFor="monto-recarga"
-            className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400"
-          >
-            Monto en pesos
+          <label htmlFor="ope-monto" className="cn-ope-etiqueta">
+            Monto
           </label>
           <input
-            id="monto-recarga"
+            id="ope-monto"
             inputMode="numeric"
             value={montoTexto}
             onChange={(e) => setMontoTexto(e.target.value)}
-            onFocus={(e) => e.currentTarget.select()}
-            className="field mt-1 w-full font-mono"
+            placeholder="20.000"
+            className="cn-ope-campo cn-ope-campo--cifra"
             autoFocus
           />
-          <p className="mt-1 text-[11px] leading-snug text-ink-500">
+          <p className="cn-ope-ayuda">
             {modo === 'descontar'
-              ? `Se descuenta del saldo actual (${firm ? pesos(firm.creditsBalance) : '—'}); nunca puede quedar negativo.`
-              : `${pesos(MONTO_SUGERIDO)} es el mínimo que paga una firma por pasarela. Aquí puede ser menor: compensar un borrador fallido no obliga a regalar el resto.`}
+              ? 'Se descuenta del saldo actual; nunca puede quedar negativo.'
+              : 'No está atado al mínimo de compra por pasarela: compensar un borrador fallido no obliga a regalar el resto.'}
           </p>
         </div>
 
         <div>
-          <label
-            htmlFor="motivo-recarga"
-            className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400"
-          >
+          <label htmlFor="ope-motivo-recarga" className="cn-ope-etiqueta">
             Motivo
           </label>
           <textarea
-            id="motivo-recarga"
+            id="ope-motivo-recarga"
             value={motivo}
             onChange={(e) => setMotivo(e.target.value)}
-            rows={2}
-            placeholder={
-              modo === 'descontar'
-                ? 'Reversión de la recarga de prueba del 1 de septiembre'
-                : 'Compensación por borrador fallido del 28 de agosto'
-            }
-            className="field mt-1 w-full resize-none"
+            rows={3}
+            placeholder={modo === 'descontar' ? 'Reversión de una recarga de prueba' : 'Pago rechazado dos veces; acordado con el socio por teléfono'}
+            className="cn-ope-campo cn-ope-area"
           />
+          {porQueNo && <p className="cn-ope-ayuda cn-ope-ayuda--aviso">{porQueNo}</p>}
         </div>
 
-        {/*
-          POR QUE EL BOTON ESTA APAGADO, escrito, y no un boton gris mudo. El
-          usuario quiso descontar $100.000 sobre $100.000 —permitido: cero no
-          es negativo— con el motivo «Error», y el boton no se encendia sin
-          decir que faltaban cinco caracteres. Un boton deshabilitado sin razon
-          se lee como un defecto del producto, no como un requisito.
-        */}
-        {!error && monto > 0 && motivoLimpio.length > 0 && motivoLimpio.length < MIN_MOTIVO && (
-          <p className="text-[12px] leading-snug text-ink-500">
-            Al motivo le faltan {MIN_MOTIVO - motivoLimpio.length} caracteres: el mínimo es {MIN_MOTIVO}, porque
-            lo leerán los socios de la firma.
+        {errorDelServidor && (
+          <p role="alert" className="cn-ope-error">
+            {errorDelServidor}
           </p>
         )}
-        {!error && monto > 0 && motivoLimpio.length === 0 && (
-          <p className="text-[12px] leading-snug text-ink-500">Escriba el motivo para habilitar el botón.</p>
-        )}
-        {!error && excedeSaldo && firm && (
-          <p className="text-[12px] leading-snug text-ink-500">
-            La firma tiene {pesos(firm.creditsBalance)}: se puede descontar hasta esa cifra, que deja el saldo en cero.
-          </p>
-        )}
-        {error && <p className="text-[12px] leading-snug text-danger">{error}</p>}
       </div>
     </Dialog>
   );

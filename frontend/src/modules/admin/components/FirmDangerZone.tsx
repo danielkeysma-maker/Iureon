@@ -1,31 +1,28 @@
 import React from 'react';
-import { AlertTriangle, Trash2 } from 'lucide-react';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 import { adminApi, type FirmDetail } from '../admin.api';
+import { cifra, faltaParaElMotivo } from '../consolaEnPantalla';
 
 /**
  * La zona de riesgo de la ficha: eliminar la firma con todo lo suyo.
+ * Cara nueva: `public/handoff/app-consola-de-operacion.html`, artboard 4
+ * (segundo diálogo: «Zona de riesgo», «Eliminar esta firma y sus datos», «Cite
+ * la autorización de la firma», «Para confirmar, escriba …», «Todavía no
+ * coincide.» y el botón inhabilitado hasta que las dos cosas estén).
  *
  * ES LA ÚNICA ACCIÓN DE LA CONSOLA QUE NO SE DESHACE, y la pantalla lo trata
- * así: va al final de la ficha, separada, en rojo, y su diálogo exige dos
- * cosas que un clic distraído no produce —el motivo, citando quién autorizó
- * el borrado y cuándo, y el nombre exacto de la firma tecleado a mano—. El
- * botón de confirmar no responde hasta que las dos estén.
+ * así: al final de la ficha, aparte, con el rojo de peligro, y su diálogo exige
+ * dos cosas que un clic distraído no produce —el motivo citando quién autorizó
+ * y cuándo, y el nombre exacto de la firma tecleado—.
  *
- * LO QUE SE VA: escritos, revisiones, transcripciones, clientes, pagos,
- * cuentas y saldo. Lo que NO se va es el registro de que ese correo ya usó su
- * prueba gratuita: si borrar la firma lo borrara, pedir el borrado sería la
- * forma de estrenar otra prueba.
- *
- * QUEDA EN LA AUDITORÍA DEL OPERADOR, no en la de la firma: la de la firma se
- * fue con ella. El servidor rechaza la firma del propio operador por diseño.
+ * LO QUE NO SE VA es el registro de que ese correo ya usó su prueba gratuita:
+ * si borrar la firma lo borrara, pedir el borrado sería la forma de estrenar
+ * otra prueba. QUEDA EN LA AUDITORÍA DEL OPERADOR, porque la de la firma se va
+ * con ella; el servidor rechaza la firma del propio operador por diseño.
  */
-
-const MIN_MOTIVO = 10;
 
 interface FirmDangerZoneProps {
   firma: FirmDetail;
-  /** Tras el borrado: cerrar la ficha, recargar la lista, mostrar las advertencias. */
   onEliminada: (resultado: { nombre: string; usuariosEliminados: number; advertencias: string[] }) => void;
 }
 
@@ -34,14 +31,10 @@ export const FirmDangerZone: React.FC<FirmDangerZoneProps> = ({ firma, onElimina
   const [motivo, setMotivo] = React.useState('');
   const [nombreEscrito, setNombreEscrito] = React.useState('');
   const [error, setError] = React.useState<string | null>(null);
-  /*
-   * `ConfirmarDialog` cierra al terminar `onConfirmar` sin distinguir éxito
-   * de fallo. Si el servidor rechaza, el diálogo debe quedarse abierto con el
-   * motivo a la vista: esta bandera le pide al cierre que no cierre, una vez.
-   */
+  /* Si el servidor rechaza, el diálogo se queda abierto con la razón a la vista, una vez. */
   const mantenerAbiertoRef = React.useRef(false);
 
-  const motivoValido = motivo.replace(/\s+/g, ' ').trim().length >= MIN_MOTIVO;
+  const motivoValido = faltaParaElMotivo(motivo) === 0;
   const nombreValido = nombreEscrito.trim() !== '' && nombreEscrito.trim() === firma.name.trim();
 
   const cerrar = () => {
@@ -71,79 +64,82 @@ export const FirmDangerZone: React.FC<FirmDangerZoneProps> = ({ firma, onElimina
 
   const confirmacion: Confirmacion | null = abierto
     ? {
-        titulo: 'Eliminar la firma y todos sus datos',
-        etiqueta: 'Eliminar definitivamente',
+        titulo: 'Eliminar esta firma y sus datos',
+        etiqueta: 'Eliminar la firma',
         peligro: true,
         deshabilitado: !(motivoValido && nombreValido),
         onConfirmar: eliminar,
         texto: (
-          /* El nombre de la firma se cita dos veces aqui y puede no llevar espacios. */
-          <div className="min-w-0 space-y-3 [overflow-wrap:anywhere]">
-            <p className="text-justify [text-wrap:pretty]">
-              Se borran <b>todos</b> los datos de <b>{firma.name}</b>: escritos, revisiones,
-              transcripciones, clientes, pagos, sus {firma.users} {firma.users === 1 ? 'cuenta' : 'cuentas'} y
-              el saldo. <b>No se puede deshacer.</b> Hágalo solo con la autorización expresa de la firma.
+          <div className="cn-ope-confirmacion">
+            <p className="cn-ope-peligro-rotulo">Zona de riesgo</p>
+            <p className="cn-ope-texto">
+              Se va todo: escritos, revisiones, transcritos, casos, clientes, pagos, sus {cifra(firma.users)}{' '}
+              {firma.users === 1 ? 'cuenta' : 'cuentas'} y el saldo. <strong>No se puede deshacer.</strong> Hágalo solo con la
+              autorización expresa de la firma.
             </p>
-            <label className="block text-[11px] text-ink-500">
-              Motivo · queda en su auditoría de operación
+            <div className="cn-ope-riesgo-campo">
+              <label htmlFor="ope-borrado-motivo" className="cn-ope-etiqueta">
+                Cite la autorización de la firma
+              </label>
               <input
+                id="ope-borrado-motivo"
                 type="text"
                 value={motivo}
                 onChange={(e) => setMotivo(e.target.value)}
-                placeholder="Cite la autorización de la firma: quién la pidió y cuándo"
-                className="mt-1 w-full rounded-control border border-line-200 bg-canvas px-2 py-1.5 text-[12px] text-ink-900 focus:border-brand-700 focus:outline-none"
+                placeholder="Quién la pidió y cuándo"
+                className="cn-ope-campo cn-ope-campo--blanco"
                 autoFocus
               />
-              {!motivoValido && motivo.length > 0 && (
-                <span className="mt-0.5 block text-[10.5px] text-ink-400">Al menos {MIN_MOTIVO} caracteres.</span>
+              {motivo.length > 0 && !motivoValido && (
+                <p className="cn-ope-ayuda cn-ope-ayuda--aviso">Faltan {faltaParaElMotivo(motivo)} caracteres.</p>
               )}
-            </label>
-            <label className="block text-[11px] text-ink-500">
-              Escriba el nombre exacto de la firma: <b className="text-ink-900">{firma.name}</b>
+            </div>
+            <div className="cn-ope-riesgo-campo">
+              <label htmlFor="ope-borrado-nombre" className="cn-ope-etiqueta">
+                Para confirmar, escriba <span className="cn-ope-peligro-nombre">{firma.name}</span>
+              </label>
               <input
+                id="ope-borrado-nombre"
                 type="text"
                 value={nombreEscrito}
                 onChange={(e) => setNombreEscrito(e.target.value)}
+                placeholder="El nombre exacto de la firma"
                 autoComplete="off"
                 spellCheck={false}
-                className="mt-1 w-full rounded-control border border-line-200 bg-canvas px-2 py-1.5 font-mono text-[12px] text-ink-900 focus:border-brand-700 focus:outline-none"
+                className="cn-ope-campo cn-ope-campo--blanco"
               />
-              {nombreEscrito.length > 0 && !nombreValido && (
-                <span className="mt-0.5 block text-[10.5px] text-ink-400">Todavía no coincide.</span>
-              )}
-            </label>
-            {error && <p className="text-justify text-[12px] leading-snug text-danger [text-wrap:pretty]">{error}</p>}
+              {nombreEscrito.length > 0 && !nombreValido && <p className="cn-ope-ayuda cn-ope-ayuda--aviso">Todavía no coincide.</p>}
+            </div>
+            {error && (
+              <p role="alert" className="cn-ope-error">
+                {error}
+              </p>
+            )}
           </div>
         )
       }
     : null;
 
   return (
-    <section className="rounded-card border border-[rgb(var(--danger)/0.35)] bg-[rgb(var(--danger)/0.04)]">
-      <header className="flex items-start gap-2 border-b border-[rgb(var(--danger)/0.25)] px-4 py-3">
-        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-danger" />
-        <div className="min-w-0">
-          <h3 className="text-[13px] font-semibold text-danger">Zona de riesgo</h3>
-          <p className="mt-0.5 text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
-            Eliminar la firma borra escritos, revisiones, transcripciones, clientes, pagos, usuarios y
-            saldo, y no se puede deshacer. Solo con autorización de la firma; queda en su auditoría de
-            operación con el motivo. El registro de la prueba gratuita se conserva.
-          </p>
-        </div>
-      </header>
-      <div className="px-4 py-3">
-        <button
-          type="button"
-          onClick={() => {
-            setError(null);
-            setAbierto(true);
-          }}
-          className="btn-danger btn-sm flex items-center gap-2"
-        >
-          <Trash2 className="h-4 w-4" />
-          Eliminar la firma y todos sus datos
-        </button>
-      </div>
+    <section className="cn-ope-riesgo" aria-labelledby="ope-riesgo">
+      <p className="cn-ope-peligro-rotulo">Zona de riesgo</p>
+      <h2 id="ope-riesgo" className="cn-ope-titulo">
+        Eliminar esta firma y sus datos
+      </h2>
+      <p className="cn-ope-texto">
+        Borra escritos, revisiones, transcritos, casos, clientes, pagos, usuarios y saldo, y no se puede deshacer. Solo con
+        autorización de la firma; queda en su auditoría de operación con el motivo. El registro de la prueba gratuita se conserva.
+      </p>
+      <button
+        type="button"
+        className="cn-ope-boton cn-ope-boton--peligro"
+        onClick={() => {
+          setError(null);
+          setAbierto(true);
+        }}
+      >
+        Eliminar la firma
+      </button>
 
       <ConfirmarDialog confirmacion={confirmacion} onCerrar={cerrar} />
     </section>

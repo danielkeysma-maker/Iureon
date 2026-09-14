@@ -1,582 +1,365 @@
 import React from 'react';
-import { AlertCircle, Building2, CreditCard, Plus, RefreshCw, ShieldCheck, Users, Library } from 'lucide-react';
 import { adminApi, type FirmSummary } from '../admin.api';
-import { FirmDetailDialog } from './FirmDetailDialog';
+import { supportChatApi } from '../../support/supportChat.api';
+import { FichaDeFirma } from './FirmDetailDialog';
 import { CatalogMasterDialog } from './CatalogMasterDialog';
-import { RechargeFirmDialog } from './RechargeFirmDialog';
 import { BandejaDeSoporte } from './BandejaDeSoporte';
 import { CorreoSaliente } from './CorreoSaliente';
+import { NuevaFirmaDialog } from './NuevaFirmaDialog';
+import {
+  cifra,
+  describirPlan,
+  diasDeSaldo,
+  esperanRespuesta,
+  estadoDeFirma,
+  filtrarFirmas,
+  ordenarPorRiesgo,
+  pesos,
+  rotuloDeSoporte
+} from '../consolaEnPantalla';
 
 /**
- * Running the platform: the firms on it, their plans, their balances.
+ * La operación de la plataforma: las firmas, sus planes y sus saldos.
+ * Cara nueva: `public/handoff/app-consola-de-operacion.html`, artboard 1
+ * (barra con Catálogo maestro · Soporte · Nueva firma, cuatro cifras, la tabla
+ * FIRMA · PLAN · CONSUMO 30 D · SALDO · ESTADO con buscador por nombre o NIT, y
+ * la fila que abre la ficha). La ficha (artboard 2) se abre EN SU LUGAR, con
+ * «‹ Firmas» para volver, como la dibuja el artboard.
  *
- * WHAT IT SHOWS AND WHAT IT DOES NOT. Counts of accounts and hearings, because
- * that is what a subscription is billed on. Never a transcript, a draft or a
- * document: managing a tenant and reading its privileged material are different
- * powers, and the server only grants the first — this screen has nothing to ask
- * for even if it wanted to.
+ * ─── LO QUE MUESTRA Y LO QUE NO ─────────────────────────────────────────────
  *
- * Every change made here is written to the AFFECTED firm's own audit trail,
- * naming the operator. A power that crosses tenants is only acceptable when the
- * tenant it crossed into can read what was done.
+ * Volúmenes (cuentas, transcritos, consumo), nunca contenido: gestionar un
+ * inquilino y leer su material privilegiado son poderes distintos, y el
+ * servidor solo concede el primero. Cada cambio se escribe en la auditoría de
+ * la firma afectada, con el correo del operador.
+ *
+ * ─── LO QUE CAMBIÓ RESPECTO DE LA CONSOLA ANTERIOR, con la razón ────────────
+ *
+ * · El selector «Activa / En mora / Cancelada» de cada fila se retiró: escribe
+ *   `subscription_status`, una columna que ninguna regla de acceso lee desde que
+ *   existen los planes. Un control que cambia algo que no gobierna nada enseña a
+ *   creer que se suspendió una firma. Suspender de verdad está en «Cambiar plan».
+ * · La bandeja de soporte bajó a su propio diálogo, detrás de «Soporte · N»,
+ *   como el artboard. N son las conversaciones que ESPERAN respuesta; si la
+ *   bandeja no se pudo leer, el botón no lleva número en vez de decir cero.
+ * · Recargar se hace desde la ficha, donde el artboard la pone: la fila entera
+ *   abre la ficha y ya no carga botones propios.
+ * · El correo saliente no está en el artboard; se conserva abajo (derivada),
+ *   porque es la única forma de comprobar que las confirmaciones salen.
  */
 
-const pesos = (valor: number): string => `$${valor.toLocaleString('es-CO')}`;
+type Aviso =
+  | { tipo: 'alta'; nombre: string }
+  | { tipo: 'borrado'; nombre: string; usuariosEliminados: number; advertencias: string[] };
 
-const NOMBRE_PLAN: Record<string, string> = { ESENCIAL: 'Esencial', PREMIUM: 'Premium', FIRMA: 'Firma' };
-const NOMBRE_PERIODO: Record<string, string> = {
-  MENSUAL: 'mensual',
-  ANUAL: 'anual',
-  PRUEBA: 'prueba',
-  CORTESIA: 'cortesía'
-};
+/** La suma solo existe si todas sus partes se leyeron: una sola ausente la vuelve desconocida. */
+const sumaLeida = (firmas: readonly FirmSummary[], campo: 'creditsBalance' | 'consumo30dCop'): number | null =>
+  firmas.every((f) => Number.isFinite(f[campo])) ? firmas.reduce((t, f) => t + f[campo], 0) : null;
 
-/** «Premium · prueba · vence 18/09/2026», o «Cortesía» para la firma sin plan. */
-const describirPlan = (f: FirmSummary): string => {
-  if (!f.plan && !f.planValidUntil) return 'Cortesía';
-  const partes = [NOMBRE_PLAN[f.plan ?? ''] ?? 'Sin plan'];
-  if (f.planPeriod && f.planPeriod !== 'CORTESIA') partes.push(NOMBRE_PERIODO[f.planPeriod]);
-  if (f.planValidUntil) {
-    const vence = new Date(f.planValidUntil);
-    const vencido = vence.getTime() < Date.now();
-    partes.push(`${vencido ? 'venció' : 'vence'} ${vence.toLocaleDateString('es-CO')}`);
-  } else {
-    partes.push('sin vencimiento');
-  }
-  return partes.join(' · ');
-};
-
-/**
- * El estado del PLAN, derivado de la fecha como lo hace el servidor. Es el que
- * decide si la firma trabaja o lee: la columna `status` (activa/en mora) no
- * gobierna nada desde que existen los planes, y una firma suspendida por
- * operación o una compra sin pagar deben verse «Vencido» en la lista sin
- * abrir la ficha.
- */
-const estadoDelPlanDe = (f: FirmSummary): { etiqueta: string; clase: string } | null => {
-  if (!f.planValidUntil) return null;
-  const dias = Math.ceil((new Date(f.planValidUntil).getTime() - Date.now()) / 86_400_000);
-  if (dias <= 0)
-    return { etiqueta: 'Vencido', clase: 'bg-[rgb(var(--danger)/0.06)] text-danger border-[rgb(var(--danger)/0.35)]' };
-  if (dias <= 7)
-    return {
-      etiqueta: `Vence en ${dias} ${dias === 1 ? 'día' : 'días'}`,
-      clase: 'bg-[rgb(var(--unverified-surf))] text-unverified border-[rgb(var(--unverified-line))]'
-    };
-  if (f.planPeriod === 'PRUEBA')
-    return { etiqueta: 'Prueba', clase: 'bg-brand-50 text-brand-700 border-[rgb(var(--brand-line))]' };
-  return { etiqueta: 'Activo', clase: 'bg-[rgb(var(--verified-surf))] text-verified border-[rgb(var(--verified-line))]' };
-};
-
-const ESTADO_ETIQUETA: Record<string, string> = {
-  active: 'Activa',
-  past_due: 'En mora',
-  canceled: 'Cancelada'
-};
-
-const ESTADO_ESTILO: Record<string, string> = {
-  active: 'bg-[rgb(var(--verified-surf))] text-verified border-[rgb(var(--verified-line))]',
-  past_due: 'bg-[rgb(var(--unverified-surf))] text-unverified border-[rgb(var(--unverified-line))]',
-  canceled: 'bg-[rgb(var(--danger)/0.06)] text-danger border-[rgb(var(--danger)/0.35)]'
-};
+const Cifra: React.FC<{ valor: string; leida: boolean; aviso?: boolean; children: React.ReactNode }> = ({
+  valor,
+  leida,
+  aviso = false,
+  children
+}) => (
+  <div className={`cn-ope-cifra ${aviso ? 'cn-ope-cifra--aviso' : ''}`}>
+    <p className={`cn-ope-cifra-valor ${leida ? 'cn-ope-mono' : 'cn-ope-cifra-valor--sin-leer'}`}>{valor}</p>
+    <p className="cn-ope-cifra-rotulo">{children}</p>
+  </div>
+);
 
 export const OperatorConsole: React.FC = () => {
   const [firms, setFirms] = React.useState<FirmSummary[]>([]);
+  const [cargando, setCargando] = React.useState(true);
+  /** Si alguna lectura de la lista salió bien: antes de eso no hay cifras que pintar. */
+  const [leida, setLeida] = React.useState(false);
+  const [error, setError] = React.useState('');
+  const [busqueda, setBusqueda] = React.useState('');
   const [fichaAbierta, setFichaAbierta] = React.useState<string | null>(null);
   const [maestroAbierto, setMaestroAbierto] = React.useState(false);
-  const [cargando, setCargando] = React.useState(true);
-  const [error, setError] = React.useState('');
+  const [soporteAbierto, setSoporteAbierto] = React.useState(false);
   const [creando, setCreando] = React.useState(false);
-  const [recargando, setRecargando] = React.useState<string | null>(null);
-  /** La firma cuyo dialogo de recarga esta abierto; null cuando ninguno. */
-  const [firmARecargar, setFirmARecargar] = React.useState<FirmSummary | null>(null);
-  /**
-   * Aviso no bloqueante tras eliminar una firma: qué se borró y, si algo no
-   * se completó (archivos en B2, alguna cuenta), qué queda por hacer a mano.
-   * Un `alert` del navegador taparía la lista que acaba de recargarse.
-   */
-  const [avisoDeBorrado, setAvisoDeBorrado] = React.useState<{
-    nombre: string;
-    usuariosEliminados: number;
-    advertencias: string[];
-  } | null>(null);
-
-  const [nueva, setNueva] = React.useState({
-    firmName: '',
-    nit: '',
-    adminEmail: '',
-    adminPassword: '',
-    initialCredits: 0
-  });
+  /** Conversaciones que esperan respuesta. `null` = la bandeja no se pudo leer. */
+  const [esperan, setEsperan] = React.useState<number | null>(null);
+  const [aviso, setAviso] = React.useState<Aviso | null>(null);
 
   const cargar = React.useCallback(async () => {
     setCargando(true);
     setError('');
     try {
       setFirms(await adminApi.listFirms());
+      setLeida(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'No se pudieron cargar las firmas.');
+      setLeida(false);
+      setError(err instanceof Error ? err.message : 'No se pudieron leer las firmas de la plataforma.');
     } finally {
       setCargando(false);
     }
   }, []);
 
+  const contarSoporte = React.useCallback(async () => {
+    try {
+      const r = await supportChatApi.bandeja();
+      setEsperan(esperanRespuesta(r.conversaciones));
+    } catch {
+      setEsperan(null);
+    }
+  }, []);
+
   React.useEffect(() => {
     void cargar();
-  }, [cargar]);
+    void contarSoporte();
+  }, [cargar, contarSoporte]);
 
-  const crear = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
+  if (fichaAbierta) {
+    return (
+      <FichaDeFirma
+        firmId={fichaAbierta}
+        onVolver={() => {
+          setFichaAbierta(null);
+          void cargar();
+        }}
+        onEliminada={(resultado) => {
+          setFichaAbierta(null);
+          setAviso({ tipo: 'borrado', ...resultado });
+          void cargar();
+        }}
+      />
+    );
+  }
 
-    try {
-      await adminApi.createFirm(nueva);
-      setNueva({ firmName: '', nit: '', adminEmail: '', adminPassword: '', initialCredits: 0 });
-      setCreando(false);
-      await cargar();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'No se pudo crear la firma.');
-    }
-  };
-
-  /*
-   * The operator's recharge is NOT bound by the commercial minimum.
-   *
-   * $100.000 is the smallest amount a firm can BUY, and it exists because
-   * Wompi's fixed $700 per transaction makes anything smaller expensive to
-   * collect. None of that applies here: crediting $20.000 as compensation for a
-   * failed draft, or correcting an amount typed wrong, is a different act with
-   * no gateway involved. Enforcing the sales floor on the repair tool would
-   * leave the only person who can fix a balance unable to fix it precisely.
-   *
-   * So the minimum is the default in the box, where it belongs — a nudge toward
-   * the amount that is usually right — and not a rule that rejects the operator.
-   */
-  /*
-   * YA NO ES UN `window.prompt`. Era la caja gris del navegador —«iureon-app
-   * .vercel.app dice»— y ademas escondia un defecto: el servidor exige motivo
-   * (`requireReason`) y el prompt solo pedia monto, asi que la recarga fallaba
-   * siempre. `RechargeFirmDialog` pide las dos cosas y este metodo recibe las
-   * dos ya validadas.
-   */
-  const recargar = async (firm: FirmSummary, monto: number, motivo: string) => {
-    setRecargando(firm.id);
-    setError('');
-
-    try {
-      const { creditsBalance } = await adminApi.addCredits(firm.id, monto, motivo);
-      // Applied locally from the SERVER's figure, not by adding on screen: the
-      // balance that matters is the one the database ended up with.
-      setFirms((actuales) =>
-        actuales.map((f) => (f.id === firm.id ? { ...f, creditsBalance } : f))
-      );
-      setFirmARecargar(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'No se pudo aplicar la recarga.');
-    } finally {
-      setRecargando(null);
-    }
-  };
-
-  const cambiarEstado = async (firm: FirmSummary, status: string) => {
-    setError('');
-    try {
-      await adminApi.updateFirm(firm.id, { status });
-      setFirms((actuales) => actuales.map((f) => (f.id === firm.id ? { ...f, status } : f)));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'No se pudo cambiar el estado.');
-    }
-  };
-
-  /*
-   * DIAS DE SALDO AL RITMO ACTUAL: balance / (consumo30/30). Solo se calcula
-   * con consumo real — una firma sin actividad no tiene "ritmo" y estimarle
-   * dias seria inventar una alarma. null = sin estimacion, y se dice.
-   */
-  const diasDeSaldo = (f: FirmSummary): number | null => {
-    if (f.consumo30dCop <= 0) return null;
-    return Math.floor(f.creditsBalance / (f.consumo30dCop / 30));
-  };
-
-  /*
-   * ORDEN POR RIESGO OPERATIVO, no alfabetico: la firma a punto de quedarse
-   * sin saldo va PRIMERO — es a la que hay que llamar hoy. Despues las de
-   * menos catalogo curado (usan el producto a medias), y el resto por consumo.
-   */
-  const ordenadas = [...firms].sort((a, b) => {
-    const da = diasDeSaldo(a);
-    const db = diasDeSaldo(b);
-    const riesgoA = da !== null && da <= 7 ? da : 999;
-    const riesgoB = db !== null && db <= 7 ? db : 999;
-    if (riesgoA !== riesgoB) return riesgoA - riesgoB;
-    return b.consumo30dCop - a.consumo30dCop;
-  });
-
-  const saldoAgregado = firms.reduce((t, f) => t + f.creditsBalance, 0);
-  const consumo30Agregado = firms.reduce((t, f) => t + f.consumo30dCop, 0);
-  const porAgotarse = firms.filter((f) => {
-    const d = diasDeSaldo(f);
-    return d !== null && d <= 7;
-  }).length;
+  /* Sin lectura buena, las cifras de arriba dicen «no se pudo leer», nunca cero. */
+  const saldoAgregado = leida ? sumaLeida(firms, 'creditsBalance') : null;
+  const consumoAgregado = leida ? sumaLeida(firms, 'consumo30dCop') : null;
+  const porAgotarse = leida
+    ? firms.filter((f) => {
+        const d = diasDeSaldo(f.creditsBalance, f.consumo30dCop);
+        return d !== null && d <= 7;
+      }).length
+    : null;
+  const visibles = ordenarPorRiesgo(filtrarFirmas(firms, busqueda));
 
   return (
-    /*
-      `min-w-0` EN LA RAÍZ y `[overflow-wrap:anywhere]` heredado: la consola vive
-      dentro de un diálogo L que en el teléfono ocupa el ancho entero, y sus
-      datos son correos de firma y NIT — palabras sin espacios que se pintan
-      fuera de su caja sin agrandarla. Declararlo aquí cubre cada párrafo, cada
-      lista y cada cifra de abajo de una vez.
-    */
-    <div className="min-w-0 space-y-4 [overflow-wrap:anywhere]">
-      {/*
-        LA BANDEJA DE SOPORTE VA ARRIBA: es lo único de esta consola que tiene a
-        alguien esperando al otro lado. Las cifras de saldo se consultan; una
-        pregunta de una firma se responde.
-      */}
-      <BandejaDeSoporte />
-
-      {/* ─── LAS CIFRAS AGREGADAS (7a): la salud de la casa de un vistazo ── */}
-      {firms.length > 0 && (
-        <div className="grid grid-cols-2 gap-px overflow-hidden rounded-card border border-line-200 bg-line-100 sm:grid-cols-4">
-          <div className="min-w-0 bg-surface px-3 py-2.5 sm:px-4">
-            <p className="font-mono text-[18px] font-semibold text-ink-900">
-              ${saldoAgregado.toLocaleString('es-CO')}
-            </p>
-            <p className="text-justify text-meta text-ink-500">Saldo agregado — es pasivo: trabajo ya vendido</p>
-          </div>
-          <div className="min-w-0 bg-surface px-3 py-2.5 sm:px-4">
-            <p className="font-mono text-[18px] font-semibold text-ink-900">
-              ${consumo30Agregado.toLocaleString('es-CO')}
-            </p>
-            <p className="text-meta text-ink-500">Consumo 30 días</p>
-          </div>
-          <div className="min-w-0 bg-surface px-3 py-2.5 sm:px-4">
-            <p className={`font-mono text-[18px] font-semibold ${porAgotarse > 0 ? 'text-unverified' : 'text-ink-900'}`}>
-              {porAgotarse}
-            </p>
-            <p className="text-justify text-meta text-ink-500">Con ≤7 días de saldo al ritmo actual</p>
-          </div>
-          <div className="min-w-0 bg-surface px-3 py-2.5 sm:px-4">
-            <p className="font-mono text-[18px] font-semibold text-ink-900">{firms.length}</p>
-            <p className="text-meta text-ink-500">Firmas en la plataforma</p>
-          </div>
-        </div>
-      )}
-      {/*
-        LA CABECERA ENVUELVE, Y ESE ERA EL CORTE. Los tres botones —«Catálogo
-        maestro», «Actualizar», «Nueva firma»— suman 320px con sus iconos, y el
-        rótulo de la izquierda otros 150: en una fila que no envolvía ni encogía,
-        «Nueva firma» terminaba en el píxel 390 de una pantalla de 360 y el
-        `overflow-hidden` del diálogo se lo comía. Ahora el grupo de botones baja
-        a su propio renglón cuando no cabe, y el rótulo puede encoger.
-      */}
-      <div className="flex flex-wrap items-center justify-between gap-2 bg-surface border border-line-200 rounded-card px-3 py-3 sm:px-4">
-        <div className="flex min-w-0 items-center gap-2">
-          <ShieldCheck className="w-4 h-4 shrink-0 text-brand-700" />
-          <div className="min-w-0">
-            <h3 className="font-bold text-ink-900 text-xs">Firmas en la plataforma</h3>
-            <p className="text-[11px] text-ink-500">
-              {firms.length} {firms.length === 1 ? 'firma registrada' : 'firmas registradas'}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex min-w-0 flex-wrap items-center gap-2">
+    <div className="cn-ope-cuerpo">
+      <div className="cn-ope-barra">
+        {/*
+          «Superusuario» en gris y no en dorado: el artboard lo pinta dorado,
+          pero el dorado de la casa es solo del módulo activo.
+        */}
+        <span className="cn-ope-sello">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z" />
+          </svg>
+          Superusuario
+        </span>
+        <div className="cn-ope-barra-acciones">
           {/*
-            El maestro va en la cabecera de la lista de firmas y no dentro de
-            una ficha: no es un dato DE una firma, es la base que reciben todas.
-            Colgarlo de una firma sugeriria que se puede publicar desde ella.
+            El maestro va en la barra de la consola y no dentro de una ficha: no
+            es un dato DE una firma, es la base que reciben todas.
           */}
-          <button
-            onClick={() => setMaestroAbierto(true)}
-            className="px-3 py-1.5 bg-canvas hover:bg-line-100 text-ink-700 border border-line-200 rounded-control text-[11px] font-semibold flex items-center gap-1.5"
-          >
-            <Library className="w-3.5 h-3.5" />
+          <button type="button" className="cn-ope-boton cn-ope-boton--suave" onClick={() => setMaestroAbierto(true)}>
             Catálogo maestro
           </button>
           <button
-            onClick={() => void cargar()}
-            className="px-3 py-1.5 bg-canvas hover:bg-line-100 text-ink-700 border border-line-200 rounded-control text-[11px] font-semibold flex items-center gap-1.5"
+            type="button"
+            className="cn-ope-boton cn-ope-boton--suave"
+            onClick={() => setSoporteAbierto(true)}
+            aria-label={
+              esperan === null
+                ? 'Soporte: no se pudo leer cuántas conversaciones esperan respuesta'
+                : `Soporte: ${esperan} ${esperan === 1 ? 'conversación espera' : 'conversaciones esperan'} respuesta`
+            }
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${cargando ? 'animate-spin' : ''}`} />
-            <span>Actualizar</span>
+            {rotuloDeSoporte(esperan)}
           </button>
-          <button
-            onClick={() => setCreando((v) => !v)}
-            className="px-3 py-1.5 bg-brand-700 hover:bg-brand-800 text-white rounded-control text-[11px] font-semibold flex items-center gap-1.5"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Nueva firma</span>
+          <button type="button" className="cn-ope-boton cn-ope-boton--primario" onClick={() => setCreando(true)}>
+            Nueva firma
           </button>
         </div>
       </div>
 
       {error && (
-        <div className="bg-[rgb(var(--danger)/0.06)] border border-[rgb(var(--danger)/0.35)] rounded-card p-3 flex items-start gap-2">
-          <AlertCircle className="w-4 h-4 text-danger shrink-0 mt-0.5" />
-          <p className="min-w-0 text-justify text-[11px] leading-snug text-danger [text-wrap:pretty]">{error}</p>
+        <div role="alert" className="cn-ope-error">
+          <p>{error}</p>
+          <button type="button" className="cn-ope-boton cn-ope-boton--suave" onClick={() => void cargar()} disabled={cargando}>
+            Intentar de nuevo
+          </button>
         </div>
       )}
 
-      {avisoDeBorrado && (
-        <div
-          className={`rounded-card border p-3 flex items-start gap-2 ${
-            avisoDeBorrado.advertencias.length > 0
-              ? 'bg-[rgb(var(--unverified-surf))] border-[rgb(var(--unverified-line))]'
-              : 'bg-[rgb(var(--verified-surf))] border-[rgb(var(--verified-line))]'
-          }`}
-        >
-          {avisoDeBorrado.advertencias.length > 0 ? (
-            <AlertCircle className="w-4 h-4 text-unverified shrink-0 mt-0.5" />
-          ) : (
-            <ShieldCheck className="w-4 h-4 text-verified shrink-0 mt-0.5" />
-          )}
-          <div className="min-w-0 flex-1 text-[11px] text-ink-900">
-            <p className="text-justify [text-wrap:pretty]">
-              La firma <b>{avisoDeBorrado.nombre}</b> fue eliminada con todos sus datos ·{' '}
-              {avisoDeBorrado.usuariosEliminados}{' '}
-              {avisoDeBorrado.usuariosEliminados === 1 ? 'cuenta eliminada' : 'cuentas eliminadas'}.
-              Quedó en su auditoría de operación.
-            </p>
-            {avisoDeBorrado.advertencias.length > 0 && (
+      {aviso && (
+        <div role="status" className={`cn-ope-aviso ${aviso.tipo === 'borrado' && aviso.advertencias.length > 0 ? '' : 'cn-ope-aviso--ok'}`}>
+          <div className="cn-ope-aviso-texto">
+            {aviso.tipo === 'alta' ? (
+              <p>
+                La firma <strong>{aviso.nombre}</strong> quedó creada con la cuenta de su socio administrador, en Premium ·
+                cortesía y sin vencimiento.
+              </p>
+            ) : (
               <>
-                <p className="mt-1.5 font-semibold text-unverified">
-                  Quedó pendiente, por hacer a mano:
+                <p>
+                  La firma <strong>{aviso.nombre}</strong> fue eliminada con todos sus datos · {cifra(aviso.usuariosEliminados)}{' '}
+                  {aviso.usuariosEliminados === 1 ? 'cuenta eliminada' : 'cuentas eliminadas'}. Quedó en su auditoría de
+                  operación.
                 </p>
-                <ul className="mt-0.5 list-disc space-y-0.5 pl-4 text-ink-700">
-                  {avisoDeBorrado.advertencias.map((a) => (
-                    <li key={a} className="break-all">{a}</li>
-                  ))}
-                </ul>
+                {aviso.advertencias.length > 0 && (
+                  <>
+                    <p className="cn-ope-aviso-titulo">Quedó pendiente, por hacer a mano:</p>
+                    <ul className="cn-ope-aviso-lista">
+                      {aviso.advertencias.map((a) => (
+                        <li key={a}>{a}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
               </>
             )}
           </div>
-          <button
-            type="button"
-            onClick={() => setAvisoDeBorrado(null)}
-            className="shrink-0 text-[11px] text-ink-500 hover:text-ink-700"
-          >
+          <button type="button" className="cn-ope-boton cn-ope-boton--terciario" onClick={() => setAviso(null)}>
             Cerrar
           </button>
         </div>
       )}
 
-      {creando && (
-        <form onSubmit={crear} className="bg-surface border border-line-200 rounded-card p-4 space-y-3">
-          <h4 className="font-bold text-ink-900 text-xs">Registrar una firma cliente</h4>
-          <p className="text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
-            Se crea la firma y la cuenta de su administrador en un solo paso. Entrégale la contraseña
-            por un canal seguro y pídele que la cambie.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            <input
-              value={nueva.firmName}
-              onChange={(e) => setNueva({ ...nueva, firmName: e.target.value })}
-              placeholder="Nombre de la firma"
-              className="bg-canvas border border-line-200 rounded-control px-3 py-2 text-[11px] focus:outline-none focus:border-brand-700"
-              required
-            />
-            <input
-              value={nueva.nit}
-              onChange={(e) => setNueva({ ...nueva, nit: e.target.value })}
-              placeholder="NIT (opcional: un litigante persona natural no tiene)"
-              className="bg-canvas border border-line-200 rounded-control px-3 py-2 text-[11px] font-mono focus:outline-none focus:border-brand-700"
-            />
-            <input
-              type="email"
-              value={nueva.adminEmail}
-              onChange={(e) => setNueva({ ...nueva, adminEmail: e.target.value })}
-              placeholder="Correo del administrador"
-              className="bg-canvas border border-line-200 rounded-control px-3 py-2 text-[11px] focus:outline-none focus:border-brand-700"
-              required
-            />
-            <input
-              type="password"
-              value={nueva.adminPassword}
-              onChange={(e) => setNueva({ ...nueva, adminPassword: e.target.value })}
-              placeholder="Contraseña inicial (mínimo 8)"
-              className="bg-canvas border border-line-200 rounded-control px-3 py-2 text-[11px] font-mono focus:outline-none focus:border-brand-700"
-              required
-            />
-            <input
-              type="number"
-              value={nueva.initialCredits || ''}
-              onChange={(e) => setNueva({ ...nueva, initialCredits: Number(e.target.value) })}
-              placeholder="Saldo inicial en COP (opcional)"
-              className="bg-canvas border border-line-200 rounded-control px-3 py-2 text-[11px] focus:outline-none focus:border-brand-700"
-            />
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              type="submit"
-              className="px-3 py-1.5 bg-brand-700 hover:bg-brand-800 text-white rounded-control text-[11px] font-semibold"
-            >
-              Crear firma y cuenta
-            </button>
-            <button
-              type="button"
-              onClick={() => setCreando(false)}
-              className="text-[11px] text-ink-500 hover:text-ink-700"
-            >
-              Cancelar
-            </button>
-          </div>
-        </form>
+      {(leida || error) && (
+        <section className="cn-ope-cifras" aria-label="La plataforma en cifras">
+          <Cifra valor={pesos(saldoAgregado)} leida={saldoAgregado !== null}>
+            Saldo agregado · <span className="cn-ope-cifra-pasivo">pasivo: trabajo ya vendido</span>
+          </Cifra>
+          <Cifra valor={pesos(consumoAgregado)} leida={consumoAgregado !== null}>
+            Consumo · últimos 30 días
+          </Cifra>
+          <Cifra valor={cifra(porAgotarse)} leida={porAgotarse !== null} aviso={porAgotarse !== null && porAgotarse > 0}>
+            Firmas con 7 días o menos de saldo
+          </Cifra>
+          <Cifra valor={leida ? cifra(firms.length) : cifra(null)} leida={leida}>
+            Firmas en la plataforma
+          </Cifra>
+        </section>
       )}
 
-      {cargando && firms.length === 0 ? (
-        <p className="text-[11px] text-ink-500 px-1">Cargando firmas…</p>
-      ) : firms.length === 0 ? (
-        <div className="bg-surface border border-line-200 rounded-card p-6 text-center">
-          <Building2 className="w-6 h-6 text-slate-300 mx-auto mb-2" />
-          <p className="text-[11px] text-ink-500">Todavía no hay firmas registradas en la plataforma.</p>
+      <section className="cn-ope-seccion" aria-labelledby="ope-firmas">
+        <div className="cn-ope-seccion-cabeza">
+          <h2 id="ope-firmas" className="cn-ope-titulo">
+            Firmas en la plataforma
+          </h2>
+          <div className="cn-ope-buscar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" />
+              <line x1="16.5" y1="16.5" x2="21" y2="21" />
+            </svg>
+            <input
+              type="search"
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              placeholder="Por nombre o NIT"
+              aria-label="Buscar firmas por nombre o NIT"
+              className="cn-ope-campo cn-ope-campo--buscar"
+            />
+          </div>
+          <button type="button" className="cn-ope-boton cn-ope-boton--suave" onClick={() => void cargar()} disabled={cargando}>
+            {cargando ? 'Actualizando…' : 'Actualizar'}
+          </button>
         </div>
-      ) : (
-        <div className="bg-surface border border-line-200 rounded-card divide-y divide-line-100">
-          {ordenadas.map((firm) => (
-            <div key={firm.id} className="p-4 space-y-2">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <button
-                    type="button"
-                    onClick={() => setFichaAbierta(firm.id)}
-                    className="block max-w-full truncate text-left text-xs font-bold text-ink-900 hover:underline"
-                    title="Abrir la ficha de la firma"
-                  >
-                    {firm.name}
-                  </button>
-                  <p className="text-[11px] text-ink-500 font-mono">{firm.nit ? `NIT ${firm.nit}` : 'Sin NIT'}</p>
-                </div>
 
-                <div className="flex shrink-0 items-center gap-1.5">
-                  {(() => {
-                    const ep = estadoDelPlanDe(firm);
-                    return ep ? (
-                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${ep.clase}`}>
-                        {ep.etiqueta}
+        <div className="cn-ope-tabla cn-ope-tabla--firmas">
+          <div className="cn-ope-tabla-cabeza" aria-hidden="true">
+            <span>Firma</span>
+            <span>Plan</span>
+            <span className="cn-ope-derecha">Consumo 30 d</span>
+            <span className="cn-ope-derecha">Saldo</span>
+            <span>Estado</span>
+          </div>
+
+          {visibles.length === 0 ? (
+            <p className="cn-ope-vacio">
+              {cargando && !leida
+                ? 'Leyendo las firmas de la plataforma…'
+                : !leida
+                  ? 'La lista no se pudo leer.'
+                  : firms.length === 0
+                    ? 'Todavía no hay firmas en la plataforma. Cree la primera con «Nueva firma».'
+                    : `Ninguna firma coincide con «${busqueda.trim()}».`}
+            </p>
+          ) : (
+            <ul className="cn-ope-filas">
+              {visibles.map((f) => {
+                const estado = estadoDeFirma(f);
+                const dias = diasDeSaldo(f.creditsBalance, f.consumo30dCop);
+                const usuariosLeidos = Number.isFinite(f.users);
+                return (
+                  <li key={f.id}>
+                    <button
+                      type="button"
+                      className="cn-ope-fila cn-ope-fila--firma"
+                      onClick={() => setFichaAbierta(f.id)}
+                      aria-label={`Abrir la ficha de ${f.name}`}
+                    >
+                      <span className="cn-ope-celda-principal">
+                        <span className="cn-ope-principal">{f.name}</span>
+                        <span className="cn-ope-secundario">
+                          {f.nit ? (
+                            <>
+                              NIT <span className="cn-ope-mono">{f.nit}</span>
+                            </>
+                          ) : (
+                            'Sin NIT'
+                          )}{' '}
+                          ·{' '}
+                          {usuariosLeidos
+                            ? `${cifra(f.users)} ${f.users === 1 ? 'usuario' : 'usuarios'}`
+                            : `usuarios: ${cifra(null)}`}
+                        </span>
                       </span>
-                    ) : null;
-                  })()}
-                  <span
-                    className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
-                      ESTADO_ESTILO[firm.status] ?? 'bg-canvas text-ink-700 border-line-200'
-                    }`}
-                  >
-                    {ESTADO_ETIQUETA[firm.status] ?? firm.status}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-ink-500">
-                <span className="flex items-center gap-1">
-                  <CreditCard className="w-3 h-3 text-ink-400" />
-                  Saldo <b className="text-ink-900">{pesos(firm.creditsBalance)}</b>
-                  {/*
-                    LOS DIAS, no solo los pesos: "4 dias de saldo" es la alarma
-                    que hace llamar hoy. Solo con consumo real — sin ritmo no
-                    hay estimacion, y se dice "sin consumo" en vez de inventar.
-                  */}
-                  {(() => {
-                    const d = diasDeSaldo(firm);
-                    if (d === null)
-                      return <span className="text-ink-400">· sin consumo este mes</span>;
-                    return (
-                      <span className={d <= 7 ? 'font-semibold text-unverified' : 'text-ink-400'}>
-                        · ≈{d} {d === 1 ? 'día' : 'días'} al ritmo actual
+                      <span className="cn-ope-celda-plan">{describirPlan(f)}</span>
+                      <span className="cn-ope-derecha">
+                        <span className="cn-ope-rotulo-movil">Consumo 30 días</span>
+                        <span className={Number.isFinite(f.consumo30dCop) ? 'cn-ope-mono' : ''}>{pesos(f.consumo30dCop)}</span>
                       </span>
-                    );
-                  })()}
-                </span>
-                <span>Consumo 30 d <b className="text-ink-900">{pesos(firm.consumo30dCop)}</b></span>
-                <span className="flex items-center gap-1">
-                  <Users className="w-3 h-3 text-ink-400" />
-                  {firm.users} {firm.users === 1 ? 'cuenta' : 'cuentas'}
-                </span>
-                <span>
-                  {/* La salud del activo que la firma construye: curado bajo = producto a medias. */}
-                  Catálogo curado{' '}
-                  <b className="text-ink-900">
-                    {firm.catalogoTotal > 0
-                      ? `${Math.round((firm.catalogoCuradas / firm.catalogoTotal) * 100)}%`
-                      : '—'}
-                  </b>
-                  <span className="text-ink-400"> ({firm.catalogoCuradas})</span>
-                </span>
-                <span>
-                  {firm.transcriptions}{' '}
-                  {firm.transcriptions === 1 ? 'transcripción' : 'transcripciones'}
-                </span>
-                {/*
-                  El plan y su vencimiento, no el `planTier` heredado: lo que
-                  decide si la firma trabaja mañana es la fecha. Se edita en la
-                  ficha, con motivo.
-                */}
-                <span>{describirPlan(firm)}</span>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2 pt-1">
-                <button
-                  onClick={() => setFirmARecargar(firm)}
-                  disabled={recargando === firm.id}
-                  className="px-2.5 py-1 bg-[rgb(var(--verified-surf))] hover:bg-[rgb(var(--verified-surf))] text-verified border border-[rgb(var(--verified-line))] rounded-control text-[11px] font-semibold disabled:opacity-50"
-                >
-                  {recargando === firm.id ? 'Recargando…' : 'Recargar saldo'}
-                </button>
-
-                <select
-                  value={firm.status}
-                  onChange={(e) => void cambiarEstado(firm, e.target.value)}
-                  className="bg-canvas border border-line-200 rounded-control px-2 py-1 text-[11px] focus:outline-none focus:border-brand-700"
-                >
-                  <option value="active">Activa</option>
-                  <option value="past_due">En mora</option>
-                  <option value="canceled">Cancelada</option>
-                </select>
-              </div>
-            </div>
-          ))}
+                      <span className="cn-ope-derecha">
+                        <span className="cn-ope-rotulo-movil">Saldo</span>
+                        <span className={Number.isFinite(f.creditsBalance) ? 'cn-ope-mono' : ''}>{pesos(f.creditsBalance)}</span>
+                        <span className="cn-ope-secundario">{dias === null ? 'sin consumo' : `≈ ${cifra(dias)} días`}</span>
+                      </span>
+                      <span className="cn-ope-celda-estado">
+                        <span className={`cn-ope-estado cn-ope-estado--${estado.tono}`}>{estado.etiqueta}</span>
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </div>
-      )}
 
-      {/*
-        EL CORREO SALIENTE VA ABAJO, no arriba: no hay nadie esperando al otro
-        lado, como sí lo hay en la bandeja de soporte. Es infraestructura que se
-        comprueba cuando se cambia la configuración —o cuando una firma dice que
-        no le llegó la confirmación de su pago—, y hasta entonces no debe
-        competir con las firmas por la parte alta de la pantalla.
-      */}
+        <p className="cn-ope-texto cn-ope-texto--pie">
+          «Saldo bajo» se calcula al ritmo de consumo de cada firma, no con un umbral fijo: siete días de su propio uso. Esta
+          consola gestiona el negocio de cada firma —su plan, su saldo y sus cuentas— y no da acceso a sus escritos, audiencias
+          ni expedientes. Cada cambio queda en la auditoría de la firma afectada, con su correo.
+        </p>
+      </section>
+
       <CorreoSaliente />
 
-      {/*
-        Said plainly, because an operator should know the limits of their own
-        console — and because a firm that asks deserves an answer that matches
-        what the code does.
-      */}
-      <p className="px-1 text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
-        Esta consola gestiona el negocio de cada firma: su plan, su saldo y sus cuentas. No da acceso
-        a sus audiencias, borradores ni expedientes — eso es material amparado por el secreto
-        profesional. Cada cambio queda registrado en la auditoría de la firma afectada, con tu correo.
-      </p>
-
-      <FirmDetailDialog
-        firmId={fichaAbierta}
-        onClose={() => setFichaAbierta(null)}
-        onEliminada={(resultado) => {
-          setFichaAbierta(null);
-          setAvisoDeBorrado(resultado);
+      <NuevaFirmaDialog
+        abierto={creando}
+        onCerrar={() => setCreando(false)}
+        onCreada={(nombre) => {
+          setCreando(false);
+          setAviso({ tipo: 'alta', nombre });
           void cargar();
         }}
       />
-      <RechargeFirmDialog
-        firm={firmARecargar}
-        ocupado={firmARecargar !== null && recargando === firmARecargar.id}
-        onCerrar={() => setFirmARecargar(null)}
-        onConfirmar={recargar}
-      />
-
       <CatalogMasterDialog isOpen={maestroAbierto} onClose={() => setMaestroAbierto(false)} />
+      {soporteAbierto && (
+        <BandejaDeSoporte
+          onCerrar={() => {
+            setSoporteAbierto(false);
+            void contarSoporte();
+          }}
+          onCambio={setEsperan}
+        />
+      )}
     </div>
   );
 };

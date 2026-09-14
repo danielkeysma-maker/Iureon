@@ -6,6 +6,8 @@
  * persistence layer all speak these shapes.
  */
 
+import type { EstiloAplicado } from '../estilo/types';
+
 /** A draft as produced by the three-engine pipeline. */
 /**
  * Contra qué ficha del catálogo se redactó el escrito.
@@ -28,6 +30,8 @@ export interface ProcedenciaDelBorrador {
   curadaPor: string | null;
   seccionesSinArticulo: number;
   seccionesTotales: number;
+  /** El estilo que la firma enseñó y con el que se redactó; null o ausente = formato por defecto. */
+  estiloAplicado?: EstiloAplicado | null;
 }
 
 export interface GeneratedDraft {
@@ -39,6 +43,11 @@ export interface GeneratedDraft {
   tokensConsumed: number;
   /** Ausente en borradores guardados antes de que esto existiera. */
   procedencia?: ProcedenciaDelBorrador | null;
+  /**
+   * También suelto: una actuación sin catalogar trae procedencia null y aun así
+   * pudo redactarse con el estilo del rol.
+   */
+  estiloAplicado?: EstiloAplicado | null;
 }
 
 /** BORRADOR | REVISAR | LISTO | RADICADO. The same set the database checks. */

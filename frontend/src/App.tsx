@@ -56,6 +56,7 @@ import { SupportView } from './modules/help/components/SupportView';
 import { SupportMobileView } from './modules/help/components/SupportMobileView';
 import { TriageView } from './modules/catalog/components/TriageView';
 import { SettingsView } from './modules/settings/components/SettingsView';
+import { SECCION_ESTILO, alPedirElEstiloDeLaFirma } from './modules/estilo/irAlEstilo';
 import { SelectorDeCasoDeRedaccion, WorkshopConfigBar } from './modules/workspace/components/WorkshopConfigBar';
 import type { ActuacionRole } from './modules/catalog/types';
 import { FirmBrandingModal } from './modules/tenant/components/FirmBrandingModal';
@@ -563,19 +564,22 @@ export function App() {
       lineSpacing: b.lineSpacing
     }));
   };
-  const workflow = useLegalAgentWorkflow(
-    marcaDeFirma ? formatoComoInstruccion(marcaDeFirma) : undefined,
-    expedienteDeRedaccion
-  );
-
   /*
    * Quién firma el escrito.
    *
    * Vive aquí y no dentro del panel porque la barra de configuración abarca el
    * ancho completo —sobre el panel Y sobre el documento— y el panel necesita el
    * mismo valor para el verbo del botón y para seguir a la actuación elegida.
+   *
+   * VA ANTES DEL FLUJO DE REDACCIÓN: el flujo lo manda al servidor, que con él
+   * elige el estilo enseñado por la firma cuando la actuación no resuelve.
    */
   const [userRole, setUserRole] = useState<ActuacionRole>('LITIGANTE');
+  const workflow = useLegalAgentWorkflow(
+    marcaDeFirma ? formatoComoInstruccion(marcaDeFirma) : undefined,
+    expedienteDeRedaccion,
+    userRole
+  );
 
   /*
    * A firm is created from the OPERATOR CONSOLE, which issues its first account
@@ -784,6 +788,10 @@ export function App() {
         destino === 'privacidad'
       ) {
         setMainView(destino);
+      } else if (destino === SECCION_ESTILO) {
+        /* Ajustes → Estilo de la firma: la sección se deja recordada y Ajustes abre en ella. */
+        recordar(PANTALLAS.ajustes, SECCION_ESTILO);
+        setMainView('ajustes');
       } else if (destino === 'agenda') {
         /*
          * EL AVISO DE UN TERMINO ABRE LA AGENDA, no solo Herramientas.
@@ -829,6 +837,23 @@ export function App() {
     // setMainView es estable en la práctica (setState + sessionStorage); no se lista para no re-suscribir en cada render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session, esSuperusuario]);
+
+  /*
+   * «ABRIR AJUSTES → ESTILO DE LA FIRMA» DESDE EL DIÁLOGO DE ENSEÑAR. El pie de
+   * ese diálogo promete que desde ahí se quita un formato; el enlace pide ir con
+   * un evento (ver `estilo/irAlEstilo.ts`) y aquí se navega. Si Ajustes ya está
+   * montado, él mismo escucha y cambia de sección.
+   */
+  useEffect(
+    () =>
+      alPedirElEstiloDeLaFirma(() => {
+        recordar(PANTALLAS.ajustes, SECCION_ESTILO);
+        setMainView('ajustes');
+      }),
+    // setMainView es estable en la práctica; ver el efecto anterior.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   // ═══ Clave de localStorage scoped por firma+usuario ═══
   const {
@@ -1530,8 +1555,10 @@ export function App() {
                       </div>
                     </>
                   }
-                  /* Lo único de «cómo escribe su firma» que viaja al motor es la marca de Membrete, y solo si la firma la configuró. */
+                  /* «Cómo escribe su firma»: la marca de Membrete, si se configuró, y el formato que la firma enseñó, con su interruptor. */
                   formatoDeFirmaConfigurado={Boolean(marcaDeFirma)}
+                  usarEstilo={workflow.usarEstilo}
+                  setUsarEstilo={workflow.setUsarEstilo}
                   onAbrirMembrete={() => setIsBrandingModalOpen(true)}
                   borradorAbierto={
                     workflow.generatedDraft && !workflow.isProcessing
@@ -1609,6 +1636,9 @@ export function App() {
                 }}
                 onOpenSavedDraftsModal={() => setIsSavedDraftsModalOpen(true)}
                 formato={firmBranding}
+                rolDelTaller={userRole}
+                puedeEnsenarFormato={session?.user.role === 'FIRM_ADMIN' || session?.user.role === 'SUPER_ADMIN'}
+                onSaldoCambiado={() => void refreshBalance()}
                 onAbrirTaller={(textoActual) => {
                   if (!workflow.generatedDraft) return;
                   const entrada = savedDrafts.find((d) => d.id === loadedDraftId) ?? null;
