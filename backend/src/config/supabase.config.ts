@@ -42,3 +42,20 @@ export const supabaseAuth = configured
       auth: { persistSession: false, autoRefreshToken: false }
     })
   : null;
+
+/**
+ * UN CLIENTE DE CREDENCIALES DE UN SOLO USO, para canjear un enlace de
+ * recuperación (`verifyOtp`).
+ *
+ * Canjear el enlace deja la sesión de ESE usuario dentro del cliente, igual que
+ * iniciar sesión. Hacerlo sobre `supabaseAuth`, compartido por todas las
+ * peticiones de la instancia, dejaría esa sesión de recuperación viva en memoria
+ * mientras otra petición usa el mismo objeto. Se crea uno por canje y se
+ * descarta: nunca toca una tabla y muere con la petición.
+ */
+export const clienteDeAuthEfimero = () =>
+  configured
+    ? createClient(config.supabase.url, config.supabase.serviceKey, {
+        auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+      })
+    : null;

@@ -12,23 +12,16 @@
  * codebase already removed twice from these very calculators.
  */
 import {
-  FUENTE_CC_1617,
-  FUENTE_CCO_884,
   FUENTE_CGP_25_26,
   FUENTE_CGP_COMPETENCIA,
-  FUENTE_CP_305,
   FUENTE_CPT_2025,
-  FUENTE_IBC_PAGINA,
   FUENTE_IPC_PAGINA,
-  FUENTE_LEY_510_111,
-  IBC_ULTIMO_VERIFICADO,
   SMLMV_POR_ANIO,
   smlmvDe,
   type Fuente
 } from './fuentes';
 
 const esFinito = (n: unknown): n is number => typeof n === 'number' && Number.isFinite(n);
-const redondear2 = (n: number): number => Math.round(n * 100) / 100;
 
 // ─── Indexación por IPC ─────────────────────────────────────────────────────
 
@@ -86,144 +79,22 @@ export const indexarPorIpc = (input: IndexacionInput): IndexacionResult => {
 
 // ─── Intereses de mora ──────────────────────────────────────────────────────
 
-export type ModoInteres = 'COMERCIAL' | 'CIVIL' | 'PACTADA';
-
-export interface InteresesInput {
-  capital: number;
-  desde: string; // YYYY-MM-DD
-  hasta: string; // YYYY-MM-DD
-  modo: ModoInteres;
-  ibcEA?: number;
-  tasaPactadaEA?: number;
-}
-
-export interface InteresesResult {
-  capital: number;
-  desde: string;
-  hasta: string;
-  dias: number;
-  modo: ModoInteres;
-  tasaAnualEA: number;
-  tasaDiaria: number;
-  interes: number;
-  total: number;
-  topeUsuraEA: number | null;
-  excedeUsura: boolean;
-  formula: string;
-  supuestos: string[];
-  advertencias: string[];
-  fuentes: Fuente[];
-}
-
-/** C.Co. art. 884: mora comercial = 1.5 × interés bancario corriente. */
-export const moraComercialDesdeIbc = (ibcEA: number): number => redondear2(ibcEA * 1.5);
-
-/** Interés legal civil, C.C. art. 1617 regla 1a: seis por ciento anual. */
-export const INTERES_LEGAL_CIVIL_EA = 6;
-
-const esFechaIso = (s: unknown): s is string => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s) && !Number.isNaN(Date.parse(s));
-
-export const diasCalendarioEntre = (desde: string, hasta: string): number => {
-  const a = Date.parse(`${desde}T00:00:00Z`);
-  const b = Date.parse(`${hasta}T00:00:00Z`);
-  return Math.round((b - a) / 86_400_000);
-};
-
-export const liquidarIntereses = (input: InteresesInput): InteresesResult => {
-  const { capital, desde, hasta, modo } = input;
-  if (!esFinito(capital) || capital <= 0) throw new Error('El capital debe ser un número mayor que cero.');
-  if (!esFechaIso(desde) || !esFechaIso(hasta)) throw new Error('Las fechas deben tener el formato AAAA-MM-DD.');
-  const dias = diasCalendarioEntre(desde, hasta);
-  if (dias <= 0) throw new Error('La fecha de corte debe ser posterior a la fecha de exigibilidad.');
-
-  const fuentes: Fuente[] = [];
-  const advertencias: string[] = [];
-  let tasaAnualEA: number;
-  let topeUsuraEA: number | null = null;
-
-  const exigirIbc = (): number => {
-    if (!esFinito(input.ibcEA) || input.ibcEA <= 0) {
-      throw new Error(
-        'Falta el interés bancario corriente certificado para el periodo (% E.A.). La tasa cambia cada mes y el servidor no la asume: tómela de la certificación de la Superintendencia Financiera.'
-      );
-    }
-    fuentes.push(FUENTE_IBC_PAGINA);
-    if (IBC_ULTIMO_VERIFICADO && input.ibcEA === IBC_ULTIMO_VERIFICADO.tasaEA) {
-      fuentes.push(IBC_ULTIMO_VERIFICADO.fuente);
-      const primerMes = desde.slice(0, 7);
-      const ultimoMes = hasta.slice(0, 7);
-      if (primerMes !== IBC_ULTIMO_VERIFICADO.mes || ultimoMes !== IBC_ULTIMO_VERIFICADO.mes) {
-        advertencias.push(
-          `La tasa aplicada es la certificada para ${IBC_ULTIMO_VERIFICADO.mes}; el periodo liquidado cubre otros meses, cada uno con su propia certificación. Una liquidación exacta aplica la tasa de cada mes por separado.`
-        );
-      }
-    } else {
-      advertencias.push('El interés bancario corriente fue ingresado por usted; conserve la certificación del periodo como soporte.');
-    }
-    return input.ibcEA;
-  };
-
-  if (modo === 'COMERCIAL') {
-    const ibc = exigirIbc();
-    tasaAnualEA = moraComercialDesdeIbc(ibc);
-    topeUsuraEA = tasaAnualEA;
-    fuentes.push(FUENTE_CCO_884, FUENTE_LEY_510_111, FUENTE_CP_305);
-  } else if (modo === 'CIVIL') {
-    tasaAnualEA = INTERES_LEGAL_CIVIL_EA;
-    fuentes.push(FUENTE_CC_1617);
-  } else if (modo === 'PACTADA') {
-    if (!esFinito(input.tasaPactadaEA) || input.tasaPactadaEA <= 0) throw new Error('Falta la tasa pactada (% E.A.).');
-    const ibc = exigirIbc();
-    tasaAnualEA = input.tasaPactadaEA;
-    topeUsuraEA = moraComercialDesdeIbc(ibc);
-    fuentes.push(FUENTE_CP_305, FUENTE_CCO_884);
-  } else {
-    throw new Error('Modo de interés no reconocido. Use COMERCIAL, CIVIL o PACTADA.');
-  }
-
-  const excedeUsura = topeUsuraEA !== null && tasaAnualEA > topeUsuraEA;
-  if (excedeUsura) {
-    advertencias.push(
-      'La tasa supera el tope de usura (1,5 × interés bancario corriente): el cálculo se muestra con la tasa pactada para que se vea el exceso, pero cobrarlo constituye usura y el acreedor pierde los intereses (C.Co. art. 884).'
-    );
-  }
-
-  /*
-   * Simple interest over calendar days, 365-day year, no capitalisation. The
-   * certified rate is efectivo anual; dividing it linearly by 365 is the
-   * customary judicial liquidation convention and is stated as an assumption
-   * rather than hidden. C.C. art. 1617 regla 3a forbids anatocism by default.
-   */
-  const tasaDiaria = tasaAnualEA / 100 / 365;
-  const interes = Math.round(capital * tasaDiaria * dias);
-  const total = capital + interes;
-
-  return {
-    capital,
-    desde,
-    hasta,
-    dias,
-    modo,
-    tasaAnualEA,
-    tasaDiaria,
-    interes,
-    total,
-    topeUsuraEA,
-    excedeUsura,
-    formula: `${capital.toLocaleString('es-CO')} × (${tasaAnualEA} % ÷ 365) × ${dias} días = ${interes.toLocaleString('es-CO')}`,
-    supuestos: [
-      'Interés simple sobre días calendario transcurridos entre las dos fechas (la fecha inicial no cuenta; la final sí).',
-      'Año de 365 días; la tasa anual se prorratea linealmente por día, sin capitalizar intereses.',
-      modo === 'COMERCIAL'
-        ? 'Tasa = 1,5 × interés bancario corriente certificado (C.Co. art. 884, modificado por Ley 510 de 1999 art. 111).'
-        : modo === 'CIVIL'
-          ? 'Tasa = interés legal civil del 6 % anual (C.C. art. 1617).'
-          : 'Tasa = la pactada por las partes, contrastada con el tope de usura (1,5 × IBC; C.P. art. 305).'
-    ],
-    advertencias,
-    fuentes
-  };
-};
+/*
+ * La liquidación vive en `interesesPorTramos.ts`: cada periodo de mora con la
+ * tasa que la Superintendencia Financiera certificó para ese periodo, en vez de
+ * una sola tasa escrita por el abogado para todo el lapso, y con la conversión
+ * exponencial de la tasa efectiva anual en vez de la división entre 365. Se
+ * reexporta aquí para que el controlador siga importando del servicio de
+ * cálculos.
+ */
+export {
+  INTERES_LEGAL_CIVIL_EA,
+  diasCalendarioEntre,
+  liquidarIntereses,
+  type InteresesInput,
+  type InteresesResult,
+  type ModoInteres
+} from './interesesPorTramos';
 
 // ─── Competencia por cuantía ────────────────────────────────────────────────
 

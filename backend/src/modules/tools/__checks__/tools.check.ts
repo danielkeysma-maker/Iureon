@@ -12,7 +12,9 @@
  */
 import {
   calendarioDe,
+  contarDiasCalendario,
   contarDiasHabiles,
+  contarMesesOAnios,
   domingoDePascua,
   festivosDe,
   motivoNoHabil,
@@ -23,10 +25,10 @@ import {
   determinarCuantia,
   diasCalendarioEntre,
   indexarPorIpc,
-  liquidarIntereses,
-  moraComercialDesdeIbc
+  liquidarIntereses
 } from '../calculos.service';
-import { IBC_ULTIMO_VERIFICADO, SMLMV_POR_ANIO, smlmvDe } from '../fuentes';
+import { SMLMV_POR_ANIO, smlmvDe } from '../fuentes';
+import { ULTIMO_DIA_CERTIFICADO } from '../tasasCertificadas';
 import { ProceduralTermsService } from '../../procedural-terms/terms.service';
 
 let fallos = 0;
@@ -105,33 +107,86 @@ const civil = svc.calculateJudicialTerm({ notifiedDate: '2026-03-27', termInDays
 check('viernes antes de Semana Santa 2026: penal vence el lunes 30, civil el lunes 6 de abril', penal.dueDate === '2026-03-30' && civil.dueDate === '2026-04-06', `${penal.dueDate} / ${civil.dueDate}`);
 check('el servicio rechaza una fecha malformada', lanza(() => svc.calculateJudicialTerm({ notifiedDate: '14/08/2026', termInDays: 5, jurisdictionType: 'CIVIL', firmId: 'x' }), 'AAAA-MM-DD'));
 
+// ─── Clase de término: hábiles, calendario, meses y años (CGP art. 118) ─────
+const sinClase = svc.calculateJudicialTerm({ notifiedDate: '2026-12-18', termInDays: 1, jurisdictionType: 'CIVIL', firmId: 'x' });
+const habilesExplicito = svc.calculateJudicialTerm({ notifiedDate: '2026-12-18', termInDays: 1, jurisdictionType: 'CIVIL', firmId: 'x', termUnit: 'DIAS_HABILES' });
+check(
+  'sin clase de término el servicio cuenta días hábiles, igual que antes',
+  sinClase.termUnit === 'DIAS_HABILES' && sinClase.dueDate === '2027-01-12' && sinClase.totalBusinessDays === 1 && JSON.stringify(sinClase) === JSON.stringify(habilesExplicito),
+  `${sinClase.termUnit} ${sinClase.dueDate}`
+);
+check('el desglose rotula el modo usado', sinClase.modeLabel === 'Días hábiles' && sinClase.notes.length === 0);
+
+const cal5 = svc.calculateJudicialTerm({ notifiedDate: '2026-08-14', termInDays: 5, jurisdictionType: 'CIVIL', firmId: 'x', termUnit: 'DIAS_CALENDARIO' });
+check(
+  'a través del festivo del 17 de agosto de 2026: 5 días hábiles vencen el 24 y 5 días calendario el 19',
+  t.dueDate === '2026-08-24' && cal5.dueDate === '2026-08-19' && cal5.modeLabel === 'Días calendario',
+  `${t.dueDate} / ${cal5.dueDate}`
+);
+check(
+  'en días calendario no se descuenta nada, y se listan los no hábiles que sí se contaron',
+  cal5.excludedDays.length === 0 && cal5.countedNonBusinessDays.map((d) => d.date).join(',') === '2026-08-15,2026-08-16,2026-08-17',
+  cal5.countedNonBusinessDays.map((d) => d.date).join(',')
+);
+
+const cal1 = svc.calculateJudicialTerm({ notifiedDate: '2026-12-18', termInDays: 1, jurisdictionType: 'CIVIL', firmId: 'x', termUnit: 'DIAS_CALENDARIO' });
+check(
+  'a través de la vacancia: 1 día hábil desde el 18 de diciembre vence el 12 de enero; 1 día calendario, el sábado 19, sin moverse',
+  sinClase.dueDate === '2027-01-12' && cal1.dueDate === '2026-12-19' && (cal1.dueOnNonBusinessDay ?? '').includes('Sábado'),
+  `${cal1.dueDate} ${cal1.dueOnNonBusinessDay}`
+);
+const cal10 = svc.calculateJudicialTerm({ notifiedDate: '2026-12-18', termInDays: 10, jurisdictionType: 'CIVIL', firmId: 'x', termUnit: 'DIAS_CALENDARIO' });
+check(
+  '10 días calendario desde el 18 de diciembre vencen el 28, dentro de la vacancia, y los 10 días contados eran no hábiles',
+  cal10.dueDate === '2026-12-28' && cal10.countedNonBusinessDays.length === 10 && (cal10.dueOnNonBusinessDay ?? '').includes('Vacancia'),
+  `${cal10.dueDate} ${cal10.countedNonBusinessDays.length}`
+);
+check(
+  'días calendario advierte que no descontó y que la fecha no se movió',
+  cal10.notes.some((n) => n.includes('No se descontaron')) && cal10.notes.some((n) => n.includes('no se movió')) && !cal5.notes.some((n) => n.includes('no se movió'))
+);
+check('la agenda y el contador cuentan días calendario con la misma función', contarDiasCalendario('2026-08-14', 5).fechaFin === cal5.dueDate);
+
+const mes1 = svc.calculateJudicialTerm({ notifiedDate: '2026-01-30', termInDays: 1, jurisdictionType: 'CIVIL', firmId: 'x', termUnit: 'MESES' });
+check(
+  '1 mes notificado el 30 de enero de 2026: corre desde el 31; febrero no tiene 31 (28, sábado) y se extiende al lunes 2 de marzo',
+  mes1.startDate === '2026-01-31' && mes1.nominalDueDate === '2026-02-28' && mes1.dueDate === '2026-03-02' && mes1.extensionDays.length === 2 && mes1.modeLabel === 'Meses',
+  `${mes1.nominalDueDate} ${mes1.dueDate}`
+);
+const bisiesto = contarMesesOAnios('2024-01-30', 1, 'MESES');
+check('en año bisiesto el último día de febrero es el 29 (jueves, hábil)', bisiesto.fechaNominal === '2024-02-29' && bisiesto.alUltimoDiaDelMes && bisiesto.fechaFin === '2024-02-29', bisiesto.fechaFin);
+const mesSinAjuste = contarMesesOAnios('2026-08-13', 1, 'MESES');
+check('notificado el 13 de agosto de 2026, 1 mes vence el lunes 14 de septiembre, sin ajuste', mesSinAjuste.fechaFin === '2026-09-14' && !mesSinAjuste.alUltimoDiaDelMes && mesSinAjuste.prorroga.length === 0, mesSinAjuste.fechaFin);
+const anio1 = svc.calculateJudicialTerm({ notifiedDate: '2025-12-31', termInDays: 1, jurisdictionType: 'CIVIL', firmId: 'x', termUnit: 'ANIOS' });
+check(
+  '1 año notificado el 31 de diciembre de 2025 vence el 1 de enero de 2027 (festivo y vacancia) y se extiende al martes 12',
+  anio1.nominalDueDate === '2027-01-01' && anio1.dueDate === '2027-01-12' && anio1.extensionDays.length === 11 && anio1.modeLabel === 'Años',
+  `${anio1.nominalDueDate} ${anio1.dueDate} ${anio1.extensionDays.length}`
+);
+check('una clase de término desconocida se rechaza hablando', lanza(() => svc.calculateJudicialTerm({ notifiedDate: '2026-08-14', termInDays: 1, jurisdictionType: 'CIVIL', firmId: 'x', termUnit: 'SEMANAS' as never }), 'clase de término'));
+check('cero meses se rechaza hablando', lanza(() => contarMesesOAnios('2026-01-01', 0, 'MESES'), 'meses'));
+
 const cal = calendarioDe(2026);
 check('el calendario anual trae 12 meses y las fuentes', cal.diasHabilesPorMes.length === 12 && cal.fuentes.length === 4);
 check('agosto 2026 tiene 19 días hábiles', cal.diasHabilesPorMes[7].habiles === 19, `${cal.diasHabilesPorMes[7].habiles}`);
 
-// ─── Intereses: 1,5 × IBC ───────────────────────────────────────────────────
-check('1,5 × 19,49 = 29,24 (Resolución 1260 de 2026)', moraComercialDesdeIbc(19.49) === 29.24);
-check('1,5 × 17,01 = 25.52 (Resolución 0405 de 2026, marzo)', moraComercialDesdeIbc(17.01) === 25.52);
-check('la constante IBC verificada es la de septiembre de 2026', IBC_ULTIMO_VERIFICADO?.tasaEA === 19.49 && IBC_ULTIMO_VERIFICADO.mes === '2026-09');
+// ─── Intereses ──────────────────────────────────────────────────────────────
+/*
+ * La liquidación por tramos de tasa certificada, la tabla de certificaciones y
+ * la conversión de la tasa efectiva anual se guardan en `check:intereses-tramos`.
+ * Aquí solo se comprueba que el servicio de cálculos la sigue exponiendo.
+ */
 check('interés legal civil es 6 %', INTERES_LEGAL_CIVIL_EA === 6);
 check('días calendario entre 1 y 31 de enero son 30', diasCalendarioEntre('2026-01-01', '2026-01-31') === 30);
 
-const com = liquidarIntereses({ capital: 10_000_000, desde: '2026-09-01', hasta: '2026-10-01', modo: 'COMERCIAL', ibcEA: 19.49 });
-check('comercial: tasa aplicada 29,24 % sobre 30 días', com.tasaAnualEA === 29.24 && com.dias === 30);
-check('comercial: 10.000.000 × 0,2924/365 × 30 = 240.329', com.interes === Math.round((10_000_000 * 0.2924 * 30) / 365), `${com.interes}`);
-check('comercial: no excede usura por definición', !com.excedeUsura && com.topeUsuraEA === 29.24);
+const com = liquidarIntereses({ capital: 10_000_000, desde: '2026-08-31', hasta: '2026-09-30', modo: 'COMERCIAL' });
+check('comercial por tramos: septiembre de 2026 al 29,24 % E.A. da $213.061', com.tramos.length === 1 && com.tramos[0].tasaEA === 29.24 && com.interes === 213_061, `${com.interes}`);
 check('comercial: cita art. 884, Ley 510 y art. 305', ['884', '510', '305'].every((s) => com.fuentes.some((f) => f.norma.includes(s))));
-check('comercial: advierte si el periodo cruza otro mes distinto del certificado', liquidarIntereses({ capital: 1, desde: '2026-07-01', hasta: '2026-10-01', modo: 'COMERCIAL', ibcEA: 19.49 }).advertencias.some((a) => a.includes('2026-09')));
-check('comercial sin IBC se niega hablando', lanza(() => liquidarIntereses({ capital: 1, desde: '2026-01-01', hasta: '2026-02-01', modo: 'COMERCIAL' }), 'Superintendencia'));
+check('la tabla cargada llega hasta la certificación de septiembre de 2026', ULTIMO_DIA_CERTIFICADO === '2026-09-30');
 
 const civ = liquidarIntereses({ capital: 1_000_000, desde: '2025-01-01', hasta: '2026-01-01', modo: 'CIVIL' });
 check('civil: 6 % sobre 365 días = 60.000', civ.interes === 60_000 && civ.dias === 365, `${civ.interes}`);
 check('civil: cita el art. 1617', civ.fuentes.some((f) => f.norma.includes('1617')));
-
-const pac = liquidarIntereses({ capital: 1_000_000, desde: '2026-09-01', hasta: '2026-09-11', modo: 'PACTADA', ibcEA: 19.49, tasaPactadaEA: 35 });
-check('pactada 35 % con IBC 19,49 excede el tope de 29,24 y lo dice', pac.excedeUsura && pac.topeUsuraEA === 29.24 && pac.advertencias.some((a) => a.includes('usura')));
-const pacOk = liquidarIntereses({ capital: 1_000_000, desde: '2026-09-01', hasta: '2026-09-11', modo: 'PACTADA', ibcEA: 19.49, tasaPactadaEA: 20 });
-check('pactada 20 % no excede', !pacOk.excedeUsura);
 check('fechas invertidas se rechazan', lanza(() => liquidarIntereses({ capital: 1, desde: '2026-02-01', hasta: '2026-01-01', modo: 'CIVIL' }), 'posterior'));
 
 // ─── Cuantía: exactamente 40 y 150 SMLMV ────────────────────────────────────

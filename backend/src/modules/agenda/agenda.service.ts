@@ -2,7 +2,7 @@ import { supabase } from '../../config/supabase.config';
 import { esExpedienteDeLaFirma } from '../expedientes/expedientes.service';
 import { auditService } from '../audit/audit.service';
 import { catalogService } from '../catalog/catalog.service';
-import { contarDiasHabiles, fuentesDelCalendario } from '../tools/calendario.service';
+import { contarDiasCalendario, contarDiasHabiles, fuentesDelCalendario } from '../tools/calendario.service';
 import type { Fuente } from '../tools/fuentes';
 import { leerPlazoDeLaFicha, type LecturaDelPlazo } from './plazoDeLaFicha';
 import {
@@ -56,20 +56,6 @@ const fecha = (valor: unknown, campo: string): string => {
   return v;
 };
 
-const DIA_MS = 24 * 60 * 60 * 1000;
-
-/**
- * Suma días de calendario a partir del día SIGUIENTE al de la notificación.
- *
- * El art. 118 del CGP hace correr el término desde el día siguiente al de la
- * notificación, y eso vale igual para los días de calendario: lo que cambia con
- * ellos es que no se descuenta nada, no dónde empieza la cuenta.
- */
-const sumarDiasDeCalendario = (desde: string, dias: number): string => {
-  const inicio = Date.parse(`${desde}T00:00:00Z`) + DIA_MS;
-  return new Date(inicio + (dias - 1) * DIA_MS).toISOString().slice(0, 10);
-};
-
 export interface FechaCalculada {
   fechaLimite: string;
   fuentes: Fuente[];
@@ -88,8 +74,14 @@ export const calcularFechaLimite = (
     throw new AgendaError('INVALID_TERM', 'El término debe ser un número entero de días entre 1 y 3650.', 400);
   }
 
+  /*
+   * DÍAS DE CALENDARIO: LA MISMA CUENTA QUE EL CONTADOR DE TÉRMINOS. Desde el
+   * día siguiente al de la notificación (CGP art. 118) y sin descontar nada.
+   * Vivía aquí una suma propia; con el contador ofreciendo días calendario,
+   * dos sumas habrían podido dar dos fechas para el mismo término.
+   */
   if (tipo === 'CALENDARIO') {
-    const fechaLimite = sumarDiasDeCalendario(fechaNotificacion, dias);
+    const fechaLimite = contarDiasCalendario(fechaNotificacion, dias).fechaFin;
     return { fechaLimite, fuentes: fuentesDelCalendario(Number(fechaLimite.slice(0, 4))), excluidos: [] };
   }
 

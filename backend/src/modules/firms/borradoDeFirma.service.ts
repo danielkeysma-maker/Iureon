@@ -1,7 +1,8 @@
 import { listarTodasLasCuentas } from '../auth/listarCuentas';
 import { supabase } from '../../config/supabase.config';
 import { AuthError, listFirmUsers, olvidarSesionesDe } from '../auth/auth.service';
-import { BackblazeB2TenantStorageService } from '../documents/b2.service';
+import { B2_CLAVES_POR_LISTADO, BackblazeB2TenantStorageService } from '../documents/b2.service';
+import { barrerArchivosDeLaFirma } from './barridoDeArchivos';
 import { correoDeBorrado } from '../mail/avisos.mail';
 import type { QuienBorro } from '../mail/avisos.mail';
 
@@ -78,9 +79,14 @@ export const firmIdDelOperador = async (): Promise<string | null> => {
  *  1. Its accounts are LISTED (not yet deleted) while the firm still exists.
  *  2. Its B2 objects are deleted; a failure is a warning, never a stop —
  *     files in a bucket are recoverable by hand, a half-deleted tenant is not.
+ *     Todo lo que sube cualquier módulo (documentos de expedientes y carpetas,
+ *     originales de revisiones, adjuntos, audio) nace bajo `<firm_id>/` en
+ *     `generateUploadPresignedUrl`, así que el barrido por prefijo lo alcanza
+ *     sin enumerar módulos. Lo que no se pudo borrar se reporta archivo por
+ *     archivo, y también si el barrido no llegó al final (`barridoDeArchivos`).
  *  3. `borrar_firma_completa` removes every row in one transaction (see
- *     supabase/migration-borrar-firma.sql for the table list and why
- *     trial_signups survives).
+ *     supabase/migration-borrar-firma-completa-v3.sql for the table list, the
+ *     order, and why trial_signups and audit_logs survive).
  *  4. The accounts are deleted LAST: had they gone first and step 3 failed,
  *     the firm would keep its data with nobody able to sign in.
  *
@@ -109,26 +115,14 @@ export const borrarFirmaConTodo = async (input: {
 
   // 2. B2. Unconfigured or failing storage is reported, not fatal.
   const b2 = new BackblazeB2TenantStorageService();
-  try {
-    let ronda = 0;
-    let borradosEnRonda = -1;
-    while (ronda < MAX_RONDAS_B2 && borradosEnRonda !== 0) {
-      const objetos = await b2.listFirmDocuments(input.firmId);
-      if (objetos.length === 0) break;
-      borradosEnRonda = 0;
-      for (const objeto of objetos) {
-        const borrado = await b2.deleteObject(input.firmId, objeto.fileKey);
-        if (borrado) borradosEnRonda += 1;
-        else advertencias.push(`Archivo en B2 no borrado: ${objeto.fileKey}`);
-      }
-      // A round that deleted nothing would list the same objects forever.
-      ronda += 1;
-    }
-  } catch (err) {
-    advertencias.push(
-      `No se pudieron listar ni borrar los archivos de la firma en B2: ${(err as Error).message}`
-    );
-  }
+  const barrido = await barrerArchivosDeLaFirma(
+    {
+      listar: () => b2.listFirmDocuments(input.firmId),
+      borrar: (clave) => b2.deleteObject(input.firmId, clave)
+    },
+    { tamanoDePagina: B2_CLAVES_POR_LISTADO, maxRondas: MAX_RONDAS_B2 }
+  );
+  advertencias.push(...barrido.advertencias);
 
   // 3. The database, in one transaction.
   const { data: tablas, error } = await client.rpc('borrar_firma_completa', {
@@ -142,7 +136,7 @@ export const borrarFirmaConTodo = async (input: {
     if (sinFuncion) {
       throw new AuthError(
         'MIGRATION_REQUIRED',
-        'Falta ejecutar supabase/migration-borrar-firma.sql en la base de datos antes de poder eliminar una firma.',
+        'Falta ejecutar supabase/migration-borrar-firma-completa-v3.sql en la base de datos antes de poder eliminar una firma.',
         503
       );
     }

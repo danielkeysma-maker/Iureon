@@ -18,6 +18,14 @@ export interface B2FileObject {
   downloadUrl: string;
 }
 
+/**
+ * Cuántas claves pide `listFirmDocuments` en cada consulta. Se exporta porque
+ * el barrido del borrado de firma necesita saber cuándo una página vino llena:
+ * una página llena de archivos que no se pudieron borrar no deja ver lo que
+ * hay detrás.
+ */
+export const B2_CLAVES_POR_LISTADO = 100;
+
 export class BackblazeB2TenantStorageService {
   private b2: any;
   private isAuthorized = false;
@@ -192,7 +200,7 @@ export class BackblazeB2TenantStorageService {
         const response = await this.b2.listFileNames({
           bucketId: config.backblaze.bucketId,
           prefix: `${firmId}/`,
-          maxFileCount: 100
+          maxFileCount: B2_CLAVES_POR_LISTADO
         });
 
         return response.data.files.map((file: any) => ({

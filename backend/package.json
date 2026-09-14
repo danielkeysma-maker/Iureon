@@ -39,6 +39,7 @@
     "check:names": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/transcription/__checks__/speakerNames.check.ts",
     "check:conflicts": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/transcription/__checks__/voiceConflicts.check.ts",
     "check:tools": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/tools/__checks__/tools.check.ts",
+    "check:intereses-tramos": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/tools/__checks__/interesesPorTramos.check.ts",
     "check:leer-filas": "npx ts-node -P tsconfig.check.json --transpile-only src/__checks__/leerTodasLasFilas.check.ts",
     "check:rutas": "npx ts-node -P tsconfig.check.json --transpile-only src/__checks__/rutas.check.ts",
     "check:estados": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/transcription/__checks__/estados.check.ts",
@@ -88,12 +89,14 @@
     "check:proximo-termino": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/expedientes/__checks__/proximoTermino.check.ts",
     "check:renombrar-documento": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/expedientes/__checks__/renombrarDocumento.check.ts",
     "check:carpetas-guardas": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/expedientes/__checks__/carpetasGuardas.check.ts",
+    "check:borrado-firma-completo": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/firms/__checks__/borradoFirmaCompleto.check.ts",
     "check:posicion": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/posicion.check.ts",
     "check:comprobaciones-informe": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/comprobacionesDelInforme.check.ts",
     "check:glosa-informe":"npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/glosaDelInforme.check.ts",
     "check:glosa": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/glosa.check.ts",
     "check:glosa-red": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/glosa.check.ts --red",
-    "check:sin-aprendizaje-falso": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/__checks__/sinAprendizajeFalso.check.ts"
+    "check:sin-aprendizaje-falso": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/__checks__/sinAprendizajeFalso.check.ts",
+    "check:recuperacion": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/auth/__checks__/recuperacion.check.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

@@ -25,8 +25,9 @@
  *     «en solo lectura», botón para cancelar y botón para exportar.
  *     `borrarFirmaConTodo` borra DE INMEDIATO y el correo sale DESPUÉS.
  *   · Esa misma maqueta afirmaba que la auditoría «se conserva por obligación
- *     legal»: ni se conserva —`borrar_firma_completa` borra `audit_logs`— ni
- *     esta casa afirma obligaciones legales en ningún texto.
+ *     legal». Se conserva, pero porque un disparador impide borrarla
+ *     (migration-auditoria-inmutable.sql), y esta casa no afirma obligaciones
+ *     legales en ningún texto.
  *   · Los enlaces apuntaban a `app.iureon.co` y a rutas que no existen
  *     (`/preferencias`, `/exportar`, `/facturas`, `/datos`).
  * ══════════════════════════════════════════════════════════════════════════
@@ -310,7 +311,8 @@ check(
  * legal». Aquí no se cita derecho: en el momento en que un correo dijera
  * «conforme al artículo tal» estaría prometiendo un respaldo que este
  * repositorio no verifica, que es exactamente lo que la doctrina de
- * verificación prohíbe. Y esa auditoría ni siquiera se conserva.
+ * verificación prohíbe. La auditoría sí se conserva, pero la constancia lo
+ * explica con el hecho técnico —la base no deja borrarla—, no con una norma.
  */
 const FORMA_DE_CITA =
   /\bart(?:í|i)culo\s+\d|\bart\.\s*\d|\bley\s+\d|\bdecreto\s+\d|\bsentencia\s+[CTS]U?-\d|c(?:ó|o)digo\s+(?:civil|penal|general|sustantivo)/i;
@@ -506,7 +508,7 @@ check('asunto de la constancia', borrado.asunto === 'Constancia de borrado de da
 check('la constancia dice la fecha Y la hora', borrado.html.includes('4 de septiembre de 2026 a las') && borrado.html.includes('hora de Colombia'));
 check('la hora se calcula en Bogotá, no en UTC', fechaYHora('2026-09-04T02:00:00.000Z').includes('3 de septiembre de 2026'));
 check('la constancia nombra lo que se borró', borrado.html.includes('Documentos cargados: 42') && borrado.texto.includes('Borradores guardados: 7'));
-check('una tabla sin filas no se lista', !borrado.html.includes('Clientes y sus expedientes'));
+check('una tabla sin filas no se lista', !borrado.html.includes('Clientes:'));
 check('una tabla sin traducir se nombra igual', borrado.html.includes('tabla_que_nadie_tradujo: 3'));
 check('la constancia cuenta las cuentas eliminadas', borrado.html.includes('Cuentas de usuario eliminadas'));
 check('la constancia dice que no queda copia', borrado.html.includes('no queda copia de lo borrado'));
@@ -540,11 +542,18 @@ for (const p of [borrado, borradoPorOperador]) {
 }
 check('la constancia niega expresamente el periodo de solo lectura', borrado.html.includes('ni periodo de solo lectura'));
 check('la constancia dice que ya se ejecutó', borrado.html.includes('El borrado ya se ejecutó') && borrado.html.includes('no se puede deshacer'));
-check('la constancia dice que la auditoría también se borró', /registro de auditor[íi]a de la firma se borraron/.test(borrado.html));
+/*
+ * Hasta migration-borrar-firma-completa-v3.sql la constancia decía que la
+ * auditoría «se borró con todo lo demás». Era falso en cuanto corrió
+ * migration-auditoria-inmutable.sql: su disparador rechaza el DELETE, y la
+ * función de borrado ya no la toca. Ahora se dice que se conserva y por qué.
+ */
 check(
-  'la constancia NO afirma que la auditoría se conserva',
-  !/auditor[íi]a[^.]{0,60}se conserva/i.test(borrado.html) && !/queda el registro de auditor/i.test(borrado.html)
+  'la constancia dice que el registro de auditoría se conserva, y por qué',
+  /registro de auditor[íi]a de la firma se conserva/.test(borrado.html) && borrado.html.includes('no permite editarlo ni borrarlo')
 );
+check('la constancia NO dice que la auditoría se borró', !/auditor[íi]a[^.]{0,60}se borr/i.test(borrado.html));
+check('y no presenta esa conservación como obligación legal', !/auditor[íi]a[^.]{0,120}obligaci/i.test(borrado.html));
 check('la constancia dice qué sí se conserva, sin invocar norma', borrado.html.includes('límite de pruebas gratuitas por dirección'));
 check('la constancia explica el audio con la verdad', borrado.html.includes('se borra en el mismo momento de transcribirse'));
 

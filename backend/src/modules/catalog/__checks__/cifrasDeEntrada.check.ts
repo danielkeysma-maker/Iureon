@@ -183,7 +183,6 @@ const PROHIBIDAS: Array<[RegExp, string]> = [
   [/15\s*minutos/i, '«15 minutos»: la ventana del límite de intentos es de Supabase y no se conoce'],
   [/saldo de cortes[ií]a/i, '«saldo de cortesía»: la prueba abre con saldo cero'],
   [/solo lectura/i, '«solo lectura»: la prueba terminada pierde todo el acceso'],
-  [/olvid[óo] su contrase[ñn]a|\?[^'"]*recuperar/i, 'un enlace a una recuperación de contraseña que no existe'],
   [/inici(?:ar|e) sesi[óo]n/i, '«Iniciar sesión»: la copia dice «Entrar»'],
   [/Premium[^.]{0,40}prueba|prueba[^.]{0,40}Premium/i, 'una prueba de Premium, que no existe']
 ];
@@ -202,6 +201,31 @@ for (const [nombre, texto] of [
     check(`${nombre}: no dice ${motivo}`, !hallado, hallado ? `encontrado «${hallado}»` : '');
   }
 }
+
+/*
+ * «¿OLVIDÓ SU CONTRASEÑA?» SOLO SI LA RECUPERACIÓN EXISTE EN EL SERVIDOR.
+ *
+ * Esta guarda nació prohibiendo el enlace, porque la maqueta lo traía y el
+ * flujo no existía. El 14 de septiembre de 2026 existe (`auth/recuperacion.*`),
+ * así que la regla se da vuelta sin perder su propósito: la pantalla puede
+ * ofrecer el enlace mientras el servidor tenga la ruta pública que lo atiende.
+ * Si alguien retira la ruta, el enlace vuelve a ser una promesa falsa y esto
+ * falla.
+ */
+const RUTAS_AUTH = readFileSync(join(RAIZ, 'backend', 'src', 'modules', 'auth', 'auth.routes.ts'), 'utf8');
+const ofreceRecuperar = /olvid[óo] su contrase[ñn]a|\?[^'"]*recuperar/i.test(ENTRAR);
+check(
+  'Entrar: «¿Olvidó su contraseña?» solo lleva a una recuperación que el servidor atiende',
+  !ofreceRecuperar ||
+    (ENTRAR.includes('href="/?recuperar=1"') &&
+      RUTAS_AUTH.includes("publicRouter.post('/auth/recuperar'") &&
+      RUTAS_AUTH.includes("publicRouter.post('/auth/restablecer'")),
+  ofreceRecuperar ? 'Entrar ofrece el enlace' : 'Entrar no lo ofrece'
+);
+check(
+  'Registro: no ofrece recuperar una contraseña que todavía no existe',
+  !/olvid[óo] su contrase[ñn]a|\?[^'"]*recuperar/i.test(REGISTRO)
+);
 
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);
 process.exit(fallos === 0 ? 0 : 1);

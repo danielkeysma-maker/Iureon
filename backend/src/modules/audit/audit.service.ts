@@ -156,7 +156,16 @@ export type AuditAction =
    * mandaron la confirmación?» tiene que poder leer la respuesta verdadera en
    * su propio rastro. `resource` dice qué se confirmó y con qué referencia.
    */
-  | 'EMAIL_SENT';
+  | 'EMAIL_SENT'
+  /*
+   * Recuperación de contraseña por correo. Se anota en la firma de la cuenta,
+   * con la IP y el desenlace (enviado, no salió, cuenta desactivada), nunca el
+   * token. Solo existe fila cuando la cuenta existe y tiene firma: un correo
+   * sin cuenta no tiene firma en cuya auditoría escribir, y anotarlo en otra
+   * sería contarle a esa firma quién anda probando direcciones.
+   */
+  | 'CONTRASENA_RECUPERACION_SOLICITADA'
+  | 'CONTRASENA_RESTABLECIDA';
 
 export interface AuditLogEntry {
   id: string;

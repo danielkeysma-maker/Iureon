@@ -40,9 +40,12 @@ import type { Plan, PlanPeriod } from '../subscriptions/plan.catalog';
  * deshacer porque el correo no salió, y un plan ya escrito tampoco.
  *
  * NO SE AFIRMA NINGUNA OBLIGACIÓN LEGAL NI SE CITA NINGUNA NORMA. La maqueta
- * del borrado decía que la auditoría «se conserva por obligación legal»; ni la
- * obligación se puede verificar desde aquí ni la auditoría se conserva —la
- * función `borrar_firma_completa` borra `audit_logs` con todo lo demás—. Estos
+ * del borrado decía que la auditoría «se conserva por obligación legal»; esa
+ * obligación no se puede verificar desde aquí. La auditoría SÍ se conserva,
+ * pero por una razón técnica y comprobable —un disparador impide borrarla
+ * (migration-auditoria-inmutable.sql), y `borrar_firma_completa` la deja fuera
+ * desde migration-borrar-firma-completa-v3.sql—, y así lo dice la constancia,
+ * sin invocar norma. Estos
  * correos dejan constancia de un hecho: qué se borró, cuándo, qué plan quedó,
  * hasta cuándo.
  */
@@ -195,10 +198,16 @@ export const plantillaDeFirmaCreada = (d: DatosDeFirmaCreada): Plantilla => {
 const NOMBRE_DE_TABLA: Record<string, string> = {
   document_embeddings: 'Índices de búsqueda de sus documentos',
   legal_documents: 'Documentos cargados',
+  expediente_carpetas: 'Carpetas de los expedientes',
+  expediente_actores: 'Partes y actores de los expedientes',
   saved_drafts: 'Borradores guardados',
   document_reviews: 'Revisiones de documentos',
   transcriptions: 'Transcripciones de audiencias y entrevistas',
-  clients: 'Clientes y sus expedientes',
+  agenda_avisos: 'Avisos programados de la agenda',
+  agenda_terminos: 'Agenda de términos',
+  expedientes: 'Expedientes',
+  clients: 'Clientes',
+  firm_actuaciones: 'Actuaciones propias del catálogo de la firma',
   firm_style_profiles: 'Perfil de estilo de la firma (tabla antigua, sin uso)',
   estilo_lecciones: 'Lecciones de estilo de la firma',
   catalog_verifications: 'Verificaciones del catálogo hechas por la firma',
@@ -215,7 +224,6 @@ const NOMBRE_DE_TABLA: Record<string, string> = {
   credit_movements: 'Movimientos de saldo',
   payment_intents: 'Intenciones de pago',
   subscription_payments: 'Pagos de suscripción',
-  audit_logs: 'Registro de auditoría',
   firms: 'Ficha de la firma'
 };
 
@@ -287,14 +295,14 @@ export const plantillaDeBorrado = (d: DatosDeBorrado): Plantilla => {
         detalle: 'No hay plazo, ni periodo de solo lectura, ni forma de cancelarlo: se cumplió en el acto.'
       },
       {
-        titulo: 'En Iureon no queda copia.',
+        titulo: 'En Iureon no queda copia de su material.',
         detalle:
-          'Documentos, borradores, revisiones, transcripciones, clientes, saldo y el propio registro de auditoría de la firma se borraron con todo lo demás.'
+          'Documentos, expedientes con sus carpetas y actores, agenda de términos, borradores, revisiones, transcripciones, clientes y saldo se borraron con todo lo demás.'
       },
       {
-        titulo: 'Lo único que se conserva.',
+        titulo: 'Lo que se conserva.',
         detalle:
-          'Si la cuenta se abrió desde la página pública, queda anotado que esa dirección de correo abrió una firma, con su fecha. Sostiene el límite de pruebas gratuitas por dirección y no contiene material de sus casos.'
+          'El registro de auditoría de la firma se conserva: la base de datos no permite editarlo ni borrarlo, tampoco en un borrado como este. Anota qué acción se hizo, cuándo, con qué cuenta y desde qué dirección, con una descripción breve —por ejemplo, el título de un escrito o el asunto de un término—; no guarda el contenido de los documentos. Y si la cuenta se abrió desde la página pública, queda anotado que esa dirección de correo abrió una firma, con su fecha: sostiene el límite de pruebas gratuitas por dirección y no contiene material de sus casos.'
       }
     ]),
     nota(
@@ -524,9 +532,9 @@ export const correoDeFirmaCreada = async (d: DatosDeFirmaCreada): Promise<Result
 /**
  * La constancia del borrado, a la firma y al operador.
  *
- * LAS DOS PARTES, Y ESE ES EL PUNTO. La firma se queda sin cuentas y sin
- * registro de auditoría propio —se borró con todo lo demás—, así que el único
- * papel que le queda es este correo. El operador recibe la misma copia, en la
+ * LAS DOS PARTES, Y ESE ES EL PUNTO. La firma se queda sin cuentas con las que
+ * entrar —su registro de auditoría queda en la base, pero ya nadie de ella
+ * puede abrirlo—, así que el único papel que le queda es este correo. El operador recibe la misma copia, en la
  * dirección del titular que ya está en `emisor.ts`, como prueba de que
  * cumplió. Sale DESPUÉS del borrado, a direcciones listadas ANTES de
  * eliminarlas: esa es la última ocasión en que existen.

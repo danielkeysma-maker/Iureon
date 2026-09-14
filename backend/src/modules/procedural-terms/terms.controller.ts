@@ -6,7 +6,8 @@ const termsService = new ProceduralTermsService();
 export const calculateTermsController = async (req: Request, res: Response): Promise<void> => {
   try {
     const firmId = req.firmId;
-    const { notifiedDate, termInDays, jurisdictionType } = req.body;
+    // `termUnit` es opcional: sin él se cuentan días hábiles, como siempre.
+    const { notifiedDate, termInDays, jurisdictionType, termUnit } = req.body;
 
     if (!firmId) {
       res.status(401).json({ error: 'UNAUTHORIZED', message: 'Se requiere req.firmId autenticado' });
@@ -22,7 +23,8 @@ export const calculateTermsController = async (req: Request, res: Response): Pro
       firmId,
       notifiedDate,
       termInDays: Number(termInDays),
-      jurisdictionType: jurisdictionType || 'LABORAL'
+      jurisdictionType: jurisdictionType || 'LABORAL',
+      termUnit
     });
 
     res.json({ success: true, result });

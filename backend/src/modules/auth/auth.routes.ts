@@ -11,6 +11,7 @@ import {
   setUserActiveController,
   setUserRoleController,
 } from './auth.controller';
+import { recuperarController, restablecerController } from './recuperacion.controller';
 
 /**
  * The two endpoints that must live BEFORE the session middleware, because a
@@ -28,6 +29,13 @@ const publicRouter = Router();
 
 publicRouter.post('/auth/login', loginController as any);
 publicRouter.post('/auth/refresh', refreshController as any);
+/*
+ * Recuperar la contraseña por correo: pedir el enlace y canjearlo. Públicas por
+ * la misma razón que entrar — quien las usa no tiene sesión—. Sus límites y su
+ * respuesta neutral viven en `recuperacion.rules.ts`.
+ */
+publicRouter.post('/auth/recuperar', recuperarController as any);
+publicRouter.post('/auth/restablecer', restablecerController as any);
 
 export const authPublicRoutes = publicRouter;
 

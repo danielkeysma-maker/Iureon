@@ -1,7 +1,14 @@
 import { Request, Response } from 'express';
 import { determinarCuantia, indexarPorIpc, liquidarIntereses } from './calculos.service';
 import { calendarioDe } from './calendario.service';
-import { FUENTE_IBC_PAGINA, FUENTE_IPC_PAGINA, IBC_ULTIMO_VERIFICADO, SMLMV_POR_ANIO } from './fuentes';
+import { FUENTE_IBC_PAGINA, FUENTE_IPC_PAGINA, SMLMV_POR_ANIO } from './fuentes';
+import {
+  CERTIFICACIONES_IBC,
+  CONSULTADO_EL,
+  MODALIDAD_CERTIFICADA,
+  PRIMER_DIA_CERTIFICADO,
+  ULTIMO_DIA_CERTIFICADO
+} from './tasasCertificadas';
 
 /**
  * A refused computation is a 400 with the Spanish reason, never a 500: the
@@ -26,12 +33,38 @@ const numero = (v: unknown): number | undefined => {
   return Number.isFinite(n) ? n : undefined;
 };
 
+/*
+ * `ibc` conserva la forma que ya leían las pantallas —la última certificación—,
+ * pero ahora sale de la misma tabla con que se liquida y no de una constante
+ * escrita aparte: dos copias de la misma tasa terminan diciendo cosas distintas
+ * el mes en que alguien actualiza solo una. `certificaciones` anuncia el rango
+ * cargado para que la pantalla lo diga antes de calcular.
+ */
+const ultima = CERTIFICACIONES_IBC[CERTIFICACIONES_IBC.length - 1];
+
 export const parametrosController = (_req: Request, res: Response): void => {
   res.json({
     success: true,
     result: {
       smlmv: SMLMV_POR_ANIO,
-      ibc: IBC_ULTIMO_VERIFICADO,
+      ibc: {
+        tasaEA: ultima.interesBancarioCorrienteEA,
+        modalidad: MODALIDAD_CERTIFICADA,
+        mes: ultima.desde.slice(0, 7),
+        resolucion: `${ultima.resolucion} (${ultima.fechaResolucion})`,
+        fuente: {
+          nombre: `Interés bancario corriente · ${MODALIDAD_CERTIFICADA} · ${ultima.desde} a ${ultima.hasta}`,
+          norma: `Superintendencia Financiera, ${ultima.resolucion}, art. 1`,
+          url: ultima.url,
+          consultadoEl: ultima.consultadoEl
+        }
+      },
+      certificaciones: {
+        modalidad: MODALIDAD_CERTIFICADA,
+        desde: PRIMER_DIA_CERTIFICADO,
+        hasta: ULTIMO_DIA_CERTIFICADO,
+        consultadoEl: CONSULTADO_EL
+      },
       enlaces: { ibc: FUENTE_IBC_PAGINA, ipc: FUENTE_IPC_PAGINA }
     }
   });
@@ -50,15 +83,18 @@ export const indexacionController = (req: Request, res: Response): void => {
   );
 };
 
+/*
+ * `ibcEA` ya no se lee: la tasa de cada tramo sale de la tabla certificada. Un
+ * cliente viejo que todavía lo mande recibe la misma liquidación que uno nuevo.
+ */
 export const interesesController = (req: Request, res: Response): void => {
-  const { capital, desde, hasta, modo, ibcEA, tasaPactadaEA } = req.body ?? {};
+  const { capital, desde, hasta, modo, tasaPactadaEA } = req.body ?? {};
   responder(res, () =>
     liquidarIntereses({
       capital: numero(capital) as number,
       desde: String(desde ?? ''),
       hasta: String(hasta ?? ''),
       modo,
-      ibcEA: numero(ibcEA),
       tasaPactadaEA: numero(tasaPactadaEA)
     })
   );

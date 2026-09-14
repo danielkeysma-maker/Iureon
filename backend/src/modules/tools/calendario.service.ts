@@ -236,6 +236,134 @@ export const contarDiasHabiles = (desde: string, dias: number, opciones: Opcione
   return { fechaInicio, fechaFin: iso(cursor), diasHabiles: dias, excluidos };
 };
 
+export interface ConteoCalendario {
+  fechaInicio: string;
+  fechaFin: string;
+  dias: number;
+  /**
+   * Días que SE CONTARON aunque no son hábiles (fin de semana, festivo,
+   * vacancia). Se listan para que el abogado vea qué no se descontó, no porque
+   * se hayan descontado.
+   */
+  noHabilesContados: DiaNoHabil[];
+  /** Por qué el día del vencimiento no es hábil, o null si lo es. */
+  venceEnNoHabil: string | null;
+}
+
+/**
+ * Cuenta `dias` días de CALENDARIO desde el día siguiente a `desde`.
+ *
+ * ─── SE CUENTA TODO, Y EL VENCIMIENTO NO SE MUEVE ───────────────────────────
+ *
+ * El art. 118 del CGP hace correr el término fuera de audiencia «a partir del
+ * día siguiente al de la notificación», y eso no cambia con la clase de días.
+ * Lo que el artículo NO dice es qué pasa cuando un término en días de
+ * calendario vence en un día inhábil: la prórroga al primer día hábil
+ * siguiente la escribe solo para los términos de meses o de años. Mover aquí
+ * la fecha sería aplicar por analogía una regla que la norma leída no da, así
+ * que la fecha se deja donde cae y el resultado lo advierte.
+ *
+ * Única cuenta de días de calendario del backend: la agenda la usa también,
+ * para que la vista previa y el contador no puedan discrepar.
+ */
+export const contarDiasCalendario = (desde: string, dias: number, opciones: OpcionesCalendario = {}): ConteoCalendario => {
+  if (!Number.isInteger(dias) || dias <= 0) throw new Error('El número de días debe ser un entero mayor que cero.');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(desde) || Number.isNaN(Date.parse(desde))) {
+    throw new Error('La fecha debe tener el formato AAAA-MM-DD.');
+  }
+  const inicio = addDays(new Date(`${desde}T00:00:00Z`), 1);
+  const noHabilesContados: DiaNoHabil[] = [];
+  for (let i = 0; i < dias; i++) {
+    const fecha = iso(addDays(inicio, i));
+    const motivo = motivoNoHabil(fecha, opciones);
+    if (motivo) noHabilesContados.push({ fecha, motivo });
+  }
+  const fechaFin = iso(addDays(inicio, dias - 1));
+  return {
+    fechaInicio: iso(inicio),
+    fechaFin,
+    dias,
+    noHabilesContados,
+    venceEnNoHabil: motivoNoHabil(fechaFin, opciones)
+  };
+};
+
+export type UnidadLarga = 'MESES' | 'ANIOS';
+
+export interface ConteoLargo {
+  fechaInicio: string;
+  /** El mismo día del mes o año correspondiente, antes de prorrogar. */
+  fechaNominal: string;
+  fechaFin: string;
+  cantidad: number;
+  unidad: UnidadLarga;
+  /** El mes de llegada no tenía ese día y se tomó su último día. */
+  alUltimoDiaDelMes: boolean;
+  /** Los días inhábiles que se saltaron para llegar al primer día hábil. */
+  prorroga: DiaNoHabil[];
+}
+
+/**
+ * Términos de meses o de años, con la regla del art. 118 del CGP, inc. penúltimo,
+ * leída en el texto oficial de la Secretaría del Senado:
+ *
+ *   «Cuando el término sea de meses o de años, su vencimiento tendrá lugar el
+ *   mismo día que empezó a correr del correspondiente mes o año. Si este no
+ *   tiene ese día, el término vencerá el último día del respectivo mes o año.
+ *   Si su vencimiento ocurre en día inhábil se extenderá hasta el primer día
+ *   hábil siguiente.»
+ *
+ * «Empezó a correr» es el día siguiente al de la notificación (mismo artículo,
+ * inc. 2, término concedido fuera de audiencia), así que ese es el día que se
+ * busca en el mes o año de llegada. El día inhábil es el mismo que decide
+ * `motivoNoHabil` —fin de semana, festivo y vacancia judicial—, de modo que
+ * esta cuenta y la de días hábiles no pueden llamar hábil a días distintos.
+ */
+export const contarMesesOAnios = (
+  desde: string,
+  cantidad: number,
+  unidad: UnidadLarga,
+  opciones: OpcionesCalendario = {}
+): ConteoLargo => {
+  const tope = unidad === 'MESES' ? 600 : 50;
+  if (!Number.isInteger(cantidad) || cantidad <= 0 || cantidad > tope) {
+    throw new Error(
+      unidad === 'MESES'
+        ? `El número de meses debe ser un entero entre 1 y ${tope}.`
+        : `El número de años debe ser un entero entre 1 y ${tope}.`
+    );
+  }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(desde) || Number.isNaN(Date.parse(desde))) {
+    throw new Error('La fecha debe tener el formato AAAA-MM-DD.');
+  }
+
+  const inicio = addDays(new Date(`${desde}T00:00:00Z`), 1);
+  const meses = unidad === 'MESES' ? cantidad : cantidad * 12;
+  const indice = inicio.getUTCFullYear() * 12 + inicio.getUTCMonth() + meses;
+  const anio = Math.floor(indice / 12);
+  const mes = indice % 12; // 0-11
+  const ultimoDia = new Date(Date.UTC(anio, mes + 1, 0)).getUTCDate();
+  const dia = inicio.getUTCDate();
+  const nominal = new Date(Date.UTC(anio, mes, Math.min(dia, ultimoDia)));
+
+  const prorroga: DiaNoHabil[] = [];
+  let cursor = nominal;
+  for (let motivo = motivoNoHabil(iso(cursor), opciones); motivo; motivo = motivoNoHabil(iso(cursor), opciones)) {
+    prorroga.push({ fecha: iso(cursor), motivo });
+    cursor = addDays(cursor, 1);
+  }
+
+  return {
+    fechaInicio: iso(inicio),
+    fechaNominal: iso(nominal),
+    fechaFin: iso(cursor),
+    cantidad,
+    unidad,
+    alUltimoDiaDelMes: dia > ultimoDia,
+    prorroga
+  };
+};
+
 export interface CalendarioAnual {
   anio: number;
   festivos: Festivo[];

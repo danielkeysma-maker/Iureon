@@ -16,9 +16,9 @@
  *
  * A new year's SMLMV: read the decree on funcionpublica.gov.co (Gestor
  * Normativo) or dapre.presidencia.gov.co and add the row with its URL and the
- * date. Never copy a value from a news item. The IBC: it changes monthly, so
- * only the latest value actually verified on superfinanciera.gov.co lives
- * here, labelled with its month; the tool asks the lawyer for any other period.
+ * date. Never copy a value from a news item. The IBC: it changes monthly; every
+ * certified period, with its resolución and official URL, lives in
+ * `tasasCertificadas.ts`, which explains how to add next month's row.
  */
 
 export interface Fuente {
@@ -161,43 +161,18 @@ export const smlmvDe = (anio: number): SmlmvAnual | null => SMLMV_POR_ANIO.find(
 
 // ─── Interés bancario corriente ─────────────────────────────────────────────
 
-export interface IbcVerificado {
-  /** % efectivo anual. */
-  tasaEA: number;
-  modalidad: string;
-  /** YYYY-MM the certification applies to. */
-  mes: string;
-  resolucion: string;
-  fuente: Fuente;
-}
+/*
+ * Las tasas certificadas, periodo por periodo, viven en `tasasCertificadas.ts`
+ * con su resolución y su URL. Aquí queda solo la página donde la
+ * Superintendencia las publica cada mes.
+ */
 
 /** Stable landing page where the monthly certification is published. */
 export const FUENTE_IBC_PAGINA: Fuente = {
   nombre: 'Certificaciones mensuales del interés bancario corriente (comunicados por mes)',
   norma: 'Superintendencia Financiera de Colombia · resoluciones mensuales',
   url: 'https://www.superfinanciera.gov.co/publicaciones/10829/sala-de-prensacomunicados-de-prensa-interes-bancario-corriente-10829/',
-  consultadoEl: '2026-09-04'
-};
-
-/**
- * Only the most recent value read on the Superfinanciera resolution itself.
- * `null` would mean no monthly certification could be read there on the stated
- * date, and the tool then asks for the rate instead of assuming one. The value
- * is read from the PDF of the resolución, art. 1: "Certificar en un 19.49%
- * efectivo anual el interés bancario corriente para la modalidad de crédito de
- * consumo y ordinario" (1–30 September 2026).
- */
-export const IBC_ULTIMO_VERIFICADO: IbcVerificado | null = {
-  tasaEA: 19.49,
-  modalidad: 'crédito de consumo y ordinario',
-  mes: '2026-09',
-  resolucion: 'Resolución 1260 de 2026 (31 de agosto de 2026)',
-  fuente: {
-    nombre: 'Interés bancario corriente · consumo y ordinario · septiembre de 2026 · 19,49 % E.A.',
-    norma: 'Superintendencia Financiera, Resolución 1260 de 2026, art. 1',
-    url: 'https://www.superfinanciera.gov.co/loader.php?lServicio=Tools2&lTipo=descargas&lFuncion=descargar&idFile=1083363',
-    consultadoEl: '2026-09-04'
-  }
+  consultadoEl: '2026-09-14'
 };
 
 // ─── IPC ────────────────────────────────────────────────────────────────────
