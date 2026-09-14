@@ -42,9 +42,13 @@ interface DraftProvenanceBarProps {
   procedencia: ProcedenciaDelBorrador | null | undefined;
 }
 
-const AMBAR =
-  'border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))] text-unverified';
-const VERDE = 'border-[rgb(var(--verified-line))] bg-[rgb(var(--verified-surf))] text-verified';
+/*
+ * EL ÁMBAR LLEVA GUION Y EL VERDE NO. En la cara nueva el borde discontinuo es
+ * la señal de «sin verificar» (README-app §1): es lo que distingue los dos
+ * estados en escala de grises, donde el ámbar y el verde se confunden.
+ */
+const AMBAR = 'cn-red-procedencia cn-red-procedencia--ambar';
+const VERDE = 'cn-red-procedencia cn-red-procedencia--verde';
 
 export const DraftProvenanceBar: React.FC<DraftProvenanceBarProps> = ({ procedencia }) => {
   /*
@@ -56,9 +60,9 @@ export const DraftProvenanceBar: React.FC<DraftProvenanceBarProps> = ({ proceden
 
   if (procedencia === null) {
     return (
-      <div className={`flex items-start gap-2.5 rounded-card border px-4 py-2.5 ${AMBAR}`}>
-        <FileQuestion className="mt-0.5 h-4 w-4 shrink-0" />
-        <p className="text-justify text-[12px] leading-snug [text-wrap:pretty]">
+      <div className={AMBAR}>
+        <FileQuestion className="cn-red-procedencia-icono" strokeWidth={1.8} aria-hidden />
+        <p className="cn-red-procedencia-texto">
           <strong className="font-semibold">Esta actuación no está en el catálogo.</strong> El
           escrito se redactó sin ficha procesal que lo respalde: ningún término, artículo ni
           autoridad de los que aparecen abajo fue tomado de una fuente verificada. Revíselos contra
@@ -92,17 +96,15 @@ export const DraftProvenanceBar: React.FC<DraftProvenanceBarProps> = ({ proceden
   const enAmbar = sinTermino || faltanArticulos;
 
   return (
-    <div
-      className={`flex items-start gap-2.5 rounded-card border px-4 py-2.5 ${enAmbar ? AMBAR : VERDE}`}
-    >
+    <div className={enAmbar ? AMBAR : VERDE}>
       {enAmbar ? (
-        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+        <AlertTriangle className="cn-red-procedencia-icono" strokeWidth={1.8} aria-hidden />
       ) : (
-        <BadgeCheck className="mt-0.5 h-4 w-4 shrink-0" />
+        <BadgeCheck className="cn-red-procedencia-icono" strokeWidth={1.8} aria-hidden />
       )}
 
-      <div className="min-w-0 flex-1 space-y-1">
-        <p className="text-justify text-[12px] leading-snug [text-wrap:pretty]">
+      <div className="cn-red-procedencia-cuerpo">
+        <p className="cn-red-procedencia-texto">
           Redactado contra <strong className="font-semibold">{procedencia.exactName}</strong> ·{' '}
           {procedencia.legalBasis}
           {procedencia.curadaPorLaFirma && procedencia.curadaPor && (
@@ -111,7 +113,7 @@ export const DraftProvenanceBar: React.FC<DraftProvenanceBarProps> = ({ proceden
         </p>
 
         {deLaFirma && (
-          <p className="text-justify text-[12px] leading-snug [text-wrap:pretty]">
+          <p className="cn-red-procedencia-texto">
             <strong className="font-semibold">
               {esTitulo
                 ? 'Este escrito se redactó sin nombre de actuación.'
@@ -124,7 +126,7 @@ export const DraftProvenanceBar: React.FC<DraftProvenanceBarProps> = ({ proceden
         )}
 
         {sinTermino && (
-          <p className="text-justify text-[12px] leading-snug [text-wrap:pretty]">
+          <p className="cn-red-procedencia-texto">
             <strong className="font-semibold">Nadie ha comprobado el término de esta ficha.</strong>{' '}
             Si el escrito afirma un plazo, no viene del catálogo verificado: confírmelo contra la
             norma antes de exportar.
@@ -132,7 +134,7 @@ export const DraftProvenanceBar: React.FC<DraftProvenanceBarProps> = ({ proceden
         )}
 
         {faltanArticulos && (
-          <p className="text-justify text-[12px] leading-snug [text-wrap:pretty]">
+          <p className="cn-red-procedencia-texto">
             {procedencia.seccionesSinArticulo} de {procedencia.seccionesTotales} secciones
             obligatorias no tienen artículo confirmado. Se le siguen exigiendo al escrito; lo que
             falta es la cita que las sostiene.
@@ -144,9 +146,9 @@ export const DraftProvenanceBar: React.FC<DraftProvenanceBarProps> = ({ proceden
             href={procedencia.sourceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-[11.5px] font-semibold underline underline-offset-2"
+            className="cn-red-procedencia-enlace"
           >
-            <ExternalLink className="h-3 w-3" />
+            <ExternalLink className="cn-red-procedencia-enlace-icono" strokeWidth={1.8} aria-hidden />
             Ver la norma en su fuente oficial
           </a>
         )}

@@ -4,12 +4,12 @@ import {
   ChevronRight,
   CircleDashed,
   HelpCircle,
-  Link2,
   MinusCircle,
   PenLine,
   Sparkles
 } from 'lucide-react';
-import { Combobox, type OpcionCombobox } from './Combobox';
+import { EstadoDeLaFicha, SelectorEnCascada, type OpcionEnCascada } from './SelectorEnCascada';
+import { estadoDeLaFicha, ordenarParaLaLista } from '../services/fichaEnLaLista';
 import { rotuloDeExpediente, useExpedientes } from '../../expedientes/useExpedientes';
 import { useActuacionLookup } from '../../catalog/hooks/useActuacion';
 import { useBranchActuacionesState } from '../../catalog/hooks/useBranchActuaciones';
@@ -47,6 +47,38 @@ const OPCION_PROPIA = '__ESCRIBIR_EL_NOMBRE__';
  */
 const OPCION_SIN_NOMBRE = '__SIN_NOMBRE_DE_ACTUACION__';
 
+/*
+ * LAS TRES SALIDAS VAN ANTES DE TODA ACTUACIÓN, en un bloque propio.
+ *
+ * Estaban mezcladas con las fichas —la guía primera y las otras dos al final
+ * de noventa renglones—, así que quien no encontraba su actuación tenía que
+ * llegar al fondo de la lista para descubrir que había otra puerta. Ahora se
+ * pintan encima de la lista, bajo «Si no está en la lista», y la lupa no las
+ * filtra: justo cuando la búsqueda no encuentra nada es cuando hacen falta.
+ * El orden sigue siendo el de la conversación: «no sé cuál es» → «ni sé cómo se
+ * llama» → «no está».
+ */
+const SERVICIOS: { valor: string; etiqueta: string; detalle: string; Icono: typeof Sparkles }[] = [
+  {
+    valor: OPCION_GUIA,
+    etiqueta: 'Que la guía proponga la actuación',
+    detalle: 'a partir de los hechos que usted escribió',
+    Icono: Sparkles
+  },
+  {
+    valor: OPCION_SIN_NOMBRE,
+    etiqueta: 'No sé cómo se llama: describir qué debe lograr…',
+    detalle: 'se redacta sin nombre de actuación y sin norma verificada',
+    Icono: HelpCircle
+  },
+  {
+    valor: OPCION_PROPIA,
+    etiqueta: 'Ninguna de estas: escribir el nombre…',
+    detalle: 'quedará en esta rama, sin norma verificada',
+    Icono: PenLine
+  }
+];
+
 /**
  * "De qué se trata este escrito": rol → rama → tipo, en una barra de 42px.
  *
@@ -72,7 +104,7 @@ const OPCION_SIN_NOMBRE = '__SIN_NOMBRE_DE_ACTUACION__';
  * una: escribir "super" es más rápido que buscar con la vista.
  */
 
-const ROLES: OpcionCombobox[] = [
+const ROLES: OpcionEnCascada[] = [
   { valor: 'LITIGANTE', etiqueta: 'Firma / Litigante' },
   { valor: 'DESPACHO', etiqueta: 'Juez / Despacho' },
   { valor: 'SECRETARIA', etiqueta: 'Secretaría' }
@@ -123,16 +155,25 @@ const IconoEstado: React.FC<{ actuacion?: Actuacion | null; sinCatalogar?: boole
   sinCatalogar
 }) => {
   if (sinCatalogar)
-    return <CircleDashed className="h-3.5 w-3.5 shrink-0 text-unverified" strokeWidth={2.4} />;
+    return <CircleDashed className="cn-red-termino-icono cn-red-termino-icono--sin" strokeWidth={2.2} />;
   if (!actuacion) return null;
   if (actuacion.term.status === 'NO_CADUCA')
-    return <MinusCircle className="h-3.5 w-3.5 shrink-0 text-neutral-fact" strokeWidth={2.4} />;
+    return <MinusCircle className="cn-red-termino-icono cn-red-termino-icono--neutro" strokeWidth={2.2} />;
   if (actuacion.term.status === 'NO_VERIFICADO')
-    return <CircleDashed className="h-3.5 w-3.5 shrink-0 text-unverified" strokeWidth={2.4} />;
-  return <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-verified" strokeWidth={2.4} />;
+    return <CircleDashed className="cn-red-termino-icono cn-red-termino-icono--sin" strokeWidth={2.2} />;
+  return <CheckCircle2 className="cn-red-termino-icono cn-red-termino-icono--ok" strokeWidth={2.2} />;
 };
 
-const Flecha = () => <ChevronRight className="h-3 w-3 shrink-0 text-ink-400" strokeWidth={2.4} />;
+/*
+ * LA FLECHA ENTRE CAJAS DICE QUE LO DE LA DERECHA DEPENDE DE LO DE LA IZQUIERDA
+ * (README-app §2). Con tres listas sueltas nadie entiende por qué la actuación
+ * se vació al cambiar la rama; con la flecha, la dependencia se ve antes.
+ */
+const Flecha = () => (
+  <span className="cn-red-flecha" aria-hidden>
+    <ChevronRight className="cn-red-flecha-icono" strokeWidth={1.8} />
+  </span>
+);
 
 export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
   userRole,
@@ -166,7 +207,7 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
    */
   const expedientes = useExpedientes();
 
-  const opcionesExpediente: OpcionCombobox[] = useMemo(
+  const opcionesExpediente: OpcionEnCascada[] = useMemo(
     () => [
       { valor: '', etiqueta: 'Sin expediente' },
       ...expedientes.map((e) => ({ valor: e.id, etiqueta: rotuloDeExpediente(e) }))
@@ -174,7 +215,7 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
     [expedientes]
   );
 
-  const opcionesRama: OpcionCombobox[] = useMemo(
+  const opcionesRama: OpcionEnCascada[] = useMemo(
     () => ramas.map((b) => ({ valor: b, etiqueta: BRANCH_LABELS[b] ?? b })),
     [ramas]
   );
@@ -188,60 +229,42 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
    * llegó a estar escrito aquí— afirma una verificación que el catálogo no
    * respalda, justo sobre el dato que decide.
    */
-  const opcionesTipo: OpcionCombobox[] = useMemo(
-    () => [
-      {
-        valor: OPCION_GUIA,
-        etiqueta: 'Que la guía proponga la actuación',
-        detalle: 'a partir de los hechos que usted escribió',
-        icono: <Sparkles className="h-3.5 w-3.5 shrink-0 text-brand-700" strokeWidth={2.4} />
-      },
+  const opcionesTipo: OpcionEnCascada[] = useMemo(
+    () =>
       /*
-       * LO PRESTADO SE DICE EN EL RENGLÓN, no en un grupo aparte.
+       * SOLO FICHAS DEL CATÁLOGO, en orden alfabético español y en dos bloques:
+       * las de la rama y, debajo, las prestadas por remisión. Las tres salidas
+       * de servicio no están aquí: van en su bloque, encima (ver SERVICIOS).
        *
-       * El `Combobox` no tiene cabeceras de sección, y ponerle una opción falsa
-       * que hiciera de título se filtraría mal en cuanto el abogado escribiera
-       * en el buscador. El renglón sí lleva su propio detalle, y ahí cabe la
-       * frase entera — que además es la que hay que leer justo antes de elegir,
-       * no una etiqueta de grupo que se quedó cinco renglones más arriba.
-       *
-       * El servidor manda el texto (`a.porRemision.marca`) para que la pantalla
-       * y el motor digan lo mismo. Y ya vienen al final de la lista: el orden lo
-       * fija `catalog.service.ts`, no esta pantalla.
+       * LO PRESTADO SE DICE UNA VEZ, en la cabecera del bloque y con los dos
+       * textos que manda el servidor (`marca` y `aviso`), para que la pantalla y
+       * el motor digan lo mismo. Repetido en cada renglón, catorce veces, dejaba
+       * de leerse.
        */
-      ...catalogo.actuaciones.map((a) => ({
-        valor: a.exactName,
-        etiqueta: a.exactName,
-        detalle: a.porRemision
-          ? a.porRemision.marca
-          : a.firmDefined
-          ? esTituloDeTrabajo(a.exactName)
-            ? 'título de trabajo · no es el nombre de una figura'
-            : 'de su firma · sin norma verificada'
-          : a.term.status === 'NO_CADUCA'
-          ? 'No caduca'
-          : a.term.status === 'NO_VERIFICADO'
-          ? 'sin dato'
-          : a.term.description ?? '',
-        icono: a.porRemision ? (
-          <Link2 className="h-3.5 w-3.5 shrink-0 text-ink-400" strokeWidth={2.4} />
-        ) : (
-          <IconoEstado actuacion={a} />
-        )
-      })),
-      {
-        valor: OPCION_PROPIA,
-        etiqueta: 'Ninguna de estas: escribir el nombre…',
-        detalle: 'quedará en esta rama, sin norma verificada',
-        icono: <PenLine className="h-3.5 w-3.5 shrink-0 text-unverified" strokeWidth={2.4} />
-      },
-      {
-        valor: OPCION_SIN_NOMBRE,
-        etiqueta: 'No sé cómo se llama: describir qué debe lograr…',
-        detalle: 'se redacta sin nombre de actuación y sin norma verificada',
-        icono: <HelpCircle className="h-3.5 w-3.5 shrink-0 text-unverified" strokeWidth={2.4} />
-      }
-    ],
+      ordenarParaLaLista(catalogo.actuaciones).map((a): OpcionEnCascada => {
+        if (a.porRemision) {
+          return {
+            valor: a.exactName,
+            etiqueta: a.exactName,
+            detalleTexto: a.porRemision.marca,
+            grupo: { titulo: a.porRemision.marca, aviso: a.porRemision.aviso }
+          };
+        }
+        const estado = estadoDeLaFicha(a, esTituloDeTrabajo(a.exactName));
+        /* El término sigue a la vista antes de elegir: es el dato que decide. */
+        const termino = a.term.status === 'VERIFICADO' ? a.term.description ?? '' : '';
+        return {
+          valor: a.exactName,
+          etiqueta: a.exactName,
+          detalle: (
+            <>
+              <EstadoDeLaFicha estado={estado} />
+              {termino && <span className="cn-red-fila-termino">{termino}</span>}
+            </>
+          ),
+          detalleTexto: [estado.articulo, estado.texto, termino].filter(Boolean).join(' · ')
+        };
+      }),
     [catalogo.actuaciones]
   );
 
@@ -409,29 +432,31 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
       Eso es rehacer la barra, no contenerla; mientras tanto esto evita que rompa
       el resto, que es un defecto distinto y peor.
     */}
-    <div className="flex h-[42px] shrink-0 items-center gap-2 overflow-x-auto border-b border-line-200 bg-surface px-5 lg:overflow-x-visible">
-      <span className="shrink-0 font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
-        Este escrito
-      </span>
-
-      <Combobox
-        etiqueta="Quién escribe"
+    {/*
+      LA CARA NUEVA SUMA ALTO A PROPÓSITO: cada caja lleva su rótulo encima y
+      mide 44 px, porque la cascada tiene que leerse —quién firma, luego la
+      rama, luego la actuación— y un rótulo dentro del botón desaparece en
+      cuanto hay algo elegido. Sigue sin `flex-wrap` por la razón de arriba.
+    */}
+    <div className="cn-red-barra">
+      <SelectorEnCascada
+        etiqueta="Quién firma"
         valor={userRole}
         opciones={ROLES}
         onChange={(v) => setUserRole(v as ActuacionRole)}
         conBusqueda={false}
-        anchoBoton="max-w-[150px]"
+        anchoCampo="cn-red-campo--rol"
         pie="Cambia el tono y las secciones obligatorias del escrito."
       />
 
       <Flecha />
 
-      <Combobox
+      <SelectorEnCascada
         etiqueta="Rama"
         valor={legalBranch}
         opciones={opcionesRama}
         onChange={setLegalBranch}
-        anchoBoton="max-w-[190px]"
+        anchoCampo="cn-red-campo--rama"
         cargando={ramasEstado.estado === 'CARGANDO'}
         pie={
           /*
@@ -449,28 +474,50 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
 
       <Flecha />
 
-      <Combobox
-        etiqueta="Tipo de documento"
+      <SelectorEnCascada
+        etiqueta="Actuación"
         valor={documentType}
         opciones={opcionesTipo}
         onChange={elegirTipo}
         vacio="Elegir actuación…"
-        anchoBoton="max-w-[280px]"
+        anchoCampo="cn-red-campo--actuacion"
         cargando={catalogo.estado === 'CARGANDO'}
+        antesDeLaLista={(cerrar) => (
+          <div className="cn-red-servicios">
+            <p className="cn-red-servicios-titulo">Si no está en la lista</p>
+            {SERVICIOS.map(({ valor, etiqueta, detalle, Icono }) => (
+              <button
+                key={valor}
+                type="button"
+                onClick={() => {
+                  cerrar();
+                  elegirTipo(valor);
+                }}
+                className="cn-red-servicio"
+              >
+                <Icono className="cn-red-servicio-icono" strokeWidth={1.8} aria-hidden />
+                <span className="cn-red-fila-textos">
+                  <span className="cn-red-servicio-nombre">{etiqueta}</span>
+                  <span className="cn-red-fila-detalle">{detalle}</span>
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
         pie={
           catalogo.estado === 'LISTA' ? (
             <>
-              <b className="font-mono font-semibold text-ink-900">{verificadas}</b> de{' '}
-              <b className="font-mono font-semibold text-ink-900">{catalogo.nombres.length}</b> con
+              <b className="cn-red-cifra">{verificadas}</b> de{' '}
+              <b className="cn-red-cifra">{catalogo.nombres.length}</b> con
               término verificado contra la norma.
               {otrosRoles > 0 && (
                 <>
                   {' '}
                   La lista muestra solo las que firma{' '}
-                  <b className="font-semibold text-ink-700">
+                  <b className="cn-red-cifra">
                     {ROLES.find((r) => r.valor === userRole)?.etiqueta}
                   </b>
-                  ; hay <b className="font-mono font-semibold text-ink-900">{otrosRoles}</b> más en
+                  ; hay <b className="cn-red-cifra">{otrosRoles}</b> más en
                   esta rama con otro rol.
                 </>
               )}
@@ -487,10 +534,10 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
              */
             <>
               Ninguna actuación de esta rama la firma{' '}
-              <b className="font-semibold text-ink-700">
+              <b className="cn-red-cifra">
                 {ROLES.find((r) => r.valor === userRole)?.etiqueta}
               </b>
-              ; hay <b className="font-mono font-semibold text-ink-900">{otrosRoles}</b> con otro rol.
+              ; hay <b className="cn-red-cifra">{otrosRoles}</b> con otro rol.
             </>
           ) : (
             'Esta rama aún no tiene catálogo verificado.'
@@ -507,16 +554,20 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
         Solo se pinta si la firma tiene expedientes: un desplegable con «Sin
         expediente» y nada más no ofrece nada.
       */}
+      {/*
+        El caso no depende de la actuación, así que no lleva flecha: una raya lo
+        separa de la cascada en vez de encadenarlo a ella.
+      */}
       {expedientes.length > 0 && (
         <>
-          <Flecha />
-          <Combobox
+          <span className="cn-red-raya" aria-hidden />
+          <SelectorEnCascada
             etiqueta="De qué caso"
             valor={expedienteId}
             opciones={opcionesExpediente}
             onChange={setExpedienteId}
             vacio="Sin expediente"
-            anchoBoton="max-w-[220px]"
+            anchoCampo="cn-red-campo--caso"
             pie="El borrador queda contado dentro del caso, y si el caso tiene documentos cargados el escrito nace con lo que ellos dicen. Sin esto nace suelto y hay que jalarlo después desde Expedientes."
           />
         </>
@@ -543,26 +594,21 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
         Con `max-w` explícito el corte ocurre siempre, y el texto completo vive
         en el `title` y en la ficha de la izquierda, donde sí se puede leer.
       */}
-      <div className="ml-auto flex min-w-0 items-center gap-3 pl-3">
+      <div className="cn-red-termino-caja">
         {lookup.estado !== 'CARGANDO' && (
-          <span
-            className="hidden max-w-[280px] items-center gap-1.5 xl:flex"
-            title={actuacion?.term.description ?? undefined}
-          >
+          <span className="cn-red-termino" title={actuacion?.term.description ?? undefined}>
             <IconoEstado actuacion={actuacion} sinCatalogar={lookup.estado === 'SIN_CATALOGAR'} />
-            <span className="min-w-0 truncate text-meta text-ink-700">
+            <span className="cn-red-termino-texto">
               {lookup.estado === 'SIN_CATALOGAR' ? (
-                <span className="text-unverified">Sin catalogar</span>
+                <span className="cn-red-termino-sin">Sin catalogar</span>
               ) : actuacion?.term.status === 'NO_CADUCA' ? (
                 'No caduca'
               ) : actuacion?.term.status === 'NO_VERIFICADO' ? (
-                <span className="text-unverified">Término sin verificar</span>
+                <span className="cn-red-termino-sin">Término sin verificar</span>
               ) : (
                 <>
-                  <span className="text-ink-500">Término </span>
-                  <span className="font-mono font-semibold text-ink-900">
-                    {actuacion?.term.description}
-                  </span>
+                  <span className="cn-red-termino-rotulo">Término </span>
+                  <span className="cn-red-mono">{actuacion?.term.description}</span>
                 </>
               )}
             </span>

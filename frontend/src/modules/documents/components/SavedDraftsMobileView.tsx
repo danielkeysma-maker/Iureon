@@ -36,6 +36,13 @@ import type { SavedDraftEntry } from '../types';
  * vencimiento del mismo escrito —porque una redondea distinto— es el defecto
  * más caro que este producto podría tener. La forma cambia; el reloj no.
  *
+ * ─── LA CARA NUEVA ──────────────────────────────────────────────────────────
+ *
+ * Tarjetas de radio 14 sobre el gris del lienzo, letra desde 14 px y el
+ * primario de 52 px abajo. La tarjeta urgente se marca con un borde CONTINUO
+ * ámbar: el discontinuo significa «sin verificar» y lo lleva solo la píldora de
+ * lo que falta de respaldo.
+ *
  * ─── LO QUE EL ARTBOARD PIDE Y AQUÍ NO ESTÁ, con la razón ───────────────────
  *
  * · Los filtros «De la firma / Estado / Orden» de 10a. En móvil el orden ya es
@@ -75,27 +82,28 @@ export const SavedDraftsMobileView: React.FC<SavedDraftsMobileViewProps> = ({
   const grupos = React.useMemo(() => agruparPorTermino(visibles), [visibles]);
 
   return (
-    <div data-visita="vista-borradores" className="flex h-full min-h-0 flex-1 flex-col bg-canvas">
+    <div data-visita="vista-borradores" className="cara-nueva cn-bor flex h-full min-h-0 min-w-0 flex-1 flex-col">
       {/*
         SIN TITULO PROPIO. `MobileHeader` ya pone «Borradores» con su contexto
         debajo, que es como 4d arma la cabecera —una sola—. Repetirlo aqui
         gastaba dos renglones de los 844 en decir dos veces lo mismo.
       */}
-      <header className="shrink-0 border-b border-line-200 bg-surface px-4 py-3">
-        <div className="relative">
-          <IconoBuscar className="pointer-events-none absolute left-3 top-[11px] h-3.5 w-3.5 text-ink-400" />
+      <header className="cn-bor-movil-cabeza">
+        <div className="cn-bor-movil-buscar-caja">
+          <IconoBuscar className="h-4 w-4" />
           <input
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
             placeholder="Buscar borrador"
-            className="field h-[38px] w-full pl-9"
+            aria-label="Buscar borrador"
+            className="cn-campo cn-bor-movil-buscar"
           />
         </div>
       </header>
 
-      <div className="min-h-0 flex-1 overflow-y-auto pb-4">
+      <div className="cn-bor-movil-lista">
         {grupos.length === 0 ? (
-          <p className="px-4 py-16 text-center text-[12.5px] text-ink-500">
+          <p className="cn-bor-movil-vacio">
             {busqueda.trim()
               ? 'Ningún borrador coincide.'
               : 'Todavía no hay escritos guardados.'}
@@ -103,23 +111,18 @@ export const SavedDraftsMobileView: React.FC<SavedDraftsMobileViewProps> = ({
         ) : (
           grupos.map((grupo) => (
             <section key={grupo.titulo}>
-              <p
-                className={`px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] ${
-                  grupo.urgente ? 'text-danger' : 'text-ink-400'
-                }`}
-              >
+              <p className={`cn-bor-movil-rotulo ${grupo.urgente ? 'cn-bor-movil-rotulo--urge' : ''}`}>
                 {grupo.titulo} · {grupo.entradas.length}
               </p>
 
-              <ul className="space-y-2 px-3">
+              <ul className="cn-bor-movil-tarjetas">
                 {grupo.entradas.map((e) => {
                   const dias = diasHasta(e.venceEl);
                   const radicado = esRadicado(e);
                   /*
-                   * URGENTE ES DOS DÍAS O MENOS, y también lo vencido. El rojo
-                   * de este producto significa destructivo o grabando, así que
-                   * aquí se usa solo cuando el plazo de verdad aprieta — un
-                   * listado entero en rojo no señala nada.
+                   * URGENTE ES DOS DÍAS O MENOS, y también lo vencido. Se
+                   * marca solo cuando el plazo de verdad aprieta — un listado
+                   * entero resaltado no señala nada.
                    */
                   const urge = !radicado && dias !== null && dias <= 2;
 
@@ -128,17 +131,13 @@ export const SavedDraftsMobileView: React.FC<SavedDraftsMobileViewProps> = ({
                       <button
                         type="button"
                         onClick={() => onAbrir(e)}
-                        className={`flex w-full items-start gap-3 rounded-card border bg-surface px-3.5 py-3 text-left ${
-                          urge
-                            ? 'border-[rgb(var(--danger)/0.35)]'
-                            : 'border-line-200'
-                        }`}
+                        className={`cn-bor-tarjeta ${urge ? 'cn-bor-tarjeta--urge' : ''}`}
                       >
-                        <span className="min-w-0 flex-1">
-                          <span className="block text-[13px] font-medium leading-tight text-ink-900">
+                        <span className="cn-bor-tarjeta-textos">
+                          <span className="cn-bor-tarjeta-titulo">
                             {e.draft.title || 'Escrito sin título'}
                           </span>
-                          <span className="mt-1 block text-[11.5px] leading-snug text-ink-500">
+                          <span className="cn-bor-tarjeta-meta">
                             {[
                               e.cliente,
                               e.version ? `v${e.version}` : null,
@@ -149,24 +148,18 @@ export const SavedDraftsMobileView: React.FC<SavedDraftsMobileViewProps> = ({
                           </span>
                         </span>
 
-                        <span className="shrink-0 text-right">
+                        <span className="cn-bor-tarjeta-lado">
                           {radicado ? (
-                            <span className="block text-[11.5px] text-ink-500">Radicado</span>
+                            <span className="cn-bor-dias">Radicado</span>
                           ) : e.venceEl && dias !== null ? (
                             <>
-                              <span className="block text-[13px] font-semibold leading-none text-ink-900">
-                                {fechaCorta(e.venceEl)}
-                              </span>
-                              <span
-                                className={`mt-1 block text-[11px] leading-none ${
-                                  urge ? 'font-semibold text-danger' : 'text-ink-500'
-                                }`}
-                              >
+                              <span className="cn-bor-tarjeta-fecha">{fechaCorta(e.venceEl)}</span>
+                              <span className={`cn-bor-dias ${urge ? 'cn-bor-dias--urge' : ''}`}>
                                 {cuantoFalta(dias)}
                               </span>
                             </>
                           ) : (
-                            <span className="block text-[11.5px] text-ink-500">Sin término</span>
+                            <span className="cn-bor-dias">Sin término</span>
                           )}
 
                           {/*
@@ -175,11 +168,7 @@ export const SavedDraftsMobileView: React.FC<SavedDraftsMobileViewProps> = ({
                             cuando hay algo que decir — un borrador con respaldo
                             completo no necesita una linea que lo diga.
                           */}
-                          {faltaDeRespaldo(e) && (
-                            <span className="mt-1 block text-[11px] leading-tight text-unverified">
-                              {faltaDeRespaldo(e)}
-                            </span>
-                          )}
+                          {faltaDeRespaldo(e) && <span className="cn-bor-sin">{faltaDeRespaldo(e)}</span>}
                         </span>
                       </button>
                     </li>
@@ -192,21 +181,21 @@ export const SavedDraftsMobileView: React.FC<SavedDraftsMobileViewProps> = ({
       </div>
 
       {/*
-        EL PRIMARIO VIVE ABAJO, FIJO Y DE 48px (4d). Es el destino táctil más
-        fácil de acertar con el pulgar, y arriba competiría con el buscador —
-        que es lo que de verdad se usa al entrar con treinta y cuatro escritos.
+        EL PRIMARIO VIVE ABAJO, FIJO Y DE 52px. Es el destino táctil más fácil
+        de acertar con el pulgar, y arriba competiría con el buscador —que es lo
+        que de verdad se usa al entrar con treinta y cuatro escritos.
       */}
       {!soloLectura && (
-      <div className="shrink-0 border-t border-line-200 bg-surface px-3 py-2.5">
-        <button
-          type="button"
-          onClick={onRedactar}
-          className="btn-primary flex h-12 w-full items-center justify-center gap-2"
-        >
-          <PenLine className="h-4 w-4" />
-          Redactar escrito
-        </button>
-      </div>
+        <div className="cn-bor-movil-pie">
+          <button
+            type="button"
+            onClick={onRedactar}
+            className="cn-ini-boton cn-ini-boton--primario cn-bor-movil-redactar"
+          >
+            <PenLine className="h-4 w-4" aria-hidden="true" />
+            Redactar escrito
+          </button>
+        </div>
       )}
     </div>
   );

@@ -2,9 +2,9 @@ import React from 'react';
 import {
   AlertTriangle,
   Clock,
-  Compass,
   ExternalLink,
   FileText,
+  Info,
   Loader2,
   Paperclip,
   PenLine,
@@ -46,6 +46,15 @@ import type { MainView } from '../../tenant/types';
  * The deadline is shown because it is the thing that runs out while somebody is
  * deciding what to do, and it is exactly what this user does not know to ask
  * for.
+ *
+ * LA CARA NUEVA (`public/handoff/app-orientacion.html`). La piel vive en
+ * `design/cara-nueva.css`, bajo `.cara-nueva .cn-ori-*`. Del artboard se tomó la
+ * forma, no las promesas: no hay «Dónde buscar» por rama ni las 28 ramas, ni
+ * «Consultas parecidas», ni precio fijo en el botón, ni «Ninguna encaja», ni la
+ * ficha completa en diálogo, ni «Poner el término en la agenda». Ninguna de esas
+ * cosas existe en el servidor, y pintarlas sería prometer lo que no se hace. El
+ * orden de las candidatas sigue siendo el del término más corto, no la
+ * cercanía a los hechos que dibuja la maqueta.
  */
 
 interface TriageViewProps {
@@ -231,50 +240,52 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView, on
   const campoHechos = React.useRef<HTMLTextAreaElement>(null);
 
   /*
-   * MARGEN DE 16 EN MOVIL, 24 DESDE `sm`. Veinticuatro por lado se comen 48 de
-   * los 375, y esta pantalla es texto largo: cada pixel de ancho es una palabra
-   * menos por renglon.
+   * MARGEN DE 16 EN MOVIL, 40 DESDE `lg` (en `.cn-ori-cuerpo`). Esta pantalla
+   * es texto largo: cada pixel de ancho es una palabra menos por renglon. Una
+   * sola columna de 760 px como máximo, igual que Inicio: más ancha, los
+   * renglones de los hechos dejan de leerse de un vistazo.
    */
   return (
-    <div data-visita="vista-orientacion" className="flex-1 overflow-y-auto bg-canvas p-4 sm:p-6">
-      <div className="mx-auto max-w-5xl space-y-4 font-sans">
-        {/* ─── ENCABEZADO (1f) ─────────────────────────────────────────────── */}
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-card bg-brand-700">
-            <Compass className="h-5 w-5 text-on-brand" />
-          </div>
-          <div className="min-w-0">
-            <h2 className="text-title text-ink-900">Orientación</h2>
-            <p className="text-meta text-ink-500">
-              Describa los hechos; el catálogo propone la actuación.
-            </p>
-          </div>
+    <div data-visita="vista-orientacion" className="cara-nueva cn-ori min-w-0 flex-1 overflow-y-auto">
+      <div className="cn-ori-cuerpo">
+        {/* ─── ENCABEZADO ──────────────────────────────────────────────────── */}
+        <header>
+          <h1 className="cn-ori-h1">¿Qué actuación necesita?</h1>
+          <p className="cn-ori-bajada">
+            Cuente qué pasó y el catálogo le propone candidatas, cada una con su término y su
+            norma.
+          </p>
           {censo && (
-            <span className="font-mono text-[11px] text-ink-400 sm:ml-auto sm:shrink-0">
+            <p className="cn-ori-censo">
               {censo.total} actuaciones · {censo.verificadas} verificadas
-            </span>
+            </p>
           )}
-        </div>
+        </header>
 
-        <section className="space-y-3 rounded-card border border-line-200 bg-surface p-4">
-          <label className="block">
-            <span className="text-ui font-medium text-ink-900">
+        <section className="cn-ori-form" aria-label="Los hechos del caso">
+          <div>
+            <label htmlFor="hechos-de-la-orientacion" className="cn-ori-etiqueta">
               Los hechos, como se los contaría a un colega
-            </span>
+            </label>
             <textarea
+              id="hechos-de-la-orientacion"
               ref={campoHechos}
               value={hechos}
               onChange={(e) => setHechos(e.target.value)}
-              placeholder="A mi cliente lo despidieron sin justa causa el 3 de febrero. Estaba incapacitado desde diciembre por una lesión de hombro que se originó cargando en la bodega. La empresa nunca reportó el accidente a la ARL y no pidió permiso al inspector de trabajo."
+              placeholder="Cuente qué pasó, a quién y qué se busca. En lenguaje corriente: no hace falta redactar."
               rows={5}
-              className="field-area mt-1.5 w-full resize-y text-justify [text-wrap:pretty]"
+              className="cn-ori-hechos"
             />
-          </label>
+          </div>
 
           {/* ─── ADJUNTAR EL DOCUMENTO ────────────────────────────────────────
               Se lee aquí mismo, en el navegador, y el texto CAE EN EL CUADRO de
               arriba, que sigue siendo editable: el abogado ve exactamente lo
-              que va a viajar y puede recortarlo. Nada se sube ni se cobra. */}
+              que va a viajar y puede recortarlo. Nada se sube ni se cobra.
+
+              Sin borde discontinuo: en este sistema el guion dice «sin
+              verificar», y una zona de soltar no es una afirmación sin
+              comprobar. Al arrastrar se enciende el anillo azul del foco. */}
           <div
             onDragOver={(e) => {
               e.preventDefault();
@@ -286,9 +297,7 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView, on
               setArrastrando(false);
               void adjuntoHechos.leer(e.dataTransfer.files?.[0]);
             }}
-            className={`min-w-0 rounded-card border border-dashed px-3 py-2.5 transition-colors ${
-              arrastrando ? 'border-brand-700 bg-brand-700/[0.06]' : 'border-line-200 bg-canvas'
-            }`}
+            className={`cn-ori-adjunto ${arrastrando ? 'cn-ori-adjunto--arrastrando' : ''}`}
           >
             {adjuntoHechos.leyendo ? (
               /*
@@ -296,36 +305,30 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView, on
                 páginas tarda un par de segundos y el resto de la vista sigue
                 siendo usable mientras tanto.
               */
-              <p className="flex items-center gap-2 text-meta text-ink-500">
-                <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" />
+              <p className="cn-ori-adjunto-fila">
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
                 Leyendo el archivo…
               </p>
             ) : adjuntoHechos.adjunto ? (
-              <div className="min-w-0 space-y-1">
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                  <FileText className="h-3.5 w-3.5 shrink-0 text-ink-400" />
+              <div className="min-w-0">
+                <div className="cn-ori-adjunto-fila">
+                  <FileText className="h-4 w-4" aria-hidden="true" />
                   {/*
                     El nombre de un archivo puede ser una sola palabra larguísima
-                    —un radicado, un guion bajo tras otro—: sin
-                    `[overflow-wrap:anywhere]` se pinta fuera de su caja.
+                    —un radicado, un guion bajo tras otro—: la clase lo parte
+                    en cualquier punto para que no se pinte fuera de su caja.
                   */}
-                  <span className="min-w-0 text-meta text-ink-700 [overflow-wrap:anywhere]">
-                    {adjuntoHechos.adjunto.nombre}
-                  </span>
-                  <span className="shrink-0 font-mono text-[11px] text-ink-400">
+                  <span className="cn-ori-adjunto-nombre">{adjuntoHechos.adjunto.nombre}</span>
+                  <span className="cn-ori-adjunto-nota">
                     {adjuntoHechos.adjunto.caracteres} caracteres
                   </span>
-                  <button
-                    type="button"
-                    onClick={adjuntoHechos.quitar}
-                    className="ml-auto flex shrink-0 items-center gap-1 text-meta text-ink-500 hover:text-ink-900 hover:underline"
-                  >
-                    <X className="h-3 w-3" />
+                  <button type="button" onClick={adjuntoHechos.quitar} className="cn-ori-quitar">
+                    <X className="h-4 w-4" aria-hidden="true" />
                     Quitar
                   </button>
                 </div>
                 {adjuntoHechos.adjunto.recortado && (
-                  <p className="text-justify text-meta text-ink-500 [text-wrap:pretty]">
+                  <p className="cn-ori-adjunto-texto">
                     El documento es largo: se leyó el comienzo del documento.
                   </p>
                 )}
@@ -341,13 +344,11 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView, on
                 )}
               </div>
             ) : (
-              <label className="flex min-w-0 cursor-pointer flex-wrap items-center gap-x-2 gap-y-1">
-                <Paperclip className="h-3.5 w-3.5 shrink-0 text-ink-400" />
-                <span className="text-meta text-ink-700">
-                  Arrastre aquí el oficio, la demanda o la notificación
-                </span>
-                <span className="text-meta text-brand-700 underline">o escoja el archivo</span>
-                <span className="shrink-0 font-mono text-[11px] text-ink-400">PDF · Word · texto</span>
+              <label className="cn-ori-adjunto-fila">
+                <Paperclip className="h-4 w-4" aria-hidden="true" />
+                <span>Arrastre aquí el oficio, la demanda o la notificación</span>
+                <span className="cn-ori-adjunto-escoger">o escoja el archivo</span>
+                <span className="cn-ori-adjunto-nota">PDF · Word · texto</span>
                 <input
                   type="file"
                   accept={ARCHIVOS_DE_HECHOS}
@@ -368,31 +369,19 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView, on
               el tono de las advertencias y no en el de las averías: un escaneo
               sin texto no es una falla de la aplicación.
             */
-            <p className="flex items-start gap-2 rounded-card border border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))]/60 px-3 py-2 text-justify text-meta text-ink-700 [text-wrap:pretty]">
-              <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-unverified" />
+            <p className="cn-ori-aviso">
+              <AlertTriangle className="h-4 w-4" aria-hidden="true" />
               <span className="min-w-0">{adjuntoHechos.motivo}</span>
             </p>
           )}
 
-          <div className="flex flex-wrap items-center gap-3">
-            {/*
-              SIN DATOS PERSONALES DEL CLIENTE (1f). Va junto al campo y no en
-              una política: es donde se decide qué se escribe. Los hechos viajan
-              a un modelo externo, y el nombre y la cédula del cliente no hacen
-              falta para saber qué actuación corresponde.
-            */}
-            <p className="flex items-center gap-1.5 text-meta text-ink-500">
-              <ShieldOff className="h-3.5 w-3.5 shrink-0 text-ink-400" />
-              Sin datos personales del cliente
-            </p>
-
-{/*
+          {/*
             EL CASO, OPCIONAL Y DESPUÉS DE LOS HECHOS. Ésta es la pantalla de
             quien NO sabe todavía qué tiene, así que pedirle el expediente
             antes de contar el caso sería pedirle lo que quizá no existe. Va
             debajo, y solo si la firma tiene expedientes.
           */}
-          <div className="mb-3">
+          <div className="cn-ori-selector">
             <SelectorDeExpediente
               valor={expedienteId}
               onCambio={setExpedienteId}
@@ -401,35 +390,49 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView, on
             />
           </div>
 
-          <p className="font-mono text-[11px] text-ink-400">
+          <div className="cn-ori-pie-form">
+            {/*
+              SIN DATOS PERSONALES DEL CLIENTE (1f). Va junto al campo y no en
+              una política: es donde se decide qué se escribe. Los hechos viajan
+              a un modelo externo, y el nombre y la cédula del cliente no hacen
+              falta para saber qué actuación corresponde.
+            */}
+            <p className="cn-ori-privacidad">
+              <ShieldOff className="h-4 w-4" aria-hidden="true" />
+              Sin datos personales del cliente
+            </p>
+
+            <p className="cn-ori-contador">
               {hechos.trim().length < 20
                 ? 'Cuéntelo con algo más de detalle: quién, qué pasó y qué se busca.'
                 : `${hechos.trim().length} caracteres`}
             </p>
 
             <button
+              type="button"
               onClick={() => void orientar()}
               disabled={hechos.trim().length < 20 || cargando}
-              className="btn-primary ml-auto shrink-0"
+              className="cn-ini-boton cn-ini-boton--primario cn-ori-orientar"
             >
               {cargando ? (
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
               ) : (
-                <Search className="h-3.5 w-3.5" />
+                <Search className="h-4 w-4" aria-hidden="true" />
               )}
               {cargando ? 'Orientando…' : 'Orientar'}
             </button>
           </div>
 
           {!result && !cargando && (
-            <div className="border-t border-line-100 pt-2.5">
-              <p className="mb-1.5 text-meta text-ink-400">O pruebe con uno de estos:</p>
-              <div className="space-y-1">
+            <div className="cn-ori-ejemplos">
+              <p className="cn-ori-ejemplos-titulo">O pruebe con uno de estos:</p>
+              <div className="cn-ori-ejemplos-lista">
                 {EJEMPLOS.map((e) => (
                   <button
                     key={e}
+                    type="button"
                     onClick={() => void orientar(e)}
-                    className="block text-left text-meta text-brand-700 hover:underline"
+                    className="cn-ori-ejemplo"
                   >
                     {e}
                   </button>
@@ -440,30 +443,33 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView, on
         </section>
 
         {error && (
-          <div className="flex items-start gap-2 rounded-card border border-[rgb(var(--danger)/0.35)] bg-[rgb(var(--danger)/0.06)] p-3">
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-danger" />
-            <p className="text-meta text-danger">{error}</p>
+          <div className="cn-error" role="alert">
+            <AlertTriangle className="h-4 w-4" aria-hidden="true" />
+            <p>{error}</p>
           </div>
         )}
 
         {sinSaldo && (
-          <div className="flex items-start gap-3 rounded-card border border-line-200 bg-canvas p-4">
-            <Clock className="mt-0.5 h-4 w-4 shrink-0 text-ink-500" />
-            <div className="text-ui leading-relaxed text-ink-700">
-              <p className="mb-1 font-semibold text-ink-900">Cupo gratuito de hoy agotado</p>
-              <p className="text-justify [text-wrap:pretty]">{sinSaldo}</p>
-              <button
-                onClick={() => setMainView('search')}
-                className="mt-2 text-meta text-brand-700 hover:underline"
-              >
-                Buscar jurisprudencia mientras tanto →
-              </button>
+          <div className="cn-ori-estado">
+            <div className="cn-ori-estado-cabeza">
+              <Clock className="h-4 w-4" aria-hidden="true" />
+              <div className="min-w-0">
+                <p className="cn-ori-estado-titulo">Cupo gratuito de hoy agotado</p>
+                <p className="cn-ori-estado-texto">{sinSaldo}</p>
+                <button
+                  type="button"
+                  onClick={() => setMainView('search')}
+                  className="cn-ini-enlace"
+                >
+                  Buscar jurisprudencia mientras tanto →
+                </button>
+              </div>
             </div>
           </div>
         )}
 
         {result?.cupoRestante !== undefined && result.cupoRestante <= 5 && (
-          <p className="px-1 text-meta text-ink-500">
+          <p className="cn-ori-cupo">
             {result.cupoRestante > 0
               ? `Le quedan ${result.cupoRestante} orientaciones gratuitas hoy.${
                   result.precioOrientacionCop
@@ -480,31 +486,31 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView, on
             Respuesta legítima, con salidas. No pide disculpas ni sugiere
             reintentar: nombra el hecho, lista los datos que suelen faltar y
             ofrece salidas reales, con la consecuencia de la más riesgosa
-            escrita antes de tomarla. */}
+            escrita antes de tomarla.
+
+            La maqueta añade «No se le cobró esta consulta», y aquí NO va:
+            pasado el cupo gratuito del día la consulta sin actuación también
+            descuenta. La línea del cupo, arriba, dice lo que de verdad pasó. */}
         {result && result.status !== 'OK' && (
-          <div className="rounded-card border border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))]/60 p-4">
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-unverified" />
-              <div className="min-w-0 text-ui leading-relaxed text-ink-900">
-                <p className="font-semibold">
+          <div className="cn-ori-estado cn-ori-estado--hueco">
+            <div className="cn-ori-estado-cabeza">
+              <AlertTriangle className="h-4 w-4" aria-hidden="true" />
+              <div className="min-w-0">
+                <p className="cn-ori-estado-titulo">
                   {result.status === 'SIN_COINCIDENCIA'
                     ? 'El catálogo no reconoce una actuación para estos hechos'
                     : 'La orientación no está disponible'}
                 </p>
-                <p className="mt-1 text-justify [text-wrap:pretty]">{result.reason}</p>
+                <p className="cn-ori-estado-texto">{result.reason}</p>
 
                 {result.status === 'SIN_COINCIDENCIA' && (result.preguntas?.length ?? 0) > 0 && (
-                  <div className="mt-3">
-                    <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
-                      Puede que falte precisar
-                    </p>
-                    <ol className="mt-1.5 space-y-1">
+                  <div>
+                    <p className="cn-ori-estado-rotulo">Puede que falte precisar</p>
+                    <ol className="cn-ori-preguntas">
                       {result.preguntas!.map((q, i) => (
-                        <li key={i} className="flex gap-2 text-ui text-ink-900">
-                          <span className="shrink-0 font-mono text-[10.5px] text-ink-400">
-                            {String(i + 1).padStart(2, '0')}
-                          </span>
-                          <span className="min-w-0 text-justify [text-wrap:pretty]">{q}</span>
+                        <li key={i}>
+                          <span className="cn-ori-preguntas-num">{String(i + 1).padStart(2, '0')}</span>
+                          <span className="min-w-0">{q}</span>
                         </li>
                       ))}
                     </ol>
@@ -513,22 +519,28 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView, on
 
                 {result.status === 'SIN_COINCIDENCIA' && (
                   <>
-                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <div className="cn-ori-botones">
                       <button
+                        type="button"
                         onClick={() => {
                           campoHechos.current?.focus();
                           window.scrollTo({ top: 0, behavior: 'smooth' });
                         }}
-                        className="btn-primary btn-sm"
+                        className="cn-ini-boton cn-ini-boton--primario"
                       >
                         Completar los hechos
                       </button>
-                      <button onClick={() => setMainView('search')} className="btn-secondary btn-sm">
+                      <button
+                        type="button"
+                        onClick={() => setMainView('search')}
+                        className="cn-ini-boton cn-ini-boton--blanco"
+                      >
                         Buscar en jurisprudencia
                       </button>
                       <button
+                        type="button"
                         onClick={() => onDraft('', '', hechos.trim(), '')}
-                        className="btn-neutral btn-sm"
+                        className="cn-ini-boton cn-ini-boton--texto"
                         title="Lleva los hechos al taller. Tendrá que elegir allí la actuación."
                       >
                         Redactar sin catálogo
@@ -539,7 +551,7 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView, on
                       Prohibir redactar sería paternalista; dejar que ocurra en
                       silencio sería peor.
                     */}
-                    <p className="mt-2 text-justify text-meta leading-[1.5] text-ink-700 [text-wrap:pretty]">
+                    <p className="cn-ori-consecuencia">
                       Si redacta sin catálogo, ningún término ni artículo del escrito quedará
                       verificado: todo saldrá marcado como sin verificar.
                     </p>
@@ -551,35 +563,10 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView, on
         )}
 
         {result?.status === 'OK' && (
-          <div className="space-y-3">
-            {/* ─── LO QUE EL CATÁLOGO LEYÓ ─────────────────────────────────── */}
-            {result.senales && (result.senales.rama || result.senales.elementos.length > 0) && (
-              <div className="rounded-card border border-line-200 bg-surface px-4 py-3">
-                <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
-                  Lo que el catálogo leyó
-                </p>
-                <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                  {result.senales.rama && (
-                    <span className="rounded-control bg-brand-700 px-2 py-0.5 text-meta font-semibold text-on-brand">
-                      {result.senales.rama}
-                    </span>
-                  )}
-                  {result.senales.elementos.map((e) => (
-                    <span key={e} className="chip-neutral">
-                      {e}
-                    </span>
-                  ))}
-                </div>
-                <p className="mt-1.5 text-meta text-ink-400">
-                  Corrija un elemento y las sugerencias se recalculan: es más rápido corregir una
-                  etiqueta que reescribir el párrafo.
-                </p>
-              </div>
-            )}
-
+          <section className="cn-ori-resultados" aria-label="Actuaciones posibles">
             {/* ─── EL ORDEN, DICHO ─────────────────────────────────────────── */}
-            <div className="flex flex-wrap items-baseline gap-x-2 px-1">
-              <p className="text-ui font-semibold text-ink-900">
+            <div>
+              <h2 className="cn-ori-h2">
                 {/*
                   «actuaciones», no «actuaciónes»: la palabra PIERDE la tilde
                   al pasar al plural, porque deja de ser aguda terminada en n.
@@ -588,38 +575,67 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView, on
                 */}
                 {sugerencias.length}{' '}
                 {sugerencias.length === 1 ? 'actuación posible' : 'actuaciones posibles'}
-              </p>
-              <p className="text-meta text-ink-500">
-                ordenadas por término más corto — lo que se vence primero va primero
+              </h2>
+              {/*
+                El artboard dice que se ordenan «por cercanía a los hechos». No
+                es lo que hace el código: `porTerminoMasCorto`. Se dice el orden
+                real, que es además la razón de ser del orden.
+              */}
+              <p className="cn-ori-orden">
+                Ordenadas por término más corto — lo que se vence primero va primero.
               </p>
             </div>
 
-            {sugerencias.map(({ actuacion: a, razon }, i) => {
-              const sinVerificar = a.term.status === 'NO_VERIFICADO';
-              const esPrimario = i === idxPrimario;
+            {/*
+              LA ADVERTENCIA VA ARRIBA DE LAS CANDIDATAS (README-app §2), no al
+              pie: leída después de escoger, ya no advierte de nada. Es la
+              misma frase que antes cerraba la lista.
+            */}
+            <p className="cn-ori-advertencia">
+              <Info className="h-4 w-4" aria-hidden="true" />
+              <span>Esto orienta, no decide. La calificación jurídica del caso es suya.</span>
+            </p>
 
-              return (
-                <article
-                  key={a.id}
-                  /*
-                    LA TARJETA SIN VERIFICAR CAMBIA DE TEXTURA, no solo de color
-                    (1f): el borde punteado la distingue sin depender de que
-                    alguien vea el ámbar, que es la regla de redundancia del
-                    sistema.
-                  */
-                  className={`overflow-hidden rounded-card bg-surface ${
-                    sinVerificar
-                      ? 'border border-dashed border-[rgb(var(--unverified-line))]'
-                      : 'border border-line-200'
-                  }`}
-                >
-                  <header className="border-b border-line-100 bg-canvas px-4 py-3">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-brand-700">
-                          {BRANCH_LABELS[a.branch] ?? a.branch}
-                        </span>
-                        <h3 className="text-subtitle text-ink-900">{a.exactName}</h3>
+            {/* ─── LO QUE EL CATÁLOGO LEYÓ ─────────────────────────────────── */}
+            {result.senales && (result.senales.rama || result.senales.elementos.length > 0) && (
+              <div className="cn-ori-leyo">
+                <p className="cn-ori-leyo-titulo">Lo que el catálogo leyó</p>
+                <div className="cn-ori-chips">
+                  {result.senales.rama && (
+                    <span className="cn-ori-chip cn-ori-chip--rama">{result.senales.rama}</span>
+                  )}
+                  {result.senales.elementos.map((e) => (
+                    <span key={e} className="cn-ori-chip">
+                      {e}
+                    </span>
+                  ))}
+                </div>
+                <p className="cn-ori-leyo-nota">
+                  Si algo de esto no corresponde a su caso, corrija los hechos y vuelva a orientar.
+                </p>
+              </div>
+            )}
+
+            <div className="cn-ori-lista">
+              {sugerencias.map(({ actuacion: a, razon }, i) => {
+                const sinVerificar = a.term.status === 'NO_VERIFICADO';
+                const esPrimario = i === idxPrimario;
+
+                return (
+                  <article
+                    key={a.id}
+                    /*
+                      LA TARJETA SIN VERIFICAR CAMBIA DE TEXTURA, no solo de color
+                      (1f): el borde punteado la distingue sin depender de que
+                      alguien vea el ámbar, que es la regla de redundancia del
+                      sistema.
+                    */
+                    className={`cn-ori-tarjeta ${sinVerificar ? 'cn-ori-tarjeta--sin' : ''}`}
+                  >
+                    <header className="cn-ori-tarjeta-cabeza">
+                      <div className="cn-ori-tarjeta-textos">
+                        <h3 className="cn-ori-tarjeta-titulo">{a.exactName}</h3>
+                        <p className="cn-ori-tarjeta-rama">{BRANCH_LABELS[a.branch] ?? a.branch}</p>
                         {/*
                           LA LÍNEA DE ARRIBA DICE LA RAMA DE LA FICHA, y cuando
                           la ficha llega prestada esa rama NO es la que el
@@ -629,18 +645,16 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView, on
                           comprobado para su rama.
                         */}
                         {a.porRemision && (
-                          <p className="mt-0.5 text-meta leading-snug text-ink-500 [text-wrap:pretty]">
-                            {a.porRemision.marca}
-                          </p>
+                          <p className="cn-ori-tarjeta-remision">{a.porRemision.marca}</p>
                         )}
                       </div>
                       <span
-                        className={`shrink-0 ${
+                        className={`cn-ori-estado-chip ${
                           sinVerificar
-                            ? 'chip-unverified'
+                            ? 'cn-ori-estado-chip--sin'
                             : a.term.status === 'NO_CADUCA'
-                            ? 'chip-neutral'
-                            : 'chip-verified'
+                            ? 'cn-ori-estado-chip--neutro'
+                            : 'cn-ori-estado-chip--ok'
                         }`}
                       >
                         {sinVerificar
@@ -649,134 +663,130 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView, on
                           ? 'No caduca'
                           : 'Verificado'}
                       </span>
-                    </div>
-                    {razon && (
-                      <p className="mt-1.5 text-justify text-meta italic leading-[1.5] text-ink-500 [text-wrap:pretty]">
-                        {razon}
-                      </p>
-                    )}
-                  </header>
+                    </header>
+                    {razon && <p className="cn-ori-razon">{razon}</p>}
 
-                  {/*
-                    ORDEN FIJO EN TODAS LAS TARJETAS (1f): término, norma,
-                    autoridad. Fijo para poder compararlas de un vistazo — si
-                    cada tarjeta ordena sus datos distinto, hay que leerlas
-                    enteras.
+                    {/*
+                      ORDEN FIJO EN TODAS LAS TARJETAS (1f): término, norma,
+                      autoridad. Fijo para poder compararlas de un vistazo — si
+                      cada tarjeta ordena sus datos distinto, hay que leerlas
+                      enteras. La norma va en mono porque es lo citable.
 
-                    EL «VENCE <fecha>» DEL ARTBOARD NO SE PINTA, Y ES A
-                    PROPÓSITO. Calcular la fecha exige saber desde cuándo corre
-                    el término —la notificación, el despido, la estructuración—
-                    y eso no está en unos hechos escritos en prosa. Una fecha de
-                    vencimiento inventada es lo más peligroso que esta pantalla
-                    podría mostrar.
-                  */}
-                  <dl className="space-y-2 p-4">
-                    <div className="flex gap-2">
-                      <dt className="w-[74px] shrink-0 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-400">
-                        {sinVerificar ? 'Término*' : 'Término'}
-                      </dt>
-                      <dd className="min-w-0 flex-1 text-justify text-ui leading-[1.5] text-ink-900 [text-wrap:pretty]">
-                        {a.term.status === 'NO_CADUCA'
-                          ? 'No aplica término de caducidad.'
-                          : a.term.description ??
-                            'Nadie ha comprobado este término. No lo dé por cierto.'}
-                      </dd>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <dt className="w-[74px] shrink-0 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-400">
-                        Norma
-                      </dt>
-                      <dd className="min-w-0 flex-1 text-justify text-ui leading-[1.5] text-ink-700 [text-wrap:pretty]">
-                        {a.legalBasis}
-                      </dd>
-                    </div>
-
-                    {a.competentAuthority && (
-                      <div className="flex gap-2">
-                        <dt className="w-[74px] shrink-0 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-400">
-                          Autoridad
-                        </dt>
-                        <dd className="min-w-0 flex-1 text-justify text-ui leading-[1.5] text-ink-700 [text-wrap:pretty]">
-                          {a.competentAuthority}
+                      EL «VENCE <fecha>» DEL ARTBOARD NO SE PINTA, Y ES A
+                      PROPÓSITO. Calcular la fecha exige saber desde cuándo corre
+                      el término —la notificación, el despido, la estructuración—
+                      y eso no está en unos hechos escritos en prosa. Una fecha de
+                      vencimiento inventada es lo más peligroso que esta pantalla
+                      podría mostrar.
+                    */}
+                    <dl className="cn-ori-datos">
+                      <div className="cn-ori-dato">
+                        <dt>{sinVerificar ? 'Término*' : 'Término'}</dt>
+                        <dd>
+                          {a.term.status === 'NO_CADUCA'
+                            ? 'No aplica término de caducidad.'
+                            : a.term.description ??
+                              'Nadie ha comprobado este término. No lo dé por cierto.'}
                         </dd>
                       </div>
+
+                      <div className="cn-ori-dato">
+                        <dt>Norma</dt>
+                        <dd className="cn-ori-mono">{a.legalBasis}</dd>
+                      </div>
+
+                      {a.competentAuthority && (
+                        <div className="cn-ori-dato">
+                          <dt>Autoridad</dt>
+                          <dd>{a.competentAuthority}</dd>
+                        </div>
+                      )}
+                    </dl>
+
+                    {sinVerificar && (
+                      <p className="cn-ori-nota-sin">
+                        El modelo la propone por los hechos, pero su término no está verificado
+                        contra la norma. No la dé por cierta.
+                      </p>
                     )}
-                  </dl>
 
-                  {sinVerificar && (
-                    <p className="mx-4 mb-3 rounded-control border border-dashed border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))] px-3 py-2 text-justify text-meta leading-[1.5] text-ink-900 [text-wrap:pretty]">
-                      El modelo la propone por los hechos, pero su término no está verificado contra
-                      la norma. No la dé por cierta.
-                    </p>
-                  )}
+                    {/* ─── ACCIONES ───────────────────────────────────────────
+                        Un solo primario en toda la lista, y solo si está
+                        verificada: seis primarios equivalen a ninguno. En la
+                        tarjeta sin verificar la acción principal no es redactar
+                        sino VERIFICAR Y CATALOGAR — convierte el hallazgo en un
+                        activo de la firma en vez de en un escrito sin respaldo. */}
+                    <div className="cn-ori-acciones">
+                      {sinVerificar ? (
+                        <button
+                          type="button"
+                          onClick={() => setMainView('catalogo')}
+                          className="cn-ini-boton cn-ini-boton--suave cn-ori-boton--verificar"
+                        >
+                          <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+                          Verificar y catalogar
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setEligiendo(eligiendo === a.id ? null : a.id)}
+                          aria-expanded={eligiendo === a.id}
+                          className={`cn-ini-boton ${
+                            esPrimario ? 'cn-ini-boton--primario' : 'cn-ini-boton--suave'
+                          }`}
+                        >
+                          <PenLine className="h-4 w-4" aria-hidden="true" />
+                          Redactar esta
+                        </button>
+                      )}
 
-                  {/* ─── ACCIONES ───────────────────────────────────────────
-                      Un solo primario en toda la lista, y solo si está
-                      verificada: seis primarios equivalen a ninguno. En la
-                      tarjeta sin verificar la acción principal no es redactar
-                      sino VERIFICAR Y CATALOGAR — convierte el hallazgo en un
-                      activo de la firma en vez de en un escrito sin respaldo. */}
-                  <div className="flex flex-wrap items-center gap-1.5 border-t border-line-100 px-4 py-2.5">
-                    {sinVerificar ? (
                       <button
+                        type="button"
                         onClick={() => setMainView('catalogo')}
-                        className="btn-secondary btn-sm"
+                        className="cn-ini-boton cn-ini-boton--texto"
                       >
-                        <ShieldCheck className="h-3 w-3" />
-                        Verificar y catalogar
+                        Ver ficha
                       </button>
-                    ) : (
-                      <button
-                        onClick={() => setEligiendo(eligiendo === a.id ? null : a.id)}
-                        aria-expanded={eligiendo === a.id}
-                        className={esPrimario ? 'btn-primary btn-sm' : 'btn-secondary btn-sm'}
-                      >
-                        <PenLine className="h-3 w-3" />
-                        Redactar esta
-                      </button>
+
+                      {a.sourceUrl && (
+                        <a
+                          href={a.sourceUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="cn-ini-boton cn-ini-boton--texto"
+                        >
+                          Ver norma
+                          <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                        </a>
+                      )}
+                    </div>
+
+                    {/*
+                      EL PANEL VA PEGADO A SU TARJETA, no al final de la lista.
+                      Es la misma lección del panel de dividir en Audiencias: si
+                      una acción responde lejos de donde se pulsa, con la lista
+                      larga —y aquí son hasta seis fichas— el abogado pulsa, el
+                      estado cambia, y no ve ocurrir nada.
+                    */}
+                    {eligiendo === a.id && (
+                      <div className="cn-ori-panel">
+                        <PanelDeInstruccion
+                          actuacion={a}
+                          hechos={hechos}
+                          onCancelar={() => setEligiendo(null)}
+                          onLlevar={(instruccion) =>
+                            onDraft(a.exactName, a.branch, hechos.trim(), instruccion)
+                          }
+                        />
+                      </div>
                     )}
-
-                    <button onClick={() => setMainView('catalogo')} className="btn-neutral btn-sm">
-                      Ver ficha
-                    </button>
-
-                    {a.sourceUrl && (
-                      <a
-                        href={a.sourceUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn-neutral btn-sm"
-                      >
-                        Ver norma
-                        <ExternalLink className="h-3 w-3" />
-                      </a>
-                    )}
-                  </div>
-
-                  {/*
-                    EL PANEL VA PEGADO A SU TARJETA, no al final de la lista.
-                    Es la misma lección del panel de dividir en Audiencias: si
-                    una acción responde lejos de donde se pulsa, con la lista
-                    larga —y aquí son hasta seis fichas— el abogado pulsa, el
-                    estado cambia, y no ve ocurrir nada.
-                  */}
-                  {eligiendo === a.id && (
-                    <PanelDeInstruccion
-                      actuacion={a}
-                      hechos={hechos}
-                      onCancelar={() => setEligiendo(null)}
-                      onLlevar={(instruccion) =>
-                        onDraft(a.exactName, a.branch, hechos.trim(), instruccion)
-                      }
-                    />
-                  )}
-                </article>
-              );
-            })}
+                  </article>
+                );
+              })}
+            </div>
 
             {result.suggestions.length > sugerencias.length && (
-              <p className="px-1 text-meta text-ink-500">
+              <p className="cn-ori-pie">
                 El catálogo devolvió {result.suggestions.length}; se muestran las{' '}
                 {sugerencias.length} de término más corto. Una lista más larga no orienta: reparte
                 la duda.
@@ -789,142 +799,136 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView, on
               que alguien lo note por otra vía.
             */}
             {result.descartadas.length > 0 && (
-              <details className="rounded-card border border-line-200 bg-canvas p-3">
-                <summary className="cursor-pointer text-meta text-ink-500">
+              <details className="cn-ori-descartadas">
+                <summary>
                   {result.descartadas.length} propuesta
                   {result.descartadas.length === 1 ? '' : 's'} que el catálogo no reconoció
                 </summary>
-                <ul className="mt-2 space-y-0.5">
+                <ul>
                   {result.descartadas.map((d) => (
-                    <li key={d} className="text-meta text-ink-500">
-                      {d}
-                    </li>
+                    <li key={d}>{d}</li>
                   ))}
                 </ul>
               </details>
             )}
+          </section>
+        )}
 
-            <p className="px-1 pb-2 text-meta text-ink-500">
-              Esto orienta, no decide. La calificación jurídica del caso es suya.
-            </p>
-          </div>
+        {/*
+          El historial VACIO tambien se anuncia: sin esta linea, el modulo entero
+          parece no haber cambiado hasta la primera consulta — y nadie descubre
+          una capacidad que no se presenta.
+        */}
+        {historial.length === 0 && (
+          <p className="cn-ori-vacio">
+            Desde ahora, cada orientación queda guardada aquí para toda la firma: se busca por los
+            hechos, se reutiliza para otro cliente, y las consultas sin actuación se agrupan como la
+            lista de trabajo del catálogo.
+          </p>
+        )}
+
+        {/* ─── HISTORIAL (13a) · cada consulta vale para la siguiente ───────── */}
+        {historial.length > 0 && (
+          <section className="cn-ori-historial" aria-label="Orientaciones de la firma">
+            <div className="cn-ori-historial-cabeza">
+              <h2 className="cn-ori-h3">Orientaciones de la firma · {historial.length}</h2>
+              <input
+                value={busquedaHist}
+                onChange={(e) => setBusquedaHist(e.target.value)}
+                placeholder="Buscar por hechos: «despido incapacidad inspector»"
+                aria-label="Buscar en las orientaciones de la firma"
+                className="cn-campo cn-ori-buscar"
+              />
+            </div>
+
+            <div className="cn-ori-filas">
+              {historial
+                .filter(
+                  (h) =>
+                    !busquedaHist.trim() ||
+                    h.hechos.toLowerCase().includes(busquedaHist.trim().toLowerCase())
+                )
+                .slice(0, 15)
+                .map((h) => (
+                  <div key={h.id} className="cn-ori-fila">
+                    <span className="cn-ori-fila-textos">
+                      <span className="cn-ori-fila-hechos">{h.hechos}</span>
+                      <span className="cn-ori-fila-meta">
+                        {h.userEmail.split('@')[0]} ·{' '}
+                        {new Date(h.createdAt).toLocaleDateString('es-CO', {
+                          day: 'numeric',
+                          month: 'short'
+                        })}
+                        {h.senales?.rama ? ` · ${h.senales.rama}` : ''}
+                      </span>
+                    </span>
+
+                    {/*
+                      EN MOVIL LA SUGERENCIA BAJA A SU PROPIO RENGLON. Un ancho
+                      fijo junto a la fecha y la rama no cabe en 375 y empujaba
+                      la fila fuera del borde.
+
+                      «Sin actuación en catálogo» no lleva guion: no es una
+                      afirmación sin verificar sino un hueco, y el guion de este
+                      sistema solo dice lo primero.
+                    */}
+                    <span className="cn-ori-fila-sugerencia">
+                      {h.status === 'OK' ? (
+                        <>
+                          {h.sugerencias[0]?.nombre ?? ''}
+                          {h.sugerencias.length > 1 && (
+                            <span className="cn-ori-fila-de"> · de {h.sugerencias.length}</span>
+                          )}
+                        </>
+                      ) : (
+                        <span className="cn-ori-fila-hueco">Sin actuación en catálogo</span>
+                      )}
+                    </span>
+
+                    {/*
+                      REUTILIZAR copia los HECHOS, nunca los datos del cliente
+                      anterior — es el atajo real de una firma que ve el mismo
+                      caso dos veces por semana.
+                    */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setHechos(h.hechos);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="cn-ini-boton cn-ini-boton--suave"
+                      title="Copia los hechos al cuadro de consulta. Nunca los datos del cliente anterior."
+                    >
+                      Reutilizar
+                    </button>
+                  </div>
+                ))}
+            </div>
+
+            {/* ─── LOS HUECOS DEL CATÁLOGO · la lista de trabajo ─────────────── */}
+            {huecos.length > 0 && (
+              <div className="cn-ori-huecos">
+                <h3 className="cn-ori-estado-titulo">
+                  Huecos del catálogo · {huecos.reduce((n, x) => n + x.veces, 0)} consultas sin
+                  actuación
+                </h3>
+                <p className="cn-ori-estado-texto">
+                  Consultas iguales agrupadas y contadas: dicen exactamente qué le falta curar a la
+                  firma, antes que cualquier métrica.
+                </p>
+                <ul className="cn-ori-huecos-lista">
+                  {huecos.slice(0, 6).map((hu) => (
+                    <li key={hu.hechos}>
+                      <span className="cn-ori-huecos-veces">{hu.veces}×</span>
+                      <span className="cn-ori-huecos-hechos">{hu.hechos}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </section>
         )}
       </div>
-
-      {/*
-        El historial VACIO tambien se anuncia: sin esta linea, el modulo entero
-        parece no haber cambiado hasta la primera consulta — y nadie descubre
-        una capacidad que no se presenta.
-      */}
-      {historial.length === 0 && (
-        <p className="mx-auto mt-6 max-w-3xl rounded-card border border-line-200 bg-surface px-4 py-3 text-justify text-meta leading-[1.6] text-ink-500 [text-wrap:pretty]">
-          Desde ahora, cada orientación queda guardada aquí para toda la firma: se busca por los
-          hechos, se reutiliza para otro cliente, y las consultas sin actuación se agrupan como la
-          lista de trabajo del catálogo.
-        </p>
-      )}
-
-      {/* ─── HISTORIAL (13a) · cada consulta vale para la siguiente ───────── */}
-      {historial.length > 0 && (
-        <div className="mx-auto mt-6 max-w-3xl space-y-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-ui font-semibold text-ink-900">
-              Orientaciones de la firma · {historial.length}
-            </h2>
-            <input
-              value={busquedaHist}
-              onChange={(e) => setBusquedaHist(e.target.value)}
-              placeholder="Buscar por hechos: «despido incapacidad inspector»"
-              className="field ml-auto w-[280px] max-w-full"
-            />
-          </div>
-
-          <div className="overflow-hidden rounded-card border border-line-200 bg-surface">
-            {historial
-              .filter(
-                (h) =>
-                  !busquedaHist.trim() ||
-                  h.hechos.toLowerCase().includes(busquedaHist.trim().toLowerCase())
-              )
-              .slice(0, 15)
-              .map((h) => (
-                <div key={h.id} className="t-row flex flex-wrap items-start gap-3">
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-justify text-ui leading-snug text-ink-900 [text-wrap:pretty]">
-                      {h.hechos}
-                    </span>
-                    <span className="mt-0.5 block font-mono text-[11px] text-ink-500">
-                      {h.userEmail.split('@')[0]} ·{' '}
-                      {new Date(h.createdAt).toLocaleDateString('es-CO', {
-                        day: 'numeric',
-                        month: 'short'
-                      })}
-                      {h.senales?.rama ? ` · ${h.senales.rama}` : ''}
-                    </span>
-                  </span>
-
-                  {/*
-                    EN MOVIL LA SUGERENCIA BAJA A SU PROPIO RENGLON. 190px fijos
-                    junto a la fecha y la rama no caben en 375 y empujaban la
-                    fila fuera del borde.
-                  */}
-                  <span className="w-full sm:w-[190px] sm:shrink-0">
-                    {h.status === 'OK' ? (
-                      <span className="block truncate text-ui text-ink-900">
-                        {h.sugerencias[0]?.nombre ?? ''}
-                        {h.sugerencias.length > 1 && (
-                          <span className="text-ink-400"> · de {h.sugerencias.length}</span>
-                        )}
-                      </span>
-                    ) : (
-                      <span className="chip-unverified">Sin actuación en catálogo</span>
-                    )}
-                  </span>
-
-                  {/*
-                    REUTILIZAR copia los HECHOS, nunca los datos del cliente
-                    anterior — es el atajo real de una firma que ve el mismo
-                    caso dos veces por semana.
-                  */}
-                  <button
-                    onClick={() => {
-                      setHechos(h.hechos);
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }}
-                    className="btn-neutral btn-sm shrink-0"
-                    title="Copia los hechos al cuadro de consulta. Nunca los datos del cliente anterior."
-                  >
-                    Reutilizar
-                  </button>
-                </div>
-              ))}
-          </div>
-
-          {/* ─── LOS HUECOS DEL CATÁLOGO · la lista de trabajo ─────────────── */}
-          {huecos.length > 0 && (
-            <div className="rounded-card border border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))] p-4">
-              <h3 className="text-ui font-semibold text-ink-900">
-                Huecos del catálogo · {huecos.reduce((n, x) => n + x.veces, 0)} consultas sin
-                actuación
-              </h3>
-              <p className="mt-0.5 text-justify text-meta leading-[1.5] text-ink-700 [text-wrap:pretty]">
-                Consultas iguales agrupadas y contadas: dicen exactamente qué le falta curar a la
-                firma, antes que cualquier métrica.
-              </p>
-              <ul className="mt-2 space-y-1">
-                {huecos.slice(0, 6).map((hu) => (
-                  <li key={hu.hechos} className="flex items-start gap-2 text-ui text-ink-900">
-                    <span className="shrink-0 font-mono text-[11px] font-semibold text-unverified">
-                      {hu.veces}×
-                    </span>
-                    <span className="min-w-0 truncate">{hu.hechos}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 };

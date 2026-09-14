@@ -1,5 +1,5 @@
 import React from 'react';
-import { CalendarClock, ClipboardCheck, RefreshCw, ShieldCheck, Trash2 } from 'lucide-react';
+import { AlertCircle, CalendarClock, ClipboardCheck, RefreshCw, ShieldCheck, Trash2 } from 'lucide-react';
 import { usePlanSoloLectura } from '../../subscriptions/PlanContext';
 import { reviewApi, type ConsentimientoDeGuardado, type RevisionGuardada } from '../services/review.api';
 import type { DatosDelTaller } from './TallerDeRevision';
@@ -31,6 +31,13 @@ import type { ActuacionRole } from '../../catalog/types';
  *
  * Una revisión se abre en el taller solo si su texto se conservó (la firma lo
  * autorizó). Si no, se dice y se ofrece lo que sí hay: el informe.
+ *
+ * ─── LA CARA NUEVA, SOLO EN LA LISTA ────────────────────────────────────────
+ *
+ * Esta pantalla cambia de piel; el taller y el diálogo de revisión no, que
+ * tienen su propia unidad. El aviso de la autorización deja el ámbar de
+ * Tailwind por el ámbar de la cara nueva, sin guion —no es un dato sin
+ * verificar— y el rojo queda para eliminar y para el error.
  */
 
 interface RevisionesViewProps {
@@ -224,12 +231,12 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({
   };
 
   return (
-    <div data-visita="vista-taller" className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-canvas">
-      <div className="mx-auto w-full max-w-6xl px-4 py-5 sm:px-6">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h1 className="text-[20px] font-semibold text-ink-900">Revisiones</h1>
-            <p className="mt-0.5 max-w-[60ch] text-[13px] leading-snug text-ink-500">
+    <div data-visita="vista-taller" className="cara-nueva cn-rev flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto">
+      <div className="cn-rev-cuerpo">
+        <div className="cn-rev-cabeza">
+          <div className="cn-rev-textos">
+            <h1 className="cn-rev-h1">Revisiones</h1>
+            <p className="cn-rev-bajada">
               Los escritos que su firma ha revisado. Abra uno para seguir corrigiéndolo en el taller, con los pasajes marcados y el revisor al
               lado; cuando el texto esté como lo quiere, «Llevar a Redacción» lo guarda como borrador de la firma y lo abre allí, sin tocar la
               revisión. Para revisar uno nuevo no hace falta salir de aquí ni saber de antemano qué actuación es: súbalo y, si no lo sabe,
@@ -237,13 +244,13 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({
             </p>
           </div>
           {/*
-            LA FILA DE BOTONES ENVUELVE en el teléfono: son dos etiquetas largas
-            y `btn-sm` no encoge su texto, así que en 320px la segunda quedaría
+            LA FILA DE BOTONES ENVUELVE en el teléfono: son etiquetas largas y
+            el botón no encoge su texto, así que en 320px la última quedaría
             fuera de la pantalla sin que la página llegara a desbordarse.
           */}
-          <div className="flex flex-wrap gap-2">
-            <button type="button" onClick={cargar} className="btn-neutral btn-sm">
-              <RefreshCw className={`h-3.5 w-3.5 ${cargando ? 'animate-spin' : ''}`} />
+          <div className="cn-rev-botones">
+            <button type="button" onClick={cargar} className="cn-ini-boton cn-ini-boton--suave cn-rev-boton">
+              <RefreshCw className={`h-4 w-4 ${cargando ? 'animate-spin' : ''}`} aria-hidden="true" />
               Actualizar
             </button>
             {/*
@@ -252,12 +259,16 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({
             */}
             {!soloLectura && (
               <>
-                <button type="button" onClick={onIrARedaccion} className="btn-neutral btn-sm">
-                  <ClipboardCheck className="h-3.5 w-3.5" />
+                <button type="button" onClick={onIrARedaccion} className="cn-ini-boton cn-ini-boton--suave cn-rev-boton">
+                  <ClipboardCheck className="h-4 w-4" aria-hidden="true" />
                   Ir a Redacción
                 </button>
-                <button type="button" onClick={() => setRevisarAbierto(true)} className="btn-primary btn-sm">
-                  <ClipboardCheck className="h-3.5 w-3.5" />
+                <button
+                  type="button"
+                  onClick={() => setRevisarAbierto(true)}
+                  className="cn-ini-boton cn-ini-boton--primario cn-rev-boton"
+                >
+                  <ClipboardCheck className="h-4 w-4" aria-hidden="true" />
                   Revisar un documento
                 </button>
               </>
@@ -296,36 +307,32 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({
         )}
 
         {consentimiento && (
-          <div
-            className={`mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-card border px-3 py-2 text-[12.5px] leading-snug ${
-              consentimiento.guarda ? 'border-line-200 bg-surface text-ink-700' : 'border-amber-200 bg-amber-50 text-amber-900'
-            }`}
-          >
-            <ShieldCheck className={`h-4 w-4 shrink-0 ${consentimiento.guarda ? 'text-verified' : 'text-amber-700'}`} />
+          <div className={`cn-rev-consentimiento ${consentimiento.guarda ? '' : 'cn-rev-consentimiento--falta'}`}>
+            <ShieldCheck className="h-5 w-5" aria-hidden="true" />
             {/*
               EN EL TELÉFONO EL AVISO SE QUEDABA CON 66px. La fila envuelve,
-              pero este párrafo es `flex-1` con base 0: no reclama ancho, así
-              que el botón «Autorizar guardado» —que no encoge— se llevaba la
-              línea entera y el texto se pintaba en una columna de 66px que se
-              salía por la derecha. En el teléfono ocupa el ancho completo y el
-              botón baja solo; desde `sm:` vuelve a compartir la línea.
+              pero este párrafo reclamaba ancho cero, así que el botón
+              «Autorizar guardado» —que no encoge— se llevaba la línea entera y
+              el texto se pintaba en una columna de 66px que se salía por la
+              derecha. En el teléfono ocupa el ancho completo y el botón baja
+              solo; desde 640px vuelve a compartir la línea.
             */}
-            <span className="w-full [overflow-wrap:anywhere] sm:w-auto sm:min-w-0 sm:flex-1">
+            <span className="cn-rev-consentimiento-texto">
               {consentimiento.guarda ? (
                 <>
-                  <span className="font-semibold">La firma conserva los escritos revisados</span>, el archivo tal como se subió, sus marcas y la
+                  <span className="cn-rev-fuerte">La firma conserva los escritos revisados</span>, el archivo tal como se subió, sus marcas y la
                   conversación con la guía
                   {consentimiento.por ? `, autorizado por ${consentimiento.por}` : ''}
                   {consentimiento.el ? ` el ${new Date(consentimiento.el).toLocaleDateString('es-CO', { dateStyle: 'long' })}` : ''}.
                 </>
               ) : (
                 <>
-                  <span className="font-semibold">La firma no ha autorizado conservar los escritos revisados.</span> Sin esa autorización, el texto, el
+                  <span className="cn-rev-fuerte">La firma no ha autorizado conservar los escritos revisados.</span> Sin esa autorización, el texto, el
                   archivo original, las marcas y la conversación viven solo en la pestaña; el informe sí se guarda.{' '}
                   {esAdminDeFirma ? 'Como socio administrador, puede autorizarlo aquí para toda la firma.' : 'Solo un socio administrador de la firma puede autorizarlo.'}
                 </>
               )}
-              {errorConsentimiento && <span className="text-danger"> {errorConsentimiento}</span>}
+              {errorConsentimiento && <span className="cn-rev-error-linea"> {errorConsentimiento}</span>}
             </span>
             {esAdminDeFirma && (
               <button
@@ -354,7 +361,7 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({
                         }
                   )
                 }
-                className={consentimiento.guarda ? 'btn-neutral btn-sm' : 'btn-primary btn-sm'}
+                className={`cn-ini-boton cn-rev-boton ${consentimiento.guarda ? 'cn-ini-boton--suave' : 'cn-ini-boton--primario'}`}
               >
                 {consentimiento.guarda ? 'Retirar autorización' : 'Autorizar guardado'}
               </button>
@@ -362,89 +369,103 @@ export const RevisionesView: React.FC<RevisionesViewProps> = ({
           </div>
         )}
 
-        {error && <p className="mt-4 rounded-control border border-line-200 bg-surface px-3 py-2 text-[12.5px] leading-snug text-danger">{error}</p>}
+        {error && (
+          <p className="cn-error" role="alert">
+            <AlertCircle className="h-5 w-5" aria-hidden="true" />
+            <span className="min-w-0 [overflow-wrap:anywhere]">{error}</span>
+          </p>
+        )}
 
         {!cargando && lista.length === 0 && !error && (
-          <p className="mt-6 text-[13px] text-ink-500">
+          <p className="cn-rev-vacio">
             Todavía no hay revisiones. Empiece con «Revisar un documento» —un escrito suyo o uno que le llegó—: suba el archivo y, si no sabe qué
             actuación es, deje que la guía se lo proponga.
           </p>
         )}
 
-        <ul className="mt-4 divide-y divide-line-100 overflow-hidden rounded-card border border-line-200 bg-surface">
-          {lista.map((r) => (
-            <li key={r.id} className="flex items-center gap-3 px-4 py-3">
-              <button type="button" onClick={() => void abrir(r)} disabled={abriendo !== null} className="min-w-0 flex-1 text-left" title="Abrir en el taller">
-                <span className="block truncate text-ui text-ink-900">
-                  {r.cliente ? <span className="font-medium">{r.cliente}</span> : <span className="text-ink-400">Sin cliente indicado</span>}
-                  <span className="text-ink-400"> · {r.documentType}</span>
-                </span>
-                <span className="block truncate text-[11.5px] text-ink-500">
-                  {r.fileName} ·{' '}
-                  {new Date(r.createdAt).toLocaleString('es-CO', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })} ·
-                  revisión pedida por {r.userEmail}
-                  {abriendo === r.id ? ' · abriendo…' : ''}
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  /*
-                   * DE UN DOCUMENTO RECIBIDO NO VIAJA NINGÚN NOMBRE DE
-                   * ACTUACIÓN. Ahí `documentType` es la etiqueta del producto
-                   * —«Documento recibido»—, no una actuación: prellenar la
-                   * agenda con ella crearía un vencimiento a nombre de algo que
-                   * el catálogo no conoce. La actuación la elige el abogado en
-                   * el formulario, o se la propone la guía desde el informe.
-                   */
-                  const recibido = r.modo === 'DOCUMENTO_RECIBIDO';
-                  dejarPendiente({
-                    origen: 'REVISION',
-                    asunto: r.cliente || r.fileName,
-                    cliente: r.cliente || null,
-                    radicado: null,
-                    actuacionId: null,
-                    actuacionNombre: recibido ? null : r.documentType,
-                    rama: recibido ? null : r.legalBranch,
+        {/* Sin filas no se pinta la caja: un marco vacío bajo el aviso parecía una lista que no cargó. */}
+        {lista.length > 0 && (
+          <ul className="cn-rev-lista">
+            {lista.map((r) => (
+              <li key={r.id} className="cn-rev-fila">
+                <button
+                  type="button"
+                  onClick={() => void abrir(r)}
+                  disabled={abriendo !== null}
+                  className="cn-rev-abrir"
+                  title="Abrir en el taller"
+                >
+                  <span className="cn-rev-titulo">
+                    {r.cliente ? <span className="cn-rev-cliente">{r.cliente}</span> : <span className="cn-rev-apagado">Sin cliente indicado</span>}
+                    <span className="cn-rev-apagado"> · {r.documentType}</span>
+                  </span>
+                  <span className="cn-rev-meta">
+                    {r.fileName} ·{' '}
+                    {new Date(r.createdAt).toLocaleString('es-CO', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })} ·
+                    revisión pedida por {r.userEmail}
+                    {abriendo === r.id ? ' · abriendo…' : ''}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
                     /*
-                     * EL CASO SE HEREDA. Si la revision nacio atada a un
-                     * expediente, su vencimiento es del mismo caso: volver a
-                     * preguntarlo seria pedir un dato que esta fila ya trae.
+                     * DE UN DOCUMENTO RECIBIDO NO VIAJA NINGÚN NOMBRE DE
+                     * ACTUACIÓN. Ahí `documentType` es la etiqueta del producto
+                     * —«Documento recibido»—, no una actuación: prellenar la
+                     * agenda con ella crearía un vencimiento a nombre de algo que
+                     * el catálogo no conoce. La actuación la elige el abogado en
+                     * el formulario, o se la propone la guía desde el informe.
                      */
-                    expedienteId: r.expedienteId ?? null
-                  });
-                  onIrAHerramientas();
-                }}
-                className="shrink-0 text-ink-400 hover:text-ink-900"
-                title="Poner en la agenda de términos"
-                aria-label={`Poner en la agenda el término de ${r.fileName}`}
-              >
-                <CalendarClock className="h-4 w-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  setConfirmacion({
-                    titulo: 'Eliminar la revisión',
-                    texto: (
-                      <>
-                        Se eliminan el informe de «{r.fileName}», el texto de trabajo, la conversación con el revisor y el archivo original, si se
-                        conservó. No se puede recuperar.
-                      </>
-                    ),
-                    etiqueta: 'Eliminar',
-                    peligro: true,
-                    onConfirmar: () => eliminar(r)
-                  })
-                }
-                className="shrink-0 text-ink-400 hover:text-danger"
-                aria-label={`Eliminar la revisión de ${r.fileName}`}
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
-            </li>
-          ))}
-        </ul>
+                    const recibido = r.modo === 'DOCUMENTO_RECIBIDO';
+                    dejarPendiente({
+                      origen: 'REVISION',
+                      asunto: r.cliente || r.fileName,
+                      cliente: r.cliente || null,
+                      radicado: null,
+                      actuacionId: null,
+                      actuacionNombre: recibido ? null : r.documentType,
+                      rama: recibido ? null : r.legalBranch,
+                      /*
+                       * EL CASO SE HEREDA. Si la revision nacio atada a un
+                       * expediente, su vencimiento es del mismo caso: volver a
+                       * preguntarlo seria pedir un dato que esta fila ya trae.
+                       */
+                      expedienteId: r.expedienteId ?? null
+                    });
+                    onIrAHerramientas();
+                  }}
+                  className="cn-rev-icono"
+                  title="Poner en la agenda de términos"
+                  aria-label={`Poner en la agenda el término de ${r.fileName}`}
+                >
+                  <CalendarClock className="h-5 w-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setConfirmacion({
+                      titulo: 'Eliminar la revisión',
+                      texto: (
+                        <>
+                          Se eliminan el informe de «{r.fileName}», el texto de trabajo, la conversación con el revisor y el archivo original, si se
+                          conservó. No se puede recuperar.
+                        </>
+                      ),
+                      etiqueta: 'Eliminar',
+                      peligro: true,
+                      onConfirmar: () => eliminar(r)
+                    })
+                  }
+                  className="cn-rev-icono cn-rev-icono--peligro"
+                  aria-label={`Eliminar la revisión de ${r.fileName}`}
+                >
+                  <Trash2 className="h-5 w-5" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
       <ConfirmarDialog confirmacion={confirmacion} onCerrar={() => setConfirmacion(null)} />
     </div>

@@ -111,11 +111,7 @@ export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
   }) => (
     <button
       onClick={() => setRightView(valor)}
-      className={`flex h-full items-center border-b-2 text-[12.5px] transition-colors ${
-        rightView === valor
-          ? 'border-brand-700 font-semibold text-brand-700'
-          : 'border-transparent font-medium text-ink-500 hover:text-ink-900'
-      }`}
+      className={`cn-red-lienzo-pestana ${rightView === valor ? 'cn-red-lienzo-pestana--activa' : ''}`}
     >
       {children}
     </button>
@@ -123,7 +119,7 @@ export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
 
   return (
     <section
-      className={`h-full min-w-0 flex-1 flex-col overflow-hidden bg-canvas font-sans ${
+      className={`cn-red-lienzo h-full min-w-0 flex-1 flex-col overflow-hidden ${
         ocultoEnMovil ? 'hidden lg:flex' : 'flex'
       }`}
     >
@@ -137,33 +133,34 @@ export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
         separación en el teléfono y la fila lleva desplazamiento propio; en
         `sm:` vuelven las medidas de siempre y el escritorio no cambia.
       */}
-      <div className="flex h-[38px] shrink-0 items-center gap-3 overflow-x-auto border-b border-line-200 bg-surface px-3 sm:gap-4 sm:px-5">
+      <div className="cn-red-lienzo-barra">
         <Pestana valor="draft">Documento</Pestana>
         <Pestana valor="pdf">Expediente</Pestana>
 
+        {/* Conteos en la letra de interfaz: no son citables, son una medida de esta pantalla. */}
         {generatedDraft && exigidas.length > 0 && (
-          <span className="shrink-0 whitespace-nowrap text-[12.5px] font-medium text-ink-500">
+          <span className="cn-red-lienzo-dato">
             Secciones exigidas{' '}
-            <span
-              className={`font-mono text-[11px] ${
-                encontradas === exigidas.length ? 'text-verified' : 'text-unverified'
+            <b
+              className={`cn-red-cifra ${
+                encontradas === exigidas.length ? 'cn-red-cifra--ok' : 'cn-red-cifra--sin'
               }`}
             >
               {encontradas}/{exigidas.length}
-            </span>{' '}
-            <span className="text-ink-400">encontradas</span>
+            </b>{' '}
+            encontradas
           </span>
         )}
 
-        <div className="ml-auto flex shrink-0 items-center gap-2">
+        <div className="cn-red-lienzo-derecha">
           {sinVerificar && (
-            <span className="chip-unverified" title={sinVerificar}>
-              <TriangleAlert className="h-3 w-3" strokeWidth={2.4} />
+            <span className="cn-red-estado cn-red-estado--sin" title={sinVerificar}>
+              <TriangleAlert className="cn-red-estado-icono" strokeWidth={2} aria-hidden />
               Sin verificar
             </span>
           )}
           {palabras > 0 && (
-            <span className="font-mono text-[11.5px] text-ink-400">
+            <span className="cn-red-lienzo-dato">
               {palabras.toLocaleString('es-CO')} palabras
             </span>
           )}
@@ -171,7 +168,8 @@ export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
       </div>
 
       {/* ─── EL DOCUMENTO ──────────────────────────────────────────────────*/}
-      <div className="scroll-documento flex-1 overflow-y-auto px-4 pt-5">
+      <div className="scroll-documento cn-red-mesa flex-1 overflow-y-auto">
+
         {rightView === 'draft' ? (
           generatedDraft ? (
             <LegalDraftViewer
@@ -194,16 +192,16 @@ export const DocumentCanvasRight: React.FC<DocumentCanvasRightProps> = ({
               pipeline de tres motores — información sobre nosotros, en el sitio
               donde el abogado esperaba su documento.
             */
-            <div className="mx-auto mt-16 max-w-[420px] text-center">
-              <FileText className="mx-auto h-6 w-6 text-ink-400" strokeWidth={1.6} />
-              <h3 className="mt-3 text-subtitle text-ink-900">Aún no hay borrador</h3>
-              <p className="mt-1 text-ui leading-[1.6] text-ink-500">
+            <div className="cn-red-vacio">
+              <FileText className="cn-red-vacio-icono" strokeWidth={1.5} aria-hidden />
+              <h3 className="cn-red-vacio-titulo">Aún no hay borrador</h3>
+              <p className="cn-red-vacio-texto">
                 Describa a la izquierda qué debe hacer el escrito y genérelo. Aparecerá aquí, sobre
                 papel y listo para editar.
               </p>
               {onOpenSavedDraftsModal && (
-                <button onClick={onOpenSavedDraftsModal} className="btn-secondary mt-4">
-                  <FolderOpen className="h-3.5 w-3.5" />
+                <button type="button" onClick={onOpenSavedDraftsModal} className="cn-red-boton-sec">
+                  <FolderOpen className="cn-red-boton-icono" strokeWidth={1.8} aria-hidden />
                   Abrir un borrador guardado
                 </button>
               )}

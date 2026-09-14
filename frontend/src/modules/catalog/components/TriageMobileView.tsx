@@ -14,30 +14,30 @@ import { PanelDeInstruccion } from './PanelDeInstruccion';
 import type { Actuacion } from '../types';
 
 /**
- * Orientación en móvil. Artboard 4d, con las medidas COPIADAS de su HTML.
+ * Orientación en móvil. Artboard 5 (375 px) de `public/handoff/app-orientacion.html`,
+ * con la piel en `design/cara-nueva.css` bajo `.cara-nueva .cn-ori-*`.
  *
- * ─── LO QUE DICE LA MAQUETA, CITADO ─────────────────────────────────────────
+ * ─── LO QUE SE TOMÓ DE LA MAQUETA ───────────────────────────────────────────
  *
- *     contenedor:  padding:14px 16px; gap:10px
- *     tarjeta:     border:1px solid #E3E7EC; border-radius:8px; padding:12px 14px
- *     borde izq.:  3px — #14653F verificada · #4A566B no caduca · #8A5A12 sin verificar
- *     título:      600 14px/1.35 #101822, con el ícono de estado a la derecha
- *     banda:       gap:10px; padding:9px 11px; background:#F7F8FA; radius:6
- *                  rótulo 600 9.5px MONO tracking .1em · valor 600 15px MONO
- *     artículo:    400 12px/1.5 MONO #667487
- *     primario:    100% × 44px, 600 13.5px, blanco sobre #17456B, radius 6
- *     secundario:  500 13.5px #17456B sobre blanco con borde #CBD9E4
+ *     título 28/34 · bajada 16/24 · campo gris sin contorno, radio 14, 16/26
+ *     botón de orientar 52 px de alto, radio 14 · objetivos táctiles ≥ 44 px
+ *     nada por debajo de 14 px · mono solo en la norma y el término
  *
- * Todos esos colores ya son tokens: verified, neutral-fact, unverified, ink-900,
- * ink-500, line-200, canvas, brand-700, brand-line.
+ * ─── LO QUE NO SE TOMÓ, con la razón ────────────────────────────────────────
  *
- * ─── EL BORDE IZQUIERDO ES LA REDUNDANCIA DEL SISTEMA, NO ADORNO ────────────
+ * · «Consultas parecidas de su firma». No hay búsqueda por parecido en el
+ *   servidor; pintar dos filas «parecidas» sería inventarlas.
+ * · «Dónde buscar» (una rama o todas). La orientación no ofrece ese control.
+ * · El precio en el botón. El cobro depende del cupo gratuito del día, que
+ *   esta pantalla no conoce antes de consultar.
+ * · El botón pegado abajo. La barra de pestañas de 62 px ya vive ahí, como en
+ *   Inicio: un pie fijo la taparía o se le montaría encima.
  *
- * En pantalla pequeña el estado tiene que leerse sin depender del color: por eso
- * la maqueta pone además el ÍCONO junto al título y, en la que no está
- * catalogada, un fondo RAYADO y un borde punteado. Tres señales distintas para
- * el mismo hecho, que es la regla de este sistema — el estado nunca viaja solo
- * en color.
+ * ─── EL ESTADO VIAJA EN TRES SEÑALES, NO EN COLOR ───────────────────────────
+ *
+ * En pantalla pequeña el estado tiene que leerse sin depender del color: una
+ * barra de 3 px a la izquierda (sombra interior, que respeta el radio), el
+ * ÍCONO junto al título y, en la que no está verificada, el BORDE DISCONTINUO.
  *
  * ─── UN SOLO PRIMARIO ───────────────────────────────────────────────────────
  *
@@ -45,7 +45,7 @@ import type { Actuacion } from '../types';
  * relleno; las demás quedan en secundario. Seis primarios equivalen a ninguno,
  * y aquí lo que ordena la lista es el reloj: lo que se vence primero va primero.
  *
- * ─── LO QUE EL ARTBOARD PIDE Y AQUÍ NO ESTÁ, con la razón ───────────────────
+ * ─── LO QUE EL ARTBOARD ANTERIOR PEDÍA Y AQUÍ NO ESTÁ ───────────────────────
  *
  * · «VENCE · 3 may 2025». Calcular la fecha exige saber DESDE CUÁNDO corre el
  *   término —la notificación, el despido, la estructuración— y eso no está en
@@ -60,10 +60,10 @@ const MINIMO = 40;
 
 type Estado = 'VERIFICADO' | 'NO_CADUCA' | 'NO_VERIFICADO';
 
-const BORDE: Record<Estado, string> = {
-  VERIFICADO: 'rgb(var(--verified))',
-  NO_CADUCA: 'rgb(var(--neutral-fact))',
-  NO_VERIFICADO: 'rgb(var(--unverified))'
+const BARRA: Record<Estado, string> = {
+  VERIFICADO: 'cn-ori-barra--ok',
+  NO_CADUCA: 'cn-ori-barra--neutro',
+  NO_VERIFICADO: 'cn-ori-barra--sin cn-ori-tarjeta--sin'
 };
 
 const ICONO: Record<Estado, React.FC<{ className?: string; strokeWidth?: number }>> = {
@@ -73,48 +73,21 @@ const ICONO: Record<Estado, React.FC<{ className?: string; strokeWidth?: number 
 };
 
 const TINTA: Record<Estado, string> = {
-  VERIFICADO: 'text-verified',
-  NO_CADUCA: 'text-neutral-fact',
-  NO_VERIFICADO: 'text-unverified'
+  VERIFICADO: 'cn-ori-icono--ok',
+  NO_CADUCA: 'cn-ori-icono--neutro',
+  NO_VERIFICADO: 'cn-ori-icono--sin'
 };
 
-/** Los mismos milímetros para las tres tarjetas: 12px 14px, radio 8, borde 3. */
-const Tarjeta: React.FC<{ estado: Estado; children: React.ReactNode; rayada?: boolean }> = ({
-  estado,
-  children,
-  rayada
-}) => (
-  <article
-    className={`rounded-[8px] px-3.5 py-3 ${
-      rayada
-        ? 'border border-dashed border-[rgb(var(--unverified-line))]'
-        : 'border border-line-200 bg-surface'
-    }`}
-    style={{
-      borderLeft: `3px solid ${BORDE[estado]}`,
-      /*
-       * EL RAYADO DE LA MAQUETA, CON DOS TONOS OPACOS Y NO CON ALFA.
-       *
-       * 5d es explícito: «la trama diagonal del sin verificar se rehace con los
-       * dos tonos oscuros en vez de aclararse — la textura se conserva, el
-       * brillo no». Con transparencia el resultado depende de lo que haya
-       * detrás, así que la misma tarjeta se veía distinta sobre el lienzo que
-       * sobre una superficie, y en oscuro se aclaraba justo lo que debía
-       * oscurecerse.
-       *
-       * `color-mix` da el tono claro MEZCLANDO el ámbar con la superficie del
-       * tema: opaco, y sigue al modo oscuro sin fijar hexadecimales.
-       */
-      ...(rayada
-        ? {
-            background:
-              'repeating-linear-gradient(135deg, color-mix(in srgb, rgb(var(--unverified-surf)) 50%, rgb(var(--surface))) 0 6px, rgb(var(--unverified-surf)) 6px 12px)'
-          }
-        : {})
-    }}
-  >
-    {children}
-  </article>
+/* El nombre accesible del ícono: el estado no puede quedar solo en el dibujo. */
+const NOMBRE: Record<Estado, string> = {
+  VERIFICADO: 'Verificado',
+  NO_CADUCA: 'No caduca',
+  NO_VERIFICADO: 'Sin verificar'
+};
+
+/** Las mismas medidas para las tres tarjetas: relleno 16, radio 14, barra de 3. */
+const Tarjeta: React.FC<{ estado: Estado; children: React.ReactNode }> = ({ estado, children }) => (
+  <article className={`cn-ori-tarjeta cn-ori-tarjeta--movil ${BARRA[estado]}`}>{children}</article>
 );
 
 interface TriageMobileViewProps {
@@ -194,38 +167,53 @@ export const TriageMobileView: React.FC<TriageMobileViewProps> = ({ onDraft, onL
   const faltan = Math.max(0, MINIMO - hechos.trim().length);
 
   return (
-    <div data-visita="vista-orientacion" className="flex h-full min-h-0 flex-1 flex-col overflow-y-auto bg-canvas">
-      <div className="flex flex-col gap-2.5 px-4 py-3.5">
-        {/* La tarjeta de los hechos: 12px 14px, rótulo 600 12px, prosa 13/1.6. */}
-        <section className="rounded-[8px] border border-line-200 bg-surface px-3.5 py-3">
-          <h2 className="text-[12px] font-semibold text-ink-700">Los hechos</h2>
-          <textarea
-            value={hechos}
-            onChange={(e) => setHechos(e.target.value)}
-            rows={4}
-            placeholder="Despido sin justa causa el 3 de febrero, estando incapacitado y sin permiso del inspector."
-            className="mt-1.5 w-full resize-none border-0 bg-transparent p-0 text-[13px] leading-[1.6] text-ink-700 placeholder:text-ink-400 focus:outline-none"
-          />
+    <div
+      data-visita="vista-orientacion"
+      className="cara-nueva cn-ori flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-y-auto"
+    >
+      <div className="cn-ori-movil-cuerpo">
+        <header>
+          <h1 className="cn-ori-h1">¿Qué actuación necesita?</h1>
+          <p className="cn-ori-bajada">
+            Cuente qué pasó y el catálogo propone candidatas con su término y su norma.
+          </p>
+        </header>
+
+        <section className="cn-ori-form" aria-label="Los hechos del caso">
+          <div>
+            <label htmlFor="hechos-de-la-orientacion-movil" className="cn-ori-etiqueta">
+              Los hechos
+            </label>
+            <textarea
+              id="hechos-de-la-orientacion-movil"
+              value={hechos}
+              onChange={(e) => setHechos(e.target.value)}
+              rows={5}
+              placeholder="Cuente qué pasó, a quién y qué se busca. En lenguaje corriente."
+              className="cn-ori-hechos"
+            />
+          </div>
 
           {/* El adjunto: una sola línea bajo el cuadro, sin robarle sitio. */}
-          <div className="mt-2 min-w-0 border-t border-line-100 pt-2">
+          <div className="min-w-0">
             {adjuntoHechos.leyendo ? (
               /* Espera propia: la pantalla sigue viva mientras se lee el PDF. */
-              <p className="flex items-center gap-2 text-[11.5px] text-ink-500">
-                <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" />
+              <p className="cn-ori-adjunto-fila">
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
                 Leyendo el archivo…
               </p>
             ) : adjuntoHechos.adjunto ? (
-              <div className="min-w-0 space-y-1">
-                <div className="flex min-w-0 items-start gap-2">
-                  <FileText className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink-400" />
+              <div className="cn-ori-adjunto">
+                <div className="cn-ori-adjunto-fila">
+                  <FileText className="h-4 w-4" aria-hidden="true" />
                   {/*
                     Un nombre de archivo largo es una sola palabra: en 320px
-                    `break-words` no basta, hace falta `overflow-wrap:anywhere`.
+                    partir por palabras no basta, la clase parte en cualquier
+                    punto.
                   */}
-                  <span className="min-w-0 flex-1 text-[11.5px] leading-snug text-ink-700 [overflow-wrap:anywhere]">
-                    {adjuntoHechos.adjunto.nombre}
-                    <span className="ml-1.5 font-mono text-[10.5px] text-ink-400">
+                  <span className="cn-ori-adjunto-nombre">
+                    {adjuntoHechos.adjunto.nombre}{' '}
+                    <span className="cn-ori-adjunto-nota">
                       {adjuntoHechos.adjunto.caracteres} caracteres
                     </span>
                   </span>
@@ -233,13 +221,13 @@ export const TriageMobileView: React.FC<TriageMobileViewProps> = ({ onDraft, onL
                     type="button"
                     onClick={adjuntoHechos.quitar}
                     aria-label="Quitar el archivo"
-                    className="-m-1 shrink-0 p-1 text-ink-500"
+                    className="cn-ori-quitar"
                   >
-                    <X className="h-3.5 w-3.5" />
+                    <X className="h-4 w-4" aria-hidden="true" />
                   </button>
                 </div>
                 {adjuntoHechos.adjunto.recortado && (
-                  <p className="text-justify text-[11px] leading-snug text-ink-500 [text-wrap:pretty]">
+                  <p className="cn-ori-adjunto-texto">
                     El documento es largo: se leyó el comienzo del documento.
                   </p>
                 )}
@@ -255,8 +243,8 @@ export const TriageMobileView: React.FC<TriageMobileViewProps> = ({ onDraft, onL
                 )}
               </div>
             ) : (
-              <label className="flex min-w-0 items-center gap-2 text-[11.5px] text-brand-700">
-                <Paperclip className="h-3.5 w-3.5 shrink-0" />
+              <label className="cn-ori-movil-adjuntar">
+                <Paperclip className="h-4 w-4" aria-hidden="true" />
                 <span className="min-w-0">Adjuntar el oficio o la demanda (PDF, Word o texto)</span>
                 <input
                   type="file"
@@ -273,38 +261,35 @@ export const TriageMobileView: React.FC<TriageMobileViewProps> = ({ onDraft, onL
 
             {adjuntoHechos.motivo && (
               /* No se pudo leer; lo escrito a mano sigue donde estaba. */
-              <p className="mt-2 flex items-start gap-2 rounded-[6px] border border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))]/60 px-2.5 py-2 text-justify text-[11px] leading-snug text-ink-700 [text-wrap:pretty]">
-                <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-unverified" />
+              <p className="cn-ori-aviso">
+                <AlertTriangle className="h-4 w-4" aria-hidden="true" />
                 <span className="min-w-0">{adjuntoHechos.motivo}</span>
               </p>
             )}
           </div>
 
           {resultado?.senales && (
-            <div className="mt-2 flex flex-wrap gap-[5px]">
+            <div className="cn-ori-chips">
               {[
                 resultado.senales.rama ? BRANCH_LABELS[resultado.senales.rama] ?? resultado.senales.rama : null,
                 ...(resultado.senales.elementos ?? [])
               ]
                 .filter(Boolean)
                 .map((chip) => (
-                  <span
-                    key={chip as string}
-                    className="rounded-full border border-line-200 bg-canvas px-2 py-0.5 text-[11.5px] text-ink-700"
-                  >
+                  <span key={chip as string} className="cn-ori-chip">
                     {chip}
                   </span>
                 ))}
             </div>
           )}
 
-{/*
+          {/*
             EL CASO, OPCIONAL Y DESPUÉS DE LOS HECHOS. Ésta es la pantalla de
             quien NO sabe todavía qué tiene, así que pedirle el expediente
             antes de contar el caso sería pedirle lo que quizá no existe. Va
             debajo, y solo si la firma tiene expedientes.
           */}
-          <div className="mb-3">
+          <div className="cn-ori-selector">
             <SelectorDeExpediente
               valor={expedienteId}
               onCambio={setExpedienteId}
@@ -313,50 +298,51 @@ export const TriageMobileView: React.FC<TriageMobileViewProps> = ({ onDraft, onL
             />
           </div>
 
-          <button
-            type="button"
-            onClick={() => void orientar()}
-            disabled={faltan > 0 || cargando}
-            className="btn-primary mt-3 h-11 w-full disabled:opacity-50"
-          >
-            {cargando ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" /> Orientando…
-              </>
-            ) : (
-              'Orientar'
+          <div>
+            <button
+              type="button"
+              onClick={() => void orientar()}
+              disabled={faltan > 0 || cargando}
+              className="cn-ini-boton cn-ini-boton--primario cn-ori-orientar cn-ori-movil-orientar"
+            >
+              {cargando ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> Orientando…
+                </>
+              ) : (
+                'Orientar'
+              )}
+            </button>
+            {faltan > 0 && (
+              <p className="cn-ori-adjunto-texto">
+                Faltan {faltan} caracteres: con menos, el catálogo no tiene con qué proponer.
+              </p>
             )}
-          </button>
-          {faltan > 0 && (
-            <p className="mt-1.5 text-[11px] text-ink-500 text-justify">
-              Faltan {faltan} caracteres: con menos, el catálogo no tiene con qué proponer.
-            </p>
-          )}
+          </div>
         </section>
 
         {error && (
-          <p className="rounded-[8px] border border-[rgb(var(--danger)/0.35)] bg-[rgb(var(--danger)/0.06)] px-3.5 py-3 text-[12px] leading-snug text-danger text-justify">
-            {error}
+          <p className="cn-error" role="alert">
+            <AlertTriangle className="h-4 w-4" aria-hidden="true" />
+            <span className="min-w-0">{error}</span>
           </p>
         )}
 
         {resultado?.status === 'SIN_COINCIDENCIA' && (
-          <section className="rounded-[8px] border border-line-200 bg-surface px-3.5 py-3">
-            <h2 className="text-[13px] font-semibold text-ink-900">
+          <section className="cn-ori-estado cn-ori-estado--hueco">
+            <h2 className="cn-ori-estado-titulo">
               El catálogo no reconoce una actuación para estos hechos
             </h2>
-            <p className="mt-1.5 text-justify text-[12px] leading-snug text-ink-500 [text-wrap:pretty]">
+            <p className="cn-ori-estado-texto">
               No es un error: ninguna de las actuaciones verificadas encaja con lo descrito. Puede
               ser una materia que aún no catalogamos, o puede faltar un dato que define la vía.
             </p>
             {resultado.preguntas && resultado.preguntas.length > 0 && (
-              <ul className="mt-2 space-y-1.5">
+              <ul className="cn-ori-preguntas">
                 {resultado.preguntas.map((p, i) => (
-                  <li key={p} className="flex gap-2 text-[12px] leading-snug text-ink-700">
-                    <span className="shrink-0 font-mono text-[10px] text-ink-400">
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-                    <span className="text-justify [text-wrap:pretty]">{p}</span>
+                  <li key={p}>
+                    <span className="cn-ori-preguntas-num">{String(i + 1).padStart(2, '0')}</span>
+                    <span className="min-w-0">{p}</span>
                   </li>
                 ))}
               </ul>
@@ -366,13 +352,8 @@ export const TriageMobileView: React.FC<TriageMobileViewProps> = ({ onDraft, onL
 
         {sugerencias.length > 0 && (
           <>
-            {/* El rótulo con su filete, como en el HTML. */}
-            <div className="flex items-center gap-[7px]">
-              <span className="shrink-0 font-mono text-[9.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
-                Término más corto primero
-              </span>
-              <div className="h-px flex-1 bg-line-200" />
-            </div>
+            {/* El rótulo con su filete. */}
+            <p className="cn-ori-movil-rotulo">Término más corto primero</p>
 
             {sugerencias.map(({ actuacion, razon }, i) => {
               const a = actuacion as Actuacion;
@@ -385,61 +366,42 @@ export const TriageMobileView: React.FC<TriageMobileViewProps> = ({ onDraft, onL
               const esPrimario = i === 0 && estado !== 'NO_VERIFICADO';
 
               return (
-                <Tarjeta key={a.id} estado={estado} rayada={estado === 'NO_VERIFICADO'}>
-                  <div className="flex items-start gap-2">
-                    <h3 className="min-w-0 flex-1 text-[14px] font-semibold leading-[1.35] text-ink-900">
-                      {a.exactName}
-                    </h3>
-                    <Icono
-                      className={`mt-0.5 h-3.5 w-3.5 shrink-0 ${TINTA[estado]}`}
-                      strokeWidth={2.6}
-                    />
+                <Tarjeta key={a.id} estado={estado}>
+                  <div className="cn-ori-tarjeta-cabeza">
+                    <h3 className="cn-ori-tarjeta-titulo">{a.exactName}</h3>
+                    <span role="img" aria-label={NOMBRE[estado]} className="mt-1.5 shrink-0">
+                      <Icono className={`h-4 w-4 ${TINTA[estado]}`} strokeWidth={2.6} />
+                    </span>
                   </div>
 
                   {/*
                     Aquí la tarjeta no pinta la rama, así que sin esta línea la
                     ficha prestada se leería como propia de la rama elegida.
                   */}
-                  {a.porRemision && (
-                    <p className="mt-1.5 text-[11px] leading-snug text-ink-500 text-justify">
-                      {a.porRemision.marca}
-                    </p>
-                  )}
+                  {a.porRemision && <p className="cn-ori-tarjeta-remision">{a.porRemision.marca}</p>}
 
                   {estado === 'NO_VERIFICADO' ? (
-                    <p className="mt-1.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.07em] text-unverified">
-                      Sin verificar · el término no está comprobado
-                    </p>
+                    <p className="cn-ori-sin-rotulo">Sin verificar · el término no está comprobado</p>
                   ) : (
-                    <div className="mt-2.5 rounded-[6px] bg-canvas px-[11px] py-[9px]">
-                      <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
-                        Término
-                      </p>
-                      <p className="mt-0.5 font-mono text-[15px] font-semibold leading-tight text-ink-900">
+                    <div className="cn-ori-banda">
+                      <p className="cn-ori-banda-rotulo">Término</p>
+                      <p className="cn-ori-banda-valor cn-ori-mono">
                         {estado === 'NO_CADUCA' ? 'No aplica término' : a.term.description}
                       </p>
                     </div>
                   )}
 
-                  <p className="mt-2 font-mono text-[12px] leading-[1.5] text-ink-500">
-                    {a.legalBasis}
-                  </p>
+                  <p className="cn-ori-norma-movil cn-ori-mono">{a.legalBasis}</p>
 
-                  {razon && (
-                    <p className="mt-1.5 text-justify text-[11.5px] italic leading-snug text-ink-500 [text-wrap:pretty]">
-                      {razon}
-                    </p>
-                  )}
+                  {razon && <p className="cn-ori-razon">{razon}</p>}
 
                   {estado !== 'NO_VERIFICADO' && (
                     <button
                       type="button"
                       onClick={() => setEligiendo(eligiendo === a.id ? null : a.id)}
                       aria-expanded={eligiendo === a.id}
-                      className={`mt-[11px] h-11 w-full rounded-[6px] text-[13.5px] ${
-                        esPrimario
-                          ? 'bg-brand-700 font-semibold text-on-brand'
-                          : 'border border-[rgb(var(--brand-line))] bg-surface font-medium text-brand-700'
+                      className={`cn-ini-boton cn-ori-redactar-movil ${
+                        esPrimario ? 'cn-ini-boton--primario' : 'cn-ini-boton--suave'
                       }`}
                     >
                       Redactar esta
@@ -455,7 +417,7 @@ export const TriageMobileView: React.FC<TriageMobileViewProps> = ({ onDraft, onL
                     la tarjeta, que trae su propio relleno.
                   */}
                   {eligiendo === a.id && (
-                    <div className="-mx-3.5 -mb-3 mt-[11px] min-w-0 overflow-hidden rounded-b-[7px]">
+                    <div className="cn-ori-panel">
                       <PanelDeInstruccion
                         movil
                         actuacion={a}

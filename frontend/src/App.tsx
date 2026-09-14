@@ -1379,7 +1379,7 @@ export function App() {
               del documento reducido a una franja en blanco.
             */
             <ModuloBloqueado modulo="REDACCION" quePuede="Los escritos ya guardados siguen en Borradores: puede abrirlos, leerlos y exportarlos a Word o PDF.">
-            <div data-visita="vista-workspace" className="flex min-h-0 min-w-0 flex-1 flex-col">
+            <div data-visita="vista-workspace" className="cara-nueva flex min-h-0 min-w-0 flex-1 flex-col">
               {/*
                 DOS BARRAS DE CONFIGURACION, UNA POR TAMAÑO. La de escritorio son
                 tres selectores en fila; en 375px quedaban en «Fi… > … > El…» y

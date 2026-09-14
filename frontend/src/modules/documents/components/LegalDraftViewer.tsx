@@ -197,7 +197,7 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
           advertir — una barra que casi siempre dice «todo bien» se vuelve marco
           y deja de leerse el dia que dice otra cosa.
         */}
-        <div className="mb-3 empty:mb-0">
+        <div className="cn-red-procedencia-caja">
           <DraftProvenanceBar procedencia={draft.procedencia} />
         </div>
         {/*
@@ -205,29 +205,42 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
           lienzo, como una hoja que sigue más allá del recorte. Un rectángulo
           cerrado con sombra alrededor se lee como tarjeta, no como documento.
         */}
-        <div className="paper-canvas relative rounded-t-card border border-b-0 border-line-200 px-8 py-8 shadow-e1 sm:px-14">
+        {/*
+          LA CARA NUEVA TOCA EL MARCO DEL PAPEL, NUNCA SU LETRA. Radio, sombra y
+          el hueco para las herramientas son de la pantalla; la familia, el
+          tamaño y el interlineado siguen llegando de `estiloDelLienzo` y del
+          control de letra, en el `style` de abajo. Ninguna regla de
+          `cara-nueva.css` nombra la letra del papel.
+        */}
+        <div className="paper-canvas cn-red-papel relative px-8 pb-8 sm:px-14">
           {/* Editar / ver y Taller actúan sobre el TEXTO, así que viven con el
               texto, arriba: el Taller también está en el pie, pero el pie queda
               seis páginas abajo y no se encontraba. */}
-          <div className="absolute right-3 top-3 flex items-center gap-1.5">
-            <ControlDeLetra letra={letra} />
+          <div className="cn-red-herramientas">
+            <ControlDeLetra letra={letra} className="cn-red-letra" />
             {onAbrirTaller && (
               <button
+                type="button"
                 onClick={() => onAbrirTaller(editableText)}
                 disabled={!tallerHabilitado}
-                className="btn-secondary btn-sm disabled:cursor-not-allowed disabled:opacity-60"
+                className="cn-red-herr cn-red-herr--taller"
                 title={tallerHabilitado ? 'Resaltar, comentar y conversar con la guía sobre este escrito' : AVISO_FUNCION_DESHABILITADA}
               >
-                <ClipboardCheck className="h-3 w-3" />
+                <ClipboardCheck className="cn-red-herr-icono" strokeWidth={1.8} aria-hidden />
                 Taller
               </button>
             )}
             <button
+              type="button"
               onClick={() => setIsEditMode(!isEditMode)}
-              className="btn-neutral btn-sm"
+              className="cn-red-herr"
               title={isEditMode ? 'Ver con formato' : 'Editar el texto'}
             >
-              {isEditMode ? <Eye className="h-3 w-3" /> : <Pencil className="h-3 w-3" />}
+              {isEditMode ? (
+                <Eye className="cn-red-herr-icono" strokeWidth={1.8} aria-hidden />
+              ) : (
+                <Pencil className="cn-red-herr-icono" strokeWidth={1.8} aria-hidden />
+              )}
               {isEditMode ? 'Ver' : 'Editar'}
             </button>
           </div>
@@ -255,60 +268,62 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
             Acciones sobre el TEXTO, no sobre el documento: exportar y pantalla
             completa viven arriba. Y la advertencia de la exportación, que el
             diseño exige decir donde se decide. */}
-        <div className="flex flex-wrap items-center gap-1.5 rounded-b-card border border-t-0 border-line-200 bg-surface px-4 py-2.5">
-          <button onClick={() => setIsJargonModalOpen(true)} className="btn-neutral btn-sm">
-            <Sparkles className="h-3 w-3 text-ink-400" />
+        <div className="cn-red-pie-papel">
+          <button type="button" onClick={() => setIsJargonModalOpen(true)} className="cn-red-herr">
+            <Sparkles className="cn-red-herr-icono" strokeWidth={1.8} aria-hidden />
             Sugerir jerga
           </button>
 
           {onAbrirTaller && (
             <button
+              type="button"
               onClick={() => onAbrirTaller(editableText)}
               disabled={!tallerHabilitado}
-              className="btn-secondary btn-sm disabled:cursor-not-allowed disabled:opacity-60"
+              className="cn-red-herr cn-red-herr--taller"
               title={tallerHabilitado ? 'Resaltar, tachar y conversar con la guía sobre este escrito' : AVISO_FUNCION_DESHABILITADA}
             >
-              <ClipboardCheck className="h-3 w-3" />
+              <ClipboardCheck className="cn-red-herr-icono" strokeWidth={1.8} aria-hidden />
               Taller
             </button>
           )}
 
-          <button onClick={handleSaveAndTeachStyle} className="btn-neutral btn-sm">
+          <button type="button" onClick={handleSaveAndTeachStyle} className="cn-red-herr">
             {isStyleSaved ? (
               <>
-                <Check className="h-3 w-3 text-verified" />
+                <Check className="cn-red-herr-icono cn-red-herr-icono--ok" strokeWidth={2} aria-hidden />
                 Aprendido
               </>
             ) : (
               <>
-                <BrainCircuit className="h-3 w-3 text-ink-400" />
+                <BrainCircuit className="cn-red-herr-icono" strokeWidth={1.8} aria-hidden />
                 Enseñar estilo
               </>
             )}
           </button>
 
           {onOpenSavedDraftsModal && (
-            <button onClick={onOpenSavedDraftsModal} className="btn-neutral btn-sm">
-              <FolderOpen className="h-3 w-3 text-ink-400" />
+            <button type="button" onClick={onOpenSavedDraftsModal} className="cn-red-herr">
+              <FolderOpen className="cn-red-herr-icono" strokeWidth={1.8} aria-hidden />
               Mis borradores
             </button>
           )}
 
           {onSaveDraft && (
             <button
+              type="button"
               onClick={() => void guardar()}
-              className="btn-secondary btn-sm ml-auto"
+              className="cn-red-herr cn-red-herr--guardar"
               title="Guardar en el historial de la firma"
             >
-              <Save className="h-3 w-3" />
+              <Save className="cn-red-herr-icono" strokeWidth={1.8} aria-hidden />
               Guardar
             </button>
           )}
         </div>
 
         {avisoDeGuardado && (
-          <p role="status" className="notice mt-2">
-            <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-verified" />
+          <p role="status" className="cn-red-aviso-ok">
+            <Check className="cn-red-aviso-ok-icono" strokeWidth={2} aria-hidden />
             <span>{avisoDeGuardado}</span>
           </p>
         )}
@@ -318,22 +333,21 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
           donde alguien se lo pregunta al ver el lienzo oscuro. No es una opción:
           nadie quiere radicar un .docx con fondo negro.
         */}
-        <p className="mt-2 text-center text-meta text-ink-400">
+        <p className="cn-red-exporta">
           El .docx y el PDF se exportan siempre sobre papel blanco.
         </p>
 
         {/* ─── LO QUE EL ESCRITO USÓ ─────────────────────────────────────*/}
         {draft.jurisprudenciaCitada.length > 0 && (
-          <div className="card mt-4 p-4">
-            <div className="flex items-center gap-2">
-              <Scale className="h-3.5 w-3.5 text-ink-400" />
-              <h3 className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
-                Jurisprudencia usada
-              </h3>
+          <div className="cn-red-juris">
+            <div className="cn-red-juris-cabeza">
+              <Scale className="cn-red-herr-icono" strokeWidth={1.6} aria-hidden />
+              <h3 className="cn-red-juris-titulo">Jurisprudencia usada</h3>
             </div>
-            <ul className="mt-2 space-y-1">
+            {/* Las providencias sí son citables: van en mono. */}
+            <ul className="cn-red-juris-lista">
               {draft.jurisprudenciaCitada.map((item, idx) => (
-                <li key={idx} className="font-mono text-meta text-ink-700">
+                <li key={idx} className="cn-red-juris-item">
                   {item}
                 </li>
               ))}

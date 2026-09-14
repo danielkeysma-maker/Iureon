@@ -2293,3 +2293,3333 @@
 }
 :root[data-theme='dark'] .cara-nueva svg [stroke='#14294A'] { stroke: #F4F1EA; }
 :root[data-theme='dark'] .cara-nueva svg [fill='#14294A'] { fill: #F4F1EA; }
+
+/* ─── Orientación ─── */
+/*
+ * Artboards 1, 2, 4 y 5 de `public/handoff/app-orientacion.html` (formulario,
+ * candidatas, estados y móvil 375). Solo la piel: lo que la pantalla muestra y
+ * en qué orden lo decide el componente, no el artboard. Reglas que se ven aquí:
+ *   · «sin verificar» es un BORDE DISCONTINUO; ningún otro recuadro de esta
+ *     pantalla lo usa, ni siquiera la zona de soltar el archivo, o el guion
+ *     dejaría de decir «no comprobado»;
+ *   · el mono queda para lo citable: la norma y el término de la ficha; los
+ *     conteos y las fechas del historial van en la letra de interfaz;
+ *   · tinta secundaria `--ink-4` sobre gris y `--ink-5` solo sobre blanco;
+ *   · nada por debajo de 14 px en lo propio, y los tres componentes
+ *     compartidos que se montan dentro (selector de expediente, aviso de plazo,
+ *     panel de instrucción) se suben aquí, sin tocar sus archivos, porque
+ *     también los usan pantallas que todavía no cambiaron de cara.
+ */
+.cara-nueva.cn-ori {
+  --ori-ok-bg: #e9f2ec;
+  --ori-guion: rgb(138 90 18 / 0.55);
+  --ori-sombra: 0 1px 3px rgb(16 24 34 / 0.1);
+  background: var(--canvas);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .cara-nueva.cn-ori {
+    --ori-ok-bg: rgb(79 180 131 / 0.14);
+    --ori-guion: rgb(217 166 74 / 0.6);
+    --ori-sombra: none;
+  }
+}
+:root[data-theme='dark'] .cara-nueva.cn-ori {
+  --ori-ok-bg: rgb(79 180 131 / 0.14);
+  --ori-guion: rgb(217 166 74 / 0.6);
+  --ori-sombra: none;
+}
+
+.cara-nueva .cn-ori-cuerpo {
+  display: flex;
+  width: 100%;
+  max-width: 760px;
+  flex-direction: column;
+  gap: 24px;
+  margin: 0 auto;
+  padding: 16px 16px 32px;
+}
+.cara-nueva .cn-ori-mono {
+  font-family: var(--mono);
+  font-weight: 500;
+}
+
+/* ── Encabezado ───────────────────────────────────────────────────────── */
+.cara-nueva .cn-ori-h1 {
+  font-size: 28px;
+  line-height: 34px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+.cara-nueva .cn-ori-bajada {
+  margin-top: 4px;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ori-censo {
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-5);
+}
+
+/* ── Formulario ───────────────────────────────────────────────────────── */
+.cara-nueva .cn-ori-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.cara-nueva .cn-ori-etiqueta {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 15px;
+  line-height: 23px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.cara-nueva .cn-ori-hechos {
+  display: block;
+  width: 100%;
+  min-height: 140px;
+  padding: 16px;
+  border: none;
+  border-radius: 14px;
+  background: var(--field);
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 26px;
+  color: var(--ink);
+  resize: vertical;
+  transition: box-shadow 0.16s;
+}
+.cara-nueva .cn-ori-hechos::placeholder {
+  color: var(--ink-4);
+  opacity: 1;
+}
+.cara-nueva .cn-ori-hechos:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+.cara-nueva .cn-ori-hechos:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* La zona del archivo: gris liso, y al arrastrar el anillo azul del foco. Sin guion, que es de «sin verificar». */
+.cara-nueva .cn-ori-adjunto {
+  min-width: 0;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--wash);
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-3);
+  transition: background 0.16s, box-shadow 0.16s;
+}
+.cara-nueva .cn-ori-adjunto--arrastrando {
+  background: var(--brand-soft);
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+.cara-nueva .cn-ori-adjunto-fila {
+  display: flex;
+  min-width: 0;
+  min-height: 44px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+}
+.cara-nueva label.cn-ori-adjunto-fila {
+  cursor: pointer;
+}
+.cara-nueva .cn-ori-adjunto-fila svg {
+  flex: none;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ori-adjunto-nombre {
+  min-width: 0;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-ori-adjunto-escoger {
+  font-weight: 600;
+  color: var(--brand);
+}
+.cara-nueva .cn-ori-adjunto-nota {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ori-adjunto-texto {
+  margin-top: 4px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ori-quitar {
+  display: inline-flex;
+  min-height: 44px;
+  min-width: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-left: auto;
+  padding: 0 10px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--ink-4);
+  cursor: pointer;
+  transition: background 0.16s, color 0.16s;
+}
+.cara-nueva .cn-ori-quitar:hover {
+  background: var(--neutral);
+  color: var(--ink);
+}
+
+/* Advertencia que no es avería: ámbar sin guion (no es un término sin verificar) y sin rojo. */
+.cara-nueva .cn-ori-aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--warn-bg);
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+}
+.cara-nueva .cn-ori-aviso > svg {
+  flex: none;
+  margin-top: 3px;
+  color: var(--warn);
+}
+
+.cara-nueva .cn-ori-pie-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+.cara-nueva .cn-ori-privacidad {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14.5px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ori-privacidad svg {
+  flex: none;
+}
+.cara-nueva .cn-ori-contador {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-ori-orientar {
+  margin-left: auto;
+}
+.cara-nueva .cn-ori-orientar:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  box-shadow: none;
+}
+
+.cara-nueva .cn-ori-ejemplos {
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: var(--wash);
+}
+.cara-nueva .cn-ori-ejemplos-titulo {
+  margin-bottom: 8px;
+  font-size: 15px;
+  line-height: 23px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-ori-ejemplos-lista {
+  display: grid;
+  gap: 6px;
+}
+.cara-nueva .cn-ori-ejemplo {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  padding: 11px 14px;
+  border: none;
+  border-radius: 10px;
+  background: var(--canvas);
+  box-shadow: var(--shadow-1);
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.cara-nueva .cn-ori-ejemplo:hover {
+  background: var(--field);
+}
+
+/* ── Estados: error, cupo, respuesta sin actuación ────────────────────── */
+.cara-nueva .cn-ori-estado {
+  padding: 22px 24px;
+  border-radius: 16px;
+  background: var(--field);
+}
+.cara-nueva .cn-ori-estado--hueco {
+  background: var(--warn-bg);
+}
+.cara-nueva .cn-ori-estado-cabeza {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.cara-nueva .cn-ori-estado-cabeza > svg {
+  flex: none;
+  margin-top: 5px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ori-estado--hueco .cn-ori-estado-cabeza > svg {
+  color: var(--warn);
+}
+.cara-nueva .cn-ori-estado-titulo {
+  font-size: 19px;
+  line-height: 27px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.cara-nueva .cn-ori-estado-texto {
+  margin-top: 4px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-ori-estado-rotulo {
+  margin-top: 16px;
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-ori-preguntas {
+  display: grid;
+  gap: 6px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-ori-preguntas li {
+  display: flex;
+  gap: 10px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+}
+.cara-nueva .cn-ori-preguntas-num {
+  flex: none;
+  min-width: 22px;
+  font-weight: 600;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.cara-nueva .cn-ori-botones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+.cara-nueva .cn-ori-botones .cn-ini-boton {
+  min-height: 44px;
+  border-radius: 10px;
+  font-size: 15px;
+}
+.cara-nueva .cn-ori-consecuencia {
+  margin-top: 12px;
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-ori-cupo {
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+}
+
+/* ── Resultados ───────────────────────────────────────────────────────── */
+.cara-nueva .cn-ori-resultados {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.cara-nueva .cn-ori-h2 {
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.cara-nueva .cn-ori-orden {
+  margin-top: 2px;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ori-advertencia {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: var(--brand-soft);
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+}
+.cara-nueva .cn-ori-advertencia > svg {
+  flex: none;
+  margin-top: 3px;
+  color: var(--brand);
+}
+.cara-nueva .cn-ori-leyo {
+  padding: 16px 20px;
+  border-radius: 14px;
+  background: var(--wash);
+}
+.cara-nueva .cn-ori-leyo-titulo {
+  margin-bottom: 8px;
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ori-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.cara-nueva .cn-ori-chip {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  padding: 0 12px;
+  border-radius: 10px;
+  background: var(--canvas);
+  box-shadow: var(--shadow-1);
+  font-size: 14.5px;
+  line-height: 21px;
+  color: var(--ink);
+}
+.cara-nueva .cn-ori-chip--rama {
+  background: var(--brand-soft);
+  box-shadow: none;
+  font-weight: 600;
+  color: var(--brand);
+}
+.cara-nueva .cn-ori-leyo-nota {
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+
+.cara-nueva .cn-ori-lista {
+  display: grid;
+  gap: 10px;
+}
+.cara-nueva .cn-ori-tarjeta {
+  min-width: 0;
+  overflow: hidden;
+  padding: 20px;
+  border: 1.5px solid transparent;
+  border-radius: 14px;
+  background: var(--canvas);
+  box-shadow: var(--ori-sombra);
+}
+/* En oscuro la elevación es superficie: sin sombra, el filo de línea separa la tarjeta del lienzo. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .cara-nueva .cn-ori-tarjeta {
+    border-color: var(--line);
+    background: var(--field);
+  }
+}
+:root[data-theme='dark'] .cara-nueva .cn-ori-tarjeta {
+  border-color: var(--line);
+  background: var(--field);
+}
+.cara-nueva .cn-ori-tarjeta--sin {
+  border-style: dashed;
+  border-color: var(--ori-guion);
+  box-shadow: none;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .cara-nueva .cn-ori-tarjeta--sin {
+    border-color: var(--ori-guion);
+  }
+}
+:root[data-theme='dark'] .cara-nueva .cn-ori-tarjeta--sin {
+  border-color: var(--ori-guion);
+}
+.cara-nueva .cn-ori-tarjeta-cabeza {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px 16px;
+}
+.cara-nueva .cn-ori-tarjeta-textos {
+  min-width: 0;
+}
+.cara-nueva .cn-ori-tarjeta-titulo {
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-ori-tarjeta-rama {
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-ori-tarjeta-remision {
+  margin-top: 4px;
+  font-size: 14.5px;
+  line-height: 21px;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-ori-razon {
+  margin-top: 10px;
+  font-size: 15px;
+  line-height: 23px;
+  font-style: italic;
+  color: var(--ink-4);
+}
+
+.cara-nueva .cn-ori-estado-chip {
+  display: inline-flex;
+  min-height: 28px;
+  flex: none;
+  align-items: center;
+  gap: 7px;
+  padding: 0 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.cara-nueva .cn-ori-estado-chip::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-radius: 50%;
+  background: currentColor;
+}
+.cara-nueva .cn-ori-estado-chip--ok {
+  background: var(--ori-ok-bg);
+  color: var(--ok);
+}
+.cara-nueva .cn-ori-estado-chip--neutro {
+  background: var(--neutral);
+  color: var(--ink-3);
+}
+.cara-nueva .cn-ori-estado-chip--sin {
+  border: 1px dashed var(--ori-guion);
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+
+.cara-nueva .cn-ori-datos {
+  display: grid;
+  gap: 12px;
+  margin: 16px 0 0;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.cara-nueva .cn-ori-dato {
+  min-width: 0;
+}
+.cara-nueva .cn-ori-dato dt {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-ori-dato dd {
+  margin: 0;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-ori-dato dd.cn-ori-mono {
+  font-size: 14.5px;
+}
+.cara-nueva .cn-ori-nota-sin {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: var(--warn-bg);
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink);
+}
+.cara-nueva .cn-ori-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+.cara-nueva .cn-ori-acciones .cn-ini-boton {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 10px;
+  font-size: 15px;
+  text-decoration: none;
+}
+.cara-nueva .cn-ori-boton--verificar {
+  color: var(--warn);
+}
+/* El panel de instrucción vuelve al borde de la tarjeta, que trae su propio relleno. */
+.cara-nueva .cn-ori-panel {
+  min-width: 0;
+  margin: 16px -20px -20px;
+}
+
+.cara-nueva .cn-ori-pie {
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-ori-descartadas {
+  padding: 4px 16px;
+  border-radius: 12px;
+  background: var(--wash);
+}
+.cara-nueva .cn-ori-descartadas summary {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  font-size: 14.5px;
+  line-height: 21px;
+  color: var(--ink-4);
+  cursor: pointer;
+}
+.cara-nueva .cn-ori-descartadas ul {
+  display: grid;
+  gap: 4px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+  font-size: 14.5px;
+  line-height: 21px;
+  color: var(--ink-3);
+}
+
+/* ── Historial de la firma y huecos del catálogo ──────────────────────── */
+.cara-nueva .cn-ori-historial {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+.cara-nueva .cn-ori-historial-cabeza {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+}
+.cara-nueva .cn-ori-h3 {
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.cara-nueva .cn-ori-buscar {
+  width: 300px;
+  max-width: 100%;
+  height: 44px;
+  margin-left: auto;
+  font-size: 15px;
+}
+.cara-nueva .cn-ori-filas {
+  display: grid;
+  gap: 2px;
+  margin: 0 -12px;
+}
+.cara-nueva .cn-ori-fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 12px;
+  border-radius: 12px;
+  transition: background 0.14s;
+}
+.cara-nueva .cn-ori-fila:hover {
+  background: var(--field);
+}
+.cara-nueva .cn-ori-fila-textos {
+  min-width: 0;
+  flex: 1 1 260px;
+}
+.cara-nueva .cn-ori-fila-hechos {
+  display: block;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-ori-fila-meta {
+  display: block;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ori-fila-sugerencia {
+  min-width: 0;
+  flex: 1 1 100%;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cara-nueva .cn-ori-fila-de {
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ori-fila-hueco {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  padding: 0 10px;
+  border-radius: 8px;
+  background: var(--warn-bg);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--warn);
+  white-space: nowrap;
+}
+.cara-nueva .cn-ori-fila .cn-ini-boton {
+  min-height: 44px;
+  border-radius: 10px;
+  font-size: 15px;
+}
+.cara-nueva .cn-ori-vacio {
+  padding: 16px 20px;
+  border-radius: 14px;
+  background: var(--wash);
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ori-huecos {
+  padding: 22px 24px;
+  border-radius: 16px;
+  background: var(--warn-bg);
+}
+.cara-nueva .cn-ori-huecos-lista {
+  display: grid;
+  gap: 6px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-ori-huecos-lista li {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+}
+.cara-nueva .cn-ori-huecos-veces {
+  flex: none;
+  font-weight: 700;
+  color: var(--warn);
+  font-variant-numeric: tabular-nums;
+}
+.cara-nueva .cn-ori-huecos-hechos {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Móvil (artboard 5): sin historial, tarjetas apiladas ─────────────── */
+.cara-nueva .cn-ori-movil-cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 16px 24px;
+}
+.cara-nueva .cn-ori-movil-adjuntar {
+  display: flex;
+  min-height: 44px;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--brand);
+  cursor: pointer;
+}
+.cara-nueva .cn-ori-movil-adjuntar svg {
+  flex: none;
+}
+.cara-nueva .cn-ori-movil-orientar {
+  width: 100%;
+  min-height: 52px;
+  border-radius: 14px;
+}
+.cara-nueva .cn-ori-movil-rotulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 600;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ori-movil-rotulo::after {
+  content: '';
+  height: 1px;
+  flex: 1;
+  background: var(--line);
+}
+/* Tres señales para el mismo estado: la barra de 3 px (sombra interior, que respeta el radio), el ícono y, sin verificar, el guion. */
+.cara-nueva .cn-ori-tarjeta--movil {
+  padding: 16px;
+}
+.cara-nueva .cn-ori-tarjeta--movil.cn-ori-barra--ok {
+  box-shadow: inset 3px 0 0 var(--ok), var(--ori-sombra);
+}
+.cara-nueva .cn-ori-tarjeta--movil.cn-ori-barra--neutro {
+  box-shadow: inset 3px 0 0 var(--ink-4), var(--ori-sombra);
+}
+.cara-nueva .cn-ori-tarjeta--movil.cn-ori-barra--sin {
+  background: var(--warn-bg);
+  box-shadow: inset 3px 0 0 var(--warn);
+}
+.cara-nueva .cn-ori-tarjeta--movil .cn-ori-tarjeta-titulo {
+  font-size: 17px;
+  line-height: 25px;
+}
+.cara-nueva .cn-ori-icono--ok {
+  color: var(--ok);
+}
+.cara-nueva .cn-ori-icono--neutro {
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ori-icono--sin {
+  color: var(--warn);
+}
+.cara-nueva .cn-ori-banda {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--field);
+}
+.cara-nueva .cn-ori-banda-rotulo {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-ori-banda-valor {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-ori-sin-rotulo {
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 600;
+  color: var(--warn);
+}
+.cara-nueva .cn-ori-norma-movil {
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-ori-redactar-movil {
+  width: 100%;
+  margin-top: 14px;
+}
+.cara-nueva .cn-ori-tarjeta--movil .cn-ori-panel {
+  margin: 14px -16px -16px;
+}
+
+/* ── Componentes compartidos montados aquí: solo se suben de escala ───── */
+.cara-nueva .cn-ori-selector select {
+  height: 44px;
+  border: none;
+  border-radius: 12px;
+  background: var(--field);
+  font-size: 15px;
+  color: var(--ink);
+}
+.cara-nueva .cn-ori-selector p {
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 21px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-4);
+}
+.cara-nueva.cn-ori .notice-unverified {
+  margin-top: 8px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 15px;
+  line-height: 23px;
+}
+.cara-nueva.cn-ori .cn-ori-panel p,
+.cara-nueva.cn-ori .cn-ori-panel button,
+.cara-nueva.cn-ori .cn-ori-panel span,
+.cara-nueva.cn-ori .cn-ori-panel textarea {
+  font-size: 14px;
+  line-height: 21px;
+}
+
+@media (min-width: 640px) {
+  .cara-nueva .cn-ori-datos {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .cara-nueva .cn-ori-fila-sugerencia {
+    flex: 0 1 200px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .cara-nueva .cn-ori-cuerpo {
+    gap: 28px;
+    padding: 32px 40px 40px;
+  }
+  .cara-nueva .cn-ori-h1 {
+    margin-bottom: 6px;
+    font-size: 34px;
+    line-height: 40px;
+  }
+  .cara-nueva .cn-ori-bajada {
+    font-size: 18px;
+    line-height: 26px;
+  }
+  .cara-nueva .cn-ori-hechos {
+    min-height: 150px;
+    padding: 18px 20px;
+  }
+  .cara-nueva .cn-ori-tarjeta {
+    padding: 22px 24px;
+  }
+  .cara-nueva .cn-ori-tarjeta-titulo {
+    font-size: 20px;
+    line-height: 28px;
+  }
+  .cara-nueva .cn-ori-panel {
+    margin: 16px -24px -22px;
+  }
+}
+
+/* ─── Borradores y Revisiones ─── */
+/*
+ * Artboard 3 «Borradores» de `public/handoff/app-redaccion-revision.html` y la
+ * lista de Revisiones (no el taller, que tiene su unidad). Solo la piel: qué se
+ * muestra, en qué orden y con qué acciones lo decide el componente. Reglas que
+ * se ven aquí:
+ *   · el BORDE DISCONTINUO es solo de «sin verificar»: lo lleva la píldora de
+ *     lo que le falta de respaldo a un borrador y nada más; la tarjeta urgente
+ *     del móvil usa borde continuo;
+ *   · la urgencia del término es ámbar con peso, no rojo: `--danger` queda
+ *     para eliminar y para el error;
+ *   · los cuatro estados del producto tienen tono propio (el artboard pinta
+ *     dos) y «listo» lleva además el punto, para no depender del verde;
+ *   · el mono queda para el radicado del formulario; fechas y versiones van en
+ *     la letra de interfaz;
+ *   · tinta secundaria `--ink-4` en todo lo que se pinta sobre una fila que se
+ *     aclara al pasar el cursor, porque `--ink-5` no alcanza AA sobre gris;
+ *   · la cabecera de columnas solo aparece cuando la fila cabe en una línea;
+ *     debajo de ese ancho las celdas envuelven, sin tabla con barra propia, que
+ *     recortaría el menú de la fila.
+ */
+.cara-nueva.cn-bor,
+.cara-nueva.cn-rev {
+  --bor-ok-bg: #e9f2ec;
+  --bor-guion: rgb(138 90 18 / 0.55);
+  background: var(--canvas);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .cara-nueva.cn-bor,
+  :root:not([data-theme='light']) .cara-nueva.cn-rev {
+    --bor-ok-bg: rgb(79 180 131 / 0.14);
+    --bor-guion: rgb(217 166 74 / 0.6);
+  }
+}
+:root[data-theme='dark'] .cara-nueva.cn-bor,
+:root[data-theme='dark'] .cara-nueva.cn-rev {
+  --bor-ok-bg: rgb(79 180 131 / 0.14);
+  --bor-guion: rgb(217 166 74 / 0.6);
+}
+
+/* ── Encabezado y botones, compartidos por las dos pantallas ─────────────── */
+.cara-nueva .cn-bor-h1,
+.cara-nueva .cn-rev-h1 {
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+.cara-nueva .cn-bor-botones,
+.cara-nueva .cn-rev-botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cara-nueva .cn-bor-boton,
+.cara-nueva .cn-rev-boton {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 10px;
+  font-size: 15px;
+}
+.cara-nueva .cn-bor-boton:disabled,
+.cara-nueva .cn-rev-boton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  box-shadow: none;
+}
+/* Rojo sólido solo en la confirmación de eliminar; el texto toma el lienzo para que el par funcione en los dos temas. */
+.cara-nueva .cn-bor-boton--peligro {
+  background: var(--danger);
+  color: var(--canvas);
+}
+.cara-nueva .cn-bor-boton--peligro:hover {
+  opacity: 0.9;
+}
+
+/* ── Borradores · cabecera y filtros ────────────────────────────────────── */
+.cara-nueva .cn-bor-cabeza {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px 24px;
+  padding: 24px 20px 16px;
+}
+.cara-nueva .cn-bor-textos {
+  min-width: 0;
+  flex: 1 1 320px;
+}
+.cara-nueva .cn-bor-bajada {
+  margin-top: 4px;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-bor-censo {
+  margin-top: 4px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-bor-censo-urge {
+  font-weight: 600;
+  color: var(--warn);
+}
+.cara-nueva .cn-bor-filtros {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  padding: 0 20px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.cara-nueva .cn-bor-buscar {
+  width: 320px;
+  max-width: 100%;
+  height: 44px;
+  font-size: 15px;
+}
+.cara-nueva .cn-bor-select {
+  width: auto;
+  max-width: 240px;
+  height: 44px;
+  padding: 0 12px;
+  font-size: 15px;
+  cursor: pointer;
+}
+.cara-nueva .cn-bor-pildora {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  padding: 0 14px;
+  border: none;
+  border-radius: 10px;
+  background: var(--neutral);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink-3);
+  cursor: pointer;
+  transition: background 0.16s, color 0.16s;
+}
+.cara-nueva .cn-bor-pildora:hover {
+  background: var(--line-2);
+}
+.cara-nueva .cn-bor-pildora--activa,
+.cara-nueva .cn-bor-pildora--activa:hover {
+  background: var(--ink);
+  font-weight: 600;
+  color: var(--canvas);
+}
+.cara-nueva .cn-bor-enlace {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  padding: 0 4px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--brand);
+  cursor: pointer;
+}
+.cara-nueva .cn-bor-enlace:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.cara-nueva .cn-bor-orden {
+  margin-left: auto;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-5);
+}
+
+/* ── Borradores · lista agrupada por término ────────────────────────────── */
+.cara-nueva .cn-bor-lista {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+.cara-nueva .cn-bor-grupo {
+  margin-bottom: 24px;
+}
+.cara-nueva .cn-bor-grupo-titulo {
+  margin-bottom: 6px;
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-bor-grupo-titulo--urge {
+  color: var(--warn);
+}
+.cara-nueva .cn-bor-tabla {
+  display: grid;
+  gap: 2px;
+  margin: 0 -12px;
+}
+.cara-nueva .cn-bor-columnas {
+  display: none;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 600;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-bor-fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  transition: background 0.14s;
+}
+.cara-nueva .cn-bor-fila:hover {
+  background: var(--field);
+}
+.cara-nueva .cn-bor-c-escrito {
+  min-width: 0;
+  flex: 1 1 280px;
+}
+.cara-nueva .cn-bor-c-termino {
+  flex: none;
+  width: 160px;
+}
+.cara-nueva .cn-bor-c-version {
+  flex: none;
+  width: 48px;
+}
+.cara-nueva .cn-bor-c-estado {
+  flex: none;
+  width: 110px;
+}
+.cara-nueva .cn-bor-c-autor {
+  min-width: 0;
+  flex: 1 1 180px;
+}
+.cara-nueva .cn-bor-abrir {
+  display: block;
+  min-height: 44px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.cara-nueva .cn-bor-abrir:disabled {
+  cursor: default;
+}
+.cara-nueva .cn-bor-titulo {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--ink);
+}
+.cara-nueva .cn-bor-titulo svg {
+  flex: none;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-bor-titulo-texto {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cara-nueva .cn-bor-fila--radicado .cn-bor-titulo {
+  color: var(--ink-4);
+}
+.cara-nueva .cn-bor-meta {
+  display: block;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cara-nueva .cn-bor-sin {
+  display: inline-flex;
+  max-width: 100%;
+  min-height: 28px;
+  align-items: center;
+  margin-top: 6px;
+  padding: 2px 10px;
+  border: 1px dashed var(--bor-guion);
+  border-radius: 8px;
+  background: var(--warn-bg);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--warn);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-bor-fecha {
+  display: block;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink);
+}
+.cara-nueva .cn-bor-dias {
+  display: block;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-bor-dias--urge {
+  font-weight: 600;
+  color: var(--warn);
+}
+.cara-nueva .cn-bor-version {
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.cara-nueva .cn-bor-estado {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  gap: 7px;
+  padding: 0 10px;
+  border-radius: 10px;
+  background: var(--neutral);
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 600;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.cara-nueva .cn-bor-estado--revisar {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+.cara-nueva .cn-bor-estado--listo {
+  background: var(--bor-ok-bg);
+  color: var(--ok);
+}
+.cara-nueva .cn-bor-estado--listo::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-radius: 50%;
+  background: currentColor;
+}
+.cara-nueva .cn-bor-estado--radicado {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+.cara-nueva .cn-bor-autor {
+  display: block;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-4);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Borradores · menú de la fila ───────────────────────────────────────── */
+.cara-nueva .cn-bor-menu-caja {
+  position: relative;
+  flex: none;
+  width: 44px;
+  margin-left: auto;
+}
+.cara-nueva .cn-bor-menu-boton {
+  display: flex;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink-4);
+  cursor: pointer;
+  transition: background 0.16s, color 0.16s;
+}
+.cara-nueva .cn-bor-menu-boton:hover {
+  background: var(--neutral);
+  color: var(--ink);
+}
+.cara-nueva .cn-bor-menu-velo {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+}
+.cara-nueva .cn-bor-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 40;
+  display: flex;
+  width: 248px;
+  flex-direction: column;
+  margin-top: 4px;
+  padding: 6px;
+  border-radius: 12px;
+  background: var(--canvas);
+  box-shadow: var(--shadow-menu);
+}
+/* En oscuro la elevación es superficie: el menú sube a `--field` y un filo de línea lo separa. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .cara-nueva .cn-bor-menu {
+    background: var(--field);
+    box-shadow: 0 0 0 1px var(--line);
+  }
+}
+:root[data-theme='dark'] .cara-nueva .cn-bor-menu {
+  background: var(--field);
+  box-shadow: 0 0 0 1px var(--line);
+}
+.cara-nueva .cn-bor-menu-item {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+.cara-nueva .cn-bor-menu-item:hover {
+  background: var(--neutral);
+}
+.cara-nueva .cn-bor-menu-item svg {
+  flex: none;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-bor-menu-item--peligro,
+.cara-nueva .cn-bor-menu-item--peligro svg {
+  color: var(--danger);
+}
+.cara-nueva .cn-bor-menu-item--peligro:hover {
+  background: var(--danger-bg);
+}
+.cara-nueva .cn-bor-menu-raya {
+  height: 1px;
+  margin: 4px 6px;
+  background: var(--line);
+}
+
+/* ── Borradores · vacío, nota del pie y diálogos ────────────────────────── */
+.cara-nueva .cn-bor-vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px 24px;
+  border-radius: 14px;
+  background: var(--field);
+  text-align: center;
+}
+.cara-nueva .cn-bor-vacio > svg {
+  color: var(--ink-4);
+}
+.cara-nueva .cn-bor-vacio-titulo {
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-bor-vacio-texto {
+  max-width: 52ch;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-bor-vacio .cn-bor-boton {
+  margin-top: 8px;
+}
+.cara-nueva .cn-bor-nota {
+  margin-top: 8px;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: var(--field);
+}
+.cara-nueva .cn-bor-nota-titulo {
+  font-size: 15px;
+  line-height: 23px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-bor-nota-texto {
+  max-width: 72ch;
+  margin-top: 4px;
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-bor-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.cara-nueva .cn-bor-etiqueta {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 15px;
+  line-height: 23px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.cara-nueva .cn-bor-campo {
+  height: 46px;
+  font-size: 15px;
+}
+.cara-nueva .cn-bor-ayuda {
+  display: block;
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-bor-dialogo-texto {
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+}
+
+/* ── Borradores · móvil (10c): tarjetas sobre gris, primario abajo ──────── */
+.cara-nueva .cn-bor-movil-cabeza {
+  flex: none;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.cara-nueva .cn-bor-movil-buscar-caja {
+  position: relative;
+}
+.cara-nueva .cn-bor-movil-buscar-caja > svg {
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  color: var(--ink-4);
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+.cara-nueva .cn-bor-movil-buscar {
+  height: 48px;
+  padding-left: 44px;
+}
+.cara-nueva .cn-bor-movil-lista {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 16px 16px;
+  background: var(--field);
+}
+.cara-nueva .cn-bor-movil-rotulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 0 8px;
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 600;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-bor-movil-rotulo::after {
+  content: '';
+  height: 1px;
+  flex: 1;
+  background: var(--line-2);
+}
+.cara-nueva .cn-bor-movil-rotulo--urge {
+  color: var(--warn);
+}
+.cara-nueva .cn-bor-movil-tarjetas {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-bor-tarjeta {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1.5px solid transparent;
+  border-radius: 14px;
+  background: var(--canvas);
+  box-shadow: var(--shadow-1);
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .cara-nueva .cn-bor-tarjeta {
+    border-color: var(--line);
+    box-shadow: none;
+  }
+}
+:root[data-theme='dark'] .cara-nueva .cn-bor-tarjeta {
+  border-color: var(--line);
+  box-shadow: none;
+}
+.cara-nueva .cn-bor-tarjeta--urge,
+:root[data-theme='dark'] .cara-nueva .cn-bor-tarjeta--urge {
+  border-color: var(--warn);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .cara-nueva .cn-bor-tarjeta--urge {
+    border-color: var(--warn);
+  }
+}
+.cara-nueva .cn-bor-tarjeta-textos {
+  min-width: 0;
+  flex: 1;
+}
+.cara-nueva .cn-bor-tarjeta-titulo {
+  display: block;
+  font-size: 16px;
+  line-height: 23px;
+  font-weight: 600;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-bor-tarjeta-meta {
+  display: block;
+  margin-top: 2px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-bor-tarjeta-lado {
+  flex: none;
+  max-width: 45%;
+  text-align: right;
+}
+.cara-nueva .cn-bor-tarjeta-fecha {
+  display: block;
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-bor-movil-vacio {
+  padding: 56px 8px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+  text-align: center;
+}
+.cara-nueva .cn-bor-movil-pie {
+  flex: none;
+  padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+  background: var(--canvas);
+}
+.cara-nueva .cn-bor-movil-redactar {
+  width: 100%;
+  min-height: 52px;
+  border-radius: 14px;
+}
+
+/* ── Revisiones · lista ─────────────────────────────────────────────────── */
+.cara-nueva .cn-rev-cuerpo {
+  display: flex;
+  width: 100%;
+  max-width: 1120px;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0 auto;
+  padding: 24px 16px 32px;
+}
+.cara-nueva .cn-rev-cabeza {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px 24px;
+}
+.cara-nueva .cn-rev-textos {
+  min-width: 0;
+  flex: 1 1 420px;
+}
+.cara-nueva .cn-rev-bajada {
+  max-width: 68ch;
+  margin-top: 6px;
+  font-size: 16px;
+  line-height: 25px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-rev-consentimiento {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--field);
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-rev-consentimiento > svg {
+  flex: none;
+  color: var(--ok);
+}
+.cara-nueva .cn-rev-consentimiento--falta {
+  background: var(--warn-bg);
+  color: var(--ink);
+}
+.cara-nueva .cn-rev-consentimiento--falta > svg {
+  color: var(--warn);
+}
+.cara-nueva .cn-rev-consentimiento-texto {
+  width: 100%;
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-rev-fuerte {
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-rev-error-linea {
+  color: var(--danger);
+}
+.cara-nueva .cn-rev-vacio {
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: var(--field);
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-rev-lista {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--canvas);
+  box-shadow: var(--shadow-1);
+  list-style: none;
+}
+.cara-nueva .cn-rev-fila {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 4px 4px 12px;
+  border-radius: 10px;
+  transition: background 0.14s;
+}
+.cara-nueva .cn-rev-fila:hover {
+  background: var(--field);
+}
+.cara-nueva .cn-rev-abrir {
+  min-width: 0;
+  min-height: 44px;
+  flex: 1;
+  padding: 6px 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.cara-nueva .cn-rev-abrir:disabled {
+  cursor: progress;
+}
+.cara-nueva .cn-rev-titulo {
+  display: block;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cara-nueva .cn-rev-cliente {
+  font-weight: 600;
+}
+.cara-nueva .cn-rev-apagado {
+  color: var(--ink-4);
+}
+.cara-nueva .cn-rev-meta {
+  display: block;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-rev-icono {
+  display: flex;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink-4);
+  cursor: pointer;
+  transition: background 0.16s, color 0.16s;
+}
+.cara-nueva .cn-rev-icono:hover {
+  background: var(--neutral);
+  color: var(--ink);
+}
+.cara-nueva .cn-rev-icono--peligro:hover {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+@media (min-width: 640px) {
+  .cara-nueva .cn-rev-consentimiento-texto {
+    width: auto;
+    min-width: 0;
+    flex: 1;
+  }
+}
+
+@media (min-width: 1024px) {
+  .cara-nueva .cn-bor-cabeza {
+    padding: 32px 40px 20px;
+  }
+  .cara-nueva .cn-bor-filtros {
+    padding: 0 40px 16px;
+  }
+  .cara-nueva .cn-bor-lista {
+    padding: 24px 40px 40px;
+  }
+  .cara-nueva .cn-bor-h1,
+  .cara-nueva .cn-rev-h1 {
+    font-size: 34px;
+    line-height: 40px;
+  }
+  .cara-nueva .cn-bor-bajada {
+    margin-top: 6px;
+    font-size: 18px;
+    line-height: 26px;
+  }
+  .cara-nueva .cn-rev-cuerpo {
+    gap: 20px;
+    padding: 32px 40px 40px;
+  }
+}
+
+/* La fila en una línea, con su cabecera de columnas, solo cuando cabe entera. */
+@media (min-width: 1360px) {
+  .cara-nueva .cn-bor-columnas,
+  .cara-nueva .cn-bor-fila {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 160px 48px 110px minmax(0, 200px) 44px;
+    gap: 16px;
+  }
+  .cara-nueva .cn-bor-c-termino,
+  .cara-nueva .cn-bor-c-version,
+  .cara-nueva .cn-bor-c-estado,
+  .cara-nueva .cn-bor-c-autor {
+    width: auto;
+  }
+  .cara-nueva .cn-bor-menu-caja {
+    margin-left: 0;
+  }
+}
+
+/* ─── Redacción ─── */
+/*
+ * Módulo 01, la pantalla de redactar (no el taller): la barra en cascada de
+ * escritorio y su versión de teléfono, las pestañas de móvil, el panel de la
+ * instrucción con su consola y el lienzo con el papel. Sale de los artboards
+ * de selectores (1–4), 10 y del área de papel del 11 de
+ * `public/handoff/app-redaccion-revision.html`. Solo la piel. Reglas que se ven:
+ *   · el BORDE DISCONTINUO es solo de «sin verificar»: la píldora de la ficha
+ *     sin término comprobado, el aviso de actuación sin catalogar, la franja
+ *     ámbar sobre el papel y el «sin actuación elegida» del móvil. La zona de
+ *     adjuntar lo llevaba por costumbre y ya no;
+ *   · el papel conserva la letra de la firma: ninguna regla de este bloque
+ *     nombra su familia, su tamaño ni su interlineado; solo su marco. Las
+ *     herramientas que flotan sobre él vuelven a la letra de interfaz, porque
+ *     heredarían la del escrito;
+ *   · el mono queda para lo citable: el artículo de la ficha, el término, el
+ *     fundamento de cada sección, la jurisprudencia y la hora de la consola;
+ *   · `--danger` no aparece: un adjunto que no se leyó es ámbar, y el error de
+ *     la consola usa solo el fondo;
+ *   · las raíces que Tailwind muestra u oculta por tamaño (`hidden lg:flex`)
+ *     no reciben `display` desde aquí, o esta regla, más específica, las
+ *     encendería en el tamaño equivocado.
+ */
+.cara-nueva .cn-red-barra,
+.cara-nueva .cn-red-movil,
+.cara-nueva .cn-red-pestanas,
+.cara-nueva .cn-red-panel,
+.cara-nueva .cn-red-lienzo {
+  --red-mesa: #edeff2;
+  --red-ok-bg: #e9f2ec;
+  --red-guion: rgb(138 90 18 / 0.55);
+  --red-papel-sombra: 0 4px 24px rgb(16 24 34 / 0.1);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .cara-nueva .cn-red-barra,
+  :root:not([data-theme='light']) .cara-nueva .cn-red-movil,
+  :root:not([data-theme='light']) .cara-nueva .cn-red-pestanas,
+  :root:not([data-theme='light']) .cara-nueva .cn-red-panel,
+  :root:not([data-theme='light']) .cara-nueva .cn-red-lienzo {
+    --red-mesa: #0b1219;
+    --red-ok-bg: rgb(79 180 131 / 0.14);
+    --red-guion: rgb(217 166 74 / 0.6);
+    --red-papel-sombra: none;
+  }
+}
+:root[data-theme='dark'] .cara-nueva .cn-red-barra,
+:root[data-theme='dark'] .cara-nueva .cn-red-movil,
+:root[data-theme='dark'] .cara-nueva .cn-red-pestanas,
+:root[data-theme='dark'] .cara-nueva .cn-red-panel,
+:root[data-theme='dark'] .cara-nueva .cn-red-lienzo {
+  --red-mesa: #0b1219;
+  --red-ok-bg: rgb(79 180 131 / 0.14);
+  --red-guion: rgb(217 166 74 / 0.6);
+  --red-papel-sombra: none;
+}
+
+/* ── Compartido ────────────────────────────────────────────────────────── */
+.cara-nueva .cn-red-mono {
+  font-family: var(--mono);
+  font-weight: 500;
+}
+.cara-nueva .cn-red-cifra {
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-red-cifra--ok {
+  color: var(--ok);
+}
+.cara-nueva .cn-red-cifra--sin {
+  color: var(--warn);
+}
+.cara-nueva .cn-red-rotulo {
+  display: block;
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 500;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-red-estado {
+  display: inline-flex;
+  min-height: 26px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 9px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+}
+.cara-nueva .cn-red-estado--ok {
+  background: var(--red-ok-bg);
+  color: var(--ok);
+}
+.cara-nueva .cn-red-estado--neutro {
+  background: var(--neutral);
+  color: var(--ink-3);
+}
+.cara-nueva .cn-red-estado--sin {
+  border: 1px dashed var(--red-guion);
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+.cara-nueva .cn-red-estado-icono {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.cara-nueva .cn-red-punto {
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-radius: 50%;
+  background: currentColor;
+}
+.cara-nueva .cn-red-termino-icono {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.cara-nueva .cn-red-termino-icono--ok {
+  color: var(--ok);
+}
+.cara-nueva .cn-red-termino-icono--sin {
+  color: var(--warn);
+}
+.cara-nueva .cn-red-termino-icono--neutro {
+  color: var(--ink-4);
+}
+
+/* ── Barra de escritorio: la cascada ───────────────────────────────────── */
+.cara-nueva .cn-red-barra {
+  position: relative;
+  z-index: 30;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 12px 20px 14px;
+  border-bottom: 1px solid var(--line-2);
+  background: var(--canvas);
+}
+.cara-nueva .cn-red-campo {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 6px;
+}
+.cara-nueva .cn-red-campo--rol {
+  flex: 0 1 180px;
+}
+.cara-nueva .cn-red-campo--rama {
+  max-width: 280px;
+  flex: 1 1 220px;
+}
+.cara-nueva .cn-red-campo--actuacion {
+  max-width: 420px;
+  flex: 2 1 280px;
+}
+.cara-nueva .cn-red-campo--caso {
+  max-width: 260px;
+  flex: 1 1 200px;
+}
+.cara-nueva .cn-red-disparador {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px 0 14px;
+  border: none;
+  border-radius: 12px;
+  background: var(--field);
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.16s, box-shadow 0.16s;
+}
+.cara-nueva .cn-red-disparador:hover {
+  background: var(--line-2);
+}
+.cara-nueva .cn-red-disparador--abierto,
+.cara-nueva .cn-red-disparador--abierto:hover {
+  background: var(--canvas);
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+.cara-nueva .cn-red-disparador-texto {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cara-nueva .cn-red-disparador-vacio {
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-disparador-chevron {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-flecha {
+  display: grid;
+  width: 20px;
+  height: 44px;
+  flex: none;
+  place-items: center;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-red-flecha-icono {
+  width: 16px;
+  height: 16px;
+}
+.cara-nueva .cn-red-raya {
+  width: 1px;
+  height: 28px;
+  flex: none;
+  margin: 0 8px 8px;
+  background: var(--line-2);
+}
+
+/* La lista: tarjeta flotante con lupa, bloque de salidas, filas y pie. */
+.cara-nueva .cn-red-lista {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 40;
+  width: 420px;
+  max-width: min(80vw, 520px);
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--canvas);
+  box-shadow: var(--shadow-menu), 0 0 0 1px var(--line);
+}
+.cara-nueva .cn-red-buscar-caja {
+  position: relative;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+}
+.cara-nueva .cn-red-buscar-lupa {
+  position: absolute;
+  top: 50%;
+  left: 26px;
+  width: 16px;
+  height: 16px;
+  color: var(--ink-4);
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+.cara-nueva .cn-red-buscar {
+  display: block;
+  width: 100%;
+  height: 44px;
+  padding: 0 84px 0 40px;
+  border: none;
+  border-radius: 10px;
+  background: var(--field);
+  font-size: 15px;
+  color: var(--ink);
+}
+.cara-nueva .cn-red-buscar::placeholder {
+  color: var(--ink-4);
+  opacity: 1;
+}
+.cara-nueva .cn-red-buscar:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+.cara-nueva .cn-red-buscar-cuenta {
+  position: absolute;
+  top: 50%;
+  right: 26px;
+  font-size: 14px;
+  color: var(--ink-4);
+  transform: translateY(-50%);
+}
+.cara-nueva .cn-red-servicios {
+  display: grid;
+  gap: 2px;
+  padding: 8px;
+  border-bottom: 1px solid var(--line);
+  background: var(--wash);
+}
+.cara-nueva .cn-red-servicios-titulo {
+  padding: 4px 10px 2px;
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 600;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-servicio {
+  display: flex;
+  width: 100%;
+  min-height: 48px;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.cara-nueva .cn-red-servicio:hover {
+  background: var(--brand-soft);
+}
+.cara-nueva .cn-red-servicio-icono {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  margin-top: 2px;
+  color: var(--brand);
+}
+.cara-nueva .cn-red-servicio-nombre {
+  display: block;
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--brand);
+}
+.cara-nueva .cn-red-filas {
+  max-height: 340px;
+  overflow-y: auto;
+  padding: 6px;
+}
+.cara-nueva .cn-red-lista-nota {
+  padding: 14px 12px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-grupo {
+  margin: 8px 0 4px;
+  padding: 12px 10px 6px;
+  border-top: 1px solid var(--line);
+}
+.cara-nueva .cn-red-grupo-titulo {
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 600;
+  color: var(--warn);
+}
+.cara-nueva .cn-red-grupo-aviso {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-fila {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.cara-nueva .cn-red-fila:hover {
+  background: var(--field);
+}
+.cara-nueva .cn-red-fila--elegida,
+.cara-nueva .cn-red-fila--elegida:hover {
+  background: var(--brand-soft);
+}
+.cara-nueva .cn-red-fila-icono {
+  display: grid;
+  width: 18px;
+  height: 22px;
+  flex: none;
+  place-items: center;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-fila-visto {
+  width: 16px;
+  height: 16px;
+  color: var(--brand);
+}
+.cara-nueva .cn-red-fila-textos {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+}
+.cara-nueva .cn-red-fila-nombre {
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-red-fila--elegida .cn-red-fila-nombre {
+  font-weight: 600;
+  color: var(--brand);
+}
+.cara-nueva .cn-red-fila-detalle {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-fila-termino {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cara-nueva .cn-red-lista-pie {
+  padding: 10px 14px 12px;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+
+/* El término de la actuación elegida, a la derecha y solo donde cabe. */
+.cara-nueva .cn-red-termino-caja {
+  display: none;
+  height: 44px;
+  min-width: 0;
+  align-items: center;
+  margin-left: auto;
+  padding-left: 12px;
+}
+.cara-nueva .cn-red-termino {
+  display: flex;
+  min-width: 0;
+  max-width: 280px;
+  align-items: center;
+  gap: 8px;
+}
+.cara-nueva .cn-red-termino-texto {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-2);
+}
+.cara-nueva .cn-red-termino-rotulo {
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-termino-sin {
+  font-weight: 600;
+  color: var(--warn);
+}
+
+/* ── Barra del teléfono ────────────────────────────────────────────────── */
+.cara-nueva .cn-red-movil {
+  border-bottom: 1px solid var(--line-2);
+  background: var(--canvas);
+}
+.cara-nueva .cn-red-movil-cabeza {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 0 16px;
+}
+.cara-nueva .cn-red-chip {
+  min-width: 0;
+  max-width: 40%;
+  overflow: hidden;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: var(--neutral);
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 500;
+  color: var(--ink-2);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cara-nueva .cn-red-cambiar {
+  display: inline-flex;
+  min-height: 44px;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  padding: 0 8px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--brand);
+  cursor: pointer;
+}
+.cara-nueva .cn-red-cambiar-chevron {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.16s;
+}
+.cara-nueva .cn-red-cambiar-chevron--abierto {
+  transform: rotate(180deg);
+}
+.cara-nueva .cn-red-resumen {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 2px 16px 0;
+  padding: 8px 0 10px;
+  border-top: 1px solid var(--line);
+}
+.cara-nueva .cn-red-resumen-texto {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-3);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cara-nueva .cn-red-resumen-termino {
+  font-weight: 600;
+}
+.cara-nueva .cn-red-resumen-termino--ok {
+  color: var(--ink);
+}
+.cara-nueva .cn-red-resumen-termino--sin {
+  color: var(--warn);
+}
+.cara-nueva .cn-red-resumen-termino--neutro {
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-sin-actuacion {
+  margin: 6px 16px 10px;
+  padding: 8px 12px;
+  border: 1px dashed var(--red-guion);
+  border-radius: 10px;
+  background: var(--warn-bg);
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--warn);
+}
+.cara-nueva .cn-red-movil-campos {
+  display: grid;
+  gap: 14px;
+  margin-top: 6px;
+  padding: 12px 16px 16px;
+  border-top: 1px solid var(--line);
+}
+.cara-nueva .cn-red-movil-campo {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6px;
+}
+/* Listas nativas: la pintura es del campo; al abrirse, el teléfono pone la suya. 16 px evita el zoom de iOS. */
+.cara-nueva .cn-red-select {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 12px;
+  background: var(--field);
+  font-family: inherit;
+  font-size: 16px;
+  color: var(--ink);
+}
+.cara-nueva .cn-red-select:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+.cara-nueva .cn-red-nota {
+  display: block;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-nota--icono {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.cara-nueva .cn-red-nota--icono svg {
+  margin-top: 2px;
+}
+
+/* ── Pestañas del teléfono (el `display` lo pone Tailwind) ─────────────── */
+.cara-nueva .cn-red-pestanas {
+  border-bottom: 1px solid var(--line-2);
+  background: var(--canvas);
+}
+.cara-nueva .cn-red-pestana {
+  display: flex;
+  min-height: 48px;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--ink-4);
+  cursor: pointer;
+}
+.cara-nueva .cn-red-pestana:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.cara-nueva .cn-red-pestana--activa {
+  border-bottom-color: var(--brand);
+  color: var(--brand);
+}
+.cara-nueva .cn-red-pestana-icono {
+  width: 18px;
+  height: 18px;
+}
+
+/* ── Panel de la instrucción ───────────────────────────────────────────── */
+.cara-nueva .cn-red-panel {
+  border-right: 1px solid var(--line-2);
+  background: var(--canvas);
+}
+.cara-nueva .cn-red-form {
+  gap: 12px;
+  padding: 20px 16px 16px;
+}
+.cara-nueva .cn-red-cabeza {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.cara-nueva .cn-red-h2 {
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+.cara-nueva .cn-red-atajo {
+  flex: none;
+  margin-left: auto;
+  font-size: 14px;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-red-bajada {
+  margin-top: -6px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-continuando {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 0 0 14px;
+  border-radius: 12px;
+  background: var(--brand-soft);
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink);
+}
+.cara-nueva .cn-red-continuando-icono {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: var(--brand);
+}
+.cara-nueva .cn-red-continuando-texto {
+  min-width: 0;
+  flex: 1;
+}
+.cara-nueva .cn-red-icono-boton {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  place-items: center;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink-4);
+  cursor: pointer;
+  transition: background 0.16s, color 0.16s;
+}
+.cara-nueva .cn-red-icono-boton:hover {
+  background: var(--neutral);
+  color: var(--ink);
+}
+.cara-nueva .cn-red-icono-boton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.cara-nueva .cn-red-icono-boton-svg {
+  width: 16px;
+  height: 16px;
+}
+.cara-nueva .cn-red-hechos {
+  display: block;
+  width: 100%;
+  min-height: 160px;
+  flex: 1 1 auto;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 14px;
+  background: var(--field);
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 25px;
+  color: var(--ink);
+  resize: none;
+  transition: box-shadow 0.16s;
+}
+.cara-nueva .cn-red-hechos::placeholder {
+  color: var(--ink-4);
+  opacity: 1;
+}
+.cara-nueva .cn-red-hechos:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+.cara-nueva .cn-red-contador {
+  margin-top: -6px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-5);
+  text-align: right;
+}
+.cara-nueva .cn-red-bloque {
+  display: grid;
+  gap: 8px;
+}
+.cara-nueva .cn-red-adjuntar {
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--field);
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.cara-nueva .cn-red-adjuntar:hover {
+  background: var(--line-2);
+}
+.cara-nueva .cn-red-adjuntar--apagado,
+.cara-nueva .cn-red-adjuntar--apagado:hover {
+  background: var(--field);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.cara-nueva .cn-red-adjuntar-icono {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-adjuntar-texto {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 500;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-red-adjuntar-clip {
+  width: 14px;
+  height: 14px;
+}
+.cara-nueva .cn-red-ayuda {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-aviso {
+  display: flex;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--warn-bg);
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--warn);
+}
+.cara-nueva .cn-red-aviso--sin {
+  border: 1px dashed var(--red-guion);
+}
+.cara-nueva .cn-red-adjuntos {
+  display: grid;
+  max-height: 176px;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+.cara-nueva .cn-red-adjunto {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  padding-left: 12px;
+  border-radius: 10px;
+  background: var(--field);
+  font-size: 14.5px;
+  line-height: 22px;
+}
+.cara-nueva .cn-red-adjunto-icono {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-adjunto-nombre {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: 14.5px;
+  color: var(--ink-2);
+  text-align: left;
+  text-decoration: underline;
+  text-decoration-color: var(--ink-5);
+  text-overflow: ellipsis;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.cara-nueva .cn-red-adjunto-estado {
+  flex: none;
+  font-size: 14px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-adjunto-estado--error {
+  font-weight: 600;
+  color: var(--warn);
+}
+.cara-nueva .cn-red-adjunto-estado--ok {
+  color: var(--ok);
+}
+.cara-nueva .cn-red-revisar {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 14px;
+  background: var(--brand-soft);
+  text-align: left;
+  cursor: pointer;
+  transition: filter 0.16s;
+}
+.cara-nueva .cn-red-revisar:hover {
+  filter: brightness(0.97);
+}
+.cara-nueva .cn-red-revisar-icono {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  margin-top: 2px;
+  color: var(--brand);
+}
+.cara-nueva .cn-red-revisar-textos {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: 2px;
+}
+.cara-nueva .cn-red-revisar-titulo {
+  font-size: 15.5px;
+  line-height: 23px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-red-revisar-texto {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-red-ficha {
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--wash);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.cara-nueva .cn-red-ficha-cabeza {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-red-ficha-cuenta {
+  margin-left: auto;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ok);
+}
+.cara-nueva .cn-red-ficha-lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-red-ficha-fila {
+  padding: 12px 14px;
+}
+.cara-nueva .cn-red-ficha-fila + .cn-red-ficha-fila {
+  border-top: 1px solid var(--line);
+}
+.cara-nueva .cn-red-ficha-par {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.cara-nueva .cn-red-ficha-icono {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  margin-top: 3px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-ficha-textos {
+  min-width: 0;
+  flex: 1;
+}
+.cara-nueva .cn-red-ficha-titulo {
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 500;
+  color: var(--ink);
+}
+/* Sin `display`: el recorte a dos o tres renglones lo pone `line-clamp`. */
+.cara-nueva .cn-red-ficha-texto {
+  margin-top: 2px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+  text-align: justify;
+}
+.cara-nueva .cn-red-secciones {
+  display: grid;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 0 0 0 26px;
+  list-style: none;
+}
+.cara-nueva .cn-red-seccion {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 14.5px;
+  line-height: 22px;
+}
+.cara-nueva .cn-red-seccion-n {
+  flex: none;
+  font-size: 14px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-seccion-cuerpo {
+  min-width: 0;
+  flex: 1;
+  text-align: justify;
+}
+.cara-nueva .cn-red-seccion-nombre {
+  color: var(--ink);
+}
+.cara-nueva .cn-red-seccion-nombre--costumbre {
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-oblig {
+  margin-left: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ok);
+  white-space: nowrap;
+}
+.cara-nueva .cn-red-seccion-base {
+  display: block;
+  margin-top: 2px;
+  overflow: hidden;
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--ink-4);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cara-nueva .cn-red-ficha-enlace {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+  border-top: 1px solid var(--line);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.cara-nueva .cn-red-ficha-enlace:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.cara-nueva .cn-red-ficha-enlace-icono {
+  width: 14px;
+  height: 14px;
+}
+.cara-nueva .cn-red-pie {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.cara-nueva .cn-red-pie-nota {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-generar {
+  display: flex;
+  width: 100%;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  border: none;
+  border-radius: 12px;
+  background: var(--brand-fill);
+  box-shadow: var(--shadow-btn);
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.cara-nueva .cn-red-generar:hover {
+  background: var(--brand-fill-hover);
+}
+.cara-nueva .cn-red-generar:disabled {
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* ── Consola «Ejecución» ───────────────────────────────────────────────── */
+.cara-nueva .cn-red-consola {
+  display: flex;
+  max-height: 200px;
+  flex: none;
+  flex-direction: column;
+  border-top: 1px solid var(--line-2);
+  background: var(--wash);
+}
+.cara-nueva .cn-red-consola-cabeza {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 16px;
+}
+.cara-nueva .cn-red-consola-titulo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-red-consola-icono {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.cara-nueva .cn-red-consola-procesando {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--brand);
+}
+.cara-nueva .cn-red-consola-filas {
+  display: grid;
+  min-height: 0;
+  flex: 1;
+  align-content: start;
+  gap: 2px;
+  padding: 0 12px 12px;
+  overflow-y: auto;
+}
+.cara-nueva .cn-red-log {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: baseline;
+  gap: 4px 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-red-log-hora {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-log-motor {
+  padding: 0 8px;
+  border-radius: 8px;
+  background: var(--neutral);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-red-log-texto {
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-red-log--exito .cn-red-log-texto {
+  color: var(--ok);
+}
+.cara-nueva .cn-red-log--error {
+  background: var(--danger-bg);
+  color: var(--ink);
+}
+
+/* ── Lienzo: pestañas, mesa y vacío ────────────────────────────────────── */
+.cara-nueva .cn-red-lienzo {
+  background: var(--red-mesa);
+}
+.cara-nueva .cn-red-lienzo-barra {
+  display: flex;
+  min-height: 48px;
+  flex: none;
+  align-items: center;
+  gap: 16px;
+  padding: 0 16px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--line-2);
+  background: var(--canvas);
+}
+.cara-nueva .cn-red-lienzo-pestana {
+  display: flex;
+  min-height: 48px;
+  flex: none;
+  align-items: center;
+  align-self: stretch;
+  padding: 0 2px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink-3);
+  cursor: pointer;
+  transition: color 0.16s;
+}
+.cara-nueva .cn-red-lienzo-pestana:hover {
+  color: var(--ink);
+}
+.cara-nueva .cn-red-lienzo-pestana--activa {
+  border-bottom-color: var(--brand);
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-red-lienzo-dato {
+  flex: none;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+  white-space: nowrap;
+}
+.cara-nueva .cn-red-lienzo-derecha {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+.cara-nueva .cn-red-mesa {
+  padding: 20px 12px 32px;
+}
+.cara-nueva .cn-red-vacio {
+  max-width: 440px;
+  margin: 48px auto 0;
+  text-align: center;
+}
+.cara-nueva .cn-red-vacio-icono {
+  display: block;
+  width: 28px;
+  height: 28px;
+  margin: 0 auto;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-vacio-titulo {
+  margin: 12px 0 0;
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.cara-nueva .cn-red-vacio-texto {
+  margin-top: 6px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-red-boton-sec {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 12px;
+  background: var(--canvas);
+  box-shadow: var(--shadow-1);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--brand);
+  cursor: pointer;
+}
+.cara-nueva .cn-red-boton-icono {
+  width: 16px;
+  height: 16px;
+}
+
+/* ── El papel: franja de procedencia, marco, herramientas y pie ────────── */
+.cara-nueva .cn-red-procedencia-caja {
+  margin-bottom: 12px;
+}
+.cara-nueva .cn-red-procedencia-caja:empty {
+  margin-bottom: 0;
+}
+.cara-nueva .cn-red-procedencia {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  color: var(--ink);
+}
+.cara-nueva .cn-red-procedencia--ambar {
+  border: 1px dashed var(--red-guion);
+  background: var(--warn-bg);
+}
+.cara-nueva .cn-red-procedencia--verde {
+  background: var(--red-ok-bg);
+}
+.cara-nueva .cn-red-procedencia-icono {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  margin-top: 2px;
+}
+.cara-nueva .cn-red-procedencia--ambar .cn-red-procedencia-icono {
+  color: var(--warn);
+}
+.cara-nueva .cn-red-procedencia--verde .cn-red-procedencia-icono {
+  color: var(--ok);
+}
+.cara-nueva .cn-red-procedencia-cuerpo {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: 6px;
+}
+.cara-nueva .cn-red-procedencia-texto {
+  font-size: 14.5px;
+  line-height: 22px;
+  text-align: justify;
+}
+.cara-nueva .cn-red-procedencia-enlace {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-self: start;
+  gap: 6px;
+  font-size: 14.5px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.cara-nueva .cn-red-procedencia-enlace-icono {
+  width: 16px;
+  height: 16px;
+}
+/* Solo el marco. La letra del escrito la pone `estiloDelLienzo` en el `style` del texto. */
+.cara-nueva .cn-red-papel {
+  padding-top: 64px;
+  border-radius: 8px 8px 0 0;
+  box-shadow: var(--red-papel-sombra);
+}
+.cara-nueva .cn-red-herramientas {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Satoshi', -apple-system, 'Segoe UI', sans-serif;
+}
+.cara-nueva .cn-red-herr {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 10px;
+  background: var(--neutral);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.cara-nueva .cn-red-herr:hover {
+  background: var(--line-2);
+}
+.cara-nueva .cn-red-herr:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.cara-nueva .cn-red-herr--taller,
+.cara-nueva .cn-red-herr--guardar {
+  background: var(--brand-soft);
+  font-weight: 600;
+  color: var(--brand);
+}
+.cara-nueva .cn-red-herr--taller:hover,
+.cara-nueva .cn-red-herr--guardar:hover {
+  background: var(--brand-soft);
+  filter: brightness(0.96);
+}
+.cara-nueva .cn-red-herr--guardar {
+  margin-left: auto;
+}
+.cara-nueva .cn-red-herr-icono {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.cara-nueva .cn-red-herr-icono--ok {
+  color: var(--ok);
+}
+/* El control de letra es compartido: se le cambia la piel desde aquí, sin tocar su archivo. */
+.cara-nueva .cn-red-letra {
+  overflow: hidden;
+  border: none;
+  border-radius: 10px;
+  background: var(--neutral);
+}
+.cara-nueva .cn-red-letra button {
+  min-width: 36px;
+  min-height: 36px;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+.cara-nueva .cn-red-letra button:hover {
+  background: var(--line-2);
+}
+.cara-nueva .cn-red-pie-papel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--line);
+  border-radius: 0 0 8px 8px;
+  background: var(--canvas);
+  box-shadow: var(--red-papel-sombra);
+}
+.cara-nueva .cn-red-aviso-ok {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--red-ok-bg);
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink);
+}
+.cara-nueva .cn-red-aviso-ok-icono {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  margin-top: 3px;
+  color: var(--ok);
+}
+.cara-nueva .cn-red-exporta {
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+  text-align: center;
+}
+.cara-nueva .cn-red-juris {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--canvas);
+  box-shadow: var(--shadow-1);
+}
+.cara-nueva .cn-red-juris-cabeza {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-juris-titulo {
+  margin: 0;
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-red-juris-lista {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-red-juris-item {
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-3);
+  overflow-wrap: anywhere;
+}
+
+/* En pantalla táctil, todo lo que se toca llega a 44 px. */
+@media (pointer: coarse) {
+  .cara-nueva .cn-red-herr,
+  .cara-nueva .cn-red-letra button {
+    min-height: 44px;
+  }
+  .cara-nueva .cn-red-letra button {
+    min-width: 44px;
+  }
+}
+
+@media (min-width: 640px) {
+  .cara-nueva .cn-red-mesa {
+    padding: 28px 32px 40px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .cara-nueva .cn-red-form {
+    padding: 20px 20px 16px;
+  }
+  .cara-nueva .cn-red-pie {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+  .cara-nueva .cn-red-generar {
+    width: auto;
+    flex: none;
+    margin-left: auto;
+  }
+  .cara-nueva .cn-red-lienzo-barra {
+    gap: 20px;
+    padding: 0 20px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .cara-nueva .cn-red-termino-caja {
+    display: flex;
+  }
+}

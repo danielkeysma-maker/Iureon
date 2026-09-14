@@ -38,14 +38,25 @@ import {
  * borradores viejos es inaceptable cuando el borrador es la prueba de que se
  * trabajó el caso: eliminar es siempre la decisión de una persona.
  *
+ * ─── LA CARA NUEVA (artboard 3 de `app-redaccion-revision.html`) ────────────
+ *
+ * Solo la piel: el orden, los grupos, los filtros y las acciones siguen siendo
+ * los de esta pantalla. Del artboard NO se toma el conmutador «Míos / De la
+ * firma» —la lista es siempre la de la firma y no hay filtro por autor—, ni sus
+ * dos estados: el artboard dibuja «Sin terminar» y «Listo», y el producto tiene
+ * cuatro (borrador, revisar, listo, radicado), que son los que se pintan. La
+ * urgencia del término va en ámbar y con peso, no en rojo: el rojo de esta cara
+ * queda para eliminar.
+ *
  * ─── LO QUE NO SE PINTA ─────────────────────────────────────────────────────
  *
  * El diseño trae una columna «Sin verificar» con el número de afirmaciones por
  * comprobar antes de firmar. No existe: la tubería no marca por afirmación, y
  * un cero verde que nadie calculó diría «este escrito se puede radicar mañana»
  * sin que nada lo respalde. La columna se omite hasta que ese dato sea real.
- * Lo mismo con «Ver versiones» y «Guardar como plantilla»: `saved_drafts`
- * conserva el número de versión, no las versiones, y no hay plantillas.
+ * «Guardar como plantilla» tampoco: no hay plantillas. «Ver versiones» no vive
+ * en esta lista: `saved_drafts.versiones` las conserva todas —desde el
+ * 2026-09-14 ninguna se descarta— y se consultan en el taller del borrador.
  */
 
 interface SavedDraftsViewProps {
@@ -71,6 +82,16 @@ interface SavedDraftsViewProps {
   onIrAHerramientas: () => void;
 }
 
+/**
+ * La píldora de estado. Los cuatro estados del producto, cada uno con su tono;
+ * «listo» lleva además el punto, para que se distinga sin depender del verde.
+ */
+const CLASE_ESTADO: Record<EstadoBorrador, string> = {
+  BORRADOR: 'cn-bor-estado',
+  REVISAR: 'cn-bor-estado cn-bor-estado--revisar',
+  LISTO: 'cn-bor-estado cn-bor-estado--listo',
+  RADICADO: 'cn-bor-estado cn-bor-estado--radicado'
+};
 
 /** Escapa un campo para CSV. Sin esto, un despacho con coma parte la fila. */
 const csv = (valor: string | null | undefined): string =>
@@ -167,17 +188,22 @@ export const SavedDraftsView: React.FC<SavedDraftsViewProps> = ({
   };
 
   return (
-    <div data-visita="vista-borradores" className="flex h-full min-h-0 flex-1 flex-col bg-canvas font-sans">
+    <div data-visita="vista-borradores" className="cara-nueva cn-bor flex h-full min-h-0 min-w-0 flex-1 flex-col">
       {/* ─── ENCABEZADO ──────────────────────────────────────────────────── */}
-      <header className="flex shrink-0 flex-wrap items-end gap-3 border-b border-line-200 bg-surface px-5 py-3.5">
-        <div className="min-w-0 flex-1">
-          <h1 className="text-title text-ink-900">Borradores guardados</h1>
-          <p className="mt-0.5 text-meta text-ink-500">
+      <header className="cn-bor-cabeza">
+        <div className="cn-bor-textos">
+          <h1 className="cn-bor-h1">Borradores</h1>
+          {/*
+            LA BAJADA DEL ARTBOARD SE QUEDA PORQUE ES VERDAD: cada guardado
+            conserva su versión y la fila dice quién lo creó y quién lo editó.
+          */}
+          <p className="cn-bor-bajada">Todo lo empezado, con sus versiones y quién lo tocó.</p>
+          <p className="cn-bor-censo">
             {sinRadicar.length} {sinRadicar.length === 1 ? 'escrito' : 'escritos'} sin radicar
             {estaSemana > 0 && (
               <>
                 {' · '}
-                <span className="font-medium text-danger">
+                <span className="cn-bor-censo-urge">
                   {estaSemana} con término esta semana
                 </span>
               </>
@@ -185,31 +211,39 @@ export const SavedDraftsView: React.FC<SavedDraftsViewProps> = ({
           </p>
         </div>
 
-        <button onClick={exportar} className="btn-neutral btn-sm" disabled={visibles.length === 0}>
-          <Download className="h-3.5 w-3.5" />
-          Exportar lista
-        </button>
-        {!soloLectura && (
-        <button onClick={onRedactar} className="btn-primary btn-sm">
-          Redactar escrito
-        </button>
-        )}
+        <div className="cn-bor-botones">
+          <button
+            type="button"
+            onClick={exportar}
+            className="cn-ini-boton cn-ini-boton--suave cn-bor-boton"
+            disabled={visibles.length === 0}
+          >
+            <Download className="h-4 w-4" aria-hidden="true" />
+            Exportar lista
+          </button>
+          {!soloLectura && (
+            <button type="button" onClick={onRedactar} className="cn-ini-boton cn-ini-boton--primario cn-bor-boton">
+              Redactar escrito
+            </button>
+          )}
+        </div>
       </header>
 
       {/* ─── FILTROS ─────────────────────────────────────────────────────── */}
-      <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-line-200 bg-surface px-5 py-2">
+      <div className="cn-bor-filtros">
         <input
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
           placeholder="Buscar por cliente, radicado o actuación"
-          className="field w-[300px] max-w-full"
+          aria-label="Buscar por cliente, radicado o actuación"
+          className="cn-campo cn-bor-buscar"
         />
 
         <button
+          type="button"
           onClick={() => setSoloSinRadicar((v) => !v)}
-          className={`rounded-control px-2.5 py-1 text-[12.5px] font-medium ${
-            soloSinRadicar ? 'bg-brand-700 text-white' : 'bg-canvas text-ink-500 hover:text-ink-900'
-          }`}
+          aria-pressed={soloSinRadicar}
+          className={`cn-bor-pildora ${soloSinRadicar ? 'cn-bor-pildora--activa' : ''}`}
         >
           Estado: {soloSinRadicar ? 'sin radicar' : 'todos'}
         </button>
@@ -218,7 +252,8 @@ export const SavedDraftsView: React.FC<SavedDraftsViewProps> = ({
           <select
             value={rama}
             onChange={(e) => setRama(e.target.value)}
-            className="field max-w-[220px] py-1"
+            aria-label="Rama"
+            className="cn-campo cn-bor-select"
           >
             <option value="TODAS">Rama: todas</option>
             {ramas.map((r) => (
@@ -231,12 +266,13 @@ export const SavedDraftsView: React.FC<SavedDraftsViewProps> = ({
 
         {(busqueda || !soloSinRadicar || rama !== 'TODAS') && (
           <button
+            type="button"
             onClick={() => {
               setBusqueda('');
               setSoloSinRadicar(true);
               setRama('TODAS');
             }}
-            className="text-meta text-brand-700 underline underline-offset-2"
+            className="cn-bor-enlace"
           >
             Limpiar
           </button>
@@ -247,51 +283,43 @@ export const SavedDraftsView: React.FC<SavedDraftsViewProps> = ({
           Se dice para que nadie crea que la lista está desordenada al ver
           arriba un escrito que no se toca hace un mes.
         */}
-        <span className="ml-auto font-mono text-[11px] text-ink-400">
-          Orden: término más próximo
-        </span>
+        <span className="cn-bor-orden">Orden: término más próximo</span>
       </div>
 
       {/* ─── LISTA ───────────────────────────────────────────────────────── */}
-      <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+      <div className="cn-bor-lista">
         {savedDrafts.length === 0 ? (
-          <div className="card flex flex-col items-center gap-2 py-12 text-center">
-            <FileClock className="h-8 w-8 text-ink-400" />
-            <p className="text-ui text-ink-900">Todavía no hay borradores guardados.</p>
-            <p className="max-w-md text-meta text-ink-500">
+          <div className="cn-bor-vacio">
+            <FileClock className="h-8 w-8" aria-hidden="true" />
+            <p className="cn-bor-vacio-titulo">Todavía no hay borradores guardados.</p>
+            <p className="cn-bor-vacio-texto">
               Cuando redacte un escrito y lo guarde, aparece aquí con su proceso y su término, y
               esta lista lo ordena por lo que vence primero.
             </p>
             {!soloLectura && (
-            <button onClick={onRedactar} className="btn-primary btn-sm mt-2">
-              Redactar escrito
-            </button>
+              <button type="button" onClick={onRedactar} className="cn-ini-boton cn-ini-boton--primario cn-bor-boton">
+                Redactar escrito
+              </button>
             )}
           </div>
         ) : visibles.length === 0 ? (
-          <p className="card py-8 text-center text-meta text-ink-500">
-            Ninguno coincide con estos filtros.
-          </p>
+          <p className="cn-bor-vacio cn-bor-vacio-texto">Ninguno coincide con estos filtros.</p>
         ) : (
           grupos.map((grupo) => (
-            <section key={grupo.titulo} className="mb-5">
-              <h2
-                className={`mb-1.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] ${
-                  grupo.urgente ? 'text-danger' : 'text-ink-400'
-                }`}
-              >
+            <section key={grupo.titulo} className="cn-bor-grupo">
+              <h2 className={`cn-bor-grupo-titulo ${grupo.urgente ? 'cn-bor-grupo-titulo--urge' : ''}`}>
                 {grupo.titulo} · {grupo.entradas.length}
               </h2>
 
-              <div className="overflow-hidden rounded-card border border-line-200 bg-surface">
-                {/* La cabecera de columnas solo cuando hay ancho para leerla. */}
-                <div className="t-head hidden items-center gap-3 px-4 py-2 md:flex">
-                  <span className="min-w-0 flex-1">Escrito</span>
-                  <span className="w-[150px] shrink-0">Término</span>
-                  <span className="w-[64px] shrink-0">Versión</span>
-                  <span className="w-[90px] shrink-0">Estado</span>
-                  <span className="w-[170px] shrink-0">Últ. edición</span>
-                  <span className="w-[28px] shrink-0" />
+              <div className="cn-bor-tabla">
+                {/* La cabecera de columnas solo cuando hay ancho para leerla en una línea. */}
+                <div className="cn-bor-columnas" aria-hidden="true">
+                  <span>Escrito</span>
+                  <span>Término</span>
+                  <span>Versión</span>
+                  <span>Estado</span>
+                  <span>Últ. edición</span>
+                  <span />
                 </div>
 
                 {grupo.entradas.map((e) => {
@@ -300,27 +328,19 @@ export const SavedDraftsView: React.FC<SavedDraftsViewProps> = ({
                   const urge = dias !== null && dias <= 2;
 
                   return (
-                    <div
-                      key={e.id}
-                      className={`t-row flex flex-wrap items-center gap-3 px-4 py-2.5 ${
-                        radicado ? 'opacity-60' : ''
-                      }`}
-                    >
+                    <div key={e.id} className={`cn-bor-fila ${radicado ? 'cn-bor-fila--radicado' : ''}`}>
                       <button
+                        type="button"
                         onClick={() => !radicado && onAbrir(e)}
                         disabled={radicado}
-                        className="min-w-0 flex-1 text-left"
+                        className="cn-bor-abrir cn-bor-c-escrito"
                         title={radicado ? 'Radicado: se consulta y se duplica, nunca se continúa.' : 'Abrir en el panel'}
                       >
-                        <span className="flex items-center gap-1.5">
-                          {radicado && (
-                            <Lock className="h-3 w-3 shrink-0 text-ink-400" strokeWidth={2.4} />
-                          )}
-                          <span className="min-w-0 truncate text-ui text-ink-900">
-                            {e.draft.title}
-                          </span>
+                        <span className="cn-bor-titulo">
+                          {radicado && <Lock className="h-3.5 w-3.5" strokeWidth={2.4} aria-hidden="true" />}
+                          <span className="cn-bor-titulo-texto">{e.draft.title}</span>
                         </span>
-                        <span className="mt-0.5 block truncate text-meta text-ink-500">
+                        <span className="cn-bor-meta">
                           {radicado
                             ? `Radicado${e.radicadoEl ? ` el ${new Date(e.radicadoEl).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })}` : ''} · copia inmutable`
                             : [e.cliente, e.despacho].filter(Boolean).join(' · ') ||
@@ -335,12 +355,10 @@ export const SavedDraftsView: React.FC<SavedDraftsViewProps> = ({
                           algo que decir: un borrador respaldado no necesita una
                           linea que lo diga, y uno anterior a la columna tampoco
                           — no sabemos que le falte, sabemos que no lo anotamos.
+                          Lleva el BORDE DISCONTINUO porque es exactamente lo que
+                          ese guion significa en esta cara: sin verificar.
                         */}
-                        {faltaDeRespaldo(e) && (
-                          <span className="mt-0.5 block truncate text-meta text-unverified">
-                            {faltaDeRespaldo(e)}
-                          </span>
-                        )}
+                        {faltaDeRespaldo(e) && <span className="cn-bor-sin">{faltaDeRespaldo(e)}</span>}
                       </button>
 
                       {/*
@@ -348,44 +366,33 @@ export const SavedDraftsView: React.FC<SavedDraftsViewProps> = ({
                         La fecha es la que se cita en el escrito; los días son
                         los que hacen actuar. Ninguna de las dos sola alcanza.
                       */}
-                      <span className="w-[150px] shrink-0">
+                      <span className="cn-bor-c-termino">
                         {radicado ? (
-                          <span className="text-meta text-ink-500">Radicado a tiempo</span>
+                          <span className="cn-bor-dias">Radicado a tiempo</span>
                         ) : dias !== null ? (
                           <>
-                            <span className="block font-mono text-[12px] text-ink-900">
-                              {fechaLarga(e.venceEl as string)}
-                            </span>
-                            <span
-                              className={`block font-mono text-[11px] ${
-                                urge ? 'font-semibold text-danger' : 'text-ink-400'
-                              }`}
-                            >
+                            <span className="cn-bor-fecha">{fechaLarga(e.venceEl as string)}</span>
+                            <span className={`cn-bor-dias ${urge ? 'cn-bor-dias--urge' : ''}`}>
                               {cuantoFalta(dias)}
                             </span>
                           </>
                         ) : (
-                          <button
-                            onClick={() => setEditando(e)}
-                            className="text-meta text-brand-700 underline underline-offset-2"
-                          >
+                          <button type="button" onClick={() => setEditando(e)} className="cn-bor-enlace">
                             Poner término
                           </button>
                         )}
                       </span>
 
-                      <span className="w-[64px] shrink-0 font-mono text-[12px] text-ink-700">
-                        v{e.version ?? 1}
-                      </span>
+                      <span className="cn-bor-c-version cn-bor-version">v{e.version ?? 1}</span>
 
-                      <span className="w-[90px] shrink-0">
-                        <span className="chip-neutral">
+                      <span className="cn-bor-c-estado">
+                        <span className={CLASE_ESTADO[e.estado ?? 'BORRADOR']}>
                           {e.estado ? ETIQUETA_ESTADO[e.estado] : 'Borrador'}
                         </span>
                       </span>
 
                       <span
-                        className="w-[170px] shrink-0 truncate text-meta text-ink-500"
+                        className="cn-bor-c-autor cn-bor-autor"
                         title={e.editadoPor && e.editadoPor !== e.autor ? `Creado por ${e.autor ?? '—'} · editado por ${e.editadoPor}` : undefined}
                       >
                         {/* «editado por X» solo cuando X no es quien lo creó: es la información nueva. */}
@@ -399,42 +406,43 @@ export const SavedDraftsView: React.FC<SavedDraftsViewProps> = ({
                       </span>
 
                       {/* ─── MENÚ DE FILA ─────────────────────────────── */}
-                      <span className="relative w-[28px] shrink-0">
+                      <span className="cn-bor-menu-caja">
                         <button
+                          type="button"
                           onClick={() => setMenuAbierto(menuAbierto === e.id ? null : e.id)}
                           aria-label="Acciones"
-                          className="flex h-[26px] w-[26px] items-center justify-center rounded-control text-ink-400 hover:bg-canvas hover:text-ink-900"
+                          aria-expanded={menuAbierto === e.id}
+                          className="cn-bor-menu-boton"
                         >
-                          <MoreHorizontal className="h-4 w-4" />
+                          <MoreHorizontal className="h-5 w-5" />
                         </button>
 
                         {menuAbierto === e.id && (
                           <>
                             {/* Capa que cierra al tocar fuera, sin listeners globales. */}
-                            <span
-                              className="fixed inset-0 z-30"
-                              onClick={() => setMenuAbierto(null)}
-                            />
-                            <span className="surface-raised absolute right-0 top-full z-40 mt-1 flex w-[196px] flex-col overflow-hidden py-1">
+                            <span className="cn-bor-menu-velo" onClick={() => setMenuAbierto(null)} />
+                            <span className="cn-bor-menu">
                               {!radicado && (
                                 <button
+                                  type="button"
                                   onClick={() => {
                                     setMenuAbierto(null);
                                     onAbrir(e);
                                   }}
-                                  className="px-3 py-1.5 text-left text-ui text-ink-900 hover:bg-canvas"
+                                  className="cn-bor-menu-item"
                                 >
                                   Abrir
                                 </button>
                               )}
                               <button
+                                type="button"
                                 onClick={() => {
                                   setMenuAbierto(null);
                                   setEditando(e);
                                 }}
-                                className="flex items-center gap-2 px-3 py-1.5 text-left text-ui text-ink-900 hover:bg-canvas"
+                                className="cn-bor-menu-item"
                               >
-                                <Pencil className="h-3.5 w-3.5 text-ink-400" />
+                                <Pencil className="h-4 w-4" aria-hidden="true" />
                                 Datos del proceso
                               </button>
                               {/*
@@ -449,6 +457,7 @@ export const SavedDraftsView: React.FC<SavedDraftsViewProps> = ({
                                 fecha: eso lo lee el servidor de la ficha.
                               */}
                               <button
+                                type="button"
                                 onClick={() => {
                                   setMenuAbierto(null);
                                   dejarPendiente({
@@ -465,44 +474,50 @@ export const SavedDraftsView: React.FC<SavedDraftsViewProps> = ({
                                   });
                                   onIrAHerramientas();
                                 }}
-                                className="flex items-center gap-2 px-3 py-1.5 text-left text-ui text-ink-900 hover:bg-canvas"
+                                className="cn-bor-menu-item"
                               >
-                                <CalendarClock className="h-3.5 w-3.5 text-ink-400" />
+                                <CalendarClock className="h-4 w-4" aria-hidden="true" />
                                 Poner en la agenda
                               </button>
                               <button
+                                type="button"
                                 onClick={() => {
                                   setMenuAbierto(null);
                                   onDuplicar(e);
                                 }}
-                                className="flex items-center gap-2 px-3 py-1.5 text-left text-ui text-ink-900 hover:bg-canvas"
+                                className="cn-bor-menu-item"
                               >
-                                <Copy className="h-3.5 w-3.5 text-ink-400" />
+                                <Copy className="h-4 w-4" aria-hidden="true" />
                                 Duplicar
                               </button>
                               {!radicado && (
                                 <button
+                                  type="button"
                                   onClick={() => {
                                     setMenuAbierto(null);
                                     void guardar(e.id, { estado: 'RADICADO' });
                                   }}
-                                  className="flex items-center gap-2 px-3 py-1.5 text-left text-ui text-ink-900 hover:bg-canvas"
+                                  className="cn-bor-menu-item"
                                 >
-                                  <Stamp className="h-3.5 w-3.5 text-ink-400" />
+                                  <Stamp className="h-4 w-4" aria-hidden="true" />
                                   Marcar radicado
                                 </button>
                               )}
                               {!radicado && (
-                                <button
-                                  onClick={() => {
-                                    setMenuAbierto(null);
-                                    setPorEliminar(e);
-                                  }}
-                                  className="flex items-center gap-2 border-t border-line-100 px-3 py-1.5 text-left text-ui text-danger hover:bg-canvas"
-                                >
-                                  <Trash2 className="h-3.5 w-3.5" />
-                                  Eliminar
-                                </button>
+                                <>
+                                  <span className="cn-bor-menu-raya" aria-hidden="true" />
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setMenuAbierto(null);
+                                      setPorEliminar(e);
+                                    }}
+                                    className="cn-bor-menu-item cn-bor-menu-item--peligro"
+                                  >
+                                    <Trash2 className="h-4 w-4" aria-hidden="true" />
+                                    Eliminar
+                                  </button>
+                                </>
                               )}
                             </span>
                           </>
@@ -519,14 +534,17 @@ export const SavedDraftsView: React.FC<SavedDraftsViewProps> = ({
         {/*
           SE DECLARA QUE NADA SE BORRA SOLO.
           Una aplicación que purga borradores viejos es inaceptable cuando el
-          borrador es la prueba de que se trabajó el caso.
+          borrador es la prueba de que se trabajó el caso. La segunda frase es
+          la del artboard y es verdad del estado «Listo»: cambiarlo no radica,
+          no firma ni envía nada.
         */}
         {savedDrafts.length > 0 && (
-          <div className="card mt-2">
-            <p className="text-ui font-medium text-ink-900">Ningún borrador se borra solo</p>
-            <p className="mt-1 text-meta leading-[1.6] text-ink-500">
+          <div className="cn-bor-nota">
+            <p className="cn-bor-nota-titulo">Ningún borrador se borra solo</p>
+            <p className="cn-bor-nota-texto">
               Se conservan mientras la cuenta exista, incluso si el término ya venció. Eliminar es
-              siempre la decisión de una persona.
+              siempre la decisión de una persona. Marcar un borrador como listo no lo radica ni lo
+              firma: solo le dice a su firma que ya se revisó.
             </p>
           </div>
         )}
@@ -547,22 +565,27 @@ export const SavedDraftsView: React.FC<SavedDraftsViewProps> = ({
         titulo="¿Eliminar este borrador?"
         acciones={
           <>
-            <button onClick={() => setPorEliminar(null)} className="btn-neutral btn-sm">
+            <button
+              type="button"
+              onClick={() => setPorEliminar(null)}
+              className="cn-ini-boton cn-ini-boton--suave cn-bor-boton"
+            >
               Conservar
             </button>
             <button
+              type="button"
               onClick={() => {
                 if (porEliminar) onEliminar(porEliminar.id);
                 setPorEliminar(null);
               }}
-              className="btn-danger btn-sm"
+              className="cn-ini-boton cn-bor-boton cn-bor-boton--peligro"
             >
               Eliminar
             </button>
           </>
         }
       >
-        <p className="text-ui text-ink-900">
+        <p className="cn-bor-dialogo-texto">
           «{porEliminar?.draft.title}» se borra para toda la firma y no se puede recuperar.
         </p>
         {porEliminar?.venceEl && (
@@ -580,12 +603,16 @@ export const SavedDraftsView: React.FC<SavedDraftsViewProps> = ({
         tamano="S"
         titulo="Guardado en este equipo"
         acciones={
-          <button onClick={() => setAviso(null)} className="btn-primary btn-sm">
+          <button
+            type="button"
+            onClick={() => setAviso(null)}
+            className="cn-ini-boton cn-ini-boton--primario cn-bor-boton"
+          >
             Entendido
           </button>
         }
       >
-        <p className="text-ui text-ink-900">{aviso}</p>
+        <p className="cn-bor-dialogo-texto">{aviso}</p>
       </Dialog>
     </div>
   );
@@ -605,6 +632,10 @@ export const SavedDraftsView: React.FC<SavedDraftsViewProps> = ({
  * no sale una fecha sin saber cuándo empezó a correr. Solo lo sabe quien lleva
  * el caso. Calcularlo aquí sería inventar un plazo, que es la única cosa que
  * este producto no puede hacer.
+ *
+ * LOS EJEMPLOS DE LOS CAMPOS SON DE MENTIRA A LA VISTA. Un despacho y un
+ * radicado verosímiles se leen como datos de un caso real y terminan copiados
+ * en un escrito; los ceros no se confunden con nada (README-app §3).
  */
 const DatosDelProceso: React.FC<{
   entrada: SavedDraftEntry | null;
@@ -659,10 +690,11 @@ const DatosDelProceso: React.FC<{
       onIntentoDeCerrarConCambios={() => undefined}
       acciones={
         <>
-          <button onClick={onCerrar} className="btn-neutral btn-sm">
+          <button type="button" onClick={onCerrar} className="cn-ini-boton cn-ini-boton--suave cn-bor-boton">
             Cancelar
           </button>
           <button
+            type="button"
             onClick={() =>
               onGuardar({
                 // Cadena vacía es «lo borré a propósito», y por eso viaja como null.
@@ -673,7 +705,7 @@ const DatosDelProceso: React.FC<{
                 estado
               })
             }
-            className="btn-primary btn-sm"
+            className="cn-ini-boton cn-ini-boton--primario cn-bor-boton"
             disabled={!cambio}
           >
             Guardar
@@ -681,58 +713,58 @@ const DatosDelProceso: React.FC<{
         </>
       }
     >
-      <div className="flex flex-col gap-3">
-        <label className="flex flex-col gap-1">
-          <span className="field-label">Cliente o parte</span>
+      <div className="cn-bor-form">
+        <label className="block">
+          <span className="cn-bor-etiqueta">Cliente o parte</span>
           <input
             value={cliente}
             onChange={(e) => setCliente(e.target.value)}
-            placeholder="Mosquera vs. Distrilácteos"
-            className="field"
+            placeholder="Cliente vs. contraparte"
+            className="cn-campo cn-bor-campo"
           />
         </label>
 
-        <label className="flex flex-col gap-1">
-          <span className="field-label">Despacho</span>
+        <label className="block">
+          <span className="cn-bor-etiqueta">Despacho</span>
           <input
             value={despacho}
             onChange={(e) => setDespacho(e.target.value)}
-            placeholder="Juzgado 12 Laboral del Circuito"
-            className="field"
+            placeholder="Juzgado 00 Civil Municipal"
+            className="cn-campo cn-bor-campo"
           />
         </label>
 
-        <label className="flex flex-col gap-1">
-          <span className="field-label">Radicado</span>
+        <label className="block">
+          <span className="cn-bor-etiqueta">Radicado</span>
           <input
             value={radicado}
             onChange={(e) => setRadicado(e.target.value)}
-            placeholder="11001310501220250014200"
-            className="field font-mono"
+            placeholder="00000000000000000000000"
+            className="cn-campo cn-campo--mono cn-bor-campo"
           />
         </label>
 
-        <label className="flex flex-col gap-1">
-          <span className="field-label">Vence el</span>
+        <label className="block">
+          <span className="cn-bor-etiqueta">Vence el</span>
           <input
             type="date"
             value={venceEl}
             onChange={(e) => setVenceEl(e.target.value)}
-            className="field"
+            className="cn-campo cn-bor-campo"
           />
-          <span className="text-meta text-ink-500">
+          <span className="cn-bor-ayuda">
             La fecha, no el término del catálogo. El catálogo dice «dentro de los diez (10) días
             siguientes»; solo usted sabe cuándo empezaron a correr. Si el escrito no caduca, déjelo
             vacío.
           </span>
         </label>
 
-        <label className="flex flex-col gap-1">
-          <span className="field-label">Estado</span>
+        <label className="block">
+          <span className="cn-bor-etiqueta">Estado</span>
           <select
             value={estado}
             onChange={(e) => setEstado(e.target.value as EstadoBorrador)}
-            className="field"
+            className="cn-campo cn-bor-campo"
           >
             <option value="BORRADOR">Borrador — se está escribiendo</option>
             <option value="REVISAR">Revisar — hay algo por comprobar</option>
@@ -740,7 +772,7 @@ const DatosDelProceso: React.FC<{
             <option value="RADICADO">Radicado — se llevó al juzgado</option>
           </select>
           {estado === 'RADICADO' && entrada?.estado !== 'RADICADO' && (
-            <span className="notice">
+            <span className="notice mt-2 block">
               Al marcarlo radicado, su texto ya no se podrá modificar: pasa a ser la copia de lo
               que está en el expediente. Para seguir trabajando a partir de él, duplíquelo.
             </span>

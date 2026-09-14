@@ -48,11 +48,7 @@ export const MobileWorkshopTabs: React.FC<MobileWorkshopTabsProps> = ({
         onClick={() => onCambiar(id)}
         disabled={deshabilitada}
         aria-current={activa ? 'page' : undefined}
-        className={`flex min-h-[44px] flex-1 items-center justify-center gap-1.5 border-b-2 text-[12.5px] font-semibold ${
-          activa
-            ? 'border-brand-700 text-brand-700'
-            : 'border-transparent text-ink-500 disabled:text-ink-400 disabled:opacity-60'
-        }`}
+        className={`cn-red-pestana ${activa ? 'cn-red-pestana--activa' : ''}`}
       >
         {icono}
         {children}
@@ -61,13 +57,13 @@ export const MobileWorkshopTabs: React.FC<MobileWorkshopTabsProps> = ({
   };
 
   return (
-    <div className="flex shrink-0 border-b border-line-200 bg-surface lg:hidden">
-      <Pestana id="instruccion" icono={<PenLine className="h-4 w-4" />}>
+    <div className="cn-red-pestanas flex lg:hidden">
+      <Pestana id="instruccion" icono={<PenLine className="cn-red-pestana-icono" strokeWidth={1.8} aria-hidden />}>
         Instrucción
       </Pestana>
       <Pestana
         id="documento"
-        icono={<FileText className="h-4 w-4" />}
+        icono={<FileText className="cn-red-pestana-icono" strokeWidth={1.8} aria-hidden />}
         deshabilitada={!hayBorrador}
       >
         {hayBorrador ? 'Documento' : 'Sin generar'}

@@ -13,6 +13,8 @@ import { EscritoSinNombreDialog } from './EscritoSinNombreDialog';
 import { useCatalogBranchesState } from '../../catalog/hooks/useCatalogBranches';
 import { BRANCH_LABELS } from '../../catalog/branchLabels';
 import type { ActuacionRole } from '../../catalog/types';
+import { esTituloDeTrabajo } from '../../catalog/tituloDeTrabajo';
+import { estadoDeLaFicha, ordenarParaLaLista } from '../services/fichaEnLaLista';
 
 /**
  * La configuración del taller en móvil. Artboard 4d.
@@ -125,9 +127,9 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
 
   const termino = elegida
     ? elegida.term.status === 'NO_CADUCA'
-      ? { texto: 'No caduca', Icono: IconoNoAplica, clase: 'text-ink-500' }
+      ? { texto: 'No caduca', Icono: IconoNoAplica, tono: 'neutro' }
       : elegida.term.status === 'NO_VERIFICADO'
-      ? { texto: 'Término sin verificar', Icono: IconoSinVerificar, clase: 'text-unverified' }
+      ? { texto: 'Término sin verificar', Icono: IconoSinVerificar, tono: 'sin' }
       : {
           /*
            * La primera frase del término y no el párrafo: varios son cuatro
@@ -136,32 +138,35 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
            */
           texto: (elegida.term.description ?? '').split(/(?<=\.)\s/)[0],
           Icono: IconoVerificado,
-          clase: 'text-ink-900'
+          tono: 'ok'
         }
     : null;
 
+  /* Mismo orden y mismos bloques que el escritorio: alfabético, propias y luego prestadas. */
+  const ordenadas = ordenarParaLaLista(catalogo.actuaciones);
+  const propias = ordenadas.filter((a) => !a.porRemision);
+  const prestadas = ordenadas.filter((a) => a.porRemision);
+
   return (
-    <div className="shrink-0 border-b border-line-200 bg-surface">
-      <div className="flex items-center gap-[7px] px-4 pt-2.5">
-        {/* `Config.` en mono, 9.5px, versales y tracking .1em — del HTML. */}
-        <span className="shrink-0 font-mono text-[9.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
-          Config.
-        </span>
-        <span className="max-w-[96px] truncate rounded-[6px] border border-line-200 bg-canvas px-2 py-1 text-[12px] font-medium text-ink-900">
-          {ROL_CORTO[userRole]}
-        </span>
-        <span className="max-w-[96px] truncate rounded-[6px] border border-line-200 bg-canvas px-2 py-1 text-[12px] font-medium text-ink-900">
-          {BRANCH_LABELS[legalBranch] ?? legalBranch}
-        </span>
+    <div className="cn-red-movil">
+      <div className="cn-red-movil-cabeza">
+        {/*
+          Los dos chips dicen lo elegido; «Cambiar» abre las listas. Sin el
+          rótulo «Config.» en versales de 9,5 px: la escala nueva empieza en 14 y
+          los chips ya se explican solos.
+        */}
+        <span className="cn-red-chip">{ROL_CORTO[userRole]}</span>
+        <span className="cn-red-chip">{BRANCH_LABELS[legalBranch] ?? legalBranch}</span>
         <button
           type="button"
           onClick={() => setAbierto((v) => !v)}
           aria-expanded={abierto}
-          className="ml-auto flex min-h-[32px] shrink-0 items-center gap-1 px-0.5 py-1 text-[12px] font-medium text-brand-700"
+          className="cn-red-cambiar"
         >
           {abierto ? 'Listo' : 'Cambiar'}
           <ChevronDown
-            className={`h-3.5 w-3.5 transition-transform ${abierto ? 'rotate-180' : ''}`}
+            className={`cn-red-cambiar-chevron ${abierto ? 'cn-red-cambiar-chevron--abierto' : ''}`}
+            aria-hidden
           />
         </button>
       </div>
@@ -172,10 +177,10 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
         instruccion sin saber contra que ficha se va a redactar.
       */}
       {elegida && termino && !abierto && (
-        <div className="mx-4 mt-2 flex items-center gap-1.5 border-t border-line-100 pb-2.5 pt-2">
+        <div className="cn-red-resumen">
           <termino.Icono
-            className={`h-[13px] w-[13px] shrink-0 ${termino.clase}`}
-            strokeWidth={2.4}
+            className={`cn-red-termino-icono cn-red-termino-icono--${termino.tono}`}
+            strokeWidth={2.2}
           />
           {/*
             UNA SOLA LINEA, como en el HTML: «Nulidad y restablecimiento ·
@@ -183,30 +188,31 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
             semibold. Partirlo en dos renglones —como estaba— le quitaba a la
             fila su cualidad de resumen: 4d la quiere de un vistazo.
           */}
-          <p className="min-w-0 flex-1 truncate text-[12px] text-ink-700">
+          <p className="cn-red-resumen-texto">
             {elegida.exactName}
             {' · '}
-            <b className={`font-mono text-[12px] font-semibold ${termino.clase}`}>
+            <b className={`cn-red-mono cn-red-resumen-termino cn-red-resumen-termino--${termino.tono}`}>
               {termino.texto}
             </b>
           </p>
         </div>
       )}
 
+      {/* Sin actuación, nada del escrito está verificado: por eso lleva el guion. */}
       {!elegida && !abierto && (
-        <p className="border-t border-line-100 px-4 py-2 text-[12px] leading-snug text-ink-500 text-justify">
+        <p className="cn-red-sin-actuacion">
           Sin actuación elegida: el escrito saldrá sin término ni artículo verificados.
         </p>
       )}
 
       {abierto && (
-        <div className="space-y-2 border-t border-line-100 px-4 py-3">
-          <label className="block">
-            <span className="field-label">Quién firma</span>
+        <div className="cn-red-movil-campos">
+          <label className="cn-red-movil-campo">
+            <span className="cn-red-rotulo">Quién firma</span>
             <select
               value={userRole}
               onChange={(e) => setUserRole(e.target.value as ActuacionRole)}
-              className="field w-full"
+              className="cn-red-select"
             >
               {(Object.keys(ROL_CORTO) as ActuacionRole[]).map((r) => (
                 <option key={r} value={r}>
@@ -216,12 +222,12 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
             </select>
           </label>
 
-          <label className="block">
-            <span className="field-label">Rama</span>
+          <label className="cn-red-movil-campo">
+            <span className="cn-red-rotulo">Rama</span>
             <select
               value={legalBranch}
               onChange={(e) => setLegalBranch(e.target.value)}
-              className="field w-full"
+              className="cn-red-select"
             >
               {ramasEstado.ramas.map((b) => (
                 <option key={b} value={b}>
@@ -231,23 +237,40 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
             </select>
           </label>
 
-          <label className="block">
-            <span className="field-label">Actuación</span>
+          <label className="cn-red-movil-campo">
+            <span className="cn-red-rotulo">Actuación</span>
             <select
               value={documentType}
               onChange={(e) => elegirTipo(e.target.value)}
-              className="field w-full"
+              className="cn-red-select"
             >
               <option value="">Elija la actuación…</option>
-              <option value={OPCION_GUIA}>Que la guía proponga la actuación…</option>
-              {catalogo.actuaciones
-                .filter((a) => !a.porRemision)
-                .map((a) => (
-                  <option key={a.id} value={a.exactName}>
-                    {a.exactName}
-                    {a.firmDefined ? ' · de su firma, sin norma verificada' : a.term.status === 'NO_VERIFICADO' ? ' · sin verificar' : ''}
-                  </option>
-                ))}
+              {/*
+                LAS TRES SALIDAS, ANTES DE TODA FICHA y en su propio grupo. En el
+                teléfono solo la guía iba arriba y las otras dos al fondo, detrás
+                de toda la rama: quien no encuentra su actuación no llega allá.
+                Mismo orden que el escritorio.
+              */}
+              <optgroup label="Si no está en la lista">
+                <option value={OPCION_GUIA}>Que la guía proponga la actuación…</option>
+                <option value={OPCION_SIN_NOMBRE}>No sé cómo se llama: describir qué debe lograr…</option>
+                <option value={OPCION_PROPIA}>Ninguna de estas: escribir el nombre…</option>
+              </optgroup>
+              {/*
+                EL ESTADO VA EN LA OPCIÓN, con el artículo cuando el fundamento lo
+                trae. Un `<option>` no admite estilos, así que es texto; lo que
+                dice es lo mismo que la píldora del escritorio.
+              */}
+              <optgroup label="Actuaciones de esta rama">
+                {propias.map((a) => {
+                  const estado = estadoDeLaFicha(a, esTituloDeTrabajo(a.exactName));
+                  return (
+                    <option key={a.id} value={a.exactName}>
+                      {a.exactName} · {[estado.articulo, estado.texto].filter(Boolean).join(' · ')}
+                    </option>
+                  );
+                })}
+              </optgroup>
               {/*
                 AQUI SI SE AGRUPA, y en el escritorio no.
                 El <select> nativo trae <optgroup> de fabrica, asi que el
@@ -257,24 +280,15 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
                 pantallas, dos formas de decir lo mismo, y la frase es la que
                 manda el servidor para que no diverja.
               */}
-              {catalogo.actuaciones.some((a) => a.porRemision) && (
-                <optgroup
-                  label={
-                    catalogo.actuaciones.find((a) => a.porRemision)?.porRemision?.marca ??
-                    'por remisión del CGP'
-                  }
-                >
-                  {catalogo.actuaciones
-                    .filter((a) => a.porRemision)
-                    .map((a) => (
-                      <option key={a.id} value={a.exactName}>
-                        {a.exactName}
-                      </option>
-                    ))}
+              {prestadas.length > 0 && (
+                <optgroup label={prestadas[0].porRemision?.marca ?? 'por remisión del CGP'}>
+                  {prestadas.map((a) => (
+                    <option key={a.id} value={a.exactName}>
+                      {a.exactName}
+                    </option>
+                  ))}
                 </optgroup>
               )}
-              <option value={OPCION_PROPIA}>Ninguna de estas: escribir el nombre…</option>
-              <option value={OPCION_SIN_NOMBRE}>No sé cómo se llama: describir qué debe lograr…</option>
             </select>
           </label>
 
@@ -285,12 +299,12 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
             check que lo asevera.
           */}
           {expedientes.length > 0 && (
-            <label className="block">
-              <span className="field-label">De qué caso</span>
+            <label className="cn-red-movil-campo">
+              <span className="cn-red-rotulo">De qué caso</span>
               <select
                 value={expedienteId}
                 onChange={(e) => setExpedienteId(e.target.value)}
-                className="field w-full"
+                className="cn-red-select"
               >
                 <option value="">Sin expediente</option>
                 {expedientes.map((e) => (
@@ -299,16 +313,16 @@ export const WorkshopConfigMobile: React.FC<WorkshopConfigMobileProps> = ({
                   </option>
                 ))}
               </select>
-              <span className="mt-1 block text-[11px] leading-snug text-ink-500">
+              <span className="cn-red-nota">
                 El borrador queda contado dentro del caso, y si el caso tiene documentos
                 cargados el escrito nace con lo que ellos dicen.
               </span>
             </label>
           )}
 
-          <p className="flex items-start gap-1.5 pt-1 text-[11px] leading-snug text-ink-500 text-justify">
-            <IconoVerificado className="mt-0.5 h-3 w-3 shrink-0 text-verified" />
-            <span className="text-justify [text-wrap:pretty]">
+          <p className="cn-red-nota cn-red-nota--icono">
+            <IconoVerificado className="cn-red-termino-icono cn-red-termino-icono--ok" />
+            <span>
               La actuación es la que trae el artículo y el término verificados. Sin ella el
               escrito se redacta sin respaldo del catálogo.
             </span>

@@ -284,7 +284,7 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
       ancho en cada tamaño.
     */
     <section
-      className={`min-h-0 w-full min-w-0 shrink-0 flex-col border-r border-line-200 bg-surface lg:w-[364px] xl:w-[400px] ${
+      className={`cn-red-panel min-h-0 w-full min-w-0 shrink-0 flex-col lg:w-[364px] xl:w-[400px] ${
         ocultoEnMovil ? 'hidden lg:flex' : 'flex'
       }`}
     >
@@ -293,35 +293,32 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
           vez de derramarse sobre la consola. Antes ambos eran `flex-1` y se
           pisaban.
         */}
-        <form onSubmit={generar} className="flex min-h-0 flex-1 flex-col overflow-y-auto p-4">
-          <div className="flex items-baseline gap-2">
-            <h2 className="text-subtitle text-ink-900">Qué debe hacer este escrito</h2>
+        <form onSubmit={generar} className="cn-red-form flex min-h-0 flex-1 flex-col overflow-y-auto">
+          <div className="cn-red-cabeza">
+            <h2 className="cn-red-h2">Qué debe hacer este escrito</h2>
             {/* Un atajo de teclado en un telefono es ruido: no hay teclado que lo tenga. */}
-            <span className="ml-auto hidden shrink-0 font-mono text-[11px] text-ink-400 lg:inline">
-              ⌘↵ generar
-            </span>
+            <span className="cn-red-atajo hidden lg:inline">⌘↵ generar</span>
           </div>
-          <p className="mt-1 text-meta leading-[1.5] text-ink-500">
+          <p className="cn-red-bajada">
             Hechos, pretensiones, lo que quiere que sostenga. En lenguaje corriente.
           </p>
 
           {activeDraftText && (
-            <div className="notice mt-3">
-              <RefreshCw className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-700" />
-              <span className="flex-1">
+            <div className="cn-red-continuando">
+              <RefreshCw className="cn-red-continuando-icono" strokeWidth={1.8} aria-hidden />
+              <span className="cn-red-continuando-texto">
                 Continuando un borrador de{' '}
-                <b className="font-mono font-semibold">
-                  {(activeDraftText.length / 1000).toFixed(1)}k
-                </b>{' '}
+                <b className="cn-red-cifra">{(activeDraftText.length / 1000).toFixed(1)}k</b>{' '}
                 caracteres.
               </span>
               <button
                 type="button"
                 onClick={onClearActiveDraft}
                 title="Descartar el borrador base"
-                className="shrink-0 text-ink-400 hover:text-ink-700"
+                aria-label="Descartar el borrador base"
+                className="cn-red-icono-boton"
               >
-                <X className="h-3.5 w-3.5" />
+                <X className="cn-red-icono-boton-svg" strokeWidth={1.8} aria-hidden />
               </button>
             </div>
           )}
@@ -340,20 +337,23 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
                 ? `Describa los hechos y la pretensión para ${documentType.toLowerCase()}…`
                 : 'Describa los hechos y la pretensión de este escrito…'
             }
-            className="field-area mt-2.5 min-h-[140px] flex-1 resize-none"
+            className="cn-red-hechos"
           />
 
-          <p className="mt-1 text-right font-mono text-[11px] text-ink-400">
+          <p className="cn-red-contador">
             {legalPrompt.trim().length.toLocaleString('es-CO')} caracteres
           </p>
 
           {/* ─── ADJUNTOS ────────────────────────────────────────────────── */}
-          <div className="mt-3">
+          {/*
+            LA ZONA DE ADJUNTAR YA NO LLEVA GUION. Era discontinua por costumbre
+            de «zona de soltar», y en la cara nueva el guion dice «sin
+            verificar»: un recuadro vacío con esa marca afirmaba algo que no es.
+          */}
+          <div className="cn-red-bloque">
             <label
               title={adjuntosHabilitados ? undefined : AVISO_FUNCION_DESHABILITADA}
-              className={`flex items-center justify-center gap-2 rounded-control border border-dashed border-line-200 bg-canvas py-2.5 ${
-                adjuntosHabilitados ? 'cursor-pointer hover:bg-brand-50' : 'cursor-not-allowed opacity-60'
-              }`}
+              className={`cn-red-adjuntar ${adjuntosHabilitados ? '' : 'cn-red-adjuntar--apagado'}`}
             >
               <input
                 type="file"
@@ -363,9 +363,9 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
                 disabled={preparandoAdjuntos || isProcessing || !adjuntosHabilitados}
                 className="hidden"
               />
-              <UploadCloud className="h-4 w-4 text-ink-400" />
-              <span className="flex items-center gap-1 text-meta font-medium text-ink-500">
-                <Paperclip className="h-3 w-3" />
+              <UploadCloud className="cn-red-adjuntar-icono" strokeWidth={1.6} aria-hidden />
+              <span className="cn-red-adjuntar-texto">
+                <Paperclip className="cn-red-adjuntar-clip" strokeWidth={1.8} aria-hidden />
                 Adjuntar sentencias, pruebas o fotos
               </span>
             </label>
@@ -376,32 +376,28 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
               silenciosa de estar equivocado; uno que promete de menos, la más
               cara: el abogado teclea lo que ya está en el adjunto.
             */}
-            <p className="mt-1.5 text-[11px] leading-[1.45] text-ink-500 [text-wrap:pretty]">
+            <p className="cn-red-ayuda">
               Se leen PDF, Word, texto e imágenes (fotos de comparendos, oficios, cédulas). Lo que se
               extraiga se usa en el escrito y queda marcado como dato del adjunto. Hasta {MAX_ADJUNTOS}{' '}
               archivos y {formatoMb(MAX_BYTES_TOTAL).replace('.0', '')} en total.
             </p>
 
-            {!adjuntosHabilitados && <p className="notice mt-1.5">{AVISO_FUNCION_DESHABILITADA}</p>}
-            {avisoAdjuntos && <p className="notice-unverified mt-1.5">{avisoAdjuntos}</p>}
+            {!adjuntosHabilitados && <p className="cn-red-aviso">{AVISO_FUNCION_DESHABILITADA}</p>}
+            {avisoAdjuntos && <p className="cn-red-aviso">{avisoAdjuntos}</p>}
 
             {importedFiles.length > 0 && (
-              <ul className="mt-1.5 max-h-32 space-y-1 overflow-y-auto">
+              <ul className="cn-red-adjuntos">
                 {importedFiles.map((file) => (
-                  <li
-                    key={file.id}
-                    className="flex items-center gap-2 rounded-control bg-canvas px-2 py-1.5 text-meta"
-                    title={file.detalle}
-                  >
+                  <li key={file.id} className="cn-red-adjunto" title={file.detalle}>
                     {file.esImagen ? (
-                      <ImageIcon className="h-3 w-3 shrink-0 text-ink-400" />
+                      <ImageIcon className="cn-red-adjunto-icono" strokeWidth={1.6} aria-hidden />
                     ) : (
-                      <FileText className="h-3 w-3 shrink-0 text-ink-400" />
+                      <FileText className="cn-red-adjunto-icono" strokeWidth={1.6} aria-hidden />
                     )}
                     <button
                       type="button"
                       onClick={() => setAdjuntoAbierto(file.file)}
-                      className="min-w-0 flex-1 truncate text-left text-ink-700 underline decoration-line-200 underline-offset-2"
+                      className="cn-red-adjunto-nombre"
                       title="Ver el documento tal como es, antes de generar"
                     >
                       {file.name}
@@ -412,13 +408,14 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
                       motivo en el title. Sin esto, tres fotos de 8 MB son un
                       botón mudo durante veinte segundos.
                     */}
+                    {/* Un archivo que no se leyó no es una acción destructiva: ámbar, no el rojo de eliminar. */}
                     <span
-                      className={`shrink-0 font-mono text-[10px] ${
+                      className={`cn-red-adjunto-estado ${
                         file.estado === 'error'
-                          ? 'text-danger'
+                          ? 'cn-red-adjunto-estado--error'
                           : file.estado === 'enviado'
-                          ? 'text-verified'
-                          : 'text-ink-400'
+                          ? 'cn-red-adjunto-estado--ok'
+                          : ''
                       }`}
                     >
                       {file.estado === 'leyendo' && file.detalle ? file.detalle : ETIQUETA_ESTADO[file.estado]}
@@ -433,10 +430,10 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
                       type="button"
                       onClick={() => removeFile(file.id)}
                       disabled={preparandoAdjuntos}
-                      className="shrink-0 text-ink-400 hover:text-danger"
+                      className="cn-red-icono-boton cn-red-icono-boton--quitar"
                       aria-label={`Quitar ${file.name}`}
                     >
-                      <X className="h-3 w-3" />
+                      <X className="cn-red-icono-boton-svg" strokeWidth={1.8} aria-hidden />
                     </button>
                   </li>
                 ))}
@@ -455,12 +452,12 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
           <button
             type="button"
             onClick={() => setRevisarAbierto(true)}
-            className="mt-3 flex w-full items-center gap-2.5 rounded-control border border-[rgb(var(--brand-line))] bg-brand-50 px-3 py-2.5 text-left shadow-[inset_3px_0_0_rgb(var(--brand-700))] hover:border-brand-700 hover:bg-brand-50/70"
+            className="cn-red-revisar"
           >
-            <ClipboardCheck className="h-4 w-4 shrink-0 text-brand-700" />
-            <span className="min-w-0 flex-1">
-              <span className="block text-ui font-medium text-ink-900">Revisar un documento: suyo o recibido</span>
-              <span className="block text-[11px] leading-snug text-ink-500">
+            <ClipboardCheck className="cn-red-revisar-icono" strokeWidth={1.8} aria-hidden />
+            <span className="cn-red-revisar-textos">
+              <span className="cn-red-revisar-titulo">Revisar un documento: suyo o recibido</span>
+              <span className="cn-red-revisar-texto">
                 Su tutela, demanda o recurso, para saber qué está bien, qué está mal y qué corregir; o el auto, la sentencia o el oficio que le
                 llegó, para saber qué resolvió y por dónde se ataca. Informe, no borrador.
               </span>
@@ -496,14 +493,12 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
               Ahora cada línea trae un dato comprobable de ESTE escrito, y la que
               no lo tenga no se pinta. */}
           {lookup.estado === 'ENCONTRADA' && actuacion && (
-            <div className="mt-3 rounded-card border border-line-200">
-              <p className="flex items-baseline gap-2 border-b border-line-100 px-3 py-2 font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
+            <div className="cn-red-ficha">
+              <p className="cn-red-ficha-cabeza">
                 Con qué se va a redactar
-                <span className="ml-auto normal-case tracking-normal text-verified">
-                  {obligatorias} obligatorias
-                </span>
+                <span className="cn-red-ficha-cuenta">{obligatorias} obligatorias</span>
               </p>
-              <ul className="divide-y divide-line-100">
+              <ul className="cn-red-ficha-lista">
                 {/*
                   LAS SECCIONES, POR NOMBRE.
                   
@@ -513,15 +508,15 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
                   porque es lo que va a revisar cuando el escrito salga. El dato
                   estaba en la ficha y se estaba contando en vez de mostrando.
                 */}
-                <li className="px-3 py-2">
-                  <div className="flex items-start gap-2">
-                    <Scale className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink-400" />
-                    <div className="min-w-0">
-                      <p className="text-meta font-medium text-ink-900">
+                <li className="cn-red-ficha-fila">
+                  <div className="cn-red-ficha-par">
+                    <Scale className="cn-red-ficha-icono" strokeWidth={1.6} aria-hidden />
+                    <div className="cn-red-ficha-textos">
+                      <p className="cn-red-ficha-titulo">
                         Estructura exigida por la norma
                       </p>
                       <p
-                        className="mt-0.5 line-clamp-2 text-justify text-meta leading-[1.45] text-ink-500 [text-wrap:pretty]"
+                        className="cn-red-ficha-texto line-clamp-2"
                         title={actuacion.legalBasis}
                       >
                         {actuacion.legalBasis}
@@ -547,10 +542,10 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
                     Ahora el nombre manda y ocupa el ancho; el fundamento va
                     debajo, truncado con su `title` para leerlo completo.
                   */}
-                  <ol className="mt-2 space-y-1.5 pl-5">
+                  <ol className="cn-red-secciones">
                     {actuacion.requiredSections.map((sec) => (
-                      <li key={sec.n} className="flex min-w-0 items-baseline gap-1.5 text-meta">
-                        <span className="shrink-0 font-mono text-[10px] text-ink-400">{sec.n}.</span>
+                      <li key={sec.n} className="cn-red-seccion">
+                        <span className="cn-red-seccion-n">{sec.n}.</span>
                         {/*
                           JUSTIFICADO, como el escrito que va a producir. Los
                           nombres de sección de este catálogo son frases —«Los
@@ -566,8 +561,8 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
                           último renglón, que es lo que en columna estrecha
                           hace fea la justificación.
                         */}
-                        <span className="min-w-0 flex-1 text-justify [text-wrap:pretty]">
-                          <span className={sec.mandatory ? 'text-ink-900' : 'text-ink-500'}>
+                        <span className="cn-red-seccion-cuerpo">
+                          <span className={sec.mandatory ? 'cn-red-seccion-nombre' : 'cn-red-seccion-nombre cn-red-seccion-nombre--costumbre'}>
                             {sec.name}
                           </span>
                           {/*
@@ -576,15 +571,11 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
                             sección es un defecto o una elección de redacción.
                           */}
                           {sec.mandatory && (
-                            <span className="ml-1.5 whitespace-nowrap font-mono text-[9px] uppercase tracking-[0.08em] text-verified">
-                              oblig.
-                            </span>
+                            <span className="cn-red-oblig">oblig.</span>
                           )}
+                          {/* El fundamento de la sección sí es citable: va en mono. */}
                           {sec.basis && (
-                            <span
-                              className="mt-0.5 block truncate font-mono text-[10px] text-ink-400"
-                              title={sec.basis}
-                            >
+                            <span className="cn-red-seccion-base" title={sec.basis}>
                               {sec.basis}
                             </span>
                           )}
@@ -616,10 +607,10 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
                   href={actuacion.sourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1 border-t border-line-100 px-3 py-2 text-meta text-brand-700 hover:underline"
+                  className="cn-red-ficha-enlace"
                 >
                   Ver la norma
-                  <ExternalLink className="h-3 w-3" />
+                  <ExternalLink className="cn-red-ficha-enlace-icono" strokeWidth={1.8} aria-hidden />
                 </a>
               )}
             </div>
@@ -635,9 +626,9 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
             advertencia que parpadea enseña a ignorar todas las demás.
           */}
           {lookup.estado === 'SIN_CATALOGAR' && documentType && (
-            <p className="notice-unverified mt-3">
+            <p className="cn-red-aviso cn-red-aviso--sin">
               <span>
-                <b className="font-semibold">“{documentType}”</b> no está en el catálogo verificado.
+                <b className="cn-red-cifra">“{documentType}”</b> no está en el catálogo verificado.
                 El borrador usará la norma y el término que el modelo recuerde, no los comprobados.
               </span>
             </p>
@@ -651,8 +642,8 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
             inferior, y una nota de dos renglones empujando el boton hacia abajo
             lo saca del alcance.
           */}
-          <div className="mt-3 flex flex-col-reverse gap-2 border-t border-line-100 pt-3 lg:flex-row lg:items-center lg:gap-3">
-            <p className="text-meta leading-[1.4] text-ink-500">
+          <div className="cn-red-pie">
+            <p className="cn-red-pie-nota">
               {faltaActuacion
                 ? 'Elija la actuación arriba: es la que trae el artículo y el término verificados.'
                 : '3 modelos · el saldo se descuenta al terminar'}
@@ -661,7 +652,7 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
               type="submit"
               disabled={!legalPrompt.trim() || isProcessing || preparandoAdjuntos || faltaActuacion}
               title={faltaActuacion ? 'Elija la actuación en la barra de arriba' : undefined}
-              className="btn-primary h-12 w-full shrink-0 lg:ml-auto lg:h-auto lg:w-auto"
+              className="cn-red-generar"
             >
               {preparandoAdjuntos
                 ? 'Preparando adjuntos…'
@@ -709,20 +700,17 @@ const Fundamento: React.FC<{
   titulo: string;
   detalle: string;
 }> = ({ icono: Icono, titulo, detalle }) => (
-  <li className="flex items-start gap-2 px-3 py-2">
-    <Icono className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink-400" />
-    <div className="min-w-0">
-      <p className="text-meta font-medium text-ink-900">{titulo}</p>
+  <li className="cn-red-ficha-fila cn-red-ficha-par">
+    <Icono className="cn-red-ficha-icono" />
+    <div className="cn-red-ficha-textos">
+      <p className="cn-red-ficha-titulo">{titulo}</p>
       {/*
         Justificado y con `title`: son párrafos —un término del catálogo puede
         ser «Dentro de los diez (10) días siguientes a la presentación de la
         solicitud el juez proferirá el fallo…»— y el recorte a tres renglones
         esconde el resto, así que el texto completo vive en el `title`.
       */}
-      <p
-        className="mt-0.5 line-clamp-3 text-justify text-meta leading-[1.45] text-ink-500 [text-wrap:pretty]"
-        title={detalle}
-      >
+      <p className="cn-red-ficha-texto line-clamp-3" title={detalle}>
         {detalle}
       </p>
     </div>
